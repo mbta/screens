@@ -8,4 +8,5 @@ mix compile --force --warnings-as-errors
 
 mix coveralls.json -u
 
-bash <(curl -s https://codecov.io/bash)
+# TODO re-enable codecov when ready
+# bash <(curl -s https://codecov.io/bash)
