@@ -1,10 +1,1 @@
-<section class="phx-hero">
-  <h1>Screens</h1>
-</section>
-
-<section class="row">
-  <article class="column">
-    <h2>Hello</h2>
-    <p>Welcome to Screens.</p>
-  </article>
-</section>
+<div id="app"></div>
