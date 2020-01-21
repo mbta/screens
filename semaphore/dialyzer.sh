@@ -1,17 +1,10 @@
 #!/bin/bash
-set -ex
+set -e
 
-# make sure the dev-environment is setup
-mix do deps.get, deps.compile
-mix compile
-
-# copy any pre-built PLTs to the right directory
-find $SEMAPHORE_CACHE_DIR -name "dialyxir_*elixir-${ELIXIR_VERSION}_deps-dev.plt*" | xargs -I{} cp '{}' _build/dev
-
+export MIX_ENV=dev
+mix compile --force --warnings-as-errors
+find $SEMAPHORE_CACHE_DIR -name "dialyxir_*_deps-$MIX_ENV.plt*" | xargs -I{} cp '{}' _build/$MIX_ENV
 export ERL_CRASH_DUMP=/dev/null
 mix dialyzer --plt
-
-# copy build PLTs back
-cp _build/dev/*_deps-dev.plt* $SEMAPHORE_CACHE_DIR
-
+cp _build/$MIX_ENV/*_deps-$MIX_ENV.plt* $SEMAPHORE_CACHE_DIR
 mix dialyzer --halt-exit-status

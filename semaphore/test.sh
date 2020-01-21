@@ -1,12 +1,6 @@
 #!/bin/bash
-set -e -x
+set -e
 
-export MIX_ENV=test
-
-mix do deps.get, deps.compile
-mix compile --force --warnings-as-errors
-
-mix coveralls.json -u
-
-# TODO re-enable codecov when ready
-# bash <(curl -s https://codecov.io/bash)
+mix coveralls.json &&
+npm --prefix assets test
+# bash <(curl -s https://codecov.io/bash) -t $ARROW_CODECOV_TOKEN
