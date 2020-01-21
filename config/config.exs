@@ -10,7 +10,7 @@ use Mix.Config
 # Configures the endpoint
 config :screens, ScreensWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "37U2y654dUw1JztlrFmGFalNjiN+yxEX2wXQWvmxRlZ1y9gFt/pcZuqBfAOWDHZA",
+  secret_key_base: "0XmZH5iePmWrvV+PgrsU5z6WFgYupY2Zoh7FEk8pzuDLWftBrF/KtLBbG615wstt",
   render_errors: [view: ScreensWeb.ErrorView, accepts: ~w(html json)],
   pubsub: [name: Screens.PubSub, adapter: Phoenix.PubSub.PG2]
 
