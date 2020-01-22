@@ -3,11 +3,30 @@ declare function require(name: string): string;
 require("../css/app.scss");
 
 import "phoenix_html";
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
 function App(): JSX.Element {
-  return <div>Hello from React!</div>;
+  const [time, setTime] = useState(new Date().toLocaleTimeString());
+
+  useEffect(() => {
+    setTime(new Date().toLocaleTimeString());
+
+    const interval = setInterval(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div>
+      <div className="timestamp">{time}</div>
+      <div className="logo">
+        <img src="images/logo.svg" />
+      </div>
+    </div>
+  );
 }
 
 ReactDOM.render(<App />, document.getElementById("app"));
