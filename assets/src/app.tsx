@@ -17,6 +17,10 @@ interface Props {
   stopName?: string;
 }
 
+interface BodyProps {
+  data?: any;
+}
+
 const HomePage = (): JSX.Element => {
   return (
     <div>
@@ -29,12 +33,14 @@ const HomePage = (): JSX.Element => {
 const ScreenPage = (): JSX.Element => {
   const { id } = useParams();
   const [stopName, setStopName] = useState();
+  const [predictionRows, setPredictionRows] = useState();
 
   useEffect(() => {
     const myFunction = async () => {
       const result = await fetch(`/api/${id}`);
       const json = await result.json();
       setStopName(json.stop_name);
+      setPredictionRows(json.prediction_rows);
     };
 
     myFunction();
@@ -43,7 +49,7 @@ const ScreenPage = (): JSX.Element => {
   return (
     <div>
       <Header screenId={id} stopName={stopName} />
-      <Body />
+      <Body data={predictionRows} />
     </div>
   );
 };
@@ -71,12 +77,8 @@ const Header = ({ screenId, stopName }: Props): JSX.Element => {
   );
 };
 
-const Body = (): JSX.Element => {
-  return (
-    <div className="logo">
-      <img src="images/logo.svg" />
-    </div>
-  );
+const Body = ({ data }: BodyProps): JSX.Element => {
+  return <div className="logo">{JSON.stringify(data)}</div>;
 };
 
 const App = (): JSX.Element => {

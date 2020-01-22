@@ -4,13 +4,14 @@ defmodule Screens.V3Api do
   @default_opts [timeout: 2000, recv_timeout: 2000]
   @base_url "https://api-v3.mbta.com/"
 
-  def get_json(path, extra_headers \\ [], opts \\ []) do
+  def get_json(route, params \\ %{}, extra_headers \\ [], opts \\ []) do
     headers = extra_headers ++ api_key_headers(Application.get_env(:screens, :api_v3_key))
+    url = build_url(route, params)
 
     with {:http_request, {:ok, response}} <-
            {:http_request,
             HTTPoison.get(
-              @base_url <> path,
+              url,
               headers,
               Keyword.merge(@default_opts, opts)
             )},
@@ -30,6 +31,14 @@ defmodule Screens.V3Api do
       e ->
         {:error, e}
     end
+  end
+
+  defp build_url(route, params) when map_size(params) == 0 do
+    @base_url <> route
+  end
+
+  defp build_url(route, params) do
+    "#{@base_url}#{route}?#{URI.encode_query(params)}"
   end
 
   defp api_key_headers(nil), do: []
