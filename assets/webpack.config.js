@@ -7,10 +7,10 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = (env, options) => ({
   resolve: {
-    extensions: [".ts", ".tsx"]
+    extensions: [".ts", ".tsx", ".js", ".jsx"]
   },
   entry: {
-    "./src/app.ts": ["./src/app.ts"]
+    "./src/app.ts": ["./src/app.tsx"]
   },
   output: {
     filename: "app.js",
