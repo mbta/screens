@@ -17,10 +17,12 @@ defmodule ScreensWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    get "/:id", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", ScreensWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", ScreensWeb do
+    pipe_through [:api, :browser]
+
+    get "/:id", ApiController, :show
+  end
 end
