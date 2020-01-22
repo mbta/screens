@@ -26,7 +26,8 @@ config :screens,
   screen_data: %{
     "1" => %{stop_id: "place-bbsta"},
     "2" => %{stop_id: "5095"}
-  }
+  },
+  api_v3_key: "ba359ac2ed5b41a5b05bfae67321766a"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -14,7 +14,7 @@ import {
 
 interface Props {
   screenId?: string;
-  stopId?: string;
+  stopName?: string;
 }
 
 const HomePage = (): JSX.Element => {
@@ -28,13 +28,13 @@ const HomePage = (): JSX.Element => {
 
 const ScreenPage = (): JSX.Element => {
   const { id } = useParams();
-  const [stopId, setStopId] = useState();
+  const [stopName, setStopName] = useState();
 
   useEffect(() => {
     const myFunction = async () => {
       const result = await fetch(`/api/${id}`);
       const json = await result.json();
-      setStopId(json.stop_id);
+      setStopName(json.stop_name);
     };
 
     myFunction();
@@ -42,13 +42,13 @@ const ScreenPage = (): JSX.Element => {
 
   return (
     <div>
-      <Header screenId={id} stopId={stopId} />
+      <Header screenId={id} stopName={stopName} />
       <Body />
     </div>
   );
 };
 
-const Header = ({ screenId, stopId }: Props): JSX.Element => {
+const Header = ({ screenId, stopName }: Props): JSX.Element => {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const Header = ({ screenId, stopId }: Props): JSX.Element => {
   return (
     <div className="header">
       <span className="screen-id">
-        #{screenId}: {stopId}
+        #{screenId}: {stopName}
       </span>
       <span className="timestamp">{time}</span>
     </div>
