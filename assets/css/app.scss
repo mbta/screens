@@ -1,7 +1,15 @@
-.timestamp {
+.header {
   font-family: arial;
-  text-align: right;
   font-size: 48px;
+  height: 1.5em;
+}
+
+.screen-id {
+  float: left;
+}
+
+.timestamp {
+  float: right;
 }
 
 .logo {
