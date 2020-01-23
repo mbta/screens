@@ -3,19 +3,22 @@ defmodule Screens.Alerts.Alert do
 
   defstruct id: nil,
             effect: nil,
-            header: nil
+            header: nil,
+            informed_entities: nil
 
   @type t :: %__MODULE__{
           id: String.t(),
           effect: String.t(),
-          header: String.t()
+          header: String.t(),
+          informed_entities: list(map())
         }
 
   def to_map(alert) do
     %{
       id: alert.id,
       effect: alert.effect,
-      header: alert.header
+      header: alert.header,
+      informed_entities: alert.informed_entities
     }
   end
 
@@ -23,5 +26,22 @@ defmodule Screens.Alerts.Alert do
     with {:ok, result} <- Screens.V3Api.get_json("alerts", %{"filter[stop]" => stop_id}) do
       Screens.Alerts.Parser.parse_result(result)
     end
+  end
+
+  def associate_alerts_with_departures(alerts, departures) do
+    Enum.flat_map(alerts, fn alert -> associate_alert_with_departures(alert, departures) end)
+  end
+
+  defp associate_alert_with_departures(alert, departures) do
+    alert.informed_entities
+    |> Enum.flat_map(fn e -> match_departures_by_informed_entity(e, departures) end)
+    |> Enum.map(fn departure_id -> [alert.id, departure_id] end)
+  end
+
+  # Later, support informed entities other than bus routes
+  defp match_departures_by_informed_entity(%{"route" => route_id, "route_type" => 3}, departures) do
+    departures
+    |> Enum.filter(fn d -> d.route == route_id end)
+    |> Enum.map(& &1.id)
   end
 end
