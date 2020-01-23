@@ -24,8 +24,25 @@ config :phoenix, :json_library, Jason
 
 config :screens,
   screen_data: %{
-    "1" => %{stop_id: "place-bbsta"},
-    "2" => %{stop_id: "5095"}
+    "1" => %{stop_id: "1722"},
+    "2" => %{stop_id: "383"},
+    "3" => %{stop_id: "5496"},
+    "4" => %{stop_id: "2134"},
+    "5" => %{stop_id: "32549"},
+    "6" => %{stop_id: "22549"},
+    "7" => %{stop_id: "5615"},
+    "8" => %{stop_id: "36466"},
+    "9" => %{stop_id: "11257"},
+    "10" => %{stop_id: "58"},
+    "11" => %{stop_id: "21365"},
+    "12" => %{stop_id: "178"},
+    "13" => %{stop_id: "6564"},
+    "14" => %{stop_id: "1357"},
+    "15" => %{stop_id: "390"},
+    "16" => %{stop_id: "407"},
+    "17" => %{stop_id: "5605"},
+    "18" => %{stop_id: "637"},
+    "19" => %{stop_id: "8178"}
   },
   api_v3_key: "ba359ac2ed5b41a5b05bfae67321766a"
 
