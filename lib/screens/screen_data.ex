@@ -14,7 +14,7 @@ defmodule Screens.ScreenData do
   defp extract_stop_name_from_departures(departures) do
     departures
     |> Enum.map(& &1.stop_name)
-    |> Enum.reject(& is_nil/1)
+    |> Enum.reject(&is_nil/1)
     |> List.first()
   end
 

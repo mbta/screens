@@ -12,73 +12,156 @@ import {
   useParams
 } from "react-router-dom";
 
-interface Props {
-  screenId?: string;
+import moment from "moment";
+
+interface HeaderProps {
   stopName?: string;
+  currentTime?: string;
 }
 
-interface BodyProps {
+interface RowProps {
   data?: any;
+}
+
+interface TimeProps {
+  data?: any;
+  currentTimeString?: any;
 }
 
 const HomePage = (): JSX.Element => {
   return (
-    <div>
-      <Header />
-      <Body />
+    <div className="logo">
+      <img src="images/logo.svg" />
     </div>
   );
 };
 
 const ScreenPage = (): JSX.Element => {
   const { id } = useParams();
+  const [currentTime, setCurrentTime] = useState();
   const [stopName, setStopName] = useState();
   const [departureRows, setDepartureRows] = useState();
 
-  useEffect(() => {
-    const myFunction = async () => {
-      const result = await fetch(`/api/${id}`);
-      const json = await result.json();
-      setStopName(json.stop_name);
-      setDepartureRows(json.departure_rows);
-    };
-
-    myFunction();
-  }, []);
-
-  return (
-    <div>
-      <Header screenId={id} stopName={stopName} />
-      <Body data={departureRows} />
-    </div>
-  );
-};
-
-const Header = ({ screenId, stopName }: Props): JSX.Element => {
-  const [time, setTime] = useState(new Date().toLocaleTimeString());
+  const doUpdate = async () => {
+    const result = await fetch(`/api/${id}`);
+    const json = await result.json();
+    setCurrentTime(json.current_time);
+    setStopName(json.stop_name);
+    setDepartureRows(json.departure_rows);
+  };
 
   useEffect(() => {
-    setTime(new Date().toLocaleTimeString());
+    doUpdate();
 
     const interval = setInterval(() => {
-      setTime(new Date().toLocaleTimeString());
-    }, 10000);
+      doUpdate();
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="header">
-      <span className="screen-id">
-        #{screenId}: {stopName}
-      </span>
-      <span className="timestamp">{time}</span>
+    <div>
+      <Header stopName={stopName} currentTime={currentTime} />
+      <DepartureContainer
+        data={departureRows}
+        currentTimeString={currentTime}
+      />
     </div>
   );
 };
 
-const Body = ({ data }: BodyProps): JSX.Element => {
-  return <div className="logo">{JSON.stringify(data)}</div>;
+const Header = ({ stopName, currentTime }: HeaderProps): JSX.Element => {
+  const timeString = moment(currentTime).format("h:mm");
+
+  return (
+    <div className="header">
+      <div className="header-time">{timeString}</div>
+      <div className="header-realtime-indicator">UPDATED LIVE EVERY MINUTE</div>
+      <div className="header-stopname">{stopName}</div>
+    </div>
+  );
+};
+
+const DepartureContainer = ({
+  data,
+  currentTimeString
+}: TimeProps): JSX.Element => {
+  const rows = data || [];
+  return (
+    <div className="departures-container">
+      {rows.map((row: any) => (
+        <DepartureRow
+          data={row}
+          currentTimeString={currentTimeString}
+          key={row.route + row.time}
+        />
+      ))}
+    </div>
+  );
+};
+
+const DepartureRow = ({ data, currentTimeString }: TimeProps): JSX.Element => {
+  return (
+    <div className="departure-container">
+      <DepartureRoute data={data.route} />
+      <DepartureDestination data={data.destination} />
+      <DepartureTime data={data.time} currentTimeString={currentTimeString} />
+    </div>
+  );
+};
+
+const DepartureRoute = ({ data }: RowProps): JSX.Element => {
+  return (
+    <div className="departure-route-pill">
+      <span className="departure-route-number">{data}</span>
+    </div>
+  );
+};
+
+const DepartureDestination = ({ data }: RowProps): JSX.Element => {
+  if (data.includes("via")) {
+    const parts = data.split(" via ");
+    const primaryDestination = parts[0];
+    const secondaryDestination = "via " + parts[1];
+
+    return (
+      <div className="departure-destination">
+        <div className="departure-destination-container">
+          <div className="departure-destination-primary">
+            {primaryDestination}
+          </div>
+          <div className="departure-destination-secondary">
+            {secondaryDestination}
+          </div>
+        </div>
+      </div>
+    );
+  } else {
+    return (
+      <div className="departure-destination">
+        <div className="departure-destination-container">
+          <div className="departure-destination-primary">{data}</div>
+        </div>
+      </div>
+    );
+  }
+};
+
+const DepartureTime = ({ data, currentTimeString }: TimeProps): JSX.Element => {
+  const departureTime = moment(data);
+  const currentTime = moment(currentTimeString);
+  const minuteDifference = departureTime.diff(currentTime, "minutes");
+
+  if (minuteDifference < 2) {
+    return <div className="departure-time">Now</div>;
+  } else if (minuteDifference < 60) {
+    return <div className="departure-time">{minuteDifference}m</div>;
+  } else {
+    return (
+      <div className="departure-time">{departureTime.format("h:mm A")}</div>
+    );
+  }
 };
 
 const App = (): JSX.Element => {
