@@ -1,4 +1,4 @@
-defmodule Screens.Predictions.Parser do
+defmodule Screens.Schedules.Parser do
   @moduledoc false
 
   def parse_result(result) do
@@ -12,9 +12,9 @@ defmodule Screens.Predictions.Parser do
     |> parse_data(included_data)
   end
 
-  defp parse_data(data, included_data) do
+  def parse_data(data, included_data) do
     data
-    |> Enum.map(fn item -> parse_prediction(item, included_data) end)
+    |> Enum.map(fn item -> parse_schedule(item, included_data) end)
     |> Enum.reject(&is_nil(&1.time))
   end
 
@@ -26,19 +26,15 @@ defmodule Screens.Predictions.Parser do
     |> Enum.into(%{})
   end
 
-  defp parse_included(%{"type" => "stop"} = item) do
-    Screens.Stops.Parser.parse_stop(item)
+  defp parse_included(%{"type" => "trip"} = item) do
+    Screens.Trips.Parser.parse_trip(item)
   end
 
   defp parse_included(%{"type" => "route"} = item) do
     Screens.Routes.Parser.parse_route(item)
   end
 
-  defp parse_included(%{"type" => "trip"} = item) do
-    Screens.Trips.Parser.parse_trip(item)
-  end
-
-  def parse_prediction(
+  def parse_schedule(
         %{"id" => id, "attributes" => attributes, "relationships" => relationships},
         included_data
       ) do
@@ -46,19 +42,16 @@ defmodule Screens.Predictions.Parser do
     time = parse_time(time_string)
 
     %{
-      "route" => %{"data" => %{"id" => route_id}},
-      "stop" => %{"data" => %{"id" => stop_id}},
-      "trip" => %{"data" => %{"id" => trip_id}}
+      "trip" => %{"data" => %{"id" => trip_id}},
+      "route" => %{"data" => %{"id" => route_id}}
     } = relationships
 
     trip = Map.get(included_data, {"trip", trip_id})
-    stop = Map.get(included_data, {"stop", stop_id})
     route = Map.get(included_data, {"route", route_id})
 
-    %Screens.Predictions.Prediction{
+    %Screens.Schedules.Schedule{
       id: id,
       trip: trip,
-      stop: stop,
       route: route,
       time: time
     }

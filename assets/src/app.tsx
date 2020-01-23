@@ -33,14 +33,14 @@ const HomePage = (): JSX.Element => {
 const ScreenPage = (): JSX.Element => {
   const { id } = useParams();
   const [stopName, setStopName] = useState();
-  const [predictionRows, setPredictionRows] = useState();
+  const [departureRows, setDepartureRows] = useState();
 
   useEffect(() => {
     const myFunction = async () => {
       const result = await fetch(`/api/${id}`);
       const json = await result.json();
       setStopName(json.stop_name);
-      setPredictionRows(json.prediction_rows);
+      setDepartureRows(json.departure_rows);
     };
 
     myFunction();
@@ -49,7 +49,7 @@ const ScreenPage = (): JSX.Element => {
   return (
     <div>
       <Header screenId={id} stopName={stopName} />
-      <Body data={predictionRows} />
+      <Body data={departureRows} />
     </div>
   );
 };
