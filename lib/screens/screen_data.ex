@@ -3,11 +3,13 @@ defmodule Screens.ScreenData do
 
   def by_stop_id(stop_id) do
     departures = Screens.Departures.Departure.by_stop_id(stop_id)
+    alerts = Screens.Alerts.Alert.by_stop_id(stop_id)
 
     %{
       current_time: DateTime.utc_now() |> DateTime.truncate(:second) |> DateTime.to_iso8601(),
       stop_name: extract_stop_name_from_departures(departures),
-      departure_rows: format_departure_rows(departures)
+      departure_rows: format_departure_rows(departures),
+      alerts: format_alerts(alerts)
     }
   end
 
@@ -20,5 +22,9 @@ defmodule Screens.ScreenData do
 
   defp format_departure_rows(departures) do
     Enum.map(departures, &Screens.Departures.Departure.to_map/1)
+  end
+
+  defp format_alerts(alerts) do
+    Enum.map(alerts, &Screens.Alerts.Alert.to_map/1)
   end
 end
