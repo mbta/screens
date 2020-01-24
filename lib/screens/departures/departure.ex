@@ -1,13 +1,15 @@
 defmodule Screens.Departures.Departure do
   @moduledoc false
 
-  defstruct stop_name: nil,
+  defstruct id: nil,
+            stop_name: nil,
             route: nil,
             destination: nil,
             time: nil,
             realtime: nil
 
   @type t :: %__MODULE__{
+          id: String.t(),
           stop_name: String.t(),
           route: String.t(),
           destination: String.t(),
@@ -24,6 +26,7 @@ defmodule Screens.Departures.Departure do
 
   def to_map(d) do
     %{
+      id: d.id,
       route: d.route,
       destination: d.destination,
       time: d.time,
@@ -33,6 +36,7 @@ defmodule Screens.Departures.Departure do
 
   def from_prediction(p) do
     %Screens.Departures.Departure{
+      id: p.id,
       stop_name: p.stop.name,
       route: p.route.short_name,
       destination: p.trip.headsign,
@@ -43,6 +47,7 @@ defmodule Screens.Departures.Departure do
 
   def from_schedule(s) do
     %Screens.Departures.Departure{
+      id: s.id,
       stop_name: nil,
       route: s.route.short_name,
       destination: s.trip.headsign,
