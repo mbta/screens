@@ -23,7 +23,9 @@ defmodule Screens.ScreenData do
   end
 
   defp format_departure_rows(departures) do
-    Enum.map(departures, &Screens.Departures.Departure.to_map/1)
+    departures
+    |> Enum.filter(& &1.realtime)
+    |> Enum.map(&Screens.Departures.Departure.to_map/1)
   end
 
   defp format_alerts(alerts) do

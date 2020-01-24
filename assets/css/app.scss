@@ -1,34 +1,61 @@
 body {
-  margin: 0px;
+  margin: 40px auto;
   padding: 0px;
+  width: 1200px;
+  height: 1600px;
+  border: 1px solid black;
 }
 
 .header {
   background-color: black;
   color: white;
-  font-family: arial;
-  font-size: 48px;
-  height: 3em;
+  font-family: Helvetica Neue;
+  height: 288px;
   position: relative;
 }
 
 .header-time {
-  float: right;
+  position: absolute;
+  top: 28px;
+  right: 40px;
+
+  font-size: 72px;
+  color: #ffffff;
+  letter-spacing: 0;
+  text-align: right;
+  line-height: 72px;
+  font-family: Helvetica Neue;
+  font-weight: 400;
 }
 
 .header-realtime-indicator {
-  font-size: 18px;
   position: absolute;
-  bottom: 0px;
-  right: 0px;
-  width: 144px;
+  right: 40px;
+  bottom: 47px;
+  width: 196px;
+
+  font-size: 24px;
+  color: #ffffff;
+  text-align: right;
+  line-height: 32px;
+  font-family: Helvetica Neue;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
 .header-stopname {
+  width: 720px;
+
+  font-family: Helvetica Neue;
+  font-size: 72px;
   font-weight: bold;
+
+  color: #ffffff;
+  letter-spacing: 1px;
+
   position: absolute;
-  bottom: 0px;
-  left: 0px;
+  bottom: 42px;
+  left: 56px;
 }
 
 .logo {
@@ -40,34 +67,63 @@ body {
 
 .departures-container {
   display: grid;
-  grid-template-columns: 20% 60% 20%;
+  grid-template-columns: 35% 35% 30%;
   grid-row-gap: 8px;
   padding: 8px;
 }
 
-.departure-container {
+.departures-row {
   display: contents;
-  margin: 8px;
+}
+
+.departures-row-container {
+  display: contents;
+}
+
+.departure-row {
+  display: contents;
+}
+
+.departure-row-hairline {
+  grid-column: 1 / -1;
+  height: 1px;
+  background-color: black;
+  margin-left: 32px;
+  margin-right: 40px;
+}
+
+.departure-route {
+
+}
+
+.departure-route-first {
+  margin-top: 44px;
+}
+
+.departure-route-last {
+  margin-bottom: 46px;
 }
 
 .departure-route-pill {
-  width: 150px;
-  height: 80px;
-  font-family: arial;
+  width: 356px;
+  height: 172px;
+  font-family: Helvetica Neue;
   font-weight: bold;
   background: black;
-  border-radius: 40px;
+  border-radius: 144px;
   display: grid;
+  margin-left: 32px;
 }
 
 .departure-route-number {
   color: white;
-  font-size: 48px;
+  font-size: 144px;
+  letter-spacing: 5px;
   margin: auto;
 }
 
 .departure-destination {
-  font-family: arial;
+  font-family: Helvetica Neue;
   display: grid;
 }
 
@@ -76,18 +132,65 @@ body {
   margin-bottom: auto;
 }
 
+.departure-destination-first {
+  margin-top: 44px;
+}
+
+.departure-destination-last {
+  margin-bottom: 46px;
+}
+
 .departure-destination-primary {
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 72px;
+  font-weight: 500;
 }
 
 .departure-destination-secondary {
-  font-size: 18px;
-  font-weight: lighter;
+  font-size: 44px;
+  font-weight: 400;
 }
 
 .departure-time {
-  font-family: arial;
+  font-family: Helvetica Neue;
   font-size: 48px;
   font-weight: bold;
+  text-align: right;
+  margin-right: 40px;
+}
+
+.departure-time-first {
+  margin-top: 44px;
+}
+
+.departure-time-last {
+  margin-bottom: 46px;
+}
+
+.departure-time-now {
+  font-size: 144px;
+  font-family: Helvetica Neue;
+  font-weight: bold;
+  letter-spacing: 0;
+}
+
+.departure-time-minutes {
+  font-size: 144px;
+  font-family: Helvetica Neue;
+  font-weight: bold;
+  letter-spacing: 0;
+}
+
+.departure-time-minutes-label {
+  font-size: 105px;
+  line-height: 144px;
+  font-family: Helvetica Neue;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-align: right;
+}
+
+.departure-line {
+  grid-column: 1 / -1;
+  background: black;
+  height: 1px;
 }
