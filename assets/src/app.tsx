@@ -22,12 +22,26 @@ const HomePage = (): JSX.Element => {
   );
 };
 
-const ScreenPage = (): JSX.Element => {
-  return <ScreenContainer />;
+const MultiScreenPage = (): JSX.Element => {
+  return (
+    <div className="multi-screen-container">
+      {[...Array(19)].map((_, i) => (
+        <ScreenContainer id={i + 1} key={i} />
+      ))}
+    </div>
+  );
 };
 
-const ScreenContainer = (): JSX.Element => {
+const ScreenPage = (): JSX.Element => {
   const { id } = useParams();
+  return (
+    <div className="screen-container">
+      <ScreenContainer id={id} />
+    </div>
+  );
+};
+
+const ScreenContainer = ({ id }): JSX.Element => {
   const [currentTimeString, setCurrentTimeString] = useState();
   const [stopName, setStopName] = useState();
   const [alerts, setAlerts] = useState();
@@ -55,13 +69,35 @@ const ScreenContainer = (): JSX.Element => {
   }, []);
 
   return (
-    <TopScreenContainer
-      stopName={stopName}
-      currentTimeString={currentTimeString}
-      departureRows={departureRows}
-      alerts={alerts}
-      departuresAlerts={departuresAlerts}
-    />
+    <div className="dual-screen-container">
+      <TopScreenContainer
+        stopName={stopName}
+        currentTimeString={currentTimeString}
+        departureRows={departureRows}
+        alerts={alerts}
+        departuresAlerts={departuresAlerts}
+      />
+      <div className="screen-spacer"></div>
+      <BottomScreenContainer
+        departureRows={departureRows}
+        alerts={alerts}
+        departuresAlerts={departuresAlerts}
+      />
+    </div>
+  );
+};
+
+const BottomScreenContainer = ({
+  departureRows,
+  alerts,
+  departuresAlerts
+}): JSX.Element => {
+  return (
+    <div className="single-screen-container">
+      <div>{JSON.stringify(alerts)}</div>
+      <div>{JSON.stringify(departuresAlerts)}</div>
+      <div>{JSON.stringify(departureRows)}</div>
+    </div>
   );
 };
 
@@ -73,7 +109,7 @@ const TopScreenContainer = ({
   departuresAlerts
 }): JSX.Element => {
   return (
-    <div>
+    <div className="single-screen-container">
       <Header stopName={stopName} currentTimeString={currentTimeString} />
       <DeparturesContainer
         currentTimeString={currentTimeString}
@@ -99,6 +135,8 @@ const buildDeparturesRows = departuresRows => {
   if (!departuresRows) {
     return [];
   }
+
+  departuresRows = departuresRows.slice(0, 5);
 
   const rows = [];
   departuresRows.forEach(row => {
@@ -145,7 +183,12 @@ const DeparturesContainer = ({
   );
 };
 
-const DeparturesRow = ({ currentTimeString, route, destination, departureTimes }): JSX.Element => {
+const DeparturesRow = ({
+  currentTimeString,
+  route,
+  destination,
+  departureTimes
+}): JSX.Element => {
   return (
     <div className="departures-row">
       <div className="departures-row-container">
@@ -166,12 +209,28 @@ const DeparturesRow = ({ currentTimeString, route, destination, departureTimes }
   );
 };
 
-const DepartureRow = ({ currentTimeString, route, destination, time, first, last }): JSX.Element => {
+const DepartureRow = ({
+  currentTimeString,
+  route,
+  destination,
+  time,
+  first,
+  last
+}): JSX.Element => {
   return (
     <div className="departure-row">
       <DepartureRoute route={route} first={first} last={last} />
-      <DepartureDestination destination={destination} first={first} last={last} />
-      <DepartureTime time={time} currentTimeString={currentTimeString} first={first} last={last} />
+      <DepartureDestination
+        destination={destination}
+        first={first}
+        last={last}
+      />
+      <DepartureTime
+        time={time}
+        currentTimeString={currentTimeString}
+        first={first}
+        last={last}
+      />
     </div>
   );
 };
@@ -179,7 +238,8 @@ const DepartureRow = ({ currentTimeString, route, destination, time, first, last
 const DepartureRoute = ({ route, first, last }): JSX.Element => {
   let containerClass;
   if (first && last) {
-    containerClass = "departure-route departure-route-first departure-route-last";
+    containerClass =
+      "departure-route departure-route-first departure-route-last";
   } else if (first) {
     containerClass = "departure-route departure-route-first";
   } else if (last) {
@@ -197,16 +257,15 @@ const DepartureRoute = ({ route, first, last }): JSX.Element => {
       </div>
     );
   } else {
-    return (
-      <div className={containerClass}></div>
-    );
+    return <div className={containerClass}></div>;
   }
 };
 
 const DepartureDestination = ({ destination, first, last }): JSX.Element => {
   let containerClass;
   if (first && last) {
-    containerClass = "departure-destination departure-destination-first departure-destination-last";
+    containerClass =
+      "departure-destination departure-destination-first departure-destination-last";
   } else if (first) {
     containerClass = "departure-destination departure-destination-first";
   } else if (last) {
@@ -216,9 +275,7 @@ const DepartureDestination = ({ destination, first, last }): JSX.Element => {
   }
 
   if (destination === undefined) {
-    return (
-      <div className={containerClass}></div>
-    );
+    return <div className={containerClass}></div>;
   }
 
   if (destination.includes("via")) {
@@ -249,7 +306,12 @@ const DepartureDestination = ({ destination, first, last }): JSX.Element => {
   }
 };
 
-const DepartureTime = ({ time, currentTimeString, first, last }): JSX.Element => {
+const DepartureTime = ({
+  time,
+  currentTimeString,
+  first,
+  last
+}): JSX.Element => {
   const departureTime = moment(time);
   const currentTime = moment(currentTimeString);
   const minuteDifference = departureTime.diff(currentTime, "minutes");
@@ -276,7 +338,11 @@ const DepartureTime = ({ time, currentTimeString, first, last }): JSX.Element =>
     );
   } else {
     return (
-      <div className={timeContainerClass}>{departureTime.format("h:mm A")}</div>
+      <div className={timeContainerClass}>
+        <span className="departure-time-timestamp">
+          {departureTime.format("h:mm A")}
+        </span>
+      </div>
     );
   }
 };
@@ -286,7 +352,8 @@ const App = (): JSX.Element => {
     <Router>
       <Switch>
         <Route exact path="/">
-          <HomePage />
+          {/* <HomePage /> */}
+          <MultiScreenPage />
         </Route>
         <Route path="/:id">
           <ScreenPage />

@@ -1,9 +1,24 @@
-body {
+.multi-screen-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+}
+
+.dual-screen-container {
+}
+
+.single-screen-container {
   margin: 40px auto;
   padding: 0px;
   width: 1200px;
   height: 1600px;
   border: 1px solid black;
+}
+
+.screen-spacer {
+  margin: 40px auto;
+  padding: 0px;
+  width: 1200px;
+  height: 200px;
 }
 
 .header {
@@ -33,6 +48,7 @@ body {
   right: 40px;
   bottom: 47px;
   width: 196px;
+  height: 64px;
 
   font-size: 24px;
   color: #ffffff;
@@ -44,7 +60,7 @@ body {
 }
 
 .header-stopname {
-  width: 720px;
+  width: 820px;
 
   font-family: Helvetica Neue;
   font-size: 72px;
@@ -86,14 +102,13 @@ body {
 
 .departure-row-hairline {
   grid-column: 1 / -1;
-  height: 1px;
+  height: 4px;
   background-color: black;
   margin-left: 32px;
   margin-right: 40px;
 }
 
 .departure-route {
-
 }
 
 .departure-route-first {
@@ -185,6 +200,15 @@ body {
   line-height: 144px;
   font-family: Helvetica Neue;
   font-weight: 400;
+  letter-spacing: 0;
+  text-align: right;
+}
+
+.departure-time-timestamp {
+  font-size: 72px;
+  line-height: 144px;
+  font-family: Helvetica Neue;
+  font-weight: bold;
   letter-spacing: 0;
   text-align: right;
 }
