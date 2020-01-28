@@ -96,6 +96,88 @@
   height: 1180px;
 }
 
+.later-departures-container {
+
+}
+
+.later-departure-row-container {
+  display: flex;
+}
+
+.later-departure-row-hairline {
+  height: 4px;
+  background-color: #808080;
+  margin-left: 40px;
+  margin-right: 40px;
+}
+
+.later-departure-route-container {
+  width: 254px;
+  height: 130px;
+}
+
+.later-departure-route-pill {
+  width: 178px;
+  height: 86px;
+  background-color: black;
+  border-radius: 72px;
+  margin-top: 22px;
+  margin-left: 44px;
+  display: grid;
+}
+
+.later-departure-route-number {
+  color: white;
+  font-size: 72px;
+  font-family: Helvetica Neue;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin: auto;
+}
+
+.later-departure-destination-container {
+  width: 646px;
+  display: grid;
+}
+
+.later-departure-destination-text {
+  font-family: Helvetica Neue;
+  font-size: 54px;
+  margin-top: auto;
+  margin-bottom: auto;
+  font-weight: 500;
+}
+
+.later-departure-time-container {
+  width: 300px;
+  font-family: Helvetica Neue;
+  text-align: right;
+  margin-right: 40px;
+  margin-top: 22px;
+}
+
+.later-departure-time-now {
+  font-size: 72px;
+  font-weight: bold;
+}
+
+.later-departure-time-minutes {
+  font-size: 72px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.later-departure-time-minutes-label {
+  text-align: right;
+  font-size: 52.5px;
+  line-height: 72px;
+}
+
+.later-departure-time-timestamp {
+  font-size: 72px;
+  font-weight: bold;
+}
+
 .alert-container {
   background: black;
   color: white;

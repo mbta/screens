@@ -9,7 +9,8 @@ import React, {
   useEffect,
   useLayoutEffect,
   useRef,
-  useState
+  useState,
+  forwardRef
 } from "react";
 import ReactDOM from "react-dom";
 import {
@@ -77,6 +78,16 @@ const ScreenContainer = ({ id }): JSX.Element => {
     return () => clearInterval(interval);
   }, []);
 
+  const [numRows, setNumRows] = useState(7);
+  const ref = useRef(null);
+
+  useLayoutEffect(() => {
+    const height = ref.current.clientHeight;
+    if (height > 1312) {
+      setNumRows(numRows - 1);
+    }
+  });
+
   return (
     <div className="dual-screen-container">
       <TopScreenContainer
@@ -85,6 +96,8 @@ const ScreenContainer = ({ id }): JSX.Element => {
         departureRows={departureRows}
         alerts={alerts}
         departuresAlerts={departuresAlerts}
+        numRows={numRows}
+        ref={ref}
       />
       <div className="screen-spacer"></div>
       <BottomScreenContainer
@@ -92,6 +105,8 @@ const ScreenContainer = ({ id }): JSX.Element => {
         alerts={alerts}
         departuresAlerts={departuresAlerts}
         stopId={stopId}
+        numRows={numRows}
+        currentTime={currentTimeString}
       />
     </div>
   );
@@ -101,18 +116,19 @@ const BottomScreenContainer = ({
   departureRows,
   alerts,
   departuresAlerts,
-  stopId
+  stopId,
+  numRows, currentTime
 }): JSX.Element => {
   return (
     <div className="single-screen-container">
-      <FlexZoneContainer alerts={alerts} />
+      <FlexZoneContainer alerts={alerts} departureRows={departureRows} numRows={numRows} currentTime={currentTime} />
       <FareInfo />
       <DigitalBridge stopId={stopId} />
     </div>
   );
 };
 
-const FlexZoneContainer = ({alerts}): JSX.Element => {
+const FlexZoneContainer = ({alerts, departureRows, numRows, currentTime}): JSX.Element => {
   let alert;
 
   if (alerts) {
@@ -124,14 +140,111 @@ const FlexZoneContainer = ({alerts}): JSX.Element => {
   }
 
   if (!alert) {
-    return <div className="flex-zone-container"></div>;
+    return (
+      <div className="flex-zone-container">
+        <LaterDepartures departureRows={departureRows} startIndex={numRows} />
+      </div>
+    );
   }
 
   return (
     <div className="flex-zone-container">
+      <LaterDepartures departureRows={departureRows} startIndex={numRows} currentTime={currentTime} />
       <FlexZoneAlert alert={alert} />
     </div>
   );
+};
+
+const LaterDepartures = ({departureRows, startIndex, currentTime}): JSX.Element => {
+  if (!departureRows) {
+    return (
+      <div className="later-departures-container"></div>
+    );
+  }
+
+  const laterDepartureRows = departureRows.slice(startIndex, startIndex + 4);
+
+  if (laterDepartureRows.length == 0) {
+    return (
+      <div className="later-departures-container"></div>
+    );
+  }
+
+  return (
+    <div className="later-departures-container">
+      {laterDepartureRows.map((row) => (
+        <div>
+          <LaterDepartureRow
+            route={row.route}
+            destination={row.destination}
+            time={row.time}
+            currentTime={currentTime}
+            key={row.route + row.time}
+          />
+          <div className="later-departure-row-hairline"></div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const LaterDepartureRow = ({route, destination, time, currentTime}): JSX.Element => {
+  return (
+    <div className="later-departure-row-container">
+      <LaterDepartureRoute route={route} />
+      <LaterDepartureDestination destination={destination} />
+      <LaterDepartureTime time={time} currentTimeString={currentTime} />
+    </div>
+  );
+};
+
+const LaterDepartureRoute = ({route}): JSX.Element => {
+  return (
+    <div className="later-departure-route-container">
+      <div className="later-departure-route-pill">
+        <span className="later-departure-route-number">{route}</span>
+      </div>
+    </div>
+  );
+};
+
+const LaterDepartureDestination = ({destination}): JSX.Element => {
+  return (
+    <div className="later-departure-destination-container">
+      <div className="later-departure-destination-text">
+        { destination }
+      </div>
+    </div>
+  );
+};
+
+const LaterDepartureTime = ({time, currentTimeString}): JSX.Element => {
+  const departureTime = moment(time);
+  const currentTime = moment(currentTime);
+  const minuteDifference = departureTime.diff(currentTime, "minutes");
+
+  if (minuteDifference < 2) {
+      return (
+        <div className="later-departure-time-container">
+          <span className="later-departure-time-now">Now</span>
+        </div>
+      );
+    } else if (minuteDifference < 60) {
+      return (
+        <div className="later-departure-time-container">
+          <span className="later-departure-time-minutes">{minuteDifference}</span>
+          <span className="later-departure-time-minutes-label">m</span>
+        </div>
+      );
+    } else {
+      return (
+        <div className="later-departure-time-container">
+          <span className="later-departure-time-timestamp">
+            {departureTime.format("h:mm A")}
+          </span>
+        </div>
+      );
+    }
 };
 
 const FlexZoneAlert = ({alert}): JSX.Element => {
@@ -208,13 +321,14 @@ const DigitalBridge = ({ stopId }): JSX.Element => {
   );
 };
 
-const TopScreenContainer = ({
+const TopScreenContainer = forwardRef(({
   stopName,
   currentTimeString,
   departureRows,
   alerts,
-  departuresAlerts
-}): JSX.Element => {
+  departuresAlerts,
+  numRows
+}, ref): JSX.Element => {
   return (
     <div className="single-screen-container">
       <Header stopName={stopName} currentTimeString={currentTimeString} />
@@ -223,10 +337,12 @@ const TopScreenContainer = ({
         departureRows={departureRows}
         alerts={alerts}
         departuresAlerts={departuresAlerts}
+        numRows={numRows}
+        ref={ref}
       />
     </div>
   );
-};
+});
 
 const Header = ({ stopName, currentTimeString }): JSX.Element => {
   const ref = useRef(null);
@@ -264,7 +380,7 @@ const buildDeparturesRows = (
     return [];
   }
 
-  departuresRows = departuresRows.slice(0, numRows + 1);
+  departuresRows = departuresRows.slice(0, numRows);
 
   const rows = [];
   departuresRows.forEach(row => {
@@ -303,22 +419,13 @@ const buildDeparturesRows = (
   return rows;
 };
 
-const DeparturesContainer = ({
+const DeparturesContainer = forwardRef(({
   currentTimeString,
   departureRows,
   alerts,
-  departuresAlerts
-}): JSX.Element => {
-  const [numRows, setNumRows] = useState(7);
-  const ref = useRef(null);
-
-  useLayoutEffect(() => {
-    const height = ref.current.clientHeight;
-    if (height > 1312) {
-      setNumRows(numRows - 1);
-    }
-  });
-
+  departuresAlerts,
+  numRows
+}, ref) => {
   const rows = buildDeparturesRows(
     departureRows,
     alerts,
@@ -341,7 +448,7 @@ const DeparturesContainer = ({
       ))}
     </div>
   );
-};
+});
 
 const DeparturesRow = ({
   currentTimeString,
