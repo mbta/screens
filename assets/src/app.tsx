@@ -105,15 +105,48 @@ const BottomScreenContainer = ({
 }): JSX.Element => {
   return (
     <div className="single-screen-container">
-      <FlexZoneContainer />
+      <FlexZoneContainer alerts={alerts} />
       <FareInfo />
       <DigitalBridge stopId={stopId} />
     </div>
   );
 };
 
-const FlexZoneContainer = (): JSX.Element => {
-  return <div className="flex-zone-container"></div>;
+const FlexZoneContainer = ({alerts}): JSX.Element => {
+  let alert;
+
+  if (alerts) {
+    alerts.forEach(al => {
+      if (al.effect !== "DELAY") {
+        alert = al;
+      }
+    });
+  }
+
+  if (!alert) {
+    return <div className="flex-zone-container"></div>;
+  }
+
+  return (
+    <div className="flex-zone-container">
+      <FlexZoneAlert alert={alert} />
+    </div>
+  );
+};
+
+const FlexZoneAlert = ({alert}): JSX.Element => {
+  return (
+    <div className="alert-container">
+      <div className="alert-icon-container">
+        <img className="alert-icon-image" src="images/logo-white.svg" />
+      </div>
+      {/*<div className="alert-updated-timestamp">{alert.updated_at}</div>*/}
+      <div className="alert-description-container">
+       <div className="alert-description-header">{alert.effect.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})}</div>
+       <div className="alert-description-description">{alert.header}</div>
+      </div>
+    </div>
+  );
 };
 
 const FareInfo = (): JSX.Element => {
@@ -166,9 +199,8 @@ const DigitalBridge = ({ stopId }): JSX.Element => {
         <div className="digital-bridge-qr-image-container">
           <QRCode
             className="digital-bridge-qr-image"
-            size="112"
+            size={112}
             value={"www.mbta.com/stops/" + stopId}
-            renderAs="svg"
           />
         </div>
       </div>
