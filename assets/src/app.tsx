@@ -138,7 +138,7 @@ const FlexZoneAlert = ({alert}): JSX.Element => {
   return (
     <div className="alert-container">
       <div className="alert-icon-container">
-        <img className="alert-icon-image" src="images/logo-white.svg" />
+        <img className="alert-icon-image" src="images/no-service.svg" />
       </div>
       {/*<div className="alert-updated-timestamp">{alert.updated_at}</div>*/}
       <div className="alert-description-container">
@@ -153,7 +153,7 @@ const FareInfo = (): JSX.Element => {
   return (
     <div className="fare-container">
       <div className="fare-icon-container">
-        <img className="fare-icon-image" src="images/logo.svg" />
+        <img className="fare-icon-image" src="images/bus.svg" />
       </div>
       <div className="fare-info-container">
         <div className="fare-info-header">One Way Bus Fares</div>
