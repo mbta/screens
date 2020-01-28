@@ -92,6 +92,109 @@
   width: 50%;
 }
 
+.flex-zone-container {
+  height: 1180px;
+}
+
+.fare-container {
+  height: 248px;
+  display: flex;
+}
+
+.fare-icon-container {
+  width: 208px;
+}
+
+.fare-icon-image {
+  height: 128px;
+  width: 128px;
+  margin: 48px 40px 87px 40px;
+  padding: 0px;
+}
+
+.fare-info-container {
+  width: 992px;
+}
+
+.fare-info-header {
+  font-size: 36px;
+  line-height: 36px;
+  font-family: Helvetica Neue;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-top: 48px;
+  margin-bottom: 19px;
+}
+
+.fare-info-rows {
+  font-family: Helvetica Neue;
+}
+
+.fare-info-row {
+}
+
+.fare-info-row-cost {
+  font-size: 44px;
+  font-weight: bold;
+}
+
+.fare-info-row-description {
+  font-size: 44px;
+}
+
+.fare-info-row-details {
+  font-size: 36px;
+}
+
+.digital-bridge-container {
+  height: 172px;
+  background: black;
+  display: flex;
+}
+
+.digital-bridge-logo-container {
+  width: 208px;
+}
+
+.digital-bridge-logo-image {
+  height: 128px;
+  width: 128px;
+  margin: 22px 40px 22px 40px;
+  padding: 0px;
+}
+
+.digital-bridge-link-container {
+  width: 792px;
+  font-family: Helvetica Neue;
+  color: white;
+}
+
+.digital-bridge-link-description {
+  font-size: 36px;
+  line-height: 56px;
+  margin-top: 30px;
+}
+
+.digital-bridge-link-url {
+  font-size: 44px;
+  line-height: 56px;
+  font-weight: bold;
+}
+
+.digital-bridge-qr-container {
+  width: 200px;
+}
+
+.digital-bridge-qr-image-container {
+  background: white;
+  margin: 22px 40px 22px 32px;
+  border-radius: 8px;
+}
+
+.digital-bridge-qr-image {
+  margin: 8px;
+}
+
 .departures-container {
 }
 

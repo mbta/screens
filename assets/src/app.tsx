@@ -3,6 +3,7 @@ declare function require(name: string): string;
 require("../css/app.scss");
 
 import "phoenix_html";
+import QRCode from "qrcode.react";
 import React, {
   setState,
   useEffect,
@@ -53,6 +54,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [alerts, setAlerts] = useState();
   const [departureRows, setDepartureRows] = useState();
   const [departuresAlerts, setDeparturesAlerts] = useState();
+  const [stopId, setStopId] = useState();
 
   const doUpdate = async () => {
     const result = await fetch(`/api/${id}`);
@@ -62,6 +64,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
     setAlerts(json.alerts);
     setDepartureRows(json.departure_rows);
     setDeparturesAlerts(json.departures_alerts);
+    setStopId(json.stop_id);
   };
 
   useEffect(() => {
@@ -88,6 +91,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
         departureRows={departureRows}
         alerts={alerts}
         departuresAlerts={departuresAlerts}
+        stopId={stopId}
       />
     </div>
   );
@@ -96,9 +100,80 @@ const ScreenContainer = ({ id }): JSX.Element => {
 const BottomScreenContainer = ({
   departureRows,
   alerts,
-  departuresAlerts
+  departuresAlerts,
+  stopId
 }): JSX.Element => {
-  return <div className="single-screen-container"></div>;
+  return (
+    <div className="single-screen-container">
+      <FlexZoneContainer />
+      <FareInfo />
+      <DigitalBridge stopId={stopId} />
+    </div>
+  );
+};
+
+const FlexZoneContainer = (): JSX.Element => {
+  return <div className="flex-zone-container"></div>;
+};
+
+const FareInfo = (): JSX.Element => {
+  return (
+    <div className="fare-container">
+      <div className="fare-icon-container">
+        <img className="fare-icon-image" src="images/logo.svg" />
+      </div>
+      <div className="fare-info-container">
+        <div className="fare-info-header">One Way Bus Fares</div>
+        <div className="fare-info-rows">
+          <div className="fare-info-row">
+            <span className="fare-info-row-cost">$1.70 </span>
+            <span className="fare-info-row-description">CharlieCard </span>
+            <span className="fare-info-row-details">
+              (1 free transfer to Local Bus)
+            </span>
+          </div>
+          <div className="fare-info-row">
+            <span className="fare-info-row-cost">$2.00 </span>
+            <span className="fare-info-row-description">
+              Cash or CharlieTicket{" "}
+            </span>
+            <span className="fare-info-row-details">(Limited Transfers)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const DigitalBridge = ({ stopId }): JSX.Element => {
+  return (
+    <div className="digital-bridge-container">
+      <div className="digital-bridge-logo-container">
+        <img
+          className="digital-bridge-logo-image"
+          src="images/logo-white.svg"
+        />
+      </div>
+      <div className="digital-bridge-link-container">
+        <div className="digital-bridge-link-description">
+          Real time predictions and stop info on the go
+        </div>
+        <div className="digital-bridge-link-url">
+          www.mbta.com/stops/{stopId}
+        </div>
+      </div>
+      <div className="digital-bridge-qr-container">
+        <div className="digital-bridge-qr-image-container">
+          <QRCode
+            className="digital-bridge-qr-image"
+            size="112"
+            value={"www.mbta.com/stops/" + stopId}
+            renderAs="svg"
+          />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const TopScreenContainer = ({

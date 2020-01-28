@@ -11,7 +11,8 @@ defmodule Screens.ScreenData do
       stop_name: extract_stop_name_from_departures(departures),
       departure_rows: format_departure_rows(departures),
       alerts: format_alerts(alerts),
-      departures_alerts: departures_alerts
+      departures_alerts: departures_alerts,
+      stop_id: stop_id
     }
   end
 
