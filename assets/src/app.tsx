@@ -3,7 +3,13 @@ declare function require(name: string): string;
 require("../css/app.scss");
 
 import "phoenix_html";
-import React, { useEffect, useState } from "react";
+import React, {
+  setState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState
+} from "react";
 import ReactDOM from "react-dom";
 import {
   BrowserRouter as Router,
@@ -63,7 +69,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
 
     const interval = setInterval(() => {
       doUpdate();
-    }, 30000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -92,13 +98,7 @@ const BottomScreenContainer = ({
   alerts,
   departuresAlerts
 }): JSX.Element => {
-  return (
-    <div className="single-screen-container">
-      <div>{JSON.stringify(alerts)}</div>
-      <div>{JSON.stringify(departuresAlerts)}</div>
-      <div>{JSON.stringify(departureRows)}</div>
-    </div>
-  );
+  return <div className="single-screen-container"></div>;
 };
 
 const TopScreenContainer = ({
@@ -114,35 +114,67 @@ const TopScreenContainer = ({
       <DeparturesContainer
         currentTimeString={currentTimeString}
         departureRows={departureRows}
+        alerts={alerts}
+        departuresAlerts={departuresAlerts}
       />
     </div>
   );
 };
 
 const Header = ({ stopName, currentTimeString }): JSX.Element => {
+  const ref = useRef(null);
+  const [stopSize, setStopSize] = useState(2);
   const currentTime = moment(currentTimeString).format("h:mm");
+
+  useLayoutEffect(() => {
+    const height = ref.current.clientHeight;
+    if (height > 216) {
+      setStopSize(stopSize - 1);
+    }
+  });
+
+  const SIZES = ["small", "medium", "large"];
+  const stopClassName = "header-stopname header-stopname-" + SIZES[stopSize];
 
   return (
     <div className="header">
       <div className="header-time">{currentTime}</div>
       <div className="header-realtime-indicator">UPDATED LIVE EVERY MINUTE</div>
-      <div className="header-stopname">{stopName}</div>
+      <div className={stopClassName} ref={ref}>
+        {stopName}
+      </div>
     </div>
   );
 };
 
-const buildDeparturesRows = departuresRows => {
-  if (!departuresRows) {
+const buildDeparturesRows = (
+  departuresRows,
+  alerts,
+  departuresAlerts,
+  numRows
+) => {
+  if (!departuresRows || !alerts || !departuresAlerts) {
     return [];
   }
 
-  departuresRows = departuresRows.slice(0, 5);
+  departuresRows = departuresRows.slice(0, numRows + 1);
 
   const rows = [];
   departuresRows.forEach(row => {
+    const rowAlerts = [];
+    departuresAlerts.forEach(da => {
+      const alertId = da[0];
+      const departureId = da[1];
+
+      if (row.id === departureId) {
+        rowAlerts.push(alertId);
+      }
+    });
+
     if (rows.length === 0) {
       const newRow = Object.assign({}, row);
       newRow.time = [newRow.time];
+      newRow.alerts = rowAlerts;
       rows.push(newRow);
     } else {
       const lastRow = rows[rows.length - 1];
@@ -151,9 +183,11 @@ const buildDeparturesRows = departuresRows => {
         row.destination === lastRow.destination
       ) {
         lastRow.time.push(row.time);
+        // Take union of rowAlerts?
       } else {
         const newRow = Object.assign({}, row);
         newRow.time = [newRow.time];
+        newRow.alerts = rowAlerts;
         rows.push(newRow);
       }
     }
@@ -164,18 +198,37 @@ const buildDeparturesRows = departuresRows => {
 
 const DeparturesContainer = ({
   currentTimeString,
-  departureRows
+  departureRows,
+  alerts,
+  departuresAlerts
 }): JSX.Element => {
-  const rows = buildDeparturesRows(departureRows);
+  const [numRows, setNumRows] = useState(7);
+  const ref = useRef(null);
+
+  useLayoutEffect(() => {
+    const height = ref.current.clientHeight;
+    if (height > 1312) {
+      setNumRows(numRows - 1);
+    }
+  });
+
+  const rows = buildDeparturesRows(
+    departureRows,
+    alerts,
+    departuresAlerts,
+    numRows
+  );
 
   return (
-    <div className="departures-container">
-      {rows.map(row => (
+    <div className="departures-container" ref={ref}>
+      {rows.map((row, i) => (
         <DeparturesRow
           currentTimeString={currentTimeString}
           route={row.route}
           destination={row.destination}
           departureTimes={row.time}
+          rowAlerts={row.alerts}
+          alerts={alerts}
           key={row.route + row.time}
         />
       ))}
@@ -187,10 +240,13 @@ const DeparturesRow = ({
   currentTimeString,
   route,
   destination,
-  departureTimes
+  departureTimes,
+  rowAlerts,
+  alerts
 }): JSX.Element => {
   return (
     <div className="departures-row">
+      <div className="departure-row-before"></div>
       <div className="departures-row-container">
         {departureTimes.map((t, i) => (
           <DepartureRow
@@ -203,8 +259,42 @@ const DeparturesRow = ({
             key={route + t}
           />
         ))}
+        <DeparturesAlert rowAlerts={rowAlerts} alerts={alerts} />
+        <div className="departure-row-after"></div>
         <div className="departure-row-hairline"></div>
       </div>
+    </div>
+  );
+};
+
+const parseAlert = header => {
+  return header.split("up to ")[1].split(" minutes")[0];
+};
+
+const DeparturesAlert = ({ rowAlerts, alerts }): JSX.Element => {
+  let header;
+  rowAlerts.forEach(alertId => {
+    alerts.forEach(alert => {
+      if (alertId === alert.id && alert.effect === "DELAY") {
+        header = alert.header;
+      }
+    });
+  });
+
+  if (header === undefined) {
+    return <div></div>;
+  }
+
+  const delayMinutes = parseAlert(header);
+
+  return (
+    <div className="departures-row-inline-badge-container">
+      <span className="departures-row-inline-badge">
+        Delays up to{" "}
+        <span className="departures-row-inline-emphasis">
+          {delayMinutes} minutes
+        </span>
+      </span>
     </div>
   );
 };
@@ -236,19 +326,12 @@ const DepartureRow = ({
 };
 
 const DepartureRoute = ({ route, first, last }): JSX.Element => {
-  let containerClass;
-  if (first && last) {
-    containerClass =
-      "departure-route departure-route-first departure-route-last";
-  } else if (first) {
-    containerClass = "departure-route departure-route-first";
-  } else if (last) {
-    containerClass = "departure-route departure-route-last";
-  } else {
-    containerClass = "departure-route";
+  let containerClass = "departure-route";
+  if (first) {
+    containerClass += " departure-route-first";
   }
 
-  if (first === true) {
+  if (first) {
     return (
       <div className={containerClass}>
         <div className="departure-route-pill">
@@ -262,18 +345,7 @@ const DepartureRoute = ({ route, first, last }): JSX.Element => {
 };
 
 const DepartureDestination = ({ destination, first, last }): JSX.Element => {
-  let containerClass;
-  if (first && last) {
-    containerClass =
-      "departure-destination departure-destination-first departure-destination-last";
-  } else if (first) {
-    containerClass = "departure-destination departure-destination-first";
-  } else if (last) {
-    containerClass = "departure-destination departure-destination-last";
-  } else {
-    containerClass = "departure-destination";
-  }
-
+  const containerClass = "departure-destination";
   if (destination === undefined) {
     return <div className={containerClass}></div>;
   }
@@ -316,29 +388,27 @@ const DepartureTime = ({
   const currentTime = moment(currentTimeString);
   const minuteDifference = departureTime.diff(currentTime, "minutes");
 
-  let timeContainerClass = "departure-time";
+  let containerClass = "departure-time";
   if (first) {
-    timeContainerClass += " departure-time-first";
-  } else if (last) {
-    timeContainerClass += " departure-time-last";
+    containerClass += " departure-time-first";
   }
 
   if (minuteDifference < 2) {
     return (
-      <div className={timeContainerClass}>
+      <div className={containerClass}>
         <span className="departure-time-now">Now</span>
       </div>
     );
   } else if (minuteDifference < 60) {
     return (
-      <div className={timeContainerClass}>
+      <div className={containerClass}>
         <span className="departure-time-minutes">{minuteDifference}</span>
         <span className="departure-time-minutes-label">m</span>
       </div>
     );
   } else {
     return (
-      <div className={timeContainerClass}>
+      <div className={containerClass}>
         <span className="departure-time-timestamp">
           {departureTime.format("h:mm A")}
         </span>

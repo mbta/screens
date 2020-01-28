@@ -63,7 +63,6 @@
   width: 820px;
 
   font-family: Helvetica Neue;
-  font-size: 72px;
   font-weight: bold;
 
   color: #ffffff;
@@ -74,6 +73,18 @@
   left: 56px;
 }
 
+.header-stopname-small {
+  font-size: 60px;
+}
+
+.header-stopname-medium {
+  font-size: 72px;
+}
+
+.header-stopname-large {
+  font-size: 108px;
+}
+
 .logo {
   display: block;
   margin-left: auto;
@@ -82,41 +93,62 @@
 }
 
 .departures-container {
-  display: grid;
-  grid-template-columns: 35% 35% 30%;
-  grid-row-gap: 8px;
-  padding: 8px;
 }
 
 .departures-row {
-  display: contents;
 }
 
 .departures-row-container {
-  display: contents;
+}
+
+.testing {
 }
 
 .departure-row {
-  display: contents;
+  display: flex;
+}
+
+.departure-row-before {
+  height: 44px;
+}
+
+.departure-row-after {
+  height: 46px;
 }
 
 .departure-row-hairline {
-  grid-column: 1 / -1;
   height: 4px;
   background-color: black;
   margin-left: 32px;
   margin-right: 40px;
 }
 
+.departures-row-inline-badge-container {
+  margin-left: 404px;
+}
+
+.departures-row-inline-badge {
+  font-family: Helvetica Neue;
+  font-size: 48px;
+  background-color: black;
+  color: white;
+  border-radius: 16px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.departures-row-inline-emphasis {
+  font-weight: bold;
+}
+
 .departure-route {
+  width: 420px;
 }
 
 .departure-route-first {
-  margin-top: 44px;
 }
 
 .departure-route-last {
-  margin-bottom: 46px;
 }
 
 .departure-route-pill {
@@ -138,6 +170,7 @@
 }
 
 .departure-destination {
+  width: 420px;
   font-family: Helvetica Neue;
   display: grid;
 }
@@ -148,11 +181,9 @@
 }
 
 .departure-destination-first {
-  margin-top: 44px;
 }
 
 .departure-destination-last {
-  margin-bottom: 46px;
 }
 
 .departure-destination-primary {
@@ -166,6 +197,7 @@
 }
 
 .departure-time {
+  width: 360px;
   font-family: Helvetica Neue;
   font-size: 48px;
   font-weight: bold;
@@ -174,11 +206,9 @@
 }
 
 .departure-time-first {
-  margin-top: 44px;
 }
 
 .departure-time-last {
-  margin-bottom: 46px;
 }
 
 .departure-time-now {
