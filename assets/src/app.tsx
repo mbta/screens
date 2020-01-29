@@ -5,12 +5,12 @@ require("../css/app.scss");
 import "phoenix_html";
 import QRCode from "qrcode.react";
 import React, {
+  forwardRef,
   setState,
   useEffect,
   useLayoutEffect,
   useRef,
-  useState,
-  forwardRef
+  useState
 } from "react";
 import ReactDOM from "react-dom";
 import {
@@ -73,7 +73,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
 
     const interval = setInterval(() => {
       doUpdate();
-    }, 5000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, []);
@@ -117,18 +117,32 @@ const BottomScreenContainer = ({
   alerts,
   departuresAlerts,
   stopId,
-  numRows, currentTime
+  numRows,
+  currentTime
 }): JSX.Element => {
   return (
     <div className="single-screen-container">
-      <FlexZoneContainer alerts={alerts} departureRows={departureRows} numRows={numRows} currentTime={currentTime} />
+      <FlexZoneContainer
+        alerts={alerts}
+        departureRows={departureRows}
+        numRows={numRows}
+        currentTime={currentTime}
+        departuresAlerts={departuresAlerts}
+      />
       <FareInfo />
       <DigitalBridge stopId={stopId} />
     </div>
   );
 };
 
-const FlexZoneContainer = ({alerts, departureRows, numRows, currentTime}): JSX.Element => {
+const FlexZoneContainer = ({
+  alerts,
+  departureRows,
+  numRows,
+  currentTime,
+  departuresAlerts
+}): JSX.Element => {
+  // Logic to decide which flex zones to show
   let alert;
 
   if (alerts) {
@@ -142,53 +156,136 @@ const FlexZoneContainer = ({alerts, departureRows, numRows, currentTime}): JSX.E
   if (!alert) {
     return (
       <div className="flex-zone-container">
-        <LaterDepartures departureRows={departureRows} startIndex={numRows} />
+        <LaterDepartures
+          departureRows={departureRows}
+          startIndex={numRows}
+          currentTime={currentTime}
+          alerts={alerts}
+          departuresAlerts={departuresAlerts}
+        />
       </div>
     );
   }
 
   return (
     <div className="flex-zone-container">
-      <LaterDepartures departureRows={departureRows} startIndex={numRows} currentTime={currentTime} />
-      <FlexZoneAlert alert={alert} />
+      <LaterDepartures
+        departureRows={departureRows}
+        startIndex={numRows}
+        currentTime={currentTime}
+        alerts={alerts}
+        departuresAlerts={departuresAlerts}
+      />
+      <div className="flex-alert-container">
+        <FlexZoneAlert alert={alert} />
+      </div>
     </div>
   );
 };
 
-const LaterDepartures = ({departureRows, startIndex, currentTime}): JSX.Element => {
+const LaterDepartures = ({
+  departureRows,
+  startIndex,
+  currentTime,
+  alerts,
+  departuresAlerts
+}): JSX.Element => {
   if (!departureRows) {
-    return (
-      <div className="later-departures-container"></div>
-    );
+    return <div className="later-departures-container"></div>;
   }
 
   const laterDepartureRows = departureRows.slice(startIndex, startIndex + 4);
-
-  if (laterDepartureRows.length == 0) {
-    return (
-      <div className="later-departures-container"></div>
-    );
-  }
+  const rows = buildDeparturesRows(
+    laterDepartureRows,
+    alerts,
+    departuresAlerts,
+    4
+  );
 
   return (
     <div className="later-departures-container">
-      {laterDepartureRows.map((row) => (
-        <div>
-          <LaterDepartureRow
+      {rows.map((row, i) => (
+        <div key={row.route + row.time}>
+          <LaterDeparturesRow
+            currentTime={currentTime}
             route={row.route}
             destination={row.destination}
-            time={row.time}
-            currentTime={currentTime}
-            key={row.route + row.time}
+            departureTimes={row.time}
+            rowAlerts={row.alerts}
+            alerts={alerts}
           />
-          <div className="later-departure-row-hairline"></div>
         </div>
       ))}
     </div>
   );
 };
 
-const LaterDepartureRow = ({route, destination, time, currentTime}): JSX.Element => {
+const LaterDeparturesRow = ({
+  currentTime,
+  route,
+  destination,
+  departureTimes,
+  rowAlerts,
+  alerts
+}): JSX.Element => {
+  return (
+    <div className="later-departures-row">
+      <div className="later-departure-row-before"></div>
+      <div className="later-departures-row-container">
+        {departureTimes.map((t, i) => (
+          <LaterDepartureRow
+            route={i === 0 ? route : undefined}
+            destination={i === 0 ? destination : undefined}
+            time={t}
+            currentTime={currentTime}
+            first={i === 0}
+            key={route + t}
+          />
+        ))}
+        <LaterDeparturesAlert rowAlerts={rowAlerts} alerts={alerts} />
+      </div>
+      <div className="later-departure-row-after"></div>
+      <div className="later-departure-row-hairline"></div>
+    </div>
+  );
+};
+
+const LaterDeparturesAlert = ({ rowAlerts, alerts }): JSX.Element => {
+  let header;
+  rowAlerts.forEach(alertId => {
+    alerts.forEach(alert => {
+      if (alertId === alert.id && alert.effect === "DELAY") {
+        header = alert.header;
+      }
+    });
+  });
+
+  if (header === undefined) {
+    return <div></div>;
+  }
+
+  const delayMinutes = parseAlert(header);
+
+  return (
+    <div className="later-departures-row-inline-badge-container">
+      <span className="later-departures-row-inline-badge">
+        <img className="alert-badge-icon" src="images/alert.svg" />
+        Delays up to{" "}
+        <span className="later-departures-row-inline-emphasis">
+          {delayMinutes} minutes
+        </span>
+      </span>
+    </div>
+  );
+};
+
+const LaterDepartureRow = ({
+  route,
+  destination,
+  time,
+  currentTime,
+  first
+}): JSX.Element => {
   return (
     <div className="later-departure-row-container">
       <LaterDepartureRoute route={route} />
@@ -198,7 +295,11 @@ const LaterDepartureRow = ({route, destination, time, currentTime}): JSX.Element
   );
 };
 
-const LaterDepartureRoute = ({route}): JSX.Element => {
+const LaterDepartureRoute = ({ route }): JSX.Element => {
+  if (!route) {
+    return <div className="later-departure-route-container"></div>;
+  }
+
   return (
     <div className="later-departure-route-container">
       <div className="later-departure-route-pill">
@@ -208,56 +309,89 @@ const LaterDepartureRoute = ({route}): JSX.Element => {
   );
 };
 
-const LaterDepartureDestination = ({destination}): JSX.Element => {
-  return (
-    <div className="later-departure-destination-container">
-      <div className="later-departure-destination-text">
-        { destination }
+const LaterDepartureDestination = ({ destination }): JSX.Element => {
+  if (destination === undefined) {
+    return <div className="later-departure-destination-container"></div>;
+  }
+
+  if (destination.includes("via")) {
+    const parts = destination.split(" via ");
+    const primaryDestination = parts[0];
+    const secondaryDestination = "via " + parts[1];
+
+    return (
+      <div className="later-departure-destination">
+        <div className="later-departure-destination-container">
+          <div className="later-departure-destination-primary">
+            {primaryDestination}
+          </div>
+          <div className="later-departure-destination-secondary">
+            {secondaryDestination}
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  } else {
+    return (
+      <div className="later-departure-destination">
+        <div className="later-departure-destination-container">
+          <div className="later-departure-destination-primary">
+            {destination}
+          </div>
+        </div>
+      </div>
+    );
+  }
 };
 
-const LaterDepartureTime = ({time, currentTimeString}): JSX.Element => {
+const LaterDepartureTime = ({ time, currentTimeString }): JSX.Element => {
   const departureTime = moment(time);
   const currentTime = moment(currentTime);
   const minuteDifference = departureTime.diff(currentTime, "minutes");
 
   if (minuteDifference < 2) {
-      return (
-        <div className="later-departure-time-container">
-          <span className="later-departure-time-now">Now</span>
-        </div>
-      );
-    } else if (minuteDifference < 60) {
-      return (
-        <div className="later-departure-time-container">
-          <span className="later-departure-time-minutes">{minuteDifference}</span>
-          <span className="later-departure-time-minutes-label">m</span>
-        </div>
-      );
-    } else {
-      return (
-        <div className="later-departure-time-container">
-          <span className="later-departure-time-timestamp">
-            {departureTime.format("h:mm A")}
-          </span>
-        </div>
-      );
-    }
+    return (
+      <div className="later-departure-time-container">
+        <span className="later-departure-time-now">Now</span>
+      </div>
+    );
+  } else if (minuteDifference < 60) {
+    return (
+      <div className="later-departure-time-container">
+        <span className="later-departure-time-minutes">{minuteDifference}</span>
+        <span className="later-departure-time-minutes-label">m</span>
+      </div>
+    );
+  } else {
+    const timestamp = departureTime.format("h:mm");
+    const ampm = departureTime.format("A");
+
+    return (
+      <div className="later-departure-time-container">
+        <span className="later-departure-time-timestamp">{timestamp}</span>
+        <span className="later-departure-time-ampm">{ampm}</span>
+      </div>
+    );
+  }
 };
 
-const FlexZoneAlert = ({alert}): JSX.Element => {
+const FlexZoneAlert = ({ alert }): JSX.Element => {
+  const updatedTime = moment(alert.updated_at);
   return (
     <div className="alert-container">
       <div className="alert-icon-container">
-        <img className="alert-icon-image" src="images/no-service.svg" />
+        <img className="alert-icon-image" src="images/alert.svg" />
       </div>
-      {/*<div className="alert-updated-timestamp">{alert.updated_at}</div>*/}
-      <div className="alert-description-container">
-       <div className="alert-description-header">{alert.effect.replace("_", " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();})}</div>
-       <div className="alert-description-description">{alert.header}</div>
+      <div className="alert-description-header">
+        {alert.effect.replace("_", " ").replace(/\w\S*/g, txt => {
+          return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        })}
       </div>
+      <div className="alert-updated-timestamp">
+        UPDATED <br />
+        {updatedTime.format("M/D/Y · h:mm A")}
+      </div>
+      <div className="alert-description">{alert.header}</div>
     </div>
   );
 };
@@ -321,28 +455,33 @@ const DigitalBridge = ({ stopId }): JSX.Element => {
   );
 };
 
-const TopScreenContainer = forwardRef(({
-  stopName,
-  currentTimeString,
-  departureRows,
-  alerts,
-  departuresAlerts,
-  numRows
-}, ref): JSX.Element => {
-  return (
-    <div className="single-screen-container">
-      <Header stopName={stopName} currentTimeString={currentTimeString} />
-      <DeparturesContainer
-        currentTimeString={currentTimeString}
-        departureRows={departureRows}
-        alerts={alerts}
-        departuresAlerts={departuresAlerts}
-        numRows={numRows}
-        ref={ref}
-      />
-    </div>
-  );
-});
+const TopScreenContainer = forwardRef(
+  (
+    {
+      stopName,
+      currentTimeString,
+      departureRows,
+      alerts,
+      departuresAlerts,
+      numRows
+    },
+    ref
+  ): JSX.Element => {
+    return (
+      <div className="single-screen-container">
+        <Header stopName={stopName} currentTimeString={currentTimeString} />
+        <DeparturesContainer
+          currentTimeString={currentTimeString}
+          departureRows={departureRows}
+          alerts={alerts}
+          departuresAlerts={departuresAlerts}
+          numRows={numRows}
+          ref={ref}
+        />
+      </div>
+    );
+  }
+);
 
 const Header = ({ stopName, currentTimeString }): JSX.Element => {
   const ref = useRef(null);
@@ -419,36 +558,35 @@ const buildDeparturesRows = (
   return rows;
 };
 
-const DeparturesContainer = forwardRef(({
-  currentTimeString,
-  departureRows,
-  alerts,
-  departuresAlerts,
-  numRows
-}, ref) => {
-  const rows = buildDeparturesRows(
-    departureRows,
-    alerts,
-    departuresAlerts,
-    numRows
-  );
+const DeparturesContainer = forwardRef(
+  (
+    { currentTimeString, departureRows, alerts, departuresAlerts, numRows },
+    ref
+  ) => {
+    const rows = buildDeparturesRows(
+      departureRows,
+      alerts,
+      departuresAlerts,
+      numRows
+    );
 
-  return (
-    <div className="departures-container" ref={ref}>
-      {rows.map((row, i) => (
-        <DeparturesRow
-          currentTimeString={currentTimeString}
-          route={row.route}
-          destination={row.destination}
-          departureTimes={row.time}
-          rowAlerts={row.alerts}
-          alerts={alerts}
-          key={row.route + row.time}
-        />
-      ))}
-    </div>
-  );
-});
+    return (
+      <div className="departures-container" ref={ref}>
+        {rows.map((row, i) => (
+          <DeparturesRow
+            currentTimeString={currentTimeString}
+            route={row.route}
+            destination={row.destination}
+            departureTimes={row.time}
+            rowAlerts={row.alerts}
+            alerts={alerts}
+            key={row.route + row.time}
+          />
+        ))}
+      </div>
+    );
+  }
+);
 
 const DeparturesRow = ({
   currentTimeString,
@@ -469,7 +607,6 @@ const DeparturesRow = ({
             destination={i === 0 ? destination : undefined}
             time={t}
             first={i === 0}
-            last={i === departureTimes.length - 1}
             key={route + t}
           />
         ))}
@@ -504,6 +641,7 @@ const DeparturesAlert = ({ rowAlerts, alerts }): JSX.Element => {
   return (
     <div className="departures-row-inline-badge-container">
       <span className="departures-row-inline-badge">
+        <img className="alert-badge-icon" src="images/alert.svg" />
         Delays up to{" "}
         <span className="departures-row-inline-emphasis">
           {delayMinutes} minutes
@@ -518,50 +656,34 @@ const DepartureRow = ({
   route,
   destination,
   time,
-  first,
-  last
+  first
 }): JSX.Element => {
   return (
     <div className="departure-row">
-      <DepartureRoute route={route} first={first} last={last} />
-      <DepartureDestination
-        destination={destination}
-        first={first}
-        last={last}
-      />
-      <DepartureTime
-        time={time}
-        currentTimeString={currentTimeString}
-        first={first}
-        last={last}
-      />
+      <DepartureRoute route={route} first={first} />
+      <DepartureDestination destination={destination} />
+      <DepartureTime time={time} currentTimeString={currentTimeString} />
     </div>
   );
 };
 
-const DepartureRoute = ({ route, first, last }): JSX.Element => {
-  let containerClass = "departure-route";
-  if (first) {
-    containerClass += " departure-route-first";
-  }
-
+const DepartureRoute = ({ route, first }): JSX.Element => {
   if (first) {
     return (
-      <div className={containerClass}>
+      <div className="departure-route">
         <div className="departure-route-pill">
           <span className="departure-route-number">{route}</span>
         </div>
       </div>
     );
   } else {
-    return <div className={containerClass}></div>;
+    return <div className="departure-route"></div>;
   }
 };
 
-const DepartureDestination = ({ destination, first, last }): JSX.Element => {
-  const containerClass = "departure-destination";
+const DepartureDestination = ({ destination }): JSX.Element => {
   if (destination === undefined) {
-    return <div className={containerClass}></div>;
+    return <div className="departure-destination"></div>;
   }
 
   if (destination.includes("via")) {
@@ -570,7 +692,7 @@ const DepartureDestination = ({ destination, first, last }): JSX.Element => {
     const secondaryDestination = "via " + parts[1];
 
     return (
-      <div className={containerClass}>
+      <div className="departure-destination">
         <div className="departure-destination-container">
           <div className="departure-destination-primary">
             {primaryDestination}
@@ -583,7 +705,7 @@ const DepartureDestination = ({ destination, first, last }): JSX.Element => {
     );
   } else {
     return (
-      <div className={containerClass}>
+      <div className="departure-destination">
         <div className="departure-destination-container">
           <div className="departure-destination-primary">{destination}</div>
         </div>
@@ -592,40 +714,31 @@ const DepartureDestination = ({ destination, first, last }): JSX.Element => {
   }
 };
 
-const DepartureTime = ({
-  time,
-  currentTimeString,
-  first,
-  last
-}): JSX.Element => {
+const DepartureTime = ({ time, currentTimeString }): JSX.Element => {
   const departureTime = moment(time);
   const currentTime = moment(currentTimeString);
   const minuteDifference = departureTime.diff(currentTime, "minutes");
 
-  let containerClass = "departure-time";
-  if (first) {
-    containerClass += " departure-time-first";
-  }
-
   if (minuteDifference < 2) {
     return (
-      <div className={containerClass}>
+      <div className="departure-time">
         <span className="departure-time-now">Now</span>
       </div>
     );
   } else if (minuteDifference < 60) {
     return (
-      <div className={containerClass}>
+      <div className="departure-time">
         <span className="departure-time-minutes">{minuteDifference}</span>
         <span className="departure-time-minutes-label">m</span>
       </div>
     );
   } else {
+    const timestamp = departureTime.format("h:mm");
+    const ampm = departureTime.format("A");
     return (
-      <div className={containerClass}>
-        <span className="departure-time-timestamp">
-          {departureTime.format("h:mm A")}
-        </span>
+      <div className="departure-time">
+        <span className="departure-time-timestamp">{timestamp}</span>
+        <span className="departure-time-ampm">{ampm}</span>
       </div>
     );
   }

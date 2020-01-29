@@ -42,7 +42,8 @@ config :screens,
     "16" => %{stop_id: "407"},
     "17" => %{stop_id: "5605"},
     "18" => %{stop_id: "637"},
-    "19" => %{stop_id: "8178"}
+    "19" => %{stop_id: "8178"},
+    "20" => %{stop_id: "899"}
   },
   api_v3_key: "ba359ac2ed5b41a5b05bfae67321766a"
 

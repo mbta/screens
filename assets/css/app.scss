@@ -94,14 +94,28 @@
 
 .flex-zone-container {
   height: 1180px;
+  display: flex;
+  flex-flow: column;
+}
+
+.flex-alert-container {
+  height: 100%;
+  display: grid;
 }
 
 .later-departures-container {
-
 }
 
 .later-departure-row-container {
   display: flex;
+}
+
+.later-departure-row-before {
+  height: 22px;
+}
+
+.later-departure-row-after {
+  height: 24px;
 }
 
 .later-departure-row-hairline {
@@ -111,9 +125,38 @@
   margin-right: 40px;
 }
 
+.later-departures-row-inline-badge-container {
+  margin-left: 236px;
+}
+
+.alert-badge-icon {
+  width: 48px;
+  height: 54.75px;
+  position: relative;
+  top: 12px;
+  margin-left: 12px;
+  margin-right: 24px;
+}
+
+.later-departures-row-inline-badge {
+  font-family: Helvetica Neue;
+  font-size: 40px;
+  background-color: black;
+  color: white;
+  border-radius: 16px;
+  padding-left: 16px;
+  padding-right: 32px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.later-departures-row-inline-emphasis {
+  font-weight: bold;
+}
+
 .later-departure-route-container {
   width: 254px;
-  height: 130px;
+  height: 86px;
 }
 
 .later-departure-route-pill {
@@ -121,7 +164,6 @@
   height: 86px;
   background-color: black;
   border-radius: 72px;
-  margin-top: 22px;
   margin-left: 44px;
   display: grid;
 }
@@ -140,12 +182,21 @@
   display: grid;
 }
 
-.later-departure-destination-text {
-  font-family: Helvetica Neue;
-  font-size: 54px;
+.later-departure-destination {
   margin-top: auto;
   margin-bottom: auto;
+}
+
+.later-departure-destination-primary {
+  font-family: Helvetica Neue;
+  font-size: 54px;
   font-weight: 500;
+}
+
+.later-departure-destination-secondary {
+  font-family: Helvetica Neue;
+  font-size: 36px;
+  font-weight: 400;
 }
 
 .later-departure-time-container {
@@ -153,7 +204,6 @@
   font-family: Helvetica Neue;
   text-align: right;
   margin-right: 40px;
-  margin-top: 22px;
 }
 
 .later-departure-time-now {
@@ -176,6 +226,13 @@
 .later-departure-time-timestamp {
   font-size: 72px;
   font-weight: bold;
+  text-align: right;
+}
+
+.later-departure-time-ampm {
+  font-size: 52.5px;
+  line-height: 72px;
+  text-align: right;
 }
 
 .alert-container {
@@ -183,45 +240,42 @@
   color: white;
   border-radius: 0px 24px 24px 0px;
   margin-right: 34px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 208px auto 240px;
+  font-family: Helvetica Neue;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .alert-icon-container {
-  width: 208px;
 }
 
 .alert-icon-image {
   height: 128px;
   width: 128px;
   margin: 32px 40px 32px 40px;
-  padding: 0px;
 }
 
 .alert-updated-timestamp {
-  position: relative;
-  right: 44px;
-  top: 86px;
-  font-family: Helvetica Neue;
   font-size: 16px;
   text-align: right;
   color: white;
-}
-
-.alert-description-container {
-  font-family: Helvetica Neue;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-right: 44px;
 }
 
 .alert-description-header {
   font-size: 80px;
   font-weight: bold;
-  margin-top: 56px;
-  margin-bottom: 29px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
-.alert-description-description {
+.alert-description {
+  grid-column: 2 / 4;
   font-size: 40px;
   line-height: 56px;
-  margin-right: 40px;
   margin-bottom: 51px;
 }
 
@@ -333,9 +387,6 @@
 .departures-row-container {
 }
 
-.testing {
-}
-
 .departure-row {
   display: flex;
 }
@@ -361,12 +412,14 @@
 
 .departures-row-inline-badge {
   font-family: Helvetica Neue;
-  font-size: 48px;
+  font-size: 40px;
   background-color: black;
   color: white;
   border-radius: 16px;
   padding-left: 16px;
-  padding-right: 16px;
+  padding-right: 32px;
+  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
 .departures-row-inline-emphasis {
@@ -375,12 +428,6 @@
 
 .departure-route {
   width: 420px;
-}
-
-.departure-route-first {
-}
-
-.departure-route-last {
 }
 
 .departure-route-pill {
@@ -412,12 +459,6 @@
   margin-bottom: auto;
 }
 
-.departure-destination-first {
-}
-
-.departure-destination-last {
-}
-
 .departure-destination-primary {
   font-size: 72px;
   font-weight: 500;
@@ -432,15 +473,8 @@
   width: 360px;
   font-family: Helvetica Neue;
   font-size: 48px;
-  font-weight: bold;
   text-align: right;
   margin-right: 40px;
-}
-
-.departure-time-first {
-}
-
-.departure-time-last {
 }
 
 .departure-time-now {
@@ -467,11 +501,17 @@
 }
 
 .departure-time-timestamp {
+  font-family: Helvetica Neue;
+  font-size: 105px;
+  line-height: 144px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.departure-time-ampm {
+  font-family: Helvetica Neue;
   font-size: 72px;
   line-height: 144px;
-  font-family: Helvetica Neue;
-  font-weight: bold;
-  letter-spacing: 0;
   text-align: right;
 }
 
