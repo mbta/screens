@@ -4,7 +4,8 @@
 # remember to add this file to your .gitignore.
 use Mix.Config
 
-secret_key_base = "screens-dev-secret-key-base"
+secret_key_base =
+  "screens-dev-secret-key-base"
   |> ExAws.SecretsManager.get_secret_value()
   |> ExAws.request!()
   |> Map.fetch!("SecretString")
