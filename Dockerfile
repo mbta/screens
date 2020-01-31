@@ -1,12 +1,3 @@
-# build the frontend assets within a node.js container
-FROM node:13 as assets-builder
-
-WORKDIR /root
-ADD . .
-
-RUN npm --prefix assets ci
-RUN npm --prefix assets run deploy
-
 # build the application within an elixir container
 FROM elixir:1.9.4 as elixir-builder
 
@@ -17,6 +8,18 @@ ADD . .
 
 RUN mix do local.hex --force, local.rebar --force
 RUN mix do deps.get --only prod, compile --force, phx.digest, release
+
+# build the frontend assets within a node.js container
+FROM node:13 as assets-builder
+
+WORKDIR /root
+ADD . .
+
+# copy in elixir deps required to build node modules for phoenix
+COPY --from=elixir-builder /root/deps ./deps
+
+RUN npm --prefix assets ci
+RUN npm --prefix assets run deploy
 
 # use a debian container for the runtime environment
 FROM debian:buster
