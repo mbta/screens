@@ -375,12 +375,26 @@ const LaterDepartureTime = ({ time, currentTimeString }): JSX.Element => {
   }
 };
 
+const iconForAlert = alert => {
+  return (
+    {
+      SERVICE_CHANGE: "alert",
+      DETOUR: "bus",
+      STOP_MOVE: "no-service",
+      STOP_CLOSURE: "logo-white"
+    }[alert.effect] || "alert"
+  );
+};
+
 const FlexZoneAlert = ({ alert }): JSX.Element => {
   const updatedTime = moment(alert.updated_at);
   return (
     <div className="alert-container">
       <div className="alert-icon-container">
-        <img className="alert-icon-image" src="images/alert.svg" />
+        <img
+          className="alert-icon-image"
+          src={`images/${iconForAlert(alert)}.svg`}
+        />
       </div>
       <div className="alert-description-header">
         {alert.effect.replace("_", " ").replace(/\w\S*/g, txt => {

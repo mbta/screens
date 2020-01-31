@@ -47,4 +47,8 @@ defmodule Screens.Alerts.Alert do
     |> Enum.filter(fn d -> d.route == route_id end)
     |> Enum.map(& &1.id)
   end
+
+  defp match_departures_by_informed_entity(_informed_entity, _departures) do
+    []
+  end
 end

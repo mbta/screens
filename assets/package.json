@@ -9,7 +9,7 @@
     "lint:check": "tslint -p .",
     "format": "prettier --write \"{.,**}/*.{js,json,ts,tsx,css,scss}\"",
     "format:check": "prettier --check \"{.,**}/*.{js,json,ts,tsx,css,scss}\"",
-    "check": "tsc --noEmit && npm run lint:check && npm run format:check"
+    "check": "npm run lint:check && npm run format:check"
   },
   "dependencies": {
     "moment": "^2.24.0",

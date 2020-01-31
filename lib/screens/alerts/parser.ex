@@ -13,7 +13,12 @@ defmodule Screens.Alerts.Parser do
   end
 
   def parse_alert(%{"id" => id, "attributes" => attributes}) do
-    %{"effect" => effect, "header" => header, "informed_entity" => informed_entities, "updated_at" => updated_at} = attributes
+    %{
+      "effect" => effect,
+      "header" => header,
+      "informed_entity" => informed_entities,
+      "updated_at" => updated_at
+    } = attributes
 
     %Screens.Alerts.Alert{
       id: id,
