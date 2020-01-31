@@ -42,9 +42,23 @@ config :screens,
     "16" => %{stop_id: "407"},
     "17" => %{stop_id: "5605"},
     "18" => %{stop_id: "637"},
-    "19" => %{stop_id: "8178"}
+    "19" => %{stop_id: "8178"},
+    # detour
+    "100" => %{stop_id: "2166"},
+    # stop move
+    "101" => %{stop_id: "150"},
+    # stop closure
+    "102" => %{stop_id: "1921"},
+    # service change
+    "103" => %{stop_id: "2085"},
+    # station issue
+    "104" => %{stop_id: "38671"}
   },
-  api_v3_key: "ba359ac2ed5b41a5b05bfae67321766a"
+  # api_v3_key: "ba359ac2ed5b41a5b05bfae67321766a",
+  # api_v3_url: "https://api-v3.mbta.com/"
+
+  api_v3_key: "b982dde8f59047da860575f09f7fae4b",
+  api_v3_url: "https://green.dev.api.mbtace.com/"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

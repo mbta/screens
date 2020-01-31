@@ -2,7 +2,8 @@ defmodule Screens.V3Api do
   @moduledoc false
 
   @default_opts [timeout: 2000, recv_timeout: 2000]
-  @base_url "https://api-v3.mbta.com/"
+  @base_url Application.get_env(:screens, :api_v3_url)
+  # @base_url "https://green.dev.api.mbtace.com/"
 
   def get_json(route, params \\ %{}, extra_headers \\ [], opts \\ []) do
     headers = extra_headers ++ api_key_headers(Application.get_env(:screens, :api_v3_key))

@@ -11,7 +11,8 @@ defmodule Screens.ScreenData do
       stop_name: extract_stop_name_from_departures(departures),
       departure_rows: format_departure_rows(departures),
       alerts: format_alerts(alerts),
-      departures_alerts: departures_alerts
+      departures_alerts: departures_alerts,
+      stop_id: stop_id
     }
   end
 
@@ -23,7 +24,9 @@ defmodule Screens.ScreenData do
   end
 
   defp format_departure_rows(departures) do
-    Enum.map(departures, &Screens.Departures.Departure.to_map/1)
+    departures
+    |> Enum.filter(& &1.realtime)
+    |> Enum.map(&Screens.Departures.Departure.to_map/1)
   end
 
   defp format_alerts(alerts) do

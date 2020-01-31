@@ -1,34 +1,88 @@
-body {
-  margin: 0px;
+.multi-screen-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+}
+
+.dual-screen-container {
+}
+
+.single-screen-container {
+  margin: 40px auto;
   padding: 0px;
+  width: 1200px;
+  height: 1600px;
+  border: 1px solid black;
+}
+
+.screen-spacer {
+  margin: 40px auto;
+  padding: 0px;
+  width: 1200px;
+  height: 200px;
 }
 
 .header {
   background-color: black;
   color: white;
-  font-family: arial;
-  font-size: 48px;
-  height: 3em;
+  font-family: Helvetica Neue;
+  height: 288px;
   position: relative;
 }
 
 .header-time {
-  float: right;
+  position: absolute;
+  top: 28px;
+  right: 40px;
+
+  font-size: 72px;
+  color: #ffffff;
+  letter-spacing: 0;
+  text-align: right;
+  line-height: 72px;
+  font-family: Helvetica Neue;
+  font-weight: 400;
 }
 
 .header-realtime-indicator {
-  font-size: 18px;
   position: absolute;
-  bottom: 0px;
-  right: 0px;
-  width: 144px;
+  right: 40px;
+  bottom: 47px;
+  width: 196px;
+  height: 64px;
+
+  font-size: 24px;
+  color: #ffffff;
+  text-align: right;
+  line-height: 32px;
+  font-family: Helvetica Neue;
+  font-weight: 400;
+  text-transform: uppercase;
 }
 
 .header-stopname {
+  width: 820px;
+
+  font-family: Helvetica Neue;
   font-weight: bold;
+
+  color: #ffffff;
+  letter-spacing: 1px;
+
   position: absolute;
-  bottom: 0px;
-  left: 0px;
+  bottom: 42px;
+  left: 56px;
+}
+
+.header-stopname-small {
+  font-size: 60px;
+}
+
+.header-stopname-medium {
+  font-size: 72px;
+}
+
+.header-stopname-large {
+  font-size: 108px;
 }
 
 .logo {
@@ -38,36 +92,368 @@ body {
   width: 50%;
 }
 
-.departures-container {
-  display: grid;
-  grid-template-columns: 20% 60% 20%;
-  grid-row-gap: 8px;
-  padding: 8px;
+.flex-zone-container {
+  height: 1180px;
+  display: flex;
+  flex-flow: column;
 }
 
-.departure-container {
-  display: contents;
+.flex-alert-container {
+  height: 100%;
+  display: grid;
+}
+
+.later-departures-container {
+}
+
+.later-departure-row-container {
+  display: flex;
+}
+
+.later-departure-row-before {
+  height: 22px;
+}
+
+.later-departure-row-after {
+  height: 24px;
+}
+
+.later-departure-row-hairline {
+  height: 4px;
+  background-color: #808080;
+  margin-left: 40px;
+  margin-right: 40px;
+}
+
+.later-departures-row-inline-badge-container {
+  text-align: right;
+  margin-right: 40px;
+}
+
+.alert-badge-icon {
+  width: 48px;
+  height: 54.75px;
+  position: relative;
+  top: 12px;
+  margin-left: 12px;
+  margin-right: 24px;
+}
+
+.later-departures-row-inline-badge {
+  font-family: Helvetica Neue;
+  font-size: 40px;
+  background-color: black;
+  color: white;
+  border-radius: 16px;
+  padding-left: 16px;
+  padding-right: 32px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.later-departures-row-inline-emphasis {
+  font-weight: bold;
+}
+
+.later-departure-route-container {
+  width: 254px;
+  height: 86px;
+}
+
+.later-departure-route-pill {
+  width: 178px;
+  height: 86px;
+  background-color: black;
+  border-radius: 72px;
+  margin-left: 44px;
+  display: grid;
+}
+
+.later-departure-route-number {
+  color: white;
+  font-size: 72px;
+  font-family: Helvetica Neue;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin: auto;
+}
+
+.later-departure-destination-container {
+  width: 646px;
+  display: grid;
+}
+
+.later-departure-destination {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.later-departure-destination-primary {
+  font-family: Helvetica Neue;
+  font-size: 54px;
+  font-weight: 500;
+}
+
+.later-departure-destination-secondary {
+  font-family: Helvetica Neue;
+  font-size: 36px;
+  font-weight: 400;
+}
+
+.later-departure-time-container {
+  width: 300px;
+  font-family: Helvetica Neue;
+  text-align: right;
+  margin-right: 40px;
+}
+
+.later-departure-time-now {
+  font-size: 72px;
+  font-weight: bold;
+}
+
+.later-departure-time-minutes {
+  font-size: 72px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.later-departure-time-minutes-label {
+  text-align: right;
+  font-size: 52.5px;
+  line-height: 72px;
+}
+
+.later-departure-time-timestamp {
+  font-size: 72px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.later-departure-time-ampm {
+  font-size: 52.5px;
+  line-height: 72px;
+  text-align: right;
+}
+
+.alert-container {
+  background: black;
+  color: white;
+  border-radius: 0px 24px 24px 0px;
+  margin-right: 34px;
+  display: grid;
+  grid-template-columns: 208px auto 240px;
+  font-family: Helvetica Neue;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.alert-icon-container {
+}
+
+.alert-icon-image {
+  height: 128px;
+  width: 128px;
+  margin: 32px 40px 32px 40px;
+}
+
+.alert-updated-timestamp {
+  font-size: 16px;
+  text-align: right;
+  color: white;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-right: 44px;
+}
+
+.alert-description-header {
+  font-size: 80px;
+  font-weight: bold;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.alert-description {
+  grid-column: 2 / 4;
+  font-size: 40px;
+  line-height: 56px;
+  margin-bottom: 51px;
+  margin-right: 40px;
+}
+
+.fare-container {
+  height: 248px;
+  display: flex;
+}
+
+.fare-icon-container {
+  width: 208px;
+}
+
+.fare-icon-image {
+  height: 128px;
+  width: 128px;
+  margin: 48px 40px 87px 40px;
+  padding: 0px;
+}
+
+.fare-info-container {
+  width: 992px;
+}
+
+.fare-info-header {
+  font-size: 36px;
+  line-height: 36px;
+  font-family: Helvetica Neue;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-top: 48px;
+  margin-bottom: 19px;
+}
+
+.fare-info-rows {
+  font-family: Helvetica Neue;
+}
+
+.fare-info-row {
+}
+
+.fare-info-row-cost {
+  font-size: 44px;
+  font-weight: bold;
+}
+
+.fare-info-row-description {
+  font-size: 44px;
+}
+
+.fare-info-row-details {
+  font-size: 36px;
+}
+
+.digital-bridge-container {
+  height: 172px;
+  background: black;
+  display: flex;
+}
+
+.digital-bridge-logo-container {
+  width: 208px;
+}
+
+.digital-bridge-logo-image {
+  height: 128px;
+  width: 128px;
+  margin: 22px 40px 22px 40px;
+  padding: 0px;
+}
+
+.digital-bridge-link-container {
+  width: 792px;
+  font-family: Helvetica Neue;
+  color: white;
+}
+
+.digital-bridge-link-description {
+  font-size: 36px;
+  line-height: 56px;
+  margin-top: 30px;
+}
+
+.digital-bridge-link-url {
+  font-size: 44px;
+  line-height: 56px;
+  font-weight: bold;
+}
+
+.digital-bridge-qr-container {
+  width: 200px;
+}
+
+.digital-bridge-qr-image-container {
+  background: white;
+  margin: 22px 40px 22px 32px;
+  border-radius: 8px;
+}
+
+.digital-bridge-qr-image {
   margin: 8px;
 }
 
+.departures-container {
+}
+
+.departures-row {
+}
+
+.departures-row-container {
+}
+
+.departure-row {
+  display: flex;
+}
+
+.departure-row-before {
+  height: 44px;
+}
+
+.departure-row-after {
+  height: 46px;
+}
+
+.departure-row-hairline {
+  height: 4px;
+  background-color: #808080;
+  margin-left: 32px;
+  margin-right: 40px;
+}
+
+.departures-row-inline-badge-container {
+  text-align: right;
+  margin-right: 40px;
+}
+
+.departures-row-inline-badge {
+  font-family: Helvetica Neue;
+  font-size: 40px;
+  background-color: black;
+  color: white;
+  border-radius: 16px;
+  padding-left: 16px;
+  padding-right: 32px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.departures-row-inline-emphasis {
+  font-weight: bold;
+}
+
+.departure-route {
+  width: 420px;
+}
+
 .departure-route-pill {
-  width: 150px;
-  height: 80px;
-  font-family: arial;
+  width: 356px;
+  height: 172px;
+  font-family: Helvetica Neue;
   font-weight: bold;
   background: black;
-  border-radius: 40px;
+  border-radius: 144px;
   display: grid;
+  margin-left: 32px;
 }
 
 .departure-route-number {
   color: white;
-  font-size: 48px;
+  font-size: 144px;
+  letter-spacing: 5px;
   margin: auto;
 }
 
 .departure-destination {
-  font-family: arial;
+  width: 420px;
+  font-family: Helvetica Neue;
   display: grid;
 }
 
@@ -77,17 +463,63 @@ body {
 }
 
 .departure-destination-primary {
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 72px;
+  font-weight: 500;
 }
 
 .departure-destination-secondary {
-  font-size: 18px;
-  font-weight: lighter;
+  font-size: 44px;
+  font-weight: 400;
 }
 
 .departure-time {
-  font-family: arial;
+  width: 360px;
+  font-family: Helvetica Neue;
   font-size: 48px;
+  text-align: right;
+  margin-right: 40px;
+}
+
+.departure-time-now {
+  font-size: 144px;
+  font-family: Helvetica Neue;
   font-weight: bold;
+  letter-spacing: 0;
+}
+
+.departure-time-minutes {
+  font-size: 144px;
+  font-family: Helvetica Neue;
+  font-weight: bold;
+  letter-spacing: 0;
+}
+
+.departure-time-minutes-label {
+  font-size: 105px;
+  line-height: 144px;
+  font-family: Helvetica Neue;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-align: right;
+}
+
+.departure-time-timestamp {
+  font-family: Helvetica Neue;
+  font-size: 105px;
+  line-height: 144px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.departure-time-ampm {
+  font-family: Helvetica Neue;
+  font-size: 72px;
+  line-height: 144px;
+  text-align: right;
+}
+
+.departure-line {
+  grid-column: 1 / -1;
+  background: black;
+  height: 1px;
 }

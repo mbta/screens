@@ -4,13 +4,15 @@ defmodule Screens.Alerts.Alert do
   defstruct id: nil,
             effect: nil,
             header: nil,
-            informed_entities: nil
+            informed_entities: nil,
+            updated_at: nil
 
   @type t :: %__MODULE__{
           id: String.t(),
           effect: String.t(),
           header: String.t(),
-          informed_entities: list(map())
+          informed_entities: list(map()),
+          updated_at: DateTime.t()
         }
 
   def to_map(alert) do
@@ -18,7 +20,8 @@ defmodule Screens.Alerts.Alert do
       id: alert.id,
       effect: alert.effect,
       header: alert.header,
-      informed_entities: alert.informed_entities
+      informed_entities: alert.informed_entities,
+      updated_at: DateTime.to_iso8601(alert.updated_at)
     }
   end
 
@@ -43,5 +46,9 @@ defmodule Screens.Alerts.Alert do
     departures
     |> Enum.filter(fn d -> d.route == route_id end)
     |> Enum.map(& &1.id)
+  end
+
+  defp match_departures_by_informed_entity(_informed_entity, _departures) do
+    []
   end
 end

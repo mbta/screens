@@ -9,12 +9,13 @@
     "lint:check": "tslint -p .",
     "format": "prettier --write \"{.,**}/*.{js,json,ts,tsx,css,scss}\"",
     "format:check": "prettier --check \"{.,**}/*.{js,json,ts,tsx,css,scss}\"",
-    "check": "tsc --noEmit && npm run lint:check && npm run format:check"
+    "check": "npm run lint:check && npm run format:check"
   },
   "dependencies": {
     "moment": "^2.24.0",
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",
+    "qrcode.react": "^1.0.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-router-dom": "^5.1.2"
