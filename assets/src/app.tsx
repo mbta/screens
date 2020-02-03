@@ -3,15 +3,16 @@ declare function require(name: string): string;
 require("../css/app.scss");
 
 import "phoenix_html";
-import QRCode from "qrcode.react";
-import React, {
-  forwardRef,
-  setState,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState
-} from "react";
+// import QRCode from "qrcode.react";
+import React from "react";
+// , {
+//   forwardRef,
+//   setState,
+//   useEffect,
+//   useLayoutEffect,
+//   useRef,
+//   useState
+// } from "react";
 import ReactDOM from "react-dom";
 import {
   BrowserRouter as Router,
@@ -20,7 +21,7 @@ import {
   useParams
 } from "react-router-dom";
 
-import moment from "moment";
+// import moment from "moment";
 
 // const HomePage = (): JSX.Element => {
 //   return (
