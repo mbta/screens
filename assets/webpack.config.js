@@ -10,10 +10,11 @@ module.exports = (env, options) => ({
     extensions: [".ts", ".tsx", ".js", ".jsx"]
   },
   entry: {
-    "./src/app.ts": ["./src/app.tsx"]
+    polyfills: "./src/polyfills.js",
+    app: "./src/app.tsx"
   },
   output: {
-    filename: "app.js",
+    filename: "[name].js",
     path: path.resolve(__dirname, "../priv/static/js")
   },
   module: {
