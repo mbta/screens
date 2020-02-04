@@ -169,21 +169,22 @@ body {
   background-color: black;
   border-radius: 72px;
   margin-left: 44px;
-  display: grid;
+  text-align: center;
 }
 
 .later-departure-route-number {
   color: white;
   font-size: 72px;
-  font-family: neue-haas-grotesk-display;
-  font-weight: bold;
+  font-family: neue-haas-grotesk-text;
+  font-weight: 700;
   letter-spacing: 2px;
   margin: auto;
+  display: inline-block;
 }
 
 .later-departure-destination {
   display: inline-block;
-  font-family: neue-haas-grotesk-display;
+  font-family: neue-haas-grotesk-text;
   width: 646px;
 }
 
@@ -456,24 +457,25 @@ body {
 .departure-route-pill {
   width: 356px;
   height: 172px;
-  font-family: neue-haas-grotesk-display;
-  font-weight: bold;
+  font-family: neue-haas-grotesk-text;
   background: black;
   border-radius: 144px;
-  display: grid;
   margin-left: 32px;
+  text-align: center;
 }
 
 .departure-route-number {
   color: white;
   font-size: 144px;
-  letter-spacing: 5px;
+  letter-spacing: 4px;
   margin: auto;
+  display: inline-block;
+  font-weight: 700;
 }
 
 .departure-destination {
   width: 420px;
-  font-family: neue-haas-grotesk-display;
+  font-family: neue-haas-grotesk-text;
   display: inline-block;
 }
 
