@@ -19,16 +19,6 @@ module.exports = (env, options) => ({
   },
   module: {
     rules: [
-      // {
-      //   test: /\.ts(x?)$/,
-      //   exclude: /node_modules/,
-      //   use: [
-      //     {
-      //       loader: "ts-loader",
-      //       options: { transpileOnly: true }
-      //     }
-      //   ]
-      // },
       {
         test: /\.ts(x?)$/,
         exclude: /node_modules/,

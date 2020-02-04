@@ -286,7 +286,7 @@ const LaterDepartureRow = ({
   first
 }): JSX.Element => {
   return (
-    <div className="later-departure-row-container">
+    <div className="later-departure-row">
       <LaterDepartureRoute route={route} />
       <LaterDepartureDestination destination={destination} />
       <LaterDepartureTime time={time} currentTimeString={currentTime} />
@@ -296,11 +296,11 @@ const LaterDepartureRow = ({
 
 const LaterDepartureRoute = ({ route }): JSX.Element => {
   if (!route) {
-    return <div className="later-departure-route-container"></div>;
+    return <div className="later-departure-route"></div>;
   }
 
   return (
-    <div className="later-departure-route-container">
+    <div className="later-departure-route">
       <div className="later-departure-route-pill">
         <span className="later-departure-route-number">{route}</span>
       </div>
@@ -310,7 +310,7 @@ const LaterDepartureRoute = ({ route }): JSX.Element => {
 
 const LaterDepartureDestination = ({ destination }): JSX.Element => {
   if (destination === undefined) {
-    return <div className="later-departure-destination-container"></div>;
+    return <div className="later-departure-destination"></div>;
   }
 
   if (destination.includes("via")) {
@@ -624,9 +624,9 @@ const DeparturesRow = ({
           />
         ))}
         <DeparturesAlert rowAlerts={rowAlerts} alerts={alerts} />
-        <div className="departure-row-after"></div>
-        <div className="departure-row-hairline"></div>
       </div>
+      <div className="departure-row-after"></div>
+      <div className="departure-row-hairline"></div>
     </div>
   );
 };
@@ -673,25 +673,25 @@ const DepartureRow = ({
 }): JSX.Element => {
   return (
     <div className="departure-row">
-      <DepartureRoute route={route} first={first} />
+      <DepartureRoute route={route} />
       <DepartureDestination destination={destination} />
       <DepartureTime time={time} currentTimeString={currentTimeString} />
     </div>
   );
 };
 
-const DepartureRoute = ({ route, first }): JSX.Element => {
-  if (first) {
-    return (
-      <div className="departure-route">
-        <div className="departure-route-pill">
-          <span className="departure-route-number">{route}</span>
-        </div>
-      </div>
-    );
-  } else {
+const DepartureRoute = ({ route }): JSX.Element => {
+  if (!route) {
     return <div className="departure-route"></div>;
   }
+
+  return (
+    <div className="departure-route">
+      <div className="departure-route-pill">
+        <span className="departure-route-number">{route}</span>
+      </div>
+    </div>
+  );
 };
 
 const DepartureDestination = ({ destination }): JSX.Element => {
