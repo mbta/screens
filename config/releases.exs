@@ -4,6 +4,12 @@
 # remember to add this file to your .gitignore.
 import Config
 
+# make sure ExAWS.SecretsManager and its dependencies are available
+Application.ensure_all_started(:poison)
+Application.ensure_all_started(:hackney)
+Application.ensure_all_started(:ex_aws)
+Application.ensure_all_started(:ex_aws_secretsmanager)
+
 secret_key_base =
   "screens-dev-secret-key-base"
   |> ExAws.SecretsManager.get_secret_value()
