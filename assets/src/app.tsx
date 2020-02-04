@@ -416,7 +416,8 @@ const FareInfo = (): JSX.Element => {
         <img className="fare-icon-image" src="images/bus.svg" />
       </div>
       <div className="fare-info-container">
-        <div className="fare-info-header">One Way Bus Fares</div>
+        <div className="fare-info-header">Local bus one-way</div>
+        <div className="fare-info-link">More at www.mbta.com/fares</div>
         <div className="fare-info-rows">
           <div className="fare-info-row">
             <span className="fare-info-row-cost">$1.70 </span>

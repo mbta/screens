@@ -96,7 +96,7 @@ body {
 }
 
 .flex-zone-container {
-  height: 1180px;
+  height: 1165px;
   display: flex;
   flex-flow: column;
 }
@@ -285,37 +285,49 @@ body {
 }
 
 .fare-container {
-  height: 248px;
-  display: flex;
+  height: 263px;
+  font-family: neue-haas-grotesk-text;
 }
 
 .fare-icon-container {
   width: 208px;
+  display: inline-block;
 }
 
 .fare-icon-image {
   height: 128px;
   width: 128px;
-  margin: 48px 40px 87px 40px;
+  margin: 48px 40px 83px 40px;
   padding: 0px;
 }
 
 .fare-info-container {
   width: 992px;
+  display: inline-block;
+  position: relative;
+  bottom: 56px;
 }
 
 .fare-info-header {
   font-size: 36px;
   line-height: 36px;
-  font-family: neue-haas-grotesk-display;
-  font-weight: bold;
+  font-weight: 700;
   text-transform: uppercase;
   margin-top: 48px;
   margin-bottom: 19px;
+  display: inline-block;
+}
+
+.fare-info-link {
+  font-size: 32px;
+  line-height: 36px;
+  text-align: right;
+  display: inline-block;
+  margin-right: 40px;
+  width: 560px;
 }
 
 .fare-info-rows {
-  font-family: neue-haas-grotesk-display;
 }
 
 .fare-info-row {
