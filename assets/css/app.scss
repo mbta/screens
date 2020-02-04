@@ -337,45 +337,50 @@ body {
 .digital-bridge-container {
   height: 172px;
   background: black;
-  display: flex;
 }
 
 .digital-bridge-logo-container {
   width: 208px;
+  display: inline-block;
 }
 
 .digital-bridge-logo-image {
   height: 128px;
   width: 128px;
-  margin: 22px 40px 22px 40px;
-  padding: 0px;
+  margin: 24px 40px 20px 40px;
 }
 
 .digital-bridge-link-container {
   width: 792px;
-  font-family: neue-haas-grotesk-display;
+  font-family: neue-haas-grotesk-text;
   color: white;
+  display: inline-block;
+  position: relative;
+  bottom: 42px;
 }
 
 .digital-bridge-link-description {
   font-size: 36px;
   line-height: 56px;
-  margin-top: 30px;
+  font-weight: 400;
 }
 
 .digital-bridge-link-url {
   font-size: 44px;
   line-height: 56px;
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .digital-bridge-qr-container {
   width: 200px;
+  display: inline-block;
+  position: relative;
+  bottom: 24px;
 }
 
 .digital-bridge-qr-image-container {
   background: white;
-  margin: 22px 40px 22px 32px;
+  margin: 22px 32px 22px 40px;
   border-radius: 8px;
 }
 
