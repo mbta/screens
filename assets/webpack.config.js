@@ -18,15 +18,32 @@ module.exports = (env, options) => ({
   },
   module: {
     rules: [
+      // {
+      //   test: /\.ts(x?)$/,
+      //   exclude: /node_modules/,
+      //   use: [
+      //     {
+      //       loader: "ts-loader",
+      //       options: { transpileOnly: true }
+      //     }
+      //   ]
+      // },
       {
         test: /\.ts(x?)$/,
         exclude: /node_modules/,
-        use: [
-          {
-            loader: "ts-loader",
-            options: { transpileOnly: true }
-          }
-        ]
+        loader: 'babel-loader',
+        query: {
+          presets: [
+            ['@babel/preset-env', {
+              targets: {
+                browsers: '> 3%'
+              }
+            }],
+            '@babel/preset-react',
+            '@babel/preset-typescript'
+          ],
+          babelrc: false
+        }
       },
       {
         enforce: "pre",
