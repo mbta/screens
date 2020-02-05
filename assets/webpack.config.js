@@ -10,10 +10,11 @@ module.exports = (env, options) => ({
     extensions: [".ts", ".tsx", ".js", ".jsx"]
   },
   entry: {
-    "./src/app.ts": ["./src/app.tsx"]
+    polyfills: "./src/polyfills.js",
+    app: "./src/app.tsx"
   },
   output: {
-    filename: "app.js",
+    filename: "[name].js",
     path: path.resolve(__dirname, "../priv/static/js")
   },
   module: {
@@ -21,12 +22,30 @@ module.exports = (env, options) => ({
       {
         test: /\.ts(x?)$/,
         exclude: /node_modules/,
-        use: [
-          {
-            loader: "ts-loader",
-            options: { transpileOnly: true }
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: [
+              ["@babel/preset-env", { targets: "> 0.25%" }],
+              "@babel/preset-react",
+              "@babel/preset-typescript"
+            ],
+            plugins: [
+              "@babel/plugin-proposal-export-default-from",
+              "@babel/plugin-proposal-logical-assignment-operators",
+              ["@babel/plugin-proposal-optional-chaining", { loose: false }],
+              [
+                "@babel/plugin-proposal-pipeline-operator",
+                { proposal: "minimal" }
+              ],
+              [
+                "@babel/plugin-proposal-nullish-coalescing-operator",
+                { loose: false }
+              ],
+              "@babel/plugin-proposal-do-expressions"
+            ]
           }
-        ]
+        }
       },
       {
         enforce: "pre",
