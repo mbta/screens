@@ -79,15 +79,13 @@ body {
 }
 
 .header-stopname-small {
-  font-size: 60px;
-}
-
-.header-stopname-medium {
   font-size: 72px;
+  line-height: 72px;
 }
 
 .header-stopname-large {
-  font-size: 108px;
+  font-size: 96px;
+  line-height: 96px;
 }
 
 .logo {
@@ -107,6 +105,10 @@ body {
 
 .flex-bottom-container {
   height: 580px;
+}
+
+.later-departures-container {
+  overflow: hidden;
 }
 
 .later-departure-row {
@@ -337,7 +339,7 @@ body {
   text-align: right;
   display: inline-block;
   margin-right: 40px;
-  width: 554px;
+  width: 540px;
 }
 
 .fare-info-rows {

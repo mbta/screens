@@ -89,6 +89,17 @@ const ScreenContainer = ({ id }): JSX.Element => {
     }
   });
 
+  const [bottomNumRows, setBottomNumRows] = useState(5);
+  const bottomRef = useRef(null);
+  useLayoutEffect(() => {
+    if (bottomRef.current) {
+      const height = bottomRef.current.clientHeight;
+      if (height > 585) {
+        setBottomNumRows(bottomNumRows - 1);
+      }
+    }
+  });
+
   return (
     <div className="dual-screen-container">
       <TopScreenContainer
@@ -107,53 +118,83 @@ const ScreenContainer = ({ id }): JSX.Element => {
         stopId={stopId}
         numRows={numRows}
         currentTime={currentTimeString}
+        bottomNumRows={bottomNumRows}
+        ref={bottomRef}
       />
     </div>
   );
 };
 
-const BottomScreenContainer = ({
-  departureRows,
-  alerts,
-  departuresAlerts,
-  stopId,
-  numRows,
-  currentTime
-}): JSX.Element => {
-  return (
-    <div className="single-screen-container">
-      <FlexZoneContainer
-        alerts={alerts}
-        departureRows={departureRows}
-        numRows={numRows}
-        currentTime={currentTime}
-        departuresAlerts={departuresAlerts}
-      />
-      <FareInfo />
-      <DigitalBridge stopId={stopId} />
-    </div>
-  );
-};
-
-const FlexZoneContainer = ({
-  alerts,
-  departureRows,
-  numRows,
-  currentTime,
-  departuresAlerts
-}): JSX.Element => {
-  // Logic to decide which flex zones to show
-  let alert;
-
-  if (alerts) {
-    alerts.forEach(al => {
-      if (al.effect !== "DELAY") {
-        alert = al;
-      }
-    });
+const BottomScreenContainer = forwardRef(
+  (
+    {
+      departureRows,
+      alerts,
+      departuresAlerts,
+      stopId,
+      numRows,
+      currentTime,
+      bottomNumRows
+    },
+    ref
+  ): JSX.Element => {
+    return (
+      <div className="single-screen-container">
+        <FlexZoneContainer
+          alerts={alerts}
+          departureRows={departureRows}
+          numRows={numRows}
+          currentTime={currentTime}
+          departuresAlerts={departuresAlerts}
+          bottomNumRows={bottomNumRows}
+          ref={ref}
+        />
+        <FareInfo />
+        <DigitalBridge stopId={stopId} />
+      </div>
+    );
   }
+);
 
-  if (!alert) {
+const FlexZoneContainer = forwardRef(
+  (
+    {
+      alerts,
+      departureRows,
+      numRows,
+      currentTime,
+      departuresAlerts,
+      bottomNumRows
+    },
+    ref
+  ): JSX.Element => {
+    // Logic to decide which flex zones to show
+    let alert;
+
+    if (alerts) {
+      alerts.forEach(al => {
+        if (al.effect !== "DELAY") {
+          alert = al;
+        }
+      });
+    }
+
+    if (!alert) {
+      return (
+        <div className="flex-zone-container">
+          <LaterDepartures
+            departureRows={departureRows}
+            startIndex={numRows}
+            currentTime={currentTime}
+            alerts={alerts}
+            departuresAlerts={departuresAlerts}
+            bottomNumRows={bottomNumRows}
+            ref={ref}
+          />
+        </div>
+      );
+    }
+
     return (
       <div className="flex-zone-container">
         <LaterDepartures
@@ -162,63 +203,64 @@ const FlexZoneContainer = ({
           currentTime={currentTime}
           alerts={alerts}
           departuresAlerts={departuresAlerts}
+          bottomNumRows={bottomNumRows}
+          ref={ref}
         />
+        <div className="flex-bottom-container">
+          <FlexZoneAlert alert={alert} />
+        </div>
       </div>
     );
   }
+);
 
-  return (
-    <div className="flex-zone-container">
-      <LaterDepartures
-        departureRows={departureRows}
-        startIndex={numRows}
-        currentTime={currentTime}
-        alerts={alerts}
-        departuresAlerts={departuresAlerts}
-      />
-      <div className="flex-bottom-container">
-        <FlexZoneAlert alert={alert} />
-      </div>
-    </div>
-  );
-};
+const LaterDepartures = forwardRef(
+  (
+    {
+      departureRows,
+      startIndex,
+      currentTime,
+      alerts,
+      departuresAlerts,
+      bottomNumRows
+    },
+    ref
+  ): JSX.Element => {
+    if (!departureRows) {
+      return <div className="flex-top-container"></div>;
+    }
 
-const LaterDepartures = ({
-  departureRows,
-  startIndex,
-  currentTime,
-  alerts,
-  departuresAlerts
-}): JSX.Element => {
-  if (!departureRows) {
-    return <div className="flex-top-container"></div>;
-  }
+    const laterDepartureRows = departureRows.slice(
+      startIndex,
+      startIndex + bottomNumRows
+    );
+    const rows = buildDeparturesRows(
+      laterDepartureRows,
+      alerts,
+      departuresAlerts,
+      bottomNumRows
+    );
 
-  const laterDepartureRows = departureRows.slice(startIndex, startIndex + 4);
-  const rows = buildDeparturesRows(
-    laterDepartureRows,
-    alerts,
-    departuresAlerts,
-    4
-  );
-
-  return (
-    <div className="flex-top-container">
-      {rows.map((row, i) => (
-        <div key={row.route + row.time}>
-          <LaterDeparturesRow
-            currentTime={currentTime}
-            route={row.route}
-            destination={row.destination}
-            departureTimes={row.time}
-            rowAlerts={row.alerts}
-            alerts={alerts}
-          />
+    return (
+      <div className="flex-top-container">
+        <div className="later-departures-container" ref={ref}>
+          {rows.map((row, i) => (
+            <div key={row.route + row.time}>
+              <LaterDeparturesRow
+                currentTime={currentTime}
+                route={row.route}
+                destination={row.destination}
+                departureTimes={row.time}
+                rowAlerts={row.alerts}
+                alerts={alerts}
+              />
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-  );
-};
+      </div>
+    );
+  }
+);
 
 const LaterDeparturesRow = ({
   currentTime,
@@ -505,7 +547,7 @@ const TopScreenContainer = forwardRef(
 
 const Header = ({ stopName, currentTimeString }): JSX.Element => {
   const ref = useRef(null);
-  const [stopSize, setStopSize] = useState(2);
+  const [stopSize, setStopSize] = useState(1);
   const currentTime = moment(currentTimeString)
     .tz("America/New_York")
     .format("h:mm");
@@ -517,7 +559,7 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
     }
   });
 
-  const SIZES = ["small", "medium", "large"];
+  const SIZES = ["small", "large"];
   const stopClassName = "header-stopname header-stopname-" + SIZES[stopSize];
 
   return (
