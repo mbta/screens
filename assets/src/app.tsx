@@ -173,7 +173,7 @@ const FlexZoneContainer = forwardRef(
 
     if (alerts) {
       alerts.forEach(al => {
-        if (al.effect !== "DELAY") {
+        if (!alert && al.effect !== "delay") {
           alert = al;
         }
       });
@@ -296,7 +296,7 @@ const LaterDeparturesAlert = ({ rowAlerts, alerts }): JSX.Element => {
   let header;
   rowAlerts.forEach(alertId => {
     alerts.forEach(alert => {
-      if (alertId === alert.id && alert.effect === "DELAY") {
+      if (alertId === alert.id && alert.effect === "delay") {
         header = alert.header;
       }
     });
@@ -690,7 +690,7 @@ const DeparturesAlert = ({ rowAlerts, alerts }): JSX.Element => {
   let header;
   rowAlerts.forEach(alertId => {
     alerts.forEach(alert => {
-      if (alertId === alert.id && alert.effect === "DELAY") {
+      if (alertId === alert.id && alert.effect === "delay") {
         header = alert.header;
       }
     });

@@ -25,4 +25,10 @@ defmodule ScreensWeb.Router do
 
     get "/:id", ApiController, :show
   end
+
+  scope "/alert_priority", ScreensWeb do
+    pipe_through [:api, :browser]
+
+    get "/:id", AlertPriorityController, :show
+  end
 end
