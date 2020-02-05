@@ -21,6 +21,7 @@ import {
 } from "react-router-dom";
 
 import moment from "moment";
+import "moment-timezone";
 
 const HomePage = (): JSX.Element => {
   return (
@@ -362,8 +363,8 @@ const LaterDepartureTime = ({ time, currentTimeString }): JSX.Element => {
       </div>
     );
   } else {
-    const timestamp = departureTime.format("h:mm");
-    const ampm = departureTime.format("A");
+    const timestamp = departureTime.tz("America/New_York").format("h:mm");
+    const ampm = departureTime.tz("America/New_York").format("A");
 
     return (
       <div className="later-departure-time-container">
@@ -403,7 +404,7 @@ const FlexZoneAlert = ({ alert }): JSX.Element => {
         </div>
         <div className="alert-header-timestamp">
           Updated <br />
-          {updatedTime.format("M/D/Y · h:mm A")}
+          {updatedTime.tz("America/New_York").format("M/D/Y · h:mm A")}
         </div>
       </div>
 
@@ -505,7 +506,9 @@ const TopScreenContainer = forwardRef(
 const Header = ({ stopName, currentTimeString }): JSX.Element => {
   const ref = useRef(null);
   const [stopSize, setStopSize] = useState(2);
-  const currentTime = moment(currentTimeString).format("h:mm");
+  const currentTime = moment(currentTimeString)
+    .tz("America/New_York")
+    .format("h:mm");
 
   useLayoutEffect(() => {
     const height = ref.current.clientHeight;
