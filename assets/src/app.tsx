@@ -175,7 +175,7 @@ const FlexZoneContainer = ({
         alerts={alerts}
         departuresAlerts={departuresAlerts}
       />
-      <div className="flex-alert-container">
+      <div className="flex-bottom-container">
         <FlexZoneAlert alert={alert} />
       </div>
     </div>
@@ -190,7 +190,7 @@ const LaterDepartures = ({
   departuresAlerts
 }): JSX.Element => {
   if (!departureRows) {
-    return <div className="later-departures-container"></div>;
+    return <div className="flex-top-container"></div>;
   }
 
   const laterDepartureRows = departureRows.slice(startIndex, startIndex + 4);
@@ -202,7 +202,7 @@ const LaterDepartures = ({
   );
 
   return (
-    <div className="later-departures-container">
+    <div className="flex-top-container">
       {rows.map((row, i) => (
         <div key={row.route + row.time}>
           <LaterDeparturesRow
@@ -389,22 +389,27 @@ const FlexZoneAlert = ({ alert }): JSX.Element => {
   const updatedTime = moment(alert.updated_at);
   return (
     <div className="alert-container">
-      <div className="alert-icon-container">
-        <img
-          className="alert-icon-image"
-          src={`images/${iconForAlert(alert)}.svg`}
-        />
+      <div className="alert-header">
+        <div className="alert-header-icon-container">
+          <img
+            className="alert-icon-image"
+            src={`images/${iconForAlert(alert)}.svg`}
+          />
+        </div>
+        <div className="alert-header-effect">
+          {alert.effect.replace("_", " ").replace(/\w\S*/g, txt => {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+          })}
+        </div>
+        <div className="alert-header-timestamp">
+          Updated <br />
+          {updatedTime.format("M/D/Y · h:mm A")}
+        </div>
       </div>
-      <div className="alert-description-header">
-        {alert.effect.replace("_", " ").replace(/\w\S*/g, txt => {
-          return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-        })}
+
+      <div className="alert-body">
+        <div className="alert-body-description">{alert.header}</div>
       </div>
-      <div className="alert-updated-timestamp">
-        UPDATED <br />
-        {updatedTime.format("M/D/Y · h:mm A")}
-      </div>
-      <div className="alert-description">{alert.header}</div>
     </div>
   );
 };
