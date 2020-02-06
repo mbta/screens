@@ -56,6 +56,8 @@ defmodule Screens.Alerts.Alert do
           updated_at: DateTime.t()
         }
 
+  def to_map(nil), do: nil
+
   def to_map(alert) do
     aps = Enum.map(alert.active_period, &ap_to_map/1)
 
@@ -282,10 +284,34 @@ defmodule Screens.Alerts.Alert do
   ###
 
   def by_stop_id(stop_id) do
-    stop_id
-    |> fetch_alerts_for_stop_id()
-    |> Screens.Alerts.Parser.parse_result()
-    |> sort(stop_id)
+    {inline_alerts, global_alerts} =
+      stop_id
+      |> fetch_alerts_for_stop_id()
+      |> Screens.Alerts.Parser.parse_result()
+      |> split_inline_alerts()
+
+    global_alert =
+      Enum.min_by(global_alerts, fn alert -> sort_key(alert, stop_id) end, fn -> nil end)
+
+    {inline_alerts, global_alert}
+  end
+
+  defp split_inline_alerts(alerts) do
+    Enum.reduce(alerts, {[], []}, fn alert, {inline_alerts, global_alerts} ->
+      if is_inline?(alert) do
+        {[alert | inline_alerts], global_alerts}
+      else
+        {inline_alerts, [alert | global_alerts]}
+      end
+    end)
+  end
+
+  defp is_inline?(%{effect: :delay}) do
+    true
+  end
+
+  defp is_inline?(_) do
+    false
   end
 
   def associate_alerts_with_departures(alerts, departures) do

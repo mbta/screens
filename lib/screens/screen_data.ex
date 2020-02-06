@@ -3,15 +3,18 @@ defmodule Screens.ScreenData do
 
   def by_stop_id(stop_id) do
     departures = Screens.Departures.Departure.by_stop_id(stop_id)
-    alerts = Screens.Alerts.Alert.by_stop_id(stop_id)
-    departures_alerts = Screens.Alerts.Alert.associate_alerts_with_departures(alerts, departures)
+    {inline_alerts, global_alert} = Screens.Alerts.Alert.by_stop_id(stop_id)
+
+    departures_alerts =
+      Screens.Alerts.Alert.associate_alerts_with_departures(inline_alerts, departures)
 
     %{
       current_time: DateTime.utc_now() |> DateTime.truncate(:second) |> DateTime.to_iso8601(),
       stop_name: extract_stop_name_from_departures(departures),
       departure_rows: format_departure_rows(departures),
-      alerts: format_alerts(alerts),
+      inline_alerts: format_alerts(inline_alerts),
       departures_alerts: departures_alerts,
+      global_alert: Screens.Alerts.Alert.to_map(global_alert),
       stop_id: stop_id
     }
   end
