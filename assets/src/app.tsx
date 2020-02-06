@@ -174,40 +174,89 @@ const FlexZoneContainer = forwardRef(
     },
     ref
   ): JSX.Element => {
-    if (!globalAlert) {
+    // Check whether there are any later departures to show
+    let showLaterDepartures;
+    if (departureRows) {
+      showLaterDepartures = numRows < departureRows.length;
+    } else {
+      showLaterDepartures = false;
+    }
+
+    if (showLaterDepartures && globalAlert) {
+      // Later Departures + Alert
       return (
         <div className="flex-zone-container">
-          <LaterDepartures
-            departureRows={departureRows}
-            startIndex={numRows}
-            currentTime={currentTime}
-            alerts={inlineAlerts}
-            departuresAlerts={departuresAlerts}
-            bottomNumRows={bottomNumRows}
-            ref={ref}
-          />
+          <div className="flex-top-container">
+            <LaterDepartures
+              departureRows={departureRows}
+              startIndex={numRows}
+              currentTime={currentTime}
+              alerts={inlineAlerts}
+              departuresAlerts={departuresAlerts}
+              bottomNumRows={bottomNumRows}
+              ref={ref}
+            />
+          </div>
+          <div className="flex-bottom-container">
+            <FlexZoneAlert alert={globalAlert} />
+          </div>
+        </div>
+      );
+    } else if (showLaterDepartures) {
+      // Later Departures + Nearby Connections
+      return (
+        <div className="flex-zone-container">
+          <div className="flex-top-container">
+            <LaterDepartures
+              departureRows={departureRows}
+              startIndex={numRows}
+              currentTime={currentTime}
+              alerts={inlineAlerts}
+              departuresAlerts={departuresAlerts}
+              bottomNumRows={bottomNumRows}
+              ref={ref}
+            />
+          </div>
+          <div className="flex-bottom-container">
+            <NearbyConnections />
+          </div>
+        </div>
+      );
+    } else if (globalAlert) {
+      // Nearby Connections + Alert
+      return (
+        <div className="flex-zone-container">
+          <div className="flex-top-container">
+            <NearbyConnections />
+          </div>
+          <div className="flex-bottom-container">
+            <FlexZoneAlert alert={globalAlert} />
+          </div>
+        </div>
+      );
+    } else {
+      // Nearby Connections + Service Map
+      return (
+        <div className="flex-zone-container">
+          <div className="flex-top-container">
+            <NearbyConnections />
+          </div>
+          <div className="flex-bottom-container">
+            <ServiceMap />
+          </div>
         </div>
       );
     }
-
-    return (
-      <div className="flex-zone-container">
-        <LaterDepartures
-          departureRows={departureRows}
-          startIndex={numRows}
-          currentTime={currentTime}
-          alerts={inlineAlerts}
-          departuresAlerts={departuresAlerts}
-          bottomNumRows={bottomNumRows}
-          ref={ref}
-        />
-        <div className="flex-bottom-container">
-          <FlexZoneAlert alert={globalAlert} />
-        </div>
-      </div>
-    );
   }
 );
+
+const NearbyConnections = (): JSX.Element => {
+  return <div className="flex-placeholder">Nearby Connections</div>;
+};
+
+const ServiceMap = (): JSX.Element => {
+  return <div className="flex-placeholder">Service Map</div>;
+};
 
 const LaterDepartures = forwardRef(
   (
@@ -222,7 +271,7 @@ const LaterDepartures = forwardRef(
     ref
   ): JSX.Element => {
     if (!departureRows) {
-      return <div className="flex-top-container"></div>;
+      return <div></div>;
     }
 
     const laterDepartureRows = departureRows.slice(
@@ -237,21 +286,19 @@ const LaterDepartures = forwardRef(
     );
 
     return (
-      <div className="flex-top-container">
-        <div className="later-departures-container" ref={ref}>
-          {rows.map((row, i) => (
-            <div key={row.route + row.time}>
-              <LaterDeparturesRow
-                currentTime={currentTime}
-                route={row.route}
-                destination={row.destination}
-                departureTimes={row.time}
-                rowAlerts={row.alerts}
-                alerts={alerts}
-              />
-            </div>
-          ))}
-        </div>
+      <div className="later-departures-container" ref={ref}>
+        {rows.map((row, i) => (
+          <div key={row.route + row.time}>
+            <LaterDeparturesRow
+              currentTime={currentTime}
+              route={row.route}
+              destination={row.destination}
+              departureTimes={row.time}
+              rowAlerts={row.alerts}
+              alerts={alerts}
+            />
+          </div>
+        ))}
       </div>
     );
   }
