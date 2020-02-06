@@ -53,7 +53,8 @@ const ScreenPage = (): JSX.Element => {
 const ScreenContainer = ({ id }): JSX.Element => {
   const [currentTimeString, setCurrentTimeString] = useState();
   const [stopName, setStopName] = useState();
-  const [alerts, setAlerts] = useState();
+  const [inlineAlerts, setInlineAlerts] = useState();
+  const [globalAlert, setGlobalAlert] = useState();
   const [departureRows, setDepartureRows] = useState();
   const [departuresAlerts, setDeparturesAlerts] = useState();
   const [stopId, setStopId] = useState();
@@ -63,7 +64,8 @@ const ScreenContainer = ({ id }): JSX.Element => {
     const json = await result.json();
     setCurrentTimeString(json.current_time);
     setStopName(json.stop_name);
-    setAlerts(json.alerts);
+    setInlineAlerts(json.inline_alerts);
+    setGlobalAlert(json.global_alert);
     setDepartureRows(json.departure_rows);
     setDeparturesAlerts(json.departures_alerts);
     setStopId(json.stop_id);
@@ -106,14 +108,15 @@ const ScreenContainer = ({ id }): JSX.Element => {
         stopName={stopName}
         currentTimeString={currentTimeString}
         departureRows={departureRows}
-        alerts={alerts}
+        alerts={inlineAlerts}
         departuresAlerts={departuresAlerts}
         numRows={numRows}
         ref={ref}
       />
       <BottomScreenContainer
         departureRows={departureRows}
-        alerts={alerts}
+        inlineAlerts={inlineAlerts}
+        globalAlert={globalAlert}
         departuresAlerts={departuresAlerts}
         stopId={stopId}
         numRows={numRows}
@@ -129,7 +132,8 @@ const BottomScreenContainer = forwardRef(
   (
     {
       departureRows,
-      alerts,
+      inlineAlerts,
+      globalAlert,
       departuresAlerts,
       stopId,
       numRows,
@@ -141,7 +145,8 @@ const BottomScreenContainer = forwardRef(
     return (
       <div className="single-screen-container">
         <FlexZoneContainer
-          alerts={alerts}
+          inlineAlerts={inlineAlerts}
+          globalAlert={globalAlert}
           departureRows={departureRows}
           numRows={numRows}
           currentTime={currentTime}
@@ -159,7 +164,8 @@ const BottomScreenContainer = forwardRef(
 const FlexZoneContainer = forwardRef(
   (
     {
-      alerts,
+      inlineAlerts,
+      globalAlert,
       departureRows,
       numRows,
       currentTime,
@@ -168,25 +174,14 @@ const FlexZoneContainer = forwardRef(
     },
     ref
   ): JSX.Element => {
-    // Logic to decide which flex zones to show
-    let alert;
-
-    if (alerts) {
-      alerts.forEach(al => {
-        if (!alert && al.effect !== "delay") {
-          alert = al;
-        }
-      });
-    }
-
-    if (!alert) {
+    if (!globalAlert) {
       return (
         <div className="flex-zone-container">
           <LaterDepartures
             departureRows={departureRows}
             startIndex={numRows}
             currentTime={currentTime}
-            alerts={alerts}
+            alerts={inlineAlerts}
             departuresAlerts={departuresAlerts}
             bottomNumRows={bottomNumRows}
             ref={ref}
@@ -201,13 +196,13 @@ const FlexZoneContainer = forwardRef(
           departureRows={departureRows}
           startIndex={numRows}
           currentTime={currentTime}
-          alerts={alerts}
+          alerts={inlineAlerts}
           departuresAlerts={departuresAlerts}
           bottomNumRows={bottomNumRows}
           ref={ref}
         />
         <div className="flex-bottom-container">
-          <FlexZoneAlert alert={alert} />
+          <FlexZoneAlert alert={globalAlert} />
         </div>
       </div>
     );
@@ -293,26 +288,26 @@ const LaterDeparturesRow = ({
 };
 
 const LaterDeparturesAlert = ({ rowAlerts, alerts }): JSX.Element => {
-  let header;
+  let severity;
   rowAlerts.forEach(alertId => {
     alerts.forEach(alert => {
       if (alertId === alert.id && alert.effect === "delay") {
-        header = alert.header;
+        severity = alert.severity;
       }
     });
   });
 
-  if (header === undefined) {
+  if (severity === undefined) {
     return <div></div>;
   }
 
-  const delayMinutes = parseAlert(header);
+  const { delayDescription, delayMinutes } = parseSeverity(severity);
 
   return (
     <div className="later-departures-row-inline-badge-container">
       <span className="later-departures-row-inline-badge">
         <img className="alert-badge-icon" src="images/alert.svg" />
-        Delays up to{" "}
+        Delays {delayDescription + " "}
         <span className="later-departures-row-inline-emphasis">
           {delayMinutes} minutes
         </span>
@@ -682,31 +677,48 @@ const DeparturesRow = ({
   );
 };
 
-const parseAlert = header => {
-  return header.split("up to ")[1].split(" minutes")[0];
+const parseSeverity = severity => {
+  let delayDescription;
+  let delayMinutes;
+
+  // Note that delay severities are assumed to be between 3 and 9, inclusive
+  // Probably want to fail gracefully if that's not true
+
+  if (severity >= 8) {
+    delayDescription = "more than";
+    delayMinutes = 30 * (severity - 7);
+  } else {
+    delayDescription = "up to";
+    delayMinutes = 5 * (severity - 1);
+  }
+
+  return {
+    delayDescription,
+    delayMinutes
+  };
 };
 
 const DeparturesAlert = ({ rowAlerts, alerts }): JSX.Element => {
-  let header;
+  let severity;
   rowAlerts.forEach(alertId => {
     alerts.forEach(alert => {
       if (alertId === alert.id && alert.effect === "delay") {
-        header = alert.header;
+        severity = alert.severity;
       }
     });
   });
 
-  if (header === undefined) {
+  if (severity === undefined) {
     return <div></div>;
   }
 
-  const delayMinutes = parseAlert(header);
+  const { delayDescription, delayMinutes } = parseSeverity(severity);
 
   return (
     <div className="departures-row-inline-badge-container">
       <span className="departures-row-inline-badge">
         <img className="alert-badge-icon" src="images/alert.svg" />
-        Delays up to{" "}
+        Delays {delayDescription + " "}
         <span className="departures-row-inline-emphasis">
           {delayMinutes} minutes
         </span>
