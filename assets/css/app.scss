@@ -4,6 +4,13 @@ body {
   margin: 0px;
 }
 
+.flex-placeholder {
+  font-family: neue-haas-grotesk-display;
+  font-size: 96px;
+  font-weight: 700;
+  text-align: center;
+}
+
 .multi-screen-container {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
