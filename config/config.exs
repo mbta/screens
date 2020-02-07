@@ -55,7 +55,28 @@ config :screens,
     "104" => %{stop_id: "38671"}
   },
   api_v3_key: "ba359ac2ed5b41a5b05bfae67321766a",
-  api_v3_url: "https://api-v3.mbta.com/"
+  api_v3_url: "https://api-v3.mbta.com/",
+  nearby_connections: %{
+    "1722" => ["place-matt", "place-DB-2222"],
+    "383" => ["2923", "568"],
+    "5496" => ["5403"],
+    "2134" => ["place-FR-0074", "2137"],
+    "32549" => ["place-harsq", "110"],
+    "22549" => ["2168", "place-harsq"],
+    "5615" => ["place-belsq", "place-ER-0046"],
+    "36466" => ["26531", "place-NEC-2203"],
+    "11257" => ["1144", "place-rcmnl"],
+    "58" => ["1790", "5"],
+    "21365" => ["place-rvrwy", "1314"],
+    "178" => ["place-coecl", "175"],
+    "6564" => ["place-sstat", "6538"],
+    "1357" => ["place-rcmnl"],
+    "390" => ["1332", "1569"],
+    "407" => ["1346", "1583"],
+    "5605" => ["place-belsq", "place-ER-0046"],
+    "637" => ["6428", "place-NB-0064"],
+    "8178" => ["900", "8297"]
+  }
 
 # api_v3_key: "b982dde8f59047da860575f09f7fae4b",
 # api_v3_url: "https://green.dev.api.mbtace.com/"
