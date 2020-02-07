@@ -58,6 +58,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [departureRows, setDepartureRows] = useState();
   const [departuresAlerts, setDeparturesAlerts] = useState();
   const [stopId, setStopId] = useState();
+  const [nearbyConnections, setNearbyConnections] = useState();
 
   const doUpdate = async () => {
     const result = await fetch(`/api/${id}`);
@@ -69,6 +70,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
     setDepartureRows(json.departure_rows);
     setDeparturesAlerts(json.departures_alerts);
     setStopId(json.stop_id);
+    setNearbyConnections(json.nearby_connections);
   };
 
   useEffect(() => {
@@ -122,6 +124,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
         numRows={numRows}
         currentTime={currentTimeString}
         bottomNumRows={bottomNumRows}
+        nearbyConnections={nearbyConnections}
         ref={bottomRef}
       />
     </div>
@@ -138,7 +141,8 @@ const BottomScreenContainer = forwardRef(
       stopId,
       numRows,
       currentTime,
-      bottomNumRows
+      bottomNumRows,
+      nearbyConnections
     },
     ref
   ): JSX.Element => {
@@ -152,6 +156,7 @@ const BottomScreenContainer = forwardRef(
           currentTime={currentTime}
           departuresAlerts={departuresAlerts}
           bottomNumRows={bottomNumRows}
+          nearbyConnections={nearbyConnections}
           ref={ref}
         />
         <FareInfo />
@@ -170,7 +175,8 @@ const FlexZoneContainer = forwardRef(
       numRows,
       currentTime,
       departuresAlerts,
-      bottomNumRows
+      bottomNumRows,
+      nearbyConnections
     },
     ref
   ): JSX.Element => {
@@ -218,7 +224,7 @@ const FlexZoneContainer = forwardRef(
             />
           </div>
           <div className="flex-bottom-container">
-            <NearbyConnections />
+            <NearbyConnections nearbyConnections={nearbyConnections} />
           </div>
         </div>
       );
@@ -227,7 +233,7 @@ const FlexZoneContainer = forwardRef(
       return (
         <div className="flex-zone-container">
           <div className="flex-top-container">
-            <NearbyConnections />
+            <NearbyConnections nearbyConnections={nearbyConnections} />
           </div>
           <div className="flex-bottom-container">
             <FlexZoneAlert alert={globalAlert} />
@@ -239,7 +245,7 @@ const FlexZoneContainer = forwardRef(
       return (
         <div className="flex-zone-container">
           <div className="flex-top-container">
-            <NearbyConnections />
+            <NearbyConnections nearbyConnections={nearbyConnections} />
           </div>
           <div className="flex-bottom-container">
             <ServiceMap />
@@ -250,12 +256,101 @@ const FlexZoneContainer = forwardRef(
   }
 );
 
-const NearbyConnections = (): JSX.Element => {
-  return <div className="flex-placeholder">Nearby Connections</div>;
+const NearbyConnections = ({ nearbyConnections }): JSX.Element => {
+  if (!nearbyConnections) {
+    return <div></div>;
+  }
+
+  return (
+    <div className="nearby-connections-container">
+      <div className="nearby-connections-header">
+        <div className="nearby-connections-icon-container">
+          <img className="nearby-connections-icon" src="images/nearby.svg" />
+        </div>
+        <div className="nearby-connections-header-text">Nearby connections</div>
+      </div>
+      <div className="nearby-connections-hairline"></div>
+      {nearbyConnections.map(row => (
+        <div key={row.name}>
+          <NearbyConnectionsRow
+            name={row.name}
+            distance={row.distance}
+            routes={row.routes}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
+  const distanceInFeet = Math.round(distance * 5280);
+  let distanceMetric;
+  let distanceUnits;
+
+  if (distanceInFeet >= 1000) {
+    distanceUnits = "miles";
+    distanceMetric = distance.toFixed(2);
+  } else {
+    distanceUnits = "feet";
+    distanceMetric = distanceInFeet;
+  }
+
+  return (
+    <div className="nearby-connections-row">
+      <div className="nearby-connections-row-header">
+        <div className="nearby-connections-row-stop-name">
+          {name.replace("Massachusetts", "Mass")}
+        </div>
+        <div className="nearby-connections-row-distance-label">
+          <span className="nearby-connections-row-distance">
+            {distanceMetric}{" "}
+          </span>
+          <span className="nearby-connections-row-distance-units">
+            {distanceUnits}
+          </span>
+        </div>
+      </div>
+      <div className="nearby-connections-routes">
+        {routes.map(route => (
+          <div className="nearby-connections-route" key={route}>
+            <NearbyConnectionsRoute
+              route={route}
+              small={name === "South Station"}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="nearby-connections-hairline"></div>
+    </div>
+  );
+};
+
+const NearbyConnectionsRoute = ({ route, small }): JSX.Element => {
+  let pillClass;
+  let textClass;
+
+  if (small) {
+    pillClass =
+      "nearby-connections-route-pill nearby-connections-route-pill-small";
+    textClass =
+      "nearby-connections-route-text nearby-connections-route-text-small";
+  } else {
+    pillClass =
+      "nearby-connections-route-pill nearby-connections-route-pill-normal";
+    textClass =
+      "nearby-connections-route-text nearby-connections-route-text-normal";
+  }
+
+  return (
+    <div className={pillClass}>
+      <div className={textClass}>{route}</div>
+    </div>
+  );
 };
 
 const ServiceMap = (): JSX.Element => {
-  return <div className="flex-placeholder">Service Map</div>;
+  return <div className="flex-placeholder"></div>;
 };
 
 const LaterDepartures = forwardRef(
@@ -288,7 +383,7 @@ const LaterDepartures = forwardRef(
     return (
       <div className="later-departures-container" ref={ref}>
         {rows.map((row, i) => (
-          <div key={row.route + row.time}>
+          <div key={row.route + row.time + i}>
             <LaterDeparturesRow
               currentTime={currentTime}
               route={row.route}
@@ -323,7 +418,7 @@ const LaterDeparturesRow = ({
             time={t}
             currentTime={currentTime}
             first={i === 0}
-            key={route + t}
+            key={route + t + i}
           />
         ))}
         <LaterDeparturesAlert rowAlerts={rowAlerts} alerts={alerts} />
@@ -686,7 +781,7 @@ const DeparturesContainer = forwardRef(
             departureTimes={row.time}
             rowAlerts={row.alerts}
             alerts={alerts}
-            key={row.route + row.time}
+            key={row.route + row.time + i}
           />
         ))}
       </div>
@@ -713,7 +808,7 @@ const DeparturesRow = ({
             destination={i === 0 ? destination : undefined}
             time={t}
             first={i === 0}
-            key={route + t}
+            key={route + t + i}
           />
         ))}
         <DeparturesAlert rowAlerts={rowAlerts} alerts={alerts} />

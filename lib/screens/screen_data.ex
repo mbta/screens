@@ -8,6 +8,8 @@ defmodule Screens.ScreenData do
     departures_alerts =
       Screens.Alerts.Alert.associate_alerts_with_departures(inline_alerts, departures)
 
+    nearby_connections = Screens.NearbyConnections.by_stop_id(stop_id)
+
     %{
       current_time: DateTime.utc_now() |> DateTime.truncate(:second) |> DateTime.to_iso8601(),
       stop_name: extract_stop_name_from_departures(departures),
@@ -15,7 +17,8 @@ defmodule Screens.ScreenData do
       inline_alerts: format_alerts(inline_alerts),
       departures_alerts: departures_alerts,
       global_alert: Screens.Alerts.Alert.to_map(global_alert),
-      stop_id: stop_id
+      stop_id: stop_id,
+      nearby_connections: nearby_connections
     }
   end
 
