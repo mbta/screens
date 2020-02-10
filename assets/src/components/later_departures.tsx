@@ -2,10 +2,7 @@ import moment from "moment";
 import "moment-timezone";
 import React, { forwardRef } from "react";
 
-import DepartureDestination from "./departure_destination";
-import DepartureRoute from "./departure_route";
-import DepartureTime from "./departure_time";
-import DeparturesAlert from "./departures_alert";
+import DeparturesRow from "./departures_row";
 
 const buildDeparturesRows = (
   departuresRows,
@@ -87,13 +84,14 @@ const LaterDepartures = forwardRef(
       <div className="later-departures-container" ref={ref}>
         {rows.map((row, i) => (
           <div key={row.route + row.time + i}>
-            <LaterDeparturesRow
+            <DeparturesRow
               currentTime={currentTime}
               route={row.route}
               destination={row.destination}
               departureTimes={row.time}
               rowAlerts={row.alerts}
               alerts={alerts}
+              modifier={true}
             />
           </div>
         ))}
@@ -101,59 +99,5 @@ const LaterDepartures = forwardRef(
     );
   }
 );
-
-const LaterDeparturesRow = ({
-  currentTime,
-  route,
-  destination,
-  departureTimes,
-  rowAlerts,
-  alerts
-}): JSX.Element => {
-  return (
-    <div className="later-departures-row">
-      <div className="later-departure-row-before"></div>
-      <div className="later-departures-row-container">
-        {departureTimes.map((t, i) => (
-          <LaterDepartureRow
-            route={i === 0 ? route : undefined}
-            destination={i === 0 ? destination : undefined}
-            time={t}
-            currentTime={currentTime}
-            first={i === 0}
-            key={route + t + i}
-          />
-        ))}
-        <DeparturesAlert
-          rowAlerts={rowAlerts}
-          alerts={alerts}
-          modifier={true}
-        />
-      </div>
-      <div className="later-departure-row-after"></div>
-      <div className="later-departure-row-hairline"></div>
-    </div>
-  );
-};
-
-const LaterDepartureRow = ({
-  route,
-  destination,
-  time,
-  currentTime,
-  first
-}): JSX.Element => {
-  return (
-    <div className="later-departure-row">
-      <DepartureRoute route={route} modifier={true} />
-      <DepartureDestination destination={destination} modifier={true} />
-      <DepartureTime
-        time={time}
-        currentTimeString={currentTime}
-        modifier={true}
-      />
-    </div>
-  );
-};
 
 export default LaterDepartures;

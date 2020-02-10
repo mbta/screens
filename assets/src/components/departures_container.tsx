@@ -2,10 +2,7 @@ import moment from "moment";
 import "moment-timezone";
 import React, { forwardRef } from "react";
 
-import DepartureDestination from "./departure_destination";
-import DepartureRoute from "./departure_route";
-import DepartureTime from "./departure_time";
-import DeparturesAlert from "./departures_alert";
+import DeparturesRow from "./departures_row";
 
 const buildDeparturesRows = (
   departuresRows,
@@ -78,6 +75,7 @@ const DeparturesContainer = forwardRef(
             departureTimes={row.time}
             rowAlerts={row.alerts}
             alerts={alerts}
+            modifier={false}
             key={row.route + row.time + i}
           />
         ))}
@@ -85,59 +83,5 @@ const DeparturesContainer = forwardRef(
     );
   }
 );
-
-const DeparturesRow = ({
-  currentTimeString,
-  route,
-  destination,
-  departureTimes,
-  rowAlerts,
-  alerts
-}): JSX.Element => {
-  return (
-    <div className="departures-row">
-      <div className="departure-row-before"></div>
-      <div className="departures-row-container">
-        {departureTimes.map((t, i) => (
-          <DepartureRow
-            currentTimeString={currentTimeString}
-            route={i === 0 ? route : undefined}
-            destination={i === 0 ? destination : undefined}
-            time={t}
-            first={i === 0}
-            key={route + t + i}
-          />
-        ))}
-        <DeparturesAlert
-          rowAlerts={rowAlerts}
-          alerts={alerts}
-          modifier={false}
-        />
-      </div>
-      <div className="departure-row-after"></div>
-      <div className="departure-row-hairline"></div>
-    </div>
-  );
-};
-
-const DepartureRow = ({
-  currentTimeString,
-  route,
-  destination,
-  time,
-  first
-}): JSX.Element => {
-  return (
-    <div className="departure-row">
-      <DepartureRoute route={route} modifier={false} />
-      <DepartureDestination destination={destination} modifier={false} />
-      <DepartureTime
-        time={time}
-        currentTimeString={currentTimeString}
-        modifier={false}
-      />
-    </div>
-  );
-};
 
 export default DeparturesContainer;
