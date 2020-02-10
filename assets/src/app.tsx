@@ -284,7 +284,7 @@ const NearbyConnections = ({ nearbyConnections }): JSX.Element => {
 };
 
 const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
-  const FEET_PER_MINUTE = 300; // need a real value for this
+  const FEET_PER_MINUTE = 250;
   const FEET_PER_MILE = 5280;
   let distanceInMinutes = Math.round(
     (distance * FEET_PER_MILE) / FEET_PER_MINUTE
