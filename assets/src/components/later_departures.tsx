@@ -2,6 +2,8 @@ import moment from "moment";
 import "moment-timezone";
 import React, { forwardRef } from "react";
 
+import DepartureTime from "./departure_time";
+
 const buildDeparturesRows = (
   departuresRows,
   alerts,
@@ -188,7 +190,11 @@ const LaterDepartureRow = ({
     <div className="later-departure-row">
       <LaterDepartureRoute route={route} />
       <LaterDepartureDestination destination={destination} />
-      <LaterDepartureTime time={time} currentTimeString={currentTime} />
+      <DepartureTime
+        time={time}
+        currentTimeString={currentTime}
+        modifier={true}
+      />
     </div>
   );
 };
@@ -249,38 +255,6 @@ const LaterDepartureDestination = ({ destination }): JSX.Element => {
             {destination}
           </div>
         </div>
-      </div>
-    );
-  }
-};
-
-const LaterDepartureTime = ({ time, currentTimeString }): JSX.Element => {
-  const departureTime = moment(time);
-  const currentTime = moment(currentTime);
-  const secondDifference = departureTime.diff(currentTime, "seconds");
-  const minuteDifference = Math.round(secondDifference / 60);
-
-  if (secondDifference < 60) {
-    return (
-      <div className="later-departure-time-container">
-        <span className="later-departure-time-now">Now</span>
-      </div>
-    );
-  } else if (minuteDifference < 60) {
-    return (
-      <div className="later-departure-time-container">
-        <span className="later-departure-time-minutes">{minuteDifference}</span>
-        <span className="later-departure-time-minutes-label">m</span>
-      </div>
-    );
-  } else {
-    const timestamp = departureTime.tz("America/New_York").format("h:mm");
-    const ampm = departureTime.tz("America/New_York").format("A");
-
-    return (
-      <div className="later-departure-time-container">
-        <span className="later-departure-time-timestamp">{timestamp}</span>
-        <span className="later-departure-time-ampm">{ampm}</span>
       </div>
     );
   }

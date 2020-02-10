@@ -2,6 +2,8 @@ import moment from "moment";
 import "moment-timezone";
 import React, { forwardRef } from "react";
 
+import DepartureTime from "./departure_time";
+
 const buildDeparturesRows = (
   departuresRows,
   alerts,
@@ -172,7 +174,11 @@ const DepartureRow = ({
     <div className="departure-row">
       <DepartureRoute route={route} />
       <DepartureDestination destination={destination} />
-      <DepartureTime time={time} currentTimeString={currentTimeString} />
+      <DepartureTime
+        time={time}
+        currentTimeString={currentTimeString}
+        modifier={false}
+      />
     </div>
   );
 };
@@ -229,37 +235,6 @@ const DepartureDestination = ({ destination }): JSX.Element => {
         <div className="departure-destination-container">
           <div className="departure-destination-primary">{destination}</div>
         </div>
-      </div>
-    );
-  }
-};
-
-const DepartureTime = ({ time, currentTimeString }): JSX.Element => {
-  const departureTime = moment(time);
-  const currentTime = moment(currentTimeString);
-  const secondDifference = departureTime.diff(currentTime, "seconds");
-  const minuteDifference = Math.round(secondDifference / 60);
-
-  if (secondDifference < 60) {
-    return (
-      <div className="departure-time">
-        <span className="departure-time-now">Now</span>
-      </div>
-    );
-  } else if (minuteDifference < 60) {
-    return (
-      <div className="departure-time">
-        <span className="departure-time-minutes">{minuteDifference}</span>
-        <span className="departure-time-minutes-label">m</span>
-      </div>
-    );
-  } else {
-    const timestamp = departureTime.format("h:mm");
-    const ampm = departureTime.format("A");
-    return (
-      <div className="departure-time">
-        <span className="departure-time-timestamp">{timestamp}</span>
-        <span className="departure-time-ampm">{ampm}</span>
       </div>
     );
   }

@@ -2,7 +2,6 @@ declare function require(name: string): string;
 // tslint:disable-next-line
 require("../css/app.scss");
 
-import "phoenix_html";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
