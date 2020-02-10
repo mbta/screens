@@ -2,8 +2,8 @@ import moment from "moment";
 import "moment-timezone";
 import React, { forwardRef } from "react";
 
+import Departures from "./departures";
 import FlexZoneAlert from "./flex_zone_alert";
-import LaterDepartures from "./later_departures";
 import NearbyConnections from "./nearby_connections";
 import ServiceMap from "./service_map";
 
@@ -35,13 +35,14 @@ const FlexZoneContainer = forwardRef(
     if (showLaterDepartures && globalAlert) {
       // Later Departures + Alert
       topComponent = (
-        <LaterDepartures
+        <Departures
+          currentTimeString={currentTime}
           departureRows={departureRows}
-          startIndex={numRows}
-          currentTime={currentTime}
           alerts={inlineAlerts}
           departuresAlerts={departuresAlerts}
-          bottomNumRows={bottomNumRows}
+          startIndex={numRows}
+          endIndex={numRows + bottomNumRows}
+          modifier={true}
           ref={ref}
         />
       );
@@ -49,13 +50,14 @@ const FlexZoneContainer = forwardRef(
     } else if (showLaterDepartures) {
       // Later Departures + Nearby Connections
       topComponent = (
-        <LaterDepartures
+        <Departures
+          currentTimeString={currentTime}
           departureRows={departureRows}
-          startIndex={numRows}
-          currentTime={currentTime}
           alerts={inlineAlerts}
           departuresAlerts={departuresAlerts}
-          bottomNumRows={bottomNumRows}
+          startIndex={numRows}
+          endIndex={numRows + bottomNumRows}
+          modifier={true}
           ref={ref}
         />
       );

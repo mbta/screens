@@ -1,7 +1,4 @@
-import moment from "moment";
-import "moment-timezone";
 import React, { forwardRef } from "react";
-
 import DeparturesRow from "./departures_row";
 
 const buildDeparturesRows = (
@@ -53,20 +50,41 @@ const buildDeparturesRows = (
   return rows;
 };
 
-const DeparturesContainer = forwardRef(
+const Departures = forwardRef(
   (
-    { currentTimeString, departureRows, alerts, departuresAlerts, numRows },
-    ref
-  ) => {
-    const rows = buildDeparturesRows(
+    {
+      currentTimeString,
       departureRows,
       alerts,
       departuresAlerts,
-      numRows
+      startIndex,
+      endIndex,
+      modifier
+    },
+    ref
+  ): JSX.Element => {
+    let filteredRows;
+    if (!departureRows) {
+      filteredRows = departureRows;
+    } else {
+      filteredRows = departureRows.slice(startIndex, endIndex);
+    }
+    const rows = buildDeparturesRows(
+      filteredRows,
+      alerts,
+      departuresAlerts,
+      endIndex - startIndex
     );
 
+    let prefix;
+    if (modifier) {
+      prefix = "later-";
+    } else {
+      prefix = "";
+    }
+
     return (
-      <div className="departures-container" ref={ref}>
+      <div className={prefix + "departures-container"} ref={ref}>
         {rows.map((row, i) => (
           <DeparturesRow
             currentTimeString={currentTimeString}
@@ -75,7 +93,7 @@ const DeparturesContainer = forwardRef(
             departureTimes={row.time}
             rowAlerts={row.alerts}
             alerts={alerts}
-            modifier={false}
+            modifier={modifier}
             key={row.route + row.time + i}
           />
         ))}
@@ -84,4 +102,4 @@ const DeparturesContainer = forwardRef(
   }
 );
 
-export default DeparturesContainer;
+export default Departures;

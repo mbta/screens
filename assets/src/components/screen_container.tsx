@@ -9,7 +9,7 @@ import React, {
 import moment from "moment";
 import "moment-timezone";
 
-import DeparturesContainer from "./departures_container";
+import Departures from "./departures";
 import DigitalBridge from "./digital_bridge";
 import FareInfo from "./fare_info";
 import FlexZoneContainer from "./flex_zone_container";
@@ -65,12 +65,14 @@ const TopScreenContainer = forwardRef(
     return (
       <div className="single-screen-container">
         <Header stopName={stopName} currentTimeString={currentTimeString} />
-        <DeparturesContainer
+        <Departures
           currentTimeString={currentTimeString}
           departureRows={departureRows}
           alerts={alerts}
           departuresAlerts={departuresAlerts}
-          numRows={numRows}
+          startIndex={0}
+          endIndex={numRows}
+          modifier={false}
           ref={ref}
         />
       </div>
