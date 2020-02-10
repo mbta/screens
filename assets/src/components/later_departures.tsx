@@ -3,6 +3,7 @@ import "moment-timezone";
 import React, { forwardRef } from "react";
 
 import DepartureDestination from "./departure_destination";
+import DepartureRoute from "./departure_route";
 import DepartureTime from "./departure_time";
 
 const buildDeparturesRows = (
@@ -189,39 +190,13 @@ const LaterDepartureRow = ({
 }): JSX.Element => {
   return (
     <div className="later-departure-row">
-      <LaterDepartureRoute route={route} />
+      <DepartureRoute route={route} modifier={true} />
       <DepartureDestination destination={destination} modifier={true} />
       <DepartureTime
         time={time}
         currentTimeString={currentTime}
         modifier={true}
       />
-    </div>
-  );
-};
-
-const LaterDepartureRoute = ({ route }): JSX.Element => {
-  if (!route) {
-    return <div className="later-departure-route"></div>;
-  }
-
-  let pillClass;
-  let routeClass;
-  if (route.includes("/")) {
-    pillClass = "later-departure-route-pill later-departure-route-pill-small";
-    routeClass =
-      "later-departure-route-number later-departure-route-number-small";
-  } else {
-    pillClass = "later-departure-route-pill later-departure-route-pill-medium";
-    routeClass =
-      "later-departure-route-number later-departure-route-number-medium";
-  }
-
-  return (
-    <div className="later-departure-route">
-      <div className={pillClass}>
-        <span className={routeClass}>{route}</span>
-      </div>
     </div>
   );
 };
