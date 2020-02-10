@@ -5,6 +5,7 @@ import React, { forwardRef } from "react";
 import DepartureDestination from "./departure_destination";
 import DepartureRoute from "./departure_route";
 import DepartureTime from "./departure_time";
+import DeparturesAlert from "./departures_alert";
 
 const buildDeparturesRows = (
   departuresRows,
@@ -53,27 +54,6 @@ const buildDeparturesRows = (
   });
 
   return rows;
-};
-
-const parseSeverity = severity => {
-  let delayDescription;
-  let delayMinutes;
-
-  // Note that delay severities are assumed to be between 3 and 9, inclusive
-  // Probably want to fail gracefully if that's not true
-
-  if (severity >= 8) {
-    delayDescription = "more than";
-    delayMinutes = 30 * (severity - 7);
-  } else {
-    delayDescription = "up to";
-    delayMinutes = 5 * (severity - 1);
-  }
-
-  return {
-    delayDescription,
-    delayMinutes
-  };
 };
 
 const LaterDepartures = forwardRef(
@@ -144,39 +124,14 @@ const LaterDeparturesRow = ({
             key={route + t + i}
           />
         ))}
-        <LaterDeparturesAlert rowAlerts={rowAlerts} alerts={alerts} />
+        <DeparturesAlert
+          rowAlerts={rowAlerts}
+          alerts={alerts}
+          modifier={true}
+        />
       </div>
       <div className="later-departure-row-after"></div>
       <div className="later-departure-row-hairline"></div>
-    </div>
-  );
-};
-
-const LaterDeparturesAlert = ({ rowAlerts, alerts }): JSX.Element => {
-  let severity;
-  rowAlerts.forEach(alertId => {
-    alerts.forEach(alert => {
-      if (alertId === alert.id && alert.effect === "delay") {
-        severity = alert.severity;
-      }
-    });
-  });
-
-  if (severity === undefined) {
-    return <div></div>;
-  }
-
-  const { delayDescription, delayMinutes } = parseSeverity(severity);
-
-  return (
-    <div className="later-departures-row-inline-badge-container">
-      <span className="later-departures-row-inline-badge">
-        <img className="alert-badge-icon" src="images/alert.svg" />
-        Delays {delayDescription + " "}
-        <span className="later-departures-row-inline-emphasis">
-          {delayMinutes} minutes
-        </span>
-      </span>
     </div>
   );
 };
