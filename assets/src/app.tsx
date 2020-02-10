@@ -555,9 +555,10 @@ const LaterDepartureDestination = ({ destination }): JSX.Element => {
 const LaterDepartureTime = ({ time, currentTimeString }): JSX.Element => {
   const departureTime = moment(time);
   const currentTime = moment(currentTime);
-  const minuteDifference = departureTime.diff(currentTime, "minutes");
+  const secondDifference = departureTime.diff(currentTime, "seconds");
+  const minuteDifference = Math.round(secondDifference / 60);
 
-  if (minuteDifference < 2) {
+  if (secondDifference < 60) {
     return (
       <div className="later-departure-time-container">
         <span className="later-departure-time-now">Now</span>
@@ -974,9 +975,10 @@ const DepartureDestination = ({ destination }): JSX.Element => {
 const DepartureTime = ({ time, currentTimeString }): JSX.Element => {
   const departureTime = moment(time);
   const currentTime = moment(currentTimeString);
-  const minuteDifference = departureTime.diff(currentTime, "minutes");
+  const secondDifference = departureTime.diff(currentTime, "seconds");
+  const minuteDifference = Math.round(secondDifference / 60);
 
-  if (minuteDifference < 2) {
+  if (secondDifference < 60) {
     return (
       <div className="departure-time">
         <span className="departure-time-now">Now</span>
