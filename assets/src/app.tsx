@@ -496,10 +496,22 @@ const LaterDepartureRoute = ({ route }): JSX.Element => {
     return <div className="later-departure-route"></div>;
   }
 
+  let pillClass;
+  let routeClass;
+  if (route.includes("/")) {
+    pillClass = "later-departure-route-pill later-departure-route-pill-small";
+    routeClass =
+      "later-departure-route-number later-departure-route-number-small";
+  } else {
+    pillClass = "later-departure-route-pill later-departure-route-pill-medium";
+    routeClass =
+      "later-departure-route-number later-departure-route-number-medium";
+  }
+
   return (
     <div className="later-departure-route">
-      <div className="later-departure-route-pill">
-        <span className="later-departure-route-number">{route}</span>
+      <div className={pillClass}>
+        <span className={routeClass}>{route}</span>
       </div>
     </div>
   );
@@ -907,10 +919,20 @@ const DepartureRoute = ({ route }): JSX.Element => {
     return <div className="departure-route"></div>;
   }
 
+  let pillClass;
+  let routeClass;
+  if (route.includes("/")) {
+    pillClass = "departure-route-pill departure-route-pill-small";
+    routeClass = "departure-route-number departure-route-number-small";
+  } else {
+    pillClass = "departure-route-pill departure-route-pill-medium";
+    routeClass = "departure-route-number departure-route-number-medium";
+  }
+
   return (
     <div className="departure-route">
-      <div className="departure-route-pill">
-        <span className="departure-route-number">{route}</span>
+      <div className={pillClass}>
+        <span className={routeClass}>{route}</span>
       </div>
     </div>
   );

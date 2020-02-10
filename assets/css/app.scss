@@ -174,21 +174,37 @@ body {
 
 .later-departure-route-pill {
   width: 178px;
-  height: 86px;
   background-color: black;
-  border-radius: 72px;
   margin-left: 44px;
   text-align: center;
 }
 
+.later-departure-route-pill-small {
+  height: 50px;
+  border-radius: 36px;
+}
+
+.later-departure-route-pill-medium {
+  height: 86px;
+  border-radius: 72px;
+}
+
 .later-departure-route-number {
   color: white;
-  font-size: 72px;
   font-family: neue-haas-grotesk-text;
   font-weight: 700;
-  letter-spacing: 2px;
   margin: auto;
   display: inline-block;
+}
+
+.later-departure-route-number-small {
+  font-size: 36px;
+  letter-spacing: 1px;
+}
+
+.later-departure-route-number-medium {
+  font-size: 72px;
+  letter-spacing: 2px;
 }
 
 .later-departure-destination {
@@ -613,21 +629,37 @@ body {
 
 .departure-route-pill {
   width: 356px;
-  height: 172px;
   font-family: neue-haas-grotesk-text;
   background: black;
-  border-radius: 144px;
   margin-left: 32px;
   text-align: center;
 }
 
+.departure-route-pill-small {
+  height: 100px;
+  border-radius: 72px;
+}
+
+.departure-route-pill-medium {
+  height: 172px;
+  border-radius: 144px;
+}
+
 .departure-route-number {
   color: white;
-  font-size: 144px;
-  letter-spacing: 4px;
   margin: auto;
   display: inline-block;
   font-weight: 700;
+}
+
+.departure-route-number-small {
+  font-size: 72px;
+  letter-spacing: 2px;
+}
+
+.departure-route-number-medium {
+  font-size: 144px;
+  letter-spacing: 4px;
 }
 
 .departure-destination {
