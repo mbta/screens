@@ -284,7 +284,7 @@ const NearbyConnections = ({ nearbyConnections }): JSX.Element => {
 };
 
 const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
-  const FEET_PER_MINUTE = 300; // need a real value for this
+  const FEET_PER_MINUTE = 250;
   const FEET_PER_MILE = 5280;
   let distanceInMinutes = Math.round(
     (distance * FEET_PER_MILE) / FEET_PER_MINUTE
@@ -496,10 +496,22 @@ const LaterDepartureRoute = ({ route }): JSX.Element => {
     return <div className="later-departure-route"></div>;
   }
 
+  let pillClass;
+  let routeClass;
+  if (route.includes("/")) {
+    pillClass = "later-departure-route-pill later-departure-route-pill-small";
+    routeClass =
+      "later-departure-route-number later-departure-route-number-small";
+  } else {
+    pillClass = "later-departure-route-pill later-departure-route-pill-medium";
+    routeClass =
+      "later-departure-route-number later-departure-route-number-medium";
+  }
+
   return (
     <div className="later-departure-route">
-      <div className="later-departure-route-pill">
-        <span className="later-departure-route-number">{route}</span>
+      <div className={pillClass}>
+        <span className={routeClass}>{route}</span>
       </div>
     </div>
   );
@@ -543,9 +555,10 @@ const LaterDepartureDestination = ({ destination }): JSX.Element => {
 const LaterDepartureTime = ({ time, currentTimeString }): JSX.Element => {
   const departureTime = moment(time);
   const currentTime = moment(currentTime);
-  const minuteDifference = departureTime.diff(currentTime, "minutes");
+  const secondDifference = departureTime.diff(currentTime, "seconds");
+  const minuteDifference = Math.round(secondDifference / 60);
 
-  if (minuteDifference < 2) {
+  if (secondDifference < 60) {
     return (
       <div className="later-departure-time-container">
         <span className="later-departure-time-now">Now</span>
@@ -719,7 +732,13 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
   return (
     <div className="header">
       <div className="header-time">{currentTime}</div>
-      <div className="header-realtime-indicator">UPDATED LIVE EVERY MINUTE</div>
+      <div className="header-realtime-indicator">
+        <img
+          className="header-realtime-indicator-icon"
+          src="images/live-data-small.svg"
+        ></img>
+        UPDATED LIVE EVERY MINUTE
+      </div>
       <div className={stopClassName} ref={ref}>
         {stopName}
       </div>
@@ -907,10 +926,20 @@ const DepartureRoute = ({ route }): JSX.Element => {
     return <div className="departure-route"></div>;
   }
 
+  let pillClass;
+  let routeClass;
+  if (route.includes("/")) {
+    pillClass = "departure-route-pill departure-route-pill-small";
+    routeClass = "departure-route-number departure-route-number-small";
+  } else {
+    pillClass = "departure-route-pill departure-route-pill-medium";
+    routeClass = "departure-route-number departure-route-number-medium";
+  }
+
   return (
     <div className="departure-route">
-      <div className="departure-route-pill">
-        <span className="departure-route-number">{route}</span>
+      <div className={pillClass}>
+        <span className={routeClass}>{route}</span>
       </div>
     </div>
   );
@@ -952,9 +981,10 @@ const DepartureDestination = ({ destination }): JSX.Element => {
 const DepartureTime = ({ time, currentTimeString }): JSX.Element => {
   const departureTime = moment(time);
   const currentTime = moment(currentTimeString);
-  const minuteDifference = departureTime.diff(currentTime, "minutes");
+  const secondDifference = departureTime.diff(currentTime, "seconds");
+  const minuteDifference = Math.round(secondDifference / 60);
 
-  if (minuteDifference < 2) {
+  if (secondDifference < 60) {
     return (
       <div className="departure-time">
         <span className="departure-time-now">Now</span>
