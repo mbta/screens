@@ -342,9 +342,25 @@ const NearbyConnectionsRoute = ({ route, small }): JSX.Element => {
       "nearby-connections-route-text nearby-connections-route-text-normal";
   }
 
+  let routeElt;
+  if (route.includes("CR-")) {
+    route = route.replace("CR-", "");
+    routeElt = (
+      <span>
+        <img
+          className="nearby-connections-route-icon"
+          src="images/commuter-rail.svg"
+        ></img>
+        {route}
+      </span>
+    );
+  } else {
+    routeElt = <span>{route}</span>;
+  }
+
   return (
     <div className={pillClass}>
-      <div className={textClass}>{route}</div>
+      <div className={textClass}>{routeElt}</div>
     </div>
   );
 };
