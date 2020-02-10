@@ -2,6 +2,7 @@ import moment from "moment";
 import "moment-timezone";
 import React, { forwardRef } from "react";
 
+import DepartureDestination from "./departure_destination";
 import DepartureTime from "./departure_time";
 
 const buildDeparturesRows = (
@@ -173,7 +174,7 @@ const DepartureRow = ({
   return (
     <div className="departure-row">
       <DepartureRoute route={route} />
-      <DepartureDestination destination={destination} />
+      <DepartureDestination destination={destination} modifier={false} />
       <DepartureTime
         time={time}
         currentTimeString={currentTimeString}
@@ -205,39 +206,6 @@ const DepartureRoute = ({ route }): JSX.Element => {
       </div>
     </div>
   );
-};
-
-const DepartureDestination = ({ destination }): JSX.Element => {
-  if (destination === undefined) {
-    return <div className="departure-destination"></div>;
-  }
-
-  if (destination.includes("via")) {
-    const parts = destination.split(" via ");
-    const primaryDestination = parts[0];
-    const secondaryDestination = "via " + parts[1];
-
-    return (
-      <div className="departure-destination">
-        <div className="departure-destination-container">
-          <div className="departure-destination-primary">
-            {primaryDestination}
-          </div>
-          <div className="departure-destination-secondary">
-            {secondaryDestination}
-          </div>
-        </div>
-      </div>
-    );
-  } else {
-    return (
-      <div className="departure-destination">
-        <div className="departure-destination-container">
-          <div className="departure-destination-primary">{destination}</div>
-        </div>
-      </div>
-    );
-  }
 };
 
 export default DeparturesContainer;
