@@ -284,16 +284,15 @@ const NearbyConnections = ({ nearbyConnections }): JSX.Element => {
 };
 
 const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
-  const distanceInFeet = Math.round(distance * 5280);
-  let distanceMetric;
-  let distanceUnits;
+  const FEET_PER_MINUTE = 300; // need a real value for this
+  const FEET_PER_MILE = 5280;
+  let distanceInMinutes = Math.round(
+    (distance * FEET_PER_MILE) / FEET_PER_MINUTE
+  );
 
-  if (distanceInFeet >= 1000) {
-    distanceUnits = "miles";
-    distanceMetric = distance.toFixed(2);
-  } else {
-    distanceUnits = "feet";
-    distanceMetric = distanceInFeet;
+  // No zero-minute walking times
+  if (distanceInMinutes === 0) {
+    distanceInMinutes = 1;
   }
 
   return (
@@ -303,12 +302,14 @@ const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
           {name.replace("Massachusetts", "Mass")}
         </div>
         <div className="nearby-connections-row-distance-label">
+          <img
+            className="nearby-connections-distance-icon"
+            src="images/nearby.svg"
+          ></img>
           <span className="nearby-connections-row-distance">
-            {distanceMetric}{" "}
+            {distanceInMinutes}{" "}
           </span>
-          <span className="nearby-connections-row-distance-units">
-            {distanceUnits}
-          </span>
+          <span className="nearby-connections-row-distance-units">min</span>
         </div>
       </div>
       <div className="nearby-connections-routes">
