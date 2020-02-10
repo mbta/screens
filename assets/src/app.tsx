@@ -732,7 +732,13 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
   return (
     <div className="header">
       <div className="header-time">{currentTime}</div>
-      <div className="header-realtime-indicator">UPDATED LIVE EVERY MINUTE</div>
+      <div className="header-realtime-indicator">
+        <img
+          className="header-realtime-indicator-icon"
+          src="images/live-data-small.svg"
+        ></img>
+        UPDATED LIVE EVERY MINUTE
+      </div>
       <div className={stopClassName} ref={ref}>
         {stopName}
       </div>
