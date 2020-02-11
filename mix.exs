@@ -29,9 +29,18 @@ defmodule Screens.MixProject do
   #
   # Type `mix help compile.app` for more information.
   def application do
+    apps = [:logger, :runtime_tools]
+
+    apps =
+      if Mix.env() == :prod do
+        [:ehmon | apps]
+      else
+        apps
+      end
+
     [
       mod: {Screens.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: apps
     ]
   end
 
@@ -56,7 +65,8 @@ defmodule Screens.MixProject do
       {:dialyxir, "~> 0.5.1", only: [:dev, :test]},
       {:excoveralls, "~> 0.11.2", only: :test},
       {:ex_aws, "~> 2.1", only: :prod},
-      {:ex_aws_secretsmanager, "~> 2.0", only: :prod}
+      {:ex_aws_secretsmanager, "~> 2.0", only: :prod},
+      {:ehmon, github: "mbta/ehmon", only: :prod}
     ]
   end
 end
