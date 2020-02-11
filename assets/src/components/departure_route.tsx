@@ -1,41 +1,31 @@
 import React from "react";
 
+import { classWithSize } from "../util";
+
 const DepartureRoute = ({ route, modifier }): JSX.Element => {
-  let prefix;
-  if (modifier) {
-    prefix = "later-";
-  } else {
-    prefix = "";
-  }
+  const size = modifier ? "small" : "large";
 
   if (!route) {
-    return <div className={prefix + "departure-route"}></div>;
+    return <div className={classWithSize("departure-route", size)}></div>;
   }
 
-  let pillClass;
-  let routeClass;
-  if (route.includes("/")) {
-    pillClass =
-      prefix + "departure-route-pill " + prefix + "departure-route-pill-small";
-    routeClass =
-      prefix +
-      "departure-route-number " +
-      prefix +
-      "departure-route-number-small";
+  let pillSize;
+  if (size === "small" && route.includes("/")) {
+    pillSize = "xsmall";
+  } else if (size === "small") {
+    pillSize = "small";
+  } else if (route.includes("/")) {
+    pillSize = "medium";
   } else {
-    pillClass =
-      prefix + "departure-route-pill " + prefix + "departure-route-pill-medium";
-    routeClass =
-      prefix +
-      "departure-route-number " +
-      prefix +
-      "departure-route-number-medium";
+    pillSize = "large";
   }
 
   return (
-    <div className={prefix + "departure-route"}>
-      <div className={pillClass}>
-        <span className={routeClass}>{route}</span>
+    <div className={classWithSize("departure-route", size)}>
+      <div className={classWithSize("departure-route__pill", pillSize)}>
+        <span className={classWithSize("departure-route__number", pillSize)}>
+          {route}
+        </span>
       </div>
     </div>
   );

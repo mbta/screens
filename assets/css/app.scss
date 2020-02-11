@@ -2,6 +2,7 @@
 
 @import "departure_time";
 @import "departure_destination";
+@import "departure_route";
 
 body {
   margin: 0px;
@@ -174,48 +175,6 @@ body {
 
 .later-departures-row-inline-emphasis {
   font-weight: bold;
-}
-
-.later-departure-route {
-  display: table-cell;
-  vertical-align: middle;
-  width: 254px;
-  height: 86px;
-}
-
-.later-departure-route-pill {
-  width: 178px;
-  background-color: black;
-  margin-left: 44px;
-  text-align: center;
-}
-
-.later-departure-route-pill-small {
-  height: 50px;
-  border-radius: 36px;
-}
-
-.later-departure-route-pill-medium {
-  height: 86px;
-  border-radius: 72px;
-}
-
-.later-departure-route-number {
-  color: white;
-  font-family: neue-haas-grotesk-text;
-  font-weight: 700;
-  margin: auto;
-  display: inline-block;
-}
-
-.later-departure-route-number-small {
-  font-size: 36px;
-  letter-spacing: 1px;
-}
-
-.later-departure-route-number-medium {
-  font-size: 72px;
-  letter-spacing: 2px;
 }
 
 .nearby-connections-container {
@@ -574,47 +533,6 @@ body {
 
 .departures-row-inline-emphasis {
   font-weight: bold;
-}
-
-.departure-route {
-  display: table-cell;
-  vertical-align: middle;
-  width: 420px;
-}
-
-.departure-route-pill {
-  width: 356px;
-  font-family: neue-haas-grotesk-text;
-  background: black;
-  margin-left: 32px;
-  text-align: center;
-}
-
-.departure-route-pill-small {
-  height: 100px;
-  border-radius: 72px;
-}
-
-.departure-route-pill-medium {
-  height: 172px;
-  border-radius: 144px;
-}
-
-.departure-route-number {
-  color: white;
-  margin: auto;
-  display: inline-block;
-  font-weight: 700;
-}
-
-.departure-route-number-small {
-  font-size: 72px;
-  letter-spacing: 2px;
-}
-
-.departure-route-number-medium {
-  font-size: 144px;
-  letter-spacing: 4px;
 }
 
 .departure-line {
