@@ -1,5 +1,3 @@
-import moment from "moment";
-import "moment-timezone";
 import React, { forwardRef } from "react";
 
 import Departures from "./departures";

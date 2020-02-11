@@ -28,10 +28,7 @@ const DeparturesRow = ({
             key={route + t + i}
           />
         ))}
-        <DeparturesAlert
-          rowAlerts={rowAlerts}
-          alerts={alerts}
-        />
+        <DeparturesAlert rowAlerts={rowAlerts} alerts={alerts} />
       </div>
       <div className={classWithSize("departures-row__after", size)}></div>
       <div className="departures-row__hairline"></div>
