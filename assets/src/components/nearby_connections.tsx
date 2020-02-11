@@ -1,20 +1,11 @@
 import React from "react";
 
-const NearbyConnectionsRoute = ({ route, small }): JSX.Element => {
-  let pillClass;
-  let textClass;
+import { classWithSize } from "../util";
 
-  if (small) {
-    pillClass =
-      "nearby-connections-route-pill nearby-connections-route-pill-small";
-    textClass =
-      "nearby-connections-route-text nearby-connections-route-text-small";
-  } else {
-    pillClass =
-      "nearby-connections-route-pill nearby-connections-route-pill-normal";
-    textClass =
-      "nearby-connections-route-text nearby-connections-route-text-normal";
-  }
+const NearbyConnectionsRoute = ({ route, small }): JSX.Element => {
+  const size = small === true ? "small" : "large";
+  const pillClass = classWithSize("nearby-connections-route__pill", size);
+  const textClass = classWithSize("nearby-connections-route__text", size);
 
   let routeElt;
   if (route.includes("CR-")) {
@@ -22,7 +13,7 @@ const NearbyConnectionsRoute = ({ route, small }): JSX.Element => {
     routeElt = (
       <span>
         <img
-          className="nearby-connections-route-icon"
+          className="nearby-connections-route__icon"
           src="images/commuter-rail.svg"
         ></img>
         {route}
@@ -53,22 +44,22 @@ const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
 
   return (
     <div className="nearby-connections-row">
-      <div className="nearby-connections-row-header">
-        <div className="nearby-connections-row-stop-name">
+      <div className="nearby-connections-row__header">
+        <div className="nearby-connections-row__stop-name">
           {name.replace("Massachusetts", "Mass")}
         </div>
-        <div className="nearby-connections-row-distance-label">
+        <div className="nearby-connections-row__distance-label">
           <img
-            className="nearby-connections-distance-icon"
+            className="nearby-connections-row__distance-icon"
             src="images/nearby.svg"
           ></img>
-          <span className="nearby-connections-row-distance">
+          <span className="nearby-connections-row__distance">
             {distanceInMinutes}{" "}
           </span>
-          <span className="nearby-connections-row-distance-units">min</span>
+          <span className="nearby-connections-row__distance-units">min</span>
         </div>
       </div>
-      <div className="nearby-connections-routes">
+      <div className="nearby-connections-row__routes">
         {routes.map(route => (
           <div className="nearby-connections-route" key={route}>
             <NearbyConnectionsRoute
@@ -78,7 +69,7 @@ const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
           </div>
         ))}
       </div>
-      <div className="nearby-connections-hairline"></div>
+      <div className="nearby-connections__hairline"></div>
     </div>
   );
 };
@@ -89,14 +80,19 @@ const NearbyConnections = ({ nearbyConnections }): JSX.Element => {
   }
 
   return (
-    <div className="nearby-connections-container">
-      <div className="nearby-connections-header">
-        <div className="nearby-connections-icon-container">
-          <img className="nearby-connections-icon" src="images/nearby.svg" />
+    <div className="nearby-connections">
+      <div className="nearby-connections__header">
+        <div className="nearby-connections__icon-container">
+          <img
+            className="nearby-connections__icon-image"
+            src="images/nearby.svg"
+          />
         </div>
-        <div className="nearby-connections-header-text">Nearby connections</div>
+        <div className="nearby-connections__header-text">
+          Nearby connections
+        </div>
       </div>
-      <div className="nearby-connections-hairline"></div>
+      <div className="nearby-connections__hairline"></div>
       {nearbyConnections.map(row => (
         <div key={row.name}>
           <NearbyConnectionsRow
