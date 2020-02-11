@@ -134,9 +134,9 @@ defmodule Screens.Alerts.Alert do
     {
       specificity(alert, stop_id),
       -high_severity(alert),
+      -new_service_in_next_two_weeks(alert),
       -happening_now(alert),
-      -new_service_in_next_week(alert),
-      -new_info_in_last_week(alert),
+      -new_info_in_last_two_weeks(alert),
       effect_index(alert),
       alert.id
     }
@@ -148,8 +148,8 @@ defmodule Screens.Alerts.Alert do
       high_severity: -high_severity(alert),
       effect_index: effect_index(alert.effect),
       alert_id: alert.id,
-      new_service: -new_service_in_next_week(alert),
-      new_info: -new_info_in_last_week(alert),
+      new_service: -new_service_in_next_two_weeks(alert),
+      new_info: -new_info_in_last_two_weeks(alert),
       happening_now: -happening_now(alert)
     }
   end
@@ -218,22 +218,22 @@ defmodule Screens.Alerts.Alert do
     t >= start_t && t <= end_t
   end
 
-  def within_one_week(time_1, time_2) do
+  def within_two_weeks(time_1, time_2) do
     diff = DateTime.diff(time_1, time_2, :second)
-    diff <= 6 * 24 * 60 * 60 && diff >= -6 * 24 * 60 * 60
+    diff <= 14 * 24 * 60 * 60 && diff >= -14 * 24 * 60 * 60
   end
 
   # NEW INFO
-  # defined as: created_at or updated_at is within the last week
-  def new_info_in_last_week(%{created_at: created_at, updated_at: updated_at}) do
+  # defined as: created_at or updated_at is within the last two weeks
+  def new_info_in_last_two_weeks(%{created_at: created_at, updated_at: updated_at}) do
     now = DateTime.utc_now()
-    new_info = within_one_week(now, created_at) || within_one_week(now, updated_at)
+    new_info = within_two_weeks(now, created_at) || within_two_weeks(now, updated_at)
     if new_info, do: 1, else: 0
   end
 
   # NEW SERVICE
-  # defined as: next active_period start in the future is within a week of now
-  def new_service_in_next_week(%{active_period: active_period}) do
+  # defined as: next active_period start in the future is within two weeks of now
+  def new_service_in_next_two_weeks(%{active_period: active_period}) do
     next_t = first_future_active_period_start(active_period)
 
     case next_t do
@@ -244,7 +244,7 @@ defmodule Screens.Alerts.Alert do
         soon =
           next_t
           |> DateTime.from_unix!()
-          |> within_one_week(DateTime.utc_now())
+          |> within_two_weeks(DateTime.utc_now())
 
         if soon, do: 1, else: 0
     end
