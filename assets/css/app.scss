@@ -11,6 +11,7 @@
 @import "fare_info";
 @import "nearby_connections";
 @import "header";
+@import "flex_zone_alert";
 
 body {
   margin: 0px;
@@ -38,20 +39,6 @@ body {
   height: 1600px;
 }
 
-.screen-spacer {
-  margin: 40px auto;
-  padding: 0px;
-  width: 1200px;
-  height: 200px;
-}
-
-.logo {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-}
-
 .flex-zone-container {
   height: 1165px;
 }
@@ -62,66 +49,4 @@ body {
 
 .flex-bottom-container {
   height: 580px;
-}
-
-.later-departures-container {
-  overflow: hidden;
-}
-
-.alert-container {
-  background: black;
-  color: white;
-  border-radius: 0px 24px 24px 0px;
-  margin-right: 34px;
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
-.alert-header {
-  height: 160px;
-}
-
-.alert-header-icon-container {
-  display: inline-block;
-  width: 208px;
-  vertical-align: top;
-}
-
-.alert-icon-image {
-  height: 128px;
-  width: 128px;
-  margin: 32px 40px 32px 40px;
-}
-
-.alert-header-effect {
-  display: inline-block;
-  width: 720px;
-  vertical-align: top;
-  font-family: neue-haas-grotesk-display;
-  font-weight: 700;
-  font-size: 80px;
-  margin-top: 52px;
-}
-
-.alert-header-timestamp {
-  display: inline-block;
-  width: 194px;
-  vertical-align: top;
-  text-align: right;
-  margin-top: 86px;
-  margin-right: 44px;
-  font-family: neue-haas-grotesk-text;
-  font-size: 16px;
-  text-transform: uppercase;
-}
-
-.alert-body {
-  height: auto;
-}
-
-.alert-body-description {
-  padding: 25px 40px 51px 208px;
-  font-size: 40px;
-  line-height: 56px;
-  font-family: Inter;
 }
