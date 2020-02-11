@@ -2,16 +2,7 @@ import React from "react";
 
 import { classWithSize } from "../util";
 
-const DepartureDestination = ({ destination, modifier }): JSX.Element => {
-  let prefix;
-  if (modifier) {
-    prefix = "later-";
-  } else {
-    prefix = "";
-  }
-
-  const size = modifier ? "small" : "large";
-
+const DepartureDestination = ({ destination, size }): JSX.Element => {
   let inner;
   if (destination === undefined) {
     inner = <div></div>;

@@ -21,7 +21,7 @@ const parseSeverity = severity => {
   };
 };
 
-const DeparturesAlert = ({ rowAlerts, alerts, modifier }): JSX.Element => {
+const DeparturesAlert = ({ rowAlerts, alerts }): JSX.Element => {
   let severity;
   rowAlerts.forEach(alertId => {
     alerts.forEach(alert => {
@@ -36,13 +36,6 @@ const DeparturesAlert = ({ rowAlerts, alerts, modifier }): JSX.Element => {
   }
 
   const { delayDescription, delayMinutes } = parseSeverity(severity);
-
-  let prefix;
-  if (modifier) {
-    prefix = "later-";
-  } else {
-    prefix = "";
-  }
 
   return (
     <div className="departure-info">

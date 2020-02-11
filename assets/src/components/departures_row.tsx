@@ -11,17 +11,8 @@ const DeparturesRow = ({
   departureTimes,
   rowAlerts,
   alerts,
-  modifier
+  size
 }): JSX.Element => {
-  let prefix;
-  if (modifier) {
-    prefix = "later-";
-  } else {
-    prefix = "";
-  }
-
-  const size = modifier ? "small" : "large";
-
   return (
     <div className="departures-row">
       <div className={classWithSize("departures-row__before", size)}></div>
@@ -33,14 +24,13 @@ const DeparturesRow = ({
             destination={i === 0 ? destination : undefined}
             time={t}
             first={i === 0}
-            modifier={modifier}
+            size={size}
             key={route + t + i}
           />
         ))}
         <DeparturesAlert
           rowAlerts={rowAlerts}
           alerts={alerts}
-          modifier={modifier}
         />
       </div>
       <div className={classWithSize("departures-row__after", size)}></div>
