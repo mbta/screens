@@ -1,5 +1,7 @@
 @import url("https://rsms.me/inter/inter.css");
 
+@import "departure_time";
+
 body {
   margin: 0px;
 }
@@ -233,44 +235,6 @@ body {
 .later-departure-destination-secondary {
   font-size: 36px;
   font-weight: 400;
-}
-
-.later-departure-time {
-  width: 260px;
-  vertical-align: middle;
-  font-family: neue-haas-grotesk-display;
-  text-align: right;
-  margin-right: 40px;
-  display: table-cell;
-}
-
-.later-departure-time-now {
-  font-size: 72px;
-  font-weight: bold;
-}
-
-.later-departure-time-minutes {
-  font-size: 72px;
-  font-weight: bold;
-  text-align: right;
-}
-
-.later-departure-time-minutes-label {
-  text-align: right;
-  font-size: 52.5px;
-  line-height: 72px;
-}
-
-.later-departure-time-timestamp {
-  font-size: 72px;
-  font-weight: bold;
-  text-align: right;
-}
-
-.later-departure-time-ampm {
-  font-size: 52.5px;
-  line-height: 72px;
-  text-align: right;
 }
 
 .nearby-connections-container {
@@ -690,55 +654,6 @@ body {
 .departure-destination-secondary {
   font-size: 44px;
   font-weight: 400;
-}
-
-.departure-time {
-  display: table-cell;
-  vertical-align: middle;
-  width: 320px;
-  font-family: neue-haas-grotesk-display;
-  font-size: 48px;
-  text-align: right;
-  margin-right: 40px;
-  vertical-align: top;
-}
-
-.departure-time-now {
-  font-size: 144px;
-  font-family: neue-haas-grotesk-display;
-  font-weight: bold;
-  letter-spacing: 0;
-}
-
-.departure-time-minutes {
-  font-size: 144px;
-  font-family: neue-haas-grotesk-display;
-  font-weight: bold;
-  letter-spacing: 0;
-}
-
-.departure-time-minutes-label {
-  font-size: 105px;
-  line-height: 144px;
-  font-family: neue-haas-grotesk-display;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-align: right;
-}
-
-.departure-time-timestamp {
-  font-family: neue-haas-grotesk-display;
-  font-size: 105px;
-  line-height: 144px;
-  font-weight: bold;
-  text-align: right;
-}
-
-.departure-time-ampm {
-  font-family: neue-haas-grotesk-display;
-  font-size: 72px;
-  line-height: 144px;
-  text-align: right;
 }
 
 .departure-line {
