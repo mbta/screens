@@ -29,6 +29,7 @@ defmodule ScreensWeb.ConnCase do
   end
 
   setup _tags do
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+    {:ok,
+     conn: Phoenix.ConnTest.build_conn() |> Plug.Conn.put_req_header("x-forwarded-proto", "https")}
   end
 end
