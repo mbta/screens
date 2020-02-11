@@ -6,9 +6,6 @@ import React, {
   useState
 } from "react";
 
-import moment from "moment";
-import "moment-timezone";
-
 import Departures from "./departures";
 import DigitalBridge from "./digital_bridge";
 import FareInfo from "./fare_info";
@@ -114,21 +111,19 @@ const ScreenContainer = ({ id }): JSX.Element => {
   }, []);
 
   const [numRows, setNumRows] = useState(7);
+  const [bottomNumRows, setBottomNumRows] = useState(5);
   const ref = useRef(null);
+  const bottomRef = useRef(null);
 
   useLayoutEffect(() => {
     const height = ref.current.clientHeight;
     if (height > 1312) {
       setNumRows(numRows - 1);
     }
-  });
 
-  const [bottomNumRows, setBottomNumRows] = useState(5);
-  const bottomRef = useRef(null);
-  useLayoutEffect(() => {
     if (bottomRef.current) {
-      const height = bottomRef.current.clientHeight;
-      if (height > 585) {
+      const bottomHeight = bottomRef.current.clientHeight;
+      if (bottomHeight > 585) {
         setBottomNumRows(bottomNumRows - 1);
       }
     }
