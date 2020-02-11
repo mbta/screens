@@ -22,6 +22,8 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :screens, :redirect_http?, true
+
 config :screens,
   screen_data: %{
     "1" => %{stop_id: "1722"},
