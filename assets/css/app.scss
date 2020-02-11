@@ -4,6 +4,7 @@
 @import "departure_destination";
 @import "departure_route";
 @import "departure_row";
+@import "departures_alert";
 
 body {
   margin: 0px;
@@ -142,36 +143,6 @@ body {
   background-color: #808080;
   margin-left: 40px;
   margin-right: 40px;
-}
-
-.later-departures-row-inline-badge-container {
-  text-align: right;
-  margin-right: 40px;
-}
-
-.alert-badge-icon {
-  width: 48px;
-  height: 54.75px;
-  position: relative;
-  top: 12px;
-  margin-left: 12px;
-  margin-right: 24px;
-}
-
-.later-departures-row-inline-badge {
-  font-family: neue-haas-grotesk-display;
-  font-size: 40px;
-  background-color: black;
-  color: white;
-  border-radius: 16px;
-  padding-left: 16px;
-  padding-right: 32px;
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-
-.later-departures-row-inline-emphasis {
-  font-weight: bold;
 }
 
 .nearby-connections-container {
@@ -505,27 +476,6 @@ body {
   background-color: #808080;
   margin-left: 32px;
   margin-right: 40px;
-}
-
-.departures-row-inline-badge-container {
-  text-align: right;
-  margin-right: 40px;
-}
-
-.departures-row-inline-badge {
-  font-family: neue-haas-grotesk-display;
-  font-size: 40px;
-  background-color: black;
-  color: white;
-  border-radius: 16px;
-  padding-left: 16px;
-  padding-right: 32px;
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-
-.departures-row-inline-emphasis {
-  font-weight: bold;
 }
 
 .departure-line {

@@ -45,13 +45,11 @@ const DeparturesAlert = ({ rowAlerts, alerts, modifier }): JSX.Element => {
   }
 
   return (
-    <div className={prefix + "departures-row-inline-badge-container"}>
-      <span className={prefix + "departures-row-inline-badge"}>
-        <img className="alert-badge-icon" src="images/alert.svg" />
+    <div className="departure-info">
+      <span className={"departure-info__badge"}>
+        <img className="departure-info__icon" src="images/alert.svg" />
         Delays {delayDescription + " "}
-        <span className={prefix + "departures-row-inline-emphasis"}>
-          {delayMinutes} minutes
-        </span>
+        <span className="departure-info__emphasis">{delayMinutes} minutes</span>
       </span>
     </div>
   );
