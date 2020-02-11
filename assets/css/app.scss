@@ -3,6 +3,7 @@
 @import "departure_time";
 @import "departure_destination";
 @import "departure_route";
+@import "departure_row";
 
 body {
   margin: 0px;
@@ -126,10 +127,6 @@ body {
 
 .later-departures-container {
   overflow: hidden;
-}
-
-.later-departure-row {
-  display: table;
 }
 
 .later-departure-row-before {
@@ -493,10 +490,6 @@ body {
 }
 
 .departures-row-container {
-}
-
-.departure-row {
-  display: table;
 }
 
 .departure-row-before {
