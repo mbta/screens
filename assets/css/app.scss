@@ -175,6 +175,7 @@ body {
 
 .later-departure-route {
   display: table-cell;
+  vertical-align: middle;
   width: 254px;
   height: 86px;
 }
@@ -236,6 +237,7 @@ body {
 
 .later-departure-time {
   width: 260px;
+  vertical-align: middle;
   font-family: neue-haas-grotesk-display;
   text-align: right;
   margin-right: 40px;
@@ -631,6 +633,7 @@ body {
 
 .departure-route {
   display: table-cell;
+  vertical-align: middle;
   width: 420px;
 }
 
@@ -691,6 +694,7 @@ body {
 
 .departure-time {
   display: table-cell;
+  vertical-align: middle;
   width: 320px;
   font-family: neue-haas-grotesk-display;
   font-size: 48px;
