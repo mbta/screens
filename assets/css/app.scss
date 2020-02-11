@@ -12,41 +12,10 @@
 @import "nearby_connections";
 @import "header";
 @import "flex_zone_alert";
+@import "flex_zone";
+@import "screen_page";
+@import "screen_container";
 
 body {
   margin: 0px;
-}
-
-.flex-placeholder {
-  font-family: neue-haas-grotesk-display;
-  font-size: 96px;
-  font-weight: 700;
-  text-align: center;
-}
-
-.multi-screen-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-}
-
-.dual-screen-container {
-}
-
-.single-screen-container {
-  margin: 0px auto;
-  padding: 0px;
-  width: 1200px;
-  height: 1600px;
-}
-
-.flex-zone-container {
-  height: 1165px;
-}
-
-.flex-top-container {
-  height: 585px;
-}
-
-.flex-bottom-container {
-  height: 580px;
 }
