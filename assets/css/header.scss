@@ -1,0 +1,59 @@
+.header {
+  background-color: black;
+  color: white;
+  font-family: neue-haas-grotesk-display;
+  height: 288px;
+  position: relative;
+}
+
+.header__time {
+  position: absolute;
+  top: 28px;
+  right: 40px;
+  font-size: 72px;
+  color: #ffffff;
+  letter-spacing: 0;
+  text-align: right;
+  line-height: 72px;
+  font-weight: 400;
+}
+
+.header__realtime-indicator {
+  position: absolute;
+  right: 40px;
+  bottom: 47px;
+  width: 200px;
+  height: 64px;
+  font-size: 24px;
+  color: #ffffff;
+  text-align: right;
+  line-height: 32px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.header__realtime-indicator-icon {
+  height: 32px;
+  width: 32px;
+  margin-right: 8px;
+}
+
+.header__stop-name {
+  width: 820px;
+  font-weight: bold;
+  color: #ffffff;
+  letter-spacing: 1px;
+  position: absolute;
+  bottom: 42px;
+  left: 56px;
+}
+
+.header__stop-name--small {
+  font-size: 72px;
+  line-height: 72px;
+}
+
+.header__stop-name--large {
+  font-size: 96px;
+  line-height: 96px;
+}

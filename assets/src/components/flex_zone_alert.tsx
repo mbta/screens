@@ -16,27 +16,27 @@ const iconForAlert = alert => {
 const FlexZoneAlert = ({ alert }): JSX.Element => {
   const updatedTime = moment(alert.updated_at);
   return (
-    <div className="alert-container">
-      <div className="alert-header">
-        <div className="alert-header-icon-container">
+    <div className="flex-alert">
+      <div className="flex-alert__header">
+        <div className="flex-alert__icon-container">
           <img
-            className="alert-icon-image"
+            className="flex-alert__icon-image"
             src={`images/${iconForAlert(alert)}.svg`}
           />
         </div>
-        <div className="alert-header-effect">
+        <div className="flex-alert__header-effect">
           {alert.effect.replace("_", " ").replace(/\w\S*/g, txt => {
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
           })}
         </div>
-        <div className="alert-header-timestamp">
+        <div className="flex-alert__header-timestamp">
           Updated <br />
           {updatedTime.tz("America/New_York").format("M/D/Y · h:mm A")}
         </div>
       </div>
 
-      <div className="alert-body">
-        <div className="alert-body-description">{alert.header}</div>
+      <div className="flex-alert__body">
+        <div className="flex-alert__body-description">{alert.header}</div>
       </div>
     </div>
   );

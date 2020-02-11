@@ -12,15 +12,8 @@ const DepartureRow = ({
   first,
   modifier
 }): JSX.Element => {
-  let prefix;
-  if (modifier) {
-    prefix = "later-";
-  } else {
-    prefix = "";
-  }
-
   return (
-    <div className={prefix + "departure-row"}>
+    <div className={"departure-row"}>
       <DepartureRoute route={route} modifier={modifier} />
       <DepartureDestination destination={destination} modifier={modifier} />
       <DepartureTime

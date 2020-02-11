@@ -3,25 +3,25 @@ import React from "react";
 
 const DigitalBridge = ({ stopId }): JSX.Element => {
   return (
-    <div className="digital-bridge-container">
-      <div className="digital-bridge-logo-container">
+    <div className="digital-bridge">
+      <div className="digital-bridge__logo-container">
         <img
-          className="digital-bridge-logo-image"
+          className="digital-bridge__logo-image"
           src="images/logo-white.svg"
         />
       </div>
-      <div className="digital-bridge-link-container">
-        <div className="digital-bridge-link-description">
+      <div className="digital-bridge__link-container">
+        <div className="digital-bridge__link-description">
           Real time predictions and stop info on the go
         </div>
-        <div className="digital-bridge-link-url">
+        <div className="digital-bridge__link-url">
           www.mbta.com/stops/{stopId}
         </div>
       </div>
-      <div className="digital-bridge-qr-container">
-        <div className="digital-bridge-qr-image-container">
+      <div className="digital-bridge__qr-container">
+        <div className="digital-bridge__qr-image-container">
           <QRCode
-            className="digital-bridge-qr-image"
+            className="digital-bridge__qr-image"
             size={112}
             value={"www.mbta.com/stops/" + stopId}
           />

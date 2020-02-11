@@ -1,5 +1,7 @@
 import React from "react";
 
+import { classWithSize } from "../util";
+
 const DepartureDestination = ({ destination, modifier }): JSX.Element => {
   let prefix;
   if (modifier) {
@@ -8,38 +10,41 @@ const DepartureDestination = ({ destination, modifier }): JSX.Element => {
     prefix = "";
   }
 
-  if (destination === undefined) {
-    return <div className={prefix + "departure-destination"}></div>;
-  }
+  const size = modifier ? "small" : "large";
 
-  if (destination.includes("via")) {
+  let inner;
+  if (destination === undefined) {
+    inner = <div></div>;
+  } else if (destination.includes("via")) {
     const parts = destination.split(" via ");
     const primaryDestination = parts[0];
     const secondaryDestination = "via " + parts[1];
 
-    return (
-      <div className={prefix + "departure-destination"}>
-        <div className={prefix + "departure-destination-container"}>
-          <div className={prefix + "departure-destination-primary"}>
-            {primaryDestination}
-          </div>
-          <div className={prefix + "departure-destination-secondary"}>
-            {secondaryDestination}
-          </div>
+    inner = (
+      <div className={classWithSize("departure-destination__container", size)}>
+        <div className={classWithSize("departure-destination__primary", size)}>
+          {primaryDestination}
+        </div>
+        <div
+          className={classWithSize("departure-destination__secondary", size)}
+        >
+          {secondaryDestination}
         </div>
       </div>
     );
   } else {
-    return (
-      <div className={prefix + "departure-destination"}>
-        <div className={prefix + "departure-destination-container"}>
-          <div className={prefix + "departure-destination-primary"}>
-            {destination}
-          </div>
+    inner = (
+      <div className={classWithSize("departure-destination__container", size)}>
+        <div className={classWithSize("departure-destination__primary", size)}>
+          {destination}
         </div>
       </div>
     );
   }
+
+  return (
+    <div className={classWithSize("departure-destination", size)}>{inner}</div>
+  );
 };
 
 export default DepartureDestination;

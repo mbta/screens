@@ -2,27 +2,27 @@ import React from "react";
 
 const FareInfo = (): JSX.Element => {
   return (
-    <div className="fare-container">
-      <div className="fare-icon-container">
-        <img className="fare-icon-image" src="images/bus.svg" />
+    <div className="fares">
+      <div className="fares__icon-container">
+        <img className="fares__icon-image" src="images/bus.svg" />
       </div>
-      <div className="fare-info-container">
-        <div className="fare-info-header">Local bus one-way</div>
-        <div className="fare-info-link">More at www.mbta.com/fares</div>
-        <div className="fare-info-rows">
-          <div className="fare-info-row">
-            <span className="fare-info-row-cost">$1.70 </span>
-            <span className="fare-info-row-description">CharlieCard </span>
-            <span className="fare-info-row-details">
+      <div className="fares__info-container">
+        <div className="fares__info-header">Local bus one-way</div>
+        <div className="fares__info-link">More at www.mbta.com/fares</div>
+        <div className="fares__info-rows">
+          <div className="fares__info-row">
+            <span className="fares__info-row-cost">$1.70 </span>
+            <span className="fares__info-row-description">CharlieCard </span>
+            <span className="fares__info-row-details">
               (1 free transfer to Local Bus)
             </span>
           </div>
-          <div className="fare-info-row">
-            <span className="fare-info-row-cost">$2.00 </span>
-            <span className="fare-info-row-description">
+          <div className="fares__info-row">
+            <span className="fares__info-row-cost">$2.00 </span>
+            <span className="fares__info-row-description">
               Cash or CharlieTicket{" "}
             </span>
-            <span className="fare-info-row-details">(Limited Transfers)</span>
+            <span className="fares__info-row-details">(Limited Transfers)</span>
           </div>
         </div>
       </div>

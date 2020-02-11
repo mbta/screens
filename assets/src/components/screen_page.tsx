@@ -4,7 +4,7 @@ import ScreenContainer from "./screen_container";
 
 const MultiScreenPage = (): JSX.Element => {
   return (
-    <div className="multi-screen-container">
+    <div className="multi-screen-page">
       {[...Array(19)].map((_, i) => (
         <ScreenContainer id={i + 1} key={i} />
       ))}
@@ -15,7 +15,7 @@ const MultiScreenPage = (): JSX.Element => {
 const ScreenPage = (): JSX.Element => {
   const { id } = useParams();
   return (
-    <div className="screen-container">
+    <div>
       <ScreenContainer id={id} />
     </div>
   );

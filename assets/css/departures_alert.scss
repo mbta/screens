@@ -1,0 +1,29 @@
+.departure-info {
+  text-align: right;
+  margin-right: 40px;
+}
+
+.departure-info__badge {
+  background-color: black;
+  color: white;
+  font-family: neue-haas-grotesk-text;
+  font-size: 40px;
+  border-radius: 16px;
+  padding-left: 16px;
+  padding-right: 32px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.departure-info__emphasis {
+  font-weight: bold;
+}
+
+.departure-info__icon {
+  width: 48px;
+  height: 54.75px;
+  position: relative;
+  top: 12px;
+  margin-left: 12px;
+  margin-right: 24px;
+}

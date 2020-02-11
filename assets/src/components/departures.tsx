@@ -76,15 +76,8 @@ const Departures = forwardRef(
       endIndex - startIndex
     );
 
-    let prefix;
-    if (modifier) {
-      prefix = "later-";
-    } else {
-      prefix = "";
-    }
-
     return (
-      <div className={prefix + "departures-container"} ref={ref}>
+      <div className="departures" ref={ref}>
         {rows.map((row, i) => (
           <DeparturesRow
             currentTimeString={currentTimeString}

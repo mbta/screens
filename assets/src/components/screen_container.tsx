@@ -135,7 +135,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   });
 
   return (
-    <div className="dual-screen-container">
+    <div>
       <TopScreenContainer
         stopName={stopName}
         currentTimeString={currentTimeString}

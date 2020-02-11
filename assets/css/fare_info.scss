@@ -1,0 +1,60 @@
+.fares {
+  height: 263px;
+  font-family: neue-haas-grotesk-text;
+}
+
+.fares__icon-container {
+  width: 208px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.fares__icon-image {
+  height: 128px;
+  width: 128px;
+  margin: 48px 40px 83px 40px;
+  padding: 0px;
+}
+
+.fares__info-container {
+  width: 992px;
+  display: inline-block;
+}
+
+.fares__info-header {
+  font-size: 36px;
+  line-height: 36px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 48px;
+  margin-bottom: 19px;
+  display: inline-block;
+}
+
+.fares__info-link {
+  font-size: 32px;
+  line-height: 36px;
+  text-align: right;
+  display: inline-block;
+  margin-right: 40px;
+  width: 540px;
+}
+
+.fares__info-rows {
+}
+
+.fares__info-row {
+}
+
+.fares__info-row-cost {
+  font-size: 44px;
+  font-weight: bold;
+}
+
+.fares__info-row-description {
+  font-size: 44px;
+}
+
+.fares__info-row-details {
+  font-size: 36px;
+}

@@ -1,7 +1,7 @@
 import React from "react";
 
 const ServiceMap = (): JSX.Element => {
-  return <div className="flex-placeholder"></div>;
+  return <div></div>;
 };
 
 export default ServiceMap;

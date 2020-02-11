@@ -1,0 +1,142 @@
+// nearby-connections
+.nearby-connections {
+}
+
+.nearby-connections__header {
+  height: 128px;
+  padding-top: 32px;
+}
+
+.nearby-connections__icon-container {
+  display: inline-block;
+  width: 208px;
+  vertical-align: top;
+}
+
+.nearby-connections__icon-image {
+  height: 128px;
+  width: 128px;
+  margin: 0px 40px 32px 40px;
+}
+
+.nearby-connections__header-text {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 72px;
+  line-height: 72px;
+  margin-top: 22px;
+  font-family: neue-haas-grotesk-text;
+  font-weight: 700;
+}
+
+.nearby-connections__hairline {
+  height: 1px;
+  background-color: #808080;
+  margin-left: 208px;
+  margin-right: 40px;
+}
+
+// nearby-connections-row
+.nearby-connections-row {
+}
+
+.nearby-connections-row__header {
+  margin-left: 208px;
+  margin-right: 40px;
+  margin-top: 18px;
+}
+
+.nearby-connections-row__stop-name {
+  display: inline-block;
+  font-size: 44px;
+  line-height: 54px;
+  font-family: neue-haas-grotesk-text;
+  font-weight: 700;
+}
+
+.nearby-connections-row__distance {
+  font-size: 44px;
+  line-height: 54px;
+  font-weight: 700;
+}
+
+.nearby-connections-row__distance-label {
+  display: inline-block;
+  text-align: right;
+  float: right;
+  font-family: neue-haas-grotesk-text;
+}
+
+.nearby-connections-row__distance-units {
+  font-size: 36px;
+  line-height: 54px;
+}
+
+.nearby-connections-row__distance-icon {
+  width: 48px;
+  height: 54px;
+  margin-right: 12px;
+  position: relative;
+  top: 6px;
+}
+
+.nearby-connections-row__routes {
+  margin-left: 208px;
+  margin-top: 25px;
+  margin-bottom: 34px;
+  margin-right: 32px;
+}
+
+// nearby-connections-route
+.nearby-connections-route {
+  display: inline-block;
+  margin-right: 18px;
+}
+
+.nearby-connections-route__pill {
+  font-family: neue-haas-grotesk-text;
+  background: black;
+  border-radius: 54px;
+  text-align: center;
+}
+
+.nearby-connections-route__pill--large {
+  min-width: 132px;
+  height: 64px;
+  border-radius: 54px;
+}
+
+.nearby-connections-route__pill--small {
+  min-width: 79.2px;
+  height: 38.4px;
+  border-radius: 32.4px;
+}
+
+.nearby-connections-route__text {
+  color: white;
+  display: inline-block;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.nearby-connections-route__text--large {
+  font-size: 54px;
+  letter-spacing: 1.5px;
+  margin-left: 32px;
+  margin-right: 32px;
+}
+
+.nearby-connections-route__text--small {
+  font-size: 32.4px;
+  letter-spacing: 0.9px;
+  margin-left: 19.2px;
+  margin-right: 19.2px;
+}
+
+.nearby-connections-route__icon {
+  width: 48px;
+  height: 54px;
+  margin-right: 12px;
+  position: relative;
+  top: 6px;
+}

@@ -1,0 +1,52 @@
+.digital-bridge {
+  height: 172px;
+  background: black;
+}
+
+.digital-bridge__logo-container {
+  width: 208px;
+  display: inline-block;
+}
+
+.digital-bridge__logo-image {
+  height: 128px;
+  width: 128px;
+  margin: 24px 40px 20px 40px;
+}
+
+.digital-bridge__link-container {
+  width: 792px;
+  font-family: neue-haas-grotesk-text;
+  color: white;
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 30px;
+}
+
+.digital-bridge__link-description {
+  font-size: 36px;
+  line-height: 56px;
+  font-weight: 400;
+}
+
+.digital-bridge__link-url {
+  font-size: 44px;
+  line-height: 56px;
+  font-weight: 700;
+}
+
+.digital-bridge__qr-container {
+  width: 200px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.digital-bridge__qr-image-container {
+  background: white;
+  margin: 22px 32px 22px 40px;
+  border-radius: 8px;
+}
+
+.digital-bridge__qr-image {
+  margin: 8px;
+}

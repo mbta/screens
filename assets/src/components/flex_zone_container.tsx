@@ -79,9 +79,9 @@ const FlexZoneContainer = forwardRef(
     }
 
     return (
-      <div className="flex-zone-container">
-        <div className="flex-top-container">{topComponent}</div>
-        <div className="flex-bottom-container">{bottomComponent}</div>
+      <div className="flex-zone__container">
+        <div className="flex-zone__top-container">{topComponent}</div>
+        <div className="flex-zone__bottom-container">{bottomComponent}</div>
       </div>
     );
   }
