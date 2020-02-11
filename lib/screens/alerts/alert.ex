@@ -134,8 +134,8 @@ defmodule Screens.Alerts.Alert do
     {
       specificity(alert, stop_id),
       -high_severity(alert),
-      -happening_now(alert),
       -new_service_in_next_week(alert),
+      -happening_now(alert),
       -new_info_in_last_week(alert),
       effect_index(alert),
       alert.id
