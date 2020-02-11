@@ -59,7 +59,7 @@ const Departures = forwardRef(
       departuresAlerts,
       startIndex,
       endIndex,
-      modifier
+      size
     },
     ref
   ): JSX.Element => {
@@ -86,7 +86,7 @@ const Departures = forwardRef(
             departureTimes={row.time}
             rowAlerts={row.alerts}
             alerts={alerts}
-            modifier={modifier}
+            size={size}
             key={row.route + row.time + i}
           />
         ))}

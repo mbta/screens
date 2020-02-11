@@ -42,7 +42,7 @@ const FlexZoneContainer = forwardRef(
           departuresAlerts={departuresAlerts}
           startIndex={numRows}
           endIndex={numRows + bottomNumRows}
-          modifier={true}
+          size="small"
           ref={ref}
         />
       );
@@ -57,7 +57,7 @@ const FlexZoneContainer = forwardRef(
           departuresAlerts={departuresAlerts}
           startIndex={numRows}
           endIndex={numRows + bottomNumRows}
-          modifier={true}
+          size="small"
           ref={ref}
         />
       );

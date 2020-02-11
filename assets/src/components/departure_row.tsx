@@ -10,16 +10,16 @@ const DepartureRow = ({
   destination,
   time,
   first,
-  modifier
+  size
 }): JSX.Element => {
   return (
     <div className={"departure-row"}>
-      <DepartureRoute route={route} modifier={modifier} />
-      <DepartureDestination destination={destination} modifier={modifier} />
+      <DepartureRoute route={route} size={size} />
+      <DepartureDestination destination={destination} size={size} />
       <DepartureTime
         time={time}
         currentTimeString={currentTimeString}
-        modifier={modifier}
+        size={size}
       />
     </div>
   );

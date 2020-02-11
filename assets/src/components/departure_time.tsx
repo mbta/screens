@@ -4,13 +4,11 @@ import React from "react";
 
 import { classWithSize } from "../util";
 
-const DepartureTime = ({ time, currentTimeString, modifier }): JSX.Element => {
+const DepartureTime = ({ time, currentTimeString, size }): JSX.Element => {
   const departureTime = moment(time);
   const currentTime = moment(currentTimeString);
   const secondDifference = departureTime.diff(currentTime, "seconds");
   const minuteDifference = Math.round(secondDifference / 60);
-
-  const size = modifier ? "small" : "large";
 
   if (secondDifference < 60) {
     return (

@@ -2,9 +2,7 @@ import React from "react";
 
 import { classWithSize } from "../util";
 
-const DepartureRoute = ({ route, modifier }): JSX.Element => {
-  const size = modifier ? "small" : "large";
-
+const DepartureRoute = ({ route, size }): JSX.Element => {
   if (!route) {
     return <div className={classWithSize("departure-route", size)}></div>;
   }

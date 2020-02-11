@@ -72,7 +72,7 @@ const TopScreenContainer = forwardRef(
           departuresAlerts={departuresAlerts}
           startIndex={0}
           endIndex={numRows}
-          modifier={false}
+          size="large"
           ref={ref}
         />
       </div>
