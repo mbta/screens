@@ -14,6 +14,10 @@ defmodule ScreensWeb.Router do
   end
 
   scope "/", ScreensWeb do
+    get "/_health", HealthController, :index
+  end
+
+  scope "/", ScreensWeb do
     pipe_through :browser
 
     get "/", PageController, :index
