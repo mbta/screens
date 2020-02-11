@@ -19,6 +19,8 @@ config :logger, level: :info
 
 config :ex_aws, json_codec: Jason
 
+config :ehmon, :report_mf, {:ehmon, :info_report}
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
