@@ -1,0 +1,41 @@
+.departure-destination {
+  display: table-cell;
+  vertical-align: middle;
+  font-family: neue-haas-grotesk-text;
+}
+.departure-destination--large {
+  width: 420px;
+}
+
+.departure-destination--small {
+  width: 646px;
+}
+
+.departure-destination__container
+  .departure-destination__container--large
+  .departure-destination__container--small {
+}
+
+.departure-destination__primary {
+  font-weight: 500;
+}
+
+.departure-destination__primary--large {
+  font-size: 72px;
+}
+
+.departure-destination__primary--small {
+  font-size: 54px;
+}
+
+.departure-destination__secondary {
+  font-weight: 400;
+}
+
+.departure-destination__secondary--large {
+  font-size: 44px;
+}
+
+.departure-destination__secondary--small {
+  font-size: 36px;
+}

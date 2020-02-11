@@ -1,6 +1,7 @@
 @import url("https://rsms.me/inter/inter.css");
 
 @import "departure_time";
+@import "departure_destination";
 
 body {
   margin: 0px;
@@ -215,26 +216,6 @@ body {
 .later-departure-route-number-medium {
   font-size: 72px;
   letter-spacing: 2px;
-}
-
-.later-departure-destination {
-  display: table-cell;
-  font-family: neue-haas-grotesk-text;
-  width: 646px;
-  vertical-align: middle;
-}
-
-.later-departure-destination-container {
-}
-
-.later-departure-destination-primary {
-  font-size: 54px;
-  font-weight: 500;
-}
-
-.later-departure-destination-secondary {
-  font-size: 36px;
-  font-weight: 400;
 }
 
 .nearby-connections-container {
@@ -634,26 +615,6 @@ body {
 .departure-route-number-medium {
   font-size: 144px;
   letter-spacing: 4px;
-}
-
-.departure-destination {
-  width: 420px;
-  font-family: neue-haas-grotesk-text;
-  display: table-cell;
-  vertical-align: middle;
-}
-
-.departure-destination-container {
-}
-
-.departure-destination-primary {
-  font-size: 72px;
-  font-weight: 500;
-}
-
-.departure-destination-secondary {
-  font-size: 44px;
-  font-weight: 400;
 }
 
 .departure-line {

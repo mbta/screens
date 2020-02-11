@@ -2,9 +2,7 @@ import moment from "moment";
 import "moment-timezone";
 import React from "react";
 
-const classWithSize = (baseClass, size) => {
-  return `${baseClass} ${baseClass}--${size}`;
-};
+import { classWithSize } from "../util";
 
 const DepartureTime = ({ time, currentTimeString, modifier }): JSX.Element => {
   const departureTime = moment(time);
@@ -14,16 +12,15 @@ const DepartureTime = ({ time, currentTimeString, modifier }): JSX.Element => {
 
   const size = modifier ? "small" : "large";
 
-  let inner;
   if (secondDifference < 60) {
-    inner = (
-      <div>
+    return (
+      <div className={classWithSize("departure-time", size)}>
         <span className={classWithSize("departure-time__now", size)}>Now</span>
       </div>
     );
   } else if (minuteDifference < 60) {
-    inner = (
-      <div>
+    return (
+      <div className={classWithSize("departure-time", size)}>
         <span className={classWithSize("departure-time__minutes", size)}>
           {minuteDifference}
         </span>
@@ -35,8 +32,8 @@ const DepartureTime = ({ time, currentTimeString, modifier }): JSX.Element => {
   } else {
     const timestamp = departureTime.tz("America/New_York").format("h:mm");
     const ampm = departureTime.tz("America/New_York").format("A");
-    inner = (
-      <div>
+    return (
+      <div className={classWithSize("departure-time", size)}>
         <span className={classWithSize("departure-time__timestamp", size)}>
           {timestamp}
         </span>
@@ -46,8 +43,6 @@ const DepartureTime = ({ time, currentTimeString, modifier }): JSX.Element => {
       </div>
     );
   }
-
-  return <div className={classWithSize("departure-time", size)}>{inner}</div>;
 };
 
 export default DepartureTime;
