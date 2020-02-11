@@ -5,6 +5,7 @@
 @import "departure_route";
 @import "departure_row";
 @import "departures_alert";
+@import "departures_row";
 
 body {
   margin: 0px;
@@ -128,21 +129,6 @@ body {
 
 .later-departures-container {
   overflow: hidden;
-}
-
-.later-departure-row-before {
-  height: 22px;
-}
-
-.later-departure-row-after {
-  height: 24px;
-}
-
-.later-departure-row-hairline {
-  height: 1px;
-  background-color: #808080;
-  margin-left: 40px;
-  margin-right: 40px;
 }
 
 .nearby-connections-container {
@@ -455,27 +441,6 @@ body {
 }
 
 .departures-container {
-}
-
-.departures-row {
-}
-
-.departures-row-container {
-}
-
-.departure-row-before {
-  height: 44px;
-}
-
-.departure-row-after {
-  height: 46px;
-}
-
-.departure-row-hairline {
-  height: 1px;
-  background-color: #808080;
-  margin-left: 32px;
-  margin-right: 40px;
 }
 
 .departure-line {
