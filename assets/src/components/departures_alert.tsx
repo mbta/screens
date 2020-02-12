@@ -21,15 +21,12 @@ const parseSeverity = severity => {
   };
 };
 
-const DeparturesAlert = ({ rowAlerts, alerts }): JSX.Element => {
+const DeparturesAlert = ({ inlineBadges }): JSX.Element => {
   let severity;
-  rowAlerts.forEach(alertId => {
-    alerts.forEach(alert => {
-      if (alertId === alert.id && alert.effect === "delay") {
-        severity = alert.severity;
-      }
-    });
-  });
+
+  if (inlineBadges && inlineBadges.length > 0) {
+    severity = inlineBadges[0].severity;
+  }
 
   if (severity === undefined) {
     return <div></div>;

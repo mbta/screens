@@ -3,34 +3,35 @@ defmodule Screens.Departures.Departure do
 
   defstruct id: nil,
             stop_name: nil,
-            route: nil,
+            route_short_name: nil,
+            route_id: nil,
             destination: nil,
             time: nil,
-            realtime: nil
+            inline_badges: nil
 
   @type t :: %__MODULE__{
           id: String.t(),
           stop_name: String.t(),
-          route: String.t(),
+          route_short_name: String.t(),
+          route_id: String.t(),
           destination: String.t(),
           time: DateTime.t(),
-          realtime: boolean()
+          inline_badges: list(map())
         }
 
   def by_stop_id(stop_id) do
-    predictions = Screens.Predictions.Prediction.by_stop_id(stop_id)
-    schedules = Screens.Schedules.Schedule.by_stop_id(stop_id)
-
-    merge_predictions_with_schedules(predictions, schedules)
+    stop_id
+    |> Screens.Predictions.Prediction.by_stop_id()
+    |> Enum.map(&from_prediction/1)
   end
 
   def to_map(d) do
     %{
       id: d.id,
-      route: d.route,
+      route: d.route_short_name,
       destination: d.destination,
       time: d.time,
-      realtime: d.realtime
+      inline_badges: d.inline_badges
     }
   end
 
@@ -38,44 +39,26 @@ defmodule Screens.Departures.Departure do
     %Screens.Departures.Departure{
       id: p.id,
       stop_name: p.stop.name,
-      route: p.route.short_name,
+      route_short_name: p.route.short_name,
+      route_id: p.route.id,
       destination: p.trip.headsign,
       time: DateTime.to_iso8601(p.time),
-      realtime: true
+      inline_badges: []
     }
   end
 
-  def from_schedule(s) do
-    %Screens.Departures.Departure{
-      id: s.id,
-      stop_name: nil,
-      route: s.route.short_name,
-      destination: s.trip.headsign,
-      time: DateTime.to_iso8601(s.time),
-      realtime: false
-    }
+  def associate_alerts_with_departures(departures, alerts) do
+    delay_map = Screens.Alerts.Alert.build_delay_map(alerts)
+    Enum.map(departures, &update_departure_with_delay_alert(delay_map, &1))
   end
 
-  defp merge_predictions_with_schedules(predictions, schedules) do
-    # Filter schedules by time
-    # We currently filter schedules after the last prediction time, but may want to change that.
-    now = DateTime.utc_now()
-    last_prediction_time = List.last(predictions).time
+  defp update_departure_with_delay_alert(delay_map, %{route_id: route_id} = departure) do
+    case delay_map do
+      %{^route_id => severity} ->
+        %{departure | inline_badges: [%{type: :delay, severity: severity}]}
 
-    upcoming_schedules =
-      Enum.filter(schedules, fn s -> s.time > now && s.time < last_prediction_time end)
-
-    # Combine predictions with schedules based on trip_id
-    prediction_trip_ids =
-      predictions
-      |> Enum.map(& &1.trip.id)
-      |> MapSet.new()
-
-    added_schedules =
-      Enum.filter(upcoming_schedules, fn s -> !MapSet.member?(prediction_trip_ids, s.trip.id) end)
-
-    predicted_departures = Enum.map(predictions, fn p -> from_prediction(p) end)
-    scheduled_departures = Enum.map(added_schedules, fn s -> from_schedule(s) end)
-    Enum.sort_by(predicted_departures ++ scheduled_departures, & &1.time)
+      _ ->
+        departure
+    end
   end
 end

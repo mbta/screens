@@ -13,7 +13,7 @@ defmodule Screens.NearbyConnections do
       %{"data" => stops_data} = result
 
       stops_data
-      |> Enum.map(fn stop_data -> parse_stop_data(stop_data) end)
+      |> Enum.map(&parse_stop_data/1)
       |> build_nearby_connections(stop_id)
     end
   end
@@ -35,9 +35,21 @@ defmodule Screens.NearbyConnections do
     {stop_data, nearby_stops_data} = split_stops_data(stops_data, stop_id)
     %{stop_lat: stop_lat, stop_lon: stop_lon} = stop_data
 
-    nearby_stops_data
-    |> Enum.map(fn stop -> build_nearby_connection(stop, stop_lat, stop_lon) end)
-    |> Enum.sort_by(& &1.distance)
+    nearby_connections =
+      nearby_stops_data
+      |> Enum.map(&build_nearby_connection(&1, stop_lat, stop_lon))
+      |> Enum.sort_by(& &1.distance)
+      |> Enum.map(&convert_distance/1)
+
+    {stop_data, nearby_connections}
+  end
+
+  @miles_to_feet 5280
+  @feet_to_minutes 1 / 250
+
+  defp convert_distance(%{distance: distance_miles} = connection) do
+    distance_minutes = max(1, Kernel.round(distance_miles * @miles_to_feet * @feet_to_minutes))
+    %{connection | distance: distance_minutes}
   end
 
   def build_nearby_connection(

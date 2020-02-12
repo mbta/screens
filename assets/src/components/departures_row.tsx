@@ -5,12 +5,11 @@ import DepartureRow from "./departure_row";
 import DeparturesAlert from "./departures_alert";
 
 const DeparturesRow = ({
-  currentTime,
+  currentTimeString,
   route,
   destination,
   departureTimes,
-  rowAlerts,
-  alerts,
+  inlineBadges,
   size
 }): JSX.Element => {
   return (
@@ -19,16 +18,15 @@ const DeparturesRow = ({
       <div className="departures-row__container">
         {departureTimes.map((t, i) => (
           <DepartureRow
-            currentTime={currentTime}
+            currentTimeString={currentTimeString}
             route={i === 0 ? route : undefined}
             destination={i === 0 ? destination : undefined}
             time={t}
-            first={i === 0}
             size={size}
             key={route + t + i}
           />
         ))}
-        <DeparturesAlert rowAlerts={rowAlerts} alerts={alerts} />
+        <DeparturesAlert inlineBadges={inlineBadges} />
       </div>
       <div className={classWithSize("departures-row__after", size)}></div>
       <div className="departures-row__hairline"></div>

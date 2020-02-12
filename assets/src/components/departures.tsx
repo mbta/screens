@@ -1,34 +1,18 @@
 import React, { forwardRef } from "react";
 import DeparturesRow from "./departures_row";
 
-const buildDeparturesRows = (
-  departuresRows,
-  alerts,
-  departuresAlerts,
-  numRows
-) => {
-  if (!departuresRows || !alerts || !departuresAlerts) {
+const buildDeparturesRows = departures => {
+  if (!departures) {
     return [];
   }
 
-  departuresRows = departuresRows.slice(0, numRows);
-
   const rows = [];
-  departuresRows.forEach(row => {
-    const rowAlerts = [];
-    departuresAlerts.forEach(da => {
-      const alertId = da[0];
-      const departureId = da[1];
 
-      if (row.id === departureId) {
-        rowAlerts.push(alertId);
-      }
-    });
-
+  // Do we need to do anything with inlineBadges?
+  departures.forEach(row => {
     if (rows.length === 0) {
       const newRow = Object.assign({}, row);
       newRow.time = [newRow.time];
-      newRow.alerts = rowAlerts;
       rows.push(newRow);
     } else {
       const lastRow = rows[rows.length - 1];
@@ -37,11 +21,9 @@ const buildDeparturesRows = (
         row.destination === lastRow.destination
       ) {
         lastRow.time.push(row.time);
-        // Take union of rowAlerts?
       } else {
         const newRow = Object.assign({}, row);
         newRow.time = [newRow.time];
-        newRow.alerts = rowAlerts;
         rows.push(newRow);
       }
     }
@@ -52,30 +34,17 @@ const buildDeparturesRows = (
 
 const Departures = forwardRef(
   (
-    {
-      currentTimeString,
-      departureRows,
-      alerts,
-      departuresAlerts,
-      startIndex,
-      endIndex,
-      size
-    },
+    { currentTimeString, departures, startIndex, endIndex, size },
     ref
   ): JSX.Element => {
     let filteredRows;
-    if (!departureRows) {
-      filteredRows = departureRows;
+    if (!departures) {
+      filteredRows = departures;
     } else {
-      filteredRows = departureRows.slice(startIndex, endIndex);
+      filteredRows = departures.slice(startIndex, endIndex);
     }
-    const rows = buildDeparturesRows(
-      filteredRows,
-      alerts,
-      departuresAlerts,
-      endIndex - startIndex
-    );
 
+    const rows = buildDeparturesRows(filteredRows);
     return (
       <div className="departures" ref={ref}>
         {rows.map((row, i) => (
@@ -84,8 +53,7 @@ const Departures = forwardRef(
             route={row.route}
             destination={row.destination}
             departureTimes={row.time}
-            rowAlerts={row.alerts}
-            alerts={alerts}
+            inlineBadges={row.inline_badges}
             size={size}
             key={row.route + row.time + i}
           />

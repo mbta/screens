@@ -58,6 +58,8 @@ config :screens,
   },
   api_v3_key: "ba359ac2ed5b41a5b05bfae67321766a",
   api_v3_url: "https://api-v3.mbta.com/",
+  # api_v3_key: "b982dde8f59047da860575f09f7fae4b",
+  # api_v3_url: "https://green.dev.api.mbtace.com/",
   nearby_connections: %{
     "1722" => ["place-matt", "place-DB-2222"],
     "383" => ["2923", "568"],
@@ -134,9 +136,6 @@ config :screens,
     "place-rvrwy" => ["Green Line • E"],
     "place-sstat" => ["Red Line", "SL 1", "SL2", "SL3", "Commuter Rail"]
   }
-
-# api_v3_key: "b982dde8f59047da860575f09f7fae4b",
-# api_v3_url: "https://green.dev.api.mbtace.com/"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

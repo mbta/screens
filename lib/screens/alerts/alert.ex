@@ -59,6 +59,14 @@ defmodule Screens.Alerts.Alert do
   def to_map(nil), do: nil
 
   def to_map(alert) do
+    %{
+      effect: alert.effect,
+      header: alert.header,
+      updated_at: DateTime.to_iso8601(alert.updated_at)
+    }
+  end
+
+  def to_full_map(alert) do
     aps = Enum.map(alert.active_period, &ap_to_map/1)
 
     %{
@@ -122,7 +130,7 @@ defmodule Screens.Alerts.Alert do
     |> Screens.Alerts.Parser.parse_result()
     |> sort(stop_id)
     |> Enum.map(fn alert ->
-      %{alert: to_map(alert), priority: to_priority_map(alert, stop_id)}
+      %{alert: to_full_map(alert), priority: to_priority_map(alert, stop_id)}
     end)
   end
 
@@ -314,24 +322,55 @@ defmodule Screens.Alerts.Alert do
     false
   end
 
-  def associate_alerts_with_departures(alerts, departures) do
-    Enum.flat_map(alerts, fn alert -> associate_alert_with_departures(alert, departures) end)
+  def build_delay_map(alerts) do
+    Enum.reduce(alerts, %{}, &delay_map_reducer/2)
   end
 
-  defp associate_alert_with_departures(alert, departures) do
-    alert.informed_entities
-    |> Enum.flat_map(fn e -> match_departures_by_informed_entity(e, departures) end)
-    |> Enum.map(fn departure_id -> [alert.id, departure_id] end)
+  defp delay_map_reducer(%{informed_entities: ies, severity: severity}, delay_map) do
+    route_ids = bus_route_informed_entities(ies)
+    Enum.reduce(route_ids, delay_map, &delay_map_reducer_helper(&1, severity, &2))
   end
 
-  # Later, support informed entities other than bus routes
-  defp match_departures_by_informed_entity(%{"route" => route_id, "route_type" => 3}, departures) do
-    departures
-    |> Enum.filter(fn d -> d.route == route_id end)
-    |> Enum.map(& &1.id)
+  defp delay_map_reducer_helper(route_id, severity, delay_map) do
+    case delay_map do
+      %{^route_id => current_severity} when current_severity >= severity ->
+        delay_map
+
+      _ ->
+        Map.put(delay_map, route_id, severity)
+    end
   end
 
-  defp match_departures_by_informed_entity(_informed_entity, _departures) do
+  defp bus_route_informed_entities(informed_entities) do
+    Enum.flat_map(informed_entities, &bus_route_informed_entity/1)
+  end
+
+  defp bus_route_informed_entity(%{"route" => route_id, "route_type" => 3}) do
+    [route_id]
+  end
+
+  defp bus_route_informed_entity(_) do
     []
   end
+
+  # def associate_alerts_with_departures(alerts, departures) do
+  #   Enum.flat_map(alerts, fn alert -> associate_alert_with_departures(alert, departures) end)
+  # end
+
+  # defp associate_alert_with_departures(alert, departures) do
+  #   alert.informed_entities
+  #   |> Enum.flat_map(fn e -> match_departures_by_informed_entity(e, departures) end)
+  #   |> Enum.map(fn departure_id -> [alert.id, departure_id] end)
+  # end
+
+  # # Later, support informed entities other than bus routes
+  # defp match_departures_by_informed_entity(%{"route" => route_id, "route_type" => 3}, departures) do
+  #   departures
+  #   |> Enum.filter(fn d -> d.route == route_id end)
+  #   |> Enum.map(& &1.id)
+  # end
+
+  # defp match_departures_by_informed_entity(_informed_entity, _departures) do
+  #   []
+  # end
 end

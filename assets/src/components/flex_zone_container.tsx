@@ -8,21 +8,19 @@ import ServiceMap from "./service_map";
 const FlexZoneContainer = forwardRef(
   (
     {
-      inlineAlerts,
+      currentTimeString,
+      departures,
+      startIndex,
+      endIndex,
       globalAlert,
-      departureRows,
-      numRows,
-      currentTime,
-      departuresAlerts,
-      bottomNumRows,
       nearbyConnections
     },
     ref
   ): JSX.Element => {
     // Check whether there are any later departures to show
     let showLaterDepartures;
-    if (departureRows) {
-      showLaterDepartures = numRows < departureRows.length;
+    if (departures) {
+      showLaterDepartures = startIndex < departures.length;
     } else {
       showLaterDepartures = false;
     }
@@ -34,12 +32,10 @@ const FlexZoneContainer = forwardRef(
       // Later Departures + Alert
       topComponent = (
         <Departures
-          currentTimeString={currentTime}
-          departureRows={departureRows}
-          alerts={inlineAlerts}
-          departuresAlerts={departuresAlerts}
-          startIndex={numRows}
-          endIndex={numRows + bottomNumRows}
+          currentTimeString={currentTimeString}
+          departures={departures}
+          startIndex={startIndex}
+          endIndex={endIndex}
           size="small"
           ref={ref}
         />
@@ -49,12 +45,10 @@ const FlexZoneContainer = forwardRef(
       // Later Departures + Nearby Connections
       topComponent = (
         <Departures
-          currentTimeString={currentTime}
-          departureRows={departureRows}
-          alerts={inlineAlerts}
-          departuresAlerts={departuresAlerts}
-          startIndex={numRows}
-          endIndex={numRows + bottomNumRows}
+          currentTimeString={currentTimeString}
+          departures={departures}
+          startIndex={startIndex}
+          endIndex={endIndex}
           size="small"
           ref={ref}
         />
