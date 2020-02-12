@@ -32,10 +32,6 @@ defmodule Screens.ScreenData do
     Enum.map(departures, &Screens.Departures.Departure.to_map/1)
   end
 
-  defp format_alerts(alerts) do
-    Enum.map(alerts, &Screens.Alerts.Alert.to_map/1)
-  end
-
   def format_global_alert(alert) do
     Screens.Alerts.Alert.to_map(alert)
   end
