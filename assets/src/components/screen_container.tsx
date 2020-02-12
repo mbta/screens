@@ -72,9 +72,20 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [globalAlert, setGlobalAlert] = useState();
   const [nearbyConnections, setNearbyConnections] = useState();
 
+  let version;
+
   const doUpdate = async () => {
     const result = await fetch(`/api/${id}`);
     const json = await result.json();
+
+    if (version === undefined) {
+      version = json.version;
+    }
+
+    if (version !== json.version) {
+      window.location.reload(true);
+    }
+
     setCurrentTimeString(json.current_time);
     setStopName(json.stop_name);
     setStopId(json.stop_id);
