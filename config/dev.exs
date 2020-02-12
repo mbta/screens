@@ -21,6 +21,9 @@ config :screens, ScreensWeb.Endpoint,
     ]
   ]
 
+config :screens,
+  api_v3_key: System.get_env("API_V3_KEY")
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed
