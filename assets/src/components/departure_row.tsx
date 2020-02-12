@@ -9,7 +9,6 @@ const DepartureRow = ({
   route,
   destination,
   time,
-  first,
   size
 }): JSX.Element => {
   return (

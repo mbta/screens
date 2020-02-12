@@ -31,17 +31,6 @@ const NearbyConnectionsRoute = ({ route, small }): JSX.Element => {
 };
 
 const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
-  const FEET_PER_MINUTE = 250;
-  const FEET_PER_MILE = 5280;
-  let distanceInMinutes = Math.round(
-    (distance * FEET_PER_MILE) / FEET_PER_MINUTE
-  );
-
-  // No zero-minute walking times
-  if (distanceInMinutes === 0) {
-    distanceInMinutes = 1;
-  }
-
   return (
     <div className="nearby-connections-row">
       <div className="nearby-connections-row__header">
@@ -53,9 +42,7 @@ const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
             className="nearby-connections-row__distance-icon"
             src="images/nearby.svg"
           ></img>
-          <span className="nearby-connections-row__distance">
-            {distanceInMinutes}{" "}
-          </span>
+          <span className="nearby-connections-row__distance">{distance} </span>
           <span className="nearby-connections-row__distance-units">min</span>
         </div>
       </div>

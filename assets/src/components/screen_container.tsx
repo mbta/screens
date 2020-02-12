@@ -12,17 +12,36 @@ import FareInfo from "./fare_info";
 import FlexZoneContainer from "./flex_zone_container";
 import Header from "./header";
 
+const TopScreenContainer = forwardRef(
+  (
+    { currentTimeString, stopName, departures, startIndex, endIndex },
+    ref
+  ): JSX.Element => {
+    return (
+      <div className="single-screen-container">
+        <Header stopName={stopName} currentTimeString={currentTimeString} />
+        <Departures
+          currentTimeString={currentTimeString}
+          departures={departures}
+          startIndex={startIndex}
+          endIndex={endIndex}
+          size="large"
+          ref={ref}
+        />
+      </div>
+    );
+  }
+);
+
 const BottomScreenContainer = forwardRef(
   (
     {
-      departureRows,
-      inlineAlerts,
+      currentTimeString,
+      departures,
+      startIndex,
+      endIndex,
       globalAlert,
-      departuresAlerts,
       stopId,
-      numRows,
-      currentTime,
-      bottomNumRows,
       nearbyConnections
     },
     ref
@@ -30,13 +49,11 @@ const BottomScreenContainer = forwardRef(
     return (
       <div className="single-screen-container">
         <FlexZoneContainer
-          inlineAlerts={inlineAlerts}
+          currentTimeString={currentTimeString}
+          departures={departures}
+          startIndex={startIndex}
+          endIndex={endIndex}
           globalAlert={globalAlert}
-          departureRows={departureRows}
-          numRows={numRows}
-          currentTime={currentTime}
-          departuresAlerts={departuresAlerts}
-          bottomNumRows={bottomNumRows}
           nearbyConnections={nearbyConnections}
           ref={ref}
         />
@@ -47,44 +64,12 @@ const BottomScreenContainer = forwardRef(
   }
 );
 
-const TopScreenContainer = forwardRef(
-  (
-    {
-      stopName,
-      currentTimeString,
-      departureRows,
-      alerts,
-      departuresAlerts,
-      numRows
-    },
-    ref
-  ): JSX.Element => {
-    return (
-      <div className="single-screen-container">
-        <Header stopName={stopName} currentTimeString={currentTimeString} />
-        <Departures
-          currentTimeString={currentTimeString}
-          departureRows={departureRows}
-          alerts={alerts}
-          departuresAlerts={departuresAlerts}
-          startIndex={0}
-          endIndex={numRows}
-          size="large"
-          ref={ref}
-        />
-      </div>
-    );
-  }
-);
-
 const ScreenContainer = ({ id }): JSX.Element => {
   const [currentTimeString, setCurrentTimeString] = useState();
   const [stopName, setStopName] = useState();
-  const [inlineAlerts, setInlineAlerts] = useState();
-  const [globalAlert, setGlobalAlert] = useState();
-  const [departureRows, setDepartureRows] = useState();
-  const [departuresAlerts, setDeparturesAlerts] = useState();
   const [stopId, setStopId] = useState();
+  const [departures, setDepartures] = useState();
+  const [globalAlert, setGlobalAlert] = useState();
   const [nearbyConnections, setNearbyConnections] = useState();
 
   const doUpdate = async () => {
@@ -92,11 +77,9 @@ const ScreenContainer = ({ id }): JSX.Element => {
     const json = await result.json();
     setCurrentTimeString(json.current_time);
     setStopName(json.stop_name);
-    setInlineAlerts(json.inline_alerts);
-    setGlobalAlert(json.global_alert);
-    setDepartureRows(json.departure_rows);
-    setDeparturesAlerts(json.departures_alerts);
     setStopId(json.stop_id);
+    setDepartures(json.departures);
+    setGlobalAlert(json.global_alert);
     setNearbyConnections(json.nearby_connections);
   };
 
@@ -132,23 +115,20 @@ const ScreenContainer = ({ id }): JSX.Element => {
   return (
     <div>
       <TopScreenContainer
-        stopName={stopName}
         currentTimeString={currentTimeString}
-        departureRows={departureRows}
-        alerts={inlineAlerts}
-        departuresAlerts={departuresAlerts}
-        numRows={numRows}
+        stopName={stopName}
+        departures={departures}
+        startIndex={0}
+        endIndex={numRows}
         ref={ref}
       />
       <BottomScreenContainer
-        departureRows={departureRows}
-        inlineAlerts={inlineAlerts}
+        currentTimeString={currentTimeString}
+        departures={departures}
+        startIndex={numRows}
+        endIndex={numRows + bottomNumRows}
         globalAlert={globalAlert}
-        departuresAlerts={departuresAlerts}
         stopId={stopId}
-        numRows={numRows}
-        currentTime={currentTimeString}
-        bottomNumRows={bottomNumRows}
         nearbyConnections={nearbyConnections}
         ref={bottomRef}
       />

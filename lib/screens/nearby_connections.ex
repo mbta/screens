@@ -13,7 +13,7 @@ defmodule Screens.NearbyConnections do
       %{"data" => stops_data} = result
 
       stops_data
-      |> Enum.map(fn stop_data -> parse_stop_data(stop_data) end)
+      |> Enum.map(&parse_stop_data/1)
       |> build_nearby_connections(stop_id)
     end
   end
@@ -37,8 +37,9 @@ defmodule Screens.NearbyConnections do
 
     nearby_connections =
       nearby_stops_data
-      |> Enum.map(fn stop -> build_nearby_connection(stop, stop_lat, stop_lon) end)
+      |> Enum.map(&build_nearby_connection(&1, stop_lat, stop_lon))
       |> Enum.sort_by(& &1.distance)
+      |> Enum.map(&convert_distance/1)
 
     {stop_data, nearby_connections}
   end
@@ -46,14 +47,18 @@ defmodule Screens.NearbyConnections do
   @miles_to_feet 5280
   @feet_to_minutes 1 / 250
 
+  defp convert_distance(%{distance: distance_miles} = connection) do
+    distance_minutes = max(1, Kernel.round(distance_miles * @miles_to_feet * @feet_to_minutes))
+    %{connection | distance: distance_minutes}
+  end
+
   def build_nearby_connection(
         %{stop_lat: nearby_lat, stop_lon: nearby_lon, stop_name: name, stop_id: nearby_id},
         stop_lat,
         stop_lon
       ) do
     distance_miles = distance(stop_lat, stop_lon, nearby_lat, nearby_lon)
-    distance_minutes = max(1, Kernel.round(distance_miles * @miles_to_feet * @feet_to_minutes))
-    %{name: name, distance: distance_minutes, routes: routes_at_stop(nearby_id)}
+    %{name: name, distance: distance_miles, routes: routes_at_stop(nearby_id)}
   end
 
   def routes_at_stop(stop_id) do
