@@ -10,9 +10,10 @@ Application.ensure_all_started(:hackney)
 Application.ensure_all_started(:ex_aws)
 Application.ensure_all_started(:ex_aws_secretsmanager)
 
-# TODO source the environment name from somewhere else (env var?)
+eb_env_name = System.get_env("ENVIRONMENT_NAME")
+
 secret_key_base =
-  "screens-dev-secret-key-base"
+  (eb_env_name <> "-secret-key-base")
   |> ExAws.SecretsManager.get_secret_value()
   |> ExAws.request!()
   |> Map.fetch!("SecretString")
