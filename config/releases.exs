@@ -18,9 +18,17 @@ secret_key_base =
   |> ExAws.request!()
   |> Map.fetch!("SecretString")
 
+api_v3_key =
+  (eb_env_name <> "-api-v3-key")
+  |> ExAws.SecretsManager.get_secret_value()
+  |> ExAws.request!()
+  |> Map.fetch!("SecretString")
+
 config :screens, ScreensWeb.Endpoint,
   http: [:inet6, port: String.to_integer(System.get_env("PORT") || "4000")],
   secret_key_base: secret_key_base
+
+config :screens, api_v3_key: api_v3_key
 
 # ## Using releases (Elixir v1.9+)
 #
