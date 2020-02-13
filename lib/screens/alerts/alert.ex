@@ -60,7 +60,7 @@ defmodule Screens.Alerts.Alert do
 
   def to_map(alert) do
     %{
-      effect: :shuttle,
+      effect: alert.effect,
       header: alert.header,
       updated_at: DateTime.to_iso8601(alert.updated_at)
     }

@@ -1,20 +1,20 @@
 @import url("https://rsms.me/inter/inter.css");
 
-@import "departure_time";
 @import "departure_destination";
 @import "departure_route";
 @import "departure_row";
-@import "departures_alert";
-@import "departures_row";
+@import "departure_time";
 @import "departures";
+@import "departures_row";
 @import "digital_bridge";
 @import "fare_info";
-@import "nearby_connections";
-@import "header";
-@import "flex_zone_alert";
 @import "flex_zone";
-@import "screen_page";
+@import "global_alert";
+@import "header";
+@import "inline_alert";
+@import "nearby_connections";
 @import "screen_container";
+@import "screen_page";
 
 body {
   margin: 0px;

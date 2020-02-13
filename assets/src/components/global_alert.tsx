@@ -8,33 +8,33 @@ const iconForAlert = alert => {
   return { shuttle: "bus-negative-white" }[alert.effect] || "alert";
 };
 
-const FlexZoneAlert = ({ alert }): JSX.Element => {
+const GlobalAlert = ({ alert }): JSX.Element => {
   const updatedTime = moment(alert.updated_at);
   return (
-    <div className="flex-alert">
-      <div className="flex-alert__header">
-        <div className="flex-alert__icon-container">
+    <div className="global-alert">
+      <div className="global-alert__header">
+        <div className="global-alert__icon-container">
           <img
-            className="flex-alert__icon-image"
+            className="global-alert__icon-image"
             src={`images/${iconForAlert(alert)}.svg`}
           />
         </div>
-        <div className="flex-alert__header-effect">
+        <div className="global-alert__header-effect">
           {alert.effect.replace("_", " ").replace(/\w\S*/g, txt => {
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
           })}
         </div>
-        <div className="flex-alert__header-timestamp">
+        <div className="global-alert__header-timestamp">
           Updated <br />
           {updatedTime.tz("America/New_York").format("M/D/Y · h:mm A")}
         </div>
       </div>
 
-      <div className="flex-alert__body">
-        <div className="flex-alert__body-description">{alert.header}</div>
+      <div className="global-alert__body">
+        <div className="global-alert__body-description">{alert.header}</div>
       </div>
     </div>
   );
 };
 
-export default FlexZoneAlert;
+export default GlobalAlert;
