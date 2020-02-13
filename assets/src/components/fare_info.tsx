@@ -4,7 +4,10 @@ const FareInfo = (): JSX.Element => {
   return (
     <div className="fares">
       <div className="fares__icon-container">
-        <img className="fares__icon-image" src="images/bus.svg" />
+        <img
+          className="fares__icon-image"
+          src="images/bus-negative-black.svg"
+        />
       </div>
       <div className="fares__info-container">
         <div className="fares__info-header">Local bus one-way</div>
