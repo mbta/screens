@@ -119,8 +119,9 @@ defmodule Screens.Alerts.Alert do
   ]
 
   def fetch_alerts_for_stop_id(stop_id) do
-    with {:ok, result} <- Screens.V3Api.get_json("alerts", %{"filter[stop]" => stop_id}) do
-      result
+    case Screens.V3Api.get_json("alerts", %{"filter[stop]" => stop_id}) do
+      {:ok, result} -> {:ok, result}
+      _ -> :error
     end
   end
 
@@ -135,7 +136,7 @@ defmodule Screens.Alerts.Alert do
   end
 
   def sort(alerts, stop_id) do
-    Enum.sort_by(alerts, fn alert -> sort_key(alert, stop_id) end)
+    Enum.sort_by(alerts, &sort_key(&1, stop_id))
   end
 
   def sort_key(alert, stop_id) do
@@ -169,7 +170,7 @@ defmodule Screens.Alerts.Alert do
   # 3 if no stop or route IE
   def specificity(%{informed_entities: ies}, stop_id) do
     ies
-    |> Enum.map(fn ie -> ie_specificity(ie, stop_id) end)
+    |> Enum.map(&ie_specificity(&1, stop_id))
     |> Enum.min()
   end
 
@@ -211,7 +212,7 @@ defmodule Screens.Alerts.Alert do
   # defined as: some active period contains the current time
   def happening_now(%{active_period: aps}) do
     now = DateTime.utc_now()
-    if Enum.any?(aps, fn ap -> in_active_period(ap, now) end), do: 1, else: 0
+    if Enum.any?(aps, &in_active_period(&1, now)), do: 1, else: 0
   end
 
   def in_active_period({nil, end_t}, t) do
@@ -298,8 +299,7 @@ defmodule Screens.Alerts.Alert do
       |> Screens.Alerts.Parser.parse_result()
       |> split_inline_alerts()
 
-    global_alert =
-      Enum.min_by(global_alerts, fn alert -> sort_key(alert, stop_id) end, fn -> nil end)
+    global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
 
     {inline_alerts, global_alert}
   end
@@ -352,25 +352,4 @@ defmodule Screens.Alerts.Alert do
   defp bus_route_informed_entity(_) do
     []
   end
-
-  # def associate_alerts_with_departures(alerts, departures) do
-  #   Enum.flat_map(alerts, fn alert -> associate_alert_with_departures(alert, departures) end)
-  # end
-
-  # defp associate_alert_with_departures(alert, departures) do
-  #   alert.informed_entities
-  #   |> Enum.flat_map(fn e -> match_departures_by_informed_entity(e, departures) end)
-  #   |> Enum.map(fn departure_id -> [alert.id, departure_id] end)
-  # end
-
-  # # Later, support informed entities other than bus routes
-  # defp match_departures_by_informed_entity(%{"route" => route_id, "route_type" => 3}, departures) do
-  #   departures
-  #   |> Enum.filter(fn d -> d.route == route_id end)
-  #   |> Enum.map(& &1.id)
-  # end
-
-  # defp match_departures_by_informed_entity(_informed_entity, _departures) do
-  #   []
-  # end
 end

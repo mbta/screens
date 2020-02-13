@@ -4,6 +4,12 @@ defmodule Screens.ScreenData do
   @version 1
 
   def by_stop_id(stop_id) do
+    # N.B.: If we are unable to fetch alerts:
+    # - inline_alerts will be an empty list
+    # - global_alert will be nil
+    #
+    # We do this because we still want to return an API response with departures,
+    # even if the other API requests fail.
     {inline_alerts, global_alert} = Screens.Alerts.Alert.by_stop_id(stop_id)
 
     departures =

@@ -1,61 +1,64 @@
 defmodule Screens.Alerts.Parser do
   @moduledoc false
 
-  def parse_result(result) do
+  def parse_result({:ok, result}) do
     result
     |> Map.get("data")
-    |> parse_data()
+    |> Enum.flat_map(&parse_alert/1)
   end
 
-  defp parse_data(data) do
-    data
-    |> Enum.map(fn item -> parse_alert(item) end)
+  def parse_result(:error) do
+    []
   end
 
   def parse_alert(%{"id" => id, "attributes" => attributes}) do
-    %{
-      "active_period" => active_period,
-      "created_at" => created_at,
-      "updated_at" => updated_at,
-      "effect" => effect,
-      "header" => header,
-      "informed_entity" => informed_entities,
-      "lifecycle" => lifecycle,
-      "severity" => severity,
-      "timeframe" => timeframe
-    } = attributes
-
-    %Screens.Alerts.Alert{
-      id: id,
-      effect: parse_effect(effect),
-      severity: severity,
-      header: header,
-      informed_entities: informed_entities,
-      active_period: parse_active_periods(active_period),
-      lifecycle: lifecycle,
-      timeframe: timeframe,
-      created_at: parse_time(created_at),
-      updated_at: parse_time(updated_at)
-    }
+    with %{
+           "active_period" => active_period,
+           "created_at" => created_at,
+           "updated_at" => updated_at,
+           "effect" => effect,
+           "header" => header,
+           "informed_entity" => informed_entities,
+           "lifecycle" => lifecycle,
+           "severity" => severity,
+           "timeframe" => timeframe
+         } <- attributes do
+      [
+        %Screens.Alerts.Alert{
+          id: id,
+          effect: parse_effect(effect),
+          severity: severity,
+          header: header,
+          informed_entities: informed_entities,
+          active_period: parse_active_periods(active_period),
+          lifecycle: lifecycle,
+          timeframe: timeframe,
+          created_at: parse_time(created_at),
+          updated_at: parse_time(updated_at)
+        }
+      ]
+    else
+      []
+    end
   end
 
   defp parse_active_periods(periods) do
-    Enum.map(periods, fn p -> parse_active_period(p) end)
+    Enum.map(periods, &parse_active_period/1)
   end
 
   defp parse_active_period(%{"start" => nil, "end" => end_str}) do
-    {:ok, end_t, _} = DateTime.from_iso8601(end_str)
+    end_t = parse_time(end_str)
     {nil, end_t}
   end
 
   defp parse_active_period(%{"start" => start_str, "end" => nil}) do
-    {:ok, start_t, _} = DateTime.from_iso8601(start_str)
+    start_t = parse_time(start_str)
     {start_t, nil}
   end
 
   defp parse_active_period(%{"start" => start_str, "end" => end_str}) do
-    {:ok, start_t, _} = DateTime.from_iso8601(start_str)
-    {:ok, end_t, _} = DateTime.from_iso8601(end_str)
+    start_t = parse_time(start_str)
+    end_t = parse_time(end_str)
     {start_t, end_t}
   end
 
@@ -76,8 +79,6 @@ defmodule Screens.Alerts.Parser do
   defp parse_effect("STOP_CLOSURE"), do: :stop_closure
   defp parse_effect("DOCK_CLOSURE"), do: :dock_closure
   defp parse_effect("STATION_CLOSURE"), do: :station_closure
-  # previous configuration
-  defp parse_effect("STOP_MOVE"), do: :stop_moved
   defp parse_effect("STOP_MOVED"), do: :stop_moved
   defp parse_effect("EXTRA_SERVICE"), do: :extra_service
   defp parse_effect("SCHEDULE_CHANGE"), do: :schedule_change
