@@ -1,0 +1,83 @@
+.connection-error {
+  margin: 0px auto;
+  padding: 0px;
+  width: 1200px;
+  height: 1600px;
+}
+
+.connection-error__top {
+  background: black;
+  height: 288px;
+}
+
+.connection-error__top-icon {
+  display: inline-block;
+  vertical-align: top;
+  height: 128px;
+  width: 128px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.connection-error__top-icon--logo {
+  padding-top: 120px;
+}
+
+.connection-error__top-icon--no-data {
+  padding-top: 112px;
+}
+
+.connection-error__top-text {
+  display: inline-block;
+  vertical-align: top;
+  width: 952px;
+  margin-top: 136px;
+  font-size: 96px;
+  line-height: 96px;
+  letter-spacing: 1px;
+  font-family: neue-haas-grotesk-display;
+  font-weight: 700;
+}
+
+.connection-error__top-text--white {
+  color: white;
+}
+
+.connection-error__top-text--black {
+  color: black;
+}
+
+.connection-error__middle {
+  height: 656px;
+}
+
+.connection-error__bottom {
+  background: black;
+  height: 656px;
+}
+
+.connection-error__bottom-icon {
+}
+
+.connection-error__bottom-text {
+  color: white;
+  margin-left: 208px;
+  font-size: 72px;
+  line-height: 72px;
+  font-family: neue-haas-grotesk-display;
+}
+
+.connection-error__bottom-text-description {
+  padding-top: 112px;
+  font-weight: 400;
+}
+
+.connection-error__bottom-text-mbta-link {
+  padding-top: 112px;
+  font-weight: 700;
+}
+
+.connection-error__bottom-text-transit-link {
+  padding-top: 36px;
+  font-weight: 700;
+}

@@ -1,5 +1,6 @@
 import React, { forwardRef } from "react";
 import DeparturesRow from "./departures_row";
+import OvernightDepartures from "./overnight_departures";
 
 const buildDeparturesRows = departures => {
   if (!departures) {
@@ -37,13 +38,11 @@ const Departures = forwardRef(
     { currentTimeString, departures, startIndex, endIndex, size },
     ref
   ): JSX.Element => {
-    let filteredRows;
-    if (!departures) {
-      filteredRows = departures;
-    } else {
-      filteredRows = departures.slice(startIndex, endIndex);
+    if (!departures || departures.length === 0) {
+      return <OvernightDepartures />;
     }
 
+    const filteredRows = departures.slice(startIndex, endIndex);
     const rows = buildDeparturesRows(filteredRows);
     return (
       <div className="departures" ref={ref}>
