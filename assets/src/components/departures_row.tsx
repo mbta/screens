@@ -2,7 +2,7 @@ import React from "react";
 
 import { classWithSize } from "../util";
 import DepartureRow from "./departure_row";
-import DeparturesAlert from "./departures_alert";
+import InlineAlert from "./inline_alert";
 
 const DeparturesRow = ({
   currentTimeString,
@@ -26,7 +26,7 @@ const DeparturesRow = ({
             key={route + t + i}
           />
         ))}
-        <DeparturesAlert inlineBadges={inlineBadges} />
+        <InlineAlert inlineBadges={inlineBadges} />
       </div>
       <div className={classWithSize("departures-row__after", size)}></div>
       <div className="departures-row__hairline"></div>

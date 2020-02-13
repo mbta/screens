@@ -21,7 +21,7 @@ const parseSeverity = severity => {
   };
 };
 
-const DeparturesAlert = ({ inlineBadges }): JSX.Element => {
+const InlineAlert = ({ inlineBadges }): JSX.Element => {
   let severity;
 
   if (inlineBadges && inlineBadges.length > 0) {
@@ -35,14 +35,14 @@ const DeparturesAlert = ({ inlineBadges }): JSX.Element => {
   const { delayDescription, delayMinutes } = parseSeverity(severity);
 
   return (
-    <div className="departure-info">
-      <span className={"departure-info__badge"}>
-        <img className="departure-info__icon" src="images/alert.svg" />
+    <div className="inline-alert">
+      <span className={"inline-alert__badge"}>
+        <img className="inline-alert__icon" src="images/alert.svg" />
         Delays {delayDescription + " "}
-        <span className="departure-info__emphasis">{delayMinutes} minutes</span>
+        <span className="inline-alert__emphasis">{delayMinutes} minutes</span>
       </span>
     </div>
   );
 };
 
-export default DeparturesAlert;
+export default InlineAlert;

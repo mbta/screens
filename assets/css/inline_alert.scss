@@ -1,9 +1,9 @@
-.departure-info {
+.inline-alert {
   text-align: right;
   margin-right: 40px;
 }
 
-.departure-info__badge {
+.inline-alert__badge {
   background-color: black;
   color: white;
   font-family: neue-haas-grotesk-text;
@@ -15,11 +15,11 @@
   padding-bottom: 12px;
 }
 
-.departure-info__emphasis {
+.inline-alert__emphasis {
   font-weight: bold;
 }
 
-.departure-info__icon {
+.inline-alert__icon {
   width: 48px;
   height: 54.75px;
   position: relative;
