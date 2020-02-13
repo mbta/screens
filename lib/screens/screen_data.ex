@@ -26,7 +26,15 @@ defmodule Screens.ScreenData do
           :error
       end
 
-    {%{stop_name: stop_name}, nearby_connections} = NearbyConnections.by_stop_id(stop_id)
+    nearby_connections_data = NearbyConnections.by_stop_id(stop_id)
+
+    nearby_connections =
+      case nearby_connections_data do
+        {:ok, {_, nearby_connections}} -> nearby_connections
+        _ -> []
+      end
+
+    stop_name = extract_stop_name(nearby_connections_data, departures)
 
     case departures do
       {:ok, departures} ->
@@ -47,6 +55,18 @@ defmodule Screens.ScreenData do
           success: false
         }
     end
+  end
+
+  defp extract_stop_name({:ok, {%{stop_name: stop_name}, _}}, _) do
+    stop_name
+  end
+
+  defp extract_stop_name(_, {:ok, [departure | _]}) do
+    departure.stop_name
+  end
+
+  defp extract_stop_name(_, _) do
+    nil
   end
 
   defp format_current_time(t) do
