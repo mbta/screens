@@ -3,14 +3,9 @@ import "moment-timezone";
 import React from "react";
 
 const iconForAlert = alert => {
-  return (
-    {
-      SERVICE_CHANGE: "alert",
-      DETOUR: "bus",
-      STOP_MOVE: "no-service",
-      STOP_CLOSURE: "logo-white"
-    }[alert.effect] || "alert"
-  );
+  // For now, shuttles will show a bus icon, and everything else will
+  // just show the default alert icon.
+  return { shuttle: "bus-negative-white" }[alert.effect] || "alert";
 };
 
 const FlexZoneAlert = ({ alert }): JSX.Element => {
