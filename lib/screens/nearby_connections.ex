@@ -9,20 +9,19 @@ defmodule Screens.NearbyConnections do
 
     stop_query = Enum.join([stop_id | nearby_connection_stop_ids], ",")
 
-    with {:ok, result} <- Screens.V3Api.get_json("stops", %{"filter[id]" => stop_query}) do
-      %{"data" => stops_data} = result
+    case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_query}) do
+      {:ok, %{"data" => stops_data}} ->
+        result =
+          stops_data
+          |> Enum.map(&parse_stop_data/1)
+          |> build_nearby_connections(stop_id)
 
-      stops_data
-      |> Enum.map(&parse_stop_data/1)
-      |> build_nearby_connections(stop_id)
+        {:ok, result}
+
+      _ ->
+        :error
     end
   end
-
-  # need to know:
-  # for each nearby stop:
-  # - stop name
-  # - distance (or walking time)
-  # - routes served
 
   def parse_stop_data(%{
         "attributes" => %{"latitude" => lat, "longitude" => lon, "name" => name},
@@ -58,7 +57,8 @@ defmodule Screens.NearbyConnections do
         stop_lon
       ) do
     distance_miles = distance(stop_lat, stop_lon, nearby_lat, nearby_lon)
-    %{name: name, distance: distance_miles, routes: routes_at_stop(nearby_id)}
+    routes = routes_at_stop(nearby_id)
+    %{name: name, distance: distance_miles, routes: routes}
   end
 
   def routes_at_stop(stop_id) do

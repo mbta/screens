@@ -6,6 +6,7 @@ import React, {
   useState
 } from "react";
 
+import ConnectionError from "./connection_error";
 import Departures from "./departures";
 import DigitalBridge from "./digital_bridge";
 import FareInfo from "./fare_info";
@@ -64,15 +65,16 @@ const BottomScreenContainer = forwardRef(
   }
 );
 
+let version;
+
 const ScreenContainer = ({ id }): JSX.Element => {
+  const [success, setSuccess] = useState();
   const [currentTimeString, setCurrentTimeString] = useState();
   const [stopName, setStopName] = useState();
   const [stopId, setStopId] = useState();
   const [departures, setDepartures] = useState();
   const [globalAlert, setGlobalAlert] = useState();
   const [nearbyConnections, setNearbyConnections] = useState();
-
-  let version;
 
   const doUpdate = async () => {
     const result = await fetch(`/api/${id}`);
@@ -86,6 +88,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
       window.location.reload(true);
     }
 
+    setSuccess(json.success);
     setCurrentTimeString(json.current_time);
     setStopName(json.stop_name);
     setStopId(json.stop_id);
@@ -99,7 +102,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
 
     const interval = setInterval(() => {
       doUpdate();
-    }, 30000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -110,9 +113,11 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const bottomRef = useRef(null);
 
   useLayoutEffect(() => {
-    const height = ref.current.clientHeight;
-    if (height > 1312) {
-      setNumRows(numRows - 1);
+    if (ref.current) {
+      const height = ref.current.clientHeight;
+      if (height > 1312) {
+        setNumRows(numRows - 1);
+      }
     }
 
     if (bottomRef.current) {
@@ -123,28 +128,35 @@ const ScreenContainer = ({ id }): JSX.Element => {
     }
   });
 
-  return (
-    <div>
-      <TopScreenContainer
-        currentTimeString={currentTimeString}
-        stopName={stopName}
-        departures={departures}
-        startIndex={0}
-        endIndex={numRows}
-        ref={ref}
-      />
-      <BottomScreenContainer
-        currentTimeString={currentTimeString}
-        departures={departures}
-        startIndex={numRows}
-        endIndex={numRows + bottomNumRows}
-        globalAlert={globalAlert}
-        stopId={stopId}
-        nearbyConnections={nearbyConnections}
-        ref={bottomRef}
-      />
-    </div>
-  );
+  if (success) {
+    return (
+      <div>
+        <TopScreenContainer
+          currentTimeString={currentTimeString}
+          stopName={stopName}
+          departures={departures}
+          startIndex={0}
+          endIndex={numRows}
+          ref={ref}
+        />
+        <BottomScreenContainer
+          currentTimeString={currentTimeString}
+          departures={departures}
+          startIndex={numRows}
+          endIndex={numRows + bottomNumRows}
+          globalAlert={globalAlert}
+          stopId={stopId}
+          nearbyConnections={nearbyConnections}
+          ref={bottomRef}
+        />
+      </div>
+    );
+  } else if (version !== undefined) {
+    return <ConnectionError />;
+  } else {
+    // The first API response hasn't come back yet, so leave the screen blank.
+    return <div></div>;
+  }
 };
 
 export default ScreenContainer;
