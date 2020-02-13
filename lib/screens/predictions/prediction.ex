@@ -16,13 +16,13 @@ defmodule Screens.Predictions.Prediction do
         }
 
   def by_stop_id(stop_id) do
-    with {:ok, result} <-
-           Screens.V3Api.get_json("predictions", %{
-             "filter[stop]" => stop_id,
-             "sort" => "departure_time",
-             "include" => "route,stop,trip"
-           }) do
-      Screens.Predictions.Parser.parse_result(result)
+    case Screens.V3Api.get_json("predictions", %{
+           "filter[stop]" => stop_id,
+           "sort" => "departure_time",
+           "include" => "route,stop,trip"
+         }) do
+      {:ok, result} -> {:ok, Screens.Predictions.Parser.parse_result(result)}
+      _ -> :error
     end
   end
 end

@@ -20,9 +20,10 @@ defmodule Screens.Departures.Departure do
         }
 
   def by_stop_id(stop_id) do
-    stop_id
-    |> Screens.Predictions.Prediction.by_stop_id()
-    |> Enum.map(&from_prediction/1)
+    case Screens.Predictions.Prediction.by_stop_id(stop_id) do
+      {:ok, result} -> {:ok, Enum.map(result, &from_prediction/1)}
+      :error -> :error
+    end
   end
 
   def to_map(d) do

@@ -12,33 +12,35 @@ defmodule Screens.Alerts.Parser do
   end
 
   def parse_alert(%{"id" => id, "attributes" => attributes}) do
-    with %{
-           "active_period" => active_period,
-           "created_at" => created_at,
-           "updated_at" => updated_at,
-           "effect" => effect,
-           "header" => header,
-           "informed_entity" => informed_entities,
-           "lifecycle" => lifecycle,
-           "severity" => severity,
-           "timeframe" => timeframe
-         } <- attributes do
-      [
-        %Screens.Alerts.Alert{
-          id: id,
-          effect: parse_effect(effect),
-          severity: severity,
-          header: header,
-          informed_entities: informed_entities,
-          active_period: parse_active_periods(active_period),
-          lifecycle: lifecycle,
-          timeframe: timeframe,
-          created_at: parse_time(created_at),
-          updated_at: parse_time(updated_at)
-        }
-      ]
-    else
-      []
+    case attributes do
+      %{
+        "active_period" => active_period,
+        "created_at" => created_at,
+        "updated_at" => updated_at,
+        "effect" => effect,
+        "header" => header,
+        "informed_entity" => informed_entities,
+        "lifecycle" => lifecycle,
+        "severity" => severity,
+        "timeframe" => timeframe
+      } ->
+        [
+          %Screens.Alerts.Alert{
+            id: id,
+            effect: parse_effect(effect),
+            severity: severity,
+            header: header,
+            informed_entities: informed_entities,
+            active_period: parse_active_periods(active_period),
+            lifecycle: lifecycle,
+            timeframe: timeframe,
+            created_at: parse_time(created_at),
+            updated_at: parse_time(updated_at)
+          }
+        ]
+
+      _ ->
+        []
     end
   end
 
