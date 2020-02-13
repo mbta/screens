@@ -102,7 +102,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
 
     const interval = setInterval(() => {
       doUpdate();
-    }, 5000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, []);
@@ -152,7 +152,12 @@ const ScreenContainer = ({ id }): JSX.Element => {
       </div>
     );
   } else if (version !== undefined) {
-    return <ConnectionError />;
+    return (
+      <div>
+        <ConnectionError />
+        <ConnectionError />
+      </div>
+    );
   } else {
     // The first API response hasn't come back yet, so leave the screen blank.
     return <div></div>;
