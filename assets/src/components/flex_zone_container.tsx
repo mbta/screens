@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 
 import Departures from "./departures";
-import FlexZoneAlert from "./flex_zone_alert";
+import GlobalAlert from "./global_alert";
 import NearbyConnections from "./nearby_connections";
 import ServiceMap from "./service_map";
 
@@ -40,7 +40,7 @@ const FlexZoneContainer = forwardRef(
           ref={ref}
         />
       );
-      bottomComponent = <FlexZoneAlert alert={globalAlert} />;
+      bottomComponent = <GlobalAlert alert={globalAlert} />;
     } else if (showLaterDepartures) {
       // Later Departures + Nearby Connections
       topComponent = (
@@ -61,7 +61,7 @@ const FlexZoneContainer = forwardRef(
       topComponent = (
         <NearbyConnections nearbyConnections={nearbyConnections} />
       );
-      bottomComponent = <FlexZoneAlert alert={globalAlert} />;
+      bottomComponent = <GlobalAlert alert={globalAlert} />;
     } else {
       // Nearby Connections + Service Map
       topComponent = (
