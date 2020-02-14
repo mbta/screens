@@ -11,21 +11,21 @@ const FareInfo = (): JSX.Element => {
       </div>
       <div className="fares__info-container">
         <div className="fares__info-header">Local bus one-way</div>
-        <div className="fares__info-link">More at www.mbta.com/fares</div>
+        <div className="fares__info-link">mbta.com/fares/bus-fares</div>
         <div className="fares__info-rows">
           <div className="fares__info-row">
             <span className="fares__info-row-cost">$1.70 </span>
             <span className="fares__info-row-description">CharlieCard </span>
             <span className="fares__info-row-details">
-              (1 free transfer to Local Bus)
+              (1 free local bus transfer within 2 hrs)
             </span>
           </div>
           <div className="fares__info-row">
             <span className="fares__info-row-cost">$2.00 </span>
             <span className="fares__info-row-description">
-              Cash or CharlieTicket{" "}
+              CharlieTicket or cash{" "}
             </span>
-            <span className="fares__info-row-details">(Limited Transfers)</span>
+            <span className="fares__info-row-details">(Limited transfers)</span>
           </div>
         </div>
       </div>

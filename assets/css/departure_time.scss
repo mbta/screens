@@ -1,7 +1,7 @@
 .departure-time {
-  display: table-cell;
+  display: inline-block;
   vertical-align: middle;
-  font-family: neue-haas-grotesk-display;
+  font-family: neue-haas-grotesk-text;
   text-align: right;
 }
 
@@ -17,6 +17,7 @@
 
 .departure-time__now {
   font-weight: 700;
+  line-height: 1.185em;
 }
 
 .departure-time__now--large {
@@ -29,6 +30,8 @@
 
 .departure-time__minutes {
   font-weight: 700;
+  margin-right: 0.0694em;
+  line-height: 1.185em;
 }
 
 .departure-time__minutes--large {

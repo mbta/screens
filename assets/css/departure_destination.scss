@@ -1,8 +1,9 @@
 .departure-destination {
-  display: table-cell;
+  display: inline-block;
   vertical-align: middle;
   font-family: neue-haas-grotesk-text;
 }
+
 .departure-destination--large {
   width: 420px;
 }
@@ -11,12 +12,17 @@
   width: 646px;
 }
 
-.departure-destination__container
-  .departure-destination__container--large
-  .departure-destination__container--small {
+.departure-destination__container {
+}
+
+.departure-destination__container--large {
+}
+
+.departure-destination__container--small {
 }
 
 .departure-destination__primary {
+  line-height: 1em;
   font-weight: 500;
 }
 
@@ -30,6 +36,7 @@
 
 .departure-destination__secondary {
   font-weight: 400;
+  line-height: 1em;
 }
 
 .departure-destination__secondary--large {

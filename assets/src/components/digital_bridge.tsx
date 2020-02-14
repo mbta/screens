@@ -12,11 +12,9 @@ const DigitalBridge = ({ stopId }): JSX.Element => {
       </div>
       <div className="digital-bridge__link-container">
         <div className="digital-bridge__link-description">
-          Real time predictions and stop info on the go
+          Real-time predictions and stop info on the go
         </div>
-        <div className="digital-bridge__link-url">
-          www.mbta.com/stops/{stopId}
-        </div>
+        <div className="digital-bridge__link-url">mbta.com/stops/{stopId}</div>
       </div>
       <div className="digital-bridge__qr-container">
         <div className="digital-bridge__qr-image-container">

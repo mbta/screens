@@ -1,7 +1,6 @@
 .header {
   background-color: black;
   color: white;
-  font-family: neue-haas-grotesk-display;
   height: 288px;
   position: relative;
 }
@@ -10,6 +9,7 @@
   position: absolute;
   top: 28px;
   right: 40px;
+  font-family: neue-haas-grotesk-text;
   font-size: 72px;
   color: #ffffff;
   letter-spacing: 0;
@@ -22,8 +22,9 @@
   position: absolute;
   right: 40px;
   bottom: 47px;
-  width: 200px;
+  width: 240px;
   height: 64px;
+  font-family: neue-haas-grotesk-text;
   font-size: 24px;
   color: #ffffff;
   text-align: right;
@@ -40,11 +41,12 @@
 
 .header__stop-name {
   width: 820px;
+  font-family: neue-haas-grotesk-display;
   font-weight: bold;
   color: #ffffff;
   letter-spacing: 1px;
   position: absolute;
-  bottom: 42px;
+  bottom: 38px;
   left: 56px;
 }
 
