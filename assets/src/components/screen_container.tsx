@@ -65,8 +65,6 @@ const BottomScreenContainer = forwardRef(
   }
 );
 
-let version;
-
 const ScreenContainer = ({ id }): JSX.Element => {
   const [success, setSuccess] = useState();
   const [currentTimeString, setCurrentTimeString] = useState();
@@ -76,16 +74,16 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [globalAlert, setGlobalAlert] = useState();
   const [nearbyConnections, setNearbyConnections] = useState();
 
+  let version;
+
   const doUpdate = async () => {
     const result = await fetch(`/api/${id}`);
     const json = await result.json();
 
     if (version === undefined) {
       version = json.version;
-    }
-
-    if (version !== json.version) {
-      window.location.reload(true);
+    } else if (version !== json.version) {
+      window.location.reload(false);
     }
 
     setSuccess(json.success);
@@ -151,16 +149,13 @@ const ScreenContainer = ({ id }): JSX.Element => {
         />
       </div>
     );
-  } else if (version !== undefined) {
+  } else {
     return (
       <div>
         <ConnectionError />
         <ConnectionError />
       </div>
     );
-  } else {
-    // The first API response hasn't come back yet, so leave the screen blank.
-    return <div></div>;
   }
 };
 
