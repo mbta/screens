@@ -86,7 +86,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
       window.location.reload(true);
     }
 
-    setSuccess(json.success_thingy_two);
+    setSuccess(json.success);
     setCurrentTimeString(json.current_time);
     setStopName(json.stop_name);
     setStopId(json.stop_id);
