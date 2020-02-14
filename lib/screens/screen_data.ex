@@ -5,7 +5,7 @@ defmodule Screens.ScreenData do
   alias Screens.Departures.Departure
   alias Screens.NearbyConnections
 
-  @version 3
+  @version 4
 
   def by_stop_id(stop_id) do
     # If we are unable to fetch alerts:
@@ -40,7 +40,7 @@ defmodule Screens.ScreenData do
       {:ok, departures} ->
         %{
           version: @version,
-          success: true,
+          success_did_occur: true,
           current_time: format_current_time(DateTime.utc_now()),
           stop_name: stop_name,
           stop_id: stop_id,
@@ -52,7 +52,7 @@ defmodule Screens.ScreenData do
       :error ->
         %{
           version: @version,
-          success: false
+          success_did_occur: false
         }
     end
   end
