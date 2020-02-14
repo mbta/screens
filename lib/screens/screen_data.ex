@@ -40,7 +40,7 @@ defmodule Screens.ScreenData do
       {:ok, departures} ->
         %{
           version: @version,
-          success_thing: true,
+          success_thingy: true,
           current_time: format_current_time(DateTime.utc_now()),
           stop_name: stop_name,
           stop_id: stop_id,
@@ -52,7 +52,7 @@ defmodule Screens.ScreenData do
       :error ->
         %{
           version: @version,
-          success_thing: false
+          success_thingy: false
         }
     end
   end
