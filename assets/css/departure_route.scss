@@ -1,5 +1,5 @@
 .departure-route {
-  display: table-cell;
+  display: inline-block;
   vertical-align: middle;
 }
 
@@ -19,7 +19,7 @@
 
 .departure-route__pill--xsmall {
   width: 178px;
-  height: 50px;
+  height: 60px;
   margin-left: 44px;
   border-radius: 36px;
 }
@@ -33,7 +33,7 @@
 
 .departure-route__pill--medium {
   width: 356px;
-  height: 100px;
+  height: 120px;
   margin-left: 32px;
   border-radius: 72px;
 }
@@ -51,10 +51,12 @@
   font-weight: 700;
   display: inline-block;
   margin: auto;
+  line-height: 1.185em;
 }
 
 .departure-route__number--xsmall {
-  font-size: 36px;
+  font-size: 40px;
+  line-height: 60px;
   letter-spacing: 1px;
 }
 
@@ -64,7 +66,8 @@
 }
 
 .departure-route__number--medium {
-  font-size: 72px;
+  font-size: 80px;
+  line-height: 120px;
   letter-spacing: 2px;
 }
 

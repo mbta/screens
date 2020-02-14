@@ -14,8 +14,7 @@ const DeparturesRow = ({
 }): JSX.Element => {
   return (
     <div className="departures-row">
-      <div className={classWithSize("departures-row__before", size)}></div>
-      <div className="departures-row__container">
+      <div className={classWithSize("departures-row__container", size)}>
         {departureTimes.map((t, i) => (
           <DepartureRow
             currentTimeString={currentTimeString}
@@ -28,7 +27,6 @@ const DeparturesRow = ({
         ))}
         <InlineAlert inlineBadges={inlineBadges} />
       </div>
-      <div className={classWithSize("departures-row__after", size)}></div>
       <div className="departures-row__hairline"></div>
     </div>
   );
