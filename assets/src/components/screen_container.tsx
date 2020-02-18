@@ -75,18 +75,12 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [globalAlert, setGlobalAlert] = useState();
   const [nearbyConnections, setNearbyConnections] = useState();
 
-  let version;
+  const apiVersion = document.getElementById("app").dataset.apiVersion;
 
   const doUpdate = async () => {
     try {
-      const result = await fetch(`/api/screen/${id}`);
+      const result = await fetch(`/api/screen/${id}?version=${apiVersion}`);
       const json = await result.json();
-
-      if (version === undefined) {
-        version = json.version;
-      } else if (version !== json.version) {
-        window.location.reload(false);
-      }
 
       setSuccess(json.success);
       setCurrentTimeString(json.current_time);
