@@ -12,6 +12,7 @@ import DigitalBridge from "./digital_bridge";
 import FareInfo from "./fare_info";
 import FlexZoneContainer from "./flex_zone_container";
 import Header from "./header";
+import OvernightDepartures from "./overnight_departures";
 
 const TopScreenContainer = forwardRef(
   (
@@ -131,29 +132,40 @@ const ScreenContainer = ({ id }): JSX.Element => {
   });
 
   if (success) {
-    return (
-      <div>
-        <TopScreenContainer
-          currentTimeString={currentTimeString}
-          stopName={stopName}
-          departures={departures}
-          startIndex={0}
-          endIndex={numRows}
-          ref={ref}
-        />
-        <BottomScreenContainer
-          currentTimeString={currentTimeString}
-          departures={departures}
-          startIndex={numRows}
-          endIndex={numRows + bottomNumRows}
-          globalAlert={globalAlert}
-          stopId={stopId}
-          nearbyConnections={nearbyConnections}
-          ref={bottomRef}
-        />
-      </div>
-    );
+    if (departures && departures.length > 0) {
+      return (
+        <div>
+          <TopScreenContainer
+            currentTimeString={currentTimeString}
+            stopName={stopName}
+            departures={departures}
+            startIndex={0}
+            endIndex={numRows}
+            ref={ref}
+          />
+          <BottomScreenContainer
+            currentTimeString={currentTimeString}
+            departures={departures}
+            startIndex={numRows}
+            endIndex={numRows + bottomNumRows}
+            globalAlert={globalAlert}
+            stopId={stopId}
+            nearbyConnections={nearbyConnections}
+            ref={bottomRef}
+          />
+        </div>
+      );
+    } else {
+      // We successfully fetched data, but there are no predictions.
+      // For now, assume that this is because it's the middle of the night.
+      return (
+        <div>
+          <OvernightDepartures />
+        </div>
+      );
+    }
   } else {
+    // We weren't able to fetch data. Show a connection error message.
     return (
       <div>
         <ConnectionError />
