@@ -1,4 +1,4 @@
-defmodule ScreensWeb.ApiController do
+defmodule ScreensWeb.ScreenApiController do
   use ScreensWeb, :controller
 
   def show(conn, %{"id" => screen_id}) do

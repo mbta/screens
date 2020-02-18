@@ -27,7 +27,7 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
       <div className="header__realtime-indicator">
         <img
           className="header__realtime-indicator-icon"
-          src="images/live-data-small.svg"
+          src="/images/live-data-small.svg"
         ></img>
         UPDATED LIVE EVERY MINUTE
       </div>

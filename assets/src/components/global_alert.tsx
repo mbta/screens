@@ -16,7 +16,7 @@ const GlobalAlert = ({ alert }): JSX.Element => {
         <div className="global-alert__icon-container">
           <img
             className="global-alert__icon-image"
-            src={`images/${iconForAlert(alert)}.svg`}
+            src={`/images/${iconForAlert(alert)}.svg`}
           />
         </div>
         <div className="global-alert__header-effect">

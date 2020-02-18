@@ -7,7 +7,7 @@ const DigitalBridge = ({ stopId }): JSX.Element => {
       <div className="digital-bridge__logo-container">
         <img
           className="digital-bridge__logo-image"
-          src="images/logo-white.svg"
+          src="/images/logo-white.svg"
         />
       </div>
       <div className="digital-bridge__link-container">

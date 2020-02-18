@@ -1,4 +1,4 @@
-defmodule ScreensWeb.PageController do
+defmodule ScreensWeb.ScreenController do
   use ScreensWeb, :controller
 
   def index(conn, _params) do
