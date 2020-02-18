@@ -5,9 +5,17 @@ defmodule Screens.ScreenData do
   alias Screens.Departures.Departure
   alias Screens.NearbyConnections
 
-  @version 1
+  def by_stop_id_with_version(stop_id, client_version) do
+    api_version = Application.get_env(:screens, :api_version)
 
-  def by_stop_id(stop_id) do
+    if api_version == client_version do
+      by_stop_id(stop_id)
+    else
+      %{force_reload: true}
+    end
+  end
+
+  defp by_stop_id(stop_id) do
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
     # - global_alert will be nil
@@ -39,7 +47,7 @@ defmodule Screens.ScreenData do
     case departures do
       {:ok, departures} ->
         %{
-          version: @version,
+          force_reload: false,
           success: true,
           current_time: format_current_time(DateTime.utc_now()),
           stop_name: stop_name,
@@ -51,7 +59,7 @@ defmodule Screens.ScreenData do
 
       :error ->
         %{
-          version: @version,
+          force_reload: false,
           success: false
         }
     end
