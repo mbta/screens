@@ -77,22 +77,26 @@ const ScreenContainer = ({ id }): JSX.Element => {
   let version;
 
   const doUpdate = async () => {
-    const result = await fetch(`/api/${id}`);
-    const json = await result.json();
+    try {
+      const result = await fetch(`/api/${id}`);
+      const json = await result.json();
 
-    if (version === undefined) {
-      version = json.version;
-    } else if (version !== json.version) {
-      window.location.reload(false);
+      if (version === undefined) {
+        version = json.version;
+      } else if (version !== json.version) {
+        window.location.reload(false);
+      }
+
+      setSuccess(json.success);
+      setCurrentTimeString(json.current_time);
+      setStopName(json.stop_name);
+      setStopId(json.stop_id);
+      setDepartures(json.departures);
+      setGlobalAlert(json.global_alert);
+      setNearbyConnections(json.nearby_connections);
+    } catch (err) {
+      setSuccess(false);
     }
-
-    setSuccess(json.success);
-    setCurrentTimeString(json.current_time);
-    setStopName(json.stop_name);
-    setStopId(json.stop_id);
-    setDepartures(json.departures);
-    setGlobalAlert(json.global_alert);
-    setNearbyConnections(json.nearby_connections);
   };
 
   useEffect(() => {
