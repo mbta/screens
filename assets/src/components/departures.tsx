@@ -1,6 +1,5 @@
 import React, { forwardRef } from "react";
 import DeparturesRow from "./departures_row";
-import OvernightDepartures from "./overnight_departures";
 
 const buildDeparturesRows = departures => {
   if (!departures) {
@@ -39,7 +38,8 @@ const Departures = forwardRef(
     ref
   ): JSX.Element => {
     if (!departures || departures.length === 0) {
-      return <OvernightDepartures />;
+      // This shouldn't be possible, because we'd be showing OvernightDepartures.
+      return <div></div>;
     }
 
     const filteredRows = departures.slice(startIndex, endIndex);
