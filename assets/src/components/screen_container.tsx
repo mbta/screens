@@ -82,6 +82,10 @@ const ScreenContainer = ({ id }): JSX.Element => {
       const result = await fetch(`/api/screen/${id}?version=${apiVersion}`);
       const json = await result.json();
 
+      if (json.force_reload === true) {
+        window.location.reload(false);
+      }
+
       setSuccess(json.success);
       setCurrentTimeString(json.current_time);
       setStopName(json.stop_name);
