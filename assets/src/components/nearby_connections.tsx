@@ -14,7 +14,7 @@ const NearbyConnectionsRoute = ({ route, small }): JSX.Element => {
       <span>
         <img
           className="nearby-connections-route__icon"
-          src="images/commuter-rail.svg"
+          src="/images/commuter-rail.svg"
         ></img>
         {route}
       </span>
@@ -40,7 +40,7 @@ const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
         <div className="nearby-connections-row__distance-label">
           <img
             className="nearby-connections-row__distance-icon"
-            src="images/nearby.svg"
+            src="/images/nearby.svg"
           ></img>
           <span className="nearby-connections-row__distance">{distance} </span>
           <span className="nearby-connections-row__distance-units">min</span>
@@ -72,7 +72,7 @@ const NearbyConnections = ({ nearbyConnections }): JSX.Element => {
         <div className="nearby-connections__icon-container">
           <img
             className="nearby-connections__icon-image"
-            src="images/nearby.svg"
+            src="/images/nearby.svg"
           />
         </div>
         <div className="nearby-connections__header-text">

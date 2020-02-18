@@ -23,17 +23,17 @@ defmodule ScreensWeb.Router do
     get "/_health", HealthController, :index
   end
 
-  scope "/", ScreensWeb do
+  scope "/screen", ScreensWeb do
     pipe_through [:redirect_prod_http, :browser]
 
-    get "/", PageController, :index
-    get "/:id", PageController, :index
+    get "/", ScreenController, :index
+    get "/:id", ScreenController, :index
   end
 
-  scope "/api", ScreensWeb do
+  scope "/api/screen", ScreensWeb do
     pipe_through [:redirect_prod_http, :api, :browser]
 
-    get "/:id", ApiController, :show
+    get "/:id", ScreenApiController, :show
   end
 
   scope "/alert_priority", ScreensWeb do

@@ -7,7 +7,7 @@ const OvernightDepartures = (): JSX.Element => {
         <div className="overnight-departures__icon">
           <img
             className="overnight-departures__icon-image"
-            src="images/overnight.svg"
+            src="/images/overnight.svg"
           />
         </div>
         <div className="overnight-departures__text">

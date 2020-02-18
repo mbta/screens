@@ -78,7 +78,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
 
   const doUpdate = async () => {
     try {
-      const result = await fetch(`/api/${id}`);
+      const result = await fetch(`/api/screen/${id}`);
       const json = await result.json();
 
       if (version === undefined) {

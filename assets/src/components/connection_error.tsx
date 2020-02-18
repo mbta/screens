@@ -6,7 +6,7 @@ const ConnectionError = (): JSX.Element => {
       <div className="connection-error__top">
         <img
           className="connection-error__top-icon connection-error__top-icon--logo"
-          src="images/logo-white.svg"
+          src="/images/logo-white.svg"
         />
         <div className="connection-error__top-text connection-error__top-text--white">
           Please excuse us
@@ -15,7 +15,7 @@ const ConnectionError = (): JSX.Element => {
       <div className="connection-error__middle">
         <img
           className="connection-error__top-icon connection-error__top-icon--no-data"
-          src="images/live-data-none.svg"
+          src="/images/live-data-none.svg"
         />
         <div className="connection-error__top-text connection-error__top-text--black">
           Live updates are temporarily unavailable.
