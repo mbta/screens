@@ -25,6 +25,7 @@ config :phoenix, :json_library, Jason
 config :screens, :redirect_http?, true
 
 config :screens,
+  api_version: 1,
   screen_data: %{
     "1" => %{stop_id: "1722"},
     "2" => %{stop_id: "383"},
