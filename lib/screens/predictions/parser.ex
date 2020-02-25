@@ -1,15 +1,13 @@
 defmodule Screens.Predictions.Parser do
   @moduledoc false
 
-  def parse_result(result) do
-    included_data =
-      result
-      |> Map.get("included")
-      |> parse_included_data()
+  def parse_result(%{"data" => data, "included" => included}) do
+    included_data = parse_included_data(included)
+    parse_data(data, included_data)
+  end
 
-    result
-    |> Map.get("data")
-    |> parse_data(included_data)
+  def parse_result(%{"data" => []}) do
+    []
   end
 
   defp parse_data(data, included_data) do
