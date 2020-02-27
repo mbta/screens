@@ -130,7 +130,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   });
 
   if (success) {
-    if (false && departures && departures.length > 0) {
+    if (departures && departures.length > 0) {
       return (
         <div>
           <TopScreenContainer
