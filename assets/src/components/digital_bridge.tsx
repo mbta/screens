@@ -21,7 +21,11 @@ const DigitalBridge = ({ stopId }): JSX.Element => {
           <QRCode
             className="digital-bridge__qr-image"
             size={112}
-            value={"www.mbta.com/stops/" + stopId}
+            value={
+              "www.mbta.com/stops/" +
+              stopId +
+              "?utm_source=qr&utm_medium=eink&utm_campaign=einkbus"
+            }
           />
         </div>
       </div>
