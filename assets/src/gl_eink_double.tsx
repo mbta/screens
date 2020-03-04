@@ -12,7 +12,7 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
-        <Route exact path="/screen">
+        <Route exact path="/screen/gl_eink_double">
           <MultiScreenPage />
         </Route>
         <Route path="/screen/:id">
