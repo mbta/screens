@@ -5,6 +5,18 @@
   position: relative;
 }
 
+.header__environment {
+  position: absolute;
+  top: 12px;
+  left: 40px;
+  font-family: neue-haas-grotesk-text;
+  font-size: 48px;
+  color: #ffffff;
+  letter-spacing: 0;
+  line-height: 48px;
+  font-weight: 700;
+}
+
 .header__time {
   position: absolute;
   top: 28px;
