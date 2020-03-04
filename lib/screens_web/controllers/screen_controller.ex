@@ -2,10 +2,16 @@ defmodule ScreensWeb.ScreenController do
   use ScreensWeb, :controller
 
   plug(:api_version)
+  plug(:environment_name)
 
   defp api_version(conn, _) do
     api_version = Application.get_env(:screens, :api_version)
     assign(conn, :api_version, api_version)
+  end
+
+  defp environment_name(conn, _) do
+    environment_name = Application.get_env(:screens, :environment_name)
+    assign(conn, :environment_name, environment_name)
   end
 
   defp screen_ids(target_app_id) do
