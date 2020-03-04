@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Screens</title>
     <link rel="stylesheet" href="https://use.typekit.net/emd6vhv.css">
-    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
+    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/#{@app_id}.css") %>"/>
   </head>
   <body>
     <%= render @view_module, @view_template, assigns %>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/polyfills.js") %>"></script>
-    <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+    <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/#{@app_id}.js") %>"></script>
   </body>
 </html>

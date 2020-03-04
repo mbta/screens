@@ -1,6 +1,6 @@
 declare function require(name: string): string;
 // tslint:disable-next-line
-require("../css/app.scss");
+require("../css/gl_eink_single.scss");
 
 import React from "react";
 import ReactDOM from "react-dom";
@@ -12,7 +12,7 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
-        <Route exact path="/screen">
+        <Route exact path="/screen/gl_eink_single">
           <MultiScreenPage />
         </Route>
         <Route path="/screen/:id">

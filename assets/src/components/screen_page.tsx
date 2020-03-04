@@ -3,10 +3,14 @@ import { useParams } from "react-router-dom";
 import ScreenContainer from "./screen_container";
 
 const MultiScreenPage = (): JSX.Element => {
+  const screenIds = JSON.parse(
+    document.getElementById("app").dataset.screenIds
+  );
+
   return (
     <div className="multi-screen-page">
-      {[...Array(19)].map((_, i) => (
-        <ScreenContainer id={i + 1} key={i} />
+      {screenIds.map(id => (
+        <ScreenContainer id={id} key={id} />
       ))}
     </div>
   );
