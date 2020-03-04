@@ -11,7 +11,9 @@ module.exports = (env, options) => ({
   },
   entry: {
     polyfills: "./src/polyfills.js",
-    app: "./src/app.tsx"
+    bus_eink: "./src/bus_eink.tsx",
+    gl_eink_single: "./src/gl_eink_single.tsx",
+    gl_eink_double: "./src/gl_eink_double.tsx"
   },
   output: {
     filename: "[name].js",
@@ -67,7 +69,7 @@ module.exports = (env, options) => ({
     ]
   },
   plugins: [
-    new MiniCssExtractPlugin({ filename: "../css/app.css" }),
+    new MiniCssExtractPlugin({ filename: "../css/[name].css" }),
     new CopyWebpackPlugin([{ from: "static/", to: "../" }])
   ],
   devtool: "source-map",

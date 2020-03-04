@@ -8,7 +8,15 @@ defmodule ScreensWeb.ScreenController do
     assign(conn, :api_version, api_version)
   end
 
-  def index(conn, _params) do
-    render(conn, "index.html")
+  def index(conn, %{"id" => screen_id}) do
+    app_id =
+      :screens
+      |> Application.get_env(:screen_data)
+      |> Map.get(screen_id)
+      |> Map.get(:app_id)
+
+    conn
+    |> assign(:app_id, app_id)
+    |> render("index.html")
   end
 end

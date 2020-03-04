@@ -1,6 +1,6 @@
 declare function require(name: string): string;
 // tslint:disable-next-line
-require("../css/app.scss");
+require("../css/gl_eink_single.scss");
 
 import React from "react";
 import ReactDOM from "react-dom";
