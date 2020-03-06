@@ -81,6 +81,7 @@ defmodule Screens.Alerts.Parser do
   defp parse_effect("STOP_CLOSURE"), do: :stop_closure
   defp parse_effect("DOCK_CLOSURE"), do: :dock_closure
   defp parse_effect("STATION_CLOSURE"), do: :station_closure
+  defp parse_effect("STOP_MOVE"), do: :stop_moved
   defp parse_effect("STOP_MOVED"), do: :stop_moved
   defp parse_effect("EXTRA_SERVICE"), do: :extra_service
   defp parse_effect("SCHEDULE_CHANGE"), do: :schedule_change
