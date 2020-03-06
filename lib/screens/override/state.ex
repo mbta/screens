@@ -2,7 +2,7 @@ defmodule Screens.Override.State do
   @moduledoc false
 
   @initial_fetch_wait_ms 500
-  @refresh_ms 5 * 1000
+  @refresh_ms 15 * 1000
   @default_config %{globally_disabled: false, disabled_screen_ids: MapSet.new()}
 
   use GenServer
