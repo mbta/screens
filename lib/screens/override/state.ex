@@ -3,6 +3,7 @@ defmodule Screens.Override.State do
 
   @initial_fetch_wait_ms 500
   @refresh_ms 5 * 1000
+  @default_config %{globally_disabled: false, disabled_screen_ids: MapSet.new()}
 
   use GenServer
 
@@ -24,7 +25,7 @@ defmodule Screens.Override.State do
   @impl true
   def init(:ok) do
     schedule_refresh(self(), @initial_fetch_wait_ms)
-    {:ok, %{globally_disabled: false, disabled_screen_ids: MapSet.new()}}
+    {:ok, @default_config}
   end
 
   @impl true
@@ -42,7 +43,12 @@ defmodule Screens.Override.State do
 
   @impl true
   def handle_info(:refresh, _state) do
-    new_state = Screens.Override.Fetch.fetch_config_from_s3()
+    new_state =
+      case Screens.Override.Fetch.fetch_config_from_s3() do
+        {:ok, config} -> config
+        :error -> @default_config
+      end
+
     schedule_refresh(self())
     {:noreply, new_state}
   end
