@@ -27,7 +27,9 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
   return (
     <div className="header">
       <div className="header__environment">
-        {["dev", "dev-green"].includes(environmentName) ? environmentName : ""}
+        {["screens-dev", "screens-dev-green"].includes(environmentName)
+          ? environmentName
+          : ""}
       </div>
       <div className="header__time">{currentTime}</div>
       <div className="header__realtime-indicator">

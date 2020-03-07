@@ -25,7 +25,6 @@ config :phoenix, :json_library, Jason
 config :screens, :redirect_http?, true
 
 config :screens,
-  environment_name: {:system, "ENVIRONMENT_NAME"},
   api_version: "1",
   screen_data: %{
     "1" => %{stop_id: "1722", app_id: "bus_eink"},

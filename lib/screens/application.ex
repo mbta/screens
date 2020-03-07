@@ -8,8 +8,6 @@ defmodule Screens.Application do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    load_runtime_config()
-
     # List all child processes to be supervised
     children = [
       # Start the endpoint when the application starts
@@ -30,21 +28,5 @@ defmodule Screens.Application do
   def config_change(changed, _new, removed) do
     ScreensWeb.Endpoint.config_change(changed, removed)
     :ok
-  end
-
-  def load_runtime_config do
-    Application.put_env(
-      :screens,
-      :environment_name,
-      runtime_config(Application.get_env(:screens, :environment_name))
-    )
-  end
-
-  defp runtime_config({:system, environment_variable}) do
-    System.get_env(environment_variable)
-  end
-
-  defp runtime_config(value) do
-    value
   end
 end
