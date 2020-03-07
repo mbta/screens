@@ -30,6 +30,8 @@ config :screens, ScreensWeb.Endpoint,
 
 config :screens, api_v3_key: api_v3_key
 
+config :screens, environment_name: eb_env_name
+
 # ## Using releases (Elixir v1.9+)
 #
 # If you are doing OTP releases, you need to instruct Phoenix
