@@ -24,7 +24,7 @@ defmodule Screens.Override.Fetch do
 
   defp config_path_for_environment do
     case Application.get_env(:screens, :environment_name) do
-      "prod" -> "prod.json"
+      "screens-prod" -> "prod.json"
       _ -> "dev.json"
     end
   end
