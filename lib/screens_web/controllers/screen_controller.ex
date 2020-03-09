@@ -1,6 +1,9 @@
 defmodule ScreensWeb.ScreenController do
   use ScreensWeb, :controller
 
+  @default_app_id "bus_eink"
+  @app_ids ["bus_eink", "gl_eink_single", "gl_eink_double"]
+
   plug(:api_version)
   plug(:environment_name)
 
@@ -28,7 +31,7 @@ defmodule ScreensWeb.ScreenController do
   end
 
   def index(conn, %{"id" => app_id})
-      when app_id in ["bus_eink", "gl_eink_single", "gl_eink_double"] do
+      when app_id in @app_ids do
     conn
     |> assign(:app_id, app_id)
     |> assign(:screen_ids, screen_ids(app_id))
@@ -36,14 +39,31 @@ defmodule ScreensWeb.ScreenController do
   end
 
   def index(conn, %{"id" => screen_id}) do
-    app_id =
+    screen_data =
       :screens
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
-      |> Map.get(:app_id)
 
+    case screen_data do
+      nil ->
+        render_not_found(conn)
+
+      %{app_id: app_id} ->
+        conn
+        |> assign(:app_id, app_id)
+        |> render("index.html")
+    end
+  end
+
+  def index(conn, _params) do
+    render_not_found(conn)
+  end
+
+  defp render_not_found(conn) do
     conn
-    |> assign(:app_id, app_id)
-    |> render("index.html")
+    |> assign(:app_id, @default_app_id)
+    |> put_status(:not_found)
+    |> put_view(ScreensWeb.ErrorView)
+    |> render("404.html")
   end
 end
