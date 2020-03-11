@@ -50,7 +50,7 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
           className={classWithSize("header__stop-name", SIZES[stopSize])}
           ref={ref}
         >
-          {"Boston College"}
+          {stopName}
         </div>
       </div>
     </div>

@@ -19,6 +19,13 @@ defmodule Screens.Departures.Departure do
           inline_badges: list(map())
         }
 
+  def by_stop_id(stop_id, route_id, direction_id) do
+    case Screens.Predictions.Prediction.by_stop_id(stop_id, route_id, direction_id) do
+      {:ok, result} -> {:ok, Enum.map(result, &from_prediction/1)}
+      :error -> :error
+    end
+  end
+
   def by_stop_id(stop_id) do
     case Screens.Predictions.Prediction.by_stop_id(stop_id) do
       {:ok, result} -> {:ok, Enum.map(result, &from_prediction/1)}
