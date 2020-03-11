@@ -43,15 +43,19 @@ const Departures = ({ departures, currentTimeString }): JSX.Element => {
 
   return (
     <div className="departures">
-      <Departure
-        time={topDeparture.time}
-        currentTimeString={currentTimeString}
-      />
+      {topDeparture ? (
+        <Departure
+          time={topDeparture.time}
+          currentTimeString={currentTimeString}
+        />
+      ) : null}
       <div className="departures__hairline"></div>
-      <Departure
-        time={bottomDeparture.time}
-        currentTimeString={currentTimeString}
-      />
+      {bottomDeparture ? (
+        <Departure
+          time={bottomDeparture.time}
+          currentTimeString={currentTimeString}
+        />
+      ) : null}
     </div>
   );
 };

@@ -56,6 +56,66 @@ config :screens,
       stop_id: "place-bland",
       route_id: "Green-B",
       direction_id: 0,
+      app_id: "gl_eink_single"
+    },
+    "103" => %{
+      stop_id: "place-bcnwa",
+      route_id: "Green-C",
+      direction_id: 1,
+      app_id: "gl_eink_single"
+    },
+    "104" => %{
+      stop_id: "place-bcnwa",
+      route_id: "Green-C",
+      direction_id: 0,
+      app_id: "gl_eink_single"
+    },
+    "105" => %{
+      stop_id: "place-mfa",
+      route_id: "Green-E",
+      direction_id: 1,
+      app_id: "gl_eink_single"
+    },
+    "106" => %{
+      stop_id: "place-mfa",
+      route_id: "Green-E",
+      direction_id: 0,
+      app_id: "gl_eink_single"
+    },
+    "201" => %{
+      stop_id: "place-bland",
+      route_id: "Green-B",
+      direction_id: 1,
+      app_id: "gl_eink_double"
+    },
+    "202" => %{
+      stop_id: "place-bland",
+      route_id: "Green-B",
+      direction_id: 0,
+      app_id: "gl_eink_double"
+    },
+    "203" => %{
+      stop_id: "place-bcnwa",
+      route_id: "Green-C",
+      direction_id: 1,
+      app_id: "gl_eink_double"
+    },
+    "204" => %{
+      stop_id: "place-bcnwa",
+      route_id: "Green-C",
+      direction_id: 0,
+      app_id: "gl_eink_double"
+    },
+    "205" => %{
+      stop_id: "place-mfa",
+      route_id: "Green-E",
+      direction_id: 1,
+      app_id: "gl_eink_double"
+    },
+    "206" => %{
+      stop_id: "place-mfa",
+      route_id: "Green-E",
+      direction_id: 0,
       app_id: "gl_eink_double"
     }
   },
@@ -81,9 +141,9 @@ config :screens,
     "637" => ["6428", "place-NB-0064"],
     "8178" => ["900", "8297"],
     # Empty placeholders until we decide what to do about nearby connections/departures
-    "70148" => [],
-    "70149" => [],
-    "place-bland" => []
+    "place-bland" => [],
+    "place-bcnwa" => [],
+    "place-mfa" => []
   },
   routes_at_stop: %{
     "110" => ["1", "68", "69"],
