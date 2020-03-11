@@ -43,7 +43,7 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
         <div className="header__stop-container-route">
           <img
             className="header__stop-container-route-image"
-            src="/images/logo-white.svg"
+            src="/images/GL-B.svg"
           ></img>
         </div>
         <div

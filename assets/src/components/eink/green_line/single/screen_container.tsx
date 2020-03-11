@@ -7,59 +7,25 @@ import React, {
 } from "react";
 
 import ConnectionError from "Components/connection_error";
-import Departures from "Components/departures";
 import DigitalBridge from "Components/digital_bridge";
+import Departures from "Components/eink/green_line/departures";
 import Header from "Components/eink/green_line/header";
-import FareInfo from "Components/fare_info";
-import FlexZoneContainer from "Components/flex_zone_container";
+import LineMap from "Components/eink/green_line/line_map";
 import OvernightDepartures from "Components/overnight_departures";
 
 const TopScreenContainer = forwardRef(
   (
-    { currentTimeString, stopName, departures, startIndex, endIndex },
+    { currentTimeString, stopName, departures, startIndex, endIndex, stopId },
     ref
   ): JSX.Element => {
     return (
       <div className="single-screen-container">
         <Header stopName={stopName} currentTimeString={currentTimeString} />
+        <LineMap />
         <Departures
-          currentTimeString={currentTimeString}
           departures={departures}
-          startIndex={startIndex}
-          endIndex={endIndex}
-          size="large"
-          ref={ref}
-        />
-      </div>
-    );
-  }
-);
-
-const BottomScreenContainer = forwardRef(
-  (
-    {
-      currentTimeString,
-      departures,
-      startIndex,
-      endIndex,
-      globalAlert,
-      stopId,
-      nearbyConnections
-    },
-    ref
-  ): JSX.Element => {
-    return (
-      <div className="single-screen-container">
-        <FlexZoneContainer
           currentTimeString={currentTimeString}
-          departures={departures}
-          startIndex={startIndex}
-          endIndex={endIndex}
-          globalAlert={globalAlert}
-          nearbyConnections={nearbyConnections}
-          ref={ref}
         />
-        <FareInfo />
         <DigitalBridge stopId={stopId} />
       </div>
     );
@@ -116,7 +82,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   useLayoutEffect(() => {
     if (ref.current) {
       const height = ref.current.clientHeight;
-      if (height > 1312) {
+      if (height > 1140) {
         setNumRows(numRows - 1);
       }
     }
@@ -134,6 +100,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
       return (
         <div>
           <TopScreenContainer
+            stopId={stopId}
             currentTimeString={currentTimeString}
             stopName={stopName}
             departures={departures}
@@ -146,6 +113,8 @@ const ScreenContainer = ({ id }): JSX.Element => {
     } else {
       // We successfully fetched data, but there are no predictions.
       // For now, assume that this is because it's the middle of the night.
+
+      // NOTE THAT FOR GREEN LINE THIS IS NO LONGER TRUE
       return (
         <div>
           <OvernightDepartures currentTimeString={currentTimeString} />
