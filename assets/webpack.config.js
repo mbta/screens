@@ -7,7 +7,11 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = (env, options) => ({
   resolve: {
-    extensions: [".ts", ".tsx", ".js", ".jsx"]
+    extensions: [".ts", ".tsx", ".js", ".jsx"],
+    alias: {
+      Components: path.resolve(__dirname, "src/components"),
+      Util: path.resolve(__dirname, "src/util")
+    }
   },
   entry: {
     polyfills: "./src/polyfills.js",

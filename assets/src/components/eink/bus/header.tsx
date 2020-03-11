@@ -2,7 +2,7 @@ import moment from "moment";
 import "moment-timezone";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
-import { classWithSize } from "../util";
+import { classWithSize } from "Util";
 
 const Header = ({ stopName, currentTimeString }): JSX.Element => {
   const SIZES = ["small", "large"];

@@ -6,7 +6,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-import { MultiScreenPage, ScreenPage } from "./components/screen_page";
+import {
+  MultiScreenPage,
+  ScreenPage
+} from "Components/eink/green_line/double/screen_page";
 
 const App = (): JSX.Element => {
   return (
