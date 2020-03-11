@@ -39,11 +39,19 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
         ></img>
         UPDATED LIVE EVERY MINUTE
       </div>
-      <div
-        className={classWithSize("header__stop-name", SIZES[stopSize])}
-        ref={ref}
-      >
-        {stopName}
+      <div className="header__stop-container">
+        <div className="header__stop-container-route">
+          <img
+            className="header__stop-container-route-image"
+            src="/images/logo-white.svg"
+          ></img>
+        </div>
+        <div
+          className={classWithSize("header__stop-name", SIZES[stopSize])}
+          ref={ref}
+        >
+          {"Boston College"}
+        </div>
       </div>
     </div>
   );
