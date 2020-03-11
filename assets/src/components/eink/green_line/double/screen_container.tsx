@@ -17,12 +17,24 @@ import OvernightDepartures from "Components/overnight_departures";
 
 const TopScreenContainer = forwardRef(
   (
-    { currentTimeString, stopName, departures, startIndex, endIndex, stopId },
+    {
+      currentTimeString,
+      stopName,
+      departures,
+      startIndex,
+      endIndex,
+      stopId,
+      routeId
+    },
     ref
   ): JSX.Element => {
     return (
       <div className="single-screen-container">
-        <Header stopName={stopName} currentTimeString={currentTimeString} />
+        <Header
+          stopName={stopName}
+          routeId={routeId}
+          currentTimeString={currentTimeString}
+        />
         <LineMap height={1312} currentTimeString={currentTimeString} />
         <Departures
           departures={departures}
@@ -69,6 +81,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [currentTimeString, setCurrentTimeString] = useState();
   const [stopName, setStopName] = useState();
   const [stopId, setStopId] = useState();
+  const [routeId, setRouteId] = useState();
   const [departures, setDepartures] = useState();
   const [globalAlert, setGlobalAlert] = useState();
   const [nearbyConnections, setNearbyConnections] = useState();
@@ -88,6 +101,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
       setCurrentTimeString(json.current_time);
       setStopName(json.stop_name);
       setStopId(json.stop_id);
+      setRouteId(json.route_id);
       setDepartures(json.departures);
       setGlobalAlert(json.global_alert);
       setNearbyConnections(json.nearby_connections);
@@ -138,6 +152,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
             startIndex={0}
             endIndex={numRows}
             stopId={stopId}
+            routeId={routeId}
             ref={ref}
           />
           <BottomScreenContainer

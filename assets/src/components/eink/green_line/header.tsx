@@ -4,7 +4,23 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 
 import { classWithSize } from "Util";
 
-const Header = ({ stopName, currentTimeString }): JSX.Element => {
+const iconForRoute = routeId => {
+  if (routeId === "Green-B") {
+    return "/images/GL-B.svg";
+  }
+  if (routeId === "Green-C") {
+    return "/images/GL-C.svg";
+  }
+  if (routeId === "Green-D") {
+    return "/images/GL-D.svg";
+  }
+  if (routeId === "Green-E") {
+    return "/images/GL-E.svg";
+  }
+  return "/images/logo-white.svg";
+};
+
+const Header = ({ stopName, routeId, currentTimeString }): JSX.Element => {
   const SIZES = ["small", "large"];
   const MAX_HEIGHT = 216;
 
@@ -43,7 +59,7 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
         <div className="header__stop-container-route">
           <img
             className="header__stop-container-route-image"
-            src="/images/GL-B.svg"
+            src={iconForRoute(routeId)}
           ></img>
         </div>
         <div

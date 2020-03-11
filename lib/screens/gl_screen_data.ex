@@ -70,6 +70,7 @@ defmodule Screens.GLScreenData do
           current_time: format_current_time(DateTime.utc_now()),
           stop_name: destination,
           stop_id: stop_id,
+          route_id: route_id,
           departures: format_departure_rows(departures),
           global_alert: format_global_alert(global_alert),
           nearby_connections: nearby_connections
