@@ -21,7 +21,7 @@ const TopScreenContainer = forwardRef(
     return (
       <div className="single-screen-container">
         <Header stopName={stopName} currentTimeString={currentTimeString} />
-        <LineMap currentTimeString={currentTimeString} />
+        <LineMap height={1140} currentTimeString={currentTimeString} />
         <Departures
           departures={departures}
           currentTimeString={currentTimeString}

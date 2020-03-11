@@ -7,28 +7,26 @@ import React, {
 } from "react";
 
 import ConnectionError from "Components/connection_error";
-import Departures from "Components/departures";
 import DigitalBridge from "Components/digital_bridge";
+import Departures from "Components/eink/green_line/departures";
 import Header from "Components/eink/green_line/header";
+import LineMap from "Components/eink/green_line/line_map";
 import FareInfo from "Components/fare_info";
 import FlexZoneContainer from "Components/flex_zone_container";
 import OvernightDepartures from "Components/overnight_departures";
 
 const TopScreenContainer = forwardRef(
   (
-    { currentTimeString, stopName, departures, startIndex, endIndex },
+    { currentTimeString, stopName, departures, startIndex, endIndex, stopId },
     ref
   ): JSX.Element => {
     return (
       <div className="single-screen-container">
         <Header stopName={stopName} currentTimeString={currentTimeString} />
+        <LineMap height={1312} currentTimeString={currentTimeString} />
         <Departures
-          currentTimeString={currentTimeString}
           departures={departures}
-          startIndex={startIndex}
-          endIndex={endIndex}
-          size="large"
-          ref={ref}
+          currentTimeString={currentTimeString}
         />
       </div>
     );
@@ -139,6 +137,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
             departures={departures}
             startIndex={0}
             endIndex={numRows}
+            stopId={stopId}
             ref={ref}
           />
           <BottomScreenContainer

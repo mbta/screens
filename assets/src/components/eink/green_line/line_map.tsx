@@ -2,10 +2,7 @@ import moment from "moment";
 import "moment-timezone";
 import React from "react";
 
-const LineMapLine = ({ currentTimeString }): JSX.Element => {
-  const width = 442;
-  const height = 1140;
-
+const LineMapLine = ({ height, width, currentTimeString }): JSX.Element => {
   const radius = 14;
   const dy = 112;
   const lineWidth = 40;
@@ -15,7 +12,7 @@ const LineMapLine = ({ currentTimeString }): JSX.Element => {
   const textMargin = 18;
   const strokeWidth = 16;
 
-  const lastStopIndex = 7;
+  const lastStopIndex = 9;
   const currentStopY = stopMarginTop + 2 * dy + radius;
   let lastStopY = stopMarginTop + lastStopIndex * dy + radius;
 
@@ -280,10 +277,8 @@ const LineMapVehicleIcon = ({ x, y, size }): JSX.Element => {
   );
 };
 
-const LineMap = ({ currentTimeString }): JSX.Element => {
+const LineMap = ({ height, currentTimeString }): JSX.Element => {
   const width = 442;
-  const height = 1140;
-
   return (
     <div className="line-map">
       <svg
@@ -293,7 +288,11 @@ const LineMap = ({ currentTimeString }): JSX.Element => {
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <LineMapLine currentTimeString={currentTimeString} />
+        <LineMapLine
+          height={height}
+          width={width}
+          currentTimeString={currentTimeString}
+        />
       </svg>
     </div>
   );
