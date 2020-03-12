@@ -4,8 +4,10 @@ defmodule Screens.Stops.Stop do
   defstruct id: nil,
             name: nil
 
+  @type id :: String.t()
+
   @type t :: %__MODULE__{
-          id: String.t(),
+          id: id,
           name: String.t()
         }
 end

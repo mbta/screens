@@ -5,8 +5,10 @@ defmodule Screens.Routes.Route do
             short_name: nil,
             direction_destinations: nil
 
+  @type id :: String.t()
+
   @type t :: %__MODULE__{
-          id: String.t(),
+          id: id,
           short_name: String.t(),
           direction_destinations: list()
         }

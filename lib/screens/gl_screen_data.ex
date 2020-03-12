@@ -6,7 +6,7 @@ defmodule Screens.GLScreenData do
   alias Screens.NearbyConnections
 
   def by_stop_id_with_override_and_version(stop_id, screen_id, client_version) do
-    %{route_id: route_id, direction_id: direction_id} =
+    %{route_id: route_id, direction_id: direction_id, platform_id: platform_id} =
       :screens
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
@@ -17,21 +17,21 @@ defmodule Screens.GLScreenData do
         success: false
       }
     else
-      by_stop_id_with_version(stop_id, client_version, route_id, direction_id)
+      by_stop_id_with_version(stop_id, client_version, route_id, direction_id, platform_id)
     end
   end
 
-  defp by_stop_id_with_version(stop_id, client_version, route_id, direction_id) do
+  defp by_stop_id_with_version(stop_id, client_version, route_id, direction_id, platform_id) do
     api_version = Application.get_env(:screens, :api_version)
 
     if api_version == client_version do
-      by_stop_id(stop_id, route_id, direction_id)
+      by_stop_id(stop_id, route_id, direction_id, platform_id)
     else
       %{force_reload: true}
     end
   end
 
-  defp by_stop_id(stop_id, route_id, direction_id) do
+  defp by_stop_id(stop_id, route_id, direction_id, platform_id) do
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
     # - global_alert will be nil
@@ -40,9 +40,11 @@ defmodule Screens.GLScreenData do
     # even if the other API requests fail.
     {inline_alerts, global_alert} = Alert.by_stop_id(stop_id)
 
+    predictions = Screens.Predictions.Prediction.by_stop_id(stop_id, route_id, direction_id)
+
     # If we are unable to fetch departures, we want to show an error message on the screen.
     departures =
-      case Departure.by_stop_id(stop_id, route_id, direction_id) do
+      case Departure.from_predictions(predictions) do
         {:ok, result} ->
           {:ok, Departure.associate_alerts_with_departures(result, inline_alerts)}
 
@@ -62,6 +64,16 @@ defmodule Screens.GLScreenData do
     {:ok, %{direction_destinations: destinations}} = Screens.Routes.Route.by_id(route_id)
     destination = Enum.at(destinations, direction_id)
 
+    line_map_data =
+      case predictions do
+        {:ok, predictions} ->
+          Screens.LineMap.by_stop_id(platform_id, route_id, direction_id, predictions)
+
+        :error ->
+          # handle case where vehicle request fails
+          nil
+      end
+
     case departures do
       {:ok, departures} ->
         %{
@@ -73,7 +85,8 @@ defmodule Screens.GLScreenData do
           route_id: route_id,
           departures: format_departure_rows(departures),
           global_alert: format_global_alert(global_alert),
-          nearby_connections: nearby_connections
+          nearby_connections: nearby_connections,
+          line_map: line_map_data
         }
 
       :error ->

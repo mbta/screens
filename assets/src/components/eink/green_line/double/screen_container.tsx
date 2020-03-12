@@ -24,7 +24,8 @@ const TopScreenContainer = forwardRef(
       startIndex,
       endIndex,
       stopId,
-      routeId
+      routeId,
+      lineMapData
     },
     ref
   ): JSX.Element => {
@@ -35,7 +36,11 @@ const TopScreenContainer = forwardRef(
           routeId={routeId}
           currentTimeString={currentTimeString}
         />
-        <LineMap height={1312} currentTimeString={currentTimeString} />
+        <LineMap
+          data={lineMapData}
+          height={1312}
+          currentTimeString={currentTimeString}
+        />
         <Departures
           departures={departures}
           currentTimeString={currentTimeString}
@@ -85,6 +90,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [departures, setDepartures] = useState();
   const [globalAlert, setGlobalAlert] = useState();
   const [nearbyConnections, setNearbyConnections] = useState();
+  const [lineMapData, setLineMapData] = useState();
 
   const apiVersion = document.getElementById("app").dataset.apiVersion;
 
@@ -105,6 +111,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
       setDepartures(json.departures);
       setGlobalAlert(json.global_alert);
       setNearbyConnections(json.nearby_connections);
+      setLineMapData(json.line_map);
     } catch (err) {
       setSuccess(false);
     }
@@ -153,6 +160,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
             endIndex={numRows}
             stopId={stopId}
             routeId={routeId}
+            lineMapData={lineMapData}
             ref={ref}
           />
           <BottomScreenContainer

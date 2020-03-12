@@ -2,7 +2,12 @@ import moment from "moment";
 import "moment-timezone";
 import React from "react";
 
-const LineMapLine = ({ height, width, currentTimeString }): JSX.Element => {
+const LineMapLine = ({
+  data,
+  height,
+  width,
+  currentTimeString
+}): JSX.Element => {
   const radius = 14;
   const dy = 112;
   const lineWidth = 40;
@@ -12,19 +17,16 @@ const LineMapLine = ({ height, width, currentTimeString }): JSX.Element => {
   const textMargin = 18;
   const strokeWidth = 16;
 
-  const lastStopIndex = 9;
+  const lastStopIndex = 2 + data.stops.count_before;
   const currentStopY = stopMarginTop + 2 * dy + radius;
   let lastStopY = stopMarginTop + lastStopIndex * dy + radius;
-
-  const vehicles = [
-    { index: 3.6, time: currentTimeString, id: 1 },
-    { index: 6, time: currentTimeString, id: 2 }
-  ];
 
   const showOriginStop = lastStopY + radius + strokeWidth <= height;
   if (!showOriginStop) {
     lastStopY = height;
   }
+
+  const vehicles = data.vehicles;
 
   const dPast = [
     "M",
@@ -61,16 +63,16 @@ const LineMapLine = ({ height, width, currentTimeString }): JSX.Element => {
     "Z"
   ].join(" ");
 
-  const currentStopName = "Blandford";
-  const nextStopName = "BU East";
-  const followingStopName = "BU Central";
-  const originStopName = "Park Street";
+  const currentStopName = data.stops.current;
+  const nextStopName = data.stops.next;
+  const followingStopName = data.stops.following;
+  const originStopName = data.stops.origin;
 
   return (
     <g>
       <path d={dPast} fill="#CCCCCC"></path>
       <path d={dFuture} fill="#000000"></path>
-      {[...Array(9)].map((_, i) => (
+      {[...Array(lastStopIndex)].map((_, i) => (
         <circle
           cx={marginLeft + lineWidth / 2}
           cy={stopMarginTop + radius + i * dy}
@@ -128,6 +130,7 @@ const LineMapLine = ({ height, width, currentTimeString }): JSX.Element => {
         <LineMapVehicle
           x={marginLeft + lineWidth / 2}
           y={stopMarginTop + radius + v.index * dy}
+          height={height}
           time={v.time}
           currentTimeString={currentTimeString}
           key={v.id}
@@ -181,7 +184,17 @@ const degreesToRadians = angleInDegrees => {
   return (angleInDegrees * Math.PI) / 180.0;
 };
 
-const LineMapVehicle = ({ x, y, time, currentTimeString }): JSX.Element => {
+const LineMapVehicle = ({
+  x,
+  y,
+  height,
+  time,
+  currentTimeString
+}): JSX.Element => {
+  if (y > height) {
+    return null;
+  }
+
   // Parameters
   const centerX = x;
   const centerY = y;
@@ -225,13 +238,37 @@ const LineMapVehicle = ({ x, y, time, currentTimeString }): JSX.Element => {
   const secondDifference = departureTime.diff(currentTime, "seconds");
   const minuteDifference = Math.round(secondDifference / 60);
 
-  let timeString;
-  if (time === null) {
-    timeString = "";
+  let timeLabel;
+  if (time === null || secondDifference < 0) {
+    timeLabel = null;
   } else if (secondDifference < 60) {
-    timeString = "Now";
+    timeLabel = (
+      <text
+        x={x + 20 + 18} // lineWidth / 2 + textMargin
+        y={y + 44} // eyeballed it...
+        fontFamily="neue-haas-grotesk-text"
+        fontSize="40"
+        fontWeight="700"
+        textAnchor="right"
+      >
+        Now
+      </text>
+    );
   } else {
-    timeString = minuteDifference + "m";
+    timeLabel = (
+      <text
+        x={x + 20 + 18} // lineWidth / 2 + textMargin
+        y={y + 44} // eyeballed it...
+        fontFamily="neue-haas-grotesk-text"
+      >
+        <tspan fontSize="40" fontWeight="700" textAnchor="right">
+          {minuteDifference}
+        </tspan>
+        <tspan fontSize="30" fontWeight="400" textAnchor="right" dx="3">
+          m
+        </tspan>
+      </text>
+    );
   }
 
   return (
@@ -248,16 +285,7 @@ const LineMapVehicle = ({ x, y, time, currentTimeString }): JSX.Element => {
         y={centerY - iconSize / 2}
         size={iconSize}
       />
-      <text
-        x={x + 20 + 18} // lineWidth / 2 + textMargin
-        y={y + 44} // eyeballed it...
-        fontFamily="neue-haas-grotesk-text"
-        fontSize="40"
-        fontWeight="700"
-        textAnchor="right"
-      >
-        {timeString}
-      </text>
+      {timeLabel}
     </g>
   );
 };
@@ -277,7 +305,11 @@ const LineMapVehicleIcon = ({ x, y, size }): JSX.Element => {
   );
 };
 
-const LineMap = ({ height, currentTimeString }): JSX.Element => {
+const LineMap = ({ data, height, currentTimeString }): JSX.Element => {
+  if (!data) {
+    return <div className="line-map"></div>;
+  }
+
   const width = 442;
   return (
     <div className="line-map">
@@ -289,6 +321,7 @@ const LineMap = ({ height, currentTimeString }): JSX.Element => {
         xmlns="http://www.w3.org/2000/svg"
       >
         <LineMapLine
+          data={data}
           height={height}
           width={width}
           currentTimeString={currentTimeString}

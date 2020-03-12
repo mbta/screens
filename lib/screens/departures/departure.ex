@@ -43,14 +43,44 @@ defmodule Screens.Departures.Departure do
     }
   end
 
-  def from_prediction(p) do
+  def from_predictions({:ok, predictions}) do
+    {:ok, Enum.map(predictions, &from_prediction/1)}
+  end
+
+  def from_predictions(:error), do: :error
+
+  def from_prediction(%{
+        id: id,
+        stop: %{name: stop_name},
+        route: %{id: route_id, short_name: route_short_name},
+        trip: %{headsign: destination},
+        time: time
+      }) do
     %Screens.Departures.Departure{
-      id: p.id,
-      stop_name: p.stop.name,
-      route_short_name: p.route.short_name,
-      route_id: p.route.id,
-      destination: p.trip.headsign,
-      time: DateTime.to_iso8601(p.time),
+      id: id,
+      stop_name: stop_name,
+      route_short_name: route_short_name,
+      route_id: route_id,
+      destination: destination,
+      time: DateTime.to_iso8601(time),
+      inline_badges: []
+    }
+  end
+
+  def from_prediction(%{
+        id: id,
+        stop: %{name: stop_name},
+        route: %{id: route_id, short_name: route_short_name},
+        trip: nil,
+        time: time
+      }) do
+    %Screens.Departures.Departure{
+      id: id,
+      stop_name: stop_name,
+      route_short_name: route_short_name,
+      route_id: route_id,
+      destination: nil,
+      time: DateTime.to_iso8601(time),
       inline_badges: []
     }
   end

@@ -4,8 +4,10 @@ defmodule Screens.Trips.Trip do
   defstruct id: nil,
             headsign: nil
 
+  @type id :: String.t()
+
   @type t :: %__MODULE__{
-          id: String.t(),
+          id: id,
           headsign: String.t()
         }
 end

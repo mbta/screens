@@ -48,72 +48,84 @@ config :screens,
     "19" => %{stop_id: "8178", app_id: "bus_eink"},
     "101" => %{
       stop_id: "place-bland",
+      platform_id: "70148",
       route_id: "Green-B",
       direction_id: 1,
       app_id: "gl_eink_single"
     },
     "102" => %{
       stop_id: "place-bland",
+      platform_id: "70149",
       route_id: "Green-B",
       direction_id: 0,
       app_id: "gl_eink_single"
     },
     "103" => %{
       stop_id: "place-bcnwa",
+      platform_id: "70230",
       route_id: "Green-C",
       direction_id: 1,
       app_id: "gl_eink_single"
     },
     "104" => %{
       stop_id: "place-bcnwa",
+      platform_id: "70229",
       route_id: "Green-C",
       direction_id: 0,
       app_id: "gl_eink_single"
     },
     "105" => %{
       stop_id: "place-mfa",
+      platform_id: "70246",
       route_id: "Green-E",
       direction_id: 1,
       app_id: "gl_eink_single"
     },
     "106" => %{
       stop_id: "place-mfa",
+      platform_id: "70245",
       route_id: "Green-E",
       direction_id: 0,
       app_id: "gl_eink_single"
     },
     "201" => %{
       stop_id: "place-bland",
+      platform_id: "70148",
       route_id: "Green-B",
       direction_id: 1,
       app_id: "gl_eink_double"
     },
     "202" => %{
       stop_id: "place-bland",
+      platform_id: "70149",
       route_id: "Green-B",
       direction_id: 0,
       app_id: "gl_eink_double"
     },
     "203" => %{
       stop_id: "place-bcnwa",
+      platform_id: "70230",
       route_id: "Green-C",
       direction_id: 1,
       app_id: "gl_eink_double"
     },
     "204" => %{
       stop_id: "place-bcnwa",
+      platform_id: "70229",
       route_id: "Green-C",
       direction_id: 0,
       app_id: "gl_eink_double"
     },
     "205" => %{
       stop_id: "place-mfa",
+      platform_id: "70246",
       route_id: "Green-E",
       direction_id: 1,
       app_id: "gl_eink_double"
     },
     "206" => %{
       stop_id: "place-mfa",
+      platform_id: "70245",
       route_id: "Green-E",
       direction_id: 0,
       app_id: "gl_eink_double"
