@@ -9,9 +9,9 @@ import React, {
 import ConnectionError from "Components/connection_error";
 import DigitalBridge from "Components/digital_bridge";
 import Departures from "Components/eink/green_line/departures";
+import FareInfo from "Components/eink/green_line/fare_info";
 import Header from "Components/eink/green_line/header";
 import LineMap from "Components/eink/green_line/line_map";
-import FareInfo from "Components/fare_info";
 import FlexZoneContainer from "Components/flex_zone_container";
 import OvernightDepartures from "Components/overnight_departures";
 
@@ -153,43 +153,33 @@ const ScreenContainer = ({ id }): JSX.Element => {
     }
   });
 
-  if (success) {
-    if (departures && departures.length > 0) {
-      return (
-        <div>
-          <TopScreenContainer
-            currentTimeString={currentTimeString}
-            stopName={stopName}
-            departures={departures}
-            startIndex={0}
-            endIndex={numRows}
-            stopId={stopId}
-            routeId={routeId}
-            lineMapData={lineMapData}
-            headway={headway}
-            ref={ref}
-          />
-          <BottomScreenContainer
-            currentTimeString={currentTimeString}
-            departures={departures}
-            startIndex={numRows}
-            endIndex={numRows + bottomNumRows}
-            globalAlert={globalAlert}
-            stopId={stopId}
-            nearbyConnections={nearbyConnections}
-            ref={bottomRef}
-          />
-        </div>
-      );
-    } else {
-      // We successfully fetched data, but there are no predictions.
-      // For now, assume that this is because it's the middle of the night.
-      return (
-        <div>
-          <OvernightDepartures currentTimeString={currentTimeString} />
-        </div>
-      );
-    }
+  if (success && departures) {
+    return (
+      <div>
+        <TopScreenContainer
+          currentTimeString={currentTimeString}
+          stopName={stopName}
+          departures={departures}
+          startIndex={0}
+          endIndex={numRows}
+          stopId={stopId}
+          routeId={routeId}
+          lineMapData={lineMapData}
+          headway={headway}
+          ref={ref}
+        />
+        <BottomScreenContainer
+          currentTimeString={currentTimeString}
+          departures={departures}
+          startIndex={numRows}
+          endIndex={numRows + bottomNumRows}
+          globalAlert={globalAlert}
+          stopId={stopId}
+          nearbyConnections={nearbyConnections}
+          ref={bottomRef}
+        />
+      </div>
+    );
   } else {
     // We weren't able to fetch data. Show a connection error message.
     return (

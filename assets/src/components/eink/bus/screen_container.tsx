@@ -9,8 +9,8 @@ import React, {
 import ConnectionError from "Components/connection_error";
 import Departures from "Components/departures";
 import DigitalBridge from "Components/digital_bridge";
+import FareInfo from "Components/eink/bus/fare_info";
 import Header from "Components/eink/bus/header";
-import FareInfo from "Components/fare_info";
 import FlexZoneContainer from "Components/flex_zone_container";
 import OvernightDepartures from "Components/overnight_departures";
 
