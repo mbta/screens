@@ -1,6 +1,7 @@
 .departures {
   display: inline-block;
   width: 758px;
+  height: 1140px;
   vertical-align: top;
 }
 
@@ -9,18 +10,18 @@
   font-size: 72px;
   text-align: right;
   color: #999999;
-  margin-right: 40px;
-  margin-left: 120px;
-  margin-top: 72px;
-  margin-bottom: 72px;
+  padding-right: 40px;
+  padding-left: 120px;
+  padding-top: 72px;
+  padding-bottom: 72px;
 }
 
 .departures__departure {
   font-family: "neue-haas-grotesk-text";
   text-align: right;
-  margin-right: 40px;
-  margin-top: 72px;
-  margin-bottom: 72px;
+  padding-right: 40px;
+  padding-top: 72px;
+  padding-bottom: 72px;
 }
 
 .departures__departure--now {
@@ -33,7 +34,7 @@
   font-size: 336px;
   font-weight: 700;
   line-height: 336px;
-  margin-right: 0.0694em;
+  padding-right: 0.0694em;
 }
 
 .departures__departure--minutes-label {
@@ -52,4 +53,15 @@
   height: 2px;
   width: 718px;
   background: #cccccc;
+}
+
+.departures__container {
+  height: 100%;
+  position: relative;
+}
+
+.departures__delay-badge {
+  position: absolute;
+  bottom: 52px;
+  right: 0px;
 }

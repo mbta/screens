@@ -35,17 +35,17 @@ const TopScreenContainer = forwardRef(
           routeId={routeId}
           currentTimeString={currentTimeString}
         />
-        <LineMap
-          data={lineMapData}
-          height={1140}
-          currentTimeString={currentTimeString}
-        />
-        <Departures
-          departures={departures}
-          headway={headway}
-          destination={stopName}
-          currentTimeString={currentTimeString}
-        />
+          <LineMap
+            data={lineMapData}
+            height={1140}
+            currentTimeString={currentTimeString}
+          />
+          <Departures
+            departures={departures}
+            headway={headway}
+            destination={stopName}
+            currentTimeString={currentTimeString}
+          />
         <DigitalBridge stopId={stopId} />
       </div>
     );

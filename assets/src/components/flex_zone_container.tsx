@@ -1,9 +1,9 @@
 import React, { forwardRef } from "react";
 
-import Departures from "./departures";
-import GlobalAlert from "./global_alert";
-import NearbyConnections from "./nearby_connections";
-import ServiceMap from "./service_map";
+import Departures from "Components/eink/bus/departures";
+import GlobalAlert from "Components/global_alert";
+import NearbyConnections from "Components/nearby_connections";
+import ServiceMap from "Components/service_map";
 
 const FlexZoneContainer = forwardRef(
   (

@@ -7,7 +7,7 @@ import React, {
 } from "react";
 
 import ConnectionError from "Components/connection_error";
-import Departures from "Components/departures";
+import Departures from "Components/eink/bus/departures";
 import DigitalBridge from "Components/digital_bridge";
 import FareInfo from "Components/eink/bus/fare_info";
 import Header from "Components/eink/bus/header";

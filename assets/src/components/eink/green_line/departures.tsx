@@ -2,6 +2,8 @@ import moment from "moment";
 import "moment-timezone";
 import React from "react";
 
+import InlineAlert from "Components/inline_alert";
+
 const Departure = ({ time, currentTimeString }): JSX.Element => {
   const departureTime = moment(time);
   const currentTime = moment(currentTimeString);
@@ -55,25 +57,32 @@ const Departures = ({
   const topDeparture = departures[0];
   const bottomDeparture = departures[1];
 
+  const inlineBadges = [{severity: 3}];
+
   return (
     <div className="departures">
-      {topDeparture ? (
-        <Departure
-          time={topDeparture.time}
-          currentTimeString={currentTimeString}
-        />
-      ) : (
-        <HeadwayMessage destination={destination} headway={headway} />
-      )}
-      <div className="departures__hairline"></div>
-      {bottomDeparture ? (
-        <Departure
-          time={bottomDeparture.time}
-          currentTimeString={currentTimeString}
-        />
-      ) : topDeparture ? (
-        <HeadwayMessage destination={destination} headway={headway} />
-      ) : null}
+      <div className="departures__container">
+        {topDeparture ? (
+          <Departure
+            time={topDeparture.time}
+            currentTimeString={currentTimeString}
+          />
+        ) : (
+          <HeadwayMessage destination={destination} headway={headway} />
+        )}
+        <div className="departures__hairline"></div>
+        {bottomDeparture ? (
+          <Departure
+            time={bottomDeparture.time}
+            currentTimeString={currentTimeString}
+          />
+        ) : topDeparture ? (
+          <HeadwayMessage destination={destination} headway={headway} />
+        ) : null}
+        <div className="departures__delay-badge">
+          <InlineAlert inlineBadges={inlineBadges} />
+        </div>
+      </div>
     </div>
   );
 };
