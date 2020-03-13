@@ -74,6 +74,8 @@ defmodule Screens.GLScreenData do
           nil
       end
 
+    headway_data = Screens.Headways.by_route_id(route_id)
+
     case departures do
       {:ok, departures} ->
         %{
@@ -86,7 +88,8 @@ defmodule Screens.GLScreenData do
           departures: format_departure_rows(departures),
           global_alert: format_global_alert(global_alert),
           nearby_connections: nearby_connections,
-          line_map: line_map_data
+          line_map: line_map_data,
+          headway: headway_data
         }
 
       :error ->

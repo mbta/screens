@@ -25,6 +25,7 @@ const TopScreenContainer = forwardRef(
       endIndex,
       stopId,
       routeId,
+      headway,
       lineMapData
     },
     ref
@@ -43,6 +44,8 @@ const TopScreenContainer = forwardRef(
         />
         <Departures
           departures={departures}
+          headway={headway}
+          destination={stopName}
           currentTimeString={currentTimeString}
         />
       </div>
@@ -91,6 +94,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [globalAlert, setGlobalAlert] = useState();
   const [nearbyConnections, setNearbyConnections] = useState();
   const [lineMapData, setLineMapData] = useState();
+  const [headway, setHeadway] = useState();
 
   const apiVersion = document.getElementById("app").dataset.apiVersion;
 
@@ -112,6 +116,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
       setGlobalAlert(json.global_alert);
       setNearbyConnections(json.nearby_connections);
       setLineMapData(json.line_map);
+      setHeadway(json.headway);
     } catch (err) {
       setSuccess(false);
     }
@@ -161,6 +166,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
             stopId={stopId}
             routeId={routeId}
             lineMapData={lineMapData}
+            headway={headway}
             ref={ref}
           />
           <BottomScreenContainer

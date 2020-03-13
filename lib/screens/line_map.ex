@@ -40,6 +40,7 @@ defmodule Screens.LineMap do
 
     vehicles
     |> Enum.map(&format_vehicle(&1, route_stops, current_stop_index, trip_id_to_time))
+    |> Enum.reject(&is_nil/1)
     |> Enum.reject(fn %{index: index} -> index < 0 end)
   end
 
@@ -52,11 +53,18 @@ defmodule Screens.LineMap do
     vehicle_stop_index =
       Enum.find_index(route_stops, fn %{id: route_stop_id} -> route_stop_id == vehicle_stop_id end)
 
-    index =
-      2 + current_stop_index - vehicle_stop_index + status_adjustment(vehicle_stop_index, status)
+    case vehicle_stop_index do
+      nil ->
+        nil
 
-    time = Map.get(trip_id_to_time, vehicle_trip_id)
-    %{id: id, index: index, time: time}
+      _ ->
+        index =
+          2 + current_stop_index - vehicle_stop_index +
+            status_adjustment(vehicle_stop_index, status)
+
+        time = Map.get(trip_id_to_time, vehicle_trip_id)
+        %{id: id, index: index, time: time}
+    end
   end
 
   defp status_adjustment(0, _), do: 0.0

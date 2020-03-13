@@ -35,7 +35,21 @@ const Departure = ({ time, currentTimeString }): JSX.Element => {
   }
 };
 
-const Departures = ({ departures, currentTimeString }): JSX.Element => {
+const HeadwayMessage = ({ destination, headway }): JSX.Element => {
+  const range = 2;
+  return (
+    <div className="departures__headway-message">
+      Trains to {destination} every {headway - range}-{headway + range} minutes
+    </div>
+  );
+};
+
+const Departures = ({
+  departures,
+  destination,
+  headway,
+  currentTimeString
+}): JSX.Element => {
   departures = departures.slice(0, 2);
 
   const topDeparture = departures[0];
@@ -48,13 +62,17 @@ const Departures = ({ departures, currentTimeString }): JSX.Element => {
           time={topDeparture.time}
           currentTimeString={currentTimeString}
         />
-      ) : null}
+      ) : (
+        <HeadwayMessage destination={destination} headway={headway} />
+      )}
       <div className="departures__hairline"></div>
       {bottomDeparture ? (
         <Departure
           time={bottomDeparture.time}
           currentTimeString={currentTimeString}
         />
+      ) : topDeparture ? (
+        <HeadwayMessage destination={destination} headway={headway} />
       ) : null}
     </div>
   );
