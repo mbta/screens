@@ -305,34 +305,30 @@ const LineMapVehicleIcon = ({ x, y, size }): JSX.Element => {
   );
 };
 
-// const LineMap = ({ data, height, currentTimeString }): JSX.Element => {
-//   if (!data) {
-//     return <div className="line-map"></div>;
-//   }
+const LineMap = ({ data, height, currentTimeString }): JSX.Element => {
+  if (!data) {
+    return <div className="line-map"></div>;
+  }
 
-//   const width = 442;
-//   return (
-//     <div className="line-map">
-//       <svg
-//         width={width + "px"}
-//         height={height + "px"}
-//         viewBox={[0, 0, width, height].join(" ")}
-//         version="1.1"
-//         xmlns="http://www.w3.org/2000/svg"
-//       >
-//         <LineMapLine
-//           data={data}
-//           height={height}
-//           width={width}
-//           currentTimeString={currentTimeString}
-//         />
-//       </svg>
-//     </div>
-//   );
-// };
-
-const LineMap = (): JSX.Element => {
-  return <div className="line-map"></div>;
+  const width = 442;
+  return (
+    <div className="line-map">
+      <svg
+        width={width + "px"}
+        height={height + "px"}
+        viewBox={[0, 0, width, height].join(" ")}
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <LineMapLine
+          data={data}
+          height={height}
+          width={width}
+          currentTimeString={currentTimeString}
+        />
+      </svg>
+    </div>
+  );
 };
 
 export default LineMap;

@@ -35,6 +35,7 @@ defmodule Screens.LineMap do
   defp format_vehicles(vehicles, route_stops, current_stop_index, predictions) do
     trip_id_to_time =
       predictions
+      |> Enum.reject(&is_nil(&1.trip))
       |> Enum.map(fn %{trip: %{id: trip_id}, time: time} -> {trip_id, time} end)
       |> Enum.into(%{})
 
@@ -42,6 +43,19 @@ defmodule Screens.LineMap do
     |> Enum.map(&format_vehicle(&1, route_stops, current_stop_index, trip_id_to_time))
     |> Enum.reject(&is_nil/1)
     |> Enum.reject(fn %{index: index} -> index < 0 end)
+    |> maybe_strip_time()
+  end
+
+  defp maybe_strip_time(vehicles) do
+    if Enum.any?(vehicles, fn v -> v.index > 2 and is_nil(v.time) end) do
+      Enum.map(vehicles, &strip_time/1)
+    else
+      vehicles
+    end
+  end
+
+  defp strip_time(vehicle) do
+    %{vehicle | time: nil}
   end
 
   defp format_vehicle(
