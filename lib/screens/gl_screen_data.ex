@@ -38,18 +38,15 @@ defmodule Screens.GLScreenData do
     #
     # We do this because we still want to return an API response with departures,
     # even if the other API requests fail.
-    {inline_alerts, global_alert} = Alert.by_stop_id(stop_id)
+    {inline_alerts, global_alert} = Alert.by_route_id(route_id, stop_id)
 
     predictions = Screens.Predictions.Prediction.by_stop_id(stop_id, route_id, direction_id)
 
     # If we are unable to fetch departures, we want to show an error message on the screen.
     departures =
       case Departure.from_predictions(predictions) do
-        {:ok, result} ->
-          {:ok, Departure.associate_alerts_with_departures(result, inline_alerts)}
-
-        :error ->
-          :error
+        {:ok, result} -> {:ok, result}
+        :error -> :error
       end
 
     nearby_connections_data = NearbyConnections.by_stop_id(stop_id)
@@ -87,6 +84,7 @@ defmodule Screens.GLScreenData do
           route_id: route_id,
           departures: format_departure_rows(departures),
           global_alert: format_global_alert(global_alert),
+          inline_alert: format_inline_alert(inline_alerts),
           nearby_connections: nearby_connections,
           line_map: line_map_data,
           headway: headway_data
@@ -110,5 +108,13 @@ defmodule Screens.GLScreenData do
 
   def format_global_alert(alert) do
     Alert.to_map(alert)
+  end
+
+  defp format_inline_alert([alert | _]) do
+    %{severity: alert.severity}
+  end
+
+  defp format_inline_alert(_) do
+    nil
   end
 end

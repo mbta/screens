@@ -352,4 +352,24 @@ defmodule Screens.Alerts.Alert do
   defp bus_route_informed_entity(_) do
     []
   end
+
+  ###
+  defp fetch_alerts_for_route_id(route_id) do
+    case Screens.V3Api.get_json("alerts", %{"filter[route]" => route_id}) do
+      {:ok, result} -> {:ok, result}
+      _ -> :error
+    end
+  end
+
+  def by_route_id(route_id, stop_id) do
+    {inline_alerts, global_alerts} =
+      route_id
+      |> fetch_alerts_for_route_id()
+      |> Screens.Alerts.Parser.parse_result()
+      |> split_inline_alerts()
+
+    global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
+
+    {inline_alerts, global_alert}
+  end
 end

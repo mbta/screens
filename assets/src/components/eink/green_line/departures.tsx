@@ -2,7 +2,7 @@ import moment from "moment";
 import "moment-timezone";
 import React from "react";
 
-import InlineAlert from "Components/inline_alert";
+import InlineAlert from "Components/eink/green_line/inline_alert";
 
 const Departure = ({ time, currentTimeString }): JSX.Element => {
   const departureTime = moment(time);
@@ -50,14 +50,13 @@ const Departures = ({
   departures,
   destination,
   headway,
+  inlineAlert,
   currentTimeString
 }): JSX.Element => {
   departures = departures.slice(0, 2);
 
   const topDeparture = departures[0];
   const bottomDeparture = departures[1];
-
-  const inlineBadges = [{severity: 3}];
 
   return (
     <div className="departures">
@@ -80,7 +79,7 @@ const Departures = ({
           <HeadwayMessage destination={destination} headway={headway} />
         ) : null}
         <div className="departures__delay-badge">
-          <InlineAlert inlineBadges={inlineBadges} />
+          <InlineAlert alertData={inlineAlert} />
         </div>
       </div>
     </div>

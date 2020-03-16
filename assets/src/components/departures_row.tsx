@@ -1,8 +1,8 @@
 import React from "react";
 
+import InlineAlert from "Components/eink/bus/inline_alert";
 import { classWithSize } from "../util";
 import DepartureRow from "./departure_row";
-import InlineAlert from "./inline_alert";
 
 const DeparturesRow = ({
   currentTimeString,

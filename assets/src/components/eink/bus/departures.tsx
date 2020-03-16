@@ -1,5 +1,5 @@
-import React, { forwardRef } from "react";
 import DeparturesRow from "Components/departures_row";
+import React, { forwardRef } from "react";
 
 const buildDeparturesRows = departures => {
   if (!departures) {

@@ -7,8 +7,8 @@ import React, {
 } from "react";
 
 import ConnectionError from "Components/connection_error";
-import Departures from "Components/eink/bus/departures";
 import DigitalBridge from "Components/digital_bridge";
+import Departures from "Components/eink/bus/departures";
 import FareInfo from "Components/eink/bus/fare_info";
 import Header from "Components/eink/bus/header";
 import FlexZoneContainer from "Components/flex_zone_container";

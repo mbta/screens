@@ -24,7 +24,8 @@ const TopScreenContainer = forwardRef(
       stopId,
       routeId,
       lineMapData,
-      headway
+      headway,
+      inlineAlert
     },
     ref
   ): JSX.Element => {
@@ -35,17 +36,18 @@ const TopScreenContainer = forwardRef(
           routeId={routeId}
           currentTimeString={currentTimeString}
         />
-          <LineMap
-            data={lineMapData}
-            height={1140}
-            currentTimeString={currentTimeString}
-          />
-          <Departures
-            departures={departures}
-            headway={headway}
-            destination={stopName}
-            currentTimeString={currentTimeString}
-          />
+        <LineMap
+          data={lineMapData}
+          height={1140}
+          currentTimeString={currentTimeString}
+        />
+        <Departures
+          departures={departures}
+          headway={headway}
+          destination={stopName}
+          inlineAlert={inlineAlert}
+          currentTimeString={currentTimeString}
+        />
         <DigitalBridge stopId={stopId} />
       </div>
     );
@@ -63,6 +65,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [nearbyConnections, setNearbyConnections] = useState();
   const [lineMapData, setLineMapData] = useState();
   const [headway, setHeadway] = useState();
+  const [inlineAlert, setInlineAlert] = useState();
 
   const apiVersion = document.getElementById("app").dataset.apiVersion;
 
@@ -82,6 +85,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
       setRouteId(json.route_id);
       setDepartures(json.departures);
       setGlobalAlert(json.global_alert);
+      setInlineAlert(json.inline_alert);
       setNearbyConnections(json.nearby_connections);
       setLineMapData(json.line_map);
       setHeadway(json.headway);
@@ -134,6 +138,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
           routeId={routeId}
           lineMapData={lineMapData}
           headway={headway}
+          inlineAlert={inlineAlert}
           ref={ref}
         />
       </div>
