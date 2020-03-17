@@ -100,7 +100,7 @@ const NearbyDeparturesRow = ({
 };
 
 const NearbyDepartures = ({ data, currentTimeString }): JSX.Element => {
-  if (!data || data.length === 0) {
+  if (!data || data.length === 0 || data.includes(null)) {
     return null;
   }
 

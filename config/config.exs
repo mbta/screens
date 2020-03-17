@@ -90,13 +90,6 @@ config :screens,
       direction_id: 0,
       app_id: "gl_eink_single"
     },
-    "107" => %{
-      stop_id: "place-newto",
-      platform_id: "70171",
-      route_id: "Green-D",
-      direction_id: 0,
-      app_id: "gl_eink_single"
-    },
     "201" => %{
       stop_id: "place-bland",
       platform_id: "70148",
@@ -136,13 +129,6 @@ config :screens,
       stop_id: "place-mfa",
       platform_id: "70245",
       route_id: "Green-E",
-      direction_id: 0,
-      app_id: "gl_eink_double"
-    },
-    "207" => %{
-      stop_id: "place-newto",
-      platform_id: "70171",
-      route_id: "Green-D",
       direction_id: 0,
       app_id: "gl_eink_double"
     }

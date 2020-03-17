@@ -33,4 +33,6 @@ defmodule Screens.NearbyDepartures do
       destination: destination
     }
   end
+
+  defp format_prediction(_), do: nil
 end

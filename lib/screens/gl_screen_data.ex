@@ -73,7 +73,7 @@ defmodule Screens.GLScreenData do
           nil
       end
 
-    headway_data = Screens.Headways.by_route_id(route_id)
+    headway_data = Screens.Headways.by_route_id(route_id, stop_id, direction_id)
 
     case departures do
       {:ok, departures} ->
