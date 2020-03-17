@@ -158,7 +158,10 @@ const ScreenContainer = ({ id }): JSX.Element => {
       // For now, assume that this is because it's the middle of the night.
       return (
         <div>
-          <OvernightDepartures currentTimeString={currentTimeString} />
+          <OvernightDepartures
+            size="double"
+            currentTimeString={currentTimeString}
+          />
         </div>
       );
     }

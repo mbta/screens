@@ -126,23 +126,34 @@ const ScreenContainer = ({ id }): JSX.Element => {
   });
 
   if (success && departures) {
-    return (
-      <div>
-        <TopScreenContainer
-          stopId={stopId}
-          currentTimeString={currentTimeString}
-          stopName={stopName}
-          departures={departures}
-          startIndex={0}
-          endIndex={numRows}
-          routeId={routeId}
-          lineMapData={lineMapData}
-          headway={headway}
-          inlineAlert={inlineAlert}
-          ref={ref}
-        />
-      </div>
-    );
+    if (departures.length === 0 && headway === null) {
+      return (
+        <div>
+          <OvernightDepartures
+            size="single"
+            currentTimeString={currentTimeString}
+          />
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <TopScreenContainer
+            stopId={stopId}
+            currentTimeString={currentTimeString}
+            stopName={stopName}
+            departures={departures}
+            startIndex={0}
+            endIndex={numRows}
+            routeId={routeId}
+            lineMapData={lineMapData}
+            headway={headway}
+            inlineAlert={inlineAlert}
+            ref={ref}
+          />
+        </div>
+      );
+    }
   } else {
     // We weren't able to fetch data. Show a connection error message.
     return (

@@ -164,34 +164,45 @@ const ScreenContainer = ({ id }): JSX.Element => {
   });
 
   if (success && departures) {
-    return (
-      <div>
-        <TopScreenContainer
-          currentTimeString={currentTimeString}
-          stopName={stopName}
-          departures={departures}
-          startIndex={0}
-          endIndex={numRows}
-          stopId={stopId}
-          routeId={routeId}
-          lineMapData={lineMapData}
-          headway={headway}
-          inlineAlert={inlineAlert}
-          ref={ref}
-        />
-        <BottomScreenContainer
-          currentTimeString={currentTimeString}
-          departures={[]}
-          startIndex={numRows}
-          endIndex={numRows + bottomNumRows}
-          globalAlert={globalAlert}
-          stopId={stopId}
-          nearbyConnections={nearbyConnections}
-          nearbyDepartures={nearbyDepartures}
-          ref={bottomRef}
-        />
-      </div>
-    );
+    if (departures.length === 0 && headway === null) {
+      return (
+        <div>
+          <OvernightDepartures
+            size="double"
+            currentTimeString={currentTimeString}
+          />
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <TopScreenContainer
+            currentTimeString={currentTimeString}
+            stopName={stopName}
+            departures={departures}
+            startIndex={0}
+            endIndex={numRows}
+            stopId={stopId}
+            routeId={routeId}
+            lineMapData={lineMapData}
+            headway={headway}
+            inlineAlert={inlineAlert}
+            ref={ref}
+          />
+          <BottomScreenContainer
+            currentTimeString={currentTimeString}
+            departures={[]}
+            startIndex={numRows}
+            endIndex={numRows + bottomNumRows}
+            globalAlert={globalAlert}
+            stopId={stopId}
+            nearbyConnections={nearbyConnections}
+            nearbyDepartures={nearbyDepartures}
+            ref={bottomRef}
+          />
+        </div>
+      );
+    }
   } else {
     // We weren't able to fetch data. Show a connection error message.
     return (
