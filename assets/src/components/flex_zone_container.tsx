@@ -4,6 +4,7 @@ import Departures from "Components/eink/bus/departures";
 import GlobalAlert from "Components/global_alert";
 import NearbyConnections from "Components/nearby_connections";
 import ServiceMap from "Components/service_map";
+import TakeoverAlert from "Components/takeover_alert";
 
 const FlexZoneContainer = forwardRef(
   (
@@ -13,7 +14,8 @@ const FlexZoneContainer = forwardRef(
       startIndex,
       endIndex,
       globalAlert,
-      nearbyConnections
+      nearbyConnections,
+      serviceLevel
     },
     ref
   ): JSX.Element => {
@@ -28,7 +30,13 @@ const FlexZoneContainer = forwardRef(
     let topComponent;
     let bottomComponent;
 
-    if (showLaterDepartures && globalAlert) {
+    if (serviceLevel > 1) {
+      return (
+        <div className="flex-zone__container">
+          <TakeoverAlert />
+        </div>
+      );
+    } else if (showLaterDepartures && globalAlert) {
       // Later Departures + Alert
       topComponent = (
         <Departures

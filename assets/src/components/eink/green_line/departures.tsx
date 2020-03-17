@@ -3,6 +3,7 @@ import "moment-timezone";
 import React from "react";
 
 import InlineAlert from "Components/eink/green_line/inline_alert";
+import TakeoverInlineAlert from "Components/eink/green_line/takeover_inline_alert";
 
 const Departure = ({ time, currentTimeString }): JSX.Element => {
   const departureTime = moment(time);
@@ -51,7 +52,8 @@ const Departures = ({
   destination,
   headway,
   inlineAlert,
-  currentTimeString
+  currentTimeString,
+  serviceLevel
 }): JSX.Element => {
   departures = departures.slice(0, 2);
 
@@ -79,7 +81,11 @@ const Departures = ({
           <HeadwayMessage destination={destination} headway={headway} />
         ) : null}
         <div className="departures__delay-badge">
-          <InlineAlert alertData={inlineAlert} />
+          {serviceLevel > 1 ? (
+            <TakeoverInlineAlert />
+          ) : (
+            <InlineAlert alertData={inlineAlert} />
+          )}
         </div>
       </div>
     </div>
