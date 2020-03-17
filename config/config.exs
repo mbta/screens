@@ -148,6 +148,12 @@ config :screens,
     }
   },
   api_v3_url: "https://api-v3.mbta.com/",
+  nearby_departures: %{
+    "place-bland" => ["941", "951"],
+    "place-bcnwa" => ["1276", "1292"],
+    "place-mfa" => ["51317", "71391"],
+    "place-newto" => ["8504", "8528"]
+  },
   nearby_connections: %{
     "1722" => ["place-matt", "place-DB-2222"],
     "383" => ["2923", "568"],

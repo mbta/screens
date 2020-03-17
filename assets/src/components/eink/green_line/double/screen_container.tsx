@@ -13,6 +13,8 @@ import FareInfo from "Components/eink/green_line/fare_info";
 import Header from "Components/eink/green_line/header";
 import LineMap from "Components/eink/green_line/line_map";
 import FlexZoneContainer from "Components/flex_zone_container";
+import GlobalAlert from "Components/global_alert";
+import NearbyDepartures from "Components/nearby_departures";
 import OvernightDepartures from "Components/overnight_departures";
 
 const TopScreenContainer = forwardRef(
@@ -64,21 +66,23 @@ const BottomScreenContainer = forwardRef(
       endIndex,
       globalAlert,
       stopId,
-      nearbyConnections
+      nearbyDepartures
     },
     ref
   ): JSX.Element => {
     return (
       <div className="single-screen-container">
-        <FlexZoneContainer
-          currentTimeString={currentTimeString}
-          departures={departures}
-          startIndex={startIndex}
-          endIndex={endIndex}
-          globalAlert={globalAlert}
-          nearbyConnections={nearbyConnections}
-          ref={ref}
-        />
+        <div className="flex-zone__container">
+          <div className="flex-zone__top-container">
+            <NearbyDepartures
+              data={nearbyDepartures}
+              currentTimeString={currentTimeString}
+            />
+          </div>
+          <div className="flex-zone__bottom-container">
+            {globalAlert ? <GlobalAlert alert={globalAlert} /> : null}
+          </div>
+        </div>
         <FareInfo />
         <DigitalBridge stopId={stopId} />
       </div>
@@ -95,6 +99,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [departures, setDepartures] = useState();
   const [globalAlert, setGlobalAlert] = useState();
   const [nearbyConnections, setNearbyConnections] = useState();
+  const [nearbyDepartures, setNearbyDepartures] = useState();
   const [lineMapData, setLineMapData] = useState();
   const [headway, setHeadway] = useState();
   const [inlineAlert, setInlineAlert] = useState();
@@ -119,6 +124,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
       setGlobalAlert(json.global_alert);
       setInlineAlert(json.inline_alert);
       setNearbyConnections(json.nearby_connections);
+      setNearbyDepartures(json.nearby_departures);
       setLineMapData(json.line_map);
       setHeadway(json.headway);
     } catch (err) {
@@ -181,6 +187,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
           globalAlert={globalAlert}
           stopId={stopId}
           nearbyConnections={nearbyConnections}
+          nearbyDepartures={nearbyDepartures}
           ref={bottomRef}
         />
       </div>

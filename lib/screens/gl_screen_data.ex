@@ -57,6 +57,8 @@ defmodule Screens.GLScreenData do
         _ -> []
       end
 
+    nearby_departures = Screens.NearbyDepartures.by_stop_id(stop_id)
+
     # Move this and make it less brittle
     {:ok, %{direction_destinations: destinations}} = Screens.Routes.Route.by_id(route_id)
     destination = Enum.at(destinations, direction_id)
@@ -86,6 +88,7 @@ defmodule Screens.GLScreenData do
           global_alert: format_global_alert(global_alert),
           inline_alert: format_inline_alert(inline_alerts),
           nearby_connections: nearby_connections,
+          nearby_departures: nearby_departures,
           line_map: line_map_data,
           headway: headway_data
         }
