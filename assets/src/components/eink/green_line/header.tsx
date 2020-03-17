@@ -2,9 +2,25 @@ import moment from "moment";
 import "moment-timezone";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
-import { classWithSize } from "../util";
+import { classWithSize } from "Util";
 
-const Header = ({ stopName, currentTimeString }): JSX.Element => {
+const iconForRoute = routeId => {
+  if (routeId === "Green-B") {
+    return "/images/GL-B.svg";
+  }
+  if (routeId === "Green-C") {
+    return "/images/GL-C.svg";
+  }
+  if (routeId === "Green-D") {
+    return "/images/GL-D.svg";
+  }
+  if (routeId === "Green-E") {
+    return "/images/GL-E.svg";
+  }
+  return "/images/logo-white.svg";
+};
+
+const Header = ({ stopName, routeId, currentTimeString }): JSX.Element => {
   const SIZES = ["small", "large"];
   const MAX_HEIGHT = 216;
 
@@ -39,11 +55,19 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
         ></img>
         UPDATED LIVE EVERY MINUTE
       </div>
-      <div
-        className={classWithSize("header__stop-name", SIZES[stopSize])}
-        ref={ref}
-      >
-        {stopName}
+      <div className="header__stop-container">
+        <div className="header__stop-container-route">
+          <img
+            className="header__stop-container-route-image"
+            src={iconForRoute(routeId)}
+          ></img>
+        </div>
+        <div
+          className={classWithSize("header__stop-name", SIZES[stopSize])}
+          ref={ref}
+        >
+          {stopName}
+        </div>
       </div>
     </div>
   );

@@ -22,6 +22,8 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 config :screens, :redirect_http?, true
 
 config :screens,
@@ -46,10 +48,98 @@ config :screens,
     "17" => %{stop_id: "5605", app_id: "bus_eink"},
     "18" => %{stop_id: "637", app_id: "bus_eink"},
     "19" => %{stop_id: "8178", app_id: "bus_eink"},
-    "101" => %{stop_id: "70148", app_id: "gl_eink_single"},
-    "102" => %{stop_id: "70149", app_id: "gl_eink_double"}
+    "101" => %{
+      stop_id: "place-bland",
+      platform_id: "70148",
+      route_id: "Green-B",
+      direction_id: 1,
+      app_id: "gl_eink_single"
+    },
+    "102" => %{
+      stop_id: "place-bland",
+      platform_id: "70149",
+      route_id: "Green-B",
+      direction_id: 0,
+      app_id: "gl_eink_single"
+    },
+    "103" => %{
+      stop_id: "place-bcnwa",
+      platform_id: "70230",
+      route_id: "Green-C",
+      direction_id: 1,
+      app_id: "gl_eink_single"
+    },
+    "104" => %{
+      stop_id: "place-bcnwa",
+      platform_id: "70229",
+      route_id: "Green-C",
+      direction_id: 0,
+      app_id: "gl_eink_single"
+    },
+    "105" => %{
+      stop_id: "place-mfa",
+      platform_id: "70246",
+      route_id: "Green-E",
+      direction_id: 1,
+      app_id: "gl_eink_single"
+    },
+    "106" => %{
+      stop_id: "place-mfa",
+      platform_id: "70245",
+      route_id: "Green-E",
+      direction_id: 0,
+      app_id: "gl_eink_single"
+    },
+    "201" => %{
+      stop_id: "place-bland",
+      platform_id: "70148",
+      route_id: "Green-B",
+      direction_id: 1,
+      app_id: "gl_eink_double"
+    },
+    "202" => %{
+      stop_id: "place-bland",
+      platform_id: "70149",
+      route_id: "Green-B",
+      direction_id: 0,
+      app_id: "gl_eink_double"
+    },
+    "203" => %{
+      stop_id: "place-bcnwa",
+      platform_id: "70230",
+      route_id: "Green-C",
+      direction_id: 1,
+      app_id: "gl_eink_double"
+    },
+    "204" => %{
+      stop_id: "place-bcnwa",
+      platform_id: "70229",
+      route_id: "Green-C",
+      direction_id: 0,
+      app_id: "gl_eink_double"
+    },
+    "205" => %{
+      stop_id: "place-mfa",
+      platform_id: "70246",
+      route_id: "Green-E",
+      direction_id: 1,
+      app_id: "gl_eink_double"
+    },
+    "206" => %{
+      stop_id: "place-mfa",
+      platform_id: "70245",
+      route_id: "Green-E",
+      direction_id: 0,
+      app_id: "gl_eink_double"
+    }
   },
   api_v3_url: "https://api-v3.mbta.com/",
+  nearby_departures: %{
+    "place-bland" => ["941", "951"],
+    "place-bcnwa" => ["1276", "1292"],
+    "place-mfa" => ["51317", "71391"],
+    "place-newto" => ["8504", "8528"]
+  },
   nearby_connections: %{
     "1722" => ["place-matt", "place-DB-2222"],
     "383" => ["2923", "568"],
@@ -71,8 +161,10 @@ config :screens,
     "637" => ["6428", "place-NB-0064"],
     "8178" => ["900", "8297"],
     # Empty placeholders until we decide what to do about nearby connections/departures
-    "70148" => [],
-    "70149" => []
+    "place-bland" => [],
+    "place-bcnwa" => [],
+    "place-mfa" => [],
+    "place-newto" => []
   },
   routes_at_stop: %{
     "110" => ["1", "68", "69"],

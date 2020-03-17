@@ -1,0 +1,152 @@
+// nearby-departures
+.nearby-departures {
+}
+
+.nearby-departures__header {
+  height: 128px;
+  padding-top: 32px;
+}
+
+.nearby-departures__icon-container {
+  display: inline-block;
+  width: 208px;
+  vertical-align: top;
+}
+
+.nearby-departures__icon-image {
+  height: 128px;
+  width: 128px;
+  margin: 0px 40px 32px 40px;
+}
+
+.nearby-departures__header-text {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 72px;
+  line-height: 72px;
+  margin-top: 22px;
+  font-family: neue-haas-grotesk-text;
+  font-weight: 700;
+}
+
+.nearby-departures__hairline {
+  height: 1px;
+  background-color: #808080;
+  margin-left: 208px;
+  margin-right: 40px;
+}
+
+// nearby-departures-row
+.nearby-departures-row {
+}
+
+.nearby-departures-row__header {
+  margin-left: 208px;
+  margin-right: 40px;
+  margin-top: 18px;
+}
+
+.nearby-departures-row__body {
+  margin-left: 208px;
+  margin-right: 40px;
+  margin-top: 18px;
+  margin-bottom: 24px;
+  display: inline-block;
+}
+
+.nearby-departures-row__stop-name {
+  display: inline-block;
+  font-size: 44px;
+  line-height: 54px;
+  font-family: neue-haas-grotesk-text;
+  font-weight: 700;
+}
+
+.nearby-departures-row__routes {
+  margin-left: 208px;
+  margin-top: 25px;
+  margin-bottom: 34px;
+  margin-right: 32px;
+}
+
+// nearby-departures-route
+.nearby-departures-route {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.nearby-departures-route__pill {
+  font-family: neue-haas-grotesk-text;
+  background: black;
+  border-radius: 54px;
+  text-align: center;
+  width: 178px;
+  height: 86px;
+  border-radius: 72px;
+  margin-right: 32px;
+}
+
+.nearby-departures-route__text {
+  color: white;
+  display: inline-block;
+  font-weight: 700;
+  font-size: 72px;
+  line-height: 86px;
+  letter-spacing: 2px;
+}
+
+.nearby-departures-destination {
+  display: inline-block;
+  vertical-align: middle;
+  font-family: neue-haas-grotesk-text;
+  width: 500px;
+}
+
+.nearby-departures-destination__primary {
+  line-height: 1em;
+  font-weight: 500;
+  font-size: 54px;
+}
+
+.nearby-departures-destination__secondary {
+  font-size: 33px;
+  line-height: 36px;
+  font-weight: 400;
+}
+
+.nearby-departures-time {
+  display: inline-block;
+  vertical-align: middle;
+  font-family: neue-haas-grotesk-text;
+  text-align: right;
+  width: 242px;
+}
+
+.nearby-departures-time__now {
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1.185em;
+}
+
+.nearby-departures-time__minutes {
+  font-size: 72px;
+  font-weight: 700;
+  margin-right: 0.0694em;
+  line-height: 1.185em;
+}
+
+.nearby-departures-time__minutes-label {
+  font-size: 52.5px;
+  line-height: 72px;
+}
+
+.nearby-departures-time__timestamp {
+  font-size: 72px;
+  line-height: 72px;
+  font-weight: 700;
+}
+
+.nearby-departures-time__ampm {
+  font-size: 52.5px;
+  line-height: 72px;
+}

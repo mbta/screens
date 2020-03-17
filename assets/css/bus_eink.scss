@@ -5,18 +5,19 @@
 @import "departure_route";
 @import "departure_row";
 @import "departure_time";
-@import "departures";
 @import "departures_row";
 @import "digital_bridge";
 @import "fare_info";
 @import "flex_zone";
 @import "global_alert";
-@import "header";
+@import "eink/bus/header";
 @import "inline_alert";
 @import "nearby_connections";
 @import "overnight_departures";
 @import "screen_container";
 @import "screen_page";
+
+@import "eink/bus/departures";
 
 body {
   margin: 0px;

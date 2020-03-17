@@ -1,6 +1,6 @@
+import ScreenContainer from "Components/eink/green_line/single/screen_container";
 import React from "react";
 import { useParams } from "react-router-dom";
-import ScreenContainer from "./screen_container";
 
 const MultiScreenPage = (): JSX.Element => {
   const screenIds = JSON.parse(

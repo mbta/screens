@@ -6,13 +6,13 @@ import React, {
   useState
 } from "react";
 
-import ConnectionError from "./connection_error";
-import Departures from "./departures";
-import DigitalBridge from "./digital_bridge";
-import FareInfo from "./fare_info";
-import FlexZoneContainer from "./flex_zone_container";
-import Header from "./header";
-import OvernightDepartures from "./overnight_departures";
+import ConnectionError from "Components/connection_error";
+import DigitalBridge from "Components/digital_bridge";
+import Departures from "Components/eink/bus/departures";
+import FareInfo from "Components/eink/bus/fare_info";
+import Header from "Components/eink/bus/header";
+import FlexZoneContainer from "Components/flex_zone_container";
+import OvernightDepartures from "Components/overnight_departures";
 
 const TopScreenContainer = forwardRef(
   (
@@ -158,7 +158,10 @@ const ScreenContainer = ({ id }): JSX.Element => {
       // For now, assume that this is because it's the middle of the night.
       return (
         <div>
-          <OvernightDepartures currentTimeString={currentTimeString} />
+          <OvernightDepartures
+            size="double"
+            currentTimeString={currentTimeString}
+          />
         </div>
       );
     }
