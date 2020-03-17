@@ -73,7 +73,9 @@ defmodule Screens.GLScreenData do
           nil
       end
 
-    headway_data = Screens.Headways.by_route_id(route_id, stop_id, direction_id)
+    service_level = Screens.Override.State.green_line_service()
+
+    headway_data = Screens.Headways.by_route_id(route_id, stop_id, direction_id, service_level)
 
     case departures do
       {:ok, departures} ->
@@ -90,7 +92,8 @@ defmodule Screens.GLScreenData do
           nearby_connections: nearby_connections,
           nearby_departures: nearby_departures,
           line_map: line_map_data,
-          headway: headway_data
+          headway: headway_data,
+          service_level: service_level
         }
 
       :error ->

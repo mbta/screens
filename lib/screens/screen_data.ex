@@ -55,6 +55,8 @@ defmodule Screens.ScreenData do
 
     stop_name = extract_stop_name(nearby_connections_data, departures)
 
+    service_level = Screens.Override.State.bus_service()
+
     case departures do
       {:ok, departures} ->
         %{
@@ -65,7 +67,8 @@ defmodule Screens.ScreenData do
           stop_id: stop_id,
           departures: format_departure_rows(departures),
           global_alert: format_global_alert(global_alert),
-          nearby_connections: nearby_connections
+          nearby_connections: nearby_connections,
+          service_level: service_level
         }
 
       :error ->
