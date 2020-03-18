@@ -25,7 +25,8 @@ const TopScreenContainer = forwardRef(
       routeId,
       lineMapData,
       headway,
-      inlineAlert
+      inlineAlert,
+      serviceLevel
     },
     ref
   ): JSX.Element => {
@@ -47,6 +48,7 @@ const TopScreenContainer = forwardRef(
           destination={stopName}
           inlineAlert={inlineAlert}
           currentTimeString={currentTimeString}
+          serviceLevel={serviceLevel}
         />
         <DigitalBridge stopId={stopId} />
       </div>
@@ -66,6 +68,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [lineMapData, setLineMapData] = useState();
   const [headway, setHeadway] = useState();
   const [inlineAlert, setInlineAlert] = useState();
+  const [serviceLevel, setServiceLevel] = useState(1);
 
   const apiVersion = document.getElementById("app").dataset.apiVersion;
 
@@ -89,6 +92,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
       setNearbyConnections(json.nearby_connections);
       setLineMapData(json.line_map);
       setHeadway(json.headway);
+      setServiceLevel(json.service_level);
     } catch (err) {
       setSuccess(false);
     }
@@ -149,6 +153,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
             lineMapData={lineMapData}
             headway={headway}
             inlineAlert={inlineAlert}
+            serviceLevel={serviceLevel}
             ref={ref}
           />
         </div>

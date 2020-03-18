@@ -16,6 +16,7 @@ import FlexZoneContainer from "Components/flex_zone_container";
 import GlobalAlert from "Components/global_alert";
 import NearbyDepartures from "Components/nearby_departures";
 import OvernightDepartures from "Components/overnight_departures";
+import TakeoverAlert from "Components/takeover_alert";
 
 const TopScreenContainer = forwardRef(
   (
@@ -66,10 +67,23 @@ const BottomScreenContainer = forwardRef(
       endIndex,
       globalAlert,
       stopId,
-      nearbyDepartures
+      nearbyDepartures,
+      serviceLevel
     },
     ref
   ): JSX.Element => {
+    if (serviceLevel > 1) {
+      return (
+        <div className="single-screen-container">
+          <div className="flex-zone__container">
+            <TakeoverAlert />
+          </div>
+          <FareInfo />
+          <DigitalBridge stopId={stopId} />
+        </div>
+      );
+    }
+
     return (
       <div className="single-screen-container">
         <div className="flex-zone__container">
@@ -103,6 +117,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [lineMapData, setLineMapData] = useState();
   const [headway, setHeadway] = useState();
   const [inlineAlert, setInlineAlert] = useState();
+  const [serviceLevel, setServiceLevel] = useState(1);
 
   const apiVersion = document.getElementById("app").dataset.apiVersion;
 
@@ -127,6 +142,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
       setNearbyDepartures(json.nearby_departures);
       setLineMapData(json.line_map);
       setHeadway(json.headway);
+      setServiceLevel(json.service_level);
     } catch (err) {
       setSuccess(false);
     }
@@ -198,6 +214,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
             stopId={stopId}
             nearbyConnections={nearbyConnections}
             nearbyDepartures={nearbyDepartures}
+            serviceLevel={serviceLevel}
             ref={bottomRef}
           />
         </div>

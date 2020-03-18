@@ -44,7 +44,8 @@ const BottomScreenContainer = forwardRef(
       endIndex,
       globalAlert,
       stopId,
-      nearbyConnections
+      nearbyConnections,
+      serviceLevel
     },
     ref
   ): JSX.Element => {
@@ -57,6 +58,7 @@ const BottomScreenContainer = forwardRef(
           endIndex={endIndex}
           globalAlert={globalAlert}
           nearbyConnections={nearbyConnections}
+          serviceLevel={serviceLevel}
           ref={ref}
         />
         <FareInfo />
@@ -74,6 +76,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const [departures, setDepartures] = useState();
   const [globalAlert, setGlobalAlert] = useState();
   const [nearbyConnections, setNearbyConnections] = useState();
+  const [serviceLevel, setServiceLevel] = useState(1);
 
   const apiVersion = document.getElementById("app").dataset.apiVersion;
 
@@ -93,6 +96,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
       setDepartures(json.departures);
       setGlobalAlert(json.global_alert);
       setNearbyConnections(json.nearby_connections);
+      setServiceLevel(json.service_level);
     } catch (err) {
       setSuccess(false);
     }
@@ -149,6 +153,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
             globalAlert={globalAlert}
             stopId={stopId}
             nearbyConnections={nearbyConnections}
+            serviceLevel={serviceLevel}
             ref={bottomRef}
           />
         </div>

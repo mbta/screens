@@ -3,7 +3,12 @@ defmodule Screens.Override.State do
 
   @initial_fetch_wait_ms 500
   @refresh_ms 15 * 1000
-  @default_config %{globally_disabled: false, disabled_screen_ids: MapSet.new()}
+  @default_config %{
+    globally_disabled: false,
+    disabled_screen_ids: MapSet.new(),
+    bus_service: 1,
+    green_line_service: 1
+  }
 
   use GenServer
 
@@ -13,6 +18,14 @@ defmodule Screens.Override.State do
 
   def lookup(pid \\ __MODULE__, screen_id) do
     GenServer.call(pid, {:lookup, screen_id})
+  end
+
+  def bus_service(pid \\ __MODULE__) do
+    GenServer.call(pid, :bus_service)
+  end
+
+  def green_line_service(pid \\ __MODULE__) do
+    GenServer.call(pid, :green_line_service)
   end
 
   def schedule_refresh(pid, ms \\ @refresh_ms) do
@@ -39,6 +52,14 @@ defmodule Screens.Override.State do
         %{globally_disabled: false, disabled_screen_ids: disabled_screen_ids} = state
       ) do
     {:reply, MapSet.member?(disabled_screen_ids, screen_id), state}
+  end
+
+  def handle_call(:bus_service, _from, %{bus_service: bus_service} = state) do
+    {:reply, bus_service, state}
+  end
+
+  def handle_call(:green_line_service, _from, %{green_line_service: green_line_service} = state) do
+    {:reply, green_line_service, state}
   end
 
   @impl true
