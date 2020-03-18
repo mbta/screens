@@ -7,17 +7,23 @@ defmodule Screens.NearbyDepartures do
       |> Application.get_env(:nearby_departures)
       |> Map.get(stop_id)
 
-    {:ok, predictions} =
+    prediction_result =
       nearby_departure_stop_ids
       |> Enum.join(",")
       |> Screens.Predictions.Prediction.by_stop_id()
 
-    predictions
-    |> Enum.group_by(& &1.stop.id)
-    |> Enum.map(fn {stop_id, prediction_list} ->
-      {stop_id, Enum.min_by(prediction_list, & &1.time)}
-    end)
-    |> Enum.map(fn {_stop_id, prediction} -> format_prediction(prediction) end)
+    case prediction_result do
+      {:ok, predictions} ->
+        predictions
+        |> Enum.group_by(& &1.stop.id)
+        |> Enum.map(fn {stop_id, prediction_list} ->
+          {stop_id, Enum.min_by(prediction_list, & &1.time)}
+        end)
+        |> Enum.map(fn {_stop_id, prediction} -> format_prediction(prediction) end)
+
+      :error ->
+        []
+    end
   end
 
   defp format_prediction(%{
