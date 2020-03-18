@@ -27,7 +27,7 @@ config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 config :screens, :redirect_http?, true
 
 config :screens,
-  api_version: "1",
+  api_version: "2",
   screen_data: %{
     "1" => %{stop_id: "1722", app_id: "bus_eink"},
     "2" => %{stop_id: "383", app_id: "bus_eink"},
