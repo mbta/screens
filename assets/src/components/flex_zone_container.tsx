@@ -33,7 +33,7 @@ const FlexZoneContainer = forwardRef(
     if (serviceLevel > 1) {
       return (
         <div className="flex-zone__container">
-          <TakeoverAlert />
+          <TakeoverAlert mode="bus" />
         </div>
       );
     } else if (showLaterDepartures && globalAlert) {

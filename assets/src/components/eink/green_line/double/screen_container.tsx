@@ -76,7 +76,7 @@ const BottomScreenContainer = forwardRef(
       return (
         <div className="single-screen-container">
           <div className="flex-zone__container">
-            <TakeoverAlert />
+            <TakeoverAlert mode="subway" />
           </div>
           <FareInfo />
           <DigitalBridge stopId={stopId} />
