@@ -40,8 +40,17 @@ defmodule Screens.Predictions.Parser do
         %{"id" => id, "attributes" => attributes, "relationships" => relationships},
         included_data
       ) do
-    %{"departure_time" => time_string} = attributes
-    time = parse_time(time_string)
+    %{"arrival_time" => arrival_time_string, "departure_time" => departure_time_string} =
+      attributes
+
+    arrival_time = parse_time(arrival_time_string)
+    departure_time = parse_time(departure_time_string)
+
+    time =
+      case arrival_time do
+        nil -> departure_time
+        t -> t
+      end
 
     %{
       "route" => %{"data" => %{"id" => route_id}},
