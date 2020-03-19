@@ -79,9 +79,11 @@ defmodule Screens.Headways do
 
   defp schedule_with_override(time, service_level) do
     # Level 3 turns weekday into Saturday schedule
+    # Level 4 is always Sunday schedule
     # Otherwise, use normal schedule
     case {service_level, schedule(time)} do
       {3, :weekday} -> :saturday
+      {4, _} -> :sunday
       {_, schedule} -> schedule
     end
   end
