@@ -15,6 +15,7 @@ import LineMap from "Components/eink/green_line/line_map";
 import FlexZoneContainer from "Components/flex_zone_container";
 import GlobalAlert from "Components/global_alert";
 import NearbyDepartures from "Components/nearby_departures";
+import { NoServiceBottom, NoServiceTop } from "Components/no_service";
 import OvernightDepartures from "Components/overnight_departures";
 import TakeoverAlert from "Components/takeover_alert";
 
@@ -180,7 +181,14 @@ const ScreenContainer = ({ id }): JSX.Element => {
   });
 
   if (success && departures) {
-    if (departures.length === 0 && headway === null) {
+    if (serviceLevel === 5) {
+      return (
+        <div>
+          <NoServiceTop mode="subway" />
+          <NoServiceBottom />
+        </div>
+      );
+    } else if (departures.length === 0 && headway === null) {
       return (
         <div>
           <OvernightDepartures

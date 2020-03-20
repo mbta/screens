@@ -11,6 +11,7 @@ import DigitalBridge from "Components/digital_bridge";
 import Departures from "Components/eink/green_line/departures";
 import Header from "Components/eink/green_line/header";
 import LineMap from "Components/eink/green_line/line_map";
+import { NoServiceTop } from "Components/no_service";
 import OvernightDepartures from "Components/overnight_departures";
 
 const TopScreenContainer = forwardRef(
@@ -130,7 +131,13 @@ const ScreenContainer = ({ id }): JSX.Element => {
   });
 
   if (success && departures) {
-    if (departures.length === 0 && headway === null) {
+    if (serviceLevel === 5) {
+      return (
+        <div>
+          <NoServiceTop mode="subway" />
+        </div>
+      );
+    } else if (departures.length === 0 && headway === null) {
       return (
         <div>
           <OvernightDepartures

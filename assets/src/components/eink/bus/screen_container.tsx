@@ -12,6 +12,7 @@ import Departures from "Components/eink/bus/departures";
 import FareInfo from "Components/eink/bus/fare_info";
 import Header from "Components/eink/bus/header";
 import FlexZoneContainer from "Components/flex_zone_container";
+import { NoServiceBottom, NoServiceTop } from "Components/no_service";
 import OvernightDepartures from "Components/overnight_departures";
 
 const TopScreenContainer = forwardRef(
@@ -134,7 +135,14 @@ const ScreenContainer = ({ id }): JSX.Element => {
   });
 
   if (success) {
-    if (departures && departures.length > 0) {
+    if (serviceLevel === 5) {
+      return (
+        <div>
+          <NoServiceTop mode="bus" />
+          <NoServiceBottom />
+        </div>
+      );
+    } else if (departures && departures.length > 0) {
       return (
         <div>
           <TopScreenContainer
