@@ -47,9 +47,10 @@ defmodule Screens.Predictions.Parser do
     departure_time = parse_time(departure_time_string)
 
     time =
-      case arrival_time do
-        nil -> departure_time
-        t -> t
+      case {arrival_time, departure_time} do
+        {nil, t} -> t
+        {_, nil} -> nil
+        {t, _} -> t
       end
 
     %{
