@@ -6,7 +6,7 @@
   background-color: black;
   color: white;
   font-family: neue-haas-grotesk-text;
-  font-size: 36px;
+  font-size: 32px;
   border-radius: 16px;
   padding-left: 16px;
   padding-right: 16px;
@@ -30,4 +30,8 @@
   width: 600px;
   margin-top: 12px;
   margin-bottom: 12px;
+}
+
+.takeover-inline-alert__link {
+  font-weight: 700;
 }
