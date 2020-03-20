@@ -11,7 +11,15 @@ const TakeoverInlineAlert = (): JSX.Element => {
           />
         </div>
         <div className="takeover-inline-alert__text">
-          We're running less service to help slow the spread of COVID-19.
+          <div>
+            We're running less service to help slow the spread of COVID-19.
+          </div>
+          <div>
+            More:{" "}
+            <span className="takeover-inline-alert__link">
+              mbta.com/coronavirus
+            </span>
+          </div>
         </div>
       </div>
     </div>
