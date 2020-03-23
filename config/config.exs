@@ -55,7 +55,21 @@ config :screens,
       direction_id: 1,
       app_id: "gl_eink_single"
     },
+    "111" => %{
+      stop_id: "place-bland",
+      platform_id: "70148",
+      route_id: "Green-B",
+      direction_id: 1,
+      app_id: "gl_eink_single"
+    },
     "102" => %{
+      stop_id: "place-bland",
+      platform_id: "70149",
+      route_id: "Green-B",
+      direction_id: 0,
+      app_id: "gl_eink_single"
+    },
+    "112" => %{
       stop_id: "place-bland",
       platform_id: "70149",
       route_id: "Green-B",
@@ -111,6 +125,13 @@ config :screens,
       direction_id: 1,
       app_id: "gl_eink_double"
     },
+    "213" => %{
+      stop_id: "place-bcnwa",
+      platform_id: "70230",
+      route_id: "Green-C",
+      direction_id: 1,
+      app_id: "gl_eink_double"
+    },
     "204" => %{
       stop_id: "place-bcnwa",
       platform_id: "70229",
@@ -126,6 +147,13 @@ config :screens,
       app_id: "gl_eink_double"
     },
     "206" => %{
+      stop_id: "place-mfa",
+      platform_id: "70245",
+      route_id: "Green-E",
+      direction_id: 0,
+      app_id: "gl_eink_double"
+    },
+    "216" => %{
       stop_id: "place-mfa",
       platform_id: "70245",
       route_id: "Green-E",
