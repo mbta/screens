@@ -372,4 +372,14 @@ defmodule Screens.Alerts.Alert do
 
     {inline_alerts, global_alert}
   end
+
+  def priority_by_route_id(route_id, stop_id) do
+    route_id
+    |> fetch_alerts_for_route_id()
+    |> Screens.Alerts.Parser.parse_result()
+    |> sort(stop_id)
+    |> Enum.map(fn alert ->
+      %{alert: to_full_map(alert), priority: to_priority_map(alert, stop_id)}
+    end)
+  end
 end
