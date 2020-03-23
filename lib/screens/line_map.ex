@@ -11,11 +11,59 @@ defmodule Screens.LineMap do
     current_stop_index =
       Enum.find_index(route_stops, fn %{id: route_stop_id} -> route_stop_id == stop_id end)
 
+    %{id: origin_stop_id} = Enum.at(route_stops, 0)
+    schedule = next_scheduled_departure(origin_stop_id, route_id, predictions)
+
     %{
       stops: format_stops(route_stops, current_stop_index),
-      vehicles: format_vehicles(vehicles, route_stops, current_stop_index, predictions)
+      vehicles: format_vehicles(vehicles, route_stops, current_stop_index, predictions),
+      schedule: format_schedule(schedule)
     }
   end
+
+  defp next_scheduled_departure(origin_stop_id, route_id, predictions) do
+    time = DateTime.add(DateTime.utc_now(), -180)
+
+    case Screens.Schedules.Schedule.by_stop_id(origin_stop_id, route_id) do
+      {:ok, [_ | _] = schedules} ->
+        schedules
+        |> Enum.filter(&check_after(&1, time))
+        |> next_unpredicted_departure(predictions)
+
+      _ ->
+        nil
+    end
+  end
+
+  defp check_after(%{time: nil}, _time) do
+    false
+  end
+
+  defp check_after(%{time: t}, time) do
+    DateTime.compare(t, time) == :gt
+  end
+
+  defp next_unpredicted_departure([], _) do
+    nil
+  end
+
+  defp next_unpredicted_departure([first_schedule | _], []) do
+    first_schedule
+  end
+
+  defp next_unpredicted_departure(schedules, [%{trip: %{id: trip_id}}]) do
+    schedules
+    |> Enum.reject(fn %{trip_id: t_id} -> t_id == trip_id end)
+    |> Enum.at(0)
+  end
+
+  defp next_unpredicted_departure(_schedules, _predictions) do
+    # If there are two predictions, we don't want to show a schedule departure.
+    nil
+  end
+
+  defp format_schedule(%{time: t}), do: %{time: t}
+  defp format_schedule(nil), do: nil
 
   defp format_stops(route_stops, current_stop_index) do
     %{name: current_stop_name} = Enum.at(route_stops, current_stop_index)
