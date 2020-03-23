@@ -108,6 +108,7 @@ const LineMapLine = ({
           lastStopY={lastStopY}
           stopRadius={radius}
           stopName={originStopName}
+          time={data.schedule.time}
         />
       ) : null}
 
@@ -154,7 +155,8 @@ const ScheduledDeparture = ({
   lastStopX,
   lastStopY,
   stopRadius,
-  stopName
+  stopName,
+  time
 }): JSX.Element => {
   const x = lastStopX;
   const y = lastStopY + stopRadius * 7;
@@ -176,7 +178,9 @@ const ScheduledDeparture = ({
         fill="#999999"
       >
         <tspan fontSize="40" fontWeight="700">
-          12:42
+          {moment(time)
+            .tz("America/New_York")
+            .format("h:mm")}
         </tspan>
         <tspan fontSize="24" dy="36" x={x + radius + margin}>
           Scheduled to depart

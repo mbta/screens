@@ -11,10 +11,25 @@ defmodule Screens.LineMap do
     current_stop_index =
       Enum.find_index(route_stops, fn %{id: route_stop_id} -> route_stop_id == stop_id end)
 
+    %{id: origin_stop_id} = Enum.at(route_stops, 0)
+    schedule = next_scheduled_departure(origin_stop_id, route_id)
+
     %{
       stops: format_stops(route_stops, current_stop_index),
-      vehicles: format_vehicles(vehicles, route_stops, current_stop_index, predictions)
+      vehicles: format_vehicles(vehicles, route_stops, current_stop_index, predictions),
+      schedule: format_schedule(schedule)
     }
+  end
+
+  defp next_scheduled_departure(origin_stop_id, route_id) do
+    case Screens.Schedules.Schedule.next_departure(origin_stop_id, route_id) do
+      {:ok, t} -> t
+      :error -> nil
+    end
+  end
+
+  defp format_schedule(%{time: t}) do
+    %{time: t}
   end
 
   defp format_stops(route_stops, current_stop_index) do
