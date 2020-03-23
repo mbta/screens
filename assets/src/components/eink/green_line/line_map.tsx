@@ -26,6 +26,8 @@ const LineMapLine = ({
     lastStopY = height;
   }
 
+  const showScheduledDeparture = lastStopY + 8 * radius + strokeWidth <= height;
+
   const vehicles = data.vehicles;
 
   const dPast = [
@@ -100,6 +102,14 @@ const LineMapLine = ({
           strokeWidth={strokeWidth}
         ></circle>
       ) : null}
+      {showScheduledDeparture ? (
+        <ScheduledDeparture
+          lastStopX={marginLeft + lineWidth / 2}
+          lastStopY={lastStopY}
+          stopRadius={radius}
+          stopName={originStopName}
+        />
+      ) : null}
 
       {/* Stop labels */}
       <LineMapStopLabel
@@ -136,6 +146,45 @@ const LineMapLine = ({
           key={v.id}
         />
       ))}
+    </g>
+  );
+};
+
+const ScheduledDeparture = ({
+  lastStopX,
+  lastStopY,
+  stopRadius,
+  stopName
+}): JSX.Element => {
+  const x = lastStopX;
+  const y = lastStopY + stopRadius * 7;
+  const radius = 30;
+  const margin = 9;
+
+  return (
+    <g>
+      <circle cx={x} cy={y} r={radius} fill="#999999" strokeWidth="0"></circle>
+      <LineMapVehicleIcon
+        x={x - radius * 0.8}
+        y={y - radius * 0.8}
+        size={radius * 1.6}
+      />
+      <text
+        x={x + radius + margin}
+        y={y + 12}
+        fontFamily="neue-haas-grotesk-text"
+        fill="#999999"
+      >
+        <tspan fontSize="40" fontWeight="700">
+          12:42
+        </tspan>
+        <tspan fontSize="24" dy="36" x={x + radius + margin}>
+          Scheduled to depart
+        </tspan>
+        <tspan fontSize="24" dy="32" x={x + radius + margin}>
+          {stopName}
+        </tspan>
+      </text>
     </g>
   );
 };
