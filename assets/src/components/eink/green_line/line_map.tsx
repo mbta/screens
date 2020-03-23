@@ -26,7 +26,8 @@ const LineMapLine = ({
     lastStopY = height;
   }
 
-  const showScheduledDeparture = lastStopY + 8 * radius + strokeWidth <= height;
+  const showScheduledDeparture =
+    data.schedule !== null && lastStopY + 8 * radius + strokeWidth <= height;
 
   const vehicles = data.vehicles;
 
