@@ -14,11 +14,34 @@ defmodule Screens.LineMap do
     %{id: origin_stop_id} = Enum.at(route_stops, 0)
     schedule = next_scheduled_departure(origin_stop_id, route_id, predictions)
 
-    %{
-      stops: format_stops(route_stops, current_stop_index),
-      vehicles: format_vehicles(vehicles, route_stops, current_stop_index, predictions),
-      schedule: format_schedule(schedule)
+    {
+      %{
+        stops: format_stops(route_stops, current_stop_index),
+        vehicles: format_vehicles(vehicles, route_stops, current_stop_index, predictions),
+        schedule: format_schedule(schedule)
+      },
+      {:ok,
+       filter_predictions_by_vehicles(predictions, vehicles, route_stops, current_stop_index)}
     }
+  end
+
+  defp filter_predictions_by_vehicles(predictions, vehicles, route_stops, current_stop_index) do
+    departed_vehicle_trip_ids =
+      vehicles
+      |> Enum.filter(fn v -> find_vehicle_index(v, route_stops) > current_stop_index end)
+      |> Enum.map(fn %{trip_id: trip_id} -> trip_id end)
+      |> Enum.reject(&is_nil/1)
+
+    Enum.reject(predictions, fn p ->
+      case p do
+        %{trip: %{id: trip_id}} -> trip_id in departed_vehicle_trip_ids
+        _ -> false
+      end
+    end)
+  end
+
+  defp find_vehicle_index(%{stop_id: vehicle_stop_id}, route_stops) do
+    Enum.find_index(route_stops, fn %{id: route_stop_id} -> route_stop_id == vehicle_stop_id end)
   end
 
   defp next_scheduled_departure(origin_stop_id, route_id, predictions) do

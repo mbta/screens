@@ -143,7 +143,7 @@ const LineMapLine = ({
           x={marginLeft + lineWidth / 2}
           y={stopMarginTop + radius + v.index * dy}
           height={height}
-          time={v.time}
+          time={v.index >= 2 ? v.time : null}
           currentTimeString={currentTimeString}
           key={v.id}
         />

@@ -47,6 +47,18 @@ const HeadwayMessage = ({ destination, headway }): JSX.Element => {
   );
 };
 
+const departureIsInFuture = (departure, currentTimeString) => {
+  if (!departure.time) {
+    return false;
+  }
+
+  const departureTime = moment(departure.time);
+  const currentTime = moment(currentTimeString);
+  const secondDifference = departureTime.diff(currentTime, "seconds");
+
+  return secondDifference > 0;
+};
+
 const Departures = ({
   departures,
   destination,
@@ -55,7 +67,9 @@ const Departures = ({
   currentTimeString,
   serviceLevel
 }): JSX.Element => {
-  departures = departures.slice(0, 2);
+  departures = departures.filter(d =>
+    departureIsInFuture(d, currentTimeString)
+  );
 
   const topDeparture = departures[0];
   const bottomDeparture = departures[1];
