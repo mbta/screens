@@ -42,6 +42,16 @@ defmodule Screens.GLScreenData do
 
     predictions = Screens.Predictions.Prediction.by_stop_id(stop_id, route_id, direction_id)
 
+    {line_map_data, predictions} =
+      case predictions do
+        {:ok, predictions} ->
+          Screens.LineMap.by_stop_id(platform_id, route_id, direction_id, predictions)
+
+        :error ->
+          # handle case where vehicle request fails
+          {nil, :error}
+      end
+
     # If we are unable to fetch departures, we want to show an error message on the screen.
     departures =
       case Departure.from_predictions(predictions) do
@@ -62,16 +72,6 @@ defmodule Screens.GLScreenData do
     # Move this and make it less brittle
     {:ok, %{direction_destinations: destinations}} = Screens.Routes.Route.by_id(route_id)
     destination = Enum.at(destinations, direction_id)
-
-    line_map_data =
-      case predictions do
-        {:ok, predictions} ->
-          Screens.LineMap.by_stop_id(platform_id, route_id, direction_id, predictions)
-
-        :error ->
-          # handle case where vehicle request fails
-          nil
-      end
 
     service_level = Screens.Override.State.green_line_service()
 
