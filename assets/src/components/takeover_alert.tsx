@@ -36,7 +36,7 @@ const TakeoverAlert = ({ mode }): JSX.Element => {
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+        <g stroke="none" strokeWidth="1" fill="#FFFFFF" fillRule="evenodd">
           {/* Solid black background */}
           <path
             d="M0,0 L1132,0 C1151.88225,0 1168,16.117749 1168,36 L1168,1044 C1168,1063.88225 1151.88225,1080 1132,1080 L0,1080 L0,1080 L0,0 Z"
@@ -80,7 +80,7 @@ const TakeoverAlert = ({ mode }): JSX.Element => {
 
           {/* Hatched background */}
           <g>
-            <mask id="mask" fill="white">
+            <mask id="mask" fill="#FFFFFF">
               <rect x="0" y="0" width="1168" height="512"></rect>
             </mask>
             <rect fill="#FFFFFF" x="0" y="0" width="1168" height="512"></rect>
