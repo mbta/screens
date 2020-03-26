@@ -366,15 +366,16 @@ const LineMap = ({ data, height, currentTimeString }): JSX.Element => {
     return <div className="line-map"></div>;
   }
 
-  const fakeHeight = height === 1140 ? 1140 : 2912;
+  // We set the SVG height to fill the entire screen due to an issue on Mercury double-stack signs.
+  const screenHeight = height === 1140 ? 1140 : 2740;
 
   const width = 442;
   return (
     <div className="line-map">
       <svg
         width={width + "px"}
-        height={fakeHeight + "px"}
-        viewBox={[0, 0, width, fakeHeight].join(" ")}
+        height={screenHeight + "px"}
+        viewBox={[0, 0, width, screenHeight].join(" ")}
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
         className="line-map__svg"
