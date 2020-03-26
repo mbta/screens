@@ -75,16 +75,18 @@ const LineMapLine = ({
     <g>
       <path d={dPast} fill="#CCCCCC"></path>
       <path d={dFuture} fill="#000000"></path>
-      {[...Array(lastStopIndex)].map((_, i) => (
-        <circle
-          cx={marginLeft + lineWidth / 2}
-          cy={stopMarginTop + radius + i * dy}
-          r={radius}
-          fill="#FFFFFF"
-          stroke="none"
-          key={"circle-" + i}
-        ></circle>
-      ))}
+      {[...Array(lastStopIndex)].map((_, i) =>
+        stopMarginTop + radius + i * dy < height ? (
+          <circle
+            cx={marginLeft + lineWidth / 2}
+            cy={stopMarginTop + radius + i * dy}
+            r={radius}
+            fill="#FFFFFF"
+            stroke="none"
+            key={"circle-" + i}
+          ></circle>
+        ) : null
+      )}
       <circle
         cx={marginLeft + lineWidth / 2}
         cy={currentStopY}
