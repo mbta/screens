@@ -366,15 +366,18 @@ const LineMap = ({ data, height, currentTimeString }): JSX.Element => {
     return <div className="line-map"></div>;
   }
 
+  const fakeHeight = height === 1140 ? 1140 : 2912;
+
   const width = 442;
   return (
     <div className="line-map">
       <svg
         width={width + "px"}
-        height={height + "px"}
-        viewBox={[0, 0, width, height].join(" ")}
+        height={fakeHeight + "px"}
+        viewBox={[0, 0, width, fakeHeight].join(" ")}
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
+        className="line-map__svg"
       >
         <LineMapLine
           data={data}
