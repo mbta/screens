@@ -75,16 +75,18 @@ const LineMapLine = ({
     <g>
       <path d={dPast} fill="#CCCCCC"></path>
       <path d={dFuture} fill="#000000"></path>
-      {[...Array(lastStopIndex)].map((_, i) => (
-        <circle
-          cx={marginLeft + lineWidth / 2}
-          cy={stopMarginTop + radius + i * dy}
-          r={radius}
-          fill="#FFFFFF"
-          stroke="none"
-          key={"circle-" + i}
-        ></circle>
-      ))}
+      {[...Array(lastStopIndex)].map((_, i) =>
+        stopMarginTop + radius + i * dy < height ? (
+          <circle
+            cx={marginLeft + lineWidth / 2}
+            cy={stopMarginTop + radius + i * dy}
+            r={radius}
+            fill="#FFFFFF"
+            stroke="none"
+            key={"circle-" + i}
+          ></circle>
+        ) : null
+      )}
       <circle
         cx={marginLeft + lineWidth / 2}
         cy={currentStopY}
@@ -364,15 +366,19 @@ const LineMap = ({ data, height, currentTimeString }): JSX.Element => {
     return <div className="line-map"></div>;
   }
 
+  // We set the SVG height to fill the entire screen due to an issue on Mercury double-stack signs.
+  const screenHeight = height === 1140 ? 1140 : 2740;
+
   const width = 442;
   return (
     <div className="line-map">
       <svg
         width={width + "px"}
-        height={height + "px"}
-        viewBox={[0, 0, width, height].join(" ")}
+        height={screenHeight + "px"}
+        viewBox={[0, 0, width, screenHeight].join(" ")}
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
+        className="line-map__svg"
       >
         <LineMapLine
           data={data}
