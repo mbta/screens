@@ -67,7 +67,9 @@ defmodule Screens.MixProject do
       {:excoveralls, "~> 0.11.2", only: :test},
       {:ex_aws, "~> 2.1", only: :prod},
       {:ex_aws_secretsmanager, "~> 2.0", only: :prod},
-      {:ehmon, github: "mbta/ehmon", only: :prod}
+      {:ehmon, github: "mbta/ehmon", only: :prod},
+      {:sweet_xml, "~> 0.6.6"},
+      {:timex, "~> 3.6"}
     ]
   end
 end

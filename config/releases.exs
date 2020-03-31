@@ -24,13 +24,20 @@ api_v3_key =
   |> ExAws.request!()
   |> Map.fetch!("SecretString")
 
+gds_dms_password =
+  "gds-dms-password"
+  |> ExAws.SecretsManager.get_secret_value()
+  |> ExAws.request!()
+  |> Map.fetch!("SecretString")
+
 config :screens, ScreensWeb.Endpoint,
   http: [:inet6, port: String.to_integer(System.get_env("PORT") || "4000")],
   secret_key_base: secret_key_base
 
-config :screens, api_v3_key: api_v3_key
-
-config :screens, environment_name: eb_env_name
+config :screens,
+  api_v3_key: api_v3_key,
+  environment_name: eb_env_name,
+  gds_dms_password: gds_dms_password
 
 # ## Using releases (Elixir v1.9+)
 #
