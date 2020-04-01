@@ -295,7 +295,7 @@ const LineMapVehicle = ({
   const minuteDifference = Math.round(secondDifference / 60);
 
   let timeLabel;
-  if (time === null || secondDifference < 0) {
+  if (time === null) {
     timeLabel = null;
   } else if (secondDifference < 60) {
     timeLabel = (
