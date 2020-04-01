@@ -5,14 +5,16 @@ defmodule Screens.Predictions.Prediction do
             trip: nil,
             stop: nil,
             route: nil,
-            time: nil
+            arrival_time: nil,
+            departure_time: nil
 
   @type t :: %__MODULE__{
           id: String.t(),
           trip: Screens.Trips.Trip.t() | nil,
           stop: Screens.Stops.Stop.t(),
           route: Screens.Routes.Route.t(),
-          time: DateTime.t()
+          arrival_time: DateTime.t() | nil,
+          departure_time: DateTime.t() | nil
         }
 
   def by_stop_id(stop_id, route_id, direction_id) do
@@ -37,5 +39,9 @@ defmodule Screens.Predictions.Prediction do
       {:ok, result} -> {:ok, Screens.Predictions.Parser.parse_result(result)}
       _ -> :error
     end
+  end
+
+  def departure_in_past(%{departure_time: departure_time}) do
+    DateTime.compare(departure_time, DateTime.utc_now()) == :lt
   end
 end

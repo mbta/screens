@@ -17,7 +17,7 @@ defmodule Screens.NearbyDepartures do
         predictions
         |> Enum.group_by(& &1.stop.id)
         |> Enum.map(fn {stop_id, prediction_list} ->
-          {stop_id, Enum.min_by(prediction_list, & &1.time)}
+          {stop_id, Enum.min_by(prediction_list, & &1.departure_time)}
         end)
         |> Enum.map(fn {_stop_id, prediction} -> format_prediction(prediction) end)
 
@@ -27,11 +27,14 @@ defmodule Screens.NearbyDepartures do
   end
 
   defp format_prediction(%{
-         time: time,
+         arrival_time: arrival_time,
+         departure_time: departure_time,
          stop: %{name: stop_name},
          route: %{short_name: route},
          trip: %{headsign: destination}
        }) do
+    time = Screens.Departures.Departure.select_prediction_time(arrival_time, departure_time)
+
     %{
       stop_name: stop_name,
       route: route,

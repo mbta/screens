@@ -20,17 +20,15 @@ defmodule Screens.Departures.Departure do
         }
 
   def by_stop_id(stop_id, route_id, direction_id) do
-    case Screens.Predictions.Prediction.by_stop_id(stop_id, route_id, direction_id) do
-      {:ok, result} -> {:ok, Enum.map(result, &from_prediction/1)}
-      :error -> :error
-    end
+    stop_id
+    |> Screens.Predictions.Prediction.by_stop_id(route_id, direction_id)
+    |> from_predictions()
   end
 
   def by_stop_id(stop_id) do
-    case Screens.Predictions.Prediction.by_stop_id(stop_id) do
-      {:ok, result} -> {:ok, Enum.map(result, &from_prediction/1)}
-      :error -> :error
-    end
+    stop_id
+    |> Screens.Predictions.Prediction.by_stop_id()
+    |> from_predictions()
   end
 
   def to_map(d) do
@@ -44,7 +42,13 @@ defmodule Screens.Departures.Departure do
   end
 
   def from_predictions({:ok, predictions}) do
-    {:ok, Enum.map(predictions, &from_prediction/1)}
+    departures =
+      predictions
+      |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
+      |> Enum.reject(&Screens.Predictions.Prediction.departure_in_past/1)
+      |> Enum.map(&from_prediction/1)
+
+    {:ok, departures}
   end
 
   def from_predictions(:error), do: :error
@@ -54,8 +58,11 @@ defmodule Screens.Departures.Departure do
         stop: %{name: stop_name},
         route: %{id: route_id, short_name: route_short_name},
         trip: %{headsign: destination},
-        time: time
+        arrival_time: arrival_time,
+        departure_time: departure_time
       }) do
+    time = select_prediction_time(arrival_time, departure_time)
+
     %Screens.Departures.Departure{
       id: id,
       stop_name: stop_name,
@@ -72,8 +79,11 @@ defmodule Screens.Departures.Departure do
         stop: %{name: stop_name},
         route: %{id: route_id, short_name: route_short_name},
         trip: nil,
-        time: time
+        arrival_time: arrival_time,
+        departure_time: departure_time
       }) do
+    time = select_prediction_time(arrival_time, departure_time)
+
     %Screens.Departures.Departure{
       id: id,
       stop_name: stop_name,
@@ -83,6 +93,14 @@ defmodule Screens.Departures.Departure do
       time: DateTime.to_iso8601(time),
       inline_badges: []
     }
+  end
+
+  def select_prediction_time(arrival_time, departure_time) do
+    case {arrival_time, departure_time} do
+      {nil, t} -> t
+      {_, nil} -> nil
+      {t, _} -> t
+    end
   end
 
   def associate_alerts_with_departures(departures, alerts) do
