@@ -5,7 +5,7 @@ defmodule Screens.GLScreenData do
   alias Screens.Departures.Departure
   alias Screens.NearbyConnections
 
-  def by_stop_id_with_override_and_version(stop_id, screen_id, client_version) do
+  def by_stop_id_with_override_and_version(stop_id, screen_id, client_version, _is_screen) do
     %{route_id: route_id, direction_id: direction_id, platform_id: platform_id} =
       :screens
       |> Application.get_env(:screen_data)

@@ -5,7 +5,7 @@ defmodule Screens.ScreenData do
   alias Screens.Departures.Departure
   alias Screens.NearbyConnections
 
-  def by_stop_id_with_override_and_version(stop_id, screen_id, client_version) do
+  def by_stop_id_with_override_and_version(stop_id, screen_id, client_version, _is_screen) do
     if Screens.Override.State.lookup(String.to_integer(screen_id)) do
       %{
         force_reload: false,
