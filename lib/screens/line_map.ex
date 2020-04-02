@@ -107,7 +107,7 @@ defmodule Screens.LineMap do
     trip_id_to_time =
       predictions
       |> Enum.reject(&is_nil(&1.trip))
-      |> Enum.map(fn %{trip: %{id: trip_id}, time: time} -> {trip_id, time} end)
+      |> Enum.map(&select_prediction_time/1)
       |> Enum.into(%{})
 
     vehicles
@@ -115,6 +115,15 @@ defmodule Screens.LineMap do
     |> Enum.reject(&is_nil/1)
     |> Enum.reject(fn %{index: index} -> index < 0 end)
     |> maybe_strip_time()
+  end
+
+  def select_prediction_time(%{
+        arrival_time: arrival_time,
+        departure_time: departure_time,
+        trip: %{id: trip_id}
+      }) do
+    time = Screens.Departures.Departure.select_prediction_time(arrival_time, departure_time)
+    {trip_id, time}
   end
 
   defp maybe_strip_time(vehicles) do

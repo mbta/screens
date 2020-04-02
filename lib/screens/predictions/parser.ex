@@ -11,9 +11,7 @@ defmodule Screens.Predictions.Parser do
   end
 
   defp parse_data(data, included_data) do
-    data
-    |> Enum.map(fn item -> parse_prediction(item, included_data) end)
-    |> Enum.reject(&is_nil(&1.time))
+    Enum.map(data, &parse_prediction(&1, included_data))
   end
 
   defp parse_included_data(data) do
@@ -46,13 +44,6 @@ defmodule Screens.Predictions.Parser do
     arrival_time = parse_time(arrival_time_string)
     departure_time = parse_time(departure_time_string)
 
-    time =
-      case {arrival_time, departure_time} do
-        {nil, t} -> t
-        {_, nil} -> nil
-        {t, _} -> t
-      end
-
     %{
       "route" => %{"data" => %{"id" => route_id}},
       "stop" => %{"data" => %{"id" => stop_id}},
@@ -68,7 +59,8 @@ defmodule Screens.Predictions.Parser do
       trip: trip,
       stop: stop,
       route: route,
-      time: time
+      arrival_time: arrival_time,
+      departure_time: departure_time
     }
   end
 
