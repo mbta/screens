@@ -22,7 +22,8 @@ config :screens, ScreensWeb.Endpoint,
   ]
 
 config :screens,
-  api_v3_key: System.get_env("API_V3_KEY")
+  api_v3_key: System.get_env("API_V3_KEY"),
+  gds_dms_password: System.get_env("GDS_DMS_PASSWORD")
 
 # ## SSL Support
 #
