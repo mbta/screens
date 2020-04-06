@@ -45,7 +45,13 @@ defmodule ScreensWeb.ScreenController do
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
 
-    _is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
+    # TODO: Remove the !
+    is_screen = !ScreensWeb.UserAgent.is_screen_conn?(conn)
+
+    _ =
+      if is_screen do
+        Logger.info("[screen page load] screen_id=#{screen_id}")
+      end
 
     case screen_data do
       nil ->

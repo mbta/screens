@@ -8,7 +8,13 @@ defmodule ScreensWeb.ScreenApiController do
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
 
-    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
+    # TODO: Remove the !
+    is_screen = !ScreensWeb.UserAgent.is_screen_conn?(conn)
+
+    _ =
+      if is_screen do
+        Logger.info("[screen data request] screen_id=#{screen_id} version=#{version}")
+      end
 
     data =
       case app_id do
