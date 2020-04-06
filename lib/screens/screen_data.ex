@@ -1,18 +1,37 @@
 defmodule Screens.ScreenData do
   @moduledoc false
+  require Logger
 
   alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
   alias Screens.NearbyConnections
 
-  def by_stop_id_with_override_and_version(stop_id, screen_id, client_version, _is_screen) do
+  defp log_api_response(screen_id, client_version, is_screen, response) do
+    _ =
+      if is_screen do
+        Logger.info(
+          "[screen api response] screen_id=#{screen_id} version=#{client_version} response_json=#{
+            Jason.encode!(response)
+          }"
+        )
+      end
+
+    response
+  end
+
+  def by_stop_id_with_override_and_version(stop_id, screen_id, client_version, is_screen) do
     if Screens.Override.State.lookup(String.to_integer(screen_id)) do
-      %{
+      log_api_response(screen_id, client_version, is_screen, %{
         force_reload: false,
         success: false
-      }
+      })
     else
-      by_stop_id_with_version(stop_id, client_version)
+      log_api_response(
+        screen_id,
+        client_version,
+        is_screen,
+        by_stop_id_with_version(stop_id, client_version)
+      )
     end
   end
 
