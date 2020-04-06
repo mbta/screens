@@ -1,32 +1,39 @@
 defmodule Screens.ScreenData do
   @moduledoc false
+  require Logger
 
   alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
+  alias Screens.LogScreenData
   alias Screens.NearbyConnections
 
-  def by_stop_id_with_override_and_version(stop_id, screen_id, client_version) do
+  def by_stop_id_with_override_and_version(stop_id, screen_id, client_version, is_screen) do
     if Screens.Override.State.lookup(String.to_integer(screen_id)) do
-      %{
+      LogScreenData.log_api_response(screen_id, client_version, is_screen, %{
         force_reload: false,
         success: false
-      }
+      })
     else
-      by_stop_id_with_version(stop_id, client_version)
+      LogScreenData.log_api_response(
+        screen_id,
+        client_version,
+        is_screen,
+        by_stop_id_with_version(stop_id, client_version, screen_id, is_screen)
+      )
     end
   end
 
-  defp by_stop_id_with_version(stop_id, client_version) do
+  defp by_stop_id_with_version(stop_id, client_version, screen_id, is_screen) do
     api_version = Application.get_env(:screens, :api_version)
 
     if api_version == client_version do
-      by_stop_id(stop_id)
+      by_stop_id(stop_id, screen_id, is_screen)
     else
       %{force_reload: true}
     end
   end
 
-  defp by_stop_id(stop_id) do
+  defp by_stop_id(stop_id, screen_id, is_screen) do
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
     # - global_alert will be nil
@@ -56,6 +63,8 @@ defmodule Screens.ScreenData do
     stop_name = extract_stop_name(nearby_connections_data, departures)
 
     service_level = Screens.Override.State.bus_service()
+
+    _ = LogScreenData.log_departures(screen_id, is_screen, departures)
 
     case departures do
       {:ok, departures} ->

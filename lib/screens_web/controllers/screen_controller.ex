@@ -1,5 +1,6 @@
 defmodule ScreensWeb.ScreenController do
   use ScreensWeb, :controller
+  require Logger
 
   @default_app_id "bus_eink"
   @app_ids ["bus_eink", "gl_eink_single", "gl_eink_double"]
@@ -43,6 +44,13 @@ defmodule ScreensWeb.ScreenController do
       :screens
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
+
+    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
+
+    _ =
+      if is_screen do
+        Logger.info("[screen page load] screen_id=#{screen_id}")
+      end
 
     case screen_data do
       nil ->
