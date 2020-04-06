@@ -4,20 +4,8 @@ defmodule Screens.GLScreenData do
 
   alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
+  alias Screens.LogScreenData
   alias Screens.NearbyConnections
-
-  defp log_api_response(screen_id, client_version, is_screen, response) do
-    _ =
-      if is_screen do
-        Logger.info(
-          "[screen api response] screen_id=#{screen_id} version=#{client_version} response_json=#{
-            Jason.encode!(response)
-          }"
-        )
-      end
-
-    response
-  end
 
   def by_stop_id_with_override_and_version(stop_id, screen_id, client_version, is_screen) do
     %{route_id: route_id, direction_id: direction_id, platform_id: platform_id} =
@@ -26,31 +14,47 @@ defmodule Screens.GLScreenData do
       |> Map.get(screen_id)
 
     if Screens.Override.State.lookup(String.to_integer(screen_id)) do
-      log_api_response(screen_id, client_version, is_screen, %{
+      LogScreenData.log_api_response(screen_id, client_version, is_screen, %{
         force_reload: false,
         success: false
       })
     else
-      log_api_response(
+      LogScreenData.log_api_response(
         screen_id,
         client_version,
         is_screen,
-        by_stop_id_with_version(stop_id, client_version, route_id, direction_id, platform_id)
+        by_stop_id_with_version(
+          stop_id,
+          client_version,
+          route_id,
+          direction_id,
+          platform_id,
+          screen_id,
+          is_screen
+        )
       )
     end
   end
 
-  defp by_stop_id_with_version(stop_id, client_version, route_id, direction_id, platform_id) do
+  defp by_stop_id_with_version(
+         stop_id,
+         client_version,
+         route_id,
+         direction_id,
+         platform_id,
+         screen_id,
+         is_screen
+       ) do
     api_version = Application.get_env(:screens, :api_version)
 
     if api_version == client_version do
-      by_stop_id(stop_id, route_id, direction_id, platform_id)
+      by_stop_id(stop_id, route_id, direction_id, platform_id, screen_id, is_screen)
     else
       %{force_reload: true}
     end
   end
 
-  defp by_stop_id(stop_id, route_id, direction_id, platform_id) do
+  defp by_stop_id(stop_id, route_id, direction_id, platform_id, screen_id, is_screen) do
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
     # - global_alert will be nil
@@ -95,6 +99,8 @@ defmodule Screens.GLScreenData do
     service_level = Screens.Override.State.green_line_service()
 
     headway_data = Screens.Headways.by_route_id(route_id, stop_id, direction_id, service_level)
+
+    _ = LogScreenData.log_departures(screen_id, is_screen, departures)
 
     case departures do
       {:ok, departures} ->
