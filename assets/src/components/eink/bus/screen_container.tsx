@@ -70,15 +70,7 @@ const BottomScreenContainer = forwardRef(
 );
 
 const ScreenContainer = ({ id }): JSX.Element => {
-  const [success, setSuccess] = useState();
-  const [currentTimeString, setCurrentTimeString] = useState();
-  const [stopName, setStopName] = useState();
-  const [stopId, setStopId] = useState();
-  const [departures, setDepartures] = useState();
-  const [globalAlert, setGlobalAlert] = useState();
-  const [nearbyConnections, setNearbyConnections] = useState();
-  const [serviceLevel, setServiceLevel] = useState(1);
-
+  const [apiResponse, setApiResponse] = useState(null);
   const apiVersion = document.getElementById("app").dataset.apiVersion;
 
   const doUpdate = async () => {
@@ -89,17 +81,9 @@ const ScreenContainer = ({ id }): JSX.Element => {
       if (json.force_reload === true) {
         window.location.reload(false);
       }
-
-      setSuccess(json.success);
-      setCurrentTimeString(json.current_time);
-      setStopName(json.stop_name);
-      setStopId(json.stop_id);
-      setDepartures(json.departures);
-      setGlobalAlert(json.global_alert);
-      setNearbyConnections(json.nearby_connections);
-      setServiceLevel(json.service_level);
+      setApiResponse(json);
     } catch (err) {
-      setSuccess(false);
+      setApiResponse({ success: false });
     }
   };
 
@@ -142,34 +126,38 @@ const ScreenContainer = ({ id }): JSX.Element => {
     }
   });
 
-  if (success) {
-    if (serviceLevel === 5) {
+  if (apiResponse && apiResponse.success) {
+    if (apiResponse && apiResponse.serviceLevel === 5) {
       return (
         <div>
           <NoServiceTop mode="bus" />
           <NoServiceBottom />
         </div>
       );
-    } else if (departures && departures.length > 0) {
+    } else if (
+      apiResponse &&
+      apiResponse.departures &&
+      apiResponse.departures.length > 0
+    ) {
       return (
         <div>
           <TopScreenContainer
-            currentTimeString={currentTimeString}
-            stopName={stopName}
-            departures={departures}
+            currentTimeString={apiResponse.current_time}
+            stopName={apiResponse.stop_name}
+            departures={apiResponse.departures}
             startIndex={0}
             endIndex={departureCount}
             ref={departuresRef}
           />
           <BottomScreenContainer
-            currentTimeString={currentTimeString}
-            departures={departures}
+            currentTimeString={apiResponse.current_time}
+            departures={apiResponse.departures}
             startIndex={departureCount}
             endIndex={departureCount + laterDepartureCount}
-            globalAlert={globalAlert}
-            stopId={stopId}
-            nearbyConnections={nearbyConnections}
-            serviceLevel={serviceLevel}
+            globalAlert={apiResponse.global_alert}
+            stopId={apiResponse.stop_id}
+            nearbyConnections={apiResponse.nearbyConnections}
+            serviceLevel={apiResponse.service_level}
             ref={laterDeparturesRef}
           />
         </div>
@@ -181,7 +169,7 @@ const ScreenContainer = ({ id }): JSX.Element => {
         <div>
           <OvernightDepartures
             size="double"
-            currentTimeString={currentTimeString}
+            currentTimeString={apiResponse.currentTimeString}
           />
         </div>
       );
