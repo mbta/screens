@@ -16,18 +16,13 @@ import { NoServiceBottom, NoServiceTop } from "Components/no_service";
 import OvernightDepartures from "Components/overnight_departures";
 
 const TopScreenContainer = forwardRef(
-  (
-    { currentTimeString, stopName, departures, startIndex, endIndex },
-    ref
-  ): JSX.Element => {
+  ({ currentTimeString, stopName, departures }, ref): JSX.Element => {
     return (
       <div className="single-screen-container">
         <Header stopName={stopName} currentTimeString={currentTimeString} />
         <Departures
           currentTimeString={currentTimeString}
           departures={departures}
-          startIndex={startIndex}
-          endIndex={endIndex}
           size="large"
           ref={ref}
         />
@@ -41,8 +36,6 @@ const BottomScreenContainer = forwardRef(
     {
       currentTimeString,
       departures,
-      startIndex,
-      endIndex,
       globalAlert,
       stopId,
       nearbyConnections,
@@ -55,8 +48,6 @@ const BottomScreenContainer = forwardRef(
         <FlexZoneContainer
           currentTimeString={currentTimeString}
           departures={departures}
-          startIndex={startIndex}
-          endIndex={endIndex}
           globalAlert={globalAlert}
           nearbyConnections={nearbyConnections}
           serviceLevel={serviceLevel}
@@ -147,21 +138,23 @@ const ScreenContainer = ({ id }): JSX.Element => {
       apiResponse.departures &&
       apiResponse.departures.length > 0
     ) {
+      const departuresData = apiResponse.departures.slice(0, departureCount);
+      const laterDeparturesData = apiResponse.departures.slice(
+        departureCount,
+        departureCount + laterDepartureCount
+      );
+
       return (
         <div>
           <TopScreenContainer
             currentTimeString={apiResponse.current_time}
             stopName={apiResponse.stop_name}
-            departures={apiResponse.departures}
-            startIndex={0}
-            endIndex={departureCount}
+            departures={departuresData}
             ref={departuresRef}
           />
           <BottomScreenContainer
             currentTimeString={apiResponse.current_time}
-            departures={apiResponse.departures}
-            startIndex={departureCount}
-            endIndex={departureCount + laterDepartureCount}
+            departures={laterDeparturesData}
             globalAlert={apiResponse.global_alert}
             stopId={apiResponse.stop_id}
             nearbyConnections={apiResponse.nearbyConnections}
