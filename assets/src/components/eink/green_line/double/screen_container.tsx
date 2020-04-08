@@ -1,10 +1,4 @@
-import React, {
-  forwardRef,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState
-} from "react";
+import React, { useEffect, useState } from "react";
 
 import ConnectionError from "Components/connection_error";
 import DigitalBridge from "Components/digital_bridge";
@@ -19,91 +13,76 @@ import { NoServiceBottom, NoServiceTop } from "Components/no_service";
 import OvernightDepartures from "Components/overnight_departures";
 import TakeoverAlert from "Components/takeover_alert";
 
-const TopScreenContainer = forwardRef(
-  (
-    {
-      currentTimeString,
-      stopName,
-      departures,
-      startIndex,
-      endIndex,
-      stopId,
-      routeId,
-      headway,
-      lineMapData,
-      inlineAlert
-    },
-    ref
-  ): JSX.Element => {
-    return (
-      <div className="single-screen-container">
-        <Header
-          stopName={stopName}
-          routeId={routeId}
-          currentTimeString={currentTimeString}
-        />
-        <LineMap
-          data={lineMapData}
-          height={1312}
-          currentTimeString={currentTimeString}
-        />
-        <Departures
-          departures={departures}
-          headway={headway}
-          destination={stopName}
-          inlineAlert={inlineAlert}
-          currentTimeString={currentTimeString}
-        />
-      </div>
-    );
-  }
-);
+const TopScreenContainer = ({
+  currentTimeString,
+  stopName,
+  departures,
+  stopId,
+  routeId,
+  headway,
+  lineMapData,
+  inlineAlert
+}): JSX.Element => {
+  return (
+    <div className="single-screen-container">
+      <Header
+        stopName={stopName}
+        routeId={routeId}
+        currentTimeString={currentTimeString}
+      />
+      <LineMap
+        data={lineMapData}
+        height={1312}
+        currentTimeString={currentTimeString}
+      />
+      <Departures
+        departures={departures}
+        headway={headway}
+        destination={stopName}
+        inlineAlert={inlineAlert}
+        currentTimeString={currentTimeString}
+      />
+    </div>
+  );
+};
 
-const BottomScreenContainer = forwardRef(
-  (
-    {
-      currentTimeString,
-      departures,
-      startIndex,
-      endIndex,
-      globalAlert,
-      stopId,
-      nearbyDepartures,
-      serviceLevel
-    },
-    ref
-  ): JSX.Element => {
-    if (serviceLevel > 1) {
-      return (
-        <div className="single-screen-container">
-          <div className="flex-zone__container">
-            <TakeoverAlert mode="subway" />
-          </div>
-          <FareInfo />
-          <DigitalBridge stopId={stopId} />
-        </div>
-      );
-    }
-
+const BottomScreenContainer = ({
+  currentTimeString,
+  globalAlert,
+  stopId,
+  nearbyDepartures,
+  serviceLevel
+}): JSX.Element => {
+  if (serviceLevel > 1) {
     return (
       <div className="single-screen-container">
         <div className="flex-zone__container">
-          <div className="flex-zone__top-container">
-            <NearbyDepartures
-              data={nearbyDepartures}
-              currentTimeString={currentTimeString}
-            />
-          </div>
-          <div className="flex-zone__bottom-container">
-            {globalAlert ? <GlobalAlert alert={globalAlert} /> : null}
-          </div>
+          <TakeoverAlert mode="subway" />
         </div>
         <FareInfo />
         <DigitalBridge stopId={stopId} />
       </div>
     );
   }
-);
+
+  return (
+    <div className="single-screen-container">
+      <div className="flex-zone__container">
+        <div className="flex-zone__top-container">
+          <NearbyDepartures
+            data={nearbyDepartures}
+            currentTimeString={currentTimeString}
+          />
+        </div>
+        <div className="flex-zone__bottom-container">
+          {globalAlert ? <GlobalAlert alert={globalAlert} /> : null}
+        </div>
+      </div>
+      <FareInfo />
+      <DigitalBridge stopId={stopId} />
+    </div>
+  );
+};
 
 const ScreenContainer = ({ id }): JSX.Element => {
   const [success, setSuccess] = useState();
@@ -159,27 +138,6 @@ const ScreenContainer = ({ id }): JSX.Element => {
     return () => clearInterval(interval);
   }, []);
 
-  const [numRows, setNumRows] = useState(7);
-  const [bottomNumRows, setBottomNumRows] = useState(5);
-  const ref = useRef(null);
-  const bottomRef = useRef(null);
-
-  useLayoutEffect(() => {
-    if (ref.current) {
-      const height = ref.current.clientHeight;
-      if (height > 1312) {
-        setNumRows(numRows - 1);
-      }
-    }
-
-    if (bottomRef.current) {
-      const bottomHeight = bottomRef.current.clientHeight;
-      if (bottomHeight > 585) {
-        setBottomNumRows(bottomNumRows - 1);
-      }
-    }
-  });
-
   if (success && departures) {
     if (serviceLevel === 5) {
       return (
@@ -204,26 +162,19 @@ const ScreenContainer = ({ id }): JSX.Element => {
             currentTimeString={currentTimeString}
             stopName={stopName}
             departures={departures}
-            startIndex={0}
-            endIndex={numRows}
             stopId={stopId}
             routeId={routeId}
             lineMapData={lineMapData}
             headway={headway}
             inlineAlert={inlineAlert}
-            ref={ref}
           />
           <BottomScreenContainer
             currentTimeString={currentTimeString}
-            departures={[]}
-            startIndex={numRows}
-            endIndex={numRows + bottomNumRows}
             globalAlert={globalAlert}
             stopId={stopId}
             nearbyConnections={nearbyConnections}
             nearbyDepartures={nearbyDepartures}
             serviceLevel={serviceLevel}
-            ref={bottomRef}
           />
         </div>
       );
