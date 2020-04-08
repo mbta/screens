@@ -113,23 +113,31 @@ const ScreenContainer = ({ id }): JSX.Element => {
     return () => clearInterval(interval);
   }, []);
 
-  const [numRows, setNumRows] = useState(7);
-  const [bottomNumRows, setBottomNumRows] = useState(5);
-  const ref = useRef(null);
-  const bottomRef = useRef(null);
+  // Fit as many rows as will fit in departures and later departures
+  const MAX_DEPARTURE_ROWS = 7;
+  const MAX_LATER_DEPARTURE_ROWS = 5;
+  const MAX_DEPARTURES_HEIGHT = 1312;
+  const MAX_LATER_DEPARTURES_HEIGHT = 585;
+
+  const [departureCount, setDepartureCount] = useState(MAX_DEPARTURE_ROWS);
+  const [laterDepartureCount, setLaterDepartureCount] = useState(
+    MAX_LATER_DEPARTURE_ROWS
+  );
+  const departuresRef = useRef(null);
+  const laterDeparturesRef = useRef(null);
 
   useLayoutEffect(() => {
-    if (ref.current) {
-      const height = ref.current.clientHeight;
-      if (height > 1312) {
-        setNumRows(numRows - 1);
+    if (departuresRef.current) {
+      const departuresHeight = departuresRef.current.clientHeight;
+      if (departuresHeight > MAX_DEPARTURES_HEIGHT) {
+        setDepartureCount(departureCount - 1);
       }
     }
 
-    if (bottomRef.current) {
-      const bottomHeight = bottomRef.current.clientHeight;
-      if (bottomHeight > 585) {
-        setBottomNumRows(bottomNumRows - 1);
+    if (laterDeparturesRef.current) {
+      const laterDeparturesHeight = laterDeparturesRef.current.clientHeight;
+      if (laterDeparturesHeight > MAX_LATER_DEPARTURES_HEIGHT) {
+        setLaterDepartureCount(laterDepartureCount - 1);
       }
     }
   });
@@ -150,19 +158,19 @@ const ScreenContainer = ({ id }): JSX.Element => {
             stopName={stopName}
             departures={departures}
             startIndex={0}
-            endIndex={numRows}
-            ref={ref}
+            endIndex={departureCount}
+            ref={departuresRef}
           />
           <BottomScreenContainer
             currentTimeString={currentTimeString}
             departures={departures}
-            startIndex={numRows}
-            endIndex={numRows + bottomNumRows}
+            startIndex={departureCount}
+            endIndex={departureCount + laterDepartureCount}
             globalAlert={globalAlert}
             stopId={stopId}
             nearbyConnections={nearbyConnections}
             serviceLevel={serviceLevel}
-            ref={bottomRef}
+            ref={laterDeparturesRef}
           />
         </div>
       );
