@@ -1,10 +1,4 @@
-import React, {
-  forwardRef,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState
-} from "react";
+import React, { useEffect, useState } from "react";
 
 import ConnectionError from "Components/connection_error";
 import DigitalBridge from "Components/digital_bridge";
@@ -14,48 +8,41 @@ import LineMap from "Components/eink/green_line/line_map";
 import { NoServiceTop } from "Components/no_service";
 import OvernightDepartures from "Components/overnight_departures";
 
-const TopScreenContainer = forwardRef(
-  (
-    {
-      currentTimeString,
-      stopName,
-      departures,
-      startIndex,
-      endIndex,
-      stopId,
-      routeId,
-      lineMapData,
-      headway,
-      inlineAlert,
-      serviceLevel
-    },
-    ref
-  ): JSX.Element => {
-    return (
-      <div className="single-screen-container">
-        <Header
-          stopName={stopName}
-          routeId={routeId}
-          currentTimeString={currentTimeString}
-        />
-        <LineMap
-          data={lineMapData}
-          height={1140}
-          currentTimeString={currentTimeString}
-        />
-        <Departures
-          departures={departures}
-          headway={headway}
-          destination={stopName}
-          inlineAlert={inlineAlert}
-          currentTimeString={currentTimeString}
-          serviceLevel={serviceLevel}
-        />
-        <DigitalBridge stopId={stopId} />
-      </div>
-    );
-  }
-);
+const TopScreenContainer = ({
+  currentTimeString,
+  stopName,
+  departures,
+  stopId,
+  routeId,
+  lineMapData,
+  headway,
+  inlineAlert,
+  serviceLevel
+}): JSX.Element => {
+  return (
+    <div className="single-screen-container">
+      <Header
+        stopName={stopName}
+        routeId={routeId}
+        currentTimeString={currentTimeString}
+      />
+      <LineMap
+        data={lineMapData}
+        height={1140}
+        currentTimeString={currentTimeString}
+      />
+      <Departures
+        departures={departures}
+        headway={headway}
+        destination={stopName}
+        inlineAlert={inlineAlert}
+        currentTimeString={currentTimeString}
+        serviceLevel={serviceLevel}
+      />
+      <DigitalBridge stopId={stopId} />
+    </div>
+  );
+};
 
 const ScreenContainer = ({ id }): JSX.Element => {
   const [success, setSuccess] = useState();
@@ -109,27 +96,6 @@ const ScreenContainer = ({ id }): JSX.Element => {
     return () => clearInterval(interval);
   }, []);
 
-  const [numRows, setNumRows] = useState(7);
-  const [bottomNumRows, setBottomNumRows] = useState(5);
-  const ref = useRef(null);
-  const bottomRef = useRef(null);
-
-  useLayoutEffect(() => {
-    if (ref.current) {
-      const height = ref.current.clientHeight;
-      if (height > 1140) {
-        setNumRows(numRows - 1);
-      }
-    }
-
-    if (bottomRef.current) {
-      const bottomHeight = bottomRef.current.clientHeight;
-      if (bottomHeight > 585) {
-        setBottomNumRows(bottomNumRows - 1);
-      }
-    }
-  });
-
   if (success && departures) {
     if (serviceLevel === 5) {
       return (
@@ -150,18 +116,15 @@ const ScreenContainer = ({ id }): JSX.Element => {
       return (
         <div>
           <TopScreenContainer
-            stopId={stopId}
             currentTimeString={currentTimeString}
             stopName={stopName}
             departures={departures}
-            startIndex={0}
-            endIndex={numRows}
+            stopId={stopId}
             routeId={routeId}
             lineMapData={lineMapData}
             headway={headway}
             inlineAlert={inlineAlert}
             serviceLevel={serviceLevel}
-            ref={ref}
           />
         </div>
       );
