@@ -69,11 +69,13 @@ const BottomScreenContainer = forwardRef(
   }
 );
 
-const ScreenContainer = ({ id }): JSX.Element => {
+const useApiResponse = id => {
+  const DATA_REFRESH_MS = 30000;
+
   const [apiResponse, setApiResponse] = useState(null);
   const apiVersion = document.getElementById("app").dataset.apiVersion;
 
-  const doUpdate = async () => {
+  const fetchData = async () => {
     try {
       const result = await fetch(`/api/screen/${id}?version=${apiVersion}`);
       const json = await result.json();
@@ -88,14 +90,20 @@ const ScreenContainer = ({ id }): JSX.Element => {
   };
 
   useEffect(() => {
-    doUpdate();
+    fetchData();
 
     const interval = setInterval(() => {
-      doUpdate();
-    }, 30000);
+      fetchData();
+    }, DATA_REFRESH_MS);
 
     return () => clearInterval(interval);
   }, []);
+
+  return apiResponse;
+};
+
+const ScreenContainer = ({ id }): JSX.Element => {
+  const apiResponse = useApiResponse(id);
 
   // Fit as many rows as will fit in departures and later departures
   const MAX_DEPARTURE_ROWS = 7;
