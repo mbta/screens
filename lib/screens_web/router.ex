@@ -25,7 +25,12 @@ defmodule ScreensWeb.Router do
   scope "/screen", ScreensWeb do
     pipe_through [:redirect_prod_http, :browser]
 
-    get "/", ScreenController, :index
+    get "/:id", ScreenController, :index
+  end
+
+  scope "/audit", ScreensWeb do
+    pipe_through [:redirect_prod_http, :browser]
+
     get "/:id", ScreenController, :index
   end
 

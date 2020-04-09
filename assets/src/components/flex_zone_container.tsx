@@ -11,8 +11,6 @@ const FlexZoneContainer = forwardRef(
     {
       currentTimeString,
       departures,
-      startIndex,
-      endIndex,
       globalAlert,
       nearbyConnections,
       serviceLevel
@@ -20,12 +18,7 @@ const FlexZoneContainer = forwardRef(
     ref
   ): JSX.Element => {
     // Check whether there are any later departures to show
-    let showLaterDepartures;
-    if (departures) {
-      showLaterDepartures = startIndex < departures.length;
-    } else {
-      showLaterDepartures = false;
-    }
+    const showLaterDepartures = departures && departures.length > 0;
 
     let topComponent;
     let bottomComponent;
@@ -42,8 +35,6 @@ const FlexZoneContainer = forwardRef(
         <Departures
           currentTimeString={currentTimeString}
           departures={departures}
-          startIndex={startIndex}
-          endIndex={endIndex}
           size="small"
           ref={ref}
         />
@@ -55,8 +46,6 @@ const FlexZoneContainer = forwardRef(
         <Departures
           currentTimeString={currentTimeString}
           departures={departures}
-          startIndex={startIndex}
-          endIndex={endIndex}
           size="small"
           ref={ref}
         />

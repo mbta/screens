@@ -5,7 +5,6 @@ defmodule Screens.GLScreenData do
   alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
-  alias Screens.NearbyConnections
 
   def by_stop_id_with_override_and_version(stop_id, screen_id, client_version, is_screen) do
     %{route_id: route_id, direction_id: direction_id, platform_id: platform_id} =
@@ -82,14 +81,6 @@ defmodule Screens.GLScreenData do
         :error -> :error
       end
 
-    nearby_connections_data = NearbyConnections.by_stop_id(stop_id)
-
-    nearby_connections =
-      case nearby_connections_data do
-        {:ok, {_, nearby_connections}} -> nearby_connections
-        _ -> []
-      end
-
     nearby_departures = Screens.NearbyDepartures.by_stop_id(stop_id)
 
     # Move this and make it less brittle
@@ -114,7 +105,6 @@ defmodule Screens.GLScreenData do
           departures: format_departure_rows(departures),
           global_alert: format_global_alert(global_alert),
           inline_alert: format_inline_alert(inline_alerts),
-          nearby_connections: nearby_connections,
           nearby_departures: nearby_departures,
           line_map: line_map_data,
           headway: headway_data,

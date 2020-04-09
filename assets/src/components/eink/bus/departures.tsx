@@ -33,20 +33,14 @@ const buildDeparturesRows = departures => {
 };
 
 const Departures = forwardRef(
-  (
-    { currentTimeString, departures, startIndex, endIndex, size },
-    ref
-  ): JSX.Element => {
+  ({ currentTimeString, departures, size }, ref): JSX.Element => {
     if (!departures || departures.length === 0) {
-      // This shouldn't be possible, because we'd be showing OvernightDepartures.
-      return <div></div>;
+      return null;
     }
-
-    const filteredRows = departures.slice(startIndex, endIndex);
-    const rows = buildDeparturesRows(filteredRows);
+    const departuresRows = buildDeparturesRows(departures);
     return (
       <div className="departures" ref={ref}>
-        {rows.map((row, i) => (
+        {departuresRows.map((row, i) => (
           <DeparturesRow
             currentTimeString={currentTimeString}
             route={row.route}

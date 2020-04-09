@@ -8,7 +8,9 @@ import LineMap from "Components/eink/green_line/line_map";
 import { NoServiceTop } from "Components/no_service";
 import OvernightDepartures from "Components/overnight_departures";
 
-const TopScreenContainer = ({
+import useApiResponse from "Hooks/use_api_response";
+
+const TopScreenLayout = ({
   currentTimeString,
   stopName,
   departures,
@@ -44,99 +46,66 @@ const TopScreenContainer = ({
   );
 };
 
-const ScreenContainer = ({ id }): JSX.Element => {
-  const [success, setSuccess] = useState();
-  const [currentTimeString, setCurrentTimeString] = useState();
-  const [stopName, setStopName] = useState();
-  const [stopId, setStopId] = useState();
-  const [routeId, setRouteId] = useState();
-  const [departures, setDepartures] = useState();
-  const [globalAlert, setGlobalAlert] = useState();
-  const [nearbyConnections, setNearbyConnections] = useState();
-  const [lineMapData, setLineMapData] = useState();
-  const [headway, setHeadway] = useState();
-  const [inlineAlert, setInlineAlert] = useState();
-  const [serviceLevel, setServiceLevel] = useState(1);
+const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
+  return (
+    <TopScreenLayout
+      currentTimeString={apiResponse.current_time}
+      stopName={apiResponse.stop_name}
+      departures={apiResponse.departures}
+      stopId={apiResponse.stop_id}
+      routeId={apiResponse.route_id}
+      lineMapData={apiResponse.line_map}
+      headway={apiResponse.headway}
+      inlineAlert={apiResponse.inline_alert}
+      serviceLevel={apiResponse.service_level}
+    />
+  );
+};
 
-  const apiVersion = document.getElementById("app").dataset.apiVersion;
+const NoServiceScreenLayout = (): JSX.Element => {
+  // COVID Level 5 message
+  return <NoServiceTop mode="subway" />;
+};
 
-  const doUpdate = async () => {
-    try {
-      const result = await fetch(`/api/screen/${id}?version=${apiVersion}`);
-      const json = await result.json();
+const NoDeparturesScreenLayout = ({ apiResponse }): JSX.Element => {
+  // We successfully fetched data, but there are no predictions.
+  // For now, assume that this is because it's the middle of the night.
+  return (
+    <OvernightDepartures
+      size="single"
+      currentTimeString={apiResponse.currentTimeString}
+    />
+  );
+};
 
-      if (json.force_reload === true) {
-        window.location.reload(false);
-      }
+const NoConnectionScreenLayout = (): JSX.Element => {
+  // We weren't able to fetch data. Show a connection error message.
+  return <ConnectionError />;
+};
 
-      setSuccess(json.success);
-      setCurrentTimeString(json.current_time);
-      setStopName(json.stop_name);
-      setStopId(json.stop_id);
-      setRouteId(json.route_id);
-      setDepartures(json.departures);
-      setGlobalAlert(json.global_alert);
-      setInlineAlert(json.inline_alert);
-      setNearbyConnections(json.nearby_connections);
-      setLineMapData(json.line_map);
-      setHeadway(json.headway);
-      setServiceLevel(json.service_level);
-    } catch (err) {
-      setSuccess(false);
-    }
-  };
-
-  useEffect(() => {
-    doUpdate();
-
-    const interval = setInterval(() => {
-      doUpdate();
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  if (success && departures) {
-    if (serviceLevel === 5) {
-      return (
-        <div>
-          <NoServiceTop mode="subway" />
-        </div>
-      );
-    } else if (departures.length === 0 && headway === null) {
-      return (
-        <div>
-          <OvernightDepartures
-            size="single"
-            currentTimeString={currentTimeString}
-          />
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          <TopScreenContainer
-            currentTimeString={currentTimeString}
-            stopName={stopName}
-            departures={departures}
-            stopId={stopId}
-            routeId={routeId}
-            lineMapData={lineMapData}
-            headway={headway}
-            inlineAlert={inlineAlert}
-            serviceLevel={serviceLevel}
-          />
-        </div>
-      );
-    }
-  } else {
-    // We weren't able to fetch data. Show a connection error message.
-    return (
-      <div>
-        <ConnectionError />
-      </div>
-    );
+const ScreenLayout = ({ apiResponse }): JSX.Element => {
+  if (!apiResponse || apiResponse.success === false) {
+    return <NoConnectionScreenLayout />;
   }
+
+  if (apiResponse.service_level === 5) {
+    return <NoServiceScreenLayout />;
+  }
+
+  if (
+    (!apiResponse.departures || apiResponse.departures.length === 0) &&
+    apiResponse.headway === null
+  ) {
+    return <NoDeparturesScreenLayout apiResponse={apiResponse} />;
+  }
+
+  return <DefaultScreenLayout apiResponse={apiResponse} />;
+};
+
+const ScreenContainer = ({ id }): JSX.Element => {
+  const apiResponse = useApiResponse(id);
+  return <ScreenLayout apiResponse={apiResponse} />;
 };
 
 export default ScreenContainer;
+export { ScreenLayout };

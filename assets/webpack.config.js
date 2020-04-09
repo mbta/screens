@@ -10,6 +10,7 @@ module.exports = (env, options) => ({
     extensions: [".ts", ".tsx", ".js", ".jsx"],
     alias: {
       Components: path.resolve(__dirname, "src/components"),
+      Hooks: path.resolve(__dirname, "src/hooks"),
       Util: path.resolve(__dirname, "src/util")
     }
   },
