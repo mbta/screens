@@ -5,7 +5,6 @@ defmodule Screens.GLScreenData do
   alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
-  alias Screens.NearbyConnections
 
   def by_stop_id_with_override_and_version(stop_id, screen_id, client_version, is_screen) do
     %{route_id: route_id, direction_id: direction_id, platform_id: platform_id} =
