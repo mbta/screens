@@ -1,10 +1,4 @@
-import React, {
-  forwardRef,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState
-} from "react";
+import React, { forwardRef, useLayoutEffect, useRef, useState } from "react";
 
 import ConnectionError from "Components/connection_error";
 import DigitalBridge from "Components/digital_bridge";
@@ -14,6 +8,8 @@ import Header from "Components/eink/bus/header";
 import FlexZoneContainer from "Components/flex_zone_container";
 import { NoServiceBottom, NoServiceTop } from "Components/no_service";
 import OvernightDepartures from "Components/overnight_departures";
+
+import useApiResponse from "Hooks/use_api_response";
 
 const TopScreenLayout = forwardRef(
   ({ currentTimeString, stopName, departures }, ref): JSX.Element => {
@@ -59,39 +55,6 @@ const BottomScreenLayout = forwardRef(
     );
   }
 );
-
-const useApiResponse = id => {
-  const DATA_REFRESH_MS = 30000;
-
-  const [apiResponse, setApiResponse] = useState(null);
-  const apiVersion = document.getElementById("app").dataset.apiVersion;
-
-  const fetchData = async () => {
-    try {
-      const result = await fetch(`/api/screen/${id}?version=${apiVersion}`);
-      const json = await result.json();
-
-      if (json.force_reload === true) {
-        window.location.reload(false);
-      }
-      setApiResponse(json);
-    } catch (err) {
-      setApiResponse({ success: false });
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-
-    const interval = setInterval(() => {
-      fetchData();
-    }, DATA_REFRESH_MS);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return apiResponse;
-};
 
 const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   // Fit as many rows as will fit in departures and later departures
@@ -205,4 +168,4 @@ const ScreenContainer = ({ id }): JSX.Element => {
 };
 
 export default ScreenContainer;
-export { ScreenLayout };
+export { ScreenLayout, useApiResponse };
