@@ -205,3 +205,4 @@ const ScreenContainer = ({ id }): JSX.Element => {
 };
 
 export default ScreenContainer;
+export { ScreenLayout };
