@@ -7,6 +7,7 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import {
+  AuditScreenPage,
   MultiScreenPage,
   ScreenPage
 } from "Components/eink/green_line/double/screen_page";
@@ -17,6 +18,9 @@ const App = (): JSX.Element => {
       <Switch>
         <Route exact path="/screen/gl_eink_double">
           <MultiScreenPage />
+        </Route>
+        <Route exact path="/audit/gl_eink_double">
+          <AuditScreenPage />
         </Route>
         <Route path="/screen/:id">
           <ScreenPage />

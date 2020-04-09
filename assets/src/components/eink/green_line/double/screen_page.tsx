@@ -1,5 +1,7 @@
-import ScreenContainer from "Components/eink/green_line/double/screen_container";
-import React from "react";
+import ScreenContainer, {
+  ScreenLayout
+} from "Components/eink/green_line/double/screen_container";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 
 const MultiScreenPage = (): JSX.Element => {
@@ -25,4 +27,19 @@ const ScreenPage = (): JSX.Element => {
   );
 };
 
-export { ScreenPage, MultiScreenPage };
+const AuditScreenPage = (): JSX.Element => {
+  const [data, setData] = useState("");
+
+  const handleChange = event => {
+    setData(JSON.parse(event.target.value));
+  };
+
+  return (
+    <div className="audit-screen-page">
+      <textarea value={JSON.stringify(data)} onChange={handleChange}></textarea>
+      <ScreenLayout apiResponse={data} />;
+    </div>
+  );
+};
+
+export { ScreenPage, MultiScreenPage, AuditScreenPage };
