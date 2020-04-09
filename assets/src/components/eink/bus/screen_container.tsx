@@ -15,7 +15,7 @@ import FlexZoneContainer from "Components/flex_zone_container";
 import { NoServiceBottom, NoServiceTop } from "Components/no_service";
 import OvernightDepartures from "Components/overnight_departures";
 
-const TopScreenContainer = forwardRef(
+const TopScreenLayout = forwardRef(
   ({ currentTimeString, stopName, departures }, ref): JSX.Element => {
     return (
       <div className="single-screen-container">
@@ -31,7 +31,7 @@ const TopScreenContainer = forwardRef(
   }
 );
 
-const BottomScreenContainer = forwardRef(
+const BottomScreenLayout = forwardRef(
   (
     {
       currentTimeString,
@@ -93,9 +93,7 @@ const useApiResponse = id => {
   return apiResponse;
 };
 
-const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse(id);
-
+const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   // Fit as many rows as will fit in departures and later departures
   const MAX_DEPARTURE_ROWS = 7;
   const MAX_LATER_DEPARTURE_ROWS = 5;
@@ -125,65 +123,85 @@ const ScreenContainer = ({ id }): JSX.Element => {
     }
   });
 
-  if (apiResponse && apiResponse.success) {
-    if (apiResponse && apiResponse.serviceLevel === 5) {
-      return (
-        <div>
-          <NoServiceTop mode="bus" />
-          <NoServiceBottom />
-        </div>
-      );
-    } else if (
-      apiResponse &&
-      apiResponse.departures &&
-      apiResponse.departures.length > 0
-    ) {
-      const departuresData = apiResponse.departures.slice(0, departureCount);
-      const laterDeparturesData = apiResponse.departures.slice(
-        departureCount,
-        departureCount + laterDepartureCount
-      );
+  const departuresData = apiResponse.departures.slice(0, departureCount);
+  const laterDeparturesData = apiResponse.departures.slice(
+    departureCount,
+    departureCount + laterDepartureCount
+  );
 
-      return (
-        <div>
-          <TopScreenContainer
-            currentTimeString={apiResponse.current_time}
-            stopName={apiResponse.stop_name}
-            departures={departuresData}
-            ref={departuresRef}
-          />
-          <BottomScreenContainer
-            currentTimeString={apiResponse.current_time}
-            departures={laterDeparturesData}
-            globalAlert={apiResponse.global_alert}
-            stopId={apiResponse.stop_id}
-            nearbyConnections={apiResponse.nearbyConnections}
-            serviceLevel={apiResponse.service_level}
-            ref={laterDeparturesRef}
-          />
-        </div>
-      );
-    } else {
-      // We successfully fetched data, but there are no predictions.
-      // For now, assume that this is because it's the middle of the night.
-      return (
-        <div>
-          <OvernightDepartures
-            size="double"
-            currentTimeString={apiResponse.currentTimeString}
-          />
-        </div>
-      );
-    }
-  } else {
-    // We weren't able to fetch data. Show a connection error message.
-    return (
-      <div>
-        <ConnectionError />
-        <ConnectionError />
-      </div>
-    );
+  return (
+    <div>
+      <TopScreenLayout
+        currentTimeString={apiResponse.current_time}
+        stopName={apiResponse.stop_name}
+        departures={departuresData}
+        ref={departuresRef}
+      />
+      <BottomScreenLayout
+        currentTimeString={apiResponse.current_time}
+        departures={laterDeparturesData}
+        globalAlert={apiResponse.global_alert}
+        stopId={apiResponse.stop_id}
+        nearbyConnections={apiResponse.nearbyConnections}
+        serviceLevel={apiResponse.service_level}
+        ref={laterDeparturesRef}
+      />
+    </div>
+  );
+};
+
+const NoServiceScreenLayout = (): JSX.Element => {
+  // COVID Level 5 message
+  return (
+    <div>
+      <NoServiceTop mode="bus" />
+      <NoServiceBottom />
+    </div>
+  );
+};
+
+const NoDeparturesScreenLayout = ({ apiResponse }): JSX.Element => {
+  // We successfully fetched data, but there are no predictions.
+  // For now, assume that this is because it's the middle of the night.
+  return (
+    <div>
+      <OvernightDepartures
+        size="double"
+        currentTimeString={apiResponse.currentTimeString}
+      />
+    </div>
+  );
+};
+
+const NoConnectionScreenLayout = (): JSX.Element => {
+  // We weren't able to fetch data. Show a connection error message.
+  return (
+    <div>
+      <ConnectionError />
+      <ConnectionError />
+    </div>
+  );
+};
+
+const ScreenLayout = ({ apiResponse }): JSX.Element => {
+  if (!apiResponse || apiResponse.success === false) {
+    return <NoConnectionScreenLayout />;
   }
+
+  if (apiResponse.serviceLevel === 5) {
+    return <NoServiceScreenLayout />;
+  }
+
+  if (!apiResponse.departures || apiResponse.departures.length === 0) {
+    return <NoDeparturesScreenLayout apiResponse={apiResponse} />;
+  }
+
+  return <DefaultScreenLayout apiResponse={apiResponse} />;
+};
+
+const ScreenContainer = ({ id }): JSX.Element => {
+  const apiResponse = useApiResponse(id);
+  return <ScreenLayout apiResponse={apiResponse} />;
 };
 
 export default ScreenContainer;
