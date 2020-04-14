@@ -64,7 +64,7 @@ defmodule Screens.MixProject do
       {:tzdata, "~> 1.0.3"},
       {:credo, "~> 1.1.3", only: [:dev, :test]},
       {:dialyxir, "~> 0.5.1", only: [:dev, :test]},
-      {:excoveralls, "~> 0.11.2", only: :test},
+      {:excoveralls, "~> 0.12.3", only: :test},
       {:ex_aws, "~> 2.1", only: :prod},
       {:ex_aws_secretsmanager, "~> 2.0", only: :prod},
       {:ehmon, github: "mbta/ehmon", only: :prod},
