@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithSize } from "../util";
+import { classWithSize } from "Util";
 
 const DepartureRoute = ({ route, size }): JSX.Element => {
   if (!route) {

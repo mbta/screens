@@ -198,3 +198,4 @@ const NoService = ({ mode }): JSX.Element => {
 };
 
 export { NoServiceTop, NoServiceBottom };
+export default NoService;

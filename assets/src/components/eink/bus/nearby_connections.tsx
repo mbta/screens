@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithSize } from "../util";
+import { classWithSize } from "Util";
 
 const NearbyConnectionsRoute = ({ route, small }): JSX.Element => {
   const size = small === true ? "small" : "large";

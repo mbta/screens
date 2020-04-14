@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 
-import ConnectionError from "Components/connection_error";
-import DigitalBridge from "Components/digital_bridge";
+import ConnectionError from "Components/eink/connection_error";
+import DigitalBridge from "Components/eink/digital_bridge";
+import GlobalAlert from "Components/eink/global_alert";
 import Departures from "Components/eink/green_line/departures";
 import FareInfo from "Components/eink/green_line/fare_info";
 import Header from "Components/eink/green_line/header";
 import LineMap from "Components/eink/green_line/line_map";
-import FlexZoneContainer from "Components/flex_zone_container";
-import GlobalAlert from "Components/global_alert";
-import NearbyDepartures from "Components/nearby_departures";
-import { NoServiceBottom, NoServiceTop } from "Components/no_service";
-import OvernightDepartures from "Components/overnight_departures";
-import TakeoverAlert from "Components/takeover_alert";
+import NearbyDepartures from "Components/eink/green_line/nearby_departures";
+import NoService from "Components/eink/no_service";
+import OvernightDepartures from "Components/eink/overnight_departures";
+import TakeoverAlert from "Components/eink/takeover_alert";
 
 import useApiResponse from "Hooks/use_api_response";
 
@@ -112,17 +111,13 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
 
 const NoServiceScreenLayout = (): JSX.Element => {
   // COVID Level 5 message
-  return (
-    <div>
-      <NoServiceTop mode="subway" />
-      <NoServiceBottom />
-    </div>
-  );
+  return <NoService mode="subway" />;
 };
 
 const NoDeparturesScreenLayout = ({ apiResponse }): JSX.Element => {
-  // We successfully fetched data, but there are no predictions.
-  // For now, assume that this is because it's the middle of the night.
+  // We successfully fetched data, but there are no predictions, and we don't have
+  // a headway for the current daypart. For now, we assume that it's the middle of
+  // the night.
   return (
     <OvernightDepartures
       size="double"

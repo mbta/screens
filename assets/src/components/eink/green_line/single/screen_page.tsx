@@ -20,11 +20,7 @@ const MultiScreenPage = (): JSX.Element => {
 
 const ScreenPage = (): JSX.Element => {
   const { id } = useParams();
-  return (
-    <div>
-      <ScreenContainer id={id} />
-    </div>
-  );
+  return <ScreenContainer id={id} />;
 };
 
 const AuditScreenPage = (): JSX.Element => {

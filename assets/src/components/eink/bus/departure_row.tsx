@@ -1,8 +1,8 @@
 import React from "react";
 
-import DepartureDestination from "./departure_destination";
-import DepartureRoute from "./departure_route";
-import DepartureTime from "./departure_time";
+import DepartureDestination from "Components/eink/bus/departure_destination";
+import DepartureRoute from "Components/eink/bus/departure_route";
+import DepartureTime from "Components/eink/bus/departure_time";
 
 const DepartureRow = ({
   currentTimeString,

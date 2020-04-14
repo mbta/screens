@@ -1,13 +1,13 @@
 import React, { forwardRef, useLayoutEffect, useRef, useState } from "react";
 
-import ConnectionError from "Components/connection_error";
-import DigitalBridge from "Components/digital_bridge";
 import Departures from "Components/eink/bus/departures";
 import FareInfo from "Components/eink/bus/fare_info";
+import FlexZoneContainer from "Components/eink/bus/flex_zone_container";
 import Header from "Components/eink/bus/header";
-import FlexZoneContainer from "Components/flex_zone_container";
-import { NoServiceBottom, NoServiceTop } from "Components/no_service";
-import OvernightDepartures from "Components/overnight_departures";
+import ConnectionError from "Components/eink/connection_error";
+import DigitalBridge from "Components/eink/digital_bridge";
+import NoService from "Components/eink/no_service";
+import OvernightDepartures from "Components/eink/overnight_departures";
 
 import useApiResponse from "Hooks/use_api_response";
 import useFitDepartures from "Hooks/use_fit_departures";
@@ -95,24 +95,17 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
 
 const NoServiceScreenLayout = (): JSX.Element => {
   // COVID Level 5 message
-  return (
-    <div>
-      <NoServiceTop mode="bus" />
-      <NoServiceBottom />
-    </div>
-  );
+  return <NoService mode="bus" />;
 };
 
 const NoDeparturesScreenLayout = ({ apiResponse }): JSX.Element => {
   // We successfully fetched data, but there are no predictions.
   // For now, assume that this is because it's the middle of the night.
   return (
-    <div>
-      <OvernightDepartures
-        size="double"
-        currentTimeString={apiResponse.currentTimeString}
-      />
-    </div>
+    <OvernightDepartures
+      size="double"
+      currentTimeString={apiResponse.currentTimeString}
+    />
   );
 };
 
