@@ -2,6 +2,8 @@ import moment from "moment";
 import "moment-timezone";
 import React from "react";
 
+import { timeRepresentation } from "Components/eink/base_departure_time";
+
 const LineMapLine = ({
   data,
   height,
@@ -289,42 +291,39 @@ const LineMapVehicle = ({
   ].join(" ");
 
   // Format time
-  const departureTime = moment(time);
-  const currentTime = moment(currentTimeString);
-  const secondDifference = departureTime.diff(currentTime, "seconds");
-  const minuteDifference = Math.round(secondDifference / 60);
+  let timeLabel = null;
 
-  let timeLabel;
-  if (time === null) {
-    timeLabel = null;
-  } else if (secondDifference < 60) {
-    timeLabel = (
-      <text
-        x={x + 20 + 18} // lineWidth / 2 + textMargin
-        y={y + 44} // eyeballed it...
-        fontFamily="neue-haas-grotesk-text"
-        fontSize="40"
-        fontWeight="700"
-        textAnchor="right"
-      >
-        Now
-      </text>
-    );
-  } else {
-    timeLabel = (
-      <text
-        x={x + 20 + 18} // lineWidth / 2 + textMargin
-        y={y + 44} // eyeballed it...
-        fontFamily="neue-haas-grotesk-text"
-      >
-        <tspan fontSize="40" fontWeight="700" textAnchor="right">
-          {minuteDifference}
-        </tspan>
-        <tspan fontSize="30" fontWeight="400" textAnchor="right" dx="3">
-          m
-        </tspan>
-      </text>
-    );
+  if (time !== null) {
+    const timeRep = timeRepresentation(time, currentTimeString);
+    if (timeRep.type === "TIME_NOW") {
+      timeLabel = (
+        <text
+          x={x + 20 + 18} // lineWidth / 2 + textMargin
+          y={y + 44} // eyeballed it...
+          fontFamily="neue-haas-grotesk-text"
+          fontSize="40"
+          fontWeight="700"
+          textAnchor="right"
+        >
+          Now
+        </text>
+      );
+    } else if (timeRep.type === "TIME_MINUTES") {
+      timeLabel = (
+        <text
+          x={x + 20 + 18} // lineWidth / 2 + textMargin
+          y={y + 44} // eyeballed it...
+          fontFamily="neue-haas-grotesk-text"
+        >
+          <tspan fontSize="40" fontWeight="700" textAnchor="right">
+            {timeRep.minutes}
+          </tspan>
+          <tspan fontSize="30" fontWeight="400" textAnchor="right" dx="3">
+            m
+          </tspan>
+        </text>
+      );
+    }
   }
 
   return (

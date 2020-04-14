@@ -114,40 +114,11 @@
   font-weight: 400;
 }
 
+// nearby-departures-time
 .nearby-departures-time {
   display: inline-block;
-  vertical-align: middle;
-  font-family: neue-haas-grotesk-text;
-  text-align: right;
   width: 242px;
-}
-
-.nearby-departures-time__now {
+  vertical-align: middle;
+  text-align: right;
   font-size: 72px;
-  font-weight: 700;
-  line-height: 1.185em;
-}
-
-.nearby-departures-time__minutes {
-  font-size: 72px;
-  font-weight: 700;
-  margin-right: 0.0694em;
-  line-height: 1.185em;
-}
-
-.nearby-departures-time__minutes-label {
-  font-size: 52.5px;
-  line-height: 72px;
-}
-
-.nearby-departures-time__timestamp {
-  font-size: 72px;
-  line-height: 72px;
-  font-weight: 700;
-  margin-right: 0.0694em;
-}
-
-.nearby-departures-time__ampm {
-  font-size: 52.5px;
-  line-height: 72px;
 }

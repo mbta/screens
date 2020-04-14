@@ -1,0 +1,32 @@
+.base-departure-time {
+  font-family: neue-haas-grotesk-text;
+  line-height: 1em;
+}
+
+.base-departure-time__now {
+  font-size: 1em;
+  font-weight: 700;
+}
+
+.base-departure-time__minutes {
+  font-size: 1em;
+  font-weight: 700;
+  margin-right: 0.0694em;
+  line-height: 1.185em;
+}
+
+.base-departure-time__minutes-label {
+  font-size: 0.729em;
+  font-weight: 400;
+  line-height: 1em;
+}
+
+.base-departure-time__timestamp {
+  font-weight: 700;
+  margin-right: 0.0694em;
+  font-size: 1em;
+}
+
+.base-departure-time__ampm {
+  font-size: 0.729em;
+}

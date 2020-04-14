@@ -1,84 +1,25 @@
 .departure-time {
   display: inline-block;
   vertical-align: middle;
-  font-family: neue-haas-grotesk-text;
   text-align: right;
 }
 
 .departure-time--large {
+  font-size: 144px;
   width: 320px;
   padding-right: 40px;
 }
 
+.departure-time--large .base-departure-time__timestamp {
+  font-size: 0.5em;
+}
+
+.departure-time--large .base-departure-time__ampm {
+  font-size: 0.5em;
+}
+
 .departure-time--small {
+  font-size: 72px;
   width: 260px;
   padding-right: 40px;
-}
-
-.departure-time__now {
-  font-weight: 700;
-  line-height: 1.185em;
-}
-
-.departure-time__now--large {
-  font-size: 144px;
-}
-
-.departure-time__now--small {
-  font-size: 72px;
-}
-
-.departure-time__minutes {
-  font-weight: 700;
-  margin-right: 0.0694em;
-  line-height: 1.185em;
-}
-
-.departure-time__minutes--large {
-  font-size: 144px;
-}
-
-.departure-time__minutes--small {
-  font-size: 72px;
-}
-
-.departure-time__minutes-label {
-}
-
-.departure-time__minutes-label--large {
-  font-size: 105px;
-  line-height: 144px;
-}
-
-.departure-time__minutes-label--small {
-  font-size: 52.5px;
-  line-height: 72px;
-}
-
-.departure-time__timestamp {
-  font-weight: 700;
-  margin-right: 0.0694em;
-}
-
-.departure-time__timestamp--large {
-  font-size: 72px;
-  line-height: 144px;
-}
-
-.departure-time__timestamp--small {
-  font-size: 72px;
-  line-height: 72px;
-}
-
-.departure-time__ampm {
-}
-
-.departure-time__ampm--large {
-  font-size: 52.5px;
-  line-height: 144px;
-}
-
-.departure-time__ampm--small {
-  font-size: 52.5px;
-  line-height: 72px;
 }
