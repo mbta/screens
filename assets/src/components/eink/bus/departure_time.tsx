@@ -2,7 +2,7 @@ import moment from "moment";
 import "moment-timezone";
 import React from "react";
 
-import { classWithSize } from "../util";
+import { classWithSize } from "Util";
 
 const DepartureTime = ({ time, currentTimeString, size }): JSX.Element => {
   const departureTime = moment(time);

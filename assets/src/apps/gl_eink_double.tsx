@@ -1,6 +1,6 @@
 declare function require(name: string): string;
 // tslint:disable-next-line
-require("../css/bus_eink.scss");
+require("../../css/gl_eink_double.scss");
 
 import React from "react";
 import ReactDOM from "react-dom";
@@ -10,16 +10,16 @@ import {
   AuditScreenPage,
   MultiScreenPage,
   ScreenPage
-} from "Components/eink/bus/screen_page";
+} from "Components/eink/green_line/double/screen_page";
 
 const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
-        <Route exact path="/screen/bus_eink">
+        <Route exact path="/screen/gl_eink_double">
           <MultiScreenPage />
         </Route>
-        <Route exact path="/audit/bus_eink">
+        <Route exact path="/audit/gl_eink_double">
           <AuditScreenPage />
         </Route>
         <Route path="/screen/:id">

@@ -16,9 +16,9 @@ module.exports = (env, options) => ({
   },
   entry: {
     polyfills: "./src/polyfills.js",
-    bus_eink: "./src/bus_eink.tsx",
-    gl_eink_single: "./src/gl_eink_single.tsx",
-    gl_eink_double: "./src/gl_eink_double.tsx"
+    bus_eink: "./src/apps/bus_eink.tsx",
+    gl_eink_single: "./src/apps/gl_eink_single.tsx",
+    gl_eink_double: "./src/apps/gl_eink_double.tsx"
   },
   output: {
     filename: "[name].js",

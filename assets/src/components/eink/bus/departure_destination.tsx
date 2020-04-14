@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithSize } from "../util";
+import { classWithSize } from "Util";
 
 const DepartureDestination = ({ destination, size }): JSX.Element => {
   let inner;
