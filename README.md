@@ -19,4 +19,4 @@
 
 Visit [`localhost:4000/screen/1`](http://localhost:4000/screen/1) in your browser to check that everything is working.
 
-You may want to add `EXPORT API_V3_KEY=<your-key-here>` to your shell config so that you don't have to specify it each time you run `mix phx.server`.
+You may want to add `export API_V3_KEY=<your-key-here>` to your shell config so that you don't have to specify it each time you run `mix phx.server`.
