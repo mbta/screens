@@ -34,3 +34,6 @@ npm-debug.log
 /priv/static/
 
 /assets/coverage
+
+# Ignore the directory created by the ElixirLS VSCode plugin
+.elixir_ls/
