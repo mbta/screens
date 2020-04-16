@@ -5,11 +5,7 @@ defmodule Screens.LogScreenData do
   def log_api_response(screen_id, client_version, is_screen, response) do
     _ =
       if is_screen do
-        Logger.info(
-          "[screen api response] screen_id=#{screen_id} version=#{client_version} response_json=#{
-            Jason.encode!(response)
-          }"
-        )
+        Logger.info("[screen api response] screen_id=#{screen_id} version=#{client_version}")
       end
 
     response
