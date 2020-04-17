@@ -2,7 +2,7 @@
 set -e
 
 ELIXIR_VERSION=1.9.4
-ERLANG_VERSION=22.2.1
+ERLANG_VERSION=22.3.2
 NODE_JS_VERSION=13.6
 
 change-phantomjs-version 2.1.1
