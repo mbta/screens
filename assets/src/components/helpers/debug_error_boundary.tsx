@@ -1,17 +1,21 @@
 import React from "react";
 
-type State = {hasError: boolean};
+interface State {hasError: boolean};
 
 /**
  * Do not use this component on customer facing pages!
  * It's for debugging only--it renders text that riders shouldn't see when its
- * children fail to render.
+ * children fail to render, and logs error info to the console.
  *
  * Wraps children in an error boundary so that render failures in the children
  * don't cause the entire page to fail.
  */
 class DebugErrorBoundary extends React.Component {
-  state: State;
+  public state: State;
+
+  public static getDerivedStateFromError(_error: Error) {
+    return {hasError: true};
+  }
 
   constructor(props: object) {
     super(props);
@@ -20,22 +24,19 @@ class DebugErrorBoundary extends React.Component {
     };
   }
 
-  static getDerivedStateFromError(_error: Error) {
-    return {hasError: true};
-  }
-
-  componentDidCatch(error: Error, errorInfo: object) {
+  public componentDidCatch(error: Error, errorInfo: object) {
+    // tslint:disable-next-line:console
     console.error(error, errorInfo);
   }
 
-  componentDidUpdate(_prevProps: object, prevState: State) {
+  public componentDidUpdate(_prevProps: object, prevState: State) {
     // try to recover when a re-render occurs
     if (prevState.hasError) {
       this.setState({hasError: false});
     }
   }
 
-  render() {
+  public render() {
     if (this.state.hasError) {
       return <h1>Something went wrong. Check console for error info.</h1>;
     }
