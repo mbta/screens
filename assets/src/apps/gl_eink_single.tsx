@@ -6,24 +6,28 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
+import ScreenContainer, {
+  ScreenLayout
+} from "Components/eink/green_line/single/screen_container";
+
 import {
   AuditScreenPage,
   MultiScreenPage,
   ScreenPage
-} from "Components/eink/green_line/single/screen_page";
+} from "Components/eink/screen_page";
 
 const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
         <Route exact path="/screen/gl_eink_single">
-          <MultiScreenPage />
+          <MultiScreenPage screenContainer={ScreenContainer} />
         </Route>
         <Route exact path="/audit/gl_eink_single">
-          <AuditScreenPage />
+          <AuditScreenPage screenLayout={ScreenLayout} />
         </Route>
         <Route path="/screen/:id">
-          <ScreenPage />
+          <ScreenPage screenContainer={ScreenContainer} />
         </Route>
       </Switch>
     </Router>

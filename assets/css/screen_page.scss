@@ -7,3 +7,7 @@
   display: grid;
   grid-template-columns: 1fr 2fr;
 }
+
+.audit-input-invalid {
+  border: 1px solid red;
+}
