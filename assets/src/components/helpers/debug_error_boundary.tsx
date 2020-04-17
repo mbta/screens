@@ -11,11 +11,11 @@ interface State {hasError: boolean};
  * don't cause the entire page to fail.
  */
 class DebugErrorBoundary extends React.Component {
-  public state: State;
-
   public static getDerivedStateFromError(_error: Error) {
     return {hasError: true};
   }
+
+  public state: State;
 
   constructor(props: object) {
     super(props);
@@ -25,7 +25,7 @@ class DebugErrorBoundary extends React.Component {
   }
 
   public componentDidCatch(error: Error, errorInfo: object) {
-    // tslint:disable-next-line:console
+    // tslint:disable-next-line:no-console
     console.error(error, errorInfo);
   }
 
