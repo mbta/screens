@@ -1,6 +1,8 @@
 import React from "react";
 
-interface State {hasError: boolean};
+interface State {
+  hasError: boolean;
+}
 
 /**
  * Do not use this component on customer facing pages!
@@ -12,7 +14,7 @@ interface State {hasError: boolean};
  */
 class DebugErrorBoundary extends React.Component {
   public static getDerivedStateFromError(_error: Error) {
-    return {hasError: true};
+    return { hasError: true };
   }
 
   public state: State;
@@ -32,7 +34,7 @@ class DebugErrorBoundary extends React.Component {
   public componentDidUpdate(_prevProps: object, prevState: State) {
     // try to recover when a re-render occurs
     if (prevState.hasError) {
-      this.setState({hasError: false});
+      this.setState({ hasError: false });
     }
   }
 

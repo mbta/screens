@@ -2,7 +2,11 @@ import DebugErrorBoundary from "Components/helpers/debug_error_boundary";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 
-const MultiScreenPage = ({screenContainer: ScreenContainer}: {screenContainer: React.ComponentType}): JSX.Element => {
+const MultiScreenPage = ({
+  screenContainer: ScreenContainer
+}: {
+  screenContainer: React.ComponentType;
+}): JSX.Element => {
   const screenIds = JSON.parse(
     document.getElementById("app").dataset.screenIds
   );
@@ -16,12 +20,20 @@ const MultiScreenPage = ({screenContainer: ScreenContainer}: {screenContainer: R
   );
 };
 
-const ScreenPage = ({screenContainer: ScreenContainer}: {screenContainer: React.ComponentType}): JSX.Element => {
+const ScreenPage = ({
+  screenContainer: ScreenContainer
+}: {
+  screenContainer: React.ComponentType;
+}): JSX.Element => {
   const { id } = useParams();
   return <ScreenContainer id={id} />;
 };
 
-const AuditScreenPage = ({screenLayout: ScreenLayout}: {screenLayout: React.ComponentType}): JSX.Element => {
+const AuditScreenPage = ({
+  screenLayout: ScreenLayout
+}: {
+  screenLayout: React.ComponentType;
+}): JSX.Element => {
   const [data, setData] = useState("");
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -36,7 +48,7 @@ const AuditScreenPage = ({screenLayout: ScreenLayout}: {screenLayout: React.Comp
       isValid = false;
     }
     return isValid;
-  }
+  };
 
   const parseData = () => {
     try {
@@ -46,11 +58,17 @@ const AuditScreenPage = ({screenLayout: ScreenLayout}: {screenLayout: React.Comp
     }
   };
 
-  const textareaProps = isDataValidJson() ? {} : {className: "audit-input-invalid"};
+  const textareaProps = isDataValidJson()
+    ? {}
+    : { className: "audit-input-invalid" };
 
   return (
     <div className="audit-screen-page">
-      <textarea value={data} onChange={handleChange} {...textareaProps}></textarea>
+      <textarea
+        value={data}
+        onChange={handleChange}
+        {...textareaProps}
+      ></textarea>
       <DebugErrorBoundary>
         <ScreenLayout apiResponse={parseData()} />;
       </DebugErrorBoundary>
