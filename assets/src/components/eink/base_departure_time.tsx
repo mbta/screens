@@ -2,6 +2,8 @@ import moment from "moment";
 import "moment-timezone";
 import React from "react";
 
+moment.tz.setDefault("America/New_York");
+
 const timeRepresentation = (departureTimeString, currentTimeString) => {
   const departureTime = moment(departureTimeString);
   const currentTime = moment(currentTimeString);
@@ -13,8 +15,8 @@ const timeRepresentation = (departureTimeString, currentTimeString) => {
   } else if (minuteDifference < 60) {
     return { type: "TIME_MINUTES", minutes: minuteDifference };
   } else {
-    const timestamp = departureTime.tz("America/New_York").format("h:mm");
-    const ampm = departureTime.tz("America/New_York").format("A");
+    const timestamp = departureTime.format("h:mm");
+    const ampm = departureTime.format("A");
     return {
       type: "TIME_TIMESTAMP",
       timestamp,
