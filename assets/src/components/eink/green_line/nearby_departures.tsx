@@ -1,38 +1,16 @@
-import moment from "moment";
-import "moment-timezone";
 import React from "react";
 
-const NearbyDeparturesTime = ({ time, currentTimeString }): JSX.Element => {
-  const departureTime = moment(time);
-  const currentTime = moment(currentTimeString);
-  const secondDifference = departureTime.diff(currentTime, "seconds");
-  const minuteDifference = Math.round(secondDifference / 60);
+import BaseDepartureTime from "Components/eink/base_departure_time";
 
-  if (secondDifference < 60) {
-    return (
-      <div className="nearby-departures-time">
-        <span className="nearby-departures-time__now">Now</span>
-      </div>
-    );
-  } else if (minuteDifference < 60) {
-    return (
-      <div className="nearby-departures-time">
-        <span className="nearby-departures-time__minutes">
-          {minuteDifference}
-        </span>
-        <span className="nearby-departures-time__minutes-label">m</span>
-      </div>
-    );
-  } else {
-    const timestamp = departureTime.tz("America/New_York").format("h:mm");
-    const ampm = departureTime.tz("America/New_York").format("A");
-    return (
-      <div className="nearby-departures-time">
-        <span className="nearby-departures-time__timestamp">{timestamp}</span>
-        <span className="nearby-departures-time__ampm">{ampm}</span>
-      </div>
-    );
-  }
+const NearbyDeparturesTime = ({ time, currentTimeString }): JSX.Element => {
+  return (
+    <div className="nearby-departures-time">
+      <BaseDepartureTime
+        departureTimeString={time}
+        currentTimeString={currentTimeString}
+      />
+    </div>
+  );
 };
 
 const NearbyDeparturesRoute = ({ route }): JSX.Element => {

@@ -1,0 +1,48 @@
+.departures {
+  display: inline-block;
+  width: 758px;
+  vertical-align: top;
+}
+
+.departures__headway-message {
+  font-family: "neue-haas-grotesk-text";
+  font-size: 72px;
+  text-align: right;
+  color: #999999;
+  padding-right: 40px;
+  padding-top: 72px;
+  padding-bottom: 72px;
+}
+
+.departures__departure {
+  font-size: 336px;
+  text-align: right;
+  padding-right: 40px;
+  padding-top: 72px;
+  padding-bottom: 72px;
+}
+
+.departures__departure .base-departure-time__minutes {
+  line-height: 1em;
+}
+
+.departures__departure .base-departure-time__minutes-label {
+  line-height: 0.729em;
+}
+
+.departures__hairline {
+  height: 2px;
+  width: 718px;
+  background: #cccccc;
+}
+
+.departures__container {
+  height: 100%;
+  position: relative;
+}
+
+.departures__delay-badge {
+  position: absolute;
+  bottom: 52px;
+  right: 0px;
+}

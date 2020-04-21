@@ -1,5 +1,7 @@
 @import url("https://rsms.me/inter/inter.css");
 
+@import "base_departure_time";
+
 @import "connection_error";
 @import "digital_bridge";
 @import "fare_info";
@@ -11,6 +13,8 @@
 @import "overnight_departures";
 @import "screen_container";
 @import "screen_page";
+
+@import "eink/green_line/departures";
 
 @import "eink/green_line/single/line_map";
 @import "eink/green_line/single/departures";
