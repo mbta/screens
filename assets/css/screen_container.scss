@@ -4,4 +4,9 @@
   padding: 0px;
   width: 1200px;
   height: 1600px;
+
+  &--gl {
+    @extend .single-screen-container;
+    height: 1594px;
+  }
 }

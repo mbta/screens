@@ -22,7 +22,7 @@ const TopScreenLayout = ({
   serviceLevel
 }): JSX.Element => {
   return (
-    <div className="single-screen-container">
+    <div className="single-screen-container--gl">
       <Header
         stopName={stopName}
         routeId={routeId}
