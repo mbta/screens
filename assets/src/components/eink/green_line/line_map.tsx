@@ -8,7 +8,7 @@ const LineMapLine = ({
   data,
   height,
   width,
-  currentTimeString
+  currentTimeString,
 }): JSX.Element => {
   const radius = 14;
   const dy = 112;
@@ -46,7 +46,7 @@ const LineMapLine = ({
     "L",
     marginLeft,
     lastStopY,
-    "Z"
+    "Z",
   ].join(" ");
 
   const dFuture = [
@@ -65,7 +65,7 @@ const LineMapLine = ({
     "L",
     marginLeft,
     marginTop + lineWidth / 2,
-    "Z"
+    "Z",
   ].join(" ");
 
   const currentStopName = data.stops.current;
@@ -142,7 +142,7 @@ const LineMapLine = ({
           origin={true}
         />
       ) : null}
-      {vehicles.map(v => (
+      {vehicles.map((v) => (
         <LineMapVehicle
           x={marginLeft + lineWidth / 2}
           y={stopMarginTop + radius + v.index * dy}
@@ -161,7 +161,7 @@ const ScheduledDeparture = ({
   lastStopY,
   stopRadius,
   stopName,
-  time
+  time,
 }): JSX.Element => {
   const x = lastStopX;
   const y = lastStopY + stopRadius * 7;
@@ -183,9 +183,7 @@ const ScheduledDeparture = ({
         fill="#999999"
       >
         <tspan fontSize="40" fontWeight="700">
-          {moment(time)
-            .tz("America/New_York")
-            .format("h:mm")}
+          {moment(time).tz("America/New_York").format("h:mm")}
         </tspan>
         <tspan fontSize="24" dy="36" x={x + radius + margin}>
           Scheduled to depart
@@ -238,7 +236,7 @@ const LineMapStopLabel = ({ x, y, lines, current, origin }): JSX.Element => {
 };
 
 // Helper function
-const degreesToRadians = angleInDegrees => {
+const degreesToRadians = (angleInDegrees) => {
   return (angleInDegrees * Math.PI) / 180.0;
 };
 
@@ -247,7 +245,7 @@ const LineMapVehicle = ({
   y,
   height,
   time,
-  currentTimeString
+  currentTimeString,
 }): JSX.Element => {
   if (y > height) {
     return null;
@@ -287,7 +285,7 @@ const LineMapVehicle = ({
     "L",
     pointX,
     pointY,
-    "Z"
+    "Z",
   ].join(" ");
 
   // Format time

@@ -10,7 +10,7 @@ const DeparturesRow = ({
   destination,
   departureTimes,
   inlineBadges,
-  size
+  size,
 }): JSX.Element => {
   return (
     <div className="departures-row">
