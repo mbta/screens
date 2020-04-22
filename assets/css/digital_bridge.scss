@@ -1,9 +1,12 @@
 .digital-bridge {
   height: 172px;
   background: black;
+  position: absolute;
+  bottom: 0px;
 }
 
 .digital-bridge__logo-container {
+  font-size: 0;
   width: 208px;
   display: inline-block;
 }
@@ -39,6 +42,7 @@
   width: 200px;
   display: inline-block;
   vertical-align: top;
+  font-size: 0;
 }
 
 .digital-bridge__qr-image-container {

@@ -1,6 +1,13 @@
 .single-screen-container {
+  position: relative;
   margin: 0px auto;
   padding: 0px;
   width: 1200px;
   height: 1600px;
+
+  &--gl-mercury {
+    // Mercury single screens have a few pixels obscured by a "surface graphic mask",
+    // making the visible height less than 1600px.
+    height: 1594px;
+  }
 }
