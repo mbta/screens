@@ -1,4 +1,4 @@
-defmodule Screens.VendorDataLogger do
+defmodule Screens.VendorData.Logger do
   @moduledoc false
 
   require Logger
