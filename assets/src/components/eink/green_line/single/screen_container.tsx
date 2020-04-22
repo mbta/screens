@@ -19,7 +19,7 @@ const TopScreenLayout = ({
   lineMapData,
   headway,
   inlineAlert,
-  serviceLevel
+  serviceLevel,
 }): JSX.Element => {
   return (
     <div className="single-screen-container">

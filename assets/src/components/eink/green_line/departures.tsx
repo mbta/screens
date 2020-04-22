@@ -30,7 +30,7 @@ const Departures = ({
   headway,
   inlineAlert,
   currentTimeString,
-  serviceLevel
+  serviceLevel,
 }): JSX.Element => {
   const topDeparture = departures[0];
   const bottomDeparture = departures[1];

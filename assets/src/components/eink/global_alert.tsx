@@ -2,7 +2,7 @@ import moment from "moment";
 import "moment-timezone";
 import React from "react";
 
-const iconForAlert = alert => {
+const iconForAlert = (alert) => {
   // For now, shuttles will show a bus icon, and everything else will
   // just show the default alert icon.
   return { shuttle: "bus-negative-white" }[alert.effect] || "alert";
@@ -20,7 +20,7 @@ const GlobalAlert = ({ alert }): JSX.Element => {
           />
         </div>
         <div className="global-alert__header-effect">
-          {alert.effect.replace("_", " ").replace(/\w\S*/g, txt => {
+          {alert.effect.replace("_", " ").replace(/\w\S*/g, (txt) => {
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
           })}
         </div>

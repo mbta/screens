@@ -36,7 +36,7 @@ const BottomScreenLayout = forwardRef(
       globalAlert,
       stopId,
       nearbyConnections,
-      serviceLevel
+      serviceLevel,
     },
     ref
   ): JSX.Element => {

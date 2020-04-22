@@ -47,7 +47,7 @@ const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
         </div>
       </div>
       <div className="nearby-connections-row__routes">
-        {routes.map(route => (
+        {routes.map((route) => (
           <div className="nearby-connections-route" key={route}>
             <NearbyConnectionsRoute
               route={route}
@@ -80,7 +80,7 @@ const NearbyConnections = ({ nearbyConnections }): JSX.Element => {
         </div>
       </div>
       <div className="nearby-connections__hairline"></div>
-      {nearbyConnections.map(row => (
+      {nearbyConnections.map((row) => (
         <div key={row.name}>
           <NearbyConnectionsRow
             name={row.name}

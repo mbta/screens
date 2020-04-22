@@ -13,7 +13,7 @@ const FlexZoneContainer = forwardRef(
       departures,
       globalAlert,
       nearbyConnections,
-      serviceLevel
+      serviceLevel,
     },
     ref
   ): JSX.Element => {
