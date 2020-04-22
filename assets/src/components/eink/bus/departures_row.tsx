@@ -2,7 +2,7 @@ import React from "react";
 
 import DepartureRow from "Components/eink/bus/departure_row";
 import InlineAlert from "Components/eink/bus/inline_alert";
-import { classWithSize } from "Util";
+import { classWithModifier } from "Util";
 
 const DeparturesRow = ({
   currentTimeString,
@@ -14,7 +14,7 @@ const DeparturesRow = ({
 }): JSX.Element => {
   return (
     <div className="departures-row">
-      <div className={classWithSize("departures-row__container", size)}>
+      <div className={classWithModifier("departures-row__container", size)}>
         {departureTimes.map((t, i) => (
           <DepartureRow
             currentTimeString={currentTimeString}

@@ -1,11 +1,11 @@
 import React from "react";
 
-import { classWithSize } from "Util";
+import { classWithModifier } from "Util";
 
 const NearbyConnectionsRoute = ({ route, small }): JSX.Element => {
   const size = small === true ? "small" : "large";
-  const pillClass = classWithSize("nearby-connections-route__pill", size);
-  const textClass = classWithSize("nearby-connections-route__text", size);
+  const pillClass = classWithModifier("nearby-connections-route__pill", size);
+  const textClass = classWithModifier("nearby-connections-route__text", size);
 
   let routeElt;
   if (route.includes("CR-")) {
@@ -63,7 +63,7 @@ const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
 
 const NearbyConnections = ({ nearbyConnections }): JSX.Element => {
   if (!nearbyConnections || nearbyConnections.length === 0) {
-    return <div></div>;
+    return null;
   }
 
   return (

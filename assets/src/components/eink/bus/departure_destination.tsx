@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithSize } from "Util";
+import { classWithModifier } from "Util";
 
 const DepartureDestination = ({ destination, size }): JSX.Element => {
   let inner;
@@ -12,12 +12,19 @@ const DepartureDestination = ({ destination, size }): JSX.Element => {
     const secondaryDestination = "via " + parts[1];
 
     inner = (
-      <div className={classWithSize("departure-destination__container", size)}>
-        <div className={classWithSize("departure-destination__primary", size)}>
+      <div
+        className={classWithModifier("departure-destination__container", size)}
+      >
+        <div
+          className={classWithModifier("departure-destination__primary", size)}
+        >
           {primaryDestination}
         </div>
         <div
-          className={classWithSize("departure-destination__secondary", size)}
+          className={classWithModifier(
+            "departure-destination__secondary",
+            size
+          )}
         >
           {secondaryDestination}
         </div>
@@ -25,8 +32,12 @@ const DepartureDestination = ({ destination, size }): JSX.Element => {
     );
   } else {
     inner = (
-      <div className={classWithSize("departure-destination__container", size)}>
-        <div className={classWithSize("departure-destination__primary", size)}>
+      <div
+        className={classWithModifier("departure-destination__container", size)}
+      >
+        <div
+          className={classWithModifier("departure-destination__primary", size)}
+        >
           {destination}
         </div>
       </div>
@@ -34,7 +45,9 @@ const DepartureDestination = ({ destination, size }): JSX.Element => {
   }
 
   return (
-    <div className={classWithSize("departure-destination", size)}>{inner}</div>
+    <div className={classWithModifier("departure-destination", size)}>
+      {inner}
+    </div>
   );
 };
 

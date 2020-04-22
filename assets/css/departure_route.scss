@@ -4,74 +4,15 @@
 }
 
 .departure-route--large {
-  width: 420px;
+  width: 356px;
+  font-size: 144px;
+  margin-left: 32px;
+  margin-right: 32px;
 }
 
 .departure-route--small {
-  width: 254px;
-}
-
-.departure-route__pill {
-  font-family: neue-haas-grotesk-text;
-  background: black;
-  text-align: center;
-}
-
-.departure-route__pill--xsmall {
   width: 178px;
-  height: 60px;
-  margin-left: 44px;
-  border-radius: 36px;
-}
-
-.departure-route__pill--small {
-  width: 178px;
-  height: 86px;
-  margin-left: 44px;
-  border-radius: 72px;
-}
-
-.departure-route__pill--medium {
-  width: 356px;
-  height: 120px;
-  margin-left: 32px;
-  border-radius: 72px;
-}
-
-.departure-route__pill--large {
-  width: 356px;
-  height: 172px;
-  margin-left: 32px;
-  border-radius: 144px;
-}
-
-.departure-route__number {
-  color: white;
-  font-family: neue-haas-grotesk-text;
-  font-weight: 700;
-  display: inline-block;
-  margin: auto;
-  line-height: 1.185em;
-}
-
-.departure-route__number--xsmall {
-  font-size: 40px;
-  line-height: 60px;
-  letter-spacing: 1px;
-}
-
-.departure-route__number--small {
   font-size: 72px;
-  letter-spacing: 2px;
-}
-
-.departure-route__number--medium {
-  font-size: 80px;
-  line-height: 120px;
-  letter-spacing: 2px;
-}
-
-.departure-route__number--large {
-  font-size: 144px;
-  letter-spacing: 4px;
+  margin-left: 44px;
+  margin-right: 32px;
 }
