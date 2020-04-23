@@ -1,6 +1,7 @@
 import React from "react";
 
 import BaseDepartureTime from "Components/eink/base_departure_time";
+import BaseDepartureDestination from "Components/eink/base_departure_destination";
 
 const NearbyDeparturesTime = ({ time, currentTimeString }): JSX.Element => {
   return (
@@ -24,32 +25,11 @@ const NearbyDeparturesRoute = ({ route }): JSX.Element => {
 };
 
 const NearbyDeparturesDestination = ({ destination }): JSX.Element => {
-  if (destination === undefined) {
-    return null;
-  } else if (destination.includes("via")) {
-    const parts = destination.split(" via ");
-    const primaryDestination = parts[0];
-    const secondaryDestination = "via " + parts[1];
-
-    return (
-      <div className="nearby-departures-destination">
-        <div className="nearby-departures-destination__primary">
-          {primaryDestination}
-        </div>
-        <div className="nearby-departures-destination__secondary">
-          {secondaryDestination}
-        </div>
-      </div>
-    );
-  } else {
-    return (
-      <div className="nearby-departures-destination">
-        <div className="nearby-departures-destination__primary">
-          {destination}
-        </div>
-      </div>
-    );
-  }
+  return (
+    <div className="nearby-departures-destination">
+      <BaseDepartureDestination destination={destination} />
+    </div>
+  );
 };
 
 const NearbyDeparturesRow = ({
