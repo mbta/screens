@@ -4,170 +4,7 @@ import React from "react";
 
 import { timeRepresentation } from "Components/eink/base_departure_time";
 
-const LineMapLine = ({
-  data,
-  height,
-  width,
-  currentTimeString,
-}): JSX.Element => {
-  const radius = 14;
-  const dy = 112;
-  const lineWidth = 40;
-  const marginLeft = 84;
-  const marginTop = 32;
-  const stopMarginTop = 110;
-  const textMargin = 18;
-  const strokeWidth = 16;
-
-  const lastStopIndex = 2 + data.stops.count_before;
-  const currentStopY = stopMarginTop + 2 * dy + radius;
-  let lastStopY = stopMarginTop + lastStopIndex * dy + radius;
-
-  const showOriginStop = lastStopY + radius + strokeWidth <= height;
-  if (!showOriginStop) {
-    lastStopY = height;
-  }
-
-  const showScheduledDeparture =
-    data.schedule !== null && lastStopY + 8 * radius + strokeWidth <= height;
-
-  const vehicles = data.vehicles;
-
-  const dPast = [
-    "M",
-    marginLeft,
-    currentStopY,
-    "L",
-    marginLeft + lineWidth,
-    currentStopY,
-    "L",
-    marginLeft + lineWidth,
-    lastStopY,
-    "L",
-    marginLeft,
-    lastStopY,
-    "Z",
-  ].join(" ");
-
-  const dFuture = [
-    "M",
-    marginLeft + lineWidth / 2,
-    marginTop,
-    "L",
-    marginLeft + lineWidth,
-    marginTop + lineWidth / 2,
-    "L",
-    marginLeft + lineWidth,
-    currentStopY,
-    "L",
-    marginLeft,
-    currentStopY,
-    "L",
-    marginLeft,
-    marginTop + lineWidth / 2,
-    "Z",
-  ].join(" ");
-
-  const currentStopName = data.stops.current;
-  const nextStopName = data.stops.next;
-  const followingStopName = data.stops.following;
-  const originStopName = data.stops.origin;
-
-  return (
-    <g>
-      <path d={dPast} fill="#CCCCCC"></path>
-      <path d={dFuture} fill="#000000"></path>
-      {[...Array(lastStopIndex)].map((_, i) =>
-        stopMarginTop + radius + i * dy < height ? (
-          <circle
-            cx={marginLeft + lineWidth / 2}
-            cy={stopMarginTop + radius + i * dy}
-            r={radius}
-            fill="#FFFFFF"
-            stroke="none"
-            key={"circle-" + i}
-          ></circle>
-        ) : null
-      )}
-      <circle
-        cx={marginLeft + lineWidth / 2}
-        cy={currentStopY}
-        r={radius + strokeWidth / 2}
-        fill="#FFFFFF"
-        stroke="#000000"
-        strokeWidth={strokeWidth}
-      ></circle>
-      {showOriginStop ? (
-        <circle
-          cx={marginLeft + lineWidth / 2}
-          cy={lastStopY}
-          r={radius + strokeWidth / 2}
-          fill="#FFFFFF"
-          stroke="#CCCCCC"
-          strokeWidth={strokeWidth}
-        ></circle>
-      ) : null}
-      {showScheduledDeparture ? (
-        <ScheduledDeparture
-          lastStopX={marginLeft + lineWidth / 2}
-          lastStopY={lastStopY}
-          stopRadius={radius}
-          stopName={originStopName}
-          time={data.schedule.time}
-        />
-      ) : null}
-
-      {/* Stop labels */}
-      <LineMapStopLabel
-        x={marginLeft + lineWidth + textMargin}
-        y={stopMarginTop + 2 * radius}
-        lines={[followingStopName]}
-      />
-      <LineMapStopLabel
-        x={marginLeft + lineWidth + textMargin}
-        y={stopMarginTop + 2 * radius + dy}
-        lines={[nextStopName]}
-      />
-      <LineMapStopLabel
-        x={marginLeft + lineWidth + textMargin}
-        y={stopMarginTop + 2 * radius + 2 * dy}
-        lines={[currentStopName]}
-        current={true}
-      />
-      {showOriginStop ? (
-        <LineMapStopLabel
-          x={marginLeft + lineWidth + textMargin}
-          y={stopMarginTop + 2 * radius + lastStopIndex * dy}
-          lines={[originStopName]}
-          origin={true}
-        />
-      ) : null}
-      {vehicles.map((v) => (
-        <LineMapVehicle
-          x={marginLeft + lineWidth / 2}
-          y={stopMarginTop + radius + v.index * dy}
-          height={height}
-          time={v.index >= 2 ? v.time : null}
-          currentTimeString={currentTimeString}
-          key={v.id}
-        />
-      ))}
-    </g>
-  );
-};
-
-const ScheduledDeparture = ({
-  lastStopX,
-  lastStopY,
-  stopRadius,
-  stopName,
-  time,
-}): JSX.Element => {
-  const x = lastStopX;
-  const y = lastStopY + stopRadius * 7;
-  const radius = 30;
-  const margin = 9;
-
+const ScheduledDepartureIcon = ({ x, y, radius }): JSX.Element => {
   return (
     <g>
       <circle cx={x} cy={y} r={radius} fill="#999999" strokeWidth="0"></circle>
@@ -176,22 +13,57 @@ const ScheduledDeparture = ({
         y={y - radius * 0.8}
         size={radius * 1.6}
       />
-      <text
-        x={x + radius + margin}
-        y={y + 12}
-        fontFamily="neue-haas-grotesk-text"
-        fill="#999999"
-      >
-        <tspan fontSize="40" fontWeight="700">
-          {moment(time).tz("America/New_York").format("h:mm")}
-        </tspan>
-        <tspan fontSize="24" dy="36" x={x + radius + margin}>
-          Scheduled to depart
-        </tspan>
-        <tspan fontSize="24" dy="32" x={x + radius + margin}>
-          {stopName}
-        </tspan>
-      </text>
+    </g>
+  );
+};
+
+const ScheduledDepartureDescription = ({
+  x,
+  y,
+  radius,
+  margin,
+  time,
+  stopName,
+}): JSX.Element => {
+  return (
+    <text
+      x={x + radius + margin}
+      y={y + 12}
+      fontFamily="neue-haas-grotesk-text"
+      fill="#999999"
+    >
+      <tspan fontSize="40" fontWeight="700">
+        {moment(time).tz("America/New_York").format("h:mm")}
+      </tspan>
+      <tspan fontSize="24" dy="36" x={x + radius + margin}>
+        Scheduled to depart
+      </tspan>
+      <tspan fontSize="24" dy="32" x={x + radius + margin}>
+        {stopName}
+      </tspan>
+    </text>
+  );
+};
+
+const ScheduledDeparture = ({
+  lastStopX,
+  lastStopY,
+  dy,
+  stopRadius,
+  stopName,
+  time,
+}): JSX.Element => {
+  const x = lastStopX;
+  const y = lastStopY + dy - stopRadius;
+  const radius = 30;
+  const margin = 9;
+
+  return (
+    <g>
+      <ScheduledDepartureIcon {...{ x, y, radius }} />
+      <ScheduledDepartureDescription
+        {...{ x, y, radius, margin, time, stopName }}
+      />
     </g>
   );
 };
@@ -240,17 +112,7 @@ const degreesToRadians = (angleInDegrees) => {
   return (angleInDegrees * Math.PI) / 180.0;
 };
 
-const LineMapVehicle = ({
-  x,
-  y,
-  height,
-  time,
-  currentTimeString,
-}): JSX.Element => {
-  if (y > height) {
-    return null;
-  }
-
+const LineMapVehicleDroplet = ({ x, y }): JSX.Element => {
   // Parameters
   const centerX = x;
   const centerY = y;
@@ -288,42 +150,6 @@ const LineMapVehicle = ({
     "Z",
   ].join(" ");
 
-  // Format time
-  let timeLabel = null;
-
-  if (time !== null) {
-    const timeRep = timeRepresentation(time, currentTimeString);
-    if (timeRep.type === "TIME_NOW") {
-      timeLabel = (
-        <text
-          x={x + 20 + 18} // lineWidth / 2 + textMargin
-          y={y + 44} // eyeballed it...
-          fontFamily="neue-haas-grotesk-text"
-          fontSize="40"
-          fontWeight="700"
-          textAnchor="right"
-        >
-          Now
-        </text>
-      );
-    } else if (timeRep.type === "TIME_MINUTES") {
-      timeLabel = (
-        <text
-          x={x + 20 + 18} // lineWidth / 2 + textMargin
-          y={y + 44} // eyeballed it...
-          fontFamily="neue-haas-grotesk-text"
-        >
-          <tspan fontSize="40" fontWeight="700" textAnchor="right">
-            {timeRep.minutes}
-          </tspan>
-          <tspan fontSize="30" fontWeight="400" textAnchor="right" dx="3">
-            m
-          </tspan>
-        </text>
-      );
-    }
-  }
-
   return (
     <g>
       <path
@@ -338,7 +164,69 @@ const LineMapVehicle = ({
         y={centerY - iconSize / 2}
         size={iconSize}
       />
-      {timeLabel}
+    </g>
+  );
+};
+
+const LineMapVehicleLabel = ({
+  x,
+  y,
+  time,
+  currentTimeString,
+}): JSX.Element => {
+  if (time === null) {
+    return null;
+  } else {
+    const timeRep = timeRepresentation(time, currentTimeString);
+    if (timeRep.type === "TIME_NOW") {
+      return (
+        <text
+          x={x + 20 + 18} // lineWidth / 2 + textMargin
+          y={y + 44} // eyeballed it...
+          fontFamily="neue-haas-grotesk-text"
+          fontSize="40"
+          fontWeight="700"
+          textAnchor="right"
+        >
+          Now
+        </text>
+      );
+    } else if (timeRep.type === "TIME_MINUTES") {
+      return (
+        <text
+          x={x + 20 + 18} // lineWidth / 2 + textMargin
+          y={y + 44} // eyeballed it...
+          fontFamily="neue-haas-grotesk-text"
+        >
+          <tspan fontSize="40" fontWeight="700" textAnchor="right">
+            {timeRep.minutes}
+          </tspan>
+          <tspan fontSize="30" fontWeight="400" textAnchor="right" dx="3">
+            m
+          </tspan>
+        </text>
+      );
+    } else {
+      return null;
+    }
+  }
+};
+
+const LineMapVehicle = ({
+  x,
+  y,
+  height,
+  time,
+  currentTimeString,
+}): JSX.Element => {
+  if (y > height) {
+    return null;
+  }
+
+  return (
+    <g>
+      <LineMapVehicleDroplet x={x} y={y} />
+      <LineMapVehicleLabel {...{ x, y, time, currentTimeString }} />
     </g>
   );
 };
@@ -358,6 +246,334 @@ const LineMapVehicleIcon = ({ x, y, size }): JSX.Element => {
   );
 };
 
+const LineMapLineBefore = ({
+  lineWidth,
+  marginLeft,
+  marginTop,
+  currentStopY,
+  lastStopY,
+}): JSX.Element => {
+  const dPast = [
+    "M",
+    marginLeft,
+    currentStopY,
+    "L",
+    marginLeft + lineWidth,
+    currentStopY,
+    "L",
+    marginLeft + lineWidth,
+    lastStopY,
+    "L",
+    marginLeft,
+    lastStopY,
+    "Z",
+  ].join(" ");
+
+  return <path d={dPast} fill="#CCCCCC"></path>;
+};
+
+const LineMapLineAfter = ({
+  lineWidth,
+  marginLeft,
+  marginTop,
+  currentStopY,
+}): JSX.Element => {
+  const dFuture = [
+    "M",
+    marginLeft + lineWidth / 2,
+    marginTop,
+    "L",
+    marginLeft + lineWidth,
+    marginTop + lineWidth / 2,
+    "L",
+    marginLeft + lineWidth,
+    currentStopY,
+    "L",
+    marginLeft,
+    currentStopY,
+    "L",
+    marginLeft,
+    marginTop + lineWidth / 2,
+    "Z",
+  ].join(" ");
+
+  return <path d={dFuture} fill="#000000"></path>;
+};
+
+const LineMapLine = (props): JSX.Element => {
+  return (
+    <g>
+      <LineMapLineBefore {...props} />
+      <LineMapLineAfter {...props} />
+    </g>
+  );
+};
+
+const LineMapStop = ({
+  marginLeft,
+  textMargin,
+  lineWidth,
+  stopMarginTop,
+  radius,
+  i,
+  dy,
+  stopName,
+  lastStopIndex,
+}): JSX.Element => {
+  return (
+    <g>
+      <circle
+        cx={marginLeft + lineWidth / 2}
+        cy={stopMarginTop + radius + i * dy}
+        r={radius}
+        fill="#FFFFFF"
+        stroke="none"
+      ></circle>
+      {stopName === null ? null : (
+        <LineMapStopLabel
+          x={marginLeft + lineWidth + textMargin}
+          y={stopMarginTop + 2 * radius + i * dy}
+          lines={[stopName]}
+          current={i === 2}
+          origin={i === lastStopIndex}
+        />
+      )}
+    </g>
+  );
+};
+
+const LineMapCurrentStop = ({
+  marginLeft,
+  lineWidth,
+  currentStopY,
+  radius,
+  strokeWidth,
+}): JSX.Element => {
+  return (
+    <circle
+      cx={marginLeft + lineWidth / 2}
+      cy={currentStopY}
+      r={radius + strokeWidth / 2}
+      fill="#FFFFFF"
+      stroke="#000000"
+      strokeWidth={strokeWidth}
+    ></circle>
+  );
+};
+
+const LineMapOriginStop = ({
+  marginLeft,
+  lineWidth,
+  lastStopY,
+  radius,
+  strokeWidth,
+  showOriginStop,
+}): JSX.Element => {
+  if (showOriginStop) {
+    return (
+      <circle
+        cx={marginLeft + lineWidth / 2}
+        cy={lastStopY}
+        r={radius + strokeWidth / 2}
+        fill="#FFFFFF"
+        stroke="#CCCCCC"
+        strokeWidth={strokeWidth}
+      ></circle>
+    );
+  } else {
+    return null;
+  }
+};
+
+const LineMapStops = ({
+  stopMarginTop,
+  radius,
+  dy,
+  height,
+  lineWidth,
+  marginLeft,
+  lastStopIndex,
+  currentStopY,
+  strokeWidth,
+  showOriginStop,
+  lastStopY,
+  stopNames,
+  textMargin,
+}): JSX.Element => {
+  const currentStopProps = {
+    marginLeft,
+    lineWidth,
+    currentStopY,
+    radius,
+    strokeWidth,
+  };
+  const originStopProps = {
+    marginLeft,
+    lineWidth,
+    lastStopY,
+    radius,
+    strokeWidth,
+    showOriginStop,
+  };
+  return (
+    <g>
+      {[...Array(lastStopIndex + 1)].map((_, i) => {
+        if (stopMarginTop + radius + i * dy < height) {
+          const key = "stop-" + i;
+          const stopName = stopNames[i];
+          const props = {
+            marginLeft,
+            textMargin,
+            lineWidth,
+            stopMarginTop,
+            radius,
+            i,
+            dy,
+            stopName,
+            lastStopIndex,
+            key,
+          };
+          return <LineMapStop {...props} />;
+        } else {
+          return null;
+        }
+      })}
+      <LineMapCurrentStop {...currentStopProps} />
+      <LineMapOriginStop {...originStopProps} />
+    </g>
+  );
+};
+
+const LineMapBase = ({
+  lineWidth,
+  marginLeft,
+  marginTop,
+  stopMarginTop,
+  radius,
+  dy,
+  currentStopY,
+  lastStopY,
+  height,
+  lastStopIndex,
+  strokeWidth,
+  showOriginStop,
+  stopNames,
+  textMargin,
+}): JSX.Element => {
+  const lineProps = {
+    lineWidth,
+    marginLeft,
+    marginTop,
+    currentStopY,
+    lastStopY,
+  };
+
+  const stopProps = {
+    height,
+    lineWidth,
+    marginLeft,
+    stopMarginTop,
+    radius,
+    dy,
+    lastStopIndex,
+    currentStopY,
+    strokeWidth,
+    showOriginStop,
+    lastStopY,
+    stopNames,
+    textMargin,
+  };
+  return (
+    <g>
+      <LineMapLine {...lineProps} />
+      <LineMapStops {...stopProps} />
+    </g>
+  );
+};
+
+const LineMapContainer = ({
+  data,
+  height,
+  width,
+  currentTimeString,
+}): JSX.Element => {
+  const radius = 14;
+  const dy = 112;
+  const lineWidth = 40;
+  const marginLeft = 84;
+  const marginTop = 32;
+  const stopMarginTop = 110;
+  const textMargin = 18;
+  const strokeWidth = 16;
+
+  const lastStopIndex = 2 + data.stops.count_before;
+  const currentStopY = stopMarginTop + 2 * dy + radius;
+  let lastStopY = stopMarginTop + lastStopIndex * dy + radius;
+
+  const showOriginStop = lastStopY + radius + strokeWidth <= height;
+  if (!showOriginStop) {
+    lastStopY = height;
+  }
+
+  const showScheduledDeparture =
+    data.schedule !== null && lastStopY + 8 * radius + strokeWidth <= height;
+
+  const vehicles = data.vehicles;
+
+  const unlabeledStops = Array.from({ length: lastStopIndex - 3 }, () => null);
+  const stopNames = [
+    data.stops.following,
+    data.stops.next,
+    data.stops.current,
+    ...unlabeledStops,
+    data.stops.origin,
+  ];
+
+  const lineMapProps = {
+    lineWidth,
+    marginLeft,
+    marginTop,
+    stopMarginTop,
+    radius,
+    dy,
+    lastStopIndex,
+    currentStopY,
+    lastStopY,
+    height,
+    strokeWidth,
+    showOriginStop,
+    stopNames,
+    textMargin,
+  };
+
+  return (
+    <g>
+      <LineMapBase {...lineMapProps} />
+      {showScheduledDeparture ? (
+        <ScheduledDeparture
+          lastStopX={marginLeft + lineWidth / 2}
+          lastStopY={lastStopY}
+          stopRadius={radius}
+          stopName={data.stops.origin}
+          time={data.schedule.time}
+          dy={dy}
+        />
+      ) : null}
+
+      {vehicles.map((v) => (
+        <LineMapVehicle
+          x={marginLeft + lineWidth / 2}
+          y={stopMarginTop + radius + v.index * dy}
+          height={height}
+          time={v.index >= 2 ? v.time : null}
+          currentTimeString={currentTimeString}
+          key={v.id}
+        />
+      ))}
+    </g>
+  );
+};
+
 const LineMap = ({ data, height, currentTimeString }): JSX.Element => {
   if (!data) {
     return <div className="line-map"></div>;
@@ -365,22 +581,23 @@ const LineMap = ({ data, height, currentTimeString }): JSX.Element => {
 
   // We set the SVG height to fill the entire screen due to an issue on Mercury double-stack signs.
   const screenHeight = height === 1140 ? 1140 : 2740;
+  const contentHeight = height;
+  const contentWidth = 442;
 
-  const width = 442;
   return (
     <div className="line-map">
       <svg
-        width={width + "px"}
+        width={contentWidth + "px"}
         height={screenHeight + "px"}
-        viewBox={[0, 0, width, screenHeight].join(" ")}
+        viewBox={[0, 0, contentWidth, screenHeight].join(" ")}
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
         className="line-map__svg"
       >
-        <LineMapLine
+        <LineMapContainer
           data={data}
-          height={height}
-          width={width}
+          height={contentHeight}
+          width={contentWidth}
           currentTimeString={currentTimeString}
         />
       </svg>
