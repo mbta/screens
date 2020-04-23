@@ -1,17 +1,23 @@
 import moment from "moment";
 import "moment-timezone";
-import React from "react";
+import React, { createContext, useContext } from "react";
 
 import { timeRepresentation } from "Components/eink/base_departure_time";
 
-const ScheduledDepartureIcon = ({ x, y, radius }): JSX.Element => {
+const ScheduledDepartureIcon = ({ x, y, iconRadius }): JSX.Element => {
   return (
     <g>
-      <circle cx={x} cy={y} r={radius} fill="#999999" strokeWidth="0"></circle>
+      <circle
+        cx={x}
+        cy={y}
+        r={iconRadius}
+        fill="#999999"
+        strokeWidth="0"
+      ></circle>
       <LineMapVehicleIcon
-        x={x - radius * 0.8}
-        y={y - radius * 0.8}
-        size={radius * 1.6}
+        x={x - iconRadius * 0.8}
+        y={y - iconRadius * 0.8}
+        size={iconRadius * 1.6}
       />
     </g>
   );
@@ -20,14 +26,14 @@ const ScheduledDepartureIcon = ({ x, y, radius }): JSX.Element => {
 const ScheduledDepartureDescription = ({
   x,
   y,
-  radius,
+  iconRadius,
   margin,
   time,
   stopName,
 }): JSX.Element => {
   return (
     <text
-      x={x + radius + margin}
+      x={x + iconRadius + margin}
       y={y + 12}
       fontFamily="neue-haas-grotesk-text"
       fill="#999999"
@@ -35,34 +41,41 @@ const ScheduledDepartureDescription = ({
       <tspan fontSize="40" fontWeight="700">
         {moment(time).tz("America/New_York").format("h:mm")}
       </tspan>
-      <tspan fontSize="24" dy="36" x={x + radius + margin}>
+      <tspan fontSize="24" dy="36" x={x + iconRadius + margin}>
         Scheduled to depart
       </tspan>
-      <tspan fontSize="24" dy="32" x={x + radius + margin}>
+      <tspan fontSize="24" dy="32" x={x + iconRadius + margin}>
         {stopName}
       </tspan>
     </text>
   );
 };
 
-const ScheduledDeparture = ({
-  lastStopX,
-  lastStopY,
-  dy,
-  stopRadius,
-  stopName,
-  time,
-}): JSX.Element => {
-  const x = lastStopX;
-  const y = lastStopY + dy - stopRadius;
-  const radius = 30;
+const ScheduledDeparture = ({ stopName, schedule }): JSX.Element => {
+  const {
+    showScheduledDeparture,
+    lastStopY,
+    dy,
+    radius,
+    marginLeft,
+    lineWidth,
+  } = useContext(LineMapContext);
+
+  if (!showScheduledDeparture) {
+    return null;
+  }
+
+  const time = schedule.time;
+  const x = marginLeft + lineWidth / 2;
+  const y = lastStopY + dy - radius;
+  const iconRadius = 30;
   const margin = 9;
 
   return (
     <g>
-      <ScheduledDepartureIcon {...{ x, y, radius }} />
+      <ScheduledDepartureIcon {...{ x, y, iconRadius }} />
       <ScheduledDepartureDescription
-        {...{ x, y, radius, margin, time, stopName }}
+        {...{ x, y, iconRadius, margin, time, stopName }}
       />
     </g>
   );
@@ -212,25 +225,6 @@ const LineMapVehicleLabel = ({
   }
 };
 
-const LineMapVehicle = ({
-  x,
-  y,
-  height,
-  time,
-  currentTimeString,
-}): JSX.Element => {
-  if (y > height) {
-    return null;
-  }
-
-  return (
-    <g>
-      <LineMapVehicleDroplet x={x} y={y} />
-      <LineMapVehicleLabel {...{ x, y, time, currentTimeString }} />
-    </g>
-  );
-};
-
 const LineMapVehicleIcon = ({ x, y, size }): JSX.Element => {
   const viewBoxSize = 128; // property of the path
   const scale = size / viewBoxSize;
@@ -246,13 +240,51 @@ const LineMapVehicleIcon = ({ x, y, size }): JSX.Element => {
   );
 };
 
-const LineMapLineBefore = ({
-  lineWidth,
-  marginLeft,
-  marginTop,
-  currentStopY,
-  lastStopY,
-}): JSX.Element => {
+const LineMapVehicle = ({ vehicle, currentTimeString }): JSX.Element => {
+  const {
+    lineWidth,
+    radius,
+    dy,
+    height,
+    marginLeft,
+    stopMarginTop,
+  } = useContext(LineMapContext);
+
+  const x = marginLeft + lineWidth / 2;
+  const y = stopMarginTop + radius + vehicle.index * dy;
+  const time = vehicle.index >= 2 ? vehicle.time : null;
+
+  if (y > height) {
+    return null;
+  }
+
+  return (
+    <g>
+      <LineMapVehicleDroplet x={x} y={y} />
+      <LineMapVehicleLabel {...{ x, y, time, currentTimeString }} />
+    </g>
+  );
+};
+
+const LineMapVehicles = ({ vehicles, currentTimeString }): JSX.Element => {
+  return vehicles.map((v) => (
+    <LineMapVehicle
+      vehicle={v}
+      currentTimeString={currentTimeString}
+      key={v.id}
+    />
+  ));
+};
+
+const LineMapLineBefore = (): JSX.Element => {
+  const {
+    currentStopY,
+    lastStopY,
+    lineWidth,
+    marginLeft,
+    marginTop,
+  } = useContext(LineMapContext);
+
   const dPast = [
     "M",
     marginLeft,
@@ -272,12 +304,11 @@ const LineMapLineBefore = ({
   return <path d={dPast} fill="#CCCCCC"></path>;
 };
 
-const LineMapLineAfter = ({
-  lineWidth,
-  marginLeft,
-  marginTop,
-  currentStopY,
-}): JSX.Element => {
+const LineMapLineAfter = (): JSX.Element => {
+  const { currentStopY, lineWidth, marginLeft, marginTop } = useContext(
+    LineMapContext
+  );
+
   const dFuture = [
     "M",
     marginLeft + lineWidth / 2,
@@ -300,26 +331,26 @@ const LineMapLineAfter = ({
   return <path d={dFuture} fill="#000000"></path>;
 };
 
-const LineMapLine = (props): JSX.Element => {
+const LineMapLine = (): JSX.Element => {
   return (
     <g>
-      <LineMapLineBefore {...props} />
-      <LineMapLineAfter {...props} />
+      <LineMapLineBefore />
+      <LineMapLineAfter />
     </g>
   );
 };
 
-const LineMapStop = ({
-  marginLeft,
-  textMargin,
-  lineWidth,
-  stopMarginTop,
-  radius,
-  i,
-  dy,
-  stopName,
-  lastStopIndex,
-}): JSX.Element => {
+const LineMapStop = ({ i, stopName }): JSX.Element => {
+  const {
+    lastStopIndex,
+    lineWidth,
+    radius,
+    dy,
+    marginLeft,
+    stopMarginTop,
+    textMargin,
+  } = useContext(LineMapContext);
+
   return (
     <g>
       <circle
@@ -342,13 +373,15 @@ const LineMapStop = ({
   );
 };
 
-const LineMapCurrentStop = ({
-  marginLeft,
-  lineWidth,
-  currentStopY,
-  radius,
-  strokeWidth,
-}): JSX.Element => {
+const LineMapCurrentStop = (): JSX.Element => {
+  const {
+    currentStopY,
+    lineWidth,
+    strokeWidth,
+    radius,
+    marginLeft,
+  } = useContext(LineMapContext);
+
   return (
     <circle
       cx={marginLeft + lineWidth / 2}
@@ -361,14 +394,16 @@ const LineMapCurrentStop = ({
   );
 };
 
-const LineMapOriginStop = ({
-  marginLeft,
-  lineWidth,
-  lastStopY,
-  radius,
-  strokeWidth,
-  showOriginStop,
-}): JSX.Element => {
+const LineMapOriginStop = (): JSX.Element => {
+  const {
+    lastStopY,
+    showOriginStop,
+    lineWidth,
+    strokeWidth,
+    radius,
+    marginLeft,
+  } = useContext(LineMapContext);
+
   if (showOriginStop) {
     return (
       <circle
@@ -385,111 +420,42 @@ const LineMapOriginStop = ({
   }
 };
 
-const LineMapStops = ({
-  stopMarginTop,
-  radius,
-  dy,
-  height,
-  lineWidth,
-  marginLeft,
-  lastStopIndex,
-  currentStopY,
-  strokeWidth,
-  showOriginStop,
-  lastStopY,
-  stopNames,
-  textMargin,
-}): JSX.Element => {
-  const currentStopProps = {
-    marginLeft,
-    lineWidth,
-    currentStopY,
+const LineMapStops = ({}): JSX.Element => {
+  const {
+    lastStopIndex,
+    stopNames,
     radius,
-    strokeWidth,
-  };
-  const originStopProps = {
-    marginLeft,
-    lineWidth,
-    lastStopY,
-    radius,
-    strokeWidth,
-    showOriginStop,
-  };
+    dy,
+    height,
+    stopMarginTop,
+  } = useContext(LineMapContext);
   return (
     <g>
       {[...Array(lastStopIndex + 1)].map((_, i) => {
         if (stopMarginTop + radius + i * dy < height) {
-          const key = "stop-" + i;
-          const stopName = stopNames[i];
-          const props = {
-            marginLeft,
-            textMargin,
-            lineWidth,
-            stopMarginTop,
-            radius,
-            i,
-            dy,
-            stopName,
-            lastStopIndex,
-            key,
-          };
-          return <LineMapStop {...props} />;
+          return (
+            <LineMapStop i={i} stopName={stopNames[i]} key={"stop-" + i} />
+          );
         } else {
           return null;
         }
       })}
-      <LineMapCurrentStop {...currentStopProps} />
-      <LineMapOriginStop {...originStopProps} />
+      <LineMapCurrentStop />
+      <LineMapOriginStop />
     </g>
   );
 };
 
-const LineMapBase = ({
-  lineWidth,
-  marginLeft,
-  marginTop,
-  stopMarginTop,
-  radius,
-  dy,
-  currentStopY,
-  lastStopY,
-  height,
-  lastStopIndex,
-  strokeWidth,
-  showOriginStop,
-  stopNames,
-  textMargin,
-}): JSX.Element => {
-  const lineProps = {
-    lineWidth,
-    marginLeft,
-    marginTop,
-    currentStopY,
-    lastStopY,
-  };
-
-  const stopProps = {
-    height,
-    lineWidth,
-    marginLeft,
-    stopMarginTop,
-    radius,
-    dy,
-    lastStopIndex,
-    currentStopY,
-    strokeWidth,
-    showOriginStop,
-    lastStopY,
-    stopNames,
-    textMargin,
-  };
+const LineMapBase = (): JSX.Element => {
   return (
     <g>
-      <LineMapLine {...lineProps} />
-      <LineMapStops {...stopProps} />
+      <LineMapLine />
+      <LineMapStops />
     </g>
   );
 };
+
+const LineMapContext = createContext();
 
 const LineMapContainer = ({
   data,
@@ -497,28 +463,32 @@ const LineMapContainer = ({
   width,
   currentTimeString,
 }): JSX.Element => {
-  const radius = 14;
-  const dy = 112;
-  const lineWidth = 40;
-  const marginLeft = 84;
-  const marginTop = 32;
-  const stopMarginTop = 110;
-  const textMargin = 18;
-  const strokeWidth = 16;
+  const constants = {
+    radius: 14,
+    dy: 112,
+    lineWidth: 40,
+    marginLeft: 84,
+    marginTop: 32,
+    stopMarginTop: 110,
+    textMargin: 18,
+    strokeWidth: 16,
+  };
 
   const lastStopIndex = 2 + data.stops.count_before;
-  const currentStopY = stopMarginTop + 2 * dy + radius;
-  let lastStopY = stopMarginTop + lastStopIndex * dy + radius;
+  const currentStopY =
+    constants.stopMarginTop + 2 * constants.dy + constants.radius;
+  let lastStopY =
+    constants.stopMarginTop + lastStopIndex * constants.dy + constants.radius;
 
-  const showOriginStop = lastStopY + radius + strokeWidth <= height;
+  const showOriginStop =
+    lastStopY + constants.radius + constants.strokeWidth <= height;
   if (!showOriginStop) {
     lastStopY = height;
   }
 
   const showScheduledDeparture =
-    data.schedule !== null && lastStopY + 8 * radius + strokeWidth <= height;
-
-  const vehicles = data.vehicles;
+    data.schedule !== null &&
+    lastStopY + 8 * constants.radius + constants.strokeWidth <= height;
 
   const unlabeledStops = Array.from({ length: lastStopIndex - 3 }, () => null);
   const stopNames = [
@@ -529,48 +499,30 @@ const LineMapContainer = ({
     data.stops.origin,
   ];
 
-  const lineMapProps = {
-    lineWidth,
-    marginLeft,
-    marginTop,
-    stopMarginTop,
-    radius,
-    dy,
+  const props = {
     lastStopIndex,
     currentStopY,
     lastStopY,
     height,
-    strokeWidth,
     showOriginStop,
     stopNames,
-    textMargin,
+    showScheduledDeparture,
   };
 
-  return (
-    <g>
-      <LineMapBase {...lineMapProps} />
-      {showScheduledDeparture ? (
-        <ScheduledDeparture
-          lastStopX={marginLeft + lineWidth / 2}
-          lastStopY={lastStopY}
-          stopRadius={radius}
-          stopName={data.stops.origin}
-          time={data.schedule.time}
-          dy={dy}
-        />
-      ) : null}
+  const params = { ...constants, ...props };
 
-      {vehicles.map((v) => (
-        <LineMapVehicle
-          x={marginLeft + lineWidth / 2}
-          y={stopMarginTop + radius + v.index * dy}
-          height={height}
-          time={v.index >= 2 ? v.time : null}
-          currentTimeString={currentTimeString}
-          key={v.id}
-        />
-      ))}
-    </g>
+  return (
+    <LineMapContext.Provider value={params}>
+      <LineMapBase />
+      <ScheduledDeparture
+        stopName={data.stops.origin}
+        schedule={data.schedule}
+      />
+      <LineMapVehicles
+        vehicles={data.vehicles}
+        currentTimeString={currentTimeString}
+      />
+    </LineMapContext.Provider>
   );
 };
 
