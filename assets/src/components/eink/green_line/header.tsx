@@ -2,7 +2,7 @@ import moment from "moment";
 import "moment-timezone";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
-import { classWithSize } from "Util";
+import { classWithModifier } from "Util";
 
 const HeaderRouteIcon = ({ route }): JSX.Element => {
   let path;
@@ -84,7 +84,7 @@ const Header = ({ stopName, routeId, currentTimeString }): JSX.Element => {
           <HeaderRouteIcon route={routeId} />
         </div>
         <div
-          className={classWithSize("header__stop-name", SIZES[stopSize])}
+          className={classWithModifier("header__stop-name", SIZES[stopSize])}
           ref={ref}
         >
           {stopName}

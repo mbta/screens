@@ -2,7 +2,7 @@ import moment from "moment";
 import "moment-timezone";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
-import { classWithSize } from "Util";
+import { classWithModifier } from "Util";
 
 const Header = ({ stopName, currentTimeString }): JSX.Element => {
   const SIZES = ["small", "large"];
@@ -40,7 +40,7 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
         UPDATED LIVE EVERY MINUTE
       </div>
       <div
-        className={classWithSize("header__stop-name", SIZES[stopSize])}
+        className={classWithModifier("header__stop-name", SIZES[stopSize])}
         ref={ref}
       >
         {stopName}

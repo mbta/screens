@@ -1,0 +1,30 @@
+.base-route-pill__pill {
+  background: black;
+  text-align: center;
+
+  &--with-slash {
+    border-radius: 0.5em;
+    height: 0.833em;
+  }
+
+  &--no-slash {
+    border-radius: 1em;
+    height: 1.194em;
+  }
+}
+
+.base-route-pill__route-text {
+  color: white;
+  font-family: neue-haas-grotesk-text;
+  font-weight: 700;
+  letter-spacing: 0.0277em;
+
+  &--with-slash {
+    font-size: 0.556em;
+    line-height: 1.5em;
+  }
+
+  &--no-slash {
+    line-height: 1.194em;
+  }
+}
