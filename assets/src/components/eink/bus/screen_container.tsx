@@ -85,7 +85,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         departures={laterDeparturesData}
         globalAlert={apiResponse.global_alert}
         stopId={apiResponse.stop_id}
-        nearbyConnections={apiResponse.nearbyConnections}
+        nearbyConnections={apiResponse.nearby_connections}
         serviceLevel={apiResponse.service_level}
         ref={laterDeparturesRef}
       />

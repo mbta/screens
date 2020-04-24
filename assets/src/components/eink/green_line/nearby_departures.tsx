@@ -2,6 +2,7 @@ import React from "react";
 
 import BaseDepartureTime from "Components/eink/base_departure_time";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
+import BaseRoutePill from "Components/eink/base_route_pill";
 
 const NearbyDeparturesTime = ({ time, currentTimeString }): JSX.Element => {
   return (
@@ -17,9 +18,7 @@ const NearbyDeparturesTime = ({ time, currentTimeString }): JSX.Element => {
 const NearbyDeparturesRoute = ({ route }): JSX.Element => {
   return (
     <div className="nearby-departures-route">
-      <div className="nearby-departures-route__pill">
-        <div className="nearby-departures-route__text">{route}</div>
-      </div>
+      <BaseRoutePill route={route} />
     </div>
   );
 };

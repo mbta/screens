@@ -1,11 +1,11 @@
 import React from "react";
 
 import BaseDepartureTime from "Components/eink/base_departure_time";
-import { classWithSize } from "Util";
+import { classWithModifier } from "Util";
 
 const DepartureTime = ({ time, currentTimeString, size }): JSX.Element => {
   return (
-    <div className={classWithSize("departure-time", size)}>
+    <div className={classWithModifier("departure-time", size)}>
       <BaseDepartureTime
         departureTimeString={time}
         currentTimeString={currentTimeString}

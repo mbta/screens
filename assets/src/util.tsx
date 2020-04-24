@@ -1,3 +1,3 @@
-export const classWithSize = (baseClass, size) => {
-  return `${baseClass} ${baseClass}--${size}`;
+export const classWithModifier = (baseClass, modifier) => {
+  return `${baseClass} ${baseClass}--${modifier}`;
 };

@@ -60,36 +60,12 @@
   font-weight: 700;
 }
 
-.nearby-departures-row__routes {
-  margin-left: 208px;
-  margin-top: 25px;
-  margin-bottom: 34px;
-  margin-right: 32px;
-}
-
 .nearby-departures-route {
   display: inline-block;
   vertical-align: middle;
-}
-
-.nearby-departures-route__pill {
-  font-family: neue-haas-grotesk-text;
-  background: black;
-  border-radius: 54px;
-  text-align: center;
   width: 178px;
-  height: 86px;
-  border-radius: 72px;
   margin-right: 32px;
-}
-
-.nearby-departures-route__text {
-  color: white;
-  display: inline-block;
-  font-weight: 700;
   font-size: 72px;
-  line-height: 86px;
-  letter-spacing: 2px;
 }
 
 .nearby-departures-destination {
