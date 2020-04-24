@@ -57,7 +57,6 @@ const ScheduledDeparture = ({ stopName, schedule }): JSX.Element => {
     lastStopY,
     dy,
     radius,
-    marginLeft,
     lineWidth,
   } = useContext(LineMapContext);
 
@@ -66,7 +65,7 @@ const ScheduledDeparture = ({ stopName, schedule }): JSX.Element => {
   }
 
   const time = schedule.time;
-  const x = marginLeft + lineWidth / 2;
+  const x = lineWidth / 2;
   const y = lastStopY + dy - radius;
   const iconRadius = 30;
   const margin = 9;
@@ -241,16 +240,11 @@ const LineMapVehicleIcon = ({ x, y, size }): JSX.Element => {
 };
 
 const LineMapVehicle = ({ vehicle, currentTimeString }): JSX.Element => {
-  const {
-    lineWidth,
-    radius,
-    dy,
-    height,
-    marginLeft,
-    stopMarginTop,
-  } = useContext(LineMapContext);
+  const { lineWidth, radius, dy, height, stopMarginTop } = useContext(
+    LineMapContext
+  );
 
-  const x = marginLeft + lineWidth / 2;
+  const x = lineWidth / 2;
   const y = stopMarginTop + radius + vehicle.index * dy;
   const time = vehicle.index >= 2 ? vehicle.time : null;
 
@@ -277,26 +271,22 @@ const LineMapVehicles = ({ vehicles, currentTimeString }): JSX.Element => {
 };
 
 const LineMapLineBefore = (): JSX.Element => {
-  const {
-    currentStopY,
-    lastStopY,
-    lineWidth,
-    marginLeft,
-    marginTop,
-  } = useContext(LineMapContext);
+  const { currentStopY, lastStopY, lineWidth } = useContext(
+    LineMapContext
+  );
 
   const dPast = [
     "M",
-    marginLeft,
+    0,
     currentStopY,
     "L",
-    marginLeft + lineWidth,
+    lineWidth,
     currentStopY,
     "L",
-    marginLeft + lineWidth,
+    lineWidth,
     lastStopY,
     "L",
-    marginLeft,
+    0,
     lastStopY,
     "Z",
   ].join(" ");
@@ -305,25 +295,23 @@ const LineMapLineBefore = (): JSX.Element => {
 };
 
 const LineMapLineAfter = (): JSX.Element => {
-  const { currentStopY, lineWidth, marginLeft, marginTop } = useContext(
-    LineMapContext
-  );
+  const { currentStopY, lineWidth, marginTop } = useContext(LineMapContext);
 
   const dFuture = [
     "M",
-    marginLeft + lineWidth / 2,
+    lineWidth / 2,
     marginTop,
     "L",
-    marginLeft + lineWidth,
+    lineWidth,
     marginTop + lineWidth / 2,
     "L",
-    marginLeft + lineWidth,
+    lineWidth,
     currentStopY,
     "L",
-    marginLeft,
+    0,
     currentStopY,
     "L",
-    marginLeft,
+    0,
     marginTop + lineWidth / 2,
     "Z",
   ].join(" ");
@@ -346,7 +334,6 @@ const LineMapStop = ({ i, stopName }): JSX.Element => {
     lineWidth,
     radius,
     dy,
-    marginLeft,
     stopMarginTop,
     textMargin,
   } = useContext(LineMapContext);
@@ -354,7 +341,7 @@ const LineMapStop = ({ i, stopName }): JSX.Element => {
   return (
     <g>
       <circle
-        cx={marginLeft + lineWidth / 2}
+        cx={lineWidth / 2}
         cy={stopMarginTop + radius + i * dy}
         r={radius}
         fill="#FFFFFF"
@@ -362,7 +349,7 @@ const LineMapStop = ({ i, stopName }): JSX.Element => {
       ></circle>
       {stopName === null ? null : (
         <LineMapStopLabel
-          x={marginLeft + lineWidth + textMargin}
+          x={lineWidth + textMargin}
           y={stopMarginTop + 2 * radius + i * dy}
           lines={[stopName]}
           current={i === 2}
@@ -374,17 +361,13 @@ const LineMapStop = ({ i, stopName }): JSX.Element => {
 };
 
 const LineMapCurrentStop = (): JSX.Element => {
-  const {
-    currentStopY,
-    lineWidth,
-    strokeWidth,
-    radius,
-    marginLeft,
-  } = useContext(LineMapContext);
+  const { currentStopY, lineWidth, strokeWidth, radius } = useContext(
+    LineMapContext
+  );
 
   return (
     <circle
-      cx={marginLeft + lineWidth / 2}
+      cx={lineWidth / 2}
       cy={currentStopY}
       r={radius + strokeWidth / 2}
       fill="#FFFFFF"
@@ -401,13 +384,12 @@ const LineMapOriginStop = (): JSX.Element => {
     lineWidth,
     strokeWidth,
     radius,
-    marginLeft,
   } = useContext(LineMapContext);
 
   if (showOriginStop) {
     return (
       <circle
-        cx={marginLeft + lineWidth / 2}
+        cx={lineWidth / 2}
         cy={lastStopY}
         r={radius + strokeWidth / 2}
         fill="#FFFFFF"
@@ -513,15 +495,17 @@ const LineMapContainer = ({
 
   return (
     <LineMapContext.Provider value={params}>
-      <LineMapBase />
-      <ScheduledDeparture
-        stopName={data.stops.origin}
-        schedule={data.schedule}
-      />
-      <LineMapVehicles
-        vehicles={data.vehicles}
-        currentTimeString={currentTimeString}
-      />
+      <g transform={`translate(${constants.marginLeft}, 0)`}>
+        <LineMapBase />
+        <ScheduledDeparture
+          stopName={data.stops.origin}
+          schedule={data.schedule}
+        />
+        <LineMapVehicles
+          vehicles={data.vehicles}
+          currentTimeString={currentTimeString}
+        />
+      </g>
     </LineMapContext.Provider>
   );
 };
