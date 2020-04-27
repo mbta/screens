@@ -14,7 +14,7 @@ defmodule Screens.Override do
             green_line_service: 1,
             headway_mode_screen_ids: MapSet.new()
 
-  def new() do
+  def new do
     %Override{}
   end
 

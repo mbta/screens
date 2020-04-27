@@ -59,7 +59,11 @@ defmodule Screens.Override.State do
     {:reply, bus_service, state}
   end
 
-  def handle_call(:green_line_service, _from, %Override{green_line_service: green_line_service} = state) do
+  def handle_call(
+        :green_line_service,
+        _from,
+        %Override{green_line_service: green_line_service} = state
+      ) do
     {:reply, green_line_service, state}
   end
 
@@ -70,7 +74,8 @@ defmodule Screens.Override.State do
   def handle_call(
         {:headway_mode?, screen_id},
         _from,
-        %Override{globally_disabled: false, headway_mode_screen_ids: headway_mode_screen_ids} = state
+        %Override{globally_disabled: false, headway_mode_screen_ids: headway_mode_screen_ids} =
+          state
       ) do
     {:reply, MapSet.member?(headway_mode_screen_ids, screen_id), state}
   end
