@@ -1,8 +1,6 @@
 defmodule Screens.VendorData.State do
   @moduledoc false
 
-  @callback do_log() :: :ok
-
   defmacro __using__(_) do
     quote do
       use GenServer

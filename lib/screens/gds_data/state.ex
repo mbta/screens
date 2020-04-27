@@ -3,9 +3,6 @@ defmodule Screens.GdsData.State do
 
   use Screens.VendorData.State
 
-  @behaviour Screens.VendorData.State
-
-  @impl true
   def do_log do
     Screens.GdsData.Logger.log_data()
     :ok

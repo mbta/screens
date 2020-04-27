@@ -3,9 +3,6 @@ defmodule Screens.MercuryData.State do
 
   use Screens.VendorData.State
 
-  @behaviour Screens.VendorData.State
-
-  @impl true
   def do_log do
     Screens.MercuryData.Logger.log_data()
     :ok
