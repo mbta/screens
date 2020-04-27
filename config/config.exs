@@ -160,7 +160,8 @@ config :screens,
       route_id: "Green-E",
       direction_id: 0,
       app_id: "gl_eink_double"
-    }
+    },
+    "301" => %{stop_id: "10642", app_id: "solari"}
   },
   api_v3_url: "https://api-v3.mbta.com/",
   nearby_departures: %{

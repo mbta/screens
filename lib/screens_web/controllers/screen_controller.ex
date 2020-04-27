@@ -3,7 +3,7 @@ defmodule ScreensWeb.ScreenController do
   require Logger
 
   @default_app_id "bus_eink"
-  @app_ids ["bus_eink", "gl_eink_single", "gl_eink_double"]
+  @app_ids ["bus_eink", "gl_eink_single", "gl_eink_double", "solari"]
 
   plug(:api_version)
   plug(:environment_name)
