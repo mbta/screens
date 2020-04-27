@@ -15,7 +15,8 @@ defmodule Screens.Application do
       # Starts a worker by calling: Screens.Worker.start_link(arg)
       # {Screens.Worker, arg},
       Screens.Override.Supervisor,
-      Screens.GdsData.Supervisor
+      Screens.GdsData.Supervisor,
+      Screens.MercuryData.Supervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
