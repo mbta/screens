@@ -29,13 +29,13 @@ defmodule Screens.MercuryData.Fetch do
   end
 
   defp fetch_relevant_status_fields(status) do
-    [
-      {:signal_strength, "RSSI"},
-      {:temperature, "Temperature"},
-      {:battery, "Battery"},
-      {:battery_voltage, "BatteryVoltage"},
-      {:uptime, "Uptime"}
-    ]
+    %{
+      signal_strength: "RSSI",
+      temperature: "Temperature",
+      battery: "Battery",
+      battery_voltage: "BatteryVoltage",
+      uptime: "Uptime"
+    }
     |> Enum.map(fn {name, status_key} -> {name, Map.get(status, status_key)} end)
     |> Enum.into(%{})
   end
