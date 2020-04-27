@@ -18,7 +18,7 @@ defmodule ScreensWeb.ScreenApiController do
     data =
       case app_id do
         "bus_eink" ->
-          Screens.ScreenData.by_stop_id_with_override_and_version(
+          Screens.BusScreenData.by_stop_id_with_override_and_version(
             stop_id,
             screen_id,
             version,

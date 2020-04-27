@@ -9,16 +9,8 @@ defmodule Screens.Override.Fetch do
 
     with {:ok, response} <- HTTPoison.get(url, headers, Keyword.merge(@default_opts, opts)),
          %{status_code: 200, body: body} <- response,
-         {:ok, parsed} <- Jason.decode(body),
-         %{"disabled_screen_ids" => disabled_screen_ids, "globally_disabled" => globally_disabled} <-
-           parsed do
-      {:ok,
-       %{
-         globally_disabled: globally_disabled,
-         disabled_screen_ids: MapSet.new(disabled_screen_ids),
-         bus_service: Map.get(parsed, "bus_service", 1),
-         green_line_service: Map.get(parsed, "green_line_service", 1)
-       }}
+         {:ok, parsed} <- Jason.decode(body, keys: :atoms!) do
+      {:ok, Screens.Override.new(parsed)}
     else
       _ -> :error
     end

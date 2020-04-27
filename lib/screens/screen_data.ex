@@ -1,4 +1,4 @@
-defmodule Screens.ScreenData do
+defmodule Screens.BusScreenData do
   @moduledoc false
   require Logger
 
@@ -8,7 +8,7 @@ defmodule Screens.ScreenData do
   alias Screens.NearbyConnections
 
   def by_stop_id_with_override_and_version(stop_id, screen_id, client_version, is_screen) do
-    if Screens.Override.State.lookup(String.to_integer(screen_id)) do
+    if Screens.Override.State.disabled?(String.to_integer(screen_id)) do
       LogScreenData.log_api_response(screen_id, client_version, is_screen, %{
         force_reload: false,
         success: false
