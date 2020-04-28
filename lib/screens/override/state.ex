@@ -70,8 +70,7 @@ defmodule Screens.Override.State do
   def handle_call(
         {:headway_mode?, screen_id},
         _from,
-        %Override{headway_mode_screen_ids: headway_mode_screen_ids} =
-          state
+        %Override{headway_mode_screen_ids: headway_mode_screen_ids} = state
       ) do
     {:reply, MapSet.member?(headway_mode_screen_ids, screen_id), state}
   end

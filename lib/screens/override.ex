@@ -5,12 +5,12 @@ defmodule Screens.Override do
   """
 
   @type t :: %__MODULE__{
-    globally_disabled: boolean(),
-    disabled_screen_ids: MapSet.t(pos_integer()),
-    bus_service: pos_integer(),
-    green_line_service: pos_integer(),
-    headway_mode_screen_ids: MapSet.t(pos_integer())
-  }
+          globally_disabled: boolean(),
+          disabled_screen_ids: MapSet.t(pos_integer()),
+          bus_service: pos_integer(),
+          green_line_service: pos_integer(),
+          headway_mode_screen_ids: MapSet.t(pos_integer())
+        }
 
   defstruct globally_disabled: false,
             disabled_screen_ids: MapSet.new(),
