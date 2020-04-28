@@ -1,10 +1,10 @@
-defmodule Screens.GdsData.State do
+defmodule Screens.MercuryData.State do
   @moduledoc false
 
   use Screens.VendorData.State
 
   def do_log do
-    Screens.GdsData.Logger.log_data()
+    Screens.MercuryData.Logger.log_data()
     :ok
   end
 end

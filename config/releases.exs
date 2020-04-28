@@ -30,6 +30,12 @@ gds_dms_password =
   |> ExAws.request!()
   |> Map.fetch!("SecretString")
 
+mercury_api_key =
+  "mercury-api-key"
+  |> ExAws.SecretsManager.get_secret_value()
+  |> ExAws.request!()
+  |> Map.fetch!("SecretString")
+
 config :screens, ScreensWeb.Endpoint,
   http: [:inet6, port: String.to_integer(System.get_env("PORT") || "4000")],
   secret_key_base: secret_key_base
@@ -37,7 +43,8 @@ config :screens, ScreensWeb.Endpoint,
 config :screens,
   api_v3_key: api_v3_key,
   environment_name: eb_env_name,
-  gds_dms_password: gds_dms_password
+  gds_dms_password: gds_dms_password,
+  mercury_api_key: mercury_api_key
 
 # ## Using releases (Elixir v1.9+)
 #
