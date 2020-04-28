@@ -23,7 +23,7 @@ const TopScreenLayout = ({
   headway,
   lineMapData,
   inlineAlert,
-  isHeadwayMode,
+  isHeadwayMode
 }): JSX.Element => {
   return (
     <div className="single-screen-container">
@@ -54,7 +54,7 @@ const BottomScreenLayout = ({
   globalAlert,
   stopId,
   nearbyDepartures,
-  serviceLevel,
+  serviceLevel
 }): JSX.Element => {
   if (serviceLevel > 1) {
     return (
@@ -145,7 +145,8 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
       return <NoConnectionScreenLayout />;
     case apiResponse.service_level === 5:
       return <NoServiceScreenLayout />;
-    case (!apiResponse.departures || apiResponse.departures.length === 0) && apiResponse.headway === null:
+    case (!apiResponse.departures || apiResponse.departures.length === 0) &&
+      apiResponse.headway === null:
       return <NoDeparturesScreenLayout apiResponse={apiResponse} />;
     default:
       return <DefaultScreenLayout apiResponse={apiResponse} />;

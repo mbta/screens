@@ -17,7 +17,7 @@ const Departure = ({ time, currentTimeString }): JSX.Element => {
 
 enum HeadwayMessageVariant {
   Main,
-  Sub,
+  Sub
 }
 
 interface HeadwayMessageProps {
@@ -25,11 +25,19 @@ interface HeadwayMessageProps {
   headway: number;
   variant: HeadwayMessageVariant;
 }
-const HeadwayMessage = ({ destination, headway, variant }: HeadwayMessageProps): JSX.Element => {
+const HeadwayMessage = ({
+  destination,
+  headway,
+  variant
+}: HeadwayMessageProps): JSX.Element => {
   const range = 2;
   const message = (
     <>
-      Trains to {destination} every <span className="departures__headway-message__range">{headway - range}-{headway + range}</span> minutes
+      Trains to {destination} every{" "}
+      <span className="departures__headway-message__range">
+        {headway - range}-{headway + range}
+      </span>{" "}
+      minutes
     </>
   );
 
@@ -46,11 +54,7 @@ const HeadwayMessage = ({ destination, headway, variant }: HeadwayMessageProps):
         </>
       );
     case HeadwayMessageVariant.Sub:
-      return (
-        <div className="departures__headway-message">
-          {message}
-        </div>
-      );
+      return <div className="departures__headway-message">{message}</div>;
   }
 };
 
@@ -67,7 +71,11 @@ const Departures = ({
     <div className="departures">
       <div className="departures__container">
         {isHeadwayMode ? (
-          <HeadwayMessage destination={destination} headway={headway} variant={HeadwayMessageVariant.Main} />
+          <HeadwayMessage
+            destination={destination}
+            headway={headway}
+            variant={HeadwayMessageVariant.Main}
+          />
         ) : (
           <>
             {topDeparture ? (
@@ -76,7 +84,11 @@ const Departures = ({
                 currentTimeString={currentTimeString}
               />
             ) : (
-              <HeadwayMessage destination={destination} headway={headway} variant={HeadwayMessageVariant.Sub} />
+              <HeadwayMessage
+                destination={destination}
+                headway={headway}
+                variant={HeadwayMessageVariant.Sub}
+              />
             )}
             <div className="departures__hairline"></div>
             {bottomDeparture ? (
@@ -85,7 +97,11 @@ const Departures = ({
                 currentTimeString={currentTimeString}
               />
             ) : topDeparture ? (
-              <HeadwayMessage destination={destination} headway={headway} variant={HeadwayMessageVariant.Sub} />
+              <HeadwayMessage
+                destination={destination}
+                headway={headway}
+                variant={HeadwayMessageVariant.Sub}
+              />
             ) : null}
             <div className="departures__delay-badge">
               {serviceLevel > 1 ? (
