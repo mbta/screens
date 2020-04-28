@@ -58,8 +58,44 @@ const HeadwayMessage = ({
   }
 };
 
+// Displays up to 2 departures, padding with a headway
+// message when there is only 0 or 1 departure to show.
+const DepartureList = ({
+  departures,
+  currentTimeString,
+  destination,
+  headway
+}: DepartureListProps): JSX.Element[] => {
+  const renderedDepartures = departures.map(({ time }) => (
+    <Departure time={time} currentTimeString={currentTimeString} key={time} />
+  ));
+
+  if (renderedDepartures.length < 2) {
+    renderedDepartures.push(
+      <HeadwayMessage
+        destination={destination}
+        headway={headway}
+        variant={HeadwayMessageVariant.Sub}
+        key="departure-list-headway"
+      />
+    );
+  }
+
+  return [
+    ...renderedDepartures.slice(0, 1),
+    <div className="departures__hairline" key="departure-list-hairline" />,
+    ...renderedDepartures.slice(1)
+  ];
+};
+interface DepartureListProps {
+  departures: { time: string }[];
+  currentTimeString: string;
+  destination: string;
+  headway: number;
+}
+
 const Departures = ({
-  departures: [topDeparture, bottomDeparture],
+  departures,
   destination,
   headway,
   inlineAlert,
@@ -77,41 +113,20 @@ const Departures = ({
             variant={HeadwayMessageVariant.Main}
           />
         ) : (
-          <>
-            {topDeparture ? (
-              <Departure
-                time={topDeparture.time}
-                currentTimeString={currentTimeString}
-              />
-            ) : (
-              <HeadwayMessage
-                destination={destination}
-                headway={headway}
-                variant={HeadwayMessageVariant.Sub}
-              />
-            )}
-            <div className="departures__hairline"></div>
-            {bottomDeparture ? (
-              <Departure
-                time={bottomDeparture.time}
-                currentTimeString={currentTimeString}
-              />
-            ) : topDeparture ? (
-              <HeadwayMessage
-                destination={destination}
-                headway={headway}
-                variant={HeadwayMessageVariant.Sub}
-              />
-            ) : null}
-            <div className="departures__delay-badge">
-              {serviceLevel > 1 ? (
-                <TakeoverInlineAlert />
-              ) : (
-                <InlineAlert alertData={inlineAlert} />
-              )}
-            </div>
-          </>
+          <DepartureList
+            departures={departures}
+            currentTimeString={currentTimeString}
+            destination={destination}
+            headway={headway}
+          />
         )}
+        <div className="departures__delay-badge">
+          {serviceLevel > 1 ? (
+            <TakeoverInlineAlert />
+          ) : (
+            <InlineAlert alertData={inlineAlert} />
+          )}
+        </div>
       </div>
     </div>
   );
