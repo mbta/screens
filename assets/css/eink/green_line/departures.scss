@@ -14,6 +14,28 @@
   padding-bottom: 72px;
 }
 
+.departures__headway-message--large {
+  font-family: "neue-haas-grotesk-display";
+  font-weight: bold;
+  font-size: 96px;
+  line-height: 96px;
+  color: #000000;
+  letter-spacing: 1px;
+}
+
+.departures__headway-message__subheading {
+  font-family: "neue-haas-grotesk-text";
+  font-size: 56px;
+  text-align: right;
+  color: #999999;
+  padding-right: 40px;
+  padding-bottom: 72px;
+}
+
+.departures__headway-message__range {
+  white-space: nowrap;
+}
+
 .departures__departure {
   font-size: 336px;
   text-align: right;

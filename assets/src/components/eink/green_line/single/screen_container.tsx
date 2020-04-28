@@ -20,6 +20,7 @@ const TopScreenLayout = ({
   headway,
   inlineAlert,
   serviceLevel,
+  isHeadwayMode
 }): JSX.Element => {
   return (
     <div className="single-screen-container single-screen-container--gl-mercury">
@@ -40,6 +41,7 @@ const TopScreenLayout = ({
         inlineAlert={inlineAlert}
         currentTimeString={currentTimeString}
         serviceLevel={serviceLevel}
+        isHeadwayMode={isHeadwayMode}
       />
       <DigitalBridge stopId={stopId} />
     </div>
@@ -58,6 +60,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
       headway={apiResponse.headway}
       inlineAlert={apiResponse.inline_alert}
       serviceLevel={apiResponse.service_level}
+      isHeadwayMode={apiResponse.is_headway_mode}
     />
   );
 };
@@ -85,22 +88,16 @@ const NoConnectionScreenLayout = (): JSX.Element => {
 };
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
-  if (!apiResponse || apiResponse.success === false) {
-    return <NoConnectionScreenLayout />;
+  switch (true) {
+    case !apiResponse || apiResponse.success === false:
+      return <NoConnectionScreenLayout />;
+    case apiResponse.service_level === 5:
+      return <NoServiceScreenLayout />;
+    case (!apiResponse.departures || apiResponse.departures.length === 0) && apiResponse.headway === null:
+      return <NoDeparturesScreenLayout apiResponse={apiResponse} />;
+    default:
+      return <DefaultScreenLayout apiResponse={apiResponse} />;
   }
-
-  if (apiResponse.service_level === 5) {
-    return <NoServiceScreenLayout />;
-  }
-
-  if (
-    (!apiResponse.departures || apiResponse.departures.length === 0) &&
-    apiResponse.headway === null
-  ) {
-    return <NoDeparturesScreenLayout apiResponse={apiResponse} />;
-  }
-
-  return <DefaultScreenLayout apiResponse={apiResponse} />;
 };
 
 const ScreenContainer = ({ id }): JSX.Element => {
