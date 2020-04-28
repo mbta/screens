@@ -22,12 +22,12 @@ defmodule Screens.Override do
   def new, do: %__MODULE__{}
 
   @type json_map :: %{
-    optional(:globally_disabled) => boolean(),
-    optional(:disabled_screen_ids) => list(pos_integer()),
-    optional(:bus_service) => pos_integer(),
-    optional(:green_line_service) => pos_integer(),
-    optional(:headway_mode_screen_ids) => list(pos_integer())
-  }
+          optional(:globally_disabled) => boolean(),
+          optional(:disabled_screen_ids) => list(pos_integer()),
+          optional(:bus_service) => pos_integer(),
+          optional(:green_line_service) => pos_integer(),
+          optional(:headway_mode_screen_ids) => list(pos_integer())
+        }
 
   @doc """
   Creates a new Override struct from parsed JSON.
@@ -43,23 +43,26 @@ defmodule Screens.Override do
       }
   """
   @spec from_json(json_map()) :: __MODULE__.t()
-  def from_json(%{} = json_map) do
-    converted = json_map
-    |> disabled_map_set()
-    |> headway_mode_map_set()
+  def from_json(%{} = override_map) do
+    converted =
+      override_map
+      |> disabled_map_set()
+      |> headway_mode_map_set()
 
     struct(__MODULE__, converted)
   end
 
   # Converts the `disabled_screen_ids` list to a MapSet, if it exists
-  defp disabled_map_set(%{disabled_screen_ids: disabled_screen_ids} = json_map) do
-    Map.put(json_map, :disabled_screen_ids, MapSet.new(disabled_screen_ids))
+  defp disabled_map_set(%{disabled_screen_ids: disabled_screen_ids} = override_map) do
+    Map.put(override_map, :disabled_screen_ids, MapSet.new(disabled_screen_ids))
   end
-  defp disabled_map_set(%{} = json_map), do: json_map
+
+  defp disabled_map_set(%{} = override_map), do: override_map
 
   # Converts the `disabled_screen_ids` list to a MapSet, if it exists
-  defp headway_mode_map_set(%{headway_mode_screen_ids: headway_mode_screen_ids} = json_map) do
-    Map.put(json_map, :headway_mode_screen_ids, MapSet.new(headway_mode_screen_ids))
+  defp headway_mode_map_set(%{headway_mode_screen_ids: headway_mode_screen_ids} = override_map) do
+    Map.put(override_map, :headway_mode_screen_ids, MapSet.new(headway_mode_screen_ids))
   end
-  defp headway_mode_map_set(%{} = json_map), do: json_map
+
+  defp headway_mode_map_set(%{} = override_map), do: override_map
 end
