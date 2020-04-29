@@ -4,7 +4,12 @@ import BaseRoutePill from "Components/eink/base_route_pill";
 import BaseDepartureTime from "Components/eink/base_departure_time";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
 
-const Departure = ({route, destination, time, currentTimeString}): JSX.Element => {
+const Departure = ({
+  route,
+  destination,
+  time,
+  currentTimeString,
+}): JSX.Element => {
   return (
     <div className="departure">
       <div className="departure-route">
@@ -14,7 +19,10 @@ const Departure = ({route, destination, time, currentTimeString}): JSX.Element =
         <BaseDepartureDestination destination={destination} />
       </div>
       <div className="departure-time">
-        <BaseDepartureTime departureTimeString={time} currentTimeString={currentTimeString} />
+        <BaseDepartureTime
+          departureTimeString={time}
+          currentTimeString={currentTimeString}
+        />
       </div>
     </div>
   );

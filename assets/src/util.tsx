@@ -5,6 +5,5 @@ export const classWithModifier = (baseClass, modifier) => {
   return `${baseClass} ${baseClass}--${modifier}`;
 };
 
-export const formatTimeString = timeString => moment(currentTimeString)
-.tz("America/New_York")
-.format("h:mm");
+export const formatTimeString = (timeString) =>
+  moment(timeString).tz("America/New_York").format("h:mm");

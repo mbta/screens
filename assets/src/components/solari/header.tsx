@@ -2,9 +2,9 @@ import React from "react";
 
 import { formatTimeString } from "Util";
 
-const Header = ({stationName, currentTimeString}): JSX.Element => {
+const Header = ({ stationName, currentTimeString }): JSX.Element => {
   const environmentName = document.getElementById("app").dataset
-  .environmentName;
+    .environmentName;
 
   const currentTime = formatTimeString(currentTimeString);
 
@@ -15,15 +15,9 @@ const Header = ({stationName, currentTimeString}): JSX.Element => {
           ? environmentName
           : ""}
       </div>
-      <div className="header__time">
-        {currentTime}
-      </div>
-      <div className="header__title">
-        Upcoming Trips
-      </div>
-      <div className="header__station-name">
-        {stationName}
-      </div>
+      <div className="header__time">{currentTime}</div>
+      <div className="header__title">Upcoming Trips</div>
+      <div className="header__station-name">{stationName}</div>
     </div>
   );
 };
