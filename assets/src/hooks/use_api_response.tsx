@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const useApiResponse = (id) => {
+const useApiResponse = id => {
   const DATA_REFRESH_MS = 30000;
 
   const [apiResponse, setApiResponse] = useState(null);

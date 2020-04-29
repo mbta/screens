@@ -1,6 +1,6 @@
 import React from "react";
 
-const parseSeverity = (severity) => {
+const parseSeverity = severity => {
   let delayDescription;
   let delayMinutes;
 
@@ -21,7 +21,7 @@ const parseSeverity = (severity) => {
 
   return {
     delayDescription,
-    delayMinutes,
+    delayMinutes
   };
 };
 

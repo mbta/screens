@@ -7,13 +7,13 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import ScreenContainer, {
-  ScreenLayout,
+  ScreenLayout
 } from "Components/eink/green_line/single/screen_container";
 
 import {
   AuditScreenPage,
   MultiScreenPage,
-  ScreenPage,
+  ScreenPage
 } from "Components/eink/screen_page";
 
 const App = (): JSX.Element => {

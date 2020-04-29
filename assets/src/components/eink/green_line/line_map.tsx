@@ -60,7 +60,7 @@ const ScheduledDepartureDescription = ({
   iconRadius,
   margin,
   time,
-  stopName,
+  stopName
 }): JSX.Element => {
   return (
     <text
@@ -70,7 +70,9 @@ const ScheduledDepartureDescription = ({
       fill={COLOR_DARK_GRAY}
     >
       <tspan fontSize="40" fontWeight="700">
-        {moment(time).tz("America/New_York").format("h:mm")}
+        {moment(time)
+          .tz("America/New_York")
+          .format("h:mm")}
       </tspan>
       <tspan fontSize="24" dy="36" x={x + iconRadius + margin}>
         Scheduled to depart
@@ -141,7 +143,7 @@ const LineMapStopLabel = ({ x, y, lines, current, origin }): JSX.Element => {
 };
 
 // Helper function
-const degreesToRadians = (angleInDegrees) => {
+const degreesToRadians = angleInDegrees => {
   return (angleInDegrees * Math.PI) / 180.0;
 };
 
@@ -180,7 +182,7 @@ const LineMapVehicleDroplet = ({ x, y }): JSX.Element => {
     "L",
     pointX,
     pointY,
-    "Z",
+    "Z"
   ].join(" ");
 
   return (
@@ -205,7 +207,7 @@ const LineMapVehicleLabel = ({
   x,
   y,
   time,
-  currentTimeString,
+  currentTimeString
 }): JSX.Element => {
   const timeRep = timeRepresentation(time, currentTimeString);
   if (timeRep.type === "TIME_NOW") {
@@ -280,7 +282,7 @@ const LineMapVehicle = ({ vehicle, currentTimeString }): JSX.Element => {
 };
 
 const LineMapVehicles = ({ vehicles, currentTimeString }): JSX.Element => {
-  return vehicles.map((v) => (
+  return vehicles.map(v => (
     <LineMapVehicle
       vehicle={v}
       currentTimeString={currentTimeString}
@@ -305,7 +307,7 @@ const LineMapLineBefore = (): JSX.Element => {
     "L",
     0,
     lineBottomY,
-    "Z",
+    "Z"
   ].join(" ");
 
   return <path d={dPast} fill={COLOR_LIGHT_GRAY} />;
@@ -330,7 +332,7 @@ const LineMapLineAfter = (): JSX.Element => {
     "L",
     0,
     marginTop + lineWidth / 2,
-    "Z",
+    "Z"
   ].join(" ");
 
   return <path d={dFuture} fill={COLOR_BLACK} />;
@@ -352,7 +354,7 @@ const LineMapStop = ({ i, stopName }): JSX.Element => {
     radius,
     dy,
     stopMarginTop,
-    textMargin,
+    textMargin
   } = useContext(LineMapContext);
 
   return (
@@ -419,7 +421,7 @@ const LineMapStops = ({}): JSX.Element => {
     radius,
     dy,
     height,
-    stopMarginTop,
+    stopMarginTop
   } = useContext(LineMapContext);
   return (
     <g>
@@ -451,7 +453,7 @@ const LineMapContainer = ({
   data,
   height,
   width,
-  currentTimeString,
+  currentTimeString
 }: {
   data: LineMapData;
   height: number;
@@ -466,7 +468,7 @@ const LineMapContainer = ({
     marginTop: 32,
     stopMarginTop: 110,
     textMargin: 18,
-    strokeWidth: 16,
+    strokeWidth: 16
   };
 
   // We define the stop index to be the (zero-indexed) position
@@ -518,7 +520,7 @@ const LineMapContainer = ({
     data.stops.next,
     data.stops.current,
     ...unlabeledStops,
-    data.stops.origin,
+    data.stops.origin
   ];
 
   const props = {
@@ -528,7 +530,7 @@ const LineMapContainer = ({
     height,
     showOriginStop,
     stopNames,
-    showScheduledDeparture,
+    showScheduledDeparture
   };
 
   const params = { ...constants, ...props };
@@ -555,7 +557,7 @@ const LineMapContainer = ({
 const LineMap = ({
   data,
   height,
-  currentTimeString,
+  currentTimeString
 }: {
   data: LineMapData;
   height: number;

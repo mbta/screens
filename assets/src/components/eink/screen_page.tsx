@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 
 const MultiScreenPage = ({
-  screenContainer: ScreenContainer,
+  screenContainer: ScreenContainer
 }: {
   screenContainer: React.ComponentType;
 }): JSX.Element => {
@@ -13,7 +13,7 @@ const MultiScreenPage = ({
 
   return (
     <div className="multi-screen-page">
-      {screenIds.map((id) => (
+      {screenIds.map(id => (
         <ScreenContainer id={id} key={id} />
       ))}
     </div>
@@ -21,7 +21,7 @@ const MultiScreenPage = ({
 };
 
 const ScreenPage = ({
-  screenContainer: ScreenContainer,
+  screenContainer: ScreenContainer
 }: {
   screenContainer: React.ComponentType;
 }): JSX.Element => {
@@ -30,7 +30,7 @@ const ScreenPage = ({
 };
 
 const AuditScreenPage = ({
-  screenLayout: ScreenLayout,
+  screenLayout: ScreenLayout
 }: {
   screenLayout: React.ComponentType;
 }): JSX.Element => {

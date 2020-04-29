@@ -22,7 +22,7 @@ class DebugErrorBoundary extends React.Component {
   constructor(props: object) {
     super(props);
     this.state = {
-      hasError: false,
+      hasError: false
     };
   }
 

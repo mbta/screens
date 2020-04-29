@@ -1,7 +1,7 @@
 import DeparturesRow from "Components/eink/bus/departures_row";
 import React, { forwardRef } from "react";
 
-const buildDeparturesRows = (departures) => {
+const buildDeparturesRows = departures => {
   if (!departures) {
     return [];
   }
@@ -9,7 +9,7 @@ const buildDeparturesRows = (departures) => {
   const rows = [];
 
   // Do we need to do anything with inlineBadges?
-  departures.forEach((row) => {
+  departures.forEach(row => {
     if (rows.length === 0) {
       const newRow = Object.assign({}, row);
       newRow.time = [newRow.time];

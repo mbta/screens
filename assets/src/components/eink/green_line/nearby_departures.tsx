@@ -36,7 +36,7 @@ const NearbyDeparturesRow = ({
   route,
   time,
   destination,
-  currentTimeString,
+  currentTimeString
 }): JSX.Element => {
   return (
     <div className="nearby-departures-row">
