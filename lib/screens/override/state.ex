@@ -1,14 +1,11 @@
 defmodule Screens.Override.State do
   @moduledoc false
 
+  alias Screens.Override
+
   @initial_fetch_wait_ms 500
   @refresh_ms 15 * 1000
-  @default_config %{
-    globally_disabled: false,
-    disabled_screen_ids: MapSet.new(),
-    bus_service: 1,
-    green_line_service: 1
-  }
+  @default_config Override.new()
 
   use GenServer
 
@@ -16,8 +13,8 @@ defmodule Screens.Override.State do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  def lookup(pid \\ __MODULE__, screen_id) do
-    GenServer.call(pid, {:lookup, screen_id})
+  def disabled?(pid \\ __MODULE__, screen_id) do
+    GenServer.call(pid, {:disabled?, screen_id})
   end
 
   def bus_service(pid \\ __MODULE__) do
@@ -26,6 +23,10 @@ defmodule Screens.Override.State do
 
   def green_line_service(pid \\ __MODULE__) do
     GenServer.call(pid, :green_line_service)
+  end
+
+  def headway_mode?(pid \\ __MODULE__, screen_id) do
+    GenServer.call(pid, {:headway_mode?, screen_id})
   end
 
   def schedule_refresh(pid, ms \\ @refresh_ms) do
@@ -42,24 +43,28 @@ defmodule Screens.Override.State do
   end
 
   @impl true
-  def handle_call({:lookup, _screen_id}, _from, %{globally_disabled: true} = state) do
+  def handle_call({:disabled?, _screen_id}, _from, %Override{globally_disabled: true} = state) do
     {:reply, true, state}
   end
 
   def handle_call(
-        {:lookup, screen_id},
+        {:disabled?, screen_id},
         _from,
-        %{globally_disabled: false, disabled_screen_ids: disabled_screen_ids} = state
+        %Override{globally_disabled: false, disabled_screen_ids: disabled_screen_ids} = state
       ) do
     {:reply, MapSet.member?(disabled_screen_ids, screen_id), state}
   end
 
-  def handle_call(:bus_service, _from, %{bus_service: bus_service} = state) do
-    {:reply, bus_service, state}
+  def handle_call(:bus_service, _from, state) do
+    {:reply, state.bus_service, state}
   end
 
-  def handle_call(:green_line_service, _from, %{green_line_service: green_line_service} = state) do
-    {:reply, green_line_service, state}
+  def handle_call(:green_line_service, _from, state) do
+    {:reply, state.green_line_service, state}
+  end
+
+  def handle_call({:headway_mode?, screen_id}, _from, state) do
+    {:reply, MapSet.member?(state.headway_mode_screen_ids, screen_id), state}
   end
 
   @impl true

@@ -15,14 +15,84 @@ const Departure = ({ time, currentTimeString }): JSX.Element => {
   );
 };
 
-const HeadwayMessage = ({ destination, headway }): JSX.Element => {
+enum HeadwayMessageVariant {
+  Main,
+  Sub,
+}
+
+interface HeadwayMessageProps {
+  destination: string;
+  headway: number;
+  variant: HeadwayMessageVariant;
+}
+const HeadwayMessage = ({
+  destination,
+  headway,
+  variant,
+}: HeadwayMessageProps): JSX.Element => {
   const range = 2;
-  return (
-    <div className="departures__headway-message">
-      Trains to {destination} every {headway - range}-{headway + range} minutes
-    </div>
+  const message = (
+    <>
+      Trains to {destination} every{" "}
+      <span className="departures__headway-message__range">
+        {headway - range}-{headway + range}
+      </span>{" "}
+      minutes
+    </>
   );
+
+  switch (variant) {
+    case HeadwayMessageVariant.Main:
+      return (
+        <>
+          <div className="departures__headway-message departures__headway-message--large">
+            {message}
+          </div>
+          <div className="departures__headway-message__subheading">
+            Live updates are not available during this reduced service
+          </div>
+        </>
+      );
+    case HeadwayMessageVariant.Sub:
+      return <div className="departures__headway-message">{message}</div>;
+  }
 };
+
+// Displays up to 2 departures, padding with a headway
+// message when there is only 0 or 1 departure to show.
+const DepartureList = ({
+  departures,
+  currentTimeString,
+  destination,
+  headway,
+}: DepartureListProps): JSX.Element[] => {
+  const renderedDepartures = departures.map(({ time }) => (
+    <Departure time={time} currentTimeString={currentTimeString} key={time} />
+  ));
+
+  if (renderedDepartures.length < 2) {
+    renderedDepartures.push(
+      <HeadwayMessage
+        destination={destination}
+        headway={headway}
+        variant={HeadwayMessageVariant.Sub}
+        key="departure-list-headway"
+      />
+    );
+  }
+
+  return [
+    ...renderedDepartures.slice(0, 1),
+    <div className="departures__hairline" key="departure-list-hairline" />,
+    ...renderedDepartures.slice(1),
+  ];
+};
+interface DepartureListProps {
+  departures: { time: string }[];
+  currentTimeString: string;
+  destination: string;
+  headway: number;
+}
 
 const Departures = ({
   departures,
@@ -31,30 +101,25 @@ const Departures = ({
   inlineAlert,
   currentTimeString,
   serviceLevel,
+  isHeadwayMode,
 }): JSX.Element => {
-  const topDeparture = departures[0];
-  const bottomDeparture = departures[1];
-
   return (
     <div className="departures">
       <div className="departures__container">
-        {topDeparture ? (
-          <Departure
-            time={topDeparture.time}
-            currentTimeString={currentTimeString}
+        {isHeadwayMode ? (
+          <HeadwayMessage
+            destination={destination}
+            headway={headway}
+            variant={HeadwayMessageVariant.Main}
           />
         ) : (
-          <HeadwayMessage destination={destination} headway={headway} />
-        )}
-        <div className="departures__hairline"></div>
-        {bottomDeparture ? (
-          <Departure
-            time={bottomDeparture.time}
+          <DepartureList
+            departures={departures}
             currentTimeString={currentTimeString}
+            destination={destination}
+            headway={headway}
           />
-        ) : topDeparture ? (
-          <HeadwayMessage destination={destination} headway={headway} />
-        ) : null}
+        )}
         <div className="departures__delay-badge">
           {serviceLevel > 1 ? (
             <TakeoverInlineAlert />

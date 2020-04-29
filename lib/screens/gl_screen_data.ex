@@ -12,7 +12,7 @@ defmodule Screens.GLScreenData do
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
 
-    if Screens.Override.State.lookup(String.to_integer(screen_id)) do
+    if Screens.Override.State.disabled?(String.to_integer(screen_id)) do
       LogScreenData.log_api_response(screen_id, client_version, is_screen, %{
         force_reload: false,
         success: false
@@ -47,13 +47,27 @@ defmodule Screens.GLScreenData do
     api_version = Application.get_env(:screens, :api_version)
 
     if api_version == client_version do
-      by_stop_id(stop_id, route_id, direction_id, platform_id, screen_id, is_screen)
+      by_stop_id(
+        stop_id,
+        route_id,
+        direction_id,
+        platform_id,
+        screen_id,
+        is_screen
+      )
     else
       %{force_reload: true}
     end
   end
 
-  defp by_stop_id(stop_id, route_id, direction_id, platform_id, screen_id, is_screen) do
+  defp by_stop_id(
+         stop_id,
+         route_id,
+         direction_id,
+         platform_id,
+         screen_id,
+         is_screen
+       ) do
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
     # - global_alert will be nil
@@ -108,7 +122,8 @@ defmodule Screens.GLScreenData do
           nearby_departures: nearby_departures,
           line_map: line_map_data,
           headway: headway_data,
-          service_level: service_level
+          service_level: service_level,
+          is_headway_mode: Screens.Override.State.headway_mode?(String.to_integer(screen_id))
         }
 
       :error ->

@@ -23,6 +23,7 @@ const TopScreenLayout = ({
   headway,
   lineMapData,
   inlineAlert,
+  isHeadwayMode,
 }): JSX.Element => {
   return (
     <div className="single-screen-container">
@@ -42,6 +43,7 @@ const TopScreenLayout = ({
         destination={stopName}
         inlineAlert={inlineAlert}
         currentTimeString={currentTimeString}
+        isHeadwayMode={isHeadwayMode}
       />
     </div>
   );
@@ -97,6 +99,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         lineMapData={apiResponse.line_map}
         headway={apiResponse.headway}
         inlineAlert={apiResponse.inline_alert}
+        isHeadwayMode={apiResponse.is_headway_mode}
       />
       <BottomScreenLayout
         currentTimeString={apiResponse.current_time}
@@ -137,22 +140,17 @@ const NoConnectionScreenLayout = (): JSX.Element => {
 };
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
-  if (!apiResponse || apiResponse.success === false) {
-    return <NoConnectionScreenLayout />;
+  switch (true) {
+    case !apiResponse || apiResponse.success === false:
+      return <NoConnectionScreenLayout />;
+    case apiResponse.service_level === 5:
+      return <NoServiceScreenLayout />;
+    case (!apiResponse.departures || apiResponse.departures.length === 0) &&
+      apiResponse.headway === null:
+      return <NoDeparturesScreenLayout apiResponse={apiResponse} />;
+    default:
+      return <DefaultScreenLayout apiResponse={apiResponse} />;
   }
-
-  if (apiResponse.service_level === 5) {
-    return <NoServiceScreenLayout />;
-  }
-
-  if (
-    (!apiResponse.departures || apiResponse.departures.length === 0) &&
-    apiResponse.headway === null
-  ) {
-    return <NoDeparturesScreenLayout apiResponse={apiResponse} />;
-  }
-
-  return <DefaultScreenLayout apiResponse={apiResponse} />;
 };
 
 const ScreenContainer = ({ id }): JSX.Element => {
