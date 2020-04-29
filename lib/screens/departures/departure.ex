@@ -1,11 +1,14 @@
 defmodule Screens.Departures.Departure do
   @moduledoc false
 
+  alias Screens.Predictions.Prediction
+
   defstruct id: nil,
             stop_name: nil,
             route_short_name: nil,
             route_id: nil,
             destination: nil,
+            direction_id: nil,
             time: nil,
             inline_badges: nil
 
@@ -15,19 +18,26 @@ defmodule Screens.Departures.Departure do
           route_short_name: String.t(),
           route_id: String.t(),
           destination: String.t(),
+          direction_id: 0 | 1 | nil,
           time: DateTime.t(),
           inline_badges: list(map())
         }
 
   def by_stop_id(stop_id, route_id, direction_id) do
     stop_id
-    |> Screens.Predictions.Prediction.by_stop_id(route_id, direction_id)
+    |> Prediction.by_stop_id(route_id, direction_id)
     |> from_predictions()
   end
 
   def by_stop_id(stop_id) do
     stop_id
-    |> Screens.Predictions.Prediction.by_stop_id()
+    |> Prediction.by_stop_id()
+    |> from_predictions()
+  end
+
+  def fetch(opts) do
+    opts
+    |> Prediction.fetch()
     |> from_predictions()
   end
 
@@ -36,6 +46,7 @@ defmodule Screens.Departures.Departure do
       id: d.id,
       route: d.route_short_name,
       destination: d.destination,
+      direction_id: d.direction_id,
       time: d.time,
       inline_badges: d.inline_badges
     }
@@ -45,7 +56,7 @@ defmodule Screens.Departures.Departure do
     departures =
       predictions
       |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
-      |> Enum.reject(&Screens.Predictions.Prediction.departure_in_past/1)
+      |> Enum.reject(&Prediction.departure_in_past/1)
       |> Enum.map(&from_prediction/1)
 
     {:ok, departures}
@@ -57,7 +68,7 @@ defmodule Screens.Departures.Departure do
         id: id,
         stop: %{name: stop_name},
         route: %{id: route_id, short_name: route_short_name},
-        trip: %{headsign: destination},
+        trip: %{headsign: destination, direction_id: direction_id},
         arrival_time: arrival_time,
         departure_time: departure_time
       }) do
@@ -69,6 +80,7 @@ defmodule Screens.Departures.Departure do
       route_short_name: route_short_name,
       route_id: route_id,
       destination: destination,
+      direction_id: direction_id,
       time: DateTime.to_iso8601(time),
       inline_badges: []
     }

@@ -3,10 +3,13 @@ defmodule ScreensWeb.ScreenApiController do
   require Logger
 
   def show(conn, %{"id" => screen_id, "version" => version}) do
-    %{app_id: app_id, stop_id: stop_id} =
+    config_data =
       :screens
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
+
+    app_id = Map.get(config_data, :app_id)
+    stop_id = Map.get(config_data, :stop_id)
 
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
 
@@ -36,6 +39,13 @@ defmodule ScreensWeb.ScreenApiController do
         "gl_eink_double" ->
           Screens.GLScreenData.by_stop_id_with_override_and_version(
             stop_id,
+            screen_id,
+            version,
+            is_screen
+          )
+
+        "solari" ->
+          Screens.SolariScreenData.by_screen_id_with_override_and_version(
             screen_id,
             version,
             is_screen

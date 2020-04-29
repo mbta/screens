@@ -71,7 +71,7 @@ defmodule Screens.BusScreenData do
         %{
           force_reload: false,
           success: true,
-          current_time: format_current_time(DateTime.utc_now()),
+          current_time: Screens.Util.format_time(DateTime.utc_now()),
           stop_name: stop_name,
           stop_id: stop_id,
           departures: format_departure_rows(departures),
@@ -98,10 +98,6 @@ defmodule Screens.BusScreenData do
 
   defp extract_stop_name(_, _) do
     nil
-  end
-
-  defp format_current_time(t) do
-    t |> DateTime.truncate(:second) |> DateTime.to_iso8601()
   end
 
   defp format_departure_rows(departures) do
