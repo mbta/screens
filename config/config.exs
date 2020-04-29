@@ -161,7 +161,54 @@ config :screens,
       direction_id: 0,
       app_id: "gl_eink_double"
     },
-    "301" => %{stop_id: "10642", app_id: "solari"}
+    "301" => %{
+      station_name: "Forest Hills",
+      sections: [
+        %{
+          name: "Upper Busway",
+          arrow: :right,
+          query: %{stop_ids: ["10642"]},
+          layout: {:upcoming, %{num_rows: 3}}
+        },
+        %{
+          name: "Lower Busway",
+          arrow: :up,
+          query: %{stop_ids: ["875"]},
+          layout: {:upcoming, %{num_rows: 3}}
+        },
+        %{
+          name: "Commuter Rail",
+          arrow: :left,
+          query: %{stop_ids: ["Forest Hills"]},
+          layout: :bidirectional
+        }
+      ],
+      app_id: "solari"
+    },
+    "302" => %{
+      station_name: "Forest Hills",
+      sections: [
+        %{
+          name: "Upper Busway",
+          arrow: :right,
+          query: %{stop_ids: ["10642"]},
+          layout: {:upcoming, %{num_rows: 4}}
+        },
+        %{
+          name: "Orange Line",
+          arrow: :up,
+          query: %{stop_ids: ["70001"]},
+          layout: {:upcoming, %{num_rows: 2}}
+        },
+        %{
+          name: "Commuter Rail",
+          arrow: :left,
+          query: %{stop_ids: ["Forest Hills"]},
+          layout: :bidirectional
+        }
+      ],
+      app_id: "solari"
+    }
   },
   api_v3_url: "https://api-v3.mbta.com/",
   nearby_departures: %{
