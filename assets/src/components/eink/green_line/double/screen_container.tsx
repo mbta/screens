@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import ConnectionError from "Components/eink/connection_error";
 import DigitalBridge from "Components/eink/digital_bridge";

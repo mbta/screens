@@ -1,4 +1,4 @@
-import React, { forwardRef, useLayoutEffect, useRef, useState } from "react";
+import React, { forwardRef, useRef } from "react";
 
 import Departures from "Components/eink/bus/departures";
 import FareInfo from "Components/eink/bus/fare_info";
