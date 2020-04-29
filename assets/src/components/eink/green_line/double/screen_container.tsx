@@ -23,7 +23,7 @@ const TopScreenLayout = ({
   headway,
   lineMapData,
   inlineAlert,
-  isHeadwayMode
+  isHeadwayMode,
 }): JSX.Element => {
   return (
     <div className="single-screen-container">
@@ -54,7 +54,7 @@ const BottomScreenLayout = ({
   globalAlert,
   stopId,
   nearbyDepartures,
-  serviceLevel
+  serviceLevel,
 }): JSX.Element => {
   if (serviceLevel > 1) {
     return (

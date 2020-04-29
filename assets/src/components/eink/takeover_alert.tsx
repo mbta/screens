@@ -88,13 +88,14 @@ const TakeoverAlert = ({ mode }): JSX.Element => {
               <g transform="translate(-1090.000000, -243.000000)">
                 {[...Array(n)].map((_, i) => (
                   <g
-                    transform={`translate(${start -
-                      d * i}, 643.000000) rotate(45.000000) translate(${-(
+                    transform={`translate(${
+                      start - d * i
+                    }, 643.000000) rotate(45.000000) translate(${-(
                       start -
                       d * i
-                    )}, -643.000000) translate(${start -
-                      d * i -
-                      rectWidth}, -245.000000)`}
+                    )}, -643.000000) translate(${
+                      start - d * i - rectWidth
+                    }, -245.000000)`}
                     key={i}
                   >
                     {stripePath}

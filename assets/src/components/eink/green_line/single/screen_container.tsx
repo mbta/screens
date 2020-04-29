@@ -20,7 +20,7 @@ const TopScreenLayout = ({
   headway,
   inlineAlert,
   serviceLevel,
-  isHeadwayMode
+  isHeadwayMode,
 }): JSX.Element => {
   return (
     <div className="single-screen-container single-screen-container--gl-mercury">

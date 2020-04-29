@@ -9,7 +9,7 @@ const DepartureRow = ({
   route,
   destination,
   time,
-  size
+  size,
 }): JSX.Element => {
   return (
     <div className={"departure-row"}>

@@ -20,14 +20,14 @@ const timeRepresentation = (departureTimeString, currentTimeString) => {
     return {
       type: "TIME_TIMESTAMP",
       timestamp,
-      ampm
+      ampm,
     };
   }
 };
 
 const BaseDepartureTime = ({
   departureTimeString,
-  currentTimeString
+  currentTimeString,
 }): JSX.Element => {
   const time = timeRepresentation(departureTimeString, currentTimeString);
 

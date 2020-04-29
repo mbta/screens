@@ -17,7 +17,7 @@ const Departure = ({ time, currentTimeString }): JSX.Element => {
 
 enum HeadwayMessageVariant {
   Main,
-  Sub
+  Sub,
 }
 
 interface HeadwayMessageProps {
@@ -28,7 +28,7 @@ interface HeadwayMessageProps {
 const HeadwayMessage = ({
   destination,
   headway,
-  variant
+  variant,
 }: HeadwayMessageProps): JSX.Element => {
   const range = 2;
   const message = (
@@ -64,7 +64,7 @@ const DepartureList = ({
   departures,
   currentTimeString,
   destination,
-  headway
+  headway,
 }: DepartureListProps): JSX.Element[] => {
   const renderedDepartures = departures.map(({ time }) => (
     <Departure time={time} currentTimeString={currentTimeString} key={time} />
@@ -84,7 +84,7 @@ const DepartureList = ({
   return [
     ...renderedDepartures.slice(0, 1),
     <div className="departures__hairline" key="departure-list-hairline" />,
-    ...renderedDepartures.slice(1)
+    ...renderedDepartures.slice(1),
   ];
 };
 interface DepartureListProps {
@@ -101,7 +101,7 @@ const Departures = ({
   inlineAlert,
   currentTimeString,
   serviceLevel,
-  isHeadwayMode
+  isHeadwayMode,
 }): JSX.Element => {
   return (
     <div className="departures">
