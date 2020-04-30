@@ -23,7 +23,7 @@ const Section = ({
       <div className="departure-container">
         {departures.map(({ id, route, destination, time }) => (
           <Departure
-            route={route}
+            route={name === "Commuter Rail" ? "CR" : route}
             destination={destination}
             time={time}
             currentTimeString={currentTimeString}
