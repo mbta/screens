@@ -1,13 +1,12 @@
 .section-list {
-  font-family: "neue-haas-grotesk-text";
+  font-family: neue-haas-grotesk-text;
 }
 
 .section-header {
   color: #171f26;
   background-color: #e1e1df;
   height: 128px;
-  // TODO: get color and thickness from Tyler
-  border-top: 6px solid purple;
+  border-top: 5px solid rgba(23, 31, 38, 0.1);
 }
 
 .section-header__name {

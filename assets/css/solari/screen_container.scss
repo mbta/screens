@@ -3,4 +3,10 @@
   margin: 0px auto;
   width: 1080px;
   height: 1920px;
+
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #f5f4f1 0 7px,
+    rgba(199, 199, 199, 0.58) 7px 10px
+  );
 }

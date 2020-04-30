@@ -16,6 +16,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         sections={apiResponse.sections}
         currentTimeString={apiResponse.current_time}
       />
+      <div className="screen-container__flex-space" />
     </div>
   );
 };

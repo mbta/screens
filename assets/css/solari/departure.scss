@@ -1,5 +1,4 @@
 .departure-container {
-  // TODO: get correct color from Tyler
   background-color: #f5f4f1;
 }
 
@@ -10,6 +9,6 @@
   margin-right: 42px;
 
   &:not(:last-child) {
-    border-bottom: 4px solid purple;
+    border-bottom: 3px solid rgba(199, 199, 199, 0.58);
   }
 }
