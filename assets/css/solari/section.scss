@@ -1,0 +1,18 @@
+.section-list {
+  font-family: "neue-haas-grotesk-text";
+}
+
+.section-header {
+  color: #171f26;
+  background-color: #e1e1df;
+  height: 128px;
+  // TODO: get color and thickness from Tyler
+  border-top: 6px solid purple;
+}
+
+.section-header__name {
+  font-size: 53px;
+  vertical-align: center;
+  font-weight: 700;
+  line-height: 128px;
+}

@@ -16,8 +16,10 @@ const Header = ({ stationName, currentTimeString }): JSX.Element => {
           : ""}
       </div>
       <div className="header__time">{currentTime}</div>
-      <div className="header__title">Upcoming Trips</div>
-      <div className="header__station-name">{stationName}</div>
+      <div className="header__content-container">
+        <div className="header__title">Upcoming Trips</div>
+        <div className="header__station-name">{stationName}</div>
+      </div>
     </div>
   );
 };
