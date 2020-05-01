@@ -18,7 +18,9 @@
 }
 
 .section-header__arrow-container {
+  display: inline-block;
   height: 128px;
+  width: 57px;
   font-size: 0;
   margin-left: 42px;
   vertical-align: middle;

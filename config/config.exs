@@ -166,19 +166,19 @@ config :screens,
       sections: [
         %{
           name: "Busway",
-          arrow: :down,
+          arrow: :s,
           query: %{stop_ids: ["334"]},
           layout: {:upcoming, %{num_rows: 5}}
         },
         %{
           name: "Red Line",
-          arrow: :left,
+          arrow: :w,
           query: %{stop_ids: ["70094"]},
           layout: {:upcoming, %{num_rows: 2}}
         },
         %{
           name: "Mattapan Trolley",
-          arrow: :right,
+          arrow: :e,
           query: %{stop_ids: ["70261"]},
           layout: {:upcoming, %{num_rows: 1}}
         }
@@ -196,13 +196,13 @@ config :screens,
         },
         %{
           name: "Bus (Massachusetts Ave @ Pearl St)",
-          arrow: :right,
+          arrow: :e,
           query: %{stop_ids: ["72"]},
           layout: {:upcoming, %{num_rows: 3}}
         },
         %{
           name: "Bus (Magazine St & Green St)",
-          arrow: :left,
+          arrow: :w,
           query: %{stop_ids: ["1060", "1123"]},
           layout: {:upcoming, %{num_rows: 3}}
         }
@@ -318,13 +318,13 @@ config :screens,
       sections: [
         %{
           name: "Upper Busway",
-          arrow: :right,
+          arrow: :e,
           query: %{stop_ids: ["20761"]},
           layout: {:upcoming, %{num_rows: 4}}
         },
         %{
           name: "Lower Busway",
-          arrow: :right,
+          arrow: :e,
           query: %{stop_ids: ["2076"]},
           layout: {:upcoming, %{num_rows: 4}}
         }
@@ -336,7 +336,7 @@ config :screens,
       sections: [
         %{
           name: "Busway",
-          arrow: :downright,
+          arrow: :se,
           query: %{stop_ids: ["8310"]},
           layout: {:upcoming, %{num_rows: 10}}
         }
@@ -348,13 +348,13 @@ config :screens,
       sections: [
         %{
           name: "Blue Line",
-          arrow: :right,
+          arrow: :e,
           query: %{stop_ids: ["70045", "70046"]},
           layout: :bidirectional
         },
         %{
           name: "Bus",
-          arrow: :left,
+          arrow: :w,
           query: %{stop_ids: ["5740", "57400"]},
           layout: {:upcoming, %{num_rows: 6}}
         }
@@ -366,19 +366,19 @@ config :screens,
       sections: [
         %{
           name: "Upper Busway",
-          arrow: :right,
+          arrow: :e,
           query: %{stop_ids: ["17861"]},
           layout: {:upcoming, %{num_rows: 3}}
         },
         %{
           name: "Lower Busway",
-          arrow: :right,
+          arrow: :e,
           query: %{stop_ids: ["17862", "17863"]},
           layout: {:upcoming, %{num_rows: 3}}
         },
         %{
           name: "Commuter Rail",
-          arrow: :right,
+          arrow: :e,
           query: %{stop_ids: ["Ruggles"]},
           layout: {:upcoming, %{num_rows: 2}}
         }
@@ -390,13 +390,13 @@ config :screens,
       sections: [
         %{
           name: "Upper Busway",
-          arrow: :left,
+          arrow: :w,
           query: %{stop_ids: ["29001", "29002", "29003", "29004", "29005", "29006"]},
           layout: {:upcoming, %{num_rows: 4}}
         },
         %{
           name: "Lower Busway",
-          arrow: :downleft,
+          arrow: :sw,
           query: %{
             stop_ids: ["29007", "29008", "29009", "29010", "29011", "29012", "29013", "29014"]
           },
@@ -410,13 +410,13 @@ config :screens,
       sections: [
         %{
           name: "Blue Line",
-          arrow: :downleft,
+          arrow: :sw,
           query: %{stop_ids: ["70059"]},
           layout: {:upcoming, %{num_rows: 2}}
         },
         %{
           name: "Bus",
-          arrow: :left,
+          arrow: :w,
           query: %{stop_ids: ["15795"]},
           layout: {:upcoming, %{num_rows: 6}}
         }
