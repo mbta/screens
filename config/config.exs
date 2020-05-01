@@ -162,6 +162,110 @@ config :screens,
       app_id: "gl_eink_double"
     },
     "301" => %{
+      station_name: "Ashmont",
+      sections: [
+        %{
+          name: "Busway",
+          arrow: :down,
+          query: %{stop_ids: ["334"]},
+          layout: {:upcoming, %{num_rows: 5}}
+        },
+        %{
+          name: "Red Line",
+          arrow: :left,
+          query: %{stop_ids: ["70094"]},
+          layout: {:upcoming, %{num_rows: 2}}
+        },
+        %{
+          name: "Mattapan Trolley",
+          arrow: :right,
+          query: %{stop_ids: ["70261"]},
+          layout: {:upcoming, %{num_rows: 1}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "302" => %{
+      station_name: "Central",
+      sections: [
+        %{
+          name: "Red Line",
+          arrow: nil,
+          query: %{stop_ids: ["70069", "70070"]},
+          layout: :bidirectional
+        },
+        %{
+          name: "Bus (Massachusetts Ave @ Pearl St)",
+          arrow: :right,
+          query: %{stop_ids: ["72"]},
+          layout: {:upcoming, %{num_rows: 3}}
+        },
+        %{
+          name: "Bus (Magazine St & Green St)",
+          arrow: :left,
+          query: %{stop_ids: ["1060", "1123"]},
+          layout: {:upcoming, %{num_rows: 3}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "303" => %{
+      station_name: "Dudley - Platform A",
+      sections: [
+        %{
+          name: "Platform A",
+          arrow: nil,
+          query: %{stop_ids: ["place-dudly"], route_ids: ["15", "23", "28", "44", "45"]},
+          layout: {:upcoming, %{num_rows: 4}}
+        },
+        %{
+          name: "Other Platforms",
+          arrow: nil,
+          query: %{
+            stop_ids: ["place-dudly"],
+            route_ids: ["1", "8", "14", "19", "41", "42", "47", "66", "170", "171", "749", "751"]
+          },
+          layout: {:upcoming, %{num_rows: 4}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "304" => %{
+      station_name: "Dudley - Platform C",
+      sections: [
+        %{
+          name: "Platform C",
+          arrow: nil,
+          query: %{stop_ids: ["place-dudly"], route_ids: ["14", "41", "42", "66"]},
+          layout: {:upcoming, %{num_rows: 4}}
+        },
+        %{
+          name: "Other Platforms",
+          arrow: nil,
+          query: %{
+            stop_ids: ["place-dudly"],
+            route_ids: [
+              "1",
+              "8",
+              "15",
+              "19",
+              "23",
+              "28",
+              "44",
+              "45",
+              "47",
+              "170",
+              "171",
+              "749",
+              "751"
+            ]
+          },
+          layout: {:upcoming, %{num_rows: 4}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "305" => %{
       station_name: "Forest Hills",
       sections: [
         %{
@@ -185,7 +289,7 @@ config :screens,
       ],
       app_id: "solari"
     },
-    "302" => %{
+    "306" => %{
       station_name: "Forest Hills",
       sections: [
         %{
@@ -205,6 +309,116 @@ config :screens,
           arrow: :left,
           query: %{stop_ids: ["Forest Hills"]},
           layout: :bidirectional
+        }
+      ],
+      app_id: "solari"
+    },
+    "307" => %{
+      station_name: "Harvard",
+      sections: [
+        %{
+          name: "Upper Busway",
+          arrow: :right,
+          query: %{stop_ids: ["20761"]},
+          layout: {:upcoming, %{num_rows: 4}}
+        },
+        %{
+          name: "Lower Busway",
+          arrow: :right,
+          query: %{stop_ids: ["2076"]},
+          layout: {:upcoming, %{num_rows: 4}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "308" => %{
+      station_name: "Haymarket",
+      sections: [
+        %{
+          name: "Busway",
+          arrow: :downright,
+          query: %{stop_ids: ["8310"]},
+          layout: {:upcoming, %{num_rows: 10}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "309" => %{
+      station_name: "Maverick",
+      sections: [
+        %{
+          name: "Blue Line",
+          arrow: :right,
+          query: %{stop_ids: ["70045", "70046"]},
+          layout: :bidirectional
+        },
+        %{
+          name: "Bus",
+          arrow: :left,
+          query: %{stop_ids: ["5740", "57400"]},
+          layout: {:upcoming, %{num_rows: 6}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "310" => %{
+      station_name: "Ruggles",
+      sections: [
+        %{
+          name: "Upper Busway",
+          arrow: :right,
+          query: %{stop_ids: ["17861"]},
+          layout: {:upcoming, %{num_rows: 3}}
+        },
+        %{
+          name: "Lower Busway",
+          arrow: :right,
+          query: %{stop_ids: ["17862", "17863"]},
+          layout: {:upcoming, %{num_rows: 3}}
+        },
+        %{
+          name: "Commuter Rail",
+          arrow: :right,
+          query: %{stop_ids: ["Ruggles"]},
+          layout: {:upcoming, %{num_rows: 2}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "311" => %{
+      station_name: "Sullivan Square",
+      sections: [
+        %{
+          name: "Upper Busway",
+          arrow: :left,
+          query: %{stop_ids: ["29001", "29002", "29003", "29004", "29005", "29006"]},
+          layout: {:upcoming, %{num_rows: 4}}
+        },
+        %{
+          name: "Lower Busway",
+          arrow: :downleft,
+          query: %{
+            stop_ids: ["29007", "29008", "29009", "29010", "29011", "29012", "29013", "29014"]
+          },
+          layout: {:upcoming, %{num_rows: 4}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "312" => %{
+      station_name: "Wonderland",
+      sections: [
+        %{
+          name: "Blue Line",
+          arrow: :downleft,
+          query: %{stop_ids: ["70059"]},
+          layout: {:upcoming, %{num_rows: 2}}
+        },
+        %{
+          name: "Bus",
+          arrow: :left,
+          query: %{stop_ids: ["15795"]},
+          layout: {:upcoming, %{num_rows: 6}}
         }
       ],
       app_id: "solari"
