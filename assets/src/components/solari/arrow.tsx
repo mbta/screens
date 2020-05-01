@@ -13,7 +13,7 @@ enum Direction {
   S = "s",
   SW = "sw",
   W = "w",
-  NW = "nw"
+  NW = "nw",
 }
 
 interface ArrowDescriptor {
@@ -52,14 +52,23 @@ const directionToArrow = (direction: Direction): ArrowDescriptor => {
       className += "--rotate-0";
   }
 
-  return {imageName, className};
+  return { imageName, className };
 };
 
-const Arrow = ({direction, className}: {direction: Direction, className: string}): JSX.Element => {
-  const {imageName, className: baseClassName} = directionToArrow(direction);
+const Arrow = ({
+  direction,
+  className,
+}: {
+  direction: Direction;
+  className: string;
+}): JSX.Element => {
+  const { imageName, className: baseClassName } = directionToArrow(direction);
   return (
-    <img className={`${baseClassName} ${className}`} src={`/images/${imageName}`} />
+    <img
+      className={`${baseClassName} ${className}`}
+      src={`/images/${imageName}`}
+    />
   );
-}
+};
 
 export default Arrow;
