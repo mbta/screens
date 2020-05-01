@@ -45,6 +45,7 @@ defmodule Screens.Departures.Departure do
     %{
       id: d.id,
       route: d.route_short_name,
+      route_id: d.route_id,
       destination: d.destination,
       direction_id: d.direction_id,
       time: d.time,

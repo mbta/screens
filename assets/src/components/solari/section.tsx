@@ -21,15 +21,20 @@ const Section = ({
     <div className="section-list">
       <SectionHeader name={name} arrow={arrow} />
       <div className="departure-container">
-        {departures.map(({ id, route, destination, time }) => (
-          <Departure
-            route={name === "Commuter Rail" ? "CR" : route}
-            destination={destination}
-            time={time}
-            currentTimeString={currentTimeString}
-            key={id}
-          />
-        ))}
+        {departures.map((departure) => {
+          const { id, route, destination, time } = departure;
+          const routeId = departure.route_id;
+          return (
+            <Departure
+              route={route}
+              routeId={routeId}
+              destination={destination}
+              time={time}
+              currentTimeString={currentTimeString}
+              key={id}
+            />
+          );
+        })}
       </div>
     </div>
   );
