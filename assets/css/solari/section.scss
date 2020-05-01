@@ -11,7 +11,21 @@
 
 .section-header__name {
   font-size: 53px;
-  vertical-align: center;
   font-weight: 700;
   line-height: 128px;
+  margin-left: 27px;
+  vertical-align: middle;
+}
+
+.section-header__arrow-container {
+  height: 128px;
+  font-size: 0;
+  margin-left: 42px;
+  vertical-align: middle;
+}
+
+.section-header__arrow-image {
+  width: 57px;
+  height: 57px;
+  margin: 35.5px 0 35.5px;
 }

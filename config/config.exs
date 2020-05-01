@@ -270,19 +270,19 @@ config :screens,
       sections: [
         %{
           name: "Upper Busway",
-          arrow: :right,
+          arrow: :e,
           query: %{stop_ids: ["10642"]},
           layout: {:upcoming, %{num_rows: 3}}
         },
         %{
           name: "Lower Busway",
-          arrow: :up,
+          arrow: :n,
           query: %{stop_ids: ["875"]},
           layout: {:upcoming, %{num_rows: 3}}
         },
         %{
           name: "Commuter Rail",
-          arrow: :left,
+          arrow: :w,
           query: %{stop_ids: ["Forest Hills"]},
           layout: :bidirectional
         }
@@ -294,19 +294,19 @@ config :screens,
       sections: [
         %{
           name: "Upper Busway",
-          arrow: :right,
+          arrow: :e,
           query: %{stop_ids: ["10642"]},
           layout: {:upcoming, %{num_rows: 4}}
         },
         %{
           name: "Orange Line",
-          arrow: :up,
+          arrow: :n,
           query: %{stop_ids: ["70001"]},
           layout: {:upcoming, %{num_rows: 2}}
         },
         %{
           name: "Commuter Rail",
-          arrow: :left,
+          arrow: :w,
           query: %{stop_ids: ["Forest Hills"]},
           layout: :bidirectional
         }

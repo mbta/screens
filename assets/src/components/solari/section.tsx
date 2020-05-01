@@ -1,11 +1,14 @@
 import React from "react";
 
 import Departure from "Components/solari/departure";
+import Arrow from "Components/solari/arrow";
 
 const SectionHeader = ({ name, arrow }): JSX.Element => {
   return (
     <div className="section-header">
-      <span className="section-header__arrow">{arrow}</span>
+      <span className="section-header__arrow-container">
+          <Arrow direction={arrow} className="section-header__arrow-image" />
+      </span>
       <span className="section-header__name">{name}</span>
     </div>
   );

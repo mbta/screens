@@ -1,0 +1,7 @@
+$rotations: 0, 90, 180, 270;
+
+@each $rotation in $rotations {
+  .arrow__icon-image--rotate-#{$rotation} {
+    transform: rotate(#{$rotation}deg);
+  }
+}
