@@ -14,6 +14,8 @@ import TakeoverAlert from "Components/eink/takeover_alert";
 
 import useApiResponse from "Hooks/use_api_response";
 
+import { EINK_REFRESH_MS } from "Constants";
+
 const TopScreenLayout = ({
   currentTimeString,
   stopName,
@@ -154,7 +156,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
 };
 
 const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse(id);
+  const apiResponse = useApiResponse(id, EINK_REFRESH_MS);
   return <ScreenLayout apiResponse={apiResponse} />;
 };
 

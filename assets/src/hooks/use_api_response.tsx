@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 
-const useApiResponse = (id) => {
-  const DATA_REFRESH_MS = 30000;
-
+const useApiResponse = (id, refreshMs) => {
   const [apiResponse, setApiResponse] = useState(null);
   const apiVersion = document.getElementById("app").dataset.apiVersion;
 
@@ -25,7 +23,7 @@ const useApiResponse = (id) => {
 
     const interval = setInterval(() => {
       fetchData();
-    }, DATA_REFRESH_MS);
+    }, refreshMs);
 
     return () => clearInterval(interval);
   }, []);

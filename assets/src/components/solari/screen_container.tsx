@@ -1,9 +1,11 @@
 import React from "react";
 
-import useApiResponse from "Hooks/use_api_response";
-
 import Header from "Components/solari/header";
 import SectionList from "Components/solari/section_list";
+
+import useApiResponse from "Hooks/use_api_response";
+
+import { SOLARI_REFRESH_MS } from "Constants";
 
 const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   return (
@@ -30,7 +32,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
 };
 
 const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse(id);
+  const apiResponse = useApiResponse(id, SOLARI_REFRESH_MS);
   return <ScreenLayout apiResponse={apiResponse} />;
 };
 

@@ -12,6 +12,8 @@ import OvernightDepartures from "Components/eink/overnight_departures";
 import useApiResponse from "Hooks/use_api_response";
 import useFitDepartures from "Hooks/use_fit_departures";
 
+import { EINK_REFRESH_MS } from "Constants";
+
 const TopScreenLayout = forwardRef(
   ({ currentTimeString, stopName, departures }, ref): JSX.Element => {
     return (
@@ -136,7 +138,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
 };
 
 const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse(id);
+  const apiResponse = useApiResponse(id, EINK_REFRESH_MS);
   return <ScreenLayout apiResponse={apiResponse} />;
 };
 

@@ -11,7 +11,8 @@ module.exports = (env, options) => ({
     alias: {
       Components: path.resolve(__dirname, "src/components"),
       Hooks: path.resolve(__dirname, "src/hooks"),
-      Util: path.resolve(__dirname, "src/util")
+      Util: path.resolve(__dirname, "src/util"),
+      Constants: path.resolve(__dirname, "src/constants")
     }
   },
   entry: {
