@@ -57,16 +57,8 @@ const Header = ({ stopName, routeId, currentTimeString }): JSX.Element => {
     }
   });
 
-  const environmentName = document.getElementById("app").dataset
-    .environmentName;
-
   return (
     <div className="header">
-      <div className="header__environment">
-        {["screens-dev", "screens-dev-green"].includes(environmentName)
-          ? environmentName
-          : ""}
-      </div>
       <div className="header__time">{currentTime}</div>
       <div className="header__realtime-indicator">
         <img
