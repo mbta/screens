@@ -571,25 +571,21 @@ const LineMap = ({
     return <div className="line-map"></div>;
   }
 
-  // We set the SVG height to fill the entire screen due to an issue on Mercury double-stack signs.
-  const screenHeight = height === 1140 ? 1140 : 2740;
-  const contentHeight = height;
-  const contentWidth = 442;
-
+  const width = 442;
   return (
     <div className="line-map">
       <svg
-        width={contentWidth + "px"}
-        height={screenHeight + "px"}
-        viewBox={[0, 0, contentWidth, screenHeight].join(" ")}
+        width={width + "px"}
+        height={height + "px"}
+        viewBox={[0, 0, width, height].join(" ")}
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
         className="line-map__svg"
       >
         <LineMapContainer
           data={data}
-          height={contentHeight}
-          width={contentWidth}
+          height={height}
+          width={width}
           currentTimeString={currentTimeString}
           showVehicles={showVehicles}
         />
