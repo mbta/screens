@@ -23,7 +23,7 @@ const Section = ({
   currentTimeString,
 }): JSX.Element => {
   return (
-    <div className="section-list">
+    <div className="section">
       <SectionHeader name={name} arrow={arrow} />
       <div className="departure-container">
         {departures.map((departure) => {

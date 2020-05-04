@@ -6,7 +6,7 @@ import BaseDepartureDestination from "Components/eink/base_departure_destination
 
 import { classWithModifier } from "Util";
 
-const foo = (route, routeId) => {
+const routeToPill = (route, routeId) => {
   if (routeId === "Blue") {
     return { routeName: "BL", routePillColor: "blue" };
   }
@@ -41,7 +41,7 @@ const Departure = ({
   time,
   currentTimeString,
 }): JSX.Element => {
-  const { routeName, routePillColor } = foo(route, routeId);
+  const { routeName, routePillColor } = routeToPill(route, routeId);
 
   return (
     <div className="departure">

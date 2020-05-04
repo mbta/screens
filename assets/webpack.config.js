@@ -9,6 +9,7 @@ module.exports = (env, options) => ({
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx"],
     alias: {
+      // Please also update the "paths" list in tsconfig.json when you add aliases here!
       Components: path.resolve(__dirname, "src/components"),
       Hooks: path.resolve(__dirname, "src/hooks"),
       Util: path.resolve(__dirname, "src/util"),
