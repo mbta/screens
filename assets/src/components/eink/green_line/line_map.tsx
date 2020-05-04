@@ -546,10 +546,10 @@ const LineMapContainer = ({
           />
         )}
         {showVehicles && (
-        <LineMapVehicles
-          vehicles={data.vehicles}
-          currentTimeString={currentTimeString}
-        />
+          <LineMapVehicles
+            vehicles={data.vehicles}
+            currentTimeString={currentTimeString}
+          />
         )}
       </g>
     </LineMapContext.Provider>
