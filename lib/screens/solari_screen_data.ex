@@ -57,12 +57,15 @@ defmodule Screens.SolariScreenData do
          layout: layout_params
        }) do
     case query_data(query_params) do
-      {:ok, data} -> %{
-        name: section_name,
-        arrow: arrow,
-        departures: do_layout(data, layout_params)
-      }
-      :error -> %{force_reload: false, success: false}
+      {:ok, data} ->
+        %{
+          name: section_name,
+          arrow: arrow,
+          departures: do_layout(data, layout_params)
+        }
+
+      :error ->
+        %{force_reload: false, success: false}
     end
   end
 
