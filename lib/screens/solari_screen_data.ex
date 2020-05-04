@@ -33,7 +33,7 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp by_screen_id(screen_id, is_screen) do
+  defp by_screen_id(screen_id, _is_screen) do
     %{station_name: station_name, sections: sections} =
       :screens
       |> Application.get_env(:screen_data)
