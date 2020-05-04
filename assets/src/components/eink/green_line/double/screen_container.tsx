@@ -38,6 +38,7 @@ const TopScreenLayout = ({
         data={lineMapData}
         height={1312}
         currentTimeString={currentTimeString}
+        showVehicles={!isHeadwayMode}
       />
       <Departures
         departures={departures}

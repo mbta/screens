@@ -452,11 +452,13 @@ const LineMapContainer = ({
   height,
   width,
   currentTimeString,
+  showVehicles,
 }: {
   data: LineMapData;
   height: number;
   width: number;
   currentTimeString: string;
+  showVehicles: boolean;
 }): JSX.Element => {
   const constants = {
     radius: 14,
@@ -543,10 +545,12 @@ const LineMapContainer = ({
             schedule={data.schedule}
           />
         )}
-        <LineMapVehicles
-          vehicles={data.vehicles}
-          currentTimeString={currentTimeString}
-        />
+        {showVehicles && (
+          <LineMapVehicles
+            vehicles={data.vehicles}
+            currentTimeString={currentTimeString}
+          />
+        )}
       </g>
     </LineMapContext.Provider>
   );
@@ -556,10 +560,12 @@ const LineMap = ({
   data,
   height,
   currentTimeString,
+  showVehicles,
 }: {
   data: LineMapData;
   height: number;
   currentTimeString: string;
+  showVehicles: boolean;
 }): JSX.Element => {
   if (!data) {
     return <div className="line-map"></div>;
@@ -585,6 +591,7 @@ const LineMap = ({
           height={contentHeight}
           width={contentWidth}
           currentTimeString={currentTimeString}
+          showVehicles={showVehicles}
         />
       </svg>
     </div>
