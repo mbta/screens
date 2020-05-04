@@ -9,16 +9,19 @@ module.exports = (env, options) => ({
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx"],
     alias: {
+      // Please also update the "paths" list in tsconfig.json when you add aliases here!
       Components: path.resolve(__dirname, "src/components"),
       Hooks: path.resolve(__dirname, "src/hooks"),
-      Util: path.resolve(__dirname, "src/util")
+      Util: path.resolve(__dirname, "src/util"),
+      Constants: path.resolve(__dirname, "src/constants")
     }
   },
   entry: {
     polyfills: "./src/polyfills.js",
     bus_eink: "./src/apps/bus_eink.tsx",
     gl_eink_single: "./src/apps/gl_eink_single.tsx",
-    gl_eink_double: "./src/apps/gl_eink_double.tsx"
+    gl_eink_double: "./src/apps/gl_eink_double.tsx",
+    solari: "./src/apps/solari.tsx"
   },
   output: {
     filename: "[name].js",

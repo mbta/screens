@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import ConnectionError from "Components/eink/connection_error";
 import DigitalBridge from "Components/eink/digital_bridge";
@@ -9,6 +9,8 @@ import { NoServiceTop } from "Components/eink/no_service";
 import OvernightDepartures from "Components/eink/overnight_departures";
 
 import useApiResponse from "Hooks/use_api_response";
+
+import { EINK_REFRESH_MS } from "Constants";
 
 const TopScreenLayout = ({
   currentTimeString,
@@ -102,7 +104,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
 };
 
 const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse(id);
+  const apiResponse = useApiResponse(id, EINK_REFRESH_MS);
   return <ScreenLayout apiResponse={apiResponse} />;
 };
 

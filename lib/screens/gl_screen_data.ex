@@ -112,7 +112,7 @@ defmodule Screens.GLScreenData do
         %{
           force_reload: false,
           success: true,
-          current_time: format_current_time(DateTime.utc_now()),
+          current_time: Screens.Util.format_time(DateTime.utc_now()),
           stop_name: destination,
           stop_id: stop_id,
           route_id: route_id,
@@ -132,10 +132,6 @@ defmodule Screens.GLScreenData do
           success: false
         }
     end
-  end
-
-  defp format_current_time(t) do
-    t |> DateTime.truncate(:second) |> DateTime.to_iso8601()
   end
 
   defp format_departure_rows(departures) do

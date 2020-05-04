@@ -1,0 +1,18 @@
+@import url("https://rsms.me/inter/inter.css");
+
+@import "screen_page";
+
+@import "base/base_route_pill";
+
+@import "solari/screen_container";
+@import "solari/departure";
+@import "solari/departure_route";
+@import "solari/departure_destination";
+@import "solari/departure_time";
+@import "solari/section";
+@import "solari/header";
+@import "solari/arrow";
+
+body {
+  margin: 0px;
+}

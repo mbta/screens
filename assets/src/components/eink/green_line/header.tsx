@@ -1,8 +1,6 @@
-import moment from "moment";
-import "moment-timezone";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
-import { classWithModifier } from "Util";
+import { classWithModifier, formatTimeString } from "Util";
 
 const HeaderRouteIcon = ({ route }): JSX.Element => {
   let path;
@@ -50,9 +48,7 @@ const Header = ({ stopName, routeId, currentTimeString }): JSX.Element => {
 
   const ref = useRef(null);
   const [stopSize, setStopSize] = useState(1);
-  const currentTime = moment(currentTimeString)
-    .tz("America/New_York")
-    .format("h:mm");
+  const currentTime = formatTimeString(currentTimeString);
 
   useLayoutEffect(() => {
     const height = ref.current.clientHeight;
