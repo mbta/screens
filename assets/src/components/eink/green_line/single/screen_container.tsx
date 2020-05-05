@@ -33,7 +33,7 @@ const TopScreenLayout = ({
       />
       <LineMap
         data={lineMapData}
-        height={1140}
+        height={1134}
         currentTimeString={currentTimeString}
         showVehicles={!isHeadwayMode}
       />

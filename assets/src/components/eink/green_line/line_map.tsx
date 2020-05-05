@@ -411,10 +411,10 @@ const LineMapOriginStop = (): JSX.Element => {
   );
 };
 
-const LineMapStops = ({}): JSX.Element => {
+const LineMapStops = (): JSX.Element => {
   const {
     showOriginStop,
-    originStopIndex,
+    lastVisibleStopIndex,
     stopNames,
     radius,
     dy,
@@ -423,15 +423,9 @@ const LineMapStops = ({}): JSX.Element => {
   } = useContext(LineMapContext);
   return (
     <g>
-      {[...Array(originStopIndex + 1)].map((_, i) => {
-        if (stopMarginTop + radius + i * dy < height) {
-          return (
-            <LineMapStop i={i} stopName={stopNames[i]} key={"stop-" + i} />
-          );
-        } else {
-          return null;
-        }
-      })}
+      {[...Array(lastVisibleStopIndex + 1)].map((_, i) => (
+        <LineMapStop i={i} stopName={stopNames[i]} key={"stop-" + i} />
+      ))}
       <LineMapCurrentStop />
       {showOriginStop && <LineMapOriginStop />}
     </g>
@@ -480,7 +474,7 @@ const LineMapContainer = ({
 
   // The last stop which fits in the alloted vertical space
   const lastVisibleStopIndex = Math.floor(
-    (height - constants.stopMarginTop + constants.radius) / constants.dy
+    (height - constants.stopMarginTop - 2 * constants.radius) / constants.dy
   );
 
   // Compute the y-position of the current stop
@@ -531,6 +525,7 @@ const LineMapContainer = ({
     showOriginStop,
     stopNames,
     showScheduledDeparture,
+    lastVisibleStopIndex,
   };
 
   const params = { ...constants, ...props };
