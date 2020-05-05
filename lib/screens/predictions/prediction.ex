@@ -60,11 +60,15 @@ defmodule Screens.Predictions.Prediction do
     predictions
     |> Enum.group_by(& &1.id)
     |> Enum.map(fn
-      {_id, [prediction]} ->
-        prediction
+      {_id, [single_prediction]} ->
+        single_prediction
 
-      {_id, predictions} ->
-        predictions |> Enum.find(hd(predictions), &String.contains?(&1.route.short_name, "/"))
+      {_id, grouped_predictions} ->
+        Enum.find(
+          grouped_predictions,
+          hd(grouped_predictions),
+          &String.contains?(&1.route.short_name, "/")
+        )
     end)
     |> Enum.sort_by(& &1.departure_time)
   end
