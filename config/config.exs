@@ -28,7 +28,7 @@ config :screens, :redirect_http?, true
 
 config :screens,
   gds_dms_username: "mbtadata@gmail.com",
-  api_version: "4",
+  api_version: "5",
   screen_data: %{
     "1" => %{stop_id: "1722", app_id: "bus_eink"},
     "2" => %{stop_id: "383", app_id: "bus_eink"},
