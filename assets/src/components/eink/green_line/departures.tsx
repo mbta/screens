@@ -66,8 +66,8 @@ const DepartureList = ({
   destination,
   headway,
 }: DepartureListProps): JSX.Element[] => {
-  const renderedDepartures = departures.map(({ time }) => (
-    <Departure time={time} currentTimeString={currentTimeString} key={time} />
+  const renderedDepartures = departures.map(({ id, time }) => (
+    <Departure time={time} currentTimeString={currentTimeString} key={id} />
   ));
 
   if (renderedDepartures.length < 2) {
