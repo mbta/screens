@@ -77,7 +77,8 @@ defmodule Screens.BusScreenData do
           departures: format_departure_rows(departures),
           global_alert: format_global_alert(global_alert),
           nearby_connections: nearby_connections,
-          service_level: service_level
+          service_level: service_level,
+          psa_name: "covid-service-change"
         }
 
       :error ->

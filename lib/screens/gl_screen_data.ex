@@ -123,7 +123,8 @@ defmodule Screens.GLScreenData do
           line_map: line_map_data,
           headway: headway_data,
           service_level: service_level,
-          is_headway_mode: Screens.Override.State.headway_mode?(String.to_integer(screen_id))
+          is_headway_mode: Screens.Override.State.headway_mode?(String.to_integer(screen_id)),
+          psa_name: "covid-service-change"
         }
 
       :error ->

@@ -57,33 +57,27 @@ const BottomScreenLayout = ({
   globalAlert,
   stopId,
   nearbyDepartures,
-  serviceLevel,
+  psaName,
 }): JSX.Element => {
-  if (serviceLevel > 1) {
-    return (
-      <div className="single-screen-container">
-        <div className="flex-zone__container">
-          <TakeoverAlert mode="subway" />
-        </div>
-        <FareInfo />
-        <DigitalBridge stopId={stopId} />
+  const flexZoneContent = psaName ? (
+    <TakeoverAlert name={psaName} mode="subway" />
+  ) : (
+    <>
+      <div className="flex-zone__top-container">
+        <NearbyDepartures
+          data={nearbyDepartures}
+          currentTimeString={currentTimeString}
+        />
       </div>
-    );
-  }
+      <div className="flex-zone__bottom-container">
+        {globalAlert ? <GlobalAlert alert={globalAlert} /> : null}
+      </div>
+    </>
+  );
 
   return (
     <div className="single-screen-container">
-      <div className="flex-zone__container">
-        <div className="flex-zone__top-container">
-          <NearbyDepartures
-            data={nearbyDepartures}
-            currentTimeString={currentTimeString}
-          />
-        </div>
-        <div className="flex-zone__bottom-container">
-          {globalAlert ? <GlobalAlert alert={globalAlert} /> : null}
-        </div>
-      </div>
+      <div className="flex-zone__container">{flexZoneContent}</div>
       <FareInfo />
       <DigitalBridge stopId={stopId} />
     </div>
@@ -109,7 +103,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         globalAlert={apiResponse.global_alert}
         stopId={apiResponse.stop_id}
         nearbyDepartures={apiResponse.nearby_departures}
-        serviceLevel={apiResponse.service_level}
+        psaName={apiResponse.psa_name}
       />
     </div>
   );
