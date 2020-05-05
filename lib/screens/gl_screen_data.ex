@@ -76,7 +76,12 @@ defmodule Screens.GLScreenData do
     # even if the other API requests fail.
     {inline_alerts, global_alert} = Alert.by_route_id(route_id, stop_id)
 
-    predictions = Screens.Predictions.Prediction.fetch(%{stop_id: stop_id, route_id: route_id, direction_id: direction_id})
+    predictions =
+      Screens.Predictions.Prediction.fetch(%{
+        stop_id: stop_id,
+        route_id: route_id,
+        direction_id: direction_id
+      })
 
     {line_map_data, predictions} =
       case predictions do
