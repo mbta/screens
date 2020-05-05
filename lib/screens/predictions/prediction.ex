@@ -52,11 +52,24 @@ defmodule Screens.Predictions.Prediction do
   end
 
   @doc """
-  Predictions for combined bus routes, e.g. 24/27, are duplicated as 3 separate predictions:
-  one each for 24, 27, and 24/27; all with the same route ID.
-  This finds those cases and keeps only the combined prediction--24/27 in our example.
+  Chooses the "preferred prediction" from multiple predictions in cases of combined routes.
+
+  The parts of a prediction that this function is concerned with are:
+
+      prediction
+        |- id
+        |- route
+        |    |- id
+        |- trip
+             |- preferred route ID
+
+  For any set of predictions with the same ID, they will also share the same trip, but will have differing routes.
+  This function finds and chooses the prediction whose route ID equals its trip's preferred route ID.
+
+  For buses, that prediction will always be the "slashed" route, e.g. 24/27.
   """
-  def deduplicate_slashed_routes(predictions) do
+  @spec deduplicate_combined_routes([t()]) :: [t()]
+  def deduplicate_combined_routes(predictions) do
     predictions
     |> Enum.group_by(& &1.id)
     |> Enum.map(fn
@@ -67,7 +80,7 @@ defmodule Screens.Predictions.Prediction do
         Enum.find(
           grouped_predictions,
           hd(grouped_predictions),
-          &String.contains?(&1.route.short_name, "/")
+          &(&1.route.id == &1.trip.preferred_route_id)
         )
     end)
     |> Enum.sort_by(& &1.departure_time)

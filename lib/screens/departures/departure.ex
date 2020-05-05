@@ -46,7 +46,7 @@ defmodule Screens.Departures.Departure do
       predictions
       |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
       |> Enum.reject(&Prediction.departure_in_past/1)
-      |> Prediction.deduplicate_slashed_routes()
+      |> Prediction.deduplicate_combined_routes()
       |> Enum.map(&from_prediction/1)
 
     {:ok, departures}
