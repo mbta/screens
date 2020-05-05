@@ -107,6 +107,8 @@ defmodule Screens.GLScreenData do
 
     _ = LogScreenData.log_departures(screen_id, is_screen, departures)
 
+    psa_name = Screens.Psa.current_green_line_psa()
+
     case departures do
       {:ok, departures} ->
         %{
@@ -124,7 +126,7 @@ defmodule Screens.GLScreenData do
           headway: headway_data,
           service_level: service_level,
           is_headway_mode: Screens.Override.State.headway_mode?(String.to_integer(screen_id)),
-          psa_name: "covid-service-change"
+          psa_name: psa_name
         }
 
       :error ->

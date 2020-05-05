@@ -66,6 +66,8 @@ defmodule Screens.BusScreenData do
 
     _ = LogScreenData.log_departures(screen_id, is_screen, departures)
 
+    psa_name = Screens.Psa.current_bus_psa()
+
     case departures do
       {:ok, departures} ->
         %{
@@ -78,7 +80,7 @@ defmodule Screens.BusScreenData do
           global_alert: format_global_alert(global_alert),
           nearby_connections: nearby_connections,
           service_level: service_level,
-          psa_name: "covid-service-change"
+          psa_name: psa_name
         }
 
       :error ->
