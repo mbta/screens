@@ -4,7 +4,7 @@ defmodule Screens.Trips.Trip do
   defstruct id: "",
             direction_id: nil,
             headsign: nil,
-            preferred_route_id: nil
+            route_id: nil
 
   @type id :: String.t()
 
@@ -12,6 +12,6 @@ defmodule Screens.Trips.Trip do
           id: id,
           direction_id: 0 | 1 | nil,
           headsign: String.t() | nil,
-          preferred_route_id: String.t() | nil
+          route_id: String.t() | nil
         }
 end

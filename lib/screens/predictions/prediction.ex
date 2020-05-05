@@ -61,10 +61,10 @@ defmodule Screens.Predictions.Prediction do
         |- route
         |    |- id
         |- trip
-             |- preferred route ID
+             |- route id
 
   For any set of predictions with the same ID, they will also share the same trip, but will have differing routes.
-  This function finds and chooses the prediction whose route ID equals its trip's preferred route ID.
+  This function finds and chooses the prediction whose route ID equals its trip's route ID.
 
   For buses, that prediction will always be the "slashed" route, e.g. 24/27.
   """
@@ -79,8 +79,7 @@ defmodule Screens.Predictions.Prediction do
       {_id, grouped_predictions} ->
         Enum.find(
           grouped_predictions,
-          hd(grouped_predictions),
-          &(&1.route.id == &1.trip.preferred_route_id)
+          &(&1.route.id == &1.trip.route_id)
         )
     end)
     |> Enum.sort_by(& &1.departure_time)
