@@ -8,13 +8,7 @@ import TakeoverAlert from "Components/eink/takeover_alert";
 
 const FlexZoneContainer = forwardRef(
   (
-    {
-      currentTimeString,
-      departures,
-      globalAlert,
-      nearbyConnections,
-      serviceLevel,
-    },
+    { currentTimeString, departures, globalAlert, nearbyConnections, psaName },
     ref
   ): JSX.Element => {
     // Check whether there are any later departures to show
@@ -23,10 +17,10 @@ const FlexZoneContainer = forwardRef(
     let topComponent;
     let bottomComponent;
 
-    if (serviceLevel > 1) {
+    if (psaName) {
       return (
         <div className="flex-zone__container">
-          <TakeoverAlert mode="bus" />
+          <TakeoverAlert name={psaName} mode="bus" />
         </div>
       );
     } else if (showLaterDepartures && globalAlert) {

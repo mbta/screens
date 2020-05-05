@@ -38,7 +38,7 @@ const BottomScreenLayout = forwardRef(
       globalAlert,
       stopId,
       nearbyConnections,
-      serviceLevel,
+      psaName,
     },
     ref
   ): JSX.Element => {
@@ -49,7 +49,7 @@ const BottomScreenLayout = forwardRef(
           departures={departures}
           globalAlert={globalAlert}
           nearbyConnections={nearbyConnections}
-          serviceLevel={serviceLevel}
+          psaName={psaName}
           ref={ref}
         />
         <FareInfo />
@@ -88,7 +88,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         globalAlert={apiResponse.global_alert}
         stopId={apiResponse.stop_id}
         nearbyConnections={apiResponse.nearby_connections}
-        serviceLevel={apiResponse.service_level}
+        psaName={apiResponse.psa_name}
         ref={laterDeparturesRef}
       />
     </div>
@@ -126,7 +126,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
     return <NoConnectionScreenLayout />;
   }
 
-  if (apiResponse.serviceLevel === 5) {
+  if (apiResponse.service_level === 5) {
     return <NoServiceScreenLayout />;
   }
 

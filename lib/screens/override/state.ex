@@ -29,6 +29,14 @@ defmodule Screens.Override.State do
     GenServer.call(pid, {:headway_mode?, screen_id})
   end
 
+  def bus_psa_list(pid \\ __MODULE__) do
+    GenServer.call(pid, :bus_psa_list)
+  end
+
+  def green_line_psa_list(pid \\ __MODULE__) do
+    GenServer.call(pid, :green_line_psa_list)
+  end
+
   def schedule_refresh(pid, ms \\ @refresh_ms) do
     Process.send_after(pid, :refresh, ms)
     :ok
@@ -65,6 +73,14 @@ defmodule Screens.Override.State do
 
   def handle_call({:headway_mode?, screen_id}, _from, state) do
     {:reply, MapSet.member?(state.headway_mode_screen_ids, screen_id), state}
+  end
+
+  def handle_call(:bus_psa_list, _from, state) do
+    {:reply, state.bus_psa_list, state}
+  end
+
+  def handle_call(:green_line_psa_list, _from, state) do
+    {:reply, state.green_line_psa_list, state}
   end
 
   @impl true
