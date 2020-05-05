@@ -59,25 +59,25 @@ const BottomScreenLayout = ({
   nearbyDepartures,
   psaName,
 }): JSX.Element => {
-  const flexZoneContent = psaName ? (
-    <TakeoverAlert name={psaName} mode="subway" />
-  ) : (
-    <>
-      <div className="flex-zone__top-container">
-        <NearbyDepartures
-          data={nearbyDepartures}
-          currentTimeString={currentTimeString}
-        />
-      </div>
-      <div className="flex-zone__bottom-container">
-        {globalAlert ? <GlobalAlert alert={globalAlert} /> : null}
-      </div>
-    </>
-  );
-
   return (
     <div className="single-screen-container">
-      <div className="flex-zone__container">{flexZoneContent}</div>
+      <div className="flex-zone__container">
+        {psaName ? (
+          <TakeoverAlert name={psaName} mode="subway" />
+        ) : (
+          <>
+            <div className="flex-zone__top-container">
+              <NearbyDepartures
+                data={nearbyDepartures}
+                currentTimeString={currentTimeString}
+              />
+            </div>
+            <div className="flex-zone__bottom-container">
+              {globalAlert ? <GlobalAlert alert={globalAlert} /> : null}
+            </div>
+          </>
+        )}
+      </div>
       <FareInfo />
       <DigitalBridge stopId={stopId} />
     </div>
