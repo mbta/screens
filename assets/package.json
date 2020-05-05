@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
-    "moment": "^2.24.0",
+    "moment": "^2.25.3",
     "moment-timezone": "^0.5.28",
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",
