@@ -10,7 +10,7 @@ defmodule Screens.NearbyDepartures do
     prediction_result =
       nearby_departure_stop_ids
       |> Enum.join(",")
-      |> Screens.Predictions.Prediction.by_stop_id()
+      |> (&Screens.Predictions.Prediction.fetch(%{stop_id: &1})).()
 
     case prediction_result do
       {:ok, predictions} ->

@@ -44,7 +44,7 @@ defmodule Screens.BusScreenData do
 
     # If we are unable to fetch departures, we want to show an error message on the screen.
     departures =
-      case Departure.by_stop_id(stop_id) do
+      case Departure.fetch(%{stop_id: stop_id}) do
         {:ok, result} ->
           {:ok, Departure.associate_alerts_with_departures(result, inline_alerts)}
 

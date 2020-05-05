@@ -23,18 +23,6 @@ defmodule Screens.Departures.Departure do
           inline_badges: list(map())
         }
 
-  def by_stop_id(stop_id, route_id, direction_id) do
-    stop_id
-    |> Prediction.by_stop_id(route_id, direction_id)
-    |> from_predictions()
-  end
-
-  def by_stop_id(stop_id) do
-    stop_id
-    |> Prediction.by_stop_id()
-    |> from_predictions()
-  end
-
   def fetch(opts) do
     opts
     |> Prediction.fetch()
@@ -58,6 +46,7 @@ defmodule Screens.Departures.Departure do
       predictions
       |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
       |> Enum.reject(&Prediction.departure_in_past/1)
+      |> Prediction.deduplicate_slashed_routes()
       |> Enum.map(&from_prediction/1)
 
     {:ok, departures}
