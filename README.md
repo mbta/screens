@@ -14,6 +14,7 @@
 1. Install versions specified in `.tool-versions` with `asdf install`
 1. Install Elixir dependencies with `mix deps.get`
 1. Install Node.js dependencies with `npm install --prefix assets`
+1. Save the JSON found [here](https://mbta-dotcom.s3.amazonaws.com/screens/config/prod.json) as `priv/local.json` to supply your local server with override config values.
 1. Sign up for a [V3 API key](https://api-v3.mbta.com/)
 1. Start Phoenix endpoint with `API_V3_KEY=<your-key-here> mix phx.server`
 
