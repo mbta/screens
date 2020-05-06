@@ -1,3 +1,5 @@
+@import "fonts";
+
 .overnight-departures {
   margin: 0px auto;
   padding: 0px;
@@ -5,14 +7,13 @@
 }
 
 .overnight-departures__time {
+  @include font--text--55regular;
   position: absolute;
   top: 28px;
   right: 40px;
-  font-family: neue-haas-grotesk-text;
   font-size: 72px;
   color: #ffffff;
   letter-spacing: 0;
   text-align: right;
   line-height: 72px;
-  font-weight: 400;
 }

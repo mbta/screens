@@ -1,11 +1,13 @@
+@import "fonts";
+
 .takeover-inline-alert {
   margin-right: 40px;
 }
 
 .takeover-inline-alert__badge {
+  @include font--text--55regular;
   background-color: black;
   color: white;
-  font-family: neue-haas-grotesk-text;
   font-size: 32px;
   border-radius: 16px;
   padding-left: 16px;
@@ -33,5 +35,5 @@
 }
 
 .takeover-inline-alert__link {
-  font-weight: 700;
+  @include font--text--75bold;
 }

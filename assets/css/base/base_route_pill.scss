@@ -1,3 +1,5 @@
+@import "../fonts";
+
 .base-route-pill__pill {
   text-align: center;
 
@@ -13,8 +15,7 @@
 }
 
 .base-route-pill__route-text {
-  font-family: neue-haas-grotesk-text;
-  font-weight: 700;
+  @include font--text--75bold;
   letter-spacing: 0.0277em;
 
   &--with-slash {

@@ -1,6 +1,7 @@
+@import "fonts";
+
 .fares {
   height: 263px;
-  font-family: neue-haas-grotesk-text;
 }
 
 .fares__icon-container {
@@ -22,9 +23,9 @@
 }
 
 .fares__info-header {
+  @include font--text--75bold;
   font-size: 36px;
   line-height: 36px;
-  font-weight: 700;
   text-transform: uppercase;
   margin-top: 48px;
   margin-bottom: 19px;
@@ -32,6 +33,7 @@
 }
 
 .fares__info-link {
+  @include font--text--55regular;
   font-size: 32px;
   line-height: 36px;
   text-align: right;
@@ -47,14 +49,16 @@
 }
 
 .fares__info-row-cost {
+  @include font--text--75bold;
   font-size: 44px;
-  font-weight: bold;
 }
 
 .fares__info-row-description {
+  @include font--text--55regular;
   font-size: 44px;
 }
 
 .fares__info-row-details {
+  @include font--text--55regular;
   font-size: 32px;
 }
