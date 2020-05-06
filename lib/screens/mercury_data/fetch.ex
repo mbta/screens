@@ -34,7 +34,9 @@ defmodule Screens.MercuryData.Fetch do
       temperature: "Temperature",
       battery: "Battery",
       battery_voltage: "BatteryVoltage",
-      uptime: "Uptime"
+      uptime: "Uptime",
+      connect_reason: "ConnectReason",
+      connectivity_used: "ConnectivityUsed"
     }
     |> Enum.map(fn {name, status_key} -> {name, Map.get(status, status_key)} end)
     |> Enum.into(%{})
