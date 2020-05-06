@@ -85,8 +85,10 @@ defmodule Screens.Override.State do
 
   @impl true
   def handle_info(:refresh, _state) do
+    override_fetcher = Application.get_env(:screens, :override_fetcher)
+
     new_state =
-      case Screens.Override.Fetch.fetch_config_from_s3() do
+      case override_fetcher.fetch_config() do
         {:ok, config} -> config
         :error -> @default_config
       end
