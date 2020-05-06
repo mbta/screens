@@ -1,6 +1,4 @@
-.section-list {
-  font-family: neue-haas-grotesk-text;
-}
+@import "../fonts";
 
 .section-header {
   color: #171f26;
@@ -10,8 +8,8 @@
 }
 
 .section-header__name {
+  @include font--text--75bold;
   font-size: 53px;
-  font-weight: 700;
   line-height: 128px;
   margin-left: 27px;
   vertical-align: middle;
