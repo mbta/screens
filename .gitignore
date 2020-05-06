@@ -33,6 +33,9 @@ npm-debug.log
 # this depending on your deployment strategy.
 /priv/static/
 
+# Local config file
+/priv/local.json
+
 /assets/coverage
 
 # Ignore the directory created by the ElixirLS VSCode plugin
