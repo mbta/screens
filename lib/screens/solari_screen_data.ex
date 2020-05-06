@@ -53,10 +53,10 @@ defmodule Screens.SolariScreenData do
   defp fetch_section_data(%{
          name: section_name,
          arrow: arrow,
-         query: query_params,
+         query: %{params: query_params, opts: query_opts},
          layout: layout_params
        }) do
-    case query_data(query_params) do
+    case query_data(query_params, query_opts) do
       {:ok, data} ->
         %{
           name: section_name,
@@ -69,8 +69,8 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp query_data(query_params) do
-    Screens.Departures.Departure.fetch(query_params)
+  defp query_data(query_params, query_opts) do
+    Screens.Departures.Departure.fetch(query_params, query_opts)
   end
 
   defp do_layout(query_data, {:upcoming, %{num_rows: num_rows}}) do

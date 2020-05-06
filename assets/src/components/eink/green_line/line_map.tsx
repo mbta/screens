@@ -85,7 +85,7 @@ const ScheduledDepartureDescription = ({
 const ScheduledDeparture = ({ stopName, schedule }): JSX.Element => {
   const { lineBottomY, dy, radius, lineWidth } = useContext(LineMapContext);
 
-  const time = schedule.time;
+  const time = schedule.departure_time;
   const x = lineWidth / 2;
   const y = lineBottomY + dy - radius;
   const iconRadius = 30;

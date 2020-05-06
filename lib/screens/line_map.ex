@@ -47,7 +47,7 @@ defmodule Screens.LineMap do
   defp next_scheduled_departure(origin_stop_id, route_id, predictions) do
     time = DateTime.add(DateTime.utc_now(), -180)
 
-    case Screens.Schedules.Schedule.by_stop_id(origin_stop_id, route_id) do
+    case Screens.Schedules.Schedule.fetch(%{stop_id: origin_stop_id, route_id: route_id}) do
       {:ok, [_ | _] = schedules} ->
         schedules
         |> Enum.filter(&check_after(&1, time))
@@ -58,11 +58,11 @@ defmodule Screens.LineMap do
     end
   end
 
-  defp check_after(%{time: nil}, _time) do
+  defp check_after(%{departure_time: nil}, _time) do
     false
   end
 
-  defp check_after(%{time: t}, time) do
+  defp check_after(%{departure_time: t}, time) do
     DateTime.compare(t, time) == :gt
   end
 
@@ -85,7 +85,7 @@ defmodule Screens.LineMap do
     nil
   end
 
-  defp format_schedule(%{time: t}), do: %{time: t}
+  defp format_schedule(%{departure_time: t}), do: %{departure_time: t}
   defp format_schedule(nil), do: nil
 
   defp format_stops(route_stops, current_stop_index) do

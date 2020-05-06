@@ -168,19 +168,19 @@ config :screens,
         %{
           name: "Busway",
           arrow: :s,
-          query: %{stop_ids: ["334"]},
+          query: %{params: %{stop_ids: ["334"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 5}}
         },
         %{
           name: "Red Line",
           arrow: :w,
-          query: %{stop_ids: ["70094"]},
+          query: %{params: %{stop_ids: ["70094"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}}
         },
         %{
           name: "Mattapan Trolley",
           arrow: :e,
-          query: %{stop_ids: ["70261"]},
+          query: %{params: %{stop_ids: ["70261"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 1}}
         }
       ],
@@ -192,19 +192,19 @@ config :screens,
         %{
           name: "Red Line",
           arrow: nil,
-          query: %{stop_ids: ["70069", "70070"]},
+          query: %{params: %{stop_ids: ["70069", "70070"]}, opts: %{}},
           layout: :bidirectional
         },
         %{
           name: "Bus (Massachusetts Ave @ Pearl St)",
           arrow: :e,
-          query: %{stop_ids: ["72"]},
+          query: %{params: %{stop_ids: ["72"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 3}}
         },
         %{
           name: "Bus (Magazine St & Green St)",
           arrow: :w,
-          query: %{stop_ids: ["1060", "1123"]},
+          query: %{params: %{stop_ids: ["1060", "1123"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 3}}
         }
       ],
@@ -216,15 +216,34 @@ config :screens,
         %{
           name: "Platform A",
           arrow: nil,
-          query: %{stop_ids: ["place-dudly"], route_ids: ["15", "23", "28", "44", "45"]},
+          query: %{
+            params: %{stop_ids: ["place-dudly"], route_ids: ["15", "23", "28", "44", "45"]},
+            opts: %{}
+          },
           layout: {:upcoming, %{num_rows: 4}}
         },
         %{
           name: "Other Platforms",
           arrow: nil,
           query: %{
-            stop_ids: ["place-dudly"],
-            route_ids: ["1", "8", "14", "19", "41", "42", "47", "66", "170", "171", "749", "751"]
+            params: %{
+              stop_ids: ["place-dudly"],
+              route_ids: [
+                "1",
+                "8",
+                "14",
+                "19",
+                "41",
+                "42",
+                "47",
+                "66",
+                "170",
+                "171",
+                "749",
+                "751"
+              ]
+            },
+            opts: %{}
           },
           layout: {:upcoming, %{num_rows: 4}}
         }
@@ -237,29 +256,35 @@ config :screens,
         %{
           name: "Platform C",
           arrow: nil,
-          query: %{stop_ids: ["place-dudly"], route_ids: ["14", "41", "42", "66"]},
+          query: %{
+            params: %{stop_ids: ["place-dudly"], route_ids: ["14", "41", "42", "66"]},
+            opts: %{}
+          },
           layout: {:upcoming, %{num_rows: 4}}
         },
         %{
           name: "Other Platforms",
           arrow: nil,
           query: %{
-            stop_ids: ["place-dudly"],
-            route_ids: [
-              "1",
-              "8",
-              "15",
-              "19",
-              "23",
-              "28",
-              "44",
-              "45",
-              "47",
-              "170",
-              "171",
-              "749",
-              "751"
-            ]
+            params: %{
+              stop_ids: ["place-dudly"],
+              route_ids: [
+                "1",
+                "8",
+                "15",
+                "19",
+                "23",
+                "28",
+                "44",
+                "45",
+                "47",
+                "170",
+                "171",
+                "749",
+                "751"
+              ]
+            },
+            opts: %{}
           },
           layout: {:upcoming, %{num_rows: 4}}
         }
@@ -272,19 +297,19 @@ config :screens,
         %{
           name: "Upper Busway",
           arrow: :e,
-          query: %{stop_ids: ["10642"]},
+          query: %{params: %{stop_ids: ["10642"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 3}}
         },
         %{
           name: "Lower Busway",
           arrow: :n,
-          query: %{stop_ids: ["875"]},
+          query: %{params: %{stop_ids: ["875"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 3}}
         },
         %{
           name: "Commuter Rail",
           arrow: :w,
-          query: %{stop_ids: ["Forest Hills"]},
+          query: %{params: %{stop_ids: ["Forest Hills"]}, opts: %{include_schedules: true}},
           layout: :bidirectional
         }
       ],
@@ -296,19 +321,19 @@ config :screens,
         %{
           name: "Upper Busway",
           arrow: :e,
-          query: %{stop_ids: ["10642"]},
+          query: %{params: %{stop_ids: ["10642"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 4}}
         },
         %{
           name: "Orange Line",
           arrow: :n,
-          query: %{stop_ids: ["70001"]},
+          query: %{params: %{stop_ids: ["70001"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}}
         },
         %{
           name: "Commuter Rail",
           arrow: :w,
-          query: %{stop_ids: ["Forest Hills"]},
+          query: %{params: %{stop_ids: ["Forest Hills"]}, opts: %{include_schedules: true}},
           layout: :bidirectional
         }
       ],
@@ -320,13 +345,13 @@ config :screens,
         %{
           name: "Upper Busway",
           arrow: :e,
-          query: %{stop_ids: ["20761"]},
+          query: %{params: %{stop_ids: ["20761"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 4}}
         },
         %{
           name: "Lower Busway",
           arrow: :e,
-          query: %{stop_ids: ["2076"]},
+          query: %{params: %{stop_ids: ["2076"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 4}}
         }
       ],
@@ -338,7 +363,7 @@ config :screens,
         %{
           name: "Busway",
           arrow: :se,
-          query: %{stop_ids: ["8310"]},
+          query: %{params: %{stop_ids: ["8310"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 10}}
         }
       ],
@@ -350,13 +375,13 @@ config :screens,
         %{
           name: "Blue Line",
           arrow: :e,
-          query: %{stop_ids: ["70045", "70046"]},
+          query: %{params: %{stop_ids: ["70045", "70046"]}, opts: %{}},
           layout: :bidirectional
         },
         %{
           name: "Bus",
           arrow: :w,
-          query: %{stop_ids: ["5740", "57400"]},
+          query: %{params: %{stop_ids: ["5740", "57400"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 6}}
         }
       ],
@@ -368,19 +393,19 @@ config :screens,
         %{
           name: "Upper Busway",
           arrow: :e,
-          query: %{stop_ids: ["17861"]},
+          query: %{params: %{stop_ids: ["17861"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 3}}
         },
         %{
           name: "Lower Busway",
           arrow: :e,
-          query: %{stop_ids: ["17862", "17863"]},
+          query: %{params: %{stop_ids: ["17862", "17863"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 3}}
         },
         %{
           name: "Commuter Rail",
           arrow: :e,
-          query: %{stop_ids: ["Ruggles"]},
+          query: %{params: %{stop_ids: ["Ruggles"]}, opts: %{include_schedules: true}},
           layout: {:upcoming, %{num_rows: 2}}
         }
       ],
@@ -392,14 +417,20 @@ config :screens,
         %{
           name: "Upper Busway",
           arrow: :w,
-          query: %{stop_ids: ["29001", "29002", "29003", "29004", "29005", "29006"]},
+          query: %{
+            params: %{stop_ids: ["29001", "29002", "29003", "29004", "29005", "29006"]},
+            opts: %{}
+          },
           layout: {:upcoming, %{num_rows: 4}}
         },
         %{
           name: "Lower Busway",
           arrow: :sw,
           query: %{
-            stop_ids: ["29007", "29008", "29009", "29010", "29011", "29012", "29013", "29014"]
+            params: %{
+              stop_ids: ["29007", "29008", "29009", "29010", "29011", "29012", "29013", "29014"]
+            },
+            opts: %{}
           },
           layout: {:upcoming, %{num_rows: 4}}
         }
@@ -412,13 +443,13 @@ config :screens,
         %{
           name: "Blue Line",
           arrow: :sw,
-          query: %{stop_ids: ["70059"]},
+          query: %{params: %{stop_ids: ["70059"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}}
         },
         %{
           name: "Bus",
           arrow: :w,
-          query: %{stop_ids: ["15795"]},
+          query: %{params: %{stop_ids: ["15795"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 6}}
         }
       ],

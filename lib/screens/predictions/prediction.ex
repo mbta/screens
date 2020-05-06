@@ -17,9 +17,11 @@ defmodule Screens.Predictions.Prediction do
           departure_time: DateTime.t() | nil
         }
 
-  def fetch(opts) do
+  def fetch(query_params) do
     default_params = %{"sort" => "departure_time", "include" => "route,stop,trip"}
-    api_query_params = opts |> Enum.map(&format_query_param/1) |> Enum.into(default_params)
+
+    api_query_params =
+      query_params |> Enum.map(&format_query_param/1) |> Enum.into(default_params)
 
     case Screens.V3Api.get_json("predictions", api_query_params) do
       {:ok, result} -> {:ok, Screens.Predictions.Parser.parse_result(result)}
@@ -45,10 +47,6 @@ defmodule Screens.Predictions.Prediction do
 
   defp format_query_param({:direction_id, direction_id}) do
     {"filter[direction_id]", direction_id}
-  end
-
-  def departure_in_past(%{departure_time: departure_time}) do
-    DateTime.compare(departure_time, DateTime.utc_now()) == :lt
   end
 
   @doc """
