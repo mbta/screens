@@ -297,21 +297,11 @@ defmodule Screens.Alerts.Alert do
       stop_id
       |> fetch_alerts_for_stop_id()
       |> Screens.Alerts.Parser.parse_result()
-      |> split_inline_alerts()
+      |> Enum.split_with(&is_inline?/1)
 
     global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
 
     {inline_alerts, global_alert}
-  end
-
-  defp split_inline_alerts(alerts) do
-    Enum.reduce(alerts, {[], []}, fn alert, {inline_alerts, global_alerts} ->
-      if is_inline?(alert) do
-        {[alert | inline_alerts], global_alerts}
-      else
-        {inline_alerts, [alert | global_alerts]}
-      end
-    end)
   end
 
   defp is_inline?(%{effect: :delay}) do
@@ -366,7 +356,7 @@ defmodule Screens.Alerts.Alert do
       route_id
       |> fetch_alerts_for_route_id()
       |> Screens.Alerts.Parser.parse_result()
-      |> split_inline_alerts()
+      |> Enum.split_with(&is_inline?/1)
 
     global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
 

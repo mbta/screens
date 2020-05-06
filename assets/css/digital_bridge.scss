@@ -1,3 +1,5 @@
+@import "fonts";
+
 .digital-bridge {
   height: 172px;
   background: black;
@@ -19,7 +21,6 @@
 
 .digital-bridge__link-container {
   width: 792px;
-  font-family: neue-haas-grotesk-text;
   color: white;
   display: inline-block;
   vertical-align: top;
@@ -27,15 +28,15 @@
 }
 
 .digital-bridge__link-description {
+  @include font--text--55regular;
   font-size: 36px;
   line-height: 56px;
-  font-weight: 400;
 }
 
 .digital-bridge__link-url {
+  @include font--text--75bold;
   font-size: 44px;
   line-height: 56px;
-  font-weight: 700;
 }
 
 .digital-bridge__qr-container {

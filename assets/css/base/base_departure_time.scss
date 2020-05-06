@@ -1,32 +1,35 @@
+@import "../fonts";
+
 .base-departure-time {
-  font-family: neue-haas-grotesk-text;
   line-height: 1em;
 }
 
 .base-departure-time__now {
+  @include font--text--75bold;
   font-size: 1em;
-  font-weight: 700;
 }
 
 .base-departure-time__minutes {
+  @include font--text--75bold;
   font-size: 1em;
-  font-weight: 700;
   margin-right: 0.0694em;
   line-height: 1.185em;
 }
 
 .base-departure-time__minutes-label {
+  @include font--text--55regular;
   font-size: 0.729em;
   font-weight: 400;
   line-height: 1em;
 }
 
 .base-departure-time__timestamp {
-  font-weight: 700;
+  @include font--text--75bold;
   margin-right: 0.0694em;
   font-size: 1em;
 }
 
 .base-departure-time__ampm {
+  @include font--text--55regular;
   font-size: 0.729em;
 }

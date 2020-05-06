@@ -1,3 +1,5 @@
+@import "../../fonts";
+
 .departures {
   display: inline-block;
   width: 758px;
@@ -5,7 +7,7 @@
 }
 
 .departures__headway-message {
-  font-family: "neue-haas-grotesk-text";
+  @include font--text--55regular;
   font-size: 72px;
   text-align: right;
   color: #999999;
@@ -15,8 +17,7 @@
 }
 
 .departures__headway-message--large {
-  font-family: "neue-haas-grotesk-display";
-  font-weight: bold;
+  @include font--display--75bold;
   font-size: 96px;
   line-height: 96px;
   color: #000000;
@@ -24,7 +25,7 @@
 }
 
 .departures__headway-message__subheading {
-  font-family: "neue-haas-grotesk-text";
+  @include font--text--55regular;
   font-size: 56px;
   text-align: right;
   color: #999999;

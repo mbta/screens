@@ -1,12 +1,14 @@
+@import "fonts";
+
 .inline-alert {
   text-align: right;
   margin-right: 40px;
 }
 
 .inline-alert__badge {
+  @include font--text--55regular;
   background-color: black;
   color: white;
-  font-family: neue-haas-grotesk-text;
   font-size: 40px;
   border-radius: 16px;
   padding-left: 16px;
@@ -16,7 +18,7 @@
 }
 
 .inline-alert__emphasis {
-  font-weight: bold;
+  @include font--text--75bold;
 }
 
 .inline-alert__icon {

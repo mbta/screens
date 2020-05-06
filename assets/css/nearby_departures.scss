@@ -1,3 +1,5 @@
+@import "fonts";
+
 .nearby-departures {
 }
 
@@ -19,13 +21,12 @@
 }
 
 .nearby-departures__header-text {
+  @include font--text--75bold;
   display: inline-block;
   vertical-align: top;
   font-size: 72px;
   line-height: 72px;
   margin-top: 22px;
-  font-family: neue-haas-grotesk-text;
-  font-weight: 700;
 }
 
 .nearby-departures__hairline {
@@ -53,11 +54,10 @@
 }
 
 .nearby-departures-row__stop-name {
+  @include font--text--75bold;
   display: inline-block;
   font-size: 44px;
   line-height: 54px;
-  font-family: neue-haas-grotesk-text;
-  font-weight: 700;
 }
 
 .nearby-departures-route {

@@ -1,5 +1,7 @@
+@import "../fonts";
+
 .base-departure-destination__container {
-  font-family: neue-haas-grotesk-text;
+  @include font--text--55regular;
 }
 
 .base-departure-destination__primary {

@@ -1,0 +1,36 @@
+// https://fonts.adobe.com/fonts/neue-haas-grotesk#details-section
+
+@mixin font--display--65medium {
+  font-family: neue-haas-grotesk-display, sans-serif;
+  font-weight: 600;
+}
+
+@mixin font--display--75bold {
+  font-family: neue-haas-grotesk-display, sans-serif;
+  font-weight: 700;
+}
+
+@mixin font--text--55roman {
+  font-family: neue-haas-grotesk-text, sans-serif;
+  font-weight: 400;
+}
+@mixin font--text--55regular {
+  @include font--text--55roman;
+}
+
+@mixin font--text--65medium {
+  font-family: neue-haas-grotesk-text, sans-serif;
+  font-weight: 500;
+}
+
+@mixin font--text--75bold {
+  font-family: neue-haas-grotesk-text, sans-serif;
+  font-weight: 700;
+}
+
+// https://rsms.me/inter/
+
+@mixin font--paragraph--regular {
+  font-family: Inter;
+  font-weight: 400;
+}

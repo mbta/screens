@@ -1,3 +1,5 @@
+@import "fonts";
+
 .global-alert {
   background: black;
   color: white;
@@ -24,23 +26,22 @@
 }
 
 .global-alert__header-effect {
+  @include font--display--75bold;
   display: inline-block;
   width: 720px;
   vertical-align: top;
-  font-family: neue-haas-grotesk-display;
-  font-weight: 700;
   font-size: 80px;
   margin-top: 52px;
 }
 
 .global-alert__header-timestamp {
+  @include font--text--55regular;
   display: inline-block;
   width: 194px;
   vertical-align: top;
   text-align: right;
   margin-top: 86px;
   margin-right: 44px;
-  font-family: neue-haas-grotesk-text;
   font-size: 16px;
   text-transform: uppercase;
 }
@@ -50,8 +51,8 @@
 }
 
 .global-alert__body-description {
+  @include font--paragraph--regular;
   padding: 25px 40px 51px 208px;
   font-size: 40px;
   line-height: 56px;
-  font-family: Inter;
 }

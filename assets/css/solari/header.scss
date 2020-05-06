@@ -1,3 +1,5 @@
+@import "../fonts";
+
 .header {
   background-color: #171f26;
   color: white;
@@ -5,8 +7,8 @@
 }
 
 .header__time {
+  @include font--text--55regular;
   position: absolute;
-  font-family: neue-haas-grotesk-text;
   font-size: 60px;
   top: 31px;
   right: 35px;
@@ -15,17 +17,17 @@
 .header__content-container {
   padding-top: 127px;
   padding-left: 46px;
-  font-family: neue-haas-grotesk-display;
 }
 
 .header__title {
+  @include font--display--75bold;
   font-size: 111px;
-  font-weight: 700;
   letter-spacing: 2px;
   line-height: 120px;
 }
 
 .header__station-name {
+  @include font--display--65medium;
   text-transform: uppercase;
   font-size: 54px;
   letter-spacing: 3px;
@@ -34,13 +36,12 @@
 }
 
 .header__environment {
+  @include font--text--75bold;
   position: absolute;
   top: 12px;
   left: 40px;
-  font-family: neue-haas-grotesk-text;
   font-size: 48px;
   color: #ffffff;
   letter-spacing: 0;
   line-height: 48px;
-  font-weight: 700;
 }
