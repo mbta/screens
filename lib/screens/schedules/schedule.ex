@@ -2,23 +2,27 @@ defmodule Screens.Schedules.Schedule do
   @moduledoc false
 
   defstruct id: nil,
-            time: nil,
-            trip_id: nil
+            trip: nil,
+            stop: nil,
+            route: nil,
+            trip_id: nil,
+            arrival_time: nil,
+            departure_time: nil
 
   @type t :: %__MODULE__{
           id: String.t(),
-          time: DateTime.t(),
-          trip_id: Screens.Trips.Trip.id()
+          trip: Screens.Trips.Trip.t() | nil,
+          stop: Screens.Stops.Stop.t(),
+          route: Screens.Routes.Route.t(),
+          arrival_time: DateTime.t() | nil,
+          departure_time: DateTime.t() | nil
         }
 
-  def by_stop_id(stop_id, route_id) do
-    case Screens.V3Api.get_json("schedules", %{
-           "filter[stop]" => stop_id,
-           "filter[route]" => route_id,
-           "sort" => "departure_time"
-         }) do
-      {:ok, result} -> {:ok, Screens.Schedules.Parser.parse_result(result)}
-      _ -> :error
-    end
+  def fetch(query_params) do
+    Screens.Departures.Departure.do_query_and_parse(
+      query_params,
+      "schedules",
+      Screens.Schedules.Parser
+    )
   end
 end
