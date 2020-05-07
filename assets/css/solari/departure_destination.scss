@@ -1,8 +1,6 @@
 @import "../base/base_departure_destination";
-@import "../fonts";
 
 .departure-destination {
-  @include font--text--55regular;
   color: #171f26;
   display: inline-block;
   vertical-align: middle;

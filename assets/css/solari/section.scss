@@ -3,29 +3,30 @@
 .section-header {
   color: #171f26;
   background-color: #e1e1df;
-  height: 128px;
+  height: 123px;
   border-top: 5px solid rgba(23, 31, 38, 0.1);
 }
 
 .section-header__name {
   @include font--text--75bold;
-  font-size: 53px;
-  line-height: 128px;
-  margin-left: 27px;
+  font-size: 50px;
+  line-height: 123px;
+  margin-left: 48px;
   vertical-align: middle;
 }
 
 .section-header__arrow-container {
-  display: inline-block;
-  height: 128px;
+  // display: inline-block;
+  float: right;
+  margin-right: 50px;
+  height: 123px;
   width: 57px;
   font-size: 0;
-  margin-left: 42px;
   vertical-align: middle;
 }
 
 .section-header__arrow-image {
   width: 57px;
   height: 57px;
-  margin: 35.5px 0 35.5px;
+  margin: 33px 0 33px;
 }

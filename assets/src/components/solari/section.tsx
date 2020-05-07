@@ -6,12 +6,12 @@ import Arrow from "Components/solari/arrow";
 const SectionHeader = ({ name, arrow }): JSX.Element => {
   return (
     <div className="section-header">
+      <span className="section-header__name">{name}</span>
       <span className="section-header__arrow-container">
         {arrow !== null && (
           <Arrow direction={arrow} className="section-header__arrow-image" />
         )}
       </span>
-      <span className="section-header__name">{name}</span>
     </div>
   );
 };
