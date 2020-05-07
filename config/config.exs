@@ -28,7 +28,7 @@ config :screens, :redirect_http?, true
 
 config :screens,
   gds_dms_username: "mbtadata@gmail.com",
-  api_version: "6",
+  api_version: "7",
   override_fetcher: Screens.Override.Fetch,
   screen_data: %{
     "1" => %{stop_id: "1722", app_id: "bus_eink"},
