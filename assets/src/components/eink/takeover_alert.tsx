@@ -6,7 +6,9 @@ const TakeoverAlert = ({ name, mode }): JSX.Element => {
   } else {
     return (
       <div className="takeover-alert">
-        <img src={`/images/psa/${name}-${mode}.png`} />
+        <img
+          src={`https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${name}-${mode}.png`}
+        />
       </div>
     );
   }
