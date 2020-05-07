@@ -7,33 +7,12 @@ defmodule Screens.BusScreenData do
   alias Screens.LogScreenData
   alias Screens.NearbyConnections
 
-  def by_stop_id_with_override_and_version(stop_id, screen_id, client_version, is_screen) do
-    if Screens.Override.State.disabled?(String.to_integer(screen_id)) do
-      LogScreenData.log_api_response(screen_id, client_version, is_screen, %{
-        force_reload: false,
-        success: false
-      })
-    else
-      LogScreenData.log_api_response(
-        screen_id,
-        client_version,
-        is_screen,
-        by_stop_id_with_version(stop_id, client_version, screen_id, is_screen)
-      )
-    end
-  end
+  def by_screen_id(screen_id, is_screen) do
+    %{stop_id: stop_id} =
+      :screens
+      |> Application.get_env(:screen_data)
+      |> Map.get(screen_id)
 
-  defp by_stop_id_with_version(stop_id, client_version, screen_id, is_screen) do
-    api_version = Application.get_env(:screens, :api_version)
-
-    if api_version == client_version do
-      by_stop_id(stop_id, screen_id, is_screen)
-    else
-      %{force_reload: true}
-    end
-  end
-
-  defp by_stop_id(stop_id, screen_id, is_screen) do
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
     # - global_alert will be nil
