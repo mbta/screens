@@ -217,7 +217,11 @@ config :screens,
           name: "Platform A",
           arrow: nil,
           query: %{
-            params: %{stop_ids: ["place-dudly"], route_ids: ["15", "23", "28", "44", "45"]},
+            params: %{
+              stop_ids: ["place-dudly"],
+              route_ids: ["15", "23", "28", "44", "45"],
+              direction_id: 1
+            },
             opts: %{}
           },
           layout: {:upcoming, %{num_rows: 4}}
@@ -227,25 +231,34 @@ config :screens,
           arrow: nil,
           query: %{
             params: %{
-              stop_ids: ["place-dudly"],
-              route_ids: [
-                "1",
-                "8",
-                "14",
-                "19",
-                "41",
-                "42",
-                "47",
-                "66",
-                "170",
-                "171",
-                "749",
-                "751"
-              ]
+              stop_ids: ["place-dudly"]
             },
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 4}}
+          layout:
+            {:upcoming,
+             %{
+               num_rows: 4,
+               routes: [
+                 "1",
+                 "8",
+                 "14",
+                 "19",
+                 "41",
+                 "42",
+                 "47",
+                 "66",
+                 "170",
+                 "171",
+                 "749",
+                 "751",
+                 {"15", 0},
+                 {"23", 0},
+                 {"28", 0},
+                 {"44", 0},
+                 {"45", 0}
+               ]
+             }}
         }
       ],
       app_id: "solari"
@@ -257,36 +270,43 @@ config :screens,
           name: "Platform C",
           arrow: nil,
           query: %{
-            params: %{stop_ids: ["place-dudly"], route_ids: ["14", "41", "42", "66"]},
+            params: %{stop_ids: ["place-dudly"]},
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 4}}
+          layout:
+            {:upcoming, %{num_rows: 4, routes: [{"14", 1}, {"41", 0}, {"42", 0}, {"66", 0}]}}
         },
         %{
           name: "Other Platforms",
           arrow: nil,
           query: %{
             params: %{
-              stop_ids: ["place-dudly"],
-              route_ids: [
-                "1",
-                "8",
-                "15",
-                "19",
-                "23",
-                "28",
-                "44",
-                "45",
-                "47",
-                "170",
-                "171",
-                "749",
-                "751"
-              ]
+              stop_ids: ["place-dudly"]
             },
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 4}}
+          layout:
+            {:upcoming,
+             %{
+               num_rows: 4,
+               routes: [
+                 "1",
+                 "8",
+                 "15",
+                 "19",
+                 "23",
+                 "28",
+                 "44",
+                 "45",
+                 "47",
+                 "170",
+                 "171",
+                 "749",
+                 "751",
+                 {"14", 0},
+                 {"41", 1}
+               ]
+             }}
         }
       ],
       app_id: "solari"
