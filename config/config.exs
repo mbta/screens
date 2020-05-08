@@ -173,7 +173,7 @@ config :screens,
         },
         %{
           name: "Red Line",
-          arrow: :w,
+          arrow: :e,
           query: %{params: %{stop_ids: ["70094"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}}
         },
@@ -224,7 +224,7 @@ config :screens,
             },
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 4}}
+          layout: {:upcoming, %{num_rows: 6}}
         },
         %{
           name: "Other Platforms",
@@ -238,7 +238,7 @@ config :screens,
           layout:
             {:upcoming,
              %{
-               num_rows: 4,
+               num_rows: 2,
                routes: [
                  "1",
                  "8",
@@ -274,7 +274,7 @@ config :screens,
             opts: %{}
           },
           layout:
-            {:upcoming, %{num_rows: 4, routes: [{"14", 1}, {"41", 0}, {"42", 0}, {"66", 0}]}}
+            {:upcoming, %{num_rows: 6, routes: [{"14", 1}, {"41", 0}, {"42", 0}, {"66", 0}]}}
         },
         %{
           name: "Other Platforms",
@@ -288,7 +288,7 @@ config :screens,
           layout:
             {:upcoming,
              %{
-               num_rows: 4,
+               num_rows: 2,
                routes: [
                  "1",
                  "8",
@@ -342,13 +342,7 @@ config :screens,
           name: "Upper Busway",
           arrow: :e,
           query: %{params: %{stop_ids: ["10642"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 4}}
-        },
-        %{
-          name: "Orange Line",
-          arrow: :n,
-          query: %{params: %{stop_ids: ["70001"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 2}}
+          layout: {:upcoming, %{num_rows: 6}}
         },
         %{
           name: "Commuter Rail",
@@ -366,13 +360,13 @@ config :screens,
           name: "Upper Busway",
           arrow: :e,
           query: %{params: %{stop_ids: ["20761"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 4}}
+          layout: {:upcoming, %{num_rows: 6}}
         },
         %{
           name: "Lower Busway",
           arrow: :e,
           query: %{params: %{stop_ids: ["2076"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 4}}
+          layout: {:upcoming, %{num_rows: 2}}
         }
       ],
       app_id: "solari"
@@ -384,7 +378,13 @@ config :screens,
           name: "Busway",
           arrow: :se,
           query: %{params: %{stop_ids: ["8310"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 10}}
+          layout: {:upcoming, %{num_rows: 7}}
+        },
+        %{
+          name: "Congress St @ Haymarket Sta",
+          arrow: :n,
+          query: %{params: %{stop_id: "117"}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 3}}
         }
       ],
       app_id: "solari"
@@ -411,16 +411,10 @@ config :screens,
       station_name: "Ruggles",
       sections: [
         %{
-          name: "Upper Busway",
-          arrow: :e,
-          query: %{params: %{stop_ids: ["17861"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 3}}
-        },
-        %{
           name: "Lower Busway",
           arrow: :e,
           query: %{params: %{stop_ids: ["17862", "17863"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 3}}
+          layout: {:upcoming, %{num_rows: 7}}
         },
         %{
           name: "Commuter Rail",
@@ -462,7 +456,7 @@ config :screens,
       sections: [
         %{
           name: "Blue Line",
-          arrow: :sw,
+          arrow: :se,
           query: %{params: %{stop_ids: ["70059"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}}
         },
