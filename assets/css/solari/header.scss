@@ -9,29 +9,30 @@
 .header__time {
   @include font--text--55regular;
   position: absolute;
-  font-size: 60px;
-  top: 31px;
+  font-size: 50px;
+  line-height: 72px;
+  top: 23px;
   right: 35px;
 }
 
 .header__content-container {
-  padding-top: 127px;
+  padding-top: 125px;
   padding-left: 46px;
 }
 
-.header__title {
+.header__station-name {
   @include font--display--75bold;
   font-size: 111px;
   letter-spacing: 2px;
   line-height: 120px;
 }
 
-.header__station-name {
+.header__subtitle {
   @include font--display--65medium;
   text-transform: uppercase;
-  font-size: 54px;
+  font-size: 50px;
   letter-spacing: 3px;
-  margin-top: 20px;
+  margin-top: 16px;
   line-height: 60px;
 }
 
