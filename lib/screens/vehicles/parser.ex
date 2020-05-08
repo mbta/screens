@@ -7,7 +7,7 @@ defmodule Screens.Vehicles.Parser do
     |> Enum.reject(&is_nil(&1.stop_id))
   end
 
-  defp parse_vehicle(%{
+  def parse_vehicle(%{
          "attributes" => %{"direction_id" => direction_id, "current_status" => current_status},
          "id" => vehicle_id,
          "relationships" => %{"trip" => trip_data, "stop" => stop_data}
@@ -30,4 +30,5 @@ defmodule Screens.Vehicles.Parser do
   defp parse_current_status("STOPPED_AT"), do: :stopped_at
   defp parse_current_status("INCOMING_AT"), do: :incoming_at
   defp parse_current_status("IN_TRANSIT_TO"), do: :in_transit_to
+  defp parse_current_status(other), do: nil
 end

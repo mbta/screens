@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithModifier } from "Util";
+import { classWithModifier } from "Util/util";
 import BaseRoutePill from "Components/eink/base_route_pill";
 
 const DepartureRoute = ({ route, size }): JSX.Element => {

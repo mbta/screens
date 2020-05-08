@@ -2,7 +2,7 @@ import moment from "moment";
 import "moment-timezone";
 import React, { createContext, useContext } from "react";
 
-import { timeRepresentation } from "Components/eink/base_departure_time";
+import { einkTimeRepresentation } from "Util/time_representation";
 
 const COLOR_WHITE = "#FFFFFF";
 const COLOR_BLACK = "#000000";
@@ -207,8 +207,8 @@ const LineMapVehicleLabel = ({
   time,
   currentTimeString,
 }): JSX.Element => {
-  const timeRep = timeRepresentation(time, currentTimeString);
-  if (timeRep.type === "TIME_NOW") {
+  const timeRep = einkTimeRepresentation(time, currentTimeString);
+  if (timeRep.type === "TEXT") {
     return (
       <text
         x={x + 20 + 18} // lineWidth / 2 + textMargin
@@ -218,10 +218,10 @@ const LineMapVehicleLabel = ({
         fontWeight="700"
         textAnchor="right"
       >
-        Now
+        {timeRep.text}
       </text>
     );
-  } else if (timeRep.type === "TIME_MINUTES") {
+  } else if (timeRep.type === "MINUTES") {
     return (
       <text
         x={x + 20 + 18} // lineWidth / 2 + textMargin

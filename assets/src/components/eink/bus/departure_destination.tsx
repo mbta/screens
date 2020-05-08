@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithModifier } from "Util";
+import { classWithModifier } from "Util/util";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
 
 const DepartureDestination = ({ destination, size }): JSX.Element => {

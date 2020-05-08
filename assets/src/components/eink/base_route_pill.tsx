@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithModifier } from "Util";
+import { classWithModifier } from "Util/util";
 
 const BaseRoutePill = ({ route }): JSX.Element => {
   const modifier = route.includes("/") ? "with-slash" : "no-slash";
