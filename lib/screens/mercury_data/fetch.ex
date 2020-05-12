@@ -9,9 +9,9 @@ defmodule Screens.MercuryData.Fetch do
     with {:ok, response} <- HTTPoison.get(@api_url_base, headers),
          %{status_code: 200, body: body} <- response,
          {:ok, parsed} <- Jason.decode(body) do
-      Enum.map(parsed, &fetch_relevant_fields/1)
+      {:ok, Enum.map(parsed, &fetch_relevant_fields/1)}
     else
-      _ -> nil
+      _ -> :error
     end
   end
 

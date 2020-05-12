@@ -45,10 +45,14 @@ defmodule Screens.GdsData.Fetch do
     utc_time = DateTime.utc_now()
     {:ok, italy_time} = DateTime.shift_zone(utc_time, "Europe/Rome")
     italy_date = DateTime.to_date(italy_time)
-    {:ok, token} = get_token()
 
-    @screen_sn_list
-    |> Enum.map(&fetch_screen_data(token, &1, italy_date))
+    case get_token() do
+      {:ok, token} ->
+        {:ok, Enum.map(@screen_sn_list, &fetch_screen_data(token, &1, italy_date))}
+
+      :error ->
+        :error
+    end
   end
 
   def fetch_screen_data(token, screen_sn, date) do
