@@ -1,17 +1,16 @@
 defmodule Screens.MercuryData.Fetch do
   @moduledoc false
 
+  import Screens.VendorData.Fetch, only: [make_and_parse_request: 4]
+
   @api_url_base "https://cms.mercuryinnovation.com.au/ExtApi/devices"
 
   def fetch_data do
     headers = [{"apikey", Application.get_env(:screens, :mercury_api_key)}]
 
-    with {:ok, response} <- HTTPoison.get(@api_url_base, headers),
-         %{status_code: 200, body: body} <- response,
-         {:ok, parsed} <- Jason.decode(body) do
-      Enum.map(parsed, &fetch_relevant_fields/1)
-    else
-      _ -> nil
+    case make_and_parse_request(@api_url_base, headers, &Jason.decode/1, :mercury) do
+      {:ok, parsed} -> {:ok, Enum.map(parsed, &fetch_relevant_fields/1)}
+      :error -> :error
     end
   end
 
