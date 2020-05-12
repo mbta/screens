@@ -27,7 +27,14 @@ const Section = ({
       <SectionHeader name={name} arrow={arrow} />
       <div className="departure-container">
         {departures.map((departure) => {
-          const { id, route, destination, time, route_id: routeId, vehicle_status: vehicleStatus } = departure;
+          const {
+            id,
+            route,
+            destination,
+            time,
+            route_id: routeId,
+            vehicle_status: vehicleStatus,
+          } = departure;
           return (
             <Departure
               route={route}

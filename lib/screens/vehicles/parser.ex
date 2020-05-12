@@ -8,10 +8,10 @@ defmodule Screens.Vehicles.Parser do
   end
 
   def parse_vehicle(%{
-         "attributes" => %{"direction_id" => direction_id, "current_status" => current_status},
-         "id" => vehicle_id,
-         "relationships" => %{"trip" => trip_data, "stop" => stop_data}
-       }) do
+        "attributes" => %{"direction_id" => direction_id, "current_status" => current_status},
+        "id" => vehicle_id,
+        "relationships" => %{"trip" => trip_data, "stop" => stop_data}
+      }) do
     %Screens.Vehicles.Vehicle{
       id: vehicle_id,
       direction_id: direction_id,

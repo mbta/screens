@@ -1,12 +1,12 @@
 import React from "react";
 
-import {TimeRepresentation} from "Util/time_representation";
+import { TimeRepresentation } from "Util/time_representation";
 
 interface BaseDepartureTimeProps {
   time: TimeRepresentation;
 }
 
-const BaseDepartureTime = ({time}: BaseDepartureTimeProps): JSX.Element => {
+const BaseDepartureTime = ({ time }: BaseDepartureTimeProps): JSX.Element => {
   if (time.type === "TEXT") {
     return (
       <div className="base-departure-time">

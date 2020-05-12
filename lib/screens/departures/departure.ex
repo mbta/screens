@@ -73,14 +73,17 @@ defmodule Screens.Departures.Departure do
 
   def from_schedules(:error), do: :error
 
-  defp from_prediction_or_schedule(%{
-    id: id,
-    stop: %{name: stop_name},
-    route: %{id: route_id, short_name: route_short_name},
-    arrival_time: arrival_time,
-    departure_time: departure_time
-  } = data) do
+  defp from_prediction_or_schedule(
+         %{
+           id: id,
+           stop: %{name: stop_name},
+           route: %{id: route_id, short_name: route_short_name},
+           arrival_time: arrival_time,
+           departure_time: departure_time
+         } = data
+       ) do
     time = select_prediction_time(arrival_time, departure_time)
+
     base_data = %{
       id: id,
       stop_name: stop_name,
@@ -90,15 +93,20 @@ defmodule Screens.Departures.Departure do
       inline_badges: []
     }
 
-    trip_data = case Map.get(data, :trip) do
-      %{headsign: destination, direction_id: direction_id} -> %{destination: destination, direction_id: direction_id}
-      nil -> %{}
-    end
+    trip_data =
+      case Map.get(data, :trip) do
+        %{headsign: destination, direction_id: direction_id} ->
+          %{destination: destination, direction_id: direction_id}
 
-    vehicle_data = case Map.get(data, :vehicle) do
-      %{current_status: vehicle_status} -> %{vehicle_status: vehicle_status}
-      nil -> %{}
-    end
+        nil ->
+          %{}
+      end
+
+    vehicle_data =
+      case Map.get(data, :vehicle) do
+        %{current_status: vehicle_status} -> %{vehicle_status: vehicle_status}
+        nil -> %{}
+      end
 
     departure = Enum.reduce([base_data, trip_data, vehicle_data], &Map.merge/2)
 

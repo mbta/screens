@@ -57,10 +57,12 @@ defmodule Screens.Predictions.Parser do
     trip = Map.get(included_data, {"trip", trip_id})
     stop = Map.get(included_data, {"stop", stop_id})
     route = Map.get(included_data, {"route", route_id})
-    vehicle = case get_in(relationships, ["vehicle", "data", "id"]) do
-      nil -> nil
-      vehicle_id -> Map.get(included_data, {"vehicle", vehicle_id})
-    end
+
+    vehicle =
+      case get_in(relationships, ["vehicle", "data", "id"]) do
+        nil -> nil
+        vehicle_id -> Map.get(included_data, {"vehicle", vehicle_id})
+      end
 
     %Screens.Predictions.Prediction{
       id: id,
@@ -72,8 +74,6 @@ defmodule Screens.Predictions.Parser do
       departure_time: departure_time
     }
   end
-
-
 
   defp parse_time(nil), do: nil
 

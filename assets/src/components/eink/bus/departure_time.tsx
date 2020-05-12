@@ -1,4 +1,4 @@
-import {einkTimeRepresentation} from "Util/time_representation";
+import { einkTimeRepresentation } from "Util/time_representation";
 
 import React from "react";
 
