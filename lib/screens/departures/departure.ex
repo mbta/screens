@@ -100,7 +100,7 @@ defmodule Screens.Departures.Departure do
       nil -> %{}
     end
 
-    departure = [base_data, trip_data, vehicle_data] |> Enum.reduce(&Map.merge/2)
+    departure = Enum.reduce([base_data, trip_data, vehicle_data], &Map.merge/2)
 
     struct(__MODULE__, departure)
   end
@@ -132,8 +132,8 @@ defmodule Screens.Departures.Departure do
     merge_predictions_and_schedules(predictions, schedules)
   end
 
-  def do_query_and_parse(query_params, api_endpoint, parser, include \\ ~w[route stop trip]) do
-    default_params = %{"sort" => "departure_time", "include" => Enum.join(include, ",")}
+  def do_query_and_parse(query_params, api_endpoint, parser) do
+    default_params = %{"sort" => "departure_time", "include" => "route,stop,trip"}
 
     api_query_params =
       query_params |> Enum.map(&format_query_param/1) |> Enum.into(default_params)
@@ -162,6 +162,10 @@ defmodule Screens.Departures.Departure do
 
   defp format_query_param({:direction_id, direction_id}) do
     {"filter[direction_id]", direction_id}
+  end
+
+  defp format_query_param({:include, relationships}) do
+    {"include", Enum.join(relationships, ",")}
   end
 
   @doc """

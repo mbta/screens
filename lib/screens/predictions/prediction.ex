@@ -21,10 +21,9 @@ defmodule Screens.Predictions.Prediction do
 
   def fetch(query_params) do
     Screens.Departures.Departure.do_query_and_parse(
-      query_params,
+      Map.put(query_params, :include, ~w[route stop trip vehicle]),
       "predictions",
-      Screens.Predictions.Parser,
-      ~w[route stop trip vehicle]
+      Screens.Predictions.Parser
     )
   end
 end
