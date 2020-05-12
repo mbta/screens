@@ -10,6 +10,7 @@ defmodule Screens.Departures.Departure do
             route_id: nil,
             destination: nil,
             direction_id: nil,
+            vehicle_status: nil,
             time: nil,
             inline_badges: nil
 
@@ -20,6 +21,7 @@ defmodule Screens.Departures.Departure do
           route_id: String.t(),
           destination: String.t(),
           direction_id: 0 | 1 | nil,
+          vehicle_status: String.t(),
           time: DateTime.t(),
           inline_badges: list(map())
         }
@@ -71,47 +73,44 @@ defmodule Screens.Departures.Departure do
 
   def from_schedules(:error), do: :error
 
-  def from_prediction_or_schedule(%{
-        id: id,
-        stop: %{name: stop_name},
-        route: %{id: route_id, short_name: route_short_name},
-        trip: %{headsign: destination, direction_id: direction_id},
-        arrival_time: arrival_time,
-        departure_time: departure_time
-      }) do
+  defp from_prediction_or_schedule(
+         %{
+           id: id,
+           stop: %{name: stop_name},
+           route: %{id: route_id, short_name: route_short_name},
+           arrival_time: arrival_time,
+           departure_time: departure_time
+         } = data
+       ) do
     time = select_prediction_time(arrival_time, departure_time)
 
-    %Screens.Departures.Departure{
+    base_data = %{
       id: id,
       stop_name: stop_name,
       route_short_name: route_short_name,
       route_id: route_id,
-      destination: destination,
-      direction_id: direction_id,
       time: DateTime.to_iso8601(time),
       inline_badges: []
     }
-  end
 
-  def from_prediction_or_schedule(%{
-        id: id,
-        stop: %{name: stop_name},
-        route: %{id: route_id, short_name: route_short_name},
-        trip: nil,
-        arrival_time: arrival_time,
-        departure_time: departure_time
-      }) do
-    time = select_prediction_time(arrival_time, departure_time)
+    trip_data =
+      case Map.get(data, :trip) do
+        %{headsign: destination, direction_id: direction_id} ->
+          %{destination: destination, direction_id: direction_id}
 
-    %Screens.Departures.Departure{
-      id: id,
-      stop_name: stop_name,
-      route_short_name: route_short_name,
-      route_id: route_id,
-      destination: nil,
-      time: DateTime.to_iso8601(time),
-      inline_badges: []
-    }
+        nil ->
+          %{}
+      end
+
+    vehicle_data =
+      case Map.get(data, :vehicle) do
+        %{current_status: vehicle_status} -> %{vehicle_status: vehicle_status}
+        nil -> %{}
+      end
+
+    departure = Enum.reduce([base_data, trip_data, vehicle_data], &Map.merge/2)
+
+    struct(__MODULE__, departure)
   end
 
   def from_predictions({:ok, predictions}) do
@@ -173,6 +172,10 @@ defmodule Screens.Departures.Departure do
     {"filter[direction_id]", direction_id}
   end
 
+  defp format_query_param({:include, relationships}) do
+    {"include", Enum.join(relationships, ",")}
+  end
+
   @doc """
   Chooses the "preferred prediction" from multiple predictions in cases of combined routes.
 
@@ -214,6 +217,7 @@ defmodule Screens.Departures.Departure do
       route_id: d.route_id,
       destination: d.destination,
       direction_id: d.direction_id,
+      vehicle_status: d.vehicle_status,
       time: d.time,
       inline_badges: d.inline_badges
     }

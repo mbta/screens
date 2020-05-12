@@ -34,6 +34,10 @@ defmodule Screens.Predictions.Parser do
     Screens.Trips.Parser.parse_trip(item)
   end
 
+  defp parse_included(%{"type" => "vehicle"} = item) do
+    Screens.Vehicles.Parser.parse_vehicle(item)
+  end
+
   def parse_prediction(
         %{"id" => id, "attributes" => attributes, "relationships" => relationships},
         included_data
@@ -54,11 +58,18 @@ defmodule Screens.Predictions.Parser do
     stop = Map.get(included_data, {"stop", stop_id})
     route = Map.get(included_data, {"route", route_id})
 
+    vehicle =
+      case get_in(relationships, ["vehicle", "data", "id"]) do
+        nil -> nil
+        vehicle_id -> Map.get(included_data, {"vehicle", vehicle_id})
+      end
+
     %Screens.Predictions.Prediction{
       id: id,
       trip: trip,
       stop: stop,
       route: route,
+      vehicle: vehicle,
       arrival_time: arrival_time,
       departure_time: departure_time
     }

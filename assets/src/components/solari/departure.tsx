@@ -1,10 +1,12 @@
 import React from "react";
 
+import { standardTimeRepresentation } from "Util/time_representation";
+
 import BaseRoutePill from "Components/eink/base_route_pill";
 import BaseDepartureTime from "Components/eink/base_departure_time";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
 
-import { classWithModifier } from "Util";
+import { classWithModifier } from "Util/util";
 
 const routeToPill = (route, routeId) => {
   if (routeId === "Blue") {
@@ -40,6 +42,7 @@ const Departure = ({
   destination,
   time,
   currentTimeString,
+  vehicleStatus,
 }): JSX.Element => {
   const { routeName, routePillColor } = routeToPill(route, routeId);
 
@@ -53,8 +56,11 @@ const Departure = ({
       </div>
       <div className="departure-time">
         <BaseDepartureTime
-          departureTimeString={time}
-          currentTimeString={currentTimeString}
+          time={standardTimeRepresentation(
+            time,
+            currentTimeString,
+            vehicleStatus
+          )}
         />
       </div>
     </div>

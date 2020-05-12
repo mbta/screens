@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 
-import { classWithModifier, formatTimeString } from "Util";
+import { classWithModifier, formatTimeString } from "Util/util";
 
 const Header = ({ stopName, currentTimeString }): JSX.Element => {
   const SIZES = ["small", "large"];

@@ -1,50 +1,26 @@
-import moment from "moment";
-import "moment-timezone";
 import React from "react";
 
-moment.tz.setDefault("America/New_York");
+import { TimeRepresentation } from "Util/time_representation";
 
-const timeRepresentation = (departureTimeString, currentTimeString) => {
-  const departureTime = moment(departureTimeString);
-  const currentTime = moment(currentTimeString);
-  const secondDifference = departureTime.diff(currentTime, "seconds");
-  const minuteDifference = Math.round(secondDifference / 60);
+interface BaseDepartureTimeProps {
+  time: TimeRepresentation;
+}
 
-  if (secondDifference < 60) {
-    return { type: "TIME_NOW" };
-  } else if (minuteDifference < 60) {
-    return { type: "TIME_MINUTES", minutes: minuteDifference };
-  } else {
-    const timestamp = departureTime.format("h:mm");
-    const ampm = departureTime.format("A");
-    return {
-      type: "TIME_TIMESTAMP",
-      timestamp,
-      ampm,
-    };
-  }
-};
-
-const BaseDepartureTime = ({
-  departureTimeString,
-  currentTimeString,
-}): JSX.Element => {
-  const time = timeRepresentation(departureTimeString, currentTimeString);
-
-  if (time.type === "TIME_NOW") {
+const BaseDepartureTime = ({ time }: BaseDepartureTimeProps): JSX.Element => {
+  if (time.type === "TEXT") {
     return (
       <div className="base-departure-time">
-        <span className="base-departure-time__now">Now</span>
+        <span className="base-departure-time__text">{time.text}</span>
       </div>
     );
-  } else if (time.type === "TIME_MINUTES") {
+  } else if (time.type === "MINUTES") {
     return (
       <div className="base-departure-time">
         <span className="base-departure-time__minutes">{time.minutes}</span>
         <span className="base-departure-time__minutes-label">m</span>
       </div>
     );
-  } else if (time.type === "TIME_TIMESTAMP") {
+  } else if (time.type === "TIMESTAMP") {
     return (
       <div className="base-departure-time">
         <span className="base-departure-time__timestamp">{time.timestamp}</span>
@@ -57,4 +33,3 @@ const BaseDepartureTime = ({
 };
 
 export default BaseDepartureTime;
-export { timeRepresentation };

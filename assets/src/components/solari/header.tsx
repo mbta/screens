@@ -1,6 +1,6 @@
 import React from "react";
 
-import { formatTimeString } from "Util";
+import { formatTimeString } from "Util/util";
 
 const Header = ({ stationName, currentTimeString }): JSX.Element => {
   const environmentName = document.getElementById("app").dataset

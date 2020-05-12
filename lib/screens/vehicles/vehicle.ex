@@ -7,7 +7,7 @@ defmodule Screens.Vehicles.Vehicle do
             trip_id: nil,
             stop_id: nil
 
-  @type current_status :: :incoming_at | :stopped_at | :in_transit_to
+  @type current_status :: :incoming_at | :stopped_at | :in_transit_to | nil
 
   @type t :: %__MODULE__{
           id: String.t(),
