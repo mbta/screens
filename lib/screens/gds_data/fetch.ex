@@ -5,9 +5,13 @@ defmodule Screens.GdsData.Fetch do
   use Timex
   require Logger
 
+  import Screens.VendorData.Fetch, only: [make_and_parse_request: 3]
+
   @token_url_base "http://91.241.86.224/DMSService.asmx/GetToken"
   @device_list_url_base "http://91.241.86.224/DMSService.asmx/GetDevicesList"
   @ping_url_base "http://91.241.86.224/DMSService.asmx/GetDevicesPing"
+
+  @vendor_name :gds
 
   @screen_sn_list [
     "100301",
@@ -69,7 +73,7 @@ defmodule Screens.GdsData.Fetch do
 
     @token_url_base
     |> build_url(params)
-    |> make_and_parse_request(&parse_token/1)
+    |> make_and_parse_request(&parse_token/1, @vendor_name)
   end
 
   defp parse_token(xml) do
@@ -89,8 +93,9 @@ defmodule Screens.GdsData.Fetch do
       "Day" => date.day
     }
 
-    url = build_url(@device_list_url_base, params)
-    make_and_parse_request(url, &parse_devices_data/1)
+    @device_list_url_base
+    |> build_url(params)
+    |> make_and_parse_request(&parse_devices_data/1, @vendor_name)
   end
 
   defp parse_devices_data(xml) do
@@ -172,7 +177,7 @@ defmodule Screens.GdsData.Fetch do
     ping_data =
       @ping_url_base
       |> build_url(params)
-      |> make_and_parse_request(&parse_ping/1)
+      |> make_and_parse_request(&parse_ping/1, @vendor_name)
 
     case ping_data do
       {:ok, ping_count} -> {screen_sn, ping_count}
@@ -206,7 +211,8 @@ defmodule Screens.GdsData.Fetch do
     {:ok, merged_data}
   end
 
-  defp merge_device_and_ping_data(_, _) do
+  defp merge_device_and_ping_data(:error, {:ok, _pings_data}) do
+    _ = Logger.info("gds_fetch_error fetch_devices_data")
     :error
   end
 
@@ -216,15 +222,5 @@ defmodule Screens.GdsData.Fetch do
 
   defp build_url(base_url, params) do
     "#{base_url}?#{URI.encode_query(params)}"
-  end
-
-  defp make_and_parse_request(url, parse_fn) do
-    with {:ok, response} <- HTTPoison.get(url),
-         %{status_code: 200, body: body} <- response,
-         {:ok, parsed} <- parse_fn.(body) do
-      {:ok, parsed}
-    else
-      _ -> :error
-    end
   end
 end
