@@ -30,5 +30,5 @@ defmodule Screens.Vehicles.Parser do
   defp parse_current_status("STOPPED_AT"), do: :stopped_at
   defp parse_current_status("INCOMING_AT"), do: :incoming_at
   defp parse_current_status("IN_TRANSIT_TO"), do: :in_transit_to
-  defp parse_current_status(other), do: nil
+  defp parse_current_status(_), do: nil
 end
