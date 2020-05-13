@@ -1,6 +1,5 @@
 defmodule Screens.BusScreenData do
   @moduledoc false
-  require Logger
 
   alias Screens.Alerts.Alert
   alias Screens.Departures.Departure

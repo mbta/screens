@@ -5,10 +5,7 @@ defmodule ScreensWeb.ScreenApiController do
   def show(conn, %{"id" => screen_id, "version" => version}) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
 
-    _ =
-      if is_screen do
-        Logger.info("[screen data request] screen_id=#{screen_id} version=#{version}")
-      end
+    _ = Screens.LogScreenData.log_data_request(screen_id, version, is_screen)
 
     data =
       Screens.ScreenData.by_screen_id_with_override_and_version(screen_id, version, is_screen)

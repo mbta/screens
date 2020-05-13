@@ -47,10 +47,7 @@ defmodule ScreensWeb.ScreenController do
 
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
 
-    _ =
-      if is_screen do
-        Logger.info("[screen page load] screen_id=#{screen_id}")
-      end
+    _ = Screens.LogScreenData.log_page_load(screen_id, is_screen)
 
     case screen_data do
       nil ->
