@@ -10,12 +10,18 @@ defmodule Screens.SolariScreenData do
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
 
+    current_time =
+      case schedule do
+        nil -> DateTime.utc_now()
+        {_, time} -> time
+      end
+
     case fetch_sections_data(sections, schedule) do
       {:ok, data} ->
         %{
           force_reload: false,
           success: true,
-          current_time: Screens.Util.format_time(DateTime.utc_now()),
+          current_time: Screens.Util.format_time(current_time),
           station_name: station_name,
           sections: data
         }
