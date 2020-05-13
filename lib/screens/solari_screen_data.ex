@@ -4,13 +4,13 @@ defmodule Screens.SolariScreenData do
   require Logger
   alias Screens.Departures.Departure
 
-  def by_screen_id(screen_id, _is_screen) do
+  def by_screen_id(screen_id, _is_screen, schedule \\ nil) do
     %{station_name: station_name, sections: sections} =
       :screens
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
 
-    case fetch_sections_data(sections) do
+    case fetch_sections_data(sections, schedule) do
       {:ok, data} ->
         %{
           force_reload: false,
@@ -25,8 +25,8 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp fetch_sections_data(sections) do
-    sections_data = Enum.map(sections, &fetch_section_data/1)
+  defp fetch_sections_data(sections, schedule) do
+    sections_data = Enum.map(sections, &fetch_section_data(&1, schedule))
 
     if Enum.any?(sections_data, fn data -> data == :error end) do
       :error
@@ -35,13 +35,16 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp fetch_section_data(%{
-         name: section_name,
-         arrow: arrow,
-         query: %{params: query_params, opts: query_opts},
-         layout: layout_params
-       }) do
-    case query_data(query_params, query_opts) do
+  defp fetch_section_data(
+         %{
+           name: section_name,
+           arrow: arrow,
+           query: %{params: query_params, opts: query_opts},
+           layout: layout_params
+         },
+         schedule
+       ) do
+    case query_data(query_params, query_opts, schedule) do
       {:ok, data} ->
         {:ok,
          %{
@@ -56,8 +59,12 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp query_data(query_params, query_opts) do
-    Departure.fetch(query_params, query_opts)
+  def query_data(query_params, query_opts, schedule) do
+    if is_nil(schedule) do
+      Departure.fetch(query_params, query_opts)
+    else
+      Departure.fetch_schedules_by_date_and_time(query_params, schedule)
+    end
   end
 
   defp do_layout(query_data, {:upcoming, %{num_rows: num_rows} = layout_opts}) do

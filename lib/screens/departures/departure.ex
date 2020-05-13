@@ -33,6 +33,68 @@ defmodule Screens.Departures.Departure do
     end
   end
 
+  def fetch_schedules_by_date_and_time(query_params, {service_date, dt}) do
+    # Split the service day at 3am by shifting to Pacific Time.
+    # Midnight at Pacific Time is always 3am here.
+    utc_time = DateTime.utc_now()
+    {:ok, pacific_time} = DateTime.shift_zone(utc_time, "America/Los_Angeles")
+    current_service_date = DateTime.to_date(pacific_time)
+
+    second_difference = 60 * 60 * 24 * Date.diff(current_service_date, service_date)
+
+    schedules =
+      query_params
+      |> Map.put(:date, Date.to_string(service_date))
+      |> Schedule.fetch()
+
+    case schedules do
+      {:ok, data} ->
+        departures =
+          data
+          |> Enum.map(&shift_seconds(&1, second_difference))
+          |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
+          |> Enum.filter(fn %{departure_time: departure_time} ->
+            DateTime.compare(departure_time, dt) != :lt
+          end)
+          |> deduplicate_combined_routes()
+          |> Enum.map(&from_prediction_or_schedule/1)
+
+        {:ok, departures}
+
+      :error ->
+        :error
+    end
+  end
+
+  defp shift_seconds(%{arrival_time: nil, departure_time: nil} = schedule, _seconds_to_add) do
+    schedule
+  end
+
+  defp shift_seconds(
+         %{arrival_time: arrival_time, departure_time: nil} = schedule,
+         seconds_to_add
+       ) do
+    new_arrival_time = DateTime.add(arrival_time, seconds_to_add)
+    %{schedule | arrival_time: new_arrival_time}
+  end
+
+  defp shift_seconds(
+         %{arrival_time: nil, departure_time: departure_time} = schedule,
+         seconds_to_add
+       ) do
+    new_departure_time = DateTime.add(departure_time, seconds_to_add)
+    %{schedule | departure_time: new_departure_time}
+  end
+
+  defp shift_seconds(
+         %{arrival_time: arrival_time, departure_time: departure_time} = schedule,
+         seconds_to_add
+       ) do
+    new_arrival_time = DateTime.add(arrival_time, seconds_to_add)
+    new_departure_time = DateTime.add(departure_time, seconds_to_add)
+    %{schedule | arrival_time: new_arrival_time, departure_time: new_departure_time}
+  end
+
   defp fetch_predictions_only(query_params) do
     query_params
     |> Prediction.fetch()
@@ -64,6 +126,7 @@ defmodule Screens.Departures.Departure do
   def from_schedules({:ok, schedules}) do
     departures =
       schedules
+      |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
       |> Enum.reject(&departure_in_past/1)
       |> deduplicate_combined_routes()
       |> Enum.map(&from_prediction_or_schedule/1)
@@ -174,6 +237,10 @@ defmodule Screens.Departures.Departure do
 
   defp format_query_param({:include, relationships}) do
     {"include", Enum.join(relationships, ",")}
+  end
+
+  defp format_query_param({:date, date}) do
+    {"date", date}
   end
 
   @doc """
