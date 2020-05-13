@@ -1,6 +1,7 @@
 defmodule Screens.SolariScreenData do
   @moduledoc false
 
+  require Logger
   alias Screens.Departures.Departure
 
   def by_screen_id(screen_id, _is_screen) do
@@ -9,15 +10,29 @@ defmodule Screens.SolariScreenData do
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
 
-    section_data = Enum.map(sections, &fetch_section_data/1)
+    case fetch_sections_data(sections) do
+      {:ok, data} ->
+        %{
+          force_reload: false,
+          success: true,
+          current_time: Screens.Util.format_time(DateTime.utc_now()),
+          station_name: station_name,
+          sections: data
+        }
 
-    %{
-      force_reload: false,
-      success: true,
-      current_time: Screens.Util.format_time(DateTime.utc_now()),
-      station_name: station_name,
-      sections: section_data
-    }
+      :error ->
+        %{force_reload: false, success: false}
+    end
+  end
+
+  defp fetch_sections_data(sections) do
+    sections_data = Enum.map(sections, &fetch_section_data/1)
+
+    if Enum.any?(sections_data, fn data -> data == :error end) do
+      :error
+    else
+      {:ok, Enum.map(sections_data, fn {:ok, data} -> data end)}
+    end
   end
 
   defp fetch_section_data(%{
@@ -28,14 +43,16 @@ defmodule Screens.SolariScreenData do
        }) do
     case query_data(query_params, query_opts) do
       {:ok, data} ->
-        %{
-          name: section_name,
-          arrow: arrow,
-          departures: do_layout(data, layout_params)
-        }
+        {:ok,
+         %{
+           name: section_name,
+           arrow: arrow,
+           departures: do_layout(data, layout_params)
+         }}
 
       :error ->
-        %{force_reload: false, success: false}
+        _ = Logger.info("solari fetch_section_data failed to fetch #{section_name}")
+        :error
     end
   end
 
