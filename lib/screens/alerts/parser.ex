@@ -25,18 +25,18 @@ defmodule Screens.Alerts.Parser do
         "severity" => severity,
         "timeframe" => timeframe
       } ->
-          %Screens.Alerts.Alert{
-            id: id,
-            effect: parse_effect(effect),
-            severity: severity,
-            header: header,
-            informed_entities: informed_entities,
-            active_period: parse_active_periods(active_period),
-            lifecycle: lifecycle,
-            timeframe: timeframe,
-            created_at: parse_time(created_at),
-            updated_at: parse_time(updated_at)
-          }
+        %Screens.Alerts.Alert{
+          id: id,
+          effect: parse_effect(effect),
+          severity: severity,
+          header: header,
+          informed_entities: informed_entities,
+          active_period: parse_active_periods(active_period),
+          lifecycle: lifecycle,
+          timeframe: timeframe,
+          created_at: parse_time(created_at),
+          updated_at: parse_time(updated_at)
+        }
 
       _ ->
         nil

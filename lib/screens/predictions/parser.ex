@@ -70,8 +70,13 @@ defmodule Screens.Predictions.Parser do
 
     alerts =
       case get_in(relationships, ["alerts", "data"]) do
-        nil -> []
-        alerts_data -> Enum.map(alerts_data, fn %{"id" => alert_id} -> Map.get(included_data, {"alert", alert_id}) end)
+        nil ->
+          []
+
+        alerts_data ->
+          Enum.map(alerts_data, fn %{"id" => alert_id} ->
+            Map.get(included_data, {"alert", alert_id})
+          end)
       end
 
     %Screens.Predictions.Prediction{
