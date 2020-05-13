@@ -1,6 +1,6 @@
 import DebugErrorBoundary from "Components/helpers/debug_error_boundary";
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 
 const MultiScreenPage = ({
   screenContainer: ScreenContainer,
@@ -11,11 +11,19 @@ const MultiScreenPage = ({
     document.getElementById("app").dataset.screenIds
   );
 
+  const query = new URLSearchParams(useLocation().search);
+  const date = query.get("date");
+  const time = query.get("time");
+
   return (
     <div className="multi-screen-page">
-      {screenIds.map((id) => (
-        <ScreenContainer id={id} key={id} />
-      ))}
+      {screenIds.map((id) => {
+        if (date !== null && time !== null) {
+          return <ScreenContainer id={id} date={date} time={time} key={id} />;
+        } else {
+          return <ScreenContainer id={id} key={id} />;
+        }
+      })}
     </div>
   );
 };
@@ -26,7 +34,16 @@ const ScreenPage = ({
   screenContainer: React.ComponentType;
 }): JSX.Element => {
   const { id } = useParams();
-  return <ScreenContainer id={id} />;
+
+  const query = new URLSearchParams(useLocation().search);
+  const date = query.get("date");
+  const time = query.get("time");
+
+  if (date !== null && time !== null) {
+    return <ScreenContainer id={id} date={date} time={time} />;
+  } else {
+    return <ScreenContainer id={id} />;
+  }
 };
 
 const AuditScreenPage = ({

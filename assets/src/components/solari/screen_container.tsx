@@ -31,8 +31,8 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   return <DefaultScreenLayout apiResponse={apiResponse} />;
 };
 
-const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse(id, SOLARI_REFRESH_MS);
+const ScreenContainer = ({ id, date, time }): JSX.Element => {
+  const apiResponse = useApiResponse(id, SOLARI_REFRESH_MS, date, time);
   return <ScreenLayout apiResponse={apiResponse} />;
 };
 
