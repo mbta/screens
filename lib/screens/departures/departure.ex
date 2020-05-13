@@ -11,6 +11,7 @@ defmodule Screens.Departures.Departure do
             destination: nil,
             direction_id: nil,
             vehicle_status: nil,
+            alerts: [],
             time: nil,
             inline_badges: nil
 
@@ -22,6 +23,7 @@ defmodule Screens.Departures.Departure do
           destination: String.t(),
           direction_id: 0 | 1 | nil,
           vehicle_status: String.t(),
+          alerts: list(:delay | :snow_route | :last_trip),
           time: DateTime.t(),
           inline_badges: list(map())
         }
@@ -73,6 +75,19 @@ defmodule Screens.Departures.Departure do
 
   def from_schedules(:error), do: :error
 
+  def from_predictions({:ok, predictions}) do
+    departures =
+      predictions
+      |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
+      |> Enum.reject(&departure_in_past/1)
+      |> deduplicate_combined_routes()
+      |> Enum.map(&from_prediction_or_schedule/1)
+
+    {:ok, departures}
+  end
+
+  def from_predictions(:error), do: :error
+
   defp from_prediction_or_schedule(
          %{
            id: id,
@@ -108,23 +123,16 @@ defmodule Screens.Departures.Departure do
         nil -> %{}
       end
 
-    departure = Enum.reduce([base_data, trip_data, vehicle_data], &Map.merge/2)
+    alert_data =
+      case Map.get(data, :alerts) do
+        nil -> %{}
+        alerts -> %{alerts: get_alerts_list(alerts)}
+      end
+
+    departure = Enum.reduce([base_data, trip_data, vehicle_data, alert_data], &Map.merge/2)
 
     struct(__MODULE__, departure)
   end
-
-  def from_predictions({:ok, predictions}) do
-    departures =
-      predictions
-      |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
-      |> Enum.reject(&departure_in_past/1)
-      |> deduplicate_combined_routes()
-      |> Enum.map(&from_prediction_or_schedule/1)
-
-    {:ok, departures}
-  end
-
-  def from_predictions(:error), do: :error
 
   def select_prediction_time(arrival_time, departure_time) do
     case {arrival_time, departure_time} do
@@ -218,6 +226,7 @@ defmodule Screens.Departures.Departure do
       destination: d.destination,
       direction_id: d.direction_id,
       vehicle_status: d.vehicle_status,
+      alerts: d.alerts,
       time: d.time,
       inline_badges: d.inline_badges
     }
@@ -240,5 +249,19 @@ defmodule Screens.Departures.Departure do
       _ ->
         departure
     end
+  end
+
+  defp get_alerts_list(alerts) do
+    [
+      delay: Enum.any?(alerts, &(&1.effect == :delay)),
+      snow_route: false,
+      last_trip: false
+    ]
+    |> Enum.filter(fn {_alert_type, active?} -> active? end)
+    |> Enum.map(fn {alert_type, _active?} -> alert_type end)
+  end
+
+  defp append_if(list, condition, extra) do
+    if condition, do: extra ++ list, else: list
   end
 end
