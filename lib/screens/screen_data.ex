@@ -30,10 +30,11 @@ defmodule Screens.ScreenData do
     end
   end
 
-  defp by_screen_id_with_version(screen_id, client_version, is_screen) do
-    api_version = Application.get_env(:screens, :api_version)
+  defp by_screen_id_with_version(screen_id, client_version_str, is_screen) do
+    api_version = Screens.Override.State.api_version()
+    client_version = String.to_integer(client_version_str)
 
-    if api_version == client_version do
+    if api_version <= client_version do
       by_screen_id(screen_id, is_screen)
     else
       %{force_reload: true}
