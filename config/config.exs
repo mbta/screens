@@ -248,7 +248,9 @@ config :screens,
           layout:
             {:upcoming,
              %{
-               num_rows: 2,
+               num_rows: 10,
+               visible_rows: 3,
+               paged: true,
                routes: [
                  "1",
                  "8",
@@ -298,7 +300,9 @@ config :screens,
           layout:
             {:upcoming,
              %{
-               num_rows: 2,
+               num_rows: 10,
+               visible_rows: 3,
+               paged: true,
                routes: [
                  "1",
                  "8",
