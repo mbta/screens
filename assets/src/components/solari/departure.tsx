@@ -67,7 +67,9 @@ const Departure = ({
       </div>
       {alerts.length > 0 && (
         <div className="departure__alerts-container">
-          {alerts.map(alert => <InlineAlertBadge alert={alert} key={alert} />)}
+          {alerts.map((alert) => (
+            <InlineAlertBadge alert={alert} key={alert} />
+          ))}
         </div>
       )}
     </div>
