@@ -1,5 +1,7 @@
 import React from "react";
 
+import { classWithModifier } from "Util/util";
+
 const alertValues = {
   delay: { svgPath: "/images/solari-delay-white.svg", text: "delays" },
   snow_route: { svgPath: "/images/solari-snowflake.svg", text: "snow route" },
@@ -13,18 +15,18 @@ interface InlineAlertBadgeProps {
 const InlineAlertBadge = ({ alert }: InlineAlertBadgeProps): JSX.Element => {
   const { svgPath, text } = alertValues[alert];
 
-  const withClassModifier = (className: string) =>
-    `${className} ${className}--${alert}`;
+  const withModifier = (className: string) =>
+    classWithModifier(className, alert)
 
   return (
-    <div className={withClassModifier("inline-alert-badge")}>
-      <div className={withClassModifier("inline-alert-badge__icon-container")}>
+    <div className={withModifier("inline-alert-badge")}>
+      <div className={withModifier("inline-alert-badge__icon-container")}>
         <img
-          className={withClassModifier("inline-alert-badge__icon-image")}
+          className={withModifier("inline-alert-badge__icon-image")}
           src={svgPath}
         />
       </div>
-      <div className={withClassModifier("inline-alert-badge__text")}>
+      <div className={withModifier("inline-alert-badge__text")}>
         {text}
       </div>
     </div>
