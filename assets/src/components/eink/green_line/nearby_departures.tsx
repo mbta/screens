@@ -4,12 +4,13 @@ import BaseDepartureTime from "Components/eink/base_departure_time";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
 import BaseRoutePill from "Components/eink/base_route_pill";
 
+import { einkTimeRepresentation } from "Util/time_representation";
+
 const NearbyDeparturesTime = ({ time, currentTimeString }): JSX.Element => {
   return (
     <div className="nearby-departures-time">
       <BaseDepartureTime
-        departureTimeString={time}
-        currentTimeString={currentTimeString}
+        time={einkTimeRepresentation(time, currentTimeString)}
       />
     </div>
   );
