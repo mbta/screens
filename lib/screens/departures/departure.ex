@@ -260,8 +260,4 @@ defmodule Screens.Departures.Departure do
     |> Enum.filter(fn {_alert_type, active?} -> active? end)
     |> Enum.map(fn {alert_type, _active?} -> alert_type end)
   end
-
-  defp append_if(list, condition, extra) do
-    if condition, do: extra ++ list, else: list
-  end
 end
