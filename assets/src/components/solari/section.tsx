@@ -26,15 +26,15 @@ const Section = ({
     <div className="section">
       <SectionHeader name={name} arrow={arrow} />
       <div className="departure-container">
-        {departures.map((departure) => {
-          const {
+        {departures.map(({
             id,
             route,
             destination,
             time,
             route_id: routeId,
             vehicle_status: vehicleStatus,
-          } = departure;
+            alerts
+          }) => {
           return (
             <Departure
               route={route}
@@ -43,6 +43,7 @@ const Section = ({
               time={time}
               currentTimeString={currentTimeString}
               vehicleStatus={vehicleStatus}
+              alerts={alerts}
               key={id}
             />
           );

@@ -1,0 +1,75 @@
+@import "../fonts";
+
+.inline-alert-badge {
+  display: inline-block;
+  box-shadow: 0px 5px 21px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  height: 48px;
+  vertical-align: middle;
+
+  &:not(:last-child) {
+    margin-right: 30px;
+  }
+
+  &--delay {
+    background: #171F26;
+  }
+
+  &--snow_route {
+    background: #ffffff;
+    border: 3px solid #171F26;
+    box-sizing: border-box;
+  }
+
+  &--last_trip {
+    background: #404274;
+  }
+}
+
+.inline-alert-badge__text {
+  display: inline-block;
+  @include font--text--65medium;
+  font-size: 30px;
+  line-height: 48px;
+  vertical-align: middle;
+  text-transform: uppercase;
+  margin-left: 12px;
+  margin-right: 19px;
+
+  &--delay {
+    color: #ffffff;
+  }
+
+  &--snow_route {
+    color: #171F26;
+    line-height: 42px;
+  }
+
+  &--last_trip {
+    color: #ffffff;
+  }
+}
+
+.inline-alert-badge__icon-container {
+  display: inline-block;
+  margin-left: 12px;
+  height: 48px;
+  width: 31px;
+  font-size: 0;
+  vertical-align: middle;
+
+  &--snow_route {
+    height: 42px;
+  }
+}
+
+.inline-alert-badge__icon-image {
+  height: 32px;
+  width: 32px;
+  margin-top: 8px;
+  vertical-align: middle;
+
+  &--snow_route {
+    margin-top: 5px;
+  }
+}
