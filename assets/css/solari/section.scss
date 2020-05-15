@@ -29,3 +29,12 @@
   height: 57px;
   margin: 33px 0 33px;
 }
+
+.section-header__route-count {
+  @include font--text--55regular;
+  float: right;
+  margin-right: 50px;
+  font-size: 50px;
+  line-height: 123px;
+  vertical-align: middle;
+}

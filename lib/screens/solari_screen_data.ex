@@ -35,19 +35,22 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp fetch_section_data(%{
-         name: section_name,
-         arrow: arrow,
-         query: %{params: query_params, opts: query_opts},
-         layout: layout_params
-       }) do
+  defp fetch_section_data(
+         %{
+           name: section_name,
+           arrow: arrow,
+           query: %{params: query_params, opts: query_opts},
+           layout: layout_params
+         } = screen_config
+       ) do
     case query_data(query_params, query_opts) do
       {:ok, data} ->
         {:ok,
          %{
            name: section_name,
            arrow: arrow,
-           departures: do_layout(data, layout_params)
+           departures: do_layout(data, layout_params),
+           route_count: route_count(screen_config)
          }}
 
       :error ->
@@ -60,11 +63,22 @@ defmodule Screens.SolariScreenData do
     Departure.fetch(query_params, query_opts)
   end
 
+  defp route_count(%{arrow: nil, layout: {:upcoming, %{routes: routes}}}), do: length(routes)
+
+  defp route_count(%{
+         arrow: nil,
+         layout: {:upcoming, _},
+         query: %{params: %{route_ids: route_ids}}
+       }),
+       do: length(route_ids)
+
+  defp route_count(_), do: nil
+
   defp do_layout(query_data, {:upcoming, %{num_rows: num_rows} = layout_opts}) do
     query_data
     |> filter_by_routes(layout_opts)
     |> Enum.take(num_rows)
-    |> Enum.map(&Departure.to_map/1)
+    |> Enum.map(&Map.from_struct/1)
   end
 
   defp do_layout(query_data, :bidirectional) do
@@ -73,7 +87,7 @@ defmodule Screens.SolariScreenData do
     |> Tuple.to_list()
     |> Enum.flat_map(&Enum.slice(&1, 0, 1))
     |> Enum.sort_by(& &1.time)
-    |> Enum.map(&Departure.to_map/1)
+    |> Enum.map(&Map.from_struct/1)
   end
 
   defp filter_by_routes(query_data, %{routes: routes}) do

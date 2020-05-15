@@ -3,15 +3,19 @@ import React from "react";
 import Departure from "Components/solari/departure";
 import Arrow from "Components/solari/arrow";
 
-const SectionHeader = ({ name, arrow }): JSX.Element => {
+const SectionHeader = ({ name, arrow, routeCount }): JSX.Element => {
   return (
     <div className="section-header">
       <span className="section-header__name">{name}</span>
-      <span className="section-header__arrow-container">
-        {arrow !== null && (
+      {arrow !== null ? (
+        <span className="section-header__arrow-container">
           <Arrow direction={arrow} className="section-header__arrow-image" />
-        )}
-      </span>
+        </span>
+      ) : (
+        routeCount !== null && (
+          <span className="section-header__route-count">{`${routeCount} routes`}</span>
+        )
+      )}
     </div>
   );
 };
@@ -21,10 +25,11 @@ const Section = ({
   arrow,
   departures,
   currentTimeString,
+  route_count: routeCount,
 }): JSX.Element => {
   return (
     <div className="section">
-      <SectionHeader name={name} arrow={arrow} />
+      <SectionHeader name={name} arrow={arrow} routeCount={routeCount} />
       <div className="departure-container">
         {departures.map(
           ({
