@@ -13,6 +13,10 @@ defmodule Screens.Override.State do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
+  def api_version(pid \\ __MODULE__) do
+    GenServer.call(pid, :api_version)
+  end
+
   def disabled?(pid \\ __MODULE__, screen_id) do
     GenServer.call(pid, {:disabled?, screen_id})
   end
@@ -51,6 +55,10 @@ defmodule Screens.Override.State do
   end
 
   @impl true
+  def handle_call(:api_version, _from, %Override{api_version: api_version} = state) do
+    {:reply, api_version, state}
+  end
+
   def handle_call({:disabled?, _screen_id}, _from, %Override{globally_disabled: true} = state) do
     {:reply, true, state}
   end
