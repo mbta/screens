@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import Departure from "Components/solari/departure";
 import Arrow from "Components/solari/arrow";
@@ -19,29 +19,31 @@ const SectionHeader = ({ name, arrow }): JSX.Element => {
 class PagedSection extends React.Component {
   constructor(props) {
     super(props);
-    this.numStaticRows = props.paging.num_rows - 1;
+    this.numStaticRows = props.paging.visible_rows - 1;
     this.state = { index: this.numStaticRows, departures: props.departures };
   }
 
   componentDidMount() {
-    this.interval = setInterval(() => {
-      if (!this.state.departures || this.state.departures.length === 0) {
-        this.setState({ departures: this.props.departures });
-      } else if (this.state.index === this.state.departures.length - 1) {
-        // Reached end of list, update departures and restart paging
-        this.setState({
-          index: this.numStaticRows,
-          departures: this.props.departures,
-        });
-      } else {
-        this.setState({ index: this.state.index + 1 });
-      }
-    }, 2000);
+    this.interval = setInterval(this.updatePaging.bind(this), 2000);
   }
 
   componentWillUnmount() {
     if (this.interval) {
       clearInterval(this.interval);
+    }
+  }
+
+  updatePaging() {
+    if (!this.state.departures || this.state.departures.length === 0) {
+      this.setState({ departures: this.props.departures });
+    } else if (this.state.index === this.state.departures.length - 1) {
+      // Reached end of list, update departures and restart paging
+      this.setState({
+        index: this.numStaticRows,
+        departures: this.props.departures,
+      });
+    } else {
+      this.setState({ index: this.state.index + 1 });
     }
   }
 
@@ -54,27 +56,28 @@ class PagedSection extends React.Component {
         <div className="departure-container">
           {this.state.departures
             .slice(0, this.numStaticRows)
-            .map((departure) => {
-              const {
+            .map(
+              ({
                 id,
                 route,
                 destination,
                 time,
                 route_id: routeId,
                 vehicle_status: vehicleStatus,
-              } = departure;
-              return (
-                <Departure
-                  route={route}
-                  routeId={routeId}
-                  destination={destination}
-                  time={time}
-                  currentTimeString={this.props.currentTimeString}
-                  vehicleStatus={vehicleStatus}
-                  key={id}
-                />
-              );
-            })}
+              }) => {
+                return (
+                  <Departure
+                    route={route}
+                    routeId={routeId}
+                    destination={destination}
+                    time={time}
+                    currentTimeString={this.props.currentTimeString}
+                    vehicleStatus={vehicleStatus}
+                    key={id}
+                  />
+                );
+              }
+            )}
 
           {currentPagedDeparture && (
             <>

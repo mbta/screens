@@ -58,7 +58,7 @@ defmodule Screens.SolariScreenData do
   end
 
   defp do_paging({:upcoming, %{paged: true, visible_rows: visible_rows}}) do
-    %{is_enabled: true, num_rows: visible_rows}
+    %{is_enabled: true, visible_rows: visible_rows}
   end
 
   defp do_paging(_) do
