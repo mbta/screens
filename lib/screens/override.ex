@@ -5,6 +5,7 @@ defmodule Screens.Override do
   """
 
   @type t :: %__MODULE__{
+          api_version: pos_integer(),
           globally_disabled: boolean(),
           disabled_screen_ids: MapSet.t(pos_integer()),
           bus_service: pos_integer(),
@@ -14,7 +15,8 @@ defmodule Screens.Override do
           green_line_psa_list: list(String.t())
         }
 
-  defstruct globally_disabled: false,
+  defstruct api_version: 1,
+            globally_disabled: false,
             disabled_screen_ids: MapSet.new(),
             bus_service: 1,
             green_line_service: 1,
@@ -26,6 +28,7 @@ defmodule Screens.Override do
   def new, do: %__MODULE__{}
 
   @type json_map :: %{
+          optional(:api_version) => pos_integer(),
           optional(:globally_disabled) => boolean(),
           optional(:disabled_screen_ids) => list(pos_integer()),
           optional(:bus_service) => pos_integer(),

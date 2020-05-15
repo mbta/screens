@@ -4,20 +4,27 @@ defmodule Screens.SolariScreenData do
   require Logger
   alias Screens.Departures.Departure
 
-  def by_screen_id(screen_id, _is_screen) do
-    %{station_name: station_name, sections: sections} =
+  def by_screen_id(screen_id, _is_screen, schedule \\ nil) do
+    %{station_name: station_name, sections: sections, show_section_headers: show_section_headers} =
       :screens
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
 
-    case fetch_sections_data(sections) do
+    current_time =
+      case schedule do
+        nil -> DateTime.utc_now()
+        {_, time} -> time
+      end
+
+    case fetch_sections_data(sections, schedule) do
       {:ok, data} ->
         %{
           force_reload: false,
           success: true,
-          current_time: Screens.Util.format_time(DateTime.utc_now()),
+          current_time: Screens.Util.format_time(current_time),
           station_name: station_name,
-          sections: data
+          sections: data,
+          show_section_headers: show_section_headers
         }
 
       :error ->
@@ -25,8 +32,8 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp fetch_sections_data(sections) do
-    sections_data = Enum.map(sections, &fetch_section_data/1)
+  defp fetch_sections_data(sections, schedule) do
+    sections_data = Enum.map(sections, &fetch_section_data(&1, schedule))
 
     if Enum.any?(sections_data, fn data -> data == :error end) do
       :error
@@ -41,15 +48,17 @@ defmodule Screens.SolariScreenData do
            arrow: arrow,
            query: %{params: query_params, opts: query_opts},
            layout: layout_params
-         } = screen_config
+         } = screen_config,
+         schedule
        ) do
-    case query_data(query_params, query_opts) do
+    case query_data(query_params, query_opts, schedule) do
       {:ok, data} ->
         {:ok,
          %{
            name: section_name,
            arrow: arrow,
            departures: do_layout(data, layout_params),
+           paging: do_paging(layout_params),
            route_count: route_count(screen_config)
          }}
 
@@ -59,8 +68,20 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp query_data(query_params, query_opts) do
-    Departure.fetch(query_params, query_opts)
+  defp do_paging({:upcoming, %{paged: true, visible_rows: visible_rows}}) do
+    %{is_enabled: true, visible_rows: visible_rows}
+  end
+
+  defp do_paging(_) do
+    %{is_enabled: false}
+  end
+
+  def query_data(query_params, query_opts, schedule) do
+    if is_nil(schedule) do
+      Departure.fetch(query_params, query_opts)
+    else
+      Departure.fetch_schedules_by_date_and_time(query_params, schedule)
+    end
   end
 
   defp route_count(%{arrow: nil, layout: {:upcoming, %{routes: routes}}}), do: length(routes)

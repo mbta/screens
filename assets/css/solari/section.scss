@@ -1,10 +1,13 @@
 @import "../fonts";
 
+.section {
+  border-top: 5px solid #c5c7c9;
+}
+
 .section-header {
   color: #171f26;
   background-color: #e1e1df;
   height: 123px;
-  border-top: 5px solid rgba(23, 31, 38, 0.1);
 }
 
 .section-header__name {
@@ -28,6 +31,13 @@
   width: 57px;
   height: 57px;
   margin: 33px 0 33px;
+}
+
+.section__later-departure-header {
+  @include font--text--65medium;
+  font-size: 40px;
+  margin-left: 42px;
+  margin-top: 12px;
 }
 
 .section-header__route-count {

@@ -9,7 +9,7 @@ defmodule ScreensWeb.ScreenController do
   plug(:environment_name)
 
   defp api_version(conn, _) do
-    api_version = Application.get_env(:screens, :api_version)
+    api_version = Screens.Override.State.api_version()
     assign(conn, :api_version, api_version)
   end
 

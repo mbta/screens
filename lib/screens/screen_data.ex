@@ -30,10 +30,11 @@ defmodule Screens.ScreenData do
     end
   end
 
-  defp by_screen_id_with_version(screen_id, client_version, is_screen) do
-    api_version = Application.get_env(:screens, :api_version)
+  defp by_screen_id_with_version(screen_id, client_version_str, is_screen) do
+    api_version = Screens.Override.State.api_version()
+    client_version = String.to_integer(client_version_str)
 
-    if api_version == client_version do
+    if api_version <= client_version do
       by_screen_id(screen_id, is_screen)
     else
       %{force_reload: true}
@@ -48,5 +49,24 @@ defmodule Screens.ScreenData do
 
     screen_data_module = Map.get(@modules_by_app_id, app_id)
     screen_data_module.by_screen_id(screen_id, is_screen)
+  end
+
+  def by_screen_id_with_datetime(screen_id, date_str, time_str) do
+    %{app_id: app_id} =
+      :screens
+      |> Application.get_env(:screen_data)
+      |> Map.get(screen_id)
+
+    # Split the service day at 3am by shifting to Pacific Time.
+    # Midnight at Pacific Time is always 3am here.
+    utc_time = DateTime.utc_now()
+    {:ok, pacific_time} = DateTime.shift_zone(utc_time, "America/Los_Angeles")
+    current_service_date = DateTime.to_date(pacific_time)
+
+    {:ok, date} = Date.from_iso8601(date_str)
+    {:ok, time, _} = DateTime.from_iso8601("#{current_service_date} #{time_str}Z")
+
+    screen_data_module = Map.get(@modules_by_app_id, app_id)
+    screen_data_module.by_screen_id(screen_id, false, {date, time})
   end
 end
