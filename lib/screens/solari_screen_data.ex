@@ -48,13 +48,22 @@ defmodule Screens.SolariScreenData do
          %{
            name: section_name,
            arrow: arrow,
-           departures: do_layout(data, layout_params)
+           departures: do_layout(data, layout_params),
+           paging: do_paging(layout_params)
          }}
 
       :error ->
         _ = Logger.info("solari fetch_section_data failed to fetch #{section_name}")
         :error
     end
+  end
+
+  defp do_paging({:upcoming, %{paged: true, visible_rows: visible_rows}}) do
+    %{is_enabled: true, visible_rows: visible_rows}
+  end
+
+  defp do_paging(_) do
+    %{is_enabled: false}
   end
 
   defp query_data(query_params, query_opts) do
