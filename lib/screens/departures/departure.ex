@@ -244,10 +244,9 @@ defmodule Screens.Departures.Departure do
   For any set of predictions with the same ID, they will also share the same trip, but will have differing routes.
   This function filters out predictions whose route ID does not equal its trip's route ID.
 
-  For buses, that prediction will always be the "slashed" route, e.g. 24/27.
+  For buses, that means removing predictions for routes 24 and 27 when combined route 24/27 exists.
   """
-  @spec deduplicate_combined_routes([t()]) :: [t()]
-  def deduplicate_combined_routes(predictions) do
+  defp deduplicate_combined_routes(predictions) do
     Enum.filter(predictions, &(&1.route.id == &1.trip.route_id))
   end
 
