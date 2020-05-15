@@ -20,11 +20,12 @@ const Section = ({
   name,
   arrow,
   departures,
+  showSectionHeaders,
   currentTimeString,
 }): JSX.Element => {
   return (
     <div className="section">
-      <SectionHeader name={name} arrow={arrow} />
+      {showSectionHeaders && <SectionHeader name={name} arrow={arrow} />}
       <div className="departure-container">
         {departures.map(
           ({
