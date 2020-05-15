@@ -174,6 +174,7 @@ config :screens,
     },
     "301" => %{
       station_name: "Ashmont",
+      show_section_headers: true,
       sections: [
         %{
           name: "Busway",
@@ -198,6 +199,7 @@ config :screens,
     },
     "302" => %{
       station_name: "Central",
+      show_section_headers: true,
       sections: [
         %{
           name: "Red Line",
@@ -222,6 +224,7 @@ config :screens,
     },
     "303" => %{
       station_name: "Dudley - Platform A",
+      show_section_headers: true,
       sections: [
         %{
           name: "Platform A",
@@ -277,6 +280,7 @@ config :screens,
     },
     "304" => %{
       station_name: "Dudley - Platform C",
+      show_section_headers: true,
       sections: [
         %{
           name: "Platform C",
@@ -327,18 +331,13 @@ config :screens,
     },
     "305" => %{
       station_name: "Forest Hills",
+      show_section_headers: false,
       sections: [
         %{
-          name: "Upper Busway",
-          arrow: :e,
-          query: %{params: %{stop_id: "10642"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 3}}
-        },
-        %{
-          name: "Lower Busway",
-          arrow: :n,
-          query: %{params: %{stop_id: "875"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 3}}
+          name: "Buses",
+          arrow: nil,
+          query: %{params: %{stop_ids: ["10642", "875"]}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 8}}
         },
         %{
           name: "Commuter Rail",
@@ -351,6 +350,7 @@ config :screens,
     },
     "306" => %{
       station_name: "Forest Hills",
+      show_section_headers: true,
       sections: [
         %{
           name: "Upper Busway",
@@ -369,6 +369,7 @@ config :screens,
     },
     "307" => %{
       station_name: "Harvard",
+      show_section_headers: true,
       sections: [
         %{
           name: "Upper Busway",
@@ -387,6 +388,7 @@ config :screens,
     },
     "308" => %{
       station_name: "Haymarket",
+      show_section_headers: true,
       sections: [
         %{
           name: "Busway",
@@ -405,6 +407,7 @@ config :screens,
     },
     "309" => %{
       station_name: "Maverick",
+      show_section_headers: true,
       sections: [
         %{
           name: "Blue Line",
@@ -423,6 +426,7 @@ config :screens,
     },
     "310" => %{
       station_name: "Ruggles",
+      show_section_headers: true,
       sections: [
         %{
           name: "Lower Busway",
@@ -441,6 +445,7 @@ config :screens,
     },
     "311" => %{
       station_name: "Sullivan Square",
+      show_section_headers: true,
       sections: [
         %{
           name: "Upper Busway",
@@ -467,6 +472,7 @@ config :screens,
     },
     "312" => %{
       station_name: "Wonderland",
+      show_section_headers: true,
       sections: [
         %{
           name: "Blue Line",

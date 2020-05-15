@@ -2,7 +2,11 @@ import React from "react";
 
 import { PagedSection, Section } from "Components/solari/section";
 
-const SectionList = ({ sections, currentTimeString }): JSX.Element => {
+const SectionList = ({
+  sections,
+  showSectionHeaders,
+  currentTimeString,
+}): JSX.Element => {
   return (
     <div className="section-list">
       {sections.map((section) => {
@@ -18,6 +22,7 @@ const SectionList = ({ sections, currentTimeString }): JSX.Element => {
           return (
             <Section
               {...section}
+              showSectionHeaders={showSectionHeaders}
               currentTimeString={currentTimeString}
               key={section.name}
             />

@@ -38,6 +38,10 @@ defmodule Screens.Predictions.Parser do
     Screens.Vehicles.Parser.parse_vehicle(item)
   end
 
+  defp parse_included(%{"type" => "alert"} = item) do
+    Screens.Alerts.Parser.parse_alert(item)
+  end
+
   def parse_prediction(
         %{"id" => id, "attributes" => attributes, "relationships" => relationships},
         included_data
@@ -64,12 +68,24 @@ defmodule Screens.Predictions.Parser do
         vehicle_id -> Map.get(included_data, {"vehicle", vehicle_id})
       end
 
+    alerts =
+      case get_in(relationships, ["alerts", "data"]) do
+        nil ->
+          []
+
+        alerts_data ->
+          Enum.map(alerts_data, fn %{"id" => alert_id} ->
+            Map.get(included_data, {"alert", alert_id})
+          end)
+      end
+
     %Screens.Predictions.Prediction{
       id: id,
       trip: trip,
       stop: stop,
       route: route,
       vehicle: vehicle,
+      alerts: alerts,
       arrival_time: arrival_time,
       departure_time: departure_time
     }

@@ -1,10 +1,13 @@
 @import "../fonts";
 
+.section {
+  border-top: 5px solid #c5c7c9;
+}
+
 .section-header {
   color: #171f26;
   background-color: #e1e1df;
   height: 123px;
-  border-top: 5px solid rgba(23, 31, 38, 0.1);
 }
 
 .section-header__name {

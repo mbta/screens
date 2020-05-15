@@ -4,7 +4,8 @@ defmodule Screens.Alerts.Parser do
   def parse_result({:ok, result}) do
     result
     |> Map.get("data")
-    |> Enum.flat_map(&parse_alert/1)
+    |> Enum.map(&parse_alert/1)
+    |> Enum.reject(&is_nil/1)
   end
 
   def parse_result(:error) do
@@ -24,23 +25,21 @@ defmodule Screens.Alerts.Parser do
         "severity" => severity,
         "timeframe" => timeframe
       } ->
-        [
-          %Screens.Alerts.Alert{
-            id: id,
-            effect: parse_effect(effect),
-            severity: severity,
-            header: header,
-            informed_entities: informed_entities,
-            active_period: parse_active_periods(active_period),
-            lifecycle: lifecycle,
-            timeframe: timeframe,
-            created_at: parse_time(created_at),
-            updated_at: parse_time(updated_at)
-          }
-        ]
+        %Screens.Alerts.Alert{
+          id: id,
+          effect: parse_effect(effect),
+          severity: severity,
+          header: header,
+          informed_entities: informed_entities,
+          active_period: parse_active_periods(active_period),
+          lifecycle: lifecycle,
+          timeframe: timeframe,
+          created_at: parse_time(created_at),
+          updated_at: parse_time(updated_at)
+        }
 
       _ ->
-        []
+        nil
     end
   end
 
