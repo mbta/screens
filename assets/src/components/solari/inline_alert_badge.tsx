@@ -16,7 +16,7 @@ const InlineAlertBadge = ({ alert }: InlineAlertBadgeProps): JSX.Element => {
   const { svgPath, text } = alertValues[alert];
 
   const withModifier = (className: string) =>
-    classWithModifier(className, alert)
+    classWithModifier(className, alert);
 
   return (
     <div className={withModifier("inline-alert-badge")}>
@@ -26,9 +26,7 @@ const InlineAlertBadge = ({ alert }: InlineAlertBadgeProps): JSX.Element => {
           src={svgPath}
         />
       </div>
-      <div className={withModifier("inline-alert-badge__text")}>
-        {text}
-      </div>
+      <div className={withModifier("inline-alert-badge__text")}>{text}</div>
     </div>
   );
 };
