@@ -15,28 +15,7 @@ defmodule Screens.VendorData.Logger do
     :ok
   end
 
-  @spec log_screen_entry(map(), atom()) :: :ok | {:error, any()}
   defp log_screen_entry(screen_data, vendor_name) do
-    data_str =
-      screen_data
-      |> Enum.map(&format_log_value/1)
-      |> Enum.join(" ")
-
-    Logger.info("#{vendor_name}_data_report #{data_str}")
-  end
-
-  @spec format_log_value({atom(), String.t()}) :: String.t()
-  defp format_log_value({key, value}) do
-    value_str =
-      case value do
-        nil -> "null"
-        _ -> "#{value}"
-      end
-
-    if String.contains?(value_str, " ") do
-      "#{key}=\"#{value_str}\""
-    else
-      "#{key}=#{value_str}"
-    end
+    Screens.LogScreenData.log_message("#{vendor_name}_data_report", screen_data)
   end
 end

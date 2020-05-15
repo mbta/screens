@@ -20,33 +20,37 @@ const Section = ({
   name,
   arrow,
   departures,
+  showSectionHeaders,
   currentTimeString,
 }): JSX.Element => {
   return (
     <div className="section">
-      <SectionHeader name={name} arrow={arrow} />
+      {showSectionHeaders && <SectionHeader name={name} arrow={arrow} />}
       <div className="departure-container">
-        {departures.map((departure) => {
-          const {
+        {departures.map(
+          ({
             id,
             route,
             destination,
             time,
             route_id: routeId,
             vehicle_status: vehicleStatus,
-          } = departure;
-          return (
-            <Departure
-              route={route}
-              routeId={routeId}
-              destination={destination}
-              time={time}
-              currentTimeString={currentTimeString}
-              vehicleStatus={vehicleStatus}
-              key={id}
-            />
-          );
-        })}
+            alerts,
+          }) => {
+            return (
+              <Departure
+                route={route}
+                routeId={routeId}
+                destination={destination}
+                time={time}
+                currentTimeString={currentTimeString}
+                vehicleStatus={vehicleStatus}
+                alerts={alerts}
+                key={id}
+              />
+            );
+          }
+        )}
       </div>
     </div>
   );

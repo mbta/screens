@@ -31,52 +31,56 @@ config :screens,
   api_version: "7",
   override_fetcher: Screens.Override.Fetch,
   screen_data: %{
-    "1" => %{stop_id: "1722", app_id: "bus_eink"},
-    "2" => %{stop_id: "383", app_id: "bus_eink"},
-    "3" => %{stop_id: "5496", app_id: "bus_eink"},
-    "4" => %{stop_id: "2134", app_id: "bus_eink"},
-    "5" => %{stop_id: "32549", app_id: "bus_eink"},
-    "6" => %{stop_id: "22549", app_id: "bus_eink"},
-    "7" => %{stop_id: "5615", app_id: "bus_eink"},
-    "8" => %{stop_id: "36466", app_id: "bus_eink"},
-    "9" => %{stop_id: "11257", app_id: "bus_eink"},
-    "10" => %{stop_id: "58", app_id: "bus_eink"},
-    "11" => %{stop_id: "21365", app_id: "bus_eink"},
-    "12" => %{stop_id: "178", app_id: "bus_eink"},
+    "1" => %{stop_id: "1722", app_id: "bus_eink", name: "100301 1624 Blue B001"},
+    "2" => %{stop_id: "383", app_id: "bus_eink", name: "100303 Blue Hill Ave B002"},
+    "3" => %{stop_id: "5496", app_id: "bus_eink", name: "100311 Broadway Nor B003"},
+    "4" => %{stop_id: "2134", app_id: "bus_eink", name: "100105 Church Lex B004"},
+    "5" => %{stop_id: "32549", app_id: "bus_eink", name: "100313 Eliot Bennett B005"},
+    "6" => %{stop_id: "22549", app_id: "bus_eink", name: "100315 Harvard Sq B006"},
+    "7" => %{stop_id: "5615", app_id: "bus_eink", name: "100319 Hawthorne B007"},
+    "8" => %{stop_id: "36466", app_id: "bus_eink", name: "100302 Hyde Park Oak B008"},
+    "9" => %{stop_id: "11257", app_id: "bus_eink", name: "100317 Malcolm X B009"},
+    "10" => %{stop_id: "58", app_id: "bus_eink", name: "100316 Mass Ave Harr B010"},
+    "11" => %{stop_id: "21365", app_id: "bus_eink", name: "100304 Huntington B011"},
+    "12" => %{stop_id: "178", app_id: "bus_eink", name: "100322 St James Dart B012"},
     "13" => %{stop_id: "6564", app_id: "bus_eink"},
-    "14" => %{stop_id: "1357", app_id: "bus_eink"},
-    "15" => %{stop_id: "390", app_id: "bus_eink"},
-    "16" => %{stop_id: "407", app_id: "bus_eink"},
-    "17" => %{stop_id: "5605", app_id: "bus_eink"},
-    "18" => %{stop_id: "637", app_id: "bus_eink"},
-    "19" => %{stop_id: "8178", app_id: "bus_eink"},
+    "14" => %{stop_id: "1357", app_id: "bus_eink", name: "100323 Tremont opp Rox B014"},
+    "15" => %{stop_id: "390", app_id: "bus_eink", name: "100305 Warren Quincy B015"},
+    "16" => %{stop_id: "407", app_id: "bus_eink", name: "100306 Warren Towns B016"},
+    "17" => %{stop_id: "5605", app_id: "bus_eink", name: "100309 Wash Broad B017"},
+    "18" => %{stop_id: "637", app_id: "bus_eink", name: "100308 Wash Firth B018"},
+    "19" => %{stop_id: "8178", app_id: "bus_eink", name: "100310 Watertown Sq B019"},
     "101" => %{
       stop_id: "place-bland",
       platform_id: "70148",
       route_id: "Green-B",
       direction_id: 1,
-      app_id: "gl_eink_single"
+      app_id: "gl_eink_single",
+      name: "002047 Blandford EB GL01"
     },
     "111" => %{
       stop_id: "place-bland",
       platform_id: "70148",
       route_id: "Green-B",
       direction_id: 1,
-      app_id: "gl_eink_single"
+      app_id: "gl_eink_single",
+      name: "002046 Blandford EB GL02"
     },
     "102" => %{
       stop_id: "place-bland",
       platform_id: "70149",
       route_id: "Green-B",
       direction_id: 0,
-      app_id: "gl_eink_single"
+      app_id: "gl_eink_single",
+      name: "002051 Blandford WB GL04"
     },
     "112" => %{
       stop_id: "place-bland",
       platform_id: "70149",
       route_id: "Green-B",
       direction_id: 0,
-      app_id: "gl_eink_single"
+      app_id: "gl_eink_single",
+      name: "002049 Blandford WB GL03"
     },
     "103" => %{
       stop_id: "place-bcnwa",
@@ -90,7 +94,8 @@ config :screens,
       platform_id: "70229",
       route_id: "Green-C",
       direction_id: 0,
-      app_id: "gl_eink_single"
+      app_id: "gl_eink_single",
+      name: "002050 Wash Sq WB GL07"
     },
     "105" => %{
       stop_id: "place-mfa",
@@ -125,21 +130,24 @@ config :screens,
       platform_id: "70230",
       route_id: "Green-C",
       direction_id: 1,
-      app_id: "gl_eink_double"
+      app_id: "gl_eink_double",
+      name: "100098 Wash Sq EB GL05"
     },
     "213" => %{
       stop_id: "place-bcnwa",
       platform_id: "70230",
       route_id: "Green-C",
       direction_id: 1,
-      app_id: "gl_eink_double"
+      app_id: "gl_eink_double",
+      name: "100102 Wash Sq EB GL06"
     },
     "204" => %{
       stop_id: "place-bcnwa",
       platform_id: "70229",
       route_id: "Green-C",
       direction_id: 0,
-      app_id: "gl_eink_double"
+      app_id: "gl_eink_double",
+      name: "100097 Wash Sq WB GL08"
     },
     "205" => %{
       stop_id: "place-mfa",
@@ -153,17 +161,20 @@ config :screens,
       platform_id: "70245",
       route_id: "Green-E",
       direction_id: 0,
-      app_id: "gl_eink_double"
+      app_id: "gl_eink_double",
+      name: "002013 MFA WB GL10"
     },
     "216" => %{
       stop_id: "place-mfa",
       platform_id: "70245",
       route_id: "Green-E",
       direction_id: 0,
-      app_id: "gl_eink_double"
+      app_id: "gl_eink_double",
+      name: "100101 MFA WB GL09"
     },
     "301" => %{
       station_name: "Ashmont",
+      show_section_headers: true,
       sections: [
         %{
           name: "Busway",
@@ -188,6 +199,7 @@ config :screens,
     },
     "302" => %{
       station_name: "Central",
+      show_section_headers: true,
       sections: [
         %{
           name: "Red Line",
@@ -212,6 +224,7 @@ config :screens,
     },
     "303" => %{
       station_name: "Dudley - Platform A",
+      show_section_headers: true,
       sections: [
         %{
           name: "Platform A",
@@ -265,6 +278,7 @@ config :screens,
     },
     "304" => %{
       station_name: "Dudley - Platform C",
+      show_section_headers: true,
       sections: [
         %{
           name: "Platform C",
@@ -313,18 +327,13 @@ config :screens,
     },
     "305" => %{
       station_name: "Forest Hills",
+      show_section_headers: false,
       sections: [
         %{
-          name: "Upper Busway",
-          arrow: :e,
-          query: %{params: %{stop_id: "10642"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 3}}
-        },
-        %{
-          name: "Lower Busway",
-          arrow: :n,
-          query: %{params: %{stop_id: "875"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 3}}
+          name: "Buses",
+          arrow: nil,
+          query: %{params: %{stop_ids: ["10642", "875"]}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 8}}
         },
         %{
           name: "Commuter Rail",
@@ -337,6 +346,7 @@ config :screens,
     },
     "306" => %{
       station_name: "Forest Hills",
+      show_section_headers: true,
       sections: [
         %{
           name: "Upper Busway",
@@ -355,6 +365,7 @@ config :screens,
     },
     "307" => %{
       station_name: "Harvard",
+      show_section_headers: true,
       sections: [
         %{
           name: "Upper Busway",
@@ -373,6 +384,7 @@ config :screens,
     },
     "308" => %{
       station_name: "Haymarket",
+      show_section_headers: true,
       sections: [
         %{
           name: "Busway",
@@ -391,6 +403,7 @@ config :screens,
     },
     "309" => %{
       station_name: "Maverick",
+      show_section_headers: true,
       sections: [
         %{
           name: "Blue Line",
@@ -409,6 +422,7 @@ config :screens,
     },
     "310" => %{
       station_name: "Ruggles",
+      show_section_headers: true,
       sections: [
         %{
           name: "Lower Busway",
@@ -427,6 +441,7 @@ config :screens,
     },
     "311" => %{
       station_name: "Sullivan Square",
+      show_section_headers: true,
       sections: [
         %{
           name: "Upper Busway",
@@ -453,6 +468,7 @@ config :screens,
     },
     "312" => %{
       station_name: "Wonderland",
+      show_section_headers: true,
       sections: [
         %{
           name: "Blue Line",

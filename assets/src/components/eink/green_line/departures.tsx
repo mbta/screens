@@ -4,12 +4,13 @@ import BaseDepartureTime from "Components/eink/base_departure_time";
 import InlineAlert from "Components/eink/green_line/inline_alert";
 import TakeoverInlineAlert from "Components/eink/green_line/takeover_inline_alert";
 
+import { einkTimeRepresentation } from "Util/time_representation";
+
 const Departure = ({ time, currentTimeString }): JSX.Element => {
   return (
     <div className="departures__departure">
       <BaseDepartureTime
-        departureTimeString={time}
-        currentTimeString={currentTimeString}
+        time={einkTimeRepresentation(time, currentTimeString)}
       />
     </div>
   );
