@@ -32,3 +32,10 @@
   height: 57px;
   margin: 33px 0 33px;
 }
+
+.section__later-departure-header {
+  @include font--text--65medium;
+  font-size: 40px;
+  margin-left: 42px;
+  margin-top: 12px;
+}
