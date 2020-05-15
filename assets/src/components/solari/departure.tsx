@@ -5,6 +5,7 @@ import { standardTimeRepresentation } from "Util/time_representation";
 import BaseRoutePill from "Components/eink/base_route_pill";
 import BaseDepartureTime from "Components/eink/base_departure_time";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
+import InlineAlertBadge from "Components/solari/inline_alert_badge";
 
 import { classWithModifier } from "Util/util";
 
@@ -43,6 +44,7 @@ const Departure = ({
   time,
   currentTimeString,
   vehicleStatus,
+  alerts,
 }): JSX.Element => {
   const { routeName, routePillColor } = routeToPill(route, routeId);
 
@@ -63,6 +65,13 @@ const Departure = ({
           )}
         />
       </div>
+      {alerts.length > 0 && (
+        <div className="departure__alerts-container">
+          {alerts.map((alert) => (
+            <InlineAlertBadge alert={alert} key={alert} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
