@@ -66,33 +66,20 @@ defmodule Screens.Departures.Departure do
     end
   end
 
-  defp shift_seconds(%{arrival_time: nil, departure_time: nil} = schedule, _seconds_to_add) do
-    schedule
-  end
-
-  defp shift_seconds(
-         %{arrival_time: arrival_time, departure_time: nil} = schedule,
-         seconds_to_add
-       ) do
-    new_arrival_time = DateTime.add(arrival_time, seconds_to_add)
-    %{schedule | arrival_time: new_arrival_time}
-  end
-
-  defp shift_seconds(
-         %{arrival_time: nil, departure_time: departure_time} = schedule,
-         seconds_to_add
-       ) do
-    new_departure_time = DateTime.add(departure_time, seconds_to_add)
-    %{schedule | departure_time: new_departure_time}
-  end
-
   defp shift_seconds(
          %{arrival_time: arrival_time, departure_time: departure_time} = schedule,
          seconds_to_add
        ) do
-    new_arrival_time = DateTime.add(arrival_time, seconds_to_add)
-    new_departure_time = DateTime.add(departure_time, seconds_to_add)
-    %{schedule | arrival_time: new_arrival_time, departure_time: new_departure_time}
+    add_seconds = fn
+      nil -> nil
+      date_time -> DateTime.add(date_time, seconds_to_add)
+    end
+
+    %{
+      schedule
+      | arrival_time: add_seconds.(arrival_time),
+        departure_time: add_seconds.(departure_time)
+    }
   end
 
   defp fetch_predictions_only(query_params) do

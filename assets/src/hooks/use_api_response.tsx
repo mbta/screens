@@ -5,7 +5,7 @@ const useApiResponse = (id, refreshMs, date, time) => {
   const apiVersion = document.getElementById("app").dataset.apiVersion;
 
   let apiPath;
-  if (date !== undefined && time !== undefined) {
+  if (date && time) {
     apiPath = `/api/screen/${id}?version=${apiVersion}&date=${date}&time=${time}`;
     refreshMs = 1000 * 60 * 60; // 1 per hour
   } else {

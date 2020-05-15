@@ -6,6 +6,7 @@ import SectionList from "Components/solari/section_list";
 import useApiResponse from "Hooks/use_api_response";
 
 import { SOLARI_REFRESH_MS } from "Constants";
+import { useLocation } from "react-router-dom";
 
 const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   return (
@@ -31,7 +32,11 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   return <DefaultScreenLayout apiResponse={apiResponse} />;
 };
 
-const ScreenContainer = ({ id, date, time }): JSX.Element => {
+const ScreenContainer = ({ id }): JSX.Element => {
+  const query = new URLSearchParams(useLocation().search);
+  const date = query.get("date");
+  const time = query.get("time");
+
   const apiResponse = useApiResponse(id, SOLARI_REFRESH_MS, date, time);
   return <ScreenLayout apiResponse={apiResponse} />;
 };

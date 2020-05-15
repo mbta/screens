@@ -56,6 +56,8 @@ defmodule Screens.ScreenData do
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
 
+    # Split the service day at 3am by shifting to Pacific Time.
+    # Midnight at Pacific Time is always 3am here.
     utc_time = DateTime.utc_now()
     {:ok, pacific_time} = DateTime.shift_zone(utc_time, "America/Los_Angeles")
     current_service_date = DateTime.to_date(pacific_time)
