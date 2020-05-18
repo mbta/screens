@@ -48,7 +48,7 @@ defmodule Screens.SolariScreenData do
            header_extra: header_extra,
            query: %{params: query_params, opts: query_opts},
            layout: layout_params
-         } = screen_config,
+         } = section_config,
          schedule
        ) do
     case query_data(query_params, query_opts, schedule) do
@@ -56,7 +56,7 @@ defmodule Screens.SolariScreenData do
         {:ok,
          %{
            name: section_name,
-           header_extra: do_header_extra(header_extra, screen_config),
+           header_extra: do_header_extra(header_extra, section_config),
            departures: do_layout(data, layout_params),
            paging: do_paging(layout_params)
          }}
@@ -83,16 +83,17 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp do_header_extra(nil, _screen_config), do: nil
+  defp do_header_extra({:arrow, direction}, _section_config) do
+    %{content_type: :arrow, value: direction}
+  end
 
-  defp do_header_extra({:arrow, direction}, _screen_config),
-    do: %{content_type: :arrow, value: direction}
+  defp do_header_extra(:route_count, %{layout: {:upcoming, %{routes: routes}}}) do
+    %{content_type: :route_count, value: length(routes)}
+  end
 
-  defp do_header_extra(:route_count, %{layout: {:upcoming, %{routes: routes}}}),
-    do: %{content_type: :route_count, value: length(routes)}
-
-  defp do_header_extra(:route_count, %{query: %{params: %{route_ids: route_ids}}}),
-    do: %{content_type: :route_count, value: length(route_ids)}
+  defp do_header_extra(:route_count, %{query: %{params: %{route_ids: route_ids}}}) do
+    %{content_type: :route_count, value: length(route_ids)}
+  end
 
   defp do_header_extra(_, _), do: nil
 
