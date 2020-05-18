@@ -6,6 +6,10 @@ defmodule Screens.Schedules.Parser do
     parse_data(data, included_data)
   end
 
+  def parse_result(%{"data" => []}) do
+    []
+  end
+
   defp parse_included_data(data) do
     data
     |> Enum.map(fn item ->
