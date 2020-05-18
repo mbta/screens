@@ -3,21 +3,36 @@ import React from "react";
 import Departure from "Components/solari/departure";
 import Arrow from "Components/solari/arrow";
 
-const SectionHeader = ({ name, arrow, routeCount }): JSX.Element => {
+const SectionHeader = ({ name, extraContent }): JSX.Element => {
   return (
     <div className="section-header">
       <span className="section-header__name">{name}</span>
-      {arrow !== null ? (
-        <span className="section-header__arrow-container">
-          <Arrow direction={arrow} className="section-header__arrow-image" />
-        </span>
-      ) : (
-        routeCount !== null && (
-          <span className="section-header__route-count">{`${routeCount} routes`}</span>
-        )
+      {extraContent !== null && (
+        <SectionHeaderExtra
+          contentType={extraContent.content_type}
+          value={extraContent.value}
+        />
       )}
     </div>
   );
+};
+
+const SectionHeaderExtra = ({ contentType, value }): JSX.Element => {
+  if (contentType === "arrow") {
+    const direction = value;
+    return (
+      <span className="section-header__arrow-container">
+        <Arrow direction={direction} className="section-header__arrow-image" />
+      </span>
+    );
+  }
+
+  if (contentType === "route_count") {
+    const count = value;
+    return (
+      <span className="section-header__route-count">{`${count} routes`}</span>
+    );
+  }
 };
 
 class PagedSection extends React.Component {
@@ -58,8 +73,7 @@ class PagedSection extends React.Component {
       <div className="section">
         <SectionHeader
           name={this.props.name}
-          arrow={this.props.arrow}
-          routeCount={this.props.route_count}
+          extraContent={this.props.header_extra}
         />
         <div className="departure-container">
           {this.state.departures
@@ -113,16 +127,15 @@ class PagedSection extends React.Component {
 
 const Section = ({
   name,
-  arrow,
+  header_extra: headerExtra,
   departures,
   showSectionHeaders,
   currentTimeString,
-  route_count: routeCount,
 }): JSX.Element => {
   return (
     <div className="section">
       {showSectionHeaders && (
-        <SectionHeader name={name} arrow={arrow} routeCount={routeCount} />
+        <SectionHeader name={name} extraContent={headerExtra} />
       )}
       <div className="departure-container">
         {departures.map(

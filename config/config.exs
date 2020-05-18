@@ -177,19 +177,19 @@ config :screens,
       sections: [
         %{
           name: "Busway",
-          arrow: :s,
+          header_extra: {:arrow, :s},
           query: %{params: %{stop_id: "334"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 5}}
         },
         %{
           name: "Red Line",
-          arrow: :e,
+          header_extra: {:arrow, :e},
           query: %{params: %{stop_id: "70094"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}}
         },
         %{
           name: "Mattapan Trolley",
-          arrow: :e,
+          header_extra: {:arrow, :e},
           query: %{params: %{stop_id: "70261"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 1}}
         }
@@ -202,19 +202,19 @@ config :screens,
       sections: [
         %{
           name: "Red Line",
-          arrow: nil,
+          header_extra: nil,
           query: %{params: %{stop_ids: ["70069", "70070"]}, opts: %{}},
           layout: :bidirectional
         },
         %{
           name: "Bus (Massachusetts Ave @ Pearl St)",
-          arrow: :e,
+          header_extra: {:arrow, :e},
           query: %{params: %{stop_id: "72"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 3}}
         },
         %{
           name: "Bus (Magazine St & Green St)",
-          arrow: :w,
+          header_extra: {:arrow, :w},
           query: %{params: %{stop_ids: ["1060", "1123"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 3}}
         }
@@ -227,7 +227,7 @@ config :screens,
       sections: [
         %{
           name: "Platform A",
-          arrow: nil,
+          header_extra: :route_count,
           query: %{
             params: %{
               stop_id: "place-dudly",
@@ -240,7 +240,7 @@ config :screens,
         },
         %{
           name: "Other Platforms",
-          arrow: nil,
+          header_extra: :route_count,
           query: %{
             params: %{
               stop_id: "place-dudly"
@@ -283,7 +283,7 @@ config :screens,
       sections: [
         %{
           name: "Platform C",
-          arrow: nil,
+          header_extra: :route_count,
           query: %{
             params: %{stop_id: "place-dudly"},
             opts: %{}
@@ -293,7 +293,7 @@ config :screens,
         },
         %{
           name: "Other Platforms",
-          arrow: nil,
+          header_extra: :route_count,
           query: %{
             params: %{
               stop_id: "place-dudly"
@@ -334,13 +334,13 @@ config :screens,
       sections: [
         %{
           name: "Buses",
-          arrow: nil,
+          header_extra: nil,
           query: %{params: %{stop_ids: ["10642", "875"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}}
         },
         %{
           name: "Commuter Rail",
-          arrow: :w,
+          header_extra: {:arrow, :w},
           query: %{params: %{stop_id: "Forest Hills"}, opts: %{include_schedules: true}},
           layout: :bidirectional
         }
@@ -353,13 +353,13 @@ config :screens,
       sections: [
         %{
           name: "Upper Busway",
-          arrow: :e,
+          header_extra: {:arrow, :e},
           query: %{params: %{stop_id: "10642"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 6}}
         },
         %{
           name: "Commuter Rail",
-          arrow: :w,
+          header_extra: {:arrow, :w},
           query: %{params: %{stop_id: "Forest Hills"}, opts: %{include_schedules: true}},
           layout: :bidirectional
         }
@@ -372,13 +372,13 @@ config :screens,
       sections: [
         %{
           name: "Upper Busway",
-          arrow: :e,
+          header_extra: {:arrow, :e},
           query: %{params: %{stop_id: "20761"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 6}}
         },
         %{
           name: "Lower Busway",
-          arrow: :e,
+          header_extra: {:arrow, :e},
           query: %{params: %{stop_id: "2076"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}}
         }
@@ -391,13 +391,13 @@ config :screens,
       sections: [
         %{
           name: "Busway",
-          arrow: :se,
+          header_extra: {:arrow, :se},
           query: %{params: %{stop_id: "8310"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 7}}
         },
         %{
           name: "Congress St @ Haymarket Sta",
-          arrow: :n,
+          header_extra: {:arrow, :n},
           query: %{params: %{stop_id: "117"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 3}}
         }
@@ -410,13 +410,13 @@ config :screens,
       sections: [
         %{
           name: "Blue Line",
-          arrow: :e,
+          header_extra: {:arrow, :e},
           query: %{params: %{stop_ids: ["70045", "70046"]}, opts: %{}},
           layout: :bidirectional
         },
         %{
           name: "Bus",
-          arrow: :w,
+          header_extra: {:arrow, :w},
           query: %{params: %{stop_ids: ["5740", "57400"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 6}}
         }
@@ -429,13 +429,13 @@ config :screens,
       sections: [
         %{
           name: "Lower Busway",
-          arrow: :e,
+          header_extra: {:arrow, :e},
           query: %{params: %{stop_ids: ["17862", "17863"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 7}}
         },
         %{
           name: "Commuter Rail",
-          arrow: :e,
+          header_extra: {:arrow, :e},
           query: %{params: %{stop_id: "Ruggles"}, opts: %{include_schedules: true}},
           layout: {:upcoming, %{num_rows: 2}}
         }
@@ -448,7 +448,7 @@ config :screens,
       sections: [
         %{
           name: "Upper Busway",
-          arrow: :w,
+          header_extra: {:arrow, :w},
           query: %{
             params: %{stop_ids: ["29001", "29002", "29003", "29004", "29005", "29006"]},
             opts: %{}
@@ -457,7 +457,7 @@ config :screens,
         },
         %{
           name: "Lower Busway",
-          arrow: :sw,
+          header_extra: {:arrow, :sw},
           query: %{
             params: %{
               stop_ids: ["29007", "29008", "29009", "29010", "29011", "29012", "29013", "29014"]
@@ -475,13 +475,13 @@ config :screens,
       sections: [
         %{
           name: "Blue Line",
-          arrow: :se,
+          header_extra: {:arrow, :se},
           query: %{params: %{stop_id: "70059"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}}
         },
         %{
           name: "Bus",
-          arrow: :w,
+          header_extra: {:arrow, :w},
           query: %{params: %{stop_id: "15795"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 6}}
         }

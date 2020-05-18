@@ -238,14 +238,12 @@ defmodule Screens.Departures.Departure do
     {"date", date}
   end
 
-  @doc """
-  Chooses the "preferred prediction" from multiple predictions in cases of combined routes.
-
-  For any set of predictions with the same ID, they will also share the same trip, but will have differing routes.
-  This function filters out predictions whose route ID does not equal its trip's route ID.
-
-  For buses, that means removing predictions for routes 24 and 27 when combined route 24/27 exists.
-  """
+  # Chooses the "preferred prediction" from multiple predictions in cases of combined routes.
+  #
+  # For any set of predictions with the same ID, they will also share the same trip, but will have differing routes.
+  # This function filters out predictions whose route ID does not equal its trip's route ID.
+  #
+  # For buses, that means removing predictions for routes 24 and 27 when combined route 24/27 exists.
   defp deduplicate_combined_routes(predictions) do
     Enum.filter(predictions, &(&1.route.id == &1.trip.route_id))
   end
