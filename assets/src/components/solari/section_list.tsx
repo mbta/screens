@@ -14,6 +14,7 @@ const SectionList = ({
           return (
             <PagedSection
               {...section}
+              showSectionHeaders={showSectionHeaders}
               currentTimeString={currentTimeString}
               key={section.name}
             />
