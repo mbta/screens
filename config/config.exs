@@ -173,13 +173,13 @@ config :screens,
     },
     "301" => %{
       station_name: "Ashmont",
-      show_section_headers: true,
+      show_section_headers: false,
       sections: [
         %{
           name: "Busway",
           arrow: :s,
           query: %{params: %{stop_id: "334"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 5}}
+          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}}
         },
         %{
           name: "Red Line",
@@ -198,7 +198,7 @@ config :screens,
     },
     "302" => %{
       station_name: "Central",
-      show_section_headers: true,
+      show_section_headers: false,
       sections: [
         %{
           name: "Red Line",
@@ -207,22 +207,16 @@ config :screens,
           layout: :bidirectional
         },
         %{
-          name: "Bus (Massachusetts Ave @ Pearl St)",
-          arrow: :e,
-          query: %{params: %{stop_id: "72"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 3}}
-        },
-        %{
-          name: "Bus (Magazine St & Green St)",
-          arrow: :w,
-          query: %{params: %{stop_ids: ["1060", "1123"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 3}}
+          name: "Bus",
+          arrow: nil,
+          query: %{params: %{stop_ids: ["72", "1060", "1123"]}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}}
         }
       ],
       app_id: "solari"
     },
     "303" => %{
-      station_name: "Dudley - Platform A",
+      station_name: "Dudley",
       show_section_headers: true,
       sections: [
         %{
@@ -236,49 +230,13 @@ config :screens,
             },
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 6}}
-        },
-        %{
-          name: "Other Platforms",
-          arrow: nil,
-          query: %{
-            params: %{
-              stop_id: "place-dudly"
-            },
-            opts: %{}
-          },
-          layout:
-            {:upcoming,
-             %{
-               num_rows: 10,
-               visible_rows: 3,
-               paged: true,
-               routes: [
-                 "1",
-                 "8",
-                 "14",
-                 "19",
-                 "41",
-                 "42",
-                 "47",
-                 "66",
-                 "170",
-                 "171",
-                 "749",
-                 "751",
-                 {"15", 0},
-                 {"23", 0},
-                 {"28", 0},
-                 {"44", 0},
-                 {"45", 0}
-               ]
-             }}
+          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}}
         }
       ],
       app_id: "solari"
     },
     "304" => %{
-      station_name: "Dudley - Platform C",
+      station_name: "Dudley",
       show_section_headers: true,
       sections: [
         %{
@@ -289,40 +247,12 @@ config :screens,
             opts: %{}
           },
           layout:
-            {:upcoming, %{num_rows: 6, routes: [{"14", 1}, {"41", 0}, {"42", 0}, {"66", 0}]}}
-        },
-        %{
-          name: "Other Platforms",
-          arrow: nil,
-          query: %{
-            params: %{
-              stop_id: "place-dudly"
-            },
-            opts: %{}
-          },
-          layout:
             {:upcoming,
              %{
-               num_rows: 10,
-               visible_rows: 3,
+               num_rows: 12,
+               visible_rows: 8,
                paged: true,
-               routes: [
-                 "1",
-                 "8",
-                 "15",
-                 "19",
-                 "23",
-                 "28",
-                 "44",
-                 "45",
-                 "47",
-                 "170",
-                 "171",
-                 "749",
-                 "751",
-                 {"14", 0},
-                 {"41", 1}
-               ]
+               routes: [{"14", 1}, {"41", 0}, {"42", 0}, {"66", 0}]
              }}
         }
       ],
@@ -330,32 +260,32 @@ config :screens,
     },
     "305" => %{
       station_name: "Forest Hills",
-      show_section_headers: false,
-      sections: [
-        %{
-          name: "Buses",
-          arrow: nil,
-          query: %{params: %{stop_ids: ["10642", "875"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 8}}
-        },
-        %{
-          name: "Commuter Rail",
-          arrow: :w,
-          query: %{params: %{stop_id: "Forest Hills"}, opts: %{include_schedules: true}},
-          layout: :bidirectional
-        }
-      ],
-      app_id: "solari"
-    },
-    "306" => %{
-      station_name: "Forest Hills",
       show_section_headers: true,
       sections: [
         %{
           name: "Upper Busway",
           arrow: :e,
           query: %{params: %{stop_id: "10642"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 6}}
+          layout: {:upcoming, %{num_rows: 8, visible_rows: 4, paged: true}}
+        },
+        %{
+          name: "Lower Busway",
+          arrow: :n,
+          query: %{params: %{stop_id: "875"}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 8, visible_rows: 4, paged: true}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "306" => %{
+      station_name: "Forest Hills",
+      show_section_headers: false,
+      sections: [
+        %{
+          name: "Upper Busway",
+          arrow: :e,
+          query: %{params: %{stop_id: "10642"}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}}
         },
         %{
           name: "Commuter Rail",
@@ -374,7 +304,7 @@ config :screens,
           name: "Upper Busway",
           arrow: :e,
           query: %{params: %{stop_id: "20761"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 6}}
+          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}}
         },
         %{
           name: "Lower Busway",
@@ -393,20 +323,20 @@ config :screens,
           name: "Busway",
           arrow: :se,
           query: %{params: %{stop_id: "8310"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 7}}
+          layout: {:upcoming, %{num_rows: 11, visible_rows: 7, paged: true}}
         },
         %{
           name: "Congress St @ Haymarket Sta",
           arrow: :n,
           query: %{params: %{stop_id: "117"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 3}}
+          layout: {:upcoming, %{num_rows: 7, visible_rows: 3, paged: true}}
         }
       ],
       app_id: "solari"
     },
     "309" => %{
       station_name: "Maverick",
-      show_section_headers: true,
+      show_section_headers: false,
       sections: [
         %{
           name: "Blue Line",
@@ -418,7 +348,7 @@ config :screens,
           name: "Bus",
           arrow: :w,
           query: %{params: %{stop_ids: ["5740", "57400"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 6}}
+          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}}
         }
       ],
       app_id: "solari"
@@ -431,7 +361,7 @@ config :screens,
           name: "Lower Busway",
           arrow: :e,
           query: %{params: %{stop_ids: ["17862", "17863"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 7}}
+          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}}
         },
         %{
           name: "Commuter Rail",
@@ -453,7 +383,7 @@ config :screens,
             params: %{stop_ids: ["29001", "29002", "29003", "29004", "29005", "29006"]},
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 4}}
+          layout: {:upcoming, %{num_rows: 9, visible_rows: 5, paged: true}}
         },
         %{
           name: "Lower Busway",
@@ -464,14 +394,14 @@ config :screens,
             },
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 4}}
+          layout: {:upcoming, %{num_rows: 9, visible_rows: 5, paged: true}}
         }
       ],
       app_id: "solari"
     },
     "312" => %{
       station_name: "Wonderland",
-      show_section_headers: true,
+      show_section_headers: false,
       sections: [
         %{
           name: "Blue Line",
@@ -483,7 +413,7 @@ config :screens,
           name: "Bus",
           arrow: :w,
           query: %{params: %{stop_id: "15795"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 6}}
+          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}}
         }
       ],
       app_id: "solari"

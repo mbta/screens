@@ -52,7 +52,9 @@ class PagedSection extends React.Component {
 
     return (
       <div className="section">
-        <SectionHeader name={this.props.name} arrow={this.props.arrow} />
+        {this.props.showSectionHeaders && (
+          <SectionHeader name={this.props.name} arrow={this.props.arrow} />
+        )}
         <div className="departure-container">
           {this.state.departures
             .slice(0, this.numStaticRows)
