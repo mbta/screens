@@ -6,7 +6,7 @@ defmodule Screens.Departures.Departure do
 
   defstruct id: nil,
             stop_name: nil,
-            route_short_name: nil,
+            route: nil,
             route_id: nil,
             destination: nil,
             direction_id: nil,
@@ -18,7 +18,7 @@ defmodule Screens.Departures.Departure do
   @type t :: %__MODULE__{
           id: String.t(),
           stop_name: String.t(),
-          route_short_name: String.t(),
+          route: String.t(),
           route_id: String.t(),
           destination: String.t(),
           direction_id: 0 | 1 | nil,
@@ -152,7 +152,7 @@ defmodule Screens.Departures.Departure do
     base_data = %{
       id: id,
       stop_name: stop_name,
-      route_short_name: route_short_name,
+      route: route_short_name,
       route_id: route_id,
       time: DateTime.to_iso8601(time),
       inline_badges: []
@@ -238,52 +238,14 @@ defmodule Screens.Departures.Departure do
     {"date", date}
   end
 
-  @doc """
-  Chooses the "preferred prediction" from multiple predictions in cases of combined routes.
-
-  The parts of a prediction that this function is concerned with are:
-
-      prediction
-        |- id
-        |- route
-        |    |- id
-        |- trip
-             |- route id
-
-  For any set of predictions with the same ID, they will also share the same trip, but will have differing routes.
-  This function finds and chooses the prediction whose route ID equals its trip's route ID.
-
-  For buses, that prediction will always be the "slashed" route, e.g. 24/27.
-  """
-  @spec deduplicate_combined_routes([t()]) :: [t()]
-  def deduplicate_combined_routes(predictions) do
-    predictions
-    |> Enum.group_by(& &1.id)
-    |> Enum.map(fn
-      {_id, [single_prediction]} ->
-        single_prediction
-
-      {_id, grouped_predictions} ->
-        Enum.find(
-          grouped_predictions,
-          &(&1.route.id == &1.trip.route_id)
-        )
-    end)
-    |> Enum.sort_by(& &1.departure_time)
-  end
-
-  def to_map(d) do
-    %{
-      id: d.id,
-      route: d.route_short_name,
-      route_id: d.route_id,
-      destination: d.destination,
-      direction_id: d.direction_id,
-      vehicle_status: d.vehicle_status,
-      alerts: d.alerts,
-      time: d.time,
-      inline_badges: d.inline_badges
-    }
+  # Chooses the "preferred prediction" from multiple predictions in cases of combined routes.
+  #
+  # For any set of predictions with the same ID, they will also share the same trip, but will have differing routes.
+  # This function filters out predictions whose route ID does not equal its trip's route ID.
+  #
+  # For buses, that means removing predictions for routes 24 and 27 when combined route 24/27 exists.
+  defp deduplicate_combined_routes(predictions) do
+    Enum.filter(predictions, &(&1.route.id == &1.trip.route_id))
   end
 
   def departure_in_past(%{departure_time: departure_time}) do

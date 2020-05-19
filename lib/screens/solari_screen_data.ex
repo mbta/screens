@@ -87,7 +87,7 @@ defmodule Screens.SolariScreenData do
     query_data
     |> filter_by_routes(layout_opts)
     |> Enum.take(num_rows)
-    |> Enum.map(&Departure.to_map/1)
+    |> Enum.map(&Map.from_struct/1)
   end
 
   defp do_layout(query_data, :bidirectional) do
@@ -96,7 +96,7 @@ defmodule Screens.SolariScreenData do
     |> Tuple.to_list()
     |> Enum.flat_map(&Enum.slice(&1, 0, 1))
     |> Enum.sort_by(& &1.time)
-    |> Enum.map(&Departure.to_map/1)
+    |> Enum.map(&Map.from_struct/1)
   end
 
   defp filter_by_routes(query_data, %{routes: routes}) do

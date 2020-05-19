@@ -82,7 +82,7 @@ defmodule Screens.BusScreenData do
   end
 
   defp format_departure_rows(departures) do
-    Enum.map(departures, &Departure.to_map/1)
+    Enum.map(departures, &Map.from_struct/1)
   end
 
   def format_global_alert(alert) do
