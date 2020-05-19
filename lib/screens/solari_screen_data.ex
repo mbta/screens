@@ -100,7 +100,7 @@ defmodule Screens.SolariScreenData do
   end
 
   defp filter_by_routes(query_data, %{routes: {action, routes}}) do
-    route_matchers = routes |> Enum.flat_map(&build_route_matcher/1) |> MapSet.new()
+    route_matchers = routes |> Enum.flat_map(&route_direction_tuple/1) |> MapSet.new()
 
     filter_fn =
       case action do
@@ -115,6 +115,6 @@ defmodule Screens.SolariScreenData do
 
   defp filter_by_routes(query_data, _), do: query_data
 
-  defp build_route_matcher({_, _} = route_id_and_direction), do: [route_id_and_direction]
-  defp build_route_matcher(route_id), do: [{route_id, 0}, {route_id, 1}]
+  defp route_direction_tuple({_, _} = route_id_and_direction), do: [route_id_and_direction]
+  defp route_direction_tuple(route_id), do: [{route_id, 0}, {route_id, 1}]
 end
