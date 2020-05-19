@@ -4,10 +4,11 @@
   width: 1080px;
   height: 1920px;
 
-  background-image: repeating-linear-gradient(
+  background: repeating-linear-gradient(
     -45deg,
-    #f5f4f1 0px,
-    #f5f4f1 12px,
-    rgba(199, 199, 199, 0.58) 12px 17px
+    #f5f4f1 0,
+    #f5f4f1 40%,
+    rgba(199, 199, 199, 0.58) 40% 50%
   );
+  background-size: 15px 15px;
 }
