@@ -252,7 +252,7 @@ config :screens,
                num_rows: 12,
                visible_rows: 8,
                paged: true,
-               routes: [{"14", 1}, {"41", 0}, {"42", 0}, {"66", 0}]
+               routes: {:include, [{"14", 1}, {"41", 0}, {"42", 0}, {"66", 0}]}
              }}
         }
       ],
@@ -310,7 +310,12 @@ config :screens,
           name: "Lower Busway",
           arrow: :e,
           query: %{params: %{stop_id: "2076"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 2}}
+          layout:
+            {:upcoming,
+             %{
+               num_rows: 2,
+               routes: {:exclude, [{"74", 1}, {"75", 1}, {"77", 1}, {"78", 1}, {"96", 1}]}
+             }}
         }
       ],
       app_id: "solari"

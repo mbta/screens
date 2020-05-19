@@ -99,24 +99,22 @@ defmodule Screens.SolariScreenData do
     |> Enum.map(&Map.from_struct/1)
   end
 
-  defp filter_by_routes(query_data, %{routes: routes}) do
-    route_matchers = Enum.map(routes, &build_route_matcher/1)
+  defp filter_by_routes(query_data, %{routes: {action, routes}}) do
+    route_matchers = routes |> Enum.flat_map(&route_direction_tuple/1) |> MapSet.new()
 
-    Enum.filter(query_data, fn departure ->
-      Enum.any?(route_matchers, fn match_fn -> match_fn.(departure) end)
+    filter_fn =
+      case action do
+        :include -> &Enum.filter/2
+        :exclude -> &Enum.reject/2
+      end
+
+    filter_fn.(query_data, fn departure ->
+      MapSet.member?(route_matchers, {departure.route_id, departure.direction_id})
     end)
   end
 
   defp filter_by_routes(query_data, _), do: query_data
 
-  @spec build_route_matcher({String.t(), 0 | 1} | String.t()) :: (Departure.t() -> boolean())
-  defp build_route_matcher({route_id, direction_id}) do
-    fn %Departure{route_id: departure_route, direction_id: departure_direction} ->
-      route_id == departure_route and direction_id == departure_direction
-    end
-  end
-
-  defp build_route_matcher(route_id) do
-    fn %Departure{route_id: departure_route} -> route_id == departure_route end
-  end
+  defp route_direction_tuple({_, _} = route_id_and_direction), do: [route_id_and_direction]
+  defp route_direction_tuple(route_id), do: [{route_id, 0}, {route_id, 1}]
 end
