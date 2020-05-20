@@ -422,6 +422,58 @@ config :screens,
         }
       ],
       app_id: "solari"
+    },
+    "320" => %{
+      station_name: "Summer Street",
+      show_section_headers: true,
+      sections: [
+        %{
+          name: "Summer St opp WTC Ave",
+          arrow: nil,
+          query: %{params: %{stop_id: "889"}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 8}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "321" => %{
+      station_name: "Summer Street",
+      show_section_headers: true,
+      sections: [
+        %{
+          name: "Summer St @ WTC Ave",
+          arrow: nil,
+          query: %{params: %{stop_id: "890"}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 8}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "322" => %{
+      station_name: "Columbus Ave",
+      show_section_headers: true,
+      sections: [
+        %{
+          name: "Columbus Ave @ Walnut Ave",
+          arrow: nil,
+          query: %{params: %{stop_id: "1743"}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 8}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "323" => %{
+      station_name: "Columbus Ave",
+      show_section_headers: true,
+      sections: [
+        %{
+          name: "Columbus Ave @ Walnut Ave",
+          arrow: nil,
+          query: %{params: %{stop_id: "11413"}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 8}}
+        }
+      ],
+      app_id: "solari"
     }
   },
   api_v3_url: "https://api-v3.mbta.com/",
