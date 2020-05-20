@@ -14,6 +14,7 @@ const SectionList = ({
           return (
             <PagedSection
               {...section}
+              numRows={section.paging.visible_rows}
               showSectionHeaders={showSectionHeaders}
               currentTimeString={currentTimeString}
               key={section.name}
@@ -23,6 +24,7 @@ const SectionList = ({
           return (
             <Section
               {...section}
+              numRows={section.departures.length}
               showSectionHeaders={showSectionHeaders}
               currentTimeString={currentTimeString}
               key={section.name}

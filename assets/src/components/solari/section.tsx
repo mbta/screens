@@ -19,7 +19,7 @@ const SectionHeader = ({ name, arrow }): JSX.Element => {
 class PagedSection extends React.Component {
   constructor(props) {
     super(props);
-    this.numStaticRows = props.paging.visible_rows - 1;
+    this.numStaticRows = props.numRows - 1;
     this.state = { index: this.numStaticRows, departures: props.departures };
   }
 
@@ -112,35 +112,38 @@ const Section = ({
   showSectionHeaders,
   currentTimeString,
   paging,
+  numRows,
 }): JSX.Element => {
   return (
     <div className="section">
       {showSectionHeaders && <SectionHeader name={name} arrow={arrow} />}
       <div className="departure-container">
-        {departures.map(
-          ({
-            id,
-            route,
-            destination,
-            time,
-            route_id: routeId,
-            vehicle_status: vehicleStatus,
-            alerts,
-          }) => {
-            return (
-              <Departure
-                route={route}
-                routeId={routeId}
-                destination={destination}
-                time={time}
-                currentTimeString={currentTimeString}
-                vehicleStatus={vehicleStatus}
-                alerts={alerts}
-                key={id}
-              />
-            );
-          }
-        )}
+        {departures
+          .slice(0, numRows)
+          .map(
+            ({
+              id,
+              route,
+              destination,
+              time,
+              route_id: routeId,
+              vehicle_status: vehicleStatus,
+              alerts,
+            }) => {
+              return (
+                <Departure
+                  route={route}
+                  routeId={routeId}
+                  destination={destination}
+                  time={time}
+                  currentTimeString={currentTimeString}
+                  vehicleStatus={vehicleStatus}
+                  alerts={alerts}
+                  key={id}
+                />
+              );
+            }
+          )}
       </div>
     </div>
   );
