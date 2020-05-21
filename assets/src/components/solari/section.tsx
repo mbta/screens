@@ -19,12 +19,15 @@ const SectionHeader = ({ name, arrow }): JSX.Element => {
 class PagedSection extends React.Component {
   constructor(props) {
     super(props);
-    this.numStaticRows = props.numRows - 1;
-    this.state = { index: this.numStaticRows, departures: props.departures };
+    this.state = { index: props.numRows - 1 };
+    this.MAX_PAGE_COUNT = 5;
   }
 
   componentDidMount() {
-    this.interval = setInterval(this.updatePaging.bind(this), 2000);
+    this.interval = setInterval(
+      this.updatePaging.bind(this),
+      this.pageDuration()
+    );
   }
 
   componentWillUnmount() {
@@ -34,21 +37,29 @@ class PagedSection extends React.Component {
   }
 
   updatePaging() {
-    if (!this.state.departures || this.state.departures.length === 0) {
-      this.setState({ departures: this.props.departures });
-    } else if (this.state.index === this.state.departures.length - 1) {
-      // Reached end of list, update departures and restart paging
-      this.setState({
-        index: this.numStaticRows,
-        departures: this.props.departures,
-      });
+    const maxIndex = this.pageCount() + this.props.numRows - 2;
+    this.setState({ index: Math.min(maxIndex, this.state.index + 1) });
+  }
+
+  pageCount() {
+    const excessDepartures =
+      this.props.departures.length - this.props.numRows + 1;
+    return Math.min(excessDepartures, this.MAX_PAGE_COUNT);
+  }
+
+  pageDuration() {
+    const numPages = this.pageCount();
+    if (numPages <= 1) {
+      return 15000;
+    } else if (numPages === 2) {
+      return 3750;
     } else {
-      this.setState({ index: this.state.index + 1 });
+      return 15000 / numPages;
     }
   }
 
   render() {
-    const currentPagedDeparture = this.state.departures[this.state.index];
+    const currentPagedDeparture = this.props.departures[this.state.index];
 
     return (
       <div className="section">
@@ -56,8 +67,8 @@ class PagedSection extends React.Component {
           <SectionHeader name={this.props.name} arrow={this.props.arrow} />
         )}
         <div className="departure-container">
-          {this.state.departures
-            .slice(0, this.numStaticRows)
+          {this.props.departures
+            .slice(0, this.props.numRows - 1)
             .map(
               ({
                 id,
