@@ -17,7 +17,7 @@ const arraySum = (arr) => arr.reduce((acc, n) => acc + n, 0);
 const minBy = (arr, fn) => {
   const min = arr.reduce(
     ({ elt, value }, newElt) => {
-      const newValue = fn.call(null, newElt);
+      const newValue = fn(newElt);
       if (newValue < value) {
         return { elt: newElt, value: newValue };
       } else {
@@ -33,8 +33,8 @@ const minBy = (arr, fn) => {
 const allRoundings = (arr) => {
   return arr.reduce(
     (list, elt) => {
-      const floors = list.map((l) => l.concat([Math.floor(elt)]));
-      const ceils = list.map((l) => l.concat([Math.ceil(elt)]));
+      const floors = list.map((l) => [...l, Math.floor(elt)]);
+      const ceils = list.map((l) => [...l, Math.ceil(elt)]);
       return floors.concat(ceils);
     },
     [[]]
@@ -43,7 +43,7 @@ const allRoundings = (arr) => {
 
 const assignSectionSizes = (sections, numRows) => {
   const initialSizes = sections.map((section) => {
-    if (section.paging && section.paging.is_enabled === true) {
+    if (section?.paging?.is_enabled) {
       return section.paging.visible_rows;
     } else {
       return section.departures.length;

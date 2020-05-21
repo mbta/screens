@@ -37,18 +37,19 @@ class PagedSection extends React.Component {
   }
 
   updatePaging() {
-    const maxIndex = this.pageCount() + this.props.numRows - 2;
-    this.setState({ index: Math.min(maxIndex, this.state.index + 1) });
+    this.setState((state, props) => {
+      const maxIndex = this.pageCount(props) + props.numRows - 2;
+      return { index: Math.min(maxIndex, state.index + 1) };
+    });
   }
 
-  pageCount() {
-    const excessDepartures =
-      this.props.departures.length - this.props.numRows + 1;
+  pageCount(props) {
+    const excessDepartures = props.departures.length - props.numRows + 1;
     return Math.min(excessDepartures, this.MAX_PAGE_COUNT);
   }
 
   pageDuration() {
-    const numPages = this.pageCount();
+    const numPages = this.pageCount(this.props);
     if (numPages <= 1) {
       return 15000;
     } else if (numPages === 2) {
