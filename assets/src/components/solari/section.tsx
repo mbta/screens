@@ -19,12 +19,15 @@ const SectionHeader = ({ name, arrow }): JSX.Element => {
 class PagedSection extends React.Component {
   constructor(props) {
     super(props);
-    this.numStaticRows = props.paging.visible_rows - 1;
-    this.state = { index: this.numStaticRows, departures: props.departures };
+    this.state = { index: props.numRows - 1 };
+    this.MAX_PAGE_COUNT = 5;
   }
 
   componentDidMount() {
-    this.interval = setInterval(this.updatePaging.bind(this), 2000);
+    this.interval = setInterval(
+      this.updatePaging.bind(this),
+      this.pageDuration()
+    );
   }
 
   componentWillUnmount() {
@@ -34,21 +37,30 @@ class PagedSection extends React.Component {
   }
 
   updatePaging() {
-    if (!this.state.departures || this.state.departures.length === 0) {
-      this.setState({ departures: this.props.departures });
-    } else if (this.state.index === this.state.departures.length - 1) {
-      // Reached end of list, update departures and restart paging
-      this.setState({
-        index: this.numStaticRows,
-        departures: this.props.departures,
-      });
+    this.setState((state, props) => {
+      const maxIndex = this.pageCount(props) + props.numRows - 2;
+      return { index: Math.min(maxIndex, state.index + 1) };
+    });
+  }
+
+  pageCount(props) {
+    const excessDepartures = props.departures.length - props.numRows + 1;
+    return Math.min(excessDepartures, this.MAX_PAGE_COUNT);
+  }
+
+  pageDuration() {
+    const numPages = this.pageCount(this.props);
+    if (numPages <= 1) {
+      return 15000;
+    } else if (numPages === 2) {
+      return 3750;
     } else {
-      this.setState({ index: this.state.index + 1 });
+      return 15000 / numPages;
     }
   }
 
   render() {
-    const currentPagedDeparture = this.state.departures[this.state.index];
+    const currentPagedDeparture = this.props.departures[this.state.index];
 
     return (
       <div className="section">
@@ -56,8 +68,8 @@ class PagedSection extends React.Component {
           <SectionHeader name={this.props.name} arrow={this.props.arrow} />
         )}
         <div className="departure-container">
-          {this.state.departures
-            .slice(0, this.numStaticRows)
+          {this.props.departures
+            .slice(0, this.props.numRows - 1)
             .map(
               ({
                 id,
@@ -115,37 +127,40 @@ const Section = ({
   showSectionHeaders,
   currentTimeString,
   paging,
+  numRows,
 }): JSX.Element => {
   return (
     <div className="section">
       {showSectionHeaders && <SectionHeader name={name} arrow={arrow} />}
       <div className="departure-container">
-        {departures.map(
-          ({
-            id,
-            route,
-            destination,
-            time,
-            route_id: routeId,
-            vehicle_status: vehicleStatus,
-            alerts,
-            stop_type: stopType,
-          }) => {
-            return (
-              <Departure
-                route={route}
-                routeId={routeId}
-                destination={destination}
-                time={time}
-                currentTimeString={currentTimeString}
-                vehicleStatus={vehicleStatus}
-                alerts={alerts}
-                stopType={stopType}
-                key={id}
-              />
-            );
-          }
-        )}
+        {departures
+          .slice(0, numRows)
+          .map(
+            ({
+              id,
+              route,
+              destination,
+              time,
+              route_id: routeId,
+              vehicle_status: vehicleStatus,
+              alerts,
+              stop_type: stopType,
+            }) => {
+              return (
+                <Departure
+                  route={route}
+                  routeId={routeId}
+                  destination={destination}
+                  time={time}
+                  currentTimeString={currentTimeString}
+                  vehicleStatus={vehicleStatus}
+                  alerts={alerts}
+                  stopType={stopType}
+                  key={id}
+                />
+              );
+            }
+          )}
       </div>
     </div>
   );
