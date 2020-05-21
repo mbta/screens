@@ -388,7 +388,7 @@ config :screens,
             params: %{stop_ids: ["29001", "29002", "29003", "29004", "29005", "29006"]},
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 7, visible_rows: 6, paged: true}}
+          layout: {:upcoming, %{num_rows: 9, visible_rows: 5, paged: true}}
         },
         %{
           name: "Lower Busway",
@@ -399,7 +399,7 @@ config :screens,
             },
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 7, visible_rows: 6, paged: true}}
+          layout: {:upcoming, %{num_rows: 9, visible_rows: 5, paged: true}}
         }
       ],
       app_id: "solari"

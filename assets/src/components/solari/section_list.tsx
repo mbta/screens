@@ -12,6 +12,35 @@ const totalRows = (sections) => {
   }, 0);
 };
 
+const arraySum = (arr) => arr.reduce((acc, n) => acc + n, 0);
+
+const minBy = (arr, fn) => {
+  const min = arr.reduce(
+    ({ elt, value }, newElt) => {
+      const newValue = fn.call(null, newElt);
+      if (newValue < value) {
+        return { elt: newElt, value: newValue };
+      } else {
+        return { elt, value };
+      }
+    },
+    { elt: null, value: Number.MAX_SAFE_INTEGER }
+  );
+
+  return min.elt;
+};
+
+const allRoundings = (arr) => {
+  return arr.reduce(
+    (list, elt) => {
+      const floors = list.map((l) => l.concat([Math.floor(elt)]));
+      const ceils = list.map((l) => l.concat([Math.ceil(elt)]));
+      return floors.concat(ceils);
+    },
+    [[]]
+  );
+};
+
 const assignSectionSizes = (sections, numRows) => {
   const initialSizes = sections.map((section) => {
     if (section.paging && section.paging.is_enabled === true) {
@@ -21,13 +50,21 @@ const assignSectionSizes = (sections, numRows) => {
     }
   }, []);
 
-  const initialRows = initialSizes.reduce((a, b) => a + b, 0);
-  // const scaledSizes = initialSizes.map(n => (n * numRows / initialRows));
-  const scaledSizes = initialSizes.map((n) =>
-    Math.round((n * numRows) / initialRows)
-  );
+  const initialRows = arraySum(initialSizes);
+  const scaledSizes = initialSizes.map((n) => (n * numRows) / initialRows);
 
-  return scaledSizes;
+  // Choose "best" rounding
+  const allSizeCombinations = allRoundings(scaledSizes);
+  const validSizeCombinations = allSizeCombinations.filter(
+    (comb) => arraySum(comb) === numRows
+  );
+  const roundedSizes = minBy(validSizeCombinations, (comb) => {
+    return arraySum(
+      comb.map((rounded, i) => Math.abs(rounded - scaledSizes[i]))
+    );
+  });
+
+  return roundedSizes;
 };
 
 const SectionList = ({
