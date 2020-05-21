@@ -12,6 +12,7 @@ defmodule Screens.Departures.Departure do
             direction_id: nil,
             vehicle_status: nil,
             alerts: [],
+            stop_type: nil,
             time: nil,
             inline_badges: nil
 
@@ -24,6 +25,7 @@ defmodule Screens.Departures.Departure do
           direction_id: 0 | 1 | nil,
           vehicle_status: String.t(),
           alerts: list(:delay | :snow_route | :last_trip),
+          stop_type: :first_stop | :last_stop | :mid_route_stop,
           time: DateTime.t(),
           inline_badges: list(map())
         }
@@ -155,6 +157,7 @@ defmodule Screens.Departures.Departure do
       route: route_short_name,
       route_id: route_id,
       time: DateTime.to_iso8601(time),
+      stop_type: stop_type(arrival_time, departure_time),
       inline_badges: []
     }
 
@@ -189,6 +192,14 @@ defmodule Screens.Departures.Departure do
       {nil, t} -> t
       {_, nil} -> nil
       {t, _} -> t
+    end
+  end
+
+  def stop_type(arrival_time, departure_time) do
+    case {arrival_time, departure_time} do
+      {nil, _} -> :first_stop
+      {_, nil} -> :last_stop
+      {_, _} -> :mid_route_stop
     end
   end
 
