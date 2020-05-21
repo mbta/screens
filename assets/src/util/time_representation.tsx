@@ -11,7 +11,8 @@ export type TimeRepresentation =
 export const standardTimeRepresentation = (
   departureTimeString: string,
   currentTimeString: string,
-  vehicleStatus: string
+  vehicleStatus: string,
+  stopType: string
 ): TimeRepresentation => {
   const departureTime = moment(departureTimeString);
   const currentTime = moment(currentTimeString);
@@ -23,6 +24,9 @@ export const standardTimeRepresentation = (
   }
 
   if (secondDifference <= 30) {
+    if (stopType === "first_stop") {
+      return { type: "TEXT", text: "BRD" };
+    }
     return { type: "TEXT", text: "ARR" };
   }
 

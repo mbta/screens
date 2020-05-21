@@ -44,6 +44,7 @@ const Departure = ({
   time,
   currentTimeString,
   vehicleStatus,
+  stopType,
   alerts,
 }): JSX.Element => {
   const { routeName, routePillColor } = routeToPill(route, routeId);
@@ -61,7 +62,8 @@ const Departure = ({
           time={standardTimeRepresentation(
             time,
             currentTimeString,
-            vehicleStatus
+            vehicleStatus,
+            stopType
           )}
         />
       </div>

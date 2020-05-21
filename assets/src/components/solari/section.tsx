@@ -79,6 +79,7 @@ class PagedSection extends React.Component {
                 route_id: routeId,
                 vehicle_status: vehicleStatus,
                 alerts: alerts,
+                stop_type: stopType,
               }) => {
                 return (
                   <Departure
@@ -89,6 +90,7 @@ class PagedSection extends React.Component {
                     currentTimeString={this.props.currentTimeString}
                     vehicleStatus={vehicleStatus}
                     alerts={alerts}
+                    stopType={stopType}
                     key={id}
                   />
                 );
@@ -108,6 +110,7 @@ class PagedSection extends React.Component {
                 currentTimeString={this.props.currentTimeString}
                 vehicleStatus={currentPagedDeparture.vehicle_status}
                 alerts={currentPagedDeparture.alerts}
+                stopType={currentPagedDeparture.stopType}
               />
             </>
           )}
@@ -141,6 +144,7 @@ const Section = ({
               route_id: routeId,
               vehicle_status: vehicleStatus,
               alerts,
+              stop_type: stopType,
             }) => {
               return (
                 <Departure
@@ -151,6 +155,7 @@ const Section = ({
                   currentTimeString={currentTimeString}
                   vehicleStatus={vehicleStatus}
                   alerts={alerts}
+                  stopType={stopType}
                   key={id}
                 />
               );
