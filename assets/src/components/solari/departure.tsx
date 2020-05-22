@@ -48,9 +48,10 @@ const Departure = ({
   alerts,
 }): JSX.Element => {
   const { routeName, routePillColor } = routeToPill(route, routeId);
+  const via = destination.includes(" via ") ? "with-via" : "no-via";
 
   return (
-    <div className="departure">
+    <div className={classWithModifier("departure", via)}>
       <div className={classWithModifier("departure-route", routePillColor)}>
         <BaseRoutePill route={routeName} />
       </div>
