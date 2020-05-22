@@ -70,7 +70,7 @@ const PagedDeparture = ({
         time={currentPagedDeparture.time}
         currentTimeString={currentTimeString}
         vehicleStatus={currentPagedDeparture.vehicle_status}
-        alerts={currentPagedDeparture.alerts}
+        alerts={[] /* don't show alerts in the scrolling row */}
         stopType={currentPagedDeparture.stopType}
       />
     </div>
