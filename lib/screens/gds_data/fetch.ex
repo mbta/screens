@@ -206,6 +206,7 @@ defmodule Screens.GdsData.Fetch do
         devices_data
         |> Map.get(sn)
         |> Map.put(:ping_count, ping_count)
+        |> Map.put(:screen_sn, sn)
       end)
 
     {:ok, merged_data}
