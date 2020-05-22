@@ -40,6 +40,12 @@ defmodule ScreensWeb.Router do
     get "/:id", ScreenApiController, :show
   end
 
+  scope "/api/audio", ScreensWeb do
+    pipe_through [:redirect_prod_http, :api, :browser]
+
+    get "/:id", ScreenApiController, :audio
+  end
+
   scope "/alert_priority", ScreensWeb do
     pipe_through [:redirect_prod_http, :api, :browser]
 

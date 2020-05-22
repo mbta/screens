@@ -65,8 +65,10 @@ defmodule Screens.MixProject do
       {:credo, "~> 1.4.0", only: [:dev, :test]},
       {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.12.3", only: :test},
-      {:ex_aws, "~> 2.1", only: :prod},
+      {:ex_aws, "~> 2.0"},
       {:ex_aws_secretsmanager, "~> 2.0", only: :prod},
+      {:ex_aws_polly, "~> 0.3.1"},
+      {:poison, "~> 3.0"},
       {:ehmon, github: "mbta/ehmon", only: :prod},
       {:sweet_xml, "~> 0.6.6"},
       {:timex, "~> 3.6"}
