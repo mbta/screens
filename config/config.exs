@@ -209,8 +209,10 @@ config :screens,
         %{
           name: "Bus",
           arrow: nil,
-          query: %{params: %{stop_ids: ["72", "1060", "1123"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}}
+          query: %{params: %{stop_ids: ["72", "102", "1060", "1123"]}, opts: %{}},
+          layout:
+            {:upcoming,
+             %{num_rows: 12, visible_rows: 8, paged: true, routes: {:exclude, [{"70", 1}]}}}
         }
       ],
       app_id: "solari"
