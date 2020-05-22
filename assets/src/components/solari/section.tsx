@@ -3,7 +3,7 @@ import React from "react";
 import Departure from "Components/solari/departure";
 import Arrow from "Components/solari/arrow";
 
-import { classWithModifier } from "Util/util";
+import { classWithModifiers } from "Util/util";
 
 const SectionHeader = ({ name, arrow }): JSX.Element => {
   return (
@@ -19,9 +19,17 @@ const SectionHeader = ({ name, arrow }): JSX.Element => {
 };
 
 const RoutePill = ({ route, selected }): JSX.Element => {
-  const modifier = selected ? "selected" : "unselected";
-  const pillClass = classWithModifier("later-departure__route-pill", modifier);
-  const textClass = classWithModifier("later-departure__route-text", modifier);
+  const selectedModifier = selected ? "selected" : "unselected";
+  const slashModifier = route.includes("/") ? "with-slash" : "no-slash";
+  const modifiers = [selectedModifier, slashModifier];
+  const pillClass = classWithModifiers(
+    "later-departure__route-pill",
+    modifiers
+  );
+  const textClass = classWithModifiers(
+    "later-departure__route-text",
+    modifiers
+  );
 
   return (
     <div className={pillClass}>

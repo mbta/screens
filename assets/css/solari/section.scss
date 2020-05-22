@@ -107,11 +107,22 @@
     height: 40px;
     width: 83px;
   }
+
+  &--with-slash {
+    top: -4.5px;
+  }
 }
 
 .later-departure__route-text {
   @include font--text--75bold;
-  font-size: 34px;
+
+  &--with-slash {
+    font-size: 24px;
+  }
+
+  &--no-slash {
+    font-size: 36px;
+  }
 
   &--selected {
     line-height: 46px;
