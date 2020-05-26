@@ -426,6 +426,50 @@ config :screens,
       ],
       app_id: "solari"
     },
+    "313" => %{
+      station_name: "10 Park Plaza",
+      show_section_headers: true,
+      sections: [
+        %{
+          name: "Commuter Rail (South Station)",
+          arrow: :w,
+          query: %{params: %{stop_id: "South Station"}, opts: %{include_schedules: true}},
+          layout: {:upcoming, %{num_rows: 7, visible_rows: 3, paged: true}}
+        },
+        %{
+          name: "Tufts Medical Center",
+          arrow: :nw,
+          query: %{params: %{stop_ids: ["70016", "70017", "49002", "6565"]}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 5}}
+        },
+        %{
+          name: "Bus",
+          arrow: :e,
+          query: %{params: %{stop_id: "9983"}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 1}}
+        }
+      ],
+      app_id: "solari"
+    },
+    "314" => %{
+      station_name: "10 Park Plaza",
+      show_section_headers: true,
+      sections: [
+        %{
+          name: "Commuter Rail (Back Bay)",
+          arrow: :nw,
+          query: %{params: %{stop_id: "Back Bay"}, opts: %{include_schedules: true}},
+          layout: {:upcoming, %{num_rows: 9, visible_rows: 5, paged: true}}
+        },
+        %{
+          name: "Bus",
+          arrow: nil,
+          query: %{params: %{stop_ids: ["145", "9983"]}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 5}}
+        }
+      ],
+      app_id: "solari"
+    },
     "320" => %{
       station_name: "Summer Street",
       show_section_headers: true,
