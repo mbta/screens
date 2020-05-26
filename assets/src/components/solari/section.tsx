@@ -3,6 +3,8 @@ import React from "react";
 import Departure from "Components/solari/departure";
 import Arrow from "Components/solari/arrow";
 
+import { classWithModifiers } from "Util/util";
+
 const SectionHeader = ({ name, arrow }): JSX.Element => {
   return (
     <div className="section-header">
@@ -12,6 +14,65 @@ const SectionHeader = ({ name, arrow }): JSX.Element => {
           <Arrow direction={arrow} className="section-header__arrow-image" />
         )}
       </span>
+    </div>
+  );
+};
+
+const RoutePill = ({ route, selected }): JSX.Element => {
+  const selectedModifier = selected ? "selected" : "unselected";
+  const slashModifier = route.includes("/") ? "with-slash" : "no-slash";
+  const modifiers = [selectedModifier, slashModifier];
+  const pillClass = classWithModifiers(
+    "later-departure__route-pill",
+    modifiers
+  );
+  const textClass = classWithModifiers(
+    "later-departure__route-text",
+    modifiers
+  );
+
+  return (
+    <div className={pillClass}>
+      <div className={textClass}>{route}</div>
+    </div>
+  );
+};
+
+const PagedDeparture = ({
+  departures,
+  currentPageNumber,
+  currentTimeString,
+}): JSX.Element => {
+  const currentPagedDeparture = departures[currentPageNumber];
+
+  if (!currentPagedDeparture) {
+    return null;
+  }
+
+  return (
+    <div className="later-departure">
+      <div className="later-departure__header">
+        <div className="later-departure__header-title">Later Departures</div>
+        <div className="later-departure__header-route-list">
+          {departures.map((departure, i) => (
+            <RoutePill
+              route={departure.route}
+              selected={i === currentPageNumber}
+              key={departure.id}
+            />
+          ))}
+        </div>
+      </div>
+      <Departure
+        route={currentPagedDeparture.route}
+        routeId={currentPagedDeparture.route_id}
+        destination={currentPagedDeparture.destination}
+        time={currentPagedDeparture.time}
+        currentTimeString={currentTimeString}
+        vehicleStatus={currentPagedDeparture.vehicle_status}
+        alerts={[] /* don't show alerts in the scrolling row */}
+        stopType={currentPagedDeparture.stopType}
+      />
     </div>
   );
 };
@@ -59,61 +120,62 @@ class PagedSection extends React.Component {
     }
   }
 
-  render() {
-    const currentPagedDeparture = this.props.departures[this.state.index];
+  pagedRoutes() {
+    return this.pagedDepartures().map(({ route }) => route);
+  }
 
+  pagedDepartures() {
+    const startIndex = this.props.numRows - 1;
+    const pageCount = this.pageCount(this.props);
+    return this.props.departures.slice(startIndex, startIndex + pageCount);
+  }
+
+  currentPageNumber() {
+    return this.state.index - (this.props.numRows - 1);
+  }
+
+  render() {
+    const staticDepartures = this.props.departures.slice(
+      0,
+      this.props.numRows - 1
+    );
     return (
       <div className="section">
         {this.props.showSectionHeaders && (
           <SectionHeader name={this.props.name} arrow={this.props.arrow} />
         )}
         <div className="departure-container">
-          {this.props.departures
-            .slice(0, this.props.numRows - 1)
-            .map(
-              ({
-                id,
-                route,
-                destination,
-                time,
-                route_id: routeId,
-                vehicle_status: vehicleStatus,
-                alerts: alerts,
-                stop_type: stopType,
-              }) => {
-                return (
-                  <Departure
-                    route={route}
-                    routeId={routeId}
-                    destination={destination}
-                    time={time}
-                    currentTimeString={this.props.currentTimeString}
-                    vehicleStatus={vehicleStatus}
-                    alerts={alerts}
-                    stopType={stopType}
-                    key={id}
-                  />
-                );
-              }
-            )}
-
-          {currentPagedDeparture && (
-            <>
-              <div className="section__later-departure-header">
-                Later Departures from {this.props.name}
-              </div>
-              <Departure
-                route={currentPagedDeparture.route}
-                routeId={currentPagedDeparture.route_id}
-                destination={currentPagedDeparture.destination}
-                time={currentPagedDeparture.time}
-                currentTimeString={this.props.currentTimeString}
-                vehicleStatus={currentPagedDeparture.vehicle_status}
-                alerts={currentPagedDeparture.alerts}
-                stopType={currentPagedDeparture.stopType}
-              />
-            </>
+          {staticDepartures.map(
+            ({
+              id,
+              route,
+              destination,
+              time,
+              route_id: routeId,
+              vehicle_status: vehicleStatus,
+              alerts: alerts,
+              stop_type: stopType,
+            }) => {
+              return (
+                <Departure
+                  route={route}
+                  routeId={routeId}
+                  destination={destination}
+                  time={time}
+                  currentTimeString={this.props.currentTimeString}
+                  vehicleStatus={vehicleStatus}
+                  alerts={alerts}
+                  stopType={stopType}
+                  key={id}
+                />
+              );
+            }
           )}
+          <PagedDeparture
+            departures={this.pagedDepartures()}
+            currentPageNumber={this.currentPageNumber()}
+            currentTimeString={this.props.currentTimeString}
+          />
         </div>
       </div>
     );

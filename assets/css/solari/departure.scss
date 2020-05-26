@@ -3,13 +3,21 @@
 }
 
 .departure {
-  padding-top: 24px;
-  padding-bottom: 24px;
   margin-left: 42px;
   margin-right: 42px;
 
   &:not(:last-child) {
     border-bottom: 3px solid rgba(199, 199, 199, 0.58);
+  }
+
+  &--with-via {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  &--no-via {
+    padding-top: 24px;
+    padding-bottom: 24px;
   }
 }
 
