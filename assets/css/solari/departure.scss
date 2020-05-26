@@ -2,13 +2,23 @@
   background-color: #f5f4f1;
 }
 
-.departure {
+.departure-group {
   margin-left: 42px;
   margin-right: 42px;
 
   &:not(:last-child) {
     border-bottom: 3px solid rgba(199, 199, 199, 0.58);
   }
+
+  .departure {
+    margin-left: 0px;
+    margin-right: 0px;
+  }
+}
+
+.departure {
+  margin-left: 42px;
+  margin-right: 42px;
 
   &--with-via {
     padding-top: 14px;

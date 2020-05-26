@@ -10,6 +10,10 @@ import InlineAlertBadge from "Components/solari/inline_alert_badge";
 import { classWithModifier } from "Util/util";
 
 const routeToPill = (route, routeId) => {
+  if (route === null) {
+    return { routeName: null, routePillColor: null };
+  }
+
   if (routeId === "Blue") {
     return { routeName: "BL", routePillColor: "blue" };
   }
@@ -48,15 +52,16 @@ const Departure = ({
   alerts,
 }): JSX.Element => {
   const { routeName, routePillColor } = routeToPill(route, routeId);
-  const via = destination.includes(" via ") ? "with-via" : "no-via";
+  const via =
+    destination && destination.includes(" via ") ? "with-via" : "no-via";
 
   return (
     <div className={classWithModifier("departure", via)}>
       <div className={classWithModifier("departure-route", routePillColor)}>
-        <BaseRoutePill route={routeName} />
+        {routeName && <BaseRoutePill route={routeName} />}
       </div>
       <div className="departure-destination">
-        <BaseDepartureDestination destination={destination} />
+        {destination && <BaseDepartureDestination destination={destination} />}
       </div>
       <div className="departure-time">
         <BaseDepartureTime
