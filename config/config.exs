@@ -390,7 +390,8 @@ config :screens,
             params: %{stop_ids: ["29001", "29002", "29003", "29004", "29005", "29006"]},
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 9, visible_rows: 5, paged: true}}
+          layout:
+            {:upcoming, %{num_rows: 9, visible_rows: 5, paged: true, routes: {:exclude, ["90"]}}}
         },
         %{
           name: "Lower Busway",
