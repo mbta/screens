@@ -86,6 +86,7 @@ defmodule Screens.SolariScreenData do
   defp do_layout(query_data, {:upcoming, %{num_rows: num_rows} = layout_opts}) do
     query_data
     |> filter_by_routes(layout_opts)
+    |> filter_by_minutes(layout_opts)
     |> Enum.take(num_rows)
     |> Enum.map(&Map.from_struct/1)
   end
@@ -98,6 +99,17 @@ defmodule Screens.SolariScreenData do
     |> Enum.sort_by(& &1.time)
     |> Enum.map(&Map.from_struct/1)
   end
+
+  defp filter_by_minutes(query_data, %{max_minutes: max_minutes}) do
+    max_departure_time = DateTime.add(DateTime.utc_now(), 60 * max_minutes)
+
+    Enum.reject(query_data, fn %{time: time_str} ->
+      {:ok, departure_time, _} = DateTime.from_iso8601(time_str)
+      DateTime.compare(departure_time, max_departure_time) == :gt
+    end)
+  end
+
+  defp filter_by_minutes(query_data, _), do: query_data
 
   defp filter_by_routes(query_data, %{routes: {action, routes}}) do
     route_matchers = routes |> Enum.flat_map(&route_direction_tuple/1) |> MapSet.new()

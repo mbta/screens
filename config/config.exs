@@ -434,7 +434,7 @@ config :screens,
           name: "Commuter Rail (South Station)",
           arrow: :w,
           query: %{params: %{stop_id: "South Station"}, opts: %{include_schedules: true}},
-          layout: {:upcoming, %{num_rows: 7, visible_rows: 3, paged: true}}
+          layout: {:upcoming, %{num_rows: 7, visible_rows: 3, paged: true, max_minutes: 60}}
         },
         %{
           name: "Tufts Medical Center",
@@ -459,7 +459,7 @@ config :screens,
           name: "Commuter Rail (Back Bay)",
           arrow: :nw,
           query: %{params: %{stop_id: "Back Bay"}, opts: %{include_schedules: true}},
-          layout: {:upcoming, %{num_rows: 9, visible_rows: 5, paged: true}}
+          layout: {:upcoming, %{num_rows: 9, visible_rows: 5, paged: true, max_minutes: 60}}
         },
         %{
           name: "Bus",
