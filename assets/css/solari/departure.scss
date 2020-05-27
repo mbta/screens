@@ -5,42 +5,26 @@
 .departure-group {
   margin-left: 42px;
   margin-right: 42px;
+  padding-bottom: 10px;
+  padding-top: 10px;
 
   &:not(:last-child) {
     border-bottom: 3px solid rgba(199, 199, 199, 0.58);
   }
-
-  .departure {
-    margin-left: 0px;
-    margin-right: 0px;
-
-    &--with-via {
-      padding-top: 3.5px;
-      padding-bottom: 3.5px;
-    }
-
-    &--no-via {
-      padding-top: 14px;
-      padding-bottom: 14px;
-    }
-  }
-
-  padding-bottom: 10px;
-  padding-top: 10px;
 }
 
 .departure {
-  margin-left: 42px;
-  margin-right: 42px;
+  margin-left: 0px;
+  margin-right: 0px;
 
   &--with-via {
-    padding-top: 13.5px;
-    padding-bottom: 13.5px;
+    padding-top: 3.5px;
+    padding-bottom: 3.5px;
   }
 
   &--no-via {
-    padding-top: 24px;
-    padding-bottom: 24px;
+    padding-top: 14px;
+    padding-bottom: 14px;
   }
 }
 

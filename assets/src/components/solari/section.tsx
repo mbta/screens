@@ -119,6 +119,9 @@ const PagedDeparture = ({
     return null;
   }
 
+  // Don't show alert badges in the paging row
+  currentPagedDeparture.alerts = [];
+
   return (
     <div className="later-departure">
       <div className="later-departure__header">
@@ -133,15 +136,9 @@ const PagedDeparture = ({
           ))}
         </div>
       </div>
-      <Departure
-        route={currentPagedDeparture.route}
-        routeId={currentPagedDeparture.route_id}
-        destination={currentPagedDeparture.destination}
-        time={currentPagedDeparture.time}
+      <DepartureGroup
+        departures={[currentPagedDeparture]}
         currentTimeString={currentTimeString}
-        vehicleStatus={currentPagedDeparture.vehicle_status}
-        alerts={[] /* don't show alerts in the scrolling row */}
-        stopType={currentPagedDeparture.stopType}
       />
     </div>
   );
