@@ -330,7 +330,14 @@ config :screens,
           name: "Busway",
           arrow: :se,
           query: %{params: %{stop_id: "8310"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 11, visible_rows: 7, paged: true}}
+          layout:
+            {:upcoming,
+             %{
+               num_rows: 11,
+               visible_rows: 7,
+               paged: true,
+               routes: {:exclude, [{"92", 1}, {"93", 1}]}
+             }}
         },
         %{
           name: "Congress St @ Haymarket Sta",
