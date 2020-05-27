@@ -113,7 +113,7 @@ const PagedDeparture = ({
   currentPageNumber,
   currentTimeString,
 }): JSX.Element => {
-  if (currentPageNumber > departures.length) {
+  if (currentPageNumber >= departures.length) {
     return null;
   }
 
