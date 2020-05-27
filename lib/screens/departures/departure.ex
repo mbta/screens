@@ -96,6 +96,7 @@ defmodule Screens.Departures.Departure do
     predicted_trip_ids =
       predictions
       |> Enum.reject(&is_nil(&1.trip))
+      |> Enum.reject(&is_nil(&1.departure_time))
       |> Enum.map(& &1.trip.id)
       |> Enum.into(MapSet.new())
 
