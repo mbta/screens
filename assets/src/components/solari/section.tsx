@@ -113,14 +113,15 @@ const PagedDeparture = ({
   currentPageNumber,
   currentTimeString,
 }): JSX.Element => {
-  const currentPagedDeparture = departures[currentPageNumber];
-
-  if (!currentPagedDeparture) {
+  if (currentPageNumber > departures.length) {
     return null;
   }
 
   // Don't show alert badges in the paging row
-  currentPagedDeparture.alerts = [];
+  const currentPagedDeparture = {
+    ...departures[currentPageNumber],
+    alerts: [],
+  };
 
   return (
     <div className="later-departure">
