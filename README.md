@@ -23,7 +23,7 @@
    export AWS_SECRET_ACCESS_KEY="<secret key>"
    ```
 
-   You can put this in `priv/local-env.sh` if you like, and it will be ignored by git. Wherever you put the keys, make sure to `source` them before running the local server.
+   You can put this in `priv/local.env` if you like, and it will be ignored by git. Wherever you put the keys, make sure to `source` them before running the local server.
 
 1. Sign up for a [V3 API key](https://api-v3.mbta.com/)
 1. Start Phoenix endpoint with `API_V3_KEY=<your-key-here> mix phx.server`
