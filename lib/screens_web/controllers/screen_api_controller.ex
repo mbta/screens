@@ -31,7 +31,7 @@ defmodule ScreensWeb.ScreenApiController do
 
     {:ok, %{body: audio_data}} =
       text
-      |> ExAws.Polly.synthesize_speech()
+      |> ExAws.Polly.synthesize_speech(lexicon_names: ["mbtalexicon"])
       |> ExAws.request()
 
     send_download(conn, {:binary, audio_data},
