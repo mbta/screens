@@ -22,6 +22,9 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Use Jason for JSON parsing in ExAws
+config :ex_aws, json_codec: Jason
+
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :screens, :redirect_http?, true
