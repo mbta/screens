@@ -87,17 +87,25 @@ defmodule Screens.SolariScreenData do
     query_data
     |> filter_by_routes(layout_opts)
     |> filter_by_minutes(layout_opts)
+    |> Enum.sort_by(& &1.time)
     |> Enum.take(num_rows)
     |> Enum.map(&Map.from_struct/1)
   end
 
-  defp do_layout(query_data, :bidirectional) do
+  defp do_layout(query_data, {:bidirectional, layout_opts}) do
     query_data
+    |> filter_by_routes(layout_opts)
+    |> filter_by_minutes(layout_opts)
+    |> Enum.sort_by(& &1.time)
     |> Enum.split_with(fn %{direction_id: direction_id} -> direction_id == 0 end)
     |> Tuple.to_list()
     |> Enum.flat_map(&Enum.slice(&1, 0, 1))
     |> Enum.sort_by(& &1.time)
     |> Enum.map(&Map.from_struct/1)
+  end
+
+  defp do_layout(query_data, :bidirectional) do
+    do_layout(query_data, {:bidirectional, %{}})
   end
 
   defp filter_by_minutes(query_data, %{max_minutes: max_minutes}) do
