@@ -148,15 +148,15 @@ const PagedDeparture = ({
 class PagedSection extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { index: props.numRows - 1 };
+    this.state = { currentPageNumber: 0 };
     this.MAX_PAGE_COUNT = 5;
   }
 
   componentDidMount() {
-    this.interval = setInterval(
-      this.updatePaging.bind(this),
-      this.pageDuration()
-    );
+    const refreshMs = this.pageDuration();
+    if (refreshMs !== null) {
+      this.interval = setInterval(this.updatePaging.bind(this), refreshMs);
+    }
   }
 
   componentWillUnmount() {
@@ -167,20 +167,20 @@ class PagedSection extends React.Component {
 
   updatePaging() {
     this.setState((state, props) => {
-      const maxIndex = this.pageCount(props) + props.numRows - 2;
-      return { index: Math.min(maxIndex, state.index + 1) };
+      const numPages = this.pageCount(props);
+      if (numPages === 0) {
+        return { currentPageNumber: 0 };
+      } else {
+        return { currentPageNumber: (state.currentPageNumber + 1) % numPages };
+      }
     });
-  }
-
-  pageCount(props) {
-    const excessDepartures = props.departures.length - props.numRows + 1;
-    return Math.min(excessDepartures, this.MAX_PAGE_COUNT);
   }
 
   pageDuration() {
     const numPages = this.pageCount(this.props);
     if (numPages <= 1) {
-      return 15000;
+      // Don't set an interval if there are 0 or 1 pages
+      return null;
     } else if (numPages === 2) {
       return 3750;
     } else {
@@ -198,8 +198,9 @@ class PagedSection extends React.Component {
     return this.props.departures.slice(startIndex, startIndex + pageCount);
   }
 
-  currentPageNumber() {
-    return this.state.index - (this.props.numRows - 1);
+  pageCount(props) {
+    const excessDepartures = props.departures.length - props.numRows + 1;
+    return Math.min(excessDepartures, this.MAX_PAGE_COUNT);
   }
 
   render() {
@@ -207,7 +208,6 @@ class PagedSection extends React.Component {
       0,
       this.props.numRows - 1
     );
-
     const staticDepartureGroups = buildDepartureGroups(staticDepartures);
 
     return (
@@ -225,7 +225,7 @@ class PagedSection extends React.Component {
           ))}
           <PagedDeparture
             departures={this.pagedDepartures()}
-            currentPageNumber={this.currentPageNumber()}
+            currentPageNumber={this.state.currentPageNumber}
             currentTimeString={this.props.currentTimeString}
           />
         </div>
