@@ -212,7 +212,7 @@ class PagedSection extends React.Component {
 
     return (
       <div className="section">
-        {this.props.showSectionHeaders && (
+        {this.props.showSectionHeaders && this.props.name !== null && (
           <SectionHeader name={this.props.name} arrow={this.props.arrow} />
         )}
         <div className="departure-container">
@@ -248,7 +248,9 @@ const Section = ({
 
   return (
     <div className="section">
-      {showSectionHeaders && <SectionHeader name={name} arrow={arrow} />}
+      {showSectionHeaders && name !== null && (
+        <SectionHeader name={name} arrow={arrow} />
+      )}
       <div className="departure-container">
         {departureGroups.map((group) => (
           <DepartureGroup

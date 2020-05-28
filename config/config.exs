@@ -446,8 +446,14 @@ config :screens,
         %{
           name: "Tufts Medical Center",
           arrow: :nw,
-          query: %{params: %{stop_ids: ["70016", "70017", "49002", "6565"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 5, routes: {:exclude, ["11"]}}}
+          query: %{params: %{stop_ids: ["70016", "70017"]}, opts: %{}},
+          layout: :bidirectional
+        },
+        %{
+          name: nil,
+          arrow: nil,
+          query: %{params: %{stop_ids: ["49002", "6565"]}, opts: %{}},
+          layout: {:bidirectional, %{routes: {:exclude, ["11"]}}}
         },
         %{
           name: "Bus",
