@@ -19,8 +19,11 @@ defmodule ScreensWeb.ScreenApiController do
     json(conn, data)
   end
 
-  def audio(conn, %{"id" => screen_id, "version" => version, "accent" => accent}) do
-    lexicon = if accent == "boston", do: "bostonlexicon", else: "mbtalexicon"
+  def audio(conn, %{"id" => screen_id, "version" => version} = params) do
+    lexicon =
+      if Map.get(params, "accent", "standard") == "boston",
+        do: "bostonlexicon",
+        else: "mbtalexicon"
 
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
 
