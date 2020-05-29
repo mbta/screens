@@ -24,7 +24,7 @@ const allRoundings = (arr) => {
   );
 };
 
-const assignSectionSizes = (sections, numRows): Array<Number> => {
+const assignSectionSizes = (sections, numRows): number[] => {
   // split empty and non-empty sections into two arrays, keeping track of their original indices
   const [indexedEmpties, indexedNonEmpties] = sections.reduce(
     ([empties, nonEmpties], section, i) => [
@@ -40,7 +40,7 @@ const assignSectionSizes = (sections, numRows): Array<Number> => {
   const indexedAssignedEmpties = indexedEmpties.map(([i]) => [i, 1]);
 
   // get the non-empty sections, assign sizes to them, and then rejoin them with their original indices
-  let indexedAssignedNonEmpties: Array<[Number, Number]> = [];
+  let indexedAssignedNonEmpties: [number, number][] = [];
   if (indexedNonEmpties.length > 0) {
     const [nonEmptyIndices, nonEmpties] = _.unzip(indexedNonEmpties);
     const assignedNonEmpties = assignSectionSizesImpl(
@@ -56,7 +56,7 @@ const assignSectionSizes = (sections, numRows): Array<Number> => {
     .map(([_i, v]) => v);
 };
 
-const assignSectionSizesImpl = (sections, numRows): Array<Number> => {
+const assignSectionSizesImpl = (sections, numRows): number[] => {
   const initialSizes = sections.map((section) => {
     if (section?.paging?.is_enabled) {
       return section.paging.visible_rows;
