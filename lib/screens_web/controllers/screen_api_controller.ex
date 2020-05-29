@@ -20,18 +20,37 @@ defmodule ScreensWeb.ScreenApiController do
   end
 
   def audio(conn, %{"id" => screen_id, "version" => version} = params) do
+    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
+
+    _ = Screens.LogScreenData.log_data_request(screen_id, version, is_screen)
+
+    data =
+      Screens.ScreenData.by_screen_id_with_override_and_version(screen_id, version, is_screen)
+
+    # * * * * * * * * * *
+
     lexicon =
       if Map.get(params, "accent", "standard") == "boston",
         do: "bostonlexicon",
         else: "mbtalexicon"
 
-    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
+    audio_data = api_response_to_audio(data, lexicon)
 
-    # _ = Screens.LogScreenData.log_data_request(screen_id, version, is_screen)
+    send_download(conn, {:binary, audio_data},
+      filename: "poly_sample.mp3",
+      content_type: "audio/mpeg",
+      disposition: :inline
+    )
+  end
 
-    %{station_name: station_name, sections: sections, current_time: current_time} =
-      Screens.ScreenData.by_screen_id_with_override_and_version(screen_id, version, is_screen)
-
+  defp api_response_to_audio(
+         %{
+           station_name: station_name,
+           sections: sections,
+           current_time: current_time
+         },
+         lexicon
+       ) do
     text =
       "<speak>Upcoming trips at #{station_name}: #{speak_sections(sections, current_time)}.</speak>"
 
@@ -40,11 +59,7 @@ defmodule ScreensWeb.ScreenApiController do
       |> ExAws.Polly.synthesize_speech(lexicon_names: [lexicon], text_type: "ssml")
       |> ExAws.request()
 
-    send_download(conn, {:binary, audio_data},
-      filename: "poly_sample.mp3",
-      content_type: "audio/mpeg",
-      disposition: :inline
-    )
+    audio_data
   end
 
   defp speak_sections(sections, current_time) do
