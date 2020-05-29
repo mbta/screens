@@ -43,3 +43,6 @@ npm-debug.log
 
 # Ignore the directory created by the ElixirLS VSCode plugin
 .elixir_ls/
+
+# Detritus left behind by macOS Finder
+.DS_Store
