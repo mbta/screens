@@ -64,7 +64,7 @@ defmodule Screens.MixProject do
       {:tzdata, "~> 1.0.3"},
       {:credo, "~> 1.4.0", only: [:dev, :test]},
       {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.12.3", only: :test},
+      {:excoveralls, "~> 0.13.0", only: :test},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_secretsmanager, "~> 2.0", only: :prod},
       {:ex_aws_polly, github: "jzimbel-mbta/ex_aws_polly"},
