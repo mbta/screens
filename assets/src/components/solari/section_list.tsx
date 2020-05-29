@@ -1,4 +1,5 @@
 import React, { useRef, useState, useLayoutEffect } from "react";
+import _ from "lodash";
 
 import { PagedSection, Section } from "Components/solari/section";
 
@@ -12,24 +13,6 @@ const totalRows = (sections) => {
   }, 0);
 };
 
-const arraySum = (arr) => arr.reduce((acc, n) => acc + n, 0);
-
-const minBy = (arr, fn) => {
-  const min = arr.reduce(
-    ({ elt, value }, newElt) => {
-      const newValue = fn(newElt);
-      if (newValue < value) {
-        return { elt: newElt, value: newValue };
-      } else {
-        return { elt, value };
-      }
-    },
-    { elt: null, value: Number.MAX_SAFE_INTEGER }
-  );
-
-  return min.elt;
-};
-
 const allRoundings = (arr) => {
   return arr.reduce(
     (list, elt) => {
@@ -41,7 +24,39 @@ const allRoundings = (arr) => {
   );
 };
 
-const assignSectionSizes = (sections, numRows) => {
+const assignSectionSizes = (sections, numRows): Array<Number> => {
+  // split empty and non-empty sections into two arrays, keeping track of their original indices
+  const [indexedEmpties, indexedNonEmpties] = sections.reduce(
+    ([empties, nonEmpties], section, i) => [
+      section.departures.length === 0 ? [...empties, [i, section]] : empties,
+      section.departures.length > 0
+        ? [...nonEmpties, [i, section]]
+        : nonEmpties,
+    ],
+    [[], []]
+  );
+
+  // set the sizes for all empty sections to 1, to accomodate the "no departures" placeholder message
+  const indexedAssignedEmpties = indexedEmpties.map(([i]) => [i, 1]);
+
+  // get the non-empty sections, assign sizes to them, and then rejoin them with their original indices
+  let indexedAssignedNonEmpties: Array<[Number, Number]> = [];
+  if (indexedNonEmpties.length > 0) {
+    const [nonEmptyIndices, nonEmpties] = _.unzip(indexedNonEmpties);
+    const assignedNonEmpties = assignSectionSizesImpl(
+      nonEmpties,
+      numRows - indexedEmpties.length
+    );
+    indexedAssignedNonEmpties = _.zip(nonEmptyIndices, assignedNonEmpties);
+  }
+
+  // combine the arrays, restore the original order of elements, and drop the indices
+  return [...indexedAssignedEmpties, ...indexedAssignedNonEmpties]
+    .sort(([i1], [i2]) => i1 - i2)
+    .map(([_i, v]) => v);
+};
+
+const assignSectionSizesImpl = (sections, numRows): Array<Number> => {
   const initialSizes = sections.map((section) => {
     if (section?.paging?.is_enabled) {
       return section.paging.visible_rows;
@@ -50,18 +65,16 @@ const assignSectionSizes = (sections, numRows) => {
     }
   }, []);
 
-  const initialRows = arraySum(initialSizes);
+  const initialRows = _.sum(initialSizes);
   const scaledSizes = initialSizes.map((n) => (n * numRows) / initialRows);
 
   // Choose "best" rounding
   const allSizeCombinations = allRoundings(scaledSizes);
   const validSizeCombinations = allSizeCombinations.filter(
-    (comb) => arraySum(comb) === numRows
+    (comb) => _.sum(comb) === numRows
   );
-  const roundedSizes = minBy(validSizeCombinations, (comb) => {
-    return arraySum(
-      comb.map((rounded, i) => Math.abs(rounded - scaledSizes[i]))
-    );
+  const roundedSizes = _.minBy(validSizeCombinations, (comb) => {
+    return _.sum(comb.map((rounded, i) => Math.abs(rounded - scaledSizes[i])));
   });
 
   return roundedSizes;

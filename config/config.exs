@@ -179,19 +179,22 @@ config :screens,
           name: "Busway",
           arrow: :s,
           query: %{params: %{stop_id: "334"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}}
+          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
+          pill: :bus
         },
         %{
           name: "Red Line",
           arrow: :e,
           query: %{params: %{stop_id: "70094"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 2}}
+          layout: {:upcoming, %{num_rows: 2}},
+          pill: :red
         },
         %{
           name: "Mattapan Trolley",
           arrow: :e,
           query: %{params: %{stop_id: "70261"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 1}}
+          layout: {:upcoming, %{num_rows: 1}},
+          pill: :mattapan
         }
       ],
       app_id: "solari"
@@ -204,7 +207,8 @@ config :screens,
           name: "Red Line",
           arrow: nil,
           query: %{params: %{stop_ids: ["70069", "70070"]}, opts: %{}},
-          layout: :bidirectional
+          layout: :bidirectional,
+          pill: :red
         },
         %{
           name: "Bus",
@@ -212,7 +216,8 @@ config :screens,
           query: %{params: %{stop_ids: ["72", "102", "1060", "1123"]}, opts: %{}},
           layout:
             {:upcoming,
-             %{num_rows: 14, visible_rows: 10, paged: true, routes: {:exclude, [{"70", 1}]}}}
+             %{num_rows: 14, visible_rows: 10, paged: true, routes: {:exclude, [{"70", 1}]}}},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -232,7 +237,8 @@ config :screens,
             },
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}}
+          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -255,7 +261,8 @@ config :screens,
                visible_rows: 8,
                paged: true,
                routes: {:include, [{"14", 1}, {"41", 0}, {"42", 0}, {"66", 0}]}
-             }}
+             }},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -268,13 +275,15 @@ config :screens,
           name: "Upper Busway",
           arrow: :e,
           query: %{params: %{stop_id: "10642"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}}
+          layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}},
+          pill: :bus
         },
         %{
           name: "Lower Busway",
           arrow: :n,
           query: %{params: %{stop_id: "875"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}}
+          layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -287,13 +296,15 @@ config :screens,
           name: "Upper Busway",
           arrow: :e,
           query: %{params: %{stop_id: "10642"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}}
+          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
+          pill: :bus
         },
         %{
           name: "Commuter Rail",
           arrow: :w,
           query: %{params: %{stop_id: "Forest Hills"}, opts: %{include_schedules: true}},
-          layout: :bidirectional
+          layout: :bidirectional,
+          pill: :cr
         }
       ],
       app_id: "solari"
@@ -306,7 +317,8 @@ config :screens,
           name: "Upper Busway",
           arrow: :e,
           query: %{params: %{stop_id: "20761"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}}
+          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}},
+          pill: :bus
         },
         %{
           name: "Lower Busway",
@@ -317,7 +329,8 @@ config :screens,
              %{
                num_rows: 2,
                routes: {:exclude, [{"74", 1}, {"75", 1}, {"77", 1}, {"78", 1}, {"96", 1}]}
-             }}
+             }},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -337,13 +350,15 @@ config :screens,
                visible_rows: 8,
                paged: true,
                routes: {:exclude, [{"92", 1}, {"93", 1}]}
-             }}
+             }},
+          pill: :bus
         },
         %{
           name: "Congress St @ Haymarket Sta",
           arrow: :n,
           query: %{params: %{stop_id: "117"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 8, visible_rows: 4, paged: true}}
+          layout: {:upcoming, %{num_rows: 8, visible_rows: 4, paged: true}},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -356,13 +371,15 @@ config :screens,
           name: "Blue Line",
           arrow: :e,
           query: %{params: %{stop_ids: ["70045", "70046"]}, opts: %{}},
-          layout: :bidirectional
+          layout: :bidirectional,
+          pill: :blue
         },
         %{
           name: "Bus",
           arrow: :w,
           query: %{params: %{stop_ids: ["5740", "57400"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}}
+          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -375,13 +392,15 @@ config :screens,
           name: "Lower Busway",
           arrow: :e,
           query: %{params: %{stop_ids: ["17862", "17863"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}}
+          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
+          pill: :bus
         },
         %{
           name: "Commuter Rail",
           arrow: :e,
           query: %{params: %{stop_id: "Ruggles"}, opts: %{include_schedules: true}},
-          layout: {:upcoming, %{num_rows: 2}}
+          layout: {:upcoming, %{num_rows: 2}},
+          pill: :cr
         }
       ],
       app_id: "solari"
@@ -398,7 +417,8 @@ config :screens,
             opts: %{}
           },
           layout:
-            {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true, routes: {:exclude, ["90"]}}}
+            {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true, routes: {:exclude, ["90"]}}},
+          pill: :bus
         },
         %{
           name: "Lower Busway",
@@ -409,7 +429,8 @@ config :screens,
             },
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}}
+          layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -422,13 +443,15 @@ config :screens,
           name: "Blue Line",
           arrow: :se,
           query: %{params: %{stop_id: "70059"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 2}}
+          layout: {:upcoming, %{num_rows: 2}},
+          pill: :blue
         },
         %{
           name: "Bus",
           arrow: :w,
           query: %{params: %{stop_id: "15795"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}}
+          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -441,25 +464,29 @@ config :screens,
           name: "Commuter Rail (South Station)",
           arrow: :w,
           query: %{params: %{stop_id: "South Station"}, opts: %{include_schedules: true}},
-          layout: {:upcoming, %{num_rows: 7, visible_rows: 3, paged: true, max_minutes: 120}}
+          layout: {:upcoming, %{num_rows: 7, visible_rows: 3, paged: true, max_minutes: 120}},
+          pill: :cr
         },
         %{
           name: "Tufts Medical Center",
           arrow: :nw,
           query: %{params: %{stop_ids: ["70016", "70017"]}, opts: %{}},
-          layout: :bidirectional
+          layout: :bidirectional,
+          pill: :orange
         },
         %{
           name: nil,
           arrow: nil,
           query: %{params: %{stop_ids: ["49002", "6565"]}, opts: %{}},
-          layout: {:bidirectional, %{routes: {:exclude, ["11"]}}}
+          layout: {:bidirectional, %{routes: {:exclude, ["11"]}}},
+          pill: :silver
         },
         %{
           name: "Bus",
           arrow: :e,
           query: %{params: %{stop_id: "9983"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 1}}
+          layout: {:upcoming, %{num_rows: 1}},
+          pill: :blue
         }
       ],
       app_id: "solari"
@@ -475,13 +502,15 @@ config :screens,
             params: %{stop_id: "Back Bay", direction_id: 0},
             opts: %{include_schedules: true}
           },
-          layout: {:upcoming, %{num_rows: 8, max_minutes: 120}}
+          layout: {:upcoming, %{num_rows: 8, max_minutes: 120}},
+          pill: :cr
         },
         %{
           name: "Bus",
           arrow: nil,
           query: %{params: %{stop_ids: ["145", "9983"]}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 2}}
+          layout: {:upcoming, %{num_rows: 2}},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -494,7 +523,8 @@ config :screens,
           name: "Summer St opp WTC Ave",
           arrow: nil,
           query: %{params: %{stop_id: "889"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 8}}
+          layout: {:upcoming, %{num_rows: 8}},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -507,7 +537,8 @@ config :screens,
           name: "Summer St @ WTC Ave",
           arrow: nil,
           query: %{params: %{stop_id: "890"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 8}}
+          layout: {:upcoming, %{num_rows: 8}},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -520,7 +551,8 @@ config :screens,
           name: "Columbus Ave @ Walnut Ave",
           arrow: nil,
           query: %{params: %{stop_id: "1743"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 8}}
+          layout: {:upcoming, %{num_rows: 8}},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -533,7 +565,8 @@ config :screens,
           name: "Columbus Ave @ Walnut Ave",
           arrow: nil,
           query: %{params: %{stop_id: "11413"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 8}}
+          layout: {:upcoming, %{num_rows: 8}},
+          pill: :bus
         }
       ],
       app_id: "solari"

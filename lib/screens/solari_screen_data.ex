@@ -47,7 +47,8 @@ defmodule Screens.SolariScreenData do
            name: section_name,
            arrow: arrow,
            query: %{params: query_params, opts: query_opts},
-           layout: layout_params
+           layout: layout_params,
+           pill: pill
          },
          schedule
        ) do
@@ -57,6 +58,7 @@ defmodule Screens.SolariScreenData do
          %{
            name: section_name,
            arrow: arrow,
+           pill: pill,
            departures: do_layout(data, layout_params),
            paging: do_paging(layout_params)
          }}
