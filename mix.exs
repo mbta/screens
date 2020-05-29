@@ -67,7 +67,7 @@ defmodule Screens.MixProject do
       {:excoveralls, "~> 0.13.0", only: :test},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_secretsmanager, "~> 2.0", only: :prod},
-      {:ex_aws_polly, github: "jzimbel-mbta/ex_aws_polly"},
+      {:ex_aws_polly, "~> 0.4.0"},
       {:ehmon, github: "mbta/ehmon", only: :prod},
       {:sweet_xml, "~> 0.6.6"},
       {:timex, "~> 3.6"}
