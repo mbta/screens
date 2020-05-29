@@ -33,3 +33,9 @@
   margin-left: 168px;
   height: 48px;
 }
+
+.departure-group--multiple-rows {
+  .departure__alerts-container {
+    position: absolute;
+  }
+}
