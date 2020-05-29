@@ -19,7 +19,9 @@ defmodule ScreensWeb.ScreenApiController do
     json(conn, data)
   end
 
-  def audio(conn, %{"id" => screen_id, "version" => version}) do
+  def audio(conn, %{"id" => screen_id, "version" => version, "accent" => accent}) do
+    lexicon = if accent == "boston", do: "bostonlexicon", else: "mbtalexicon"
+
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
 
     # _ = Screens.LogScreenData.log_data_request(screen_id, version, is_screen)
@@ -27,11 +29,12 @@ defmodule ScreensWeb.ScreenApiController do
     %{station_name: station_name, sections: sections, current_time: current_time} =
       Screens.ScreenData.by_screen_id_with_override_and_version(screen_id, version, is_screen)
 
-    text = "Upcoming trips at #{station_name}: #{speak_sections(sections, current_time)}."
+    text =
+      "<speak>Upcoming trips at #{station_name}: #{speak_sections(sections, current_time)}.</speak>"
 
     {:ok, %{body: audio_data}} =
       text
-      |> ExAws.Polly.synthesize_speech(lexicon_names: ["mbtalexicon"])
+      |> ExAws.Polly.synthesize_speech(lexicon_names: [lexicon], text_type: "ssml")
       |> ExAws.request()
 
     send_download(conn, {:binary, audio_data},
@@ -44,14 +47,15 @@ defmodule ScreensWeb.ScreenApiController do
   defp speak_sections(sections, current_time) do
     sections
     |> Enum.map(&speak_section(&1, current_time))
-    |> Enum.join(", ")
+    |> Enum.join(". ")
   end
 
   defp speak_section(section, current_time) do
-    section.departures
-    |> Enum.take(2)
-    |> Enum.map(&speak_departure(&1, section.name, current_time))
-    |> Enum.join(", ")
+    "#{section.name}: " <>
+      (section.departures
+       |> Enum.take(2)
+       |> Enum.map(&speak_departure(&1, section.name, current_time))
+       |> Enum.join(", "))
   end
 
   defp speak_departure(d, section_name, current_time) do
@@ -61,8 +65,13 @@ defmodule ScreensWeb.ScreenApiController do
     minutes = if time == 1, do: "minute", else: "minutes"
 
     case Integer.parse(d.route) do
-      {bus_route, ""} -> "bus route #{bus_route} to #{d.destination} in #{time} #{minutes}"
-      :error -> "#{section_name} to #{d.destination} in #{time} #{minutes}"
+      {bus_route, ""} ->
+        "bus route <say-as interpret-as=\"address\">#{bus_route}</say-as> to #{d.destination} in #{
+          time
+        } #{minutes}"
+
+      :error ->
+        "#{section_name} to #{d.destination} in #{time} #{minutes}"
     end
   end
 end
