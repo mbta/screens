@@ -84,12 +84,14 @@ const DepartureGroup = ({ departures, currentTimeString }): JSX.Element => {
 const SectionHeader = ({ name, arrow }): JSX.Element => {
   return (
     <div className="section-header">
-      <span className="section-header__name">{name}</span>
-      <span className="section-header__arrow-container">
+      <div className="section-header__container">
+        <span className="section-header__name">{name}</span>
         {arrow !== null && (
-          <Arrow direction={arrow} className="section-header__arrow-image" />
+          <span className="section-header__arrow-container">
+            <Arrow direction={arrow} className="section-header__arrow-image" />
+          </span>
         )}
-      </span>
+      </div>
     </div>
   );
 };
@@ -231,10 +233,15 @@ class PagedSection extends React.Component {
     );
     const staticDepartureGroups = buildDepartureGroups(staticDepartures);
 
+    let arrow = this.props.arrow;
+    if (this.props.sectionHeaders !== "normal") {
+      arrow = null;
+    }
+
     const frameProps = {
       sectionHeaders: this.props.sectionHeaders,
       name: this.props.name,
-      arrow: this.props.arrow,
+      arrow: arrow,
     };
 
     if (staticDepartureGroups.length === 0) {
@@ -275,6 +282,10 @@ const Section = ({
 }): JSX.Element => {
   departures = departures.slice(0, numRows);
   const departureGroups = buildDepartureGroups(departures);
+
+  if (sectionHeaders !== "normal") {
+    arrow = null;
+  }
 
   const frameProps = { sectionHeaders, name, arrow };
 
