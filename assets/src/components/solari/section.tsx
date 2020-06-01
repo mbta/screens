@@ -84,14 +84,12 @@ const DepartureGroup = ({ departures, currentTimeString }): JSX.Element => {
 const SectionHeader = ({ name, arrow }): JSX.Element => {
   return (
     <div className="section-header">
-      <div className="section-header__container">
-        <span className="section-header__name">{name}</span>
-        {arrow !== null && (
-          <span className="section-header__arrow-container">
-            <Arrow direction={arrow} className="section-header__arrow-image" />
-          </span>
-        )}
-      </div>
+      <span className="section-header__name">{name}</span>
+      {arrow !== null && (
+        <span className="section-header__arrow-container">
+          <Arrow direction={arrow} className="section-header__arrow-image" />
+        </span>
+      )}
     </div>
   );
 };

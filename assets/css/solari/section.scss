@@ -10,22 +10,17 @@
   .section-header {
     color: black;
     height: 88px;
-    transform: scaleX(-1) rotate(90deg);
-    transform-origin: 0 0;
+    transform-origin: 100% 0;
+    transform: translateX(-100%) rotate(-90deg);
     position: absolute;
     top: 0;
     left: 0;
-  }
-
-  .section-header__container {
-    transform: scaleX(-1);
   }
 
   .section-header__name {
     margin-right: 28px;
     font-size: 36px;
     line-height: 88px;
-    float: right;
     text-transform: uppercase;
   }
 
