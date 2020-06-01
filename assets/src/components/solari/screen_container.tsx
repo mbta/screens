@@ -17,7 +17,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
       />
       <SectionList
         sections={apiResponse.sections}
-        showSectionHeaders={apiResponse.show_section_headers}
+        sectionHeaders={apiResponse.section_headers}
         currentTimeString={apiResponse.current_time}
         key={apiResponse.current_time}
       />

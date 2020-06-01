@@ -5,7 +5,7 @@ defmodule Screens.SolariScreenData do
   alias Screens.Departures.Departure
 
   def by_screen_id(screen_id, _is_screen, schedule \\ nil) do
-    %{station_name: station_name, sections: sections, show_section_headers: show_section_headers} =
+    %{station_name: station_name, sections: sections, section_headers: section_headers} =
       :screens
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
@@ -24,7 +24,7 @@ defmodule Screens.SolariScreenData do
           current_time: Screens.Util.format_time(current_time),
           station_name: station_name,
           sections: data,
-          show_section_headers: show_section_headers
+          section_headers: section_headers
         }
 
       :error ->

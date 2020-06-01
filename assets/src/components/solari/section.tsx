@@ -132,18 +132,23 @@ const PagedDeparture = ({
 };
 
 const SectionFrame = ({
-  showSectionHeaders,
+  sectionHeaders,
   name,
   arrow,
   children,
-}): JSX.Element => (
-  <div className="section">
-    {showSectionHeaders && name !== null && (
-      <SectionHeader name={name} arrow={arrow} />
-    )}
-    <div className="departure-container">{children}</div>
-  </div>
-);
+}): JSX.Element => {
+  const sectionModifier = sectionHeaders === "vertical" ? "vertical" : "normal";
+  const sectionClass = classWithModifier("section", sectionModifier);
+
+  return (
+    <div className={sectionClass}>
+      {sectionHeaders !== null && name !== null && (
+        <SectionHeader name={name} arrow={arrow} />
+      )}
+      <div className="departure-container">{children}</div>
+    </div>
+  );
+};
 
 const NoDeparturesMessage = ({ pill }): JSX.Element => (
   <div className="departure-group">
@@ -227,7 +232,7 @@ class PagedSection extends React.Component {
     const staticDepartureGroups = buildDepartureGroups(staticDepartures);
 
     const frameProps = {
-      showSectionHeaders: this.props.showSectionHeaders,
+      sectionHeaders: this.props.sectionHeaders,
       name: this.props.name,
       arrow: this.props.arrow,
     };
@@ -263,7 +268,7 @@ const Section = ({
   name,
   arrow,
   departures,
-  showSectionHeaders,
+  sectionHeaders,
   currentTimeString,
   numRows,
   pill,
@@ -271,7 +276,7 @@ const Section = ({
   departures = departures.slice(0, numRows);
   const departureGroups = buildDepartureGroups(departures);
 
-  const frameProps = { showSectionHeaders, name, arrow };
+  const frameProps = { sectionHeaders, name, arrow };
 
   if (departureGroups.length === 0) {
     return (

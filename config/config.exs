@@ -173,7 +173,7 @@ config :screens,
     },
     "301" => %{
       station_name: "Ashmont",
-      show_section_headers: false,
+      section_headers: nil,
       sections: [
         %{
           name: "Busway",
@@ -201,7 +201,7 @@ config :screens,
     },
     "302" => %{
       station_name: "Central",
-      show_section_headers: false,
+      section_headers: nil,
       sections: [
         %{
           name: "Red Line",
@@ -224,7 +224,7 @@ config :screens,
     },
     "303" => %{
       station_name: "Dudley",
-      show_section_headers: true,
+      section_headers: :normal,
       sections: [
         %{
           name: "Platform A",
@@ -245,7 +245,7 @@ config :screens,
     },
     "304" => %{
       station_name: "Dudley",
-      show_section_headers: true,
+      section_headers: :normal,
       sections: [
         %{
           name: "Platform C",
@@ -269,7 +269,7 @@ config :screens,
     },
     "305" => %{
       station_name: "Forest Hills",
-      show_section_headers: true,
+      section_headers: :vertical,
       sections: [
         %{
           name: "Upper Busway",
@@ -290,7 +290,7 @@ config :screens,
     },
     "306" => %{
       station_name: "Forest Hills",
-      show_section_headers: false,
+      section_headers: nil,
       sections: [
         %{
           name: "Upper Busway",
@@ -311,7 +311,7 @@ config :screens,
     },
     "307" => %{
       station_name: "Harvard",
-      show_section_headers: true,
+      section_headers: :normal,
       sections: [
         %{
           name: "Upper Busway",
@@ -337,7 +337,7 @@ config :screens,
     },
     "308" => %{
       station_name: "Haymarket",
-      show_section_headers: true,
+      section_headers: :normal,
       sections: [
         %{
           name: "Busway",
@@ -365,7 +365,7 @@ config :screens,
     },
     "309" => %{
       station_name: "Maverick",
-      show_section_headers: false,
+      section_headers: nil,
       sections: [
         %{
           name: "Blue Line",
@@ -386,7 +386,7 @@ config :screens,
     },
     "310" => %{
       station_name: "Ruggles",
-      show_section_headers: true,
+      section_headers: :normal,
       sections: [
         %{
           name: "Lower Busway",
@@ -407,7 +407,7 @@ config :screens,
     },
     "311" => %{
       station_name: "Sullivan Square",
-      show_section_headers: true,
+      section_headers: :normal,
       sections: [
         %{
           name: "Upper Busway",
@@ -437,7 +437,7 @@ config :screens,
     },
     "312" => %{
       station_name: "Wonderland",
-      show_section_headers: false,
+      section_headers: nil,
       sections: [
         %{
           name: "Blue Line",
@@ -458,7 +458,7 @@ config :screens,
     },
     "313" => %{
       station_name: "10 Park Plaza",
-      show_section_headers: true,
+      section_headers: :normal,
       sections: [
         %{
           name: "Commuter Rail (South Station)",
@@ -493,7 +493,7 @@ config :screens,
     },
     "314" => %{
       station_name: "10 Park Plaza",
-      show_section_headers: true,
+      section_headers: :normal,
       sections: [
         %{
           name: "Commuter Rail (Back Bay)",
@@ -517,7 +517,7 @@ config :screens,
     },
     "320" => %{
       station_name: "Summer Street",
-      show_section_headers: true,
+      section_headers: :normal,
       sections: [
         %{
           name: "Summer St opp WTC Ave",
@@ -531,7 +531,7 @@ config :screens,
     },
     "321" => %{
       station_name: "Summer Street",
-      show_section_headers: true,
+      section_headers: :normal,
       sections: [
         %{
           name: "Summer St @ WTC Ave",
@@ -545,7 +545,7 @@ config :screens,
     },
     "322" => %{
       station_name: "Columbus Ave",
-      show_section_headers: true,
+      section_headers: :normal,
       sections: [
         %{
           name: "Columbus Ave @ Walnut Ave",
@@ -559,7 +559,7 @@ config :screens,
     },
     "323" => %{
       station_name: "Columbus Ave",
-      show_section_headers: true,
+      section_headers: :normal,
       sections: [
         %{
           name: "Columbus Ave @ Walnut Ave",
