@@ -86,7 +86,7 @@ const assignSectionSizesHelper = (
 
 const SectionList = ({
   sections,
-  showSectionHeaders,
+  sectionHeaders,
   currentTimeString,
 }): JSX.Element => {
   const MAX_DEPARTURES_HEIGHT = 1565;
@@ -118,7 +118,7 @@ const SectionList = ({
             <PagedSection
               {...section}
               numRows={state.sectionSizes[i]}
-              showSectionHeaders={showSectionHeaders}
+              sectionHeaders={sectionHeaders}
               currentTimeString={currentTimeString}
               key={section.name + state.sectionSizes[i] + currentTimeString}
             />
@@ -128,7 +128,7 @@ const SectionList = ({
             <Section
               {...section}
               numRows={state.sectionSizes[i]}
-              showSectionHeaders={showSectionHeaders}
+              sectionHeaders={sectionHeaders}
               currentTimeString={currentTimeString}
               key={section.name + state.sectionSizes[i] + currentTimeString}
             />
