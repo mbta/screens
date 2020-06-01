@@ -44,8 +44,10 @@ const buildDepartureGroups = (departures) => {
 };
 
 const DepartureGroup = ({ departures, currentTimeString }): JSX.Element => {
+  const groupModifier = departures.length > 1 ? "multiple-rows" : "single-row";
+
   return (
-    <div className="departure-group">
+    <div className={classWithModifier("departure-group", groupModifier)}>
       {departures.map(
         (
           {
@@ -68,7 +70,7 @@ const DepartureGroup = ({ departures, currentTimeString }): JSX.Element => {
               time={time}
               currentTimeString={currentTimeString}
               vehicleStatus={vehicleStatus}
-              alerts={alerts}
+              alerts={i === 0 ? alerts : []}
               stopType={stopType}
               key={id}
             />
