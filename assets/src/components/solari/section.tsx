@@ -239,7 +239,7 @@ class PagedSection extends React.Component {
     const frameProps = {
       sectionHeaders: this.props.sectionHeaders,
       name: this.props.name,
-      arrow: arrow,
+      arrow,
     };
 
     if (staticDepartureGroups.length === 0) {
