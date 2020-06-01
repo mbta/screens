@@ -1,4 +1,5 @@
 import React, { useRef, useState, useLayoutEffect } from "react";
+import _ from "lodash";
 
 import { PagedSection, Section } from "Components/solari/section";
 
@@ -12,55 +13,71 @@ const totalRows = (sections) => {
   }, 0);
 };
 
-const arraySum = (arr) => arr.reduce((acc, n) => acc + n, 0);
-
-const minBy = (arr, fn) => {
-  const min = arr.reduce(
-    ({ elt, value }, newElt) => {
-      const newValue = fn(newElt);
-      if (newValue < value) {
-        return { elt: newElt, value: newValue };
-      } else {
-        return { elt, value };
-      }
+const allRoundings = (
+  obj: Record<number, number>
+): Record<number, number>[] => {
+  return _.reduce(
+    obj,
+    (list, n, key) => {
+      const floors = list.map((o) => ({ ...o, [key]: Math.floor(n) }));
+      const ceils = list.map((o) => ({ ...o, [key]: Math.ceil(n) }));
+      return [...floors, ...ceils];
     },
-    { elt: null, value: Number.MAX_SAFE_INTEGER }
-  );
-
-  return min.elt;
-};
-
-const allRoundings = (arr) => {
-  return arr.reduce(
-    (list, elt) => {
-      const floors = list.map((l) => [...l, Math.floor(elt)]);
-      const ceils = list.map((l) => [...l, Math.ceil(elt)]);
-      return floors.concat(ceils);
-    },
-    [[]]
+    [{}]
   );
 };
 
-const assignSectionSizes = (sections, numRows) => {
-  const initialSizes = sections.map((section) => {
+const assignSectionSizes = (sections: object[], numRows: number): number[] => {
+  // set the sizes for all empty sections to 1, to accomodate the "no departures" placeholder message
+  const indexedAssignedEmpties = _.mapValues(
+    _.pickBy({ ...sections }, (section) => section.departures.length === 0),
+    () => 1
+  );
+
+  const indexedNonEmpties = _.pickBy(
+    { ...sections },
+    (section) => section.departures.length > 0
+  );
+
+  const indexedAssignedNonEmpties = assignSectionSizesHelper(
+    indexedNonEmpties,
+    numRows - _.size(indexedAssignedEmpties)
+  );
+
+  // merge the objects and convert back to an array
+  return Array.from({
+    ...indexedAssignedEmpties,
+    ...indexedAssignedNonEmpties,
+    length: _.size(indexedAssignedEmpties) + _.size(indexedAssignedNonEmpties),
+  });
+};
+
+const assignSectionSizesHelper = (
+  sections: Record<number, object>,
+  numRows: number
+): Record<number, number> => {
+  const initialSizes = _.mapValues(sections, (section) => {
     if (section?.paging?.is_enabled) {
       return section.paging.visible_rows;
     } else {
       return section.departures.length;
     }
-  }, []);
+  });
 
-  const initialRows = arraySum(initialSizes);
-  const scaledSizes = initialSizes.map((n) => (n * numRows) / initialRows);
+  const initialRows = _.sum(Object.values(initialSizes));
+  const scaledSizes = _.mapValues(
+    initialSizes,
+    (n) => (n * numRows) / initialRows
+  );
 
   // Choose "best" rounding
   const allSizeCombinations = allRoundings(scaledSizes);
   const validSizeCombinations = allSizeCombinations.filter(
-    (comb) => arraySum(comb) === numRows
+    (comb) => _.sum(Object.values(comb)) === numRows
   );
-  const roundedSizes = minBy(validSizeCombinations, (comb) => {
-    return arraySum(
-      comb.map((rounded, i) => Math.abs(rounded - scaledSizes[i]))
+  const roundedSizes = _.minBy(validSizeCombinations, (comb) => {
+    return _.sum(
+      _.map(comb, (rounded, i) => Math.abs(rounded - scaledSizes[i]))
     );
   });
 

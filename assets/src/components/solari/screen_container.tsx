@@ -19,6 +19,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         sections={apiResponse.sections}
         showSectionHeaders={apiResponse.show_section_headers}
         currentTimeString={apiResponse.current_time}
+        key={apiResponse.current_time}
       />
       <div className="screen-container__flex-space" />
     </div>
