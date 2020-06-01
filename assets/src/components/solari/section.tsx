@@ -3,7 +3,7 @@ import React from "react";
 import Departure from "Components/solari/departure";
 import Arrow from "Components/solari/arrow";
 
-import { classWithModifiers } from "Util/util";
+import { classWithModifier, classWithModifiers } from "Util/util";
 
 const buildDepartureGroups = (departures) => {
   if (!departures) {
@@ -40,8 +40,10 @@ const buildDepartureGroups = (departures) => {
 };
 
 const DepartureGroup = ({ departures, currentTimeString }): JSX.Element => {
+  const groupModifier = departures.length > 1 ? "multiple-rows" : "single-row";
+
   return (
-    <div className="departure-group">
+    <div className={classWithModifier("departure-group", groupModifier)}>
       {departures.map(
         (
           {
@@ -64,7 +66,7 @@ const DepartureGroup = ({ departures, currentTimeString }): JSX.Element => {
               time={time}
               currentTimeString={currentTimeString}
               vehicleStatus={vehicleStatus}
-              alerts={alerts}
+              alerts={i === 0 ? alerts : []}
               stopType={stopType}
               key={id}
             />
