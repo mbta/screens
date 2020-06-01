@@ -13,68 +13,72 @@ const totalRows = (sections) => {
   }, 0);
 };
 
-const allRoundings = (arr) => {
-  return arr.reduce(
-    (list, elt) => {
-      const floors = list.map((l) => [...l, Math.floor(elt)]);
-      const ceils = list.map((l) => [...l, Math.ceil(elt)]);
-      return floors.concat(ceils);
+const allRoundings = (
+  obj: Record<number, number>
+): Record<number, number>[] => {
+  return _.reduce(
+    obj,
+    (list, n, key) => {
+      const floors = list.map((o) => ({ ...o, [key]: Math.floor(n) }));
+      const ceils = list.map((o) => ({ ...o, [key]: Math.ceil(n) }));
+      return [...floors, ...ceils];
     },
-    [[]]
+    [{}]
   );
 };
 
-const assignSectionSizes = (sections, numRows): number[] => {
-  // split empty and non-empty sections into two arrays, keeping track of their original indices
-  const [indexedEmpties, indexedNonEmpties] = sections.reduce(
-    ([empties, nonEmpties], section, i) => [
-      section.departures.length === 0 ? [...empties, [i, section]] : empties,
-      section.departures.length > 0
-        ? [...nonEmpties, [i, section]]
-        : nonEmpties,
-    ],
-    [[], []]
-  );
-
+const assignSectionSizes = (sections: object[], numRows: number): number[] => {
   // set the sizes for all empty sections to 1, to accomodate the "no departures" placeholder message
-  const indexedAssignedEmpties = indexedEmpties.map(([i]) => [i, 1]);
+  const indexedAssignedEmpties = _.mapValues(
+    _.pickBy({ ...sections }, (section) => section.departures.length === 0),
+    () => 1
+  );
 
-  // get the non-empty sections, assign sizes to them, and then rejoin them with their original indices
-  let indexedAssignedNonEmpties: [number, number][] = [];
-  if (indexedNonEmpties.length > 0) {
-    const [nonEmptyIndices, nonEmpties] = _.unzip(indexedNonEmpties);
-    const assignedNonEmpties = assignSectionSizesImpl(
-      nonEmpties,
-      numRows - indexedEmpties.length
-    );
-    indexedAssignedNonEmpties = _.zip(nonEmptyIndices, assignedNonEmpties);
-  }
+  const indexedNonEmpties = _.pickBy(
+    { ...sections },
+    (section) => section.departures.length > 0
+  );
 
-  // combine the arrays, restore the original order of elements, and drop the indices
-  return [...indexedAssignedEmpties, ...indexedAssignedNonEmpties]
-    .sort(([i1], [i2]) => i1 - i2)
-    .map(([_i, v]) => v);
+  const indexedAssignedNonEmpties = assignSectionSizesHelper(
+    indexedNonEmpties,
+    numRows - _.size(indexedAssignedEmpties)
+  );
+
+  // merge the objects and convert back to an array
+  return Array.from({
+    ...indexedAssignedEmpties,
+    ...indexedAssignedNonEmpties,
+    length: _.size(indexedAssignedEmpties) + _.size(indexedAssignedNonEmpties),
+  });
 };
 
-const assignSectionSizesImpl = (sections, numRows): number[] => {
-  const initialSizes = sections.map((section) => {
+const assignSectionSizesHelper = (
+  sections: Record<number, object>,
+  numRows: number
+): Record<number, number> => {
+  const initialSizes = _.mapValues(sections, (section) => {
     if (section?.paging?.is_enabled) {
       return section.paging.visible_rows;
     } else {
       return section.departures.length;
     }
-  }, []);
+  });
 
-  const initialRows = _.sum(initialSizes);
-  const scaledSizes = initialSizes.map((n) => (n * numRows) / initialRows);
+  const initialRows = _.sum(Object.values(initialSizes));
+  const scaledSizes = _.mapValues(
+    initialSizes,
+    (n) => (n * numRows) / initialRows
+  );
 
   // Choose "best" rounding
   const allSizeCombinations = allRoundings(scaledSizes);
   const validSizeCombinations = allSizeCombinations.filter(
-    (comb) => _.sum(comb) === numRows
+    (comb) => _.sum(Object.values(comb)) === numRows
   );
   const roundedSizes = _.minBy(validSizeCombinations, (comb) => {
-    return _.sum(comb.map((rounded, i) => Math.abs(rounded - scaledSizes[i])));
+    return _.sum(
+      _.map(comb, (rounded, i) => Math.abs(rounded - scaledSizes[i]))
+    );
   });
 
   return roundedSizes;
