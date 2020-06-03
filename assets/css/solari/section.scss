@@ -143,20 +143,16 @@
     height: 40px;
     width: 83px;
   }
-
-  &--with-slash {
-    top: -4.5px;
-  }
 }
 
 .later-departure__route-text {
   @include font--text--75bold;
 
-  &--with-slash {
+  &--size-small {
     font-size: 24px;
   }
 
-  &--no-slash {
+  &--size-normal {
     font-size: 36px;
   }
 
