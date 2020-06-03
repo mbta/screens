@@ -40,11 +40,22 @@ const routeToPill = (route: string, routeId: string): PillType => {
   return { routeName: route, routePillColor: "yellow" };
 };
 
-const Pill = ({ routeName, routePillColor }: PillType): JSX.Element => (
-  <div className={classWithModifier("departure-route", routePillColor)}>
-    {routeName && <BaseRoutePill route={routeName} />}
-  </div>
-);
+const Pill = ({ routeName, routePillColor }: PillType): JSX.Element => {
+  if (routeName === "CR") {
+    routeName = (
+      <img
+        className="departure-route--icon"
+        src="/images/commuter-rail.svg"
+      ></img>
+    );
+  }
+
+  return (
+    <div className={classWithModifier("departure-route", routePillColor)}>
+      {routeName && <BaseRoutePill route={routeName} />}
+    </div>
+  );
+};
 
 const DepartureRoutePill = ({
   route,
