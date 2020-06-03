@@ -81,6 +81,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         stopName={apiResponse.stop_name}
         departures={departuresData}
         ref={departuresRef}
+        key={`top-${apiResponse.current_time}`}
       />
       <BottomScreenLayout
         currentTimeString={apiResponse.current_time}
@@ -90,6 +91,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         nearbyConnections={apiResponse.nearby_connections}
         psaName={apiResponse.psa_name}
         ref={laterDeparturesRef}
+        key={`bottom-${apiResponse.current_time}`}
       />
     </div>
   );
