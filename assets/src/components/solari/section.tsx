@@ -171,6 +171,7 @@ class PagedSection extends React.Component {
     super(props);
     this.state = { currentPageNumber: 0 };
     this.MAX_PAGE_COUNT = 5;
+    this.MIN_PAGE_COUNT = 3;
   }
 
   componentDidMount() {
@@ -225,10 +226,11 @@ class PagedSection extends React.Component {
   }
 
   render() {
-    const staticDepartures = this.props.departures.slice(
-      0,
-      this.props.numRows - 1
-    );
+    const numPages = this.pageCount(this.props);
+    const showPagedDeparture = numPages >= this.MIN_PAGE_COUNT;
+    const staticDepartures = showPagedDeparture
+      ? this.props.departures.slice(0, this.props.numRows - 1)
+      : this.props.departures;
     const staticDepartureGroups = buildDepartureGroups(staticDepartures);
 
     let arrow = this.props.arrow;
@@ -259,11 +261,13 @@ class PagedSection extends React.Component {
             key={group[0].id}
           />
         ))}
-        <PagedDeparture
-          departures={this.pagedDepartures()}
-          currentPageNumber={this.state.currentPageNumber}
-          currentTimeString={this.props.currentTimeString}
-        />
+        {showPagedDeparture && (
+          <PagedDeparture
+            departures={this.pagedDepartures()}
+            currentPageNumber={this.state.currentPageNumber}
+            currentTimeString={this.props.currentTimeString}
+          />
+        )}
       </SectionFrame>
     );
   }
