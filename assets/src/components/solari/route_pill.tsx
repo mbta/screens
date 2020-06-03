@@ -40,11 +40,22 @@ const routeToPill = (route: string, routeId: string): PillType => {
   return { routeName: route, routePillColor: "yellow" };
 };
 
-const Pill = ({ routeName, routePillColor }: PillType): JSX.Element => (
-  <div className={classWithModifier("departure-route", routePillColor)}>
-    {routeName && <BaseRoutePill route={routeName} />}
-  </div>
-);
+const Pill = ({ routeName, routePillColor }: PillType): JSX.Element => {
+  if (routeName === "CR") {
+    routeName = (
+      <img
+        className="departure-route--icon"
+        src="/images/commuter-rail.svg"
+      ></img>
+    );
+  }
+
+  return (
+    <div className={classWithModifier("departure-route", routePillColor)}>
+      {routeName && <BaseRoutePill route={routeName} />}
+    </div>
+  );
+};
 
 const DepartureRoutePill = ({
   route,
@@ -72,10 +83,31 @@ const SectionRoutePill = ({ pill }: { pill: string }): JSX.Element => (
   <Pill {...sectionPillToPill(pill)} />
 );
 
-const PagedDepartureRoutePill = ({ route, selected }): JSX.Element => {
+// Three-letter abbreviations for commuter rail routes
+const routeIdMapping: Record<string, string> = {
+  "CR-Haverhill": "HVL",
+  "CR-Newburyport": "NBP",
+  "CR-Lowell": "LWL",
+  "CR-Fitchburg": "FBG",
+  "CR-Worcester": "WOR",
+  "CR-Needham": "NDM",
+  "CR-Franklin": "FRK",
+  "CR-Providence": "PVD",
+  "CR-Fairmount": "FMT",
+  "CR-Middleborough": "MID",
+  "CR-Kingston": "KNG",
+  "CR-Greenbush": "GRB",
+};
+
+const PagedDepartureRoutePill = ({ route, routeId, selected }): JSX.Element => {
+  const isCommuterRail = routeId.startsWith("CR-");
+  const isSlashRoute = route.includes("/");
+
   const selectedModifier = selected ? "selected" : "unselected";
-  const slashModifier = route.includes("/") ? "with-slash" : "no-slash";
-  const modifiers = [selectedModifier, slashModifier];
+  const sizeModifier =
+    isCommuterRail || isSlashRoute ? "size-small" : "size-normal";
+  const modeModifier = isCommuterRail ? "commuter-rail" : "bus";
+  const modifiers = [selectedModifier, sizeModifier, modeModifier];
   const pillClass = classWithModifiers(
     "later-departure__route-pill",
     modifiers
@@ -85,9 +117,11 @@ const PagedDepartureRoutePill = ({ route, selected }): JSX.Element => {
     modifiers
   );
 
+  const routeText = routeId.startsWith("CR-") ? routeIdMapping[routeId] : route;
+
   return (
     <div className={pillClass}>
-      <div className={textClass}>{route}</div>
+      <div className={textClass}>{routeText}</div>
     </div>
   );
 };
