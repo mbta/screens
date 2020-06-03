@@ -117,6 +117,7 @@ const PagedDeparture = ({
           {departures.map((departure, i) => (
             <PagedDepartureRoutePill
               route={departure.route}
+              routeId={departure.route_id}
               selected={i === currentPageNumber}
               key={departure.id}
             />

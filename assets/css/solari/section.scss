@@ -99,10 +99,21 @@
   margin-left: 25px;
 
   &--selected {
-    background: #ffc72c;
-    color: #000000;
     height: 46px;
     width: 89px;
+
+    // Different selected pill colors by mode
+    &.later-departure__route-pill {
+      &--commuter-rail {
+        background: #80276c;
+        color: #ffffff;
+      }
+
+      &--bus {
+        background: #ffc72c;
+        color: #000000;
+      }
+    }
   }
 
   &--selected:before,

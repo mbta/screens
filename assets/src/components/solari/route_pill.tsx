@@ -72,10 +72,11 @@ const SectionRoutePill = ({ pill }: { pill: string }): JSX.Element => (
   <Pill {...sectionPillToPill(pill)} />
 );
 
-const PagedDepartureRoutePill = ({ route, selected }): JSX.Element => {
+const PagedDepartureRoutePill = ({ route, routeId, selected }): JSX.Element => {
   const selectedModifier = selected ? "selected" : "unselected";
   const slashModifier = route.includes("/") ? "with-slash" : "no-slash";
-  const modifiers = [selectedModifier, slashModifier];
+  const modeModifier = routeId.startsWith("CR-") ? "commuter-rail" : "bus";
+  const modifiers = [selectedModifier, slashModifier, modeModifier];
   const pillClass = classWithModifiers(
     "later-departure__route-pill",
     modifiers
