@@ -570,6 +570,34 @@ config :screens,
         }
       ],
       app_id: "solari"
+    },
+    "324" => %{
+      station_name: "Columbus Ave",
+      section_headers: :normal,
+      sections: [
+        %{
+          name: "Seaver St opp Elm Hill Ave",
+          arrow: nil,
+          query: %{params: %{stop_id: "17401"}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 8}},
+          pill: :bus
+        }
+      ],
+      app_id: "solari"
+    },
+    "325" => %{
+      station_name: "Blue Hill Ave",
+      section_headers: :normal,
+      sections: [
+        %{
+          name: "Blue Hill Ave @ Ellington St",
+          arrow: nil,
+          query: %{params: %{stop_id: "383"}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 8}},
+          pill: :bus
+        }
+      ],
+      app_id: "solari"
     }
   },
   api_v3_url: "https://api-v3.mbta.com/",
