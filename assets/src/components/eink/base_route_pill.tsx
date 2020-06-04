@@ -3,7 +3,10 @@ import React from "react";
 import { classWithModifier } from "Util/util";
 
 const BaseRoutePill = ({ route }): JSX.Element => {
-  const modifier = route.includes("/") ? "with-slash" : "no-slash";
+  const modifier =
+    typeof route === "string" && route.includes("/")
+      ? "with-slash"
+      : "no-slash";
 
   return (
     <div className={classWithModifier("base-route-pill__pill", modifier)}>

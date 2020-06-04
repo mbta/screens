@@ -2,8 +2,12 @@ import React from "react";
 
 import Departure from "Components/solari/departure";
 import Arrow from "Components/solari/arrow";
-
-import { classWithModifiers } from "Util/util";
+import {
+  SectionRoutePill,
+  PagedDepartureRoutePill,
+} from "Components/solari/route_pill";
+import BaseDepartureDestination from "Components/eink/base_departure_destination";
+import { classWithModifier } from "Util/util";
 
 const buildDepartureGroups = (departures) => {
   if (!departures) {
@@ -40,8 +44,10 @@ const buildDepartureGroups = (departures) => {
 };
 
 const DepartureGroup = ({ departures, currentTimeString }): JSX.Element => {
+  const groupModifier = departures.length > 1 ? "multiple-rows" : "single-row";
+
   return (
-    <div className="departure-group">
+    <div className={classWithModifier("departure-group", groupModifier)}>
       {departures.map(
         (
           {
@@ -64,7 +70,7 @@ const DepartureGroup = ({ departures, currentTimeString }): JSX.Element => {
               time={time}
               currentTimeString={currentTimeString}
               vehicleStatus={vehicleStatus}
-              alerts={alerts}
+              alerts={i === 0 ? alerts : []}
               stopType={stopType}
               key={id}
             />
@@ -79,31 +85,11 @@ const SectionHeader = ({ name, arrow }): JSX.Element => {
   return (
     <div className="section-header">
       <span className="section-header__name">{name}</span>
-      <span className="section-header__arrow-container">
-        {arrow !== null && (
+      {arrow !== null && (
+        <span className="section-header__arrow-container">
           <Arrow direction={arrow} className="section-header__arrow-image" />
-        )}
-      </span>
-    </div>
-  );
-};
-
-const RoutePill = ({ route, selected }): JSX.Element => {
-  const selectedModifier = selected ? "selected" : "unselected";
-  const slashModifier = route.includes("/") ? "with-slash" : "no-slash";
-  const modifiers = [selectedModifier, slashModifier];
-  const pillClass = classWithModifiers(
-    "later-departure__route-pill",
-    modifiers
-  );
-  const textClass = classWithModifiers(
-    "later-departure__route-text",
-    modifiers
-  );
-
-  return (
-    <div className={pillClass}>
-      <div className={textClass}>{route}</div>
+        </span>
+      )}
     </div>
   );
 };
@@ -129,8 +115,9 @@ const PagedDeparture = ({
         <div className="later-departure__header-title">Later Departures</div>
         <div className="later-departure__header-route-list">
           {departures.map((departure, i) => (
-            <RoutePill
+            <PagedDepartureRoutePill
               route={departure.route}
+              routeId={departure.route_id}
               selected={i === currentPageNumber}
               key={departure.id}
             />
@@ -145,11 +132,47 @@ const PagedDeparture = ({
   );
 };
 
+const SectionFrame = ({
+  sectionHeaders,
+  name,
+  arrow,
+  children,
+}): JSX.Element => {
+  const sectionModifier = sectionHeaders === "vertical" ? "vertical" : "normal";
+  const sectionClass = classWithModifier("section", sectionModifier);
+
+  return (
+    <div className={sectionClass}>
+      {sectionHeaders !== null && name !== null && (
+        <SectionHeader name={name} arrow={arrow} />
+      )}
+      <div className="departure-container">{children}</div>
+    </div>
+  );
+};
+
+const NoDeparturesMessage = ({ pill }): JSX.Element => (
+  <div className="departure-group">
+    <div className="departure--no-via">
+      <SectionRoutePill pill={pill} />
+      <div
+        className={classWithModifier(
+          "departure-destination",
+          "no-departures-placeholder"
+        )}
+      >
+        <BaseDepartureDestination destination="No departures currently available" />
+      </div>
+    </div>
+  </div>
+);
+
 class PagedSection extends React.Component {
   constructor(props) {
     super(props);
     this.state = { currentPageNumber: 0 };
     this.MAX_PAGE_COUNT = 5;
+    this.MIN_PAGE_COUNT = 3;
   }
 
   componentDidMount() {
@@ -204,32 +227,49 @@ class PagedSection extends React.Component {
   }
 
   render() {
-    const staticDepartures = this.props.departures.slice(
-      0,
-      this.props.numRows - 1
-    );
+    const numPages = this.pageCount(this.props);
+    const showPagedDeparture = numPages >= this.MIN_PAGE_COUNT;
+    const staticDepartures = showPagedDeparture
+      ? this.props.departures.slice(0, this.props.numRows - 1)
+      : this.props.departures;
     const staticDepartureGroups = buildDepartureGroups(staticDepartures);
 
+    let arrow = this.props.arrow;
+    if (this.props.sectionHeaders !== "normal") {
+      arrow = null;
+    }
+
+    const frameProps = {
+      sectionHeaders: this.props.sectionHeaders,
+      name: this.props.name,
+      arrow,
+    };
+
+    if (staticDepartureGroups.length === 0) {
+      return (
+        <SectionFrame {...frameProps}>
+          <NoDeparturesMessage pill={this.props.pill} />
+        </SectionFrame>
+      );
+    }
+
     return (
-      <div className="section">
-        {this.props.showSectionHeaders && this.props.name !== null && (
-          <SectionHeader name={this.props.name} arrow={this.props.arrow} />
-        )}
-        <div className="departure-container">
-          {staticDepartureGroups.map((group) => (
-            <DepartureGroup
-              departures={group}
-              currentTimeString={this.props.currentTimeString}
-              key={group[0].id}
-            />
-          ))}
+      <SectionFrame {...frameProps}>
+        {staticDepartureGroups.map((group) => (
+          <DepartureGroup
+            departures={group}
+            currentTimeString={this.props.currentTimeString}
+            key={group[0].id}
+          />
+        ))}
+        {showPagedDeparture && (
           <PagedDeparture
             departures={this.pagedDepartures()}
             currentPageNumber={this.state.currentPageNumber}
             currentTimeString={this.props.currentTimeString}
           />
-        </div>
-      </div>
+        )}
+      </SectionFrame>
     );
   }
 }
@@ -238,29 +278,38 @@ const Section = ({
   name,
   arrow,
   departures,
-  showSectionHeaders,
+  sectionHeaders,
   currentTimeString,
-  paging,
   numRows,
+  pill,
 }): JSX.Element => {
   departures = departures.slice(0, numRows);
   const departureGroups = buildDepartureGroups(departures);
 
+  if (sectionHeaders !== "normal") {
+    arrow = null;
+  }
+
+  const frameProps = { sectionHeaders, name, arrow };
+
+  if (departureGroups.length === 0) {
+    return (
+      <SectionFrame {...frameProps}>
+        <NoDeparturesMessage pill={pill} />
+      </SectionFrame>
+    );
+  }
+
   return (
-    <div className="section">
-      {showSectionHeaders && name !== null && (
-        <SectionHeader name={name} arrow={arrow} />
-      )}
-      <div className="departure-container">
-        {departureGroups.map((group) => (
-          <DepartureGroup
-            departures={group}
-            currentTimeString={currentTimeString}
-            key={group[0].id}
-          />
-        ))}
-      </div>
-    </div>
+    <SectionFrame {...frameProps}>
+      {departureGroups.map((group) => (
+        <DepartureGroup
+          departures={group}
+          currentTimeString={currentTimeString}
+          key={group[0].id}
+        />
+      ))}
+    </SectionFrame>
   );
 };
 

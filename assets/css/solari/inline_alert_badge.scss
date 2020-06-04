@@ -50,6 +50,12 @@
   }
 }
 
+.departure-group--multiple-rows {
+  .inline-alert-badge {
+    position: relative;
+  }
+}
+
 .inline-alert-badge__icon-container {
   display: inline-block;
   margin-left: 12px;

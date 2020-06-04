@@ -6,4 +6,19 @@
   vertical-align: middle;
   width: 654px;
   font-size: 50px;
+
+  &--no-departures-placeholder {
+    font-size: 40px;
+    width: 828px;
+  }
+}
+
+.section--vertical {
+  .departure-destination {
+    width: 566px;
+
+    &--no-departures-placeholder {
+      width: 740px;
+    }
+  }
 }

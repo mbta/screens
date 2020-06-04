@@ -4,17 +4,47 @@
   border-top: 5px solid #c5c7c9;
 }
 
-.section-header {
-  color: #171f26;
-  background-color: #e1e1df;
-  height: 123px;
+.section--vertical {
+  position: relative;
+
+  .section-header {
+    color: black;
+    height: 88px;
+    transform-origin: 100% 0;
+    transform: translateX(-100%) rotate(-90deg);
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .section-header__name {
+    margin-right: 28px;
+    font-size: 36px;
+    line-height: 88px;
+    text-transform: uppercase;
+  }
+
+  .later-departure__header-title {
+    font-size: 30px;
+  }
+}
+
+.section--normal {
+  .section-header {
+    color: #171f26;
+    background-color: #e1e1df;
+    height: 123px;
+  }
+
+  .section-header__name {
+    font-size: 50px;
+    line-height: 123px;
+    margin-left: 48px;
+  }
 }
 
 .section-header__name {
   @include font--text--75bold;
-  font-size: 50px;
-  line-height: 123px;
-  margin-left: 48px;
   vertical-align: middle;
 }
 
@@ -31,11 +61,6 @@
   width: 57px;
   height: 57px;
   margin: 33px 0 33px;
-}
-
-.later-departure {
-  border-top: 5px solid #ababab;
-  border-bottom: 5px solid #ababab;
 }
 
 .later-departure__header {
@@ -74,10 +99,21 @@
   margin-left: 25px;
 
   &--selected {
-    background: #ffc72c;
-    color: #000000;
     height: 46px;
     width: 89px;
+
+    // Different selected pill colors by mode
+    &.later-departure__route-pill {
+      &--commuter-rail {
+        background: #80276c;
+        color: #ffffff;
+      }
+
+      &--bus {
+        background: #ffc72c;
+        color: #000000;
+      }
+    }
   }
 
   &--selected:before,
@@ -107,20 +143,16 @@
     height: 40px;
     width: 83px;
   }
-
-  &--with-slash {
-    top: -4.5px;
-  }
 }
 
 .later-departure__route-text {
   @include font--text--75bold;
 
-  &--with-slash {
+  &--size-small {
     font-size: 24px;
   }
 
-  &--no-slash {
+  &--size-normal {
     font-size: 36px;
   }
 

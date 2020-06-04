@@ -2,6 +2,12 @@
   background-color: #f5f4f1;
 }
 
+.section--vertical {
+  .departure-container {
+    border-left: 88px solid #e3e3e3;
+  }
+}
+
 .departure-group {
   margin-left: 42px;
   margin-right: 42px;
@@ -32,4 +38,10 @@
   margin-top: 6px;
   margin-left: 168px;
   height: 48px;
+}
+
+.departure-group--multiple-rows {
+  .departure__alerts-container {
+    position: absolute;
+  }
 }
