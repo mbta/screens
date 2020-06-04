@@ -89,6 +89,12 @@
   position: absolute;
   right: 0px;
   top: 31px;
+
+  &--size-normal {
+    .later-departure__route-pill--size-small {
+      top: -4.5px;
+    }
+  }
 }
 
 .later-departure__route-pill {
