@@ -176,13 +176,6 @@ config :screens,
       section_headers: nil,
       sections: [
         %{
-          name: "Busway",
-          arrow: :s,
-          query: %{params: %{stop_id: "334"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
-          pill: :bus
-        },
-        %{
           name: "Red Line",
           arrow: :e,
           query: %{params: %{stop_id: "70094"}, opts: %{}},
@@ -195,6 +188,13 @@ config :screens,
           query: %{params: %{stop_id: "70261"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 1}},
           pill: :mattapan
+        },
+        %{
+          name: "Busway",
+          arrow: :s,
+          query: %{params: %{stop_id: "334"}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
+          pill: :bus
         }
       ],
       app_id: "solari"
@@ -293,18 +293,18 @@ config :screens,
       section_headers: nil,
       sections: [
         %{
-          name: "Upper Busway",
-          arrow: :e,
-          query: %{params: %{stop_id: "10642"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
-          pill: :bus
-        },
-        %{
           name: "Commuter Rail",
           arrow: :w,
           query: %{params: %{stop_id: "Forest Hills"}, opts: %{include_schedules: true}},
           layout: :bidirectional,
           pill: :cr
+        },
+        %{
+          name: "Upper Busway",
+          arrow: :e,
+          query: %{params: %{stop_id: "10642"}, opts: %{}},
+          layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
+          pill: :bus
         }
       ],
       app_id: "solari"
