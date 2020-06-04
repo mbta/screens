@@ -104,4 +104,10 @@ defmodule Screens.Override.State do
     schedule_refresh(self())
     {:noreply, new_state}
   end
+
+  # Handle leaked :ssl_closed messages from Hackney.
+  # Workaround for this issue: https://github.com/benoitc/hackney/issues/464
+  def handle_info({:ssl_closed, _}, state) do
+    {:noreply, state}
+  end
 end
