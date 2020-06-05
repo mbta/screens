@@ -44,6 +44,8 @@ defmodule ScreensWeb.Router do
     pipe_through [:redirect_prod_http, :api, :browser]
 
     get "/:id/readout.mp3", AudioController, :show
+
+    get "/:id/debug", AudioController, :debug
   end
 
   scope "/alert_priority", ScreensWeb do
