@@ -21,6 +21,17 @@ defmodule Screens.LogScreenData do
     end
   end
 
+  def log_audio_request(screen_id, is_screen) do
+    if is_screen do
+      data = %{
+        screen_id: screen_id,
+        screen_name: screen_name_for_id(screen_id)
+      }
+
+      log_message("[screen audio request]", data)
+    end
+  end
+
   def log_api_response(screen_id, client_version, is_screen, response) do
     _ =
       if is_screen do

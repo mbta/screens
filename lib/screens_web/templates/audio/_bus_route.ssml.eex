@@ -1,0 +1,11 @@
+<%= cond do %>
+  <% String.contains?(@route, "/") -> %>
+    <%= for route_part <- String.split(@route, "/") do %>
+      <say-as interpret-as="address"><%= route_part %></say-as>
+    <% end %>
+  <% String.contains?(@route, "SL") -> %>
+    <% "SL" <> silver_line_route_number = @route %>
+    Silver Line route <say-as interpret-as="address"><%= silver_line_route_number %></say-as>
+  <% true -> %><say-as interpret-as="address"><%= @route %></say-as>
+<% end %>
+bus to <%= @destination %>

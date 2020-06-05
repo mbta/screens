@@ -1,0 +1,11 @@
+<s>
+  The next
+  <%= render_route(@departure.route, @departure.route_id, @departure.destination) %>
+  <%= render_time(@departure.time, @departure.current_time, @departure.vehicle_status, @departure.stop_type) %>
+</s>
+<%= if not is_nil(@departure.name) do %>
+  <s>Board at <%= @departure.name %></s>
+<% end %>
+<%= if :delay in @departure.alerts do %>
+  <s>There are delays on this route</s>
+<% end %>

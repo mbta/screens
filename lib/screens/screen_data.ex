@@ -41,7 +41,7 @@ defmodule Screens.ScreenData do
     end
   end
 
-  defp by_screen_id(screen_id, is_screen) do
+  def by_screen_id(screen_id, is_screen) do
     %{app_id: app_id} =
       :screens
       |> Application.get_env(:screen_data)

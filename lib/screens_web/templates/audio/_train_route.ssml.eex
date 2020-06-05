@@ -1,0 +1,8 @@
+<%= case @route_id do %>
+  <% "CR-" <> line_name -> %><%= line_name %> Commuter Rail train
+  <% "Blue" -> %>Blue Line train
+  <% "Red" -> %>Red Line train
+  <% "Mattapan" -> %>Mattapan Trolley
+  <% "Orange" -> %>Orange Line train
+<% end %>
+to <%= @destination %>
