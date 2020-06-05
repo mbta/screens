@@ -4,8 +4,6 @@ defmodule Screens.Audio do
   @lexicon_names ["mbtalexicon"]
 
   def synthesize(ssml_string) do
-    IO.puts(ssml_string)
-
     result =
       ssml_string
       |> ExAws.Polly.synthesize_speech(lexicon_names: @lexicon_names, text_type: "ssml")
