@@ -1,6 +1,0 @@
-<%= case @time_representation do %>
-  <% :brd -> %>is now boarding
-  <% :arr -> %>is now arriving
-  <% {:minutes, minute_difference} -> %>departs in <%= minute_difference %> minutes
-  <% {:timestamp, time} -> %>departs at <%= time %>
-<% end %>
