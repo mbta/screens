@@ -24,6 +24,6 @@ defmodule ScreensWeb.AudioView do
         true -> {:timestamp, Timex.format!(departure_time, "{h12}:{m} {AM}")}
       end
 
-    render("_time_representation.ssml", time_representation: time_representation)
+    render("_departure_time.ssml", time_representation: time_representation)
   end
 end
