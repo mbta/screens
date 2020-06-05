@@ -16,6 +16,8 @@ defmodule Screens.SolariScreenData do
         {_, time} -> time
       end
 
+    show_psa = Screens.Psa.show_solari_psa()
+
     case fetch_sections_data(sections, schedule) do
       {:ok, data} ->
         %{
@@ -24,7 +26,8 @@ defmodule Screens.SolariScreenData do
           current_time: Screens.Util.format_time(current_time),
           station_name: station_name,
           sections: data,
-          section_headers: section_headers
+          section_headers: section_headers,
+          show_psa: show_psa
         }
 
       :error ->
