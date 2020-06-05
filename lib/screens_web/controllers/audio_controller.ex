@@ -3,7 +3,7 @@ defmodule ScreensWeb.AudioController do
   require Logger
   alias Phoenix.View
 
-  @fallback_audio_path "assets/static/audio/audio_fallback.mp3"
+  @fallback_audio_path "assets/static/audio/readout_fallback.mp3"
 
   def show(conn, %{"id" => screen_id}) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
