@@ -4,7 +4,8 @@
        xsi:schemaLocation="http://www.w3.org/2001/10/synthesis
                  http://www.w3.org/TR/speech-synthesis11/synthesis.xsd"
        xml:lang="en-US">
-  <p><%= render "_header.ssml", station_name: @station_name %></p>
-  <p>
-<%= render_many @departures, ScreensWeb.AudioView, "_departure.ssml", as: :departure %>  </p>
+<p>
+<%= render "_header.ssml", station_name: @station_name %></p>
+<p>
+<%= render_many @departures, ScreensWeb.AudioView, "_departure.ssml", as: :departure %></p>
 </speak>
