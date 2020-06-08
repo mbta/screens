@@ -1,6 +1,6 @@
 # Developing SSML Templates for Amazon Polly
 
-While tweaking or adding to these templates, keep in mind that whitespace and newlines are _*not*_ ignored by Polly's SSML parser and will add unwated pauses. I suggest the following:
+While tweaking or adding to these templates, keep in mind that whitespace and newlines are _*not*_ ignored by Polly's SSML parser and will add unwanted pauses. I suggest the following:
 
 - Temporarily disable your editor's setting to add a newline to the end of the file on save, or permanently disable it for `.ssml.eex` files if possible.
 - Keep all non-rendering newlines within `<%= %>` or `<% %>` Elixir escape tags.
