@@ -117,17 +117,11 @@ class SectionList extends React.Component<SectionListProps, SectionListState> {
     this.maybeAdjustSectionSizes();
   }
 
-  componentDidUpdate(
-    _prevProps: SectionListProps,
-    prevState: SectionListState
-  ) {
-    if (this.stateEquals(prevState)) {
-      const newStateFromProps = SectionList.getInitialStateFromProps(
-        this.props
-      );
-      if (!this.stateEquals(newStateFromProps)) {
-        this.setState(newStateFromProps);
-      }
+  componentDidUpdate(_props: SectionListProps, prevState: SectionListState) {
+    const newStateFromProps = SectionList.getInitialStateFromProps(this.props);
+
+    if (this.stateEquals(prevState) && !this.stateEquals(newStateFromProps)) {
+      this.setState(newStateFromProps);
     } else {
       this.maybeAdjustSectionSizes();
     }
