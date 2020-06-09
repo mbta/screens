@@ -136,9 +136,9 @@ class SectionList extends React.Component<SectionListProps, SectionListState> {
   stateEquals(otherState: SectionListState) {
     const { numRows, sectionSizes } = this.state;
     return (
-      numRows == otherState.numRows &&
-      sectionSizes.length == otherState.sectionSizes.length &&
-      sectionSizes.every((n, i) => n == otherState.sectionSizes[i])
+      numRows === otherState.numRows &&
+      sectionSizes.length === otherState.sectionSizes.length &&
+      sectionSizes.every((n, i) => n === otherState.sectionSizes[i])
     );
   }
 
