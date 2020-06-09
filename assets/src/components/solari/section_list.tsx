@@ -97,17 +97,6 @@ interface SectionListState {
 
 const MAX_DEPARTURES_HEIGHT = 1565;
 
-const debug = <T extends Array<any>, U>(fn: (...args: T) => U) => (
-  ...args: T
-) => {
-  console.log(`called ${fn.name} with`, ...args);
-  const result = fn(...args);
-  if (result != undefined) {
-    console.log(`${fn.name} returned`, result);
-  }
-  return result;
-};
-
 class SectionList extends React.Component<SectionListProps, SectionListState> {
   ref: React.RefObject<HTMLDivElement>;
 
@@ -115,29 +104,32 @@ class SectionList extends React.Component<SectionListProps, SectionListState> {
     super(props);
     this.ref = React.createRef();
 
-    this.state = debug(SectionList.getInitialStateFromProps)(props);
+    this.state = SectionList.getInitialStateFromProps(props);
   }
 
   static getInitialStateFromProps(props: SectionListProps) {
-    const initialRows = debug(totalRows)(props.sections);
-    const initialSizes = debug(assignSectionSizes)(props.sections, initialRows);
+    const initialRows = totalRows(props.sections);
+    const initialSizes = assignSectionSizes(props.sections, initialRows);
     return { numRows: initialRows, sectionSizes: initialSizes };
   }
 
   componentDidMount() {
-    debug(this.maybeAdjustSectionSizes.bind(this))();
+    this.maybeAdjustSectionSizes();
   }
 
   componentDidUpdate(
     _prevProps: SectionListProps,
     prevState: SectionListState
   ) {
-    if (debug(this.stateEquals.bind(this))(prevState)) {
-      this.setState((_, prevProps) =>
-        debug(SectionList.getInitialStateFromProps)(prevProps)
+    if (this.stateEquals(prevState)) {
+      const newStateFromProps = SectionList.getInitialStateFromProps(
+        this.props
       );
+      if (!this.stateEquals(newStateFromProps)) {
+        this.setState(newStateFromProps);
+      }
     } else {
-      debug(this.maybeAdjustSectionSizes.bind(this))();
+      this.maybeAdjustSectionSizes();
     }
   }
 
