@@ -166,9 +166,7 @@ class SectionList extends React.Component<SectionListProps, SectionListState> {
               numRows={this.state.sectionSizes[i]}
               sectionHeaders={sectionHeaders}
               currentTimeString={currentTimeString}
-              key={
-                section.name + this.state.sectionSizes[i] + currentTimeString
-              }
+              key={section.name}
             />
           );
         })}
