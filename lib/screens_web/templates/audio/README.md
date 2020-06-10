@@ -25,6 +25,6 @@ While tweaking or adding to these templates, keep in mind that whitespace and ne
   <%= render_route_id @route_id %> to <%= destination %>
   ```
 
-  **Note**: If this function's return value contains any tags, they _must_ be wrapped in a `{:safe, _}` tuple to prevent the template engine from escaping the brackets. See `ScreensWeb.AudioView.say_as_address_open` for an example.
+  **Note**: If this function's return value contains any tags, they _must_ be wrapped in a `{:safe, _}` tuple to prevent the template engine from escaping the brackets. See `ScreensWeb.AudioView.say_as_address` for an example.
 
 - Use `<s>` and `<p>` to explicitly mark sentences and paragraphs. Use `<break>` if you need to fine-tune a pause.

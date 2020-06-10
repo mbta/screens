@@ -23,7 +23,7 @@ defmodule ScreensWeb.AudioView do
 
   @spec render_route_id(String.t()) :: HTML.unsafe()
   def render_route_id("CR-" <> line_name) do
-    [line_name, " Commuter Rail train"]
+    [line_name, " Line train"]
   end
 
   def render_route_id(color) when color in ~w[Blue Red Orange] do
@@ -34,16 +34,16 @@ defmodule ScreensWeb.AudioView do
 
   @spec render_route(String.t()) :: HTML.unsafe()
   def render_route("SL" <> route_number) do
-    ["Silver Line route ", say_as_address_open(), route_number, say_as_close()]
+    ["Silver Line route ", say_as_address(route_number)]
   end
 
   def render_route(route) do
     if String.contains?(route, "/") do
       for route_part <- String.split(route, "/") do
-        [say_as_address_open(), route_part, say_as_close()]
+        say_as_address(route_part)
       end
     else
-      [say_as_address_open(), route, say_as_close()]
+      say_as_address(route)
     end
   end
 
@@ -59,11 +59,10 @@ defmodule ScreensWeb.AudioView do
     ["departs at ", timestamp]
   end
 
-  @spec say_as_address_open() :: HTML.safe()
-  defp say_as_address_open, do: {:safe, ~s|<say-as interpret-as="address">|}
-
-  @spec say_as_close() :: HTML.safe()
-  defp say_as_close, do: {:safe, "</say-as>"}
+  @spec say_as_address(HTML.unsafe()) :: HTML.unsafe()
+  defp say_as_address(text) do
+    [{:safe, ~s|<say-as interpret-as="address">|}, text, {:safe, "</say-as>"}]
+  end
 
   defp get_time_representation(departure_time, current_time, vehicle_status, stop_type) do
     {:ok, departure_time, _} = DateTime.from_iso8601(departure_time)
