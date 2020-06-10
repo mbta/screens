@@ -1,4 +1,4 @@
-import React, { useRef, useState, useLayoutEffect } from "react";
+import React from "react";
 import _ from "lodash";
 
 import { PagedSection, Section } from "Components/solari/section";
@@ -84,59 +84,97 @@ const assignSectionSizesHelper = (
   return roundedSizes;
 };
 
-const SectionList = ({
-  sections,
-  sectionHeaders,
-  currentTimeString,
-}): JSX.Element => {
-  const MAX_DEPARTURES_HEIGHT = 1565;
+interface SectionListProps {
+  sections: object[];
+  sectionHeaders: string;
+  currentTimeString: string;
+}
 
-  const ref = useRef(null);
-  const initialRows = totalRows(sections);
-  const initialSizes = assignSectionSizes(sections, initialRows);
-  const initialState = { numRows: initialRows, sectionSizes: initialSizes };
-  const [state, setState] = useState(initialState);
+interface SectionListState {
+  numRows: number;
+  sectionSizes: number[];
+}
 
-  useLayoutEffect(() => {
-    if (ref.current) {
-      const departuresHeight = ref.current.clientHeight;
+const MAX_DEPARTURES_HEIGHT = 1565;
 
-      if (departuresHeight > MAX_DEPARTURES_HEIGHT && state.numRows > 5) {
-        const newRows = state.numRows - 1;
-        const newSizes = assignSectionSizes(sections, newRows);
-        const newState = { numRows: newRows, sectionSizes: newSizes };
-        setState(newState);
+class SectionList extends React.Component<SectionListProps, SectionListState> {
+  ref: React.RefObject<HTMLDivElement>;
+
+  constructor(props: SectionListProps) {
+    super(props);
+    this.ref = React.createRef();
+
+    this.state = SectionList.getInitialStateFromProps(props);
+  }
+
+  static getInitialStateFromProps(props: SectionListProps) {
+    const initialRows = totalRows(props.sections);
+    const initialSizes = assignSectionSizes(props.sections, initialRows);
+    return { numRows: initialRows, sectionSizes: initialSizes };
+  }
+
+  componentDidMount() {
+    this.maybeAdjustSectionSizes();
+  }
+
+  componentDidUpdate(_props: SectionListProps, prevState: SectionListState) {
+    const newStateFromProps = SectionList.getInitialStateFromProps(this.props);
+
+    if (this.stateEquals(prevState) && !this.stateEquals(newStateFromProps)) {
+      this.setState(newStateFromProps);
+    } else {
+      this.maybeAdjustSectionSizes();
+    }
+  }
+
+  stateEquals(otherState: SectionListState) {
+    const { numRows, sectionSizes } = this.state;
+    return (
+      numRows === otherState.numRows &&
+      sectionSizes.length === otherState.sectionSizes.length &&
+      sectionSizes.every((n, i) => n === otherState.sectionSizes[i])
+    );
+  }
+
+  maybeAdjustSectionSizes() {
+    if (this.ref.current != null) {
+      const departuresHeight = this.ref.current.clientHeight;
+
+      if (departuresHeight > MAX_DEPARTURES_HEIGHT && this.state.numRows > 5) {
+        this.setState((prevState, prevProps) => {
+          const newRows = prevState.numRows - 1;
+          const newSizes = assignSectionSizes(prevProps.sections, newRows);
+          return { numRows: newRows, sectionSizes: newSizes };
+        });
       }
     }
-  });
+  }
 
-  return (
-    <div className="section-list" ref={ref}>
-      {sections.map((section, i) => {
-        if (section.paging && section.paging.is_enabled === true) {
+  render() {
+    const { sections, sectionHeaders, currentTimeString } = this.props;
+
+    return (
+      <div className="section-list" ref={this.ref}>
+        {sections.map((section, i) => {
+          const SectionComponent = section?.paging?.is_enabled
+            ? PagedSection
+            : Section;
+
           return (
-            <PagedSection
+            <SectionComponent
               {...section}
-              numRows={state.sectionSizes[i]}
+              numRows={this.state.sectionSizes[i]}
               sectionHeaders={sectionHeaders}
               currentTimeString={currentTimeString}
-              key={section.name + state.sectionSizes[i] + currentTimeString}
+              key={
+                section.name + this.state.sectionSizes[i] + currentTimeString
+              }
             />
           );
-        } else {
-          return (
-            <Section
-              {...section}
-              numRows={state.sectionSizes[i]}
-              sectionHeaders={sectionHeaders}
-              currentTimeString={currentTimeString}
-              key={section.name + state.sectionSizes[i] + currentTimeString}
-            />
-          );
-        }
-      })}
-    </div>
-  );
-};
+        })}
+      </div>
+    );
+  }
+}
 
 export default SectionList;
