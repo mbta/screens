@@ -266,8 +266,8 @@ const PagedSection = ({
   const staticDepartureGroups = buildDepartureGroups(staticDepartures);
 
   const frameProps = {
-    sectionHeaders: sectionHeaders,
-    name: name,
+    sectionHeaders,
+    name,
     arrow: sectionHeaders === "normal" ? arrow : null,
   };
 
