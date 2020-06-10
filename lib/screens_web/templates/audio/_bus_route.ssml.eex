@@ -1,0 +1,1 @@
+<%= render_route @route %> bus to <%= @destination %>

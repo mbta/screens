@@ -36,6 +36,9 @@ npm-debug.log
 # Local config file
 /priv/local.json
 
+# local environment variables
+/priv/local.env
+
 /assets/coverage
 
 # Ignore the directory created by the ElixirLS VSCode plugin

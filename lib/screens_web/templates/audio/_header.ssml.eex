@@ -1,0 +1,1 @@
+<s>This screen shows upcoming trips at <%= @station_name %></s>
