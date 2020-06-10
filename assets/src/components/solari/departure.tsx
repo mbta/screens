@@ -22,21 +22,26 @@ const Departure = ({
   const via =
     destination && destination.includes(" via ") ? "with-via" : "no-via";
 
+  const timeRepresentation = standardTimeRepresentation(
+    time,
+    currentTimeString,
+    vehicleStatus,
+    stopType
+  );
+
+  const timeAnimationModifier =
+    timeRepresentation.type === "TEXT" ? "animated" : "static";
+
   return (
     <div className={classWithModifier("departure", via)}>
       <DepartureRoutePill route={route} routeId={routeId} />
       <div className="departure-destination">
         {destination && <BaseDepartureDestination destination={destination} />}
       </div>
-      <div className="departure-time">
-        <BaseDepartureTime
-          time={standardTimeRepresentation(
-            time,
-            currentTimeString,
-            vehicleStatus,
-            stopType
-          )}
-        />
+      <div
+        className={classWithModifier("departure-time", timeAnimationModifier)}
+      >
+        <BaseDepartureTime time={timeRepresentation} />
       </div>
       {alerts.length > 0 && (
         <div className="departure__alerts-container">
