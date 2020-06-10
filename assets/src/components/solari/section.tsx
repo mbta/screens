@@ -1,7 +1,7 @@
 import React from "react";
 
 import Departure from "Components/solari/departure";
-import Arrow from "Components/solari/arrow";
+import Arrow, { Direction } from "Components/solari/arrow";
 import {
   SectionRoutePill,
   PagedDepartureRoutePill,
@@ -94,56 +94,6 @@ const SectionHeader = ({ name, arrow }): JSX.Element => {
   );
 };
 
-const PagedDeparture = ({
-  departures,
-  currentPageNumber,
-  currentTimeString,
-}): JSX.Element => {
-  if (currentPageNumber >= departures.length) {
-    return null;
-  }
-
-  // Don't show alert badges in the paging row
-  const currentPagedDeparture = {
-    ...departures[currentPageNumber],
-    alerts: [],
-  };
-
-  // Determine whether all route pills are small.
-  // If route pills differ in size, we need to adjust the position of the small ones.
-  // If all route pills are the same size, we don't want to make any adjustment.
-  const isSmall = (departure) =>
-    departure.route_id.startsWith("CR-") || departure.route.includes("/");
-  const sizeModifier = departures.every(isSmall) ? "size-small" : "size-normal";
-
-  return (
-    <div className="later-departure">
-      <div className="later-departure__header">
-        <div className="later-departure__header-title">Later Departures</div>
-        <div
-          className={classWithModifier(
-            "later-departure__header-route-list",
-            sizeModifier
-          )}
-        >
-          {departures.map((departure, i) => (
-            <PagedDepartureRoutePill
-              route={departure.route}
-              routeId={departure.route_id}
-              selected={i === currentPageNumber}
-              key={departure.id}
-            />
-          ))}
-        </div>
-      </div>
-      <DepartureGroup
-        departures={[currentPagedDeparture]}
-        currentTimeString={currentTimeString}
-      />
-    </div>
-  );
-};
-
 const SectionFrame = ({
   sectionHeaders,
   name,
@@ -179,18 +129,34 @@ const NoDeparturesMessage = ({ pill }): JSX.Element => (
   </div>
 );
 
-class PagedSection extends React.Component {
-  constructor(props) {
+interface PagedDepartureProps {
+  pageCount: number;
+  departures: object[];
+}
+
+interface PagedDepartureState {
+  currentPageNumber: number;
+}
+
+class PagedDeparture extends React.Component<
+  PagedDepartureProps,
+  PagedDepartureState
+> {
+  interval: number | null;
+
+  constructor(props: PagedDepartureProps) {
     super(props);
     this.state = { currentPageNumber: 0 };
-    this.MAX_PAGE_COUNT = 5;
-    this.MIN_PAGE_COUNT = 3;
+    this.interval = null;
   }
 
   componentDidMount() {
     const refreshMs = this.pageDuration();
     if (refreshMs !== null) {
-      this.interval = setInterval(this.updatePaging.bind(this), refreshMs);
+      this.interval = window.setInterval(
+        this.updatePaging.bind(this),
+        refreshMs
+      );
     }
   }
 
@@ -201,90 +167,143 @@ class PagedSection extends React.Component {
   }
 
   updatePaging() {
-    this.setState((state, props) => {
-      const numPages = this.pageCount(props);
-      if (numPages === 0) {
+    this.setState((state: PagedDepartureState, props: PagedDepartureProps) => {
+      if (props.pageCount === 0) {
         return { currentPageNumber: 0 };
       } else {
-        return { currentPageNumber: (state.currentPageNumber + 1) % numPages };
+        return {
+          currentPageNumber: (state.currentPageNumber + 1) % props.pageCount,
+        };
       }
     });
   }
 
   pageDuration() {
-    const numPages = this.pageCount(this.props);
-    if (numPages <= 1) {
+    if (this.props.pageCount <= 1) {
       // Don't set an interval if there are 0 or 1 pages
       return null;
-    } else if (numPages === 2) {
+    } else if (this.props.pageCount === 2) {
       return 3750;
     } else {
-      return 15000 / numPages;
+      return 15000 / this.props.pageCount;
     }
-  }
-
-  pagedRoutes() {
-    return this.pagedDepartures().map(({ route }) => route);
-  }
-
-  pagedDepartures() {
-    const startIndex = this.props.numRows - 1;
-    const pageCount = this.pageCount(this.props);
-    return this.props.departures.slice(startIndex, startIndex + pageCount);
-  }
-
-  pageCount(props) {
-    const excessDepartures = props.departures.length - props.numRows + 1;
-    return Math.min(excessDepartures, this.MAX_PAGE_COUNT);
   }
 
   render() {
-    const numPages = this.pageCount(this.props);
-    const showPagedDeparture = numPages >= this.MIN_PAGE_COUNT;
-    const staticDepartures = showPagedDeparture
-      ? this.props.departures.slice(0, this.props.numRows - 1)
-      : this.props.departures;
-    const staticDepartureGroups = buildDepartureGroups(staticDepartures);
-
-    let arrow = this.props.arrow;
-    if (this.props.sectionHeaders !== "normal") {
-      arrow = null;
-    }
-
-    const frameProps = {
-      sectionHeaders: this.props.sectionHeaders,
-      name: this.props.name,
-      arrow,
+    // Don't show alert badges in the paging row
+    const currentPagedDeparture = {
+      ...this.props.departures[this.state.currentPageNumber],
+      alerts: [],
     };
 
-    if (staticDepartureGroups.length === 0) {
-      return (
-        <SectionFrame {...frameProps}>
-          <NoDeparturesMessage pill={this.props.pill} />
-        </SectionFrame>
-      );
-    }
+    // Determine whether all route pills are small.
+    // If route pills differ in size, we need to adjust the position of the small ones.
+    // If all route pills are the same size, we don't want to make any adjustment.
+    const isSmall = (departure) =>
+      departure.route_id.startsWith("CR-") || departure.route.includes("/");
+    const sizeModifier = this.props.departures.every(isSmall)
+      ? "size-small"
+      : "size-normal";
 
     return (
-      <SectionFrame {...frameProps}>
-        {staticDepartureGroups.map((group) => (
-          <DepartureGroup
-            departures={group}
-            currentTimeString={this.props.currentTimeString}
-            key={group[0].id}
-          />
-        ))}
-        {showPagedDeparture && (
-          <PagedDeparture
-            departures={this.pagedDepartures()}
-            currentPageNumber={this.state.currentPageNumber}
-            currentTimeString={this.props.currentTimeString}
-          />
-        )}
-      </SectionFrame>
+      <div className="later-departure">
+        <div className="later-departure__header">
+          <div className="later-departure__header-title">Later Departures</div>
+          <div
+            className={classWithModifier(
+              "later-departure__header-route-list",
+              sizeModifier
+            )}
+          >
+            {this.props.departures.map((departure, i) => (
+              <PagedDepartureRoutePill
+                route={departure.route}
+                routeId={departure.route_id}
+                selected={i === this.state.currentPageNumber}
+                key={departure.id}
+              />
+            ))}
+          </div>
+        </div>
+        <DepartureGroup
+          departures={[currentPagedDeparture]}
+          currentTimeString={this.props.currentTimeString}
+        />
+      </div>
     );
   }
 }
+
+const MAX_PAGE_COUNT = 5;
+const MIN_PAGE_COUNT = 3;
+
+interface PagedSectionProps {
+  departures: object[];
+  numRows: number;
+  arrow: Direction | null;
+  sectionHeaders: "normal" | "vertical" | null;
+  name: string | null;
+  pill: string;
+  currentTimeString: string;
+}
+
+const PagedSection = ({
+  departures,
+  numRows,
+  arrow,
+  sectionHeaders,
+  name,
+  pill,
+  currentTimeString,
+}: PagedSectionProps): JSX.Element => {
+  const excessDepartures = departures.length - numRows + 1;
+  const pageCount = Math.min(excessDepartures, MAX_PAGE_COUNT);
+
+  const showPagedDeparture = pageCount >= MIN_PAGE_COUNT;
+  const staticDepartures = showPagedDeparture
+    ? departures.slice(0, numRows - 1)
+    : departures;
+  const staticDepartureGroups = buildDepartureGroups(staticDepartures);
+
+  const frameProps = {
+    sectionHeaders,
+    name,
+    arrow: sectionHeaders === "normal" ? arrow : null,
+  };
+
+  if (staticDepartureGroups.length === 0) {
+    return (
+      <SectionFrame {...frameProps}>
+        <NoDeparturesMessage pill={pill} />
+      </SectionFrame>
+    );
+  }
+
+  let pagedDepartures;
+  if (showPagedDeparture) {
+    const startIndex = numRows - 1;
+    pagedDepartures = departures.slice(startIndex, startIndex + pageCount);
+  }
+
+  return (
+    <SectionFrame {...frameProps}>
+      {staticDepartureGroups.map((group) => (
+        <DepartureGroup
+          departures={group}
+          currentTimeString={currentTimeString}
+          key={group[0].id}
+        />
+      ))}
+      {showPagedDeparture && (
+        <PagedDeparture
+          pageCount={pageCount}
+          departures={pagedDepartures}
+          key={currentTimeString}
+        />
+      )}
+    </SectionFrame>
+  );
+};
 
 const Section = ({
   name,

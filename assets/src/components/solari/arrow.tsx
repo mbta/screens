@@ -72,3 +72,4 @@ const Arrow = ({
 };
 
 export default Arrow;
+export { Direction };
