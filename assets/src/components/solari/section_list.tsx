@@ -156,31 +156,21 @@ class SectionList extends React.Component<SectionListProps, SectionListState> {
     return (
       <div className="section-list" ref={this.ref}>
         {sections.map((section, i) => {
-          if (section.paging && section.paging.is_enabled === true) {
-            return (
-              <PagedSection
-                {...section}
-                numRows={this.state.sectionSizes[i]}
-                sectionHeaders={sectionHeaders}
-                currentTimeString={currentTimeString}
-                key={
-                  section.name + this.state.sectionSizes[i] + currentTimeString
-                }
-              />
-            );
-          } else {
-            return (
-              <Section
-                {...section}
-                numRows={this.state.sectionSizes[i]}
-                sectionHeaders={sectionHeaders}
-                currentTimeString={currentTimeString}
-                key={
-                  section.name + this.state.sectionSizes[i] + currentTimeString
-                }
-              />
-            );
-          }
+          const SectionComponent = section?.paging?.is_enabled
+            ? PagedSection
+            : Section;
+
+          return (
+            <SectionComponent
+              {...section}
+              numRows={this.state.sectionSizes[i]}
+              sectionHeaders={sectionHeaders}
+              currentTimeString={currentTimeString}
+              key={
+                section.name + this.state.sectionSizes[i] + currentTimeString
+              }
+            />
+          );
         })}
       </div>
     );
