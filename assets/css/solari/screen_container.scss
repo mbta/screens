@@ -11,4 +11,32 @@
     rgba(199, 199, 199, 0.58) 40% 50%
   );
   background-size: 15px 15px;
+  overflow-y: hidden;
+}
+
+.screen-container__flex-space {
+  position: absolute;
+  left: -100%;
+  bottom: 100px;
+
+  animation: slide 5s cubic-bezier(0.32, 0, 0.67, 0) forwards;
+  animation-delay: 9s;
+
+  @keyframes slide {
+    0% {
+      left: -100%;
+    }
+
+    4% {
+      left: 0;
+    }
+
+    96% {
+      left: 0;
+    }
+
+    100% {
+      left: -100%;
+    }
+  }
 }

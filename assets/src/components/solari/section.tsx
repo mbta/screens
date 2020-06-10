@@ -196,11 +196,25 @@ class PagedDeparture extends React.Component<
       alerts: [],
     };
 
+    // Determine whether all route pills are small.
+    // If route pills differ in size, we need to adjust the position of the small ones.
+    // If all route pills are the same size, we don't want to make any adjustment.
+    const isSmall = (departure) =>
+      departure.route_id.startsWith("CR-") || departure.route.includes("/");
+    const sizeModifier = this.props.departures.every(isSmall)
+      ? "size-small"
+      : "size-normal";
+
     return (
       <div className="later-departure">
         <div className="later-departure__header">
           <div className="later-departure__header-title">Later Departures</div>
-          <div className="later-departure__header-route-list">
+          <div
+            className={classWithModifier(
+              "later-departure__header-route-list",
+              sizeModifier
+            )}
+          >
             {this.props.departures.map((departure, i) => (
               <PagedDepartureRoutePill
                 route={departure.route}
