@@ -1,5 +1,4 @@
 import React from "react";
-import _ from "lodash";
 
 import Departure from "Components/solari/departure";
 import Arrow from "Components/solari/arrow";
@@ -113,10 +112,9 @@ const PagedDeparture = ({
   // Determine whether all route pills are small.
   // If route pills differ in size, we need to adjust the position of the small ones.
   // If all route pills are the same size, we don't want to make any adjustment.
-  const isCommuterRail = departures[0].route_id.startsWith("CR-");
-  const allRoutesSlashed = _.every(departures, (d) => d.route.includes("/"));
-  const sizeModifier =
-    isCommuterRail || allRoutesSlashed ? "size-small" : "size-normal";
+  const isSmall = (departure) =>
+    departure.route_id.startsWith("CR-") || departure.route.includes("/");
+  const sizeModifier = departures.every(isSmall) ? "size-small" : "size-normal";
 
   return (
     <div className="later-departure">
