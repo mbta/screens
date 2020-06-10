@@ -20,7 +20,14 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         sectionHeaders={apiResponse.section_headers}
         currentTimeString={apiResponse.current_time}
       />
-      <div className="screen-container__flex-space" />
+      {apiResponse.show_psa && (
+        <div
+          className="screen-container__flex-space"
+          key={"flex-" + apiResponse.current_time}
+        >
+          <img src="/images/feedback-psa.png" />
+        </div>
+      )}
     </div>
   );
 };
