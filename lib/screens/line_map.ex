@@ -25,10 +25,13 @@ defmodule Screens.LineMap do
     }
   end
 
-  defp filter_predictions_by_vehicles(predictions, vehicles, route_stops, current_stop_index) do
+  def filter_predictions_by_vehicles(predictions, vehicles, route_stops, current_stop_index) do
     departed_vehicle_trip_ids =
       vehicles
-      |> Enum.filter(fn v -> find_vehicle_index(v, route_stops) > current_stop_index end)
+      |> Enum.filter(fn v ->
+        index = find_vehicle_index(v, route_stops)
+        not is_nil(index) and index > current_stop_index
+      end)
       |> Enum.map(fn %{trip_id: trip_id} -> trip_id end)
       |> Enum.reject(&is_nil/1)
 
