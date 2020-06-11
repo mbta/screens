@@ -57,7 +57,9 @@ defmodule Screens.ScreenData do
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
 
-    {:ok, datetime, 0} = DateTime.from_iso8601("#{datetime_str}Z")
+    {:ok, naive} = Timex.parse(datetime_str, "{ISO:Extended}")
+    {:ok, local} = DateTime.from_naive(naive, "America/New_York")
+    {:ok, datetime} = DateTime.shift_zone(local, "Etc/UTC")
     screen_data_module = Map.get(@modules_by_app_id, app_id)
     screen_data_module.by_screen_id(screen_id, false, datetime)
   end
