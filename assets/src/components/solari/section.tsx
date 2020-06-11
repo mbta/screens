@@ -29,44 +29,6 @@ const camelizeDepartureObject = ({
   stopType,
 });
 
-const DepartureGroup = ({ departures, currentTimeString }): JSX.Element => {
-  const groupModifier = departures.length > 1 ? "multiple-rows" : "single-row";
-
-  return (
-    <div className={classWithModifier("departure-group", groupModifier)}>
-      {departures.map(
-        (
-          {
-            id,
-            route,
-            destination,
-            time,
-            route_id: routeId,
-            vehicle_status: vehicleStatus,
-            alerts,
-            stop_type: stopType,
-          },
-          i
-        ) => {
-          return (
-            <Departure
-              route={i === 0 ? route : null}
-              routeId={routeId}
-              destination={i === 0 ? destination : null}
-              time={time}
-              currentTimeString={currentTimeString}
-              vehicleStatus={vehicleStatus}
-              alerts={i === 0 ? alerts : []}
-              stopType={stopType}
-              key={id}
-            />
-          );
-        }
-      )}
-    </div>
-  );
-};
-
 const SectionHeader = ({ name, arrow }): JSX.Element => {
   return (
     <div className="section-header">
