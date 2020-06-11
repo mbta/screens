@@ -8,7 +8,7 @@
   }
 }
 
-.departure-group {
+.departure {
   margin-left: 42px;
   margin-right: 42px;
   padding-bottom: 10px;
@@ -17,20 +17,15 @@
   &:not(:last-child) {
     border-bottom: 3px solid rgba(199, 199, 199, 0.58);
   }
-}
-
-.departure {
-  margin-left: 0px;
-  margin-right: 0px;
 
   &--with-via {
-    padding-top: 3.5px;
-    padding-bottom: 3.5px;
+    padding-top: 14px;
+    padding-bottom: 14px;
   }
 
   &--no-via {
-    padding-top: 14px;
-    padding-bottom: 14px;
+    padding-top: 24px;
+    padding-bottom: 24px;
   }
 }
 
