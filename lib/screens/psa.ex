@@ -3,6 +3,7 @@ defmodule Screens.Psa do
 
   @eink_refresh_seconds 30
   @solari_refresh_seconds 15
+  @solari_psa_period 3
 
   alias Screens.Override.State
 
@@ -14,8 +15,16 @@ defmodule Screens.Psa do
     choose_from_rotating_list(State.green_line_psa_list(), @eink_refresh_seconds)
   end
 
-  def show_solari_psa do
-    choose_from_rotating_list([true, false, false], @solari_refresh_seconds)
+  def current_solari_psa do
+    # How often to change the selected PSA
+    solari_psa_refresh_seconds = @solari_refresh_seconds * @solari_psa_period
+
+    # Choose which PSA to show, if we're showing one this refresh
+    solari_psa = choose_from_rotating_list(State.solari_psa_list(), solari_psa_refresh_seconds)
+
+    # Return either the current PSA or nil
+    solari_list = [solari_psa] ++ List.duplicate(nil, @solari_psa_period - 1)
+    choose_from_rotating_list(solari_list, @solari_refresh_seconds)
   end
 
   defp choose_from_rotating_list([], _), do: nil
