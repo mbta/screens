@@ -4,21 +4,21 @@ defmodule Screens.SolariScreenData do
   require Logger
   alias Screens.Departures.Departure
 
-  def by_screen_id(screen_id, _is_screen, schedule \\ nil) do
+  def by_screen_id(screen_id, _is_screen, datetime \\ nil) do
     %{station_name: station_name, sections: sections, section_headers: section_headers} =
       :screens
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
 
     current_time =
-      case schedule do
+      case datetime do
         nil -> DateTime.utc_now()
-        {_, time} -> time
+        dt -> dt
       end
 
     show_psa = Screens.Psa.show_solari_psa()
 
-    case fetch_sections_data(sections, schedule) do
+    case fetch_sections_data(sections, datetime) do
       {:ok, data} ->
         %{
           force_reload: false,
@@ -35,8 +35,8 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp fetch_sections_data(sections, schedule) do
-    sections_data = Enum.map(sections, &fetch_section_data(&1, schedule))
+  defp fetch_sections_data(sections, datetime) do
+    sections_data = Enum.map(sections, &fetch_section_data(&1, datetime))
 
     if Enum.any?(sections_data, fn data -> data == :error end) do
       :error
@@ -53,9 +53,9 @@ defmodule Screens.SolariScreenData do
            layout: layout_params,
            pill: pill
          },
-         schedule
+         datetime
        ) do
-    case query_data(query_params, query_opts, schedule) do
+    case query_data(query_params, query_opts, datetime) do
       {:ok, data} ->
         {:ok,
          %{
@@ -80,11 +80,11 @@ defmodule Screens.SolariScreenData do
     %{is_enabled: false}
   end
 
-  def query_data(query_params, query_opts, schedule) do
-    if is_nil(schedule) do
+  def query_data(query_params, query_opts, datetime) do
+    if is_nil(datetime) do
       Departure.fetch(query_params, query_opts)
     else
-      Departure.fetch_schedules_by_date_and_time(query_params, schedule)
+      Departure.fetch_schedules_by_datetime(query_params, datetime)
     end
   end
 

@@ -51,22 +51,14 @@ defmodule Screens.ScreenData do
     screen_data_module.by_screen_id(screen_id, is_screen)
   end
 
-  def by_screen_id_with_datetime(screen_id, date_str, time_str) do
+  def by_screen_id_with_datetime(screen_id, datetime_str) do
     %{app_id: app_id} =
       :screens
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
 
-    # Split the service day at 3am by shifting to Pacific Time.
-    # Midnight at Pacific Time is always 3am here.
-    utc_time = DateTime.utc_now()
-    {:ok, pacific_time} = DateTime.shift_zone(utc_time, "America/Los_Angeles")
-    current_service_date = DateTime.to_date(pacific_time)
-
-    {:ok, date} = Date.from_iso8601(date_str)
-    {:ok, time, _} = DateTime.from_iso8601("#{current_service_date} #{time_str}Z")
-
+    {:ok, datetime, 0} = DateTime.from_iso8601("#{datetime_str}Z")
     screen_data_module = Map.get(@modules_by_app_id, app_id)
-    screen_data_module.by_screen_id(screen_id, false, {date, time})
+    screen_data_module.by_screen_id(screen_id, false, datetime)
   end
 end

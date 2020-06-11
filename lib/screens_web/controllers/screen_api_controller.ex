@@ -2,8 +2,8 @@ defmodule ScreensWeb.ScreenApiController do
   use ScreensWeb, :controller
   require Logger
 
-  def show(conn, %{"id" => screen_id, "version" => _version, "date" => date, "time" => time}) do
-    data = Screens.ScreenData.by_screen_id_with_datetime(screen_id, date, time)
+  def show(conn, %{"id" => screen_id, "version" => _version, "datetime" => datetime}) do
+    data = Screens.ScreenData.by_screen_id_with_datetime(screen_id, datetime)
 
     json(conn, data)
   end
