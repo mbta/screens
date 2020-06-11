@@ -144,13 +144,21 @@ defmodule Screens.Headways do
   # placeholder value
   defp service_start(:sunday, "place-mfa", 1), do: ~T[05:35:00]
 
-  defp service_start(_, "place-bland", 0), do: ~T[05:40:00]
-  defp service_start(_, "place-bland", 1), do: ~T[04:45:00]
-  defp service_start(_, "place-bcnwa", 0), do: ~T[05:30:00]
-  defp service_start(_, "place-bcnwa", 1), do: ~T[04:50:00]
-  defp service_start(_, "place-mfa", 0), do: ~T[05:01:00]
+  defp service_start(:saturday, "place-bland", 0), do: ~T[05:40:00]
+  defp service_start(:saturday, "place-bland", 1), do: ~T[04:45:00]
+  defp service_start(:saturday, "place-bcnwa", 0), do: ~T[05:30:00]
+  defp service_start(:saturday, "place-bcnwa", 1), do: ~T[04:50:00]
+  defp service_start(:saturday, "place-mfa", 0), do: ~T[05:01:00]
   # placeholder value
-  defp service_start(_, "place-mfa", 1), do: ~T[05:01:00]
+  defp service_start(:saturday, "place-mfa", 1), do: ~T[05:01:00]
+
+  defp service_start(:weekday, "place-bland", 0), do: ~T[05:45:00]
+  defp service_start(:weekday, "place-bland", 1), do: ~T[05:01:00]
+  defp service_start(:weekday, "place-bcnwa", 0), do: ~T[05:48:00]
+  defp service_start(:weekday, "place-bcnwa", 1), do: ~T[04:57:00]
+  defp service_start(:weekday, "place-mfa", 0), do: ~T[05:00:00]
+  # placeholder value
+  defp service_start(:weekday, "place-mfa", 1), do: ~T[05:00:00]
 
   # Time to begin showing Good Night screen if there are no predictions
   defp service_end(:sunday, "place-bland", 0), do: ~T[01:12:00]
@@ -161,11 +169,19 @@ defmodule Screens.Headways do
   # placeholder value
   defp service_end(:sunday, "place-mfa", 1), do: ~T[00:54:00]
 
-  defp service_end(_, "place-bland", 0), do: ~T[01:20:00]
-  defp service_end(_, "place-bland", 1), do: ~T[00:39:00]
-  defp service_end(_, "place-bcnwa", 0), do: ~T[01:16:00]
-  defp service_end(_, "place-bcnwa", 1), do: ~T[00:34:00]
-  defp service_end(_, "place-mfa", 0), do: ~T[00:55:00]
+  defp service_end(:saturday, "place-bland", 0), do: ~T[01:20:00]
+  defp service_end(:saturday, "place-bland", 1), do: ~T[00:39:00]
+  defp service_end(:saturday, "place-bcnwa", 0), do: ~T[01:16:00]
+  defp service_end(:saturday, "place-bcnwa", 1), do: ~T[00:14:00]
+  defp service_end(:saturday, "place-mfa", 0), do: ~T[00:55:00]
   # placeholder value
-  defp service_end(_, "place-mfa", 1), do: ~T[00:55:00]
+  defp service_end(:saturday, "place-mfa", 1), do: ~T[00:55:00]
+
+  defp service_end(:weekday, "place-bland", 0), do: ~T[01:20:00]
+  defp service_end(:weekday, "place-bland", 1), do: ~T[00:39:00]
+  defp service_end(:weekday, "place-bcnwa", 0), do: ~T[01:17:00]
+  defp service_end(:weekday, "place-bcnwa", 1), do: ~T[00:11:00]
+  defp service_end(:weekday, "place-mfa", 0), do: ~T[00:55:00]
+  # placeholder value
+  defp service_end(:weekday, "place-mfa", 1), do: ~T[00:55:00]
 end
