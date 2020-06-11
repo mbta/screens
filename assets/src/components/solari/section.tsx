@@ -9,77 +9,25 @@ import {
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
 import { classWithModifier } from "Util/util";
 
-const buildDepartureGroups = (departures) => {
-  if (!departures) {
-    return [];
-  }
-
-  const groups = [];
-
-  departures.forEach((departure) => {
-    if (groups.length === 0) {
-      groups.push([departure]);
-    } else {
-      const currentGroup = groups[groups.length - 1];
-      const {
-        route_id: groupRoute,
-        destination: groupDestination,
-      } = currentGroup[0];
-      const {
-        route_id: departureRoute,
-        destination: departureDestination,
-      } = departure;
-      if (
-        groupRoute === departureRoute &&
-        groupDestination === departureDestination
-      ) {
-        currentGroup.push(departure);
-      } else {
-        groups.push([departure]);
-      }
-    }
-  });
-
-  return groups;
-};
-
-const DepartureGroup = ({ departures, currentTimeString }): JSX.Element => {
-  const groupModifier = departures.length > 1 ? "multiple-rows" : "single-row";
-
-  return (
-    <div className={classWithModifier("departure-group", groupModifier)}>
-      {departures.map(
-        (
-          {
-            id,
-            route,
-            destination,
-            time,
-            route_id: routeId,
-            vehicle_status: vehicleStatus,
-            alerts,
-            stop_type: stopType,
-          },
-          i
-        ) => {
-          return (
-            <Departure
-              route={i === 0 ? route : null}
-              routeId={routeId}
-              destination={i === 0 ? destination : null}
-              time={time}
-              currentTimeString={currentTimeString}
-              vehicleStatus={vehicleStatus}
-              alerts={i === 0 ? alerts : []}
-              stopType={stopType}
-              key={id}
-            />
-          );
-        }
-      )}
-    </div>
-  );
-};
+const camelizeDepartureObject = ({
+  id,
+  route,
+  destination,
+  time,
+  route_id: routeId,
+  vehicle_status: vehicleStatus,
+  alerts,
+  stop_type: stopType,
+}) => ({
+  id,
+  route,
+  destination,
+  time,
+  routeId,
+  vehicleStatus,
+  alerts,
+  stopType,
+});
 
 const SectionHeader = ({ name, arrow }): JSX.Element => {
   return (
@@ -114,17 +62,15 @@ const SectionFrame = ({
 };
 
 const NoDeparturesMessage = ({ pill }): JSX.Element => (
-  <div className="departure-group">
-    <div className="departure--no-via">
-      <SectionRoutePill pill={pill} />
-      <div
-        className={classWithModifier(
-          "departure-destination",
-          "no-departures-placeholder"
-        )}
-      >
-        <BaseDepartureDestination destination="No departures currently available" />
-      </div>
+  <div className={classWithModifier("departure", "no-via")}>
+    <SectionRoutePill pill={pill} />
+    <div
+      className={classWithModifier(
+        "departure-destination",
+        "no-departures-placeholder"
+      )}
+    >
+      <BaseDepartureDestination destination="No departures currently available" />
     </div>
   </div>
 );
@@ -225,8 +171,8 @@ class PagedDeparture extends React.Component<
             ))}
           </div>
         </div>
-        <DepartureGroup
-          departures={[currentPagedDeparture]}
+        <Departure
+          {...camelizeDepartureObject(currentPagedDeparture)}
           currentTimeString={this.props.currentTimeString}
         />
       </div>
@@ -263,7 +209,6 @@ const PagedSection = ({
   const staticDepartures = showPagedDeparture
     ? departures.slice(0, numRows - 1)
     : departures;
-  const staticDepartureGroups = buildDepartureGroups(staticDepartures);
 
   const frameProps = {
     sectionHeaders,
@@ -271,7 +216,7 @@ const PagedSection = ({
     arrow: sectionHeaders === "normal" ? arrow : null,
   };
 
-  if (staticDepartureGroups.length === 0) {
+  if (staticDepartures.length === 0) {
     return (
       <SectionFrame {...frameProps}>
         <NoDeparturesMessage pill={pill} />
@@ -287,11 +232,11 @@ const PagedSection = ({
 
   return (
     <SectionFrame {...frameProps}>
-      {staticDepartureGroups.map((group) => (
-        <DepartureGroup
-          departures={group}
+      {staticDepartures.map((departure) => (
+        <Departure
+          {...camelizeDepartureObject(departure)}
           currentTimeString={currentTimeString}
-          key={group[0].id}
+          key={departure.id}
         />
       ))}
       {showPagedDeparture && (
@@ -315,7 +260,6 @@ const Section = ({
   pill,
 }): JSX.Element => {
   departures = departures.slice(0, numRows);
-  const departureGroups = buildDepartureGroups(departures);
 
   if (sectionHeaders !== "normal") {
     arrow = null;
@@ -323,7 +267,7 @@ const Section = ({
 
   const frameProps = { sectionHeaders, name, arrow };
 
-  if (departureGroups.length === 0) {
+  if (departures.length === 0) {
     return (
       <SectionFrame {...frameProps}>
         <NoDeparturesMessage pill={pill} />
@@ -333,11 +277,11 @@ const Section = ({
 
   return (
     <SectionFrame {...frameProps}>
-      {departureGroups.map((group) => (
-        <DepartureGroup
-          departures={group}
+      {departures.map((departure) => (
+        <Departure
+          {...camelizeDepartureObject(departure)}
           currentTimeString={currentTimeString}
-          key={group[0].id}
+          key={departure.id}
         />
       ))}
     </SectionFrame>
