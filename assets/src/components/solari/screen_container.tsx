@@ -2,6 +2,7 @@ import React from "react";
 
 import Header from "Components/solari/header";
 import SectionList from "Components/solari/section_list";
+import Psa from "Components/solari/psa";
 
 import useApiResponse from "Hooks/use_api_response";
 
@@ -20,13 +21,11 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         sectionHeaders={apiResponse.section_headers}
         currentTimeString={apiResponse.current_time}
       />
-      {apiResponse.show_psa && (
-        <div
-          className="screen-container__flex-space"
-          key={"flex-" + apiResponse.current_time}
-        >
-          <img src="/images/feedback-psa.png" />
-        </div>
+      {apiResponse.psa_name && (
+        <Psa
+          psaName={apiResponse.psa_name}
+          currentTimeString={apiResponse.current_time}
+        />
       )}
     </div>
   );

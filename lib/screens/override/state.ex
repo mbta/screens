@@ -41,6 +41,10 @@ defmodule Screens.Override.State do
     GenServer.call(pid, :green_line_psa_list)
   end
 
+  def solari_psa_list(pid \\ __MODULE__) do
+    GenServer.call(pid, :solari_psa_list)
+  end
+
   def schedule_refresh(pid, ms \\ @refresh_ms) do
     Process.send_after(pid, :refresh, ms)
     :ok
@@ -89,6 +93,10 @@ defmodule Screens.Override.State do
 
   def handle_call(:green_line_psa_list, _from, state) do
     {:reply, state.green_line_psa_list, state}
+  end
+
+  def handle_call(:solari_psa_list, _from, state) do
+    {:reply, state.solari_psa_list, state}
   end
 
   @impl true

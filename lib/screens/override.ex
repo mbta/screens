@@ -12,7 +12,8 @@ defmodule Screens.Override do
           green_line_service: pos_integer(),
           headway_mode_screen_ids: MapSet.t(pos_integer()),
           bus_psa_list: list(String.t()),
-          green_line_psa_list: list(String.t())
+          green_line_psa_list: list(String.t()),
+          solari_psa_list: list(String.t())
         }
 
   defstruct api_version: 1,
@@ -22,7 +23,8 @@ defmodule Screens.Override do
             green_line_service: 1,
             headway_mode_screen_ids: MapSet.new(),
             bus_psa_list: [],
-            green_line_psa_list: []
+            green_line_psa_list: [],
+            solari_psa_list: []
 
   @spec new :: __MODULE__.t()
   def new, do: %__MODULE__{}
@@ -35,7 +37,8 @@ defmodule Screens.Override do
           optional(:green_line_service) => pos_integer(),
           optional(:headway_mode_screen_ids) => list(pos_integer()),
           optional(:bus_psa_list) => list(String.t()),
-          optional(:green_line_psa_list) => list(String.t())
+          optional(:green_line_psa_list) => list(String.t()),
+          optional(:solari_psa_list) => list(String.t())
         }
 
   @doc """
