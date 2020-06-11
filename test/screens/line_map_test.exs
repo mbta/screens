@@ -31,7 +31,7 @@ defmodule Screens.LineMapTest do
           @current_stop_index
         )
 
-      assert [%Prediction{trip: %{id: 1}}, %Prediction{trip: %{id: 2}}] = result
+      assert [%Prediction{trip: %{id: 1}}, %Prediction{trip: %{id: 2}}] == result
     end
 
     test "filters predictions from vehicles after current stop" do
@@ -61,7 +61,7 @@ defmodule Screens.LineMapTest do
           @current_stop_index
         )
 
-      assert [%Prediction{trip: %{id: 1}}] = result
+      assert [%Prediction{trip: %{id: 1}}] == result
     end
   end
 end
