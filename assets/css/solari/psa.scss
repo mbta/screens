@@ -1,0 +1,47 @@
+.psa {
+  position: absolute;
+  left: -100%;
+  bottom: 100px;
+
+  animation: slide 5s cubic-bezier(0.32, 0, 0.67, 0) forwards;
+  animation-delay: 9s;
+}
+
+.psa__progress-bar {
+  position: relative;
+  bottom: 24px;
+  content: "";
+  height: 20px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  animation: progress 4.6s linear forwards;
+  animation-delay: 9.2s;
+}
+
+@keyframes slide {
+  0% {
+    left: -100%;
+  }
+
+  4% {
+    left: 0;
+  }
+
+  96% {
+    left: 0;
+  }
+
+  100% {
+    left: -100%;
+  }
+}
+
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
