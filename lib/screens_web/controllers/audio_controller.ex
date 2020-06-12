@@ -46,7 +46,7 @@ defmodule ScreensWeb.AudioController do
     end
   end
 
-  defp send_audio(conn, kind, disposition \\ :attachment) do
+  defp send_audio(conn, kind, disposition) do
     send_download(conn, kind, filename: "readout.mp3", disposition: disposition)
   end
 end
