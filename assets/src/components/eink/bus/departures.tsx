@@ -1,4 +1,4 @@
-import DeparturesRow from "Components/eink/bus/departures_row";
+import DepartureGroup from "Components/eink/bus/departure_group";
 import React, { forwardRef } from "react";
 
 const buildDepartureGroups = (departures) => {
@@ -44,7 +44,7 @@ const Departures = forwardRef(
     return (
       <div className="departures" ref={ref}>
         {departureGroups.map((group, i) => (
-          <DeparturesRow
+          <DepartureGroup
             currentTimeString={currentTimeString}
             departures={group}
             size={size}
