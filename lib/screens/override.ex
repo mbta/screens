@@ -11,9 +11,7 @@ defmodule Screens.Override do
           bus_service: pos_integer(),
           green_line_service: pos_integer(),
           headway_mode_screen_ids: MapSet.t(pos_integer()),
-          bus_psa_list: list(String.t()),
-          green_line_psa_list: list(String.t()),
-          solari_psa_list: list(String.t())
+          psa_lists_by_screen_id: %{String.t() => list(String.t())}
         }
 
   defstruct api_version: 1,
@@ -22,9 +20,7 @@ defmodule Screens.Override do
             bus_service: 1,
             green_line_service: 1,
             headway_mode_screen_ids: MapSet.new(),
-            bus_psa_list: [],
-            green_line_psa_list: [],
-            solari_psa_list: []
+            psa_lists_by_screen_id: %{}
 
   @spec new :: __MODULE__.t()
   def new, do: %__MODULE__{}
@@ -36,9 +32,7 @@ defmodule Screens.Override do
           optional(:bus_service) => pos_integer(),
           optional(:green_line_service) => pos_integer(),
           optional(:headway_mode_screen_ids) => list(pos_integer()),
-          optional(:bus_psa_list) => list(String.t()),
-          optional(:green_line_psa_list) => list(String.t()),
-          optional(:solari_psa_list) => list(String.t())
+          optional(:psa_lists_by_screen_id) => %{String.t() => list(String.t())}
         }
 
   @doc """
@@ -51,7 +45,8 @@ defmodule Screens.Override do
         disabled_screen_ids: #MapSet<[1, 2]>,
         globally_disabled: false,
         green_line_service: 1,
-        headway_mode_screen_ids: #MapSet<[]>
+        headway_mode_screen_ids: #MapSet<[]>,
+        ... more values added after this comment was written
       }
   """
   @spec from_json(json_map()) :: __MODULE__.t()
@@ -60,6 +55,7 @@ defmodule Screens.Override do
       override_map
       |> disabled_map_set()
       |> headway_mode_map_set()
+      |> psa_lists_map()
 
     struct(__MODULE__, converted)
   end
@@ -77,4 +73,14 @@ defmodule Screens.Override do
   end
 
   defp headway_mode_map_set(%{} = override_map), do: override_map
+
+  # Converts the keyword-list-like psa_lists_by_screen_id to a map, if it exists
+  defp psa_lists_map(%{psa_lists_by_screen_id: psa_lists_by_screen_id} = override_map) do
+    psa_lists_map =
+      for [screen_id, psa_list] <- psa_lists_by_screen_id, into: %{}, do: {screen_id, psa_list}
+
+    Map.put(override_map, :psa_lists_by_screen_id, psa_lists_map)
+  end
+
+  defp psa_lists_map(%{} = override_map), do: override_map
 end
