@@ -19,7 +19,7 @@ defmodule Screens.Departures.Departure do
             crowding_level: nil,
             inline_badges: nil
 
-  @type crowding_level :: 0 | 1 | 2 | 3 | nil
+  @type crowding_level :: 1 | 2 | 3 | nil
 
   @type t :: %__MODULE__{
           id: String.t(),
