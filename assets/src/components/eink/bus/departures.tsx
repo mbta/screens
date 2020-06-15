@@ -1,35 +1,38 @@
-import DeparturesRow from "Components/eink/bus/departures_row";
+import DepartureGroup from "Components/eink/bus/departure_group";
 import React, { forwardRef } from "react";
 
-const buildDeparturesRows = (departures) => {
+const buildDepartureGroups = (departures) => {
   if (!departures) {
     return [];
   }
 
-  const rows = [];
+  const groups = [];
 
-  // Do we need to do anything with inlineBadges?
-  departures.forEach((row) => {
-    if (rows.length === 0) {
-      const newRow = Object.assign({}, row);
-      newRow.time = [newRow.time];
-      rows.push(newRow);
+  departures.forEach((departure) => {
+    if (groups.length === 0) {
+      groups.push([departure]);
     } else {
-      const lastRow = rows[rows.length - 1];
+      const currentGroup = groups[groups.length - 1];
+      const {
+        route: groupRoute,
+        destination: groupDestination,
+      } = currentGroup[0];
+      const {
+        route: departureRoute,
+        destination: departureDestination,
+      } = departure;
       if (
-        row.route === lastRow.route &&
-        row.destination === lastRow.destination
+        groupRoute === departureRoute &&
+        groupDestination === departureDestination
       ) {
-        lastRow.time.push(row.time);
+        currentGroup.push(departure);
       } else {
-        const newRow = Object.assign({}, row);
-        newRow.time = [newRow.time];
-        rows.push(newRow);
+        groups.push([departure]);
       }
     }
   });
 
-  return rows;
+  return groups;
 };
 
 const Departures = forwardRef(
@@ -37,18 +40,15 @@ const Departures = forwardRef(
     if (!departures || departures.length === 0) {
       return null;
     }
-    const departuresRows = buildDeparturesRows(departures);
+    const departureGroups = buildDepartureGroups(departures);
     return (
       <div className="departures" ref={ref}>
-        {departuresRows.map((row, i) => (
-          <DeparturesRow
+        {departureGroups.map((group, i) => (
+          <DepartureGroup
             currentTimeString={currentTimeString}
-            route={row.route}
-            destination={row.destination}
-            departureTimes={row.time}
-            inlineBadges={row.inline_badges}
+            departures={group}
             size={size}
-            key={row.route + row.time + i}
+            key={group[0].id}
           />
         ))}
       </div>

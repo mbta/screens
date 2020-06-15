@@ -1,7 +1,7 @@
 import React from "react";
 
 const BaseDepartureDestination = ({ destination }): JSX.Element => {
-  if (destination === undefined) {
+  if (!destination) {
     return null;
   }
 
