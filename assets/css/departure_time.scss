@@ -5,9 +5,14 @@
 }
 
 .departure-time--large {
-  font-size: 144px;
-  width: 320px;
-  padding-right: 40px;
+  font-size: 120px;
+  width: 240px;
+  padding-right: 32px;
+}
+
+.departure-time--large .base-departure-time__text {
+  font-size: 0.875em;
+  line-height: 1em;
 }
 
 .departure-time--large .base-departure-time__timestamp {

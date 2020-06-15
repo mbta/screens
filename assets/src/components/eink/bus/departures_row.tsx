@@ -6,26 +6,29 @@ import { classWithModifier } from "Util/util";
 
 const DeparturesRow = ({
   currentTimeString,
-  route,
-  destination,
-  departureTimes,
-  inlineBadges,
+  departures,
   size,
 }): JSX.Element => {
   return (
     <div className="departures-row">
       <div className={classWithModifier("departures-row__container", size)}>
-        {departureTimes.map((t, i) => (
-          <DepartureRow
-            currentTimeString={currentTimeString}
-            route={i === 0 ? route : undefined}
-            destination={i === 0 ? destination : undefined}
-            time={t}
-            size={size}
-            key={route + t + i}
-          />
-        ))}
-        <InlineAlert inlineBadges={inlineBadges} />
+        {departures.map(
+          (
+            { id, route, destination, crowding_level: crowdingLevel, time },
+            i
+          ) => (
+            <DepartureRow
+              currentTimeString={currentTimeString}
+              route={i === 0 ? route : null}
+              destination={i === 0 ? destination : null}
+              crowdingLevel={crowdingLevel}
+              time={time}
+              size={size}
+              key={id}
+            />
+          )
+        )}
+        <InlineAlert inlineBadges={departures[0].inlineBadges} />
       </div>
       <div className="departures-row__hairline"></div>
     </div>
