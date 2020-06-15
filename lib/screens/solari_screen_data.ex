@@ -16,7 +16,7 @@ defmodule Screens.SolariScreenData do
         dt -> dt
       end
 
-    psa_name = Screens.Psa.current_solari_psa()
+    psa_name = Screens.Psa.current_psa_for(screen_id)
 
     case fetch_sections_data(sections, datetime) do
       {:ok, data} ->

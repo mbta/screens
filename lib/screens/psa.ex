@@ -7,24 +7,31 @@ defmodule Screens.Psa do
 
   alias Screens.Override.State
 
-  def current_bus_psa do
-    choose_from_rotating_list(State.bus_psa_list(), @eink_refresh_seconds)
+  def current_psa_for(screen_id) do
+    app_id =
+      :screens
+      |> Application.get_env(:screen_data)
+      |> get_in([screen_id, :app_id])
+
+    psa_list = State.psa_list(screen_id)
+
+    choose_psa(psa_list, app_id)
   end
 
-  def current_green_line_psa do
-    choose_from_rotating_list(State.green_line_psa_list(), @eink_refresh_seconds)
-  end
-
-  def current_solari_psa do
+  defp choose_psa(psa_list, "solari") do
     # How often to change the selected PSA
     solari_psa_refresh_seconds = @solari_refresh_seconds * @solari_psa_period
 
     # Choose which PSA to show, if we're showing one this refresh
-    solari_psa = choose_from_rotating_list(State.solari_psa_list(), solari_psa_refresh_seconds)
+    solari_psa = choose_from_rotating_list(psa_list, solari_psa_refresh_seconds)
 
     # Return either the current PSA or nil
     solari_list = [solari_psa] ++ List.duplicate(nil, @solari_psa_period - 1)
     choose_from_rotating_list(solari_list, @solari_refresh_seconds)
+  end
+
+  defp choose_psa(psa_list, app_id) when app_id in ~w[bus_eink gl_eink_single gl_eink_double] do
+    choose_from_rotating_list(psa_list, @eink_refresh_seconds)
   end
 
   defp choose_from_rotating_list([], _), do: nil
