@@ -3,6 +3,8 @@ defmodule Screens.Departures.Departure do
 
   alias Screens.Predictions.Prediction
   alias Screens.Schedules.Schedule
+  alias Screens.Trips.Trip
+  alias Screens.Vehicles.Vehicle
 
   defstruct id: nil,
             stop_name: nil,
@@ -14,7 +16,10 @@ defmodule Screens.Departures.Departure do
             alerts: [],
             stop_type: nil,
             time: nil,
+            crowding_level: nil,
             inline_badges: nil
+
+  @type crowding_level :: 0 | 1 | 2 | 3 | nil
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -27,6 +32,7 @@ defmodule Screens.Departures.Departure do
           alerts: list(:delay | :snow_route | :last_trip),
           stop_type: :first_stop | :last_stop | :mid_route_stop,
           time: DateTime.t(),
+          crowding_level: crowding_level,
           inline_badges: list(map())
         }
 
@@ -153,8 +159,12 @@ defmodule Screens.Departures.Departure do
 
     vehicle_data =
       case Map.get(data, :vehicle) do
-        %{current_status: vehicle_status} -> %{vehicle_status: vehicle_status}
-        nil -> %{}
+        %{current_status: current_status} = vehicle ->
+          trip = Map.get(data, :trip)
+          %{vehicle_status: current_status, crowding_level: crowding_level(vehicle, trip)}
+
+        nil ->
+          %{}
       end
 
     alert_data =
@@ -183,6 +193,26 @@ defmodule Screens.Departures.Departure do
       {_, _} -> :mid_route_stop
     end
   end
+
+  @spec crowding_level(Vehicle.t(), Trip.t() | nil) :: crowding_level
+  defp crowding_level(_vehicle, nil), do: nil
+
+  defp crowding_level(vehicle, trip) do
+    %{occupancy_status: occupancy_status, trip_id: vehicle_trip_id} = vehicle
+    %{id: trip_trip_id} = trip
+
+    if trip_trip_id == vehicle_trip_id do
+      crowding_level_from_occupancy_status(occupancy_status)
+    else
+      nil
+    end
+  end
+
+  @spec crowding_level_from_occupancy_status(Vehicle.occupancy_status()) :: crowding_level
+  defp crowding_level_from_occupancy_status(:many_seats_available), do: 1
+  defp crowding_level_from_occupancy_status(:few_seats_available), do: 2
+  defp crowding_level_from_occupancy_status(:full), do: 3
+  defp crowding_level_from_occupancy_status(nil), do: nil
 
   defp fetch_predictions_and_schedules(query_params) do
     predictions = Prediction.fetch(query_params)

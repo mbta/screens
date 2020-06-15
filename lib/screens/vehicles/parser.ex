@@ -8,7 +8,11 @@ defmodule Screens.Vehicles.Parser do
   end
 
   def parse_vehicle(%{
-        "attributes" => %{"direction_id" => direction_id, "current_status" => current_status},
+        "attributes" => %{
+          "direction_id" => direction_id,
+          "current_status" => current_status,
+          "occupancy_status" => occupancy_status
+        },
         "id" => vehicle_id,
         "relationships" => %{"trip" => trip_data, "stop" => stop_data}
       }) do
@@ -16,6 +20,7 @@ defmodule Screens.Vehicles.Parser do
       id: vehicle_id,
       direction_id: direction_id,
       current_status: parse_current_status(current_status),
+      occupancy_status: parse_occupancy_status(occupancy_status),
       trip_id: trip_id_from_trip_data(trip_data),
       stop_id: stop_id_from_stop_data(stop_data)
     }
@@ -31,4 +36,9 @@ defmodule Screens.Vehicles.Parser do
   defp parse_current_status("INCOMING_AT"), do: :incoming_at
   defp parse_current_status("IN_TRANSIT_TO"), do: :in_transit_to
   defp parse_current_status(_), do: nil
+
+  defp parse_occupancy_status("MANY_SEATS_AVAILABLE"), do: :many_seats_available
+  defp parse_occupancy_status("FEW_SEATS_AVAILABLE"), do: :few_seats_available
+  defp parse_occupancy_status("FULL"), do: :full
+  defp parse_occupancy_status(_), do: nil
 end
