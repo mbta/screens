@@ -7,7 +7,7 @@ import {
   PagedDepartureRoutePill,
 } from "Components/solari/route_pill";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
-import { classWithModifier } from "Util/util";
+import { classWithModifier, classWithModifiers } from "Util/util";
 
 const camelizeDepartureObject = ({
   id,
@@ -46,6 +46,7 @@ const SectionFrame = ({
   sectionHeaders,
   name,
   arrow,
+  overhead,
   children,
 }): JSX.Element => {
   const sectionModifier = sectionHeaders === "vertical" ? "vertical" : "normal";
@@ -53,7 +54,7 @@ const SectionFrame = ({
 
   return (
     <div className={sectionClass}>
-      {sectionHeaders !== null && name !== null && (
+      {sectionHeaders !== null && name !== null && overhead === false && (
         <SectionHeader name={name} arrow={arrow} />
       )}
       <div className="departure-container">{children}</div>
@@ -62,7 +63,7 @@ const SectionFrame = ({
 };
 
 const NoDeparturesMessage = ({ pill }): JSX.Element => (
-  <div className={classWithModifier("departure", "no-via")}>
+  <div className={classWithModifiers("departure", ["no-via", "size-normal"])}>
     <SectionRoutePill pill={pill} />
     <div
       className={classWithModifier(
@@ -200,6 +201,7 @@ const PagedSection = ({
   sectionHeaders,
   name,
   pill,
+  overhead,
   currentTimeString,
 }: PagedSectionProps): JSX.Element => {
   const excessDepartures = departures.length - numRows + 1;
@@ -214,6 +216,7 @@ const PagedSection = ({
     sectionHeaders,
     name,
     arrow: sectionHeaders === "normal" ? arrow : null,
+    overhead,
   };
 
   if (staticDepartures.length === 0) {
@@ -257,6 +260,7 @@ const Section = ({
   sectionHeaders,
   currentTimeString,
   numRows,
+  overhead,
   pill,
 }): JSX.Element => {
   departures = departures.slice(0, numRows);
@@ -265,7 +269,7 @@ const Section = ({
     arrow = null;
   }
 
-  const frameProps = { sectionHeaders, name, arrow };
+  const frameProps = { sectionHeaders, name, arrow, overhead };
 
   if (departures.length === 0) {
     return (
@@ -280,6 +284,7 @@ const Section = ({
       {departures.map((departure) => (
         <Departure
           {...camelizeDepartureObject(departure)}
+          overhead={overhead}
           currentTimeString={currentTimeString}
           key={departure.id}
         />

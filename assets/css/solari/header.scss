@@ -3,37 +3,26 @@
 .header {
   background-color: #171f26;
   color: white;
-  height: 355px;
 }
 
 .header__time {
   @include font--text--55regular;
   position: absolute;
-  font-size: 50px;
-  line-height: 72px;
-  top: 23px;
-  right: 35px;
 }
 
 .header__content-container {
-  padding-top: 125px;
-  padding-left: 46px;
+  padding-top: 128px;
+  padding-left: 48px;
 }
 
 .header__station-name {
   @include font--display--75bold;
-  font-size: 111px;
   letter-spacing: 2px;
-  line-height: 120px;
 }
 
 .header__subtitle {
   @include font--display--65medium;
-  text-transform: uppercase;
-  font-size: 50px;
   letter-spacing: 3px;
-  margin-top: 16px;
-  line-height: 60px;
 }
 
 .header__environment {
@@ -45,4 +34,49 @@
   color: #ffffff;
   letter-spacing: 0;
   line-height: 48px;
+}
+
+.header--size-normal {
+  height: 355px;
+
+  .header__time {
+    font-size: 50px;
+    line-height: 72px;
+    top: 23px;
+    right: 35px;
+  }
+
+  .header__station-name {
+    font-size: 111px;
+    line-height: 120px;
+  }
+
+  .header__subtitle {
+    text-transform: uppercase;
+    font-size: 50px;
+    margin-top: 16px;
+    line-height: 60px;
+  }
+}
+
+.header--size-large {
+  height: 456px;
+
+  .header__time {
+    top: 32px;
+    right: 40px;
+    font-size: 96px;
+    line-height: 96px;
+  }
+
+  .header__station-name {
+    font-size: 156px;
+    line-height: 156px;
+  }
+
+  .header__subtitle {
+    font-size: 96px;
+    line-height: 96px;
+    margin-top: 32px;
+  }
 }

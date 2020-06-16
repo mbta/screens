@@ -88,6 +88,7 @@ interface SectionListProps {
   sections: object[];
   sectionHeaders: string;
   currentTimeString: string;
+  overhead: boolean;
 }
 
 interface SectionListState {
@@ -95,14 +96,13 @@ interface SectionListState {
   sectionSizes: number[];
 }
 
-const MAX_DEPARTURES_HEIGHT = 1565;
-
 class SectionList extends React.Component<SectionListProps, SectionListState> {
   ref: React.RefObject<HTMLDivElement>;
 
   constructor(props: SectionListProps) {
     super(props);
     this.ref = React.createRef();
+    this.MAX_DEPARTURES_HEIGHT = this.props.overhead ? 1464 : 1565;
 
     this.state = SectionList.getInitialStateFromProps(props);
   }
@@ -140,7 +140,10 @@ class SectionList extends React.Component<SectionListProps, SectionListState> {
     if (this.ref.current != null) {
       const departuresHeight = this.ref.current.clientHeight;
 
-      if (departuresHeight > MAX_DEPARTURES_HEIGHT && this.state.numRows > 5) {
+      if (
+        departuresHeight > this.MAX_DEPARTURES_HEIGHT &&
+        this.state.numRows > 5
+      ) {
         this.setState((prevState, prevProps) => {
           const newRows = prevState.numRows - 1;
           const newSizes = assignSectionSizes(prevProps.sections, newRows);
@@ -166,6 +169,7 @@ class SectionList extends React.Component<SectionListProps, SectionListState> {
               numRows={this.state.sectionSizes[i]}
               sectionHeaders={sectionHeaders}
               currentTimeString={currentTimeString}
+              overhead={this.props.overhead}
               key={section.name}
             />
           );

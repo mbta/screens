@@ -7,7 +7,7 @@ import BaseDepartureDestination from "Components/eink/base_departure_destination
 import InlineAlertBadge from "Components/solari/inline_alert_badge";
 import { DepartureRoutePill } from "Components/solari/route_pill";
 
-import { classWithModifier } from "Util/util";
+import { classWithModifier, classWithModifiers } from "Util/util";
 
 const Departure = ({
   route,
@@ -18,9 +18,12 @@ const Departure = ({
   vehicleStatus,
   stopType,
   alerts,
+  overhead,
 }): JSX.Element => {
-  const via =
+  const viaModifier =
     destination && destination.includes(" via ") ? "with-via" : "no-via";
+
+  const sizeModifier = overhead ? "size-large" : "size-normal";
 
   const timeRepresentation = standardTimeRepresentation(
     time,
@@ -33,7 +36,9 @@ const Departure = ({
     timeRepresentation.type === "TEXT" ? "animated" : "static";
 
   return (
-    <div className={classWithModifier("departure", via)}>
+    <div
+      className={classWithModifiers("departure", [viaModifier, sizeModifier])}
+    >
       <DepartureRoutePill route={route} routeId={routeId} />
       <div className="departure-destination">
         {destination && <BaseDepartureDestination destination={destination} />}

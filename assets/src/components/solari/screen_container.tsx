@@ -15,8 +15,11 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
       <Header
         stationName={apiResponse.station_name}
         currentTimeString={apiResponse.current_time}
+        sections={apiResponse.sections}
+        overhead={false}
       />
       <SectionList
+        overhead={false}
         sections={apiResponse.sections}
         sectionHeaders={apiResponse.section_headers}
         currentTimeString={apiResponse.current_time}
@@ -31,9 +34,32 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   );
 };
 
+const OverheadScreenLayout = ({ apiResponse }): JSX.Element => {
+  return (
+    <div className="screen-container">
+      <Header
+        stationName={apiResponse.station_name}
+        currentTimeString={apiResponse.current_time}
+        sections={apiResponse.sections}
+        overhead={true}
+      />
+      <SectionList
+        overhead={true}
+        sections={apiResponse.sections}
+        sectionHeaders={apiResponse.section_headers}
+        currentTimeString={apiResponse.current_time}
+      />
+    </div>
+  );
+};
+
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
   if (apiResponse === null) {
     return null;
+  }
+
+  if (apiResponse.overhead) {
+    return <OverheadScreenLayout apiResponse={apiResponse} />;
   }
 
   return <DefaultScreenLayout apiResponse={apiResponse} />;

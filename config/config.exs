@@ -181,6 +181,7 @@ config :screens,
     },
     "301" => %{
       station_name: "Ashmont",
+      overhead: false,
       section_headers: nil,
       sections: [
         %{
@@ -209,6 +210,7 @@ config :screens,
     },
     "302" => %{
       station_name: "Central",
+      overhead: false,
       section_headers: nil,
       sections: [
         %{
@@ -232,6 +234,7 @@ config :screens,
     },
     "303" => %{
       station_name: "Dudley",
+      overhead: true,
       section_headers: :normal,
       sections: [
         %{
@@ -245,7 +248,7 @@ config :screens,
             },
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}},
+          layout: {:upcoming, %{num_rows: 8}},
           pill: :bus
         }
       ],
@@ -253,6 +256,7 @@ config :screens,
     },
     "304" => %{
       station_name: "Dudley",
+      overhead: true,
       section_headers: :normal,
       sections: [
         %{
@@ -265,9 +269,7 @@ config :screens,
           layout:
             {:upcoming,
              %{
-               num_rows: 12,
-               visible_rows: 8,
-               paged: true,
+               num_rows: 8,
                routes: {:include, [{"14", 1}, {"41", 0}, {"42", 0}, {"66", 0}]}
              }},
           pill: :bus
@@ -277,6 +279,7 @@ config :screens,
     },
     "305" => %{
       station_name: "Forest Hills",
+      overhead: false,
       section_headers: :vertical,
       sections: [
         %{
@@ -298,6 +301,7 @@ config :screens,
     },
     "306" => %{
       station_name: "Forest Hills",
+      overhead: false,
       section_headers: nil,
       sections: [
         %{
@@ -319,6 +323,7 @@ config :screens,
     },
     "307" => %{
       station_name: "Harvard",
+      overhead: false,
       section_headers: :normal,
       sections: [
         %{
@@ -345,6 +350,7 @@ config :screens,
     },
     "308" => %{
       station_name: "Haymarket",
+      overhead: false,
       section_headers: :normal,
       sections: [
         %{
@@ -373,6 +379,7 @@ config :screens,
     },
     "309" => %{
       station_name: "Maverick",
+      overhead: false,
       section_headers: nil,
       sections: [
         %{
@@ -394,6 +401,7 @@ config :screens,
     },
     "310" => %{
       station_name: "Ruggles",
+      overhead: false,
       section_headers: :normal,
       sections: [
         %{
@@ -415,6 +423,7 @@ config :screens,
     },
     "311" => %{
       station_name: "Sullivan Square",
+      overhead: false,
       section_headers: :normal,
       sections: [
         %{
@@ -445,6 +454,7 @@ config :screens,
     },
     "312" => %{
       station_name: "Wonderland",
+      overhead: false,
       section_headers: nil,
       sections: [
         %{
@@ -466,6 +476,7 @@ config :screens,
     },
     "313" => %{
       station_name: "10 Park Plaza",
+      overhead: false,
       section_headers: :normal,
       sections: [
         %{
@@ -501,6 +512,7 @@ config :screens,
     },
     "314" => %{
       station_name: "10 Park Plaza",
+      overhead: false,
       section_headers: :normal,
       sections: [
         %{
@@ -525,6 +537,7 @@ config :screens,
     },
     "320" => %{
       station_name: "Summer Street",
+      overhead: false,
       section_headers: :normal,
       sections: [
         %{
@@ -539,6 +552,7 @@ config :screens,
     },
     "321" => %{
       station_name: "Summer Street",
+      overhead: false,
       section_headers: :normal,
       sections: [
         %{
@@ -553,6 +567,7 @@ config :screens,
     },
     "322" => %{
       station_name: "Columbus Ave",
+      overhead: false,
       section_headers: :normal,
       sections: [
         %{
@@ -567,6 +582,7 @@ config :screens,
     },
     "323" => %{
       station_name: "Columbus Ave",
+      overhead: false,
       section_headers: :normal,
       sections: [
         %{
@@ -581,6 +597,7 @@ config :screens,
     },
     "324" => %{
       station_name: "Columbus Ave",
+      overhead: false,
       section_headers: :normal,
       sections: [
         %{
@@ -595,6 +612,7 @@ config :screens,
     },
     "325" => %{
       station_name: "Blue Hill Ave",
+      overhead: false,
       section_headers: :normal,
       sections: [
         %{
