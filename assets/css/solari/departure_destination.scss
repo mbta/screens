@@ -7,7 +7,7 @@
   vertical-align: middle;
 }
 
-.departure--size-normal {
+.screen-container--size-normal {
   .departure-destination {
     width: 654px;
     font-size: 50px;
@@ -29,7 +29,7 @@
   }
 }
 
-.departure--size-large {
+.screen-container--size-large {
   .departure-destination {
     @include font--text--65medium;
     width: 550px;

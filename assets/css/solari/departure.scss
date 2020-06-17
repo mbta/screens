@@ -14,18 +14,20 @@
   }
 }
 
-.departure--size-normal {
-  margin-left: 42px;
-  margin-right: 42px;
-  padding-bottom: 10px;
-  padding-top: 10px;
+.screen-container--size-normal {
+  .departure {
+    margin-left: 42px;
+    margin-right: 42px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+  }
 
-  &.departure--with-via {
+  & .departure--with-via {
     padding-top: 13.5px;
     padding-bottom: 13.5px;
   }
 
-  &.departure--no-via {
+  & .departure--no-via {
     padding-top: 24px;
     padding-bottom: 24px;
   }
@@ -43,11 +45,13 @@
   }
 }
 
-.departure--size-large {
-  margin-left: 32px;
-  margin-right: 32px;
-  padding-bottom: 32px;
-  padding-top: 32px;
+.screen-container--size-large {
+  .departure {
+    margin-left: 32px;
+    margin-right: 32px;
+    padding-bottom: 32px;
+    padding-top: 32px;
+  }
 
   .departure__alerts-container {
     margin-top: 6px;

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { formatTimeString, classWithModifier } from "Util/util";
+import { formatTimeString } from "Util/util";
 
 const Header = ({
   stationName,
@@ -13,10 +13,9 @@ const Header = ({
 
   const currentTime = formatTimeString(currentTimeString);
   const subtitle = overhead ? `${sections[0].name} Trips` : "Upcoming Trips";
-  const sizeModifier = overhead ? "size-large" : "size-normal";
 
   return (
-    <div className={classWithModifier("header", sizeModifier)}>
+    <div className="header">
       <div className="header__environment">
         {["screens-dev", "screens-dev-green"].includes(environmentName)
           ? environmentName

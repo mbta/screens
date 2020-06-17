@@ -36,8 +36,10 @@
   line-height: 48px;
 }
 
-.header--size-normal {
-  height: 355px;
+.screen-container--size-normal {
+  .header {
+    height: 355px;
+  }
 
   .header__time {
     font-size: 50px;
@@ -59,8 +61,10 @@
   }
 }
 
-.header--size-large {
-  height: 456px;
+.screen-container--size-large {
+  .header {
+    height: 456px;
+  }
 
   .header__time {
     top: 32px;

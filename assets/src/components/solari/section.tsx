@@ -63,7 +63,7 @@ const SectionFrame = ({
 };
 
 const NoDeparturesMessage = ({ pill }): JSX.Element => (
-  <div className={classWithModifiers("departure", ["no-via", "size-normal"])}>
+  <div className={classWithModifier("departure", "no-via")}>
     <SectionRoutePill pill={pill} />
     <div
       className={classWithModifier(
@@ -284,7 +284,6 @@ const Section = ({
       {departures.map((departure) => (
         <Departure
           {...camelizeDepartureObject(departure)}
-          overhead={overhead}
           currentTimeString={currentTimeString}
           key={departure.id}
         />
