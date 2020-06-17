@@ -34,6 +34,11 @@
     @include font--text--65medium;
     width: 550px;
     font-size: 96px;
+
+    &--no-departures-placeholder {
+      width: 784px;
+      font-size: 84px;
+    }
   }
 
   .base-departure-destination__secondary {

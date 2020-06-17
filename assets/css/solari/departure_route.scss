@@ -3,11 +3,6 @@
   vertical-align: middle;
 }
 
-.departure-route--icon {
-  height: 50px;
-  margin-top: 4.5px;
-}
-
 .departure-route--yellow .base-route-pill__pill {
   background: #ffc72c;
   color: black;
@@ -49,6 +44,11 @@
     font-size: 50px;
     margin-right: 26px;
   }
+
+  .departure-route--icon {
+    height: 50px;
+    margin-top: 4.5px;
+  }
 }
 
 .screen-container--size-large {
@@ -56,5 +56,10 @@
     width: 200px;
     font-size: 96px;
     margin-right: 32px;
+  }
+
+  .departure-route--icon {
+    height: 72px;
+    margin-top: 4.5px;
   }
 }
