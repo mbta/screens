@@ -8,15 +8,17 @@
   }
 }
 
+.departure {
+  &:not(:last-child) {
+    border-bottom: 3px solid rgba(199, 199, 199, 0.58);
+  }
+}
+
 .departure--size-normal {
   margin-left: 42px;
   margin-right: 42px;
   padding-bottom: 10px;
   padding-top: 10px;
-
-  &:not(:last-child) {
-    border-bottom: 3px solid rgba(199, 199, 199, 0.58);
-  }
 
   &.departure--with-via {
     padding-top: 13.5px;
@@ -46,10 +48,6 @@
   margin-right: 32px;
   padding-bottom: 32px;
   padding-top: 32px;
-
-  &:not(:last-child) {
-    border-bottom: 3px solid rgba(199, 199, 199, 0.58);
-  }
 
   .departure__alerts-container {
     margin-top: 6px;

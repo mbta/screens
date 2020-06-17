@@ -14,15 +14,15 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
     <div className="screen-container">
       <Header
         stationName={apiResponse.station_name}
-        currentTimeString={apiResponse.current_time}
         sections={apiResponse.sections}
-        overhead={false}
+        currentTimeString={apiResponse.current_time}
+        overhead={apiResponse.overhead}
       />
       <SectionList
-        overhead={false}
         sections={apiResponse.sections}
         sectionHeaders={apiResponse.section_headers}
         currentTimeString={apiResponse.current_time}
+        overhead={apiResponse.overhead}
       />
       {apiResponse.psa_name && (
         <Psa
@@ -34,32 +34,9 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   );
 };
 
-const OverheadScreenLayout = ({ apiResponse }): JSX.Element => {
-  return (
-    <div className="screen-container">
-      <Header
-        stationName={apiResponse.station_name}
-        currentTimeString={apiResponse.current_time}
-        sections={apiResponse.sections}
-        overhead={true}
-      />
-      <SectionList
-        overhead={true}
-        sections={apiResponse.sections}
-        sectionHeaders={apiResponse.section_headers}
-        currentTimeString={apiResponse.current_time}
-      />
-    </div>
-  );
-};
-
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
   if (apiResponse === null) {
     return null;
-  }
-
-  if (apiResponse.overhead) {
-    return <OverheadScreenLayout apiResponse={apiResponse} />;
   }
 
   return <DefaultScreenLayout apiResponse={apiResponse} />;

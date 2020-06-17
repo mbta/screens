@@ -51,12 +51,12 @@ const SectionFrame = ({
 }): JSX.Element => {
   const sectionModifier = sectionHeaders === "vertical" ? "vertical" : "normal";
   const sectionClass = classWithModifier("section", sectionModifier);
+  const shouldShowHeader =
+    sectionHeaders !== null && name !== null && !overhead;
 
   return (
     <div className={sectionClass}>
-      {sectionHeaders !== null && name !== null && overhead === false && (
-        <SectionHeader name={name} arrow={arrow} />
-      )}
+      {shouldShowHeader && <SectionHeader name={name} arrow={arrow} />}
       <div className="departure-container">{children}</div>
     </div>
   );

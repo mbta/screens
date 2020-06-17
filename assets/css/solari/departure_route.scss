@@ -43,18 +43,18 @@
   color: white;
 }
 
-.departure--size-large {
-  .departure-route {
-    width: 200px;
-    font-size: 96px;
-    margin-right: 32px;
-  }
-}
-
 .departure--size-normal {
   .departure-route {
     width: 142px;
     font-size: 50px;
     margin-right: 26px;
+  }
+}
+
+.departure--size-large {
+  .departure-route {
+    width: 200px;
+    font-size: 96px;
+    margin-right: 32px;
   }
 }

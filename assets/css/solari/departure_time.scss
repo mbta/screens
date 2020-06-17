@@ -25,6 +25,13 @@
   }
 }
 
+.departure--size-normal {
+  .departure-time {
+    width: 174px;
+    font-size: 50px;
+  }
+}
+
 .departure--size-large {
   .departure-time {
     width: 234px;
@@ -37,12 +44,5 @@
 
   .base-departure-time__ampm {
     font-size: 0.365em;
-  }
-}
-
-.departure--size-normal {
-  .departure-time {
-    width: 174px;
-    font-size: 50px;
   }
 }

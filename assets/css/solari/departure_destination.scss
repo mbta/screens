@@ -7,18 +7,6 @@
   vertical-align: middle;
 }
 
-.departure--size-large {
-  .departure-destination {
-    @include font--text--65medium;
-    width: 550px;
-    font-size: 96px;
-  }
-
-  .base-departure-destination__secondary {
-    font-size: 0.875em;
-  }
-}
-
 .departure--size-normal {
   .departure-destination {
     width: 654px;
@@ -38,5 +26,17 @@
     &--no-departures-placeholder {
       width: 740px;
     }
+  }
+}
+
+.departure--size-large {
+  .departure-destination {
+    @include font--text--65medium;
+    width: 550px;
+    font-size: 96px;
+  }
+
+  .base-departure-destination__secondary {
+    font-size: 0.875em;
   }
 }
