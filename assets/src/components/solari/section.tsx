@@ -7,7 +7,7 @@ import {
   PagedDepartureRoutePill,
 } from "Components/solari/route_pill";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
-import { classWithModifier } from "Util/util";
+import { classWithModifier, classWithModifiers } from "Util/util";
 
 const camelizeDepartureObject = ({
   id,
@@ -46,16 +46,17 @@ const SectionFrame = ({
   sectionHeaders,
   name,
   arrow,
+  overhead,
   children,
 }): JSX.Element => {
   const sectionModifier = sectionHeaders === "vertical" ? "vertical" : "normal";
   const sectionClass = classWithModifier("section", sectionModifier);
+  const shouldShowHeader =
+    sectionHeaders !== null && name !== null && !overhead;
 
   return (
     <div className={sectionClass}>
-      {sectionHeaders !== null && name !== null && (
-        <SectionHeader name={name} arrow={arrow} />
-      )}
+      {shouldShowHeader && <SectionHeader name={name} arrow={arrow} />}
       <div className="departure-container">{children}</div>
     </div>
   );
@@ -200,6 +201,7 @@ const PagedSection = ({
   sectionHeaders,
   name,
   pill,
+  overhead,
   currentTimeString,
 }: PagedSectionProps): JSX.Element => {
   const excessDepartures = departures.length - numRows + 1;
@@ -214,6 +216,7 @@ const PagedSection = ({
     sectionHeaders,
     name,
     arrow: sectionHeaders === "normal" ? arrow : null,
+    overhead,
   };
 
   if (staticDepartures.length === 0) {
@@ -257,6 +260,7 @@ const Section = ({
   sectionHeaders,
   currentTimeString,
   numRows,
+  overhead,
   pill,
 }): JSX.Element => {
   departures = departures.slice(0, numRows);
@@ -265,7 +269,7 @@ const Section = ({
     arrow = null;
   }
 
-  const frameProps = { sectionHeaders, name, arrow };
+  const frameProps = { sectionHeaders, name, arrow, overhead };
 
   if (departures.length === 0) {
     return (

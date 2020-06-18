@@ -19,7 +19,7 @@ const Departure = ({
   stopType,
   alerts,
 }): JSX.Element => {
-  const via =
+  const viaModifier =
     destination && destination.includes(" via ") ? "with-via" : "no-via";
 
   const timeRepresentation = standardTimeRepresentation(
@@ -33,7 +33,7 @@ const Departure = ({
     timeRepresentation.type === "TEXT" ? "animated" : "static";
 
   return (
-    <div className={classWithModifier("departure", via)}>
+    <div className={classWithModifier("departure", viaModifier)}>
       <DepartureRoutePill route={route} routeId={routeId} />
       <div className="departure-destination">
         {destination && <BaseDepartureDestination destination={destination} />}

@@ -1,14 +1,6 @@
 .departure-route {
   display: inline-block;
   vertical-align: middle;
-  width: 142px;
-  font-size: 50px;
-  margin-right: 26px;
-}
-
-.departure-route--icon {
-  height: 50px;
-  margin-top: 4.5px;
 }
 
 .departure-route--yellow .base-route-pill__pill {
@@ -44,4 +36,30 @@
 .departure-route--silver .base-route-pill__pill {
   background: #7c878e;
   color: white;
+}
+
+.screen-container--size-normal {
+  .departure-route {
+    width: 142px;
+    font-size: 50px;
+    margin-right: 26px;
+  }
+
+  .departure-route--icon {
+    height: 50px;
+    margin-top: 4.5px;
+  }
+}
+
+.screen-container--size-large {
+  .departure-route {
+    width: 200px;
+    font-size: 96px;
+    margin-right: 32px;
+  }
+
+  .departure-route--icon {
+    height: 72px;
+    margin-top: 4.5px;
+  }
 }

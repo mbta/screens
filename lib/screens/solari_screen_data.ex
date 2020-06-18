@@ -5,7 +5,12 @@ defmodule Screens.SolariScreenData do
   alias Screens.Departures.Departure
 
   def by_screen_id(screen_id, _is_screen, datetime \\ nil) do
-    %{station_name: station_name, sections: sections, section_headers: section_headers} =
+    %{
+      station_name: station_name,
+      sections: sections,
+      section_headers: section_headers,
+      overhead: overhead
+    } =
       :screens
       |> Application.get_env(:screen_data)
       |> Map.get(screen_id)
@@ -27,7 +32,8 @@ defmodule Screens.SolariScreenData do
           station_name: station_name,
           sections: data,
           section_headers: section_headers,
-          psa_name: psa_name
+          psa_name: psa_name,
+          overhead: overhead
         }
 
       :error ->

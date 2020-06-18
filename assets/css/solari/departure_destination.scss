@@ -1,15 +1,21 @@
 @import "../base/base_departure_destination";
+@import "../fonts";
 
 .departure-destination {
   color: #171f26;
   display: inline-block;
   vertical-align: middle;
-  width: 654px;
-  font-size: 50px;
+}
 
-  &--no-departures-placeholder {
-    font-size: 40px;
-    width: 828px;
+.screen-container--size-normal {
+  .departure-destination {
+    width: 654px;
+    font-size: 50px;
+
+    &--no-departures-placeholder {
+      font-size: 40px;
+      width: 828px;
+    }
   }
 }
 
@@ -20,5 +26,22 @@
     &--no-departures-placeholder {
       width: 740px;
     }
+  }
+}
+
+.screen-container--size-large {
+  .departure-destination {
+    @include font--text--65medium;
+    width: 550px;
+    font-size: 96px;
+
+    &--no-departures-placeholder {
+      width: 784px;
+      font-size: 84px;
+    }
+  }
+
+  .base-departure-destination__secondary {
+    font-size: 0.875em;
   }
 }
