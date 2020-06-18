@@ -3,8 +3,6 @@
 .inline-alert-badge {
   display: inline-block;
   box-shadow: 0px 5px 21px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
-  height: 48px;
   vertical-align: middle;
 
   &:not(:last-child) {
@@ -29,12 +27,8 @@
 .inline-alert-badge__text {
   display: inline-block;
   @include font--text--65medium;
-  font-size: 30px;
-  line-height: 48px;
   vertical-align: middle;
   text-transform: uppercase;
-  margin-left: 12px;
-  margin-right: 19px;
 
   &--delay {
     color: #ffffff;
@@ -42,7 +36,6 @@
 
   &--snow_route {
     color: #171f26;
-    line-height: 42px;
   }
 
   &--last_trip {
@@ -50,32 +43,94 @@
   }
 }
 
-.departure-group--multiple-rows {
-  .inline-alert-badge {
-    position: relative;
-  }
-}
-
 .inline-alert-badge__icon-container {
   display: inline-block;
-  margin-left: 12px;
-  height: 48px;
-  width: 31px;
   font-size: 0;
   vertical-align: middle;
-
-  &--snow_route {
-    height: 42px;
-  }
 }
 
 .inline-alert-badge__icon-image {
-  height: 32px;
-  width: 32px;
-  margin-top: 8px;
   vertical-align: middle;
+}
 
-  &--snow_route {
-    margin-top: 5px;
+.screen-container--size-normal {
+  .inline-alert-badge {
+    height: 48px;
+    border-radius: 5px;
+  }
+
+  .inline-alert-badge__text {
+    font-size: 30px;
+    line-height: 48px;
+    margin-left: 12px;
+    margin-right: 19px;
+
+    &--snow_route {
+      line-height: 42px;
+    }
+  }
+
+  .inline-alert-badge__icon-container {
+    margin-left: 12px;
+    height: 48px;
+    width: 31px;
+
+    &--snow_route {
+      height: 42px;
+    }
+  }
+
+  .inline-alert-badge__icon-image {
+    height: 32px;
+    width: 32px;
+    margin-top: 8px;
+
+    &--snow_route {
+      margin-top: 5px;
+    }
+  }
+}
+
+.screen-container--size-large {
+  .inline-alert-badge {
+    height: 112px;
+    border-radius: 10px;
+  }
+
+  .inline-alert-badge__text {
+    font-size: 60px;
+    line-height: 112px;
+    margin-left: 32px;
+    margin-right: 46px;
+
+    &--snow_route {
+      line-height: 106px;
+    }
+  }
+
+  .inline-alert-badge__icon-container {
+    margin-left: 30px;
+    height: 76px;
+    width: 60px;
+
+    &--snow_route {
+      height: 70px;
+    }
+  }
+
+  .inline-alert-badge__icon-image {
+    height: 60px;
+    width: 60px;
+    margin-top: 8px;
+
+    &--snow_route {
+      margin-top: 5px;
+    }
+  }
+}
+
+.departure-group--multiple-rows {
+  .inline-alert-badge {
+    position: relative;
   }
 }
