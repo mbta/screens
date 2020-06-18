@@ -233,7 +233,7 @@ config :screens,
       app_id: "solari"
     },
     "303" => %{
-      station_name: "Dudley",
+      station_name: "Nubian",
       overhead: true,
       section_headers: :normal,
       sections: [
@@ -255,7 +255,7 @@ config :screens,
       app_id: "solari"
     },
     "304" => %{
-      station_name: "Dudley",
+      station_name: "Nubian",
       overhead: true,
       section_headers: :normal,
       sections: [
