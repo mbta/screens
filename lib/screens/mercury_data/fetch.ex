@@ -33,6 +33,7 @@ defmodule Screens.MercuryData.Fetch do
       temperature: "Temperature",
       battery: "Battery",
       battery_voltage: "BatteryVoltage",
+      external_battery: "ExternalBattery",
       uptime: "Uptime",
       connect_reason: "ConnectReason",
       connectivity_used: "ConnectivityUsed"
