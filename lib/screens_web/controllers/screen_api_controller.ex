@@ -13,6 +13,10 @@ defmodule ScreensWeb.ScreenApiController do
 
     _ = Screens.LogScreenData.log_data_request(screen_id, version, is_screen)
 
+    user_agent = get_req_header(conn, "user-agent")
+
+    Logger.info("[solari user agent] agent=\"#{user_agent}\"")
+
     data =
       Screens.ScreenData.by_screen_id_with_override_and_version(screen_id, version, is_screen)
 
