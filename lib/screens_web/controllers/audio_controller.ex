@@ -5,16 +5,21 @@ defmodule ScreensWeb.AudioController do
 
   @fallback_audio_path "assets/static/audio/readout_fallback.mp3"
 
-  def show(conn, %{"id" => screen_id}) do
+  def show(conn, %{"id" => screen_id} = params) do
+    disposition =
+      params
+      |> Map.get("disposition")
+      |> disposition_atom()
+
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
 
     _ = Screens.LogScreenData.log_audio_request(screen_id, is_screen)
 
     with {:ok, ssml} <- render_ssml(screen_id, is_screen),
          {:ok, audio_data} <- Screens.Audio.synthesize(ssml) do
-      send_audio(conn, {:binary, audio_data})
+      send_audio(conn, {:binary, audio_data}, disposition)
     else
-      _ -> send_audio(conn, {:file, @fallback_audio_path})
+      _ -> send_audio(conn, {:file, @fallback_audio_path}, disposition)
     end
   end
 
@@ -38,7 +43,10 @@ defmodule ScreensWeb.AudioController do
     end
   end
 
-  defp send_audio(conn, kind) do
-    send_download(conn, kind, filename: "readout.mp3", disposition: :inline)
+  defp send_audio(conn, kind, disposition) do
+    send_download(conn, kind, filename: "readout.mp3", disposition: disposition)
   end
+
+  defp disposition_atom("inline"), do: :inline
+  defp disposition_atom(_), do: :attachment
 end
