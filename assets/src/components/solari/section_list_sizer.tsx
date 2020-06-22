@@ -105,13 +105,19 @@ interface State {
   sectionSizes: number[];
 }
 
+const NORMAL_DEPARTURES_HEIGHT = 1565;
+const OVERHEAD_DEPARTURES_HEIGHT = 1464;
+
 class SectionListSizer extends React.Component<Props, State> {
   ref: React.RefObject<HTMLDivElement>;
+  maxDeparturesHeight: number;
 
   constructor(props: Props) {
     super(props);
     this.ref = React.createRef();
-    this.MAX_DEPARTURES_HEIGHT = this.props.overhead ? 1464 : 1565;
+    this.maxDeparturesHeight = this.props.overhead
+      ? OVERHEAD_DEPARTURES_HEIGHT
+      : NORMAL_DEPARTURES_HEIGHT;
 
     this.state = SectionListSizer.getInitialStateFromProps(props);
   }
@@ -162,17 +168,10 @@ class SectionListSizer extends React.Component<Props, State> {
   }
 
   shouldAdjustSectionSizes() {
-    if (this.ref.current != null) {
-      const departuresHeight = this.ref.current.clientHeight;
-
-      if (
-        departuresHeight > this.MAX_DEPARTURES_HEIGHT &&
-        this.state.numRows > 5
-      ) {
-        return true;
-      }
-    }
-    return false;
+    const departuresHeight = this.ref?.current?.clientHeight ?? 0;
+    return (
+      departuresHeight > this.maxDeparturesHeight && this.state.numRows > 5
+    );
   }
 
   adjustSectionSizes() {
