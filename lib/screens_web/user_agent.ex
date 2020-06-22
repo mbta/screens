@@ -11,7 +11,7 @@ defmodule ScreensWeb.UserAgent do
   def is_screen?(nil), do: false
 
   def is_screen?(user_agent) do
-    is_mercury?(user_agent) or is_gds?(user_agent)
+    is_mercury?(user_agent) or is_gds?(user_agent) or is_solari?(user_agent)
   end
 
   defp is_mercury?(user_agent) do
@@ -21,5 +21,10 @@ defmodule ScreensWeb.UserAgent do
 
   defp is_gds?(user_agent) do
     String.contains?(user_agent, "einkapp-qt")
+  end
+
+  defp is_solari?(user_agent) do
+    String.contains?(user_agent, "(X11; Ubuntu; Linux i686; rv:22.0)") and
+      String.contains?(user_agent, "Firefox/22.0")
   end
 end
