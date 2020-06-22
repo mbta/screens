@@ -59,3 +59,8 @@
     height: 112px;
   }
 }
+
+// Make sure the dummy section list is easy to tell from the real one
+.section-list--dummy .departure-container {
+  background-color: #ff00ff;
+}

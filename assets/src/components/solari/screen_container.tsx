@@ -1,7 +1,7 @@
 import React from "react";
 
 import Header from "Components/solari/header";
-import SectionList from "Components/solari/section_list";
+import SectionListContainer from "Components/solari/section_list_container";
 import Psa from "Components/solari/psa";
 
 import { classWithModifier } from "Util/util";
@@ -22,7 +22,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         currentTimeString={apiResponse.current_time}
         overhead={apiResponse.overhead}
       />
-      <SectionList
+      <SectionListContainer
         sections={apiResponse.sections}
         sectionHeaders={apiResponse.section_headers}
         currentTimeString={apiResponse.current_time}

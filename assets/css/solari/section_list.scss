@@ -1,0 +1,19 @@
+// Comment out the *'d styles to view the dummy section list in dev.
+// (scroll right from the visible portion)
+
+.section-list-container {
+  position: relative;
+  // *
+  overflow: hidden;
+}
+
+.section-list {
+  &--dummy {
+    position: absolute;
+    left: 1080px;
+    top: 0;
+    width: 1080px;
+    // *
+    opacity: 0;
+  }
+}
