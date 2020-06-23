@@ -75,7 +75,7 @@ const SectionFrame = ({
   return (
     <div className={sectionClass}>
       {shouldShowHeader && <SectionHeader name={name} arrow={arrow} />}
-      <div className="departure-container">{children}</div>
+      <div className="departures-container">{children}</div>
     </div>
   );
 };
