@@ -38,8 +38,11 @@ defmodule Screens.Schedules.Parser do
          %{"id" => id, "attributes" => attributes, "relationships" => relationships},
          included_data
        ) do
-    %{"arrival_time" => arrival_time_string, "departure_time" => departure_time_string} =
-      attributes
+    %{
+      "arrival_time" => arrival_time_string,
+      "departure_time" => departure_time_string,
+      "stop_headsign" => stop_headsign
+    } = attributes
 
     arrival_time = parse_time(arrival_time_string)
     departure_time = parse_time(departure_time_string)
@@ -60,7 +63,8 @@ defmodule Screens.Schedules.Parser do
       stop: stop,
       route: route,
       arrival_time: arrival_time,
-      departure_time: departure_time
+      departure_time: departure_time,
+      stop_headsign: stop_headsign
     }
   end
 
