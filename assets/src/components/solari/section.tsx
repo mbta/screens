@@ -1,4 +1,5 @@
 import React from "react";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 import Departure from "Components/solari/departure";
 import Arrow, { Direction } from "Components/solari/arrow";
@@ -7,7 +8,8 @@ import {
   PagedDepartureRoutePill,
 } from "Components/solari/route_pill";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
-import { classWithModifier, classWithModifiers } from "Util/util";
+import { classWithModifier } from "Util/util";
+import { standardTimeRepresentation } from "Util/time_representation";
 
 const camelizeDepartureObject = ({
   id,
@@ -28,6 +30,22 @@ const camelizeDepartureObject = ({
   alerts,
   stopType,
 });
+
+const isArrivingOrBoarding = (
+  { time, vehicle_status, stop_type },
+  currentTimeString
+) => {
+  const timeRepresentation = standardTimeRepresentation(
+    time,
+    currentTimeString,
+    vehicle_status,
+    stop_type
+  );
+  return (
+    timeRepresentation.type === "TEXT" &&
+    ["ARR", "BRD"].includes(timeRepresentation.text)
+  );
+};
 
 const SectionHeader = ({ name, arrow }): JSX.Element => {
   return (
@@ -57,7 +75,7 @@ const SectionFrame = ({
   return (
     <div className={sectionClass}>
       {shouldShowHeader && <SectionHeader name={name} arrow={arrow} />}
-      <div className="departure-container">{children}</div>
+      <div className="departures-container">{children}</div>
     </div>
   );
 };
@@ -181,6 +199,63 @@ class PagedDeparture extends React.Component<
   }
 }
 
+interface DepartureListProps {
+  departure: object;
+  currentTimeString: string;
+  isAnimated: boolean;
+}
+
+const DepartureList = ({
+  departures,
+  currentTimeString,
+  isAnimated,
+}: DepartureListProps): JSX.Element => {
+  if (isAnimated) {
+    return (
+      <TransitionGroup component={null}>
+        {departures.map((departure) => {
+          const isImminent = isArrivingOrBoarding(departure, currentTimeString);
+
+          const transitionProps = isImminent
+            ? {
+                timeout: { exit: 400 },
+                classNames: classWithModifier("departure-animated", "arr-brd"),
+                enter: false,
+                exit: true,
+              }
+            : {
+                timeout: { enter: 400 },
+                classNames: classWithModifier("departure-animated", "normal"),
+                enter: true,
+                exit: false,
+              };
+
+          return (
+            <CSSTransition {...transitionProps} key={departure.id}>
+              <Departure
+                {...camelizeDepartureObject(departure)}
+                currentTimeString={currentTimeString}
+              />
+            </CSSTransition>
+          );
+        })}
+      </TransitionGroup>
+    );
+  } else {
+    return (
+      <>
+        {departures.map((departure) => (
+          <Departure
+            {...camelizeDepartureObject(departure)}
+            currentTimeString={currentTimeString}
+            key={departure.id}
+          />
+        ))}
+      </>
+    );
+  }
+};
+
 const MAX_PAGE_COUNT = 5;
 const MIN_PAGE_COUNT = 3;
 
@@ -191,6 +266,8 @@ interface PagedSectionProps {
   sectionHeaders: "normal" | "vertical" | null;
   name: string | null;
   pill: string;
+  overhead: boolean;
+  isAnimated: boolean;
   currentTimeString: string;
 }
 
@@ -202,6 +279,7 @@ const PagedSection = ({
   name,
   pill,
   overhead,
+  isAnimated,
   currentTimeString,
 }: PagedSectionProps): JSX.Element => {
   const excessDepartures = departures.length - numRows + 1;
@@ -235,13 +313,11 @@ const PagedSection = ({
 
   return (
     <SectionFrame {...frameProps}>
-      {staticDepartures.map((departure) => (
-        <Departure
-          {...camelizeDepartureObject(departure)}
-          currentTimeString={currentTimeString}
-          key={departure.id}
-        />
-      ))}
+      <DepartureList
+        departures={staticDepartures}
+        currentTimeString={currentTimeString}
+        isAnimated={isAnimated}
+      />
       {showPagedDeparture && (
         <PagedDeparture
           pageCount={pageCount}
@@ -261,6 +337,7 @@ const Section = ({
   currentTimeString,
   numRows,
   overhead,
+  isAnimated,
   pill,
 }): JSX.Element => {
   departures = departures.slice(0, numRows);
@@ -281,13 +358,11 @@ const Section = ({
 
   return (
     <SectionFrame {...frameProps}>
-      {departures.map((departure) => (
-        <Departure
-          {...camelizeDepartureObject(departure)}
-          currentTimeString={currentTimeString}
-          key={departure.id}
-        />
-      ))}
+      <DepartureList
+        departures={departures}
+        currentTimeString={currentTimeString}
+        isAnimated={isAnimated}
+      />
     </SectionFrame>
   );
 };
