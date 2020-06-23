@@ -31,6 +31,22 @@ const camelizeDepartureObject = ({
   stopType,
 });
 
+const isArrivingOrBoarding = (
+  { time, vehicle_status, stop_type },
+  currentTimeString
+) => {
+  const timeRepresentation = standardTimeRepresentation(
+    time,
+    currentTimeString,
+    vehicle_status,
+    stop_type
+  );
+  return (
+    timeRepresentation.type === "TEXT" &&
+    ["ARR", "BRD"].includes(timeRepresentation.text)
+  );
+};
+
 const SectionHeader = ({ name, arrow }): JSX.Element => {
   return (
     <div className="section-header">
@@ -183,6 +199,63 @@ class PagedDeparture extends React.Component<
   }
 }
 
+interface DepartureListProps {
+  departure: object;
+  currentTimeString: string;
+  isAnimated: boolean;
+}
+
+const DepartureList = ({
+  departures,
+  currentTimeString,
+  isAnimated,
+}: DepartureListProps): JSX.Element => {
+  if (isAnimated) {
+    return (
+      <TransitionGroup component={null}>
+        {departures.map((departure) => {
+          const isImminent = isArrivingOrBoarding(departure, currentTimeString);
+
+          const transitionProps = isImminent
+            ? {
+                timeout: { exit: 200 },
+                classNames: classWithModifier("departure-animated", "arr-brd"),
+                enter: false,
+                exit: true,
+              }
+            : {
+                timeout: { enter: 200 },
+                classNames: classWithModifier("departure-animated", "normal"),
+                enter: true,
+                exit: false,
+              };
+
+          return (
+            <CSSTransition {...transitionProps} key={departure.id}>
+              <Departure
+                {...camelizeDepartureObject(departure)}
+                currentTimeString={currentTimeString}
+              />
+            </CSSTransition>
+          );
+        })}
+      </TransitionGroup>
+    );
+  } else {
+    return (
+      <>
+        {departures.map((departure) => (
+          <Departure
+            {...camelizeDepartureObject(departure)}
+            currentTimeString={currentTimeString}
+            key={departure.id}
+          />
+        ))}
+      </>
+    );
+  }
+};
+
 const MAX_PAGE_COUNT = 5;
 const MIN_PAGE_COUNT = 3;
 
@@ -253,79 +326,6 @@ const PagedSection = ({
         />
       )}
     </SectionFrame>
-  );
-};
-
-interface DepartureListProps {
-  departure: object;
-  currentTimeString: string;
-  isAnimated: boolean;
-}
-
-const DepartureList = ({
-  departures,
-  currentTimeString,
-  isAnimated,
-}: DepartureListProps): JSX.Element => {
-  if (isAnimated) {
-    return (
-      <TransitionGroup component={null}>
-        {departures.map((departure) => {
-          const isImminent = isArrivingOrBoarding(departure, currentTimeString);
-
-          const transitionProps = isImminent
-            ? {
-                timeout: { exit: 200 },
-                classNames: classWithModifier("departure-animated", "arr-brd"),
-                enter: false,
-                exit: true,
-              }
-            : {
-                timeout: { enter: 200 },
-                classNames: classWithModifier("departure-animated", "normal"),
-                enter: true,
-                exit: false,
-              };
-
-          return (
-            <CSSTransition {...transitionProps} key={departure.id}>
-              <Departure
-                {...camelizeDepartureObject(departure)}
-                currentTimeString={currentTimeString}
-              />
-            </CSSTransition>
-          );
-        })}
-      </TransitionGroup>
-    );
-  } else {
-    return (
-      <>
-        {departures.map((departure) => (
-          <Departure
-            {...camelizeDepartureObject(departure)}
-            currentTimeString={currentTimeString}
-            key={departure.id}
-          />
-        ))}
-      </>
-    );
-  }
-};
-
-const isArrivingOrBoarding = (
-  { time, vehicle_status, stop_type },
-  currentTimeString
-) => {
-  const timeRepresentation = standardTimeRepresentation(
-    time,
-    currentTimeString,
-    vehicle_status,
-    stop_type
-  );
-  return (
-    timeRepresentation.type === "TEXT" &&
-    ["ARR", "BRD"].includes(timeRepresentation.text)
   );
 };
 
