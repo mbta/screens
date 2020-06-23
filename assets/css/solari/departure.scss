@@ -60,6 +60,30 @@
   }
 }
 
+.departure-animated {
+  &--normal {
+    // hide new departures until the previous departure has animated out
+    &-enter {
+      display: none;
+    }
+
+    &-enter-active {
+      display: none;
+    }
+  }
+
+  &--arr-brd {
+    &-exit {
+      transform: translateX(0px);
+    }
+
+    &-exit-active {
+      transform: translateX(1038px);
+      transition: transform 200ms cubic-bezier(0.32, 0, 0.67, 0);
+    }
+  }
+}
+
 // Make sure the dummy section list is easy to tell from the real one
 .section-list--dummy .departure-container {
   background-color: #ff00ff;

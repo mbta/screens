@@ -42,6 +42,7 @@ const SectionList = React.forwardRef(
               sectionHeaders={sectionHeaders}
               currentTimeString={currentTimeString}
               overhead={overhead}
+              isAnimated={!isDummy}
               key={section.name}
             />
           );
