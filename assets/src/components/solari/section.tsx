@@ -218,13 +218,13 @@ const DepartureList = ({
 
           const transitionProps = isImminent
             ? {
-                timeout: { exit: 200 },
+                timeout: { exit: 400 },
                 classNames: classWithModifier("departure-animated", "arr-brd"),
                 enter: false,
                 exit: true,
               }
             : {
-                timeout: { enter: 200 },
+                timeout: { enter: 400 },
                 classNames: classWithModifier("departure-animated", "normal"),
                 enter: true,
                 exit: false,
