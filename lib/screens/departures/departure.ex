@@ -176,11 +176,11 @@ defmodule Screens.Departures.Departure do
     trip_data =
       case Map.get(data, :trip) do
         %{headsign: destination, direction_id: direction_id} ->
-          # Override trip headsign with stop_headsign if not nil
-          case stop_headsign do
-            nil -> %{destination: destination, direction_id: direction_id}
-            _ -> %{destination: stop_headsign, direction_id: direction_id}
-          end
+          %{
+            # Override trip headsign with stop_headsign if not nil
+            destination: if(is_nil(stop_headsign), do: destination, else: stop_headsign),
+            direction_id: direction_id
+          }
 
         nil ->
           %{}
