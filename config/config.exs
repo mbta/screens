@@ -226,7 +226,12 @@ config :screens,
           query: %{params: %{stop_ids: ["72", "102", "1060", "1123"]}, opts: %{}},
           layout:
             {:upcoming,
-             %{num_rows: 14, visible_rows: 10, paged: true, routes: {:exclude, [{"70", 1}]}}},
+             %{
+               num_rows: 14,
+               visible_rows: 10,
+               paged: true,
+               routes: {:exclude, [{"70", 1}, {"64", 1}]}
+             }},
           pill: :bus
         }
       ],
@@ -329,8 +334,15 @@ config :screens,
         %{
           name: "Upper Busway",
           arrow: :e,
-          query: %{params: %{stop_id: "20761"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}},
+          query: %{params: %{stop_id: "20762"}, opts: %{}},
+          layout:
+            {:upcoming,
+             %{
+               num_rows: 14,
+               visible_rows: 10,
+               paged: true,
+               routes: {:exclude, [{"74", 1}, {"75", 1}, {"77", 1}, {"78", 1}, {"96", 1}]}
+             }},
           pill: :bus
         },
         %{
@@ -371,7 +383,9 @@ config :screens,
           name: "Congress St @ Haymarket Sta",
           arrow: :n,
           query: %{params: %{stop_id: "117"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 8, visible_rows: 4, paged: true}},
+          layout:
+            {:upcoming,
+             %{num_rows: 8, visible_rows: 4, paged: true, routes: {:exclude, [{"4", 0}]}}},
           pill: :bus
         }
       ],
@@ -446,7 +460,7 @@ config :screens,
             },
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}},
+          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}},
           pill: :bus
         }
       ],
@@ -528,7 +542,7 @@ config :screens,
         %{
           name: "Bus",
           arrow: nil,
-          query: %{params: %{stop_ids: ["145", "9983"]}, opts: %{}},
+          query: %{params: %{stop_ids: ["145", "1241", "9983"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}},
           pill: :bus
         }
