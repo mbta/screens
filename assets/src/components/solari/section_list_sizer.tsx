@@ -107,6 +107,7 @@ interface State {
 
 const NORMAL_DEPARTURES_HEIGHT = 1565;
 const OVERHEAD_DEPARTURES_HEIGHT = 1464;
+const MIN_NUM_ROWS = 3;
 
 class SectionListSizer extends React.Component<Props, State> {
   ref: React.RefObject<HTMLDivElement>;
@@ -170,7 +171,8 @@ class SectionListSizer extends React.Component<Props, State> {
   shouldAdjustSectionSizes() {
     const departuresHeight = this.ref?.current?.clientHeight ?? 0;
     return (
-      departuresHeight > this.maxDeparturesHeight && this.state.numRows > 5
+      departuresHeight > this.maxDeparturesHeight &&
+      this.state.numRows > MIN_NUM_ROWS
     );
   }
 
