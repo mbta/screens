@@ -338,8 +338,8 @@ config :screens,
           layout:
             {:upcoming,
              %{
-               num_rows: 12,
-               visible_rows: 8,
+               num_rows: 14,
+               visible_rows: 10,
                paged: true,
                routes: {:exclude, [{"74", 1}, {"75", 1}, {"77", 1}, {"78", 1}, {"96", 1}]}
              }},
@@ -460,7 +460,7 @@ config :screens,
             },
             opts: %{}
           },
-          layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}},
+          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}},
           pill: :bus
         }
       ],
