@@ -334,8 +334,15 @@ config :screens,
         %{
           name: "Upper Busway",
           arrow: :e,
-          query: %{params: %{stop_id: "20761"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}},
+          query: %{params: %{stop_id: "20762"}, opts: %{}},
+          layout:
+            {:upcoming,
+             %{
+               num_rows: 12,
+               visible_rows: 8,
+               paged: true,
+               routes: {:exclude, [{"74", 1}, {"75", 1}, {"77", 1}, {"78", 1}, {"96", 1}]}
+             }},
           pill: :bus
         },
         %{
