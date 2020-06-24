@@ -1,10 +1,10 @@
 defmodule Screens.SolariScreenData do
   @moduledoc false
 
-  require Logger
   alias Screens.Departures.Departure
+  alias Screens.LogScreenData
 
-  def by_screen_id(screen_id, _is_screen, datetime \\ nil) do
+  def by_screen_id(screen_id, is_screen, datetime \\ nil) do
     %{
       station_name: station_name,
       sections: sections,
@@ -23,7 +23,10 @@ defmodule Screens.SolariScreenData do
 
     psa_name = Screens.Psa.current_psa_for(screen_id)
 
-    case fetch_sections_data(sections, datetime) do
+    sections_data = fetch_sections_data(sections, datetime)
+    _ = LogScreenData.log_departures(screen_id, is_screen, sections_data)
+
+    case sections_data do
       {:ok, data} ->
         %{
           force_reload: false,
@@ -73,7 +76,6 @@ defmodule Screens.SolariScreenData do
          }}
 
       :error ->
-        _ = Logger.info("solari fetch_section_data failed to fetch #{section_name}")
         :error
     end
   end
