@@ -78,7 +78,31 @@ defmodule Screens.Departures.Departure do
     |> from_predictions()
   end
 
+  # Copies stop headsigns from schedules to predictions with the same trip_id
+  defp copy_stop_headsigns(predictions, schedules) do
+    stop_headsigns_by_trip =
+      schedules
+      |> Enum.reject(&is_nil(&1.trip))
+      |> Enum.map(fn %{trip: %{id: trip_id}, stop_headsign: stop_headsign} ->
+        {trip_id, stop_headsign}
+      end)
+      |> Enum.into(%{})
+
+    Enum.map(predictions, &copy_stop_headsign(&1, stop_headsigns_by_trip))
+  end
+
+  defp copy_stop_headsign(%{trip: %{id: trip_id}} = prediction, stop_headsigns_by_trip) do
+    stop_headsign = Map.get(stop_headsigns_by_trip, trip_id)
+    %{prediction | stop_headsign: stop_headsign}
+  end
+
+  defp copy_stop_headsign(prediction, _stop_headsigns_by_trip) do
+    prediction
+  end
+
   defp merge_predictions_and_schedules({:ok, predictions}, {:ok, schedules}) do
+    predictions = copy_stop_headsigns(predictions, schedules)
+
     predicted_trip_ids =
       predictions
       |> Enum.reject(&is_nil(&1.trip))
@@ -133,7 +157,8 @@ defmodule Screens.Departures.Departure do
            stop: %{name: stop_name},
            route: %{id: route_id, short_name: route_short_name},
            arrival_time: arrival_time,
-           departure_time: departure_time
+           departure_time: departure_time,
+           stop_headsign: stop_headsign
          } = data
        ) do
     time = select_prediction_time(arrival_time, departure_time)
@@ -151,7 +176,11 @@ defmodule Screens.Departures.Departure do
     trip_data =
       case Map.get(data, :trip) do
         %{headsign: destination, direction_id: direction_id} ->
-          %{destination: destination, direction_id: direction_id}
+          %{
+            # Override trip headsign with stop_headsign if not nil
+            destination: if(is_nil(stop_headsign), do: destination, else: stop_headsign),
+            direction_id: direction_id
+          }
 
         nil ->
           %{}

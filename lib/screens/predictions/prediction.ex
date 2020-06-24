@@ -8,7 +8,8 @@ defmodule Screens.Predictions.Prediction do
             vehicle: nil,
             alerts: [],
             arrival_time: nil,
-            departure_time: nil
+            departure_time: nil,
+            stop_headsign: nil
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -18,7 +19,8 @@ defmodule Screens.Predictions.Prediction do
           vehicle: Screens.Vehicles.Vehicle.t(),
           alerts: list(Screens.Alerts.Alert.t()),
           arrival_time: DateTime.t() | nil,
-          departure_time: DateTime.t() | nil
+          departure_time: DateTime.t() | nil,
+          stop_headsign: String.t() | nil
         }
 
   def fetch(query_params) do
