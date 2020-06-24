@@ -206,7 +206,8 @@ config :screens,
           pill: :bus
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "Ashmont SOL01"
     },
     "302" => %{
       station_name: "Central",
@@ -235,7 +236,8 @@ config :screens,
           pill: :bus
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "Central SOL02"
     },
     "303" => %{
       station_name: "Nubian",
@@ -257,7 +259,8 @@ config :screens,
           pill: :bus
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "Nubian Platform A SOL03"
     },
     "304" => %{
       station_name: "Nubian",
@@ -280,7 +283,8 @@ config :screens,
           pill: :bus
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "Nubian Platform C SOL"
     },
     "305" => %{
       station_name: "Forest Hills",
@@ -302,7 +306,8 @@ config :screens,
           pill: :bus
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "Forest Hills Lobby SOL05"
     },
     "306" => %{
       station_name: "Forest Hills",
@@ -324,7 +329,8 @@ config :screens,
           pill: :bus
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "Forest Hills Upper Busway SOL06"
     },
     "307" => %{
       station_name: "Harvard",
@@ -358,7 +364,8 @@ config :screens,
           pill: :bus
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "Harvard SOL07"
     },
     "308" => %{
       station_name: "Haymarket",
@@ -389,7 +396,8 @@ config :screens,
           pill: :bus
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "Haymarket SOL08"
     },
     "309" => %{
       station_name: "Maverick",
@@ -411,7 +419,8 @@ config :screens,
           pill: :bus
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "Maverick SOL09"
     },
     "310" => %{
       station_name: "Ruggles",
@@ -433,7 +442,8 @@ config :screens,
           pill: :cr
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "Ruggles SOL10"
     },
     "311" => %{
       station_name: "Sullivan Square",
@@ -464,7 +474,8 @@ config :screens,
           pill: :bus
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "Sullivan Square SOL11"
     },
     "312" => %{
       station_name: "Wonderland",
@@ -486,7 +497,8 @@ config :screens,
           pill: :bus
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "Wonderland SOL12"
     },
     "313" => %{
       station_name: "10 Park Plaza",
@@ -522,7 +534,8 @@ config :screens,
           pill: :blue
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "10 Park Plaza Stuart SOL13"
     },
     "314" => %{
       station_name: "10 Park Plaza",
@@ -547,7 +560,8 @@ config :screens,
           pill: :bus
         }
       ],
-      app_id: "solari"
+      app_id: "solari",
+      name: "10 Park Plaza Charles SOL14"
     },
     "320" => %{
       station_name: "Summer Street",
