@@ -535,7 +535,7 @@ config :screens,
         %{
           name: "Bus",
           arrow: nil,
-          query: %{params: %{stop_ids: ["145", "9983"]}, opts: %{}},
+          query: %{params: %{stop_ids: ["145", "1241", "9983"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}},
           pill: :bus
         }
