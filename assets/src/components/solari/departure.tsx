@@ -33,23 +33,27 @@ const Departure = ({
     timeRepresentation.type === "TEXT" ? "animated" : "static";
 
   return (
-    <div className={classWithModifier("departure", viaModifier)}>
-      <DepartureRoutePill route={route} routeId={routeId} />
-      <div className="departure-destination">
-        {destination && <BaseDepartureDestination destination={destination} />}
-      </div>
-      <div
-        className={classWithModifier("departure-time", timeAnimationModifier)}
-      >
-        <BaseDepartureTime time={timeRepresentation} />
-      </div>
-      {alerts.length > 0 && (
-        <div className="departure__alerts-container">
-          {alerts.map((alert) => (
-            <InlineAlertBadge alert={alert} key={alert} />
-          ))}
+    <div className="departure-container">
+      <div className={classWithModifier("departure", viaModifier)}>
+        <DepartureRoutePill route={route} routeId={routeId} />
+        <div className="departure-destination">
+          {destination && (
+            <BaseDepartureDestination destination={destination} />
+          )}
         </div>
-      )}
+        <div
+          className={classWithModifier("departure-time", timeAnimationModifier)}
+        >
+          <BaseDepartureTime time={timeRepresentation} />
+        </div>
+        {alerts.length > 0 && (
+          <div className="departure__alerts-container">
+            {alerts.map((alert) => (
+              <InlineAlertBadge alert={alert} key={alert} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
