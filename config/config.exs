@@ -226,7 +226,12 @@ config :screens,
           query: %{params: %{stop_ids: ["72", "102", "1060", "1123"]}, opts: %{}},
           layout:
             {:upcoming,
-             %{num_rows: 14, visible_rows: 10, paged: true, routes: {:exclude, [{"70", 1}]}}},
+             %{
+               num_rows: 14,
+               visible_rows: 10,
+               paged: true,
+               routes: {:exclude, [{"70", 1}, {"64", 1}]}
+             }},
           pill: :bus
         }
       ],
@@ -371,7 +376,9 @@ config :screens,
           name: "Congress St @ Haymarket Sta",
           arrow: :n,
           query: %{params: %{stop_id: "117"}, opts: %{}},
-          layout: {:upcoming, %{num_rows: 8, visible_rows: 4, paged: true}},
+          layout:
+            {:upcoming,
+             %{num_rows: 8, visible_rows: 4, paged: true, routes: {:exclude, [{"4", 0}]}}},
           pill: :bus
         }
       ],
