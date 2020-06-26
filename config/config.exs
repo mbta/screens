@@ -531,7 +531,7 @@ config :screens,
           arrow: :e,
           query: %{params: %{stop_id: "9983"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 1}},
-          pill: :blue
+          pill: :bus
         }
       ],
       app_id: "solari",
