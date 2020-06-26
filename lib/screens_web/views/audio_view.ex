@@ -3,11 +3,6 @@ defmodule ScreensWeb.AudioView do
 
   import Phoenix.HTML
 
-  @type time_representation ::
-          %{type: :text, value: String.t()}
-          | %{type: :minutes, value: integer}
-          | %{type: :timestamp, value: String.t()}
-
   @spec render_pill_header(atom()) :: Phoenix.HTML.safe()
   def render_pill_header(:blue), do: ~E"Blue Line"
   def render_pill_header(:bus), do: ~E"Bus"
@@ -72,13 +67,8 @@ defmodule ScreensWeb.AudioView do
 |)
   end
 
-  def render_departure_group({route_descriptor, departures}) do
-    departure_time_groups =
-      departures
-      |> Enum.map(&%{pill: &1.pill, time_representation: get_time_representation(&1)})
-      |> group_departure_time_representations()
-
-    [first | rest] = departure_time_groups
+  def render_departure_group({route_descriptor, time_groups}) do
+    [first | rest] = time_groups
 
     first_rendered = render_first_departure_time_group(route_descriptor, first)
 
@@ -87,49 +77,17 @@ defmodule ScreensWeb.AudioView do
     ~E|<%= first_rendered %><%= rest_rendered %>|
   end
 
-  defp render_first_departure_time_group({route, route_id, destination}, departure_time) do
+  defp render_first_departure_time_group({route, route_id, destination}, time_group) do
     route_destination = render_route_destination(route, route_id, destination)
 
-    departure_time_group = render_departure_time_group(departure_time, false)
+    times = render_departure_time_group(time_group, false)
 
-    ~E|<s><%= route_destination %> <%= departure_time_group %></s>
+    ~E|<s><%= route_destination %> <%= times %></s>
 |
   end
 
-  defp group_departure_time_representations(departure_time_representations) do
-    departure_time_representations
-    |> Enum.reduce([], &departure_time_representation_reducer/2)
-    |> Enum.map(fn
-      %{} = item -> item
-      item -> Enum.reverse(item)
-    end)
-    |> Enum.reverse()
-  end
-
-  defp departure_time_representation_reducer(
-         %{time_representation: %{type: :text}} = d_time_rep,
-         acc
-       ) do
-    [d_time_rep | acc]
-  end
-
-  defp departure_time_representation_reducer(d_time_rep, []) do
-    [[d_time_rep]]
-  end
-
-  defp departure_time_representation_reducer(d_time_rep, acc) do
-    if is_list(hd(acc)) and
-         d_time_rep.time_representation.type == hd(hd(acc)).time_representation.type do
-      [[d_time_rep | hd(acc)] | tl(acc)]
-    else
-      [[d_time_rep] | acc]
-    end
-  end
-
-  defp render_departure_time_group(departure_time_group, with_prefix)
-       when is_list(departure_time_group) do
-    number = length(departure_time_group)
-    %{pill: pill, time_representation: %{type: type}} = hd(departure_time_group)
+  defp render_departure_time_group(%{pill: pill, type: type, values: values}, with_prefix) do
+    number = length(values)
 
     prefix =
       cond do
@@ -145,8 +103,8 @@ defmodule ScreensWeb.AudioView do
       end
 
     times =
-      departure_time_group
-      |> Enum.map(&render_time_representation(&1.time_representation))
+      values
+      |> Enum.map(&render_time_representation(%{type: type, value: &1}))
       |> Enum.intersperse(", ")
 
     if with_prefix do
@@ -157,15 +115,15 @@ defmodule ScreensWeb.AudioView do
     end
   end
 
-  defp render_departure_time_group(%{pill: pill, time_representation: time_representation}, true) do
-    ~E|Next <%= render_pill_mode(pill, 1) %> <% render_time_representation(time_representation) %>|
+  defp render_departure_time_group(%{pill: pill, type: :text, value: value}, true) do
+    ~E|Next <%= render_pill_mode(pill, 1) %> <% render_time_representation(%{type: :text, value: value}) %>|
   end
 
-  defp render_departure_time_group(%{time_representation: time_representation}, false) do
-    render_time_representation(time_representation)
+  defp render_departure_time_group(%{type: :text, value: value}, false) do
+    render_time_representation(%{type: :text, value: value})
   end
 
-  @spec render_time_representation(time_representation) :: Phoenix.HTML.safe()
+  @spec render_time_representation(Screens.Audio.time_representation()) :: Phoenix.HTML.safe()
   def render_time_representation(%{type: :text, value: :brd}), do: ~E"is now boarding"
   def render_time_representation(%{type: :text, value: :arr}), do: ~E"is now arriving"
 
@@ -184,38 +142,4 @@ defmodule ScreensWeb.AudioView do
 
   defp pluralize_minutes(1), do: "minute"
   defp pluralize_minutes(_), do: "minutes"
-
-  defp get_time_representation(%{
-         time: time,
-         current_time: current_time,
-         vehicle_status: vehicle_status,
-         stop_type: stop_type
-       }) do
-    {:ok, time, _} = DateTime.from_iso8601(time)
-    {:ok, current_time, _} = DateTime.from_iso8601(current_time)
-
-    second_difference = DateTime.diff(time, current_time)
-    minute_difference = round(second_difference / 60)
-
-    cond do
-      vehicle_status === :stopped_at and second_difference <= 90 ->
-        %{type: :text, value: :brd}
-
-      second_difference <= 30 ->
-        if stop_type === :first_stop,
-          do: %{type: :text, value: :brd},
-          else: %{type: :text, value: :arr}
-
-      minute_difference < 60 ->
-        %{type: :minutes, value: minute_difference}
-
-      true ->
-        timestamp =
-          time
-          |> Timex.to_datetime("America/New_York")
-          |> Timex.format!("{h12}:{m} {AM}")
-
-        %{type: :timestamp, value: timestamp}
-    end
-  end
 end
