@@ -7,6 +7,7 @@
 .base-departure-time__text {
   @include font--text--75bold;
   font-size: 1em;
+  line-height: 1.185em;
 }
 
 .base-departure-time__minutes {
