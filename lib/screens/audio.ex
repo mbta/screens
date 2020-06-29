@@ -80,9 +80,7 @@ defmodule Screens.Audio do
     |> Enum.map(&Map.merge(%{pill: &1.pill}, get_time_representation(&1)))
     |> Enum.chunk_by(& &1.type)
     |> ungroup_arr_brd()
-    |> Enum.map(fn [time | _rest] = times ->
-      %{pill: time.pill, type: time.type, values: Enum.map(times, & &1.value)}
-    end)
+    |> Enum.map(&time_list_to_time_group/1)
   end
 
   # ARR and BRD departures are never grouped together
@@ -97,6 +95,10 @@ defmodule Screens.Audio do
         [group | acc]
     end)
     |> Enum.reverse()
+  end
+
+  defp time_list_to_time_group([time | _rest] = times) do
+    %{pill: time.pill, type: time.type, values: Enum.map(times, & &1.value)}
   end
 
   defp get_time_representation(%{
