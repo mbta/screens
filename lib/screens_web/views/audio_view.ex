@@ -66,7 +66,8 @@ defmodule ScreensWeb.AudioView do
   end
 
   defp render_departure_groups(departure_groups) do
-    Enum.map(departure_groups, &render_departure_group/1)
+    departure_groups
+    |> Enum.map(&render_departure_group/1)
     |> Enum.intersperse(~E|<break strength="x-strong"/>
 |)
   end
