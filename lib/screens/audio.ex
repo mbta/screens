@@ -78,32 +78,25 @@ defmodule Screens.Audio do
   defp group_time_types(departures) do
     departures
     |> Enum.map(&Map.merge(%{pill: &1.pill}, get_time_representation(&1)))
-    |> Enum.reduce([], &time_group_reducer/2)
-    |> Enum.map(fn
-      %{values: values} = item -> %{item | values: Enum.reverse(values)}
-      %{value: _} = item -> item
+    |> Enum.chunk_by(& &1.type)
+    |> ungroup_arr_brd()
+    |> Enum.map(fn [time | _rest] = times ->
+      %{pill: time.pill, type: time.type, values: Enum.map(times, & &1.value)}
     end)
-    |> Enum.reverse()
   end
 
   # ARR and BRD departures are never grouped together
-  defp time_group_reducer(
-         %{type: :text} = time,
-         acc
-       ) do
-    [time | acc]
-  end
+  defp ungroup_arr_brd(grouped_times) do
+    grouped_times
+    |> Enum.reduce([], fn
+      [%{type: :text} | _rest] = group, acc ->
+        ungrouped = group |> Enum.reverse() |> Enum.map(&[&1])
+        ungrouped ++ acc
 
-  defp time_group_reducer(time, []) do
-    [%{pill: time.pill, type: time.type, values: [time.value]}]
-  end
-
-  defp time_group_reducer(time, acc) do
-    if time.type == hd(acc).type do
-      [%{hd(acc) | values: [time.value | hd(acc).values]} | tl(acc)]
-    else
-      [%{pill: time.pill, type: time.type, values: [time.value]} | acc]
-    end
+      group, acc ->
+        [group | acc]
+    end)
+    |> Enum.reverse()
   end
 
   defp get_time_representation(%{

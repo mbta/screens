@@ -89,7 +89,7 @@ defmodule ScreensWeb.AudioView do
 
     times = render_departure_time_group(time_group, false)
 
-    ~E|<s><%= route_destination %> <%= times %></s>
+    ~E|<s><%= route_destination %><%= times %></s>
 |
   end
 
@@ -98,15 +98,21 @@ defmodule ScreensWeb.AudioView do
 
     prefix =
       cond do
-        not with_prefix -> nil
-        with_prefix and type == :minutes -> ~E|Next <%= render_pill_mode(pill, number) %>|
-        with_prefix and type == :timestamp -> ~E|Later <%= render_pill_mode(pill, number) %>|
+        not with_prefix ->
+          ~E""
+
+        with_prefix and type in [:text, :minutes] ->
+          ~E|Next <%= render_pill_mode(pill, number) %>|
+
+        with_prefix and type == :timestamp ->
+          ~E|Later <%= render_pill_mode(pill, number) %>|
       end
 
     preposition =
       case type do
-        :minutes -> ~E"in"
-        :timestamp -> ~E"at"
+        :text -> ~E""
+        :minutes -> ~E" in "
+        :timestamp -> ~E" at "
       end
 
     times =
@@ -115,19 +121,11 @@ defmodule ScreensWeb.AudioView do
       |> Enum.intersperse(", ")
 
     if with_prefix do
-      ~E|<s><%= prefix %> <%= preposition %> <%= times %></s>
+      ~E|<s><%= prefix %><%= preposition %><%= times %></s>
 |
     else
-      ~E|<%= preposition %> <%= times %>|
+      ~E|<%= preposition %><%= times %>|
     end
-  end
-
-  defp render_departure_time_group(%{pill: pill, type: :text, value: value}, true) do
-    ~E|Next <%= render_pill_mode(pill, 1) %> <%= render_time_representation(%{type: :text, value: value}) %>|
-  end
-
-  defp render_departure_time_group(%{type: :text, value: value}, false) do
-    render_time_representation(%{type: :text, value: value})
   end
 
   @spec render_time_representation(Screens.Audio.time_representation()) :: Phoenix.HTML.safe()
