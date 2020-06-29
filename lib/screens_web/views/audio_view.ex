@@ -12,6 +12,7 @@ defmodule ScreensWeb.AudioView do
   def render_pill_header(:red), do: ~E"Red Line"
   def render_pill_header(:silver), do: ~E"Silver Line"
 
+  @spec render_pill_mode(atom(), non_neg_integer()) :: Phoenix.HTML.safe()
   def render_pill_mode(pill, 1) when pill in ~w[blue orange red cr]a, do: ~E"train"
   def render_pill_mode(pill, _) when pill in ~w[blue orange red cr]a, do: ~E"trains"
   def render_pill_mode(pill, 1) when pill in ~w[bus silver]a, do: ~E"bus"
@@ -67,14 +68,16 @@ defmodule ScreensWeb.AudioView do
 |)
   end
 
-  def render_departure_group({route_descriptor, time_groups}) do
+  def render_departure_group({route_descriptor, %{times: time_groups, alerts: alerts}}) do
     [first | rest] = time_groups
 
     first_rendered = render_first_departure_time_group(route_descriptor, first)
 
     rest_rendered = Enum.map(rest, &render_departure_time_group(&1, true))
 
-    ~E|<%= first_rendered %><%= rest_rendered %>|
+    alerts_rendered = render_alerts(alerts)
+
+    ~E|<%= first_rendered %><%= rest_rendered %><%= alerts_rendered %>|
   end
 
   defp render_first_departure_time_group({route, route_id, destination}, time_group) do
@@ -134,6 +137,15 @@ defmodule ScreensWeb.AudioView do
   def render_time_representation(%{type: :timestamp, value: timestamp}) do
     ~E|<%= timestamp %>|
   end
+
+  @spec render_alerts([atom()]) :: [Phoenix.HTML.safe()]
+  defp render_alerts(alerts) do
+    Enum.map(alerts, &render_alert/1)
+  end
+
+  defp render_alert(:delay), do: ~E|<s>There are delays on this route</s>
+|
+  defp render_alert(_), do: ~E""
 
   @spec say_as_address(Phoenix.HTML.unsafe()) :: Phoenix.HTML.safe()
   defp say_as_address(text) do

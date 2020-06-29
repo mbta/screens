@@ -55,7 +55,13 @@ defmodule Screens.Audio do
     |> Enum.flat_map(& &1.departures)
     |> Enum.sort_by(& &1.time)
     |> Util.group_by_with_order(&{&1.route, &1.route_id, &1.destination})
-    |> Enum.map(fn {key, departures} -> {key, group_time_types(departures)} end)
+    |> Enum.map(fn {key, departures} ->
+      {key,
+       %{
+         times: group_time_types(departures),
+         alerts: hd(departures).alerts
+       }}
+    end)
   end
 
   defp move_data_to_departures(section, include_wayfinding, current_time) do
@@ -66,7 +72,7 @@ defmodule Screens.Audio do
       current_time: current_time
     }
 
-    Map.put(section, :departures, Enum.map(section.departures, &Map.merge(&1, data)))
+    %{section | departures: Enum.map(section.departures, &Map.merge(&1, data))}
   end
 
   defp group_time_types(departures) do
