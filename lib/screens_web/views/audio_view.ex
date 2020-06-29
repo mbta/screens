@@ -4,23 +4,23 @@ defmodule ScreensWeb.AudioView do
   import Phoenix.HTML
 
   @spec render_pill_header(atom()) :: Phoenix.HTML.safe()
-  def render_pill_header(:blue), do: ~E"Blue Line"
-  def render_pill_header(:bus), do: ~E"Bus"
-  def render_pill_header(:cr), do: ~E"Commuter Rail"
-  def render_pill_header(:mattapan), do: ~E"Mattapan Line"
-  def render_pill_header(:orange), do: ~E"Orange Line"
-  def render_pill_header(:red), do: ~E"Red Line"
-  def render_pill_header(:silver), do: ~E"Silver Line"
+  defp render_pill_header(:blue), do: ~E"Blue Line"
+  defp render_pill_header(:bus), do: ~E"Bus"
+  defp render_pill_header(:cr), do: ~E"Commuter Rail"
+  defp render_pill_header(:mattapan), do: ~E"Mattapan Line"
+  defp render_pill_header(:orange), do: ~E"Orange Line"
+  defp render_pill_header(:red), do: ~E"Red Line"
+  defp render_pill_header(:silver), do: ~E"Silver Line"
 
   @spec render_pill_mode(atom(), non_neg_integer()) :: Phoenix.HTML.safe()
-  def render_pill_mode(pill, 1) when pill in ~w[blue orange red cr]a, do: ~E"train"
-  def render_pill_mode(pill, _) when pill in ~w[blue orange red cr]a, do: ~E"trains"
-  def render_pill_mode(pill, 1) when pill in ~w[bus silver]a, do: ~E"bus"
-  def render_pill_mode(pill, _) when pill in ~w[bus silver]a, do: ~E"buses"
-  def render_pill_mode(:mattapan, 1), do: ~E"trolley"
-  def render_pill_mode(:mattapan, _), do: ~E"trolleys"
+  defp render_pill_mode(pill, 1) when pill in ~w[blue orange red cr]a, do: ~E"train"
+  defp render_pill_mode(pill, _) when pill in ~w[blue orange red cr]a, do: ~E"trains"
+  defp render_pill_mode(pill, 1) when pill in ~w[bus silver]a, do: ~E"bus"
+  defp render_pill_mode(pill, _) when pill in ~w[bus silver]a, do: ~E"buses"
+  defp render_pill_mode(:mattapan, 1), do: ~E"trolley"
+  defp render_pill_mode(:mattapan, _), do: ~E"trolleys"
 
-  def render_route_descriptor({route, route_id, destination}) do
+  defp render_route_descriptor({route, route_id, destination}) do
     if route_id in ~w[Blue Red Mattapan Orange] or String.starts_with?(route_id, "CR") do
       render("_train_route.ssml",
         route_id: route_id,
@@ -32,22 +32,22 @@ defmodule ScreensWeb.AudioView do
   end
 
   @spec render_route_id(String.t()) :: Phoenix.HTML.safe()
-  def render_route_id("CR-" <> line_name) do
+  defp render_route_id("CR-" <> line_name) do
     ~E|<%= line_name %> Line train|
   end
 
-  def render_route_id(color) when color in ~w[Blue Red Orange] do
+  defp render_route_id(color) when color in ~w[Blue Red Orange] do
     ~E|<%= color %> Line train|
   end
 
-  def render_route_id("Mattapan"), do: ~E"Mattapan Trolley"
+  defp render_route_id("Mattapan"), do: ~E"Mattapan Trolley"
 
   @spec render_route(String.t()) :: Phoenix.HTML.safe()
-  def render_route("SL" <> route_number) do
+  defp render_route("SL" <> route_number) do
     ~E|Silver Line route <%= say_as_address(route_number) %>|
   end
 
-  def render_route(route) do
+  defp render_route(route) do
     route_number =
       if String.contains?(route, "/") do
         route
@@ -60,18 +60,18 @@ defmodule ScreensWeb.AudioView do
     ~E|Bus <%= route_number %>|
   end
 
-  def render_departure_groups([]) do
+  defp render_departure_groups([]) do
     ~E|<s>No departures currently available</s>
 |
   end
 
-  def render_departure_groups(departure_groups) do
+  defp render_departure_groups(departure_groups) do
     Enum.map(departure_groups, &render_departure_group/1)
     |> Enum.intersperse(~E|<break strength="x-strong"/>
 |)
   end
 
-  def render_departure_group({route_descriptor, %{times: time_groups, alerts: alerts}}) do
+  defp render_departure_group({route_descriptor, %{times: time_groups, alerts: alerts}}) do
     [first | rest] = time_groups
 
     first_rendered = render_first_departure_time_group(route_descriptor, first)
@@ -130,14 +130,14 @@ defmodule ScreensWeb.AudioView do
   end
 
   @spec render_time_representation(Screens.Audio.time_representation()) :: Phoenix.HTML.safe()
-  def render_time_representation(%{type: :text, value: :brd}), do: ~E"is now boarding"
-  def render_time_representation(%{type: :text, value: :arr}), do: ~E"is now arriving"
+  defp render_time_representation(%{type: :text, value: :brd}), do: ~E"is now boarding"
+  defp render_time_representation(%{type: :text, value: :arr}), do: ~E"is now arriving"
 
-  def render_time_representation(%{type: :minutes, value: minutes}) do
+  defp render_time_representation(%{type: :minutes, value: minutes}) do
     ~E|<%= minutes %> <%= pluralize_minutes(minutes) %>|
   end
 
-  def render_time_representation(%{type: :timestamp, value: timestamp}) do
+  defp render_time_representation(%{type: :timestamp, value: timestamp}) do
     ~E|<%= timestamp %>|
   end
 
