@@ -1,7 +1,18 @@
 defmodule Screens.Audio do
   @moduledoc false
 
+  alias Screens.Util
+
   @lexicon_names ["mbtalexicon"]
+
+  @type time_representation ::
+          %{type: :text, value: String.t()}
+          | %{type: :minutes, value: integer}
+          | %{type: :timestamp, value: String.t()}
+
+  @type departure_group_key :: {String.t(), String.t(), String.t()}
+
+  @type departure_group :: {departure_group_key(), [map()]}
 
   def synthesize(ssml_string) do
     result =
@@ -25,44 +36,102 @@ defmodule Screens.Audio do
 
     %{
       station_name: station_name,
-      departures: group_departures_by_pill_and_flatten(sections, include_wayfinding, current_time)
+      departures_by_pill: group_departures_by_pill(sections, include_wayfinding, current_time)
     }
   end
 
-  defp group_departures_by_pill_and_flatten(sections, include_wayfinding, current_time) do
+  @spec group_departures_by_pill(list(map()), boolean(), String.t()) ::
+          keyword([departure_group()])
+  defp group_departures_by_pill(sections, include_wayfinding, current_time) do
     sections
     |> Enum.map(&move_data_to_departures(&1, include_wayfinding, current_time))
-    |> group_by_with_order(& &1.pill)
-    |> Enum.flat_map(fn {_pill, sections} -> merge_section_departures(sections) end)
+    |> Util.group_by_with_order(& &1.pill)
+    |> Enum.map(fn {pill, sections} -> {pill, merge_section_departures(sections)} end)
   end
 
+  @spec merge_section_departures([map()]) :: [departure_group()]
   defp merge_section_departures(sections) do
     sections
-    |> Enum.reduce([], fn %{departures: departures}, acc -> acc ++ departures end)
+    |> Enum.flat_map(& &1.departures)
     |> Enum.sort_by(& &1.time)
+    |> Util.group_by_with_order(&{&1.route, &1.route_id, &1.destination})
+    |> Enum.map(fn {key, departures} ->
+      {key,
+       %{
+         times: group_time_types(departures),
+         alerts: hd(departures).alerts
+       }}
+    end)
   end
 
   defp move_data_to_departures(section, include_wayfinding, current_time) do
     data = %{
       name: if(include_wayfinding, do: section.name, else: nil),
       arrow: if(include_wayfinding, do: section.arrow, else: nil),
+      pill: section.pill,
       current_time: current_time
     }
 
-    Map.put(section, :departures, Enum.map(section.departures, &Map.merge(&1, data)))
+    %{section | departures: Enum.map(section.departures, &Map.merge(&1, data))}
   end
 
-  # Similar to Enum.group_by, except it returns a keyword list instead of a map to maintain order.
-  # key_fun must always return an atom.
-  def group_by_with_order(enumerable, key_fun, value_fun \\ fn x -> x end)
-      when is_function(key_fun) do
-    enumerable
-    |> Enum.reverse()
-    |> Enum.reduce([], fn entry, acc ->
-      key = key_fun.(entry)
-      value = value_fun.(entry)
+  defp group_time_types(departures) do
+    departures
+    |> Enum.map(&Map.merge(%{pill: &1.pill}, get_time_representation(&1)))
+    |> Enum.chunk_by(& &1.type)
+    |> ungroup_arr_brd()
+    |> Enum.map(&time_list_to_time_group/1)
+  end
 
-      Keyword.put(acc, key, [value | Keyword.get(acc, key, [])])
+  # ARR and BRD departures are never grouped together
+  defp ungroup_arr_brd(grouped_times) do
+    grouped_times
+    |> Enum.reduce([], fn
+      [%{type: :text} | _rest] = group, acc ->
+        ungrouped = group |> Enum.reverse() |> Enum.map(&[&1])
+        ungrouped ++ acc
+
+      group, acc ->
+        [group | acc]
     end)
+    |> Enum.reverse()
+  end
+
+  defp time_list_to_time_group([time | _rest] = times) do
+    %{pill: time.pill, type: time.type, values: Enum.map(times, & &1.value)}
+  end
+
+  defp get_time_representation(%{
+         time: time,
+         current_time: current_time,
+         vehicle_status: vehicle_status,
+         stop_type: stop_type
+       }) do
+    {:ok, time, _} = DateTime.from_iso8601(time)
+    {:ok, current_time, _} = DateTime.from_iso8601(current_time)
+
+    second_difference = DateTime.diff(time, current_time)
+    minute_difference = round(second_difference / 60)
+
+    cond do
+      vehicle_status === :stopped_at and second_difference <= 90 ->
+        %{type: :text, value: :brd}
+
+      second_difference <= 30 ->
+        if stop_type === :first_stop,
+          do: %{type: :text, value: :brd},
+          else: %{type: :text, value: :arr}
+
+      minute_difference < 60 ->
+        %{type: :minutes, value: minute_difference}
+
+      true ->
+        timestamp =
+          time
+          |> Timex.to_datetime("America/New_York")
+          |> Timex.format!("{h12}:{m} {AM}")
+
+        %{type: :timestamp, value: timestamp}
+    end
   end
 end
