@@ -44,17 +44,20 @@ defmodule ScreensWeb.AudioView do
 
   @spec render_route(String.t()) :: Phoenix.HTML.safe()
   def render_route("SL" <> route_number) do
-    ~E|Silver Line route <% say_as_address(route_number) %>|
+    ~E|Silver Line route <%= say_as_address(route_number) %>|
   end
 
   def render_route(route) do
-    if String.contains?(route, "/") do
-      for route_part <- String.split(route, "/") do
-        say_as_address(route_part)
+    route_number =
+      if String.contains?(route, "/") do
+        for route_part <- String.split(route, "/") do
+          say_as_address(route_part)
+        end
+      else
+        say_as_address(route)
       end
-    else
-      say_as_address(route)
-    end
+
+    ~E|Bus <%= route_number %>|
   end
 
   def render_departure_groups([]) do
@@ -119,7 +122,7 @@ defmodule ScreensWeb.AudioView do
   end
 
   defp render_departure_time_group(%{pill: pill, type: :text, value: value}, true) do
-    ~E|Next <%= render_pill_mode(pill, 1) %> <% render_time_representation(%{type: :text, value: value}) %>|
+    ~E|Next <%= render_pill_mode(pill, 1) %> <%= render_time_representation(%{type: :text, value: value}) %>|
   end
 
   defp render_departure_time_group(%{type: :text, value: value}, false) do
