@@ -11,6 +11,10 @@ defmodule ScreensWeb.AudioController do
       |> Map.get("disposition")
       |> disposition_atom()
 
+    user_agent = get_req_header(conn, "user-agent")
+
+    _ = Logger.info("[solari audio user agent] agent=\"#{user_agent}\"")
+
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
 
     _ = Screens.LogScreenData.log_audio_request(screen_id, is_screen)
