@@ -20,7 +20,7 @@ defmodule ScreensWeb.AudioView do
   def render_pill_mode(:mattapan, 1), do: ~E"trolley"
   def render_pill_mode(:mattapan, _), do: ~E"trolleys"
 
-  def render_route_destination(route, route_id, destination) do
+  def render_route_descriptor({route, route_id, destination}) do
     if route_id in ~w[Blue Red Mattapan Orange] or String.starts_with?(route_id, "CR") do
       render("_train_route.ssml",
         route_id: route_id,
@@ -78,13 +78,13 @@ defmodule ScreensWeb.AudioView do
 
     rest_rendered = Enum.map(rest, &render_departure_time_group(&1, true))
 
-    alerts_rendered = render_alerts(alerts)
+    alerts_rendered = render_alerts(alerts, route_descriptor)
 
     ~E|<%= first_rendered %><%= rest_rendered %><%= alerts_rendered %>|
   end
 
-  defp render_first_departure_time_group({route, route_id, destination}, time_group) do
-    route_destination = render_route_destination(route, route_id, destination)
+  defp render_first_departure_time_group(route_descriptor, time_group) do
+    route_destination = render_route_descriptor(route_descriptor)
 
     times = render_departure_time_group(time_group, false)
 
@@ -141,14 +141,17 @@ defmodule ScreensWeb.AudioView do
     ~E|<%= timestamp %>|
   end
 
-  @spec render_alerts([atom()]) :: [Phoenix.HTML.safe()]
-  defp render_alerts(alerts) do
-    Enum.map(alerts, &render_alert/1)
+  @spec render_alerts([atom()], Screens.Audio.departure_group_key()) :: [Phoenix.HTML.safe()]
+  defp render_alerts(alerts, route_descriptor) do
+    Enum.map(alerts, &render_alert(&1, route_descriptor))
   end
 
-  defp render_alert(:delay), do: ~E|<s>There are delays on this route</s>
+  defp render_alert(:delay, route_descriptor) do
+    ~E|<s>There are delays on <%= render_route_descriptor(route_descriptor) %></s>
 |
-  defp render_alert(_), do: ~E""
+  end
+
+  defp render_alert(_, _), do: ~E""
 
   @spec say_as_address(Phoenix.HTML.unsafe()) :: Phoenix.HTML.safe()
   defp say_as_address(text) do
