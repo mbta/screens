@@ -50,9 +50,9 @@ defmodule ScreensWeb.AudioView do
   def render_route(route) do
     route_number =
       if String.contains?(route, "/") do
-        for route_part <- String.split(route, "/") do
-          say_as_address(route_part)
-        end
+        route
+        |> String.split("/")
+        |> Enum.map(&say_as_address/1)
       else
         say_as_address(route)
       end
