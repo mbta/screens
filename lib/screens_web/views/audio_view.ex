@@ -57,7 +57,7 @@ defmodule ScreensWeb.AudioView do
         say_as_address(route)
       end
 
-    ~E|Bus <%= route_number %>|
+    ~E|Route <%= route_number %>|
   end
 
   defp render_departure_groups([]) do
