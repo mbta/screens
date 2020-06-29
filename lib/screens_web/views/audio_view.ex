@@ -77,7 +77,7 @@ defmodule ScreensWeb.AudioView do
 
     first_rendered = render_first_departure_time_group(route_descriptor, first)
 
-    rest_rendered = Enum.map(rest, &render_departure_time_group(&1, true))
+    rest_rendered = Enum.map(rest, &render_departure_time_group_with_prefix/1)
 
     alerts_rendered = render_alerts(alerts, route_descriptor)
 
@@ -87,45 +87,45 @@ defmodule ScreensWeb.AudioView do
   defp render_first_departure_time_group(route_descriptor, time_group) do
     route_destination = render_route_descriptor(route_descriptor)
 
-    times = render_departure_time_group(time_group, false)
+    times = render_departure_time_group(time_group)
 
     ~E|<s><%= route_destination %><%= times %></s>
 |
   end
 
-  defp render_departure_time_group(%{pill: pill, type: type, values: values}, with_prefix) do
+  defp render_departure_time_group_with_prefix(%{pill: pill, type: type, values: values}) do
     number = length(values)
 
     prefix =
-      cond do
-        not with_prefix ->
-          ~E""
-
-        with_prefix and type in [:text, :minutes] ->
-          ~E|Next <%= render_pill_mode(pill, number) %>|
-
-        with_prefix and type == :timestamp ->
-          ~E|Later <%= render_pill_mode(pill, number) %>|
-      end
-
-    preposition =
       case type do
-        :text -> ~E""
-        :minutes -> ~E" in "
-        :timestamp -> ~E" at "
+        :timestamp -> ~E|Later <%= render_pill_mode(pill, number) %>|
+        _ -> ~E|Next <%= render_pill_mode(pill, number) %>|
       end
 
-    times =
-      values
-      |> Enum.map(&render_time_representation(%{type: type, value: &1}))
-      |> Enum.intersperse(", ")
+    time_group_rendered = render_departure_time_group(%{type: type, values: values})
 
-    if with_prefix do
-      ~E|<s><%= prefix %><%= preposition %><%= times %></s>
+    ~E|<s><%= prefix %> <%= time_group_rendered %></s>
 |
-    else
-      ~E|<%= preposition %><%= times %>|
-    end
+  end
+
+  defp render_departure_time_group(%{type: type, values: values}) do
+    preposition = preposition_for(type)
+
+    times = render_time_representations(type, values)
+
+    ~E| <%= preposition %><%= times %>|
+  end
+
+  @spec preposition_for(atom()) :: Phoenix.HTML.safe()
+  defp preposition_for(:text), do: ~E""
+  defp preposition_for(:minutes), do: ~E"in "
+  defp preposition_for(:timestamp), do: ~E"at "
+
+  @spec render_time_representations(atom(), [any()]) :: [Phoenix.HTML.safe()]
+  defp render_time_representations(type, values) do
+    values
+    |> Enum.map(&render_time_representation(%{type: type, value: &1}))
+    |> Enum.intersperse(~E", ")
   end
 
   @spec render_time_representation(Screens.Audio.time_representation()) :: Phoenix.HTML.safe()
