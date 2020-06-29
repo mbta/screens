@@ -89,7 +89,7 @@ defmodule ScreensWeb.AudioView do
 
     times = render_departure_time_group(time_group)
 
-    ~E|<s><%= route_destination %><%= times %></s>
+    ~E|<s><%= route_destination %> <%= times %></s>
 |
   end
 
@@ -113,7 +113,7 @@ defmodule ScreensWeb.AudioView do
 
     times = render_time_representations(type, values)
 
-    ~E| <%= preposition %><%= times %>|
+    ~E|<%= preposition %><%= times %>|
   end
 
   @spec preposition_for(atom()) :: Phoenix.HTML.safe()
