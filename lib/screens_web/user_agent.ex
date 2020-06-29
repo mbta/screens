@@ -24,6 +24,14 @@ defmodule ScreensWeb.UserAgent do
   end
 
   defp is_solari?(user_agent) do
+    is_solari_audio?(user_agent) or is_solari_browser?(user_agent)
+  end
+
+  defp is_solari_audio?(user_agent) do
+    String.contains?(user_agent, "MPlayer")
+  end
+
+  defp is_solari_browser?(user_agent) do
     String.contains?(user_agent, "(X11; Ubuntu; Linux i686; rv:22.0)") and
       String.contains?(user_agent, "Firefox/22.0")
   end
