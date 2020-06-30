@@ -14,7 +14,10 @@ defmodule ScreensWeb.ScreenApiController do
     _ = Screens.LogScreenData.log_data_request(screen_id, version, is_screen)
 
     data =
-      Screens.ScreenData.by_screen_id_with_override_and_version(screen_id, version, is_screen)
+      Screens.ScreenData.by_screen_id(screen_id, is_screen,
+        check_disabled: true,
+        client_version: version
+      )
 
     json(conn, data)
   end
