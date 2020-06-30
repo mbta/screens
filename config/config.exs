@@ -311,7 +311,7 @@ config :screens,
           arrow: :n,
           query: %{params: %{stop_id: "875"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}},
-          audio: %{wayfinding: "Upper Busway"},
+          audio: %{wayfinding: "Lower Busway"},
           pill: :bus
         }
       ],
