@@ -27,13 +27,17 @@ defmodule ScreensWeb.AudioController do
   end
 
   def debug(conn, %{"id" => screen_id}) do
-    with %{success: true} = data <- Screens.ScreenData.by_screen_id(screen_id, false),
-         template_assigns <- Screens.Audio.from_api_data(data),
-         ssml <- render_ssml(template_assigns) do
-      text(conn, ssml)
-    else
-      _ -> text(conn, "Failed to load data")
-    end
+    result =
+      with %{success: true} = data <-
+             Screens.ScreenData.by_screen_id(screen_id, false, check_disabled: true),
+           template_assigns <- Screens.Audio.from_api_data(data) do
+        render_ssml(template_assigns)
+      else
+        %{force_reload: false, success: false} -> "Screen is disabled"
+        _ -> "Failed to load data"
+      end
+
+    text(conn, result)
   end
 
   defp render_ssml(template_assigns) do
