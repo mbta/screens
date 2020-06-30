@@ -27,7 +27,7 @@ defmodule Screens.ScreenData do
         true -> fetch_data(screen_id, is_screen)
       end
 
-    _ = log(screen_id, client_version, is_screen)
+    _ = LogScreenData.log_api_response(screen_id, client_version, is_screen)
 
     response
   end
@@ -59,10 +59,6 @@ defmodule Screens.ScreenData do
 
     screen_data_module = Map.get(@modules_by_app_id, app_id)
     screen_data_module.by_screen_id(screen_id, is_screen)
-  end
-
-  defp log(screen_id, client_version, is_screen) do
-    LogScreenData.log_api_response(screen_id, client_version, is_screen)
   end
 
   defp app_id_from_screen_id(screen_id) do
