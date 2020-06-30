@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://use.typekit.net/emd6vhv.css">
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/#{@app_id}.css") %>"/>
   </head>
-  <body>
+  <body class="<%= @body_class %>">
     <%= render @view_module, @view_template, assigns %>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/polyfills.js") %>"></script>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/#{@app_id}.js") %>"></script>
