@@ -60,6 +60,7 @@ defmodule Screens.SolariScreenData do
            arrow: arrow,
            query: %{params: query_params, opts: query_opts},
            layout: layout_params,
+           audio: audio_params,
            pill: pill
          },
          datetime
@@ -71,6 +72,7 @@ defmodule Screens.SolariScreenData do
            name: section_name,
            arrow: arrow,
            pill: pill,
+           audio: audio_params,
            departures: do_layout(data, layout_params),
            paging: do_paging(layout_params)
          }}

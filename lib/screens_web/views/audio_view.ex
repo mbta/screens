@@ -3,14 +3,20 @@ defmodule ScreensWeb.AudioView do
 
   import Phoenix.HTML
 
-  @spec render_pill_header(atom()) :: Phoenix.HTML.safe()
-  defp render_pill_header(:blue), do: ~E"Blue Line"
-  defp render_pill_header(:bus), do: ~E"Bus"
-  defp render_pill_header(:cr), do: ~E"Commuter Rail"
-  defp render_pill_header(:mattapan), do: ~E"Mattapan Line"
-  defp render_pill_header(:orange), do: ~E"Orange Line"
-  defp render_pill_header(:red), do: ~E"Red Line"
-  defp render_pill_header(:silver), do: ~E"Silver Line"
+  @spec render_pill_header(atom(), String.t() | nil) :: Phoenix.HTML.safe()
+  defp render_pill_header(pill, wayfinding) do
+    ~E|<s><%= render_pill(pill) %> trips<%= render_wayfinding(wayfinding) %></s>
+|
+  end
+
+  @spec render_pill(atom()) :: Phoenix.HTML.safe()
+  defp render_pill(:blue), do: ~E"Blue Line"
+  defp render_pill(:bus), do: ~E"Bus"
+  defp render_pill(:cr), do: ~E"Commuter Rail"
+  defp render_pill(:mattapan), do: ~E"Mattapan Line"
+  defp render_pill(:orange), do: ~E"Orange Line"
+  defp render_pill(:red), do: ~E"Red Line"
+  defp render_pill(:silver), do: ~E"Silver Line"
 
   @spec render_pill_mode(atom(), non_neg_integer()) :: Phoenix.HTML.safe()
   defp render_pill_mode(pill, 1) when pill in ~w[blue orange red cr]a, do: ~E"train"
@@ -72,10 +78,12 @@ defmodule ScreensWeb.AudioView do
 |)
   end
 
-  defp render_departure_group({route_descriptor, %{times: time_groups, alerts: alerts}}) do
+  defp render_departure_group(
+         {route_descriptor, %{times: time_groups, alerts: alerts, wayfinding: wayfinding}}
+       ) do
     [first | rest] = time_groups
 
-    first_rendered = render_first_departure_time_group(route_descriptor, first)
+    first_rendered = render_first_departure_time_group(route_descriptor, wayfinding, first)
 
     rest_rendered = Enum.map(rest, &render_departure_time_group_with_prefix/1)
 
@@ -84,12 +92,14 @@ defmodule ScreensWeb.AudioView do
     ~E|<%= first_rendered %><%= rest_rendered %><%= alerts_rendered %>|
   end
 
-  defp render_first_departure_time_group(route_descriptor, time_group) do
+  defp render_first_departure_time_group(route_descriptor, wayfinding, time_group) do
     route_destination = render_route_descriptor(route_descriptor)
+
+    wayfinding_rendered = render_wayfinding(wayfinding)
 
     times = render_departure_time_group(time_group)
 
-    ~E|<s><%= route_destination %> <%= times %></s>
+    ~E|<s><%= route_destination %><%= wayfinding_rendered %><%= times %></s>
 |
   end
 
@@ -113,7 +123,7 @@ defmodule ScreensWeb.AudioView do
 
     times = render_time_representations(type, values)
 
-    ~E|<%= preposition %><%= times %>|
+    ~E| <%= preposition %><%= times %>|
   end
 
   @spec preposition_for(atom()) :: Phoenix.HTML.safe()
@@ -151,6 +161,9 @@ defmodule ScreensWeb.AudioView do
   end
 
   defp render_alert(_, _), do: ~E""
+
+  defp render_wayfinding(nil), do: ~E""
+  defp render_wayfinding(wayfinding), do: ~E| from <%= wayfinding %>|
 
   @spec say_as_address(Phoenix.HTML.unsafe()) :: Phoenix.HTML.safe()
   defp say_as_address(text) do
