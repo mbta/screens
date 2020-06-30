@@ -261,7 +261,7 @@ config :screens,
             opts: %{}
           },
           layout: {:upcoming, %{num_rows: 8}},
-          audio: %{wayfinding: nil},
+          audio: %{wayfinding: "Platform A"},
           pill: :bus
         }
       ],
@@ -286,7 +286,7 @@ config :screens,
                num_rows: 8,
                routes: {:include, [{"14", 1}, {"41", 0}, {"42", 0}, {"66", 0}]}
              }},
-          audio: %{wayfinding: nil},
+          audio: %{wayfinding: "Platform C"},
           pill: :bus
         }
       ],
@@ -336,7 +336,7 @@ config :screens,
           arrow: :e,
           query: %{params: %{stop_id: "10642"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
-          audio: %{wayfinding: nil},
+          audio: %{wayfinding: "Upper Busway"},
           pill: :bus
         }
       ],
