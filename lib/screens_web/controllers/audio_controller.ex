@@ -15,7 +15,10 @@ defmodule ScreensWeb.AudioController do
 
     _ = Screens.LogScreenData.log_audio_request(screen_id, is_screen)
 
-    with {:ok, ssml} <- render_ssml(screen_id, is_screen),
+    with %{success: true} = data <-
+           Screens.ScreenData.by_screen_id(screen_id, is_screen, check_disabled: true),
+         template_assigns <- Screens.Audio.from_api_data(data),
+         ssml <- render_ssml(template_assigns),
          {:ok, audio_data} <- Screens.Audio.synthesize(ssml) do
       send_audio(conn, {:binary, audio_data}, disposition)
     else
@@ -24,23 +27,17 @@ defmodule ScreensWeb.AudioController do
   end
 
   def debug(conn, %{"id" => screen_id}) do
-    case render_ssml(screen_id, false) do
-      {:ok, ssml} -> text(conn, ssml)
+    with %{success: true} = data <- Screens.ScreenData.by_screen_id(screen_id, false),
+         template_assigns <- Screens.Audio.from_api_data(data),
+         ssml <- render_ssml(template_assigns) do
+      text(conn, ssml)
+    else
       _ -> text(conn, "Failed to load data")
     end
   end
 
-  defp render_ssml(screen_id, is_screen) do
-    data = Screens.ScreenData.by_screen_id(screen_id, is_screen)
-
-    case data do
-      %{success: true} ->
-        template_assigns = Screens.Audio.from_api_data(data)
-        {:ok, View.render_to_string(ScreensWeb.AudioView, "index.ssml", template_assigns)}
-
-      _ ->
-        :error
-    end
+  defp render_ssml(template_assigns) do
+    View.render_to_string(ScreensWeb.AudioView, "index.ssml", template_assigns)
   end
 
   defp send_audio(conn, kind, disposition) do
