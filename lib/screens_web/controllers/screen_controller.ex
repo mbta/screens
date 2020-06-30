@@ -7,6 +7,7 @@ defmodule ScreensWeb.ScreenController do
 
   plug(:api_version)
   plug(:environment_name)
+  plug(:body_class)
 
   defp api_version(conn, _) do
     api_version = Screens.Override.State.api_version()
@@ -16,6 +17,16 @@ defmodule ScreensWeb.ScreenController do
   defp environment_name(conn, _) do
     environment_name = Application.get_env(:screens, :environment_name)
     assign(conn, :environment_name, environment_name)
+  end
+
+  defp body_class(conn, _) do
+    body_class =
+      case Map.get(conn.params, "scroll") do
+        "true" -> "scroll-enabled"
+        _ -> "scroll-disabled"
+      end
+
+    assign(conn, :body_class, body_class)
   end
 
   defp screen_ids(target_app_id) do
