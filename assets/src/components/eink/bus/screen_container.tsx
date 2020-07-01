@@ -8,6 +8,7 @@ import ConnectionError from "Components/eink/connection_error";
 import DigitalBridge from "Components/eink/digital_bridge";
 import NoService from "Components/eink/no_service";
 import OvernightDepartures from "Components/eink/overnight_departures";
+import TakeoverScreenLayout from "Components/eink/takeover_screen_layout";
 
 import useApiResponse from "Hooks/use_api_response";
 import useFitDepartures from "Hooks/use_fit_departures";
@@ -124,19 +125,18 @@ const NoConnectionScreenLayout = (): JSX.Element => {
 };
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
-  if (!apiResponse || apiResponse.success === false) {
-    return <NoConnectionScreenLayout />;
+  switch (true) {
+    case !apiResponse || apiResponse.success === false:
+      return <NoConnectionScreenLayout />;
+    case apiResponse.psa_type === "takeover":
+      return <TakeoverScreenLayout apiResponse={apiResponse} size="double" />;
+    case apiResponse.service_level === 5:
+      return <NoServiceScreenLayout />;
+    case !apiResponse.departures || apiResponse.departures.length === 0:
+      return <NoDeparturesScreenLayout apiResponse={apiResponse} />;
+    default:
+      return <DefaultScreenLayout apiResponse={apiResponse} />;
   }
-
-  if (apiResponse.service_level === 5) {
-    return <NoServiceScreenLayout />;
-  }
-
-  if (!apiResponse.departures || apiResponse.departures.length === 0) {
-    return <NoDeparturesScreenLayout apiResponse={apiResponse} />;
-  }
-
-  return <DefaultScreenLayout apiResponse={apiResponse} />;
 };
 
 const ScreenContainer = ({ id }): JSX.Element => {

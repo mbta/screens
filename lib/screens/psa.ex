@@ -13,9 +13,8 @@ defmodule Screens.Psa do
       |> Application.get_env(:screen_data)
       |> get_in([screen_id, :app_id])
 
-    psa_list = State.psa_list(screen_id)
-
-    choose_psa(psa_list, app_id)
+    {psa_type, psa_list} = State.psa_list(screen_id)
+    {psa_type, choose_psa(psa_list, app_id)}
   end
 
   defp choose_psa(psa_list, "solari") do

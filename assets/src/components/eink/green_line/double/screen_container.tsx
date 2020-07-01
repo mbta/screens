@@ -11,6 +11,7 @@ import NearbyDepartures from "Components/eink/green_line/nearby_departures";
 import NoService from "Components/eink/no_service";
 import OvernightDepartures from "Components/eink/overnight_departures";
 import TakeoverAlert from "Components/eink/takeover_alert";
+import TakeoverScreenLayout from "Components/eink/takeover_screen_layout";
 
 import useApiResponse from "Hooks/use_api_response";
 
@@ -63,7 +64,7 @@ const BottomScreenLayout = ({
     <div className="single-screen-container">
       <div className="flex-zone__container">
         {psaName ? (
-          <TakeoverAlert name={psaName} mode="subway" />
+          <TakeoverAlert name={psaName} />
         ) : (
           <>
             <div className="flex-zone__top-container">
@@ -140,6 +141,8 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   switch (true) {
     case !apiResponse || apiResponse.success === false:
       return <NoConnectionScreenLayout />;
+    case apiResponse.psa_type === "takeover":
+      return <TakeoverScreenLayout apiResponse={apiResponse} size="double" />;
     case apiResponse.service_level === 5:
       return <NoServiceScreenLayout />;
     case (!apiResponse.departures || apiResponse.departures.length === 0) &&

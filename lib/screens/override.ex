@@ -11,7 +11,7 @@ defmodule Screens.Override do
           bus_service: pos_integer(),
           green_line_service: pos_integer(),
           headway_mode_screen_ids: MapSet.t(pos_integer()),
-          psa_lists_by_screen_id: %{String.t() => list(String.t())}
+          psa_lists_by_screen_id: %{String.t() => {String.t(), list(String.t())}}
         }
 
   defstruct api_version: 1,
@@ -32,7 +32,7 @@ defmodule Screens.Override do
           optional(:bus_service) => pos_integer(),
           optional(:green_line_service) => pos_integer(),
           optional(:headway_mode_screen_ids) => list(pos_integer()),
-          optional(:psa_lists_by_screen_id) => %{String.t() => list(String.t())}
+          optional(:psa_lists_by_screen_id) => %{String.t() => {String.t(), list(String.t())}}
         }
 
   @doc """
@@ -77,7 +77,9 @@ defmodule Screens.Override do
   # Converts the keyword-list-like psa_lists_by_screen_id to a map, if it exists
   defp psa_lists_map(%{psa_lists_by_screen_id: psa_lists_by_screen_id} = override_map) do
     psa_lists_map =
-      for [screen_id, psa_list] <- psa_lists_by_screen_id, into: %{}, do: {screen_id, psa_list}
+      for [screen_id, [psa_type, psa_list]] <- psa_lists_by_screen_id,
+          into: %{},
+          do: {screen_id, {psa_type, psa_list}}
 
     Map.put(override_map, :psa_lists_by_screen_id, psa_lists_map)
   end
