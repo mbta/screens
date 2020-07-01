@@ -38,9 +38,17 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   );
 };
 
+const NoConnectionScreenLayout = (): JSX.Element => {
+  return (
+    <div className="screen-container">
+      <img src="/images/solari-no-connection.png" />
+    </div>
+  );
+};
+
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
-  if (apiResponse === null) {
-    return null;
+  if (!apiResponse || apiResponse.success === false) {
+    return <NoConnectionScreenLayout />;
   }
 
   return <DefaultScreenLayout apiResponse={apiResponse} />;
