@@ -26,7 +26,7 @@
     "regenerator-runtime": "^0.13.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.10.3",
+    "@babel/core": "^7.10.4",
     "@babel/plugin-proposal-do-expressions": "^7.10.1",
     "@babel/plugin-proposal-export-default-from": "^7.10.1",
     "@babel/plugin-proposal-logical-assignment-operators": "^7.10.3",
