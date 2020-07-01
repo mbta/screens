@@ -189,6 +189,7 @@ config :screens,
           arrow: :e,
           query: %{params: %{stop_id: "70094"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}},
+          audio: %{wayfinding: nil},
           pill: :red
         },
         %{
@@ -196,6 +197,7 @@ config :screens,
           arrow: :e,
           query: %{params: %{stop_id: "70261"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 1}},
+          audio: %{wayfinding: nil},
           pill: :mattapan
         },
         %{
@@ -203,6 +205,7 @@ config :screens,
           arrow: :s,
           query: %{params: %{stop_id: "334"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
+          audio: %{wayfinding: nil},
           pill: :bus
         }
       ],
@@ -219,6 +222,7 @@ config :screens,
           arrow: nil,
           query: %{params: %{stop_ids: ["70069", "70070"]}, opts: %{}},
           layout: :bidirectional,
+          audio: %{wayfinding: nil},
           pill: :red
         },
         %{
@@ -233,6 +237,7 @@ config :screens,
                paged: true,
                routes: {:exclude, [{"70", 1}, {"64", 1}]}
              }},
+          audio: %{wayfinding: nil},
           pill: :bus
         }
       ],
@@ -256,6 +261,7 @@ config :screens,
             opts: %{}
           },
           layout: {:upcoming, %{num_rows: 8}},
+          audio: %{wayfinding: "Platform A"},
           pill: :bus
         }
       ],
@@ -280,6 +286,7 @@ config :screens,
                num_rows: 8,
                routes: {:include, [{"14", 1}, {"41", 0}, {"42", 0}, {"66", 0}]}
              }},
+          audio: %{wayfinding: "Platform C"},
           pill: :bus
         }
       ],
@@ -296,6 +303,7 @@ config :screens,
           arrow: :e,
           query: %{params: %{stop_id: "10642"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}},
+          audio: %{wayfinding: "Upper Busway"},
           pill: :bus
         },
         %{
@@ -303,6 +311,7 @@ config :screens,
           arrow: :n,
           query: %{params: %{stop_id: "875"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}},
+          audio: %{wayfinding: "Lower Busway"},
           pill: :bus
         }
       ],
@@ -319,6 +328,7 @@ config :screens,
           arrow: :w,
           query: %{params: %{stop_id: "Forest Hills"}, opts: %{include_schedules: true}},
           layout: :bidirectional,
+          audio: %{wayfinding: nil},
           pill: :cr
         },
         %{
@@ -326,6 +336,7 @@ config :screens,
           arrow: :e,
           query: %{params: %{stop_id: "10642"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
+          audio: %{wayfinding: "Upper Busway"},
           pill: :bus
         }
       ],
@@ -349,6 +360,7 @@ config :screens,
                paged: true,
                routes: {:exclude, [{"74", 1}, {"75", 1}, {"77", 1}, {"78", 1}, {"96", 1}]}
              }},
+          audio: %{wayfinding: "Upper Busway"},
           pill: :bus
         },
         %{
@@ -361,6 +373,7 @@ config :screens,
                num_rows: 2,
                routes: {:exclude, [{"74", 1}, {"75", 1}, {"77", 1}, {"78", 1}, {"96", 1}]}
              }},
+          audio: %{wayfinding: "Lower Busway"},
           pill: :bus
         }
       ],
@@ -384,6 +397,7 @@ config :screens,
                paged: true,
                routes: {:exclude, [{"92", 1}, {"93", 1}]}
              }},
+          audio: %{wayfinding: "Busway"},
           pill: :bus
         },
         %{
@@ -393,6 +407,7 @@ config :screens,
           layout:
             {:upcoming,
              %{num_rows: 8, visible_rows: 4, paged: true, routes: {:exclude, [{"4", 0}]}}},
+          audio: %{wayfinding: "Congress Street at Haymarket Station"},
           pill: :bus
         }
       ],
@@ -409,6 +424,7 @@ config :screens,
           arrow: :e,
           query: %{params: %{stop_ids: ["70045", "70046"]}, opts: %{}},
           layout: :bidirectional,
+          audio: %{wayfinding: nil},
           pill: :blue
         },
         %{
@@ -416,6 +432,7 @@ config :screens,
           arrow: :w,
           query: %{params: %{stop_ids: ["5740", "57400"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
+          audio: %{wayfinding: nil},
           pill: :bus
         }
       ],
@@ -432,6 +449,7 @@ config :screens,
           arrow: :e,
           query: %{params: %{stop_ids: ["17862", "17863"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
+          audio: %{wayfinding: "Lower Busway"},
           pill: :bus
         },
         %{
@@ -439,6 +457,7 @@ config :screens,
           arrow: :e,
           query: %{params: %{stop_id: "Ruggles"}, opts: %{include_schedules: true}},
           layout: {:upcoming, %{num_rows: 2}},
+          audio: %{wayfinding: nil},
           pill: :cr
         }
       ],
@@ -459,6 +478,7 @@ config :screens,
           },
           layout:
             {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true, routes: {:exclude, ["90"]}}},
+          audio: %{wayfinding: "Upper Busway"},
           pill: :bus
         },
         %{
@@ -471,6 +491,7 @@ config :screens,
             opts: %{}
           },
           layout: {:upcoming, %{num_rows: 12, visible_rows: 8, paged: true}},
+          audio: %{wayfinding: "Lower Busway"},
           pill: :bus
         }
       ],
@@ -487,6 +508,7 @@ config :screens,
           arrow: :se,
           query: %{params: %{stop_id: "70059"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}},
+          audio: %{wayfinding: nil},
           pill: :blue
         },
         %{
@@ -494,6 +516,7 @@ config :screens,
           arrow: :w,
           query: %{params: %{stop_id: "15795"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
+          audio: %{wayfinding: nil},
           pill: :bus
         }
       ],
@@ -510,6 +533,7 @@ config :screens,
           arrow: :w,
           query: %{params: %{stop_id: "South Station"}, opts: %{include_schedules: true}},
           layout: {:upcoming, %{num_rows: 7, visible_rows: 3, paged: true, max_minutes: 120}},
+          audio: %{wayfinding: "South Station"},
           pill: :cr
         },
         %{
@@ -517,6 +541,7 @@ config :screens,
           arrow: :nw,
           query: %{params: %{stop_ids: ["70016", "70017"]}, opts: %{}},
           layout: :bidirectional,
+          audio: %{wayfinding: "Tufts Medical Center"},
           pill: :orange
         },
         %{
@@ -524,6 +549,7 @@ config :screens,
           arrow: nil,
           query: %{params: %{stop_ids: ["49002", "6565"]}, opts: %{}},
           layout: {:bidirectional, %{routes: {:exclude, ["11"]}}},
+          audio: %{wayfinding: "Tufts Medical Center"},
           pill: :silver
         },
         %{
@@ -531,6 +557,7 @@ config :screens,
           arrow: :e,
           query: %{params: %{stop_id: "9983"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 1}},
+          audio: %{wayfinding: "Stuart Street at Charles Street South"},
           pill: :bus
         }
       ],
@@ -550,6 +577,7 @@ config :screens,
             opts: %{include_schedules: true}
           },
           layout: {:upcoming, %{num_rows: 8, max_minutes: 120}},
+          audio: %{wayfinding: "Back Bay"},
           pill: :cr
         },
         %{
@@ -557,6 +585,7 @@ config :screens,
           arrow: nil,
           query: %{params: %{stop_ids: ["145", "1241", "9983"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}},
+          audio: %{wayfinding: nil},
           pill: :bus
         }
       ],
@@ -573,6 +602,7 @@ config :screens,
           arrow: nil,
           query: %{params: %{stop_id: "889"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}},
+          audio: %{wayfinding: nil},
           pill: :bus
         }
       ],
@@ -588,6 +618,7 @@ config :screens,
           arrow: nil,
           query: %{params: %{stop_id: "890"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}},
+          audio: %{wayfinding: nil},
           pill: :bus
         }
       ],
@@ -603,6 +634,7 @@ config :screens,
           arrow: nil,
           query: %{params: %{stop_id: "1743"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}},
+          audio: %{wayfinding: nil},
           pill: :bus
         }
       ],
@@ -618,6 +650,7 @@ config :screens,
           arrow: nil,
           query: %{params: %{stop_id: "11413"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}},
+          audio: %{wayfinding: nil},
           pill: :bus
         }
       ],
@@ -633,6 +666,7 @@ config :screens,
           arrow: nil,
           query: %{params: %{stop_id: "17401"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}},
+          audio: %{wayfinding: nil},
           pill: :bus
         }
       ],
@@ -648,6 +682,7 @@ config :screens,
           arrow: nil,
           query: %{params: %{stop_id: "383"}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}},
+          audio: %{wayfinding: nil},
           pill: :bus
         }
       ],

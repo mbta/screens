@@ -27,29 +27,29 @@ defmodule Screens.Audio do
   end
 
   def from_api_data(%{
-        section_headers: section_headers,
         station_name: station_name,
         sections: sections,
         current_time: current_time
       }) do
-    include_wayfinding = not is_nil(section_headers)
-
     %{
       station_name: station_name,
-      departures_by_pill: group_departures_by_pill(sections, include_wayfinding, current_time)
+      departures_by_pill: group_departures_by_pill(sections, current_time)
     }
   end
 
-  @spec group_departures_by_pill(list(map()), boolean(), String.t()) ::
+  @spec group_departures_by_pill(list(map()), String.t()) ::
           keyword([departure_group()])
-  defp group_departures_by_pill(sections, include_wayfinding, current_time) do
+  defp group_departures_by_pill(sections, current_time) do
     sections
-    |> Enum.map(&move_data_to_departures(&1, include_wayfinding, current_time))
+    |> Enum.map(&move_data_to_departures(&1, current_time))
     |> Util.group_by_with_order(& &1.pill)
     |> Enum.map(fn {pill, sections} -> {pill, merge_section_departures(sections)} end)
   end
 
-  @spec merge_section_departures([map()]) :: [departure_group()]
+  @spec merge_section_departures([map()]) :: %{
+          wayfinding: String.t() | nil,
+          departure_groups: [departure_group()]
+        }
   defp merge_section_departures(sections) do
     sections
     |> Enum.flat_map(& &1.departures)
@@ -59,16 +59,17 @@ defmodule Screens.Audio do
       {key,
        %{
          times: group_time_types(departures),
-         alerts: hd(departures).alerts
+         alerts: hd(departures).alerts,
+         wayfinding: hd(departures).wayfinding
        }}
     end)
+    |> condense_wayfinding()
   end
 
-  defp move_data_to_departures(section, include_wayfinding, current_time) do
+  defp move_data_to_departures(section, current_time) do
     data = %{
-      name: if(include_wayfinding, do: section.name, else: nil),
-      arrow: if(include_wayfinding, do: section.arrow, else: nil),
       pill: section.pill,
+      wayfinding: section.audio.wayfinding,
       current_time: current_time
     }
 
@@ -99,6 +100,29 @@ defmodule Screens.Audio do
 
   defp time_list_to_time_group([time | _rest] = times) do
     %{pill: time.pill, type: time.type, values: Enum.map(times, & &1.value)}
+  end
+
+  # Don't repeat wayfinding info if it's the same for all departure groups within a pill
+  defp condense_wayfinding(departure_groups) do
+    unique_wayfinding =
+      Enum.uniq_by(departure_groups, fn {_key, %{wayfinding: wayfinding}} -> wayfinding end)
+
+    if length(unique_wayfinding) == 1 do
+      {_key, %{wayfinding: common_wayfinding}} = hd(unique_wayfinding)
+
+      without_wayfinding =
+        Enum.map(departure_groups, fn {key, group} -> {key, %{group | wayfinding: nil}} end)
+
+      %{
+        wayfinding: common_wayfinding,
+        departure_groups: without_wayfinding
+      }
+    else
+      %{
+        wayfinding: nil,
+        departure_groups: departure_groups
+      }
+    end
   end
 
   defp get_time_representation(%{

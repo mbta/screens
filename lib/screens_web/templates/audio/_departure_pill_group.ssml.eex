@@ -1,5 +1,4 @@
 <%
-  {pill, departure_groups} = @pill_group
+  {pill, %{wayfinding: wayfinding, departure_groups: departure_groups}} = @pill_group
 %><p>
-<s><%= render_pill_header(pill) %></s>
-<%= render_departure_groups(departure_groups) %></p>
+<%= render_pill_header(pill, wayfinding) %><%= render_departure_groups(departure_groups) %></p>
