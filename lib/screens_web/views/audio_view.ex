@@ -135,7 +135,7 @@ defmodule ScreensWeb.AudioView do
   defp render_time_representations(type, values) do
     values
     |> Enum.map(&render_time_representation(%{type: type, value: &1}))
-    |> Enum.intersperse(~E", ")
+    |> oxford_comma_intersperse()
   end
 
   @spec render_time_representation(Screens.Audio.time_representation()) :: Phoenix.HTML.safe()
@@ -172,4 +172,26 @@ defmodule ScreensWeb.AudioView do
 
   defp pluralize_minutes(1), do: "minute"
   defp pluralize_minutes(_), do: "minutes"
+
+  defp oxford_comma_intersperse(list), do: oxford_comma_intersperse(list, :start)
+
+  defp oxford_comma_intersperse([], _state) do
+    []
+  end
+
+  defp oxford_comma_intersperse([el], _state) do
+    [el]
+  end
+
+  defp oxford_comma_intersperse([el1, el2], :start) do
+    [el1, ~E" and ", el2]
+  end
+
+  defp oxford_comma_intersperse([el1, el2], :recurse) do
+    [el1, ~E", and ", el2]
+  end
+
+  defp oxford_comma_intersperse([first | rest], _state) do
+    [first, ~E", " | oxford_comma_intersperse(rest, :recurse)]
+  end
 end
