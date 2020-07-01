@@ -105,16 +105,16 @@ defmodule Screens.Audio do
   # Don't repeat wayfinding info if it's the same for all departure groups within a pill
   defp condense_wayfinding(departure_groups) do
     unique_wayfinding =
-      departure_groups
-      |> Enum.map(fn {_key, %{wayfinding: wayfinding}} -> wayfinding end)
-      |> MapSet.new()
+      Enum.uniq_by(departure_groups, fn {_key, %{wayfinding: wayfinding}} -> wayfinding end)
 
-    if MapSet.size(unique_wayfinding) == 1 do
+    if length(unique_wayfinding) == 1 do
+      {_key, %{wayfinding: common_wayfinding}} = hd(unique_wayfinding)
+
       without_wayfinding =
         Enum.map(departure_groups, fn {key, group} -> {key, %{group | wayfinding: nil}} end)
 
       %{
-        wayfinding: hd(MapSet.to_list(unique_wayfinding)),
+        wayfinding: common_wayfinding,
         departure_groups: without_wayfinding
       }
     else
