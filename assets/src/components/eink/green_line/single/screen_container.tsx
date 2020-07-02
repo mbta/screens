@@ -7,6 +7,7 @@ import Header from "Components/eink/green_line/header";
 import LineMap from "Components/eink/green_line/line_map";
 import { NoServiceTop } from "Components/eink/no_service";
 import OvernightDepartures from "Components/eink/overnight_departures";
+import TakeoverScreenLayout from "Components/eink/takeover_screen_layout";
 
 import useApiResponse from "Hooks/use_api_response";
 
@@ -94,6 +95,8 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   switch (true) {
     case !apiResponse || apiResponse.success === false:
       return <NoConnectionScreenLayout />;
+    case apiResponse.psa_type === "takeover":
+      return <TakeoverScreenLayout apiResponse={apiResponse} size="single" />;
     case apiResponse.service_level === 5:
       return <NoServiceScreenLayout />;
     case (!apiResponse.departures || apiResponse.departures.length === 0) &&

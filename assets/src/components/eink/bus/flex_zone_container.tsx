@@ -20,7 +20,7 @@ const FlexZoneContainer = forwardRef(
     if (psaName) {
       return (
         <div className="flex-zone__container">
-          <TakeoverAlert name={psaName} mode="bus" />
+          <TakeoverAlert name={psaName} />
         </div>
       );
     } else if (showLaterDepartures && globalAlert) {

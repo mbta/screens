@@ -44,7 +44,7 @@ defmodule Screens.BusScreenData do
 
     _ = LogScreenData.log_departures(screen_id, is_screen, departures)
 
-    psa_name = Screens.Psa.current_psa_for(screen_id)
+    {psa_type, psa_name} = Screens.Psa.current_psa_for(screen_id)
 
     case departures do
       {:ok, departures} ->
@@ -58,6 +58,7 @@ defmodule Screens.BusScreenData do
           global_alert: format_global_alert(global_alert),
           nearby_connections: nearby_connections,
           service_level: service_level,
+          psa_type: psa_type,
           psa_name: psa_name
         }
 
