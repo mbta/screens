@@ -80,7 +80,7 @@ defmodule Screens.Override.State do
   end
 
   def handle_call({:psa_list, screen_id}, _from, state) do
-    {:reply, Map.get(state.psa_lists_by_screen_id, screen_id, []), state}
+    {:reply, Map.get(state.psa_lists_by_screen_id, screen_id, {nil, []}), state}
   end
 
   @impl true
