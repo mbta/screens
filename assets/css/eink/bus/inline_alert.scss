@@ -1,0 +1,31 @@
+.inline-alert {
+  text-align: right;
+  margin-right: 40px;
+}
+
+.inline-alert__badge {
+  display: inline-block;
+  background-color: black;
+  color: white;
+  border-radius: 10px;
+  @include font--text--55regular;
+  text-transform: uppercase;
+  padding-right: 16px;
+  padding-left: 16px;
+}
+
+.inline-alert__icon {
+  display: inline-block;
+  width: 38px;
+  padding-right: 12px;
+  position: relative;
+  top: 3px;
+}
+
+.inline-alert__text {
+  display: inline-block;
+  font-size: 36px;
+  line-height: 36px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
