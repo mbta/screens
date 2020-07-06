@@ -291,7 +291,7 @@ config :screens,
         }
       ],
       app_id: "solari",
-      name: "Nubian Platform C SOL"
+      name: "Nubian Platform C SOL04"
     },
     "305" => %{
       station_name: "Forest Hills",
