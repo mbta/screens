@@ -82,7 +82,6 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         stopName={apiResponse.stop_name}
         departures={departuresData}
         ref={departuresRef}
-        key={`top-${apiResponse.current_time}`}
       />
       <BottomScreenLayout
         currentTimeString={apiResponse.current_time}
@@ -92,7 +91,6 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         nearbyConnections={apiResponse.nearby_connections}
         psaName={apiResponse.psa_name}
         ref={laterDeparturesRef}
-        key={`bottom-${apiResponse.current_time}`}
       />
     </div>
   );
@@ -135,7 +133,12 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
     case !apiResponse.departures || apiResponse.departures.length === 0:
       return <NoDeparturesScreenLayout apiResponse={apiResponse} />;
     default:
-      return <DefaultScreenLayout apiResponse={apiResponse} />;
+      return (
+        <DefaultScreenLayout
+          apiResponse={apiResponse}
+          key={apiResponse.current_time}
+        />
+      );
   }
 };
 

@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 
-const useApiResponse = (id, refreshMs, datetime) => {
+const useApiResponse = (
+  id,
+  refreshMs,
+  datetime = null,
+  withWatchdog = false
+) => {
   const [apiResponse, setApiResponse] = useState(null);
   const apiVersion = document.getElementById("app").dataset.apiVersion;
 
@@ -20,6 +25,7 @@ const useApiResponse = (id, refreshMs, datetime) => {
       if (json.force_reload === true) {
         window.location.reload(false);
       }
+      if (withWatchdog) updateSolariWatchdog();
       setApiResponse(json);
     } catch (err) {
       setApiResponse({ success: false });
@@ -37,6 +43,12 @@ const useApiResponse = (id, refreshMs, datetime) => {
   }, []);
 
   return apiResponse;
+};
+
+const updateSolariWatchdog = () => {
+  const now = new Date().toISOString();
+  localStorage.clear();
+  localStorage.setItem("mainWatch", now);
 };
 
 export default useApiResponse;

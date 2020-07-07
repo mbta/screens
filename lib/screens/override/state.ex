@@ -86,8 +86,8 @@ defmodule Screens.Override.State do
   def handle_call({:psa_list, screen_id}, _from, state) do
     psa_list =
       case get_in(state.config_by_screen_id, [screen_id, :psa_list]) do
-        nil -> []
-        l -> l
+        nil -> {nil, []}
+        not_nil -> not_nil
       end
 
     {:reply, psa_list, state}
