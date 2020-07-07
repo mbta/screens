@@ -1,8 +1,8 @@
 defmodule Screens.Audio do
   @moduledoc false
 
-  alias Screens.Util
   alias Screens.Psa
+  alias Screens.Util
 
   @lexicon_names ["mbtalexicon"]
 
