@@ -30,7 +30,7 @@ const DepartureGroup = ({
             />
           )
         )}
-        {alerts && alerts.length > 0 && <InlineAlert alerts={alerts} />}
+        {alerts && alerts.length > 0 && <InlineAlert />}
       </div>
       <div className="departure-group__hairline"></div>
     </div>
