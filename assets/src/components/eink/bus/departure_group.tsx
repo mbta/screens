@@ -9,6 +9,8 @@ const DepartureGroup = ({
   departures,
   size,
 }): JSX.Element => {
+  const alerts = departures[0].alerts;
+
   return (
     <div className="departure-group">
       <div className={classWithModifier("departure-group__container", size)}>
@@ -28,7 +30,7 @@ const DepartureGroup = ({
             />
           )
         )}
-        <InlineAlert inlineBadges={departures[0].inlineBadges} />
+        {alerts && alerts.length > 0 && <InlineAlert />}
       </div>
       <div className="departure-group__hairline"></div>
     </div>
