@@ -17,7 +17,7 @@ defmodule ScreensWeb.AudioController do
 
     with %{success: true} = data <-
            Screens.ScreenData.by_screen_id(screen_id, is_screen, check_disabled: true),
-         template_assigns <- Screens.Audio.from_api_data(data),
+         template_assigns <- Screens.Audio.from_api_data(data, screen_id),
          ssml <- render_ssml(template_assigns),
          {:ok, audio_data} <- Screens.Audio.synthesize(ssml) do
       send_audio(conn, {:binary, audio_data}, disposition)
@@ -28,7 +28,7 @@ defmodule ScreensWeb.AudioController do
 
   def debug(conn, %{"id" => screen_id}) do
     with %{success: true} = data <- Screens.ScreenData.by_screen_id(screen_id, false),
-         template_assigns <- Screens.Audio.from_api_data(data),
+         template_assigns <- Screens.Audio.from_api_data(data, screen_id),
          ssml <- render_ssml(template_assigns) do
       text(conn, ssml)
     else

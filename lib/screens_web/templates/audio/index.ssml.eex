@@ -7,4 +7,5 @@
 <p>
 <%= render "_header.ssml", station_name: @station_name %></p>
 <%= render_many @departures_by_pill, ScreensWeb.AudioView, "_departure_pill_group.ssml", as: :pill_group %>
+<%= render_psa @psa %>
 </speak>

@@ -1,6 +1,7 @@
 defmodule Screens.Audio do
   @moduledoc false
 
+  alias Screens.Psa
   alias Screens.Util
 
   @lexicon_names ["mbtalexicon"]
@@ -26,14 +27,18 @@ defmodule Screens.Audio do
     end
   end
 
-  def from_api_data(%{
-        station_name: station_name,
-        sections: sections,
-        current_time: current_time
-      }) do
+  def from_api_data(
+        %{
+          station_name: station_name,
+          sections: sections,
+          current_time: current_time
+        },
+        screen_id
+      ) do
     %{
       station_name: station_name,
-      departures_by_pill: group_departures_by_pill(sections, current_time)
+      departures_by_pill: group_departures_by_pill(sections, current_time),
+      psa: Psa.current_audio_psa_for(screen_id)
     }
   end
 

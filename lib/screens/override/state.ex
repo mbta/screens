@@ -37,6 +37,10 @@ defmodule Screens.Override.State do
     GenServer.call(pid, {:psa_list, screen_id})
   end
 
+  def audio_psa(pid \\ __MODULE__, screen_id) do
+    GenServer.call(pid, {:audio_psa, screen_id})
+  end
+
   def schedule_refresh(pid, ms \\ @refresh_ms) do
     Process.send_after(pid, :refresh, ms)
     :ok
@@ -80,7 +84,18 @@ defmodule Screens.Override.State do
   end
 
   def handle_call({:psa_list, screen_id}, _from, state) do
-    {:reply, Map.get(state.psa_lists_by_screen_id, screen_id, {nil, []}), state}
+    psa_list =
+      case get_in(state.config_by_screen_id, [screen_id, :psa_list]) do
+        nil -> {nil, []}
+        not_nil -> not_nil
+      end
+
+    {:reply, psa_list, state}
+  end
+
+  def handle_call({:audio_psa, screen_id}, _from, state) do
+    audio_psa = get_in(state.config_by_screen_id, [screen_id, :audio_psa])
+    {:reply, audio_psa, state}
   end
 
   @impl true

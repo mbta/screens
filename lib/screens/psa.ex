@@ -17,6 +17,10 @@ defmodule Screens.Psa do
     {psa_type, choose_psa(psa_list, app_id)}
   end
 
+  def current_audio_psa_for(screen_id) do
+    State.audio_psa(screen_id)
+  end
+
   defp choose_psa(psa_list, "solari") do
     # How often to change the selected PSA
     solari_psa_refresh_seconds = @solari_refresh_seconds * @solari_psa_period

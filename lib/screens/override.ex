@@ -11,8 +11,15 @@ defmodule Screens.Override do
           bus_service: pos_integer(),
           green_line_service: pos_integer(),
           headway_mode_screen_ids: MapSet.t(pos_integer()),
-          psa_lists_by_screen_id: %{String.t() => {String.t(), list(String.t())}}
+          config_by_screen_id: %{String.t() => screen_id_config()}
         }
+
+  @type screen_id_config :: %{
+          psa_list: {String.t(), list(String.t())},
+          audio_psa: {audio_type(), String.t()} | nil
+        }
+
+  @type audio_type :: :plaintext | :ssml
 
   defstruct api_version: 1,
             globally_disabled: false,
@@ -20,7 +27,7 @@ defmodule Screens.Override do
             bus_service: 1,
             green_line_service: 1,
             headway_mode_screen_ids: MapSet.new(),
-            psa_lists_by_screen_id: %{}
+            config_by_screen_id: %{}
 
   @spec new :: __MODULE__.t()
   def new, do: %__MODULE__{}
@@ -32,7 +39,14 @@ defmodule Screens.Override do
           optional(:bus_service) => pos_integer(),
           optional(:green_line_service) => pos_integer(),
           optional(:headway_mode_screen_ids) => list(pos_integer()),
-          optional(:psa_lists_by_screen_id) => %{String.t() => {String.t(), list(String.t())}}
+          optional(:config_by_screen_id) => %{String.t() => screen_id_config_json()}
+        }
+
+  @type screen_id_config_json :: %{
+          # psa_list: [String.t(), list(String.t())]
+          psa_list: list(),
+          # audio_psa: ["plaintext" | "ssml", String.t()]
+          audio_psa: list() | nil
         }
 
   @doc """
@@ -55,7 +69,7 @@ defmodule Screens.Override do
       override_map
       |> disabled_map_set()
       |> headway_mode_map_set()
-      |> psa_lists_map()
+      |> config_by_screen_id_map()
 
     struct(__MODULE__, converted)
   end
@@ -74,15 +88,31 @@ defmodule Screens.Override do
 
   defp headway_mode_map_set(%{} = override_map), do: override_map
 
-  # Converts the keyword-list-like psa_lists_by_screen_id to a map, if it exists
-  defp psa_lists_map(%{psa_lists_by_screen_id: psa_lists_by_screen_id} = override_map) do
-    psa_lists_map =
-      for [screen_id, [psa_type, psa_list]] <- psa_lists_by_screen_id,
+  # Converts the keyword-list-like config_by_screen_id to a map, if it exists
+  defp config_by_screen_id_map(%{config_by_screen_id: config_by_screen_id} = override_map) do
+    config_map =
+      for [screen_id, config] <- config_by_screen_id,
           into: %{},
-          do: {screen_id, {psa_type, psa_list}}
+          do: {screen_id, screen_config_map(config)}
 
-    Map.put(override_map, :psa_lists_by_screen_id, psa_lists_map)
+    Map.put(override_map, :config_by_screen_id, config_map)
   end
 
-  defp psa_lists_map(%{} = override_map), do: override_map
+  defp config_by_screen_id_map(%{} = override_map), do: override_map
+
+  defp screen_config_map(%{psa_list: [psa_type, psa_list], audio_psa: audio_psa}) do
+    %{
+      psa_list: {psa_type, psa_list},
+      audio_psa: audio_psa_tuple(audio_psa)
+    }
+  end
+
+  defp audio_psa_tuple([audio_type, text]) do
+    {audio_type_atom(audio_type), text}
+  end
+
+  defp audio_psa_tuple(nil), do: nil
+
+  defp audio_type_atom("plaintext"), do: :plaintext
+  defp audio_type_atom("ssml"), do: :ssml
 end
