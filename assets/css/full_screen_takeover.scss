@@ -1,10 +1,11 @@
-.overnight-departures {
+.full-screen-takeover__container {
+  position: relative;
   margin: 0px auto;
   padding: 0px;
   width: 1200px;
 }
 
-.overnight-departures__time {
+.full-screen-takeover__time {
   @include font--text--55regular;
   position: absolute;
   top: 28px;
