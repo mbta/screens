@@ -1,6 +1,8 @@
 defmodule Screens.Audio do
   @moduledoc false
 
+  require Logger
+
   alias Screens.Psa
   alias Screens.Util
 
@@ -22,8 +24,12 @@ defmodule Screens.Audio do
       |> ExAws.request()
 
     case result do
-      {:ok, %{body: audio_data}} -> {:ok, audio_data}
-      _ -> :error
+      {:ok, %{body: audio_data}} ->
+        {:ok, audio_data}
+
+      {:error, reason} ->
+        _ = Logger.error("Failed to synthesize speech", ssml_string: ssml_string, reason: reason)
+        :error
     end
   end
 
