@@ -9,7 +9,7 @@ defmodule Screens.Override.Fetch do
 
     with {:ok, response} <- HTTPoison.get(url, headers, Keyword.merge(@default_opts, opts)),
          %{status_code: 200, body: body} <- response,
-         {:ok, parsed} <- Jason.decode(body, keys: :atoms!) do
+         {:ok, parsed} <- Jason.decode(body, keys: :atoms) do
       {:ok, Screens.Override.from_json(parsed)}
     else
       _ -> :error
