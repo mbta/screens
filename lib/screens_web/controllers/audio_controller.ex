@@ -19,10 +19,10 @@ defmodule ScreensWeb.AudioController do
            Screens.ScreenData.by_screen_id(screen_id, is_screen, check_disabled: true),
          template_assigns <- Screens.Audio.from_api_data(data, screen_id),
          ssml <- render_ssml(template_assigns),
-         {:ok, audio_data} <- Screens.Audio.synthesize(ssml) do
+         {:ok, audio_data} <- Screens.Audio.synthesize(ssml, is_screen) do
       send_audio(conn, {:binary, audio_data}, disposition)
     else
-      _ -> send_fallback_audio(conn, disposition)
+      _ -> send_fallback_audio(conn, is_screen, screen_id, disposition)
     end
   end
 
@@ -40,8 +40,11 @@ defmodule ScreensWeb.AudioController do
     View.render_to_string(ScreensWeb.AudioView, "index.ssml", template_assigns)
   end
 
-  defp send_fallback_audio(conn, disposition) do
-    _ = Logger.info("Sending fallback audio readout")
+  defp send_fallback_audio(conn, is_screen, screen_id, disposition) do
+    if is_screen do
+      _ = Logger.info("fallback_audio #{screen_id}")
+    end
+
     send_audio(conn, {:file, @fallback_audio_path}, disposition)
   end
 

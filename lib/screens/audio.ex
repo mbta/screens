@@ -17,7 +17,7 @@ defmodule Screens.Audio do
 
   @type departure_group :: {departure_group_key(), [map()]}
 
-  def synthesize(ssml_string) do
+  def synthesize(ssml_string, is_screen) do
     result =
       ssml_string
       |> ExAws.Polly.synthesize_speech(lexicon_names: @lexicon_names, text_type: "ssml")
@@ -28,7 +28,10 @@ defmodule Screens.Audio do
         {:ok, audio_data}
 
       {:error, reason} ->
-        _ = Logger.error("Failed to synthesize speech", ssml_string: ssml_string, reason: reason)
+        if is_screen do
+          _ = Logger.error("synthesize_ssml_failed #{reason}")
+        end
+
         :error
     end
   end
