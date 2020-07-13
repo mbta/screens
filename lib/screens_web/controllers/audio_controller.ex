@@ -41,9 +41,10 @@ defmodule ScreensWeb.AudioController do
   end
 
   defp send_fallback_audio(conn, is_screen, screen_id, disposition) do
-    if is_screen do
-      _ = Logger.info("fallback_audio #{screen_id}")
-    end
+    _ =
+      if is_screen do
+        Logger.info("fallback_audio #{screen_id}")
+      end
 
     send_audio(conn, {:file, @fallback_audio_path}, disposition)
   end

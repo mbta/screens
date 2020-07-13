@@ -28,9 +28,10 @@ defmodule Screens.Audio do
         {:ok, audio_data}
 
       {:error, reason} ->
-        if is_screen do
-          _ = Logger.error("synthesize_ssml_failed #{reason}")
-        end
+        _ =
+          if is_screen do
+            Logger.error("synthesize_ssml_failed #{reason}")
+          end
 
         :error
     end
