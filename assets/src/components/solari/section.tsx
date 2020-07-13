@@ -170,6 +170,10 @@ class PagedDeparture extends React.Component<
       ? "size-small"
       : "size-normal";
 
+    const pillWidth = 89; // px
+    const pillSpace = 25; // px
+    const pillOffset = 30; // px
+
     return (
       <div className="later-departure">
         <div className="later-departure__header">
@@ -180,14 +184,50 @@ class PagedDeparture extends React.Component<
               sizeModifier
             )}
           >
-            {this.props.departures.map((departure, i) => (
-              <PagedDepartureRoutePill
-                route={departure.route}
-                routeId={departure.route_id}
-                selected={i === this.state.currentPageNumber}
-                key={departure.id}
-              />
-            ))}
+            {this.props.departures.map((departure, i) => {
+              const index = this.props.pageCount - (i + 1);
+              const selectedIndex =
+                this.props.pageCount - (this.state.currentPageNumber + 1);
+              const caretBaseClass = "later-departure__route-pill-caret";
+              const beforeCaretClass = classWithModifier(
+                caretBaseClass,
+                "before"
+              );
+              const afterCaretClass = classWithModifier(
+                caretBaseClass,
+                "after"
+              );
+              return (
+                <React.Fragment key={departure.id}>
+                  {index === 0 && (
+                    <div
+                      className={beforeCaretClass}
+                      style={{
+                        transform: `translateX(${
+                          selectedIndex * -(pillWidth + pillSpace) - pillOffset
+                        }px)`,
+                      }}
+                    ></div>
+                  )}
+                  <PagedDepartureRoutePill
+                    route={departure.route}
+                    routeId={departure.route_id}
+                    selected={i === this.state.currentPageNumber}
+                    index={index}
+                  />
+                  {index === 0 && (
+                    <div
+                      className={afterCaretClass}
+                      style={{
+                        transform: `translateX(${
+                          selectedIndex * -(pillWidth + pillSpace) - pillOffset
+                        }px)`,
+                      }}
+                    ></div>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
         <Departure
