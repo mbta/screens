@@ -193,6 +193,8 @@ class PagedDeparture extends React.Component<
         <Departure
           {...camelizeDepartureObject(currentPagedDeparture)}
           currentTimeString={this.props.currentTimeString}
+          groupStart={true}
+          groupEnd={true}
         />
       </div>
     );
@@ -205,6 +207,30 @@ interface DepartureListProps {
   isAnimated: boolean;
 }
 
+const isGroupStart = (departures, i) => {
+  if (i === 0) {
+    return true;
+  }
+
+  const departure = departures[i];
+  const prev = departures[i - 1];
+  return (
+    departure.destination !== prev.destination || departure.route !== prev.route
+  );
+};
+
+const isGroupEnd = (departures, i) => {
+  if (i === departures.length - 1) {
+    return true;
+  }
+
+  const departure = departures[i];
+  const next = departures[i + 1];
+  return (
+    departure.destination !== next.destination || departure.route !== next.route
+  );
+};
+
 const DepartureList = ({
   departures,
   currentTimeString,
@@ -213,7 +239,7 @@ const DepartureList = ({
   if (isAnimated) {
     return (
       <TransitionGroup component={null}>
-        {departures.map((departure) => {
+        {departures.map((departure, i) => {
           const isImminent = isArrivingOrBoarding(departure, currentTimeString);
 
           const transitionProps = isImminent
@@ -235,6 +261,8 @@ const DepartureList = ({
               <Departure
                 {...camelizeDepartureObject(departure)}
                 currentTimeString={currentTimeString}
+                groupStart={isGroupStart(departures, i)}
+                groupEnd={isGroupEnd(departures, i)}
               />
             </CSSTransition>
           );
@@ -244,10 +272,12 @@ const DepartureList = ({
   } else {
     return (
       <>
-        {departures.map((departure) => (
+        {departures.map((departure, i) => (
           <Departure
             {...camelizeDepartureObject(departure)}
             currentTimeString={currentTimeString}
+            groupStart={isGroupStart(departures, i)}
+            groupEnd={isGroupEnd(departures, i)}
             key={departure.id}
           />
         ))}
