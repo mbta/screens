@@ -187,7 +187,7 @@ config :screens,
         %{
           name: "Red Line",
           arrow: :e,
-          query: %{params: %{stop_id: "70094"}, opts: %{}},
+          query: %{params: %{stop_ids: ["70094"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}},
           audio: %{wayfinding: nil},
           pill: :red
@@ -195,7 +195,7 @@ config :screens,
         %{
           name: "Mattapan Trolley",
           arrow: :e,
-          query: %{params: %{stop_id: "70261"}, opts: %{}},
+          query: %{params: %{stop_ids: ["70261"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 1}},
           audio: %{wayfinding: nil},
           pill: :mattapan
@@ -203,7 +203,7 @@ config :screens,
         %{
           name: "Busway",
           arrow: :s,
-          query: %{params: %{stop_id: "334"}, opts: %{}},
+          query: %{params: %{stop_ids: ["334"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
           audio: %{wayfinding: nil},
           pill: :bus
@@ -254,7 +254,7 @@ config :screens,
           arrow: nil,
           query: %{
             params: %{
-              stop_id: "place-dudly",
+              stop_ids: ["place-dudly"],
               route_ids: ["15", "23", "28", "44", "45"],
               direction_id: 1
             },
@@ -277,7 +277,7 @@ config :screens,
           name: "Platform C",
           arrow: nil,
           query: %{
-            params: %{stop_id: "place-dudly"},
+            params: %{stop_ids: ["place-dudly"]},
             opts: %{}
           },
           layout:
@@ -301,7 +301,7 @@ config :screens,
         %{
           name: "Upper Busway",
           arrow: :e,
-          query: %{params: %{stop_id: "10642"}, opts: %{}},
+          query: %{params: %{stop_ids: ["10642"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}},
           audio: %{wayfinding: "Upper Busway"},
           pill: :bus
@@ -309,7 +309,7 @@ config :screens,
         %{
           name: "Lower Busway",
           arrow: :n,
-          query: %{params: %{stop_id: "875"}, opts: %{}},
+          query: %{params: %{stop_ids: ["875"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true}},
           audio: %{wayfinding: "Lower Busway"},
           pill: :bus
@@ -326,7 +326,7 @@ config :screens,
         %{
           name: "Commuter Rail",
           arrow: :w,
-          query: %{params: %{stop_id: "Forest Hills"}, opts: %{include_schedules: true}},
+          query: %{params: %{stop_ids: ["Forest Hills"]}, opts: %{include_schedules: true}},
           layout: :bidirectional,
           audio: %{wayfinding: nil},
           pill: :cr
@@ -334,7 +334,7 @@ config :screens,
         %{
           name: "Upper Busway",
           arrow: :e,
-          query: %{params: %{stop_id: "10642"}, opts: %{}},
+          query: %{params: %{stop_ids: ["10642"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
           audio: %{wayfinding: "Upper Busway"},
           pill: :bus
@@ -351,7 +351,7 @@ config :screens,
         %{
           name: "Upper Busway",
           arrow: :e,
-          query: %{params: %{stop_id: "20762"}, opts: %{}},
+          query: %{params: %{stop_ids: ["20762"]}, opts: %{}},
           layout:
             {:upcoming,
              %{
@@ -366,7 +366,7 @@ config :screens,
         %{
           name: "Lower Busway",
           arrow: :e,
-          query: %{params: %{stop_id: "2076"}, opts: %{}},
+          query: %{params: %{stop_ids: ["2076"]}, opts: %{}},
           layout:
             {:upcoming,
              %{
@@ -388,7 +388,7 @@ config :screens,
         %{
           name: "Busway",
           arrow: :se,
-          query: %{params: %{stop_id: "8310"}, opts: %{}},
+          query: %{params: %{stop_ids: ["8310"]}, opts: %{}},
           layout:
             {:upcoming,
              %{
@@ -403,7 +403,7 @@ config :screens,
         %{
           name: "Congress St @ Haymarket Sta",
           arrow: :n,
-          query: %{params: %{stop_id: "117"}, opts: %{}},
+          query: %{params: %{stop_ids: ["117"]}, opts: %{}},
           layout:
             {:upcoming,
              %{num_rows: 8, visible_rows: 4, paged: true, routes: {:exclude, [{"4", 0}]}}},
@@ -455,7 +455,7 @@ config :screens,
         %{
           name: "Commuter Rail",
           arrow: :e,
-          query: %{params: %{stop_id: "Ruggles"}, opts: %{include_schedules: true}},
+          query: %{params: %{stop_ids: ["Ruggles"]}, opts: %{include_schedules: true}},
           layout: {:upcoming, %{num_rows: 2}},
           audio: %{wayfinding: nil},
           pill: :cr
@@ -477,7 +477,13 @@ config :screens,
             opts: %{}
           },
           layout:
-            {:upcoming, %{num_rows: 10, visible_rows: 6, paged: true, routes: {:exclude, ["90"]}}},
+            {:upcoming,
+             %{
+               num_rows: 10,
+               visible_rows: 6,
+               paged: true,
+               routes: {:exclude, [{"90", 0}, {"90", 1}]}
+             }},
           audio: %{wayfinding: "Upper Busway"},
           pill: :bus
         },
@@ -506,7 +512,7 @@ config :screens,
         %{
           name: "Blue Line",
           arrow: :se,
-          query: %{params: %{stop_id: "70059"}, opts: %{}},
+          query: %{params: %{stop_ids: ["70059"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 2}},
           audio: %{wayfinding: nil},
           pill: :blue
@@ -514,7 +520,7 @@ config :screens,
         %{
           name: "Bus",
           arrow: :w,
-          query: %{params: %{stop_id: "15795"}, opts: %{}},
+          query: %{params: %{stop_ids: ["15795"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 14, visible_rows: 10, paged: true}},
           audio: %{wayfinding: nil},
           pill: :bus
@@ -531,7 +537,7 @@ config :screens,
         %{
           name: "Commuter Rail (South Station)",
           arrow: :w,
-          query: %{params: %{stop_id: "South Station"}, opts: %{include_schedules: true}},
+          query: %{params: %{stop_ids: ["South Station"]}, opts: %{include_schedules: true}},
           layout: {:upcoming, %{num_rows: 7, visible_rows: 3, paged: true, max_minutes: 120}},
           audio: %{wayfinding: "South Station"},
           pill: :cr
@@ -548,14 +554,14 @@ config :screens,
           name: nil,
           arrow: nil,
           query: %{params: %{stop_ids: ["49002", "6565"]}, opts: %{}},
-          layout: {:bidirectional, %{routes: {:exclude, ["11"]}}},
+          layout: {:bidirectional, %{routes: {:exclude, [{"11", 0}, {"11", 1}]}}},
           audio: %{wayfinding: "Tufts Medical Center"},
           pill: :silver
         },
         %{
           name: "Bus",
           arrow: :e,
-          query: %{params: %{stop_id: "9983"}, opts: %{}},
+          query: %{params: %{stop_ids: ["9983"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 1}},
           audio: %{wayfinding: "Stuart Street at Charles Street South"},
           pill: :bus
@@ -573,7 +579,7 @@ config :screens,
           name: "Commuter Rail (Back Bay)",
           arrow: :nw,
           query: %{
-            params: %{stop_id: "Back Bay", direction_id: 0},
+            params: %{stop_ids: ["Back Bay"], direction_id: 0},
             opts: %{include_schedules: true}
           },
           layout: {:upcoming, %{num_rows: 8, max_minutes: 120}},
@@ -600,7 +606,7 @@ config :screens,
         %{
           name: "Summer St opp WTC Ave",
           arrow: nil,
-          query: %{params: %{stop_id: "889"}, opts: %{}},
+          query: %{params: %{stop_ids: ["889"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}},
           audio: %{wayfinding: nil},
           pill: :bus
@@ -616,7 +622,7 @@ config :screens,
         %{
           name: "Summer St @ WTC Ave",
           arrow: nil,
-          query: %{params: %{stop_id: "890"}, opts: %{}},
+          query: %{params: %{stop_ids: ["890"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}},
           audio: %{wayfinding: nil},
           pill: :bus
@@ -632,7 +638,7 @@ config :screens,
         %{
           name: "Columbus Ave @ Walnut Ave",
           arrow: nil,
-          query: %{params: %{stop_id: "1743"}, opts: %{}},
+          query: %{params: %{stop_ids: ["1743"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}},
           audio: %{wayfinding: nil},
           pill: :bus
@@ -648,7 +654,7 @@ config :screens,
         %{
           name: "Columbus Ave @ Walnut Ave",
           arrow: nil,
-          query: %{params: %{stop_id: "11413"}, opts: %{}},
+          query: %{params: %{stop_ids: ["11413"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}},
           audio: %{wayfinding: nil},
           pill: :bus
@@ -664,7 +670,7 @@ config :screens,
         %{
           name: "Seaver St opp Elm Hill Ave",
           arrow: nil,
-          query: %{params: %{stop_id: "17401"}, opts: %{}},
+          query: %{params: %{stop_ids: ["17401"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}},
           audio: %{wayfinding: nil},
           pill: :bus
@@ -680,7 +686,7 @@ config :screens,
         %{
           name: "Blue Hill Ave @ Ellington St",
           arrow: nil,
-          query: %{params: %{stop_id: "383"}, opts: %{}},
+          query: %{params: %{stop_ids: ["383"]}, opts: %{}},
           layout: {:upcoming, %{num_rows: 8}},
           audio: %{wayfinding: nil},
           pill: :bus
