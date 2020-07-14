@@ -29,11 +29,11 @@ const routeToPill = (route: string, routeId: string): PillType => {
     return { routeName: "OL", routePillColor: "orange" };
   }
 
-  if (routeId.startsWith("CR")) {
+  if (routeId && routeId.startsWith("CR")) {
     return { routeName: "CR", routePillColor: "purple" };
   }
 
-  if (route.startsWith("SL")) {
+  if (route && route.startsWith("SL")) {
     return { routeName: route, routePillColor: "silver" };
   }
 

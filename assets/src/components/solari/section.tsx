@@ -116,6 +116,31 @@ class PagedDeparture extends React.Component<
   }
 
   componentDidMount() {
+    this.startPaging();
+  }
+
+  componentWillUnmount() {
+    this.stopPaging();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!this.propsEqual(prevProps)) {
+      this.stopPaging();
+      this.setState({ currentPageNumber: 0 });
+      this.startPaging();
+    }
+  }
+
+  propsEqual(otherProps) {
+    const { pageCount, departures } = this.props;
+    return (
+      pageCount === otherProps.pageCount &&
+      departures.length === otherProps.departures.length &&
+      departures.every((d, i) => d === otherProps.departures[i])
+    );
+  }
+
+  startPaging() {
     const refreshMs = this.pageDuration();
     if (refreshMs !== null) {
       this.interval = window.setInterval(
@@ -125,9 +150,10 @@ class PagedDeparture extends React.Component<
     }
   }
 
-  componentWillUnmount() {
+  stopPaging() {
     if (this.interval) {
       clearInterval(this.interval);
+      this.interval = null;
     }
   }
 
@@ -359,11 +385,7 @@ const PagedSection = ({
         isAnimated={isAnimated}
       />
       {showPagedDeparture && (
-        <PagedDeparture
-          pageCount={pageCount}
-          departures={pagedDepartures}
-          key={currentTimeString}
-        />
+        <PagedDeparture pageCount={pageCount} departures={pagedDepartures} />
       )}
     </SectionFrame>
   );
