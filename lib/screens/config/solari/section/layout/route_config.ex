@@ -1,30 +1,28 @@
 defmodule Screens.Config.Solari.Section.Layout.RouteConfig do
   alias Screens.Config.Solari.Section.Layout.RouteConfig.RouteDescriptor
 
-  @type t :: %__MODULE__{
-          action: :exclude | :include,
-          route_list: list(RouteDescriptor.t())
-        }
+  @type t :: {:exclude | :include, list(RouteDescriptor.t())}
 
   @default_action :exclude
 
-  defstruct action: @default_action,
-            route_list: []
-
   @spec from_json(map() | :default) :: t()
-  def from_json(%{"action" => action, "route_list" => route_list}) when is_list(route_list) do
-    %__MODULE__{
-      action: action_from_json(action),
-      route_list: Enum.map(route_list, &RouteDescriptor.from_json/1)
+  def from_json(%{} = json) do
+    action = Map.get(json, "action", :default)
+    route_list = Map.get(json, "route_list", [])
+    route_list = if is_list(route_list), do: route_list, else: []
+
+    {
+      action_from_json(action),
+      Enum.map(route_list, &RouteDescriptor.from_json/1)
     }
   end
 
   def from_json(:default) do
-    %__MODULE__{}
+    {@default_action, []}
   end
 
   @spec to_json(t()) :: map()
-  def to_json(%__MODULE__{action: action, route_list: route_list}) do
+  def to_json({action, route_list}) do
     %{
       "action" => action_to_json(action),
       "route_list" => Enum.map(route_list, &RouteDescriptor.to_json/1)

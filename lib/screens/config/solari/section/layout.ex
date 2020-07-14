@@ -2,13 +2,13 @@ defmodule Screens.Config.Solari.Section.Layout do
   alias Screens.Config.Solari.Section.Layout.{BidirectionalOpts, UpcomingOpts}
 
   @type t ::
-          %__MODULE__{
-            type: :bidirectional,
-            opts: BidirectionalOpts.t()
+          {
+            :bidirectional,
+            BidirectionalOpts.t()
           }
-          | %__MODULE__{
-              type: :upcoming,
-              opts: UpcomingOpts.t()
+          | {
+              :upcoming,
+              UpcomingOpts.t()
             }
 
   @default_type :upcoming
@@ -18,26 +18,23 @@ defmodule Screens.Config.Solari.Section.Layout do
     upcoming: UpcomingOpts
   }
 
-  defstruct type: @default_type,
-            opts: @opts_modules[@default_type].from_json(:default)
-
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
     type = Map.get(json, "type", :default)
     opts = Map.get(json, "opts", :default)
 
-    %__MODULE__{
-      type: type_from_json(type),
-      opts: opts_from_json(opts, type)
+    {
+      type_from_json(type),
+      opts_from_json(opts, type)
     }
   end
 
   def from_json(:default) do
-    %__MODULE__{}
+    {@default_type, @opts_modules[@default_type].from_json(:default)}
   end
 
   @spec to_json(t()) :: map()
-  def to_json(%__MODULE__{type: type, opts: opts}) do
+  def to_json({type, opts}) do
     %{
       "type" => type_to_json(type),
       "opts" => opts_to_json(opts, type)
