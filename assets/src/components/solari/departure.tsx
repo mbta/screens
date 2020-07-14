@@ -53,7 +53,7 @@ const Departure = ({
         {groupStart ? (
           <DepartureRoutePill route={route} routeId={routeId} />
         ) : (
-          <div className="departure-route"></div>
+          <PlaceholderRoutePill />
         )}
         <div className="departure-destination">
           {destination && groupStart && (
