@@ -116,6 +116,31 @@ class PagedDeparture extends React.Component<
   }
 
   componentDidMount() {
+    this.startPaging();
+  }
+
+  componentWillUnmount() {
+    this.stopPaging();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!this.propsEqual(prevProps)) {
+      this.stopPaging();
+      this.setState({ currentPageNumber: 0 });
+      this.startPaging();
+    }
+  }
+
+  propsEqual(otherProps) {
+    const { pageCount, departures } = this.props;
+    return (
+      pageCount === otherProps.pageCount &&
+      departures.length === otherProps.departures.length &&
+      departures.every((d, i) => d.id === otherProps.departures[i].id)
+    );
+  }
+
+  startPaging() {
     const refreshMs = this.pageDuration();
     if (refreshMs !== null) {
       this.interval = window.setInterval(
@@ -125,9 +150,10 @@ class PagedDeparture extends React.Component<
     }
   }
 
-  componentWillUnmount() {
+  stopPaging() {
     if (this.interval) {
       clearInterval(this.interval);
+      this.interval = null;
     }
   }
 
@@ -170,6 +196,16 @@ class PagedDeparture extends React.Component<
       ? "size-small"
       : "size-normal";
 
+    const pillWidth = 89; // px
+    const pillSpace = 25; // px
+    const pillOffset = 30; // px
+
+    const selectedRightOffset =
+      this.props.pageCount - (this.state.currentPageNumber + 1);
+    const caretBaseClass = "later-departure__route-pill-caret";
+    const beforeCaretClass = classWithModifier(caretBaseClass, "before");
+    const afterCaretClass = classWithModifier(caretBaseClass, "after");
+
     return (
       <div className="later-departure">
         <div className="later-departure__header">
@@ -180,14 +216,40 @@ class PagedDeparture extends React.Component<
               sizeModifier
             )}
           >
-            {this.props.departures.map((departure, i) => (
-              <PagedDepartureRoutePill
-                route={departure.route}
-                routeId={departure.route_id}
-                selected={i === this.state.currentPageNumber}
-                key={departure.id}
-              />
-            ))}
+            {this.props.departures.map((departure, i) => {
+              const rightOffset = this.props.pageCount - (i + 1);
+              return (
+                <React.Fragment key={departure.id}>
+                  {rightOffset === 0 && (
+                    <div
+                      className={beforeCaretClass}
+                      style={{
+                        transform: `translateX(${
+                          selectedRightOffset * -(pillWidth + pillSpace) -
+                          pillOffset
+                        }px)`,
+                      }}
+                    ></div>
+                  )}
+                  <PagedDepartureRoutePill
+                    route={departure.route}
+                    routeId={departure.route_id}
+                    selected={i === this.state.currentPageNumber}
+                  />
+                  {rightOffset === 0 && (
+                    <div
+                      className={afterCaretClass}
+                      style={{
+                        transform: `translateX(${
+                          selectedRightOffset * -(pillWidth + pillSpace) -
+                          pillOffset
+                        }px)`,
+                      }}
+                    ></div>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
         <Departure
@@ -349,11 +411,7 @@ const PagedSection = ({
         isAnimated={isAnimated}
       />
       {showPagedDeparture && (
-        <PagedDeparture
-          pageCount={pageCount}
-          departures={pagedDepartures}
-          key={currentTimeString}
-        />
+        <PagedDeparture pageCount={pageCount} departures={pagedDepartures} />
       )}
     </SectionFrame>
   );
