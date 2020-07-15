@@ -6,7 +6,13 @@ export const classWithModifier = (baseClass, modifier) => {
 };
 
 export const classWithModifiers = (baseClass, modifiers) => {
-  return `${baseClass} ` + modifiers.map((m) => `${baseClass}--${m}`).join(" ");
+  if (modifiers.length === 0) {
+    return baseClass;
+  } else {
+    return (
+      `${baseClass} ` + modifiers.map((m) => `${baseClass}--${m}`).join(" ")
+    );
+  }
 };
 
 export const formatTimeString = (timeString) =>

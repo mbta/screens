@@ -61,6 +61,10 @@ const Pill = ({ routeName, routePillColor }: PillType): JSX.Element => {
   );
 };
 
+const PlaceholderRoutePill = (): JSX.Element => {
+  return <div className="departure-route"></div>;
+};
+
 const DepartureRoutePill = ({
   route,
   routeId,
@@ -130,4 +134,9 @@ const PagedDepartureRoutePill = ({ route, routeId, selected }): JSX.Element => {
   );
 };
 
-export { DepartureRoutePill, SectionRoutePill, PagedDepartureRoutePill };
+export {
+  DepartureRoutePill,
+  PlaceholderRoutePill,
+  SectionRoutePill,
+  PagedDepartureRoutePill,
+};

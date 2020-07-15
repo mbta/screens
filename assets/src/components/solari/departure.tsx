@@ -5,9 +5,12 @@ import { standardTimeRepresentation } from "Util/time_representation";
 import BaseDepartureTime from "Components/eink/base_departure_time";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
 import InlineAlertBadge from "Components/solari/inline_alert_badge";
-import { DepartureRoutePill } from "Components/solari/route_pill";
+import {
+  DepartureRoutePill,
+  PlaceholderRoutePill,
+} from "Components/solari/route_pill";
 
-import { classWithModifier } from "Util/util";
+import { classWithModifier, classWithModifiers } from "Util/util";
 
 const Departure = ({
   route,
@@ -18,6 +21,8 @@ const Departure = ({
   vehicleStatus,
   stopType,
   alerts,
+  groupStart,
+  groupEnd,
 }): JSX.Element => {
   const viaModifier =
     destination && destination.includes(" via ") ? "with-via" : "no-via";
@@ -32,12 +37,26 @@ const Departure = ({
   const timeAnimationModifier =
     timeRepresentation.type === "TEXT" ? "animated" : "static";
 
+  const containerModifiers = [];
+  if (groupStart) {
+    containerModifiers.push("group-start");
+  }
+  if (groupEnd) {
+    containerModifiers.push("group-end");
+  }
+
   return (
-    <div className="departure-container">
+    <div
+      className={classWithModifiers("departure-container", containerModifiers)}
+    >
       <div className={classWithModifier("departure", viaModifier)}>
-        <DepartureRoutePill route={route} routeId={routeId} />
+        {groupStart ? (
+          <DepartureRoutePill route={route} routeId={routeId} />
+        ) : (
+          <PlaceholderRoutePill />
+        )}
         <div className="departure-destination">
-          {destination && (
+          {destination && groupStart && (
             <BaseDepartureDestination destination={destination} />
           )}
         </div>
@@ -46,7 +65,7 @@ const Departure = ({
         >
           <BaseDepartureTime time={timeRepresentation} />
         </div>
-        {alerts.length > 0 && (
+        {groupStart && alerts.length > 0 && (
           <div className="departure__alerts-container">
             {alerts.map((alert) => (
               <InlineAlertBadge alert={alert} key={alert} />
