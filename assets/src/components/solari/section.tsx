@@ -136,7 +136,7 @@ class PagedDeparture extends React.Component<
     return (
       pageCount === otherProps.pageCount &&
       departures.length === otherProps.departures.length &&
-      departures.every((d, i) => d === otherProps.departures[i])
+      departures.every((d, i) => d.id === otherProps.departures[i].id)
     );
   }
 
@@ -200,6 +200,12 @@ class PagedDeparture extends React.Component<
     const pillSpace = 25; // px
     const pillOffset = 30; // px
 
+    const selectedRightOffset =
+      this.props.pageCount - (this.state.currentPageNumber + 1);
+    const caretBaseClass = "later-departure__route-pill-caret";
+    const beforeCaretClass = classWithModifier(caretBaseClass, "before");
+    const afterCaretClass = classWithModifier(caretBaseClass, "after");
+
     return (
       <div className="later-departure">
         <div className="later-departure__header">
@@ -211,26 +217,16 @@ class PagedDeparture extends React.Component<
             )}
           >
             {this.props.departures.map((departure, i) => {
-              const index = this.props.pageCount - (i + 1);
-              const selectedIndex =
-                this.props.pageCount - (this.state.currentPageNumber + 1);
-              const caretBaseClass = "later-departure__route-pill-caret";
-              const beforeCaretClass = classWithModifier(
-                caretBaseClass,
-                "before"
-              );
-              const afterCaretClass = classWithModifier(
-                caretBaseClass,
-                "after"
-              );
+              const rightOffset = this.props.pageCount - (i + 1);
               return (
                 <React.Fragment key={departure.id}>
-                  {index === 0 && (
+                  {rightOffset === 0 && (
                     <div
                       className={beforeCaretClass}
                       style={{
                         transform: `translateX(${
-                          selectedIndex * -(pillWidth + pillSpace) - pillOffset
+                          selectedRightOffset * -(pillWidth + pillSpace) -
+                          pillOffset
                         }px)`,
                       }}
                     ></div>
@@ -239,14 +235,14 @@ class PagedDeparture extends React.Component<
                     route={departure.route}
                     routeId={departure.route_id}
                     selected={i === this.state.currentPageNumber}
-                    index={index}
                   />
-                  {index === 0 && (
+                  {rightOffset === 0 && (
                     <div
                       className={afterCaretClass}
                       style={{
                         transform: `translateX(${
-                          selectedIndex * -(pillWidth + pillSpace) - pillOffset
+                          selectedRightOffset * -(pillWidth + pillSpace) -
+                          pillOffset
                         }px)`,
                       }}
                     ></div>
