@@ -36,6 +36,7 @@
     }
   }
 
+  // Don't add extra padding above the first row in a group until the previous row is done animating.
   .departure-animated--arr-brd-exit-active + .departure-container--group-start {
     .departure--with-via {
       padding-top: 7px;
@@ -77,6 +78,7 @@
     }
   }
 
+  // Don't add extra padding above the first row in a group until the previous row is done animating.
   .departure-animated--arr-brd-exit-active + .departure-container--group-start {
     padding-top: 0;
   }
@@ -94,6 +96,8 @@
   }
 }
 
+// Here, we animate out the departure time, unless the row which is animating out is the last of
+// its departure group, in which case we animate out the whole row.
 .departure-animated {
   &--normal {
     // hide new departures until the previous departure has animated out
@@ -146,6 +150,12 @@
   }
 }
 
+// The following styles hide route pills, destinations and alerts when a row is animating out.
+// They achieve this by setting opacity to 0 in all rows following an exiting row, but then
+// overriding this by setting opacity to 1 in all rows including and following the next group start.
+
+// The next three styles handle the case where the exiting row isn't grouped with any other departures.
+// In this case, the next group start is the first row in the next group, and we want to show it.
 .departure-animated--arr-brd-exit-active.departure-container--group-start.departure-container--group-end
   ~ .departure-container {
   .departure-route,
@@ -174,6 +184,8 @@
   }
 }
 
+// The next three styles handle the case where the exiting row is grouped with other departures.
+// In this case, the next group start is the new first row in the current group, and we want to hide it.
 .departure-animated--arr-brd-exit-active ~ .departure-container {
   .departure-route,
   .departure-destination,
