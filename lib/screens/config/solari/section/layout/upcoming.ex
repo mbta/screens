@@ -1,4 +1,4 @@
-defmodule Screens.Config.Solari.Section.Layout.UpcomingOpts do
+defmodule Screens.Config.Solari.Section.Layout.Upcoming do
   alias Screens.Config.Solari.Section.Layout.RouteConfig
 
   @type t :: %__MODULE__{
@@ -48,12 +48,12 @@ defmodule Screens.Config.Solari.Section.Layout.UpcomingOpts do
   for primitive_key <- ~w[num_rows paged visible_rows max_minutes]a do
     primitive_key_string = Atom.to_string(primitive_key)
 
-    defp add_key_from_json(map, {unquote(primitive_key_string), value}) do
+    defp add_key_from_json({unquote(primitive_key_string), value}, map) do
       Map.put(map, unquote(primitive_key), value)
     end
   end
 
-  defp add_key_from_json(map, _) do
+  defp add_key_from_json(_, map) do
     map
   end
 end

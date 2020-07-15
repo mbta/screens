@@ -87,6 +87,10 @@ defmodule Screens.Config.Solari.Section do
     @default_arrow
   end
 
+  defp arrow_to_json(nil) do
+    nil
+  end
+
   for pill <- ~w[bus red orange green blue cr mattapan silver]a do
     pill_string = Atom.to_string(pill)
 

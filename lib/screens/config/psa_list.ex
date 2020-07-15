@@ -1,7 +1,7 @@
 defmodule Screens.Config.PsaList do
-  @type t :: %__MODULE__{
-          type: psa_type,
-          paths: list(String.t())
+  @type t :: {
+          psa_type,
+          list(String.t())
         }
 
   @default_psa_type :takeover
@@ -12,24 +12,21 @@ defmodule Screens.Config.PsaList do
   @type gl_psa_type :: :double | :takeover
   @type solari_psa_type :: :psa | :takeover
 
-  defstruct type: @default_psa_type,
-            paths: []
-
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
     type = Map.get(json, "type", :default)
     paths = Map.get(json, "paths", [])
     paths = if is_list(paths), do: paths, else: []
 
-    %__MODULE__{type: type_from_json(type), paths: paths}
+    {type_from_json(type), paths}
   end
 
   def from_json(:default) do
-    %__MODULE__{}
+    {@default_psa_type, []}
   end
 
   @spec to_json(t) :: map()
-  def to_json(%__MODULE__{type: type, paths: paths}) do
+  def to_json({type, paths}) do
     %{
       "type" => type_to_json(type),
       "paths" => paths
