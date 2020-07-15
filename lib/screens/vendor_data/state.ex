@@ -36,6 +36,12 @@ defmodule Screens.VendorData.State do
         current_ms = now.second * 1000 + div(microsecond, 1000)
         60 * 1000 - current_ms
       end
+
+      # Handle leaked :ssl_closed messages from Hackney.
+      # Workaround for this issue: https://github.com/benoitc/hackney/issues/464
+      def handle_info({:ssl_closed, _}, state) do
+        {:noreply, state}
+      end
     end
   end
 end
