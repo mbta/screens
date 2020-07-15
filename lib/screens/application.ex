@@ -14,7 +14,7 @@ defmodule Screens.Application do
       ScreensWeb.Endpoint,
       # Starts a worker by calling: Screens.Worker.start_link(arg)
       # {Screens.Worker, arg},
-      Screens.Override.Supervisor,
+      Screens.Config.State.Supervisor,
       Screens.GdsData.Supervisor,
       Screens.MercuryData.Supervisor
     ]
