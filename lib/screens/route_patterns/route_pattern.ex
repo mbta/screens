@@ -24,7 +24,8 @@ defmodule Screens.RoutePatterns.RoutePattern do
            "sort" => "typicality",
            "include" => "representative_trip.stops"
          }) do
-      {:ok, result} -> Screens.RoutePatterns.Parser.parse_result(result)
+      {:ok, result} -> {:ok, Screens.RoutePatterns.Parser.parse_result(result)}
+      _ -> :error
     end
   end
 end

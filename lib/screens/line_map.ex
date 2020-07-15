@@ -6,23 +6,31 @@ defmodule Screens.LineMap do
 
   def by_stop_id(stop_id, route_id, direction_id, predictions) do
     vehicles = Vehicle.by_route_and_direction(route_id, direction_id)
-    route_stops = RoutePattern.stops_by_route_and_direction(route_id, direction_id)
+    route_stops_result = RoutePattern.stops_by_route_and_direction(route_id, direction_id)
 
-    current_stop_index =
-      Enum.find_index(route_stops, fn %{id: route_stop_id} -> route_stop_id == stop_id end)
+    case route_stops_result do
+      :error ->
+        {nil, :error}
 
-    %{id: origin_stop_id} = Enum.at(route_stops, 0)
-    schedule = next_scheduled_departure(origin_stop_id, route_id, predictions)
+      {:ok, route_stops} ->
+        current_stop_index =
+          Enum.find_index(route_stops, fn %{id: route_stop_id} -> route_stop_id == stop_id end)
 
-    {
-      %{
-        stops: format_stops(route_stops, current_stop_index),
-        vehicles: format_vehicles(vehicles, route_stops, current_stop_index, predictions),
-        schedule: format_schedule(schedule)
-      },
-      {:ok,
-       filter_predictions_by_vehicles(predictions, vehicles, route_stops, current_stop_index)}
-    }
+        %{id: origin_stop_id} = Enum.at(route_stops, 0)
+        schedule = next_scheduled_departure(origin_stop_id, route_id, predictions)
+
+        line_map_data = %{
+          stops: format_stops(route_stops, current_stop_index),
+          vehicles: format_vehicles(vehicles, route_stops, current_stop_index, predictions),
+          schedule: format_schedule(schedule)
+        }
+
+        filtered_predictions =
+          {:ok,
+           filter_predictions_by_vehicles(predictions, vehicles, route_stops, current_stop_index)}
+
+        {line_map_data, filtered_predictions}
+    end
   end
 
   def filter_predictions_by_vehicles(predictions, vehicles, route_stops, current_stop_index) do
