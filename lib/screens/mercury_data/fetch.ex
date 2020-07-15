@@ -1,14 +1,21 @@
 defmodule Screens.MercuryData.Fetch do
   @moduledoc false
 
-  import Screens.VendorData.Fetch, only: [make_and_parse_request: 4]
+  import Screens.VendorData.Fetch, only: [make_and_parse_request: 5]
 
   @api_url_base "https://cms.mercuryinnovation.com.au/ExtApi/devices"
+  @vendor_request_opts [hackney: [pool: :mercury_api_pool]]
 
   def fetch_data do
     headers = [{"apikey", Application.get_env(:screens, :mercury_api_key)}]
 
-    case make_and_parse_request(@api_url_base, headers, &Jason.decode/1, :mercury) do
+    case make_and_parse_request(
+           @api_url_base,
+           headers,
+           &Jason.decode/1,
+           :mercury,
+           @vendor_request_opts
+         ) do
       {:ok, parsed} -> {:ok, Enum.map(parsed, &fetch_relevant_fields/1)}
       :error -> :error
     end
