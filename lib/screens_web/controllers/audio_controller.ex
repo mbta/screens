@@ -5,6 +5,18 @@ defmodule ScreensWeb.AudioController do
 
   @fallback_audio_path "assets/static/audio/readout_fallback.mp3"
 
+  plug(:check_config)
+
+  defp check_config(conn, _) do
+    if not Screens.Config.State.ok?() do
+      conn
+      |> send_audio({:file, @fallback_audio_path}, disposition: :attachment)
+      |> halt()
+    else
+      conn
+    end
+  end
+
   def show(conn, %{"id" => screen_id} = params) do
     disposition =
       params

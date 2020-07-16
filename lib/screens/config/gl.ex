@@ -1,5 +1,6 @@
 defmodule Screens.Config.Gl do
   alias Screens.Config.PsaList
+  alias Screens.Util
 
   @type t :: %__MODULE__{
           stop_id: String.t(),
@@ -10,58 +11,40 @@ defmodule Screens.Config.Gl do
           psa_list: PsaList.t()
         }
 
-  @default_stop_id ""
-  @default_platform_id ""
-  @default_route_id ""
-  @default_direction_id 0
-  @default_headway_mode false
-
-  defstruct stop_id: @default_stop_id,
-            platform_id: @default_platform_id,
-            route_id: @default_route_id,
-            direction_id: @default_direction_id,
-            headway_mode: @default_headway_mode,
+  @enforce_keys [:stop_id, :platform_id, :route_id, :direction_id]
+  defstruct stop_id: nil,
+            platform_id: nil,
+            route_id: nil,
+            direction_id: nil,
+            headway_mode: false,
             psa_list: PsaList.from_json(:default)
 
-  @spec from_json(map() | :default) :: t()
+  @spec from_json(map()) :: t()
   def from_json(%{} = json) do
-    stop_id = Map.get(json, "stop_id", @default_stop_id)
-    platform_id = Map.get(json, "platform_id", @default_platform_id)
-    route_id = Map.get(json, "route_id", @default_route_id)
-    direction_id = Map.get(json, "direction_id", @default_direction_id)
-    headway_mode = Map.get(json, "headway_mode", @default_headway_mode)
-    psa_list = Map.get(json, "psa_list", :default)
+    struct_map =
+      json
+      |> Map.take(Util.struct_keys(__MODULE__))
+      |> Enum.into(%{}, fn {k, v} -> {String.to_existing_atom(k), value_from_json(k, v)} end)
 
-    %__MODULE__{
-      stop_id: stop_id,
-      platform_id: platform_id,
-      route_id: route_id,
-      direction_id: direction_id,
-      headway_mode: headway_mode,
-      psa_list: PsaList.from_json(psa_list)
-    }
-  end
-
-  def from_json(:default) do
-    %__MODULE__{}
+    struct!(__MODULE__, struct_map)
   end
 
   @spec to_json(t()) :: map()
-  def to_json(%__MODULE__{
-        stop_id: stop_id,
-        platform_id: platform_id,
-        route_id: route_id,
-        direction_id: direction_id,
-        headway_mode: headway_mode,
-        psa_list: psa_list
-      }) do
-    %{
-      "stop_id" => stop_id,
-      "platform_id" => platform_id,
-      "route_id" => route_id,
-      "direction_id" => direction_id,
-      "headway_mode" => headway_mode,
-      "psa_list" => PsaList.to_json(psa_list)
-    }
+  def to_json(%__MODULE__{} = t) do
+    t
+    |> Map.from_struct()
+    |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
   end
+
+  defp value_from_json("psa_list", psa_list) do
+    PsaList.from_json(psa_list)
+  end
+
+  defp value_from_json(_, value), do: value
+
+  defp value_to_json(:psa_list, psa_list) do
+    PsaList.to_json(psa_list)
+  end
+
+  defp value_to_json(_, value), do: value
 end

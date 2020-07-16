@@ -1,5 +1,6 @@
 defmodule Screens.Config.Solari.Section.Layout.Upcoming do
   alias Screens.Config.Solari.Section.Layout.RouteConfig
+  alias Screens.Util
 
   @type t :: %__MODULE__{
           num_rows: pos_integer(),
@@ -17,11 +18,12 @@ defmodule Screens.Config.Solari.Section.Layout.Upcoming do
 
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
-    primitives = Enum.reduce(json, %{}, &add_key_from_json/2)
+    struct_map =
+      json
+      |> Map.take(Util.struct_keys(__MODULE__))
+      |> Enum.into(%{}, fn {k, v} -> {String.to_existing_atom(k), value_from_json(k, v)} end)
 
-    routes = Map.get(json, "routes", :default)
-
-    struct(__MODULE__, Map.merge(primitives, routes))
+    struct!(__MODULE__, struct_map)
   end
 
   def from_json(:default) do
@@ -29,31 +31,21 @@ defmodule Screens.Config.Solari.Section.Layout.Upcoming do
   end
 
   @spec to_json(t()) :: map()
-  def to_json(%__MODULE__{
-        num_rows: num_rows,
-        paged: paged,
-        visible_rows: visible_rows,
-        routes: routes,
-        max_minutes: max_minutes
-      }) do
-    %{
-      "num_rows" => num_rows,
-      "paged" => paged,
-      "visible_rows" => visible_rows,
-      "routes" => RouteConfig.to_json(routes),
-      "max_minutes" => max_minutes
-    }
+  def to_json(%__MODULE__{} = t) do
+    t
+    |> Map.from_struct()
+    |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
   end
 
-  for primitive_key <- ~w[num_rows paged visible_rows max_minutes]a do
-    primitive_key_string = Atom.to_string(primitive_key)
-
-    defp add_key_from_json({unquote(primitive_key_string), value}, map) do
-      Map.put(map, unquote(primitive_key), value)
-    end
+  defp value_from_json("routes", routes) do
+    RouteConfig.from_json(routes)
   end
 
-  defp add_key_from_json(_, map) do
-    map
+  defp value_from_json(_, value), do: value
+
+  defp value_to_json(:routes, routes) do
+    RouteConfig.to_json(routes)
   end
+
+  defp value_to_json(_, value), do: value
 end

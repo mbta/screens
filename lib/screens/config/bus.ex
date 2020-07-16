@@ -1,36 +1,42 @@
 defmodule Screens.Config.Bus do
   alias Screens.Config.PsaList
+  alias Screens.Util
 
   @type t :: %__MODULE__{
           stop_id: String.t(),
           psa_list: PsaList.t()
         }
 
-  @default_stop_id ""
-
-  defstruct stop_id: @default_stop_id,
+  @enforce_keys [:stop_id]
+  defstruct stop_id: nil,
             psa_list: PsaList.from_json(:default)
 
-  @spec from_json(map() | :default) :: t()
+  @spec from_json(map()) :: t()
   def from_json(%{} = json) do
-    stop_id = Map.get(json, "stop_id", @default_stop_id)
-    psa_list = Map.get(json, "psa_list", :default)
+    struct_map =
+      json
+      |> Map.take(Util.struct_keys(__MODULE__))
+      |> Enum.into(%{}, fn {k, v} -> {String.to_existing_atom(k), value_from_json(k, v)} end)
 
-    %__MODULE__{
-      stop_id: stop_id,
-      psa_list: PsaList.from_json(psa_list)
-    }
-  end
-
-  def from_json(:default) do
-    %__MODULE__{}
+    struct!(__MODULE__, struct_map)
   end
 
   @spec to_json(t()) :: map()
-  def to_json(%__MODULE__{stop_id: stop_id, psa_list: psa_list}) do
-    %{
-      "stop_id" => stop_id,
-      "psa_list" => PsaList.to_json(psa_list)
-    }
+  def to_json(%__MODULE__{} = t) do
+    t
+    |> Map.from_struct()
+    |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
   end
+
+  defp value_from_json("psa_list", psa_list) do
+    PsaList.from_json(psa_list)
+  end
+
+  defp value_from_json(_, value), do: value
+
+  defp value_to_json(:psa_list, psa_list) do
+    PsaList.to_json(psa_list)
+  end
+
+  defp value_to_json(_, value), do: value
 end

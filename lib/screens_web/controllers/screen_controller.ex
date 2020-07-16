@@ -5,12 +5,23 @@ defmodule ScreensWeb.ScreenController do
   @default_app_id "bus_eink"
   @app_ids ["bus_eink", "gl_eink_single", "gl_eink_double", "solari"]
 
+  plug(:check_config)
   plug(:api_version)
   plug(:environment_name)
   plug(:body_class)
 
+  defp check_config(conn, _) do
+    if not Screens.Config.State.ok?() do
+      conn
+      |> render_not_found()
+      |> halt()
+    else
+      conn
+    end
+  end
+
   defp api_version(conn, _) do
-    api_version = Screens.Override.State.api_version()
+    {:ok, api_version} = Screens.Config.State.api_version()
     assign(conn, :api_version, api_version)
   end
 

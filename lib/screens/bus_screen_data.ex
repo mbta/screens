@@ -40,7 +40,7 @@ defmodule Screens.BusScreenData do
 
     stop_name = extract_stop_name(nearby_connections_data, departures)
 
-    service_level = Screens.Override.State.bus_service()
+    {:ok, service_level} = Screens.Config.State.bus_service()
 
     _ = LogScreenData.log_departures(screen_id, is_screen, departures)
 

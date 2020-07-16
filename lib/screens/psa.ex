@@ -5,7 +5,7 @@ defmodule Screens.Psa do
   @solari_refresh_seconds 15
   @solari_psa_period 3
 
-  alias Screens.Override.State
+  alias Screens.Config.State
 
   def current_psa_for(screen_id) do
     app_id =
@@ -13,12 +13,13 @@ defmodule Screens.Psa do
       |> Application.get_env(:screen_data)
       |> get_in([screen_id, :app_id])
 
-    {psa_type, psa_list} = State.psa_list(screen_id)
+    {:ok, {psa_type, psa_list}} = State.psa_list(screen_id)
     {psa_type, choose_psa(psa_list, app_id)}
   end
 
   def current_audio_psa_for(screen_id) do
-    State.audio_psa(screen_id)
+    {:ok, audio_psa} = State.audio_psa(screen_id)
+    audio_psa
   end
 
   defp choose_psa(psa_list, "solari") do

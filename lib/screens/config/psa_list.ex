@@ -4,9 +4,9 @@ defmodule Screens.Config.PsaList do
           list(String.t())
         }
 
-  @default_psa_type :takeover
+  @default_psa_type nil
 
-  @type psa_type :: bus_psa_type | gl_psa_type | solari_psa_type
+  @type psa_type :: bus_psa_type | gl_psa_type | solari_psa_type | nil
 
   @type bus_psa_type :: :double | :takeover
   @type gl_psa_type :: :double | :takeover
@@ -28,8 +28,8 @@ defmodule Screens.Config.PsaList do
   @spec to_json(t) :: map()
   def to_json({type, paths}) do
     %{
-      "type" => type_to_json(type),
-      "paths" => paths
+      type: type,
+      paths: paths
     }
   end
 
@@ -38,10 +38,6 @@ defmodule Screens.Config.PsaList do
 
     defp type_from_json(unquote(psa_type_string)) do
       unquote(psa_type)
-    end
-
-    defp type_to_json(unquote(psa_type)) do
-      unquote(psa_type_string)
     end
   end
 

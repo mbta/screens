@@ -1,7 +1,7 @@
 defmodule Screens.Config.State.LocalFetch do
   alias Screens.Config
 
-  @local_config_file "local.json"
+  @local_config_file "local_new.json"
 
   @spec fetch_config :: {:ok, Config.t()} | :error
   def fetch_config do
