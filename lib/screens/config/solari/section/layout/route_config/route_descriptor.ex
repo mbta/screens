@@ -1,4 +1,6 @@
 defmodule Screens.Config.Solari.Section.Layout.RouteConfig.RouteDescriptor do
+  @moduledoc false
+
   @type t :: {String.t(), direction_id}
 
   @type direction_id :: 0 | 1
