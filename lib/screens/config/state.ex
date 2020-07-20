@@ -1,11 +1,13 @@
 defmodule Screens.Config.State do
   alias Screens.Config
 
-  @opaque t :: {Config.t(), retry_count :: non_neg_integer()} | :error
+  @typep t :: {Config.t(), retry_count :: non_neg_integer()} | :error
 
   @initial_fetch_wait_ms 500
   @refresh_ms 15 * 1000
   @max_retries 8
+
+  @config_fetcher Application.get_env(:screens, :config_fetcher)
 
   use GenServer
 
@@ -29,20 +31,32 @@ defmodule Screens.Config.State do
     GenServer.call(pid, :green_line_service)
   end
 
-  def disabled?(pid \\ __MODULE__, screen_id) do
+  def disabled?(pid \\ __MODULE__, screen_id) when is_integer(screen_id) do
     GenServer.call(pid, {:disabled?, screen_id})
   end
 
-  def headway_mode?(pid \\ __MODULE__, screen_id) do
+  def headway_mode?(pid \\ __MODULE__, screen_id) when is_integer(screen_id) do
     GenServer.call(pid, {:headway_mode?, screen_id})
   end
 
-  def psa_list(pid \\ __MODULE__, screen_id) do
+  def psa_list(pid \\ __MODULE__, screen_id) when is_integer(screen_id) do
     GenServer.call(pid, {:psa_list, screen_id})
   end
 
-  def audio_psa(pid \\ __MODULE__, screen_id) do
+  def audio_psa(pid \\ __MODULE__, screen_id) when is_integer(screen_id) do
     GenServer.call(pid, {:audio_psa, screen_id})
+  end
+
+  def screen(pid \\ __MODULE__, screen_id) when is_integer(screen_id) do
+    GenServer.call(pid, {:screen, screen_id})
+  end
+
+  def app_params(pid \\ __MODULE__, screen_id) when is_integer(screen_id) do
+    GenServer.call(pid, {:app_params, screen_id})
+  end
+
+  def screens(pid \\ __MODULE__) do
+    GenServer.call(pid, :screens)
   end
 
   def schedule_refresh(pid, ms \\ @refresh_ms) do
@@ -54,10 +68,8 @@ defmodule Screens.Config.State do
 
   @impl true
   def init(:ok) do
-    config_fetcher = Application.get_env(:screens, :config_fetcher)
-
     init_state =
-      case config_fetcher.fetch_config() do
+      case @config_fetcher.fetch_config() do
         {:ok, config} -> {config, 0}
         :error -> :error
       end
@@ -89,6 +101,7 @@ defmodule Screens.Config.State do
 
   def handle_call({:disabled?, screen_id}, _from, {config, _} = state) do
     disabled? = get_in(config.screens, [screen_id, Access.key(:disabled)]) || false
+
     {:reply, {:ok, disabled?}, state}
   end
 
@@ -115,6 +128,22 @@ defmodule Screens.Config.State do
     {:reply, {:ok, audio_psa}, state}
   end
 
+  def handle_call({:screen, screen_id}, _from, {config, _} = state) do
+    screen = get_in(config.screens, [screen_id])
+
+    {:reply, {:ok, screen}, state}
+  end
+
+  def handle_call(:screens, _from, {config, _} = state) do
+    {:reply, {:ok, config.screens}, state}
+  end
+
+  def handle_call({:app_params, screen_id}, _from, {config, _} = state) do
+    app_params = get_in(config.screens, [screen_id, Access.key(:app_params)])
+
+    {:reply, {:ok, app_params}, state}
+  end
+
   # If we're in an error state, all queries on the state get an :error response
   def handle_call(_, _from, :error) do
     {:reply, :error, :error}
@@ -122,10 +151,8 @@ defmodule Screens.Config.State do
 
   @impl true
   def handle_info(:refresh, state) do
-    config_fetcher = Application.get_env(:screens, :config_fetcher)
-
     new_state =
-      case config_fetcher.fetch_config() do
+      case @config_fetcher.fetch_config() do
         {:ok, config} -> {config, 0}
         :error -> error_state(state)
       end
@@ -140,7 +167,8 @@ defmodule Screens.Config.State do
     {:noreply, state}
   end
 
-  @spec error_state(t()) :: t()
+  # Determines new state from current state when a fetch error occurred
+  @spec error_state(current_state :: t()) :: t()
   defp error_state(:error) do
     :error
   end

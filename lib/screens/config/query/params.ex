@@ -1,4 +1,4 @@
-defmodule Screens.Config.Solari.Section.Query.Params do
+defmodule Screens.Config.Query.Params do
   alias Screens.Util
 
   @type t :: %__MODULE__{

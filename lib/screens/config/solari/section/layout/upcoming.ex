@@ -3,18 +3,18 @@ defmodule Screens.Config.Solari.Section.Layout.Upcoming do
   alias Screens.Util
 
   @type t :: %__MODULE__{
-          num_rows: pos_integer(),
+          num_rows: pos_integer() | :infinity,
           paged: boolean(),
-          visible_rows: pos_integer(),
+          visible_rows: pos_integer() | :infinity,
           routes: RouteConfig.t(),
-          max_minutes: pos_integer()
+          max_minutes: pos_integer() | :infinity
         }
 
   defstruct num_rows: 1,
             paged: false,
             visible_rows: 1,
             routes: RouteConfig.from_json(:default),
-            max_minutes: 1
+            max_minutes: :infinity
 
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
@@ -35,6 +35,14 @@ defmodule Screens.Config.Solari.Section.Layout.Upcoming do
     t
     |> Map.from_struct()
     |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
+  end
+
+  for key <- ~w[num_rows visible_rows max_minutes]a do
+    key_string = Atom.to_string(key)
+
+    defp value_from_json(unquote(key_string), "infinity"), do: :infinity
+
+    defp value_to_json(unquote(key), :infinity), do: "infinity"
   end
 
   defp value_from_json("routes", routes) do

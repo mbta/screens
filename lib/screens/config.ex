@@ -11,7 +11,7 @@ defmodule Screens.Config do
           }
         }
 
-  @type screen_id :: String.t()
+  @type screen_id :: pos_integer()
 
   @enforce_keys [:screens]
   defstruct api_version: 1,
@@ -38,7 +38,7 @@ defmodule Screens.Config do
 
   defp value_from_json("screens", screens) do
     Enum.into(screens, %{}, fn {screen_id, screen_config} ->
-      {screen_id, Screen.from_json(screen_config)}
+      {String.to_integer(screen_id), Screen.from_json(screen_config)}
     end)
   end
 

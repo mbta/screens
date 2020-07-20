@@ -4,12 +4,16 @@ defmodule Screens.GLScreenData do
   alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
+  alias Screens.Config.{Gl, State}
 
   def by_screen_id(screen_id, is_screen) do
-    %{stop_id: stop_id, route_id: route_id, direction_id: direction_id, platform_id: platform_id} =
-      :screens
-      |> Application.get_env(:screen_data)
-      |> Map.get(screen_id)
+    {:ok,
+     %Gl{
+       stop_id: stop_id,
+       route_id: route_id,
+       direction_id: direction_id,
+       platform_id: platform_id
+     } = app_params} = State.app_params(screen_id)
 
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
@@ -20,11 +24,9 @@ defmodule Screens.GLScreenData do
     {inline_alerts, global_alert} = Alert.by_route_id(route_id, stop_id)
 
     predictions =
-      Screens.Predictions.Prediction.fetch(%{
-        stop_id: stop_id,
-        route_id: route_id,
-        direction_id: direction_id
-      })
+      app_params
+      |> Gl.to_query_params()
+      |> Screens.Predictions.Prediction.fetch()
 
     {line_map_data, predictions} =
       case predictions do

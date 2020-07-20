@@ -2,12 +2,13 @@ defmodule Screens.ScreenData do
   @moduledoc false
 
   alias Screens.LogScreenData
+  alias Screens.Config.{Screen, State}
 
   @modules_by_app_id %{
-    "bus_eink" => Screens.BusScreenData,
-    "gl_eink_single" => Screens.GLScreenData,
-    "gl_eink_double" => Screens.GLScreenData,
-    "solari" => Screens.SolariScreenData
+    bus_eink: Screens.BusScreenData,
+    gl_eink_single: Screens.GLScreenData,
+    gl_eink_double: Screens.GLScreenData,
+    solari: Screens.SolariScreenData
   }
 
   @disabled_response %{force_reload: false, success: false}
@@ -43,7 +44,7 @@ defmodule Screens.ScreenData do
   end
 
   defp disabled?(screen_id) do
-    {:ok, disabled?} = Screens.Config.State.disabled?(screen_id)
+    {:ok, disabled?} = State.disabled?(screen_id)
     disabled?
   end
 
@@ -63,9 +64,7 @@ defmodule Screens.ScreenData do
   end
 
   defp app_id_from_screen_id(screen_id) do
-    :screens
-    |> Application.get_env(:screen_data)
-    |> Map.get(screen_id)
-    |> Map.get(:app_id)
+    {:ok, %Screen{app_id: app_id}} = State.screen(screen_id)
+    app_id
   end
 end

@@ -1,17 +1,13 @@
 defmodule Screens.Psa do
   @moduledoc false
+  alias Screens.Config.{Screen, State}
 
   @eink_refresh_seconds 30
   @solari_refresh_seconds 15
   @solari_psa_period 3
 
-  alias Screens.Config.State
-
   def current_psa_for(screen_id) do
-    app_id =
-      :screens
-      |> Application.get_env(:screen_data)
-      |> get_in([screen_id, :app_id])
+    {:ok, %Screen{app_id: app_id}} = State.screen(screen_id)
 
     {:ok, {psa_type, psa_list}} = State.psa_list(screen_id)
     {psa_type, choose_psa(psa_list, app_id)}
@@ -22,7 +18,7 @@ defmodule Screens.Psa do
     audio_psa
   end
 
-  defp choose_psa(psa_list, "solari") do
+  defp choose_psa(psa_list, :solari) do
     # How often to change the selected PSA
     solari_psa_refresh_seconds = @solari_refresh_seconds * @solari_psa_period
 
@@ -34,7 +30,7 @@ defmodule Screens.Psa do
     choose_from_rotating_list(solari_list, @solari_refresh_seconds)
   end
 
-  defp choose_psa(psa_list, app_id) when app_id in ~w[bus_eink gl_eink_single gl_eink_double] do
+  defp choose_psa(psa_list, app_id) when app_id in ~w[bus_eink gl_eink_single gl_eink_double]a do
     choose_from_rotating_list(psa_list, @eink_refresh_seconds)
   end
 
