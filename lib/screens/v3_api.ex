@@ -1,7 +1,7 @@
 defmodule Screens.V3Api do
   @moduledoc false
 
-  @default_opts [timeout: 2000, recv_timeout: 2000]
+  @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool]]
   @base_url Application.get_env(:screens, :api_v3_url)
 
   def get_json(route, params \\ %{}, extra_headers \\ [], opts \\ []) do

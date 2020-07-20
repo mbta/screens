@@ -1,7 +1,7 @@
 defmodule Screens.Override.Fetch do
   @moduledoc false
 
-  @default_opts [timeout: 2000, recv_timeout: 2000]
+  @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :s3_pool]]
 
   def fetch_config(opts \\ []) do
     url = "https://mbta-dotcom.s3.amazonaws.com/screens/config/" <> config_path_for_environment()
