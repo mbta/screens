@@ -1,4 +1,6 @@
 defmodule Screens.Config.PsaList do
+  @moduledoc false
+
   @type t :: {
           psa_type,
           list(String.t())

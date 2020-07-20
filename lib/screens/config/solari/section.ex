@@ -1,6 +1,8 @@
 defmodule Screens.Config.Solari.Section do
-  alias Screens.Config.Solari.Section.{Audio, Layout}
+  @moduledoc false
+
   alias Screens.Config.Query
+  alias Screens.Config.Solari.Section.{Audio, Layout}
   alias Screens.Util
 
   @type t :: %__MODULE__{

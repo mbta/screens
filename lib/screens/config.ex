@@ -1,4 +1,6 @@
 defmodule Screens.Config do
+  @moduledoc false
+
   alias Screens.Config.Screen
   alias Screens.Util
 

@@ -1,4 +1,6 @@
 defmodule Screens.Config.State.LocalFetch do
+  @moduledoc false
+
   alias Screens.Config
 
   @local_config_file "local.json"

@@ -1,4 +1,6 @@
 defmodule Screens.Config.Solari.Section.Layout.Bidirectional do
+  @moduledoc false
+
   alias Screens.Config.Solari.Section.Layout.RouteConfig
 
   @type t :: %__MODULE__{

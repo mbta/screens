@@ -14,12 +14,12 @@ defmodule ScreensWeb.ScreenController do
   plug(:body_class)
 
   defp check_config(conn, _) do
-    if not Screens.Config.State.ok?() do
+    if Screens.Config.State.ok?() do
+      conn
+    else
       conn
       |> render_not_found()
       |> halt()
-    else
-      conn
     end
   end
 

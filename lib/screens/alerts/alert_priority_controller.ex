@@ -1,7 +1,7 @@
 defmodule ScreensWeb.AlertPriorityController do
   use ScreensWeb, :controller
 
-  alias Screens.Config.{State, Bus, Gl}
+  alias Screens.Config.{Bus, Gl, State}
 
   def show(conn, %{"id" => screen_id}) do
     {:ok, app_params} = State.app_params(screen_id)

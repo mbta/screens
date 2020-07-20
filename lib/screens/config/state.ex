@@ -1,4 +1,6 @@
 defmodule Screens.Config.State do
+  @moduledoc false
+
   alias Screens.Config
 
   @typep t :: {Config.t(), retry_count :: non_neg_integer()} | :error

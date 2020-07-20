@@ -3,12 +3,11 @@ defmodule Screens.SolariScreenData do
 
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
-  alias Screens.Config.{Solari, State}
+  alias Screens.Config.{Solari, State, Query}
+  alias Screens.Config.Query.{Opts, Params}
   alias Screens.Config.Solari.Section
   alias Screens.Config.Solari.Section.Layout
   alias Screens.Config.Solari.Section.Layout.{Bidirectional, Upcoming}
-  alias Screens.Config.Query
-  alias Screens.Config.Query.{Opts, Params}
 
   def by_screen_id(screen_id, is_screen, datetime \\ nil) do
     {:ok,

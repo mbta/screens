@@ -1,4 +1,6 @@
 defmodule Screens.Config.Solari.Section.Layout.Upcoming do
+  @moduledoc false
+
   alias Screens.Config.Solari.Section.Layout.RouteConfig
   alias Screens.Util
 

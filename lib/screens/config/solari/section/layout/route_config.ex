@@ -1,4 +1,6 @@
 defmodule Screens.Config.Solari.Section.Layout.RouteConfig do
+  @moduledoc false
+
   alias Screens.Config.Solari.Section.Layout.RouteConfig.RouteDescriptor
 
   @type t :: {:exclude | :include, list(RouteDescriptor.t())}

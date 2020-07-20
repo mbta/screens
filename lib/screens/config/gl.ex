@@ -1,4 +1,6 @@
 defmodule Screens.Config.Gl do
+  @moduledoc false
+
   alias Screens.Config.PsaList
   alias Screens.Config.Query.Params
   alias Screens.Util

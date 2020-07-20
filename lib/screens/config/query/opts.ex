@@ -1,4 +1,6 @@
 defmodule Screens.Config.Query.Opts do
+  @moduledoc false
+
   alias Screens.Util
 
   @type t :: %__MODULE__{

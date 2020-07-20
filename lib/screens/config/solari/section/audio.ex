@@ -1,4 +1,6 @@
 defmodule Screens.Config.Solari.Section.Audio do
+  @moduledoc false
+
   alias Screens.Util
 
   @type t :: %__MODULE__{

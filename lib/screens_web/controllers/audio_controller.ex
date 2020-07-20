@@ -8,12 +8,12 @@ defmodule ScreensWeb.AudioController do
   plug(:check_config)
 
   defp check_config(conn, _) do
-    if not Screens.Config.State.ok?() do
+    if Screens.Config.State.ok?() do
+      conn
+    else
       conn
       |> send_audio({:file, @fallback_audio_path}, disposition: :attachment)
       |> halt()
-    else
-      conn
     end
   end
 

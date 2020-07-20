@@ -1,4 +1,6 @@
 defmodule Screens.Config.Solari.Section.Layout do
+  @moduledoc false
+
   alias Screens.Config.Solari.Section.Layout.{Bidirectional, Upcoming}
 
   @type t ::

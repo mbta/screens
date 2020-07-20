@@ -1,4 +1,6 @@
 defmodule Screens.Config.AudioPsa do
+  @moduledoc false
+
   @type t :: {:plaintext | :ssml, String.t()} | nil
 
   @default_psa_type :plaintext

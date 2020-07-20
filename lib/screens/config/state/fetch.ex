@@ -1,4 +1,6 @@
 defmodule Screens.Config.State.Fetch do
+  @moduledoc false
+
   alias Screens.Config
 
   @default_opts [timeout: 2000, recv_timeout: 2000]

@@ -1,4 +1,6 @@
 defmodule Screens.Config.Solari do
+  @moduledoc false
+
   alias Screens.Config.{AudioPsa, PsaList, Solari.Section}
   alias Screens.Util
 
