@@ -1,7 +1,7 @@
 defmodule Screens.SolariScreenData do
   @moduledoc false
 
-  alias Screens.Config.{Solari, State, Query}
+  alias Screens.Config.{Query, Solari, State}
   alias Screens.Config.Query.{Opts, Params}
   alias Screens.Config.Solari.Section
   alias Screens.Config.Solari.Section.Layout
