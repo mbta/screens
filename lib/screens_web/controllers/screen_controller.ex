@@ -24,8 +24,7 @@ defmodule ScreensWeb.ScreenController do
   end
 
   defp api_version(conn, _) do
-    {:ok, api_version} = Screens.Config.State.api_version()
-    assign(conn, :api_version, api_version)
+    assign(conn, :api_version, Screens.Config.State.api_version())
   end
 
   defp environment_name(conn, _) do
@@ -44,10 +43,8 @@ defmodule ScreensWeb.ScreenController do
   end
 
   defp screen_ids(target_app_id) do
-    {:ok, screens} = State.screens()
-
     screen_ids =
-      for {screen_id, %Screen{app_id: app_id}} <- screens, app_id == target_app_id do
+      for {screen_id, %Screen{app_id: app_id}} <- State.screens(), app_id == target_app_id do
         screen_id
       end
 
@@ -69,13 +66,14 @@ defmodule ScreensWeb.ScreenController do
 
     _ = Screens.LogScreenData.log_page_load(screen_id, is_screen)
 
-    with {screen_id, ""} <- Integer.parse(screen_id),
-         {:ok, %Screen{app_id: app_id}} <- State.screen(screen_id) do
-      conn
-      |> assign(:app_id, app_id)
-      |> render("index.html")
-    else
-      _ -> render_not_found(conn)
+    case State.screen(screen_id) do
+      %Screen{app_id: app_id} ->
+        conn
+        |> assign(:app_id, app_id)
+        |> render("index.html")
+
+      nil ->
+        render_not_found(conn)
     end
   end
 

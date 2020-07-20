@@ -83,7 +83,7 @@ defmodule Screens.LogScreenData do
   end
 
   defp screen_name_for_id(screen_id) do
-    {:ok, %Screen{name: name}} = State.screen(screen_id)
+    %Screen{name: name} = State.screen(screen_id)
     name
   end
 end

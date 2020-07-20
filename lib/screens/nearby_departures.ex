@@ -1,6 +1,8 @@
 defmodule Screens.NearbyDepartures do
   @moduledoc false
 
+  alias Screens.Config.Query.Params
+
   def by_stop_id(stop_id) do
     nearby_departure_stop_ids =
       :screens
@@ -8,7 +10,7 @@ defmodule Screens.NearbyDepartures do
       |> Map.get(stop_id)
 
     prediction_result =
-      Screens.Predictions.Prediction.fetch(%{stop_ids: nearby_departure_stop_ids})
+      Screens.Predictions.Prediction.fetch(%Params{stop_ids: nearby_departure_stop_ids})
 
     case prediction_result do
       {:ok, predictions} ->

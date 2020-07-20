@@ -18,8 +18,6 @@ defmodule ScreensWeb.AudioController do
   end
 
   def show(conn, %{"id" => screen_id} = params) do
-    {screen_id, ""} = Integer.parse(screen_id)
-
     disposition =
       params
       |> Map.get("disposition")

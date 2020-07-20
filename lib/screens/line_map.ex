@@ -1,6 +1,7 @@
 defmodule Screens.LineMap do
   @moduledoc false
 
+  alias Screens.Config.Query.Params
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Vehicles.Vehicle
 
@@ -58,7 +59,10 @@ defmodule Screens.LineMap do
   defp next_scheduled_departure(origin_stop_id, route_id, predictions) do
     time = DateTime.add(DateTime.utc_now(), -180)
 
-    case Screens.Schedules.Schedule.fetch(%{stop_id: origin_stop_id, route_id: route_id}) do
+    case Screens.Schedules.Schedule.fetch(%Params{
+           stop_ids: [origin_stop_id],
+           route_ids: [route_id]
+         }) do
       {:ok, [_ | _] = schedules} ->
         schedules
         |> Enum.filter(&check_after(&1, time))

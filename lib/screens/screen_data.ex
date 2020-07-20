@@ -44,12 +44,11 @@ defmodule Screens.ScreenData do
   end
 
   defp disabled?(screen_id) do
-    {:ok, disabled?} = State.disabled?(screen_id)
-    disabled?
+    State.disabled?(screen_id)
   end
 
   defp outdated?(client_version_str) do
-    {:ok, api_version} = Screens.Config.State.api_version()
+    api_version = Screens.Config.State.api_version()
 
     client_version = String.to_integer(client_version_str)
 
@@ -64,7 +63,7 @@ defmodule Screens.ScreenData do
   end
 
   defp app_id_from_screen_id(screen_id) do
-    {:ok, %Screen{app_id: app_id}} = State.screen(screen_id)
+    %Screen{app_id: app_id} = State.screen(screen_id)
     app_id
   end
 end

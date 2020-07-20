@@ -10,13 +10,12 @@ defmodule Screens.SolariScreenData do
   alias Screens.LogScreenData
 
   def by_screen_id(screen_id, is_screen, datetime \\ nil) do
-    {:ok,
-     %Solari{
-       station_name: station_name,
-       sections: sections,
-       section_headers: section_headers,
-       overhead: overhead
-     }} = State.app_params(screen_id)
+    %Solari{
+      station_name: station_name,
+      sections: sections,
+      section_headers: section_headers,
+      overhead: overhead
+    } = State.app_params(screen_id)
 
     current_time =
       case datetime do

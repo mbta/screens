@@ -1,21 +1,25 @@
 defmodule Screens.Psa do
   @moduledoc false
-  alias Screens.Config.{Screen, State}
+  alias Screens.Config.{Screen, Solari, State}
 
   @eink_refresh_seconds 30
   @solari_refresh_seconds 15
   @solari_psa_period 3
 
   def current_psa_for(screen_id) do
-    {:ok, %Screen{app_id: app_id}} = State.screen(screen_id)
+    %Screen{
+      app_id: app_id,
+      app_params: %_app{psa_list: {psa_type, psa_list}}
+    } = State.screen(screen_id)
 
-    {:ok, {psa_type, psa_list}} = State.psa_list(screen_id)
     {psa_type, choose_psa(psa_list, app_id)}
   end
 
   def current_audio_psa_for(screen_id) do
-    {:ok, audio_psa} = State.audio_psa(screen_id)
-    audio_psa
+    case State.app_params(screen_id) do
+      %Solari{audio_psa: audio_psa} -> audio_psa
+      _ -> nil
+    end
   end
 
   defp choose_psa(psa_list, :solari) do

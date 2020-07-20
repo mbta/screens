@@ -8,7 +8,7 @@ defmodule Screens.BusScreenData do
   alias Screens.Config.{Bus, State}
 
   def by_screen_id(screen_id, is_screen) do
-    {:ok, %Bus{stop_id: stop_id} = app_params} = State.app_params(screen_id)
+    %Bus{stop_id: stop_id} = app_params = State.app_params(screen_id)
 
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
@@ -38,7 +38,7 @@ defmodule Screens.BusScreenData do
 
     stop_name = extract_stop_name(nearby_connections_data, departures)
 
-    {:ok, service_level} = Screens.Config.State.bus_service()
+    service_level = State.bus_service()
 
     _ = LogScreenData.log_departures(screen_id, is_screen, departures)
 

@@ -4,10 +4,8 @@ defmodule ScreensWeb.AlertPriorityController do
   alias Screens.Config.{Bus, Gl, State}
 
   def show(conn, %{"id" => screen_id}) do
-    {:ok, app_params} = State.app_params(screen_id)
-
     data =
-      case app_params do
+      case State.app_params(screen_id) do
         %Bus{stop_id: stop_id} ->
           Screens.Alerts.Alert.priority_by_stop_id(stop_id)
 
