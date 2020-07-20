@@ -3,7 +3,7 @@ defmodule Screens.Config.State.Fetch do
 
   alias Screens.Config
 
-  @default_opts [timeout: 2000, recv_timeout: 2000]
+  @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :s3_pool]]
 
   @spec fetch_config(keyword()) :: {:ok, Config.t()} | :error
   def fetch_config(opts \\ []) do

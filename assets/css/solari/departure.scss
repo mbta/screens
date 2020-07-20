@@ -8,8 +8,25 @@
   }
 }
 
-.departure-container--group-end:not(:last-child) {
-  border-bottom: 3px solid rgba(199, 199, 199, 0.58);
+// Add a border before each group start, except for the first one
+.departure-container--group-start:not(:first-child) {
+  border-top: 3px solid rgba(199, 199, 199, 0.58);
+}
+
+// While a row is animating out, don't show a border above the next group start unless the exiting row is a group end
+// This prevents us from showing a border above the new group start until the animation is complete
+.departure-animated--arr-brd-exit-active:not(.departure-container--group-end)
+  + .departure-container--group-start {
+  border-top: none;
+}
+
+// Add a border above the later departure section, but not above departure rows inside it
+.later-departure {
+  border-top: 3px solid rgba(199, 199, 199, 0.58);
+
+  .departure-container {
+    border-top: none;
+  }
 }
 
 .departure-container--group-start:not(.departure-container--group-end) {
@@ -37,7 +54,8 @@
   }
 
   // Don't add extra padding above the first row in a group until the previous row is done animating.
-  .departure-animated--arr-brd-exit-active + .departure-container--group-start {
+  .departure-animated--arr-brd-exit-active:not(.departure-container--group-end)
+    + .departure-container--group-start {
     .departure--with-via {
       padding-top: 7px;
     }
