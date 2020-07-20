@@ -1,6 +1,8 @@
 defmodule Screens.Audio do
   @moduledoc false
 
+  require Logger
+
   alias Screens.Psa
   alias Screens.Util
 
@@ -15,15 +17,23 @@ defmodule Screens.Audio do
 
   @type departure_group :: {departure_group_key(), [map()]}
 
-  def synthesize(ssml_string) do
+  def synthesize(ssml_string, is_screen) do
     result =
       ssml_string
       |> ExAws.Polly.synthesize_speech(lexicon_names: @lexicon_names, text_type: "ssml")
       |> ExAws.request()
 
     case result do
-      {:ok, %{body: audio_data}} -> {:ok, audio_data}
-      _ -> :error
+      {:ok, %{body: audio_data}} ->
+        {:ok, audio_data}
+
+      {:error, reason} ->
+        _ =
+          if is_screen do
+            Logger.error("synthesize_ssml_failed #{reason}")
+          end
+
+        :error
     end
   end
 

@@ -95,8 +95,29 @@
   }
 }
 
+.later-departure__route-pill-caret {
+  content: "";
+  display: inline-block;
+  border-style: solid;
+  border-width: 14px;
+  width: 0;
+  height: 0;
+  position: absolute;
+  top: 44px;
+  right: 0;
+  transition: transform 0.2s ease;
+
+  &--before {
+    border-color: transparent transparent #ababab;
+  }
+
+  &--after {
+    margin-top: 7px;
+    border-color: transparent transparent #f5f4f1;
+  }
+}
+
 .later-departure__route-pill {
-  position: relative;
   display: inline-block;
   text-align: center;
   border-radius: 46px;
@@ -118,27 +139,6 @@
         color: #000000;
       }
     }
-  }
-
-  &--selected:before,
-  &--selected:after {
-    content: "";
-    border-style: solid;
-    border-width: 14px;
-    width: 0;
-    height: 0;
-    position: absolute;
-    top: 44px;
-    left: 30px;
-  }
-
-  &--selected:before {
-    border-color: transparent transparent #ababab;
-  }
-
-  &--selected:after {
-    margin-top: 7px;
-    border-color: transparent transparent #f5f4f1;
   }
 
   &--unselected {

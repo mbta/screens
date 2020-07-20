@@ -29,11 +29,11 @@ const routeToPill = (route: string, routeId: string): PillType => {
     return { routeName: "OL", routePillColor: "orange" };
   }
 
-  if (routeId.startsWith("CR")) {
+  if (routeId && routeId.startsWith("CR")) {
     return { routeName: "CR", routePillColor: "purple" };
   }
 
-  if (route.startsWith("SL")) {
+  if (route && route.startsWith("SL")) {
     return { routeName: route, routePillColor: "silver" };
   }
 
@@ -59,6 +59,10 @@ const Pill = ({ routeName, routePillColor }: PillType): JSX.Element => {
       {routeName && <BaseRoutePill route={routeName} />}
     </div>
   );
+};
+
+const PlaceholderRoutePill = (): JSX.Element => {
+  return <div className="departure-route"></div>;
 };
 
 const DepartureRoutePill = ({
@@ -130,4 +134,9 @@ const PagedDepartureRoutePill = ({ route, routeId, selected }): JSX.Element => {
   );
 };
 
-export { DepartureRoutePill, SectionRoutePill, PagedDepartureRoutePill };
+export {
+  DepartureRoutePill,
+  PlaceholderRoutePill,
+  SectionRoutePill,
+  PagedDepartureRoutePill,
+};

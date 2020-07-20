@@ -8,9 +8,13 @@
   }
 }
 
-.departure-container {
-  &:not(:last-child) {
-    border-bottom: 3px solid rgba(199, 199, 199, 0.58);
+.departure-container--group-end:not(:last-child) {
+  border-bottom: 3px solid rgba(199, 199, 199, 0.58);
+}
+
+.departure-container--group-start:not(.departure-container--group-end) {
+  .departure__alerts-container {
+    position: absolute;
   }
 }
 
@@ -18,18 +22,39 @@
   .departure {
     margin-left: 42px;
     margin-right: 42px;
-    padding-bottom: 10px;
-    padding-top: 10px;
+    padding-bottom: 7px;
+    padding-top: 7px;
   }
 
-  & .departure--with-via {
-    padding-top: 13.5px;
-    padding-bottom: 13.5px;
+  .departure-container--group-start {
+    .departure--with-via {
+      padding-top: 13.5px;
+    }
+
+    .departure--no-via {
+      padding-top: 24px;
+    }
   }
 
-  & .departure--no-via {
-    padding-top: 24px;
-    padding-bottom: 24px;
+  // Don't add extra padding above the first row in a group until the previous row is done animating.
+  .departure-animated--arr-brd-exit-active + .departure-container--group-start {
+    .departure--with-via {
+      padding-top: 7px;
+    }
+
+    .departure--no-via {
+      padding-top: 7px;
+    }
+  }
+
+  .departure-container--group-end {
+    .departure--with-via {
+      padding-bottom: 13.5px;
+    }
+
+    .departure--no-via {
+      padding-bottom: 24px;
+    }
   }
 
   .departure__alerts-container {
@@ -39,18 +64,29 @@
   }
 }
 
-.departure-group--multiple-rows {
-  .departure__alerts-container {
-    position: absolute;
-  }
-}
-
 .screen-container--size-large {
   .departure {
     margin-left: 32px;
     margin-right: 32px;
-    padding-bottom: 32px;
-    padding-top: 32px;
+    padding-bottom: 0;
+    padding-top: 0;
+  }
+
+  .departure-container--group-start {
+    .departure {
+      padding-top: 32px;
+    }
+  }
+
+  // Don't add extra padding above the first row in a group until the previous row is done animating.
+  .departure-animated--arr-brd-exit-active + .departure-container--group-start {
+    padding-top: 0;
+  }
+
+  .departure-container--group-end {
+    .departure {
+      padding-bottom: 32px;
+    }
   }
 
   .departure__alerts-container {
@@ -60,7 +96,37 @@
   }
 }
 
+// Here, we animate out the departure time, unless the row which is animating out is the last of
+// its departure group, in which case we animate out the whole row.
 .departure-animated {
+  &--normal {
+    // hide new departures until the previous departure has animated out
+    &-enter {
+      display: none;
+    }
+
+    &-enter-active {
+      display: none;
+    }
+  }
+
+  &--arr-brd {
+    &-exit {
+      .departure-time {
+        transform: translateX(0%);
+      }
+    }
+
+    &-exit-active {
+      .departure-time {
+        transform: translateX(100%);
+        transition: transform 200ms cubic-bezier(0.32, 0, 0.67, 0);
+      }
+    }
+  }
+}
+
+.departure-container--group-end.departure-animated {
   &--normal {
     // hide new departures until the previous departure has animated out
     &-enter {
@@ -81,6 +147,71 @@
       transform: translateX(100%);
       transition: transform 200ms cubic-bezier(0.32, 0, 0.67, 0);
     }
+  }
+}
+
+// The following styles hide route pills, destinations and alerts when a row is animating out.
+// They achieve this by setting opacity to 0 in all rows following an exiting row, but then
+// overriding this by setting opacity to 1 in all rows including and following the next group start.
+
+// The next three styles handle the case where the exiting row isn't grouped with any other departures.
+// In this case, the next group start is the first row in the next group, and we want to show it.
+.departure-animated--arr-brd-exit-active.departure-container--group-start.departure-container--group-end
+  ~ .departure-container {
+  .departure-route,
+  .departure-destination,
+  .departure__alerts-container {
+    opacity: 0;
+  }
+}
+
+.departure-animated--arr-brd-exit-active.departure-container--group-start.departure-container--group-end
+  ~ .departure-container--group-start {
+  .departure-route,
+  .departure-destination,
+  .departure__alerts-container {
+    opacity: 1;
+  }
+}
+
+.departure-animated--arr-brd-exit-active.departure-container--group-start.departure-container--group-end
+  ~ .departure-container--group-start
+  ~ .departure-container {
+  .departure-route,
+  .departure-destination,
+  .departure__alerts-container {
+    opacity: 1;
+  }
+}
+
+// The next three styles handle the case where the exiting row is grouped with other departures.
+// In this case, the next group start is the new first row in the current group, and we want to hide it.
+.departure-animated--arr-brd-exit-active ~ .departure-container {
+  .departure-route,
+  .departure-destination,
+  .departure__alerts-container {
+    opacity: 0;
+  }
+}
+
+.departure-animated--arr-brd-exit-active
+  ~ .departure-container--group-start
+  ~ .departure-container--group-start {
+  .departure-route,
+  .departure-destination,
+  .departure__alerts-container {
+    opacity: 1;
+  }
+}
+
+.departure-animated--arr-brd-exit-active
+  ~ .departure-container--group-start
+  ~ .departure-container--group-start
+  ~ .departure-container {
+  .departure-route,
+  .departure-destination,
+  .departure__alerts-container {
+    opacity: 1;
   }
 }
 
