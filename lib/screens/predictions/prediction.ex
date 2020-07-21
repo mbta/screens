@@ -1,7 +1,7 @@
 defmodule Screens.Predictions.Prediction do
   @moduledoc false
 
-  alias Screens.Config.Query.Params
+  alias Screens.Departures.Departure
 
   defstruct id: nil,
             trip: nil,
@@ -25,9 +25,9 @@ defmodule Screens.Predictions.Prediction do
           stop_headsign: String.t() | nil
         }
 
-  @spec fetch(Params.t()) :: {:ok, list(t())} | :error
-  def fetch(%Params{} = query_params) do
-    Screens.Departures.Departure.do_query_and_parse(
+  @spec fetch(Departure.query_params()) :: {:ok, list(t())} | :error
+  def fetch(%{} = query_params) do
+    Departure.do_query_and_parse(
       query_params,
       "predictions",
       Screens.Predictions.Parser,

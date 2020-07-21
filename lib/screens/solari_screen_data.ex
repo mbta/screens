@@ -100,9 +100,11 @@ defmodule Screens.SolariScreenData do
     %{is_enabled: false}
   end
 
-  defp query_data(%Params{} = query_params, %Opts{} = query_opts, datetime) do
+  defp query_data(%Params{} = params, %Opts{include_schedules: include_schedules}, datetime) do
+    query_params = Map.from_struct(params)
+
     if is_nil(datetime) do
-      Departure.fetch(query_params, query_opts)
+      Departure.fetch(query_params, include_schedules)
     else
       Departure.fetch_schedules_by_datetime(query_params, datetime)
     end

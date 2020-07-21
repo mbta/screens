@@ -4,7 +4,7 @@ defmodule Screens.GLScreenData do
   alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
-  alias Screens.Config.{Gl, Query.Params, State}
+  alias Screens.Config.{Gl, State}
 
   def by_screen_id(screen_id, is_screen) do
     %Gl{
@@ -24,7 +24,7 @@ defmodule Screens.GLScreenData do
     {inline_alerts, global_alert} = Alert.by_route_id(route_id, stop_id)
 
     predictions =
-      Screens.Predictions.Prediction.fetch(%Params{
+      Screens.Predictions.Prediction.fetch(%{
         direction_id: direction_id,
         route_ids: [route_id],
         stop_ids: [stop_id]
