@@ -6,5 +6,8 @@ config :screens, ScreensWeb.Endpoint,
   http: [port: 4002],
   server: false
 
+config :screens,
+  config_fetcher: Screens.Config.State.LocalFetch
+
 # Print only warnings and errors during test
 config :logger, level: :warn

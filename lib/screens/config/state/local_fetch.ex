@@ -3,12 +3,11 @@ defmodule Screens.Config.State.LocalFetch do
 
   alias Screens.Config
 
-  @local_config_file "local.json"
+  @local_config_path Path.join(:code.priv_dir(:screens), "local.json")
 
   @spec fetch_config :: {:ok, Config.t()} | :error
-  def fetch_config do
-    with {:ok, file_contents} <-
-           File.read(Path.join(:code.priv_dir(:screens), @local_config_file)),
+  def fetch_config(path \\ @local_config_path) do
+    with {:ok, file_contents} <- File.read(path),
          {:ok, parsed} <- Jason.decode(file_contents) do
       {:ok, Config.from_json(parsed)}
     else
