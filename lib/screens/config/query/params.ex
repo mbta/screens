@@ -9,11 +9,9 @@ defmodule Screens.Config.Query.Params do
           direction_id: 0 | 1 | :both
         }
 
-  @default_direction_id :both
-
   defstruct stop_ids: [],
             route_ids: [],
-            direction_id: @default_direction_id
+            direction_id: :both
 
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do

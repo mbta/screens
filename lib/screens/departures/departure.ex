@@ -259,6 +259,7 @@ defmodule Screens.Departures.Departure do
       all_params
       |> Enum.reduce(fn params, acc -> Map.merge(acc, params) end)
       |> Enum.map(&format_query_param/1)
+      |> Enum.reject(fn {_k, v} -> is_nil(v) end)
       |> Enum.into(%{})
 
     case Screens.V3Api.get_json(api_endpoint, api_query_params) do
@@ -267,8 +268,16 @@ defmodule Screens.Departures.Departure do
     end
   end
 
+  defp format_query_param({:stop_ids, []}) do
+    {"filter[stop]", nil}
+  end
+
   defp format_query_param({:stop_ids, stop_ids}) do
     {"filter[stop]", Enum.join(stop_ids, ",")}
+  end
+
+  defp format_query_param({:route_ids, []}) do
+    {"filter[route]", nil}
   end
 
   defp format_query_param({:route_ids, route_ids}) do
@@ -276,7 +285,7 @@ defmodule Screens.Departures.Departure do
   end
 
   defp format_query_param({:direction_id, :both}) do
-    {"filter[direction_id]", ""}
+    {"filter[direction_id]", nil}
   end
 
   defp format_query_param({:direction_id, direction_id}) do

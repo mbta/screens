@@ -14,7 +14,7 @@ defmodule ScreensWeb.ScreenController do
   plug(:body_class)
 
   defp check_config(conn, _) do
-    if Screens.Config.State.ok?() do
+    if State.ok?() do
       conn
     else
       conn
@@ -24,7 +24,7 @@ defmodule ScreensWeb.ScreenController do
   end
 
   defp api_version(conn, _) do
-    assign(conn, :api_version, Screens.Config.State.api_version())
+    assign(conn, :api_version, State.api_version())
   end
 
   defp environment_name(conn, _) do

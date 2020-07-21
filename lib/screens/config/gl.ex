@@ -2,7 +2,6 @@ defmodule Screens.Config.Gl do
   @moduledoc false
 
   alias Screens.Config.PsaList
-  alias Screens.Config.Query.Params
   alias Screens.Util
 
   @type t :: %__MODULE__{
@@ -50,17 +49,4 @@ defmodule Screens.Config.Gl do
   end
 
   defp value_to_json(_, value), do: value
-
-  @spec to_query_params(t()) :: Params.t()
-  def to_query_params(%__MODULE__{
-        direction_id: direction_id,
-        route_id: route_id,
-        stop_id: stop_id
-      }) do
-    %Params{
-      direction_id: direction_id,
-      route_ids: [route_id],
-      stop_ids: [stop_id]
-    }
-  end
 end

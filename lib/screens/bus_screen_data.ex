@@ -5,10 +5,10 @@ defmodule Screens.BusScreenData do
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
   alias Screens.NearbyConnections
-  alias Screens.Config.{Bus, State}
+  alias Screens.Config.{Bus, Query.Params, State}
 
   def by_screen_id(screen_id, is_screen) do
-    %Bus{stop_id: stop_id} = app_params = State.app_params(screen_id)
+    %Bus{stop_id: stop_id} = State.app_params(screen_id)
 
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
@@ -20,7 +20,7 @@ defmodule Screens.BusScreenData do
 
     # If we are unable to fetch departures, we want to show an error message on the screen.
     departures =
-      case Departure.fetch(Bus.to_query_params(app_params)) do
+      case Departure.fetch(%Params{stop_ids: [stop_id]}) do
         {:ok, result} ->
           {:ok, Departure.associate_alerts_with_departures(result, inline_alerts)}
 

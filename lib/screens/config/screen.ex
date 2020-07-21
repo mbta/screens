@@ -5,7 +5,7 @@ defmodule Screens.Config.Screen do
   alias Screens.Util
 
   @type t :: %__MODULE__{
-          vendor: :gds | :mercury | :solari,
+          vendor: :gds | :mercury | :solari | :c3ms,
           device_id: String.t(),
           name: String.t(),
           app_id: :bus_eink | :gl_eink_single | :gl_eink_double | :solari,
@@ -59,7 +59,7 @@ defmodule Screens.Config.Screen do
     |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v, app_id)} end)
   end
 
-  for vendor <- ~w[gds mercury solari]a do
+  for vendor <- ~w[gds mercury solari c3ms]a do
     vendor_string = Atom.to_string(vendor)
 
     defp value_from_json("vendor", unquote(vendor_string), _app_id) do

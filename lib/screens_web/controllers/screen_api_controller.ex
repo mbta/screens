@@ -1,11 +1,12 @@
 defmodule ScreensWeb.ScreenApiController do
   use ScreensWeb, :controller
   require Logger
+  alias Screens.Config.State
 
   plug(:check_config)
 
   defp check_config(conn, _) do
-    if Screens.Config.State.ok?() do
+    if State.ok?() do
       conn
     else
       conn

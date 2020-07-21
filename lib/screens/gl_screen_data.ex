@@ -4,15 +4,16 @@ defmodule Screens.GLScreenData do
   alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
-  alias Screens.Config.{Gl, State}
+  alias Screens.Config.{Gl, Query.Params, State}
 
   def by_screen_id(screen_id, is_screen) do
     %Gl{
       stop_id: stop_id,
       route_id: route_id,
       direction_id: direction_id,
+      headway_mode: headway_mode?,
       platform_id: platform_id
-    } = app_params = State.app_params(screen_id)
+    } = State.app_params(screen_id)
 
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
@@ -23,9 +24,11 @@ defmodule Screens.GLScreenData do
     {inline_alerts, global_alert} = Alert.by_route_id(route_id, stop_id)
 
     predictions =
-      app_params
-      |> Gl.to_query_params()
-      |> Screens.Predictions.Prediction.fetch()
+      Screens.Predictions.Prediction.fetch(%Params{
+        direction_id: direction_id,
+        route_ids: [route_id],
+        stop_ids: [stop_id]
+      })
 
     {line_map_data, predictions} =
       case predictions do
@@ -57,8 +60,6 @@ defmodule Screens.GLScreenData do
     _ = LogScreenData.log_departures(screen_id, is_screen, departures)
 
     {psa_type, psa_name} = Screens.Psa.current_psa_for(screen_id)
-
-    headway_mode? = State.headway_mode?(screen_id)
 
     case departures do
       {:ok, departures} ->

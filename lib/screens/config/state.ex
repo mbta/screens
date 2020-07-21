@@ -4,6 +4,7 @@ defmodule Screens.Config.State do
   require Logger
 
   alias Screens.Config
+  alias Screens.Config.Screen
 
   @typep t :: {Config.t(), retry_count :: non_neg_integer()} | :error
 
@@ -36,14 +37,6 @@ defmodule Screens.Config.State do
 
   def disabled?(pid \\ __MODULE__, screen_id) when is_binary(screen_id) do
     GenServer.call(pid, {:disabled?, screen_id})
-  end
-
-  def headway_mode?(pid \\ __MODULE__, screen_id) when is_binary(screen_id) do
-    GenServer.call(pid, {:headway_mode?, screen_id})
-  end
-
-  def audio_psa(pid \\ __MODULE__, screen_id) when is_binary(screen_id) do
-    GenServer.call(pid, {:audio_psa, screen_id})
   end
 
   def screen(pid \\ __MODULE__, screen_id) when is_binary(screen_id) do
@@ -99,28 +92,19 @@ defmodule Screens.Config.State do
   end
 
   def handle_call({:disabled?, screen_id}, _from, {config, _} = state) do
-    disabled? = get_in(config.screens, [screen_id, Access.key(:disabled)]) || false
+    screen = Map.get(config.screens, screen_id)
+
+    disabled? =
+      case screen do
+        %Screen{disabled: disabled} -> disabled
+        nil -> false
+      end
 
     {:reply, disabled?, state}
   end
 
-  def handle_call({:headway_mode?, screen_id}, _from, {config, _} = state) do
-    headway_mode? =
-      get_in(config.screens, [screen_id, Access.key(:app_params), Access.key(:headway_mode)]) ||
-        false
-
-    {:reply, headway_mode?, state}
-  end
-
-  def handle_call({:audio_psa, screen_id}, _from, {config, _} = state) do
-    audio_psa =
-      get_in(config.screens, [screen_id, Access.key(:app_params), Access.key(:audio_psa)])
-
-    {:reply, audio_psa, state}
-  end
-
   def handle_call({:screen, screen_id}, _from, {config, _} = state) do
-    screen = get_in(config.screens, [screen_id])
+    screen = Map.get(config.screens, screen_id)
 
     {:reply, screen, state}
   end
@@ -130,7 +114,13 @@ defmodule Screens.Config.State do
   end
 
   def handle_call({:app_params, screen_id}, _from, {config, _} = state) do
-    app_params = get_in(config.screens, [screen_id, Access.key(:app_params)])
+    screen = Map.get(config.screens, screen_id)
+
+    app_params =
+      case screen do
+        %Screen{app_params: app_params} -> app_params
+        nil -> nil
+      end
 
     {:reply, app_params, state}
   end
@@ -166,7 +156,7 @@ defmodule Screens.Config.State do
   end
 
   defp error_state({config, retry_count}) do
-    _ = Logger.error("config_state_fetch_error #{retry_count}")
+    _ = Logger.error("config_state_fetch_error retry_count=#{retry_count}")
     {config, retry_count + 1}
   end
 end

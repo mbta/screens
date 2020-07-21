@@ -48,7 +48,7 @@ defmodule Screens.ScreenData do
   end
 
   defp outdated?(client_version_str) do
-    api_version = Screens.Config.State.api_version()
+    api_version = State.api_version()
 
     client_version = String.to_integer(client_version_str)
 
