@@ -48,7 +48,7 @@ defmodule ScreensWeb.ScreenController do
         screen_id
       end
 
-    Enum.sort(screen_ids)
+    Enum.sort_by(screen_ids, &String.to_integer/1)
   end
 
   def index(conn, %{"id" => app_id})
