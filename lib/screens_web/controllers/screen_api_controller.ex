@@ -1,6 +1,19 @@
 defmodule ScreensWeb.ScreenApiController do
   use ScreensWeb, :controller
   require Logger
+  alias Screens.Config.State
+
+  plug(:check_config)
+
+  defp check_config(conn, _) do
+    if State.ok?() do
+      conn
+    else
+      conn
+      |> put_status(:not_found)
+      |> halt()
+    end
+  end
 
   def show(conn, %{"id" => screen_id, "version" => _version, "datetime" => datetime}) do
     data = Screens.ScreenData.by_screen_id_with_datetime(screen_id, datetime)

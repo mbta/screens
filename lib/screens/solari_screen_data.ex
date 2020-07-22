@@ -1,19 +1,21 @@
 defmodule Screens.SolariScreenData do
   @moduledoc false
 
+  alias Screens.Config.{Query, Solari, State}
+  alias Screens.Config.Query.{Opts, Params}
+  alias Screens.Config.Solari.Section
+  alias Screens.Config.Solari.Section.Layout
+  alias Screens.Config.Solari.Section.Layout.{Bidirectional, Upcoming}
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
 
   def by_screen_id(screen_id, is_screen, datetime \\ nil) do
-    %{
+    %Solari{
       station_name: station_name,
       sections: sections,
       section_headers: section_headers,
       overhead: overhead
-    } =
-      :screens
-      |> Application.get_env(:screen_data)
-      |> Map.get(screen_id)
+    } = State.app_params(screen_id)
 
     current_time =
       case datetime do
@@ -56,10 +58,10 @@ defmodule Screens.SolariScreenData do
   end
 
   defp fetch_section_data(
-         %{
+         %Section{
            name: section_name,
            arrow: arrow,
-           query: %{params: query_params, opts: query_opts},
+           query: %Query{params: query_params, opts: query_opts},
            layout: layout_params,
            audio: audio_params,
            pill: pill
@@ -68,14 +70,16 @@ defmodule Screens.SolariScreenData do
        ) do
     case query_data(query_params, query_opts, datetime) do
       {:ok, data} ->
+        departures = do_layout(data, layout_params)
+
         {:ok,
          %{
            name: section_name,
            arrow: arrow,
            pill: pill,
-           audio: audio_params,
-           departures: do_layout(data, layout_params),
-           paging: do_paging(layout_params)
+           audio: Map.from_struct(audio_params),
+           departures: departures,
+           paging: do_paging(departures, layout_params)
          }}
 
       :error ->
@@ -83,32 +87,41 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp do_paging({:upcoming, %{paged: true, visible_rows: visible_rows}}) do
+  @spec do_paging(list(map()), Layout.t()) :: map()
+  defp do_paging(departures, %Upcoming{paged: true, visible_rows: :infinity}) do
+    %{is_enabled: true, visible_rows: length(departures)}
+  end
+
+  defp do_paging(_departures, %Upcoming{paged: true, visible_rows: visible_rows}) do
     %{is_enabled: true, visible_rows: visible_rows}
   end
 
-  defp do_paging(_) do
+  defp do_paging(_, _) do
     %{is_enabled: false}
   end
 
-  def query_data(query_params, query_opts, datetime) do
+  defp query_data(%Params{} = params, %Opts{include_schedules: include_schedules}, datetime) do
+    query_params = Map.from_struct(params)
+
     if is_nil(datetime) do
-      Departure.fetch(query_params, query_opts)
+      Departure.fetch(query_params, include_schedules)
     else
       Departure.fetch_schedules_by_datetime(query_params, datetime)
     end
   end
 
-  defp do_layout(query_data, {:upcoming, %{num_rows: num_rows} = layout_opts}) do
+  @spec do_layout(list(map()), Upcoming.t()) :: list(map())
+  defp do_layout(query_data, %Upcoming{num_rows: num_rows} = layout_opts) do
     query_data
     |> filter_by_routes(layout_opts)
     |> filter_by_minutes(layout_opts)
     |> Enum.sort_by(& &1.time)
-    |> Enum.take(num_rows)
+    |> take_rows(num_rows)
     |> Enum.map(&Map.from_struct/1)
   end
 
-  defp do_layout(query_data, {:bidirectional, layout_opts}) do
+  @spec do_layout(list(map()), Bidirectional.t()) :: list(map())
+  defp do_layout(query_data, %Bidirectional{} = layout_opts) do
     query_data
     |> filter_by_routes(layout_opts)
     |> filter_by_minutes(layout_opts)
@@ -120,9 +133,8 @@ defmodule Screens.SolariScreenData do
     |> Enum.map(&Map.from_struct/1)
   end
 
-  defp do_layout(query_data, :bidirectional) do
-    do_layout(query_data, {:bidirectional, %{}})
-  end
+  @spec filter_by_minutes(list(map()), Layout.t()) :: list(map())
+  defp filter_by_minutes(query_data, %{max_minutes: :infinity}), do: query_data
 
   defp filter_by_minutes(query_data, %{max_minutes: max_minutes}) do
     max_departure_time = DateTime.add(DateTime.utc_now(), 60 * max_minutes)
@@ -135,8 +147,9 @@ defmodule Screens.SolariScreenData do
 
   defp filter_by_minutes(query_data, _), do: query_data
 
+  @spec filter_by_routes(list(map()), Layout.t()) :: list(map())
   defp filter_by_routes(query_data, %{routes: {action, routes}}) do
-    route_matchers = routes |> Enum.flat_map(&route_direction_tuple/1) |> MapSet.new()
+    route_matchers = MapSet.new(routes)
 
     filter_fn =
       case action do
@@ -151,6 +164,9 @@ defmodule Screens.SolariScreenData do
 
   defp filter_by_routes(query_data, _), do: query_data
 
-  defp route_direction_tuple({_, _} = route_id_and_direction), do: [route_id_and_direction]
-  defp route_direction_tuple(route_id), do: [{route_id, 0}, {route_id, 1}]
+  defp take_rows(query_data, :infinity), do: query_data
+
+  defp take_rows(query_data, num_rows) do
+    Enum.take(query_data, num_rows)
+  end
 end

@@ -1,4 +1,4 @@
-defmodule Screens.Override.Supervisor do
+defmodule Screens.Config.State.Supervisor do
   @moduledoc false
 
   use Supervisor
@@ -9,7 +9,7 @@ defmodule Screens.Override.Supervisor do
 
   def init(:ok) do
     children = [
-      worker(Screens.Override.State, [[name: Screens.Override.State]])
+      worker(Screens.Config.State, [[name: Screens.Config.State]])
     ]
 
     supervise(children, strategy: :one_for_one)

@@ -25,7 +25,7 @@ config :screens,
   api_v3_key: System.get_env("API_V3_KEY"),
   gds_dms_password: System.get_env("GDS_DMS_PASSWORD"),
   mercury_api_key: System.get_env("MERCURY_API_KEY"),
-  override_fetcher: Screens.Override.LocalFetch
+  config_fetcher: Screens.Config.State.LocalFetch
 
 # ## SSL Support
 #

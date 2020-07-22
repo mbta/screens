@@ -5,12 +5,10 @@ defmodule Screens.BusScreenData do
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
   alias Screens.NearbyConnections
+  alias Screens.Config.{Bus, State}
 
   def by_screen_id(screen_id, is_screen) do
-    %{stop_id: stop_id} =
-      :screens
-      |> Application.get_env(:screen_data)
-      |> Map.get(screen_id)
+    %Bus{stop_id: stop_id} = State.app_params(screen_id)
 
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
@@ -22,7 +20,7 @@ defmodule Screens.BusScreenData do
 
     # If we are unable to fetch departures, we want to show an error message on the screen.
     departures =
-      case Departure.fetch(%{stop_id: stop_id}) do
+      case Departure.fetch(%{stop_ids: [stop_id]}) do
         {:ok, result} ->
           {:ok, Departure.associate_alerts_with_departures(result, inline_alerts)}
 
@@ -40,7 +38,7 @@ defmodule Screens.BusScreenData do
 
     stop_name = extract_stop_name(nearby_connections_data, departures)
 
-    service_level = Screens.Override.State.bus_service()
+    service_level = State.bus_service()
 
     _ = LogScreenData.log_departures(screen_id, is_screen, departures)
 

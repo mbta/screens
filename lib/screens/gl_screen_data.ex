@@ -4,12 +4,16 @@ defmodule Screens.GLScreenData do
   alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
+  alias Screens.Config.{Gl, State}
 
   def by_screen_id(screen_id, is_screen) do
-    %{stop_id: stop_id, route_id: route_id, direction_id: direction_id, platform_id: platform_id} =
-      :screens
-      |> Application.get_env(:screen_data)
-      |> Map.get(screen_id)
+    %Gl{
+      stop_id: stop_id,
+      route_id: route_id,
+      direction_id: direction_id,
+      headway_mode: headway_mode?,
+      platform_id: platform_id
+    } = State.app_params(screen_id)
 
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
@@ -21,9 +25,9 @@ defmodule Screens.GLScreenData do
 
     predictions =
       Screens.Predictions.Prediction.fetch(%{
-        stop_id: stop_id,
-        route_id: route_id,
-        direction_id: direction_id
+        direction_id: direction_id,
+        route_ids: [route_id],
+        stop_ids: [stop_id]
       })
 
     {line_map_data, predictions} =
@@ -49,7 +53,7 @@ defmodule Screens.GLScreenData do
     {:ok, %{direction_destinations: destinations}} = Screens.Routes.Route.by_id(route_id)
     destination = Enum.at(destinations, direction_id)
 
-    service_level = Screens.Override.State.green_line_service()
+    service_level = State.green_line_service()
 
     headway_data = Screens.Headways.by_route_id(route_id, stop_id, direction_id, service_level)
 
@@ -73,7 +77,7 @@ defmodule Screens.GLScreenData do
           line_map: line_map_data,
           headway: headway_data,
           service_level: service_level,
-          is_headway_mode: Screens.Override.State.headway_mode?(String.to_integer(screen_id)),
+          is_headway_mode: headway_mode?,
           psa_type: psa_type,
           psa_name: psa_name
         }

@@ -1,5 +1,6 @@
 defmodule Screens.Schedules.Schedule do
   @moduledoc false
+  alias Screens.Departures.Departure
 
   defstruct id: nil,
             trip: nil,
@@ -20,11 +21,15 @@ defmodule Screens.Schedules.Schedule do
           stop_headsign: String.t() | nil
         }
 
-  def fetch(query_params) do
-    Screens.Departures.Departure.do_query_and_parse(
+  @spec fetch(Departure.query_params()) :: {:ok, list(t())} | :error
+  def fetch(%{} = query_params, date \\ nil) do
+    extra_params = if is_nil(date), do: %{}, else: %{date: date}
+
+    Departure.do_query_and_parse(
       query_params,
       "schedules",
-      Screens.Schedules.Parser
+      Screens.Schedules.Parser,
+      extra_params
     )
   end
 end

@@ -36,23 +36,32 @@ defmodule Screens.Departures.Departure do
           inline_badges: list(map())
         }
 
-  def fetch(query_params, opts \\ %{}) do
-    case Map.get(opts, :include_schedules, false) do
-      true -> fetch_predictions_and_schedules(query_params)
-      false -> fetch_predictions_only(query_params)
+  @type query_params :: %{
+          optional(:stop_ids) => list(String.t()),
+          optional(:route_ids) => list(String.t()),
+          optional(:direction_id) => 0 | 1 | :both,
+          optional(:sort) => String.t(),
+          optional(:include) => list(String.t()),
+          optional(:date) => String.t()
+        }
+
+  @spec fetch(query_params(), boolean()) :: {:ok, list()} | :error
+  def fetch(%{} = query_params, include_schedules \\ false) do
+    if include_schedules do
+      fetch_predictions_and_schedules(query_params)
+    else
+      fetch_predictions_only(query_params)
     end
   end
 
-  def fetch_schedules_by_datetime(query_params, dt) do
+  @spec fetch_schedules_by_datetime(query_params(), DateTime.t()) :: {:ok, t()} | :error
+  def fetch_schedules_by_datetime(%{} = query_params, dt) do
     # Find the current service date by shifting the given datetime to Pacific Time.
     # This splits the service day at 3am, as midnight at Pacific Time is always 3am here.
     {:ok, pacific_time} = DateTime.shift_zone(dt, "America/Los_Angeles")
     service_date = DateTime.to_date(pacific_time)
 
-    schedules =
-      query_params
-      |> Map.put(:date, Date.to_string(service_date))
-      |> Schedule.fetch()
+    schedules = Schedule.fetch(query_params, Date.to_string(service_date))
 
     case schedules do
       {:ok, data} ->
@@ -72,7 +81,7 @@ defmodule Screens.Departures.Departure do
     end
   end
 
-  defp fetch_predictions_only(query_params) do
+  defp fetch_predictions_only(%{} = query_params) do
     query_params
     |> Prediction.fetch()
     |> from_predictions()
@@ -243,17 +252,23 @@ defmodule Screens.Departures.Departure do
   defp crowding_level_from_occupancy_status(:full), do: 3
   defp crowding_level_from_occupancy_status(nil), do: nil
 
-  defp fetch_predictions_and_schedules(query_params) do
+  defp fetch_predictions_and_schedules(%{} = query_params) do
     predictions = Prediction.fetch(query_params)
     schedules = Schedule.fetch(query_params)
     merge_predictions_and_schedules(predictions, schedules)
   end
 
-  def do_query_and_parse(query_params, api_endpoint, parser) do
-    default_params = %{"sort" => "departure_time", "include" => "route,stop,trip"}
+  def do_query_and_parse(%{} = query_params, api_endpoint, parser, extra_params \\ %{}) do
+    default_params = %{sort: "departure_time", include: ~w[route stop trip]}
+
+    all_params = [default_params, query_params, extra_params]
 
     api_query_params =
-      query_params |> Enum.map(&format_query_param/1) |> Enum.into(default_params)
+      all_params
+      |> Enum.reduce(fn params, acc -> Map.merge(acc, params) end)
+      |> Enum.map(&format_query_param/1)
+      |> Enum.reject(&is_nil/1)
+      |> Enum.into(%{})
 
     case Screens.V3Api.get_json(api_endpoint, api_query_params) do
       {:ok, result} -> {:ok, parser.parse_result(result)}
@@ -261,24 +276,32 @@ defmodule Screens.Departures.Departure do
     end
   end
 
-  defp format_query_param({:stop_id, stop_id}) do
-    {"filter[stop]", stop_id}
+  defp format_query_param({:stop_ids, []}) do
+    nil
   end
 
   defp format_query_param({:stop_ids, stop_ids}) do
     {"filter[stop]", Enum.join(stop_ids, ",")}
   end
 
-  defp format_query_param({:route_id, route_id}) do
-    {"filter[route]", route_id}
+  defp format_query_param({:route_ids, []}) do
+    nil
   end
 
   defp format_query_param({:route_ids, route_ids}) do
     {"filter[route]", Enum.join(route_ids, ",")}
   end
 
+  defp format_query_param({:direction_id, :both}) do
+    nil
+  end
+
   defp format_query_param({:direction_id, direction_id}) do
     {"filter[direction_id]", direction_id}
+  end
+
+  defp format_query_param({:sort, sort}) do
+    {"sort", sort}
   end
 
   defp format_query_param({:include, relationships}) do

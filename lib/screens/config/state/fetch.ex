@@ -1,16 +1,19 @@
-defmodule Screens.Override.Fetch do
+defmodule Screens.Config.State.Fetch do
   @moduledoc false
+
+  alias Screens.Config
 
   @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :s3_pool]]
 
+  @spec fetch_config(keyword()) :: {:ok, Config.t()} | :error
   def fetch_config(opts \\ []) do
     url = "https://mbta-dotcom.s3.amazonaws.com/screens/config/" <> config_path_for_environment()
     headers = []
 
     with {:ok, response} <- HTTPoison.get(url, headers, Keyword.merge(@default_opts, opts)),
          %{status_code: 200, body: body} <- response,
-         {:ok, parsed} <- Jason.decode(body, keys: :atoms) do
-      {:ok, Screens.Override.from_json(parsed)}
+         {:ok, parsed} <- Jason.decode(body) do
+      {:ok, Config.from_json(parsed)}
     else
       _ -> :error
     end

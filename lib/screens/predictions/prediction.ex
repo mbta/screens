@@ -1,6 +1,8 @@
 defmodule Screens.Predictions.Prediction do
   @moduledoc false
 
+  alias Screens.Departures.Departure
+
   defstruct id: nil,
             trip: nil,
             stop: nil,
@@ -23,11 +25,13 @@ defmodule Screens.Predictions.Prediction do
           stop_headsign: String.t() | nil
         }
 
-  def fetch(query_params) do
-    Screens.Departures.Departure.do_query_and_parse(
-      Map.put(query_params, :include, ~w[route stop trip vehicle alerts]),
+  @spec fetch(Departure.query_params()) :: {:ok, list(t())} | :error
+  def fetch(%{} = query_params) do
+    Departure.do_query_and_parse(
+      query_params,
       "predictions",
-      Screens.Predictions.Parser
+      Screens.Predictions.Parser,
+      %{include: ~w[route stop trip vehicle alerts]}
     )
   end
 end

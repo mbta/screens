@@ -2,16 +2,29 @@ defmodule ScreensWeb.ScreenController do
   use ScreensWeb, :controller
   require Logger
 
-  @default_app_id "bus_eink"
-  @app_ids ["bus_eink", "gl_eink_single", "gl_eink_double", "solari"]
+  alias Screens.Config.{Screen, State}
 
+  @default_app_id :bus_eink
+  @app_ids ~w[bus_eink gl_eink_single gl_eink_double solari]a
+  @app_id_strings Enum.map(@app_ids, &Atom.to_string/1)
+
+  plug(:check_config)
   plug(:api_version)
   plug(:environment_name)
   plug(:body_class)
 
+  defp check_config(conn, _) do
+    if State.ok?() do
+      conn
+    else
+      conn
+      |> render_not_found()
+      |> halt()
+    end
+  end
+
   defp api_version(conn, _) do
-    api_version = Screens.Override.State.api_version()
-    assign(conn, :api_version, api_version)
+    assign(conn, :api_version, State.api_version())
   end
 
   defp environment_name(conn, _) do
@@ -30,20 +43,18 @@ defmodule ScreensWeb.ScreenController do
   end
 
   defp screen_ids(target_app_id) do
-    :screens
-    |> Application.get_env(:screen_data)
-    |> Enum.reduce([], fn {screen_id, %{app_id: app_id}}, acc ->
-      if app_id == target_app_id do
-        [String.to_integer(screen_id) | acc]
-      else
-        acc
+    screen_ids =
+      for {screen_id, %Screen{app_id: app_id}} <- State.screens(), app_id == target_app_id do
+        screen_id
       end
-    end)
-    |> Enum.sort()
+
+    Enum.sort(screen_ids)
   end
 
   def index(conn, %{"id" => app_id})
-      when app_id in @app_ids do
+      when app_id in @app_id_strings do
+    app_id = String.to_existing_atom(app_id)
+
     conn
     |> assign(:app_id, app_id)
     |> assign(:screen_ids, screen_ids(app_id))
@@ -51,23 +62,18 @@ defmodule ScreensWeb.ScreenController do
   end
 
   def index(conn, %{"id" => screen_id}) do
-    screen_data =
-      :screens
-      |> Application.get_env(:screen_data)
-      |> Map.get(screen_id)
-
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
 
     _ = Screens.LogScreenData.log_page_load(screen_id, is_screen)
 
-    case screen_data do
-      nil ->
-        render_not_found(conn)
-
-      %{app_id: app_id} ->
+    case State.screen(screen_id) do
+      %Screen{app_id: app_id} ->
         conn
         |> assign(:app_id, app_id)
         |> render("index.html")
+
+      nil ->
+        render_not_found(conn)
     end
   end
 

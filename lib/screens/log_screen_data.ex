@@ -1,6 +1,7 @@
 defmodule Screens.LogScreenData do
   @moduledoc false
   require Logger
+  alias Screens.Config.{Screen, State}
 
   def log_page_load(screen_id, is_screen) do
     if is_screen do
@@ -82,9 +83,7 @@ defmodule Screens.LogScreenData do
   end
 
   defp screen_name_for_id(screen_id) do
-    :screens
-    |> Application.get_env(:screen_data)
-    |> Map.get(screen_id)
-    |> Map.get(:name)
+    %Screen{name: name} = State.screen(screen_id)
+    name
   end
 end
