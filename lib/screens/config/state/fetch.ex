@@ -21,9 +21,9 @@ defmodule Screens.Config.State.Fetch do
 
   defp config_path_for_environment do
     case Application.get_env(:screens, :environment_name) do
-      "screens-prod" -> "prod.json"
-      "screens-dev" -> "dev.json"
-      "screens-dev-green" -> "dev-green.json"
+      "screens-prod" -> "prod_new.json"
+      "screens-dev" -> "dev_new.json"
+      "screens-dev-green" -> "dev-green_new.json"
     end
   end
 end
