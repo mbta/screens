@@ -31,7 +31,7 @@ defmodule Screens.Predictions.Prediction do
       query_params,
       "predictions",
       Screens.Predictions.Parser,
-      %{include: ~w[route stop trip vehicle alerts]}
+      %{include: ~w[route stop trip trip.stops vehicle alerts]}
     )
   end
 end

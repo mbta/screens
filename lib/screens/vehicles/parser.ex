@@ -11,7 +11,8 @@ defmodule Screens.Vehicles.Parser do
         "attributes" => %{
           "direction_id" => direction_id,
           "current_status" => current_status,
-          "occupancy_status" => occupancy_status
+          "occupancy_status" => occupancy_status,
+          "current_stop_sequence" => stop_sequence
         },
         "id" => vehicle_id,
         "relationships" => %{"trip" => trip_data, "stop" => stop_data}
@@ -22,7 +23,8 @@ defmodule Screens.Vehicles.Parser do
       current_status: parse_current_status(current_status),
       occupancy_status: parse_occupancy_status(occupancy_status),
       trip_id: trip_id_from_trip_data(trip_data),
-      stop_id: stop_id_from_stop_data(stop_data)
+      stop_id: stop_id_from_stop_data(stop_data),
+      stop_sequence: stop_sequence
     }
   end
 
