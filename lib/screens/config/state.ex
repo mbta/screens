@@ -156,7 +156,7 @@ defmodule Screens.Config.State do
   end
 
   defp error_state({config, retry_count}) do
-    _ = Logger.error("config_state_fetch_error retry_count=#{retry_count}")
+    _ = Logger.info("config_state_fetch_error retry_count=#{retry_count}")
     {config, retry_count + 1}
   end
 end
