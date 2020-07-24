@@ -10,6 +10,8 @@ defmodule Screens.Config.State do
 
   @initial_fetch_wait_ms 500
   @refresh_ms 15 * 1000
+  # Start logging fetch failures as errors after this many minutes of consecutive failures
+  @fetch_failure_error_threshold_minutes 2
 
   @config_fetcher Application.get_env(:screens, :config_fetcher)
 
@@ -156,7 +158,21 @@ defmodule Screens.Config.State do
   end
 
   defp error_state({config, retry_count}) do
-    _ = Logger.error("config_state_fetch_error retry_count=#{retry_count}")
+    log_message = "config_state_fetch_error retry_count=#{retry_count}"
+
+    _ =
+      if log_as_error?(retry_count) do
+        Logger.error(log_message)
+      else
+        Logger.info(log_message)
+      end
+
     {config, retry_count + 1}
+  end
+
+  defp log_as_error?(retry_count) do
+    threshold_ms = @fetch_failure_error_threshold_minutes * 60 * 1000
+
+    retry_count * @refresh_ms >= threshold_ms
   end
 end
