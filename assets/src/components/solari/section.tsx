@@ -8,7 +8,7 @@ import {
   PagedDepartureRoutePill,
 } from "Components/solari/route_pill";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
-import { classWithModifier } from "Util/util";
+import { classWithModifier, classWithModifiers } from "Util/util";
 import { standardTimeRepresentation } from "Util/time_representation";
 
 const camelizeDepartureObject = ({
@@ -81,15 +81,22 @@ const SectionFrame = ({
 };
 
 const NoDeparturesMessage = ({ pill }): JSX.Element => (
-  <div className={classWithModifier("departure", "no-via")}>
-    <SectionRoutePill pill={pill} />
-    <div
-      className={classWithModifier(
-        "departure-destination",
-        "no-departures-placeholder"
-      )}
-    >
-      <BaseDepartureDestination destination="No departures currently available" />
+  <div
+    className={classWithModifiers("departure-container", [
+      "group-start",
+      "group-end",
+    ])}
+  >
+    <div className={classWithModifier("departure", "no-via")}>
+      <SectionRoutePill pill={pill} />
+      <div
+        className={classWithModifier(
+          "departure-destination",
+          "no-departures-placeholder"
+        )}
+      >
+        <BaseDepartureDestination destination="No departures currently available" />
+      </div>
     </div>
   </div>
 );
