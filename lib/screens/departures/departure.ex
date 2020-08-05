@@ -251,9 +251,20 @@ defmodule Screens.Departures.Departure do
         _ -> nil
       end
 
-    if not is_nil(trip_trip_id) and not is_nil(vehicle_trip_id) and not is_nil(first_stop) and
-         trip_trip_id == vehicle_trip_id and
-         not (current_status == :in_transit_to and next_stop == first_stop) do
+    # We only want to show crowding data if the data is relevant to riders looking at this screen.
+    # Crowding data for a vehicle is only relevant if the vehicle has actually started the trip
+    # associated with the predicted departure: The trip ids of the vehicle and prediction must
+    # match, and the vehicle can't be IN_TRANSIT_TO the first stop, or else the trip has not begun.
+    vehicle_on_prediction_trip? =
+      not is_nil(trip_trip_id) and not is_nil(vehicle_trip_id) and trip_trip_id == vehicle_trip_id
+
+    vehicle_started_trip? =
+      not is_nil(first_stop) and
+        not (current_status == :in_transit_to and next_stop == first_stop)
+
+    crowding_data_relevant? = vehicle_on_prediction_trip? and vehicle_started_trip?
+
+    if crowding_data_relevant? do
       crowding_level_from_occupancy_status(occupancy_status)
     else
       nil
