@@ -43,7 +43,9 @@ defmodule Screens.MercuryData.Fetch do
       external_battery: "ExternalBattery",
       uptime: "Uptime",
       connect_reason: "ConnectReason",
-      connectivity_used: "ConnectivityUsed"
+      connectivity_used: "ConnectivityUsed",
+      last_image_time: "LastImage",
+      last_data_time: "LastData"
     }
     |> Enum.map(fn {name, status_key} -> {name, Map.get(status, status_key)} end)
     |> Enum.into(%{})
