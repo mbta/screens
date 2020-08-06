@@ -1,4 +1,3 @@
-codecov:
 coverage:
   status:
     patch: off
