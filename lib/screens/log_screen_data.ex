@@ -33,16 +33,31 @@ defmodule Screens.LogScreenData do
     end
   end
 
-  def log_api_response(screen_id, client_version, is_screen) do
-    if is_screen do
-      data = %{
-        screen_id: screen_id,
-        screen_name: screen_name_for_id(screen_id),
-        version: client_version
-      }
+  def log_api_response(%{force_reload: true}, screen_id, client_version, is_screen) do
+    log_api_response_success(screen_id, client_version, is_screen)
+  end
 
-      log_message("[screen api response]", data)
-    end
+  def log_api_response(%{success: true}, screen_id, client_version, is_screen) do
+    log_api_response_success(screen_id, client_version, is_screen)
+  end
+
+  def log_api_response(_response, _screen_id, _client_version, _is_screen) do
+    :ok
+  end
+
+  defp log_api_response_success(screen_id, client_version, is_screen) do
+    _ =
+      if is_screen do
+        data = %{
+          screen_id: screen_id,
+          screen_name: screen_name_for_id(screen_id),
+          version: client_version
+        }
+
+        log_message("[screen api response success]", data)
+      end
+
+    :ok
   end
 
   def log_departures(_screen_id, false, _), do: nil

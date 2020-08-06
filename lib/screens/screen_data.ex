@@ -28,7 +28,7 @@ defmodule Screens.ScreenData do
         true -> fetch_data(screen_id, is_screen)
       end
 
-    _ = LogScreenData.log_api_response(screen_id, client_version, is_screen)
+    _ = LogScreenData.log_api_response(response, screen_id, client_version, is_screen)
 
     response
   end
