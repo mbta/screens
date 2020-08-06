@@ -72,6 +72,16 @@ const SectionFrame = ({
   const shouldShowHeader =
     sectionHeaders !== null && name !== null && !overhead;
 
+  if (sectionHeaders === "vertical") {
+    const iconSrcByName = {
+      "Upper Busway": "/images/icon-upper-busway.svg",
+      "Lower Busway": "/images/icon-lower-busway.svg",
+      "Commuter Rail": "/images/icon-commuter-rail.svg",
+    };
+
+    name = <img className="section-header__icon" src={iconSrcByName[name]} />;
+  }
+
   return (
     <div className={sectionClass}>
       {shouldShowHeader && <SectionHeader name={name} arrow={arrow} />}
