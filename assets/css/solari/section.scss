@@ -7,19 +7,15 @@
 
   .section-header {
     color: black;
-    height: 88px;
-    transform-origin: 100% 0;
-    transform: translateX(-100%) rotate(-90deg);
+    width: 88px;
     position: absolute;
     top: 0;
     left: 0;
   }
 
-  .section-header__name {
-    margin-right: 28px;
-    font-size: 36px;
-    line-height: 88px;
-    text-transform: uppercase;
+  .section-header__icon {
+    display: block;
+    margin: 20px auto 0 auto;
   }
 
   .later-departure__header-title {
