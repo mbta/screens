@@ -19,7 +19,7 @@ if [ ! -d "${ERL_HOME}" ]; then
     until KERL_BUILD_BACKEND=git kerl build $ERLANG_VERSION $ERLANG_VERSION || (( erlang_install_attempt == MAX_ERLANG_INSTALL_ATTEMPTS ))
     do
     	echo "Failed to build erlang, trying again in 5 seconds..."
-    	erlang_install_attempt++
+    	((erlang_install_attempt++))
     	sleep 5
     done
     kerl install $ERLANG_VERSION $ERL_HOME
