@@ -88,12 +88,55 @@ const DepartureList = ({
     ...renderedDepartures.slice(1, 2),
   ];
 };
+
 interface DepartureListProps {
   departures: { time: string }[];
   currentTimeString: string;
   destination: string;
   headway: number;
 }
+
+const DeparturesListPsa = ({ psaName }): JSX.Element => {
+  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaName}.png`;
+  return (
+    <div>
+      <img src={srcPath} />
+    </div>
+  );
+};
+
+const DepartureWithPsa = ({
+  departures,
+  currentTimeString,
+  destination,
+  headway,
+  psaName,
+}): JSX.Element[] => {
+  let firstDepartureOrHeadway;
+
+  if (departures.length > 0) {
+    firstDepartureOrHeadway = (
+      <Departure
+        time={departures[0].time}
+        currentTimeString={currentTimeString}
+        key={departures[0].id}
+      />
+    );
+  } else {
+    firstDepartureOrHeadway = (
+      <HeadwayMessage
+        destination={destination}
+        headway={headway}
+        variant={HeadwayMessageVariant.Sub}
+        key={"departures-list-headway"}
+      />
+    );
+  }
+
+  const psa = <DeparturesListPsa psaName={psaName} />;
+
+  return [firstDepartureOrHeadway, psa];
+};
 
 const Departures = ({
   departures,
@@ -103,24 +146,43 @@ const Departures = ({
   currentTimeString,
   serviceLevel,
   isHeadwayMode,
+  psaName,
 }): JSX.Element => {
+  let departuresComponent;
+
+  if (psaName) {
+    departuresComponent = (
+      <DepartureWithPsa
+        departures={departures}
+        currentTimeString={currentTimeString}
+        destination={destination}
+        headway={headway}
+        psaName={psaName}
+      />
+    );
+  } else if (isHeadwayMode) {
+    departuresComponent = (
+      <HeadwayMessage
+        destination={destination}
+        headway={headway}
+        variant={HeadwayMessageVariant.Main}
+      />
+    );
+  } else {
+    departuresComponent = (
+      <DepartureList
+        departures={departures}
+        currentTimeString={currentTimeString}
+        destination={destination}
+        headway={headway}
+      />
+    );
+  }
+
   return (
     <div className="departures">
       <div className="departures__container">
-        {isHeadwayMode ? (
-          <HeadwayMessage
-            destination={destination}
-            headway={headway}
-            variant={HeadwayMessageVariant.Main}
-          />
-        ) : (
-          <DepartureList
-            departures={departures}
-            currentTimeString={currentTimeString}
-            destination={destination}
-            headway={headway}
-          />
-        )}
+        {departuresComponent}
         <div className="departures__delay-badge">
           {serviceLevel > 1 ? (
             <TakeoverInlineAlert />
