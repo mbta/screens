@@ -1,6 +1,8 @@
 defmodule Screens.V3Api do
   @moduledoc false
 
+  require Logger
+
   @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool]]
   @base_url Application.get_env(:screens, :api_v3_url)
 
@@ -20,17 +22,23 @@ defmodule Screens.V3Api do
       {:ok, parsed}
     else
       {:http_request, e} ->
-        {:http_fetch_error, e}
+        log_api_error({:http_fetch_error, e})
 
       {:response_success, %{status_code: _status_code}} = response ->
-        {:bad_response_code, response}
+        log_api_error({:bad_response_code, response})
 
       {:parse, {:error, e}} ->
-        {:parse_error, e}
+        log_api_error({:parse_error, e})
 
       e ->
-        {:error, e}
+        log_api_error({:error, e})
     end
+  end
+
+  defp log_api_error({error_type, _error_data} = error) do
+    _ = Logger.info("[api_v3_get_json_error] error_type=#{error_type}")
+
+    error
   end
 
   defp build_url(route, params) when map_size(params) == 0 do
