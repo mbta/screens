@@ -41,18 +41,26 @@
   padding-right: 40px;
   padding-top: 72px;
   padding-bottom: 72px;
-}
 
-.departures__departure .base-departure-time__text {
-  line-height: 1em;
-}
+  & .base-departure-time__text {
+    line-height: 1em;
+  }
 
-.departures__departure .base-departure-time__minutes {
-  line-height: 1em;
-}
+  & .base-departure-time__minutes {
+    line-height: 1em;
+  }
 
-.departures__departure .base-departure-time__minutes-label {
-  line-height: 0.729em;
+  & .base-departure-time__minutes-label {
+    line-height: 0.729em;
+  }
+
+  & .base-departure-time__timestamp {
+    font-size: 0.5em;
+  }
+
+  & .base-departure-time__ampm {
+    font-size: 0.365em;
+  }
 }
 
 .departures__hairline {
