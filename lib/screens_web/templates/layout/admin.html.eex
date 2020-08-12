@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>admin</title>
+</head>
+<body>
+	<%= render @view_module, @view_template, assigns %>
+</body>
+</html>

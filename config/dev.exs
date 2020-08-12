@@ -27,6 +27,13 @@ config :screens,
   mercury_api_key: System.get_env("MERCURY_API_KEY"),
   config_fetcher: Screens.Config.State.LocalFetch
 
+config :screens, ScreensWeb.AuthManager, secret_key: "secret key"
+
+config :ueberauth, Ueberauth,
+  providers: [
+    cognito: {Screens.Ueberauth.Strategy.Fake, []}
+  ]
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

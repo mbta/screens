@@ -36,6 +36,18 @@ mercury_api_key =
   |> ExAws.request!()
   |> Map.fetch!("SecretString")
 
+cognito_client_secret =
+  (eb_env_name <> "-cognito-client-secret")
+  |> ExAws.SecretsManager.get_secret_value()
+  |> ExAws.request!()
+  |> Map.fetch!("SecretString")
+
+screens_auth_secret =
+  (eb_env_name <> "-screens-auth-secret")
+  |> ExAws.SecretsManager.get_secret_value()
+  |> ExAws.request!()
+  |> Map.fetch!("SecretString")
+
 config :screens, ScreensWeb.Endpoint,
   http: [:inet6, port: String.to_integer(System.get_env("PORT") || "4000")],
   secret_key_base: secret_key_base
@@ -45,6 +57,9 @@ config :screens,
   environment_name: eb_env_name,
   gds_dms_password: gds_dms_password,
   mercury_api_key: mercury_api_key
+
+config :ueberauth, Ueberauth.Strategy.Cognito, client_secret: cognito_client_secret
+config :screens, ScreensWeb.AuthManager, secret_key: screens_auth_secret
 
 # ## Using releases (Elixir v1.9+)
 #
