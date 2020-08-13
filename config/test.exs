@@ -9,5 +9,12 @@ config :screens, ScreensWeb.Endpoint,
 config :screens,
   config_fetcher: Screens.Config.State.LocalFetch
 
+config :screens, ScreensWeb.AuthManager, secret_key: "test key"
+
+config :ueberauth, Ueberauth,
+  providers: [
+    cognito: {Screens.Ueberauth.Strategy.Fake, []}
+  ]
+
 # Print only warnings and errors during test
 config :logger, level: :warn
