@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.20",
     "moment": "^2.27.0",
     "moment-timezone": "^0.5.31",
     "phoenix": "file:../deps/phoenix",
