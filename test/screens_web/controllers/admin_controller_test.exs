@@ -1,7 +1,7 @@
 defmodule ScreensWeb.Controllers.AdminControllerTest do
   use ScreensWeb.ConnCase
 
-  describe "index" do
+  describe "index/2" do
     @tag :authenticated
     test "responds 200 to authenticated requests", %{conn: conn} do
       conn = get(conn, "/admin")
