@@ -16,6 +16,7 @@ defmodule ScreensWeb.ConnCase do
   """
 
   use ExUnit.CaseTemplate
+  import Plug.Test
 
   using do
     quote do
@@ -28,8 +29,36 @@ defmodule ScreensWeb.ConnCase do
     end
   end
 
-  setup _tags do
-    {:ok,
-     conn: Phoenix.ConnTest.build_conn() |> Plug.Conn.put_req_header("x-forwarded-proto", "https")}
+  setup tags do
+    cond do
+      tags[:authenticated] ->
+        user = "test_user"
+
+        screens_group = Application.get_env(:screens, :cognito_group)
+
+        conn =
+          Phoenix.ConnTest.build_conn()
+          |> Plug.Conn.put_req_header("x-forwarded-proto", "https")
+          |> init_test_session(%{})
+          |> Guardian.Plug.sign_in(ScreensWeb.AuthManager, user, %{groups: [screens_group]})
+
+        {:ok, conn: conn}
+
+      tags[:authenticated_not_in_group] ->
+        user = "test_user"
+
+        conn =
+          Phoenix.ConnTest.build_conn()
+          |> Plug.Conn.put_req_header("x-forwarded-proto", "https")
+          |> init_test_session(%{})
+          |> Guardian.Plug.sign_in(ScreensWeb.AuthManager, user, %{groups: []})
+
+        {:ok, conn: conn}
+
+      true ->
+        {:ok,
+         conn:
+           Phoenix.ConnTest.build_conn() |> Plug.Conn.put_req_header("x-forwarded-proto", "https")}
+    end
   end
 end

@@ -18,8 +18,39 @@ defmodule ScreensWeb.Router do
     end
   end
 
+  pipeline :auth do
+    plug(ScreensWeb.AuthManager.Pipeline)
+  end
+
+  pipeline :ensure_auth do
+    plug(Guardian.Plug.EnsureAuthenticated)
+  end
+
+  pipeline :ensure_screens_group do
+    plug(ScreensWeb.EnsureScreensGroup)
+  end
+
   scope "/", ScreensWeb do
     get "/_health", HealthController, :index
+  end
+
+  scope "/", ScreensWeb do
+    pipe_through([:redirect_prod_http, :browser, :auth, :ensure_auth])
+
+    get("/unauthorized", UnauthorizedController, :index)
+  end
+
+  scope "/auth", ScreensWeb do
+    pipe_through([:browser])
+
+    get("/:provider", AuthController, :request)
+    get("/:provider/callback", AuthController, :callback)
+  end
+
+  scope "/admin", ScreensWeb do
+    pipe_through [:redirect_prod_http, :browser, :auth, :ensure_auth, :ensure_screens_group]
+
+    get("/", AdminController, :index)
   end
 
   scope "/screen", ScreensWeb do
