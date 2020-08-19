@@ -18,7 +18,6 @@ defmodule Screens.Application do
       Screens.GdsData.Supervisor,
       Screens.MercuryData.Supervisor,
       :hackney_pool.child_spec(:ex_aws_pool, []),
-      :hackney_pool.child_spec(:s3_pool, []),
       :hackney_pool.child_spec(:api_v3_pool, []),
       :hackney_pool.child_spec(:gds_api_pool, []),
       :hackney_pool.child_spec(:mercury_api_pool, [])
