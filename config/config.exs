@@ -56,6 +56,7 @@ config :ueberauth, Ueberauth.Strategy.Cognito,
 config :screens,
   gds_dms_username: "mbtadata@gmail.com",
   config_fetcher: Screens.Config.State.Fetch,
+  config_s3_bucket: "mbta-ctd-config",
   api_v3_url: "https://api-v3.mbta.com/",
   nearby_departures: %{
     "place-bland" => ["941", "951"],

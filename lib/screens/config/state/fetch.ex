@@ -1,17 +1,12 @@
 defmodule Screens.Config.State.Fetch do
   @moduledoc false
 
+  require Logger
   alias Screens.Config
 
-  @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :s3_pool]]
-
-  @spec fetch_config(keyword()) :: {:ok, Config.t()} | :error
-  def fetch_config(opts \\ []) do
-    url = "https://mbta-dotcom.s3.amazonaws.com/screens/config/" <> config_path_for_environment()
-    headers = []
-
-    with {:ok, response} <- HTTPoison.get(url, headers, Keyword.merge(@default_opts, opts)),
-         %{status_code: 200, body: body} <- response,
+  @spec fetch_config() :: {:ok, Config.t()} | :error
+  def fetch_config do
+    with {:ok, body} <- get_from_s3(),
          {:ok, parsed} <- Jason.decode(body) do
       {:ok, Config.from_json(parsed)}
     else
@@ -19,11 +14,33 @@ defmodule Screens.Config.State.Fetch do
     end
   end
 
-  defp config_path_for_environment do
-    case Application.get_env(:screens, :environment_name) do
-      "screens-prod" -> "prod.json"
-      "screens-dev" -> "dev.json"
-      "screens-dev-green" -> "dev-green.json"
+  def get_from_s3 do
+    bucket = Application.get_env(:screens, :config_s3_bucket)
+    path = config_path_for_environment()
+    get_operation = ExAws.S3.get_object(bucket, path)
+
+    case ExAws.request(get_operation) do
+      {:ok, %{body: body, status_code: 200}} ->
+        {:ok, body}
+
+      {:error, err} ->
+        _ = Logger.info("s3_fetch_error #{inspect(err)}")
+        :error
     end
+  end
+
+  def put_to_s3(contents) do
+    bucket = Application.get_env(:screens, :config_s3_bucket)
+    path = config_path_for_environment()
+    put_operation = ExAws.S3.put_object(bucket, path, contents)
+
+    case ExAws.request(put_operation) do
+      {:ok, %{status_code: 200}} -> :ok
+      _ -> :error
+    end
+  end
+
+  defp config_path_for_environment do
+    "screens/#{Application.get_env(:screens, :environment_name)}.json"
   end
 end

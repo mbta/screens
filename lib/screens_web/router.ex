@@ -53,6 +53,14 @@ defmodule ScreensWeb.Router do
     get("/", AdminController, :index)
   end
 
+  scope "/api/admin", ScreensWeb do
+    pipe_through [:redirect_prod_http, :api, :browser, :auth, :ensure_auth, :ensure_screens_group]
+
+    get "/", AdminApiController, :index
+    post "/validate", AdminApiController, :validate
+    post "/confirm", AdminApiController, :confirm
+  end
+
   scope "/screen", ScreensWeb do
     pipe_through [:redirect_prod_http, :browser]
 
