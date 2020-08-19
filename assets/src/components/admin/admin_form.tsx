@@ -12,7 +12,7 @@ const validateJson = (json) => {
   }
 };
 
-const doSubmit = async (path, data, callbackFn, errorFn) => {
+const doSubmit = async (path, data) => {
   try {
     const csrfToken = document.head.querySelector("[name~=csrf-token][content]")
       .content;
@@ -26,26 +26,28 @@ const doSubmit = async (path, data, callbackFn, errorFn) => {
       body: JSON.stringify(data),
     });
     const json = await result.json();
-    callbackFn(json);
+    return json;
   } catch (err) {
     alert("An error occurred.");
+    throw err;
   }
 };
 
-const AdminValidateControls = ({
-  config,
-  setConfig,
-  setEditable,
-}): JSX.Element => {
+const AdminValidateControls = ({ setEditable }): JSX.Element => {
   const validateCallback = (resultJson) => {
-    setConfig(JSON.stringify(resultJson.config, null, 2));
+    document.getElementById("config").value = JSON.stringify(
+      resultJson.config,
+      null,
+      2
+    );
     setEditable(false);
   };
 
   const validateFn = () => {
+    const config = document.getElementById("config").value;
     if (validateJson(config)) {
       const dataToSubmit = { config };
-      doSubmit(VALIDATE_PATH, dataToSubmit, validateCallback);
+      doSubmit(VALIDATE_PATH, dataToSubmit).then(validateCallback);
     } else {
       alert("JSON is invalid!");
     }
@@ -58,7 +60,7 @@ const AdminValidateControls = ({
   );
 };
 
-const AdminConfirmControls = ({ config, setEditable }): JSX.Element => {
+const AdminConfirmControls = ({ setEditable }): JSX.Element => {
   const backFn = () => {
     setEditable(true);
   };
@@ -74,8 +76,9 @@ const AdminConfirmControls = ({ config, setEditable }): JSX.Element => {
   };
 
   const confirmFn = () => {
+    const config = document.getElementById("config").value;
     const dataToSubmit = { config };
-    doSubmit(CONFIRM_PATH, dataToSubmit, confirmCallback);
+    doSubmit(CONFIRM_PATH, dataToSubmit).then(confirmCallback);
   };
 
   return (
@@ -88,12 +91,11 @@ const AdminConfirmControls = ({ config, setEditable }): JSX.Element => {
 
 const AdminForm = (): JSX.Element => {
   const [editable, setEditable] = useState(true);
-  const [config, setConfig] = useState("");
 
   const fetchConfig = async () => {
     const result = await fetch("/api/admin/");
     const json = await result.json();
-    setConfig(json.config);
+    document.getElementById("config").value = json.config;
   };
 
   useEffect(() => {
@@ -101,27 +103,13 @@ const AdminForm = (): JSX.Element => {
     return;
   }, []);
 
-  const updateConfig = (e) => {
-    setConfig(e.target.value);
-  };
-
   return (
     <div>
-      <textarea
-        id="config"
-        disabled={!editable}
-        className="admin__textarea"
-        value={config}
-        onChange={updateConfig}
-      />
+      <textarea id="config" disabled={!editable} className="admin__textarea" />
       {editable ? (
-        <AdminValidateControls
-          config={config}
-          setEditable={setEditable}
-          setConfig={setConfig}
-        />
+        <AdminValidateControls setEditable={setEditable} />
       ) : (
-        <AdminConfirmControls config={config} setEditable={setEditable} />
+        <AdminConfirmControls setEditable={setEditable} />
       )}
     </div>
   );
