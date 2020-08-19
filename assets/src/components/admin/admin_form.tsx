@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const VALIDATE_PATH = "/api/admin/validate";
 const CONFIRM_PATH = "/api/admin/confirm";
@@ -33,18 +33,14 @@ const doSubmit = async (path, data) => {
   }
 };
 
-const AdminValidateControls = ({ setEditable }): JSX.Element => {
+const AdminValidateControls = ({ setEditable, configRef }): JSX.Element => {
   const validateCallback = (resultJson) => {
-    document.getElementById("config").value = JSON.stringify(
-      resultJson.config,
-      null,
-      2
-    );
+    configRef.current.value = JSON.stringify(resultJson.config, null, 2);
     setEditable(false);
   };
 
   const validateFn = () => {
-    const config = document.getElementById("config").value;
+    const config = configRef.current.value;
     if (validateJson(config)) {
       const dataToSubmit = { config };
       doSubmit(VALIDATE_PATH, dataToSubmit).then(validateCallback);
@@ -60,7 +56,7 @@ const AdminValidateControls = ({ setEditable }): JSX.Element => {
   );
 };
 
-const AdminConfirmControls = ({ setEditable }): JSX.Element => {
+const AdminConfirmControls = ({ setEditable, configRef }): JSX.Element => {
   const backFn = () => {
     setEditable(true);
   };
@@ -76,7 +72,7 @@ const AdminConfirmControls = ({ setEditable }): JSX.Element => {
   };
 
   const confirmFn = () => {
-    const config = document.getElementById("config").value;
+    const config = configRef.current.value;
     const dataToSubmit = { config };
     doSubmit(CONFIRM_PATH, dataToSubmit).then(confirmCallback);
   };
@@ -91,11 +87,12 @@ const AdminConfirmControls = ({ setEditable }): JSX.Element => {
 
 const AdminForm = (): JSX.Element => {
   const [editable, setEditable] = useState(true);
+  const configRef = useRef(null);
 
   const fetchConfig = async () => {
     const result = await fetch("/api/admin/");
     const json = await result.json();
-    document.getElementById("config").value = json.config;
+    configRef.current.value = json.config;
   };
 
   useEffect(() => {
@@ -105,11 +102,19 @@ const AdminForm = (): JSX.Element => {
 
   return (
     <div>
-      <textarea id="config" disabled={!editable} className="admin__textarea" />
+      <textarea
+        ref={configRef}
+        id="config"
+        disabled={!editable}
+        className="admin__textarea"
+      />
       {editable ? (
-        <AdminValidateControls setEditable={setEditable} />
+        <AdminValidateControls
+          setEditable={setEditable}
+          configRef={configRef}
+        />
       ) : (
-        <AdminConfirmControls setEditable={setEditable} />
+        <AdminConfirmControls setEditable={setEditable} configRef={configRef} />
       )}
     </div>
   );
