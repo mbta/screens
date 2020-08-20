@@ -7,14 +7,14 @@ const useApiResponse = (
   withWatchdog = false
 ) => {
   const [apiResponse, setApiResponse] = useState(null);
-  const apiVersion = document.getElementById("app").dataset.apiVersion;
+  const lastRefresh = document.getElementById("app").dataset.lastRefresh;
 
   let apiPath;
   if (datetime) {
-    apiPath = `/api/screen/${id}?version=${apiVersion}&datetime=${datetime}`;
+    apiPath = `/api/screen/${id}?last_refresh=${lastRefresh}&datetime=${datetime}`;
     refreshMs = 1000 * 60 * 60; // 1 per hour
   } else {
-    apiPath = `/api/screen/${id}?version=${apiVersion}`;
+    apiPath = `/api/screen/${id}?last_refresh=${lastRefresh}`;
   }
 
   const fetchData = async () => {

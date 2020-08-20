@@ -9,7 +9,7 @@ defmodule Screens.Config.Screen do
           device_id: String.t(),
           name: String.t(),
           app_id: :bus_eink | :gl_eink_single | :gl_eink_double | :solari,
-          last_refresh_timestamp: DateTime.t() | nil,
+          refresh_after: DateTime.t() | nil,
           disabled: boolean(),
           app_params: Bus.t() | Gl.t() | Solari.t(),
           tags: list(String.t())
@@ -30,7 +30,7 @@ defmodule Screens.Config.Screen do
             device_id: nil,
             name: nil,
             app_id: nil,
-            last_refresh_timestamp: nil,
+            refresh_after: nil,
             disabled: false,
             app_params: nil,
             tags: []
@@ -69,7 +69,7 @@ defmodule Screens.Config.Screen do
 
   defp value_from_json("app_id", _app_id_string, app_id), do: app_id
 
-  defp value_from_json("last_refresh_timestamp", timestamp, _app_id) when is_binary(timestamp) do
+  defp value_from_json("refresh_after", timestamp, _app_id) when is_binary(timestamp) do
     case DateTime.from_iso8601(timestamp) do
       {:ok, dt, _} -> dt
       {:error, _} -> nil
@@ -82,7 +82,7 @@ defmodule Screens.Config.Screen do
 
   defp value_from_json(_, value, _), do: value
 
-  defp value_to_json(:last_refresh_timestamp, %DateTime{} = dt, _app_id) do
+  defp value_to_json(:refresh_after, %DateTime{} = dt, _app_id) do
     DateTime.to_iso8601(dt)
   end
 

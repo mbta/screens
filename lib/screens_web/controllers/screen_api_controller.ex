@@ -15,21 +15,21 @@ defmodule ScreensWeb.ScreenApiController do
     end
   end
 
-  def show(conn, %{"id" => screen_id, "version" => _version, "datetime" => datetime}) do
+  def show(conn, %{"id" => screen_id, "last_refresh" => _last_refresh, "datetime" => datetime}) do
     data = Screens.ScreenData.by_screen_id_with_datetime(screen_id, datetime)
 
     json(conn, data)
   end
 
-  def show(conn, %{"id" => screen_id, "version" => version}) do
+  def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh}) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
 
-    _ = Screens.LogScreenData.log_data_request(screen_id, version, is_screen)
+    _ = Screens.LogScreenData.log_data_request(screen_id, last_refresh, is_screen)
 
     data =
       Screens.ScreenData.by_screen_id(screen_id, is_screen,
         check_disabled: true,
-        client_version: version
+        last_refresh: last_refresh
       )
 
     json(conn, data)

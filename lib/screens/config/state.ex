@@ -25,8 +25,8 @@ defmodule Screens.Config.State do
     GenServer.call(pid, :ok?)
   end
 
-  def api_version(pid \\ __MODULE__) do
-    GenServer.call(pid, :api_version)
+  def refresh_after(pid \\ __MODULE__, screen_id) do
+    GenServer.call(pid, {:refresh_after, screen_id})
   end
 
   def service_level(pid \\ __MODULE__, screen_id) do
@@ -77,8 +77,16 @@ defmodule Screens.Config.State do
     {:reply, true, state}
   end
 
-  def handle_call(:api_version, _from, {config, _} = state) do
-    {:reply, config.api_version, state}
+  def handle_call({:refresh_after, screen_id}, _from, {config, _} = state) do
+    screen = Map.get(config.screens, screen_id)
+
+    refresh_after =
+      case screen do
+        %Screen{refresh_after: refresh_after} -> refresh_after
+        _ -> nil
+      end
+
+    {:reply, refresh_after, state}
   end
 
   def handle_call({:service_level, screen_id}, _from, {config, _} = state) do
