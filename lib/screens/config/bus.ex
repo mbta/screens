@@ -6,11 +6,13 @@ defmodule Screens.Config.Bus do
 
   @type t :: %__MODULE__{
           stop_id: String.t(),
+          service_level: pos_integer(),
           psa_list: PsaList.t()
         }
 
   @enforce_keys [:stop_id]
   defstruct stop_id: nil,
+            service_level: 1,
             psa_list: PsaList.from_json(:default)
 
   @spec from_json(map()) :: t()

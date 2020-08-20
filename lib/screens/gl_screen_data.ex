@@ -12,7 +12,8 @@ defmodule Screens.GLScreenData do
       route_id: route_id,
       direction_id: direction_id,
       headway_mode: headway_mode?,
-      platform_id: platform_id
+      platform_id: platform_id,
+      service_level: service_level
     } = State.app_params(screen_id)
 
     {line_map_data, departures} =
@@ -38,10 +39,10 @@ defmodule Screens.GLScreenData do
         departures: format_departure_rows(departures),
         global_alert: format_global_alert(global_alert),
         inline_alert: format_inline_alert(inline_alerts),
-        nearby_departures: Screens.NearbyDepartures.by_stop_id(stop_id),
+        nearby_departures: Screens.NearbyDepartures.by_screen_id(screen_id),
         line_map: line_map_data,
-        headway: Screens.Headways.by_route_id(route_id, stop_id, direction_id),
-        service_level: State.green_line_service(),
+        headway: Screens.Headways.by_route_id(route_id, stop_id, direction_id, service_level),
+        service_level: service_level,
         is_headway_mode: headway_mode?,
         psa_type: psa_type,
         psa_name: psa_name

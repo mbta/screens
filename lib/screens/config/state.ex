@@ -29,12 +29,8 @@ defmodule Screens.Config.State do
     GenServer.call(pid, :api_version)
   end
 
-  def bus_service(pid \\ __MODULE__) do
-    GenServer.call(pid, :bus_service)
-  end
-
-  def green_line_service(pid \\ __MODULE__) do
-    GenServer.call(pid, :green_line_service)
+  def service_level(pid \\ __MODULE__, screen_id) do
+    GenServer.call(pid, {:service_level, screen_id})
   end
 
   def disabled?(pid \\ __MODULE__, screen_id) when is_binary(screen_id) do
@@ -85,8 +81,16 @@ defmodule Screens.Config.State do
     {:reply, config.api_version, state}
   end
 
-  def handle_call(:bus_service, _from, {config, _} = state) do
-    {:reply, config.bus_service, state}
+  def handle_call({:service_level, screen_id}, _from, {config, _} = state) do
+    screen = Map.get(config.screens, screen_id)
+
+    service_level =
+      case screen do
+        %Screen{app_params: %{service_level: service_level}} -> service_level
+        _ -> 1
+      end
+
+    {:reply, service_level, state}
   end
 
   def handle_call(:green_line_service, _from, {config, _} = state) do

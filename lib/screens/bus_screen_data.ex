@@ -38,7 +38,7 @@ defmodule Screens.BusScreenData do
 
     stop_name = extract_stop_name(nearby_connections_data, departures)
 
-    service_level = State.bus_service()
+    service_level = State.service_level(screen_id)
 
     _ = LogScreenData.log_departures(screen_id, is_screen, departures)
 

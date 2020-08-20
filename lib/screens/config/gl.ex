@@ -10,6 +10,7 @@ defmodule Screens.Config.Gl do
           route_id: String.t(),
           direction_id: 0 | 1,
           headway_mode: boolean(),
+          service_level: pos_integer(),
           psa_list: PsaList.t()
         }
 
@@ -19,6 +20,7 @@ defmodule Screens.Config.Gl do
             route_id: nil,
             direction_id: nil,
             headway_mode: false,
+            service_level: 1,
             psa_list: PsaList.from_json(:default)
 
   @spec from_json(map()) :: t()
