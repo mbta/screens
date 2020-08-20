@@ -28,7 +28,7 @@ defmodule Screens.BusScreenData do
           :error
       end
 
-    nearby_connections_data = NearbyConnections.by_stop_id(stop_id)
+    nearby_connections_data = NearbyConnections.by_screen_id(screen_id)
 
     nearby_connections =
       case nearby_connections_data do
