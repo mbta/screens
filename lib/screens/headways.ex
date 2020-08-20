@@ -1,8 +1,6 @@
 defmodule Screens.Headways do
   @moduledoc false
 
-  alias Screens.Config.State
-
   @dayparts [
     {:late_night, ~T[00:00:00], :close},
     {:early_morning, :open, ~T[06:30:00]},
