@@ -1,26 +1,19 @@
 defmodule Screens.Config.NearbyConnections do
   @moduledoc false
 
-  @type t :: list(nearby_connection)
-  @typep nearby_connection :: {stop_id, list(route_id)}
-  @typep stop_id :: String.t()
-  @typep route_id :: String.t()
+  alias Screens.Config.NearbyConnection
 
+  @type t :: list(NearbyConnection.t())
+
+  @spec from_json(list() | :default) :: t()
   def from_json(json) when is_list(json) do
-    Enum.map(json, &from_json_helper/1)
+    Enum.map(json, &NearbyConnection.from_json/1)
   end
 
   def from_json(:default), do: []
 
-  defp from_json_helper([stop_id, route_id_list]) do
-    {stop_id, route_id_list}
-  end
-
+  @spec to_json(t()) :: list()
   def to_json(nearby_connections) do
-    Enum.map(nearby_connections, &to_json_helper/1)
-  end
-
-  defp to_json_helper({stop_id, route_id_list}) do
-    [stop_id, route_id_list]
+    Enum.map(nearby_connections, &NearbyConnection.to_json/1)
   end
 end

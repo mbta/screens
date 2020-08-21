@@ -1,11 +1,10 @@
 defmodule Screens.NearbyDepartures do
   @moduledoc false
 
-  alias Screens.Config.{Gl, Screen, State}
+  alias Screens.Config.{Gl, State}
 
   def by_screen_id(screen_id) do
-    %Screen{app_params: %Gl{nearby_departures: nearby_departure_stop_ids}} =
-      State.screen(screen_id)
+    %Gl{nearby_departures: nearby_departure_stop_ids} = State.app_params(screen_id)
 
     prediction_result =
       Screens.Predictions.Prediction.fetch(%{stop_ids: nearby_departure_stop_ids})

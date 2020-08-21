@@ -49,11 +49,11 @@ defmodule Screens.ScreenData do
 
   defp outdated?(screen_id, client_refresh_timestamp) do
     {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
-    refresh_after_time = State.refresh_after(screen_id)
+    refresh_if_loaded_before_time = State.refresh_if_loaded_before(screen_id)
 
-    case refresh_after_time do
+    case refresh_if_loaded_before_time do
       nil -> false
-      _ -> DateTime.compare(client_refresh_time, refresh_after_time) == :lt
+      _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
     end
   end
 

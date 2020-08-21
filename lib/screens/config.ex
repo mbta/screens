@@ -13,7 +13,7 @@ defmodule Screens.Config do
   @type screen_id :: String.t()
 
   @enforce_keys [:screens]
-  defstruct screens: nil
+  defstruct @enforce_keys
 
   @spec from_json(map()) :: t()
   def from_json(%{} = json) do
