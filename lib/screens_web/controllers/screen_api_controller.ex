@@ -34,4 +34,11 @@ defmodule ScreensWeb.ScreenApiController do
 
     json(conn, data)
   end
+
+  # Older clients use version to determine whether they're outdated. We want these
+  # clients to reload, so we have to (temporarily) handle these requests.
+  def show(conn, %{"version" => _version}) do
+    data = %{force_reload: true}
+    json(conn, data)
+  end
 end
