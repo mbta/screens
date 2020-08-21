@@ -1,20 +1,20 @@
 defmodule Screens.NearbyConnections do
   @moduledoc false
 
-  def by_stop_id(stop_id) do
-    nearby_connection_stop_ids =
-      :screens
-      |> Application.get_env(:nearby_connections)
-      |> Map.get(stop_id)
+  alias Screens.Config.{Bus, State}
 
-    stop_query = Enum.join([stop_id | nearby_connection_stop_ids], ",")
+  def by_screen_id(screen_id) do
+    %Bus{stop_id: stop_id, nearby_connections: nearby_connections} = State.app_params(screen_id)
+
+    nearby_stop_ids = Enum.map(nearby_connections, fn {stop_id, _} -> stop_id end)
+    stop_query = Enum.join([stop_id | nearby_stop_ids], ",")
 
     case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_query}) do
       {:ok, %{"data" => stops_data}} ->
         result =
           stops_data
           |> Enum.map(&parse_stop_data/1)
-          |> build_nearby_connections(stop_id)
+          |> build_nearby_connections(stop_id, nearby_connections)
 
         {:ok, result}
 
@@ -30,13 +30,13 @@ defmodule Screens.NearbyConnections do
     %{stop_id: id, stop_name: name, stop_lat: lat, stop_lon: lon}
   end
 
-  def build_nearby_connections(stops_data, stop_id) do
+  def build_nearby_connections(stops_data, stop_id, routes_at_stops) do
     {stop_data, nearby_stops_data} = split_stops_data(stops_data, stop_id)
     %{stop_lat: stop_lat, stop_lon: stop_lon} = stop_data
 
     nearby_connections =
       nearby_stops_data
-      |> Enum.map(&build_nearby_connection(&1, stop_lat, stop_lon))
+      |> Enum.map(&build_nearby_connection(&1, stop_lat, stop_lon, routes_at_stops))
       |> Enum.sort_by(& &1.distance)
       |> Enum.map(&convert_distance/1)
 
@@ -54,17 +54,12 @@ defmodule Screens.NearbyConnections do
   def build_nearby_connection(
         %{stop_lat: nearby_lat, stop_lon: nearby_lon, stop_name: name, stop_id: nearby_id},
         stop_lat,
-        stop_lon
+        stop_lon,
+        routes_at_stops
       ) do
     distance_miles = distance(stop_lat, stop_lon, nearby_lat, nearby_lon)
-    routes = routes_at_stop(nearby_id)
-    %{name: name, distance: distance_miles, routes: routes}
-  end
-
-  def routes_at_stop(stop_id) do
-    :screens
-    |> Application.get_env(:routes_at_stop)
-    |> Map.get(stop_id)
+    routes_at_stop = routes_at_stops |> Enum.into(%{}) |> Map.get(nearby_id)
+    %{name: name, distance: distance_miles, routes: routes_at_stop}
   end
 
   def split_stops_data(stops_data, stop_id) do

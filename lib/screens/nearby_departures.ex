@@ -1,11 +1,10 @@
 defmodule Screens.NearbyDepartures do
   @moduledoc false
 
-  def by_stop_id(stop_id) do
-    nearby_departure_stop_ids =
-      :screens
-      |> Application.get_env(:nearby_departures)
-      |> Map.get(stop_id)
+  alias Screens.Config.{Gl, State}
+
+  def by_screen_id(screen_id) do
+    %Gl{nearby_departures: nearby_departure_stop_ids} = State.app_params(screen_id)
 
     prediction_result =
       Screens.Predictions.Prediction.fetch(%{stop_ids: nearby_departure_stop_ids})

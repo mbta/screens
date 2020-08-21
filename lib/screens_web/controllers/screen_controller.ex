@@ -9,8 +9,8 @@ defmodule ScreensWeb.ScreenController do
   @app_id_strings Enum.map(@app_ids, &Atom.to_string/1)
 
   plug(:check_config)
-  plug(:api_version)
   plug(:environment_name)
+  plug(:last_refresh)
   plug(:body_class)
 
   defp check_config(conn, _) do
@@ -23,8 +23,9 @@ defmodule ScreensWeb.ScreenController do
     end
   end
 
-  defp api_version(conn, _) do
-    assign(conn, :api_version, State.api_version())
+  defp last_refresh(conn, _) do
+    now = DateTime.utc_now() |> DateTime.to_iso8601()
+    assign(conn, :last_refresh, now)
   end
 
   defp environment_name(conn, _) do

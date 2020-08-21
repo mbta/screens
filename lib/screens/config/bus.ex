@@ -1,17 +1,22 @@
 defmodule Screens.Config.Bus do
   @moduledoc false
 
+  alias Screens.Config.NearbyConnections
   alias Screens.Config.PsaList
   alias Screens.Util
 
   @type t :: %__MODULE__{
           stop_id: String.t(),
-          psa_list: PsaList.t()
+          service_level: pos_integer(),
+          psa_list: PsaList.t(),
+          nearby_connections: NearbyConnections.t()
         }
 
   @enforce_keys [:stop_id]
   defstruct stop_id: nil,
-            psa_list: PsaList.from_json(:default)
+            service_level: 1,
+            psa_list: PsaList.from_json(:default),
+            nearby_connections: NearbyConnections.from_json(:default)
 
   @spec from_json(map()) :: t()
   def from_json(%{} = json) do
@@ -34,10 +39,18 @@ defmodule Screens.Config.Bus do
     PsaList.from_json(psa_list)
   end
 
+  defp value_from_json("nearby_connections", nearby_connections) do
+    NearbyConnections.from_json(nearby_connections)
+  end
+
   defp value_from_json(_, value), do: value
 
   defp value_to_json(:psa_list, psa_list) do
     PsaList.to_json(psa_list)
+  end
+
+  defp value_to_json(:nearby_connections, nearby_connections) do
+    NearbyConnections.to_json(nearby_connections)
   end
 
   defp value_to_json(_, value), do: value

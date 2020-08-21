@@ -1,8 +1,6 @@
 defmodule Screens.Headways do
   @moduledoc false
 
-  alias Screens.Config.State
-
   @dayparts [
     {:late_night, ~T[00:00:00], :close},
     {:early_morning, :open, ~T[06:30:00]},
@@ -13,8 +11,8 @@ defmodule Screens.Headways do
     {:late_night, ~T[20:00:00], :midnight}
   ]
 
-  def by_route_id(route_id, stop_id, direction_id, time \\ DateTime.utc_now()) do
-    current_schedule = schedule_with_override(time)
+  def by_route_id(route_id, stop_id, direction_id, service_level, time \\ DateTime.utc_now()) do
+    current_schedule = schedule_with_override(time, service_level)
     current_daypart = daypart(time, stop_id, direction_id, current_schedule)
     headway(route_id, current_schedule, current_daypart)
   end
@@ -79,8 +77,7 @@ defmodule Screens.Headways do
   defp headway("Green-E", :sunday, :early_morning), do: 15
   defp headway("Green-E", :sunday, _), do: 12
 
-  defp schedule_with_override(time) do
-    service_level = State.green_line_service()
+  defp schedule_with_override(time, service_level) do
     # Level 3 turns weekday into Saturday schedule
     # Level 4 is always Sunday schedule
     # Otherwise, use normal schedule

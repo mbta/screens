@@ -25,16 +25,12 @@ defmodule Screens.Config.State do
     GenServer.call(pid, :ok?)
   end
 
-  def api_version(pid \\ __MODULE__) do
-    GenServer.call(pid, :api_version)
+  def refresh_if_loaded_before(pid \\ __MODULE__, screen_id) do
+    GenServer.call(pid, {:refresh_if_loaded_before, screen_id})
   end
 
-  def bus_service(pid \\ __MODULE__) do
-    GenServer.call(pid, :bus_service)
-  end
-
-  def green_line_service(pid \\ __MODULE__) do
-    GenServer.call(pid, :green_line_service)
+  def service_level(pid \\ __MODULE__, screen_id) do
+    GenServer.call(pid, {:service_level, screen_id})
   end
 
   def disabled?(pid \\ __MODULE__, screen_id) when is_binary(screen_id) do
@@ -81,12 +77,28 @@ defmodule Screens.Config.State do
     {:reply, true, state}
   end
 
-  def handle_call(:api_version, _from, {config, _} = state) do
-    {:reply, config.api_version, state}
+  def handle_call({:refresh_if_loaded_before, screen_id}, _from, {config, _} = state) do
+    screen = Map.get(config.screens, screen_id)
+
+    refresh_if_loaded_before =
+      case screen do
+        %Screen{refresh_if_loaded_before: refresh_if_loaded_before} -> refresh_if_loaded_before
+        _ -> nil
+      end
+
+    {:reply, refresh_if_loaded_before, state}
   end
 
-  def handle_call(:bus_service, _from, {config, _} = state) do
-    {:reply, config.bus_service, state}
+  def handle_call({:service_level, screen_id}, _from, {config, _} = state) do
+    screen = Map.get(config.screens, screen_id)
+
+    service_level =
+      case screen do
+        %Screen{app_params: %{service_level: service_level}} -> service_level
+        _ -> 1
+      end
+
+    {:reply, service_level, state}
   end
 
   def handle_call(:green_line_service, _from, {config, _} = state) do

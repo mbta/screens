@@ -5,9 +5,6 @@ defmodule Screens.Config do
   alias Screens.Util
 
   @type t :: %__MODULE__{
-          api_version: pos_integer(),
-          bus_service: pos_integer(),
-          green_line_service: pos_integer(),
           screens: %{
             screen_id => Screen.t()
           }
@@ -16,10 +13,7 @@ defmodule Screens.Config do
   @type screen_id :: String.t()
 
   @enforce_keys [:screens]
-  defstruct api_version: 1,
-            bus_service: 1,
-            green_line_service: 1,
-            screens: nil
+  defstruct @enforce_keys
 
   @spec from_json(map()) :: t()
   def from_json(%{} = json) do

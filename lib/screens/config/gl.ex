@@ -10,7 +10,9 @@ defmodule Screens.Config.Gl do
           route_id: String.t(),
           direction_id: 0 | 1,
           headway_mode: boolean(),
-          psa_list: PsaList.t()
+          service_level: pos_integer(),
+          psa_list: PsaList.t(),
+          nearby_departures: list(String.t())
         }
 
   @enforce_keys [:stop_id, :platform_id, :route_id, :direction_id]
@@ -19,7 +21,9 @@ defmodule Screens.Config.Gl do
             route_id: nil,
             direction_id: nil,
             headway_mode: false,
-            psa_list: PsaList.from_json(:default)
+            service_level: 1,
+            psa_list: PsaList.from_json(:default),
+            nearby_departures: []
 
   @spec from_json(map()) :: t()
   def from_json(%{} = json) do

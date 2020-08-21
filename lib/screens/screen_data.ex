@@ -18,17 +18,17 @@ defmodule Screens.ScreenData do
   def by_screen_id(screen_id, is_screen, opts \\ []) do
     check_disabled = Keyword.get(opts, :check_disabled, false)
 
-    client_version = Keyword.get(opts, :client_version, nil)
-    check_version = not is_nil(client_version)
+    last_refresh = Keyword.get(opts, :last_refresh, nil)
+    check_outdated = not is_nil(last_refresh)
 
     response =
       cond do
         check_disabled and disabled?(screen_id) -> @disabled_response
-        check_version and outdated?(client_version) -> @outdated_response
+        check_outdated and outdated?(screen_id, last_refresh) -> @outdated_response
         true -> fetch_data(screen_id, is_screen)
       end
 
-    _ = LogScreenData.log_api_response(response, screen_id, client_version, is_screen)
+    _ = LogScreenData.log_api_response(response, screen_id, last_refresh, is_screen)
 
     response
   end
@@ -47,12 +47,14 @@ defmodule Screens.ScreenData do
     State.disabled?(screen_id)
   end
 
-  defp outdated?(client_version_str) do
-    api_version = State.api_version()
+  defp outdated?(screen_id, client_refresh_timestamp) do
+    {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
+    refresh_if_loaded_before_time = State.refresh_if_loaded_before(screen_id)
 
-    client_version = String.to_integer(client_version_str)
-
-    client_version < api_version
+    case refresh_if_loaded_before_time do
+      nil -> false
+      _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
+    end
   end
 
   defp fetch_data(screen_id, is_screen) do

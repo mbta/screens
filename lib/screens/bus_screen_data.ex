@@ -28,7 +28,7 @@ defmodule Screens.BusScreenData do
           :error
       end
 
-    nearby_connections_data = NearbyConnections.by_stop_id(stop_id)
+    nearby_connections_data = NearbyConnections.by_screen_id(screen_id)
 
     nearby_connections =
       case nearby_connections_data do
@@ -38,7 +38,7 @@ defmodule Screens.BusScreenData do
 
     stop_name = extract_stop_name(nearby_connections_data, departures)
 
-    service_level = State.bus_service()
+    service_level = State.service_level(screen_id)
 
     _ = LogScreenData.log_departures(screen_id, is_screen, departures)
 
