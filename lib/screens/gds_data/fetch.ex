@@ -21,9 +21,10 @@ defmodule Screens.GdsData.Fetch do
     italy_date = DateTime.to_date(italy_time)
 
     with {:get_token, {:ok, token}} <- {:get_token, get_token()},
-         {:fetch_sns, {:ok, sns}} <- {:fetch_sns, fetch_screen_sns(token, italy_date)} do
-      devices_data = fetch_devices_data(token, italy_date)
-      pings_data = fetch_pings_data(sns, token, italy_date)
+         {:fetch_devices_data, {:ok, devices_data}} <-
+           {:fetch_devices_data, fetch_devices_data(token, italy_date)} do
+      sns = Map.keys(devices_data)
+      {:ok, pings_data} = fetch_pings_data(sns, token, italy_date)
       merge_device_and_ping_data(sns, devices_data, pings_data)
     else
       {step, :error} ->
@@ -96,35 +97,6 @@ defmodule Screens.GdsData.Fetch do
       |> Enum.into(%{})
 
     {:ok, devices_data}
-  end
-
-  defp fetch_screen_sns(token, date) do
-    params = %{
-      "Token" => token,
-      "Year" => date.year,
-      "Month" => date.month,
-      "Day" => date.day
-    }
-
-    @device_list_url_base
-    |> build_url(params)
-    |> make_and_parse_request(&parse_screen_sns/1, @vendor_name, @vendor_request_opts)
-  end
-
-  defp parse_screen_sns(xml) do
-    parsed =
-      xml
-      |> xpath(~x"//string/text()")
-      |> xmap(devices: [~x"//Devices/Device"l, sn: ~x"./sn/text()"s])
-
-    case parsed do
-      %{devices: [_ | _] = devices} ->
-        sns = Enum.map(devices, &Map.get(&1, :sn))
-        {:ok, sns}
-
-      _ ->
-        :error
-    end
   end
 
   defp parse_device_log(%{
@@ -202,7 +174,7 @@ defmodule Screens.GdsData.Fetch do
     end
   end
 
-  defp merge_device_and_ping_data(screen_sns, {:ok, devices_data}, {:ok, pings_data}) do
+  defp merge_device_and_ping_data(screen_sns, devices_data, pings_data) do
     merged_data =
       screen_sns
       |> Enum.map(fn sn ->
@@ -215,11 +187,6 @@ defmodule Screens.GdsData.Fetch do
       end)
 
     {:ok, merged_data}
-  end
-
-  defp merge_device_and_ping_data(_screen_sns, :error, {:ok, _pings_data}) do
-    _ = Logger.info("gds_fetch_error fetch_devices_data")
-    :error
   end
 
   defp build_url(base_url, params) when map_size(params) == 0 do
