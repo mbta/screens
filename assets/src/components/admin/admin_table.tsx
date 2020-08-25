@@ -7,6 +7,13 @@ import { doSubmit } from "Util/admin";
 const VALIDATE_PATH = "/api/admin/validate";
 const CONFIRM_PATH = "/api/admin/confirm";
 
+// Helpers
+const gatherSelectOptions = (rows, columnId) => {
+  const options = rows.map((row) => row.values[columnId]);
+  const uniqueOptions = new Set(options);
+  return Array.from(uniqueOptions);
+};
+
 // Filters
 const DefaultColumnFilter = ({
   column: { filterValue, preFilteredRows, setFilter },
@@ -27,13 +34,10 @@ const DefaultColumnFilter = ({
 const SelectColumnFilter = ({
   column: { filterValue, setFilter, preFilteredRows, id },
 }) => {
-  const options = useMemo(() => {
-    const optionsSet = new Set();
-    preFilteredRows.forEach((row) => {
-      optionsSet.add(row.values[id]);
-    });
-    return [...optionsSet.values()];
-  }, [id, preFilteredRows]);
+  const options = useMemo(() => gatherSelectOptions(preFilteredRows, id), [
+    id,
+    preFilteredRows,
+  ]);
 
   return (
     <select
@@ -94,13 +98,10 @@ const EditableSelect = ({
 }) => {
   const [value, setValue] = useState(initialValue);
 
-  const options = useMemo(() => {
-    const optionsSet = new Set();
-    preFilteredRows.forEach((row) => {
-      optionsSet.add(row.values[id]);
-    });
-    return [...optionsSet.values()];
-  }, [id, preFilteredRows]);
+  const options = useMemo(() => gatherSelectOptions(preFilteredRows, id), [
+    id,
+    preFilteredRows,
+  ]);
 
   const onChange = (e) => {
     setValue(e.target.value);
@@ -164,7 +165,7 @@ const EditableCheckbox = ({
 
 const EditableTextarea = ({
   value: initialValue,
-  row: { index },
+  row: { index, values: rowValues },
   column: { id },
   doUpdate,
   editable,
@@ -176,8 +177,12 @@ const EditableTextarea = ({
   };
 
   const onBlur = () => {
-    const json = JSON.parse(value);
-    doUpdate(index, id, json);
+    try {
+      const json = JSON.parse(value);
+      doUpdate(index, id, json);
+    } catch (err) {
+      alert(`Invalid JSON in ${id} for Screen ID ${rowValues.id}`);
+    }
   };
 
   useEffect(() => {
@@ -197,15 +202,6 @@ const EditableTextarea = ({
 
 // Renders the table
 const Table = ({ columns, data, doUpdate, editable }): JSX.Element => {
-  const defaultColumn = useMemo(
-    () => ({
-      Filter: DefaultColumnFilter,
-    }),
-    []
-  );
-
-  const filterTypes = useMemo(() => ({}), []);
-
   const {
     getTableProps,
     getTableBodyProps,
@@ -220,8 +216,6 @@ const Table = ({ columns, data, doUpdate, editable }): JSX.Element => {
     {
       columns,
       data,
-      defaultColumn,
-      filterTypes,
       doUpdate,
       editable,
     },
@@ -263,24 +257,14 @@ const Table = ({ columns, data, doUpdate, editable }): JSX.Element => {
 const configToData = (config) => {
   return _.chain(config.screens)
     .toPairs()
-    .map(([screenId, screenData]) => {
-      screenData.id = screenId;
-      return screenData;
-    })
+    .map(([screenId, screenData]) => ({ ...screenData, id: screenId }))
     .sortBy((screenData) => parseInt(screenData.id, 10))
     .value();
 };
 
 const dataToConfig = (data) => {
   const screens = _.chain(data)
-    .map((screenData) => {
-      const screenId = screenData.id;
-      const screenKeys = _.remove(_.keys(screenData), (k) => k !== "id");
-      const screenConfig = _.fromPairs(
-        _.map(screenKeys, (k) => [k, screenData[k]])
-      );
-      return [screenId, screenConfig];
-    })
+    .map(({ id, ...screenConfig }) => [id, screenConfig])
     .fromPairs()
     .value();
 
@@ -341,7 +325,7 @@ const AdminTable = (): JSX.Element => {
   const fetchConfig = async () => {
     const result = await fetch("/api/admin/");
     const json = await result.json();
-    const config = await JSON.parse(json.config);
+    const config = JSON.parse(json.config);
     setData(configToData(config));
   };
 
@@ -351,15 +335,20 @@ const AdminTable = (): JSX.Element => {
   }, []);
 
   const columns = [
-    { Header: "Screen ID", accessor: "id" },
-    { Header: "Name", accessor: "name", Cell: EditableCell },
+    { Header: "Screen ID", accessor: "id", Filter: DefaultColumnFilter },
+    {
+      Header: "Name",
+      accessor: "name",
+      Cell: EditableCell,
+      Filter: DefaultColumnFilter,
+    },
     {
       Header: "Vendor",
       accessor: "vendor",
       Filter: SelectColumnFilter,
       filter: "includes",
     },
-    { Header: "Device ID", accessor: "device_id" },
+    { Header: "Device ID", accessor: "device_id", Filter: DefaultColumnFilter },
     {
       Header: "App ID",
       accessor: "app_id",
@@ -367,7 +356,12 @@ const AdminTable = (): JSX.Element => {
       Filter: SelectColumnFilter,
       filter: "includes",
     },
-    { Header: "Disabled", accessor: "disabled", Cell: EditableCheckbox },
+    {
+      Header: "Disabled",
+      accessor: "disabled",
+      Cell: EditableCheckbox,
+      Filter: DefaultColumnFilter,
+    },
     {
       Header: "App Params",
       accessor: "app_params",
@@ -382,7 +376,7 @@ const AdminTable = (): JSX.Element => {
       old.map((row, index) => {
         if (index === rowIndex) {
           return {
-            ...old[rowIndex],
+            ...row,
             [columnId]: value,
           };
         }
@@ -393,18 +387,24 @@ const AdminTable = (): JSX.Element => {
 
   return (
     <div className="admin-table">
-      <Table
-        columns={columns}
-        data={data}
-        doUpdate={doUpdate}
-        editable={editable}
-      />
-      <AdminTableControls
-        data={data}
-        setData={setData}
-        editable={editable}
-        setEditable={setEditable}
-      />
+      {data.length > 0 ? (
+        <>
+          <Table
+            columns={columns}
+            data={data}
+            doUpdate={doUpdate}
+            editable={editable}
+          />
+          <AdminTableControls
+            data={data}
+            setData={setData}
+            editable={editable}
+            setEditable={setEditable}
+          />
+        </>
+      ) : (
+        <div>Loading data...</div>
+      )}
     </div>
   );
 };
