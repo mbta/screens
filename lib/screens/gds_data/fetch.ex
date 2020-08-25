@@ -14,45 +14,21 @@ defmodule Screens.GdsData.Fetch do
   @vendor_name :gds
   @vendor_request_opts [hackney: [pool: :gds_api_pool]]
 
-  @screen_sn_list [
-    "100301",
-    "100303",
-    "100320",
-    "100105",
-    "100313",
-    "100326",
-    "100319",
-    "100302",
-    "100317",
-    "100316",
-    "100304",
-    "100322",
-    "100323",
-    "100305",
-    "100306",
-    "100309",
-    "100308",
-    "100310",
-    "100101",
-    "100098",
-    "100102",
-    "100097"
-  ]
-
   def fetch_data_for_current_day do
     # GDS API Dates are in Central European time
     utc_time = DateTime.utc_now()
     {:ok, italy_time} = DateTime.shift_zone(utc_time, "Europe/Rome")
     italy_date = DateTime.to_date(italy_time)
 
-    case get_token() do
-      {:ok, token} ->
-        devices_data = fetch_devices_data(token, italy_date)
-        pings_data = fetch_pings_data(token, italy_date)
-        merge_device_and_ping_data(devices_data, pings_data)
-
-      :error ->
-        _ = Logger.info("gds_fetch_error get_token")
+    with {:get_token, {:ok, token}} <- {:get_token, get_token()},
+         {:fetch_devices_data, {:ok, devices_data}} <-
+           {:fetch_devices_data, fetch_devices_data(token, italy_date)} do
+      sns = Map.keys(devices_data)
+      {:ok, pings_data} = fetch_pings_data(sns, token, italy_date)
+      merge_device_and_ping_data(sns, devices_data, pings_data)
+    else
+      {step, :error} ->
+        _ = Logger.info("gds_fetch_error #{step}")
         :error
     end
   end
@@ -157,9 +133,9 @@ defmodule Screens.GdsData.Fetch do
     end
   end
 
-  defp fetch_pings_data(token, date) do
+  defp fetch_pings_data(screen_sns, token, date) do
     pings_data =
-      @screen_sn_list
+      screen_sns
       |> Enum.map(&fetch_ping_data(token, &1, date))
       |> Enum.into(%{})
 
@@ -198,9 +174,9 @@ defmodule Screens.GdsData.Fetch do
     end
   end
 
-  defp merge_device_and_ping_data({:ok, devices_data}, {:ok, pings_data}) do
+  defp merge_device_and_ping_data(screen_sns, devices_data, pings_data) do
     merged_data =
-      @screen_sn_list
+      screen_sns
       |> Enum.map(fn sn ->
         ping_count = Map.get(pings_data, sn)
 
@@ -211,11 +187,6 @@ defmodule Screens.GdsData.Fetch do
       end)
 
     {:ok, merged_data}
-  end
-
-  defp merge_device_and_ping_data(:error, {:ok, _pings_data}) do
-    _ = Logger.info("gds_fetch_error fetch_devices_data")
-    :error
   end
 
   defp build_url(base_url, params) when map_size(params) == 0 do
