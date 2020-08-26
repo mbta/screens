@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useTable, useFilters } from "react-table";
 import _ from "lodash";
 
@@ -64,25 +64,19 @@ const EditableCell = ({
   doUpdate,
   editable,
 }) => {
-  const [value, setValue] = useState(initialValue);
-
-  const onChange = (e) => {
-    setValue(e.target.value);
-  };
+  const inputElt = useRef(null);
 
   const onBlur = () => {
-    doUpdate(index, id, value);
+    if (inputElt.current) {
+      doUpdate(index, id, inputElt.current.value);
+    }
   };
-
-  useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
 
   return (
     <input
+      defaultValue={initialValue}
+      ref={inputElt}
       className={`admin-table__column--${id}`}
-      value={value}
-      onChange={onChange}
       onBlur={onBlur}
       disabled={!editable}
     />
@@ -96,30 +90,24 @@ const EditableSelect = ({
   doUpdate,
   editable,
 }) => {
-  const [value, setValue] = useState(initialValue);
-
   const options = useMemo(() => gatherSelectOptions(preFilteredRows, id), [
     id,
     preFilteredRows,
   ]);
 
+  const selectElt = useRef(null);
+
   const onChange = (e) => {
-    setValue(e.target.value);
+    if (selectElt.current) {
+      doUpdate(index, id, selectElt.current.value);
+    }
   };
-
-  const onBlur = () => {
-    doUpdate(index, id, value);
-  };
-
-  useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
 
   return (
     <select
-      value={value}
+      defaultValue={initialValue}
+      ref={selectElt}
       onChange={onChange}
-      onBlur={onBlur}
       disabled={!editable}
     >
       {options.map((opt) => (
@@ -138,26 +126,20 @@ const EditableCheckbox = ({
   doUpdate,
   editable,
 }) => {
-  const [value, setValue] = useState(initialValue);
+  const inputElt = useRef(null);
 
   const onChange = (e) => {
-    setValue(e.target.checked);
+    if (inputElt.current) {
+      doUpdate(index, id, inputElt.current.checked);
+    }
   };
-
-  const onBlur = () => {
-    doUpdate(index, id, value);
-  };
-
-  useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
 
   return (
     <input
+      ref={inputElt}
       type="checkbox"
-      checked={value}
+      defaultChecked={initialValue}
       onChange={onChange}
-      onBlur={onBlur}
       disabled={!editable}
     />
   );
@@ -170,30 +152,24 @@ const EditableTextarea = ({
   doUpdate,
   editable,
 }) => {
-  const [value, setValue] = useState(JSON.stringify(initialValue, null, 2));
-
-  const onChange = (e) => {
-    setValue(e.target.value);
-  };
+  const textareaElt = useRef(null);
 
   const onBlur = () => {
-    try {
-      const json = JSON.parse(value);
-      doUpdate(index, id, json);
-    } catch (err) {
-      alert(`Invalid JSON in ${id} for Screen ID ${rowValues.id}`);
+    if (textareaElt.current) {
+      try {
+        const json = JSON.parse(textareaElt.current.value);
+        doUpdate(index, id, json);
+      } catch (err) {
+        alert(`Invalid JSON in ${id} for Screen ID ${rowValues.id}`);
+      }
     }
   };
 
-  useEffect(() => {
-    setValue(JSON.stringify(initialValue, null, 2));
-  }, [initialValue]);
-
   return (
     <textarea
+      ref={textareaElt}
       className="admin-table__textarea"
-      value={value}
-      onChange={onChange}
+      defaultValue={JSON.stringify(initialValue, null, 2)}
       onBlur={onBlur}
       disabled={!editable}
     />
