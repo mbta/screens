@@ -7,9 +7,10 @@ defmodule Screens.GdsData.Fetch do
 
   import Screens.VendorData.Fetch, only: [make_and_parse_request: 4]
 
-  @token_url_base "http://91.241.86.224/DMSService.asmx/GetToken"
-  @device_list_url_base "http://91.241.86.224/DMSService.asmx/GetDevicesList"
-  @ping_url_base "http://91.241.86.224/DMSService.asmx/GetDevicesPing"
+  @gds_api_url "https://dms.gds.com/DMSService.asmx"
+  @token_url_base "#{@gds_api_url}/GetToken"
+  @device_list_url_base "#{@gds_api_url}/GetDevicesList"
+  @ping_url_base "#{@gds_api_url}/GetDevicesPing"
 
   @vendor_name :gds
   @vendor_request_opts [hackney: [pool: :gds_api_pool]]
