@@ -14,6 +14,28 @@ const gatherSelectOptions = (rows, columnId) => {
   return Array.from(uniqueOptions);
 };
 
+const buildDefaultMutator = (columnId) => {
+  return (row, value) => {
+    return { ...row, [columnId]: value };
+  };
+};
+
+const buildIndexMapping = (data, dataFilter) => {
+  // Map from index in filter to index in all data
+  const [indexMapping, _filteredIndex] = data.reduce(
+    ([acc, filteredIndex], row, index) => {
+      const isIncluded = dataFilter(row);
+      return [
+        isIncluded ? { ...acc, [filteredIndex]: index } : acc,
+        isIncluded ? filteredIndex + 1 : filteredIndex,
+      ];
+    },
+    [{}, 0]
+  );
+
+  return indexMapping;
+};
+
 // Filters
 const DefaultColumnFilter = ({
   column: { filterValue, preFilteredRows, setFilter },
@@ -60,7 +82,7 @@ const SelectColumnFilter = ({
 const EditableCell = ({
   value: initialValue,
   row: { index },
-  column: { id },
+  column: { id, mutator },
   doUpdate,
   editable,
 }) => {
@@ -68,7 +90,7 @@ const EditableCell = ({
 
   const onBlur = () => {
     if (inputElt.current) {
-      doUpdate(index, id, inputElt.current.value);
+      doUpdate(index, mutator || id, inputElt.current.value);
     }
   };
 
@@ -86,7 +108,7 @@ const EditableCell = ({
 const EditableSelect = ({
   value: initialValue,
   row: { index },
-  column: { id, preFilteredRows },
+  column: { id, mutator, preFilteredRows },
   doUpdate,
   editable,
 }) => {
@@ -99,7 +121,7 @@ const EditableSelect = ({
 
   const onChange = (e) => {
     if (selectElt.current) {
-      doUpdate(index, id, selectElt.current.value);
+      doUpdate(index, mutator || id, selectElt.current.value);
     }
   };
 
@@ -122,7 +144,7 @@ const EditableSelect = ({
 const EditableCheckbox = ({
   value: initialValue,
   row: { index },
-  column: { id },
+  column: { id, mutator },
   doUpdate,
   editable,
 }) => {
@@ -130,7 +152,7 @@ const EditableCheckbox = ({
 
   const onChange = (e) => {
     if (inputElt.current) {
-      doUpdate(index, id, inputElt.current.checked);
+      doUpdate(index, mutator || id, inputElt.current.checked);
     }
   };
 
@@ -148,7 +170,7 @@ const EditableCheckbox = ({
 const EditableTextarea = ({
   value: initialValue,
   row: { index, values: rowValues },
-  column: { id },
+  column: { id, mutator },
   doUpdate,
   editable,
 }) => {
@@ -158,7 +180,7 @@ const EditableTextarea = ({
     if (textareaElt.current) {
       try {
         const json = JSON.parse(textareaElt.current.value);
-        doUpdate(index, id, json);
+        doUpdate(index, mutator || id, json);
       } catch (err) {
         alert(`Invalid JSON in ${id} for Screen ID ${rowValues.id}`);
       }
@@ -291,11 +313,12 @@ const AdminTableControls = ({
   }
 };
 
-const AdminTable = (): JSX.Element => {
+const AdminTable = ({ columns, dataFilter }): JSX.Element => {
   const [data, setData] = useState([]);
   const [editable, setEditable] = useState(true);
   const [tableVersion, setTableVersion] = useState(0);
 
+  // Fetch config on page load
   const fetchConfig = async () => {
     const result = await fetch("/api/admin/");
     const json = await result.json();
@@ -314,51 +337,19 @@ const AdminTable = (): JSX.Element => {
     setTableVersion((version) => version + 1);
   };
 
-  const columns = [
-    { Header: "Screen ID", accessor: "id", Filter: DefaultColumnFilter },
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: EditableCell,
-      Filter: DefaultColumnFilter,
-    },
-    {
-      Header: "Vendor",
-      accessor: "vendor",
-      Filter: SelectColumnFilter,
-      filter: "includes",
-    },
-    { Header: "Device ID", accessor: "device_id", Filter: DefaultColumnFilter },
-    {
-      Header: "App ID",
-      accessor: "app_id",
-      Cell: EditableSelect,
-      Filter: SelectColumnFilter,
-      filter: "includes",
-    },
-    {
-      Header: "Disabled",
-      accessor: "disabled",
-      Cell: EditableCheckbox,
-      Filter: DefaultColumnFilter,
-    },
-    {
-      Header: "App Params",
-      accessor: "app_params",
-      Cell: EditableTextarea,
-      disableFilters: true,
-    },
-  ];
-
   // Update the state when the user makes changes in the table
-  const doUpdate = (rowIndex, columnId, value) => {
-    setData((old) =>
-      old.map((row, index) => {
-        if (index === rowIndex) {
-          return {
-            ...row,
-            [columnId]: value,
-          };
+  const indexMapping = buildIndexMapping(data, dataFilter);
+  const doUpdate = (rowIndex, columnIdOrMutator, value) => {
+    const mutator =
+      typeof columnIdOrMutator === "function"
+        ? columnIdOrMutator
+        : buildDefaultMutator(columnIdOrMutator);
+
+    setData((orig) =>
+      orig.map((row, index) => {
+        const origIndex = indexMapping[rowIndex];
+        if (index === origIndex) {
+          return mutator(row, value);
         }
         return row;
       })
@@ -371,7 +362,7 @@ const AdminTable = (): JSX.Element => {
         <>
           <Table
             columns={columns}
-            data={data}
+            data={_.filter(data, dataFilter)}
             doUpdate={doUpdate}
             editable={editable}
             key={`table-${tableVersion}`}
@@ -390,4 +381,12 @@ const AdminTable = (): JSX.Element => {
   );
 };
 
+export {
+  DefaultColumnFilter,
+  SelectColumnFilter,
+  EditableCell,
+  EditableSelect,
+  EditableCheckbox,
+  EditableTextarea,
+};
 export default AdminTable;
