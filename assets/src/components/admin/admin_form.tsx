@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { doSubmit } from "Util/admin";
 
 const VALIDATE_PATH = "/api/admin/validate";
 const CONFIRM_PATH = "/api/admin/confirm";
@@ -9,27 +10,6 @@ const validateJson = (json) => {
     return true;
   } catch (err) {
     return false;
-  }
-};
-
-const doSubmit = async (path, data) => {
-  try {
-    const csrfToken = document.head.querySelector("[name~=csrf-token][content]")
-      .content;
-    const result = await fetch(path, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-csrf-token": csrfToken,
-      },
-      credentials: "include",
-      body: JSON.stringify(data),
-    });
-    const json = await result.json();
-    return json;
-  } catch (err) {
-    alert("An error occurred.");
-    throw err;
   }
 };
 
