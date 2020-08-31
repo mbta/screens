@@ -248,13 +248,12 @@ const dataToConfig = (data) => {
 };
 
 // Functions to make API calls
-const doValidate = async (data, setData, setEditable) => {
+const doValidate = async (data, onValidate) => {
   const config = dataToConfig(data);
   const dataToSubmit = { config: JSON.stringify(config, null, 2) };
   const result = await doSubmit(VALIDATE_PATH, dataToSubmit);
   const validatedConfig = await configToData(result.config);
-  setData(validatedConfig);
-  setEditable(false);
+  onValidate(validatedConfig);
 };
 
 const doConfirm = async (data, setEditable) => {
@@ -272,16 +271,14 @@ const doConfirm = async (data, setEditable) => {
 
 const AdminTableControls = ({
   data,
-  setData,
   editable,
   setEditable,
+  onValidate,
 }): JSX.Element => {
   if (editable) {
     return (
       <div className="admin-table__controls">
-        <button onClick={() => doValidate(data, setData, setEditable)}>
-          Validate
-        </button>
+        <button onClick={() => doValidate(data, onValidate)}>Validate</button>
       </div>
     );
   } else {
@@ -297,6 +294,7 @@ const AdminTableControls = ({
 const AdminTable = (): JSX.Element => {
   const [data, setData] = useState([]);
   const [editable, setEditable] = useState(true);
+  const [tableVersion, setTableVersion] = useState(0);
 
   const fetchConfig = async () => {
     const result = await fetch("/api/admin/");
@@ -309,6 +307,12 @@ const AdminTable = (): JSX.Element => {
     fetchConfig();
     return;
   }, []);
+
+  const onValidate = (validatedConfig) => {
+    setData(validatedConfig);
+    setEditable(false);
+    setTableVersion((version) => version + 1);
+  };
 
   const columns = [
     { Header: "Screen ID", accessor: "id", Filter: DefaultColumnFilter },
@@ -370,12 +374,13 @@ const AdminTable = (): JSX.Element => {
             data={data}
             doUpdate={doUpdate}
             editable={editable}
+            key={`table-${tableVersion}`}
           />
           <AdminTableControls
             data={data}
-            setData={setData}
             editable={editable}
             setEditable={setEditable}
+            onValidate={onValidate}
           />
         </>
       ) : (
