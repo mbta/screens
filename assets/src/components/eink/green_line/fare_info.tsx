@@ -21,7 +21,7 @@ const FareInfo = (): JSX.Element => {
             </span>
           </div>
           <div className="fares__info-row">
-            <span className="fares__info-row-cost">$2.90 </span>
+            <span className="fares__info-row-cost">$2.40 </span>
             <span className="fares__info-row-description">
               CharlieTicket or cash{" "}
             </span>
