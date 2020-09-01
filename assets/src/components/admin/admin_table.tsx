@@ -345,9 +345,9 @@ const AdminTable = ({ columns, dataFilter }): JSX.Element => {
         ? columnIdOrMutator
         : buildDefaultMutator(columnIdOrMutator);
 
+    const origIndex = indexMapping[rowIndex];
     setData((orig) =>
       orig.map((row, index) => {
-        const origIndex = indexMapping[rowIndex];
         if (index === origIndex) {
           return mutator(row, value);
         }
@@ -362,7 +362,7 @@ const AdminTable = ({ columns, dataFilter }): JSX.Element => {
         <>
           <Table
             columns={columns}
-            data={_.filter(data, dataFilter)}
+            data={data.filter(dataFilter)}
             doUpdate={doUpdate}
             editable={editable}
             key={`table-${tableVersion}`}

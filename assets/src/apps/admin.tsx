@@ -22,22 +22,25 @@ const App = (): JSX.Element => {
       <AdminNavbar />
       <Switch>
         <Route exact path="/">
-          <AdminForm />
-        </Route>
-        <Route exact path="/all-screens-table">
           <AllScreensTable />
         </Route>
-        <Route exact path="/bus-screens-table">
+        <Route exact path="/all-screens">
+          <AllScreensTable />
+        </Route>
+        <Route exact path="/bus-screens">
           <BusScreensTable />
         </Route>
-        <Route exact path="/gl_single-screens-table">
+        <Route exact path="/gl_single-screens">
           <GLSingleScreensTable />
         </Route>
-        <Route exact path="/gl_double-screens-table">
+        <Route exact path="/gl_double-screens">
           <GLDoubleScreensTable />
         </Route>
-        <Route exact path="/solari-screens-table">
+        <Route exact path="/solari-screens">
           <SolariScreensTable />
+        </Route>
+        <Route exact path="/json-editor">
+          <AdminForm />
         </Route>
       </Switch>
     </Router>

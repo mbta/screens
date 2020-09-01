@@ -14,11 +14,10 @@ const buildAppParamAccessor = (key) => {
 };
 
 const buildAppParamMutator = (key) => {
-  return (row, value) => {
-    const newRow = { ...row };
-    newRow.app_params[key] = value;
-    return newRow;
-  };
+  return (row, value) => ({
+    ...row,
+    app_params: { ...row.app_params, [key]: value },
+  });
 };
 
 // Table configuration
@@ -59,7 +58,7 @@ const AllScreensTable = (): JSX.Element => {
     },
   ];
 
-  const dataFilter = (row) => true;
+  const dataFilter = () => true;
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
