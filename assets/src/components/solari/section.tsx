@@ -47,6 +47,21 @@ const isArrivingOrBoarding = (
   );
 };
 
+const verticalHeaderIconSrc = (name, departuresLength) => {
+  switch (true) {
+    case departuresLength <= 1 && name === "Upper Busway":
+      return "/images/icon-upper-busway-arrow-only.svg";
+    case departuresLength <= 1 && name === "Lower Busway":
+      return "/images/icon-lower-busway-arrow-only.svg";
+    case name === "Upper Busway":
+      return "/images/icon-upper-busway.svg";
+    case name === "Lower Busway":
+      return "/images/icon-lower-busway.svg";
+    case name === "Commuter Rail":
+      return "/images/icon-commuter-rail.svg";
+  }
+};
+
 const SectionHeader = ({ name, arrow }): JSX.Element => {
   return (
     <div className="section-header">
@@ -65,6 +80,7 @@ const SectionFrame = ({
   name,
   arrow,
   overhead,
+  departuresLength,
   children,
 }): JSX.Element => {
   const sectionModifier = sectionHeaders === "vertical" ? "vertical" : "normal";
@@ -73,13 +89,9 @@ const SectionFrame = ({
     sectionHeaders !== null && name !== null && !overhead;
 
   if (sectionHeaders === "vertical") {
-    const iconSrcByName = {
-      "Upper Busway": "/images/icon-upper-busway.svg",
-      "Lower Busway": "/images/icon-lower-busway.svg",
-      "Commuter Rail": "/images/icon-commuter-rail.svg",
-    };
+    const iconSrc = verticalHeaderIconSrc(name, departuresLength);
 
-    name = <img className="section-header__icon" src={iconSrcByName[name]} />;
+    name = <img className="section-header__icon" src={iconSrc} />;
   }
 
   return (
@@ -404,6 +416,7 @@ const PagedSection = ({
     name,
     arrow: sectionHeaders === "normal" ? arrow : null,
     overhead,
+    departuresLength: staticDepartures.length,
   };
 
   if (staticDepartures.length === 0) {
@@ -451,7 +464,13 @@ const Section = ({
     arrow = null;
   }
 
-  const frameProps = { sectionHeaders, name, arrow, overhead };
+  const frameProps = {
+    sectionHeaders,
+    name,
+    arrow,
+    overhead,
+    departuresLength: departures.length,
+  };
 
   if (departures.length === 0) {
     return (
