@@ -8,7 +8,13 @@ import { HashRouter as Router, Route, Switch } from "react-router-dom";
 
 import AdminNavbar from "Components/admin/admin_navbar";
 import AdminForm from "Components/admin/admin_form";
-import AdminTable from "Components/admin/admin_table";
+import {
+  AllScreensTable,
+  BusScreensTable,
+  GLSingleScreensTable,
+  GLDoubleScreensTable,
+  SolariScreensTable,
+} from "Components/admin/admin_tables";
 
 const App = (): JSX.Element => {
   return (
@@ -16,10 +22,25 @@ const App = (): JSX.Element => {
       <AdminNavbar />
       <Switch>
         <Route exact path="/">
-          <AdminForm />
+          <AllScreensTable />
         </Route>
-        <Route exact path="/all-screens-table">
-          <AdminTable />
+        <Route exact path="/all-screens">
+          <AllScreensTable />
+        </Route>
+        <Route exact path="/bus-screens">
+          <BusScreensTable />
+        </Route>
+        <Route exact path="/gl_single-screens">
+          <GLSingleScreensTable />
+        </Route>
+        <Route exact path="/gl_double-screens">
+          <GLDoubleScreensTable />
+        </Route>
+        <Route exact path="/solari-screens">
+          <SolariScreensTable />
+        </Route>
+        <Route exact path="/json-editor">
+          <AdminForm />
         </Route>
       </Switch>
     </Router>
