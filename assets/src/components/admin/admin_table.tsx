@@ -1,19 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { useTable, useFilters } from "react-table";
+import { useTable, useFilters, useRowSelect } from "react-table";
 import _ from "lodash";
 
 import { doSubmit } from "Util/admin";
+import { IndeterminateCheckbox } from "Components/admin/admin_cells";
 
 const VALIDATE_PATH = "/api/admin/validate";
 const CONFIRM_PATH = "/api/admin/confirm";
 
 // Helpers
-const gatherSelectOptions = (rows, columnId) => {
-  const options = rows.map((row) => row.values[columnId]);
-  const uniqueOptions = new Set(options);
-  return Array.from(uniqueOptions);
-};
-
 const buildDefaultMutator = (columnId) => {
   return (row, value) => {
     return { ...row, [columnId]: value };
@@ -36,170 +31,18 @@ const buildIndexMapping = (data, dataFilter) => {
   return indexMapping;
 };
 
-// Filters
-const DefaultColumnFilter = ({
-  column: { filterValue, preFilteredRows, setFilter },
-}) => {
-  const count = preFilteredRows.length;
-
-  return (
-    <input
-      value={filterValue || ""}
-      onChange={(e) => {
-        setFilter(e.target.value || undefined);
-      }}
-      placeholder={`Search ${count} records...`}
-    />
-  );
-};
-
-const SelectColumnFilter = ({
-  column: { filterValue, setFilter, preFilteredRows, id },
-}) => {
-  const options = useMemo(() => gatherSelectOptions(preFilteredRows, id), [
-    id,
-    preFilteredRows,
-  ]);
-
-  return (
-    <select
-      value={filterValue}
-      onChange={(e) => {
-        setFilter(e.target.value || undefined);
-      }}
-    >
-      <option value="">All</option>
-      {options.map((option, i) => (
-        <option key={i} value={option}>
-          {option}
-        </option>
-      ))}
-    </select>
-  );
-};
-
-// Cell Components
-const EditableCell = ({
-  value: initialValue,
-  row: { index },
-  column: { id, mutator },
-  doUpdate,
-  editable,
-}) => {
-  const inputElt = useRef(null);
-
-  const onBlur = () => {
-    if (inputElt.current) {
-      doUpdate(index, mutator || id, inputElt.current.value);
-    }
-  };
-
-  return (
-    <input
-      defaultValue={initialValue}
-      ref={inputElt}
-      className={`admin-table__column--${id}`}
-      onBlur={onBlur}
-      disabled={!editable}
-    />
-  );
-};
-
-const EditableSelect = ({
-  value: initialValue,
-  row: { index },
-  column: { id, mutator, preFilteredRows },
-  doUpdate,
-  editable,
-}) => {
-  const options = useMemo(() => gatherSelectOptions(preFilteredRows, id), [
-    id,
-    preFilteredRows,
-  ]);
-
-  const selectElt = useRef(null);
-
-  const onChange = (e) => {
-    if (selectElt.current) {
-      doUpdate(index, mutator || id, selectElt.current.value);
-    }
-  };
-
-  return (
-    <select
-      defaultValue={initialValue}
-      ref={selectElt}
-      onChange={onChange}
-      disabled={!editable}
-    >
-      {options.map((opt) => (
-        <option value={opt} key={opt}>
-          {opt}
-        </option>
-      ))}
-    </select>
-  );
-};
-
-const EditableCheckbox = ({
-  value: initialValue,
-  row: { index },
-  column: { id, mutator },
-  doUpdate,
-  editable,
-}) => {
-  const inputElt = useRef(null);
-
-  const onChange = (e) => {
-    if (inputElt.current) {
-      doUpdate(index, mutator || id, inputElt.current.checked);
-    }
-  };
-
-  return (
-    <input
-      ref={inputElt}
-      type="checkbox"
-      defaultChecked={initialValue}
-      onChange={onChange}
-      disabled={!editable}
-    />
-  );
-};
-
-const EditableTextarea = ({
-  value: initialValue,
-  row: { index, values: rowValues },
-  column: { id, mutator },
-  doUpdate,
-  editable,
-}) => {
-  const textareaElt = useRef(null);
-
-  const onBlur = () => {
-    if (textareaElt.current) {
-      try {
-        const json = JSON.parse(textareaElt.current.value);
-        doUpdate(index, mutator || id, json);
-      } catch (err) {
-        alert(`Invalid JSON in ${id} for Screen ID ${rowValues.id}`);
-      }
-    }
-  };
-
-  return (
-    <textarea
-      ref={textareaElt}
-      className="admin-table__textarea"
-      defaultValue={JSON.stringify(initialValue, null, 2)}
-      onBlur={onBlur}
-      disabled={!editable}
-    />
-  );
-};
-
 // Renders the table
-const Table = ({ columns, data, doUpdate, editable }): JSX.Element => {
+const Table = ({
+  columns,
+  data,
+  unfilteredData,
+  setData,
+  doUpdate,
+  onValidate,
+  editable,
+  setEditable,
+  setTableVersion,
+}): JSX.Element => {
   const {
     getTableProps,
     getTableBodyProps,
@@ -210,6 +53,7 @@ const Table = ({ columns, data, doUpdate, editable }): JSX.Element => {
     visibleColumns,
     preGlobalFilteredRows,
     setGlobalFilter,
+    state: { selectedRowIds },
   } = useTable(
     {
       columns,
@@ -217,37 +61,72 @@ const Table = ({ columns, data, doUpdate, editable }): JSX.Element => {
       doUpdate,
       editable,
     },
-    useFilters
+    useFilters,
+    useRowSelect,
+    (hooks) => {
+      hooks.visibleColumns.push((cols) => [
+        {
+          id: "selection",
+          Header: ({ getToggleAllRowsSelectedProps }) => (
+            <div>
+              <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
+            </div>
+          ),
+          Cell: ({ row }) => (
+            <div>
+              <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+            </div>
+          ),
+        },
+        ...cols,
+      ]);
+    }
   );
 
   return (
-    <table {...getTableProps()}>
-      <thead>
-        {headerGroups.map((headerGroup) => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map((column) => (
-              <th {...column.getHeaderProps()}>
-                {column.render("Header")}
-                <div>{column.canFilter ? column.render("Filter") : null}</div>
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row, i) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map((cell) => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
-              })}
+    <>
+      <table {...getTableProps()}>
+        <thead>
+          {headerGroups.map((headerGroup) => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => (
+                <th {...column.getHeaderProps()}>
+                  {column.render("Header")}
+                  <div>{column.canFilter ? column.render("Filter") : null}</div>
+                </th>
+              ))}
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          ))}
+        </thead>
+
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row, i) => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map((cell) => {
+                  return (
+                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <AdminTableControls
+        columns={columns}
+        data={data}
+        unfilteredData={unfilteredData}
+        setData={setData}
+        editable={editable}
+        setEditable={setEditable}
+        onValidate={onValidate}
+        selectedRowIds={selectedRowIds}
+        doUpdate={doUpdate}
+        setTableVersion={setTableVersion}
+      />
+    </>
   );
 };
 
@@ -291,26 +170,159 @@ const doConfirm = async (data, setEditable) => {
   }
 };
 
-const AdminTableControls = ({
+const EditModal = ({
+  columns,
   data,
+  setData,
+  selectedRowIds,
+  setShowEditModal,
+  setTableVersion,
+  doUpdate,
+}) => {
+  const selectedRows = _.filter(data, (_row, i) => selectedRowIds[i]);
+  const refs = _.fromPairs(columns.map(({ Header }) => [Header, useRef(null)]));
+
+  const applyChanges = () => {
+    columns.forEach(({ Header, FormCell, id, accessor, mutator, type }) => {
+      const ref = refs[Header];
+      let value;
+
+      if (ref.current) {
+        if (type === "number") {
+          value = parseInt(ref.current.value, 10);
+          if (isNaN(value)) {
+            value = undefined;
+          }
+        } else if (type === "boolean") {
+          if (ref.current.value === "true") {
+            value = true;
+          } else if (ref.current.value === "false") {
+            value = false;
+          } else {
+            value = undefined;
+          }
+        } else if (type === "json") {
+          try {
+            value = JSON.parse(ref.current.value);
+          } catch (err) {
+            value = undefined;
+          }
+        } else {
+          value = ref.current.value || undefined;
+        }
+      }
+
+      if (value !== undefined) {
+        const columnIdOrMutator =
+          typeof accessor === "function" ? mutator : accessor;
+        _.forEach(selectedRowIds, (_true, rowIndex) => {
+          doUpdate(rowIndex, columnIdOrMutator, value);
+        });
+      }
+    });
+
+    setTableVersion((version) => version + 1);
+    setShowEditModal(false);
+  };
+
+  return (
+    <div className="admin-modal__background">
+      <div className="admin-modal__content">
+        {columns.map(({ Header, FormCell, accessor }, i) => {
+          if (FormCell) {
+            const selectedRowValues = selectedRows.map((row) => {
+              if (typeof accessor === "function") {
+                return accessor(row);
+              } else {
+                return row[accessor];
+              }
+            });
+
+            const firstValue = selectedRowValues[0];
+            const otherValues = selectedRowValues.slice(
+              1,
+              selectedRowValues.length
+            );
+            const valuesAllMatch = _.every(otherValues, (otherValue) =>
+              _.isEqual(firstValue, otherValue)
+            );
+            const value = valuesAllMatch ? firstValue : undefined;
+
+            return (
+              <div key={Header}>
+                <div>{Header}</div>
+                <FormCell value={value} ref={refs[Header]} />
+              </div>
+            );
+          }
+
+          return null;
+        })}
+        <button onClick={applyChanges}>Apply Changes</button>
+        <button onClick={() => setShowEditModal(false)}>Discard Changes</button>
+      </div>
+    </div>
+  );
+};
+
+const AdminTableControls = ({
+  columns,
+  data,
+  unfilteredData,
+  setData,
   editable,
   setEditable,
   onValidate,
+  selectedRowIds,
+  doUpdate,
+  setTableVersion,
 }): JSX.Element => {
+  const [showEditModal, setShowEditModal] = useState(false);
+  let controlsDiv;
+
+  const disableMultiEdit = Object.keys(selectedRowIds).length === 0;
+
   if (editable) {
-    return (
+    controlsDiv = (
       <div className="admin-table__controls">
-        <button onClick={() => doValidate(data, onValidate)}>Validate</button>
+        <button
+          disabled={disableMultiEdit}
+          onClick={() => setShowEditModal(true)}
+        >
+          Edit Selected Rows
+        </button>
+        <button onClick={() => doValidate(unfilteredData, onValidate)}>
+          Validate
+        </button>
       </div>
     );
   } else {
-    return (
+    controlsDiv = (
       <div className="admin-table__controls">
         <button onClick={() => setEditable(true)}>Back</button>
-        <button onClick={() => doConfirm(data, setEditable)}>Confirm</button>
+        <button onClick={() => doConfirm(unfilteredData, setEditable)}>
+          Confirm
+        </button>
       </div>
     );
   }
+
+  return (
+    <div>
+      {controlsDiv}
+      {showEditModal ? (
+        <EditModal
+          columns={columns}
+          data={data}
+          setData={setData}
+          selectedRowIds={selectedRowIds}
+          setShowEditModal={setShowEditModal}
+          setTableVersion={setTableVersion}
+          doUpdate={doUpdate}
+        />
+      ) : null}
+    </div>
+  );
 };
 
 const AdminTable = ({ columns, dataFilter }): JSX.Element => {
@@ -363,15 +375,14 @@ const AdminTable = ({ columns, dataFilter }): JSX.Element => {
           <Table
             columns={columns}
             data={data.filter(dataFilter)}
+            unfilteredData={data}
+            setData={setData}
             doUpdate={doUpdate}
-            editable={editable}
-            key={`table-${tableVersion}`}
-          />
-          <AdminTableControls
-            data={data}
             editable={editable}
             setEditable={setEditable}
             onValidate={onValidate}
+            setTableVersion={setTableVersion}
+            key={`table-${tableVersion}`}
           />
         </>
       ) : (
@@ -381,12 +392,4 @@ const AdminTable = ({ columns, dataFilter }): JSX.Element => {
   );
 };
 
-export {
-  DefaultColumnFilter,
-  SelectColumnFilter,
-  EditableCell,
-  EditableSelect,
-  EditableCheckbox,
-  EditableTextarea,
-};
 export default AdminTable;

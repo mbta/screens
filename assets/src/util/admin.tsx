@@ -1,3 +1,9 @@
+const gatherSelectOptions = (rows, columnId) => {
+  const options = rows.map((row) => row.values[columnId]);
+  const uniqueOptions = new Set(options);
+  return Array.from(uniqueOptions);
+};
+
 const doSubmit = async (path, data) => {
   try {
     const csrfToken = document.head.querySelector("[name~=csrf-token][content]")
@@ -19,4 +25,4 @@ const doSubmit = async (path, data) => {
   }
 };
 
-export { doSubmit };
+export { gatherSelectOptions, doSubmit };
