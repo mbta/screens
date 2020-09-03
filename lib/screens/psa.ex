@@ -13,7 +13,10 @@ defmodule Screens.Psa do
       app_params: %_app{psa_config: psa_config}
     } = State.screen(screen_id)
 
-    %PsaConfig{default_list: default_list, override_list: %OverrideList{psa_list: override_list, active_time_range: active_time_range}} = psa_config
+    %PsaConfig{
+      default_list: default_list,
+      override_list: %OverrideList{psa_list: override_list, active_time_range: active_time_range}
+    } = psa_config
 
     {psa_type, psa_list} = get_active_psa_list(active_time_range, default_list, override_list)
 

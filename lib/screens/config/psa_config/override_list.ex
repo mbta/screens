@@ -14,7 +14,6 @@ defmodule Screens.Config.PsaConfig.OverrideList do
 
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
-
     struct_map =
       json
       |> Map.take(Util.struct_keys(__MODULE__))
