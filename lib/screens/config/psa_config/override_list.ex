@@ -6,13 +6,13 @@ defmodule Screens.Config.PsaConfig.OverrideList do
 
   @type t :: %__MODULE__{
           psa_list: PsaList.t(),
-          active_time_range: DateTimeRange.t() | nil
+          active_time_range: DateTimeRange.t()
         }
 
-  defstruct psa_list: PsaList.from_json(:default),
-            active_time_range: nil
+  @enforce_keys [:psa_list, :active_time_range]
+  defstruct @enforce_keys
 
-  @spec from_json(map() | :default) :: t()
+  @spec from_json(map()) :: t()
   def from_json(%{} = json) do
     struct_map =
       json
@@ -22,18 +22,12 @@ defmodule Screens.Config.PsaConfig.OverrideList do
     struct!(__MODULE__, struct_map)
   end
 
-  def from_json(:default) do
-    %__MODULE__{}
-  end
-
   @spec to_json(t()) :: map()
   def to_json(%__MODULE__{} = t) do
     t
     |> Map.from_struct()
     |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
   end
-
-  defp value_from_json("active_time_range", nil), do: nil
 
   defp value_from_json("active_time_range", active_time_range) do
     DateTimeRange.from_json(active_time_range)
@@ -44,8 +38,6 @@ defmodule Screens.Config.PsaConfig.OverrideList do
   end
 
   defp value_from_json(_, value), do: value
-
-  defp value_to_json(:active_time_range, nil), do: nil
 
   defp value_to_json(:active_time_range, active_time_range) do
     DateTimeRange.to_json(active_time_range)

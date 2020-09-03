@@ -6,11 +6,11 @@ defmodule Screens.Config.PsaConfig do
 
   @type t :: %__MODULE__{
           default_list: PsaList.t(),
-          override_list: OverrideList.t()
+          override_list: OverrideList.t() | nil
         }
 
   defstruct default_list: PsaList.from_json(:default),
-            override_list: OverrideList.from_json(:default)
+            override_list: nil
 
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
@@ -37,6 +37,8 @@ defmodule Screens.Config.PsaConfig do
     PsaList.from_json(default_list)
   end
 
+  defp value_from_json("override_list", nil), do: nil
+
   defp value_from_json("override_list", override_list) do
     OverrideList.from_json(override_list)
   end
@@ -46,6 +48,8 @@ defmodule Screens.Config.PsaConfig do
   defp value_to_json(:default_list, default_list) do
     PsaList.to_json(default_list)
   end
+
+  defp value_to_json(:override_list, nil), do: nil
 
   defp value_to_json(:override_list, override_list) do
     OverrideList.to_json(override_list)
