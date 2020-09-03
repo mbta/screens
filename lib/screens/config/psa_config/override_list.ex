@@ -1,21 +1,20 @@
 defmodule Screens.Config.PsaConfig.OverrideList do
   @moduledoc false
 
-  alias Screens.Config.PsaConfig.PsaList
+  alias Screens.Config.{DateTimeRange, PsaConfig.PsaList}
   alias Screens.Util
 
   @type t :: %__MODULE__{
           psa_list: PsaList.t(),
-          start_time: DateTime.t() | nil,
-          end_time: DateTime.t() | nil
+          active_time_range: DateTimeRange.t() | nil
         }
 
   defstruct psa_list: PsaList.from_json(:default),
-            start_time: nil,
-            end_time: nil
+            active_time_range: nil
 
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
+
     struct_map =
       json
       |> Map.take(Util.struct_keys(__MODULE__))
@@ -35,26 +34,10 @@ defmodule Screens.Config.PsaConfig.OverrideList do
     |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
   end
 
-  for datetime_key <- ~w[start_time end_time]a do
-    datetime_key_string = Atom.to_string(datetime_key)
+  defp value_from_json("active_time_range", nil), do: nil
 
-    defp value_from_json(unquote(datetime_key_string), nil), do: nil
-
-    defp value_from_json(unquote(datetime_key_string), timestamp) do
-      timestamp
-      |> DateTime.from_iso8601()
-      # TODO: should we just let parsing fail if this receives an invalid timestamp, instead of falling back on nil?
-      |> case do
-        {:ok, dt, _offset} -> dt
-        _ -> nil
-      end
-    end
-
-    defp value_to_json(unquote(datetime_key), nil), do: nil
-
-    defp value_to_json(unquote(datetime_key), datetime) do
-      DateTime.to_iso8601(datetime)
-    end
+  defp value_from_json("active_time_range", active_time_range) do
+    DateTimeRange.from_json(active_time_range)
   end
 
   defp value_from_json("psa_list", psa_list) do
@@ -63,10 +46,15 @@ defmodule Screens.Config.PsaConfig.OverrideList do
 
   defp value_from_json(_, value), do: value
 
+  defp value_to_json(:active_time_range, nil), do: nil
+
+  defp value_to_json(:active_time_range, active_time_range) do
+    DateTimeRange.to_json(active_time_range)
+  end
+
   defp value_to_json(:psa_list, psa_list) do
     PsaList.to_json(psa_list)
   end
 
   defp value_to_json(_, value), do: value
-
 end

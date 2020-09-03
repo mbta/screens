@@ -1,6 +1,7 @@
 defmodule Screens.Psa do
   @moduledoc false
-  alias Screens.Config.{Screen, Solari, State}
+  alias Screens.Config.{PsaConfig, Screen, Solari, State}
+  alias Screens.Config.PsaConfig.OverrideList
 
   @eink_refresh_seconds 30
   @solari_refresh_seconds 15
@@ -9,8 +10,12 @@ defmodule Screens.Psa do
   def current_psa_for(screen_id) do
     %Screen{
       app_id: app_id,
-      app_params: %_app{psa_list: {psa_type, psa_list}}
+      app_params: %_app{psa_config: psa_config}
     } = State.screen(screen_id)
+
+    %PsaConfig{default_list: default_list, override_list: %OverrideList{psa_list: override_list, active_time_range: active_time_range}} = psa_config
+
+    {psa_type, psa_list} = get_active_psa_list(active_time_range, default_list, override_list)
 
     {psa_type, choose_psa(psa_list, app_id)}
   end
@@ -19,6 +24,17 @@ defmodule Screens.Psa do
     case State.app_params(screen_id) do
       %Solari{audio_psa: audio_psa} -> audio_psa
       _ -> nil
+    end
+  end
+
+  defp get_active_psa_list(nil, default_list, _override_list), do: default_list
+
+  defp get_active_psa_list({start_time, end_time}, default_list, override_list) do
+    now = Timex.now()
+
+    case {Timex.diff(now, start_time), Timex.diff(end_time, now)} do
+      {diff1, diff2} when diff1 >= 0 and diff2 > 0 -> override_list
+      _ -> default_list
     end
   end
 
