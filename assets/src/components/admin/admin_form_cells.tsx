@@ -4,9 +4,9 @@ const FormStaticCell = ({ value }) => {
   return <input defaultValue={value} disabled={true} />;
 };
 
-const FormCell = ({ value, header, setFormValues }) => {
+const FormTextCell = ({ value, header, setFormValues }) => {
   const onBlur = (e) => {
-    const newValue = e.target.value;
+    const newValue = e.target.value || undefined;
     setFormValues((formValues) => ({
       ...formValues,
       [header]: newValue,
@@ -24,10 +24,12 @@ const buildFormSelect = (options, isNumber) => {
         newValue = parseInt(newValue, 10);
       }
 
-      setFormValues((formValues) => ({
-        ...formValues,
-        [header]: newValue,
-      }));
+      if (!(isNumber && isNaN(newValue))) {
+        setFormValues((formValues) => ({
+          ...formValues,
+          [header]: newValue,
+        }));
+      }
     };
 
     return (
@@ -52,6 +54,8 @@ const FormBoolean = ({ value, header, setFormValues }) => {
       newValue = true;
     } else if (e.target.value === "false") {
       newValue = false;
+    } else {
+      newValue = undefined;
     }
 
     setFormValues((formValues) => ({
@@ -84,4 +88,10 @@ const FormTextarea = ({ value, header, setFormValues }) => {
   );
 };
 
-export { FormCell, FormStaticCell, buildFormSelect, FormBoolean, FormTextarea };
+export {
+  FormTextCell,
+  FormStaticCell,
+  buildFormSelect,
+  FormBoolean,
+  FormTextarea,
+};

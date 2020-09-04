@@ -16,7 +16,7 @@ import {
 } from "Components/admin/admin_cells";
 
 import {
-  FormCell,
+  FormTextCell,
   FormStaticCell,
   FormBoolean,
   buildFormSelect,
@@ -49,7 +49,7 @@ const AllScreensTable = (): JSX.Element => {
       accessor: "name",
       Cell: EditableCell,
       Filter: DefaultColumnFilter,
-      FormCell,
+      FormCell: FormTextCell,
     },
     {
       Header: "Vendor",
@@ -110,7 +110,7 @@ const BusScreensTable = (): JSX.Element => {
       accessor: "name",
       Cell: EditableCell,
       Filter: DefaultColumnFilter,
-      FormCell,
+      FormCell: FormTextCell,
     },
     {
       Header: "Stop ID",
@@ -118,7 +118,7 @@ const BusScreensTable = (): JSX.Element => {
       mutator: buildAppParamMutator("stop_id"),
       Cell: EditableCell,
       Filter: DefaultColumnFilter,
-      FormCell,
+      FormCell: FormTextCell,
     },
     {
       Header: "Service Level",
@@ -164,7 +164,7 @@ const greenLineAppColumns = [
     accessor: "name",
     Cell: EditableCell,
     Filter: DefaultColumnFilter,
-    FormCell,
+    FormCell: FormTextCell,
   },
   {
     Header: "Stop ID",
@@ -172,7 +172,7 @@ const greenLineAppColumns = [
     mutator: buildAppParamMutator("stop_id"),
     Cell: EditableCell,
     Filter: DefaultColumnFilter,
-    FormCell,
+    FormCell: FormTextCell,
   },
   {
     Header: "Route ID",
@@ -180,7 +180,7 @@ const greenLineAppColumns = [
     mutator: buildAppParamMutator("route_id"),
     Cell: EditableCell,
     Filter: DefaultColumnFilter,
-    FormCell,
+    FormCell: FormTextCell,
   },
   {
     Header: "Direction ID",
@@ -196,7 +196,7 @@ const greenLineAppColumns = [
     mutator: buildAppParamMutator("platform_id"),
     Cell: EditableCell,
     Filter: DefaultColumnFilter,
-    FormCell,
+    FormCell: FormTextCell,
   },
   {
     Header: "Headway Mode",
@@ -257,7 +257,7 @@ const SolariScreensTable = (): JSX.Element => {
       mutator: buildAppParamMutator("station_name"),
       Cell: EditableCell,
       Filter: DefaultColumnFilter,
-      FormCell,
+      FormCell: FormTextCell,
     },
     {
       Header: "Overhead",
