@@ -9,18 +9,14 @@ const EditableCell = ({
   doUpdate,
   editable,
 }) => {
-  const inputElt = useRef(null);
-
-  const onBlur = () => {
-    if (inputElt.current) {
-      doUpdate(index, mutator || id, inputElt.current.value);
-    }
+  const onBlur = (e) => {
+    const value = e.target.value;
+    doUpdate(index, mutator || id, value);
   };
 
   return (
     <input
       defaultValue={initialValue}
-      ref={inputElt}
       className={`admin-table__column--${id}`}
       onBlur={onBlur}
       disabled={!editable}
@@ -35,23 +31,18 @@ const EditableNumberInput = ({
   doUpdate,
   editable,
 }) => {
-  const inputElt = useRef(null);
-
-  const onBlur = () => {
-    if (inputElt.current) {
-      const value = parseInt(inputElt.current.value, 10);
-      if (!isNaN(value)) {
-        doUpdate(index, mutator || id, value);
-      } else {
-        alert(`Integer value expected in ${id} for Screen ID ${rowValues.id}`);
-      }
+  const onBlur = (e) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value)) {
+      doUpdate(index, mutator || id, value);
+    } else {
+      alert(`Integer value expected in ${id} for Screen ID ${rowValues.id}`);
     }
   };
 
   return (
     <input
       defaultValue={initialValue}
-      ref={inputElt}
       className={`admin-table__column--${id}`}
       onBlur={onBlur}
       disabled={!editable}
@@ -66,17 +57,13 @@ const EditableCheckbox = ({
   doUpdate,
   editable,
 }) => {
-  const inputElt = useRef(null);
-
   const onChange = (e) => {
-    if (inputElt.current) {
-      doUpdate(index, mutator || id, inputElt.current.checked);
-    }
+    const value = e.target.checked;
+    doUpdate(index, mutator || id, value);
   };
 
   return (
     <input
-      ref={inputElt}
       type="checkbox"
       defaultChecked={initialValue}
       onChange={onChange}
@@ -97,18 +84,14 @@ const EditableSelect = ({
     preFilteredRows,
   ]);
 
-  const selectElt = useRef(null);
-
   const onChange = (e) => {
-    if (selectElt.current) {
-      doUpdate(index, mutator || id, selectElt.current.value);
-    }
+    const value = e.target.value;
+    doUpdate(index, mutator || id, value);
   };
 
   return (
     <select
       defaultValue={initialValue}
-      ref={selectElt}
       onChange={onChange}
       disabled={!editable}
     >
@@ -128,22 +111,17 @@ const EditableTextarea = ({
   doUpdate,
   editable,
 }) => {
-  const textareaElt = useRef(null);
-
-  const onBlur = () => {
-    if (textareaElt.current) {
-      try {
-        const json = JSON.parse(textareaElt.current.value);
-        doUpdate(index, mutator || id, json);
-      } catch (err) {
-        alert(`Invalid JSON in ${id} for Screen ID ${rowValues.id}`);
-      }
+  const onBlur = (e) => {
+    try {
+      const json = JSON.parse(e.target.value);
+      doUpdate(index, mutator || id, json);
+    } catch (err) {
+      alert(`Invalid JSON in ${id} for Screen ID ${rowValues.id}`);
     }
   };
 
   return (
     <textarea
-      ref={textareaElt}
       className="admin-table__textarea"
       defaultValue={JSON.stringify(initialValue, null, 2)}
       onBlur={onBlur}

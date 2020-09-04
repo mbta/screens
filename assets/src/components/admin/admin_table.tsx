@@ -180,38 +180,15 @@ const EditModal = ({
   doUpdate,
 }) => {
   const selectedRows = _.filter(data, (_row, i) => selectedRowIds[i]);
-  const refs = _.fromPairs(columns.map(({ Header }) => [Header, useRef(null)]));
+
+  const initialFormValues = _.fromPairs(
+    columns.map(({ Header }) => [Header, undefined])
+  );
+  const [formValues, setFormValues] = useState(initialFormValues);
 
   const applyChanges = () => {
-    columns.forEach(({ Header, FormCell, id, accessor, mutator, type }) => {
-      const ref = refs[Header];
-      let value;
-
-      if (ref.current) {
-        if (type === "number") {
-          value = parseInt(ref.current.value, 10);
-          if (isNaN(value)) {
-            value = undefined;
-          }
-        } else if (type === "boolean") {
-          if (ref.current.value === "true") {
-            value = true;
-          } else if (ref.current.value === "false") {
-            value = false;
-          } else {
-            value = undefined;
-          }
-        } else if (type === "json") {
-          try {
-            value = JSON.parse(ref.current.value);
-          } catch (err) {
-            value = undefined;
-          }
-        } else {
-          value = ref.current.value || undefined;
-        }
-      }
-
+    columns.forEach(({ Header, FormCell, id, accessor, mutator }) => {
+      const value = formValues[Header];
       if (value !== undefined) {
         const columnIdOrMutator =
           typeof accessor === "function" ? mutator : accessor;
@@ -251,7 +228,11 @@ const EditModal = ({
             return (
               <div key={Header}>
                 <div>{Header}</div>
-                <FormCell value={value} ref={refs[Header]} />
+                <FormCell
+                  value={value}
+                  header={Header}
+                  setFormValues={setFormValues}
+                />
               </div>
             );
           }

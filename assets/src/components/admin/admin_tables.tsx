@@ -43,7 +43,6 @@ const AllScreensTable = (): JSX.Element => {
       accessor: "id",
       Filter: DefaultColumnFilter,
       FormCell: FormStaticCell,
-      type: "string",
     },
     {
       Header: "Name",
@@ -51,7 +50,6 @@ const AllScreensTable = (): JSX.Element => {
       Cell: EditableCell,
       Filter: DefaultColumnFilter,
       FormCell,
-      type: "string",
     },
     {
       Header: "Vendor",
@@ -59,14 +57,12 @@ const AllScreensTable = (): JSX.Element => {
       Filter: SelectColumnFilter,
       filter: "includes",
       FormCell: FormStaticCell,
-      type: "string",
     },
     {
       Header: "Device ID",
       accessor: "device_id",
       Filter: DefaultColumnFilter,
       FormCell: FormStaticCell,
-      type: "string",
     },
     {
       Header: "App ID",
@@ -80,7 +76,6 @@ const AllScreensTable = (): JSX.Element => {
         "gl_eink_double",
         "solari_eink",
       ]),
-      type: "string",
     },
     {
       Header: "Disabled",
@@ -88,7 +83,6 @@ const AllScreensTable = (): JSX.Element => {
       Cell: EditableCheckbox,
       Filter: DefaultColumnFilter,
       FormCell: FormBoolean,
-      type: "boolean",
     },
     {
       Header: "App Params",
@@ -96,7 +90,6 @@ const AllScreensTable = (): JSX.Element => {
       Cell: EditableTextarea,
       disableFilters: true,
       FormCell: FormTextarea,
-      type: "json",
     },
   ];
 
@@ -111,7 +104,6 @@ const BusScreensTable = (): JSX.Element => {
       accessor: "id",
       Filter: DefaultColumnFilter,
       FormCell: FormStaticCell,
-      type: "string",
     },
     {
       Header: "Name",
@@ -119,7 +111,6 @@ const BusScreensTable = (): JSX.Element => {
       Cell: EditableCell,
       Filter: DefaultColumnFilter,
       FormCell,
-      type: "string",
     },
     {
       Header: "Stop ID",
@@ -128,7 +119,6 @@ const BusScreensTable = (): JSX.Element => {
       Cell: EditableCell,
       Filter: DefaultColumnFilter,
       FormCell,
-      type: "string",
     },
     {
       Header: "Service Level",
@@ -136,8 +126,7 @@ const BusScreensTable = (): JSX.Element => {
       mutator: buildAppParamMutator("service_level"),
       Cell: EditableNumberInput,
       Filter: DefaultColumnFilter,
-      FormCell: buildFormSelect([1, 2, 3, 4, 5]),
-      type: "number",
+      FormCell: buildFormSelect([1, 2, 3, 4, 5], true),
     },
     {
       Header: "PSA List",
@@ -146,7 +135,6 @@ const BusScreensTable = (): JSX.Element => {
       Cell: EditableTextarea,
       disableFilters: true,
       FormCell: FormTextarea,
-      type: "json",
     },
     {
       Header: "Nearby Connections",
@@ -155,7 +143,6 @@ const BusScreensTable = (): JSX.Element => {
       Cell: EditableTextarea,
       disableFilters: true,
       FormCell: FormTextarea,
-      type: "json",
     },
   ];
 
@@ -171,7 +158,6 @@ const greenLineAppColumns = [
     accessor: "id",
     Filter: DefaultColumnFilter,
     FormCell: FormStaticCell,
-    type: "string",
   },
   {
     Header: "Name",
@@ -179,7 +165,6 @@ const greenLineAppColumns = [
     Cell: EditableCell,
     Filter: DefaultColumnFilter,
     FormCell,
-    type: "text",
   },
   {
     Header: "Stop ID",
@@ -188,7 +173,6 @@ const greenLineAppColumns = [
     Cell: EditableCell,
     Filter: DefaultColumnFilter,
     FormCell,
-    type: "text",
   },
   {
     Header: "Route ID",
@@ -197,7 +181,6 @@ const greenLineAppColumns = [
     Cell: EditableCell,
     Filter: DefaultColumnFilter,
     FormCell,
-    type: "text",
   },
   {
     Header: "Direction ID",
@@ -205,8 +188,7 @@ const greenLineAppColumns = [
     mutator: buildAppParamMutator("direction_id"),
     Cell: EditableCell,
     Filter: DefaultColumnFilter,
-    FormCell: buildFormSelect([0, 1]),
-    type: "number",
+    FormCell: buildFormSelect([0, 1], true),
   },
   {
     Header: "Platform ID",
@@ -215,7 +197,6 @@ const greenLineAppColumns = [
     Cell: EditableCell,
     Filter: DefaultColumnFilter,
     FormCell,
-    type: "text",
   },
   {
     Header: "Headway Mode",
@@ -224,16 +205,14 @@ const greenLineAppColumns = [
     Cell: EditableCheckbox,
     Filter: DefaultColumnFilter,
     FormCell: FormBoolean,
-    type: "boolean",
   },
   {
     Header: "Service Level",
     accessor: buildAppParamAccessor("service_level"),
     mutator: buildAppParamMutator("service_level"),
-    Cell: EditableCell,
+    Cell: EditableNumberInput,
     Filter: DefaultColumnFilter,
-    FormCell: buildFormSelect([1, 2, 3, 4, 5]),
-    type: "number",
+    FormCell: buildFormSelect([1, 2, 3, 4, 5], true),
   },
   {
     Header: "PSA List",
@@ -242,7 +221,6 @@ const greenLineAppColumns = [
     Cell: EditableTextarea,
     disableFilters: true,
     FormCell: FormTextarea,
-    type: "json",
   },
   {
     Header: "Nearby Departures",
@@ -251,7 +229,6 @@ const greenLineAppColumns = [
     Cell: EditableTextarea,
     disableFilters: true,
     FormCell: FormTextarea,
-    type: "json",
   },
 ];
 
@@ -281,7 +258,6 @@ const SolariScreensTable = (): JSX.Element => {
       Cell: EditableCell,
       Filter: DefaultColumnFilter,
       FormCell,
-      type: "text",
     },
     {
       Header: "Overhead",
@@ -290,7 +266,6 @@ const SolariScreensTable = (): JSX.Element => {
       Cell: EditableCheckbox,
       Filter: DefaultColumnFilter,
       FormCell: FormBoolean,
-      type: "boolean",
     },
     {
       Header: "Section Headers",
@@ -299,7 +274,6 @@ const SolariScreensTable = (): JSX.Element => {
       Cell: EditableSelect,
       Filter: SelectColumnFilter,
       FormCell: buildFormSelect([null, "normal", "vertical"]),
-      type: "text",
     },
     {
       Header: "Sections",
@@ -308,7 +282,6 @@ const SolariScreensTable = (): JSX.Element => {
       Cell: EditableTextarea,
       disableFilters: true,
       FormCell: FormTextarea,
-      type: "json",
     },
     {
       Header: "Audio PSA",
@@ -317,7 +290,6 @@ const SolariScreensTable = (): JSX.Element => {
       Cell: EditableTextarea,
       disableFilters: true,
       FormCell: FormTextarea,
-      type: "json",
     },
     {
       Header: "PSA List",
@@ -326,7 +298,6 @@ const SolariScreensTable = (): JSX.Element => {
       Cell: EditableTextarea,
       disableFilters: true,
       FormCell: FormTextarea,
-      type: "json",
     },
   ];
 

@@ -1,17 +1,37 @@
-import React, { forwardRef } from "react";
+import React from "react";
 
-const FormStaticCell = forwardRef(({ value }, ref) => {
+const FormStaticCell = ({ value }) => {
   return <input defaultValue={value} disabled={true} />;
-});
+};
 
-const FormCell = forwardRef(({ value }, ref) => {
-  return <input ref={ref} defaultValue={value} />;
-});
+const FormCell = ({ value, header, setFormValues }) => {
+  const onBlur = (e) => {
+    const newValue = e.target.value;
+    setFormValues((formValues) => ({
+      ...formValues,
+      [header]: newValue,
+    }));
+  };
 
-const buildFormSelect = (options) => {
-  const FormSelect = forwardRef(({ value }, ref) => {
+  return <input defaultValue={value} onBlur={onBlur} />;
+};
+
+const buildFormSelect = (options, isNumber) => {
+  const FormSelect = ({ value, header, setFormValues }) => {
+    const onChange = (e) => {
+      let newValue = e.target.value;
+      if (isNumber) {
+        newValue = parseInt(newValue, 10);
+      }
+
+      setFormValues((formValues) => ({
+        ...formValues,
+        [header]: newValue,
+      }));
+    };
+
     return (
-      <select ref={ref} defaultValue={value}>
+      <select onChange={onChange} defaultValue={value}>
         <option value={undefined}></option>
         {options.map((opt) => (
           <option value={opt} key={opt}>
@@ -20,37 +40,48 @@ const buildFormSelect = (options) => {
         ))}
       </select>
     );
-  });
+  };
 
   return FormSelect;
 };
 
-const FormBoolean = forwardRef(({ value }, ref) => {
+const FormBoolean = ({ value, header, setFormValues }) => {
+  const onChange = (e) => {
+    let newValue;
+    if (e.target.value === "true") {
+      newValue = true;
+    } else if (e.target.value === "false") {
+      newValue = false;
+    }
+
+    setFormValues((formValues) => ({
+      ...formValues,
+      [header]: newValue,
+    }));
+  };
+
   return (
-    <select ref={ref} defaultValue={value}>
+    <select onChange={onChange} defaultValue={value}>
       <option value={undefined}></option>
       <option value={true}>True</option>
       <option value={false}>False</option>
     </select>
   );
-});
+};
 
-const FormTextarea = forwardRef(({ value }, ref) => {
+const FormTextarea = ({ value, header, setFormValues }) => {
   const onBlur = (e) => {
     try {
-      JSON.parse(e.target.value);
+      const json = JSON.parse(e.target.value);
+      setFormValues((formValues) => ({ ...formValues, [header]: json }));
     } catch (err) {
-      alert("Invalid JSON!");
+      alert(err);
     }
   };
 
   return (
-    <textarea
-      ref={ref}
-      defaultValue={JSON.stringify(value, null, 2)}
-      onBlur={onBlur}
-    />
+    <textarea onBlur={onBlur} defaultValue={JSON.stringify(value, null, 2)} />
   );
-});
+};
 
 export { FormCell, FormStaticCell, buildFormSelect, FormBoolean, FormTextarea };
