@@ -38,7 +38,7 @@ defmodule Screens.Psa do
          %OverrideList{psa_list: override_list, start_time: start_time, end_time: end_time},
          default_list
        ) do
-    {:ok, now} = DateTime.now("Etc/UTC")
+    now = DateTime.utc_now()
 
     if in_date_time_range?(now, {start_time, end_time}) do
       override_list
