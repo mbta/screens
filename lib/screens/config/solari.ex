@@ -1,7 +1,7 @@
 defmodule Screens.Config.Solari do
   @moduledoc false
 
-  alias Screens.Config.{AudioPsa, PsaList, Solari.Section}
+  alias Screens.Config.{AudioPsa, PsaConfig, Solari.Section}
   alias Screens.Util
 
   @type t :: %__MODULE__{
@@ -9,7 +9,7 @@ defmodule Screens.Config.Solari do
           overhead: boolean(),
           section_headers: :normal | :vertical | nil,
           sections: list(Section.t()),
-          psa_list: PsaList.t(),
+          psa_config: PsaConfig.t(),
           audio_psa: AudioPsa.t()
         }
 
@@ -18,7 +18,7 @@ defmodule Screens.Config.Solari do
             overhead: false,
             section_headers: :normal,
             sections: [],
-            psa_list: PsaList.from_json(:default),
+            psa_config: PsaConfig.from_json(:default),
             audio_psa: AudioPsa.from_json(:default)
 
   @spec from_json(map()) :: t()
@@ -50,8 +50,8 @@ defmodule Screens.Config.Solari do
     Enum.map(sections, &Section.from_json/1)
   end
 
-  defp value_from_json("psa_list", psa_list) do
-    PsaList.from_json(psa_list)
+  defp value_from_json("psa_config", psa_config) do
+    PsaConfig.from_json(psa_config)
   end
 
   defp value_from_json("audio_psa", audio_psa) do
@@ -64,8 +64,8 @@ defmodule Screens.Config.Solari do
     Enum.map(sections, &Section.to_json/1)
   end
 
-  defp value_to_json(:psa_list, psa_list) do
-    PsaList.to_json(psa_list)
+  defp value_to_json(:psa_config, psa_config) do
+    PsaConfig.to_json(psa_config)
   end
 
   defp value_to_json(:audio_psa, audio_psa) do

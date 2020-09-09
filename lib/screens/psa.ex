@@ -1,6 +1,7 @@
 defmodule Screens.Psa do
   @moduledoc false
-  alias Screens.Config.{Screen, Solari, State}
+  alias Screens.Config.{PsaConfig, Screen, Solari, State}
+  alias Screens.Config.PsaConfig.OverrideList
 
   @eink_refresh_seconds 30
   @solari_refresh_seconds 15
@@ -9,8 +10,15 @@ defmodule Screens.Psa do
   def current_psa_for(screen_id) do
     %Screen{
       app_id: app_id,
-      app_params: %_app{psa_list: {psa_type, psa_list}}
+      app_params: %_app{psa_config: psa_config}
     } = State.screen(screen_id)
+
+    %PsaConfig{
+      default_list: default_list,
+      override_list: override_list
+    } = psa_config
+
+    {psa_type, psa_list} = get_active_psa_list(override_list, default_list)
 
     {psa_type, choose_psa(psa_list, app_id)}
   end
@@ -20,6 +28,37 @@ defmodule Screens.Psa do
       %Solari{audio_psa: audio_psa} -> audio_psa
       _ -> nil
     end
+  end
+
+  defp get_active_psa_list(override_list, default_list)
+
+  defp get_active_psa_list(nil, default_list), do: default_list
+
+  defp get_active_psa_list(
+         %OverrideList{psa_list: override_list, start_time: start_time, end_time: end_time},
+         default_list
+       ) do
+    now = DateTime.utc_now()
+
+    if in_date_time_range?(now, {start_time, end_time}) do
+      override_list
+    else
+      default_list
+    end
+  end
+
+  defp in_date_time_range?(_dt, {nil, nil}), do: true
+
+  defp in_date_time_range?(dt, {start_time, nil}) do
+    DateTime.compare(dt, start_time) in [:gt, :eq]
+  end
+
+  defp in_date_time_range?(dt, {nil, end_time}) do
+    DateTime.compare(dt, end_time) == :lt
+  end
+
+  defp in_date_time_range?(dt, {start_time, end_time}) do
+    in_date_time_range?(dt, {start_time, nil}) and in_date_time_range?(dt, {nil, end_time})
   end
 
   defp choose_psa(psa_list, :solari) do
