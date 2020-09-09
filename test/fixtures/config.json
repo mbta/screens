@@ -1,36 +1,1842 @@
 {
-  "api_version": 12,
-  "bus_service": 3,
-  "green_line_service": 1,
   "screens": {
+    "1": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-portuguese"
+            ],
+            "type": "double"
+          },
+          "override_list": {
+            "psa_list": {
+              "paths": [
+                "face-covering-required"
+              ],
+              "type": "double"
+            },
+            "start_time": "2020-09-04T04:00:00Z",
+            "end_time": "2020-09-08T04:00:00Z"
+          }
+        },
+        "service_level": 1,
+        "stop_id": "1722"
+      },
+      "device_id": "100301",
+      "disabled": false,
+      "name": "100301 1624 Blue B001",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "2": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-portuguese"
+            ],
+            "type": "double"
+          },
+          "override_list": {
+            "psa_list": {
+              "paths": [
+                "face-covering-required"
+              ],
+              "type": "double"
+            },
+            "start_time": null,
+            "end_time": "2020-09-10T04:00:00Z"
+          }
+        },
+        "service_level": 1,
+        "stop_id": "383"
+      },
+      "device_id": "100303",
+      "disabled": false,
+      "name": "100303 Blue Hill Ave B002",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "3": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-portuguese"
+            ],
+            "type": "double"
+          },
+          "override_list": {
+            "psa_list": {
+              "paths": [
+                "face-covering-required"
+              ],
+              "type": "double"
+            },
+            "start_time": "2020-09-04T04:00:00Z",
+            "end_time": null
+          }
+        },
+        "service_level": 1,
+        "stop_id": "5496"
+      },
+      "device_id": "100311",
+      "disabled": false,
+      "name": "100311 Broadway Nor B003",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "4": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required"
+            ],
+            "type": "double"
+          },
+          "override_list": {
+            "psa_list": {
+              "paths": [
+                "face-covering-required"
+              ],
+              "type": "double"
+            },
+            "start_time": null,
+            "end_time": null
+          }
+        },
+        "service_level": 1,
+        "stop_id": "2134"
+      },
+      "device_id": "100105",
+      "disabled": false,
+      "name": "100105 Church Lex B004",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "5": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-chinese_simplified"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "32549"
+      },
+      "device_id": "100313",
+      "disabled": false,
+      "name": "100313 Eliot Bennett B005",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "6": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-chinese_simplified"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "22549"
+      },
+      "device_id": "100315",
+      "disabled": false,
+      "name": "100315 Harvard Sq B006",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "7": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-portuguese"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "5615"
+      },
+      "device_id": "100319",
+      "disabled": false,
+      "name": "100319 Hawthorne B007",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "8": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-portuguese"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "36466"
+      },
+      "device_id": "100302",
+      "disabled": false,
+      "name": "100302 Hyde Park Oak B008",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "9": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-vietnamese"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "11257"
+      },
+      "device_id": "100317",
+      "disabled": false,
+      "name": "100317 Malcolm X B009",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "10": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-chinese_simplified"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "58"
+      },
+      "device_id": "100316",
+      "disabled": false,
+      "name": "100316 Mass Ave Harr B010",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "11": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-vietnamese"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "21365"
+      },
+      "device_id": "100304",
+      "disabled": false,
+      "name": "100304 Huntington B011",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "12": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-chinese_simplified"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "178"
+      },
+      "device_id": "100322",
+      "disabled": false,
+      "name": "100322 St James Dart B012",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "14": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-vietnamese"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "1357"
+      },
+      "device_id": "100323",
+      "disabled": false,
+      "name": "100323 Tremont opp Rox B014",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "15": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-portuguese"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "390"
+      },
+      "device_id": "100305",
+      "disabled": false,
+      "name": "100305 Warren Quincy B015",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "16": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-portuguese"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "407"
+      },
+      "device_id": "100306",
+      "disabled": false,
+      "name": "100306 Warren Towns B016",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "17": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-portuguese"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "5605"
+      },
+      "device_id": "100309",
+      "disabled": false,
+      "name": "100309 Wash Broad B017",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "18": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-french"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "637"
+      },
+      "device_id": "100308",
+      "disabled": false,
+      "name": "100308 Wash Firth B018",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "19": {
+      "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "8178"
+      },
+      "device_id": "100310",
+      "disabled": false,
+      "name": "100310 Watertown Sq B019",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "101": {
+      "app_id": "gl_eink_single",
+      "app_params": {
+        "direction_id": 1,
+        "headway_mode": false,
+        "nearby_departures": [
+          "941",
+          "951"
+        ],
+        "platform_id": "70148",
+        "psa_config": {
+          "default_list": {
+            "paths": [],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "route_id": "Green-B",
+        "service_level": 1,
+        "stop_id": "place-bland"
+      },
+      "device_id": "002047",
+      "disabled": false,
+      "name": "002047 Blandford EB GL01",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "102": {
+      "app_id": "gl_eink_single",
+      "app_params": {
+        "direction_id": 0,
+        "headway_mode": false,
+        "nearby_departures": [
+          "941",
+          "951"
+        ],
+        "platform_id": "70149",
+        "psa_config": {
+          "default_list": {
+            "paths": [],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "route_id": "Green-B",
+        "service_level": 1,
+        "stop_id": "place-bland"
+      },
+      "device_id": "002051",
+      "disabled": false,
+      "name": "002051 Blandford WB GL04",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "104": {
+      "app_id": "gl_eink_single",
+      "app_params": {
+        "direction_id": 0,
+        "headway_mode": false,
+        "nearby_departures": [
+          "1276",
+          "1292"
+        ],
+        "platform_id": "70229",
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "route_id": "Green-C",
+        "service_level": 1,
+        "stop_id": "place-bcnwa"
+      },
+      "device_id": "002050",
+      "disabled": false,
+      "name": "002050 Wash Sq WB GL07",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
     "111": {
       "app_id": "gl_eink_single",
       "app_params": {
         "direction_id": 1,
         "headway_mode": false,
+        "nearby_departures": [
+          "941",
+          "951"
+        ],
         "platform_id": "70148",
-        "psa_list": {
-          "paths": ["face-covering-required"],
-          "type": "double"
+        "psa_config": {
+          "default_list": {
+            "paths": [],
+            "type": "double"
+          },
+          "override_list": null
         },
         "route_id": "Green-B",
+        "service_level": 1,
         "stop_id": "place-bland"
       },
       "device_id": "002046",
       "disabled": false,
-      "last_refresh_timestamp": null,
       "name": "002046 Blandford EB GL02",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
       "vendor": "gds"
+    },
+    "112": {
+      "app_id": "gl_eink_single",
+      "app_params": {
+        "direction_id": 0,
+        "headway_mode": false,
+        "nearby_departures": [
+          "941",
+          "951"
+        ],
+        "platform_id": "70149",
+        "psa_config": {
+          "default_list": {
+            "paths": [],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "route_id": "Green-B",
+        "service_level": 1,
+        "stop_id": "place-bland"
+      },
+      "device_id": "002049",
+      "disabled": false,
+      "name": "002049 Blandford WB GL03",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
+    },
+    "203": {
+      "app_id": "gl_eink_double",
+      "app_params": {
+        "direction_id": 1,
+        "headway_mode": false,
+        "nearby_departures": [
+          "1276",
+          "1292"
+        ],
+        "platform_id": "70230",
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "route_id": "Green-C",
+        "service_level": 1,
+        "stop_id": "place-bcnwa"
+      },
+      "device_id": "100098",
+      "disabled": false,
+      "name": "100098 Wash Sq EB GL05",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "mercury"
+    },
+    "204": {
+      "app_id": "gl_eink_double",
+      "app_params": {
+        "direction_id": 0,
+        "headway_mode": false,
+        "nearby_departures": [
+          "1276",
+          "1292"
+        ],
+        "platform_id": "70229",
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "route_id": "Green-C",
+        "service_level": 1,
+        "stop_id": "place-bcnwa"
+      },
+      "device_id": "100097",
+      "disabled": false,
+      "name": "100097 Wash Sq WB GL08",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "mercury"
+    },
+    "206": {
+      "app_id": "gl_eink_double",
+      "app_params": {
+        "direction_id": 0,
+        "headway_mode": false,
+        "nearby_departures": [
+          "51317",
+          "71391"
+        ],
+        "platform_id": "70245",
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "route_id": "Green-E",
+        "service_level": 1,
+        "stop_id": "place-mfa"
+      },
+      "device_id": "002013",
+      "disabled": false,
+      "name": "002013 MFA WB GL10",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "mercury"
+    },
+    "213": {
+      "app_id": "gl_eink_double",
+      "app_params": {
+        "direction_id": 1,
+        "headway_mode": false,
+        "nearby_departures": [
+          "1276",
+          "1292"
+        ],
+        "platform_id": "70230",
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "route_id": "Green-C",
+        "service_level": 1,
+        "stop_id": "place-bcnwa"
+      },
+      "device_id": "100102",
+      "disabled": false,
+      "name": "100102 Wash Sq EB GL06",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "mercury"
+    },
+    "216": {
+      "app_id": "gl_eink_double",
+      "app_params": {
+        "direction_id": 0,
+        "headway_mode": false,
+        "nearby_departures": [
+          "51317",
+          "71391"
+        ],
+        "platform_id": "70245",
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "route_id": "Green-E",
+        "service_level": 1,
+        "stop_id": "place-mfa"
+      },
+      "device_id": "100101",
+      "disabled": false,
+      "name": "100101 MFA WB GL09",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "mercury"
+    },
+    "301": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
+        },
+        "section_headers": null,
+        "sections": [
+          {
+            "arrow": "e",
+            "audio": {
+              "wayfinding": null
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 2,
+                "paged": false,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                },
+                "visible_rows": 1
+              },
+              "type": "upcoming"
+            },
+            "name": "Red Line",
+            "pill": "red",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "70094"
+                ]
+              }
+            }
+          },
+          {
+            "arrow": "e",
+            "audio": {
+              "wayfinding": null
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 1,
+                "paged": false,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                },
+                "visible_rows": 1
+              },
+              "type": "upcoming"
+            },
+            "name": "Mattapan Trolley",
+            "pill": "mattapan",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "70261"
+                ]
+              }
+            }
+          },
+          {
+            "arrow": "s",
+            "audio": {
+              "wayfinding": null
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 14,
+                "paged": true,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                },
+                "visible_rows": 10
+              },
+              "type": "upcoming"
+            },
+            "name": "Busway",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "334"
+                ]
+              }
+            }
+          }
+        ],
+        "station_name": "Ashmont"
+      },
+      "device_id": "SOL01",
+      "disabled": false,
+      "name": "Ashmont SOL01",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "302": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
+        },
+        "section_headers": null,
+        "sections": [
+          {
+            "arrow": null,
+            "audio": {
+              "wayfinding": null
+            },
+            "layout": {
+              "opts": {
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                }
+              },
+              "type": "bidirectional"
+            },
+            "name": "Red Line",
+            "pill": "red",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "70069",
+                  "70070"
+                ]
+              }
+            }
+          },
+          {
+            "arrow": null,
+            "audio": {
+              "wayfinding": null
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 14,
+                "paged": true,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": [
+                    {
+                      "direction_id": 1,
+                      "route": "70"
+                    },
+                    {
+                      "direction_id": 1,
+                      "route": "64"
+                    }
+                  ]
+                },
+                "visible_rows": 10
+              },
+              "type": "upcoming"
+            },
+            "name": "Bus",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "72",
+                  "102",
+                  "1060",
+                  "1123"
+                ]
+              }
+            }
+          }
+        ],
+        "station_name": "Central"
+      },
+      "device_id": "SOL02",
+      "disabled": false,
+      "name": "Central SOL02",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "303": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": true,
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
+        },
+        "section_headers": "normal",
+        "sections": [
+          {
+            "arrow": null,
+            "audio": {
+              "wayfinding": "Platform A"
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 8,
+                "paged": false,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                },
+                "visible_rows": 1
+              },
+              "type": "upcoming"
+            },
+            "name": "Platform A",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": 1,
+                "route_ids": [
+                  "15",
+                  "23",
+                  "28",
+                  "44",
+                  "45"
+                ],
+                "stop_ids": [
+                  "place-dudly"
+                ]
+              }
+            }
+          }
+        ],
+        "station_name": "Nubian"
+      },
+      "device_id": "SOL03",
+      "disabled": false,
+      "name": "Nubian Platform A SOL03",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "304": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": true,
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
+        },
+        "section_headers": "normal",
+        "sections": [
+          {
+            "arrow": null,
+            "audio": {
+              "wayfinding": "Platform C"
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 8,
+                "paged": false,
+                "routes": {
+                  "action": "include",
+                  "route_list": [
+                    {
+                      "direction_id": 1,
+                      "route": "14"
+                    },
+                    {
+                      "direction_id": 0,
+                      "route": "41"
+                    },
+                    {
+                      "direction_id": 0,
+                      "route": "42"
+                    },
+                    {
+                      "direction_id": 0,
+                      "route": "66"
+                    }
+                  ]
+                },
+                "visible_rows": 1
+              },
+              "type": "upcoming"
+            },
+            "name": "Platform C",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "place-dudly"
+                ]
+              }
+            }
+          }
+        ],
+        "station_name": "Nubian"
+      },
+      "device_id": "SOL04",
+      "disabled": false,
+      "name": "Nubian Platform C SOL04",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "305": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
+        },
+        "section_headers": "vertical",
+        "sections": [
+          {
+            "arrow": "e",
+            "audio": {
+              "wayfinding": "Upper Busway"
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 10,
+                "paged": true,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                },
+                "visible_rows": 6
+              },
+              "type": "upcoming"
+            },
+            "name": "Upper Busway",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "10642"
+                ]
+              }
+            }
+          },
+          {
+            "arrow": "n",
+            "audio": {
+              "wayfinding": "Lower Busway"
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 10,
+                "paged": true,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                },
+                "visible_rows": 6
+              },
+              "type": "upcoming"
+            },
+            "name": "Lower Busway",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "875"
+                ]
+              }
+            }
+          }
+        ],
+        "station_name": "Forest Hills"
+      },
+      "device_id": "SOL05",
+      "disabled": false,
+      "name": "Forest Hills Lobby SOL05",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "306": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
+        },
+        "section_headers": null,
+        "sections": [
+          {
+            "arrow": "w",
+            "audio": {
+              "wayfinding": null
+            },
+            "layout": {
+              "opts": {
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                }
+              },
+              "type": "bidirectional"
+            },
+            "name": "Commuter Rail",
+            "pill": "cr",
+            "query": {
+              "opts": {
+                "include_schedules": true
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "Forest Hills"
+                ]
+              }
+            }
+          },
+          {
+            "arrow": "e",
+            "audio": {
+              "wayfinding": "Upper Busway"
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 14,
+                "paged": true,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                },
+                "visible_rows": 10
+              },
+              "type": "upcoming"
+            },
+            "name": "Upper Busway",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "10642"
+                ]
+              }
+            }
+          }
+        ],
+        "station_name": "Forest Hills"
+      },
+      "device_id": "SOL06",
+      "disabled": false,
+      "name": "Forest Hills Upper Busway SOL06",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "307": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
+        },
+        "section_headers": "normal",
+        "sections": [
+          {
+            "arrow": "e",
+            "audio": {
+              "wayfinding": "Upper Busway"
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 14,
+                "paged": true,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": [
+                    {
+                      "direction_id": 1,
+                      "route": "74"
+                    },
+                    {
+                      "direction_id": 1,
+                      "route": "75"
+                    },
+                    {
+                      "direction_id": 1,
+                      "route": "77"
+                    },
+                    {
+                      "direction_id": 1,
+                      "route": "78"
+                    },
+                    {
+                      "direction_id": 1,
+                      "route": "96"
+                    }
+                  ]
+                },
+                "visible_rows": 10
+              },
+              "type": "upcoming"
+            },
+            "name": "Upper Busway",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "20762"
+                ]
+              }
+            }
+          },
+          {
+            "arrow": "e",
+            "audio": {
+              "wayfinding": "Lower Busway"
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 2,
+                "paged": false,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": [
+                    {
+                      "direction_id": 1,
+                      "route": "74"
+                    },
+                    {
+                      "direction_id": 1,
+                      "route": "75"
+                    },
+                    {
+                      "direction_id": 1,
+                      "route": "77"
+                    },
+                    {
+                      "direction_id": 1,
+                      "route": "78"
+                    },
+                    {
+                      "direction_id": 1,
+                      "route": "96"
+                    }
+                  ]
+                },
+                "visible_rows": 1
+              },
+              "type": "upcoming"
+            },
+            "name": "Lower Busway",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "2076"
+                ]
+              }
+            }
+          }
+        ],
+        "station_name": "Harvard"
+      },
+      "device_id": "SOL07",
+      "disabled": false,
+      "name": "Harvard SOL07",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "308": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
+        },
+        "section_headers": "normal",
+        "sections": [
+          {
+            "arrow": "se",
+            "audio": {
+              "wayfinding": "Busway"
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 12,
+                "paged": true,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": [
+                    {
+                      "direction_id": 1,
+                      "route": "92"
+                    },
+                    {
+                      "direction_id": 1,
+                      "route": "93"
+                    }
+                  ]
+                },
+                "visible_rows": 8
+              },
+              "type": "upcoming"
+            },
+            "name": "Busway",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "8310"
+                ]
+              }
+            }
+          },
+          {
+            "arrow": "n",
+            "audio": {
+              "wayfinding": "Congress Street at Haymarket Station"
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 8,
+                "paged": true,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": [
+                    {
+                      "direction_id": 0,
+                      "route": "4"
+                    }
+                  ]
+                },
+                "visible_rows": 4
+              },
+              "type": "upcoming"
+            },
+            "name": "Congress St @ Haymarket Sta",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "117"
+                ]
+              }
+            }
+          }
+        ],
+        "station_name": "Haymarket"
+      },
+      "device_id": "SOL08",
+      "disabled": false,
+      "name": "Haymarket SOL08",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "309": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
+        },
+        "section_headers": null,
+        "sections": [
+          {
+            "arrow": "e",
+            "audio": {
+              "wayfinding": null
+            },
+            "layout": {
+              "opts": {
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                }
+              },
+              "type": "bidirectional"
+            },
+            "name": "Blue Line",
+            "pill": "blue",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "70045",
+                  "70046"
+                ]
+              }
+            }
+          },
+          {
+            "arrow": "w",
+            "audio": {
+              "wayfinding": null
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 14,
+                "paged": true,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                },
+                "visible_rows": 10
+              },
+              "type": "upcoming"
+            },
+            "name": "Bus",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "5740",
+                  "57400"
+                ]
+              }
+            }
+          }
+        ],
+        "station_name": "Maverick"
+      },
+      "device_id": "SOL09",
+      "disabled": false,
+      "name": "Maverick SOL09",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "310": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
+        },
+        "section_headers": "normal",
+        "sections": [
+          {
+            "arrow": "e",
+            "audio": {
+              "wayfinding": "Lower Busway"
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 14,
+                "paged": true,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                },
+                "visible_rows": 10
+              },
+              "type": "upcoming"
+            },
+            "name": "Lower Busway",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "17862",
+                  "17863"
+                ]
+              }
+            }
+          },
+          {
+            "arrow": "e",
+            "audio": {
+              "wayfinding": null
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 2,
+                "paged": false,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                },
+                "visible_rows": 1
+              },
+              "type": "upcoming"
+            },
+            "name": "Commuter Rail",
+            "pill": "cr",
+            "query": {
+              "opts": {
+                "include_schedules": true
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": [
+                  "Ruggles"
+                ]
+              }
+            }
+          }
+        ],
+        "station_name": "Ruggles"
+      },
+      "device_id": "SOL10",
+      "disabled": false,
+      "name": "Ruggles SOL10",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
     },
     "311": {
       "app_id": "solari",
       "app_params": {
         "audio_psa": null,
         "overhead": false,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
         },
         "section_headers": "normal",
         "sections": [
@@ -126,197 +1932,31 @@
       },
       "device_id": "SOL11",
       "disabled": false,
-      "last_refresh_timestamp": null,
       "name": "Sullivan Square SOL11",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
       "vendor": "solari"
     },
-    "304": {
-      "app_id": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": true,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
-        },
-        "section_headers": "normal",
-        "sections": [
-          {
-            "arrow": null,
-            "audio": {
-              "wayfinding": "Platform C"
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 8,
-                "paged": false,
-                "routes": {
-                  "action": "include",
-                  "route_list": [
-                    {
-                      "direction_id": 1,
-                      "route": "14"
-                    },
-                    {
-                      "direction_id": 0,
-                      "route": "41"
-                    },
-                    {
-                      "direction_id": 0,
-                      "route": "42"
-                    },
-                    {
-                      "direction_id": 0,
-                      "route": "66"
-                    }
-                  ]
-                },
-                "visible_rows": 1
-              },
-              "type": "upcoming"
-            },
-            "name": "Platform C",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["place-dudly"]
-              }
-            }
-          }
-        ],
-        "station_name": "Nubian"
-      },
-      "device_id": "SOL04",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "Nubian Platform C SOL04",
-      "tags": [],
-      "vendor": "solari"
-    },
-    "10": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-chinese_simplified"
-          ],
-          "type": "double"
-        },
-        "stop_id": "58"
-      },
-      "device_id": "100316",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100316 Mass Ave Harr B010",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "14": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-vietnamese"
-          ],
-          "type": "double"
-        },
-        "stop_id": "1357"
-      },
-      "device_id": "100323",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100323 Tremont opp Rox B014",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "307": {
+    "312": {
       "app_id": "solari",
       "app_params": {
         "audio_psa": null,
         "overhead": false,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
         },
-        "section_headers": "normal",
+        "section_headers": null,
         "sections": [
           {
-            "arrow": "e",
+            "arrow": "se",
             "audio": {
-              "wayfinding": "Upper Busway"
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 14,
-                "paged": true,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": [
-                    {
-                      "direction_id": 1,
-                      "route": "74"
-                    },
-                    {
-                      "direction_id": 1,
-                      "route": "75"
-                    },
-                    {
-                      "direction_id": 1,
-                      "route": "77"
-                    },
-                    {
-                      "direction_id": 1,
-                      "route": "78"
-                    },
-                    {
-                      "direction_id": 1,
-                      "route": "96"
-                    }
-                  ]
-                },
-                "visible_rows": 10
-              },
-              "type": "upcoming"
-            },
-            "name": "Upper Busway",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["20762"]
-              }
-            }
-          },
-          {
-            "arrow": "e",
-            "audio": {
-              "wayfinding": "Lower Busway"
+              "wayfinding": null
             },
             "layout": {
               "opts": {
@@ -325,105 +1965,11 @@
                 "paged": false,
                 "routes": {
                   "action": "exclude",
-                  "route_list": [
-                    {
-                      "direction_id": 1,
-                      "route": "74"
-                    },
-                    {
-                      "direction_id": 1,
-                      "route": "75"
-                    },
-                    {
-                      "direction_id": 1,
-                      "route": "77"
-                    },
-                    {
-                      "direction_id": 1,
-                      "route": "78"
-                    },
-                    {
-                      "direction_id": 1,
-                      "route": "96"
-                    }
-                  ]
+                  "route_list": []
                 },
                 "visible_rows": 1
               },
               "type": "upcoming"
-            },
-            "name": "Lower Busway",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["2076"]
-              }
-            }
-          }
-        ],
-        "station_name": "Harvard"
-      },
-      "device_id": "SOL07",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "Harvard SOL07",
-      "tags": [],
-      "vendor": "solari"
-    },
-    "12": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-chinese_simplified"
-          ],
-          "type": "double"
-        },
-        "stop_id": "178"
-      },
-      "device_id": "100322",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100322 St James Dart B012",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "309": {
-      "app_id": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
-        },
-        "section_headers": null,
-        "sections": [
-          {
-            "arrow": "e",
-            "audio": {
-              "wayfinding": null
-            },
-            "layout": {
-              "opts": {
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                }
-              },
-              "type": "bidirectional"
             },
             "name": "Blue Line",
             "pill": "blue",
@@ -434,7 +1980,9 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": ["70045", "70046"]
+                "stop_ids": [
+                  "70059"
+                ]
               }
             }
           },
@@ -465,888 +2013,19 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": ["5740", "57400"]
+                "stop_ids": [
+                  "15795"
+                ]
               }
             }
           }
         ],
-        "station_name": "Maverick"
+        "station_name": "Wonderland"
       },
-      "device_id": "SOL09",
+      "device_id": "SOL12",
       "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "Maverick SOL09",
-      "tags": [],
-      "vendor": "solari"
-    },
-    "16": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-portuguese"
-          ],
-          "type": "double"
-        },
-        "stop_id": "407"
-      },
-      "device_id": "100306",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100306 Warren Towns B016",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "4": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": ["face-covering-required"],
-          "type": "double"
-        },
-        "stop_id": "2134"
-      },
-      "device_id": "100105",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100105 Church Lex B004",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "8": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-portuguese"
-          ],
-          "type": "double"
-        },
-        "stop_id": "36466"
-      },
-      "device_id": "100302",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100302 Hyde Park Oak B008",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "5": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-chinese_simplified"
-          ],
-          "type": "double"
-        },
-        "stop_id": "32549"
-      },
-      "device_id": "100313",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100313 Eliot Bennett B005",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "314": {
-      "app_id": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
-        },
-        "section_headers": "normal",
-        "sections": [
-          {
-            "arrow": "nw",
-            "audio": {
-              "wayfinding": "Back Bay"
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": 120,
-                "num_rows": 8,
-                "paged": false,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                },
-                "visible_rows": 1
-              },
-              "type": "upcoming"
-            },
-            "name": "Commuter Rail (Back Bay)",
-            "pill": "cr",
-            "query": {
-              "opts": {
-                "include_schedules": true
-              },
-              "params": {
-                "direction_id": 0,
-                "route_ids": [],
-                "stop_ids": ["Back Bay"]
-              }
-            }
-          },
-          {
-            "arrow": null,
-            "audio": {
-              "wayfinding": null
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 2,
-                "paged": false,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                },
-                "visible_rows": 1
-              },
-              "type": "upcoming"
-            },
-            "name": "Bus",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["145", "1241", "9983"]
-              }
-            }
-          }
-        ],
-        "station_name": "10 Park Plaza"
-      },
-      "device_id": "C3MS02",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "10 Park Plaza Charles SOL14",
-      "tags": [],
-      "vendor": "c3ms"
-    },
-    "213": {
-      "app_id": "gl_eink_double",
-      "app_params": {
-        "direction_id": 1,
-        "headway_mode": false,
-        "platform_id": "70230",
-        "psa_list": {
-          "paths": ["c-shutdown-clock-double"],
-          "type": "takeover"
-        },
-        "route_id": "Green-C",
-        "stop_id": "place-bcnwa"
-      },
-      "device_id": "100102",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100102 Wash Sq EB GL06",
-      "tags": [],
-      "vendor": "mercury"
-    },
-    "3": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-portuguese"
-          ],
-          "type": "double"
-        },
-        "stop_id": "5496"
-      },
-      "device_id": "100311",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100311 Broadway Nor B003",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "19": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": ["face-covering-required"],
-          "type": "double"
-        },
-        "stop_id": "8178"
-      },
-      "device_id": "100310",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100310 Watertown Sq B019",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "102": {
-      "app_id": "gl_eink_single",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "platform_id": "70149",
-        "psa_list": {
-          "paths": ["face-covering-required"],
-          "type": "double"
-        },
-        "route_id": "Green-B",
-        "stop_id": "place-bland"
-      },
-      "device_id": "002051",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "002051 Blandford WB GL04",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "9": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-vietnamese"
-          ],
-          "type": "double"
-        },
-        "stop_id": "11257"
-      },
-      "device_id": "100317",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100317 Malcolm X B009",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "204": {
-      "app_id": "gl_eink_double",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "platform_id": "70229",
-        "psa_list": {
-          "paths": ["c-shutdown-clock-double"],
-          "type": "takeover"
-        },
-        "route_id": "Green-C",
-        "stop_id": "place-bcnwa"
-      },
-      "device_id": "100097",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100097 Wash Sq WB GL08",
-      "tags": [],
-      "vendor": "mercury"
-    },
-    "7": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-portuguese"
-          ],
-          "type": "double"
-        },
-        "stop_id": "5615"
-      },
-      "device_id": "100319",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100319 Hawthorne B007",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "203": {
-      "app_id": "gl_eink_double",
-      "app_params": {
-        "direction_id": 1,
-        "headway_mode": false,
-        "platform_id": "70230",
-        "psa_list": {
-          "paths": ["c-shutdown-clock-double"],
-          "type": "takeover"
-        },
-        "route_id": "Green-C",
-        "stop_id": "place-bcnwa"
-      },
-      "device_id": "100098",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100098 Wash Sq EB GL05",
-      "tags": [],
-      "vendor": "mercury"
-    },
-    "216": {
-      "app_id": "gl_eink_double",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "platform_id": "70245",
-        "psa_list": {
-          "paths": ["face-covering-required"],
-          "type": "double"
-        },
-        "route_id": "Green-E",
-        "stop_id": "place-mfa"
-      },
-      "device_id": "100101",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100101 MFA WB GL09",
-      "tags": [],
-      "vendor": "mercury"
-    },
-    "310": {
-      "app_id": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
-        },
-        "section_headers": "normal",
-        "sections": [
-          {
-            "arrow": "e",
-            "audio": {
-              "wayfinding": "Lower Busway"
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 14,
-                "paged": true,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                },
-                "visible_rows": 10
-              },
-              "type": "upcoming"
-            },
-            "name": "Lower Busway",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["17862", "17863"]
-              }
-            }
-          },
-          {
-            "arrow": "e",
-            "audio": {
-              "wayfinding": null
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 2,
-                "paged": false,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                },
-                "visible_rows": 1
-              },
-              "type": "upcoming"
-            },
-            "name": "Commuter Rail",
-            "pill": "cr",
-            "query": {
-              "opts": {
-                "include_schedules": true
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["Ruggles"]
-              }
-            }
-          }
-        ],
-        "station_name": "Ruggles"
-      },
-      "device_id": "SOL10",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "Ruggles SOL10",
-      "tags": [],
-      "vendor": "solari"
-    },
-    "2": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-portuguese"
-          ],
-          "type": "double"
-        },
-        "stop_id": "383"
-      },
-      "device_id": "100303",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100303 Blue Hill Ave B002",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "11": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": ["face-covering-required"],
-          "type": "double"
-        },
-        "stop_id": "21365"
-      },
-      "device_id": "100304",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100304 Huntington B011",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "15": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-portuguese"
-          ],
-          "type": "double"
-        },
-        "stop_id": "390"
-      },
-      "device_id": "100305",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100305 Warren Quincy B015",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "17": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-portuguese"
-          ],
-          "type": "double"
-        },
-        "stop_id": "5605"
-      },
-      "device_id": "100309",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100309 Wash Broad B017",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "18": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": ["face-covering-required"],
-          "type": "double"
-        },
-        "stop_id": "637"
-      },
-      "device_id": "100308",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100308 Wash Firth B018",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "302": {
-      "app_id": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
-        },
-        "section_headers": null,
-        "sections": [
-          {
-            "arrow": null,
-            "audio": {
-              "wayfinding": null
-            },
-            "layout": {
-              "opts": {
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                }
-              },
-              "type": "bidirectional"
-            },
-            "name": "Red Line",
-            "pill": "red",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["70069", "70070"]
-              }
-            }
-          },
-          {
-            "arrow": null,
-            "audio": {
-              "wayfinding": null
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 14,
-                "paged": true,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": [
-                    {
-                      "direction_id": 1,
-                      "route": "70"
-                    },
-                    {
-                      "direction_id": 1,
-                      "route": "64"
-                    }
-                  ]
-                },
-                "visible_rows": 10
-              },
-              "type": "upcoming"
-            },
-            "name": "Bus",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["72", "102", "1060", "1123"]
-              }
-            }
-          }
-        ],
-        "station_name": "Central"
-      },
-      "device_id": "SOL02",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "Central SOL02",
-      "tags": [],
-      "vendor": "solari"
-    },
-    "303": {
-      "app_id": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": true,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
-        },
-        "section_headers": "normal",
-        "sections": [
-          {
-            "arrow": null,
-            "audio": {
-              "wayfinding": "Platform A"
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 8,
-                "paged": false,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                },
-                "visible_rows": 1
-              },
-              "type": "upcoming"
-            },
-            "name": "Platform A",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": 1,
-                "route_ids": ["15", "23", "28", "44", "45"],
-                "stop_ids": ["place-dudly"]
-              }
-            }
-          }
-        ],
-        "station_name": "Nubian"
-      },
-      "device_id": "SOL03",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "Nubian Platform A SOL03",
-      "tags": [],
-      "vendor": "solari"
-    },
-    "308": {
-      "app_id": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
-        },
-        "section_headers": "normal",
-        "sections": [
-          {
-            "arrow": "se",
-            "audio": {
-              "wayfinding": "Busway"
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 12,
-                "paged": true,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": [
-                    {
-                      "direction_id": 1,
-                      "route": "92"
-                    },
-                    {
-                      "direction_id": 1,
-                      "route": "93"
-                    }
-                  ]
-                },
-                "visible_rows": 8
-              },
-              "type": "upcoming"
-            },
-            "name": "Busway",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["8310"]
-              }
-            }
-          },
-          {
-            "arrow": "n",
-            "audio": {
-              "wayfinding": "Congress Street at Haymarket Station"
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 8,
-                "paged": true,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": [
-                    {
-                      "direction_id": 0,
-                      "route": "4"
-                    }
-                  ]
-                },
-                "visible_rows": 4
-              },
-              "type": "upcoming"
-            },
-            "name": "Congress St @ Haymarket Sta",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["117"]
-              }
-            }
-          }
-        ],
-        "station_name": "Haymarket"
-      },
-      "device_id": "SOL08",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "Haymarket SOL08",
-      "tags": [],
-      "vendor": "solari"
-    },
-    "306": {
-      "app_id": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
-        },
-        "section_headers": null,
-        "sections": [
-          {
-            "arrow": "w",
-            "audio": {
-              "wayfinding": null
-            },
-            "layout": {
-              "opts": {
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                }
-              },
-              "type": "bidirectional"
-            },
-            "name": "Commuter Rail",
-            "pill": "cr",
-            "query": {
-              "opts": {
-                "include_schedules": true
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["Forest Hills"]
-              }
-            }
-          },
-          {
-            "arrow": "e",
-            "audio": {
-              "wayfinding": "Upper Busway"
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 14,
-                "paged": true,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                },
-                "visible_rows": 10
-              },
-              "type": "upcoming"
-            },
-            "name": "Upper Busway",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["10642"]
-              }
-            }
-          }
-        ],
-        "station_name": "Forest Hills"
-      },
-      "device_id": "SOL06",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "Forest Hills Upper Busway SOL06",
+      "name": "Wonderland SOL12",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
       "vendor": "solari"
     },
@@ -1355,9 +2034,14 @@
       "app_params": {
         "audio_psa": null,
         "overhead": false,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
         },
         "section_headers": "normal",
         "sections": [
@@ -1388,7 +2072,9 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": ["South Station"]
+                "stop_ids": [
+                  "South Station"
+                ]
               }
             }
           },
@@ -1415,7 +2101,10 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": ["70016", "70017"]
+                "stop_ids": [
+                  "70016",
+                  "70017"
+                ]
               }
             }
           },
@@ -1451,7 +2140,10 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": ["49002", "6565"]
+                "stop_ids": [
+                  "49002",
+                  "6565"
+                ]
               }
             }
           },
@@ -1482,7 +2174,9 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": ["9983"]
+                "stop_ids": [
+                  "9983"
+                ]
               }
             }
           }
@@ -1491,49 +2185,62 @@
       },
       "device_id": "C3MS01",
       "disabled": false,
-      "last_refresh_timestamp": null,
       "name": "10 Park Plaza Stuart SOL13",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
       "vendor": "c3ms"
     },
-    "6": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-chinese_simplified"
-          ],
-          "type": "double"
-        },
-        "stop_id": "22549"
-      },
-      "device_id": "100315",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100315 Harvard Sq B006",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "301": {
+    "314": {
       "app_id": "solari",
       "app_params": {
         "audio_psa": null,
         "overhead": false,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
         },
-        "section_headers": null,
+        "section_headers": "normal",
         "sections": [
           {
-            "arrow": "e",
+            "arrow": "nw",
+            "audio": {
+              "wayfinding": "Back Bay"
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": 120,
+                "num_rows": 8,
+                "paged": false,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                },
+                "visible_rows": 1
+              },
+              "type": "upcoming"
+            },
+            "name": "Commuter Rail (Back Bay)",
+            "pill": "cr",
+            "query": {
+              "opts": {
+                "include_schedules": true
+              },
+              "params": {
+                "direction_id": 0,
+                "route_ids": [],
+                "stop_ids": [
+                  "Back Bay"
+                ]
+              }
+            }
+          },
+          {
+            "arrow": null,
             "audio": {
               "wayfinding": null
             },
@@ -1547,191 +2254,6 @@
                   "route_list": []
                 },
                 "visible_rows": 1
-              },
-              "type": "upcoming"
-            },
-            "name": "Red Line",
-            "pill": "red",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["70094"]
-              }
-            }
-          },
-          {
-            "arrow": "e",
-            "audio": {
-              "wayfinding": null
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 1,
-                "paged": false,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                },
-                "visible_rows": 1
-              },
-              "type": "upcoming"
-            },
-            "name": "Mattapan Trolley",
-            "pill": "mattapan",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["70261"]
-              }
-            }
-          },
-          {
-            "arrow": "s",
-            "audio": {
-              "wayfinding": null
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 14,
-                "paged": true,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                },
-                "visible_rows": 10
-              },
-              "type": "upcoming"
-            },
-            "name": "Busway",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["334"]
-              }
-            }
-          }
-        ],
-        "station_name": "Ashmont"
-      },
-      "device_id": "SOL01",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "Ashmont SOL01",
-      "tags": [],
-      "vendor": "solari"
-    },
-    "104": {
-      "app_id": "gl_eink_single",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "platform_id": "70229",
-        "psa_list": {
-          "paths": ["c-shutdown-clock-single"],
-          "type": "takeover"
-        },
-        "route_id": "Green-C",
-        "stop_id": "place-bcnwa"
-      },
-      "device_id": "002050",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "002050 Wash Sq WB GL07",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "206": {
-      "app_id": "gl_eink_double",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "platform_id": "70245",
-        "psa_list": {
-          "paths": ["face-covering-required"],
-          "type": "double"
-        },
-        "route_id": "Green-E",
-        "stop_id": "place-mfa"
-      },
-      "device_id": "002013",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "002013 MFA WB GL10",
-      "tags": [],
-      "vendor": "mercury"
-    },
-    "312": {
-      "app_id": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
-        },
-        "section_headers": null,
-        "sections": [
-          {
-            "arrow": "se",
-            "audio": {
-              "wayfinding": null
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 2,
-                "paged": false,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                },
-                "visible_rows": 1
-              },
-              "type": "upcoming"
-            },
-            "name": "Blue Line",
-            "pill": "blue",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["70059"]
-              }
-            }
-          },
-          {
-            "arrow": "w",
-            "audio": {
-              "wayfinding": null
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 14,
-                "paged": true,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                },
-                "visible_rows": 10
               },
               "type": "upcoming"
             },
@@ -1744,167 +2266,23 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": ["15795"]
+                "stop_ids": [
+                  "145",
+                  "1241",
+                  "9983"
+                ]
               }
             }
           }
         ],
-        "station_name": "Wonderland"
+        "station_name": "10 Park Plaza"
       },
-      "device_id": "SOL12",
+      "device_id": "C3MS02",
       "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "Wonderland SOL12",
+      "name": "10 Park Plaza Charles SOL14",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "solari"
-    },
-    "101": {
-      "app_id": "gl_eink_single",
-      "app_params": {
-        "direction_id": 1,
-        "headway_mode": false,
-        "platform_id": "70148",
-        "psa_list": {
-          "paths": ["face-covering-required"],
-          "type": "double"
-        },
-        "route_id": "Green-B",
-        "stop_id": "place-bland"
-      },
-      "device_id": "002047",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "002047 Blandford EB GL01",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "1": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "psa_list": {
-          "paths": [
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-spanish",
-            "face-covering-required",
-            "crowding-language-english",
-            "face-covering-required",
-            "crowding-language-portuguese"
-          ],
-          "type": "double"
-        },
-        "stop_id": "1722"
-      },
-      "device_id": "100301",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "100301 1624 Blue B001",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "305": {
-      "app_id": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
-        "psa_list": {
-          "paths": ["solari-feedback"],
-          "type": "psa"
-        },
-        "section_headers": "vertical",
-        "sections": [
-          {
-            "arrow": "e",
-            "audio": {
-              "wayfinding": "Upper Busway"
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 10,
-                "paged": true,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                },
-                "visible_rows": 6
-              },
-              "type": "upcoming"
-            },
-            "name": "Upper Busway",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["10642"]
-              }
-            }
-          },
-          {
-            "arrow": "n",
-            "audio": {
-              "wayfinding": "Lower Busway"
-            },
-            "layout": {
-              "opts": {
-                "max_minutes": "infinity",
-                "num_rows": 10,
-                "paged": true,
-                "routes": {
-                  "action": "exclude",
-                  "route_list": []
-                },
-                "visible_rows": 6
-              },
-              "type": "upcoming"
-            },
-            "name": "Lower Busway",
-            "pill": "bus",
-            "query": {
-              "opts": {
-                "include_schedules": false
-              },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [],
-                "stop_ids": ["875"]
-              }
-            }
-          }
-        ],
-        "station_name": "Forest Hills"
-      },
-      "device_id": "SOL05",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "Forest Hills Lobby SOL05",
-      "tags": [],
-      "vendor": "solari"
-    },
-    "112": {
-      "app_id": "gl_eink_single",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "platform_id": "70149",
-        "psa_list": {
-          "paths": ["face-covering-required"],
-          "type": "double"
-        },
-        "route_id": "Green-B",
-        "stop_id": "place-bland"
-      },
-      "device_id": "002049",
-      "disabled": false,
-      "last_refresh_timestamp": null,
-      "name": "002049 Blandford WB GL03",
-      "tags": [],
-      "vendor": "gds"
+      "vendor": "c3ms"
     }
   }
 }

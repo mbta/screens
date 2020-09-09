@@ -1,4 +1,4 @@
-defmodule Screens.Config.PsaList do
+defmodule Screens.Config.PsaConfig.PsaList do
   @moduledoc false
 
   @type t :: {
