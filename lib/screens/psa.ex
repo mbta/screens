@@ -15,10 +15,13 @@ defmodule Screens.Psa do
 
     %PsaConfig{
       default_list: default_list,
-      override_list: %OverrideList{psa_list: override_list, active_time_range: active_time_range}
+      override_list: override_list
     } = psa_config
 
-    {psa_type, psa_list} = get_active_psa_list(active_time_range, default_list, override_list)
+    {psa_type, psa_list} = case override_list do
+      %OverrideList{psa_list: override_list, active_time_range: active_time_range} -> get_active_psa_list(active_time_range, default_list, override_list)
+      nil -> default_list
+    end
 
     {psa_type, choose_psa(psa_list, app_id)}
   end
@@ -32,13 +35,28 @@ defmodule Screens.Psa do
 
   defp get_active_psa_list(nil, default_list, _override_list), do: default_list
 
-  defp get_active_psa_list({start_time, end_time}, default_list, override_list) do
+  defp get_active_psa_list({nil, nil}, default_list, _override_list), do: default_list
+
+  defp get_active_psa_list({_, _} = override_active_time_range, default_list, override_list) do
     now = Timex.now()
 
-    case {Timex.diff(now, start_time), Timex.diff(end_time, now)} do
-      {diff1, diff2} when diff1 >= 0 and diff2 > 0 -> override_list
-      _ -> default_list
+    if in_date_time_range?(now, override_active_time_range) do
+      override_list
+    else
+      default_list
     end
+  end
+
+  defp in_date_time_range?(dt, {start_time, nil}) do
+    Timex.diff(dt, start_time) >= 0
+  end
+
+  defp in_date_time_range?(dt, {nil, end_time}) do
+    Timex.diff(end_time, dt) > 0
+  end
+
+  defp in_date_time_range?(dt, {start_time, end_time}) do
+    Timex.diff(dt, start_time) >= 0 and Timex.diff(end_time, dt) > 0
   end
 
   defp choose_psa(psa_list, :solari) do
