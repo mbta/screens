@@ -2,16 +2,8 @@
   "screens": {
     "1": {
       "app_id": "bus_eink",
-      "device_id": "100301",
-      "disabled": false,
-      "name": "100301 1624 Blue B001",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "gds",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "1722",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -27,30 +19,69 @@
             "type": "double"
           },
           "override_list": {
-            "active_time_range": {
-              "start_time": "2020-09-04T00:00:00Z",
-              "end_time": "2020-09-08T00:00:00Z"
-            },
             "psa_list": {
-              "paths": ["face-covering-required"],
+              "paths": [
+                "face-covering-required"
+              ],
               "type": "double"
-            }
+            },
+            "start_time": "2020-09-04T04:00:00Z",
+            "end_time": "2020-09-08T04:00:00Z"
           }
-        }
-      }
+        },
+        "service_level": 1,
+        "stop_id": "1722"
+      },
+      "device_id": "100301",
+      "disabled": false,
+      "name": "100301 1624 Blue B001",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
     },
     "2": {
       "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-portuguese"
+            ],
+            "type": "double"
+          },
+          "override_list": {
+            "psa_list": {
+              "paths": [
+                "face-covering-required"
+              ],
+              "type": "double"
+            },
+            "start_time": null,
+            "end_time": "2020-09-10T04:00:00Z"
+          }
+        },
+        "service_level": 1,
+        "stop_id": "383"
+      },
       "device_id": "100303",
       "disabled": false,
       "name": "100303 Blue Hill Ave B002",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
+      "vendor": "gds"
+    },
+    "3": {
+      "app_id": "bus_eink",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "383",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -65,52 +96,31 @@
             ],
             "type": "double"
           },
-          "override_list": null
-        }
-      }
-    },
-    "3": {
-      "app_id": "bus_eink",
+          "override_list": {
+            "psa_list": {
+              "paths": [
+                "face-covering-required"
+              ],
+              "type": "double"
+            },
+            "start_time": "2020-09-04T04:00:00Z",
+            "end_time": null
+          }
+        },
+        "service_level": 1,
+        "stop_id": "5496"
+      },
       "device_id": "100311",
       "disabled": false,
       "name": "100311 Broadway Nor B003",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
-      "app_params": {
-        "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "5496",
-        "psa_config": {
-          "default_list": {
-            "paths": [
-              "face-covering-required",
-              "crowding-language-english",
-              "face-covering-required",
-              "crowding-language-spanish",
-              "face-covering-required",
-              "crowding-language-english",
-              "face-covering-required",
-              "crowding-language-portuguese"
-            ],
-            "type": "double"
-          },
-          "override_list": null
-        }
-      }
+      "vendor": "gds"
     },
     "4": {
       "app_id": "bus_eink",
-      "device_id": "100105",
-      "disabled": false,
-      "name": "100105 Church Lex B004",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "gds",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "2134",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -118,22 +128,61 @@
             ],
             "type": "double"
           },
-          "override_list": null
-        }
-      }
+          "override_list": {
+            "psa_list": {
+              "paths": [
+                "face-covering-required"
+              ],
+              "type": "double"
+            },
+            "start_time": null,
+            "end_time": null
+          }
+        },
+        "service_level": 1,
+        "stop_id": "2134"
+      },
+      "device_id": "100105",
+      "disabled": false,
+      "name": "100105 Church Lex B004",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
     },
     "5": {
       "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-chinese_simplified"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "32549"
+      },
       "device_id": "100313",
       "disabled": false,
       "name": "100313 Eliot Bennett B005",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
+      "vendor": "gds"
+    },
+    "6": {
+      "app_id": "bus_eink",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "32549",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -149,21 +198,21 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
-    },
-    "6": {
-      "app_id": "bus_eink",
+        },
+        "service_level": 1,
+        "stop_id": "22549"
+      },
       "device_id": "100315",
       "disabled": false,
       "name": "100315 Harvard Sq B006",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
+      "vendor": "gds"
+    },
+    "7": {
+      "app_id": "bus_eink",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "22549",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -174,26 +223,26 @@
               "face-covering-required",
               "crowding-language-english",
               "face-covering-required",
-              "crowding-language-chinese_simplified"
+              "crowding-language-portuguese"
             ],
             "type": "double"
           },
           "override_list": null
-        }
-      }
-    },
-    "7": {
-      "app_id": "bus_eink",
+        },
+        "service_level": 1,
+        "stop_id": "5615"
+      },
       "device_id": "100319",
       "disabled": false,
       "name": "100319 Hawthorne B007",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
+      "vendor": "gds"
+    },
+    "8": {
+      "app_id": "bus_eink",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "5615",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -209,21 +258,21 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
-    },
-    "8": {
-      "app_id": "bus_eink",
+        },
+        "service_level": 1,
+        "stop_id": "36466"
+      },
       "device_id": "100302",
       "disabled": false,
       "name": "100302 Hyde Park Oak B008",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
+      "vendor": "gds"
+    },
+    "9": {
+      "app_id": "bus_eink",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "36466",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -234,26 +283,26 @@
               "face-covering-required",
               "crowding-language-english",
               "face-covering-required",
-              "crowding-language-portuguese"
+              "crowding-language-vietnamese"
             ],
             "type": "double"
           },
           "override_list": null
-        }
-      }
-    },
-    "9": {
-      "app_id": "bus_eink",
+        },
+        "service_level": 1,
+        "stop_id": "11257"
+      },
       "device_id": "100317",
       "disabled": false,
       "name": "100317 Malcolm X B009",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
+      "vendor": "gds"
+    },
+    "10": {
+      "app_id": "bus_eink",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "11257",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -264,26 +313,26 @@
               "face-covering-required",
               "crowding-language-english",
               "face-covering-required",
-              "crowding-language-vietnamese"
+              "crowding-language-chinese_simplified"
             ],
             "type": "double"
           },
           "override_list": null
-        }
-      }
-    },
-    "10": {
-      "app_id": "bus_eink",
+        },
+        "service_level": 1,
+        "stop_id": "58"
+      },
       "device_id": "100316",
       "disabled": false,
       "name": "100316 Mass Ave Harr B010",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
+      "vendor": "gds"
+    },
+    "11": {
+      "app_id": "bus_eink",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "58",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -294,56 +343,26 @@
               "face-covering-required",
               "crowding-language-english",
               "face-covering-required",
-              "crowding-language-chinese_simplified"
+              "crowding-language-vietnamese"
             ],
             "type": "double"
           },
           "override_list": null
-        }
-      }
-    },
-    "11": {
-      "app_id": "bus_eink",
+        },
+        "service_level": 1,
+        "stop_id": "21365"
+      },
       "device_id": "100304",
       "disabled": false,
       "name": "100304 Huntington B011",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
-      "app_params": {
-        "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "21365",
-        "psa_config": {
-          "default_list": {
-            "paths": [
-              "face-covering-required",
-              "crowding-language-english",
-              "face-covering-required",
-              "crowding-language-spanish",
-              "face-covering-required",
-              "crowding-language-english",
-              "face-covering-required",
-              "crowding-language-vietnamese"
-            ],
-            "type": "double"
-          },
-          "override_list": null
-        }
-      }
+      "vendor": "gds"
     },
     "12": {
       "app_id": "bus_eink",
-      "device_id": "100322",
-      "disabled": false,
-      "name": "100322 St James Dart B012",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "gds",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "178",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -359,21 +378,21 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
+        },
+        "service_level": 1,
+        "stop_id": "178"
+      },
+      "device_id": "100322",
+      "disabled": false,
+      "name": "100322 St James Dart B012",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
     },
     "14": {
       "app_id": "bus_eink",
-      "device_id": "100323",
-      "disabled": false,
-      "name": "100323 Tremont opp Rox B014",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "gds",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "1357",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -389,21 +408,51 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
+        },
+        "service_level": 1,
+        "stop_id": "1357"
+      },
+      "device_id": "100323",
+      "disabled": false,
+      "name": "100323 Tremont opp Rox B014",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
     },
     "15": {
       "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-spanish",
+              "face-covering-required",
+              "crowding-language-english",
+              "face-covering-required",
+              "crowding-language-portuguese"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "390"
+      },
       "device_id": "100305",
       "disabled": false,
       "name": "100305 Warren Quincy B015",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
+      "vendor": "gds"
+    },
+    "16": {
+      "app_id": "bus_eink",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "390",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -419,21 +468,21 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
-    },
-    "16": {
-      "app_id": "bus_eink",
+        },
+        "service_level": 1,
+        "stop_id": "407"
+      },
       "device_id": "100306",
       "disabled": false,
       "name": "100306 Warren Towns B016",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
+      "vendor": "gds"
+    },
+    "17": {
+      "app_id": "bus_eink",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "407",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -449,51 +498,21 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
-    },
-    "17": {
-      "app_id": "bus_eink",
+        },
+        "service_level": 1,
+        "stop_id": "5605"
+      },
       "device_id": "100309",
       "disabled": false,
       "name": "100309 Wash Broad B017",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
-      "app_params": {
-        "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "5605",
-        "psa_config": {
-          "default_list": {
-            "paths": [
-              "face-covering-required",
-              "crowding-language-english",
-              "face-covering-required",
-              "crowding-language-spanish",
-              "face-covering-required",
-              "crowding-language-english",
-              "face-covering-required",
-              "crowding-language-portuguese"
-            ],
-            "type": "double"
-          },
-          "override_list": null
-        }
-      }
+      "vendor": "gds"
     },
     "18": {
       "app_id": "bus_eink",
-      "device_id": "100308",
-      "disabled": false,
-      "name": "100308 Wash Firth B018",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "gds",
       "app_params": {
         "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "637",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -509,96 +528,98 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
+        },
+        "service_level": 1,
+        "stop_id": "637"
+      },
+      "device_id": "100308",
+      "disabled": false,
+      "name": "100308 Wash Firth B018",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
     },
     "19": {
       "app_id": "bus_eink",
+      "app_params": {
+        "nearby_connections": [],
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "face-covering-required"
+            ],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "service_level": 1,
+        "stop_id": "8178"
+      },
       "device_id": "100310",
       "disabled": false,
       "name": "100310 Watertown Sq B019",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
-      "app_params": {
-        "nearby_connections": [],
-        "service_level": 1,
-        "stop_id": "8178",
-        "psa_config": {
-          "default_list": {
-            "paths": [
-              "face-covering-required"
-            ],
-            "type": "double"
-          },
-          "override_list": null
-        }
-      }
+      "vendor": "gds"
     },
     "101": {
       "app_id": "gl_eink_single",
+      "app_params": {
+        "direction_id": 1,
+        "headway_mode": false,
+        "nearby_departures": [
+          "941",
+          "951"
+        ],
+        "platform_id": "70148",
+        "psa_config": {
+          "default_list": {
+            "paths": [],
+            "type": "double"
+          },
+          "override_list": null
+        },
+        "route_id": "Green-B",
+        "service_level": 1,
+        "stop_id": "place-bland"
+      },
       "device_id": "002047",
       "disabled": false,
       "name": "002047 Blandford EB GL01",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
+      "vendor": "gds"
+    },
+    "102": {
+      "app_id": "gl_eink_single",
       "app_params": {
-        "direction_id": 1,
+        "direction_id": 0,
         "headway_mode": false,
         "nearby_departures": [
           "941",
           "951"
         ],
-        "platform_id": "70148",
-        "route_id": "Green-B",
-        "service_level": 1,
-        "stop_id": "place-bland",
+        "platform_id": "70149",
         "psa_config": {
           "default_list": {
             "paths": [],
             "type": "double"
           },
           "override_list": null
-        }
-      }
-    },
-    "102": {
-      "app_id": "gl_eink_single",
+        },
+        "route_id": "Green-B",
+        "service_level": 1,
+        "stop_id": "place-bland"
+      },
       "device_id": "002051",
       "disabled": false,
       "name": "002051 Blandford WB GL04",
       "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
       "tags": [],
-      "vendor": "gds",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "nearby_departures": [
-          "941",
-          "951"
-        ],
-        "platform_id": "70149",
-        "route_id": "Green-B",
-        "service_level": 1,
-        "stop_id": "place-bland",
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "override_list": null
-        }
-      }
+      "vendor": "gds"
     },
     "104": {
       "app_id": "gl_eink_single",
-      "device_id": "002050",
-      "disabled": false,
-      "name": "002050 Wash Sq WB GL07",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "gds",
       "app_params": {
         "direction_id": 0,
         "headway_mode": false,
@@ -607,9 +628,6 @@
           "1292"
         ],
         "platform_id": "70229",
-        "route_id": "Green-C",
-        "service_level": 1,
-        "stop_id": "place-bcnwa",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -618,17 +636,20 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
+        },
+        "route_id": "Green-C",
+        "service_level": 1,
+        "stop_id": "place-bcnwa"
+      },
+      "device_id": "002050",
+      "disabled": false,
+      "name": "002050 Wash Sq WB GL07",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
     },
     "111": {
       "app_id": "gl_eink_single",
-      "device_id": "002046",
-      "disabled": false,
-      "name": "002046 Blandford EB GL02",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "gds",
       "app_params": {
         "direction_id": 1,
         "headway_mode": false,
@@ -637,26 +658,26 @@
           "951"
         ],
         "platform_id": "70148",
-        "route_id": "Green-B",
-        "service_level": 1,
-        "stop_id": "place-bland",
         "psa_config": {
           "default_list": {
             "paths": [],
             "type": "double"
           },
           "override_list": null
-        }
-      }
+        },
+        "route_id": "Green-B",
+        "service_level": 1,
+        "stop_id": "place-bland"
+      },
+      "device_id": "002046",
+      "disabled": false,
+      "name": "002046 Blandford EB GL02",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
     },
     "112": {
       "app_id": "gl_eink_single",
-      "device_id": "002049",
-      "disabled": false,
-      "name": "002049 Blandford WB GL03",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "gds",
       "app_params": {
         "direction_id": 0,
         "headway_mode": false,
@@ -665,26 +686,26 @@
           "951"
         ],
         "platform_id": "70149",
-        "route_id": "Green-B",
-        "service_level": 1,
-        "stop_id": "place-bland",
         "psa_config": {
           "default_list": {
             "paths": [],
             "type": "double"
           },
           "override_list": null
-        }
-      }
+        },
+        "route_id": "Green-B",
+        "service_level": 1,
+        "stop_id": "place-bland"
+      },
+      "device_id": "002049",
+      "disabled": false,
+      "name": "002049 Blandford WB GL03",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "gds"
     },
     "203": {
       "app_id": "gl_eink_double",
-      "device_id": "100098",
-      "disabled": false,
-      "name": "100098 Wash Sq EB GL05",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "mercury",
       "app_params": {
         "direction_id": 1,
         "headway_mode": false,
@@ -693,9 +714,6 @@
           "1292"
         ],
         "platform_id": "70230",
-        "route_id": "Green-C",
-        "service_level": 1,
-        "stop_id": "place-bcnwa",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -704,17 +722,20 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
+        },
+        "route_id": "Green-C",
+        "service_level": 1,
+        "stop_id": "place-bcnwa"
+      },
+      "device_id": "100098",
+      "disabled": false,
+      "name": "100098 Wash Sq EB GL05",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "mercury"
     },
     "204": {
       "app_id": "gl_eink_double",
-      "device_id": "100097",
-      "disabled": false,
-      "name": "100097 Wash Sq WB GL08",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "mercury",
       "app_params": {
         "direction_id": 0,
         "headway_mode": false,
@@ -723,9 +744,6 @@
           "1292"
         ],
         "platform_id": "70229",
-        "route_id": "Green-C",
-        "service_level": 1,
-        "stop_id": "place-bcnwa",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -734,17 +752,20 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
+        },
+        "route_id": "Green-C",
+        "service_level": 1,
+        "stop_id": "place-bcnwa"
+      },
+      "device_id": "100097",
+      "disabled": false,
+      "name": "100097 Wash Sq WB GL08",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "mercury"
     },
     "206": {
       "app_id": "gl_eink_double",
-      "device_id": "002013",
-      "disabled": false,
-      "name": "002013 MFA WB GL10",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "mercury",
       "app_params": {
         "direction_id": 0,
         "headway_mode": false,
@@ -753,9 +774,6 @@
           "71391"
         ],
         "platform_id": "70245",
-        "route_id": "Green-E",
-        "service_level": 1,
-        "stop_id": "place-mfa",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -764,17 +782,20 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
+        },
+        "route_id": "Green-E",
+        "service_level": 1,
+        "stop_id": "place-mfa"
+      },
+      "device_id": "002013",
+      "disabled": false,
+      "name": "002013 MFA WB GL10",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "mercury"
     },
     "213": {
       "app_id": "gl_eink_double",
-      "device_id": "100102",
-      "disabled": false,
-      "name": "100102 Wash Sq EB GL06",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "mercury",
       "app_params": {
         "direction_id": 1,
         "headway_mode": false,
@@ -783,9 +804,6 @@
           "1292"
         ],
         "platform_id": "70230",
-        "route_id": "Green-C",
-        "service_level": 1,
-        "stop_id": "place-bcnwa",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -794,17 +812,20 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
+        },
+        "route_id": "Green-C",
+        "service_level": 1,
+        "stop_id": "place-bcnwa"
+      },
+      "device_id": "100102",
+      "disabled": false,
+      "name": "100102 Wash Sq EB GL06",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "mercury"
     },
     "216": {
       "app_id": "gl_eink_double",
-      "device_id": "100101",
-      "disabled": false,
-      "name": "100101 MFA WB GL09",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "mercury",
       "app_params": {
         "direction_id": 0,
         "headway_mode": false,
@@ -813,9 +834,6 @@
           "71391"
         ],
         "platform_id": "70245",
-        "route_id": "Green-E",
-        "service_level": 1,
-        "stop_id": "place-mfa",
         "psa_config": {
           "default_list": {
             "paths": [
@@ -824,20 +842,32 @@
             "type": "double"
           },
           "override_list": null
-        }
-      }
+        },
+        "route_id": "Green-E",
+        "service_level": 1,
+        "stop_id": "place-mfa"
+      },
+      "device_id": "100101",
+      "disabled": false,
+      "name": "100101 MFA WB GL09",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "mercury"
     },
     "301": {
       "app_id": "solari",
-      "device_id": "SOL01",
-      "disabled": false,
-      "name": "Ashmont SOL01",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "solari",
       "app_params": {
         "audio_psa": null,
         "overhead": false,
+        "psa_config": {
+          "default_list": {
+            "paths": [
+              "solari-feedback"
+            ],
+            "type": "psa"
+          },
+          "override_list": null
+        },
         "section_headers": null,
         "sections": [
           {
@@ -940,7 +970,20 @@
             }
           }
         ],
-        "station_name": "Ashmont",
+        "station_name": "Ashmont"
+      },
+      "device_id": "SOL01",
+      "disabled": false,
+      "name": "Ashmont SOL01",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "302": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -949,20 +992,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "302": {
-      "app_id": "solari",
-      "device_id": "SOL02",
-      "disabled": false,
-      "name": "Central SOL02",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
+        },
         "section_headers": null,
         "sections": [
           {
@@ -1041,7 +1071,20 @@
             }
           }
         ],
-        "station_name": "Central",
+        "station_name": "Central"
+      },
+      "device_id": "SOL02",
+      "disabled": false,
+      "name": "Central SOL02",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "303": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": true,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -1050,20 +1093,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "303": {
-      "app_id": "solari",
-      "device_id": "SOL03",
-      "disabled": false,
-      "name": "Nubian Platform A SOL03",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": true,
+        },
         "section_headers": "normal",
         "sections": [
           {
@@ -1106,7 +1136,20 @@
             }
           }
         ],
-        "station_name": "Nubian",
+        "station_name": "Nubian"
+      },
+      "device_id": "SOL03",
+      "disabled": false,
+      "name": "Nubian Platform A SOL03",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "304": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": true,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -1115,20 +1158,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "304": {
-      "app_id": "solari",
-      "device_id": "SOL04",
-      "disabled": false,
-      "name": "Nubian Platform C SOL04",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": true,
+        },
         "section_headers": "normal",
         "sections": [
           {
@@ -1182,7 +1212,20 @@
             }
           }
         ],
-        "station_name": "Nubian",
+        "station_name": "Nubian"
+      },
+      "device_id": "SOL04",
+      "disabled": false,
+      "name": "Nubian Platform C SOL04",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "305": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -1191,20 +1234,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "305": {
-      "app_id": "solari",
-      "device_id": "SOL05",
-      "disabled": false,
-      "name": "Forest Hills Lobby SOL05",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
+        },
         "section_headers": "vertical",
         "sections": [
           {
@@ -1274,7 +1304,20 @@
             }
           }
         ],
-        "station_name": "Forest Hills",
+        "station_name": "Forest Hills"
+      },
+      "device_id": "SOL05",
+      "disabled": false,
+      "name": "Forest Hills Lobby SOL05",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "306": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -1283,20 +1326,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "306": {
-      "app_id": "solari",
-      "device_id": "SOL06",
-      "disabled": false,
-      "name": "Forest Hills Upper Busway SOL06",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
+        },
         "section_headers": null,
         "sections": [
           {
@@ -1362,7 +1392,20 @@
             }
           }
         ],
-        "station_name": "Forest Hills",
+        "station_name": "Forest Hills"
+      },
+      "device_id": "SOL06",
+      "disabled": false,
+      "name": "Forest Hills Upper Busway SOL06",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "307": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -1371,20 +1414,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "307": {
-      "app_id": "solari",
-      "device_id": "SOL07",
-      "disabled": false,
-      "name": "Harvard SOL07",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
+        },
         "section_headers": "normal",
         "sections": [
           {
@@ -1496,7 +1526,20 @@
             }
           }
         ],
-        "station_name": "Harvard",
+        "station_name": "Harvard"
+      },
+      "device_id": "SOL07",
+      "disabled": false,
+      "name": "Harvard SOL07",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "308": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -1505,20 +1548,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "308": {
-      "app_id": "solari",
-      "device_id": "SOL08",
-      "disabled": false,
-      "name": "Haymarket SOL08",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
+        },
         "section_headers": "normal",
         "sections": [
           {
@@ -1602,7 +1632,20 @@
             }
           }
         ],
-        "station_name": "Haymarket",
+        "station_name": "Haymarket"
+      },
+      "device_id": "SOL08",
+      "disabled": false,
+      "name": "Haymarket SOL08",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "309": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -1611,20 +1654,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "309": {
-      "app_id": "solari",
-      "device_id": "SOL09",
-      "disabled": false,
-      "name": "Maverick SOL09",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
+        },
         "section_headers": null,
         "sections": [
           {
@@ -1692,7 +1722,20 @@
             }
           }
         ],
-        "station_name": "Maverick",
+        "station_name": "Maverick"
+      },
+      "device_id": "SOL09",
+      "disabled": false,
+      "name": "Maverick SOL09",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "310": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -1701,20 +1744,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "310": {
-      "app_id": "solari",
-      "device_id": "SOL10",
-      "disabled": false,
-      "name": "Ruggles SOL10",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
+        },
         "section_headers": "normal",
         "sections": [
           {
@@ -1785,7 +1815,20 @@
             }
           }
         ],
-        "station_name": "Ruggles",
+        "station_name": "Ruggles"
+      },
+      "device_id": "SOL10",
+      "disabled": false,
+      "name": "Ruggles SOL10",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "311": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -1794,20 +1837,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "311": {
-      "app_id": "solari",
-      "device_id": "SOL11",
-      "disabled": false,
-      "name": "Sullivan Square SOL11",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
+        },
         "section_headers": "normal",
         "sections": [
           {
@@ -1898,7 +1928,20 @@
             }
           }
         ],
-        "station_name": "Sullivan Square",
+        "station_name": "Sullivan Square"
+      },
+      "device_id": "SOL11",
+      "disabled": false,
+      "name": "Sullivan Square SOL11",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "312": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -1907,20 +1950,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "312": {
-      "app_id": "solari",
-      "device_id": "SOL12",
-      "disabled": false,
-      "name": "Wonderland SOL12",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "solari",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
+        },
         "section_headers": null,
         "sections": [
           {
@@ -1990,7 +2020,20 @@
             }
           }
         ],
-        "station_name": "Wonderland",
+        "station_name": "Wonderland"
+      },
+      "device_id": "SOL12",
+      "disabled": false,
+      "name": "Wonderland SOL12",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "solari"
+    },
+    "313": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -1999,20 +2042,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "313": {
-      "app_id": "solari",
-      "device_id": "C3MS01",
-      "disabled": false,
-      "name": "10 Park Plaza Stuart SOL13",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "c3ms",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
+        },
         "section_headers": "normal",
         "sections": [
           {
@@ -2151,7 +2181,20 @@
             }
           }
         ],
-        "station_name": "10 Park Plaza",
+        "station_name": "10 Park Plaza"
+      },
+      "device_id": "C3MS01",
+      "disabled": false,
+      "name": "10 Park Plaza Stuart SOL13",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "c3ms"
+    },
+    "314": {
+      "app_id": "solari",
+      "app_params": {
+        "audio_psa": null,
+        "overhead": false,
         "psa_config": {
           "default_list": {
             "paths": [
@@ -2160,20 +2203,7 @@
             "type": "psa"
           },
           "override_list": null
-        }
-      }
-    },
-    "314": {
-      "app_id": "solari",
-      "device_id": "C3MS02",
-      "disabled": false,
-      "name": "10 Park Plaza Charles SOL14",
-      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
-      "tags": [],
-      "vendor": "c3ms",
-      "app_params": {
-        "audio_psa": null,
-        "overhead": false,
+        },
         "section_headers": "normal",
         "sections": [
           {
@@ -2245,17 +2275,14 @@
             }
           }
         ],
-        "station_name": "10 Park Plaza",
-        "psa_config": {
-          "default_list": {
-            "paths": [
-              "solari-feedback"
-            ],
-            "type": "psa"
-          },
-          "override_list": null
-        }
-      }
+        "station_name": "10 Park Plaza"
+      },
+      "device_id": "C3MS02",
+      "disabled": false,
+      "name": "10 Park Plaza Charles SOL14",
+      "refresh_if_loaded_before": "2020-09-01T12:24:18.852101Z",
+      "tags": [],
+      "vendor": "c3ms"
     }
   }
 }
