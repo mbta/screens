@@ -3,6 +3,7 @@ import React from "react";
 import AdminTable from "Components/admin/admin_table";
 
 import {
+  filterTags,
   DefaultColumnFilter,
   SelectColumnFilter,
 } from "Components/admin/admin_filters";
@@ -10,6 +11,7 @@ import {
 import {
   EditableCell,
   EditableNumberInput,
+  EditableList,
   EditableSelect,
   EditableCheckbox,
   EditableTextarea,
@@ -85,6 +87,14 @@ const AllScreensTable = (): JSX.Element => {
       FormCell: FormBoolean,
     },
     {
+      Header: "Tags",
+      accessor: "tags",
+      Cell: EditableList,
+      Filter: DefaultColumnFilter,
+      filter: filterTags,
+      FormCell: FormTextCell,
+    },
+    {
       Header: "App Params",
       accessor: "app_params",
       Cell: EditableTextarea,
@@ -127,6 +137,14 @@ const BusScreensTable = (): JSX.Element => {
       Cell: EditableNumberInput,
       Filter: DefaultColumnFilter,
       FormCell: buildFormSelect([1, 2, 3, 4, 5], true),
+    },
+    {
+      Header: "Tags",
+      accessor: "tags",
+      Cell: EditableList,
+      Filter: DefaultColumnFilter,
+      filter: filterTags,
+      FormCell: FormTextCell,
     },
     {
       Header: "PSA List",
@@ -215,6 +233,14 @@ const greenLineAppColumns = [
     FormCell: buildFormSelect([1, 2, 3, 4, 5], true),
   },
   {
+    Header: "Tags",
+    accessor: "tags",
+    Cell: EditableList,
+    Filter: DefaultColumnFilter,
+    filter: filterTags,
+    FormCell: FormTextCell,
+  },
+  {
     Header: "PSA List",
     accessor: buildAppParamAccessor("psa_list"),
     mutator: buildAppParamMutator("psa_list"),
@@ -274,6 +300,14 @@ const SolariScreensTable = (): JSX.Element => {
       Cell: EditableSelect,
       Filter: SelectColumnFilter,
       FormCell: buildFormSelect([null, "normal", "vertical"]),
+    },
+    {
+      Header: "Tags",
+      accessor: "tags",
+      Cell: EditableList,
+      Filter: DefaultColumnFilter,
+      filter: filterTags,
+      FormCell: FormTextCell,
     },
     {
       Header: "Sections",

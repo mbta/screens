@@ -1,4 +1,5 @@
 import React, { useRef, useMemo, useEffect } from "react";
+import _ from "lodash";
 
 import { gatherSelectOptions } from "Util/admin";
 
@@ -11,6 +12,28 @@ const EditableCell = ({
 }) => {
   const onBlur = (e) => {
     const value = e.target.value;
+    doUpdate(index, mutator || id, value);
+  };
+
+  return (
+    <input
+      defaultValue={initialValue}
+      className={`admin-table__column--${id}`}
+      onBlur={onBlur}
+      disabled={!editable}
+    />
+  );
+};
+
+const EditableList = ({
+  value: initialValue,
+  row: { index },
+  column: { id, mutator },
+  doUpdate,
+  editable,
+}) => {
+  const onBlur = (e) => {
+    const value = _.sortBy(e.target.value.split(","));
     doUpdate(index, mutator || id, value);
   };
 
@@ -146,6 +169,7 @@ const IndeterminateCheckbox = ({ indeterminate, ...rest }) => {
 
 export {
   EditableCell,
+  EditableList,
   EditableNumberInput,
   EditableSelect,
   EditableCheckbox,

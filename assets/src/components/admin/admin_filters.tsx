@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 
 import { gatherSelectOptions } from "Util/admin";
 
+// Filter Components
 const DefaultColumnFilter = ({
   column: { filterValue, preFilteredRows, setFilter },
 }) => {
@@ -43,4 +44,14 @@ const SelectColumnFilter = ({
   );
 };
 
-export { DefaultColumnFilter, SelectColumnFilter };
+// Custom filter functions
+const filterTags = (rows, id, filterValue) => {
+  const tagsToFilter = filterValue.split(",");
+
+  return rows.filter((row) => {
+    const rowValue = row.values[id];
+    return tagsToFilter.every((tag) => rowValue.includes(tag));
+  });
+};
+
+export { DefaultColumnFilter, SelectColumnFilter, filterTags };
