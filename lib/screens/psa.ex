@@ -38,7 +38,7 @@ defmodule Screens.Psa do
          %OverrideList{psa_list: override_list, start_time: start_time, end_time: end_time},
          default_list
        ) do
-    now = Timex.now()
+    {:ok, now} = DateTime.now("Etc/UTC")
 
     if in_date_time_range?(now, {start_time, end_time}) do
       override_list
@@ -47,7 +47,7 @@ defmodule Screens.Psa do
     end
   end
 
-  defp in_date_time_range?(_dt, {nil, nil}), do: false
+  defp in_date_time_range?(_dt, {nil, nil}), do: true
 
   defp in_date_time_range?(dt, {start_time, nil}) do
     DateTime.compare(dt, start_time) in [:gt, :eq]
