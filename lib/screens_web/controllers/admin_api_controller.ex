@@ -24,4 +24,35 @@ defmodule ScreensWeb.AdminApiController do
 
     json(conn, %{success: success})
   end
+
+  def refresh(conn, %{"screen_ids" => screen_id_json}) do
+    {:ok, screen_ids} = Jason.decode(screen_id_json)
+
+    %Config{screens: current_screens} = Config.State.config()
+
+    new_screens =
+      current_screens
+      |> Enum.map(fn {screen_id, screen_config} ->
+        new_screen_config =
+          if screen_id in screen_ids do
+            %Config.Screen{screen_config | refresh_if_loaded_before: DateTime.utc_now()}
+          else
+            screen_config
+          end
+
+        {screen_id, new_screen_config}
+      end)
+      |> Enum.into(%{})
+
+    new_config = %Config{screens: new_screens}
+    {:ok, new_config_json} = Jason.encode(Config.to_json(new_config), pretty: true)
+
+    success =
+      case @config_fetcher.put_to_s3(new_config_json) do
+        :ok -> true
+        :error -> false
+      end
+
+    json(conn, %{success: success})
+  end
 end

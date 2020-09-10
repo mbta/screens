@@ -49,6 +49,10 @@ defmodule Screens.Config.State do
     GenServer.call(pid, :screens)
   end
 
+  def config(pid \\ __MODULE__) do
+    GenServer.call(pid, :config)
+  end
+
   def schedule_refresh(pid, ms \\ @refresh_ms) do
     Process.send_after(pid, :refresh, ms)
     :ok
@@ -125,6 +129,10 @@ defmodule Screens.Config.State do
 
   def handle_call(:screens, _from, {config, _} = state) do
     {:reply, config.screens, state}
+  end
+
+  def handle_call(:config, _from, {config, _} = state) do
+    {:reply, config, state}
   end
 
   def handle_call({:app_params, screen_id}, _from, {config, _} = state) do
