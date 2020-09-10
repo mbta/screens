@@ -46,7 +46,7 @@ const SelectColumnFilter = ({
 
 // Custom filter functions
 const filterTags = (rows, id, filterValue) => {
-  const tagsToFilter = filterValue.split(",");
+  const tagsToFilter = filterValue.split(/\s*,\s*/);
 
   return rows.filter((row) => {
     const rowValue = row.values[id];

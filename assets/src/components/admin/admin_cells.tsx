@@ -33,7 +33,7 @@ const EditableList = ({
   editable,
 }) => {
   const onBlur = (e) => {
-    const value = _.sortBy(e.target.value.split(","));
+    const value = _.sortBy(e.target.value.split(/\s*,\s*/));
     doUpdate(index, mutator || id, value);
   };
 
