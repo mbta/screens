@@ -23,8 +23,10 @@ const EditModal = ({
       if (value !== undefined) {
         const columnIdOrMutator =
           typeof accessor === "function" ? mutator : accessor;
-        _.forEach(selectedRowIds, (_true, rowIndex) => {
-          doUpdate(rowIndex, columnIdOrMutator, value);
+        _.forEach(selectedRowIds, (selected, rowIndex) => {
+          if (selected === true) {
+            doUpdate(rowIndex, columnIdOrMutator, value);
+          }
         });
       }
     });

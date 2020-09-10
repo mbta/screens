@@ -231,7 +231,7 @@ const AdminTableControls = ({
         />
       ) : null}
       {showAddModal ? (
-        <AddModal setData={setData} setShowAddModal={setShowAddModal} />
+        <AddModal setData={setData} closeModal={() => setShowAddModal(false)} />
       ) : null}
     </div>
   );

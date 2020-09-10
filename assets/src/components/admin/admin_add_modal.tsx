@@ -43,10 +43,11 @@ const defaultAppParamsByAppId = {
   solari: { station_name: "STATION_NAME" },
 };
 
-const AddModal = ({ setData, setShowAddModal }): JSX.Element => {
-  const initialFormValues = _.fromPairs(
-    fields.map(({ key }) => [key, undefined])
-  );
+const initialFormValues = _.fromPairs(
+  fields.map(({ key }) => [key, undefined])
+);
+
+const AddModal = ({ setData, closeModal }): JSX.Element => {
   const [formValues, setFormValues] = useState(initialFormValues);
 
   const addScreen = () => {
@@ -63,7 +64,7 @@ const AddModal = ({ setData, setShowAddModal }): JSX.Element => {
     };
 
     setData((data) => _.concat(data, newRow));
-    setShowAddModal(false);
+    closeModal();
   };
 
   return (
@@ -77,7 +78,7 @@ const AddModal = ({ setData, setShowAddModal }): JSX.Element => {
         ))}
         <div>
           <button onClick={addScreen}>Add</button>
-          <button onClick={() => setShowAddModal(false)}>Cancel</button>
+          <button onClick={closeModal}>Cancel</button>
         </div>
       </div>
     </div>
