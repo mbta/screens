@@ -59,6 +59,7 @@ defmodule ScreensWeb.Router do
     get "/", AdminApiController, :index
     post "/validate", AdminApiController, :validate
     post "/confirm", AdminApiController, :confirm
+    post "/refresh", AdminApiController, :refresh
   end
 
   scope "/screen", ScreensWeb do

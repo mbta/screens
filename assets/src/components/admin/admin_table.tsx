@@ -9,6 +9,7 @@ import EditModal from "Components/admin/admin_edit_modal";
 
 const VALIDATE_PATH = "/api/admin/validate";
 const CONFIRM_PATH = "/api/admin/confirm";
+const REFRESH_PATH = "/api/admin/refresh";
 
 // Helpers
 const buildDefaultMutator = (columnId) => {
@@ -172,6 +173,23 @@ const doConfirm = async (data, setEditable) => {
   }
 };
 
+const doRefresh = async (data, selectedRowIds) => {
+  const msg =
+    "Are you sure? Any unconfirmed changes to the config will be lost.";
+  if (confirm(msg)) {
+    const selectedRows = _.filter(data, (_row, i) => selectedRowIds[i]);
+    const selectedScreenIds = _.map(selectedRows, ({ id }) => id);
+    const dataToSubmit = { screen_ids: selectedScreenIds };
+    const result = await doSubmit(REFRESH_PATH, dataToSubmit);
+    if (result.success === true) {
+      alert("Refresh scheduled successfully");
+      window.location.reload();
+    } else {
+      alert("Refresh schedule failed");
+    }
+  }
+};
+
 const AdminTableControls = ({
   columns,
   data,
@@ -199,6 +217,12 @@ const AdminTableControls = ({
           onClick={() => setShowEditModal(true)}
         >
           Edit Selected Rows
+        </button>
+        <button
+          disabled={disableMultiEdit}
+          onClick={() => doRefresh(data, selectedRowIds)}
+        >
+          Refresh Selected Rows
         </button>
         <button onClick={() => doValidate(unfilteredData, onValidate)}>
           Validate
