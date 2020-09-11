@@ -59,6 +59,11 @@ defmodule Screens.Config.Screen do
     |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v, app_id)} end)
   end
 
+  @spec schedule_refresh_at_time(t(), DateTime.t()) :: t()
+  def schedule_refresh_at_time(screen_config, time) do
+    %__MODULE__{screen_config | refresh_if_loaded_before: time}
+  end
+
   for vendor <- ~w[gds mercury solari c3ms]a do
     vendor_string = Atom.to_string(vendor)
 

@@ -174,11 +174,12 @@ const doConfirm = async (data, setEditable) => {
 };
 
 const doRefresh = async (data, selectedRowIds) => {
-  const msg = "Are you sure? This will overwrite any ununconfirmed changes.";
+  const msg =
+    "Are you sure? Any unconfirmed changes to the config will be lost.";
   if (confirm(msg)) {
     const selectedRows = _.filter(data, (_row, i) => selectedRowIds[i]);
     const selectedScreenIds = _.map(selectedRows, ({ id }) => id);
-    const dataToSubmit = { screen_ids: JSON.stringify(selectedScreenIds) };
+    const dataToSubmit = { screen_ids: selectedScreenIds };
     const result = await doSubmit(REFRESH_PATH, dataToSubmit);
     if (result.success === true) {
       alert("Refresh scheduled successfully");

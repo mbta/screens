@@ -32,6 +32,29 @@ defmodule Screens.Config do
     |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
   end
 
+  @spec schedule_refresh_for_screen_ids(t(), list(String.t())) :: t()
+  def schedule_refresh_for_screen_ids(config, screen_ids) do
+    %__MODULE__{screens: current_screens} = config
+
+    now = DateTime.utc_now()
+
+    new_screens =
+      current_screens
+      |> Enum.map(fn {screen_id, screen_config} ->
+        new_screen_config =
+          if screen_id in screen_ids do
+            Screen.schedule_refresh_at_time(screen_config, now)
+          else
+            screen_config
+          end
+
+        {screen_id, new_screen_config}
+      end)
+      |> Enum.into(%{})
+
+    %__MODULE__{screens: new_screens}
+  end
+
   defp value_from_json("screens", screens) do
     Enum.into(screens, %{}, fn {screen_id, screen_config} ->
       {screen_id, Screen.from_json(screen_config)}
