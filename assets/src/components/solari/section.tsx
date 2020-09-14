@@ -86,7 +86,7 @@ const SectionFrame = ({
   const sectionModifier = sectionHeaders === "vertical" ? "vertical" : "normal";
   const sectionClass = classWithModifier("section", sectionModifier);
   const shouldShowHeader =
-    sectionHeaders !== null && name !== null && !overhead;
+    sectionHeaders !== "none" && name !== null && !overhead;
 
   if (sectionHeaders === "vertical") {
     const iconSrc = verticalHeaderIconSrc(name, departuresLength);
@@ -384,7 +384,7 @@ interface PagedSectionProps {
   departures: object[];
   numRows: number;
   arrow: Direction | null;
-  sectionHeaders: "normal" | "vertical" | null;
+  sectionHeaders: "normal" | "vertical" | "none";
   name: string | null;
   pill: string;
   overhead: boolean;
