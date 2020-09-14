@@ -7,7 +7,7 @@ defmodule Screens.Config.Solari do
   @type t :: %__MODULE__{
           station_name: String.t(),
           overhead: boolean(),
-          section_headers: :normal | :vertical | nil,
+          section_headers: :normal | :vertical | :none,
           sections: list(Section.t()),
           psa_config: PsaConfig.t(),
           audio_psa: AudioPsa.t()
@@ -38,7 +38,7 @@ defmodule Screens.Config.Solari do
     |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
   end
 
-  for headers <- ~w[normal vertical]a do
+  for headers <- ~w[normal vertical none]a do
     headers_string = Atom.to_string(headers)
 
     defp value_from_json("section_headers", unquote(headers_string)) do
