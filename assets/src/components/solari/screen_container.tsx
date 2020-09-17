@@ -46,9 +46,24 @@ const NoConnectionScreenLayout = (): JSX.Element => {
   );
 };
 
+const TakeoverScreenLayout = ({ apiResponse }): JSX.Element => {
+  const psaName = apiResponse.psa_name;
+  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaName}.png`;
+
+  return (
+    <div className="screen-container">
+      <img src={srcPath} />
+    </div>
+  );
+};
+
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
   if (!apiResponse || apiResponse.success === false) {
     return <NoConnectionScreenLayout />;
+  }
+
+  if (apiResponse.psa_type === "takeover") {
+    return <TakeoverScreenLayout apiResponse={apiResponse} />;
   }
 
   return <DefaultScreenLayout apiResponse={apiResponse} />;
