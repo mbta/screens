@@ -1,6 +1,8 @@
 defmodule Screens.Headways do
   @moduledoc false
 
+  alias Screens.Schedules.Schedule
+
   @dayparts [
     {:late_night, ~T[00:00:00], :close},
     {:early_morning, :open, ~T[06:30:00]},
@@ -13,7 +15,7 @@ defmodule Screens.Headways do
 
   def by_route_id(route_id, stop_id, direction_id, service_level, time \\ DateTime.utc_now()) do
     current_schedule = schedule_with_override(time, service_level)
-    current_daypart = daypart(time, stop_id, direction_id, current_schedule)
+    current_daypart = daypart(time, stop_id, direction_id)
     headway(route_id, current_schedule, current_daypart)
   end
 
@@ -102,7 +104,7 @@ defmodule Screens.Headways do
     end
   end
 
-  defp daypart(utc_time, stop_id, direction_id, current_schedule) do
+  defp daypart(utc_time, stop_id, direction_id) do
     {:ok, local_time} = DateTime.shift_zone(utc_time, "America/New_York")
     local_time = DateTime.to_time(local_time)
 
@@ -110,19 +112,19 @@ defmodule Screens.Headways do
       Enum.find(
         @dayparts,
         {:overnight, nil, nil},
-        &match(&1, local_time, {stop_id, direction_id, current_schedule})
+        &match(&1, local_time, {stop_id, direction_id})
       )
 
     daypart
   end
 
-  defp match({daypart, :open, t_end}, local_time, {stop_id, direction_id, schedule}) do
-    t_start = service_start(schedule, stop_id, direction_id)
+  defp match({daypart, :open, t_end}, local_time, {stop_id, direction_id}) do
+    t_start = service_start(stop_id, direction_id)
     match({daypart, t_start, t_end}, local_time, nil)
   end
 
-  defp match({daypart, t_start, :close}, local_time, {stop_id, direction_id, schedule}) do
-    t_end = service_end(schedule, stop_id, direction_id)
+  defp match({daypart, t_start, :close}, local_time, {stop_id, direction_id}) do
+    t_end = service_end(stop_id, direction_id)
     match({daypart, t_start, t_end}, local_time, nil)
   end
 
@@ -135,53 +137,26 @@ defmodule Screens.Headways do
       Time.compare(local_time, t_end) == :lt
   end
 
+  defp service_start_or_end(stop_id, direction_id, min_or_max_fn) do
+    {:ok, schedules} = Schedule.fetch(%{stop_ids: [stop_id], direction_id: direction_id})
+
+    {:ok, local_dt} =
+      schedules
+      |> Enum.map(& &1.arrival_time)
+      |> Enum.filter(&(not is_nil(&1)))
+      |> min_or_max_fn.()
+      |> DateTime.shift_zone("America/New_York")
+
+    DateTime.to_time(local_dt)
+  end
+
   # Time to stop showing Good Night screen if there are no predictions
-  defp service_start(:sunday, "place-bland", 0), do: ~T[06:12:00]
-  defp service_start(:sunday, "place-bland", 1), do: ~T[05:20:00]
-  defp service_start(:sunday, "place-bcnwa", 0), do: ~T[06:06:00]
-  defp service_start(:sunday, "place-bcnwa", 1), do: ~T[05:30:00]
-  defp service_start(:sunday, "place-mfa", 0), do: ~T[05:35:00]
-  # placeholder value
-  defp service_start(:sunday, "place-mfa", 1), do: ~T[05:35:00]
-
-  defp service_start(:saturday, "place-bland", 0), do: ~T[05:40:00]
-  defp service_start(:saturday, "place-bland", 1), do: ~T[04:45:00]
-  defp service_start(:saturday, "place-bcnwa", 0), do: ~T[05:30:00]
-  defp service_start(:saturday, "place-bcnwa", 1), do: ~T[04:50:00]
-  defp service_start(:saturday, "place-mfa", 0), do: ~T[05:01:00]
-  # placeholder value
-  defp service_start(:saturday, "place-mfa", 1), do: ~T[05:01:00]
-
-  defp service_start(:weekday, "place-bland", 0), do: ~T[05:45:00]
-  defp service_start(:weekday, "place-bland", 1), do: ~T[05:01:00]
-  defp service_start(:weekday, "place-bcnwa", 0), do: ~T[05:48:00]
-  defp service_start(:weekday, "place-bcnwa", 1), do: ~T[04:57:00]
-  defp service_start(:weekday, "place-mfa", 0), do: ~T[05:00:00]
-  # placeholder value
-  defp service_start(:weekday, "place-mfa", 1), do: ~T[05:00:00]
+  defp service_start(stop_id, direction_id) do
+    service_start_or_end(stop_id, direction_id, &Enum.min/1)
+  end
 
   # Time to begin showing Good Night screen if there are no predictions
-  defp service_end(:sunday, "place-bland", 0), do: ~T[01:12:00]
-  defp service_end(:sunday, "place-bland", 1), do: ~T[00:37:00]
-  defp service_end(:sunday, "place-bcnwa", 0), do: ~T[01:29:00]
-  defp service_end(:sunday, "place-bcnwa", 1), do: ~T[00:14:00]
-  defp service_end(:sunday, "place-mfa", 0), do: ~T[00:54:00]
-  # placeholder value
-  defp service_end(:sunday, "place-mfa", 1), do: ~T[00:54:00]
-
-  defp service_end(:saturday, "place-bland", 0), do: ~T[01:20:00]
-  defp service_end(:saturday, "place-bland", 1), do: ~T[00:39:00]
-  defp service_end(:saturday, "place-bcnwa", 0), do: ~T[01:16:00]
-  defp service_end(:saturday, "place-bcnwa", 1), do: ~T[00:14:00]
-  defp service_end(:saturday, "place-mfa", 0), do: ~T[00:55:00]
-  # placeholder value
-  defp service_end(:saturday, "place-mfa", 1), do: ~T[00:55:00]
-
-  defp service_end(:weekday, "place-bland", 0), do: ~T[01:20:00]
-  defp service_end(:weekday, "place-bland", 1), do: ~T[00:39:00]
-  defp service_end(:weekday, "place-bcnwa", 0), do: ~T[01:17:00]
-  defp service_end(:weekday, "place-bcnwa", 1), do: ~T[00:11:00]
-  defp service_end(:weekday, "place-mfa", 0), do: ~T[00:55:00]
-  # placeholder value
-  defp service_end(:weekday, "place-mfa", 1), do: ~T[00:55:00]
+  defp service_end(stop_id, direction_id) do
+    service_start_or_end(stop_id, direction_id, &Enum.max/1)
+  end
 end
