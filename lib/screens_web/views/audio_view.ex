@@ -165,14 +165,15 @@ defmodule ScreensWeb.AudioView do
   defp render_wayfinding(nil), do: ~E""
   defp render_wayfinding(wayfinding), do: ~E| from <%= wayfinding %>|
 
-  @spec render_psa({:plaintext | :ssml, String.t()} | nil) :: Phoenix.HTML.safe()
+  @spec render_psa({:plaintext | :ssml, String.t(), :takeover | :end} | nil) ::
+          Phoenix.HTML.safe()
   defp render_psa(nil), do: ~E""
 
-  defp render_psa({:plaintext, text}) do
+  defp render_psa({:plaintext, text, _}) do
     ~E|<s><%= text %></s>|
   end
 
-  defp render_psa({:ssml, ssml}) do
+  defp render_psa({:ssml, ssml, _}) do
     raw(ssml)
   end
 

@@ -4,8 +4,12 @@
        xsi:schemaLocation="http://www.w3.org/2001/10/synthesis
                  http://www.w3.org/TR/speech-synthesis11/synthesis.xsd"
        xml:lang="en-US">
+<%= if is_nil(@psa) or ({_, _, type} = @psa; type != :takeover) do %>
 <p>
 <%= render "_header.ssml", station_name: @station_name %></p>
 <%= render_many @departures_by_pill, ScreensWeb.AudioView, "_departure_pill_group.ssml", as: :pill_group %>
 <%= render_psa @psa %>
+<% else %>
+<%= render_psa @psa %>
+<% end %>
 </speak>
