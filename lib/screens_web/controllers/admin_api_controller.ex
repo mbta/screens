@@ -5,6 +5,8 @@ defmodule ScreensWeb.AdminApiController do
 
   @config_fetcher Application.get_env(:screens, :config_fetcher)
 
+  plug :accepts, ["multipart/form-data"] when action == :upload_image
+
   def index(conn, _params) do
     {:ok, config} = @config_fetcher.get_from_s3()
     json(conn, %{config: config})
@@ -37,5 +39,30 @@ defmodule ScreensWeb.AdminApiController do
       end
 
     json(conn, %{success: success})
+  end
+
+  def image_names(conn, _params) do
+    # image_names = Screens.Image.fetch_image_names()
+    # json(conn, %{image_names: image_names})
+    json(conn, %{image_names: ~w[crowding-legend face-covering-required solari-feedback]})
+  end
+
+  def upload_image(conn, %{"image" => %Plug.Upload{content_type: "image/png"} = upload_struct}) do
+    # response = case Screens.Image.upload_image(upload_struct) do
+    #   {:ok, uploaded_name} -> %{success: true, uploaded_name: uploaded_name}
+    #   :error -> %{success: false}
+    # end
+    # json(conn, response)
+    uploaded_name = String.downcase(upload_struct.filename)
+    json(conn, %{success: true, uploaded_name: uploaded_name})
+  end
+
+  def delete_image(conn, %{"name" => name}) do
+    # response = case Screens.Image.delete_image(name) do
+    #   :ok -> %{success: true}
+    #   :error -> %{success: false}
+    # end
+    # json(conn, response)
+    json(conn, %{success: true})
   end
 end

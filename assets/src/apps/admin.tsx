@@ -15,6 +15,7 @@ import {
   GLDoubleScreensTable,
   SolariScreensTable,
 } from "Components/admin/admin_tables";
+import ImageManager from "Components/admin/admin_image_manager";
 
 const App = (): JSX.Element => {
   return (
@@ -41,6 +42,9 @@ const App = (): JSX.Element => {
         </Route>
         <Route exact path="/json-editor">
           <AdminForm />
+        </Route>
+        <Route exact path="/image-manager">
+          <ImageManager />
         </Route>
       </Switch>
     </Router>
