@@ -45,7 +45,7 @@ defmodule Screens.Image do
 
   defp s3_path_to_image_name(path) do
     @image_name_pattern
-    |> Regex.run(path)
-    |> Enum.at(1)
+    |> Regex.run(path, capture: :all_but_first)
+    |> hd()
   end
 end
