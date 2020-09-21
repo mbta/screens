@@ -60,7 +60,7 @@ defmodule Screens.Psa do
     in_date_time_range?(dt, {start_time, nil}) and in_date_time_range?(dt, {nil, end_time})
   end
 
-  defp choose_psa(psa_list, :solari, :psa) do
+  defp choose_psa(psa_list, :solari, :slide_in) do
     # How often to change the selected PSA
     solari_psa_refresh_seconds = @solari_refresh_seconds * @solari_psa_period
 
