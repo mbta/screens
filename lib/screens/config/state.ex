@@ -162,9 +162,9 @@ defmodule Screens.Config.State do
 
   @impl true
   def handle_info(:refresh, state) do
-    schedule_refresh(self())
-
     pid = self()
+
+    schedule_refresh(pid)
 
     async_fetch = fn ->
       case @config_fetcher.fetch_config() do
