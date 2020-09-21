@@ -38,23 +38,23 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   );
 };
 
-const NoConnectionScreenLayout = (): JSX.Element => {
-  return (
-    <div className="screen-container">
-      <img src="/images/solari-no-connection.png" />
-    </div>
-  );
-};
-
-const TakeoverScreenLayout = ({ apiResponse }): JSX.Element => {
-  const psaName = apiResponse.psa_name;
-  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaName}.png`;
-
+const FullScreenImageLayout = ({ srcPath }): JSX.Element => {
   return (
     <div className="screen-container">
       <img src={srcPath} />
     </div>
   );
+};
+
+const NoConnectionScreenLayout = (): JSX.Element => {
+  const srcPath = "/images/solari-no-connection.png";
+  return <FullScreenImageLayout srcPath={srcPath} />;
+};
+
+const TakeoverScreenLayout = ({ apiResponse }): JSX.Element => {
+  const psaName = apiResponse.psa_name;
+  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaName}.png`;
+  return <FullScreenImageLayout srcPath={srcPath} />;
 };
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
