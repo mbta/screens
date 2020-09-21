@@ -58,6 +58,14 @@ defmodule Screens.Config.State do
     :ok
   end
 
+  def put_config(pid, config) do
+    GenServer.cast(pid, {:put_config, config})
+  end
+
+  def put_fetch_error(pid) do
+    GenServer.cast(pid, :put_fetch_error)
+  end
+
   ###
 
   @impl true
@@ -154,20 +162,36 @@ defmodule Screens.Config.State do
 
   @impl true
   def handle_info(:refresh, state) do
-    new_state =
-      case @config_fetcher.fetch_config() do
-        {:ok, config} -> {config, 0}
-        :error -> error_state(state)
-      end
-
     schedule_refresh(self())
-    {:noreply, new_state}
+
+    pid = self()
+
+    async_fetch = fn ->
+      case @config_fetcher.fetch_config() do
+        {:ok, config} -> put_config(pid, config)
+        :error -> put_fetch_error(pid)
+      end
+    end
+
+    # asynchronously update state so that we aren't blocked while waiting for the request to complete
+    Task.start(async_fetch)
+
+    {:noreply, state}
   end
 
   # Handle leaked :ssl_closed messages from Hackney.
   # Workaround for this issue: https://github.com/benoitc/hackney/issues/464
   def handle_info({:ssl_closed, _}, state) do
     {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast({:put_config, new_config}, _) do
+    {:noreply, {new_config, 0}}
+  end
+
+  def handle_cast(:put_fetch_error, state) do
+    {:noreply, error_state(state)}
   end
 
   # Logs fetch failures and returns the appropriate error state.
