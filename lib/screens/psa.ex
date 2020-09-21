@@ -19,8 +19,7 @@ defmodule Screens.Psa do
     } = psa_config
 
     {psa_type, psa_list} = get_active_psa_list(override_list, default_list)
-
-    {psa_type, choose_psa(psa_list, app_id)}
+    {psa_type, choose_psa(psa_list, app_id, psa_type)}
   end
 
   def current_audio_psa_for(screen_id) do
@@ -61,7 +60,7 @@ defmodule Screens.Psa do
     in_date_time_range?(dt, {start_time, nil}) and in_date_time_range?(dt, {nil, end_time})
   end
 
-  defp choose_psa(psa_list, :solari) do
+  defp choose_psa(psa_list, :solari, :slide_in) do
     # How often to change the selected PSA
     solari_psa_refresh_seconds = @solari_refresh_seconds * @solari_psa_period
 
@@ -73,7 +72,11 @@ defmodule Screens.Psa do
     choose_from_rotating_list(solari_list, @solari_refresh_seconds)
   end
 
-  defp choose_psa(psa_list, app_id) when app_id in ~w[bus_eink gl_eink_single gl_eink_double]a do
+  defp choose_psa(psa_list, :solari, _psa_type) do
+    choose_from_rotating_list(psa_list, @solari_refresh_seconds)
+  end
+
+  defp choose_psa(psa_list, _app_id, _psa_type) do
     choose_from_rotating_list(psa_list, @eink_refresh_seconds)
   end
 

@@ -12,7 +12,7 @@ defmodule Screens.Config.PsaConfig.PsaList do
 
   @type bus_psa_type :: :double | :takeover
   @type gl_psa_type :: :double | :takeover | :departure
-  @type solari_psa_type :: :psa | :takeover
+  @type solari_psa_type :: :slide_in | :takeover
 
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
@@ -35,7 +35,7 @@ defmodule Screens.Config.PsaConfig.PsaList do
     }
   end
 
-  for psa_type <- ~w[psa double takeover departure]a do
+  for psa_type <- ~w[slide_in double takeover departure]a do
     psa_type_string = Atom.to_string(psa_type)
 
     defp type_from_json(unquote(psa_type_string)) do
