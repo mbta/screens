@@ -6,6 +6,10 @@ defmodule ScreensWeb.AuthController do
     send_resp(conn, 404, "Not Found")
   end
 
+  def callback(conn, %{"provider" => provider}) when provider != "cognito" do
+    send_resp(conn, 404, "Not Found")
+  end
+
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
     username = auth.uid
     expiration = auth.credentials.expires_at
