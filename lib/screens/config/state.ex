@@ -174,7 +174,7 @@ defmodule Screens.Config.State do
     end
 
     # asynchronously update state so that we aren't blocked while waiting for the request to complete
-    Task.start(async_fetch)
+    _ = Task.start(async_fetch)
 
     {:noreply, state}
   end
