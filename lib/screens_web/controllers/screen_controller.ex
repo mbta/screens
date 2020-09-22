@@ -8,10 +8,10 @@ defmodule ScreensWeb.ScreenController do
   @app_ids ~w[bus_eink gl_eink_single gl_eink_double solari]a
   @app_id_strings Enum.map(@app_ids, &Atom.to_string/1)
 
+  plug(:body_class)
   plug(:check_config)
   plug(:environment_name)
   plug(:last_refresh)
-  plug(:body_class)
 
   defp check_config(conn, _) do
     if State.ok?() do
