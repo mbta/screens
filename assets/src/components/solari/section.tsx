@@ -20,6 +20,7 @@ const camelizeDepartureObject = ({
   vehicle_status: vehicleStatus,
   alerts,
   stop_type: stopType,
+  crowding_level: crowdingLevel,
 }) => ({
   id,
   route,
@@ -29,6 +30,7 @@ const camelizeDepartureObject = ({
   vehicleStatus,
   alerts,
   stopType,
+  crowdingLevel,
 });
 
 const isArrivingOrBoarding = (
@@ -126,6 +128,7 @@ const NoDeparturesMessage = ({ pill }): JSX.Element => (
 interface PagedDepartureProps {
   pageCount: number;
   departures: object[];
+  overhead: boolean;
 }
 
 interface PagedDepartureState {
@@ -284,6 +287,7 @@ class PagedDeparture extends React.Component<
         <Departure
           {...camelizeDepartureObject(currentPagedDeparture)}
           currentTimeString={this.props.currentTimeString}
+          overhead={this.props.overhead}
           groupStart={true}
           groupEnd={true}
         />
@@ -296,6 +300,7 @@ interface DepartureListProps {
   departure: object;
   currentTimeString: string;
   isAnimated: boolean;
+  overhead: boolean;
 }
 
 const isGroupStart = (departures, i) => {
@@ -326,6 +331,7 @@ const DepartureList = ({
   departures,
   currentTimeString,
   isAnimated,
+  overhead,
 }: DepartureListProps): JSX.Element => {
   if (isAnimated) {
     return (
@@ -352,6 +358,7 @@ const DepartureList = ({
               <Departure
                 {...camelizeDepartureObject(departure)}
                 currentTimeString={currentTimeString}
+                overhead={overhead}
                 groupStart={isGroupStart(departures, i)}
                 groupEnd={isGroupEnd(departures, i)}
               />
@@ -367,6 +374,7 @@ const DepartureList = ({
           <Departure
             {...camelizeDepartureObject(departure)}
             currentTimeString={currentTimeString}
+            overhead={overhead}
             groupStart={isGroupStart(departures, i)}
             groupEnd={isGroupEnd(departures, i)}
             key={departure.id}
@@ -438,10 +446,15 @@ const PagedSection = ({
       <DepartureList
         departures={staticDepartures}
         currentTimeString={currentTimeString}
+        overhead={overhead}
         isAnimated={isAnimated}
       />
       {showPagedDeparture && (
-        <PagedDeparture pageCount={pageCount} departures={pagedDepartures} />
+        <PagedDeparture
+          pageCount={pageCount}
+          departures={pagedDepartures}
+          overhead={overhead}
+        />
       )}
     </SectionFrame>
   );
@@ -485,6 +498,7 @@ const Section = ({
       <DepartureList
         departures={departures}
         currentTimeString={currentTimeString}
+        overhead={overhead}
         isAnimated={isAnimated}
       />
     </SectionFrame>
