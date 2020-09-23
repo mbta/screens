@@ -21,6 +21,8 @@ const Departure = ({
   vehicleStatus,
   stopType,
   alerts,
+  crowdingLevel,
+  overhead,
   groupStart,
   groupEnd,
 }): JSX.Element => {
@@ -60,6 +62,16 @@ const Departure = ({
             <BaseDepartureDestination destination={destination} />
           )}
         </div>
+        {!overhead && (
+          <div className="departure-crowding">
+            {crowdingLevel && (
+              <img
+                className="departure-crowding__image"
+                src={`/images/crowding-color-level-${crowdingLevel}.svg`}
+              />
+            )}
+          </div>
+        )}
         <div
           className={classWithModifier("departure-time", timeAnimationModifier)}
         >
