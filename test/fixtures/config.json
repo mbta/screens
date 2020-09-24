@@ -982,7 +982,11 @@
     "302": {
       "app_id": "solari",
       "app_params": {
-        "audio_psa": null,
+        "audio_psa": {
+          "format": "ssml",
+          "name": "some-psa",
+          "type": "end"
+        },
         "overhead": false,
         "psa_config": {
           "default_list": {
