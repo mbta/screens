@@ -3,9 +3,9 @@ defmodule Screens.Audio do
 
   require Logger
 
+  alias Screens.Audio.Fetch
   alias Screens.Psa
   alias Screens.Util
-  alias Screens.Audio.Fetch
 
   @lexicon_names ["mbtalexicon"]
 
