@@ -10,8 +10,8 @@ defmodule Screens.Config.AudioPsa do
   @default_psa_type :end
 
   @spec from_json(map() | :default) :: t()
-  def from_json(%{"format" => format, "text" => text, "type" => type}) when is_binary(text) do
-    {format_from_json(format), text, type_from_json(type)}
+  def from_json(%{"format" => format, "name" => name, "type" => type}) when is_binary(name) do
+    {format_from_json(format), name, type_from_json(type)}
   end
 
   def from_json(_) do
@@ -19,11 +19,11 @@ defmodule Screens.Config.AudioPsa do
   end
 
   @spec to_json(t()) :: map()
-  def to_json({format, text, type}) do
+  def to_json({format, name, type}) do
     %{
-      "format" => format_to_json(format),
-      "text" => text,
-      "type" => type_to_json(type)
+      format: format_to_json(format),
+      name: name,
+      type: type_to_json(type)
     }
   end
 

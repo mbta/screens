@@ -5,6 +5,7 @@ defmodule Screens.Audio do
 
   alias Screens.Psa
   alias Screens.Util
+  alias Screens.Audio.Fetch
 
   @lexicon_names ["mbtalexicon"]
 
@@ -48,7 +49,7 @@ defmodule Screens.Audio do
     %{
       station_name: station_name,
       departures_by_pill: group_departures_by_pill(sections, current_time),
-      psa: Psa.current_audio_psa_for(screen_id)
+      psa: get_audio_psa(screen_id)
     }
   end
 
@@ -171,6 +172,13 @@ defmodule Screens.Audio do
           |> Timex.format!("{h12}:{m} {AM}")
 
         %{type: :timestamp, value: timestamp}
+    end
+  end
+
+  defp get_audio_psa(screen_id) do
+    case Psa.current_audio_psa_for(screen_id) do
+      nil -> nil
+      psa_config -> Fetch.fetch_psa(psa_config)
     end
   end
 end

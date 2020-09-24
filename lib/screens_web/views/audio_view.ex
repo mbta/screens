@@ -170,7 +170,7 @@ defmodule ScreensWeb.AudioView do
   defp render_psa(nil), do: ~E""
 
   defp render_psa({:plaintext, text, _}) do
-    ~E|<s><%= text %></s>|
+    ~E|<p><s><%= text %></s></p>|
   end
 
   defp render_psa({:ssml, ssml, _}) do
