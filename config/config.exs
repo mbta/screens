@@ -57,6 +57,8 @@ config :screens,
   gds_dms_username: "mbtadata@gmail.com",
   config_fetcher: Screens.Config.State.Fetch,
   config_s3_bucket: "mbta-ctd-config",
+  audio_psa_s3_bucket: "mbta-dotcom",
+  audio_psa_s3_directory: "/screens/audio_assets/psa/",
   api_v3_url: "https://api-v3.mbta.com/"
 
 # Import environment specific config. This must remain at the bottom
