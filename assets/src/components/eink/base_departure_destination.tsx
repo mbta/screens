@@ -1,32 +1,39 @@
 import React from "react";
 
+const splitDestination = (destination) => {
+  const viaPattern = /(.+) (via .+)/;
+  const parenPattern = /(.+) (\(.+)/;
+
+  if (viaPattern.test(destination)) {
+    return viaPattern.exec(destination).slice(1);
+  } else if (parenPattern.test(destination)) {
+    return parenPattern.exec(destination).slice(1);
+  } else {
+    return [destination];
+  }
+};
+
 const BaseDepartureDestination = ({ destination }): JSX.Element => {
   if (!destination) {
     return null;
   }
 
-  if (destination.includes("via")) {
-    const parts = destination.split(" via ");
-    const primaryDestination = parts[0];
-    const secondaryDestination = "via " + parts[1];
+  const [primaryDestination, secondaryDestination] = splitDestination(
+    destination
+  );
 
-    return (
-      <div className="base-departure-destination__container">
-        <div className="base-departure-destination__primary">
-          {primaryDestination}
-        </div>
+  return (
+    <div className="base-departure-destination__container">
+      <div className="base-departure-destination__primary">
+        {primaryDestination}
+      </div>
+      {secondaryDestination && (
         <div className="base-departure-destination__secondary">
           {secondaryDestination}
         </div>
-      </div>
-    );
-  } else {
-    return (
-      <div className="base-departure-destination__container">
-        <div className="base-departure-destination__primary">{destination}</div>
-      </div>
-    );
-  }
+      )}
+    </div>
+  );
 };
 
 export default BaseDepartureDestination;
