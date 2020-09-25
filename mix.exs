@@ -75,7 +75,8 @@ defmodule Screens.MixProject do
       {:hackney, "== 1.15.2"},
       {:guardian, "~> 2.0"},
       {:ueberauth, "~> 0.6"},
-      {:ueberauth_cognito, "~> 0.2"}
+      {:ueberauth_cognito, "~> 0.2"},
+      {:corsica, "~> 1.0"}
     ]
   end
 end

@@ -17,21 +17,11 @@ import {
 } from "Components/eink/screen_page";
 
 const App = (): JSX.Element => {
+  console.log("Solari app is rendering");
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/screen/solari">
-          <MultiScreenPage screenContainer={ScreenContainer} />
-        </Route>
-        <Route exact path="/audit/solari">
-          <AuditScreenPage screenLayout={ScreenLayout} />
-        </Route>
-        <Route path="/screen/:id">
-          <ScreenPage screenContainer={ScreenContainer} />
-        </Route>
-      </Switch>
-    </Router>
+    <MultiScreenPage screenContainer={ScreenContainer} />
   );
 };
 
+console.log("calling ReactDOM.render")
 ReactDOM.render(<App />, document.getElementById("app"));

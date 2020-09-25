@@ -11,16 +11,19 @@ const useApiResponse = (
 
   let apiPath;
   if (datetime) {
-    apiPath = `/api/screen/${id}?last_refresh=${lastRefresh}&datetime=${datetime}`;
+    apiPath = `http://localhost:4000/api/screen/${id}?last_refresh=${lastRefresh}&datetime=${datetime}`;
     refreshMs = 1000 * 60 * 60; // 1 per hour
   } else {
-    apiPath = `/api/screen/${id}?last_refresh=${lastRefresh}`;
+    apiPath = `http://localhost:4000/api/screen/${id}?last_refresh=${lastRefresh}`;
   }
+  console.log("apiPath =", apiPath)
 
   const fetchData = async () => {
     try {
       const result = await fetch(apiPath);
+      console.log("fetch result =", result)
       const json = await result.json();
+      console.log("result json =", json)
 
       if (json.force_reload === true) {
         window.location.reload(false);
