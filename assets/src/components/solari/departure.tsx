@@ -25,6 +25,7 @@ const Departure = ({
   overhead,
   groupStart,
   groupEnd,
+  trackNumber,
 }): JSX.Element => {
   const viaModifier =
     destination && destination.includes(" via ") ? "with-via" : "no-via";
@@ -53,7 +54,11 @@ const Departure = ({
     >
       <div className={classWithModifier("departure", viaModifier)}>
         {groupStart ? (
-          <DepartureRoutePill route={route} routeId={routeId} />
+          <DepartureRoutePill
+            route={route}
+            routeId={routeId}
+            trackNumber={trackNumber}
+          />
         ) : (
           <PlaceholderRoutePill />
         )}

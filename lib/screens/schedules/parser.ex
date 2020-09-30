@@ -57,6 +57,8 @@ defmodule Screens.Schedules.Parser do
     stop = Map.get(included_data, {"stop", stop_id})
     route = Map.get(included_data, {"route", route_id})
 
+    track_number = parse_track_number(stop_id)
+
     %Screens.Schedules.Schedule{
       id: id,
       trip: trip,
@@ -64,7 +66,8 @@ defmodule Screens.Schedules.Parser do
       route: route,
       arrival_time: arrival_time,
       departure_time: departure_time,
-      stop_headsign: stop_headsign
+      stop_headsign: stop_headsign,
+      track_number: track_number
     }
   end
 
@@ -73,5 +76,17 @@ defmodule Screens.Schedules.Parser do
   defp parse_time(s) do
     {:ok, time, _} = DateTime.from_iso8601(s)
     time
+  end
+
+  @spec parse_track_number(stop_id :: String.t()) :: pos_integer() | nil
+  defp parse_track_number(nil), do: nil
+
+  defp parse_track_number(stop_id) do
+    ~r|^\w+-\w+-(\d+)$|
+    |> Regex.run(stop_id, capture: :all_but_first)
+    |> case do
+      nil -> nil
+      [track_number] -> String.to_integer(track_number)
+    end
   end
 end

@@ -17,7 +17,8 @@ defmodule Screens.Departures.Departure do
             stop_type: nil,
             time: nil,
             crowding_level: nil,
-            inline_badges: nil
+            inline_badges: nil,
+            track_number: nil
 
   @type crowding_level :: 1 | 2 | 3 | nil
 
@@ -33,7 +34,8 @@ defmodule Screens.Departures.Departure do
           stop_type: :first_stop | :last_stop | :mid_route_stop,
           time: DateTime.t(),
           crowding_level: crowding_level,
-          inline_badges: list(map())
+          inline_badges: list(map()),
+          track_number: pos_integer() | nil
         }
 
   @type query_params :: %{
@@ -167,7 +169,8 @@ defmodule Screens.Departures.Departure do
            route: %{id: route_id, short_name: route_short_name},
            arrival_time: arrival_time,
            departure_time: departure_time,
-           stop_headsign: stop_headsign
+           stop_headsign: stop_headsign,
+           track_number: track_number
          } = data
        ) do
     time = select_prediction_time(arrival_time, departure_time)
@@ -179,7 +182,8 @@ defmodule Screens.Departures.Departure do
       route_id: route_id,
       time: DateTime.to_iso8601(time),
       stop_type: stop_type(arrival_time, departure_time),
-      inline_badges: []
+      inline_badges: [],
+      track_number: track_number
     }
 
     trip_data =
