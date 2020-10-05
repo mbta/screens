@@ -146,24 +146,28 @@ defmodule Screens.Headways do
   end
 
   defp service_start_or_end(stop_id, direction_id, min_or_max_fn) do
-    {:ok, schedules} = Schedule.fetch(%{stop_ids: [stop_id], direction_id: direction_id})
+    case Schedule.fetch(%{stop_ids: [stop_id], direction_id: direction_id}) do
+      {:ok, schedules} ->
+        filtered_schedules =
+          schedules
+          |> Enum.map(& &1.arrival_time)
+          |> Enum.filter(&(not is_nil(&1)))
 
-    filtered_schedules =
-      schedules
-      |> Enum.map(& &1.arrival_time)
-      |> Enum.filter(&(not is_nil(&1)))
+        case filtered_schedules do
+          [] ->
+            nil
 
-    case filtered_schedules do
-      [] ->
+          _ ->
+            {:ok, local_dt} =
+              filtered_schedules
+              |> min_or_max_fn.()
+              |> DateTime.shift_zone("America/New_York")
+
+            DateTime.to_time(local_dt)
+        end
+
+      :error ->
         nil
-
-      _ ->
-        {:ok, local_dt} =
-          filtered_schedules
-          |> min_or_max_fn.()
-          |> DateTime.shift_zone("America/New_York")
-
-        DateTime.to_time(local_dt)
     end
   end
 
