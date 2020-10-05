@@ -14,19 +14,12 @@ defmodule Screens.NearbyDepartures do
         predictions
         |> Enum.group_by(& &1.stop.id)
         |> Enum.map(fn {stop_id, prediction_list} ->
-          {stop_id, select_earliest_prediction(prediction_list)}
+          {stop_id, Enum.min_by(prediction_list, & &1.departure_time, fn -> nil end)}
         end)
         |> Enum.map(fn {_stop_id, prediction} -> format_prediction(prediction) end)
 
       :error ->
         []
-    end
-  end
-
-  defp select_earliest_prediction(prediction_list) do
-    case Enum.reject(prediction_list, &is_nil(&1.departure_time)) do
-      [] -> nil
-      predictions -> Enum.min_by(predictions, & &1.departure_time)
     end
   end
 

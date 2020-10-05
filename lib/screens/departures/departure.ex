@@ -69,7 +69,6 @@ defmodule Screens.Departures.Departure do
       {:ok, data} ->
         departures =
           data
-          |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
           |> Enum.filter(fn %{departure_time: departure_time} ->
             DateTime.compare(departure_time, dt) != :lt
           end)
@@ -118,7 +117,6 @@ defmodule Screens.Departures.Departure do
     predicted_trip_ids =
       predictions
       |> Enum.reject(&is_nil(&1.trip))
-      |> Enum.reject(&is_nil(&1.departure_time))
       |> Enum.map(& &1.trip.id)
       |> Enum.into(MapSet.new())
 
@@ -140,7 +138,6 @@ defmodule Screens.Departures.Departure do
   def from_schedules({:ok, schedules}) do
     departures =
       schedules
-      |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
       |> Enum.reject(&departure_in_past/1)
       |> deduplicate_combined_routes()
       |> Enum.map(&from_prediction_or_schedule/1)
@@ -153,7 +150,6 @@ defmodule Screens.Departures.Departure do
   def from_predictions({:ok, predictions}) do
     departures =
       predictions
-      |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
       |> Enum.reject(&departure_in_past/1)
       |> deduplicate_combined_routes()
       |> Enum.map(&from_prediction_or_schedule/1)
@@ -345,7 +341,7 @@ defmodule Screens.Departures.Departure do
       route_ids = Enum.map(predictions, & &1.route.id)
 
       if length(route_ids) > 1 and Enum.at(route_ids, 0) != "64" do
-        Logger.info(
+        Logger.warn(
           "log_unexpected_groups found #{length(route_ids)} predictions on trip #{trip_id} for route #{
             Enum.at(route_ids, 0)
           }"
@@ -363,7 +359,6 @@ defmodule Screens.Departures.Departure do
   defp deduplicate_repeated_trips({:ok, predictions}) do
     deduplicated_predictions =
       predictions
-      |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
       |> Enum.group_by(fn %{trip: %Trip{id: trip_id}} -> trip_id end)
       |> log_unexpected_groups()
       |> Enum.map(fn {_trip_id, predictions} -> Enum.min_by(predictions, & &1.departure_time) end)
