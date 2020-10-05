@@ -41,28 +41,28 @@ defmodule ScreensWeb.AdminApiController do
     json(conn, %{success: success})
   end
 
-  def image_names(conn, _params) do
-    # image_names = Screens.Image.fetch_image_names()
-    # json(conn, %{image_names: image_names})
-    json(conn, %{image_names: ~w[crowding-legend face-covering-required solari-feedback]})
+  def image_filenames(conn, _params) do
+    image_filenames = Screens.Image.fetch_image_filenames()
+    json(conn, %{image_filenames: image_filenames})
   end
 
-  def upload_image(conn, %{"image" => %Plug.Upload{content_type: "image/png"} = upload_struct}) do
-    # response = case Screens.Image.upload_image(upload_struct) do
-    #   {:ok, uploaded_name} -> %{success: true, uploaded_name: uploaded_name}
-    #   :error -> %{success: false}
-    # end
-    # json(conn, response)
-    uploaded_name = String.downcase(upload_struct.filename)
-    json(conn, %{success: true, uploaded_name: uploaded_name})
+  def upload_image(conn, %{"image" => %Plug.Upload{} = upload_struct}) do
+    response =
+      case Screens.Image.upload_image(upload_struct) do
+        {:ok, uploaded_name} -> %{success: true, uploaded_name: uploaded_name}
+        :error -> %{success: false}
+      end
+
+    json(conn, response)
   end
 
-  def delete_image(conn, %{"name" => name}) do
-    # response = case Screens.Image.delete_image(name) do
-    #   :ok -> %{success: true}
-    #   :error -> %{success: false}
-    # end
-    # json(conn, response)
-    json(conn, %{success: true})
+  def delete_image(conn, %{"name" => filename}) do
+    response =
+      case Screens.Image.delete_image(filename) do
+        :ok -> %{success: true}
+        :error -> %{success: false}
+      end
+
+    json(conn, response)
   end
 end

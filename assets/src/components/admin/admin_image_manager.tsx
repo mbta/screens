@@ -7,7 +7,7 @@ interface FileWithPreview extends File {
 }
 
 const IMAGE_BUCKET_BASE_URL =
-  "https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/";
+  "https://mbta-screens.s3.amazonaws.com/dev/images/psa/";
 
 const fetchWithCsrf = (resource: RequestInfo, init: RequestInit = {}) => {
   const csrfToken = document.head.querySelector("[name~=csrf-token][content]")
@@ -19,13 +19,13 @@ const fetchWithCsrf = (resource: RequestInfo, init: RequestInit = {}) => {
   });
 };
 
-const fetchImageNames = async () => {
-  const response = await fetchWithCsrf("/api/admin/image_names");
-  const { image_names: imageNames } = await response.json();
-  return _.sortBy(imageNames);
+const fetchImageFilenames = async () => {
+  const response = await fetchWithCsrf("/api/admin/image_filenames");
+  const { image_filenames: imageFilenames } = await response.json();
+  return _.sortBy(imageFilenames);
 };
 
-const ImageNameSelect = ({ options, onChange }): JSX.Element => {
+const ImageFilenameSelect = ({ options, onChange }): JSX.Element => {
   const handleChange = (e) => {
     onChange(e.target.value);
   };
@@ -56,15 +56,15 @@ const ImageThumbnail = ({ src, fullSize = false }): JSX.Element => (
   </div>
 );
 
-const S3ImageThumbnail = ({ imageName }): JSX.Element => (
-  <ImageThumbnail src={`${IMAGE_BUCKET_BASE_URL}${imageName}.png`} fullSize />
+const S3ImageThumbnail = ({ filename }): JSX.Element => (
+  <ImageThumbnail src={`${IMAGE_BUCKET_BASE_URL}${filename}`} fullSize />
 );
 
 const ImageManagerContainer = ({}): JSX.Element => {
-  const [imageNames, setImageNames] = useState<string[]>([]);
+  const [imageFilenames, setImageFilenames] = useState<string[]>([]);
 
   const loadState = async () => {
-    setImageNames(await fetchImageNames());
+    setImageFilenames(await fetchImageFilenames());
   };
 
   useEffect(() => {
@@ -72,8 +72,8 @@ const ImageManagerContainer = ({}): JSX.Element => {
     return;
   }, []);
 
-  return imageNames.length > 0 ? (
-    <ImageManager imageNames={imageNames} />
+  return imageFilenames.length > 0 ? (
+    <ImageManager imageFilenames={imageFilenames} />
   ) : (
     <div>Loading...</div>
   );
@@ -83,43 +83,52 @@ const ImageUpload = ({}): JSX.Element => {
   const [stagedImageUpload, setStagedImageUpload] = useState<FileWithPreview>(
     null
   );
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleClickUpload = async () => {
+    setIsUploading(true);
+
     const formData = new FormData();
     formData.append("image", stagedImageUpload, stagedImageUpload.name);
+
     try {
       const response = await fetchWithCsrf("/api/admin/image", {
         method: "POST",
         body: formData,
       });
+
       const result = await response.json();
       if (result.success) {
-        alert(
-          `Success. Image has been uploaded to S3 as "${result.uploaded_name}".`
-        );
+        alert(`Success. Image has been uploaded as "${result.uploaded_name}".`);
         location.reload();
       } else {
         throw new Error();
       }
     } catch (e) {
       alert("Upload failed.");
+      setIsUploading(false);
     }
   };
 
   const onDrop = useCallback(
     ([acceptedFile]) => {
-      const fileWithPreview = Object.assign(acceptedFile, {
-        preview: URL.createObjectURL(acceptedFile),
-      });
-      setStagedImageUpload(fileWithPreview);
+      if (!!acceptedFile) {
+        const fileWithPreview = Object.assign(acceptedFile, {
+          preview: URL.createObjectURL(acceptedFile),
+        });
+        setStagedImageUpload(fileWithPreview);
+      } else {
+        alert("That file is too large; please try one under 20MB.");
+      }
     },
     [setStagedImageUpload]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: "image/png",
+    accept: ["image/png", "image/gif", "image/svg+xml"],
     multiple: false,
+    maxSize: 20000000,
   });
 
   return (
@@ -131,41 +140,51 @@ const ImageUpload = ({}): JSX.Element => {
         ) : (
           <p>Drag and drop, or click to select an image.</p>
         )}
-        <p>PNGs only. Make sure your image has the name you want to use!</p>
+        <p>
+          <strong>
+            PNG, GIF, or XML only. 20MB max. Make sure your image has the name
+            you want to use!
+          </strong>
+        </p>
       </div>
       {stagedImageUpload != null && (
         <ImageThumbnail src={stagedImageUpload.preview} />
       )}
       <button
         className="admin-image-manager__upload-button"
-        disabled={stagedImageUpload == null}
+        disabled={stagedImageUpload == null || isUploading}
         onClick={handleClickUpload}
       >
-        Upload
+        {isUploading ? "Uploading..." : "Upload"}
       </button>
     </>
   );
 };
 
-const ImageManager = ({ imageNames }): JSX.Element => {
-  const [selectedImageName, setSelectedImageName] = useState(undefined);
+const ImageManager = ({ imageFilenames }): JSX.Element => {
+  const [selectedFilename, setSelectedFilename] = useState(undefined);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleClickDelete = async () => {
-    if (confirm(`Permanently delete "${selectedImageName}.png"?`)) {
+    if (confirm(`Permanently delete "${selectedFilename}"?`)) {
+      setIsDeleting(true);
+
       try {
         const response = await fetchWithCsrf(
-          `/api/admin/image/${selectedImageName}`,
+          `/api/admin/image/${selectedFilename}`,
           { method: "DELETE" }
         );
-        const { success } = await response.json();
-        if (success) {
-          alert(`Success. "${selectedImageName}.png" has been deleted.`);
+
+        const result = await response.json();
+        if (result.success) {
+          alert(`Success. "${selectedFilename}" has been deleted.`);
           location.reload();
         } else {
           throw new Error();
         }
       } catch (e) {
-        alert(`Failed to delete ${selectedImageName}.`);
+        alert(`Failed to delete ${selectedFilename}.`);
+        setIsDeleting(false);
       }
     }
   };
@@ -174,18 +193,21 @@ const ImageManager = ({ imageNames }): JSX.Element => {
     <div className="admin-image-manager">
       <h2>Manage Images</h2>
       <span>
-        <ImageNameSelect options={imageNames} onChange={setSelectedImageName} />
+        <ImageFilenameSelect
+          options={imageFilenames}
+          onChange={setSelectedFilename}
+        />
         <button
           className="admin-image-manager__delete-button"
-          disabled={!selectedImageName}
+          disabled={!selectedFilename || isDeleting}
           onClick={handleClickDelete}
         >
-          Delete...
+          {isDeleting ? "Deleting..." : "Delete..."}
         </button>
       </span>
-      {selectedImageName && (
+      {selectedFilename && (
         <div className="admin-image-manager__preview-container">
-          <S3ImageThumbnail imageName={selectedImageName} />
+          <S3ImageThumbnail filename={selectedFilename} />
         </div>
       )}
       <h2>Upload New Image</h2>
