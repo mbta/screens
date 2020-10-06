@@ -145,7 +145,8 @@ defmodule ScreensWeb.AudioView do
     ~E|<%= time_rendered %><%= crowding_rendered %>|
   end
 
-  @spec render_time_representation(atom(), atom() | pos_integer() | String.t()) :: Phoenix.HTML.safe()
+  @spec render_time_representation(atom(), atom() | pos_integer() | String.t()) ::
+          Phoenix.HTML.safe()
   defp render_time_representation(:text, :brd), do: ~E"is now boarding"
   defp render_time_representation(:text, :arr), do: ~E"is now arriving"
 
@@ -157,7 +158,8 @@ defmodule ScreensWeb.AudioView do
     ~E|<%= timestamp %>|
   end
 
-  @spec render_crowding_level(Screens.Departures.Departure.crowding_level()) :: Phoenix.HTML.safe()
+  @spec render_crowding_level(Screens.Departures.Departure.crowding_level()) ::
+          Phoenix.HTML.safe()
   defp render_crowding_level(1), do: ~E" (bus is not currently crowded)"
   defp render_crowding_level(2), do: ~E" (bus currently has some crowding)"
   defp render_crowding_level(3), do: ~E" (bus is currently crowded)"

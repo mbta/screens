@@ -96,7 +96,9 @@ defmodule Screens.Audio do
 
   defp group_time_types(departures) do
     departures
-    |> Enum.map(&Map.merge(%{pill: &1.pill, crowding_level: &1.crowding_level}, get_time_representation(&1)))
+    |> Enum.map(
+      &Map.merge(%{pill: &1.pill, crowding_level: &1.crowding_level}, get_time_representation(&1))
+    )
     |> Enum.chunk_by(& &1.type)
     |> ungroup_arr_brd()
     |> Enum.map(&time_list_to_time_group/1)
