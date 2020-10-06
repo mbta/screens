@@ -10,9 +10,11 @@ defmodule Screens.Audio do
   @lexicon_names ["mbtalexicon"]
 
   @type time_representation ::
-          %{type: :text, value: String.t()}
-          | %{type: :minutes, value: integer}
-          | %{type: :timestamp, value: String.t()}
+          %{type: :text, value: time_value(String.t())}
+          | %{type: :minutes, value: time_value(integer)}
+          | %{type: :timestamp, value: time_value(String.t())}
+
+  @type time_value(t) :: {t, Screens.Departures.Departure.crowding_level()}
 
   @type departure_group_key :: {String.t(), String.t(), String.t()}
 
@@ -94,7 +96,7 @@ defmodule Screens.Audio do
 
   defp group_time_types(departures) do
     departures
-    |> Enum.map(&Map.merge(%{pill: &1.pill}, get_time_representation(&1)))
+    |> Enum.map(&Map.merge(%{pill: &1.pill, crowding_level: &1.crowding_level}, get_time_representation(&1)))
     |> Enum.chunk_by(& &1.type)
     |> ungroup_arr_brd()
     |> Enum.map(&time_list_to_time_group/1)
@@ -114,8 +116,10 @@ defmodule Screens.Audio do
     |> Enum.reverse()
   end
 
-  defp time_list_to_time_group([time | _rest] = times) do
-    %{pill: time.pill, type: time.type, values: Enum.map(times, & &1.value)}
+  defp time_list_to_time_group([first_time | _] = times) do
+    values = Enum.map(times, &{&1.value, &1.crowding_level})
+
+    %{pill: first_time.pill, type: first_time.type, values: values}
   end
 
   # Don't repeat wayfinding info if it's the same for all departure groups within a pill
