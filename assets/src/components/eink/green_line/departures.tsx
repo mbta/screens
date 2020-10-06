@@ -97,7 +97,7 @@ interface DepartureListProps {
 }
 
 const DeparturesListPsa = ({ psaName }): JSX.Element => {
-  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaName}.png`;
+  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaName}`;
   return (
     <div>
       <img src={srcPath} />
