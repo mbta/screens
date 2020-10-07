@@ -34,7 +34,7 @@ defmodule Screens.Image do
   @spec upload_image(Plug.Upload.t()) :: {:ok, String.t()} | :error
   def upload_image(%Plug.Upload{filename: filename, path: local_path, content_type: content_type}) do
     filename = String.downcase(filename)
-    s3_path = @psa_images_prefix <> filename
+    s3_path = get_s3_path(filename)
 
     result =
       local_path
@@ -45,6 +45,26 @@ defmodule Screens.Image do
     case result do
       {:ok, %{status_code: 200}} -> {:ok, filename}
       _ -> :error
+    end
+  end
+
+  @spec fetch_image(String.t()) :: {:ok, binary(), String.t()} | :error
+  def fetch_image(filename) do
+    s3_path = get_s3_path(filename)
+
+    get_operation = S3.get_object(@bucket, s3_path)
+
+    case ExAws.request(get_operation) do
+      {:ok, %{status_code: 200, body: body, headers: headers}} ->
+        content_type =
+          headers
+          |> List.keyfind("Content-Type", 0)
+          |> elem(1)
+
+        {:ok, body, content_type}
+
+      _ ->
+        :error
     end
   end
 
@@ -70,4 +90,6 @@ defmodule Screens.Image do
   defp directory?(obj) do
     String.ends_with?(obj.key, "/")
   end
+
+  defp get_s3_path(filename), do: @psa_images_prefix <> filename
 end

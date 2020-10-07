@@ -6,9 +6,6 @@ interface FileWithPreview extends File {
   preview: string;
 }
 
-const IMAGE_BUCKET_BASE_URL =
-  "https://mbta-screens.s3.amazonaws.com/dev/images/psa/";
-
 const fetchWithCsrf = (resource: RequestInfo, init: RequestInit = {}) => {
   const csrfToken = document.head.querySelector("[name~=csrf-token][content]")
     .content;
@@ -57,7 +54,7 @@ const ImageThumbnail = ({ src, fullSize = false }): JSX.Element => (
 );
 
 const S3ImageThumbnail = ({ filename }): JSX.Element => (
-  <ImageThumbnail src={`${IMAGE_BUCKET_BASE_URL}${filename}`} fullSize />
+  <ImageThumbnail src={`/api/admin/image/${filename}`} fullSize />
 );
 
 const ImageManagerContainer = ({}): JSX.Element => {

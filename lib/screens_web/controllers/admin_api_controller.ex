@@ -1,7 +1,7 @@
 defmodule ScreensWeb.AdminApiController do
   use ScreensWeb, :controller
 
-  alias Screens.Config
+  alias Screens.{Config, Image}
 
   @config_fetcher Application.get_env(:screens, :config_fetcher)
 
@@ -42,13 +42,13 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   def image_filenames(conn, _params) do
-    image_filenames = Screens.Image.fetch_image_filenames()
+    image_filenames = Image.fetch_image_filenames()
     json(conn, %{image_filenames: image_filenames})
   end
 
   def upload_image(conn, %{"image" => %Plug.Upload{} = upload_struct}) do
     response =
-      case Screens.Image.upload_image(upload_struct) do
+      case Image.upload_image(upload_struct) do
         {:ok, uploaded_name} -> %{success: true, uploaded_name: uploaded_name}
         :error -> %{success: false}
       end
@@ -56,9 +56,25 @@ defmodule ScreensWeb.AdminApiController do
     json(conn, response)
   end
 
-  def delete_image(conn, %{"name" => filename}) do
+  def show_image(conn, %{"filename" => filename}) do
+    case Image.fetch_image(filename) do
+      {:ok, image_binary, content_type} ->
+        send_download(conn, {:binary, image_binary},
+          filename: filename,
+          content_type: content_type,
+          disposition: :inline
+        )
+
+      :error ->
+        conn
+        |> put_resp_content_type("text/plain")
+        |> resp(404, "Not Found")
+    end
+  end
+
+  def delete_image(conn, %{"filename" => filename}) do
     response =
-      case Screens.Image.delete_image(filename) do
+      case Image.delete_image(filename) do
         :ok -> %{success: true}
         :error -> %{success: false}
       end
