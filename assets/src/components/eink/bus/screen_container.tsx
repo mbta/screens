@@ -89,7 +89,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         globalAlert={apiResponse.global_alert}
         stopId={apiResponse.stop_id}
         nearbyConnections={apiResponse.nearby_connections}
-        psaFilename={apiResponse.psa_name}
+        psaFilename={apiResponse.psa_filename}
         ref={laterDeparturesRef}
       />
     </div>

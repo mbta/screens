@@ -68,7 +68,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
       serviceLevel={apiResponse.service_level}
       isHeadwayMode={apiResponse.is_headway_mode}
       psaFilename={
-        apiResponse.psa_type === "departure" ? apiResponse.psa_name : null
+        apiResponse.psa_type === "departure" ? apiResponse.psa_filename : null
       }
     />
   );

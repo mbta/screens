@@ -23,7 +23,7 @@ defmodule Screens.SolariScreenData do
         dt -> dt
       end
 
-    {psa_type, psa_name} = Screens.Psa.current_psa_for(screen_id)
+    {psa_type, psa_filename} = Screens.Psa.current_psa_for(screen_id)
 
     sections_data = fetch_sections_data(sections, datetime)
     _ = LogScreenData.log_departures(screen_id, is_screen, sections_data)
@@ -38,7 +38,7 @@ defmodule Screens.SolariScreenData do
           sections: data,
           section_headers: section_headers,
           psa_type: psa_type,
-          psa_name: psa_name,
+          psa_filename: psa_filename,
           overhead: overhead
         }
 
