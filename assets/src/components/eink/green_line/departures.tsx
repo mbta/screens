@@ -96,8 +96,8 @@ interface DepartureListProps {
   headway: number;
 }
 
-const DeparturesListPsa = ({ psaName }): JSX.Element => {
-  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaName}`;
+const DeparturesListPsa = ({ psaFilename }): JSX.Element => {
+  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaFilename}`;
   return (
     <div>
       <img src={srcPath} />
@@ -110,7 +110,7 @@ const DepartureWithPsa = ({
   currentTimeString,
   destination,
   headway,
-  psaName,
+  psaFilename,
 }): JSX.Element[] => {
   let firstDepartureOrHeadway;
 
@@ -133,7 +133,7 @@ const DepartureWithPsa = ({
     );
   }
 
-  const psa = <DeparturesListPsa psaName={psaName} />;
+  const psa = <DeparturesListPsa psaFilename={psaFilename} />;
 
   return [firstDepartureOrHeadway, psa];
 };
@@ -146,18 +146,18 @@ const Departures = ({
   currentTimeString,
   serviceLevel,
   isHeadwayMode,
-  psaName,
+  psaFilename,
 }): JSX.Element => {
   let departuresComponent;
 
-  if (psaName) {
+  if (psaFilename) {
     departuresComponent = (
       <DepartureWithPsa
         departures={departures}
         currentTimeString={currentTimeString}
         destination={destination}
         headway={headway}
-        psaName={psaName}
+        psaFilename={psaFilename}
       />
     );
   } else if (isHeadwayMode) {

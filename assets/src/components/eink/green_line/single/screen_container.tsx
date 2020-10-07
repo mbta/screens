@@ -24,7 +24,7 @@ const TopScreenLayout = ({
   inlineAlert,
   serviceLevel,
   isHeadwayMode,
-  psaName,
+  psaFilename,
 }): JSX.Element => {
   return (
     <div className="single-screen-container single-screen-container--gl-mercury">
@@ -47,7 +47,7 @@ const TopScreenLayout = ({
         currentTimeString={currentTimeString}
         serviceLevel={serviceLevel}
         isHeadwayMode={isHeadwayMode}
-        psaName={psaName}
+        psaFilename={psaFilename}
       />
       <DigitalBridge stopId={stopId} />
     </div>
@@ -67,7 +67,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
       inlineAlert={apiResponse.inline_alert}
       serviceLevel={apiResponse.service_level}
       isHeadwayMode={apiResponse.is_headway_mode}
-      psaName={
+      psaFilename={
         apiResponse.psa_type === "departure" ? apiResponse.psa_name : null
       }
     />

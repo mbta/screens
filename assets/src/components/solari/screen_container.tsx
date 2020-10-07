@@ -30,7 +30,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
       />
       {apiResponse.psa_name && (
         <Psa
-          psaName={apiResponse.psa_name}
+          psaFilename={apiResponse.psa_name}
           currentTimeString={apiResponse.current_time}
         />
       )}
@@ -52,8 +52,8 @@ const NoConnectionScreenLayout = (): JSX.Element => {
 };
 
 const TakeoverScreenLayout = ({ apiResponse }): JSX.Element => {
-  const psaName = apiResponse.psa_name;
-  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaName}`;
+  const psaFilename = apiResponse.psa_name;
+  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaFilename}`;
   return <FullScreenImageLayout srcPath={srcPath} />;
 };
 

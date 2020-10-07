@@ -39,7 +39,7 @@ const BottomScreenLayout = forwardRef(
       globalAlert,
       stopId,
       nearbyConnections,
-      psaName,
+      psaFilename,
     },
     ref
   ): JSX.Element => {
@@ -50,7 +50,7 @@ const BottomScreenLayout = forwardRef(
           departures={departures}
           globalAlert={globalAlert}
           nearbyConnections={nearbyConnections}
-          psaName={psaName}
+          psaFilename={psaFilename}
           ref={ref}
         />
         <FareInfo />
@@ -89,7 +89,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         globalAlert={apiResponse.global_alert}
         stopId={apiResponse.stop_id}
         nearbyConnections={apiResponse.nearby_connections}
-        psaName={apiResponse.psa_name}
+        psaFilename={apiResponse.psa_name}
         ref={laterDeparturesRef}
       />
     </div>
