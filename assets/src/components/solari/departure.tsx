@@ -26,8 +26,14 @@ const Departure = ({
   groupStart,
   groupEnd,
 }): JSX.Element => {
+  const viaPattern = /(.+) (via .+)/;
+  const parenPattern = /(.+) (\(.+)/;
+
   const viaModifier =
-    destination && destination.includes(" via ") ? "with-via" : "no-via";
+    destination &&
+    (viaPattern.test(destination) || parenPattern.test(destination))
+      ? "with-via"
+      : "no-via";
 
   const timeRepresentation = standardTimeRepresentation(
     time,
