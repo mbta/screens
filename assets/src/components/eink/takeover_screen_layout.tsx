@@ -3,8 +3,8 @@ import React from "react";
 import FullScreenTakeover from "Components/eink/full_screen_takeover";
 
 const TakeoverScreenLayout = ({ apiResponse, size }): JSX.Element => {
-  const psaName = apiResponse.psa_name;
-  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaName}.png`;
+  const psaFilename = apiResponse.psa_filename;
+  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaFilename}`;
   return (
     <FullScreenTakeover
       srcPath={srcPath}

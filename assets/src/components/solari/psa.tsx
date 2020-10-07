@@ -1,7 +1,7 @@
 import React from "react";
 
-const Psa = ({ psaName, currentTimeString }): JSX.Element => {
-  const imageSrc = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaName}.png`;
+const Psa = ({ psaFilename, currentTimeString }): JSX.Element => {
+  const imageSrc = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaFilename}`;
   return (
     <div className="psa" key={currentTimeString}>
       <img src={imageSrc} />
