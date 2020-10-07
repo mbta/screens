@@ -146,29 +146,23 @@ defmodule Screens.Headways do
   end
 
   defp service_start_or_end(stop_id, direction_id, min_or_max_fn) do
-    case Schedule.fetch(%{stop_ids: [stop_id], direction_id: direction_id}) do
-      {:ok, schedules} ->
-        filtered_schedules =
-          schedules
-          |> Enum.map(& &1.arrival_time)
-          |> Enum.filter(&(not is_nil(&1)))
+    with {:ok, schedules} <- Schedule.fetch(%{stop_ids: [stop_id], direction_id: direction_id}),
+         [] = arrival_times <- get_arrival_times(schedules) do
+      {:ok, local_dt} =
+        arrival_times
+        |> min_or_max_fn.()
+        |> DateTime.shift_zone("America/New_York")
 
-        case filtered_schedules do
-          [] ->
-            nil
-
-          _ ->
-            {:ok, local_dt} =
-              filtered_schedules
-              |> min_or_max_fn.()
-              |> DateTime.shift_zone("America/New_York")
-
-            DateTime.to_time(local_dt)
-        end
-
-      :error ->
-        nil
+      DateTime.to_time(local_dt)
+    else
+      _ -> nil
     end
+  end
+
+  defp get_arrival_times(schedules) do
+    schedules
+    |> Enum.map(& &1.arrival_time)
+    |> Enum.reject(&is_nil(&1))
   end
 
   # Time to stop showing Good Night screen if there are no predictions
