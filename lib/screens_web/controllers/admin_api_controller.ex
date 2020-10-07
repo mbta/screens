@@ -56,22 +56,6 @@ defmodule ScreensWeb.AdminApiController do
     json(conn, response)
   end
 
-  def show_image(conn, %{"filename" => filename}) do
-    case Image.fetch_image(filename) do
-      {:ok, image_binary, content_type} ->
-        send_download(conn, {:binary, image_binary},
-          filename: filename,
-          content_type: content_type,
-          disposition: :inline
-        )
-
-      :error ->
-        conn
-        |> put_resp_content_type("text/plain")
-        |> resp(404, "Not Found")
-    end
-  end
-
   def delete_image(conn, %{"filename" => filename}) do
     response =
       case Image.delete_image(filename) do

@@ -54,7 +54,7 @@ const ImageThumbnail = ({ src, fullSize = false }): JSX.Element => (
 );
 
 const S3ImageThumbnail = ({ filename }): JSX.Element => (
-  <ImageThumbnail src={`/api/admin/image/${filename}`} fullSize />
+  <ImageThumbnail src={`/image/${filename}`} fullSize />
 );
 
 const ImageManagerContainer = ({}): JSX.Element => {

@@ -62,7 +62,6 @@ defmodule ScreensWeb.Router do
     post "/refresh", AdminApiController, :refresh
     get "/image_filenames", AdminApiController, :image_filenames
     post "/image", AdminApiController, :upload_image
-    get "/image/:filename", AdminApiController, :show_image
     delete "/image/:filename", AdminApiController, :delete_image
   end
 
@@ -70,6 +69,12 @@ defmodule ScreensWeb.Router do
     pipe_through [:redirect_prod_http, :browser]
 
     get "/:id", ScreenController, :index
+  end
+
+  scope "/image", ScreensWeb do
+    pipe_through [:redirect_prod_http, :browser]
+
+    get "/:filename", ScreenController, :show_image
   end
 
   scope "/audit", ScreensWeb do

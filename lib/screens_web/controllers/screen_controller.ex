@@ -82,6 +82,10 @@ defmodule ScreensWeb.ScreenController do
     render_not_found(conn)
   end
 
+  def show_image(conn, %{"filename" => filename}) do
+    redirect(conn, external: Screens.Image.get_s3_url(filename))
+  end
+
   defp render_not_found(conn) do
     conn
     |> assign(:app_id, @default_app_id)

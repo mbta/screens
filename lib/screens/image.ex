@@ -4,6 +4,7 @@ defmodule Screens.Image do
   alias ExAws.S3
 
   @bucket "mbta-screens"
+  @s3_base_url "https:#{@bucket}.s3.amazonaws.com/"
   @psa_images_prefix Application.get_env(:screens, :environment_name, "dev") <> "/images/psa/"
 
   # Matches all non-delimiter characters located after the last delimiter.
@@ -30,6 +31,9 @@ defmodule Screens.Image do
     |> Stream.map(&get_image_filename/1)
     |> Enum.to_list()
   end
+
+  @spec get_s3_url(String.t()) :: String.t()
+  def get_s3_url(filename), do: @s3_base_url <> get_s3_path(filename)
 
   @spec upload_image(Plug.Upload.t()) :: {:ok, String.t()} | :error
   def upload_image(%Plug.Upload{filename: filename, path: local_path, content_type: content_type}) do
