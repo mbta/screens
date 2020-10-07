@@ -1,6 +1,8 @@
 defmodule Screens.Departures.Departure do
   @moduledoc false
 
+  require Logger
+
   alias Screens.Predictions.Prediction
   alias Screens.Schedules.Schedule
   alias Screens.Trips.Trip
@@ -67,7 +69,6 @@ defmodule Screens.Departures.Departure do
       {:ok, data} ->
         departures =
           data
-          |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
           |> Enum.filter(fn %{departure_time: departure_time} ->
             DateTime.compare(departure_time, dt) != :lt
           end)
@@ -84,6 +85,7 @@ defmodule Screens.Departures.Departure do
   defp fetch_predictions_only(%{} = query_params) do
     query_params
     |> Prediction.fetch()
+    |> deduplicate_repeated_trips()
     |> from_predictions()
   end
 
@@ -115,7 +117,6 @@ defmodule Screens.Departures.Departure do
     predicted_trip_ids =
       predictions
       |> Enum.reject(&is_nil(&1.trip))
-      |> Enum.reject(&is_nil(&1.departure_time))
       |> Enum.map(& &1.trip.id)
       |> Enum.into(MapSet.new())
 
@@ -137,7 +138,6 @@ defmodule Screens.Departures.Departure do
   def from_schedules({:ok, schedules}) do
     departures =
       schedules
-      |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
       |> Enum.reject(&departure_in_past/1)
       |> deduplicate_combined_routes()
       |> Enum.map(&from_prediction_or_schedule/1)
@@ -150,7 +150,6 @@ defmodule Screens.Departures.Departure do
   def from_predictions({:ok, predictions}) do
     departures =
       predictions
-      |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
       |> Enum.reject(&departure_in_past/1)
       |> deduplicate_combined_routes()
       |> Enum.map(&from_prediction_or_schedule/1)
@@ -336,6 +335,39 @@ defmodule Screens.Departures.Departure do
   defp format_query_param({:date, date}) do
     {"date", date}
   end
+
+  defp log_unexpected_groups(groups) do
+    Enum.each(groups, fn {trip_id, predictions} ->
+      route_ids = Enum.map(predictions, & &1.route.id)
+
+      if length(route_ids) > 1 and Enum.at(route_ids, 0) != "64" do
+        Logger.warn(
+          "log_unexpected_groups found #{length(route_ids)} predictions on trip #{trip_id} for route #{
+            Enum.at(route_ids, 0)
+          }"
+        )
+      end
+    end)
+
+    groups
+  end
+
+  # If there are multiple predictions along the same trip, choose only the earliest one to display.
+  # This addresses a specific issue at Central where late-night outbound 64 trips which start in
+  # Central Square serve multiple stops we're displaying on the Solari screen there. This shouldn't
+  # happen anywhere else.
+  defp deduplicate_repeated_trips({:ok, predictions}) do
+    deduplicated_predictions =
+      predictions
+      |> Enum.group_by(fn %{trip: %Trip{id: trip_id}} -> trip_id end)
+      |> log_unexpected_groups()
+      |> Enum.map(fn {_trip_id, predictions} -> Enum.min_by(predictions, & &1.departure_time) end)
+      |> Enum.sort_by(& &1.departure_time)
+
+    {:ok, deduplicated_predictions}
+  end
+
+  defp deduplicate_repeated_trips(:error), do: :error
 
   # This function filters out predictions whose route ID does not equal its trip's route ID.
   #

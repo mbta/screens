@@ -27,11 +27,17 @@ defmodule Screens.Predictions.Prediction do
 
   @spec fetch(Departure.query_params()) :: {:ok, list(t())} | :error
   def fetch(%{} = query_params) do
-    Departure.do_query_and_parse(
-      query_params,
-      "predictions",
-      Screens.Predictions.Parser,
-      %{include: ~w[route stop trip trip.stops vehicle alerts]}
-    )
+    predictions =
+      Departure.do_query_and_parse(
+        query_params,
+        "predictions",
+        Screens.Predictions.Parser,
+        %{include: ~w[route stop trip trip.stops vehicle alerts]}
+      )
+
+    case predictions do
+      {:ok, result} -> {:ok, Enum.reject(result, &is_nil(&1.departure_time))}
+      :error -> :error
+    end
   end
 end
