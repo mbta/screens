@@ -1,9 +1,11 @@
 defmodule ScreensWeb.AdminApiController do
   use ScreensWeb, :controller
 
-  alias Screens.Config
+  alias Screens.{Config, Image}
 
   @config_fetcher Application.get_env(:screens, :config_fetcher)
+
+  plug :accepts, ["multipart/form-data"] when action == :upload_image
 
   def index(conn, _params) do
     {:ok, config} = @config_fetcher.get_from_s3()
@@ -37,5 +39,30 @@ defmodule ScreensWeb.AdminApiController do
       end
 
     json(conn, %{success: success})
+  end
+
+  def image_filenames(conn, _params) do
+    image_filenames = Image.fetch_image_filenames()
+    json(conn, %{image_filenames: image_filenames})
+  end
+
+  def upload_image(conn, %{"image" => %Plug.Upload{} = upload_struct}) do
+    response =
+      case Image.upload_image(upload_struct) do
+        {:ok, uploaded_name} -> %{success: true, uploaded_name: uploaded_name}
+        :error -> %{success: false}
+      end
+
+    json(conn, response)
+  end
+
+  def delete_image(conn, %{"filename" => filename}) do
+    response =
+      case Image.delete_image(filename) do
+        :ok -> %{success: true}
+        :error -> %{success: false}
+      end
+
+    json(conn, response)
   end
 end

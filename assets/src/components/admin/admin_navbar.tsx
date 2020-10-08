@@ -22,6 +22,9 @@ const AdminNavbar = (): JSX.Element => {
       <Link to="/json-editor">
         <button>JSON Editor</button>
       </Link>
+      <Link to="/image-manager">
+        <button>Image Manager</button>
+      </Link>
     </div>
   );
 };

@@ -21,6 +21,7 @@
     "qrcode.react": "^1.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-dropzone": "^11.1.0",
     "react-router-dom": "^5.2.0",
     "react-table": "^7.5.0",
     "react-transition-group": "^4.4.1",
