@@ -160,7 +160,7 @@ defmodule ScreensWeb.AudioView do
 
   @spec render_crowding_level(Screens.Departures.Departure.crowding_level()) ::
           Phoenix.HTML.safe()
-  defp render_crowding_level(1), do: ~E" (not currently crowded)"
+  defp render_crowding_level(1), do: ~E" (currently not crowded)"
   defp render_crowding_level(2), do: ~E" (currently has some crowding)"
   defp render_crowding_level(3), do: ~E" (currently crowded)"
   defp render_crowding_level(nil), do: ~E""
