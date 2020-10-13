@@ -27,7 +27,7 @@ defmodule Screens.GLScreenData do
     with {:ok, departures} <- departures,
          {:ok, destination} <- destination do
       {inline_alerts, global_alert} = Alert.by_route_id(route_id, stop_id)
-      {psa_type, psa_filename} = Screens.Psa.current_psa_for(screen_id)
+      {psa_type, psa_url} = Screens.Psa.current_psa_for(screen_id)
 
       %{
         force_reload: false,
@@ -45,7 +45,7 @@ defmodule Screens.GLScreenData do
         service_level: service_level,
         is_headway_mode: headway_mode?,
         psa_type: psa_type,
-        psa_filename: psa_filename
+        psa_url: psa_url
       }
     else
       :error ->

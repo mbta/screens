@@ -4,7 +4,7 @@ defmodule Screens.Image do
   alias ExAws.S3
 
   @bucket "mbta-screens"
-  @s3_base_url "https:#{@bucket}.s3.amazonaws.com/"
+  @s3_base_url "https://#{@bucket}.s3.amazonaws.com/"
   @psa_images_prefix Application.get_env(:screens, :environment_name, "dev") <> "/images/psa/"
 
   # Matches all non-delimiter characters located after the last delimiter.
