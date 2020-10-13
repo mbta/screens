@@ -1,7 +1,7 @@
 defmodule Screens.Config.Solari do
   @moduledoc false
 
-  alias Screens.Config.{AudioPsa, PsaConfig, Solari.Section}
+  alias Screens.Config.{AudioPsa, HeadwayConfig, PsaConfig, Solari.Section}
   alias Screens.Util
 
   @type t :: %__MODULE__{
@@ -10,7 +10,8 @@ defmodule Screens.Config.Solari do
           section_headers: :normal | :vertical | :none,
           sections: list(Section.t()),
           psa_config: PsaConfig.t(),
-          audio_psa: AudioPsa.t()
+          audio_psa: AudioPsa.t(),
+          headway_config: HeadwayConfig.t()
         }
 
   @enforce_keys [:station_name]
@@ -19,7 +20,8 @@ defmodule Screens.Config.Solari do
             section_headers: :normal,
             sections: [],
             psa_config: PsaConfig.from_json(:default),
-            audio_psa: AudioPsa.from_json(:default)
+            audio_psa: AudioPsa.from_json(:default),
+            headway_config: HeadwayConfig.from_json(:default)
 
   @spec from_json(map()) :: t()
   def from_json(%{} = json) do
@@ -58,6 +60,10 @@ defmodule Screens.Config.Solari do
     AudioPsa.from_json(audio_psa)
   end
 
+  defp value_from_json("headway_config", headway_config) do
+    HeadwayConfig.from_json(headway_config)
+  end
+
   defp value_from_json(_, value), do: value
 
   defp value_to_json(:sections, sections) do
@@ -70,6 +76,10 @@ defmodule Screens.Config.Solari do
 
   defp value_to_json(:audio_psa, audio_psa) do
     AudioPsa.to_json(audio_psa)
+  end
+
+  defp value_to_json(:headway_config, headway_config) do
+    HeadwayConfig.to_json(headway_config)
   end
 
   defp value_to_json(_, value), do: value
