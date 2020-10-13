@@ -333,6 +333,14 @@ const SolariScreensTable = (): JSX.Element => {
       disableFilters: true,
       FormCell: FormTextarea,
     },
+    {
+      Header: "Headway Config",
+      accessor: buildAppParamAccessor("headway_config"),
+      mutator: buildAppParamMutator("headway_config"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
   ];
 
   const dataFilter = ({ app_id }) => {
