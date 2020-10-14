@@ -59,7 +59,6 @@ config :screens,
   config_s3_bucket: "mbta-ctd-config",
   audio_psa_s3_bucket: "mbta-dotcom",
   audio_psa_s3_directory: "/screens/audio_assets/psa/",
-  signs_ui_s3_bucket: "mbta-signs",
   signs_ui_s3_path: "config.json",
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.Fetch,
   api_v3_url: "https://api-v3.mbta.com/"
