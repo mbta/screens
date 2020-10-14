@@ -1,4 +1,4 @@
-defmodule Screens.Config.HeadwayConfig do
+defmodule Screens.Config.Solari.Section.Headway do
   @moduledoc false
 
   @typep sign_id :: String.t()

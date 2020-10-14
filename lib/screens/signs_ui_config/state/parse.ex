@@ -22,6 +22,6 @@ defmodule Screens.SignsUiConfig.State.Parse do
     Enum.flat_map(signs, &get_headway_mode_sign/1)
   end
 
-  defp get_headway_mode_sign(%{"id" => id, "mode" => "headway"}), do: [id]
+  defp get_headway_mode_sign({_, %{"id" => id, "mode" => "headway"}}), do: [id]
   defp get_headway_mode_sign(_), do: []
 end
