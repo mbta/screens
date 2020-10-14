@@ -1,20 +1,22 @@
 defmodule Screens.SolariScreenData do
   @moduledoc false
 
-  alias Screens.Config.{Query, Solari, State}
+  alias Screens.Config.{HeadwayConfig, Query, Solari, State}
   alias Screens.Config.Query.{Opts, Params}
   alias Screens.Config.Solari.Section
   alias Screens.Config.Solari.Section.Layout
   alias Screens.Config.Solari.Section.Layout.{Bidirectional, Upcoming}
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
+  alias Screens.SignsUiConfig
 
   def by_screen_id(screen_id, is_screen, datetime \\ nil) do
     %Solari{
       station_name: station_name,
       sections: sections,
       section_headers: section_headers,
-      overhead: overhead
+      overhead: overhead,
+      headway_config: headway_config
     } = State.app_params(screen_id)
 
     current_time =
@@ -27,6 +29,8 @@ defmodule Screens.SolariScreenData do
 
     sections_data = fetch_sections_data(sections, datetime)
     _ = LogScreenData.log_departures(screen_id, is_screen, sections_data)
+
+    headway_mode = fetch_headway_mode(headway_config, current_time)
 
     case sections_data do
       {:ok, data} ->
@@ -85,6 +89,38 @@ defmodule Screens.SolariScreenData do
       :error ->
         :error
     end
+  end
+
+  def fetch_headway_mode(%HeadwayConfig{headway_id: nil}, _), do: %{active: false}
+
+  def fetch_headway_mode(%HeadwayConfig{sign_ids: sign_ids, headway_id: headway_id}, current_time) do
+    if SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids) do
+      time_ranges = SignsUiConfig.State.time_ranges(headway_id)
+      current_time_period = time_period(current_time)
+
+      case time_ranges do
+        %{^current_time_period => {range_low, range_high}} ->
+          %{active: true, range_low: range_low, range_high: range_high}
+
+        _ ->
+          %{active: false}
+      end
+    else
+      %{active: false}
+    end
+  end
+
+  def time_period(utc_time) do
+    {:ok, dt} = DateTime.shift_zone(utc_time, "America/New_York")
+    day_of_week = dt |> DateTime.to_date() |> Date.day_of_week()
+
+    weekday? = day_of_week in 1..5
+
+    rush_hour? =
+      (dt.hour >= 7 and dt.hour < 9) or (dt.hour >= 16 and dt.hour < 18) or
+        (dt.hour == 18 and dt.minute <= 30)
+
+    if(weekday? and rush_hour?, do: :peak, else: :off_peak)
   end
 
   @spec do_paging(list(map()), Layout.t()) :: map()
