@@ -3,7 +3,7 @@ defmodule Screens.SignsUiConfig.State.Fetch do
 
   require Logger
 
-  @spec fetch_config() :: {:ok, Config.t()} | :error
+  @spec fetch_config() :: {:ok, {[String.t()], map()}} | :error
   def fetch_config do
     with {:ok, body} <- get_from_s3(),
          {:ok, decoded} <- Jason.decode(body) do
