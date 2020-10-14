@@ -2,6 +2,7 @@ import React from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 import Departure from "Components/solari/departure";
+import HeadwayDeparture from "Components/solari/headway_departure";
 import Arrow, { Direction } from "Components/solari/arrow";
 import {
   SectionRoutePill,
@@ -385,6 +386,28 @@ const DepartureList = ({
   }
 };
 
+const HeadwayDepartureList = ({
+  pill,
+  headsigns,
+  rangeLow,
+  rangeHigh,
+}): JSX.Element => {
+  headsigns = ["Ashmont", "Braintree"];
+  return (
+    <>
+      {headsigns.map((headsign, i) => (
+        <HeadwayDeparture
+          pill={pill}
+          headsign={headsign}
+          rangeLow={rangeLow}
+          rangeHigh={rangeHigh}
+          key={headsign}
+        />
+      ))}
+    </>
+  );
+};
+
 const MAX_PAGE_COUNT = 5;
 const MIN_PAGE_COUNT = 3;
 
@@ -470,6 +493,7 @@ const Section = ({
   overhead,
   isAnimated,
   pill,
+  headway: { active, headsigns, range_low: rangeLow, range_high: rangeHigh },
 }): JSX.Element => {
   departures = departures.slice(0, numRows);
 
@@ -489,6 +513,19 @@ const Section = ({
     return (
       <SectionFrame {...frameProps}>
         <NoDeparturesMessage pill={pill} />
+      </SectionFrame>
+    );
+  }
+
+  if (active) {
+    return (
+      <SectionFrame {...frameProps}>
+        <HeadwayDepartureList
+          pill={pill}
+          headsigns={headsigns}
+          rangeLow={rangeLow}
+          rangeHigh={rangeHigh}
+        />
       </SectionFrame>
     );
   }
