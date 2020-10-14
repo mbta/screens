@@ -18,17 +18,18 @@
 .base-departure-time__minutes-label {
   @include font--text--55regular;
   font-size: 0.729em;
-  font-weight: 400;
   line-height: 1em;
 }
 
 .base-departure-time__timestamp {
   @include font--text--75bold;
-  margin-right: 0.0694em;
   font-size: 1em;
+  margin-right: 0.0694em;
+  line-height: 1.185em;
 }
 
 .base-departure-time__ampm {
   @include font--text--55regular;
   font-size: 0.729em;
+  line-height: 1em;
 }
