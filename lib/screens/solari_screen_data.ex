@@ -94,14 +94,17 @@ defmodule Screens.SolariScreenData do
 
   def fetch_headway_mode(%Headway{headway_id: nil}, _), do: %{active: false}
 
-  def fetch_headway_mode(%Headway{sign_ids: sign_ids, headway_id: headway_id}, current_time) do
+  def fetch_headway_mode(
+        %Headway{sign_ids: sign_ids, headway_id: headway_id, headsigns: headsigns},
+        current_time
+      ) do
     if SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids) do
       time_ranges = SignsUiConfig.State.time_ranges(headway_id)
       current_time_period = time_period(current_time)
 
       case time_ranges do
         %{^current_time_period => {range_low, range_high}} ->
-          %{active: true, range_low: range_low, range_high: range_high}
+          %{active: true, headsigns: headsigns, range_low: range_low, range_high: range_high}
 
         _ ->
           %{active: false}

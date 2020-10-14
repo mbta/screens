@@ -392,7 +392,6 @@ const HeadwayDepartureList = ({
   rangeLow,
   rangeHigh,
 }): JSX.Element => {
-  headsigns = ["Ashmont", "Braintree"];
   return (
     <>
       {headsigns.map((headsign, i) => (
