@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.w3.org/2001/10/synthesis
                  http://www.w3.org/TR/speech-synthesis11/synthesis.xsd"
-       xml:lang="en-US">
+       xml:lang="en-US"><prosody rate="90%">
 <%= if is_nil(@psa) or ({_, _, type} = @psa; type != :takeover) do %>
 <p>
 <%= render "_header.ssml", station_name: @station_name %></p>
@@ -12,4 +12,4 @@
 <% else %>
 <%= render_psa @psa %>
 <% end %>
-</speak>
+</prosody></speak>
