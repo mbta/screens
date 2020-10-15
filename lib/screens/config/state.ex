@@ -4,7 +4,7 @@ defmodule Screens.Config.State do
   require Logger
 
   alias Screens.Config
-  alias Screens.Config.Screen
+  alias Screens.Config.{Devops, Screen}
 
   @typep t :: {Config.t(), retry_count :: non_neg_integer()} | :error
 
@@ -51,6 +51,10 @@ defmodule Screens.Config.State do
 
   def config(pid \\ __MODULE__) do
     GenServer.call(pid, :config)
+  end
+
+  def mode_disabled?(pid \\ __MODULE__, mode) do
+    GenServer.call(pid, {:mode_disabled?, mode})
   end
 
   def schedule_refresh(pid, ms \\ @refresh_ms) do
@@ -153,6 +157,12 @@ defmodule Screens.Config.State do
       end
 
     {:reply, app_params, state}
+  end
+
+  def handle_call({:mode_disabled?, mode}, _from, {config, _} = state) do
+    %Devops{disabled_modes: disabled_modes} = config.devops
+
+    {:reply, Enum.member?(disabled_modes, mode), state}
   end
 
   # If we're in an error state, all queries on the state get an :error response

@@ -1,19 +1,21 @@
 defmodule Screens.Config do
   @moduledoc false
 
-  alias Screens.Config.Screen
+  alias Screens.Config.{Devops, Screen}
   alias Screens.Util
 
   @type t :: %__MODULE__{
           screens: %{
             screen_id => Screen.t()
-          }
+          },
+          devops: Devops.t()
         }
 
   @type screen_id :: String.t()
 
   @enforce_keys [:screens]
-  defstruct @enforce_keys
+  defstruct screens: nil,
+            devops: Devops.from_json(:default)
 
   @spec from_json(map()) :: t()
   def from_json(%{} = json) do
@@ -61,12 +63,20 @@ defmodule Screens.Config do
     end)
   end
 
+  defp value_from_json("devops", devops) do
+    Devops.from_json(devops)
+  end
+
   defp value_from_json(_, value), do: value
 
   defp value_to_json(:screens, screens) do
     Enum.into(screens, %{}, fn {screen_id, screen_config} ->
       {screen_id, Screen.to_json(screen_config)}
     end)
+  end
+
+  defp value_to_json(:devops, devops) do
+    Devops.to_json(devops)
   end
 
   defp value_to_json(_, value), do: value
