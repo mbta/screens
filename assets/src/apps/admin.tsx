@@ -16,6 +16,7 @@ import {
   SolariScreensTable,
 } from "Components/admin/admin_tables";
 import ImageManager from "Components/admin/admin_image_manager";
+import Devops from "Components/admin/devops";
 
 const App = (): JSX.Element => {
   return (
@@ -45,6 +46,9 @@ const App = (): JSX.Element => {
         </Route>
         <Route exact path="/image-manager">
           <ImageManager />
+        </Route>
+        <Route exact path="/devops">
+          <Devops />
         </Route>
       </Switch>
     </Router>

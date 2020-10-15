@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { doSubmit } from "Util/admin";
 
-const VALIDATE_PATH = "/api/admin/validate";
-const CONFIRM_PATH = "/api/admin/confirm";
+const VALIDATE_PATH = "/api/admin/screens/validate";
+const CONFIRM_PATH = "/api/admin/screens/confirm";
 
 const validateJson = (json) => {
   try {
@@ -71,8 +71,12 @@ const AdminForm = (): JSX.Element => {
 
   const fetchConfig = async () => {
     const result = await fetch("/api/admin/");
-    const json = await result.json();
-    configRef.current.value = json.config;
+    const resultJson = await result.json();
+    const screensConfigJson = {
+      screens: JSON.parse(resultJson.config).screens,
+    };
+    const screensConfigString = JSON.stringify(screensConfigJson, null, 2);
+    configRef.current.value = screensConfigString;
   };
 
   useEffect(() => {

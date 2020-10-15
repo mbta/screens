@@ -25,6 +25,9 @@ const AdminNavbar = (): JSX.Element => {
       <Link to="/image-manager">
         <button>Image Manager</button>
       </Link>
+      <Link to="/devops">
+        <button>Devops</button>
+      </Link>
     </div>
   );
 };

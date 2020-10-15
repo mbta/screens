@@ -36,7 +36,7 @@ defmodule Screens.Config do
 
   @spec schedule_refresh_for_screen_ids(t(), list(String.t())) :: t()
   def schedule_refresh_for_screen_ids(config, screen_ids) do
-    %__MODULE__{screens: current_screens} = config
+    %__MODULE__{screens: current_screens, devops: devops} = config
 
     now = DateTime.utc_now()
 
@@ -54,7 +54,7 @@ defmodule Screens.Config do
       end)
       |> Enum.into(%{})
 
-    %__MODULE__{screens: new_screens}
+    %__MODULE__{screens: new_screens, devops: devops}
   end
 
   defp value_from_json("screens", screens) do
