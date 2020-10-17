@@ -39,7 +39,7 @@
     "@babel/preset-typescript": "^7.12.0",
     "@types/jest": "^26.0.14",
     "@types/lodash": "^4.14.162",
-    "@types/react": "^16.9.52",
+    "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.8",
     "@types/react-router-dom": "^5.1.6",
     "babel-loader": "^8.1.0",
