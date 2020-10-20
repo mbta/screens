@@ -15,7 +15,7 @@
 1. Install versions specified in `.tool-versions` with `asdf install`
 1. Install Elixir dependencies with `mix deps.get`
 1. Install Node.js dependencies with `npm install --prefix assets`
-1. Save the JSON found [here](https://mbta-dotcom.s3.amazonaws.com/screens/config/prod.json) as `priv/local.json` to supply your local server with override config values.
+1. Get access to our S3 bucket from DevOps and/or a teammate and save the JSON found at mbta-ctd-config/screens/screens-prod.json as `priv/local.json` to supply your local server with config values.
 1. Visit [AWS security credentials](https://console.aws.amazon.com/iam/home#/security_credentials) and create an access key if you don't already have it. Save the access key ID and secret access key as environment variables:
 
    ```sh

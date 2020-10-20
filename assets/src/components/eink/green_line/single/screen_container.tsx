@@ -24,7 +24,7 @@ const TopScreenLayout = ({
   inlineAlert,
   serviceLevel,
   isHeadwayMode,
-  psaFilename,
+  psaUrl,
 }): JSX.Element => {
   return (
     <div className="single-screen-container single-screen-container--gl-mercury">
@@ -47,7 +47,7 @@ const TopScreenLayout = ({
         currentTimeString={currentTimeString}
         serviceLevel={serviceLevel}
         isHeadwayMode={isHeadwayMode}
-        psaFilename={psaFilename}
+        psaUrl={psaUrl}
       />
       <DigitalBridge stopId={stopId} />
     </div>
@@ -67,9 +67,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
       inlineAlert={apiResponse.inline_alert}
       serviceLevel={apiResponse.service_level}
       isHeadwayMode={apiResponse.is_headway_mode}
-      psaFilename={
-        apiResponse.psa_type === "departure" ? apiResponse.psa_filename : null
-      }
+      psaUrl={apiResponse.psa_type === "departure" ? apiResponse.psa_url : null}
     />
   );
 };
@@ -101,7 +99,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
     case !apiResponse || apiResponse.success === false:
       return <NoConnectionScreenLayout />;
     case apiResponse.psa_type === "takeover":
-      return <TakeoverScreenLayout apiResponse={apiResponse} size="single" />;
+      return <TakeoverScreenLayout apiResponse={apiResponse} />;
     case apiResponse.service_level === 5:
       return <NoServiceScreenLayout />;
     case (!apiResponse.departures || apiResponse.departures.length === 0) &&
