@@ -32,7 +32,8 @@ const Devops = () => {
       .then((json) => JSON.parse(json.config))
       .then((config) => config.devops.disabled_modes)
       .then(setDisabledModes)
-      .then((_) => setLoaded(true));
+      .then((_) => setLoaded(true))
+      .catch((_) => alert("Failed to load config!"));
   }, []);
 
   useEffect(() => {
