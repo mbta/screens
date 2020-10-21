@@ -4,15 +4,14 @@ defmodule Screens.SignsUiConfig.State do
   @typep signs_list :: [String.t()]
   @typep time_range :: {non_neg_integer(), non_neg_integer()}
   @typep time_range_map :: %{peak: time_range, off_peak: time_range}
-  @typep config :: {signs_list, time_range_map}
-  @typep t :: {config, retry_count :: non_neg_integer()} | :error
+  @type config :: {signs_list, time_range_map}
+  @type t :: {config, retry_count :: non_neg_integer()} | :error
   @config_fetcher Application.get_env(:screens, :signs_ui_config_fetcher)
 
-  use Screens.ConfigCache.State
-
-  def fetch_config, do: @config_fetcher.fetch_config()
-  def refresh_ms, do: 60 * 1000
-  def fetch_failure_error_threshold_minutes, do: 2
+  use Screens.ConfigCache.State,
+    fetch_config_fn: &@config_fetcher.fetch_config/0,
+    refresh_ms: 60 * 1000,
+    fetch_failure_error_threshold_minutes: 2
 
   def sign_in_headway_mode?(pid \\ __MODULE__, sign_id) do
     GenServer.call(pid, {:sign_in_headway_mode, sign_id})

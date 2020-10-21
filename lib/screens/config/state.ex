@@ -7,13 +7,10 @@ defmodule Screens.Config.State do
   @typep t :: {Config.t(), retry_count :: non_neg_integer()} | :error
   @config_fetcher Application.get_env(:screens, :config_fetcher)
 
-  use Screens.ConfigCache.State
-
-  def fetch_config, do: @config_fetcher.fetch_config()
-
-  def refresh_ms, do: 15 * 1000
-  # Start logging fetch failures as errors after this many minutes of consecutive failures
-  def fetch_failure_error_threshold_minutes, do: 2
+  use Screens.ConfigCache.State,
+    fetch_config_fn: &@config_fetcher.fetch_config/0,
+    refresh_ms: 15 * 1000,
+    fetch_failure_error_threshold_minutes: 2
 
   def ok?(pid \\ __MODULE__) do
     GenServer.call(pid, :ok?)

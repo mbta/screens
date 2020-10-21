@@ -1,7 +1,11 @@
 defmodule Screens.ConfigCache.State do
   @moduledoc false
 
-  defmacro __using__(_) do
+  defmacro __using__(
+             fetch_config_fn: fetch_config,
+             refresh_ms: refresh_ms,
+             fetch_failure_error_threshold_minutes: fetch_failure_error_threshold_minutes
+           ) do
     quote do
       use GenServer
 
@@ -11,7 +15,7 @@ defmodule Screens.ConfigCache.State do
         GenServer.start_link(__MODULE__, :ok, opts)
       end
 
-      def schedule_refresh(pid, ms \\ refresh_ms()) do
+      def schedule_refresh(pid, ms \\ unquote(refresh_ms)) do
         Process.send_after(pid, :refresh, ms)
         :ok
       end
@@ -28,12 +32,12 @@ defmodule Screens.ConfigCache.State do
       @impl true
       def init(:ok) do
         init_state =
-          case fetch_config() do
+          case unquote(fetch_config).() do
             {:ok, config} -> {config, 0}
             :error -> error_state(:error)
           end
 
-        schedule_refresh(self(), refresh_ms())
+        schedule_refresh(self(), unquote(refresh_ms))
         {:ok, init_state}
       end
 
@@ -44,7 +48,7 @@ defmodule Screens.ConfigCache.State do
         schedule_refresh(pid)
 
         async_fetch = fn ->
-          case fetch_config() do
+          case unquote(fetch_config).() do
             {:ok, config} -> put_config(pid, config)
             :error -> put_fetch_error(pid)
           end
@@ -92,9 +96,9 @@ defmodule Screens.ConfigCache.State do
       end
 
       defp log_as_error?(retry_count) do
-        threshold_ms = fetch_failure_error_threshold_minutes() * 60 * 1000
+        threshold_ms = unquote(fetch_failure_error_threshold_minutes) * 60 * 1000
 
-        retry_count * refresh_ms() >= threshold_ms
+        retry_count * unquote(refresh_ms) >= threshold_ms
       end
     end
   end
