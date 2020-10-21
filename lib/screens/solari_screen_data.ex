@@ -121,7 +121,7 @@ defmodule Screens.SolariScreenData do
     weekday? = day_of_week in 1..5
 
     rush_hour? =
-      (dt.hour >= 7 and dt.hour < 9) or (dt.hour >= 16 and dt.hour < 18) or
+      dt.hour in 7..8 or dt.hour in 16..17 or
         (dt.hour == 18 and dt.minute <= 30)
 
     if(weekday? and rush_hour?, do: :peak, else: :off_peak)

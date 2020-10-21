@@ -394,7 +394,7 @@ const HeadwayDepartureList = ({
 }): JSX.Element => {
   return (
     <>
-      {headsigns.map((headsign, i) => (
+      {headsigns.map((headsign) => (
         <HeadwayDeparture
           pill={pill}
           headsign={headsign}

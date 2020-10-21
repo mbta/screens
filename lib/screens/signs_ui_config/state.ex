@@ -1,8 +1,6 @@
 defmodule Screens.SignsUiConfig.State do
   @moduledoc false
 
-  require Logger
-
   @typep signs_list :: [String.t()]
   @typep time_range :: {non_neg_integer(), non_neg_integer()}
   @typep time_range_map :: %{peak: time_range, off_peak: time_range}

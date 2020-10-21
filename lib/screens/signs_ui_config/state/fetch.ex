@@ -23,7 +23,7 @@ defmodule Screens.SignsUiConfig.State.Fetch do
         {:ok, body}
 
       {:error, err} ->
-        _ = Logger.info("s3_fetch_error #{inspect(err)}")
+        _ = Logger.info("s3_signs_ui_config_fetch_error #{inspect(err)}")
         :error
     end
   end

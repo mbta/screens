@@ -1,8 +1,6 @@
 defmodule Screens.Config.State do
   @moduledoc false
 
-  require Logger
-
   alias Screens.Config
   alias Screens.Config.{Devops, Screen}
 
