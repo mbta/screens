@@ -6,7 +6,7 @@ defmodule Screens.SignsUiConfig.State.S3Fetch do
 
   require Logger
 
-  @spec fetch_config() :: {:ok, State.config()} | :error
+  @impl true
   def fetch_config do
     with {:ok, body} <- get_from_s3(),
          {:ok, decoded} <- Jason.decode(body) do
