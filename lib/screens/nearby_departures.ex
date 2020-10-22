@@ -4,6 +4,14 @@ defmodule Screens.NearbyDepartures do
   alias Screens.Config.{Gl, State}
 
   def by_screen_id(screen_id) do
+    if State.mode_disabled?(:bus) do
+      []
+    else
+      by_enabled_screen_id(screen_id)
+    end
+  end
+
+  defp by_enabled_screen_id(screen_id) do
     %Gl{nearby_departures: nearby_departure_stop_ids} = State.app_params(screen_id)
 
     prediction_result =

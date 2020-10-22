@@ -8,6 +8,17 @@ defmodule Screens.BusScreenData do
   alias Screens.Config.{Bus, State}
 
   def by_screen_id(screen_id, is_screen) do
+    if State.mode_disabled?(:bus) do
+      %{
+        force_reload: false,
+        success: false
+      }
+    else
+      by_enabled_screen_id(screen_id, is_screen)
+    end
+  end
+
+  defp by_enabled_screen_id(screen_id, is_screen) do
     %Bus{stop_id: stop_id} = State.app_params(screen_id)
 
     # If we are unable to fetch alerts:
