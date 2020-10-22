@@ -48,6 +48,14 @@ screens_auth_secret =
   |> ExAws.request!()
   |> Map.fetch!("SecretString")
 
+signs_ui_s3_bucket =
+  case eb_env_name do
+    "screens-prod" -> "mbta-signs"
+    "screens-dev" -> "mbta-signs-dev"
+    "screens-dev-green" -> "mbta-signs-dev"
+    _ -> nil
+  end
+
 config :screens, ScreensWeb.Endpoint,
   http: [:inet6, port: String.to_integer(System.get_env("PORT") || "4000")],
   secret_key_base: secret_key_base
@@ -56,7 +64,8 @@ config :screens,
   api_v3_key: api_v3_key,
   environment_name: eb_env_name,
   gds_dms_password: gds_dms_password,
-  mercury_api_key: mercury_api_key
+  mercury_api_key: mercury_api_key,
+  signs_ui_s3_bucket: signs_ui_s3_bucket
 
 config :ueberauth, Ueberauth.Strategy.Cognito, client_secret: cognito_client_secret
 config :screens, ScreensWeb.AuthManager, secret_key: screens_auth_secret

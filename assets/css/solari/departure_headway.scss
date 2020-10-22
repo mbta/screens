@@ -1,0 +1,34 @@
+.departure-headway {
+  display: inline-block;
+  vertical-align: middle;
+  text-align: right;
+  width: 300px;
+}
+
+.departure-headway__destination {
+  color: #171f26;
+  display: inline-block;
+  vertical-align: middle;
+  width: 528px;
+  font-size: 50px;
+}
+
+.departure-headway__highlight {
+  display: inline-block;
+  color: white;
+  background: #007373;
+  border-radius: 5.5px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.23);
+}
+
+.departure-headway__message {
+  @include font--text--55regular;
+  font-size: 36px;
+  line-height: 52px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.departure-headway__range {
+  @include font--text--75bold;
+}

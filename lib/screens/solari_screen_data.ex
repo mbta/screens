@@ -4,12 +4,13 @@ defmodule Screens.SolariScreenData do
   alias Screens.Config.{Query, Solari, State}
   alias Screens.Config.Query.{Opts, Params}
   alias Screens.Config.Solari.Section
-  alias Screens.Config.Solari.Section.Layout
+  alias Screens.Config.Solari.Section.{Headway, Layout}
   alias Screens.Config.Solari.Section.Layout.{Bidirectional, Upcoming}
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
+  alias Screens.SignsUiConfig
 
-  def by_screen_id(screen_id, is_screen, datetime \\ nil) do
+  def by_screen_id(screen_id, is_screen, at_historical_datetime \\ nil) do
     %Solari{
       station_name: station_name,
       sections: sections,
@@ -18,14 +19,14 @@ defmodule Screens.SolariScreenData do
     } = State.app_params(screen_id)
 
     current_time =
-      case datetime do
+      case at_historical_datetime do
         nil -> DateTime.utc_now()
         dt -> dt
       end
 
     {psa_type, psa_url} = Screens.Psa.current_psa_for(screen_id)
 
-    sections_data = fetch_sections_data(sections, datetime)
+    sections_data = fetch_sections_data(sections, at_historical_datetime, current_time)
     _ = LogScreenData.log_departures(screen_id, is_screen, sections_data)
 
     case sections_data do
@@ -47,8 +48,9 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp fetch_sections_data(sections, datetime) do
-    sections_data = Enum.map(sections, &fetch_section_data(&1, datetime))
+  defp fetch_sections_data(sections, at_historical_datetime, current_time) do
+    sections_data =
+      Enum.map(sections, &fetch_section_data(&1, at_historical_datetime, current_time))
 
     if Enum.any?(sections_data, fn data -> data == :error end) do
       :error
@@ -64,11 +66,13 @@ defmodule Screens.SolariScreenData do
            query: %Query{params: query_params, opts: query_opts},
            layout: layout_params,
            audio: audio_params,
-           pill: pill
+           pill: pill,
+           headway: headway_config
          },
-         datetime
+         at_historical_datetime,
+         current_time
        ) do
-    case query_data(query_params, query_opts, datetime) do
+    case query_data(query_params, query_opts, at_historical_datetime) do
       {:ok, data} ->
         departures = do_layout(data, layout_params)
 
@@ -79,12 +83,48 @@ defmodule Screens.SolariScreenData do
            pill: pill,
            audio: Map.from_struct(audio_params),
            departures: departures,
-           paging: do_paging(departures, layout_params)
+           paging: do_paging(departures, layout_params),
+           headway: fetch_headway_mode(headway_config, current_time)
          }}
 
       :error ->
         :error
     end
+  end
+
+  def fetch_headway_mode(%Headway{headway_id: nil}, _), do: %{active: false}
+
+  def fetch_headway_mode(
+        %Headway{sign_ids: sign_ids, headway_id: headway_id, headsigns: headsigns},
+        current_time
+      ) do
+    if SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids) do
+      time_ranges = SignsUiConfig.State.time_ranges(headway_id)
+      current_time_period = time_period(current_time)
+
+      case time_ranges do
+        %{^current_time_period => {range_low, range_high}} ->
+          %{active: true, headsigns: headsigns, range_low: range_low, range_high: range_high}
+
+        _ ->
+          %{active: false}
+      end
+    else
+      %{active: false}
+    end
+  end
+
+  def time_period(utc_time) do
+    {:ok, dt} = DateTime.shift_zone(utc_time, "America/New_York")
+    day_of_week = dt |> DateTime.to_date() |> Date.day_of_week()
+
+    weekday? = day_of_week in 1..5
+
+    rush_hour? =
+      dt.hour in 7..8 or dt.hour in 16..17 or
+        (dt.hour == 18 and dt.minute <= 30)
+
+    if(weekday? and rush_hour?, do: :peak, else: :off_peak)
   end
 
   @spec do_paging(list(map()), Layout.t()) :: map()
@@ -100,13 +140,17 @@ defmodule Screens.SolariScreenData do
     %{is_enabled: false}
   end
 
-  defp query_data(%Params{} = params, %Opts{include_schedules: include_schedules}, datetime) do
+  defp query_data(
+         %Params{} = params,
+         %Opts{include_schedules: include_schedules},
+         at_historical_datetime
+       ) do
     query_params = Map.from_struct(params)
 
-    if is_nil(datetime) do
+    if is_nil(at_historical_datetime) do
       Departure.fetch(query_params, include_schedules)
     else
-      Departure.fetch_schedules_by_datetime(query_params, datetime)
+      Departure.fetch_schedules_by_datetime(query_params, at_historical_datetime)
     end
   end
 
