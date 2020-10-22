@@ -2,12 +2,13 @@ defmodule Screens.Config.State.LocalFetch do
   @moduledoc false
 
   alias Screens.Config
+  @behaviour Config.State.Fetch
 
   @local_config_path Path.join(:code.priv_dir(:screens), "local.json")
 
-  @spec fetch_config :: {:ok, Config.t()} | :error
-  def fetch_config(path \\ @local_config_path) do
-    with {:ok, file_contents} <- get_from_s3(path),
+  @impl true
+  def fetch_config do
+    with {:ok, file_contents} <- get_from_s3(),
          {:ok, parsed} <- Jason.decode(file_contents) do
       {:ok, Config.from_json(parsed)}
     else
@@ -15,12 +16,14 @@ defmodule Screens.Config.State.LocalFetch do
     end
   end
 
-  def get_from_s3(path \\ @local_config_path) do
-    File.read(path)
+  @impl true
+  def get_from_s3 do
+    File.read(@local_config_path)
   end
 
-  def put_to_s3(contents, path \\ @local_config_path) do
-    case File.write(path, contents) do
+  @impl true
+  def put_to_s3(contents) do
+    case File.write(@local_config_path, contents) do
       :ok -> :ok
       {:error, _} -> :error
     end
