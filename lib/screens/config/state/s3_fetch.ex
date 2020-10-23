@@ -5,26 +5,43 @@ defmodule Screens.Config.State.S3Fetch do
   alias Screens.Config
 
   @behaviour Config.State.Fetch
+  @behaviour Screens.ConfigCache.State.Fetch
 
   @impl true
-  def fetch_config do
-    with {:ok, body} <- get_from_s3(),
+  def fetch_config(current_version) do
+    with {:ok, body, new_version} <- get_from_s3(current_version),
          {:ok, parsed} <- Jason.decode(body) do
-      {:ok, Config.from_json(parsed)}
+      {:ok, Config.from_json(parsed), new_version}
     else
+      :unchanged -> :unchanged
       _ -> :error
     end
   end
 
   @impl true
-  def get_from_s3 do
+  def get_from_s3(current_version \\ nil) do
     bucket = Application.get_env(:screens, :config_s3_bucket)
     path = config_path_for_environment()
-    get_operation = ExAws.S3.get_object(bucket, path)
+
+    opts =
+      case current_version do
+        nil -> []
+        _ -> [{:if_none_match, current_version}]
+      end
+
+    get_operation = ExAws.S3.get_object(bucket, path, opts)
 
     case ExAws.request(get_operation) do
-      {:ok, %{body: body, status_code: 200}} ->
-        {:ok, body}
+      {:ok, %{status_code: 304}} ->
+        :unchanged
+
+      {:ok, %{body: body, headers: headers, status_code: 200}} ->
+        etag =
+          headers
+          |> Enum.into(%{})
+          |> Map.get("ETag")
+
+        {:ok, body, etag}
 
       {:error, err} ->
         _ = Logger.info("s3_config_fetch_error #{inspect(err)}")

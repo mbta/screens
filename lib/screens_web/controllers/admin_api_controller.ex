@@ -8,7 +8,7 @@ defmodule ScreensWeb.AdminApiController do
   plug :accepts, ["multipart/form-data"] when action == :upload_image
 
   def index(conn, _params) do
-    {:ok, config} = @config_fetcher.get_from_s3()
+    {:ok, config, _version} = @config_fetcher.get_from_s3()
     json(conn, %{config: config})
   end
 

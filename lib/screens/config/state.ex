@@ -3,12 +3,13 @@ defmodule Screens.Config.State do
 
   alias Screens.Config
   alias Screens.Config.{Devops, Screen}
+  alias Screens.ConfigCache.State.Fetch
 
-  @typep t :: {Config.t(), retry_count :: non_neg_integer()} | :error
+  @typep t :: {Config.t(), retry_count :: non_neg_integer(), Fetch.version_id()} | :error
   @config_fetcher Application.get_env(:screens, :config_fetcher)
 
   use Screens.ConfigCache.State,
-    fetch_config_fn: &@config_fetcher.fetch_config/0,
+    fetch_config_fn: &@config_fetcher.fetch_config/1,
     refresh_ms: 15 * 1000,
     fetch_failure_error_threshold_minutes: 2
 
@@ -55,11 +56,11 @@ defmodule Screens.Config.State do
     {:reply, false, :error}
   end
 
-  def handle_call(:ok?, _from, {_config, _retry_count} = state) do
+  def handle_call(:ok?, _from, state) do
     {:reply, true, state}
   end
 
-  def handle_call({:refresh_if_loaded_before, screen_id}, _from, {config, _} = state) do
+  def handle_call({:refresh_if_loaded_before, screen_id}, _from, {config, _, _} = state) do
     screen = Map.get(config.screens, screen_id)
 
     refresh_if_loaded_before =
@@ -71,7 +72,7 @@ defmodule Screens.Config.State do
     {:reply, refresh_if_loaded_before, state}
   end
 
-  def handle_call({:service_level, screen_id}, _from, {config, _} = state) do
+  def handle_call({:service_level, screen_id}, _from, {config, _, _} = state) do
     screen = Map.get(config.screens, screen_id)
 
     service_level =
@@ -83,11 +84,11 @@ defmodule Screens.Config.State do
     {:reply, service_level, state}
   end
 
-  def handle_call(:green_line_service, _from, {config, _} = state) do
+  def handle_call(:green_line_service, _from, {config, _, _} = state) do
     {:reply, config.green_line_service, state}
   end
 
-  def handle_call({:disabled?, screen_id}, _from, {config, _} = state) do
+  def handle_call({:disabled?, screen_id}, _from, {config, _, _} = state) do
     screen = Map.get(config.screens, screen_id)
 
     disabled? =
@@ -99,21 +100,21 @@ defmodule Screens.Config.State do
     {:reply, disabled?, state}
   end
 
-  def handle_call({:screen, screen_id}, _from, {config, _} = state) do
+  def handle_call({:screen, screen_id}, _from, {config, _, _} = state) do
     screen = Map.get(config.screens, screen_id)
 
     {:reply, screen, state}
   end
 
-  def handle_call(:screens, _from, {config, _} = state) do
+  def handle_call(:screens, _from, {config, _, _} = state) do
     {:reply, config.screens, state}
   end
 
-  def handle_call(:config, _from, {config, _} = state) do
+  def handle_call(:config, _from, {config, _, _} = state) do
     {:reply, config, state}
   end
 
-  def handle_call({:app_params, screen_id}, _from, {config, _} = state) do
+  def handle_call({:app_params, screen_id}, _from, {config, _, _} = state) do
     screen = Map.get(config.screens, screen_id)
 
     app_params =
@@ -125,7 +126,7 @@ defmodule Screens.Config.State do
     {:reply, app_params, state}
   end
 
-  def handle_call({:mode_disabled?, mode}, _from, {config, _} = state) do
+  def handle_call({:mode_disabled?, mode}, _from, {config, _, _} = state) do
     %Devops{disabled_modes: disabled_modes} = config.devops
 
     {:reply, Enum.member?(disabled_modes, mode), state}
