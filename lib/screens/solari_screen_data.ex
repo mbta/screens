@@ -11,6 +11,14 @@ defmodule Screens.SolariScreenData do
   alias Screens.SignsUiConfig
 
   def by_screen_id(screen_id, is_screen, at_historical_datetime \\ nil) do
+    if State.mode_disabled?(:bus) do
+      %{force_reload: false, success: false}
+    else
+      by_enabled_screen_id(screen_id, is_screen, at_historical_datetime)
+    end
+  end
+
+  defp by_enabled_screen_id(screen_id, is_screen, at_historical_datetime) do
     %Solari{
       station_name: station_name,
       sections: sections,
