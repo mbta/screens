@@ -349,7 +349,7 @@ defmodule Screens.Departures.Departure do
       route_ids = Enum.map(predictions, & &1.route.id)
 
       if length(route_ids) > 1 and Enum.at(route_ids, 0) != "64" do
-        Logger.info(
+        Logger.warn(
           "log_unexpected_groups found #{length(route_ids)} predictions on trip #{trip_id} for route #{
             Enum.at(route_ids, 0)
           }"
