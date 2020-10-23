@@ -72,7 +72,7 @@ defmodule Screens.Departures.Departure do
           |> Enum.filter(fn %{departure_time: departure_time} ->
             DateTime.compare(departure_time, dt) != :lt
           end)
-          |> deduplicate_combined_routes()
+          |> deduplicate_slashed_routes()
           |> Enum.map(&from_prediction_or_schedule/1)
 
         {:ok, departures}
@@ -83,10 +83,17 @@ defmodule Screens.Departures.Departure do
   end
 
   defp fetch_predictions_only(%{} = query_params) do
-    query_params
-    |> Prediction.fetch()
-    |> deduplicate_repeated_trips()
-    |> from_predictions()
+    case Prediction.fetch(query_params) do
+      {:ok, predictions} ->
+        predictions
+        |> Enum.reject(&departure_in_past/1)
+        |> deduplicate_slashed_routes()
+        |> deduplicate_repeated_trips()
+        |> from_predictions()
+
+      :error ->
+        :error
+    end
   end
 
   # Copies stop headsigns from schedules to predictions with the same trip_id
@@ -136,25 +143,13 @@ defmodule Screens.Departures.Departure do
   defp merge_predictions_and_schedules(_, _), do: :error
 
   def from_schedules({:ok, schedules}) do
-    departures =
-      schedules
-      |> Enum.reject(&departure_in_past/1)
-      |> deduplicate_combined_routes()
-      |> Enum.map(&from_prediction_or_schedule/1)
-
-    {:ok, departures}
+    {:ok, Enum.map(schedules, &from_prediction_or_schedule/1)}
   end
 
   def from_schedules(:error), do: :error
 
   def from_predictions({:ok, predictions}) do
-    departures =
-      predictions
-      |> Enum.reject(&departure_in_past/1)
-      |> deduplicate_combined_routes()
-      |> Enum.map(&from_prediction_or_schedule/1)
-
-    {:ok, departures}
+    {:ok, Enum.map(predictions, &from_prediction_or_schedule/1)}
   end
 
   def from_predictions(:error), do: :error
@@ -279,8 +274,21 @@ defmodule Screens.Departures.Departure do
   defp fetch_predictions_and_schedules(%{} = query_params) do
     predictions = Prediction.fetch(query_params)
     schedules = Schedule.fetch(query_params)
-    merge_predictions_and_schedules(predictions, schedules)
+    filtered_predictions = filter_predictions_or_schedules(predictions)
+    filtered_schedules = filter_predictions_or_schedules(schedules)
+    merge_predictions_and_schedules(filtered_predictions, filtered_schedules)
   end
+
+  defp filter_predictions_or_schedules({:ok, predictions_or_schedules}) do
+    filtered =
+      predictions_or_schedules
+      |> Enum.reject(&departure_in_past/1)
+      |> deduplicate_slashed_routes()
+
+    {:ok, filtered}
+  end
+
+  defp filter_predictions_or_schedules(:error), do: :error
 
   def do_query_and_parse(%{} = query_params, api_endpoint, parser, extra_params \\ %{}) do
     default_params = %{sort: "departure_time", include: ~w[route stop trip]}
@@ -356,7 +364,7 @@ defmodule Screens.Departures.Departure do
   # This addresses a specific issue at Central where late-night outbound 64 trips which start in
   # Central Square serve multiple stops we're displaying on the Solari screen there. This shouldn't
   # happen anywhere else.
-  defp deduplicate_repeated_trips({:ok, predictions}) do
+  defp deduplicate_repeated_trips(predictions) do
     deduplicated_predictions =
       predictions
       |> Enum.group_by(fn %{trip: %Trip{id: trip_id}} -> trip_id end)
@@ -367,12 +375,10 @@ defmodule Screens.Departures.Departure do
     {:ok, deduplicated_predictions}
   end
 
-  defp deduplicate_repeated_trips(:error), do: :error
-
   # This function filters out predictions whose route ID does not equal its trip's route ID.
   #
   # For buses, that means removing predictions for routes 24 and 27 when combined route 24/27 exists.
-  defp deduplicate_combined_routes(predictions) do
+  defp deduplicate_slashed_routes(predictions) do
     Enum.filter(predictions, fn
       %{route: %{id: id1}, trip: %{route_id: id2}} -> id1 == id2
       _ -> true
