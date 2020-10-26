@@ -130,7 +130,11 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
       return <TakeoverScreenLayout apiResponse={apiResponse} />;
     case apiResponse.service_level === 5:
       return <NoServiceScreenLayout />;
-    case !apiResponse.departures || apiResponse.departures.length === 0:
+    case (!apiResponse.departures || apiResponse.departures.length === 0) &&
+      apiResponse.in_service_day:
+      return <NoConnectionScreenLayout />;
+    case (!apiResponse.departures || apiResponse.departures.length === 0) &&
+      !apiResponse.in_service_day:
       return <NoDeparturesScreenLayout apiResponse={apiResponse} />;
     default:
       return (
