@@ -28,7 +28,7 @@ defmodule Screens.DupScreenData do
         }
 
       :error ->
-        # TODO can we actually reload the DUP app without disturbing the rest of the DUP content?
+        # FOLLOW-UP can we actually reload the DUP app without disturbing the rest of the DUP content?
         %{force_reload: true, success: false}
     end
   end

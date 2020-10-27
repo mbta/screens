@@ -6,7 +6,7 @@ defmodule Screens.Config.Dup.Secondary do
 
   @type t :: %__MODULE__{
           good_state: Primary.t()
-          # TODO more fields TBD to configure alerting
+          # FOLLOW-UP more fields TBD to configure alerting
         }
 
   defstruct good_state: Primary.from_json(:default)
