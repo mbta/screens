@@ -8,7 +8,7 @@ defmodule ScreensWeb.AdminApiController do
   plug :accepts, ["multipart/form-data"] when action == :upload_image
 
   def index(conn, _params) do
-    {:ok, config} = @config_fetcher.get_from_s3()
+    {:ok, config, _version} = @config_fetcher.get_config()
     json(conn, %{config: config})
   end
 
@@ -24,7 +24,7 @@ defmodule ScreensWeb.AdminApiController do
     new_config_json = new_config |> Config.to_json() |> Jason.encode!(pretty: true)
 
     success =
-      case @config_fetcher.put_to_s3(new_config_json) do
+      case @config_fetcher.put_config(new_config_json) do
         :ok -> true
         :error -> false
       end
@@ -39,7 +39,7 @@ defmodule ScreensWeb.AdminApiController do
     new_config_json = new_config |> Config.to_json() |> Jason.encode!(pretty: true)
 
     success =
-      case @config_fetcher.put_to_s3(new_config_json) do
+      case @config_fetcher.put_config(new_config_json) do
         :ok -> true
         :error -> false
       end
@@ -53,7 +53,7 @@ defmodule ScreensWeb.AdminApiController do
     {:ok, new_config_json} = Jason.encode(Config.to_json(new_config), pretty: true)
 
     success =
-      case @config_fetcher.put_to_s3(new_config_json) do
+      case @config_fetcher.put_config(new_config_json) do
         :ok -> true
         :error -> false
       end

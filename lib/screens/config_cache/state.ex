@@ -2,6 +2,7 @@ defmodule Screens.ConfigCache.State do
   @moduledoc false
 
   defmacro __using__(
+             config_module: config_module,
              fetch_config_fn: fetch_config,
              refresh_ms: refresh_ms,
              fetch_failure_error_threshold_minutes: fetch_failure_error_threshold_minutes
@@ -20,8 +21,8 @@ defmodule Screens.ConfigCache.State do
         :ok
       end
 
-      def put_config(pid, config) do
-        GenServer.cast(pid, {:put_config, config})
+      def put_config(pid, config, version) do
+        GenServer.cast(pid, {:put_config, config, version})
       end
 
       def put_fetch_error(pid) do
@@ -32,9 +33,12 @@ defmodule Screens.ConfigCache.State do
       @impl true
       def init(:ok) do
         init_state =
-          case unquote(fetch_config).() do
-            {:ok, config} -> {config, 0}
-            :error -> error_state(:error)
+          case unquote(fetch_config).(nil) do
+            {:ok, config, new_version} ->
+              %unquote(config_module){config: config, retry_count: 0, version_id: new_version}
+
+            :error ->
+              error_state(:error)
           end
 
         schedule_refresh(self(), unquote(refresh_ms))
@@ -42,14 +46,18 @@ defmodule Screens.ConfigCache.State do
       end
 
       @impl true
-      def handle_info(:refresh, state) do
+      def handle_info(
+            :refresh,
+            %unquote(config_module){config: current_config, version_id: current_version} = state
+          ) do
         pid = self()
 
         schedule_refresh(pid)
 
         async_fetch = fn ->
-          case unquote(fetch_config).() do
-            {:ok, config} -> put_config(pid, config)
+          case unquote(fetch_config).(current_version) do
+            {:ok, new_config, new_version} -> put_config(pid, new_config, new_version)
+            :unchanged -> put_config(pid, current_config, current_version)
             :error -> put_fetch_error(pid)
           end
         end
@@ -67,8 +75,9 @@ defmodule Screens.ConfigCache.State do
       end
 
       @impl true
-      def handle_cast({:put_config, new_config}, _) do
-        {:noreply, {new_config, 0}}
+      def handle_cast({:put_config, new_config, new_version}, _) do
+        {:noreply,
+         %unquote(config_module){config: new_config, retry_count: 0, version_id: new_version}}
       end
 
       def handle_cast(:put_fetch_error, state) do
@@ -82,7 +91,11 @@ defmodule Screens.ConfigCache.State do
         :error
       end
 
-      defp error_state({config, retry_count}) do
+      defp error_state(%unquote(config_module){
+             config: config,
+             retry_count: retry_count,
+             version_id: version_id
+           }) do
         log_message = "config_state_fetch_error retry_count=#{retry_count}"
 
         _ =
@@ -92,7 +105,11 @@ defmodule Screens.ConfigCache.State do
             Logger.info(log_message)
           end
 
-        {config, retry_count + 1}
+        %unquote(config_module){
+          config: config,
+          retry_count: retry_count + 1,
+          version_id: version_id
+        }
       end
 
       defp log_as_error?(retry_count) do

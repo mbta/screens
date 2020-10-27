@@ -55,7 +55,7 @@ config :ueberauth, Ueberauth.Strategy.Cognito,
 
 config :screens,
   gds_dms_username: "mbtadata@gmail.com",
-  config_fetcher: Screens.Config.State.Fetch,
+  config_fetcher: Screens.Config.State.S3Fetch,
   config_s3_bucket: "mbta-ctd-config",
   audio_psa_s3_bucket: "mbta-dotcom",
   audio_psa_s3_directory: "/screens/audio_assets/psa/",
