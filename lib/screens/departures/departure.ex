@@ -89,7 +89,7 @@ defmodule Screens.Departures.Departure do
         |> Enum.reject(&departure_in_past/1)
         |> deduplicate_slashed_routes()
         |> deduplicate_repeated_trips()
-        |> from_predictions()
+        |> from_predictions_or_schedules()
 
       :error ->
         :error
@@ -130,8 +130,8 @@ defmodule Screens.Departures.Departure do
     unpredicted_schedules =
       Enum.reject(schedules, fn %{trip: %{id: trip_id}} -> trip_id in predicted_trip_ids end)
 
-    {:ok, predicted_departures} = from_predictions({:ok, predictions})
-    {:ok, scheduled_departures} = from_schedules({:ok, unpredicted_schedules})
+    {:ok, predicted_departures} = from_predictions_or_schedules({:ok, predictions})
+    {:ok, scheduled_departures} = from_predictions_or_schedules({:ok, unpredicted_schedules})
 
     merged =
       (predicted_departures ++ scheduled_departures)
@@ -142,17 +142,11 @@ defmodule Screens.Departures.Departure do
 
   defp merge_predictions_and_schedules(_, _), do: :error
 
-  def from_schedules({:ok, schedules}) do
+  def from_predictions_or_schedules({:ok, schedules}) do
     {:ok, Enum.map(schedules, &from_prediction_or_schedule/1)}
   end
 
-  def from_schedules(:error), do: :error
-
-  def from_predictions({:ok, predictions}) do
-    {:ok, Enum.map(predictions, &from_prediction_or_schedule/1)}
-  end
-
-  def from_predictions(:error), do: :error
+  def from_predictions_or_schedules(:error), do: :error
 
   defp from_prediction_or_schedule(
          %{
