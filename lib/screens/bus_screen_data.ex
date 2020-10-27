@@ -5,6 +5,7 @@ defmodule Screens.BusScreenData do
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
   alias Screens.NearbyConnections
+  alias Screens.Schedules.Schedule
   alias Screens.Config.{Bus, State}
 
   def by_screen_id(screen_id, is_screen) do
@@ -55,12 +56,15 @@ defmodule Screens.BusScreenData do
 
     {psa_type, psa_url} = Screens.Psa.current_psa_for(screen_id)
 
+    now = DateTime.utc_now()
+    in_service_day? = in_service_day_at_stop?(stop_id, now)
+
     case departures do
       {:ok, departures} ->
         %{
           force_reload: false,
           success: true,
-          current_time: Screens.Util.format_time(DateTime.utc_now()),
+          current_time: Screens.Util.format_time(now),
           stop_name: stop_name,
           stop_id: stop_id,
           departures: format_departure_rows(departures),
@@ -68,7 +72,8 @@ defmodule Screens.BusScreenData do
           nearby_connections: nearby_connections,
           service_level: service_level,
           psa_type: psa_type,
-          psa_url: psa_url
+          psa_url: psa_url,
+          in_service_day: in_service_day?
         }
 
       :error ->
@@ -76,6 +81,25 @@ defmodule Screens.BusScreenData do
           force_reload: false,
           success: false
         }
+    end
+  end
+
+  defp in_service_day_at_stop?(stop_id, current_time) do
+    with {:ok, schedules} <- Schedule.fetch(%{stop_ids: [stop_id]}),
+         {first_arrival_time, last_arrival_time} <- get_service_day_from_schedules(schedules) do
+      DateTime.compare(first_arrival_time, current_time) in [:lt, :eq] and
+        DateTime.compare(last_arrival_time, current_time) == :gt
+    else
+      _ -> true
+    end
+  end
+
+  defp get_service_day_from_schedules(schedules) do
+    schedules
+    |> Enum.map(& &1.departure_time)
+    |> case do
+      [] -> nil
+      departure_times -> {Enum.min(departure_times), Enum.max(departure_times)}
     end
   end
 
