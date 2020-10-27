@@ -73,7 +73,7 @@ defmodule Screens.GLScreenData do
         {line_map_data, filtered_predictions} =
           Screens.LineMap.by_stop_id(platform_id, route_id, direction_id, predictions)
 
-        departures = Departure.from_predictions(filtered_predictions)
+        departures = Departure.from_predictions_or_schedules(filtered_predictions)
 
         {line_map_data, departures}
 
