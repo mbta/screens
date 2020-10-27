@@ -87,7 +87,7 @@ defmodule Screens.BusScreenData do
   defp in_service_day_at_stop?(stop_id, current_time) do
     with {:ok, schedules} <- Schedule.fetch(%{stop_ids: [stop_id]}),
          {first_arrival_time, last_arrival_time} <- get_service_day_from_schedules(schedules) do
-      DateTime.compare(first_arrival_time, current_time) in [:lt, :eq] &&
+      DateTime.compare(first_arrival_time, current_time) in [:lt, :eq] and
         DateTime.compare(last_arrival_time, current_time) == :gt
     else
       _ -> true
@@ -95,14 +95,11 @@ defmodule Screens.BusScreenData do
   end
 
   defp get_service_day_from_schedules(schedules) do
-    departure_times =
-      schedules
-      |> Enum.map(& &1.departure_time)
-      |> Enum.reject(&is_nil/1)
-
-    case departure_times do
+    schedules
+    |> Enum.map(& &1.departure_time)
+    |> case do
       [] -> nil
-      _ -> {Enum.min(departure_times), Enum.max(departure_times)}
+      departure_times -> {Enum.min(departure_times), Enum.max(departure_times)}
     end
   end
 
