@@ -4,12 +4,12 @@ defmodule Screens.Config.Dup.Section do
   alias Screens.Util
 
   @type t :: %__MODULE__{
-    stop_ids: list(stop_id()),
-    route_ids: list(route_id()),
-    layout: :bidirectional | :upcoming,
-    # TODO which pills do we actually expect to show on DUPs? Bus, all heavy rail, CR, maybe SL?
-    pill: :bus | :red | :orange | :green | :blue | :cr | :mattapan | :silver
-  }
+          stop_ids: list(stop_id()),
+          route_ids: list(route_id()),
+          layout: :bidirectional | :upcoming,
+          # TODO which pills do we actually expect to show on DUPs? Bus, all heavy rail, CR, maybe SL?
+          pill: :bus | :red | :orange | :green | :blue | :cr | :mattapan | :silver
+        }
 
   @type stop_id :: String.t()
   @type route_id :: String.t()

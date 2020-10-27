@@ -5,9 +5,9 @@ defmodule Screens.Config.Dup.Primary do
   alias Screens.Util
 
   @type t :: %__MODULE__{
-    header: String.t(),
-    sections: list(Section.t())
-  }
+          header: String.t(),
+          sections: list(Section.t())
+        }
 
   defstruct header: "",
             sections: []
