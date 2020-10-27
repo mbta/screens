@@ -2,6 +2,7 @@ import React from "react";
 
 import { classWithModifier, classWithModifiers } from "Util/util";
 import BaseRoutePill from "Components/eink/base_route_pill";
+import { WIDE_MINI_PILL_ROUTES } from "Components/solari/section";
 
 interface PillType {
   routeName: string | null;
@@ -110,12 +111,19 @@ const routeIdMapping: Record<string, string> = {
 const PagedDepartureRoutePill = ({ route, routeId, selected }): JSX.Element => {
   const isCommuterRail = routeId.startsWith("CR-");
   const isSlashRoute = route.includes("/");
+  const isWideRoute = WIDE_MINI_PILL_ROUTES.includes(route);
 
   const selectedModifier = selected ? "selected" : "unselected";
   const sizeModifier =
     isCommuterRail || isSlashRoute ? "size-small" : "size-normal";
   const modeModifier = isCommuterRail ? "commuter-rail" : "bus";
-  const modifiers = [selectedModifier, sizeModifier, modeModifier];
+  const widthModifier = isWideRoute ? "width-wide" : "width-normal";
+  const modifiers = [
+    selectedModifier,
+    sizeModifier,
+    modeModifier,
+    widthModifier,
+  ];
   const pillClass = classWithModifiers(
     "later-departure__route-pill",
     modifiers
