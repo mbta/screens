@@ -9,7 +9,7 @@ defmodule Screens.Config.State.S3Fetch do
 
   @impl true
   def fetch_config(current_version) do
-    with {:ok, body, new_version} <- get_from_s3(current_version),
+    with {:ok, body, new_version} <- get_config(current_version),
          {:ok, parsed} <- Jason.decode(body) do
       {:ok, Config.from_json(parsed), new_version}
     else
@@ -19,14 +19,14 @@ defmodule Screens.Config.State.S3Fetch do
   end
 
   @impl true
-  def get_from_s3(current_version \\ nil) do
+  def get_config(current_version \\ nil) do
     bucket = Application.get_env(:screens, :config_s3_bucket)
     path = config_path_for_environment()
 
     opts =
       case current_version do
         nil -> []
-        _ -> [{:if_none_match, current_version}]
+        _ -> [if_none_match: current_version]
       end
 
     get_operation = ExAws.S3.get_object(bucket, path, opts)
@@ -50,7 +50,7 @@ defmodule Screens.Config.State.S3Fetch do
   end
 
   @impl true
-  def put_to_s3(contents) do
+  def put_config(contents) do
     bucket = Application.get_env(:screens, :config_s3_bucket)
     path = config_path_for_environment()
     put_operation = ExAws.S3.put_object(bucket, path, contents)

@@ -24,7 +24,7 @@ defmodule Screens.SignsUiConfig.State.S3Fetch do
     opts =
       case current_version do
         nil -> []
-        _ -> [{:if_none_match, current_version}]
+        _ -> [if_none_match: current_version]
       end
 
     get_operation = ExAws.S3.get_object(bucket, path, opts)

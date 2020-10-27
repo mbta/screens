@@ -3,7 +3,7 @@ defmodule Screens.Config.State.Fetch do
 
   alias Screens.ConfigCache.State.Fetch
 
-  @callback get_from_s3(Fetch.version_id()) ::
+  @callback get_config(Fetch.version_id()) ::
               {:ok, String.t(), Fetch.version_id()} | :unchanged | :error
-  @callback put_to_s3(String.t()) :: :ok | :error
+  @callback put_config(String.t()) :: :ok | :error
 end

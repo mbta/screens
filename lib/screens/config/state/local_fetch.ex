@@ -9,7 +9,7 @@ defmodule Screens.Config.State.LocalFetch do
 
   @impl true
   def fetch_config(current_version) do
-    with {:ok, file_contents, new_version} <- get_from_s3(current_version),
+    with {:ok, file_contents, new_version} <- get_config(current_version),
          {:ok, parsed} <- Jason.decode(file_contents) do
       {:ok, Config.from_json(parsed), new_version}
     else
@@ -18,7 +18,7 @@ defmodule Screens.Config.State.LocalFetch do
   end
 
   @impl true
-  def get_from_s3(current_version \\ nil) do
+  def get_config(current_version \\ nil) do
     case File.read(@local_config_path) do
       {:ok, contents} -> {:ok, contents, current_version}
       _ -> :error
@@ -26,7 +26,7 @@ defmodule Screens.Config.State.LocalFetch do
   end
 
   @impl true
-  def put_to_s3(contents) do
+  def put_config(contents) do
     case File.write(@local_config_path, contents) do
       :ok -> :ok
       {:error, _} -> :error
