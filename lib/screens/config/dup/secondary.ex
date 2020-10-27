@@ -38,5 +38,9 @@ defmodule Screens.Config.Dup.Secondary do
 
   defp value_from_json(_, value), do: value
 
+  defp value_to_json(:good_state, good_state_config) do
+    Primary.to_json(good_state_config)
+  end
+
   defp value_to_json(_, value), do: value
 end
