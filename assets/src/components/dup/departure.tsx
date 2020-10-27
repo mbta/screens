@@ -6,7 +6,6 @@ import BaseDepartureTime from "Components/eink/base_departure_time";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
 import { DepartureRoutePill } from "Components/solari/route_pill";
 
-
 const Departure = ({
   route,
   routeId,
@@ -17,7 +16,6 @@ const Departure = ({
   stopType,
   // TODO crowding, alerts?
 }): JSX.Element => {
-
   const timeRepresentation = standardTimeRepresentation(
     time,
     currentTimeString,

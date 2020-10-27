@@ -2,7 +2,7 @@ import React from "react";
 
 import { formatTimeString } from "Util/util";
 
-const Header = ({text, currentTimeString}): JSX.Element => {
+const Header = ({ text, currentTimeString }): JSX.Element => {
   const environmentName = document.getElementById("app").dataset
     .environmentName;
 
@@ -16,10 +16,7 @@ const Header = ({text, currentTimeString}): JSX.Element => {
           : ""}
       </div>
       <div className="header__logo-container">
-        <img
-          className="header__logo-image"
-          src="/images/logo-white.svg"
-        />
+        <img className="header__logo-image" src="/images/logo-white.svg" />
       </div>
       <div className="header__content-container">
         <div className="header__text">{text}</div>
