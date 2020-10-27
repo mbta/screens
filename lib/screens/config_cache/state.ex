@@ -2,6 +2,7 @@ defmodule Screens.ConfigCache.State do
   @moduledoc false
 
   defmacro __using__(
+             config_module: config_module,
              fetch_config_fn: fetch_config,
              refresh_ms: refresh_ms,
              fetch_failure_error_threshold_minutes: fetch_failure_error_threshold_minutes
@@ -33,8 +34,11 @@ defmodule Screens.ConfigCache.State do
       def init(:ok) do
         init_state =
           case unquote(fetch_config).(nil) do
-            {:ok, config, new_version} -> {config, 0, new_version}
-            :error -> error_state(:error)
+            {:ok, config, new_version} ->
+              %unquote(config_module){config: config, retry_count: 0, version_id: new_version}
+
+            :error ->
+              error_state(:error)
           end
 
         schedule_refresh(self(), unquote(refresh_ms))
@@ -42,7 +46,10 @@ defmodule Screens.ConfigCache.State do
       end
 
       @impl true
-      def handle_info(:refresh, {current_config, _, current_version} = state) do
+      def handle_info(
+            :refresh,
+            %unquote(config_module){config: current_config, version_id: current_version} = state
+          ) do
         pid = self()
 
         schedule_refresh(pid)
@@ -69,7 +76,8 @@ defmodule Screens.ConfigCache.State do
 
       @impl true
       def handle_cast({:put_config, new_config, new_version}, _) do
-        {:noreply, {new_config, 0, new_version}}
+        {:noreply,
+         %unquote(config_module){config: new_config, retry_count: 0, version_id: new_version}}
       end
 
       def handle_cast(:put_fetch_error, state) do
@@ -83,7 +91,11 @@ defmodule Screens.ConfigCache.State do
         :error
       end
 
-      defp error_state({config, retry_count, version}) do
+      defp error_state(%unquote(config_module){
+             config: config,
+             retry_count: retry_count,
+             version_id: version_id
+           }) do
         log_message = "config_state_fetch_error retry_count=#{retry_count}"
 
         _ =
@@ -93,7 +105,11 @@ defmodule Screens.ConfigCache.State do
             Logger.info(log_message)
           end
 
-        {config, retry_count + 1, version}
+        %unquote(config_module){
+          config: config,
+          retry_count: retry_count + 1,
+          version_id: version_id
+        }
       end
 
       defp log_as_error?(retry_count) do
