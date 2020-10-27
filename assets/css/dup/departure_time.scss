@@ -1,0 +1,12 @@
+@import "../base/base_departure_time";
+
+.departure-time {
+  color: #171f26;
+  text-align: right;
+  display: inline-block;
+  vertical-align: middle;
+  width: 234px;
+  font-size: 108px;
+
+  // TODO: include the pulsing animation for ARR/BRD?
+}

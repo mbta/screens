@@ -1,0 +1,9 @@
+.departure-container {
+  background-color: #f5f4f1;
+  height: 211px;
+  padding-left: 20px;
+
+  &:not(:first-child) {
+    border-top: 3px solid rgba(199, 199, 199, 0.58);
+  }
+}
