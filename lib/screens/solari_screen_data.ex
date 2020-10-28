@@ -78,7 +78,7 @@ defmodule Screens.SolariScreenData do
          at_historical_datetime,
          current_time
        ) do
-    if section_disabled?(section) do
+    if section_disabled?(section, headway_config) do
       {:ok,
        %{
          name: section_name,
@@ -95,8 +95,10 @@ defmodule Screens.SolariScreenData do
     end
   end
 
-  defp section_disabled?(%Section{pill: pill}) do
-    subway_disabled? = State.mode_disabled?(:subway)
+  defp section_disabled?(%Section{pill: pill}, %Headway{sign_ids: sign_ids}) do
+    subway_disabled? =
+      State.mode_disabled?(:subway) || SignsUiConfig.State.all_signs_inactive?(sign_ids)
+
     subway_section? = pill in ~w[red orange blue]a
 
     commuter_rail_disabled? = State.mode_disabled?(:commuter_rail)
