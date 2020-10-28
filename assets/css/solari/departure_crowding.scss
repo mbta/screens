@@ -1,10 +1,53 @@
 .departure-crowding {
   vertical-align: middle;
   display: inline-block;
-  width: 52px;
-  padding-right: 18px;
+
+  &--normal {
+    width: 52px;
+    padding-right: 18px;
+  }
+
+  &--overhead {
+    height: 127.5px;
+    width: 209px;
+    padding-right: 25px;
+    text-align: right;
+
+    // Only actually visible for 5 seconds, but we hold the crowding icon off-screen for an extra
+    // 5 seconds to ensure that we have time for the new data request to complete.
+    animation: swap-with-time 10000ms linear;
+
+    @keyframes swap-with-time {
+      0% {
+        transform: translateX(200%);
+      }
+
+      // 200ms to enter/leave
+      2% {
+        transform: translateX(0);
+      }
+
+      48% {
+        transform: translateX(0);
+      }
+
+      // Finish leaving after 5 seconds
+      50% {
+        transform: translateX(200%);
+      }
+
+      100% {
+        transform: translateX(200%);
+      }
+    }
+  }
 }
 
-.departure-crowding__image {
+.departure-crowding__image--normal {
   width: 52px;
+}
+
+.departure-crowding__image--overhead {
+  height: 89px;
+  padding-top: 19px;
 }
