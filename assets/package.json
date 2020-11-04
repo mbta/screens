@@ -43,7 +43,7 @@
     "@types/react-dom": "^16.9.8",
     "@types/react-router-dom": "^5.1.6",
     "babel-loader": "^8.1.0",
-    "copy-webpack-plugin": "^6.2.1",
+    "copy-webpack-plugin": "^6.3.0",
     "css-loader": "^5.0.0",
     "jest": "^25.5.4",
     "mini-css-extract-plugin": "^1.2.1",
