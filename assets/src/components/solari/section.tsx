@@ -12,6 +12,8 @@ import BaseDepartureDestination from "Components/eink/base_departure_destination
 import { classWithModifier, classWithModifiers } from "Util/util";
 import { standardTimeRepresentation } from "Util/time_representation";
 
+const WIDE_MINI_PILL_ROUTES = ["441/442"];
+
 const camelizeDepartureObject = ({
   id,
   route,
@@ -229,12 +231,29 @@ class PagedDeparture extends React.Component<
       ? "size-small"
       : "size-normal";
 
-    const pillWidth = 89; // px
+    const normalPillWidth = 89; // px
+    const widePillWidth = 158; // px
     const pillSpace = 25; // px
-    const pillOffset = 30; // px
 
     const selectedRightOffset =
       this.props.pageCount - (this.state.currentPageNumber + 1);
+    const numWidePillsToTheRight = this.props.departures
+      .slice(this.state.currentPageNumber + 1)
+      .filter(({ route }) => WIDE_MINI_PILL_ROUTES.includes(route)).length;
+    const numNormalPillsToTheRight =
+      selectedRightOffset - numWidePillsToTheRight;
+
+    const currentPillIsWide = WIDE_MINI_PILL_ROUTES.includes(
+      currentPagedDeparture.route
+    );
+    const pillCenterOffset = currentPillIsWide ? 64.5 : 30; // px
+    const totalPillSpaceWidth = selectedRightOffset * pillSpace;
+    const totalPillWidth =
+      numWidePillsToTheRight * widePillWidth +
+      numNormalPillsToTheRight * normalPillWidth;
+    const translateWidth =
+      totalPillSpaceWidth + totalPillWidth + pillCenterOffset;
+
     const caretBaseClass = "later-departure__route-pill-caret";
     const beforeCaretClass = classWithModifier(caretBaseClass, "before");
     const afterCaretClass = classWithModifier(caretBaseClass, "after");
@@ -257,10 +276,7 @@ class PagedDeparture extends React.Component<
                     <div
                       className={beforeCaretClass}
                       style={{
-                        transform: `translateX(${
-                          selectedRightOffset * -(pillWidth + pillSpace) -
-                          pillOffset
-                        }px)`,
+                        transform: `translateX(${translateWidth}px)`,
                       }}
                     ></div>
                   )}
@@ -273,10 +289,7 @@ class PagedDeparture extends React.Component<
                     <div
                       className={afterCaretClass}
                       style={{
-                        transform: `translateX(${
-                          selectedRightOffset * -(pillWidth + pillSpace) -
-                          pillOffset
-                        }px)`,
+                        transform: `translateX(${translateWidth}px)`,
                       }}
                     ></div>
                   )}
@@ -410,6 +423,19 @@ const HeadwayDepartureList = ({
 const MAX_PAGE_COUNT = 5;
 const MIN_PAGE_COUNT = 3;
 
+const getPageCount = (departures, numRows) => {
+  const excessDepartures = departures.length - numRows + 1;
+  const unadjustedPageCount = Math.min(excessDepartures, MAX_PAGE_COUNT);
+
+  // Reduce the number of pages if needed to make room for slashed routes
+  // which require wider mini-pills.
+  const startIndex = numRows - 1;
+  const widePillCount = departures
+    .slice(startIndex, startIndex + unadjustedPageCount)
+    .filter(({ route }) => WIDE_MINI_PILL_ROUTES.includes(route)).length;
+  return unadjustedPageCount - widePillCount;
+};
+
 interface PagedSectionProps {
   departures: object[];
   numRows: number;
@@ -433,9 +459,7 @@ const PagedSection = ({
   isAnimated,
   currentTimeString,
 }: PagedSectionProps): JSX.Element => {
-  const excessDepartures = departures.length - numRows + 1;
-  const pageCount = Math.min(excessDepartures, MAX_PAGE_COUNT);
-
+  const pageCount = getPageCount(departures, numRows);
   const showPagedDeparture = pageCount >= MIN_PAGE_COUNT;
   const staticDepartures = showPagedDeparture
     ? departures.slice(0, numRows - 1)
@@ -541,4 +565,4 @@ const Section = ({
   );
 };
 
-export { PagedSection, Section };
+export { PagedSection, Section, WIDE_MINI_PILL_ROUTES };
