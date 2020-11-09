@@ -97,7 +97,7 @@ defmodule Screens.SolariScreenData do
 
   defp section_disabled?(%Section{pill: pill}, %Headway{sign_ids: sign_ids}) do
     subway_disabled? =
-      State.mode_disabled?(:subway) || SignsUiConfig.State.all_signs_inactive?(sign_ids)
+      State.mode_disabled?(:subway) or SignsUiConfig.State.all_signs_inactive?(sign_ids)
 
     subway_section? = pill in ~w[red orange blue]a
 
@@ -107,8 +107,8 @@ defmodule Screens.SolariScreenData do
     light_rail_disabled? = State.mode_disabled?(:light_rail)
     light_rail_section? = pill in ~w[green mattapan]a
 
-    (subway_section? && subway_disabled?) || (commuter_rail_section? && commuter_rail_disabled?) ||
-      (light_rail_section? && light_rail_disabled?)
+    (subway_section? and subway_disabled?) or (commuter_rail_section? and commuter_rail_disabled?) or
+      (light_rail_section? and light_rail_disabled?)
   end
 
   defp fetch_enabled_section_data(
