@@ -23,6 +23,30 @@
       opacity: 1;
     }
   }
+
+  &--overhead-with-crowding {
+    // Time is visible for 10s before we switch to showing crowding
+    animation: swap-with-crowding 10000ms linear;
+
+    @keyframes swap-with-crowding {
+      0% {
+        transform: translateX(200%);
+      }
+
+      // 200ms to enter/leave
+      2% {
+        transform: translateX(0);
+      }
+
+      98% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(200%);
+      }
+    }
+  }
 }
 
 .screen-container--size-normal {

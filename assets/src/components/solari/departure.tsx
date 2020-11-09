@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import { standardTimeRepresentation } from "Util/time_representation";
 
@@ -11,6 +11,88 @@ import {
 } from "Components/solari/route_pill";
 
 import { classWithModifier, classWithModifiers } from "Util/util";
+
+const NormalDepartureTimeAndCrowding = ({
+  crowdingLevel,
+  timeRepresentation,
+  timeAnimationModifier,
+}) => {
+  return (
+    <>
+      <div className={classWithModifier("departure-crowding", "normal")}>
+        {crowdingLevel && (
+          <img
+            className="departure-crowding__image--normal"
+            src={`/images/crowding-color-level-${crowdingLevel}.svg`}
+          />
+        )}
+      </div>
+      <div
+        className={classWithModifier("departure-time", timeAnimationModifier)}
+      >
+        <BaseDepartureTime time={timeRepresentation} />
+      </div>
+    </>
+  );
+};
+
+const OverheadDepartureTimeAndCrowding = ({
+  crowdingLevel,
+  timeRepresentation,
+  timeAnimationModifier: arrivingModifier,
+  currentTimeString,
+}) => {
+  const [showCrowding, setShowCrowding] = useState(false);
+  const ref = useRef(null);
+
+  // When we load new data, show the time, which is styled to animate in from the right.
+  useEffect(() => {
+    setShowCrowding(false);
+  }, [currentTimeString]);
+
+  // Timing is controlled by the timings on the animation. The animation on the time element
+  // ends after 10s, then the animationend event toggles crowding on.
+  useEffect(() => {
+    const onAnimationEnd = (e) => {
+      setShowCrowding(true);
+    };
+
+    if (ref.current) {
+      ref.current.addEventListener("animationend", onAnimationEnd);
+      return () => {
+        if (ref.current) {
+          ref.current.removeEventListener("animationend", onAnimationEnd);
+        }
+      };
+    }
+  });
+
+  const timeModifiers = crowdingLevel
+    ? [arrivingModifier, "overhead-with-crowding"]
+    : [arrivingModifier];
+
+  return (
+    <>
+      {showCrowding ? (
+        <div className={classWithModifier("departure-crowding", "overhead")}>
+          {crowdingLevel && (
+            <img
+              className="departure-crowding__image--overhead"
+              src={`/images/crowding-color-level-${crowdingLevel}.svg`}
+            />
+          )}
+        </div>
+      ) : (
+        <div
+          className={classWithModifiers("departure-time", timeModifiers)}
+          ref={ref}
+        >
+          <BaseDepartureTime time={timeRepresentation} />
+        </div>
+      )}
+    </>
+  );
+};
 
 const Departure = ({
   route,
@@ -68,21 +150,22 @@ const Departure = ({
             <BaseDepartureDestination destination={destination} />
           )}
         </div>
-        {!overhead && (
-          <div className="departure-crowding">
-            {crowdingLevel && (
-              <img
-                className="departure-crowding__image"
-                src={`/images/crowding-color-level-${crowdingLevel}.svg`}
-              />
-            )}
-          </div>
+
+        {overhead ? (
+          <OverheadDepartureTimeAndCrowding
+            crowdingLevel={crowdingLevel}
+            timeRepresentation={timeRepresentation}
+            timeAnimationModifier={timeAnimationModifier}
+            currentTimeString={currentTimeString}
+          />
+        ) : (
+          <NormalDepartureTimeAndCrowding
+            crowdingLevel={crowdingLevel}
+            timeRepresentation={timeRepresentation}
+            timeAnimationModifier={timeAnimationModifier}
+          />
         )}
-        <div
-          className={classWithModifier("departure-time", timeAnimationModifier)}
-        >
-          <BaseDepartureTime time={timeRepresentation} />
-        </div>
+
         {groupStart && alerts.length > 0 && (
           <div className="departure__alerts-container">
             {alerts.map((alert) => (
