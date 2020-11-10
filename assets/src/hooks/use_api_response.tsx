@@ -11,7 +11,6 @@ const useApiResponse = (
 
   let apiPath;
   if (datetime) {
-    // http://screens-dev-green.mbtace.com
     apiPath = `http://screens-dev-green.mbtace.com/api/screen/${id}?last_refresh=${lastRefresh}&datetime=${datetime}`;
     refreshMs = 1000 * 60 * 60; // 1 per hour
   } else {

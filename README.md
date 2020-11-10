@@ -31,3 +31,8 @@
 Visit [`localhost:4000/screen/1`](http://localhost:4000/screen/1) in your browser to check that everything is working.
 
 You may want to add `export API_V3_KEY=<your-key-here>` to your shell config so that you don't have to specify it each time you run `mix phx.server`.
+
+## Packaging the DUP app
+The DUP screens require the client app to be packaged into a single HTML file rather than dynamically served from our Phoenix server.
+
+You can find instructions on the packaging process [here](assets/src/components/dup/README.md).
