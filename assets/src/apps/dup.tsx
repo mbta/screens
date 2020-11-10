@@ -6,9 +6,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-import ScreenContainer, {
-  ScreenLayout,
-} from "Components/dup/screen_container";
+import ScreenContainer, { ScreenLayout } from "Components/dup/screen_container";
 
 import {
   AuditScreenPage,
@@ -18,20 +16,8 @@ import {
 
 const App = (): JSX.Element => {
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/screen/dup">
-          <MultiScreenPage screenContainer={ScreenContainer} />
-        </Route>
-        <Route exact path="/audit/dup">
-          <AuditScreenPage screenLayout={ScreenLayout} />
-        </Route>
-        <Route path="/screen/:id">
-          <ScreenPage screenContainer={ScreenContainer} />
-        </Route>
-      </Switch>
-    </Router>
-  );
+    <ScreenContainer id={"401"} />
+  )
 };
 
 ReactDOM.render(<App />, document.getElementById("app"));

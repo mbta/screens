@@ -15,6 +15,7 @@ defmodule Screens.Application do
       # Starts a worker by calling: Screens.Worker.start_link(arg)
       # {Screens.Worker, arg},
       Screens.Config.State.Supervisor,
+      Screens.SignsUiConfig.State.Supervisor,
       Screens.GdsData.Supervisor,
       Screens.MercuryData.Supervisor,
       :hackney_pool.child_spec(:ex_aws_pool, []),

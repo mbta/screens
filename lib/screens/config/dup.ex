@@ -5,9 +5,9 @@ defmodule Screens.Config.Dup do
   alias Screens.Util
 
   @type t :: %__MODULE__{
-    primary: Primary.t(),
-    secondary: Secondary.t()
-  }
+          primary: Primary.t(),
+          secondary: Secondary.t()
+        }
 
   defstruct primary: Primary.from_json(:default),
             secondary: Secondary.from_json(:default)

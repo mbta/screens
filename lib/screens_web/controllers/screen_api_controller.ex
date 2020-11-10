@@ -4,6 +4,7 @@ defmodule ScreensWeb.ScreenApiController do
   alias Screens.Config.State
 
   plug(:check_config)
+  plug Corsica, origins: "*"
 
   defp check_config(conn, _) do
     if State.ok?() do

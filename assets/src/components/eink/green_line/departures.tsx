@@ -96,11 +96,10 @@ interface DepartureListProps {
   headway: number;
 }
 
-const DeparturesListPsa = ({ psaFilename }): JSX.Element => {
-  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaFilename}`;
+const DeparturesListPsa = ({ psaUrl }): JSX.Element => {
   return (
     <div>
-      <img src={srcPath} />
+      <img src={psaUrl} />
     </div>
   );
 };
@@ -110,32 +109,27 @@ const DepartureWithPsa = ({
   currentTimeString,
   destination,
   headway,
-  psaFilename,
-}): JSX.Element[] => {
-  let firstDepartureOrHeadway;
-
-  if (departures.length > 0) {
-    firstDepartureOrHeadway = (
-      <Departure
-        time={departures[0].time}
-        currentTimeString={currentTimeString}
-        key={departures[0].id}
-      />
-    );
-  } else {
-    firstDepartureOrHeadway = (
-      <HeadwayMessage
-        destination={destination}
-        headway={headway}
-        variant={HeadwayMessageVariant.Sub}
-        key={"departures-list-headway"}
-      />
-    );
-  }
-
-  const psa = <DeparturesListPsa psaFilename={psaFilename} />;
-
-  return [firstDepartureOrHeadway, psa];
+  psaUrl,
+}): JSX.Element => {
+  return (
+    <>
+      {departures.length > 0 ? (
+        <Departure
+          time={departures[0].time}
+          currentTimeString={currentTimeString}
+          key={departures[0].id}
+        />
+      ) : (
+        <HeadwayMessage
+          destination={destination}
+          headway={headway}
+          variant={HeadwayMessageVariant.Sub}
+          key={"departures-list-headway"}
+        />
+      )}
+      <DeparturesListPsa psaUrl={psaUrl} />
+    </>
+  );
 };
 
 const Departures = ({
@@ -146,18 +140,18 @@ const Departures = ({
   currentTimeString,
   serviceLevel,
   isHeadwayMode,
-  psaFilename,
+  psaUrl,
 }): JSX.Element => {
   let departuresComponent;
 
-  if (psaFilename) {
+  if (psaUrl) {
     departuresComponent = (
       <DepartureWithPsa
         departures={departures}
         currentTimeString={currentTimeString}
         destination={destination}
         headway={headway}
-        psaFilename={psaFilename}
+        psaUrl={psaUrl}
       />
     );
   } else if (isHeadwayMode) {

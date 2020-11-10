@@ -25,15 +25,17 @@ const camelizeDepartureObject = ({
 });
 
 const Section = ({ departures, currentTimeString }): JSX.Element => {
-  return <div className="section">
-    {departures.map((departure) => (
-      <Departure
-        {...camelizeDepartureObject(departure)}
-        currentTimeString={currentTimeString}
-        key={departure.id}
-      />
-    ))}
-  </div>;
+  return (
+    <div className="section">
+      {departures.map((departure) => (
+        <Departure
+          {...camelizeDepartureObject(departure)}
+          currentTimeString={currentTimeString}
+          key={departure.id}
+        />
+      ))}
+    </div>
+  );
 };
 
 export default Section;

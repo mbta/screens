@@ -18,8 +18,28 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   def confirm(conn, %{"config" => config}) do
+    %Config{devops: current_devops_config} = Config.State.config()
+    %Config{screens: new_screens_config} = config |> Jason.decode!() |> Config.from_json()
+    new_config = %Config{screens: new_screens_config, devops: current_devops_config}
+    new_config_json = new_config |> Config.to_json() |> Jason.encode!(pretty: true)
+
     success =
-      case @config_fetcher.put_to_s3(config) do
+      case @config_fetcher.put_to_s3(new_config_json) do
+        :ok -> true
+        :error -> false
+      end
+
+    json(conn, %{success: success})
+  end
+
+  def devops(conn, %{"disabled_modes" => _disabled_modes} = json) do
+    %Config{screens: current_screens_config} = Config.State.config()
+    new_devops_config = Config.Devops.from_json(json)
+    new_config = %Config{screens: current_screens_config, devops: new_devops_config}
+    new_config_json = new_config |> Config.to_json() |> Jason.encode!(pretty: true)
+
+    success =
+      case @config_fetcher.put_to_s3(new_config_json) do
         :ok -> true
         :error -> false
       end

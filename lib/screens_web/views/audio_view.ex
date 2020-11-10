@@ -134,21 +134,36 @@ defmodule ScreensWeb.AudioView do
   @spec render_time_representations(atom(), [any()]) :: [Phoenix.HTML.safe()]
   defp render_time_representations(type, values) do
     values
-    |> Enum.map(&render_time_representation(%{type: type, value: &1}))
+    |> Enum.map(&render_time_representation_with_crowding(%{type: type, value: &1}))
     |> oxford_comma_intersperse()
   end
 
-  @spec render_time_representation(Screens.Audio.time_representation()) :: Phoenix.HTML.safe()
-  defp render_time_representation(%{type: :text, value: :brd}), do: ~E"is now boarding"
-  defp render_time_representation(%{type: :text, value: :arr}), do: ~E"is now arriving"
+  defp render_time_representation_with_crowding(%{type: type, value: {time_value, crowding_level}}) do
+    time_rendered = render_time_representation(type, time_value)
+    crowding_rendered = render_crowding_level(crowding_level)
 
-  defp render_time_representation(%{type: :minutes, value: minutes}) do
+    ~E|<%= time_rendered %><%= crowding_rendered %>|
+  end
+
+  @spec render_time_representation(atom(), atom() | pos_integer() | String.t()) ::
+          Phoenix.HTML.safe()
+  defp render_time_representation(:text, :brd), do: ~E"is now boarding"
+  defp render_time_representation(:text, :arr), do: ~E"is now arriving"
+
+  defp render_time_representation(:minutes, minutes) do
     ~E|<%= minutes %> <%= pluralize_minutes(minutes) %>|
   end
 
-  defp render_time_representation(%{type: :timestamp, value: timestamp}) do
+  defp render_time_representation(:timestamp, timestamp) do
     ~E|<%= timestamp %>|
   end
+
+  @spec render_crowding_level(Screens.Departures.Departure.crowding_level()) ::
+          Phoenix.HTML.safe()
+  defp render_crowding_level(1), do: ~E" (currently not crowded)"
+  defp render_crowding_level(2), do: ~E" (currently has some crowding)"
+  defp render_crowding_level(3), do: ~E" (currently crowded)"
+  defp render_crowding_level(nil), do: ~E""
 
   @spec render_alerts([atom()], Screens.Audio.departure_group_key()) :: [Phoenix.HTML.safe()]
   defp render_alerts(alerts, route_descriptor) do

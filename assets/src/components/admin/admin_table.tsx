@@ -7,8 +7,8 @@ import { IndeterminateCheckbox } from "Components/admin/admin_cells";
 import AddModal from "Components/admin/admin_add_modal";
 import EditModal from "Components/admin/admin_edit_modal";
 
-const VALIDATE_PATH = "/api/admin/validate";
-const CONFIRM_PATH = "/api/admin/confirm";
+const VALIDATE_PATH = "/api/admin/screens/validate";
+const CONFIRM_PATH = "/api/admin/screens/confirm";
 const REFRESH_PATH = "/api/admin/refresh";
 
 // Helpers

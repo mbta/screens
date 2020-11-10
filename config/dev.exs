@@ -16,7 +16,7 @@ config :screens, ScreensWeb.Endpoint,
       "node_modules/webpack/bin/webpack.js",
       "--mode",
       "development",
-      "--watch-stdin",
+      "--watch",
       cd: Path.expand("../assets", __DIR__)
     ]
   ]
@@ -25,7 +25,8 @@ config :screens,
   api_v3_key: System.get_env("API_V3_KEY"),
   gds_dms_password: System.get_env("GDS_DMS_PASSWORD"),
   mercury_api_key: System.get_env("MERCURY_API_KEY"),
-  config_fetcher: Screens.Config.State.LocalFetch
+  config_fetcher: Screens.Config.State.LocalFetch,
+  signs_ui_config_fetcher: Screens.SignsUiConfig.State.LocalFetch
 
 config :screens, ScreensWeb.AuthManager, secret_key: "secret key"
 

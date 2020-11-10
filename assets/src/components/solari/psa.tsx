@@ -1,10 +1,9 @@
 import React from "react";
 
-const Psa = ({ psaFilename, currentTimeString }): JSX.Element => {
-  const imageSrc = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaFilename}`;
+const Psa = ({ psaUrl, currentTimeString }): JSX.Element => {
   return (
     <div className="psa" key={currentTimeString}>
-      <img src={imageSrc} />
+      <img src={psaUrl} />
       <div className="psa__progress-bar" />
     </div>
   );
