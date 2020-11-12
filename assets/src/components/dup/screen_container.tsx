@@ -29,7 +29,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
 };
 
 const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse({id, rotationIndex: 0});
+  const apiResponse = useApiResponse({ id, rotationIndex: 0 });
 
   return <ScreenLayout apiResponse={apiResponse} />;
 };

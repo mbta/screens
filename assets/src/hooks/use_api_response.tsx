@@ -17,12 +17,12 @@ const useApiResponse = ({
   refreshMs,
   datetime,
   withWatchdog = false,
-  rotationIndex
+  rotationIndex,
 }: UseApiResponseArgs) => {
   const [apiResponse, setApiResponse] = useState(null);
   const lastRefresh = document.getElementById("app").dataset.lastRefresh;
 
-  const apiPath = buildApiPath({id, lastRefresh, datetime, rotationIndex});
+  const apiPath = buildApiPath({ id, lastRefresh, datetime, rotationIndex });
 
   const fetchData = async () => {
     try {
@@ -56,21 +56,26 @@ const useApiResponse = ({
   return apiResponse;
 };
 
-const buildApiPath = ({id, lastRefresh, datetime, rotationIndex}: BuildApiPathArgs) => {
+const buildApiPath = ({
+  id,
+  lastRefresh,
+  datetime,
+  rotationIndex,
+}: BuildApiPathArgs) => {
   let apiPath = `/api/screen/${id}`;
-  
+
   if (rotationIndex != null) {
     apiPath += `/${rotationIndex}`;
   }
-  
+
   apiPath += `?last_refresh=${lastRefresh}`;
-  
+
   if (datetime != null) {
     apiPath += `&datetime=${datetime}`;
   }
 
   return apiPath;
-}
+};
 
 const updateSolariWatchdog = () => {
   const now = new Date().toISOString();
