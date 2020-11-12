@@ -42,11 +42,15 @@ const useApiResponse = ({
   useEffect(() => {
     fetchData();
 
-    const interval = setInterval(() => {
-      fetchData();
-    }, refreshMs);
+    if (refreshMs != null) {
+      const interval = setInterval(() => {
+        fetchData();
+      }, refreshMs);
 
-    return () => clearInterval(interval);
+      return () => clearInterval(interval);
+    }
+
+    return () => {};
   }, []);
 
   return apiResponse;
