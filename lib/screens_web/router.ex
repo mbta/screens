@@ -88,6 +88,7 @@ defmodule ScreensWeb.Router do
     pipe_through [:redirect_prod_http, :api, :browser]
 
     get "/:id", ScreenApiController, :show
+    get "/:id/:rotation_index", ScreenApiController, :show_dup
   end
 
   scope "/audio", ScreensWeb do

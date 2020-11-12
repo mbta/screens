@@ -1,0 +1,45 @@
+.header {
+  background-color: #171f26;
+  color: white;
+  height: 253px;
+}
+
+.header__time {
+  @include font--text--55regular;
+  display: inline-block;
+  font-size: 100px;
+}
+
+.header__logo-container {
+  height: 128px;
+  width: 128px;
+  margin: 24px 40px 20px 40px;
+  display: inline-block;
+}
+
+.header__logo-image {
+  height: 128px;
+  width: 128px;
+}
+
+.header__content-container {
+  width: 1000px;
+  display: inline-block;
+}
+
+.header__text {
+  @include font--display--75bold;
+  letter-spacing: 2px;
+  font-size: 120px;
+}
+
+.header__environment {
+  @include font--text--75bold;
+  position: absolute;
+  top: 12px;
+  left: 40px;
+  font-size: 48px;
+  color: #ffffff;
+  letter-spacing: 0;
+  line-height: 48px;
+}

@@ -1,0 +1,47 @@
+.departure-route {
+  display: inline-block;
+  vertical-align: middle;
+  width: 142px;
+  font-size: 50px;
+  margin-right: 26px;
+}
+
+.departure-route--icon {
+  height: 50px;
+  margin-top: 4.5px;
+}
+
+.departure-route--yellow .base-route-pill__pill {
+  background: #ffc72c;
+  color: black;
+}
+
+.departure-route--blue .base-route-pill__pill {
+  background: #003da5;
+  color: white;
+}
+
+.departure-route--red .base-route-pill__pill {
+  background: #da291c;
+  color: white;
+}
+
+.departure-route--orange .base-route-pill__pill {
+  background: #ed8b00;
+  color: white;
+}
+
+.departure-route--green .base-route-pill__pill {
+  background: #00843d;
+  color: white;
+}
+
+.departure-route--purple .base-route-pill__pill {
+  background: #80276c;
+  color: white;
+}
+
+.departure-route--silver .base-route-pill__pill {
+  background: #7c878e;
+  color: white;
+}

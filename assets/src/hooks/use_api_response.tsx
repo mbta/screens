@@ -1,21 +1,24 @@
 import { useEffect, useState } from "react";
 
-const useApiResponse = (
+interface UseApiResponseArgs {
+  id: string;
+  datetime?: string | null;
+  rotationIndex?: number;
+  refreshMs?: number;
+  withWatchdog?: boolean;
+}
+
+const useApiResponse = ({
   id,
+  datetime,
+  rotationIndex,
   refreshMs,
-  datetime = null,
-  withWatchdog = false
-) => {
-  const [apiResponse, setApiResponse] = useState(null);
+  withWatchdog = false,
+}: UseApiResponseArgs) => {
+  const [apiResponse, setApiResponse] = useState<object | null>(null);
   const lastRefresh = document.getElementById("app").dataset.lastRefresh;
 
-  let apiPath;
-  if (datetime) {
-    apiPath = `/api/screen/${id}?last_refresh=${lastRefresh}&datetime=${datetime}`;
-    refreshMs = 1000 * 60 * 60; // 1 per hour
-  } else {
-    apiPath = `/api/screen/${id}?last_refresh=${lastRefresh}`;
-  }
+  const apiPath = buildApiPath({ id, datetime, rotationIndex, lastRefresh });
 
   const fetchData = async () => {
     try {
@@ -23,7 +26,7 @@ const useApiResponse = (
       const json = await result.json();
 
       if (json.force_reload === true) {
-        window.location.reload(false);
+        window.location.reload();
       }
       if (withWatchdog) updateSolariWatchdog();
       setApiResponse(json);
@@ -35,14 +38,46 @@ const useApiResponse = (
   useEffect(() => {
     fetchData();
 
-    const interval = setInterval(() => {
-      fetchData();
-    }, refreshMs);
+    if (refreshMs != null) {
+      const interval = setInterval(() => {
+        fetchData();
+      }, refreshMs);
 
-    return () => clearInterval(interval);
+      return () => clearInterval(interval);
+    }
+
+    return () => undefined;
   }, []);
 
   return apiResponse;
+};
+
+interface BuildApiPathArgs {
+  id: string;
+  datetime?: string | null;
+  rotationIndex?: number;
+  lastRefresh?: string;
+}
+
+const buildApiPath = ({
+  id,
+  datetime,
+  rotationIndex,
+  lastRefresh,
+}: BuildApiPathArgs) => {
+  let apiPath = `/api/screen/${id}`;
+
+  if (rotationIndex != null) {
+    apiPath += `/${rotationIndex}`;
+  }
+
+  apiPath += `?last_refresh=${lastRefresh}`;
+
+  if (datetime != null) {
+    apiPath += `&datetime=${datetime}`;
+  }
+
+  return apiPath;
 };
 
 const updateSolariWatchdog = () => {

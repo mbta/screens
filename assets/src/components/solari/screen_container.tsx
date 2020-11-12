@@ -71,7 +71,12 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const query = new URLSearchParams(useLocation().search);
   const datetime = query.get("datetime");
 
-  const apiResponse = useApiResponse(id, SOLARI_REFRESH_MS, datetime, true);
+  const apiResponse = useApiResponse({
+    id,
+    datetime,
+    refreshMs: SOLARI_REFRESH_MS,
+    withWatchdog: true,
+  });
   return <ScreenLayout apiResponse={apiResponse} />;
 };
 

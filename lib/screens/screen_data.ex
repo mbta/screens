@@ -8,7 +8,8 @@ defmodule Screens.ScreenData do
     bus_eink: Screens.BusScreenData,
     gl_eink_single: Screens.GLScreenData,
     gl_eink_double: Screens.GLScreenData,
-    solari: Screens.SolariScreenData
+    solari: Screens.SolariScreenData,
+    dup: Screens.DupScreenData
   }
 
   @disabled_response %{force_reload: false, success: false}
