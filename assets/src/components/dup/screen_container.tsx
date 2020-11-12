@@ -4,7 +4,6 @@ import Header from "Components/dup/header";
 import SectionList from "Components/dup/section_list";
 
 import useApiResponse from "Hooks/use_api_response";
-import { DUP_REFRESH_MS } from "Constants";
 
 const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   return (
@@ -30,7 +29,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
 };
 
 const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse(id, DUP_REFRESH_MS);
+  const apiResponse = useApiResponse({id});
 
   return <ScreenLayout apiResponse={apiResponse} />;
 };

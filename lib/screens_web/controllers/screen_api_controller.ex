@@ -4,7 +4,7 @@ defmodule ScreensWeb.ScreenApiController do
   alias Screens.Config.State
 
   plug(:check_config)
-  plug Corsica, origins: "*"
+  plug Corsica, [origins: "*"] when action == :show_dup
 
   defp check_config(conn, _) do
     if State.ok?() do
@@ -34,5 +34,9 @@ defmodule ScreensWeb.ScreenApiController do
       )
 
     json(conn, data)
+  end
+
+  def show_dup(conn, %{"id" => screen_id, "rotation_index" => _rotation_index}) do
+    show(conn, %{"id" => screen_id, "last_refresh" => nil})
   end
 end

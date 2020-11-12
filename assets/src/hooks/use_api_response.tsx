@@ -1,21 +1,28 @@
 import { useEffect, useState } from "react";
 
-const useApiResponse = (
+interface BuildApiPathArgs {
+  id: string;
+  datetime?: string | null;
+  withWatchdog?: boolean;
+  rotationIndex?: number;
+  lastRefresh?: string;
+}
+
+interface UseApiResponseArgs extends Omit<BuildApiPathArgs, "lastRefresh"> {
+  refreshMs?: number;
+}
+
+const useApiResponse = ({
   id,
   refreshMs,
-  datetime = null,
-  withWatchdog = false
-) => {
+  datetime,
+  withWatchdog = false,
+  rotationIndex
+}: UseApiResponseArgs) => {
   const [apiResponse, setApiResponse] = useState(null);
   const lastRefresh = document.getElementById("app").dataset.lastRefresh;
 
-  let apiPath;
-  if (datetime) {
-    apiPath = `http://screens-dev-green.mbtace.com/api/screen/${id}?last_refresh=${lastRefresh}&datetime=${datetime}`;
-    refreshMs = 1000 * 60 * 60; // 1 per hour
-  } else {
-    apiPath = `http://screens-dev-green.mbtace.com/api/screen/${id}?last_refresh=${lastRefresh}`;
-  }
+  const apiPath = buildApiPath({id, lastRefresh, datetime, rotationIndex});
 
   const fetchData = async () => {
     try {
@@ -23,7 +30,7 @@ const useApiResponse = (
       const json = await result.json();
 
       if (json.force_reload === true) {
-        window.location.reload(false);
+        window.location.reload();
       }
       if (withWatchdog) updateSolariWatchdog();
       setApiResponse(json);
@@ -44,6 +51,22 @@ const useApiResponse = (
 
   return apiResponse;
 };
+
+const buildApiPath = ({id, lastRefresh, datetime, rotationIndex}: BuildApiPathArgs) => {
+  let apiPath = `http://screens-dev-green.mbtace.com/api/screen/${id}`;
+  
+  if (rotationIndex != null) {
+    apiPath += `/${rotationIndex}`;
+  }
+  
+  apiPath += `?last_refresh=${lastRefresh}`;
+  
+  if (datetime != null) {
+    apiPath += `&datetime=${datetime}`;
+  }
+
+  return apiPath;
+}
 
 const updateSolariWatchdog = () => {
   const now = new Date().toISOString();

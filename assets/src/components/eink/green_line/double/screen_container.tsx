@@ -154,7 +154,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
 };
 
 const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse(id, EINK_REFRESH_MS);
+  const apiResponse = useApiResponse({id, refreshMs: EINK_REFRESH_MS});
   return <ScreenLayout apiResponse={apiResponse} />;
 };
 
