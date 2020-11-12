@@ -9,7 +9,7 @@ defmodule Screens.Psa do
 
   @bucket "mbta-screens"
   @s3_base_url "https://#{@bucket}.s3.amazonaws.com/"
-  @psa_images_prefix Application.get_env(:screens, :environment_name, "dev") <> "/images/psa/"
+  @psa_images_prefix Application.compile_env(:screens, :environment_name, "dev") <> "/images/psa/"
 
   def current_psa_for(screen_id) do
     %Screen{
