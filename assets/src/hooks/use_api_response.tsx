@@ -46,7 +46,7 @@ const useApiResponse = ({
       return () => clearInterval(interval);
     }
 
-    return () => {};
+    return () => undefined;
   }, []);
 
   return apiResponse;
