@@ -73,8 +73,8 @@ const ScreenContainer = ({ id }): JSX.Element => {
 
   const apiResponse = useApiResponse({
     id,
-    refreshMs: SOLARI_REFRESH_MS,
     datetime,
+    refreshMs: SOLARI_REFRESH_MS,
     withWatchdog: true,
   });
   return <ScreenLayout apiResponse={apiResponse} />;

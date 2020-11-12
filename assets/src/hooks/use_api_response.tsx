@@ -1,28 +1,24 @@
 import { useEffect, useState } from "react";
 
-interface BuildApiPathArgs {
+interface UseApiResponseArgs {
   id: string;
   datetime?: string | null;
-  withWatchdog?: boolean;
   rotationIndex?: number;
-  lastRefresh?: string;
-}
-
-interface UseApiResponseArgs extends Omit<BuildApiPathArgs, "lastRefresh"> {
   refreshMs?: number;
+  withWatchdog?: boolean;
 }
 
 const useApiResponse = ({
   id,
-  refreshMs,
   datetime,
-  withWatchdog = false,
   rotationIndex,
+  refreshMs,
+  withWatchdog = false,
 }: UseApiResponseArgs) => {
-  const [apiResponse, setApiResponse] = useState(null);
+  const [apiResponse, setApiResponse] = useState<object | null>(null);
   const lastRefresh = document.getElementById("app").dataset.lastRefresh;
 
-  const apiPath = buildApiPath({ id, lastRefresh, datetime, rotationIndex });
+  const apiPath = buildApiPath({ id, datetime, rotationIndex, lastRefresh });
 
   const fetchData = async () => {
     try {
@@ -56,11 +52,18 @@ const useApiResponse = ({
   return apiResponse;
 };
 
+interface BuildApiPathArgs {
+  id: string;
+  datetime?: string | null;
+  rotationIndex?: number;
+  lastRefresh?: string;
+}
+
 const buildApiPath = ({
   id,
-  lastRefresh,
   datetime,
   rotationIndex,
+  lastRefresh,
 }: BuildApiPathArgs) => {
   let apiPath = `/api/screen/${id}`;
 
