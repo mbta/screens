@@ -53,7 +53,7 @@ const useApiResponse = ({
 };
 
 const buildApiPath = ({id, lastRefresh, datetime, rotationIndex}: BuildApiPathArgs) => {
-  let apiPath = `http://screens-dev-green.mbtace.com/api/screen/${id}`;
+  let apiPath = `/api/screen/${id}`;
   
   if (rotationIndex != null) {
     apiPath += `/${rotationIndex}`;
