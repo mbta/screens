@@ -14,7 +14,6 @@ const Departure = ({
   currentTimeString,
   vehicleStatus,
   stopType,
-  // TODO crowding, alerts?
 }): JSX.Element => {
   const timeRepresentation = standardTimeRepresentation(
     time,
