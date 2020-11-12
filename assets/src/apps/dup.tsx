@@ -16,8 +16,20 @@ import {
 
 const App = (): JSX.Element => {
   return (
-    <ScreenContainer id={"401"} />
-  )
+    <Router>
+      <Switch>
+        <Route exact path="/screen/solari">
+          <MultiScreenPage screenContainer={ScreenContainer} />
+        </Route>
+        <Route exact path="/audit/solari">
+          <AuditScreenPage screenLayout={ScreenLayout} />
+        </Route>
+        <Route path="/screen/:id">
+          <ScreenPage screenContainer={ScreenContainer} />
+        </Route>
+      </Switch>
+    </Router>
+  );
 };
 
 ReactDOM.render(<App />, document.getElementById("app"));
