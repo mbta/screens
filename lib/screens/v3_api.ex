@@ -3,7 +3,7 @@ defmodule Screens.V3Api do
 
   require Logger
 
-  @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool], ssl: [versions: [:"tlsv1.2", :"tlsv1.1", :tlsv1, :sslv3]]]
+  @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool]]
   @base_url Application.compile_env(:screens, :api_v3_url)
 
   def get_json(route, params \\ %{}, extra_headers \\ [], opts \\ []) do
@@ -15,15 +15,13 @@ defmodule Screens.V3Api do
             HTTPoison.get(
               url,
               headers,
-              Keyword.merge(@default_opts, opts) |> IO.inspect(label: "opts")
+              Keyword.merge(@default_opts, opts)
             )},
          {:response_success, %{status_code: 200, body: body}} <- {:response_success, response},
          {:parse, {:ok, parsed}} <- {:parse, Jason.decode(body)} do
       {:ok, parsed}
     else
       {:http_request, e} ->
-        IO.puts(HTTPoison.Error.message(e |> elem(1)))
-        IO.inspect(e)
         log_api_error({:http_fetch_error, e})
 
       {:response_success, %{status_code: _status_code}} = response ->
