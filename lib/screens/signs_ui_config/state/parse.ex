@@ -7,9 +7,9 @@ defmodule Screens.SignsUiConfig.State.Parse do
       |> Enum.map(fn {id, data} -> {id, parse_time_ranges(data)} end)
       |> Enum.into(%{})
 
-    signs_in_headway_mode = get_headway_mode_signs(signs)
+    sign_modes = parse_sign_modes(signs)
 
-    {signs_in_headway_mode, time_ranges}
+    {sign_modes, time_ranges}
   end
 
   defp parse_time_ranges(%{"off_peak" => off_peak, "peak" => peak}) do
@@ -18,10 +18,15 @@ defmodule Screens.SignsUiConfig.State.Parse do
 
   defp parse_time_range(%{"range_low" => low, "range_high" => high}), do: {low, high}
 
-  defp get_headway_mode_signs(signs) do
-    Enum.flat_map(signs, &get_headway_mode_sign/1)
+  defp parse_sign_modes(signs) do
+    signs
+    |> Enum.map(fn {_, %{"id" => id, "mode" => mode}} -> {id, parse_sign_mode(mode)} end)
+    |> Enum.into(%{})
   end
 
-  defp get_headway_mode_sign({_, %{"id" => id, "mode" => "headway"}}), do: [id]
-  defp get_headway_mode_sign(_), do: []
+  for mode <- ~w[auto headway off static_text]a do
+    mode_string = Atom.to_string(mode)
+
+    defp parse_sign_mode(unquote(mode_string)), do: unquote(mode)
+  end
 end

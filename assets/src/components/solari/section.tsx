@@ -107,7 +107,7 @@ const SectionFrame = ({
   );
 };
 
-const NoDeparturesMessage = ({ pill }): JSX.Element => (
+const PlaceholderMessage = ({ pill, text }): JSX.Element => (
   <div
     className={classWithModifiers("departure-container", [
       "group-start",
@@ -122,11 +122,23 @@ const NoDeparturesMessage = ({ pill }): JSX.Element => (
           "no-departures-placeholder"
         )}
       >
-        <BaseDepartureDestination destination="No departures currently available" />
+        <BaseDepartureDestination destination={text} />
       </div>
     </div>
   </div>
 );
+
+const NoDeparturesMessage = ({ pill }): JSX.Element => {
+  return (
+    <PlaceholderMessage pill={pill} text="No departures currently available" />
+  );
+};
+
+const NoDataMessage = ({ pill }): JSX.Element => {
+  return (
+    <PlaceholderMessage pill={pill} text="Live updates currently unavailable" />
+  );
+};
 
 interface PagedDepartureProps {
   pageCount: number;
@@ -458,6 +470,7 @@ const PagedSection = ({
   overhead,
   isAnimated,
   currentTimeString,
+  disabled,
 }: PagedSectionProps): JSX.Element => {
   const pageCount = getPageCount(departures, numRows);
   const showPagedDeparture = pageCount >= MIN_PAGE_COUNT;
@@ -476,7 +489,11 @@ const PagedSection = ({
   if (staticDepartures.length === 0) {
     return (
       <SectionFrame {...frameProps}>
-        <NoDeparturesMessage pill={pill} />
+        {disabled ? (
+          <NoDataMessage pill={pill} />
+        ) : (
+          <NoDeparturesMessage pill={pill} />
+        )}
       </SectionFrame>
     );
   }
@@ -517,6 +534,7 @@ const Section = ({
   isAnimated,
   pill,
   headway: { active, headsigns, range_low: rangeLow, range_high: rangeHigh },
+  disabled,
 }): JSX.Element => {
   departures = departures.slice(0, numRows);
 
@@ -535,7 +553,11 @@ const Section = ({
   if (departures.length === 0) {
     return (
       <SectionFrame {...frameProps}>
-        <NoDeparturesMessage pill={pill} />
+        {disabled ? (
+          <NoDataMessage pill={pill} />
+        ) : (
+          <NoDeparturesMessage pill={pill} />
+        )}
       </SectionFrame>
     );
   }
