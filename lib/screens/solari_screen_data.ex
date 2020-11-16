@@ -71,6 +71,50 @@ defmodule Screens.SolariScreenData do
          %Section{
            name: section_name,
            arrow: arrow,
+           audio: audio_params,
+           pill: pill,
+           headway: headway_config
+         } = section,
+         at_historical_datetime,
+         current_time
+       ) do
+    if section_disabled?(section, headway_config) do
+      {:ok,
+       %{
+         name: section_name,
+         arrow: arrow,
+         pill: pill,
+         audio: Map.from_struct(audio_params),
+         departures: [],
+         paging: %{is_enabled: false},
+         headway: fetch_headway_mode(headway_config, current_time),
+         disabled: true
+       }}
+    else
+      fetch_enabled_section_data(section, at_historical_datetime, current_time)
+    end
+  end
+
+  defp section_disabled?(%Section{pill: pill}, %Headway{sign_ids: sign_ids}) do
+    subway_disabled? =
+      State.mode_disabled?(:subway) or SignsUiConfig.State.all_signs_inactive?(sign_ids)
+
+    subway_section? = pill in ~w[red orange blue]a
+
+    commuter_rail_disabled? = State.mode_disabled?(:commuter_rail)
+    commuter_rail_section? = pill === :cr
+
+    light_rail_disabled? = State.mode_disabled?(:light_rail)
+    light_rail_section? = pill in ~w[green mattapan]a
+
+    (subway_section? and subway_disabled?) or (commuter_rail_section? and commuter_rail_disabled?) or
+      (light_rail_section? and light_rail_disabled?)
+  end
+
+  defp fetch_enabled_section_data(
+         %Section{
+           name: section_name,
+           arrow: arrow,
            query: %Query{params: query_params, opts: query_opts},
            layout: layout_params,
            audio: audio_params,
@@ -92,7 +136,8 @@ defmodule Screens.SolariScreenData do
            audio: Map.from_struct(audio_params),
            departures: departures,
            paging: do_paging(departures, layout_params),
-           headway: fetch_headway_mode(headway_config, current_time)
+           headway: fetch_headway_mode(headway_config, current_time),
+           disabled: false
          }}
 
       :error ->

@@ -3,10 +3,11 @@ defmodule Screens.SignsUiConfig.State do
 
   alias Screens.ConfigCache.State.Fetch
 
-  @typep signs_list :: [String.t()]
+  @typep mode :: :auto | :headway | :off | :static_text
+  @typep signs_mode_map :: %{String.t() => mode}
   @typep time_range :: {non_neg_integer(), non_neg_integer()}
   @typep time_range_map :: %{peak: time_range, off_peak: time_range}
-  @type config :: {signs_list, time_range_map}
+  @type config :: {signs_mode_map, time_range_map}
   @config_fetcher Application.get_env(:screens, :signs_ui_config_fetcher)
 
   @type t ::
@@ -28,12 +29,16 @@ defmodule Screens.SignsUiConfig.State do
     refresh_ms: 60 * 1000,
     fetch_failure_error_threshold_minutes: 2
 
-  def sign_in_headway_mode?(pid \\ __MODULE__, sign_id) do
-    GenServer.call(pid, {:sign_in_headway_mode, sign_id})
+  def all_signs_in_headway_mode?(pid \\ __MODULE__, sign_ids) do
+    all_signs_in_modes?(pid, sign_ids, [:headway])
   end
 
-  def all_signs_in_headway_mode?(pid \\ __MODULE__, sign_ids) do
-    GenServer.call(pid, {:all_signs_in_headway_mode, sign_ids})
+  def all_signs_inactive?(pid \\ __MODULE__, sign_ids) do
+    all_signs_in_modes?(pid, sign_ids, [:off, :static_text])
+  end
+
+  defp all_signs_in_modes?(pid, sign_ids, modes) do
+    GenServer.call(pid, {:all_signs_in_modes, sign_ids, modes})
   end
 
   def time_ranges(pid \\ __MODULE__, line_or_trunk) do
@@ -43,20 +48,15 @@ defmodule Screens.SignsUiConfig.State do
   ###
 
   @impl true
-  def handle_call({:sign_in_headway_mode, sign_id}, _from, %__MODULE__{config: config} = state) do
-    {signs_in_headway_mode, _} = config
-    result = Enum.member?(signs_in_headway_mode, sign_id)
-
-    {:reply, result, state}
-  end
-
   def handle_call(
-        {:all_signs_in_headway_mode, sign_ids},
+        {:all_signs_in_modes, sign_ids, modes},
         _from,
         %__MODULE__{config: config} = state
       ) do
-    {signs_in_headway_mode, _} = config
-    result = Enum.all?(sign_ids, fn sign_id -> Enum.member?(signs_in_headway_mode, sign_id) end)
+    {sign_mode_map, _} = config
+
+    result =
+      Enum.all?(sign_ids, fn sign_id -> Enum.member?(modes, Map.get(sign_mode_map, sign_id)) end)
 
     {:reply, result, state}
   end
