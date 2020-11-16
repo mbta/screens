@@ -341,10 +341,38 @@ const SolariScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
+const DupScreensTable = (): JSX.Element => {
+  const columns = [
+    { Header: "Screen ID", accessor: "id", Filter: DefaultColumnFilter },
+    {
+      Header: "Primary Departures",
+      accessor: buildAppParamAccessor("primary"),
+      mutator: buildAppParamMutator("primary"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Secondary Departures",
+      accessor: buildAppParamAccessor("secondary"),
+      mutator: buildAppParamMutator("secondary"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+  ];
+
+  const dataFilter = ({ app_id }) => {
+    return app_id === "dup";
+  };
+  return <AdminTable columns={columns} dataFilter={dataFilter} />;
+};
+
 export {
   AllScreensTable,
   BusScreensTable,
   GLSingleScreensTable,
   GLDoubleScreensTable,
   SolariScreensTable,
+  DupScreensTable,
 };

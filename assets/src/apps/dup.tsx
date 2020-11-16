@@ -18,10 +18,10 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
-        <Route exact path="/screen/solari">
+        <Route exact path="/screen/dup">
           <MultiScreenPage screenContainer={ScreenContainer} />
         </Route>
-        <Route exact path="/audit/solari">
+        <Route exact path="/audit/dup">
           <AuditScreenPage screenLayout={ScreenLayout} />
         </Route>
         <Route path="/screen/:id">

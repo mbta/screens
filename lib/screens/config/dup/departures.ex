@@ -1,15 +1,16 @@
-defmodule Screens.Config.Dup.Secondary do
+defmodule Screens.Config.Dup.Departures do
   @moduledoc false
 
-  alias Screens.Config.Dup.Primary
+  alias Screens.Config.Dup.Section
   alias Screens.Util
 
   @type t :: %__MODULE__{
-          good_state: Primary.t()
-          # FOLLOW-UP more fields TBD to configure alerting
+          header: String.t(),
+          sections: list(Section.t())
         }
 
-  defstruct good_state: Primary.from_json(:default)
+  defstruct header: "",
+            sections: []
 
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
@@ -32,14 +33,14 @@ defmodule Screens.Config.Dup.Secondary do
     |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
   end
 
-  defp value_from_json("good_state", good_state_config) do
-    Primary.from_json(good_state_config)
+  defp value_from_json("sections", sections) when is_list(sections) do
+    Enum.map(sections, &Section.from_json/1)
   end
 
   defp value_from_json(_, value), do: value
 
-  defp value_to_json(:good_state, good_state_config) do
-    Primary.to_json(good_state_config)
+  defp value_to_json(:sections, sections) do
+    Enum.map(sections, &Section.to_json/1)
   end
 
   defp value_to_json(_, value), do: value

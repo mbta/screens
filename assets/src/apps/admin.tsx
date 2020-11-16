@@ -14,6 +14,7 @@ import {
   GLSingleScreensTable,
   GLDoubleScreensTable,
   SolariScreensTable,
+  DupScreensTable,
 } from "Components/admin/admin_tables";
 import ImageManager from "Components/admin/admin_image_manager";
 import Devops from "Components/admin/devops";
@@ -40,6 +41,9 @@ const App = (): JSX.Element => {
         </Route>
         <Route exact path="/solari-screens">
           <SolariScreensTable />
+        </Route>
+        <Route exact path="/dup-screens">
+          <DupScreensTable />
         </Route>
         <Route exact path="/json-editor">
           <AdminForm />

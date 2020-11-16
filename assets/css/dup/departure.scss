@@ -1,9 +1,15 @@
 .departure-container {
   background-color: #f5f4f1;
-  height: 211px;
-  padding-left: 20px;
+  position: relative;
 
   &:not(:first-child) {
-    border-top: 3px solid rgba(199, 199, 199, 0.58);
+    .departure-hairline {
+      position: absolute;
+      left: 302px;
+      top: -2px;
+      height: 4px;
+      width: 1586px;
+      background-color: #cccbc8;
+    }
   }
 }

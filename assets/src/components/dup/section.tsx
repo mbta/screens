@@ -34,6 +34,7 @@ const Section = ({ departures, currentTimeString }): JSX.Element => {
           key={departure.id}
         />
       ))}
+      <div className="section-hairline" />
     </div>
   );
 };
