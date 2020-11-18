@@ -4,18 +4,12 @@ defmodule Screens.DupScreenData do
   alias Screens.Config.{Dup, State}
   alias Screens.Departures.Departure
 
-  @headsign_replacements %{
-    "Government Center" => "Government Ctr",
-    "Charlestown Navy Yard" => "Charlestown"
-  }
-
   def by_screen_id("dup-bus-headsigns", _is_screen) do
     current_time = DateTime.utc_now()
 
     bus_headsigns = [
       "Saugus Center via Kennedy Dr & Square One Mall",
       "Malden via Square One Mall & Kennedy Dr",
-      "Quincy Center via Brook Rd & Alleyne St",
       "Washington St & Pleasant St Weymouth",
       "West Lynn Garage via Cliftondale",
       "Weymouth Landing via Quincy Ave",
@@ -126,7 +120,7 @@ defmodule Screens.DupScreenData do
 
     departures =
       Enum.map(bus_headsigns, fn d ->
-        %{route: "0", route_id: "0", destination: d, time: current_time}
+        %{route: "0", route_id: "0", destination: d, time: current_time, id: d}
       end)
 
     %{
@@ -201,7 +195,6 @@ defmodule Screens.DupScreenData do
         section_departures =
           departures
           |> Enum.map(&Map.from_struct/1)
-          |> Enum.map(&replace_long_headsigns/1)
           |> Enum.sort_by(& &1.time)
           |> Enum.take(num_rows)
 
@@ -210,15 +203,5 @@ defmodule Screens.DupScreenData do
       :error ->
         :error
     end
-  end
-
-  defp replace_long_headsigns(%{destination: destination} = departure) do
-    new_destination =
-      case Map.get(@headsign_replacements, destination) do
-        nil -> destination
-        replacement -> replacement
-      end
-
-    %{departure | destination: new_destination}
   end
 end
