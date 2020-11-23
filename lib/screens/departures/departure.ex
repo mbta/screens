@@ -341,8 +341,11 @@ defmodule Screens.Departures.Departure do
   defp log_unexpected_groups(groups) do
     Enum.each(groups, fn {trip_id, predictions} ->
       route_ids = Enum.map(predictions, & &1.route.id)
+      route_id = Enum.at(route_ids, 0)
 
-      if length(route_ids) > 1 and Enum.at(route_ids, 0) != "64" do
+      expected_route_ids = ["64", "120"]
+
+      if length(route_ids) > 1 and !Enum.member?(expected_route_ids, route_id) do
         Logger.warn(
           "log_unexpected_groups found #{length(route_ids)} predictions on trip #{trip_id} for route #{
             Enum.at(route_ids, 0)
