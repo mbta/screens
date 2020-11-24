@@ -1,16 +1,16 @@
 defmodule Screens.Config.Dup do
   @moduledoc false
 
-  alias Screens.Config.Dup.{Primary, Secondary}
+  alias Screens.Config.Dup.Departures
   alias Screens.Util
 
   @type t :: %__MODULE__{
-          primary: Primary.t(),
-          secondary: Secondary.t()
+          primary: Departures.t(),
+          secondary: Departures.t()
         }
 
-  defstruct primary: Primary.from_json(:default),
-            secondary: Secondary.from_json(:default)
+  defstruct primary: Departures.from_json(:default),
+            secondary: Departures.from_json(:default)
 
   @spec from_json(map()) :: t()
   def from_json(%{} = json) do
@@ -30,21 +30,21 @@ defmodule Screens.Config.Dup do
   end
 
   defp value_from_json("primary", primary) do
-    Primary.from_json(primary)
+    Departures.from_json(primary)
   end
 
   defp value_from_json("secondary", secondary) do
-    Secondary.from_json(secondary)
+    Departures.from_json(secondary)
   end
 
   defp value_from_json(_, value), do: value
 
   defp value_to_json(:primary, primary) do
-    Primary.to_json(primary)
+    Departures.to_json(primary)
   end
 
   defp value_to_json(:secondary, secondary) do
-    Secondary.to_json(secondary)
+    Departures.to_json(secondary)
   end
 
   defp value_to_json(_, value), do: value

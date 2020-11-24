@@ -29,8 +29,9 @@ const Departure = ({
         {destination && <BaseDepartureDestination destination={destination} />}
       </div>
       <div className="departure-time">
-        <BaseDepartureTime time={timeRepresentation} />
+        <BaseDepartureTime time={timeRepresentation} hideAmPm={true} />
       </div>
+      <div className="departure-hairline" />
     </div>
   );
 };

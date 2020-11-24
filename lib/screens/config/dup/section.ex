@@ -6,18 +6,15 @@ defmodule Screens.Config.Dup.Section do
   @type t :: %__MODULE__{
           stop_ids: list(stop_id()),
           route_ids: list(route_id()),
-          layout: :bidirectional | :upcoming,
-          # FOLLOW-UP which pills do we actually expect to show on DUPs? Bus, all heavy rail, CR, maybe SL?
-          pill: :bus | :red | :orange | :green | :blue | :cr | :mattapan | :silver
+          pill: :bus | :red | :orange | :green | :blue | :cr | :mattapan | :silver | :ferry
         }
 
   @type stop_id :: String.t()
   @type route_id :: String.t()
 
-  @enforce_keys ~w[layout pill]a
+  @enforce_keys [:pill]
   defstruct stop_ids: [],
             route_ids: [],
-            layout: nil,
             pill: nil
 
   @spec from_json(map()) :: t()
@@ -37,15 +34,7 @@ defmodule Screens.Config.Dup.Section do
     |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
   end
 
-  for layout <- ~w[bidirectional upcoming]a do
-    layout_string = Atom.to_string(layout)
-
-    defp value_from_json("layout", unquote(layout_string)) do
-      unquote(layout)
-    end
-  end
-
-  for pill <- ~w[bus red orange green blue cr mattapan silver]a do
+  for pill <- ~w[bus red orange green blue cr mattapan silver ferry]a do
     pill_string = Atom.to_string(pill)
 
     defp value_from_json("pill", unquote(pill_string)) do

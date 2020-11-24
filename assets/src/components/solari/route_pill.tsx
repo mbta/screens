@@ -30,8 +30,28 @@ const routeToPill = (route: string, routeId: string): PillType => {
     return { routeName: "OL", routePillColor: "orange" };
   }
 
+  if (routeId === "Green-B") {
+    return { routeName: "GL·B", routePillColor: "green" };
+  }
+
+  if (routeId === "Green-C") {
+    return { routeName: "GL·C", routePillColor: "green" };
+  }
+
+  if (routeId === "Green-D") {
+    return { routeName: "GL·D", routePillColor: "green" };
+  }
+
+  if (routeId === "Green-E") {
+    return { routeName: "GL·E", routePillColor: "green" };
+  }
+
   if (routeId && routeId.startsWith("CR")) {
     return { routeName: "CR", routePillColor: "purple" };
+  }
+
+  if (routeId && routeId.startsWith("Boat")) {
+    return { routeName: "Boat", routePillColor: "teal" };
   }
 
   if (route && route.startsWith("SL")) {
@@ -48,6 +68,10 @@ const Pill = ({ routeName, routePillColor }: PillType): JSX.Element => {
         className="departure-route--icon"
         src="/images/commuter-rail.svg"
       ></img>
+    );
+  } else if (routeName === "Boat") {
+    routeName = (
+      <img className="departure-route--icon" src="/images/ferry.svg"></img>
     );
   } else if (routeName === "BUS") {
     routeName = (

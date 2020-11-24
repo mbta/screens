@@ -1,36 +1,41 @@
 .header {
   background-color: #171f26;
   color: white;
-  height: 253px;
+  height: 248px;
+  position: relative;
 }
 
 .header__time {
-  @include font--text--55regular;
-  display: inline-block;
-  font-size: 100px;
+  font-family: neue-haas-grotesk-display, sans-serif;
+  font-size: 96px;
+  position: absolute;
+  top: 66px;
+  right: 40px;
 }
 
 .header__logo-container {
-  height: 128px;
-  width: 128px;
-  margin: 24px 40px 20px 40px;
+  height: 184px;
+  width: 184px;
+  margin: 32px 64px 32px 64px;
   display: inline-block;
+  vertical-align: middle;
 }
 
 .header__logo-image {
-  height: 128px;
-  width: 128px;
+  height: 184px;
+  width: 184px;
 }
 
 .header__content-container {
-  width: 1000px;
+  width: 1300px;
   display: inline-block;
+  vertical-align: middle;
 }
 
 .header__text {
-  @include font--display--75bold;
-  letter-spacing: 2px;
-  font-size: 120px;
+  font-family: neue-haas-grotesk-display, sans-serif;
+  font-weight: 700;
+  font-size: 144px;
 }
 
 .header__environment {

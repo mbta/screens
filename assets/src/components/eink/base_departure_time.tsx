@@ -6,7 +6,10 @@ interface BaseDepartureTimeProps {
   time: TimeRepresentation;
 }
 
-const BaseDepartureTime = ({ time }: BaseDepartureTimeProps): JSX.Element => {
+const BaseDepartureTime = ({
+  time,
+  hideAmPm,
+}: BaseDepartureTimeProps): JSX.Element => {
   if (time.type === "TEXT") {
     return (
       <div className="base-departure-time">
@@ -24,7 +27,9 @@ const BaseDepartureTime = ({ time }: BaseDepartureTimeProps): JSX.Element => {
     return (
       <div className="base-departure-time">
         <span className="base-departure-time__timestamp">{time.timestamp}</span>
-        <span className="base-departure-time__ampm">{time.ampm}</span>
+        {!hideAmPm && (
+          <span className="base-departure-time__ampm">{time.ampm}</span>
+        )}
       </div>
     );
   } else {
