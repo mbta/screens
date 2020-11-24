@@ -8,6 +8,6 @@
   font-size: 138px;
 
   .base-departure-destination__primary {
-    font-weight: 600;
+    @include font--display--65medium;
   }
 }

@@ -84,12 +84,7 @@ defmodule Screens.DupScreenData do
   end
 
   defp replace_long_headsigns(%{destination: destination} = departure) do
-    new_destination =
-      case Map.get(@headsign_replacements, destination) do
-        nil -> destination
-        replacement -> replacement
-      end
-
+    new_destination = Map.get(@headsign_replacements, destination, destination)
     %{departure | destination: new_destination}
   end
 end
