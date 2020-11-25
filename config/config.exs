@@ -12,7 +12,7 @@ config :screens, ScreensWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "0XmZH5iePmWrvV+PgrsU5z6WFgYupY2Zoh7FEk8pzuDLWftBrF/KtLBbG615wstt",
   render_errors: [view: ScreensWeb.ErrorView, accepts: ~w(html json)],
-  pubsub_server: Screens.PubSub
+  pubsub: [name: Screens.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -24,8 +24,8 @@ config :phoenix, :json_library, Jason
 
 # Use the HTML encoder for SSML files as well
 config :phoenix, :format_encoders,
-  html: Phoenix.HTML.Engine,
-  ssml: Phoenix.HTML.Engine
+  html: Phoenix.Template.HTML,
+  ssml: Phoenix.Template.HTML
 
 # Use Jason for JSON parsing in ExAws
 config :ex_aws, json_codec: Jason

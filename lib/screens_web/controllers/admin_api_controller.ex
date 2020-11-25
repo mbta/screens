@@ -3,7 +3,7 @@ defmodule ScreensWeb.AdminApiController do
 
   alias Screens.{Config, Image}
 
-  @config_fetcher Application.compile_env(:screens, :config_fetcher)
+  @config_fetcher Application.get_env(:screens, :config_fetcher)
 
   plug :accepts, ["multipart/form-data"] when action == :upload_image
 

@@ -1,8 +1,6 @@
 defmodule Screens.Config.State.Supervisor do
   @moduledoc false
 
-  alias Screens.Config.State
-
   use Supervisor
 
   def start_link([]) do
@@ -11,9 +9,9 @@ defmodule Screens.Config.State.Supervisor do
 
   def init(:ok) do
     children = [
-      %{id: State, start: {State, :start_link, [[name: State]]}}
+      worker(Screens.Config.State, [[name: Screens.Config.State]])
     ]
 
-    Supervisor.init(children, strategy: :one_for_one)
+    supervise(children, strategy: :one_for_one)
   end
 end

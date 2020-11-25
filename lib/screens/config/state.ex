@@ -5,7 +5,7 @@ defmodule Screens.Config.State do
   alias Screens.Config.{Devops, Screen}
   alias Screens.ConfigCache.State.Fetch
 
-  @config_fetcher Application.compile_env(:screens, :config_fetcher)
+  @config_fetcher Application.get_env(:screens, :config_fetcher)
 
   @type t ::
           %__MODULE__{

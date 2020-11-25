@@ -4,7 +4,7 @@ defmodule Screens.V3Api do
   require Logger
 
   @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool]]
-  @base_url Application.compile_env(:screens, :api_v3_url)
+  @base_url Application.get_env(:screens, :api_v3_url)
 
   def get_json(route, params \\ %{}, extra_headers \\ [], opts \\ []) do
     headers = extra_headers ++ api_key_headers(Application.get_env(:screens, :api_v3_key))

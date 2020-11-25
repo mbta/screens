@@ -7,6 +7,6 @@
     <title>Screens</title>
   </head>
   <body>
-    <%= @inner_content %>
+    <%= render @view_module, @view_template, assigns %>
   </body>
 </html>
