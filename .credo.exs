@@ -47,7 +47,6 @@
         {Credo.Check.Warning.BoolOperationOnSameValues},
         {Credo.Check.Warning.IExPry},
         {Credo.Check.Warning.IoInspect},
-        {Credo.Check.Warning.LazyLogging},
         {Credo.Check.Warning.OperationOnSameValues},
         {Credo.Check.Warning.OperationWithConstantResult},
         {Credo.Check.Warning.UnusedEnumOperation},
@@ -67,7 +66,10 @@
 
         # incompatible with Elxiir 1.9.1
         {Credo.Check.Refactor.MapInto, false},
-        {Credo.Check.Warning.LazyLogging, false}
+        {Credo.Check.Warning.LazyLogging, false},
+
+        # disabled until we upgrade Elixir
+        {Credo.Check.Warning.ApplicationConfigInModuleAttribute, false}
       ]
     }
   ]
