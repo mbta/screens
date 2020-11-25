@@ -1,8 +1,6 @@
 defmodule Screens.MercuryData.Supervisor do
   @moduledoc false
 
-  alias Screens.MercuryData.State
-
   use Supervisor
 
   def start_link([]) do
@@ -11,9 +9,9 @@ defmodule Screens.MercuryData.Supervisor do
 
   def init(:ok) do
     children = [
-      %{id: State, start: {State, :start_link, [[name: State]]}}
+      worker(Screens.MercuryData.State, [[name: Screens.MercuryData.State]])
     ]
 
-    Supervisor.init(children, strategy: :one_for_one)
+    supervise(children, strategy: :one_for_one)
   end
 end

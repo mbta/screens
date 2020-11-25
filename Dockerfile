@@ -1,5 +1,5 @@
 # first, get the elixir dependencies within an elixir container
-FROM elixir:1.11.2 as elixir-builder
+FROM elixir:1.9.4 as elixir-builder
 
 ENV LANG="C.UTF-8" MIX_ENV="prod"
 

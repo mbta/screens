@@ -21,8 +21,7 @@ defmodule Screens.Application do
       :hackney_pool.child_spec(:ex_aws_pool, []),
       :hackney_pool.child_spec(:api_v3_pool, []),
       :hackney_pool.child_spec(:gds_api_pool, []),
-      :hackney_pool.child_spec(:mercury_api_pool, []),
-      {Phoenix.PubSub, [name: Screens.PubSub, adapter: Phoenix.PubSub.PG2]}
+      :hackney_pool.child_spec(:mercury_api_pool, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -1,8 +1,6 @@
 defmodule Screens.GdsData.Supervisor do
   @moduledoc false
 
-  alias Screens.GdsData.State
-
   use Supervisor
 
   def start_link([]) do
@@ -11,9 +9,9 @@ defmodule Screens.GdsData.Supervisor do
 
   def init(:ok) do
     children = [
-      %{id: State, start: {State, :start_link, [[name: State]]}}
+      worker(Screens.GdsData.State, [[name: Screens.GdsData.State]])
     ]
 
-    Supervisor.init(children, strategy: :one_for_one)
+    supervise(children, strategy: :one_for_one)
   end
 end
