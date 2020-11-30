@@ -3,8 +3,8 @@ import React from "react";
 import { standardTimeRepresentation } from "Util/time_representation";
 
 import BaseDepartureTime from "Components/eink/base_departure_time";
-import BaseDepartureDestination from "Components/eink/base_departure_destination";
 import { DepartureRoutePill } from "Components/solari/route_pill";
+import Destination from "Components/dup/destination";
 
 const Departure = ({
   route,
@@ -26,7 +26,7 @@ const Departure = ({
     <div className="departure-container">
       <DepartureRoutePill route={route} routeId={routeId} />
       <div className="departure-destination">
-        {destination && <BaseDepartureDestination destination={destination} />}
+        {destination && <Destination destination={destination} />}
       </div>
       <div className="departure-time">
         <BaseDepartureTime time={timeRepresentation} hideAmPm={true} />

@@ -4,10 +4,133 @@ defmodule Screens.DupScreenData do
   alias Screens.Config.{Dup, State}
   alias Screens.Departures.Departure
 
-  @headsign_replacements %{
-    "Government Center" => "Government Ctr",
-    "Charlestown Navy Yard" => "Charlestown"
-  }
+  def by_screen_id("dup-bus-headsigns", _is_screen) do
+    current_time = DateTime.utc_now()
+
+    bus_headsigns = [
+      "Saugus Center via Kennedy Dr & Square One Mall",
+      "Malden via Square One Mall & Kennedy Dr",
+      "Washington St & Pleasant St Weymouth",
+      "West Lynn Garage via Cliftondale",
+      "Weymouth Landing via Quincy Ave",
+      "Harbor Point via South Bay Center",
+      "Saugus Center via Square One Mall",
+      "Quincy Center via Holbrook Court",
+      "Quincy Center via Des Moines Rd",
+      "Quincy Center via North Quincy",
+      "Woodland Rd via Gateway Center",
+      "Wellington via Gateway Center",
+      "West Lynn Garage via Maverick",
+      "Kenmore via South Bay Center",
+      "Malden via Square One Mall",
+      "Central Square via Cliftondale",
+      "Quincy Center via Billings Rd",
+      "Fort Point via Des Moines Rd",
+      "Quincy Center via Coddington",
+      "Quincy Center via Quincy Ave",
+      "Montello via Holbrook Court",
+      "Germantown via Coddington",
+      "Haymarket via Cliftondale",
+      "Quincy Center via McGrath",
+      "Quincy Center via Shaw St",
+      "Middleborough / Lakeville",
+      "Hingham Depot via Center",
+      "Kenmore via Boston Latin",
+      "Logan Airport Terminal C",
+      "Logan Airport via Andrew",
+      "Squantum via Billings Rd",
+      "Sullivan (Limited Stops)",
+      "Ruggles (Limited Stops)",
+      "Downtown via Navy Yard",
+      "Germantown via McGrath",
+      "Haymarket via Maverick",
+      "Sullivan via Navy Yard",
+      "Haymarket via Kenmore",
+      "Watertown via Kenmore",
+      "Chestnut Hill Mall",
+      "Government Center",
+      "Holbrook/Randolph",
+      "Jack Satter House",
+      "Melrose Highlands",
+      "Wickford Junction",
+      "Weymouth Landing",
+      "Needham Heights",
+      "South Shore Plaza",
+      "Arlington Center",
+      "Cleveland Circle",
+      "Brighton Center",
+      "Crawford Square",
+      "Boston College",
+      "Central Square",
+      "Clarendon Hill",
+      "Forge Park/495",
+      "Watertown Yard",
+      "East Weymouth",
+      "Fields Corner",
+      "Hingham Depot",
+      "Linden Square",
+      "Logan Airport",
+      "North Station",
+      "Quincy Center",
+      "Reading Depot",
+      "South Station",
+      "Forest Hills",
+      "Heath Street",
+      "Lebanon Loop",
+      "North Quincy",
+      "West Medford",
+      "Avon Square",
+      "Cary Square",
+      "Houghs Neck",
+      "Park Street",
+      "Salem Depot",
+      "Woodland Rd",
+      "Oak Square",
+      "Providence",
+      "Wellington",
+      "Wonderland",
+      "Braintree",
+      "Greenbush",
+      "Haverhill",
+      "Haymarket",
+      "Oak Grove",
+      "Reservoir",
+      "Riverside",
+      "Stoughton",
+      "Worcester",
+      "Assembly",
+      "Back Bay",
+      "Downtown",
+      "Mattapan",
+      "Montello",
+      "Plymouth",
+      "Redstone",
+      "Squantum",
+      "Sullivan",
+      "Chelsea",
+      "Reading",
+      "Drydock",
+      "Bowdoin",
+      "Alewife",
+      "Ashmont",
+      "Kenmore",
+      "Malden",
+      "Davis"
+    ]
+
+    departures =
+      Enum.map(bus_headsigns, fn d ->
+        %{route: "0", route_id: "0", destination: d, time: current_time, id: d}
+      end)
+
+    %{
+      force_reload: false,
+      success: true,
+      header: "Bus Headsign Test",
+      sections: [%{departures: departures, pill: :bus}],
+      current_time: Screens.Util.format_time(current_time)
+    }
+  end
 
   def by_screen_id(screen_id, _is_screen) do
     %Dup{primary: primary_departures} = State.app_params(screen_id)
@@ -72,7 +195,6 @@ defmodule Screens.DupScreenData do
         section_departures =
           departures
           |> Enum.map(&Map.from_struct/1)
-          |> Enum.map(&replace_long_headsigns/1)
           |> Enum.sort_by(& &1.time)
           |> Enum.take(num_rows)
 
@@ -81,10 +203,5 @@ defmodule Screens.DupScreenData do
       :error ->
         :error
     end
-  end
-
-  defp replace_long_headsigns(%{destination: destination} = departure) do
-    new_destination = Map.get(@headsign_replacements, destination, destination)
-    %{departure | destination: new_destination}
   end
 end
