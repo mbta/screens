@@ -132,7 +132,9 @@ defmodule Screens.DupScreenData do
     }
   end
 
-  def by_screen_id(screen_id, _is_screen) do
+  def by_screen_id(screen_id, rotation_index)
+
+  def by_screen_id(screen_id, "0") do
     %Dup{primary: primary_departures} = State.app_params(screen_id)
 
     current_time = DateTime.utc_now()
@@ -141,6 +143,24 @@ defmodule Screens.DupScreenData do
     case response_type do
       :departures -> fetch_departures_response(primary_departures, current_time)
     end
+  end
+
+  def by_screen_id(screen_id, "1") do
+    %Dup{primary: primary_departures} = State.app_params(screen_id)
+
+    current_time = DateTime.utc_now()
+    response_type = fetch_response_type()
+
+    case response_type do
+      :departures -> fetch_departures_response(primary_departures, current_time)
+    end
+  end
+
+  def by_screen_id(screen_id, "2") do
+    %Dup{secondary: secondary_departures} = State.app_params(screen_id)
+
+    current_time = DateTime.utc_now()
+    fetch_departures_response(secondary_departures, current_time)
   end
 
   defp fetch_response_type, do: :departures
