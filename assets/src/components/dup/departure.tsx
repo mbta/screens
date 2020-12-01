@@ -6,6 +6,8 @@ import BaseDepartureTime from "Components/eink/base_departure_time";
 import { DepartureRoutePill } from "Components/solari/route_pill";
 import Destination from "Components/dup/destination";
 
+import FreeText from "Components/dup/free_text";
+
 const Departure = ({
   route,
   routeId,

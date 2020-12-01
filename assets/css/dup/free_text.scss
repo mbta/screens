@@ -1,0 +1,100 @@
+.free-text {
+  font-family: Inter;
+  font-size: 138px;
+  line-height: 144px;
+  color: #ffffff;
+}
+
+.free-text__line {
+  display: inline-block;
+  vertical-align: top;
+  width: 1544px;
+}
+
+.free-text__icon-container {
+  display: inline-block;
+  vertical-align: top;
+  width: 312px;
+  text-align: center;
+}
+
+.free-text__icon-image {
+  height: 168px;
+}
+
+.free-text__string {
+  &--bold {
+    font-weight: 700;
+  }
+}
+
+.free-text__route-pill {
+  display: inline-block;
+  height: 144px;
+  width: 248px;
+  border-radius: 72px;
+  font-family: neue-haas-grotesk-text;
+  font-size: 96px;
+  line-height: 144px;
+  font-weight: 700;
+  text-align: center;
+
+  &--green {
+    background: #00843d;
+  }
+
+  &--blue {
+    background: #003da5;
+  }
+
+  &--red {
+    background: #da291c;
+  }
+
+  &--orange {
+    background: #ed8b00;
+  }
+
+  &--silver {
+    background: #7c878e;
+  }
+
+  &--purple {
+    background: #80276c;
+  }
+}
+
+.free-text__text-pill {
+  display: inline-block;
+  border-radius: 84px;
+  font-size: 126px;
+  line-height: 168px;
+  font-family: neue-haas-grotesk-text;
+  font-weight: 700;
+  padding-left: 84px;
+  padding-right: 84px;
+
+  &--green {
+    background: #00843d;
+  }
+
+  &--blue {
+    background: #003da5;
+  }
+
+  &--red {
+    background: #da291c;
+  }
+
+  &--orange {
+    background: #ed8b00;
+  }
+
+  &--silver {
+    background: #7c878e;
+  }
+
+  &--purple {
+    background: #80276c;
+  }
+}
