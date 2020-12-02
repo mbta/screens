@@ -30,7 +30,7 @@ defmodule Screens.Alerts.Parser do
           effect: parse_effect(effect),
           severity: severity,
           header: header,
-          informed_entities: informed_entities,
+          informed_entities: parse_informed_entities(informed_entities),
           active_period: parse_active_periods(active_period),
           lifecycle: lifecycle,
           timeframe: timeframe,
@@ -41,6 +41,18 @@ defmodule Screens.Alerts.Parser do
       _ ->
         nil
     end
+  end
+
+  defp parse_informed_entities(ies) do
+    Enum.map(ies, &parse_informed_entity/1)
+  end
+
+  defp parse_informed_entity(ie) do
+    %{
+      stop: get_in(ie, ["stop"]),
+      route: get_in(ie, ["route"]),
+      route_type: get_in(ie, ["route_type"])
+    }
   end
 
   defp parse_active_periods(periods) do

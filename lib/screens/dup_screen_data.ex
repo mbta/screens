@@ -1,8 +1,13 @@
 defmodule Screens.DupScreenData do
   @moduledoc false
 
+  alias Screens.Alerts.Alert
   alias Screens.Config.{Dup, State}
   alias Screens.Departures.Departure
+
+  # Filters for the types of alerts we care about
+  @alert_route_types ~w[light_rail subway]a
+  @alert_effects MapSet.new(~w[delay shuttle suspension station_closure]a)
 
   def by_screen_id("dup-bus-headsigns", _is_screen) do
     current_time = DateTime.utc_now()
@@ -140,6 +145,13 @@ defmodule Screens.DupScreenData do
     current_time = DateTime.utc_now()
     response_type = fetch_response_type()
 
+    {:ok, stops_to_lines} = map_stops_to_lines(primary_departures)
+    line_count = count_lines(stops_to_lines)
+
+    {:ok, alerts} = fetch_alerts(primary_departures)
+    alerted_lines = get_alerted_lines(alerts, stops_to_lines)
+    alerted_line_count = MapSet.size(alerted_lines)
+
     case response_type do
       :departures -> fetch_departures_response(primary_departures, current_time)
     end
@@ -164,6 +176,29 @@ defmodule Screens.DupScreenData do
   end
 
   defp fetch_response_type, do: :departures
+
+  defp fetch_alerts(%Dup.Departures{sections: sections}) do
+    opts = [
+      stop_ids: Enum.flat_map(sections, & &1.stop_ids),
+      route_ids: Enum.flat_map(sections, & &1.route_ids),
+      route_types: @alert_route_types
+    ]
+
+    opts
+    |> Alert.fetch()
+    |> case do
+      {:ok, alerts} ->
+        filtered = Enum.filter(alerts, fn a ->
+          Alert.happening_now?(a)
+          and a.effect in @alert_effects
+        end)
+
+        {:ok, filtered}
+
+      :error ->
+        :error
+    end
+  end
 
   defp fetch_departures_response(
          %Dup.Departures{header: header, sections: sections},
@@ -223,5 +258,61 @@ defmodule Screens.DupScreenData do
       :error ->
         :error
     end
+  end
+
+  defp map_stops_to_lines(%Dup.Departures{sections: sections}) do
+    stop_ids = Enum.flat_map(sections, & &1.stop_ids)
+
+    results =
+      sections
+      |> Enum.flat_map(& &1.stop_ids)
+      # TODO run these requests concurrently
+      |> Enum.map(&map_stop_to_line/1)
+
+    if Enum.any?(results, & &1 == :error) do
+      :error
+    else
+      {:ok, Map.new(results)}
+    end
+  end
+
+  defp map_stop_to_line(stop_id) do
+    # In order to get stop id in the "relationships" data, we must make one request per stop id.
+    result = Screens.Routes.Route.fetch(stop_ids: [stop_id], route_types: @alert_route_types, include: ~w[stop line])
+
+    case result do
+      {:ok, routes} ->
+        routes
+        |> Enum.reject(&(is_nil(&1.stop_id) or is_nil(&1.line_id)))
+        |> Enum.map(& &1.line_id)
+        |> Enum.uniq()
+        |> case do
+          [line_id] -> {stop_id, line_id}
+          _ -> :error
+        end
+
+      :error ->
+        :error
+    end
+  end
+
+  defp count_lines(stop_to_line_mapping) do
+    stop_to_line_mapping
+      |> Map.values()
+      |> MapSet.new()
+      |> MapSet.size()
+  end
+
+  defp get_alerted_lines(alerts, stops_to_lines) do
+    alerts
+    |> Enum.map(&alert_to_lines(&1, stops_to_lines))
+    |> Enum.reduce(&MapSet.union/2)
+  end
+
+  defp alert_to_lines(alert, stops_to_lines) do
+    alert.informed_entities
+    |> Enum.map(&Map.get(stops_to_lines, &1.stop))
+    |> Enum.reject(&is_nil/1)
+    |> MapSet.new()
   end
 end
