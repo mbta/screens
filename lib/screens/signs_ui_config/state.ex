@@ -37,6 +37,8 @@ defmodule Screens.SignsUiConfig.State do
     all_signs_in_modes?(pid, sign_ids, [:off, :static_text])
   end
 
+  defp all_signs_in_modes?(_pid, [], _modes), do: false
+
   defp all_signs_in_modes?(pid, sign_ids, modes) do
     GenServer.call(pid, {:all_signs_in_modes, sign_ids, modes})
   end
