@@ -1,6 +1,7 @@
 @import url("https://rsms.me/inter/inter.css");
 
 @import "fonts_inter";
+@import "colors";
 
 @import "screen_page";
 
@@ -13,6 +14,7 @@
 @import "dup/departure_time";
 @import "dup/header";
 @import "dup/section";
+@import "dup/free_text";
 
 body {
   margin: 0px;
