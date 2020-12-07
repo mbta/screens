@@ -239,9 +239,9 @@ defmodule Screens.DupScreenData do
     alert_region = Screens.AdjacentStops.alert_region(informed_stop_ids, adjacent_stops1, adjacent_stops2)
 
     {region, headsign} = case alert_region do
-      :disruption_toward_1 -> {:inside, headsign1}
-      :disruption_toward_2 -> {:inside, headsign2}
-      :middle -> {:boundary, nil}
+      :disruption_toward_1 -> {:boundary, headsign1}
+      :disruption_toward_2 -> {:boundary, headsign2}
+      :middle -> {:inside, nil}
     end
 
     %{
