@@ -1,26 +1,20 @@
 import React from "react";
 
-import { standardTimeRepresentation } from "Util/time_representation";
-
-import BaseDepartureTime from "Components/eink/base_departure_time";
 import { DepartureRoutePill } from "Components/solari/route_pill";
 import Destination from "Components/dup/destination";
+import Time from "Components/dup/time";
 
 const Departure = ({
   route,
   routeId,
   destination,
   time,
+  scheduledTime,
   currentTimeString,
   vehicleStatus,
   stopType,
 }): JSX.Element => {
-  const timeRepresentation = standardTimeRepresentation(
-    time,
-    currentTimeString,
-    vehicleStatus,
-    stopType
-  );
+  const noMinutes = routeId.startsWith("CR-") || routeId.startsWith("Boat-");
 
   return (
     <div className="departure-container">
@@ -28,9 +22,14 @@ const Departure = ({
       <div className="departure-destination">
         {destination && <Destination destination={destination} />}
       </div>
-      <div className="departure-time">
-        <BaseDepartureTime time={timeRepresentation} hideAmPm={true} />
-      </div>
+      <Time
+        time={time}
+        scheduledTime={scheduledTime}
+        currentTimeString={currentTimeString}
+        vehicleStatus={vehicleStatus}
+        stopType={stopType}
+        noMinutes={noMinutes}
+      />
       <div className="departure-hairline" />
     </div>
   );

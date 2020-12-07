@@ -18,6 +18,7 @@ defmodule Screens.Departures.Departure do
             alerts: [],
             stop_type: nil,
             time: nil,
+            scheduled_time: nil,
             crowding_level: nil,
             inline_badges: nil
 
@@ -118,20 +119,71 @@ defmodule Screens.Departures.Departure do
     prediction
   end
 
-  defp merge_predictions_and_schedules({:ok, predictions}, {:ok, schedules}) do
-    predictions = copy_stop_headsigns(predictions, schedules)
+  # Attaches scheduled times to predicted departures.
+  # For each departure, look up the corresponding prediction's trip,
+  # then find the schedule for that trip.
+  defp with_scheduled_times(predicted_departures, predictions, schedules) do
+    predictions_by_id = Enum.into(predictions, %{}, fn %{id: id} = p -> {id, p} end)
+
+    schedules_by_trip_id =
+      schedules
+      |> Enum.reject(fn
+        %{trip: nil} -> true
+        %{trip: %{id: nil}} -> true
+        _ -> false
+      end)
+      |> Enum.into(%{}, fn %{trip: %{id: trip_id}} = s -> {trip_id, s} end)
+
+    Enum.map(
+      predicted_departures,
+      &with_scheduled_time(&1, predictions_by_id, schedules_by_trip_id)
+    )
+  end
+
+  defp with_scheduled_time(departure, predictions_by_id, schedules_by_trip_id) do
+    %{id: id} = departure
+
+    case Map.get(predictions_by_id, id) do
+      %{trip: nil} ->
+        departure
+
+      %{trip: %{id: nil}} ->
+        departure
+
+      %{trip: %{id: trip_id}} ->
+        case Map.get(schedules_by_trip_id, trip_id) do
+          nil ->
+            departure
+
+          %{arrival_time: arrival_time, departure_time: departure_time} ->
+            time = select_prediction_time(arrival_time, departure_time)
+            %{departure | scheduled_time: DateTime.to_iso8601(time)}
+        end
+    end
+  end
+
+  defp merge_predictions_and_schedules({:ok, all_predictions}, {:ok, all_schedules}) do
+    filtered_predictions = filter_predictions_or_schedules(all_predictions)
+    filtered_schedules = filter_predictions_or_schedules(all_schedules)
+
+    filtered_predictions = copy_stop_headsigns(filtered_predictions, filtered_schedules)
 
     predicted_trip_ids =
-      predictions
+      filtered_predictions
       |> Enum.reject(&is_nil(&1.trip))
       |> Enum.map(& &1.trip.id)
       |> Enum.into(MapSet.new())
 
     unpredicted_schedules =
-      Enum.reject(schedules, fn %{trip: %{id: trip_id}} -> trip_id in predicted_trip_ids end)
+      Enum.reject(filtered_schedules, fn %{trip: %{id: trip_id}} ->
+        trip_id in predicted_trip_ids
+      end)
 
-    {:ok, predicted_departures} = from_predictions_or_schedules({:ok, predictions})
+    {:ok, predicted_departures} = from_predictions_or_schedules({:ok, filtered_predictions})
     {:ok, scheduled_departures} = from_predictions_or_schedules({:ok, unpredicted_schedules})
+
+    predicted_departures =
+      with_scheduled_times(predicted_departures, filtered_predictions, all_schedules)
 
     merged =
       (predicted_departures ++ scheduled_departures)
@@ -268,21 +320,14 @@ defmodule Screens.Departures.Departure do
   defp fetch_predictions_and_schedules(%{} = query_params) do
     predictions = Prediction.fetch(query_params)
     schedules = Schedule.fetch(query_params)
-    filtered_predictions = filter_predictions_or_schedules(predictions)
-    filtered_schedules = filter_predictions_or_schedules(schedules)
-    merge_predictions_and_schedules(filtered_predictions, filtered_schedules)
+    merge_predictions_and_schedules(predictions, schedules)
   end
 
-  defp filter_predictions_or_schedules({:ok, predictions_or_schedules}) do
-    filtered =
-      predictions_or_schedules
-      |> Enum.reject(&departure_in_past/1)
-      |> deduplicate_slashed_routes()
-
-    {:ok, filtered}
+  defp filter_predictions_or_schedules(predictions_or_schedules) do
+    predictions_or_schedules
+    |> Enum.reject(&departure_in_past/1)
+    |> deduplicate_slashed_routes()
   end
-
-  defp filter_predictions_or_schedules(:error), do: :error
 
   def do_query_and_parse(%{} = query_params, api_endpoint, parser, extra_params \\ %{}) do
     default_params = %{sort: "departure_time", include: ~w[route stop trip]}

@@ -8,6 +8,11 @@
   width: 400px;
   margin-right: 32px;
   font-size: 138px;
+
+  &--disabled {
+    color: #6e6e6e;
+    text-decoration: line-through;
+  }
 }
 
 .base-departure-time__minutes {

@@ -86,8 +86,12 @@ const Destination = ({ destination }) => {
 
   useLayoutEffect(() => {
     if (firstLineRef.current && secondLineRef.current) {
-      const firstLines = firstLineRef.current.clientHeight / LINE_HEIGHT;
-      const secondLines = secondLineRef.current.clientHeight / LINE_HEIGHT;
+      const firstLines = Math.round(
+        firstLineRef.current.clientHeight / LINE_HEIGHT
+      );
+      const secondLines = Math.round(
+        secondLineRef.current.clientHeight / LINE_HEIGHT
+      );
 
       switch (phase) {
         case PHASES.ONE_LINE_FULL:
