@@ -39,7 +39,10 @@ const Icon = ({ icon }) => {
 
 const FormatString = ({ format, text }) => {
   const modifiers = format === null ? [] : [format];
-  const className = classWithModifiers("free-text__string", modifiers);
+  const className = `free-text__element ${classWithModifiers(
+    "free-text__string",
+    modifiers
+  )}`;
 
   return <span className={className}>{text}</span>;
 };
@@ -54,7 +57,7 @@ const RoutePill = ({ route }) => {
   }[route];
 
   return (
-    <span className={"free-text__route-container"}>
+    <span className="free-text__element free-text__route-container">
       <div className={classWithModifier("free-text__route-pill", route)}>
         {routeName}
       </div>
@@ -64,7 +67,7 @@ const RoutePill = ({ route }) => {
 
 const TextPill = ({ color, text }) => {
   return (
-    <span className="free-text__pill-container">
+    <span className="free-text__element free-text__pill-container">
       <div className={classWithModifier("free-text__text-pill", color)}>
         {text}
       </div>
@@ -93,7 +96,7 @@ const FreeTextLine = ({ icon, text }) => {
       <div className="free-text__line">
         {text.map((elt) => (
           <React.Fragment key={getKey(elt)}>
-            <FreeTextElement elt={elt} />{" "}
+            <FreeTextElement elt={elt} />
           </React.Fragment>
         ))}
       </div>
