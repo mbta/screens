@@ -95,9 +95,7 @@ const FreeTextLine = ({ icon, text }) => {
       <Icon icon={icon} />
       <div className="free-text__line">
         {text.map((elt) => (
-          <React.Fragment key={getKey(elt)}>
-            <FreeTextElement elt={elt} />
-          </React.Fragment>
+          <FreeTextElement elt={elt} key={getKey(elt)} />
         ))}
       </div>
     </div>
