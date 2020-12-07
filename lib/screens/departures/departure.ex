@@ -123,22 +123,16 @@ defmodule Screens.Departures.Departure do
   # For each departure, look up the corresponding prediction's trip,
   # then find the schedule for that trip.
   defp with_scheduled_times(predicted_departures, predictions, schedules) do
-    predictions_by_id =
-      predictions
-      |> Enum.map(fn %{id: id} = p -> {id, p} end)
-      |> Enum.into(%{})
+    predictions_by_id = Enum.into(predictions, %{}, fn %{id: id} = p -> {id, p} end)
 
     schedules_by_trip_id =
       schedules
-      |> Enum.reject(fn s ->
-        case s do
-          %{trip: nil} -> true
-          %{trip: %{id: nil}} -> true
-          _ -> false
-        end
+      |> Enum.reject(fn
+        %{trip: nil} -> true
+        %{trip: %{id: nil}} -> true
+        _ -> false
       end)
-      |> Enum.map(fn %{trip: %{id: trip_id}} = s -> {trip_id, s} end)
-      |> Enum.into(%{})
+      |> Enum.into(%{}, fn %{trip: %{id: trip_id}} = s -> {trip_id, s} end)
 
     Enum.map(
       predicted_departures,

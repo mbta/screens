@@ -34,8 +34,8 @@ export const standardTimeRepresentation = (
   currentTimeString: string,
   vehicleStatus: string,
   stopType: string,
-  noMinutes: string,
-  forceTimestamp: string
+  noMinutes: boolean,
+  forceTimestamp: boolean
 ): TimeRepresentation => {
   const departureTime = moment(departureTimeString);
   const currentTime = moment(currentTimeString);
