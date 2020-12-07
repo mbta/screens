@@ -18,6 +18,7 @@ defmodule Screens.Alerts.Parser do
         "active_period" => active_period,
         "created_at" => created_at,
         "updated_at" => updated_at,
+        "cause" => cause,
         "effect" => effect,
         "header" => header,
         "informed_entity" => informed_entities,
@@ -27,6 +28,7 @@ defmodule Screens.Alerts.Parser do
       } ->
         %Screens.Alerts.Alert{
           id: id,
+          cause: parse_cause(cause),
           effect: parse_effect(effect),
           severity: severity,
           header: header,
@@ -111,4 +113,53 @@ defmodule Screens.Alerts.Parser do
   defp parse_effect("STOP_SHOVELING"), do: :stop_shoveling
   defp parse_effect("SUMMARY"), do: :summary
   defp parse_effect(_), do: :unknown
+
+  @causes %{
+    "ACCIDENT" => :accident,
+    "AMTRAK" => :amtrak,
+    "AN_EARLIER_MECHANICAL_PROBLEM" => :an_earlier_mechanical_problem,
+    "AN_EARLIER_SIGNAL_PROBLEM" => :an_earlier_signal_problem,
+    "AUTOS_IMPEDING_SERVICE" => :autos_impeding_service,
+    "COAST_GUARD_RESTRICTION" => :coast_guard_restriction,
+    "CONGESTION" => :congestion,
+    "CONSTRUCTION" => :construction,
+    "CROSSING_MALFUNCTION" => :crossing_malfunction,
+    "DEMONSTRATION" => :demonstration,
+    "DISABLED_BUS" => :disabled_bus,
+    "DISABLED_TRAIN" => :disabled_train,
+    "DRAWBRIDGE_BEING_RAISED" => :drawbridge_being_raised,
+    "ELECTRICAL_WORK" => :electrical_work,
+    "FIRE" => :fire,
+    "FOG" => :fog,
+    "FREIGHT_TRAIN_INTERFERENCE" => :freight_train_interference,
+    "HAZMAT_CONDITION" => :hazmat_condition,
+    "HEAVY_RIDERSHIP" => :heavy_ridership,
+    "HIGH_WINDS" => :high_winds,
+    "HOLIDAY" => :holiday,
+    "HURRICANE" => :hurricane,
+    "ICE_IN_HARBOR" => :ice_in_harbor,
+    "MAINTENANCE" => :maintenance,
+    "MECHANICAL_PROBLEM" => :mechanical_problem,
+    "MEDICAL_EMERGENCY" => :medical_emergency,
+    "PARADE" => :parade,
+    "POLICE_ACTION" => :police_action,
+    "POWER_PROBLEM" => :power_problem,
+    "SEVERE_WEATHER" => :severe_weather,
+    "SIGNAL_PROBLEM" => :signal_problem,
+    "SLIPPERY_RAIL" => :slippery_rail,
+    "SNOW" => :snow,
+    "SPECIAL_EVENT" => :special_event,
+    "SPEED_RESTRICTION" => :speed_restriction,
+    "SWITCH_PROBLEM" => :switch_problem,
+    "TIE_REPLACEMENT" => :tie_replacement,
+    "TRACK_PROBLEM" => :track_problem,
+    "TRACK_WORK" => :track_work,
+    "TRAFFIC" => :traffic,
+    "UNRULY_PASSENGER" => :unruly_passenger,
+    "WEATHER" => :weather
+  }
+
+  defp parse_cause(cause) do
+    Map.get(@causes, cause, :unknown)
+  end
 end

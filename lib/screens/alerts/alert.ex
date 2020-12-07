@@ -2,6 +2,7 @@ defmodule Screens.Alerts.Alert do
   @moduledoc false
 
   defstruct id: nil,
+            cause: nil,
             effect: nil,
             severity: nil,
             header: nil,
@@ -11,6 +12,51 @@ defmodule Screens.Alerts.Alert do
             timeframe: nil,
             created_at: nil,
             updated_at: nil
+
+  @type cause ::
+          :accident
+          | :amtrak
+          | :an_earlier_mechanical_problem
+          | :an_earlier_signal_problem
+          | :autos_impeding_service
+          | :coast_guard_restriction
+          | :congestion
+          | :construction
+          | :crossing_malfunction
+          | :demonstration
+          | :disabled_bus
+          | :disabled_train
+          | :drawbridge_being_raised
+          | :electrical_work
+          | :fire
+          | :fog
+          | :freight_train_interference
+          | :hazmat_condition
+          | :heavy_ridership
+          | :high_winds
+          | :holiday
+          | :hurricane
+          | :ice_in_harbor
+          | :maintenance
+          | :mechanical_problem
+          | :medical_emergency
+          | :parade
+          | :police_action
+          | :power_problem
+          | :severe_weather
+          | :signal_problem
+          | :slippery_rail
+          | :snow
+          | :special_event
+          | :speed_restriction
+          | :switch_problem
+          | :tie_replacement
+          | :track_problem
+          | :track_work
+          | :traffic
+          | :unruly_passenger
+          | :weather
+          | :unknown
 
   @type effect ::
           :access_issue
@@ -51,6 +97,7 @@ defmodule Screens.Alerts.Alert do
 
   @type t :: %__MODULE__{
           id: String.t(),
+          cause: cause,
           effect: effect,
           severity: integer,
           header: String.t(),
@@ -130,10 +177,9 @@ defmodule Screens.Alerts.Alert do
       |> Enum.flat_map(&format_query_param/1)
       |> Enum.into(%{})
 
-    case Screens.V3Api.get_json("alerts", params) do
-      {:ok, result} -> {:ok, Screens.Alerts.Parser.parse_result(result)}
-      _ -> :error
-    end
+    "alerts"
+    |> Screens.V3Api.get_json(params)
+    |> Screens.Alerts.Parser.parse_result()
   end
 
   defp format_query_param({:stop_ids, stop_ids}) do

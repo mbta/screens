@@ -139,32 +139,24 @@ defmodule Screens.DupScreenData do
 
   def by_screen_id(screen_id, rotation_index)
 
-  def by_screen_id(screen_id, "0") do
+  def by_screen_id(screen_id, rotation_index) when rotation_index in ~w[0 1] do
     %Dup{primary: primary_departures} = State.app_params(screen_id)
 
-    current_time = DateTime.utc_now()
-    response_type = fetch_response_type()
+    alerts = fetch_and_interpret_alerts(primary_departures)
 
-    {:ok, stops_to_lines} = map_stops_to_lines(primary_departures)
-    line_count = count_lines(stops_to_lines)
-
-    {:ok, alerts} = fetch_alerts(primary_departures)
-    alerted_lines = get_alerted_lines(alerts, stops_to_lines)
-    alerted_line_count = MapSet.size(alerted_lines)
-
-    case response_type do
-      :departures -> fetch_departures_response(primary_departures, current_time)
-    end
-  end
-
-  def by_screen_id(screen_id, "1") do
-    %Dup{primary: primary_departures} = State.app_params(screen_id)
+    line_count = station_line_count(primary_departures)
 
     current_time = DateTime.utc_now()
-    response_type = fetch_response_type()
 
-    case response_type do
-      :departures -> fetch_departures_response(primary_departures, current_time)
+    case response_type(alerts, line_count, rotation_index) do
+      :departures ->
+        fetch_departures_response(primary_departures, current_time)
+
+      :partial_alert ->
+        fetch_partial_alert_response(primary_departures, alerts, current_time)
+
+      :fullscreen_alert ->
+        fetch_fullscreen_alert_response(primary_departures, alerts, line_count)
     end
   end
 
@@ -175,29 +167,97 @@ defmodule Screens.DupScreenData do
     fetch_departures_response(secondary_departures, current_time)
   end
 
-  defp fetch_response_type, do: :departures
+  defp response_type([], _, _), do: :departures
 
-  defp fetch_alerts(%Dup.Departures{sections: sections}) do
+  defp response_type(alerts, line_count, rotation_index) do
+    if Enum.any?(alerts, & &1.effect == :station_closure) do
+      :fullscreen_alert
+    else
+      flowchart(line_count, alerts, rotation_index)
+    end
+  end
+
+  defp flowchart(1, [alert], rotation_index) do
+    case {alert.region, rotation_index} do
+      {:inside, _} -> :fullscreen_alert
+      {:boundary, "0"} -> :partial_alert
+      {:boundary, "1"} -> :fullscreen_alert
+    end
+  end
+
+  defp flowchart(2, [_alert], rotation_index) do
+    case rotation_index do
+      "0" -> :partial_alert
+      "1" -> :fullscreen_alert
+    end
+  end
+
+  defp flowchart(2, [_alert1, _alert2], _rotation_index) do
+    :fullscreen_alert
+  end
+
+  defp fetch_and_interpret_alerts(%Dup.Departures{sections: sections}) do
+    sections
+    |> Enum.map(&fetch_and_interpret_alert/1)
+    |> Enum.reject(&is_nil/1)
+  end
+
+  defp fetch_and_interpret_alert(%Dup.Section{stop_ids: stop_ids, route_ids: route_ids, pill: pill}) do
+    case fetch_alert(stop_ids, route_ids) do
+      nil -> nil
+      alert -> interpret_alert(alert, stop_ids, pill)
+    end
+  end
+
+  defp fetch_alert(stop_ids, route_ids) do
     opts = [
-      stop_ids: Enum.flat_map(sections, & &1.stop_ids),
-      route_ids: Enum.flat_map(sections, & &1.route_ids),
+      stop_ids: stop_ids,
+      route_ids: route_ids,
       route_types: @alert_route_types
     ]
 
     opts
     |> Alert.fetch()
-    |> case do
-      {:ok, alerts} ->
-        filtered = Enum.filter(alerts, fn a ->
-          Alert.happening_now?(a)
-          and a.effect in @alert_effects
-        end)
+    |> Enum.filter(fn a ->
+      Alert.happening_now?(a) and a.effect in @alert_effects
+    end)
+    |> choose_alert()
+  end
 
-        {:ok, filtered}
+  defp interpret_alert(alert, stop_ids, pill) do
+    [
+      %{adjacent_stops: adjacent_stops1, headsign: headsign1},
+      %{adjacent_stops: adjacent_stops2, headsign: headsign2}
+    ] = Enum.map(stop_ids, fn id ->
+      :screens
+      |> Application.get_env(:dup_constants)
+      |> Map.get(id)
+    end)
 
-      :error ->
-        :error
+    informed_stop_ids = Enum.map(alert.informed_entities, & &1.stop)
+
+    alert_region = Screens.AdjacentStops.alert_region(informed_stop_ids, adjacent_stops1, adjacent_stops2)
+
+    {region, headsign} = case alert_region do
+      :disruption_toward_1 -> {:inside, headsign1}
+      :disruption_toward_2 -> {:inside, headsign2}
+      :middle -> {:boundary, nil}
     end
+
+    %{
+      cause: alert.cause,
+      effect: alert.effect,
+      region: region,
+      headsign: headsign,
+      pill: pill
+    }
+  end
+
+  defp choose_alert([]), do: nil
+
+  defp choose_alert([first_alert | _] = alerts) do
+    # Prioritize shuttle alerts when one exists; otherwise just choose the first in the list.
+    Enum.find(alerts, first_alert, &(&1.effect == :shuttle))
   end
 
   defp fetch_departures_response(
@@ -213,12 +273,207 @@ defmodule Screens.DupScreenData do
           success: true,
           header: header,
           sections: data,
-          current_time: Screens.Util.format_time(current_time)
+          current_time: Screens.Util.format_time(current_time),
+          type: :departures
         }
 
       :error ->
         %{force_reload: false, success: false}
     end
+  end
+
+  defp fetch_partial_alert_response(primary_departures, alerts, current_time) do
+    departures_response = fetch_departures_response(primary_departures, current_time)
+
+    case departures_response do
+      %{force_reload: false, success: true, sections: sections} ->
+        %{departures_response |
+          sections: limit_three_departures(sections),
+          alerts: render_partial_alerts(alerts)
+        }
+
+      _ ->
+        departures_response
+    end
+  end
+
+  defp fetch_fullscreen_alert_response(%Dup.Departures{header: header}, [alert], line_count) do
+    %{
+      type: :full_screen_alert,
+      force_reload: false,
+      success: true,
+      header: header,
+      pattern: pattern(alert.region, alert.effect, line_count),
+      color: color(alert.pill, alert.effect, line_count, 1),
+      free_text_lines: render_fullscreen_freetext(alert)
+    }
+  end
+
+  defp fetch_fullscreen_alert_response(%Dup.Departures{header: header}, [alert, _alert], _) do
+    %{
+      type: :full_screen_alert,
+      force_reload: false,
+      success: true,
+      header: header,
+      pattern: :x,
+      color: :yellow,
+      free_text_lines: render_fullscreen_freetext(alert)
+    }
+  end
+
+  defp render_fullscreen_freetext(alert) do
+    {icon1, line1} = render_alert_effect(alert)
+
+    icon2 = render_alert_remedy_icon(alert.effect)
+    line2 = [%{format: :bold, text: render_alert_remedy(alert.effect)}]
+
+    [%{icon: icon1, text: line1}, %{icon: icon2, text: line2}]
+  end
+
+  defp pattern(_, :delay, _), do: :hatched
+  defp pattern(_, :shuttle, 1), do: :x
+  defp pattern(_, :shuttle, 2), do: :chevron
+  defp pattern(:inside, :suspension, 1), do: :x
+  defp pattern(_, :suspension, _), do: :chevron
+  defp pattern(_, :station_closure, _), do: :x
+
+  defp color(_, _, 2, 2), do: :yellow
+  defp color(pill, :station_closure, 1, _), do: line_color(pill)
+  defp color(_, :station_closure, 2, _), do: :yellow
+  defp color(pill, _, _, _), do: line_color(pill)
+
+  defp line_color(:mattapan), do: :red
+  defp line_color(pill), do: pill
+
+  @alert_cause_mapping %{
+    an_earlier_mechanical_problem: "due to an earlier mechanical problem",
+    an_earlier_signal_problem: "due to an earlier signal problem",
+    construction: "for construction",
+    crossing_malfunction: "due to a crossing malfunction",
+    demonstration: "due to a nearby demonstration",
+    disabled_train: "due to a disabled train",
+    electrical_work: "for electrical work",
+    fire: "due to a fire",
+    hazmat_condition: "due to hazardous conditions",
+    heavy_ridership: "due to heavy ridership",
+    high_winds: "due to high winds",
+    holiday: "for the holiday",
+    hurricane: "due to severe weather",
+    maintenance: "for maintenance",
+    mechanical_problem: "due to a mechanical problem",
+    medical_emergency: "due to a medical emergency",
+    parade: "for a parade",
+    police_action: "due to police action",
+    power_problem: "due to a power issue",
+    severe_weather: "due to severe weather",
+    signal_problem: "due to a signal problem",
+    slippery_rail: "due to slippery rails",
+    snow: "due to snow conditions",
+    special_event: "for a special event",
+    speed_restriction: "due to a speed restriction",
+    switch_problem: "due to a switch problem",
+    tie_replacement: "for maintenance",
+    track_problem: "due to a track problem",
+    track_work: "for track work",
+    unruly_passenger: "due to an unruly passenger",
+    weather: "due to weather conditions"
+  }
+
+  defp render_alert_cause(cause) do
+    Map.get(@alert_cause_mapping, cause, "")
+  end
+
+  @pill_to_specifier %{
+    red: "Red Line",
+    orange: "Orange Line",
+    green: "Green Line",
+    blue: "Blue Line",
+    mattapan: "Mattapan Line"
+  }
+
+  defp render_alert_effect(%{effect: :delay, cause: cause}) do
+    {:warning, [%{format: :bold, text: "SERVICE DISRUPTION"}, render_alert_cause(cause)]}
+  end
+
+  defp render_alert_effect(%{region: :inside, cause: cause}) do
+    {:x, [%{format: :bold, text: "STATION_CLOSED"}, render_alert_cause(cause)]}
+  end
+
+  defp render_alert_effect(%{region: :boundary, pill: pill, headsign: headsign}) do
+    {:warning, [%{format: :bold, text: "No #{@pill_to_specifier[pill]}"}, "service to #{headsign}"]}
+  end
+
+  @alert_remedy_text_mapping %{
+    delay: "Expect delays",
+    shuttle: "Use shuttle bus",
+    suspension: "Seek alternate route",
+    station_closure: "Seek alternate route"
+  }
+
+  defp render_alert_remedy(effect) do
+    @alert_remedy_text_mapping[effect]
+  end
+
+  @alert_remedy_icon_mapping %{
+    delay: nil,
+    shuttle: :shuttle,
+    suspension: nil,
+    station_closure: nil
+  }
+
+  defp render_alert_remedy_icon(effect) do
+    @alert_remedy_icon_mapping[effect]
+  end
+
+  defp limit_three_departures(sections) do
+    if length(Enum.flat_map(sections, & &1.departures)) == 4 do
+      remove_one_departure(sections)
+    else
+      sections
+    end
+  end
+
+  defp remove_one_departure([section]) do
+    [
+      %{section |
+        departures: Enum.take(section.departures, length(section.departures) - 1)
+      }
+    ]
+  end
+
+  defp remove_one_departure([section1, section2]) do
+    [
+      section1,
+      %{section2 |
+        departures: Enum.take(section2.departures, length(section2.departures) - 1)
+      }
+    ]
+  end
+
+  defp render_partial_alerts([alert]) do
+    [
+      %{
+        affected: alert.pill,
+        content: render_partial_alert_content(alert)
+      }
+    ]
+  end
+
+  defp render_partial_alert_content(alert) do
+    {specifier, service_or_trains} = partial_alert_specifier(alert)
+
+    %{
+      icon: :warning,
+      text: [%{format: :bold, text: "No #{specifier}"}, service_or_trains]
+    }
+  end
+
+  defp partial_alert_specifier(%{headsign: nil, pill: pill}) do
+    {@pill_to_specifier[pill], "service"}
+  end
+
+  defp partial_alert_specifier(%{headsign: headsign}) do
+    {headsign, "trains"}
   end
 
   defp fetch_sections_data([_, _] = sections) do
@@ -260,59 +515,8 @@ defmodule Screens.DupScreenData do
     end
   end
 
-  defp map_stops_to_lines(%Dup.Departures{sections: sections}) do
-    stop_ids = Enum.flat_map(sections, & &1.stop_ids)
-
-    results =
-      sections
-      |> Enum.flat_map(& &1.stop_ids)
-      # TODO run these requests concurrently
-      |> Enum.map(&map_stop_to_line/1)
-
-    if Enum.any?(results, & &1 == :error) do
-      :error
-    else
-      {:ok, Map.new(results)}
-    end
-  end
-
-  defp map_stop_to_line(stop_id) do
-    # In order to get stop id in the "relationships" data, we must make one request per stop id.
-    result = Screens.Routes.Route.fetch(stop_ids: [stop_id], route_types: @alert_route_types, include: ~w[stop line])
-
-    case result do
-      {:ok, routes} ->
-        routes
-        |> Enum.reject(&(is_nil(&1.stop_id) or is_nil(&1.line_id)))
-        |> Enum.map(& &1.line_id)
-        |> Enum.uniq()
-        |> case do
-          [line_id] -> {stop_id, line_id}
-          _ -> :error
-        end
-
-      :error ->
-        :error
-    end
-  end
-
-  defp count_lines(stop_to_line_mapping) do
-    stop_to_line_mapping
-      |> Map.values()
-      |> MapSet.new()
-      |> MapSet.size()
-  end
-
-  defp get_alerted_lines(alerts, stops_to_lines) do
-    alerts
-    |> Enum.map(&alert_to_lines(&1, stops_to_lines))
-    |> Enum.reduce(&MapSet.union/2)
-  end
-
-  defp alert_to_lines(alert, stops_to_lines) do
-    alert.informed_entities
-    |> Enum.map(&Map.get(stops_to_lines, &1.stop))
-    |> Enum.reject(&is_nil/1)
-    |> MapSet.new()
+  defp station_line_count(%Dup.Departures{sections: [section | _]}) do
+    stop_id = hd(section.stop_ids)
+    if stop_id in Application.get_env(:screens, :two_line_stops), do: 2, else: 1
   end
 end

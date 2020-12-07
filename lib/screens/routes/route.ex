@@ -4,6 +4,7 @@ defmodule Screens.Routes.Route do
   defstruct id: nil,
             short_name: nil,
             direction_destinations: nil,
+            stop_id: nil,
             line_id: nil
 
   @type id :: String.t()
