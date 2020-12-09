@@ -170,7 +170,7 @@ defmodule Screens.DupScreenData do
   defp response_type([], _, _), do: :departures
 
   defp response_type(alerts, line_count, rotation_index) do
-    if Enum.any?(alerts, & &1.effect == :station_closure) do
+    if Enum.any?(alerts, &(&1.effect == :station_closure)) do
       :fullscreen_alert
     else
       response_type_helper(alerts, line_count, rotation_index)
@@ -200,7 +200,11 @@ defmodule Screens.DupScreenData do
     Enum.flat_map(sections, &fetch_and_interpret_alert/1)
   end
 
-  defp fetch_and_interpret_alert(%Dup.Section{stop_ids: stop_ids, route_ids: route_ids, pill: pill}) do
+  defp fetch_and_interpret_alert(%Dup.Section{
+         stop_ids: stop_ids,
+         route_ids: route_ids,
+         pill: pill
+       }) do
     case fetch_alert(stop_ids, route_ids) do
       nil -> []
       alert -> [interpret_alert(alert, stop_ids, pill)]
@@ -226,21 +230,24 @@ defmodule Screens.DupScreenData do
     [
       %{adjacent_stops: adjacent_stops1, headsign: headsign1},
       %{adjacent_stops: adjacent_stops2, headsign: headsign2}
-    ] = Enum.map(stop_ids, fn id ->
-      :screens
-      |> Application.get_env(:dup_constants)
-      |> Map.get(id)
-    end)
+    ] =
+      Enum.map(stop_ids, fn id ->
+        :screens
+        |> Application.get_env(:dup_constants)
+        |> Map.get(id)
+      end)
 
     informed_stop_ids = Enum.map(alert.informed_entities, & &1.stop)
 
-    alert_region = Screens.AdjacentStops.alert_region(informed_stop_ids, adjacent_stops1, adjacent_stops2)
+    alert_region =
+      Screens.AdjacentStops.alert_region(informed_stop_ids, adjacent_stops1, adjacent_stops2)
 
-    {region, headsign} = case alert_region do
-      :disruption_toward_1 -> {:boundary, headsign1}
-      :disruption_toward_2 -> {:boundary, headsign2}
-      :middle -> {:inside, nil}
-    end
+    {region, headsign} =
+      case alert_region do
+        :disruption_toward_1 -> {:boundary, headsign1}
+        :disruption_toward_2 -> {:boundary, headsign2}
+        :middle -> {:inside, nil}
+      end
 
     %{
       cause: alert.cause,
@@ -285,9 +292,10 @@ defmodule Screens.DupScreenData do
 
     case departures_response do
       %{force_reload: false, success: true, sections: sections} ->
-        %{departures_response |
-          sections: limit_three_departures(sections),
-          alerts: render_partial_alerts(alerts)
+        %{
+          departures_response
+          | sections: limit_three_departures(sections),
+            alerts: render_partial_alerts(alerts)
         }
 
       _ ->
@@ -390,7 +398,10 @@ defmodule Screens.DupScreenData do
   }
 
   defp render_alert_issue(%{effect: :delay, cause: cause}) do
-    %{icon: :warning, free_text: [%{format: :bold, text: "SERVICE DISRUPTION"}, render_alert_cause(cause)]}
+    %{
+      icon: :warning,
+      free_text: [%{format: :bold, text: "SERVICE DISRUPTION"}, render_alert_cause(cause)]
+    }
   end
 
   defp render_alert_issue(%{region: :inside, cause: cause}) do
@@ -398,7 +409,13 @@ defmodule Screens.DupScreenData do
   end
 
   defp render_alert_issue(%{region: :boundary, pill: pill, headsign: headsign}) do
-    %{icon: :warning, free_text: [%{format: :bold, text: "No #{@pill_to_specifier[pill]}"}, "service to #{headsign}"]}
+    %{
+      icon: :warning,
+      free_text: [
+        %{format: :bold, text: "No #{@pill_to_specifier[pill]}"},
+        "service to #{headsign}"
+      ]
+    }
   end
 
   @alert_remedy_text_mapping %{

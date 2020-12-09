@@ -90,10 +90,10 @@ defmodule Screens.Alerts.Alert do
           | :unknown
 
   @type informed_entity :: %{
-    stop: String.t() | nil,
-    route: String.t() | nil,
-    route_type: non_neg_integer() | nil
-  }
+          stop: String.t() | nil,
+          route: String.t() | nil,
+          route_type: non_neg_integer() | nil
+        }
 
   @type t :: %__MODULE__{
           id: String.t(),

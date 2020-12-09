@@ -182,7 +182,10 @@ config :screens,
   # Stop IDs at stations serviced by two subway lines, where we also have DUP screens.
   two_line_stops: [
     # Haymarket
-    "70024", "70025", "70203", "70204"
+    "70024",
+    "70025",
+    "70203",
+    "70204"
   ]
 
 # Import environment specific config. This must remain at the bottom
