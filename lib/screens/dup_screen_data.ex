@@ -173,11 +173,11 @@ defmodule Screens.DupScreenData do
     if Enum.any?(alerts, & &1.effect == :station_closure) do
       :fullscreen_alert
     else
-      flowchart(line_count, alerts, rotation_index)
+      response_type_helper(alerts, line_count, rotation_index)
     end
   end
 
-  defp flowchart(1, [alert], rotation_index) do
+  defp response_type_helper([alert], 1, rotation_index) do
     case {alert.region, rotation_index} do
       {:inside, _} -> :fullscreen_alert
       {:boundary, "0"} -> :partial_alert
@@ -185,27 +185,25 @@ defmodule Screens.DupScreenData do
     end
   end
 
-  defp flowchart(2, [_alert], rotation_index) do
+  defp response_type_helper([_alert], 2, rotation_index) do
     case rotation_index do
       "0" -> :partial_alert
       "1" -> :fullscreen_alert
     end
   end
 
-  defp flowchart(2, [_alert1, _alert2], _rotation_index) do
+  defp response_type_helper([_alert1, _alert2], 2, _rotation_index) do
     :fullscreen_alert
   end
 
   defp fetch_and_interpret_alerts(%Dup.Departures{sections: sections}) do
-    sections
-    |> Enum.map(&fetch_and_interpret_alert/1)
-    |> Enum.reject(&is_nil/1)
+    Enum.flat_map(sections, &fetch_and_interpret_alert/1)
   end
 
   defp fetch_and_interpret_alert(%Dup.Section{stop_ids: stop_ids, route_ids: route_ids, pill: pill}) do
     case fetch_alert(stop_ids, route_ids) do
-      nil -> nil
-      alert -> interpret_alert(alert, stop_ids, pill)
+      nil -> []
+      alert -> [interpret_alert(alert, stop_ids, pill)]
     end
   end
 
@@ -305,7 +303,8 @@ defmodule Screens.DupScreenData do
       header: header,
       pattern: pattern(alert.region, alert.effect, line_count),
       color: color(alert.pill, alert.effect, line_count, 1),
-      free_text_lines: render_fullscreen_freetext(alert)
+      issue: render_alert_issue(alert),
+      remedy: render_alert_remedy(alert)
     }
   end
 
@@ -317,17 +316,16 @@ defmodule Screens.DupScreenData do
       header: header,
       pattern: :x,
       color: :yellow,
-      free_text_lines: render_fullscreen_freetext(alert)
+      issue: render_alert_issue(alert),
+      remedy: render_alert_remedy(alert)
     }
   end
 
-  defp render_fullscreen_freetext(alert) do
-    {icon1, line1} = render_alert_effect(alert)
+  defp render_alert_remedy(alert) do
+    icon = render_alert_remedy_icon(alert.effect)
+    line = [%{format: :bold, text: render_alert_remedy(alert.effect)}]
 
-    icon2 = render_alert_remedy_icon(alert.effect)
-    line2 = [%{format: :bold, text: render_alert_remedy(alert.effect)}]
-
-    [%{icon: icon1, text: line1}, %{icon: icon2, text: line2}]
+    %{icon: icon, free_text: line}
   end
 
   defp pattern(_, :delay, _), do: :hatched
@@ -391,16 +389,16 @@ defmodule Screens.DupScreenData do
     mattapan: "Mattapan Line"
   }
 
-  defp render_alert_effect(%{effect: :delay, cause: cause}) do
-    {:warning, [%{format: :bold, text: "SERVICE DISRUPTION"}, render_alert_cause(cause)]}
+  defp render_alert_issue(%{effect: :delay, cause: cause}) do
+    %{icon: :warning, free_text: [%{format: :bold, text: "SERVICE DISRUPTION"}, render_alert_cause(cause)]}
   end
 
-  defp render_alert_effect(%{region: :inside, cause: cause}) do
-    {:x, [%{format: :bold, text: "STATION_CLOSED"}, render_alert_cause(cause)]}
+  defp render_alert_issue(%{region: :inside, cause: cause}) do
+    %{icon: :x, free_text: [%{format: :bold, text: "STATION CLOSED"}, render_alert_cause(cause)]}
   end
 
-  defp render_alert_effect(%{region: :boundary, pill: pill, headsign: headsign}) do
-    {:warning, [%{format: :bold, text: "No #{@pill_to_specifier[pill]}"}, "service to #{headsign}"]}
+  defp render_alert_issue(%{region: :boundary, pill: pill, headsign: headsign}) do
+    %{icon: :warning, free_text: [%{format: :bold, text: "No #{@pill_to_specifier[pill]}"}, "service to #{headsign}"]}
   end
 
   @alert_remedy_text_mapping %{
@@ -425,30 +423,9 @@ defmodule Screens.DupScreenData do
     @alert_remedy_icon_mapping[effect]
   end
 
-  defp limit_three_departures(sections) do
-    if length(Enum.flat_map(sections, & &1.departures)) == 4 do
-      remove_one_departure(sections)
-    else
-      sections
-    end
-  end
-
-  defp remove_one_departure([section]) do
-    [
-      %{section |
-        departures: Enum.take(section.departures, length(section.departures) - 1)
-      }
-    ]
-  end
-
-  defp remove_one_departure([section1, section2]) do
-    [
-      section1,
-      %{section2 |
-        departures: Enum.take(section2.departures, length(section2.departures) - 1)
-      }
-    ]
-  end
+  defp limit_three_departures([[d1, d2], [d3, _d4]]), do: [[d1, d2], [d3]]
+  defp limit_three_departures([[d1, d2, d3, _d4]]), do: [[d1, d2, d3]]
+  defp limit_three_departures(sections), do: sections
 
   defp render_partial_alerts([alert]) do
     [
