@@ -208,11 +208,13 @@ defmodule Screens.DupScreenData do
 
     case departures_response do
       %{force_reload: false, success: true, sections: sections} ->
-        %{
-          departures_response
-          | sections: Data.limit_three_departures(sections),
+        Map.merge(
+          departures_response,
+          %{
+            sections: Data.limit_three_departures(sections),
             alerts: Response.render_partial_alerts(alerts)
-        }
+          }
+        )
 
       _ ->
         departures_response
