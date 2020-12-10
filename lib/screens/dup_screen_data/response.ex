@@ -27,8 +27,10 @@ defmodule Screens.DupScreenData.Response do
     mattapan: "Mattapan Line"
   }
 
-  defp partial_alert_specifier(%{headsign: nil, pill: pill}) do
-    {@pill_to_specifier[pill], "service"}
+  for {pill, specifier} <- @pill_to_specifier do
+    defp partial_alert_specifier(%{headsign: nil, pill: unquote(pill)}) do
+      {unquote(specifier), "service"}
+    end
   end
 
   defp partial_alert_specifier(%{headsign: headsign}) do
@@ -81,8 +83,14 @@ defmodule Screens.DupScreenData.Response do
     weather: "due to weather conditions"
   }
 
-  defp render_alert_cause(cause) do
-    Map.get(@alert_cause_mapping, cause, "")
+  for {cause, cause_text} <- @alert_cause_mapping do
+    defp render_alert_cause(unquote(cause)) do
+      unquote(cause_text)
+    end
+  end
+
+  defp render_alert_cause(_) do
+    ""
   end
 
   def alert_issue(%{effect: :delay, cause: cause}) do
@@ -120,9 +128,12 @@ defmodule Screens.DupScreenData.Response do
     station_closure: "Seek alternate route"
   }
 
-  defp alert_remedy_text(effect) do
-    @alert_remedy_text_mapping[effect]
+  for {effect, remedy} <- @alert_remedy_text_mapping do
+    defp alert_remedy_text(unquote(effect)) do
+      unquote(remedy)
+    end
   end
+
 
   @alert_remedy_icon_mapping %{
     delay: nil,
@@ -131,8 +142,10 @@ defmodule Screens.DupScreenData.Response do
     station_closure: nil
   }
 
-  defp alert_remedy_icon(effect) do
-    @alert_remedy_icon_mapping[effect]
+  for {effect, icon} <- @alert_remedy_icon_mapping do
+    defp alert_remedy_icon(unquote(effect)) do
+      unquote(icon)
+    end
   end
 
   defp line_color(:mattapan), do: :red
