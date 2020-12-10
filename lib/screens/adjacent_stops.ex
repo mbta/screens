@@ -43,7 +43,7 @@ defmodule Screens.AdjacentStops do
 
   defp in_informed_stop_ids?(informed_stop_ids, adjacent_stop)
 
-  defp in_informed_stop_ids?(informed_stop_ids, nil), do: false
+  defp in_informed_stop_ids?(_informed_stop_ids, nil), do: false
 
   defp in_informed_stop_ids?(informed_stop_ids, adjacent_stop)
        when is_binary(adjacent_stop) do
