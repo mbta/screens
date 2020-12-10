@@ -134,7 +134,6 @@ defmodule Screens.DupScreenData.Response do
     end
   end
 
-
   @alert_remedy_icon_mapping %{
     delay: nil,
     shuttle: :shuttle,
