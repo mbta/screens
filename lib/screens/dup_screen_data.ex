@@ -170,7 +170,8 @@ defmodule Screens.DupScreenData do
          stop_ids: stop_ids,
          route_ids: route_ids,
          pill: pill
-       }) when pill in ~w[red orange green blue] do
+       })
+       when pill in ~w[red orange green blue] do
     alerts = Request.fetch_alerts(stop_ids, route_ids)
 
     alerts
