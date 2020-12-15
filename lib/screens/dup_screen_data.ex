@@ -170,7 +170,7 @@ defmodule Screens.DupScreenData do
          stop_ids: stop_ids,
          route_ids: route_ids,
          pill: pill
-       }) do
+       }) when pill in ~w[red orange green blue] do
     alerts = Request.fetch_alerts(stop_ids, route_ids)
 
     alerts
@@ -180,6 +180,8 @@ defmodule Screens.DupScreenData do
       alert -> [Data.interpret_alert(alert, stop_ids, pill)]
     end
   end
+
+  defp fetch_and_interpret_alert(_non_subway_section), do: []
 
   defp fetch_departures_response(
          %Dup.Departures{header: header, sections: sections},

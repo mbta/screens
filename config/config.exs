@@ -64,120 +64,70 @@ config :screens,
   api_v3_url: "https://api-v3.mbta.com/"
 
 config :screens,
-  # "Constant" (rarely changing) system properties used by the DUP app to save on API requests.
-  # Map keys are IDs of stops where we have DUP screens.
-  dup_constants: %{
-    ### GL
+  # Maps alert informed entity contents to the appropriate headsign to show for that alert.
+  # List elements must be of the shape {informed_stop_ids, not_informed_stop_ids, headsign}.
+  # Each set of stop IDs must be either a single string or a MapSet of strings.
+  dup_alert_headsign_matchers: %{
     # Kenmore
-    "70150" => %{
-      adjacent_stops: {MapSet.new(~w[70148 70186 70212]), "70152"},
-      headsign: "Park Street"
-    },
-    "71150" => %{
-      adjacent_stops: {MapSet.new(~w[70148 70186 70212]), "70152"},
-      headsign: "Park Street"
-    },
-    "70151" => %{
-      adjacent_stops: {"70153", MapSet.new(~w[70149 70187 70211])},
-      headsign: "Cleveland Circle/Riverside"
-    },
-    "71151" => %{
-      adjacent_stops: {"70153", MapSet.new(~w[70149 70187 70211])},
-      headsign: "Cleveland Circle/Riverside"
-    },
+    "place-kencl" => [
+      {"70149", MapSet.new(~w[70153 70211 70187]), "Boston College"},
+      {"70211", MapSet.new(~w[70153 70149 70187]), "Cleveland Circle"},
+      {"70187", MapSet.new(~w[70153 70149 70211]), "Riverside"},
+      {MapSet.new(~w[70149 70211]), MapSet.new(~w[70153 70187]), "BC/Clev. Circ."},
+      {MapSet.new(~w[70149 70187]), MapSet.new(~w[70153 70211]), "BC/Riverside"},
+      {MapSet.new(~w[70211 70187]), MapSet.new(~w[70153 70149]), "Clev. Circ./Riverside"},
+      {MapSet.new(~w[70149 70211 70187]), "70153", "Westbound"},
+      {"70152", MapSet.new(~w[70148 70212 70186]), "Park Street"}
+    ],
     # Prudential
-    "70240" => %{
-      adjacent_tops: {"70242", "70154"},
-      headsign: "Park Street"
-    },
-    "70239" => %{
-      adjacent_stops: {"70155", "70241"},
-      headsign: "Heath Street"
-    },
+    "place-prmnl" => [
+      {"70154", "70242", "Park Street"},
+      {"70241", "70155", "Heath Street"}
+    ],
     # Haymarket
-    "70203" => %{
-      adjacent_stops: {"70201", "70205"},
-      headsign: "North Station & North"
-    },
-    "70204" => %{
-      adjacent_stops: {"70206", "70202"},
-      headsign: "Copley & West"
-    },
-    ### OL
+    "place-haecl" => [
+      # GL
+      {"70205", "70201", "Northbound"},
+      {"70202", "70206", "Copley & West"},
+      # OL
+      {"70027", "70023", "Oak Grove"},
+      {"70022", "70026", "Forest Hills"}
+    ],
     # Back Bay
-    "70015" => %{
-      adjacent_stops: {"70013", "70017"},
-      headsign: "Oak Grove"
-    },
-    "70014" => %{
-      adjacent_stops: {"70016", "70012"},
-      headsign: "Forest Hills"
-    },
+    "place-bbsta" => [
+      {"70017", "70013", "Oak Grove"},
+      {"70012", "70016", "Forest Hills"}
+    ],
     # Tufts
-    "70017" => %{
-      adjacent_stops: {"70015", "70019"},
-      headsign: "Oak Grove"
-    },
-    "70016" => %{
-      adjacent_stops: {"70018", "70014"},
-      headsign: "Forest Hills"
-    },
-    # Haymarket
-    "70025" => %{
-      adjacent_stops: {"70023", "70027"},
-      headsign: "Oak Grove"
-    },
-    "70024" => %{
-      adjacent_stops: {"70026", "70022"},
-      headsign: "Forest Hills"
-    },
+    "place-tumnl" => [
+      {"70019", "70015", "Oak Grove"},
+      {"70014", "70018", "Forest Hills"}
+    ],
     # Sullivan
-    "70031" => %{
-      adjacent_stops: {"70029", "70279"},
-      headsign: "Oak Grove"
-    },
-    "70030" => %{
-      adjacent_stops: {"70278", "70028"},
-      headsign: "Forest Hills"
-    },
+    "place-sull" => [
+      {"70279", "70029", "Oak Grove"},
+      {"70028", "70278", "Forest Hills"}
+    ],
     # Malden Center
-    "70035" => %{
-      adjacent_stops: {"70033", "70036"},
-      headsign: "Oak Grove"
-    },
-    "70034" => %{
-      adjacent_stops: {"70036", "70032"},
-      headsign: "Forest Hills"
-    },
-    ### RL
+    "place-mlmnl" => [
+      {"70036", "70033", "Oak Grove"},
+      {"70032", "70036", "Forest Hills"}
+    ],
     # Broadway
-    "70082" => %{
-      adjacent_stops: {"70084", "70080"},
-      headsign: "Alewife"
-    },
-    "70081" => %{
-      adjacent_stops: {"70079", "70083"},
-      headsign: "Ashmont/Braintree"
-    },
-    ### BL
+    "place-brdwy" => [
+      {"70080", "70084", "Alewife"},
+      {"70083", "70079", "Ashmont/Braintree"}
+    ],
     # Aquarium
-    "70044" => %{
-      adjacent_stops: {"70042", "70046"},
-      headsign: "Wonderland"
-    },
-    "70043" => %{
-      adjacent_stops: {"70045", "70041"},
-      headsign: "Bowdoin"
-    },
+    "place-aqucl" => [
+      {"70046", "70042", "Wonderland"},
+      {"70041", "70045", "Bowdoin"}
+    ],
     # Airport
-    "70048" => %{
-      adjacent_stops: {"70046", "70050"},
-      headsign: "Wonderland"
-    },
-    "70047" => %{
-      adjacent_stops: {"70049", "70045"},
-      headsign: "Bowdoin"
-    }
+    "place-aport" => [
+      {"70050", "70046", "Wonderland"},
+      {"70045", "70049", "Bowdoin"}
+    ]
   },
   # Stop IDs at stations serviced by two subway lines, where we also have DUP screens.
   two_line_stops: [

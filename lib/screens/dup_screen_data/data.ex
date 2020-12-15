@@ -10,28 +10,16 @@ defmodule Screens.DupScreenData.Data do
     Enum.find(alerts, hd(alerts), &(&1.effect == :shuttle))
   end
 
-  def interpret_alert(alert, stop_ids, pill) do
-    [
-      %{adjacent_stops: adjacent_stops1, headsign: headsign1},
-      %{adjacent_stops: adjacent_stops2, headsign: headsign2}
-    ] =
-      Enum.map(stop_ids, fn id ->
-        :screens
-        |> Application.get_env(:dup_constants)
-        |> Map.get(id)
-      end)
-
-    informed_stop_ids = Enum.map(alert.informed_entities, & &1.stop)
-
-    alert_region =
-      Screens.AdjacentStops.alert_region(informed_stop_ids, adjacent_stops1, adjacent_stops2)
+  def interpret_alert(alert, [parent_stop_id], pill) do
+    informed_stop_ids = Enum.into(alert.informed_entities, MapSet.new(), & &1.stop)
 
     {region, headsign} =
-      case alert_region do
-        :disruption_toward_1 -> {:boundary, headsign1}
-        :disruption_toward_2 -> {:boundary, headsign2}
-        :middle -> {:inside, nil}
-      end
+      :screens
+      |> Application.get_env(:dup_alert_headsign_matchers)
+      |> Map.get(parent_stop_id)
+      |> Enum.find_value({:inside, nil}, fn {informed, not_informed, headsign} ->
+        if alert_region_match?(informed, not_informed, informed_stop_ids), do: {:boundary, headsign}, else: false
+      end)
 
     %{
       cause: alert.cause,
@@ -59,6 +47,18 @@ defmodule Screens.DupScreenData.Data do
     else
       response_type_helper(alerts, line_count, rotation_index)
     end
+  end
+
+  defp alert_region_match?(%MapSet{} = informed, %MapSet{} = not_informed, %MapSet{} = informed_stop_ids) do
+    MapSet.subset?(informed, informed_stop_ids) and MapSet.disjoint?(not_informed, informed_stop_ids)
+  end
+
+  defp alert_region_match?(informed, not_informed, informed_stop_ids) when is_binary(informed) do
+    alert_region_match?(MapSet.new([informed]), not_informed, informed_stop_ids)
+  end
+
+  defp alert_region_match?(informed, not_informed, informed_stop_ids) when is_binary(not_informed) do
+    alert_region_match?(informed, MapSet.new([not_informed]), informed_stop_ids)
   end
 
   defp response_type_helper([alert], 1, rotation_index) do
