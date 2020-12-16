@@ -7,23 +7,26 @@
 
 .free-text__line {
   display: inline-block;
-  vertical-align: top;
-  width: 1544px;
+  vertical-align: middle;
+  width: 1608px;
 }
 
 .free-text__icon-container {
   display: inline-block;
-  vertical-align: top;
+  vertical-align: middle;
   width: 312px;
+  height: 208px;
   text-align: center;
 }
 
 .free-text__icon-image {
   height: 168px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
-.free-text__element:not(:last-child) {
-  &::after {
+.free-text__element {
+  &:not(:last-child)::after {
     content: " ";
   }
 }
