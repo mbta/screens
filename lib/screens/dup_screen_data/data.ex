@@ -18,7 +18,7 @@ defmodule Screens.DupScreenData.Data do
       |> Application.get_env(:dup_alert_headsign_matchers)
       |> Map.get(parent_stop_id)
       |> Enum.find_value({:inside, nil}, fn {informed, not_informed, headsign} ->
-        if alert_region_match?(informed, not_informed, informed_stop_ids),
+        if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
           do: {:boundary, headsign},
           else: false
       end)
@@ -51,22 +51,13 @@ defmodule Screens.DupScreenData.Data do
     end
   end
 
-  defp alert_region_match?(
-         %MapSet{} = informed,
-         %MapSet{} = not_informed,
-         %MapSet{} = informed_stop_ids
-       ) do
+  defp to_set(stop_id) when is_binary(stop_id), do: MapSet.new([stop_id])
+  defp to_set(stop_ids) when is_list(stop_ids), do: MapSet.new(stop_ids)
+  defp to_set(%MapSet{} = already_a_set), do: already_a_set
+
+  defp alert_region_match?(informed, not_informed, informed_stop_ids) do
     MapSet.subset?(informed, informed_stop_ids) and
       MapSet.disjoint?(not_informed, informed_stop_ids)
-  end
-
-  defp alert_region_match?(informed, not_informed, informed_stop_ids) when is_binary(informed) do
-    alert_region_match?(MapSet.new([informed]), not_informed, informed_stop_ids)
-  end
-
-  defp alert_region_match?(informed, not_informed, informed_stop_ids)
-       when is_binary(not_informed) do
-    alert_region_match?(informed, MapSet.new([not_informed]), informed_stop_ids)
   end
 
   defp response_type_helper([alert], 1, rotation_index) do

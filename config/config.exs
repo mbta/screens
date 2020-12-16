@@ -66,18 +66,18 @@ config :screens,
 config :screens,
   # Maps alert informed entity contents to the appropriate headsign to show for that alert.
   # List elements must be of the shape {informed_stop_ids, not_informed_stop_ids, headsign}.
-  # Each set of stop IDs must be either a single string or a MapSet of strings.
+  # Each set of stop IDs can be either a single string or a list of strings.
   dup_alert_headsign_matchers: %{
     # Kenmore
     "place-kencl" => [
-      {"70149", MapSet.new(~w[70153 70211 70187]), "Boston College"},
-      {"70211", MapSet.new(~w[70153 70149 70187]), "Cleveland Circle"},
-      {"70187", MapSet.new(~w[70153 70149 70211]), "Riverside"},
-      {MapSet.new(~w[70149 70211]), MapSet.new(~w[70153 70187]), "BC/Clev. Circ."},
-      {MapSet.new(~w[70149 70187]), MapSet.new(~w[70153 70211]), "BC/Riverside"},
-      {MapSet.new(~w[70211 70187]), MapSet.new(~w[70153 70149]), "Clev. Circ./Riverside"},
-      {MapSet.new(~w[70149 70211 70187]), "70153", "Westbound"},
-      {"70152", MapSet.new(~w[70148 70212 70186]), "Park Street"}
+      {"70149", ~w[70153 70211 70187], "Boston College"},
+      {"70211", ~w[70153 70149 70187], "Cleveland Circle"},
+      {"70187", ~w[70153 70149 70211], "Riverside"},
+      {~w[70149 70211], ~w[70153 70187], "BC/Clev. Circ."},
+      {~w[70149 70187], ~w[70153 70211], "BC/Riverside"},
+      {~w[70211 70187], ~w[70153 70149], "Clev. Circ./Riverside"},
+      {~w[70149 70211 70187], "70153", "Westbound"},
+      {"70152", ~w[70148 70212 70186], "Park Street"}
     ],
     # Prudential
     "place-prmnl" => [
