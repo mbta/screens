@@ -2,7 +2,7 @@ defmodule Screens.DupScreenData do
   @moduledoc false
 
   alias Screens.Config.{Dup, State}
-  alias Screens.Departures.Departure
+  alias Screens.DupScreenData.{Data, Request, Response}
 
   def by_screen_id("dup-bus-headsigns", _is_screen) do
     current_time = DateTime.utc_now()
@@ -132,24 +132,65 @@ defmodule Screens.DupScreenData do
     }
   end
 
-  def by_screen_id(screen_id, _is_screen) do
+  def by_screen_id(screen_id, rotation_index)
+
+  def by_screen_id(screen_id, rotation_index) when rotation_index in ~w[0 1] do
     %Dup{primary: primary_departures} = State.app_params(screen_id)
 
-    current_time = DateTime.utc_now()
-    response_type = fetch_response_type()
+    alerts = fetch_and_interpret_alerts(primary_departures)
 
-    case response_type do
-      :departures -> fetch_departures_response(primary_departures, current_time)
+    line_count = Data.station_line_count(primary_departures)
+
+    current_time = DateTime.utc_now()
+
+    case Data.response_type(alerts, line_count, rotation_index) do
+      :departures ->
+        fetch_departures_response(primary_departures, current_time)
+
+      :partial_alert ->
+        fetch_partial_alert_response(primary_departures, alerts, current_time)
+
+      :fullscreen_alert ->
+        fetch_fullscreen_alert_response(primary_departures, alerts, line_count)
     end
   end
 
-  defp fetch_response_type, do: :departures
+  def by_screen_id(screen_id, "2") do
+    %Dup{secondary: secondary_departures} = State.app_params(screen_id)
+
+    current_time = DateTime.utc_now()
+    fetch_departures_response(secondary_departures, current_time)
+  end
+
+  defp fetch_and_interpret_alerts(%Dup.Departures{sections: sections}) do
+    sections
+    |> Task.async_stream(&fetch_and_interpret_alert/1)
+    |> Enum.flat_map(fn {:ok, data} -> data end)
+  end
+
+  defp fetch_and_interpret_alert(%Dup.Section{
+         stop_ids: stop_ids,
+         route_ids: route_ids,
+         pill: pill
+       })
+       when pill in ~w[red orange green blue]a do
+    alerts = Request.fetch_alerts(stop_ids, route_ids)
+
+    alerts
+    |> Data.choose_alert()
+    |> case do
+      nil -> []
+      alert -> [Data.interpret_alert(alert, stop_ids, pill)]
+    end
+  end
+
+  defp fetch_and_interpret_alert(_non_subway_section), do: []
 
   defp fetch_departures_response(
          %Dup.Departures{header: header, sections: sections},
          current_time
        ) do
-    sections_data = fetch_sections_data(sections)
+    sections_data = Request.fetch_sections_data(sections)
 
     case sections_data do
       {:ok, data} ->
@@ -158,7 +199,8 @@ defmodule Screens.DupScreenData do
           success: true,
           header: header,
           sections: data,
-          current_time: Screens.Util.format_time(current_time)
+          current_time: Screens.Util.format_time(current_time),
+          type: :departures
         }
 
       :error ->
@@ -166,42 +208,47 @@ defmodule Screens.DupScreenData do
     end
   end
 
-  defp fetch_sections_data([_, _] = sections) do
-    sections_data = Enum.map(sections, &fetch_section_data(&1, 2))
+  defp fetch_partial_alert_response(primary_departures, alerts, current_time) do
+    departures_response = fetch_departures_response(primary_departures, current_time)
 
-    if Enum.any?(sections_data, fn data -> data == :error end) do
-      :error
-    else
-      {:ok, Enum.map(sections_data, fn {:ok, data} -> data end)}
+    case departures_response do
+      %{force_reload: false, success: true, sections: sections} ->
+        Map.merge(
+          departures_response,
+          %{
+            sections: Data.limit_three_departures(sections),
+            alerts: Response.render_partial_alerts(alerts)
+          }
+        )
+
+      _ ->
+        departures_response
     end
   end
 
-  defp fetch_sections_data([section]) do
-    case fetch_section_data(section, 4) do
-      {:ok, data} -> {:ok, [data]}
-      :error -> :error
-    end
+  defp fetch_fullscreen_alert_response(%Dup.Departures{header: header}, [alert], line_count) do
+    %{
+      type: :full_screen_alert,
+      force_reload: false,
+      success: true,
+      header: header,
+      pattern: Response.pattern(alert.region, alert.effect, line_count),
+      color: Response.color(alert.pill, alert.effect, line_count, 1),
+      issue: Response.alert_issue(alert),
+      remedy: Response.alert_remedy(alert)
+    }
   end
 
-  defp fetch_section_data(
-         %Dup.Section{stop_ids: stop_ids, route_ids: route_ids, pill: pill},
-         num_rows
-       ) do
-    query_params = %{stop_ids: stop_ids, route_ids: route_ids}
-    include_schedules? = Enum.member?([:cr, :ferry], pill)
-
-    case Departure.fetch(query_params, include_schedules?) do
-      {:ok, departures} ->
-        section_departures =
-          departures
-          |> Enum.map(&Map.from_struct/1)
-          |> Enum.sort_by(& &1.time)
-          |> Enum.take(num_rows)
-
-        {:ok, %{departures: section_departures, pill: pill}}
-
-      :error ->
-        :error
-    end
+  defp fetch_fullscreen_alert_response(%Dup.Departures{header: header}, [alert, _alert], _) do
+    %{
+      type: :full_screen_alert,
+      force_reload: false,
+      success: true,
+      header: header,
+      pattern: :x,
+      color: :yellow,
+      issue: Response.alert_issue(alert),
+      remedy: Response.alert_remedy(alert)
+    }
   end
 end

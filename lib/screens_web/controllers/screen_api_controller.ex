@@ -36,7 +36,13 @@ defmodule ScreensWeb.ScreenApiController do
     json(conn, data)
   end
 
-  def show_dup(conn, %{"id" => screen_id, "rotation_index" => _rotation_index}) do
-    show(conn, %{"id" => screen_id, "last_refresh" => nil})
+  def show_dup(conn, %{"id" => screen_id, "rotation_index" => rotation_index}) do
+    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
+
+    _ = Screens.LogScreenData.log_data_request(screen_id, nil, is_screen)
+
+    data = Screens.DupScreenData.by_screen_id(screen_id, rotation_index)
+
+    json(conn, data)
   end
 end
