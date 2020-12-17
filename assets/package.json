@@ -60,7 +60,7 @@
     "typescript": "^3.9.7",
     "webpack": "^4.44.2",
     "webpack-cli": "^4.2.0",
-    "whatwg-fetch": "^3.4.1"
+    "whatwg-fetch": "^3.5.0"
   },
   "jest": {
     "clearMocks": true,
