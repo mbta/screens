@@ -7,7 +7,8 @@ config :screens, ScreensWeb.Endpoint,
   server: false
 
 config :screens,
-  config_fetcher: Screens.Config.State.LocalFetch
+  config_fetcher: Screens.Config.State.LocalFetch,
+  signs_ui_config_fetcher: Screens.SignsUiConfig.State.LocalFetch
 
 config :screens, ScreensWeb.AuthManager, secret_key: "test key"
 

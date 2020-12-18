@@ -2,6 +2,7 @@ defmodule Screens.DupScreenData do
   @moduledoc false
 
   alias Screens.Config.{Dup, State}
+  alias Screens.Config.Dup.Override.{FullscreenAlert, PartialAlertList}
   alias Screens.DupScreenData.{Data, Request, Response}
 
   def by_screen_id("dup-bus-headsigns", _is_screen) do
@@ -135,8 +136,28 @@ defmodule Screens.DupScreenData do
   def by_screen_id(screen_id, rotation_index)
 
   def by_screen_id(screen_id, rotation_index) when rotation_index in ~w[0 1] do
-    %Dup{primary: primary_departures} = State.app_params(screen_id)
+    %Dup{primary: primary_departures, override: override} = State.app_params(screen_id)
 
+    case {override, rotation_index} do
+      {nil, _} ->
+        primary_screen_response(primary_departures, rotation_index)
+
+      {{screen0, _}, "0"} ->
+        primary_screen_response_with_override(primary_departures, rotation_index, screen0)
+
+      {{_, screen1}, "1"} ->
+        primary_screen_response_with_override(primary_departures, rotation_index, screen1)
+    end
+  end
+
+  def by_screen_id(screen_id, "2") do
+    %Dup{secondary: secondary_departures} = State.app_params(screen_id)
+
+    current_time = DateTime.utc_now()
+    fetch_departures_response(secondary_departures, current_time)
+  end
+
+  defp primary_screen_response(primary_departures, rotation_index) do
     alerts = fetch_and_interpret_alerts(primary_departures)
 
     line_count = Data.station_line_count(primary_departures)
@@ -155,11 +176,38 @@ defmodule Screens.DupScreenData do
     end
   end
 
-  def by_screen_id(screen_id, "2") do
-    %Dup{secondary: secondary_departures} = State.app_params(screen_id)
+  defp primary_screen_response_with_override(
+         primary_departures,
+         rotation_index,
+         %PartialAlertList{} = override
+       ) do
+    alerts = fetch_and_interpret_alerts(primary_departures)
+
+    line_count = Data.station_line_count(primary_departures)
 
     current_time = DateTime.utc_now()
-    fetch_departures_response(secondary_departures, current_time)
+
+    case Data.response_type(alerts, line_count, rotation_index) do
+      :fullscreen_alert ->
+        fetch_fullscreen_alert_response(primary_departures, alerts, line_count)
+
+      _ ->
+        fetch_partial_alert_response(primary_departures, override, current_time, override: true)
+    end
+  end
+
+  defp primary_screen_response_with_override(primary_departures, _, %FullscreenAlert{} = override) do
+    alert_response = FullscreenAlert.to_json(override)
+
+    Map.merge(
+      alert_response,
+      %{
+        type: :full_screen_alert,
+        force_reload: false,
+        success: true,
+        header: alert_response.header || primary_departures.header
+      }
+    )
   end
 
   defp fetch_and_interpret_alerts(%Dup.Departures{sections: sections}) do
@@ -208,16 +256,22 @@ defmodule Screens.DupScreenData do
     end
   end
 
-  defp fetch_partial_alert_response(primary_departures, alerts, current_time) do
+  defp fetch_partial_alert_response(primary_departures, alerts, current_time, opts \\ []) do
     departures_response = fetch_departures_response(primary_departures, current_time)
 
     case departures_response do
       %{force_reload: false, success: true, sections: sections} ->
+        alerts =
+          if(Keyword.get(opts, :override, false),
+            do: PartialAlertList.to_json(alerts).alerts,
+            else: Response.render_partial_alerts(alerts)
+          )
+
         Map.merge(
           departures_response,
           %{
             sections: Data.limit_three_departures(sections),
-            alerts: Response.render_partial_alerts(alerts)
+            alerts: alerts
           }
         )
 

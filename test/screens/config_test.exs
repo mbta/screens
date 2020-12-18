@@ -7,7 +7,7 @@ defmodule Screens.ConfigTest do
   @test_config_path Path.join(~w[#{File.cwd!()} test fixtures config.json])
 
   def fetch_config(_context) do
-    {:ok, config} = LocalFetch.fetch_config(@test_config_path)
+    {:ok, config, _} = LocalFetch.fetch_config(@test_config_path)
     {:ok, %{config: config}}
   end
 
