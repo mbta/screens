@@ -8,12 +8,12 @@ defmodule Screens.Config.Dup.Override.FreeTextLine do
           text: list(FreeText.t())
         }
 
-  @type icon :: :warning | :x | :shuttle
+  @type icon :: :warning | :x | :shuttle | :subway | :cr | :walk
 
   @enforce_keys ~w[icon text]a
   defstruct @enforce_keys
 
-  for icon <- ~w[warning x shuttle]a do
+  for icon <- ~w[warning x shuttle subway cr walk]a do
     icon_string = Atom.to_string(icon)
 
     def from_json(%{"icon" => unquote(icon_string), "text" => free_text_elements}) do

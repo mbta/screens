@@ -13,7 +13,7 @@ defmodule Screens.Config.Dup.Override.FullscreenAlert do
         }
 
   @type pattern :: :hatched | :chevron | :x
-  @type color :: :red | :orange | :green | :blue | :yellow
+  @type color :: :red | :orange | :green | :blue | :purple | :yellow
 
   @enforce_keys ~w[pattern color issue remedy]a
   defstruct [header: nil] ++ @enforce_keys
@@ -51,7 +51,7 @@ defmodule Screens.Config.Dup.Override.FullscreenAlert do
     end
   end
 
-  for color <- ~w[red orange green blue yellow]a do
+  for color <- ~w[red orange green blue purple yellow]a do
     color_string = Atom.to_string(color)
 
     defp value_from_json("color", unquote(color_string)) do
