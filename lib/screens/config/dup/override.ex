@@ -1,7 +1,7 @@
 defmodule Screens.Config.Dup.Override do
   @moduledoc false
 
-  alias Screens.Config.Dup.Override.{PartialAlertList, FullscreenAlert}
+  alias Screens.Config.Dup.Override.{FullscreenAlert, PartialAlertList}
 
   @type screen0 :: PartialAlertList.t() | FullscreenAlert.t()
   @type screen1 :: FullscreenAlert.t()

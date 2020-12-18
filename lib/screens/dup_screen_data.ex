@@ -2,7 +2,7 @@ defmodule Screens.DupScreenData do
   @moduledoc false
 
   alias Screens.Config.{Dup, State}
-  alias Screens.Config.Dup.Override.{PartialAlertList, FullscreenAlert}
+  alias Screens.Config.Dup.Override.{FullscreenAlert, PartialAlertList}
   alias Screens.DupScreenData.{Data, Request, Response}
 
   def by_screen_id("dup-bus-headsigns", _is_screen) do
