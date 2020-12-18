@@ -33,6 +33,7 @@ defmodule Screens.Config.Dup.Override.FullscreenAlert do
     t
     |> Map.from_struct()
     |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
+    |> Map.put(:type, :fullscreen)
   end
 
   defp value_from_json("issue", issue) do
