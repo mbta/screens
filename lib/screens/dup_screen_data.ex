@@ -226,9 +226,9 @@ defmodule Screens.DupScreenData do
   end
 
   defp primary_screen_response_with_override(
-         primary_departures,
+         _primary_departures,
          _,
-         %FullscreenImage{image_url: image_url} = override
+         %FullscreenImage{image_url: image_url}
        ) do
     current_time = DateTime.utc_now()
 
