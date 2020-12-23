@@ -1,6 +1,7 @@
 import React from "react";
 
 import Departure from "Components/dup/departure";
+import { FreeTextLine } from "Components/dup/free_text";
 
 const camelizeDepartureObject = ({
   id,
@@ -41,4 +42,17 @@ const Section = ({ departures, currentTimeString }): JSX.Element => {
   );
 };
 
+const HeadwaySection = ({ headway, pill }): JSX.Element => {
+  const [lo, hi] = headway;
+  return (
+    <div className="section section--headway">
+      <FreeTextLine
+        icon={pill}
+        text={["every", { format: "bold", text: `${lo}-${hi}` }, "minutes"]}
+      />
+    </div>
+  );
+};
+
 export default Section;
+export { HeadwaySection };

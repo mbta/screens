@@ -1,6 +1,6 @@
 import React from "react";
 
-import Section from "Components/dup/section";
+import Section, { HeadwaySection } from "Components/dup/section";
 import { getKey, FreeTextElement } from "Components/dup/free_text";
 
 const HeadwaySectionList = ({ section: { pill, headway } }): JSX.Element => {
@@ -52,13 +52,19 @@ const SectionList = ({ sections, currentTimeString }): JSX.Element => {
 
   return (
     <div className="section-list">
-      {sections.map(({ departures, pill }) => (
-        <Section
-          departures={departures}
-          currentTimeString={currentTimeString}
-          key={pill}
-        />
-      ))}
+      {sections.map(({ departures, pill, headway }) => {
+        if (headway) {
+          return <HeadwaySection headway={headway} pill={pill} key={pill} />;
+        } else {
+          return (
+            <Section
+              departures={departures}
+              currentTimeString={currentTimeString}
+              key={pill}
+            />
+          );
+        }
+      })}
     </div>
   );
 };
