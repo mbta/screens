@@ -2,7 +2,8 @@ defmodule Screens.DupScreenData.Request do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Dup
+  alias Screens.Config.Dup.Section
+  alias Screens.Config.Dup.Section.Headway
   alias Screens.Departures.Departure
 
   # Filters for the types of alerts we care about
@@ -43,8 +44,12 @@ defmodule Screens.DupScreenData.Request do
     end
   end
 
+  defp fetch_section_data(%Section{pill: pill, headway: %Headway{override: {lo, hi}}}, _num_rows) do
+    {:ok, %{pill: pill, headway: [lo, hi]}}
+  end
+
   defp fetch_section_data(
-         %Dup.Section{stop_ids: stop_ids, route_ids: route_ids, pill: pill},
+         %Section{stop_ids: stop_ids, route_ids: route_ids, pill: pill},
          num_rows
        ) do
     query_params = %{stop_ids: stop_ids, route_ids: route_ids}
