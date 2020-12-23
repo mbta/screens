@@ -5,6 +5,7 @@ defmodule Screens.DupScreenData.Request do
   alias Screens.Config.Dup.Section
   alias Screens.Config.Dup.Section.Headway
   alias Screens.Departures.Departure
+  alias Screens.SignsUiConfig
 
   # Filters for the types of alerts we care about
   @alert_route_types ~w[light_rail subway]a
@@ -24,10 +25,10 @@ defmodule Screens.DupScreenData.Request do
     end)
   end
 
-  def fetch_sections_data([_, _] = sections) do
+  def fetch_sections_data([_, _] = sections, current_time) do
     sections_data =
       sections
-      |> Task.async_stream(&fetch_section_data(&1, 2))
+      |> Task.async_stream(&fetch_section_data(&1, 2, current_time))
       |> Enum.map(fn {:ok, data} -> data end)
 
     if Enum.any?(sections_data, fn data -> data == :error end) do
@@ -37,21 +38,53 @@ defmodule Screens.DupScreenData.Request do
     end
   end
 
-  def fetch_sections_data([section]) do
-    case fetch_section_data(section, 4) do
+  def fetch_sections_data([section], current_time) do
+    case fetch_section_data(section, 4, current_time) do
       {:ok, data} -> {:ok, [data]}
       :error -> :error
     end
   end
 
-  defp fetch_section_data(%Section{pill: pill, headway: %Headway{override: {lo, hi}}}, _num_rows) do
+  defp fetch_section_data(
+         %Section{pill: pill, headway: %Headway{override: {lo, hi}}},
+         _num_rows,
+         _current_time
+       ) do
     {:ok, %{pill: pill, headway: [lo, hi]}}
   end
 
   defp fetch_section_data(
-         %Section{stop_ids: stop_ids, route_ids: route_ids, pill: pill},
-         num_rows
+         %Section{stop_ids: stop_ids, route_ids: route_ids, pill: pill, headway: headway},
+         num_rows,
+         current_time
        ) do
+    case fetch_headway_mode(headway, current_time) do
+      {:active, {lo, hi}} ->
+        {:ok, %{pill: pill, headway: [lo, hi]}}
+
+      :inactive ->
+        fetch_section_departures(stop_ids, route_ids, pill, num_rows)
+    end
+  end
+
+  defp fetch_headway_mode(%Headway{sign_ids: sign_ids, headway_id: headway_id}, current_time) do
+    if SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids) do
+      time_ranges = SignsUiConfig.State.time_ranges(headway_id)
+      current_time_period = SignsUiConfig.State.time_period(current_time)
+
+      case time_ranges do
+        %{^current_time_period => {lo, hi}} ->
+          {:active, {lo, hi}}
+
+        _ ->
+          :inactive
+      end
+    else
+      :inactive
+    end
+  end
+
+  defp fetch_section_departures(stop_ids, route_ids, pill, num_rows) do
     query_params = %{stop_ids: stop_ids, route_ids: route_ids}
     include_schedules? = Enum.member?([:cr, :ferry], pill)
 

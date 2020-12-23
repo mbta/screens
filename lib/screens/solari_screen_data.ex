@@ -153,7 +153,7 @@ defmodule Screens.SolariScreenData do
       ) do
     if SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids) do
       time_ranges = SignsUiConfig.State.time_ranges(headway_id)
-      current_time_period = time_period(current_time)
+      current_time_period = SignsUiConfig.State.time_period(current_time)
 
       case time_ranges do
         %{^current_time_period => {range_low, range_high}} ->
@@ -165,19 +165,6 @@ defmodule Screens.SolariScreenData do
     else
       %{active: false}
     end
-  end
-
-  def time_period(utc_time) do
-    {:ok, dt} = DateTime.shift_zone(utc_time, "America/New_York")
-    day_of_week = dt |> DateTime.to_date() |> Date.day_of_week()
-
-    weekday? = day_of_week in 1..5
-
-    rush_hour? =
-      dt.hour in 7..8 or dt.hour in 16..17 or
-        (dt.hour == 18 and dt.minute <= 30)
-
-    if(weekday? and rush_hour?, do: :peak, else: :off_peak)
   end
 
   @spec do_paging(list(map()), Layout.t()) :: map()

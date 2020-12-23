@@ -147,7 +147,7 @@ defmodule Screens.DupScreenData do
          %Dup.Departures{header: header, sections: sections},
          current_time
        ) do
-    sections_data = Request.fetch_sections_data(sections)
+    sections_data = Request.fetch_sections_data(sections, current_time)
 
     case sections_data do
       {:ok, data} ->

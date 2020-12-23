@@ -47,6 +47,19 @@ defmodule Screens.SignsUiConfig.State do
     GenServer.call(pid, {:time_ranges, line_or_trunk})
   end
 
+  def time_period(utc_time) do
+    {:ok, dt} = DateTime.shift_zone(utc_time, "America/New_York")
+    day_of_week = dt |> DateTime.to_date() |> Date.day_of_week()
+
+    weekday? = day_of_week in 1..5
+
+    rush_hour? =
+      dt.hour in 7..8 or dt.hour in 16..17 or
+        (dt.hour == 18 and dt.minute <= 30)
+
+    if(weekday? and rush_hour?, do: :peak, else: :off_peak)
+  end
+
   ###
 
   @impl true
