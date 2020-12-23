@@ -122,3 +122,4 @@ const FreeText = ({ lines }) => {
 };
 
 export default FreeText;
+export { getKey, FreeTextLine, FreeTextElement };

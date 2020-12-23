@@ -107,3 +107,40 @@
   font-size: 108px;
   margin-left: 72px;
 }
+
+.headway-section-list {
+  padding-top: 72px;
+}
+
+.headway-section-list__icon-container {
+  display: inline-block;
+  text-align: center;
+  vertical-align: top;
+  width: 312px;
+}
+
+.headway-section-list__icon-image {
+  width: 168px;
+}
+
+.headway-section-list__message {
+  width: 1544px;
+  display: inline-block;
+  vertical-align: top;
+  font-size: 144px;
+  color: #171f26;
+  line-height: 160px;
+  font-family: Inter;
+
+  .free-text__text-pill {
+    color: #ffffff;
+  }
+}
+
+.headway-section-list__link {
+  font-family: Inter;
+  font-size: 108px;
+  position: absolute;
+  bottom: 56px;
+  right: 72px;
+}
