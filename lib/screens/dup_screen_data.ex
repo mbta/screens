@@ -125,12 +125,12 @@ defmodule Screens.DupScreenData do
     |> Enum.flat_map(fn {:ok, data} -> data end)
   end
 
-  defp fetch_and_interpret_alert(%Dup.Section{
-         stop_ids: stop_ids,
-         route_ids: route_ids,
-         pill: pill
-       })
-       when pill in ~w[red orange green blue]a do
+  def fetch_and_interpret_alert(%Dup.Section{
+        stop_ids: stop_ids,
+        route_ids: route_ids,
+        pill: pill
+      })
+      when pill in ~w[red orange green blue]a do
     alerts = Request.fetch_alerts(stop_ids, route_ids)
 
     alerts
@@ -141,7 +141,7 @@ defmodule Screens.DupScreenData do
     end
   end
 
-  defp fetch_and_interpret_alert(_non_subway_section), do: []
+  def fetch_and_interpret_alert(_non_subway_section), do: []
 
   defp fetch_departures_response(
          %Dup.Departures{header: header, sections: sections},

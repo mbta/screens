@@ -54,11 +54,12 @@ defmodule Screens.DupScreenData.Request do
   end
 
   defp fetch_section_data(
-         %Section{stop_ids: stop_ids, route_ids: route_ids, pill: pill, headway: headway},
+         %Section{stop_ids: stop_ids, route_ids: route_ids, pill: pill, headway: headway} =
+           section,
          num_rows,
          current_time
        ) do
-    case fetch_headway_mode(headway, current_time) do
+    case fetch_headway_mode(section, headway, current_time) do
       {:active, {lo, hi}} ->
         {:ok, %{pill: pill, headway: [lo, hi]}}
 
@@ -67,8 +68,20 @@ defmodule Screens.DupScreenData.Request do
     end
   end
 
-  defp fetch_headway_mode(%Headway{sign_ids: sign_ids, headway_id: headway_id}, current_time) do
-    if SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids) do
+  defp fetch_headway_mode(
+         section,
+         %Headway{sign_ids: sign_ids, headway_id: headway_id},
+         current_time
+       ) do
+    section_alert = Screens.DupScreenData.fetch_and_interpret_alert(section)
+    # NB: There aren't currently any DUPs at permanent terminals, do we assume all
+    # terminals are temporary. In the future, we'll need to check that the boundary
+    # isn't a normal terminal.
+    temporary_terminal? = match?([%{region: :boundary}], section_alert)
+    signs_ui_headways? = SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids)
+    headway_mode? = temporary_terminal? or signs_ui_headways?
+
+    if headway_mode? do
       time_ranges = SignsUiConfig.State.time_ranges(headway_id)
       current_time_period = SignsUiConfig.State.time_period(current_time)
 
