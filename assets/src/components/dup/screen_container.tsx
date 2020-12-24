@@ -8,6 +8,53 @@ import useApiResponse from "Hooks/use_api_response";
 
 import { formatTimeString, classWithModifier } from "Util/util";
 
+const LinkArrow = ({ width, color }) => {
+  const height = 40;
+  const stroke = 8;
+  const headWidth = 40;
+
+  const d = [
+    "M",
+    stroke / 2,
+    height / 2,
+    "L",
+    width - headWidth,
+    height / 2,
+    "L",
+    width - headWidth,
+    stroke / 2,
+    "L",
+    width - stroke / 2,
+    height / 2,
+    "L",
+    width - headWidth,
+    height - stroke / 2,
+    "L",
+    width - headWidth,
+    height / 2,
+    "Z",
+  ].join(" ");
+
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={`0 0 ${width} ${height}`}
+      width={`${width}px`}
+      height={`${height}px`}
+      version="1.1"
+    >
+      <path
+        stroke={color}
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill={color}
+        d={d}
+      />
+    </svg>
+  );
+};
+
 const NoDataLayout = ({ apiResponse }): JSX.Element => {
   return (
     <div className={classWithModifier("screen-container", "no-data")}>
@@ -23,7 +70,12 @@ const NoDataLayout = ({ apiResponse }): JSX.Element => {
           Live updates are temporarily unavailable
         </div>
       </div>
-      <div className="no-data__url">mbta.com/schedules</div>
+      <div className="no-data__link">
+        <div className="no-data__link-arrow">
+          <LinkArrow width="375" color="#a2a3a3" />
+        </div>
+        <div className="no-data__link-text">mbta.com/schedules</div>
+      </div>
     </div>
   );
 };
@@ -37,7 +89,12 @@ const DisabledLayout = ({ apiResponse }): JSX.Element => {
       <div className="disabled__logo-container">
         <img className="disabled__logo-image" src="/images/logo-white.svg" />
       </div>
-      <div className="disabled__url">mbta.com</div>
+      <div className="disabled__link">
+        <div className="disabled__link-arrow">
+          <LinkArrow width="576" color="#64696e" />
+        </div>
+        <div className="disabled__link-text">mbta.com</div>
+      </div>
     </div>
   );
 };
