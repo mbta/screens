@@ -11,6 +11,7 @@ import { formatTimeString, classWithModifier } from "Util/util";
 const NoDataLayout = ({ apiResponse }): JSX.Element => {
   return (
     <div className={classWithModifier("screen-container", "no-data")}>
+      <Header text="Station Name" />
       <div className="no-data__body">
         <div className="no-data__icon-container">
           <img
