@@ -3,6 +3,53 @@ import React from "react";
 import Section, { HeadwaySection } from "Components/dup/section";
 import { getKey, FreeTextElement } from "Components/dup/free_text";
 
+const LinkArrow = ({ width }) => {
+  const height = 40;
+  const stroke = 8;
+  const headWidth = 40;
+
+  const d = [
+    "M",
+    stroke / 2,
+    height / 2,
+    "L",
+    width - headWidth,
+    height / 2,
+    "L",
+    width - headWidth,
+    stroke / 2,
+    "L",
+    width - stroke / 2,
+    height / 2,
+    "L",
+    width - headWidth,
+    height - stroke / 2,
+    "L",
+    width - headWidth,
+    height / 2,
+    "Z",
+  ].join(" ");
+
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={`0 0 ${width} ${height}`}
+      width={`${width}px`}
+      height={`${height}px`}
+      version="1.1"
+    >
+      <path
+        stroke="#a2a3a3"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="#a2a3a3"
+        d={d}
+      />
+    </svg>
+  );
+};
+
 const HeadwaySectionList = ({ section: { pill, headway } }): JSX.Element => {
   const pillToLineName = {
     blue: "BLUE LINE",
@@ -21,7 +68,7 @@ const HeadwaySectionList = ({ section: { pill, headway } }): JSX.Element => {
   ];
 
   return (
-    <div className="section-list">
+    <div className="section-list section-list--headway">
       <div className="headway-section-list">
         <div className="headway-section-list__icon-container">
           <img
@@ -39,7 +86,14 @@ const HeadwaySectionList = ({ section: { pill, headway } }): JSX.Element => {
             ))}
           </div>
         </div>
-        <div className="headway-section-list__link">mbta.com/schedules</div>
+        <div className="headway-section-list__link">
+          <div className="headway-section-list__link-arrow">
+            <LinkArrow width="375" />
+          </div>
+          <div className="headway-section-list__link-text">
+            mbta.com/schedules
+          </div>
+        </div>
       </div>
     </div>
   );

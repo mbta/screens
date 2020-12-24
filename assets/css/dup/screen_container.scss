@@ -16,6 +16,10 @@
 .section-list {
   height: 832px;
   background-color: #f5f4f1;
+
+  &--headway {
+    background-color: #e6e4e1;
+  }
 }
 
 .disabled__time {
@@ -138,9 +142,20 @@
 }
 
 .headway-section-list__link {
-  font-family: Inter;
-  font-size: 108px;
   position: absolute;
   bottom: 56px;
   right: 72px;
+}
+
+.headway-section-list__link-arrow {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.headway-section-list__link-text {
+  display: inline-block;
+  vertical-align: middle;
+  font-family: Inter;
+  font-size: 108px;
+  margin-left: 72px;
 }
