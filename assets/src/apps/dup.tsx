@@ -9,23 +9,23 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenContainer, { ScreenLayout } from "Components/dup/screen_container";
 
 import {
-  AuditScreenPage,
-  MultiScreenPage,
   ScreenPage,
-} from "Components/eink/screen_page";
+  RotationPage,
+  MultiRotationPage,
+} from "Components/dup/dup_screen_page";
 
 const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
         <Route exact path="/screen/dup">
-          <MultiScreenPage screenContainer={ScreenContainer} />
+          <MultiRotationPage screenContainer={ScreenContainer} />
         </Route>
-        <Route exact path="/audit/dup">
-          <AuditScreenPage screenLayout={ScreenLayout} />
+        <Route path="/screen/:id/:rotationIndex">
+          <ScreenPage screenContainer={ScreenContainer} />
         </Route>
         <Route path="/screen/:id">
-          <ScreenPage screenContainer={ScreenContainer} />
+          <RotationPage screenContainer={ScreenContainer} />
         </Route>
       </Switch>
     </Router>

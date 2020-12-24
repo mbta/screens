@@ -32,8 +32,8 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   return <DefaultScreenLayout apiResponse={apiResponse} />;
 };
 
-const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse({ id, rotationIndex: 0 });
+const ScreenContainer = ({ id, rotationIndex }): JSX.Element => {
+  const apiResponse = useApiResponse({ id, rotationIndex });
 
   return <ScreenLayout apiResponse={apiResponse} />;
 };
