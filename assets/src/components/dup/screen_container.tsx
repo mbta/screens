@@ -6,6 +6,7 @@ import PartialAlerts from "Components/dup/partial_alert";
 import FreeText from "Components/dup/free_text";
 
 import useApiResponse from "Hooks/use_api_response";
+import { useOutfrontStation } from "Hooks/use_outfront_tags";
 
 import { formatTimeString, classWithModifier } from "Util/util";
 
@@ -57,9 +58,11 @@ const LinkArrow = ({ width, color }) => {
 };
 
 const NoDataLayout = (): JSX.Element => {
+  const stationName = useOutfrontStation() || "No Data";
+
   return (
     <div className={classWithModifier("screen-container", "no-data")}>
-      <Header text="Station Name" />
+      <Header text={stationName} />
       <div className="no-data__body">
         <div className="no-data__icon-container">
           <img
