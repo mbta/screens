@@ -6,10 +6,7 @@ const Header = ({ text, currentTimeString }): JSX.Element => {
   const environmentName = document.getElementById("app").dataset
     .environmentName;
 
-  const currentTime =
-    currentTimeString !== undefined
-      ? formatTimeString(currentTimeString)
-      : undefined;
+  const currentTime = currentTimeString && formatTimeString(currentTimeString);
 
   return (
     <div className="header">
@@ -24,9 +21,7 @@ const Header = ({ text, currentTimeString }): JSX.Element => {
       <div className="header__content-container">
         <div className="header__text">{text}</div>
       </div>
-      {currentTime !== undefined && (
-        <div className="header__time">{currentTime}</div>
-      )}
+      {currentTime && <div className="header__time">{currentTime}</div>}
     </div>
   );
 };

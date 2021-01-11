@@ -55,7 +55,7 @@ const LinkArrow = ({ width, color }) => {
   );
 };
 
-const NoDataLayout = ({ apiResponse }): JSX.Element => {
+const NoDataLayout = (): JSX.Element => {
   return (
     <div className={classWithModifier("screen-container", "no-data")}>
       <Header text="Station Name" />
@@ -127,7 +127,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
   if (!apiResponse || apiResponse.success === false) {
-    return <NoDataLayout apiResponse={apiResponse} />;
+    return <NoDataLayout />;
   } else if (apiResponse.type === "disabled") {
     return <DisabledLayout apiResponse={apiResponse} />;
   } else if (apiResponse.type === "static_image") {
