@@ -3,10 +3,9 @@
 @import "fonts_inter";
 @import "colors";
 
-@import "screen_page";
-
 @import "base/base_route_pill";
 
+@import "dup/dup_screen_page";
 @import "dup/screen_container";
 @import "dup/departure";
 @import "dup/departure_route";
