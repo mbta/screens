@@ -6,6 +6,107 @@ import PartialAlerts from "Components/dup/partial_alert";
 
 import useApiResponse from "Hooks/use_api_response";
 
+import { formatTimeString, classWithModifier } from "Util/util";
+
+const LinkArrow = ({ width, color }) => {
+  const height = 40;
+  const stroke = 8;
+  const headWidth = 40;
+
+  const d = [
+    "M",
+    stroke / 2,
+    height / 2,
+    "L",
+    width - headWidth,
+    height / 2,
+    "L",
+    width - headWidth,
+    stroke / 2,
+    "L",
+    width - stroke / 2,
+    height / 2,
+    "L",
+    width - headWidth,
+    height - stroke / 2,
+    "L",
+    width - headWidth,
+    height / 2,
+    "Z",
+  ].join(" ");
+
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={`0 0 ${width} ${height}`}
+      width={`${width}px`}
+      height={`${height}px`}
+      version="1.1"
+    >
+      <path
+        stroke={color}
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill={color}
+        d={d}
+      />
+    </svg>
+  );
+};
+
+const NoDataLayout = (): JSX.Element => {
+  return (
+    <div className={classWithModifier("screen-container", "no-data")}>
+      <Header text="Station Name" />
+      <div className="no-data__body">
+        <div className="no-data__icon-container">
+          <img
+            className="no-data__icon-image"
+            src="/images/live-data-none.svg"
+          />
+        </div>
+        <div className="no-data__message">
+          Live updates are temporarily unavailable
+        </div>
+      </div>
+      <div className="no-data__link">
+        <div className="no-data__link-arrow">
+          <LinkArrow width="375" color="#a2a3a3" />
+        </div>
+        <div className="no-data__link-text">mbta.com/schedules</div>
+      </div>
+    </div>
+  );
+};
+
+const DisabledLayout = ({ apiResponse }): JSX.Element => {
+  const currentTime = formatTimeString(apiResponse.current_time);
+
+  return (
+    <div className={classWithModifier("screen-container", "disabled")}>
+      <div className="disabled__time">{currentTime}</div>
+      <div className="disabled__logo-container">
+        <img className="disabled__logo-image" src="/images/logo-white.svg" />
+      </div>
+      <div className="disabled__link">
+        <div className="disabled__link-arrow">
+          <LinkArrow width="576" color="#64696e" />
+        </div>
+        <div className="disabled__link-text">mbta.com</div>
+      </div>
+    </div>
+  );
+};
+
+const StaticImageLayout = ({ srcUrl }): JSX.Element => {
+  return (
+    <div className="screen-container">
+      <img src={srcUrl} />
+    </div>
+  );
+};
+
 const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   return (
     <div className="screen-container">
@@ -26,7 +127,11 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
   if (!apiResponse || apiResponse.success === false) {
-    return <div className="screen-container">No Data</div>;
+    return <NoDataLayout />;
+  } else if (apiResponse.type === "disabled") {
+    return <DisabledLayout apiResponse={apiResponse} />;
+  } else if (apiResponse.type === "static_image") {
+    return <StaticImageLayout srcUrl={apiResponse.image_url} />;
   }
 
   return <DefaultScreenLayout apiResponse={apiResponse} />;

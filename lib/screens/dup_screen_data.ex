@@ -2,7 +2,7 @@ defmodule Screens.DupScreenData do
   @moduledoc false
 
   alias Screens.Config.{Dup, State}
-  alias Screens.Config.Dup.Override.{FullscreenAlert, PartialAlertList}
+  alias Screens.Config.Dup.Override.{FullscreenAlert, FullscreenImage, PartialAlertList}
   alias Screens.DupScreenData.{Data, Request, Response}
 
   def by_screen_id("dup-bus-headsigns", _is_screen) do
@@ -137,15 +137,19 @@ defmodule Screens.DupScreenData do
 
   def by_screen_id(screen_id, rotation_index) when rotation_index in ~w[0 1] do
     %Dup{primary: primary_departures, override: override} = State.app_params(screen_id)
+    disabled = State.disabled?(screen_id)
 
-    case {override, rotation_index} do
-      {nil, _} ->
+    case {override, rotation_index, disabled} do
+      {_, _, true} ->
+        disabled_response()
+
+      {nil, _, _} ->
         primary_screen_response(primary_departures, rotation_index)
 
-      {{screen0, _}, "0"} ->
+      {{screen0, _}, "0", _} ->
         primary_screen_response_with_override(primary_departures, rotation_index, screen0)
 
-      {{_, screen1}, "1"} ->
+      {{_, screen1}, "1", _} ->
         primary_screen_response_with_override(primary_departures, rotation_index, screen1)
     end
   end
@@ -155,6 +159,17 @@ defmodule Screens.DupScreenData do
 
     current_time = DateTime.utc_now()
     fetch_departures_response(secondary_departures, current_time)
+  end
+
+  defp disabled_response do
+    current_time = DateTime.utc_now()
+
+    %{
+      force_reload: false,
+      success: true,
+      type: :disabled,
+      current_time: Screens.Util.format_time(current_time)
+    }
   end
 
   defp primary_screen_response(primary_departures, rotation_index) do
@@ -208,6 +223,22 @@ defmodule Screens.DupScreenData do
         header: alert_response.header || primary_departures.header
       }
     )
+  end
+
+  defp primary_screen_response_with_override(
+         _primary_departures,
+         _,
+         %FullscreenImage{image_url: image_url}
+       ) do
+    current_time = DateTime.utc_now()
+
+    %{
+      force_reload: false,
+      success: true,
+      type: :static_image,
+      image_url: image_url,
+      current_time: Screens.Util.format_time(current_time)
+    }
   end
 
   defp fetch_and_interpret_alerts(%Dup.Departures{sections: sections}) do

@@ -360,6 +360,14 @@ const DupScreensTable = (): JSX.Element => {
       disableFilters: true,
       FormCell: FormTextarea,
     },
+    {
+      Header: "Override",
+      accessor: buildAppParamAccessor("override"),
+      mutator: buildAppParamMutator("override"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
   ];
 
   const dataFilter = ({ app_id }) => {
