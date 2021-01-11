@@ -25,9 +25,9 @@ defmodule Screens.DupScreenData.Request do
     end)
   end
 
-  def fetch_sections_data([_, _] = sections, current_time) do
+  def fetch_sections_data([_, _] = sections_with_alerts, current_time) do
     sections_data =
-      sections
+      sections_with_alerts
       |> Task.async_stream(&fetch_section_data(&1, 2, current_time))
       |> Enum.map(fn {:ok, data} -> data end)
 
@@ -38,15 +38,15 @@ defmodule Screens.DupScreenData.Request do
     end
   end
 
-  def fetch_sections_data([section], current_time) do
-    case fetch_section_data(section, 4, current_time) do
+  def fetch_sections_data([section_with_alert], current_time) do
+    case fetch_section_data(section_with_alert, 4, current_time) do
       {:ok, data} -> {:ok, [data]}
       :error -> :error
     end
   end
 
   defp fetch_section_data(
-         %Section{pill: pill, headway: %Headway{override: {lo, hi}}},
+         {%Section{pill: pill, headway: %Headway{override: {lo, hi}}}, _section_alert},
          _num_rows,
          _current_time
        ) do
@@ -54,12 +54,12 @@ defmodule Screens.DupScreenData.Request do
   end
 
   defp fetch_section_data(
-         %Section{stop_ids: stop_ids, route_ids: route_ids, pill: pill, headway: headway} =
-           section,
+         {%Section{stop_ids: stop_ids, route_ids: route_ids, pill: pill, headway: headway} =
+            section, section_alert},
          num_rows,
          current_time
        ) do
-    case fetch_headway_mode(section, headway, current_time) do
+    case fetch_headway_mode(section, headway, section_alert, current_time) do
       {:active, {lo, hi}} ->
         {:ok, %{pill: pill, headway: [lo, hi]}}
 
@@ -69,12 +69,12 @@ defmodule Screens.DupScreenData.Request do
   end
 
   defp fetch_headway_mode(
-         section,
+         _section,
          %Headway{sign_ids: sign_ids, headway_id: headway_id},
+         section_alert,
          current_time
        ) do
-    section_alert = Screens.DupScreenData.fetch_and_interpret_alert(section)
-    # NB: There aren't currently any DUPs at permanent terminals, do we assume all
+    # NB: There aren't currently any DUPs at permanent terminals, so we assume all
     # terminals are temporary. In the future, we'll need to check that the boundary
     # isn't a normal terminal.
     temporary_terminal? = match?([%{region: :boundary}], section_alert)
