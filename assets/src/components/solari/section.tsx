@@ -288,7 +288,7 @@ class PagedDeparture extends React.Component<
                     <div
                       className={beforeCaretClass}
                       style={{
-                        transform: `translateX(${translateWidth}px)`,
+                        transform: `translateX(-${translateWidth}px)`,
                       }}
                     ></div>
                   )}
@@ -301,7 +301,7 @@ class PagedDeparture extends React.Component<
                     <div
                       className={afterCaretClass}
                       style={{
-                        transform: `translateX(${translateWidth}px)`,
+                        transform: `translateX(-${translateWidth}px)`,
                       }}
                     ></div>
                   )}
