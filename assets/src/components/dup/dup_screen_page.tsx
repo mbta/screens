@@ -38,11 +38,11 @@ const MultiRotationPage = ({
   return (
     <div className="rotation-page">
       {screenIds.map((id) => (
-        <>
-          <ScreenContainer id={id} rotationIndex={0} key={`${id}-0`} />
-          <ScreenContainer id={id} rotationIndex={1} key={`${id}-1`} />
-          <ScreenContainer id={id} rotationIndex={2} key={`${id}-2`} />
-        </>
+        <React.Fragment key={id}>
+          <ScreenContainer id={id} rotationIndex={0} />
+          <ScreenContainer id={id} rotationIndex={1} />
+          <ScreenContainer id={id} rotationIndex={2} />
+        </React.Fragment>
       ))}
     </div>
   );
