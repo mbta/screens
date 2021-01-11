@@ -4,7 +4,7 @@ defmodule Screens.Config.Dup.Section.Headway do
   alias Screens.Util
 
   @typep sign_id :: String.t()
-  @typep headway_id :: String.t()
+  @typep headway_id :: String.t() | nil
   @typep override :: {pos_integer, pos_integer} | nil
 
   @type t :: %__MODULE__{

@@ -49,13 +49,14 @@ defmodule Screens.SignsUiConfig.State do
 
   def time_period(utc_time) do
     {:ok, dt} = DateTime.shift_zone(utc_time, "America/New_York")
-    day_of_week = dt |> DateTime.to_date() |> Date.day_of_week()
 
+    day_of_week = dt |> DateTime.to_date() |> Date.day_of_week()
     weekday? = day_of_week in 1..5
 
-    rush_hour? =
-      dt.hour in 7..8 or dt.hour in 16..17 or
-        (dt.hour == 18 and dt.minute <= 30)
+    t = {dt.hour, dt.minute}
+    am_rush? = t >= {7, 0} and t < {9, 0}
+    pm_rush? = t >= {16, 0} and t <= {18, 30}
+    rush_hour? = am_rush? or pm_rush?
 
     if(weekday? and rush_hour?, do: :peak, else: :off_peak)
   end

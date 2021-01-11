@@ -2,6 +2,7 @@ import React from "react";
 
 import Section, { HeadwaySection } from "Components/dup/section";
 import { getKey, FreeTextElement } from "Components/dup/free_text";
+import { classWithModifier } from "Util/util";
 
 const LinkArrow = ({ width }) => {
   const height = 40;
@@ -68,7 +69,7 @@ const HeadwaySectionList = ({ section: { pill, headway } }): JSX.Element => {
   ];
 
   return (
-    <div className="section-list section-list--headway">
+    <div className={classWithModifier("section-list", "headway")}>
       <div className="headway-section-list">
         <div className="headway-section-list__icon-container">
           <img
