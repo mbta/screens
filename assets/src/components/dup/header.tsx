@@ -5,15 +5,13 @@ import { classWithModifier, formatTimeString } from "Util/util";
 const patternMap: { [key: string]: string } = {
   hatched: "disruption",
   x: "closure",
-  chevron: "suspension"
+  chevron: "suspension",
 };
 
 const CurrentTime = ({ currentTimeString }): JSX.Element => {
   const currentTime = formatTimeString(currentTimeString);
 
-  return (
-    <div className="header__time">{currentTime}</div>
-  );
+  return <div className="header__time">{currentTime}</div>;
 };
 
 const Pattern = ({ pattern }: { pattern: string }): JSX.Element => {
@@ -32,7 +30,9 @@ const Header = ({ text, currentTimeString, pattern, color }): JSX.Element => {
   const environmentName = document.getElementById("app").dataset
     .environmentName;
 
-  const className = color ? classWithModifier("header", `color-${color}`) : "header";
+  const className = color
+    ? classWithModifier("header", `color-${color}`)
+    : "header";
 
   const logoColor = color === "yellow" ? "black" : "white";
 
@@ -44,12 +44,17 @@ const Header = ({ text, currentTimeString, pattern, color }): JSX.Element => {
           : ""}
       </div>
       <div className="header__logo-container">
-        <img className="header__logo-image" src={`/images/logo-${logoColor}.svg`} />
+        <img
+          className="header__logo-image"
+          src={`/images/logo-${logoColor}.svg`}
+        />
       </div>
       <div className="header__content-container">
         <div className="header__text">{text}</div>
       </div>
-      {currentTimeString && <CurrentTime currentTimeString={currentTimeString} />}
+      {currentTimeString && (
+        <CurrentTime currentTimeString={currentTimeString} />
+      )}
       {pattern && <Pattern pattern={pattern} />}
     </div>
   );
