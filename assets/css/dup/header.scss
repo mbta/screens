@@ -1,8 +1,26 @@
 .header {
+  position: relative;
   background-color: #171f26;
   color: white;
   height: 248px;
   position: relative;
+
+  &--color-red {
+    background-color: $line-color-red;
+  }
+  &--color-orange {
+    background-color: $line-color-orange;
+  }
+  &--color-green {
+    background-color: $line-color-green;
+  }
+  &--color-blue {
+    background-color: $line-color-blue;
+  }
+  &--color-yellow {
+    background-color: $alert-yellow;
+    color: #171f26;
+  }
 }
 
 .header__time {
@@ -47,4 +65,10 @@
   color: #ffffff;
   letter-spacing: 0;
   line-height: 48px;
+}
+
+.header__accent-pattern-container {
+  position: absolute;
+  right: 0;
+  display: inline-block;
 }

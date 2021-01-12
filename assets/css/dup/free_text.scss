@@ -1,28 +1,16 @@
 .free-text {
   font-family: Inter;
-  font-size: 138px;
-  line-height: 144px;
-  color: #ffffff;
 }
 
 .free-text__line {
   display: inline-block;
   vertical-align: middle;
-  width: 1608px;
 }
 
 .free-text__icon-container {
   display: inline-block;
   vertical-align: middle;
-  width: 312px;
-  height: 208px;
   text-align: center;
-}
-
-.free-text__icon-image {
-  height: 168px;
-  padding-top: 20px;
-  padding-bottom: 20px;
 }
 
 .free-text__element {
@@ -39,12 +27,7 @@
 
 .free-text__route-pill {
   display: inline-block;
-  height: 144px;
-  width: 248px;
-  border-radius: 72px;
   font-family: neue-haas-grotesk-text;
-  font-size: 96px;
-  line-height: 144px;
   font-weight: 700;
   text-align: center;
 
@@ -75,13 +58,8 @@
 
 .free-text__text-pill {
   display: inline-block;
-  border-radius: 84px;
-  font-size: 126px;
-  line-height: 168px;
   font-family: neue-haas-grotesk-text;
   font-weight: 700;
-  padding-left: 84px;
-  padding-right: 84px;
 
   &--green {
     background: $line-color-green;
@@ -105,5 +83,89 @@
 
   &--purple {
     background: $line-color-cr;
+  }
+}
+
+.partial-alert {
+  .free-text {
+    font-size: 138px;
+    line-height: 144px;
+    color: #ffffff;
+  }
+
+  .free-text__line {
+    width: 1608px;
+  }
+
+  .free-text__icon-container {
+    width: 312px;
+    height: 208px;
+  }
+
+  .free-text__icon-image {
+    height: 168px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .free-text__route-pill {
+    height: 144px;
+    width: 248px;
+    border-radius: 72px;
+    font-size: 96px;
+    line-height: 144px;
+  }
+
+  .free-text__text-pill {
+    border-radius: 84px;
+    font-size: 126px;
+    line-height: 168px;
+    padding-left: 84px;
+    padding-right: 84px;
+  }
+}
+
+.full-screen-alert-text {
+  .free-text {
+    font-size: 138px;
+    color: #ffffff;
+  }
+
+  .free-text__line-container {
+    margin-bottom: 56px;
+    line-height: 144px;
+  }
+
+  .free-text__line {
+    width: 1544px;
+  }
+
+  .free-text__icon-container {
+    width: 184px;
+    height: 184px;
+    margin-right: 64px;
+    vertical-align: top;
+  }
+
+  .free-text__icon-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .free-text__route-pill {
+    height: 144px;
+    width: 248px;
+    border-radius: 72px;
+    font-size: 96px;
+    line-height: 144px;
+  }
+
+  .free-text__text-pill {
+    border-radius: 84px;
+    font-size: 126px;
+    line-height: 168px;
+    padding-left: 84px;
+    padding-right: 84px;
   }
 }

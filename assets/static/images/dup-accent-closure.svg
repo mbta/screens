@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="464px" height="248px" viewBox="0 0 464 248" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>DUP/Alert Header/Accent-Closure</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="464" height="248"></rect>
+    </defs>
+    <g id="DUP/Alert-Header/Accent-Closure" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <mask id="mask-2" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+        <g id="Mask"></g>
+        <g id="X" mask="url(#mask-2)" stroke="#171F26" stroke-width="16">
+            <g transform="translate(-132.000000, -236.000000)">
+                <path d="M630,90 L90,630 L630,90 Z" id="Line"></path>
+                <polyline id="Path" points="810 90 540 360 810 630"></polyline>
+                <polyline id="Path" points="720 90 450 360 720 630"></polyline>
+                <polyline id="Path" transform="translate(135.000000, 360.000000) scale(-1, 1) translate(-135.000000, -360.000000) " points="270 90 0 360 270 630"></polyline>
+                <polyline id="Path" transform="translate(360.000000, 585.000000) rotate(90.000000) translate(-360.000000, -585.000000) " points="495 315 225 585 495 855"></polyline>
+                <polyline id="Path" transform="translate(360.000000, 135.000000) scale(1, -1) rotate(90.000000) translate(-360.000000, -135.000000) " points="495 -135 225 135 495 405"></polyline>
+                <path d="M630,90 L90,630 L630,90 Z" id="Line" transform="translate(360.000000, 360.000000) scale(-1, 1) translate(-360.000000, -360.000000) "></path>
+            </g>
+        </g>
+    </g>
+</svg>
