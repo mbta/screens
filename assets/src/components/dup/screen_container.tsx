@@ -7,6 +7,8 @@ import FreeText from "Components/dup/free_text";
 
 import useApiResponse from "Hooks/use_api_response";
 
+import { formatTimeString, classWithModifier } from "Util/util";
+
 const LinkArrow = ({ width, color }) => {
   const height = 40;
   const stroke = 8;
@@ -54,6 +56,58 @@ const LinkArrow = ({ width, color }) => {
   );
 };
 
+const NoDataLayout = (): JSX.Element => {
+  return (
+    <div className={classWithModifier("screen-container", "no-data")}>
+      <Header text="Station Name" />
+      <div className="no-data__body">
+        <div className="no-data__icon-container">
+          <img
+            className="no-data__icon-image"
+            src="/images/live-data-none.svg"
+          />
+        </div>
+        <div className="no-data__message">
+          Live updates are temporarily unavailable
+        </div>
+      </div>
+      <div className="no-data__link">
+        <div className="no-data__link-arrow">
+          <LinkArrow width="375" color="#a2a3a3" />
+        </div>
+        <div className="no-data__link-text">mbta.com/schedules</div>
+      </div>
+    </div>
+  );
+};
+
+const DisabledLayout = ({ apiResponse }): JSX.Element => {
+  const currentTime = formatTimeString(apiResponse.current_time);
+
+  return (
+    <div className={classWithModifier("screen-container", "disabled")}>
+      <div className="disabled__time">{currentTime}</div>
+      <div className="disabled__logo-container">
+        <img className="disabled__logo-image" src="/images/logo-white.svg" />
+      </div>
+      <div className="disabled__link">
+        <div className="disabled__link-arrow">
+          <LinkArrow width="576" color="#64696e" />
+        </div>
+        <div className="disabled__link-text">mbta.com</div>
+      </div>
+    </div>
+  );
+};
+
+const StaticImageLayout = ({ srcUrl }): JSX.Element => {
+  return (
+    <div className="screen-container">
+      <img src={srcUrl} />
+    </div>
+  );
+};
+
 const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   return (
     <div className="screen-container">
@@ -98,19 +152,23 @@ const FullScreenAlertLayout = ({ apiResponse }): JSX.Element => {
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
   if (!apiResponse || apiResponse.success === false) {
-    return <div className="screen-container">No Data</div>;
+    return <NoDataLayout />;
   }
 
   switch (apiResponse.type) {
+    case "disabled":
+      return <DisabledLayout apiResponse={apiResponse} />;
+    case "static_image":
+      return <StaticImageLayout srcUrl={apiResponse.image_url} />;
     case "full_screen_alert":
       return <FullScreenAlertLayout apiResponse={apiResponse} />;
-    case "departures":
+    default:
       return <DefaultScreenLayout apiResponse={apiResponse} />;
   }
 };
 
-const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse({ id, rotationIndex: 0 });
+const ScreenContainer = ({ id, rotationIndex }): JSX.Element => {
+  const apiResponse = useApiResponse({ id, rotationIndex });
 
   return <ScreenLayout apiResponse={apiResponse} />;
 };
