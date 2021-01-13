@@ -8,6 +8,7 @@ const srcForIcon = (icon) => {
     x: "/images/no-service-white.svg",
     shuttle: "/images/bus-white.svg",
     subway: "/images/subway-white.svg",
+    "subway-negative-black": "/images/subway-negative-black.svg",
     cr: "/images/commuter-rail.svg",
     walk: "/images/nearby-white.svg",
   }[icon];
@@ -22,13 +23,17 @@ const getKey = (elt) => {
     return `route-pill--${elt.route}`;
   } else if (elt.text !== undefined) {
     return `${elt.color}--${elt.text}`;
+  } else if (elt.special !== undefined) {
+    return `special--${elt.special}`;
   }
 };
 
 const Icon = ({ icon }) => {
   let iconElt;
 
-  if (["red", "blue", "orange", "green", "silver"].includes(icon)) {
+  if (icon === null) {
+    iconElt = null;
+  } else if (["red", "blue", "orange", "green", "silver"].includes(icon)) {
     iconElt = <RoutePill route={icon} />;
   } else {
     iconElt = <img className="free-text__icon-image" src={srcForIcon(icon)} />;
@@ -75,6 +80,14 @@ const TextPill = ({ color, text }) => {
   );
 };
 
+const Special = ({ data }) => {
+  if (data === "break") {
+    return <br />;
+  }
+
+  return null;
+};
+
 const FreeTextElement = ({ elt }) => {
   if (typeof elt === "string") {
     return <FormatString text={elt} format={null} />;
@@ -84,6 +97,8 @@ const FreeTextElement = ({ elt }) => {
     return <RoutePill route={elt.route} />;
   } else if (elt.color !== undefined) {
     return <TextPill color={elt.color} text={elt.text} />;
+  } else if (elt.special !== undefined) {
+    return <Special data={elt.special} />;
   }
 
   return null;
@@ -122,4 +137,3 @@ const FreeText = ({ lines }) => {
 };
 
 export default FreeText;
-export { getKey, FreeTextLine, FreeTextElement };

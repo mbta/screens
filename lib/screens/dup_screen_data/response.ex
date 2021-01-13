@@ -101,7 +101,7 @@ defmodule Screens.DupScreenData.Response do
   end
 
   def alert_issue(%{region: :inside, cause: cause}) do
-    %{icon: :x, free_text: [%{format: :bold, text: "STATION CLOSED"}, render_alert_cause(cause)]}
+    %{icon: :x, text: [%{format: :bold, text: "STATION CLOSED"}, render_alert_cause(cause)]}
   end
 
   def alert_issue(%{region: :boundary, pill: pill, headsign: headsign}) do
@@ -118,7 +118,7 @@ defmodule Screens.DupScreenData.Response do
     icon = alert_remedy_icon(alert.effect)
     line = [%{format: :bold, text: alert_remedy_text(alert.effect)}]
 
-    %{icon: icon, free_text: line}
+    %{icon: icon, text: line}
   end
 
   @alert_remedy_text_mapping %{

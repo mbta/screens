@@ -1,7 +1,7 @@
 import React from "react";
 
 import Section, { HeadwaySection } from "Components/dup/section";
-import { getKey, FreeTextElement } from "Components/dup/free_text";
+import FreeText from "Components/dup/free_text";
 import { classWithModifier } from "Util/util";
 
 const LinkArrow = ({ width }) => {
@@ -61,39 +61,31 @@ const HeadwaySectionList = ({ section: { pill, headway } }): JSX.Element => {
   };
 
   const [lo, hi] = headway;
-  const lineText = { color: pill, text: pillToLineName[pill] };
-  const headwayText = [
+  const text = [
+    { color: pill, text: pillToLineName[pill] },
+    { special: "break" },
     "every",
     { format: "bold", text: `${lo}-${hi}` },
     "minutes",
   ];
+  const lines = { icon: "subway-negative-black", text };
 
   return (
     <div className={classWithModifier("section-list", "headway")}>
-      <div className="headway-section-list">
-        <div className="headway-section-list__icon-container">
-          <img
-            className="headway-section-list__icon-image"
-            src="/images/subway-negative-black.svg"
-          />
+      <div
+        className={
+          "headway-section-list " +
+          classWithModifier("full-screen-alert-text", "dark")
+        }
+      >
+        <FreeText lines={lines} />
+      </div>
+      <div className="headway-section-list__link">
+        <div className="headway-section-list__link-arrow">
+          <LinkArrow width="375" />
         </div>
-        <div className="headway-section-list__message">
-          <div>
-            <FreeTextElement elt={lineText} />
-          </div>
-          <div>
-            {headwayText.map((elt) => (
-              <FreeTextElement elt={elt} key={getKey(elt)} />
-            ))}
-          </div>
-        </div>
-        <div className="headway-section-list__link">
-          <div className="headway-section-list__link-arrow">
-            <LinkArrow width="375" />
-          </div>
-          <div className="headway-section-list__link-text">
-            mbta.com/schedules
-          </div>
+        <div className="headway-section-list__link-text">
+          mbta.com/schedules
         </div>
       </div>
     </div>

@@ -128,6 +128,20 @@
     padding-left: 84px;
     padding-right: 84px;
   }
+
+  &--dark {
+    .free-text {
+      color: #000000;
+    }
+
+    .free-text__route-pill {
+      color: #ffffff;
+    }
+
+    .free-text__text-pill {
+      color: #ffffff;
+    }
+  }
 }
 
 .full-screen-alert-text {
@@ -172,5 +186,19 @@
     line-height: 168px;
     padding-left: 84px;
     padding-right: 84px;
+  }
+
+  &--dark {
+    .free-text {
+      color: #000000;
+    }
+
+    .free-text__route-pill {
+      color: #ffffff;
+    }
+
+    .free-text__text-pill {
+      color: #ffffff;
+    }
   }
 }
