@@ -1,27 +1,61 @@
 import React from "react";
 
-import { formatTimeString } from "Util/util";
+import { classWithModifier, formatTimeString } from "Util/util";
 
-const Header = ({ text, currentTimeString }): JSX.Element => {
+const patternMap: { [key: string]: string } = {
+  hatched: "disruption",
+  x: "closure",
+  chevron: "suspension",
+};
+
+const CurrentTime = ({ currentTimeString }): JSX.Element => {
+  const currentTime = formatTimeString(currentTimeString);
+
+  return <div className="header__time">{currentTime}</div>;
+};
+
+const Pattern = ({ pattern }: { pattern: string }): JSX.Element => {
+  const svgName = patternMap[pattern];
+
+  const svgPath = `/images/dup-accent-${svgName}.svg`;
+
+  return (
+    <div className="header__accent-pattern-container">
+      <img className="header__accent-pattern-image" src={svgPath} />
+    </div>
+  );
+};
+
+const Header = ({ text, currentTimeString, pattern, color }): JSX.Element => {
   const environmentName = document.getElementById("app").dataset
     .environmentName;
 
-  const currentTime = currentTimeString && formatTimeString(currentTimeString);
+  const className = color
+    ? classWithModifier("header", `color-${color}`)
+    : "header";
+
+  const logoColor = color === "yellow" ? "black" : "white";
 
   return (
-    <div className="header">
+    <div className={className}>
       <div className="header__environment">
         {["screens-dev", "screens-dev-green"].includes(environmentName)
           ? environmentName
           : ""}
       </div>
       <div className="header__logo-container">
-        <img className="header__logo-image" src="/images/logo-white.svg" />
+        <img
+          className="header__logo-image"
+          src={`/images/logo-${logoColor}.svg`}
+        />
       </div>
       <div className="header__content-container">
         <div className="header__text">{text}</div>
       </div>
-      {currentTime && <div className="header__time">{currentTime}</div>}
+      {currentTimeString && (
+        <CurrentTime currentTimeString={currentTimeString} />
+      )}
+      {pattern && <Pattern pattern={pattern} />}
     </div>
   );
 };

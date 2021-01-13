@@ -3,6 +3,7 @@ import React from "react";
 import Header from "Components/dup/header";
 import SectionList from "Components/dup/section_list";
 import PartialAlerts from "Components/dup/partial_alert";
+import FreeText from "Components/dup/free_text";
 
 import useApiResponse from "Hooks/use_api_response";
 
@@ -125,16 +126,45 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   );
 };
 
+const FullScreenAlertLayout = ({ apiResponse }): JSX.Element => {
+  return (
+    <div className="screen-container">
+      <Header
+        text={apiResponse.header}
+        color={apiResponse.color}
+        pattern={apiResponse.pattern}
+        currentTimeString={apiResponse.current_time}
+      />
+      <div className="full-screen-alert__body">
+        <div className="full-screen-alert-text">
+          <FreeText lines={[apiResponse.issue, apiResponse.remedy]} />
+        </div>
+        <div className="full-screen-alert__link">
+          <div className="full-screen-alert__link-arrow">
+            <LinkArrow width="628" color="#64696e" />
+          </div>
+          <div className="full-screen-alert__link-text">mbta.com/alerts</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
   if (!apiResponse || apiResponse.success === false) {
     return <NoDataLayout />;
-  } else if (apiResponse.type === "disabled") {
-    return <DisabledLayout apiResponse={apiResponse} />;
-  } else if (apiResponse.type === "static_image") {
-    return <StaticImageLayout srcUrl={apiResponse.image_url} />;
   }
 
-  return <DefaultScreenLayout apiResponse={apiResponse} />;
+  switch (apiResponse.type) {
+    case "disabled":
+      return <DisabledLayout apiResponse={apiResponse} />;
+    case "static_image":
+      return <StaticImageLayout srcUrl={apiResponse.image_url} />;
+    case "full_screen_alert":
+      return <FullScreenAlertLayout apiResponse={apiResponse} />;
+    default:
+      return <DefaultScreenLayout apiResponse={apiResponse} />;
+  }
 };
 
 const ScreenContainer = ({ id, rotationIndex }): JSX.Element => {

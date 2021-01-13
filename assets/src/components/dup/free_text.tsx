@@ -91,7 +91,7 @@ const FreeTextElement = ({ elt }) => {
 
 const FreeTextLine = ({ icon, text }) => {
   return (
-    <div>
+    <div className="free-text__line-container">
       <Icon icon={icon} />
       <div className="free-text__line">
         {text.map((elt) => (
