@@ -43,13 +43,23 @@ defmodule ScreensWeb.ScreenController do
     assign(conn, :body_class, body_class)
   end
 
+  defp id_sort_fn(a, b) do
+    case {Integer.parse(a), Integer.parse(b)} do
+      {{m, ""}, {n, ""}} ->
+        m <= n
+
+      _ ->
+        a <= b
+    end
+  end
+
   defp screen_ids(target_app_id) do
     screen_ids =
       for {screen_id, %Screen{app_id: app_id}} <- State.screens(), app_id == target_app_id do
         screen_id
       end
 
-    Enum.sort_by(screen_ids, &String.to_integer/1)
+    Enum.sort(screen_ids, &id_sort_fn/2)
   end
 
   def index(conn, %{"id" => app_id})
