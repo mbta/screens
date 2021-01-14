@@ -29,8 +29,14 @@ defmodule Screens.DupScreenData do
   def by_screen_id(screen_id, "2") do
     %Dup{secondary: secondary_departures} = State.app_params(screen_id)
 
-    current_time = DateTime.utc_now()
-    fetch_departures_response(secondary_departures, current_time)
+    case secondary_departures do
+      %Dup.Departures{sections: []} ->
+        by_screen_id(screen_id, "0")
+
+      _ ->
+        current_time = DateTime.utc_now()
+        fetch_departures_response(secondary_departures, current_time)
+    end
   end
 
   defp disabled_response do
