@@ -74,7 +74,11 @@ const HeadwaySectionList = ({ section: { pill, headway } }): JSX.Element => {
   );
 };
 
-const SectionList = ({ sections, currentTimeString, currentPage }): JSX.Element => {
+const SectionList = ({
+  sections,
+  currentTimeString,
+  currentPage,
+}): JSX.Element => {
   if (sections.length === 1 && sections[0].headway) {
     return <HeadwaySectionList section={sections[0]} />;
   }

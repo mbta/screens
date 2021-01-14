@@ -112,9 +112,7 @@ const StaticImageLayout = ({ srcUrl }): JSX.Element => {
   );
 };
 
-const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
-  const currentPage = useCurrentPage();
-
+const DefaultScreenLayout = ({ apiResponse, currentPage }): JSX.Element => {
   return (
     <div className="screen-container">
       <Header
@@ -158,6 +156,8 @@ const FullScreenAlertLayout = ({ apiResponse }): JSX.Element => {
 };
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
+  const currentPage = useCurrentPage();
+
   if (!apiResponse || apiResponse.success === false) {
     return <NoDataLayout />;
   }
@@ -170,7 +170,12 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
     case "full_screen_alert":
       return <FullScreenAlertLayout apiResponse={apiResponse} />;
     default:
-      return <DefaultScreenLayout apiResponse={apiResponse} />;
+      return (
+        <DefaultScreenLayout
+          apiResponse={apiResponse}
+          currentPage={currentPage}
+        />
+      );
   }
 };
 
