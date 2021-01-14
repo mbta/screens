@@ -35,7 +35,7 @@ defmodule Screens.DupScreenData do
 
       _ ->
         current_time = DateTime.utc_now()
-        fetch_departures_response(secondary_departures, current_time)
+        fetch_departures_response(secondary_departures, %{}, current_time)
     end
   end
 
@@ -51,7 +51,8 @@ defmodule Screens.DupScreenData do
   end
 
   defp primary_screen_response(primary_departures, rotation_index) do
-    alerts = fetch_and_interpret_alerts(primary_departures)
+    alerts_by_section = fetch_and_interpret_alerts(primary_departures)
+    alerts = flatten_alerts(alerts_by_section)
 
     line_count = Data.station_line_count(primary_departures)
 
@@ -59,10 +60,10 @@ defmodule Screens.DupScreenData do
 
     case Data.response_type(alerts, line_count, rotation_index) do
       :departures ->
-        fetch_departures_response(primary_departures, current_time)
+        fetch_departures_response(primary_departures, alerts_by_section, current_time)
 
       :partial_alert ->
-        fetch_partial_alert_response(primary_departures, alerts, current_time)
+        fetch_partial_alert_response(primary_departures, alerts_by_section, current_time)
 
       :fullscreen_alert ->
         fetch_fullscreen_alert_response(primary_departures, alerts, line_count)
@@ -74,7 +75,8 @@ defmodule Screens.DupScreenData do
          rotation_index,
          %PartialAlertList{} = override
        ) do
-    alerts = fetch_and_interpret_alerts(primary_departures)
+    alerts_by_section = fetch_and_interpret_alerts(primary_departures)
+    alerts = flatten_alerts(alerts_by_section)
 
     line_count = Data.station_line_count(primary_departures)
 
@@ -119,10 +121,15 @@ defmodule Screens.DupScreenData do
     }
   end
 
+  defp flatten_alerts(alerts_by_section) do
+    Enum.flat_map(alerts_by_section, fn {_pill, alerts} -> alerts end)
+  end
+
   defp fetch_and_interpret_alerts(%Dup.Departures{sections: sections}) do
     sections
     |> Task.async_stream(&fetch_and_interpret_alert/1)
-    |> Enum.flat_map(fn {:ok, data} -> data end)
+    |> Enum.map(fn {:ok, data} -> data end)
+    |> Enum.into(%{})
   end
 
   defp fetch_and_interpret_alert(%Dup.Section{
@@ -133,21 +140,30 @@ defmodule Screens.DupScreenData do
        when pill in ~w[red orange green blue]a do
     alerts = Request.fetch_alerts(stop_ids, route_ids)
 
-    alerts
-    |> Data.choose_alert()
-    |> case do
-      nil -> []
-      alert -> [Data.interpret_alert(alert, stop_ids, pill)]
-    end
+    chosen_alert =
+      alerts
+      |> Data.choose_alert()
+      |> case do
+        nil -> []
+        alert -> [Data.interpret_alert(alert, stop_ids, pill)]
+      end
+
+    {pill, chosen_alert}
   end
 
-  defp fetch_and_interpret_alert(_non_subway_section), do: []
+  defp fetch_and_interpret_alert(%Dup.Section{pill: pill}), do: {pill, []}
 
   defp fetch_departures_response(
          %Dup.Departures{header: header, sections: sections},
+         alerts_by_section,
          current_time
        ) do
-    sections_data = Request.fetch_sections_data(sections)
+    sections_with_alerts =
+      Enum.map(sections, fn section ->
+        {section, Map.get(alerts_by_section, section.pill)}
+      end)
+
+    sections_data = Request.fetch_sections_data(sections_with_alerts, current_time)
 
     case sections_data do
       {:ok, data} ->
@@ -165,13 +181,23 @@ defmodule Screens.DupScreenData do
     end
   end
 
-  defp fetch_partial_alert_response(primary_departures, alerts, current_time, opts \\ []) do
-    departures_response = fetch_departures_response(primary_departures, current_time)
+  defp fetch_partial_alert_response(
+         primary_departures,
+         alerts_or_override,
+         current_time,
+         opts \\ []
+       ) do
+    override? = Keyword.get(opts, :override, false)
+    alerts_by_section = if(override?, do: %{}, else: alerts_or_override)
+    alerts = if(override?, do: alerts_or_override, else: flatten_alerts(alerts_by_section))
+
+    departures_response =
+      fetch_departures_response(primary_departures, alerts_by_section, current_time)
 
     case departures_response do
       %{force_reload: false, success: true, sections: sections} ->
         alerts =
-          if(Keyword.get(opts, :override, false),
+          if(override?,
             do: PartialAlertList.to_json(alerts).alerts,
             else: Response.render_partial_alerts(alerts)
           )

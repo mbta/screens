@@ -135,7 +135,8 @@ config :screens,
     "70024",
     "70025",
     "70203",
-    "70204"
+    "70204",
+    "place-haecl"
   ]
 
 # Import environment specific config. This must remain at the bottom

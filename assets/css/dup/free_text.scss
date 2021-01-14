@@ -11,6 +11,11 @@
   display: inline-block;
   vertical-align: middle;
   text-align: center;
+
+  .free-text__route-pill {
+    margin-top: 30px;
+    color: #ffffff;
+  }
 }
 
 .free-text__element {
@@ -123,6 +128,20 @@
     padding-left: 84px;
     padding-right: 84px;
   }
+
+  &--dark {
+    .free-text {
+      color: #171f26;
+    }
+
+    .free-text__route-pill {
+      color: #ffffff;
+    }
+
+    .free-text__text-pill {
+      color: #ffffff;
+    }
+  }
 }
 
 .full-screen-alert-text {
@@ -167,5 +186,19 @@
     line-height: 168px;
     padding-left: 84px;
     padding-right: 84px;
+  }
+
+  &--dark {
+    .free-text {
+      color: #171f26;
+    }
+
+    .free-text__route-pill {
+      color: #ffffff;
+    }
+
+    .free-text__text-pill {
+      color: #ffffff;
+    }
   }
 }
