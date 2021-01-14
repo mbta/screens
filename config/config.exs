@@ -61,7 +61,7 @@ config :screens,
   audio_psa_s3_directory: "/screens/audio_assets/psa/",
   signs_ui_s3_path: "config.json",
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.S3Fetch,
-  api_v3_url: "https://api-v3.mbta.com/"
+  default_api_v3_url: "https://api-v3.mbta.com/"
 
 config :screens,
   # Maps alert informed entity contents to the appropriate headsign to show for that alert.
