@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e -x -u
+set -e -u
 
 # bash script should be called with aws environment (dev / dev-green / prod)
 # other required configuration:
