@@ -27,13 +27,18 @@ const camelizeDepartureObject = ({
   crowdingLevel,
 });
 
-const Section = ({ departures, currentTimeString }): JSX.Element => {
+const Section = ({
+  departures,
+  currentTimeString,
+  currentPage,
+}): JSX.Element => {
   return (
     <div className="section">
       {departures.map((departure) => (
         <Departure
           {...camelizeDepartureObject(departure)}
           currentTimeString={currentTimeString}
+          currentPage={currentPage}
           key={departure.id}
         />
       ))}

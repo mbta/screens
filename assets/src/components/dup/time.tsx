@@ -16,16 +16,8 @@ const Time = ({
   vehicleStatus,
   stopType,
   noMinutes,
+  currentPage,
 }) => {
-  const [page, setPage] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPage((p) => 1 - p);
-    }, 3750);
-    return () => clearInterval(interval);
-  }, []);
-
   const timeRepresentation = standardTimeRepresentation(
     time,
     currentTimeString,
@@ -45,7 +37,7 @@ const Time = ({
       true
     );
     if (!timeRepresentationsEqual(timeRepresentation, scheduleRepresentation)) {
-      if (page === 0) {
+      if (currentPage === 0) {
         return (
           <div className="departure-time">
             <BaseDepartureTime time={timeRepresentation} hideAmPm={true} />

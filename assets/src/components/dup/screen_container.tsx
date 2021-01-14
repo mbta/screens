@@ -7,6 +7,7 @@ import FreeText from "Components/dup/free_text";
 
 import useApiResponse from "Hooks/use_api_response";
 import { useOutfrontStation } from "Hooks/use_outfront_tags";
+import useCurrentPage from "Hooks/use_current_dup_page";
 
 import { formatTimeString, classWithModifier } from "Util/util";
 
@@ -112,6 +113,8 @@ const StaticImageLayout = ({ srcUrl }): JSX.Element => {
 };
 
 const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
+  const currentPage = useCurrentPage();
+
   return (
     <div className="screen-container">
       <Header
@@ -121,6 +124,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
       <SectionList
         sections={apiResponse.sections}
         currentTimeString={apiResponse.current_time}
+        currentPage={currentPage}
       />
       {apiResponse.alerts?.length > 0 && (
         <PartialAlerts alerts={apiResponse.alerts} />
