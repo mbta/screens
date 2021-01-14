@@ -153,7 +153,7 @@ defmodule Screens.SolariScreenData do
       ) do
     if SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids) do
       time_ranges = SignsUiConfig.State.time_ranges(headway_id)
-      current_time_period = SignsUiConfig.State.time_period(current_time)
+      current_time_period = Screens.Util.time_period(current_time)
 
       case time_ranges do
         %{^current_time_period => {range_low, range_high}} ->

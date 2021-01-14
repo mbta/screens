@@ -1,6 +1,33 @@
 defmodule Screens.DupScreenData.Response do
   @moduledoc false
 
+  @pill_to_specifier %{
+    red: "Red Line",
+    orange: "Orange Line",
+    green: "Green Line",
+    blue: "Blue Line",
+    mattapan: "Mattapan Line"
+  }
+
+  def render_headway_lines(pill, {lo, hi}, num_rows) do
+    case num_rows do
+      2 ->
+        %{icon: pill, text: ["every", %{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]}
+
+      4 ->
+        %{
+          icon: "subway-negative-black",
+          text: [
+            %{color: pill, text: @pill_to_specifier |> Map.get(pill) |> String.upcase()},
+            %{special: :break},
+            "every",
+            %{format: :bold, text: "#{lo}-#{hi}"},
+            "minutes"
+          ]
+        }
+    end
+  end
+
   def render_partial_alerts([alert]) do
     [
       %{
@@ -18,14 +45,6 @@ defmodule Screens.DupScreenData.Response do
       text: [%{format: :bold, text: "No #{specifier}"}, service_or_trains]
     }
   end
-
-  @pill_to_specifier %{
-    red: "Red Line",
-    orange: "Orange Line",
-    green: "Green Line",
-    blue: "Blue Line",
-    mattapan: "Mattapan Line"
-  }
 
   for {pill, specifier} <- @pill_to_specifier do
     defp partial_alert_specifier(%{headsign: nil, pill: unquote(pill)}) do

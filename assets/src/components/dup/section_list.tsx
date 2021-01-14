@@ -52,24 +52,6 @@ const LinkArrow = ({ width }) => {
 };
 
 const HeadwaySectionList = ({ section: { pill, headway } }): JSX.Element => {
-  const pillToLineName = {
-    blue: "BLUE LINE",
-    green: "GREEN LINE",
-    orange: "ORANGE LINE",
-    red: "RED LINE",
-    mattapan: "MATTAPAN LINE",
-  };
-
-  const [lo, hi] = headway;
-  const text = [
-    { color: pill, text: pillToLineName[pill] },
-    { special: "break" },
-    "every",
-    { format: "bold", text: `${lo}-${hi}` },
-    "minutes",
-  ];
-  const lines = { icon: "subway-negative-black", text };
-
   return (
     <div className={classWithModifier("section-list", "headway")}>
       <div
@@ -78,7 +60,7 @@ const HeadwaySectionList = ({ section: { pill, headway } }): JSX.Element => {
           classWithModifier("full-screen-alert-text", "dark")
         }
       >
-        <FreeText lines={lines} />
+        <FreeText lines={headway} />
       </div>
       <div className="headway-section-list__link">
         <div className="headway-section-list__link-arrow">

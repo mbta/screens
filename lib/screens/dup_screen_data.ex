@@ -160,8 +160,7 @@ defmodule Screens.DupScreenData do
        ) do
     sections_with_alerts =
       Enum.map(sections, fn section ->
-        %Dup.Section{pill: pill} = section
-        {section, Map.get(alerts_by_section, pill)}
+        {section, Map.get(alerts_by_section, section.pill)}
       end)
 
     sections_data = Request.fetch_sections_data(sections_with_alerts, current_time)

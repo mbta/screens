@@ -43,15 +43,10 @@ const Section = ({ departures, currentTimeString }): JSX.Element => {
 };
 
 const HeadwaySection = ({ headway, pill }): JSX.Element => {
-  const [lo, hi] = headway;
-  const lines = {
-    icon: pill,
-    text: ["every", { format: "bold", text: `${lo}-${hi}` }, "minutes"],
-  };
   return (
     <div className="section section--headway">
       <div className="partial-alert partial-alert--dark">
-        <FreeText lines={lines} />
+        <FreeText lines={headway} />
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ defmodule Screens.DupScreenData.Request do
   alias Screens.Config.Dup.Section
   alias Screens.Config.Dup.Section.Headway
   alias Screens.Departures.Departure
+  alias Screens.DupScreenData.Response
   alias Screens.SignsUiConfig
 
   # Filters for the types of alerts we care about
@@ -47,10 +48,10 @@ defmodule Screens.DupScreenData.Request do
 
   defp fetch_section_data(
          {%Section{pill: pill, headway: %Headway{override: {lo, hi}}}, _section_alert},
-         _num_rows,
+         num_rows,
          _current_time
        ) do
-    {:ok, %{pill: pill, headway: [lo, hi]}}
+    {:ok, %{pill: pill, headway: Response.render_headway_lines(pill, {lo, hi}, num_rows)}}
   end
 
   defp fetch_section_data(
@@ -61,7 +62,7 @@ defmodule Screens.DupScreenData.Request do
        ) do
     case fetch_headway_mode(section, headway, section_alert, current_time) do
       {:active, {lo, hi}} ->
-        {:ok, %{pill: pill, headway: [lo, hi]}}
+        {:ok, %{pill: pill, headway: Response.render_headway_lines(pill, {lo, hi}, num_rows)}}
 
       :inactive ->
         fetch_section_departures(stop_ids, route_ids, pill, num_rows)
@@ -83,7 +84,7 @@ defmodule Screens.DupScreenData.Request do
 
     if headway_mode? do
       time_ranges = SignsUiConfig.State.time_ranges(headway_id)
-      current_time_period = SignsUiConfig.State.time_period(current_time)
+      current_time_period = Screens.Util.time_period(current_time)
 
       case time_ranges do
         %{^current_time_period => {lo, hi}} ->
