@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="464px" height="248px" viewBox="0 0 464 248" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="552px" height="248px" viewBox="0 0 552 248" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>DUP/Alert Header/Accent-Disruption</title>
     <defs>
-        <rect id="path-1" x="-88" y="0" width="552" height="248"></rect>
+        <rect id="path-1" x="0" y="0" width="552" height="248"></rect>
     </defs>
     <g id="DUP/Alert-Header/Accent-Disruption" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <mask id="mask-2" fill="white">
@@ -10,7 +10,7 @@
         </mask>
         <g id="Mask"></g>
         <g id="Hatching" mask="url(#mask-2)" stroke="#171F26" stroke-width="16">
-            <g transform="translate(-492.000000, -416.000000)" id="Line">
+            <g transform="translate(-404.000000, -416.000000)" id="Line">
                 <path d="M1530,0 L450,1080 L1530,0 Z"></path>
                 <path d="M1440,0 L360,1080 L1440,0 Z"></path>
                 <path d="M1350,0 L270,1080 L1350,0 Z"></path>
