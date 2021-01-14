@@ -103,6 +103,6 @@ defmodule Screens.Psa do
   defp get_s3_url(filename), do: @s3_base_url <> psa_images_prefix() <> filename
 
   defp psa_images_prefix do
-    Application.get_env(:screens, :environment_name, "screeens-prod") <> "/images/psa/"
+    Application.get_env(:screens, :environment_name, "screens-prod") <> "/images/psa/"
   end
 end
