@@ -7,9 +7,7 @@ defmodule Screens.Psa do
   @solari_refresh_seconds 15
   @solari_psa_period 3
 
-  @bucket "mbta-screens"
-  @s3_base_url "https://#{@bucket}.s3.amazonaws.com/"
-  @psa_images_prefix Application.get_env(:screens, :environment_name, "dev") <> "/images/psa/"
+  @s3_base_url "https://mbta-screens.s3.amazonaws.com/"
 
   def current_psa_for(screen_id) do
     %Screen{
@@ -102,5 +100,9 @@ defmodule Screens.Psa do
   end
 
   defp get_s3_url(nil), do: nil
-  defp get_s3_url(filename), do: @s3_base_url <> @psa_images_prefix <> filename
+  defp get_s3_url(filename), do: @s3_base_url <> psa_images_prefix() <> filename
+
+  defp psa_images_prefix do
+    Application.get_env(:screens, :environment_name, "screens-prod") <> "/images/psa/"
+  end
 end
