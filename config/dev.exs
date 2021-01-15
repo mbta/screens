@@ -22,8 +22,8 @@ config :screens, ScreensWeb.Endpoint,
   ]
 
 config :screens,
-  default_api_v3_url: System.get_env("API_V3_URL", "https://api-v3.mbta.com/"),
   api_v3_key: System.get_env("API_V3_KEY"),
+  api_v3_url: System.get_env("API_V3_URL", "https://api-v3.mbta.com/"),
   gds_dms_password: System.get_env("GDS_DMS_PASSWORD"),
   mercury_api_key: System.get_env("MERCURY_API_KEY"),
   config_fetcher: Screens.Config.State.LocalFetch,
