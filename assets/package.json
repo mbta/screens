@@ -12,7 +12,7 @@
     "check": "npm run lint:check && npm run format:check"
   },
   "dependencies": {
-    "core-js": "^3.8.2",
+    "core-js": "^3.8.3",
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.32",
