@@ -21,9 +21,7 @@ defmodule Screens.DupScreenData.Request do
 
     opts
     |> Alert.fetch()
-    |> Enum.filter(fn a ->
-      Alert.happening_now?(a) and a.effect in @alert_effects
-    end)
+    |> Enum.filter(&relevant?/1)
   end
 
   def fetch_sections_data([_, _] = sections_with_alerts, current_time) do
@@ -116,4 +114,16 @@ defmodule Screens.DupScreenData.Request do
         :error
     end
   end
+
+  defp relevant?(alert) do
+    Alert.happening_now?(alert) and
+      alert.effect in @alert_effects and
+      effect_specific_conditions?(alert)
+  end
+
+  defp effect_specific_conditions?(%Alert{effect: :delay} = alert) do
+    Alert.high_severity?(alert)
+  end
+
+  defp effect_specific_conditions?(_), do: true
 end
