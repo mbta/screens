@@ -297,6 +297,10 @@ defmodule Screens.Alerts.Alert do
 
   def high_severity(_), do: 0
 
+  def high_severity?(alert) do
+    high_severity(alert) > 0
+  end
+
   # HAPPENING NOW
   # defined as: some active period contains the current time
   defp happening_now(%{active_period: aps}) do
