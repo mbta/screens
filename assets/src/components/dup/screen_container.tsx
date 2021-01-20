@@ -6,7 +6,7 @@ import PartialAlerts from "Components/dup/partial_alert";
 import FreeText from "Components/dup/free_text";
 
 import useApiResponse from "Hooks/use_api_response";
-import { useOutfrontStation } from "Hooks/use_outfront_tags";
+import useOutfrontStation from "Hooks/use_outfront_station";
 import useCurrentPage from "Hooks/use_current_dup_page";
 
 import { formatTimeString, classWithModifier } from "Util/util";

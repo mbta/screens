@@ -2,7 +2,7 @@ import DebugErrorBoundary from "Components/helpers/debug_error_boundary";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { useOutfrontStation } from "Hooks/use_outfront_tags";
+import useOutfrontStation from "Hooks/use_outfront_station";
 
 const ScreenPage = ({
   screenContainer: ScreenContainer,

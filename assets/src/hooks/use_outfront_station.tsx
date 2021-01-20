@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import _ from "lodash";
 
 const useOutfrontTags = () => {
   const [tags, setTags] = useState(null);
 
   useEffect(() => {
-    if (parent && parent.parent && parent.parent.mraid) {
+    if (parent?.parent?.mraid ?? false) {
       try {
         const rawTags = parent.parent.mraid.getTags();
         setTags(JSON.parse(rawTags).tags);
@@ -13,7 +12,7 @@ const useOutfrontTags = () => {
         setTags(null);
       }
     }
-  }, []);
+  }, [parent?.parent?.mraid]);
 
   return tags;
 };
@@ -21,12 +20,11 @@ const useOutfrontTags = () => {
 const useOutfrontStation = () => {
   const tags = useOutfrontTags();
   if (tags !== null) {
-    const station = _.find(tags, ({ name }) => name === "Station").value;
+    const station = tags.find(({ name }) => name === "Station")?.value ?? null;
     return station;
   } else {
     return null;
   }
 };
 
-export default useOutfrontTags;
-export { useOutfrontStation };
+export default useOutfrontStation;
