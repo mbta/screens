@@ -13,6 +13,7 @@ const Departure = ({
   currentTimeString,
   vehicleStatus,
   stopType,
+  currentPage,
 }): JSX.Element => {
   const noMinutes = routeId.startsWith("CR-") || routeId.startsWith("Boat-");
 
@@ -20,7 +21,9 @@ const Departure = ({
     <div className="departure-container">
       <DepartureRoutePill route={route} routeId={routeId} />
       <div className="departure-destination">
-        {destination && <Destination destination={destination} />}
+        {destination && (
+          <Destination destination={destination} currentPage={currentPage} />
+        )}
       </div>
       <Time
         time={time}
@@ -29,6 +32,7 @@ const Departure = ({
         vehicleStatus={vehicleStatus}
         stopType={stopType}
         noMinutes={noMinutes}
+        currentPage={currentPage}
       />
       <div className="departure-hairline" />
     </div>

@@ -40,7 +40,7 @@ enum PHASES {
   DONE,
 }
 
-const RenderedDestination = ({ parts, index1, index2, page }) => {
+const RenderedDestination = ({ parts, index1, index2, currentPageIndex }) => {
   let currentPage;
   if (index1 === parts.length) {
     currentPage = parts.join(" ");
@@ -49,7 +49,7 @@ const RenderedDestination = ({ parts, index1, index2, page }) => {
       parts.slice(0, index1).join(" ") + "…",
       "…" + parts.slice(index1, index2).join(" "),
     ];
-    currentPage = pages[page];
+    currentPage = pages[currentPageIndex];
   }
 
   return (
@@ -59,16 +59,7 @@ const RenderedDestination = ({ parts, index1, index2, page }) => {
   );
 };
 
-const Destination = ({ destination }) => {
-  const [page, setPage] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPage((p) => 1 - p);
-    }, 3750);
-    return () => clearInterval(interval);
-  }, []);
-
+const Destination = ({ destination, currentPage }) => {
   const firstLineRef = useRef(null);
   const secondLineRef = useRef(null);
 
@@ -155,7 +146,7 @@ const Destination = ({ destination }) => {
         index1={index1}
         index2={index2}
         parts={parts}
-        page={page}
+        currentPageIndex={currentPage}
       />
     );
   }

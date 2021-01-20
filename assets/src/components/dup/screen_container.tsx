@@ -6,6 +6,8 @@ import PartialAlerts from "Components/dup/partial_alert";
 import FreeText from "Components/dup/free_text";
 
 import useApiResponse from "Hooks/use_api_response";
+import useOutfrontStation from "Hooks/use_outfront_station";
+import useCurrentPage from "Hooks/use_current_dup_page";
 
 import { formatTimeString, classWithModifier } from "Util/util";
 
@@ -57,9 +59,11 @@ const LinkArrow = ({ width, color }) => {
 };
 
 const NoDataLayout = (): JSX.Element => {
+  const stationName = useOutfrontStation() || "No Data";
+
   return (
     <div className={classWithModifier("screen-container", "no-data")}>
-      <Header text="Station Name" />
+      <Header text={stationName} />
       <div className="no-data__body">
         <div className="no-data__icon-container">
           <img
@@ -108,7 +112,7 @@ const StaticImageLayout = ({ srcUrl }): JSX.Element => {
   );
 };
 
-const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
+const DefaultScreenLayout = ({ apiResponse, currentPage }): JSX.Element => {
   return (
     <div className="screen-container">
       <Header
@@ -118,6 +122,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
       <SectionList
         sections={apiResponse.sections}
         currentTimeString={apiResponse.current_time}
+        currentPage={currentPage}
       />
       {apiResponse.alerts?.length > 0 && (
         <PartialAlerts alerts={apiResponse.alerts} />
@@ -151,6 +156,8 @@ const FullScreenAlertLayout = ({ apiResponse }): JSX.Element => {
 };
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
+  const currentPage = useCurrentPage();
+
   if (!apiResponse || apiResponse.success === false) {
     return <NoDataLayout />;
   }
@@ -163,7 +170,12 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
     case "full_screen_alert":
       return <FullScreenAlertLayout apiResponse={apiResponse} />;
     default:
-      return <DefaultScreenLayout apiResponse={apiResponse} />;
+      return (
+        <DefaultScreenLayout
+          apiResponse={apiResponse}
+          currentPage={currentPage}
+        />
+      );
   }
 };
 
