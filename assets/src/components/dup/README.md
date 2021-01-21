@@ -8,7 +8,7 @@
     <ScreenPage screenContainer={ScreenContainer} />
   );
   ```
-- Edit `imagePath` function in `util.tsx` to omit the leading `/`, making all paths relative. (Also double-check that there aren't any stray \<img\> tags across the codebase that don't use this function for their `src`! There should be no instances of "/images/" in the frontend code).
+- Edit `imagePath` function in `util.tsx` to omit the leading `/`, making all paths relative. (Also double-check that there aren't any stray \<img\> tags across the codebase that don't use this function for their `src`! There should be no instances of "/images/" in the frontend code besides in `imagePath`).
 - Start the local server normally with `iex -S mix phx.server`, let it compile the JS/CSS.
 - Create priv/static/dup-app.html if it doesn’t already exist. Copy paste contents as directed below.
 - Create a zip folder containing dup-app.html at the top level, as well as the images directory. You will have a zip folder for each rotation index: dup-app-0.zip, dup-app-1.zip, dup-app-2.zip. For each zip you will need to manually edit dup-app.html to pass a different rotation index prop to the `ScreenContainer` component.
