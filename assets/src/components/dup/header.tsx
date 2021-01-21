@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithModifier, formatTimeString } from "Util/util";
+import { classWithModifier, formatTimeString, imagePath } from "Util/util";
 
 const patternMap: { [key: string]: string } = {
   hatched: "disruption",
@@ -17,7 +17,7 @@ const CurrentTime = ({ currentTimeString }): JSX.Element => {
 const Pattern = ({ pattern }: { pattern: string }): JSX.Element => {
   const svgName = patternMap[pattern];
 
-  const svgPath = `/images/dup-accent-${svgName}.svg`;
+  const svgPath = imagePath(`dup-accent-${svgName}.svg`);
 
   return (
     <div className="header__accent-pattern-container">
@@ -46,7 +46,7 @@ const Header = ({ text, currentTimeString, pattern, color }): JSX.Element => {
       <div className="header__logo-container">
         <img
           className="header__logo-image"
-          src={`/images/logo-${logoColor}.svg`}
+          src={imagePath(`logo-${logoColor}.svg`)}
         />
       </div>
       <div className="header__content-container">

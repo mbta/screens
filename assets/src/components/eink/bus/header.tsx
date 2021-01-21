@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 
-import { classWithModifier, formatTimeString } from "Util/util";
+import { classWithModifier, formatTimeString, imagePath } from "Util/util";
 
 const Header = ({ stopName, currentTimeString }): JSX.Element => {
   const SIZES = ["small", "large"];
@@ -31,7 +31,7 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
       <div className="header__realtime-indicator">
         <img
           className="header__realtime-indicator-icon"
-          src="/images/live-data-small.svg"
+          src={imagePath("live-data-small.svg")}
         ></img>
         UPDATED LIVE EVERY MINUTE
       </div>

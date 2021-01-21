@@ -1,4 +1,5 @@
 import React from "react";
+import { imagePath } from "Util/util";
 
 /*
 - arrow.svg points North
@@ -66,7 +67,7 @@ const Arrow = ({
   return (
     <img
       className={`${baseClassName} ${className}`}
-      src={`/images/${imageName}`}
+      src={imagePath(imageName)}
     />
   );
 };

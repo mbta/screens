@@ -10,7 +10,7 @@ import {
   PlaceholderRoutePill,
 } from "Components/solari/route_pill";
 
-import { classWithModifier, classWithModifiers } from "Util/util";
+import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 
 const NormalDepartureTimeAndCrowding = ({
   crowdingLevel,
@@ -23,7 +23,7 @@ const NormalDepartureTimeAndCrowding = ({
         {crowdingLevel && (
           <img
             className="departure-crowding__image--normal"
-            src={`/images/crowding-color-level-${crowdingLevel}.svg`}
+            src={imagePath(`crowding-color-level-${crowdingLevel}.svg`)}
           />
         )}
       </div>
@@ -78,7 +78,7 @@ const OverheadDepartureTimeAndCrowding = ({
           {crowdingLevel && (
             <img
               className="departure-crowding__image--overhead"
-              src={`/images/crowding-color-level-${crowdingLevel}.svg`}
+              src={imagePath(`crowding-color-level-${crowdingLevel}.svg`)}
             />
           )}
         </div>
