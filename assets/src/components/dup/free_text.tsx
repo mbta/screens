@@ -3,15 +3,18 @@ import _ from "lodash";
 
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 
-const iconPaths: { [key: string]: string } = _.mapValues({
-  warning: "alert.svg",
-  x: "no-service-white.svg",
-  shuttle: "bus-white.svg",
-  subway: "subway-white.svg",
-  "subway-negative-black": "subway-negative-black.svg",
-  cr: "commuter-rail.svg",
-  walk: "nearby-white.svg",
-}, imagePath);
+const iconPaths: { [key: string]: string } = _.mapValues(
+  {
+    warning: "alert.svg",
+    x: "no-service-white.svg",
+    shuttle: "bus-white.svg",
+    subway: "subway-white.svg",
+    "subway-negative-black": "subway-negative-black.svg",
+    cr: "commuter-rail.svg",
+    walk: "nearby-white.svg",
+  },
+  imagePath
+);
 
 const srcForIcon = (icon) => {
   return iconPaths[icon];

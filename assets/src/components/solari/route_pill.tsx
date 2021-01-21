@@ -75,7 +75,10 @@ const Pill = ({ routeName, routePillColor }: PillType): JSX.Element => {
     );
   } else if (routeName === "BUS") {
     routeName = (
-      <img className="departure-route--icon" src={imagePath("bus-black.svg")}></img>
+      <img
+        className="departure-route--icon"
+        src={imagePath("bus-black.svg")}
+      ></img>
     );
   }
 

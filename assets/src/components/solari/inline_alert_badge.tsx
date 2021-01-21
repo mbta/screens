@@ -3,11 +3,14 @@ import _ from "lodash";
 
 import { classWithModifier, imagePath } from "Util/util";
 
-const alertValues = _.mapValues({
-  delay: { svgPath: "solari-delay-white.svg", text: "delays" },
-  snow_route: { svgPath: "solari-snowflake.svg", text: "snow route" },
-  last_trip: { svgPath: "solari-moon.svg", text: "last trip" },
-}, ({ svgPath, ...rest }) => ({ ...rest, svgPath: imagePath(svgPath) }));
+const alertValues = _.mapValues(
+  {
+    delay: { svgPath: "solari-delay-white.svg", text: "delays" },
+    snow_route: { svgPath: "solari-snowflake.svg", text: "snow route" },
+    last_trip: { svgPath: "solari-moon.svg", text: "last trip" },
+  },
+  ({ svgPath, ...rest }) => ({ ...rest, svgPath: imagePath(svgPath) })
+);
 
 interface InlineAlertBadgeProps {
   alert: "delay" | "snow_route" | "last_trip";

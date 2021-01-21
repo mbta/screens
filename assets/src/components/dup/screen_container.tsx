@@ -92,7 +92,10 @@ const DisabledLayout = ({ apiResponse }): JSX.Element => {
     <div className={classWithModifier("screen-container", "disabled")}>
       <div className="disabled__time">{currentTime}</div>
       <div className="disabled__logo-container">
-        <img className="disabled__logo-image" src={imagePath("logo-white.svg")} />
+        <img
+          className="disabled__logo-image"
+          src={imagePath("logo-white.svg")}
+        />
       </div>
       <div className="disabled__link">
         <div className="disabled__link-arrow">

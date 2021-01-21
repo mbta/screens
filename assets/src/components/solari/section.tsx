@@ -160,7 +160,7 @@ interface PagedDepartureState {
 class PagedDeparture extends React.Component<
   PagedDepartureProps,
   PagedDepartureState
-  > {
+> {
   interval: number | null;
 
   constructor(props: PagedDepartureProps) {
@@ -374,17 +374,17 @@ const DepartureList = ({
 
           const transitionProps = isImminent
             ? {
-              timeout: { exit: 400 },
-              classNames: classWithModifier("departure-animated", "arr-brd"),
-              enter: false,
-              exit: true,
-            }
+                timeout: { exit: 400 },
+                classNames: classWithModifier("departure-animated", "arr-brd"),
+                enter: false,
+                exit: true,
+              }
             : {
-              timeout: { enter: 400 },
-              classNames: classWithModifier("departure-animated", "normal"),
-              enter: true,
-              exit: false,
-            };
+                timeout: { enter: 400 },
+                classNames: classWithModifier("departure-animated", "normal"),
+                enter: true,
+                exit: false,
+              };
 
           return (
             <CSSTransition {...transitionProps} key={departure.id}>
@@ -499,8 +499,8 @@ const PagedSection = ({
         {disabled ? (
           <NoDataMessage pill={pill} />
         ) : (
-            <NoDeparturesMessage pill={pill} />
-          )}
+          <NoDeparturesMessage pill={pill} />
+        )}
       </SectionFrame>
     );
   }
@@ -563,8 +563,8 @@ const Section = ({
         {disabled ? (
           <NoDataMessage pill={pill} />
         ) : (
-            <NoDeparturesMessage pill={pill} />
-          )}
+          <NoDeparturesMessage pill={pill} />
+        )}
       </SectionFrame>
     );
   }

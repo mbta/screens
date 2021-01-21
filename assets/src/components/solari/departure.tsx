@@ -83,13 +83,13 @@ const OverheadDepartureTimeAndCrowding = ({
           )}
         </div>
       ) : (
-          <div
-            className={classWithModifiers("departure-time", timeModifiers)}
-            ref={ref}
-          >
-            <BaseDepartureTime time={timeRepresentation} />
-          </div>
-        )}
+        <div
+          className={classWithModifiers("departure-time", timeModifiers)}
+          ref={ref}
+        >
+          <BaseDepartureTime time={timeRepresentation} />
+        </div>
+      )}
     </>
   );
 };
@@ -113,7 +113,7 @@ const Departure = ({
 
   const viaModifier =
     destination &&
-      (viaPattern.test(destination) || parenPattern.test(destination))
+    (viaPattern.test(destination) || parenPattern.test(destination))
       ? "with-via"
       : "no-via";
 
@@ -143,8 +143,8 @@ const Departure = ({
         {groupStart ? (
           <DepartureRoutePill route={route} routeId={routeId} />
         ) : (
-            <PlaceholderRoutePill />
-          )}
+          <PlaceholderRoutePill />
+        )}
         <div className="departure-destination">
           {destination && groupStart && (
             <BaseDepartureDestination destination={destination} />
@@ -159,12 +159,12 @@ const Departure = ({
             currentTimeString={currentTimeString}
           />
         ) : (
-            <NormalDepartureTimeAndCrowding
-              crowdingLevel={crowdingLevel}
-              timeRepresentation={timeRepresentation}
-              timeAnimationModifier={timeAnimationModifier}
-            />
-          )}
+          <NormalDepartureTimeAndCrowding
+            crowdingLevel={crowdingLevel}
+            timeRepresentation={timeRepresentation}
+            timeAnimationModifier={timeAnimationModifier}
+          />
+        )}
 
         {groupStart && alerts.length > 0 && (
           <div className="departure__alerts-container">
