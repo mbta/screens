@@ -4,7 +4,7 @@ import Header from "Components/solari/header";
 import SectionListContainer from "Components/solari/section_list_container";
 import Psa from "Components/solari/psa";
 
-import { classWithModifier } from "Util/util";
+import { classWithModifier, imagePath } from "Util/util";
 
 import useApiResponse from "Hooks/use_api_response";
 
@@ -47,7 +47,7 @@ const FullScreenImageLayout = ({ srcPath }): JSX.Element => {
 };
 
 const NoConnectionScreenLayout = (): JSX.Element => {
-  const srcPath = "/images/solari-no-connection.png";
+  const srcPath = imagePath("solari-no-connection.png");
   return <FullScreenImageLayout srcPath={srcPath} />;
 };
 

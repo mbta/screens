@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithModifier, classWithModifiers } from "Util/util";
+import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 import BaseRoutePill from "Components/eink/base_route_pill";
 import { WIDE_MINI_PILL_ROUTES } from "Components/solari/section";
 
@@ -66,16 +66,16 @@ const Pill = ({ routeName, routePillColor }: PillType): JSX.Element => {
     routeName = (
       <img
         className="departure-route--icon"
-        src="/images/commuter-rail.svg"
+        src={imagePath("commuter-rail.svg")}
       ></img>
     );
   } else if (routeName === "Boat") {
     routeName = (
-      <img className="departure-route--icon" src="/images/ferry.svg"></img>
+      <img className="departure-route--icon" src={imagePath("ferry.svg")}></img>
     );
   } else if (routeName === "BUS") {
     routeName = (
-      <img className="departure-route--icon" src="/images/bus-black.svg"></img>
+      <img className="departure-route--icon" src={imagePath("bus-black.svg")}></img>
     );
   }
 

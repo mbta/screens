@@ -1,17 +1,20 @@
 import React from "react";
+import _ from "lodash";
 
-import { classWithModifier, classWithModifiers } from "Util/util";
+import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
+
+const iconPaths: { [key: string]: string } = _.mapValues({
+  warning: "alert.svg",
+  x: "no-service-white.svg",
+  shuttle: "bus-white.svg",
+  subway: "subway-white.svg",
+  "subway-negative-black": "subway-negative-black.svg",
+  cr: "commuter-rail.svg",
+  walk: "nearby-white.svg",
+}, imagePath);
 
 const srcForIcon = (icon) => {
-  return {
-    warning: "/images/alert.svg",
-    x: "/images/no-service-white.svg",
-    shuttle: "/images/bus-white.svg",
-    subway: "/images/subway-white.svg",
-    "subway-negative-black": "/images/subway-negative-black.svg",
-    cr: "/images/commuter-rail.svg",
-    walk: "/images/nearby-white.svg",
-  }[icon];
+  return iconPaths[icon];
 };
 
 const getKey = (elt) => {

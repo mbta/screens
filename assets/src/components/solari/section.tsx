@@ -9,7 +9,7 @@ import {
   PagedDepartureRoutePill,
 } from "Components/solari/route_pill";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
-import { classWithModifier, classWithModifiers } from "Util/util";
+import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 import { standardTimeRepresentation } from "Util/time_representation";
 
 const WIDE_MINI_PILL_ROUTES = ["441/442"];
@@ -53,18 +53,25 @@ const isArrivingOrBoarding = (
 };
 
 const verticalHeaderIconSrc = (name, departuresLength) => {
+  let iconFileName = "";
   switch (true) {
     case departuresLength <= 1 && name === "Upper Busway":
-      return "/images/icon-upper-busway-arrow-only.svg";
+      iconFileName = "icon-upper-busway-arrow-only.svg";
+      break;
     case departuresLength <= 1 && name === "Lower Busway":
-      return "/images/icon-lower-busway-arrow-only.svg";
+      iconFileName = "icon-lower-busway-arrow-only.svg";
+      break;
     case name === "Upper Busway":
-      return "/images/icon-upper-busway.svg";
+      iconFileName = "icon-upper-busway.svg";
+      break;
     case name === "Lower Busway":
-      return "/images/icon-lower-busway.svg";
+      iconFileName = "icon-lower-busway.svg";
+      break;
     case name === "Commuter Rail":
-      return "/images/icon-commuter-rail.svg";
+      iconFileName = "icon-commuter-rail.svg";
+      break;
   }
+  return imagePath(iconFileName);
 };
 
 const SectionHeader = ({ name, arrow }): JSX.Element => {
@@ -153,7 +160,7 @@ interface PagedDepartureState {
 class PagedDeparture extends React.Component<
   PagedDepartureProps,
   PagedDepartureState
-> {
+  > {
   interval: number | null;
 
   constructor(props: PagedDepartureProps) {
@@ -367,17 +374,17 @@ const DepartureList = ({
 
           const transitionProps = isImminent
             ? {
-                timeout: { exit: 400 },
-                classNames: classWithModifier("departure-animated", "arr-brd"),
-                enter: false,
-                exit: true,
-              }
+              timeout: { exit: 400 },
+              classNames: classWithModifier("departure-animated", "arr-brd"),
+              enter: false,
+              exit: true,
+            }
             : {
-                timeout: { enter: 400 },
-                classNames: classWithModifier("departure-animated", "normal"),
-                enter: true,
-                exit: false,
-              };
+              timeout: { enter: 400 },
+              classNames: classWithModifier("departure-animated", "normal"),
+              enter: true,
+              exit: false,
+            };
 
           return (
             <CSSTransition {...transitionProps} key={departure.id}>
@@ -492,8 +499,8 @@ const PagedSection = ({
         {disabled ? (
           <NoDataMessage pill={pill} />
         ) : (
-          <NoDeparturesMessage pill={pill} />
-        )}
+            <NoDeparturesMessage pill={pill} />
+          )}
       </SectionFrame>
     );
   }
@@ -556,8 +563,8 @@ const Section = ({
         {disabled ? (
           <NoDataMessage pill={pill} />
         ) : (
-          <NoDeparturesMessage pill={pill} />
-        )}
+            <NoDeparturesMessage pill={pill} />
+          )}
       </SectionFrame>
     );
   }

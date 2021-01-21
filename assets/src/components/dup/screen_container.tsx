@@ -9,7 +9,7 @@ import useApiResponse from "Hooks/use_api_response";
 import useOutfrontStation from "Hooks/use_outfront_station";
 import useCurrentPage from "Hooks/use_current_dup_page";
 
-import { formatTimeString, classWithModifier } from "Util/util";
+import { formatTimeString, classWithModifier, imagePath } from "Util/util";
 
 const LinkArrow = ({ width, color }) => {
   const height = 40;
@@ -68,7 +68,7 @@ const NoDataLayout = (): JSX.Element => {
         <div className="no-data__icon-container">
           <img
             className="no-data__icon-image"
-            src="/images/live-data-none.svg"
+            src={imagePath("live-data-none.svg")}
           />
         </div>
         <div className="no-data__message">
@@ -92,7 +92,7 @@ const DisabledLayout = ({ apiResponse }): JSX.Element => {
     <div className={classWithModifier("screen-container", "disabled")}>
       <div className="disabled__time">{currentTime}</div>
       <div className="disabled__logo-container">
-        <img className="disabled__logo-image" src="/images/logo-white.svg" />
+        <img className="disabled__logo-image" src={imagePath("logo-white.svg")} />
       </div>
       <div className="disabled__link">
         <div className="disabled__link-arrow">
