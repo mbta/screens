@@ -6,25 +6,40 @@ import { ROTATION_INDEX } from "./rotation_index";
 import { NoDataLayout } from "Components/dup/screen_container";
 import { isDup } from "Util/util";
 
-const ScreenPage = ({
+const DupScreenPage = ({
   screenContainer: ScreenContainer,
 }: {
   screenContainer: React.ComponentType;
 }): JSX.Element => {
-  if (isDup()) {
-    const station = useOutfrontStation();
+  const station = useOutfrontStation();
 
-    if (station !== null) {
-      const id = `DUP-${station.replace(/\s/g, "")}`;
-      return <ScreenContainer id={id} rotationIndex={ROTATION_INDEX} />;
-    } else {
-      return <NoDataLayout />;
-    }
+  if (station !== null) {
+    const id = `DUP-${station.replace(/\s/g, "")}`;
+    return <ScreenContainer id={id} rotationIndex={ROTATION_INDEX} />;
+  } else {
+    return <NoDataLayout />;
   }
+};
 
+const DevelopmentScreenPage = ({
+  screenContainer: ScreenContainer,
+}: {
+  screenContainer: React.ComponentType;
+}): JSX.Element => {
   const { id, rotationIndex } = useParams();
   return <ScreenContainer id={id} rotationIndex={rotationIndex} />;
 };
+
+const ScreenPage = ({
+  screenContainer,
+}: {
+  screenContainer: React.ComponentType;
+}): JSX.Element =>
+  isDup() ? (
+    <DupScreenPage screenContainer={screenContainer} />
+  ) : (
+    <DevelopmentScreenPage screenContainer={screenContainer} />
+  );
 
 const RotationPage = ({
   screenContainer: ScreenContainer,
