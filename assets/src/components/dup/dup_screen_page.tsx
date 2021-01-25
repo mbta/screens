@@ -12,7 +12,7 @@ const ScreenPage = ({
   const station = useOutfrontStation();
 
   if (station !== null) {
-    const id = `DUP-${station.replaceAll(" ", "")}`;
+    const id = `DUP-${station.replace(/\s/g, "")}`;
     return <ScreenContainer id={id} rotationIndex={0} />;
   } else {
     const { id, rotationIndex } = useParams();
