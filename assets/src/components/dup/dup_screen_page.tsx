@@ -38,8 +38,8 @@ const ScreenPage = ({
   isDup() ? (
     <DupScreenPage screenContainer={screenContainer} />
   ) : (
-      <DevelopmentScreenPage screenContainer={screenContainer} />
-    );
+    <DevelopmentScreenPage screenContainer={screenContainer} />
+  );
 
 const RotationPage = ({
   screenContainer: ScreenContainer,

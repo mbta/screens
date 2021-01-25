@@ -82,7 +82,9 @@ const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
         <div className="no-data__link-text">mbta.com/schedules</div>
       </div>
       {code && (
-        <div className="no-data__error-code">Maintenance code: &ldquo;{code}&rdquo;</div>
+        <div className="no-data__error-code">
+          Maintenance code: &ldquo;{code}&rdquo;
+        </div>
       )}
     </div>
   );
