@@ -5,7 +5,7 @@
   - `buildApiPath` in use_api_response.tsx should return a full URL for the API path: prefix `apiPath` string with "https://screens.mbta.com".
   - `App` component in dup.tsx should just return `<ScreenPage screenContainer={ScreenContainer} />`.
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
-  - `ScreenPage` component in dup_screen_page.tsx should call `useOutfrontStation` to get station tag info.
+  - `ScreenPage` component in dup_screen_page.tsx should render `DupScreenPage` rather than `DevelopmentScreenPage`.
 - Start the local server normally with `iex -S mix phx.server`, let it compile the JS/CSS.
 - Create priv/static/dup-app.html if it doesn’t already exist. Copy paste contents as directed below.
 - Create a zip folder containing dup-app.html at the top level, as well as the images directory. You will have a zip folder for each rotation index: dup-app-0.zip, dup-app-1.zip, dup-app-2.zip. For each zip you can either:
