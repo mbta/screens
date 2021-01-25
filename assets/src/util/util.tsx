@@ -21,6 +21,4 @@ export const formatTimeString = (timeString) =>
 export const isDup = () => location.href.startsWith("file:");
 
 export const imagePath = (fileName: string): string =>
-  isDup()
-    ? `images/${fileName}`
-    : `/images/${fileName}`;
+  isDup() ? `images/${fileName}` : `/images/${fileName}`;
