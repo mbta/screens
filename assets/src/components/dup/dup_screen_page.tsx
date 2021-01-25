@@ -4,25 +4,26 @@ import { useParams } from "react-router-dom";
 import useOutfrontStation from "Hooks/use_outfront_station";
 import { ROTATION_INDEX } from "./rotation_index";
 import { NoDataLayout } from "Components/dup/screen_container";
+import { isDup } from "Util/util";
 
 const ScreenPage = ({
   screenContainer: ScreenContainer,
 }: {
   screenContainer: React.ComponentType;
 }): JSX.Element => {
-  const station = useOutfrontStation();
+  if (isDup()) {
+    const station = useOutfrontStation();
 
-  if (station !== null) {
-    const id = `DUP-${station.replace(/\s/g, "")}`;
-    return <ScreenContainer id={id} rotationIndex={ROTATION_INDEX} />;
-  } else {
-    try {
-      const { id, rotationIndex } = useParams();
-      return <ScreenContainer id={id} rotationIndex={rotationIndex} />;
-    } catch {
-      return <NoDataLayout />
+    if (station !== null) {
+      const id = `DUP-${station.replace(/\s/g, "")}`;
+      return <ScreenContainer id={id} rotationIndex={ROTATION_INDEX} />;
+    } else {
+      return <NoDataLayout />;
     }
   }
+
+  const { id, rotationIndex } = useParams();
+  return <ScreenContainer id={id} rotationIndex={rotationIndex} />;
 };
 
 const RotationPage = ({
