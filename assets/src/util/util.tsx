@@ -18,4 +18,7 @@ export const classWithModifiers = (baseClass, modifiers) => {
 export const formatTimeString = (timeString) =>
   moment(timeString).tz("America/New_York").format("h:mm");
 
-export const imagePath = (fileName: string): string => `/images/${fileName}`;
+export const isDup = () => location.href.startsWith("file:");
+
+export const imagePath = (fileName: string): string =>
+  isDup() ? `images/${fileName}` : `/images/${fileName}`;

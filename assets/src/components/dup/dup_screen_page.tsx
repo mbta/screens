@@ -1,10 +1,12 @@
-import DebugErrorBoundary from "Components/helpers/debug_error_boundary";
-import React, { useState } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 
 import useOutfrontStation from "Hooks/use_outfront_station";
+import { ROTATION_INDEX } from "./rotation_index";
+import { NoDataLayout } from "Components/dup/screen_container";
+import { isDup } from "Util/util";
 
-const ScreenPage = ({
+const DupScreenPage = ({
   screenContainer: ScreenContainer,
 }: {
   screenContainer: React.ComponentType;
@@ -12,13 +14,32 @@ const ScreenPage = ({
   const station = useOutfrontStation();
 
   if (station !== null) {
-    const id = `DUP-${station.replaceAll(" ", "")}`;
-    return <ScreenContainer id={id} rotationIndex={0} />;
+    const id = `DUP-${station.replace(/\s/g, "")}`;
+    return <ScreenContainer id={id} rotationIndex={ROTATION_INDEX} />;
   } else {
-    const { id, rotationIndex } = useParams();
-    return <ScreenContainer id={id} rotationIndex={rotationIndex} />;
+    return <NoDataLayout />;
   }
 };
+
+const DevelopmentScreenPage = ({
+  screenContainer: ScreenContainer,
+}: {
+  screenContainer: React.ComponentType;
+}): JSX.Element => {
+  const { id, rotationIndex } = useParams();
+  return <ScreenContainer id={id} rotationIndex={rotationIndex} />;
+};
+
+const ScreenPage = ({
+  screenContainer,
+}: {
+  screenContainer: React.ComponentType;
+}): JSX.Element =>
+  isDup() ? (
+    <DupScreenPage screenContainer={screenContainer} />
+  ) : (
+    <DevelopmentScreenPage screenContainer={screenContainer} />
+  );
 
 const RotationPage = ({
   screenContainer: ScreenContainer,

@@ -20,7 +20,8 @@ const useOutfrontTags = () => {
 const useOutfrontStation = () => {
   const tags = useOutfrontTags();
   if (tags !== null) {
-    const station = tags.find(({ name }) => name === "Station")?.value ?? null;
+    const station =
+      tags.find(({ name }) => name === "Station")?.value?.[0] ?? null;
     return station;
   } else {
     return null;
