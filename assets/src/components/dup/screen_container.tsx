@@ -189,4 +189,4 @@ const ScreenContainer = ({ id, rotationIndex }): JSX.Element => {
 };
 
 export default ScreenContainer;
-export { ScreenLayout };
+export { NoDataLayout, ScreenLayout };

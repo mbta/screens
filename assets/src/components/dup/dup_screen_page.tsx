@@ -1,8 +1,9 @@
-import DebugErrorBoundary from "Components/helpers/debug_error_boundary";
-import React, { useState } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 
 import useOutfrontStation from "Hooks/use_outfront_station";
+import { ROTATION_INDEX } from "./rotation_index";
+import { NoDataLayout } from "Components/dup/screen_container";
 
 const ScreenPage = ({
   screenContainer: ScreenContainer,
@@ -13,10 +14,14 @@ const ScreenPage = ({
 
   if (station !== null) {
     const id = `DUP-${station.replace(/\s/g, "")}`;
-    return <ScreenContainer id={id} rotationIndex={0} />;
+    return <ScreenContainer id={id} rotationIndex={ROTATION_INDEX} />;
   } else {
-    const { id, rotationIndex } = useParams();
-    return <ScreenContainer id={id} rotationIndex={rotationIndex} />;
+    try {
+      const { id, rotationIndex } = useParams();
+      return <ScreenContainer id={id} rotationIndex={rotationIndex} />;
+    } catch {
+      return <NoDataLayout />
+    }
   }
 };
 
