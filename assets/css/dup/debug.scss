@@ -1,0 +1,24 @@
+#debug {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  background: rgba(0,0,0, 0.5);
+  color: #fff;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  height: 100%;
+  font-size: 1.5em;
+  z-index: 10000;
+}
+
+#debug p {
+  position: relative;
+  z-index: 9999;
+  font-size: 1.5em;
+  bottom: unset;
+  left: unset;
+  letter-spacing: normal;
+  font-family: Arial;
+}

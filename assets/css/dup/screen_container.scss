@@ -112,6 +112,17 @@
   margin-left: 72px;
 }
 
+.no-data__error-code {
+  @include font--text--75bold;
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  font-size: 48px;
+  color: #171f26;
+  letter-spacing: 0;
+  line-height: 48px;
+}
+
 .headway-section-list {
   padding-top: 72px;
   padding-left: 64px;

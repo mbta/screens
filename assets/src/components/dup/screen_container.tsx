@@ -58,7 +58,7 @@ const LinkArrow = ({ width, color }) => {
   );
 };
 
-const NoDataLayout = (): JSX.Element => {
+const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
   const stationName = useOutfrontStation() || "No Data";
 
   return (
@@ -81,6 +81,9 @@ const NoDataLayout = (): JSX.Element => {
         </div>
         <div className="no-data__link-text">mbta.com/schedules</div>
       </div>
+      {code && (
+        <div className="no-data__error-code">Maintenance code: &ldquo;{code}&rdquo;</div>
+      )}
     </div>
   );
 };
@@ -162,7 +165,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   const currentPage = useCurrentPage();
 
   if (!apiResponse || apiResponse.success === false) {
-    return <NoDataLayout />;
+    return <NoDataLayout code="network" />;
   }
 
   switch (apiResponse.type) {
