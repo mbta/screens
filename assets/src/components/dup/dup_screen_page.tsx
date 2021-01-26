@@ -17,7 +17,7 @@ const DupScreenPage = ({
     const id = `DUP-${station.replace(/\s/g, "")}`;
     return <ScreenContainer id={id} rotationIndex={ROTATION_INDEX} />;
   } else {
-    return <NoDataLayout code="station-tag" />;
+    return <NoDataLayout code="0" />;
   }
 };
 

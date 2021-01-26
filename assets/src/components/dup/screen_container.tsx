@@ -82,9 +82,7 @@ const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
         <div className="no-data__link-text">mbta.com/schedules</div>
       </div>
       {code && (
-        <div className="no-data__error-code">
-          Maintenance code: &ldquo;{code}&rdquo;
-        </div>
+        <div className="no-data__error-code">Maintenance code: {code}</div>
       )}
     </div>
   );
@@ -167,7 +165,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   const currentPage = useCurrentPage();
 
   if (!apiResponse || apiResponse.success === false) {
-    return <NoDataLayout code="network" />;
+    return <NoDataLayout code="1" />;
   }
 
   switch (apiResponse.type) {

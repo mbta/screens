@@ -115,10 +115,10 @@
 .no-data__error-code {
   @include font--text--75bold;
   position: absolute;
-  bottom: 12px;
-  left: 12px;
+  top: 12px;
+  right: 12px;
   font-size: 48px;
-  color: #171f26;
+  color: #a2a3a3;
   letter-spacing: 0;
   line-height: 48px;
 }
