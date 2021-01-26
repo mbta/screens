@@ -59,7 +59,7 @@ const LinkArrow = ({ width, color }) => {
 };
 
 const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
-  const stationName = useOutfrontStation() || "No Data";
+  const stationName = useOutfrontStation() || "Transit information";
 
   return (
     <div className={classWithModifier("screen-container", "no-data")}>
