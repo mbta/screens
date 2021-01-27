@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { isDup } from "Util/util";
 
 interface UseApiResponseArgs {
   id: string;
@@ -75,6 +76,10 @@ const buildApiPath = ({
 
   if (datetime != null) {
     apiPath += `&datetime=${datetime}`;
+  }
+
+  if (isDup()) {
+    apiPath = "https://screens-dev-green.mbtace.com" + apiPath;
   }
 
   return apiPath;

@@ -39,3 +39,28 @@ Contents of dup-app.html:
 
 </html>
 ```
+
+## Debugging
+
+To assist with debugging on the DUP screens, you can paste this at the module scope in dup.tsx to have console logs
+show up on the screen:
+```js
+const dEl = document.createElement("div");
+dEl.id = "debug";
+document.body.appendChild(dEl);
+// save the original console.log function
+const old_logger = console.log;
+// grab html element for adding console.log output
+const html_logger = document.getElementById("debug");
+// replace console.log function with our own function
+console.log = function(msg) {
+  // first call old logger for console output
+  old_logger.call(this, arguments);
+  // check what we need to output (object or text) and add it to the html element.
+  if (typeof msg == "object") {
+      html_logger.innerHTML += "<div>" + (JSON && JSON.stringify ? JSON.stringify(msg) : msg) + "<div>";
+  } else {
+      html_logger.innerHTML += "<div>" + msg + "<div>";
+  }
+};
+```

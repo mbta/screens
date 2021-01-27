@@ -1,13 +1,15 @@
 import QRCode from "qrcode.react";
 import React from "react";
 
+import { imagePath } from "Util/util";
+
 const DigitalBridge = ({ stopId }): JSX.Element => {
   return (
     <div className="digital-bridge">
       <div className="digital-bridge__logo-container">
         <img
           className="digital-bridge__logo-image"
-          src="/images/logo-white.svg"
+          src={imagePath("logo-white.svg")}
         />
       </div>
       <div className="digital-bridge__link-container">

@@ -5,6 +5,7 @@ import BaseDepartureDestination from "Components/eink/base_departure_destination
 import BaseRoutePill from "Components/eink/base_route_pill";
 
 import { einkTimeRepresentation } from "Util/time_representation";
+import { imagePath } from "Util/util";
 
 const NearbyDeparturesTime = ({ time, currentTimeString }): JSX.Element => {
   return (
@@ -68,7 +69,7 @@ const NearbyDepartures = ({ data, currentTimeString }): JSX.Element => {
         <div className="nearby-departures__icon-container">
           <img
             className="nearby-departures__icon-image"
-            src="/images/nearby.svg"
+            src={imagePath("nearby.svg")}
           />
         </div>
         <div className="nearby-departures__header-text">Nearby departures</div>

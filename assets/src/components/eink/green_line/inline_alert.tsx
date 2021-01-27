@@ -1,4 +1,5 @@
 import React from "react";
+import { imagePath } from "Util/util";
 
 const parseSeverity = (severity) => {
   let delayDescription;
@@ -41,7 +42,7 @@ const InlineAlert = ({ alertData }): JSX.Element => {
   return (
     <div className="inline-alert">
       <span className={"inline-alert__badge"}>
-        <img className="inline-alert__icon" src="/images/alert.svg" />
+        <img className="inline-alert__icon" src={imagePath("alert.svg")} />
         Delays {delayDescription + " "}
         <span className="inline-alert__emphasis">{delayMinutes} minutes</span>
       </span>

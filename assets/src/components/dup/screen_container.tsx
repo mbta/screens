@@ -9,7 +9,7 @@ import useApiResponse from "Hooks/use_api_response";
 import useOutfrontStation from "Hooks/use_outfront_station";
 import useCurrentPage from "Hooks/use_current_dup_page";
 
-import { formatTimeString, classWithModifier } from "Util/util";
+import { formatTimeString, classWithModifier, imagePath } from "Util/util";
 
 const LinkArrow = ({ width, color }) => {
   const height = 40;
@@ -58,8 +58,8 @@ const LinkArrow = ({ width, color }) => {
   );
 };
 
-const NoDataLayout = (): JSX.Element => {
-  const stationName = useOutfrontStation() || "No Data";
+const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
+  const stationName = useOutfrontStation() || "Transit information";
 
   return (
     <div className={classWithModifier("screen-container", "no-data")}>
@@ -68,7 +68,7 @@ const NoDataLayout = (): JSX.Element => {
         <div className="no-data__icon-container">
           <img
             className="no-data__icon-image"
-            src="/images/live-data-none.svg"
+            src={imagePath("live-data-none.svg")}
           />
         </div>
         <div className="no-data__message">
@@ -81,6 +81,9 @@ const NoDataLayout = (): JSX.Element => {
         </div>
         <div className="no-data__link-text">mbta.com/schedules</div>
       </div>
+      {code && (
+        <div className="no-data__error-code">Maintenance code: {code}</div>
+      )}
     </div>
   );
 };
@@ -92,7 +95,10 @@ const DisabledLayout = ({ apiResponse }): JSX.Element => {
     <div className={classWithModifier("screen-container", "disabled")}>
       <div className="disabled__time">{currentTime}</div>
       <div className="disabled__logo-container">
-        <img className="disabled__logo-image" src="/images/logo-white.svg" />
+        <img
+          className="disabled__logo-image"
+          src={imagePath("logo-white.svg")}
+        />
       </div>
       <div className="disabled__link">
         <div className="disabled__link-arrow">
@@ -159,7 +165,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   const currentPage = useCurrentPage();
 
   if (!apiResponse || apiResponse.success === false) {
-    return <NoDataLayout />;
+    return <NoDataLayout code="1" />;
   }
 
   switch (apiResponse.type) {
@@ -186,4 +192,4 @@ const ScreenContainer = ({ id, rotationIndex }): JSX.Element => {
 };
 
 export default ScreenContainer;
-export { ScreenLayout };
+export { NoDataLayout, ScreenLayout };

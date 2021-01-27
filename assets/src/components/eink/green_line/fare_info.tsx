@@ -1,4 +1,5 @@
 import React from "react";
+import { imagePath } from "Util/util";
 
 const FareInfo = (): JSX.Element => {
   return (
@@ -6,7 +7,7 @@ const FareInfo = (): JSX.Element => {
       <div className="fares__icon-container">
         <img
           className="fares__icon-image"
-          src="/images/subway-negative-black.svg"
+          src={imagePath("subway-negative-black.svg")}
         />
       </div>
       <div className="fares__info-container">
