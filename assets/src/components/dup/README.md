@@ -6,7 +6,7 @@
   - `App` component in dup.tsx should just return `<ScreenPage screenContainer={ScreenContainer} />`.
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
   - `ScreenPage` component in dup_screen_page.tsx should render `DupScreenPage` rather than `DevelopmentScreenPage`.
-- Start the local server normally with `iex -S mix phx.server`, let it compile the JS/CSS.
+- Build the minified JS/CSS with `npm --prefix assets run deploy`.
 - Create priv/static/dup-app.html if it doesn’t already exist. Copy paste contents as directed below.
 - Copy the following files into the correct location:
   ```sh
@@ -15,7 +15,7 @@
   ```
 - Create a zip folder containing dup-app.html, dup.css, polyfills.js, and dup.js at the top level; as well as the images directory. You will have a zip folder for each rotation index: dup-app-0.zip, dup-app-1.zip, dup-app-2.zip. For each zip you can either:
   - manually edit dup.js to set a different value for the `ROTATION_INDEX` constant, or
-  - edit the `ROTATION_INDEX` constant in rotation_index.tsx, let the JS recompile, and then copy dup.js to priv/static once again.
+  - edit the `ROTATION_INDEX` constant in rotation_index.tsx, rerun `npm --prefix assets run deploy`, and then copy dup.js to priv/static once again.
 
 Contents of dup-app.html:
 ```html
