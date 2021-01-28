@@ -52,14 +52,22 @@ const old_logger = console.log;
 // grab html element for adding console.log output
 const html_logger = document.getElementById("debug");
 // replace console.log function with our own function
-console.log = function(msg) {
+console.log = function (...msgs) {
   // first call old logger for console output
   old_logger.call(this, arguments);
-  // check what we need to output (object or text) and add it to the html element.
-  if (typeof msg == "object") {
-      html_logger.innerHTML += "<div>" + (JSON && JSON.stringify ? JSON.stringify(msg) : msg) + "<div>";
-  } else {
-      html_logger.innerHTML += "<div>" + msg + "<div>";
-  }
+
+  // convert object args to strings and join them together
+  const text = msgs
+    .map((msg) => {
+      if (typeof msg == "object") {
+        return JSON && JSON.stringify ? JSON.stringify(msg) : msg;
+      } else {
+        return msg;
+      }
+    })
+    .join(" ");
+
+  // add the log to the html element.
+  html_logger.innerHTML += "<div>" + text + "<div>";
 };
 ```
