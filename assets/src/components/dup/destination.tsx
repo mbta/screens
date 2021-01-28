@@ -60,6 +60,8 @@ const RenderedDestination = ({ parts, index1, index2, currentPageIndex }) => {
 };
 
 const Destination = ({ destination, currentPage }) => {
+  const debug = destination === "City Point via South Bay Center";
+
   const firstLineRef = useRef(null);
   const secondLineRef = useRef(null);
 
@@ -86,6 +88,16 @@ const Destination = ({ destination, currentPage }) => {
 
       switch (phase) {
         case PHASES.ONE_LINE_FULL:
+          if (debug) {
+            console.log(
+              "ONE_LINE_FULL ",
+              firstLines,
+              secondLines,
+              index1,
+              index2
+            );
+          }
+
           // Don't abbreviate if it already fits on one line.
           if (firstLines === 1 && secondLines === 0) {
             setPhase(PHASES.DONE);
@@ -96,6 +108,16 @@ const Destination = ({ destination, currentPage }) => {
           break;
 
         case PHASES.ONE_LINE_ABBREV:
+          if (debug) {
+            console.log(
+              "ONE_LINE_ABBREV ",
+              firstLines,
+              secondLines,
+              index1,
+              index2
+            );
+          }
+
           // Do abbreviate if it's the difference between fitting on one line and not.
           if (firstLines === 1 && secondLines === 0) {
             setPhase(PHASES.DONE);
@@ -106,6 +128,16 @@ const Destination = ({ destination, currentPage }) => {
           break;
 
         case PHASES.TWO_LINES_FULL:
+          if (debug) {
+            console.log(
+              "TWO_LINES_FULL ",
+              firstLines,
+              secondLines,
+              index1,
+              index2
+            );
+          }
+
           // Don't abbreviate if we fit on two lines either way
           if (firstLines === 1 && secondLines === 1) {
             setPhase(PHASES.DONE);
@@ -123,6 +155,16 @@ const Destination = ({ destination, currentPage }) => {
           break;
 
         case PHASES.TWO_LINES_ABBREV:
+          if (debug) {
+            console.log(
+              "TWO_LINES_ABBREV ",
+              firstLines,
+              secondLines,
+              index1,
+              index2
+            );
+          }
+
           // Do abbreviate if it's the difference between fitting on two lines and not.
           // Cut off at 2 lines no matter what, so unexpected input doesn't wrap.
           if (firstLines > 1 && index1 > 1) {
