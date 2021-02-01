@@ -114,25 +114,27 @@ defmodule Screens.DupScreenData.Response do
     ""
   end
 
-  def alert_issue(%{effect: :delay, cause: cause}) do
+  def alert_issue(alert, line_count)
+
+  def alert_issue(%{effect: :delay, cause: cause}, _) do
     %{
       icon: :warning,
       text: [%{format: :bold, text: "SERVICE DISRUPTION"}, render_alert_cause(cause)]
     }
   end
 
-  def alert_issue(%{effect: :suspension, region: :inside, pill: pill}) do
+  def alert_issue(%{region: :inside, cause: cause}, 1) do
+    %{icon: :x, text: [%{format: :bold, text: "STATION CLOSED"}, render_alert_cause(cause)]}
+  end
+
+  def alert_issue(%{region: :inside, pill: pill}, 2) do
     %{
       icon: :warning,
       text: [%{format: :bold, text: "No #{@pill_to_specifier[pill]}"}, "service"]
     }
   end
 
-  def alert_issue(%{region: :inside, cause: cause}) do
-    %{icon: :x, text: [%{format: :bold, text: "STATION CLOSED"}, render_alert_cause(cause)]}
-  end
-
-  def alert_issue(%{region: :boundary, pill: pill, headsign: headsign}) do
+  def alert_issue(%{region: :boundary, pill: pill, headsign: headsign}, 1) do
     %{
       icon: :warning,
       text: [
