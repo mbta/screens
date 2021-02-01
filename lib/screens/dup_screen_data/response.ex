@@ -56,6 +56,7 @@ defmodule Screens.DupScreenData.Response do
     {headsign, "trains"}
   end
 
+  def pattern(region, effect, line_count)
   def pattern(_, :delay, _), do: :hatched
   def pattern(_, :shuttle, 1), do: :x
   def pattern(_, :shuttle, 2), do: :chevron
@@ -63,6 +64,7 @@ defmodule Screens.DupScreenData.Response do
   def pattern(_, :suspension, _), do: :chevron
   def pattern(_, :station_closure, _), do: :x
 
+  def color(pill, effect, line_count, affected_count)
   def color(_, _, 2, 2), do: :yellow
   def color(pill, :station_closure, 1, _), do: line_color(pill)
   def color(_, :station_closure, 2, _), do: :yellow
@@ -112,18 +114,27 @@ defmodule Screens.DupScreenData.Response do
     ""
   end
 
-  def alert_issue(%{effect: :delay, cause: cause}) do
+  def alert_issue(alert, line_count)
+
+  def alert_issue(%{effect: :delay, cause: cause}, _) do
     %{
       icon: :warning,
       text: [%{format: :bold, text: "SERVICE DISRUPTION"}, render_alert_cause(cause)]
     }
   end
 
-  def alert_issue(%{region: :inside, cause: cause}) do
+  def alert_issue(%{region: :inside, cause: cause}, 1) do
     %{icon: :x, text: [%{format: :bold, text: "STATION CLOSED"}, render_alert_cause(cause)]}
   end
 
-  def alert_issue(%{region: :boundary, pill: pill, headsign: headsign}) do
+  def alert_issue(%{region: :inside, pill: pill}, 2) do
+    %{
+      icon: :warning,
+      text: [%{format: :bold, text: "No #{@pill_to_specifier[pill]}"}, "service"]
+    }
+  end
+
+  def alert_issue(%{region: :boundary, pill: pill, headsign: headsign}, 1) do
     %{
       icon: :warning,
       text: [

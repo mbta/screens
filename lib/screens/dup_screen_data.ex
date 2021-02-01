@@ -223,7 +223,7 @@ defmodule Screens.DupScreenData do
       header: header,
       pattern: Response.pattern(alert.region, alert.effect, line_count),
       color: Response.color(alert.pill, alert.effect, line_count, 1),
-      issue: Response.alert_issue(alert),
+      issue: Response.alert_issue(alert, line_count),
       remedy: Response.alert_remedy(alert)
     }
   end
@@ -236,7 +236,7 @@ defmodule Screens.DupScreenData do
       header: header,
       pattern: :x,
       color: :yellow,
-      issue: Response.alert_issue(alert),
+      issue: Response.alert_issue(alert, 2),
       remedy: Response.alert_remedy(alert)
     }
   end
