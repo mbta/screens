@@ -76,7 +76,7 @@ config :screens,
       {~w[70149 70211], ~w[70153 70187], "BC/Clev. Circ."},
       {~w[70149 70187], ~w[70153 70211], "BC/Riverside"},
       {~w[70211 70187], ~w[70153 70149], "Clev. Circ./Riverside"},
-      {~w[70149 70211 70187], "70153", "Westbound"},
+      {~w[70149 70211 70187], "70153", {:adj, "westbound"}},
       {"70152", ~w[70148 70212 70186], "Park Street"}
     ],
     # Prudential
