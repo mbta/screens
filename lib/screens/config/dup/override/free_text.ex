@@ -8,7 +8,7 @@ defmodule Screens.Config.Dup.Override.FreeText do
           | %{color: color, text: String.t()}
           | %{special: special}
 
-  @type format :: :bold
+  @type format :: :bold | :small
   @type route_pill :: :red | :blue | :orange | :green | :silver
   @type color :: :red | :blue | :orange | :green | :silver | :purple
   @type special :: :break
