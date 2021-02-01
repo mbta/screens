@@ -52,6 +52,10 @@ defmodule Screens.DupScreenData.Response do
     end
   end
 
+  defp partial_alert_specifier(%{headsign: {:adj, headsign}}) do
+    {headsign, "trains"}
+  end
+
   defp partial_alert_specifier(%{headsign: headsign}) do
     {headsign, "trains"}
   end
@@ -128,7 +132,7 @@ defmodule Screens.DupScreenData.Response do
       icon: :warning,
       text: [
         %{format: :bold, text: "No #{@pill_to_specifier[pill]}"},
-        "service to #{headsign}"
+        service_to_headsign(headsign)
       ]
     }
   end
@@ -165,6 +169,9 @@ defmodule Screens.DupScreenData.Response do
       unquote(icon)
     end
   end
+
+  defp service_to_headsign({:adj, headsign}), do: "#{headsign} service"
+  defp service_to_headsign(headsign), do: "service to #{headsign}"
 
   defp line_color(:mattapan), do: :red
   defp line_color(pill), do: pill
