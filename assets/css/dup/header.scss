@@ -67,6 +67,26 @@
   line-height: 48px;
 }
 
+.header__version {
+  @include font--display--65medium;
+  font-size: 32px;
+  position: absolute;
+  bottom: 0px;
+  left: 8px;
+  color: #ffffff;
+  opacity: 0.33;
+}
+
+.header__error-code {
+  @include font--display--65medium;
+  font-size: 32px;
+  position: absolute;
+  bottom: 0px;
+  right: 8px;
+  color: #ffffff;
+  opacity: 0.33;
+}
+
 .header__accent-pattern-container {
   position: absolute;
   right: 0;

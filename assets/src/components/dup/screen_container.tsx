@@ -70,7 +70,7 @@ const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
 
   return (
     <div className={classWithModifier("screen-container", "no-data")}>
-      <Header text={stationName} />
+      <Header text={stationName} code={code} />
       <div className="no-data__body">
         <div className="no-data__icon-container">
           <img
@@ -88,9 +88,6 @@ const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
         </div>
         <div className="no-data__link-text">mbta.com/schedules</div>
       </div>
-      {code && (
-        <div className="no-data__error-code">Maintenance code: {code}</div>
-      )}
     </div>
   );
 };
