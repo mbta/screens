@@ -6,16 +6,17 @@
   - `App` component in dup.tsx should just return `<ScreenPage screenContainer={ScreenContainer} />`.
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
   - `ScreenPage` component in dup_screen_page.tsx should render `DupScreenPage` rather than `DevelopmentScreenPage`.
-- Build the minified JS/CSS with `npm --prefix assets run deploy`.
+- Comment out the Inter web font import line at the top of dup.scss.
 - Create priv/static/dup-app.html if it doesn’t already exist. Copy paste contents as directed below.
-- Copy the following files into the correct location:
+- `cd` to priv/static and run the following:
   ```sh
-  cd priv/static
-  cp css/dup.css js/polyfills.js js/dup.js .
+  for ROTATION_INDEX in {0..2}; do
+    echo "export const ROTATION_INDEX = ${ROTATION_INDEX};" > ../../assets/src/components/dup/rotation_index.tsx
+    npm --prefix ../../assets run deploy
+    cp -r css/dup.css js/polyfills.js js/dup.js ../dup_font_face.css ../fonts .
+    zip -r dup-app-${ROTATION_INDEX}.zip dup.css polyfills.js dup.js dup_font_face.css fonts images dup-app.html
+  done
   ```
-- Create a zip folder containing dup-app.html, dup.css, dup_font_face.css, polyfills.js, and dup.js at the top level; as well as the images and fonts directories. You will have a zip folder for each rotation index: dup-app-0.zip, dup-app-1.zip, dup-app-2.zip. For each zip you can either:
-  - manually edit dup.js to set a different value for the `ROTATION_INDEX` constant, or
-  - edit the `ROTATION_INDEX` constant in rotation_index.tsx, rerun `npm --prefix assets run deploy`, and then copy dup.js to priv/static once again.
 
 Contents of dup-app.html:
 ```html
@@ -27,6 +28,7 @@ Contents of dup-app.html:
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Screens</title>
+  <link rel="stylesheet" href="dup_font_face.css">
   <link rel="stylesheet" href="dup.css">
 </head>
 

@@ -1,6 +1,7 @@
 import React from "react";
 
 import { classWithModifier, formatTimeString, imagePath } from "Util/util";
+import { DUP_VERSION } from "./version";
 
 const patternMap: { [key: string]: string } = {
   hatched: "disruption",
@@ -26,7 +27,13 @@ const Pattern = ({ pattern }: { pattern: string }): JSX.Element => {
   );
 };
 
-const Header = ({ text, currentTimeString, pattern, color }): JSX.Element => {
+const Header = ({
+  text,
+  currentTimeString,
+  pattern,
+  color,
+  code,
+}): JSX.Element => {
   const environmentName = document.getElementById("app").dataset
     .environmentName;
 
@@ -43,6 +50,10 @@ const Header = ({ text, currentTimeString, pattern, color }): JSX.Element => {
           ? environmentName
           : ""}
       </div>
+      <div className="header__version">{DUP_VERSION}</div>
+      {code && (
+        <div className="header__error-code">Maintenance code: {code}</div>
+      )}
       <div className="header__logo-container">
         <img
           className="header__logo-image"
