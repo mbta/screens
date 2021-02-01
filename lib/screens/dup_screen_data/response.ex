@@ -9,6 +9,11 @@ defmodule Screens.DupScreenData.Response do
     mattapan: "Mattapan Line"
   }
 
+  @headsign_overrides %{
+    "Boston College" => "Boston Coll",
+    "Cleveland Circle" => "Cleveland Cir"
+  }
+
   def render_headway_lines(pill, {lo, hi}, num_rows) do
     case num_rows do
       2 ->
@@ -57,7 +62,8 @@ defmodule Screens.DupScreenData.Response do
   end
 
   defp partial_alert_specifier(%{headsign: headsign}) do
-    {headsign, "trains"}
+    overridden_headsign = Map.get(@headsign_overrides, headsign, headsign)
+    {overridden_headsign, "trains"}
   end
 
   def pattern(region, effect, line_count)
