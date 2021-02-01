@@ -81,42 +81,27 @@ defmodule Screens.DupScreenData.Response do
   def color(pill, _, _, _), do: line_color(pill)
 
   @alert_cause_mapping %{
-    an_earlier_mechanical_problem: "due to an earlier mechanical problem",
-    an_earlier_signal_problem: "due to an earlier signal problem",
+    accident: "due to an accident",
     construction: "for construction",
-    crossing_malfunction: "due to a crossing malfunction",
-    demonstration: "due to a nearby demonstration",
     disabled_train: "due to a disabled train",
-    electrical_work: "for electrical work",
     fire: "due to a fire",
-    hazmat_condition: "due to hazardous conditions",
-    heavy_ridership: "due to heavy ridership",
-    high_winds: "due to high winds",
     holiday: "for the holiday",
-    hurricane: "due to severe weather",
     maintenance: "for maintenance",
-    mechanical_problem: "due to a mechanical problem",
     medical_emergency: "due to a medical emergency",
-    parade: "for a parade",
     police_action: "due to police action",
     power_problem: "due to a power issue",
-    severe_weather: "due to severe weather",
     signal_problem: "due to a signal problem",
-    slippery_rail: "due to slippery rails",
     snow: "due to snow conditions",
     special_event: "for a special event",
-    speed_restriction: "due to a speed restriction",
     switch_problem: "due to a switch problem",
-    tie_replacement: "for maintenance",
     track_problem: "due to a track problem",
-    track_work: "for track work",
-    unruly_passenger: "due to an unruly passenger",
+    traffic: "due to traffic",
     weather: "due to weather conditions"
   }
 
   for {cause, cause_text} <- @alert_cause_mapping do
     defp render_alert_cause(unquote(cause)) do
-      unquote(cause_text)
+      %{format: :small, text: unquote(cause_text)}
     end
   end
 
