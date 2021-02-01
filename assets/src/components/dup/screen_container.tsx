@@ -58,8 +58,15 @@ const LinkArrow = ({ width, color }) => {
   );
 };
 
+// Fix station name tags without rider-facing names
+const REPLACEMENTS = {
+  WTC: "World Trade Center",
+  Malden: "Malden Center",
+};
+
 const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
-  const stationName = useOutfrontStation() || "Transit information";
+  let stationName = useOutfrontStation() || "Transit information";
+  stationName = REPLACEMENTS[stationName] || stationName;
 
   return (
     <div className={classWithModifier("screen-container", "no-data")}>
