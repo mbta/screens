@@ -17,7 +17,7 @@ defmodule Screens.Config.Dup.Override.FreeText do
     text
   end
 
-  for format <- ~w[bold]a do
+  for format <- ~w[bold small]a do
     format_string = Atom.to_string(format)
 
     def from_json(%{"format" => unquote(format_string), "text" => text}) do
