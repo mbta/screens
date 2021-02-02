@@ -1,6 +1,8 @@
 defmodule Screens.DupScreenData.Request do
   @moduledoc false
 
+  require Logger
+
   alias Screens.Alerts.Alert
   alias Screens.Config.Dup.Section
   alias Screens.Config.Dup.Section.Headway
@@ -96,6 +98,22 @@ defmodule Screens.DupScreenData.Request do
     end
   end
 
+  defp log_empty_section(stop_ids, route_ids) do
+    stop_id_string =
+      case stop_ids do
+        [] -> "null"
+        stop_id_list -> Enum.join(stop_id_list, ",")
+      end
+
+    route_id_string =
+      case route_ids do
+        [] -> "null"
+        route_id_list -> Enum.join(route_id_list, ",")
+      end
+
+    Logger.info("[dup empty section] stop_ids=#{stop_id_string} route_ids=#{route_id_string}")
+  end
+
   defp fetch_section_departures(stop_ids, route_ids, pill, num_rows) do
     query_params = %{stop_ids: stop_ids, route_ids: route_ids}
     include_schedules? = Enum.member?([:cr, :ferry], pill)
@@ -107,6 +125,12 @@ defmodule Screens.DupScreenData.Request do
           |> Enum.map(&Map.from_struct/1)
           |> Enum.sort_by(& &1.time)
           |> Enum.take(num_rows)
+
+        _ =
+          case section_departures do
+            [] -> log_empty_section(stop_ids, route_ids)
+            _ -> nil
+          end
 
         {:ok, %{departures: section_departures, pill: pill}}
 
