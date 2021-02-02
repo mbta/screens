@@ -12,6 +12,16 @@ defmodule Screens.DupScreenData.Request do
   @alert_route_types ~w[light_rail subway]a
   @alert_effects MapSet.new(~w[delay shuttle suspension station_closure]a)
 
+  @branch_stations ["place-kencl", "place-jfk", "place-coecl"]
+  @branch_terminals [
+    "Boston College",
+    "Cleveland Circle",
+    "Riverside",
+    "Heath Street",
+    "Ashmont",
+    "Braintree"
+  ]
+
   def fetch_alerts(stop_ids, route_ids) do
     opts = [
       stop_ids: stop_ids,
@@ -67,8 +77,16 @@ defmodule Screens.DupScreenData.Request do
     end
   end
 
+  defp branch_stations do
+    MapSet.new(@branch_stations)
+  end
+
+  defp branch_terminals do
+    MapSet.new(@branch_terminals)
+  end
+
   defp fetch_headway_mode(
-         _section,
+         %Section{stop_ids: stop_ids},
          %Headway{sign_ids: sign_ids, headway_id: headway_id},
          section_alert,
          current_time
@@ -77,8 +95,21 @@ defmodule Screens.DupScreenData.Request do
     # terminals are temporary. In the future, we'll need to check that the boundary
     # isn't a normal terminal.
     temporary_terminal? = match?([%{region: :boundary}], section_alert)
+
+    branch_station? =
+      MapSet.size(MapSet.intersection(MapSet.new(stop_ids), branch_stations())) > 0
+
+    branch_alert? =
+      case section_alert do
+        [%{headsign: headsign}] -> headsign in branch_terminals()
+        _ -> false
+      end
+
+    non_branch_temporary_terminal? =
+      temporary_terminal? and not (branch_station? and branch_alert?)
+
     signs_ui_headways? = SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids)
-    headway_mode? = temporary_terminal? or signs_ui_headways?
+    headway_mode? = non_branch_temporary_terminal? or signs_ui_headways?
 
     if headway_mode? do
       time_ranges = SignsUiConfig.State.time_ranges(headway_id)
