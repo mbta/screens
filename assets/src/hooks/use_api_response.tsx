@@ -79,7 +79,7 @@ const buildApiPath = ({
   }
 
   if (isDup()) {
-    apiPath = "https://screens-dev-green.mbtace.com" + apiPath;
+    apiPath = "https://screens.mbta.com" + apiPath;
   }
 
   return apiPath;
