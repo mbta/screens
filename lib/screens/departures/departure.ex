@@ -407,11 +407,21 @@ defmodule Screens.Departures.Departure do
   # Central Square serve multiple stops we're displaying on the Solari screen there. This shouldn't
   # happen anywhere else.
   defp deduplicate_repeated_trips(predictions) do
-    deduplicated_predictions =
-      predictions
+    {predictions_without_trip, predictions_with_trip} =
+      Enum.split_with(predictions, fn
+        %{trip: nil} -> true
+        %{trip: %{id: nil}} -> true
+        _ -> false
+      end)
+
+    deduplicated_predictions_with_trip =
+      predictions_with_trip
       |> Enum.group_by(fn %{trip: %Trip{id: trip_id}} -> trip_id end)
       |> log_unexpected_groups()
       |> Enum.map(fn {_trip_id, predictions} -> Enum.min_by(predictions, & &1.departure_time) end)
+
+    deduplicated_predictions =
+      (predictions_without_trip ++ deduplicated_predictions_with_trip)
       |> Enum.sort_by(& &1.departure_time)
 
     {:ok, deduplicated_predictions}
