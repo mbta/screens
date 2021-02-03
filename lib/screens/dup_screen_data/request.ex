@@ -77,12 +77,25 @@ defmodule Screens.DupScreenData.Request do
     end
   end
 
-  defp branch_stations do
-    MapSet.new(@branch_stations)
+  defp temporary_terminal?(section_alert) do
+    # NB: There aren't currently any DUPs at permanent terminals, so we assume all
+    # terminals are temporary. In the future, we'll need to check that the boundary
+    # isn't a normal terminal.
+    match?([%{region: :boundary}], section_alert)
   end
 
-  defp branch_terminals do
-    MapSet.new(@branch_terminals)
+  defp branch_station?(stop_ids) do
+    case stop_ids do
+      [parent_station_id] -> parent_station_id in MapSet.new(@branch_stations)
+      _ -> false
+    end
+  end
+
+  defp branch_alert?(section_alert) do
+    case section_alert do
+      [%{headsign: headsign}] -> headsign in MapSet.new(@branch_terminals)
+      _ -> false
+    end
   end
 
   defp fetch_headway_mode(
@@ -91,22 +104,9 @@ defmodule Screens.DupScreenData.Request do
          section_alert,
          current_time
        ) do
-    # NB: There aren't currently any DUPs at permanent terminals, so we assume all
-    # terminals are temporary. In the future, we'll need to check that the boundary
-    # isn't a normal terminal.
-    temporary_terminal? = match?([%{region: :boundary}], section_alert)
-
-    branch_station? =
-      MapSet.size(MapSet.intersection(MapSet.new(stop_ids), branch_stations())) > 0
-
-    branch_alert? =
-      case section_alert do
-        [%{headsign: headsign}] -> headsign in branch_terminals()
-        _ -> false
-      end
-
     non_branch_temporary_terminal? =
-      temporary_terminal? and not (branch_station? and branch_alert?)
+      temporary_terminal?(section_alert) and
+        not (branch_station?(stop_ids) and branch_alert?(section_alert))
 
     signs_ui_headways? = SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids)
     headway_mode? = non_branch_temporary_terminal? or signs_ui_headways?
