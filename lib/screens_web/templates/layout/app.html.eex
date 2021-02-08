@@ -5,7 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Screens</title>
+    <%= if @app_id != :dup do %>
     <link rel="stylesheet" href="https://use.typekit.net/emd6vhv.css">
+    <% end %>
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/#{@app_id}.css") %>"/>
   </head>
   <body class="<%= @body_class %>">

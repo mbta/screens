@@ -1,16 +1,23 @@
 import React from "react";
+import _ from "lodash";
 
-import { classWithModifier, classWithModifiers } from "Util/util";
+import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
+
+const iconPaths: { [key: string]: string } = _.mapValues(
+  {
+    warning: "alert.svg",
+    x: "no-service-white.svg",
+    shuttle: "bus-white.svg",
+    subway: "subway-white.svg",
+    "subway-negative-black": "subway-negative-black.svg",
+    cr: "commuter-rail.svg",
+    walk: "nearby-white.svg",
+  },
+  imagePath
+);
 
 const srcForIcon = (icon) => {
-  return {
-    warning: "/images/alert.svg",
-    x: "/images/no-service-white.svg",
-    shuttle: "/images/bus-white.svg",
-    subway: "/images/subway-white.svg",
-    cr: "/images/commuter-rail.svg",
-    walk: "/images/nearby-white.svg",
-  }[icon];
+  return iconPaths[icon];
 };
 
 const getKey = (elt) => {
@@ -22,13 +29,17 @@ const getKey = (elt) => {
     return `route-pill--${elt.route}`;
   } else if (elt.text !== undefined) {
     return `${elt.color}--${elt.text}`;
+  } else if (elt.special !== undefined) {
+    return `special--${elt.special}`;
   }
 };
 
 const Icon = ({ icon }) => {
   let iconElt;
 
-  if (["red", "blue", "orange", "green", "silver"].includes(icon)) {
+  if (icon === null) {
+    iconElt = null;
+  } else if (["red", "blue", "orange", "green", "silver"].includes(icon)) {
     iconElt = <RoutePill route={icon} />;
   } else {
     iconElt = <img className="free-text__icon-image" src={srcForIcon(icon)} />;
@@ -75,6 +86,14 @@ const TextPill = ({ color, text }) => {
   );
 };
 
+const Special = ({ data }) => {
+  if (data === "break") {
+    return <br />;
+  }
+
+  return null;
+};
+
 const FreeTextElement = ({ elt }) => {
   if (typeof elt === "string") {
     return <FormatString text={elt} format={null} />;
@@ -84,6 +103,8 @@ const FreeTextElement = ({ elt }) => {
     return <RoutePill route={elt.route} />;
   } else if (elt.color !== undefined) {
     return <TextPill color={elt.color} text={elt.text} />;
+  } else if (elt.special !== undefined) {
+    return <Special data={elt.special} />;
   }
 
   return null;
@@ -91,7 +112,7 @@ const FreeTextElement = ({ elt }) => {
 
 const FreeTextLine = ({ icon, text }) => {
   return (
-    <div>
+    <div className="free-text__line-container">
       <Icon icon={icon} />
       <div className="free-text__line">
         {text.map((elt) => (

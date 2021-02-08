@@ -1,4 +1,5 @@
 import React from "react";
+import { imagePath } from "Util/util";
 
 const TakeoverInlineAlert = (): JSX.Element => {
   return (
@@ -7,7 +8,7 @@ const TakeoverInlineAlert = (): JSX.Element => {
         <div className="takeover-inline-alert__image">
           <img
             className="takeover-inline-alert__icon"
-            src="/images/alert.svg"
+            src={imagePath("alert.svg")}
           />
         </div>
         <div className="takeover-inline-alert__text">

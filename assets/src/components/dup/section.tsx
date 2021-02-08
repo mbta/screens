@@ -1,6 +1,7 @@
 import React from "react";
 
 import Departure from "Components/dup/departure";
+import FreeText from "Components/dup/free_text";
 
 const camelizeDepartureObject = ({
   id,
@@ -26,13 +27,18 @@ const camelizeDepartureObject = ({
   crowdingLevel,
 });
 
-const Section = ({ departures, currentTimeString }): JSX.Element => {
+const Section = ({
+  departures,
+  currentTimeString,
+  currentPage,
+}): JSX.Element => {
   return (
     <div className="section">
       {departures.map((departure) => (
         <Departure
           {...camelizeDepartureObject(departure)}
           currentTimeString={currentTimeString}
+          currentPage={currentPage}
           key={departure.id}
         />
       ))}
@@ -41,4 +47,15 @@ const Section = ({ departures, currentTimeString }): JSX.Element => {
   );
 };
 
+const HeadwaySection = ({ headway, pill }): JSX.Element => {
+  return (
+    <div className="section section--headway">
+      <div className="partial-alert partial-alert--dark">
+        <FreeText lines={headway} />
+      </div>
+    </div>
+  );
+};
+
 export default Section;
+export { HeadwaySection };

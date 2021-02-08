@@ -9,27 +9,32 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenContainer, { ScreenLayout } from "Components/dup/screen_container";
 
 import {
-  AuditScreenPage,
-  MultiScreenPage,
   ScreenPage,
-} from "Components/eink/screen_page";
+  RotationPage,
+  MultiRotationPage,
+} from "Components/dup/dup_screen_page";
+import { isDup } from "Util/util";
 
 const App = (): JSX.Element => {
-  return (
-    <Router>
-      <Switch>
-        <Route exact path="/screen/dup">
-          <MultiScreenPage screenContainer={ScreenContainer} />
-        </Route>
-        <Route exact path="/audit/dup">
-          <AuditScreenPage screenLayout={ScreenLayout} />
-        </Route>
-        <Route path="/screen/:id">
-          <ScreenPage screenContainer={ScreenContainer} />
-        </Route>
-      </Switch>
-    </Router>
-  );
+  if (isDup()) {
+    return <ScreenPage screenContainer={ScreenContainer} />;
+  } else {
+    return (
+      <Router>
+        <Switch>
+          <Route exact path="/screen/dup">
+            <MultiRotationPage screenContainer={ScreenContainer} />
+          </Route>
+          <Route path="/screen/:id/:rotationIndex">
+            <ScreenPage screenContainer={ScreenContainer} />
+          </Route>
+          <Route path="/screen/:id">
+            <RotationPage screenContainer={ScreenContainer} />
+          </Route>
+        </Switch>
+      </Router>
+    );
+  }
 };
 
 ReactDOM.render(<App />, document.getElementById("app"));

@@ -61,7 +61,7 @@ config :screens,
   audio_psa_s3_directory: "/screens/audio_assets/psa/",
   signs_ui_s3_path: "config.json",
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.S3Fetch,
-  api_v3_url: "https://api-v3.mbta.com/"
+  default_api_v3_url: "https://api-v3.mbta.com/"
 
 config :screens,
   # Maps alert informed entity contents to the appropriate headsign to show for that alert.
@@ -76,7 +76,7 @@ config :screens,
       {~w[70149 70211], ~w[70153 70187], "BC/Clev. Circ."},
       {~w[70149 70187], ~w[70153 70211], "BC/Riverside"},
       {~w[70211 70187], ~w[70153 70149], "Clev. Circ./Riverside"},
-      {~w[70149 70211 70187], "70153", "Westbound"},
+      {~w[70149 70211 70187], "70153", {:adj, "westbound"}},
       {"70152", ~w[70148 70212 70186], "Park Street"}
     ],
     # Prudential
@@ -135,7 +135,8 @@ config :screens,
     "70024",
     "70025",
     "70203",
-    "70204"
+    "70204",
+    "place-haecl"
   ]
 
 # Import environment specific config. This must remain at the bottom

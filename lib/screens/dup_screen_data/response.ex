@@ -1,6 +1,38 @@
 defmodule Screens.DupScreenData.Response do
   @moduledoc false
 
+  @pill_to_specifier %{
+    red: "Red Line",
+    orange: "Orange Line",
+    green: "Green Line",
+    blue: "Blue Line",
+    mattapan: "Mattapan Line"
+  }
+
+  @headsign_overrides %{
+    "Boston College" => "Boston Coll",
+    "Cleveland Circle" => "Cleveland Cir"
+  }
+
+  def render_headway_lines(pill, {lo, hi}, num_rows) do
+    case num_rows do
+      2 ->
+        %{icon: pill, text: ["every", %{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]}
+
+      4 ->
+        %{
+          icon: "subway-negative-black",
+          text: [
+            %{color: pill, text: @pill_to_specifier |> Map.get(pill) |> String.upcase()},
+            %{special: :break},
+            "every",
+            %{format: :bold, text: "#{lo}-#{hi}"},
+            "minutes"
+          ]
+        }
+    end
+  end
+
   def render_partial_alerts([alert]) do
     [
       %{
@@ -19,24 +51,22 @@ defmodule Screens.DupScreenData.Response do
     }
   end
 
-  @pill_to_specifier %{
-    red: "Red Line",
-    orange: "Orange Line",
-    green: "Green Line",
-    blue: "Blue Line",
-    mattapan: "Mattapan Line"
-  }
-
   for {pill, specifier} <- @pill_to_specifier do
     defp partial_alert_specifier(%{headsign: nil, pill: unquote(pill)}) do
       {unquote(specifier), "service"}
     end
   end
 
-  defp partial_alert_specifier(%{headsign: headsign}) do
+  defp partial_alert_specifier(%{headsign: {:adj, headsign}}) do
     {headsign, "trains"}
   end
 
+  defp partial_alert_specifier(%{headsign: headsign}) do
+    overridden_headsign = Map.get(@headsign_overrides, headsign, headsign)
+    {overridden_headsign, "trains"}
+  end
+
+  def pattern(region, effect, line_count)
   def pattern(_, :delay, _), do: :hatched
   def pattern(_, :shuttle, 1), do: :x
   def pattern(_, :shuttle, 2), do: :chevron
@@ -44,48 +74,34 @@ defmodule Screens.DupScreenData.Response do
   def pattern(_, :suspension, _), do: :chevron
   def pattern(_, :station_closure, _), do: :x
 
+  def color(pill, effect, line_count, affected_count)
   def color(_, _, 2, 2), do: :yellow
   def color(pill, :station_closure, 1, _), do: line_color(pill)
   def color(_, :station_closure, 2, _), do: :yellow
   def color(pill, _, _, _), do: line_color(pill)
 
   @alert_cause_mapping %{
-    an_earlier_mechanical_problem: "due to an earlier mechanical problem",
-    an_earlier_signal_problem: "due to an earlier signal problem",
+    accident: "due to an accident",
     construction: "for construction",
-    crossing_malfunction: "due to a crossing malfunction",
-    demonstration: "due to a nearby demonstration",
     disabled_train: "due to a disabled train",
-    electrical_work: "for electrical work",
     fire: "due to a fire",
-    hazmat_condition: "due to hazardous conditions",
-    heavy_ridership: "due to heavy ridership",
-    high_winds: "due to high winds",
     holiday: "for the holiday",
-    hurricane: "due to severe weather",
     maintenance: "for maintenance",
-    mechanical_problem: "due to a mechanical problem",
     medical_emergency: "due to a medical emergency",
-    parade: "for a parade",
     police_action: "due to police action",
     power_problem: "due to a power issue",
-    severe_weather: "due to severe weather",
     signal_problem: "due to a signal problem",
-    slippery_rail: "due to slippery rails",
     snow: "due to snow conditions",
     special_event: "for a special event",
-    speed_restriction: "due to a speed restriction",
     switch_problem: "due to a switch problem",
-    tie_replacement: "for maintenance",
     track_problem: "due to a track problem",
-    track_work: "for track work",
-    unruly_passenger: "due to an unruly passenger",
+    traffic: "due to traffic",
     weather: "due to weather conditions"
   }
 
   for {cause, cause_text} <- @alert_cause_mapping do
     defp render_alert_cause(unquote(cause)) do
-      unquote(cause_text)
+      %{format: :small, text: unquote(cause_text)}
     end
   end
 
@@ -93,23 +109,32 @@ defmodule Screens.DupScreenData.Response do
     ""
   end
 
-  def alert_issue(%{effect: :delay, cause: cause}) do
+  def alert_issue(alert, line_count)
+
+  def alert_issue(%{effect: :delay, cause: cause}, _) do
     %{
       icon: :warning,
       text: [%{format: :bold, text: "SERVICE DISRUPTION"}, render_alert_cause(cause)]
     }
   end
 
-  def alert_issue(%{region: :inside, cause: cause}) do
-    %{icon: :x, free_text: [%{format: :bold, text: "STATION CLOSED"}, render_alert_cause(cause)]}
+  def alert_issue(%{region: :inside, cause: cause}, 1) do
+    %{icon: :x, text: [%{format: :bold, text: "STATION CLOSED"}, render_alert_cause(cause)]}
   end
 
-  def alert_issue(%{region: :boundary, pill: pill, headsign: headsign}) do
+  def alert_issue(%{region: :inside, pill: pill}, 2) do
+    %{
+      icon: :warning,
+      text: [%{format: :bold, text: "No #{@pill_to_specifier[pill]}"}, "service"]
+    }
+  end
+
+  def alert_issue(%{region: :boundary, pill: pill, headsign: headsign}, 1) do
     %{
       icon: :warning,
       text: [
         %{format: :bold, text: "No #{@pill_to_specifier[pill]}"},
-        "service to #{headsign}"
+        service_to_headsign(headsign)
       ]
     }
   end
@@ -118,7 +143,7 @@ defmodule Screens.DupScreenData.Response do
     icon = alert_remedy_icon(alert.effect)
     line = [%{format: :bold, text: alert_remedy_text(alert.effect)}]
 
-    %{icon: icon, free_text: line}
+    %{icon: icon, text: line}
   end
 
   @alert_remedy_text_mapping %{
@@ -146,6 +171,9 @@ defmodule Screens.DupScreenData.Response do
       unquote(icon)
     end
   end
+
+  defp service_to_headsign({:adj, headsign}), do: "#{headsign} service"
+  defp service_to_headsign(headsign), do: "service to #{headsign}"
 
   defp line_color(:mattapan), do: :red
   defp line_color(pill), do: pill
