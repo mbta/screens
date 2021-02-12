@@ -1,7 +1,6 @@
 defmodule Screens.Psa do
   @moduledoc false
   alias Screens.Config.{PsaConfig, Screen, Solari, State}
-  alias Screens.Config.PsaConfig.OverrideList
 
   @eink_refresh_seconds 30
   @solari_refresh_seconds 15
@@ -17,10 +16,10 @@ defmodule Screens.Psa do
 
     %PsaConfig{
       default_list: default_list,
-      override_list: override_list
+      scheduled_overrides: scheduled_overrides
     } = psa_config
 
-    {psa_type, psa_list} = get_active_psa_list(override_list, default_list)
+    {psa_type, psa_list} = get_active_psa_list(scheduled_overrides, default_list)
 
     psa_s3_url =
       psa_list
@@ -37,21 +36,14 @@ defmodule Screens.Psa do
     end
   end
 
-  defp get_active_psa_list(override_list, default_list)
-
-  defp get_active_psa_list(nil, default_list), do: default_list
-
-  defp get_active_psa_list(
-         %OverrideList{psa_list: override_list, start_time: start_time, end_time: end_time},
-         default_list
-       ) do
+  defp get_active_psa_list(scheduled_overrides, default_list) do
     now = DateTime.utc_now()
 
-    if in_date_time_range?(now, {start_time, end_time}) do
-      override_list
-    else
-      default_list
-    end
+    Enum.find_value(scheduled_overrides, default_list, fn override ->
+      if in_date_time_range?(now, {override.start_time, override.end_time}),
+        do: override.override_list,
+        else: false
+    end)
   end
 
   defp in_date_time_range?(_dt, {nil, nil}), do: true

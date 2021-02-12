@@ -18,7 +18,7 @@
             "paths": [],
             "type": null
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "route_id": "Green-B",
         "service_level": 1,
@@ -43,7 +43,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "normal",
         "sections": [
@@ -166,7 +166,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "normal",
         "sections": [
@@ -261,7 +261,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "58"
@@ -289,7 +289,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "1357"
@@ -313,7 +313,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "normal",
         "sections": [
@@ -497,7 +497,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "178"
@@ -521,7 +521,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "none",
         "sections": [
@@ -631,7 +631,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "407"
@@ -666,7 +666,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "2134"
@@ -703,7 +703,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "36466"
@@ -740,7 +740,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "32549"
@@ -764,7 +764,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "normal",
         "sections": [
@@ -871,7 +871,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "route_id": "Green-C",
         "service_level": 1,
@@ -902,7 +902,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "5496"
@@ -939,7 +939,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "8178"
@@ -966,7 +966,7 @@
             "paths": [],
             "type": null
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "route_id": "Green-B",
         "service_level": 1,
@@ -1002,7 +1002,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "11257"
@@ -1029,7 +1029,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "route_id": "Green-C",
         "service_level": 1,
@@ -1064,7 +1064,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "5615"
@@ -1091,7 +1091,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "route_id": "Green-C",
         "service_level": 1,
@@ -1119,7 +1119,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "route_id": "Green-E",
         "service_level": 1,
@@ -1144,7 +1144,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "normal",
         "sections": [
@@ -1257,7 +1257,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "383"
@@ -1291,7 +1291,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "21365"
@@ -1325,7 +1325,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "390"
@@ -1359,7 +1359,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "5605"
@@ -1425,7 +1425,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "637"
@@ -1490,7 +1490,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "none",
         "sections": [
@@ -1607,7 +1607,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "normal",
         "sections": [
@@ -1677,7 +1677,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "normal",
         "sections": [
@@ -1812,7 +1812,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "none",
         "sections": [
@@ -1941,7 +1941,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "normal",
         "sections": [
@@ -2136,7 +2136,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "22549"
@@ -2197,15 +2197,35 @@
         "override": [
           {
             "type": "partial",
-            "alerts": [{"affected": "blue", "content": {"icon": "warning", "text": ["No Blue Line service"]}}]
+            "alerts": [
+              {
+                "affected": "blue",
+                "content": {
+                  "icon": "warning",
+                  "text": [
+                    "No Blue Line service"
+                  ]
+                }
+              }
+            ]
           },
           {
             "type": "fullscreen",
             "header": null,
             "pattern": "hatched",
             "color": "blue",
-            "issue": {"icon": "warning", "text": ["No Blue Line service"]},
-            "remedy": {"icon": "shuttle", "text": ["Use shuttle bus"]}
+            "issue": {
+              "icon": "warning",
+              "text": [
+                "No Blue Line service"
+              ]
+            },
+            "remedy": {
+              "icon": "shuttle",
+              "text": [
+                "Use shuttle bus"
+              ]
+            }
           }
         ]
       },
@@ -2228,7 +2248,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "none",
         "sections": [
@@ -2371,7 +2391,7 @@
             "paths": [],
             "type": null
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "route_id": "Green-C",
         "service_level": 1,
@@ -2399,7 +2419,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "route_id": "Green-E",
         "service_level": 1,
@@ -2424,7 +2444,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "none",
         "sections": [
@@ -2529,7 +2549,7 @@
             "paths": [],
             "type": null
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "route_id": "Green-B",
         "service_level": 1,
@@ -2565,7 +2585,7 @@
             "paths": [],
             "type": "double"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "service_level": 1,
         "stop_id": "1722"
@@ -2589,7 +2609,7 @@
             ],
             "type": "slide_in"
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "section_headers": "vertical",
         "sections": [
@@ -2694,7 +2714,7 @@
             "paths": [],
             "type": null
           },
-          "override_list": null
+          "scheduled_overrides": []
         },
         "route_id": "Green-B",
         "service_level": 1,
