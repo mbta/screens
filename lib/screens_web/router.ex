@@ -73,6 +73,18 @@ defmodule ScreensWeb.Router do
     get "/:id/:rotation_index", ScreenController, :index
   end
 
+  scope "/v2/screen", ScreensWeb do
+    pipe_through [:redirect_prod_http, :browser]
+
+    get "/:id", V2.ScreenController, :index
+  end
+
+  scope "/v2/api/screen", ScreensWeb do
+    pipe_through [:redirect_prod_http, :api, :browser]
+
+    get "/:id", V2.ScreenApiController, :show
+  end
+
   scope "/image", ScreensWeb do
     pipe_through [:redirect_prod_http, :browser]
 
