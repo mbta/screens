@@ -41,7 +41,7 @@ defmodule Screens.Psa do
 
     Enum.find_value(scheduled_overrides, default_list, fn override ->
       if in_date_time_range?(now, {override.start_time, override.end_time}),
-        do: override.override_list,
+        do: override.psa_list,
         else: false
     end)
   end
