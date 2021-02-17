@@ -2,8 +2,8 @@ defmodule Screens.Config.Dup.Section do
   @moduledoc false
 
   alias Screens.Config.Dup.Section.Headway
-  alias Screens.Util
   alias Screens.RouteType
+  alias Screens.Util
 
   @type t :: %__MODULE__{
           stop_ids: list(stop_id()),

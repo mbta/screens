@@ -1,8 +1,8 @@
 defmodule Screens.Config.Query.Params do
   @moduledoc false
 
-  alias Screens.Util
   alias Screens.RouteType
+  alias Screens.Util
 
   @type t :: %__MODULE__{
           stop_ids: list(String.t()),
