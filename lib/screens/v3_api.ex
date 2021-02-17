@@ -4,7 +4,6 @@ defmodule Screens.V3Api do
   require Logger
 
   @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool]]
-  @base_url Application.get_env(:screens, :api_v3_url)
 
   def get_json(route, params \\ %{}, extra_headers \\ [], opts \\ []) do
     headers = extra_headers ++ api_key_headers(Application.get_env(:screens, :api_v3_key))
@@ -42,11 +41,26 @@ defmodule Screens.V3Api do
   end
 
   defp build_url(route, params) when map_size(params) == 0 do
-    @base_url <> route
+    base_url() <> route
   end
 
   defp build_url(route, params) do
-    "#{@base_url}#{route}?#{URI.encode_query(params)}"
+    "#{base_url()}#{route}?#{URI.encode_query(params)}"
+  end
+
+  defp base_url do
+    :screens
+    |> Application.get_env(:environment_name)
+    |> base_url_for_environment()
+  end
+
+  defp base_url_for_environment(environment_name) do
+    case environment_name do
+      "screens-prod" -> "https://api-v3.mbta.com/"
+      "screens-dev" -> "https://dev.api.mbtace.com/"
+      "screens-dev-green" -> "https://green.dev.api.mbtace.com/"
+      _ -> Application.get_env(:screens, :default_api_v3_url)
+    end
   end
 
   defp api_key_headers(nil), do: []

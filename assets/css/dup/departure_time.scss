@@ -1,0 +1,20 @@
+@import "../base/base_departure_time";
+
+.departure-time {
+  color: #171f26;
+  display: inline-block;
+  text-align: right;
+  vertical-align: middle;
+  width: 400px;
+  margin-right: 32px;
+  font-size: 138px;
+
+  &--disabled {
+    color: #6e6e6e;
+    text-decoration: line-through;
+  }
+}
+
+.base-departure-time__minutes {
+  font-weight: 800;
+}

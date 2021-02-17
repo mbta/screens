@@ -120,12 +120,20 @@ defmodule Screens.Headways do
 
   defp match({daypart, :open, t_end}, local_time, {stop_id, direction_id}) do
     t_start = service_start(stop_id, direction_id)
-    match({daypart, t_start, t_end}, local_time, nil)
+
+    case t_start do
+      %Time{} -> match({daypart, t_start, t_end}, local_time, nil)
+      nil -> false
+    end
   end
 
   defp match({daypart, t_start, :close}, local_time, {stop_id, direction_id}) do
     t_end = service_end(stop_id, direction_id)
-    match({daypart, t_start, t_end}, local_time, nil)
+
+    case t_end do
+      %Time{} -> match({daypart, t_start, t_end}, local_time, nil)
+      nil -> false
+    end
   end
 
   defp match({_daypart, t_start, :midnight}, local_time, _) do
@@ -138,16 +146,23 @@ defmodule Screens.Headways do
   end
 
   defp service_start_or_end(stop_id, direction_id, min_or_max_fn) do
-    {:ok, schedules} = Schedule.fetch(%{stop_ids: [stop_id], direction_id: direction_id})
+    with {:ok, schedules} <- Schedule.fetch(%{stop_ids: [stop_id], direction_id: direction_id}),
+         [] = arrival_times <- get_arrival_times(schedules) do
+      {:ok, local_dt} =
+        arrival_times
+        |> min_or_max_fn.()
+        |> DateTime.shift_zone("America/New_York")
 
-    {:ok, local_dt} =
-      schedules
-      |> Enum.map(& &1.arrival_time)
-      |> Enum.filter(&(not is_nil(&1)))
-      |> min_or_max_fn.()
-      |> DateTime.shift_zone("America/New_York")
+      DateTime.to_time(local_dt)
+    else
+      _ -> nil
+    end
+  end
 
-    DateTime.to_time(local_dt)
+  defp get_arrival_times(schedules) do
+    schedules
+    |> Enum.map(& &1.arrival_time)
+    |> Enum.reject(&is_nil(&1))
   end
 
   # Time to stop showing Good Night screen if there are no predictions

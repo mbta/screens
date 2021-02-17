@@ -1,6 +1,8 @@
 defmodule Screens.Departures.Departure do
   @moduledoc false
 
+  require Logger
+
   alias Screens.Predictions.Prediction
   alias Screens.Schedules.Schedule
   alias Screens.Trips.Trip
@@ -16,6 +18,7 @@ defmodule Screens.Departures.Departure do
             alerts: [],
             stop_type: nil,
             time: nil,
+            scheduled_time: nil,
             crowding_level: nil,
             inline_badges: nil,
             track_number: nil
@@ -69,11 +72,10 @@ defmodule Screens.Departures.Departure do
       {:ok, data} ->
         departures =
           data
-          |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
           |> Enum.filter(fn %{departure_time: departure_time} ->
             DateTime.compare(departure_time, dt) != :lt
           end)
-          |> deduplicate_combined_routes()
+          |> deduplicate_slashed_routes()
           |> Enum.map(&from_prediction_or_schedule/1)
 
         {:ok, departures}
@@ -84,9 +86,17 @@ defmodule Screens.Departures.Departure do
   end
 
   defp fetch_predictions_only(%{} = query_params) do
-    query_params
-    |> Prediction.fetch()
-    |> from_predictions()
+    case Prediction.fetch(query_params) do
+      {:ok, predictions} ->
+        predictions
+        |> Enum.reject(&departure_in_past/1)
+        |> deduplicate_slashed_routes()
+        |> deduplicate_repeated_trips()
+        |> from_predictions_or_schedules()
+
+      :error ->
+        :error
+    end
   end
 
   # Copies stop headsigns from schedules to predictions with the same trip_id
@@ -111,21 +121,71 @@ defmodule Screens.Departures.Departure do
     prediction
   end
 
-  defp merge_predictions_and_schedules({:ok, predictions}, {:ok, schedules}) do
-    predictions = copy_stop_headsigns(predictions, schedules)
+  # Attaches scheduled times to predicted departures.
+  # For each departure, look up the corresponding prediction's trip,
+  # then find the schedule for that trip.
+  defp with_scheduled_times(predicted_departures, predictions, schedules) do
+    predictions_by_id = Enum.into(predictions, %{}, fn %{id: id} = p -> {id, p} end)
+
+    schedules_by_trip_id =
+      schedules
+      |> Enum.reject(fn
+        %{trip: nil} -> true
+        %{trip: %{id: nil}} -> true
+        _ -> false
+      end)
+      |> Enum.into(%{}, fn %{trip: %{id: trip_id}} = s -> {trip_id, s} end)
+
+    Enum.map(
+      predicted_departures,
+      &with_scheduled_time(&1, predictions_by_id, schedules_by_trip_id)
+    )
+  end
+
+  defp with_scheduled_time(departure, predictions_by_id, schedules_by_trip_id) do
+    %{id: id} = departure
+
+    case Map.get(predictions_by_id, id) do
+      %{trip: nil} ->
+        departure
+
+      %{trip: %{id: nil}} ->
+        departure
+
+      %{trip: %{id: trip_id}} ->
+        case Map.get(schedules_by_trip_id, trip_id) do
+          nil ->
+            departure
+
+          %{arrival_time: arrival_time, departure_time: departure_time} ->
+            time = select_prediction_time(arrival_time, departure_time)
+            %{departure | scheduled_time: DateTime.to_iso8601(time)}
+        end
+    end
+  end
+
+  defp merge_predictions_and_schedules({:ok, all_predictions}, {:ok, all_schedules}) do
+    filtered_predictions = filter_predictions_or_schedules(all_predictions)
+    filtered_schedules = filter_predictions_or_schedules(all_schedules)
+
+    filtered_predictions = copy_stop_headsigns(filtered_predictions, filtered_schedules)
 
     predicted_trip_ids =
-      predictions
+      filtered_predictions
       |> Enum.reject(&is_nil(&1.trip))
-      |> Enum.reject(&is_nil(&1.departure_time))
       |> Enum.map(& &1.trip.id)
       |> Enum.into(MapSet.new())
 
     unpredicted_schedules =
-      Enum.reject(schedules, fn %{trip: %{id: trip_id}} -> trip_id in predicted_trip_ids end)
+      Enum.reject(filtered_schedules, fn %{trip: %{id: trip_id}} ->
+        trip_id in predicted_trip_ids
+      end)
 
-    {:ok, predicted_departures} = from_predictions({:ok, predictions})
-    {:ok, scheduled_departures} = from_schedules({:ok, unpredicted_schedules})
+    {:ok, predicted_departures} = from_predictions_or_schedules({:ok, filtered_predictions})
+    {:ok, scheduled_departures} = from_predictions_or_schedules({:ok, unpredicted_schedules})
+
+    predicted_departures =
+      with_scheduled_times(predicted_departures, filtered_predictions, all_schedules)
 
     merged =
       (predicted_departures ++ scheduled_departures)
@@ -136,31 +196,11 @@ defmodule Screens.Departures.Departure do
 
   defp merge_predictions_and_schedules(_, _), do: :error
 
-  def from_schedules({:ok, schedules}) do
-    departures =
-      schedules
-      |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
-      |> Enum.reject(&departure_in_past/1)
-      |> deduplicate_combined_routes()
-      |> Enum.map(&from_prediction_or_schedule/1)
-
-    {:ok, departures}
+  def from_predictions_or_schedules({:ok, schedules}) do
+    {:ok, Enum.map(schedules, &from_prediction_or_schedule/1)}
   end
 
-  def from_schedules(:error), do: :error
-
-  def from_predictions({:ok, predictions}) do
-    departures =
-      predictions
-      |> Enum.reject(fn %{departure_time: departure_time} -> is_nil(departure_time) end)
-      |> Enum.reject(&departure_in_past/1)
-      |> deduplicate_combined_routes()
-      |> Enum.map(&from_prediction_or_schedule/1)
-
-    {:ok, departures}
-  end
-
-  def from_predictions(:error), do: :error
+  def from_predictions_or_schedules(:error), do: :error
 
   defp from_prediction_or_schedule(
          %{
@@ -287,6 +327,12 @@ defmodule Screens.Departures.Departure do
     merge_predictions_and_schedules(predictions, schedules)
   end
 
+  defp filter_predictions_or_schedules(predictions_or_schedules) do
+    predictions_or_schedules
+    |> Enum.reject(&departure_in_past/1)
+    |> deduplicate_slashed_routes()
+  end
+
   def do_query_and_parse(%{} = query_params, api_endpoint, parser, extra_params \\ %{}) do
     default_params = %{sort: "departure_time", include: ~w[route stop trip]}
 
@@ -341,10 +387,54 @@ defmodule Screens.Departures.Departure do
     {"date", date}
   end
 
+  defp log_unexpected_groups(groups) do
+    Enum.each(groups, fn {trip_id, predictions} ->
+      route_ids = Enum.map(predictions, & &1.route.id)
+      route_id = Enum.at(route_ids, 0)
+
+      expected_route_ids = ["64", "120"]
+
+      if length(route_ids) > 1 and !Enum.member?(expected_route_ids, route_id) do
+        Logger.warn(
+          "log_unexpected_groups found #{length(route_ids)} predictions on trip #{trip_id} for route #{
+            Enum.at(route_ids, 0)
+          }"
+        )
+      end
+    end)
+
+    groups
+  end
+
+  # If there are multiple predictions along the same trip, choose only the earliest one to display.
+  # This addresses a specific issue at Central where late-night outbound 64 trips which start in
+  # Central Square serve multiple stops we're displaying on the Solari screen there. This shouldn't
+  # happen anywhere else.
+  defp deduplicate_repeated_trips(predictions) do
+    {predictions_without_trip, predictions_with_trip} =
+      Enum.split_with(predictions, fn
+        %{trip: nil} -> true
+        %{trip: %{id: nil}} -> true
+        _ -> false
+      end)
+
+    deduplicated_predictions_with_trip =
+      predictions_with_trip
+      |> Enum.group_by(fn %{trip: %Trip{id: trip_id}} -> trip_id end)
+      |> log_unexpected_groups()
+      |> Enum.map(fn {_trip_id, predictions} -> Enum.min_by(predictions, & &1.departure_time) end)
+
+    deduplicated_predictions =
+      (predictions_without_trip ++ deduplicated_predictions_with_trip)
+      |> Enum.sort_by(& &1.departure_time)
+
+    {:ok, deduplicated_predictions}
+  end
+
   # This function filters out predictions whose route ID does not equal its trip's route ID.
   #
   # For buses, that means removing predictions for routes 24 and 27 when combined route 24/27 exists.
-  defp deduplicate_combined_routes(predictions) do
+  defp deduplicate_slashed_routes(predictions) do
     Enum.filter(predictions, fn
       %{route: %{id: id1}, trip: %{route_id: id2}} -> id1 == id2
       _ -> true

@@ -18,6 +18,10 @@ defmodule ScreensWeb.AudioController do
     end
   end
 
+  defp screen_exists?(screen_id) do
+    not is_nil(State.screen(screen_id))
+  end
+
   def show(conn, %{"id" => screen_id} = params) do
     disposition =
       params
@@ -28,7 +32,8 @@ defmodule ScreensWeb.AudioController do
 
     _ = Screens.LogScreenData.log_audio_request(screen_id, is_screen)
 
-    with %{success: true} = data <-
+    with true <- screen_exists?(screen_id),
+         %{success: true} = data <-
            Screens.ScreenData.by_screen_id(screen_id, is_screen, check_disabled: true),
          template_assigns <- Screens.Audio.from_api_data(data, screen_id),
          ssml <- render_ssml(template_assigns),
@@ -40,7 +45,8 @@ defmodule ScreensWeb.AudioController do
   end
 
   def debug(conn, %{"id" => screen_id}) do
-    with %{success: true} = data <- Screens.ScreenData.by_screen_id(screen_id, false),
+    with true <- screen_exists?(screen_id),
+         %{success: true} = data <- Screens.ScreenData.by_screen_id(screen_id, false),
          template_assigns <- Screens.Audio.from_api_data(data, screen_id),
          ssml <- render_ssml(template_assigns) do
       text(conn, ssml)

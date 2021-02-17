@@ -1,25 +1,30 @@
 defmodule Screens.Config.State do
   @moduledoc false
 
-  require Logger
-
   alias Screens.Config
-  alias Screens.Config.Screen
-
-  @typep t :: {Config.t(), retry_count :: non_neg_integer()} | :error
-
-  @initial_fetch_wait_ms 500
-  @refresh_ms 15 * 1000
-  # Start logging fetch failures as errors after this many minutes of consecutive failures
-  @fetch_failure_error_threshold_minutes 2
+  alias Screens.Config.{Devops, Screen}
+  alias Screens.ConfigCache.State.Fetch
 
   @config_fetcher Application.get_env(:screens, :config_fetcher)
 
-  use GenServer
+  @type t ::
+          %__MODULE__{
+            config: Config.t(),
+            retry_count: non_neg_integer(),
+            version_id: Fetch.version_id()
+          }
+          | :error
 
-  def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok, opts)
-  end
+  @enforce_keys [:config]
+  defstruct config: nil,
+            retry_count: 0,
+            version_id: nil
+
+  use Screens.ConfigCache.State,
+    config_module: Screens.Config.State,
+    fetch_config_fn: &@config_fetcher.fetch_config/1,
+    refresh_ms: 15 * 1000,
+    fetch_failure_error_threshold_minutes: 2
 
   def ok?(pid \\ __MODULE__) do
     GenServer.call(pid, :ok?)
@@ -53,43 +58,26 @@ defmodule Screens.Config.State do
     GenServer.call(pid, :config)
   end
 
-  def schedule_refresh(pid, ms \\ @refresh_ms) do
-    Process.send_after(pid, :refresh, ms)
-    :ok
-  end
-
-  def put_config(pid, config) do
-    GenServer.cast(pid, {:put_config, config})
-  end
-
-  def put_fetch_error(pid) do
-    GenServer.cast(pid, :put_fetch_error)
+  def mode_disabled?(pid \\ __MODULE__, mode) do
+    GenServer.call(pid, {:mode_disabled?, mode})
   end
 
   ###
-
-  @impl true
-  def init(:ok) do
-    init_state =
-      case @config_fetcher.fetch_config() do
-        {:ok, config} -> {config, 0}
-        :error -> error_state(:error)
-      end
-
-    schedule_refresh(self(), @initial_fetch_wait_ms)
-    {:ok, init_state}
-  end
 
   @impl true
   def handle_call(:ok?, _from, :error) do
     {:reply, false, :error}
   end
 
-  def handle_call(:ok?, _from, {_config, _retry_count} = state) do
+  def handle_call(:ok?, _from, state) do
     {:reply, true, state}
   end
 
-  def handle_call({:refresh_if_loaded_before, screen_id}, _from, {config, _} = state) do
+  def handle_call(
+        {:refresh_if_loaded_before, screen_id},
+        _from,
+        %__MODULE__{config: config} = state
+      ) do
     screen = Map.get(config.screens, screen_id)
 
     refresh_if_loaded_before =
@@ -101,7 +89,7 @@ defmodule Screens.Config.State do
     {:reply, refresh_if_loaded_before, state}
   end
 
-  def handle_call({:service_level, screen_id}, _from, {config, _} = state) do
+  def handle_call({:service_level, screen_id}, _from, %__MODULE__{config: config} = state) do
     screen = Map.get(config.screens, screen_id)
 
     service_level =
@@ -113,11 +101,11 @@ defmodule Screens.Config.State do
     {:reply, service_level, state}
   end
 
-  def handle_call(:green_line_service, _from, {config, _} = state) do
+  def handle_call(:green_line_service, _from, %__MODULE__{config: config} = state) do
     {:reply, config.green_line_service, state}
   end
 
-  def handle_call({:disabled?, screen_id}, _from, {config, _} = state) do
+  def handle_call({:disabled?, screen_id}, _from, %__MODULE__{config: config} = state) do
     screen = Map.get(config.screens, screen_id)
 
     disabled? =
@@ -129,21 +117,21 @@ defmodule Screens.Config.State do
     {:reply, disabled?, state}
   end
 
-  def handle_call({:screen, screen_id}, _from, {config, _} = state) do
+  def handle_call({:screen, screen_id}, _from, %__MODULE__{config: config} = state) do
     screen = Map.get(config.screens, screen_id)
 
     {:reply, screen, state}
   end
 
-  def handle_call(:screens, _from, {config, _} = state) do
+  def handle_call(:screens, _from, %__MODULE__{config: config} = state) do
     {:reply, config.screens, state}
   end
 
-  def handle_call(:config, _from, {config, _} = state) do
+  def handle_call(:config, _from, %__MODULE__{config: config} = state) do
     {:reply, config, state}
   end
 
-  def handle_call({:app_params, screen_id}, _from, {config, _} = state) do
+  def handle_call({:app_params, screen_id}, _from, %__MODULE__{config: config} = state) do
     screen = Map.get(config.screens, screen_id)
 
     app_params =
@@ -155,68 +143,14 @@ defmodule Screens.Config.State do
     {:reply, app_params, state}
   end
 
+  def handle_call({:mode_disabled?, mode}, _from, %__MODULE__{config: config} = state) do
+    %Devops{disabled_modes: disabled_modes} = config.devops
+
+    {:reply, Enum.member?(disabled_modes, mode), state}
+  end
+
   # If we're in an error state, all queries on the state get an :error response
   def handle_call(_, _from, :error) do
     {:reply, :error, :error}
-  end
-
-  @impl true
-  def handle_info(:refresh, state) do
-    pid = self()
-
-    schedule_refresh(pid)
-
-    async_fetch = fn ->
-      case @config_fetcher.fetch_config() do
-        {:ok, config} -> put_config(pid, config)
-        :error -> put_fetch_error(pid)
-      end
-    end
-
-    # asynchronously update state so that we aren't blocked while waiting for the request to complete
-    _ = Task.start(async_fetch)
-
-    {:noreply, state}
-  end
-
-  # Handle leaked :ssl_closed messages from Hackney.
-  # Workaround for this issue: https://github.com/benoitc/hackney/issues/464
-  def handle_info({:ssl_closed, _}, state) do
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_cast({:put_config, new_config}, _) do
-    {:noreply, {new_config, 0}}
-  end
-
-  def handle_cast(:put_fetch_error, state) do
-    {:noreply, error_state(state)}
-  end
-
-  # Logs fetch failures and returns the appropriate error state.
-  @spec error_state(current_state :: t()) :: t()
-  defp error_state(:error) do
-    _ = Logger.error("config_state_init_fetch_error")
-    :error
-  end
-
-  defp error_state({config, retry_count}) do
-    log_message = "config_state_fetch_error retry_count=#{retry_count}"
-
-    _ =
-      if log_as_error?(retry_count) do
-        Logger.error(log_message)
-      else
-        Logger.info(log_message)
-      end
-
-    {config, retry_count + 1}
-  end
-
-  defp log_as_error?(retry_count) do
-    threshold_ms = @fetch_failure_error_threshold_minutes * 60 * 1000
-
-    retry_count * @refresh_ms >= threshold_ms
   end
 end

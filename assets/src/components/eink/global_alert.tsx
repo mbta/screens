@@ -1,6 +1,7 @@
 import moment from "moment";
 import "moment-timezone";
 import React from "react";
+import { imagePath } from "Util/util";
 
 const iconForAlert = (alert) => {
   // For now, shuttles will show a bus icon, and everything else will
@@ -16,7 +17,7 @@ const GlobalAlert = ({ alert }): JSX.Element => {
         <div className="global-alert__icon-container">
           <img
             className="global-alert__icon-image"
-            src={`/images/${iconForAlert(alert)}.svg`}
+            src={imagePath(`${iconForAlert(alert)}.svg`)}
           />
         </div>
         <div className="global-alert__header-effect">

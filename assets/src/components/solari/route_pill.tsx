@@ -1,7 +1,8 @@
 import React from "react";
 
-import { classWithModifier, classWithModifiers } from "Util/util";
+import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 import BaseRoutePill from "Components/eink/base_route_pill";
+import { WIDE_MINI_PILL_ROUTES } from "Components/solari/section";
 
 interface PillType {
   routeName: string | null;
@@ -33,11 +34,31 @@ const routeToPill = (
     return { routeName: "OL", routePillColor: "orange" };
   }
 
+  if (routeId === "Green-B") {
+    return { routeName: "GL·B", routePillColor: "green" };
+  }
+
+  if (routeId === "Green-C") {
+    return { routeName: "GL·C", routePillColor: "green" };
+  }
+
+  if (routeId === "Green-D") {
+    return { routeName: "GL·D", routePillColor: "green" };
+  }
+
+  if (routeId === "Green-E") {
+    return { routeName: "GL·E", routePillColor: "green" };
+  }
+
   if (routeId && routeId.startsWith("CR")) {
     return {
       routeName: trackNumber == null ? "CR" : `TR${trackNumber}`,
       routePillColor: "purple",
     };
+  }
+
+  if (routeId && routeId.startsWith("Boat")) {
+    return { routeName: "Boat", routePillColor: "teal" };
   }
 
   if (route && route.startsWith("SL")) {
@@ -52,12 +73,19 @@ const Pill = ({ routeName, routePillColor }: PillType): JSX.Element => {
     routeName = (
       <img
         className="departure-route--icon"
-        src="/images/commuter-rail.svg"
+        src={imagePath("commuter-rail.svg")}
       ></img>
+    );
+  } else if (routeName === "Boat") {
+    routeName = (
+      <img className="departure-route--icon" src={imagePath("ferry.svg")}></img>
     );
   } else if (routeName === "BUS") {
     routeName = (
-      <img className="departure-route--icon" src="/images/bus-black.svg"></img>
+      <img
+        className="departure-route--icon"
+        src={imagePath("bus-black.svg")}
+      ></img>
     );
   }
 
@@ -119,12 +147,19 @@ const routeIdMapping: Record<string, string> = {
 const PagedDepartureRoutePill = ({ route, routeId, selected }): JSX.Element => {
   const isCommuterRail = routeId.startsWith("CR-");
   const isSlashRoute = route.includes("/");
+  const isWideRoute = WIDE_MINI_PILL_ROUTES.includes(route);
 
   const selectedModifier = selected ? "selected" : "unselected";
   const sizeModifier =
     isCommuterRail || isSlashRoute ? "size-small" : "size-normal";
   const modeModifier = isCommuterRail ? "commuter-rail" : "bus";
-  const modifiers = [selectedModifier, sizeModifier, modeModifier];
+  const widthModifier = isWideRoute ? "width-wide" : "width-normal";
+  const modifiers = [
+    selectedModifier,
+    sizeModifier,
+    modeModifier,
+    widthModifier,
+  ];
   const pillClass = classWithModifiers(
     "later-departure__route-pill",
     modifiers

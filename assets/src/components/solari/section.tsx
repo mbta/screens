@@ -2,14 +2,17 @@ import React from "react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 import Departure from "Components/solari/departure";
+import HeadwayDeparture from "Components/solari/headway_departure";
 import Arrow, { Direction } from "Components/solari/arrow";
 import {
   SectionRoutePill,
   PagedDepartureRoutePill,
 } from "Components/solari/route_pill";
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
-import { classWithModifier, classWithModifiers } from "Util/util";
+import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 import { standardTimeRepresentation } from "Util/time_representation";
+
+const WIDE_MINI_PILL_ROUTES = ["441/442"];
 
 const camelizeDepartureObject = ({
   id,
@@ -52,18 +55,25 @@ const isArrivingOrBoarding = (
 };
 
 const verticalHeaderIconSrc = (name, departuresLength) => {
+  let iconFileName = "";
   switch (true) {
     case departuresLength <= 1 && name === "Upper Busway":
-      return "/images/icon-upper-busway-arrow-only.svg";
+      iconFileName = "icon-upper-busway-arrow-only.svg";
+      break;
     case departuresLength <= 1 && name === "Lower Busway":
-      return "/images/icon-lower-busway-arrow-only.svg";
+      iconFileName = "icon-lower-busway-arrow-only.svg";
+      break;
     case name === "Upper Busway":
-      return "/images/icon-upper-busway.svg";
+      iconFileName = "icon-upper-busway.svg";
+      break;
     case name === "Lower Busway":
-      return "/images/icon-lower-busway.svg";
+      iconFileName = "icon-lower-busway.svg";
+      break;
     case name === "Commuter Rail":
-      return "/images/icon-commuter-rail.svg";
+      iconFileName = "icon-commuter-rail.svg";
+      break;
   }
+  return imagePath(iconFileName);
 };
 
 const SectionHeader = ({ name, arrow }): JSX.Element => {
@@ -106,7 +116,7 @@ const SectionFrame = ({
   );
 };
 
-const NoDeparturesMessage = ({ pill }): JSX.Element => (
+const PlaceholderMessage = ({ pill, text }): JSX.Element => (
   <div
     className={classWithModifiers("departure-container", [
       "group-start",
@@ -121,11 +131,23 @@ const NoDeparturesMessage = ({ pill }): JSX.Element => (
           "no-departures-placeholder"
         )}
       >
-        <BaseDepartureDestination destination="No departures currently available" />
+        <BaseDepartureDestination destination={text} />
       </div>
     </div>
   </div>
 );
+
+const NoDeparturesMessage = ({ pill }): JSX.Element => {
+  return (
+    <PlaceholderMessage pill={pill} text="No departures currently available" />
+  );
+};
+
+const NoDataMessage = ({ pill }): JSX.Element => {
+  return (
+    <PlaceholderMessage pill={pill} text="Live updates currently unavailable" />
+  );
+};
 
 interface PagedDepartureProps {
   pageCount: number;
@@ -230,12 +252,29 @@ class PagedDeparture extends React.Component<
       ? "size-small"
       : "size-normal";
 
-    const pillWidth = 89; // px
+    const normalPillWidth = 89; // px
+    const widePillWidth = 158; // px
     const pillSpace = 25; // px
-    const pillOffset = 30; // px
 
     const selectedRightOffset =
       this.props.pageCount - (this.state.currentPageNumber + 1);
+    const numWidePillsToTheRight = this.props.departures
+      .slice(this.state.currentPageNumber + 1)
+      .filter(({ route }) => WIDE_MINI_PILL_ROUTES.includes(route)).length;
+    const numNormalPillsToTheRight =
+      selectedRightOffset - numWidePillsToTheRight;
+
+    const currentPillIsWide = WIDE_MINI_PILL_ROUTES.includes(
+      currentPagedDeparture.route
+    );
+    const pillCenterOffset = currentPillIsWide ? 64.5 : 30; // px
+    const totalPillSpaceWidth = selectedRightOffset * pillSpace;
+    const totalPillWidth =
+      numWidePillsToTheRight * widePillWidth +
+      numNormalPillsToTheRight * normalPillWidth;
+    const translateWidth =
+      totalPillSpaceWidth + totalPillWidth + pillCenterOffset;
+
     const caretBaseClass = "later-departure__route-pill-caret";
     const beforeCaretClass = classWithModifier(caretBaseClass, "before");
     const afterCaretClass = classWithModifier(caretBaseClass, "after");
@@ -258,10 +297,7 @@ class PagedDeparture extends React.Component<
                     <div
                       className={beforeCaretClass}
                       style={{
-                        transform: `translateX(${
-                          selectedRightOffset * -(pillWidth + pillSpace) -
-                          pillOffset
-                        }px)`,
+                        transform: `translateX(-${translateWidth}px)`,
                       }}
                     ></div>
                   )}
@@ -274,10 +310,7 @@ class PagedDeparture extends React.Component<
                     <div
                       className={afterCaretClass}
                       style={{
-                        transform: `translateX(${
-                          selectedRightOffset * -(pillWidth + pillSpace) -
-                          pillOffset
-                        }px)`,
+                        transform: `translateX(-${translateWidth}px)`,
                       }}
                     ></div>
                   )}
@@ -387,8 +420,42 @@ const DepartureList = ({
   }
 };
 
+const HeadwayDepartureList = ({
+  pill,
+  headsigns,
+  rangeLow,
+  rangeHigh,
+}): JSX.Element => {
+  return (
+    <>
+      {headsigns.map((headsign) => (
+        <HeadwayDeparture
+          pill={pill}
+          headsign={headsign}
+          rangeLow={rangeLow}
+          rangeHigh={rangeHigh}
+          key={headsign}
+        />
+      ))}
+    </>
+  );
+};
+
 const MAX_PAGE_COUNT = 5;
 const MIN_PAGE_COUNT = 3;
+
+const getPageCount = (departures, numRows) => {
+  const excessDepartures = departures.length - numRows + 1;
+  const unadjustedPageCount = Math.min(excessDepartures, MAX_PAGE_COUNT);
+
+  // Reduce the number of pages if needed to make room for slashed routes
+  // which require wider mini-pills.
+  const startIndex = numRows - 1;
+  const widePillCount = departures
+    .slice(startIndex, startIndex + unadjustedPageCount)
+    .filter(({ route }) => WIDE_MINI_PILL_ROUTES.includes(route)).length;
+  return unadjustedPageCount - widePillCount;
+};
 
 interface PagedSectionProps {
   departures: object[];
@@ -412,10 +479,9 @@ const PagedSection = ({
   overhead,
   isAnimated,
   currentTimeString,
+  disabled,
 }: PagedSectionProps): JSX.Element => {
-  const excessDepartures = departures.length - numRows + 1;
-  const pageCount = Math.min(excessDepartures, MAX_PAGE_COUNT);
-
+  const pageCount = getPageCount(departures, numRows);
   const showPagedDeparture = pageCount >= MIN_PAGE_COUNT;
   const staticDepartures = showPagedDeparture
     ? departures.slice(0, numRows - 1)
@@ -432,7 +498,11 @@ const PagedSection = ({
   if (staticDepartures.length === 0) {
     return (
       <SectionFrame {...frameProps}>
-        <NoDeparturesMessage pill={pill} />
+        {disabled ? (
+          <NoDataMessage pill={pill} />
+        ) : (
+          <NoDeparturesMessage pill={pill} />
+        )}
       </SectionFrame>
     );
   }
@@ -472,6 +542,8 @@ const Section = ({
   overhead,
   isAnimated,
   pill,
+  headway: { active, headsigns, range_low: rangeLow, range_high: rangeHigh },
+  disabled,
 }): JSX.Element => {
   departures = departures.slice(0, numRows);
 
@@ -490,7 +562,24 @@ const Section = ({
   if (departures.length === 0) {
     return (
       <SectionFrame {...frameProps}>
-        <NoDeparturesMessage pill={pill} />
+        {disabled ? (
+          <NoDataMessage pill={pill} />
+        ) : (
+          <NoDeparturesMessage pill={pill} />
+        )}
+      </SectionFrame>
+    );
+  }
+
+  if (active) {
+    return (
+      <SectionFrame {...frameProps}>
+        <HeadwayDepartureList
+          pill={pill}
+          headsigns={headsigns}
+          rangeLow={rangeLow}
+          rangeHigh={rangeHigh}
+        />
       </SectionFrame>
     );
   }
@@ -507,4 +596,4 @@ const Section = ({
   );
 };
 
-export { PagedSection, Section };
+export { PagedSection, Section, WIDE_MINI_PILL_ROUTES };

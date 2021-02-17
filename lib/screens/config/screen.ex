@@ -1,25 +1,26 @@
 defmodule Screens.Config.Screen do
   @moduledoc false
 
-  alias Screens.Config.{Bus, Gl, Solari}
+  alias Screens.Config.{Bus, Dup, Gl, Solari}
   alias Screens.Util
 
   @type t :: %__MODULE__{
-          vendor: :gds | :mercury | :solari | :c3ms,
+          vendor: :gds | :mercury | :solari | :c3ms | :outfront,
           device_id: String.t(),
           name: String.t(),
-          app_id: :bus_eink | :gl_eink_single | :gl_eink_double | :solari,
+          app_id: :bus_eink | :gl_eink_single | :gl_eink_double | :solari | :dup,
           refresh_if_loaded_before: DateTime.t() | nil,
           disabled: boolean(),
-          app_params: Bus.t() | Gl.t() | Solari.t(),
+          app_params: Bus.t() | Dup.t() | Gl.t() | Solari.t(),
           tags: list(String.t())
         }
 
-  @recognized_app_ids ~w[bus_eink gl_eink_single gl_eink_double solari]a
+  @recognized_app_ids ~w[bus_eink gl_eink_single gl_eink_double solari dup]a
   @recognized_app_id_strings Enum.map(@recognized_app_ids, &Atom.to_string/1)
 
   @app_config_modules_by_app_id %{
     bus_eink: Bus,
+    dup: Dup,
     gl_eink_single: Gl,
     gl_eink_double: Gl,
     solari: Solari
@@ -64,7 +65,7 @@ defmodule Screens.Config.Screen do
     %__MODULE__{screen_config | refresh_if_loaded_before: time}
   end
 
-  for vendor <- ~w[gds mercury solari c3ms]a do
+  for vendor <- ~w[gds mercury solari c3ms outfront]a do
     vendor_string = Atom.to_string(vendor)
 
     defp value_from_json("vendor", unquote(vendor_string), _app_id) do

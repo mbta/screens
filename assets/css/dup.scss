@@ -1,0 +1,23 @@
+@import url("https://rsms.me/inter/inter.css");
+
+@import "fonts_inter";
+@import "colors";
+
+@import "base/base_route_pill";
+
+@import "dup/dup_screen_page";
+@import "dup/screen_container";
+@import "dup/departure";
+@import "dup/departure_route";
+@import "dup/departure_destination";
+@import "dup/departure_time";
+@import "dup/header";
+@import "dup/section";
+@import "dup/free_text";
+@import "dup/partial_alert";
+@import "dup/full_screen_alert";
+@import "dup/debug";
+
+body {
+  margin: 0px;
+}

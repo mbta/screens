@@ -58,13 +58,13 @@ const BottomScreenLayout = ({
   globalAlert,
   stopId,
   nearbyDepartures,
-  psaName,
+  psaUrl,
 }): JSX.Element => {
   return (
     <div className="single-screen-container">
       <div className="flex-zone__container">
-        {psaName ? (
-          <TakeoverAlert name={psaName} />
+        {psaUrl ? (
+          <TakeoverAlert psaUrl={psaUrl} />
         ) : (
           <>
             <div className="flex-zone__top-container">
@@ -104,7 +104,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         globalAlert={apiResponse.global_alert}
         stopId={apiResponse.stop_id}
         nearbyDepartures={apiResponse.nearby_departures}
-        psaName={apiResponse.psa_name}
+        psaUrl={apiResponse.psa_url}
       />
     </div>
   );
@@ -141,8 +141,8 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   switch (true) {
     case !apiResponse || apiResponse.success === false:
       return <NoConnectionScreenLayout />;
-    case apiResponse.psa_type === "takeover" && apiResponse.psa_name !== null:
-      return <TakeoverScreenLayout apiResponse={apiResponse} size="double" />;
+    case apiResponse.psa_type === "takeover" && apiResponse.psa_url != null:
+      return <TakeoverScreenLayout apiResponse={apiResponse} />;
     case apiResponse.service_level === 5:
       return <NoServiceScreenLayout />;
     case (!apiResponse.departures || apiResponse.departures.length === 0) &&
@@ -154,7 +154,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
 };
 
 const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse(id, EINK_REFRESH_MS);
+  const apiResponse = useApiResponse({ id, refreshMs: EINK_REFRESH_MS });
   return <ScreenLayout apiResponse={apiResponse} />;
 };
 

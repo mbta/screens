@@ -27,11 +27,17 @@ defmodule Screens.Schedules.Schedule do
   def fetch(%{} = query_params, date \\ nil) do
     extra_params = if is_nil(date), do: %{}, else: %{date: date}
 
-    Departure.do_query_and_parse(
-      query_params,
-      "schedules",
-      Screens.Schedules.Parser,
-      extra_params
-    )
+    schedules =
+      Departure.do_query_and_parse(
+        query_params,
+        "schedules",
+        Screens.Schedules.Parser,
+        extra_params
+      )
+
+    case schedules do
+      {:ok, result} -> {:ok, Enum.reject(result, &is_nil(&1.departure_time))}
+      :error -> :error
+    end
   end
 end

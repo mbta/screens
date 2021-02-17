@@ -16,12 +16,13 @@ const fields = [
       "gl_eink_single",
       "gl_eink_double",
       "solari",
+      "dup",
     ]),
   },
   {
     key: "vendor",
     label: "Vendor",
-    FormCell: buildFormSelect(["gds", "mercury", "solari", "c3ms"]),
+    FormCell: buildFormSelect(["gds", "mercury", "solari", "c3ms", "outfront"]),
   },
   { key: "device_id", label: "Device ID", FormCell: FormTextCell },
 ];

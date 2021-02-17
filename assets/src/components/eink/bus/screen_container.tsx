@@ -39,7 +39,7 @@ const BottomScreenLayout = forwardRef(
       globalAlert,
       stopId,
       nearbyConnections,
-      psaName,
+      psaUrl,
     },
     ref
   ): JSX.Element => {
@@ -50,7 +50,7 @@ const BottomScreenLayout = forwardRef(
           departures={departures}
           globalAlert={globalAlert}
           nearbyConnections={nearbyConnections}
-          psaName={psaName}
+          psaUrl={psaUrl}
           ref={ref}
         />
         <FareInfo />
@@ -89,7 +89,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         globalAlert={apiResponse.global_alert}
         stopId={apiResponse.stop_id}
         nearbyConnections={apiResponse.nearby_connections}
-        psaName={apiResponse.psa_name}
+        psaUrl={apiResponse.psa_url}
         ref={laterDeparturesRef}
       />
     </div>
@@ -123,14 +123,18 @@ const NoConnectionScreenLayout = (): JSX.Element => {
 };
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
+  const noDepartures = (apiResponse?.departures?.length ?? 0) === 0;
+
   switch (true) {
     case !apiResponse || apiResponse.success === false:
       return <NoConnectionScreenLayout />;
     case apiResponse.psa_type === "takeover":
-      return <TakeoverScreenLayout apiResponse={apiResponse} size="double" />;
+      return <TakeoverScreenLayout apiResponse={apiResponse} />;
     case apiResponse.service_level === 5:
       return <NoServiceScreenLayout />;
-    case !apiResponse.departures || apiResponse.departures.length === 0:
+    case noDepartures && apiResponse.in_service_day:
+      return <NoConnectionScreenLayout />;
+    case noDepartures && !apiResponse.in_service_day:
       return <NoDeparturesScreenLayout apiResponse={apiResponse} />;
     default:
       return (
@@ -143,7 +147,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
 };
 
 const ScreenContainer = ({ id }): JSX.Element => {
-  const apiResponse = useApiResponse(id, EINK_REFRESH_MS);
+  const apiResponse = useApiResponse({ id, refreshMs: EINK_REFRESH_MS });
   return <ScreenLayout apiResponse={apiResponse} />;
 };
 

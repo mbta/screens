@@ -1,0 +1,21 @@
+.section {
+  position: relative;
+
+  &:not(:first-child) {
+    .section-hairline {
+      position: absolute;
+      left: 0px;
+      top: -3px;
+      height: 6px;
+      width: 1920px;
+      background-color: #bfbebb;
+    }
+  }
+
+  &--headway {
+    font-size: 138px;
+    color: #171f26;
+    line-height: 128px;
+    font-family: Inter;
+  }
+}

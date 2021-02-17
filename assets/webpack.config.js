@@ -22,6 +22,7 @@ module.exports = (env, options) => ({
     gl_eink_single: "./src/apps/gl_eink_single.tsx",
     gl_eink_double: "./src/apps/gl_eink_double.tsx",
     solari: "./src/apps/solari.tsx",
+    dup: "./src/apps/dup.tsx",
     admin: "./src/apps/admin.tsx"
   },
   output: {

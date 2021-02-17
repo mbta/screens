@@ -57,15 +57,26 @@ defmodule ScreensWeb.Router do
     pipe_through [:redirect_prod_http, :api, :browser, :auth, :ensure_auth, :ensure_screens_group]
 
     get "/", AdminApiController, :index
-    post "/validate", AdminApiController, :validate
-    post "/confirm", AdminApiController, :confirm
+    post "/screens/validate", AdminApiController, :validate
+    post "/screens/confirm", AdminApiController, :confirm
     post "/refresh", AdminApiController, :refresh
+    post "/devops", AdminApiController, :devops
+    get "/image_filenames", AdminApiController, :image_filenames
+    post "/image", AdminApiController, :upload_image
+    delete "/image/:filename", AdminApiController, :delete_image
   end
 
   scope "/screen", ScreensWeb do
     pipe_through [:redirect_prod_http, :browser]
 
     get "/:id", ScreenController, :index
+    get "/:id/:rotation_index", ScreenController, :index
+  end
+
+  scope "/image", ScreensWeb do
+    pipe_through [:redirect_prod_http, :browser]
+
+    get "/:filename", ScreenController, :show_image
   end
 
   scope "/audit", ScreensWeb do
@@ -78,6 +89,7 @@ defmodule ScreensWeb.Router do
     pipe_through [:redirect_prod_http, :api, :browser]
 
     get "/:id", ScreenApiController, :show
+    get "/:id/:rotation_index", ScreenApiController, :show_dup
   end
 
   scope "/audio", ScreensWeb do

@@ -86,7 +86,7 @@
 
   &--size-normal {
     .later-departure__route-pill--size-small {
-      top: -4.5px;
+      transform: translateY(-4.5px);
     }
   }
 }
@@ -121,7 +121,17 @@
 
   &--selected {
     height: 46px;
-    width: 89px;
+
+    // Width depends on the route
+    &.later-departure__route-pill {
+      &--width-wide {
+        width: 158px;
+      }
+
+      &--width-normal {
+        width: 89px;
+      }
+    }
 
     // Different selected pill colors by mode
     &.later-departure__route-pill {
@@ -141,7 +151,17 @@
     color: rgba(23, 31, 38, 0.8);
     border: 3px solid rgba(23, 31, 38, 0.8);
     height: 40px;
-    width: 83px;
+
+    // Width depends on the route
+    &.later-departure__route-pill {
+      &--width-wide {
+        width: 152px;
+      }
+
+      &--width-normal {
+        width: 83px;
+      }
+    }
   }
 }
 

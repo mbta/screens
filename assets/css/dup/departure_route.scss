@@ -1,0 +1,85 @@
+.departure-route {
+  display: inline-block;
+  vertical-align: middle;
+  width: 248px;
+  font-size: 96px;
+  margin-left: 32px;
+  margin-right: 32px;
+  padding-top: 32px;
+  padding-bottom: 32px;
+
+  .base-route-pill__route-text {
+    font-family: Helvetica, sans-serif;
+    line-height: 144px;
+  }
+}
+
+.departure-route--icon {
+  height: 112.5px;
+  margin-top: 15.75px;
+}
+
+.departure-route--yellow {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-left: 0px;
+  width: 280px;
+
+  .base-route-pill__pill {
+    background: #ffc72c;
+    color: black;
+    height: 168px;
+    border-radius: 0 20px 20px 0;
+    font-size: 128px;
+    letter-spacing: -2px;
+  }
+
+  .base-route-pill__route-text {
+    line-height: 168px;
+    font-family: Inter, sans-serif;
+  }
+}
+
+.departure-route--blue .base-route-pill__pill {
+  background: #003da5;
+  color: white;
+  height: 144px;
+}
+
+.departure-route--red .base-route-pill__pill {
+  background: #da291c;
+  color: white;
+  height: 144px;
+}
+
+.departure-route--orange .base-route-pill__pill {
+  background: #ed8b00;
+  color: white;
+  height: 144px;
+}
+
+.departure-route--green .base-route-pill__pill {
+  background: #00843d;
+  color: white;
+  font-size: 84px;
+  height: 144px;
+}
+
+.departure-route--purple .base-route-pill__pill {
+  background: #80276c;
+  color: white;
+  height: 144px;
+}
+
+.departure-route--teal .base-route-pill__pill {
+  background: #008eaa;
+  color: white;
+  height: 144px;
+}
+
+.departure-route--silver .base-route-pill__pill {
+  background: #7c878e;
+  font-size: 84px;
+  color: white;
+  height: 144px;
+}

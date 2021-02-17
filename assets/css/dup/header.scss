@@ -1,0 +1,94 @@
+.header {
+  position: relative;
+  background-color: #171f26;
+  color: white;
+  height: 248px;
+  position: relative;
+
+  &--color-red {
+    background-color: $line-color-red;
+  }
+  &--color-orange {
+    background-color: $line-color-orange;
+  }
+  &--color-green {
+    background-color: $line-color-green;
+  }
+  &--color-blue {
+    background-color: $line-color-blue;
+  }
+  &--color-yellow {
+    background-color: $alert-yellow;
+    color: #171f26;
+  }
+}
+
+.header__time {
+  font-family: Helvetica, sans-serif;
+  font-size: 96px;
+  position: absolute;
+  top: 66px;
+  right: 40px;
+}
+
+.header__logo-container {
+  height: 184px;
+  width: 184px;
+  margin: 32px 64px 32px 64px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.header__logo-image {
+  height: 184px;
+  width: 184px;
+}
+
+.header__content-container {
+  width: 1608px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.header__text {
+  font-family: Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 144px;
+}
+
+.header__environment {
+  @include font--text--75bold;
+  position: absolute;
+  top: 12px;
+  left: 40px;
+  font-size: 48px;
+  color: #ffffff;
+  letter-spacing: 0;
+  line-height: 48px;
+}
+
+.header__version {
+  @include font--display--65medium;
+  font-size: 32px;
+  position: absolute;
+  bottom: 0px;
+  left: 8px;
+  color: #ffffff;
+  opacity: 0.33;
+}
+
+.header__error-code {
+  @include font--display--65medium;
+  font-size: 32px;
+  position: absolute;
+  bottom: 0px;
+  right: 8px;
+  color: #ffffff;
+  opacity: 0.33;
+}
+
+.header__accent-pattern-container {
+  position: absolute;
+  right: 0;
+  display: inline-block;
+}

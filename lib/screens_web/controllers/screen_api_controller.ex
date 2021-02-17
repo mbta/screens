@@ -4,6 +4,7 @@ defmodule ScreensWeb.ScreenApiController do
   alias Screens.Config.State
 
   plug(:check_config)
+  plug Corsica, [origins: "*"] when action == :show_dup
 
   defp check_config(conn, _) do
     if State.ok?() do
@@ -35,10 +36,13 @@ defmodule ScreensWeb.ScreenApiController do
     json(conn, data)
   end
 
-  # Older clients use version to determine whether they're outdated. We want these
-  # clients to reload, so we have to (temporarily) handle these requests.
-  def show(conn, %{"version" => _version}) do
-    data = %{force_reload: true}
+  def show_dup(conn, %{"id" => screen_id, "rotation_index" => rotation_index}) do
+    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
+
+    _ = Screens.LogScreenData.log_data_request(screen_id, nil, is_screen)
+
+    data = Screens.DupScreenData.by_screen_id(screen_id, rotation_index)
+
     json(conn, data)
   end
 end

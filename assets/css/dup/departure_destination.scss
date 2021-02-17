@@ -1,0 +1,13 @@
+@import "../base/base_departure_destination";
+
+.departure-destination {
+  color: #171f26;
+  display: inline-block;
+  vertical-align: middle;
+  width: 1176px;
+  font-size: 138px;
+
+  .base-departure-destination__primary {
+    @include font--display--65medium;
+  }
+}

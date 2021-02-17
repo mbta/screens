@@ -4,7 +4,7 @@ import Header from "Components/solari/header";
 import SectionListContainer from "Components/solari/section_list_container";
 import Psa from "Components/solari/psa";
 
-import { classWithModifier } from "Util/util";
+import { classWithModifier, imagePath } from "Util/util";
 
 import useApiResponse from "Hooks/use_api_response";
 
@@ -28,9 +28,9 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         currentTimeString={apiResponse.current_time}
         overhead={apiResponse.overhead}
       />
-      {apiResponse.psa_name && (
+      {apiResponse.psa_url && (
         <Psa
-          psaName={apiResponse.psa_name}
+          psaUrl={apiResponse.psa_url}
           currentTimeString={apiResponse.current_time}
         />
       )}
@@ -47,14 +47,12 @@ const FullScreenImageLayout = ({ srcPath }): JSX.Element => {
 };
 
 const NoConnectionScreenLayout = (): JSX.Element => {
-  const srcPath = "/images/solari-no-connection.png";
+  const srcPath = imagePath("solari-no-connection.png");
   return <FullScreenImageLayout srcPath={srcPath} />;
 };
 
 const TakeoverScreenLayout = ({ apiResponse }): JSX.Element => {
-  const psaName = apiResponse.psa_name;
-  const srcPath = `https://mbta-dotcom.s3.amazonaws.com/screens/images/psa/${psaName}.png`;
-  return <FullScreenImageLayout srcPath={srcPath} />;
+  return <FullScreenImageLayout srcPath={apiResponse.psa_url} />;
 };
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
@@ -73,7 +71,12 @@ const ScreenContainer = ({ id }): JSX.Element => {
   const query = new URLSearchParams(useLocation().search);
   const datetime = query.get("datetime");
 
-  const apiResponse = useApiResponse(id, SOLARI_REFRESH_MS, datetime, true);
+  const apiResponse = useApiResponse({
+    id,
+    datetime,
+    refreshMs: SOLARI_REFRESH_MS,
+    withWatchdog: true,
+  });
   return <ScreenLayout apiResponse={apiResponse} />;
 };
 

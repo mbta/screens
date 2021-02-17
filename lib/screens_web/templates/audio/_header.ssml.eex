@@ -1,1 +1,2 @@
 <s>Upcoming trips at <%= @station_name %></s>
+<s>Crowding information is provided when available</s>

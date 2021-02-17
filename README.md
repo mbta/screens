@@ -15,7 +15,7 @@
 1. Install versions specified in `.tool-versions` with `asdf install`
 1. Install Elixir dependencies with `mix deps.get`
 1. Install Node.js dependencies with `npm install --prefix assets`
-1. Save the JSON found [here](https://mbta-dotcom.s3.amazonaws.com/screens/config/prod.json) as `priv/local.json` to supply your local server with override config values.
+1. Get access to our S3 bucket from DevOps and/or a teammate and save the JSON found at mbta-ctd-config/screens/screens-prod.json as `priv/local.json` to supply your local server with config values.
 1. Visit [AWS security credentials](https://console.aws.amazon.com/iam/home#/security_credentials) and create an access key if you don't already have it. Save the access key ID and secret access key as environment variables:
 
    ```sh
@@ -31,3 +31,8 @@
 Visit [`localhost:4000/screen/1`](http://localhost:4000/screen/1) in your browser to check that everything is working.
 
 You may want to add `export API_V3_KEY=<your-key-here>` to your shell config so that you don't have to specify it each time you run `mix phx.server`.
+
+## Packaging the DUP app
+The DUP screens require the client app to be packaged into a single HTML file rather than dynamically served from our Phoenix server.
+
+You can find instructions on the packaging process [here](assets/src/components/dup/README.md).

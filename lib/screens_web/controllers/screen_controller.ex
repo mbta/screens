@@ -5,7 +5,7 @@ defmodule ScreensWeb.ScreenController do
   alias Screens.Config.{Screen, State}
 
   @default_app_id :bus_eink
-  @app_ids ~w[bus_eink gl_eink_single gl_eink_double solari]a
+  @app_ids ~w[bus_eink gl_eink_single gl_eink_double solari dup]a
   @app_id_strings Enum.map(@app_ids, &Atom.to_string/1)
 
   plug(:body_class)
@@ -43,13 +43,23 @@ defmodule ScreensWeb.ScreenController do
     assign(conn, :body_class, body_class)
   end
 
+  defp id_sort_fn(a, b) do
+    case {Integer.parse(a), Integer.parse(b)} do
+      {{m, ""}, {n, ""}} ->
+        m <= n
+
+      _ ->
+        a <= b
+    end
+  end
+
   defp screen_ids(target_app_id) do
     screen_ids =
       for {screen_id, %Screen{app_id: app_id}} <- State.screens(), app_id == target_app_id do
         screen_id
       end
 
-    Enum.sort_by(screen_ids, &String.to_integer/1)
+    Enum.sort(screen_ids, &id_sort_fn/2)
   end
 
   def index(conn, %{"id" => app_id})
@@ -80,6 +90,10 @@ defmodule ScreensWeb.ScreenController do
 
   def index(conn, _params) do
     render_not_found(conn)
+  end
+
+  def show_image(conn, %{"filename" => filename}) do
+    redirect(conn, external: Screens.Image.get_s3_url(filename))
   end
 
   defp render_not_found(conn) do

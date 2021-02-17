@@ -7,6 +7,8 @@ defmodule Screens.Psa do
   @solari_refresh_seconds 15
   @solari_psa_period 3
 
+  @s3_base_url "https://mbta-screens.s3.amazonaws.com/"
+
   def current_psa_for(screen_id) do
     %Screen{
       app_id: app_id,
@@ -19,7 +21,13 @@ defmodule Screens.Psa do
     } = psa_config
 
     {psa_type, psa_list} = get_active_psa_list(override_list, default_list)
-    {psa_type, choose_psa(psa_list, app_id, psa_type)}
+
+    psa_s3_url =
+      psa_list
+      |> choose_psa(app_id, psa_type)
+      |> get_s3_url()
+
+    {psa_type, psa_s3_url}
   end
 
   def current_audio_psa_for(screen_id) do
@@ -89,5 +97,12 @@ defmodule Screens.Psa do
     periods_since_midnight = div(seconds_since_midnight, seconds_to_show)
     current_index = rem(periods_since_midnight, length(list))
     Enum.at(list, current_index)
+  end
+
+  defp get_s3_url(nil), do: nil
+  defp get_s3_url(filename), do: @s3_base_url <> psa_images_prefix() <> filename
+
+  defp psa_images_prefix do
+    Application.get_env(:screens, :environment_name, "screens-prod") <> "/images/psa/"
   end
 end

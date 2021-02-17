@@ -19,8 +19,17 @@ const AdminNavbar = (): JSX.Element => {
       <Link to="/solari-screens">
         <button>Solari Screens Table</button>
       </Link>
+      <Link to="/dup-screens">
+        <button>DUP Screens Table</button>
+      </Link>
       <Link to="/json-editor">
         <button>JSON Editor</button>
+      </Link>
+      <Link to="/image-manager">
+        <button>Image Manager</button>
+      </Link>
+      <Link to="/devops">
+        <button>Devops</button>
       </Link>
     </div>
   );

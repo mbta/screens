@@ -33,8 +33,9 @@ npm-debug.log
 # this depending on your deployment strategy.
 /priv/static/
 
-# Local config file
+# Local config files
 /priv/local.json
+/priv/signs_ui_config.json
 
 # local environment variables
 /priv/local.env

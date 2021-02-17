@@ -2,6 +2,7 @@ defmodule Screens.Alerts.Alert do
   @moduledoc false
 
   defstruct id: nil,
+            cause: nil,
             effect: nil,
             severity: nil,
             header: nil,
@@ -11,6 +12,51 @@ defmodule Screens.Alerts.Alert do
             timeframe: nil,
             created_at: nil,
             updated_at: nil
+
+  @type cause ::
+          :accident
+          | :amtrak
+          | :an_earlier_mechanical_problem
+          | :an_earlier_signal_problem
+          | :autos_impeding_service
+          | :coast_guard_restriction
+          | :congestion
+          | :construction
+          | :crossing_malfunction
+          | :demonstration
+          | :disabled_bus
+          | :disabled_train
+          | :drawbridge_being_raised
+          | :electrical_work
+          | :fire
+          | :fog
+          | :freight_train_interference
+          | :hazmat_condition
+          | :heavy_ridership
+          | :high_winds
+          | :holiday
+          | :hurricane
+          | :ice_in_harbor
+          | :maintenance
+          | :mechanical_problem
+          | :medical_emergency
+          | :parade
+          | :police_action
+          | :power_problem
+          | :severe_weather
+          | :signal_problem
+          | :slippery_rail
+          | :snow
+          | :special_event
+          | :speed_restriction
+          | :switch_problem
+          | :tie_replacement
+          | :track_problem
+          | :track_work
+          | :traffic
+          | :unruly_passenger
+          | :weather
+          | :unknown
 
   @type effect ::
           :access_issue
@@ -43,12 +89,19 @@ defmodule Screens.Alerts.Alert do
           | :track_change
           | :unknown
 
+  @type informed_entity :: %{
+          stop: String.t() | nil,
+          route: String.t() | nil,
+          route_type: non_neg_integer() | nil
+        }
+
   @type t :: %__MODULE__{
           id: String.t(),
+          cause: cause,
           effect: effect,
           severity: integer,
           header: String.t(),
-          informed_entities: list(map()),
+          informed_entities: list(informed_entity()),
           active_period: list(),
           lifecycle: String.t(),
           timeframe: String.t(),
@@ -117,6 +170,42 @@ defmodule Screens.Alerts.Alert do
     :access_issue,
     :policy_change
   ]
+
+  def fetch(opts \\ []) do
+    params =
+      opts
+      |> Enum.flat_map(&format_query_param/1)
+      |> Enum.into(%{})
+
+    "alerts"
+    |> Screens.V3Api.get_json(params)
+    |> Screens.Alerts.Parser.parse_result()
+  end
+
+  defp format_query_param({:stop_ids, stop_ids}) do
+    [
+      {"filter[stop]", Enum.join(stop_ids, ",")}
+    ]
+  end
+
+  defp format_query_param({:route_ids, route_ids}) do
+    [
+      {"filter[route]", Enum.join(route_ids, ",")}
+    ]
+  end
+
+  defp format_query_param({:route_types, route_types}) do
+    route_type_ids =
+      route_types
+      |> Enum.map(&Screens.RouteType.to_id/1)
+      |> Enum.join(",")
+
+    [
+      {"filter[route_type]", route_type_ids}
+    ]
+  end
+
+  defp format_query_param(_), do: []
 
   def fetch_alerts_for_stop_id(stop_id) do
     case Screens.V3Api.get_json("alerts", %{"filter[stop]" => stop_id}) do
@@ -187,11 +276,11 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  def ie_target(%{"stop" => stop_id}) do
+  def ie_target(%{stop: stop_id}) do
     {:stop, stop_id}
   end
 
-  def ie_target(%{"route" => route_id}) do
+  def ie_target(%{route: route_id}) do
     {:route, route_id}
   end
 
@@ -208,11 +297,22 @@ defmodule Screens.Alerts.Alert do
 
   def high_severity(_), do: 0
 
+  def high_severity?(alert) do
+    high_severity(alert) > 0
+  end
+
   # HAPPENING NOW
   # defined as: some active period contains the current time
-  def happening_now(%{active_period: aps}) do
+  defp happening_now(%{active_period: aps}) do
     now = DateTime.utc_now()
     if Enum.any?(aps, &in_active_period(&1, now)), do: 1, else: 0
+  end
+
+  def happening_now?(alert) do
+    case happening_now(alert) do
+      0 -> false
+      1 -> true
+    end
   end
 
   def in_active_period({nil, end_t}, t) do
@@ -335,7 +435,7 @@ defmodule Screens.Alerts.Alert do
     Enum.flat_map(informed_entities, &bus_route_informed_entity/1)
   end
 
-  defp bus_route_informed_entity(%{"route" => route_id, "route_type" => 3}) do
+  defp bus_route_informed_entity(%{route: route_id, route_type: 3}) do
     [route_id]
   end
 
