@@ -101,7 +101,7 @@ defmodule Screens.Predictions.Parser do
     time
   end
 
-  @spec parse_track_number(stop_id :: String.t()) :: pos_integer() | nil
+  @spec parse_track_number(stop_id :: String.t() | nil) :: pos_integer() | nil
   defp parse_track_number(nil), do: nil
 
   defp parse_track_number(stop_id) do
