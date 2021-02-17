@@ -47,7 +47,8 @@ defmodule Screens.Departures.Departure do
           optional(:direction_id) => 0 | 1 | :both,
           optional(:sort) => String.t(),
           optional(:include) => list(String.t()),
-          optional(:date) => String.t()
+          optional(:date) => String.t(),
+          optional(:route_type) => Screens.RouteType.t() | nil
         }
 
   @spec fetch(query_params(), boolean()) :: {:ok, list()} | :error
@@ -385,6 +386,14 @@ defmodule Screens.Departures.Departure do
 
   defp format_query_param({:date, date}) do
     {"date", date}
+  end
+
+  defp format_query_param({:route_type, nil}) do
+    nil
+  end
+
+  defp format_query_param({:route_type, route_type}) do
+    {"filter[route_type]", Screens.RouteType.to_id(route_type)}
   end
 
   defp log_unexpected_groups(groups) do
