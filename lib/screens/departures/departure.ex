@@ -46,10 +46,8 @@ defmodule Screens.Departures.Departure do
           optional(:sort) => String.t(),
           optional(:include) => list(String.t()),
           optional(:date) => String.t(),
-          optional(:route_type) => Screens.Config.Query.Params.route_type()
+          optional(:route_type) => Screens.RouteType.t() | nil
         }
-
-  @route_type_mapping light_rail: 0, subway: 1, rail: 2, bus: 3, ferry: 4
 
   @spec fetch(query_params(), boolean()) :: {:ok, list()} | :error
   def fetch(%{} = query_params, include_schedules \\ false) do
@@ -386,14 +384,12 @@ defmodule Screens.Departures.Departure do
     {"date", date}
   end
 
-  for {route_type, number} <- @route_type_mapping do
-    defp format_query_param({:route_type, unquote(route_type)}) do
-      {"filter[route_type]", unquote(number)}
-    end
+  defp format_query_param({:route_type, nil}) do
+    nil
   end
 
-  defp format_query_param({:route_type, _}) do
-    nil
+  defp format_query_param({:route_type, route_type}) do
+    {"filter[route_type]", Screens.RouteType.to_id(route_type)}
   end
 
   defp log_unexpected_groups(groups) do
