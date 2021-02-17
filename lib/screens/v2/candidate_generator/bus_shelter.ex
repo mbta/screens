@@ -1,14 +1,16 @@
 defmodule Screens.V2.CandidateGenerator.BusShelter do
   @moduledoc false
 
-  alias Screens.V2.ScreenData
+  alias Screens.V2.CandidateGenerator
 
-  @spec candidate_templates() :: ScreenData.candidate_templates()
+  @behaviour CandidateGenerator
+
+  @impl CandidateGenerator
   def candidate_templates do
     :ok
   end
 
-  @spec candidate_instances(ScreenData.config()) :: ScreenData.candidate_instances()
+  @impl CandidateGenerator
   def candidate_instances(:ok) do
     :ok
   end
