@@ -20,7 +20,11 @@ const Departure = ({
 
   return (
     <div className="departure-container">
-      <DepartureRoutePill route={route} routeId={routeId} trackNumber={trackNumber} />
+      <DepartureRoutePill
+        route={route}
+        routeId={routeId}
+        trackNumber={trackNumber}
+      />
       <div className="departure-destination">
         {destination && (
           <Destination destination={destination} currentPage={currentPage} />
