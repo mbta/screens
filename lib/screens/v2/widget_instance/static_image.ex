@@ -1,6 +1,8 @@
 defmodule Screens.V2.WidgetInstance.StaticImage do
   @moduledoc false
 
+  alias Screens.V2.WidgetInstance.StaticImage
+
   defstruct screen: nil,
             image_url: nil,
             priority: nil,
@@ -15,20 +17,18 @@ defmodule Screens.V2.WidgetInstance.StaticImage do
           priority: Screens.V2.WidgetInstance.priority(),
           size: size()
         }
-end
 
-defimpl Screens.V2.WidgetInstance, for: Screens.V2.WidgetInstance.StaticImage do
-  alias Screens.V2.WidgetInstance.StaticImage
+  defimpl Screens.V2.WidgetInstance do
+    def priority(%StaticImage{priority: priority}), do: priority
+    def serialize(%StaticImage{image_url: image_url}), do: %{url: image_url}
 
-  def priority(%StaticImage{priority: priority}), do: priority
-  def serialize(%StaticImage{image_url: image_url}), do: %{url: image_url}
-
-  def slot_names(%StaticImage{screen: _screen, size: size}) do
-    case size do
-      :fullscreen -> [:fullscreen]
-      :large -> [:large]
-      :medium -> [:medium_left, :medium_right]
-      :small -> [:small_upper_right, :small_lower_right]
+    def slot_names(%StaticImage{screen: _screen, size: size}) do
+      case size do
+        :fullscreen -> [:fullscreen]
+        :large -> [:large]
+        :medium -> [:medium_left, :medium_right]
+        :small -> [:small_upper_right, :small_lower_right]
+      end
     end
   end
 end
