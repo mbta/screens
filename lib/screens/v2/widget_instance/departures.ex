@@ -12,25 +12,27 @@ defmodule Screens.V2.WidgetInstance.Departures do
           screen: config(),
           predictions: list(Prediction.t())
         }
-end
 
-defimpl Screens.V2.WidgetInstance, for: Screens.V2.WidgetInstance.Departures do
-  alias Screens.Predictions.Prediction
+  defimpl Screens.V2.WidgetInstance do
+    def priority(_instance), do: [2]
 
-  def priority(_instance), do: [2]
+    def serialize(instance) do
+      departures =
+        instance.predictions
+        |> Enum.sort_by(& &1.departure_time)
+        |> Enum.map(&serialize_prediction/1)
 
-  def serialize(instance) do
-    departures =
-      instance.predictions
-      |> Enum.sort_by(& &1.departure_time)
-      |> Enum.map(&serialize_prediction/1)
+      %{departures: departures}
+    end
 
-    %{departures: departures}
+    defp serialize_prediction(%Prediction{
+           route: route,
+           trip: trip,
+           departure_time: departure_time
+         }) do
+      %{route: route.short_name, destination: trip.headsign, time: departure_time}
+    end
+
+    def slot_names(_instance), do: [:main_content]
   end
-
-  defp serialize_prediction(%Prediction{route: route, trip: trip, departure_time: departure_time}) do
-    %{route: route.short_name, destination: trip.headsign, time: departure_time}
-  end
-
-  def slot_names(_instance), do: [:main_content]
 end
