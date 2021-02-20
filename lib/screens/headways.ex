@@ -147,7 +147,7 @@ defmodule Screens.Headways do
 
   defp service_start_or_end(stop_id, direction_id, min_or_max_fn) do
     with {:ok, schedules} <- Schedule.fetch(%{stop_ids: [stop_id], direction_id: direction_id}),
-         [] = arrival_times <- get_arrival_times(schedules) do
+         [_ | _] = arrival_times <- get_arrival_times(schedules) do
       {:ok, local_dt} =
         arrival_times
         |> min_or_max_fn.()
