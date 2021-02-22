@@ -86,4 +86,33 @@ defmodule Screens.V2.TemplateTest do
       assert expected == Template.slot_combinations(template)
     end
   end
+
+  describe "position_widget_instances/2" do
+    test "handles nested maps correctly" do
+      layout =
+        {:normal, [:header, :main_content, {:two_medium, [:medium_left, :medium_right]}, :footer]}
+
+      selected_widgets = %{
+        header: %{type: :header, current_time: "12:34"},
+        main_content: %{type: :departures, rows: []},
+        medium_left: %{type: :alert, route: "44"},
+        medium_right: %{type: :static_image, url: "img.png"},
+        footer: %{type: :footer, url: "mbta.com/stops/123"}
+      }
+
+      expected = %{
+        type: :normal,
+        header: %{type: :header, current_time: "12:34"},
+        main_content: %{type: :departures, rows: []},
+        two_medium: %{
+          type: :two_medium,
+          medium_left: %{type: :alert, route: "44"},
+          medium_right: %{type: :static_image, url: "img.png"}
+        },
+        footer: %{type: :footer, url: "mbta.com/stops/123"}
+      }
+
+      assert expected == Template.position_widget_instances(layout, selected_widgets)
+    end
+  end
 end

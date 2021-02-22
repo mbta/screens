@@ -14,11 +14,11 @@ defmodule Screens.V2.Template do
   end
 
   @spec layout_combinations(template()) :: nonempty_list(layout())
-  def layout_combinations(template) when is_atom(template) do
+  defp layout_combinations(template) when is_atom(template) do
     [template]
   end
 
-  def layout_combinations(template) when is_map(template) do
+  defp layout_combinations(template) when is_map(template) do
     Enum.flat_map(template, fn {layout, template_list} ->
       template_list
       |> Enum.map(&layout_combinations/1)
@@ -28,7 +28,7 @@ defmodule Screens.V2.Template do
   end
 
   @spec product(list(list(layout()))) :: list(layout())
-  def product(list_of_lists) do
+  defp product(list_of_lists) do
     Enum.reduce(list_of_lists, [[]], fn list, acc ->
       for l <- list, a <- acc do
         a ++ [l]
@@ -37,11 +37,28 @@ defmodule Screens.V2.Template do
   end
 
   @spec flatten_layout(layout()) :: list(slot_id())
-  def flatten_layout(layout) when is_atom(layout) do
+  defp flatten_layout(layout) when is_atom(layout) do
     [layout]
   end
 
-  def flatten_layout({_layout_key, layout_list}) do
+  defp flatten_layout({_layout_key, layout_list}) do
     Enum.flat_map(layout_list, &flatten_layout/1)
   end
+
+  @spec position_widget_instances(layout(), map()) :: map()
+  def position_widget_instances(layout, selected_widget_map) when is_atom(layout) do
+    Map.get(selected_widget_map, layout)
+  end
+
+  def position_widget_instances({layout_key, layout_list}, selected_widget_map) do
+    layout_list
+    |> Enum.map(fn layout ->
+      {layout_name(layout), position_widget_instances(layout, selected_widget_map)}
+    end)
+    |> Enum.into(%{type: layout_key})
+  end
+
+  @spec layout_name(layout()) :: atom()
+  defp layout_name(layout) when is_atom(layout), do: layout
+  defp layout_name({layout_key, _layout_list}), do: layout_key
 end
