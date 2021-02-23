@@ -1,9 +1,35 @@
 defmodule Screens.V2.ScreenDataTest do
   use ExUnit.Case, async: true
 
-  describe "by_screen_id/1" do
-    test "returns ok" do
-      assert :ok = Screens.V2.ScreenData.by_screen_id(1)
+  alias Screens.V2.WidgetInstance.StaticImage
+
+  describe "pick_instances/2" do
+    test "chooses the expected template and instance placement" do
+      candidate_templates = [
+        {[:large], {:one_large, [:large]}},
+        {[:medium_left, :small_upper_right, :small_lower_right],
+         {:one_medium_two_small, [:medium_left, :small_upper_right, :small_lower_right]}},
+        {[:medium_left, :medium_right], {:two_medium, [:medium_left, :medium_right]}}
+      ]
+
+      candidate_instances = [
+        %StaticImage{size: :small, priority: [4], image_url: "4"},
+        %StaticImage{size: :small, priority: [1], image_url: "1"},
+        %StaticImage{size: :medium, priority: [3], image_url: "3"},
+        %StaticImage{size: :small, priority: [2], image_url: "2"}
+      ]
+
+      {actual_layout, actual_instance_placement} =
+        Screens.V2.ScreenData.pick_instances(candidate_templates, candidate_instances)
+
+      assert {:one_medium_two_small, [:medium_left, :small_upper_right, :small_lower_right]} ==
+               actual_layout
+
+      assert %{
+               medium_left: %StaticImage{size: :medium, priority: [3], image_url: "3"},
+               small_lower_right: %StaticImage{size: :small, priority: [2], image_url: "2"},
+               small_upper_right: %StaticImage{size: :small, priority: [1], image_url: "1"}
+             } = actual_instance_placement
     end
   end
 end
