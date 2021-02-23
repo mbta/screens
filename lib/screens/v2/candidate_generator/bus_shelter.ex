@@ -11,7 +11,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(:ok) do
-    :ok
+  def candidate_instances(_) do
+    []
   end
 end
