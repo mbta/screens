@@ -78,7 +78,8 @@ defmodule Screens.Audio do
        %{
          times: group_time_types(departures),
          alerts: hd(departures).alerts,
-         wayfinding: hd(departures).wayfinding
+         wayfinding: hd(departures).wayfinding,
+         track_number: hd(departures).track_number
        }}
     end)
     |> condense_wayfinding()
