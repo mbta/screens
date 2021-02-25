@@ -11,52 +11,68 @@ defmodule Screens.V2.TemplateTest do
     end
 
     test "handles map correctly" do
-      template = %{
-        one_large: [:large],
-        two_medium: [:medium_left, :medium_right],
-        one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right]
-      }
+      template =
+        {:flex_zone,
+         %{
+           one_large: [:large],
+           two_medium: [:medium_left, :medium_right],
+           one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right]
+         }}
 
       expected = [
-        {[:large], {:one_large, [:large]}},
+        {[:large], {:flex_zone, {:one_large, [:large]}}},
         {[:medium_left, :small_upper_right, :small_lower_right],
-         {:one_medium_two_small, [:medium_left, :small_upper_right, :small_lower_right]}},
-        {[:medium_left, :medium_right], {:two_medium, [:medium_left, :medium_right]}}
+         {:flex_zone,
+          {:one_medium_two_small, [:medium_left, :small_upper_right, :small_lower_right]}}},
+        {[:medium_left, :medium_right],
+         {:flex_zone, {:two_medium, [:medium_left, :medium_right]}}}
       ]
 
       assert expected == Template.slot_combinations(template)
     end
 
     test "handles nested maps correctly" do
-      template = %{
-        normal: [
-          :header,
-          :main_content,
-          %{
-            one_large: [:large],
-            one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right],
-            two_medium: [:medium_left, :medium_right]
-          },
-          :footer
-        ],
-        takeover: [:fullscreen]
-      }
+      template =
+        {:screen,
+         %{
+           normal: [
+             :header,
+             :main_content,
+             {:flex_zone,
+              %{
+                one_large: [:large],
+                one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right],
+                two_medium: [:medium_left, :medium_right]
+              }},
+             :footer
+           ],
+           takeover: [:fullscreen]
+         }}
 
       expected = [
         {[:header, :main_content, :large, :footer],
-         {:normal, [:header, :main_content, {:one_large, [:large]}, :footer]}},
+         {:screen,
+          {:normal, [:header, :main_content, {:flex_zone, {:one_large, [:large]}}, :footer]}}},
         {[:header, :main_content, :medium_left, :small_upper_right, :small_lower_right, :footer],
-         {:normal,
-          [
-            :header,
-            :main_content,
-            {:one_medium_two_small, [:medium_left, :small_upper_right, :small_lower_right]},
-            :footer
-          ]}},
+         {:screen,
+          {:normal,
+           [
+             :header,
+             :main_content,
+             {:flex_zone,
+              {:one_medium_two_small, [:medium_left, :small_upper_right, :small_lower_right]}},
+             :footer
+           ]}}},
         {[:header, :main_content, :medium_left, :medium_right, :footer],
-         {:normal,
-          [:header, :main_content, {:two_medium, [:medium_left, :medium_right]}, :footer]}},
-        {[:fullscreen], {:takeover, [:fullscreen]}}
+         {:screen,
+          {:normal,
+           [
+             :header,
+             :main_content,
+             {:flex_zone, {:two_medium, [:medium_left, :medium_right]}},
+             :footer
+           ]}}},
+        {[:fullscreen], {:screen, {:takeover, [:fullscreen]}}}
       ]
 
       assert expected == Template.slot_combinations(template)
@@ -68,19 +84,30 @@ defmodule Screens.V2.TemplateTest do
         two_medium: [:medium_left, :medium_right]
       }
 
-      template = %{
-        normal: [flex_zone, flex_zone]
-      }
+      template =
+        {:screen,
+         %{
+           normal: [{:flex_a, flex_zone}, {:flex_b, flex_zone}]
+         }}
 
       expected = [
-        {[:large, :large], {:normal, [one_large: [:large], one_large: [:large]]}},
+        {[:large, :large],
+         {:screen, {:normal, [flex_a: {:one_large, [:large]}, flex_b: {:one_large, [:large]}]}}},
         {[:medium_left, :medium_right, :large],
-         {:normal, [two_medium: [:medium_left, :medium_right], one_large: [:large]]}},
+         {:screen,
+          {:normal,
+           [flex_a: {:two_medium, [:medium_left, :medium_right]}, flex_b: {:one_large, [:large]}]}}},
         {[:large, :medium_left, :medium_right],
-         {:normal, [one_large: [:large], two_medium: [:medium_left, :medium_right]]}},
+         {:screen,
+          {:normal,
+           [flex_a: {:one_large, [:large]}, flex_b: {:two_medium, [:medium_left, :medium_right]}]}}},
         {[:medium_left, :medium_right, :medium_left, :medium_right],
-         {:normal,
-          [two_medium: [:medium_left, :medium_right], two_medium: [:medium_left, :medium_right]]}}
+         {:screen,
+          {:normal,
+           [
+             flex_a: {:two_medium, [:medium_left, :medium_right]},
+             flex_b: {:two_medium, [:medium_left, :medium_right]}
+           ]}}}
       ]
 
       assert expected == Template.slot_combinations(template)
@@ -90,7 +117,14 @@ defmodule Screens.V2.TemplateTest do
   describe "position_widget_instances/2" do
     test "handles nested maps correctly" do
       layout =
-        {:normal, [:header, :main_content, {:two_medium, [:medium_left, :medium_right]}, :footer]}
+        {:screen,
+         {:normal,
+          [
+            :header,
+            :main_content,
+            {:flex_zone, {:two_medium, [:medium_left, :medium_right]}},
+            :footer
+          ]}}
 
       selected_widgets = %{
         header: %{type: :header, current_time: "12:34"},
@@ -104,7 +138,7 @@ defmodule Screens.V2.TemplateTest do
         type: :normal,
         header: %{type: :header, current_time: "12:34"},
         main_content: %{type: :departures, rows: []},
-        two_medium: %{
+        flex_zone: %{
           type: :two_medium,
           medium_left: %{type: :alert, route: "44"},
           medium_right: %{type: :static_image, url: "img.png"}
