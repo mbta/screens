@@ -2,13 +2,11 @@ defmodule Screens.Config.Dup.Section do
   @moduledoc false
 
   alias Screens.Config.Dup.Section.Headway
-  alias Screens.RouteType
   alias Screens.Util
 
   @type t :: %__MODULE__{
           stop_ids: list(stop_id()),
           route_ids: list(route_id()),
-          route_type: RouteType.t() | nil,
           pill: :bus | :red | :orange | :green | :blue | :cr | :mattapan | :silver | :ferry,
           headway: Headway.t()
         }
@@ -19,7 +17,6 @@ defmodule Screens.Config.Dup.Section do
   @enforce_keys [:pill]
   defstruct stop_ids: [],
             route_ids: [],
-            route_type: nil,
             pill: nil,
             headway: Headway.from_json(:default)
 
@@ -50,10 +47,6 @@ defmodule Screens.Config.Dup.Section do
 
   defp value_from_json("headway", headway) do
     Headway.from_json(headway)
-  end
-
-  defp value_from_json("route_type", route_type) when is_binary(route_type) do
-    RouteType.from_string(route_type)
   end
 
   defp value_from_json(_, value), do: value

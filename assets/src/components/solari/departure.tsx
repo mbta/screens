@@ -107,7 +107,6 @@ const Departure = ({
   overhead,
   groupStart,
   groupEnd,
-  trackNumber,
 }): JSX.Element => {
   const viaPattern = /(.+) (via .+)/;
   const parenPattern = /(.+) (\(.+)/;
@@ -142,11 +141,7 @@ const Departure = ({
     >
       <div className={classWithModifier("departure", viaModifier)}>
         {groupStart ? (
-          <DepartureRoutePill
-            route={route}
-            routeId={routeId}
-            trackNumber={trackNumber}
-          />
+          <DepartureRoutePill route={route} routeId={routeId} />
         ) : (
           <PlaceholderRoutePill />
         )}

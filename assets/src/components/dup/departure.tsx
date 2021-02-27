@@ -14,17 +14,12 @@ const Departure = ({
   vehicleStatus,
   stopType,
   currentPage,
-  trackNumber,
 }): JSX.Element => {
   const noMinutes = routeId.startsWith("CR-") || routeId.startsWith("Boat-");
 
   return (
     <div className="departure-container">
-      <DepartureRoutePill
-        route={route}
-        routeId={routeId}
-        trackNumber={trackNumber}
-      />
+      <DepartureRoutePill route={route} routeId={routeId} />
       <div className="departure-destination">
         {destination && (
           <Destination destination={destination} currentPage={currentPage} />

@@ -24,7 +24,6 @@ const camelizeDepartureObject = ({
   alerts,
   stop_type: stopType,
   crowding_level: crowdingLevel,
-  track_number: trackNumber,
 }) => ({
   id,
   route,
@@ -35,7 +34,6 @@ const camelizeDepartureObject = ({
   alerts,
   stopType,
   crowdingLevel,
-  trackNumber,
 });
 
 const isArrivingOrBoarding = (
