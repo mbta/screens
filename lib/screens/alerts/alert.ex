@@ -316,15 +316,15 @@ defmodule Screens.Alerts.Alert do
   end
 
   def in_active_period({nil, end_t}, t) do
-    t <= end_t
+    DateTime.compare(t, end_t) in [:lt, :eq]
   end
 
   def in_active_period({start_t, nil}, t) do
-    t >= start_t
+    DateTime.compare(t, start_t) in [:gt, :eq]
   end
 
   def in_active_period({start_t, end_t}, t) do
-    t >= start_t && t <= end_t
+    DateTime.compare(t, start_t) in [:gt, :eq] && DateTime.compare(t, end_t) in [:lt, :eq]
   end
 
   def within_two_weeks(time_1, time_2) do
