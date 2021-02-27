@@ -9,8 +9,7 @@ defmodule Screens.Schedules.Schedule do
             trip_id: nil,
             arrival_time: nil,
             departure_time: nil,
-            stop_headsign: nil,
-            track_number: nil
+            stop_headsign: nil
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -19,8 +18,7 @@ defmodule Screens.Schedules.Schedule do
           route: Screens.Routes.Route.t(),
           arrival_time: DateTime.t() | nil,
           departure_time: DateTime.t() | nil,
-          stop_headsign: String.t() | nil,
-          track_number: pos_integer() | nil
+          stop_headsign: String.t() | nil
         }
 
   @spec fetch(Departure.query_params(), String.t() | nil) :: {:ok, list(t())} | :error

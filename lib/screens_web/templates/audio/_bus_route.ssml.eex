@@ -1,0 +1,1 @@
+<%= render_route @route %> to <%= @destination %>
