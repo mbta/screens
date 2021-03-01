@@ -6,11 +6,11 @@ defmodule Screens.Config.PsaConfig do
 
   @type t :: %__MODULE__{
           default_list: PsaList.t(),
-          override_list: OverrideList.t() | nil
+          scheduled_overrides: [OverrideList.t()]
         }
 
   defstruct default_list: PsaList.from_json(:default),
-            override_list: nil
+            scheduled_overrides: []
 
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
@@ -37,10 +37,8 @@ defmodule Screens.Config.PsaConfig do
     PsaList.from_json(default_list)
   end
 
-  defp value_from_json("override_list", nil), do: nil
-
-  defp value_from_json("override_list", override_list) do
-    OverrideList.from_json(override_list)
+  defp value_from_json("scheduled_overrides", scheduled_overrides) do
+    Enum.map(scheduled_overrides, &OverrideList.from_json/1)
   end
 
   defp value_from_json(_, value), do: value
@@ -49,10 +47,8 @@ defmodule Screens.Config.PsaConfig do
     PsaList.to_json(default_list)
   end
 
-  defp value_to_json(:override_list, nil), do: nil
-
-  defp value_to_json(:override_list, override_list) do
-    OverrideList.to_json(override_list)
+  defp value_to_json(:scheduled_overrides, scheduled_overrides) do
+    Enum.map(scheduled_overrides, &OverrideList.to_json/1)
   end
 
   defp value_to_json(_, value), do: value
