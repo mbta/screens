@@ -40,9 +40,21 @@ defmodule ScreensWeb.ScreenApiController do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
 
     _ = Screens.LogScreenData.log_data_request(screen_id, nil, is_screen)
+    _ = log_user_agent(conn)
 
     data = Screens.DupScreenData.by_screen_id(screen_id, rotation_index)
 
     json(conn, data)
+  end
+
+  defp log_user_agent(conn) do
+    user_agent =
+      conn.req_headers
+      |> Enum.into(%{})
+      |> Map.get("user-agent")
+
+    if !is_nil(user_agent) do
+      Logger.info("[dup user agent] #{user_agent}")
+    end
   end
 end
