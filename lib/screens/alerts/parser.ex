@@ -8,7 +8,7 @@ defmodule Screens.Alerts.Parser do
     |> Enum.reject(&is_nil/1)
   end
 
-  def parse_result(:error) do
+  def parse_result(_) do
     []
   end
 
