@@ -1,6 +1,8 @@
 defmodule Screens.V2.ScreenData do
   @moduledoc false
 
+  require Logger
+
   alias Screens.V2.WidgetInstance
 
   @type screen_id :: String.t()
@@ -46,21 +48,24 @@ defmodule Screens.V2.ScreenData do
       |> Enum.map(fn t -> {t, %{}} end)
       |> Enum.into(%{})
 
-    placements = Enum.reduce(prioritized_instances, candidate_placements, &reducer/2)
+    placements = Enum.reduce(prioritized_instances, candidate_placements, &place_instance/2)
 
-    # N.B. If there are multiple templates returned, arbitrarily select the first.
-    selected_template =
-      placements
-      |> Map.keys()
-      |> Enum.at(0)
+    # N.B. If there are multiple templates returned, log it, then arbitrarily select the first.
+    valid_templates = Map.keys(placements)
 
+    _ =
+      if length(valid_templates) > 1 do
+        Logger.info("[found multiple valid templates]")
+      end
+
+    selected_template = hd(valid_templates)
     selected_instances = Map.get(placements, selected_template)
     {_, selected_layout} = selected_template
 
     {selected_layout, selected_instances}
   end
 
-  defp reducer(instance, placements) do
+  defp place_instance(instance, placements) do
     instance_slots = WidgetInstance.slot_names(instance)
     live_templates = Map.keys(placements)
     placeable_templates = get_valid_templates(live_templates, instance_slots)
@@ -100,12 +105,17 @@ defmodule Screens.V2.ScreenData do
 
   defp get_valid_slots(template, instance_slots) do
     {template_slots, _} = template
-    template_slots -- template_slots -- instance_slots
+    list_intersection(template_slots, instance_slots)
+  end
+
+  defp list_intersection(l1, l2) do
+    l1 -- l1 -- l2
   end
 
   defp get_first_slot(template, instance_slots) do
-    [slot | _] = get_valid_slots(template, instance_slots)
-    slot
+    template
+    |> get_valid_slots(instance_slots)
+    |> hd()
   end
 
   defp template_is_placeable?(template, instance_slots) do
