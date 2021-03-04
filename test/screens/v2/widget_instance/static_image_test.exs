@@ -22,7 +22,6 @@ defmodule Screens.V2.WidgetInstance.StaticImageTest do
   describe "serialize/1" do
     test "returns instance url", %{instance: instance} do
       assert %{
-               type: :static_image,
                url:
                  "https://mbta-screens.s3.amazonaws.com/screens-prod/images/psa/e-ink-face-covering-psa.png"
              } == WidgetInstance.serialize(instance)
@@ -52,6 +51,12 @@ defmodule Screens.V2.WidgetInstance.StaticImageTest do
 
       assert MapSet.new([:small_upper_right, :small_lower_right]) ==
                MapSet.new(WidgetInstance.slot_names(instance))
+    end
+  end
+
+  describe "widget_type/1" do
+    test "returns static image", %{instance: instance} do
+      assert :static_image == WidgetInstance.widget_type(instance)
     end
   end
 end

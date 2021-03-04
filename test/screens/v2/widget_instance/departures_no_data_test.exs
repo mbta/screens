@@ -12,13 +12,19 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoDataTest do
 
   describe "serialize/1" do
     test "returns empty map" do
-      assert %{type: :departures_no_data} == WidgetInstance.serialize(@instance)
+      assert %{} == WidgetInstance.serialize(@instance)
     end
   end
 
   describe "slot_names/1" do
     test "returns main_content" do
       assert [:main_content] == WidgetInstance.slot_names(@instance)
+    end
+  end
+
+  describe "widget_type/1" do
+    test "returns departures no data" do
+      assert :departures_no_data == WidgetInstance.widget_type(@instance)
     end
   end
 end

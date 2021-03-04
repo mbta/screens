@@ -56,7 +56,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       alert_active? = fn _ -> true end
 
       expected = %{
-        type: :alert,
         pill: :bus,
         icon: :warning,
         active_status: :active,
@@ -73,6 +72,14 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       widget = alert_widget_with_effect(:delay)
 
       assert ~w[medium_left medium_right]a == AlertWidget.slot_names(widget)
+    end
+  end
+
+  describe "widget_type/1" do
+    test "returns alert widget type" do
+      widget = alert_widget_with_effect(:delay)
+
+      assert :alert == AlertWidget.widget_type(widget)
     end
   end
 

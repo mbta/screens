@@ -22,7 +22,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         |> Enum.sort_by(& &1.departure_time)
         |> Enum.map(&serialize_prediction/1)
 
-      %{type: :departures, departures: departures}
+      %{departures: departures}
     end
 
     defp serialize_prediction(%Prediction{
@@ -34,5 +34,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
 
     def slot_names(_instance), do: [:main_content]
+
+    def widget_type(_instance), do: :departures
   end
 end
