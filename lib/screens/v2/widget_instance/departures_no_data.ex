@@ -11,7 +11,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoData do
 
   defimpl Screens.V2.WidgetInstance do
     def priority(_instance), do: [2]
-    def serialize(_instance), do: %{}
+    def serialize(_instance), do: %{type: :departures_no_data}
     def slot_names(_instance), do: [:main_content]
   end
 end

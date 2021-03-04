@@ -20,7 +20,7 @@ defmodule Screens.V2.WidgetInstance.StaticImage do
 
   defimpl Screens.V2.WidgetInstance do
     def priority(%StaticImage{priority: priority}), do: priority
-    def serialize(%StaticImage{image_url: image_url}), do: %{url: image_url}
+    def serialize(%StaticImage{image_url: image_url}), do: %{type: :static_image, url: image_url}
 
     def slot_names(%StaticImage{screen: _screen, size: size}) do
       case size do

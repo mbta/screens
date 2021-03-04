@@ -22,7 +22,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         |> Enum.sort_by(& &1.departure_time)
         |> Enum.map(&serialize_prediction/1)
 
-      %{departures: departures}
+      %{type: :departures, departures: departures}
     end
 
     defp serialize_prediction(%Prediction{

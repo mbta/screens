@@ -40,6 +40,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       departure_time: departure_time
     } do
       assert %{
+               type: :departures,
                departures: [
                  %{destination: trip_headsign, route: route_name, time: departure_time}
                ]

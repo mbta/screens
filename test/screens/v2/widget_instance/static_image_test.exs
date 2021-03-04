@@ -22,6 +22,7 @@ defmodule Screens.V2.WidgetInstance.StaticImageTest do
   describe "serialize/1" do
     test "returns instance url", %{instance: instance} do
       assert %{
+               type: :static_image,
                url:
                  "https://mbta-screens.s3.amazonaws.com/screens-prod/images/psa/e-ink-face-covering-psa.png"
              } == WidgetInstance.serialize(instance)

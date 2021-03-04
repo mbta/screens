@@ -56,6 +56,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       alert_active? = fn _ -> true end
 
       expected = %{
+        type: :alert,
         pill: :bus,
         icon: :warning,
         active_status: :active,

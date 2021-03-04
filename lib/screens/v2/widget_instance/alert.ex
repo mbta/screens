@@ -38,6 +38,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   def serialize(%T{} = t, alert_active? \\ &Alert.happening_now?/1) do
     %{
+      type: :alert,
       pill: :bus,
       icon: :warning,
       active_status: if(alert_active?.(t.alert), do: :active, else: :upcoming),
