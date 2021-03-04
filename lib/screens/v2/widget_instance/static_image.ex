@@ -30,5 +30,7 @@ defmodule Screens.V2.WidgetInstance.StaticImage do
         :small -> [:small_upper_right, :small_lower_right]
       end
     end
+
+    def widget_type(_instance), do: :static_image
   end
 end

@@ -75,6 +75,14 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     end
   end
 
+  describe "widget_type/1" do
+    test "returns alert widget type" do
+      widget = alert_widget_with_effect(:delay)
+
+      assert :alert == AlertWidget.widget_type(widget)
+    end
+  end
+
   defp alert_widget_with_effect(effect) do
     %AlertWidget{
       screen: :ok,

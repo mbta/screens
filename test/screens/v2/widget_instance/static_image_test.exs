@@ -53,4 +53,10 @@ defmodule Screens.V2.WidgetInstance.StaticImageTest do
                MapSet.new(WidgetInstance.slot_names(instance))
     end
   end
+
+  describe "widget_type/1" do
+    test "returns static image", %{instance: instance} do
+      assert :static_image == WidgetInstance.widget_type(instance)
+    end
+  end
 end

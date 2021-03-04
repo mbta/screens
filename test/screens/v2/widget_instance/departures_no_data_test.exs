@@ -21,4 +21,10 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoDataTest do
       assert [:main_content] == WidgetInstance.slot_names(@instance)
     end
   end
+
+  describe "widget_type/1" do
+    test "returns departures no data" do
+      assert :departures_no_data == WidgetInstance.widget_type(@instance)
+    end
+  end
 end
