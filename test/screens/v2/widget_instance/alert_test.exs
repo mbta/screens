@@ -1,85 +1,58 @@
 defmodule Screens.V2.WidgetInstance.AlertTest do
   use ExUnit.Case, async: true
 
-  alias Screens.V2.WidgetInstance.Alert
-  alias Screens.Alerts.Alert, as: ApiAlert
-
-  setup_all do
-    delay_widget = %Alert{
-      screen: :ok,
-      alert: %ApiAlert{effect: :delay}
-    }
-
-    closure_widget = %Alert{
-      screen: :ok,
-      alert: %ApiAlert{effect: :stop_closure}
-    }
-
-    other_widget = %Alert{
-      screen: :ok,
-      alert: %ApiAlert{effect: :unknown}
-    }
-
-    [
-      delay_widget: delay_widget,
-      closure_widget: closure_widget,
-      other_widget: other_widget
-    ]
-  end
+  alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
+  alias Screens.Alerts.Alert
 
   describe "priority/1" do
-    test "always gives a base priority of 1", ctx do
-      dummy_fn = fn _ -> 0 end
+    test "always gives a base priority of 1" do
+      delay_widget = alert_widget_with_effect(:delay)
+      closure_widget = alert_widget_with_effect(:stop_closure)
+      other_widget = alert_widget_with_effect(:unknown)
+
+      alert_active? = fn _ -> true end
 
       expected_base_priority = 1
 
-      assert [^expected_base_priority | _] =
-               Alert.priority(ctx.delay_widget, dummy_fn, dummy_fn, dummy_fn)
-
-      assert [^expected_base_priority | _] =
-               Alert.priority(ctx.closure_widget, dummy_fn, dummy_fn, dummy_fn)
-
-      assert [^expected_base_priority | _] =
-               Alert.priority(ctx.other_widget, dummy_fn, dummy_fn, dummy_fn)
+      assert [^expected_base_priority | _] = AlertWidget.priority(delay_widget, alert_active?)
+      assert [^expected_base_priority | _] = AlertWidget.priority(closure_widget, alert_active?)
+      assert [^expected_base_priority | _] = AlertWidget.priority(other_widget, alert_active?)
     end
 
-    test "uses active priority, then informed entity priority, then effect priority", %{
-      delay_widget: widget
-    } do
-      pid = self()
+    test "returns higher priority for active alerts" do
+      widget = alert_widget_with_effect(:delay)
 
-      expected_base_priority = 1
-      expected_ap = 10
-      expected_iep = 20
-      expected_ep = 30
+      yes_active = fn _ -> true end
+      no_active = fn _ -> false end
 
-      expected = [expected_base_priority, expected_ap, expected_iep, expected_ep]
+      assert AlertWidget.priority(widget, yes_active) < AlertWidget.priority(widget, no_active)
+    end
 
-      ap_fn = fn _ ->
-        send(pid, :called_active)
-        expected_ap
-      end
+    test "returns lower priority for delays" do
+      closure_widget = alert_widget_with_effect(:stop_closure)
+      delay_widget = alert_widget_with_effect(:delay)
 
-      iep_fn = fn _ ->
-        send(pid, :called_informed_entity)
-        expected_iep
-      end
+      alert_active? = fn _ -> true end
 
-      ep_fn = fn _ ->
-        send(pid, :called_effect)
-        expected_ep
-      end
+      assert AlertWidget.priority(closure_widget, alert_active?) <
+               AlertWidget.priority(delay_widget, alert_active?)
+    end
 
-      assert expected == Alert.priority(widget, ap_fn, iep_fn, ep_fn)
+    test "returns lowest priority for effects we don't know how to handle well" do
+      delay_widget = alert_widget_with_effect(:delay)
+      other_widget = alert_widget_with_effect(:unknown)
 
-      assert_received :called_active
-      assert_received :called_informed_entity
-      assert_received :called_effect
+      alert_active? = fn _ -> true end
+
+      assert AlertWidget.priority(delay_widget, alert_active?) <
+               AlertWidget.priority(other_widget, alert_active?)
     end
   end
 
   describe "serialize/1" do
-    test "serializes the alert", %{delay_widget: widget} do
+    test "serializes the alert" do
+      widget = alert_widget_with_effect(:delay)
+
       alert_active? = fn _ -> true end
 
       expected = %{
@@ -90,44 +63,22 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
         text: ["Dummy alert text"]
       }
 
-      assert expected == Alert.serialize(widget, alert_active?)
+      assert expected == AlertWidget.serialize(widget, alert_active?)
     end
   end
 
   describe "slot_names/1" do
-    test "returns medium-size slot names", %{delay_widget: widget} do
-      assert ~w[medium_left medium_right]a == Alert.slot_names(widget)
+    test "returns medium-size slot names" do
+      widget = alert_widget_with_effect(:delay)
+
+      assert ~w[medium_left medium_right]a == AlertWidget.slot_names(widget)
     end
   end
 
-  describe "active_priority/1" do
-    test "returns higher priority for active alerts", %{delay_widget: widget} do
-      yes_active = fn _ -> true end
-      no_active = fn _ -> false end
-
-      assert Alert.active_priority(widget, yes_active) < Alert.active_priority(widget, no_active)
-    end
-  end
-
-  describe "informed_entity_priority/1" do
-    test "returns 0", %{delay_widget: widget} do
-      assert 0 == Alert.informed_entity_priority(widget)
-    end
-  end
-
-  describe "effect_priority/1" do
-    test "returns lower priority for delays", %{delay_widget: widget} do
-      assert 1 == Alert.effect_priority(widget)
-    end
-
-    test "returns higher priority for stop closures", %{closure_widget: widget} do
-      assert 0 == Alert.effect_priority(widget)
-    end
-
-    test "returns lowest priority for effects we don't know how to handle well", %{
-      other_widget: widget
-    } do
-      assert 100 == Alert.effect_priority(widget)
-    end
+  defp alert_widget_with_effect(effect) do
+    %AlertWidget{
+      screen: :ok,
+      alert: %Alert{effect: effect}
+    }
   end
 end
