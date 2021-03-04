@@ -6,7 +6,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.Trips.Trip
   alias Screens.V2.WidgetInstance
 
-  setup_all do
+  setup do
     trip_headsign = "Ruggles"
     trip = %Trip{headsign: trip_headsign}
 
