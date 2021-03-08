@@ -63,7 +63,7 @@ defmodule Screens.MixProject do
       {:httpoison, "~> 1.8.0"},
       {:tzdata, "~> 1.0.3"},
       {:credo, "~> 1.5.0", only: [:dev, :test]},
-      {:dialyxir, "~> 1.0.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.14.0", only: :test},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.0"},
