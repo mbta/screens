@@ -1,16 +1,18 @@
 # first, get the elixir dependencies within an elixir container
-FROM elixir:1.9.4 as elixir-builder
+FROM hexpm/elixir:1.9.4-erlang-22.3.4.16-debian-buster-20210208 as elixir-builder
 
 ENV LANG="C.UTF-8" MIX_ENV="prod"
 
 WORKDIR /root
 ADD . .
 
+RUN apt-get update && apt-get install -y git
+
 RUN mix do local.hex --force, local.rebar --force
 RUN mix do deps.get --only prod
 
 # next, build the frontend assets within a node.js container
-FROM node:14 as assets-builder
+FROM node:14-buster as assets-builder
 
 WORKDIR /root
 ADD . .
@@ -34,7 +36,7 @@ COPY --from=assets-builder /root/priv/static ./priv/static
 RUN mix do compile --force, phx.digest, release
 
 # finally, use a debian container for the runtime environment
-FROM debian:buster
+FROM debian:buster-20210208
 
 ENV MIX_ENV="prod" TERM="xterm" LANG="C.UTF-8" PORT="4000"
 
