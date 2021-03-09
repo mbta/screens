@@ -22,5 +22,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
     end
 
     def slot_names(_instance), do: [:header]
+
+    def widget_type(_instance), do: :normal_header
   end
 end

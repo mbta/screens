@@ -32,4 +32,10 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
       assert [:header] == WidgetInstance.slot_names(instance)
     end
   end
+
+  describe "widget_type/1" do
+    test "returns normal_header", %{instance: instance} do
+      assert :normal_header == WidgetInstance.widget_type(instance)
+    end
+  end
 end

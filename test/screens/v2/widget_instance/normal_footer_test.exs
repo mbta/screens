@@ -30,4 +30,10 @@ defmodule Screens.V2.WidgetInstance.NormalFooterTest do
       assert [:footer] == WidgetInstance.slot_names(instance)
     end
   end
+
+  describe "widget_type/1" do
+    test "returns normal_footer", %{instance: instance} do
+      assert :normal_footer == WidgetInstance.widget_type(instance)
+    end
+  end
 end

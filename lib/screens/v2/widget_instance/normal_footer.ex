@@ -20,5 +20,7 @@ defmodule Screens.V2.WidgetInstance.NormalFooter do
     end
 
     def slot_names(_instance), do: [:footer]
+
+    def widget_type(_instance), do: :normal_footer
   end
 end
