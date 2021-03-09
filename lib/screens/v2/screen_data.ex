@@ -9,7 +9,7 @@ defmodule Screens.V2.ScreenData do
   @type config :: :ok
   @type candidate_generator :: module()
   @type candidate_templates :: :ok
-  @type candidate_instances :: :ok
+  @type candidate_instances :: list(WidgetInstance.t())
   @type selected_template :: :ok
   @type selected_widgets :: :ok
   @type selected :: {selected_template, selected_widgets}
