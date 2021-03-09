@@ -3,7 +3,7 @@ defmodule Screens.V2.WidgetInstance.StaticImageTest do
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.StaticImage
 
-  setup_all do
+  setup do
     priority = [2]
 
     image_url =
