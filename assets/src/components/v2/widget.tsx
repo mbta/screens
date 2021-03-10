@@ -1,6 +1,10 @@
 import React from "react";
 
-const TYPE_TO_COMPONENT = {};
+import NormalHeader from "Components/v2/header/normal";
+
+const TYPE_TO_COMPONENT: Record<string, React.ComponentType<any>> = {
+  normal_header: NormalHeader,
+};
 
 const Widget = ({ data }) => {
   const { type, ...props } = data;
