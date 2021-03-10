@@ -1,8 +1,12 @@
 import React from "react";
 
-import Widget from "Components/v2/widget";
+import Widget, { WidgetData } from "Components/v2/widget";
 
-const OneLarge = ({ large }) => {
+interface Props {
+  large: WidgetData;
+}
+
+const OneLarge: React.ComponentType<Props> = ({ large }) => {
   return (
     <div className="flex-one-large">
       <div className="flex-one-large__large">

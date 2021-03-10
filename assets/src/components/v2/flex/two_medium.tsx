@@ -1,8 +1,16 @@
 import React from "react";
 
-import Widget from "Components/v2/widget";
+import Widget, { WidgetData } from "Components/v2/widget";
 
-const TwoMedium = ({ medium_left: mediumLeft, medium_right: mediumRight }) => {
+interface Props {
+  medium_left: WidgetData;
+  medium_right: WidgetData;
+}
+
+const TwoMedium: React.ComponentType<Props> = ({
+  medium_left: mediumLeft,
+  medium_right: mediumRight,
+}) => {
   return (
     <div className="flex-two-medium">
       <div className="flex-two-medium__left">

@@ -1,8 +1,12 @@
 import React from "react";
 
-import Widget from "Components/v2/widget";
+import Widget, { WidgetData } from "Components/v2/widget";
 
-const Takeover = ({ fullscreen }) => {
+interface Props {
+  fullscreen: WidgetData;
+}
+
+const Takeover: React.ComponentType<Props> = ({ fullscreen }) => {
   return (
     <div className="screen-takeover">
       <div className="screen-takeover__fullscreen">

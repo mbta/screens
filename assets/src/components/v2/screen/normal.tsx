@@ -1,8 +1,15 @@
 import React from "react";
 
-import Widget from "Components/v2/widget";
+import Widget, { WidgetData } from "Components/v2/widget";
 
-const Normal = ({
+interface Props {
+  header: WidgetData;
+  main_content: WidgetData;
+  flex_zone: WidgetData;
+  footer: WidgetData;
+}
+
+const Normal: React.ComponentType<Props> = ({
   header,
   main_content: mainContent,
   flex_zone: flexZone,
