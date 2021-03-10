@@ -9,10 +9,14 @@ defmodule Screens.V2.ScreenData do
   @type screen_id :: String.t()
   @type config :: :ok
   @type candidate_generator :: module()
+  @type candidate_templates :: :ok
   @type candidate_instances :: list(WidgetInstance.t())
+  @type selected_template :: :ok
+  @type selected_widgets :: :ok
+  @type selected :: {selected_template, selected_widgets}
   @type serializable_map :: %{type: atom()}
 
-  @spec by_screen_id(screen_id()) :: map()
+  @spec by_screen_id(screen_id()) :: serializable_map()
   def by_screen_id(screen_id) do
     config = get_config(screen_id)
     candidate_generator = get_candidate_generator(config)
