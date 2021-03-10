@@ -5,19 +5,41 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   alias Screens.Predictions.Prediction
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
-  alias Screens.V2.WidgetInstance.{Departures, DeparturesNoData, StaticImage}
+
+  alias Screens.V2.WidgetInstance.{
+    Departures,
+    DeparturesNoData,
+    NormalFooter,
+    NormalHeader,
+    StaticImage
+  }
 
   @behaviour CandidateGenerator
 
   # Using Columbus Ave @ Walnut Ave until we have real config
   @dummy_stop_id "1743"
+  @dummy_station_name "Columbus Ave @ Walnut Ave"
 
   @dummy_psa_priority [5]
   @dummy_psa_size :small
 
   @impl CandidateGenerator
-  def candidate_templates do
-    :ok
+  def candidate_template do
+    {:screen,
+     %{
+       normal: [
+         :header,
+         :main_content,
+         {:flex_zone,
+          %{
+            one_large: [:large],
+            one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right],
+            two_medium: [:medium_left, :medium_right]
+          }},
+         :footer
+       ],
+       takeover: [:fullscreen]
+     }}
   end
 
   @impl CandidateGenerator
@@ -41,7 +63,10 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
       |> fetch_psas()
       |> generate_static_image_widgets(config)
 
-    [departures_widget] ++ alert_widgets ++ psa_widgets
+    header_widget = %NormalHeader{station_name: @dummy_station_name, time: DateTime.utc_now()}
+    footer_widget = %NormalFooter{url: "mbta.com/stops/#{@dummy_stop_id}"}
+
+    [departures_widget] ++ alert_widgets ++ psa_widgets ++ [header_widget] ++ [footer_widget]
   end
 
   defp fetch_predictions(stop_id, prediction_fetcher) do
