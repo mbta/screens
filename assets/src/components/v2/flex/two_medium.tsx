@@ -7,7 +7,10 @@ interface Props {
   medium_right: WidgetData;
 }
 
-const TwoMedium: React.ComponentType<Props> = ({ medium_left: mediumLeft, medium_right: mediumRight }) => {
+const TwoMedium: React.ComponentType<Props> = ({
+  medium_left: mediumLeft,
+  medium_right: mediumRight,
+}) => {
   return (
     <div className="flex-two-medium">
       <div className="flex-two-medium__left">

@@ -7,7 +7,6 @@ import OneLarge from "Components/v2/flex/one_large";
 import TwoMedium from "Components/v2/flex/two_medium";
 import OneMediumTwoSmall from "Components/v2/flex/one_medium_two_small";
 
-
 type WidgetData = { type: string } & Record<string, any>;
 
 const TYPE_TO_COMPONENT: Record<string, React.ComponentType<any>> = {
@@ -35,4 +34,4 @@ const Widget: React.ComponentType<Props> = ({ data }) => {
 };
 
 export default Widget;
-export { WidgetData }
+export { WidgetData };
