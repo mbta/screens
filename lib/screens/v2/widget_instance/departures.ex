@@ -34,5 +34,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
 
     def slot_names(_instance), do: [:main_content]
+
+    def widget_type(_instance), do: :departures
   end
 end

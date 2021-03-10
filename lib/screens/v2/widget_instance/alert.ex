@@ -48,6 +48,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   def slot_names(%T{}), do: ~w[medium_left medium_right]a
 
+  def widget_type(%T{}), do: :alert
+
   defp active_priority(%T{alert: alert}, alert_active?) do
     if alert_active?.(alert), do: 0, else: 1
   end
@@ -79,5 +81,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
     def priority(t), do: T.priority(t)
     def serialize(t), do: T.serialize(t)
     def slot_names(t), do: T.slot_names(t)
+    def widget_type(t), do: T.widget_type(t)
   end
 end

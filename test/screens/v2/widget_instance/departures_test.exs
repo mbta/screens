@@ -6,7 +6,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.Trips.Trip
   alias Screens.V2.WidgetInstance
 
-  setup_all do
+  setup do
     trip_headsign = "Ruggles"
     trip = %Trip{headsign: trip_headsign}
 
@@ -50,6 +50,12 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   describe "slot_names/1" do
     test "returns main_content", %{instance: instance} do
       assert [:main_content] == WidgetInstance.slot_names(instance)
+    end
+  end
+
+  describe "widget_type/1" do
+    test "returns departures", %{instance: instance} do
+      assert :departures == WidgetInstance.widget_type(instance)
     end
   end
 end

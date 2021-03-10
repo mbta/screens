@@ -11,7 +11,8 @@ defmodule ScreensWeb.UserAgent do
   def is_screen?(nil), do: false
 
   def is_screen?(user_agent) do
-    is_mercury?(user_agent) or is_gds?(user_agent) or is_solari?(user_agent)
+    is_mercury?(user_agent) or is_gds?(user_agent) or is_solari?(user_agent) or
+      is_dup?(user_agent)
   end
 
   defp is_mercury?(user_agent) do
@@ -34,5 +35,9 @@ defmodule ScreensWeb.UserAgent do
   defp is_solari_browser?(user_agent) do
     String.contains?(user_agent, "(X11; Ubuntu; Linux i686; rv:22.0)") and
       String.contains?(user_agent, "Firefox/22.0")
+  end
+
+  defp is_dup?(user_agent) do
+    user_agent == "okhttp/3.8.0"
   end
 end

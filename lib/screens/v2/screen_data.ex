@@ -3,6 +3,7 @@ defmodule Screens.V2.ScreenData do
 
   require Logger
 
+  alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
 
   @type screen_id :: String.t()
@@ -13,7 +14,7 @@ defmodule Screens.V2.ScreenData do
   @type selected_template :: :ok
   @type selected_widgets :: :ok
   @type selected :: {selected_template, selected_widgets}
-  @type serializable_map :: :ok
+  @type serializable_map :: %{type: atom()}
 
   @spec by_screen_id(screen_id()) :: serializable_map()
   def by_screen_id(screen_id) do
@@ -37,7 +38,8 @@ defmodule Screens.V2.ScreenData do
     Screens.V2.CandidateGenerator.BusShelter
   end
 
-  @spec pick_instances(candidate_templates(), candidate_instances()) :: selected()
+  @spec pick_instances(Template.template(), candidate_instances()) ::
+          {Template.layout(), %{atom() => WidgetInstance.t()}}
   def pick_instances(candidate_templates, candidate_instances) do
     prioritized_instances = Enum.sort_by(candidate_instances, &WidgetInstance.priority/1)
 
@@ -123,8 +125,19 @@ defmodule Screens.V2.ScreenData do
     length(matching_slots) > 0
   end
 
-  @spec serialize(selected()) :: serializable_map()
-  def serialize({:ok, :ok}) do
-    :ok
+  @spec serialize({Template.layout(), %{atom() => WidgetInstance.t()}}) :: map()
+  def serialize({layout, instance_map}) do
+    serialized_instance_map =
+      instance_map
+      |> Enum.map(fn {slot_id, instance} -> {slot_id, serialize_instance_with_type(instance)} end)
+      |> Enum.into(%{})
+
+    Template.position_widget_instances(layout, serialized_instance_map)
+  end
+
+  defp serialize_instance_with_type(instance) do
+    instance
+    |> WidgetInstance.serialize()
+    |> Map.merge(%{type: WidgetInstance.widget_type(instance)})
   end
 end

@@ -3,7 +3,7 @@ defmodule Screens.V2.WidgetInstance.StaticImageTest do
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.StaticImage
 
-  setup_all do
+  setup do
     priority = [2]
 
     image_url =
@@ -51,6 +51,12 @@ defmodule Screens.V2.WidgetInstance.StaticImageTest do
 
       assert MapSet.new([:small_upper_right, :small_lower_right]) ==
                MapSet.new(WidgetInstance.slot_names(instance))
+    end
+  end
+
+  describe "widget_type/1" do
+    test "returns static image", %{instance: instance} do
+      assert :static_image == WidgetInstance.widget_type(instance)
     end
   end
 end
