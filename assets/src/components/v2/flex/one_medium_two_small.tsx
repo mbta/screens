@@ -1,8 +1,14 @@
 import React from "react";
 
-import Widget from "Components/v2/widget";
+import Widget, { WidgetData } from "Components/v2/widget";
 
-const OneMediumTwoSmall = ({
+interface Props {
+  medium_left: WidgetData;
+  small_upper_right: WidgetData;
+  small_lower_right: WidgetData;
+}
+
+const OneMediumTwoSmall: React.ComponentType<Props> = ({
   medium_left: mediumLeft,
   small_upper_right: smallUpperRight,
   small_lower_right: smallLowerRight,
