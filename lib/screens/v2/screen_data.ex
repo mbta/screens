@@ -9,21 +9,18 @@ defmodule Screens.V2.ScreenData do
   @type screen_id :: String.t()
   @type config :: :ok
   @type candidate_generator :: module()
-  @type candidate_templates :: :ok
   @type candidate_instances :: list(WidgetInstance.t())
-  @type selected_template :: :ok
-  @type selected_widgets :: :ok
-  @type selected :: {selected_template, selected_widgets}
+  @type selected_instances_map :: %{atom() => WidgetInstance.t()}
   @type serializable_map :: %{type: atom()}
 
   @spec by_screen_id(screen_id()) :: serializable_map()
   def by_screen_id(screen_id) do
     config = get_config(screen_id)
     candidate_generator = get_candidate_generator(config)
-    candidate_templates = candidate_generator.candidate_templates()
+    screen_template = candidate_generator.screen_template()
     candidate_instances = candidate_generator.candidate_instances(config)
 
-    candidate_templates
+    screen_template
     |> pick_instances(candidate_instances)
     |> serialize()
   end
@@ -39,14 +36,15 @@ defmodule Screens.V2.ScreenData do
   end
 
   @spec pick_instances(Template.template(), candidate_instances()) ::
-          {Template.layout(), %{atom() => WidgetInstance.t()}}
-  def pick_instances(candidate_templates, candidate_instances) do
+          {Template.layout(), selected_instances_map()}
+  def pick_instances(screen_template, candidate_instances) do
     prioritized_instances = Enum.sort_by(candidate_instances, &WidgetInstance.priority/1)
 
     # N.B. Each template can place each instance it contains in a different place, so we need to
     # store a mapping from slot_id to instance for each template.
     candidate_placements =
-      candidate_templates
+      screen_template
+      |> Template.slot_combinations()
       |> Enum.map(fn t -> {t, %{}} end)
       |> Enum.into(%{})
 
@@ -125,7 +123,7 @@ defmodule Screens.V2.ScreenData do
     length(matching_slots) > 0
   end
 
-  @spec serialize({Template.layout(), %{atom() => WidgetInstance.t()}}) :: map()
+  @spec serialize({Template.layout(), selected_instances_map()}) :: serializable_map()
   def serialize({layout, instance_map}) do
     serialized_instance_map =
       instance_map

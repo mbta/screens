@@ -5,14 +5,13 @@ defmodule Screens.V2.ScreenDataTest do
 
   describe "pick_instances/2" do
     test "chooses the expected template and instance placement" do
-      candidate_templates = [
-        {[:large], {:flex_zone, {:one_large, [:large]}}},
-        {[:medium_left, :small_upper_right, :small_lower_right],
-         {:flex_zone,
-          {:one_medium_two_small, [:medium_left, :small_upper_right, :small_lower_right]}}},
-        {[:medium_left, :medium_right],
-         {:flex_zone, {:two_medium, [:medium_left, :medium_right]}}}
-      ]
+      candidate_template =
+        {:flex_zone,
+         %{
+           one_large: [:large],
+           two_medium: [:medium_left, :medium_right],
+           one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right]
+         }}
 
       candidate_instances = [
         %StaticImage{size: :small, priority: [4], image_url: "4"},
@@ -22,7 +21,7 @@ defmodule Screens.V2.ScreenDataTest do
       ]
 
       {actual_layout, actual_instance_placement} =
-        Screens.V2.ScreenData.pick_instances(candidate_templates, candidate_instances)
+        Screens.V2.ScreenData.pick_instances(candidate_template, candidate_instances)
 
       assert {:flex_zone,
               {:one_medium_two_small, [:medium_left, :small_upper_right, :small_lower_right]}} ==

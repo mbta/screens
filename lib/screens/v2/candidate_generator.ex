@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator do
 
   alias Screens.V2.ScreenData
 
-  @callback candidate_templates() :: Screens.V2.Template.template()
+  @callback screen_template() :: Screens.V2.Template.template()
 
   @callback candidate_instances(ScreenData.config()) :: ScreenData.candidate_instances()
 end
