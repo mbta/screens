@@ -17,10 +17,10 @@ defmodule Screens.V2.ScreenData do
   def by_screen_id(screen_id) do
     config = get_config(screen_id)
     candidate_generator = get_candidate_generator(config)
-    candidate_template = candidate_generator.candidate_template()
+    screen_template = candidate_generator.screen_template()
     candidate_instances = candidate_generator.candidate_instances(config)
 
-    candidate_template
+    screen_template
     |> pick_instances(candidate_instances)
     |> serialize()
   end
@@ -37,13 +37,13 @@ defmodule Screens.V2.ScreenData do
 
   @spec pick_instances(Template.template(), candidate_instances()) ::
           {Template.layout(), selected_instances_map()}
-  def pick_instances(candidate_template, candidate_instances) do
+  def pick_instances(screen_template, candidate_instances) do
     prioritized_instances = Enum.sort_by(candidate_instances, &WidgetInstance.priority/1)
 
     # N.B. Each template can place each instance it contains in a different place, so we need to
     # store a mapping from slot_id to instance for each template.
     candidate_placements =
-      candidate_template
+      screen_template
       |> Template.slot_combinations()
       |> Enum.map(fn t -> {t, %{}} end)
       |> Enum.into(%{})

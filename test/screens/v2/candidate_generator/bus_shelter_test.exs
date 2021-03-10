@@ -14,7 +14,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
     StaticImage
   }
 
-  describe "candidate_template/0" do
+  describe "screen_template/0" do
     test "returns template" do
       assert {:screen,
               %{
@@ -30,7 +30,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
                   :footer
                 ],
                 takeover: [:fullscreen]
-              }} == BusShelter.candidate_template()
+              }} == BusShelter.screen_template()
     end
   end
 

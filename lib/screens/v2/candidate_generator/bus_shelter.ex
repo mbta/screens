@@ -24,7 +24,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   @dummy_psa_size :small
 
   @impl CandidateGenerator
-  def candidate_template do
+  def screen_template do
     {:screen,
      %{
        normal: [
