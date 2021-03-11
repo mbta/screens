@@ -20,7 +20,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   @dummy_stop_id "1743"
   @dummy_station_name "Columbus Ave @ Walnut Ave"
 
-  @dummy_psa_priority [5]
+  @dummy_psa_priority [1]
   @dummy_psa_size :small
 
   @impl CandidateGenerator
