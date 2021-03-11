@@ -68,6 +68,23 @@ defmodule Screens.ConfigCache.State do
         {:noreply, state}
       end
 
+      def handle_info(:refresh, :error) do
+        pid = self()
+
+        schedule_refresh(pid)
+
+        async_fetch = fn ->
+          case unquote(fetch_config).(nil) do
+            {:ok, new_config, new_version} -> put_config(pid, new_config, new_version)
+            :error -> put_fetch_error(pid)
+          end
+        end
+
+        _ = Task.start(async_fetch)
+
+        {:noreply, :error}
+      end
+
       # Handle leaked :ssl_closed messages from Hackney.
       # Workaround for this issue: https://github.com/benoitc/hackney/issues/464
       def handle_info({:ssl_closed, _}, state) do
