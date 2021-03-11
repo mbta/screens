@@ -15,7 +15,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
     departure_time = ~U[2021-02-18 22:36:00Z]
 
-    prediction = %Prediction{route: route, trip: trip, departure_time: departure_time}
+    prediction = %Prediction{id: 1, route: route, trip: trip, departure_time: departure_time}
     instance = %WidgetInstance.Departures{predictions: [prediction]}
 
     %{
@@ -41,7 +41,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     } do
       assert %{
                departures: [
-                 %{destination: trip_headsign, route: route_name, time: departure_time}
+                 %{id: 1, destination: trip_headsign, route: route_name, time: departure_time}
                ]
              } == WidgetInstance.serialize(instance)
     end
