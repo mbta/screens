@@ -72,7 +72,7 @@ defmodule Screens.MixProject do
       {:ehmon, github: "mbta/ehmon", only: :prod},
       {:sweet_xml, "~> 0.6.6"},
       {:timex, "~> 3.6"},
-      {:hackney, "== 1.17.0"},
+      {:hackney, "== 1.17.2"},
       {:guardian, "~> 2.0"},
       {:ueberauth, "~> 0.6"},
       {:ueberauth_cognito, "~> 0.2"},
