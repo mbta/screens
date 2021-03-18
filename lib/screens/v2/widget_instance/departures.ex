@@ -26,11 +26,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
 
     defp serialize_prediction(%Prediction{
+           id: id,
            route: route,
            trip: trip,
            departure_time: departure_time
          }) do
-      %{route: route.short_name, destination: trip.headsign, time: departure_time}
+      %{id: id, route: route.short_name, destination: trip.headsign, time: departure_time}
     end
 
     def slot_names(_instance), do: [:main_content]
