@@ -6,6 +6,7 @@ import Takeover from "Components/v2/screen/takeover";
 import OneLarge from "Components/v2/flex/one_large";
 import TwoMedium from "Components/v2/flex/two_medium";
 import OneMediumTwoSmall from "Components/v2/flex/one_medium_two_small";
+import Alert from "Components/v2/alert";
 import NormalFooter from "Components/v2/footer/normal";
 
 type WidgetData = { type: string } & Record<string, any>;
@@ -18,6 +19,7 @@ const TYPE_TO_COMPONENT: Record<string, React.ComponentType<any>> = {
   two_medium: TwoMedium,
   one_medium_two_small: OneMediumTwoSmall,
   normal_footer: NormalFooter,
+  alert: Alert,
 };
 
 interface Props {
