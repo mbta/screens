@@ -15,4 +15,13 @@ defmodule Screens.RouteType do
   def from_id(id) do
     Map.get(@inverted_mapping, id)
   end
+
+  @spec from_string(String.t()) :: t()
+  for t <- Map.keys(@route_type_mapping) do
+    string_t = Atom.to_string(t)
+
+    def from_string(unquote(string_t)) do
+      unquote(t)
+    end
+  end
 end
