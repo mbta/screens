@@ -28,12 +28,9 @@ defmodule ScreensWeb.AudioView do
 
   defp render_route_descriptor({route, route_id, destination}) do
     if route_id in ~w[Blue Red Mattapan Orange] or String.starts_with?(route_id, "CR") do
-      render("_train_route.ssml",
-        route_id: route_id,
-        destination: destination
-      )
+      ~E|<%= render_route_id(route_id) %> to <%= destination %>|
     else
-      render("_bus_route.ssml", route: route, destination: destination)
+      ~E|<%= render_route(route) %> to <%= destination %>|
     end
   end
 
@@ -79,11 +76,18 @@ defmodule ScreensWeb.AudioView do
   end
 
   defp render_departure_group(
-         {route_descriptor, %{times: time_groups, alerts: alerts, wayfinding: wayfinding}}
+         {route_descriptor,
+          %{
+            times: time_groups,
+            alerts: alerts,
+            wayfinding: wayfinding,
+            track_number: track_number
+          }}
        ) do
     [first | rest] = time_groups
 
-    first_rendered = render_first_departure_time_group(route_descriptor, wayfinding, first)
+    first_rendered =
+      render_first_departure_time_group(route_descriptor, track_number, wayfinding, first)
 
     rest_rendered = Enum.map(rest, &render_departure_time_group_with_prefix/1)
 
@@ -92,14 +96,16 @@ defmodule ScreensWeb.AudioView do
     ~E|<%= first_rendered %><%= rest_rendered %><%= alerts_rendered %>|
   end
 
-  defp render_first_departure_time_group(route_descriptor, wayfinding, time_group) do
+  defp render_first_departure_time_group(route_descriptor, track_number, wayfinding, time_group) do
     route_destination = render_route_descriptor(route_descriptor)
+
+    track_number_rendered = render_track_number(track_number)
 
     wayfinding_rendered = render_wayfinding(wayfinding)
 
     times = render_departure_time_group(time_group)
 
-    ~E|<s><%= route_destination %><%= wayfinding_rendered %><%= times %></s>
+    ~E|<s><%= route_destination %><%= track_number_rendered %><%= wayfinding_rendered %><%= times %></s>
 |
   end
 
@@ -179,6 +185,9 @@ defmodule ScreensWeb.AudioView do
 
   defp render_wayfinding(nil), do: ~E""
   defp render_wayfinding(wayfinding), do: ~E| from <%= wayfinding %>|
+
+  defp render_track_number(nil), do: ~E""
+  defp render_track_number(track_number), do: ~E| on track <%= track_number %>|
 
   @spec render_psa({:plaintext | :ssml, String.t(), :takeover | :end} | nil) ::
           Phoenix.HTML.safe()

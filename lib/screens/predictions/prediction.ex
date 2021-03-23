@@ -11,7 +11,8 @@ defmodule Screens.Predictions.Prediction do
             alerts: [],
             arrival_time: nil,
             departure_time: nil,
-            stop_headsign: nil
+            stop_headsign: nil,
+            track_number: nil
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -22,7 +23,8 @@ defmodule Screens.Predictions.Prediction do
           alerts: list(Screens.Alerts.Alert.t()),
           arrival_time: DateTime.t() | nil,
           departure_time: DateTime.t() | nil,
-          stop_headsign: String.t() | nil
+          stop_headsign: String.t() | nil,
+          track_number: pos_integer() | nil
         }
 
   @spec fetch(Departure.query_params()) :: {:ok, list(t())} | :error
