@@ -29,7 +29,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
                    }},
                   :footer
                 ],
-                takeover: [:fullscreen]
+                takeover: [:full_screen]
               }} == BusShelter.screen_template()
     end
   end
