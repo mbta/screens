@@ -1,19 +1,18 @@
 import React from "react";
 import useApiResponse from "Hooks/v2/use_api_response";
+import Widget from "Components/v2/widget";
 
-const ScreenLayout = ({ apiResponse, WidgetComponent }) => {
+const ScreenLayout = ({ apiResponse }) => {
   return (
     <div className="screen-container">
-      {apiResponse && <WidgetComponent data={apiResponse} />}
+      {apiResponse && <Widget data={apiResponse} />}
     </div>
   );
 };
 
-const ScreenContainer = ({ id, WidgetComponent }) => {
+const ScreenContainer = ({ id }) => {
   const apiResponse = useApiResponse({ id });
-  return (
-    <ScreenLayout apiResponse={apiResponse} WidgetComponent={WidgetComponent} />
-  );
+  return <ScreenLayout apiResponse={apiResponse} />;
 };
 
 export default ScreenContainer;

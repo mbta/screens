@@ -6,14 +6,18 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenPage from "Components/v2/screen_page";
-import Widget from "Components/v2/bus_eink/widget";
+import { MappingContext } from "Components/v2/widget";
+
+const TYPE_TO_COMPONENT = {};
 
 const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
         <Route path="/v2/screen/:id">
-          <ScreenPage WidgetComponent={Widget} />
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ScreenPage />
+          </MappingContext.Provider>
         </Route>
       </Switch>
     </Router>
