@@ -127,6 +127,11 @@ config :screens,
     "place-aport" => [
       {"70050", "70046", "Wonderland"},
       {"70045", "70049", "Bowdoin"}
+    ],
+    # Quincy Center
+    "place-qnctr" => [
+      {"70100", "70104", "Alewife"},
+      {"70103", "70099", "Braintree"}
     ]
   },
   # Stop IDs at stations serviced by two subway lines, where we also have DUP screens.
