@@ -39,8 +39,13 @@
   font-family: Helvetica, sans-serif;
   font-weight: 700;
   text-align: center;
+  transform: translateY(-20px);
 
-  &--green {
+  &--green,
+  &--green_b,
+  &--green_c,
+  &--green_d,
+  &--green_e {
     background: $line-color-green;
   }
 
@@ -65,10 +70,19 @@
   }
 }
 
+.free-text__route-pill__text {
+  display: inline-block;
+  font-family: Helvetica, sans-serif;
+  font-weight: 700;
+  text-align: center;
+  transform: translateY(6px);
+}
+
 .free-text__text-pill {
   display: inline-block;
   font-family: Helvetica, sans-serif;
   font-weight: 700;
+  transform: translateY(-20px);
 
   &--green {
     background: $line-color-green;
@@ -93,6 +107,13 @@
   &--purple {
     background: $line-color-cr;
   }
+}
+
+.free-text__text-pill__text {
+  display: inline-block;
+  font-family: Helvetica, sans-serif;
+  font-weight: 700;
+  transform: translateY(6px);
 }
 
 .partial-alert {

@@ -68,12 +68,16 @@ const RoutePill = ({ route }) => {
     green: "GL",
     silver: "SL",
     cr: "CR",
+    green_b: "B",
+    green_c: "C",
+    green_d: "D",
+    green_e: "E",
   }[route];
 
   return (
     <span className="free-text__element free-text__route-container">
       <div className={classWithModifier("free-text__route-pill", route)}>
-        {routeName}
+        <div className="free-text__route-pill__text">{routeName}</div>
       </div>
     </span>
   );
@@ -83,7 +87,7 @@ const TextPill = ({ color, text }) => {
   return (
     <span className="free-text__element free-text__pill-container">
       <div className={classWithModifier("free-text__text-pill", color)}>
-        {text}
+        <div className="free-text__text-pill__text">{text}</div>
       </div>
     </span>
   );

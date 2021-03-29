@@ -9,7 +9,17 @@ defmodule Screens.Config.Dup.Override.FreeText do
           | %{special: special}
 
   @type format :: :bold | :small
-  @type route_pill :: :red | :blue | :orange | :green | :silver | :cr
+  @type route_pill ::
+          :red
+          | :blue
+          | :orange
+          | :green
+          | :silver
+          | :cr
+          | :green_b
+          | :green_c
+          | :green_d
+          | :green_e
   @type color :: :red | :blue | :orange | :green | :silver | :purple
   @type special :: :break
 
@@ -25,7 +35,7 @@ defmodule Screens.Config.Dup.Override.FreeText do
     end
   end
 
-  for route_pill <- ~w[red blue orange green silver cr]a do
+  for route_pill <- ~w[red blue orange green silver cr green_b green_c green_d green_e]a do
     route_pill_string = Atom.to_string(route_pill)
 
     def from_json(%{"route" => unquote(route_pill_string)}) do
