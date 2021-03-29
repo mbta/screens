@@ -4,29 +4,29 @@ defmodule Screens.Config.Dup.Override.PartialAlert do
   alias Screens.Config.Dup.Override.FreeTextLine
 
   @type t :: %__MODULE__{
-          affected: pill,
+          color: color,
           content: FreeTextLine.t()
         }
 
-  @type pill :: :red | :orange | :green | :blue | :mattapan | :cr
+  @type color :: :red | :orange | :green | :blue | :silver | :purple | :yellow
 
-  @enforce_keys ~w[affected content]a
+  @enforce_keys ~w[color content]a
   defstruct @enforce_keys
 
-  for pill <- ~w[red orange green blue mattapan cr]a do
-    pill_string = Atom.to_string(pill)
+  for color <- ~w[red orange green blue silver purple yellow]a do
+    color_string = Atom.to_string(color)
 
-    def from_json(%{"affected" => unquote(pill_string), "content" => content}) do
+    def from_json(%{"color" => unquote(color_string), "content" => content}) do
       %__MODULE__{
-        affected: unquote(pill),
+        color: unquote(color),
         content: FreeTextLine.from_json(content)
       }
     end
   end
 
-  def to_json(%__MODULE__{affected: affected, content: content}) do
+  def to_json(%__MODULE__{color: color, content: content}) do
     %{
-      affected: affected,
+      color: color,
       content: FreeTextLine.to_json(content)
     }
   end
