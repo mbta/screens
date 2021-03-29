@@ -16,22 +16,6 @@ const ABBREVIATIONS = {
   Washington: "Wash",
 };
 
-// Adjustments to specific problematic headsigns
-const REPLACEMENTS = {
-  "Holbrook/Randolph": "Holbrook / Randolph",
-  "Charlestown Navy Yard": "Charlestown",
-  "Saugus Center via Kennedy Dr & Square One Mall":
-    "Saugus Center via Kndy Dr & Square One",
-  "Malden via Square One Mall & Kennedy Dr":
-    "Malden via Square One Mall & Kndy Dr",
-  "Washington St & Pleasant St Weymouth": "Washington St & Plsnt St Weymouth",
-  "Woodland Rd via Gateway Center": "Woodland Rd via Gatew'y Center",
-  "Sullivan (Limited Stops)": "Sullivan",
-  "Ruggles (Limited Stops)": "Ruggles",
-  "Wickford Junction": "Wickford Jct",
-  "Needham Heights": "Needham Hts",
-};
-
 enum PHASES {
   ONE_LINE_FULL,
   ONE_LINE_ABBREV,
@@ -63,8 +47,7 @@ const Destination = ({ destination, currentPage }) => {
   const firstLineRef = useRef(null);
   const secondLineRef = useRef(null);
 
-  const correctedDestination = REPLACEMENTS[destination] || destination;
-  let parts = correctedDestination.split(" ");
+  let parts = destination.split(" ");
 
   const [index1, setIndex1] = useState(parts.length);
   const [index2, setIndex2] = useState(parts.length);

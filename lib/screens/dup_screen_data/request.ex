@@ -24,6 +24,21 @@ defmodule Screens.DupScreenData.Request do
     "Braintree"
   ]
 
+  @headsign_replacements %{
+    "Holbrook/Randolph" => "Holbrook / Randolph",
+    "Charlestown Navy Yard" => "Charlestown",
+    "Saugus Center via Kennedy Dr & Square One Mall" => "Saugus Center via Kndy Dr & Square One",
+    "Malden via Square One Mall & Kennedy Dr" => "Malden via Square One Mall & Kndy Dr",
+    "Washington St & Pleasant St Weymouth" => "Washington St & Plsnt St Weymouth",
+    "Woodland Rd via Gateway Center" => "Woodland Rd via Gatew'y Center",
+    "Sullivan (Limited Stops)" => "Sullivan",
+    "Ruggles (Limited Stops)" => "Ruggles",
+    "Wickford Junction" => "Wickford Jct",
+    "Needham Heights" => "Needham Hts",
+    "Houghs Neck Via McGrath & Germantown" => "Houghs Neck Via McGth & Gtwn",
+    "Houghs Neck Via Germantown" => "Houghs Neck Via Germntwn"
+  }
+
   def fetch_alerts(stop_ids, route_ids) do
     opts = [
       stop_ids: stop_ids,
@@ -161,6 +176,7 @@ defmodule Screens.DupScreenData.Request do
           |> Enum.map(&Map.from_struct/1)
           |> Enum.sort_by(& &1.time)
           |> Enum.take(num_rows)
+          |> Enum.map(&replace_long_headsigns/1)
 
         _ =
           case section_departures do
@@ -173,6 +189,11 @@ defmodule Screens.DupScreenData.Request do
       :error ->
         :error
     end
+  end
+
+  defp replace_long_headsigns(%{destination: destination} = departure_map) do
+    replaced_destination = Map.get(@headsign_replacements, destination, destination)
+    %{departure_map | destination: replaced_destination}
   end
 
   defp relevant?(alert) do
