@@ -23,7 +23,10 @@ defmodule Screens.DupScreenData.Response do
         %{
           icon: "subway-negative-black",
           text: [
-            %{color: pill, text: @pill_to_specifier |> Map.get(pill) |> String.upcase()},
+            %{
+              color: line_color(pill),
+              text: @pill_to_specifier |> Map.get(pill) |> String.upcase()
+            },
             %{special: :break},
             "every",
             %{format: :bold, text: "#{lo}-#{hi}"},
@@ -36,7 +39,7 @@ defmodule Screens.DupScreenData.Response do
   def render_partial_alerts([alert]) do
     [
       %{
-        color: alert.pill,
+        color: line_color(alert.pill),
         content: render_partial_alert_content(alert)
       }
     ]
