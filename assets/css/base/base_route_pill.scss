@@ -19,6 +19,10 @@
   &--with-slash {
     font-size: 0.556em;
     line-height: 1.5em;
+
+    &__part1, &__part2 {
+      display: inline-block;
+    }
   }
 
   &--no-slash {
