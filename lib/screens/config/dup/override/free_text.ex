@@ -7,6 +7,7 @@ defmodule Screens.Config.Dup.Override.FreeText do
           | %{route: route_pill}
           | %{color: color, text: String.t()}
           | %{special: special}
+          | %{icon: Screens.Config.Dup.Override.FreeTextLine.icon()}
 
   @type format :: :bold | :small
   @type route_pill ::
@@ -56,6 +57,15 @@ defmodule Screens.Config.Dup.Override.FreeText do
 
     def from_json(%{"special" => unquote(special_string)}) do
       %{special: unquote(special)}
+    end
+  end
+
+  for icon <-
+        ~w[warning x shuttle subway cr walk red blue orange green silver green_b green_c green_d green_e]a do
+    icon_string = Atom.to_string(icon)
+
+    def from_json(%{"icon" => unquote(icon_string)}) do
+      %{icon: unquote(icon)}
     end
   end
 

@@ -20,12 +20,17 @@ defmodule Screens.Config.Dup.Override.FreeTextLine do
           | :orange
           | :green
           | :silver
+          | :green_b
+          | :green_c
+          | :green_d
+          | :green_e
           | nil
 
   @enforce_keys ~w[icon text]a
   defstruct @enforce_keys
 
-  for icon <- ~w[warning x shuttle subway cr walk red blue orange green silver]a do
+  for icon <-
+        ~w[warning x shuttle subway cr walk red blue orange green silver green_b green_c green_d green_e]a do
     icon_string = Atom.to_string(icon)
 
     def from_json(%{"icon" => unquote(icon_string), "text" => free_text_elements}) do
