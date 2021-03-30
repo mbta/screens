@@ -82,16 +82,22 @@ const RoutePill = ({ route }) => {
     green: "GL",
     silver: "SL",
     cr: "CR",
-    green_b: "B",
-    green_c: "C",
-    green_d: "D",
-    green_e: "E",
+    green_b: "GL·B",
+    green_c: "GL·C",
+    green_d: "GL·D",
+    green_e: "GL·E",
   }[route];
+
+  const branch = route.startsWith("green_") ? "branch" : "trunk";
 
   return (
     <span className="free-text__element free-text__route-container">
       <div className={classWithModifier("free-text__route-pill", route)}>
-        <div className="free-text__route-pill__text">{routeName}</div>
+        <div
+          className={classWithModifier("free-text__route-pill__text", branch)}
+        >
+          {routeName}
+        </div>
       </div>
     </span>
   );

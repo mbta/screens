@@ -75,7 +75,12 @@
   font-family: Helvetica, sans-serif;
   font-weight: 700;
   text-align: center;
-  transform: translateY(6px);
+  transform: translateY(12px);
+
+  &--branch {
+    font-size: 84px;
+    transform: translateY(8px);
+  }
 }
 
 .free-text__text-pill {
