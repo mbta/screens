@@ -14,6 +14,10 @@ const iconPaths: { [key: string]: string } = _.mapValues(
     "subway-negative-black": "subway-negative-black.svg",
     cr: "commuter-rail.svg",
     walk: "nearby-white.svg",
+    green_b: "gl-b-color.svg",
+    green_c: "gl-c-color.svg",
+    green_d: "gl-d-color.svg",
+    green_e: "gl-e-color.svg",
   },
   imagePath
 );
@@ -33,6 +37,8 @@ const getKey = (elt) => {
     return `${elt.color}--${elt.text}`;
   } else if (elt.special !== undefined) {
     return `special--${elt.special}`;
+  } else if (elt.icon !== undefined) {
+    return `icon--${elt.icon}`;
   }
 };
 
@@ -48,6 +54,14 @@ const Icon = ({ icon }) => {
   }
 
   return <div className="free-text__icon-container">{iconElt}</div>;
+};
+
+const InlineIcon = ({ icon }) => {
+  return (
+    <span className="free-text__element free-text__inline-icon">
+      <img className="free-text__inline-icon-image" src={srcForIcon(icon)} />
+    </span>
+  );
 };
 
 const FormatString = ({ format, text }) => {
@@ -112,6 +126,8 @@ const FreeTextElement = ({ elt }) => {
     return <TextPill color={elt.color} text={elt.text} />;
   } else if (elt.special !== undefined) {
     return <Special data={elt.special} />;
+  } else if (elt.icon !== undefined) {
+    return <InlineIcon icon={elt.icon} />;
   }
 
   return null;

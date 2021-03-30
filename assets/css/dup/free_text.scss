@@ -154,6 +154,16 @@
     padding-right: 84px;
   }
 
+  .free-text__inline-icon {
+    height: 208px;
+    line-height: 208px;
+  }
+
+  .free-text__inline-icon-image {
+    height: 139px;
+    transform: translateY(20px);
+  }
+
   &--dark {
     .free-text {
       color: #171f26;
@@ -211,6 +221,16 @@
     line-height: 168px;
     padding-left: 84px;
     padding-right: 84px;
+  }
+
+  .free-text__inline-icon {
+    height: 168px;
+    line-height: 168px;
+  }
+
+  .free-text__inline-icon-image {
+    transform: translateY(20px);
+    height: 139px;
   }
 
   &--dark {
