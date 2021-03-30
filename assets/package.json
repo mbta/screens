@@ -37,7 +37,7 @@
     "@babel/preset-react": "^7.12.13",
     "@babel/preset-stage-1": "^7.8.3",
     "@babel/preset-typescript": "^7.13.0",
-    "@types/jest": "^26.0.20",
+    "@types/jest": "^26.0.22",
     "@types/lodash": "^4.14.168",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.2",
