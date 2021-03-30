@@ -5,10 +5,7 @@ import { classWithModifier } from "Util/util";
 const BaseRoutePill = ({ route }): JSX.Element => {
   const isSlashRoute = typeof route === "string" && route.includes("/");
 
-  const modifier =
-    isSlashRoute
-      ? "with-slash"
-      : "no-slash";
+  const modifier = isSlashRoute ? "with-slash" : "no-slash";
 
   if (isSlashRoute) {
     const parts = route.split("/");
@@ -20,8 +17,12 @@ const BaseRoutePill = ({ route }): JSX.Element => {
         <div
           className={classWithModifier("base-route-pill__route-text", modifier)}
         >
-          <div className="base-route-pill__route-text--with-slash__part1">{part1}</div>
-          <div className="base-route-pill__route-text--with-slash__part2">{part2}</div>
+          <div className="base-route-pill__route-text--with-slash__part1">
+            {part1}
+          </div>
+          <div className="base-route-pill__route-text--with-slash__part2">
+            {part2}
+          </div>
         </div>
       </div>
     );
