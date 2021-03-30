@@ -13,6 +13,20 @@
     line-height: 144px;
     transform: translateY(8px);
   }
+
+  .base-route-pill__route-text--with-slash__part1 {
+    display: flow;
+    line-height: 84px;
+    text-align: start;
+    margin-left: 42px;
+  }
+
+  .base-route-pill__route-text--with-slash__part2 {
+    display: flow;
+    line-height: 64px;
+    text-align: start;
+    margin-left: 42px;
+  }
 }
 
 .departure-route--icon {
