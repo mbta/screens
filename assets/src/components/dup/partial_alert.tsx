@@ -4,10 +4,10 @@ import FreeText from "Components/dup/free_text";
 import { classWithModifier } from "Util/util";
 
 const PartialAlert = ({ alert }) => {
-  const { affected, content } = alert;
+  const { color, content } = alert;
 
   return (
-    <div className={classWithModifier("partial-alert", affected)}>
+    <div className={classWithModifier("partial-alert", color)}>
       <FreeText lines={content} />
     </div>
   );

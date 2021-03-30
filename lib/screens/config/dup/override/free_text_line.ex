@@ -8,12 +8,24 @@ defmodule Screens.Config.Dup.Override.FreeTextLine do
           text: list(FreeText.t())
         }
 
-  @type icon :: :warning | :x | :shuttle | :subway | :cr | :walk
+  @type icon ::
+          :warning
+          | :x
+          | :shuttle
+          | :subway
+          | :cr
+          | :walk
+          | :red
+          | :blue
+          | :orange
+          | :green
+          | :silver
+          | nil
 
   @enforce_keys ~w[icon text]a
   defstruct @enforce_keys
 
-  for icon <- ~w[warning x shuttle subway cr walk]a do
+  for icon <- ~w[warning x shuttle subway cr walk red blue orange green silver]a do
     icon_string = Atom.to_string(icon)
 
     def from_json(%{"icon" => unquote(icon_string), "text" => free_text_elements}) do
@@ -22,6 +34,13 @@ defmodule Screens.Config.Dup.Override.FreeTextLine do
         text: Enum.map(free_text_elements, &FreeText.from_json/1)
       }
     end
+  end
+
+  def from_json(%{"icon" => nil, "text" => free_text_elements}) do
+    %__MODULE__{
+      icon: nil,
+      text: Enum.map(free_text_elements, &FreeText.from_json/1)
+    }
   end
 
   def to_json(%__MODULE__{icon: icon, text: free_text_elements}) do

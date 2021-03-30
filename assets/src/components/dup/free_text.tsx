@@ -3,6 +3,8 @@ import _ from "lodash";
 
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 
+const pillIcons = ["red", "blue", "orange", "green", "silver"];
+
 const iconPaths: { [key: string]: string } = _.mapValues(
   {
     warning: "alert.svg",
@@ -39,7 +41,7 @@ const Icon = ({ icon }) => {
 
   if (icon === null) {
     iconElt = null;
-  } else if (["red", "blue", "orange", "green", "silver"].includes(icon)) {
+  } else if (pillIcons.includes(icon)) {
     iconElt = <RoutePill route={icon} />;
   } else {
     iconElt = <img className="free-text__icon-image" src={srcForIcon(icon)} />;
@@ -65,12 +67,17 @@ const RoutePill = ({ route }) => {
     orange: "OL",
     green: "GL",
     silver: "SL",
+    cr: "CR",
+    green_b: "B",
+    green_c: "C",
+    green_d: "D",
+    green_e: "E",
   }[route];
 
   return (
     <span className="free-text__element free-text__route-container">
       <div className={classWithModifier("free-text__route-pill", route)}>
-        {routeName}
+        <div className="free-text__route-pill__text">{routeName}</div>
       </div>
     </span>
   );
@@ -80,7 +87,7 @@ const TextPill = ({ color, text }) => {
   return (
     <span className="free-text__element free-text__pill-container">
       <div className={classWithModifier("free-text__text-pill", color)}>
-        {text}
+        <div className="free-text__text-pill__text">{text}</div>
       </div>
     </span>
   );
