@@ -6,8 +6,9 @@
   - `App` component in dup.tsx should just return `<ScreenPage screenContainer={ScreenContainer} />`.
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
   - `ScreenPage` component in dup_screen_page.tsx should render `DupScreenPage` rather than `DevelopmentScreenPage`.
-- Comment out the Inter web font import line at the top of dup.scss.
 - Create priv/static/dup-app.html if it doesn’t already exist. Copy paste contents as directed below.
+- Set the version string in assets/src/components/dup/version.tsx to `current_year.current_month.current_day.1`.
+- In assets/webpack.config.js, change `publicPath` in the font config to have value `'fonts/'`.
 - `cd` to priv/static and run the following:
   ```sh
   for ROTATION_INDEX in {0..2}; do
@@ -17,6 +18,7 @@
     zip -r dup-app-${ROTATION_INDEX}.zip dup.css polyfills.js dup.js dup_font_face.css fonts images dup-app.html
   done
   ```
+- Commit the version bump on a branch, push it, and create a PR to mark the deploy.
 
 Contents of dup-app.html:
 ```html
