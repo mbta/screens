@@ -1,7 +1,7 @@
 defmodule Screens.Config.Screen do
   @moduledoc false
 
-  alias Screens.Config.{Bus, Dup, Gl, Solari}
+  alias Screens.Config.{Bus, BusShelter, Dup, Gl, Solari}
   alias Screens.Util
 
   @type t :: %__MODULE__{
@@ -15,7 +15,7 @@ defmodule Screens.Config.Screen do
           tags: list(String.t())
         }
 
-  @recognized_app_ids ~w[bus_eink gl_eink_single gl_eink_double solari dup]a
+  @recognized_app_ids ~w[bus_eink bus_shelter gl_eink_single gl_eink_double solari dup]a
   @recognized_app_id_strings Enum.map(@recognized_app_ids, &Atom.to_string/1)
 
   @app_config_modules_by_app_id %{
@@ -23,7 +23,8 @@ defmodule Screens.Config.Screen do
     dup: Dup,
     gl_eink_single: Gl,
     gl_eink_double: Gl,
-    solari: Solari
+    solari: Solari,
+    bus_shelter: BusShelter
   }
 
   @enforce_keys [:vendor, :device_id, :name, :app_id, :app_params]

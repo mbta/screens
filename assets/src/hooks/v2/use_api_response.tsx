@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 
 const useApiResponse = ({ id, refreshMs }) => {
   const [apiResponse, setApiResponse] = useState(null);
-  const apiPath = `/v2/api/screen/${id}`;
+  const lastRefresh = document.getElementById("app").dataset.lastRefresh;
+  const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}`;
 
   const fetchData = async () => {
     const result = await fetch(apiPath);
