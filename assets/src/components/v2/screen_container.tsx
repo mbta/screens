@@ -1,6 +1,6 @@
 import React from "react";
-import Widget from "Components/v2/widget";
 import useApiResponse from "Hooks/v2/use_api_response";
+import Widget from "Components/v2/widget";
 
 const ScreenLayout = ({ apiResponse }) => {
   return (
