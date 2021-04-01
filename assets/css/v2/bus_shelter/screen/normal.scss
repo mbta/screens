@@ -1,0 +1,38 @@
+.screen-normal {
+  width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
+.screen-normal__header {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 1080px;
+  height: 280px;
+}
+
+.screen-normal__main-content {
+  position: absolute;
+  top: 280px;
+  left: 0px;
+  width: 1080px;
+  height: 824px;
+}
+
+.screen-normal__flex-zone {
+  position: absolute;
+  top: 1104px;
+  left: 0px;
+  width: 1080px;
+  height: 644px;
+}
+
+.screen-normal__footer {
+  position: absolute;
+  top: 1748px;
+  left: 0px;
+  width: 1080px;
+  height: 172px;
+}

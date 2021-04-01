@@ -9,11 +9,11 @@ interface Props {
   footer: WidgetData;
 }
 
-const Normal: React.ComponentType<Props> = ({
+const NormalScreen: React.ComponentType<Props> = ({
   header,
+  footer,
   main_content: mainContent,
   flex_zone: flexZone,
-  footer,
 }) => {
   return (
     <div className="screen-normal">
@@ -33,4 +33,4 @@ const Normal: React.ComponentType<Props> = ({
   );
 };
 
-export default Normal;
+export default NormalScreen;

@@ -18,13 +18,11 @@ const OneMediumTwoSmall: React.ComponentType<Props> = ({
       <div className="flex-one-medium-two-small__left">
         <Widget data={mediumLeft} />
       </div>
-      <div className="flex-one-medium-two-small__right">
-        <div className="flex-one-medium-two-small__upper-right">
-          <Widget data={smallUpperRight} />
-        </div>
-        <div className="flex-one-medium-two-small__lower-right">
-          <Widget data={smallLowerRight} />
-        </div>
+      <div className="flex-one-medium-two-small__upper-right">
+        <Widget data={smallUpperRight} />
+      </div>
+      <div className="flex-one-medium-two-small__lower-right">
+        <Widget data={smallLowerRight} />
       </div>
     </div>
   );
