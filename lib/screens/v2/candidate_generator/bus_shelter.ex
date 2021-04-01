@@ -38,13 +38,13 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
           }},
          :footer
        ],
-       takeover: [:fullscreen]
+       takeover: [:full_screen]
      }}
   end
 
   @impl CandidateGenerator
   def candidate_instances(
-        :ok = config,
+        config,
         prediction_fetcher \\ &Prediction.fetch/1,
         alert_fetcher \\ &Alert.fetch/1
       ) do
@@ -89,7 +89,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
     Enum.map(alerts, &%AlertWidget{screen: config, alert: &1})
   end
 
-  defp fetch_psas(:ok) do
+  defp fetch_psas(_config) do
     [
       %{
         image_url:

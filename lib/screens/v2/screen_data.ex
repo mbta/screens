@@ -3,15 +3,25 @@ defmodule Screens.V2.ScreenData do
 
   require Logger
 
+  alias Screens.V2.CandidateGenerator
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
 
   @type screen_id :: String.t()
-  @type config :: :ok
+  @type config :: Screens.Config.Screen.t()
   @type candidate_generator :: module()
   @type candidate_instances :: list(WidgetInstance.t())
   @type selected_instances_map :: %{atom() => WidgetInstance.t()}
   @type serializable_map :: %{type: atom()}
+
+  @app_id_to_candidate_generator %{
+    bus_eink: CandidateGenerator.BusEink,
+    gl_eink_double: CandidateGenerator.GlEinkDouble,
+    gl_eink_single: CandidateGenerator.GlEinkSingle,
+    solari: CandidateGenerator.Solari,
+    dup: CandidateGenerator.Dup,
+    bus_shelter: CandidateGenerator.BusShelter
+  }
 
   @spec by_screen_id(screen_id()) :: serializable_map()
   def by_screen_id(screen_id) do
@@ -26,13 +36,13 @@ defmodule Screens.V2.ScreenData do
   end
 
   @spec get_config(screen_id()) :: config()
-  def get_config(_screen_id) do
-    :ok
+  def get_config(screen_id) do
+    Screens.Config.State.screen(screen_id)
   end
 
   @spec get_candidate_generator(config()) :: candidate_generator()
-  def get_candidate_generator(:ok) do
-    Screens.V2.CandidateGenerator.BusShelter
+  def get_candidate_generator(%Screens.Config.Screen{app_id: app_id}) do
+    Map.get(@app_id_to_candidate_generator, app_id)
   end
 
   @spec pick_instances(Template.template(), candidate_instances()) ::
