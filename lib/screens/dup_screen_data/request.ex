@@ -35,8 +35,8 @@ defmodule Screens.DupScreenData.Request do
     "Ruggles (Limited Stops)" => "Ruggles",
     "Wickford Junction" => "Wickford Jct",
     "Needham Heights" => "Needham Hts",
-    "Houghs Neck Via McGrath & Germantown" => "Houghs Neck Via McGth & Gtwn",
-    "Houghs Neck Via Germantown" => "Houghs Neck Via Germntwn"
+    "Houghs Neck via McGrath & Germantown" => "Houghs Neck via McGth & Gtwn",
+    "Houghs Neck via Germantown" => "Houghs Neck via Germntwn"
   }
 
   def fetch_alerts(stop_ids, route_ids) do
