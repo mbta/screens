@@ -1,8 +1,9 @@
 defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
+  alias Screens.Config.{Dup, Screen}
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.WidgetInstance.Placeholder
+  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
 
@@ -16,10 +17,15 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(_config) do
-    [
-      %Placeholder{color: :grey, slot_names: [:header]},
-      %Placeholder{color: :red, slot_names: [:main_content]}
-    ]
+  def candidate_instances(config) do
+    header_instances(config) ++
+      [
+        %Placeholder{color: :red, slot_names: [:main_content]}
+      ]
+  end
+
+  defp header_instances(config) do
+    %Screen{app_params: %Dup{primary: %Dup.Departures{header: header_text}}} = config
+    [%NormalHeader{screen: config, icon: :logo, text: header_text, time: DateTime.utc_now()}]
   end
 end
