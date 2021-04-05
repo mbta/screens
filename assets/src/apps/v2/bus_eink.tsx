@@ -9,7 +9,7 @@ import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
 
 import NormalScreen from "Components/v2/bus_eink/normal_screen";
-import TakeoverScreen from "Components/v2/bus_eink/takeover_screen";
+import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
 
 const TYPE_TO_COMPONENT = {

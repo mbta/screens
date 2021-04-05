@@ -9,7 +9,7 @@ import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
 
 import NormalScreen from "Components/v2/bus_shelter/normal_screen";
-import TakeoverScreen from "Components/v2/bus_shelter/takeover_screen";
+import TakeoverScreen from "Components/v2/takeover_screen";
 
 import OneLarge from "Components/v2/bus_shelter/flex/one_large";
 import OneMediumTwoSmall from "Components/v2/bus_shelter/flex/one_medium_two_small";
