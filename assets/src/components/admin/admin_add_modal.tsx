@@ -17,12 +17,20 @@ const fields = [
       "gl_eink_double",
       "solari",
       "dup",
+      "bus_shelter",
     ]),
   },
   {
     key: "vendor",
     label: "Vendor",
-    FormCell: buildFormSelect(["gds", "mercury", "solari", "c3ms", "outfront"]),
+    FormCell: buildFormSelect([
+      "gds",
+      "mercury",
+      "solari",
+      "c3ms",
+      "outfront",
+      "lg-mri",
+    ]),
   },
   { key: "device_id", label: "Device ID", FormCell: FormTextCell },
 ];
@@ -42,6 +50,8 @@ const defaultAppParamsByAppId = {
     direction_id: -1,
   },
   solari: { station_name: "STATION_NAME" },
+  dup: { header: "STATION_NAME" },
+  bus_shelter: { stop_id: "STOP_ID" },
 };
 
 const initialFormValues = _.fromPairs(

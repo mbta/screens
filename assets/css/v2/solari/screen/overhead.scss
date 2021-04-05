@@ -1,0 +1,22 @@
+.screen-overhead {
+  width: 1080px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
+.screen-overhead__header {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 1080px;
+  height: 304px;
+}
+
+.screen-overhead__main-content {
+  position: absolute;
+  top: 304px;
+  left: 0px;
+  width: 1080px;
+  height: 1616px;
+}
