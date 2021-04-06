@@ -14,8 +14,8 @@
   for ROTATION_INDEX in {0..2}; do
     echo "export const ROTATION_INDEX = ${ROTATION_INDEX};" > ../../assets/src/components/dup/rotation_index.tsx
     npm --prefix ../../assets run deploy
-    cp -r css/dup.css js/polyfills.js js/dup.js ../dup_font_face.css ../fonts .
-    zip -r dup-app-${ROTATION_INDEX}.zip dup.css polyfills.js dup.js dup_font_face.css fonts images dup-app.html
+    cp -r css/dup.css js/polyfills.js js/dup.js ../dup_font_face.css ../fonts ../template.json ../preview.png .
+    zip -r dup-app-${ROTATION_INDEX}.zip dup.css polyfills.js dup.js dup_font_face.css fonts images dup-app.html template.json preview.png
   done
   ```
 - Commit the version bump on a branch, push it, and create a PR to mark the deploy.
