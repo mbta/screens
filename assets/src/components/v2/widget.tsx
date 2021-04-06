@@ -9,6 +9,10 @@ interface Props {
 const MappingContext = React.createContext({});
 
 const Widget: React.ComponentType<Props> = ({ data }) => {
+  if (data === null) {
+    return null;
+  }
+
   const { type, ...props } = data;
   const typeToComponent = useContext(MappingContext);
   const Component = typeToComponent[type];
