@@ -19,15 +19,15 @@ defmodule Screens.V2.CandidateGenerator.Solari do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(config) do
-    header_instances(config) ++
+  def candidate_instances(config, now \\ DateTime.utc_now()) do
+    header_instances(config, now) ++
       [
         %Placeholder{color: :blue, slot_names: [:main_content_normal]}
       ]
   end
 
-  defp header_instances(config) do
+  defp header_instances(config, now) do
     %Screen{app_params: %Solari{station_name: header_text}} = config
-    [%NormalHeader{screen: config, text: header_text, time: DateTime.utc_now()}]
+    [%NormalHeader{screen: config, text: header_text, time: now}]
   end
 end
