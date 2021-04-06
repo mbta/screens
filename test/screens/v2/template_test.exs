@@ -4,12 +4,6 @@ defmodule Screens.V2.TemplateTest do
   alias Screens.V2.Template
 
   describe "with_paging/2" do
-    """
-    You left off on writing tests!
-    But also!!! the type defs aren't quite correct!!!!!
-    Paging introduces lists of index+template tuples!!!!!!!
-    """
-
     test "handles atom correctly" do
       template = :header
 
