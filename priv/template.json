@@ -1,0 +1,10 @@
+{
+  "templates": [
+    {
+      "displayName": "MBTA - DUP APP 0",
+      "preview": "preview.png",
+      "indexTemplate": "dup-app.html",
+      "previewOrientation": "landscape"
+    }
+  ]
+}
