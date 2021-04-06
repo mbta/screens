@@ -5,13 +5,13 @@ defmodule Screens.Config.Screen do
   alias Screens.Util
 
   @type t :: %__MODULE__{
-          vendor: :gds | :mercury | :solari | :c3ms | :outfront,
+          vendor: :gds | :mercury | :solari | :c3ms | :outfront | :lg_mri,
           device_id: String.t(),
           name: String.t(),
-          app_id: :bus_eink | :gl_eink_single | :gl_eink_double | :solari | :dup,
+          app_id: :bus_eink | :bus_shelter | :gl_eink_single | :gl_eink_double | :solari | :dup,
           refresh_if_loaded_before: DateTime.t() | nil,
           disabled: boolean(),
-          app_params: Bus.t() | Dup.t() | Gl.t() | Solari.t(),
+          app_params: Bus.t() | BusShelter.t() | Dup.t() | Gl.t() | Solari.t(),
           tags: list(String.t())
         }
 
