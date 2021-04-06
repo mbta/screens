@@ -1,20 +1,20 @@
 defmodule Screens.V2.Template do
   @moduledoc false
 
+  @type paging_index :: non_neg_integer()
+
   @typedoc """
   Regions of screen content can be paged across data loads.
   Paging cannot be nested: one paged region cannot contain another.
   Use `with_paging/2` to create a paged region within a template.
   """
-  @type paging_index :: non_neg_integer()
+  @type paged(element) :: {paging_index(), element}
 
-  @type non_paged_slot_id :: atom()
-  @type paged_slot_id :: {paging_index(), slot_id()}
   @typedoc """
   A slot_id represents a defined region on the screen.
-  e.g. :header, :main_content, :flex_zone, {0, :flex_zone}
+  e.g. :header, :main_content, :flex_zone
   """
-  @type slot_id :: non_paged_slot_id() | paged_slot_id()
+  @type slot_id :: atom()
 
   @typedoc """
   A layout_type represents a way of filling a defined region on the screen.
@@ -25,11 +25,11 @@ defmodule Screens.V2.Template do
   @type layout_type :: atom()
 
   @type non_paged_template ::
-          non_paged_slot_id()
-          | {non_paged_slot_id(), %{layout_type() => list(non_paged_template())}}
+          slot_id()
+          | {slot_id(), %{layout_type() => list(non_paged_template())}}
   @type paged_template ::
-          paged_slot_id()
-          | {paged_slot_id(), %{layout_type() => list(paged_template())}}
+          paged(slot_id())
+          | {paged(slot_id()), %{layout_type() => list(paged_template())}}
   @typedoc """
   A template represents all possible ways to fill a region on the screen.
   e.g. a Bus Shelter Screen Flex Zone could have the template:
@@ -50,7 +50,7 @@ defmodule Screens.V2.Template do
   """
   @type layout :: slot_id() | {slot_id(), {layout_type(), list(layout())}}
 
-  @spec with_paging(non_paged_template(), pos_integer()) :: list(template())
+  @spec with_paging(non_paged_template(), pos_integer()) :: nonempty_list(paged_template())
   def with_paging(template, num_pages) when is_atom(template) or is_atom(elem(template, 0)) do
     Enum.map(0..(num_pages - 1), &paged_template(template, &1))
   end
