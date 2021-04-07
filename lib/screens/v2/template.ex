@@ -40,7 +40,10 @@ defmodule Screens.V2.Template do
      one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right]
    }}
   """
-  @type template :: non_paged_template() | nonempty_list(paged_template())
+  @type template ::
+          slot_id()
+          | {slot_id(), %{layout_type() => list(template())}}
+          | nonempty_list(paged_template())
 
   @typedoc """
   A layout represents one possible way to resolve a template.
