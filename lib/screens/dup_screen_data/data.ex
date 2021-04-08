@@ -32,6 +32,22 @@ defmodule Screens.DupScreenData.Data do
     }
   end
 
+  def alert_routes_at_station(alert, [parent_stop_id]) do
+    filter_fn = fn
+      %{stop: stop_id} -> stop_id == parent_stop_id
+      _ -> false
+    end
+
+    route_fn = fn
+      %{route: route_id} -> [route_id]
+      _ -> []
+    end
+
+    alert.informed_entities
+    |> Enum.filter(filter_fn)
+    |> Enum.flat_map(route_fn)
+  end
+
   def station_line_count(%Dup.Departures{sections: [section | _]}) do
     stop_id = hd(section.stop_ids)
     if stop_id in Application.get_env(:screens, :two_line_stops), do: 2, else: 1
