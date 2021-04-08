@@ -118,38 +118,85 @@ defmodule Screens.DupScreenData.SpecialCases do
          %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
          %{effect: :shuttle, region: :boundary, routes: ["Green-C"], headsign: "Cleveland Circle"}
        ]) do
+    kenmore_bc_partial_alert_text()
+  end
+
+  defp kenmore_partial_alert_text([
+         %{effect: :shuttle, region: :boundary, headsign: "BC/Clev. Circ."}
+       ]) do
+    kenmore_bc_partial_alert_text()
+  end
+
+  defp kenmore_partial_alert_text([
+         %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
+         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
+       ]) do
+    kenmore_bd_partial_alert_text()
+  end
+
+  defp kenmore_partial_alert_text([
+         %{effect: :shuttle, region: :boundary, headsign: "BC/Riverside"}
+       ]) do
+    kenmore_bd_partial_alert_text()
+  end
+
+  defp kenmore_partial_alert_text([
+         %{
+           effect: :shuttle,
+           region: :boundary,
+           routes: ["Green-C"],
+           headsign: "Cleveland Circle"
+         },
+         %{
+           effect: :shuttle,
+           region: :boundary,
+           routes: ["Green-D"],
+           headsign: "Riverside"
+         }
+       ]) do
+    kenmore_cd_partial_alert_text()
+  end
+
+  defp kenmore_partial_alert_text([
+         %{effect: :shuttle, region: :boundary, headsign: "Clev. Circ./Riverside"}
+       ]) do
+    kenmore_cd_partial_alert_text()
+  end
+
+  defp kenmore_partial_alert_text([
+         %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
+         %{
+           effect: :shuttle,
+           region: :boundary,
+           routes: ["Green-C"],
+           headsign: "Cleveland Circle"
+         },
+         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
+       ]) do
+    kenmore_bcd_partial_alert_text()
+  end
+
+  defp kenmore_partial_alert_text([
+         %{effect: :shuttle, region: :boundary, headsign: {:adj, "westbound"}}
+       ]) do
+    kenmore_bcd_partial_alert_text()
+  end
+
+  defp kenmore_partial_alert_text(_), do: nil
+
+  defp kenmore_bc_partial_alert_text do
     {:ok, ["No", %{format: :bold, text: "Bost Coll/Clvlnd Cir"}]}
   end
 
-  defp kenmore_partial_alert_text([
-         %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
-         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
-       ]) do
+  defp kenmore_bd_partial_alert_text do
     {:ok, ["No", %{format: :bold, text: "Bost Coll / Riverside"}]}
   end
 
-  defp kenmore_partial_alert_text([
-         %{
-           effect: :shuttle,
-           region: :boundary,
-           routes: ["Green-C"],
-           headsign: "Cleveland Circle"
-         },
-         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
-       ]) do
+  defp kenmore_cd_partial_alert_text do
     {:ok, ["No", %{format: :bold, text: "Clvlnd Cir/Riverside"}]}
   end
 
-  defp kenmore_partial_alert_text([
-         %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
-         %{
-           effect: :shuttle,
-           region: :boundary,
-           routes: ["Green-C"],
-           headsign: "Cleveland Circle"
-         },
-         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
-       ]) do
+  defp kenmore_bcd_partial_alert_text do
     partial_alert_text = ["No", %{format: :bold, text: "Westbound"}, "trains"]
 
     kenmore_headway_id = "green_trunk"
@@ -176,12 +223,72 @@ defmodule Screens.DupScreenData.SpecialCases do
     end
   end
 
-  defp kenmore_partial_alert_text(_), do: nil
-
   defp kenmore_fullscreen_alert_text([
          %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
          %{effect: :shuttle, region: :boundary, routes: ["Green-C"], headsign: "Cleveland Circle"}
        ]) do
+    kenmore_bc_fullscreen_alert_text()
+  end
+
+  defp kenmore_fullscreen_alert_text([
+         %{effect: :shuttle, region: :boundary, headsign: "BC/Clev. Circ."}
+       ]) do
+    kenmore_bc_fullscreen_alert_text()
+  end
+
+  defp kenmore_fullscreen_alert_text([
+         %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
+         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
+       ]) do
+    kenmore_bd_fullscreen_alert_text()
+  end
+
+  defp kenmore_fullscreen_alert_text([
+         %{effect: :shuttle, region: :boundary, headsign: "BC/Riverside"}
+       ]) do
+    kenmore_bd_fullscreen_alert_text()
+  end
+
+  defp kenmore_fullscreen_alert_text([
+         %{
+           effect: :shuttle,
+           region: :boundary,
+           routes: ["Green-C"],
+           headsign: "Cleveland Circle"
+         },
+         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
+       ]) do
+    kenmore_cd_fullscreen_alert_text()
+  end
+
+  defp kenmore_fullscreen_alert_text([
+         %{effect: :shuttle, region: :boundary, headsign: "Clev. Circ./Riverside"}
+       ]) do
+    kenmore_cd_fullscreen_alert_text()
+  end
+
+  defp kenmore_fullscreen_alert_text([
+         %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
+         %{
+           effect: :shuttle,
+           region: :boundary,
+           routes: ["Green-C"],
+           headsign: "Cleveland Circle"
+         },
+         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
+       ]) do
+    kenmore_bcd_fullscreen_alert_text()
+  end
+
+  defp kenmore_fullscreen_alert_text([
+         %{effect: :shuttle, region: :boundary, headsign: {:adj, "westbound"}}
+       ]) do
+    kenmore_bcd_fullscreen_alert_text()
+  end
+
+  defp kenmore_fullscreen_alert_text(_), do: nil
+
+  defp kenmore_bc_fullscreen_alert_text do
     [
       "No",
       %{icon: :green_b},
@@ -193,10 +300,7 @@ defmodule Screens.DupScreenData.SpecialCases do
     ]
   end
 
-  defp kenmore_fullscreen_alert_text([
-         %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
-         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
-       ]) do
+  defp kenmore_bd_fullscreen_alert_text do
     [
       "No",
       %{icon: :green_b},
@@ -208,15 +312,7 @@ defmodule Screens.DupScreenData.SpecialCases do
     ]
   end
 
-  defp kenmore_fullscreen_alert_text([
-         %{
-           effect: :shuttle,
-           region: :boundary,
-           routes: ["Green-C"],
-           headsign: "Cleveland Circle"
-         },
-         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
-       ]) do
+  defp kenmore_cd_fullscreen_alert_text do
     [
       "No",
       %{icon: :green_c},
@@ -228,16 +324,7 @@ defmodule Screens.DupScreenData.SpecialCases do
     ]
   end
 
-  defp kenmore_fullscreen_alert_text([
-         %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
-         %{
-           effect: :shuttle,
-           region: :boundary,
-           routes: ["Green-C"],
-           headsign: "Cleveland Circle"
-         },
-         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
-       ]) do
+  defp kenmore_bcd_fullscreen_alert_text do
     [
       "No",
       %{icon: :green_b},
@@ -247,6 +334,4 @@ defmodule Screens.DupScreenData.SpecialCases do
       "trains"
     ]
   end
-
-  defp kenmore_fullscreen_alert_text(_), do: nil
 end
