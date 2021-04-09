@@ -305,7 +305,6 @@ defmodule Screens.DupScreenData.SpecialCases do
       %{icon: :green_b},
       %{format: :bold, text: "Boston College"},
       "or",
-      %{special: :break},
       %{icon: :green_d},
       %{format: :bold, text: "Riverside"},
       "trains"
