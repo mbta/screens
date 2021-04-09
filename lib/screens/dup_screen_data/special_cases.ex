@@ -28,11 +28,9 @@ defmodule Screens.DupScreenData.SpecialCases do
     interpreted_alerts =
       alerts
       |> Enum.map(fn alert ->
-        Map.put(
-          Data.interpret_alert(alert, stop_ids, pill),
-          :routes,
-          Data.alert_routes_at_station(alert, stop_ids)
-        )
+        alert
+        |> Data.interpret_alert(stop_ids, pill)
+        |> Map.put(:routes, Data.alert_routes_at_station(alert, stop_ids))
       end)
       |> Enum.sort_by(& &1.routes)
 
@@ -294,6 +292,7 @@ defmodule Screens.DupScreenData.SpecialCases do
       %{icon: :green_b},
       %{format: :bold, text: "Boston Coll"},
       "or",
+      %{special: :break},
       %{icon: :green_c},
       %{format: :bold, text: "Cleveland Cir"},
       "trains"
@@ -306,6 +305,7 @@ defmodule Screens.DupScreenData.SpecialCases do
       %{icon: :green_b},
       %{format: :bold, text: "Boston College"},
       "or",
+      %{special: :break},
       %{icon: :green_d},
       %{format: :bold, text: "Riverside"},
       "trains"
@@ -318,6 +318,7 @@ defmodule Screens.DupScreenData.SpecialCases do
       %{icon: :green_c},
       %{format: :bold, text: "Cleveland Cir"},
       "or",
+      %{special: :break},
       %{icon: :green_d},
       %{format: :bold, text: "Riverside"},
       "trains"
