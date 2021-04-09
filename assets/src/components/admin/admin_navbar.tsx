@@ -19,6 +19,9 @@ const AdminNavbar = (): JSX.Element => {
       <Link to="/solari-screens">
         <button>Solari Screens Table</button>
       </Link>
+      <Link to="/solari-large-screens">
+        <button>Solari Large Screens Table</button>
+      </Link>
       <Link to="/dup-screens">
         <button>DUP Screens Table</button>
       </Link>

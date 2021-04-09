@@ -8,14 +8,21 @@ defmodule Screens.Config.Screen do
           vendor: :gds | :mercury | :solari | :c3ms | :outfront | :lg_mri,
           device_id: String.t(),
           name: String.t(),
-          app_id: :bus_eink | :bus_shelter | :gl_eink_single | :gl_eink_double | :solari | :dup,
+          app_id:
+            :bus_eink
+            | :bus_shelter
+            | :gl_eink_single
+            | :gl_eink_double
+            | :solari
+            | :solari_large
+            | :dup,
           refresh_if_loaded_before: DateTime.t() | nil,
           disabled: boolean(),
           app_params: Bus.t() | BusShelter.t() | Dup.t() | Gl.t() | Solari.t(),
           tags: list(String.t())
         }
 
-  @recognized_app_ids ~w[bus_eink bus_shelter gl_eink_single gl_eink_double solari dup]a
+  @recognized_app_ids ~w[bus_eink bus_shelter gl_eink_single gl_eink_double solari solari_large dup]a
   @recognized_app_id_strings Enum.map(@recognized_app_ids, &Atom.to_string/1)
 
   @app_config_modules_by_app_id %{
@@ -24,6 +31,7 @@ defmodule Screens.Config.Screen do
     gl_eink_single: Gl,
     gl_eink_double: Gl,
     solari: Solari,
+    solari_large: Solari,
     bus_shelter: BusShelter
   }
 

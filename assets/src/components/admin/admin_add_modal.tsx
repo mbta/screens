@@ -16,6 +16,7 @@ const fields = [
       "gl_eink_single",
       "gl_eink_double",
       "solari",
+      "solari_large",
       "dup",
       "bus_shelter",
     ]),
