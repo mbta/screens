@@ -2,8 +2,14 @@ defmodule Screens.DupScreenData do
   @moduledoc false
 
   alias Screens.Config.{Dup, State}
-  alias Screens.Config.Dup.Override.{FullscreenAlert, FullscreenImage, PartialAlertList}
-  alias Screens.DupScreenData.{Data, Request, Response}
+
+  alias Screens.Config.Dup.Override.{
+    FullscreenAlert,
+    FullscreenImage,
+    PartialAlertList
+  }
+
+  alias Screens.DupScreenData.{Data, Request, Response, SpecialCases}
 
   def by_screen_id(screen_id, rotation_index)
 
@@ -51,6 +57,16 @@ defmodule Screens.DupScreenData do
   end
 
   defp primary_screen_response(primary_departures, rotation_index) do
+    case SpecialCases.handle_special_cases(primary_departures, rotation_index) do
+      {:ok, response} ->
+        response
+
+      nil ->
+        default_primary_screen_response(primary_departures, rotation_index)
+    end
+  end
+
+  defp default_primary_screen_response(primary_departures, rotation_index) do
     alerts_by_section = fetch_and_interpret_alerts(primary_departures)
     alerts = flatten_alerts(alerts_by_section)
 
@@ -181,12 +197,12 @@ defmodule Screens.DupScreenData do
     end
   end
 
-  defp fetch_partial_alert_response(
-         primary_departures,
-         alerts_or_override,
-         current_time,
-         opts \\ []
-       ) do
+  def fetch_partial_alert_response(
+        primary_departures,
+        alerts_or_override,
+        current_time,
+        opts \\ []
+      ) do
     override? = Keyword.get(opts, :override, false)
     alerts_by_section = if(override?, do: %{}, else: alerts_or_override)
     alerts = if(override?, do: alerts_or_override, else: flatten_alerts(alerts_by_section))
