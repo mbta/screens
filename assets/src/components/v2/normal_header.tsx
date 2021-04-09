@@ -7,6 +7,7 @@ const ICON_TO_SRC = {
   green_c: "GL-C.svg",
   green_d: "GL-D.svg",
   green_e: "GL-E.svg",
+  logo: "logo-white.svg",
 };
 
 const NormalHeaderIcon = ({ icon }) => {
@@ -60,16 +61,14 @@ const NormalHeaderUpdated = () => {
   );
 };
 
-const NormalHeader = ({ icon, text, time, showUpdated }) => {
+const NormalHeader = ({ icon, text, time, showUpdated, maxHeight }) => {
   const SIZES = ["small", "large"];
-  const MAX_HEIGHT = 208;
-
   const ref = useRef(null);
   const [stopSize, setStopSize] = useState(1);
 
   useLayoutEffect(() => {
     const height = ref.current.clientHeight;
-    if (height > MAX_HEIGHT) {
+    if (height > maxHeight) {
       setStopSize(stopSize - 1);
     }
   });

@@ -9,6 +9,7 @@ const NormalHeader = ({ icon, text, time }) => {
       text={text}
       time={time}
       showUpdated={true}
+      maxHeight={208}
     />
   );
 };
