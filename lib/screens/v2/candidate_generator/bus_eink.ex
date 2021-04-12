@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
 
   alias Screens.Config.{Bus, Screen}
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
 
@@ -33,8 +33,8 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
         fetch_stop_name_fn \\ &fetch_stop_name/1
       ) do
     header_instances(config, now, fetch_stop_name_fn) ++
+      footer_instances(config) ++
       [
-        %Placeholder{color: :blue, slot_names: [:footer]},
         %Placeholder{color: :green, slot_names: [:main_content]},
         %Placeholder{color: :red, slot_names: [:medium_flex]}
       ]
@@ -47,6 +47,17 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
       nil -> []
       stop_name -> [%NormalHeader{screen: config, text: stop_name, time: now}]
     end
+  end
+
+  defp footer_instances(%Screen{app_params: %Bus{stop_id: stop_id}} = config) do
+    [
+      %FareInfoFooter{
+        screen: config,
+        mode: :bus,
+        text: "For real-time predictions and fare purchase locations:",
+        url: "mbta.com/stops/#{stop_id}"
+      }
+    ]
   end
 
   defp fetch_stop_name(stop_id) do
