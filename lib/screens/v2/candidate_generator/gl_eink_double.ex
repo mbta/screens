@@ -26,12 +26,16 @@ defmodule Screens.V2.CandidateGenerator.GlEinkDouble do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(_config) do
-    [
-      %Placeholder{color: :red, slot_names: [:header]},
-      %Placeholder{color: :red, slot_names: [:footer]},
-      %Placeholder{color: :blue, slot_names: [:main_content]},
-      %Placeholder{color: :green, slot_names: [:medium_flex]}
-    ]
+  def candidate_instances(
+        config,
+        now \\ DateTime.utc_now(),
+        fetch_destination_fn \\ &CandidateGenerator.Helpers.fetch_destination/2
+      ) do
+    CandidateGenerator.Helpers.gl_header_instances(config, now, fetch_destination_fn) ++
+      [
+        %Placeholder{color: :red, slot_names: [:footer]},
+        %Placeholder{color: :blue, slot_names: [:main_content]},
+        %Placeholder{color: :green, slot_names: [:medium_flex]}
+      ]
   end
 end

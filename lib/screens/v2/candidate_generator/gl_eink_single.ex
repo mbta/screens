@@ -20,11 +20,15 @@ defmodule Screens.V2.CandidateGenerator.GlEinkSingle do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(_config) do
-    [
-      %Placeholder{color: :blue, slot_names: [:header]},
-      %Placeholder{color: :blue, slot_names: [:footer]},
-      %Placeholder{color: :green, slot_names: [:main_content]}
-    ]
+  def candidate_instances(
+        config,
+        now \\ DateTime.utc_now(),
+        fetch_destination_fn \\ &CandidateGenerator.Helpers.fetch_destination/2
+      ) do
+    CandidateGenerator.Helpers.gl_header_instances(config, now, fetch_destination_fn) ++
+      [
+        %Placeholder{color: :blue, slot_names: [:footer]},
+        %Placeholder{color: :green, slot_names: [:main_content]}
+      ]
   end
 end
