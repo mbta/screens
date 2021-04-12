@@ -2,7 +2,9 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.WidgetInstance.Placeholder
+  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
+
+  alias Screens.Config.{Screen, Solari}
 
   @behaviour CandidateGenerator
 
@@ -16,10 +18,15 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(_config) do
-    [
-      %Placeholder{color: :green, slot_names: [:header]},
-      %Placeholder{color: :blue, slot_names: [:main_content]}
-    ]
+  def candidate_instances(config, now \\ DateTime.utc_now()) do
+    header_instances(config, now) ++
+      [
+        %Placeholder{color: :blue, slot_names: [:main_content]}
+      ]
+  end
+
+  defp header_instances(config, now) do
+    %Screen{app_params: %Solari{station_name: header_text}} = config
+    [%NormalHeader{screen: config, text: header_text, time: now}]
   end
 end
