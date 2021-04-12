@@ -19,6 +19,7 @@ defmodule Screens.V2.ScreenData do
     gl_eink_double: CandidateGenerator.GlEinkDouble,
     gl_eink_single: CandidateGenerator.GlEinkSingle,
     solari: CandidateGenerator.Solari,
+    solari_large: CandidateGenerator.SolariLarge,
     dup: CandidateGenerator.Dup,
     bus_shelter: CandidateGenerator.BusShelter
   }

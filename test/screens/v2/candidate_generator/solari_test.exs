@@ -21,8 +21,7 @@ defmodule Screens.V2.CandidateGenerator.SolariTest do
     test "returns correct template" do
       assert {:screen,
               %{
-                normal: [:header_normal, :main_content_normal],
-                overhead: [:header_overhead, :main_content_overhead],
+                normal: [:header, :main_content],
                 takeover: [:full_screen]
               }} == Solari.screen_template()
     end
