@@ -42,15 +42,14 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
       fetch_stop_fn = fn "1722" -> "1624 Blue Hill Ave @ Mattapan Sq" end
       now = ~U[2020-04-06T10:00:00Z]
 
-      assert [%NormalHeader{} = header_widget | _] =
-               BusEink.candidate_instances(config, now, fetch_stop_fn)
+      expected_header = %NormalHeader{
+        screen: config,
+        icon: nil,
+        text: "1624 Blue Hill Ave @ Mattapan Sq",
+        time: ~U[2020-04-06T10:00:00Z]
+      }
 
-      assert %NormalHeader{
-               screen: config,
-               icon: nil,
-               text: "1624 Blue Hill Ave @ Mattapan Sq",
-               time: ~U[2020-04-06T10:00:00Z]
-             } == header_widget
+      assert expected_header in BusEink.candidate_instances(config, now, fetch_stop_fn)
     end
   end
 end

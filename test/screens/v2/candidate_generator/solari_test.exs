@@ -31,14 +31,15 @@ defmodule Screens.V2.CandidateGenerator.SolariTest do
   describe "candidate_instances/2" do
     test "returns expected header", %{config: config} do
       now = ~U[2020-04-06T10:00:00Z]
-      assert [%NormalHeader{} = header_widget | _] = Solari.candidate_instances(config, now)
 
-      assert %NormalHeader{
-               screen: config,
-               icon: nil,
-               text: "Ruggles",
-               time: ~U[2020-04-06T10:00:00Z]
-             } == header_widget
+      expected_header = %NormalHeader{
+        screen: config,
+        icon: nil,
+        text: "Ruggles",
+        time: ~U[2020-04-06T10:00:00Z]
+      }
+
+      assert expected_header in Solari.candidate_instances(config, now)
     end
   end
 end

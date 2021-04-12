@@ -11,7 +11,7 @@ defmodule Screens.V2.WidgetInstance.AlertHeader do
             time: nil
 
   @type icon :: :logo | :green_b | :green_c | :green_d | :green_e
-  @type color :: :blue | :green | :orange | :purple | :red | :yellow
+  @type color :: :blue | :green | :orange | :purple | :red | :yellow | :silver
   @type accent :: :x | :hatched | :chevron
 
   @type t :: %__MODULE__{

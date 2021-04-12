@@ -42,15 +42,14 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       fetch_stop_fn = fn "1216" -> "Columbus Ave @ Dimock St" end
       now = ~U[2020-04-06T10:00:00Z]
 
-      assert [%NormalHeader{} = header_widget | _] =
-               BusShelter.candidate_instances(config, now, fetch_stop_fn)
+      expected_header = %NormalHeader{
+        screen: config,
+        icon: nil,
+        text: "Columbus Ave @ Dimock St",
+        time: ~U[2020-04-06T10:00:00Z]
+      }
 
-      assert %NormalHeader{
-               screen: config,
-               icon: nil,
-               text: "Columbus Ave @ Dimock St",
-               time: ~U[2020-04-06T10:00:00Z]
-             } == header_widget
+      assert expected_header in BusShelter.candidate_instances(config, now, fetch_stop_fn)
     end
   end
 end

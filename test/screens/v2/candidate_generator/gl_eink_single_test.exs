@@ -41,15 +41,18 @@ defmodule Screens.V2.CandidateGenerator.GlEinkSingleTest do
       fetch_destination_fn = fn "Green-B", 0 -> "Boston College" end
       now = ~U[2020-04-06T10:00:00Z]
 
-      assert [%NormalHeader{} = header_widget | _] =
-               GlEinkSingle.candidate_instances(config, now, fetch_destination_fn)
+      expected_header = %NormalHeader{
+        screen: config,
+        icon: :green_b,
+        text: "Boston College",
+        time: ~U[2020-04-06T10:00:00Z]
+      }
 
-      assert %NormalHeader{
-               screen: config,
-               icon: :green_b,
-               text: "Boston College",
-               time: ~U[2020-04-06T10:00:00Z]
-             } == header_widget
+      assert expected_header in GlEinkSingle.candidate_instances(
+               config,
+               now,
+               fetch_destination_fn
+             )
     end
   end
 end
