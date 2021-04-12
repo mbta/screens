@@ -11,7 +11,7 @@ import { MappingContext } from "Components/v2/widget";
 import NormalScreen from "Components/v2/dup/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
-import NormalHeader from "Components/v2/lcd/normal_header";
+import NormalHeader from "Components/v2/dup/normal_header";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,

@@ -10,6 +10,7 @@ const NormalHeader = ({ icon, text, time }) => {
       text={text}
       time={time}
       showUpdated={false}
+      versionNumber={DUP_VERSION}
       maxHeight={208}
     />
   );

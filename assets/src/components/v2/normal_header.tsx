@@ -61,7 +61,18 @@ const NormalHeaderUpdated = () => {
   );
 };
 
-const NormalHeader = ({ icon, text, time, showUpdated, maxHeight }) => {
+const NormalHeaderVersion = ({ versionNumber }) => {
+  return <div className="normal-header-version">{versionNumber}</div>;
+};
+
+const NormalHeader = ({
+  icon,
+  text,
+  time,
+  showUpdated,
+  versionNumber,
+  maxHeight,
+}) => {
   const SIZES = ["small", "large"];
   const ref = useRef(null);
   const [stopSize, setStopSize] = useState(1);
@@ -82,6 +93,7 @@ const NormalHeader = ({ icon, text, time, showUpdated, maxHeight }) => {
         ref={ref}
       />
       <NormalHeaderTime time={time} />
+      {versionNumber && <NormalHeaderVersion versionNumber={versionNumber} />}
       {showUpdated && <NormalHeaderUpdated />}
     </div>
   );
