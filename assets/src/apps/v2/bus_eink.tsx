@@ -11,11 +11,13 @@ import { MappingContext } from "Components/v2/widget";
 import NormalScreen from "Components/v2/bus_eink/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
+import FareInfoFooter from "Components/v2/eink/fare_info_footer";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
   full_takeover: TakeoverScreen,
   placeholder: Placeholder,
+  fare_info_footer: FareInfoFooter,
 };
 
 const App = (): JSX.Element => {

@@ -1,7 +1,11 @@
+@import url("https://rsms.me/inter/inter.css");
+
 @import "v2/bus_eink/screen/normal";
 @import "v2/bus_eink/screen/takeover";
 
 @import "v2/placeholder";
+@import "v2/eink/link_footer";
+@import "v2/eink/fare_info_footer";
 
 body {
   margin: 0px;

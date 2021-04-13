@@ -1,0 +1,41 @@
+.link-footer {
+  position: relative;
+  height: 172px;
+  background: #000000;
+}
+
+.link-footer__contents {
+  position: absolute;
+  left: 40px;
+  top: 22px;
+}
+
+.link-footer__logo {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.link-footer__logo-image {
+  height: 128px;
+  width: 128px;
+  margin-right: 40px;
+}
+
+.link-footer__message {
+  display: inline-block;
+  vertical-align: middle;
+  width: 952px;
+
+  font-size: 40px;
+  line-height: 52px;
+  font-family: Inter;
+  color: #ffffff;
+}
+
+.link-footer__message-text {
+  font-weight: 300;
+}
+
+.link-footer__message-url {
+  font-weight: 600;
+}
