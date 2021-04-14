@@ -3,67 +3,6 @@ defmodule Screens.V2.TemplateTest do
 
   alias Screens.V2.Template
 
-  describe "with_paging/2" do
-    test "handles atom correctly" do
-      template = :header
-
-      assert [{0, :header}, {1, :header}] = Template.with_paging(template, 2)
-    end
-
-    test "handles map correctly" do
-      template =
-        {:flex_zone,
-         %{
-           one_large: [:large],
-           two_medium: [
-             :medium_left,
-             {:medium_right,
-              %{
-                child_slot1: [:child_a, :child_b],
-                child_slot2: [:child_c]
-              }}
-           ]
-         }}
-
-      num_pages = 2
-
-      expected = [
-        {{0, :flex_zone},
-         %{
-           one_large: [{0, :large}],
-           two_medium: [
-             {0, :medium_left},
-             {{0, :medium_right},
-              %{
-                child_slot1: [{0, :child_a}, {0, :child_b}],
-                child_slot2: [{0, :child_c}]
-              }}
-           ]
-         }},
-        {{1, :flex_zone},
-         %{
-           one_large: [{1, :large}],
-           two_medium: [
-             {1, :medium_left},
-             {{1, :medium_right},
-              %{
-                child_slot1: [{1, :child_a}, {1, :child_b}],
-                child_slot2: [{1, :child_c}]
-              }}
-           ]
-         }}
-      ]
-
-      assert expected == Template.with_paging(template, num_pages)
-    end
-
-    test "rejects paged templates" do
-      paged_template = [{0, :header}, {1, :header}]
-
-      assert_raise FunctionClauseError, fn -> Template.with_paging(paged_template, 2) end
-    end
-  end
-
   describe "slot_combinations/1" do
     test "handles atom correctly" do
       assert [{slot_id_list, layout}] = Template.slot_combinations(:header)

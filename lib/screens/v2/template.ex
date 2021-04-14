@@ -1,20 +1,31 @@
 defmodule Screens.V2.Template do
   @moduledoc false
 
+  import Screens.V2.Template.Guards
+
+  @typedoc """
+  A paging_index is used in combination with a slot_id to
+  uniquely identify a paged element on the screen.
+  """
   @type paging_index :: non_neg_integer()
 
   @typedoc """
-  Regions of screen content can be paged across data loads.
-  Paging cannot be nested: one paged region cannot contain another.
-  Use `with_paging/2` to create a paged region within a template.
+  A non_paged_slot_id represents a defined, non-paged region on the screen.
+  e.g. :header, :main_content, :flex_zone
   """
-  @type paged(element) :: {paging_index(), element}
+  @type non_paged_slot_id :: atom()
+
+  @typedoc """
+  A paged_slot_id uniquely identifies a paged element on the screen.
+  e.g. {0, :medium_left}, {1, :large}
+  """
+  @type paged_slot_id :: {paging_index(), non_paged_slot_id()}
 
   @typedoc """
   A slot_id represents a defined region on the screen.
-  e.g. :header, :main_content, :flex_zone
+  e.g. :header, {0, :medium_left}
   """
-  @type slot_id :: atom()
+  @type slot_id :: non_paged_slot_id() | paged_slot_id()
 
   @typedoc """
   A layout_type represents a way of filling a defined region on the screen.
@@ -25,11 +36,10 @@ defmodule Screens.V2.Template do
   @type layout_type :: atom()
 
   @type non_paged_template ::
-          slot_id()
-          | {slot_id(), %{layout_type() => list(non_paged_template())}}
+          non_paged_slot_id()
+          | {non_paged_slot_id(), %{layout_type() => list(non_paged_template())}}
   @type paged_template ::
-          paged(slot_id())
-          | {paged(slot_id()), %{layout_type() => list(paged_template())}}
+          paged_slot_id() | {paged_slot_id(), %{layout_type() => list(paged_template())}}
   @typedoc """
   A template represents all possible ways to fill a region on the screen.
   e.g. a Bus Shelter Screen Flex Zone could have the template:
@@ -41,9 +51,9 @@ defmodule Screens.V2.Template do
    }}
   """
   @type template ::
-          slot_id()
-          | {slot_id(), %{layout_type() => list(template())}}
-          | nonempty_list(paged_template())
+          non_paged_slot_id()
+          | paged_template()
+          | {non_paged_slot_id(), %{layout_type() => list(template())}}
 
   @typedoc """
   A layout represents one possible way to resolve a template.
@@ -53,11 +63,6 @@ defmodule Screens.V2.Template do
   """
   @type layout :: slot_id() | {slot_id(), {layout_type(), list(layout())}}
 
-  @spec with_paging(non_paged_template(), pos_integer()) :: nonempty_list(paged_template())
-  def with_paging(template, num_pages) when is_atom(template) or is_atom(elem(template, 0)) do
-    Enum.map(0..(num_pages - 1), &paged_template(template, &1))
-  end
-
   @spec slot_combinations(template()) :: nonempty_list({nonempty_list(slot_id()), layout()})
   def slot_combinations(template) do
     template
@@ -66,37 +71,18 @@ defmodule Screens.V2.Template do
   end
 
   @spec layout_combinations(template()) :: nonempty_list(layout())
-  def layout_combinations(template) when is_atom(template) do
+  def layout_combinations(template)
+      when is_slot_id(template) do
     [template]
   end
 
-  def layout_combinations({slot_id, template}) do
-    Enum.flat_map(template, fn {layout, template_list} ->
+  def layout_combinations({slot_id, layout_map}) do
+    Enum.flat_map(layout_map, fn {layout_type, template_list} ->
       template_list
       |> Enum.map(&layout_combinations/1)
       |> product()
-      |> Enum.map(fn list -> {slot_id, {layout, list}} end)
+      |> Enum.map(fn list -> {slot_id, {layout_type, list}} end)
     end)
-  end
-
-  defp paged_template(template, page_index) when is_atom(template) do
-    paged_id(template, page_index)
-  end
-
-  defp paged_template({slot_id, template}, page_index) when is_atom(slot_id) do
-    {paged_id(slot_id, page_index), paged_layout_map(template, page_index)}
-  end
-
-  defp paged_id(slot_id, page_index) do
-    {page_index, slot_id}
-  end
-
-  defp paged_layout_map(layout_map, page_index) do
-    layout_map
-    |> Enum.map(fn {layout_type, child_templates} ->
-      {layout_type, Enum.map(child_templates, &paged_template(&1, page_index))}
-    end)
-    |> Enum.into(%{})
   end
 
   @spec product(list(list(layout()))) :: list(layout())
@@ -109,7 +95,7 @@ defmodule Screens.V2.Template do
   end
 
   @spec flatten_layout(layout()) :: list(slot_id())
-  defp flatten_layout(layout) when is_atom(layout) do
+  defp flatten_layout(layout) when is_slot_id(layout) do
     [layout]
   end
 
@@ -133,4 +119,11 @@ defmodule Screens.V2.Template do
   @spec slot_id(layout()) :: slot_id()
   defp slot_id(layout) when is_atom(layout), do: layout
   defp slot_id({slot_id, {_layout_type, _layout_list}}), do: slot_id
+
+  def slots_match?(s1, s2) do
+    depage_slot_id(s1) == depage_slot_id(s2)
+  end
+
+  def depage_slot_id({_page_index, slot_id}), do: slot_id
+  def depage_slot_id(slot_id), do: slot_id
 end

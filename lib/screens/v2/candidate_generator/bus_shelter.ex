@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   alias Screens.Alerts.Alert
   alias Screens.Predictions.Prediction
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
   alias Screens.V2.WidgetInstance.{
@@ -30,16 +31,20 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
        normal: [
          :header,
          :main_content,
-         {:flex_zone,
-          %{
-            one_large: [:large],
-            one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right],
-            two_medium: [:medium_left, :medium_right]
-          }},
+         Builder.with_paging(
+           {:flex_zone,
+            %{
+              one_large: [:large],
+              one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right],
+              two_medium: [:medium_left, :medium_right]
+            }},
+           3
+         ),
          :footer
        ],
        takeover: [:full_screen]
      }}
+    |> Builder.build_template()
   end
 
   @impl CandidateGenerator

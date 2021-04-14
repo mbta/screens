@@ -11,7 +11,7 @@ defmodule Screens.V2.ScreenData do
   @type config :: Screens.Config.Screen.t()
   @type candidate_generator :: module()
   @type candidate_instances :: list(WidgetInstance.t())
-  @type selected_instances_map :: %{atom() => WidgetInstance.t()}
+  @type selected_instances_map :: %{Template.slot_id() => WidgetInstance.t()}
   @type serializable_map :: %{type: atom()}
 
   @app_id_to_candidate_generator %{
@@ -23,6 +23,15 @@ defmodule Screens.V2.ScreenData do
     bus_shelter: CandidateGenerator.BusShelter
   }
 
+  @app_id_to_refresh_rate %{
+    bus_eink: 30,
+    gl_eink_double: 30,
+    gl_eink_single: 30,
+    solari: 15,
+    dup: nil,
+    bus_shelter: 15
+  }
+
   @spec by_screen_id(screen_id()) :: serializable_map()
   def by_screen_id(screen_id) do
     config = get_config(screen_id)
@@ -32,7 +41,7 @@ defmodule Screens.V2.ScreenData do
 
     screen_template
     |> pick_instances(candidate_instances)
-    |> serialize()
+    |> serialize(get_refresh_rate(config))
   end
 
   @spec get_config(screen_id()) :: config()
@@ -43,6 +52,11 @@ defmodule Screens.V2.ScreenData do
   @spec get_candidate_generator(config()) :: candidate_generator()
   def get_candidate_generator(%Screens.Config.Screen{app_id: app_id}) do
     Map.get(@app_id_to_candidate_generator, app_id)
+  end
+
+  @spec get_refresh_rate(config()) :: pos_integer() | nil
+  def get_refresh_rate(%Screens.Config.Screen{app_id: app_id}) do
+    Map.get(@app_id_to_refresh_rate, app_id)
   end
 
   @spec pick_instances(Template.template(), candidate_instances()) ::
@@ -93,7 +107,7 @@ defmodule Screens.V2.ScreenData do
         # from the list of unoccupied slot_ids.
         placeable_templates
         |> Enum.map(fn t ->
-          chosen_slot = get_first_slot(t, instance_slots)
+          chosen_slot = get_first_slot(t, instance_slots) |> IO.inspect(label: "👉")
 
           updated_placement =
             placements
@@ -101,7 +115,7 @@ defmodule Screens.V2.ScreenData do
             |> Map.put(chosen_slot, instance)
 
           {slots, layout} = t
-          new_t = {slots -- [chosen_slot], layout}
+          new_t = {(slots -- [chosen_slot]) |> IO.inspect(label: "🌝"), layout}
 
           {new_t, updated_placement}
         end)
@@ -111,21 +125,14 @@ defmodule Screens.V2.ScreenData do
 
   defp get_valid_templates(templates, instance_slots) do
     Enum.filter(templates, &template_is_placeable?(&1, instance_slots))
-  end
-
-  defp get_valid_slots(template, instance_slots) do
-    {template_slots, _} = template
-    list_intersection(template_slots, instance_slots)
-  end
-
-  defp list_intersection(l1, l2) do
-    l1 -- l1 -- l2
+    |> IO.inspect(label: "🍕 valid templates for #{inspect(instance_slots)}")
   end
 
   defp get_first_slot(template, instance_slots) do
     template
     |> get_valid_slots(instance_slots)
     |> hd()
+    |> IO.inspect(label: "❇️ first slot for #{inspect(instance_slots)}")
   end
 
   defp template_is_placeable?(template, instance_slots) do
@@ -133,13 +140,38 @@ defmodule Screens.V2.ScreenData do
     length(matching_slots) > 0
   end
 
-  @spec serialize({Template.layout(), selected_instances_map()}) :: serializable_map()
-  def serialize({layout, instance_map}) do
+  defp get_valid_slots(template, instance_slots) do
+    {template_slots, _} = template
+
+    # N.B. The slots are sorted so that paged regions have their earlier pages filled first.
+    # e.g. [:footer, :header, {0, :flex_zone}, {1, :flex_zone}]
+    # (though usually we wouldn't get a mix of paged an non-paged slots for a given widget instance)
+    sorted_slot_list_intersection(template_slots, instance_slots)
+  end
+
+  @spec sorted_slot_list_intersection(
+          list(Template.slot_id()),
+          list(Template.non_paged_slot_id())
+        ) ::
+          list(Template.slot_id())
+  def sorted_slot_list_intersection(template_slots, instance_slots) do
+    for t_slot <- template_slots,
+        i_slot <- instance_slots,
+        Template.slots_match?(t_slot, i_slot) do
+      t_slot
+    end
+    |> Enum.sort(&<=/2)
+  end
+
+  @spec serialize({Template.layout(), selected_instances_map()}, integer()) :: serializable_map()
+  def serialize({layout, instance_map}, _refresh_rate) do
     serialized_instance_map =
       instance_map
       |> Enum.map(fn {slot_id, instance} -> {slot_id, serialize_instance_with_type(instance)} end)
       |> Enum.into(%{})
 
+    IO.inspect(layout, label: "layout")
+    IO.inspect(serialized_instance_map, label: "serialized_instance_map")
     Template.position_widget_instances(layout, serialized_instance_map)
   end
 

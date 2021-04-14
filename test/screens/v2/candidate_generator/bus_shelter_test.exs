@@ -21,11 +21,35 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
                 normal: [
                   :header,
                   :main_content,
-                  {:flex_zone,
+                  {{0, :flex_zone},
                    %{
-                     one_large: [:large],
-                     one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right],
-                     two_medium: [:medium_left, :medium_right]
+                     one_large: [{0, :large}],
+                     one_medium_two_small: [
+                       {0, :medium_left},
+                       {0, :small_upper_right},
+                       {0, :small_lower_right}
+                     ],
+                     two_medium: [{0, :medium_left}, {0, :medium_right}]
+                   }},
+                  {{1, :flex_zone},
+                   %{
+                     one_large: [{1, :large}],
+                     one_medium_two_small: [
+                       {1, :medium_left},
+                       {1, :small_upper_right},
+                       {1, :small_lower_right}
+                     ],
+                     two_medium: [{1, :medium_left}, {1, :medium_right}]
+                   }},
+                  {{2, :flex_zone},
+                   %{
+                     one_large: [{2, :large}],
+                     one_medium_two_small: [
+                       {2, :medium_left},
+                       {2, :small_upper_right},
+                       {2, :small_lower_right}
+                     ],
+                     two_medium: [{2, :medium_left}, {2, :medium_right}]
                    }},
                   :footer
                 ],
