@@ -1,7 +1,7 @@
 defmodule Screens.V2.ScreenDataTest do
   use ExUnit.Case, async: true
 
-  alias Screens.V2.WidgetInstance.{Departures, NormalHeader, StaticImage, MockWidget}
+  alias Screens.V2.WidgetInstance.MockWidget
 
   describe "pick_instances/2" do
     test "chooses the expected template and instance placement" do
@@ -14,10 +14,22 @@ defmodule Screens.V2.ScreenDataTest do
          }}
 
       candidate_instances = [
-        %StaticImage{size: :small, priority: [4], image_url: "4"},
-        %StaticImage{size: :small, priority: [1], image_url: "1"},
-        %StaticImage{size: :medium, priority: [3], image_url: "3"},
-        %StaticImage{size: :small, priority: [2], image_url: "2"}
+        %MockWidget{
+          slot_names: [:small_upper_right, :small_lower_right],
+          priority: [4],
+          content: "4"
+        },
+        %MockWidget{
+          slot_names: [:small_upper_right, :small_lower_right],
+          priority: [1],
+          content: "1"
+        },
+        %MockWidget{slot_names: [:medium_left, :medium_right], priority: [3], content: "3"},
+        %MockWidget{
+          slot_names: [:small_upper_right, :small_lower_right],
+          priority: [2],
+          content: "2"
+        }
       ]
 
       {actual_layout, actual_instance_placement} =
@@ -28,9 +40,9 @@ defmodule Screens.V2.ScreenDataTest do
                actual_layout
 
       assert %{
-               medium_left: %StaticImage{size: :medium, priority: [3], image_url: "3"},
-               small_lower_right: %StaticImage{size: :small, priority: [2], image_url: "2"},
-               small_upper_right: %StaticImage{size: :small, priority: [1], image_url: "1"}
+               medium_left: %MockWidget{content: "3"},
+               small_lower_right: %MockWidget{content: "2"},
+               small_upper_right: %MockWidget{content: "1"}
              } = actual_instance_placement
     end
 
@@ -65,12 +77,24 @@ defmodule Screens.V2.ScreenDataTest do
          }}
 
       candidate_instances = [
-        %StaticImage{size: :small, priority: [4], image_url: "4"},
-        %StaticImage{size: :small, priority: [1], image_url: "1"},
-        %StaticImage{size: :medium, priority: [3], image_url: "3"},
-        %StaticImage{size: :small, priority: [2], image_url: "2"},
-        %StaticImage{size: :large, priority: [2], image_url: "5"},
-        %NormalHeader{}
+        %MockWidget{
+          slot_names: [:small_upper_right, :small_lower_right],
+          priority: [4],
+          content: "4"
+        },
+        %MockWidget{
+          slot_names: [:small_upper_right, :small_lower_right],
+          priority: [1],
+          content: "1"
+        },
+        %MockWidget{slot_names: [:medium_left, :medium_right], priority: [3], content: "3"},
+        %MockWidget{
+          slot_names: [:small_upper_right, :small_lower_right],
+          priority: [2],
+          content: "2"
+        },
+        %MockWidget{slot_names: [:large], priority: [2], content: "5"},
+        %MockWidget{slot_names: [:header], priority: [2], content: "header"}
       ]
 
       {actual_layout, actual_instance_placement} =
@@ -87,19 +111,11 @@ defmodule Screens.V2.ScreenDataTest do
                ]}} == actual_layout
 
       assert %{
-               :header => %NormalHeader{},
-               {0, :medium_left} => %StaticImage{size: :medium, priority: [3], image_url: "3"},
-               {0, :small_lower_right} => %StaticImage{
-                 size: :small,
-                 priority: [2],
-                 image_url: "2"
-               },
-               {0, :small_upper_right} => %StaticImage{
-                 size: :small,
-                 priority: [1],
-                 image_url: "1"
-               },
-               {1, :large} => %StaticImage{size: :large, priority: [2], image_url: "5"}
+               :header => %MockWidget{content: "header"},
+               {0, :medium_left} => %MockWidget{content: "3"},
+               {0, :small_lower_right} => %MockWidget{content: "2"},
+               {0, :small_upper_right} => %MockWidget{content: "1"},
+               {1, :large} => %MockWidget{content: "5"}
              } = actual_instance_placement
     end
 
@@ -186,18 +202,33 @@ defmodule Screens.V2.ScreenDataTest do
           ]}}
 
       selected_widgets = %{
-        main_content: %Departures{predictions: []},
-        medium_left: %StaticImage{image_url: "face_covering.png", size: :medium},
-        medium_right: %StaticImage{image_url: "autopay.png", size: :medium}
+        main_content: %MockWidget{
+          slot_names: [:main_content],
+          priority: [2],
+          widget_type: :departures,
+          content: []
+        },
+        medium_left: %MockWidget{
+          slot_names: [:medium_left, :medium_right],
+          priority: [2],
+          widget_type: :static_image,
+          content: "face_covering.png"
+        },
+        medium_right: %MockWidget{
+          slot_names: [:medium_left, :medium_right],
+          priority: [2],
+          widget_type: :static_image,
+          content: "autopay.png"
+        }
       }
 
       expected = %{
         type: :normal,
-        main_content: %{type: :departures, departures: []},
+        main_content: %{type: :departures, content: []},
         flex_zone: %{
           type: :two_medium,
-          medium_left: %{type: :static_image, url: "face_covering.png"},
-          medium_right: %{type: :static_image, url: "autopay.png"}
+          medium_left: %{type: :static_image, content: "face_covering.png"},
+          medium_right: %{type: :static_image, content: "autopay.png"}
         }
       }
 
