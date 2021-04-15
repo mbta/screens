@@ -72,19 +72,11 @@ defmodule Screens.V2.ScreenData do
       |> Enum.map(fn t -> {t, %{}} end)
       |> Enum.into(%{})
 
-    placements = Enum.reduce(prioritized_instances, candidate_placements, &place_instance/2)
-
-    # N.B. If there are multiple templates returned, log it, then arbitrarily select the first.
-    valid_templates = Map.keys(placements)
-
-    _ =
-      if length(valid_templates) > 1 do
-        Logger.info("[found multiple valid templates]")
-      end
-
-    selected_template = hd(valid_templates)
-    selected_instances = Map.get(placements, selected_template)
-    {_, selected_layout} = selected_template
+    {{_, selected_layout}, selected_instances} =
+      prioritized_instances
+      |> Enum.reduce(candidate_placements, &place_instance/2)
+      |> log_mismatched_placement_widgets()
+      |> select_best_placement()
 
     {selected_layout, selected_instances}
   end
@@ -107,7 +99,7 @@ defmodule Screens.V2.ScreenData do
         # from the list of unoccupied slot_ids.
         placeable_templates
         |> Enum.map(fn t ->
-          chosen_slot = get_first_slot(t, instance_slots) |> IO.inspect(label: "👉")
+          chosen_slot = get_first_slot(t, instance_slots)
 
           updated_placement =
             placements
@@ -115,7 +107,7 @@ defmodule Screens.V2.ScreenData do
             |> Map.put(chosen_slot, instance)
 
           {slots, layout} = t
-          new_t = {(slots -- [chosen_slot]) |> IO.inspect(label: "🌝"), layout}
+          new_t = {slots -- [chosen_slot], layout}
 
           {new_t, updated_placement}
         end)
@@ -125,14 +117,12 @@ defmodule Screens.V2.ScreenData do
 
   defp get_valid_templates(templates, instance_slots) do
     Enum.filter(templates, &template_is_placeable?(&1, instance_slots))
-    |> IO.inspect(label: "🍕 valid templates for #{inspect(instance_slots)}")
   end
 
   defp get_first_slot(template, instance_slots) do
     template
     |> get_valid_slots(instance_slots)
     |> hd()
-    |> IO.inspect(label: "❇️ first slot for #{inspect(instance_slots)}")
   end
 
   defp template_is_placeable?(template, instance_slots) do
@@ -144,9 +134,47 @@ defmodule Screens.V2.ScreenData do
     {template_slots, _} = template
 
     # N.B. The slots are sorted so that paged regions have their earlier pages filled first.
-    # e.g. [:footer, :header, {0, :flex_zone}, {1, :flex_zone}]
-    # (though usually we wouldn't get a mix of paged an non-paged slots for a given widget instance)
+    # e.g. [{0, :paged_region1}, {0, :paged_region2}, {1, :paged_region1}, {1, :paged_region2}]
     sorted_slot_list_intersection(template_slots, instance_slots)
+  end
+
+  defp log_mismatched_placement_widgets(placements) when map_size(placements) < 2, do: placements
+
+  defp log_mismatched_placement_widgets(placements) do
+    [first_widget_set | widget_sets] =
+      placements
+      |> Map.values()
+      |> Enum.map(&Map.values/1)
+      |> Enum.map(&MapSet.new/1)
+
+    if Enum.any?(widget_sets, &(not MapSet.equal?(first_widget_set, &1))) do
+      Logger.info("[mismatched widget placements]")
+    end
+
+    placements
+  end
+
+  defp select_best_placement(placements) when map_size(placements) < 2 do
+    placements
+    |> Map.to_list()
+    |> hd()
+  end
+
+  defp select_best_placement(placements) do
+    # When multiple valid placements are produced due to paging, prefer the one
+    # that has higher-priority instances placed on earlier pages.
+    # Each placement is compared by sorting the mapping by instance priority,
+    # then mapping each entry to its slot's page index (or nil if not paged).
+    # Example min_by comparison key: [nil, 0, 1, 0, 0]
+    placements
+    |> Enum.min_by(fn {_, slot_to_instance} ->
+      slot_to_instance
+      |> Enum.sort_by(fn {_, instance} -> WidgetInstance.priority(instance) end)
+      |> Enum.map(fn
+        {{page_index, _slot}, _} -> page_index
+        {_slot, _} -> nil
+      end)
+    end)
   end
 
   @spec sorted_slot_list_intersection(
@@ -160,7 +188,7 @@ defmodule Screens.V2.ScreenData do
         Template.slots_match?(t_slot, i_slot) do
       t_slot
     end
-    |> Enum.sort(&<=/2)
+    |> Enum.sort(&Template.slot_precedes_or_equal?/2)
   end
 
   @spec serialize({Template.layout(), selected_instances_map()}, integer()) :: serializable_map()
@@ -170,8 +198,6 @@ defmodule Screens.V2.ScreenData do
       |> Enum.map(fn {slot_id, instance} -> {slot_id, serialize_instance_with_type(instance)} end)
       |> Enum.into(%{})
 
-    IO.inspect(layout, label: "layout")
-    IO.inspect(serialized_instance_map, label: "serialized_instance_map")
     Template.position_widget_instances(layout, serialized_instance_map)
   end
 

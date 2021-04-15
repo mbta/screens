@@ -126,4 +126,21 @@ defmodule Screens.V2.Template do
 
   def depage_slot_id({_page_index, slot_id}), do: slot_id
   def depage_slot_id(slot_id), do: slot_id
+
+  @doc """
+  Used for sorting. Non-paged slots precede all paged slots but are otherwise
+  considered equal to each other for sorting purposes, to maintain the layout order as much as possible.
+  Paged slots are ordered by their page indices only, again to maintain the layout order.
+  """
+  def slot_precedes_or_equal?(s1, s2)
+      when is_paged_slot_id(s1) and is_non_paged_slot_id(s2) do
+    false
+  end
+
+  def slot_precedes_or_equal?({page1, _} = s1, {page2, _} = s2)
+      when is_paged_slot_id(s1) and is_paged_slot_id(s2) do
+    page1 <= page2
+  end
+
+  def slot_precedes_or_equal?(_, _), do: true
 end

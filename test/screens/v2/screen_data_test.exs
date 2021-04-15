@@ -1,10 +1,9 @@
 defmodule Screens.V2.ScreenDataTest do
   use ExUnit.Case, async: true
 
-  alias Screens.V2.WidgetInstance.{Departures, StaticImage, NormalHeader}
+  alias Screens.V2.WidgetInstance.{Departures, NormalHeader, StaticImage, MockWidget}
 
   describe "pick_instances/2" do
-    @tag :skip
     test "chooses the expected template and instance placement" do
       candidate_template =
         {:flex_zone,
@@ -35,7 +34,7 @@ defmodule Screens.V2.ScreenDataTest do
              } = actual_instance_placement
     end
 
-    test "handles paged regions correctly" do
+    test "handles paged regions correctly, and places higher-priority instances in earlier pages" do
       candidate_template =
         {:screen,
          %{
@@ -103,10 +102,80 @@ defmodule Screens.V2.ScreenDataTest do
                {1, :large} => %StaticImage{size: :large, priority: [2], image_url: "5"}
              } = actual_instance_placement
     end
+
+    test "prefers to place as many instances as possible, priority allowing" do
+      candidate_template =
+        {:screen,
+         %{
+           normal_flex_zone: [
+             {{0, :flex_zone}, %{one_large: [{0, :large}]}},
+             {{1, :flex_zone}, %{one_large: [{1, :large}]}}
+           ],
+           takeover_flex_zone: [:large_takeover]
+         }}
+
+      # We expect the high-priority instance to be placed in the first page rather than
+      # the takeover slot, because that allows the second widget to be placed.
+      candidate_instances = [
+        %MockWidget{slot_names: [:large], priority: [2], content: "2"},
+        %MockWidget{slot_names: [:large_takeover, :large], priority: [1], content: "1"}
+      ]
+
+      {actual_layout, actual_instance_placement} =
+        Screens.V2.ScreenData.pick_instances(candidate_template, candidate_instances)
+
+      assert {:screen,
+              {:normal_flex_zone,
+               [
+                 {{0, :flex_zone}, {:one_large, [{0, :large}]}},
+                 {{1, :flex_zone}, {:one_large, [{1, :large}]}}
+               ]}} == actual_layout
+
+      assert %{{0, :large} => %MockWidget{content: "1"}, {1, :large} => %MockWidget{content: "2"}} =
+               actual_instance_placement
+    end
+
+    test "fills earlier pages first" do
+      candidate_template =
+        {:screen,
+         %{
+           normal: [
+             {{0, :paged_content1}, %{one_large: [{0, :content1_large}]}},
+             {{1, :paged_content1}, %{one_large: [{1, :content1_large}]}},
+             {{0, :paged_content2}, %{one_large: [{0, :content2_large}]}},
+             {{1, :paged_content2}, %{one_large: [{1, :content2_large}]}}
+           ]
+         }}
+
+      candidate_instances = [
+        %MockWidget{slot_names: [:content1_large, :content2_large], priority: [2], content: "2"},
+        %MockWidget{slot_names: [:content1_large, :content2_large], priority: [1], content: "1"},
+        %MockWidget{slot_names: [:content1_large, :content2_large], priority: [4], content: "4"},
+        %MockWidget{slot_names: [:content1_large, :content2_large], priority: [3], content: "3"}
+      ]
+
+      {actual_layout, actual_instance_placement} =
+        Screens.V2.ScreenData.pick_instances(candidate_template, candidate_instances)
+
+      assert {:screen,
+              {:normal,
+               [
+                 {{0, :paged_content1}, {:one_large, [{0, :content1_large}]}},
+                 {{1, :paged_content1}, {:one_large, [{1, :content1_large}]}},
+                 {{0, :paged_content2}, {:one_large, [{0, :content2_large}]}},
+                 {{1, :paged_content2}, {:one_large, [{1, :content2_large}]}}
+               ]}} == actual_layout
+
+      assert %{
+               {0, :content1_large} => %MockWidget{content: "1"},
+               {0, :content2_large} => %MockWidget{content: "2"},
+               {1, :content1_large} => %MockWidget{content: "3"},
+               {1, :content2_large} => %MockWidget{content: "4"}
+             } = actual_instance_placement
+    end
   end
 
   describe "serialize/1" do
-    @tag :skip
     test "serializes a hierarchical layout" do
       layout =
         {:screen,
@@ -138,7 +207,6 @@ defmodule Screens.V2.ScreenDataTest do
   end
 
   describe "sorted_slot_list_intersection/2" do
-    @tag :skip
     test "returns the intersection of two non-paged slot lists" do
       template_slots = [
         :normal_header,
@@ -157,7 +225,6 @@ defmodule Screens.V2.ScreenDataTest do
                Screens.V2.ScreenData.sorted_slot_list_intersection(template_slots, instance_slots)
     end
 
-    @tag :skip
     test "matches instance slots with all corresponding paged template slots" do
       template_slots = [
         {0, :medium_left},
@@ -174,7 +241,6 @@ defmodule Screens.V2.ScreenDataTest do
                Screens.V2.ScreenData.sorted_slot_list_intersection(template_slots, instance_slots)
     end
 
-    @tag :skip
     test "sorts paged slots by their page index and prioritizes non-paged content" do
       template_slots = [
         :normal_header,
