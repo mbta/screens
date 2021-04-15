@@ -13,23 +13,14 @@ defmodule Screens.V2.ScreenDataTest do
            one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right]
          }}
 
+      smalls = [:small_upper_right, :small_lower_right]
+      mediums = [:medium_left, :medium_right]
+
       candidate_instances = [
-        %MockWidget{
-          slot_names: [:small_upper_right, :small_lower_right],
-          priority: [4],
-          content: "4"
-        },
-        %MockWidget{
-          slot_names: [:small_upper_right, :small_lower_right],
-          priority: [1],
-          content: "1"
-        },
-        %MockWidget{slot_names: [:medium_left, :medium_right], priority: [3], content: "3"},
-        %MockWidget{
-          slot_names: [:small_upper_right, :small_lower_right],
-          priority: [2],
-          content: "2"
-        }
+        %MockWidget{slot_names: smalls, priority: [4], content: "4"},
+        %MockWidget{slot_names: smalls, priority: [1], content: "1"},
+        %MockWidget{slot_names: mediums, priority: [3], content: "3"},
+        %MockWidget{slot_names: smalls, priority: [2], content: "2"}
       ]
 
       {actual_layout, actual_instance_placement} =
@@ -76,23 +67,14 @@ defmodule Screens.V2.ScreenDataTest do
            takeover: [:full_screen]
          }}
 
+      smalls = [:small_upper_right, :small_lower_right]
+      mediums = [:medium_left, :medium_right]
+
       candidate_instances = [
-        %MockWidget{
-          slot_names: [:small_upper_right, :small_lower_right],
-          priority: [4],
-          content: "4"
-        },
-        %MockWidget{
-          slot_names: [:small_upper_right, :small_lower_right],
-          priority: [1],
-          content: "1"
-        },
-        %MockWidget{slot_names: [:medium_left, :medium_right], priority: [3], content: "3"},
-        %MockWidget{
-          slot_names: [:small_upper_right, :small_lower_right],
-          priority: [2],
-          content: "2"
-        },
+        %MockWidget{slot_names: smalls, priority: [4], content: "4"},
+        %MockWidget{slot_names: smalls, priority: [1], content: "1"},
+        %MockWidget{slot_names: mediums, priority: [3], content: "3"},
+        %MockWidget{slot_names: smalls, priority: [2], content: "2"},
         %MockWidget{slot_names: [:large], priority: [2], content: "5"},
         %MockWidget{slot_names: [:header], priority: [2], content: "header"}
       ]
@@ -204,19 +186,16 @@ defmodule Screens.V2.ScreenDataTest do
       selected_widgets = %{
         main_content: %MockWidget{
           slot_names: [:main_content],
-          priority: [2],
           widget_type: :departures,
           content: []
         },
         medium_left: %MockWidget{
           slot_names: [:medium_left, :medium_right],
-          priority: [2],
           widget_type: :static_image,
           content: "face_covering.png"
         },
         medium_right: %MockWidget{
           slot_names: [:medium_left, :medium_right],
-          priority: [2],
           widget_type: :static_image,
           content: "autopay.png"
         }
