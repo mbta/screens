@@ -1,6 +1,7 @@
-defmodule Screens.V2.ScreenDataTest do
+defmodule ScreenDataTest do
   use ExUnit.Case, async: true
 
+  alias Screens.V2.ScreenData
   alias Screens.V2.WidgetInstance.MockWidget
 
   describe "pick_instances/2" do
@@ -24,7 +25,7 @@ defmodule Screens.V2.ScreenDataTest do
       ]
 
       {actual_layout, actual_instance_placement} =
-        Screens.V2.ScreenData.pick_instances(candidate_template, candidate_instances)
+        ScreenData.pick_instances(candidate_template, candidate_instances)
 
       assert {:flex_zone,
               {:one_medium_two_small, [:medium_left, :small_upper_right, :small_lower_right]}} ==
@@ -80,7 +81,7 @@ defmodule Screens.V2.ScreenDataTest do
       ]
 
       {actual_layout, actual_instance_placement} =
-        Screens.V2.ScreenData.pick_instances(candidate_template, candidate_instances)
+        ScreenData.pick_instances(candidate_template, candidate_instances)
 
       assert {:screen,
               {:normal,
@@ -120,7 +121,7 @@ defmodule Screens.V2.ScreenDataTest do
       ]
 
       {actual_layout, actual_instance_placement} =
-        Screens.V2.ScreenData.pick_instances(candidate_template, candidate_instances)
+        ScreenData.pick_instances(candidate_template, candidate_instances)
 
       assert {:screen,
               {:normal_flex_zone,
@@ -153,7 +154,7 @@ defmodule Screens.V2.ScreenDataTest do
       ]
 
       {actual_layout, actual_instance_placement} =
-        Screens.V2.ScreenData.pick_instances(candidate_template, candidate_instances)
+        ScreenData.pick_instances(candidate_template, candidate_instances)
 
       assert {:screen,
               {:normal,
@@ -211,8 +212,115 @@ defmodule Screens.V2.ScreenDataTest do
         }
       }
 
-      assert expected ==
-               Screens.V2.ScreenData.serialize({layout, selected_widgets}, 9_999_999_999)
+      assert expected == ScreenData.serialize({layout, selected_widgets})
+    end
+  end
+
+  describe "resolve_paging/3" do
+    test "chooses pages based on current time; condenses layout and widget map accordingly" do
+      layout =
+        {:screen,
+         {:normal,
+          [
+            :header,
+            {{0, :flex_zone},
+             {:one_medium_two_small,
+              [{0, :medium_left}, {0, :small_upper_right}, {0, :small_lower_right}]}},
+            {{1, :flex_zone}, {:one_large, [{1, :large}]}}
+          ]}}
+
+      selected_widgets = %{
+        :header => %MockWidget{slot_names: [], widget_type: :header, content: "header"},
+        {0, :medium_left} => %MockWidget{
+          slot_names: [],
+          widget_type: :subway_status,
+          content: "3"
+        },
+        {0, :small_lower_right} => %MockWidget{slot_names: [], widget_type: :alert, content: "2"},
+        {0, :small_upper_right} => %MockWidget{slot_names: [], widget_type: :alert, content: "1"},
+        {1, :large} => %MockWidget{slot_names: [], widget_type: :psa, content: "5"}
+      }
+
+      refresh_rate = 15
+      now = ~U"2021-01-01T00:00:16Z"
+
+      expected_layout =
+        {:screen,
+         {:normal,
+          [
+            :header,
+            {:flex_zone, {:one_large, [:large]}}
+          ]}}
+
+      assert {^expected_layout,
+              %{
+                header: %MockWidget{widget_type: :header, content: "header"},
+                large: %MockWidget{widget_type: :psa, content: "5"}
+              }} = ScreenData.resolve_paging({layout, selected_widgets}, refresh_rate, now)
+    end
+
+    test "chooses pages independently for each paged region, and handles paged regions rooted deeper in the layout" do
+      layout =
+        {:screen,
+         {:normal,
+          [
+            {{0, :header}, {:time_header, [{0, :header_text}, {0, :time}]}},
+            {{1, :header}, {:weather_header, [{1, :header_text}, {1, :weather}]}},
+            {:main_content,
+             {:normal_main_content,
+              [
+                :departures,
+                {{0, :flex_zone},
+                 {:one_medium_two_small,
+                  [{0, :medium_left}, {0, :small_upper_right}, {0, :small_lower_right}]}},
+                {{1, :flex_zone}, {:one_large, [{1, :large}]}},
+                {{2, :flex_zone}, {:two_medium, [{2, :medium_left}, {2, :medium_right}]}}
+              ]}},
+            {{0, :footer}, {:fare_info_footer, [{0, :fare_info}]}},
+            {{1, :footer}, {:stop_link_footer, [{1, :stop_link}]}}
+          ]}}
+
+      selected_widgets = %{
+        {0, :header_text} => %MockWidget{slot_names: [], content: "header_text 0"},
+        {0, :time} => %MockWidget{slot_names: [], content: "time"},
+        {1, :header_text} => %MockWidget{slot_names: [], content: "header_text 1"},
+        {1, :weather} => %MockWidget{slot_names: [], content: "weather"},
+        :departures => %MockWidget{slot_names: [], content: "departures"},
+        {0, :medium_left} => %MockWidget{slot_names: [], content: "medium_left 0"},
+        {0, :small_upper_right} => %MockWidget{slot_names: [], content: "small_upper_right"},
+        {0, :small_lower_right} => %MockWidget{slot_names: [], content: "small_lower_right"},
+        {1, :large} => %MockWidget{slot_names: [], content: "large"},
+        {2, :medium_left} => %MockWidget{slot_names: [], content: "medium_left 1"},
+        {2, :medium_right} => %MockWidget{slot_names: [], content: "medium_right"},
+        {0, :fare_info} => %MockWidget{slot_names: [], content: "fare_info"},
+        {1, :stop_link} => %MockWidget{slot_names: [], content: "stop_link"}
+      }
+
+      # We expect page index = 0 for regions with 2 pages,
+      #           page index = 2 for regions with 3 pages.
+      refresh_rate = 15
+      now = ~U"2021-01-01T00:00:32Z"
+
+      expected_layout =
+        {:screen,
+         {:normal,
+          [
+            {:header, {:time_header, [:header_text, :time]}},
+            {:main_content,
+             {:normal_main_content,
+              [:departures, {:flex_zone, {:two_medium, [:medium_left, :medium_right]}}]}},
+            {:footer, {:fare_info_footer, [:fare_info]}}
+          ]}}
+
+      assert {^expected_layout,
+              %{
+                header_text: %MockWidget{slot_names: [], content: "header_text 0"},
+                time: %MockWidget{slot_names: [], content: "time"},
+                departures: %MockWidget{slot_names: [], content: "departures"},
+                medium_left: %MockWidget{slot_names: [], content: "medium_left 1"},
+                medium_right: %MockWidget{slot_names: [], content: "medium_right"},
+                fare_info: %MockWidget{slot_names: [], content: "fare_info"}
+              }} = ScreenData.resolve_paging({layout, selected_widgets}, refresh_rate, now)
     end
   end
 
@@ -231,8 +339,7 @@ defmodule Screens.V2.ScreenDataTest do
 
       expected = [:departures, :small_upper_right, :small_lower_right]
 
-      assert expected ==
-               Screens.V2.ScreenData.sorted_slot_list_intersection(template_slots, instance_slots)
+      assert expected == ScreenData.sorted_slot_list_intersection(template_slots, instance_slots)
     end
 
     test "matches instance slots with all corresponding paged template slots" do
@@ -247,8 +354,7 @@ defmodule Screens.V2.ScreenDataTest do
 
       expected = [{0, :medium_right}, {1, :medium_right}]
 
-      assert expected ==
-               Screens.V2.ScreenData.sorted_slot_list_intersection(template_slots, instance_slots)
+      assert expected == ScreenData.sorted_slot_list_intersection(template_slots, instance_slots)
     end
 
     test "sorts paged slots by their page index and prioritizes non-paged content" do
@@ -275,8 +381,7 @@ defmodule Screens.V2.ScreenDataTest do
         {1, :region2}
       ]
 
-      assert expected ==
-               Screens.V2.ScreenData.sorted_slot_list_intersection(template_slots, instance_slots)
+      assert expected == ScreenData.sorted_slot_list_intersection(template_slots, instance_slots)
     end
   end
 end

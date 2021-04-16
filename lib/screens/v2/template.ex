@@ -55,6 +55,8 @@ defmodule Screens.V2.Template do
           | paged_template()
           | {non_paged_slot_id(), %{layout_type() => list(template())}}
 
+  @type non_paged_layout ::
+          non_paged_slot_id() | {non_paged_slot_id(), {layout_type(), list(non_paged_layout())}}
   @typedoc """
   A layout represents one possible way to resolve a template.
   e.g. a layout for the above flex zone could be:
@@ -111,21 +113,23 @@ defmodule Screens.V2.Template do
   def position_widget_instances({_slot_id, {layout_type, layout_list}}, selected_widget_map) do
     layout_list
     |> Enum.map(fn layout ->
-      {slot_id(layout), position_widget_instances(layout, selected_widget_map)}
+      {get_slot_id(layout), position_widget_instances(layout, selected_widget_map)}
     end)
     |> Enum.into(%{type: layout_type})
   end
 
-  @spec slot_id(layout()) :: slot_id()
-  defp slot_id(layout) when is_atom(layout), do: layout
-  defp slot_id({slot_id, {_layout_type, _layout_list}}), do: slot_id
+  @spec get_slot_id(layout()) :: slot_id()
+  defp get_slot_id(layout) when is_atom(layout), do: layout
+  defp get_slot_id({slot_id, {_layout_type, _layout_list}}), do: slot_id
 
   def slots_match?(s1, s2) do
-    depage_slot_id(s1) == depage_slot_id(s2)
+    unpage(s1) == unpage(s2)
   end
 
-  def depage_slot_id({_page_index, slot_id}), do: slot_id
-  def depage_slot_id(slot_id), do: slot_id
+  def get_page(slot_id) when is_paged_slot_id(slot_id), do: elem(slot_id, 0)
+
+  def unpage(slot_id) when is_paged_slot_id(slot_id), do: elem(slot_id, 1)
+  def unpage(slot_id) when is_non_paged_slot_id(slot_id), do: slot_id
 
   @doc """
   Used for sorting. Non-paged slots precede all paged slots but are otherwise
