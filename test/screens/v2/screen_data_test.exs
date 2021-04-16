@@ -276,8 +276,8 @@ defmodule ScreenDataTest do
                 {{1, :flex_zone}, {:one_large, [{1, :large}]}},
                 {{2, :flex_zone}, {:two_medium, [{2, :medium_left}, {2, :medium_right}]}}
               ]}},
-            {{0, :footer}, {:fare_info_footer, [{0, :fare_info}]}},
-            {{1, :footer}, {:stop_link_footer, [{1, :stop_link}]}}
+            {0, :footer},
+            {1, :footer}
           ]}}
 
       selected_widgets = %{
@@ -292,8 +292,8 @@ defmodule ScreenDataTest do
         {1, :large} => %MockWidget{slot_names: [], content: "large"},
         {2, :medium_left} => %MockWidget{slot_names: [], content: "medium_left 1"},
         {2, :medium_right} => %MockWidget{slot_names: [], content: "medium_right"},
-        {0, :fare_info} => %MockWidget{slot_names: [], content: "fare_info"},
-        {1, :stop_link} => %MockWidget{slot_names: [], content: "stop_link"}
+        {0, :footer} => %MockWidget{slot_names: [], content: "footer 0"},
+        {1, :footer} => %MockWidget{slot_names: [], content: "footer 1"}
       }
 
       # We expect page index = 0 for regions with 2 pages,
@@ -309,7 +309,7 @@ defmodule ScreenDataTest do
             {:main_content,
              {:normal_main_content,
               [:departures, {:flex_zone, {:two_medium, [:medium_left, :medium_right]}}]}},
-            {:footer, {:fare_info_footer, [:fare_info]}}
+            :footer
           ]}}
 
       assert {^expected_layout,
@@ -319,7 +319,7 @@ defmodule ScreenDataTest do
                 departures: %MockWidget{slot_names: [], content: "departures"},
                 medium_left: %MockWidget{slot_names: [], content: "medium_left 1"},
                 medium_right: %MockWidget{slot_names: [], content: "medium_right"},
-                fare_info: %MockWidget{slot_names: [], content: "fare_info"}
+                footer: %MockWidget{slot_names: [], content: "footer 0"}
               }} = ScreenData.resolve_paging({layout, selected_widgets}, refresh_rate, now)
     end
   end
