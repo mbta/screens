@@ -12,8 +12,7 @@ defmodule Screens.V2.CandidateGenerator.Solari do
   def screen_template do
     {:screen,
      %{
-       normal: [:header_normal, :main_content_normal],
-       overhead: [:header_overhead, :main_content_overhead],
+       normal: [:header, :main_content],
        takeover: [:full_screen]
      }}
   end
@@ -22,7 +21,7 @@ defmodule Screens.V2.CandidateGenerator.Solari do
   def candidate_instances(config, now \\ DateTime.utc_now()) do
     header_instances(config, now) ++
       [
-        %Placeholder{color: :blue, slot_names: [:main_content_normal]}
+        %Placeholder{color: :blue, slot_names: [:main_content]}
       ]
   end
 
