@@ -11,11 +11,13 @@ import { MappingContext } from "Components/v2/widget";
 import NormalScreen from "Components/v2/gl_eink_double/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
+import NormalHeader from "Components/v2/eink/normal_header";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
   full_takeover: TakeoverScreen,
   placeholder: Placeholder,
+  normal_header: NormalHeader,
 };
 
 const App = (): JSX.Element => {

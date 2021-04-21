@@ -33,7 +33,7 @@ defmodule Screens.V2.CandidateGenerator.SolariTest do
 
       expected_header = %NormalHeader{
         screen: config,
-        icon: nil,
+        icon: :logo,
         text: "Ruggles",
         time: ~U[2020-04-06T10:00:00Z]
       }

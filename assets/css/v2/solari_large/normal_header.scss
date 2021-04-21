@@ -1,0 +1,47 @@
+.normal-header {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: rgb(23, 31, 38);
+}
+.normal-header-icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.normal-header-icon__image {
+  height: 184px;
+  width: 184px;
+  margin-right: 28px;
+}
+
+.normal-header-title {
+  width: 824px;
+  position: absolute;
+  left: 40px;
+  bottom: 40px;
+}
+
+.normal-header-title__text {
+  display: inline-block;
+  vertical-align: middle;
+  font-family: neue-haas-grotesk-display;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 164px;
+  line-height: 136px;
+
+  &--with-icon {
+    width: 612px;
+  }
+}
+
+.normal-header-time {
+  position: absolute;
+  right: 40px;
+  top: 40px;
+  font-family: Inter;
+  font-size: 96px;
+  line-height: 96px;
+  color: #ffffff;
+}
