@@ -1,0 +1,48 @@
+.fare-info {
+  height: 264px;
+  position: relative;
+}
+
+.fare-info__icon {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+}
+
+.fare-info__icon-image {
+  height: 128px;
+  width: 128px;
+}
+
+.fare-info__message {
+  position: absolute;
+  top: 40px;
+  left: 208px;
+}
+
+.fare-info__message-header {
+  font-family: Inter;
+  font-size: 44px;
+  line-height: 72px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.fare-info__message-body {
+  margin-top: 3px;
+  font-family: Inter;
+  font-size: 44px;
+  line-height: 56px;
+  width: 712px;
+}
+
+.fare-info__cost {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  font-family: Inter;
+  font-size: 72px;
+  line-height: 72px;
+  font-weight: 700;
+  color: #000000;
+}
