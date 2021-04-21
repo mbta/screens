@@ -1,8 +1,8 @@
-defmodule Screens.V2.CandidateGenerator.SolariTest do
+defmodule Screens.V2.CandidateGenerator.SolariLargeTest do
   use ExUnit.Case, async: true
 
   alias Screens.Config
-  alias Screens.V2.CandidateGenerator.Solari
+  alias Screens.V2.CandidateGenerator.SolariLarge
   alias Screens.V2.WidgetInstance.NormalHeader
 
   setup do
@@ -11,7 +11,7 @@ defmodule Screens.V2.CandidateGenerator.SolariTest do
       vendor: :solari,
       device_id: "TEST",
       name: "TEST",
-      app_id: :solari
+      app_id: :solari_large
     }
 
     %{config: config}
@@ -23,7 +23,7 @@ defmodule Screens.V2.CandidateGenerator.SolariTest do
               %{
                 normal: [:header, :main_content],
                 takeover: [:full_screen]
-              }} == Solari.screen_template()
+              }} == SolariLarge.screen_template()
     end
   end
 
@@ -33,12 +33,12 @@ defmodule Screens.V2.CandidateGenerator.SolariTest do
 
       expected_header = %NormalHeader{
         screen: config,
-        icon: :logo,
+        icon: nil,
         text: "Ruggles",
         time: ~U[2020-04-06T10:00:00Z]
       }
 
-      assert expected_header in Solari.candidate_instances(config, now)
+      assert expected_header in SolariLarge.candidate_instances(config, now)
     end
   end
 end

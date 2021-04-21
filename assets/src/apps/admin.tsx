@@ -14,6 +14,7 @@ import {
   GLSingleScreensTable,
   GLDoubleScreensTable,
   SolariScreensTable,
+  SolariLargeScreensTable,
   DupScreensTable,
   BusShelterScreensTable,
 } from "Components/admin/admin_tables";
@@ -42,6 +43,9 @@ const App = (): JSX.Element => {
         </Route>
         <Route exact path="/solari-screens">
           <SolariScreensTable />
+        </Route>
+        <Route exact path="/solari-large-screens">
+          <SolariLargeScreensTable />
         </Route>
         <Route exact path="/dup-screens">
           <DupScreensTable />

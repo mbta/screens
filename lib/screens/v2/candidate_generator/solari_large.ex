@@ -1,4 +1,4 @@
-defmodule Screens.V2.CandidateGenerator.Solari do
+defmodule Screens.V2.CandidateGenerator.SolariLarge do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
@@ -27,6 +27,6 @@ defmodule Screens.V2.CandidateGenerator.Solari do
 
   defp header_instances(config, now) do
     %Screen{app_params: %Solari{station_name: header_text}} = config
-    [%NormalHeader{screen: config, icon: :logo, text: header_text, time: now}]
+    [%NormalHeader{screen: config, text: header_text, time: now}]
   end
 end

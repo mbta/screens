@@ -2,7 +2,6 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
   @moduledoc false
 
   alias Screens.V2.WidgetInstance.NormalHeader
-  alias Screens.Config.{Screen, Solari}
 
   defstruct screen: nil,
             icon: nil,
@@ -22,13 +21,6 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
     def serialize(%NormalHeader{icon: icon, text: text, time: time}) do
       %{icon: icon, text: text, time: DateTime.to_iso8601(time)}
-    end
-
-    def slot_names(%NormalHeader{screen: %Screen{app_params: %Solari{overhead: overhead}}}) do
-      case overhead do
-        true -> [:header_overhead]
-        false -> [:header_normal]
-      end
     end
 
     def slot_names(_instance), do: [:header]

@@ -46,7 +46,8 @@ defmodule Screens.GdsData.Fetch do
     params = %{
       "UserName" => Application.get_env(:screens, :gds_dms_username),
       "Password" => Application.get_env(:screens, :gds_dms_password),
-      "Company" => "M B T A"
+      "Company" => "M B T A",
+      "AspxAutoDetectCookieSupport" => 1
     }
 
     @token_url_base
@@ -68,7 +69,8 @@ defmodule Screens.GdsData.Fetch do
       "Token" => token,
       "Year" => date.year,
       "Month" => date.month,
-      "Day" => date.day
+      "Day" => date.day,
+      "AspxAutoDetectCookieSupport" => 1
     }
 
     @device_list_url_base
@@ -149,7 +151,8 @@ defmodule Screens.GdsData.Fetch do
       "Sn" => screen_sn,
       "Year" => date.year,
       "Month" => date.month,
-      "Day" => date.day
+      "Day" => date.day,
+      "AspxAutoDetectCookieSupport" => 1
     }
 
     ping_data =

@@ -12,12 +12,14 @@ import NormalScreen from "Components/v2/gl_eink_double/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
 import FareInfoFooter from "Components/v2/eink/fare_info_footer";
+import NormalHeader from "Components/v2/eink/normal_header";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
   full_takeover: TakeoverScreen,
   placeholder: Placeholder,
   fare_info_footer: FareInfoFooter,
+  normal_header: NormalHeader,
 };
 
 const App = (): JSX.Element => {

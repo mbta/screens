@@ -1,6 +1,6 @@
 declare function require(name: string): string;
 // tslint:disable-next-line
-require("../../../css/bus_eink_v2.scss");
+require("../../../css/solari_large_v2.scss");
 
 import React from "react";
 import ReactDOM from "react-dom";
@@ -8,18 +8,15 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
 
-import NormalScreen from "Components/v2/bus_eink/normal_screen";
+import NormalScreen from "Components/v2/solari_large/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
-
 import Placeholder from "Components/v2/placeholder";
-import NormalHeader from "Components/v2/eink/normal_header";
-import FareInfoFooter from "Components/v2/eink/fare_info_footer";
+import NormalHeader from "Components/v2/lcd/normal_header";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
-  full_takeover: TakeoverScreen,
+  takeover: TakeoverScreen,
   placeholder: Placeholder,
-  fare_info_footer: FareInfoFooter,
   normal_header: NormalHeader,
 };
 
