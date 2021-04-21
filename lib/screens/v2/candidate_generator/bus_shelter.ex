@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
 
   alias Screens.Config.{BusShelter, Screen}
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
 
@@ -33,8 +33,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
         fetch_stop_name_fn \\ &fetch_stop_name/1
       ) do
     header_instances(config, now, fetch_stop_name_fn) ++
+      footer_instances(config) ++
       [
-        %Placeholder{color: :blue, slot_names: [:footer]},
         %Placeholder{color: :red, slot_names: [:main_content]},
         %Placeholder{color: :green, slot_names: [:medium_left]},
         %Placeholder{color: :blue, slot_names: [:small_upper_right]},
@@ -49,6 +49,10 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
       nil -> []
       stop_name -> [%NormalHeader{screen: config, text: stop_name, time: now}]
     end
+  end
+
+  defp footer_instances(%Screen{app_params: %BusShelter{stop_id: stop_id}} = config) do
+    [%LinkFooter{screen: config, text: "More at", url: "mbta.com/stops/#{stop_id}"}]
   end
 
   defp fetch_stop_name(stop_id) do

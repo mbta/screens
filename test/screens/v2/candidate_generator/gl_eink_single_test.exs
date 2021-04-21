@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.GlEinkSingleTest do
 
   alias Screens.Config
   alias Screens.V2.CandidateGenerator.GlEinkSingle
-  alias Screens.V2.WidgetInstance.NormalHeader
+  alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader}
 
   setup do
     config = %Config.Screen{
@@ -37,9 +37,16 @@ defmodule Screens.V2.CandidateGenerator.GlEinkSingleTest do
   end
 
   describe "candidate_instances/1" do
-    test "returns expected header", %{config: config} do
+    test "returns expected header and footer", %{config: config} do
       fetch_destination_fn = fn "Green-B", 0 -> "Boston College" end
       now = ~U[2020-04-06T10:00:00Z]
+
+      actual_instances =
+        GlEinkSingle.candidate_instances(
+          config,
+          now,
+          fetch_destination_fn
+        )
 
       expected_header = %NormalHeader{
         screen: config,
@@ -48,11 +55,14 @@ defmodule Screens.V2.CandidateGenerator.GlEinkSingleTest do
         time: ~U[2020-04-06T10:00:00Z]
       }
 
-      assert expected_header in GlEinkSingle.candidate_instances(
-               config,
-               now,
-               fetch_destination_fn
-             )
+      expected_footer = %LinkFooter{
+        screen: config,
+        text: "For real-time predictions and fare purchase locations:",
+        url: "mbta.com/stops/place-bland"
+      }
+
+      assert expected_header in actual_instances
+      assert expected_footer in actual_instances
     end
   end
 end

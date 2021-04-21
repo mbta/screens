@@ -1,8 +1,9 @@
 defmodule Screens.V2.CandidateGenerator.GlEinkSingle do
   @moduledoc false
 
+  alias Screens.Config.{Gl, Screen}
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.WidgetInstance.Placeholder
+  alias Screens.V2.WidgetInstance.{LinkFooter, Placeholder}
 
   @behaviour CandidateGenerator
 
@@ -26,9 +27,17 @@ defmodule Screens.V2.CandidateGenerator.GlEinkSingle do
         fetch_destination_fn \\ &CandidateGenerator.Helpers.fetch_destination/2
       ) do
     CandidateGenerator.Helpers.gl_header_instances(config, now, fetch_destination_fn) ++
-      [
-        %Placeholder{color: :blue, slot_names: [:footer]},
-        %Placeholder{color: :green, slot_names: [:main_content]}
-      ]
+      footer_instances(config) ++
+      [%Placeholder{color: :green, slot_names: [:main_content]}]
+  end
+
+  defp footer_instances(%Screen{app_params: %Gl{stop_id: stop_id}} = config) do
+    [
+      %LinkFooter{
+        screen: config,
+        text: "For real-time predictions and fare purchase locations:",
+        url: "mbta.com/stops/#{stop_id}"
+      }
+    ]
   end
 end
