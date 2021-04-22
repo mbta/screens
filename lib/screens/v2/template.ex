@@ -5,7 +5,7 @@ defmodule Screens.V2.Template do
 
   @typedoc """
   A paging_index is used in combination with a slot_id to
-  uniquely identify a paged element on the screen.
+  uniquely identify a paged region on the screen.
   """
   @type paging_index :: non_neg_integer()
 
@@ -16,7 +16,7 @@ defmodule Screens.V2.Template do
   @type non_paged_slot_id :: atom()
 
   @typedoc """
-  A paged_slot_id uniquely identifies a paged element on the screen.
+  A paged_slot_id uniquely identifies a paged region on the screen.
   e.g. {0, :medium_left}, {1, :large}
   """
   @type paged_slot_id :: {paging_index(), non_paged_slot_id()}
@@ -28,7 +28,7 @@ defmodule Screens.V2.Template do
   @type slot_id :: non_paged_slot_id() | paged_slot_id()
 
   @typedoc """
-  A layout_type represents a way of filling a defined region on the screen.
+  A layout_type names a way of filling a defined region on the screen.
   In the API, this is the value of `type`.
   On the frontend, this corresponds to the React Component which will be used.
   e.g. :normal, :takeover, :two_medium
@@ -60,8 +60,7 @@ defmodule Screens.V2.Template do
   @typedoc """
   A layout represents one possible way to resolve a template.
   e.g. a layout for the above flex zone could be:
-  {[:medium_left, :medium_right],
-   {:flex_zone, {:two_medium, [:medium_left, :medium_right]}}}
+  {:flex_zone, {:two_medium, [:medium_left, :medium_right]}}
   """
   @type layout :: slot_id() | {slot_id(), {layout_type(), list(layout())}}
 
@@ -119,16 +118,20 @@ defmodule Screens.V2.Template do
   end
 
   @spec get_slot_id(layout()) :: slot_id()
-  defp get_slot_id(layout) when is_atom(layout), do: layout
-  defp get_slot_id({slot_id, {_layout_type, _layout_list}}), do: slot_id
+  def get_slot_id(layout) when is_slot_id(layout), do: layout
+  def get_slot_id({slot_id, _}) when is_slot_id(slot_id), do: slot_id
 
   def slots_match?(s1, s2) do
     unpage(s1) == unpage(s2)
   end
 
+  @spec get_page(layout()) :: paging_index()
   def get_page(slot_id) when is_paged_slot_id(slot_id), do: elem(slot_id, 0)
+  def get_page({slot_id, _}) when is_paged_slot_id(slot_id), do: elem(slot_id, 0)
 
+  @spec unpage(layout()) :: non_paged_slot_id()
   def unpage(slot_id) when is_paged_slot_id(slot_id), do: elem(slot_id, 1)
+  def unpage({slot_id, _}) when is_paged_slot_id(slot_id), do: elem(slot_id, 1)
   def unpage(slot_id) when is_non_paged_slot_id(slot_id), do: slot_id
 
   @doc """
