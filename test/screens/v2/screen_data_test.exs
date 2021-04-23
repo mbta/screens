@@ -181,7 +181,8 @@ defmodule ScreenDataTest do
          {:normal,
           [
             :main_content,
-            {:flex_zone, {:two_medium, [:medium_left, :medium_right]}}
+            {:flex_zone, {:two_medium, [:medium_left, :medium_right]}},
+            :footer
           ]}}
 
       selected_widgets = %{
@@ -199,20 +200,30 @@ defmodule ScreenDataTest do
           slot_names: [:medium_left, :medium_right],
           widget_type: :static_image,
           content: "autopay.png"
+        },
+        footer: %MockWidget{
+          slot_names: [:footer],
+          widget_type: :normal_footer,
+          content: "fare info"
         }
       }
+
+      paging_metadata = %{flex_zone: {1, 3}, footer: {0, 2}}
 
       expected = %{
         type: :normal,
         main_content: %{type: :departures, content: []},
         flex_zone: %{
           type: :two_medium,
+          page_index: 1,
+          num_pages: 3,
           medium_left: %{type: :static_image, content: "face_covering.png"},
           medium_right: %{type: :static_image, content: "autopay.png"}
-        }
+        },
+        footer: %{type: :normal_footer, page_index: 0, num_pages: 2, content: "fare info"}
       }
 
-      assert expected == ScreenData.serialize({layout, selected_widgets})
+      assert expected == ScreenData.serialize({layout, selected_widgets, paging_metadata})
     end
   end
 
@@ -252,11 +263,15 @@ defmodule ScreenDataTest do
             {:flex_zone, {:one_large, [:large]}}
           ]}}
 
+      expected_paging_metadata = %{flex_zone: {1, 2}}
+
       assert {^expected_layout,
               %{
                 header: %MockWidget{widget_type: :header, content: "header"},
                 large: %MockWidget{widget_type: :psa, content: "5"}
-              }} = ScreenData.resolve_paging({layout, selected_widgets}, refresh_rate, now)
+              },
+              ^expected_paging_metadata} =
+               ScreenData.resolve_paging({layout, selected_widgets}, refresh_rate, now)
     end
 
     test "chooses pages independently for each paged region, and handles paged regions rooted deeper in the layout" do
@@ -312,6 +327,8 @@ defmodule ScreenDataTest do
             :footer
           ]}}
 
+      expected_paging_metadata = %{header: {0, 2}, flex_zone: {2, 3}, footer: {0, 2}}
+
       assert {^expected_layout,
               %{
                 header_text: %MockWidget{slot_names: [], content: "header_text 0"},
@@ -320,7 +337,9 @@ defmodule ScreenDataTest do
                 medium_left: %MockWidget{slot_names: [], content: "medium_left 1"},
                 medium_right: %MockWidget{slot_names: [], content: "medium_right"},
                 footer: %MockWidget{slot_names: [], content: "footer 0"}
-              }} = ScreenData.resolve_paging({layout, selected_widgets}, refresh_rate, now)
+              },
+              ^expected_paging_metadata} =
+               ScreenData.resolve_paging({layout, selected_widgets}, refresh_rate, now)
     end
   end
 

@@ -57,4 +57,17 @@ defmodule Screens.Util do
       keys
     end
   end
+
+  @doc """
+  Similar to Enum.unzip, except it expects an enumerable of 3-element instead of 2-element tuples.
+  """
+  @spec unzip3(Enum.t()) :: {[Enum.element()], [Enum.element()], [Enum.element()]}
+  def unzip3(enumerable) do
+    {list1, list2, list3} =
+      Enum.reduce(enumerable, {[], [], []}, fn {el1, el2, el3}, {list1, list2, list3} ->
+        {[el1 | list1], [el2 | list2], [el3 | list3]}
+      end)
+
+    {:lists.reverse(list1), :lists.reverse(list2), :lists.reverse(list3)}
+  end
 end

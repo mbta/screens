@@ -104,17 +104,39 @@ defmodule Screens.V2.Template do
     Enum.flat_map(layout_list, &flatten_layout/1)
   end
 
-  @spec position_widget_instances(layout(), map()) :: map()
-  def position_widget_instances(layout, selected_widget_map) when is_atom(layout) do
+  @spec position_widget_instances(layout(), map(), map()) :: map()
+  def position_widget_instances(layout, selected_widget_map, _paging_metadata)
+      when is_atom(layout) do
     Map.get(selected_widget_map, layout)
   end
 
-  def position_widget_instances({_slot_id, {layout_type, layout_list}}, selected_widget_map) do
+  def position_widget_instances(
+        {_slot_id, {layout_type, layout_list}},
+        selected_widget_map,
+        paging_metadata
+      ) do
     layout_list
     |> Enum.map(fn layout ->
-      {get_slot_id(layout), position_widget_instances(layout, selected_widget_map)}
+      slot_id = get_slot_id(layout)
+
+      widget_data =
+        layout
+        |> position_widget_instances(selected_widget_map, paging_metadata)
+        |> put_paging_metadata(slot_id, paging_metadata)
+
+      {slot_id, widget_data}
     end)
     |> Enum.into(%{type: layout_type})
+  end
+
+  defp put_paging_metadata(positioned_widget, slot_id, paging_metadata) do
+    case Map.get(paging_metadata, slot_id) do
+      {page_index, num_pages} ->
+        Map.merge(positioned_widget, %{page_index: page_index, num_pages: num_pages})
+
+      _ ->
+        positioned_widget
+    end
   end
 
   @spec get_slot_id(layout()) :: slot_id()
