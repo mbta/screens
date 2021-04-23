@@ -8,7 +8,17 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
 
-const TYPE_TO_COMPONENT = {};
+import NormalScreen from "Components/v2/solari/normal_screen";
+import TakeoverScreen from "Components/v2/takeover_screen";
+import Placeholder from "Components/v2/placeholder";
+import NormalHeader from "Components/v2/lcd/normal_header";
+
+const TYPE_TO_COMPONENT = {
+  normal: NormalScreen,
+  takeover: TakeoverScreen,
+  placeholder: Placeholder,
+  normal_header: NormalHeader,
+};
 
 const App = (): JSX.Element => {
   return (

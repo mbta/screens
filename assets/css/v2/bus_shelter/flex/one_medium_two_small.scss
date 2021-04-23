@@ -1,0 +1,27 @@
+.flex-one-medium-two-small {
+  position: relative;
+}
+
+.flex-one-medium-two-small__left {
+  position: absolute;
+  top: 24px;
+  left: 40px;
+  width: 480px;
+  height: 580px;
+}
+
+.flex-one-medium-two-small__upper-right {
+  position: absolute;
+  top: 24px;
+  left: 560px;
+  width: 480px;
+  height: 270px;
+}
+
+.flex-one-medium-two-small__lower-right {
+  position: absolute;
+  top: 334px;
+  left: 560px;
+  width: 480px;
+  height: 270px;
+}

@@ -1,18 +1,21 @@
 defmodule Screens.V2.CandidateGenerator.BusShelterTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Alerts.Alert
-  alias Screens.Predictions.Prediction
+  alias Screens.Config
   alias Screens.V2.CandidateGenerator.BusShelter
-  alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
+  alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader}
 
-  alias Screens.V2.WidgetInstance.{
-    Departures,
-    DeparturesNoData,
-    NormalFooter,
-    NormalHeader,
-    StaticImage
-  }
+  setup do
+    config = %Config.Screen{
+      app_params: %Config.BusShelter{stop_id: "1216"},
+      vendor: :lg_mri,
+      device_id: "TEST",
+      name: "TEST",
+      app_id: :bus_shelter
+    }
+
+    %{config: config}
+  end
 
   describe "screen_template/0" do
     test "returns template" do
@@ -58,35 +61,24 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
     end
   end
 
-  describe "candidate_instances/1" do
-    test "returns departure, alert, and static image widget instances" do
-      prediction_fetcher = fn _params -> {:ok, List.duplicate(%Prediction{}, 3)} end
-      alert_fetcher = fn _params -> List.duplicate(%Alert{}, 2) end
+  describe "candidate_instances/3" do
+    test "returns expected header and footer", %{config: config} do
+      fetch_stop_fn = fn "1216" -> "Columbus Ave @ Dimock St" end
+      now = ~U[2020-04-06T10:00:00Z]
 
-      assert [
-               %Departures{},
-               %AlertWidget{},
-               %AlertWidget{},
-               %StaticImage{},
-               %StaticImage{},
-               %NormalHeader{},
-               %NormalFooter{}
-             ] = BusShelter.candidate_instances(:ok, prediction_fetcher, alert_fetcher)
-    end
+      expected_header = %NormalHeader{
+        screen: config,
+        icon: nil,
+        text: "Columbus Ave @ Dimock St",
+        time: ~U[2020-04-06T10:00:00Z]
+      }
 
-    test "returns a DeparturesNoData widget if prediction fetcher returns :error" do
-      prediction_fetcher = fn _params -> :error end
-      alert_fetcher = fn _params -> List.duplicate(%Alert{}, 2) end
+      expected_footer = %LinkFooter{screen: config, text: "More at", url: "mbta.com/stops/1216"}
 
-      assert [
-               %DeparturesNoData{},
-               %AlertWidget{},
-               %AlertWidget{},
-               %StaticImage{},
-               %StaticImage{},
-               %NormalHeader{},
-               %NormalFooter{}
-             ] = BusShelter.candidate_instances(:ok, prediction_fetcher, alert_fetcher)
+      actual_instances = BusShelter.candidate_instances(config, now, fetch_stop_fn)
+
+      assert expected_header in actual_instances
+      assert expected_footer in actual_instances
     end
   end
 end

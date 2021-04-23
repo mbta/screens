@@ -8,7 +8,27 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
 
-const TYPE_TO_COMPONENT = {};
+import NormalScreen from "Components/v2/bus_shelter/normal_screen";
+import TakeoverScreen from "Components/v2/takeover_screen";
+
+import OneLarge from "Components/v2/bus_shelter/flex/one_large";
+import OneMediumTwoSmall from "Components/v2/bus_shelter/flex/one_medium_two_small";
+import TwoMedium from "Components/v2/bus_shelter/flex/two_medium";
+
+import Placeholder from "Components/v2/placeholder";
+import LinkFooter from "Components/v2/link_footer";
+import NormalHeader from "Components/v2/lcd/normal_header";
+
+const TYPE_TO_COMPONENT = {
+  normal: NormalScreen,
+  takeover: TakeoverScreen,
+  one_large: OneLarge,
+  two_medium: TwoMedium,
+  one_medium_two_small: OneMediumTwoSmall,
+  placeholder: Placeholder,
+  link_footer: LinkFooter,
+  normal_header: NormalHeader,
+};
 
 const App = (): JSX.Element => {
   return (

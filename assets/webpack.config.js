@@ -28,6 +28,7 @@ module.exports = (env, options) => ({
     gl_eink_single_v2: "./src/apps/v2/gl_eink_single.tsx",
     gl_eink_double_v2: "./src/apps/v2/gl_eink_double.tsx",
     solari_v2: "./src/apps/v2/solari.tsx",
+    solari_large_v2: "./src/apps/v2/solari_large.tsx",
     dup_v2: "./src/apps/v2/dup.tsx",
     bus_shelter_v2: "./src/apps/v2/bus_shelter.tsx"
   },

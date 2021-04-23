@@ -1,3 +1,13 @@
+@import url("https://rsms.me/inter/inter.css");
+
+@import "v2/gl_eink_double/screen/normal";
+@import "v2/gl_eink_double/screen/takeover";
+
+@import "v2/placeholder";
+@import "v2/eink/normal_header";
+@import "v2/eink/link_footer";
+@import "v2/eink/fare_info_footer";
+
 body {
   margin: 0px;
 }

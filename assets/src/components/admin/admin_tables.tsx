@@ -341,6 +341,73 @@ const SolariScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
+const SolariLargeScreensTable = (): JSX.Element => {
+  const columns = [
+    { Header: "Screen ID", accessor: "id", Filter: DefaultColumnFilter },
+    {
+      Header: "Station Name",
+      accessor: buildAppParamAccessor("station_name"),
+      mutator: buildAppParamMutator("station_name"),
+      Cell: EditableCell,
+      Filter: DefaultColumnFilter,
+      FormCell: FormTextCell,
+    },
+    {
+      Header: "Overhead",
+      accessor: buildAppParamAccessor("overhead"),
+      mutator: buildAppParamMutator("overhead"),
+      Cell: EditableCheckbox,
+      Filter: DefaultColumnFilter,
+      FormCell: FormBoolean,
+    },
+    {
+      Header: "Section Headers",
+      accessor: buildAppParamAccessor("section_headers"),
+      mutator: buildAppParamMutator("section_headers"),
+      Cell: EditableSelect,
+      Filter: SelectColumnFilter,
+      FormCell: buildFormSelect([null, "normal", "vertical"]),
+    },
+    {
+      Header: "Tags",
+      accessor: "tags",
+      Cell: EditableList,
+      Filter: DefaultColumnFilter,
+      filter: filterTags,
+      FormCell: FormTextCell,
+    },
+    {
+      Header: "Sections",
+      accessor: buildAppParamAccessor("sections"),
+      mutator: buildAppParamMutator("sections"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Audio PSA",
+      accessor: buildAppParamAccessor("audio_psa"),
+      mutator: buildAppParamMutator("audio_psa"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "PSA Config",
+      accessor: buildAppParamAccessor("psa_config"),
+      mutator: buildAppParamMutator("psa_config"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+  ];
+
+  const dataFilter = ({ app_id }) => {
+    return app_id === "solari_large";
+  };
+  return <AdminTable columns={columns} dataFilter={dataFilter} />;
+};
+
 const DupScreensTable = (): JSX.Element => {
   const columns = [
     { Header: "Screen ID", accessor: "id", Filter: DefaultColumnFilter },
@@ -376,11 +443,44 @@ const DupScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
+const BusShelterScreensTable = (): JSX.Element => {
+  const columns = [
+    {
+      Header: "Screen ID",
+      accessor: "id",
+      Filter: DefaultColumnFilter,
+      FormCell: FormStaticCell,
+    },
+    {
+      Header: "Name",
+      accessor: "name",
+      Cell: EditableCell,
+      Filter: DefaultColumnFilter,
+      FormCell: FormTextCell,
+    },
+    {
+      Header: "Stop ID",
+      accessor: buildAppParamAccessor("stop_id"),
+      mutator: buildAppParamMutator("stop_id"),
+      Cell: EditableCell,
+      Filter: DefaultColumnFilter,
+      FormCell: FormTextCell,
+    },
+  ];
+
+  const dataFilter = ({ app_id }) => {
+    return app_id === "bus_shelter";
+  };
+  return <AdminTable columns={columns} dataFilter={dataFilter} />;
+};
+
 export {
   AllScreensTable,
   BusScreensTable,
   GLSingleScreensTable,
   GLDoubleScreensTable,
   SolariScreensTable,
+  SolariLargeScreensTable,
   DupScreensTable,
+  BusShelterScreensTable,
 };

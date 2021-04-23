@@ -6,7 +6,8 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
   setup do
     %{
       instance: %WidgetInstance.NormalHeader{
-        station_name: "Ruggles",
+        icon: :logo,
+        text: "Ruggles",
         time: ~U[2021-03-04 11:00:00Z]
       }
     }
@@ -19,9 +20,10 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
   end
 
   describe "serialize/1" do
-    test "returns serialized name and time", %{instance: instance} do
+    test "returns serialized text, icon and time", %{instance: instance} do
       assert %{
-               station_name: "Ruggles",
+               icon: :logo,
+               text: "Ruggles",
                time: "2021-03-04T11:00:00Z"
              } == WidgetInstance.serialize(instance)
     end
