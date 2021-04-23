@@ -3,10 +3,10 @@ defmodule Screens.V2.ScreenData do
 
   require Logger
 
+  alias Screens.Util
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
-  alias Screens.Util
 
   import Screens.V2.Template.Guards
 
@@ -158,9 +158,10 @@ defmodule Screens.V2.ScreenData do
       |> Enum.map(&Map.values/1)
       |> Enum.map(&MapSet.new/1)
 
-    if Enum.any?(widget_sets, &(not MapSet.equal?(first_widget_set, &1))) do
-      Logger.info("[mismatched widget placements]")
-    end
+    _ =
+      if Enum.any?(widget_sets, &(not MapSet.equal?(first_widget_set, &1))) do
+        Logger.info("[mismatched widget placements]")
+      end
 
     placements
   end
