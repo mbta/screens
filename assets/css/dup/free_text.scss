@@ -5,6 +5,10 @@
 .free-text__line {
   display: inline-block;
   vertical-align: middle;
+
+  .free-text__route-pill {
+    transform: translateY(-20px);
+  }
 }
 
 .free-text__icon-container {
@@ -39,7 +43,6 @@
   font-family: Helvetica, sans-serif;
   font-weight: 700;
   text-align: center;
-  transform: translateY(-20px);
 
   &--green,
   &--green_b,

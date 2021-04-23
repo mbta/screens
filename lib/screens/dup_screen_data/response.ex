@@ -121,8 +121,15 @@ defmodule Screens.DupScreenData.Response do
     }
   end
 
-  def alert_issue(%{region: :inside, cause: cause}, 1) do
-    %{icon: :x, text: [%{format: :bold, text: "STATION CLOSED"}, render_alert_cause(cause)]}
+  def alert_issue(%{region: :inside, cause: cause, pill: pill}, 1) do
+    %{
+      icon: :warning,
+      text: [
+        %{format: :bold, text: "No #{@pill_to_specifier[pill]}"},
+        "trains",
+        render_alert_cause(cause)
+      ]
+    }
   end
 
   def alert_issue(%{region: :inside, pill: pill}, 2) do
@@ -175,8 +182,8 @@ defmodule Screens.DupScreenData.Response do
     end
   end
 
-  defp service_to_headsign({:adj, headsign}), do: "#{headsign} service"
-  defp service_to_headsign(headsign), do: "service to #{headsign}"
+  defp service_to_headsign({:adj, headsign}), do: "#{headsign} trains"
+  defp service_to_headsign(headsign), do: "trains to #{headsign}"
 
   defp line_color(:bus), do: :yellow
   defp line_color(:cr), do: :purple
