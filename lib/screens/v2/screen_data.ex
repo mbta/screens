@@ -3,16 +3,24 @@ defmodule Screens.V2.ScreenData do
 
   require Logger
 
+  alias Screens.Util
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
+
+  import Screens.V2.Template.Guards
 
   @type screen_id :: String.t()
   @type config :: Screens.Config.Screen.t()
   @type candidate_generator :: module()
   @type candidate_instances :: list(WidgetInstance.t())
-  @type selected_instances_map :: %{atom() => WidgetInstance.t()}
+  @type selected_instances_map :: %{Template.slot_id() => WidgetInstance.t()}
+  @type non_paged_selected_instances_map :: %{Template.non_paged_slot_id() => WidgetInstance.t()}
   @type serializable_map :: %{type: atom()}
+  @type paging_metadata :: %{
+          Template.non_paged_slot_id() =>
+            {page_index :: non_neg_integer(), num_pages :: pos_integer()}
+        }
 
   @app_id_to_candidate_generator %{
     bus_eink: CandidateGenerator.BusEink,
@@ -24,15 +32,26 @@ defmodule Screens.V2.ScreenData do
     bus_shelter: CandidateGenerator.BusShelter
   }
 
+  @app_id_to_refresh_rate %{
+    bus_eink: 30,
+    gl_eink_double: 30,
+    gl_eink_single: 30,
+    solari: 15,
+    dup: nil,
+    bus_shelter: 15
+  }
+
   @spec by_screen_id(screen_id()) :: serializable_map()
   def by_screen_id(screen_id) do
     config = get_config(screen_id)
     candidate_generator = get_candidate_generator(config)
+    refresh_rate = get_refresh_rate(config)
     screen_template = candidate_generator.screen_template()
     candidate_instances = candidate_generator.candidate_instances(config)
 
     screen_template
     |> pick_instances(candidate_instances)
+    |> resolve_paging(refresh_rate)
     |> serialize()
   end
 
@@ -44,6 +63,11 @@ defmodule Screens.V2.ScreenData do
   @spec get_candidate_generator(config()) :: candidate_generator()
   def get_candidate_generator(%Screens.Config.Screen{app_id: app_id}) do
     Map.get(@app_id_to_candidate_generator, app_id)
+  end
+
+  @spec get_refresh_rate(config()) :: pos_integer() | nil
+  def get_refresh_rate(%Screens.Config.Screen{app_id: app_id}) do
+    Map.get(@app_id_to_refresh_rate, app_id)
   end
 
   @spec pick_instances(Template.template(), candidate_instances()) ::
@@ -59,19 +83,11 @@ defmodule Screens.V2.ScreenData do
       |> Enum.map(fn t -> {t, %{}} end)
       |> Enum.into(%{})
 
-    placements = Enum.reduce(prioritized_instances, candidate_placements, &place_instance/2)
-
-    # N.B. If there are multiple templates returned, log it, then arbitrarily select the first.
-    valid_templates = Map.keys(placements)
-
-    _ =
-      if length(valid_templates) > 1 do
-        Logger.info("[found multiple valid templates]")
-      end
-
-    selected_template = hd(valid_templates)
-    selected_instances = Map.get(placements, selected_template)
-    {_, selected_layout} = selected_template
+    {{_, selected_layout}, selected_instances} =
+      prioritized_instances
+      |> Enum.reduce(candidate_placements, &place_instance/2)
+      |> log_mismatched_placement_widgets()
+      |> select_best_placement()
 
     {selected_layout, selected_instances}
   end
@@ -114,15 +130,6 @@ defmodule Screens.V2.ScreenData do
     Enum.filter(templates, &template_is_placeable?(&1, instance_slots))
   end
 
-  defp get_valid_slots(template, instance_slots) do
-    {template_slots, _} = template
-    list_intersection(template_slots, instance_slots)
-  end
-
-  defp list_intersection(l1, l2) do
-    l1 -- l1 -- l2
-  end
-
   defp get_first_slot(template, instance_slots) do
     template
     |> get_valid_slots(instance_slots)
@@ -134,14 +141,201 @@ defmodule Screens.V2.ScreenData do
     length(matching_slots) > 0
   end
 
-  @spec serialize({Template.layout(), selected_instances_map()}) :: serializable_map()
-  def serialize({layout, instance_map}) do
+  defp get_valid_slots(template, instance_slots) do
+    {template_slots, _} = template
+
+    # N.B. The slots are sorted so that paged regions have their earlier pages filled first.
+    # e.g. [{0, :paged_region1}, {0, :paged_region2}, {1, :paged_region1}, {1, :paged_region2}]
+    sorted_slot_list_intersection(template_slots, instance_slots)
+  end
+
+  defp log_mismatched_placement_widgets(placements) when map_size(placements) < 2, do: placements
+
+  defp log_mismatched_placement_widgets(placements) do
+    [first_widget_set | widget_sets] =
+      placements
+      |> Map.values()
+      |> Enum.map(&Map.values/1)
+      |> Enum.map(&MapSet.new/1)
+
+    _ =
+      if Enum.any?(widget_sets, &(not MapSet.equal?(first_widget_set, &1))) do
+        Logger.info("[mismatched widget placements]")
+      end
+
+    placements
+  end
+
+  defp select_best_placement(placements) when map_size(placements) < 2 do
+    placements
+    |> Map.to_list()
+    |> hd()
+  end
+
+  defp select_best_placement(placements) do
+    # When multiple valid placements are produced due to paging, prefer the one
+    # that has higher-priority instances placed on earlier pages.
+    # Each placement is compared by sorting the mapping by instance priority,
+    # then mapping each entry to its slot's page index (or nil if not paged).
+    # Example min_by comparison key: [nil, 0, 1, 0, 0]
+    placements
+    |> Enum.min_by(fn {_, slot_to_instance} ->
+      slot_to_instance
+      |> Enum.sort_by(fn {_, instance} -> WidgetInstance.priority(instance) end)
+      |> Enum.map(fn
+        {{page_index, _slot}, _} -> page_index
+        {_slot, _} -> nil
+      end)
+    end)
+  end
+
+  @spec sorted_slot_list_intersection(
+          list(Template.slot_id()),
+          list(Template.non_paged_slot_id())
+        ) ::
+          list(Template.slot_id())
+  def sorted_slot_list_intersection(template_slots, instance_slots) do
+    for t_slot <- template_slots,
+        i_slot <- instance_slots,
+        Template.slots_match?(t_slot, i_slot) do
+      t_slot
+    end
+    |> Enum.sort(&Template.slot_precedes_or_equal?/2)
+  end
+
+  @spec resolve_paging(
+          {Template.layout(), selected_instances_map()},
+          integer() | nil,
+          DateTime.t()
+        ) ::
+          {Template.non_paged_layout(), non_paged_selected_instances_map(), paging_metadata()}
+  def resolve_paging(layout_and_instances, refresh_rate, now \\ DateTime.utc_now())
+
+  def resolve_paging(layout_and_instances, nil, _now) do
+    layout_and_instances
+  end
+
+  def resolve_paging({layout, instance_map}, refresh_rate, now) do
+    {unpaged_layout, selected_paged_slot_ids, paging_metadata} =
+      choose_visible_slot_ids(layout, refresh_rate, now)
+
+    # Now filter instance map by set of paged slot ids, then unpage
+    instance_map =
+      instance_map
+      |> Enum.filter(fn
+        {slot_id, _instance} when is_paged_slot_id(slot_id) ->
+          slot_id in selected_paged_slot_ids
+
+        _ ->
+          true
+      end)
+      |> Enum.map(fn {slot_id, instance} -> {Template.unpage(slot_id), instance} end)
+      |> Enum.into(%{})
+
+    {unpaged_layout, instance_map, paging_metadata}
+  end
+
+  defp select_page_index(num_pages, refresh_rate, now) do
+    seconds_since_midnight = now.hour * 60 * 60 + now.minute * 60 + now.second
+    periods_since_midnight = div(seconds_since_midnight, refresh_rate)
+    rem(periods_since_midnight, num_pages)
+  end
+
+  @spec choose_visible_slot_ids(Template.layout(), integer(), DateTime.t()) ::
+          {Template.non_paged_layout(), MapSet.t(Template.paged_slot_id()), paging_metadata()}
+  defp choose_visible_slot_ids(layout, refresh_rate, now)
+
+  defp choose_visible_slot_ids(slot_id, _refresh_rate, _now) when is_non_paged_slot_id(slot_id) do
+    {slot_id, MapSet.new(), %{}}
+  end
+
+  defp choose_visible_slot_ids({slot_id, {layout_type, children}}, refresh_rate, now) do
+    {children, selected_paged_slot_ids, paging_metadata} =
+      choose_visible_slot_ids(children, refresh_rate, now)
+
+    {{slot_id, {layout_type, children}}, selected_paged_slot_ids, paging_metadata}
+  end
+
+  defp choose_visible_slot_ids(layouts, refresh_rate, now) when is_list(layouts) do
+    {selected_paged_slot_ids, paging_metadata_entries} =
+      layouts
+      |> Enum.filter(fn
+        layout when is_paged(layout) -> true
+        _ -> false
+      end)
+      |> Enum.group_by(&Template.unpage/1, &Template.get_page/1)
+      |> Enum.map(fn {slot_id, page_indexes} -> {slot_id, Enum.max(page_indexes) + 1} end)
+      |> Enum.map(fn {slot_id, num_pages} ->
+        selected_page_index = select_page_index(num_pages, refresh_rate, now)
+        selected_paged_slot_id = {selected_page_index, slot_id}
+        paging_metadata_entry = {slot_id, {selected_page_index, num_pages}}
+
+        {selected_paged_slot_id, paging_metadata_entry}
+      end)
+      |> Enum.unzip()
+
+    paging_metadata = Map.new(paging_metadata_entries)
+
+    selected_layouts =
+      Enum.filter(layouts, fn
+        layout when is_paged(layout) -> Template.get_slot_id(layout) in selected_paged_slot_ids
+        _ -> true
+      end)
+
+    # Now we have the list of layouts to keep, but still need to unpage them
+    # and create a set of the paged slot ids to keep in the instance map.
+    # We also need to recurse on non-paged layouts in case they contain paging deeper down.
+    {unpaged_layouts, paged_slot_sets, paging_metadata_maps} =
+      selected_layouts
+      |> Enum.map(fn
+        layout when is_paged(layout) ->
+          layout
+          |> unpage_layout_and_track_slots()
+          |> Tuple.append(%{})
+
+        layout ->
+          choose_visible_slot_ids(layout, refresh_rate, now)
+      end)
+      |> Util.unzip3()
+
+    paged_slot_set = Enum.reduce(paged_slot_sets, &MapSet.union/2)
+
+    paging_metadata = Enum.reduce(paging_metadata_maps, paging_metadata, &Map.merge/2)
+
+    {unpaged_layouts, paged_slot_set, paging_metadata}
+  end
+
+  defp unpage_layout_and_track_slots(slot_id) when is_paged_slot_id(slot_id) do
+    {Template.unpage(slot_id), MapSet.new([slot_id])}
+  end
+
+  defp unpage_layout_and_track_slots({slot_id, {layout_type, children}})
+       when is_paged_slot_id(slot_id) do
+    {children, paged_slot_sets} =
+      children
+      |> Enum.map(&unpage_layout_and_track_slots/1)
+      |> Enum.unzip()
+
+    paged_slot_set = Enum.reduce(paged_slot_sets, &MapSet.union/2)
+
+    {{Template.unpage(slot_id), {layout_type, children}}, paged_slot_set}
+  end
+
+  defp unpage_layout_and_track_slots(non_paged_layout) do
+    {non_paged_layout, MapSet.new()}
+  end
+
+  @spec serialize(
+          {Template.non_paged_layout(), non_paged_selected_instances_map(), paging_metadata()}
+        ) ::
+          serializable_map()
+  def serialize({layout, instance_map, paging_metadata}) do
     serialized_instance_map =
       instance_map
       |> Enum.map(fn {slot_id, instance} -> {slot_id, serialize_instance_with_type(instance)} end)
       |> Enum.into(%{})
 
-    Template.position_widget_instances(layout, serialized_instance_map)
+    Template.position_widget_instances(layout, serialized_instance_map, paging_metadata)
   end
 
   defp serialize_instance_with_type(instance) do

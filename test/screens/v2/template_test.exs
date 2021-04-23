@@ -134,19 +134,24 @@ defmodule Screens.V2.TemplateTest do
         footer: %{type: :footer, url: "mbta.com/stops/123"}
       }
 
+      paging_metadata = %{flex_zone: {2, 3}}
+
       expected = %{
         type: :normal,
         header: %{type: :header, current_time: "12:34"},
         main_content: %{type: :departures, rows: []},
         flex_zone: %{
           type: :two_medium,
+          page_index: 2,
+          num_pages: 3,
           medium_left: %{type: :alert, route: "44"},
           medium_right: %{type: :static_image, url: "img.png"}
         },
         footer: %{type: :footer, url: "mbta.com/stops/123"}
       }
 
-      assert expected == Template.position_widget_instances(layout, selected_widgets)
+      assert expected ==
+               Template.position_widget_instances(layout, selected_widgets, paging_metadata)
     end
   end
 end
