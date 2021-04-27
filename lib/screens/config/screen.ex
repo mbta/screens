@@ -36,7 +36,7 @@ defmodule Screens.Config.Screen do
           tags: list(String.t())
         }
 
-  @recognized_app_ids ~w[bus_eink bus_shelter dup gl_eink_single gl_eink_double solari solari_large]a
+  @recognized_app_ids ~w[bus_eink dup gl_eink_single gl_eink_double solari solari_large]a
   @recognized_v2_app_ids ~w[bus_eink_v2 bus_shelter_v2 dup_v2 gl_eink_v2 solari_v2 solari_large_v2]a
   @recognized_app_id_strings Enum.map(
                                @recognized_app_ids ++ @recognized_v2_app_ids,
