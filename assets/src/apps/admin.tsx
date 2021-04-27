@@ -66,18 +66,6 @@ const App = (): JSX.Element => {
         <Route exact path="/solari-large-v2-screens">
           <SolariLargeV2ScreensTable />
         </Route>
-        <Route exact path="/bus-eink-v2-screens">
-          <BusEinkV2ScreensTable />
-        </Route>
-        <Route exact path="/gl-eink-v2-screens">
-          <GLEinkV2ScreensTable />
-        </Route>
-        <Route exact path="/solari-v2-screens">
-          <SolariV2ScreensTable />
-        </Route>
-        <Route exact path="/solari-large-v2-screens">
-          <SolariLargeV2ScreensTable />
-        </Route>
         <Route exact path="/bus-shelter-v2-screens">
           <BusShelterV2ScreensTable />
         </Route>
