@@ -1,17 +1,21 @@
 defmodule Screens.V2.CandidateGenerator.BusEinkTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config
+  alias Screens.Config.{Screen, V2}
   alias Screens.V2.CandidateGenerator.BusEink
   alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader}
 
   setup do
-    config = %Config.Screen{
-      app_params: %Config.Bus{stop_id: "1722"},
+    config = %Screen{
+      app_params: %V2.BusEink{
+        departures: %V2.Departures{sections: []},
+        header: %V2.Header{type: :current_stop_id, stop_id: "1722"},
+        footer: %V2.Footer{stop_id: "1722"}
+      },
       vendor: :gds,
       device_id: "TEST",
       name: "TEST",
-      app_id: :bus_eink
+      app_id: :bus_eink_v2
     }
 
     %{config: config}
