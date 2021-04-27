@@ -1,7 +1,7 @@
 defmodule Screens.Config.Screen do
   @moduledoc false
 
-  alias Screens.Config.{Bus, BusShelter, Dup, Gl, Solari}
+  alias Screens.Config.{Bus, BusShelter, Dup, Gl, Solari, V2}
   alias Screens.Util
 
   @type t :: %__MODULE__{
@@ -10,29 +10,45 @@ defmodule Screens.Config.Screen do
           name: String.t(),
           app_id:
             :bus_eink
+            | :bus_eink_v2
             | :bus_shelter
+            | :bus_shelter_v2
+            | :dup
+            | :dup_v2
             | :gl_eink_single
             | :gl_eink_double
+            | :gl_eink_v2
             | :solari
+            | :solari_v2
             | :solari_large
-            | :dup,
+            | :solari_large_v2,
           refresh_if_loaded_before: DateTime.t() | nil,
           disabled: boolean(),
           app_params: Bus.t() | BusShelter.t() | Dup.t() | Gl.t() | Solari.t(),
           tags: list(String.t())
         }
 
-  @recognized_app_ids ~w[bus_eink bus_shelter gl_eink_single gl_eink_double solari solari_large dup]a
-  @recognized_app_id_strings Enum.map(@recognized_app_ids, &Atom.to_string/1)
+  @recognized_app_ids ~w[bus_eink bus_shelter dup gl_eink_single gl_eink_double solari solari_large]a
+  @recognized_v2_app_ids ~w[bus_eink_v2 bus_shelter_v2 dup_v2 gl_eink_v2 solari_v2 solari_large_v2]a
+  @recognized_app_id_strings Enum.map(
+                               @recognized_app_ids ++ @recognized_v2_app_ids,
+                               &Atom.to_string/1
+                             )
 
   @app_config_modules_by_app_id %{
     bus_eink: Bus,
+    bus_eink_v2: V2.BusEink,
+    bus_shelter: BusShelter,
+    bus_shelter_v2: V2.BusShelter,
     dup: Dup,
+    dup_v2: V2.Dup,
     gl_eink_single: Gl,
     gl_eink_double: Gl,
+    gl_eink_v2: V2.GlEink,
     solari: Solari,
+    solari_v2: V2.Solari,
     solari_large: Solari,
-    bus_shelter: BusShelter
+    solari_large_v2: V2.SolariLarge
   }
 
   @enforce_keys [:vendor, :device_id, :name, :app_id, :app_params]
