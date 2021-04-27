@@ -212,7 +212,7 @@ defmodule Screens.V2.ScreenData do
   def resolve_paging(layout_and_instances, refresh_rate, now \\ DateTime.utc_now())
 
   def resolve_paging(layout_and_instances, nil, _now) do
-    layout_and_instances
+    Tuple.append(layout_and_instances, %{})
   end
 
   def resolve_paging({layout, instance_map}, refresh_rate, now) do
