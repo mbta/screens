@@ -1,5 +1,6 @@
 defmodule Screens.Config.Dup.Section.Headway do
   @moduledoc false
+  # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 
   alias Screens.Util
 

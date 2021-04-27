@@ -1,5 +1,6 @@
 defmodule Screens.Config.V2.GlEink do
   @moduledoc false
+  # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 
   alias Screens.Config.V2.{Departures, Footer, Header}
   alias Screens.Util
