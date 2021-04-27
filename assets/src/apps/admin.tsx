@@ -17,6 +17,11 @@ import {
   SolariLargeScreensTable,
   DupScreensTable,
   BusShelterScreensTable,
+  BusEinkV2ScreensTable,
+  GLEinkV2ScreensTable,
+  SolariV2ScreensTable,
+  SolariLargeV2ScreensTable,
+  BusShelterV2ScreensTable,
 } from "Components/admin/admin_tables";
 import ImageManager from "Components/admin/admin_image_manager";
 import Devops from "Components/admin/devops";
@@ -52,6 +57,21 @@ const App = (): JSX.Element => {
         </Route>
         <Route exact path="/bus-shelter-screens">
           <BusShelterScreensTable />
+        </Route>
+        <Route exact path="/bus-eink-v2-screens">
+          <BusEinkV2ScreensTable />
+        </Route>
+        <Route exact path="/gl-eink-v2-screens">
+          <GLEinkV2ScreensTable />
+        </Route>
+        <Route exact path="/solari-v2-screens">
+          <SolariV2ScreensTable />
+        </Route>
+        <Route exact path="/solari-large-v2-screens">
+          <SolariLargeV2ScreensTable />
+        </Route>
+        <Route exact path="/bus-shelter-v2-screens">
+          <BusShelterV2ScreensTable />
         </Route>
         <Route exact path="/json-editor">
           <AdminForm />
