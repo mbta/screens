@@ -24,7 +24,17 @@ defmodule Screens.Config.Screen do
             | :solari_large_v2,
           refresh_if_loaded_before: DateTime.t() | nil,
           disabled: boolean(),
-          app_params: Bus.t() | BusShelter.t() | Dup.t() | Gl.t() | Solari.t(),
+          app_params:
+            Bus.t()
+            | BusShelter.t()
+            | Dup.t()
+            | Gl.t()
+            | Solari.t()
+            | V2.BusEink.t()
+            | V2.BusShelter.t()
+            | V2.GlEink.t()
+            | V2.Solari.t()
+            | V2.SolariLarge.t(),
           tags: list(String.t())
         }
 
