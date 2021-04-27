@@ -16,7 +16,6 @@ import {
   SolariScreensTable,
   SolariLargeScreensTable,
   DupScreensTable,
-  BusShelterScreensTable,
   BusEinkV2ScreensTable,
   GLEinkV2ScreensTable,
   SolariV2ScreensTable,
@@ -54,9 +53,6 @@ const App = (): JSX.Element => {
         </Route>
         <Route exact path="/dup-screens">
           <DupScreensTable />
-        </Route>
-        <Route exact path="/bus-shelter-screens">
-          <BusShelterScreensTable />
         </Route>
         <Route exact path="/bus-eink-v2-screens">
           <BusEinkV2ScreensTable />
