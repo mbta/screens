@@ -1,7 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.BusShelter do
   @moduledoc false
 
-  alias Screens.Config.{BusShelter, Screen}
+  alias Screens.Config.Screen
+  alias Screens.Config.V2.{BusShelter, Footer, Header}
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader, Placeholder}
@@ -43,12 +44,15 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
         %Placeholder{color: :red, slot_names: [:main_content]},
         %Placeholder{color: :green, slot_names: [:medium_left]},
         %Placeholder{color: :blue, slot_names: [:small_upper_right]},
-        %Placeholder{color: :grey, slot_names: [:small_lower_right]}
+        %Placeholder{color: :grey, slot_names: [:small_lower_right]},
+        %Placeholder{color: :green, slot_names: [:large]},
+        %Placeholder{color: :red, slot_names: [:large]}
       ]
   end
 
   defp header_instances(config, now, fetch_stop_name_fn) do
-    %Screen{app_params: %BusShelter{stop_id: stop_id}} = config
+    %Screen{app_params: %BusShelter{header: %Header{type: :current_stop_id, stop_id: stop_id}}} =
+      config
 
     case fetch_stop_name_fn.(stop_id) do
       nil -> []
@@ -56,7 +60,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
     end
   end
 
-  defp footer_instances(%Screen{app_params: %BusShelter{stop_id: stop_id}} = config) do
+  defp footer_instances(config) do
+    %Screen{app_params: %BusShelter{footer: %Footer{stop_id: stop_id}}} = config
     [%LinkFooter{screen: config, text: "More at", url: "mbta.com/stops/#{stop_id}"}]
   end
 
