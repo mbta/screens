@@ -1,5 +1,6 @@
 defmodule Screens.Config.V2.Solari do
   @moduledoc false
+  # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 
   alias Screens.Config.V2.{Departures, Header}
   alias Screens.Util
