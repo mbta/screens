@@ -23,22 +23,19 @@ defmodule Screens.V2.ScreenData do
         }
 
   @app_id_to_candidate_generator %{
-    bus_eink: CandidateGenerator.BusEink,
-    gl_eink_double: CandidateGenerator.GlEinkDouble,
-    gl_eink_single: CandidateGenerator.GlEinkSingle,
-    solari: CandidateGenerator.Solari,
-    solari_large: CandidateGenerator.SolariLarge,
-    dup: CandidateGenerator.Dup,
-    bus_shelter: CandidateGenerator.BusShelter
+    bus_eink_v2: CandidateGenerator.BusEink,
+    bus_shelter_v2: CandidateGenerator.BusShelter,
+    gl_eink_v2: CandidateGenerator.GlEink,
+    solari_v2: CandidateGenerator.Solari,
+    solari_large_v2: CandidateGenerator.SolariLarge
   }
 
   @app_id_to_refresh_rate %{
-    bus_eink: 30,
-    gl_eink_double: 30,
-    gl_eink_single: 30,
-    solari: 15,
-    dup: nil,
-    bus_shelter: 15
+    bus_eink_v2: 30,
+    bus_shelter_v2: 15,
+    gl_eink_v2: 30,
+    solari_v2: 15,
+    solari_large_v2: 15
   }
 
   @spec by_screen_id(screen_id()) :: serializable_map()
