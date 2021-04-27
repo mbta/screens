@@ -16,7 +16,7 @@ import OneMediumTwoSmall from "Components/v2/bus_shelter/flex/one_medium_two_sma
 import TwoMedium from "Components/v2/bus_shelter/flex/two_medium";
 
 import Placeholder from "Components/v2/placeholder";
-import LinkFooter from "Components/v2/link_footer";
+import LinkFooter from "Components/v2/bus_shelter/link_footer";
 import NormalHeader from "Components/v2/lcd/normal_header";
 
 const TYPE_TO_COMPONENT = {
