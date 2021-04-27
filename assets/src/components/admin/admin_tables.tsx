@@ -443,37 +443,6 @@ const DupScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
-const BusShelterScreensTable = (): JSX.Element => {
-  const columns = [
-    {
-      Header: "Screen ID",
-      accessor: "id",
-      Filter: DefaultColumnFilter,
-      FormCell: FormStaticCell,
-    },
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: EditableCell,
-      Filter: DefaultColumnFilter,
-      FormCell: FormTextCell,
-    },
-    {
-      Header: "Stop ID",
-      accessor: buildAppParamAccessor("stop_id"),
-      mutator: buildAppParamMutator("stop_id"),
-      Cell: EditableCell,
-      Filter: DefaultColumnFilter,
-      FormCell: FormTextCell,
-    },
-  ];
-
-  const dataFilter = ({ app_id }) => {
-    return app_id === "bus_shelter";
-  };
-  return <AdminTable columns={columns} dataFilter={dataFilter} />;
-};
-
 const BusEinkV2ScreensTable = (): JSX.Element => {
   const columns = [
     {
@@ -706,7 +675,6 @@ export {
   SolariScreensTable,
   SolariLargeScreensTable,
   DupScreensTable,
-  BusShelterScreensTable,
   BusEinkV2ScreensTable,
   GLEinkV2ScreensTable,
   SolariV2ScreensTable,

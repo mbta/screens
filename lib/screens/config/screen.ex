@@ -1,7 +1,7 @@
 defmodule Screens.Config.Screen do
   @moduledoc false
 
-  alias Screens.Config.{Bus, BusShelter, Dup, Gl, Solari, V2}
+  alias Screens.Config.{Bus, Dup, Gl, Solari, V2}
   alias Screens.Util
 
   @type t :: %__MODULE__{
@@ -11,7 +11,6 @@ defmodule Screens.Config.Screen do
           app_id:
             :bus_eink
             | :bus_eink_v2
-            | :bus_shelter
             | :bus_shelter_v2
             | :dup
             | :dup_v2
@@ -26,7 +25,6 @@ defmodule Screens.Config.Screen do
           disabled: boolean(),
           app_params:
             Bus.t()
-            | BusShelter.t()
             | Dup.t()
             | Gl.t()
             | Solari.t()
@@ -48,7 +46,6 @@ defmodule Screens.Config.Screen do
   @app_config_modules_by_app_id %{
     bus_eink: Bus,
     bus_eink_v2: V2.BusEink,
-    bus_shelter: BusShelter,
     bus_shelter_v2: V2.BusShelter,
     dup: Dup,
     dup_v2: V2.Dup,

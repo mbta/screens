@@ -14,7 +14,6 @@ const fields = [
     FormCell: buildFormSelect([
       "bus_eink",
       "bus_eink_v2",
-      "bus_shelter",
       "bus_shelter_v2",
       "dup",
       "gl_eink_single",
@@ -67,7 +66,6 @@ const defaultAppParamsByAppId = {
   },
   solari: { station_name: "STATION_NAME" },
   dup: { header: "STATION_NAME" },
-  bus_shelter: { stop_id: "STOP_ID" },
   bus_shelter_v2: {
     departures: {},
     footer: {},
