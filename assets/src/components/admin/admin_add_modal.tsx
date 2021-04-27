@@ -66,6 +66,10 @@ const defaultAppParamsByAppId = {
   },
   solari: { station_name: "STATION_NAME" },
   dup: { header: "STATION_NAME" },
+<<<<<<< HEAD
+=======
+  bus_shelter: { stop_id: "STOP_ID" },
+>>>>>>> feat: add v2 apps to admin tool
   bus_shelter_v2: {
     departures: {},
     footer: {},
