@@ -39,6 +39,7 @@ defmodule Screens.V2.Departure do
     predictions_or_schedules
     |> Enum.reject(&in_past_or_nil_time?/1)
     |> Enum.reject(&multi_route_duplicate?/1)
+    |> choose_earliest_stop_per_trip()
   end
 
   defp in_past_or_nil_time?(%{arrival_time: nil, departure_time: nil}), do: true
@@ -53,6 +54,26 @@ defmodule Screens.V2.Departure do
 
   defp multi_route_duplicate?(%{route: %{id: id1}, trip: %{route_id: id2}}), do: id1 != id2
   defp multi_route_duplicate?(_), do: false
+
+  defp choose_earliest_stop_per_trip(predictions_or_schedules) do
+    {departures_without_trip, departures_with_trip} =
+      Enum.split_with(predictions_or_schedules, fn
+        %{trip: nil} -> true
+        %{trip: %{id: nil}} -> true
+        _ -> false
+      end)
+
+    deduplicated_predictions_with_trip =
+      departures_with_trip
+      |> Enum.group_by(fn %{trip: %Trip{id: trip_id}} -> trip_id end)
+      |> Enum.map(fn {_trip_id, departures} -> Enum.min_by(departures, & &1.departure_time) end)
+
+    deduplicated_predictions =
+      (departures_without_trip ++ deduplicated_predictions_with_trip)
+      |> Enum.sort_by(& &1.departure_time)
+
+    deduplicated_predictions
+  end
 
   defp merge_predictions_and_schedules(predictions, schedules) do
     predicted_trip_ids =
@@ -94,7 +115,8 @@ defmodule Screens.V2.Departure do
   defp fetch_predictions_only(params) do
     case Prediction.fetch(params) do
       {:ok, predictions} ->
-        departures = Enum.map(predictions, fn p -> %__MODULE__{prediction: p} end)
+        relevant_predictions = get_relevant_departures(predictions)
+        departures = Enum.map(relevant_predictions, fn p -> %__MODULE__{prediction: p} end)
         {:ok, departures}
 
       :error ->
