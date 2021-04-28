@@ -170,8 +170,12 @@ defmodule Screens.V2.Departure do
 
   def crowding_level(%__MODULE__{prediction: p}) when not is_nil(p) do
     case p do
-      %Prediction{vehicle: %Vehicle{occupancy_status: occupancy_status}} ->
-        crowding_level_from_occupancy_status(occupancy_status)
+      %Prediction{trip: %Trip{} = trip, vehicle: %Vehicle{occupancy_status: status} = vehicle} ->
+        if crowding_data_relevant?(trip, vehicle) do
+          crowding_level_from_occupancy_status(status)
+        else
+          nil
+        end
 
       _ ->
         nil
@@ -179,6 +183,19 @@ defmodule Screens.V2.Departure do
   end
 
   def crowding_level(%__MODULE__{prediction: nil, schedule: _}), do: nil
+
+  defp crowding_data_relevant?(%Trip{id: trip_trip_id, stops: [first_stop | _]}, %Vehicle{
+         current_status: current_status,
+         trip_id: vehicle_trip_id,
+         stop_id: next_stop
+       })
+       when not is_nil(trip_trip_id) and not is_nil(vehicle_trip_id) do
+    vehicle_on_prediction_trip? = trip_trip_id == vehicle_trip_id
+    vehicle_started_trip? = not (current_status == :in_transit_to and next_stop == first_stop)
+    vehicle_on_prediction_trip? and vehicle_started_trip?
+  end
+
+  defp crowding_data_relevant?(_trip, _vehicle), do: false
 
   defp crowding_level_from_occupancy_status(:many_seats_available), do: 1
   defp crowding_level_from_occupancy_status(:few_seats_available), do: 2
