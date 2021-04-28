@@ -50,14 +50,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
       headsign = Departure.headsign(first_departure)
       inline_alerts = first_departure |> Departure.alerts() |> Enum.filter(&alert_is_inline?/1)
 
-      times_with_crowding =
-        Enum.map(departure_list, fn d -> {Departure.time(d), Departure.crowding_level(d)} end)
-
       %{
         route_id: route_id,
         headsign: headsign,
-        times_with_crowding: times_with_crowding,
-        inline_alerts: inline_alerts
+        inline_alerts: inline_alerts,
+        departures: departure_list
       }
     end
 
@@ -67,13 +64,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
     defp serialize_row(%{
            route_id: route_id,
            headsign: headsign,
-           times_with_crowding: times_with_crowding,
-           inline_alerts: inline_alerts
+           inline_alerts: inline_alerts,
+           departures: departures
          }) do
       %{
         route: serialize_route(route_id),
         headsign: serialize_headsign(headsign),
-        times_with_crowding: serialize_times(times_with_crowding),
+        times_with_crowding: serialize_times_with_crowding(departures),
         inline_alerts: serialize_inline_alerts(inline_alerts)
       }
     end
@@ -138,20 +135,30 @@ defmodule Screens.V2.WidgetInstance.Departures do
       %{headsign: headsign, variation: variation}
     end
 
-    defp serialize_times(times_with_crowding) do
-      Enum.map(times_with_crowding, &serialize_time_with_crowding/1)
+    defp serialize_times_with_crowding(departures) do
+      Enum.map(departures, &serialize_time_with_crowding/1)
     end
 
-    defp serialize_time_with_crowding({time, crowding_level}) do
-      %{time: serialize_time(time), crowding: crowding_level}
+    defp serialize_time_with_crowding(departure) do
+      %{time: serialize_time(departure), crowding: serialize_crowding(departure)}
     end
 
-    defp serialize_time(departure_time) do
+    defp serialize_time(departure) do
+      departure_time = Departure.time(departure)
+      vehicle_status = Departure.vehicle_status(departure)
+      stop_type = Departure.stop_type(departure)
+
       now = DateTime.utc_now()
       second_diff = DateTime.diff(departure_time, now)
       minute_diff = div(second_diff, 60)
 
       cond do
+        vehicle_status == :stopped_at and second_diff < 90 ->
+          %{type: :text, text: "BRD"}
+
+        second_diff < 30 and stop_type == :first_stop ->
+          %{type: :text, text: "BRD"}
+
         second_diff < 30 ->
           %{type: :text, text: "ARR"}
 
@@ -165,6 +172,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
           am_pm = if local_time.hour >= 12, do: :pm, else: :am
           %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm}
       end
+    end
+
+    defp serialize_crowding(departure) do
+      Departure.crowding_level(departure)
     end
 
     defp serialize_inline_alerts(inline_alerts) do

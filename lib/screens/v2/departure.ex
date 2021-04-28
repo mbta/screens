@@ -201,4 +201,37 @@ defmodule Screens.V2.Departure do
   defp crowding_level_from_occupancy_status(:few_seats_available), do: 2
   defp crowding_level_from_occupancy_status(:full), do: 3
   defp crowding_level_from_occupancy_status(nil), do: nil
+
+  def vehicle_status(%__MODULE__{prediction: p}) when not is_nil(p) do
+    case p do
+      %Prediction{vehicle: %Vehicle{current_status: current_status}} ->
+        current_status
+
+      _ ->
+        nil
+    end
+  end
+
+  def vehicle_status(%__MODULE__{prediction: nil, schedule: _}), do: nil
+
+  def stop_type(%__MODULE__{
+        prediction: %Prediction{arrival_time: arrival_time, departure_time: departure_time}
+      }) do
+    case {arrival_time, departure_time} do
+      {nil, _} -> :first_stop
+      {_, nil} -> :last_stop
+      {_, _} -> :mid_route_stop
+    end
+  end
+
+  def stop_type(%__MODULE__{
+        prediction: nil,
+        schedule: %Schedule{arrival_time: arrival_time, departure_time: departure_time}
+      }) do
+    case {arrival_time, departure_time} do
+      {nil, _} -> :first_stop
+      {_, nil} -> :last_stop
+      {_, _} -> :mid_route_stop
+    end
+  end
 end
