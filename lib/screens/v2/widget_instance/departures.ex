@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @moduledoc false
 
   alias Screens.Config.Dup.Override.FreeText
-  alias Screens.Departures.Departure
+  alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
 
   defstruct screen: nil,
@@ -41,40 +41,40 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     defp group_departures(departures) do
       departures
-      |> Enum.chunk_by(fn %Departure{route_id: route_id, destination: destination} ->
-        {route_id, destination}
-      end)
+      |> Enum.chunk_by(fn d -> {Departure.route_id(d), Departure.headsign(d)} end)
       |> Enum.map(&make_row/1)
     end
 
     defp make_row([first_departure | _] = departure_list) do
-      %Departure{route_id: route_id, destination: destination, inline_badges: inline_badges} =
-        first_departure
+      route_id = Departure.route_id(first_departure)
+      headsign = Departure.headsign(first_departure)
+      inline_alerts = first_departure |> Departure.alerts() |> Enum.filter(&alert_is_inline?/1)
 
       times_with_crowding =
-        Enum.map(departure_list, fn %Departure{time: time, crowding_level: crowding_level} ->
-          {time, crowding_level}
-        end)
+        Enum.map(departure_list, fn d -> {Departure.time(d), Departure.crowding_level(d)} end)
 
       %{
         route_id: route_id,
-        destination: destination,
+        headsign: headsign,
         times_with_crowding: times_with_crowding,
-        inline_badges: inline_badges
+        inline_alerts: inline_alerts
       }
     end
 
+    defp alert_is_inline?(%{effect: :delay}), do: true
+    defp alert_is_inline?(_), do: false
+
     defp serialize_row(%{
            route_id: route_id,
-           destination: destination,
+           headsign: headsign,
            times_with_crowding: times_with_crowding,
-           inline_badges: inline_badges
+           inline_alerts: inline_alerts
          }) do
       %{
         route: serialize_route(route_id),
-        destination: serialize_destination(destination),
+        headsign: serialize_headsign(headsign),
         times_with_crowding: serialize_times(times_with_crowding),
-        inline_alerts: serialize_inline_alerts(inline_badges)
+        inline_alerts: serialize_inline_alerts(inline_alerts)
       }
     end
 
@@ -119,20 +119,20 @@ defmodule Screens.V2.WidgetInstance.Departures do
       end
     end
 
-    defp serialize_destination(destination) do
+    defp serialize_headsign(headsign) do
       via_pattern = ~r/(.+) (via .+)/
       paren_pattern = ~r/(.+) (\(.+)/
 
       [headsign, variation] =
         cond do
-          String.match?(destination, via_pattern) ->
-            via_pattern |> Regex.run(destination) |> Enum.drop(1)
+          String.match?(headsign, via_pattern) ->
+            via_pattern |> Regex.run(headsign) |> Enum.drop(1)
 
-          String.match?(destination, paren_pattern) ->
-            paren_pattern |> Regex.run(destination) |> Enum.drop(1)
+          String.match?(headsign, paren_pattern) ->
+            paren_pattern |> Regex.run(headsign) |> Enum.drop(1)
 
           true ->
-            [destination, nil]
+            [headsign, nil]
         end
 
       %{headsign: headsign, variation: variation}
@@ -143,12 +143,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
 
     defp serialize_time_with_crowding({time, crowding_level}) do
-      {serialize_time(time), crowding_level}
+      %{time: serialize_time(time), crowding: crowding_level}
     end
 
     defp serialize_time(departure_time) do
       now = DateTime.utc_now()
-      second_diff = DateTime.diff(now, departure_time)
+      second_diff = DateTime.diff(departure_time, now)
       minute_diff = div(second_diff, 60)
 
       cond do
@@ -171,8 +171,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
       Enum.map(inline_alerts, &serialize_inline_alert/1)
     end
 
-    defp serialize_inline_alert(%{type: :delay, severity: severity}) do
-      {delay_minutes, delay_description} =
+    defp serialize_inline_alert(%{effect: :delay, severity: severity}) do
+      {delay_description, delay_minutes} =
         cond do
           severity < 3 -> {"up to", 10}
           severity > 9 -> {"more than", 60}
