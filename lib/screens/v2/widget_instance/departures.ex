@@ -143,10 +143,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
       %{time: serialize_time(departure), crowding: serialize_crowding(departure)}
     end
 
+    # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
     defp serialize_time(departure) do
       departure_time = Departure.time(departure)
       vehicle_status = Departure.vehicle_status(departure)
       stop_type = Departure.stop_type(departure)
+      route_type = Departure.route_type(departure)
 
       now = DateTime.utc_now()
       second_diff = DateTime.diff(departure_time, now)
@@ -162,7 +164,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         second_diff < 30 ->
           %{type: :text, text: "ARR"}
 
-        minute_diff < 60 ->
+        minute_diff < 60 and route_type not in [2, 4] ->
           %{type: :minutes, minutes: minute_diff}
 
         true ->

@@ -234,4 +234,15 @@ defmodule Screens.V2.Departure do
       {_, _} -> :mid_route_stop
     end
   end
+
+  def route_type(%__MODULE__{prediction: %Prediction{route: %Route{type: route_type}}}) do
+    route_type
+  end
+
+  def route_type(%__MODULE__{
+        prediction: nil,
+        schedule: %Schedule{route: %Route{type: route_type}}
+      }) do
+    route_type
+  end
 end
