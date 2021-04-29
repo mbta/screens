@@ -134,7 +134,8 @@ defmodule Screens.V2.Departure do
       end)
       |> Enum.map(fn s -> %__MODULE__{schedule: s} end)
 
-    predicted_departures ++ unpredicted_departures
+    (predicted_departures ++ unpredicted_departures)
+    |> Enum.sort_by(&time/1)
   end
 
   defp fetch_predictions_only(params) do
@@ -189,6 +190,12 @@ defmodule Screens.V2.Departure do
   def time(%__MODULE__{prediction: nil, schedule: s}) do
     select_departure_time(s)
   end
+
+  def scheduled_time(%__MODULE__{schedule: s}) when not is_nil(s) do
+    select_departure_time(s)
+  end
+
+  def scheduled_time(_), do: nil
 
   defp select_departure_time(%{arrival_time: t, departure_time: nil}), do: t
   defp select_departure_time(%{arrival_time: _, departure_time: t}), do: t

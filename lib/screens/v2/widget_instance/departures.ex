@@ -144,7 +144,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
 
     defp serialize_time_with_crowding(departure, screen) do
-      %{time: serialize_time(departure, screen), crowding: serialize_crowding(departure)}
+      serialized_time =
+        case Departure.route_type(departure) do
+          2 -> serialize_time_with_schedule(departure, screen)
+          _ -> serialize_time(departure, screen)
+        end
+
+      Map.merge(serialized_time, %{crowding: serialize_crowding(departure)})
     end
 
     # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
@@ -156,16 +162,19 @@ defmodule Screens.V2.WidgetInstance.Departures do
       second_diff = DateTime.diff(departure_time, now)
       minute_diff = div(second_diff, 60)
 
-      cond do
-        second_diff < 60 ->
-          %{type: :text, text: "Now"}
+      time =
+        cond do
+          second_diff < 60 ->
+            %{type: :text, text: "Now"}
 
-        minute_diff < 60 ->
-          %{type: :minutes, minutes: minute_diff}
+          minute_diff < 60 ->
+            %{type: :minutes, minutes: minute_diff}
 
-        true ->
-          serialize_timestamp(departure_time)
-      end
+          true ->
+            serialize_timestamp(departure_time)
+        end
+
+      %{time: time}
     end
 
     defp serialize_time(departure, _screen) do
@@ -178,21 +187,47 @@ defmodule Screens.V2.WidgetInstance.Departures do
       second_diff = DateTime.diff(departure_time, now)
       minute_diff = div(second_diff, 60)
 
-      cond do
-        vehicle_status == :stopped_at and second_diff < 90 ->
-          %{type: :text, text: "BRD"}
+      time =
+        cond do
+          vehicle_status == :stopped_at and second_diff < 90 ->
+            %{type: :text, text: "BRD"}
 
-        second_diff < 30 and stop_type == :first_stop ->
-          %{type: :text, text: "BRD"}
+          second_diff < 30 and stop_type == :first_stop ->
+            %{type: :text, text: "BRD"}
 
-        second_diff < 30 ->
-          %{type: :text, text: "ARR"}
+          second_diff < 30 ->
+            %{type: :text, text: "ARR"}
 
-        minute_diff < 60 and route_type not in [2, 4] ->
-          %{type: :minutes, minutes: minute_diff}
+          minute_diff < 60 and route_type not in [2, 4] ->
+            %{type: :minutes, minutes: minute_diff}
 
-        true ->
-          serialize_timestamp(departure_time)
+          true ->
+            serialize_timestamp(departure_time)
+        end
+
+      %{time: time}
+    end
+
+    defp serialize_time_with_schedule(departure, screen) do
+      %{time: serialized_time} = serialize_time(departure, screen)
+
+      scheduled_time = Departure.scheduled_time(departure)
+
+      if is_nil(scheduled_time) do
+        %{time: serialized_time}
+      else
+        serialized_scheduled_time = serialize_timestamp(scheduled_time)
+
+        case serialized_time do
+          %{type: :text} ->
+            %{time: serialized_time}
+
+          ^serialized_scheduled_time ->
+            %{time: serialized_time}
+
+          _ ->
+            %{time: serialized_time, scheduled_time: serialized_scheduled_time}
+        end
       end
     end
 
