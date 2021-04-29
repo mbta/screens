@@ -41,51 +41,35 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
 
     defp group_departures(departures) do
-      departures
-      |> Enum.chunk_by(fn d -> {Departure.route_id(d), Departure.headsign(d)} end)
-      |> Enum.map(&make_row/1)
-    end
-
-    defp make_row([first_departure | _] = departure_list) do
-      route_id = Departure.route_id(first_departure)
-      headsign = Departure.headsign(first_departure)
-      inline_alerts = first_departure |> Departure.alerts() |> Enum.filter(&alert_is_inline?/1)
-
-      %{
-        route_id: route_id,
-        headsign: headsign,
-        inline_alerts: inline_alerts,
-        departures: departure_list
-      }
+      Enum.chunk_by(departures, fn d -> {Departure.route_id(d), Departure.headsign(d)} end)
     end
 
     defp alert_is_inline?(%{effect: :delay}), do: true
     defp alert_is_inline?(_), do: false
 
-    defp serialize_row(
-           %{
-             route_id: route_id,
-             headsign: headsign,
-             inline_alerts: inline_alerts,
-             departures: departures
-           },
-           screen
-         ) do
+    defp serialize_row(departures, screen) do
       %{
-        route: serialize_route(route_id),
-        headsign: serialize_headsign(headsign),
+        route: serialize_route(departures),
+        headsign: serialize_headsign(departures),
         times_with_crowding: serialize_times_with_crowding(departures, screen),
-        inline_alerts: serialize_inline_alerts(inline_alerts)
+        inline_alerts: serialize_inline_alerts(departures)
       }
     end
 
-    defp serialize_route(route_id) do
+    defp serialize_route([first_departure | _]) do
+      route_id = Departure.route_id(first_departure)
+      route_type = Departure.route_type(first_departure)
+      track_number = Departure.track_number(first_departure)
+
       route =
         cond do
-          String.starts_with?(route_id, "CR-") ->
+          not is_nil(track_number) ->
+            %{type: :text, text: "TR#{track_number}"}
+
+          route_type == 2 ->
             %{type: :icon, icon: :rail}
 
-          String.starts_with?(route_id, "Boat-") ->
+          route_type == 4 ->
             %{type: :icon, icon: :boat}
 
           String.contains?(route_id, "/") ->
@@ -96,31 +80,29 @@ defmodule Screens.V2.WidgetInstance.Departures do
             %{type: :text, text: route_id}
         end
 
-      Map.merge(route, %{color: get_color_for_route(route_id)})
+      Map.merge(route, %{color: get_color_for_route(route_id, route_type)})
     end
 
-    defp get_color_for_route("Red"), do: :red
-    defp get_color_for_route("Mattapan"), do: :red
-    defp get_color_for_route("Orange"), do: :orange
-    defp get_color_for_route("Blue"), do: :blue
+    defp get_color_for_route("Red", _), do: :red
+    defp get_color_for_route("Mattapan", _), do: :red
+    defp get_color_for_route("Orange", _), do: :orange
+    defp get_color_for_route("Blue", _), do: :blue
 
-    defp get_color_for_route(route_id)
+    defp get_color_for_route(route_id, _)
          when route_id in ["Green-B", "Green-C", "Green-D", "Green-E"],
          do: :green
 
-    defp get_color_for_route(route_id)
+    defp get_color_for_route(route_id, _)
          when route_id in ["741", "742", "743", "746", "749", "751"],
          do: :silver
 
-    defp get_color_for_route(route_id) do
-      cond do
-        String.starts_with?(route_id, "CR-") -> :purple
-        String.starts_with?(route_id, "Boat-") -> :teal
-        true -> :yellow
-      end
-    end
+    defp get_color_for_route(_, 2), do: :purple
+    defp get_color_for_route(_, 4), do: :teal
+    defp get_color_for_route(_, _), do: :yellow
 
-    defp serialize_headsign(headsign) do
+    defp serialize_headsign([first_departure | _]) do
+      headsign = Departure.headsign(first_departure)
+
       via_pattern = ~r/(.+) (via .+)/
       paren_pattern = ~r/(.+) (\(.+)/
 
@@ -243,8 +225,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
       Departure.crowding_level(departure)
     end
 
-    defp serialize_inline_alerts(inline_alerts) do
-      Enum.map(inline_alerts, &serialize_inline_alert/1)
+    defp serialize_inline_alerts([first_departure | _]) do
+      first_departure
+      |> Departure.alerts()
+      |> Enum.filter(&alert_is_inline?/1)
+      |> Enum.map(&serialize_inline_alert/1)
     end
 
     defp serialize_inline_alert(%{effect: :delay, severity: severity}) do

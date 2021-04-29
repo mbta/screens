@@ -277,4 +277,7 @@ defmodule Screens.V2.Departure do
       }) do
     route_type
   end
+
+  def track_number(%__MODULE__{prediction: p}) when not is_nil(p), do: p.track_number
+  def track_number(%__MODULE__{prediction: nil, schedule: s}), do: s.track_number
 end
