@@ -48,22 +48,22 @@ defmodule Screens.V2.Departure do
     end
   end
 
-  def get_relevant_departures(predictions_or_schedules) do
+  def get_relevant_departures(predictions_or_schedules, now \\ DateTime.utc_now()) do
     predictions_or_schedules
-    |> Enum.reject(&in_past_or_nil_time?/1)
+    |> Enum.reject(&in_past_or_nil_time?(&1, now))
     |> Enum.reject(&multi_route_duplicate?/1)
     |> Enum.reject(&vehicle_already_departed?/1)
     |> choose_earliest_stop_per_trip()
   end
 
-  defp in_past_or_nil_time?(%{arrival_time: nil, departure_time: nil}), do: true
+  defp in_past_or_nil_time?(%{arrival_time: nil, departure_time: nil}, _), do: true
 
-  defp in_past_or_nil_time?(%{departure_time: nil, arrival_time: t}) do
-    DateTime.compare(t, DateTime.utc_now()) == :lt
+  defp in_past_or_nil_time?(%{departure_time: nil, arrival_time: t}, now) do
+    DateTime.compare(t, now) == :lt
   end
 
-  defp in_past_or_nil_time?(%{departure_time: t}) do
-    DateTime.compare(t, DateTime.utc_now()) == :lt
+  defp in_past_or_nil_time?(%{departure_time: t}, now) do
+    DateTime.compare(t, now) == :lt
   end
 
   defp multi_route_duplicate?(%{route: %{id: id1}, trip: %{route_id: id2}}), do: id1 != id2
