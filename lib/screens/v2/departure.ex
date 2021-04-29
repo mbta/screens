@@ -4,6 +4,7 @@ defmodule Screens.V2.Departure do
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
+  alias Screens.Stops.Stop
   alias Screens.Trips.Trip
   alias Screens.Vehicles.Vehicle
 
@@ -39,6 +40,7 @@ defmodule Screens.V2.Departure do
     predictions_or_schedules
     |> Enum.reject(&in_past_or_nil_time?/1)
     |> Enum.reject(&multi_route_duplicate?/1)
+    |> Enum.reject(&vehicle_already_departed?/1)
     |> choose_earliest_stop_per_trip()
   end
 
@@ -54,6 +56,29 @@ defmodule Screens.V2.Departure do
 
   defp multi_route_duplicate?(%{route: %{id: id1}, trip: %{route_id: id2}}), do: id1 != id2
   defp multi_route_duplicate?(_), do: false
+
+  defp vehicle_already_departed?(%Prediction{
+         stop: %Stop{id: prediction_stop},
+         trip: %Trip{id: trip_trip_id, stops: stops},
+         vehicle: %Vehicle{
+           trip_id: vehicle_trip_id,
+           stop_id: vehicle_stop
+         }
+       })
+       when not is_nil(trip_trip_id) and not is_nil(vehicle_trip_id) and not is_nil(vehicle_stop) do
+    trip_ids_match? = trip_trip_id == vehicle_trip_id
+
+    prediction_stop_index = Enum.find_index(stops, fn stop -> stop == prediction_stop end)
+    vehicle_stop_index = Enum.find_index(stops, fn stop -> stop == vehicle_stop end)
+
+    vehicle_has_passed? =
+      not is_nil(prediction_stop_index) and not is_nil(vehicle_stop_index) and
+        vehicle_stop_index > prediction_stop_index
+
+    trip_ids_match? and vehicle_has_passed?
+  end
+
+  defp vehicle_already_departed?(_), do: false
 
   defp choose_earliest_stop_per_trip(predictions_or_schedules) do
     {departures_without_trip, departures_with_trip} =
