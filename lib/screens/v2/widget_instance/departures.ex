@@ -2,6 +2,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @moduledoc false
 
   alias Screens.Config.Dup.Override.FreeText
+  alias Screens.Config.Screen
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
 
@@ -21,22 +22,22 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type section :: normal_section | notice_section
   @type t :: %__MODULE__{
-          screen: Screens.Config.Screen.t(),
+          screen: Screen.t(),
           section_data: list(section)
         }
 
   defimpl Screens.V2.WidgetInstance do
     def priority(_instance), do: [2]
 
-    def serialize(%Departures{section_data: section_data}) do
-      %{sections: Enum.map(section_data, &serialize_section/1)}
+    def serialize(%Departures{section_data: section_data, screen: screen}) do
+      %{sections: Enum.map(section_data, &serialize_section(&1, screen))}
     end
 
-    defp serialize_section(%{type: :notice_section} = section), do: section
+    defp serialize_section(%{type: :notice_section} = section, _screen), do: section
 
-    defp serialize_section(%{type: :normal_section, departures: departures}) do
+    defp serialize_section(%{type: :normal_section, departures: departures}, screen) do
       rows = group_departures(departures)
-      %{type: :normal_section, rows: Enum.map(rows, &serialize_row/1)}
+      %{type: :normal_section, rows: Enum.map(rows, &serialize_row(&1, screen))}
     end
 
     defp group_departures(departures) do
@@ -61,16 +62,19 @@ defmodule Screens.V2.WidgetInstance.Departures do
     defp alert_is_inline?(%{effect: :delay}), do: true
     defp alert_is_inline?(_), do: false
 
-    defp serialize_row(%{
-           route_id: route_id,
-           headsign: headsign,
-           inline_alerts: inline_alerts,
-           departures: departures
-         }) do
+    defp serialize_row(
+           %{
+             route_id: route_id,
+             headsign: headsign,
+             inline_alerts: inline_alerts,
+             departures: departures
+           },
+           screen
+         ) do
       %{
         route: serialize_route(route_id),
         headsign: serialize_headsign(headsign),
-        times_with_crowding: serialize_times_with_crowding(departures),
+        times_with_crowding: serialize_times_with_crowding(departures, screen),
         inline_alerts: serialize_inline_alerts(inline_alerts)
       }
     end
@@ -135,16 +139,36 @@ defmodule Screens.V2.WidgetInstance.Departures do
       %{headsign: headsign, variation: variation}
     end
 
-    defp serialize_times_with_crowding(departures) do
-      Enum.map(departures, &serialize_time_with_crowding/1)
+    defp serialize_times_with_crowding(departures, screen) do
+      Enum.map(departures, &serialize_time_with_crowding(&1, screen))
     end
 
-    defp serialize_time_with_crowding(departure) do
-      %{time: serialize_time(departure), crowding: serialize_crowding(departure)}
+    defp serialize_time_with_crowding(departure, screen) do
+      %{time: serialize_time(departure, screen), crowding: serialize_crowding(departure)}
     end
 
     # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
-    defp serialize_time(departure) do
+    defp serialize_time(departure, %Screen{app_id: app_id})
+         when app_id in [:bus_eink_v2, :gl_eink_v2] do
+      departure_time = Departure.time(departure)
+
+      now = DateTime.utc_now()
+      second_diff = DateTime.diff(departure_time, now)
+      minute_diff = div(second_diff, 60)
+
+      cond do
+        second_diff < 60 ->
+          %{type: :text, text: "Now"}
+
+        minute_diff < 60 ->
+          %{type: :minutes, minutes: minute_diff}
+
+        true ->
+          serialize_timestamp(departure_time)
+      end
+    end
+
+    defp serialize_time(departure, _screen) do
       departure_time = Departure.time(departure)
       vehicle_status = Departure.vehicle_status(departure)
       stop_type = Departure.stop_type(departure)
@@ -168,12 +192,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
           %{type: :minutes, minutes: minute_diff}
 
         true ->
-          {:ok, local_time} = DateTime.shift_zone(departure_time, "America/New_York")
-          hour = 1 + rem(local_time.hour - 1, 12)
-          minute = local_time.minute
-          am_pm = if local_time.hour >= 12, do: :pm, else: :am
-          %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm}
+          serialize_timestamp(departure_time)
       end
+    end
+
+    defp serialize_timestamp(departure_time) do
+      {:ok, local_time} = DateTime.shift_zone(departure_time, "America/New_York")
+      hour = 1 + rem(local_time.hour - 1, 12)
+      minute = local_time.minute
+      am_pm = if local_time.hour >= 12, do: :pm, else: :am
+      %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm}
     end
 
     defp serialize_crowding(departure) do
