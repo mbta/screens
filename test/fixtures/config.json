@@ -2767,6 +2767,210 @@
       "refresh_if_loaded_before": null,
       "tags": [],
       "vendor": "outfront"
+    },
+    "1001": {
+      "app_id": "bus_eink_v2",
+      "app_params": {
+        "departures": {
+          "sections": [
+            {
+              "filter": [],
+              "headway": {
+                "headway_id": null,
+                "override": null,
+                "sign_ids": []
+              },
+              "query": {
+                "opts": {
+                  "include_schedules": false
+                },
+                "params": {
+                  "direction_id": "both",
+                  "route_ids": [
+                    "1722"
+                  ],
+                  "route_type": null,
+                  "stop_ids": []
+                }
+              }
+            }
+          ]
+        },
+        "footer": {
+          "stop_id": "1722"
+        },
+        "header": {
+          "stop_id": "1722"
+        }
+      },
+      "device_id": "TEST",
+      "disabled": false,
+      "name": "",
+      "refresh_if_loaded_before": null,
+      "tags": [],
+      "vendor": "gds"
+    },
+    "1002": {
+      "app_id": "bus_eink_v2",
+      "app_params": {
+        "departures": {
+          "sections": [
+            {
+              "filter": [],
+              "headway": {
+                "headway_id": null,
+                "override": null,
+                "sign_ids": []
+              },
+              "query": {
+                "opts": {
+                  "include_schedules": false
+                },
+                "params": {
+                  "direction_id": "both",
+                  "route_ids": [
+                    "383"
+                  ],
+                  "route_type": null,
+                  "stop_ids": []
+                }
+              }
+            }
+          ]
+        },
+        "footer": {
+          "stop_id": "383"
+        },
+        "header": {
+          "stop_id": "383"
+        }
+      },
+      "device_id": "TEST",
+      "disabled": false,
+      "name": "",
+      "refresh_if_loaded_before": null,
+      "tags": [],
+      "vendor": "gds"
+    },
+    "1301": {
+      "app_id": "solari_v2",
+      "app_params": {
+        "departures": {
+          "sections": [
+            {
+              "filter": [],
+              "headway": {
+                "headway_id": null,
+                "override": null,
+                "sign_ids": []
+              },
+              "query": {
+                "opts": {
+                  "include_schedules": false
+                },
+                "params": {
+                  "direction_id": "both",
+                  "route_ids": [
+                    "1722"
+                  ],
+                  "route_type": null,
+                  "stop_ids": []
+                }
+              }
+            }
+          ]
+        },
+        "header": {
+          "stop_name": "Ashmont"
+        }
+      },
+      "device_id": "TEST",
+      "disabled": false,
+      "name": "",
+      "refresh_if_loaded_before": null,
+      "tags": [],
+      "vendor": "solari"
+    },
+    "1353": {
+      "app_id": "solari_large_v2",
+      "app_params": {
+        "departures": {
+          "sections": [
+            {
+              "filter": [],
+              "headway": {
+                "headway_id": null,
+                "override": null,
+                "sign_ids": []
+              },
+              "query": {
+                "opts": {
+                  "include_schedules": false
+                },
+                "params": {
+                  "direction_id": "both",
+                  "route_ids": [
+                    "1722"
+                  ],
+                  "route_type": null,
+                  "stop_ids": []
+                }
+              }
+            }
+          ]
+        },
+        "header": {
+          "stop_name": "Nubian"
+        }
+      },
+      "device_id": "TEST",
+      "disabled": false,
+      "name": "",
+      "refresh_if_loaded_before": null,
+      "tags": [],
+      "vendor": "gds"
+    },
+    "1401": {
+      "app_id": "bus_shelter_v2",
+      "app_params": {
+        "departures": {
+          "sections": [
+            {
+              "filter": [],
+              "headway": {
+                "headway_id": null,
+                "override": null,
+                "sign_ids": []
+              },
+              "query": {
+                "opts": {
+                  "include_schedules": false
+                },
+                "params": {
+                  "direction_id": "both",
+                  "route_ids": [
+                    "1722"
+                  ],
+                  "route_type": null,
+                  "stop_ids": []
+                }
+              }
+            }
+          ]
+        },
+        "footer": {
+          "stop_id": "1722"
+        },
+        "header": {
+          "stop_id": "1722"
+        }
+      },
+      "device_id": "TEST",
+      "disabled": false,
+      "name": "",
+      "refresh_if_loaded_before": null,
+      "tags": [],
+      "vendor": "lg-mri"
     }
   }
 }
