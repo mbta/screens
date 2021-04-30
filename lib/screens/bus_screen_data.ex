@@ -34,6 +34,7 @@ defmodule Screens.BusScreenData do
     departures =
       case Departure.fetch(%{stop_ids: [stop_id]}) do
         {:ok, result} ->
+          result = Enum.sort_by(result, & &1.time)
           {:ok, Departure.associate_alerts_with_departures(result, inline_alerts)}
 
         :error ->
