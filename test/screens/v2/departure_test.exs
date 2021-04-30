@@ -421,6 +421,23 @@ defmodule Screens.V2.DepartureTest do
     end
   end
 
+  describe "route_name/1" do
+    test "returns prediction route short_name when present" do
+      prediction = %Prediction{route: %Route{id: "214216", short_name: "214/216"}}
+      schedule = %Schedule{route: %Route{id: "1", short_name: "1"}}
+      departure = %Departure{prediction: prediction, schedule: schedule}
+
+      assert "214/216" == Departure.route_name(departure)
+    end
+
+    test "returns schedule route short_name when no prediction is present" do
+      schedule = %Schedule{route: %Route{id: "214216", short_name: "214/216"}}
+      departure = %Departure{prediction: nil, schedule: schedule}
+
+      assert "214/216" == Departure.route_name(departure)
+    end
+  end
+
   describe "route_type/1" do
     test "returns prediction route_type when present" do
       prediction = %Prediction{route: %Route{type: 2}}

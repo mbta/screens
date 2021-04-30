@@ -201,6 +201,17 @@ defmodule Screens.V2.Departure do
     route_id
   end
 
+  def route_name(%__MODULE__{prediction: %Prediction{route: %Route{short_name: route_name}}}) do
+    route_name
+  end
+
+  def route_name(%__MODULE__{
+        prediction: nil,
+        schedule: %Schedule{route: %Route{short_name: route_name}}
+      }) do
+    route_name
+  end
+
   def route_type(%__MODULE__{prediction: %Prediction{route: %Route{type: route_type}}}) do
     route_type
   end
@@ -244,7 +255,12 @@ defmodule Screens.V2.Departure do
     track_number
   end
 
-  def track_number(%__MODULE__{prediction: _, schedule: s}), do: s.track_number
+  def track_number(%__MODULE__{prediction: _, schedule: %Schedule{track_number: track_number}})
+      when not is_nil(track_number) do
+    track_number
+  end
+
+  def track_number(_), do: nil
 
   def vehicle_status(%__MODULE__{prediction: p}) when not is_nil(p) do
     case p do
