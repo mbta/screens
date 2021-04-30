@@ -443,228 +443,116 @@ const DupScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
-const BusEinkV2ScreensTable = (): JSX.Element => {
-  const columns = [
-    {
-      Header: "Screen ID",
-      accessor: "id",
-      Filter: DefaultColumnFilter,
-      FormCell: FormStaticCell,
-    },
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: EditableCell,
-      Filter: DefaultColumnFilter,
-      FormCell: FormTextCell,
-    },
-    {
-      Header: "Departures",
-      accessor: buildAppParamAccessor("departures"),
-      mutator: buildAppParamMutator("departures"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Footer",
-      accessor: buildAppParamAccessor("footer"),
-      mutator: buildAppParamMutator("footer"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Header",
-      accessor: buildAppParamAccessor("header"),
-      mutator: buildAppParamMutator("header"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-  ];
+const v2Columns = [
+  {
+    Header: "Screen ID",
+    accessor: "id",
+    Filter: DefaultColumnFilter,
+    FormCell: FormStaticCell,
+  },
+  {
+    Header: "Name",
+    accessor: "name",
+    Cell: EditableCell,
+    Filter: DefaultColumnFilter,
+    FormCell: FormTextCell,
+  },
+  {
+    Header: "Departures",
+    accessor: buildAppParamAccessor("departures"),
+    mutator: buildAppParamMutator("departures"),
+    Cell: EditableTextarea,
+    disableFilters: true,
+    FormCell: FormTextarea,
+  },
+  {
+    Header: "Footer",
+    accessor: buildAppParamAccessor("footer"),
+    mutator: buildAppParamMutator("footer"),
+    Cell: EditableTextarea,
+    disableFilters: true,
+    FormCell: FormTextarea,
+  },
+  {
+    Header: "Header",
+    accessor: buildAppParamAccessor("header"),
+    mutator: buildAppParamMutator("header"),
+    Cell: EditableTextarea,
+    disableFilters: true,
+    FormCell: FormTextarea,
+  },
+];
 
+const BusEinkV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "bus_eink_v2";
   };
 
-  return <AdminTable columns={columns} dataFilter={dataFilter} />;
+  return <AdminTable columns={v2Columns} dataFilter={dataFilter} />;
 };
 
 const GLEinkV2ScreensTable = (): JSX.Element => {
-  const columns = [
-    {
-      Header: "Screen ID",
-      accessor: "id",
-      Filter: DefaultColumnFilter,
-      FormCell: FormStaticCell,
-    },
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: EditableCell,
-      Filter: DefaultColumnFilter,
-      FormCell: FormTextCell,
-    },
-    {
-      Header: "Departures",
-      accessor: buildAppParamAccessor("departures"),
-      mutator: buildAppParamMutator("departures"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Footer",
-      accessor: buildAppParamAccessor("footer"),
-      mutator: buildAppParamMutator("footer"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Header",
-      accessor: buildAppParamAccessor("header"),
-      mutator: buildAppParamMutator("header"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-  ];
-
   const dataFilter = ({ app_id }) => {
     return app_id === "gl_eink_v2";
   };
 
-  return <AdminTable columns={columns} dataFilter={dataFilter} />;
+  return <AdminTable columns={v2Columns} dataFilter={dataFilter} />;
 };
 
 const BusShelterV2ScreensTable = (): JSX.Element => {
-  const columns = [
-    {
-      Header: "Screen ID",
-      accessor: "id",
-      Filter: DefaultColumnFilter,
-      FormCell: FormStaticCell,
-    },
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: EditableCell,
-      Filter: DefaultColumnFilter,
-      FormCell: FormTextCell,
-    },
-    {
-      Header: "Departures",
-      accessor: buildAppParamAccessor("departures"),
-      mutator: buildAppParamMutator("departures"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Footer",
-      accessor: buildAppParamAccessor("footer"),
-      mutator: buildAppParamMutator("footer"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Header",
-      accessor: buildAppParamAccessor("header"),
-      mutator: buildAppParamMutator("header"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-  ];
-
   const dataFilter = ({ app_id }) => {
     return app_id === "bus_shelter_v2";
   };
 
-  return <AdminTable columns={columns} dataFilter={dataFilter} />;
+  return <AdminTable columns={v2Columns} dataFilter={dataFilter} />;
 };
 
-const SolariV2ScreensTable = (): JSX.Element => {
-  const columns = [
-    {
-      Header: "Screen ID",
-      accessor: "id",
-      Filter: DefaultColumnFilter,
-      FormCell: FormStaticCell,
-    },
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: EditableCell,
-      Filter: DefaultColumnFilter,
-      FormCell: FormTextCell,
-    },
-    {
-      Header: "Departures",
-      accessor: buildAppParamAccessor("departures"),
-      mutator: buildAppParamMutator("departures"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Header",
-      accessor: buildAppParamAccessor("header"),
-      mutator: buildAppParamMutator("header"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-  ];
+const v2SolariColumns = [
+  {
+    Header: "Screen ID",
+    accessor: "id",
+    Filter: DefaultColumnFilter,
+    FormCell: FormStaticCell,
+  },
+  {
+    Header: "Name",
+    accessor: "name",
+    Cell: EditableCell,
+    Filter: DefaultColumnFilter,
+    FormCell: FormTextCell,
+  },
+  {
+    Header: "Departures",
+    accessor: buildAppParamAccessor("departures"),
+    mutator: buildAppParamMutator("departures"),
+    Cell: EditableTextarea,
+    disableFilters: true,
+    FormCell: FormTextarea,
+  },
+  {
+    Header: "Header",
+    accessor: buildAppParamAccessor("header"),
+    mutator: buildAppParamMutator("header"),
+    Cell: EditableTextarea,
+    disableFilters: true,
+    FormCell: FormTextarea,
+  },
+];
 
+const SolariV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "solari_v2";
   };
 
-  return <AdminTable columns={columns} dataFilter={dataFilter} />;
+  return <AdminTable columns={v2SolariColumns} dataFilter={dataFilter} />;
 };
 
 const SolariLargeV2ScreensTable = (): JSX.Element => {
-  const columns = [
-    {
-      Header: "Screen ID",
-      accessor: "id",
-      Filter: DefaultColumnFilter,
-      FormCell: FormStaticCell,
-    },
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: EditableCell,
-      Filter: DefaultColumnFilter,
-      FormCell: FormTextCell,
-    },
-    {
-      Header: "Departures",
-      accessor: buildAppParamAccessor("departures"),
-      mutator: buildAppParamMutator("departures"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Header",
-      accessor: buildAppParamAccessor("header"),
-      mutator: buildAppParamMutator("header"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-  ];
-
   const dataFilter = ({ app_id }) => {
     return app_id === "solari_large_v2";
   };
 
-  return <AdminTable columns={columns} dataFilter={dataFilter} />;
+  return <AdminTable columns={v2SolariColumns} dataFilter={dataFilter} />;
 };
 
 export {
