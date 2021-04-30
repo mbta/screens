@@ -14,7 +14,7 @@ defmodule Screens.V2.CandidateGenerator.SolariLargeTest do
       vendor: :gds,
       device_id: "TEST",
       name: "TEST",
-      app_id: :bus_eink_v2
+      app_id: :solari_large_v2
     }
 
     %{config: config}
