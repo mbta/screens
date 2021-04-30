@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.GlEinkSingle do
 
   alias Screens.Config.{Gl, Screen}
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{LinkFooter, Placeholder}
 
   @behaviour CandidateGenerator
@@ -18,6 +19,7 @@ defmodule Screens.V2.CandidateGenerator.GlEinkSingle do
        ],
        full_takeover: [:full_screen]
      }}
+    |> Builder.build_template()
   end
 
   @impl CandidateGenerator

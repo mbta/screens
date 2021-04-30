@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
 
   alias Screens.Config.{Bus, Screen}
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
@@ -24,6 +25,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
        ],
        full_takeover: [:full_screen]
      }}
+    |> Builder.build_template()
   end
 
   @impl CandidateGenerator
