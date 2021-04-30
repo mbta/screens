@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
 
   alias Screens.Config.{Screen, Solari}
@@ -15,6 +16,7 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
        normal: [:header, :main_content],
        takeover: [:full_screen]
      }}
+    |> Builder.build_template()
   end
 
   @impl CandidateGenerator
