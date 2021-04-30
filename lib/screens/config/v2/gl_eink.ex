@@ -2,13 +2,14 @@ defmodule Screens.Config.V2.GlEink do
   @moduledoc false
   # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 
-  alias Screens.Config.V2.{Departures, Footer, Header}
+  alias Screens.Config.V2.{Departures, Footer}
+  alias Screens.Config.V2.Header.Destination
   alias Screens.Util
 
   @type t :: %__MODULE__{
           departures: Departures.t(),
           footer: Footer.t(),
-          header: Header.t()
+          header: Destination.t()
         }
 
   @enforce_keys [:departures, :footer, :header]
@@ -42,7 +43,7 @@ defmodule Screens.Config.V2.GlEink do
   end
 
   defp value_from_json("header", header) do
-    Header.from_json(header)
+    Destination.from_json(header)
   end
 
   defp value_to_json(:departures, departures) do
@@ -54,6 +55,6 @@ defmodule Screens.Config.V2.GlEink do
   end
 
   defp value_to_json(:header, header) do
-    Header.to_json(header)
+    Destination.to_json(header)
   end
 end

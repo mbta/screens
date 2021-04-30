@@ -2,7 +2,8 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusEink, Footer, Header}
+  alias Screens.Config.V2.{BusEink, Footer}
+  alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader, Placeholder}
@@ -44,8 +45,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
   end
 
   defp header_instances(config, now, fetch_stop_name_fn) do
-    %Screen{app_params: %BusEink{header: %Header{type: :current_stop_id, stop_id: stop_id}}} =
-      config
+    %Screen{app_params: %BusEink{header: %CurrentStopId{stop_id: stop_id}}} = config
 
     case fetch_stop_name_fn.(stop_id) do
       nil -> []

@@ -2,7 +2,8 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{Header, SolariLarge}
+  alias Screens.Config.V2.Header.CurrentStopName
+  alias Screens.Config.V2.SolariLarge
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
@@ -29,7 +30,7 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
 
   defp header_instances(config, now) do
     %Screen{
-      app_params: %SolariLarge{header: %Header{type: :current_stop_name, stop_name: stop_name}}
+      app_params: %SolariLarge{header: %CurrentStopName{stop_name: stop_name}}
     } = config
 
     [%NormalHeader{screen: config, text: stop_name, time: now}]

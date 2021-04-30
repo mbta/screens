@@ -2,12 +2,13 @@ defmodule Screens.Config.V2.SolariLarge do
   @moduledoc false
   # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 
-  alias Screens.Config.V2.{Departures, Header}
+  alias Screens.Config.V2.Departures
+  alias Screens.Config.V2.Header.CurrentStopName
   alias Screens.Util
 
   @type t :: %__MODULE__{
           departures: Departures.t(),
-          header: Header.t()
+          header: CurrentStopName.t()
         }
 
   @enforce_keys [:departures, :header]
@@ -36,7 +37,7 @@ defmodule Screens.Config.V2.SolariLarge do
   end
 
   defp value_from_json("header", header) do
-    Header.from_json(header)
+    CurrentStopName.from_json(header)
   end
 
   defp value_to_json(:departures, departures) do
@@ -44,6 +45,6 @@ defmodule Screens.Config.V2.SolariLarge do
   end
 
   defp value_to_json(:header, header) do
-    Header.to_json(header)
+    CurrentStopName.to_json(header)
   end
 end

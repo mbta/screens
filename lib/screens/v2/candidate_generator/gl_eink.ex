@@ -2,7 +2,8 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{Footer, GlEink, Header}
+  alias Screens.Config.V2.{Footer, GlEink}
+  alias Screens.Config.V2.Header.Destination
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader, Placeholder}
 
@@ -44,7 +45,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   def header_instances(config, now, fetch_destination_fn) do
     %Screen{
       app_params: %GlEink{
-        header: %Header{type: :destination, route_id: route_id, direction_id: direction_id}
+        header: %Destination{route_id: route_id, direction_id: direction_id}
       }
     } = config
 

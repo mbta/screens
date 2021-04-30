@@ -9,7 +9,7 @@ defmodule Screens.V2.CandidateGenerator.SolariLargeTest do
     config = %Screen{
       app_params: %V2.SolariLarge{
         departures: %V2.Departures{sections: []},
-        header: %V2.Header{type: :current_stop_name, stop_name: "Ruggles"}
+        header: %V2.Header.CurrentStopName{stop_name: "Ruggles"}
       },
       vendor: :gds,
       device_id: "TEST",

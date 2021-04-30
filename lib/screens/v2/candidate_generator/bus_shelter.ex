@@ -2,7 +2,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusShelter, Footer, Header}
+  alias Screens.Config.V2.{BusShelter, Footer}
+  alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader, Placeholder}
@@ -51,8 +52,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   end
 
   defp header_instances(config, now, fetch_stop_name_fn) do
-    %Screen{app_params: %BusShelter{header: %Header{type: :current_stop_id, stop_id: stop_id}}} =
-      config
+    %Screen{app_params: %BusShelter{header: %CurrentStopId{stop_id: stop_id}}} = config
 
     case fetch_stop_name_fn.(stop_id) do
       nil -> []
