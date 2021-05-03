@@ -1,17 +1,21 @@
 defmodule Screens.V2.CandidateGenerator.BusShelterTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config
+  alias Screens.Config.{Screen, V2}
   alias Screens.V2.CandidateGenerator.BusShelter
   alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader}
 
   setup do
-    config = %Config.Screen{
-      app_params: %Config.BusShelter{stop_id: "1216"},
+    config = %Screen{
+      app_params: %V2.BusShelter{
+        departures: %V2.Departures{sections: []},
+        header: %V2.Header.CurrentStopId{stop_id: "1216"},
+        footer: %V2.Footer{stop_id: "1216"}
+      },
       vendor: :lg_mri,
       device_id: "TEST",
       name: "TEST",
-      app_id: :bus_shelter
+      app_id: :bus_shelter_v2
     }
 
     %{config: config}

@@ -1,10 +1,9 @@
-defmodule Screens.Config.BusShelter do
+defmodule Screens.Config.V2.Header.CurrentStopId do
   @moduledoc false
 
-  @type t :: %__MODULE__{
-          stop_id: String.t()
-        }
+  @type t :: %__MODULE__{stop_id: String.t()}
 
+  @enforce_keys [:stop_id]
   defstruct stop_id: nil
 
   @spec from_json(map()) :: t()

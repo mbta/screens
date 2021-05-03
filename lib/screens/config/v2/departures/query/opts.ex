@@ -1,4 +1,4 @@
-defmodule Screens.Config.Query.Opts do
+defmodule Screens.Config.V2.Departures.Query.Opts do
   @moduledoc false
   # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 

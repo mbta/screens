@@ -1,17 +1,20 @@
 defmodule Screens.V2.CandidateGenerator.SolariLargeTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config
+  alias Screens.Config.{Screen, V2}
   alias Screens.V2.CandidateGenerator.SolariLarge
   alias Screens.V2.WidgetInstance.NormalHeader
 
   setup do
-    config = %Config.Screen{
-      app_params: %Config.Solari{station_name: "Ruggles"},
-      vendor: :solari,
+    config = %Screen{
+      app_params: %V2.SolariLarge{
+        departures: %V2.Departures{sections: []},
+        header: %V2.Header.CurrentStopName{stop_name: "Ruggles"}
+      },
+      vendor: :gds,
       device_id: "TEST",
       name: "TEST",
-      app_id: :solari_large
+      app_id: :solari_large_v2
     }
 
     %{config: config}

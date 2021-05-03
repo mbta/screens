@@ -1,16 +1,15 @@
-defmodule Screens.Config.Query.Opts do
+defmodule Screens.Config.V2.Departures do
   @moduledoc false
-  # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 
+  alias Screens.Config.V2.Departures.Section
   alias Screens.Util
 
-  @type t :: %__MODULE__{
-          include_schedules: boolean()
-        }
+  @type t :: %__MODULE__{sections: list(Section.t())}
 
-  defstruct include_schedules: false
+  @enforce_keys [:sections]
+  defstruct sections: []
 
-  @spec from_json(map() | :default) :: t()
+  @spec from_json(map()) :: t()
   def from_json(%{} = json) do
     struct_map =
       json
@@ -20,8 +19,8 @@ defmodule Screens.Config.Query.Opts do
     struct!(__MODULE__, struct_map)
   end
 
-  def from_json(:default) do
-    %__MODULE__{}
+  defp value_from_json("sections", sections) when is_list(sections) do
+    Enum.map(sections, &Section.from_json/1)
   end
 
   @spec to_json(t()) :: map()
@@ -31,7 +30,7 @@ defmodule Screens.Config.Query.Opts do
     |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
   end
 
-  defp value_from_json(_, value), do: value
-
-  defp value_to_json(_, value), do: value
+  defp value_to_json(:sections, sections) do
+    Enum.map(sections, &Section.to_json/1)
+  end
 end

@@ -1,5 +1,6 @@
 defmodule Screens.Config.Query.Params do
   @moduledoc false
+  # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 
   alias Screens.RouteType
   alias Screens.Util

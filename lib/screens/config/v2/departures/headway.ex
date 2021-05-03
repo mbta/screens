@@ -1,14 +1,22 @@
-defmodule Screens.Config.Query.Opts do
+defmodule Screens.Config.V2.Departures.Headway do
   @moduledoc false
   # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 
   alias Screens.Util
 
+  @typep sign_id :: String.t()
+  @typep headway_id :: String.t() | nil
+  @typep override :: {pos_integer, pos_integer} | nil
+
   @type t :: %__MODULE__{
-          include_schedules: boolean()
+          sign_ids: [sign_id],
+          headway_id: headway_id,
+          override: override
         }
 
-  defstruct include_schedules: false
+  defstruct sign_ids: [],
+            headway_id: nil,
+            override: nil
 
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
@@ -25,13 +33,15 @@ defmodule Screens.Config.Query.Opts do
   end
 
   @spec to_json(t()) :: map()
-  def to_json(%__MODULE__{} = t) do
+  def to_json(t) do
     t
     |> Map.from_struct()
     |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
   end
 
+  defp value_from_json("override", [lo, hi]), do: {lo, hi}
   defp value_from_json(_, value), do: value
 
+  defp value_to_json(:override, {lo, hi}), do: [lo, hi]
   defp value_to_json(_, value), do: value
 end
