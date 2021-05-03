@@ -11,10 +11,10 @@ defmodule Screens.V2.CandidateGenerator.SolariTest do
         departures: %V2.Departures{sections: []},
         header: %V2.Header.CurrentStopName{stop_name: "Ruggles"}
       },
-      vendor: :gds,
+      vendor: :solari,
       device_id: "TEST",
       name: "TEST",
-      app_id: :bus_eink_v2
+      app_id: :solari_test_v2
     }
 
     %{config: config}

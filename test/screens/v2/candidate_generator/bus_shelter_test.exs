@@ -12,10 +12,10 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
         header: %V2.Header.CurrentStopId{stop_id: "1216"},
         footer: %V2.Footer{stop_id: "1216"}
       },
-      vendor: :gds,
+      vendor: :lg_mri,
       device_id: "TEST",
       name: "TEST",
-      app_id: :bus_eink_v2
+      app_id: :bus_shelter_v2
     }
 
     %{config: config}
