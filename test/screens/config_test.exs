@@ -4,10 +4,8 @@ defmodule Screens.ConfigTest do
   alias Screens.Config
   alias Screens.Config.State.LocalFetch
 
-  @test_config_path Path.join(~w[#{File.cwd!()} test fixtures config.json])
-
   def fetch_config(_context) do
-    {:ok, config, _} = LocalFetch.fetch_config(@test_config_path)
+    {:ok, config, _} = LocalFetch.fetch_config(nil)
     {:ok, %{config: config}}
   end
 
