@@ -8,6 +8,7 @@ config :screens, ScreensWeb.Endpoint,
 
 config :screens,
   config_fetcher: Screens.Config.State.LocalFetch,
+  local_config_file_spec: {:test, "config.json"},
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.LocalFetch
 
 config :screens, ScreensWeb.AuthManager, secret_key: "test key"

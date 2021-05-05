@@ -27,6 +27,7 @@ config :screens,
   gds_dms_password: System.get_env("GDS_DMS_PASSWORD"),
   mercury_api_key: System.get_env("MERCURY_API_KEY"),
   config_fetcher: Screens.Config.State.LocalFetch,
+  local_config_file_spec: {:priv, "local.json"},
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.LocalFetch
 
 config :screens, ScreensWeb.AuthManager, secret_key: "secret key"
