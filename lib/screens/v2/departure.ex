@@ -4,8 +4,8 @@ defmodule Screens.V2.Departure do
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
-  alias Screens.Stops.Stop
   alias Screens.Trips.Trip
+  alias Screens.V2.Departure.Builder
   alias Screens.Vehicles.Vehicle
 
   @type t :: %__MODULE__{
@@ -27,9 +27,12 @@ defmodule Screens.V2.Departure do
   def fetch_predictions_and_schedules(params) do
     with {:ok, predictions} <- Prediction.fetch(params),
          {:ok, schedules} <- Schedule.fetch(params) do
-      relevant_predictions = get_relevant_departures(predictions)
-      relevant_schedules = get_relevant_departures(schedules)
-      departures = merge_predictions_and_schedules(relevant_predictions, relevant_schedules)
+      relevant_predictions = Builder.get_relevant_departures(predictions)
+      relevant_schedules = Builder.get_relevant_departures(schedules)
+
+      departures =
+        Builder.merge_predictions_and_schedules(relevant_predictions, relevant_schedules)
+
       {:ok, departures}
     else
       _ -> :error
@@ -39,114 +42,13 @@ defmodule Screens.V2.Departure do
   def fetch_predictions_only(params) do
     case Prediction.fetch(params) do
       {:ok, predictions} ->
-        relevant_predictions = get_relevant_departures(predictions)
+        relevant_predictions = Builder.get_relevant_departures(predictions)
         departures = Enum.map(relevant_predictions, fn p -> %__MODULE__{prediction: p} end)
         {:ok, departures}
 
       :error ->
         :error
     end
-  end
-
-  def get_relevant_departures(predictions_or_schedules, now \\ DateTime.utc_now()) do
-    predictions_or_schedules
-    |> Enum.reject(&in_past_or_nil_time?(&1, now))
-    |> Enum.reject(&multi_route_duplicate?/1)
-    |> Enum.reject(&vehicle_already_departed?/1)
-    |> choose_earliest_stop_per_trip()
-  end
-
-  defp in_past_or_nil_time?(%{arrival_time: nil, departure_time: nil}, _), do: true
-
-  defp in_past_or_nil_time?(%{departure_time: nil, arrival_time: t}, now) do
-    DateTime.compare(t, now) == :lt
-  end
-
-  defp in_past_or_nil_time?(%{departure_time: t}, now) do
-    DateTime.compare(t, now) == :lt
-  end
-
-  defp multi_route_duplicate?(%{route: %{id: id1}, trip: %{route_id: id2}}), do: id1 != id2
-  defp multi_route_duplicate?(_), do: false
-
-  defp vehicle_already_departed?(%Prediction{
-         stop: %Stop{id: prediction_stop},
-         trip: %Trip{id: trip_trip_id, stops: stops},
-         vehicle: %Vehicle{
-           trip_id: vehicle_trip_id,
-           stop_id: vehicle_stop
-         }
-       })
-       when not is_nil(trip_trip_id) and not is_nil(vehicle_trip_id) and not is_nil(vehicle_stop) do
-    trip_ids_match? = trip_trip_id == vehicle_trip_id
-
-    prediction_stop_index = Enum.find_index(stops, fn stop -> stop == prediction_stop end)
-    vehicle_stop_index = Enum.find_index(stops, fn stop -> stop == vehicle_stop end)
-
-    vehicle_has_passed? =
-      not is_nil(prediction_stop_index) and not is_nil(vehicle_stop_index) and
-        vehicle_stop_index > prediction_stop_index
-
-    trip_ids_match? and vehicle_has_passed?
-  end
-
-  defp vehicle_already_departed?(_), do: false
-
-  defp choose_earliest_stop_per_trip(predictions_or_schedules) do
-    {departures_without_trip, departures_with_trip} =
-      Enum.split_with(predictions_or_schedules, fn
-        %{trip: nil} -> true
-        %{trip: %{id: nil}} -> true
-        _ -> false
-      end)
-
-    deduplicated_predictions_with_trip =
-      departures_with_trip
-      |> Enum.group_by(fn %{trip: %Trip{id: trip_id}} -> trip_id end)
-      |> Enum.map(fn {_trip_id, departures} -> Enum.min_by(departures, & &1.departure_time) end)
-
-    departures_without_trip
-    |> Kernel.++(deduplicated_predictions_with_trip)
-    |> Enum.sort_by(& &1.departure_time)
-  end
-
-  def merge_predictions_and_schedules(predictions, schedules) do
-    predicted_trip_ids =
-      predictions
-      |> Enum.reject(&is_nil(&1.trip))
-      |> Enum.map(& &1.trip.id)
-      |> Enum.reject(&is_nil/1)
-      |> Enum.into(MapSet.new())
-
-    schedules_by_trip_id =
-      schedules
-      |> Enum.map(fn %{trip: %{id: trip_id}} = s -> {trip_id, s} end)
-      |> Enum.into(%{})
-
-    predicted_departures =
-      predictions
-      |> Enum.map(fn
-        %{trip: %{id: trip_id}} = p when not is_nil(trip_id) ->
-          %__MODULE__{prediction: p, schedule: Map.get(schedules_by_trip_id, trip_id)}
-
-        p ->
-          %__MODULE__{prediction: p}
-      end)
-
-    unpredicted_departures =
-      schedules
-      |> Enum.filter(fn
-        %{trip: %{id: trip_id}} when not is_nil(trip_id) ->
-          trip_id not in predicted_trip_ids
-
-        _ ->
-          false
-      end)
-      |> Enum.map(fn s -> %__MODULE__{schedule: s} end)
-
-    predicted_departures
-    |> Kernel.++(unpredicted_departures)
-    |> Enum.sort_by(&time/1)
   end
 
   ### Accessor functions
@@ -177,9 +79,11 @@ defmodule Screens.V2.Departure do
     %Prediction{trip: %Trip{headsign: headsign}} = p
 
     case s do
-      nil -> headsign
-      %Schedule{stop_headsign: nil} -> headsign
-      %Schedule{stop_headsign: stop_headsign} -> stop_headsign
+      %Schedule{stop_headsign: stop_headsign} when not is_nil(stop_headsign) ->
+        stop_headsign
+
+      _ ->
+        headsign
     end
   end
 
@@ -255,21 +159,17 @@ defmodule Screens.V2.Departure do
     track_number
   end
 
-  def track_number(%__MODULE__{prediction: _, schedule: %Schedule{track_number: track_number}})
+  def track_number(%__MODULE__{schedule: %Schedule{track_number: track_number}})
       when not is_nil(track_number) do
     track_number
   end
 
   def track_number(_), do: nil
 
-  def vehicle_status(%__MODULE__{prediction: p}) when not is_nil(p) do
-    case p do
-      %Prediction{vehicle: %Vehicle{current_status: current_status}} ->
-        current_status
-
-      _ ->
-        nil
-    end
+  def vehicle_status(%__MODULE__{
+        prediction: %Prediction{vehicle: %Vehicle{current_status: current_status}}
+      }) do
+    current_status
   end
 
   def vehicle_status(_), do: nil
@@ -295,11 +195,8 @@ defmodule Screens.V2.Departure do
   defp select_departure_time(%{arrival_time: t, departure_time: nil}), do: t
   defp select_departure_time(%{arrival_time: _, departure_time: t}), do: t
 
-  defp identify_stop_type_from_times(arrival_time, departure_time) do
-    case {arrival_time, departure_time} do
-      {nil, _} -> :first_stop
-      {_, nil} -> :last_stop
-      {_, _} -> :mid_route_stop
-    end
-  end
+  defp identify_stop_type_from_times(arrival_time, departure_time)
+  defp identify_stop_type_from_times(nil, _), do: :first_stop
+  defp identify_stop_type_from_times(_, nil), do: :last_stop
+  defp identify_stop_type_from_times(_, _), do: :mid_route_stop
 end

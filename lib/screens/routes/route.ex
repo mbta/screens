@@ -8,13 +8,11 @@ defmodule Screens.Routes.Route do
 
   @type id :: String.t()
 
-  @type route_type :: 0 | 1 | 2 | 3 | 4
-
   @type t :: %__MODULE__{
           id: id,
           short_name: String.t(),
           direction_destinations: list(String.t()),
-          type: route_type
+          type: Screens.RouteType.t()
         }
 
   def by_id(route_id) do

@@ -13,7 +13,7 @@ defmodule Screens.Routes.Parser do
       id: id,
       short_name: short_name,
       direction_destinations: direction_destinations,
-      type: route_type
+      type: Screens.RouteType.from_id(route_type)
     }
   end
 end

@@ -38,7 +38,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def widget_type(_instance), do: :departures
   end
 
-  def serialize_section(%{type: :notice_section} = section, _screen), do: section
+  def serialize_section(%{type: :notice_section, icon: icon, text: text}, _screen) do
+    %{type: :notice_section, icon: icon, text: FreeText.to_json(text)}
+  end
 
   def serialize_section(%{type: :normal_section, departures: departures}, screen) do
     rows = group_departures(departures)
@@ -69,10 +71,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
         not is_nil(track_number) ->
           %{type: :text, text: "TR#{track_number}"}
 
-        route_type == 2 ->
+        route_type == :rail ->
           %{type: :icon, icon: :rail}
 
-        route_type == 4 ->
+        route_type == :ferry ->
           %{type: :icon, icon: :boat}
 
         String.contains?(route_name, "/") ->
@@ -109,8 +111,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
        when route_id in ["741", "742", "743", "746", "749", "751"],
        do: :silver
 
-  defp get_color_for_route(_, 2), do: :purple
-  defp get_color_for_route(_, 4), do: :teal
+  defp get_color_for_route(_, :rail), do: :purple
+  defp get_color_for_route(_, :ferry), do: :teal
   defp get_color_for_route(_, _), do: :yellow
 
   def serialize_headsign([first_departure | _]) do
@@ -122,10 +124,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
     [headsign, variation] =
       cond do
         String.match?(headsign, via_pattern) ->
-          via_pattern |> Regex.run(headsign) |> Enum.drop(1)
+          Regex.run(via_pattern, headsign, capture: :all_but_first)
 
         String.match?(headsign, paren_pattern) ->
-          paren_pattern |> Regex.run(headsign) |> Enum.drop(1)
+          Regex.run(paren_pattern, headsign, capture: :all_but_first)
 
         true ->
           [headsign, nil]
@@ -141,7 +143,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defp serialize_time_with_crowding(departure, screen, now) do
     serialized_time =
       case Departure.route_type(departure) do
-        2 -> serialize_time_with_schedule(departure, screen, now)
+        :rail -> serialize_time_with_schedule(departure, screen, now)
         _ -> serialize_time(departure, screen, now)
       end
 
@@ -191,7 +193,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         second_diff < 30 ->
           %{type: :text, text: "ARR"}
 
-        minute_diff < 60 and route_type not in [2, 4] ->
+        minute_diff < 60 and route_type not in [:rail, :ferry] ->
           %{type: :minutes, minutes: minute_diff}
 
         true ->
@@ -226,7 +228,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp serialize_timestamp(departure_time) do
     {:ok, local_time} = DateTime.shift_zone(departure_time, "America/New_York")
-    hour = 1 + rem(local_time.hour - 1, 12)
+    hour = 1 + Integer.mod(local_time.hour - 1, 12)
     minute = local_time.minute
     am_pm = if local_time.hour >= 12, do: :pm, else: :am
     %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm}
