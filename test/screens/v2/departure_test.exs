@@ -196,18 +196,18 @@ defmodule Screens.V2.DepartureTest do
 
   describe "route_type/1" do
     test "returns prediction route_type when present" do
-      prediction = %Prediction{route: %Route{type: 2}}
-      schedule = %Schedule{route: %Route{type: 1}}
+      prediction = %Prediction{route: %Route{type: :rail}}
+      schedule = %Schedule{route: %Route{type: :subway}}
       departure = %Departure{prediction: prediction, schedule: schedule}
 
-      assert 2 == Departure.route_type(departure)
+      assert :rail == Departure.route_type(departure)
     end
 
     test "returns schedule route_type when no prediction is present" do
-      schedule = %Schedule{route: %Route{type: 1}}
+      schedule = %Schedule{route: %Route{type: :subway}}
       departure = %Departure{prediction: nil, schedule: schedule}
 
-      assert 1 == Departure.route_type(departure)
+      assert :subway == Departure.route_type(departure)
     end
   end
 
