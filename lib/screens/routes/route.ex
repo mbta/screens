@@ -3,14 +3,16 @@ defmodule Screens.Routes.Route do
 
   defstruct id: nil,
             short_name: nil,
-            direction_destinations: nil
+            direction_destinations: nil,
+            type: nil
 
   @type id :: String.t()
 
   @type t :: %__MODULE__{
           id: id,
           short_name: String.t(),
-          direction_destinations: list()
+          direction_destinations: list(String.t()),
+          type: Screens.RouteType.t()
         }
 
   def by_id(route_id) do

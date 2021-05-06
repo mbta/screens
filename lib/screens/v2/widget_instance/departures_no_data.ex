@@ -1,12 +1,10 @@
 defmodule Screens.V2.WidgetInstance.DeparturesNoData do
   @moduledoc false
 
-  @type config :: :ok
-
   defstruct screen: nil
 
   @type t :: %__MODULE__{
-          screen: config()
+          screen: Screens.Config.Screen.t()
         }
 
   defimpl Screens.V2.WidgetInstance do
