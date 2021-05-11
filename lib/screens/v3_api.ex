@@ -21,10 +21,11 @@ defmodule Screens.V3Api do
       {:ok, parsed}
     else
       {:http_request, e} ->
-        log_api_error({:http_fetch_error, e})
+        {:error, httpoison_error} = e
+        log_api_error({:http_fetch_error, e}, message: Exception.message(httpoison_error))
 
-      {:response_success, %{status_code: _status_code}} = response ->
-        log_api_error({:bad_response_code, response})
+      {:response_success, %{status_code: status_code}} = response ->
+        log_api_error({:bad_response_code, response}, status_code: status_code)
 
       {:parse, {:error, e}} ->
         log_api_error({:parse_error, e})
@@ -34,8 +35,13 @@ defmodule Screens.V3Api do
     end
   end
 
-  defp log_api_error({error_type, _error_data} = error) do
-    _ = Logger.info("[api_v3_get_json_error] error_type=#{error_type}")
+  defp log_api_error({error_type, _error_data} = error, extra_fields \\ []) do
+    extra_fields =
+      extra_fields
+      |> Enum.map(fn {label, value} -> "#{label}=#{value}" end)
+      |> Enum.join(" ")
+
+    _ = Logger.info("[api_v3_get_json_error] error_type=#{error_type} " <> extra_fields)
 
     error
   end
