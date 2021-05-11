@@ -75,6 +75,17 @@ defmodule Screens.V2.Departure do
 
   def crowding_level(%__MODULE__{prediction: nil, schedule: _}), do: nil
 
+  def direction_id(%__MODULE__{prediction: %Prediction{trip: %Trip{direction_id: direction_id}}}) do
+    direction_id
+  end
+
+  def direction_id(%__MODULE__{prediction: nil, schedule: s}) do
+    case s do
+      %Schedule{trip: %Trip{direction_id: direction_id}} -> direction_id
+      _ -> nil
+    end
+  end
+
   def headsign(%__MODULE__{prediction: p, schedule: s}) when not is_nil(p) do
     %Prediction{trip: %Trip{headsign: headsign}} = p
 

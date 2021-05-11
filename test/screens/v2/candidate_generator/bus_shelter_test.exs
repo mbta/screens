@@ -67,6 +67,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
 
   describe "candidate_instances/3" do
     test "returns expected header and footer", %{config: config} do
+      departures_instances_fn = fn _ -> [] end
       fetch_stop_fn = fn "1216" -> "Columbus Ave @ Dimock St" end
       now = ~U[2020-04-06T10:00:00Z]
 
@@ -79,7 +80,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
 
       expected_footer = %LinkFooter{screen: config, text: "More at", url: "mbta.com/stops/1216"}
 
-      actual_instances = BusShelter.candidate_instances(config, now, fetch_stop_fn)
+      actual_instances =
+        BusShelter.candidate_instances(config, now, fetch_stop_fn, departures_instances_fn)
 
       assert expected_header in actual_instances
       assert expected_footer in actual_instances

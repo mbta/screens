@@ -5,6 +5,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   alias Screens.Config.V2.{BusShelter, Footer}
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Helpers
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader, Placeholder}
 
@@ -37,18 +38,16 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
-        fetch_stop_name_fn \\ &fetch_stop_name/1
+        fetch_stop_name_fn \\ &fetch_stop_name/1,
+        departures_instances_fn \\ &Helpers.Departures.departures_instances/1
       ) do
-    header_instances(config, now, fetch_stop_name_fn) ++
-      footer_instances(config) ++
-      [
-        %Placeholder{color: :red, slot_names: [:main_content]},
-        %Placeholder{color: :green, slot_names: [:medium_left]},
-        %Placeholder{color: :blue, slot_names: [:small_upper_right]},
-        %Placeholder{color: :grey, slot_names: [:small_lower_right]},
-        %Placeholder{color: :green, slot_names: [:large]},
-        %Placeholder{color: :red, slot_names: [:large]}
-      ]
+    [
+      header_instances(config, now, fetch_stop_name_fn),
+      departures_instances_fn.(config),
+      footer_instances(config),
+      placeholder_instances()
+    ]
+    |> List.flatten()
   end
 
   defp header_instances(config, now, fetch_stop_name_fn) do
@@ -74,5 +73,16 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
       _ ->
         nil
     end
+  end
+
+  defp placeholder_instances do
+    [
+      %Placeholder{color: :red, slot_names: [:main_content]},
+      %Placeholder{color: :green, slot_names: [:medium_left]},
+      %Placeholder{color: :blue, slot_names: [:small_upper_right]},
+      %Placeholder{color: :grey, slot_names: [:small_lower_right]},
+      %Placeholder{color: :green, slot_names: [:large]},
+      %Placeholder{color: :red, slot_names: [:large]}
+    ]
   end
 end

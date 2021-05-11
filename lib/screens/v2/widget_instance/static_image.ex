@@ -8,7 +8,7 @@ defmodule Screens.V2.WidgetInstance.StaticImage do
             priority: nil,
             size: nil
 
-  @type config :: :ok
+  @type config :: Screens.V2.ScreenData.config()
   @type size :: :small | :medium | :large | :fullscreen
 
   @type t :: %__MODULE__{

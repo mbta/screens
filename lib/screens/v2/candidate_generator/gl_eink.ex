@@ -5,6 +5,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   alias Screens.Config.V2.{Footer, GlEink}
   alias Screens.Config.V2.Header.Destination
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Helpers
   alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
@@ -34,12 +35,13 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         now \\ DateTime.utc_now(),
         fetch_destination_fn \\ &fetch_destination/2
       ) do
-    header_instances(config, now, fetch_destination_fn) ++
-      footer_instances(config) ++
-      [
-        %Placeholder{color: :blue, slot_names: [:main_content]},
-        %Placeholder{color: :green, slot_names: [:medium_flex]}
-      ]
+    [
+      header_instances(config, now, fetch_destination_fn),
+      Helpers.Departures.departures_instances(config),
+      footer_instances(config),
+      placeholder_instances()
+    ]
+    |> List.flatten()
   end
 
   def header_instances(config, now, fetch_destination_fn) do
@@ -86,6 +88,13 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         text: "For real-time predictions and fare purchase locations:",
         url: "mbta.com/stops/#{stop_id}"
       }
+    ]
+  end
+
+  defp placeholder_instances do
+    [
+      %Placeholder{color: :blue, slot_names: [:main_content]},
+      %Placeholder{color: :green, slot_names: [:medium_flex]}
     ]
   end
 end
