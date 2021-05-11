@@ -46,7 +46,9 @@ defmodule Screens.V2.CandidateGenerator.Helpers.Departures do
       |> Map.from_struct()
       |> Keyword.new()
 
-    Departure.fetch(params, fetch_opts)
+    fetch_params = Map.from_struct(params)
+
+    Departure.fetch(fetch_params, fetch_opts)
   end
 
   def filter_departures(:error, _), do: :error
@@ -63,6 +65,10 @@ defmodule Screens.V2.CandidateGenerator.Helpers.Departures do
         route_directions: route_directions
       }) do
     {:ok, Enum.reject(departures, &departure_in_route_directions?(&1, route_directions))}
+  end
+
+  def filter_departures({:ok, departures}, nil) do
+    {:ok, departures}
   end
 
   def departure_in_route_directions?(d, route_directions) do
