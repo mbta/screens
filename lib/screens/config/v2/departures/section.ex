@@ -6,13 +6,13 @@ defmodule Screens.Config.V2.Departures.Section do
 
   @type t :: %__MODULE__{
           query: Query.t(),
-          filter: Filter.t(),
+          filter: Filter.t() | nil,
           headway: Headway.t()
         }
 
   @enforce_keys [:query]
   defstruct query: nil,
-            filter: [],
+            filter: nil,
             headway: Headway.from_json(:default)
 
   @spec from_json(map()) :: t()
@@ -29,8 +29,10 @@ defmodule Screens.Config.V2.Departures.Section do
     Query.from_json(query)
   end
 
+  defp value_from_json("filter", nil), do: nil
+
   defp value_from_json("filter", filter) do
-    Enum.map(filter, &Filter.from_json/1)
+    Filter.from_json(filter)
   end
 
   defp value_from_json("headway", headway) do
@@ -48,8 +50,10 @@ defmodule Screens.Config.V2.Departures.Section do
     Query.to_json(query)
   end
 
+  defp value_to_json(:filter, nil), do: nil
+
   defp value_to_json(:filter, filter) do
-    Enum.map(filter, &Filter.to_json/1)
+    Filter.to_json(filter)
   end
 
   defp value_to_json(:headway, headway) do

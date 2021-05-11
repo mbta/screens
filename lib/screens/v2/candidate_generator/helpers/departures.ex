@@ -65,6 +65,10 @@ defmodule Screens.V2.CandidateGenerator.Helpers.Departures do
     {:ok, Enum.reject(departures, &departure_in_route_directions?(&1, route_directions))}
   end
 
+  def filter_departures({:ok, departures}, nil) do
+    {:ok, departures}
+  end
+
   def departure_in_route_directions?(d, route_directions) do
     route_direction(d) in route_directions
   end
