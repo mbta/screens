@@ -2774,7 +2774,7 @@
         "departures": {
           "sections": [
             {
-              "filter": [],
+              "filter": null,
               "headway": {
                 "headway_id": null,
                 "override": null,
@@ -2816,7 +2816,7 @@
         "departures": {
           "sections": [
             {
-              "filter": [],
+              "filter": null,
               "headway": {
                 "headway_id": null,
                 "override": null,
@@ -2858,7 +2858,7 @@
         "departures": {
           "sections": [
             {
-              "filter": [],
+              "filter": null,
               "headway": {
                 "headway_id": null,
                 "override": null,
@@ -2897,7 +2897,7 @@
         "departures": {
           "sections": [
             {
-              "filter": [],
+              "filter": null,
               "headway": {
                 "headway_id": null,
                 "override": null,
@@ -2936,7 +2936,7 @@
         "departures": {
           "sections": [
             {
-              "filter": [],
+              "filter": null,
               "headway": {
                 "headway_id": null,
                 "override": null,
