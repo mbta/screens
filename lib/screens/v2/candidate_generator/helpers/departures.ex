@@ -49,23 +49,27 @@ defmodule Screens.V2.CandidateGenerator.Helpers.Departures do
     Departure.fetch(params, fetch_opts)
   end
 
-  defp filter_departures(:error, _), do: :error
+  def filter_departures(:error, _), do: :error
 
-  defp filter_departures({:ok, departures}, %Filter{
-         action: :include,
-         route_directions: route_directions
-       }) do
+  def filter_departures({:ok, departures}, %Filter{
+        action: :include,
+        route_directions: route_directions
+      }) do
     {:ok, Enum.filter(departures, &departure_in_route_directions?(&1, route_directions))}
   end
 
-  defp filter_departures({:ok, departures}, %Filter{
-         action: :exclude,
-         route_directions: route_directions
-       }) do
+  def filter_departures({:ok, departures}, %Filter{
+        action: :exclude,
+        route_directions: route_directions
+      }) do
     {:ok, Enum.reject(departures, &departure_in_route_directions?(&1, route_directions))}
   end
 
-  defp departure_in_route_directions?(d, route_directions) do
-    %RouteDirection{route_id: Departure.route_id(d), direction_id: Departure.direction_id(d)} in route_directions
+  def departure_in_route_directions?(d, route_directions) do
+    route_direction(d) in route_directions
+  end
+
+  defp route_direction(d) do
+    %RouteDirection{route_id: Departure.route_id(d), direction_id: Departure.direction_id(d)}
   end
 end
