@@ -5,10 +5,10 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   alias __MODULE__, as: T
 
-  defstruct screen: :ok,
+  defstruct screen: nil,
             alert: nil
 
-  @type config :: :ok
+  @type config :: Screens.V2.ScreenData.config()
 
   @type t :: %T{
           screen: config(),

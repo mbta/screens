@@ -5,6 +5,7 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
   alias Screens.Config.V2.Header.CurrentStopName
   alias Screens.Config.V2.SolariLarge
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Helpers
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
 
@@ -21,11 +22,17 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(config, now \\ DateTime.utc_now()) do
-    header_instances(config, now) ++
-      [
-        %Placeholder{color: :blue, slot_names: [:main_content]}
-      ]
+  def candidate_instances(
+        config,
+        now \\ DateTime.utc_now(),
+        departures_instances_fn \\ &Helpers.Departures.departures_instances/1
+      ) do
+    [
+      header_instances(config, now),
+      departures_instances_fn.(config),
+      placeholder_instances()
+    ]
+    |> List.flatten()
   end
 
   defp header_instances(config, now) do
@@ -34,5 +41,11 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
     } = config
 
     [%NormalHeader{screen: config, text: stop_name, time: now}]
+  end
+
+  defp placeholder_instances do
+    [
+      %Placeholder{color: :blue, slot_names: [:main_content]}
+    ]
   end
 end
