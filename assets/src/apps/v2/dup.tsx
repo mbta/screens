@@ -12,12 +12,14 @@ import NormalScreen from "Components/v2/dup/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/dup/normal_header";
+import NormalDepartures from "Components/v2/departures/normal_departures";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
   full_takeover: TakeoverScreen,
   placeholder: Placeholder,
   normal_header: NormalHeader,
+  departures: NormalDepartures,
 };
 
 const App = (): JSX.Element => {
