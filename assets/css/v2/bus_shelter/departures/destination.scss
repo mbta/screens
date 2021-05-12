@@ -1,10 +1,9 @@
 .departure-destination {
+  width: 592px;
   font-family: Inter;
 }
 
 .departure-destination__headsign {
-  width: 592px;
-
   font-size: 64px;
   line-height: 64px;
   font-weight: 600;
@@ -12,7 +11,6 @@
 }
 
 .departure-destination__variation {
-  width: 592px;
   margin-top: 8px;
 
   font-size: 48px;

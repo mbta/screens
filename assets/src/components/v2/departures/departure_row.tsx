@@ -20,7 +20,7 @@ const DepartureRow = ({
         <Destination {...headsign} />
       </div>
       <div className="departure-row__time">
-        <DepartureTimes data={timesWithCrowding} />
+        <DepartureTimes timesWithCrowding={timesWithCrowding} />
       </div>
       <div className="departure-row__alerts">
         <DepartureAlerts data={inlineAlerts} />
