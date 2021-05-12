@@ -60,3 +60,30 @@
     color: white;
   }
 }
+
+.route-pill__icon {
+  width: 100%;
+  text-align: center;
+}
+
+.route-pill__icon-image {
+  height: 60px;
+  margin-top: 7px;
+}
+
+.route-pill__slashed-text {
+  width: 100%;
+  text-align: center;
+  font-family: "neue-haas-grotesk-text";
+  font-size: 32px;
+  line-height: 74px;
+  font-weight: 700;
+}
+
+.route-pill__slashed-part-1 {
+  display: inline-block;
+}
+
+.route-pill__slashed-part-2 {
+  display: inline-block;
+}

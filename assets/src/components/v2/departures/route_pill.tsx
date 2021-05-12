@@ -47,8 +47,10 @@ const SlashedRoutePill = ({ part1, part2, color, outline }) => {
 
   return (
     <div className={classWithModifiers("route-pill", modifiers)}>
-      <div className="route-pill__slashed-part-1">{part1}</div>/
-      <div className="route-pill__slashed-part-2">{part2}</div>
+      <div className="route-pill__slashed-text">
+        <div className="route-pill__slashed-part-1">{part1}/</div>
+        <div className="route-pill__slashed-part-2">{part2}</div>
+      </div>
     </div>
   );
 };
