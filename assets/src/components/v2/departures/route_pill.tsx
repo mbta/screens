@@ -3,14 +3,16 @@ import React from "react";
 import { imagePath, classWithModifiers } from "Util/util";
 
 const TextRoutePill = ({ color, text, outline }) => {
-  let modifiers = [color];
+  const modifiers = [color];
   if (outline) {
     modifiers.push("outline");
   }
 
   return (
     <div className={classWithModifiers("route-pill", modifiers)}>
-      <div className="route-pill__text">{text}</div>
+      <div className={classWithModifiers("route-pill__text", modifiers)}>
+        {text}
+      </div>
     </div>
   );
 };
@@ -21,7 +23,7 @@ const pathForIcon = {
 };
 
 const IconRoutePill = ({ icon, color, outline }) => {
-  let modifiers = [color];
+  const modifiers = [color];
   if (outline) {
     modifiers.push("outline");
   }
@@ -31,14 +33,14 @@ const IconRoutePill = ({ icon, color, outline }) => {
   return (
     <div className={classWithModifiers("route-pill", modifiers)}>
       <div className="route-pill__icon">
-        <img src={imgSrc} />
+        <img className="route-pill__icon-image" src={imgSrc} />
       </div>
     </div>
   );
 };
 
 const SlashedRoutePill = ({ part1, part2, color, outline }) => {
-  let modifiers = [color];
+  const modifiers = [color];
   if (outline) {
     modifiers.push("outline");
   }

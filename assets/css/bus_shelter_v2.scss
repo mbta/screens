@@ -1,5 +1,7 @@
 @import url("https://rsms.me/inter/inter.css");
 
+@import "colors";
+
 @import "v2/bus_shelter/screen/normal";
 @import "v2/bus_shelter/screen/takeover";
 
@@ -10,6 +12,8 @@
 @import "v2/placeholder";
 @import "v2/bus_shelter/normal_header";
 @import "v2/bus_shelter/link_footer";
+
+@import "v2/bus_shelter/route_pill";
 
 body {
   margin: 0px;
