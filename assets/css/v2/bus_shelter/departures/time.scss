@@ -3,14 +3,18 @@
 }
 
 .departure-time-with-crowding {
+  text-align: right;
+
   &:not(:first-child) {
     margin-top: 16px;
   }
 }
 
 .departure-time {
+  display: inline-block;
+  vertical-align: middle;
+
   font-family: Inter;
-  text-align: right;
   color: #171f26;
 }
 

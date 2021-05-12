@@ -1,17 +1,14 @@
 import React from "react";
 
 import DepartureTime from "Components/v2/departures/departure_time";
-
-const DepartureCrowding = (props) => {
-  return null;
-};
+import DepartureCrowding from "Components/v2/departures/departure_crowding";
 
 const DepartureTimes = ({ timesWithCrowding }) => {
   return (
     <div className="departure-times-with-crowding">
       {timesWithCrowding.map(({ time, crowding }, i) => (
         <div className="departure-time-with-crowding" key={i}>
-          <DepartureCrowding {...crowding} />
+          {crowding && <DepartureCrowding crowdingLevel={crowding} />}
           <DepartureTime {...time} />
         </div>
       ))}
