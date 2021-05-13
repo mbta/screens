@@ -6,8 +6,8 @@ import DepartureCrowding from "Components/v2/departures/departure_crowding";
 const DepartureTimes = ({ timesWithCrowding }) => {
   return (
     <div className="departure-times-with-crowding">
-      {timesWithCrowding.map(({ time, crowding }, i) => (
-        <div className="departure-time-with-crowding" key={i}>
+      {timesWithCrowding.map(({ id, time, crowding }) => (
+        <div className="departure-time-with-crowding" key={id}>
           {crowding && <DepartureCrowding crowdingLevel={crowding} />}
           <DepartureTime {...time} />
         </div>

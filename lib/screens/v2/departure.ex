@@ -108,6 +108,9 @@ defmodule Screens.V2.Departure do
     end
   end
 
+  def id(%__MODULE__{prediction: %Prediction{id: prediction_id}}), do: prediction_id
+  def id(%__MODULE__{schedule: %Schedule{id: schedule_id}}), do: schedule_id
+
   def route_id(%__MODULE__{prediction: %Prediction{route: %Route{id: route_id}}}) do
     route_id
   end

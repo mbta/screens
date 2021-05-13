@@ -160,6 +160,23 @@ defmodule Screens.V2.DepartureTest do
     end
   end
 
+  describe "id/1" do
+    test "returns prediction id when present" do
+      prediction = %Prediction{id: "prediction-01"}
+      schedule = %Schedule{id: "schedule-01"}
+      departure = %Departure{prediction: prediction, schedule: schedule}
+
+      assert "prediction-01" == Departure.id(departure)
+    end
+
+    test "returns schedule id when no prediction is present" do
+      schedule = %Schedule{id: "schedule-01"}
+      departure = %Departure{prediction: nil, schedule: schedule}
+
+      assert "schedule-01" == Departure.id(departure)
+    end
+  end
+
   describe "route_id/1" do
     test "returns prediction route_id when present" do
       prediction = %Prediction{route: %Route{id: "28"}}

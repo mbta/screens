@@ -52,7 +52,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp serialize_row(departures, screen) do
+    departure_id_string =
+      departures
+      |> Enum.map(&Departure.id/1)
+      |> Enum.sort()
+      |> Enum.join("")
+
+    row_id = :md5 |> :crypto.hash(departure_id_string) |> Base.encode64()
+
     %{
+      id: row_id,
       route: serialize_route(departures),
       headsign: serialize_headsign(departures),
       times_with_crowding: serialize_times_with_crowding(departures, screen),
@@ -147,7 +156,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
         _ -> serialize_time(departure, screen, now)
       end
 
-    Map.merge(serialized_time, %{crowding: serialize_crowding(departure)})
+    Map.merge(serialized_time, %{
+      id: Departure.id(departure),
+      crowding: serialize_crowding(departure)
+    })
   end
 
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
