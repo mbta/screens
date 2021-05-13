@@ -14,6 +14,7 @@ import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/eink/normal_header";
 import FareInfoFooter from "Components/v2/eink/fare_info_footer";
+import NormalDepartures from "Components/v2/departures/normal_departures";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -21,6 +22,7 @@ const TYPE_TO_COMPONENT = {
   placeholder: Placeholder,
   fare_info_footer: FareInfoFooter,
   normal_header: NormalHeader,
+  departures: NormalDepartures,
 };
 
 const App = (): JSX.Element => {

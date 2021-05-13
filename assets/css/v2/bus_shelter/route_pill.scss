@@ -1,0 +1,89 @@
+.route-pill {
+  position: relative;
+  width: 144px;
+  height: 74px;
+  border-radius: 100px;
+
+  &--blue {
+    background-color: $line-color-blue;
+  }
+
+  &--green {
+    background-color: $line-color-green;
+  }
+
+  &--orange {
+    background-color: $line-color-orange;
+  }
+
+  &--purple {
+    background-color: $line-color-cr;
+  }
+
+  &--red {
+    background-color: $line-color-red;
+  }
+
+  &--silver {
+    background-color: $line-color-silver;
+  }
+
+  &--teal {
+    background-color: $line-color-ferry;
+  }
+
+  &--yellow {
+    background-color: $line-color-bus;
+    box-shadow: 2px 4px 2px 0px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.route-pill__text {
+  width: 100%;
+  text-align: center;
+  font-family: "neue-haas-grotesk-text";
+  font-size: 48px;
+  line-height: 74px;
+  font-weight: 700;
+
+  &--yellow {
+    color: black;
+  }
+
+  &--blue,
+  &--green,
+  &--orange,
+  &--purple,
+  &--red,
+  &--silver,
+  &--teal {
+    color: white;
+  }
+}
+
+.route-pill__icon {
+  width: 100%;
+  text-align: center;
+}
+
+.route-pill__icon-image {
+  height: 60px;
+  margin-top: 7px;
+}
+
+.route-pill__slashed-text {
+  width: 100%;
+  text-align: center;
+  font-family: "neue-haas-grotesk-text";
+  font-size: 32px;
+  line-height: 74px;
+  font-weight: 700;
+}
+
+.route-pill__slashed-part-1 {
+  display: inline-block;
+}
+
+.route-pill__slashed-part-2 {
+  display: inline-block;
+}

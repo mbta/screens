@@ -1,0 +1,47 @@
+.departure-times-with-crowding {
+  width: 256px;
+}
+
+.departure-time-with-crowding {
+  text-align: right;
+
+  &:not(:first-child) {
+    margin-top: 16px;
+  }
+}
+
+.departure-time {
+  display: inline-block;
+  vertical-align: middle;
+
+  font-family: Inter;
+  color: #171f26;
+}
+
+.departure-time__text {
+  font-size: 72px;
+  line-height: 64px;
+  font-weight: 800;
+}
+
+.departure-time__minutes {
+  display: inline-block;
+  margin-left: 4px;
+
+  font-size: 72px;
+  line-height: 64px;
+  font-weight: 800;
+}
+
+.departure-time__minutes-label {
+  display: inline-block;
+
+  font-size: 56px;
+  line-height: 56px;
+}
+
+.departure-time__timestamp {
+  font-size: 72px;
+  line-height: 64px;
+  font-weight: 800;
+}

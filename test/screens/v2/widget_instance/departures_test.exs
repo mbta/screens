@@ -183,7 +183,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "identifies BRD from vehicle status", %{bus_shelter_screen: screen} do
-      serialized_boarding = [%{crowding: nil, time: %{text: "BRD", type: :text}}]
+      serialized_boarding = [%{id: nil, crowding: nil, time: %{text: "BRD", type: :text}}]
       now = ~U[2020-01-01T00:00:00Z]
 
       departure = %Departure{
@@ -221,7 +221,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "identifies BRD from stop type", %{bus_shelter_screen: screen} do
-      serialized_boarding = [%{crowding: nil, time: %{text: "BRD", type: :text}}]
+      serialized_boarding = [%{id: nil, crowding: nil, time: %{text: "BRD", type: :text}}]
       now = ~U[2020-01-01T00:00:00Z]
 
       departure = %Departure{
@@ -259,7 +259,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "identifies ARR", %{bus_shelter_screen: screen} do
-      serialized_arriving = [%{crowding: nil, time: %{text: "ARR", type: :text}}]
+      serialized_arriving = [%{id: nil, crowding: nil, time: %{text: "ARR", type: :text}}]
       now = ~U[2020-01-01T00:00:00Z]
 
       departure = %Departure{
@@ -286,7 +286,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "returns Now on e-Ink screens", %{bus_eink_screen: screen} do
-      serialized_now = [%{crowding: nil, time: %{text: "Now", type: :text}}]
+      serialized_now = [%{id: nil, crowding: nil, time: %{text: "Now", type: :text}}]
       now = ~U[2020-01-01T00:00:00Z]
 
       departure = %Departure{
@@ -362,7 +362,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
     test "correctly serializes timestamps", %{bus_shelter_screen: screen} do
       serialized_timestamp = [
-        %{crowding: nil, time: %{type: :timestamp, am_pm: :am, hour: 12, minute: 20}}
+        %{id: nil, crowding: nil, time: %{type: :timestamp, am_pm: :am, hour: 12, minute: 20}}
       ]
 
       now = ~U[2020-01-01T00:00:00Z]
@@ -397,6 +397,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       assert [
                %{
+                 id: nil,
                  crowding: nil,
                  time: %{am_pm: :pm, hour: 9, minute: 20, type: :timestamp},
                  scheduled_time: %{am_pm: :pm, hour: 9, minute: 15, type: :timestamp}
