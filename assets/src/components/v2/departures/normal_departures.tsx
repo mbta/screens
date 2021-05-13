@@ -6,17 +6,19 @@ import NoticeSection from "Components/v2/departures/notice_section";
 const NormalDeparturesRenderer = forwardRef(
   ({ sections, sectionSizes }, ref) => {
     return (
-      <div className="departures" ref={ref}>
-        {sections.map(({ type, ...data }, i) => {
-          if (type === "normal_section") {
-            const { rows } = data;
-            return (
-              <NormalSection rows={rows.slice(0, sectionSizes[i])} key={i} />
-            );
-          } else if (type === "notice_section") {
-            return <NoticeSection {...data} key={i} />;
-          }
-        })}
+      <div className="departures-container">
+        <div className="departures" ref={ref}>
+          {sections.map(({ type, ...data }, i) => {
+            if (type === "normal_section") {
+              const { rows } = data;
+              return (
+                <NormalSection rows={rows.slice(0, sectionSizes[i])} key={i} />
+              );
+            } else if (type === "notice_section") {
+              return <NoticeSection {...data} key={i} />;
+            }
+          })}
+        </div>
       </div>
     );
   }
@@ -43,7 +45,7 @@ const NormalDeparturesSizer = ({ sections, onDoneSizing }) => {
   useLayoutEffect(() => {
     if (
       ref.current &&
-      ref.current.clientHeight > ref.current.parentNode.clientHeight
+      ref.current.clientHeight > ref.current.parentNode.parentNode.clientHeight
     ) {
       setTempSectionSizes((sectionSizes) => {
         return [sectionSizes[0] - 1];

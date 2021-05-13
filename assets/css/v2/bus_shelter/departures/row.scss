@@ -1,4 +1,18 @@
 .departure-row {
+  padding-bottom: 30px;
+  position: relative;
+
+  &:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    bottom: 0px;
+    left: 200px;
+
+    width: 848px;
+    height: 4px;
+    border-radius: 2px;
+    background-color: #cccbc8;
+  }
 }
 
 .departure-row__route {
