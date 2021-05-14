@@ -27,7 +27,7 @@ defmodule Screens.Config.PsaConfig.PsaList do
     {@default_psa_type, []}
   end
 
-  @spec to_json(t) :: map()
+  @spec to_json(t()) :: map()
   def to_json({type, paths}) do
     %{
       type: type,
