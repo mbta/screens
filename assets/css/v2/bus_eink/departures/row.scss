@@ -1,0 +1,37 @@
+.departure-row {
+  padding-bottom: 30px;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0px;
+    left: 344px;
+
+    width: 824px;
+    height: 2px;
+    border-radius: 4px;
+    background-color: black;
+  }
+}
+
+.departure-row__route {
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 32px;
+  margin-top: 32px;
+}
+
+.departure-row__destination {
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 32px;
+  margin-top: 68px;
+}
+
+.departure-row__time {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 32px;
+  margin-top: 44px;
+}
