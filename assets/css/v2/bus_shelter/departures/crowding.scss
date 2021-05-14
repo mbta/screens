@@ -8,3 +8,25 @@
 .departure-crowding__icon {
   height: 64px;
 }
+
+.departure-crowding__icon-person--inactive {
+  fill: #cccccc;
+}
+
+.departure-crowding__icon--level-1 {
+  .departure-crowding__icon-person--active {
+    fill: #1b7138;
+  }
+}
+
+.departure-crowding__icon--level-2 {
+  .departure-crowding__icon-person--active {
+    fill: #ff9900;
+  }
+}
+
+.departure-crowding__icon--level-3 {
+  .departure-crowding__icon-person--active {
+    fill: #d72823;
+  }
+}
