@@ -15,11 +15,13 @@
 @import "v2/bus_shelter/link_footer";
 
 @import "v2/bus_shelter/route_pill";
+@import "v2/bus_shelter/free_text";
 @import "v2/bus_shelter/departures";
 @import "v2/bus_shelter/departures/row";
 @import "v2/bus_shelter/departures/destination";
 @import "v2/bus_shelter/departures/time";
 @import "v2/bus_shelter/departures/crowding";
+@import "v2/bus_shelter/departures/alert";
 
 body {
   margin: 0px;

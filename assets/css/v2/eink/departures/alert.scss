@@ -1,0 +1,31 @@
+.departure-alert {
+  display: inline-block;
+  height: 72px;
+  border-radius: 12px;
+  background-color: black;
+  margin-left: 24px;
+
+  font-family: Inter;
+  font-size: 40px;
+  line-height: 72px;
+  color: white;
+}
+
+.departure-alert__icon {
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 24px;
+  margin-top: 12px;
+  height: 48px;
+}
+
+.departure-alert__icon-image {
+  height: 48px;
+}
+
+.departure-alert__text {
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 24px;
+  margin-right: 24px;
+}

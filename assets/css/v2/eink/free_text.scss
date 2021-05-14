@@ -1,0 +1,11 @@
+.free-text__element {
+  &:not(:last-child)::after {
+    content: " ";
+  }
+}
+
+.free-text__string {
+  &--bold {
+    font-weight: 700;
+  }
+}

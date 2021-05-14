@@ -492,7 +492,12 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       departure = %Departure{prediction: %Prediction{alerts: alerts}}
 
       expected = [
-        %{color: :black, icon: :clock, text: ["Delays up to", %{format: :bold, text: "15m"}]}
+        %{
+          id: "1",
+          color: :black,
+          icon: :clock,
+          text: ["Delays up to", %{format: :bold, text: "15m"}]
+        }
       ]
 
       assert expected == Departures.serialize_inline_alerts([departure])
@@ -515,16 +520,66 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       departure = %Departure{prediction: %Prediction{alerts: alerts}}
 
       expected = [
-        %{color: :black, icon: :clock, text: ["Delays up to", %{format: :bold, text: "10m"}]},
-        %{color: :black, icon: :clock, text: ["Delays up to", %{format: :bold, text: "10m"}]},
-        %{color: :black, icon: :clock, text: ["Delays up to", %{format: :bold, text: "10m"}]},
-        %{color: :black, icon: :clock, text: ["Delays up to", %{format: :bold, text: "15m"}]},
-        %{color: :black, icon: :clock, text: ["Delays up to", %{format: :bold, text: "20m"}]},
-        %{color: :black, icon: :clock, text: ["Delays up to", %{format: :bold, text: "25m"}]},
-        %{color: :black, icon: :clock, text: ["Delays up to", %{format: :bold, text: "30m"}]},
-        %{color: :black, icon: :clock, text: ["Delays more than", %{format: :bold, text: "30m"}]},
-        %{color: :black, icon: :clock, text: ["Delays more than", %{format: :bold, text: "60m"}]},
-        %{color: :black, icon: :clock, text: ["Delays more than", %{format: :bold, text: "60m"}]}
+        %{
+          id: "1",
+          color: :black,
+          icon: :clock,
+          text: ["Delays up to", %{format: :bold, text: "10m"}]
+        },
+        %{
+          id: "2",
+          color: :black,
+          icon: :clock,
+          text: ["Delays up to", %{format: :bold, text: "10m"}]
+        },
+        %{
+          id: "3",
+          color: :black,
+          icon: :clock,
+          text: ["Delays up to", %{format: :bold, text: "10m"}]
+        },
+        %{
+          id: "4",
+          color: :black,
+          icon: :clock,
+          text: ["Delays up to", %{format: :bold, text: "15m"}]
+        },
+        %{
+          id: "5",
+          color: :black,
+          icon: :clock,
+          text: ["Delays up to", %{format: :bold, text: "20m"}]
+        },
+        %{
+          id: "6",
+          color: :black,
+          icon: :clock,
+          text: ["Delays up to", %{format: :bold, text: "25m"}]
+        },
+        %{
+          id: "7",
+          color: :black,
+          icon: :clock,
+          text: ["Delays up to", %{format: :bold, text: "30m"}]
+        },
+        %{
+          id: "8",
+          color: :black,
+          icon: :clock,
+          text: ["Delays more than", %{format: :bold, text: "30m"}]
+        },
+        %{
+          id: "9",
+          color: :black,
+          icon: :clock,
+          text: ["Delays more than", %{format: :bold, text: "60m"}]
+        },
+        %{
+          id: "10",
+          color: :black,
+          icon: :clock,
+          text: ["Delays more than", %{format: :bold, text: "60m"}]
+        }
       ]
 
       assert expected == Departures.serialize_inline_alerts([departure])
