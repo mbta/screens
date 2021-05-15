@@ -4,8 +4,16 @@ defmodule Screens.Config.Struct do
   a JSON-serializable config struct. Modules that use this will automatically
   adopt `Screens.Config.Behaviour`.
 
-  This shouldn't be used in all cases--it's just for the more straightforward
-  pieces of config.
+  This can be used for most config modules that define structs
+  and have straightforward serialization logic.
+
+  ## Options
+
+    * `:with_default` - set true to have the generated `from_json/1` accept `:default` as an argument.
+      Default false.
+
+    * `:children` - pass a keyword list of `{struct_key, child | {:list, child} | {:map, child}}`,
+      where `child` is a module that adopts `Screens.Config.Behaviour`.
 
   In the using module, you MUST define the following:
 
@@ -13,19 +21,9 @@ defmodule Screens.Config.Struct do
 
     * A `t()` type definition for the struct
 
-    * `value_from_json/2` and `value_to_json/2`, if you do not pass a `children` list in the `use` call
+    * Clauses of `value_from_json/2` and `value_to_json/2` for struct fields not described in the `:children` opt
 
-  You MAY also define the following:
-
-    * Additional clauses of `value_from_json/2` and `value_to_json/2`
-
-  ## Options
-
-    * `:with_default` - set true to have the generated `from_json/1` accept `:default` as its argument.
-      Default false.
-
-    * `:children` - pass a keyword list of {struct_key, child_config_module | {:list, child_config_module}},
-      where child_config_module is a module that adopts `Screens.Config.Behaviour`.
+    * Any other fallback clauses of `value_from_json/2` and `value_to_json/2`
   """
 
   @type opt ::
@@ -55,7 +53,7 @@ defmodule Screens.Config.Struct do
         struct_map =
           json
           |> Map.take(Util.struct_keys(__MODULE__))
-          |> Enum.into(%{}, fn {k, v} -> {String.to_existing_atom(k), value_from_json(k, v)} end)
+          |> Enum.into(%{}, fn {k, v} -> {String.to_existing_atom(k), _value_from_json(k, v)} end)
 
         struct!(__MODULE__, struct_map)
       end
@@ -69,38 +67,51 @@ defmodule Screens.Config.Struct do
       def to_json(%__MODULE__{} = t) do
         t
         |> Map.from_struct()
-        |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
+        |> Enum.into(%{}, fn {k, v} -> {k, _value_to_json(k, v)} end)
       end
-
-      defp value_from_json(string_key, value)
-
-      defp value_to_json(key, value)
 
       for {key, child_module} <- children do
         string_key = Atom.to_string(key)
 
         case child_module do
           {:list, module} ->
-            defp value_from_json(unquote(string_key), values) do
+            defp _value_from_json(unquote(string_key), values) when is_list(values) do
               Enum.map(values, &unquote(module).from_json/1)
             end
 
-            defp value_to_json(unquote(key), values) do
+            defp _value_to_json(unquote(key), values) do
               Enum.map(values, &unquote(module).to_json/1)
             end
 
+          {:map, module} ->
+            defp _value_from_json(unquote(string_key), value_map) when is_map(value_map) do
+              Enum.into(value_map, %{}, fn {k, v} -> {k, unquote(module).from_json(v)} end)
+            end
+
+            defp _value_to_json(unquote(key), value_map) do
+              Enum.into(value_map, %{}, fn {k, v} -> {k, unquote(module).to_json(v)} end)
+            end
+
           module ->
-            defp value_from_json(unquote(string_key), value) do
+            defp _value_from_json(unquote(string_key), value) when not is_nil(value) do
               unquote(module).from_json(value)
             end
 
-            defp value_to_json(unquote(key), value) do
+            defp _value_to_json(unquote(key), value) when not is_nil(value) do
               unquote(module).to_json(value)
             end
         end
       end
 
-      defoverridable value_from_json: 2, value_to_json: 2
+      defp _value_from_json(key, value), do: value_from_json(key, value)
+
+      defp _value_to_json(key, value), do: value_to_json(key, value)
+
+      defp value_from_json("__never_matches__", _value), do: nil
+
+      defp value_to_json(:__never_matches__, _value), do: nil
+
+      defoverridable from_json: 1, to_json: 1
     end
   end
 end

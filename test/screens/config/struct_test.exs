@@ -62,10 +62,40 @@ defmodule TEST.Config4 do
   use Screens.Config.Struct, children: [daughter: TEST.Config1, sons: {:list, TEST.Config2}]
 end
 
+defmodule TEST.Config5 do
+  @type t :: %__MODULE__{
+          daughter_map: %{String.t() => TEST.Config1.t()},
+          son: TEST.Config2.t()
+        }
+
+  defstruct daughter_map: %{},
+            son: TEST.Config2.from_json(:default)
+
+  use Screens.Config.Struct, children: [daughter_map: {:map, TEST.Config1}, son: TEST.Config2]
+end
+
+defmodule TEST.Config6 do
+  @type t :: %__MODULE__{child: TEST.Config2.t() | nil}
+
+  defstruct child: nil
+
+  use Screens.Config.Struct, children: [child: TEST.Config2]
+
+  defp value_from_json(_, nil), do: nil
+end
+
+defmodule TEST.Config7 do
+  @type t :: %__MODULE__{child: TEST.Config2.t()}
+
+  defstruct [:child]
+
+  use Screens.Config.Struct, children: [child: TEST.Config2]
+end
+
 defmodule Screens.Config.StructTest do
   use ExUnit.Case, async: true
 
-  alias TEST.{Config1, Config2, Config3, Config4}
+  alias TEST.{Config1, Config2, Config3, Config4, Config5, Config6, Config7}
 
   describe "__using__/1" do
     test "generates a functioning config module when passed default options" do
@@ -115,20 +145,29 @@ defmodule Screens.Config.StructTest do
       assert config == Config4.from_json(original_json)
     end
 
-    test "fails if the using module doesn't provide `children` and doesn't define value_from_json/2, value_to_json/2" do
-      assert_raise ArgumentError, fn ->
-        defmodule TEST.InvalidConfig do
-          @type t :: %__MODULE__{
-                  action: :include | :exclude,
-                  values: list(String.t())
-                }
+    test "supports generating functions for map-valued child config fields" do
+      original_json = %{
+        "daughter_map" => %{
+          "1" => %{"action" => "include", "values" => ["e", "f"]},
+          "2" => %{"action" => "exclude", "values" => ["g"]}
+        }
+      }
 
-          @enforce_keys [:action, :values]
-          defstruct @enforce_keys
+      config = %Config5{
+        daughter_map: %{
+          "1" => %Config1{action: :include, values: ["e", "f"]},
+          "2" => %Config1{action: :exclude, values: ["g"]}
+        },
+        son: %Config2{action: :include, values: []}
+      }
 
-          use Screens.Config.Struct
-        end
-      end
+      assert config == Config5.from_json(original_json)
+    end
+
+    test "defers to the using module for handling (or not handling) nil-valued children" do
+      assert %Config6{child: nil} == Config6.from_json(%{"child" => nil})
+
+      assert_raise FunctionClauseError, fn -> Config7.from_json(%{"child" => nil}) end
     end
   end
 end

@@ -2,12 +2,12 @@ defmodule Screens.Config.Behaviour do
   @moduledoc false
 
   @typedoc """
-  Usually a struct or a list, but could conceivably be any other Elixir term.
+  Usually a struct or a tuple, but could conceivably be any other Elixir term.
   """
   @type config :: term()
 
   @typedoc """
-  Usually a map or a list, but could conceivably be another JSON-originated value.
+  Usually a map or a list, but could conceivably be any other JSON-originated value.
   """
   @type json_config :: term()
 
