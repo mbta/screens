@@ -107,11 +107,15 @@ defmodule Screens.Config.Struct do
 
       defp _value_to_json(key, value), do: value_to_json(key, value)
 
-      defp value_from_json("__never_matches__", _value), do: nil
+      defp value_from_json(_key, _value) do
+        raise "value_from_json/2 not implemented"
+      end
 
-      defp value_to_json(:__never_matches__, _value), do: nil
+      defp value_to_json(_key, _value) do
+        raise "value_to_json/2 not implemented"
+      end
 
-      defoverridable from_json: 1, to_json: 1
+      defoverridable from_json: 1, to_json: 1, value_from_json: 2, value_to_json: 2
     end
   end
 end
