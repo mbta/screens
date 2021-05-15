@@ -1,8 +1,6 @@
 defmodule Screens.Config.Solari.Section.Headway do
   @moduledoc false
 
-  alias Screens.Util
-
   @typep sign_id :: String.t()
   @typep headway_id :: String.t()
   @typep headsign :: String.t()
@@ -17,22 +15,9 @@ defmodule Screens.Config.Solari.Section.Headway do
             headway_id: nil,
             headsigns: []
 
-  @spec from_json(map() | :default) :: t()
-  def from_json(%{} = json) do
-    struct_map =
-      json
-      |> Map.take(Util.struct_keys(__MODULE__))
-      |> Enum.into(%{}, fn {k, v} -> {String.to_existing_atom(k), v} end)
+  use Screens.Config.Struct, with_default: true
 
-    struct!(__MODULE__, struct_map)
-  end
+  defp value_from_json(_, value), do: value
 
-  def from_json(:default) do
-    %__MODULE__{}
-  end
-
-  @spec to_json(t()) :: map()
-  def to_json(t) do
-    Map.from_struct(t)
-  end
+  defp value_to_json(_, value), do: value
 end

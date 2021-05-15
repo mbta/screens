@@ -8,14 +8,11 @@ defmodule Screens.Config.Dup.Override.PartialAlertList do
   @enforce_keys [:alerts]
   defstruct @enforce_keys
 
-  def from_json(%{"alerts" => alerts}) do
-    %__MODULE__{alerts: Enum.map(alerts, &PartialAlert.from_json/1)}
-  end
+  use Screens.Config.Struct, children: [alerts: {:list, PartialAlert}]
 
-  def to_json(%__MODULE__{alerts: alerts}) do
-    %{
-      type: :partial,
-      alerts: Enum.map(alerts, &PartialAlert.to_json/1)
-    }
+  def to_json(%__MODULE__{} = t) do
+    t
+    |> super()
+    |> Map.put(:type, :partial)
   end
 end

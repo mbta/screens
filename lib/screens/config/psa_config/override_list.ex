@@ -2,7 +2,6 @@ defmodule Screens.Config.PsaConfig.OverrideList do
   @moduledoc false
 
   alias Screens.Config.PsaConfig.PsaList
-  alias Screens.Util
 
   @type t :: %__MODULE__{
           psa_list: PsaList.t(),
@@ -15,22 +14,7 @@ defmodule Screens.Config.PsaConfig.OverrideList do
   @enforce_keys ~w[psa_list start_time end_time]a
   defstruct @enforce_keys
 
-  @spec from_json(map()) :: t()
-  def from_json(%{} = json) do
-    struct_map =
-      json
-      |> Map.take(Util.struct_keys(__MODULE__))
-      |> Enum.into(%{}, fn {k, v} -> {String.to_existing_atom(k), value_from_json(k, v)} end)
-
-    struct!(__MODULE__, struct_map)
-  end
-
-  @spec to_json(t()) :: map()
-  def to_json(%__MODULE__{} = t) do
-    t
-    |> Map.from_struct()
-    |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
-  end
+  use Screens.Config.Struct, children: [psa_list: PsaList]
 
   for datetime_key <- ~w[start_time end_time]a do
     datetime_key_string = Atom.to_string(datetime_key)
@@ -49,15 +33,7 @@ defmodule Screens.Config.PsaConfig.OverrideList do
     end
   end
 
-  defp value_from_json("psa_list", psa_list) do
-    PsaList.from_json(psa_list)
-  end
-
   defp value_from_json(_, value), do: value
-
-  defp value_to_json(:psa_list, psa_list) do
-    PsaList.to_json(psa_list)
-  end
 
   defp value_to_json(_, value), do: value
 end

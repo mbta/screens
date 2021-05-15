@@ -1,6 +1,8 @@
 defmodule Screens.Config.NearbyConnection do
   @moduledoc false
 
+  @behaviour Screens.Config.Behaviour
+
   @type t :: {stop_id, list(route_id)}
   @typep stop_id :: String.t()
   @typep route_id :: String.t()

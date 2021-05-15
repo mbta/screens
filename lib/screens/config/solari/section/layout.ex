@@ -3,6 +3,8 @@ defmodule Screens.Config.Solari.Section.Layout do
 
   alias Screens.Config.Solari.Section.Layout.{Bidirectional, Upcoming}
 
+  @behaviour Screens.Config.Behaviour
+
   @type t ::
           Bidirectional.t()
           | Upcoming.t()
@@ -14,6 +16,7 @@ defmodule Screens.Config.Solari.Section.Layout do
     upcoming: Upcoming
   }
 
+  @impl true
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
     type = Map.get(json, "type", :default)
@@ -26,6 +29,7 @@ defmodule Screens.Config.Solari.Section.Layout do
     @opts_modules[@default_type].from_json(:default)
   end
 
+  @impl true
   @spec to_json(t()) :: map()
   def to_json(%Bidirectional{} = layout) do
     %{

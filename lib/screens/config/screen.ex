@@ -1,6 +1,8 @@
 defmodule Screens.Config.Screen do
   @moduledoc false
 
+  @behaviour Screens.Config.Behaviour
+
   alias Screens.Config.{Bus, Dup, Gl, Solari, V2}
   alias Screens.Util
 
@@ -68,6 +70,7 @@ defmodule Screens.Config.Screen do
             app_params: nil,
             tags: []
 
+  @impl true
   @spec from_json(map()) :: t() | nil
   def from_json(%{"app_id" => app_id} = json) when app_id in @recognized_app_id_strings do
     app_id = String.to_existing_atom(app_id)
@@ -85,6 +88,7 @@ defmodule Screens.Config.Screen do
   # Prevents the application from breaking if we introduce a new app_id
   def from_json(_), do: nil
 
+  @impl true
   @spec to_json(t()) :: map()
   def to_json(%__MODULE__{app_id: app_id} = t) do
     t
