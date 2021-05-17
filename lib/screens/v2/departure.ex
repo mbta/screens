@@ -17,18 +17,25 @@ defmodule Screens.V2.Departure do
             schedule: nil
 
   def fetch(params, opts \\ []) do
+    now =
+      if is_nil(opts[:now]) do
+        DateTime.utc_now()
+      else
+        opts[:now]
+      end
+
     if opts[:include_schedules] do
-      fetch_predictions_and_schedules(params)
+      fetch_predictions_and_schedules(params, now)
     else
-      fetch_predictions_only(params)
+      fetch_predictions_only(params, now)
     end
   end
 
-  def fetch_predictions_and_schedules(params) do
+  def fetch_predictions_and_schedules(params, now) do
     with {:ok, predictions} <- Prediction.fetch(params),
          {:ok, schedules} <- Schedule.fetch(params) do
-      relevant_predictions = Builder.get_relevant_departures(predictions)
-      relevant_schedules = Builder.get_relevant_departures(schedules)
+      relevant_predictions = Builder.get_relevant_departures(predictions, now)
+      relevant_schedules = Builder.get_relevant_departures(schedules, now)
 
       departures =
         Builder.merge_predictions_and_schedules(relevant_predictions, relevant_schedules)
@@ -39,10 +46,10 @@ defmodule Screens.V2.Departure do
     end
   end
 
-  def fetch_predictions_only(params) do
+  def fetch_predictions_only(params, now) do
     case Prediction.fetch(params) do
       {:ok, predictions} ->
-        relevant_predictions = Builder.get_relevant_departures(predictions)
+        relevant_predictions = Builder.get_relevant_departures(predictions, now)
         departures = Enum.map(relevant_predictions, fn p -> %__MODULE__{prediction: p} end)
         {:ok, departures}
 

@@ -2,11 +2,13 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   @moduledoc false
 
   alias Screens.Config.Screen
+  alias Screens.Config.V2
   alias Screens.Config.V2.{Footer, GlEink}
   alias Screens.Config.V2.Header.Destination
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Helpers
-  alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.{FareInfoFooter, LineMap, NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
 
@@ -16,12 +18,14 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
      %{
        normal: [
          :header,
+         :left_sidebar,
          :main_content,
          :medium_flex,
          :footer
        ],
        bottom_takeover: [
          :header,
+         :left_sidebar,
          :main_content,
          :bottom_screen
        ],
@@ -39,9 +43,32 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
       header_instances(config, now, fetch_destination_fn),
       Helpers.Departures.departures_instances(config),
       footer_instances(config),
-      placeholder_instances()
+      placeholder_instances(),
+      line_map_instances(config)
     ]
     |> List.flatten()
+  end
+
+  def line_map_instances(
+        %Screen{
+          app_params: %GlEink{
+            line_map: %V2.LineMap{
+              station_id: station_id,
+              direction_id: direction_id,
+              route_id: route_id
+            }
+          }
+        } = config
+      ) do
+    {:ok, stops} = RoutePattern.stops_by_route_and_direction(route_id, direction_id)
+
+    {:ok, departures} =
+      Screens.V2.Departure.fetch(%{stop_ids: [station_id], direction_id: direction_id},
+        include_schedules: true,
+        now: DateTime.add(DateTime.utc_now(), -180)
+      )
+
+    [%LineMap{screen: config, stops: stops, departures: departures}]
   end
 
   def header_instances(config, now, fetch_destination_fn) do

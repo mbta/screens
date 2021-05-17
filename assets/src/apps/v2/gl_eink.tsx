@@ -14,6 +14,7 @@ import Placeholder from "Components/v2/placeholder";
 import FareInfoFooter from "Components/v2/eink/fare_info_footer";
 import NormalHeader from "Components/v2/eink/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
+import LineMap from "Components/v2/gl_eink_double/line_map";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -22,6 +23,7 @@ const TYPE_TO_COMPONENT = {
   fare_info_footer: FareInfoFooter,
   normal_header: NormalHeader,
   departures: NormalDepartures,
+  line_map: LineMap,
 };
 
 const App = (): JSX.Element => {
