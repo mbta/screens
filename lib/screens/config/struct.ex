@@ -21,7 +21,8 @@ defmodule Screens.Config.Struct do
 
     * A `t()` type definition for the struct
 
-    * Clauses of `value_from_json/2` and `value_to_json/2` for struct fields not described in the `:children` opt
+    * Clauses of `value_from_json/2` and `value_to_json/2` for struct fields not described in the `:children` opt,
+      as well as any `:children` fields that are nullable.
 
     * Any other fallback clauses of `value_from_json/2` and `value_to_json/2`
   """
