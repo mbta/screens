@@ -1,0 +1,25 @@
+.flex-zone-page-indicator {
+  position: absolute;
+  top: 624px;
+  left: 0px;
+  width: 1024px;
+  height: 20px;
+  text-align: center;
+}
+
+.flex-zone-page-indicator__page {
+  display: inline-block;
+  width: 144px;
+  height: 16px;
+  border-radius: 24px;
+  margin-left: 44px;
+
+  &--selected {
+    background: #171f26;
+  }
+
+  &--unselected {
+    background: #cccbc8;
+    box-shadow: inset 1px 2px 6px 0px #bfbebb;
+  }
+}
