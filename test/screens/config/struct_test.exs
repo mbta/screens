@@ -188,7 +188,7 @@ defmodule Screens.Config.StructTest do
       assert %Config6{child: nil} == Config6.from_json(%{"child" => nil})
 
       assert_raise RuntimeError,
-                   "Elixir.TEST.Config7.value_from_json/2 not implemented",
+                   "Elixir.TEST.Config7.value_from_json/2 not implemented (key: `child`)",
                    fn -> Config7.from_json(%{"child" => nil}) end
     end
 
@@ -196,7 +196,7 @@ defmodule Screens.Config.StructTest do
       original_json1 = %{"a" => "foo"}
 
       assert_raise RuntimeError,
-                   "Elixir.TEST.Config8.value_from_json/2 not implemented",
+                   "Elixir.TEST.Config8.value_from_json/2 not implemented (key: `a`)",
                    fn -> Config8.from_json(original_json1) end
 
       config = %Config9{a: "foo", b: false}

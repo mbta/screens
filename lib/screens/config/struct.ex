@@ -108,12 +108,12 @@ defmodule Screens.Config.Struct do
 
       defp _value_to_json(key, value), do: value_to_json(key, value)
 
-      defp value_from_json(_key, _value) do
-        raise "#{__MODULE__}.value_from_json/2 not implemented"
+      defp value_from_json(key, _value) do
+        raise "#{__MODULE__}.value_from_json/2 not implemented (key: `#{key}`)"
       end
 
-      defp value_to_json(_key, _value) do
-        raise "#{__MODULE__}.value_to_json/2 not implemented"
+      defp value_to_json(key, _value) do
+        raise "#{__MODULE__}.value_to_json/2 not implemented (key: `#{key}`)"
       end
 
       defoverridable from_json: 1, to_json: 1, value_from_json: 2, value_to_json: 2

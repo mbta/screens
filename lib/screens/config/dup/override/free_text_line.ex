@@ -35,7 +35,7 @@ defmodule Screens.Config.Dup.Override.FreeTextLine do
         ~w[warning x shuttle subway cr walk red blue orange green silver green_b green_c green_d green_e]a do
     icon_string = Atom.to_string(icon)
 
-    defp value_from_json(unquote(icon_string)) do
+    defp value_from_json("icon", unquote(icon_string)) do
       unquote(icon)
     end
   end
