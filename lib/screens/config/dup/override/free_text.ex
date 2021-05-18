@@ -1,6 +1,8 @@
 defmodule Screens.Config.Dup.Override.FreeText do
   @moduledoc false
 
+  @behaviour Screens.Config.Behaviour
+
   @type t ::
           String.t()
           | %{format: format, text: String.t()}
@@ -24,6 +26,7 @@ defmodule Screens.Config.Dup.Override.FreeText do
   @type color :: :red | :blue | :orange | :green | :silver | :purple
   @type special :: :break
 
+  @impl true
   def from_json(text) when is_binary(text) do
     text
   end
@@ -69,5 +72,6 @@ defmodule Screens.Config.Dup.Override.FreeText do
     end
   end
 
+  @impl true
   def to_json(value), do: value
 end

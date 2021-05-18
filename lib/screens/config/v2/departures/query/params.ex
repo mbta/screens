@@ -3,7 +3,6 @@ defmodule Screens.Config.V2.Departures.Query.Params do
   # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 
   alias Screens.RouteType
-  alias Screens.Util
 
   @type t :: %__MODULE__{
           stop_ids: list(String.t()),
@@ -17,26 +16,7 @@ defmodule Screens.Config.V2.Departures.Query.Params do
             direction_id: :both,
             route_type: nil
 
-  @spec from_json(map() | :default) :: t()
-  def from_json(%{} = json) do
-    struct_map =
-      json
-      |> Map.take(Util.struct_keys(__MODULE__))
-      |> Enum.into(%{}, fn {k, v} -> {String.to_existing_atom(k), value_from_json(k, v)} end)
-
-    struct!(__MODULE__, struct_map)
-  end
-
-  def from_json(:default) do
-    %__MODULE__{}
-  end
-
-  @spec to_json(t()) :: map()
-  def to_json(%__MODULE__{} = t) do
-    t
-    |> Map.from_struct()
-    |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
-  end
+  use Screens.Config.Struct, with_default: true
 
   defp value_from_json("direction_id", "both"), do: :both
 
