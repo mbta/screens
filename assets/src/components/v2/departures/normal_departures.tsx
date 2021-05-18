@@ -50,6 +50,8 @@ const NormalDeparturesSizer = ({ sections, onDoneSizing }) => {
       setTempSectionSizes((sectionSizes) => {
         return [sectionSizes[0] - 1];
       });
+    } else {
+      onDoneSizing(tempSectionSizes);
     }
   }, [sections, tempSectionSizes]);
 
