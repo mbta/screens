@@ -2,7 +2,6 @@ defmodule Screens.Config.V2.Departures.Section do
   @moduledoc false
 
   alias Screens.Config.V2.Departures.{Filter, Headway, Query}
-  alias Screens.Util
 
   @type t :: %__MODULE__{
           query: Query.t(),
@@ -15,48 +14,9 @@ defmodule Screens.Config.V2.Departures.Section do
             filter: nil,
             headway: Headway.from_json(:default)
 
-  @spec from_json(map()) :: t()
-  def from_json(%{} = json) do
-    struct_map =
-      json
-      |> Map.take(Util.struct_keys(__MODULE__))
-      |> Enum.into(%{}, fn {k, v} -> {String.to_existing_atom(k), value_from_json(k, v)} end)
+  use Screens.Config.Struct, children: [query: Query, filter: Filter, headway: Headway]
 
-    struct!(__MODULE__, struct_map)
-  end
+  defp value_from_json(_, value), do: value
 
-  defp value_from_json("query", query) do
-    Query.from_json(query)
-  end
-
-  defp value_from_json("filter", nil), do: nil
-
-  defp value_from_json("filter", filter) do
-    Filter.from_json(filter)
-  end
-
-  defp value_from_json("headway", headway) do
-    Headway.from_json(headway)
-  end
-
-  @spec to_json(t()) :: map()
-  def to_json(%__MODULE__{} = t) do
-    t
-    |> Map.from_struct()
-    |> Enum.into(%{}, fn {k, v} -> {k, value_to_json(k, v)} end)
-  end
-
-  defp value_to_json(:query, query) do
-    Query.to_json(query)
-  end
-
-  defp value_to_json(:filter, nil), do: nil
-
-  defp value_to_json(:filter, filter) do
-    Filter.to_json(filter)
-  end
-
-  defp value_to_json(:headway, headway) do
-    Headway.to_json(headway)
-  end
+  defp value_to_json(_, value), do: value
 end

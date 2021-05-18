@@ -1,6 +1,8 @@
 defmodule Screens.Config.PsaConfig.PsaList do
   @moduledoc false
 
+  @behaviour Screens.Config.Behaviour
+
   @type t :: {
           psa_type,
           list(String.t())
@@ -14,6 +16,7 @@ defmodule Screens.Config.PsaConfig.PsaList do
   @type gl_psa_type :: :double | :takeover | :departure
   @type solari_psa_type :: :slide_in | :takeover
 
+  @impl true
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
     type = Map.get(json, "type", :default)
@@ -27,7 +30,8 @@ defmodule Screens.Config.PsaConfig.PsaList do
     {@default_psa_type, []}
   end
 
-  @spec to_json(t) :: map()
+  @impl true
+  @spec to_json(t()) :: map()
   def to_json({type, paths}) do
     %{
       type: type,

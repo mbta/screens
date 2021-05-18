@@ -6,13 +6,9 @@ defmodule Screens.Config.V2.Header.CurrentStopId do
   @enforce_keys [:stop_id]
   defstruct stop_id: nil
 
-  @spec from_json(map()) :: t()
-  def from_json(%{"stop_id" => stop_id}) do
-    %__MODULE__{stop_id: stop_id}
-  end
+  use Screens.Config.Struct
 
-  @spec to_json(t()) :: map()
-  def to_json(%__MODULE__{stop_id: stop_id}) do
-    %{stop_id: stop_id}
-  end
+  defp value_from_json(_, value), do: value
+
+  defp value_to_json(_, value), do: value
 end
