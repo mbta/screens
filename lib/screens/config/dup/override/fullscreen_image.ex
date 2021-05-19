@@ -7,15 +7,15 @@ defmodule Screens.Config.Dup.Override.FullscreenImage do
 
   defstruct image_url: nil
 
-  @spec from_json(map()) :: t()
-  def from_json(%{"image_url" => image_url}) do
-    %__MODULE__{image_url: image_url}
-  end
+  use Screens.Config.Struct
 
-  @spec to_json(t()) :: map()
   def to_json(%__MODULE__{} = t) do
     t
-    |> Map.from_struct()
+    |> super()
     |> Map.put(:type, :image)
   end
+
+  defp value_from_json(_, value), do: value
+
+  defp value_to_json(_, value), do: value
 end
