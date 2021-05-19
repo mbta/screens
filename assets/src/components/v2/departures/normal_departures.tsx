@@ -12,7 +12,7 @@ const NormalDeparturesRenderer = forwardRef(
             if (type === "normal_section") {
               const { rows } = data;
               return (
-                <NormalSection rows={rows.slice(0, sectionSizes[i])} key={i} />
+                <NormalSection rows={trimRows(rows, sectionSizes[i])} key={i} />
               );
             } else if (type === "notice_section") {
               return <NoticeSection {...data} key={i} />;
@@ -24,9 +24,36 @@ const NormalDeparturesRenderer = forwardRef(
   }
 );
 
+const trimRows = (rows, n) => {
+  const trimmedRows = [];
+  let trimmedRowCount = 0;
+  let currentRowIndex = 0;
+
+  while (trimmedRowCount < n && currentRowIndex < rows.length) {
+    const currentRow = rows[currentRowIndex];
+    if (trimmedRowCount + currentRow.times_with_crowding.length < n) {
+      trimmedRows.push(currentRow);
+      trimmedRowCount += currentRow.times_with_crowding.length;
+    } else {
+      const numTimes = n - trimmedRowCount;
+      const trimmedTimes = currentRow.times_with_crowding.slice(0, numTimes);
+      const trimmedRow = { ...currentRow, times_with_crowding: trimmedTimes };
+      trimmedRows.push(trimmedRow);
+      trimmedRowCount += trimmedRow.times_with_crowding.length;
+    }
+
+    currentRowIndex += 1;
+  }
+
+  return trimmedRows;
+};
+
 const getInitialSectionSize = ({ type, ...data }) => {
   if (type === "normal_section") {
-    return data.rows.length;
+    return data.rows.reduce(
+      (acc, { times_with_crowding: times }) => acc + times.length,
+      0
+    );
   } else {
     return 0;
   }
