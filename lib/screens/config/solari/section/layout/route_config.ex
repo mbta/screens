@@ -3,10 +3,13 @@ defmodule Screens.Config.Solari.Section.Layout.RouteConfig do
 
   alias Screens.Config.Solari.Section.Layout.RouteConfig.RouteDescriptor
 
+  @behaviour Screens.Config.Behaviour
+
   @type t :: {:exclude | :include, list(RouteDescriptor.t())}
 
   @default_action :exclude
 
+  @impl true
   @spec from_json(map() | :default) :: t()
   def from_json(%{} = json) do
     action = Map.get(json, "action", :default)
@@ -23,6 +26,7 @@ defmodule Screens.Config.Solari.Section.Layout.RouteConfig do
     {@default_action, []}
   end
 
+  @impl true
   @spec to_json(t()) :: map()
   def to_json({action, route_list}) do
     %{

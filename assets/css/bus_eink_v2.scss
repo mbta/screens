@@ -17,6 +17,12 @@
 @import "v2/bus_eink/departures/crowding";
 @import "v2/bus_eink/departures/alerts";
 
+@import "v2/bus_eink/route_pill";
+@import "v2/bus_eink/departures/row";
+@import "v2/bus_eink/departures/destination";
+@import "v2/bus_eink/departures/time";
+@import "v2/bus_eink/departures/crowding";
+
 body {
   margin: 0px;
 }

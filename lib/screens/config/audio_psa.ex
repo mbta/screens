@@ -1,6 +1,8 @@
 defmodule Screens.Config.AudioPsa do
   @moduledoc false
 
+  @behaviour Screens.Config.Behaviour
+
   @type t :: {format, String.t(), type} | nil
 
   @typep format :: :plaintext | :ssml
@@ -9,6 +11,7 @@ defmodule Screens.Config.AudioPsa do
   @default_psa_format :plaintext
   @default_psa_type :end
 
+  @impl true
   @spec from_json(map() | :default) :: t()
   def from_json(%{"format" => format, "name" => name, "type" => type}) when is_binary(name) do
     {format_from_json(format), name, type_from_json(type)}
@@ -18,6 +21,7 @@ defmodule Screens.Config.AudioPsa do
     nil
   end
 
+  @impl true
   @spec to_json(t()) :: map()
   def to_json({format, name, type}) do
     %{
