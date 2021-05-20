@@ -50,7 +50,8 @@ defmodule Screens.Alerts.Parser do
     %{
       stop: get_in(ie, ["stop"]),
       route: get_in(ie, ["route"]),
-      route_type: get_in(ie, ["route_type"])
+      route_type: get_in(ie, ["route_type"]),
+      direction_id: get_in(ie, ["direction_id"])
     }
   end
 

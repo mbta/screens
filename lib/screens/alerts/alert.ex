@@ -520,4 +520,13 @@ defmodule Screens.Alerts.Alert do
       %{alert: to_full_map(alert), priority: to_priority_map(alert, stop_id)}
     end)
   end
+
+  def interpret_severity(severity) do
+    cond do
+      severity < 3 -> {:up_to, 10}
+      severity > 9 -> {:more_than, 60}
+      severity >= 8 -> {:more_than, 30 * (severity - 7)}
+      true -> {:up_to, 5 * (severity - 1)}
+    end
+  end
 end

@@ -1,0 +1,145 @@
+.subway-status {
+  background-color: #e4e6e1;
+  border-radius: 16px;
+  box-shadow: 0px 12px 24px 0px #cccbc8;
+  height: 576px;
+  width: 1024px;
+}
+
+.subway-status-body {
+  margin-bottom: 8px;
+}
+
+.subway-status-row {
+  position: relative;
+
+  &:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    bottom: 0px;
+    left: 192px;
+
+    width: 808px;
+    height: 4px;
+    border-radius: 2px;
+    background-color: #cccbc8;
+  }
+}
+
+.subway-status-row__route {
+  display: inline-block;
+  vertical-align: top;
+
+  margin-top: 22px;
+  margin-left: 24px;
+  margin-right: 24px;
+}
+
+.subway-status-row__branch {
+  display: inline-block;
+}
+
+.subway-status-row__route-icon {
+  margin-top: 22px;
+  margin-right: 16px;
+  height: 74px;
+}
+
+.subway-status-row__status {
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 22px;
+  margin-bottom: 26px;
+
+  color: #171f26;
+  font-family: Inter;
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 74px;
+}
+
+.subway-status-row__location {
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 39px;
+  margin-left: 12px;
+
+  color: #171f26;
+  font-family: Inter;
+  font-weight: 500;
+  font-size: 36px;
+  line-height: 48px;
+}
+
+.subway-status-branch-row__route {
+  display: inline-block;
+  vertical-align: top;
+  margin-top: 22px;
+  margin-left: 24px;
+}
+
+.subway-status-branch-row__route-icon {
+  height: 74px;
+
+  &:not(:last-child) {
+    margin-right: 8px;
+  }
+}
+
+.subway-status-branch-row__groups {
+  display: inline-block;
+  vertical-align: top;
+
+  margin-top: 22px;
+  margin-bottom: 22px;
+}
+
+.subway-status-branch-row__group {
+  display: inline-block;
+  margin-left: 24px;
+}
+
+.subway-status-branch-row__group-routes {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 16px;
+}
+
+.subway-status-branch-row__group-status {
+  display: inline-block;
+  vertical-align: top;
+
+  color: #171f26;
+  font-family: Inter;
+  font-weight: 600;
+  line-height: 74px;
+
+  &--small {
+    font-size: 40px;
+  }
+
+  &--normal {
+    font-size: 48px;
+  }
+}
+
+.subway-status-footer {
+  position: relative;
+  background-color: #737373;
+  width: 1024px;
+  height: 80px;
+
+  border-radius: 0 0 16px 16px;
+}
+
+.subway-status-footer__link {
+  position: absolute;
+  right: 24px;
+  top: 18px;
+
+  font-family: Inter;
+  font-weight: 800;
+  font-size: 40px;
+  line-height: 40px;
+  color: white;
+}

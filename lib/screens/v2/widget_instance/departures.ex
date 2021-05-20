@@ -1,6 +1,7 @@
 defmodule Screens.V2.WidgetInstance.Departures do
   @moduledoc false
 
+  alias Screens.Alerts.Alert
   alias Screens.Config.Dup.Override.FreeText
   alias Screens.Config.Screen
   alias Screens.V2.Departure
@@ -218,15 +219,15 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defp alert_is_inline?(_), do: false
 
   defp serialize_inline_alert(%{id: id, effect: :delay, severity: severity}) do
-    {delay_description, delay_minutes} =
-      cond do
-        severity < 3 -> {"up to", 10}
-        severity > 9 -> {"more than", 60}
-        severity >= 8 -> {"more than", 30 * (severity - 7)}
-        true -> {"up to", 5 * (severity - 1)}
+    {delay_description, delay_minutes} = Alert.interpret_severity(severity)
+
+    delay_description_text =
+      case delay_description do
+        :up_to -> "Delays up to"
+        :more_than -> "Delays more than"
       end
 
-    delay_text = ["Delays #{delay_description}", %{format: :bold, text: "#{delay_minutes}m"}]
+    delay_text = [delay_description_text, %{format: :bold, text: "#{delay_minutes}m"}]
     %{id: id, icon: :clock, text: delay_text, color: :black}
   end
 end
