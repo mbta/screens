@@ -22,9 +22,11 @@ const DepartureRow = ({
       <div className="departure-row__time">
         <DepartureTimes timesWithCrowding={timesWithCrowding} />
       </div>
-      <div className="departure-row__alerts">
-        <DepartureAlerts data={inlineAlerts} />
-      </div>
+      {inlineAlerts.length > 0 && (
+        <div className="departure-row__alerts">
+          <DepartureAlerts alerts={inlineAlerts} />
+        </div>
+      )}
     </div>
   );
 };

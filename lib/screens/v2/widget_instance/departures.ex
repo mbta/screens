@@ -168,7 +168,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     departure_time = Departure.time(departure)
 
     second_diff = DateTime.diff(departure_time, now)
-    minute_diff = div(second_diff, 60)
+    minute_diff = 1 + div(second_diff - 1, 60)
 
     time =
       cond do
@@ -260,7 +260,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defp alert_is_inline?(%{effect: :delay}), do: true
   defp alert_is_inline?(_), do: false
 
-  defp serialize_inline_alert(%{effect: :delay, severity: severity}) do
+  defp serialize_inline_alert(%{id: id, effect: :delay, severity: severity}) do
     {delay_description, delay_minutes} =
       cond do
         severity < 3 -> {"up to", 10}
@@ -270,6 +270,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
       end
 
     delay_text = ["Delays #{delay_description}", %{format: :bold, text: "#{delay_minutes}m"}]
-    %{icon: :clock, text: delay_text, color: :black}
+    %{id: id, icon: :clock, text: delay_text, color: :black}
   end
 end
