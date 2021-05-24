@@ -1,4 +1,4 @@
-defmodule Screens.V2.WidgetInstance.Alert do
+defmodule Screens.V2.WidgetInstance.AlertOld do
   @moduledoc false
 
   alias Screens.Alerts.Alert
