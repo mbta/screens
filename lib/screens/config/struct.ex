@@ -29,7 +29,7 @@ defmodule Screens.Config.Struct do
 
   @type opt ::
           {:with_default, boolean()}
-          | {:children, keyword(module() | {:list, module()})}
+          | {:children, keyword(module() | {:list, module()} | {:map, module()})}
 
   @type opts :: list(opt())
 
