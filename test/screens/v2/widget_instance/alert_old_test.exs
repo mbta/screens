@@ -1,4 +1,4 @@
-defmodule Screens.V2.WidgetInstance.AlertTest do
+defmodule Screens.V2.WidgetInstance.AlertOldTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.WidgetInstance.AlertOld, as: AlertWidget
