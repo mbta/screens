@@ -76,14 +76,18 @@ defmodule Screens.V2.WidgetInstance.Alert do
   def upstream_stop_id_set(%__MODULE__{} = t) do
     home_stop_id = home_stop_id(t)
 
-    stop_id_set(t.stop_sequences, &preceding(&1, home_stop_id))
+    t.stop_sequences
+    |> Enum.flat_map(fn stop_sequence -> slice_before(stop_sequence, home_stop_id) end)
+    |> MapSet.new()
   end
 
   @spec downstream_stop_id_set(t()) :: MapSet.t(stop_id())
   def downstream_stop_id_set(%__MODULE__{} = t) do
     home_stop_id = home_stop_id(t)
 
-    stop_id_set(t.stop_sequences, &succeeding(&1, home_stop_id))
+    t.stop_sequences
+    |> Enum.flat_map(fn stop_sequence -> slice_after(stop_sequence, home_stop_id) end)
+    |> MapSet.new()
   end
 
   @spec location(t()) ::
@@ -178,20 +182,14 @@ defmodule Screens.V2.WidgetInstance.Alert do
     end
   end
 
-  defp stop_id_set(stop_sequences, selector_fn) do
-    stop_sequences
-    |> Enum.flat_map(selector_fn)
-    |> MapSet.new()
-  end
-
-  defp preceding(list, target) do
+  defp slice_before(list, target) do
     case Enum.find_index(list, &(&1 == target)) do
       nil -> []
       i -> Enum.take(list, i)
     end
   end
 
-  defp succeeding(list, target) do
+  defp slice_after(list, target) do
     case Enum.find_index(list, &(&1 == target)) do
       nil -> []
       i -> Enum.drop(list, i + 1)
