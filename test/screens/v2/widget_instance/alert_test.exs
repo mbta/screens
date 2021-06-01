@@ -255,6 +255,13 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       assert :elsewhere == AlertWidget.location(widget)
     end
 
+    test "returns :elsewhere if an alert's informed entities only apply to routes not serving this stop",
+         %{widget: widget} do
+      widget = put_informed_entities(widget, [ie(route: "x"), ie(route: "y")])
+
+      assert :elsewhere == AlertWidget.location(widget)
+    end
+
     test "returns :inside if any of an alert's informed entities is %{route_type: <route type of this screen>}",
          %{widget: widget} do
       widget =
@@ -272,13 +279,18 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     test "ignores route type if paired with any other specifier", %{widget: widget} do
       widget =
         put_informed_entities(widget, [
-          ie(stop: "0"),
           ie(stop: "1", route_type: RouteType.to_id(:bus)),
           ie(route: "x", route_type: RouteType.to_id(:bus)),
-          ie(stop: "20", route: "a")
+          ie(stop: "1", route: "x", route_type: RouteType.to_id(:bus))
         ])
 
       assert :upstream == AlertWidget.location(widget)
+    end
+
+    test "ignores route type if it doesn't match this screen's route type", %{widget: widget} do
+      widget = put_informed_entities(widget, [ie(route_type: RouteType.to_id(:light_rail))])
+
+      assert :elsewhere == AlertWidget.location(widget)
     end
 
     test "returns :inside if any of an alert's informed entities is %{route: <route that is actively serving this stop>}",
@@ -287,19 +299,26 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
         put_informed_entities(widget, [
           ie(stop: "0"),
           ie(route: "b"),
-          ie(stop: "20", route: "a"),
-          ie()
+          ie(stop: "20", route: "a")
         ])
 
       assert :inside == AlertWidget.location(widget)
+    end
+
+    test "ignores route if it isn't actively serving this stop", %{widget: widget} do
+      widget =
+        put_informed_entities(widget, [
+          ie(stop: "1"),
+          ie(route: "x")
+        ])
+
+      assert :upstream == AlertWidget.location(widget)
     end
 
     test "returns :upstream for an alert that only affects upstream stops", %{widget: widget} do
       widget =
         put_informed_entities(widget, [
           ie(stop: "0"),
-          ie(route_type: RouteType.to_id(:light_rail)),
-          ie(route: "x"),
           ie(stop: "20", route: "a")
         ])
 
@@ -313,8 +332,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
         put_informed_entities(widget, [
           ie(stop: "0"),
           ie(stop: "5"),
-          ie(route_type: RouteType.to_id(:light_rail)),
-          ie(route: "x"),
           ie(stop: "20", route: "a")
         ])
 
@@ -352,8 +369,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
         put_informed_entities(widget, [
           ie(stop: "6"),
           ie(stop: "5"),
-          ie(route_type: RouteType.to_id(:light_rail)),
-          ie(route: "x"),
           ie(stop: "90", route: "a")
         ])
 
@@ -364,12 +379,21 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       widget =
         put_informed_entities(widget, [
           ie(stop: "6"),
-          ie(route_type: RouteType.to_id(:light_rail)),
-          ie(route: "x"),
           ie(stop: "90", route: "a")
         ])
 
       assert :downstream == AlertWidget.location(widget)
+    end
+
+    test "returns :elsewhere for an alert that affects upstream and downstream stops, but not this stop",
+         %{widget: widget} do
+      widget =
+        put_informed_entities(widget, [
+          ie(stop: "4"),
+          ie(stop: "6")
+        ])
+
+      assert :elsewhere == AlertWidget.location(widget)
     end
   end
 
