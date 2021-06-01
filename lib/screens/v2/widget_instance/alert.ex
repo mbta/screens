@@ -15,7 +15,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @type t :: %__MODULE__{
           screen: Screens.Config.Screen.t(),
-          alert: AlertData.t(),
+          alert: Alert.t(),
           stop_sequences: list(list(stop_id())),
           active_routes_at_stop: list(route_id())
         }
