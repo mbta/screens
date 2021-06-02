@@ -108,12 +108,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
     informed_entities = informed_entities(t)
 
-    # for each informed entity:
-    # map to a list of [:upstream | :home_stop | :downstream]
-    # flat map all mapped informed entities into a single list
-    # drop into a set
-    # inspect set contents to determine atom return value
-
     informed_zones_set =
       informed_entities
       |> Enum.flat_map(&informed_entity_to_zone(&1, location_context))
@@ -132,6 +126,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     end
   end
 
+  @spec effect(t()) :: Alert.effect()
   def effect(%__MODULE__{alert: %Alert{effect: effect}}), do: effect
 
   @spec informed_entity_to_zone(Alert.informed_entity(), map()) ::
