@@ -17,12 +17,7 @@ defmodule Screens.V2.Departure do
             schedule: nil
 
   def fetch(params, opts \\ []) do
-    now =
-      if is_nil(opts[:now]) do
-        DateTime.utc_now()
-      else
-        opts[:now]
-      end
+    now = Keyword.get(opts, :now, DateTime.utc_now())
 
     if opts[:include_schedules] do
       fetch_predictions_and_schedules(params, now)

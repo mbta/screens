@@ -14,21 +14,9 @@ defmodule Screens.Config.V2.LineMap do
             direction_id: nil,
             route_id: nil
 
-  def from_json(%{
-        "stop_id" => stop_id,
-        "station_id" => station_id,
-        "direction_id" => direction_id,
-        "route_id" => route_id
-      }) do
-    %__MODULE__{
-      stop_id: stop_id,
-      station_id: station_id,
-      direction_id: direction_id,
-      route_id: route_id
-    }
-  end
+  use Screens.Config.Struct
 
-  def to_json(t) do
-    Map.from_struct(t)
-  end
+  defp value_from_json(_, value), do: value
+
+  defp value_to_json(_, value), do: value
 end

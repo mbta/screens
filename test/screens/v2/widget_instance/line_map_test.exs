@@ -31,11 +31,6 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
     end
   end
 
-  describe "serialize/1" do
-    test "returns stops, vehicles and scheduled_departure" do
-    end
-  end
-
   describe "serialize_stops/2" do
     test "returns past stops and up two future stops in order", %{stops: stops} do
       assert [
