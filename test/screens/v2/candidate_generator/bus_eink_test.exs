@@ -10,7 +10,8 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
       app_params: %V2.BusEink{
         departures: %V2.Departures{sections: []},
         header: %V2.Header.CurrentStopId{stop_id: "1722"},
-        footer: %V2.Footer{stop_id: "1722"}
+        footer: %V2.Footer{stop_id: "1722"},
+        alerts: %V2.Alerts{stop_id: "1722"}
       },
       vendor: :gds,
       device_id: "TEST",

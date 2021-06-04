@@ -46,6 +46,7 @@ const defaultAppParamsByAppId = {
     departures: {},
     footer: {},
     header: {},
+    alerts: {}
   },
   gl_eink_single: {
     stop_id: "STOP_ID",
@@ -63,6 +64,7 @@ const defaultAppParamsByAppId = {
     departures: {},
     footer: {},
     header: {},
+    alerts: {}
   },
   solari: { station_name: "STATION_NAME" },
   dup: { header: "STATION_NAME" },
@@ -70,6 +72,7 @@ const defaultAppParamsByAppId = {
     departures: {},
     footer: {},
     header: {},
+    alerts: {}
   },
   solari_v2: {
     departures: {},

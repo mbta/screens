@@ -33,7 +33,7 @@ defmodule Screens.Alerts.Parser do
           severity: severity,
           header: header,
           informed_entities: parse_informed_entities(informed_entities),
-          active_period: parse_active_periods(active_period),
+          active_period: parse_and_sort_active_periods(active_period),
           lifecycle: lifecycle,
           timeframe: timeframe,
           created_at: parse_time(created_at),
@@ -57,8 +57,12 @@ defmodule Screens.Alerts.Parser do
     }
   end
 
-  defp parse_active_periods(periods) do
-    Enum.map(periods, &parse_active_period/1)
+  defp parse_and_sort_active_periods(periods) do
+    periods
+    |> Enum.map(&parse_active_period/1)
+    |> Enum.sort_by(fn {start, _} -> start end, fn dt1, dt2 ->
+      DateTime.compare(dt1, dt2) in [:lt, :eq]
+    end)
   end
 
   defp parse_active_period(%{"start" => nil, "end" => end_str}) do

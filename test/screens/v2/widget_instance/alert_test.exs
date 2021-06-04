@@ -23,20 +23,13 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   defp put_home_stop(widget, app_config_module, stop_id) do
-    alias Screens.Config.V2.Departures
-    alias Screens.Config.V2.Departures.Query.Params
-    alias Screens.Config.V2.Departures.{Query, Section}
+    alias Screens.Config.V2.Alerts
 
     %{
       widget
       | screen: %{
           widget.screen
-          | app_params:
-              struct(app_config_module, %{
-                departures: %Departures{
-                  sections: [%Section{query: %Query{params: %Params{stop_ids: [stop_id]}}}]
-                }
-              })
+          | app_params: struct(app_config_module, %{alerts: %Alerts{stop_id: stop_id}})
         }
     }
   end
@@ -49,8 +42,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     %{widget | stop_sequences: sequences}
   end
 
-  defp put_active_routes_at_stop(widget, active_routes) do
-    %{widget | active_routes_at_stop: active_routes}
+  defp put_routes_at_stop(widget, routes) do
+    %{widget | routes_at_stop: routes}
   end
 
   defp put_app_id(widget, app_id) do
@@ -210,10 +203,14 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     %{widget: put_stop_sequences(widget, stop_sequences)}
   end
 
-  defp setup_active_routes(%{widget: widget}) do
-    active_routes = ~w[a b c]
+  defp setup_routes(%{widget: widget}) do
+    routes = [
+      %{route_id: "a", active?: true},
+      %{route_id: "b", active?: false},
+      %{route_id: "c", active?: true}
+    ]
 
-    %{widget: put_active_routes_at_stop(widget, active_routes)}
+    %{widget: put_routes_at_stop(widget, routes)}
   end
 
   defp setup_screen_config(%{widget: widget}) do
@@ -241,7 +238,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   describe "location/1" do
-    setup [:setup_home_stop, :setup_stop_sequences, :setup_active_routes, :setup_screen_config]
+    setup [:setup_home_stop, :setup_stop_sequences, :setup_routes, :setup_screen_config]
 
     test "handles empty informed entities", %{widget: widget} do
       widget = put_informed_entities(widget, [])
@@ -293,7 +290,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       assert :elsewhere == AlertWidget.location(widget)
     end
 
-    test "returns :inside if any of an alert's informed entities is %{route: <route that is actively serving this stop>}",
+    test "returns :inside if any of an alert's informed entities is %{route: <route that serves this stop>}",
          %{widget: widget} do
       widget =
         put_informed_entities(widget, [
@@ -305,7 +302,17 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       assert :inside == AlertWidget.location(widget)
     end
 
-    test "ignores route if it isn't actively serving this stop", %{widget: widget} do
+    test "treats active and inactive (not running on the current day) routes the same", %{
+      widget: widget
+    } do
+      widget = put_informed_entities(widget, [ie(route: "a")])
+      assert :inside == AlertWidget.location(widget)
+
+      widget = put_informed_entities(widget, [ie(route: "b")])
+      assert :inside == AlertWidget.location(widget)
+    end
+
+    test "ignores route if it doesn't serve this stop", %{widget: widget} do
       widget =
         put_informed_entities(widget, [
           ie(stop: "1"),

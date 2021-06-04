@@ -2801,6 +2801,9 @@
         },
         "header": {
           "stop_id": "1722"
+        },
+        "alerts": {
+          "stop_id": "1722"
         }
       },
       "device_id": "TEST",
@@ -2842,6 +2845,9 @@
           "stop_id": "383"
         },
         "header": {
+          "stop_id": "383"
+        },
+        "alerts": {
           "stop_id": "383"
         }
       },
@@ -2962,6 +2968,9 @@
           "stop_id": "1722"
         },
         "header": {
+          "stop_id": "1722"
+        },
+        "alerts": {
           "stop_id": "1722"
         }
       },

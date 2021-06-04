@@ -25,7 +25,8 @@ defmodule Screens.V2.CandidateGenerator.Helpers.DeparturesTest do
             ]
           },
           header: nil,
-          footer: nil
+          footer: nil,
+          alerts: nil
         },
         vendor: nil,
         device_id: nil,
