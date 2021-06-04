@@ -168,7 +168,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     departure_time = Departure.time(departure)
 
     second_diff = DateTime.diff(departure_time, now)
-    minute_diff = 1 + div(second_diff - 1, 60)
+    minute_diff = round(second_diff / 60)
 
     time =
       cond do
@@ -192,7 +192,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     route_type = Departure.route_type(departure)
 
     second_diff = DateTime.diff(departure_time, now)
-    minute_diff = div(second_diff, 60)
+    minute_diff = round(second_diff / 60)
 
     time =
       cond do

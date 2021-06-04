@@ -501,11 +501,25 @@ const BusEinkV2ScreensTable = (): JSX.Element => {
 };
 
 const GLEinkV2ScreensTable = (): JSX.Element => {
+  const lineMapColumn = {
+    Header: "Line Map",
+    accessor: buildAppParamAccessor("line_map"),
+    mutator: buildAppParamMutator("line_map"),
+    Cell: EditableTextarea,
+    disableFilters: true,
+    FormCell: FormTextarea,
+  };
+
   const dataFilter = ({ app_id }) => {
     return app_id === "gl_eink_v2";
   };
 
-  return <AdminTable columns={[...v2Columns, alertsColumn]} dataFilter={dataFilter} />;
+  return (
+    <AdminTable
+      columns={[...v2Columns, alertsColumn, lineMapColumn]}
+      dataFilter={dataFilter}
+    />
+  );
 };
 
 const BusShelterV2ScreensTable = (): JSX.Element => {
