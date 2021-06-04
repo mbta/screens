@@ -497,7 +497,12 @@ const BusEinkV2ScreensTable = (): JSX.Element => {
     return app_id === "bus_eink_v2";
   };
 
-  return <AdminTable columns={[...v2Columns, alertsColumn]} dataFilter={dataFilter} />;
+  return (
+    <AdminTable
+      columns={[...v2Columns, alertsColumn]}
+      dataFilter={dataFilter}
+    />
+  );
 };
 
 const GLEinkV2ScreensTable = (): JSX.Element => {
@@ -527,7 +532,12 @@ const BusShelterV2ScreensTable = (): JSX.Element => {
     return app_id === "bus_shelter_v2";
   };
 
-  return <AdminTable columns={[...v2Columns, alertsColumn]} dataFilter={dataFilter} />;
+  return (
+    <AdminTable
+      columns={[...v2Columns, alertsColumn]}
+      dataFilter={dataFilter}
+    />
+  );
 };
 
 const v2SolariColumns = [

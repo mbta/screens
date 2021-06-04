@@ -22,5 +22,11 @@ defmodule Screens.Config.V2.GlEink do
             line_map: nil
 
   use Screens.Config.Struct,
-    children: [departures: Departures, footer: Footer, header: Destination, alerts: Alerts, line_map: LineMap]
+    children: [
+      departures: Departures,
+      footer: Footer,
+      header: Destination,
+      alerts: Alerts,
+      line_map: LineMap
+    ]
 end
