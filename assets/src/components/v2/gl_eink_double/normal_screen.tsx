@@ -4,6 +4,7 @@ import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
   header: WidgetData;
+  left_sidebar: WidgetData;
   main_content: WidgetData;
   medium_flex: WidgetData;
   footer: WidgetData;
@@ -12,6 +13,7 @@ interface Props {
 const NormalScreen: React.ComponentType<Props> = ({
   header,
   footer,
+  left_sidebar: leftSidebar,
   main_content: mainContent,
   medium_flex: mediumFlex,
 }) => {
@@ -19,6 +21,9 @@ const NormalScreen: React.ComponentType<Props> = ({
     <div className="screen-normal">
       <div className="screen-normal__header">
         <Widget data={header} />
+      </div>
+      <div className="screen-normal__left-sidebar">
+        <Widget data={leftSidebar} />
       </div>
       <div className="screen-normal__main-content">
         <Widget data={mainContent} />

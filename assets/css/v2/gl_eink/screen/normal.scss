@@ -13,11 +13,19 @@
   height: 288px;
 }
 
-.screen-normal__main-content {
+.screen-normal__left-sidebar {
   position: absolute;
   top: 288px;
   left: 0px;
-  width: 1200px;
+  width: 376px;
+  height: 1312px;
+}
+
+.screen-normal__main-content {
+  position: absolute;
+  top: 288px;
+  left: 376px;
+  width: 824px;
   height: 1312px;
 }
 

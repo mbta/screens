@@ -1,0 +1,64 @@
+.line-map--future {
+  fill: #000000;
+}
+
+.line-map--past {
+  fill: #cccccc;
+}
+
+.line-map__stop {
+  fill: #ffffff;
+}
+
+.line-map__stop-label {
+  font-family: "neue-haas-grotesk-text";
+  font-size: 24px;
+  line-height: 32px;
+
+  &--current {
+    font-weight: 600;
+  }
+
+  &--past {
+    fill: #999999;
+  }
+}
+
+.line-map__vehicle-droplet {
+  stroke: white;
+  stroke-width: 8;
+  stroke-linejoin: round;
+}
+
+.line-map__vehicle-label {
+  font-family: "neue-haas-grotesk-text";
+}
+
+.line-map__vehicle-label--text {
+  font-size: 40px;
+  font-weight: 700;
+}
+
+.line-map__vehicle-label--minutes {
+  font-size: 40px;
+  font-weight: 700;
+}
+
+.line-map__vehicle-label--minutes-label {
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.line-map__scheduled-departure {
+  font-family: "neue-haas-grotesk-text";
+  fill: #999999;
+
+  &--time {
+    font-size: 40px;
+    font-weight: 700;
+  }
+
+  &--message {
+    font-size: 24px;
+  }
+}
