@@ -483,12 +483,26 @@ const v2Columns = [
   },
 ];
 
+const alertsColumn = {
+  Header: "Alerts",
+  accessor: buildAppParamAccessor("alerts"),
+  mutator: buildAppParamMutator("alerts"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
 const BusEinkV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "bus_eink_v2";
   };
 
-  return <AdminTable columns={v2Columns} dataFilter={dataFilter} />;
+  return (
+    <AdminTable
+      columns={[...v2Columns, alertsColumn]}
+      dataFilter={dataFilter}
+    />
+  );
 };
 
 const GLEinkV2ScreensTable = (): JSX.Element => {
@@ -507,7 +521,7 @@ const GLEinkV2ScreensTable = (): JSX.Element => {
 
   return (
     <AdminTable
-      columns={[...v2Columns, lineMapColumn]}
+      columns={[...v2Columns, alertsColumn, lineMapColumn]}
       dataFilter={dataFilter}
     />
   );
@@ -518,7 +532,12 @@ const BusShelterV2ScreensTable = (): JSX.Element => {
     return app_id === "bus_shelter_v2";
   };
 
-  return <AdminTable columns={v2Columns} dataFilter={dataFilter} />;
+  return (
+    <AdminTable
+      columns={[...v2Columns, alertsColumn]}
+      dataFilter={dataFilter}
+    />
+  );
 };
 
 const v2SolariColumns = [

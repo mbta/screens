@@ -1,5 +1,5 @@
 defprotocol Screens.V2.WidgetInstance do
-  @type priority :: list(integer)
+  @type priority :: nonempty_list(integer)
   @type slot_id :: atom()
   @type widget_type :: atom()
 
