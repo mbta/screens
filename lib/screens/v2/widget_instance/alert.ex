@@ -124,11 +124,11 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @spec effect(t()) :: Alert.effect()
   def effect(%__MODULE__{alert: %Alert{effect: effect}}), do: effect
 
-  defp all_routes_at_stop(%__MODULE__{routes_at_stop: routes}) do
+  def all_routes_at_stop(%__MODULE__{routes_at_stop: routes}) do
     MapSet.new(routes, & &1.route_id)
   end
 
-  defp active_routes_at_stop(%__MODULE__{routes_at_stop: routes}) do
+  def active_routes_at_stop(%__MODULE__{routes_at_stop: routes}) do
     routes
     |> Enum.filter(& &1.active?)
     |> MapSet.new(& &1.route_id)
