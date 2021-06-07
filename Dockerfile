@@ -1,5 +1,6 @@
 # first, get the elixir dependencies within an elixir container
-FROM elixir:1.9.4 as elixir-builder
+# we use a container from the Hex team in order to pin the Erlang and OS versions as well
+FROM hexpm/elixir:1.12.1-erlang-24.0.1-debian-buster-20210326 as elixir-builder
 
 ENV LANG="C.UTF-8" MIX_ENV="prod"
 
@@ -10,7 +11,7 @@ RUN mix do local.hex --force, local.rebar --force
 RUN mix do deps.get --only prod
 
 # next, build the frontend assets within a node.js container
-FROM node:14 as assets-builder
+FROM node:14-buster as assets-builder
 
 WORKDIR /root
 ADD . .
