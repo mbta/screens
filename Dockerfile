@@ -7,6 +7,9 @@ ENV LANG="C.UTF-8" MIX_ENV="prod"
 WORKDIR /root
 ADD . .
 
+# install git so that mix can fetch git-repo-based deps
+RUN apt-get update && apt-get install -y git
+
 RUN mix do local.hex --force, local.rebar --force
 RUN mix do deps.get --only prod
 
