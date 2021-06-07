@@ -47,7 +47,7 @@ const FullScreenImageLayout = ({ srcPath }): JSX.Element => {
 };
 
 const NoConnectionScreenLayout = (): JSX.Element => {
-  const srcPath = imagePath("solari-no-connection.png");
+  const srcPath = imagePath("solari-no-data.png");
   return <FullScreenImageLayout srcPath={srcPath} />;
 };
 
