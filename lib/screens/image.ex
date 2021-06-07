@@ -5,7 +5,8 @@ defmodule Screens.Image do
 
   @bucket "mbta-screens"
   @s3_base_url "https://#{@bucket}.s3.amazonaws.com/"
-  @psa_images_prefix Application.compile_env(:screens, :environment_name, "dev") <> "/images/psa/"
+  @psa_images_prefix Application.compile_env(:screens, :environment_name, "screens-dev") <>
+                       "/images/psa/"
 
   # Matches all non-delimiter characters located after the last delimiter.
   # screens/images/psa/some-image_file-3.png
@@ -35,6 +36,8 @@ defmodule Screens.Image do
   @spec get_s3_url(String.t()) :: String.t()
   def get_s3_url(filename), do: @s3_base_url <> get_s3_path(filename)
 
+  # S3.upload/4's keyword arguments are incorrectly typed, causing dialyzer to report no local return if any are passed
+  @dialyzer {:nowarn_function, upload_image: 1}
   @spec upload_image(Plug.Upload.t()) :: {:ok, String.t()} | :error
   def upload_image(%Plug.Upload{filename: filename, path: local_path, content_type: content_type}) do
     filename = String.downcase(filename)

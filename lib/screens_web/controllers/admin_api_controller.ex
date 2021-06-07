@@ -66,6 +66,8 @@ defmodule ScreensWeb.AdminApiController do
     json(conn, %{image_filenames: image_filenames})
   end
 
+  # S3.upload/4's keyword arguments are incorrectly typed, causing dialyzer to report no local return if any are passed
+  @dialyzer {:nowarn_function, upload_image: 2}
   def upload_image(conn, %{"image" => %Plug.Upload{} = upload_struct}) do
     response =
       case Image.upload_image(upload_struct) do
