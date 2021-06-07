@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/#{@app_id}.css") %>"/>
   </head>
   <body>
-    <%= render @view_module, @view_template, assigns %>
+    <%= @inner_content %>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/polyfills.js") %>"></script>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/#{@app_id}.js") %>"></script>
   </body>
