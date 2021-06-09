@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",
-    "@babel/plugin-proposal-do-expressions": "^7.12.13",
+    "@babel/plugin-proposal-do-expressions": "^7.14.0",
     "@babel/plugin-proposal-export-default-from": "^7.12.13",
     "@babel/plugin-proposal-logical-assignment-operators": "^7.13.8",
     "@babel/plugin-proposal-pipeline-operator": "^7.12.13",
