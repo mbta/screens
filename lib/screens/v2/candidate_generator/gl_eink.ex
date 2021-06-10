@@ -37,11 +37,14 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
-        fetch_destination_fn \\ &fetch_destination/2
+        fetch_destination_fn \\ &fetch_destination/2,
+        departures_instances_fn \\ &Helpers.Departures.departures_instances/1,
+        alert_instances_fn \\ &Helpers.Alerts.alert_instances/1
       ) do
     [
       header_instances(config, now, fetch_destination_fn),
-      Helpers.Departures.departures_instances(config),
+      departures_instances_fn.(config),
+      alert_instances_fn.(config),
       footer_instances(config),
       placeholder_instances(),
       line_map_instances(config)

@@ -36,11 +36,13 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
         config,
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &fetch_stop_name/1,
-        departures_instances_fn \\ &Helpers.Departures.departures_instances/1
+        departures_instances_fn \\ &Helpers.Departures.departures_instances/1,
+        alert_instances_fn \\ &Helpers.Alerts.alert_instances/1
       ) do
     [
       header_instances(config, now, fetch_stop_name_fn),
       departures_instances_fn.(config),
+      alert_instances_fn.(config),
       footer_instances(config),
       placeholder_instances()
     ]
