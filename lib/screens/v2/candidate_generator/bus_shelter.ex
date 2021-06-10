@@ -35,6 +35,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   end
 
   @impl CandidateGenerator
+  # credo:disable-for-next-line Credo.Check.Design.DuplicatedCode
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
