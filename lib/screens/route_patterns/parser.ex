@@ -6,6 +6,11 @@ defmodule Screens.RoutePatterns.Parser do
     parse_data(data, included_data, route_id)
   end
 
+  def parse_result(%{"data" => data, "included" => included}) do
+    included_data = parse_included_data(included)
+    parse_data(data, included_data)
+  end
+
   defp parse_included_data(data) do
     data
     |> Enum.map(fn item ->
@@ -33,6 +38,10 @@ defmodule Screens.RoutePatterns.Parser do
     filtered_data = filter_by_route(data, route_id)
     [typical_data | _] = filtered_data
     parse_route_pattern(typical_data, included_data)
+  end
+
+  defp parse_data(data, included_data) do
+    Enum.map(data, &parse_route_pattern(&1, included_data))
   end
 
   defp filter_by_route(data, route_id) do
