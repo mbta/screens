@@ -13,7 +13,7 @@ defmodule Screens.V2.WidgetInstance.Placeholder do
         }
 
   defimpl Screens.V2.WidgetInstance do
-    def priority(_), do: [2]
+    def priority(_), do: [100]
     def serialize(%Placeholder{color: color}), do: %{color: color}
     def slot_names(%Placeholder{slot_names: slot_names}), do: slot_names
     def widget_type(_), do: :placeholder
