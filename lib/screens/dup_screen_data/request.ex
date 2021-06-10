@@ -48,6 +48,10 @@ defmodule Screens.DupScreenData.Request do
 
     opts
     |> Alert.fetch()
+    |> case do
+      {:ok, alerts} -> alerts
+      :error -> []
+    end
     |> Enum.filter(&relevant?/1)
   end
 

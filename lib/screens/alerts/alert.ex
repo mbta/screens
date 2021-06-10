@@ -177,9 +177,13 @@ defmodule Screens.Alerts.Alert do
       |> Enum.flat_map(&format_query_param/1)
       |> Enum.into(%{})
 
-    "alerts"
-    |> Screens.V3Api.get_json(params)
-    |> Screens.Alerts.Parser.parse_result()
+    case Screens.V3Api.get_json("alerts", params) do
+      {:ok, result} ->
+        {:ok, Screens.Alerts.Parser.parse_result(result)}
+
+      _ ->
+        :error
+    end
   end
 
   defp format_query_param({:stop_ids, stop_ids}) do

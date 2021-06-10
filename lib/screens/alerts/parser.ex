@@ -1,15 +1,11 @@
 defmodule Screens.Alerts.Parser do
   @moduledoc false
 
-  def parse_result({:ok, result}) do
+  def parse_result(result) do
     result
     |> Map.get("data")
     |> Enum.map(&parse_alert/1)
     |> Enum.reject(&is_nil/1)
-  end
-
-  def parse_result(_) do
-    []
   end
 
   def parse_alert(%{"id" => id, "attributes" => attributes}) do

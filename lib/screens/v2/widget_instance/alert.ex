@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.Config.Screen
   alias Screens.Config.V2.{Alerts, BusEink, BusShelter, GlEink}
   alias Screens.RouteType
+  alias Screens.Util
 
   defstruct ~w[screen alert stop_sequences routes_at_stop]a
 
@@ -72,7 +73,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     home_stop_id = home_stop_id(t)
 
     t.stop_sequences
-    |> Enum.flat_map(fn stop_sequence -> slice_before(stop_sequence, home_stop_id) end)
+    |> Enum.flat_map(fn stop_sequence -> Util.slice_before(stop_sequence, home_stop_id) end)
     |> MapSet.new()
   end
 
@@ -81,7 +82,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     home_stop_id = home_stop_id(t)
 
     t.stop_sequences
-    |> Enum.flat_map(fn stop_sequence -> slice_after(stop_sequence, home_stop_id) end)
+    |> Enum.flat_map(fn stop_sequence -> Util.slice_after(stop_sequence, home_stop_id) end)
     |> MapSet.new()
   end
 
@@ -177,20 +178,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
       informed_entity_to_zone(%{informed_entity | route: nil}, context)
     else
       []
-    end
-  end
-
-  defp slice_before(list, target) do
-    case Enum.find_index(list, &(&1 == target)) do
-      nil -> []
-      i -> Enum.take(list, i)
-    end
-  end
-
-  defp slice_after(list, target) do
-    case Enum.find_index(list, &(&1 == target)) do
-      nil -> []
-      i -> Enum.drop(list, i + 1)
     end
   end
 

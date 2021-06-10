@@ -21,4 +21,34 @@ defmodule Screens.Routes.Route do
       _ -> :error
     end
   end
+
+  def fetch(opts \\ []) do
+    params =
+      opts
+      |> Enum.flat_map(&format_query_param/1)
+      |> Enum.into(%{})
+
+    case Screens.V3Api.get_json("routes/", params) do
+      {:ok, %{"data" => data}} -> {:ok, Enum.map(data, &Screens.Routes.Parser.parse_route/1)}
+      _ -> :error
+    end
+  end
+
+  defp format_query_param({:stop_ids, stop_ids}) when is_list(stop_ids) do
+    [{"filter[stop]", Enum.join(stop_ids, ",")}]
+  end
+
+  defp format_query_param({:stop_id, stop_id}) when is_binary(stop_id) do
+    format_query_param({:stop_ids, [stop_id]})
+  end
+
+  defp format_query_param({:date, %Date{} = d}) do
+    [{"filter[date]", Date.to_iso8601(d)}]
+  end
+
+  defp format_query_param({:date, %DateTime{} = dt}) do
+    format_query_param({:date, DateTime.to_date(dt)})
+  end
+
+  defp format_query_param(_), do: []
 end
