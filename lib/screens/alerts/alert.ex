@@ -221,11 +221,18 @@ defmodule Screens.Alerts.Alert do
   def priority_by_stop_id(stop_id) do
     stop_id
     |> fetch_alerts_for_stop_id()
-    |> Screens.Alerts.Parser.parse_result()
-    |> sort(stop_id)
-    |> Enum.map(fn alert ->
-      %{alert: to_full_map(alert), priority: to_priority_map(alert, stop_id)}
-    end)
+    |> case do
+      {:ok, result} ->
+        result
+        |> Screens.Alerts.Parser.parse_result()
+        |> sort(stop_id)
+        |> Enum.map(fn alert ->
+          %{alert: to_full_map(alert), priority: to_priority_map(alert, stop_id)}
+        end)
+
+      :error ->
+        []
+    end
   end
 
   def sort(alerts, stop_id) do
@@ -400,8 +407,15 @@ defmodule Screens.Alerts.Alert do
     {inline_alerts, global_alerts} =
       stop_id
       |> fetch_alerts_for_stop_id()
-      |> Screens.Alerts.Parser.parse_result()
-      |> Enum.split_with(&is_inline?/1)
+      |> case do
+        {:ok, result} ->
+          result
+          |> Screens.Alerts.Parser.parse_result()
+          |> Enum.split_with(&is_inline?/1)
+
+        :error ->
+          {[], []}
+      end
 
     global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
 
@@ -459,8 +473,15 @@ defmodule Screens.Alerts.Alert do
     {inline_alerts, global_alerts} =
       route_id
       |> fetch_alerts_for_route_id()
-      |> Screens.Alerts.Parser.parse_result()
-      |> Enum.split_with(&is_inline?/1)
+      |> case do
+        {:ok, result} ->
+          result
+          |> Screens.Alerts.Parser.parse_result()
+          |> Enum.split_with(&is_inline?/1)
+
+        :error ->
+          {[], []}
+      end
 
     global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
 
@@ -470,10 +491,17 @@ defmodule Screens.Alerts.Alert do
   def priority_by_route_id(route_id, stop_id) do
     route_id
     |> fetch_alerts_for_route_id()
-    |> Screens.Alerts.Parser.parse_result()
-    |> sort(stop_id)
-    |> Enum.map(fn alert ->
-      %{alert: to_full_map(alert), priority: to_priority_map(alert, stop_id)}
-    end)
+    |> case do
+      {:ok, result} ->
+        result
+        |> Screens.Alerts.Parser.parse_result()
+        |> sort(stop_id)
+        |> Enum.map(fn alert ->
+          %{alert: to_full_map(alert), priority: to_priority_map(alert, stop_id)}
+        end)
+
+      :error ->
+        []
+    end
   end
 end
