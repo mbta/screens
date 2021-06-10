@@ -28,11 +28,12 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
         departures_instances_fn \\ &Helpers.Departures.departures_instances/1
       ) do
     [
-      header_instances(config, now),
-      departures_instances_fn.(config),
-      placeholder_instances()
+      fn -> header_instances(config, now) end,
+      fn -> departures_instances_fn.(config) end,
+      fn -> placeholder_instances() end
     ]
-    |> List.flatten()
+    |> Task.async_stream(& &1.(), ordered: false)
+    |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
   defp header_instances(config, now) do

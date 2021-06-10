@@ -41,13 +41,14 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
         alert_instances_fn \\ &Helpers.Alerts.alert_instances/1
       ) do
     [
-      header_instances(config, now, fetch_stop_name_fn),
-      departures_instances_fn.(config),
-      alert_instances_fn.(config),
-      footer_instances(config),
-      placeholder_instances()
+      fn -> header_instances(config, now, fetch_stop_name_fn) end,
+      fn -> departures_instances_fn.(config) end,
+      fn -> alert_instances_fn.(config) end,
+      fn -> footer_instances(config) end,
+      fn -> placeholder_instances() end
     ]
-    |> List.flatten()
+    |> Task.async_stream(& &1.(), ordered: false)
+    |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
   defp header_instances(config, now, fetch_stop_name_fn) do
