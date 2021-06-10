@@ -236,16 +236,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   def get_relevant_alerts_by_route(alerts) do
     alerts
-    |> Enum.filter(&alert_is_relevant?/1)
+    |> Enum.filter(&Alert.happening_now?/1)
+    |> Enum.filter(&relevant_effect?/1)
     |> Enum.flat_map(fn alert -> Enum.map(alert_routes(alert), fn route -> {alert, route} end) end)
     |> Enum.group_by(fn {_alert, route} -> route end, fn {alert, _route} -> alert end)
   end
 
-  defp alert_is_relevant?(%Alert{effect: :suspension}), do: true
-  defp alert_is_relevant?(%Alert{effect: :shuttle}), do: true
-  defp alert_is_relevant?(%Alert{effect: :delay}), do: true
-  defp alert_is_relevant?(%Alert{effect: :station_closure}), do: true
-  defp alert_is_relevant?(_), do: false
+  defp relevant_effect?(%Alert{effect: :suspension}), do: true
+  defp relevant_effect?(%Alert{effect: :shuttle}), do: true
+  defp relevant_effect?(%Alert{effect: :delay}), do: true
+  defp relevant_effect?(%Alert{effect: :station_closure}), do: true
+  defp relevant_effect?(_), do: false
 
   defp alert_routes(%Alert{informed_entities: entities}) do
     entities
