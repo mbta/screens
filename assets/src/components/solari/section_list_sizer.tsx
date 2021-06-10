@@ -185,12 +185,8 @@ class SectionListSizer extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      sections,
-      sectionHeaders,
-      currentTimeString,
-      overhead,
-    } = this.props;
+    const { sections, sectionHeaders, currentTimeString, overhead } =
+      this.props;
 
     return (
       <SectionList
