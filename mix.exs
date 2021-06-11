@@ -17,11 +17,7 @@ defmodule Screens.MixProject do
           :unmatched_returns
         ]
       ],
-      test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
-        coveralls: :test,
-        "coveralls.json": :test
-      ]
+      test_coverage: [tool: LcovEx]
     ]
   end
 
@@ -64,7 +60,6 @@ defmodule Screens.MixProject do
       {:tzdata, "~> 1.1.0"},
       {:credo, "~> 1.5.0", only: [:dev, :test]},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.14.0", only: :test},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.1"},
       {:ex_aws_secretsmanager, "~> 2.0", only: :prod},
@@ -76,7 +71,8 @@ defmodule Screens.MixProject do
       {:guardian, "~> 2.0"},
       {:ueberauth, "~> 0.6"},
       {:ueberauth_cognito, "~> 0.2"},
-      {:corsica, "~> 1.0"}
+      {:corsica, "~> 1.0"},
+      {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false}
     ]
   end
 end
