@@ -93,9 +93,16 @@ defmodule Screens.V2.CandidateGenerator.Helpers.Alerts do
   end
 
   @spec fetch_alerts(list(String.t()), list(String.t())) :: {:ok, list(Alert.t())} | :error
-  def fetch_alerts(stop_ids, route_ids, fetch_fn \\ &Alert.fetch/1) do
-    with {:ok, stop_based_alerts} <- fetch_fn.(stop_ids: stop_ids),
+  def fetch_alerts(
+        stop_ids,
+        route_ids,
+        fetch_fn \\ &Alert.fetch/1,
+        client_filter_fn \\ &alert_stop_and_route_filter_workaround/3
+      ) do
+    with {:ok, stop_based_alerts} <- fetch_fn.(stop_ids: stop_ids, route_ids: route_ids),
          {:ok, route_based_alerts} <- fetch_fn.(route_ids: route_ids) do
+      stop_based_alerts = client_filter_fn.(stop_based_alerts, stop_ids, route_ids)
+
       merged_alerts =
         [stop_based_alerts, route_based_alerts]
         |> Enum.concat()
@@ -105,6 +112,33 @@ defmodule Screens.V2.CandidateGenerator.Helpers.Alerts do
     else
       :error -> :error
     end
+  end
+
+  # Internally, the API expands stop filters on /alerts to also look for alerts with route-only informed entities
+  # on routes that serve the given stops.
+  #
+  # E.g. filter[stop]=1265 -> API looks for alerts with any of the following IE's: {route: "22"}, {route: "29"}, {route: "44"}.
+  #
+  # This hidden filter makes user-supplied route filters more or less ineffective, because they can't be ANDed with the
+  # stop filters. We can't say "give me alerts on stops 1, 2, and 3; but only those affecting routes x and y."
+  # So we need to do the filtering here, clientside.
+  def alert_stop_and_route_filter_workaround(alerts, stop_ids, route_ids) do
+    stop_id_set = MapSet.new(stop_ids)
+    route_id_set = MapSet.new(route_ids)
+
+    # At least one of stop or route will be non-nil in the informed entities we're working with here
+    relevant_ie? = fn
+      %{stop: stop, route: route} when not is_nil(stop) and not is_nil(route) ->
+        stop in stop_id_set and route in route_id_set
+
+      %{stop: stop, route: nil} ->
+        stop in stop_id_set
+
+      %{stop: nil, route: route} ->
+        route in route_id_set
+    end
+
+    Enum.filter(alerts, fn alert -> Enum.any?(alert.informed_entities, relevant_ie?) end)
   end
 
   defp fetch_all_route_ids(stop_id) do
