@@ -249,17 +249,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         stop_ids: ~w[1265 1266 10413 11413 17411],
         route_ids: ~w[22 29 44],
         fetch_fn: fn
-          [stop_ids: _] -> {:ok, stop_based_alerts}
+          [stop_ids: _, route_ids: _] -> {:ok, stop_based_alerts}
           [route_ids: _] -> {:ok, route_based_alerts}
         end,
         x_fetch_fn1: fn
-          [stop_ids: _] -> :error
+          [stop_ids: _, route_ids: _] -> :error
           [route_ids: _] -> {:ok, route_based_alerts}
         end,
         x_fetch_fn2: fn
-          [stop_ids: _] -> {:ok, stop_based_alerts}
+          [stop_ids: _, route_ids: _] -> {:ok, stop_based_alerts}
           [route_ids: _] -> :error
-        end
+        end,
+        client_filter_fn: fn alerts, _, _ -> alerts end
       }
     end
 
@@ -267,12 +268,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       %{
         stop_ids: stop_ids,
         route_ids: route_ids,
-        fetch_fn: fetch_fn
+        fetch_fn: fetch_fn,
+        client_filter_fn: client_filter_fn
       } = context
 
       expected_alerts = Enum.map(~w[1 2 3 4 5], &%Alert{id: &1})
 
-      assert {:ok, expected_alerts} == fetch_alerts(stop_ids, route_ids, fetch_fn)
+      assert {:ok, expected_alerts} ==
+               fetch_alerts(stop_ids, route_ids, fetch_fn, client_filter_fn)
     end
 
     test "returns :error if fetch function returns :error", context do
@@ -280,11 +283,53 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         stop_ids: stop_ids,
         route_ids: route_ids,
         x_fetch_fn1: x_fetch_fn1,
-        x_fetch_fn2: x_fetch_fn2
+        x_fetch_fn2: x_fetch_fn2,
+        client_filter_fn: client_filter_fn
       } = context
 
-      assert :error == fetch_alerts(stop_ids, route_ids, x_fetch_fn1)
-      assert :error == fetch_alerts(stop_ids, route_ids, x_fetch_fn2)
+      assert :error == fetch_alerts(stop_ids, route_ids, x_fetch_fn1, client_filter_fn)
+      assert :error == fetch_alerts(stop_ids, route_ids, x_fetch_fn2, client_filter_fn)
+    end
+  end
+
+  describe "alert_stop_and_route_filter_workaround/3" do
+    setup do
+      %{
+        stop_ids: ~w[1 2 3],
+        route_ids: ~w[11 22 33]
+      }
+    end
+
+    test "filters out alerts that inform routes that do not serve the home stop", %{
+      stop_ids: stop_ids,
+      route_ids: route_ids
+    } do
+      alerts = [
+        %Alert{id: "1", informed_entities: [%{stop: "1", route: nil}]},
+        %Alert{id: "2", informed_entities: [%{stop: nil, route: "11"}]},
+        %Alert{id: "3", informed_entities: [%{stop: "1", route: "11"}]},
+        %Alert{id: "4", informed_entities: [%{stop: nil, route: "88"}]},
+        %Alert{id: "5", informed_entities: [%{stop: "1", route: "99"}]}
+      ]
+
+      assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
+               alert_stop_and_route_filter_workaround(alerts, stop_ids, route_ids)
+    end
+
+    test "filters out alerts that inform stops that are not downstream of the home stop", %{
+      stop_ids: stop_ids,
+      route_ids: route_ids
+    } do
+      alerts = [
+        %Alert{id: "1", informed_entities: [%{stop: "1", route: nil}]},
+        %Alert{id: "2", informed_entities: [%{stop: nil, route: "11"}]},
+        %Alert{id: "3", informed_entities: [%{stop: "1", route: "22"}]},
+        %Alert{id: "4", informed_entities: [%{stop: "8", route: nil}]},
+        %Alert{id: "5", informed_entities: [%{stop: "9", route: "33"}]}
+      ]
+
+      assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
+               alert_stop_and_route_filter_workaround(alerts, stop_ids, route_ids)
     end
   end
 end
