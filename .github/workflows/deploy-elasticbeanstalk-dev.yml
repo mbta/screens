@@ -1,4 +1,4 @@
-name: Deploy to Elastic Beanstalk
+name: Deploy to dev
 
 on:
   workflow_dispatch:
