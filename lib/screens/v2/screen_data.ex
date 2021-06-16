@@ -38,10 +38,13 @@ defmodule Screens.V2.ScreenData do
     solari_large_v2: 15
   }
 
-  def bad_func, do: Enum.map(nil, fn _ -> nil end)
+  @spec bad_func(:foo) :: list()
+  def bad_func(:foo), do: Enum.map(nil, fn _ -> nil end)
 
   @spec by_screen_id(screen_id()) :: serializable_map()
   def by_screen_id(screen_id) do
+    _ = bad_func(:bar)
+
     config = get_config(screen_id)
     candidate_generator = get_candidate_generator(config)
     refresh_rate = get_refresh_rate(config)
