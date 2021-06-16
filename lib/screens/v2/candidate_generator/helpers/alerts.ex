@@ -32,15 +32,16 @@ defmodule Screens.V2.CandidateGenerator.Helpers.Alerts do
          reachable_stop_ids = [stop_id | unique_downstream_stop_ids(stop_sequences, stop_id)],
          route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
          {:ok, alerts} <- fetch_alerts_fn.(reachable_stop_ids, route_ids_at_stop) do
-      Enum.map(
-        alerts,
-        &%AlertWidget{
+      new_widget = fn alert ->
+        %AlertWidget{
+          alert: alert,
           screen: config,
-          alert: &1,
           routes_at_stop: routes_at_stop,
           stop_sequences: stop_sequences
         }
-      )
+      end
+
+      Enum.map(alerts, new_widget)
     else
       :error -> []
     end
@@ -97,16 +98,15 @@ defmodule Screens.V2.CandidateGenerator.Helpers.Alerts do
         stop_ids,
         route_ids,
         fetch_fn \\ &Alert.fetch/1,
-        client_filter_fn \\ &alert_stop_and_route_filter_workaround/3
+        filter_fn \\ &filter_alerts/3
       ) do
     with {:ok, stop_based_alerts} <- fetch_fn.(stop_ids: stop_ids, route_ids: route_ids),
          {:ok, route_based_alerts} <- fetch_fn.(route_ids: route_ids) do
-      stop_based_alerts = client_filter_fn.(stop_based_alerts, stop_ids, route_ids)
-
       merged_alerts =
         [stop_based_alerts, route_based_alerts]
         |> Enum.concat()
         |> Enum.uniq_by(& &1.id)
+        |> filter_fn.(stop_ids, route_ids)
 
       {:ok, merged_alerts}
     else
@@ -114,20 +114,23 @@ defmodule Screens.V2.CandidateGenerator.Helpers.Alerts do
     end
   end
 
-  # Internally, the API expands stop filters on /alerts to also look for alerts with route-only informed entities
-  # on routes that serve the given stops.
-  #
-  # E.g. filter[stop]=1265 -> API looks for alerts with any of the following IE's: {route: "22"}, {route: "29"}, {route: "44"}.
-  #
-  # This hidden filter makes user-supplied route filters more or less ineffective, because they can't be ANDed with the
-  # stop filters. We can't say "give me alerts on stops 1, 2, and 3; but only those affecting routes x and y."
-  # So we need to do the filtering here, clientside.
-  def alert_stop_and_route_filter_workaround(alerts, stop_ids, route_ids) do
+  @doc """
+  Filters out alerts whose effects we are not interested in, as well as those that do not inform at least one of:
+  - an entire route type, e.g. bus or light rail
+  - a route that serves the home stop, scoped to either the home stop or a downstream stop
+  - a downstream stop or the home stop
+  - a route that serves the home stop
+
+  (list describes the `relevant_ie?` function clauses in order)
+  """
+  def filter_alerts(alerts, stop_ids, route_ids) do
     stop_id_set = MapSet.new(stop_ids)
     route_id_set = MapSet.new(route_ids)
 
-    # At least one of stop or route will be non-nil in the informed entities we're working with here
     relevant_ie? = fn
+      %{route_type: route_type, stop: nil, route: nil} when not is_nil(route_type) ->
+        true
+
       %{stop: stop, route: route} when not is_nil(stop) and not is_nil(route) ->
         stop in stop_id_set and route in route_id_set
 
@@ -136,9 +139,22 @@ defmodule Screens.V2.CandidateGenerator.Helpers.Alerts do
 
       %{stop: nil, route: route} ->
         route in route_id_set
+
+      _ ->
+        false
     end
 
-    Enum.filter(alerts, fn alert -> Enum.any?(alert.informed_entities, relevant_ie?) end)
+    effects = relevant_effects()
+
+    alerts
+    |> Enum.filter(&(&1.effect in effects))
+    |> Enum.filter(&Enum.any?(&1.informed_entities, relevant_ie?))
+  end
+
+  defp relevant_effects do
+    MapSet.new(
+      ~w[shuttle station_closure stop_closure suspension detour stop_moved snow_route elevator_closure]a
+    )
   end
 
   defp fetch_all_route_ids(stop_id) do
