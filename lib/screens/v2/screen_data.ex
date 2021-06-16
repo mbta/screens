@@ -38,7 +38,7 @@ defmodule Screens.V2.ScreenData do
     solari_large_v2: 15
   }
 
-  defp bad_func, do: Enum.map(nil, fn _ -> nil end)
+  def bad_func, do: Enum.map(nil, fn _ -> nil end)
 
   @spec by_screen_id(screen_id()) :: serializable_map()
   def by_screen_id(screen_id) do
