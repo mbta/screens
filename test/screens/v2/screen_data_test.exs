@@ -36,8 +36,6 @@ defmodule ScreenDataTest do
                small_lower_right: %MockWidget{content: "2"},
                small_upper_right: %MockWidget{content: "1"}
              } = actual_instance_placement
-
-      assert false
     end
 
     test "handles paged regions correctly, and places higher-priority instances in earlier pages" do
