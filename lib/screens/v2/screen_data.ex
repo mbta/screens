@@ -5,8 +5,8 @@ defmodule Screens.V2.ScreenData do
 
   alias Screens.Util
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.WidgetInstance
   alias Screens.V2.Template
+  alias Screens.V2.WidgetInstance
 
   import Screens.V2.Template.Guards
 
