@@ -5,8 +5,8 @@ defmodule Screens.V2.ScreenData do
 
   alias Screens.Util
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
+  alias Screens.V2.Template
 
   import Screens.V2.Template.Guards
 
@@ -37,6 +37,8 @@ defmodule Screens.V2.ScreenData do
     solari_v2: 15,
     solari_large_v2: 15
   }
+
+  defp bad_func, do: Enum.map(nil, fn _ -> nil end)
 
   @spec by_screen_id(screen_id()) :: serializable_map()
   def by_screen_id(screen_id) do
