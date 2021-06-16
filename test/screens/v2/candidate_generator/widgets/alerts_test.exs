@@ -292,7 +292,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
     end
   end
 
-  describe "alert_stop_and_route_filter_workaround/3" do
+  describe "filter_alerts/3" do
     setup do
       %{
         stop_ids: ~w[1 2 3],
@@ -300,20 +300,24 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       }
     end
 
+    defp ie(opts \\ []) do
+      %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}
+    end
+
     test "filters out alerts that inform routes that do not serve the home stop", %{
       stop_ids: stop_ids,
       route_ids: route_ids
     } do
       alerts = [
-        %Alert{id: "1", informed_entities: [%{stop: "1", route: nil}]},
-        %Alert{id: "2", informed_entities: [%{stop: nil, route: "11"}]},
-        %Alert{id: "3", informed_entities: [%{stop: "1", route: "11"}]},
-        %Alert{id: "4", informed_entities: [%{stop: nil, route: "88"}]},
-        %Alert{id: "5", informed_entities: [%{stop: "1", route: "99"}]}
+        %Alert{id: "1", effect: :suspension, informed_entities: [ie(stop: "1")]},
+        %Alert{id: "2", effect: :suspension, informed_entities: [ie(route: "11")]},
+        %Alert{id: "3", effect: :suspension, informed_entities: [ie(stop: "1", route: "11")]},
+        %Alert{id: "4", effect: :suspension, informed_entities: [ie(route: "88")]},
+        %Alert{id: "5", effect: :suspension, informed_entities: [ie(stop: "1", route: "99")]}
       ]
 
       assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
-               alert_stop_and_route_filter_workaround(alerts, stop_ids, route_ids)
+               filter_alerts(alerts, stop_ids, route_ids)
     end
 
     test "filters out alerts that inform stops that are not downstream of the home stop", %{
@@ -321,15 +325,50 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       route_ids: route_ids
     } do
       alerts = [
-        %Alert{id: "1", informed_entities: [%{stop: "1", route: nil}]},
-        %Alert{id: "2", informed_entities: [%{stop: nil, route: "11"}]},
-        %Alert{id: "3", informed_entities: [%{stop: "1", route: "22"}]},
-        %Alert{id: "4", informed_entities: [%{stop: "8", route: nil}]},
-        %Alert{id: "5", informed_entities: [%{stop: "9", route: "33"}]}
+        %Alert{id: "1", effect: :suspension, informed_entities: [ie(stop: "1")]},
+        %Alert{id: "2", effect: :suspension, informed_entities: [ie(route: "11")]},
+        %Alert{id: "3", effect: :suspension, informed_entities: [ie(stop: "1", route: "22")]},
+        %Alert{id: "4", effect: :suspension, informed_entities: [ie(stop: "8")]},
+        %Alert{id: "5", effect: :suspension, informed_entities: [ie(stop: "9", route: "33")]}
       ]
 
       assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
-               alert_stop_and_route_filter_workaround(alerts, stop_ids, route_ids)
+               filter_alerts(alerts, stop_ids, route_ids)
+    end
+
+    test "keeps alerts that inform an entire route type", %{
+      stop_ids: stop_ids,
+      route_ids: route_ids
+    } do
+      alerts = [
+        %Alert{id: "1", effect: :suspension, informed_entities: [ie(route_type: 1)]},
+        %Alert{id: "2", effect: :suspension, informed_entities: [ie(stop: "9", route_type: 1)]},
+        %Alert{id: "3", effect: :suspension, informed_entities: [ie(route: "99", route_type: 1)]}
+      ]
+
+      assert [%Alert{id: "1"}] = filter_alerts(alerts, stop_ids, route_ids)
+    end
+
+    test "filters out alerts with other informed entities", %{
+      stop_ids: stop_ids,
+      route_ids: route_ids
+    } do
+      alerts = [
+        %Alert{id: "1", effect: :suspension, informed_entities: [ie()]}
+      ]
+
+      assert [] = filter_alerts(alerts, stop_ids, route_ids)
+    end
+
+    test "filters out alerts that do not have a relevant effect", %{
+      stop_ids: stop_ids,
+      route_ids: route_ids
+    } do
+      alerts = [
+        %Alert{id: "1", effect: :extra_service, informed_entities: [ie(stop: "1")]}
+      ]
+
+      assert [] = filter_alerts(alerts, stop_ids, route_ids)
     end
   end
 end
