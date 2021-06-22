@@ -12,19 +12,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
 
   @spec alert_instances(Screen.t()) :: list(AlertWidget.t())
   def alert_instances(
-        config,
+        %Screen{app_params: %app{alerts: %Alerts{stop_id: stop_id}}} = config,
         today \\ Date.utc_today(),
         fetch_routes_at_stop_fn \\ &fetch_routes_at_stop/2,
         fetch_stop_sequences_fn \\ &fetch_stop_sequences_through_stop/1,
         fetch_alerts_fn \\ &fetch_alerts/2
-      )
-
-  def alert_instances(
-        %Screen{app_params: %app{alerts: %Alerts{stop_id: stop_id}}} = config,
-        today,
-        fetch_routes_at_stop_fn,
-        fetch_stop_sequences_fn,
-        fetch_alerts_fn
       )
       when app in @alert_supporting_screen_types do
     with {:ok, routes_at_stop} <- fetch_routes_at_stop_fn.(stop_id, today),
