@@ -1,7 +1,7 @@
-defmodule Screens.V2.CandidateGenerator.Helpers.AlertsTest do
+defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
   use ExUnit.Case, async: true
 
-  import Screens.V2.CandidateGenerator.Helpers.Alerts
+  import Screens.V2.CandidateGenerator.Widgets.Alerts
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen

@@ -1,4 +1,4 @@
-defmodule Screens.V2.CandidateGenerator.Helpers.Alerts do
+defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
   @moduledoc false
 
   alias Screens.Alerts.Alert

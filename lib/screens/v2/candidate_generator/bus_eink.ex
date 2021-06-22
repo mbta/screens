@@ -5,7 +5,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
   alias Screens.Config.V2.{BusEink, Footer}
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.CandidateGenerator.Helpers
+  alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader, Placeholder}
 
@@ -37,8 +37,8 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
         config,
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &fetch_stop_name/1,
-        departures_instances_fn \\ &Helpers.Departures.departures_instances/1,
-        alert_instances_fn \\ &Helpers.Alerts.alert_instances/1
+        departures_instances_fn \\ &Widgets.Departures.departures_instances/1,
+        alert_instances_fn \\ &Widgets.Alerts.alert_instances/1
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
