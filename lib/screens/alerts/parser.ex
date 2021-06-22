@@ -1,9 +1,8 @@
 defmodule Screens.Alerts.Parser do
   @moduledoc false
 
-  def parse_result(result) do
-    result
-    |> Map.get("data")
+  def parse_result(%{"data" => data}) when is_list(data) do
+    data
     |> Enum.map(&parse_alert/1)
     |> Enum.reject(&is_nil/1)
   end
