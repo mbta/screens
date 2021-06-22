@@ -10,6 +10,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
 
   @alert_supporting_screen_types [BusEink, BusShelter, GlEink]
 
+  @relevant_effects MapSet.new(
+                      ~w[shuttle station_closure stop_closure suspension detour stop_moved snow_route elevator_closure]a
+                    )
+
   @spec alert_instances(Screen.t()) :: list(AlertWidget.t())
   def alert_instances(
         %Screen{app_params: %app{alerts: %Alerts{stop_id: stop_id}}} = config,
@@ -136,17 +140,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
         false
     end
 
-    effects = relevant_effects()
-
     alerts
-    |> Enum.filter(&(&1.effect in effects))
+    |> Enum.filter(&(&1.effect in @relevant_effects))
     |> Enum.filter(&Enum.any?(&1.informed_entities, relevant_ie?))
-  end
-
-  defp relevant_effects do
-    MapSet.new(
-      ~w[shuttle station_closure stop_closure suspension detour stop_moved snow_route elevator_closure]a
-    )
   end
 
   defp fetch_all_route_ids(stop_id) do
