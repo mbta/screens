@@ -47,11 +47,7 @@ defmodule Screens.DupScreenData.Request do
     ]
 
     opts
-    |> Alert.fetch()
-    |> case do
-      {:ok, alerts} -> alerts
-      :error -> []
-    end
+    |> Alert.fetch_or_empty_list()
     |> Enum.filter(&relevant?/1)
   end
 
