@@ -206,7 +206,19 @@ defmodule Screens.Alerts.Alert do
   end
 
   @doc """
+  Fetches:
+  1) alerts filtered by the given list of stops AND the given list of routes
+  2) alerts filtered by the given list of routes only
 
+  and merges them into one list.
+
+  NOTE: due to some undocumented logic in the V3 API, filtering by stop also automatically filters
+  by routes that serve the stop(s). This hidden filter is merged with our user-supplied route
+  filter, which can cause some unwanted alerts to show up in the response.
+
+  As a result, you will likely need to do additional client-side filtering to get the alerts
+  you're looking for.
+  https://app.asana.com/0/0/1200476247539238/f
   """
   @spec fetch_by_stop_and_route(list(Stop.id()), list(Route.id())) :: {:ok, list(t())} | :error
   def fetch_by_stop_and_route(stop_ids, route_ids, get_json_fn \\ &V3Api.get_json/2) do
