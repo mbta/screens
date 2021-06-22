@@ -28,16 +28,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
          reachable_stop_ids = [stop_id | unique_downstream_stop_ids(stop_sequences, stop_id)],
          route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
          {:ok, alerts} <- fetch_alerts_fn.(reachable_stop_ids, route_ids_at_stop) do
-      new_widget = fn alert ->
+      Enum.map(alerts, fn alert ->
         %AlertWidget{
           alert: alert,
           screen: config,
           routes_at_stop: routes_at_stop,
           stop_sequences: stop_sequences
         }
-      end
-
-      Enum.map(alerts, new_widget)
+      end)
     else
       :error -> []
     end
