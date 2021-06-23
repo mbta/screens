@@ -21,8 +21,22 @@ defmodule Screens.V2.WidgetInstance.Alert do
           now: DateTime.t()
         }
 
-  def priority(_t) do
-    [1]
+  @base_priority 2
+
+  @effect_priorities ~w[shuttle stop_closure suspension station_closure detour stop_moved snow_route elevator_closure]a
+                     |> Enum.with_index(1)
+
+  @spec priority(t()) :: nonempty_list(pos_integer()) | :no_render
+  def priority(t) do
+    tiebreakers = [
+      @base_priority,
+      tiebreaker_primary_timeframe(t),
+      tiebreaker_location(t),
+      tiebreaker_secondary_timeframe(t),
+      tiebreaker_effect(t)
+    ]
+
+    if Enum.any?(tiebreakers, &(&1 == :no_render)), do: :no_render, else: tiebreakers
   end
 
   def serialize(_t) do
@@ -148,6 +162,70 @@ defmodule Screens.V2.WidgetInstance.Alert do
     routes
     |> Enum.filter(& &1.active?)
     |> MapSet.new(& &1.route_id)
+  end
+
+  # Time units in seconds
+  @hour 60 * 60
+  @week 24 * @hour * 7
+
+  @spec tiebreaker_primary_timeframe(t()) :: pos_integer() | :no_render
+  def tiebreaker_primary_timeframe(%__MODULE__{} = t) do
+    if active?(t) do
+      from_onset = seconds_from_onset(t)
+
+      cond do
+        from_onset < 4 * @week -> 1
+        from_onset in (4 * @week)..(12 * @week - 1) -> 2
+        from_onset in (12 * @week)..(24 * @week - 1) -> 4
+        true -> :no_render
+      end
+    else
+      to_next = seconds_to_next_active_period(t)
+
+      cond do
+        to_next < 36 * @hour -> 2
+        to_next >= 36 * @hour -> 3
+      end
+    end
+  end
+
+  @spec tiebreaker_location(t()) :: pos_integer() | :no_render
+  def tiebreaker_location(%__MODULE__{} = t) do
+    case location(t) do
+      :inside -> 1
+      :boundary_upstream -> 2
+      :boundary_downstream -> 2
+      :downstream -> 3
+      _ -> :no_render
+    end
+  end
+
+  @doc """
+  This tiebreaker's only purpose is to split the two cases that produce a `primary_timeframe` of 2.
+  In all other cases, it will have no effect.
+  """
+  @spec tiebreaker_secondary_timeframe(t()) :: pos_integer()
+  def tiebreaker_secondary_timeframe(%__MODULE__{} = t) do
+    cond do
+      not active?(t) and seconds_to_next_active_period(t) < 36 * @hour ->
+        1
+
+      active?(t) and seconds_from_onset(t) in (4 * @week)..(12 * @week - 1) ->
+        2
+
+      true ->
+        3
+    end
+  end
+
+  @spec tiebreaker_effect(t()) :: pos_integer() | :no_render
+  def tiebreaker_effect(%__MODULE__{} = t) do
+    e = effect(t)
+
+    Enum.find_value(@effect_priorities, :no_render, fn
+      {^e, priority} -> priority
+      _ -> false
+    end)
   end
 
   @spec informed_entity_to_zone(Alert.informed_entity(), map()) ::
