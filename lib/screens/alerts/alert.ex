@@ -364,13 +364,12 @@ defmodule Screens.Alerts.Alert do
 
   # HAPPENING NOW
   # defined as: some active period contains the current time
-  defp happening_now(%{active_period: aps}) do
-    now = DateTime.utc_now()
+  defp happening_now(%{active_period: aps}, now \\ DateTime.utc_now()) do
     if Enum.any?(aps, &in_active_period(&1, now)), do: 1, else: 0
   end
 
-  def happening_now?(alert) do
-    case happening_now(alert) do
+  def happening_now?(alert, now \\ DateTime.utc_now()) do
+    case happening_now(alert, now) do
       0 -> false
       1 -> true
     end

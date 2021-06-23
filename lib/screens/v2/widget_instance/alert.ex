@@ -7,7 +7,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.RouteType
   alias Screens.Util
 
-  defstruct ~w[screen alert stop_sequences routes_at_stop]a
+  defstruct ~w[screen alert stop_sequences routes_at_stop now]a
 
   @type stop_id :: String.t()
 
@@ -17,7 +17,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
           screen: Screens.Config.Screen.t(),
           alert: Alert.t(),
           stop_sequences: list(list(stop_id())),
-          routes_at_stop: list(%{route_id: route_id(), active?: boolean()})
+          routes_at_stop: list(%{route_id: route_id(), active?: boolean()}),
+          now: DateTime.t()
         }
 
   def frig_off!, do: nil
@@ -42,27 +43,21 @@ defmodule Screens.V2.WidgetInstance.Alert do
     priority(t) != :no_render and slot_names(t) != :no_render
   end
 
-  def active?(%__MODULE__{alert: alert}, happening_now? \\ &Alert.happening_now?/1) do
-    happening_now?.(alert)
+  def active?(%__MODULE__{alert: alert, now: now}, happening_now? \\ &Alert.happening_now?/2) do
+    happening_now?.(alert, now)
   end
 
-  @spec seconds_from_onset(t(), DateTime.t()) :: integer() | :infinity
-  def seconds_from_onset(t, now \\ DateTime.utc_now())
-
-  def seconds_from_onset(%__MODULE__{alert: %Alert{active_period: [{start, _} | _]}}, now)
+  @spec seconds_from_onset(t()) :: integer()
+  def seconds_from_onset(%__MODULE__{alert: %Alert{active_period: [{start, _} | _]}, now: now})
       when not is_nil(start) do
     DateTime.diff(now, start, :second)
   end
 
-  def seconds_from_onset(_t, _now), do: :infinity
-
-  @spec seconds_to_next_active_period(t(), DateTime.t()) :: integer() | :infinity
-  def seconds_to_next_active_period(t, now \\ DateTime.utc_now())
-
-  def seconds_to_next_active_period(
-        %__MODULE__{alert: %Alert{active_period: active_periods}},
-        now
-      )
+  @spec seconds_to_next_active_period(t()) :: integer() | :infinity
+  def seconds_to_next_active_period(%__MODULE__{
+        alert: %Alert{active_period: active_periods},
+        now: now
+      })
       when not is_nil(active_periods) do
     next_active_period =
       Enum.find(active_periods, fn {start, _} ->
@@ -75,7 +70,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     end
   end
 
-  def seconds_to_next_active_period(_t, _now), do: :infinity
+  def seconds_to_next_active_period(_t), do: :infinity
 
   @spec home_stop_id(t()) :: String.t()
   def home_stop_id(%__MODULE__{
