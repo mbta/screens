@@ -60,6 +60,7 @@ defmodule Screens.MixProject do
       {:tzdata, "~> 1.1.0"},
       {:credo, "~> 1.5.0", only: [:dev, :test]},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
+      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.1"},
       {:ex_aws_secretsmanager, "~> 2.0", only: :prod},
