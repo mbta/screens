@@ -44,7 +44,11 @@ defmodule Screens.V2.ScreenData do
     candidate_generator = get_candidate_generator(config)
     refresh_rate = get_refresh_rate(config)
     screen_template = candidate_generator.screen_template()
-    candidate_instances = candidate_generator.candidate_instances(config)
+
+    candidate_instances =
+      config
+      |> candidate_generator.candidate_instances()
+      |> Enum.filter(&WidgetInstance.valid_candidate?/1)
 
     screen_template
     |> pick_instances(candidate_instances)
