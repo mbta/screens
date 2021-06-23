@@ -1,6 +1,10 @@
 defmodule Screens.Alerts.Alert do
   @moduledoc false
 
+  alias Screens.Routes.Route
+  alias Screens.Stops.Stop
+  alias Screens.V3Api
+
   defstruct id: nil,
             cause: nil,
             effect: nil,
@@ -172,13 +176,13 @@ defmodule Screens.Alerts.Alert do
   ]
 
   @spec fetch(keyword()) :: {:ok, list(t())} | :error
-  def fetch(opts \\ []) do
+  def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
     params =
       opts
       |> Enum.flat_map(&format_query_param/1)
       |> Enum.into(%{})
 
-    case Screens.V3Api.get_json("alerts", params) do
+    case get_json_fn.("alerts", params) do
       {:ok, result} ->
         {:ok, Screens.Alerts.Parser.parse_result(result)}
 
@@ -198,6 +202,25 @@ defmodule Screens.Alerts.Alert do
     case fetch(opts) do
       {:ok, alerts} -> alerts
       :error -> []
+    end
+  end
+
+  @doc """
+
+  """
+  @spec fetch_by_stop_and_route(list(Stop.id()), list(Route.id())) :: {:ok, list(t())} | :error
+  def fetch_by_stop_and_route(stop_ids, route_ids, get_json_fn \\ &V3Api.get_json/2) do
+    with {:ok, stop_based_alerts} <-
+           fetch([stop_ids: stop_ids, route_ids: route_ids], get_json_fn),
+         {:ok, route_based_alerts} <- fetch([route_ids: route_ids], get_json_fn) do
+      merged_alerts =
+        [stop_based_alerts, route_based_alerts]
+        |> Enum.concat()
+        |> Enum.uniq_by(& &1.id)
+
+      {:ok, merged_alerts}
+    else
+      :error -> :error
     end
   end
 
