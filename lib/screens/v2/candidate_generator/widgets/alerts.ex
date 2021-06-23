@@ -44,13 +44,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
     end
   end
 
-  # Filters out alerts whose effects we are not interested in, as well as those that do not inform at least one of:
-  # - an entire route type, e.g. bus or light rail
-  # - a route that serves the home stop, scoped to either the home stop or a downstream stop
-  # - a downstream stop or the home stop
-  # - a route that serves the home stop
-  #
-  # (list describes the `relevant_ie?` function clauses in order)
+  @doc """
+  Filters out alerts whose effects we are not interested in, as well as those that do not inform at least one of:
+  - an entire route type, e.g. bus or light rail
+  - a route that serves the home stop, scoped to either the home stop or a downstream stop
+  - a downstream stop or the home stop
+  - a route that serves the home stop
+
+  (list describes the `relevant_ie?` function clauses in order)
+  """
   def filter_alerts(alerts, stop_ids, route_ids) do
     stop_id_set = MapSet.new(stop_ids)
     route_id_set = MapSet.new(route_ids)
