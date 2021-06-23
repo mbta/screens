@@ -36,6 +36,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def slot_names(_instance), do: [:main_content]
 
     def widget_type(_instance), do: :departures
+
+    def valid_candidate?(_instance), do: true
   end
 
   def serialize_section(%{type: :notice_section, icon: icon, text: text}, _screen) do

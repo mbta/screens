@@ -12,5 +12,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoData do
     def serialize(_instance), do: %{}
     def slot_names(_instance), do: [:main_content]
     def widget_type(_instance), do: :departures_no_data
+    def valid_candidate?(_instance), do: true
   end
 end

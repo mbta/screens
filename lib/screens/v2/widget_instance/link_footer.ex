@@ -23,5 +23,7 @@ defmodule Screens.V2.WidgetInstance.LinkFooter do
     def slot_names(_instance), do: [:footer]
 
     def widget_type(_instance), do: :link_footer
+
+    def valid_candidate?(_instance), do: true
   end
 end

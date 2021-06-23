@@ -20,6 +20,28 @@ defmodule Screens.V2.WidgetInstance.Alert do
           routes_at_stop: list(%{route_id: route_id(), active?: boolean()})
         }
 
+  def frig_off!, do: nil
+
+  def priority(_t) do
+    [1]
+  end
+
+  def serialize(_t) do
+    %{}
+  end
+
+  def slot_names(_t) do
+    [:medium_left, :medium_right]
+  end
+
+  def widget_type(_t) do
+    :alert
+  end
+
+  def valid_candidate?(t) do
+    priority(t) != :no_render and slot_names(t) != :no_render
+  end
+
   def active?(%__MODULE__{alert: alert}, happening_now? \\ &Alert.happening_now?/1) do
     happening_now?.(alert)
   end
@@ -182,20 +204,12 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   defimpl Screens.V2.WidgetInstance do
-    def priority(_instance) do
-      [1]
-    end
+    alias Screens.V2.WidgetInstance.Alert
 
-    def serialize(_instance) do
-      %{}
-    end
-
-    def slot_names(_instance) do
-      [:medium_left, :medium_right]
-    end
-
-    def widget_type(_instance) do
-      :alert
-    end
+    def priority(instance), do: Alert.priority(instance)
+    def serialize(instance), do: Alert.serialize(instance)
+    def slot_names(instance), do: Alert.slot_names(instance)
+    def widget_type(instance), do: Alert.widget_type(instance)
+    def valid_candidate?(instance), do: Alert.valid_candidate?(instance)
   end
 end
