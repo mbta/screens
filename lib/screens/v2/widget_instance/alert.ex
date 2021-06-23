@@ -21,8 +21,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
           now: DateTime.t()
         }
 
-  def frig_off!, do: nil
-
   def priority(_t) do
     [1]
   end
