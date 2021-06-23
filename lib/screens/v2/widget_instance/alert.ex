@@ -178,8 +178,10 @@ defmodule Screens.V2.WidgetInstance.Alert do
   defp informed_entity_to_zone(%{stop: stop, route: nil}, context) do
     cond do
       stop == context.home_stop -> [:home_stop]
-      stop in context.upstream_stops -> [:upstream]
+      # Stops can be both upstream and downstream simultaneously, on different routes through the home stop.
+      # We check whether it's downstream first, since that takes priority.
       stop in context.downstream_stops -> [:downstream]
+      stop in context.upstream_stops -> [:upstream]
       true -> []
     end
   end
