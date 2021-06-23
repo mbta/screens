@@ -5,7 +5,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   alias Screens.Config.V2.{Footer, GlEink, Header}
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.CandidateGenerator.Helpers
+  alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.WidgetInstance.{FareInfoFooter, LineMap, NormalHeader, Placeholder}
 
   @scheduled_terminal_departure_lookback_seconds 180
@@ -37,16 +37,20 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
-        fetch_destination_fn \\ &fetch_destination/2
+        fetch_destination_fn \\ &fetch_destination/2,
+        departures_instances_fn \\ &Widgets.Departures.departures_instances/1,
+        alert_instances_fn \\ &Widgets.Alerts.alert_instances/1
       ) do
     [
-      header_instances(config, now, fetch_destination_fn),
-      Helpers.Departures.departures_instances(config),
-      footer_instances(config),
-      placeholder_instances(),
-      line_map_instances(config)
+      fn -> header_instances(config, now, fetch_destination_fn) end,
+      fn -> departures_instances_fn.(config) end,
+      fn -> alert_instances_fn.(config) end,
+      fn -> footer_instances(config) end,
+      fn -> placeholder_instances() end,
+      fn -> line_map_instances(config) end
     ]
-    |> List.flatten()
+    |> Task.async_stream(& &1.(), ordered: false)
+    |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
   def line_map_instances(

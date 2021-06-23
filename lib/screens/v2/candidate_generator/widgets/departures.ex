@@ -1,4 +1,4 @@
-defmodule Screens.V2.CandidateGenerator.Helpers.Departures do
+defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   @moduledoc false
 
   alias Screens.Config.Screen

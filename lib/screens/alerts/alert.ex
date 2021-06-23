@@ -1,6 +1,10 @@
 defmodule Screens.Alerts.Alert do
   @moduledoc false
 
+  alias Screens.Routes.Route
+  alias Screens.Stops.Stop
+  alias Screens.V3Api
+
   defstruct id: nil,
             cause: nil,
             effect: nil,
@@ -171,27 +175,73 @@ defmodule Screens.Alerts.Alert do
     :policy_change
   ]
 
-  def fetch(opts \\ []) do
+  @spec fetch(keyword()) :: {:ok, list(t())} | :error
+  def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
     params =
       opts
       |> Enum.flat_map(&format_query_param/1)
       |> Enum.into(%{})
 
-    "alerts"
-    |> Screens.V3Api.get_json(params)
-    |> Screens.Alerts.Parser.parse_result()
+    case get_json_fn.("alerts", params) do
+      {:ok, result} ->
+        {:ok, Screens.Alerts.Parser.parse_result(result)}
+
+      _ ->
+        :error
+    end
   end
 
-  defp format_query_param({:stop_ids, stop_ids}) do
+  @doc """
+  Convenience for cases when it's safe to treat an API alert data outage
+  as if there simply aren't any alerts for the given parameters.
+
+  If the query fails for any reason, an empty list is returned.
+  """
+  @spec fetch_or_empty_list(keyword()) :: list(t())
+  def fetch_or_empty_list(opts \\ []) do
+    case fetch(opts) do
+      {:ok, alerts} -> alerts
+      :error -> []
+    end
+  end
+
+  @doc """
+
+  """
+  @spec fetch_by_stop_and_route(list(Stop.id()), list(Route.id())) :: {:ok, list(t())} | :error
+  def fetch_by_stop_and_route(stop_ids, route_ids, get_json_fn \\ &V3Api.get_json/2) do
+    with {:ok, stop_based_alerts} <-
+           fetch([stop_ids: stop_ids, route_ids: route_ids], get_json_fn),
+         {:ok, route_based_alerts} <- fetch([route_ids: route_ids], get_json_fn) do
+      merged_alerts =
+        [stop_based_alerts, route_based_alerts]
+        |> Enum.concat()
+        |> Enum.uniq_by(& &1.id)
+
+      {:ok, merged_alerts}
+    else
+      :error -> :error
+    end
+  end
+
+  defp format_query_param({:stop_ids, stop_ids}) when is_list(stop_ids) do
     [
       {"filter[stop]", Enum.join(stop_ids, ",")}
     ]
   end
 
-  defp format_query_param({:route_ids, route_ids}) do
+  defp format_query_param({:stop_id, stop_id}) when is_binary(stop_id) do
+    format_query_param({:stop_ids, [stop_id]})
+  end
+
+  defp format_query_param({:route_ids, route_ids}) when is_list(route_ids) do
     [
       {"filter[route]", Enum.join(route_ids, ",")}
     ]
+  end
+
+  defp format_query_param({:route_id, route_id}) when is_binary(route_id) do
+    format_query_param({:route_ids, [route_id]})
   end
 
   defp format_query_param({:route_types, route_types}) do
@@ -215,9 +265,8 @@ defmodule Screens.Alerts.Alert do
   end
 
   def priority_by_stop_id(stop_id) do
-    stop_id
-    |> fetch_alerts_for_stop_id()
-    |> Screens.Alerts.Parser.parse_result()
+    [stop_id: stop_id]
+    |> fetch_or_empty_list()
     |> sort(stop_id)
     |> Enum.map(fn alert ->
       %{alert: to_full_map(alert), priority: to_priority_map(alert, stop_id)}
@@ -394,9 +443,8 @@ defmodule Screens.Alerts.Alert do
 
   def by_stop_id(stop_id) do
     {inline_alerts, global_alerts} =
-      stop_id
-      |> fetch_alerts_for_stop_id()
-      |> Screens.Alerts.Parser.parse_result()
+      [stop_id: stop_id]
+      |> fetch_or_empty_list()
       |> Enum.split_with(&is_inline?/1)
 
     global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
@@ -444,18 +492,10 @@ defmodule Screens.Alerts.Alert do
   end
 
   ###
-  defp fetch_alerts_for_route_id(route_id) do
-    case Screens.V3Api.get_json("alerts", %{"filter[route]" => route_id}) do
-      {:ok, result} -> {:ok, result}
-      _ -> :error
-    end
-  end
-
   def by_route_id(route_id, stop_id) do
     {inline_alerts, global_alerts} =
-      route_id
-      |> fetch_alerts_for_route_id()
-      |> Screens.Alerts.Parser.parse_result()
+      [route_id: route_id]
+      |> fetch_or_empty_list()
       |> Enum.split_with(&is_inline?/1)
 
     global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
@@ -464,9 +504,8 @@ defmodule Screens.Alerts.Alert do
   end
 
   def priority_by_route_id(route_id, stop_id) do
-    route_id
-    |> fetch_alerts_for_route_id()
-    |> Screens.Alerts.Parser.parse_result()
+    [route_id: route_id]
+    |> fetch_or_empty_list()
     |> sort(stop_id)
     |> Enum.map(fn alert ->
       %{alert: to_full_map(alert), priority: to_priority_map(alert, stop_id)}

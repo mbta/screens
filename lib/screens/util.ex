@@ -70,4 +70,28 @@ defmodule Screens.Util do
 
     {:lists.reverse(list1), :lists.reverse(list2), :lists.reverse(list3)}
   end
+
+  @doc """
+  Returns a list of elements in an enumerable that occur before the given target value,
+  or an empty list if the target is not present in the enumerable.
+  """
+  @spec slice_before(Enum.t(), any()) :: list()
+  def slice_before(enumerable, target) do
+    case Enum.find_index(enumerable, &(&1 == target)) do
+      nil -> []
+      i -> Enum.take(enumerable, i)
+    end
+  end
+
+  @doc """
+  Returns a list of elements in an enumerable that occur after the given target value,
+  or an empty list if the target is not present in the enumerable.
+  """
+  @spec slice_after(Enum.t(), any()) :: list()
+  def slice_after(list, target) do
+    case Enum.find_index(list, &(&1 == target)) do
+      nil -> []
+      i -> Enum.drop(list, i + 1)
+    end
+  end
 end

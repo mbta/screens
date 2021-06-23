@@ -47,7 +47,7 @@ defmodule Screens.DupScreenData.Request do
     ]
 
     opts
-    |> Alert.fetch()
+    |> Alert.fetch_or_empty_list()
     |> Enum.filter(&relevant?/1)
   end
 

@@ -1,4 +1,4 @@
-defmodule Screens.V2.CandidateGenerator.Helpers.DeparturesTest do
+defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Config.Screen
@@ -6,7 +6,7 @@ defmodule Screens.V2.CandidateGenerator.Helpers.DeparturesTest do
   alias Screens.Config.V2.Departures.{Filter, Section}
   alias Screens.Config.V2.BusShelter
   alias Screens.Config.V2.Departures, as: DeparturesConfig
-  alias Screens.V2.CandidateGenerator.Helpers.Departures
+  alias Screens.V2.CandidateGenerator.Widgets.Departures
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.DeparturesNoData
