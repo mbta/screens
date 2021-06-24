@@ -40,6 +40,8 @@ defmodule Screens.V2.WidgetInstance.LineMap do
     def slot_names(_instance), do: [:left_sidebar]
 
     def widget_type(_instance), do: :line_map
+
+    def valid_candidate?(_instance), do: true
   end
 
   def serialize_stops(current_stop, stops) do

@@ -32,5 +32,7 @@ defmodule Screens.V2.WidgetInstance.FareInfoFooter do
     def slot_names(_instance), do: [:footer]
 
     def widget_type(_instance), do: :fare_info_footer
+
+    def valid_candidate?(_instance), do: true
   end
 end

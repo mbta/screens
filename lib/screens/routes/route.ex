@@ -42,9 +42,9 @@ defmodule Screens.Routes.Route do
   """
   @spec fetch_routes_at_stop(String.t()) ::
           {:ok, list(%{route_id: id(), active?: boolean()})} | :error
-  def fetch_routes_at_stop(stop_id, today \\ Date.utc_today(), get_json_fn \\ &V3Api.get_json/2) do
+  def fetch_routes_at_stop(stop_id, now \\ DateTime.utc_now(), get_json_fn \\ &V3Api.get_json/2) do
     with {:ok, all_route_ids} <- fetch_all_route_ids(stop_id, get_json_fn),
-         {:ok, active_route_ids} <- fetch_active_route_ids(stop_id, today, get_json_fn) do
+         {:ok, active_route_ids} <- fetch_active_route_ids(stop_id, now, get_json_fn) do
       active_set = MapSet.new(active_route_ids)
 
       routes_at_stop =
@@ -81,8 +81,8 @@ defmodule Screens.Routes.Route do
     end
   end
 
-  defp fetch_active_route_ids(stop_id, today, get_json_fn) do
-    case fetch([stop_id: stop_id, date: today], get_json_fn) do
+  defp fetch_active_route_ids(stop_id, now, get_json_fn) do
+    case fetch([stop_id: stop_id, date: now], get_json_fn) do
       {:ok, routes} -> {:ok, Enum.map(routes, & &1.id)}
       :error -> :error
     end

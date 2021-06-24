@@ -17,5 +17,6 @@ defmodule Screens.V2.WidgetInstance.Placeholder do
     def serialize(%Placeholder{color: color}), do: %{color: color}
     def slot_names(%Placeholder{slot_names: slot_names}), do: slot_names
     def widget_type(_), do: :placeholder
+    def valid_candidate?(_instance), do: true
   end
 end

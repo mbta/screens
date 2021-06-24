@@ -18,12 +18,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
   @spec alert_instances(Screen.t()) :: list(AlertWidget.t())
   def alert_instances(
         %Screen{app_params: %app{alerts: %Alerts{stop_id: stop_id}}} = config,
-        fetch_routes_at_stop_fn \\ &Route.fetch_routes_at_stop/1,
+        now \\ DateTime.utc_now(),
+        fetch_routes_at_stop_fn \\ &Route.fetch_routes_at_stop/2,
         fetch_stop_sequences_through_stop_fn \\ &RoutePattern.fetch_stop_sequences_through_stop/1,
         fetch_alerts_by_stop_and_route_fn \\ &Alert.fetch_by_stop_and_route/2
       )
       when app in @alert_supporting_screen_types do
-    with {:ok, routes_at_stop} <- fetch_routes_at_stop_fn.(stop_id),
+    with {:ok, routes_at_stop} <- fetch_routes_at_stop_fn.(stop_id, now),
          {:ok, stop_sequences} <- fetch_stop_sequences_through_stop_fn.(stop_id),
          reachable_stop_ids = local_and_downstream_stop_ids(stop_sequences, stop_id),
          route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
@@ -36,7 +37,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
           alert: alert,
           screen: config,
           routes_at_stop: routes_at_stop,
-          stop_sequences: stop_sequences
+          stop_sequences: stop_sequences,
+          now: now
         }
       end)
     else

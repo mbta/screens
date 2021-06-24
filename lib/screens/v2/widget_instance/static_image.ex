@@ -32,5 +32,7 @@ defmodule Screens.V2.WidgetInstance.StaticImage do
     end
 
     def widget_type(_instance), do: :static_image
+
+    def valid_candidate?(_instance), do: true
   end
 end

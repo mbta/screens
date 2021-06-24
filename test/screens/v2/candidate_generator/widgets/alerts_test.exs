@@ -44,10 +44,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         bad_config: bad_config,
         routes_at_stop: routes_at_stop,
         stop_sequences: stop_sequences,
-        fetch_routes_at_stop_fn: fn _ -> {:ok, routes_at_stop} end,
+        now: ~U[2021-01-01T00:00:00Z],
+        fetch_routes_at_stop_fn: fn _, _ -> {:ok, routes_at_stop} end,
         fetch_stop_sequences_fn: fn _ -> {:ok, stop_sequences} end,
         fetch_alerts_fn: fn _, _ -> {:ok, alerts} end,
-        x_fetch_routes_at_stop_fn: fn _ -> :error end,
+        x_fetch_routes_at_stop_fn: fn _, _ -> :error end,
         x_fetch_stop_sequences_fn: fn _ -> :error end,
         x_fetch_alerts_fn: fn _, _ -> :error end
       }
@@ -58,6 +59,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         config: config,
         routes_at_stop: routes_at_stop,
         stop_sequences: stop_sequences,
+        now: now,
         fetch_routes_at_stop_fn: fetch_routes_at_stop_fn,
         fetch_stop_sequences_fn: fetch_stop_sequences_fn,
         fetch_alerts_fn: fetch_alerts_fn
@@ -66,7 +68,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       expected_common_data = %{
         screen: config,
         routes_at_stop: routes_at_stop,
-        stop_sequences: stop_sequences
+        stop_sequences: stop_sequences,
+        now: now
       }
 
       expected_widgets = [
@@ -87,6 +90,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       assert expected_widgets ==
                alert_instances(
                  config,
+                 now,
                  fetch_routes_at_stop_fn,
                  fetch_stop_sequences_fn,
                  fetch_alerts_fn
@@ -96,6 +100,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
     test "fails when passed config for an unsupported screen type", context do
       %{
         bad_config: bad_config,
+        now: now,
         fetch_routes_at_stop_fn: fetch_routes_at_stop_fn,
         fetch_stop_sequences_fn: fetch_stop_sequences_fn,
         fetch_alerts_fn: fetch_alerts_fn
@@ -104,6 +109,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       assert_raise FunctionClauseError, fn ->
         alert_instances(
           bad_config,
+          now,
           fetch_routes_at_stop_fn,
           fetch_stop_sequences_fn,
           fetch_alerts_fn
@@ -114,6 +120,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
     test "returns empty list if any query fails", context do
       %{
         config: config,
+        now: now,
         fetch_routes_at_stop_fn: fetch_routes_at_stop_fn,
         fetch_stop_sequences_fn: fetch_stop_sequences_fn,
         fetch_alerts_fn: fetch_alerts_fn,
@@ -125,6 +132,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       assert [] ==
                alert_instances(
                  config,
+                 now,
                  x_fetch_routes_at_stop_fn,
                  fetch_stop_sequences_fn,
                  fetch_alerts_fn
@@ -133,6 +141,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       assert [] ==
                alert_instances(
                  config,
+                 now,
                  fetch_routes_at_stop_fn,
                  x_fetch_stop_sequences_fn,
                  fetch_alerts_fn
@@ -141,6 +150,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       assert [] ==
                alert_instances(
                  config,
+                 now,
                  fetch_routes_at_stop_fn,
                  fetch_stop_sequences_fn,
                  x_fetch_alerts_fn
