@@ -294,7 +294,7 @@ defmodule Screens.Alerts.Alert do
       specificity(alert, stop_id),
       -high_severity(alert),
       -new_service_in_next_two_weeks(alert),
-      -happening_now(alert),
+      -happening_now_key(alert),
       -new_info_in_last_two_weeks(alert),
       effect_index(alert),
       alert.id
@@ -309,7 +309,7 @@ defmodule Screens.Alerts.Alert do
       alert_id: alert.id,
       new_service: -new_service_in_next_two_weeks(alert),
       new_info: -new_info_in_last_two_weeks(alert),
-      happening_now: -happening_now(alert)
+      happening_now: -happening_now_key(alert)
     }
   end
 
@@ -364,15 +364,12 @@ defmodule Screens.Alerts.Alert do
 
   # HAPPENING NOW
   # defined as: some active period contains the current time
-  defp happening_now(%{active_period: aps}, now \\ DateTime.utc_now()) do
-    if Enum.any?(aps, &in_active_period(&1, now)), do: 1, else: 0
+  defp happening_now_key(alert) do
+    if happening_now?(alert), do: 1, else: 0
   end
 
-  def happening_now?(alert, now \\ DateTime.utc_now()) do
-    case happening_now(alert, now) do
-      0 -> false
-      1 -> true
-    end
+  def happening_now?(%{active_period: aps}, now \\ DateTime.utc_now()) do
+    Enum.any?(aps, &in_active_period(&1, now))
   end
 
   def in_active_period({nil, end_t}, t) do
