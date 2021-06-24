@@ -6,6 +6,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.Config.V2.{Alerts, BusEink, BusShelter, GlEink}
   alias Screens.RouteType
   alias Screens.Util
+  alias Screens.V2.WidgetInstance
 
   defstruct ~w[screen alert stop_sequences routes_at_stop now]a
 
