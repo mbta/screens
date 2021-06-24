@@ -26,7 +26,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @effect_priorities ~w[shuttle stop_closure suspension station_closure detour stop_moved snow_route elevator_closure]a
                      |> Enum.with_index(1)
 
-  @spec priority(t()) :: nonempty_list(pos_integer()) | :no_render
+  @spec priority(t()) :: nonempty_list(pos_integer()) | WidgetInstance.no_render()
   def priority(t) do
     tiebreakers = [
       @base_priority,
@@ -52,7 +52,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   def valid_candidate?(t) do
-    priority(t) != :no_render and slot_names(t) != :no_render
+    priority(t) != :no_render
   end
 
   def active?(%__MODULE__{alert: alert, now: now}, happening_now? \\ &Alert.happening_now?/2) do
@@ -168,7 +168,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @hour 60 * 60
   @week 24 * @hour * 7
 
-  @spec tiebreaker_primary_timeframe(t()) :: pos_integer() | :no_render
+  @spec tiebreaker_primary_timeframe(t()) :: pos_integer() | WidgetInstance.no_render()
   def tiebreaker_primary_timeframe(%__MODULE__{} = t) do
     if active?(t) do
       from_onset = seconds_from_onset(t)
@@ -189,7 +189,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     end
   end
 
-  @spec tiebreaker_location(t()) :: pos_integer() | :no_render
+  @spec tiebreaker_location(t()) :: pos_integer() | WidgetInstance.no_render()
   def tiebreaker_location(%__MODULE__{} = t) do
     case location(t) do
       :inside -> 1
@@ -218,7 +218,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     end
   end
 
-  @spec tiebreaker_effect(t()) :: pos_integer() | :no_render
+  @spec tiebreaker_effect(t()) :: pos_integer() | WidgetInstance.no_render()
   def tiebreaker_effect(%__MODULE__{} = t) do
     e = effect(t)
 
