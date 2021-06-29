@@ -15,7 +15,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @type route_id :: String.t()
 
   @type t :: %__MODULE__{
-          screen: Screens.Config.Screen.t(),
+          screen: Screen.t(),
           alert: Alert.t(),
           stop_sequences: list(list(stop_id())),
           routes_at_stop: list(%{route_id: route_id(), active?: boolean()}),
@@ -37,15 +37,34 @@ defmodule Screens.V2.WidgetInstance.Alert do
       tiebreaker_effect(t)
     ]
 
-    if Enum.any?(tiebreakers, &(&1 == :no_render)), do: :no_render, else: tiebreakers
+    cond do
+      Enum.any?(tiebreakers, &(&1 == :no_render)) -> :no_render
+      slot_names(t) == [:full_screen] -> [1]
+      true -> tiebreakers
+    end
   end
 
   def serialize(_t) do
     %{}
   end
 
-  def slot_names(_t) do
-    [:medium_left, :medium_right]
+  def slot_names(%__MODULE__{screen: %Screen{app_id: app_id}} = t)
+      when app_id in [:bus_shelter_v2, :bus_eink_v2] do
+    if active?(t) and effect(t) in [:stop_closure, :stop_move, :suspension, :detour] and
+         informs_all_active_routes_at_home_stop?(t) do
+      [:full_screen]
+    else
+      [:medium_left, :medium_right]
+    end
+  end
+
+  def slot_names(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
+    if active?(t) and effect(t) in [:station_closure, :suspension, :shuttle] and
+         location(t) == :inside do
+      [:full_screen]
+    else
+      [:medium_flex]
+    end
   end
 
   def widget_type(_t) do
@@ -129,7 +148,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
       upstream_stops: upstream_stop_id_set(t),
       downstream_stops: downstream_stop_id_set(t),
       routes: all_routes_at_stop(t),
-      screen: t.screen
+      route_type: route_type(t)
     }
 
     informed_entities = informed_entities(t)
@@ -164,6 +183,10 @@ defmodule Screens.V2.WidgetInstance.Alert do
     |> Enum.filter(& &1.active?)
     |> MapSet.new(& &1.route_id)
   end
+
+  def route_type(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}), do: :bus
+  def route_type(%__MODULE__{screen: %Screen{app_id: :bus_eink_v2}}), do: :bus
+  def route_type(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}}), do: :light_rail
 
   # Time units in seconds
   @hour 60 * 60
@@ -229,6 +252,44 @@ defmodule Screens.V2.WidgetInstance.Alert do
     end)
   end
 
+  defp informs_all_active_routes_at_home_stop?(t) do
+    rt = route_type(t)
+    home_stop = home_stop_id(t)
+
+    # allows us to pattern match against the empty set
+    empty_set = MapSet.new()
+
+    uninformed_active_routes =
+      Enum.reduce_while(informed_entities(t), active_routes_at_stop(t), fn
+        _ie, ^empty_set ->
+          {:halt, empty_set}
+
+        %{route_type: nil, stop: nil, route: nil}, uninformed ->
+          {:cont, uninformed}
+
+        %{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
+          if RouteType.from_id(route_type_id) == rt do
+            {:halt, empty_set}
+          else
+            {:cont, uninformed}
+          end
+
+        %{stop: ^home_stop, route: nil}, _uninformed ->
+          {:halt, empty_set}
+
+        %{stop: ^home_stop, route: route}, uninformed ->
+          {:cont, MapSet.delete(uninformed, route)}
+
+        %{stop: nil, route: route}, uninformed ->
+          {:cont, MapSet.delete(uninformed, route)}
+
+        _ie, uninformed ->
+          {:cont, uninformed}
+      end)
+
+    MapSet.size(uninformed_active_routes) == 0
+  end
+
   @spec informed_entity_to_zone(Alert.informed_entity(), map()) ::
           list(:upstream | :home_stop | :downstream)
   defp informed_entity_to_zone(informed_entity, location_context)
@@ -241,13 +302,10 @@ defmodule Screens.V2.WidgetInstance.Alert do
   # Only route type is not nil--this is the only time we consider route type,
   # since it's implied by other values when they are not nil
   defp informed_entity_to_zone(%{stop: nil, route: nil, route_type: route_type_id}, context) do
-    route_type = RouteType.from_id(route_type_id)
-
-    case {route_type, context.screen.app_id} do
-      {:bus, :bus_shelter_v2} -> [:upstream, :home_stop, :downstream]
-      {:bus, :bus_eink_v2} -> [:upstream, :home_stop, :downstream]
-      {:light_rail, :gl_eink_v2} -> [:upstream, :home_stop, :downstream]
-      _ -> []
+    if RouteType.from_id(route_type_id) == context.route_type do
+      [:upstream, :home_stop, :downstream]
+    else
+      []
     end
   end
 
