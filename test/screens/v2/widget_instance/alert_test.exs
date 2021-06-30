@@ -3,7 +3,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusShelter, Solari}
+  alias Screens.Config.V2.{BusEink, BusShelter, GlEink, Solari}
   alias Screens.RouteType
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
@@ -59,11 +59,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   defp ie(opts \\ []) do
-    %{
-      stop: opts[:stop] || nil,
-      route: opts[:route] || nil,
-      route_type: opts[:route_type] || nil
-    }
+    %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}
   end
 
   defp setup_home_stop(%{widget: widget}) do
@@ -119,25 +115,36 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     %{widget: put_effect(widget, :stop_closure)}
   end
 
-  # Pass this to `setup` to set up a stop_closure alert that is currently active (just started) and affects the home stop.
-  @valid_alert_setup_group [
+  # Pass this to `setup` to set up "context" data on the alert widget, without setting up the API alert itself.
+  @alert_widget_context_setup_group [
     :setup_home_stop,
     :setup_stop_sequences,
     :setup_routes,
     :setup_screen_config,
-    :setup_now,
-    :setup_informed_entities,
-    :setup_active_period,
-    :setup_effect
+    :setup_now
   ]
+
+  # Pass this to `setup` to set up a stop_closure alert that is currently active (just started) and affects the home stop.
+  @valid_alert_setup_group @alert_widget_context_setup_group ++
+                             [
+                               :setup_informed_entities,
+                               :setup_active_period,
+                               :setup_effect
+                             ]
 
   describe "priority/1" do
     setup @valid_alert_setup_group
 
+    test "returns [1] when slot_names(widget) == [:full_screen]", %{widget: widget} do
+      assert [1] == AlertWidget.priority(widget)
+    end
+
     test "returns a list of tiebreaker values when widget should be considered for placement", %{
       widget: widget
     } do
-      assert [_ | _] = AlertWidget.priority(widget)
+      widget = put_effect(widget, :snow_route)
+
+      assert [2 | _] = AlertWidget.priority(widget)
     end
 
     test "returns :no_render if any of the tiebreaker functions returns :no_render", %{
@@ -152,6 +159,160 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       widget = put_active_period(widget, active_period)
 
       assert :no_render == AlertWidget.priority(widget)
+    end
+  end
+
+  describe "slot_names/1 for bus apps (Bus Shelter and Bus E-Ink)" do
+    setup @alert_widget_context_setup_group
+
+    # active | high-impact | informs all routes || full-screen?
+    # n      | n           | n                  || n
+    # y      | n           | n                  || n
+    # n      | y           | n                  || n
+    # y      | y           | n                  || n
+    # n      | n           | y                  || n
+    # y      | n           | y                  || n
+    # n      | y           | y                  || n
+    # y      | y           | y                  || y
+
+    @bus_slot_names_cases %{
+      {false, false, false} => [:medium_left, :medium_right],
+      {true, false, false} => [:medium_left, :medium_right],
+      {false, true, false} => [:medium_left, :medium_right],
+      {true, true, false} => [:medium_left, :medium_right],
+      {false, false, true} => [:medium_left, :medium_right],
+      {true, false, true} => [:medium_left, :medium_right],
+      {false, true, true} => [:medium_left, :medium_right],
+      {true, true, true} => [:full_screen]
+    }
+
+    for {{set_active?, set_high_impact_effect?, set_informs_all_active_routes?},
+         expected_slot_names} <- @bus_slot_names_cases do
+      false_to_not = fn
+        true -> ""
+        false -> "not "
+      end
+
+      test_description =
+        "returns #{inspect(expected_slot_names)} if alert is " <>
+          false_to_not.(set_active?) <>
+          "active and does " <>
+          false_to_not.(set_high_impact_effect?) <>
+          "have a high-impact effect and does " <>
+          false_to_not.(set_informs_all_active_routes?) <>
+          "inform all active routes at home stop"
+
+      test test_description, %{widget: widget} do
+        active_period =
+          if(unquote(set_active?),
+            do: [{~U[2021-01-01T00:00:00Z], ~U[2021-01-01T22:00:00Z]}],
+            else: [{~U[2021-01-02T00:00:00Z], ~U[2021-01-02T22:00:00Z]}]
+          )
+
+        effect = if(unquote(set_high_impact_effect?), do: :stop_closure, else: :snow_route)
+
+        informed_entities =
+          if(unquote(set_informs_all_active_routes?),
+            do: [ie(route: "a"), ie(route: "c")],
+            else: [ie(route: "a"), ie(route: "b")]
+          )
+
+        widget =
+          widget
+          |> put_active_period(active_period)
+          |> put_effect(effect)
+          |> put_informed_entities(informed_entities)
+
+        assert unquote(expected_slot_names) == AlertWidget.slot_names(widget)
+      end
+    end
+
+    test "returns [:medium_flex] for a non-full-screen alert on Bus E-Ink", %{widget: widget} do
+      widget =
+        widget
+        |> put_app_id(:bus_eink_v2)
+        |> put_home_stop(BusEink, "5")
+        |> put_active_period([{~U[2021-01-02T00:00:00Z], ~U[2021-01-02T22:00:00Z]}])
+        |> put_effect(:snow_route)
+        |> put_informed_entities([ie(route: "a"), ie(route: "b")])
+
+      assert [:medium_flex] == AlertWidget.slot_names(widget)
+    end
+  end
+
+  describe "slot_names/1 for Green Line E-Ink app" do
+    setup @alert_widget_context_setup_group ++ [:setup_gl_eink_config]
+
+    defp setup_gl_eink_config(%{widget: widget}) do
+      widget =
+        widget
+        |> put_app_id(:gl_eink_v2)
+        |> put_home_stop(GlEink, "5")
+
+      %{widget: widget}
+    end
+
+    # active | high-impact | location :inside || full-screen?
+    # n      | n           | n                || n
+    # y      | n           | n                || n
+    # n      | y           | n                || n
+    # y      | y           | n                || n
+    # n      | n           | y                || n
+    # y      | n           | y                || n
+    # n      | y           | y                || n
+    # y      | y           | y                || y
+
+    @gl_slot_names_cases %{
+      {false, false, false} => [:medium_flex],
+      {true, false, false} => [:medium_flex],
+      {false, true, false} => [:medium_flex],
+      {true, true, false} => [:medium_flex],
+      {false, false, true} => [:medium_flex],
+      {true, false, true} => [:medium_flex],
+      {false, true, true} => [:medium_flex],
+      {true, true, true} => [:full_screen]
+    }
+
+    for {{set_active?, set_high_impact_effect?, set_location_inside?}, expected_slot_names} <-
+          @gl_slot_names_cases do
+      false_to_not = fn
+        true -> ""
+        false -> "not "
+      end
+
+      test_description =
+        "returns #{inspect(expected_slot_names)} if alert is " <>
+          false_to_not.(set_active?) <>
+          "active and does " <>
+          false_to_not.(set_high_impact_effect?) <>
+          "have a high-impact effect and does " <>
+          false_to_not.(set_location_inside?) <>
+          "contain home stop in informed region"
+
+      test test_description, %{widget: widget} do
+        active_period =
+          if(unquote(set_active?),
+            do: [{~U[2021-01-01T00:00:00Z], ~U[2021-01-01T22:00:00Z]}],
+            else: [{~U[2021-01-02T00:00:00Z], ~U[2021-01-02T22:00:00Z]}]
+          )
+
+        effect =
+          if(unquote(set_high_impact_effect?), do: :station_closure, else: :elevator_closure)
+
+        informed_entities =
+          if(unquote(set_location_inside?),
+            do: [ie(stop: "4"), ie(stop: "5"), ie(stop: "6")],
+            else: [ie(stop: "5"), ie(stop: "6")]
+          )
+
+        widget =
+          widget
+          |> put_active_period(active_period)
+          |> put_effect(effect)
+          |> put_informed_entities(informed_entities)
+
+        assert unquote(expected_slot_names) == AlertWidget.slot_names(widget)
+      end
     end
   end
 
@@ -271,7 +432,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   describe "upstream_stop_id_set/1" do
-    setup [:setup_home_stop, :setup_stop_sequences]
+    setup @alert_widget_context_setup_group
 
     test "collects all stops upstream of the home stop into a set", %{widget: widget} do
       expected_upstream_stops = MapSet.new(~w[0 1 2 3 4] ++ ~w[10 20 30 4] ++ ~w[200 40])
@@ -281,7 +442,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   describe "downstream_stop_id_set/1" do
-    setup [:setup_home_stop, :setup_stop_sequences]
+    setup @alert_widget_context_setup_group
 
     test "collects all stops downstream of the home stop into a set", %{widget: widget} do
       expected_downstream_stops = MapSet.new(~w[6 7 8 9] ++ ~w[7] ++ ~w[6 90])
@@ -291,7 +452,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   describe "location/1" do
-    setup [:setup_home_stop, :setup_stop_sequences, :setup_routes, :setup_screen_config]
+    setup @alert_widget_context_setup_group
 
     test "handles empty informed entities", %{widget: widget} do
       widget = put_informed_entities(widget, [])
