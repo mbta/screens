@@ -3,7 +3,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusShelter, GlEink, Solari}
+  alias Screens.Config.V2.{BusEink, BusShelter, GlEink, Solari}
   alias Screens.RouteType
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
@@ -225,6 +225,18 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
         assert unquote(expected_slot_names) == AlertWidget.slot_names(widget)
       end
+    end
+
+    test "returns [:medium_flex] for a non-full-screen alert on Bus E-Ink", %{widget: widget} do
+      widget =
+        widget
+        |> put_app_id(:bus_eink_v2)
+        |> put_home_stop(BusEink, "5")
+        |> put_active_period([{~U[2021-01-02T00:00:00Z], ~U[2021-01-02T22:00:00Z]}])
+        |> put_effect(:snow_route)
+        |> put_informed_entities([ie(route: "a"), ie(route: "b")])
+
+      assert [:medium_flex] == AlertWidget.slot_names(widget)
     end
   end
 

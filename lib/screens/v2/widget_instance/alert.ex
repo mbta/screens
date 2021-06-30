@@ -48,23 +48,26 @@ defmodule Screens.V2.WidgetInstance.Alert do
     %{}
   end
 
-  def slot_names(%__MODULE__{screen: %Screen{app_id: app_id}} = t)
-      when app_id in [:bus_shelter_v2, :bus_eink_v2] do
-    if active?(t) and effect(t) in [:stop_closure, :stop_move, :suspension, :detour] and
-         informs_all_active_routes_at_home_stop?(t) do
-      [:full_screen]
-    else
-      [:medium_left, :medium_right]
-    end
+  def slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}} = t) do
+    if bus_app_full_screen_alert?(t), do: [:full_screen], else: [:medium_left, :medium_right]
+  end
+
+  def slot_names(%__MODULE__{screen: %Screen{app_id: :bus_eink_v2}} = t) do
+    if bus_app_full_screen_alert?(t), do: [:full_screen], else: [:medium_flex]
   end
 
   def slot_names(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
-    if active?(t) and effect(t) in [:station_closure, :suspension, :shuttle] and
-         location(t) == :inside do
-      [:full_screen]
-    else
-      [:medium_flex]
-    end
+    if gl_app_full_screen_alert?(t), do: [:full_screen], else: [:medium_flex]
+  end
+
+  defp bus_app_full_screen_alert?(t) do
+    active?(t) and effect(t) in [:stop_closure, :stop_move, :suspension, :detour] and
+      informs_all_active_routes_at_home_stop?(t)
+  end
+
+  defp gl_app_full_screen_alert?(t) do
+    active?(t) and effect(t) in [:station_closure, :suspension, :shuttle] and
+      location(t) == :inside
   end
 
   def widget_type(_t) do
