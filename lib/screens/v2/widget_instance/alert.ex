@@ -247,12 +247,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @spec tiebreaker_effect(t()) :: pos_integer() | WidgetInstance.no_render()
   def tiebreaker_effect(%__MODULE__{} = t) do
-    e = effect(t)
-
-    Enum.find_value(@effect_priorities, :no_render, fn
-      {^e, priority} -> priority
-      _ -> false
-    end)
+    Keyword.get(@effect_priorities, effect(t), :no_render)
   end
 
   defp informs_all_active_routes_at_home_stop?(t) do
