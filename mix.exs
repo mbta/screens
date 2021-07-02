@@ -66,7 +66,7 @@ defmodule Screens.MixProject do
       {:ex_aws_secretsmanager, "~> 2.0", only: :prod},
       {:ex_aws_polly, "~> 0.4.0"},
       {:ehmon, github: "mbta/ehmon", only: :prod},
-      {:sweet_xml, "~> 0.6.6"},
+      {:sweet_xml, "~> 0.7.0"},
       {:timex, "~> 3.6"},
       {:hackney, "== 1.17.4"},
       {:guardian, "~> 2.0"},
