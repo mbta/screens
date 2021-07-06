@@ -7,6 +7,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.RouteType
   alias Screens.Util
   alias Screens.V2.WidgetInstance
+  alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct ~w[screen alert stop_sequences routes_at_stop now]a
 
@@ -24,8 +25,41 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @base_priority 2
 
-  @effect_priorities ~w[shuttle stop_closure suspension station_closure detour stop_moved snow_route elevator_closure]a
-                     |> Enum.with_index(1)
+  # Keep these in descending order of priority--highest priority (lowest integer value) first
+  @relevant_effects ~w[shuttle stop_closure suspension station_closure detour stop_moved snow_route elevator_closure]a
+
+  @effect_priorities Enum.with_index(@relevant_effects, 1)
+
+  @effect_headers Enum.zip(
+                    @relevant_effects,
+                    Enum.map(@relevant_effects, fn
+                      :stop_closure ->
+                        "Stop Closed"
+
+                      :station_closure ->
+                        "Station Closed"
+
+                      :elevator_closure ->
+                        "Elevator Closed"
+
+                      effect ->
+                        effect
+                        |> Atom.to_string()
+                        |> String.split("_")
+                        |> Enum.map(&String.capitalize/1)
+                        |> Enum.join(" ")
+                    end)
+                  )
+
+  @effect_icons Enum.zip(
+                  @relevant_effects,
+                  Enum.map(@relevant_effects, fn
+                    bus when bus in [:shuttle, :detour] -> :bus
+                    major when major in [:stop_closure, :suspension, :station_closure] -> :x
+                    minor when minor in [:stop_moved, :elevator_closure] -> :warning
+                    :snow_route -> :snowflake
+                  end)
+                )
 
   @spec priority(t()) :: nonempty_list(pos_integer()) | WidgetInstance.no_render()
   def priority(t) do
@@ -44,8 +78,52 @@ defmodule Screens.V2.WidgetInstance.Alert do
     end
   end
 
-  def serialize(_t) do
-    %{}
+  @spec serialize(t()) :: map()
+  def serialize(t) do
+    e = effect(t)
+
+    %{
+      route_pills: serialize_route_pills(t),
+      icon: serialize_icon(e),
+      header: serialize_header(e),
+      body: t.alert.header,
+      url:
+        case t.alert.url do
+          nil -> "mbta.com/alerts"
+          url -> clean_up_url(url)
+        end
+    }
+  end
+
+  defp serialize_route_pills(t) do
+    t
+    |> informed_routes()
+    |> Enum.to_list()
+    |> Enum.sort_by(fn route_id ->
+      case Integer.parse(route_id) do
+        # Bus route (including SL_, CT_)
+        {route_number, ""} -> route_number
+        # Non-bus route
+        _ -> route_id
+      end
+    end)
+    |> Enum.map(&RoutePill.serialize_for_alert/1)
+  end
+
+  for {e, header} <- @effect_headers do
+    defp serialize_header(unquote(e)), do: unquote(header)
+  end
+
+  for {e, icon} <- @effect_icons do
+    defp serialize_icon(unquote(e)), do: unquote(icon)
+  end
+
+  # Removes leading scheme specifier ("http[s]"), www. prefix, and trailing "/" from url.
+  defp clean_up_url(url) do
+    url
+    |> String.replace(~r|^https?://|i, "")
+    |> String.replace(~r|^www\.|i, "")
+    |> String.replace(~r|/$|, "")
   end
 
   def slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}} = t) do
@@ -251,14 +329,19 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   defp informs_all_active_routes_at_home_stop?(t) do
+    MapSet.subset?(active_routes_at_stop(t), informed_routes_at_home_stop(t))
+  end
+
+  defp informed_routes_at_home_stop(t) do
     rt = route_type(t)
     home_stop = home_stop_id(t)
+    route_set = all_routes_at_stop(t)
 
     # allows us to pattern match against the empty set
     empty_set = MapSet.new()
 
-    uninformed_active_routes =
-      Enum.reduce_while(informed_entities(t), active_routes_at_stop(t), fn
+    uninformed_routes =
+      Enum.reduce_while(informed_entities(t), route_set, fn
         _ie, ^empty_set ->
           {:halt, empty_set}
 
@@ -285,7 +368,55 @@ defmodule Screens.V2.WidgetInstance.Alert do
           {:cont, uninformed}
       end)
 
-    MapSet.size(uninformed_active_routes) == 0
+    MapSet.difference(route_set, uninformed_routes)
+  end
+
+  defp informed_routes(t) do
+    rt = route_type(t)
+    home_stop = home_stop_id(t)
+    downstream_stop_set = downstream_stop_id_set(t)
+    route_set = all_routes_at_stop(t)
+
+    # allows us to pattern match against the empty set
+    empty_set = MapSet.new()
+
+    uninformed_routes =
+      Enum.reduce_while(informed_entities(t), route_set, fn
+        _ie, ^empty_set ->
+          {:halt, empty_set}
+
+        %{route_type: nil, stop: nil, route: nil}, uninformed ->
+          {:cont, uninformed}
+
+        %{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
+          if RouteType.from_id(route_type_id) == rt do
+            {:halt, empty_set}
+          else
+            {:cont, uninformed}
+          end
+
+        %{stop: ^home_stop, route: nil}, _uninformed ->
+          {:halt, empty_set}
+
+        # We can't handle this case properly until the struct is updated to record which routes serve which stops.
+        # %{stop: stop, route: nil}, uninformed when stop in downstream_stops ->
+        #   {:cont, MapSet.difference(uninformed, routes_by_stop[stop])}
+
+        %{stop: ^home_stop, route: route}, uninformed ->
+          {:cont, MapSet.delete(uninformed, route)}
+
+        %{stop: stop, route: route}, uninformed ->
+          if stop in downstream_stop_set do
+            {:cont, MapSet.delete(uninformed, route)}
+          else
+            {:cont, uninformed}
+          end
+
+        _ie, uninformed ->
+          {:cont, uninformed}
+      end)
+
+    MapSet.difference(route_set, uninformed_routes)
   end
 
   @spec informed_entity_to_zone(Alert.informed_entity(), map()) ::

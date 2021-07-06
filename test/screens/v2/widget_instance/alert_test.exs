@@ -162,6 +162,32 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     end
   end
 
+  describe "serialize/1" do
+    setup @valid_alert_setup_group ++ [:setup_display_values]
+
+    defp setup_display_values(%{widget: widget}) do
+      widget = %{widget | alert: %{widget.alert | header: "Stop is closed."}}
+
+      %{widget: widget}
+    end
+
+    test "serializes an alert widget", %{widget: widget} do
+      expected_json_map = %{
+        route_pills: [
+          %{type: :text, text: "a", color: :yellow},
+          %{type: :text, text: "b", color: :yellow},
+          %{type: :text, text: "c", color: :yellow}
+        ],
+        icon: :x,
+        header: "Stop Closed",
+        body: "Stop is closed.",
+        url: "mbta.com/alerts"
+      }
+
+      assert expected_json_map == AlertWidget.serialize(widget)
+    end
+  end
+
   describe "slot_names/1 for bus apps (Bus Shelter and Bus E-Ink)" do
     setup @alert_widget_context_setup_group
 

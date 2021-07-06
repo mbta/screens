@@ -19,7 +19,8 @@ defmodule Screens.Alerts.Parser do
         "informed_entity" => informed_entities,
         "lifecycle" => lifecycle,
         "severity" => severity,
-        "timeframe" => timeframe
+        "timeframe" => timeframe,
+        "url" => url
       } ->
         %Screens.Alerts.Alert{
           id: id,
@@ -32,7 +33,8 @@ defmodule Screens.Alerts.Parser do
           lifecycle: lifecycle,
           timeframe: timeframe,
           created_at: parse_time(created_at),
-          updated_at: parse_time(updated_at)
+          updated_at: parse_time(updated_at),
+          url: url
         }
 
       _ ->

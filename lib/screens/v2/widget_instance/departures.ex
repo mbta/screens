@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.Config.Screen
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
+  alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct screen: nil,
             section_data: []
@@ -77,54 +78,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
     route_type = Departure.route_type(first_departure)
     track_number = Departure.track_number(first_departure)
 
-    route =
-      cond do
-        not is_nil(track_number) ->
-          %{type: :text, text: "TR#{track_number}"}
-
-        route_type == :rail ->
-          %{type: :icon, icon: :rail}
-
-        route_type == :ferry ->
-          %{type: :icon, icon: :boat}
-
-        String.contains?(route_name, "/") ->
-          [part1, part2] = String.split(route_name, "/")
-          %{type: :slashed, part1: part1, part2: part2}
-
-        true ->
-          %{type: :text, text: get_text_for_route(route_id, route_name)}
-      end
-
-    Map.merge(route, %{color: get_color_for_route(route_id, route_type)})
+    RoutePill.serialize_for_departure(route_id, route_name, route_type, track_number)
   end
-
-  defp get_text_for_route("Red", _), do: "RL"
-  defp get_text_for_route("Mattapan", _), do: "M"
-  defp get_text_for_route("Orange", _), do: "OL"
-  defp get_text_for_route("Blue", _), do: "BL"
-  defp get_text_for_route("Green-B", _), do: "GL"
-  defp get_text_for_route("Green-C", _), do: "GL"
-  defp get_text_for_route("Green-D", _), do: "GL"
-  defp get_text_for_route("Green-E", _), do: "GL"
-  defp get_text_for_route(_, route_name), do: route_name
-
-  defp get_color_for_route("Red", _), do: :red
-  defp get_color_for_route("Mattapan", _), do: :red
-  defp get_color_for_route("Orange", _), do: :orange
-  defp get_color_for_route("Blue", _), do: :blue
-
-  defp get_color_for_route(route_id, _)
-       when route_id in ["Green-B", "Green-C", "Green-D", "Green-E"],
-       do: :green
-
-  defp get_color_for_route(route_id, _)
-       when route_id in ["741", "742", "743", "746", "749", "751"],
-       do: :silver
-
-  defp get_color_for_route(_, :rail), do: :purple
-  defp get_color_for_route(_, :ferry), do: :teal
-  defp get_color_for_route(_, _), do: :yellow
 
   def serialize_headsign([first_departure | _]) do
     headsign = Departure.headsign(first_departure)
