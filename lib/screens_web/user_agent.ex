@@ -1,17 +1,21 @@
 defmodule ScreensWeb.UserAgent do
   @moduledoc false
 
-  def is_screen_conn?(conn) do
-    conn.req_headers
-    |> Enum.into(%{})
-    |> Map.get("user-agent")
-    |> is_screen?()
+  @solari_screen_id_range MapSet.new(300..399, &Integer.to_string/1)
+
+  def is_screen_conn?(conn, screen_id) do
+    user_agent =
+      conn.req_headers
+      |> Enum.into(%{})
+      |> Map.get("user-agent")
+
+    is_screen?(user_agent, screen_id)
   end
 
-  def is_screen?(nil), do: false
+  def is_screen?(nil, _), do: false
 
-  def is_screen?(user_agent) do
-    is_mercury?(user_agent) or is_gds?(user_agent) or is_solari?(user_agent) or
+  def is_screen?(user_agent, screen_id) do
+    is_mercury?(user_agent) or is_gds?(user_agent) or is_solari?(user_agent, screen_id) or
       is_dup?(user_agent)
   end
 
@@ -24,11 +28,27 @@ defmodule ScreensWeb.UserAgent do
     String.contains?(user_agent, "einkapp-qt")
   end
 
-  defp is_solari?(user_agent) do
-    is_solari_old?(user_agent) or is_solari_new?(user_agent)
+  defp is_solari?(user_agent, screen_id) do
+    screen_id in @solari_screen_id_range and
+      (is_solari_old?(user_agent) or is_solari_new?(user_agent))
   end
 
   defp is_solari_new?(user_agent) do
+    is_solari_browser_new?(user_agent) or is_10pp_browser?(user_agent)
+  end
+
+  defp is_solari_browser_new?(user_agent) do
+    firefox_major_version =
+      case Regex.run(~r|Firefox/([\d]+)|, user_agent, capture: :all_but_first) do
+        nil -> 0
+        [version_string] -> String.to_integer(version_string)
+      end
+
+    String.contains?(user_agent, "Mozilla/5.0 (X11; Ubuntu; Linux x86_64;") and
+      firefox_major_version >= 84
+  end
+
+  defp is_10pp_browser?(user_agent) do
     String.contains?(user_agent, "BrightSign/L2D674000659/6.2.94")
   end
 

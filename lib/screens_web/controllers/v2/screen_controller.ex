@@ -30,7 +30,7 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   def index(conn, %{"id" => screen_id}) do
-    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
+    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
     _ = Screens.LogScreenData.log_page_load(screen_id, is_screen)
 
