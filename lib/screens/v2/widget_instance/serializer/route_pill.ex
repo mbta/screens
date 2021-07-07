@@ -29,7 +29,31 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   @sl_route_ids ~w[741 742 743 746 749 751]
 
-  @ct_route_ids ~w[708 747]
+  @cr_line_abbreviations %{
+    "Haverhill" => "HVL",
+    "Newburyport" => "NBP",
+    "Lowell" => "LWL",
+    "Fitchburg" => "FBG",
+    "Worcester" => "WOR",
+    "Needham" => "NDM",
+    "Franklin" => "FRK",
+    "Providence" => "PVD",
+    "Fairmount" => "FMT",
+    "Middleborough" => "MID",
+    "Kingston" => "KNG",
+    "Greenbush" => "GRB"
+  }
+
+  @special_bus_route_names %{
+    "741" => "SL1",
+    "742" => "SL2",
+    "743" => "SL3",
+    "751" => "SL4",
+    "749" => "SL5",
+    "746" => "SLW",
+    "747" => "CT2",
+    "708" => "CT3"
+  }
 
   @spec serialize_for_departure(Route.id(), String.t(), RouteType.t(), pos_integer() | nil) :: t()
   def serialize_for_departure(route_id, route_name, route_type, track_number) do
@@ -49,7 +73,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
           %{type: :slashed, part1: part1, part2: part2}
 
         true ->
-          do_serialize(route_id, route_name: route_name)
+          do_serialize(route_id, %{route_name: route_name})
       end
 
     Map.merge(route, %{color: get_color_for_route(route_id, route_type)})
@@ -57,94 +81,68 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   @spec serialize_for_alert(Route.id()) :: t()
   def serialize_for_alert(route_id) do
-    route = do_serialize(route_id, gl_branch: true, cr_abbrev: true, ferry_abbrev: true)
+    route = do_serialize(route_id, %{gl_branch: true, cr_abbrev: true, ferry_abbrev: true})
 
     Map.merge(route, %{color: get_color_for_route(route_id)})
   end
 
-  @typep bool_opt :: :gl_branch | :cr_abbrev | :ferry_abbrev
-  @typep serialize_opt :: {bool_opt(), boolean()} | {:route_name, String.t()}
-  @typep serialize_opts :: list(serialize_opt())
+  @typep serialize_opts :: %{
+           optional(:gl_branch) => boolean(),
+           optional(:cr_abbrev) => boolean(),
+           optional(:ferry_abbrev) => boolean(),
+           optional(:route_name) => String.t()
+         }
 
   @spec do_serialize(Route.id(), serialize_opts()) :: map()
-  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defp do_serialize(route_id, opts)
 
   defp do_serialize("Red", _), do: %{type: :text, text: "RL"}
   defp do_serialize("Mattapan", _), do: %{type: :text, text: "M"}
   defp do_serialize("Orange", _), do: %{type: :text, text: "OL"}
 
-  defp do_serialize("Green-" <> branch, opts) do
-    %{type: :text, text: if(opts[:gl_branch], do: "GL·" <> branch, else: "GL")}
+  defp do_serialize("Green-" <> branch, %{gl_branch: true}) do
+    %{type: :text, text: "GL·" <> branch}
+  end
+
+  defp do_serialize("Green-" <> _branch, _) do
+    %{type: :text, text: "GL"}
   end
 
   defp do_serialize("Blue", _), do: %{type: :text, text: "BL"}
 
-  defp do_serialize("CR-" <> line, opts) do
-    if opts[:cr_abbrev] do
-      line_abbrev =
-        case line do
-          "Haverhill" -> "HVL"
-          "Newburyport" -> "NBP"
-          "Lowell" -> "LWL"
-          "Fitchburg" -> "FBG"
-          "Worcester" -> "WOR"
-          "Needham" -> "NDM"
-          "Franklin" -> "FRK"
-          "Providence" -> "PVD"
-          "Fairmount" -> "FMT"
-          "Middleborough" -> "MID"
-          "Kingston" -> "KNG"
-          "Greenbush" -> "GRB"
-        end
-
-      %{type: :text, text: line_abbrev}
-    else
-      %{type: :icon, icon: :rail}
+  for {line, abbrev} <- @cr_line_abbreviations do
+    defp do_serialize("CR-" <> unquote(line), %{cr_abbrev: true}) do
+      %{type: :text, text: unquote(abbrev)}
     end
   end
 
-  defp do_serialize("Boat-" <> line, opts) do
-    if opts[:ferry_abbrev] do
-      case line do
-        "F1" -> %{type: :slashed, part1: "HNG", part2: "HUL"}
-        "F4" -> %{type: :text, text: "CTN"}
-      end
-    else
-      %{type: :icon, icon: :boat}
+  defp do_serialize("CR-" <> _line, _) do
+    %{type: :icon, icon: :rail}
+  end
+
+  defp do_serialize("Boat-" <> line, %{ferry_abbrev: true}) do
+    case line do
+      "F1" -> %{type: :slashed, part1: "HNG", part2: "HUL"}
+      "F4" -> %{type: :text, text: "CTN"}
     end
   end
 
-  defp do_serialize(route_id, _) when route_id in @sl_route_ids do
-    text =
-      case route_id do
-        "741" -> "SL1"
-        "742" -> "SL2"
-        "743" -> "SL3"
-        "751" -> "SL4"
-        "749" -> "SL5"
-        "746" -> "SLW"
-      end
-
-    %{type: :text, text: text}
+  defp do_serialize("Boat-" <> _line, _) do
+    %{type: :icon, icon: :boat}
   end
 
-  defp do_serialize(route_id, _) when route_id in @ct_route_ids do
-    text =
-      case route_id do
-        "747" -> "CT2"
-        "708" -> "CT3"
-      end
-
-    %{type: :text, text: text}
+  for {route_id, name} <- @special_bus_route_names do
+    defp do_serialize(unquote(route_id), _) do
+      %{type: :text, text: unquote(name)}
+    end
   end
 
   defp do_serialize(route_id, opts) do
-    route_name = Keyword.get(opts, :route_name, "")
+    route_name = Map.get(opts, :route_name, "")
 
     %{
       type: :text,
-      text: if(not is_nil(route_name) and route_name != "", do: route_name, else: route_id)
+      text: if(route_name != "", do: route_name, else: route_id)
     }
   end
 
