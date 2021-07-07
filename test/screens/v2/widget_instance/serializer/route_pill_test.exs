@@ -68,8 +68,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
       assert %{type: :text, text: "LWL", color: :purple} == serialize_for_alert("CR-Lowell")
     end
 
-    test "Abbreviates ferry route names" do
-      assert %{type: :text, text: "CTN", color: :teal} == serialize_for_alert("Boat-F4")
+    test "Returns boat icon for ferry routes" do
+      assert %{type: :icon, icon: :boat, color: :teal} == serialize_for_alert("Boat-F4")
     end
 
     test "Handles Silver Line routes" do

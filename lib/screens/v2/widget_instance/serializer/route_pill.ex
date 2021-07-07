@@ -81,7 +81,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   @spec serialize_for_alert(Route.id()) :: t()
   def serialize_for_alert(route_id) do
-    route = do_serialize(route_id, %{gl_branch: true, cr_abbrev: true, ferry_abbrev: true})
+    route = do_serialize(route_id, %{gl_branch: true, cr_abbrev: true})
 
     Map.merge(route, %{color: get_color_for_route(route_id)})
   end
@@ -89,7 +89,6 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   @typep serialize_opts :: %{
            optional(:gl_branch) => boolean(),
            optional(:cr_abbrev) => boolean(),
-           optional(:ferry_abbrev) => boolean(),
            optional(:route_name) => String.t()
          }
 
@@ -118,13 +117,6 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   defp do_serialize("CR-" <> _line, _) do
     %{type: :icon, icon: :rail}
-  end
-
-  defp do_serialize("Boat-" <> line, %{ferry_abbrev: true}) do
-    case line do
-      "F1" -> %{type: :slashed, part1: "HNG", part2: "HUL"}
-      "F4" -> %{type: :text, text: "CTN"}
-    end
   end
 
   defp do_serialize("Boat-" <> _line, _) do
