@@ -16,7 +16,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh}) do
-    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
+    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
     _ = Screens.LogScreenData.log_data_request(screen_id, last_refresh, is_screen)
 
