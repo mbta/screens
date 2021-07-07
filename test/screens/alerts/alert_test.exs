@@ -16,7 +16,8 @@ defmodule Screens.Alerts.AlertTest do
         "informed_entity" => [],
         "lifecycle" => nil,
         "severity" => nil,
-        "timeframe" => nil
+        "timeframe" => nil,
+        "url" => nil
       }
     }
   end

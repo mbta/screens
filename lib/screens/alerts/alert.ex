@@ -15,7 +15,8 @@ defmodule Screens.Alerts.Alert do
             lifecycle: nil,
             timeframe: nil,
             created_at: nil,
-            updated_at: nil
+            updated_at: nil,
+            url: nil
 
   @type cause ::
           :accident
