@@ -24,8 +24,8 @@ defmodule Screens.ScreenData do
 
     response =
       cond do
-        check_disabled and disabled?(screen_id) -> @disabled_response
         check_outdated and outdated?(screen_id, last_refresh) -> @outdated_response
+        check_disabled and disabled?(screen_id) -> @disabled_response
         true -> fetch_data(screen_id, is_screen)
       end
 
