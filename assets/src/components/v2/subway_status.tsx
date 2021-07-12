@@ -109,16 +109,16 @@ const SubwayStatusNormalRow = ({ route, status, location, branch }) => {
       <div className="subway-status-row__status">{status}</div>
       {location && (
         <div className="subway-status-row__location">
-          {abbreviate ? location[1] : location[0]}
+          {abbreviate ? location.abbrev : location.full}
         </div>
       )}
     </div>
   );
 };
 
-const SubwayStatusGreenLineBranchRow = ({ statuses }) => {
+const SubwayStatusGreenLineMultipleAlertsRow = ({ statuses }) => {
   const includesStopClosure = statuses.some(([_, status]) =>
-    status.startsWith("Bypassing")
+    status.toLowerCase().startsWith("bypassing")
   );
   const modifier = includesStopClosure ? "small" : "normal";
 
@@ -130,17 +130,15 @@ const SubwayStatusGreenLineBranchRow = ({ statuses }) => {
       <div className="subway-status-branch-row__groups">
         {statuses.map(([routes, status]) => (
           <div className="subway-status-branch-row__group" key={status}>
-            {routes && (
-              <div className="subway-status-branch-row__group-routes">
-                {routes.map((route) => (
-                  <img
-                    className="subway-status-branch-row__route-icon"
-                    src={iconForRoute(route)}
-                    key={route}
-                  />
-                ))}
-              </div>
-            )}
+            <div className="subway-status-branch-row__group-routes">
+              {routes.map((route) => (
+                <img
+                  className="subway-status-branch-row__route-icon"
+                  src={iconForRoute(route)}
+                  key={route}
+                />
+              ))}
+            </div>
             <div
               className={classWithModifier(
                 "subway-status-branch-row__group-status",
@@ -157,10 +155,10 @@ const SubwayStatusGreenLineBranchRow = ({ statuses }) => {
 };
 
 const SubwayStatusGreenLineRow = ({ type, ...data }) => {
-  if (type === "trunk") {
+  if (type === "single") {
     return <SubwayStatusNormalRow {...data} />;
-  } else if (type === "branch") {
-    return <SubwayStatusGreenLineBranchRow {...data} />;
+  } else if (type === "multiple") {
+    return <SubwayStatusGreenLineMultipleAlertsRow {...data} />;
   }
 
   return null;

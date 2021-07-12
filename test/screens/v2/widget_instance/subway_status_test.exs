@@ -43,8 +43,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       grouped_alerts = %{"Blue" => blue_line_alerts}
 
-      assert %{status: "Shuttle Buses", location: ["Airport to Aquarium", "Airport to Aquarium"]} =
-               SubwayStatus.serialize_route(grouped_alerts, "Blue")
+      assert %{
+               status: "Shuttle Buses",
+               location: %{full: "Airport to Aquarium", abbrev: "Airport to Aquarium"}
+             } = SubwayStatus.serialize_route(grouped_alerts, "Blue")
     end
 
     test "handles whole line shuttle alert" do
@@ -75,8 +77,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       grouped_alerts = %{"Blue" => blue_line_alerts}
 
-      assert %{status: "Suspension", location: ["Airport to Aquarium", "Airport to Aquarium"]} =
-               SubwayStatus.serialize_route(grouped_alerts, "Blue")
+      assert %{
+               status: "Suspension",
+               location: %{full: "Airport to Aquarium", abbrev: "Airport to Aquarium"}
+             } = SubwayStatus.serialize_route(grouped_alerts, "Blue")
     end
 
     test "handles whole line suspension alert" do
@@ -119,8 +123,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       grouped_alerts = %{"Blue" => blue_line_alerts}
 
-      assert %{status: "Delays over 60 minutes", location: ["Eastbound", "Eastbound"]} =
-               SubwayStatus.serialize_route(grouped_alerts, "Blue")
+      assert %{
+               status: "Delays over 60 minutes",
+               location: %{full: "Eastbound", abbrev: "Eastbound"}
+             } = SubwayStatus.serialize_route(grouped_alerts, "Blue")
     end
 
     test "handles single station closure" do
@@ -130,7 +136,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       grouped_alerts = %{"Blue" => blue_line_alerts}
 
-      assert %{status: "Bypassing", location: ["Orient Heights", "Orient Hts"]} =
+      assert %{status: "Bypassing", location: %{full: "Orient Heights", abbrev: "Orient Hts"}} =
                SubwayStatus.serialize_route(grouped_alerts, "Blue")
     end
 
@@ -146,7 +152,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       assert %{
                status: "Bypassing",
-               location: ["Orient Heights and Revere Beach", "Orient Hts and Revere Bch"]
+               location: %{
+                 full: "Orient Heights and Revere Beach",
+                 abbrev: "Orient Hts and Revere Bch"
+               }
              } = SubwayStatus.serialize_route(grouped_alerts, "Blue")
     end
 
@@ -164,7 +173,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       grouped_alerts = %{"Blue" => blue_line_alerts}
 
-      assert %{status: "Bypassing", location: ["3 stops", "3 stops"]} =
+      assert %{status: "Bypassing", location: %{full: "3 stops", abbrev: "3 stops"}} =
                SubwayStatus.serialize_route(grouped_alerts, "Blue")
     end
   end
@@ -186,9 +195,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       assert %{
                branch: "Green-B",
-               location: ["Chestnut Hill Avenue to Boston College", "Chestnut Hl to Boston Coll"],
+               location: %{
+                 full: "Chestnut Hill Avenue to Boston College",
+                 abbrev: "Chestnut Hl to Boston Coll"
+               },
                status: "Shuttle Buses",
-               type: :trunk
+               type: :single
              } = SubwayStatus.serialize_green_line(grouped_alerts)
     end
 
@@ -220,7 +232,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
         "Green-D" => green_d_alerts
       }
 
-      assert %{statuses: [[["Green-B", "Green-D"], "Shuttle Buses"]], type: :branch} ==
+      assert %{statuses: [[["Green-B", "Green-D"], "Shuttle Buses"]], type: :multiple} ==
                SubwayStatus.serialize_green_line(grouped_alerts)
     end
 
@@ -254,7 +266,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       assert %{
                statuses: [[["Green-B"], "Shuttle Buses"], [["Green-D"], "Suspension"]],
-               type: :branch
+               type: :multiple
              } ==
                SubwayStatus.serialize_green_line(grouped_alerts)
     end
@@ -292,16 +304,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       assert %{
-               location: ["Park Street to Copley", "Park St to Copley"],
+               location: %{full: "Park Street to Copley", abbrev: "Park St to Copley"},
                status: "Shuttle Buses",
-               type: :trunk
+               type: :single
              } = SubwayStatus.serialize_green_line(grouped_alerts)
     end
 
     test "handles normal service" do
       grouped_alerts = %{}
 
-      assert %{status: "Normal Service", type: :trunk} =
+      assert %{status: "Normal Service", type: :single} =
                SubwayStatus.serialize_green_line(grouped_alerts)
     end
   end
