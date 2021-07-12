@@ -57,8 +57,11 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
 
   defp subway_status_instances(config) do
     route_ids = ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E"]
-    alerts = Screens.Alerts.Alert.fetch(%{route_ids: route_ids})
-    [%SubwayStatus{screen: config, subway_alerts: alerts}]
+
+    case Screens.Alerts.Alert.fetch(route_ids: route_ids) do
+      {:ok, alerts} -> [%SubwayStatus{screen: config, subway_alerts: alerts}]
+      :error -> []
+    end
   end
 
   defp header_instances(config, now, fetch_stop_name_fn) do

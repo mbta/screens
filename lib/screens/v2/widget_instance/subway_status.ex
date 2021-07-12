@@ -232,6 +232,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     def slot_names(_instance), do: [:large]
 
     def widget_type(_instance), do: :subway_status
+
+    def valid_candidate?(_instance), do: true
   end
 
   def get_relevant_alerts_by_route(alerts) do
