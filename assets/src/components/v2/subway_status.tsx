@@ -88,15 +88,28 @@ const iconForRoute = (routeId) => {
 
 const SubwayStatusNormalRow = ({ route, status, location, branch }) => {
   const [abbreviate, setAbbreviate] = useState(false);
+  const [dropTimes, setDropTimes] = useState(false);
   const ref = useRef(null);
 
   useLayoutEffect(() => {
     if (ref.current) {
-      if (!abbreviate && ref.current.clientHeight > 122) {
-        setAbbreviate(true);
+      if (ref.current.clientHeight > 122) {
+        if (abbreviate && !dropTimes) {
+          setDropTimes(true);
+        } else {
+          setAbbreviate(true);
+        }
       }
     }
   });
+
+  if (abbreviate) {
+    status = status.replace(" minutes", "m");
+  }
+
+  if (dropTimes && status.startsWith("Delays")) {
+    status = "Delays";
+  }
 
   return (
     <div className="subway-status-row" ref={ref}>
