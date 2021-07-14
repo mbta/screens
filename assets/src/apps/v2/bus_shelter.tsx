@@ -19,6 +19,7 @@ import Placeholder from "Components/v2/placeholder";
 import LinkFooter from "Components/v2/bus_shelter/link_footer";
 import NormalHeader from "Components/v2/lcd/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
+import SubwayStatus from "Components/v2/subway_status";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -30,6 +31,7 @@ const TYPE_TO_COMPONENT = {
   link_footer: LinkFooter,
   normal_header: NormalHeader,
   departures: NormalDepartures,
+  subway_status: SubwayStatus,
 };
 
 const App = (): JSX.Element => {

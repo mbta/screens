@@ -102,10 +102,10 @@ const EditableSelect = ({
   doUpdate,
   editable,
 }) => {
-  const options = useMemo(() => gatherSelectOptions(preFilteredRows, id), [
-    id,
-    preFilteredRows,
-  ]);
+  const options = useMemo(
+    () => gatherSelectOptions(preFilteredRows, id),
+    [id, preFilteredRows]
+  );
 
   const onChange = (e) => {
     const value = e.target.value;

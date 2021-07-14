@@ -7,7 +7,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader, Placeholder, SubwayStatus}
 
   @behaviour CandidateGenerator
 
@@ -48,10 +48,20 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
       fn -> departures_instances_fn.(config) end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
-      fn -> placeholder_instances() end
+      fn -> placeholder_instances() end,
+      fn -> subway_status_instances(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
+  end
+
+  defp subway_status_instances(config) do
+    route_ids = ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E"]
+
+    case Screens.Alerts.Alert.fetch(route_ids: route_ids) do
+      {:ok, alerts} -> [%SubwayStatus{screen: config, subway_alerts: alerts}]
+      :error -> []
+    end
   end
 
   defp header_instances(config, now, fetch_stop_name_fn) do
