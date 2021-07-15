@@ -2,8 +2,35 @@ import React from "react";
 
 import { imagePath, classWithModifiers } from "Util/util";
 
-const TextRoutePill = ({ color, text, outline }) => {
-  const modifiers = [color];
+type Pill =
+  | (TextPill & { type: "text" })
+  | (IconPill & { type: "icon" })
+  | (SlashedPill & { type: "slashed" });
+
+interface BasePill {
+  color: Color;
+  outline?: boolean;
+}
+
+interface TextPill extends BasePill {
+  text: string;
+}
+
+interface IconPill extends BasePill {
+  icon: PillIcon;
+}
+
+interface SlashedPill extends BasePill {
+  part1: string;
+  part2: string;
+}
+
+type Color = "red" | "orange" | "green" | "blue" | "purple" | "yellow" | "teal";
+
+type PillIcon = "rail" | "boat";
+
+const TextRoutePill = ({ color, text, outline }: TextPill): JSX.Element => {
+  const modifiers: string[] = [color];
   if (outline) {
     modifiers.push("outline");
   }
@@ -22,8 +49,8 @@ const pathForIcon = {
   boat: "/ferry.svg",
 };
 
-const IconRoutePill = ({ icon, color, outline }) => {
-  const modifiers = [color];
+const IconRoutePill = ({ icon, color, outline }: IconPill): JSX.Element => {
+  const modifiers: string[] = [color];
   if (outline) {
     modifiers.push("outline");
   }
@@ -39,8 +66,13 @@ const IconRoutePill = ({ icon, color, outline }) => {
   );
 };
 
-const SlashedRoutePill = ({ part1, part2, color, outline }) => {
-  const modifiers = [color];
+const SlashedRoutePill = ({
+  part1,
+  part2,
+  color,
+  outline,
+}: SlashedPill): JSX.Element => {
+  const modifiers: string[] = [color];
   if (outline) {
     modifiers.push("outline");
   }
@@ -55,16 +87,30 @@ const SlashedRoutePill = ({ part1, part2, color, outline }) => {
   );
 };
 
-const RoutePill = ({ type, ...data }) => {
-  if (type === "text") {
-    return <TextRoutePill {...data} />;
-  } else if (type === "icon") {
-    return <IconRoutePill {...data} />;
-  } else if (type === "slashed") {
-    return <SlashedRoutePill {...data} />;
+const RoutePill = (pill: Pill): JSX.Element | null => {
+  switch (pill.type) {
+    case "text":
+      return <TextRoutePill {...pill} />;
+    case "icon":
+      return <IconRoutePill {...pill} />;
+    case "slashed":
+      return <SlashedRoutePill {...pill} />;
+    default:
+      return null;
   }
-
-  return null;
 };
 
+const routePillKey = (pill: Pill): string => {
+  switch (pill.type) {
+    case "text":
+      return pill.text;
+    case "icon":
+      return pill.icon;
+    case "slashed":
+      return `${pill.part1}-${pill.part2}`;
+  }
+};
+
+export { Pill };
+export { routePillKey };
 export default RoutePill;

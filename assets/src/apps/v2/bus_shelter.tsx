@@ -21,6 +21,8 @@ import NormalHeader from "Components/v2/lcd/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import SubwayStatus from "Components/v2/subway_status";
 
+import Alert from "Components/v2/alert";
+
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
   takeover: TakeoverScreen,
@@ -32,6 +34,7 @@ const TYPE_TO_COMPONENT = {
   normal_header: NormalHeader,
   departures: NormalDepartures,
   subway_status: SubwayStatus,
+  alert: Alert,
 };
 
 const App = (): JSX.Element => {
