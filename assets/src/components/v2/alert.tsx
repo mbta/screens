@@ -33,7 +33,10 @@ const Alert = ({
             ))}
           </div>
           <div className="alert-widget__content__icon">
-            <img className="alert-widget__icon-image" src={imagePath(filenameForIcon(icon))} />
+            <img
+              className="alert-widget__icon-image"
+              src={imagePath(filenameForIcon(icon))}
+            />
           </div>
           <div className="alert-widget__content__header-text">{header}</div>
           <BodyTextSizer>{body}</BodyTextSizer>
