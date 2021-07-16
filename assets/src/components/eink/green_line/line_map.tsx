@@ -257,8 +257,9 @@ const LineMapVehicleIcon = ({ x, y, size }): JSX.Element => {
 };
 
 const LineMapVehicle = ({ vehicle, currentTimeString }): JSX.Element => {
-  const { lineWidth, radius, dy, height, stopMarginTop } =
-    useContext(LineMapContext);
+  const { lineWidth, radius, dy, height, stopMarginTop } = useContext(
+    LineMapContext
+  );
 
   const x = lineWidth / 2;
   const y = stopMarginTop + radius + vehicle.index * dy;
@@ -345,8 +346,14 @@ const LineMapLine = (): JSX.Element => {
 };
 
 const LineMapStop = ({ i, stopName }): JSX.Element => {
-  const { originStopIndex, lineWidth, radius, dy, stopMarginTop, textMargin } =
-    useContext(LineMapContext);
+  const {
+    originStopIndex,
+    lineWidth,
+    radius,
+    dy,
+    stopMarginTop,
+    textMargin,
+  } = useContext(LineMapContext);
 
   return (
     <g>
@@ -371,8 +378,9 @@ const LineMapStop = ({ i, stopName }): JSX.Element => {
 };
 
 const LineMapCurrentStop = (): JSX.Element => {
-  const { currentStopY, lineWidth, strokeWidth, radius } =
-    useContext(LineMapContext);
+  const { currentStopY, lineWidth, strokeWidth, radius } = useContext(
+    LineMapContext
+  );
 
   return (
     <circle
@@ -387,8 +395,9 @@ const LineMapCurrentStop = (): JSX.Element => {
 };
 
 const LineMapOriginStop = (): JSX.Element => {
-  const { lineBottomY, lineWidth, strokeWidth, radius } =
-    useContext(LineMapContext);
+  const { lineBottomY, lineWidth, strokeWidth, radius } = useContext(
+    LineMapContext
+  );
 
   return (
     <circle

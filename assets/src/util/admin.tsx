@@ -6,9 +6,8 @@ const gatherSelectOptions = (rows, columnId) => {
 
 const doSubmit = async (path, data) => {
   try {
-    const csrfToken = document.head.querySelector(
-      "[name~=csrf-token][content]"
-    ).content;
+    const csrfToken = document.head.querySelector("[name~=csrf-token][content]")
+      .content;
     const result = await fetch(path, {
       method: "POST",
       headers: {

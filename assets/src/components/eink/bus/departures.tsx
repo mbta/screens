@@ -13,10 +13,14 @@ const buildDepartureGroups = (departures) => {
       groups.push([departure]);
     } else {
       const currentGroup = groups[groups.length - 1];
-      const { route: groupRoute, destination: groupDestination } =
-        currentGroup[0];
-      const { route: departureRoute, destination: departureDestination } =
-        departure;
+      const {
+        route: groupRoute,
+        destination: groupDestination,
+      } = currentGroup[0];
+      const {
+        route: departureRoute,
+        destination: departureDestination,
+      } = departure;
       if (
         groupRoute === departureRoute &&
         groupDestination === departureDestination
