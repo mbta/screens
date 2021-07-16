@@ -107,7 +107,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
         _ -> route_id
       end
     end)
-    |> Enum.take(2)
     |> Enum.map(&RoutePill.serialize_for_alert/1)
   end
 
@@ -406,12 +405,15 @@ defmodule Screens.V2.WidgetInstance.Alert do
         %{stop: ^home_stop, route: route}, uninformed ->
           {:cont, MapSet.delete(uninformed, route)}
 
-        %{stop: stop, route: route}, uninformed ->
+        %{stop: stop, route: route}, uninformed when is_binary(stop) ->
           if stop in downstream_stop_set do
             {:cont, MapSet.delete(uninformed, route)}
           else
             {:cont, uninformed}
           end
+
+        %{stop: nil, route: route}, uninformed ->
+          {:cont, MapSet.delete(uninformed, route)}
 
         _ie, uninformed ->
           {:cont, uninformed}
