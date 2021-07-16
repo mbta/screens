@@ -7,7 +7,7 @@ import RoutePill, {
 } from "Components/v2/departures/route_pill";
 
 interface Props {
-  route_pills: [] | [Pill] | [Pill, Pill];
+  route_pills: Pill[];
   icon: AlertIcon;
   header: string;
   body: string;
@@ -28,7 +28,7 @@ const Alert = ({
       <AlertCard>
         <div className="alert-widget__content">
           <div className="alert-widget__content__route-pills">
-            {routePills.map((pill) => (
+            {routePills.slice(0, 2).map((pill) => (
               <RoutePill {...pill} key={routePillKey(pill)} />
             ))}
           </div>
