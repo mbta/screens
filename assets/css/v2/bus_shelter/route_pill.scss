@@ -39,6 +39,7 @@
 }
 
 .route-pill__text {
+  position: absolute;
   width: 100%;
   text-align: center;
   font-family: "neue-haas-grotesk-text";
@@ -62,6 +63,7 @@
 }
 
 .route-pill__icon {
+  position: absolute;
   width: 100%;
   text-align: center;
 }
@@ -72,6 +74,7 @@
 }
 
 .route-pill__slashed-text {
+  position: absolute;
   width: 100%;
   text-align: center;
   font-family: "neue-haas-grotesk-text";
@@ -86,4 +89,26 @@
 
 .route-pill__slashed-part-2 {
   display: inline-block;
+}
+
+.alert-widget__content__route-pills--small {
+  .route-pill {
+    width: 104px;
+    height: 64px;
+  }
+
+  .route-pill__text {
+    font-size: 42px;
+    line-height: 64px;
+  }
+
+  .route-pill__icon-image {
+    height: 52px;
+    margin-top: 6px;
+  }
+
+  .route-pill__slashed-text {
+    font-size: 28px;
+    line-height: 64px;
+  }
 }

@@ -172,12 +172,55 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     end
 
     test "serializes an alert widget", %{widget: widget} do
+      widget = put_informed_entities(widget, [ie(route: "a"), ie(route: "b"), ie(route: "c")])
+
       expected_json_map = %{
         route_pills: [
           %{type: :text, text: "a", color: :yellow},
           %{type: :text, text: "b", color: :yellow},
           %{type: :text, text: "c", color: :yellow}
         ],
+        icon: :x,
+        header: "Stop Closed",
+        body: "Stop is closed.",
+        url: "mbta.com/alerts"
+      }
+
+      assert expected_json_map == AlertWidget.serialize(widget)
+    end
+
+    test "converts non-route informed entities to route pills as expected", %{widget: widget} do
+      # widget has informed_entities: [%{stop: "5", route: nil, route_type: nil}]
+
+      expected_json_map = %{
+        route_pills: [
+          %{type: :text, text: "a", color: :yellow},
+          %{type: :text, text: "b", color: :yellow},
+          %{type: :text, text: "c", color: :yellow}
+        ],
+        icon: :x,
+        header: "Stop Closed",
+        body: "Stop is closed.",
+        url: "mbta.com/alerts"
+      }
+
+      assert expected_json_map == AlertWidget.serialize(widget)
+    end
+
+    test "collapses more than 3 route pills to a single mode pill", %{widget: widget} do
+      widget =
+        widget
+        |> put_routes_at_stop([
+          %{route_id: "a", active?: true},
+          %{route_id: "b", active?: false},
+          %{route_id: "c", active?: true},
+          %{route_id: "d", active?: true},
+          %{route_id: "e", active?: true}
+        ])
+        |> put_informed_entities([ie(route: "a"), ie(route: "b"), ie(route: "c"), ie(route: "d")])
+
+      expected_json_map = %{
+        route_pills: [%{type: :icon, icon: :bus, color: :yellow}],
         icon: :x,
         header: "Stop Closed",
         body: "Stop is closed.",

@@ -96,18 +96,26 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   defp serialize_route_pills(t) do
-    t
-    |> informed_routes()
-    |> Enum.to_list()
-    |> Enum.sort_by(fn route_id ->
-      case Integer.parse(route_id) do
-        # Bus route (including SL_, CT_)
-        {route_number, ""} -> route_number
-        # Non-bus route
-        _ -> route_id
-      end
-    end)
-    |> Enum.map(&RoutePill.serialize_for_alert/1)
+    routes = informed_routes(t)
+
+    if MapSet.size(routes) <= 3 do
+      routes
+      |> Enum.to_list()
+      |> Enum.sort_by(fn route_id ->
+        case Integer.parse(route_id) do
+          # Bus route (including SL_, CT_)
+          {route_number, ""} -> route_number
+          # Non-bus route
+          _ -> route_id
+        end
+      end)
+      |> Enum.map(&RoutePill.serialize_route_for_alert/1)
+    else
+      t
+      |> route_type()
+      |> RoutePill.serialize_route_type_for_alert()
+      |> List.wrap()
+    end
   end
 
   for {e, header} <- @effect_headers do
@@ -405,12 +413,15 @@ defmodule Screens.V2.WidgetInstance.Alert do
         %{stop: ^home_stop, route: route}, uninformed ->
           {:cont, MapSet.delete(uninformed, route)}
 
-        %{stop: stop, route: route}, uninformed ->
+        %{stop: stop, route: route}, uninformed when is_binary(stop) ->
           if stop in downstream_stop_set do
             {:cont, MapSet.delete(uninformed, route)}
           else
             {:cont, uninformed}
           end
+
+        %{stop: nil, route: route}, uninformed ->
+          {:cont, MapSet.delete(uninformed, route)}
 
         _ie, uninformed ->
           {:cont, uninformed}

@@ -14,7 +14,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   @type icon_pill :: %{
           type: :icon,
-          icon: :rail | :boat,
+          icon: icon(),
           color: color()
         }
 
@@ -24,6 +24,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
           part2: String.t(),
           color: color()
         }
+
+  @type icon :: :bus | :light_rail | :rail | :boat
 
   @type color :: :red | :orange | :green | :blue | :purple | :yellow | :teal
 
@@ -79,8 +81,25 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     Map.merge(route, %{color: get_color_for_route(route_id, route_type)})
   end
 
-  @spec serialize_for_alert(Route.id()) :: t()
-  def serialize_for_alert(route_id) do
+  @spec serialize_route_type_for_alert(RouteType.t()) :: t()
+  def serialize_route_type_for_alert(:light_rail) do
+    %{type: :icon, icon: :light_rail, color: :green}
+  end
+
+  def serialize_route_type_for_alert(:rail) do
+    %{type: :icon, icon: :rail, color: :purple}
+  end
+
+  def serialize_route_type_for_alert(:bus) do
+    %{type: :icon, icon: :bus, color: :yellow}
+  end
+
+  def serialize_route_type_for_alert(:ferry) do
+    %{type: :icon, icon: :boat, color: :teal}
+  end
+
+  @spec serialize_route_for_alert(Route.id()) :: t()
+  def serialize_route_for_alert(route_id) do
     route = do_serialize(route_id, %{gl_branch: true, cr_abbrev: true})
 
     Map.merge(route, %{color: get_color_for_route(route_id)})

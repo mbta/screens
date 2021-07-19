@@ -57,8 +57,8 @@ const Header = ({ stopName, routeId, currentTimeString }): JSX.Element => {
     }
   });
 
-  const environmentName =
-    document.getElementById("app").dataset.environmentName;
+  const environmentName = document.getElementById("app").dataset
+    .environmentName;
 
   return (
     <div className="header">
