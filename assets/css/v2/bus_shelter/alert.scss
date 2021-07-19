@@ -20,11 +20,21 @@
 }
 
 .alert-widget__content__route-pills {
+  height: 74px;
+
   & .route-pill {
     display: inline-block;
+  }
 
+  &--regular .route-pill {
     &:not(:first-child) {
       margin-left: 16px;
+    }
+  }
+
+  &--small .route-pill {
+    &:not(:first-child) {
+      margin-left: 10px;
     }
   }
 }
