@@ -206,6 +206,29 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
       assert expected_json_map == AlertWidget.serialize(widget)
     end
+
+    test "collapses more than 3 route pills to a single mode pill", %{widget: widget} do
+      widget =
+        widget
+        |> put_routes_at_stop([
+          %{route_id: "a", active?: true},
+          %{route_id: "b", active?: false},
+          %{route_id: "c", active?: true},
+          %{route_id: "d", active?: true},
+          %{route_id: "e", active?: true}
+        ])
+        |> put_informed_entities([ie(route: "a"), ie(route: "b"), ie(route: "c"), ie(route: "d")])
+
+      expected_json_map = %{
+        route_pills: [%{type: :icon, icon: :bus, color: :yellow}],
+        icon: :x,
+        header: "Stop Closed",
+        body: "Stop is closed.",
+        url: "mbta.com/alerts"
+      }
+
+      assert expected_json_map == AlertWidget.serialize(widget)
+    end
   end
 
   describe "slot_names/1 for bus apps (Bus Shelter and Bus E-Ink)" do

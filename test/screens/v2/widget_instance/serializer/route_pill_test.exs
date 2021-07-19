@@ -55,33 +55,33 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
     end
   end
 
-  describe "serialize_for_alert/1" do
+  describe "serialize_route_for_alert/1" do
     test "Returns RL for Red Line" do
-      assert %{type: :text, text: "RL", color: :red} == serialize_for_alert("Red")
+      assert %{type: :text, text: "RL", color: :red} == serialize_route_for_alert("Red")
     end
 
     test "Includes branch name for Green Line" do
-      assert %{type: :text, text: "GL·B", color: :green} == serialize_for_alert("Green-B")
+      assert %{type: :text, text: "GL·B", color: :green} == serialize_route_for_alert("Green-B")
     end
 
     test "Abbreviates Commuter Rail route names" do
-      assert %{type: :text, text: "LWL", color: :purple} == serialize_for_alert("CR-Lowell")
+      assert %{type: :text, text: "LWL", color: :purple} == serialize_route_for_alert("CR-Lowell")
     end
 
     test "Returns boat icon for ferry routes" do
-      assert %{type: :icon, icon: :boat, color: :teal} == serialize_for_alert("Boat-F4")
+      assert %{type: :icon, icon: :boat, color: :teal} == serialize_route_for_alert("Boat-F4")
     end
 
     test "Handles Silver Line routes" do
-      assert %{type: :text, text: "SL1", color: :silver} == serialize_for_alert("741")
+      assert %{type: :text, text: "SL1", color: :silver} == serialize_route_for_alert("741")
     end
 
     test "Handles cross-town routes" do
-      assert %{type: :text, text: "CT2", color: :yellow} == serialize_for_alert("747")
+      assert %{type: :text, text: "CT2", color: :yellow} == serialize_route_for_alert("747")
     end
 
     test "Uses route ID for normal bus routes" do
-      assert %{type: :text, text: "44", color: :yellow} == serialize_for_alert("44")
+      assert %{type: :text, text: "44", color: :yellow} == serialize_route_for_alert("44")
     end
   end
 end
