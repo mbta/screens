@@ -59,10 +59,7 @@ const IconRoutePill = ({ icon }: IconPill): JSX.Element => {
   );
 };
 
-const SlashedRoutePill = ({
-  part1,
-  part2,
-}: SlashedPill): JSX.Element => {
+const SlashedRoutePill = ({ part1, part2 }: SlashedPill): JSX.Element => {
   return (
     <div className="route-pill__slashed-text">
       <div className="route-pill__slashed-part-1">{part1}/</div>

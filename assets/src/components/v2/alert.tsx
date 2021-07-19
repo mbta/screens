@@ -27,7 +27,12 @@ const Alert = ({
     <div className="alert-widget">
       <AlertCard>
         <div className="alert-widget__content">
-          <div className={classWithModifier("alert-widget__content__route-pills", routePills.length > 2 ? "small" : "regular")}>
+          <div
+            className={classWithModifier(
+              "alert-widget__content__route-pills",
+              routePills.length > 2 ? "small" : "regular"
+            )}
+          >
             {routePills.map((pill) => (
               <RoutePill {...pill} key={routePillKey(pill)} />
             ))}
