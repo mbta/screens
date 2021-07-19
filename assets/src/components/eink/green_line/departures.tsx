@@ -98,7 +98,7 @@ interface DepartureListProps {
 
 const DeparturesListPsa = ({ psaUrl }): JSX.Element => {
   return (
-    <div>
+    <div className="departures-list-psa">
       <img src={psaUrl} />
     </div>
   );
