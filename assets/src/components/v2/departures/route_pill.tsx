@@ -27,7 +27,7 @@ interface SlashedPill extends BasePill {
 
 type Color = "red" | "orange" | "green" | "blue" | "purple" | "yellow" | "teal";
 
-type PillIcon = "rail" | "boat";
+type PillIcon = "bus" | "light_rail" | "rail" | "boat";
 
 const TextRoutePill = ({ color, text, outline }: TextPill): JSX.Element => {
   const modifiers: string[] = [color];
@@ -36,32 +36,25 @@ const TextRoutePill = ({ color, text, outline }: TextPill): JSX.Element => {
   }
 
   return (
-    <div className={classWithModifiers("route-pill", modifiers)}>
-      <div className={classWithModifiers("route-pill__text", modifiers)}>
-        {text}
-      </div>
+    <div className={classWithModifiers("route-pill__text", modifiers)}>
+      {text}
     </div>
   );
 };
 
 const pathForIcon = {
+  bus: "/bus-black.svg",
+  light_rail: "/light-rail.svg",
   rail: "/commuter-rail.svg",
   boat: "/ferry.svg",
 };
 
-const IconRoutePill = ({ icon, color, outline }: IconPill): JSX.Element => {
-  const modifiers: string[] = [color];
-  if (outline) {
-    modifiers.push("outline");
-  }
-
+const IconRoutePill = ({ icon }: IconPill): JSX.Element => {
   const imgSrc = imagePath(pathForIcon[icon]);
 
   return (
-    <div className={classWithModifiers("route-pill", modifiers)}>
-      <div className="route-pill__icon">
-        <img className="route-pill__icon-image" src={imgSrc} />
-      </div>
+    <div className="route-pill__icon">
+      <img className="route-pill__icon-image" src={imgSrc} />
     </div>
   );
 };
@@ -69,35 +62,38 @@ const IconRoutePill = ({ icon, color, outline }: IconPill): JSX.Element => {
 const SlashedRoutePill = ({
   part1,
   part2,
-  color,
-  outline,
 }: SlashedPill): JSX.Element => {
-  const modifiers: string[] = [color];
-  if (outline) {
-    modifiers.push("outline");
-  }
-
   return (
-    <div className={classWithModifiers("route-pill", modifiers)}>
-      <div className="route-pill__slashed-text">
-        <div className="route-pill__slashed-part-1">{part1}/</div>
-        <div className="route-pill__slashed-part-2">{part2}</div>
-      </div>
+    <div className="route-pill__slashed-text">
+      <div className="route-pill__slashed-part-1">{part1}/</div>
+      <div className="route-pill__slashed-part-2">{part2}</div>
     </div>
   );
 };
 
 const RoutePill = (pill: Pill): JSX.Element | null => {
+  const modifiers: string[] = [pill.color];
+  if (pill.outline) {
+    modifiers.push("outline");
+  }
+
+  let innerContent = null;
   switch (pill.type) {
     case "text":
-      return <TextRoutePill {...pill} />;
+      innerContent = <TextRoutePill {...pill} />;
+      break;
     case "icon":
-      return <IconRoutePill {...pill} />;
+      innerContent = <IconRoutePill {...pill} />;
+      break;
     case "slashed":
-      return <SlashedRoutePill {...pill} />;
-    default:
-      return null;
+      innerContent = <SlashedRoutePill {...pill} />;
   }
+
+  return (
+    <div className={classWithModifiers("route-pill", modifiers)}>
+      {innerContent}
+    </div>
+  );
 };
 
 const routePillKey = (pill: Pill): string => {
