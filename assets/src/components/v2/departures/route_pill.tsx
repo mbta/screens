@@ -44,7 +44,7 @@ const TextRoutePill = ({ color, text, outline }: TextPill): JSX.Element => {
 
 const pathForIcon = {
   bus: "/bus-black.svg",
-  light_rail: "/light-rail.svg",
+  light_rail: "/subway-white.svg",
   rail: "/commuter-rail.svg",
   boat: "/ferry.svg",
 };
