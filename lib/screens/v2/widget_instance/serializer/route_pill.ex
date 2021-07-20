@@ -62,17 +62,17 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     route =
       cond do
         not is_nil(track_number) ->
-          %{type: :text, text: "TR#{track_number}"}
+          text("TR#{track_number}")
 
         route_type == :rail ->
-          %{type: :icon, icon: :rail}
+          icon(:rail)
 
         route_type == :ferry ->
-          %{type: :icon, icon: :boat}
+          icon(:boat)
 
         String.contains?(route_name, "/") ->
           [part1, part2] = String.split(route_name, "/")
-          %{type: :slashed, part1: part1, part2: part2}
+          slashed(part1, part2)
 
         true ->
           do_serialize(route_id, %{route_name: route_name})
@@ -83,19 +83,19 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   @spec serialize_route_type_for_alert(RouteType.t()) :: t()
   def serialize_route_type_for_alert(:light_rail) do
-    %{type: :icon, icon: :light_rail, color: :green}
+    Map.merge(icon(:light_rail), %{color: :green})
   end
 
   def serialize_route_type_for_alert(:rail) do
-    %{type: :icon, icon: :rail, color: :purple}
+    Map.merge(icon(:rail), %{color: :purple})
   end
 
   def serialize_route_type_for_alert(:bus) do
-    %{type: :icon, icon: :bus, color: :yellow}
+    Map.merge(icon(:bus), %{color: :yellow})
   end
 
   def serialize_route_type_for_alert(:ferry) do
-    %{type: :icon, icon: :boat, color: :teal}
+    Map.merge(icon(:boat), %{color: :teal})
   end
 
   @spec serialize_route_for_alert(Route.id()) :: t()
@@ -114,47 +114,36 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   @spec do_serialize(Route.id(), serialize_opts()) :: map()
   defp do_serialize(route_id, opts)
 
-  defp do_serialize("Red", _), do: %{type: :text, text: "RL"}
-  defp do_serialize("Mattapan", _), do: %{type: :text, text: "M"}
-  defp do_serialize("Orange", _), do: %{type: :text, text: "OL"}
+  defp do_serialize("Red", _), do: text("RL")
+  defp do_serialize("Mattapan", _), do: text("M")
+  defp do_serialize("Orange", _), do: text("OL")
 
-  defp do_serialize("Green-" <> branch, %{gl_branch: true}) do
-    %{type: :text, text: "GL·" <> branch}
-  end
+  defp do_serialize("Green-" <> branch, %{gl_branch: true}), do: text("GL·" <> branch)
 
-  defp do_serialize("Green-" <> _branch, _) do
-    %{type: :text, text: "GL"}
-  end
+  defp do_serialize("Green-" <> _branch, _), do: text("GL")
 
-  defp do_serialize("Blue", _), do: %{type: :text, text: "BL"}
+  defp do_serialize("Blue", _), do: text("BL")
 
   for {line, abbrev} <- @cr_line_abbreviations do
-    defp do_serialize("CR-" <> unquote(line), %{cr_abbrev: true}) do
-      %{type: :text, text: unquote(abbrev)}
-    end
+    defp do_serialize("CR-" <> unquote(line), %{cr_abbrev: true}), do: text(unquote(abbrev))
   end
 
-  defp do_serialize("CR-" <> _line, _) do
-    %{type: :icon, icon: :rail}
-  end
+  defp do_serialize("CR-" <> _line, _), do: icon(:rail)
 
-  defp do_serialize("Boat-" <> _line, _) do
-    %{type: :icon, icon: :boat}
-  end
+  defp do_serialize("Boat-" <> _line, _), do: icon(:boat)
 
   for {route_id, name} <- @special_bus_route_names do
-    defp do_serialize(unquote(route_id), _) do
-      %{type: :text, text: unquote(name)}
-    end
+    defp do_serialize(unquote(route_id), _), do: text(unquote(name))
   end
 
   defp do_serialize(route_id, opts) do
     route_name = Map.get(opts, :route_name, "")
 
-    %{
-      type: :text,
-      text: if(route_name != "", do: route_name, else: route_id)
-    }
+    if route_name != "" do
+      text(route_name)
+    else
+      text(route_id)
+    end
   end
 
   defp get_color_for_route(route_id, route_type \\ nil)
@@ -174,4 +163,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   defp get_color_for_route(_, :rail), do: :purple
   defp get_color_for_route(_, :ferry), do: :teal
   defp get_color_for_route(_, _), do: :yellow
+
+  defp text(content), do: %{type: :text, text: content}
+  defp icon(name), do: %{type: :icon, icon: name}
+  defp slashed(part1, part2), do: %{type: :slashed, part1: part1, part2: part2}
 end
