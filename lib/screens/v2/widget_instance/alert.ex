@@ -23,7 +23,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
           now: DateTime.t()
         }
 
-  @base_priority 2
+  @flex_zone_priority 2
+  @alert_base_priority 2
 
   # Keep these in descending order of priority--highest priority (lowest integer value) first
   @relevant_effects ~w[shuttle stop_closure suspension station_closure detour stop_moved snow_route elevator_closure]a
@@ -64,7 +65,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @spec priority(t()) :: nonempty_list(pos_integer()) | WidgetInstance.no_render()
   def priority(t) do
     tiebreakers = [
-      @base_priority,
+      @flex_zone_priority,
+      @alert_base_priority,
       tiebreaker_primary_timeframe(t),
       tiebreaker_location(t),
       tiebreaker_secondary_timeframe(t),
@@ -73,7 +75,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
     cond do
       Enum.any?(tiebreakers, &(&1 == :no_render)) -> :no_render
-      slot_names(t) == [:full_screen] -> [1]
+      slot_names(t) == [:full_body] -> [1]
       true -> tiebreakers
     end
   end
@@ -135,29 +137,32 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   def slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}} = t) do
-    if bus_app_full_screen_alert?(t), do: [:full_screen], else: [:medium_left, :medium_right]
+    if bus_app_takeover_alert?(t), do: [:full_body], else: [:medium_left, :medium_right]
   end
 
   def slot_names(%__MODULE__{screen: %Screen{app_id: :bus_eink_v2}} = t) do
-    if bus_app_full_screen_alert?(t), do: [:full_screen], else: [:medium_flex]
+    if bus_app_takeover_alert?(t), do: [:full_body], else: [:medium_flex]
   end
 
   def slot_names(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
-    if gl_app_full_screen_alert?(t), do: [:full_screen], else: [:medium_flex]
+    if gl_app_takeover_alert?(t), do: [:full_body], else: [:medium_flex]
   end
 
-  defp bus_app_full_screen_alert?(t) do
+  defp bus_app_takeover_alert?(t) do
     active?(t) and effect(t) in [:stop_closure, :stop_move, :suspension, :detour] and
       informs_all_active_routes_at_home_stop?(t)
   end
 
-  defp gl_app_full_screen_alert?(t) do
+  defp gl_app_takeover_alert?(t) do
     active?(t) and effect(t) in [:station_closure, :suspension, :shuttle] and
       location(t) == :inside
   end
 
-  def widget_type(_t) do
-    :alert
+  def widget_type(t) do
+    case slot_names(t) do
+      [:full_body] -> :full_body_alert
+      _ -> :alert
+    end
   end
 
   def valid_candidate?(t) do
