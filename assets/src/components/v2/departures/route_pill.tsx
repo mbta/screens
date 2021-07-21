@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ComponentType } from "react";
 
 import { imagePath, classWithModifiers } from "Util/util";
 
@@ -29,7 +29,7 @@ type Color = "red" | "orange" | "green" | "blue" | "purple" | "yellow" | "teal";
 
 type PillIcon = "bus" | "light_rail" | "rail" | "boat";
 
-const TextRoutePill = ({ color, text, outline }: TextPill): JSX.Element => {
+const TextRoutePill: ComponentType<TextPill> = ({ color, text, outline }) => {
   const modifiers: string[] = [color];
   if (outline) {
     modifiers.push("outline");
@@ -49,7 +49,7 @@ const pathForIcon = {
   boat: "/ferry.svg",
 };
 
-const IconRoutePill = ({ icon }: IconPill): JSX.Element => {
+const IconRoutePill: ComponentType<IconPill> = ({ icon }) => {
   const imgSrc = imagePath(pathForIcon[icon]);
 
   return (
@@ -59,7 +59,7 @@ const IconRoutePill = ({ icon }: IconPill): JSX.Element => {
   );
 };
 
-const SlashedRoutePill = ({ part1, part2 }: SlashedPill): JSX.Element => {
+const SlashedRoutePill: ComponentType<SlashedPill> = ({ part1, part2 }) => {
   return (
     <div className="route-pill__slashed-text">
       <div className="route-pill__slashed-part-1">{part1}/</div>
@@ -68,7 +68,7 @@ const SlashedRoutePill = ({ part1, part2 }: SlashedPill): JSX.Element => {
   );
 };
 
-const RoutePill = (pill: Pill): JSX.Element | null => {
+const RoutePill: ComponentType<Pill> = (pill) => {
   const modifiers: string[] = [pill.color];
   if (pill.outline) {
     modifiers.push("outline");
