@@ -1,21 +1,13 @@
-.screen-normal {
+.body-takeover {
   width: 1080px;
   margin-left: auto;
   margin-right: auto;
   position: relative;
 }
 
-.screen-normal__header {
+.body-takeover__full-body {
   position: absolute;
   top: 0px;
-  left: 0px;
-  width: 1080px;
-  height: 280px;
-}
-
-.screen-normal__body {
-  position: absolute;
-  top: 280px;
   left: 0px;
   width: 1080px;
   height: 1640px;

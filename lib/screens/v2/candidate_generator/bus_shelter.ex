@@ -15,21 +15,27 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   def screen_template do
     {:screen,
      %{
-       normal: [
+       screen_normal: [
          :header,
-         :main_content,
-         Builder.with_paging(
-           {:flex_zone,
-            %{
-              one_large: [:large],
-              one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right],
-              two_medium: [:medium_left, :medium_right]
-            }},
-           3
-         ),
-         :footer
+         {:body,
+          %{
+            body_normal: [
+              :main_content,
+              Builder.with_paging(
+                {:flex_zone,
+                 %{
+                   one_large: [:large],
+                   one_medium_two_small: [:medium_left, :small_upper_right, :small_lower_right],
+                   two_medium: [:medium_left, :medium_right]
+                 }},
+                3
+              ),
+              :footer
+            ],
+            body_takeover: [:full_body]
+          }}
        ],
-       takeover: [:full_screen]
+       screen_takeover: [:full_screen]
      }}
     |> Builder.build_template()
   end

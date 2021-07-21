@@ -11,6 +11,9 @@ import { MappingContext } from "Components/v2/widget";
 import NormalScreen from "Components/v2/bus_shelter/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
 
+import NormalBody from "Components/v2/bus_shelter/normal_body";
+import TakeoverBody from "Components/v2/bus_shelter/takeover_body";
+
 import OneLarge from "Components/v2/bus_shelter/flex/one_large";
 import OneMediumTwoSmall from "Components/v2/bus_shelter/flex/one_medium_two_small";
 import TwoMedium from "Components/v2/bus_shelter/flex/two_medium";
@@ -24,8 +27,10 @@ import SubwayStatus from "Components/v2/subway_status";
 import Alert from "Components/v2/alert";
 
 const TYPE_TO_COMPONENT = {
-  normal: NormalScreen,
-  takeover: TakeoverScreen,
+  screen_normal: NormalScreen,
+  screen_takeover: TakeoverScreen,
+  body_normal: NormalBody,
+  body_takeover: TakeoverBody,
   one_large: OneLarge,
   two_medium: TwoMedium,
   one_medium_two_small: OneMediumTwoSmall,
