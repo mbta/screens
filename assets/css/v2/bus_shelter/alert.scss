@@ -1,98 +1,198 @@
-.alert-widget {
+.alert-widget--flex-zone {
   // Slot dimensions are 480x580, but this leaves space for the drop-shadow.
   width: 520px;
   height: 620px;
-}
 
-.alert-widget__card {
-  // Move the card so that it fits in the medium flex zone slot and only its drop-shadow extends outside.
-  transform: translateX(-20px) translateY(-10px);
-}
-
-.alert-widget__content {
-  position: relative;
-  box-sizing: border-box;
-  width: 480px;
-  height: 580px;
-  padding-top: 24px;
-  padding-left: 32px;
-  padding-right: 32px;
-}
-
-.alert-widget__content__route-pills {
-  height: 74px;
-
-  & .route-pill {
-    display: inline-block;
+  .alert-widget__card {
+    // Move the card so that it fits in the medium flex zone slot and only its drop-shadow extends outside.
+    transform: translateX(-20px) translateY(-10px);
   }
 
-  &--regular .route-pill {
-    &:not(:first-child) {
-      margin-left: 16px;
+  .alert-widget__content {
+    position: relative;
+    box-sizing: border-box;
+    width: 480px;
+    height: 580px;
+    padding-top: 24px;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .alert-widget__content__route-pills {
+    height: 74px;
+
+    & .route-pill {
+      display: inline-block;
+    }
+
+    &--regular .route-pill {
+      &:not(:first-child) {
+        margin-left: 16px;
+      }
+    }
+
+    &--small .route-pill {
+      &:not(:first-child) {
+        margin-left: 10px;
+      }
     }
   }
 
-  &--small .route-pill {
-    &:not(:first-child) {
-      margin-left: 10px;
+  .alert-widget__content__icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .alert-widget__content__header-text {
+    height: 48px;
+    color: rgb(23, 31, 38);
+    font-size: 48px;
+    font-family: Inter, sans-serif;
+    font-weight: 800;
+    letter-spacing: 0px;
+    line-height: 48px;
+    margin-top: 32px;
+  }
+
+  .alert-widget__content__body-text {
+    color: rgb(23, 31, 38);
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    letter-spacing: 0px;
+    margin-top: 24px;
+
+    &--regular {
+      font-size: 32px;
+      line-height: 40px;
+    }
+
+    &--small {
+      height: 280px;
+      font-size: 24px;
+      line-height: 32px;
+      overflow: hidden;
     }
   }
-}
 
-.alert-widget__content__icon {
-  position: absolute;
-  top: 0;
-  right: 0;
-}
+  .alert-widget__content__cta {
+    background: rgb(115, 115, 115);
+    height: 80px;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    border-radius: 0 0 16px 16px;
+  }
 
-.alert-widget__content__header-text {
-  height: 48px;
-  color: rgb(23, 31, 38);
-  font-size: 48px;
-  font-family: Inter, sans-serif;
-  font-weight: 800;
-  letter-spacing: 0px;
-  line-height: 48px;
-  margin-top: 32px;
-}
+  .alert-widget__content__cta__icon {
+    display: none;
+  }
 
-.alert-widget__content__body-text {
-  color: rgb(23, 31, 38);
-  font-family: Inter, sans-serif;
-  font-weight: 500;
-  letter-spacing: 0px;
-  margin-top: 24px;
-
-  &--regular {
-    font-size: 32px;
+  .alert-widget__content__cta__url {
+    padding-top: 18px;
+    padding-right: 24px;
+    color: white;
+    font-size: 40px;
+    font-family: Inter, sans-serif;
+    font-weight: 800;
+    text-align: right;
     line-height: 40px;
   }
+}
 
-  &--small {
-    height: 280px;
-    font-size: 24px;
-    line-height: 32px;
-    overflow: hidden;
+.alert-widget--full-body {
+  width: 1080px;
+  height: 1640px;
+  background: #ffdd00;
+
+  .alert-widget__card {
+    transform: translateY(8px);
   }
-}
 
-.alert-widget__content__cta {
-  background: rgb(115, 115, 115);
-  height: 80px;
-  width: 100%;
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  border-radius: 0 0 16px 16px;
-}
+  .alert-widget__content {
+    position: relative;
+    box-sizing: border-box;
+    width: 1000px;
+    height: 1568px;
+    padding-top: 64px;
+    padding-left: 64px;
+    padding-right: 64px;
+  }
 
-.alert-widget__content__cta__url {
-  padding-top: 18px;
-  padding-right: 24px;
-  color: rgb(255, 255, 255);
-  font-size: 40px;
-  font-family: Inter, sans-serif;
-  font-weight: 800;
-  text-align: right;
-  line-height: 40px;
+  .alert-widget__content__route-pills {
+    display: none;
+  }
+
+  .alert-widget__content__icon {
+    height: 256px;
+  }
+
+  .alert-widget__content__icon-image {
+    height: 256px;
+  }
+
+  .alert-widget__content__header-text {
+    height: 120px;
+    color: white;
+    font-size: 120px;
+    font-family: Inter, sans-serif;
+    font-weight: 800;
+    letter-spacing: 0px;
+    line-height: 120px;
+    margin-top: 64px;
+  }
+
+  .alert-widget__content__body-text {
+    color: white;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    letter-spacing: 0px;
+    margin-top: 64px;
+
+    &--regular {
+      font-size: 56px;
+      line-height: 72px;
+    }
+
+    &--small {
+      height: 744px;
+      font-size: 42px;
+      line-height: 58px;
+      overflow: hidden;
+    }
+  }
+
+  .alert-widget__content__cta {
+    background: rgb(46, 62, 77);
+    height: 192px;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    //
+    border-radius: 0 0 32px 32px;
+  }
+
+  .alert-widget__content__cta__icon {
+    height: 128px;
+    position: absolute;
+    top: 32px;
+    left: 64px;
+  }
+
+  .alert-widget__content__cta__icon__image {
+    height: 128px;
+  }
+
+  .alert-widget__content__cta__url {
+    padding-top: 32px;
+    padding-right: 64px;
+    color: white;
+    font-size: 64px;
+    font-family: Inter, sans-serif;
+    font-weight: 800;
+    text-align: right;
+    line-height: 128px;
+  }
 }

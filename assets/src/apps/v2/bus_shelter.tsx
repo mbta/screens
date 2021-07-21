@@ -24,7 +24,7 @@ import NormalHeader from "Components/v2/lcd/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import SubwayStatus from "Components/v2/subway_status";
 
-import Alert from "Components/v2/alert";
+import { FlexZoneAlert, FullBodyAlert } from "Components/v2/alert";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -39,7 +39,8 @@ const TYPE_TO_COMPONENT = {
   normal_header: NormalHeader,
   departures: NormalDepartures,
   subway_status: SubwayStatus,
-  alert: Alert,
+  alert: FlexZoneAlert,
+  full_body_alert: FullBodyAlert,
 };
 
 const App = (): JSX.Element => {
