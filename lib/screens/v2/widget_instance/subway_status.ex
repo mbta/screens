@@ -216,7 +216,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   }
 
   defimpl Screens.V2.WidgetInstance do
-    def priority(_instance), do: [1]
+    def priority(_instance), do: [2, 1]
 
     def serialize(%SubwayStatus{subway_alerts: alerts}) do
       grouped_alerts = SubwayStatus.get_relevant_alerts_by_route(alerts)

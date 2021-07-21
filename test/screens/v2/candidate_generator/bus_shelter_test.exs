@@ -26,42 +26,48 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
     test "returns template" do
       assert {:screen,
               %{
-                normal: [
+                screen_normal: [
                   :header,
-                  :main_content,
-                  {{0, :flex_zone},
+                  {:body,
                    %{
-                     one_large: [{0, :large}],
-                     one_medium_two_small: [
-                       {0, :medium_left},
-                       {0, :small_upper_right},
-                       {0, :small_lower_right}
+                     body_normal: [
+                       :main_content,
+                       {{0, :flex_zone},
+                        %{
+                          one_large: [{0, :large}],
+                          one_medium_two_small: [
+                            {0, :medium_left},
+                            {0, :small_upper_right},
+                            {0, :small_lower_right}
+                          ],
+                          two_medium: [{0, :medium_left}, {0, :medium_right}]
+                        }},
+                       {{1, :flex_zone},
+                        %{
+                          one_large: [{1, :large}],
+                          one_medium_two_small: [
+                            {1, :medium_left},
+                            {1, :small_upper_right},
+                            {1, :small_lower_right}
+                          ],
+                          two_medium: [{1, :medium_left}, {1, :medium_right}]
+                        }},
+                       {{2, :flex_zone},
+                        %{
+                          one_large: [{2, :large}],
+                          one_medium_two_small: [
+                            {2, :medium_left},
+                            {2, :small_upper_right},
+                            {2, :small_lower_right}
+                          ],
+                          two_medium: [{2, :medium_left}, {2, :medium_right}]
+                        }},
+                       :footer
                      ],
-                     two_medium: [{0, :medium_left}, {0, :medium_right}]
-                   }},
-                  {{1, :flex_zone},
-                   %{
-                     one_large: [{1, :large}],
-                     one_medium_two_small: [
-                       {1, :medium_left},
-                       {1, :small_upper_right},
-                       {1, :small_lower_right}
-                     ],
-                     two_medium: [{1, :medium_left}, {1, :medium_right}]
-                   }},
-                  {{2, :flex_zone},
-                   %{
-                     one_large: [{2, :large}],
-                     one_medium_two_small: [
-                       {2, :medium_left},
-                       {2, :small_upper_right},
-                       {2, :small_lower_right}
-                     ],
-                     two_medium: [{2, :medium_left}, {2, :medium_right}]
-                   }},
-                  :footer
+                     body_takeover: [:full_body]
+                   }}
                 ],
-                takeover: [:full_screen]
+                screen_takeover: [:full_screen]
               }} == BusShelter.screen_template()
     end
   end

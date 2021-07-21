@@ -6,9 +6,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   alias Screens.V2.WidgetInstance.SubwayStatus
 
   describe "priority/1" do
-    test "returns 1" do
+    test "returns high priority for a flex zone widget" do
       instance = %SubwayStatus{subway_alerts: []}
-      assert [1] == WidgetInstance.priority(instance)
+      assert [2, 1] == WidgetInstance.priority(instance)
     end
   end
 

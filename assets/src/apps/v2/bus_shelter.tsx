@@ -11,6 +11,9 @@ import { MappingContext } from "Components/v2/widget";
 import NormalScreen from "Components/v2/bus_shelter/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
 
+import NormalBody from "Components/v2/bus_shelter/normal_body";
+import TakeoverBody from "Components/v2/bus_shelter/takeover_body";
+
 import OneLarge from "Components/v2/bus_shelter/flex/one_large";
 import OneMediumTwoSmall from "Components/v2/bus_shelter/flex/one_medium_two_small";
 import TwoMedium from "Components/v2/bus_shelter/flex/two_medium";
@@ -21,11 +24,13 @@ import NormalHeader from "Components/v2/lcd/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import SubwayStatus from "Components/v2/subway_status";
 
-import Alert from "Components/v2/alert";
+import { FlexZoneAlert, FullBodyAlert } from "Components/v2/alert";
 
 const TYPE_TO_COMPONENT = {
-  normal: NormalScreen,
-  takeover: TakeoverScreen,
+  screen_normal: NormalScreen,
+  screen_takeover: TakeoverScreen,
+  body_normal: NormalBody,
+  body_takeover: TakeoverBody,
   one_large: OneLarge,
   two_medium: TwoMedium,
   one_medium_two_small: OneMediumTwoSmall,
@@ -34,7 +39,8 @@ const TYPE_TO_COMPONENT = {
   normal_header: NormalHeader,
   departures: NormalDepartures,
   subway_status: SubwayStatus,
-  alert: Alert,
+  alert: FlexZoneAlert,
+  full_body_alert: FullBodyAlert,
 };
 
 const App = (): JSX.Element => {

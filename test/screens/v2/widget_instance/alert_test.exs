@@ -135,7 +135,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   describe "priority/1" do
     setup @valid_alert_setup_group
 
-    test "returns [1] when slot_names(widget) == [:full_screen]", %{widget: widget} do
+    test "returns [1] when slot_names(widget) == [:full_body]", %{widget: widget} do
       assert [1] == AlertWidget.priority(widget)
     end
 
@@ -252,7 +252,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       {false, false, true} => [:medium_left, :medium_right],
       {true, false, true} => [:medium_left, :medium_right],
       {false, true, true} => [:medium_left, :medium_right],
-      {true, true, true} => [:full_screen]
+      {true, true, true} => [:full_body]
     }
 
     for {{set_active?, set_high_impact_effect?, set_informs_all_active_routes?},
@@ -339,7 +339,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       {false, false, true} => [:medium_flex],
       {true, false, true} => [:medium_flex],
       {false, true, true} => [:medium_flex],
-      {true, true, true} => [:full_screen]
+      {true, true, true} => [:full_body]
     }
 
     for {{set_active?, set_high_impact_effect?, set_location_inside?}, expected_slot_names} <-
