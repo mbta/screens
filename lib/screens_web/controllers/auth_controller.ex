@@ -1,4 +1,6 @@
 defmodule ScreensWeb.AuthController do
+  require Logger
+
   use ScreensWeb, :controller
   plug Ueberauth
 
@@ -28,9 +30,19 @@ defmodule ScreensWeb.AuthController do
   end
 
   def callback(
-        %{assigns: %{ueberauth_failure: %Ueberauth.Failure{}}} = conn,
+        %{assigns: %{ueberauth_failure: %Ueberauth.Failure{errors: errors}}} = conn,
         _params
       ) do
+    error_messages =
+      errors
+      |> Enum.flat_map(fn
+        %Ueberauth.Failure.Error{message: message} when is_binary(message) -> [message]
+        _ -> []
+      end)
+      |> Enum.join(", ")
+
+    _ = Logger.info("[ueberauth_failure] messages=\"#{error_messages}\"")
+
     send_resp(conn, 401, "unauthenticated")
   end
 end
