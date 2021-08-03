@@ -8,6 +8,10 @@
   &:not(:first-child) {
     margin-top: 16px;
   }
+
+  .departure-time {
+    width: 151px;
+  }
 }
 
 .departure-time {
