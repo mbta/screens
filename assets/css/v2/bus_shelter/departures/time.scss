@@ -9,7 +9,7 @@
     margin-top: 16px;
   }
 
-  .departure-time {
+  .departure-time:not(.departure-time--timestamp) {
     width: 151px;
   }
 }
