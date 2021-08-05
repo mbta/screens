@@ -31,7 +31,9 @@ const DepartureTime = ({ type, ...data }) => {
     inner = <TimestampDepartureTime {...data} />;
   }
 
-  return <div className={classWithModifier("departure-time", type)}>{inner}</div>;
+  return (
+    <div className={classWithModifier("departure-time", type)}>{inner}</div>
+  );
 };
 
 export default DepartureTime;
