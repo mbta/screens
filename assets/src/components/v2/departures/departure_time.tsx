@@ -1,4 +1,5 @@
 import React from "react";
+import { classWithModifier } from "Util/util";
 
 const TextDepartureTime = ({ text }) => {
   return <div className="departure-time__text">{text}</div>;
@@ -30,7 +31,9 @@ const DepartureTime = ({ type, ...data }) => {
     inner = <TimestampDepartureTime {...data} />;
   }
 
-  return <div className="departure-time">{inner}</div>;
+  return (
+    <div className={classWithModifier("departure-time", type)}>{inner}</div>
+  );
 };
 
 export default DepartureTime;

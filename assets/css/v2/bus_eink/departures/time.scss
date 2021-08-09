@@ -8,6 +8,10 @@
   &:not(:first-child) {
     margin-top: 32px;
   }
+
+  .departure-time {
+    width: 264px;
+  }
 }
 
 .departure-time {
@@ -28,7 +32,7 @@
   display: inline-block;
   margin-left: 3px;
 
-  font-size: 120px;
+  font-size: 96px;
   line-height: 120px;
   font-weight: 800;
 }

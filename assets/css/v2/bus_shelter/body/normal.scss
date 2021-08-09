@@ -1,24 +1,30 @@
+// body total height: 1648px
+
 .body-normal__main-content {
   position: absolute;
   top: 0px;
   left: 0px;
   width: 1080px;
-  height: 824px;
+  height: 832px;
+  box-shadow: 0px 10px 20px 0px rgba(23, 31, 38, 0.25);
+  z-index: 1;
 }
 
 .body-normal__flex-zone {
   position: absolute;
-  top: 824px;
+  top: 832px;
   left: 0px;
   width: 1080px;
   height: 660px;
-  background-color: #d9d6d0;
+  background-color: rgb(179, 177, 175);
 }
 
 .body-normal__footer {
   position: absolute;
-  top: 1468px;
+  top: 1492px;
   left: 0px;
   width: 1080px;
-  height: 172px;
+  height: 156px;
+  box-shadow: 0px 0px 20px 0px rgba(23, 31, 38, 0.25);
+  z-index: 1;
 }
