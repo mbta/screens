@@ -24,7 +24,7 @@ import NormalHeader from "Components/v2/lcd/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import SubwayStatus from "Components/v2/subway_status";
 
-import EvergreenContent from "components/v2/evergreen_content";
+import EvergreenContent from "Components/v2/evergreen_content";
 
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/alert";
 

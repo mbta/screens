@@ -6,10 +6,10 @@ const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg"];
 const VIDEO_EXTENSIONS = ["mp4", "ogg"];
 
 interface Props {
-  assetUrl: string;
+  asset_url: string;
 }
 
-const EvergreenContent: ComponentType<Props> = ({ assetUrl }) => {
+const EvergreenContent: ComponentType<Props> = ({ asset_url: assetUrl }) => {
   const parts = assetUrl.split(".");
   const extension = parts[parts.length - 1].toLowerCase();
 
@@ -21,7 +21,11 @@ const EvergreenContent: ComponentType<Props> = ({ assetUrl }) => {
   return null;
 };
 
-const Image: ComponentType<Props> = ({ assetUrl }) => {
+interface ProperProps {
+  assetUrl: string;
+}
+
+const Image: ComponentType<ProperProps> = ({ assetUrl }) => {
   return (
     <div className="evergreen-content-image__container">
       <img className="evergreen-content-image__image" src={assetUrl} />
@@ -29,7 +33,7 @@ const Image: ComponentType<Props> = ({ assetUrl }) => {
   );
 };
 
-const Video: ComponentType<Props> = ({ assetUrl }) => {
+const Video: ComponentType<ProperProps> = ({ assetUrl }) => {
   return (
     <div className="evergreen-content-video">
       <LoopingVideoPlayer src={assetUrl} isPlaying />
