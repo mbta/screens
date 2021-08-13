@@ -1,4 +1,4 @@
-defmodule Screens.Config.V2.EvergreenContentInstance do
+defmodule Screens.Config.V2.EvergreenContentItem do
   @moduledoc false
 
   alias Screens.V2.WidgetInstance
