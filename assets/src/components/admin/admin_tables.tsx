@@ -481,6 +481,14 @@ const v2Columns = [
     disableFilters: true,
     FormCell: FormTextarea,
   },
+  {
+    Header: "Evergreen Content",
+    accessor: buildAppParamAccessor("evergreen_content"),
+    mutator: buildAppParamMutator("evergreen_content"),
+    Cell: EditableTextarea,
+    disableFilters: true,
+    FormCell: FormTextarea,
+  },
 ];
 
 const alertsColumn = {
