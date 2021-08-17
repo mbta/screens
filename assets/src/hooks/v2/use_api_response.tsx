@@ -1,29 +1,65 @@
+import useInterval from "Hooks/use_interval";
 import { useEffect, useState } from "react";
 
-const useApiResponse = ({ id, refreshMs }) => {
-  const [apiResponse, setApiResponse] = useState(null);
+const MINUTE_IN_MS = 60_000;
+
+interface UseApiResponseArgs {
+  id: string;
+  refreshMs?: number;
+  failureModeElapsedMs?: number;
+}
+
+const useApiResponse = ({
+  id,
+  refreshMs,
+  failureModeElapsedMs = MINUTE_IN_MS,
+}) => {
+  const [apiResponse, setApiResponse] = useState<object | null>(null);
+  const [failureStart, setFailureStart] = useState<number | null>(null);
   const lastRefresh = document.getElementById("app").dataset.lastRefresh;
   const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}`;
 
   const fetchData = async () => {
-    const result = await fetch(apiPath);
-    const json = await result.json();
-    setApiResponse(json);
+    try {
+      const result = await fetch(apiPath);
+      const json = await result.json();
+
+      if (json.force_reload) {
+        window.location.reload();
+      }
+
+      setApiResponse(json);
+      setFailureStart(null);
+    } catch (err) {
+      const now = Date.now();
+
+      if (failureStart == null) {
+        setFailureStart(now);
+        setApiResponse((state) => state);
+      } else {
+        const elapsedMs = now - failureStart;
+
+        if (elapsedMs < failureModeElapsedMs) {
+          setApiResponse((state) => state);
+        }
+        if (elapsedMs >= failureModeElapsedMs) {
+          setApiResponse({ success: false });
+        }
+      }
+    }
   };
 
+  // Perform initial data fetch once on component mount
   useEffect(() => {
     fetchData();
-
-    if (refreshMs != null) {
-      const interval = setInterval(() => {
-        fetchData();
-      }, refreshMs);
-
-      return () => clearInterval(interval);
-    }
-
-    return () => undefined;
   }, []);
+
+  // Schedule subsequent data fetches, if we need to
+  if (refreshMs != null) {
+    useInterval(() => {
+      fetchData();
+    }, refreshMs);
+  }
 
   return apiResponse;
 };
