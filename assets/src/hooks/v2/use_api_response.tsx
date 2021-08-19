@@ -5,18 +5,17 @@ const MINUTE_IN_MS = 60_000;
 
 interface UseApiResponseArgs {
   id: string;
-  refreshMs?: number;
   failureModeElapsedMs?: number;
 }
 
 const useApiResponse = ({
   id,
-  refreshMs,
   failureModeElapsedMs = MINUTE_IN_MS,
-}) => {
+}: UseApiResponseArgs) => {
   const [apiResponse, setApiResponse] = useState<object | null>(null);
   const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
-  const lastRefresh = document.getElementById("app").dataset.lastRefresh;
+  const { lastRefresh, refreshRate } = document.getElementById("app").dataset;
+  const refreshMs = parseInt(refreshRate, 10) * 1000;
   const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}`;
 
   const fetchData = async () => {
