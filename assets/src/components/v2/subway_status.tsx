@@ -1,11 +1,11 @@
 import React, { useState, useLayoutEffect, useRef } from "react";
 
 import RoutePill from "Components/v2/departures/route_pill";
-import { classWithModifier, imagePath } from "Util/util";
+import { classWithModifier } from "Util/util";
 
-const GreenLineBIcon = (
+const GreenLineBIcon = () => (
   <svg
-    className="subway-status-row__route-icon"
+    className="subway-status-branch-row__route-icon"
     viewBox="0 0 140 139"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -18,9 +18,9 @@ const GreenLineBIcon = (
   </svg>
 );
 
-const GreenLineCIcon = (
+const GreenLineCIcon = () => (
   <svg
-    className="subway-status-row__route-icon"
+    className="subway-status-branch-row__route-icon"
     viewBox="0 0 140 140"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -40,9 +40,9 @@ const GreenLineCIcon = (
   </svg>
 );
 
-const GreenLineDIcon = (
+const GreenLineDIcon = () => (
   <svg
-    className="subway-status-row__route-icon"
+    className="subway-status-branch-row__route-icon"
     viewBox="0 0 139 139"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -55,9 +55,9 @@ const GreenLineDIcon = (
   </svg>
 );
 
-const GreenLineEIcon = (
+const GreenLineEIcon = () => (
   <svg
-    className="subway-status-row__route-icon"
+    className="subway-status-branch-row__route-icon"
     viewBox="0 0 140 140"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -144,13 +144,10 @@ const SubwayStatusGreenLineMultipleAlertsRow = ({ statuses }) => {
         {statuses.map(([routes, status]) => (
           <div className="subway-status-branch-row__group" key={status}>
             <div className="subway-status-branch-row__group-routes">
-              {routes.map((route) => (
-                <img
-                  className="subway-status-branch-row__route-icon"
-                  src={iconForRoute(route)}
-                  key={route}
-                />
-              ))}
+              {routes.map((route) => {
+                const IconComponent = iconForRoute(route);
+                return <IconComponent key={route} />;
+              })}
             </div>
             <div
               className={classWithModifier(
