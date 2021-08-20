@@ -15,12 +15,13 @@ const useApiResponse = ({
   failureModeElapsedMs = MINUTE_IN_MS,
 }) => {
   const [apiResponse, setApiResponse] = useState<object | null>(null);
-  const [failureStart, setFailureStart] = useState<number | null>(null);
+  const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
   const lastRefresh = document.getElementById("app").dataset.lastRefresh;
   const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}`;
 
   const fetchData = async () => {
     try {
+      const now = Date.now();
       const result = await fetch(apiPath);
       const json = await result.json();
 
@@ -29,22 +30,15 @@ const useApiResponse = ({
       }
 
       setApiResponse(json);
-      setFailureStart(null);
+      setLastSuccess(now);
     } catch (err) {
-      const now = Date.now();
+      const elapsedMs = Date.now() - lastSuccess;
 
-      if (failureStart == null) {
-        setFailureStart(now);
+      if (elapsedMs < failureModeElapsedMs) {
         setApiResponse((state) => state);
-      } else {
-        const elapsedMs = now - failureStart;
-
-        if (elapsedMs < failureModeElapsedMs) {
-          setApiResponse((state) => state);
-        }
-        if (elapsedMs >= failureModeElapsedMs) {
-          setApiResponse({ success: false });
-        }
+      }
+      if (elapsedMs >= failureModeElapsedMs) {
+        setApiResponse({ success: false });
       }
     }
   };

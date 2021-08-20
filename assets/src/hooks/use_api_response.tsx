@@ -22,13 +22,14 @@ const useApiResponse = ({
   failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs) => {
   const [apiResponse, setApiResponse] = useState<object | null>(null);
-  const [failureStart, setFailureStart] = useState<number | null>(null);
+  const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
   const lastRefresh = document.getElementById("app").dataset.lastRefresh;
 
   const apiPath = buildApiPath({ id, datetime, rotationIndex, lastRefresh });
 
   const fetchData = async () => {
     try {
+      const now = Date.now();
       const result = await fetch(apiPath);
       const json = await result.json();
 
@@ -37,22 +38,15 @@ const useApiResponse = ({
       }
       if (withWatchdog) updateSolariWatchdog();
       setApiResponse(json);
-      setFailureStart(null);
+      setLastSuccess(now);
     } catch (err) {
-      const now = Date.now();
+      const elapsedMs = Date.now() - lastSuccess;
 
-      if (failureStart == null) {
-        setFailureStart(now);
+      if (elapsedMs < failureModeElapsedMs) {
         setApiResponse((state) => state);
-      } else {
-        const elapsedMs = now - failureStart;
-
-        if (elapsedMs < failureModeElapsedMs) {
-          setApiResponse((state) => state);
-        }
-        if (elapsedMs >= failureModeElapsedMs) {
-          setApiResponse({ success: false });
-        }
+      }
+      if (elapsedMs >= failureModeElapsedMs) {
+        setApiResponse({ success: false });
       }
     }
   };
