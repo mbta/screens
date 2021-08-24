@@ -4,7 +4,7 @@ defmodule Screens.V2.ScreenData do
   require Logger
 
   alias Screens.Util
-  alias Screens.V2.CandidateGenerator
+  alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
 
@@ -12,7 +12,6 @@ defmodule Screens.V2.ScreenData do
 
   @type screen_id :: String.t()
   @type config :: Screens.Config.Screen.t()
-  @type candidate_generator :: module()
   @type candidate_instances :: list(WidgetInstance.t())
   @type selected_instances_map :: %{Template.slot_id() => WidgetInstance.t()}
   @type non_paged_selected_instances_map :: %{Template.non_paged_slot_id() => WidgetInstance.t()}
@@ -22,27 +21,11 @@ defmodule Screens.V2.ScreenData do
             {page_index :: non_neg_integer(), num_pages :: pos_integer()}
         }
 
-  @app_id_to_candidate_generator %{
-    bus_eink_v2: CandidateGenerator.BusEink,
-    bus_shelter_v2: CandidateGenerator.BusShelter,
-    gl_eink_v2: CandidateGenerator.GlEink,
-    solari_v2: CandidateGenerator.Solari,
-    solari_large_v2: CandidateGenerator.SolariLarge
-  }
-
-  @app_id_to_refresh_rate %{
-    bus_eink_v2: 30,
-    bus_shelter_v2: 15,
-    gl_eink_v2: 30,
-    solari_v2: 15,
-    solari_large_v2: 15
-  }
-
   @spec by_screen_id(screen_id()) :: serializable_map()
   def by_screen_id(screen_id) do
     config = get_config(screen_id)
-    candidate_generator = get_candidate_generator(config)
-    refresh_rate = get_refresh_rate(config)
+    candidate_generator = Parameters.get_candidate_generator(config)
+    refresh_rate = Parameters.get_refresh_rate(config)
     screen_template = candidate_generator.screen_template()
 
     candidate_instances =
@@ -59,16 +42,6 @@ defmodule Screens.V2.ScreenData do
   @spec get_config(screen_id()) :: config()
   def get_config(screen_id) do
     Screens.Config.State.screen(screen_id)
-  end
-
-  @spec get_candidate_generator(config()) :: candidate_generator()
-  def get_candidate_generator(%Screens.Config.Screen{app_id: app_id}) do
-    Map.get(@app_id_to_candidate_generator, app_id)
-  end
-
-  @spec get_refresh_rate(config()) :: pos_integer() | nil
-  def get_refresh_rate(%Screens.Config.Screen{app_id: app_id}) do
-    Map.get(@app_id_to_refresh_rate, app_id)
   end
 
   @spec pick_instances(Template.template(), candidate_instances()) ::

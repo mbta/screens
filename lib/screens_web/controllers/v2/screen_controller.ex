@@ -2,6 +2,7 @@ defmodule ScreensWeb.V2.ScreenController do
   use ScreensWeb, :controller
 
   alias Screens.Config.{Screen, State}
+  alias Screens.V2.ScreenData.Parameters
 
   @default_app_id :bus_eink
 
@@ -38,6 +39,7 @@ defmodule ScreensWeb.V2.ScreenController do
       %Screen{app_id: app_id} ->
         conn
         |> assign(:app_id, app_id)
+        |> assign(:refresh_rate, Parameters.get_refresh_rate(app_id))
         |> put_view(ScreensWeb.V2.ScreenView)
         |> put_layout({ScreensWeb.V2.LayoutView, "app.html"})
         |> render("index.html")

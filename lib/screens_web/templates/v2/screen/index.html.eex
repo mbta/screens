@@ -1,1 +1,6 @@
-<div id="app" data-last-refresh="<%= @last_refresh %>" data-environment-name="<%= @environment_name %>"></div>
+<div
+  id="app"
+  data-last-refresh="<%= @last_refresh %>"
+  data-environment-name="<%= @environment_name %>"
+  data-refresh-rate="<%= @refresh_rate %>"
+></div>
