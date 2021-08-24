@@ -4,9 +4,9 @@ defmodule Screens.V2.ScreenData do
   require Logger
 
   alias Screens.Util
+  alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.ScreenData.Parameters
 
   import Screens.V2.Template.Guards
 
