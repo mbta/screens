@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { isDup } from "Util/util";
+import useInterval from "Hooks/use_interval";
+
+const MINUTE_IN_MS = 60_000;
 
 interface UseApiResponseArgs {
   id: string;
-  datetime?: string | null;
+  datetime?: string;
   rotationIndex?: number;
   refreshMs?: number;
   withWatchdog?: boolean;
+  failureModeElapsedMs?: number;
 }
 
 const useApiResponse = ({
@@ -15,14 +19,17 @@ const useApiResponse = ({
   rotationIndex,
   refreshMs,
   withWatchdog = false,
+  failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs) => {
   const [apiResponse, setApiResponse] = useState<object | null>(null);
+  const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
   const lastRefresh = document.getElementById("app").dataset.lastRefresh;
 
   const apiPath = buildApiPath({ id, datetime, rotationIndex, lastRefresh });
 
   const fetchData = async () => {
     try {
+      const now = Date.now();
       const result = await fetch(apiPath);
       const json = await result.json();
 
@@ -31,31 +38,37 @@ const useApiResponse = ({
       }
       if (withWatchdog) updateSolariWatchdog();
       setApiResponse(json);
+      setLastSuccess(now);
     } catch (err) {
-      setApiResponse({ success: false });
+      const elapsedMs = Date.now() - lastSuccess;
+
+      if (elapsedMs < failureModeElapsedMs) {
+        setApiResponse((state) => state);
+      }
+      if (elapsedMs >= failureModeElapsedMs) {
+        setApiResponse({ success: false });
+      }
     }
   };
 
+  // Perform initial data fetch once on component mount
   useEffect(() => {
     fetchData();
-
-    if (refreshMs != null) {
-      const interval = setInterval(() => {
-        fetchData();
-      }, refreshMs);
-
-      return () => clearInterval(interval);
-    }
-
-    return () => undefined;
   }, []);
+
+  // Schedule subsequent data fetches, if we need to
+  if (refreshMs != null) {
+    useInterval(() => {
+      fetchData();
+    }, refreshMs);
+  }
 
   return apiResponse;
 };
 
 interface BuildApiPathArgs {
   id: string;
-  datetime?: string | null;
+  datetime?: string;
   rotationIndex?: number;
   lastRefresh?: string;
 }
