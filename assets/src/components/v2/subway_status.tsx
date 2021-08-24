@@ -1,11 +1,15 @@
-import React, { useState, useLayoutEffect, useRef } from "react";
+import React, { useState, useLayoutEffect, useRef, ComponentType } from "react";
 
-import RoutePill from "Components/v2/departures/route_pill";
+import RoutePill, { Pill } from "Components/v2/departures/route_pill";
 import { classWithModifier } from "Util/util";
 
-const GreenLineBIcon = () => (
+interface IconProps {
+  className: string;
+}
+
+const GreenLineBIcon: ComponentType<IconProps> = ({ className }) => (
   <svg
-    className="subway-status-branch-row__route-icon"
+    className={className}
     viewBox="0 0 140 139"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -18,9 +22,9 @@ const GreenLineBIcon = () => (
   </svg>
 );
 
-const GreenLineCIcon = () => (
+const GreenLineCIcon: ComponentType<IconProps> = ({ className }) => (
   <svg
-    className="subway-status-branch-row__route-icon"
+    className={className}
     viewBox="0 0 140 140"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -40,9 +44,9 @@ const GreenLineCIcon = () => (
   </svg>
 );
 
-const GreenLineDIcon = () => (
+const GreenLineDIcon: ComponentType<IconProps> = ({ className }) => (
   <svg
-    className="subway-status-branch-row__route-icon"
+    className={className}
     viewBox="0 0 139 139"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -55,9 +59,9 @@ const GreenLineDIcon = () => (
   </svg>
 );
 
-const GreenLineEIcon = () => (
+const GreenLineEIcon: ComponentType<IconProps> = ({ className }) => (
   <svg
-    className="subway-status-branch-row__route-icon"
+    className={className}
     viewBox="0 0 140 140"
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
@@ -77,19 +81,45 @@ const GreenLineEIcon = () => (
   </svg>
 );
 
-const iconForRoute = (routeId) => {
-  return {
-    "Green-B": GreenLineBIcon,
-    "Green-C": GreenLineCIcon,
-    "Green-D": GreenLineDIcon,
-    "Green-E": GreenLineEIcon,
-  }[routeId];
+type IconRouteId = "Green-B" | "Green-C" | "Green-D" | "Green-E";
+
+interface IconForRouteProps {
+  className: string;
+  routeId: IconRouteId;
+}
+
+const routeIconMapping: Record<IconRouteId, ComponentType<IconProps>> = {
+  "Green-B": GreenLineBIcon,
+  "Green-C": GreenLineCIcon,
+  "Green-D": GreenLineDIcon,
+  "Green-E": GreenLineEIcon,
 };
 
-const SubwayStatusNormalRow = ({ route, status, location, branch }) => {
+const IconForRoute: ComponentType<IconForRouteProps> = ({
+  className,
+  routeId,
+}) => {
+  const IconComponent = routeIconMapping[routeId];
+
+  return <IconComponent className={className} />;
+};
+
+interface SubwayStatusNormalRowProps {
+  route: Pill;
+  status: string;
+  location?: { full: string; abbrev: string };
+  branch?: IconRouteId;
+}
+
+const SubwayStatusNormalRow: ComponentType<SubwayStatusNormalRowProps> = ({
+  route,
+  status,
+  location,
+  branch,
+}) => {
   const [abbreviate, setAbbreviate] = useState(false);
   const [dropTimes, setDropTimes] = useState(false);
-  const ref = useRef(null);
+  const ref = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
     if (ref.current) {
@@ -117,7 +147,12 @@ const SubwayStatusNormalRow = ({ route, status, location, branch }) => {
         <RoutePill {...route} />
       </div>
       {branch && (
-        <div className="subway-status-row__branch">{iconForRoute(branch)}</div>
+        <div className="subway-status-row__branch">
+          <IconForRoute
+            className="subway-status-row__route-icon"
+            routeId={branch}
+          />
+        </div>
       )}
       <div className="subway-status-row__status">{status}</div>
       {location && (
@@ -129,7 +164,13 @@ const SubwayStatusNormalRow = ({ route, status, location, branch }) => {
   );
 };
 
-const SubwayStatusGreenLineMultipleAlertsRow = ({ statuses }) => {
+interface GlMultipleProps {
+  statuses: [IconRouteId[], string][];
+}
+
+const SubwayStatusGreenLineMultipleAlertsRow: ComponentType<GlMultipleProps> = ({
+  statuses,
+}) => {
   const includesStopClosure = statuses.some(([_, status]) =>
     status.toLowerCase().startsWith("bypassing")
   );
@@ -144,10 +185,13 @@ const SubwayStatusGreenLineMultipleAlertsRow = ({ statuses }) => {
         {statuses.map(([routes, status]) => (
           <div className="subway-status-branch-row__group" key={status}>
             <div className="subway-status-branch-row__group-routes">
-              {routes.map((route) => {
-                const IconComponent = iconForRoute(route);
-                return <IconComponent key={route} />;
-              })}
+              {routes.map((route) => (
+                <IconForRoute
+                  className="subway-status-branch-row__route-icon"
+                  routeId={route}
+                  key={route}
+                />
+              ))}
             </div>
             <div
               className={classWithModifier(
@@ -164,17 +208,33 @@ const SubwayStatusGreenLineMultipleAlertsRow = ({ statuses }) => {
   );
 };
 
-const SubwayStatusGreenLineRow = ({ type, ...data }) => {
-  if (type === "single") {
-    return <SubwayStatusNormalRow {...data} />;
-  } else if (type === "multiple") {
-    return <SubwayStatusGreenLineMultipleAlertsRow {...data} />;
+type GlRowProps =
+  | (SubwayStatusNormalRowProps & { type: "single" })
+  | (GlMultipleProps & { type: "multiple" });
+
+const SubwayStatusGreenLineRow: ComponentType<GlRowProps> = (props) => {
+  if (props.type === "single") {
+    return <SubwayStatusNormalRow {...props} />;
+  } else if (props.type === "multiple") {
+    return <SubwayStatusGreenLineMultipleAlertsRow {...props} />;
   }
 
   return null;
 };
 
-const SubwayStatusBody = ({ blue, green, orange, red }) => {
+interface SubwayStatusProps {
+  blue: SubwayStatusNormalRowProps;
+  green: GlRowProps;
+  orange: SubwayStatusNormalRowProps;
+  red: SubwayStatusNormalRowProps;
+}
+
+const SubwayStatusBody: ComponentType<SubwayStatusProps> = ({
+  blue,
+  green,
+  orange,
+  red,
+}) => {
   return (
     <div className="subway-status-body">
       <SubwayStatusNormalRow {...blue} />
@@ -193,7 +253,7 @@ const SubwayStatusFooter = () => {
   );
 };
 
-const SubwayStatus = (props) => {
+const SubwayStatus: ComponentType<SubwayStatusProps> = (props) => {
   return (
     <div className="subway-status">
       <SubwayStatusBody {...props} />
