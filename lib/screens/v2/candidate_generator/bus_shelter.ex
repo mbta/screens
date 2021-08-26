@@ -93,22 +93,26 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   defp evergreen_content_instances(config) do
     %Screen{app_params: %BusShelter{evergreen_content: evergreen_content}} = config
 
-    Enum.map(evergreen_content, &evergreen_content_instance/1)
+    Enum.map(evergreen_content, &evergreen_content_instance(&1, config))
   end
 
-  defp evergreen_content_instance(%EvergreenContentItem{
-         slot_names: slot_names,
-         asset_path: asset_path,
-         priority: priority
-       }) do
+  defp evergreen_content_instance(
+         %EvergreenContentItem{
+           slot_names: slot_names,
+           asset_path: asset_path,
+           priority: priority
+         },
+         config
+       ) do
     %EvergreenContent{
+      screen: config,
       slot_names: slot_names,
-      asset_url: evergreen_asset_s3_url(asset_path),
+      asset_url: s3_asset_url(asset_path),
       priority: priority
     }
   end
 
-  defp evergreen_asset_s3_url(asset_path) do
+  defp s3_asset_url(asset_path) do
     env = Application.get_env(:screens, :environment_name, "screens-prod")
     "https://mbta-screens.s3.amazonaws.com/#{env}/#{asset_path}"
   end

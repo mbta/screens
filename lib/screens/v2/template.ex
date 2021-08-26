@@ -104,7 +104,7 @@ defmodule Screens.V2.Template do
     Enum.flat_map(layout_list, &flatten_layout/1)
   end
 
-  @spec position_widget_instances(layout(), map(), map()) :: map()
+  @spec position_widget_instances(layout(), map(), map()) :: map() | nil
   def position_widget_instances(layout, selected_widget_map, _paging_metadata)
       when is_atom(layout) do
     Map.get(selected_widget_map, layout)
