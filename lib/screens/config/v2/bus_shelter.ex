@@ -2,7 +2,7 @@ defmodule Screens.Config.V2.BusShelter do
   @moduledoc false
   # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 
-  alias Screens.Config.V2.{Alerts, Departures, EvergreenContentItem, Footer}
+  alias Screens.Config.V2.{Alerts, Departures, EvergreenContentItem, Footer, Survey}
   alias Screens.Config.V2.Header.CurrentStopId
 
   @type t :: %__MODULE__{
@@ -10,7 +10,8 @@ defmodule Screens.Config.V2.BusShelter do
           footer: Footer.t(),
           header: CurrentStopId.t(),
           alerts: Alerts.t(),
-          evergreen_content: list(EvergreenContentItem.t())
+          evergreen_content: list(EvergreenContentItem.t()),
+          survey: Survey.t()
         }
 
   @enforce_keys [:departures, :footer, :header, :alerts]
@@ -18,7 +19,8 @@ defmodule Screens.Config.V2.BusShelter do
             footer: nil,
             header: nil,
             alerts: nil,
-            evergreen_content: []
+            evergreen_content: [],
+            survey: Survey.from_json(:default)
 
   use Screens.Config.Struct,
     children: [
@@ -26,6 +28,7 @@ defmodule Screens.Config.V2.BusShelter do
       footer: Footer,
       header: CurrentStopId,
       alerts: Alerts,
-      evergreen_content: {:list, EvergreenContentItem}
+      evergreen_content: {:list, EvergreenContentItem},
+      survey: Survey
     ]
 end
