@@ -12,7 +12,6 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
     EvergreenContent,
     LinkFooter,
     NormalHeader,
-    Placeholder,
     SubwayStatus
   }
 
@@ -61,7 +60,6 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
       fn -> departures_instances_fn.(config) end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
-      fn -> placeholder_instances() end,
       fn -> subway_status_instances(config) end,
       fn -> evergreen_content_instances(config) end
     ]
@@ -124,16 +122,5 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
       _ ->
         nil
     end
-  end
-
-  defp placeholder_instances do
-    [
-      %Placeholder{color: :red, slot_names: [:main_content]},
-      %Placeholder{color: :green, slot_names: [:medium_left]},
-      %Placeholder{color: :blue, slot_names: [:small_upper_right]},
-      %Placeholder{color: :grey, slot_names: [:small_lower_right]},
-      %Placeholder{color: :green, slot_names: [:large]},
-      %Placeholder{color: :red, slot_names: [:large]}
-    ]
   end
 end
