@@ -500,6 +500,15 @@ const alertsColumn = {
   FormCell: FormTextarea,
 };
 
+const surveyColumn = {
+  Header: "Survey",
+  accessor: buildAppParamAccessor("survey"),
+  mutator: buildAppParamMutator("survey"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
 const BusEinkV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "bus_eink_v2";
@@ -542,7 +551,7 @@ const BusShelterV2ScreensTable = (): JSX.Element => {
 
   return (
     <AdminTable
-      columns={[...v2Columns, alertsColumn]}
+      columns={[...v2Columns, alertsColumn, surveyColumn]}
       dataFilter={dataFilter}
     />
   );

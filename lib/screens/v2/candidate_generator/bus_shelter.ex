@@ -2,18 +2,15 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusShelter, EvergreenContentItem, Footer}
+  alias Screens.Config.V2.{BusShelter, EvergreenContentItem, Footer, Survey}
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
 
-  alias Screens.V2.WidgetInstance.{
-    EvergreenContent,
-    LinkFooter,
-    NormalHeader,
-    SubwayStatus
-  }
+  alias Screens.V2.WidgetInstance.{EvergreenContent, LinkFooter, NormalHeader, SubwayStatus}
+
+  alias Screens.V2.WidgetInstance.Survey, as: SurveyInstance
 
   @behaviour CandidateGenerator
 
@@ -61,7 +58,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
       fn -> subway_status_instances(config) end,
-      fn -> evergreen_content_instances(config) end
+      fn -> evergreen_content_instances(config) end,
+      fn -> survey_instances(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
@@ -94,6 +92,27 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
     %Screen{app_params: %BusShelter{evergreen_content: evergreen_content}} = config
 
     Enum.map(evergreen_content, &evergreen_content_instance(&1, config))
+  end
+
+  defp survey_instances(config) do
+    %Screen{
+      app_params: %BusShelter{
+        survey: %Survey{
+          enabled: enabled,
+          medium_asset_path: medium_asset_path,
+          large_asset_path: large_asset_path
+        }
+      }
+    } = config
+
+    [
+      %SurveyInstance{
+        screen: config,
+        enabled?: enabled,
+        medium_asset_url: s3_asset_url(medium_asset_path),
+        large_asset_url: s3_asset_url(large_asset_path)
+      }
+    ]
   end
 
   defp evergreen_content_instance(
