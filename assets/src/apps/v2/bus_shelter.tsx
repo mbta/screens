@@ -25,6 +25,7 @@ import NormalDepartures from "Components/v2/departures/normal_departures";
 import SubwayStatus from "Components/v2/subway_status";
 
 import EvergreenContent from "Components/v2/evergreen_content";
+import Survey from "Components/v2/survey";
 
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/alert";
 
@@ -44,6 +45,7 @@ const TYPE_TO_COMPONENT = {
   alert: FlexZoneAlert,
   full_body_alert: FullBodyAlert,
   evergreen_content: EvergreenContent,
+  survey: Survey,
 };
 
 const App = (): JSX.Element => {
