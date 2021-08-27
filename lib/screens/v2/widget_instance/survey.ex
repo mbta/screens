@@ -26,7 +26,9 @@ defmodule Screens.V2.WidgetInstance.Survey do
     }
   end
 
-  def slot_names(%__MODULE__{}), do: [:large, :medium_left, :medium_right]
+  def slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}) do
+    [:large, :medium_left, :medium_right]
+  end
 
   def widget_type(%__MODULE__{}), do: :survey
 

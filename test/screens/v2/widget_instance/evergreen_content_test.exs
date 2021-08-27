@@ -2,11 +2,13 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.WidgetInstance
+  alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance.EvergreenContent
 
   setup do
     %{
       widget: %EvergreenContent{
+        screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
         slot_names: [:medium_left, :medium_right],
         asset_url: "https://mbta-screens.s3.amazonaws.com/screens-dev/videos/some-video.mp4",
         priority: [2, 3, 1]
