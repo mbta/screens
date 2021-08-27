@@ -1,8 +1,18 @@
 defmodule Screens.V2.WidgetInstance.EvergreenContent do
   @moduledoc false
 
-  @enforce_keys ~w[slot_names asset_url priority]a
+  alias Screens.Config.Screen
+  alias Screens.V2.WidgetInstance
+
+  @enforce_keys ~w[screen slot_names asset_url priority]a
   defstruct @enforce_keys
+
+  @type t :: %__MODULE__{
+          screen: Screen.t(),
+          slot_names: list(WidgetInstance.slot_id()),
+          asset_url: String.t(),
+          priority: WidgetInstance.priority()
+        }
 
   def priority(%__MODULE__{} = instance), do: instance.priority
 

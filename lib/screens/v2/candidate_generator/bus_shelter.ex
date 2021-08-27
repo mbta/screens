@@ -12,7 +12,6 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
     EvergreenContent,
     LinkFooter,
     NormalHeader,
-    Placeholder,
     SubwayStatus
   }
 
@@ -61,7 +60,6 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
       fn -> departures_instances_fn.(config) end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
-      fn -> placeholder_instances() end,
       fn -> subway_status_instances(config) end,
       fn -> evergreen_content_instances(config) end
     ]
@@ -95,22 +93,26 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   defp evergreen_content_instances(config) do
     %Screen{app_params: %BusShelter{evergreen_content: evergreen_content}} = config
 
-    Enum.map(evergreen_content, &evergreen_content_instance/1)
+    Enum.map(evergreen_content, &evergreen_content_instance(&1, config))
   end
 
-  defp evergreen_content_instance(%EvergreenContentItem{
-         slot_names: slot_names,
-         asset_path: asset_path,
-         priority: priority
-       }) do
+  defp evergreen_content_instance(
+         %EvergreenContentItem{
+           slot_names: slot_names,
+           asset_path: asset_path,
+           priority: priority
+         },
+         config
+       ) do
     %EvergreenContent{
+      screen: config,
       slot_names: slot_names,
-      asset_url: evergreen_asset_s3_url(asset_path),
+      asset_url: s3_asset_url(asset_path),
       priority: priority
     }
   end
 
-  defp evergreen_asset_s3_url(asset_path) do
+  defp s3_asset_url(asset_path) do
     env = Application.get_env(:screens, :environment_name, "screens-prod")
     "https://mbta-screens.s3.amazonaws.com/#{env}/#{asset_path}"
   end
@@ -124,16 +126,5 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
       _ ->
         nil
     end
-  end
-
-  defp placeholder_instances do
-    [
-      %Placeholder{color: :red, slot_names: [:main_content]},
-      %Placeholder{color: :green, slot_names: [:medium_left]},
-      %Placeholder{color: :blue, slot_names: [:small_upper_right]},
-      %Placeholder{color: :grey, slot_names: [:small_lower_right]},
-      %Placeholder{color: :green, slot_names: [:large]},
-      %Placeholder{color: :red, slot_names: [:large]}
-    ]
   end
 end
