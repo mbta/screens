@@ -22,8 +22,18 @@ defmodule Screens.V2.ScreenData do
             {page_index :: non_neg_integer(), num_pages :: pos_integer()}
         }
 
-  @spec by_screen_id(screen_id()) :: serializable_map()
-  def by_screen_id(screen_id) do
+  @outdated_response %{force_reload: true}
+
+  @spec by_screen_id(screen_id(), String.t()) :: serializable_map()
+  def by_screen_id(screen_id, last_refresh) do
+    if outdated?(screen_id, last_refresh) do
+      @outdated_response
+    else
+      fetch_data(screen_id)
+    end
+  end
+
+  def fetch_data(screen_id) do
     config = get_config(screen_id)
     _ = log_bus_shelter_request(config, screen_id)
     candidate_generator = Parameters.get_candidate_generator(config)
@@ -324,5 +334,15 @@ defmodule Screens.V2.ScreenData do
     instance
     |> WidgetInstance.serialize()
     |> Map.merge(%{type: WidgetInstance.widget_type(instance)})
+  end
+
+  defp outdated?(screen_id, client_refresh_timestamp) do
+    {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
+    refresh_if_loaded_before_time = Screens.Config.State.refresh_if_loaded_before(screen_id)
+
+    case refresh_if_loaded_before_time do
+      nil -> false
+      _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
+    end
   end
 end
