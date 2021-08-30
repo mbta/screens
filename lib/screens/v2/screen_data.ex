@@ -3,6 +3,7 @@ defmodule Screens.V2.ScreenData do
 
   require Logger
 
+  alias Screens.Config.Screen
   alias Screens.Util
   alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.Template
@@ -24,6 +25,7 @@ defmodule Screens.V2.ScreenData do
   @spec by_screen_id(screen_id()) :: serializable_map()
   def by_screen_id(screen_id) do
     config = get_config(screen_id)
+    _ = log_bus_shelter_request(config, screen_id)
     candidate_generator = Parameters.get_candidate_generator(config)
     refresh_rate = Parameters.get_refresh_rate(config)
     screen_template = candidate_generator.screen_template()
@@ -38,6 +40,12 @@ defmodule Screens.V2.ScreenData do
     |> resolve_paging(refresh_rate)
     |> serialize()
   end
+
+  defp log_bus_shelter_request(%Screen{app_id: :bus_shelter_v2}, screen_id) do
+    Logger.info("[bus shelter api request] screen_id=#{screen_id}")
+  end
+
+  defp log_bus_shelter_request(_, _), do: nil
 
   @spec get_config(screen_id()) :: config()
   def get_config(screen_id) do
