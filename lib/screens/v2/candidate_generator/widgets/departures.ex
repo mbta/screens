@@ -16,7 +16,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
       when app in [BusEink, BusShelter, GlEink, SolariLarge, Solari] do
     sections_data =
       sections
-      |> Task.async_stream(fetch_section_departures_fn)
+      |> Task.async_stream(fetch_section_departures_fn, timeout: :infinity)
       |> Enum.map(fn {:ok, data} -> data end)
 
     departures_instance =

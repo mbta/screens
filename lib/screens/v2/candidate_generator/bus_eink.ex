@@ -47,7 +47,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
       fn -> footer_instances(config) end,
       fn -> placeholder_instances() end
     ]
-    |> Task.async_stream(& &1.(), ordered: false)
+    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
