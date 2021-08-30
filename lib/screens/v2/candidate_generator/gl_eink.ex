@@ -49,7 +49,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
       fn -> placeholder_instances() end,
       fn -> line_map_instances(config) end
     ]
-    |> Task.async_stream(& &1.(), ordered: false)
+    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 

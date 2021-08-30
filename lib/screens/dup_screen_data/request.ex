@@ -54,7 +54,7 @@ defmodule Screens.DupScreenData.Request do
   def fetch_sections_data([_, _] = sections_with_alerts, current_time) do
     sections_data =
       sections_with_alerts
-      |> Task.async_stream(&fetch_section_data(&1, 2, current_time))
+      |> Task.async_stream(&fetch_section_data(&1, 2, current_time), timeout: :infinity)
       |> Enum.map(fn {:ok, data} -> data end)
 
     if Enum.any?(sections_data, fn data -> data == :error end) do

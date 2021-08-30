@@ -143,7 +143,7 @@ defmodule Screens.DupScreenData do
 
   defp fetch_and_interpret_alerts(%Dup.Departures{sections: sections}) do
     sections
-    |> Task.async_stream(&fetch_and_interpret_alert/1)
+    |> Task.async_stream(&fetch_and_interpret_alert/1, timeout: :infinity)
     |> Enum.map(fn {:ok, data} -> data end)
     |> Enum.into(%{})
   end
