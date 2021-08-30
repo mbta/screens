@@ -135,8 +135,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   describe "priority/1" do
     setup @valid_alert_setup_group
 
-    test "returns [1] when slot_names(widget) == [:full_body]", %{widget: widget} do
-      assert [1] == AlertWidget.priority(widget)
+    test "returns [1, 2] when slot_names(widget) == [:full_body]", %{widget: widget} do
+      assert [1, 2] == AlertWidget.priority(widget)
     end
 
     test "returns a list of tiebreaker values when widget should be considered for placement", %{

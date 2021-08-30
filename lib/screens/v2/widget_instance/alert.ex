@@ -23,8 +23,11 @@ defmodule Screens.V2.WidgetInstance.Alert do
           now: DateTime.t()
         }
 
-  @flex_zone_priority 2
+  @normal_content_priority 2
   @alert_base_priority 2
+  @flex_zone_alert_base_priority [@normal_content_priority, @alert_base_priority]
+
+  @automated_override_priority [1, 2]
 
   # Keep these in descending order of priority--highest priority (lowest integer value) first
   @relevant_effects ~w[shuttle stop_closure suspension station_closure detour stop_moved snow_route elevator_closure]a
@@ -64,18 +67,18 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @spec priority(t()) :: nonempty_list(pos_integer()) | WidgetInstance.no_render()
   def priority(t) do
-    tiebreakers = [
-      @flex_zone_priority,
-      @alert_base_priority,
-      tiebreaker_primary_timeframe(t),
-      tiebreaker_location(t),
-      tiebreaker_secondary_timeframe(t),
-      tiebreaker_effect(t)
-    ]
+    tiebreakers =
+      @flex_zone_alert_base_priority ++
+        [
+          tiebreaker_primary_timeframe(t),
+          tiebreaker_location(t),
+          tiebreaker_secondary_timeframe(t),
+          tiebreaker_effect(t)
+        ]
 
     cond do
       Enum.any?(tiebreakers, &(&1 == :no_render)) -> :no_render
-      slot_names(t) == [:full_body] -> [1]
+      slot_names(t) == [:full_body] -> @automated_override_priority
       true -> tiebreakers
     end
   end
