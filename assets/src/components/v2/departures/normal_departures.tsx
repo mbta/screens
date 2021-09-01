@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useLayoutEffect, useRef } from "react";
+import React, { useState, forwardRef, useLayoutEffect, useRef, useEffect } from "react";
 
 import NormalSection from "Components/v2/departures/normal_section";
 import NoticeSection from "Components/v2/departures/notice_section";
@@ -25,27 +25,19 @@ const NormalDeparturesRenderer = forwardRef(
 );
 
 const trimRows = (rows, n) => {
-  const trimmedRows = [];
-  let trimmedRowCount = 0;
-  let currentRowIndex = 0;
+  const { trimmed, count } = rows.reduce(({ count, trimmed }, row) => {
+    const trimmedRow = { ...row, times_with_crowding: row.times_with_crowding.slice(0, n - count) };
+    const addedCount = trimmedRow.times_with_crowding.length;
 
-  while (trimmedRowCount < n && currentRowIndex < rows.length) {
-    const currentRow = rows[currentRowIndex];
-    if (trimmedRowCount + currentRow.times_with_crowding.length < n) {
-      trimmedRows.push(currentRow);
-      trimmedRowCount += currentRow.times_with_crowding.length;
+    if (addedCount > 0) {
+      return { count: count + addedCount, trimmed: [...trimmed, trimmedRow] }
     } else {
-      const numTimes = n - trimmedRowCount;
-      const trimmedTimes = currentRow.times_with_crowding.slice(0, numTimes);
-      const trimmedRow = { ...currentRow, times_with_crowding: trimmedTimes };
-      trimmedRows.push(trimmedRow);
-      trimmedRowCount += trimmedRow.times_with_crowding.length;
+      return { count, trimmed }
     }
+  }, { count: 0, trimmed: [] });
 
-    currentRowIndex += 1;
-  }
-
-  return trimmedRows;
+  console.log("count:", count);
+  return trimmed;
 };
 
 const getInitialSectionSize = ({ type, ...data }) => {
@@ -93,6 +85,12 @@ const NormalDeparturesSizer = ({ sections, onDoneSizing }) => {
 
 const NormalDepartures = ({ sections }) => {
   const [sectionSizes, setSectionSizes] = useState([]);
+
+  // Reset state each time we receive new props,
+  // so that section sizes are recalculated from scratch.
+  useEffect(() => {
+    setSectionSizes([]);
+  }, [sections]);
 
   if (sectionSizes.length > 0) {
     return (

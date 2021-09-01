@@ -1,4 +1,4 @@
-import React, { forwardRef, useLayoutEffect, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { classWithModifiers, formatTimeString, imagePath } from "Util/util";
 
@@ -76,6 +76,12 @@ const NormalHeader = ({
   const SIZES = ["small", "large"];
   const ref = useRef(null);
   const [stopSize, setStopSize] = useState(1);
+
+  // Reset state when relevant props change,
+  // so that we recalculate size from scratch.
+  useEffect(() => {
+    setStopSize(1);
+  }, [icon, text]);
 
   useLayoutEffect(() => {
     const height = ref.current.clientHeight;
