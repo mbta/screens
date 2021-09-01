@@ -7,8 +7,9 @@ interface FileWithPreview extends File {
 }
 
 const fetchWithCsrf = (resource: RequestInfo, init: RequestInit = {}) => {
-  const csrfToken = document.head.querySelector("[name~=csrf-token][content]")
-    .content;
+  const csrfToken = document.head.querySelector(
+    "[name~=csrf-token][content]"
+  ).content;
   return fetch(resource, {
     ...init,
     headers: { ...(init?.headers || {}), "x-csrf-token": csrfToken },
@@ -77,9 +78,8 @@ const ImageManagerContainer = ({}): JSX.Element => {
 };
 
 const ImageUpload = ({}): JSX.Element => {
-  const [stagedImageUpload, setStagedImageUpload] = useState<FileWithPreview>(
-    null
-  );
+  const [stagedImageUpload, setStagedImageUpload] =
+    useState<FileWithPreview>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleClickUpload = async () => {

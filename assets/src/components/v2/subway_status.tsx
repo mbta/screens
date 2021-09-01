@@ -168,45 +168,44 @@ interface GlMultipleProps {
   statuses: [IconRouteId[], string][];
 }
 
-const SubwayStatusGreenLineMultipleAlertsRow: ComponentType<GlMultipleProps> = ({
-  statuses,
-}) => {
-  const includesStopClosure = statuses.some(([_, status]) =>
-    status.toLowerCase().startsWith("bypassing")
-  );
-  const modifier = includesStopClosure ? "small" : "normal";
+const SubwayStatusGreenLineMultipleAlertsRow: ComponentType<GlMultipleProps> =
+  ({ statuses }) => {
+    const includesStopClosure = statuses.some(([_, status]) =>
+      status.toLowerCase().startsWith("bypassing")
+    );
+    const modifier = includesStopClosure ? "small" : "normal";
 
-  return (
-    <div className="subway-status-row">
-      <div className="subway-status-branch-row__route">
-        <RoutePill type="text" color="green" text="GL" />
-      </div>
-      <div className="subway-status-branch-row__groups">
-        {statuses.map(([routes, status]) => (
-          <div className="subway-status-branch-row__group" key={status}>
-            <div className="subway-status-branch-row__group-routes">
-              {routes.map((route) => (
-                <IconForRoute
-                  className="subway-status-branch-row__route-icon"
-                  routeId={route}
-                  key={route}
-                />
-              ))}
+    return (
+      <div className="subway-status-row">
+        <div className="subway-status-branch-row__route">
+          <RoutePill type="text" color="green" text="GL" />
+        </div>
+        <div className="subway-status-branch-row__groups">
+          {statuses.map(([routes, status]) => (
+            <div className="subway-status-branch-row__group" key={status}>
+              <div className="subway-status-branch-row__group-routes">
+                {routes.map((route) => (
+                  <IconForRoute
+                    className="subway-status-branch-row__route-icon"
+                    routeId={route}
+                    key={route}
+                  />
+                ))}
+              </div>
+              <div
+                className={classWithModifier(
+                  "subway-status-branch-row__group-status",
+                  modifier
+                )}
+              >
+                {status}
+              </div>
             </div>
-            <div
-              className={classWithModifier(
-                "subway-status-branch-row__group-status",
-                modifier
-              )}
-            >
-              {status}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 type GlRowProps =
   | (SubwayStatusNormalRowProps & { type: "single" })

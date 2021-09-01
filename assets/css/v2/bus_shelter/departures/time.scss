@@ -10,7 +10,25 @@
   }
 
   .departure-time:not(.departure-time--timestamp) {
-    width: 151px;
+    width: 155px;
+  }
+
+  .departure-time.departure-time--text {
+    animation: pulse 500ms cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.3;
+    }
+
+    100% {
+      opacity: 1;
+    }
   }
 }
 

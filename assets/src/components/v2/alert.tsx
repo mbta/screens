@@ -76,7 +76,9 @@ const BaseAlert: ComponentType<BaseAlertProps> = ({
             />
           </div>
           <div className="alert-widget__content__header-text">{header}</div>
-          <BodyTextSizer maxHeight={bodyTextMaxHeight}>{body}</BodyTextSizer>
+          <BodyTextSizer maxHeight={bodyTextMaxHeight} key={body}>
+            {body}
+          </BodyTextSizer>
           <div className="alert-widget__content__cta">
             <div className="alert-widget__content__cta__icon">
               <img
