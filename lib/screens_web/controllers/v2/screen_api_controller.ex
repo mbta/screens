@@ -20,7 +20,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
     _ = Screens.LogScreenData.log_data_request(screen_id, last_refresh, is_screen)
 
-    data = Screens.V2.ScreenData.by_screen_id(screen_id)
+    data = Screens.V2.ScreenData.by_screen_id(screen_id, last_refresh)
     json(conn, data)
   end
 end
