@@ -36,7 +36,6 @@ const trimRows = (rows, n) => {
     }
   }, { count: 0, trimmed: [] });
 
-  console.log("count:", count);
   return trimmed;
 };
 
