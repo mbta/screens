@@ -22,10 +22,10 @@ const DefaultColumnFilter = ({
 const SelectColumnFilter = ({
   column: { filterValue, setFilter, preFilteredRows, id },
 }) => {
-  const options = useMemo(() => gatherSelectOptions(preFilteredRows, id), [
-    id,
-    preFilteredRows,
-  ]);
+  const options = useMemo(
+    () => gatherSelectOptions(preFilteredRows, id),
+    [id, preFilteredRows]
+  );
 
   return (
     <select

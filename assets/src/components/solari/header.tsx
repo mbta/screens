@@ -8,8 +8,8 @@ const Header = ({
   sections,
   overhead,
 }): JSX.Element => {
-  const environmentName = document.getElementById("app").dataset
-    .environmentName;
+  const environmentName =
+    document.getElementById("app").dataset.environmentName;
 
   const currentTime = formatTimeString(currentTimeString);
   const subtitle = overhead ? `${sections[0].name} Trips` : "Upcoming Trips";

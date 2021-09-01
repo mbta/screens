@@ -18,9 +18,8 @@ const BaseDepartureDestination = ({ destination }): JSX.Element => {
     return null;
   }
 
-  const [primaryDestination, secondaryDestination] = splitDestination(
-    destination
-  );
+  const [primaryDestination, secondaryDestination] =
+    splitDestination(destination);
 
   return (
     <div className="base-departure-destination__container">

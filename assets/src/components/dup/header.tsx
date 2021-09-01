@@ -34,8 +34,8 @@ const Header = ({
   color,
   code,
 }): JSX.Element => {
-  const environmentName = document.getElementById("app").dataset
-    .environmentName;
+  const environmentName =
+    document.getElementById("app").dataset.environmentName;
 
   const className = color
     ? classWithModifier("header", `color-${color}`)

@@ -1,4 +1,10 @@
-import React, { forwardRef, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { classWithModifiers, formatTimeString, imagePath } from "Util/util";
 

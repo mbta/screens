@@ -1,4 +1,10 @@
-import React, { useState, forwardRef, useLayoutEffect, useRef, useEffect } from "react";
+import React, {
+  useState,
+  forwardRef,
+  useLayoutEffect,
+  useRef,
+  useEffect,
+} from "react";
 
 import NormalSection from "Components/v2/departures/normal_section";
 import NoticeSection from "Components/v2/departures/notice_section";
@@ -25,16 +31,22 @@ const NormalDeparturesRenderer = forwardRef(
 );
 
 const trimRows = (rows, n) => {
-  const { trimmed, count } = rows.reduce(({ count, trimmed }, row) => {
-    const trimmedRow = { ...row, times_with_crowding: row.times_with_crowding.slice(0, n - count) };
-    const addedCount = trimmedRow.times_with_crowding.length;
+  const { trimmed, count } = rows.reduce(
+    ({ count, trimmed }, row) => {
+      const trimmedRow = {
+        ...row,
+        times_with_crowding: row.times_with_crowding.slice(0, n - count),
+      };
+      const addedCount = trimmedRow.times_with_crowding.length;
 
-    if (addedCount > 0) {
-      return { count: count + addedCount, trimmed: [...trimmed, trimmedRow] }
-    } else {
-      return { count, trimmed }
-    }
-  }, { count: 0, trimmed: [] });
+      if (addedCount > 0) {
+        return { count: count + addedCount, trimmed: [...trimmed, trimmedRow] };
+      } else {
+        return { count, trimmed };
+      }
+    },
+    { count: 0, trimmed: [] }
+  );
 
   console.log("count:", count);
   return trimmed;
