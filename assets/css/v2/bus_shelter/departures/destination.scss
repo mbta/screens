@@ -8,6 +8,10 @@
   line-height: 64px;
   font-weight: 600;
   color: #171f26;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-bottom: 5px;
 }
 
 .departure-destination__variation {
