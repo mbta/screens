@@ -58,19 +58,26 @@
   font-weight: 600;
   font-size: 48px;
   line-height: 74px;
+
+  overflow: hidden;
+  text-overflow: clip;
+  width: 808px;
+
+  .subway-status-row--done & {
+    white-space: nowrap;
+  }
 }
 
 .subway-status-row__location {
   display: inline-block;
-  vertical-align: top;
-  margin-top: 39px;
+  vertical-align: middle;
   margin-left: 12px;
 
   color: #171f26;
   font-family: Inter;
   font-weight: 500;
   font-size: 32px;
-  line-height: 48px;
+  line-height: 32px;
 }
 
 .subway-status-branch-row__route {
@@ -94,6 +101,14 @@
 
   margin-top: 22px;
   margin-bottom: 22px;
+
+  overflow: hidden;
+  text-overflow: clip;
+  width: 808px;
+
+  .subway-status-row--done & {
+    white-space: nowrap;
+  }
 }
 
 .subway-status-branch-row__group {
@@ -105,6 +120,7 @@
   display: inline-block;
   vertical-align: top;
   margin-right: 16px;
+  height: 74px;
 }
 
 .subway-status-branch-row__group-status {
