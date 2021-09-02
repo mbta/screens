@@ -31,6 +31,9 @@ import SubwayStatus from "Components/v2/subway_status";
 import EvergreenContent from "Components/v2/evergreen_content";
 import Survey from "Components/v2/survey";
 
+import NoData from "Components/v2/bus_shelter/no_data";
+import DeparturesNoData from "Components/v2/bus_shelter/departures_no_data";
+
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/alert";
 
 const TYPE_TO_COMPONENT = {
@@ -50,8 +53,8 @@ const TYPE_TO_COMPONENT = {
   full_body_alert: FullBodyAlert,
   evergreen_content: EvergreenContent,
   survey: Survey,
-  no_data: null,
-  departures_no_data: null,
+  no_data: NoData,
+  departures_no_data: DeparturesNoData,
 };
 
 const DISABLED_LAYOUT = {
