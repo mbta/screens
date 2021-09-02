@@ -507,7 +507,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     statuses_by_route
     |> Enum.flat_map(fn {route, statuses} -> Enum.map(statuses, fn s -> {route, s} end) end)
     |> Enum.group_by(fn {_route, status} -> status end, fn {route, _status} -> route end)
-    |> Enum.map(fn {status, routes} -> [routes, status] end)
+    |> Enum.map(fn {status, routes} -> [Enum.uniq(routes), status] end)
     |> Enum.sort_by(fn [[first_route | _other_routes], _status] -> first_route end)
   end
 
@@ -558,10 +558,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
       _ ->
         # If there are multiple alerts on the GL trunk, log it and serialize the count
-        _ =
-          Logger.info(
-            "[subway_status_multiple_alerts] route=#{"Green-Trunk"} count=#{alert_count}"
-          )
+        _ = Logger.info("[subway_status_multiple_alerts] route=Green-Trunk count=#{alert_count}")
 
         %{
           type: :single,
@@ -588,10 +585,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
       _ ->
         # One GL trunk alert and 2+ GL branch alerts
-        _ =
-          Logger.info(
-            "[subway_status_multiple_alerts] route=#{"Green-Trunk"} count=#{alert_count}"
-          )
+        _ = Logger.info("[subway_status_multiple_alerts] route=Green-Trunk count=#{alert_count}")
 
         %{
           type: :single,
