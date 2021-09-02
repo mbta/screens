@@ -119,6 +119,7 @@ const SubwayStatusNormalRow: ComponentType<SubwayStatusNormalRowProps> = ({
 }) => {
   const [abbreviate, setAbbreviate] = useState(false);
   const [dropTimes, setDropTimes] = useState(false);
+  const [doneSizing, setDoneSizing] = useState(false);
   const ref = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
@@ -126,9 +127,12 @@ const SubwayStatusNormalRow: ComponentType<SubwayStatusNormalRowProps> = ({
       if (ref.current.clientHeight > 122) {
         if (abbreviate && !dropTimes) {
           setDropTimes(true);
+          setDoneSizing(true);
         } else {
           setAbbreviate(true);
         }
+      } else {
+        setDoneSizing(true);
       }
     }
   });
@@ -141,8 +145,12 @@ const SubwayStatusNormalRow: ComponentType<SubwayStatusNormalRowProps> = ({
     status = "Delays";
   }
 
+  const rowClassName = doneSizing
+    ? classWithModifier("subway-status-row", "done")
+    : "subway-status-row";
+
   return (
-    <div className="subway-status-row" ref={ref}>
+    <div className={rowClassName} ref={ref}>
       <div className="subway-status-row__route">
         <RoutePill {...route} />
       </div>
@@ -154,44 +162,76 @@ const SubwayStatusNormalRow: ComponentType<SubwayStatusNormalRowProps> = ({
           />
         </div>
       )}
-      <div className="subway-status-row__status">{status}</div>
-      {location && (
-        <div className="subway-status-row__location">
-          {abbreviate ? location.abbrev : location.full}
-        </div>
-      )}
+      <div className="subway-status-row__status">
+        {status}
+        {location && (
+          <div className="subway-status-row__location">
+            {abbreviate ? location.abbrev : location.full}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
 interface GlMultipleProps {
-  statuses: [IconRouteId[], string][];
+  statuses: [IconRouteId[] | null, string][];
 }
 
 const SubwayStatusGreenLineMultipleAlertsRow: ComponentType<GlMultipleProps> =
   ({ statuses }) => {
+    const [dropTimes, setDropTimes] = useState(false);
+    const [doneSizing, setDoneSizing] = useState(false);
+    const ref = useRef<HTMLElement>(null);
+
     const includesStopClosure = statuses.some(([_, status]) =>
       status.toLowerCase().startsWith("bypassing")
     );
     const modifier = includesStopClosure ? "small" : "normal";
 
+    useLayoutEffect(() => {
+      if (ref.current) {
+        if (ref.current.clientHeight > 122) {
+          if (!dropTimes) {
+            setDropTimes(true);
+            setDoneSizing(true);
+          }
+        } else {
+          setDoneSizing(true);
+        }
+      }
+    });
+
+    if (dropTimes) {
+      statuses = statuses.map(([routes, status]) => [
+        routes,
+        status.startsWith("Delays") ? "Delays" : status,
+      ]);
+    }
+
+    const rowClassName = doneSizing
+      ? classWithModifier("subway-status-row", "done")
+      : "subway-status-row";
+
     return (
-      <div className="subway-status-row">
+      <div className={rowClassName} ref={ref}>
         <div className="subway-status-branch-row__route">
           <RoutePill type="text" color="green" text="GL" />
         </div>
         <div className="subway-status-branch-row__groups">
           {statuses.map(([routes, status]) => (
             <div className="subway-status-branch-row__group" key={status}>
-              <div className="subway-status-branch-row__group-routes">
-                {routes.map((route) => (
-                  <IconForRoute
-                    className="subway-status-branch-row__route-icon"
-                    routeId={route}
-                    key={route}
-                  />
-                ))}
-              </div>
+              {routes && (
+                <div className="subway-status-branch-row__group-routes">
+                  {routes.map((route) => (
+                    <IconForRoute
+                      className="subway-status-branch-row__route-icon"
+                      routeId={route}
+                      key={route}
+                    />
+                  ))}
+                </div>
+              )}
               <div
                 className={classWithModifier(
                   "subway-status-branch-row__group-status",
