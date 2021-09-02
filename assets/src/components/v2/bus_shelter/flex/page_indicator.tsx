@@ -6,7 +6,14 @@ const FlexZonePageIndicator = ({ pageIndex, numPages }) => {
   return (
     <div className="flex-zone-page-indicator">
       {Array.from({ length: numPages }).map((_, i) => {
-        const modifier = i === pageIndex ? "selected" : "unselected";
+        let modifier;
+        if (i < pageIndex) {
+          modifier = "past";
+        } else if (i == pageIndex) {
+          modifier = "selected";
+        } else {
+          modifier = "unselected";
+        }
 
         return (
           <div
@@ -15,7 +22,9 @@ const FlexZonePageIndicator = ({ pageIndex, numPages }) => {
               modifier
             )}
             key={i}
-          ></div>
+          >
+            <div className="flex-zone-page-indicator__page__progress-bar" />
+          </div>
         );
       })}
     </div>
