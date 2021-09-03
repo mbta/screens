@@ -60,18 +60,12 @@ const TYPE_TO_COMPONENT = {
 const DISABLED_LAYOUT = {
   full_screen: {
     type: "no_data",
-    show_alternatives: false,
-  },
-  type: "screen_takeover",
-};
-
-const FAILURE_LAYOUT = {
-  full_screen: {
-    type: "no_data",
     show_alternatives: true,
   },
   type: "screen_takeover",
 };
+
+const FAILURE_LAYOUT = DISABLED_LAYOUT;
 
 const responseMapper: ResponseMapper = (apiResponse) => {
   switch (apiResponse.state) {
