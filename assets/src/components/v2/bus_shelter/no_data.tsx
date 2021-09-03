@@ -23,7 +23,9 @@ const NoData: ComponentType<Props> = ({
         <div className="no-data__main-content__heading">
           Live updates are temporarily unavailable.
         </div>
-        <div className="no-data__main-content__subheading">Thank you for your patience.</div>
+        <div className="no-data__main-content__subheading">
+          Thank you for your patience.
+        </div>
       </div>
       {showAlternatives && (
         <>
@@ -37,7 +39,10 @@ const NoData: ComponentType<Props> = ({
               <span className="no-data__alternatives__message__em">
                 mbta.com/schedules
               </span>{" "}
-              or <span className="no-data__alternatives__message__em">Transit</span>{" "}
+              or{" "}
+              <span className="no-data__alternatives__message__em">
+                Transit
+              </span>{" "}
               app
             </div>
           </div>

@@ -10,10 +10,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias Screens.V2.WidgetInstance.DeparturesNoData
 
   def departures_instances(
-        %Screen{app_params: %app{departures: %Departures{sections: sections}}} = config,
+        %Screen{app_params: %app{}} = config,
         fetch_section_departures_fn \\ &fetch_section_departures/1
       )
       when app in [BusEink, BusShelter, GlEink, SolariLarge, Solari] do
+    if Screens.Config.State.mode_disabled?(get_devops_mode(config)) do
+      [%DeparturesNoData{screen: config, show_alternatives?: false}]
+    else
+      do_departures_instances(config, fetch_section_departures_fn)
+    end
+  end
+
+  defp do_departures_instances(
+         %{app_params: %{departures: %Departures{sections: sections}}} = config,
+         fetch_section_departures_fn
+       ) do
     sections_data =
       sections
       |> Task.async_stream(fetch_section_departures_fn, timeout: :infinity)
@@ -21,7 +32,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
     departures_instance =
       if Enum.any?(sections_data, &(&1 == :error)) do
-        %DeparturesNoData{screen: config}
+        %DeparturesNoData{screen: config, show_alternatives?: true}
       else
         sections =
           Enum.map(sections_data, fn {:ok, departures} ->
@@ -78,4 +89,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   defp route_direction(d) do
     %RouteDirection{route_id: Departure.route_id(d), direction_id: Departure.direction_id(d)}
   end
+
+  defp get_devops_mode(%Screen{app_id: :bus_shelter_v2}), do: :bus
+  defp get_devops_mode(%Screen{app_id: :bus_eink_v2}), do: :bus
+  defp get_devops_mode(%Screen{app_id: :gl_eink_v2}), do: :light_rail
+  defp get_devops_mode(_), do: nil
 end
