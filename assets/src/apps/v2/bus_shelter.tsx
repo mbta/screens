@@ -6,6 +6,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenPage from "Components/v2/screen_page";
+import {
+  ResponseMapper,
+  ResponseMapperContext,
+} from "Components/v2/screen_container";
 import { MappingContext } from "Components/v2/widget";
 
 import NormalScreen from "Components/v2/bus_shelter/normal_screen";
@@ -27,6 +31,9 @@ import SubwayStatus from "Components/v2/subway_status";
 import EvergreenContent from "Components/v2/evergreen_content";
 import Survey from "Components/v2/survey";
 
+import NoData from "Components/v2/bus_shelter/no_data";
+import DeparturesNoData from "Components/v2/bus_shelter/departures_no_data";
+
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/alert";
 
 const TYPE_TO_COMPONENT = {
@@ -46,6 +53,29 @@ const TYPE_TO_COMPONENT = {
   full_body_alert: FullBodyAlert,
   evergreen_content: EvergreenContent,
   survey: Survey,
+  no_data: NoData,
+  departures_no_data: DeparturesNoData,
+};
+
+const DISABLED_LAYOUT = {
+  full_screen: {
+    type: "no_data",
+    show_alternatives: true,
+  },
+  type: "screen_takeover",
+};
+
+const FAILURE_LAYOUT = DISABLED_LAYOUT;
+
+const responseMapper: ResponseMapper = (apiResponse) => {
+  switch (apiResponse.state) {
+    case "success":
+      return apiResponse.data;
+    case "disabled":
+      return DISABLED_LAYOUT;
+    case "failure":
+      return FAILURE_LAYOUT;
+  }
 };
 
 const App = (): JSX.Element => {
@@ -54,7 +84,9 @@ const App = (): JSX.Element => {
       <Switch>
         <Route path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <ScreenPage />
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <ScreenPage />
+            </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
       </Switch>

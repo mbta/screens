@@ -7,7 +7,7 @@
     "watch": "webpack --mode development --watch",
     "lint": "tslint --fix -p .",
     "lint:check": "tslint -p .",
-    "format": "prettier --write \"{.,**}/*.{js,json,ts,tsx,css,scss}\"",
+    "format": "prettier --list-different \"{.,**}/*.{js,json,ts,tsx,css,scss}\" | xargs prettier --write",
     "format:check": "prettier --check \"{.,**}/*.{js,json,ts,tsx,css,scss}\"",
     "check": "npm run lint:check && npm run format:check"
   },

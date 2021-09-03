@@ -17,19 +17,22 @@ defmodule Screens.V2.ScreenData do
   @type selected_instances_map :: %{Template.slot_id() => WidgetInstance.t()}
   @type non_paged_selected_instances_map :: %{Template.non_paged_slot_id() => WidgetInstance.t()}
   @type serializable_map :: %{type: atom()}
+  @type response_map :: %{
+          data: serializable_map() | nil,
+          force_reload: boolean(),
+          disabled: boolean()
+        }
   @type paging_metadata :: %{
           Template.non_paged_slot_id() =>
             {page_index :: non_neg_integer(), num_pages :: pos_integer()}
         }
 
-  @outdated_response %{force_reload: true}
-
-  @spec by_screen_id(screen_id(), String.t()) :: serializable_map()
+  @spec by_screen_id(screen_id(), String.t()) :: response_map()
   def by_screen_id(screen_id, last_refresh) do
-    if outdated?(screen_id, last_refresh) do
-      @outdated_response
-    else
-      fetch_data(screen_id)
+    cond do
+      outdated?(screen_id, last_refresh) -> outdated_response()
+      disabled?(screen_id) -> disabled_response()
+      true -> fetch_data(screen_id)
     end
   end
 
@@ -319,15 +322,15 @@ defmodule Screens.V2.ScreenData do
 
   @spec serialize(
           {Template.non_paged_layout(), non_paged_selected_instances_map(), paging_metadata()}
-        ) ::
-          serializable_map()
+        ) :: response_map()
   def serialize({layout, instance_map, paging_metadata}) do
     serialized_instance_map =
       instance_map
       |> Enum.map(fn {slot_id, instance} -> {slot_id, serialize_instance_with_type(instance)} end)
       |> Enum.into(%{})
 
-    Template.position_widget_instances(layout, serialized_instance_map, paging_metadata)
+    data = Template.position_widget_instances(layout, serialized_instance_map, paging_metadata)
+    response(data: data)
   end
 
   defp serialize_instance_with_type(instance) do
@@ -344,5 +347,21 @@ defmodule Screens.V2.ScreenData do
       nil -> false
       _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
     end
+  end
+
+  defp disabled?(screen_id) do
+    Screens.Config.State.disabled?(screen_id)
+  end
+
+  defp outdated_response, do: response(force_reload: true)
+  defp disabled_response, do: response(disabled: true)
+
+  @spec response(keyword()) :: response_map()
+  defp response(fields) do
+    %{
+      data: Keyword.get(fields, :data, nil),
+      force_reload: Keyword.get(fields, :force_reload, false),
+      disabled: Keyword.get(fields, :disabled, false)
+    }
   end
 end

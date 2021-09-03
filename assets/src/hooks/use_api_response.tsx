@@ -4,6 +4,24 @@ import useInterval from "Hooks/use_interval";
 
 const MINUTE_IN_MS = 60_000;
 
+const FAILURE_RESPONSE = { success: false };
+
+const doFailureBuffer = (
+  lastSuccess: number,
+  failureModeElapsedMs: number,
+  setApiResponse: React.Dispatch<React.SetStateAction<object>>,
+  apiResponse: object = FAILURE_RESPONSE
+) => {
+  const elapsedMs = Date.now() - lastSuccess;
+
+  if (elapsedMs < failureModeElapsedMs) {
+    setApiResponse((state) => state);
+  }
+  if (elapsedMs >= failureModeElapsedMs) {
+    setApiResponse(apiResponse);
+  }
+};
+
 interface UseApiResponseArgs {
   id: string;
   datetime?: string;
@@ -37,17 +55,20 @@ const useApiResponse = ({
         window.location.reload();
       }
       if (withWatchdog) updateSolariWatchdog();
-      setApiResponse(json);
-      setLastSuccess(now);
-    } catch (err) {
-      const elapsedMs = Date.now() - lastSuccess;
 
-      if (elapsedMs < failureModeElapsedMs) {
-        setApiResponse((state) => state);
+      if (json.success) {
+        setApiResponse(json);
+        setLastSuccess(now);
+      } else {
+        doFailureBuffer(
+          lastSuccess,
+          failureModeElapsedMs,
+          setApiResponse,
+          json
+        );
       }
-      if (elapsedMs >= failureModeElapsedMs) {
-        setApiResponse({ success: false });
-      }
+    } catch (err) {
+      doFailureBuffer(lastSuccess, failureModeElapsedMs, setApiResponse);
     }
   };
 
