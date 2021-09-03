@@ -4,11 +4,6 @@ import { useEffect, useState } from "react";
 
 const MINUTE_IN_MS = 60_000;
 
-interface UseApiResponseArgs {
-  id: string;
-  failureModeElapsedMs?: number;
-}
-
 interface RawResponse {
   data: WidgetData | null;
   force_reload: boolean;
@@ -40,6 +35,27 @@ const rawResponseToApiResponse = ({
   }
 };
 
+const doFailureBuffer = (
+  lastSuccess: number,
+  failureModeElapsedMs: number,
+  setApiResponse: React.Dispatch<React.SetStateAction<ApiResponse>>,
+  apiResponse: ApiResponse = FAILURE_RESPONSE
+) => {
+  const elapsedMs = Date.now() - lastSuccess;
+
+  if (elapsedMs < failureModeElapsedMs) {
+    setApiResponse((state) => state);
+  }
+  if (elapsedMs >= failureModeElapsedMs) {
+    setApiResponse(apiResponse);
+  }
+};
+
+interface UseApiResponseArgs {
+  id: string;
+  failureModeElapsedMs?: number;
+}
+
 const useApiResponse = ({
   id,
   failureModeElapsedMs = MINUTE_IN_MS,
@@ -60,17 +76,21 @@ const useApiResponse = ({
         window.location.reload();
       }
 
-      setApiResponse(rawResponseToApiResponse(json));
-      setLastSuccess(now);
-    } catch (err) {
-      const elapsedMs = Date.now() - lastSuccess;
+      const apiResponse = rawResponseToApiResponse(json);
 
-      if (elapsedMs < failureModeElapsedMs) {
-        setApiResponse((state) => state);
+      if (apiResponse.state == "failure") {
+        doFailureBuffer(
+          lastSuccess,
+          failureModeElapsedMs,
+          setApiResponse,
+          apiResponse
+        );
+      } else {
+        setApiResponse(apiResponse);
+        setLastSuccess(now);
       }
-      if (elapsedMs >= failureModeElapsedMs) {
-        setApiResponse(FAILURE_RESPONSE);
-      }
+    } catch (err) {
+      doFailureBuffer(lastSuccess, failureModeElapsedMs, setApiResponse);
     }
   };
 
