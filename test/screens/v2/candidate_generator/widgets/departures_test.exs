@@ -89,7 +89,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         %Section{query: "query B"} -> :error
       end
 
-      expected_departures_instances = [%DeparturesNoData{screen: config}]
+      expected_departures_instances = [
+        %DeparturesNoData{screen: config, show_alternatives?: true}
+      ]
 
       actual_departures_instances =
         Departures.departures_instances(config, fetch_section_departures_fn)
