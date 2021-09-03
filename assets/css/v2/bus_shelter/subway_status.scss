@@ -1,9 +1,11 @@
 .subway-status {
+  position: relative;
   background-color: #e4e6e1;
   border-radius: 16px;
   box-shadow: 0px 12px 24px 0px rgba(23, 31, 38, 0.25);
   height: 576px;
   width: 1024px;
+  overflow: hidden;
 }
 
 .subway-status-body {
@@ -56,19 +58,26 @@
   font-weight: 600;
   font-size: 48px;
   line-height: 74px;
+
+  overflow: hidden;
+  text-overflow: clip;
+  width: 808px;
+
+  .subway-status-row--done & {
+    white-space: nowrap;
+  }
 }
 
 .subway-status-row__location {
   display: inline-block;
-  vertical-align: top;
-  margin-top: 39px;
+  vertical-align: middle;
   margin-left: 12px;
 
   color: #171f26;
   font-family: Inter;
   font-weight: 500;
   font-size: 32px;
-  line-height: 48px;
+  line-height: 32px;
 }
 
 .subway-status-branch-row__route {
@@ -92,6 +101,14 @@
 
   margin-top: 22px;
   margin-bottom: 22px;
+
+  overflow: hidden;
+  text-overflow: clip;
+  width: 808px;
+
+  .subway-status-row--done & {
+    white-space: nowrap;
+  }
 }
 
 .subway-status-branch-row__group {
@@ -103,6 +120,7 @@
   display: inline-block;
   vertical-align: top;
   margin-right: 16px;
+  height: 74px;
 }
 
 .subway-status-branch-row__group-status {
@@ -124,12 +142,11 @@
 }
 
 .subway-status-footer {
-  position: relative;
+  position: absolute;
+  bottom: 0;
   background-color: #737373;
-  width: 1024px;
+  width: 100%;
   height: 80px;
-
-  border-radius: 0 0 16px 16px;
 }
 
 .subway-status-footer__link {
