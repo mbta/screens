@@ -73,6 +73,7 @@ defmodule Screens.MixProject do
       {:ueberauth, "~> 0.6"},
       {:ueberauth_cognito, "~> 0.2"},
       {:corsica, "~> 1.0"},
+      {:mojito, "~> 0.7"},
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false}
     ]
   end

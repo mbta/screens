@@ -3,7 +3,7 @@ defmodule Screens.V3Api do
 
   require Logger
 
-  @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool]]
+  @default_opts [timeout: 2000]
 
   def get_json(route, params \\ %{}, extra_headers \\ [], opts \\ []) do
     headers = extra_headers ++ api_key_headers(Application.get_env(:screens, :api_v3_key))
@@ -11,7 +11,7 @@ defmodule Screens.V3Api do
 
     with {:http_request, {:ok, response}} <-
            {:http_request,
-            HTTPoison.get(
+            Mojito.get(
               url,
               headers,
               Keyword.merge(@default_opts, opts)
@@ -20,9 +20,8 @@ defmodule Screens.V3Api do
          {:parse, {:ok, parsed}} <- {:parse, Jason.decode(body)} do
       {:ok, parsed}
     else
-      {:http_request, e} ->
-        {:error, httpoison_error} = e
-        log_api_error({:http_fetch_error, e}, message: Exception.message(httpoison_error))
+      {:http_request, {:error, e}} ->
+        log_api_error({:http_fetch_error, e}, message: e.message, reason: inspect(e.reason))
 
       {:response_success, %{status_code: status_code}} = response ->
         log_api_error({:bad_response_code, response}, status_code: status_code)

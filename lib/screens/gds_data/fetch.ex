@@ -13,7 +13,7 @@ defmodule Screens.GdsData.Fetch do
   @ping_url_base "#{@gds_api_url}/GetDevicesPing"
 
   @vendor_name :gds
-  @vendor_request_opts [hackney: [pool: :gds_api_pool]]
+  @vendor_request_opts []
 
   def fetch_data_for_current_day do
     # GDS API Dates are in Central European time
