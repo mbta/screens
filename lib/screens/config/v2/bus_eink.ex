@@ -2,7 +2,7 @@ defmodule Screens.Config.V2.BusEink do
   @moduledoc false
   # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 
-  alias Screens.Config.V2.{Alerts, Departures, Footer, EvergreenContentItem}
+  alias Screens.Config.V2.{Alerts, Departures, EvergreenContentItem, Footer}
   alias Screens.Config.V2.Header.CurrentStopId
 
   @type t :: %__MODULE__{

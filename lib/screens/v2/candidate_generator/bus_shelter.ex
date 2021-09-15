@@ -4,10 +4,10 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   alias Screens.Config.Screen
   alias Screens.Config.V2.{BusShelter, Footer, Survey}
   alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Util.Assets
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.Util.Assets
 
   alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader, SubwayStatus}
 
