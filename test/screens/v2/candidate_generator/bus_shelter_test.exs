@@ -78,6 +78,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       alert_instances_fn = fn _ -> [] end
       fetch_stop_fn = fn "1216" -> "Columbus Ave @ Dimock St" end
       now = ~U[2020-04-06T10:00:00Z]
+      evergreen_content_instances_fn = fn _ -> [] end
 
       expected_header = %NormalHeader{
         screen: config,
@@ -94,7 +95,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
           now,
           fetch_stop_fn,
           departures_instances_fn,
-          alert_instances_fn
+          alert_instances_fn,
+          evergreen_content_instances_fn
         )
 
       assert expected_header in actual_instances
