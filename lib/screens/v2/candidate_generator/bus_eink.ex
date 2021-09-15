@@ -2,12 +2,12 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusEink, Footer, EvergreenContentItem}
+  alias Screens.Config.V2.{BusEink, Footer}
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader, Placeholder, EvergreenContent}
+  alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
 
@@ -38,7 +38,8 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &fetch_stop_name/1,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/1,
-        alert_instances_fn \\ &Widgets.Alerts.alert_instances/1
+        alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
@@ -46,7 +47,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
       fn -> placeholder_instances() end,
-      fn -> evergreen_content_instances(config) end
+      fn -> evergreen_content_instances_fn.(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
@@ -90,32 +91,5 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
       %Placeholder{color: :green, slot_names: [:main_content]},
       %Placeholder{color: :red, slot_names: [:medium_flex]}
     ]
-  end
-
-  defp evergreen_content_instances(config) do
-    %Screen{app_params: %BusEink{evergreen_content: evergreen_content}} = config
-
-    Enum.map(evergreen_content, &evergreen_content_instance(&1, config))
-  end
-
-  defp evergreen_content_instance(
-         %EvergreenContentItem{
-           slot_names: slot_names,
-           asset_path: asset_path,
-           priority: priority
-         },
-         config
-       ) do
-    %EvergreenContent{
-      screen: config,
-      slot_names: slot_names,
-      asset_url: s3_asset_url(asset_path),
-      priority: priority
-    }
-  end
-
-  defp s3_asset_url(asset_path) do
-    env = Application.get_env(:screens, :environment_name, "screens-prod")
-    "https://mbta-screens.s3.amazonaws.com/#{env}/#{asset_path}"
   end
 end
