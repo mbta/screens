@@ -1,0 +1,64 @@
+.evergreen-content-image__container {
+  overflow: hidden;
+}
+
+.screen-normal__medium-flex {
+  .evergreen-content-image__container {
+    border-radius: 32px;
+    width: 1200px;
+    height: 1164px;
+  }
+
+  .evergreen-content-image__image {
+    width: 1200px;
+    height: 1164px;
+  }
+}
+
+.screen-normal__main-content {
+  .evergreen-content-image__container {
+    width: 1200px;
+    height: 1312px;
+  }
+
+  .evergreen-content-image__image {
+    width: 1200px;
+    height: 1312px;
+  }
+}
+
+.screen-normal__footer {
+  .evergreen-content-image__container {
+    width: 1200px;
+    height: 436px;
+  }
+
+  .evergreen-content-image__image {
+    width: 1200px;
+    height: 436px;
+  }
+}
+
+.screen-normal__header {
+  .evergreen-content-image__container {
+    width: 1200px;
+    height: 288px;
+  }
+
+  .evergreen-content-image__image {
+    width: 1200px;
+    height: 288px;
+  }
+}
+
+.screen-takeover__full-screen {
+  .evergreen-content-image__container {
+    width: 1200px;
+    height: 3200px;
+  }
+
+  .evergreen-content-image__image {
+    width: 1200px;
+    height: 3200px;
+  }
+}

@@ -1,22 +1,28 @@
-defmodule Screens.V2.CandidateGenerator.BusEinkTest do
+defmodule Screens.V2.CandidateGenerator.GlEinkTest do
   use ExUnit.Case, async: true
 
   alias Screens.Config.{Screen, V2}
-  alias Screens.V2.CandidateGenerator.BusEink
+  alias Screens.V2.CandidateGenerator.GlEink
   alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader}
 
   setup do
     config = %Screen{
-      app_params: %V2.BusEink{
+      app_params: %V2.GlEink{
         departures: %V2.Departures{sections: []},
-        header: %V2.Header.CurrentStopId{stop_id: "1722"},
+        header: %V2.Header.Destination{route_id: "Green-C", direction_id: 0},
         footer: %V2.Footer{stop_id: "1722"},
-        alerts: %V2.Alerts{stop_id: "1722"}
+        alerts: %V2.Alerts{stop_id: "1722"},
+        line_map: %V2.LineMap{
+          direction_id: 0,
+          route_id: "Green-C",
+          station_id: "place-bcnwa",
+          stop_id: "1722"
+        }
       },
       vendor: :gds,
       device_id: "TEST",
       name: "TEST",
-      app_id: :bus_eink_v2
+      app_id: :gl_eink_v2
     }
 
     %{config: config}
@@ -28,17 +34,19 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
               %{
                 normal: [
                   :header,
+                  :left_sidebar,
                   :main_content,
                   :medium_flex,
                   :footer
                 ],
                 bottom_takeover: [
                   :header,
+                  :left_sidebar,
                   :main_content,
                   :bottom_screen
                 ],
                 full_takeover: [:full_screen]
-              }} == BusEink.screen_template()
+              }} == GlEink.screen_template()
     end
   end
 
@@ -46,15 +54,15 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
     test "returns expected header", %{config: config} do
       departures_instances_fn = fn _ -> [] end
       alerts_instances_fn = fn _ -> [] end
-      fetch_stop_fn = fn "1722" -> "1624 Blue Hill Ave @ Mattapan Sq" end
+      fetch_destination_fn = fn "Green-C", 0 -> "Cleveland Circle" end
       now = ~U[2020-04-06T10:00:00Z]
       evergreen_content_instances_fn = fn _ -> [] end
 
       actual_instances =
-        BusEink.candidate_instances(
+        GlEink.candidate_instances(
           config,
           now,
-          fetch_stop_fn,
+          fetch_destination_fn,
           departures_instances_fn,
           alerts_instances_fn,
           evergreen_content_instances_fn
@@ -62,14 +70,14 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
 
       expected_header = %NormalHeader{
         screen: config,
-        icon: nil,
-        text: "1624 Blue Hill Ave @ Mattapan Sq",
+        icon: :green_c,
+        text: "Cleveland Circle",
         time: ~U[2020-04-06T10:00:00Z]
       }
 
       expected_footer = %FareInfoFooter{
         screen: config,
-        mode: :bus,
+        mode: :subway,
         text: "For real-time predictions and fare purchase locations:",
         url: "mbta.com/stops/1722"
       }

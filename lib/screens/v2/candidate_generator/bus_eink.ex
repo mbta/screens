@@ -38,14 +38,16 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &fetch_stop_name/1,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/1,
-        alert_instances_fn \\ &Widgets.Alerts.alert_instances/1
+        alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
       fn -> departures_instances_fn.(config) end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
-      fn -> placeholder_instances() end
+      fn -> placeholder_instances() end,
+      fn -> evergreen_content_instances_fn.(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)

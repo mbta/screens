@@ -6,7 +6,13 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
-  alias Screens.V2.WidgetInstance.{FareInfoFooter, LineMap, NormalHeader, Placeholder}
+
+  alias Screens.V2.WidgetInstance.{
+    FareInfoFooter,
+    LineMap,
+    NormalHeader,
+    Placeholder
+  }
 
   @scheduled_terminal_departure_lookback_seconds 180
 
@@ -39,7 +45,8 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         now \\ DateTime.utc_now(),
         fetch_destination_fn \\ &fetch_destination/2,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/1,
-        alert_instances_fn \\ &Widgets.Alerts.alert_instances/1
+        alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
       fn -> header_instances(config, now, fetch_destination_fn) end,
@@ -47,7 +54,8 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
       fn -> placeholder_instances() end,
-      fn -> line_map_instances(config) end
+      fn -> line_map_instances(config) end,
+      fn -> evergreen_content_instances_fn.(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
