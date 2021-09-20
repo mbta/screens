@@ -1,6 +1,7 @@
+import { BlinkConfig } from "Components/v2/screen_container";
 import { WidgetData } from "Components/v2/widget";
 import useInterval from "Hooks/use_interval";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -54,27 +55,50 @@ const doFailureBuffer = (
 interface UseApiResponseArgs {
   id: string;
   failureModeElapsedMs?: number;
+  blinkConfig?: BlinkConfig | null;
+  setShowBlink: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const useApiResponse = ({
   id,
   failureModeElapsedMs = MINUTE_IN_MS,
+  blinkConfig = null,
+  setShowBlink,
 }: UseApiResponseArgs): ApiResponse => {
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
   const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
+  const [requestCount, setRequestCount] = useState<number>(0);
   const { lastRefresh, refreshRate } = document.getElementById("app").dataset;
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}`;
 
+  let maybeDoBlink = () => {};
+  if (blinkConfig != null) {
+    maybeDoBlink = () => {
+      if (
+        blinkConfig != null &&
+        requestCount % blinkConfig.refreshesPerBlink == 0
+      ) {
+        setShowBlink(true);
+        setTimeout(() => {
+          setShowBlink(false);
+        }, blinkConfig.durationMs);
+      }
+    };
+  }
+
   const fetchData = async () => {
+    setRequestCount((count) => count + 1);
+    const now = Date.now();
+
     try {
-      const now = Date.now();
       const result = await fetch(apiPath);
       const json = (await result.json()) as RawResponse;
 
       if (json.force_reload) {
         window.location.reload();
       }
+      maybeDoBlink();
 
       const apiResponse = rawResponseToApiResponse(json);
 
@@ -94,16 +118,16 @@ const useApiResponse = ({
     }
   };
 
-  // Perform initial data fetch once on component mount
-  useEffect(() => {
+  const intervalCallback = () => {
     fetchData();
-  }, []);
+  };
+
+  // Perform initial data fetch once on component mount
+  useEffect(intervalCallback, []);
 
   // Schedule subsequent data fetches, if we need to
   if (refreshMs != null) {
-    useInterval(() => {
-      fetchData();
-    }, refreshMs);
+    useInterval(intervalCallback, refreshMs);
   }
 
   return apiResponse;
