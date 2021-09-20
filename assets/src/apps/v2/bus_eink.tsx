@@ -24,7 +24,7 @@ const TYPE_TO_COMPONENT = {
   fare_info_footer: FareInfoFooter,
   normal_header: NormalHeader,
   departures: NormalDepartures,
-  evergreen_content: EvergreenContent
+  evergreen_content: EvergreenContent,
 };
 
 const App = (): JSX.Element => {
