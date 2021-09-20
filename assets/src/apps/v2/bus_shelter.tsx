@@ -9,6 +9,8 @@ import ScreenPage from "Components/v2/screen_page";
 import {
   ResponseMapper,
   ResponseMapperContext,
+  BlinkConfig,
+  BlinkConfigContext,
 } from "Components/v2/screen_container";
 import { MappingContext } from "Components/v2/widget";
 
@@ -78,6 +80,11 @@ const responseMapper: ResponseMapper = (apiResponse) => {
   }
 };
 
+const blinkConfig: BlinkConfig = {
+  intervalMs: 1000 * 60 * 5,
+  durationMs: 16,
+};
+
 const App = (): JSX.Element => {
   return (
     <Router>
@@ -85,7 +92,9 @@ const App = (): JSX.Element => {
         <Route path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
-              <ScreenPage />
+              <BlinkConfigContext.Provider value={blinkConfig}>
+                <ScreenPage />
+              </BlinkConfigContext.Provider>
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
