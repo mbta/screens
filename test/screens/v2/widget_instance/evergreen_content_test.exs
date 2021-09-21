@@ -21,7 +21,9 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
         slot_names: [:medium_left, :medium_right],
         asset_url: "https://mbta-screens.s3.amazonaws.com/screens-dev/videos/some-video.mp4",
         priority: [2, 3, 1],
-        schedule: [%Schedule{start_dt: DateTime.add(DateTime.utc_now(), 30, :second), end_dt: nil}],
+        schedule: [
+          %Schedule{start_dt: DateTime.add(DateTime.utc_now(), 30, :second), end_dt: nil}
+        ],
         now: DateTime.utc_now()
       }
     }
@@ -58,6 +60,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
     test "returns true with blank schedule", %{widget: widget} do
       assert WidgetInstance.valid_candidate?(widget)
     end
+
     test "returns false with old schedule", %{widget_old_schedule: widget_old_schedule} do
       assert !WidgetInstance.valid_candidate?(widget_old_schedule)
     end
