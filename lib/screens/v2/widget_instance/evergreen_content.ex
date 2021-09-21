@@ -30,7 +30,28 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
 
   def widget_type(_instance), do: :evergreen_content
 
-  def valid_candidate?(_instance), do: true
+  def valid_candidate?(%__MODULE__{schedule: schedule, now: now}) do
+    schedule
+    |> Enum.map(fn x ->
+      case x do
+        %Schedule{start_dt: nil, end_dt: nil} ->
+          true
+
+        %Schedule{start_dt: start_dt, end_dt: nil} ->
+          DateTime.compare(start_dt, now) in [:lt, :eq]
+
+        %Schedule{start_dt: nil, end_dt: end_dt} ->
+          DateTime.compare(end_dt, now) == :gt
+
+        %Schedule{start_dt: start_dt, end_dt: end_dt} ->
+          DateTime.compare(start_dt, now) in [:lt, :eq] and DateTime.compare(end_dt, now) == :gt
+
+        _ ->
+          false
+      end
+    end)
+    |> Enum.any?(fn x -> x end)
+  end
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.EvergreenContent
