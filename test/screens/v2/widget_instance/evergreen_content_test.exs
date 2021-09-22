@@ -22,7 +22,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
         asset_url: "https://mbta-screens.s3.amazonaws.com/screens-dev/videos/some-video.mp4",
         priority: [2, 3, 1],
         schedule: [
-          %Schedule{start_dt: DateTime.add(DateTime.utc_now(), 30, :second), end_dt: nil}
+          %Schedule{start_dt: ~U[2021-01-01T00:00:00Z], end_dt: ~U[2021-01-02T00:00:00Z]}
         ],
         now: DateTime.utc_now()
       }
@@ -62,7 +62,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
     end
 
     test "returns false with old schedule", %{widget_old_schedule: widget_old_schedule} do
-      assert !WidgetInstance.valid_candidate?(widget_old_schedule)
+      refute WidgetInstance.valid_candidate?(widget_old_schedule)
     end
   end
 end

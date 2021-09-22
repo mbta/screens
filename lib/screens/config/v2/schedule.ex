@@ -2,8 +2,8 @@ defmodule Screens.Config.V2.Schedule do
   @moduledoc false
 
   @type t :: %__MODULE__{
-          start_dt: DateTime.t(),
-          end_dt: DateTime.t()
+          start_dt: DateTime.t() | nil,
+          end_dt: DateTime.t() | nil
         }
 
   defstruct start_dt: nil,

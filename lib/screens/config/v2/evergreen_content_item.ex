@@ -12,8 +12,8 @@ defmodule Screens.Config.V2.EvergreenContentItem do
         }
 
   @enforce_keys ~w[slot_names asset_path priority]a
-  defstruct slot_names: [],
-            asset_path: "",
+  defstruct slot_names: nil,
+            asset_path: nil,
             priority: nil,
             schedule: [%Schedule{}]
 
