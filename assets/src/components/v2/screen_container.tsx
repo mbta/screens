@@ -3,6 +3,7 @@ import React, {
   useContext,
   ComponentType,
   useState,
+  useEffect,
 } from "react";
 import useApiResponse, { ApiResponse } from "Hooks/v2/use_api_response";
 import Widget, { WidgetData } from "Components/v2/widget";
@@ -68,11 +69,24 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
   );
 };
 
-const ScreenContainer = ({ id }: { id: string }) => {
+const ScreenContainer = ({ id }) => {
   const blinkConfig = useContext(BlinkConfigContext);
   const [showBlink, setShowBlink] = useState(false);
 
-  const apiResponse = useApiResponse({ id, blinkConfig, setShowBlink });
+  const { apiResponse, requestCount } = useApiResponse({ id });
+
+  useEffect(() => {
+    if (
+      blinkConfig != null &&
+      requestCount % blinkConfig.refreshesPerBlink == 0
+    ) {
+      setShowBlink(true);
+
+      setTimeout(() => {
+        setShowBlink(false);
+      }, blinkConfig.durationMs);
+    }
+  }, [requestCount]);
 
   return <ScreenLayout apiResponse={apiResponse} showBlink={showBlink} />;
 };

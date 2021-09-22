@@ -1,4 +1,3 @@
-import { BlinkConfig } from "Components/v2/screen_container";
 import { WidgetData } from "Components/v2/widget";
 import useInterval from "Hooks/use_interval";
 import React, { useEffect, useState } from "react";
@@ -55,50 +54,28 @@ const doFailureBuffer = (
 interface UseApiResponseArgs {
   id: string;
   failureModeElapsedMs?: number;
-  blinkConfig?: BlinkConfig | null;
-  setShowBlink: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const useApiResponse = ({
   id,
   failureModeElapsedMs = MINUTE_IN_MS,
-  blinkConfig = null,
-  setShowBlink,
-}: UseApiResponseArgs): ApiResponse => {
+}: UseApiResponseArgs): { apiResponse: ApiResponse; requestCount: number } => {
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
-  const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
   const [requestCount, setRequestCount] = useState<number>(0);
+  const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
   const { lastRefresh, refreshRate } = document.getElementById("app").dataset;
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}`;
 
-  let maybeDoBlink = () => {};
-  if (blinkConfig != null) {
-    maybeDoBlink = () => {
-      if (
-        blinkConfig != null &&
-        requestCount % blinkConfig.refreshesPerBlink == 0
-      ) {
-        setShowBlink(true);
-        setTimeout(() => {
-          setShowBlink(false);
-        }, blinkConfig.durationMs);
-      }
-    };
-  }
-
   const fetchData = async () => {
-    setRequestCount((count) => count + 1);
-    const now = Date.now();
-
     try {
+      const now = Date.now();
       const result = await fetch(apiPath);
       const json = (await result.json()) as RawResponse;
 
       if (json.force_reload) {
         window.location.reload();
       }
-      maybeDoBlink();
 
       const apiResponse = rawResponseToApiResponse(json);
 
@@ -116,21 +93,23 @@ const useApiResponse = ({
     } catch (err) {
       doFailureBuffer(lastSuccess, failureModeElapsedMs, setApiResponse);
     }
-  };
 
-  const intervalCallback = () => {
-    fetchData();
+    setRequestCount((count) => count + 1);
   };
 
   // Perform initial data fetch once on component mount
-  useEffect(intervalCallback, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // Schedule subsequent data fetches, if we need to
   if (refreshMs != null) {
-    useInterval(intervalCallback, refreshMs);
+    useInterval(() => {
+      fetchData();
+    }, refreshMs);
   }
 
-  return apiResponse;
+  return { apiResponse, requestCount };
 };
 
 export default useApiResponse;
