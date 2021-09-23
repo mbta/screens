@@ -14,7 +14,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
         asset_url: "https://mbta-screens.s3.amazonaws.com/screens-dev/videos/some-video.mp4",
         priority: [2, 3, 1],
         schedule: [%Schedule{}],
-        now: DateTime.utc_now()
+        now: ~U[2021-02-01T00:00:00Z]
       },
       widget_old_schedule: %EvergreenContent{
         screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
@@ -24,7 +24,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
         schedule: [
           %Schedule{start_dt: ~U[2021-01-01T00:00:00Z], end_dt: ~U[2021-01-02T00:00:00Z]}
         ],
-        now: DateTime.utc_now()
+        now: ~U[2021-02-01T00:00:00Z]
       }
     }
   end
