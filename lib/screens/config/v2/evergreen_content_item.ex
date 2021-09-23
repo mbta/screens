@@ -1,18 +1,23 @@
 defmodule Screens.Config.V2.EvergreenContentItem do
   @moduledoc false
 
+  alias Screens.Config.V2.Schedule
   alias Screens.V2.WidgetInstance
 
   @type t :: %__MODULE__{
           slot_names: list(WidgetInstance.slot_id()),
           asset_path: String.t(),
-          priority: WidgetInstance.priority()
+          priority: WidgetInstance.priority(),
+          schedule: list(Schedule.t())
         }
 
   @enforce_keys ~w[slot_names asset_path priority]a
-  defstruct @enforce_keys
+  defstruct slot_names: nil,
+            asset_path: nil,
+            priority: nil,
+            schedule: [%Schedule{}]
 
-  use Screens.Config.Struct
+  use Screens.Config.Struct, children: [schedule: {:list, Schedule}]
 
   defp value_from_json("slot_names", slot_names) do
     Enum.map(slot_names, &String.to_existing_atom/1)

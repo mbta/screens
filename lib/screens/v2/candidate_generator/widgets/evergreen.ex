@@ -18,7 +18,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
          %EvergreenContentItem{
            slot_names: slot_names,
            asset_path: asset_path,
-           priority: priority
+           priority: priority,
+           schedule: schedule
          },
          config
        ) do
@@ -26,7 +27,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
       screen: config,
       slot_names: slot_names,
       asset_url: Assets.s3_asset_url(asset_path),
-      priority: priority
+      priority: priority,
+      schedule: schedule
     }
   end
 end

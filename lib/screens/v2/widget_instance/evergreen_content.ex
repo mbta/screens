@@ -2,16 +2,24 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
   @moduledoc false
 
   alias Screens.Config.Screen
+  alias Screens.Config.V2.Schedule
   alias Screens.V2.WidgetInstance
 
   @enforce_keys ~w[screen slot_names asset_url priority]a
-  defstruct @enforce_keys
+  defstruct screen: nil,
+            slot_names: nil,
+            asset_url: nil,
+            priority: nil,
+            schedule: [%Schedule{}],
+            now: DateTime.utc_now()
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
           slot_names: list(WidgetInstance.slot_id()),
           asset_url: String.t(),
-          priority: WidgetInstance.priority()
+          priority: WidgetInstance.priority(),
+          schedule: list(Schedule.t()),
+          now: DateTime.t()
         }
 
   def priority(%__MODULE__{} = instance), do: instance.priority
@@ -22,7 +30,22 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
 
   def widget_type(_instance), do: :evergreen_content
 
-  def valid_candidate?(_instance), do: true
+  def valid_candidate?(%__MODULE__{schedule: schedule, now: now}) do
+    schedule
+    |> Enum.any?(fn
+      %Schedule{start_dt: nil, end_dt: nil} ->
+        true
+
+      %Schedule{start_dt: start_dt, end_dt: nil} ->
+        DateTime.compare(start_dt, now) in [:lt, :eq]
+
+      %Schedule{start_dt: nil, end_dt: end_dt} ->
+        DateTime.compare(end_dt, now) == :gt
+
+      %Schedule{start_dt: start_dt, end_dt: end_dt} ->
+        DateTime.compare(start_dt, now) in [:lt, :eq] and DateTime.compare(end_dt, now) == :gt
+    end)
+  end
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.EvergreenContent

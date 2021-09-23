@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
   alias Screens.V2.WidgetInstance
   alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance.EvergreenContent
+  alias Screens.Config.V2.Schedule
 
   setup do
     %{
@@ -11,7 +12,19 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
         screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
         slot_names: [:medium_left, :medium_right],
         asset_url: "https://mbta-screens.s3.amazonaws.com/screens-dev/videos/some-video.mp4",
-        priority: [2, 3, 1]
+        priority: [2, 3, 1],
+        schedule: [%Schedule{}],
+        now: ~U[2021-02-01T00:00:00Z]
+      },
+      widget_old_schedule: %EvergreenContent{
+        screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
+        slot_names: [:medium_left, :medium_right],
+        asset_url: "https://mbta-screens.s3.amazonaws.com/screens-dev/videos/some-video.mp4",
+        priority: [2, 3, 1],
+        schedule: [
+          %Schedule{start_dt: ~U[2021-01-01T00:00:00Z], end_dt: ~U[2021-01-02T00:00:00Z]}
+        ],
+        now: ~U[2021-02-01T00:00:00Z]
       }
     }
   end
@@ -44,8 +57,12 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
   end
 
   describe "valid_candidate?/1" do
-    test "returns true", %{widget: widget} do
+    test "returns true with blank schedule", %{widget: widget} do
       assert WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "returns false with old schedule", %{widget_old_schedule: widget_old_schedule} do
+      refute WidgetInstance.valid_candidate?(widget_old_schedule)
     end
   end
 end
