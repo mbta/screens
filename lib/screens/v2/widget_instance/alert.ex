@@ -168,16 +168,15 @@ defmodule Screens.V2.WidgetInstance.Alert do
     end
   end
 
-  def valid_candidate?(%__MODULE__{screen: %Screen{app_id: screen_type}} = t) do
-    cond do
-      screen_type in [:bus_shelter_v2, :bus_eink_v2] ->
-        priority(t) != :no_render and
-          location(t) == :inside and
-          active?(t)
+  def valid_candidate?(%__MODULE__{screen: %Screen{app_id: screen_type}} = t)
+      when screen_type in [:bus_shelter_v2, :bus_eink_v2] do
+    priority(t) != :no_render and
+      location(t) == :inside and
+      active?(t)
+  end
 
-      screen_type == :gl_eink_v2 ->
-        priority(t) != :no_render
-    end
+  def valid_candidate?(t) do
+    priority(t) != :no_render
   end
 
   def active?(%__MODULE__{alert: alert, now: now}, happening_now? \\ &Alert.happening_now?/2) do
