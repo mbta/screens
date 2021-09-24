@@ -25,7 +25,7 @@ const TYPE_TO_COMPONENT = {
   normal_header: NormalHeader,
   departures: NormalDepartures,
   line_map: LineMap,
-  evergreen_content: EvergreenContent
+  evergreen_content: EvergreenContent,
 };
 
 const App = (): JSX.Element => {

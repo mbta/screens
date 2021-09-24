@@ -1,6 +1,6 @@
 import { WidgetData } from "Components/v2/widget";
 import useInterval from "Hooks/use_interval";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -59,8 +59,9 @@ interface UseApiResponseArgs {
 const useApiResponse = ({
   id,
   failureModeElapsedMs = MINUTE_IN_MS,
-}: UseApiResponseArgs): ApiResponse => {
+}: UseApiResponseArgs): { apiResponse: ApiResponse; requestCount: number } => {
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
+  const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
   const { lastRefresh, refreshRate } = document.getElementById("app").dataset;
   const refreshMs = parseInt(refreshRate, 10) * 1000;
@@ -92,6 +93,8 @@ const useApiResponse = ({
     } catch (err) {
       doFailureBuffer(lastSuccess, failureModeElapsedMs, setApiResponse);
     }
+
+    setRequestCount((count) => count + 1);
   };
 
   // Perform initial data fetch once on component mount
@@ -106,7 +109,7 @@ const useApiResponse = ({
     }, refreshMs);
   }
 
-  return apiResponse;
+  return { apiResponse, requestCount };
 };
 
 export default useApiResponse;
