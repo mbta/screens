@@ -5,13 +5,13 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
   alias Screens.Config.V2.Schedule
   alias Screens.V2.WidgetInstance
 
-  @enforce_keys ~w[screen slot_names asset_url priority]a
+  @enforce_keys ~w[screen slot_names asset_url priority now]a
   defstruct screen: nil,
             slot_names: nil,
             asset_url: nil,
             priority: nil,
             schedule: [%Schedule{}],
-            now: DateTime.utc_now()
+            now: nil
 
   @type t :: %__MODULE__{
           screen: Screen.t(),

@@ -28,7 +28,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
       slot_names: slot_names,
       asset_url: Assets.s3_asset_url(asset_path),
       priority: priority,
-      schedule: schedule
+      schedule: schedule,
+      now: DateTime.utc_now()
     }
   end
 end
