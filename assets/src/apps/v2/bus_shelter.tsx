@@ -82,7 +82,7 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 
 const blinkConfig: BlinkConfig = {
   refreshesPerBlink: 15,
-  durationMs: 16,
+  durationMs: 34,
 };
 
 const App = (): JSX.Element => {
