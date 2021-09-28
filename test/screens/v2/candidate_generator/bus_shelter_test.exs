@@ -102,5 +102,35 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       assert expected_header in actual_instances
       assert expected_footer in actual_instances
     end
+
+    test "supports CurrentStopName header config", %{config: config} do
+      config =
+        put_in(config.app_params.header, %V2.Header.CurrentStopName{stop_name: "Walnut Ave"})
+
+      departures_instances_fn = fn _ -> [] end
+      alert_instances_fn = fn _ -> [] end
+      fetch_stop_fn = fn "1216" -> raise "This should not be called!" end
+      now = ~U[2020-04-06T10:00:00Z]
+      evergreen_content_instances_fn = fn _ -> [] end
+
+      expected_header = %NormalHeader{
+        screen: config,
+        icon: nil,
+        text: "Walnut Ave",
+        time: ~U[2020-04-06T10:00:00Z]
+      }
+
+      actual_instances =
+        BusShelter.candidate_instances(
+          config,
+          now,
+          fetch_stop_fn,
+          departures_instances_fn,
+          alert_instances_fn,
+          evergreen_content_instances_fn
+        )
+
+      assert expected_header in actual_instances
+    end
   end
 end
