@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
 
   alias Screens.Config.Screen
   alias Screens.Config.V2.{BusShelter, Footer, Survey}
-  alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Config.V2.Header.{CurrentStopId, CurrentStopName}
   alias Screens.Util.Assets
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
@@ -77,11 +77,17 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   end
 
   defp header_instances(config, now, fetch_stop_name_fn) do
-    %Screen{app_params: %BusShelter{header: %CurrentStopId{stop_id: stop_id}}} = config
+    %Screen{app_params: %BusShelter{header: header_config}} = config
 
-    case fetch_stop_name_fn.(stop_id) do
-      nil -> []
-      stop_name -> [%NormalHeader{screen: config, text: stop_name, time: now}]
+    case header_config do
+      %CurrentStopId{stop_id: stop_id} ->
+        case fetch_stop_name_fn.(stop_id) do
+          nil -> []
+          stop_name -> [%NormalHeader{screen: config, text: stop_name, time: now}]
+        end
+
+      %CurrentStopName{stop_name: stop_name} ->
+        [%NormalHeader{screen: config, text: stop_name, time: now}]
     end
   end
 
