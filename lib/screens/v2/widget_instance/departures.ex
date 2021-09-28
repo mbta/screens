@@ -11,18 +11,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defstruct screen: nil,
             section_data: []
 
-  @type normal_section :: %{
+  @type section :: %{
           type: :normal_section,
-          departures: list(Departure.t())
+          departures: list(Departure.t() | notice())
         }
 
-  @type notice_section :: %{
-          type: :notice_section,
-          icon: atom() | nil,
-          text: FreeText.t()
+  @type notice :: %{
+          destination: String.t(),
+          headway: non_neg_integer()
         }
 
-  @type section :: normal_section | notice_section
   @type t :: %__MODULE__{
           screen: Screen.t(),
           section_data: list(section)
