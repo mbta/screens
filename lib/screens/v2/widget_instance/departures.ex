@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Dup.Override.FreeText
+  alias Screens.Config.Dup.Override.FreeTextLine
   alias Screens.Config.Screen
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
@@ -11,18 +11,20 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defstruct screen: nil,
             section_data: []
 
-  @type normal_section :: %{
+  @type section :: %{
           type: :normal_section,
-          departures: list(Departure.t())
+          rows: list(Departure.t() | notice())
         }
 
   @type notice_section :: %{
           type: :notice_section,
-          icon: atom() | nil,
-          text: FreeText.t()
+          text: FreeTextLine.t()
         }
 
-  @type section :: normal_section | notice_section
+  @type notice :: %{
+          text: FreeTextLine.t()
+        }
+
   @type t :: %__MODULE__{
           screen: Screen.t(),
           section_data: list(section)
@@ -42,11 +44,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def valid_candidate?(_instance), do: true
   end
 
-  def serialize_section(%{type: :notice_section, icon: icon, text: text}, _screen) do
-    %{type: :notice_section, icon: icon, text: FreeText.to_json(text)}
+  def serialize_section(%{type: :notice_section, text: text}, _screen) do
+    %{type: :notice_section, text: text}
   end
 
-  def serialize_section(%{type: :normal_section, departures: departures}, screen) do
+  def serialize_section(%{type: :normal_section, rows: departures}, screen) do
     rows = group_departures(departures)
     %{type: :normal_section, rows: Enum.map(rows, &serialize_row(&1, screen))}
   end
