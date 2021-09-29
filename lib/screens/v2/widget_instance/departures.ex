@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Dup.Override.FreeText
+  alias Screens.Config.Dup.Override.FreeTextLine
   alias Screens.Config.Screen
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
@@ -13,12 +13,17 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type section :: %{
           type: :normal_section,
-          departures: list(Departure.t() | notice())
+          rows: list(Departure.t() | notice())
+        }
+
+  @type notice_section :: %{
+          type: :notice_section,
+          icon: atom() | nil,
+          text: FreeTextLine.t()
         }
 
   @type notice :: %{
-          destination: String.t(),
-          headway: non_neg_integer()
+          text: FreeTextLine.t()
         }
 
   @type t :: %__MODULE__{
