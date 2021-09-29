@@ -85,6 +85,12 @@ defmodule ScreensWeb.Router do
 
       get "/:id", ScreenApiController, :show
     end
+
+    scope "/audio" do
+      pipe_through [:redirect_prod_http, :browser]
+
+      get "/text_to_speech/:text", AudioController, :text_to_speech
+    end
   end
 
   scope "/image", ScreensWeb do
@@ -112,8 +118,6 @@ defmodule ScreensWeb.Router do
     get "/:id/readout.mp3", AudioController, :show
 
     get "/:id/debug", AudioController, :debug
-
-    get "/text_to_speech/:text", AudioController, :text_to_speech
   end
 
   scope "/alert_priority", ScreensWeb do
