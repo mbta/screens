@@ -25,9 +25,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "returns serialized notice_section" do
-      section = %{type: :notice_section, icon: :warning, text: %{icon: nil, text: []}}
+      section = %{type: :notice_section, text: %{icon: :warning, text: []}}
 
-      assert %{type: :notice_section, icon: :warning, text: %{icon: nil, text: []}} ==
+      assert %{type: :notice_section, text: %{icon: :warning, text: []}} ==
                Departures.serialize_section(section, nil)
     end
   end

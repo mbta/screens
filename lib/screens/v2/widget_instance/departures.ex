@@ -18,7 +18,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type notice_section :: %{
           type: :notice_section,
-          icon: atom() | nil,
           text: FreeTextLine.t()
         }
 
@@ -45,8 +44,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def valid_candidate?(_instance), do: true
   end
 
-  def serialize_section(%{type: :notice_section, icon: icon, text: text}, _screen) do
-    %{type: :notice_section, icon: icon, text: text}
+  def serialize_section(%{type: :notice_section, text: text}, _screen) do
+    %{type: :notice_section, text: text}
   end
 
   def serialize_section(%{type: :normal_section, rows: departures}, screen) do
