@@ -20,7 +20,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
   describe "serialize_section/1" do
     test "returns serialized normal_section" do
-      section = %{type: :normal_section, departures: []}
+      section = %{type: :normal_section, rows: []}
       assert %{type: :normal_section, rows: []} == Departures.serialize_section(section, nil)
     end
 

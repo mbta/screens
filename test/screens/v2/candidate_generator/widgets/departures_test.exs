@@ -48,8 +48,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         %DeparturesWidget{
           screen: config,
           section_data: [
-            %{type: :normal_section, departures: ["departure A1", "departure A2"]},
-            %{type: :normal_section, departures: ["departure B1", "departure B2"]}
+            %{type: :normal_section, rows: ["departure A1", "departure A2"]},
+            %{type: :normal_section, rows: ["departure B1", "departure B2"]}
           ]
         }
       ]
@@ -71,8 +71,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         %DeparturesWidget{
           screen: config,
           section_data: [
-            %{type: :normal_section, departures: []},
-            %{type: :normal_section, departures: []}
+            %{type: :normal_section, rows: []},
+            %{type: :normal_section, rows: []}
           ]
         }
       ]

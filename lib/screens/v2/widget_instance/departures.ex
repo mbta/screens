@@ -44,7 +44,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :notice_section, icon: icon, text: FreeText.to_json(text)}
   end
 
-  def serialize_section(%{type: :normal_section, departures: departures}, screen) do
+  def serialize_section(%{type: :normal_section, rows: departures}, screen) do
     rows = group_departures(departures)
     %{type: :normal_section, rows: Enum.map(rows, &serialize_row(&1, screen))}
   end
