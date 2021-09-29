@@ -46,7 +46,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(%{type: :notice_section, icon: icon, text: text}, _screen) do
-    %{type: :notice_section, icon: icon, text: FreeTextLine.to_json(text)}
+    %{type: :notice_section, icon: icon, text: text}
   end
 
   def serialize_section(%{type: :normal_section, rows: departures}, screen) do
