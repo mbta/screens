@@ -112,6 +112,8 @@ defmodule ScreensWeb.Router do
     get "/:id/readout.mp3", AudioController, :show
 
     get "/:id/debug", AudioController, :debug
+
+    get "/text_to_speech/:text", AudioController, :text_to_speech
   end
 
   scope "/alert_priority", ScreensWeb do

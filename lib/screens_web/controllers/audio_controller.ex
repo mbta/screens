@@ -55,6 +55,18 @@ defmodule ScreensWeb.AudioController do
     end
   end
 
+  def text_to_speech(conn, %{"text" => text} = params) do
+    disposition =
+      params
+      |> Map.get("disposition")
+      |> disposition_atom()
+
+      case Screens.Audio.synthesize(text, false, "text") do
+        {:ok, audio_data} -> send_audio(conn, {:binary, audio_data}, disposition)
+        :error -> send_fallback_audio(conn, false, nil, disposition)
+      end
+  end
+
   defp render_ssml(template_assigns) do
     View.render_to_string(ScreensWeb.AudioView, "index.ssml", template_assigns)
   end
