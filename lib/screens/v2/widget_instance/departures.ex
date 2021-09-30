@@ -49,7 +49,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(%{type: :normal_section, rows: departures}, screen) do
-    rows = group_departures(departures) ++ Enum.filter(departures, &match?(%{text: %Screens.Config.Dup.Override.FreeTextLine{}}, &1))
+    rows =
+      group_departures(departures) ++
+        Enum.filter(departures, &match?(%{text: %Screens.Config.Dup.Override.FreeTextLine{}}, &1))
+
     %{type: :normal_section, rows: Enum.map(rows, &serialize_row(&1, screen))}
   end
 

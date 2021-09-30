@@ -1,8 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.GlEink do
   @moduledoc false
 
-  alias Screens.Config.{Screen, V2}
   alias Screens.Config.Dup.Override.FreeTextLine
+  alias Screens.Config.{Screen, V2}
   alias Screens.Config.V2.{Footer, GlEink, Header}
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.CandidateGenerator
@@ -153,14 +153,22 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
     } = config
 
     Enum.map(sections, fn {:ok, departures} ->
-      cond do
-        length(departures) <= 1 ->
-          destination = fetch_destination(route_id, direction_id)
-          headway = Screens.Headways.by_route_id(route_id, stop_id, direction_id, nil)
-          {:ok, departures ++ [%{text: %FreeTextLine{icon: nil, text: ["Trains to #{destination} every #{headway - 2}-#{headway + 2} minutes."]}}]}
+      if length(departures) <= 1 do
+        destination = fetch_destination(route_id, direction_id)
+        headway = Screens.Headways.by_route_id(route_id, stop_id, direction_id, nil)
 
-        true ->
-          {:ok, departures}
+        {:ok,
+         departures ++
+           [
+             %{
+               text: %FreeTextLine{
+                 icon: nil,
+                 text: ["Trains to #{destination} every #{headway - 2}-#{headway + 2} minutes."]
+               }
+             }
+           ]}
+      else
+        {:ok, departures}
       end
     end)
   end
