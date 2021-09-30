@@ -7,7 +7,6 @@ import React, {
 } from "react";
 
 import NormalSection from "Components/v2/departures/normal_section";
-import NoticeSection from "Components/v2/departures/notice_section";
 
 const NormalDeparturesRenderer = forwardRef(
   ({ sections, sectionSizes }, ref) => {
@@ -15,14 +14,11 @@ const NormalDeparturesRenderer = forwardRef(
       <div className="departures-container">
         <div className="departures" ref={ref}>
           {sections.map(({ type, ...data }, i) => {
-            if (type === "normal_section") {
-              const { rows } = data;
-              return (
-                <NormalSection rows={trimRows(rows, sectionSizes[i])} key={i} />
-              );
-            } else if (type === "notice_section") {
-              return <NoticeSection {...data} key={i} />;
-            }
+            const departure_rows = data.rows.filter(({ type }) => type === "departure_row");
+            const notice_rows = data.rows.filter(({ type }) => type === "notice_row");
+            return (
+              <NormalSection rows={trimRows(departure_rows, sectionSizes[i])} notice={notice_rows[0]} key={"departure-row"} />
+            );
           })}
         </div>
       </div>
@@ -52,14 +48,10 @@ const trimRows = (rows, n) => {
 };
 
 const getInitialSectionSize = ({ type, ...data }) => {
-  if (type === "normal_section") {
-    return data.rows.reduce(
-      (acc, { times_with_crowding: times }) => acc + times.length,
-      0
-    );
-  } else {
-    return 0;
-  }
+  return data.rows.filter(({ type }) => type === "departure_row").reduce(
+    (acc, { times_with_crowding: times }) => acc + times.length,
+    0
+  );
 };
 
 const getInitialSectionSizes = (sections) => {
