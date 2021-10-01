@@ -2,6 +2,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
+  alias Screens.Config.Dup.Override.FreeTextLine
   alias Screens.Config.Screen
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
@@ -28,6 +29,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       section = %{type: :notice_section, text: %{icon: :warning, text: []}}
 
       assert %{type: :notice_section, text: %{icon: :warning, text: []}} ==
+               Departures.serialize_section(section, nil)
+    end
+
+    test "returns serialized normal_section with notice" do
+      section = %{type: :normal_section, rows: [%{text: %FreeTextLine{icon: nil, text: []}}]}
+
+      assert %{type: :normal_section, rows: [%{type: :notice_row, text: %{icon: nil, text: []}}]} ==
                Departures.serialize_section(section, nil)
     end
   end
@@ -70,6 +78,26 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       departures = [d1, d2, d3, d4, d5, d6, d7]
       expected = [[d1, d2], [d3], [d4], [d5], [d6, d7]]
+      assert expected == Departures.group_departures(departures)
+    end
+
+    test "groups departures and ignores notices" do
+      d1 = %Departure{
+        prediction: %Prediction{route: %Route{id: "1"}, trip: %Trip{headsign: "Nubian"}}
+      }
+
+      d2 = %Departure{
+        prediction: %Prediction{route: %Route{id: "1"}, trip: %Trip{headsign: "Nubian"}}
+      }
+
+      d3 = %Departure{
+        schedule: %Schedule{route: %Route{id: "22"}, trip: %Trip{headsign: "Ruggles"}}
+      }
+
+      n1 = %{text: %FreeTextLine{icon: nil, text: []}}
+
+      departures = [d1, d2, d3, n1]
+      expected = [[d1, d2], [d3]]
       assert expected == Departures.group_departures(departures)
     end
   end

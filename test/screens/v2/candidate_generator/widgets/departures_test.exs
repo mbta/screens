@@ -98,6 +98,34 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
 
       assert expected_departures_instances == actual_departures_instances
     end
+
+    test "returns DeparturesWidget with results from post processing", %{config: config} do
+      fetch_section_departures_fn = fn
+        %Section{query: "query A"} -> {:ok, []}
+        %Section{query: "query B"} -> {:ok, ["departure B1"]}
+      end
+
+      post_processing_fn = fn sections, _config ->
+        Enum.map(sections, fn {:ok, departures} ->
+          {:ok, departures ++ ["notice"]}
+        end)
+      end
+
+      expected_departures_instances = [
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{type: :normal_section, rows: ["notice"]},
+            %{type: :normal_section, rows: ["departure B1", "notice"]}
+          ]
+        }
+      ]
+
+      actual_departures_instances =
+        Departures.departures_instances(config, fetch_section_departures_fn, post_processing_fn)
+
+      assert expected_departures_instances == actual_departures_instances
+    end
   end
 
   describe "filter_departures/2" do
