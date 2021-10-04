@@ -1,7 +1,6 @@
 defmodule ScreensWeb.V2.AudioController do
   use ScreensWeb, :controller
   require Logger
-  alias Phoenix.View
   alias Screens.Config.State
 
   @fallback_audio_path "assets/static/audio/readout_fallback.mp3"
@@ -20,8 +19,14 @@ defmodule ScreensWeb.V2.AudioController do
 
   def text_to_speech(conn, %{"text" => text}) do
     case Screens.Audio.synthesize(text, false, "text") do
-        {:ok, audio_data} -> send_download(conn, {:binary, audio_data}, filename: "readout.mp3", disposition: :inline)
-        :error -> send_download(conn, {:file, @fallback_audio_path}, filename: "readout.mp3", disposition: :inline)
-      end
+      {:ok, audio_data} ->
+        send_download(conn, {:binary, audio_data}, filename: "readout.mp3", disposition: :inline)
+
+      :error ->
+        send_download(conn, {:file, @fallback_audio_path},
+          filename: "readout.mp3",
+          disposition: :inline
+        )
+    end
   end
 end
