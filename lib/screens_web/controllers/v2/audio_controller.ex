@@ -3,8 +3,6 @@ defmodule ScreensWeb.V2.AudioController do
   require Logger
   alias Screens.Config.State
 
-  @fallback_audio_path "assets/static/audio/readout_fallback.mp3"
-
   plug(:check_config)
 
   defp check_config(conn, _) do
@@ -23,10 +21,7 @@ defmodule ScreensWeb.V2.AudioController do
         send_download(conn, {:binary, audio_data}, filename: "readout.mp3", disposition: :inline)
 
       :error ->
-        send_download(conn, {:file, @fallback_audio_path},
-          filename: "readout.mp3",
-          disposition: :inline
-        )
+        send_resp(conn, 404, "Not found")
     end
   end
 end
