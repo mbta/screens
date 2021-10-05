@@ -89,7 +89,7 @@ defmodule ScreensWeb.Router do
     scope "/audio" do
       pipe_through [:redirect_prod_http, :browser]
 
-      get "/text_to_speech/:text", AudioController, :text_to_speech
+      post "/text_to_speech", AudioController, :text_to_speech
     end
   end
 
