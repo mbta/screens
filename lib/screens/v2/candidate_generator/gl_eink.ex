@@ -2,6 +2,9 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   @moduledoc false
 
   alias Screens.Config.Dup.Override.FreeTextLine
+  alias Screens.Config.V2.Departures
+  alias Screens.Config.V2.Departures.{Query, Section}
+  alias Screens.Config.V2.Departures.Query.Params
   alias Screens.Config.{Screen, V2}
   alias Screens.Config.V2.{Footer, GlEink, Header}
   alias Screens.RoutePatterns.RoutePattern
@@ -147,8 +150,19 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   defp departures_post_processing(sections, config) do
     %Screen{
       app_params: %GlEink{
-        header: %Header.Destination{route_id: route_id, direction_id: direction_id},
-        footer: %Footer{stop_id: stop_id}
+        departures: %Departures{
+          sections: [
+            %Section{
+              query: %Query{
+                params: %Params{
+                  stop_ids: [stop_id],
+                  route_ids: [route_id],
+                  direction_id: direction_id
+                }
+              }
+            }
+          ]
+        }
       }
     } = config
 
