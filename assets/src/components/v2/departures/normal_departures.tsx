@@ -14,10 +14,9 @@ const NormalDeparturesRenderer = forwardRef(
       <div className="departures-container">
         <div className="departures" ref={ref}>
           {sections.map(({ type, ...data }, i) => {
-            const departure_rows = data.rows.filter(({ type }) => type === "departure_row");
-            const notice_rows = data.rows.filter(({ type }) => type === "notice_row");
+            const { rows } = data;
             return (
-              <NormalSection rows={trimRows(departure_rows, sectionSizes[i])} notice={notice_rows[0]} key={"departure-row"} />
+              <NormalSection rows={trimRows(rows, sectionSizes[i])} key={i} />
             );
           })}
         </div>
@@ -28,7 +27,11 @@ const NormalDeparturesRenderer = forwardRef(
 
 const trimRows = (rows, n) => {
   const { trimmed, count } = rows.reduce(
-    ({ count, trimmed }, row) => {
+    ({ count, trimmed }, row: Row) => {
+      if (row.type == "notice_row") {
+        return { count: count++, trimmed: [...trimmed, row] };
+      }
+
       const trimmedRow = {
         ...row,
         times_with_crowding: row.times_with_crowding.slice(0, n - count),
@@ -47,10 +50,28 @@ const trimRows = (rows, n) => {
   return trimmed;
 };
 
-const getInitialSectionSize = ({ type, ...data }) => {
-  return data.rows.filter(({ type }) => type === "departure_row").reduce(
-    (acc, { times_with_crowding: times }) => acc + times.length,
-    0
+interface DepartureRow {
+  type: "departure_row";
+  times_with_crowding: any[];
+}
+
+interface NoticeRow {
+  type: "notice_row";
+  text: object;
+}
+
+type Row = DepartureRow | NoticeRow;
+
+const getInitialSectionSize = (data) => {
+  return data.rows.reduce(
+    (acc, row: Row) => {
+      switch (row.type) {
+        case "departure_row":
+          return acc + row.times_with_crowding.length;
+        case "notice_row":
+          return acc + 1;
+      }
+    }, 0
   );
 };
 
