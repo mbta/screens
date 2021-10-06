@@ -7,7 +7,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader}
 
   @behaviour CandidateGenerator
 
@@ -46,7 +46,6 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
       fn -> departures_instances_fn.(config) end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
-      fn -> placeholder_instances() end,
       fn -> evergreen_content_instances_fn.(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
@@ -84,12 +83,5 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
       _ ->
         nil
     end
-  end
-
-  defp placeholder_instances do
-    [
-      %Placeholder{color: :green, slot_names: [:main_content]},
-      %Placeholder{color: :red, slot_names: [:medium_flex]}
-    ]
   end
 end
