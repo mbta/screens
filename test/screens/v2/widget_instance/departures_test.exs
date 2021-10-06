@@ -97,7 +97,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       n1 = %{text: %FreeTextLine{icon: nil, text: []}}
 
       departures = [d1, d2, d3, n1]
-      expected = [[d1, d2], [d3]]
+      expected = [[d1, d2], [d3], [n1]]
       assert expected == Departures.group_departures(departures)
     end
   end
