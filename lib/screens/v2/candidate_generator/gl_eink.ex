@@ -166,8 +166,8 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
       }
     } = config
 
-    Enum.map(sections, fn {:ok, departures} ->
-      if length(departures) <= 1 do
+    Enum.map(sections, fn
+      {:ok, departures} when length(departures) <= 1 ->
         destination = fetch_destination(route_id, direction_id)
         headway = Screens.Headways.by_route_id(route_id, stop_id, direction_id, nil)
 
@@ -177,13 +177,17 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
              %{
                text: %FreeTextLine{
                  icon: nil,
-                 text: ["Trains to #{destination} every #{headway - 2}-#{headway + 2} minutes."]
+                 text: [
+                   "Trains to #{destination} every",
+                   %{format: :bold, text: "#{headway - 2}-#{headway + 2}"},
+                   "minutes"
+                 ]
                }
              }
            ]}
-      else
+
+      {:ok, departures} ->
         {:ok, departures}
-      end
     end)
   end
 end
