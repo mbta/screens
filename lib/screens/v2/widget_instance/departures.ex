@@ -49,17 +49,17 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(%{type: :normal_section, rows: departures}, screen) do
-    rows =
-      group_departures(departures) ++
-        Enum.filter(departures, &match?(%{text: %Screens.Config.Dup.Override.FreeTextLine{}}, &1))
+    rows = group_departures(departures)
 
     %{type: :normal_section, rows: Enum.map(rows, &serialize_row(&1, screen))}
   end
 
   def group_departures(departures) do
     departures
-    |> Enum.reject(&match?(%{text: %Screens.Config.Dup.Override.FreeTextLine{}}, &1))
-    |> Enum.chunk_by(fn d -> {Departure.route_id(d), Departure.headsign(d)} end)
+    |> Enum.chunk_by(fn
+      %{text: %FreeTextLine{}} -> make_ref()
+      d -> {Departure.route_id(d), Departure.headsign(d)}
+    end)
   end
 
   defp serialize_row([%Departure{} | _] = departures, screen) do
@@ -81,7 +81,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
   end
 
-  defp serialize_row(%{text: %FreeTextLine{} = text}, _screen) do
+  defp serialize_row([%{text: %FreeTextLine{} = text}], _screen) do
     %{
       type: :notice_row,
       text: FreeTextLine.to_json(text)
