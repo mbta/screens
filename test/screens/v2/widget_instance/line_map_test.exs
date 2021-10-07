@@ -217,7 +217,7 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
   describe "audio_serialize/1" do
     test "returns empty string" do
       instance = %LineMap{}
-      assert "" == WidgetInstance.audio_serialize(instance)
+      assert %{} == WidgetInstance.audio_serialize(instance)
     end
   end
 

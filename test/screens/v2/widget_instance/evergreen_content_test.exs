@@ -68,7 +68,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
 
   describe "audio_serialize/1" do
     test "returns empty string", %{widget: widget} do
-      assert "" == WidgetInstance.audio_serialize(widget)
+      assert %{} == WidgetInstance.audio_serialize(widget)
     end
   end
 

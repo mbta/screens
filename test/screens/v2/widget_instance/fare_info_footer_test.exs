@@ -60,11 +60,11 @@ defmodule Screens.V2.WidgetInstance.FareInfoFooterTest do
 
   describe "audio_serialize/1" do
     test "returns empty string for bus", %{bus_instance: instance} do
-      assert "" == WidgetInstance.audio_serialize(instance)
+      assert %{} == WidgetInstance.audio_serialize(instance)
     end
 
     test "returns empty string for subway", %{subway_instance: instance} do
-      assert "" == WidgetInstance.audio_serialize(instance)
+      assert %{} == WidgetInstance.audio_serialize(instance)
     end
   end
 

@@ -63,11 +63,11 @@ defmodule Screens.V2.WidgetInstance.AlertHeaderTest do
 
   describe "audio_serialize/1" do
     test "returns empty string for header with time", %{instance_with_time: instance} do
-      assert "" == WidgetInstance.audio_serialize(instance)
+      assert %{} == WidgetInstance.audio_serialize(instance)
     end
 
     test "returns empty string for header without time", %{instance_no_time: instance} do
-      assert "" == WidgetInstance.audio_serialize(instance)
+      assert %{} == WidgetInstance.audio_serialize(instance)
     end
   end
 

@@ -69,7 +69,7 @@ defmodule Screens.V2.WidgetInstance.SurveyTest do
 
   describe "audio_serialize/1" do
     test "returns empty string", %{widget: widget} do
-      assert "" == WidgetInstance.audio_serialize(widget)
+      assert %{} == WidgetInstance.audio_serialize(widget)
     end
   end
 

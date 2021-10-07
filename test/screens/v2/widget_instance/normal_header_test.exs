@@ -43,7 +43,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
 
   describe "audio_serialize/1" do
     test "returns empty string", %{instance: instance} do
-      assert "" == WidgetInstance.audio_serialize(instance)
+      assert %{} == WidgetInstance.audio_serialize(instance)
     end
   end
 

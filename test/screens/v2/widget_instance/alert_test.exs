@@ -849,7 +849,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
   describe "audio_serialize/1" do
     test "returns empty string", %{widget: widget} do
-      assert "" == AlertWidget.audio_serialize(widget)
+      assert %{} == AlertWidget.audio_serialize(widget)
     end
   end
 
