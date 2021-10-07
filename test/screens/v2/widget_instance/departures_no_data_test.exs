@@ -34,4 +34,22 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoDataTest do
       assert :departures_no_data == WidgetInstance.widget_type(@instance)
     end
   end
+
+  describe "audio_serialize/1" do
+    test "returns empty string" do
+      assert "" == WidgetInstance.audio_serialize(@instance)
+    end
+  end
+
+  describe "audio_sort_key/1" do
+    test "returns 0" do
+      assert 0 == WidgetInstance.audio_sort_key(@instance)
+    end
+  end
+
+  describe "audio_valid_candidate?/1" do
+    test "returns false" do
+      refute WidgetInstance.audio_valid_candidate?(@instance)
+    end
+  end
 end
