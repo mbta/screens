@@ -34,5 +34,11 @@ defmodule Screens.V2.WidgetInstance.FareInfoFooter do
     def widget_type(_instance), do: :fare_info_footer
 
     def valid_candidate?(_instance), do: true
+
+    def audio_serialize(_instance), do: ""
+
+    def audio_sort_key(_instance), do: 0
+
+    def audio_valid_candidate?(_instance), do: false
   end
 end

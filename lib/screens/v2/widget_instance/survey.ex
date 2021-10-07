@@ -42,5 +42,8 @@ defmodule Screens.V2.WidgetInstance.Survey do
     def slot_names(instance), do: Survey.slot_names(instance)
     def widget_type(instance), do: Survey.widget_type(instance)
     def valid_candidate?(instance), do: Survey.valid_candidate?(instance)
+    def audio_serialize(_instance), do: ""
+    def audio_sort_key(_instance), do: 0
+    def audio_valid_candidate?(_instance), do: false
   end
 end
