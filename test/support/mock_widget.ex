@@ -17,7 +17,7 @@ defmodule Screens.V2.WidgetInstance.MockWidget do
           slot_names: list(atom()),
           valid_candidate?: boolean(),
           audio_sort_key: non_neg_integer(),
-          audio_valid_candidate?: boolean(),
+          audio_valid_candidate?: boolean()
         }
 
   defimpl Screens.V2.WidgetInstance do
