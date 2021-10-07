@@ -490,7 +490,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     end
   end
 
-  def audio_serialize(_instance), do: ""
+  def audio_serialize(_instance), do: %{}
 
   def audio_sort_key(_instance), do: 0
 

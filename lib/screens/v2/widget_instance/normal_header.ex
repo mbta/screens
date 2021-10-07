@@ -29,7 +29,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
     def valid_candidate?(_instance), do: true
 
-    def audio_serialize(_instance), do: ""
+    def audio_serialize(_instance), do: %{}
 
     def audio_sort_key(_instance), do: 0
 
