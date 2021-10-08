@@ -14,10 +14,14 @@ const NormalDeparturesRenderer = forwardRef(
       <div className="departures-container">
         <div className="departures" ref={ref}>
           {sections.map(({ type, ...data }, i) => {
-            const { rows } = data;
-            return (
-              <NormalSection rows={trimRows(rows, sectionSizes[i])} key={i} />
-            );
+            if (type === "normal_section") {
+              const { rows } = data;
+              return (
+                <NormalSection rows={trimRows(rows, sectionSizes[i])} key={i} />
+              );
+            } else if (type === "notice_section") {
+              return <NoticeSection {...data} key={i} />;
+            }
           })}
         </div>
       </div>
