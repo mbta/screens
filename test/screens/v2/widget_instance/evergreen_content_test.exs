@@ -83,4 +83,10 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
       refute WidgetInstance.audio_valid_candidate?(widget)
     end
   end
+
+  describe "audio_view/1" do
+    test "returns EvergreenContentView", %{widget: widget} do
+      assert ScreensWeb.Views.V2.Audio.EvergreenContentView == WidgetInstance.audio_view(widget)
+    end
+  end
 end

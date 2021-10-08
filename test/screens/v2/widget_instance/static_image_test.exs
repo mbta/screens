@@ -77,4 +77,10 @@ defmodule Screens.V2.WidgetInstance.StaticImageTest do
       refute WidgetInstance.audio_valid_candidate?(instance)
     end
   end
+
+  describe "audio_view/1" do
+    test "returns StaticImageView", %{instance: instance} do
+      assert ScreensWeb.Views.V2.Audio.StaticImageView == WidgetInstance.audio_view(instance)
+    end
+  end
 end

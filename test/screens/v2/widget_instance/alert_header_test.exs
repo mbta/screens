@@ -90,4 +90,14 @@ defmodule Screens.V2.WidgetInstance.AlertHeaderTest do
       refute WidgetInstance.audio_valid_candidate?(instance)
     end
   end
+
+  describe "audio_view/1" do
+    test "returns AlertHeaderView for header with time", %{instance_with_time: instance} do
+      assert ScreensWeb.Views.V2.Audio.AlertHeaderView == WidgetInstance.audio_view(instance)
+    end
+
+    test "returns AlertHeaderView for header without time", %{instance_no_time: instance} do
+      assert ScreensWeb.Views.V2.Audio.AlertHeaderView == WidgetInstance.audio_view(instance)
+    end
+  end
 end

@@ -58,4 +58,10 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
       refute WidgetInstance.audio_valid_candidate?(instance)
     end
   end
+
+  describe "audio_view/1" do
+    test "returns NormalHeaderView", %{instance: instance} do
+      assert ScreensWeb.Views.V2.Audio.NormalHeaderView == WidgetInstance.audio_view(instance)
+    end
+  end
 end

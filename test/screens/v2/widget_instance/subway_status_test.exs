@@ -352,4 +352,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       refute WidgetInstance.audio_valid_candidate?(instance)
     end
   end
+
+  describe "audio_view/1" do
+    test "returns SubwayStatusView" do
+      instance = %SubwayStatus{}
+      assert ScreensWeb.Views.V2.Audio.SubwayStatusView == WidgetInstance.audio_view(instance)
+    end
+  end
 end

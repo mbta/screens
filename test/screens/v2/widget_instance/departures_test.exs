@@ -648,4 +648,11 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       refute WidgetInstance.audio_valid_candidate?(instance)
     end
   end
+
+  describe "audio_view/1" do
+    test "returns DeparturesView" do
+      instance = %Departures{}
+      assert ScreensWeb.Views.V2.Audio.DeparturesView == WidgetInstance.audio_view(instance)
+    end
+  end
 end

@@ -52,4 +52,10 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoDataTest do
       refute WidgetInstance.audio_valid_candidate?(@instance)
     end
   end
+
+  describe "audio_view/1" do
+    test "returns DeparturesNoDataView" do
+      assert ScreensWeb.Views.V2.Audio.DeparturesNoDataView == WidgetInstance.audio_view(@instance)
+    end
+  end
 end

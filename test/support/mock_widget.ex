@@ -29,5 +29,6 @@ defmodule Screens.V2.WidgetInstance.MockWidget do
     def audio_serialize(t), do: t.audio_serialize
     def audio_sort_key(t), do: t.audio_sort_key
     def audio_valid_candidate?(t), do: t.audio_valid_candidate?
+    def audio_view(t), do: t.audio_view
   end
 end
