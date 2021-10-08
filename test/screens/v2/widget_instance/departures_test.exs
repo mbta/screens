@@ -627,4 +627,32 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert :departures == WidgetInstance.widget_type(instance)
     end
   end
+
+  describe "audio_serialize/1" do
+    test "returns empty string" do
+      instance = %Departures{}
+      assert %{} == WidgetInstance.audio_serialize(instance)
+    end
+  end
+
+  describe "audio_sort_key/1" do
+    test "returns 0" do
+      instance = %Departures{}
+      assert 0 == WidgetInstance.audio_sort_key(instance)
+    end
+  end
+
+  describe "audio_valid_candidate?/1" do
+    test "returns false" do
+      instance = %Departures{}
+      refute WidgetInstance.audio_valid_candidate?(instance)
+    end
+  end
+
+  describe "audio_view/1" do
+    test "returns DeparturesView" do
+      instance = %Departures{}
+      assert ScreensWeb.Views.V2.Audio.DeparturesView == WidgetInstance.audio_view(instance)
+    end
+  end
 end

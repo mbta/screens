@@ -42,6 +42,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def widget_type(_instance), do: :departures
 
     def valid_candidate?(_instance), do: true
+
+    def audio_serialize(_instance), do: %{}
+
+    def audio_sort_key(_instance), do: 0
+
+    def audio_valid_candidate?(_instance), do: false
+
+    def audio_view(_instance), do: ScreensWeb.Views.V2.Audio.DeparturesView
   end
 
   def serialize_section(%{type: :notice_section, text: text}, _screen) do

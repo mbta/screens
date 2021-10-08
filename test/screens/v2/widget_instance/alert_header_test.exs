@@ -60,4 +60,44 @@ defmodule Screens.V2.WidgetInstance.AlertHeaderTest do
       assert :alert_header == WidgetInstance.widget_type(instance)
     end
   end
+
+  describe "audio_serialize/1" do
+    test "returns empty string for header with time", %{instance_with_time: instance} do
+      assert %{} == WidgetInstance.audio_serialize(instance)
+    end
+
+    test "returns empty string for header without time", %{instance_no_time: instance} do
+      assert %{} == WidgetInstance.audio_serialize(instance)
+    end
+  end
+
+  describe "audio_sort_key/1" do
+    test "returns 0 for header with time", %{instance_with_time: instance} do
+      assert 0 == WidgetInstance.audio_sort_key(instance)
+    end
+
+    test "returns 0 for header without time", %{instance_no_time: instance} do
+      assert 0 == WidgetInstance.audio_sort_key(instance)
+    end
+  end
+
+  describe "audio_valid_candidate?/1" do
+    test "returns false for header with time", %{instance_with_time: instance} do
+      refute WidgetInstance.audio_valid_candidate?(instance)
+    end
+
+    test "returns false for header without time", %{instance_no_time: instance} do
+      refute WidgetInstance.audio_valid_candidate?(instance)
+    end
+  end
+
+  describe "audio_view/1" do
+    test "returns AlertHeaderView for header with time", %{instance_with_time: instance} do
+      assert ScreensWeb.Views.V2.Audio.AlertHeaderView == WidgetInstance.audio_view(instance)
+    end
+
+    test "returns AlertHeaderView for header without time", %{instance_no_time: instance} do
+      assert ScreensWeb.Views.V2.Audio.AlertHeaderView == WidgetInstance.audio_view(instance)
+    end
+  end
 end

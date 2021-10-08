@@ -42,6 +42,14 @@ defmodule Screens.V2.WidgetInstance.LineMap do
     def widget_type(_instance), do: :line_map
 
     def valid_candidate?(_instance), do: true
+
+    def audio_serialize(_instance), do: %{}
+
+    def audio_sort_key(_instance), do: 0
+
+    def audio_valid_candidate?(_instance), do: false
+
+    def audio_view(_instance), do: ScreensWeb.Views.V2.Audio.LineMapView
   end
 
   def serialize_stops(current_stop, stops) do

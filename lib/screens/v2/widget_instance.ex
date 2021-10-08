@@ -23,4 +23,16 @@ defprotocol Screens.V2.WidgetInstance do
 
   @spec valid_candidate?(t) :: boolean()
   def valid_candidate?(instance)
+
+  @spec audio_serialize(t) :: map()
+  def audio_serialize(instance)
+
+  @spec audio_sort_key(t) :: integer()
+  def audio_sort_key(instance)
+
+  @spec audio_valid_candidate?(t) :: boolean()
+  def audio_valid_candidate?(instance)
+
+  @spec audio_view(t) :: module()
+  def audio_view(instance)
 end

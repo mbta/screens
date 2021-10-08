@@ -66,4 +66,28 @@ defmodule Screens.V2.WidgetInstance.SurveyTest do
       refute WidgetInstance.valid_candidate?(widget)
     end
   end
+
+  describe "audio_serialize/1" do
+    test "returns empty string", %{widget: widget} do
+      assert %{} == WidgetInstance.audio_serialize(widget)
+    end
+  end
+
+  describe "audio_sort_key/1" do
+    test "returns 0", %{widget: widget} do
+      assert 0 == WidgetInstance.audio_sort_key(widget)
+    end
+  end
+
+  describe "audio_valid_candidate?/1" do
+    test "returns false", %{widget: widget} do
+      refute WidgetInstance.audio_valid_candidate?(widget)
+    end
+  end
+
+  describe "audio_view/1" do
+    test "returns SurveyView", %{widget: widget} do
+      assert ScreensWeb.Views.V2.Audio.SurveyView == WidgetInstance.audio_view(widget)
+    end
+  end
 end

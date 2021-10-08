@@ -846,4 +846,28 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       assert :no_render == AlertWidget.tiebreaker_effect(widget)
     end
   end
+
+  describe "audio_serialize/1" do
+    test "returns empty string", %{widget: widget} do
+      assert %{} == AlertWidget.audio_serialize(widget)
+    end
+  end
+
+  describe "audio_sort_key/1" do
+    test "returns 0", %{widget: widget} do
+      assert 0 == AlertWidget.audio_sort_key(widget)
+    end
+  end
+
+  describe "audio_valid_candidate?/1" do
+    test "returns false", %{widget: widget} do
+      refute AlertWidget.audio_valid_candidate?(widget)
+    end
+  end
+
+  describe "audio_view/1" do
+    test "returns AlertView", %{widget: widget} do
+      assert ScreensWeb.Views.V2.Audio.AlertView == AlertWidget.audio_view(widget)
+    end
+  end
 end

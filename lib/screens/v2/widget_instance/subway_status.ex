@@ -234,6 +234,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     def widget_type(_instance), do: :subway_status
 
     def valid_candidate?(_instance), do: true
+
+    def audio_serialize(_instance), do: %{}
+
+    def audio_sort_key(_instance), do: 0
+
+    def audio_valid_candidate?(_instance), do: false
+
+    def audio_view(_instance), do: ScreensWeb.Views.V2.Audio.SubwayStatusView
   end
 
   def get_relevant_alerts_by_route(alerts) do
