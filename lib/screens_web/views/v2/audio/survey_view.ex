@@ -1,5 +1,5 @@
 defmodule Screens.Views.V2.Audio.SurveyView do
-  use ScreensWeb, :view
+  # use ScreensWeb, :view
 
   import Phoenix.HTML
 
