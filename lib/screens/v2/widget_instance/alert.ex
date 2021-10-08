@@ -496,6 +496,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   def audio_valid_candidate?(_instance), do: false
 
+  def audio_view(_instance), do: ScreensWeb.Views.V2.Audio.AlertView
+
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.Alert
 
@@ -507,5 +509,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
     def audio_serialize(instance), do: Alert.audio_serialize(instance)
     def audio_sort_key(instance), do: Alert.audio_sort_key(instance)
     def audio_valid_candidate?(instance), do: Alert.audio_valid_candidate?(instance)
+    def audio_view(instance), do: Alert.audio_view(instance)
   end
 end

@@ -32,4 +32,7 @@ defprotocol Screens.V2.WidgetInstance do
 
   @spec audio_valid_candidate?(t) :: boolean()
   def audio_valid_candidate?(instance)
+
+  @spec audio_view(t) :: module()
+  def audio_view(instance)
 end

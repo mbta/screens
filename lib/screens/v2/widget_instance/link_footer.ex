@@ -31,5 +31,7 @@ defmodule Screens.V2.WidgetInstance.LinkFooter do
     def audio_sort_key(_instance), do: 0
 
     def audio_valid_candidate?(_instance), do: false
+
+    def audio_view(_instance), do: ScreensWeb.Views.V2.Audio.LinkFooterView
   end
 end
