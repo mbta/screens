@@ -52,7 +52,7 @@ defmodule Screens.V2.CandidateGenerator.GlEinkTest do
 
   describe "candidate_instances/3" do
     test "returns expected header", %{config: config} do
-      departures_instances_fn = fn _ -> [] end
+      departures_instances_fn = fn _, _, _ -> [] end
       alerts_instances_fn = fn _ -> [] end
       fetch_destination_fn = fn "Green-C", 0 -> "Cleveland Circle" end
       now = ~U[2020-04-06T10:00:00Z]

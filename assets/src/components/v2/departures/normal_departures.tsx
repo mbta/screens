@@ -32,7 +32,15 @@ const NormalDeparturesRenderer = forwardRef(
 
 const trimRows = (rows, n) => {
   const { trimmed, count } = rows.reduce(
-    ({ count, trimmed }, row) => {
+    ({ count, trimmed }, row: Row) => {
+      if (row.type == "notice_row") {
+        if (count < n) {
+          return { count: count + 1, trimmed: [...trimmed, row] };
+        } else {
+          return { count, trimmed };
+        }
+      }
+
       const trimmedRow = {
         ...row,
         times_with_crowding: row.times_with_crowding.slice(0, n - count),
@@ -51,15 +59,29 @@ const trimRows = (rows, n) => {
   return trimmed;
 };
 
-const getInitialSectionSize = ({ type, ...data }) => {
-  if (type === "normal_section") {
-    return data.rows.reduce(
-      (acc, { times_with_crowding: times }) => acc + times.length,
-      0
-    );
-  } else {
-    return 0;
-  }
+interface DepartureRow {
+  type: "departure_row";
+  times_with_crowding: any[];
+}
+
+interface NoticeRow {
+  type: "notice_row";
+  text: object;
+}
+
+type Row = DepartureRow | NoticeRow;
+
+const getInitialSectionSize = (data) => {
+  return data.rows.reduce(
+    (acc, row: Row) => {
+      switch (row.type) {
+        case "departure_row":
+          return acc + row.times_with_crowding.length;
+        case "notice_row":
+          return acc + 1;
+      }
+    }, 0
+  );
 };
 
 const getInitialSectionSizes = (sections) => {

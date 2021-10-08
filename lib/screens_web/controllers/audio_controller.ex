@@ -37,7 +37,7 @@ defmodule ScreensWeb.AudioController do
            Screens.ScreenData.by_screen_id(screen_id, is_screen, check_disabled: true),
          template_assigns <- Screens.Audio.from_api_data(data, screen_id),
          ssml <- render_ssml(template_assigns),
-         {:ok, audio_data} <- Screens.Audio.synthesize(ssml, is_screen) do
+         {:ok, audio_data} <- Screens.Audio.synthesize(ssml, is_screen, "ssml") do
       send_audio(conn, {:binary, audio_data}, disposition)
     else
       _ -> send_fallback_audio(conn, is_screen, screen_id, disposition)
