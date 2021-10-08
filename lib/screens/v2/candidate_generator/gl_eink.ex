@@ -14,8 +14,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   alias Screens.V2.WidgetInstance.{
     FareInfoFooter,
     LineMap,
-    NormalHeader,
-    Placeholder
+    NormalHeader
   }
 
   @scheduled_terminal_departure_lookback_seconds 180
@@ -63,7 +62,6 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
       end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
-      fn -> placeholder_instances() end,
       fn -> line_map_instances(config) end,
       fn -> evergreen_content_instances_fn.(config) end
     ]
@@ -137,13 +135,6 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         text: "For real-time predictions and fare purchase locations:",
         url: "mbta.com/stops/#{stop_id}"
       }
-    ]
-  end
-
-  defp placeholder_instances do
-    [
-      %Placeholder{color: :blue, slot_names: [:main_content]},
-      %Placeholder{color: :green, slot_names: [:medium_flex]}
     ]
   end
 
