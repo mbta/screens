@@ -11,24 +11,33 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   def departures_instances(
         %Screen{app_params: %app{}} = config,
-        fetch_section_departures_fn \\ &fetch_section_departures/1
+        fetch_section_departures_fn \\ &fetch_section_departures/1,
+        post_processing_fn \\ fn sections, _config -> sections end
       )
       when app in [BusEink, BusShelter, GlEink, SolariLarge, Solari] do
     if Screens.Config.State.mode_disabled?(get_devops_mode(config)) do
       [%DeparturesNoData{screen: config, show_alternatives?: false}]
     else
-      do_departures_instances(config, fetch_section_departures_fn)
+      do_departures_instances(config, fetch_section_departures_fn, post_processing_fn)
     end
+  end
+
+  def fetch_section_departures(%Section{query: query, filter: filter}) do
+    query
+    |> fetch_departures()
+    |> filter_departures(filter)
   end
 
   defp do_departures_instances(
          %{app_params: %{departures: %Departures{sections: sections}}} = config,
-         fetch_section_departures_fn
+         fetch_section_departures_fn,
+         post_processing_fn
        ) do
     sections_data =
       sections
       |> Task.async_stream(fetch_section_departures_fn, timeout: :infinity)
       |> Enum.map(fn {:ok, data} -> data end)
+      |> post_processing_fn.(config)
 
     departures_instance =
       if Enum.any?(sections_data, &(&1 == :error)) do
@@ -43,12 +52,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
       end
 
     [departures_instance]
-  end
-
-  defp fetch_section_departures(%Section{query: query, filter: filter}) do
-    query
-    |> fetch_departures()
-    |> filter_departures(filter)
   end
 
   defp fetch_departures(%Query{opts: opts, params: params}) do
