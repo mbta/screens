@@ -7,6 +7,7 @@ import React, {
 } from "react";
 
 import NormalSection from "Components/v2/departures/normal_section";
+import NoticeSection from "Components/v2/departures/notice_section";
 
 const NormalDeparturesRenderer = forwardRef(
   ({ sections, sectionSizes }, ref) => {
