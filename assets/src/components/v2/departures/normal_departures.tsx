@@ -33,7 +33,7 @@ const trimRows = (rows, n) => {
   const { trimmed, count } = rows.reduce(
     ({ count, trimmed }, row: Row) => {
       if (row.type == "notice_row") {
-        return { count: count++, trimmed: [...trimmed, row] };
+        return { count: count + 1, trimmed: [...trimmed, row] };
       }
 
       const trimmedRow = {
