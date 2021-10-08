@@ -1,6 +1,10 @@
 defmodule Screens.V2.CandidateGenerator.GlEink do
   @moduledoc false
 
+  alias Screens.Config.Dup.Override.FreeTextLine
+  alias Screens.Config.V2.Departures
+  alias Screens.Config.V2.Departures.{Query, Section}
+  alias Screens.Config.V2.Departures.Query.Params
   alias Screens.Config.{Screen, V2}
   alias Screens.Config.V2.{Footer, GlEink, Header}
   alias Screens.RoutePatterns.RoutePattern
@@ -43,13 +47,19 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         config,
         now \\ DateTime.utc_now(),
         fetch_destination_fn \\ &fetch_destination/2,
-        departures_instances_fn \\ &Widgets.Departures.departures_instances/1,
+        departures_instances_fn \\ &Widgets.Departures.departures_instances/3,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
       fn -> header_instances(config, now, fetch_destination_fn) end,
-      fn -> departures_instances_fn.(config) end,
+      fn ->
+        departures_instances_fn.(
+          config,
+          &Widgets.Departures.fetch_section_departures/1,
+          &departures_post_processing/2
+        )
+      end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
       fn -> line_map_instances(config) end,
@@ -126,5 +136,49 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         url: "mbta.com/stops/#{stop_id}"
       }
     ]
+  end
+
+  defp departures_post_processing(sections, config) do
+    %Screen{
+      app_params: %GlEink{
+        departures: %Departures{
+          sections: [
+            %Section{
+              query: %Query{
+                params: %Params{
+                  stop_ids: [stop_id],
+                  route_ids: [route_id],
+                  direction_id: direction_id
+                }
+              }
+            }
+          ]
+        }
+      }
+    } = config
+
+    Enum.map(sections, fn
+      {:ok, departures} when length(departures) <= 1 ->
+        destination = fetch_destination(route_id, direction_id)
+        headway = Screens.Headways.by_route_id(route_id, stop_id, direction_id, nil)
+
+        {:ok,
+         departures ++
+           [
+             %{
+               text: %FreeTextLine{
+                 icon: nil,
+                 text: [
+                   "Trains to #{destination} every",
+                   %{format: :bold, text: "#{headway - 2}-#{headway + 2}"},
+                   "minutes"
+                 ]
+               }
+             }
+           ]}
+
+      {:ok, departures} ->
+        {:ok, departures}
+    end)
   end
 end
