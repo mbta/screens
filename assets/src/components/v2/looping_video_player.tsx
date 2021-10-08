@@ -15,6 +15,8 @@ interface Props {
  * - `loop`: video loops indefinitely
  * - `playsInline`: video plays within the element, not fullscreen
  * - `muted`: any audio on the file is muted
+ * - `preload="auto"`: tells the browser that the video is expected to play through and should be fully downloaded
+ *                     (this helps it choose an appropriate caching strategy instead of downloading anew every time)
  *
  * Playback can be paused by flipping `isPlaying` to false.
  *
@@ -47,10 +49,11 @@ const LoopingVideoPlayer: ComponentType<Props> = ({
   return (
     <video
       src={src}
-      className={"looping-video"}
+      className="looping-video"
       onCanPlay={handleCanPlay}
       ref={ref}
       poster={poster}
+      preload="auto"
       loop
       playsInline
       muted
