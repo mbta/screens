@@ -18,6 +18,7 @@ const iconPaths: { [key: string]: string } = _.mapValues(
     green_c: "gl-c-color.svg",
     green_d: "gl-d-color.svg",
     green_e: "gl-e-color.svg",
+    clock: "clock.svg",
   },
   imagePath
 );
