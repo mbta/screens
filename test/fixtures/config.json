@@ -2939,6 +2939,12 @@
     "1401": {
       "app_id": "bus_shelter_v2",
       "app_params": {
+        "audio": {
+          "start_time": "",
+          "stop_time": "",
+          "volume": 0.0,
+          "days_active": []
+        },
         "departures": {
           "sections": [
             {
