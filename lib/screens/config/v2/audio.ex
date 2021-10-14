@@ -4,7 +4,7 @@ defmodule Screens.Config.V2.Audio do
   @type t :: %__MODULE__{
           start_time: Time.t(),
           stop_time: Time.t(),
-          days_active: list(Calendar.day()),
+          days_active: list(Calendar.day_of_week()),
           volume: float()
         }
 
