@@ -16,6 +16,14 @@ const TEXT_TOP_MARGIN = 10;
 const VEHICLE_ICON_SIZE = 44;
 const SCHEDULED_DEPARTURE_SIZE = 192;
 
+const abbreviateStop = (stop) => {
+  if (stop === "Heath Street") {
+    return "Heath St.";
+  }
+
+  return stop;
+};
+
 const BaseMapFutureTerminal = () => {
   return (
     <circle
@@ -131,9 +139,13 @@ const BaseMapStops = ({ stops }) => {
         );
 
         let stopLabel = null;
+        let labelText = abbreviateStop(label);
         if (downstream || current || terminal) {
           let modifier;
-          if (current) {
+          if (current && terminal) {
+            modifier = "current-terminal";
+            labelText = labelText.toUpperCase();
+          } else if (current) {
             modifier = "current";
           } else if (!downstream && !current) {
             modifier = "past";
@@ -145,7 +157,7 @@ const BaseMapStops = ({ stops }) => {
               y={TEXT_TOP_MARGIN + TOP_MARGIN + STOP_SPACING * i}
               className={classWithModifier("line-map__stop-label", modifier)}
             >
-              {label}
+              {labelText}
             </text>
           );
         }

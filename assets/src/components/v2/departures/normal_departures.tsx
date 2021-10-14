@@ -72,16 +72,14 @@ interface NoticeRow {
 type Row = DepartureRow | NoticeRow;
 
 const getInitialSectionSize = (data) => {
-  return data.rows.reduce(
-    (acc, row: Row) => {
-      switch (row.type) {
-        case "departure_row":
-          return acc + row.times_with_crowding.length;
-        case "notice_row":
-          return acc + 1;
-      }
-    }, 0
-  );
+  return data.rows.reduce((acc, row: Row) => {
+    switch (row.type) {
+      case "departure_row":
+        return acc + row.times_with_crowding.length;
+      case "notice_row":
+        return acc + 1;
+    }
+  }, 0);
 };
 
 const getInitialSectionSizes = (sections) => {
