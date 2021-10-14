@@ -15,7 +15,7 @@ defmodule Screens.Config.V2.BusShelter do
           audio: Audio.t()
         }
 
-  @enforce_keys [:departures, :footer, :header, :alerts, :audio]
+  @enforce_keys [:departures, :footer, :header, :alerts]
   defstruct departures: nil,
             footer: nil,
             header: nil,
