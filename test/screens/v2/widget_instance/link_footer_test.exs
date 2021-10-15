@@ -59,7 +59,7 @@ defmodule Screens.V2.WidgetInstance.LinkFooterTest do
 
   describe "audio_view/1" do
     test "returns LinkFooterView", %{instance: instance} do
-      assert ScreensWeb.Views.V2.Audio.LinkFooterView == WidgetInstance.audio_view(instance)
+      assert ScreensWeb.V2.Audio.LinkFooterView == WidgetInstance.audio_view(instance)
     end
   end
 end

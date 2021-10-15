@@ -41,6 +41,6 @@ defmodule Screens.V2.WidgetInstance.FareInfoFooter do
 
     def audio_valid_candidate?(_instance), do: false
 
-    def audio_view(_instance), do: ScreensWeb.Views.V2.Audio.FareInfoFooterView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.FareInfoFooterView
   end
 end

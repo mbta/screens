@@ -496,7 +496,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   def audio_valid_candidate?(_instance), do: false
 
-  def audio_view(_instance), do: ScreensWeb.Views.V2.Audio.AlertView
+  def audio_view(_instance), do: ScreensWeb.V2.Audio.AlertView
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.Alert

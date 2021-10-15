@@ -867,7 +867,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
   describe "audio_view/1" do
     test "returns AlertView", %{widget: widget} do
-      assert ScreensWeb.Views.V2.Audio.AlertView == AlertWidget.audio_view(widget)
+      assert ScreensWeb.V2.Audio.AlertView == AlertWidget.audio_view(widget)
     end
   end
 end

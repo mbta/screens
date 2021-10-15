@@ -55,7 +55,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoDataTest do
 
   describe "audio_view/1" do
     test "returns DeparturesNoDataView" do
-      assert ScreensWeb.Views.V2.Audio.DeparturesNoDataView ==
+      assert ScreensWeb.V2.Audio.DeparturesNoDataView ==
                WidgetInstance.audio_view(@instance)
     end
   end

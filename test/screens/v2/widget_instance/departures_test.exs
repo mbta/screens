@@ -652,7 +652,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   describe "audio_view/1" do
     test "returns DeparturesView" do
       instance = %Departures{}
-      assert ScreensWeb.Views.V2.Audio.DeparturesView == WidgetInstance.audio_view(instance)
+      assert ScreensWeb.V2.Audio.DeparturesView == WidgetInstance.audio_view(instance)
     end
   end
 end

@@ -54,12 +54,12 @@ defmodule ScreensWeb.ScreenController do
   end
 
   defp screen_ids(target_app_id) do
-    screen_ids =
-      for {screen_id, %Screen{app_id: app_id}} <- State.screens(), app_id == target_app_id do
+    ids =
+      for {screen_id, %Screen{app_id: ^target_app_id}} <- State.screens() do
         screen_id
       end
 
-    Enum.sort(screen_ids, &id_sort_fn/2)
+    Enum.sort(ids, &id_sort_fn/2)
   end
 
   def index(conn, %{"id" => app_id})

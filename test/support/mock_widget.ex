@@ -26,9 +26,9 @@ defmodule Screens.V2.WidgetInstance.MockWidget do
     def slot_names(t), do: t.slot_names
     def widget_type(t), do: t.widget_type
     def valid_candidate?(t), do: t.valid_candidate?
-    def audio_serialize(t), do: t.audio_serialize
+    def audio_serialize(t), do: %{content: t.content}
     def audio_sort_key(t), do: t.audio_sort_key
     def audio_valid_candidate?(t), do: t.audio_valid_candidate?
-    def audio_view(t), do: t.audio_view
+    def audio_view(_t), do: ScreensWeb.V2.Audio.MockWidgetView
   end
 end

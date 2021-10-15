@@ -30,17 +30,27 @@ defmodule Screens.V2.ScreenData do
   @spec by_screen_id(screen_id(), String.t()) :: response_map()
   def by_screen_id(screen_id, last_refresh) do
     cond do
-      outdated?(screen_id, last_refresh) -> outdated_response()
-      disabled?(screen_id) -> disabled_response()
-      true -> fetch_data(screen_id)
+      outdated?(screen_id, last_refresh) ->
+        outdated_response()
+
+      disabled?(screen_id) ->
+        disabled_response()
+
+      true ->
+        config = get_config(screen_id)
+        refresh_rate = Parameters.get_refresh_rate(config)
+
+        screen_id
+        |> fetch_data(config)
+        |> resolve_paging(refresh_rate)
+        |> serialize()
     end
   end
 
-  def fetch_data(screen_id) do
-    config = get_config(screen_id)
+  @spec fetch_data(screen_id(), Screen.t()) :: {Template.layout(), selected_instances_map()}
+  def fetch_data(screen_id, config) do
     _ = log_bus_shelter_request(config, screen_id)
     candidate_generator = Parameters.get_candidate_generator(config)
-    refresh_rate = Parameters.get_refresh_rate(config)
     screen_template = candidate_generator.screen_template()
 
     candidate_instances =
@@ -48,10 +58,7 @@ defmodule Screens.V2.ScreenData do
       |> candidate_generator.candidate_instances()
       |> Enum.filter(&WidgetInstance.valid_candidate?/1)
 
-    screen_template
-    |> pick_instances(candidate_instances)
-    |> resolve_paging(refresh_rate)
-    |> serialize()
+    pick_instances(screen_template, candidate_instances)
   end
 
   defp log_bus_shelter_request(%Screen{app_id: :bus_shelter_v2}, screen_id) do
