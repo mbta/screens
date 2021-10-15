@@ -49,7 +49,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     def audio_valid_candidate?(_instance), do: false
 
-    def audio_view(_instance), do: ScreensWeb.Views.V2.Audio.DeparturesView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.DeparturesView
   end
 
   def serialize_section(%{type: :notice_section, text: text}, _screen) do

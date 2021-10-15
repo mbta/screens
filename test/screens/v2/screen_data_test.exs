@@ -1,4 +1,4 @@
-defmodule ScreenDataTest do
+defmodule Screens.V2.ScreenDataTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.ScreenData

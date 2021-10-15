@@ -11,6 +11,7 @@ defmodule ScreensWeb.V2.ScreenController do
   plug(:check_config)
   plug(:environment_name)
   plug(:last_refresh)
+  plug(:v2_layout)
 
   defp check_config(conn, _) do
     if State.ok?() do
@@ -32,6 +33,10 @@ defmodule ScreensWeb.V2.ScreenController do
     assign(conn, :environment_name, environment_name)
   end
 
+  defp v2_layout(conn, _) do
+    put_layout(conn, {ScreensWeb.V2.LayoutView, "app.html"})
+  end
+
   def index(conn, %{"id" => screen_id}) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
@@ -48,7 +53,6 @@ defmodule ScreensWeb.V2.ScreenController do
         |> assign(:app_id, app_id)
         |> assign(:refresh_rate, Parameters.get_refresh_rate(app_id))
         |> put_view(ScreensWeb.V2.ScreenView)
-        |> put_layout({ScreensWeb.V2.LayoutView, "app.html"})
         |> render("index.html")
 
       nil ->

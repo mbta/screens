@@ -356,7 +356,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   describe "audio_view/1" do
     test "returns SubwayStatusView" do
       instance = %SubwayStatus{}
-      assert ScreensWeb.Views.V2.Audio.SubwayStatusView == WidgetInstance.audio_view(instance)
+      assert ScreensWeb.V2.Audio.SubwayStatusView == WidgetInstance.audio_view(instance)
     end
   end
 end

@@ -39,6 +39,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoData do
     def audio_serialize(_instance), do: %{}
     def audio_sort_key(_instance), do: 0
     def audio_valid_candidate?(_instance), do: false
-    def audio_view(_instance), do: ScreensWeb.Views.V2.Audio.DeparturesNoDataView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.DeparturesNoDataView
   end
 end

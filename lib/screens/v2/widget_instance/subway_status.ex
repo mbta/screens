@@ -241,7 +241,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
     def audio_valid_candidate?(_instance), do: false
 
-    def audio_view(_instance), do: ScreensWeb.Views.V2.Audio.SubwayStatusView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.SubwayStatusView
   end
 
   def get_relevant_alerts_by_route(alerts) do

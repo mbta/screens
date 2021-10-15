@@ -61,7 +61,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
 
   describe "audio_view/1" do
     test "returns NormalHeaderView", %{instance: instance} do
-      assert ScreensWeb.Views.V2.Audio.NormalHeaderView == WidgetInstance.audio_view(instance)
+      assert ScreensWeb.V2.Audio.NormalHeaderView == WidgetInstance.audio_view(instance)
     end
   end
 end

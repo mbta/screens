@@ -238,7 +238,7 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
   describe "audio_view/1" do
     test "returns LineMapView" do
       instance = %LineMap{}
-      assert ScreensWeb.Views.V2.Audio.LineMapView == WidgetInstance.audio_view(instance)
+      assert ScreensWeb.V2.Audio.LineMapView == WidgetInstance.audio_view(instance)
     end
   end
 end

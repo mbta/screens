@@ -87,7 +87,7 @@ defmodule Screens.V2.WidgetInstance.SurveyTest do
 
   describe "audio_view/1" do
     test "returns SurveyView", %{widget: widget} do
-      assert ScreensWeb.Views.V2.Audio.SurveyView == WidgetInstance.audio_view(widget)
+      assert ScreensWeb.V2.Audio.SurveyView == WidgetInstance.audio_view(widget)
     end
   end
 end
