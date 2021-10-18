@@ -8,10 +8,12 @@ defmodule Screens.Config.V2.Audio do
           volume: float()
         }
 
-  @enforce_keys [:start_time, :stop_time, :days_active, :volume]
-  defstruct @enforce_keys
+  defstruct start_time: ~T[00:00:00],
+            stop_time: ~T[00:00:00],
+            days_active: [],
+            volume: 0.0
 
-  use Screens.Config.Struct
+  use Screens.Config.Struct, with_default: true
 
   defp value_from_json("start_time", iso_string) do
     {:ok, t} = Time.from_iso8601(iso_string)
