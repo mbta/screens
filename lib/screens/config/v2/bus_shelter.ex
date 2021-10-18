@@ -12,7 +12,7 @@ defmodule Screens.Config.V2.BusShelter do
           alerts: Alerts.t(),
           evergreen_content: list(EvergreenContentItem.t()),
           survey: Survey.t(),
-          audio: Audio.t()
+          audio: Audio.t() | nil
         }
 
   @enforce_keys [:departures, :footer, :header, :alerts]
