@@ -48,7 +48,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         now \\ DateTime.utc_now(),
         fetch_destination_fn \\ &fetch_destination/2,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/3,
-        alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
+        _alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
@@ -60,7 +60,8 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
           &departures_post_processing/2
         )
       end,
-      fn -> alert_instances_fn.(config) end,
+      # Temporarily don't show alerts (until they're working)
+      # fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
       fn -> line_map_instances(config) end,
       fn -> evergreen_content_instances_fn.(config) end
@@ -81,14 +82,15 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         } = config
       ) do
     {:ok, stops} = RoutePattern.stops_by_route_and_direction(route_id, direction_id)
+    {:ok, reverse_stops} = RoutePattern.stops_by_route_and_direction(route_id, 1 - direction_id)
 
     {:ok, departures} =
-      Screens.V2.Departure.fetch(%{stop_ids: [station_id], direction_id: direction_id},
+      Screens.V2.Departure.fetch(%{stop_ids: [station_id]},
         include_schedules: true,
         now: DateTime.add(DateTime.utc_now(), -@scheduled_terminal_departure_lookback_seconds)
       )
 
-    [%LineMap{screen: config, stops: stops, departures: departures}]
+    [%LineMap{screen: config, stops: stops, reverse_stops: reverse_stops, departures: departures}]
   end
 
   def header_instances(config, now, fetch_destination_fn) do
