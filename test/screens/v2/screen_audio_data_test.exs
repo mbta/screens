@@ -54,6 +54,18 @@ defmodule Screens.V2.ScreenAudioDataTest do
         device_id: "TEST",
         name: "TEST",
         app_id: :bus_shelter_v2
+      },
+      config_eink: %Screen{
+        app_params: %V2.BusEink{
+          departures: %V2.Departures{sections: []},
+          footer: %V2.Footer{},
+          header: %V2.Header.CurrentStopId{stop_id: "1"},
+          alerts: %V2.Alerts{stop_id: "1"}
+        },
+        vendor: :gds,
+        device_id: "TEST",
+        name: "TEST",
+        app_id: :bus_eink_v2
       }
     }
   end
@@ -162,6 +174,42 @@ defmodule Screens.V2.ScreenAudioDataTest do
       get_config_fn = fn _screen_id -> config_no_audio end
 
       fetch_data_fn = fn _screen_id, _config_no_audio -> {:layout, selected_instances} end
+
+      expected_data = :error
+
+      assert expected_data ==
+               ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn)
+    end
+
+    test "returns an error if not a BusShelter screen", %{
+      config_eink: config_eink
+    } do
+      screen_id = "123"
+
+      selected_instances = %{
+        {0, :medium_left} => %MockWidget{
+          slot_names: [:medium_left, :medium_right],
+          audio_valid_candidate?: false,
+          audio_sort_key: 2,
+          content: "Alert"
+        },
+        :main_content => %MockWidget{
+          slot_names: [:main_content],
+          audio_valid_candidate?: true,
+          audio_sort_key: 1,
+          content: "Departures"
+        },
+        :header => %MockWidget{
+          slot_names: [:header],
+          audio_valid_candidate?: true,
+          audio_sort_key: 0,
+          content: "Header"
+        }
+      }
+
+      get_config_fn = fn _screen_id -> config_eink end
+
+      fetch_data_fn = fn _screen_id, _config_eink -> {:layout, selected_instances} end
 
       expected_data = :error
 
