@@ -47,8 +47,10 @@ defmodule Screens.V2.ScreenAudioData do
          },
          now
        ) do
-    Date.day_of_week(now) not in days_active or
-      DateTime.compare(start_time, now) == :gt or
-      DateTime.compare(stop_time, now) == :lt
+    {:ok, now_eastern} = DateTime.shift_zone(now, "America/New_York")
+
+    Date.day_of_week(now_eastern) not in days_active or
+      Time.compare(start_time, now_eastern) == :gt or
+      Time.compare(stop_time, now_eastern) == :lt
   end
 end
