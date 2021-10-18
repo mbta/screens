@@ -21,9 +21,6 @@ defmodule Screens.V2.ScreenAudioData do
       %Screen{app_params: %app{}} when app not in [BusShelter] ->
         :error
 
-      %Screen{app_params: %_app{audio: nil}} ->
-        :error
-
       %Screen{app_params: %_app{audio: audio}} ->
         if date_out_of_range?(audio, now) do
           []

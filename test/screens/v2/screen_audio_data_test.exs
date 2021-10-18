@@ -147,7 +147,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
                ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn, now)
     end
 
-    test "returns an error if audio config is missing", %{
+    test "returns an empty list if audio config is missing", %{
       config_no_audio: config_no_audio
     } do
       screen_id = "123"
@@ -177,7 +177,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
 
       fetch_data_fn = fn _screen_id, _config_no_audio -> {:layout, selected_instances} end
 
-      expected_data = :error
+      expected_data = []
 
       assert expected_data ==
                ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn)
