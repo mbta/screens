@@ -13,6 +13,17 @@ defmodule Screens.Config.V2.Audio do
 
   use Screens.Config.Struct
 
+  defp value_from_json("start_time", iso_string) do
+    {:ok, t} = Time.from_iso8601(iso_string)
+    t
+  end
+
+  defp value_from_json("stop_time", iso_string) do
+    {:ok, t} = Time.from_iso8601(iso_string)
+    t
+  end
+
   defp value_from_json(_, value), do: value
+
   defp value_to_json(_, value), do: value
 end
