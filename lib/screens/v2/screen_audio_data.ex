@@ -12,10 +12,10 @@ defmodule Screens.V2.ScreenAudioData do
   def by_screen_id(
         screen_id,
         get_config_fn \\ &ScreenData.get_config/1,
-        fetch_data_fn \\ &ScreenData.fetch_data/2
+        fetch_data_fn \\ &ScreenData.fetch_data/2,
+        now \\ DateTime.utc_now()
       ) do
     config = get_config_fn.(screen_id)
-    now = DateTime.utc_now()
 
     case config do
       %Screen{app_params: %app{}} when app not in [BusShelter] ->
