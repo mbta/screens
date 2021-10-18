@@ -22,7 +22,7 @@ defmodule Screens.Config.V2.BusShelter do
             alerts: nil,
             evergreen_content: [],
             survey: Survey.from_json(:default),
-            audio: nil
+            audio: Audio.from_json(:default)
 
   use Screens.Config.Struct,
     children: [
