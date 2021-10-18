@@ -18,10 +18,13 @@ defmodule Screens.V2.ScreenAudioData do
     now = DateTime.utc_now()
 
     case config do
-      %Screen{app_params: %BusShelter{audio: nil}} ->
+      %Screen{app_params: %app{}} when app not in [BusShelter] ->
         :error
 
-      %Screen{app_params: %BusShelter{audio: audio}} ->
+      %Screen{app_params: %_app{audio: nil}} ->
+        :error
+
+      %Screen{app_params: %_app{audio: audio}} ->
         if date_out_of_range?(audio, now) do
           [%{}]
         else
