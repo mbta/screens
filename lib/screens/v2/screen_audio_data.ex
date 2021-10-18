@@ -26,7 +26,7 @@ defmodule Screens.V2.ScreenAudioData do
 
       %Screen{app_params: %_app{audio: audio}} ->
         if date_out_of_range?(audio, now) do
-          [%{}]
+          []
         else
           screen_id
           |> fetch_data_fn.(config)

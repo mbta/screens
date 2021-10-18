@@ -109,7 +109,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
                ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn)
     end
 
-    test "returns an empty map if audio not in valid date range", %{
+    test "returns an empty list if audio not in valid date range", %{
       config_audio_inactive: config_audio_inactive
     } do
       screen_id = "123"
@@ -139,7 +139,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
 
       fetch_data_fn = fn _screen_id, _config_audio_inactive -> {:layout, selected_instances} end
 
-      expected_data = [%{}]
+      expected_data = []
 
       assert expected_data ==
                ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn)
