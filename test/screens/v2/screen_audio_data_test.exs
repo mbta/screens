@@ -22,8 +22,8 @@ defmodule Screens.V2.ScreenAudioDataTest do
       config_audio_inactive: %Screen{
         app_params: %V2.BusShelter{
           audio: %V2.Audio{
-            start_time: ~U[2021-02-01T00:00:00Z],
-            stop_time: ~U[2021-02-01T01:00:00Z],
+            start_time: ~T[00:00:00],
+            stop_time: ~T[01:00:00],
             days_active: [0, 1, 2, 3, 4, 5, 6],
             volume: 0.1
           },
@@ -40,8 +40,8 @@ defmodule Screens.V2.ScreenAudioDataTest do
       config_valid_audio: %Screen{
         app_params: %V2.BusShelter{
           audio: %V2.Audio{
-            start_time: ~U[2021-02-01T00:00:00Z],
-            stop_time: ~U[3021-02-01T00:00:00Z],
+            start_time: ~T[00:00:00],
+            stop_time: ~T[02:00:00],
             days_active: [0, 1, 2, 3, 4, 5, 6],
             volume: 0.1
           },
@@ -75,6 +75,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
       config_valid_audio: config_valid_audio
     } do
       screen_id = "123"
+      now = ~U[2021-10-18T05:00:00Z]
 
       selected_instances = %{
         {0, :medium_left} => %MockWidget{
@@ -106,13 +107,14 @@ defmodule Screens.V2.ScreenAudioDataTest do
       expected_data = [{audio_view, %{content: "Header"}}, {audio_view, %{content: "Departures"}}]
 
       assert expected_data ==
-               ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn)
+               ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn, now)
     end
 
     test "returns an empty list if audio not in valid date range", %{
       config_audio_inactive: config_audio_inactive
     } do
       screen_id = "123"
+      now = ~U[2021-10-18T15:00:00Z]
 
       selected_instances = %{
         {0, :medium_left} => %MockWidget{
@@ -142,7 +144,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
       expected_data = []
 
       assert expected_data ==
-               ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn)
+               ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn, now)
     end
 
     test "returns an error if audio config is missing", %{
