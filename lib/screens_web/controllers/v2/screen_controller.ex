@@ -4,7 +4,7 @@ defmodule ScreensWeb.V2.ScreenController do
   require Logger
 
   alias Screens.Config.{Screen, State}
-  alias Screens.Config.V2.{Audio, BusShelter}
+  alias Screens.Config.V2.Audio
   alias Screens.V2.ScreenData.Parameters
 
   @default_app_id :bus_eink
