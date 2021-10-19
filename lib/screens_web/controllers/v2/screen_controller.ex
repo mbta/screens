@@ -40,7 +40,7 @@ defmodule ScreensWeb.V2.ScreenController do
 
   defp assign_volume(conn, config) do
     case config do
-      %Screen{app_params: %BusShelter{audio: %Audio{volume: volume}}} ->
+      %Screen{app_params: %_app{audio: %Audio{volume: volume}}} ->
         assign(conn, :volume, volume)
 
       %Screen{} ->
