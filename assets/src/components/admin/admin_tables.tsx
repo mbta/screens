@@ -544,6 +544,15 @@ const GLEinkV2ScreensTable = (): JSX.Element => {
   );
 };
 
+const audioColumn = {
+  Header: "Audio",
+  accessor: buildAppParamAccessor("audio"),
+  mutator: buildAppParamMutator("audio"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
 const BusShelterV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "bus_shelter_v2";
@@ -551,7 +560,7 @@ const BusShelterV2ScreensTable = (): JSX.Element => {
 
   return (
     <AdminTable
-      columns={[...v2Columns, alertsColumn, surveyColumn]}
+      columns={[...v2Columns, alertsColumn, surveyColumn, audioColumn]}
       dataFilter={dataFilter}
     />
   );

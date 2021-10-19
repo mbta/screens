@@ -2,7 +2,7 @@ defmodule Screens.Config.V2.BusShelter do
   @moduledoc false
   # credo:disable-for-this-file Credo.Check.Design.DuplicatedCode
 
-  alias Screens.Config.V2.{Alerts, Departures, EvergreenContentItem, Footer, Survey}
+  alias Screens.Config.V2.{Alerts, Audio, Departures, EvergreenContentItem, Footer, Survey}
   alias Screens.Config.V2.Header.{CurrentStopId, CurrentStopName}
 
   @type t :: %__MODULE__{
@@ -11,7 +11,8 @@ defmodule Screens.Config.V2.BusShelter do
           header: CurrentStopId.t() | CurrentStopName.t(),
           alerts: Alerts.t(),
           evergreen_content: list(EvergreenContentItem.t()),
-          survey: Survey.t()
+          survey: Survey.t(),
+          audio: Audio.t()
         }
 
   @enforce_keys [:departures, :footer, :header, :alerts]
@@ -20,7 +21,8 @@ defmodule Screens.Config.V2.BusShelter do
             header: nil,
             alerts: nil,
             evergreen_content: [],
-            survey: Survey.from_json(:default)
+            survey: Survey.from_json(:default),
+            audio: Audio.from_json(:default)
 
   use Screens.Config.Struct,
     children: [
@@ -28,7 +30,8 @@ defmodule Screens.Config.V2.BusShelter do
       footer: Footer,
       alerts: Alerts,
       evergreen_content: {:list, EvergreenContentItem},
-      survey: Survey
+      survey: Survey,
+      audio: Audio
     ]
 
   defp value_from_json("header", %{"type" => "current_stop_id"} = header) do

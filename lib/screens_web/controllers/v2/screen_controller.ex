@@ -4,6 +4,7 @@ defmodule ScreensWeb.V2.ScreenController do
   require Logger
 
   alias Screens.Config.{Screen, State}
+  alias Screens.Config.V2.Audio
   alias Screens.V2.ScreenData.Parameters
 
   @default_app_id :bus_eink
@@ -37,12 +38,24 @@ defmodule ScreensWeb.V2.ScreenController do
     put_layout(conn, {ScreensWeb.V2.LayoutView, "app.html"})
   end
 
+  defp assign_volume(conn, config) do
+    case config do
+      %Screen{app_params: %_app{audio: %Audio{volume: volume}}} ->
+        assign(conn, :volume, volume)
+
+      %Screen{} ->
+        assign(conn, :volume, 0.0)
+    end
+  end
+
   def index(conn, %{"id" => screen_id}) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
     _ = Screens.LogScreenData.log_page_load(screen_id, is_screen)
 
-    case State.screen(screen_id) do
+    config = State.screen(screen_id)
+
+    case config do
       %Screen{app_id: app_id} ->
         _ =
           if app_id == :bus_shelter_v2 do
@@ -52,6 +65,7 @@ defmodule ScreensWeb.V2.ScreenController do
         conn
         |> assign(:app_id, app_id)
         |> assign(:refresh_rate, Parameters.get_refresh_rate(app_id))
+        |> assign_volume(config)
         |> put_view(ScreensWeb.V2.ScreenView)
         |> render("index.html")
 
