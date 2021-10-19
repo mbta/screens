@@ -371,7 +371,7 @@ const Vehicle = ({ id, index, label }) => {
     <>
       <VehicleDroplet cx={cx} cy={cy} />
       <VehicleIcon cx={cx} cy={cy} iconSize={VEHICLE_ICON_SIZE} />
-      <VehicleLabel cx={cx} cy={cy} label={label} />
+      {label && <VehicleLabel cx={cx} cy={cy} label={label} />}
     </>
   );
 };
