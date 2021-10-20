@@ -138,16 +138,43 @@ defmodule Screens.V2.WidgetInstance.LineMap do
       |> Enum.filter(&forward_directions_match?(&1, direction_id))
       |> Enum.flat_map(&serialize_vehicle_departure(&1, stops, current_stop, now))
 
-    if is_terminal? do
-      backward_vehicles =
-        departures_with_vehicle_and_trip
-        |> Enum.filter(&reverse_directions_match?(&1, direction_id))
-        |> Enum.flat_map(&serialize_vehicle_departure(&1, reverse_stops, current_stop, now))
-        |> Enum.map(fn %{index: index} = v -> %{v | index: index + @num_future_stops} end)
+    all_vehicles =
+      if is_terminal? do
+        backward_vehicles =
+          departures_with_vehicle_and_trip
+          |> Enum.filter(&reverse_directions_match?(&1, direction_id))
+          |> Enum.flat_map(&serialize_vehicle_departure(&1, reverse_stops, current_stop, now))
+          |> Enum.map(fn %{index: index} = v -> %{v | index: index + @num_future_stops} end)
 
-      forward_vehicles ++ backward_vehicles
+        forward_vehicles ++ backward_vehicles
+      else
+        forward_vehicles
+      end
+
+    adjust_vehicles_for_overlaps(all_vehicles)
+  end
+
+  # We don't want to show overlapping train icons and predictions, so if two indices
+  # are too close together, we'll push the later train down. If the predictions times
+  # are the same, they can overlap slightly; if they're different, we space them further apart.
+  defp adjust_vehicles_for_overlaps(vehicles) do
+    vehicles
+    |> Enum.sort_by(& &1.index)
+    |> Enum.reduce([], &adjust_vehicle_for_overlaps/2)
+    |> Enum.reverse()
+  end
+
+  defp adjust_vehicle_for_overlaps(v, []), do: [v]
+
+  defp adjust_vehicle_for_overlaps(
+         %{index: current_index, label: current_label} = v,
+         [%{index: prev_index, label: prev_label} | _] = acc
+       ) do
+    if current_index <= prev_index do
+      adjustment = if current_label == prev_label, do: 0.4, else: 0.7
+      [%{v | index: prev_index + adjustment} | acc]
     else
-      forward_vehicles
+      [v | acc]
     end
   end
 
