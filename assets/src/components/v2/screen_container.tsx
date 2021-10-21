@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import useApiResponse, { ApiResponse } from "Hooks/v2/use_api_response";
 import Widget, { WidgetData } from "Components/v2/widget";
+import useAudioReadout from "Hooks/v2/use_audio_readout";
 
 type ResponseMapper = (apiResponse: ApiResponse) => WidgetData;
 
@@ -50,6 +51,17 @@ const BlinkConfigContext = createContext<BlinkConfig | null>(
   defaultBlinkConfig
 );
 
+interface AudioConfig {
+  readoutIntervalMinutes: number;
+  volume: number;
+}
+
+const defaultAudioConfig = null;
+
+const AudioConfigContext = createContext<AudioConfig | null>(
+  defaultAudioConfig
+);
+
 interface ScreenLayoutProps {
   apiResponse: ApiResponse;
   showBlink: boolean;
@@ -71,9 +83,14 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
 
 const ScreenContainer = ({ id }) => {
   const blinkConfig = useContext(BlinkConfigContext);
+  const audioConfig = useContext(AudioConfigContext);
   const [showBlink, setShowBlink] = useState(false);
 
   const { apiResponse, requestCount } = useApiResponse({ id });
+
+  if (audioConfig != null) {
+    useAudioReadout({ id, readoutIntervalMinutes: audioConfig.readoutIntervalMinutes, volume: audioConfig.volume });
+  }
 
   useEffect(() => {
     if (
@@ -94,3 +111,4 @@ const ScreenContainer = ({ id }) => {
 export default ScreenContainer;
 export { ResponseMapper, ResponseMapperContext };
 export { BlinkConfig, BlinkConfigContext };
+export { AudioConfig, AudioConfigContext };
