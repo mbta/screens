@@ -95,6 +95,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   ]
 
   @green_line_b_stops [
+    {"place-gover", {"Government Center", "Gov't Ctr"}},
     {"place-pktrm", {"Park Street", "Park St"}},
     {"place-boyls", {"Boylston", "Boylston"}},
     {"place-armnl", {"Arlington", "Arlington"}},
@@ -121,8 +122,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   ]
 
   @green_line_c_stops [
-    {"place-north", {"North Station", "North Sta"}},
-    {"place-haecl", {"Haymarket", "Haymarket"}},
     {"place-gover", {"Government Center", "Gov't Ctr"}},
     {"place-pktrm", {"Park Street", "Park St"}},
     {"place-boyls", {"Boylston", "Boylston"}},
@@ -146,6 +145,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   ]
 
   @green_line_d_stops [
+    {"place-north", {"North Station", "North Sta"}},
+    {"place-haecl", {"Haymarket", "Haymarket"}},
     {"place-gover", {"Government Center", "Gov't Ctr"}},
     {"place-pktrm", {"Park Street", "Park St"}},
     {"place-boyls", {"Boylston", "Boylston"}},
