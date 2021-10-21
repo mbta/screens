@@ -11,6 +11,8 @@ import {
   ResponseMapperContext,
   BlinkConfig,
   BlinkConfigContext,
+  AudioConfigContext,
+  AudioConfig,
 } from "Components/v2/screen_container";
 import { MappingContext } from "Components/v2/widget";
 
