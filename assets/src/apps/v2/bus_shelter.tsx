@@ -87,6 +87,11 @@ const blinkConfig: BlinkConfig = {
   durationMs: 34,
 };
 
+const audioConfig: AudioConfig = {
+  readoutIntervalMinutes: parseInt(document.getElementById("app").getAttribute("data-audio-readout-interval")),
+  volume: parseFloat(document.getElementById("app").getAttribute("data-volume"))
+}
+
 const App = (): JSX.Element => {
   return (
     <Router>
@@ -95,7 +100,9 @@ const App = (): JSX.Element => {
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <BlinkConfigContext.Provider value={blinkConfig}>
-                <ScreenPage />
+                <AudioConfigContext.Provider value={audioConfig}>
+                  <ScreenPage />
+                </AudioConfigContext.Provider>
               </BlinkConfigContext.Provider>
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
