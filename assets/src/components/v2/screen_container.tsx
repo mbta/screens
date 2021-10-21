@@ -88,9 +88,7 @@ const ScreenContainer = ({ id }) => {
 
   const { apiResponse, requestCount } = useApiResponse({ id });
 
-  if (audioConfig != null) {
-    useAudioReadout({ id, readoutIntervalMinutes: audioConfig.readoutIntervalMinutes, volume: audioConfig.volume });
-  }
+  useAudioReadout({ id, audioConfig });
 
   useEffect(() => {
     if (

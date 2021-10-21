@@ -1,18 +1,21 @@
+import { AudioConfig } from "Components/v2/screen_container";
 import useInterval from "Hooks/use_interval";
 import { useEffect } from "react";
 
 interface UseAudioReadoutArgs {
   id: string;
-  readoutIntervalMinutes: number;
-  volume: number;
+  config: AudioConfig;
 }
 
 const useAudioReadout = ({
   id,
-  readoutIntervalMinutes,
-  volume
+  config
 }: UseAudioReadoutArgs): void => {
-  const readoutInterval = readoutIntervalMinutes * 60000;
+  if (config === null) {
+    return;
+  }
+
+  const readoutInterval = config.readoutIntervalMinutes * 60000;
   const apiPath = `/v2/audio/${id}/readout.mp3`;
 
   const fetchAudio = async () => {
@@ -21,7 +24,7 @@ const useAudioReadout = ({
       const blob = await result.blob();
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
-      audio.volume = volume ? +volume : 0.0;
+      audio.volume = config.volume;
       audio.play();
     } catch (err) {
       console.log(err);
