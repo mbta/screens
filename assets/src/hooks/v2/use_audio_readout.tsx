@@ -3,13 +3,16 @@ import { useEffect } from "react";
 
 interface UseAudioReadoutArgs {
   id: string;
+  readoutIntervalMinutes: number;
+  volume: number;
 }
 
 const useAudioReadout = ({
   id,
+  readoutIntervalMinutes,
+  volume
 }: UseAudioReadoutArgs): void => {
-  const { volume, audioReadoutInterval } = document.getElementById("app").dataset;
-  const readoutInterval = parseInt(audioReadoutInterval, 10) * 60000;
+  const readoutInterval = readoutIntervalMinutes * 60000;
   const apiPath = `/v2/audio/${id}/readout.mp3`;
 
   const fetchAudio = async () => {
