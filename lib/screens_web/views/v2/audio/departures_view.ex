@@ -65,8 +65,8 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
 
     prefix =
       case time.type do
-        :timestamp -> ~E|A later|
-        _ -> ~E|The following|
+        :timestamp -> "A later"
+        _ -> "The following"
       end
 
     content =
@@ -151,11 +151,11 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   defp build_text(value_renderers) do
     value_renderers
     |> Enum.reject(fn
-      {value, _renderer} -> is_nil(value)
+      {value, renderer} when is_function(renderer) -> is_nil(value)
       value -> is_nil(value)
     end)
     |> Enum.map(fn
-      {value, renderer} -> renderer.(value)
+      {value, renderer} when is_function(renderer) -> renderer.(value)
       value -> identity_render(value)
     end)
     |> Enum.intersperse(~E| |)
