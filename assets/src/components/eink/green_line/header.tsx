@@ -3,7 +3,7 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 import { classWithModifier, formatTimeString, imagePath } from "Util/util";
 
 const abbreviateStop = (stop, routeId) => {
-  if (stop === "Government Center" && ["Green-B", "Green-C"].includes(routeId)) {
+  if (stop === "Government Center") {
     return "Government Ctr";
   }
 
