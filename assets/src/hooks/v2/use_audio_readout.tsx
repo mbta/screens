@@ -24,6 +24,9 @@ const useAudioReadout = ({
       const blob = await result.blob();
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
+      audio.onended = (_e) => {
+        URL.revokeObjectURL(url);
+      };
       audio.volume = config.volume;
       audio.play();
     } catch (err) {
