@@ -100,7 +100,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
 
       get_config_fn = fn _screen_id -> config_valid_audio end
 
-      fetch_data_fn = fn _screen_id, _config_valid_audio -> {:layout, selected_instances} end
+      fetch_data_fn = fn _config_valid_audio -> {:layout, selected_instances} end
 
       audio_view = ScreensWeb.V2.Audio.MockWidgetView
 
@@ -139,7 +139,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
 
       get_config_fn = fn _screen_id -> config_audio_inactive end
 
-      fetch_data_fn = fn _screen_id, _config_audio_inactive -> {:layout, selected_instances} end
+      fetch_data_fn = fn _config_audio_inactive -> {:layout, selected_instances} end
 
       expected_data = []
 
@@ -175,7 +175,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
 
       get_config_fn = fn _screen_id -> config_no_audio end
 
-      fetch_data_fn = fn _screen_id, _config_no_audio -> {:layout, selected_instances} end
+      fetch_data_fn = fn _config_no_audio -> {:layout, selected_instances} end
 
       expected_data = []
 
@@ -211,7 +211,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
 
       get_config_fn = fn _screen_id -> config_eink end
 
-      fetch_data_fn = fn _screen_id, _config_eink -> {:layout, selected_instances} end
+      fetch_data_fn = fn _config_eink -> {:layout, selected_instances} end
 
       expected_data = :error
 

@@ -12,7 +12,7 @@ defmodule Screens.V2.ScreenAudioData do
   def by_screen_id(
         screen_id,
         get_config_fn \\ &ScreenData.get_config/1,
-        fetch_data_fn \\ &ScreenData.fetch_data/2,
+        fetch_data_fn \\ &ScreenData.fetch_data/1,
         now \\ DateTime.utc_now()
       ) do
     config = get_config_fn.(screen_id)
@@ -25,8 +25,8 @@ defmodule Screens.V2.ScreenAudioData do
         if date_out_of_range?(audio, now) do
           []
         else
-          screen_id
-          |> fetch_data_fn.(config)
+          config
+          |> fetch_data_fn.()
           |> elem(1)
           |> Map.values()
           |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)

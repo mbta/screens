@@ -1,8 +1,6 @@
 defmodule ScreensWeb.V2.ScreenController do
   use ScreensWeb, :controller
 
-  require Logger
-
   alias Screens.Config.{Screen, State}
   alias Screens.Config.V2.Audio
   alias Screens.V2.ScreenData.Parameters
@@ -57,11 +55,6 @@ defmodule ScreensWeb.V2.ScreenController do
 
     case config do
       %Screen{app_id: app_id} ->
-        _ =
-          if app_id == :bus_shelter_v2 do
-            Logger.info("[bus shelter screen request] screen_id=#{screen_id}")
-          end
-
         conn
         |> assign(:app_id, app_id)
         |> assign(:refresh_rate, Parameters.get_refresh_rate(app_id))

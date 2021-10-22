@@ -5,6 +5,6 @@
                  http://www.w3.org/TR/speech-synthesis11/synthesis.xsd"
        xml:lang="en-US"><prosody rate="90%">
 <%= for {widget_audio_view, data} <- @widget_audio_data do %>
-  <p><%= render(widget_audio_view, "_widget.ssml", data) %></p>
+  <%= render(widget_audio_view, "_widget.ssml", data) %>
 <% end %>
 </prosody></speak>

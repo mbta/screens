@@ -26,6 +26,28 @@ defmodule Screens.Config.Dup.Override.FreeText do
   @type color :: :red | :blue | :orange | :green | :silver | :purple
   @type special :: :break
 
+  @spec to_plaintext(t()) :: String.t() | nil
+  def to_plaintext(text) when is_binary(text), do: text
+
+  def to_plaintext(%{route: :red}), do: "Red Line"
+  def to_plaintext(%{route: :blue}), do: "Blue Line"
+  def to_plaintext(%{route: :orange}), do: "Orange Line"
+  def to_plaintext(%{route: :green}), do: "Green Line"
+  def to_plaintext(%{route: :silver}), do: "Silver Line"
+  def to_plaintext(%{route: :cr}), do: "Commuter Rail"
+  def to_plaintext(%{route: :green_b}), do: "Green Line - B branch"
+  def to_plaintext(%{route: :green_c}), do: "Green Line - C branch"
+  def to_plaintext(%{route: :green_d}), do: "Green Line - D branch"
+  def to_plaintext(%{route: :green_e}), do: "Green Line - E branch"
+
+  def to_plaintext(%{format: _, text: text}), do: text
+
+  def to_plaintext(%{color: _, text: text}), do: text
+
+  def to_plaintext(%{special: _}), do: nil
+
+  def to_plaintext(%{icon: _}), do: nil
+
   @impl true
   def from_json(text) when is_binary(text) do
     text

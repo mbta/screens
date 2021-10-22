@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.Alerts.Alert
   alias Screens.Config.Dup.Override.FreeTextLine
   alias Screens.Config.Screen
+  alias Screens.Util
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
@@ -27,7 +28,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          section_data: list(section)
+          section_data: list(section | notice_section)
         }
 
   defimpl Screens.V2.WidgetInstance do
@@ -43,11 +44,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     def valid_candidate?(_instance), do: true
 
-    def audio_serialize(_instance), do: %{}
+    def audio_serialize(%Departures{section_data: section_data, screen: screen}) do
+      %{sections: Enum.map(section_data, &Departures.audio_serialize_section(&1, screen))}
+    end
 
-    def audio_sort_key(_instance), do: 0
+    def audio_sort_key(_instance), do: 1
 
-    def audio_valid_candidate?(_instance), do: false
+    def audio_valid_candidate?(_instance), do: true
 
     def audio_view(_instance), do: ScreensWeb.V2.Audio.DeparturesView
   end
@@ -57,12 +60,47 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(%{type: :normal_section, rows: departures}, screen) do
-    rows = group_departures(departures)
+    rows = group_consecutive_departures(departures)
 
     %{type: :normal_section, rows: Enum.map(rows, &serialize_row(&1, screen))}
   end
 
-  def group_departures(departures) do
+  def audio_serialize_section(%{type: :notice_section, text: text}, _screen) do
+    %{type: :notice_section, text: FreeTextLine.to_plaintext(text)}
+  end
+
+  def audio_serialize_section(%{type: :normal_section, rows: departures}, screen) do
+    serialized_departure_groups =
+      departures
+      |> group_all_departures(2)
+      |> Enum.map(&audio_serialize_departure_group(&1, screen))
+
+    %{
+      type: :normal_section,
+      departure_groups: serialized_departure_groups
+    }
+  end
+
+  defp audio_serialize_departure_group({:notice, %{text: text}}, _) do
+    {:notice, FreeTextLine.to_plaintext(text)}
+  end
+
+  defp audio_serialize_departure_group({:normal, departures}, screen) do
+    serialized_group =
+      departures
+      |> serialize_row(screen, &RoutePill.serialize_for_audio_departure/4)
+      |> group_time_types()
+
+    {:normal, serialized_group}
+  end
+
+  @doc """
+  Groups consecutive departures that have the same route and headsign.
+  `notice` rows are never grouped.
+  """
+  @spec group_consecutive_departures(list(Departure.t() | notice)) ::
+          list(list(Departure.t() | notice))
+  def group_consecutive_departures(departures) do
     departures
     |> Enum.chunk_by(fn
       %{text: %FreeTextLine{}} -> make_ref()
@@ -70,7 +108,55 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end)
   end
 
-  defp serialize_row([%Departure{} | _] = departures, screen) do
+  @doc """
+  Groups all departures of the same route and headsign, limiting each group to `max_entries_per_group` entries.
+  `notice` rows are never grouped.
+
+  The list is ordered by the occurrence of the _first_ departure of each group--later departures can "leap frog"
+  ahead of other ones of a different route/headsign if there's an earlier departure of the same route/headsign.
+  """
+  @spec group_all_departures(list(Departure.t() | notice), integer) ::
+          list(
+            {:normal, list(Departure.t())}
+            | {:notice, notice}
+          )
+  def group_all_departures(departures, max_entries_per_group) do
+    departures
+    |> Util.group_by_with_order(fn
+      %{text: %FreeTextLine{}} -> make_ref()
+      d -> {Departure.route_id(d), Departure.headsign(d)}
+    end)
+    |> Enum.map(fn
+      {ref, [notice]} when is_reference(ref) ->
+        {:notice, notice}
+
+      {_key, departure_group} ->
+        {:normal, Enum.take(departure_group, max_entries_per_group)}
+    end)
+  end
+
+  defp group_time_types(%{times_with_crowding: times_with_crowding} = row) do
+    time_groups_with_crowding =
+      times_with_crowding
+      |> Enum.chunk_by(fn
+        # ARR/BRD/Now times are never grouped
+        %{time: %{type: :text}} -> make_ref()
+        %{time: %{type: type}} -> type
+      end)
+      |> Enum.map(fn group -> {hd(group).time.type, group} end)
+
+    row
+    |> Map.delete(:times_with_crowding)
+    |> Map.put(:time_groups_with_crowding, time_groups_with_crowding)
+  end
+
+  defp serialize_row(
+         departures_or_notice,
+         screen,
+         route_pill_serializer \\ &RoutePill.serialize_for_departure/4
+       )
+
+  defp serialize_row([%Departure{} | _] = departures, screen, route_pill_serializer) do
     departure_id_string =
       departures
       |> Enum.map(&Departure.id/1)
@@ -82,27 +168,27 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{
       id: row_id,
       type: :departure_row,
-      route: serialize_route(departures),
+      route: serialize_route(departures, route_pill_serializer),
       headsign: serialize_headsign(departures),
       times_with_crowding: serialize_times_with_crowding(departures, screen),
       inline_alerts: serialize_inline_alerts(departures)
     }
   end
 
-  defp serialize_row([%{text: %FreeTextLine{} = text}], _screen) do
+  defp serialize_row([%{text: %FreeTextLine{} = text}], _screen, _pill_serializer) do
     %{
       type: :notice_row,
       text: FreeTextLine.to_json(text)
     }
   end
 
-  def serialize_route([first_departure | _]) do
+  def serialize_route([first_departure | _], route_pill_serializer) do
     route_id = Departure.route_id(first_departure)
     route_name = Departure.route_name(first_departure)
     route_type = Departure.route_type(first_departure)
     track_number = Departure.track_number(first_departure)
 
-    RoutePill.serialize_for_departure(route_id, route_name, route_type, track_number)
+    route_pill_serializer.(route_id, route_name, route_type, track_number)
   end
 
   def serialize_headsign([first_departure | _]) do

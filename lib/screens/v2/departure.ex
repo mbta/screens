@@ -121,15 +121,19 @@ defmodule Screens.V2.Departure do
     route_id
   end
 
-  def route_name(%__MODULE__{prediction: %Prediction{route: %Route{short_name: route_name}}}) do
-    route_name
+  def route_name(%__MODULE__{
+        prediction: %Prediction{
+          route: %Route{id: id, short_name: short_name, long_name: long_name}
+        }
+      }) do
+    do_route_name(id, short_name, long_name)
   end
 
   def route_name(%__MODULE__{
         prediction: nil,
-        schedule: %Schedule{route: %Route{short_name: route_name}}
+        schedule: %Schedule{route: %Route{id: id, short_name: short_name, long_name: long_name}}
       }) do
-    route_name
+    do_route_name(id, short_name, long_name)
   end
 
   def route_type(%__MODULE__{prediction: %Prediction{route: %Route{type: route_type}}}) do
@@ -189,6 +193,13 @@ defmodule Screens.V2.Departure do
   end
 
   def vehicle_status(_), do: nil
+
+  defp do_route_name(id, short_name, long_name) do
+    case Integer.parse(id) do
+      {_bus_id, ""} -> short_name
+      _ -> long_name
+    end
+  end
 
   defp crowding_data_relevant?(%Trip{id: trip_trip_id, stops: [first_stop | _]}, %Vehicle{
          current_status: current_status,

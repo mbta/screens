@@ -22,6 +22,23 @@ defmodule Screens.Util do
 
   @doc """
   Similar to Enum.group_by, except it returns a list of {key, value} tuples instead of a map to maintain order.
+  Order of the groups is determined by the position of the first occurrence of a member of that group.
+
+      iex> Screens.Util.group_by_with_order(0..10, &rem(&1, 3))
+      [
+        {0, [0, 3, 6, 9]},
+        {1, [1, 4, 7, 10]},
+        {2, [2, 5, 8]}
+      ]
+
+      iex> Screens.Util.group_by_with_order(
+             [%{group_id: 2, val: :a}, %{group_id: 1, val: :b}, %{group_id: 2, val: :c}, %{group_id: 1, val: :d}],
+             & &1.group_id
+           )
+      [
+        {2, [%{group_id: 2, val: :a}, %{group_id: 2, val: :c}]},
+        {1, [%{group_id: 1, val: :b}, %{group_id: 1, val: :d}]},
+      ]
   """
   @spec group_by_with_order(Enumerable.t(), (any() -> any())) :: [{any(), [any()]}]
   def group_by_with_order(enumerable, key_fun) do

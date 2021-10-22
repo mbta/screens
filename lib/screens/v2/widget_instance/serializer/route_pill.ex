@@ -25,6 +25,12 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
           color: color()
         }
 
+  @type audio_route :: %{
+          route_text: String.t(),
+          vehicle_type: :train | :bus | :trolley | :ferry | nil,
+          track_number: pos_integer() | nil
+        }
+
   @type icon :: :bus | :light_rail | :rail | :boat
 
   @type color :: :red | :orange | :green | :blue | :purple | :yellow | :teal
@@ -79,6 +85,28 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
       end
 
     Map.merge(route, %{color: get_color_for_route(route_id, route_type)})
+  end
+
+  @spec serialize_for_audio_departure(Route.id(), String.t(), RouteType.t(), pos_integer() | nil) ::
+          audio_route()
+  def serialize_for_audio_departure(route_id, route_name, route_type, track_number) do
+    vehicle_type =
+      case {route_type, route_id} do
+        # "Trolley" is part of the route name
+        {:light_rail, "Mattapan"} -> nil
+        {:light_rail, "Green-" <> _} -> :train
+        {:subway, _} -> :train
+        {:rail, _} -> :train
+        # "Ferry" is part of the route name
+        {:ferry, _} -> nil
+        {other, _} -> other
+      end
+
+    %{
+      route_text: route_name,
+      vehicle_type: vehicle_type,
+      track_number: track_number
+    }
   end
 
   @spec serialize_route_type_for_alert(RouteType.t()) :: t()
