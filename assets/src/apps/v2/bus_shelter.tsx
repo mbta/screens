@@ -11,6 +11,8 @@ import {
   ResponseMapperContext,
   BlinkConfig,
   BlinkConfigContext,
+  AudioConfigContext,
+  AudioConfig,
 } from "Components/v2/screen_container";
 import { MappingContext } from "Components/v2/widget";
 
@@ -85,6 +87,11 @@ const blinkConfig: BlinkConfig = {
   durationMs: 34,
 };
 
+const audioConfig: AudioConfig = {
+  readoutIntervalMinutes: parseInt(document.getElementById("app").dataset.audioReadoutInterval),
+  volume: parseFloat(document.getElementById("app").dataset.volume)
+}
+
 const App = (): JSX.Element => {
   return (
     <Router>
@@ -93,7 +100,9 @@ const App = (): JSX.Element => {
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <BlinkConfigContext.Provider value={blinkConfig}>
-                <ScreenPage />
+                <AudioConfigContext.Provider value={audioConfig}>
+                  <ScreenPage />
+                </AudioConfigContext.Provider>
               </BlinkConfigContext.Provider>
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>

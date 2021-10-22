@@ -21,6 +21,14 @@ defmodule Screens.V2.ScreenData.Parameters do
     solari_large_v2: 15
   }
 
+  @app_id_to_audio_readout_interval %{
+    bus_eink_v2: 0,
+    bus_shelter_v2: 5,
+    gl_eink_v2: 0,
+    solari_v2: 0,
+    solari_large_v2: 0
+  }
+
   @spec get_candidate_generator(Screens.Config.Screen.t() | atom()) :: candidate_generator()
   def get_candidate_generator(%Screens.Config.Screen{app_id: app_id}) do
     get_candidate_generator(app_id)
@@ -37,5 +45,14 @@ defmodule Screens.V2.ScreenData.Parameters do
 
   def get_refresh_rate(app_id) do
     Map.get(@app_id_to_refresh_rate, app_id)
+  end
+
+  @spec get_audio_readout_interval(Screens.Config.Screen.t() | atom()) :: pos_integer() | nil
+  def get_audio_readout_interval(%Screens.Config.Screen{app_id: app_id}) do
+    get_refresh_rate(app_id)
+  end
+
+  def get_audio_readout_interval(app_id) do
+    Map.get(@app_id_to_audio_readout_interval, app_id)
   end
 end
