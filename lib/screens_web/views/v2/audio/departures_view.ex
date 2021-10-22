@@ -32,67 +32,80 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
       times_with_crowding: times_with_crowding
     } = departures_group
 
+    ~E|<p><%= render_times_with_crowding(times_with_crowding, route, headsign) %></p>|
+  end
+
+  defp render_times_with_crowding(times_with_crowding, route, headsign) do
+    times_with_crowding
+    |> Enum.with_index()
+    |> Enum.map(&render_time_with_crowding(&1, route, headsign))
+  end
+
+  # foo # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
+  defp render_time_with_crowding({%{crowding: crowding, time: time}, 0}, route, headsign) do
     route_headsign_rendered = render_route_headsign(route, headsign)
+    crowding_rendered = render_crowding_level(crowding)
+    preposition = preposition_for_time_type(time.type)
 
-    times_with_crowding_rendered =
-      render_times_with_crowding(times_with_crowding, route.vehicle_type)
+    content =
+      build_text([
+        "The next",
+        route_headsign_rendered,
+        if(time_is_arr_brd?(time), do: nil, else: "arrives"),
+        preposition,
+        {time, &render_time/1},
+        {crowding_rendered, fn c -> ~E|<break strength="medium"/> and <%= c %>| end}
+      ])
 
-    if first_time_is_arr_brd?(times_with_crowding) do
-      # time readout starts with "is now arriving/boarding", no connecting verb needed
-      ~E|<p><s><%= route_headsign_rendered %> <%= times_with_crowding_rendered %></s></p>|
-    else
-      ~E|<p><s><%= route_headsign_rendered %> arrives <%= times_with_crowding_rendered %></s></p>|
-    end
+    ~E|<s><%= content %></s>|
+  end
+
+  defp render_time_with_crowding({%{crowding: crowding, time: time}, _}, route, _headsign) do
+    crowding_rendered = render_crowding_level(crowding)
+    preposition = preposition_for_time_type(time.type)
+
+    content =
+      build_text([
+        {time.type,
+         fn
+           :timestamp -> ~E|A later|
+           _ -> ~E|The following|
+         end},
+        route.vehicle_type || "trip",
+        if(time_is_arr_brd?(time), do: nil, else: "arrives"),
+        preposition,
+        {time, &render_time/1},
+        {crowding_rendered, fn c -> ~E|<break strength="medium"/> and <%= c %>| end}
+      ])
+
+    ~E|<s><%= content %></s>|
   end
 
   defp render_route_headsign(
          %{route_text: route_text, vehicle_type: vehicle_type, track_number: track_number},
          headsign
        ) do
-    build_route_headsign([
-      {:route, route_text},
-      {:vehicle, vehicle_type},
-      {:headsign, headsign},
-      {:track, track_number}
+    build_text([
+      {route_text, &render_route/1},
+      {vehicle_type, fn v -> ~e|<%= v %>| end},
+      {headsign, fn h -> ~E|to <%= render_headsign(h) %>| end},
+      {track_number, fn tn -> ~E|on track <%= tn %>| end}
     ])
   end
 
-  defp build_route_headsign(stages, acc \\ "The next")
+  defp render_route(route_text) do
+    cond do
+      String.contains?(route_text, "/") and match?([_, _], String.split(route_text, "/")) ->
+        [part1, part2] = String.split(route_text, "/")
 
-  defp build_route_headsign([], acc), do: acc
+        ~E|<say-as interpret-as="address"><%= part1 %></say-as><say-as interpret-as="address"><%= part2 %></say-as>|
 
-  defp build_route_headsign([{_stage, nil} | rest], acc) do
-    build_route_headsign(rest, acc)
-  end
+      match?({_bus_route, ""}, Integer.parse(route_text)) ->
+        ~E|<say-as interpret-as="address"><%= route_text %></say-as>|
 
-  defp build_route_headsign([{:route, route_text} | rest], acc) do
-    route_rendered =
-      cond do
-        String.contains?(route_text, "/") and match?([_, _], String.split(route_text, "/")) ->
-          [part1, part2] = String.split(route_text, "/")
-
-          ~E|<%= acc %> <say-as interpret-as="address"><%= part1 %></say-as><say-as interpret-as="address"><%= part2 %></say-as>|
-
-        match?({_bus_route, ""}, Integer.parse(route_text)) ->
-          ~E|<%= acc %> <say-as interpret-as="address"><%= route_text %></say-as>|
-
-        true ->
-          ~E|<%= acc %> <%= route_text %>|
-      end
-
-    build_route_headsign(rest, route_rendered)
-  end
-
-  defp build_route_headsign([{:vehicle, vehicle_type} | rest], acc) do
-    build_route_headsign(rest, ~E|<%= acc %> <%= vehicle_type %>|)
-  end
-
-  defp build_route_headsign([{:headsign, headsign} | rest], acc) do
-    build_route_headsign(rest, ~E|<%= acc %> to <%= render_headsign(headsign) %>|)
-  end
-
-  defp build_route_headsign([{:track, track_number} | rest], acc) do
-    build_route_headsign(rest, ~E|<%= acc %> on track <%= track_number %>|)
+      true ->
+        ~E|<%= route_text %>|
+    end
   end
 
   defp render_headsign(%{headsign: headsign, variation: nil}) do
@@ -101,68 +114,6 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
 
   defp render_headsign(%{headsign: headsign, variation: variation}) do
     ~E|<%= headsign %> <%= variation %>|
-  end
-
-  defp render_times_with_crowding(times_with_crowding, vehicle_type) do
-    times_with_crowding
-    |> Enum.with_index()
-    |> Enum.map(&render_time_with_crowding(&1, vehicle_type))
-  end
-
-  # foo # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
-  defp render_time_with_crowding({%{crowding: crowding, time: time}, 0}, _) do
-    time_rendered = render_time(time)
-    crowding_rendered = render_crowding_level(crowding)
-    preposition = preposition_for_time_type(time.type)
-
-    rendered = time_rendered
-
-    rendered =
-      if is_nil(preposition) do
-        rendered
-      else
-        ~E|<%= preposition %> <%= time_rendered %>|
-      end
-
-    if is_nil(crowding_rendered) do
-      rendered
-    else
-      ~E|<%= rendered %>, and <%= crowding_rendered %>|
-    end
-  end
-
-  defp render_time_with_crowding({%{crowding: crowding, time: time}, _}, vehicle_type) do
-    time_rendered = render_time(time)
-    crowding_rendered = render_crowding_level(crowding)
-
-    prefix =
-      case time.type do
-        :timestamp -> "A later"
-        _ -> "The following"
-      end
-
-    vehicle =
-      case vehicle_type do
-        nil -> "trip"
-        v -> v
-      end
-
-    preposition = preposition_for_time_type(time.type)
-
-    rendered = ~E|</s><s><%= prefix %> <%= vehicle %>|
-
-    rendered =
-      if is_nil(preposition) do
-        ~E|<%= rendered %> <%= time_rendered %>|
-      else
-        ~E|<%= rendered %> arrives <%= preposition %> <%= time_rendered %>|
-      end
-
-    if is_nil(crowding_rendered) do
-      rendered
-    else
-      ~E|<%= rendered %>, and <%= crowding_rendered %>|
-    end
   end
 
   defp render_time(%{type: :text, text: "BRD"}), do: "is now boarding"
@@ -190,8 +141,23 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   defp render_crowding_level(3), do: "is currently crowded"
   defp render_crowding_level(nil), do: nil
 
-  defp first_time_is_arr_brd?(times_with_crowding) do
-    IO.inspect(times_with_crowding)
-    match?([%{time: %{type: :text}} | _], times_with_crowding)
+  defp time_is_arr_brd?(time) do
+    match?(%{type: :text}, time)
+  end
+
+  defp identity_render(value), do: ~E|<%= value %>|
+
+  @spec build_text(list({any(), (any() -> Phoenix.HTML.safe())})) :: list(Phoenix.HTML.safe())
+  defp build_text(value_renderers) do
+    value_renderers
+    |> Enum.reject(fn
+      {value, _renderer} -> is_nil(value)
+      value -> is_nil(value)
+    end)
+    |> Enum.map(fn
+      {value, renderer} -> renderer.(value)
+      value -> identity_render(value)
+    end)
+    |> Enum.intersperse(~E| |)
   end
 end
