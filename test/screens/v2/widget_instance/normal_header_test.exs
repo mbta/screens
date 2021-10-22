@@ -42,8 +42,8 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns empty string", %{instance: instance} do
-      assert %{} == WidgetInstance.audio_serialize(instance)
+    test "returns map with text key", %{instance: instance} do
+      assert %{text: _} = WidgetInstance.audio_serialize(instance)
     end
   end
 
@@ -54,8 +54,8 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns false", %{instance: instance} do
-      refute WidgetInstance.audio_valid_candidate?(instance)
+    test "returns true", %{instance: instance} do
+      assert WidgetInstance.audio_valid_candidate?(instance)
     end
   end
 

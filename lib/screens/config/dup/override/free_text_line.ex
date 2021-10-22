@@ -31,6 +31,13 @@ defmodule Screens.Config.Dup.Override.FreeTextLine do
 
   use Screens.Config.Struct, children: [text: {:list, FreeText}]
 
+  def to_plaintext(%__MODULE__{text: text}) do
+    text
+    |> Enum.map(&FreeText.to_plaintext/1)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.join(" ")
+  end
+
   for icon <-
         ~w[warning x shuttle subway cr walk red blue orange green silver green_b green_c green_d green_e]a do
     icon_string = Atom.to_string(icon)

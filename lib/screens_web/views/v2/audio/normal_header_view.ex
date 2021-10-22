@@ -3,7 +3,7 @@ defmodule ScreensWeb.V2.Audio.NormalHeaderView do
 
   import Phoenix.HTML
 
-  def render("_widget.ssml", _) do
-    ~E""
+  def render("_widget.ssml", %{text: text}) do
+    ~E|<p><s>This is <%= text %></s></p>|
   end
 end

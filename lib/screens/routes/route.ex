@@ -5,6 +5,7 @@ defmodule Screens.Routes.Route do
 
   defstruct id: nil,
             short_name: nil,
+            long_name: nil,
             direction_destinations: nil,
             type: nil
 
@@ -13,6 +14,7 @@ defmodule Screens.Routes.Route do
   @type t :: %__MODULE__{
           id: id,
           short_name: String.t(),
+          long_name: String.t(),
           direction_destinations: list(String.t()),
           type: Screens.RouteType.t()
         }

@@ -6,7 +6,12 @@ defmodule Screens.Routes.RouteTest do
   defp route_json(id) do
     %{
       "id" => id,
-      "attributes" => %{"short_name" => nil, "direction_destinations" => nil, "type" => 1}
+      "attributes" => %{
+        "short_name" => nil,
+        "long_name" => nil,
+        "direction_destinations" => nil,
+        "type" => 1
+      }
     }
   end
 
