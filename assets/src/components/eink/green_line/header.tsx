@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 
 import { classWithModifier, formatTimeString, imagePath } from "Util/util";
 
-const abbreviateStop = (stop, routeId) => {
+const abbreviateStop = (stop) => {
   if (stop === "Government Center") {
     return "Government Ctr";
   }
@@ -68,7 +68,7 @@ const Header = ({ stopName, routeId, currentTimeString }): JSX.Element => {
   const environmentName =
     document.getElementById("app").dataset.environmentName;
 
-  const abbreviatedStop = abbreviateStop(stopName, routeId);
+  const abbreviatedStop = abbreviateStop(stopName);
 
   return (
     <div className="header">
