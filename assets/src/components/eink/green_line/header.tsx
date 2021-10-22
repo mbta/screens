@@ -2,6 +2,14 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 
 import { classWithModifier, formatTimeString, imagePath } from "Util/util";
 
+const abbreviateStop = (stop) => {
+  if (stop === "Government Center") {
+    return "Government Ctr";
+  }
+
+  return stop;
+};
+
 const HeaderRouteIcon = ({ route }): JSX.Element => {
   let path;
 
@@ -60,6 +68,8 @@ const Header = ({ stopName, routeId, currentTimeString }): JSX.Element => {
   const environmentName =
     document.getElementById("app").dataset.environmentName;
 
+  const abbreviatedStop = abbreviateStop(stopName);
+
   return (
     <div className="header">
       <div className="header__environment">
@@ -83,7 +93,7 @@ const Header = ({ stopName, routeId, currentTimeString }): JSX.Element => {
           className={classWithModifier("header__stop-name", SIZES[stopSize])}
           ref={ref}
         >
-          {stopName}
+          {abbreviatedStop}
         </div>
       </div>
     </div>
