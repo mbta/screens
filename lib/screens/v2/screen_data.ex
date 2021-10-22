@@ -46,7 +46,7 @@ defmodule Screens.V2.ScreenData do
     end
   end
 
-  @spec fetch_data(Screen.t()) :: {Template.layout(), selected_instances_map()}
+  @spec fetch_data(Screens.Config.Screen.t()) :: {Template.layout(), selected_instances_map()}
   def fetch_data(config) do
     candidate_generator = Parameters.get_candidate_generator(config)
     screen_template = candidate_generator.screen_template()
