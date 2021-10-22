@@ -11,7 +11,7 @@ const useAudioReadout = ({
   id,
   config
 }: UseAudioReadoutArgs): void => {
-  if (config === null || config === undefined) {
+  if (config === null || config === undefined || config.readoutIntervalMinutes === 0) {
     return;
   }
 
