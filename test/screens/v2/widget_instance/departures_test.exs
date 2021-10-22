@@ -11,6 +11,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.Vehicles.Vehicle
   alias Screens.V2.{Departure, WidgetInstance}
   alias Screens.V2.WidgetInstance.Departures
+  alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   describe "priority/1" do
     test "returns 2" do
@@ -40,7 +41,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
   end
 
-  describe "group_departures/1" do
+  describe "group_consecutive_departures/1" do
     test "groups consecutive departures with matching routes and headsigns" do
       d1 = %Departure{
         prediction: %Prediction{route: %Route{id: "1"}, trip: %Trip{headsign: "Nubian"}}
@@ -78,7 +79,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       departures = [d1, d2, d3, d4, d5, d6, d7]
       expected = [[d1, d2], [d3], [d4], [d5], [d6, d7]]
-      assert expected == Departures.group_departures(departures)
+      assert expected == Departures.group_consecutive_departures(departures)
     end
 
     test "groups departures and ignores notices" do
@@ -98,71 +99,83 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       departures = [d1, d2, d3, n1]
       expected = [[d1, d2], [d3], [n1]]
-      assert expected == Departures.group_departures(departures)
+      assert expected == Departures.group_consecutive_departures(departures)
     end
   end
 
   describe "serialize_route/1" do
-    test "handles default" do
+    setup do
+      %{serializer: &RoutePill.serialize_for_departure/4}
+    end
+
+    test "handles default", %{serializer: serializer} do
       departure = %Departure{
-        prediction: %Prediction{route: %Route{id: "Blue", short_name: "", type: :light_rail}}
+        prediction: %Prediction{
+          route: %Route{id: "Blue", short_name: "", long_name: "Blue Line", type: :subway}
+        }
       }
 
-      assert %{type: :text, text: "BL", color: :blue} == Departures.serialize_route([departure])
+      assert %{type: :text, text: "BL", color: :blue} ==
+               Departures.serialize_route([departure], serializer)
 
       departure = %Departure{
-        prediction: %Prediction{route: %Route{id: "Green-B", short_name: "", type: :subway}}
+        prediction: %Prediction{
+          route: %Route{id: "Green-B", short_name: "", long_name: "Green Line B", type: :subway}
+        }
       }
 
-      assert %{type: :text, text: "GL", color: :green} == Departures.serialize_route([departure])
+      assert %{type: :text, text: "GL", color: :green} ==
+               Departures.serialize_route([departure], serializer)
 
       departure = %Departure{
         prediction: %Prediction{route: %Route{id: "741", short_name: "SL1", type: :bus}}
       }
 
       assert %{type: :text, text: "SL1", color: :silver} ==
-               Departures.serialize_route([departure])
+               Departures.serialize_route([departure], serializer)
 
       departure = %Departure{
         prediction: %Prediction{route: %Route{id: "1", short_name: "1", type: :bus}}
       }
 
-      assert %{type: :text, text: "1", color: :yellow} == Departures.serialize_route([departure])
+      assert %{type: :text, text: "1", color: :yellow} ==
+               Departures.serialize_route([departure], serializer)
     end
 
-    test "handles slashed routes" do
+    test "handles slashed routes", %{serializer: serializer} do
       departure = %Departure{
         prediction: %Prediction{route: %Route{id: "214216", short_name: "214/216", type: :bus}}
       }
 
       assert %{type: :slashed, part1: "214", part2: "216", color: :yellow} ==
-               Departures.serialize_route([departure])
+               Departures.serialize_route([departure], serializer)
     end
 
-    test "handles rail" do
+    test "handles rail", %{serializer: serializer} do
       departure = %Departure{
         prediction: %Prediction{route: %Route{id: "CR-Providence", type: :rail}}
       }
 
       assert %{type: :icon, icon: :rail, color: :purple} ==
-               Departures.serialize_route([departure])
+               Departures.serialize_route([departure], serializer)
     end
 
-    test "handles ferry" do
+    test "handles ferry", %{serializer: serializer} do
       departure = %Departure{
         prediction: %Prediction{route: %Route{id: "Boat-F1", type: :ferry}}
       }
 
-      assert %{type: :icon, icon: :boat, color: :teal} == Departures.serialize_route([departure])
+      assert %{type: :icon, icon: :boat, color: :teal} ==
+               Departures.serialize_route([departure], serializer)
     end
 
-    test "handles track numbers" do
+    test "handles track numbers", %{serializer: serializer} do
       departure = %Departure{
         prediction: %Prediction{route: %Route{id: "CR-Providence", type: :rail}, track_number: 7}
       }
 
       assert %{type: :text, text: "TR7", color: :purple} ==
-               Departures.serialize_route([departure])
+               Departures.serialize_route([departure], serializer)
     end
   end
 
@@ -629,23 +642,24 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns empty string" do
+    test "returns map with sections key" do
       instance = %Departures{}
-      assert %{} == WidgetInstance.audio_serialize(instance)
+
+      assert %{sections: _sections} = WidgetInstance.audio_serialize(instance)
     end
   end
 
   describe "audio_sort_key/1" do
-    test "returns 0" do
+    test "returns 1" do
       instance = %Departures{}
-      assert 0 == WidgetInstance.audio_sort_key(instance)
+      assert 1 == WidgetInstance.audio_sort_key(instance)
     end
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns false" do
+    test "returns true" do
       instance = %Departures{}
-      refute WidgetInstance.audio_valid_candidate?(instance)
+      assert WidgetInstance.audio_valid_candidate?(instance)
     end
   end
 
