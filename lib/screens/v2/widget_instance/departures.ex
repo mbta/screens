@@ -86,12 +86,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp audio_serialize_departure_group({:normal, departures}, screen) do
-    serialized_group =
-      departures
-      |> serialize_row(screen, &RoutePill.serialize_for_audio_departure/4)
-      |> group_time_types()
-
-    {:normal, serialized_group}
+    {:normal, serialize_row(departures, screen, &RoutePill.serialize_for_audio_departure/4)}
   end
 
   @doc """
@@ -133,21 +128,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
       {_key, departure_group} ->
         {:normal, Enum.take(departure_group, max_entries_per_group)}
     end)
-  end
-
-  defp group_time_types(%{times_with_crowding: times_with_crowding} = row) do
-    time_groups_with_crowding =
-      times_with_crowding
-      |> Enum.chunk_by(fn
-        # ARR/BRD/Now times are never grouped
-        %{time: %{type: :text}} -> make_ref()
-        %{time: %{type: type}} -> type
-      end)
-      |> Enum.map(fn group -> {hd(group).time.type, group} end)
-
-    row
-    |> Map.delete(:times_with_crowding)
-    |> Map.put(:time_groups_with_crowding, time_groups_with_crowding)
   end
 
   defp serialize_row(

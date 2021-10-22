@@ -18,30 +18,30 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   end
 
   defp render_section(%{type: :normal_section, departure_groups: departure_groups}) do
-    ~E|<p><%= Enum.map(departure_groups, &render_departure_group/1) %></p>|
+    ~E|<%= Enum.map(departure_groups, &render_departure_group/1) %>|
   end
 
   defp render_departure_group({:notice, text}) do
-    ~E|<s><%= text %></s>|
+    ~E|<p><s><%= text %></s></p>|
   end
 
   defp render_departure_group({:normal, departures_group}) do
     %{
       route: route,
       headsign: headsign,
-      time_groups_with_crowding: time_groups_with_crowding
+      times_with_crowding: times_with_crowding
     } = departures_group
 
     route_headsign_rendered = render_route_headsign(route, headsign)
 
-    time_groups_with_crowding_rendered =
-      render_time_groups_with_crowding(time_groups_with_crowding, route.vehicle_type)
+    times_with_crowding_rendered =
+      render_times_with_crowding(times_with_crowding, route.vehicle_type)
 
-    if first_group_is_arr_brd?(time_groups_with_crowding) do
+    if first_time_is_arr_brd?(times_with_crowding) do
       # time readout starts with "is now arriving/boarding", no connecting verb needed
-      ~E|<s><%= route_headsign_rendered %> <%= time_groups_with_crowding_rendered %></s>|
+      ~E|<p><s><%= route_headsign_rendered %> <%= times_with_crowding_rendered %></s></p>|
     else
-      ~E|<s><%= route_headsign_rendered %> arrives <%= time_groups_with_crowding_rendered %></s>|
+      ~E|<p><s><%= route_headsign_rendered %> arrives <%= times_with_crowding_rendered %></s></p>|
     end
   end
 
@@ -103,70 +103,65 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     ~E|<%= headsign %> <%= variation %>|
   end
 
-  defp render_time_groups_with_crowding(time_groups_with_crowding, vehicle_type) do
-    time_groups_with_crowding
+  defp render_times_with_crowding(times_with_crowding, vehicle_type) do
+    times_with_crowding
     |> Enum.with_index()
-    |> Enum.map(&render_time_group_with_crowding(&1, vehicle_type))
+    |> Enum.map(&render_time_with_crowding(&1, vehicle_type))
   end
 
-  defp render_time_group_with_crowding({{type, times_with_crowding}, 0}, _) do
-    rendered =
-      times_with_crowding
-      |> Enum.map(&render_time_with_crowding/1)
-      |> oxford_comma_intersperse()
-
-    preposition = preposition_for_time_type(type)
-
-    if is_nil(preposition) do
-      rendered
-    else
-      ~E|<%= preposition %> <%= rendered %>|
-    end
-  end
-
-  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
-  defp render_time_group_with_crowding({{type, times_with_crowding}, _}, vehicle_type) do
-    times_with_crowding_rendered =
-      times_with_crowding
-      |> Enum.map(&render_time_with_crowding/1)
-      |> oxford_comma_intersperse()
-
-    prefix =
-      case type do
-        :timestamp -> "Later"
-        _ -> "Following"
-      end
-
-    vehicle =
-      case {vehicle_type, length(times_with_crowding)} do
-        {nil, 1} -> "trip"
-        {nil, _} -> "trips"
-        {v, 1} -> v
-        {:train, _} -> "trains"
-        {:bus, _} -> "buses"
-        {:trolley, _} -> "trolleys"
-        {:ferry, _} -> "ferries"
-      end
-
-    preposition = preposition_for_time_type(type)
-
-    if is_nil(preposition) do
-      ~E|</s><s><%= prefix %> <%= vehicle %> <%= times_with_crowding_rendered %>|
-    else
-      ~E|</s><s><%= prefix %> <%= vehicle %> <%= preposition %> <%= times_with_crowding_rendered %>|
-    end
-  end
-
-  defp render_time_with_crowding(%{crowding: crowding, time: time}) do
+  # foo # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
+  defp render_time_with_crowding({%{crowding: crowding, time: time}, 0}, _) do
     time_rendered = render_time(time)
     crowding_rendered = render_crowding_level(crowding)
+    preposition = preposition_for_time_type(time.type)
 
     rendered = time_rendered
+
+    rendered =
+      if is_nil(preposition) do
+        rendered
+      else
+        ~E|<%= preposition %> <%= time_rendered %>|
+      end
 
     if is_nil(crowding_rendered) do
       rendered
     else
-      ~E|<%= rendered %> <%= crowding_rendered %>|
+      ~E|<%= rendered %>, and <%= crowding_rendered %>|
+    end
+  end
+
+  defp render_time_with_crowding({%{crowding: crowding, time: time}, _}, vehicle_type) do
+    time_rendered = render_time(time)
+    crowding_rendered = render_crowding_level(crowding)
+
+    prefix =
+      case time.type do
+        :timestamp -> "A later"
+        _ -> "The following"
+      end
+
+    vehicle =
+      case vehicle_type do
+        nil -> "trip"
+        v -> v
+      end
+
+    preposition = preposition_for_time_type(time.type)
+
+    rendered = ~E|</s><s><%= prefix %> <%= vehicle %>|
+
+    rendered =
+      if is_nil(preposition) do
+        ~E|<%= rendered %> <%= time_rendered %>|
+      else
+        ~E|<%= rendered %> arrives <%= preposition %> <%= time_rendered %>|
+      end
+
+    if is_nil(crowding_rendered) do
+      rendered
+    else
+      ~E|<%= rendered %>, and <%= crowding_rendered %>|
     end
   end
 
@@ -190,34 +185,13 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   defp preposition_for_time_type(:minutes), do: "in"
   defp preposition_for_time_type(:timestamp), do: "at"
 
-  defp render_crowding_level(1), do: "(currently not crowded)"
-  defp render_crowding_level(2), do: "(currently with some crowding)"
-  defp render_crowding_level(3), do: "(currently crowded)"
+  defp render_crowding_level(1), do: "is currently not crowded"
+  defp render_crowding_level(2), do: "currently has some crowding"
+  defp render_crowding_level(3), do: "is currently crowded"
   defp render_crowding_level(nil), do: nil
 
-  defp oxford_comma_intersperse(list, state \\ :start)
-
-  defp oxford_comma_intersperse([], _state) do
-    []
-  end
-
-  defp oxford_comma_intersperse([el], _state) do
-    [el]
-  end
-
-  defp oxford_comma_intersperse([el1, el2], :start) do
-    [el1, " and ", el2]
-  end
-
-  defp oxford_comma_intersperse([el1, el2], :recurse) do
-    [el1, ", and ", el2]
-  end
-
-  defp oxford_comma_intersperse([first | rest], _state) do
-    [first, ", " | oxford_comma_intersperse(rest, :recurse)]
-  end
-
-  defp first_group_is_arr_brd?(time_groups_with_crowding) do
-    match?([{:text, _} | _], time_groups_with_crowding)
+  defp first_time_is_arr_brd?(times_with_crowding) do
+    IO.inspect(times_with_crowding)
+    match?([%{time: %{type: :text}} | _], times_with_crowding)
   end
 end
