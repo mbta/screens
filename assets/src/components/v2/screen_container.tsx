@@ -88,7 +88,7 @@ const ScreenContainer = ({ id }) => {
 
   const { apiResponse, requestCount } = useApiResponse({ id });
 
-  useAudioReadout({ id, audioConfig });
+  useAudioReadout({ id, config: audioConfig });
 
   useEffect(() => {
     if (
