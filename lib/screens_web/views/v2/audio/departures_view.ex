@@ -57,7 +57,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     ])
   end
 
-  defp build_route_headsign(stages, acc \\ ~E|The next|)
+  defp build_route_headsign(stages, acc \\ "The next")
 
   defp build_route_headsign([], acc), do: acc
 
@@ -169,9 +169,9 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     end
   end
 
-  defp render_time(%{type: :text, text: "BRD"}), do: ~E|is now boarding|
-  defp render_time(%{type: :text, text: "ARR"}), do: ~E|is now arriving|
-  defp render_time(%{type: :text, text: "Now"}), do: ~E|is now arriving|
+  defp render_time(%{type: :text, text: "BRD"}), do: "is now boarding"
+  defp render_time(%{type: :text, text: "ARR"}), do: "is now arriving"
+  defp render_time(%{type: :text, text: "Now"}), do: "is now arriving"
 
   defp render_time(%{type: :minutes, minutes: minute_diff}) do
     ~E|<%= minute_diff %> <%= pluralize_minutes(minute_diff) %>|
@@ -186,12 +186,12 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   defp pluralize_minutes(_), do: "minutes"
 
   defp preposition_for_time_type(:text), do: nil
-  defp preposition_for_time_type(:minutes), do: ~E"in"
-  defp preposition_for_time_type(:timestamp), do: ~E"at"
+  defp preposition_for_time_type(:minutes), do: "in"
+  defp preposition_for_time_type(:timestamp), do: "at"
 
-  defp render_crowding_level(1), do: ~E"(currently not crowded)"
-  defp render_crowding_level(2), do: ~E"(currently with some crowding)"
-  defp render_crowding_level(3), do: ~E"(currently crowded)"
+  defp render_crowding_level(1), do: "(currently not crowded)"
+  defp render_crowding_level(2), do: "(currently with some crowding)"
+  defp render_crowding_level(3), do: "(currently crowded)"
   defp render_crowding_level(nil), do: nil
 
   defp oxford_comma_intersperse(list, state \\ :start)
@@ -205,15 +205,15 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   end
 
   defp oxford_comma_intersperse([el1, el2], :start) do
-    [el1, ~E" and ", el2]
+    [el1, " and ", el2]
   end
 
   defp oxford_comma_intersperse([el1, el2], :recurse) do
-    [el1, ~E", and ", el2]
+    [el1, ", and ", el2]
   end
 
   defp oxford_comma_intersperse([first | rest], _state) do
-    [first, ~E", " | oxford_comma_intersperse(rest, :recurse)]
+    [first, ", " | oxford_comma_intersperse(rest, :recurse)]
   end
 
   defp first_group_is_arr_brd?(time_groups_with_crowding) do
