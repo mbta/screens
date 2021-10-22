@@ -41,7 +41,6 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     |> Enum.map(&render_time_with_crowding(&1, route, headsign))
   end
 
-  # foo # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defp render_time_with_crowding({%{crowding: crowding, time: time}, 0}, route, headsign) do
     route_headsign_rendered = render_route_headsign(route, headsign)
     crowding_rendered = render_crowding_level(crowding)
@@ -64,13 +63,15 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     crowding_rendered = render_crowding_level(crowding)
     preposition = preposition_for_time_type(time.type)
 
+    prefix =
+      case time.type do
+        :timestamp -> ~E|A later|
+        _ -> ~E|The following|
+      end
+
     content =
       build_text([
-        {time.type,
-         fn
-           :timestamp -> ~E|A later|
-           _ -> ~E|The following|
-         end},
+        prefix,
         route.vehicle_type || "trip",
         if(time_is_arr_brd?(time), do: nil, else: "arrives"),
         preposition,
@@ -147,7 +148,6 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
 
   defp identity_render(value), do: ~E|<%= value %>|
 
-  @spec build_text(list({any(), (any() -> Phoenix.HTML.safe())})) :: list(Phoenix.HTML.safe())
   defp build_text(value_renderers) do
     value_renderers
     |> Enum.reject(fn
