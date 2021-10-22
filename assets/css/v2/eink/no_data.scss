@@ -43,9 +43,17 @@
 
 .no-data__main-content__no-connection-icon-container {
   margin-top: 155px;
+  margin-bottom: 56px;
   width: 236px;
   height: 236px;
 }
+
+.no-data__main-content__no-connection-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 
 .no-data__main-content {
   margin-left: 208px;
