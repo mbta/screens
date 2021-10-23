@@ -220,21 +220,25 @@ defmodule Screens.V2.WidgetInstance.LineMap do
     current_stop_index = Enum.find_index(stops, fn %{id: stop} -> stop == current_stop end)
     future_stops = min(length(stops) - current_stop_index - 1, @num_future_stops)
 
-    index =
-      future_stops + current_stop_index - vehicle_stop_index +
-        status_adjustment(vehicle_stop_index, vehicle_status)
-
-    label =
-      if index < future_stops do
-        nil
-      else
-        serialize_vehicle_label(d, now)
-      end
-
-    if index < 0 do
+    if is_nil(vehicle_stop_index) do
       []
     else
-      [%{id: vehicle_id, index: index, label: label}]
+      index =
+        future_stops + current_stop_index - vehicle_stop_index +
+          status_adjustment(vehicle_stop_index, vehicle_status)
+
+      label =
+        if index < future_stops do
+          nil
+        else
+          serialize_vehicle_label(d, now)
+        end
+
+      if index < 0 do
+        []
+      else
+        [%{id: vehicle_id, index: index, label: label}]
+      end
     end
   end
 
