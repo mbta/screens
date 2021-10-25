@@ -53,11 +53,11 @@ const doFailureBuffer = (
 };
 
 const useQuery = () => {
-  console.log('called')
   return new URLSearchParams(useLocation().search)
 }
 
-const useIsRealScreenParam = (query: URLSearchParams) => {
+const useIsRealScreenParam = () => {
+  const query = useQuery()
   const isRealScreen = query.get("is_real_screen")
 
   return isRealScreen === "true" ? "&is_real_screen=true" : ""
@@ -72,8 +72,7 @@ const useApiResponse = ({
   id,
   failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs): { apiResponse: ApiResponse; requestCount: number } => {
-  const query = useQuery()
-  const isRealScreenParam = useIsRealScreenParam(query)
+  const isRealScreenParam = useIsRealScreenParam()
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
