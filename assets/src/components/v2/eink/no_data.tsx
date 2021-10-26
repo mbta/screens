@@ -51,6 +51,9 @@ const NoData: ComponentType = () => {
                         app
                     </div>
                 </div>
+                <div className="no-data__phone-image-container">
+                    <img className="no-data__phone-image" src={imagePath("hand-with-phone.svg")} />
+                </div>
             </div>
         </div>
     );

@@ -101,6 +101,7 @@
 .no-data__alternatives-container {
   margin-left: 80px;
   padding-top: 92px;
+  height: 500px
 }
 
 .no-data__alternatives__message {
@@ -126,4 +127,16 @@
 
 .no-data__alternatives__message__em {
   font-weight: bold;
+}
+
+.no-data__phone-image-container {
+  width: 100%;
+  height: 1100px;
+  display: flex;
+  justify-content: center;
+}
+
+.no-data__phone-image {
+  height: 100%;
+  align-self: flex-end;
 }
