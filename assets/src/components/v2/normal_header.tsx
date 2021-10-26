@@ -16,6 +16,14 @@ const ICON_TO_SRC = {
   logo: "logo-white.svg",
 };
 
+const abbreviateText = (text) => {
+  if (text === "Government Center") {
+    return "Government Ctr";
+  }
+
+  return text;
+};
+
 const NormalHeaderIcon = ({ icon }) => {
   return (
     <div className="normal-header-icon">
@@ -33,6 +41,8 @@ const NormalHeaderTitle = forwardRef(({ icon, text, size }, ref) => {
     modifiers.push("with-icon");
   }
 
+  const abbreviatedText = abbreviateText(text);
+
   return (
     <div className="normal-header-title">
       {icon && <NormalHeaderIcon icon={icon} />}
@@ -40,7 +50,7 @@ const NormalHeaderTitle = forwardRef(({ icon, text, size }, ref) => {
         className={classWithModifiers("normal-header-title__text", modifiers)}
         ref={ref}
       >
-        {text}
+        {abbreviatedText}
       </div>
     </div>
   );
