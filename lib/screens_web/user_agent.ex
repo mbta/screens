@@ -9,15 +9,18 @@ defmodule ScreensWeb.UserAgent do
       |> Enum.into(%{})
       |> Map.get("user-agent")
 
-    is_screen?(user_agent, screen_id)
+    is_screen?(user_agent, conn, screen_id)
   end
 
-  def is_screen?(nil, _), do: false
+  def is_screen?(nil, _, _), do: false
 
-  def is_screen?(user_agent, screen_id) do
+  def is_screen?(user_agent, %{params: params}, screen_id) do
     is_mercury?(user_agent) or is_gds?(user_agent) or is_solari?(user_agent, screen_id) or
-      is_dup?(user_agent)
+      is_dup?(user_agent) or is_real_screen_via_query_param?(params)
   end
+
+  defp is_real_screen_via_query_param?(%{"is_real_screen" => "true"}), do: true
+  defp is_real_screen_via_query_param?(_), do: false
 
   defp is_mercury?(user_agent) do
     String.contains?(user_agent, "(X11; Linux x86_64)") and
