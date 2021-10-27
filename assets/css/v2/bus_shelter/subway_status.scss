@@ -63,6 +63,10 @@
   text-overflow: clip;
   width: 808px;
 
+  &:nth-child(3) {
+    width: 725px;
+  }
+
   .subway-status-row--done & {
     white-space: nowrap;
   }
