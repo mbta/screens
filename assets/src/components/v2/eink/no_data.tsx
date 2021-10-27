@@ -53,7 +53,7 @@ const NoData: ComponentType = () => {
                     </div>
                 </div>
                 <div className="no-data__phone-image-container">
-                    <HandWithPhone colorHex="#ffffff" className="no-data__phone-image" />
+                    <HandWithPhone className="no-data__phone-image" />
                 </div>
             </div>
         </div>
