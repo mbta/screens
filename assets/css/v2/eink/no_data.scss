@@ -4,7 +4,7 @@
 }
 
 .no-data__top-screen {
-  height: 1600px;
+  height: 50%;
 }
 
 .no-data__header {
@@ -94,13 +94,15 @@
 }
 
 .no-data__bottom-screen {
-  height: 1600px;
+  height: 50%;
   background-color: #000000;
 }
 
 .no-data__alternatives-container {
   margin-left: 80px;
   padding-top: 92px;
+  height: 30%;
+  box-sizing: border-box;
 }
 
 .no-data__alternatives__message {
@@ -126,4 +128,20 @@
 
 .no-data__alternatives__message__em {
   font-weight: bold;
+}
+
+.no-data__phone-image-container {
+  height: 70%;
+  position: relative;
+}
+
+.no-data__phone-image {
+  height: 90%;
+  display: inline-block;
+  max-width: 100%;
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
 }

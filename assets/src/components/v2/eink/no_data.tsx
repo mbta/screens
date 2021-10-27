@@ -1,5 +1,6 @@
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
+import HandWithPhone from "../bundled_svg/hand_with_phone";
 import NoConnection from "../bundled_svg/no_connection";
 
 const NoData: ComponentType = () => {
@@ -50,6 +51,9 @@ const NoData: ComponentType = () => {
                         </span>{" "}
                         app
                     </div>
+                </div>
+                <div className="no-data__phone-image-container">
+                    <HandWithPhone className="no-data__phone-image" />
                 </div>
             </div>
         </div>
