@@ -10,7 +10,6 @@ defmodule Screens.GdsData.Fetch do
   @gds_api_url "https://dms.gds.com/DMSService.asmx"
   @token_url_base "#{@gds_api_url}/GetToken"
   @device_list_url_base "#{@gds_api_url}/GetDevicesList"
-  @ping_url_base "#{@gds_api_url}/GetDevicesPing"
 
   @vendor_name :gds
   @vendor_request_opts [hackney: [pool: :gds_api_pool]]
@@ -25,8 +24,7 @@ defmodule Screens.GdsData.Fetch do
          {:fetch_devices_data, {:ok, devices_data}} <-
            {:fetch_devices_data, fetch_devices_data(token, italy_date)} do
       sns = Map.keys(devices_data)
-      {:ok, pings_data} = fetch_pings_data(sns, token, italy_date)
-      merge_device_and_ping_data(sns, devices_data, pings_data)
+      {:ok, merge_device_and_sn_data(sns, devices_data)}
     else
       {step, :error} ->
         _ = Logger.info("gds_fetch_error #{step}")
@@ -136,61 +134,12 @@ defmodule Screens.GdsData.Fetch do
     end
   end
 
-  defp fetch_pings_data(screen_sns, token, date) do
-    pings_data =
-      screen_sns
-      |> Enum.map(&fetch_ping_data(token, &1, date))
-      |> Enum.into(%{})
-
-    {:ok, pings_data}
-  end
-
-  defp fetch_ping_data(token, screen_sn, date) do
-    params = %{
-      "Token" => token,
-      "Sn" => screen_sn,
-      "Year" => date.year,
-      "Month" => date.month,
-      "Day" => date.day,
-      "AspxAutoDetectCookieSupport" => 1
-    }
-
-    ping_data =
-      @ping_url_base
-      |> build_url(params)
-      |> make_and_parse_request(&parse_ping/1, @vendor_name, @vendor_request_opts)
-
-    case ping_data do
-      {:ok, ping_count} -> {screen_sn, ping_count}
-      :error -> {screen_sn, nil}
-    end
-  end
-
-  defp parse_ping(xml) do
-    parsed =
-      xml
-      |> xpath(~x"//string/text()")
-      |> xmap(calls: [~x"//Calls/Call"l, ping_count: ~x"./Call/text()"i])
-
-    case parsed do
-      %{calls: [%{ping_count: ping_count}]} -> {:ok, ping_count}
-      _ -> :error
-    end
-  end
-
-  defp merge_device_and_ping_data(screen_sns, devices_data, pings_data) do
-    merged_data =
-      screen_sns
-      |> Enum.map(fn sn ->
-        ping_count = Map.get(pings_data, sn)
-
-        devices_data
-        |> Map.get(sn)
-        |> Map.put(:ping_count, ping_count)
-        |> Map.put(:screen_sn, sn)
-      end)
-
-    {:ok, merged_data}
+  defp merge_device_and_sn_data(screen_sns, devices_data) do
+    Enum.map(screen_sns, fn sn ->
+      devices_data
+      |> Map.get(sn)
+      |> Map.put(:screen_sn, sn)
+    end)
   end
 
   defp build_url(base_url, params) when map_size(params) == 0 do
