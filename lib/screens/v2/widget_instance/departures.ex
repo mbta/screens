@@ -318,7 +318,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     |> Enum.map(&serialize_inline_alert/1)
   end
 
-  defp alert_is_inline?(%{effect: :delay}), do: true
+  defp alert_is_inline?(%{effect: :delay}), do: false
   defp alert_is_inline?(_), do: false
 
   defp serialize_inline_alert(%{id: id, effect: :delay, severity: severity}) do
