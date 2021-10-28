@@ -525,103 +525,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   end
 
   describe "serialize_inline_alerts/1" do
-    test "filters to only delay alerts" do
+    test "filters all alerts" do
       a1 = %Alert{id: "1", effect: :delay, severity: 4}
       a2 = %Alert{id: "2", effect: :shuttle, severity: 7}
       a3 = %Alert{id: "3", effect: :suspension, severity: 7}
       alerts = [a1, a2, a3]
       departure = %Departure{prediction: %Prediction{alerts: alerts}}
 
-      expected = [
-        %{
-          id: "1",
-          color: :black,
-          icon: :clock,
-          text: ["Delays up to", %{format: :bold, text: "15m"}]
-        }
-      ]
-
-      assert expected == Departures.serialize_inline_alerts([departure])
-    end
-
-    test "correct interprets alert severity" do
-      alerts = [
-        %Alert{id: "1", effect: :delay, severity: 1},
-        %Alert{id: "2", effect: :delay, severity: 2},
-        %Alert{id: "3", effect: :delay, severity: 3},
-        %Alert{id: "4", effect: :delay, severity: 4},
-        %Alert{id: "5", effect: :delay, severity: 5},
-        %Alert{id: "6", effect: :delay, severity: 6},
-        %Alert{id: "7", effect: :delay, severity: 7},
-        %Alert{id: "8", effect: :delay, severity: 8},
-        %Alert{id: "9", effect: :delay, severity: 9},
-        %Alert{id: "10", effect: :delay, severity: 10}
-      ]
-
-      departure = %Departure{prediction: %Prediction{alerts: alerts}}
-
-      expected = [
-        %{
-          id: "1",
-          color: :black,
-          icon: :clock,
-          text: ["Delays up to", %{format: :bold, text: "10m"}]
-        },
-        %{
-          id: "2",
-          color: :black,
-          icon: :clock,
-          text: ["Delays up to", %{format: :bold, text: "10m"}]
-        },
-        %{
-          id: "3",
-          color: :black,
-          icon: :clock,
-          text: ["Delays up to", %{format: :bold, text: "10m"}]
-        },
-        %{
-          id: "4",
-          color: :black,
-          icon: :clock,
-          text: ["Delays up to", %{format: :bold, text: "15m"}]
-        },
-        %{
-          id: "5",
-          color: :black,
-          icon: :clock,
-          text: ["Delays up to", %{format: :bold, text: "20m"}]
-        },
-        %{
-          id: "6",
-          color: :black,
-          icon: :clock,
-          text: ["Delays up to", %{format: :bold, text: "25m"}]
-        },
-        %{
-          id: "7",
-          color: :black,
-          icon: :clock,
-          text: ["Delays up to", %{format: :bold, text: "30m"}]
-        },
-        %{
-          id: "8",
-          color: :black,
-          icon: :clock,
-          text: ["Delays more than", %{format: :bold, text: "30m"}]
-        },
-        %{
-          id: "9",
-          color: :black,
-          icon: :clock,
-          text: ["Delays more than", %{format: :bold, text: "60m"}]
-        },
-        %{
-          id: "10",
-          color: :black,
-          icon: :clock,
-          text: ["Delays more than", %{format: :bold, text: "60m"}]
-        }
-      ]
+      expected = []
 
       assert expected == Departures.serialize_inline_alerts([departure])
     end
