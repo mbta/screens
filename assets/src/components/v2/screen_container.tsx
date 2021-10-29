@@ -53,7 +53,6 @@ const BlinkConfigContext = createContext<BlinkConfig | null>(
 
 interface AudioConfig {
   readoutIntervalMinutes: number;
-  volume: number;
 }
 
 const defaultAudioConfig = null;

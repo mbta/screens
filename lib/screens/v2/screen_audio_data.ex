@@ -22,9 +22,7 @@ defmodule Screens.V2.ScreenAudioData do
         :error
 
       %Screen{app_params: %_app{audio: audio}} ->
-        if date_out_of_range?(audio, now) do
-          []
-        else
+        if date_in_range?(audio, now) do
           config
           |> fetch_data_fn.()
           |> elem(1)
@@ -32,11 +30,44 @@ defmodule Screens.V2.ScreenAudioData do
           |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
           |> Enum.sort_by(&WidgetInstance.audio_sort_key/1)
           |> Enum.map(&{WidgetInstance.audio_view(&1), WidgetInstance.audio_serialize(&1)})
+        else
+          []
         end
     end
   end
 
-  defp date_out_of_range?(
+  @spec volume_by_screen_id(screen_id()) :: {:ok, float()} | :error
+  def volume_by_screen_id(
+        screen_id,
+        get_config_fn \\ &ScreenData.get_config/1,
+        now \\ DateTime.utc_now()
+      ) do
+    config = get_config_fn.(screen_id)
+
+    case config do
+      %Screen{app_params: %app{}} when app not in [BusShelter] ->
+        :error
+
+      %Screen{app_params: %_app{audio: audio}} ->
+        {:ok, get_volume(audio, now)}
+    end
+  end
+
+  defp get_volume(
+         %Audio{
+           daytime_start_time: daytime_start_time,
+           daytime_stop_time: daytime_stop_time,
+           daytime_volume: daytime_volume,
+           nighttime_volume: nighttime_volume
+         },
+         now
+       ) do
+    if time_in_range?(now, daytime_start_time, daytime_stop_time),
+      do: daytime_volume,
+      else: nighttime_volume
+  end
+
+  defp date_in_range?(
          %Audio{
            start_time: start_time,
            stop_time: stop_time,
@@ -46,8 +77,17 @@ defmodule Screens.V2.ScreenAudioData do
        ) do
     {:ok, now_eastern} = DateTime.shift_zone(now, "America/New_York")
 
-    Date.day_of_week(now_eastern) not in days_active or
-      Time.compare(start_time, now_eastern) == :gt or
-      Time.compare(stop_time, now_eastern) == :lt
+    Date.day_of_week(now_eastern) in days_active and
+      time_in_range?(now_eastern, start_time, stop_time)
+  end
+
+  defp time_in_range?(t, start_time, stop_time) do
+    if Time.compare(start_time, stop_time) in [:lt, :eq] do
+      # The range exists within a single day starting/ending at midnight
+      Time.compare(start_time, t) in [:lt, :eq] and Time.compare(stop_time, t) == :gt
+    else
+      # The range crosses midnight, e.g. start: 5am, stop: 1am
+      Time.compare(start_time, t) in [:lt, :eq] or Time.compare(stop_time, t) == :gt
+    end
   end
 end

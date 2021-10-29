@@ -88,8 +88,7 @@ const blinkConfig: BlinkConfig = {
 };
 
 const audioConfig: AudioConfig = {
-  readoutIntervalMinutes: parseInt(document.getElementById("app").dataset.audioReadoutInterval),
-  volume: parseFloat(document.getElementById("app").dataset.volume)
+  readoutIntervalMinutes: parseInt(document.getElementById("app").dataset.audioReadoutInterval)
 }
 
 const App = (): JSX.Element => {

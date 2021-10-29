@@ -3,6 +3,5 @@
   data-last-refresh="<%= @last_refresh %>"
   data-environment-name="<%= @environment_name %>"
   data-refresh-rate="<%= @refresh_rate %>"
-  data-volume="<%= @volume %>"
   data-audio-readout-interval="<%= @audio_readout_interval %>"
 ></div>
