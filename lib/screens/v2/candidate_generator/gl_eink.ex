@@ -162,22 +162,27 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
     Enum.map(sections, fn
       {:ok, departures} when length(departures) <= 1 ->
         destination = fetch_destination(route_id, direction_id)
-        headway = Screens.Headways.by_route_id(route_id, stop_id, direction_id, nil)
 
-        {:ok,
-         departures ++
-           [
-             %{
-               text: %FreeTextLine{
-                 icon: nil,
-                 text: [
-                   "Trains to #{destination} every",
-                   %{format: :bold, text: "#{headway - 2}-#{headway + 2}"},
-                   "minutes"
-                 ]
-               }
-             }
-           ]}
+        case Screens.Headways.by_route_id(route_id, stop_id, direction_id, nil) do
+          nil ->
+            {:ok, departures}
+
+          headway ->
+            {:ok,
+             departures ++
+               [
+                 %{
+                   text: %FreeTextLine{
+                     icon: nil,
+                     text: [
+                       "Trains to #{destination} every",
+                       %{format: :bold, text: "#{headway - 2}-#{headway + 2}"},
+                       "minutes"
+                     ]
+                   }
+                 }
+               ]}
+        end
 
       {:ok, departures} ->
         {:ok, departures}
