@@ -44,16 +44,15 @@ const NormalHeaderTitle = forwardRef(({ icon, text, size, showTo }, ref) => {
   const abbreviatedText = abbreviateText(text);
 
   return (
-    <div>
-      <div className="normal-header-title">
-        {showTo && <div className="normal-header-to__text">TO</div>}
-        {icon && <NormalHeaderIcon icon={icon} />}
-        <div
-          className={classWithModifiers("normal-header-title__text", modifiers)}
-          ref={ref}
-        >
-          {abbreviatedText}
-        </div>
+    <div className="normal-header-title">
+      {showTo && <div className="normal-header-to__text">TO</div>}
+      {icon && <NormalHeaderIcon icon={icon} />}
+      <div
+        className={classWithModifiers("normal-header-title__text", modifiers)}
+        ref={ref}
+      >
+        {abbreviatedText}
+      </div>
     </div>
   );
 });
