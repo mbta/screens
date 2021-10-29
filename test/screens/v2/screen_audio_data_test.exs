@@ -24,8 +24,11 @@ defmodule Screens.V2.ScreenAudioDataTest do
           audio: %V2.Audio{
             start_time: ~T[00:00:00],
             stop_time: ~T[01:00:00],
-            days_active: [0, 1, 2, 3, 4, 5, 6],
-            volume: 0.1
+            daytime_start_time: ~T[00:00:00],
+            daytime_stop_time: ~T[01:00:00],
+            days_active: [1, 2, 3, 4, 5, 6, 7],
+            daytime_volume: 0.1,
+            nighttime_volume: 0.1
           },
           departures: %V2.Departures{sections: []},
           footer: %V2.Footer{},
@@ -42,8 +45,11 @@ defmodule Screens.V2.ScreenAudioDataTest do
           audio: %V2.Audio{
             start_time: ~T[00:00:00],
             stop_time: ~T[02:00:00],
-            days_active: [0, 1, 2, 3, 4, 5, 6],
-            volume: 0.1
+            daytime_start_time: ~T[00:00:00],
+            daytime_stop_time: ~T[01:00:00],
+            days_active: [1, 2, 3, 4, 5, 6, 7],
+            daytime_volume: 0.1,
+            nighttime_volume: 0.1
           },
           departures: %V2.Departures{sections: []},
           footer: %V2.Footer{},
