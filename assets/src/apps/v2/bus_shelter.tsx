@@ -38,7 +38,7 @@ import Survey from "Components/v2/survey";
 import NoData from "Components/v2/bus_shelter/no_data";
 import DeparturesNoData from "Components/v2/bus_shelter/departures_no_data";
 
-import { FlexZoneAlert, FullBodyAlert } from "Components/v2/alert";
+import { FlexZoneAlert, FullBodyAlert } from "Components/v2/bus_shelter/alert";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,

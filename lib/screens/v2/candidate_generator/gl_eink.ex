@@ -48,7 +48,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         now \\ DateTime.utc_now(),
         fetch_destination_fn \\ &fetch_destination/2,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/3,
-        _alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
+        alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
@@ -60,8 +60,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
           &departures_post_processing/2
         )
       end,
-      # Temporarily don't show alerts (until they're working)
-      # fn -> alert_instances_fn.(config) end,
+      fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
       fn -> line_map_instances(config) end,
       fn -> evergreen_content_instances_fn.(config) end
