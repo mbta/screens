@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 interface UseAudioReadoutArgs {
   id: string;
-  config: AudioConfig;
+  config: AudioConfig | null;
 }
 
 const useAudioReadout = ({
@@ -16,18 +16,24 @@ const useAudioReadout = ({
   }
 
   const readoutInterval = config.readoutIntervalMinutes * 60000;
-  const apiPath = `/v2/audio/${id}/readout.mp3`;
+  const readoutPath = `/v2/audio/${id}/readout.mp3`;
+  const volumePath = `/v2/audio/${id}/volume`;
 
   const fetchAudio = async () => {
     try {
-      const result = await fetch(apiPath);
-      const blob = await result.blob();
+      const readoutData = await fetch(readoutPath);
+      const volumeData = await fetch(volumePath);
+
+      const { volume } = await volumeData.json();
+
+      const blob = await readoutData.blob();
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
       audio.onended = (_e) => {
         URL.revokeObjectURL(url);
       };
-      audio.volume = config.volume;
+
+      audio.volume = volume;
       audio.play();
     } catch (err) {
       console.log(err);

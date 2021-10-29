@@ -23,6 +23,20 @@ defmodule ScreensWeb.V2.AudioController do
     end
   end
 
+  def show_volume(conn, %{"id" => screen_id}) do
+    cond do
+      not screen_exists?(screen_id) ->
+        not_found(conn)
+
+      State.disabled?(screen_id) ->
+        json(conn, %{volume: 0.0})
+
+      true ->
+        {:ok, volume} = ScreenAudioData.volume_by_screen_id(screen_id)
+        json(conn, %{volume: volume})
+    end
+  end
+
   def debug(conn, %{"id" => screen_id}) do
     cond do
       not screen_exists?(screen_id) -> not_found(conn)

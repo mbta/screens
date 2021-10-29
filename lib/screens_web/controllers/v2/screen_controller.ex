@@ -2,7 +2,6 @@ defmodule ScreensWeb.V2.ScreenController do
   use ScreensWeb, :controller
 
   alias Screens.Config.{Screen, State}
-  alias Screens.Config.V2.Audio
   alias Screens.V2.ScreenData.Parameters
 
   @default_app_id :bus_eink
@@ -36,16 +35,6 @@ defmodule ScreensWeb.V2.ScreenController do
     put_layout(conn, {ScreensWeb.V2.LayoutView, "app.html"})
   end
 
-  defp assign_volume(conn, config) do
-    case config do
-      %Screen{app_params: %_app{audio: %Audio{volume: volume}}} ->
-        assign(conn, :volume, volume)
-
-      %Screen{} ->
-        assign(conn, :volume, 0.0)
-    end
-  end
-
   def index(conn, %{"id" => screen_id}) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
@@ -59,7 +48,6 @@ defmodule ScreensWeb.V2.ScreenController do
         |> assign(:app_id, app_id)
         |> assign(:refresh_rate, Parameters.get_refresh_rate(app_id))
         |> assign(:audio_readout_interval, Parameters.get_audio_readout_interval(app_id))
-        |> assign_volume(config)
         |> put_view(ScreensWeb.V2.ScreenView)
         |> render("index.html")
 
