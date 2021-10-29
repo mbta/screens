@@ -16,6 +16,7 @@ defmodule Screens.V2.ScreenAudioData do
         now \\ DateTime.utc_now()
       ) do
     config = get_config_fn.(screen_id)
+    {:ok, now} = DateTime.shift_zone(now, "America/New_York")
 
     case config do
       %Screen{app_params: %app{}} when app not in [BusShelter] ->
@@ -43,6 +44,7 @@ defmodule Screens.V2.ScreenAudioData do
         now \\ DateTime.utc_now()
       ) do
     config = get_config_fn.(screen_id)
+    {:ok, now} = DateTime.shift_zone(now, "America/New_York")
 
     case config do
       %Screen{app_params: %app{}} when app not in [BusShelter] ->
@@ -73,15 +75,13 @@ defmodule Screens.V2.ScreenAudioData do
            stop_time: stop_time,
            days_active: days_active
          },
-         now
+         dt
        ) do
-    {:ok, now_eastern} = DateTime.shift_zone(now, "America/New_York")
-
-    Date.day_of_week(now_eastern) in days_active and
-      time_in_range?(now_eastern, start_time, stop_time)
+    Date.day_of_week(dt) in days_active and
+      time_in_range?(DateTime.to_time(dt), start_time, stop_time)
   end
 
-  defp time_in_range?(t, start_time, stop_time) do
+  def time_in_range?(t, start_time, stop_time) do
     if Time.compare(start_time, stop_time) in [:lt, :eq] do
       # The range exists within a single day starting/ending at midnight
       Time.compare(start_time, t) in [:lt, :eq] and Time.compare(stop_time, t) == :gt
