@@ -63,6 +63,10 @@
   text-overflow: clip;
   width: 808px;
 
+  // The width of 808px is good only when the text is the only thing on the row.
+  // When there is an icon, the width stays at 808px and the text no longer has enough room.
+  // If an icon is present, the text will be the 3rd child in the containing div. In that situation,
+  // the text width needs to be adjusted in order to fit in the row.
   &:nth-child(3) {
     width: 725px;
   }
