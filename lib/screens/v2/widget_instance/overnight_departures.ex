@@ -3,9 +3,7 @@ defmodule Screens.V2.WidgetInstance.OvernightDepartures do
 
   defstruct screen: nil
 
-  @type t :: %__MODULE__{
-          screen: Screens.Config.Screen.t()
-        }
+  @type t :: %__MODULE__{}
 
   def priority(_instance), do: [1]
 

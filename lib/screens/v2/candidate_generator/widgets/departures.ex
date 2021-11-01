@@ -45,7 +45,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
           %DeparturesNoData{screen: config, show_alternatives?: true}
 
         sections_data == [:overnight] ->
-          %OvernightDepartures{screen: config}
+          %OvernightDepartures{}
 
         true ->
           sections =
