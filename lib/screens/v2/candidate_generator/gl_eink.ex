@@ -165,7 +165,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
 
         case Screens.Headways.by_route_id(route_id, stop_id, direction_id, nil) do
           nil ->
-            {:ok, departures}
+            :overnight
 
           headway ->
             {:ok,
