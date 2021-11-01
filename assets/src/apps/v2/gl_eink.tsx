@@ -18,6 +18,7 @@ import LineMap from "Components/v2/gl_eink_double/line_map";
 import EvergreenContent from "Components/v2/evergreen_content";
 import NoData from "Components/v2/eink/no_data";
 import { ResponseMapperContext } from "Components/v2/screen_container";
+import OvernightDepartures from "Components/v2/eink/overnight_departures";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -28,7 +29,8 @@ const TYPE_TO_COMPONENT = {
   departures: NormalDepartures,
   line_map: LineMap,
   evergreen_content: EvergreenContent,
-  no_data: NoData
+  no_data: NoData,
+  overnight_departures: OvernightDepartures
 };
 
 const DISABLED_LAYOUT = {
