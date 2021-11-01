@@ -39,8 +39,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
       |> Enum.map(fn {:ok, data} -> data end)
       |> post_processing_fn.(config)
 
-    IO.inspect(sections_data)
-
     departures_instance =
       cond do
         Enum.any?(sections_data, &(&1 == :error)) ->
