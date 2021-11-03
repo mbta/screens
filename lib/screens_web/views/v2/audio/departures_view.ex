@@ -59,7 +59,8 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     ~E|<s><%= content %></s>|
   end
 
-  defp render_time_with_crowding({%{crowding: crowding, time: time}, _}, route, _headsign) do
+  defp render_time_with_crowding({%{crowding: crowding, time: time}, _}, route, headsign) do
+    route_headsign_rendered = render_route_headsign(route, headsign)
     crowding_rendered = render_crowding_level(crowding)
     preposition = preposition_for_time_type(time.type)
 
@@ -72,7 +73,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     content =
       build_text([
         prefix,
-        route.vehicle_type || "trip",
+        route_headsign_rendered,
         if(time_is_arr_brd?(time), do: nil, else: "arrives"),
         preposition,
         {time, &render_time/1},
