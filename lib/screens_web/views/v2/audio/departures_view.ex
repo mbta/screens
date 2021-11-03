@@ -89,7 +89,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
        ) do
     build_text([
       {route_text, &render_route/1},
-      {vehicle_type, fn v -> ~E|<%= v %>| end},
+      {vehicle_type || "trip", fn v -> ~E|<%= v %>| end},
       {headsign, fn h -> ~E|to <%= render_headsign(h) %>| end},
       {track_number, fn tn -> ~E|on track <%= tn %>| end}
     ])
