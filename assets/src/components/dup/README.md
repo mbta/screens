@@ -9,6 +9,7 @@
 - Create priv/static/dup-app.html if it doesn’t already exist. Copy paste contents as directed below.
 - Set the version string in assets/src/components/dup/version.tsx to `current_year.current_month.current_day.1`.
 - In assets/webpack.config.js, change `publicPath` in the font config to have value `'fonts/'`.
+- **Only if you are packaging for local testing**, replace `const station = useOutfrontStation();` in assets/src/components/dup/dup_screen_page.tsx with `const station = "Broadway";` (or any other station name from one of the DUP screen IDs (`DUP-${name}`)). This data is provided by Outfront's "wrapper" app that runs on the real DUP screens, but we need to set it ourselves during testing. Think of it as a sort of frontend environment variable.
 - `cd` to priv/static and run the following:
   ```sh
   for ROTATION_INDEX in {0..2}; do
