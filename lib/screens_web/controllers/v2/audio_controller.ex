@@ -16,6 +16,8 @@ defmodule ScreensWeb.V2.AudioController do
     real_screen? = Map.get(params, "is_real_screen", false)
     disposition = if Map.has_key?(params, "inline"), do: :inline, else: :attachment
 
+    Screens.LogScreenData.log_audio_request(screen_id, real_screen?)
+
     cond do
       not screen_exists?(screen_id) -> not_found(conn)
       State.disabled?(screen_id) -> disabled(conn)
