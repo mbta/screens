@@ -2,7 +2,6 @@ declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/solari_v2.scss");
 
-import * as Sentry from "@sentry/react";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -14,13 +13,7 @@ import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/lcd/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
-
-const sentryDsn = document.getElementById("app")?.dataset.sentry;
-if (sentryDsn) {
-  Sentry.init({
-    dsn: sentryDsn,
-  });
-}
+import useSentry from "Hooks/use_sentry";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -31,6 +24,7 @@ const TYPE_TO_COMPONENT = {
 };
 
 const App = (): JSX.Element => {
+  useSentry();
   return (
     <Router>
       <Switch>

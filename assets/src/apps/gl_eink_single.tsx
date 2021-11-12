@@ -2,7 +2,6 @@ declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../css/gl_eink_single.scss");
 
-import * as Sentry from "@sentry/react";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -16,15 +15,10 @@ import {
   MultiScreenPage,
   ScreenPage,
 } from "Components/eink/screen_page";
-
-const sentryDsn = document.getElementById("app")?.dataset.sentry;
-if (sentryDsn) {
-  Sentry.init({
-    dsn: sentryDsn,
-  });
-}
+import useSentry from "Hooks/use_sentry";
 
 const App = (): JSX.Element => {
+  useSentry();
   return (
     <Router>
       <Switch>
