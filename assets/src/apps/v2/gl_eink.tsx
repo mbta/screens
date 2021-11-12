@@ -19,6 +19,7 @@ import EvergreenContent from "Components/v2/evergreen_content";
 import NoData from "Components/v2/eink/no_data";
 import { ResponseMapperContext } from "Components/v2/screen_container";
 import OvernightDepartures from "Components/v2/eink/overnight_departures";
+import useSentry from "Hooks/use_sentry";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -30,7 +31,7 @@ const TYPE_TO_COMPONENT = {
   line_map: LineMap,
   evergreen_content: EvergreenContent,
   no_data: NoData,
-  overnight_departures: OvernightDepartures
+  overnight_departures: OvernightDepartures,
 };
 
 const DISABLED_LAYOUT = {
@@ -54,6 +55,7 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
+  useSentry();
   return (
     <Router>
       <Switch>

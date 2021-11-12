@@ -39,6 +39,7 @@ import NoData from "Components/v2/bus_shelter/no_data";
 import DeparturesNoData from "Components/v2/bus_shelter/departures_no_data";
 
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/alert";
+import useSentry from "Hooks/use_sentry";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -88,10 +89,13 @@ const blinkConfig: BlinkConfig = {
 };
 
 const audioConfig: AudioConfig = {
-  readoutIntervalMinutes: parseInt(document.getElementById("app").dataset.audioReadoutInterval)
-}
+  readoutIntervalMinutes: parseInt(
+    document.getElementById("app").dataset.audioReadoutInterval
+  ),
+};
 
 const App = (): JSX.Element => {
+  useSentry();
   return (
     <Router>
       <Switch>

@@ -48,6 +48,7 @@ defmodule ScreensWeb.V2.ScreenController do
         |> assign(:app_id, app_id)
         |> assign(:refresh_rate, Parameters.get_refresh_rate(app_id))
         |> assign(:audio_readout_interval, Parameters.get_audio_readout_interval(app_id))
+        |> assign(:sentry_frontend_dsn, Application.get_env(:screens, :sentry_frontend_dsn))
         |> put_view(ScreensWeb.V2.ScreenView)
         |> render("index.html")
 

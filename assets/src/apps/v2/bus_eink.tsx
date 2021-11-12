@@ -16,8 +16,12 @@ import NormalHeader from "Components/v2/eink/normal_header";
 import FareInfoFooter from "Components/v2/eink/fare_info_footer";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import EvergreenContent from "Components/v2/evergreen_content";
-import { ResponseMapper, ResponseMapperContext } from "Components/v2/screen_container";
+import {
+  ResponseMapper,
+  ResponseMapperContext,
+} from "Components/v2/screen_container";
 import NoData from "Components/v2/eink/no_data";
+import useSentry from "Hooks/use_sentry";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -27,7 +31,7 @@ const TYPE_TO_COMPONENT = {
   normal_header: NormalHeader,
   departures: NormalDepartures,
   evergreen_content: EvergreenContent,
-  no_data: NoData
+  no_data: NoData,
 };
 
 const DISABLED_LAYOUT = {
@@ -51,6 +55,7 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
+  useSentry();
   return (
     <Router>
       <Switch>
@@ -62,7 +67,7 @@ const App = (): JSX.Element => {
           </MappingContext.Provider>
         </Route>
       </Switch>
-    </Router >
+    </Router>
   );
 };
 
