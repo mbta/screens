@@ -2,6 +2,7 @@ declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/gl_eink_single_v2.scss");
 
+import * as Sentry from "@sentry/react";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -13,6 +14,13 @@ import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
 import LinkFooter from "Components/v2/eink/link_footer";
 import NormalHeader from "Components/v2/eink/normal_header";
+
+const sentryDsn = document.getElementById("app")?.dataset.sentry;
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+  });
+}
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,

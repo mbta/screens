@@ -2,6 +2,7 @@ declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/bus_eink_v2.scss");
 
+import * as Sentry from "@sentry/react";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -16,8 +17,18 @@ import NormalHeader from "Components/v2/eink/normal_header";
 import FareInfoFooter from "Components/v2/eink/fare_info_footer";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import EvergreenContent from "Components/v2/evergreen_content";
-import { ResponseMapper, ResponseMapperContext } from "Components/v2/screen_container";
+import {
+  ResponseMapper,
+  ResponseMapperContext,
+} from "Components/v2/screen_container";
 import NoData from "Components/v2/eink/no_data";
+
+const sentryDsn = document.getElementById("app")?.dataset.sentry;
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+  });
+}
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -27,7 +38,7 @@ const TYPE_TO_COMPONENT = {
   normal_header: NormalHeader,
   departures: NormalDepartures,
   evergreen_content: EvergreenContent,
-  no_data: NoData
+  no_data: NoData,
 };
 
 const DISABLED_LAYOUT = {
@@ -62,7 +73,7 @@ const App = (): JSX.Element => {
           </MappingContext.Provider>
         </Route>
       </Switch>
-    </Router >
+    </Router>
   );
 };
 

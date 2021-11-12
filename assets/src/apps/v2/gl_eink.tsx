@@ -2,6 +2,7 @@ declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/gl_eink_v2.scss");
 
+import * as Sentry from "@sentry/react";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -20,6 +21,13 @@ import NoData from "Components/v2/eink/no_data";
 import { ResponseMapperContext } from "Components/v2/screen_container";
 import OvernightDepartures from "Components/v2/eink/overnight_departures";
 
+const sentryDsn = document.getElementById("app")?.dataset.sentry;
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+  });
+}
+
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
   full_takeover: TakeoverScreen,
@@ -30,7 +38,7 @@ const TYPE_TO_COMPONENT = {
   line_map: LineMap,
   evergreen_content: EvergreenContent,
   no_data: NoData,
-  overnight_departures: OvernightDepartures
+  overnight_departures: OvernightDepartures,
 };
 
 const DISABLED_LAYOUT = {
