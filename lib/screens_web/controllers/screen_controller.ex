@@ -81,6 +81,7 @@ defmodule ScreensWeb.ScreenController do
       %Screen{app_id: app_id} ->
         conn
         |> assign(:app_id, app_id)
+        |> assign(:sentry_frontend_dsn, Application.get_env(:screens, :sentry_frontend_dsn))
         |> render("index.html")
 
       nil ->
