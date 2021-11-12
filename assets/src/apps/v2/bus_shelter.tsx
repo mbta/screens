@@ -2,6 +2,7 @@ declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/bus_shelter_v2.scss");
 
+import * as Sentry from "@sentry/react";
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
@@ -39,6 +40,13 @@ import NoData from "Components/v2/bus_shelter/no_data";
 import DeparturesNoData from "Components/v2/bus_shelter/departures_no_data";
 
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/alert";
+
+const sentryDsn = document.getElementById("app")?.dataset.sentry;
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+  });
+}
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -88,8 +96,10 @@ const blinkConfig: BlinkConfig = {
 };
 
 const audioConfig: AudioConfig = {
-  readoutIntervalMinutes: parseInt(document.getElementById("app").dataset.audioReadoutInterval)
-}
+  readoutIntervalMinutes: parseInt(
+    document.getElementById("app").dataset.audioReadoutInterval
+  ),
+};
 
 const App = (): JSX.Element => {
   return (
