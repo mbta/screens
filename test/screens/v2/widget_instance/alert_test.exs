@@ -296,7 +296,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       end
     end
 
-    test "returns [:medium_flex] for a non-full-screen alert on Bus E-Ink", %{widget: widget} do
+    test "returns [:medium] for a non-full-screen alert on Bus E-Ink", %{widget: widget} do
       widget =
         widget
         |> put_app_id(:bus_eink_v2)
@@ -305,7 +305,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
         |> put_effect(:snow_route)
         |> put_informed_entities([ie(route: "a"), ie(route: "b")])
 
-      assert [:medium_flex] == AlertWidget.slot_names(widget)
+      assert [:medium] == AlertWidget.slot_names(widget)
     end
   end
 
@@ -332,29 +332,29 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     # y      | y           | y                || y
 
     @gl_slot_names_cases %{
-      {false, false, false} => [:medium_flex],
-      {true, false, false} => [:medium_flex],
-      {false, true, false} => [:medium_flex],
-      {true, true, false} => [:medium_flex],
-      {false, false, true} => [:medium_flex],
-      {true, false, true} => [:medium_flex],
-      {false, true, true} => [:medium_flex],
-      {true, true, true} => [:full_body]
+      {false, false, false} => [:medium],
+      {true, false, false} => [:medium],
+      {false, true, false} => [:medium],
+      {true, true, false} => [:medium],
+      {false, false, true} => [:medium],
+      {true, false, true} => [:medium],
+      {false, true, true} => [:medium],
+      {true, true, true} => [:full_body_top_screen]
     }
 
     for {{set_active?, set_high_impact_effect?, set_location_inside?}, expected_slot_names} <-
           @gl_slot_names_cases do
       false_to_not = fn
-        true -> ""
-        false -> "not "
+        true -> " "
+        false -> " not "
       end
 
       test_description =
         "returns #{inspect(expected_slot_names)} if alert is " <>
           false_to_not.(set_active?) <>
-          "active and does " <>
+          "active and does" <>
           false_to_not.(set_high_impact_effect?) <>
-          "have a high-impact effect and does " <>
+          "have a high-impact effect and does" <>
           false_to_not.(set_location_inside?) <>
           "contain home stop in informed region"
 

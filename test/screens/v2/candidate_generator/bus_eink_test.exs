@@ -26,18 +26,27 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
     test "returns correct template" do
       assert {:screen,
               %{
-                normal: [
+                screen_normal: [
                   :header,
-                  :main_content,
-                  :medium_flex,
-                  :footer
+                  {:body,
+                   %{
+                     body_normal: [
+                       :main_content,
+                       {{0, :flex_zone}, %{one_medium: [{0, :medium}]}},
+                       {{1, :flex_zone}, %{one_medium: [{1, :medium}]}},
+                       :footer
+                     ],
+                     body_takeover: [
+                       :full_body_top_screen,
+                       :full_body_bottom_screen
+                     ],
+                     bottom_takeover: [
+                       :main_content,
+                       :full_body_bottom_screen
+                     ]
+                   }}
                 ],
-                bottom_takeover: [
-                  :header,
-                  :main_content,
-                  :bottom_screen
-                ],
-                full_takeover: [:full_screen]
+                screen_takeover: [:full_screen]
               }} == BusEink.screen_template()
     end
   end
