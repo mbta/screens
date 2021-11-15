@@ -10,6 +10,10 @@ import { MappingContext } from "Components/v2/widget";
 
 import NormalScreen from "Components/v2/bus_eink/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
+import TakeoverBody from "Components/v2/eink/takeover_body";
+import NormalBody from "Components/v2/bus_eink/normal_body";
+import BottomTakeoverBody from "Components/v2/bus_eink/bottom_takeover_body";
+import OneMedium from "Components/v2/eink/flex/one_medium";
 
 import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/eink/normal_header";
@@ -18,23 +22,32 @@ import NormalDepartures from "Components/v2/departures/normal_departures";
 import EvergreenContent from "Components/v2/evergreen_content";
 import { ResponseMapper, ResponseMapperContext } from "Components/v2/screen_container";
 import NoData from "Components/v2/eink/no_data";
+import { MediumFlexAlert, FullBodyTopScreenAlert } from "Components/v2/eink/alert";
+import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 
 const TYPE_TO_COMPONENT = {
-  normal: NormalScreen,
-  full_takeover: TakeoverScreen,
+  screen_normal: NormalScreen,
+  screen_takeover: TakeoverScreen,
+  body_normal: NormalBody,
+  body_takeover: TakeoverBody,
+  bottom_takeover: BottomTakeoverBody,
+  one_medium: OneMedium,
   placeholder: Placeholder,
   fare_info_footer: FareInfoFooter,
   normal_header: NormalHeader,
   departures: NormalDepartures,
+  alert: MediumFlexAlert,
+  full_body_alert: FullBodyTopScreenAlert,
   evergreen_content: EvergreenContent,
-  no_data: NoData
+  no_data: NoData,
+  bottom_screen_fillter: BottomScreenFiller
 };
 
 const DISABLED_LAYOUT = {
   full_screen: {
     type: "no_data",
   },
-  type: "full_takeover",
+  type: "screen_takeover",
 };
 
 const FAILURE_LAYOUT = DISABLED_LAYOUT;

@@ -2,61 +2,50 @@
   overflow: hidden;
 }
 
-.screen-normal__medium-flex {
-  .evergreen-content-image__container {
+.flex-one-medium__medium {
+  .evergreen-content-image__container, .evergreen-content-image__image {
     width: 1200px;
-    height: 1164px;
-  }
-
-  .evergreen-content-image__image {
-    width: 1200px;
-    height: 1164px;
-  }
-}
-
-.screen-normal__main-content {
-  .evergreen-content-image__container {
-    width: 1200px;
-    height: 1312px;
-  }
-
-  .evergreen-content-image__image {
-    width: 1200px;
-    height: 1312px;
-  }
-}
-
-.screen-normal__footer {
-  .evergreen-content-image__container {
-    width: 1200px;
-    height: 436px;
-  }
-
-  .evergreen-content-image__image {
-    width: 1200px;
-    height: 436px;
+    height: 1144px;
   }
 }
 
 .screen-normal__header {
-  .evergreen-content-image__container {
-    width: 1200px;
-    height: 288px;
-  }
-
-  .evergreen-content-image__image {
+  .evergreen-content-image__container, .evergreen-content-image__image {
     width: 1200px;
     height: 288px;
   }
 }
 
-.screen-takeover__full-screen {
-  .evergreen-content-image__container {
+.body-normal__main-content, .body-bottom-takeover__main-content {
+  .evergreen-content-image__container, .evergreen-content-image__image {
     width: 1200px;
-    height: 3200px;
+    height: 1312px;
   }
+}
 
-  .evergreen-content-image__image {
+.body-normal__footer {
+  .evergreen-content-image__container, .evergreen-content-image__image {
+    width: 1200px;
+    height: 436px;
+  }
+}
+
+.body-takeover__top-screen {
+  .evergreen-content-image__container, .evergreen-content-image__image {
+    width: 1200px;
+    height: 1312px;
+  }
+}
+
+.body-takeover__bottom-screen, .body-bottom-takeover__bottom-screen {
+  .evergreen-content-image__container, .evergreen-content-image__image {
+    width: 1200px;
+    height: 1600px;
+  }
+}
+
+.screen-takeover__full-screen {
+  .evergreen-content-image__container, .evergreen-content-image__image {
     width: 1200px;
     height: 3200px;
   }

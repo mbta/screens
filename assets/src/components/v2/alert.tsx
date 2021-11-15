@@ -6,6 +6,8 @@ import RoutePill, {
   routePillKey,
 } from "Components/v2/departures/route_pill";
 
+import LinkArrow from "Components/v2/bundled_svg/link_arrow";
+
 interface Props {
   route_pills: Pill[];
   icon: AlertIcon;
@@ -65,6 +67,9 @@ const BaseAlert: ComponentType<BaseAlertProps> = ({
                 className="alert-widget__content__cta__icon__image"
                 src={imagePath("logo-white.svg")}
               />
+            </div>
+            <div className="alert-widget__content__cta__link-arrow-container">
+              <LinkArrow />
             </div>
             <div className="alert-widget__content__cta__url">{url}</div>
           </div>

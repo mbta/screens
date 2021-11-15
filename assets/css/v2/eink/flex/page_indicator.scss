@@ -1,0 +1,36 @@
+.flex-zone-page-indicator {
+  position: absolute;
+  top: 1144px;
+  left: 0px;
+  width: 1200px;
+  height: 20px;
+  text-align: center;
+}
+
+.flex-zone-page-indicator__page__progress-bar {
+  position: absolute;
+  height: 16px;
+  width: 144px;
+}
+
+.flex-zone-page-indicator__page {
+  position: relative;
+  display: inline-block;
+  width: 144px;
+  height: 16px;
+  border-radius: 24px;
+  margin-left: 44px;
+  overflow: hidden;
+
+  &--selected {
+    .flex-zone-page-indicator__page__progress-bar {
+      background: #000000;
+    }
+  }
+
+  &--past, &--unselected {
+    .flex-zone-page-indicator__page__progress-bar {
+      background: rgb(230, 230, 230);
+    }
+  }
+}

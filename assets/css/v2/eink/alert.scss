@@ -1,25 +1,24 @@
 .alert-widget--flex-zone {
-  // Slot dimensions are 480x580, but this leaves space for the drop-shadow.
-  width: 520px;
-  height: 620px;
-
-  .alert-widget__card {
-    // Move the card so that it fits in the medium flex zone slot and only its drop-shadow extends outside.
-    transform: translateX(-20px) translateY(-10px);
-  }
+  box-sizing: border-box;
+  width: 1200px;
+  height: 1144px;
+  padding-top: 28px;
+  padding-left: 32px;
+  padding-right: 32px;
+  padding-bottom: 32px;
 
   .alert-widget__content {
     position: relative;
     box-sizing: border-box;
-    width: 480px;
-    height: 580px;
-    padding-top: 24px;
+    width: 1136px;
+    height: 1080px;
+    padding-top: 32px;
     padding-left: 32px;
-    padding-right: 32px;
+    padding-right: 72px;
   }
 
   .alert-widget__content__route-pills {
-    height: 74px;
+    height: 144px;
 
     & .route-pill {
       display: inline-block;
@@ -27,12 +26,14 @@
 
     &--regular .route-pill {
       &:not(:first-child) {
+        // TODO: example not in designs, ask about this
         margin-left: 16px;
       }
     }
 
     &--small .route-pill {
       &:not(:first-child) {
+        // TODO: example not in designs, ask about this
         margin-left: 10px;
       }
     }
@@ -45,8 +46,8 @@
   }
 
   .alert-widget__content__header-text {
-    height: 48px;
-    color: rgb(23, 31, 38);
+    height: 96px;
+    color: white;
     font-size: 48px;
     font-family: Inter, sans-serif;
     font-weight: 800;
@@ -56,7 +57,7 @@
   }
 
   .alert-widget__content__body-text {
-    color: rgb(23, 31, 38);
+    color: white;
     font-family: Inter, sans-serif;
     font-weight: 500;
     letter-spacing: 0px;
@@ -76,21 +77,23 @@
   }
 
   .alert-widget__content__cta {
-    background: rgb(115, 115, 115);
+    position: absolute;
     height: 80px;
     width: 100%;
-    position: absolute;
     left: 0;
     bottom: 0;
-    border-radius: 0 0 16px 16px;
   }
 
   .alert-widget__content__cta__icon {
     display: none;
   }
 
-  .alert-widget__content__cta__link-arrow-container {
-    display: none;
+  .link-arrow {
+    @include link-arrow-svg(473);
+  }
+
+  .link-arrow__path {
+    @include link-arrow-path(473, white);
   }
 
   .alert-widget__content__cta__url {
@@ -106,21 +109,17 @@
 }
 
 .alert-widget--full-body {
-  width: 1080px;
-  height: 1648px;
-  background: #ffdd00;
-
-  .alert-widget__card {
-    transform: translateY(10px);
-  }
+  width: 1200px;
+  height: 1312px;
+  background: black;
 
   .alert-widget__content {
     position: relative;
     box-sizing: border-box;
-    width: 1000px;
-    height: 1568px;
+    width: 1136px;
+    height: 1280px;
     padding-top: 64px;
-    padding-left: 64px;
+    padding-left: 46px;
     padding-right: 64px;
   }
 
@@ -138,7 +137,7 @@
 
   .alert-widget__content__header-text {
     height: 120px;
-    color: white;
+    color: black;
     font-size: 120px;
     font-family: Inter, sans-serif;
     font-weight: 800;
@@ -148,7 +147,7 @@
   }
 
   .alert-widget__content__body-text {
-    color: white;
+    color: black;
     font-family: Inter, sans-serif;
     font-weight: 500;
     letter-spacing: 0px;
@@ -168,35 +167,30 @@
   }
 
   .alert-widget__content__cta {
-    background: rgb(46, 62, 77);
+    position: absolute;
     height: 192px;
     width: 100%;
-    position: absolute;
     left: 0;
     bottom: 0;
-    //
     border-radius: 0 0 32px 32px;
   }
 
   .alert-widget__content__cta__icon {
-    height: 128px;
-    position: absolute;
-    top: 32px;
-    left: 64px;
-  }
-
-  .alert-widget__content__cta__icon__image {
-    height: 128px;
-  }
-
-  .alert-widget__content__cta__link-arrow-container {
     display: none;
+  }
+
+  .link-arrow {
+    @include link-arrow-svg(422);
+  }
+
+  .link-arrow__path {
+    @include link-arrow-path(422, black);
   }
 
   .alert-widget__content__cta__url {
     padding-top: 32px;
     padding-right: 64px;
-    color: white;
+    color: black;
     font-size: 64px;
     font-family: Inter, sans-serif;
     font-weight: 800;

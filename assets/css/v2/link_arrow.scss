@@ -1,0 +1,35 @@
+// This file contains mixins to generate the appropriate styles
+// for a link arrow of the given width.
+// To be used with the LinkArrow react component.
+
+// To use:
+// 1. Import this file at the top of the app CSS (e.g. assets/css/bus_eink_v2.scss)
+// 2. Within a selector that specifies where you expect the arrow to appear on the page, add:
+//    .link-arrow {
+//      @include link-arrow-svg(<width>);
+//    }
+//    .link-arrow__path {
+//      @include link-arrow-path(<same width>, <color>);
+//    }
+
+@mixin link-arrow-svg($width) {
+  $height: 40;
+
+  max-height: #{$height}px;
+  height: #{$height}px;
+  max-width: #{$width}px;
+  width: #{$width}px;
+}
+
+@mixin link-arrow-path($width, $color) {
+  $height: 40;
+  $stroke-width: 8;
+  $head-width: 40;
+
+  stroke: $color;
+  stroke-width: #{$stroke-width}px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: $color;
+  d: path("M #{$stroke-width / 2} #{$height / 2} L #{$width - $head-width} #{$height / 2} L #{$width - $head-width} #{$stroke-width / 2} L #{$width - $stroke-width / 2} #{$height / 2} L #{$width - $head-width} #{$height - $stroke-width / 2} L #{$width - $head-width} #{$height / 2} Z");
+}

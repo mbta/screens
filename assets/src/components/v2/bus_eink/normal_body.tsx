@@ -3,34 +3,29 @@ import React from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
-  header: WidgetData;
   main_content: WidgetData;
   flex_zone: WidgetData;
   footer: WidgetData;
 }
 
-const NormalScreen: React.ComponentType<Props> = ({
-  header,
+const NormalBody: React.ComponentType<Props> = ({
   footer,
   main_content: mainContent,
   flex_zone: flexZone,
 }) => {
   return (
-    <div className="screen-normal">
-      <div className="screen-normal__header">
-        <Widget data={header} />
-      </div>
-      <div className="screen-normal__main-content">
+    <div className="body-normal">
+      <div className="body-normal__main-content">
         <Widget data={mainContent} />
       </div>
-      <div className="screen-normal__flex-zone">
+      <div className="body-normal__flex-zone">
         <Widget data={flexZone} />
       </div>
-      <div className="screen-normal__footer">
+      <div className="body-normal__footer">
         <Widget data={footer} />
       </div>
     </div>
   );
 };
 
-export default NormalScreen;
+export default NormalBody;

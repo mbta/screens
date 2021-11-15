@@ -16,7 +16,7 @@ import NormalHeader from "Components/v2/eink/normal_header";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
-  full_takeover: TakeoverScreen,
+  screen_takeover: TakeoverScreen,
   placeholder: Placeholder,
   link_footer: LinkFooter,
   normal_header: NormalHeader,
