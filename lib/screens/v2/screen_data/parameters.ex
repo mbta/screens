@@ -65,7 +65,11 @@ defmodule Screens.V2.ScreenData.Parameters do
   end
 
   @spec get_audio_interval_offset_seconds(Screens.Config.Screen.t()) :: pos_integer()
-  def get_audio_interval_offset_seconds(%Screens.Config.Screen{app_params: %Screens.Config.V2.BusShelter{audio: %Screens.Config.V2.Audio{interval_offset_seconds: interval_offset_seconds}}}) do
+  def get_audio_interval_offset_seconds(%Screens.Config.Screen{
+        app_params: %Screens.Config.V2.BusShelter{
+          audio: %Screens.Config.V2.Audio{interval_offset_seconds: interval_offset_seconds}
+        }
+      }) do
     interval_offset_seconds
   end
 
