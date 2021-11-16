@@ -1,6 +1,8 @@
 defmodule Screens.V2.WidgetInstance.NormalHeader do
   @moduledoc false
 
+  alias Screens.Config.Screen
+  alias Screens.Config.V2.Header.Destination
   alias Screens.V2.WidgetInstance.NormalHeader
 
   defstruct screen: nil,
@@ -16,11 +18,25 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
           time: DateTime.t()
         }
 
+  def serialize(%__MODULE__{icon: icon, text: text, time: time} = t) do
+    %{icon: icon, text: text, time: DateTime.to_iso8601(time), show_to: showing_destination?(t)}
+  end
+
+  defp showing_destination?(%__MODULE__{
+         screen: %Screen{app_params: %_app{header: %Destination{}}}
+       }) do
+    true
+  end
+
+  defp showing_destination?(%__MODULE__{}) do
+    false
+  end
+
   defimpl Screens.V2.WidgetInstance do
     def priority(_instance), do: [2]
 
-    def serialize(%NormalHeader{icon: icon, text: text, time: time}) do
-      %{icon: icon, text: text, time: DateTime.to_iso8601(time)}
+    def serialize(t) do
+      NormalHeader.serialize(t)
     end
 
     def slot_names(_instance), do: [:header]
