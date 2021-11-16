@@ -4,6 +4,7 @@
   data-environment-name="<%= @environment_name %>"
   data-refresh-rate="<%= @refresh_rate %>"
   data-audio-readout-interval="<%= @audio_readout_interval %>"
+  data-audio-interval-offset-seconds="<%= @audio_interval_offset_seconds %>"
   <%= if record_sentry?() do %>
     data-sentry="<%= @sentry_frontend_dsn %>"
   <% end %>
