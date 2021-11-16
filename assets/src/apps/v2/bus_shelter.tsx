@@ -89,6 +89,9 @@ const blinkConfig: BlinkConfig = {
 };
 
 const audioConfig: AudioConfig = {
+  intervalOffsetSeconds: parseInt(
+    document.getElementById("app").dataset.audioIntervalOffsetSeconds
+  ),
   readoutIntervalMinutes: parseInt(
     document.getElementById("app").dataset.audioReadoutInterval
   ),
