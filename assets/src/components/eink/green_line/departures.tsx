@@ -71,7 +71,7 @@ const DepartureList = ({
     <Departure time={time} currentTimeString={currentTimeString} key={id} />
   ));
 
-  if (renderedDepartures.length < 2) {
+  if (renderedDepartures.length < 2 && headway) {
     renderedDepartures.push(
       <HeadwayMessage
         destination={destination}
