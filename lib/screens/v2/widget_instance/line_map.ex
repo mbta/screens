@@ -170,7 +170,9 @@ defmodule Screens.V2.WidgetInstance.LineMap do
          %{index: current_index, label: current_label} = v,
          [%{index: prev_index, label: prev_label} | _] = acc
        ) do
-    if current_index <= prev_index do
+    minimum_index_difference = 0.4
+
+    if current_index - prev_index <= minimum_index_difference do
       adjustment = if current_label == prev_label, do: 0.4, else: 0.7
       [%{v | index: prev_index + adjustment} | acc]
     else
