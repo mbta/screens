@@ -16,7 +16,8 @@ defmodule ScreensWeb.Plugs.Metadata do
       conn
       |> Plug.Conn.get_req_header("x-forwarded-for")
       |> List.first()
-    remote_ip = 
+
+    remote_ip =
       conn.remote_ip
       |> :inet_parse.ntoa()
       |> to_string()
