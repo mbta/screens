@@ -1,4 +1,6 @@
 defmodule ScreensWeb.Plugs.Metadata do
+  @moduledoc false
+
   require Logger
 
   def init(default), do: default
