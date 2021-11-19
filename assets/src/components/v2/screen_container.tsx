@@ -52,6 +52,7 @@ const BlinkConfigContext = createContext<BlinkConfig | null>(
 );
 
 interface AudioConfig {
+  intervalOffsetSeconds: number;
   readoutIntervalMinutes: number;
 }
 

@@ -8,7 +8,8 @@ defmodule Screens.Config.V2.Audio do
           daytime_stop_time: Time.t(),
           days_active: list(Calendar.day_of_week()),
           daytime_volume: float(),
-          nighttime_volume: float()
+          nighttime_volume: float(),
+          interval_offset_seconds: non_neg_integer()
         }
 
   defstruct start_time: ~T[00:00:00],
@@ -17,7 +18,8 @@ defmodule Screens.Config.V2.Audio do
             daytime_stop_time: ~T[00:00:00],
             days_active: [],
             daytime_volume: 0.0,
-            nighttime_volume: 0.0
+            nighttime_volume: 0.0,
+            interval_offset_seconds: 0
 
   use Screens.Config.Struct, with_default: true
 
