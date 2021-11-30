@@ -6,8 +6,6 @@ import RoutePill, {
   routePillKey,
 } from "Components/v2/departures/route_pill";
 
-import LinkArrow from "Components/v2/bundled_svg/link_arrow";
-
 interface Props {
   route_pills: Pill[];
   icon: AlertIcon;
@@ -20,6 +18,7 @@ interface BaseAlertProps {
   alertProps: Props;
   classModifier: string;
   CardComponent: ComponentType<AlertCardProps>;
+  LinkArrowComponent?: ComponentType;
   bodyTextMaxHeight: number;
   iconFilenameFn: (icon: AlertIcon) => string;
 }
@@ -34,6 +33,7 @@ const BaseAlert: ComponentType<BaseAlertProps> = ({
   classModifier,
   alertProps: { route_pills: routePills, icon, header, body, url },
   CardComponent,
+  LinkArrowComponent,
   bodyTextMaxHeight,
   iconFilenameFn,
 }) => {
@@ -68,9 +68,11 @@ const BaseAlert: ComponentType<BaseAlertProps> = ({
                 src={imagePath("logo-white.svg")}
               />
             </div>
-            <div className="alert-widget__content__cta__link-arrow-container">
-              <LinkArrow />
-            </div>
+            {LinkArrowComponent && (
+              <div className="alert-widget__content__cta__link-arrow-container">
+                <LinkArrowComponent />
+              </div>
+            )}
             <div className="alert-widget__content__cta__url">{url}</div>
           </div>
         </div>

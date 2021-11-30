@@ -92,11 +92,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
       icon: serialize_icon(e),
       header: serialize_header(e),
       body: t.alert.header,
-      url:
-        case t.alert.url do
-          nil -> "mbta.com/alerts"
-          url -> clean_up_url(url)
-        end
+      url: clean_up_url(t.alert.url || "mbta.com/alerts")
     }
   end
 

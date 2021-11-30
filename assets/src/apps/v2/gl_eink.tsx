@@ -41,7 +41,7 @@ const TYPE_TO_COMPONENT = {
   line_map: LineMap,
   evergreen_content: EvergreenContent,
   no_data: NoData,
-  bottom_screen_fillter: BottomScreenFiller
+  bottom_screen_filler: BottomScreenFiller
 };
 
 const DISABLED_LAYOUT = {

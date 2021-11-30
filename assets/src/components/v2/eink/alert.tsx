@@ -1,6 +1,7 @@
 import React, { ComponentType } from "react";
 
 import BaseAlert, { Props, AlertCardProps, AlertIcon } from "Components/v2/alert";
+import LinkArrow from "Components/v2/bundled_svg/link_arrow";
 
 const MediumFlexAlert: ComponentType<Props> = (props) => {
   return (
@@ -8,7 +9,8 @@ const MediumFlexAlert: ComponentType<Props> = (props) => {
       alertProps={props}
       classModifier="flex-zone"
       CardComponent={MediumFlexAlertCard}
-      bodyTextMaxHeight={280}
+      LinkArrowComponent={() => <LinkArrow width={473} colorHex="#ffffff" />}
+      bodyTextMaxHeight={528}
       iconFilenameFn={filenameForMediumFlexIcon}
     />
   );
@@ -20,7 +22,8 @@ const FullBodyTopScreenAlert: ComponentType<Props> = (props) => {
       alertProps={props}
       classModifier="full-body"
       CardComponent={FullBodyTopScreenAlertCard}
-      bodyTextMaxHeight={280}
+      LinkArrowComponent={() => <LinkArrow width={422} colorHex="#000000" />}
+      bodyTextMaxHeight={576}
       iconFilenameFn={filenameForFullBodyTopScreenIcon}
     />
   );

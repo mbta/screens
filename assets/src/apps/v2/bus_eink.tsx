@@ -40,7 +40,7 @@ const TYPE_TO_COMPONENT = {
   full_body_alert: FullBodyTopScreenAlert,
   evergreen_content: EvergreenContent,
   no_data: NoData,
-  bottom_screen_fillter: BottomScreenFiller
+  bottom_screen_filler: BottomScreenFiller
 };
 
 const DISABLED_LAYOUT = {

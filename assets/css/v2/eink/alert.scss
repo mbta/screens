@@ -1,3 +1,4 @@
+// Flex zone alert
 .alert-widget--flex-zone {
   box-sizing: border-box;
   width: 1200px;
@@ -20,21 +21,29 @@
   .alert-widget__content__route-pills {
     height: 144px;
 
-    & .route-pill {
+    .route-pill {
       display: inline-block;
+      background-color: white;
+    }
+
+    .route-pill__text {
+      color: black;
     }
 
     &--regular .route-pill {
       &:not(:first-child) {
-        // TODO: example not in designs, ask about this
-        margin-left: 16px;
+        margin-left: 32px;
       }
     }
 
-    &--small .route-pill {
-      &:not(:first-child) {
-        // TODO: example not in designs, ask about this
-        margin-left: 10px;
+    &--small {
+      box-sizing: border-box;
+      padding-top: 20px;
+
+      .route-pill {
+        &:not(:first-child) {
+          margin-left: 16px;
+        }
       }
     }
   }
@@ -43,44 +52,55 @@
     position: absolute;
     top: 0;
     right: 0;
+    height: 208px;
+  }
+
+  .alert-widget__content__icon-image {
+    height: 208px;
   }
 
   .alert-widget__content__header-text {
     height: 96px;
+    width: 992px;
     color: white;
-    font-size: 48px;
+    font-size: 96px;
     font-family: Inter, sans-serif;
     font-weight: 800;
     letter-spacing: 0px;
-    line-height: 48px;
-    margin-top: 32px;
+    line-height: 96px;
+    margin-top: 64px;
+    margin-left: 40px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
   }
 
   .alert-widget__content__body-text {
+    width: 992px;
     color: white;
     font-family: Inter, sans-serif;
     font-weight: 500;
     letter-spacing: 0px;
-    margin-top: 24px;
+    margin-top: 64px;
+    margin-left: 40px;
 
     &--regular {
-      font-size: 32px;
-      line-height: 40px;
+      font-size: 64px;
+      line-height: 88px;
     }
 
     &--small {
-      height: 280px;
-      font-size: 24px;
-      line-height: 32px;
+      height: 528px;
+      font-size: 48px;
+      line-height: 64px;
       overflow: hidden;
     }
   }
 
   .alert-widget__content__cta {
     position: absolute;
-    height: 80px;
-    width: 100%;
-    left: 0;
+    height: 120px;
+    margin-left: 40px;
     bottom: 0;
   }
 
@@ -88,29 +108,31 @@
     display: none;
   }
 
-  .link-arrow {
-    @include link-arrow-svg(473);
-  }
-
-  .link-arrow__path {
-    @include link-arrow-path(473, white);
+  .alert-widget__content__cta__link-arrow-container {
+    display: inline-block;
+    width: 473px;
+    margin-bottom: 64px;
   }
 
   .alert-widget__content__cta__url {
-    padding-top: 18px;
-    padding-right: 24px;
+    display: inline-block;
+    margin-left: 56px;
+    margin-bottom: 64px;
     color: white;
-    font-size: 40px;
+    font-size: 56px;
     font-family: Inter, sans-serif;
     font-weight: 800;
     text-align: right;
-    line-height: 40px;
+    line-height: 56px;
   }
 }
 
+// Top screen body takeover alert
 .alert-widget--full-body {
+  box-sizing: border-box;
   width: 1200px;
   height: 1312px;
+  padding-left: 32px;
   background: black;
 
   .alert-widget__content {
@@ -144,6 +166,7 @@
     letter-spacing: 0px;
     line-height: 120px;
     margin-top: 64px;
+    margin-left: 18px;
   }
 
   .alert-widget__content__body-text {
@@ -152,6 +175,7 @@
     font-weight: 500;
     letter-spacing: 0px;
     margin-top: 64px;
+    margin-left: 18px;
 
     &--regular {
       font-size: 56px;
@@ -168,33 +192,29 @@
 
   .alert-widget__content__cta {
     position: absolute;
-    height: 192px;
-    width: 100%;
-    left: 0;
+    height: 120px;
+    margin-left: 18px;
     bottom: 0;
-    border-radius: 0 0 32px 32px;
   }
 
   .alert-widget__content__cta__icon {
     display: none;
   }
 
-  .link-arrow {
-    @include link-arrow-svg(422);
-  }
-
-  .link-arrow__path {
-    @include link-arrow-path(422, black);
+  .alert-widget__content__cta__link-arrow-container {
+    display: inline-block;
+    width: 422px;
   }
 
   .alert-widget__content__cta__url {
-    padding-top: 32px;
-    padding-right: 64px;
+    display: inline-block;
+    margin-left: 66px;
+    margin-bottom: 56px;
     color: black;
     font-size: 64px;
     font-family: Inter, sans-serif;
     font-weight: 800;
     text-align: right;
-    line-height: 128px;
+    line-height: 64px;
   }
 }
