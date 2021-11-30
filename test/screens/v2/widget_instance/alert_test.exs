@@ -675,7 +675,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       assert :downstream == AlertWidget.location(widget)
     end
 
-    test "returns :elsewhere for an alert that affects upstream and downstream stops, but not this stop",
+    test "returns :downstream for an alert that affects upstream and downstream stops, but not this stop",
          %{widget: widget} do
       widget =
         put_informed_entities(widget, [
@@ -683,7 +683,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
           ie(stop: "6")
         ])
 
-      assert :elsewhere == AlertWidget.location(widget)
+      assert :downstream == AlertWidget.location(widget)
     end
   end
 

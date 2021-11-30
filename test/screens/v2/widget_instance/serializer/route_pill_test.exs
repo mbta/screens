@@ -60,8 +60,9 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
       assert %{type: :text, text: "RL", color: :red} == serialize_route_for_alert("Red")
     end
 
-    test "Includes branch name for Green Line" do
-      assert %{type: :text, text: "GL·B", color: :green} == serialize_route_for_alert("Green-B")
+    test "Includes branch name and long text for Green Line" do
+      assert %{type: :text, text: "Green Line B", color: :green} ==
+               serialize_route_for_alert("Green-B")
     end
 
     test "Abbreviates Commuter Rail route names" do
