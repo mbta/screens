@@ -105,6 +105,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     {"place-bland", {"Blandford Street", "Blandford"}},
     {"place-buest", {"Boston University East", "BU East"}},
     {"place-bucen", {"Boston University Central", "BU Central"}},
+    {"place-amory", {"Amory Street", "Amory St"}},
     {"place-buwst", {"Boston University West", "BU West"}},
     {"place-stplb", {"Saint Paul Street", "St. Paul St"}},
     {"place-babck", {"Babcock Street", "Babcock St"}},

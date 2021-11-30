@@ -6,6 +6,8 @@
 @import "v2/gl_eink/body/normal";
 @import "v2/eink/body/takeover";
 @import "v2/gl_eink/body/bottom_takeover";
+@import "v2/eink/flex/one_medium";
+@import "v2/eink/flex/page_indicator";
 
 @import "v2/placeholder";
 @import "v2/eink/normal_header";
@@ -13,12 +15,11 @@
 @import "v2/eink/fare_info_footer";
 @import "v2/eink/free_text";
 @import "v2/eink/departures/alert";
-@import "v2/eink/no_data";
 @import "v2/eink/alert";
 @import "v2/eink/bottom_screen_filler";
 
-@import "v2/eink/flex/page_indicator";
-@import "v2/eink/flex/one_medium";
+@import "v2/eink/departures/overnight";
+@import "v2/eink/no_data.scss";
 
 @import "v2/eink/route_pill";
 @import "v2/gl_eink/route_pill";

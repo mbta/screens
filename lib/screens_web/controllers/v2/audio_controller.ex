@@ -16,10 +16,26 @@ defmodule ScreensWeb.V2.AudioController do
     real_screen? = Map.get(params, "is_real_screen", false)
     disposition = if Map.has_key?(params, "inline"), do: :inline, else: :attachment
 
+    _ = Screens.LogScreenData.log_audio_request(screen_id, real_screen?)
+
     cond do
       not screen_exists?(screen_id) -> not_found(conn)
       State.disabled?(screen_id) -> disabled(conn)
       true -> readout(conn, screen_id, real_screen?, disposition)
+    end
+  end
+
+  def show_volume(conn, %{"id" => screen_id}) do
+    cond do
+      not screen_exists?(screen_id) ->
+        not_found(conn)
+
+      State.disabled?(screen_id) ->
+        json(conn, %{volume: 0.0})
+
+      true ->
+        {:ok, volume} = ScreenAudioData.volume_by_screen_id(screen_id)
+        json(conn, %{volume: volume})
     end
   end
 

@@ -9,7 +9,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   alias Screens.V2.CandidateGenerator.Widgets.Departures
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.DeparturesNoData
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Trips.Trip
@@ -95,6 +95,26 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
 
       actual_departures_instances =
         Departures.departures_instances(config, fetch_section_departures_fn)
+
+      assert expected_departures_instances == actual_departures_instances
+    end
+
+    test "returns OvernightDepartures if sections_data contains overnight atom", %{config: config} do
+      fetch_section_departures_fn = fn
+        %Section{query: "query A"} -> {:ok, []}
+        %Section{query: "query B"} -> {:ok, []}
+      end
+
+      post_processing_fn = fn _sections, _config ->
+        [:overnight]
+      end
+
+      expected_departures_instances = [
+        %OvernightDepartures{}
+      ]
+
+      actual_departures_instances =
+        Departures.departures_instances(config, fetch_section_departures_fn, post_processing_fn)
 
       assert expected_departures_instances == actual_departures_instances
     end

@@ -7,7 +7,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias Screens.Config.V2.{BusEink, BusShelter, Departures, GlEink, Solari, SolariLarge}
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.DeparturesNoData
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
 
   def departures_instances(
         %Screen{app_params: %app{}} = config,
@@ -40,15 +40,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
       |> post_processing_fn.(config)
 
     departures_instance =
-      if Enum.any?(sections_data, &(&1 == :error)) do
-        %DeparturesNoData{screen: config, show_alternatives?: true}
-      else
-        sections =
-          Enum.map(sections_data, fn {:ok, departures} ->
-            %{type: :normal_section, rows: departures}
-          end)
+      cond do
+        Enum.any?(sections_data, &(&1 == :error)) ->
+          %DeparturesNoData{screen: config, show_alternatives?: true}
 
-        %DeparturesWidget{screen: config, section_data: sections}
+        sections_data == [:overnight] ->
+          %OvernightDepartures{}
+
+        true ->
+          sections =
+            Enum.map(sections_data, fn {:ok, departures} ->
+              %{type: :normal_section, rows: departures}
+            end)
+
+          %DeparturesWidget{screen: config, section_data: sections}
       end
 
     [departures_instance]

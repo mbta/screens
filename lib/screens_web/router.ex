@@ -91,6 +91,8 @@ defmodule ScreensWeb.Router do
 
       get "/:id/readout.mp3", AudioController, :show
 
+      get "/:id/volume", AudioController, :show_volume
+
       get "/:id/debug", AudioController, :debug
 
       get "/text_to_speech/:text", AudioController, :text_to_speech

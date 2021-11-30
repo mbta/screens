@@ -14,8 +14,10 @@ import {
   MultiRotationPage,
 } from "Components/dup/dup_screen_page";
 import { isDup } from "Util/util";
+import useSentry from "Hooks/use_sentry";
 
 const App = (): JSX.Element => {
+  useSentry();
   if (isDup()) {
     return <ScreenPage screenContainer={ScreenContainer} />;
   } else {
