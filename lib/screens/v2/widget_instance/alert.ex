@@ -275,6 +275,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
       equal?(informed_zones_set, new([:upstream, :home_stop, :downstream])) -> :inside
       equal?(informed_zones_set, new([:upstream, :home_stop])) -> :boundary_upstream
       equal?(informed_zones_set, new([:home_stop, :downstream])) -> :boundary_downstream
+      # An edge case that occurs most often when home_stop is a terminus, and some other cases
+      equal?(informed_zones_set, new([:downstream, :upstream])) -> :downstream
       true -> :elsewhere
     end
   end

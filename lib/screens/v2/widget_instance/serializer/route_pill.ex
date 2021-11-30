@@ -128,13 +128,14 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   @spec serialize_route_for_alert(Route.id()) :: t()
   def serialize_route_for_alert(route_id) do
-    route = do_serialize(route_id, %{gl_branch: true, cr_abbrev: true})
+    route = do_serialize(route_id, %{gl_long: true, gl_branch: true, cr_abbrev: true})
 
     Map.merge(route, %{color: get_color_for_route(route_id)})
   end
 
   @typep serialize_opts :: %{
            optional(:gl_branch) => boolean(),
+           optional(:gl_long) => boolean(),
            optional(:cr_abbrev) => boolean(),
            optional(:route_name) => String.t()
          }
@@ -146,8 +147,12 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   defp do_serialize("Mattapan", _), do: %{type: :text, text: "M"}
   defp do_serialize("Orange", _), do: %{type: :text, text: "OL"}
 
-  defp do_serialize("Green-" <> branch, %{gl_branch: true}) do
-    %{type: :text, text: "GL·" <> branch}
+  defp do_serialize("Green-" <> branch, %{gl_branch: true} = opts) do
+    %{type: :text, text: if(opts[:gl_long], do: "Green Line ", else: "GL·") <> branch}
+  end
+
+  defp do_serialize("Green-" <> _branch, %{gl_long: true}) do
+    %{type: :text, text: "Green Line"}
   end
 
   defp do_serialize("Green-" <> _branch, _) do
