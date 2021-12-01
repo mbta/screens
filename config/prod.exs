@@ -12,8 +12,7 @@ use Mix.Config
 config :screens, ScreensWeb.Endpoint,
   url: [host: "example.com", port: 80],
   server: true,
-  cache_static_manifest: "priv/static/cache_manifest.json",
-  record_sentry: true
+  cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
 config :logger, level: :info
@@ -21,6 +20,9 @@ config :logger, level: :info
 config :ex_aws, json_codec: Jason
 
 config :ehmon, :report_mf, {:ehmon, :info_report}
+
+config :screens,
+  record_sentry: true
 
 # ## SSL Support
 #
