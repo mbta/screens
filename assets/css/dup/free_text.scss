@@ -133,6 +133,9 @@
 
   .free-text__line {
     width: 1608px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .free-text__icon-container {
