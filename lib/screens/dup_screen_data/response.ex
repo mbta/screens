@@ -60,8 +60,16 @@ defmodule Screens.DupScreenData.Response do
     end
   end
 
+  defp partial_alert_specifier(%{headsign: {:adj, "Ashmont/Braintree" = headsign}}) do
+    {headsign, ""}
+  end
+
   defp partial_alert_specifier(%{headsign: {:adj, headsign}}) do
     {headsign, "trains"}
+  end
+
+  defp partial_alert_specifier(%{headsign: "Ashmont/Braintree" = headsign}) do
+    {headsign, ""}
   end
 
   defp partial_alert_specifier(%{headsign: headsign}) do
