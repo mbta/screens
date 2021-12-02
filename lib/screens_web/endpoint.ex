@@ -23,6 +23,7 @@ defmodule ScreensWeb.Endpoint do
     plug Phoenix.CodeReloader
   end
 
+  plug ScreensWeb.Plugs.Metadata
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
