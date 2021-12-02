@@ -63,7 +63,7 @@ config :screens,
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.S3Fetch,
   default_api_v3_url: "https://api-v3.mbta.com/",
   record_sentry: false,
-  sentry_frontend_dsn: System.get_env("SENTRY_DSN")
+  sentry_frontend_dsn: {System, :get_env, ["SENTRY_DSN"]}
 
 config :screens,
   # Maps alert informed entity contents to the appropriate headsign to show for that alert.
