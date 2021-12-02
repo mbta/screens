@@ -65,7 +65,8 @@ config :screens,
   environment_name: eb_env_name,
   gds_dms_password: gds_dms_password,
   mercury_api_key: mercury_api_key,
-  signs_ui_s3_bucket: signs_ui_s3_bucket
+  signs_ui_s3_bucket: signs_ui_s3_bucket,
+  sentry_frontend_dsn: System.get_env("SENTRY_DSN")
 
 config :ueberauth, Ueberauth.Strategy.Cognito, client_secret: cognito_client_secret
 config :screens, ScreensWeb.AuthManager, secret_key: screens_auth_secret
