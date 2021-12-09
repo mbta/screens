@@ -5,9 +5,6 @@ import Widget, { WidgetData } from "Components/v2/widget";
 interface Props {
   header: WidgetData;
   body: WidgetData;
-  main_content: WidgetData;
-  flex_zone: WidgetData;
-  footer: WidgetData;
 }
 
 const NormalScreen: React.ComponentType<Props> = ({
