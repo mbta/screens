@@ -3,7 +3,7 @@ defmodule Screens.MercuryData.Fetch do
 
   import Screens.VendorData.Fetch, only: [make_and_parse_request: 5]
 
-  @api_url_base "https://cms.mercuryinnovation.com.au/ExtApi/devices"
+  @api_url_base "https://nexus.mercuryinnovation.com.au/ExtApi/devices"
   @vendor_request_opts [hackney: [pool: :mercury_api_pool]]
 
   def fetch_data do
