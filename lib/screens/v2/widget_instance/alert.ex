@@ -30,7 +30,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @automated_override_priority [1, 2]
 
   # Keep these in descending order of priority--highest priority (lowest integer value) first
-  @relevant_effects ~w[shuttle stop_closure suspension station_closure detour stop_moved snow_route elevator_closure]a
+  @relevant_effects ~w[shuttle stop_closure suspension station_closure detour stop_move stop_moved snow_route elevator_closure]a
 
   @effect_priorities Enum.with_index(@relevant_effects, 1)
 
@@ -58,9 +58,9 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @effect_icons Enum.zip(
                   @relevant_effects,
                   Enum.map(@relevant_effects, fn
-                    bus when bus in [:shuttle, :detour] -> :bus
-                    major when major in [:stop_closure, :suspension, :station_closure] -> :x
-                    minor when minor in [:stop_moved, :elevator_closure] -> :warning
+                    bus when bus in ~w[shuttle detour]a -> :bus
+                    major when major in ~w[stop_closure suspension station_closure]a -> :x
+                    minor when minor in ~w[stop_move stop_moved elevator_closure]a -> :warning
                     :snow_route -> :snowflake
                   end)
                 )
@@ -78,7 +78,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
     cond do
       Enum.any?(tiebreakers, &(&1 == :no_render)) -> :no_render
-      slot_names(t) == [:full_body] -> @automated_override_priority
+      takeover_alert?(t) -> @automated_override_priority
       true -> tiebreakers
     end
   end
@@ -92,11 +92,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
       icon: serialize_icon(e),
       header: serialize_header(e),
       body: t.alert.header,
-      url:
-        case t.alert.url do
-          nil -> "mbta.com/alerts"
-          url -> clean_up_url(url)
-        end
+      url: clean_up_url(t.alert.url || "mbta.com/alerts")
     }
   end
 
@@ -139,33 +135,41 @@ defmodule Screens.V2.WidgetInstance.Alert do
     |> String.replace(~r|/$|, "")
   end
 
-  def slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}} = t) do
-    if bus_app_takeover_alert?(t), do: [:full_body], else: [:medium_left, :medium_right]
+  def slot_names(t) do
+    if takeover_alert?(t), do: takeover_slot_names(t), else: normal_slot_names(t)
   end
 
-  def slot_names(%__MODULE__{screen: %Screen{app_id: :bus_eink_v2}} = t) do
-    if bus_app_takeover_alert?(t), do: [:full_body], else: [:medium_flex]
-  end
-
-  def slot_names(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
-    if gl_app_takeover_alert?(t), do: [:full_body], else: [:medium_flex]
-  end
-
-  defp bus_app_takeover_alert?(t) do
-    active?(t) and effect(t) in [:stop_closure, :stop_move, :suspension, :detour] and
+  defp takeover_alert?(%__MODULE__{screen: %Screen{app_id: bus_app_id}} = t)
+       when bus_app_id in [:bus_shelter_v2, :bus_eink_v2] do
+    active?(t) and effect(t) in [:stop_closure, :stop_move, :stop_moved, :suspension, :detour] and
       informs_all_active_routes_at_home_stop?(t)
   end
 
-  defp gl_app_takeover_alert?(t) do
+  defp takeover_alert?(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
     active?(t) and effect(t) in [:station_closure, :suspension, :shuttle] and
       location(t) == :inside
   end
 
+  defp takeover_slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}) do
+    [:full_body]
+  end
+
+  defp takeover_slot_names(%__MODULE__{screen: %Screen{app_id: eink_app_id}})
+       when eink_app_id in [:gl_eink_v2, :bus_eink_v2] do
+    [:full_body_top_screen]
+  end
+
+  defp normal_slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}) do
+    [:medium_left, :medium_right]
+  end
+
+  defp normal_slot_names(%__MODULE__{screen: %Screen{app_id: eink_app_id}})
+       when eink_app_id in [:gl_eink_v2, :bus_eink_v2] do
+    [:medium]
+  end
+
   def widget_type(t) do
-    case slot_names(t) do
-      [:full_body] -> :full_body_alert
-      _ -> :alert
-    end
+    if takeover_alert?(t), do: :full_body_alert, else: :alert
   end
 
   def valid_candidate?(%__MODULE__{screen: %Screen{app_id: screen_type}} = t)
@@ -271,6 +275,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
       equal?(informed_zones_set, new([:upstream, :home_stop, :downstream])) -> :inside
       equal?(informed_zones_set, new([:upstream, :home_stop])) -> :boundary_upstream
       equal?(informed_zones_set, new([:home_stop, :downstream])) -> :boundary_downstream
+      # An edge case that occurs most often when home_stop is a terminus, and some other cases
+      equal?(informed_zones_set, new([:downstream, :upstream])) -> :downstream
       true -> :elsewhere
     end
   end

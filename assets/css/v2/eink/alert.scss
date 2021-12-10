@@ -1,0 +1,220 @@
+// Flex zone alert
+.alert-widget--flex-zone {
+  box-sizing: border-box;
+  width: 1200px;
+  height: 1144px;
+  padding-top: 28px;
+  padding-left: 32px;
+  padding-right: 32px;
+  padding-bottom: 32px;
+
+  .alert-widget__content {
+    position: relative;
+    box-sizing: border-box;
+    width: 1136px;
+    height: 1080px;
+    padding-top: 32px;
+    padding-left: 32px;
+    padding-right: 72px;
+  }
+
+  .alert-widget__content__route-pills {
+    height: 144px;
+
+    .route-pill {
+      display: inline-block;
+      background-color: white;
+    }
+
+    .route-pill__text {
+      color: black;
+    }
+
+    &--regular .route-pill {
+      &:not(:first-child) {
+        margin-left: 32px;
+      }
+    }
+
+    &--small {
+      box-sizing: border-box;
+      padding-top: 20px;
+
+      .route-pill {
+        &:not(:first-child) {
+          margin-left: 16px;
+        }
+      }
+    }
+  }
+
+  .alert-widget__content__icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 208px;
+  }
+
+  .alert-widget__content__icon-image {
+    height: 208px;
+  }
+
+  .alert-widget__content__header-text {
+    height: 96px;
+    width: 992px;
+    color: white;
+    font-size: 96px;
+    font-family: Inter, sans-serif;
+    font-weight: 800;
+    letter-spacing: 0px;
+    line-height: 96px;
+    margin-top: 64px;
+    margin-left: 40px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
+  }
+
+  .alert-widget__content__body-text {
+    width: 992px;
+    color: white;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    letter-spacing: 0px;
+    margin-top: 64px;
+    margin-left: 40px;
+
+    &--regular {
+      font-size: 64px;
+      line-height: 88px;
+    }
+
+    &--small {
+      height: 528px;
+      font-size: 48px;
+      line-height: 64px;
+      overflow: hidden;
+    }
+  }
+
+  .alert-widget__content__cta {
+    position: absolute;
+    height: 120px;
+    margin-left: 40px;
+    bottom: 0;
+  }
+
+  .alert-widget__content__cta__icon {
+    display: none;
+  }
+
+  .alert-widget__content__cta__link-arrow-container {
+    display: inline-block;
+    width: 473px;
+    margin-bottom: 64px;
+  }
+
+  .alert-widget__content__cta__url {
+    display: inline-block;
+    margin-left: 56px;
+    margin-bottom: 64px;
+    color: white;
+    font-size: 56px;
+    font-family: Inter, sans-serif;
+    font-weight: 800;
+    text-align: right;
+    line-height: 56px;
+  }
+}
+
+// Top screen body takeover alert
+.alert-widget--full-body {
+  box-sizing: border-box;
+  width: 1200px;
+  height: 1312px;
+  padding-left: 32px;
+  background: black;
+
+  .alert-widget__content {
+    position: relative;
+    box-sizing: border-box;
+    width: 1136px;
+    height: 1280px;
+    padding-top: 64px;
+    padding-left: 46px;
+    padding-right: 64px;
+  }
+
+  .alert-widget__content__route-pills {
+    display: none;
+  }
+
+  .alert-widget__content__icon {
+    height: 256px;
+  }
+
+  .alert-widget__content__icon-image {
+    height: 256px;
+  }
+
+  .alert-widget__content__header-text {
+    height: 120px;
+    color: black;
+    font-size: 120px;
+    font-family: Inter, sans-serif;
+    font-weight: 800;
+    letter-spacing: 0px;
+    line-height: 120px;
+    margin-top: 64px;
+    margin-left: 18px;
+  }
+
+  .alert-widget__content__body-text {
+    color: black;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    letter-spacing: 0px;
+    margin-top: 64px;
+    margin-left: 18px;
+
+    &--regular {
+      font-size: 56px;
+      line-height: 72px;
+    }
+
+    &--small {
+      height: 744px;
+      font-size: 42px;
+      line-height: 58px;
+      overflow: hidden;
+    }
+  }
+
+  .alert-widget__content__cta {
+    position: absolute;
+    height: 120px;
+    margin-left: 18px;
+    bottom: 0;
+  }
+
+  .alert-widget__content__cta__icon {
+    display: none;
+  }
+
+  .alert-widget__content__cta__link-arrow-container {
+    display: inline-block;
+    width: 422px;
+  }
+
+  .alert-widget__content__cta__url {
+    display: inline-block;
+    margin-left: 66px;
+    margin-bottom: 56px;
+    color: black;
+    font-size: 64px;
+    font-family: Inter, sans-serif;
+    font-weight: 800;
+    text-align: right;
+    line-height: 64px;
+  }
+}

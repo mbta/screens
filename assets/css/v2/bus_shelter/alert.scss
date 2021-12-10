@@ -89,6 +89,10 @@
     display: none;
   }
 
+  .alert-widget__content__cta__link-arrow-container {
+    display: none;
+  }
+
   .alert-widget__content__cta__url {
     padding-top: 18px;
     padding-right: 24px;
@@ -183,6 +187,10 @@
 
   .alert-widget__content__cta__icon__image {
     height: 128px;
+  }
+
+  .alert-widget__content__cta__link-arrow-container {
+    display: none;
   }
 
   .alert-widget__content__cta__url {

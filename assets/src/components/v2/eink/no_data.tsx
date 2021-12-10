@@ -1,7 +1,7 @@
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
-import HandWithPhone from "../bundled_svg/hand_with_phone";
-import NoConnection from "../bundled_svg/no_connection";
+import NoConnection from "Components/v2/bundled_svg/no_connection";
+import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 
 const NoData: ComponentType = () => {
     return (
@@ -36,26 +36,7 @@ const NoData: ComponentType = () => {
                     </div>
                 </div>
             </div>
-            <div className="no-data__bottom-screen">
-                <div className="no-data__alternatives-container">
-                    <div className="no-data__alternatives__message">
-                        For the latest schedules and updates, go to{" "}
-                    </div>
-                    <div className="no-data__alternatives__link-app">
-                        <span className="no-data__alternatives__message__em">
-                            mbta.com/schedules
-                        </span>{" "}
-                        or{" "}
-                        <span className="no-data__alternatives__message__em">
-                            Transit
-                        </span>{" "}
-                        app
-                    </div>
-                </div>
-                <div className="no-data__phone-image-container">
-                    <HandWithPhone className="no-data__phone-image" />
-                </div>
-            </div>
+            <BottomScreenFiller />
         </div>
     );
 };

@@ -1,0 +1,37 @@
+.body-normal {
+  position: relative;
+  width: 1200px;
+  height: 2912px;
+}
+
+.body-normal__left-sidebar {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 376px;
+  height: 1312px;
+}
+
+.body-normal__main-content {
+  position: absolute;
+  top: 0px;
+  left: 376px;
+  width: 824px;
+  height: 1312px;
+}
+
+.body-normal__flex-zone {
+  position: absolute;
+  top: 1312px;
+  left: 0px;
+  width: 1200px;
+  height: 1164px;
+}
+
+.body-normal__footer {
+  position: absolute;
+  top: 2476px;
+  left: 0px;
+  width: 1200px;
+  height: 436px;
+}

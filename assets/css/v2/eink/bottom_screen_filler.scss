@@ -1,0 +1,52 @@
+.bottom-screen-filler {
+  height: 1600px;
+  background-color: #000000;
+}
+
+.bottom-screen-filler__alternatives-container {
+  margin-left: 80px;
+  padding-top: 92px;
+  height: 30%;
+  box-sizing: border-box;
+}
+
+.bottom-screen-filler__alternatives__message {
+  width: 869px;
+
+  color: #ffffff;
+  font-size: 72px;
+  font-family: Inter, sans-serif;
+  font-weight: normal;
+  letter-spacing: 0px;
+  margin-bottom: 16px;
+  line-height: 96px;
+}
+
+.bottom-screen-filler__alternatives__link-app {
+  color: #ffffff;
+  font-family: Inter, sans-serif;
+  font-size: 96px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  line-height: 112px;
+}
+
+.bottom-screen-filler__alternatives__message__em {
+  font-weight: bold;
+}
+
+.bottom-screen-filler__phone-image-container {
+  height: 70%;
+  position: relative;
+}
+
+.bottom-screen-filler__phone-image {
+  height: 90%;
+  display: inline-block;
+  max-width: 100%;
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+}

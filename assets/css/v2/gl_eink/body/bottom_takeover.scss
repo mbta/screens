@@ -1,0 +1,29 @@
+.body-bottom-takeover {
+  position: relative;
+  width: 1200px;
+  height: 2912px;
+}
+
+.body-bottom-takeover__left-sidebar {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 376px;
+  height: 1312px;
+}
+
+.body-bottom-takeover__main-content {
+  position: absolute;
+  top: 0px;
+  left: 376px;
+  width: 824px;
+  height: 1312px;
+}
+
+.body-bottom-takeover__bottom-screen {
+  position: absolute;
+  top: 1312px;
+  left: 0px;
+  width: 1200px;
+  height: 1600px;
+}

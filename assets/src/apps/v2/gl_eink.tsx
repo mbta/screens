@@ -10,6 +10,10 @@ import { MappingContext } from "Components/v2/widget";
 
 import NormalScreen from "Components/v2/gl_eink_double/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
+import NormalBody from "Components/v2/gl_eink_double/normal_body";
+import TakeoverBody from "Components/v2/eink/takeover_body";
+import BottomTakeoverBody from "Components/v2/gl_eink_double/bottom_takeover_body";
+import OneMedium from "Components/v2/eink/flex/one_medium";
 import Placeholder from "Components/v2/placeholder";
 import FareInfoFooter from "Components/v2/eink/fare_info_footer";
 import NormalHeader from "Components/v2/eink/normal_header";
@@ -17,20 +21,29 @@ import NormalDepartures from "Components/v2/departures/normal_departures";
 import LineMap from "Components/v2/gl_eink_double/line_map";
 import EvergreenContent from "Components/v2/evergreen_content";
 import NoData from "Components/v2/eink/no_data";
-import { ResponseMapperContext } from "Components/v2/screen_container";
+import { ResponseMapper, ResponseMapperContext } from "Components/v2/screen_container";
+import { MediumFlexAlert, FullBodyTopScreenAlert } from "Components/v2/eink/alert";
+import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 import OvernightDepartures from "Components/v2/eink/overnight_departures";
 import useSentry from "Hooks/use_sentry";
 
 const TYPE_TO_COMPONENT = {
-  normal: NormalScreen,
-  full_takeover: TakeoverScreen,
+  screen_normal: NormalScreen,
+  screen_takeover: TakeoverScreen,
+  body_normal: NormalBody,
+  body_takeover: TakeoverBody,
+  bottom_takeover: BottomTakeoverBody,
+  one_medium: OneMedium,
   placeholder: Placeholder,
   fare_info_footer: FareInfoFooter,
   normal_header: NormalHeader,
   departures: NormalDepartures,
+  alert: MediumFlexAlert,
+  full_body_alert: FullBodyTopScreenAlert,
   line_map: LineMap,
   evergreen_content: EvergreenContent,
   no_data: NoData,
+  bottom_screen_filler: BottomScreenFiller,
   overnight_departures: OvernightDepartures,
 };
 
@@ -38,7 +51,7 @@ const DISABLED_LAYOUT = {
   full_screen: {
     type: "no_data",
   },
-  type: "full_takeover",
+  type: "screen_takeover",
 };
 
 const FAILURE_LAYOUT = DISABLED_LAYOUT;

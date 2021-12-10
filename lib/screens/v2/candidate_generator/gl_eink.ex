@@ -10,8 +10,10 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
+  alias Screens.V2.Template.Builder
 
   alias Screens.V2.WidgetInstance.{
+    BottomScreenFiller,
     FareInfoFooter,
     LineMap,
     NormalHeader
@@ -25,21 +27,30 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   def screen_template do
     {:screen,
      %{
-       normal: [
+       screen_normal: [
          :header,
-         :left_sidebar,
-         :main_content,
-         :medium_flex,
-         :footer
+         {:body,
+          %{
+            body_normal: [
+              :left_sidebar,
+              :main_content,
+              Builder.with_paging({:flex_zone, %{one_medium: [:medium]}}, 2),
+              :footer
+            ],
+            body_takeover: [
+              :full_body_top_screen,
+              :full_body_bottom_screen
+            ],
+            bottom_takeover: [
+              :left_sidebar,
+              :main_content,
+              :full_body_bottom_screen
+            ]
+          }}
        ],
-       bottom_takeover: [
-         :header,
-         :left_sidebar,
-         :main_content,
-         :bottom_screen
-       ],
-       full_takeover: [:full_screen]
+       screen_takeover: [:full_screen]
      }}
+    |> Builder.build_template()
   end
 
   @impl CandidateGenerator
@@ -48,7 +59,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         now \\ DateTime.utc_now(),
         fetch_destination_fn \\ &fetch_destination/2,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/3,
-        _alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
+        alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
@@ -60,11 +71,11 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
           &departures_post_processing/2
         )
       end,
-      # Temporarily don't show alerts (until they're working)
-      # fn -> alert_instances_fn.(config) end,
+      fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
       fn -> line_map_instances(config) end,
-      fn -> evergreen_content_instances_fn.(config) end
+      fn -> evergreen_content_instances_fn.(config) end,
+      fn -> bottom_screen_filler_instances(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
@@ -138,6 +149,10 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         url: "mbta.com/stops/#{stop_id}"
       }
     ]
+  end
+
+  defp bottom_screen_filler_instances(config) do
+    [%BottomScreenFiller{screen: config}]
   end
 
   defp departures_post_processing(sections, config) do

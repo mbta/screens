@@ -17,7 +17,7 @@ import useSentry from "Hooks/use_sentry";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
-  full_takeover: TakeoverScreen,
+  screen_takeover: TakeoverScreen,
   placeholder: Placeholder,
   link_footer: LinkFooter,
   normal_header: NormalHeader,

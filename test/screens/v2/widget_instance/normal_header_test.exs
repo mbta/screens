@@ -24,7 +24,8 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
       assert %{
                icon: :logo,
                text: "Ruggles",
-               time: "2021-03-04T11:00:00Z"
+               time: "2021-03-04T11:00:00Z",
+               show_to: false
              } == WidgetInstance.serialize(instance)
     end
   end
