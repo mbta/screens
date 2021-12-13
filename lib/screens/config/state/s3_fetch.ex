@@ -12,7 +12,7 @@ defmodule Screens.Config.State.S3Fetch do
     # Temp fix: "bring into existence" a slot ID that has been renamed,
     # so that the app doesn't crash when using `String.to_existing_atom/1`
     # during parsing of old config.
-    _ = :medium_flex
+    _ = Logger.info("ignore_this_log atom=#{inspect(:medium_flex)}")
 
     with {:ok, body, new_version} <- get_config(current_version),
          {:ok, parsed} <- Jason.decode(body) do
