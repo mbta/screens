@@ -21,11 +21,16 @@ import NormalDepartures from "Components/v2/departures/normal_departures";
 import LineMap from "Components/v2/gl_eink_double/line_map";
 import EvergreenContent from "Components/v2/evergreen_content";
 import NoData from "Components/v2/eink/no_data";
-import { ResponseMapper, ResponseMapperContext } from "Components/v2/screen_container";
-import { MediumFlexAlert, FullBodyTopScreenAlert } from "Components/v2/eink/alert";
+import {
+  ResponseMapper,
+  ResponseMapperContext,
+} from "Components/v2/screen_container";
+import {
+  MediumFlexAlert,
+  FullBodyTopScreenAlert,
+} from "Components/v2/eink/alert";
 import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 import OvernightDepartures from "Components/v2/eink/overnight_departures";
-import useSentry from "Hooks/use_sentry";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -68,7 +73,6 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
-  useSentry();
   return (
     <Router>
       <Switch>
