@@ -2,6 +2,8 @@ import React from "react";
 
 import Widget, { WidgetData } from "Components/v2/widget";
 
+import Sticky from './sticky'
+
 interface Props {
   main_content: WidgetData;
   flex_zone: WidgetData;
@@ -16,10 +18,11 @@ const NormalBody: React.ComponentType<Props> = ({
   return (
     <div className="body-normal">
       <div className="body-normal__main-content">
-        <Widget data={mainContent} />
+        <Sticky />
+        {/* <Widget data={mainContent} /> */}
       </div>
       <div className="body-normal__flex-zone">
-        <Widget data={flexZone} />
+        {/* <Widget data={flexZone} /> */}
       </div>
       <div className="body-normal__footer">
         <Widget data={footer} />
