@@ -196,7 +196,7 @@ defmodule Screens.V2.DepartureTest do
 
   describe "route_name/1" do
     test "returns prediction route short_name when present" do
-      prediction = %Prediction{route: %Route{type: :bus, short_name: "214/216"}}
+      prediction = %Prediction{route: %Route{id: "34E", type: :bus, short_name: "214/216"}}
       schedule = %Schedule{route: %Route{id: "1", short_name: "1"}}
       departure = %Departure{prediction: prediction, schedule: schedule}
 
@@ -204,7 +204,7 @@ defmodule Screens.V2.DepartureTest do
     end
 
     test "returns schedule route short_name when no prediction is present" do
-      schedule = %Schedule{route: %Route{type: :bus, short_name: "214/216"}}
+      schedule = %Schedule{route: %Route{id: "34E", type: :bus, short_name: "214/216"}}
       departure = %Departure{prediction: nil, schedule: schedule}
 
       assert "214/216" == Departure.route_name(departure)
