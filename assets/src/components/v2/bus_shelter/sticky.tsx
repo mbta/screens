@@ -1,5 +1,6 @@
 import useInterval from "Hooks/use_interval";
 import React, { useEffect, useState } from "react";
+import FlexZonePageIndicator from "../flex/page_indicator";
 
 const dummyData = [
   { id: 1, data: [1, 2, 3] },
@@ -59,5 +60,10 @@ const VisibleData = ({ data, onFinish }) => {
     }
   }, 2000)
 
-  return (<div>Visible Data: {data.id} currentPage: {currentPage} maxPages: {maxPages} data: {data.data[currentPage]}</div>)
+  return (
+    <div>
+      <div>Visible Data: {data.id} currentPage: {currentPage} maxPages: {maxPages} data: {data.data[currentPage]}</div>
+      <FlexZonePageIndicator pageIndex={currentPage} numPages={maxPages} />
+    </div>
+  )
 }
