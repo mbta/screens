@@ -1,7 +1,22 @@
 defmodule Screens.V2.CandidateGenerator.PreFareTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Config.{Screen, V2}
   alias Screens.V2.CandidateGenerator.PreFare
+
+  setup do
+    config = %Screen{
+      app_params: %V2.PreFare{
+        header: %V2.Header.CurrentStopName{stop_name: "test"}
+      },
+      vendor: :gds,
+      device_id: "TEST",
+      name: "TEST",
+      app_id: :pre_fare_v2
+    }
+
+    %{config: config}
+  end
 
   describe "screen_template/0" do
     test "returns template" do
