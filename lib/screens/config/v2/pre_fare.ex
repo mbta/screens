@@ -7,5 +7,11 @@ defmodule Screens.Config.V2.PreFare do
           header: CurrentStopName.t()
         }
 
-  use Screens.Config.Struct
+  @enforce_keys [:header]
+  defstruct header: nil
+
+  use Screens.Config.Struct,
+    children: [
+      header: CurrentStopName
+    ]
 end
