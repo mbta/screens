@@ -20,6 +20,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
               :main_content
             ],
             right_body_normal: [
+              # This will work for now, but will need to create a Stick builder for variable page counts
               Builder.with_paging(
                 {:flex_zone,
                  %{
