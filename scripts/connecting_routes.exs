@@ -106,4 +106,4 @@ routes_by_station =
     {String.to_atom(station_id), connecting_routes}
   end)
 
-_ = IO.inspect(routes_by_station)
+_ = IO.inspect(routes_by_station, width: 240)
