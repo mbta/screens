@@ -25,18 +25,18 @@
       ```
       you can try modifying the OTP source downloaded by `asdf` to get around it (More context can be found on [this Github issue](https://github.com/asdf-vm/asdf-erlang/issues/161#issuecomment-731477842)):
 
-      ```
+      ```sh
       cd ~/.asdf/plugins/erlang/kerl-home/archives
       tar zxvf OTP-<version>.tar.gz
       ```
 
       Next, modify **~/.asdf/plugins/erlang/kerl-home/archives/otp-OTP-{version}/make/configure.in** near line 415 by adding `&& false` (exact line # may vary based on OTP version):
-      ```
+      ```sh
       #if __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > $int_macosx_version && false
       ```
 
       Re-tar the directory:
-      ```
+      ```sh
       tar cfz OTP-<version>.tar otp-OTP-<version>
       rm -rf otp-OTP-<version>
       ```
