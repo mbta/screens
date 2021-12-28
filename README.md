@@ -15,7 +15,7 @@
 1. Install versions specified in `.tool-versions` with `asdf install`
 
    **If** you see an error along the lines of 
-      ```
+      ```sh
       configure: error: 
 
          You are natively building Erlang/OTP for a later version of MacOSX
@@ -30,7 +30,7 @@
       tar zxvf OTP-<version>.tar.gz
       ```
 
-      Next, modify **~/.asdf/plugins/erlang/kerl-home/archives/otp-OTP-{version}/make/configure.in** near line 415 by adding `&& false` (exact line # may vary based on OTP version)
+      Next, modify **~/.asdf/plugins/erlang/kerl-home/archives/otp-OTP-{version}/make/configure.in** near line 415 by adding `&& false` (exact line # may vary based on OTP version):
       ```
       #if __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > $int_macosx_version && false
       ```
@@ -44,7 +44,7 @@
 
 1. Install Elixir dependencies with `mix deps.get`
 1. Install Node.js dependencies with `npm install --prefix assets`
-1. Get access to our S3 bucket from DevOps and/or a teammate and save the JSON found at mbta-ctd-config/screens/screens-prod.json as `priv/local.json` to supply your local server with config values.
+1. Get access to our S3 bucket from DevOps and/or a teammate and save the JSON found at mbta-ctd-config/screens/screens-prod.json as `priv/local.json` to supply your local server with config values. You will also need to grab the signs_ui_config JSON and save it at `priv/signs_ui_config.json`.
 1. Visit [AWS security credentials](https://console.aws.amazon.com/iam/home#/security_credentials) and create an access key if you don't already have it. Save the access key ID and secret access key as environment variables:
 
    ```sh
