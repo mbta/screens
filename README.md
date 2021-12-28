@@ -13,7 +13,7 @@
 1. Import the Node.js release team's OpenPGP keys to main keyring (this is required by asdf-nodejs):
    `bash ~/.asdf/plugins/nodejs/bin/import-release-team-keyring`
 1. Install versions specified in `.tool-versions` with `asdf install`
-   - If you see an error along the lines of 
+   If you see an error along the lines of 
       ```
       configure: error: 
 
@@ -29,7 +29,7 @@
       tar zxvf OTP-<version>.tar.gz
       ```
 
-      Next, modify **~/.asdf/plugins/erlang/kerl-home/archives/otp-OTP-<version>/make/configure.in** near line 415 by adding `&& false` (exact line # may vary based on OTP version)
+      Next, modify **~/.asdf/plugins/erlang/kerl-home/archives/otp-OTP-{version}/make/configure.in** near line 415 by adding `&& false` (exact line # may vary based on OTP version)
       ```
       #if __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > $int_macosx_version && false
       ```
