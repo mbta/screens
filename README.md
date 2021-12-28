@@ -13,7 +13,8 @@
 1. Import the Node.js release team's OpenPGP keys to main keyring (this is required by asdf-nodejs):
    `bash ~/.asdf/plugins/nodejs/bin/import-release-team-keyring`
 1. Install versions specified in `.tool-versions` with `asdf install`
-   If you see an error along the lines of 
+
+   **If** you see an error along the lines of 
       ```
       configure: error: 
 
@@ -22,7 +23,7 @@
          cross-build Erlang/OTP, or set the environment variable
          MACOSX_DEPLOYMENT_TARGET to 11.0 (or a lower version).
       ```
-      you can try modifying the source downloaded by `asdf` to get around it.
+      you can try modifying the OTP source downloaded by `asdf` to get around it (More context can be found on [this Github issue](https://github.com/asdf-vm/asdf-erlang/issues/161#issuecomment-731477842)):
 
       ```
       cd ~/.asdf/plugins/erlang/kerl-home/archives
@@ -39,8 +40,6 @@
       tar cfz OTP-<version>.tar otp-OTP-<version>
       rm -rf otp-OTP-<version>
       ```
-      More context can be found on [this Github issue](https://github.com/asdf-vm/asdf-erlang/issues/161#issuecomment-731477842)
-
       Return to your screens repo and try running `asdf install` again.
 
 1. Install Elixir dependencies with `mix deps.get`
