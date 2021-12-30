@@ -47,3 +47,6 @@ npm-debug.log
 
 # Detritus left behind by macOS Finder
 .DS_Store
+
+# Ignore .env file used for Devcontainer local development
+/.devcontainer/devcontainer.env
