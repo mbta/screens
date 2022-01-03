@@ -1,0 +1,19 @@
+@import url("https://rsms.me/inter/inter.css");
+
+@import "colors";
+
+@import "v2/pre_fare/screen_container";
+
+@import "v2/pre_fare/screen/normal";
+
+@import "v2/pre_fare/body/normal_left";
+@import "v2/pre_fare/body/normal_right";
+
+@import "v2/pre_fare/header/normal_left";
+@import "v2/pre_fare/header/normal_right";
+
+@import "v2/placeholder.scss";
+
+body {
+  margin: 0px;
+}
