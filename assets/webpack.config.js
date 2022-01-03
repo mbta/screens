@@ -29,7 +29,8 @@ module.exports = (env, options) => ({
     solari_v2: "./src/apps/v2/solari.tsx",
     solari_large_v2: "./src/apps/v2/solari_large.tsx",
     dup_v2: "./src/apps/v2/dup.tsx",
-    bus_shelter_v2: "./src/apps/v2/bus_shelter.tsx"
+    bus_shelter_v2: "./src/apps/v2/bus_shelter.tsx",
+    pre_fare_v2: "./src/apps/v2/pre_fare.tsx"
   },
   output: {
     filename: "[name].js",
