@@ -25,9 +25,11 @@ import {
   ResponseMapperContext,
 } from "Components/v2/screen_container";
 import NoData from "Components/v2/eink/no_data";
-import { MediumFlexAlert, FullBodyTopScreenAlert } from "Components/v2/eink/alert";
+import {
+  MediumFlexAlert,
+  FullBodyTopScreenAlert,
+} from "Components/v2/eink/alert";
 import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
-import useSentry from "Hooks/use_sentry";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -44,7 +46,7 @@ const TYPE_TO_COMPONENT = {
   full_body_alert: FullBodyTopScreenAlert,
   evergreen_content: EvergreenContent,
   no_data: NoData,
-  bottom_screen_filler: BottomScreenFiller
+  bottom_screen_filler: BottomScreenFiller,
 };
 
 const DISABLED_LAYOUT = {
@@ -68,7 +70,6 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
-  useSentry();
   return (
     <Router>
       <Switch>

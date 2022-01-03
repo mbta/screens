@@ -13,7 +13,6 @@ import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/dup/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
-import useSentry from "Hooks/use_sentry";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -24,7 +23,6 @@ const TYPE_TO_COMPONENT = {
 };
 
 const App = (): JSX.Element => {
-  useSentry();
   return (
     <Router>
       <Switch>

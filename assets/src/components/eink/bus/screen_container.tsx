@@ -14,6 +14,7 @@ import useApiResponse from "Hooks/use_api_response";
 import useFitDepartures from "Hooks/use_fit_departures";
 
 import { EINK_REFRESH_MS } from "Constants";
+import useSentry from "Hooks/use_sentry";
 
 const TopScreenLayout = forwardRef(
   ({ currentTimeString, stopName, departures }, ref): JSX.Element => {
@@ -124,6 +125,7 @@ const NoConnectionScreenLayout = (): JSX.Element => {
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
   const noDepartures = (apiResponse?.departures?.length ?? 0) === 0;
+  useSentry();
 
   switch (true) {
     case !apiResponse || apiResponse.success === false:

@@ -13,7 +13,6 @@ import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
 import LinkFooter from "Components/v2/eink/link_footer";
 import NormalHeader from "Components/v2/eink/normal_header";
-import useSentry from "Hooks/use_sentry";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -24,7 +23,6 @@ const TYPE_TO_COMPONENT = {
 };
 
 const App = (): JSX.Element => {
-  useSentry();
   return (
     <Router>
       <Switch>
