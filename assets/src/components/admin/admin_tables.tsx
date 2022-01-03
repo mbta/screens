@@ -566,6 +566,14 @@ const BusShelterV2ScreensTable = (): JSX.Element => {
   );
 };
 
+const PreFareV2ScreensTable = (): JSX.Element => {
+  const dataFilter = ({ app_id }) => {
+    return app_id === "pre_fare_v2";
+  };
+
+  return <AdminTable columns={[...v2Columns]} dataFilter={dataFilter} />;
+};
+
 const v2SolariColumns = [
   {
     Header: "Screen ID",
@@ -627,4 +635,5 @@ export {
   SolariV2ScreensTable,
   SolariLargeV2ScreensTable,
   BusShelterV2ScreensTable,
+  PreFareV2ScreensTable,
 };
