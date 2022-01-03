@@ -1,6 +1,6 @@
 # Adapted from https://github.com/microsoft/vscode-dev-containers/tree/main/containers/elixir-phoenix-postgres
 
-# Update the VARIANT arg in docker-compose.yml to pick an Elixir version: 1.9, 1.10, 1.10.4
+# Update the VARIANT arg in devcontainer.json to pick an Elixir version: 1.9, 1.10, 1.10.4
 ARG VARIANT="1.9.4"
 FROM elixir:${VARIANT}
 
