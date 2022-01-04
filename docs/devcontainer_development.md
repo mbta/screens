@@ -19,9 +19,12 @@ Some steps call for opening VS Code's "command palette"—you can do that with t
 1. From the project root, create the file `.devcontainer/devcontainer.env` to store environment variables needed by the app. At minimum, you will need these three lines:
    ```sh
    # Do not enclose the values in quotes!
-   API_V3_KEY=abc123            # your MBTA V3 API key
-   AWS_ACCESS_KEY_ID=qrs456     # your AWS access key
-   AWS_SECRET_ACCESS_KEY=xyz789 # your AWS secret access key
+   # your MBTA V3 API key
+   API_V3_KEY=abc123
+   # your AWS access key
+   AWS_ACCESS_KEY_ID=qrs456
+   # your AWS secret access key
+   AWS_SECRET_ACCESS_KEY=xyz789
    ```
 1. Open the project directory in VS Code.
 1. Install the [Remote-Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension: open the command palette, type "Install Extensions"+<kbd>return</kbd>, enter "Remote - Containers" in the search box of the pane that appears, and click "Install" on the first extension listed.
