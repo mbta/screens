@@ -15,6 +15,7 @@ const TEXT_LEFT_MARGIN = 18;
 const TEXT_TOP_MARGIN = 10;
 const VEHICLE_ICON_SIZE = 44;
 const SCHEDULED_DEPARTURE_SIZE = 192;
+const MAXIMUM_STOP_LABEL_LENGTH = 15;
 
 const abbreviateStop = (stop) => {
   if (stop === "Heath Street") {
@@ -22,6 +23,22 @@ const abbreviateStop = (stop) => {
   }
 
   return stop;
+};
+
+// This function splits the label into two parts as close to the middle as possible.
+// Will only split on a space.
+const splitLabel = (labelText: string) => {
+  let middle = Math.floor(labelText.length / 2);
+  let before = labelText.lastIndexOf(" ", middle);
+  let after = labelText.indexOf(" ", middle + 1);
+
+  if (middle - before < after - middle) {
+    middle = before;
+  } else {
+    middle = after;
+  }
+
+  return [labelText.substring(0, middle), labelText.substring(middle + 1)];
 };
 
 const BaseMapFutureTerminal = () => {
@@ -151,15 +168,39 @@ const BaseMapStops = ({ stops }) => {
             modifier = "past";
           }
 
-          stopLabel = (
-            <text
-              x={LEFT_MARGIN + LINE_WIDTH + TEXT_LEFT_MARGIN}
-              y={TEXT_TOP_MARGIN + TOP_MARGIN + STOP_SPACING * i}
-              className={classWithModifier("line-map__stop-label", modifier)}
-            >
-              {labelText}
-            </text>
-          );
+          if (labelText.length > MAXIMUM_STOP_LABEL_LENGTH) {
+            let labelParts = splitLabel(labelText);
+            stopLabel = (
+              <text
+                x={LEFT_MARGIN + LINE_WIDTH + TEXT_LEFT_MARGIN}
+                y={TEXT_TOP_MARGIN + TOP_MARGIN + STOP_SPACING * i}
+                className={classWithModifier("line-map__stop-label", modifier)}
+              >
+                <tspan
+                  x={LEFT_MARGIN + LINE_WIDTH + TEXT_LEFT_MARGIN}
+                  dy="-1.2em"
+                >
+                  {labelParts[0]}
+                </tspan>
+                <tspan
+                  x={LEFT_MARGIN + LINE_WIDTH + TEXT_LEFT_MARGIN}
+                  y={TEXT_TOP_MARGIN + TOP_MARGIN + STOP_SPACING * i}
+                >
+                  {labelParts[1]}
+                </tspan>
+              </text>
+            );
+          } else {
+            stopLabel = (
+              <text
+                x={LEFT_MARGIN + LINE_WIDTH + TEXT_LEFT_MARGIN}
+                y={TEXT_TOP_MARGIN + TOP_MARGIN + STOP_SPACING * i}
+                className={classWithModifier("line-map__stop-label", modifier)}
+              >
+                {labelText}
+              </text>
+            );
+          }
         }
 
         return (
