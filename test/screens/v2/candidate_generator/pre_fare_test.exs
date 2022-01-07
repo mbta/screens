@@ -6,9 +6,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
 
   setup do
     config = %Screen{
-      app_params: %V2.PreFare{
-        station_id: %Screens.Stops.Stop{id: "111"}
-      },
+      app_params: %V2.PreFare{},
       vendor: :gds,
       device_id: "TEST",
       name: "TEST",

@@ -1,12 +1,9 @@
 defmodule Screens.Config.V2.PreFare do
   @moduledoc false
 
-  @type t :: %__MODULE__{
-          station_id: Screens.Stops.Stop.id()
-        }
+  @type t :: %__MODULE__{}
 
-  @enforce_keys [:station_id]
-  defstruct station_id: nil
+  defstruct _: nil
 
   use Screens.Config.Struct
 
