@@ -1,13 +1,17 @@
 defmodule Screens.Config.V2.PreFare do
   @moduledoc false
 
-  @type t :: %__MODULE__{}
+  alias Screens.Config.V2.ElevatorStatus
 
-  defstruct _: nil
+  @type t :: %__MODULE__{
+          elevator_status: ElevatorStatus.t()
+        }
 
-  use Screens.Config.Struct
+  @enforce_keys [:elevator_status]
+  defstruct elevator_status: nil
 
-  defp value_from_json(_, value), do: value
-
-  defp value_to_json(_, value), do: value
+  use Screens.Config.Struct,
+    children: [
+      elevator_status: ElevatorStatus
+    ]
 end
