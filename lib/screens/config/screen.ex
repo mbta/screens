@@ -6,24 +6,26 @@ defmodule Screens.Config.Screen do
   alias Screens.Config.{Bus, Dup, Gl, Solari, V2}
   alias Screens.Util
 
+  @type app_id ::
+          :bus_eink
+          | :bus_eink_v2
+          | :bus_shelter_v2
+          | :dup
+          | :dup_v2
+          | :gl_eink_single
+          | :gl_eink_double
+          | :gl_eink_v2
+          | :solari
+          | :solari_v2
+          | :solari_large
+          | :solari_large_v2
+          | :pre_fare_v2
+
   @type t :: %__MODULE__{
           vendor: :gds | :mercury | :solari | :c3ms | :outfront | :lg_mri,
           device_id: String.t(),
           name: String.t(),
-          app_id:
-            :bus_eink
-            | :bus_eink_v2
-            | :bus_shelter_v2
-            | :dup
-            | :dup_v2
-            | :gl_eink_single
-            | :gl_eink_double
-            | :gl_eink_v2
-            | :solari
-            | :solari_v2
-            | :solari_large
-            | :solari_large_v2
-            | :pre_fare_v2,
+          app_id: app_id(),
           refresh_if_loaded_before: DateTime.t() | nil,
           disabled: boolean(),
           app_params:
