@@ -23,6 +23,7 @@ const fields = [
       "solari_v2",
       "solari_large",
       "solari_large_v2",
+      "pre_fare_v2",
     ]),
   },
   {
@@ -81,6 +82,11 @@ const defaultAppParamsByAppId = {
   solari_large_v2: {
     departures: {},
     header: {},
+  },
+  pre_fare_v2: {
+    header: {
+      stop_name: "",
+    },
   },
 };
 
