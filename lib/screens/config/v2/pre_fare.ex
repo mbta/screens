@@ -1,17 +1,16 @@
 defmodule Screens.Config.V2.PreFare do
   @moduledoc false
 
-  alias Screens.Config.V2.Header.CurrentStopName
-
   @type t :: %__MODULE__{
-          header: CurrentStopName.t()
+          station_id: Screens.Stops.Stop.id()
         }
 
-  @enforce_keys [:header]
-  defstruct header: nil
+  @enforce_keys [:station_id]
+  defstruct station_id: nil
 
-  use Screens.Config.Struct,
-    children: [
-      header: CurrentStopName
-    ]
+  use Screens.Config.Struct
+
+  defp value_from_json(_, value), do: value
+
+  defp value_to_json(_, value), do: value
 end
