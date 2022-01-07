@@ -15,8 +15,17 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   @max_height_list_container 0
   @max_height_station_heading 0
-  @max_height_elevator_description
-  @max_height_row_separator
+  @max_height_elevator_description 0
+  @max_height_row_separator 0
+
+  defp sort_at_home(_a, _b) do
+  end
+
+  defp sort_connecting_routes(_a, _b) do
+  end
+
+  defp sort_elsewhere(_a, _b) do
+  end
 
   defimpl Screens.V2.WidgetInstance do
     def priority(_instance), do: [2]
