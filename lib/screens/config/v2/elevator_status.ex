@@ -5,6 +5,7 @@ defmodule Screens.Config.V2.ElevatorStatus do
           parent_station_id: String.t()
         }
 
+  @enforce_keys [:parent_station_id]
   defstruct parent_station_id: nil
 
   use Screens.Config.Struct
