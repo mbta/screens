@@ -18,14 +18,17 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   # @max_height_elevator_description 0
   # @max_height_row_separator 0
 
-  defp sort_at_home(_a, _b) do
-  end
+  # defp get_active_at_home_station(_alerts) do
+  # end
 
-  defp sort_connecting_routes(_a, _b) do
-  end
+  # defp get_active_elsewhere(_alerts) do
+  # end
 
-  defp sort_elsewhere(_a, _b) do
-  end
+  # defp get_upcoming_at_home_station(_alerts) do
+  # end
+
+  # defp get_upcoming_on_connecting_lines(_alerts) do
+  # end
 
   defimpl Screens.V2.WidgetInstance do
     def priority(_instance), do: [2]
