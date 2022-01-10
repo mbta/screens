@@ -13,10 +13,10 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           alerts: list(Alert.t())
         }
 
-  @max_height_list_container 0
-  @max_height_station_heading 0
-  @max_height_elevator_description 0
-  @max_height_row_separator 0
+  # @max_height_list_container 0
+  # @max_height_station_heading 0
+  # @max_height_elevator_description 0
+  # @max_height_row_separator 0
 
   defp sort_at_home(_a, _b) do
   end
