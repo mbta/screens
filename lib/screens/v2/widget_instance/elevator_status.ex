@@ -3,11 +3,52 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
+  alias Screens.RoutePatterns.RoutePattern
 
   defstruct screen: nil,
             now: nil,
             alerts: nil,
             stop_sequences: nil
+
+  @type icon ::
+          :red
+          | :blue
+          | :orange
+          | :green
+          | :silver
+          | :green_b
+          | :green_c
+          | :green_d
+          | :green_e
+
+  @type timeframe :: %{
+          happening: :now | :upcoming,
+          detail: String.t()
+        }
+
+  @type closure :: %{
+          elevator_name: String.t(),
+          elevator_id: String.t(),
+          timeframe: timeframe(),
+          description: String.t()
+        }
+
+  @type station :: %{
+          name: String.t(),
+          icons: list(icon()),
+          elevator_closures: list(closure()),
+          is_at_home_stop: boolean()
+        }
+
+  @type detail_page :: %{
+          header_text: String.t(),
+          icons: list(icon()),
+          elevator_closure: closure()
+        }
+
+  @type list_page :: %{
+          stations: list(station())
+        }
 
   @type stop_id :: String.t()
 
