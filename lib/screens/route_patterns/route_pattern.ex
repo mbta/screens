@@ -59,4 +59,29 @@ defmodule Screens.RoutePatterns.RoutePattern do
         :error
     end
   end
+
+  @spec fetch_stop_sequences_with_parent_stations(Stop.id()) ::
+          {:ok, list(list(Stop.id()))} | :error
+  def fetch_stop_sequences_with_parent_stations(stop_id, get_json_fn \\ &V3Api.get_json/2) do
+    case get_json_fn.("route_patterns", %{
+           "include" => "representative_trip.stops",
+           "filter[stop]" => stop_id
+         }) do
+      {:ok, result} ->
+        stop_sequences =
+          get_in(result, [
+            "included",
+            Access.filter(&(&1["type"] == "stop")),
+            "relationships",
+            "parent_station",
+            "data",
+            "id"
+          ])
+
+        {:ok, stop_sequences}
+
+      _ ->
+        :error
+    end
+  end
 end
