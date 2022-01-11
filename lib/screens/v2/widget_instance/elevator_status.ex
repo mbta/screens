@@ -23,6 +23,114 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   # @max_height_elevator_description 0
   # @max_height_row_separator 0
 
+  defp get_active_at_home_station(
+         alerts,
+         now,
+         parent_station_id
+       ) do
+    alerts
+    |> Enum.filter(&active_at_home_station?(&1, now, parent_station_id))
+  end
+
+  defp get_active_elsewhere(
+         alerts,
+         now,
+         parent_station_id,
+         stop_sequences
+       ) do
+    alerts
+    |> Enum.filter(&active_elsewhere?(&1, now, parent_station_id))
+    |> Enum.sort_by(
+      fn %Alert{informed_entities: entities} -> entities end,
+      &sort_elsewhere(&1, &2, stop_sequences)
+    )
+  end
+
+  defp get_upcoming_at_home_station(
+         alerts,
+         now,
+         parent_station_id
+       ) do
+    alerts
+    |> Enum.filter(&upcoming_at_home_station?(&1, now, parent_station_id))
+  end
+
+  defp get_upcoming_elsewhere(
+         alerts,
+         now,
+         parent_station_id,
+         stop_sequences
+       ) do
+    alerts
+    |> Enum.filter(&upcoming_elsewhere?(&1, now, parent_station_id))
+    |> Enum.sort_by(
+      fn %Alert{informed_entities: entities} -> entities end,
+      &sort_elsewhere(&1, &2, stop_sequences)
+    )
+  end
+
+  defp active_at_home_station?(
+         %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
+         now,
+         station_id
+       ) do
+    Alert.happening_now?(alert, now) &&
+      Enum.any?(entities, fn entity ->
+        entity.stop == station_id
+      end)
+  end
+
+  defp active_elsewhere?(
+         %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
+         now,
+         parent_station_id
+       ) do
+    stations = get_stations_from_entities(entities)
+
+    Alert.happening_now?(alert, now) &&
+      Enum.any?(stations, fn station ->
+        station != parent_station_id
+      end)
+  end
+
+  defp upcoming_at_home_station?(
+         %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
+         now,
+         station_id
+       ) do
+    not Alert.happening_now?(alert, now) &&
+      Enum.any?(entities, fn entity ->
+        entity.stop == station_id
+      end)
+  end
+
+  defp upcoming_elsewhere?(
+         %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
+         now,
+         parent_station_id
+       ) do
+    stations = get_stations_from_entities(entities)
+
+    not Alert.happening_now?(alert, now) &&
+      Enum.any?(stations, fn station ->
+        station != parent_station_id
+      end)
+  end
+
+  defp sort_elsewhere(e1, _e2, stop_sequences) do
+    stations = get_stations_from_entities(e1)
+
+    Enum.any?(stations, fn station ->
+      station in stop_sequences
+    end)
+  end
+
+  defp get_stations_from_entities(entities) do
+    entities
+    |> Enum.map(fn %{stop: stop_id} -> stop_id end)
+    |> Enum.filter(&String.starts_with?(&1, "place-"))
+  end
+
   def priority(_instance), do: [2]
 
   def serialize(_instance) do
