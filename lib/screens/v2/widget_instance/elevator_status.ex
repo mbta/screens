@@ -1,6 +1,37 @@
 defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   @moduledoc false
 
+  defmodule DetailPage do
+    alias Screens.V2.WidgetInstance.ElevatorStatus
+
+    @type t :: %__MODULE__{
+            header_text: String.t(),
+            icons: list(ElevatorStatus.icon()),
+            elevator_closure: ElevatorStatus.closure()
+          }
+
+    @derive Jason.Encoder
+
+    defstruct header_text: nil,
+              icons: nil,
+              elevator_closure: nil
+  end
+
+  defmodule ListPage do
+    alias Screens.V2.WidgetInstance.ElevatorStatus
+
+    @type t :: %__MODULE__{
+            stations: list(ElevatorStatus.station())
+          }
+
+    @derive Jason.Encoder
+
+    defstruct stations: nil
+  end
+
+  # To be replaced by more detailed values for fitting rows in the list view
+  @max_rows_per_page 4
+
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{ElevatorStatus, PreFare}
@@ -41,16 +72,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           icons: list(icon()),
           elevator_closures: list(closure()),
           is_at_home_stop: boolean()
-        }
-
-  @type detail_page :: %{
-          header_text: String.t(),
-          icons: list(icon()),
-          elevator_closure: closure()
-        }
-
-  @type list_page :: %{
-          stations: list(station())
         }
 
   @type stop_id :: String.t()
@@ -180,19 +201,22 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     |> Enum.filter(&String.starts_with?(&1, "place-"))
   end
 
-  defp trim_and_page_alerts(
-         pages,
-         %__MODULE__{} = t
-       ) do
-    IO.inspect(
-      pages
-      # serializing list view
-      # alerts
-      # |> get_active_elsewhere(t)
-      # |> alerts_by_station()
-      # |> Enum.map(&serialize_station(&1, t))
-      # |> Enum.sort(&sort_elsewhere(&1, &2, t))
-    )
+  defp trim_and_page_alerts(pages) do
+    pages
+    |> Enum.flat_map(fn
+      %ListPage{} = page ->
+        split_list_page(page)
+
+      %DetailPage{} = page ->
+        [page]
+    end)
+    |> Enum.take(4)
+  end
+
+  defp split_list_page(%ListPage{stations: stations}) do
+    stations
+    |> Enum.chunk_every(@max_rows_per_page)
+    |> Enum.map(&%ListPage{stations: &1})
   end
 
   defp get_facility_by_id(entities, facilities) do
@@ -282,7 +306,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
            station_id_to_icons: station_id_to_icons
          } = t
        ) do
-    %{
+    %DetailPage{
       header_text: header,
       icons: Map.fetch!(station_id_to_icons, parent_station_id(t)),
       elevator_closure: serialize_closure(alert, t)
@@ -298,14 +322,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       |> alerts_by_station()
       |> Enum.map(&serialize_station(&1, t))
 
-    %{
+    %ListPage{
       stations: stations
     }
   end
 
   def priority(_instance), do: [2]
 
-  @spec serialize(t()) :: %{pages: list(detail_page() | list_page())}
+  @spec serialize(t()) :: %{pages: list(DetailPage.t() | ListPage.t())}
   def serialize(%__MODULE__{} = t) do
     # case Screens.V3Api.get_json("alerts", %{
     #        "filter[activity]" => "USING_WHEELCHAIR",
@@ -354,14 +378,17 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     # then if there is still space, show detail pages for upcoming closures at this station
     # then if there is still space, show detail pages for active closures along lines serving this station
 
-    (active_at_home ++
-       active_elsewhere ++
-       upcoming_at_home ++
-       upcoming_on_connecting_lines)
-    |> trim_and_page_alerts(t)
+    pages =
+      Enum.concat([
+        active_at_home,
+        active_elsewhere,
+        upcoming_at_home,
+        upcoming_on_connecting_lines
+      ])
+      |> trim_and_page_alerts()
 
     %{
-      pages: []
+      pages: pages
     }
   end
 
