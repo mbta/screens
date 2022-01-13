@@ -1,0 +1,15 @@
+on: 
+  push:
+    branches: [master]
+
+jobs:
+  move-asana-ticket-job:
+  name: 
+  steps:
+    - name: 
+      uses: insurify/github-asana-action@v1.0.3
+      with:
+        asana-pat: ${{ secrets.ASANA_SECRET }}
+        trigger-phrase: "\\*\\*Asana Task\\*\\*:"
+        targets: '[{"project": "Screens Dev - Sprint", "section": "In Review"}]'
+
