@@ -5,10 +5,10 @@ on:
 
 jobs:
   move-asana-ticket-job:
-  steps:
-    - name: Github-Asana action from Insurify
-      uses: insurify/github-asana-action@v1.0.3
-      with:
-        asana-pat: ${{ secrets.ASANA_SECRET }}
-        trigger-phrase: "\\*\\*Asana Task\\*\\*:"
-        targets: '[{"project": "Screens Dev - Sprint", "section": "In Review"}]'
+    steps:
+      - name: Github-Asana action from Insurify
+        uses: insurify/github-asana-action@v1.0.3
+        with:
+          asana-pat: ${{ secrets.ASANA_SECRET }}
+          trigger-phrase: "\\*\\*Asana Task\\*\\*:"
+          targets: '[{"project": "Screens Dev - Sprint", "section": "In Review"}]'
