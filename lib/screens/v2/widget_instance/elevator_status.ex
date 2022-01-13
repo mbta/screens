@@ -177,14 +177,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   defp upcoming_on_connecting_lines?(
          %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
-         %__MODULE__{now: now, stop_sequences: stop_sequences}
+         %__MODULE__{now: now, stop_sequences: stop_sequences} = t
        ) do
     stations = get_stations_from_entities(entities)
 
     not Alert.happening_now?(alert, now) &&
       Enum.any?(stations, fn station ->
         Enum.any?(stop_sequences, fn stop_sequence ->
-          station in stop_sequence
+          station in stop_sequence and station != parent_station_id(t)
         end)
       end)
   end
