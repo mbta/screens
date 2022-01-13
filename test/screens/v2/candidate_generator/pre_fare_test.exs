@@ -6,7 +6,9 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
 
   setup do
     config = %Screen{
-      app_params: %V2.PreFare{},
+      app_params: %V2.PreFare{
+        elevator_status: %V2.ElevatorStatus{parent_station_id: "111"}
+      },
       vendor: :gds,
       device_id: "TEST",
       name: "TEST",
