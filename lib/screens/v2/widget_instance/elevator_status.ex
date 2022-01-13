@@ -183,7 +183,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     not Alert.happening_now?(alert, now) &&
       Enum.any?(stations, fn station ->
-        station in stop_sequences
+        Enum.any?(stop_sequences, fn stop_sequence ->
+          station in stop_sequence
+        end)
       end)
   end
 
