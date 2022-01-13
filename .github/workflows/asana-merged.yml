@@ -5,6 +5,7 @@ on:
 
 jobs:
   move-asana-ticket-job:
+    runs-on: ubuntu-latest
     steps:
       - name: Github-Asana action from Insurify
         uses: insurify/github-asana-action@v1.0.3
