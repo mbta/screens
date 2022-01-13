@@ -2,6 +2,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   @moduledoc false
 
   defmodule DetailPage do
+    @moduledoc false
+
     alias Screens.V2.WidgetInstance.ElevatorStatus
 
     @type t :: %__MODULE__{
@@ -18,6 +20,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   end
 
   defmodule ListPage do
+    @moduledoc false
+
     alias Screens.V2.WidgetInstance.ElevatorStatus
 
     @type t :: %__MODULE__{
@@ -386,12 +390,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     # then if there is still space, show detail pages for active closures along lines serving this station
 
     pages =
-      Enum.concat([
+      [
         active_at_home,
         [active_elsewhere],
         upcoming_at_home,
         upcoming_on_connecting_lines
-      ])
+      ]
+      |> Enum.concat()
       |> trim_and_page_alerts()
 
     %{
