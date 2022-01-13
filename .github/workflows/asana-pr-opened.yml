@@ -11,5 +11,5 @@ jobs:
         uses: insurify/github-asana-action@v1.0.3
         with:
           asana-pat: ${{ secrets.ASANA_SECRET }}
-          trigger-phrase: "\\*\\*Asana Task\\*\\*:"
+          trigger-phrase: "\\*\\*Asana task\\*\\*:"
           targets: '[{"project": "Screens Dev - Sprint", "section": "In Review"}]'
