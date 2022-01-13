@@ -231,11 +231,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     |> Enum.find(fn %{id: id} -> id == facility_in_entity end)
   end
 
-  defp serialize_closure(alert, %{name: name, id: id}) do
+  defp serialize_closure(alert, %{name: name, id: id}, now) do
     %{
       elevator_name: name,
       elevator_id: id,
-      timeframe: serialize_timeframe(alert),
+      timeframe: serialize_timeframe(alert, now),
       description: alert.description
     }
   end
@@ -245,7 +245,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          %__MODULE__{
            facilities: facilities,
            station_id_to_name: station_id_to_name,
-           station_id_to_icons: station_id_to_icons
+           station_id_to_icons: station_id_to_icons,
+           now: now
          } = t
        ) do
     station_name = Map.fetch!(station_id_to_name, parent_station_id)
@@ -257,7 +258,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
                      } = alert ->
         facility = get_facility_by_id(entities, facilities)
 
-        serialize_closure(alert, facility)
+        serialize_closure(alert, facility, now)
       end)
 
     %{
@@ -268,9 +269,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     }
   end
 
-  defp serialize_timeframe(%Alert{active_period: active_period} = alert) do
+  defp serialize_timeframe(%Alert{active_period: active_period} = alert, now) do
     %{
-      happening_now: Alert.happening_now?(alert),
+      happening_now: Alert.happening_now?(alert, now),
       active_period: active_period
     }
   end
@@ -304,7 +305,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          %Alert{header: header, informed_entities: entities} = alert,
          %__MODULE__{
            station_id_to_icons: station_id_to_icons,
-           facilities: facilities
+           facilities: facilities,
+           now: now
          } = t
        ) do
     facility = get_facility_by_id(entities, facilities)
@@ -312,7 +314,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     %DetailPage{
       header_text: header,
       icons: Map.fetch!(station_id_to_icons, parent_station_id(t)),
-      elevator_closure: serialize_closure(alert, facility)
+      elevator_closure: serialize_closure(alert, facility, now)
     }
   end
 
