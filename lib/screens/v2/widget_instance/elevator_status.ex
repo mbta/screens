@@ -301,15 +301,18 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   # end
 
   defp serialize_detail_page(
-         %Alert{header: header} = alert,
+         %Alert{header: header, informed_entities: entities} = alert,
          %__MODULE__{
-           station_id_to_icons: station_id_to_icons
+           station_id_to_icons: station_id_to_icons,
+           facilities: facilities
          } = t
        ) do
+    facility = get_facility_by_id(entities, facilities)
+
     %DetailPage{
       header_text: header,
       icons: Map.fetch!(station_id_to_icons, parent_station_id(t)),
-      elevator_closure: serialize_closure(alert, t)
+      elevator_closure: serialize_closure(alert, facility)
     }
   end
 
