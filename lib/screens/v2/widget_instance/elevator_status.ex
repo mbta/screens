@@ -366,7 +366,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     active_elsewhere =
       t
       |> get_active_elsewhere()
-      |> Enum.map(&serialize_list_page(&1, t))
+      |> serialize_list_page(t)
 
     upcoming_at_home =
       t
@@ -386,7 +386,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     pages =
       Enum.concat([
         active_at_home,
-        active_elsewhere,
+        [active_elsewhere],
         upcoming_at_home,
         upcoming_on_connecting_lines
       ])
