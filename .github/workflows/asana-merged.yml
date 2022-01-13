@@ -1,12 +1,12 @@
+name: Move Asana ticket after merge
 on: 
   push:
     branches: [master]
 
 jobs:
   move-asana-ticket-job:
-  name: 
   steps:
-    - name: 
+    - name: Github-Asana action from Insurify
       uses: insurify/github-asana-action@v1.0.3
       with:
         asana-pat: ${{ secrets.ASANA_SECRET }}
