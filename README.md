@@ -13,3 +13,5 @@ You have two options to set up the project environment for development:
 The DUP screens require the client app to be packaged into a single HTML file rather than dynamically served from our Phoenix server.
 
 You can find instructions on the packaging process [here](assets/src/components/dup/README.md).
+
+
