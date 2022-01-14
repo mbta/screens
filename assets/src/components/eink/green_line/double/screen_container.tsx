@@ -16,6 +16,7 @@ import TakeoverScreenLayout from "Components/eink/takeover_screen_layout";
 import useApiResponse from "Hooks/use_api_response";
 
 import { EINK_REFRESH_MS } from "Constants";
+import useSentry from "Hooks/use_sentry";
 
 const TopScreenLayout = ({
   currentTimeString,
@@ -138,6 +139,7 @@ const NoConnectionScreenLayout = (): JSX.Element => {
 };
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
+  useSentry();
   switch (true) {
     case !apiResponse || apiResponse.success === false:
       return <NoConnectionScreenLayout />;

@@ -10,6 +10,7 @@ import useApiResponse from "Hooks/use_api_response";
 
 import { SOLARI_REFRESH_MS } from "Constants";
 import { useLocation } from "react-router-dom";
+import useSentry from "Hooks/use_sentry";
 
 const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   const sizeModifier = apiResponse.overhead ? "size-large" : "size-normal";
@@ -56,6 +57,7 @@ const TakeoverScreenLayout = ({ apiResponse }): JSX.Element => {
 };
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
+  useSentry();
   if (!apiResponse || apiResponse.success === false) {
     return <NoConnectionScreenLayout />;
   }
