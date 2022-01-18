@@ -43,6 +43,9 @@ const AdminNavbar = (): JSX.Element => {
       <Link to="/bus-shelter-v2-screens">
         <button>Bus Shelter V2 Screens Table</button>
       </Link>
+      <Link to="/pre-fare-v2-screens">
+        <button>Pre-Fare V2 Screens Table</button>
+      </Link>
       <Link to="/json-editor">
         <button>JSON Editor</button>
       </Link>
