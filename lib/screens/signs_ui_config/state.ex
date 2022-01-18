@@ -8,7 +8,7 @@ defmodule Screens.SignsUiConfig.State do
   @typep time_range :: {non_neg_integer(), non_neg_integer()}
   @typep time_range_map :: %{peak: time_range, off_peak: time_range}
   @type config :: {signs_mode_map, time_range_map}
-  @config_fetcher Application.get_env(:screens, :signs_ui_config_fetcher)
+  @config_fetcher Application.compile_env(:screens, :signs_ui_config_fetcher)
 
   @type t ::
           %__MODULE__{
