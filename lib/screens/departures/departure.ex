@@ -405,9 +405,7 @@ defmodule Screens.Departures.Departure do
 
       if length(route_ids) > 1 and !Enum.member?(expected_route_ids, route_id) do
         Logger.warn(
-          "log_unexpected_groups found #{length(route_ids)} predictions on trip #{trip_id} for route #{
-            Enum.at(route_ids, 0)
-          }"
+          "log_unexpected_groups found #{length(route_ids)} predictions on trip #{trip_id} for route #{Enum.at(route_ids, 0)}"
         )
       end
     end)
