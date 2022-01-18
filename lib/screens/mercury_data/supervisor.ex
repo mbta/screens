@@ -9,9 +9,9 @@ defmodule Screens.MercuryData.Supervisor do
 
   def init(:ok) do
     children = [
-      worker(Screens.MercuryData.State, [[name: Screens.MercuryData.State]])
+      {Screens.MercuryData.State, name: Screens.MercuryData.State}
     ]
 
-    supervise(children, strategy: :one_for_one)
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end

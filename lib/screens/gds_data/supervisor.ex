@@ -9,9 +9,9 @@ defmodule Screens.GdsData.Supervisor do
 
   def init(:ok) do
     children = [
-      worker(Screens.GdsData.State, [[name: Screens.GdsData.State]])
+      {Screens.GdsData.State, name: Screens.GdsData.State}
     ]
 
-    supervise(children, strategy: :one_for_one)
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end
