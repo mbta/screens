@@ -151,7 +151,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               elevator_id: "1",
               elevator_name: "Elevator 1",
               timeframe: %{
-                active_period: [{~U[2022-01-01 00:00:00Z], ~U[2022-01-01 22:00:00Z]}],
+                active_period: [
+                  %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
+                ],
                 happening_now: true
               }
             },
@@ -181,7 +183,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     timeframe: %{
-                      active_period: [{~U[2022-01-01 00:00:00Z], ~U[2022-01-01 22:00:00Z]}],
+                      active_period: [
+                        %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
+                      ],
                       happening_now: true
                     }
                   }
@@ -206,7 +210,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               elevator_id: "1",
               elevator_name: "Elevator 1",
               timeframe: %{
-                active_period: [{~U[2022-02-01 00:00:00Z], ~U[2022-02-01 22:00:00Z]}],
+                active_period: [
+                  %{"start" => "2022-02-01T00:00:00Z", "end" => "2022-02-01T22:00:00Z"}
+                ],
                 happening_now: false
               }
             },
@@ -230,7 +236,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               elevator_id: "1",
               elevator_name: "Elevator 1",
               timeframe: %{
-                active_period: [{~U[2022-02-01 00:00:00Z], ~U[2022-02-01 22:00:00Z]}],
+                active_period: [
+                  %{"start" => "2022-02-01T00:00:00Z", "end" => "2022-02-01T22:00:00Z"}
+                ],
                 happening_now: false
               }
             },
@@ -252,7 +260,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               elevator_id: "1",
               elevator_name: "Elevator 1",
               timeframe: %{
-                active_period: [{~U[2022-01-01 00:00:00Z], ~U[2022-01-01 22:00:00Z]}],
+                active_period: [
+                  %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
+                ],
                 happening_now: true
               }
             },
@@ -271,7 +281,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     timeframe: %{
-                      active_period: [{~U[2022-01-01 00:00:00Z], ~U[2022-01-01 22:00:00Z]}],
+                      active_period: [
+                        %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
+                      ],
                       happening_now: true
                     }
                   }

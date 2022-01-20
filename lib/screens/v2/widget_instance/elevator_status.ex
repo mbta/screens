@@ -60,8 +60,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           | :green_e
 
   @type timeframe :: %{
-          happening: :now | :upcoming,
-          detail: String.t()
+          happening_now: boolean(),
+          active_period: list()
         }
 
   @type closure :: %{
@@ -278,7 +278,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   defp serialize_timeframe(%Alert{active_period: active_period} = alert, now) do
     %{
       happening_now: Alert.happening_now?(alert, now),
-      active_period: active_period
+      active_period: Enum.map(active_period, &Alert.ap_to_map/1)
     }
   end
 
