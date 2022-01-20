@@ -117,15 +117,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   defp get_active_elsewhere(
          %__MODULE__{
-           alerts: alerts,
-           stop_sequences: stop_sequences
+           alerts: alerts
          } = t
        ) do
     alerts
     |> Enum.filter(&active_elsewhere?(&1, t))
     |> Enum.sort_by(
       fn %Alert{informed_entities: entities} -> entities end,
-      &sort_elsewhere(&1, &2, stop_sequences)
+      &sort_elsewhere(&1, &2, t)
     )
   end
 
