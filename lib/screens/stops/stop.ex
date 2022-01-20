@@ -32,7 +32,7 @@ defmodule Screens.Stops.Stop do
     end
   end
 
-  def fetch(station_id, headers \\ [], get_json_fn \\ &V3Api.get_json/5) do
+  def fetch_routes_serving_stop(station_id, headers \\ [], get_json_fn \\ &V3Api.get_json/5) do
     case get_json_fn.(
            "routes",
            %{
@@ -64,16 +64,16 @@ defmodule Screens.Stops.Stop do
     end
   end
 
-  def fetch_routes_serving_stop(station_id) do
+  def create_station_with_routes_map(station_id) do
     case StationsWithRoutesAgent.get(station_id) do
       {routes, date} ->
-        case fetch(station_id, [{"if-modified-since", date}]) do
+        case fetch_routes_serving_stop(station_id, [{"if-modified-since", date}]) do
           {:ok, new_routes} -> new_routes
           :not_modified -> routes
         end
 
       nil ->
-        case fetch(station_id) do
+        case fetch_routes_serving_stop(station_id) do
           {:ok, new_routes} -> new_routes
         end
     end

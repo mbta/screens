@@ -67,7 +67,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     elevator_closures
     |> get_parent_station_ids_from_entities()
     |> Enum.map(fn station_id ->
-      {station_id, station_id |> Stop.fetch_routes_serving_stop() |> routes_to_icons()}
+      {station_id, station_id |> Stop.create_station_with_routes_map() |> routes_to_icons()}
     end)
     |> Enum.into(%{})
   end
