@@ -28,6 +28,9 @@ defmodule Screens.V3Api do
         {:error, httpoison_error} = e
         log_api_error({:http_fetch_error, e}, message: Exception.message(httpoison_error))
 
+      {:response_success, %{status_code: 304}} ->
+        :not_modified
+
       {:response_success, %{status_code: status_code}} = response ->
         log_api_error({:bad_response_code, response}, status_code: status_code)
 
