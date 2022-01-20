@@ -5,7 +5,7 @@ defmodule Screens.V3Api do
 
   @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool]]
 
-  def get_json(route, params \\ %{}, extra_headers \\ [], opts \\ []) do
+  def get_json(route, params \\ %{}, extra_headers \\ [], opts \\ [], include_headers \\ false) do
     headers = extra_headers ++ api_key_headers(Application.get_env(:screens, :api_v3_key))
     url = build_url(route, params)
 
@@ -16,9 +16,13 @@ defmodule Screens.V3Api do
               headers,
               Keyword.merge(@default_opts, opts)
             )},
-         {:response_success, %{status_code: 200, body: body}} <- {:response_success, response},
+         {:response_success, %{status_code: 200, body: body, headers: headers}} <-
+           {:response_success, response},
          {:parse, {:ok, parsed}} <- {:parse, Jason.decode(body)} do
-      {:ok, parsed}
+      cond do
+        include_headers -> {:ok, parsed, headers}
+        true -> {:ok, parsed}
+      end
     else
       {:http_request, e} ->
         {:error, httpoison_error} = e
