@@ -54,10 +54,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           | :orange
           | :green
           | :silver
-          | :green_b
-          | :green_c
-          | :green_d
-          | :green_e
+          | :green
+          | :rail
+          | :bus
 
   @type timeframe :: %{
           happening_now: boolean(),
