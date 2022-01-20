@@ -11,7 +11,7 @@ const MappingContext = React.createContext(
 );
 
 const Widget: React.ComponentType<Props> = ({ data }) => {
-  if (data === null) {
+  if (data == null) {
     return null;
   }
 

@@ -566,6 +566,28 @@ const BusShelterV2ScreensTable = (): JSX.Element => {
   );
 };
 
+const elevatorStatusColumn = {
+  Header: "Elevator Status",
+  accessor: buildAppParamAccessor("elevator_status"),
+  mutator: buildAppParamMutator("elevator_status"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
+const PreFareV2ScreensTable = (): JSX.Element => {
+  const dataFilter = ({ app_id }) => {
+    return app_id === "pre_fare_v2";
+  };
+
+  return (
+    <AdminTable
+      columns={[...v2Columns, elevatorStatusColumn]}
+      dataFilter={dataFilter}
+    />
+  );
+};
+
 const v2SolariColumns = [
   {
     Header: "Screen ID",
@@ -627,4 +649,5 @@ export {
   SolariV2ScreensTable,
   SolariLargeV2ScreensTable,
   BusShelterV2ScreensTable,
+  PreFareV2ScreensTable,
 };

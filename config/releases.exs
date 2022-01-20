@@ -24,18 +24,6 @@ api_v3_key =
   |> ExAws.request!()
   |> Map.fetch!("SecretString")
 
-gds_dms_password =
-  "gds-dms-password"
-  |> ExAws.SecretsManager.get_secret_value()
-  |> ExAws.request!()
-  |> Map.fetch!("SecretString")
-
-mercury_api_key =
-  "mercury-api-key"
-  |> ExAws.SecretsManager.get_secret_value()
-  |> ExAws.request!()
-  |> Map.fetch!("SecretString")
-
 cognito_client_secret =
   (eb_env_name <> "-cognito-client-secret")
   |> ExAws.SecretsManager.get_secret_value()
@@ -63,8 +51,6 @@ config :screens, ScreensWeb.Endpoint,
 config :screens,
   api_v3_key: api_v3_key,
   environment_name: eb_env_name,
-  gds_dms_password: gds_dms_password,
-  mercury_api_key: mercury_api_key,
   signs_ui_s3_bucket: signs_ui_s3_bucket,
   sentry_frontend_dsn: System.get_env("SENTRY_DSN")
 
