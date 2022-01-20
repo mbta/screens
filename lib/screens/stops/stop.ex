@@ -2,7 +2,7 @@ defmodule Screens.Stops.Stop do
   @moduledoc false
 
   alias Screens.Routes
-  alias Screens.Stops.Agent
+  alias Screens.Stops.StationsWithRoutesAgent
   alias Screens.V3Api
 
   defstruct id: nil,
@@ -52,7 +52,7 @@ defmodule Screens.Stops.Stop do
           data
           |> Enum.map(fn route -> Routes.Parser.parse_route(route) end)
 
-        Agent.put(station_id, routes, date)
+        StationsWithRoutesAgent.put(station_id, routes, date)
 
         {:ok, routes}
 
@@ -65,7 +65,7 @@ defmodule Screens.Stops.Stop do
   end
 
   def fetch_routes_serving_stop(station_id) do
-    case Agent.get(station_id) do
+    case StationsWithRoutesAgent.get(station_id) do
       {routes, date} ->
         case fetch(station_id, [{"if-modified-since", date}]) do
           {:ok, new_routes} -> new_routes

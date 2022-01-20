@@ -1,4 +1,4 @@
-defmodule Screens.Stops.Agent do
+defmodule Screens.Stops.StationsWithRoutesAgent do
   use Agent
 
   def start_link(initial_value) do
