@@ -348,10 +348,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp get_endpoints(informed_entities, route_id) do
     case get_stop_sequence(informed_entities, route_id) do
       nil ->
-        %{
-          full: "",
-          abbrev: ""
-        }
+        nil
 
       stop_sequence ->
         {min_index, max_index} =
