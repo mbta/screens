@@ -132,9 +132,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     |> Enum.filter(&upcoming_at_home_station?(&1, t))
   end
 
-  defp get_upcoming_on_connecting_lines(%__MODULE__{alerts: alerts} = t) do
+  defp get_active_on_connecting_lines(%__MODULE__{alerts: alerts} = t) do
     alerts
-    |> Enum.filter(&upcoming_on_connecting_lines?(&1, t))
+    |> Enum.filter(&active_on_connecting_lines?(&1, t))
     |> Enum.sort_by(
       fn %Alert{informed_entities: entities} -> entities end,
       &sort_elsewhere(&1, &2, t)
@@ -177,13 +177,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       end)
   end
 
-  defp upcoming_on_connecting_lines?(
+  defp active_on_connecting_lines?(
          %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
          %__MODULE__{now: now, stop_sequences: stop_sequences} = t
        ) do
     stations = get_stations_from_entities(entities)
 
-    not Alert.happening_now?(alert, now) &&
+    Alert.happening_now?(alert, now) &&
       Enum.any?(stations, fn station ->
         Enum.any?(stop_sequences, fn stop_sequence ->
           station in stop_sequence and station != parent_station_id(t)
@@ -348,9 +348,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       |> get_upcoming_at_home_station()
       |> Enum.map(&serialize_detail_page(&1, t))
 
-    upcoming_on_connecting_lines =
+    active_on_connecting_lines =
       t
-      |> get_upcoming_on_connecting_lines()
+      |> get_active_on_connecting_lines()
       |> Enum.map(&serialize_detail_page(&1, t))
 
     # first show detail pages for each closure at this station
@@ -363,7 +363,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
         active_at_home,
         [active_elsewhere],
         upcoming_at_home,
-        upcoming_on_connecting_lines
+        active_on_connecting_lines
       ]
       |> Enum.concat()
       |> trim_and_page_alerts()
