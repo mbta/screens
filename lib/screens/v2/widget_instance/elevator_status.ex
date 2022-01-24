@@ -298,13 +298,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     end)
   end
 
-  # defp parse_facility_data(facilities) do
-  #   facilities
-  #   |> Enum.map(fn %{"attributes" => %{"long_name" => long_name}, "id" => id} ->
-  #     %{name: long_name, id: id}
-  #   end)
-  # end
-
   defp serialize_detail_page(
          %Alert{header: header, informed_entities: entities} = alert,
          %__MODULE__{
@@ -340,28 +333,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   @spec serialize(t()) :: %{pages: list(DetailPage.t() | ListPage.t())}
   def serialize(%__MODULE__{} = t) do
-    # case Screens.V3Api.get_json("alerts", %{
-    #        "filter[activity]" => "USING_WHEELCHAIR",
-    #        "include" => "facilities"
-    #      }) do
-    #   {:ok, result} ->
-    #     {:ok, stop_sequences} =
-    #       RoutePattern.fetch_stop_sequences_with_parent_stations("place-sull")
-
-    #     facilities =
-    #       get_in(result, [
-    #         "included",
-    #         Access.filter(&(&1["type"] == "facility"))
-    #       ])
-    #       |> parse_facility_data()
-
-    #     alerts = Screens.Alerts.Parser.parse_result(result)
-    #     parent_station_id = "place-sull"
-    #     now = DateTime.utc_now()
-    #   _ ->
-    #     IO.inspect(:error)
-    # end
-
     active_at_home =
       t
       |> get_active_at_home_station()
