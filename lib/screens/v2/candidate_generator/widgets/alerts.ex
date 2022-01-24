@@ -77,8 +77,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
     end
 
     alerts
-    |> Enum.filter(&(&1.effect in @relevant_effects))
-    |> Enum.filter(&Enum.any?(&1.informed_entities, relevant_ie?))
+    |> Stream.filter(&(&1.effect in @relevant_effects))
+    |> Stream.filter(&Enum.any?(&1.informed_entities, relevant_ie?))
+    |> Enum.to_list()
   end
 
   defp local_and_downstream_stop_ids(stop_sequences, home_stop) do
