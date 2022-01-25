@@ -21,6 +21,7 @@ import NormalBodyRight from "Components/v2/pre_fare/normal_body_right";
 import NormalHeaderLeft from "Components/v2/pre_fare/normal_header_left";
 import NormalHeaderRight from "Components/v2/pre_fare/normal_header_right";
 import TopLevelSwitch from "Components/v2/pre_fare/top_level_switch";
+import ElevatorStatus from "Components/v2/elevator_status";
 
 const TYPE_TO_COMPONENT = {
   screen_normal_left: NormalScreenLeft,
@@ -30,6 +31,7 @@ const TYPE_TO_COMPONENT = {
   body_normal: NormalBodyRight,
   header_right: NormalHeaderRight,
   top_level: TopLevelSwitch,
+  elevator_status: ElevatorStatus,
 };
 
 const DISABLED_LAYOUT = {
