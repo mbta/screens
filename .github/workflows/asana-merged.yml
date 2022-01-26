@@ -1,0 +1,15 @@
+name: Move Asana ticket after merge
+on: 
+  push:
+    branches: [master]
+
+jobs:
+  move-asana-ticket-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Github-Asana action from Insurify
+        uses: insurify/github-asana-action@v1.0.3
+        with:
+          asana-pat: ${{ secrets.ASANA_SECRET }}
+          trigger-phrase: "\\*\\*Asana task\\*\\*:"
+          targets: '[{"project": "Screens Dev - Sprint", "section": "Ready to Deploy"}]'
