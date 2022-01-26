@@ -5,7 +5,6 @@ defmodule Screens.Image do
 
   @bucket "mbta-screens"
   @s3_base_url "https://#{@bucket}.s3.amazonaws.com/"
-  @psa_images_prefix Application.compile_env(:screens, :environment_name, "dev") <> "/images/psa/"
 
   # Matches all non-delimiter characters located after the last delimiter.
   # screens/images/psa/some-image_file-3.png
@@ -23,7 +22,7 @@ defmodule Screens.Image do
 
   @spec fetch_image_filenames() :: list(String.t())
   def fetch_image_filenames do
-    list_operation = S3.list_objects(@bucket, prefix: @psa_images_prefix)
+    list_operation = S3.list_objects(@bucket, prefix: psa_images_prefix())
 
     list_operation
     |> ExAws.stream!()
@@ -74,7 +73,7 @@ defmodule Screens.Image do
 
   @spec delete_image(String.t()) :: :ok | :error
   def delete_image(filename) do
-    s3_path = @psa_images_prefix <> filename
+    s3_path = psa_images_prefix() <> filename
     delete_operation = S3.delete_object(@bucket, s3_path)
 
     case ExAws.request(delete_operation) do
@@ -95,5 +94,9 @@ defmodule Screens.Image do
     String.ends_with?(obj.key, "/")
   end
 
-  defp get_s3_path(filename), do: @psa_images_prefix <> filename
+  defp psa_images_prefix do
+    Application.get_env(:screens, :environment_name, "dev") <> "/images/psa/"
+  end
+
+  defp get_s3_path(filename), do: psa_images_prefix() <> filename
 end
