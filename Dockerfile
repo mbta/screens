@@ -58,8 +58,5 @@ COPY --from=app-builder /root/priv/static ./priv/static
 # add application artifact comipled in app build container
 COPY --from=app-builder /root/_build/prod/rel/screens .
 
-# Ensure SSL support is enabled
-RUN bin/screens eval ":crypto.supports()"
-
 # run the application
 CMD ["bin/screens", "start"]
