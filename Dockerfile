@@ -49,7 +49,7 @@ RUN apk --update add \
   # erlang-crypto requires system library libssl1.1
   libssl1.1 \
   # Erlang/OTP 24+ requires a glibc version that ships with asmjit
-  libstdc++ libgcc \
+  libstdc++ libgcc ncurses-libs \
   # Clean up the package cache after install
   && rm -rf /var/cache/apk
 
