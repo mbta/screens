@@ -14,3 +14,4 @@ jobs:
           asana-pat: ${{ secrets.ASANA_SECRET }}
           trigger-phrase: "\\*\\*Asana task\\*\\*:"
           targets: '[{"project": "Screens Dev - Sprint", "section": "Ready to Deploy"}]'
+
