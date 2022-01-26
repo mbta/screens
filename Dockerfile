@@ -6,12 +6,12 @@ ENV LANG="C.UTF-8" MIX_ENV="prod"
 WORKDIR /root
 ADD . .
 
+# Install git
+RUN apk --update add git make
+
 # Install Hex+Rebar
 RUN mix do local.hex --force, local.rebar --force
 RUN mix do deps.get --only prod
-
-# Install git
-RUN apk --update add git make
 
 # next, build the frontend assets within a Node.JS container
 FROM node:14 as assets-builder
