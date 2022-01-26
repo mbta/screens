@@ -62,6 +62,8 @@ const AudioConfigContext = createContext<AudioConfig | null>(
   defaultAudioConfig
 );
 
+const LastFetchContext = createContext<number>(0)
+
 interface ScreenLayoutProps {
   apiResponse: ApiResponse;
   showBlink: boolean;
@@ -86,7 +88,7 @@ const ScreenContainer = ({ id }) => {
   const audioConfig = useContext(AudioConfigContext);
   const [showBlink, setShowBlink] = useState(false);
 
-  const { apiResponse, requestCount } = useApiResponse({ id });
+  const { apiResponse, requestCount, lastSuccess } = useApiResponse({ id });
 
   useAudioReadout({ id, config: audioConfig });
 
@@ -103,10 +105,15 @@ const ScreenContainer = ({ id }) => {
     }
   }, [requestCount]);
 
-  return <ScreenLayout apiResponse={apiResponse} showBlink={showBlink} />;
+  return (
+    <LastFetchContext.Provider value={lastSuccess}>
+      <ScreenLayout apiResponse={apiResponse} showBlink={showBlink} />
+    </LastFetchContext.Provider>
+  )
 };
 
 export default ScreenContainer;
 export { ResponseMapper, ResponseMapperContext };
 export { BlinkConfig, BlinkConfigContext };
 export { AudioConfig, AudioConfigContext };
+export { LastFetchContext };
