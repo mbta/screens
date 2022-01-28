@@ -1,5 +1,7 @@
 # Screens
 
+IMPORTANT UPDATE TO THE README.
+
 ## Getting Started
 You have two options to set up the project environment for development:
 1. [Run on your local machine, with dependencies installed locally.](docs/local_development.md)
