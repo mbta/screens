@@ -126,8 +126,10 @@ defmodule Screens.LineMap do
 
     vehicles
     |> Enum.map(&format_vehicle(&1, route_stops, current_stop_index, trip_id_to_time))
-    |> Enum.reject(&is_nil/1)
-    |> Enum.reject(fn %{index: index} -> index < 0 end)
+    |> Enum.reject(fn
+      nil -> true
+      %{index: index} -> index < 0
+    end)
     |> maybe_strip_time()
   end
 

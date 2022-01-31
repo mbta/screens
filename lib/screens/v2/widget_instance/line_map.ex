@@ -130,20 +130,20 @@ defmodule Screens.V2.WidgetInstance.LineMap do
       ) do
     departures_with_vehicle_and_trip =
       departures
-      |> Enum.reject(fn d -> is_nil(d.prediction) end)
-      |> Enum.reject(fn %{prediction: p} -> is_nil(p.vehicle) or is_nil(p.trip) end)
+      |> Stream.reject(fn d -> is_nil(d.prediction) end)
+      |> Stream.reject(fn %{prediction: p} -> is_nil(p.vehicle) or is_nil(p.trip) end)
 
     forward_vehicles =
       departures_with_vehicle_and_trip
-      |> Enum.filter(&forward_directions_match?(&1, direction_id))
+      |> Stream.filter(&forward_directions_match?(&1, direction_id))
       |> Enum.flat_map(&serialize_vehicle_departure(&1, stops, current_stop, now))
 
     all_vehicles =
       if is_terminal? do
         backward_vehicles =
           departures_with_vehicle_and_trip
-          |> Enum.filter(&reverse_directions_match?(&1, direction_id))
-          |> Enum.flat_map(&serialize_vehicle_departure(&1, reverse_stops, current_stop, now))
+          |> Stream.filter(&reverse_directions_match?(&1, direction_id))
+          |> Stream.flat_map(&serialize_vehicle_departure(&1, reverse_stops, current_stop, now))
           |> Enum.map(fn %{index: index} = v -> %{v | index: index + @num_future_stops} end)
 
         forward_vehicles ++ backward_vehicles
@@ -268,12 +268,12 @@ defmodule Screens.V2.WidgetInstance.LineMap do
     # Number of departures with predictions (not just schedules) in this direction
     prediction_count =
       departures
-      |> Enum.reject(fn %Departure{prediction: p} -> is_nil(p) end)
-      |> Enum.reject(fn %Departure{prediction: %Prediction{trip: t}} -> is_nil(t) end)
-      |> Enum.filter(fn %Departure{prediction: %Prediction{trip: %Trip{direction_id: d}}} ->
+      |> Stream.reject(fn %Departure{prediction: p} -> is_nil(p) end)
+      |> Stream.reject(fn %Departure{prediction: %Prediction{trip: t}} -> is_nil(t) end)
+      |> Stream.filter(fn %Departure{prediction: %Prediction{trip: %Trip{direction_id: d}}} ->
         d == direction_id
       end)
-      |> length()
+      |> Enum.count()
 
     if prediction_count < 2 do
       %{name: origin_stop_name} = Enum.at(stops, 0)

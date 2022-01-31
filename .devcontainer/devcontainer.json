@@ -4,9 +4,12 @@
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
-      // Uncomment these once we've updated the code to work in newer versions
-      // "VARIANT": "1.13.0",
-      // "PHOENIX_VERSION": "1.6.5",
+      // This arg controls the Elixir version.
+      "VARIANT": "1.13.1",
+      // This arg controls the `mix phx_new` task version that creates a new Phoenix project.
+      // (Unlikely to be used for pre-existing Phoenix projects ported to Devcontainer development)
+      "PHX_NEW_VERSION": "1.6.6",
+      // This arg controls the Node.js version.
       // "NODE_VERSION": "16.13.1"
     }
   },

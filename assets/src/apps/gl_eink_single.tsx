@@ -15,10 +15,8 @@ import {
   MultiScreenPage,
   ScreenPage,
 } from "Components/eink/screen_page";
-import useSentry from "Hooks/use_sentry";
 
 const App = (): JSX.Element => {
-  useSentry();
   return (
     <Router>
       <Switch>

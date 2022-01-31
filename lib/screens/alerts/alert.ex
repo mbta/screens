@@ -260,10 +260,7 @@ defmodule Screens.Alerts.Alert do
   end
 
   defp format_query_param({:route_types, route_types}) do
-    route_type_ids =
-      route_types
-      |> Enum.map(&Screens.RouteType.to_id/1)
-      |> Enum.join(",")
+    route_type_ids = Enum.map_join(route_types, ",", &Screens.RouteType.to_id/1)
 
     [
       {"filter[route_type]", route_type_ids}
