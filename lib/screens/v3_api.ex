@@ -36,12 +36,11 @@ defmodule Screens.V3Api do
   end
 
   defp log_api_error({error_type, _error_data} = error, extra_fields \\ []) do
-    _ =
-      extra_fields
-      |> Enum.map_join(" ", fn {label, value} -> "#{label}=\"#{value}\"" end)
-      |> then(fn fields ->
-        Logger.info("[api_v3_get_json_error] error_type=#{error_type} " <> fields)
-      end)
+    extra_fields
+    |> Enum.map_join(" ", fn {label, value} -> "#{label}=\"#{value}\"" end)
+    |> then(fn fields ->
+      Logger.info("[api_v3_get_json_error] error_type=#{error_type} " <> fields)
+    end)
 
     error
   end
