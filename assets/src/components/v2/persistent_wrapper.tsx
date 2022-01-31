@@ -3,7 +3,6 @@ import { LastFetchContext } from "Components/v2/screen_container";
 
 const PersistentWrapper = ({WrappedComponent, ...data}) => {
   const lastFetch = useContext(LastFetchContext);
-  // console.log('lastFetch: ', lastFetch)
 
   const [visibleData, setVisibleData] = useState(data);
   const [isFinished, setIsFinished] = useState(false);
