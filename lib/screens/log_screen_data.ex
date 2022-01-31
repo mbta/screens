@@ -75,12 +75,11 @@ defmodule Screens.LogScreenData do
   def log_departures(_screen_id, true, {:ok, _}), do: nil
 
   def log_message(message, data) do
-    data_str =
-      data
-      |> Enum.map(&format_log_value/1)
-      |> Enum.join(" ")
-
-    Logger.info("#{message} #{data_str}")
+    data
+    |> Enum.map_join(" ", &format_log_value/1)
+    |> then(fn data_str ->
+      Logger.info("#{message} #{data_str}")
+    end)
   end
 
   defp format_log_value({key, value}) do
