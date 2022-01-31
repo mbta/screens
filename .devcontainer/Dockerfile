@@ -17,7 +17,7 @@ ARG COMMON_SCRIPT_SOURCE="https://raw.githubusercontent.com/microsoft/vscode-dev
 ARG COMMON_SCRIPT_SHA="dev-mode"
 
 # Optional Settings for Phoenix
-ARG PHOENIX_VERSION="1.4.11"
+ARG PHX_NEW_VERSION="1.4.11"
 
 # [Optional] Setup nodejs
 ARG NODE_SCRIPT_SOURCE="https://raw.githubusercontent.com/microsoft/vscode-dev-containers/main/script-library/node-debian.sh"
@@ -55,7 +55,7 @@ RUN apt-get update \
 
 RUN su ${USERNAME} -c "mix local.hex --force \
   && mix local.rebar --force \
-  && mix archive.install --force hex phx_new ${PHOENIX_VERSION}"
+  && mix archive.install --force hex phx_new ${PHX_NEW_VERSION}"
 
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update \

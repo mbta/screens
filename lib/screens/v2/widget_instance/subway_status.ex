@@ -246,9 +246,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   def get_relevant_alerts_by_route(alerts) do
     alerts
-    |> Enum.filter(&Alert.happening_now?/1)
-    |> Enum.filter(&relevant_effect?/1)
-    |> Enum.flat_map(fn alert -> Enum.map(alert_routes(alert), fn route -> {alert, route} end) end)
+    |> Stream.filter(&Alert.happening_now?/1)
+    |> Stream.filter(&relevant_effect?/1)
+    |> Stream.flat_map(fn alert ->
+      Enum.map(alert_routes(alert), fn route -> {alert, route} end)
+    end)
     |> Enum.group_by(fn {_alert, route} -> route end, fn {alert, _route} -> alert end)
   end
 
