@@ -37,14 +37,14 @@ type Icon = "orange" | "red" | "green" | "blue" | "silver" | "rail" | "bus";
 
 interface Props {
   pages: Page[];
-  lastUpdated: number;
-  onFinished: Function;
+  lastUpdate: number;
+  onFinish: Function;
 }
 
 const ElevatorStatus: ComponentType<Props> = ({
   pages,
-  lastUpdated,
-  onFinished,
+  lastUpdate,
+  onFinish,
 }) => {
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [pageIndex, setPageIndex] = useState(0);
@@ -55,11 +55,11 @@ const ElevatorStatus: ComponentType<Props> = ({
     } else {
       setPageIndex((i) => i + 1);
     }
-  }, [lastUpdated]);
+  }, [lastUpdate]);
 
   useEffect(() => {
     if (pageIndex === pages.length - 1) {
-      onFinished();
+      onFinish();
     }
   }, [pageIndex]);
 
