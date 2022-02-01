@@ -184,19 +184,25 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     stations = get_stations_from_entities(entities)
     parent_station_id = parent_station_id(t)
 
+    flat_stop_sequences =
+      stop_sequences
+      |> List.flatten()
+
     Alert.happening_now?(alert, now) and
       Enum.any?(stations, fn station ->
-        Enum.any?(stop_sequences, fn stop_sequence ->
-          station in stop_sequence and station != parent_station_id
-        end)
+        station in flat_stop_sequences and station != parent_station_id
       end)
   end
 
   defp sort_elsewhere(e1, _e2, %__MODULE__{stop_sequences: stop_sequences}) do
     stations = get_stations_from_entities(e1)
 
+    flat_stop_sequences =
+      stop_sequences
+      |> List.flatten()
+
     Enum.any?(stations, fn station ->
-      station in stop_sequences
+      station in flat_stop_sequences
     end)
   end
 
