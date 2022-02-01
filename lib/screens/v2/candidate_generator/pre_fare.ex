@@ -20,7 +20,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
             ],
             screen_takeover_left: [
               :full_screen_left
-            ]
+            ],
+            body_takeover_left: [:full_body_left]
           }},
          {:right,
           %{
@@ -28,8 +29,18 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
               :header_right,
               {:body,
                %{
-                 body_normal: [:main_content_right, :secondary_content],
-                 body_takeover: [:full_body]
+                 body_normal: [
+                   :lower_right,
+                   Builder.with_paging(
+                     {:upper_right,
+                      %{
+                        one_large: [:large],
+                        two_medium: [:medium_left, :medium_right]
+                      }},
+                     2
+                   )
+                 ],
+                 body_takeover_right: [:full_body_right]
                }}
             ],
             screen_takeover_right: [
