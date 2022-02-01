@@ -142,7 +142,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
            now: now
          } = t
        ) do
-    Alert.happening_now?(alert, now) &&
+    Alert.happening_now?(alert, now) and
       Enum.any?(entities, fn entity ->
         entity.stop == parent_station_id(t)
       end)
@@ -156,7 +156,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
        ) do
     stations = get_stations_from_entities(entities)
 
-    Alert.happening_now?(alert, now) &&
+    Alert.happening_now?(alert, now) and
       Enum.any?(stations, fn station ->
         station != parent_station_id(t)
       end)
@@ -166,7 +166,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
          %__MODULE__{now: now} = t
        ) do
-    not Alert.happening_now?(alert, now) &&
+    not Alert.happening_now?(alert, now) and
       Enum.any?(entities, fn entity ->
         entity.stop == parent_station_id(t)
       end)
@@ -178,7 +178,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
        ) do
     stations = get_stations_from_entities(entities)
 
-    Alert.happening_now?(alert, now) &&
+    Alert.happening_now?(alert, now) and
       Enum.any?(stations, fn station ->
         Enum.any?(stop_sequences, fn stop_sequence ->
           station in stop_sequence and station != parent_station_id(t)
