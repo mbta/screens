@@ -32,7 +32,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             active_period: [{~U[2022-01-01T00:00:00Z], ~U[2022-01-01T22:00:00Z]}]
           }
         ],
-        facilities: [%{name: "Elevator 1", id: "1"}],
+        facility_id_to_name: %{"1" => "Elevator 1"},
         station_id_to_name: %{"place-foo" => "Foo Station", "place-bar" => "Bar Station"},
         station_id_to_icons: %{"place-foo" => [:red], "place-bar" => [:red]},
         now: ~U[2022-01-01T10:00:00Z],
@@ -55,7 +55,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             active_period: [{~U[2022-01-01T00:00:00Z], ~U[2022-01-01T22:00:00Z]}]
           }
         ],
-        facilities: [%{name: "Elevator 1", id: "1"}],
+        facility_id_to_name: %{"1" => "Elevator 1"},
         station_id_to_name: %{"place-foo" => "Foo Station"},
         station_id_to_icons: %{"place-foo" => [:red]},
         now: ~U[2022-01-01T10:00:00Z],
@@ -78,7 +78,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             active_period: [{~U[2022-01-01T00:00:00Z], ~U[2022-01-01T22:00:00Z]}]
           }
         ],
-        facilities: [%{name: "Elevator 1", id: "1"}],
+        facility_id_to_name: %{"1" => "Elevator 1"},
         station_id_to_name: %{"place-bar" => "Bar Station"},
         station_id_to_icons: %{"place-bar" => [:red]},
         now: ~U[2022-01-01T10:00:00Z],
@@ -101,7 +101,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             active_period: [{~U[2022-02-01T00:00:00Z], ~U[2022-02-01T22:00:00Z]}]
           }
         ],
-        facilities: [%{name: "Elevator 1", id: "1"}],
+        facility_id_to_name: %{"1" => "Elevator 1"},
         station_id_to_name: %{"place-foo" => "Foo Station"},
         station_id_to_icons: %{"place-foo" => [:red]},
         now: ~U[2022-01-01T10:00:00Z],
@@ -124,7 +124,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             active_period: [{~U[2022-01-01T00:00:00Z], ~U[2022-01-01T22:00:00Z]}]
           }
         ],
-        facilities: [%{name: "Elevator 1", id: "1"}],
+        facility_id_to_name: %{"1" => "Elevator 1"},
         station_id_to_name: %{"place-bar" => "Bar Station", "place-foo" => "Foo Station"},
         station_id_to_icons: %{"place-bar" => [:red], "place-foo" => [:red]},
         now: ~U[2022-01-01T10:00:00Z],

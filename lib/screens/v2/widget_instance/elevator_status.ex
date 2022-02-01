@@ -44,7 +44,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
             now: nil,
             alerts: nil,
             stop_sequences: nil,
-            facilities: nil,
+            facility_id_to_name: nil,
             station_id_to_name: nil,
             station_id_to_icons: nil
 
@@ -89,7 +89,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           now: DateTime.t(),
           alerts: list(Alert.t()),
           stop_sequences: list(list(stop_id())),
-          facilities: list(facility()),
+          facility_id_to_name: %{String.t() => String.t()},
           station_id_to_name: %{String.t() => String.t()},
           station_id_to_icons: %{String.t() => list(icon)}
         }
@@ -231,15 +231,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   end
 
   defp get_facility_by_id(entities, facilities) do
-    facility_in_entity =
+    informed_facility_id =
       entities
       |> Enum.find_value(fn
         %{facility: facility} -> facility
         _ -> false
       end)
 
-    facilities
-    |> Enum.find(fn %{id: id} -> id == facility_in_entity end)
+    %{id: informed_facility_id, name: Map.fetch!(facilities, informed_facility_id)}
   end
 
   defp serialize_closure(alert, %{name: name, id: id}, now) do
@@ -254,7 +253,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   defp serialize_station(
          {parent_station_id, alerts},
          %__MODULE__{
-           facilities: facilities,
+           facility_id_to_name: facility_id_to_name,
            station_id_to_name: station_id_to_name,
            station_id_to_icons: station_id_to_icons,
            now: now
@@ -267,7 +266,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       |> Enum.map(fn %Alert{
                        informed_entities: entities
                      } = alert ->
-        facility = get_facility_by_id(entities, facilities)
+        facility = get_facility_by_id(entities, facility_id_to_name)
 
         serialize_closure(alert, facility, now)
       end)
@@ -309,11 +308,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          %Alert{header: header, informed_entities: entities} = alert,
          %__MODULE__{
            station_id_to_icons: station_id_to_icons,
-           facilities: facilities,
+           facility_id_to_name: facility_id_to_name,
            now: now
          } = t
        ) do
-    facility = get_facility_by_id(entities, facilities)
+    facility = get_facility_by_id(entities, facility_id_to_name)
 
     %DetailPage{
       header_text: header,
