@@ -57,19 +57,13 @@
         {Credo.Check.Warning.UnusedRegexOperation},
         {Credo.Check.Warning.UnusedStringOperation},
         {Credo.Check.Warning.UnusedTupleOperation},
+        {Credo.Check.Warning.ApplicationConfigInModuleAttribute},
 
         # Controversial and experimental checks (opt-in, just remove `, false`)
         {Credo.Check.Refactor.ABCSize, false},
         {Credo.Check.Refactor.AppendSingleItem, false},
         {Credo.Check.Refactor.VariableRebinding, false},
-        {Credo.Check.Warning.MapGetUnsafePass, false},
-
-        # incompatible with Elxiir 1.9.1
-        {Credo.Check.Refactor.MapInto, false},
-        {Credo.Check.Warning.LazyLogging, false},
-
-        # disabled until we upgrade Elixir
-        {Credo.Check.Warning.ApplicationConfigInModuleAttribute, false}
+        {Credo.Check.Warning.MapGetUnsafePass, false}
       ]
     }
   ]

@@ -9,9 +9,9 @@ defmodule Screens.V2.Departure.Builder do
 
   def get_relevant_departures(predictions_or_schedules, now \\ DateTime.utc_now()) do
     predictions_or_schedules
-    |> Enum.reject(&in_past_or_nil_time?(&1, now))
-    |> Enum.reject(&multi_route_duplicate?/1)
-    |> Enum.reject(&vehicle_already_departed?/1)
+    |> Stream.reject(&in_past_or_nil_time?(&1, now))
+    |> Stream.reject(&multi_route_duplicate?/1)
+    |> Stream.reject(&vehicle_already_departed?/1)
     |> choose_earliest_stop_per_trip()
   end
 

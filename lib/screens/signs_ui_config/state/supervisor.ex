@@ -9,9 +9,9 @@ defmodule Screens.SignsUiConfig.State.Supervisor do
 
   def init(:ok) do
     children = [
-      worker(Screens.SignsUiConfig.State, [[name: Screens.SignsUiConfig.State]])
+      {Screens.SignsUiConfig.State, name: Screens.SignsUiConfig.State}
     ]
 
-    supervise(children, strategy: :one_for_one)
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end
