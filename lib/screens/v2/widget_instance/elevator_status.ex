@@ -288,12 +288,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   defp alerts_by_station(alerts) do
     alerts
-    |> Enum.map(fn %{informed_entities: informed_entities} = alert ->
-      {get_parent_station_id_from_informed_entities(informed_entities), alert}
-    end)
-    |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
-
-    # produces %{parent_station_id => [%Alert{}, ...]}
+    |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
   end
 
   defp get_parent_station_id_from_informed_entities(entities) do
