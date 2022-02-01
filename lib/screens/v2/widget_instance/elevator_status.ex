@@ -94,11 +94,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           station_id_to_icons: %{String.t() => list(icon)}
         }
 
-  # @max_height_list_container 0
-  # @max_height_station_heading 0
-  # @max_height_elevator_description 0
-  # @max_height_row_separator 0
-
   def parent_station_id(%__MODULE__{
         screen: %Screen{
           app_params: %PreFare{
