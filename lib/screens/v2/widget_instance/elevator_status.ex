@@ -228,7 +228,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     |> Enum.map(&%ListPage{stations: &1})
   end
 
-  defp get_facility_by_id(entities, facilities) do
+  defp get_informed_facility(entities, facilities) do
     informed_facility_id =
       entities
       |> Enum.find_value(fn
@@ -264,7 +264,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       |> Enum.map(fn %Alert{
                        informed_entities: entities
                      } = alert ->
-        facility = get_facility_by_id(entities, facility_id_to_name)
+        facility = get_informed_facility(entities, facility_id_to_name)
 
         serialize_closure(alert, facility, now)
       end)
@@ -306,7 +306,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
            now: now
          } = t
        ) do
-    facility = get_facility_by_id(entities, facility_id_to_name)
+    facility = get_informed_facility(entities, facility_id_to_name)
 
     %DetailPage{
       header_text: header,
