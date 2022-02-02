@@ -19,12 +19,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     with {:ok, stop_sequences} <-
            RoutePattern.fetch_stop_sequences_through_stop(parent_station_id),
          {:ok, parent_station_map} <- Stop.fetch_parent_station_name_map(),
-         {:ok, elevator_closures, facilities} <- fetch_elevator_closures(),
+         {:ok, elevator_closures, facility_id_to_name} <- fetch_elevator_closures(),
          icon_map <- get_icon_map(elevator_closures) do
       [
         %ElevatorStatusWidget{
           alerts: elevator_closures,
-          facilities: facilities,
+          facility_id_to_name: facility_id_to_name,
           stop_sequences: stop_sequences,
           screen: config,
           now: now,
@@ -94,7 +94,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   defp parse_facility_data(facilities) do
     facilities
     |> Enum.map(fn %{"attributes" => %{"long_name" => long_name}, "id" => id} ->
-      %{name: long_name, id: id}
+      {id, long_name}
     end)
+    |> Enum.into(%{})
   end
 end
