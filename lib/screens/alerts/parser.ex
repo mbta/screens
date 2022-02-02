@@ -20,7 +20,8 @@ defmodule Screens.Alerts.Parser do
         "lifecycle" => lifecycle,
         "severity" => severity,
         "timeframe" => timeframe,
-        "url" => url
+        "url" => url,
+        "description" => description
       } ->
         %Screens.Alerts.Alert{
           id: id,
@@ -34,7 +35,8 @@ defmodule Screens.Alerts.Parser do
           timeframe: timeframe,
           created_at: parse_time(created_at),
           updated_at: parse_time(updated_at),
-          url: url
+          url: url,
+          description: description
         }
 
       _ ->
@@ -51,7 +53,8 @@ defmodule Screens.Alerts.Parser do
       stop: get_in(ie, ["stop"]),
       route: get_in(ie, ["route"]),
       route_type: get_in(ie, ["route_type"]),
-      direction_id: get_in(ie, ["direction_id"])
+      direction_id: get_in(ie, ["direction_id"]),
+      facility: get_in(ie, ["facility"])
     }
   end
 

@@ -16,7 +16,8 @@ defmodule Screens.Alerts.Alert do
             timeframe: nil,
             created_at: nil,
             updated_at: nil,
-            url: nil
+            url: nil,
+            description: nil
 
   @type cause ::
           :accident
@@ -111,7 +112,8 @@ defmodule Screens.Alerts.Alert do
           lifecycle: String.t(),
           timeframe: String.t(),
           created_at: DateTime.t(),
-          updated_at: DateTime.t()
+          updated_at: DateTime.t(),
+          description: String.t()
         }
 
   def to_map(nil), do: nil
