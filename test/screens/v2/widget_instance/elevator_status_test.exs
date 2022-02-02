@@ -140,7 +140,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   end
 
   describe "serialize/1" do
-    test "returns a detail page for one active at-home", %{
+    test "returns a detail and list page for one active at-home", %{
       one_active_at_home_instance: instance
     } do
       expected_result = %{
@@ -159,6 +159,28 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             },
             header_text: nil,
             icons: [:red]
+          },
+          %Screens.V2.WidgetInstance.ElevatorStatus.ListPage{
+            stations: [
+              %{
+                name: "Foo Station",
+                icons: [:red],
+                is_at_home_stop: true,
+                elevator_closures: [
+                  %{
+                    description: nil,
+                    elevator_id: "1",
+                    elevator_name: "Elevator 1",
+                    timeframe: %{
+                      active_period: [
+                        %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
+                      ],
+                      happening_now: true
+                    }
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
@@ -293,6 +315,24 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
           },
           %Screens.V2.WidgetInstance.ElevatorStatus.ListPage{
             stations: [
+              %{
+                name: "Foo Station",
+                icons: [:red],
+                is_at_home_stop: true,
+                elevator_closures: [
+                  %{
+                    description: nil,
+                    elevator_id: "1",
+                    elevator_name: "Elevator 1",
+                    timeframe: %{
+                      active_period: [
+                        %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
+                      ],
+                      happening_now: true
+                    }
+                  }
+                ]
+              },
               %{
                 name: "Bar Station",
                 icons: [:red],

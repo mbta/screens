@@ -324,6 +324,16 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       alerts
       |> alerts_by_station()
       |> Enum.map(&serialize_station(&1, t))
+      |> Enum.sort_by(
+        fn %{
+             is_at_home_stop: is_at_home_stop
+           } ->
+          is_at_home_stop
+        end,
+        fn s1, _s2 ->
+          s1
+        end
+      )
 
     %ListPage{
       stations: stations
@@ -341,7 +351,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     active_elsewhere =
       t
-      |> get_active_elsewhere()
+      |> get_active_at_home_station()
+      |> Enum.concat(get_active_elsewhere(t))
       |> serialize_list_page(t)
 
     upcoming_at_home =
