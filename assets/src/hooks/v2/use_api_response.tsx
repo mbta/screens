@@ -71,7 +71,7 @@ interface UseApiResponseArgs {
 const useApiResponse = ({
   id,
   failureModeElapsedMs = MINUTE_IN_MS,
-}: UseApiResponseArgs): { apiResponse: ApiResponse; requestCount: number } => {
+}: UseApiResponseArgs): { apiResponse: ApiResponse, requestCount: number, lastSuccess: number } => {
   const isRealScreenParam = useIsRealScreenParam()
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
@@ -122,7 +122,7 @@ const useApiResponse = ({
     }, refreshMs);
   }
 
-  return { apiResponse, requestCount };
+  return { apiResponse, requestCount, lastSuccess };
 };
 
 export default useApiResponse;

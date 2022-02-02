@@ -16,7 +16,8 @@ defmodule Screens.Alerts.Alert do
             timeframe: nil,
             created_at: nil,
             updated_at: nil,
-            url: nil
+            url: nil,
+            description: nil
 
   @type cause ::
           :accident
@@ -111,7 +112,8 @@ defmodule Screens.Alerts.Alert do
           lifecycle: String.t(),
           timeframe: String.t(),
           created_at: DateTime.t(),
-          updated_at: DateTime.t()
+          updated_at: DateTime.t(),
+          description: String.t()
         }
 
   def to_map(nil), do: nil
@@ -258,10 +260,7 @@ defmodule Screens.Alerts.Alert do
   end
 
   defp format_query_param({:route_types, route_types}) do
-    route_type_ids =
-      route_types
-      |> Enum.map(&Screens.RouteType.to_id/1)
-      |> Enum.join(",")
+    route_type_ids = Enum.map_join(route_types, ",", &Screens.RouteType.to_id/1)
 
     [
       {"filter[route_type]", route_type_ids}
