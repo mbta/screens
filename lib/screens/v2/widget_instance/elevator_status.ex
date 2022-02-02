@@ -286,6 +286,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     }
   end
 
+  # produces %{parent_station_id => [%Alert{}, ...]}
   defp alerts_by_station(alerts) do
     alerts
     |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
@@ -324,6 +325,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       alerts
       |> alerts_by_station()
       |> Enum.map(&serialize_station(&1, t))
+      # This sort_by does a last minute sort to put home station alerts at the top.
+      # Eventually, this will need to be more complex to properly sort elsewhere.
       |> Enum.sort_by(
         fn %{
              is_at_home_stop: is_at_home_stop
