@@ -207,9 +207,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   end
 
   defp get_stations_from_entities(entities) do
-    entities
-    |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-    |> Enum.filter(&String.starts_with?(&1, "place-"))
+    for %{stop: "place-" <> _ = stop_id} <- entities, do: stop_id
   end
 
   defp trim_and_page_alerts(pages) do
