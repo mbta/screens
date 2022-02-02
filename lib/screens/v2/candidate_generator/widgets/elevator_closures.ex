@@ -35,14 +35,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     end
   end
 
-  def fetch_elevator_closures() do
+  def fetch_elevator_closures do
     case Screens.V3Api.get_json("alerts", %{
            "filter[activity]" => "USING_WHEELCHAIR",
            "include" => "facilities"
          }) do
       {:ok, result} ->
         facilities =
-          get_in(result, [
+          result
+          |> get_in([
             "included",
             Access.filter(&(&1["type"] == "facility"))
           ])

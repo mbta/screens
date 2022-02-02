@@ -19,9 +19,10 @@ defmodule Screens.V3Api do
          {:response_success, %{status_code: 200, body: body, headers: headers}} <-
            {:response_success, response},
          {:parse, {:ok, parsed}} <- {:parse, Jason.decode(body)} do
-      cond do
-        include_headers -> {:ok, parsed, headers}
-        true -> {:ok, parsed}
+      if include_headers do
+        {:ok, parsed, headers}
+      else
+        {:ok, parsed}
       end
     else
       {:http_request, e} ->
