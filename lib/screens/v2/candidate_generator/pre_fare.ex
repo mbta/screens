@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.Placeholder
 
@@ -42,8 +43,12 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(_config) do
-    [fn -> placeholder_instances() end]
+  def candidate_instances(
+        config,
+        now \\ DateTime.utc_now(),
+        elevator_status_instances_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2
+      ) do
+    [fn -> elevator_status_instances_fn.(config, now) end, fn -> placeholder_instances() end]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end

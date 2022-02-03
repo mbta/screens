@@ -19,7 +19,8 @@ defmodule Screens.Application do
       Screens.Config.State.Supervisor,
       Screens.SignsUiConfig.State.Supervisor,
       :hackney_pool.child_spec(:ex_aws_pool, []),
-      :hackney_pool.child_spec(:api_v3_pool, [])
+      :hackney_pool.child_spec(:api_v3_pool, []),
+      {Screens.Stops.StationsWithRoutesAgent, %{}}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
