@@ -17,7 +17,11 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
           %{
             screen_normal_left: [
               :header_left,
-              :main_content_left
+              {:body_left,
+               %{
+                 body_normal_left: [:main_content_left],
+                 body_takeover_left: [:full_body_left]
+               }}
             ],
             screen_takeover_left: [
               :full_screen_left
@@ -27,10 +31,20 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
           %{
             screen_normal_right: [
               :header_right,
-              {:body,
+              {:body_right,
                %{
-                 body_normal: [:main_content_right, :secondary_content],
-                 body_takeover: [:full_body]
+                 body_normal_right: [
+                   Builder.with_paging(
+                     {:upper_right,
+                      %{
+                        one_large: [:large],
+                        two_medium: [:medium_left, :medium_right]
+                      }},
+                     2
+                   ),
+                   :lower_right
+                 ],
+                 body_takeover_right: [:full_body_right]
                }}
             ],
             screen_takeover_right: [
