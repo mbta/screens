@@ -5,7 +5,13 @@ defmodule Screens.V3Api do
 
   @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool]]
 
-  def get_json(route, params \\ %{}, extra_headers \\ [], opts \\ [], include_headers \\ false) do
+  def get_json(
+        route,
+        params \\ %{},
+        extra_headers \\ [],
+        opts \\ [],
+        return_with_headers \\ false
+      ) do
     headers = extra_headers ++ api_key_headers(Application.get_env(:screens, :api_v3_key))
     url = build_url(route, params)
 
@@ -19,7 +25,7 @@ defmodule Screens.V3Api do
          {:response_success, %{status_code: 200, body: body, headers: headers}} <-
            {:response_success, response},
          {:parse, {:ok, parsed}} <- {:parse, Jason.decode(body)} do
-      if include_headers do
+      if return_with_headers do
         {:ok, parsed, headers}
       else
         {:ok, parsed}
