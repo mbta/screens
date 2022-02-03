@@ -9,7 +9,11 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
-  defstruct ~w[screen alert stop_sequences routes_at_stop now]a
+  defstruct screen: nil,
+            alert: nil,
+            stop_sequences: nil,
+            routes_at_stop: nil,
+            now: nil
 
   @type stop_id :: String.t()
 

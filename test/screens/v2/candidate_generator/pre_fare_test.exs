@@ -27,7 +27,11 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
                    %{
                      screen_normal_left: [
                        :header_left,
-                       :main_content_left
+                       {:body_left,
+                        %{
+                          body_normal_left: [:main_content_left],
+                          body_takeover_left: [:full_body_left]
+                        }}
                      ],
                      screen_takeover_left: [
                        :full_screen_left
@@ -37,10 +41,22 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
                    %{
                      screen_normal_right: [
                        :header_right,
-                       {:body,
+                       {:body_right,
                         %{
-                          body_normal: [:main_content_right, :secondary_content],
-                          body_takeover: [:full_body]
+                          body_normal_right: [
+                            {{0, :upper_right},
+                             %{
+                               one_large: [{0, :large}],
+                               two_medium: [{0, :medium_left}, {0, :medium_right}]
+                             }},
+                            {{1, :upper_right},
+                             %{
+                               one_large: [{1, :large}],
+                               two_medium: [{1, :medium_left}, {1, :medium_right}]
+                             }},
+                            :lower_right
+                          ],
+                          body_takeover_right: [:full_body_right]
                         }}
                      ],
                      screen_takeover_right: [

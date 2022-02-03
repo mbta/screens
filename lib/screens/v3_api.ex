@@ -5,7 +5,13 @@ defmodule Screens.V3Api do
 
   @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool]]
 
-  def get_json(route, params \\ %{}, extra_headers \\ [], opts \\ []) do
+  def get_json(
+        route,
+        params \\ %{},
+        extra_headers \\ [],
+        opts \\ [],
+        return_with_headers \\ false
+      ) do
     headers = extra_headers ++ api_key_headers(Application.get_env(:screens, :api_v3_key))
     url = build_url(route, params)
 
@@ -16,13 +22,21 @@ defmodule Screens.V3Api do
               headers,
               Keyword.merge(@default_opts, opts)
             )},
-         {:response_success, %{status_code: 200, body: body}} <- {:response_success, response},
+         {:response_success, %{status_code: 200, body: body, headers: headers}} <-
+           {:response_success, response},
          {:parse, {:ok, parsed}} <- {:parse, Jason.decode(body)} do
-      {:ok, parsed}
+      if return_with_headers do
+        {:ok, parsed, headers}
+      else
+        {:ok, parsed}
+      end
     else
       {:http_request, e} ->
         {:error, httpoison_error} = e
         log_api_error({:http_fetch_error, e}, message: Exception.message(httpoison_error))
+
+      {:response_success, %{status_code: 304}} ->
+        :not_modified
 
       {:response_success, %{status_code: status_code}} = response ->
         log_api_error({:bad_response_code, response}, status_code: status_code)
