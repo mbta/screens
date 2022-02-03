@@ -57,6 +57,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           | :green
           | :rail
           | :bus
+          | :mattapan
 
   @type timeframe :: %{
           happening_now: boolean(),
