@@ -1,0 +1,55 @@
+.flex-zone-page-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0px;
+  width: 1040px;
+  height: 20px;
+  text-align: center;
+  padding-top: 16px;
+}
+
+.flex-zone-page-indicator__page__progress-bar {
+  position: absolute;
+  height: 16px;
+  background: #171f26;
+}
+
+.flex-zone-page-indicator__page {
+  position: relative;
+  display: inline-block;
+  width: 144px;
+  height: 16px;
+  border-radius: 24px;
+  margin-left: 44px;
+  overflow: hidden;
+  background: #cccbc8;
+  box-shadow: inset 1px 2px 6px 0px #bfbebb;
+
+  &--past {
+    .flex-zone-page-indicator__page__progress-bar {
+      width: 144px;
+    }
+  }
+
+  &--selected {
+    .flex-zone-page-indicator__page__progress-bar {
+      animation: progress 20s linear forwards;
+    }
+  }
+
+  &--unselected {
+    .flex-zone-page-indicator__page__progress-bar {
+      width: 0;
+    }
+  }
+}
+
+@keyframes progress {
+  0% {
+    width: 0;
+  }
+
+  100% {
+    width: 144px;
+  }
+}
