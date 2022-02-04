@@ -29,7 +29,7 @@ const TYPE_TO_COMPONENT = {
   screen_normal_right: NormalScreenRight,
   placeholder: Placeholder,
   header_left: NormalHeaderLeft,
-  body_normal: NormalBodyRight,
+  body_normal_right: NormalBodyRight,
   header_right: NormalHeaderRight,
   top_level: TopLevelSwitch,
   elevator_status: makePersistent(ElevatorStatus),
