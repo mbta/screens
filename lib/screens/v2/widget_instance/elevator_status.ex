@@ -7,16 +7,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     alias Screens.V2.WidgetInstance.ElevatorStatus
 
     @type t :: %__MODULE__{
-            header_text: String.t(),
-            icons: list(ElevatorStatus.icon()),
-            elevator_closure: ElevatorStatus.closure()
+            station: ElevatorStatus.station()
           }
 
     @derive Jason.Encoder
 
-    defstruct header_text: nil,
-              icons: nil,
-              elevator_closure: nil
+    defstruct station: nil
   end
 
   defmodule ListPage do
@@ -300,19 +296,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   end
 
   defp serialize_detail_page(
-         %Alert{header: header, informed_entities: entities} = alert,
-         %__MODULE__{
-           station_id_to_icons: station_id_to_icons,
-           facility_id_to_name: facility_id_to_name,
-           now: now
-         } = t
+         alert,
+         %__MODULE__{} = t
        ) do
-    facility = get_informed_facility(entities, facility_id_to_name)
+    parent_station_id = parent_station_id(t)
 
     %DetailPage{
-      header_text: header,
-      icons: Map.fetch!(station_id_to_icons, parent_station_id(t)),
-      elevator_closure: serialize_closure(alert, facility, now)
+      station: serialize_station({parent_station_id, [alert]}, t)
     }
   end
 
@@ -387,7 +377,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     }
   end
 
-  def slot_names(_instance), do: [:main_content_right]
+  def slot_names(_instance), do: [:lower_right]
 
   def widget_type(_instance), do: :elevator_status
 
