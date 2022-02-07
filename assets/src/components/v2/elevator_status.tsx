@@ -76,9 +76,9 @@ const ElevatorStatus: ComponentType<Props> = ({
   let pageToRender;
   if (page == null) return null;
   if (instanceOfDetailPage(page)) {
-    pageToRender = <DetailPageComponent detailPage={page as DetailPage} />;
+    pageToRender = <DetailPageComponent {...(page as DetailPage)} />;
   } else if (instanceOfListPage(page)) {
-    pageToRender = <ListPageComponent listPage={page as ListPage} />;
+    pageToRender = <ListPageComponent {...(page as ListPage)} />;
   } else {
     return null;
   }
@@ -111,43 +111,97 @@ const instanceOfListPage = (page: Page): page is ListPage => {
   return (page as ListPage).stations !== undefined;
 };
 
-interface DetailPageProps {
-  detailPage: DetailPage;
-}
+const getLocationHeadingIcon = (isAtHomeStop: boolean, happeningNow: boolean) =>
+  isAtHomeStop && happeningNow ? (
+    <img
+      className="detail-page__closure-heading-icon"
+      src="/images/elevator-status-outage-red.svg"
+    />
+  ) : (
+    <img
+      className="detail-page__closure-heading-icon"
+      src="/images/elevator-status-outage-black.svg"
+    />
+  );
 
-const DetailPageComponent: ComponentType<DetailPageProps> = ({
-  detailPage,
-}) => {
+const getRouteModeHereIcons = (isAtHomeStop: boolean, icons: Icon[]) =>
+  isAtHomeStop ? (
+    <img
+      className="detail-page__closure-you-are-here-icon"
+      src="/images/elevator-status-you-are-here.svg"
+    />
+  ) : (
+    // <div className="detail-page__closure-route-mode-icons">ICONS GO HERE</div>
+    icons.map((icon) => (
+      <img
+        className="detail-page__closure-route-mode-icons"
+        src={"/images/elevator-status-" + icon + ".svg"}
+      />
+    ))
+  );
+
+const getTimeframeHeadingIcon = (
+  isAtHomeStop: boolean,
+  happeningNow: boolean
+) =>
+  isAtHomeStop && happeningNow ? (
+    <img
+      className="detail-page__closure-heading-icon"
+      src="/images/elevator-status-alert-red.svg"
+    />
+  ) : isAtHomeStop ? (
+    <img
+      className="detail-page__closure-heading-icon"
+      src="/images/elevator-status-alert-black.svg"
+    />
+  ) : (
+    <img
+      className="detail-page__closure-heading-icon"
+      src="/images/elevator-status-alert-gray.svg"
+    />
+  );
+
+const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
   const {
-    station: {
-      is_at_home_stop: isAtHomeStop,
-      name,
-      icons,
-      elevator_closures: elevatorClosures,
-    },
-  } = detailPage;
+    is_at_home_stop: isAtHomeStop,
+    name,
+    icons,
+    elevator_closures: elevatorClosures,
+  } = station;
   const {
     header_text: headerText,
     description,
     timeframe,
   } = elevatorClosures[0];
+
+  const { happening_now: happeningNow } = timeframe;
+
   return (
     <div className="detail-page">
       <div className="detail-page__closure">
         <div className="detail-page__closure-location">
-          <div className="detail-page__closure-icon">
-            <img src="/images/elevator-status-outage-black.svg" />
+          <div className="detail-page__closure-heading-icon-container">
+            {getLocationHeadingIcon(isAtHomeStop, happeningNow)}
           </div>
           <div className="detail-page__closure-location-text">
             {isAtHomeStop ? "At this station" : name}
           </div>
-          <img src="/images/elevator-status-you-are-here.svg" />
+          <div className="detail-page__closure-route-mode-here-icon-container">
+            {getRouteModeHereIcons(false, icons)}
+          </div>
         </div>
         <div className="detail-page__closure-header">{headerText}</div>
-        <div className="detail-page__timeframe">
-          <img src="/images/elevator-status-alert-black.svg" />
+        <div
+          className={
+            "detail-page__timeframe" +
+            (isAtHomeStop && happeningNow ? " text-red" : "")
+          }
+        >
+          <div className="detail-page__closure-heading-icon-container">
+            {getTimeframeHeadingIcon(isAtHomeStop, happeningNow)}
+          </div>
           <div className="detail-page__timeframe-text-start">
-            {timeframe.happening_now ? "NOW" : "Upcoming"}
+            {happeningNow ? "NOW" : "Upcoming"}
           </div>
           <div className="detail-page__timeframe-text-end">
             Until further notice
