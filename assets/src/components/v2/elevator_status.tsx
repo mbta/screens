@@ -1,4 +1,5 @@
 import React, { ComponentType, useEffect, useState } from "react";
+import { classWithModifier } from "Util/util";
 import FlexZonePageIndicator from "./flex/page_indicator";
 
 type Page = ListPage | DetailPage;
@@ -178,7 +179,12 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
 
   return (
     <div className="detail-page">
-      <div className="detail-page__closure">
+      <div
+        className={classWithModifier(
+          "detail-page__closure",
+          isAtHomeStop && happeningNow ? "active-at-home" : ""
+        )}
+      >
         <div className="detail-page__closure-location">
           <div className="detail-page__closure-heading-icon-container">
             {getLocationHeadingIcon(isAtHomeStop, happeningNow)}
@@ -187,7 +193,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
             {isAtHomeStop ? "At this station" : name}
           </div>
           <div className="detail-page__closure-route-mode-here-icon-container">
-            {getRouteModeHereIcons(false, icons)}
+            {getRouteModeHereIcons(isAtHomeStop, icons)}
           </div>
         </div>
         <div className="detail-page__closure-header">{headerText}</div>
