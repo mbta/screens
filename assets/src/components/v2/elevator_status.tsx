@@ -115,12 +115,12 @@ const instanceOfListPage = (page: Page): page is ListPage => {
 const getLocationHeadingIcon = (isAtHomeStop: boolean, happeningNow: boolean) =>
   isAtHomeStop && happeningNow ? (
     <img
-      className="detail-page__closure-heading-icon"
+      className="detail-page__closure-outage-icon"
       src="/images/elevator-status-outage-red.svg"
     />
   ) : (
     <img
-      className="detail-page__closure-heading-icon"
+      className="detail-page__closure-outage-icon"
       src="/images/elevator-status-outage-black.svg"
     />
   );
@@ -147,18 +147,18 @@ const getTimeframeHeadingIcon = (
 ) =>
   isAtHomeStop && happeningNow ? (
     <img
-      className="detail-page__closure-heading-icon"
+      className="detail-page__closure-alert-icon"
       src="/images/elevator-status-alert-red.svg"
     />
   ) : isAtHomeStop ? (
     <img
-      className="detail-page__closure-heading-icon"
-      src="/images/elevator-status-alert-black.svg"
+      className="detail-page__closure-alert-icon"
+      src="/images/elevator-status-alert-gray.svg"
     />
   ) : (
     <img
-      className="detail-page__closure-heading-icon"
-      src="/images/elevator-status-alert-gray.svg"
+      className="detail-page__closure-alert-icon"
+      src="/images/elevator-status-alert-black.svg"
     />
   );
 
@@ -186,7 +186,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
         )}
       >
         <div className="detail-page__closure-location">
-          <div className="detail-page__closure-heading-icon-container">
+          <div className="detail-page__closure-outage-icon-container">
             {getLocationHeadingIcon(isAtHomeStop, happeningNow)}
           </div>
           <div className="detail-page__closure-location-text">
@@ -203,7 +203,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
             (isAtHomeStop && happeningNow ? " text-red" : "")
           }
         >
-          <div className="detail-page__closure-heading-icon-container">
+          <div className="detail-page__closure-alert-icon-container">
             {getTimeframeHeadingIcon(isAtHomeStop, happeningNow)}
           </div>
           <div className="detail-page__timeframe-text-start">
