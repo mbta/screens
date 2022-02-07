@@ -2,11 +2,13 @@ defmodule Screens.Config.V2.ElevatorStatus do
   @moduledoc false
 
   @type t :: %__MODULE__{
-          parent_station_id: String.t()
+          parent_station_id: String.t(),
+          platform_stop_ids: list(String.t())
         }
 
-  @enforce_keys [:parent_station_id]
-  defstruct parent_station_id: nil
+  @enforce_keys [:parent_station_id, :platform_stop_ids]
+  defstruct parent_station_id: nil,
+            platform_stop_ids: nil
 
   use Screens.Config.Struct
 
