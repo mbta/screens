@@ -101,6 +101,16 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     parent_station_id
   end
 
+  def platform_stop_ids(%__MODULE__{
+        screen: %Screen{
+          app_params: %PreFare{
+            elevator_status: %ElevatorStatus{platform_stop_ids: platform_stop_ids}
+          }
+        }
+      }) do
+    platform_stop_ids
+  end
+
   defp get_active_at_home_station(%__MODULE__{alerts: alerts} = t) do
     alerts
     |> Enum.filter(&active_at_home_station?(&1, t))
@@ -178,8 +188,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
          %__MODULE__{now: now, stop_sequences: stop_sequences} = t
        ) do
-    stations = get_stations_from_entities(entities)
+    stations = for %{stop: stop} <- entities, do: stop
     parent_station_id = parent_station_id(t)
+    platform_stop_ids = platform_stop_ids(t)
 
     flat_stop_sequences =
       stop_sequences
@@ -187,7 +198,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     Alert.happening_now?(alert, now) and
       Enum.any?(stations, fn station ->
-        station in flat_stop_sequences and station != parent_station_id
+        station != parent_station_id and station not in platform_stop_ids and
+          station in flat_stop_sequences
       end)
   end
 
