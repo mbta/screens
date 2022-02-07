@@ -57,7 +57,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   @type timeframe :: %{
           happening_now: boolean(),
-          active_period: list()
+          active_period: map()
         }
 
   @type closure :: %{
@@ -276,9 +276,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   end
 
   defp serialize_timeframe(%Alert{active_period: active_period} = alert, now) do
+    next_active_period = List.first(active_period)
+
     %{
       happening_now: Alert.happening_now?(alert, now),
-      active_period: Enum.map(active_period, &Alert.ap_to_map/1)
+      active_period: Alert.ap_to_map(next_active_period)
     }
   end
 

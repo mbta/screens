@@ -25,7 +25,7 @@ interface Closure {
   header_text: string;
   timeframe: {
     happening_now: boolean;
-    active_period: ActivePeriod[];
+    active_period: ActivePeriod;
   };
   description: string;
 }
@@ -175,7 +175,8 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
     timeframe,
   } = elevatorClosures[0];
 
-  const { happening_now: happeningNow } = timeframe;
+  const { happening_now: happeningNow, active_period: activePeriod } =
+    timeframe;
 
   return (
     <div className="detail-page">
@@ -210,7 +211,9 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
             {happeningNow ? "NOW" : "Upcoming"}
           </div>
           <div className="detail-page__timeframe-text-end">
-            Until further notice
+            {activePeriod.end === null
+              ? "Until further notice"
+              : activePeriod.start}
           </div>
         </div>
         <div className="detail-page__description">{description}</div>
