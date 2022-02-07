@@ -279,9 +279,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
         serialize_closure(alert, facility, now)
       end)
 
+    icons =
+      station_id_to_icons
+      |> Map.fetch!(parent_station_id)
+      |> Enum.take(3)
+
     %{
       name: station_name,
-      icons: Map.fetch!(station_id_to_icons, parent_station_id),
+      icons: icons,
       elevator_closures: closures,
       is_at_home_stop: parent_station_id == parent_station_id(t)
     }
