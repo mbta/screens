@@ -241,7 +241,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       elevator_name: name,
       elevator_id: id,
       timeframe: serialize_timeframe(alert, now),
-      description: alert.description
+      description: alert.description,
+      header_text: alert.header
     }
   end
 
