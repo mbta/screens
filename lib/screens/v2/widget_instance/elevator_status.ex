@@ -316,13 +316,17 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   end
 
   defp serialize_detail_page(
-         alert,
+         %{informed_entities: entities} = alert,
          %__MODULE__{} = t
        ) do
-    parent_station_id = parent_station_id(t)
+    station =
+      [alert]
+      |> alerts_by_station()
+      |> Enum.map(&serialize_station(&1, t))
+      |> hd()
 
     %DetailPage{
-      station: serialize_station({parent_station_id, [alert]}, t)
+      station: station
     }
   end
 
