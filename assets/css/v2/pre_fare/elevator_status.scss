@@ -48,16 +48,44 @@
   margin-bottom: 8px;
 
   .detail-page__closure {
-    padding-left: 25px;
-    .detail-page__closure-location {
-      display: flex;
-      flex-direction: row;
+    position: relative;
+    padding-left: 100px;
+    .detail-page__closure-heading-icon-container {
+      position: absolute;
+      left: 32px;
+      height: 45px;
+      width: 45px;
+      transform: translateY(10px);
 
+      .detail-page__closure-heading-icon {
+        object-fit: fill;
+      }
+    }
+
+    .detail-page__closure-location {
+      padding-bottom: 12px;
       .detail-page__closure-location-text {
+        display: inline-block;
         font-family: Inter, sans-serif;
         font-size: 48px;
         font-weight: 800;
         line-height: 67px;
+      }
+
+      .detail-page__closure-route-mode-here-icon-container {
+        display: inline-block;
+        padding-left: 30px;
+
+        .detail-page__closure-you-are-here-icon {
+          width: 45px;
+          height: 45px;
+        }
+
+        .detail-page__closure-route-mode-icons {
+          width: 45px;
+          height: 45px;
+          padding-right: 12px;
+        }
       }
     }
 
@@ -66,27 +94,24 @@
       font-size: 32px;
       font-weight: 500;
       line-height: 40px;
-      padding-left: 100px;
+      padding-bottom: 32px;
     }
 
     .detail-page__timeframe {
-      display: flex;
-      flex-direction: row;
-
+      padding-bottom: 24px;
       .detail-page__timeframe-text-start {
+        display: inline-block;
         font-size: 36px;
         font-family: Inter, sans-serif;
         font-weight: 800;
-        line-height: 67px;
-        padding-left: 32px;
         padding-right: 10px;
       }
 
       .detail-page__timeframe-text-end {
+        display: inline-block;
         font-family: Inter, sans-serif;
         font-size: 36px;
         font-weight: 500;
-        line-height: 67px;
         padding-left: 10px;
         padding-right: 32px;
       }
@@ -97,13 +122,6 @@
       font-size: 24px;
       line-height: 32px;
       padding-right: 32px;
-      padding-left: 100px;
     }
-  }
-
-  .detail-page__closure-icon {
-    height: 32px;
-    width: 32px;
-    padding-right: 34px;
   }
 }
