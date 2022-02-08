@@ -3,6 +3,8 @@ import React, { ComponentType, useEffect, useState } from "react";
 import { classWithModifier } from "Util/util";
 import FlexZonePageIndicator from "./flex/page_indicator";
 
+const subwayIcons = ["red", "blue", "orange", "green", "silver"];
+
 type Page = ListPage | DetailPage;
 
 interface DetailPage {
@@ -133,12 +135,14 @@ const getRouteModeHereIcons = (isAtHomeStop: boolean, icons: Icon[]) =>
       src="/images/elevator-status-you-are-here.svg"
     />
   ) : (
-    icons.map((icon) => (
-      <img
-        className="detail-page__closure-route-mode-icons"
-        src={"/images/elevator-status-" + icon + ".svg"}
-      />
-    ))
+    icons
+      .sort((i1) => (subwayIcons.includes(i1) ? -1 : 1))
+      .map((icon) => (
+        <img
+          className="detail-page__closure-route-mode-icons"
+          src={"/images/elevator-status-" + icon + ".svg"}
+        />
+      ))
   );
 
 const getTimeframeHeadingIcon = (
