@@ -316,7 +316,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   end
 
   defp serialize_detail_page(
-         %{informed_entities: entities} = alert,
+         alert,
          %__MODULE__{} = t
        ) do
     station =
