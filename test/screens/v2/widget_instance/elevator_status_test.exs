@@ -10,7 +10,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
     %{
       instance: %WidgetInstance.ElevatorStatus{
         screen: %Screen{
-          app_params: %PreFare{elevator_status: %ElevatorStatus{parent_station_id: "place-foo"}},
+          app_params: %PreFare{
+            elevator_status: %ElevatorStatus{
+              parent_station_id: "place-foo",
+              platform_stop_ids: []
+            }
+          },
           vendor: nil,
           device_id: nil,
           name: nil,
@@ -40,7 +45,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       },
       one_active_at_home_instance: %WidgetInstance.ElevatorStatus{
         screen: %Screen{
-          app_params: %PreFare{elevator_status: %ElevatorStatus{parent_station_id: "place-foo"}},
+          app_params: %PreFare{
+            elevator_status: %ElevatorStatus{
+              parent_station_id: "place-foo",
+              platform_stop_ids: []
+            }
+          },
           vendor: nil,
           device_id: nil,
           name: nil,
@@ -63,7 +73,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       },
       one_active_elsewhere_instance: %WidgetInstance.ElevatorStatus{
         screen: %Screen{
-          app_params: %PreFare{elevator_status: %ElevatorStatus{parent_station_id: "place-foo"}},
+          app_params: %PreFare{
+            elevator_status: %ElevatorStatus{
+              parent_station_id: "place-foo",
+              platform_stop_ids: []
+            }
+          },
           vendor: nil,
           device_id: nil,
           name: nil,
@@ -86,7 +101,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       },
       one_upcoming_at_home_instance: %WidgetInstance.ElevatorStatus{
         screen: %Screen{
-          app_params: %PreFare{elevator_status: %ElevatorStatus{parent_station_id: "place-foo"}},
+          app_params: %PreFare{
+            elevator_status: %ElevatorStatus{
+              parent_station_id: "place-foo",
+              platform_stop_ids: []
+            }
+          },
           vendor: nil,
           device_id: nil,
           name: nil,
@@ -109,7 +129,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       },
       one_active_on_connecting_line_instance: %WidgetInstance.ElevatorStatus{
         screen: %Screen{
-          app_params: %PreFare{elevator_status: %ElevatorStatus{parent_station_id: "place-foo"}},
+          app_params: %PreFare{
+            elevator_status: %ElevatorStatus{
+              parent_station_id: "place-foo",
+              platform_stop_ids: []
+            }
+          },
           vendor: nil,
           device_id: nil,
           name: nil,
@@ -146,19 +171,26 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       expected_result = %{
         pages: [
           %Screens.V2.WidgetInstance.ElevatorStatus.DetailPage{
-            elevator_closure: %{
-              description: nil,
-              elevator_id: "1",
-              elevator_name: "Elevator 1",
-              timeframe: %{
-                active_period: [
-                  %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
-                ],
-                happening_now: true
-              }
-            },
-            header_text: nil,
-            icons: [:red]
+            station: %{
+              name: "Foo Station",
+              icons: [:red],
+              is_at_home_stop: true,
+              elevator_closures: [
+                %{
+                  description: nil,
+                  elevator_id: "1",
+                  elevator_name: "Elevator 1",
+                  timeframe: %{
+                    active_period: %{
+                      "start" => "2022-01-01T00:00:00Z",
+                      "end" => "2022-01-01T22:00:00Z"
+                    },
+                    happening_now: true
+                  },
+                  header_text: nil
+                }
+              ]
+            }
           },
           %Screens.V2.WidgetInstance.ElevatorStatus.ListPage{
             stations: [
@@ -172,11 +204,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     timeframe: %{
-                      active_period: [
-                        %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
-                      ],
+                      active_period: %{
+                        "start" => "2022-01-01T00:00:00Z",
+                        "end" => "2022-01-01T22:00:00Z"
+                      },
                       happening_now: true
-                    }
+                    },
+                    header_text: nil
                   }
                 ]
               }
@@ -205,11 +239,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     timeframe: %{
-                      active_period: [
-                        %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
-                      ],
+                      active_period: %{
+                        "start" => "2022-01-01T00:00:00Z",
+                        "end" => "2022-01-01T22:00:00Z"
+                      },
                       happening_now: true
-                    }
+                    },
+                    header_text: nil
                   }
                 ]
               }
@@ -227,19 +263,26 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       expected_result = %{
         pages: [
           %Screens.V2.WidgetInstance.ElevatorStatus.DetailPage{
-            elevator_closure: %{
-              description: nil,
-              elevator_id: "1",
-              elevator_name: "Elevator 1",
-              timeframe: %{
-                active_period: [
-                  %{"start" => "2022-02-01T00:00:00Z", "end" => "2022-02-01T22:00:00Z"}
-                ],
-                happening_now: false
-              }
-            },
-            header_text: nil,
-            icons: [:red]
+            station: %{
+              name: "Foo Station",
+              icons: [:red],
+              is_at_home_stop: true,
+              elevator_closures: [
+                %{
+                  description: nil,
+                  elevator_id: "1",
+                  elevator_name: "Elevator 1",
+                  timeframe: %{
+                    active_period: %{
+                      "start" => "2022-02-01T00:00:00Z",
+                      "end" => "2022-02-01T22:00:00Z"
+                    },
+                    happening_now: false
+                  },
+                  header_text: nil
+                }
+              ]
+            }
           }
         ]
       }
@@ -264,30 +307,39 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     timeframe: %{
-                      active_period: [
-                        %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
-                      ],
+                      active_period: %{
+                        "start" => "2022-01-01T00:00:00Z",
+                        "end" => "2022-01-01T22:00:00Z"
+                      },
                       happening_now: true
-                    }
+                    },
+                    header_text: nil
                   }
                 ]
               }
             ]
           },
           %Screens.V2.WidgetInstance.ElevatorStatus.DetailPage{
-            elevator_closure: %{
-              description: nil,
-              elevator_id: "1",
-              elevator_name: "Elevator 1",
-              timeframe: %{
-                active_period: [
-                  %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
-                ],
-                happening_now: true
-              }
-            },
-            header_text: nil,
-            icons: [:red]
+            station: %{
+              name: "Bar Station",
+              icons: [:red],
+              is_at_home_stop: false,
+              elevator_closures: [
+                %{
+                  description: nil,
+                  elevator_id: "1",
+                  elevator_name: "Elevator 1",
+                  timeframe: %{
+                    active_period: %{
+                      "start" => "2022-01-01T00:00:00Z",
+                      "end" => "2022-01-01T22:00:00Z"
+                    },
+                    happening_now: true
+                  },
+                  header_text: nil
+                }
+              ]
+            }
           }
         ]
       }
@@ -299,19 +351,26 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       expected_result = %{
         pages: [
           %Screens.V2.WidgetInstance.ElevatorStatus.DetailPage{
-            elevator_closure: %{
-              description: nil,
-              elevator_id: "1",
-              elevator_name: "Elevator 1",
-              timeframe: %{
-                active_period: [
-                  %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
-                ],
-                happening_now: true
-              }
-            },
-            header_text: nil,
-            icons: [:red]
+            station: %{
+              name: "Foo Station",
+              icons: [:red],
+              is_at_home_stop: true,
+              elevator_closures: [
+                %{
+                  description: nil,
+                  elevator_id: "1",
+                  elevator_name: "Elevator 1",
+                  timeframe: %{
+                    active_period: %{
+                      "start" => "2022-01-01T00:00:00Z",
+                      "end" => "2022-01-01T22:00:00Z"
+                    },
+                    happening_now: true
+                  },
+                  header_text: nil
+                }
+              ]
+            }
           },
           %Screens.V2.WidgetInstance.ElevatorStatus.ListPage{
             stations: [
@@ -325,11 +384,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     timeframe: %{
-                      active_period: [
-                        %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
-                      ],
+                      active_period: %{
+                        "start" => "2022-01-01T00:00:00Z",
+                        "end" => "2022-01-01T22:00:00Z"
+                      },
                       happening_now: true
-                    }
+                    },
+                    header_text: nil
                   }
                 ]
               },
@@ -343,11 +404,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     timeframe: %{
-                      active_period: [
-                        %{"start" => "2022-01-01T00:00:00Z", "end" => "2022-01-01T22:00:00Z"}
-                      ],
+                      active_period: %{
+                        "start" => "2022-01-01T00:00:00Z",
+                        "end" => "2022-01-01T22:00:00Z"
+                      },
                       happening_now: true
-                    }
+                    },
+                    header_text: nil
                   }
                 ]
               }
@@ -361,8 +424,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   end
 
   describe "slot_names/1" do
-    test "returns main_content_right", %{instance: instance} do
-      assert [:main_content_right] == WidgetInstance.slot_names(instance)
+    test "returns lower_right", %{instance: instance} do
+      assert [:lower_right] == WidgetInstance.slot_names(instance)
     end
   end
 
