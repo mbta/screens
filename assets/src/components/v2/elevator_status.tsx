@@ -1,3 +1,4 @@
+import moment from "moment";
 import React, { ComponentType, useEffect, useState } from "react";
 import { classWithModifier } from "Util/util";
 import FlexZonePageIndicator from "./flex/page_indicator";
@@ -132,7 +133,6 @@ const getRouteModeHereIcons = (isAtHomeStop: boolean, icons: Icon[]) =>
       src="/images/elevator-status-you-are-here.svg"
     />
   ) : (
-    // <div className="detail-page__closure-route-mode-icons">ICONS GO HERE</div>
     icons.map((icon) => (
       <img
         className="detail-page__closure-route-mode-icons"
@@ -161,6 +161,44 @@ const getTimeframeHeadingIcon = (
       src="/images/elevator-status-alert-black.svg"
     />
   );
+
+const getTimeframeEndText = (
+  happeningNow: boolean,
+  activePeriod: ActivePeriod
+) => {
+  let endText: String = "";
+  if (happeningNow) {
+    if (activePeriod.end === null) {
+      endText = "Until further notice";
+    } else {
+      const endDate = moment(activePeriod.end).tz("America/New_York");
+
+      if (endDate.date() === moment().tz("America/New_York").date()) {
+        endText = "Until later today";
+      } else {
+        endText = `Until ${endDate.format("MMM D")}`;
+      }
+    }
+  } else {
+    const startDate = moment(activePeriod.start).tz("America/New_York");
+    if (activePeriod.end === null) {
+      endText = `Starting ${startDate.format("MMM D")}`;
+    } else {
+      const endDate = moment(activePeriod.end).tz("America/New_York");
+      if (startDate.month() === endDate.month()) {
+        if (startDate.day() === endDate.day()) {
+          endText = `${startDate.format("MMM D")}`;
+        } else {
+          endText = `${startDate.format("MMM D")}-${endDate.format("D")}`;
+        }
+      } else {
+        endText = `${startDate.format("MMM D")} - ${endDate.format("MMM D")}`;
+      }
+    }
+  }
+
+  return endText;
+};
 
 const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
   const {
@@ -211,9 +249,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
             {happeningNow ? "NOW" : "Upcoming"}
           </div>
           <div className="detail-page__timeframe-text-end">
-            {activePeriod.end === null
-              ? "Until further notice"
-              : activePeriod.start}
+            {getTimeframeEndText(happeningNow, activePeriod)}
           </div>
         </div>
         <div className="detail-page__description">{description}</div>
