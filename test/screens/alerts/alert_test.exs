@@ -17,7 +17,8 @@ defmodule Screens.Alerts.AlertTest do
         "lifecycle" => nil,
         "severity" => nil,
         "timeframe" => nil,
-        "url" => nil
+        "url" => nil,
+        "description" => nil
       }
     }
   end

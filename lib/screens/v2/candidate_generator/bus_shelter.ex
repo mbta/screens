@@ -9,7 +9,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
 
-  alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader, SubwayStatus}
+  alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader}
 
   alias Screens.V2.WidgetInstance.Survey, as: SurveyInstance
 
@@ -52,28 +52,20 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
         fetch_stop_name_fn \\ &fetch_stop_name/1,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/1,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
-        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
+        subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/1
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
       fn -> departures_instances_fn.(config) end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
-      fn -> subway_status_instances(config) end,
+      fn -> subway_status_instances_fn.(config) end,
       fn -> evergreen_content_instances_fn.(config) end,
       fn -> survey_instances(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
-  end
-
-  defp subway_status_instances(config) do
-    route_ids = ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E"]
-
-    case Screens.Alerts.Alert.fetch(route_ids: route_ids) do
-      {:ok, alerts} -> [%SubwayStatus{screen: config, subway_alerts: alerts}]
-      :error -> []
-    end
   end
 
   defp header_instances(config, now, fetch_stop_name_fn) do

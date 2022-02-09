@@ -4,12 +4,12 @@ import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
   header_right: WidgetData;
-  body: WidgetData;
+  body_right: WidgetData;
 }
 
 const NormalScreenRight: React.ComponentType<Props> = ({
   header_right,
-  body,
+  body_right: bodyRight,
 }) => {
   return (
     <div className="screen-normal">
@@ -17,7 +17,7 @@ const NormalScreenRight: React.ComponentType<Props> = ({
         <Widget data={header_right} />
       </div>
       <div className="screen-normal__body">
-        <Widget data={body} />
+        <Widget data={bodyRight} />
       </div>
     </div>
   );
