@@ -30,23 +30,8 @@
   }
 }
 
-.body-normal__main-content {
-  .evergreen-content-video,
-  .looping-video {
-    width: 480px;
-    height: 580px;
-  }
-}
-
-.body-normal__footer {
-  .evergreen-content-video,
-  .looping-video {
-    width: 1080px;
-    height: 156px;
-  }
-}
-
-.body-takeover__full-body {
+.body-takeover-left__full-body,
+.body-takeover-right__full-body {
   .evergreen-content-video,
   .looping-video {
     width: 1080px;
@@ -62,7 +47,8 @@
   }
 }
 
-.screen-takeover__full-screen {
+.screen-takeover-left__full-screen,
+.screen-takeover-right__full-screen {
   .evergreen-content-video,
   .looping-video {
     width: 1080px;
