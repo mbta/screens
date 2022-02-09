@@ -13,10 +13,10 @@ const NormalBodyRight: React.ComponentType<Props> = ({
 }) => {
   return (
     <div className="body-normal-right">
-      <div className="body-normal-right__secondary-content">
+      <div className="body-normal-right__upper">
         <Widget data={upperRight} />
       </div>
-      <div className="body-normal-right__main-content">
+      <div className="body-normal-right__lower">
         <Widget data={lowerRight} />
       </div>
     </div>
