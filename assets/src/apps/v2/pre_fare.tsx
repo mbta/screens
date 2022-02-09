@@ -21,15 +21,29 @@ import NormalBodyRight from "Components/v2/pre_fare/normal_body_right";
 import NormalHeaderLeft from "Components/v2/pre_fare/normal_header_left";
 import NormalHeaderRight from "Components/v2/pre_fare/normal_header_right";
 import TopLevelSwitch from "Components/v2/pre_fare/top_level_switch";
+import OneLarge from "Components/v2/pre_fare/flex/one_large";
+import TwoMedium from "Components/v2/pre_fare/flex/two_medium";
+import NormalBodyLeft from "Components/v2/pre_fare/normal_body_left";
+import BodyTakeoverLeft from "Components/v2/pre_fare/body_takeover_left";
+import BodyTakeoverRight from "Components/v2/pre_fare/body_takeover_right";
+import ScreenTakeoverLeft from "Components/v2/pre_fare/screen_takeover_left";
+import ScreenTakeoverRight from "Components/v2/pre_fare/screen_takeover_right";
 
 const TYPE_TO_COMPONENT = {
   screen_normal_left: NormalScreenLeft,
   screen_normal_right: NormalScreenRight,
-  placeholder: Placeholder,
+  body_normal_left: NormalBodyLeft,
+  body_normal_right: NormalBodyRight,
   header_left: NormalHeaderLeft,
-  body_normal: NormalBodyRight,
   header_right: NormalHeaderRight,
   top_level: TopLevelSwitch,
+  one_large: OneLarge,
+  two_medium: TwoMedium,
+  body_takeover_left: BodyTakeoverLeft,
+  body_takeover_right: BodyTakeoverRight,
+  screen_takeover_left: ScreenTakeoverLeft,
+  screen_takeover_right: ScreenTakeoverRight,
+  placeholder: Placeholder,
 };
 
 const DISABLED_LAYOUT = {
