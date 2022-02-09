@@ -1,0 +1,20 @@
+.flex-two-medium {
+  position: relative;
+  z-index: 2;
+}
+
+.flex-two-medium__left {
+  position: absolute;
+  top: 24px;
+  left: 40px;
+  width: 480px;
+  height: 580px;
+}
+
+.flex-two-medium__right {
+  position: absolute;
+  top: 24px;
+  left: 560px;
+  width: 480px;
+  height: 580px;
+}

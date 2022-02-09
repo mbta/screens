@@ -1,0 +1,12 @@
+.flex-one-large {
+  position: relative;
+  z-index: 2;
+}
+
+.flex-one-large__large {
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  width: 1024px;
+  height: 576px;
+}
