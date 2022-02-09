@@ -77,12 +77,14 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       %Placeholder{color: :green, slot_names: [:header_left]},
       %Placeholder{color: :blue, slot_names: [:header_right]},
       %Placeholder{color: :red, slot_names: [:main_content_left]},
-      %Placeholder{color: :yellow, slot_names: [:body_placeholder]},
-      %Placeholder{color: :red, slot_names: [:secondary_content]},
-      %Placeholder{color: :black, slot_names: [:main_content_right]},
+      %Placeholder{color: :red, slot_names: [:large]},
+      %Placeholder{color: :red, slot_names: [:medium_left]},
+      %Placeholder{color: :red, slot_names: [:medium_right]},
+      %Placeholder{color: :black, slot_names: [:lower_right]},
       %Placeholder{color: :gray, slot_names: [:full_screen_right]},
       %Placeholder{color: :gray, slot_names: [:full_screen_left]},
-      %Placeholder{color: :orange, slot_names: [:full_body]}
+      %Placeholder{color: :orange, slot_names: [:full_body_left]},
+      %Placeholder{color: :orange, slot_names: [:full_body_right]}
     ]
   end
 end
