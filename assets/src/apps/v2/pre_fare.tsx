@@ -18,17 +18,15 @@ import Placeholder from "Components/v2/placeholder";
 import NormalScreenLeft from "Components/v2/pre_fare/normal_screen_left";
 import NormalScreenRight from "Components/v2/pre_fare/normal_screen_right";
 import NormalBodyRight from "Components/v2/pre_fare/normal_body_right";
-import NormalHeaderLeft from "Components/v2/pre_fare/normal_header_left";
-import NormalHeaderRight from "Components/v2/pre_fare/normal_header_right";
+import NormalHeader from "Components/v2/pre_fare/normal_header";
 import TopLevelSwitch from "Components/v2/pre_fare/top_level_switch";
 
 const TYPE_TO_COMPONENT = {
   screen_normal_left: NormalScreenLeft,
   screen_normal_right: NormalScreenRight,
   placeholder: Placeholder,
-  header_left: NormalHeaderLeft,
   body_normal: NormalBodyRight,
-  header_right: NormalHeaderRight,
+  normal_header: NormalHeader,
   top_level: TopLevelSwitch,
 };
 

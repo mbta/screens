@@ -1,10 +1,13 @@
 defmodule Screens.V2.CandidateGenerator.PreFare do
   @moduledoc false
 
+  alias Screens.Config.Screen
+  alias Screens.Config.V2.PreFare
+  alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.Placeholder
+  alias Screens.V2.WidgetInstance.{Placeholder, NormalHeader}
 
   @behaviour CandidateGenerator
 
@@ -62,15 +65,26 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         now \\ DateTime.utc_now(),
         elevator_status_instances_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2
       ) do
-    [fn -> elevator_status_instances_fn.(config, now) end, fn -> placeholder_instances() end]
+    [
+      fn -> header_instances(config, now) end,
+      fn -> elevator_status_instances_fn.(config, now) end,
+      fn -> placeholder_instances() end
+    ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
+  defp header_instances(config, now) do
+    %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}} = config
+
+    [
+      %NormalHeader{screen: config, text: stop_id, time: now, slot_name: :header_left},
+      %NormalHeader{screen: config, text: stop_id, time: now, slot_name: :header_right}
+    ]
+  end
+
   defp placeholder_instances do
     [
-      %Placeholder{color: :green, slot_names: [:header_left]},
-      %Placeholder{color: :blue, slot_names: [:header_right]},
       %Placeholder{color: :red, slot_names: [:main_content_left]},
       %Placeholder{color: :yellow, slot_names: [:body_placeholder]},
       %Placeholder{color: :red, slot_names: [:secondary_content]},
