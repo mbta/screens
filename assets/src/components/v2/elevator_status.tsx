@@ -84,7 +84,7 @@ const ElevatorStatus: ComponentType<Props> = ({
   } else if (instanceOfListPage(page)) {
     pageToRender = <ListPageComponent {...(page as ListPage)} />;
   } else {
-    return null;
+    throw new Error("Unknown or null ElevatorStatus page.");
   }
 
   return (
