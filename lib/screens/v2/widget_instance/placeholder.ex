@@ -1,8 +1,8 @@
 defmodule Screens.V2.WidgetInstance.Placeholder do
   @moduledoc false
 
-  alias Screens.V2.WidgetInstance.Placeholder
   alias Screens.V2.WidgetInstance
+  alias Screens.V2.WidgetInstance.Placeholder
 
   defstruct color: nil,
             slot_names: [],
