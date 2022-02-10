@@ -115,7 +115,13 @@ const instanceOfListPage = (page: Page): page is ListPage => {
   return (page as ListPage).stations !== undefined;
 };
 
-const getLocationHeadingIcon = (isAtHomeStop: boolean, happeningNow: boolean) =>
+const LocationHeadingIcon = ({
+  isAtHomeStop,
+  happeningNow,
+}: {
+  isAtHomeStop: boolean;
+  happeningNow: boolean;
+}): JSX.Element =>
   isAtHomeStop && happeningNow ? (
     <img
       className="detail-page__closure-outage-icon"
@@ -128,27 +134,38 @@ const getLocationHeadingIcon = (isAtHomeStop: boolean, happeningNow: boolean) =>
     />
   );
 
-const getRouteModeHereIcons = (isAtHomeStop: boolean, icons: Icon[]) =>
+const RouteModeHereIcon = ({
+  isAtHomeStop,
+  icons,
+}: {
+  isAtHomeStop: boolean;
+  icons: Icon[];
+}): JSX.Element =>
   isAtHomeStop ? (
     <img
       className="detail-page__closure-you-are-here-icon"
       src="/images/elevator-status-you-are-here.svg"
     />
   ) : (
-    icons
-      .sort((i1) => (subwayIcons.includes(i1) ? -1 : 1))
-      .map((icon) => (
-        <img
-          className="detail-page__closure-route-mode-icons"
-          src={"/images/elevator-status-" + icon + ".svg"}
-        />
-      ))
+    <>
+      {icons
+        .sort((i1) => (subwayIcons.includes(i1) ? -1 : 1))
+        .map((icon) => (
+          <img
+            className="detail-page__closure-route-mode-icons"
+            src={"/images/elevator-status-" + icon + ".svg"}
+          />
+        ))}
+    </>
   );
 
-const getTimeframeHeadingIcon = (
-  isAtHomeStop: boolean,
-  happeningNow: boolean
-) =>
+const TimeframeHeadingIcon = ({
+  isAtHomeStop,
+  happeningNow,
+}: {
+  isAtHomeStop: boolean;
+  happeningNow: boolean;
+}): JSX.Element =>
   isAtHomeStop && happeningNow ? (
     <img
       className="detail-page__closure-alert-icon"
@@ -230,13 +247,16 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
       >
         <div className="detail-page__closure-location">
           <div className="detail-page__closure-outage-icon-container">
-            {getLocationHeadingIcon(isAtHomeStop, happeningNow)}
+            <LocationHeadingIcon
+              isAtHomeStop={isAtHomeStop}
+              happeningNow={happeningNow}
+            />
           </div>
           <div className="detail-page__closure-location-text">
             {isAtHomeStop ? "At this station" : name}
           </div>
           <div className="detail-page__closure-route-mode-here-icon-container">
-            {getRouteModeHereIcons(isAtHomeStop, icons)}
+            <RouteModeHereIcon isAtHomeStop={isAtHomeStop} icons={icons} />
           </div>
         </div>
         <div className="detail-page__closure-header">{headerText}</div>
@@ -247,7 +267,10 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
           }
         >
           <div className="detail-page__closure-alert-icon-container">
-            {getTimeframeHeadingIcon(isAtHomeStop, happeningNow)}
+            <TimeframeHeadingIcon
+              isAtHomeStop={isAtHomeStop}
+              happeningNow={happeningNow}
+            />
           </div>
           <div className="detail-page__timeframe-text-start">
             {happeningNow ? "NOW" : "Upcoming"}
