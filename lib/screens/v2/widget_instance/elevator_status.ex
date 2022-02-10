@@ -188,7 +188,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
          %__MODULE__{now: now, stop_sequences: stop_sequences} = t
        ) do
-    stations = for %{stop: stop} <- entities, do: stop
+    informed_platforms =
+      for %{stop: stop} when is_binary(stop) <- entities,
+          match?({_n, ""}, Integer.parse(stop)),
+          do: stop
+
     parent_station_id = parent_station_id(t)
     platform_stop_ids = platform_stop_ids(t)
 
@@ -197,7 +201,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       |> List.flatten()
 
     Alert.happening_now?(alert, now) and
-      Enum.any?(stations, fn station ->
+      Enum.any?(informed_platforms, fn station ->
         station != parent_station_id and station not in platform_stop_ids and
           station in flat_stop_sequences
       end)
