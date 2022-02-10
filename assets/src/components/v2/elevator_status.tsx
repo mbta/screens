@@ -243,7 +243,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
         <div
           className={
             "detail-page__timeframe" +
-            (isAtHomeStop && happeningNow ? " text-red" : "")
+            (isAtHomeStop && happeningNow ? " active-here-and-now" : "")
           }
         >
           <div className="detail-page__closure-alert-icon-container">
