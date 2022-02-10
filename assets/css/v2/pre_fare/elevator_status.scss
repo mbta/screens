@@ -70,7 +70,7 @@
         transform: translateY(10px);
 
         .detail-page__closure-outage-icon {
-          object-fit: fill;
+          object-fit: contain;
         }
       }
       .detail-page__closure-location-text {
@@ -117,7 +117,7 @@
         width: 45px;
 
         .detail-page__closure-alert-icon {
-          object-fit: fill;
+          object-fit: contain;
         }
       }
       .detail-page__timeframe-text-start {
