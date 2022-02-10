@@ -1,33 +1,43 @@
 import React from "react";
 
-import Widget, { WidgetData } from "Components/v2/widget";
 import { useLocation } from "react-router-dom";
 
 interface Props {
-  left: WidgetData;
-  right: WidgetData;
+  children: React.ReactChild
 }
 
 type ScreenSide = "left" | "right";
 
-const TopLevelSwitch: React.ComponentType<Props> = ({ left, right }) => {
+/**
+ * Shifts either the left or right side of the screen content into
+ * view, based on a `screen_side` query param.
+ * If the param is missing, this will show the full
+ * screen content (2160px x 1920px).
+ */
+const TopLevelSwitch: React.ComponentType<Props> = ({ children }) => {
   const query = new URLSearchParams(useLocation().search);
-  const screenSide: ScreenSide = query.get("screen_side") as ScreenSide;
+  const screenSide: ScreenSide | null = query.get("screen_side") as ScreenSide;
 
+  let viewportClassName = "pre-fare-screen-viewport";
+  let shifterClassName = "pre-fare-shifter";
   switch (screenSide) {
     case "left":
-      return (
-        <div className="left-screen">
-          <Widget data={left} />
-        </div>
-      );
+      shifterClassName += " pre-fare-shifter--left";
+      break;
     case "right":
-      return (
-        <div className="right-screen">
-          <Widget data={right} />
-        </div>
-      );
+      shifterClassName += " pre-fare-shifter--right";
+      break;
+    default:
+      viewportClassName += " pre-fare-screen-viewport--both";
   }
+
+  return (
+    <div className={viewportClassName}>
+      <div className={shifterClassName}>
+        {children}
+      </div>
+    </div>
+  );
 };
 
 export default TopLevelSwitch;
