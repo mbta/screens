@@ -79,7 +79,6 @@ const ElevatorStatus: ComponentType<Props> = ({
 
   const page = pages[pageIndex];
   let pageToRender;
-  if (page == null) return null;
   if (instanceOfDetailPage(page)) {
     pageToRender = <DetailPageComponent {...(page as DetailPage)} />;
   } else if (instanceOfListPage(page)) {
