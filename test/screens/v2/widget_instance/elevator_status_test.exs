@@ -144,7 +144,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
           %Alert{
             effect: :elevator_closure,
             informed_entities: [
-              %{stop: "place-bar", facility: "1"}
+              %{stop: "place-bar", facility: "1"},
+              %{stop: "123", facility: "1"}
             ],
             active_period: [{~U[2022-01-01T00:00:00Z], ~U[2022-01-01T22:00:00Z]}]
           }
@@ -153,7 +154,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         station_id_to_name: %{"place-bar" => "Bar Station", "place-foo" => "Foo Station"},
         station_id_to_icons: %{"place-bar" => [:red], "place-foo" => [:red]},
         now: ~U[2022-01-01T10:00:00Z],
-        stop_sequences: [["place-foo", "place-bar"]]
+        stop_sequences: [["place-foo", "place-bar", "123"]]
       }
     }
   end
