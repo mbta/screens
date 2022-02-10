@@ -1,6 +1,6 @@
 import moment from "moment";
 import React, { ComponentType, useEffect, useState } from "react";
-import { classWithModifier } from "Util/util";
+import { classWithModifier, imagePath } from "Util/util";
 import FlexZonePageIndicator from "./flex/page_indicator";
 import makePersistent from "./persistent_wrapper";
 
@@ -92,7 +92,7 @@ const ElevatorStatus: ComponentType<Props> = ({
       <div className="elevator-status">
         <div className="elevator-status__header">
           <div className="elevator-status__header-text">Elevator Closures</div>
-          <img src="/images/elevator-status-elevator.svg" />
+          <img src={imagePath("elevator-status-elevator.svg")} />
         </div>
         {pageToRender}
         <div className="elevator-status__footer">
@@ -125,12 +125,12 @@ const LocationHeadingIcon = ({
   isAtHomeStop && happeningNow ? (
     <img
       className="detail-page__closure-outage-icon"
-      src="/images/elevator-status-outage-red.svg"
+      src={imagePath("elevator-status-outage-red.svg")}
     />
   ) : (
     <img
       className="detail-page__closure-outage-icon"
-      src="/images/elevator-status-outage-black.svg"
+      src={imagePath("elevator-status-outage-black.svg")}
     />
   );
 
@@ -144,7 +144,7 @@ const RouteModeHereIcon = ({
   isAtHomeStop ? (
     <img
       className="detail-page__closure-you-are-here-icon"
-      src="/images/elevator-status-you-are-here.svg"
+      src={imagePath("elevator-status-you-are-here.svg")}
     />
   ) : (
     <>
@@ -153,7 +153,7 @@ const RouteModeHereIcon = ({
         .map((icon) => (
           <img
             className="detail-page__closure-route-mode-icons"
-            src={"/images/elevator-status-" + icon + ".svg"}
+            src={imagePath(`elevator-status-${icon}.svg`)}
           />
         ))}
     </>
@@ -169,17 +169,17 @@ const TimeframeHeadingIcon = ({
   isAtHomeStop && happeningNow ? (
     <img
       className="detail-page__closure-alert-icon"
-      src="/images/elevator-status-alert-red.svg"
+      src={imagePath("elevator-status-alert-red.svg")}
     />
   ) : isAtHomeStop ? (
     <img
       className="detail-page__closure-alert-icon"
-      src="/images/elevator-status-alert-gray.svg"
+      src={imagePath("elevator-status-alert-gray.svg")}
     />
   ) : (
     <img
       className="detail-page__closure-alert-icon"
-      src="/images/elevator-status-alert-black.svg"
+      src={imagePath("elevator-status-alert-black.svg")}
     />
   );
 
