@@ -201,9 +201,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       |> List.flatten()
 
     Alert.happening_now?(alert, now) and
-      Enum.any?(informed_platforms, fn station ->
-        station != parent_station_id and station not in platform_stop_ids and
-          station in flat_stop_sequences
+      Enum.any?(informed_platforms, fn platform ->
+        platform != parent_station_id and platform not in platform_stop_ids and
+          platform in flat_stop_sequences
       end)
   end
 
