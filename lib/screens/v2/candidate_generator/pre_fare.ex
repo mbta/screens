@@ -2,12 +2,12 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.PreFare
   alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Config.V2.PreFare
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{Placeholder, NormalHeader}
+  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
 

@@ -3,10 +3,12 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
 
   alias Screens.Config.{Screen, V2}
   alias Screens.V2.CandidateGenerator.PreFare
+  alias Screens.V2.WidgetInstance.NormalHeader
 
   setup do
     config = %Screen{
       app_params: %V2.PreFare{
+        header: %V2.Header.CurrentStopId{stop_id: "Test Station"},
         elevator_status: %V2.ElevatorStatus{parent_station_id: "111"}
       },
       vendor: :gds,
@@ -65,6 +67,39 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
                    }}
                 ]
               }} == PreFare.screen_template()
+    end
+  end
+
+  describe "candidate_instances/3" do
+    test "returns expected header", %{config: config} do
+      now = ~U[2020-04-06T10:00:00Z]
+      elevator_status_instances_fn = fn (_,_) -> [] end
+
+      expected_header = [
+        %NormalHeader{
+          screen: config,
+          icon: nil,
+          text: "Test Station",
+          time: ~U[2020-04-06T10:00:00Z],
+          slot_name: :header_left
+        },
+        %NormalHeader{
+          screen: config,
+          icon: nil,
+          text: "Test Station",
+          time: ~U[2020-04-06T10:00:00Z],
+          slot_name: :header_right
+        }
+      ]
+
+      actual_instances =
+        PreFare.candidate_instances(
+          config,
+          now,
+          elevator_status_instances_fn
+        )
+
+      assert Enum.all?(expected_header, fn x -> x in actual_instances end)
     end
   end
 end
