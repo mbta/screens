@@ -5,14 +5,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{ElevatorStatus, PreFare}
-  alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Config.V2.Header.CurrentStopName
 
   setup do
     %{
       instance: %WidgetInstance.ElevatorStatus{
         screen: %Screen{
           app_params: %PreFare{
-            header: %CurrentStopId{stop_id: "Test Station"},
+            header: %CurrentStopName{stop_name: "Test Station"},
             elevator_status: %ElevatorStatus{parent_station_id: "place-foo"}
           },
           vendor: nil,
@@ -45,7 +45,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       one_active_at_home_instance: %WidgetInstance.ElevatorStatus{
         screen: %Screen{
           app_params: %PreFare{
-            header: %CurrentStopId{stop_id: "Test Station"},
+            header: %CurrentStopName{stop_name: "Test Station"},
             elevator_status: %ElevatorStatus{parent_station_id: "place-foo"}
           },
           vendor: nil,
@@ -71,7 +71,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       one_active_elsewhere_instance: %WidgetInstance.ElevatorStatus{
         screen: %Screen{
           app_params: %PreFare{
-            header: %CurrentStopId{stop_id: "Test Station"},
+            header: %CurrentStopName{stop_name: "Test Station"},
             elevator_status: %ElevatorStatus{parent_station_id: "place-foo"}
           },
           vendor: nil,
@@ -97,7 +97,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       one_upcoming_at_home_instance: %WidgetInstance.ElevatorStatus{
         screen: %Screen{
           app_params: %PreFare{
-            header: %CurrentStopId{stop_id: "Test Station"},
+            header: %CurrentStopName{stop_name: "Test Station"},
             elevator_status: %ElevatorStatus{parent_station_id: "place-foo"}
           },
           vendor: nil,
@@ -123,7 +123,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       one_active_on_connecting_line_instance: %WidgetInstance.ElevatorStatus{
         screen: %Screen{
           app_params: %PreFare{
-            header: %CurrentStopId{stop_id: "Test Station"},
+            header: %CurrentStopName{stop_name: "Test Station"},
             elevator_status: %ElevatorStatus{parent_station_id: "place-foo"}
           },
           vendor: nil,

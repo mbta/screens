@@ -2,7 +2,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Config.V2.Header.CurrentStopName
   alias Screens.Config.V2.PreFare
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
@@ -75,11 +75,11 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   end
 
   defp header_instances(config, now) do
-    %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}} = config
+    %Screen{app_params: %PreFare{header: %CurrentStopName{stop_name: stop_name}}} = config
 
     [
-      %NormalHeader{screen: config, text: stop_id, time: now, slot_name: :header_left},
-      %NormalHeader{screen: config, text: stop_id, time: now, slot_name: :header_right}
+      %NormalHeader{screen: config, text: stop_name, time: now, slot_name: :header_left},
+      %NormalHeader{screen: config, text: stop_name, time: now, slot_name: :header_right}
     ]
   end
 
