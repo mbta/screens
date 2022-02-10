@@ -22,7 +22,6 @@ import NormalHeaderLeft from "Components/v2/pre_fare/normal_header_left";
 import NormalHeaderRight from "Components/v2/pre_fare/normal_header_right";
 import TopLevelSwitch from "Components/v2/pre_fare/top_level_switch";
 import ElevatorStatus from "Components/v2/elevator_status";
-import makePersistent from "Components/v2/persistent_wrapper";
 import OneLarge from "Components/v2/pre_fare/flex/one_large";
 import TwoMedium from "Components/v2/pre_fare/flex/two_medium";
 import NormalBodyLeft from "Components/v2/pre_fare/normal_body_left";
@@ -37,7 +36,7 @@ const TYPE_TO_COMPONENT = {
   body_normal_left: NormalBodyLeft,
   body_normal_right: NormalBodyRight,
   header_left: NormalHeaderLeft,
-  elevator_status: makePersistent(ElevatorStatus),
+  elevator_status: ElevatorStatus,
   header_right: NormalHeaderRight,
   top_level: TopLevelSwitch,
   one_large: OneLarge,

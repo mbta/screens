@@ -2,6 +2,7 @@ import moment from "moment";
 import React, { ComponentType, useEffect, useState } from "react";
 import { classWithModifier } from "Util/util";
 import FlexZonePageIndicator from "./flex/page_indicator";
+import makePersistent from "./persistent_wrapper";
 
 const subwayIcons = ["red", "blue", "orange", "green", "silver"];
 
@@ -270,4 +271,4 @@ const ListPageComponent: ComponentType<ListPageProps> = ({ listPage }) => {
   return null;
 };
 
-export default ElevatorStatus;
+export default makePersistent(ElevatorStatus);
