@@ -73,7 +73,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
   describe "candidate_instances/3" do
     test "returns expected header", %{config: config} do
       now = ~U[2020-04-06T10:00:00Z]
-      elevator_status_instances_fn = fn (_,_) -> [] end
+      elevator_status_instances_fn = fn _, _ -> [] end
 
       expected_header = [
         %NormalHeader{

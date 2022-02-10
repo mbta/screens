@@ -19,7 +19,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
           time: DateTime.t(),
           slot_name: atom() | nil
         }
-  
+
   def serialize(%__MODULE__{icon: icon, text: text, time: time, slot_name: nil} = t) do
     %{icon: icon, text: text, time: DateTime.to_iso8601(time), show_to: showing_destination?(t)}
   end
