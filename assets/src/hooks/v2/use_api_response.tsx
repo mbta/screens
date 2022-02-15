@@ -1,5 +1,4 @@
 import { WidgetData } from "Components/v2/widget";
-import useInterval from "Hooks/use_interval";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -53,15 +52,15 @@ const doFailureBuffer = (
 };
 
 const useQuery = () => {
-  return new URLSearchParams(useLocation().search)
-}
+  return new URLSearchParams(useLocation().search);
+};
 
 const useIsRealScreenParam = () => {
-  const query = useQuery()
-  const isRealScreen = query.get("is_real_screen")
+  const query = useQuery();
+  const isRealScreen = query.get("is_real_screen");
 
-  return isRealScreen === "true" ? "&is_real_screen=true" : ""
-}
+  return isRealScreen === "true" ? "&is_real_screen=true" : "";
+};
 
 interface UseApiResponseArgs {
   id: string;
@@ -71,13 +70,19 @@ interface UseApiResponseArgs {
 const useApiResponse = ({
   id,
   failureModeElapsedMs = MINUTE_IN_MS,
-}: UseApiResponseArgs): { apiResponse: ApiResponse, requestCount: number, lastSuccess: number } => {
-  const isRealScreenParam = useIsRealScreenParam()
+}: UseApiResponseArgs): {
+  apiResponse: ApiResponse;
+  requestCount: number;
+  lastSuccess: number;
+} => {
+  const isRealScreenParam = useIsRealScreenParam();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
-  const { lastRefresh, refreshRate } = document.getElementById("app").dataset;
+  const { lastRefresh, refreshRate, refreshRateOffset } =
+    document.getElementById("app").dataset;
   const refreshMs = parseInt(refreshRate, 10) * 1000;
+  const refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
   const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}${isRealScreenParam}`;
 
   const fetchData = async () => {
@@ -110,17 +115,28 @@ const useApiResponse = ({
     setRequestCount((count) => count + 1);
   };
 
-  // Perform initial data fetch once on component mount
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const calculateMsToNextRefresh = () => {
+    const now = new Date();
+    // currentMs = milliseconds since last minute on the clock
+    const currentMs = now.getSeconds() * 1000 + now.getMilliseconds();
+    let nextRefreshMs = 0;
+    while (currentMs >= nextRefreshMs) {
+      nextRefreshMs += refreshMs;
+    }
 
-  // Schedule subsequent data fetches, if we need to
-  if (refreshMs != null) {
-    useInterval(() => {
+    return nextRefreshMs - currentMs + refreshRateOffsetMs;
+  };
+
+  useEffect(() => {
+    // Initial fetch for first render
+    fetchData();
+
+    // Schedule subsequent fetches
+    setTimeout(function setFetchDataInterval() {
       fetchData();
-    }, refreshMs);
-  }
+      setTimeout(setFetchDataInterval, calculateMsToNextRefresh());
+    }, calculateMsToNextRefresh());
+  }, []);
 
   return { apiResponse, requestCount, lastSuccess };
 };
