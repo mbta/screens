@@ -14,6 +14,9 @@ defmodule Screens.V2.ScreenData.Parameters do
     pre_fare_v2: CandidateGenerator.PreFare
   }
 
+  # Refresh rates need to be <= 30 for the interval logic on the frontend to work.
+  # Adding a refresh rate that is > 30 will require adjusting the frontend logic to calculate
+  # seconds > 60 as seconds at the top of the next minute.
   @app_id_to_refresh_rate %{
     bus_eink_v2: 30,
     bus_shelter_v2: 20,
