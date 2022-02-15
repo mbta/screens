@@ -57,8 +57,7 @@ defmodule ScreensWeb.V2.ScreenController do
         |> assign(:sentry_frontend_dsn, Application.get_env(:screens, :sentry_frontend_dsn))
         |> assign(
           :refresh_rate_offset,
-          :md5
-          |> :crypto.hash(screen_id)
+          screen_id
           |> Base.encode16()
           |> String.to_integer(16)
           |> rem(refresh_rate)
