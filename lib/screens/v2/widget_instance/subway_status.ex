@@ -348,24 +348,28 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp get_endpoints(informed_entities, route_id) do
-    stop_sequence = get_stop_sequence(informed_entities, route_id)
+    case get_stop_sequence(informed_entities, route_id) do
+      nil ->
+        nil
 
-    {min_index, max_index} =
-      informed_entities
-      |> Enum.filter(&stop_on_route?(&1, stop_sequence))
-      |> Enum.map(&to_stop_index(&1, stop_sequence))
-      |> Enum.min_max()
+      stop_sequence ->
+        {min_index, max_index} =
+          informed_entities
+          |> Enum.filter(&stop_on_route?(&1, stop_sequence))
+          |> Enum.map(&to_stop_index(&1, stop_sequence))
+          |> Enum.min_max()
 
-    {_, min_station_name} = Enum.at(stop_sequence, min_index)
-    {_, max_station_name} = Enum.at(stop_sequence, max_index)
+        {_, min_station_name} = Enum.at(stop_sequence, min_index)
+        {_, max_station_name} = Enum.at(stop_sequence, max_index)
 
-    {min_full_name, min_abbreviated_name} = min_station_name
-    {max_full_name, max_abbreviated_name} = max_station_name
+        {min_full_name, min_abbreviated_name} = min_station_name
+        {max_full_name, max_abbreviated_name} = max_station_name
 
-    %{
-      full: "#{min_full_name} to #{max_full_name}",
-      abbrev: "#{min_abbreviated_name} to #{max_abbreviated_name}"
-    }
+        %{
+          full: "#{min_full_name} to #{max_full_name}",
+          abbrev: "#{min_abbreviated_name} to #{max_abbreviated_name}"
+        }
+    end
   end
 
   # Finds a stop sequence which contains all stations in informed_entities
