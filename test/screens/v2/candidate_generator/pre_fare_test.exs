@@ -69,14 +69,12 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
           icon: nil,
           text: "Test Station",
           time: ~U[2020-04-06T10:00:00Z],
-          slot_name: :header_left
         },
         %NormalHeader{
           screen: config,
           icon: nil,
           text: "Test Station",
           time: ~U[2020-04-06T10:00:00Z],
-          slot_name: :header_right
         }
       ]
 
