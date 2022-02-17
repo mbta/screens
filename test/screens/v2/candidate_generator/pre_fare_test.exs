@@ -68,13 +68,13 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
           screen: config,
           icon: nil,
           text: "Test Station",
-          time: ~U[2020-04-06T10:00:00Z],
+          time: ~U[2020-04-06T10:00:00Z]
         },
         %NormalHeader{
           screen: config,
           icon: nil,
           text: "Test Station",
-          time: ~U[2020-04-06T10:00:00Z],
+          time: ~U[2020-04-06T10:00:00Z]
         }
       ]
 
