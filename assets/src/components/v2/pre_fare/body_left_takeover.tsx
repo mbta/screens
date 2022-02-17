@@ -6,16 +6,16 @@ interface Props {
   full_body_left: WidgetData;
 }
 
-const BodyTakeoverLeft: React.ComponentType<Props> = ({
+const BodyLeftTakeover: React.ComponentType<Props> = ({
   full_body_left: fullBodyLeft,
 }) => {
   return (
-    <div className="body-takeover-left">
-      <div className="body-takeover-left__full-body">
+    <div className="body-left-takeover">
+      <div className="body-left-takeover__full-body">
         <Widget data={fullBodyLeft} />
       </div>
     </div>
   );
 };
 
-export default BodyTakeoverLeft;
+export default BodyLeftTakeover;

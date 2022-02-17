@@ -15,7 +15,12 @@
     background-color: rgba(218, 41, 28, 0.4);
   }
 
-  &--grey {
+  &--orange {
+    background-color: rgba(237, 139, 0, 0.4)
+  }
+
+  &--grey,
+  &--gray {
     background-color: rgba(124, 135, 142, 0.4);
   }
 
