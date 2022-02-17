@@ -37,7 +37,7 @@ const TYPE_TO_COMPONENT = {
   body_left_takeover: BodyLeftTakeover,
   body_right_normal: NormalBodyRight,
   body_right_takeover: BodyRightTakeover,
-  header: NormalHeader,
+  normal_header: NormalHeader,
   one_large: OneLarge,
   two_medium: TwoMedium,
   placeholder: Placeholder,

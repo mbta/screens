@@ -67,10 +67,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   defp header_instances(config, now) do
     %Screen{app_params: %PreFare{header: %CurrentStopName{stop_name: stop_name}}} = config
 
-    [
-      %NormalHeader{screen: config, text: stop_name, time: now, slot_name: :header_left},
-      %NormalHeader{screen: config, text: stop_name, time: now, slot_name: :header_right}
-    ]
+    [%NormalHeader{screen: config, text: stop_name, time: now}]
   end
 
   defp placeholder_instances do
