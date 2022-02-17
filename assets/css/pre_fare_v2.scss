@@ -2,14 +2,22 @@
 
 @import "colors";
 
+@import "v2/pre_fare/viewport";
 @import "v2/pre_fare/screen_container";
 
 @import "v2/pre_fare/screen/normal";
+@import "v2/pre_fare/screen/takeover";
 
-@import "v2/pre_fare/body/normal_left";
-@import "v2/pre_fare/body/normal_right";
+@import "v2/pre_fare/body/normal";
+@import "v2/pre_fare/body/takeover";
 
-@import "v2/pre_fare/header/normal";
+@import "v2/pre_fare/body_left/normal";
+@import "v2/pre_fare/body_left/takeover";
+
+@import "v2/pre_fare/body_right/normal";
+@import "v2/pre_fare/body_right/takeover";
+
+@import "v2/pre_fare/normal_header";
 
 @import "v2/pre_fare/flex/one_large";
 @import "v2/pre_fare/flex/two_medium";
