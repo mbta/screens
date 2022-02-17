@@ -2,10 +2,6 @@ import React from "react";
 
 import { useLocation } from "react-router-dom";
 
-interface Props {
-  children: React.ReactChild
-}
-
 type ScreenSide = "left" | "right";
 
 /**
@@ -14,7 +10,7 @@ type ScreenSide = "left" | "right";
  * If the param is missing, this will show the full
  * screen content (2160px x 1920px).
  */
-const TopLevelSwitch: React.ComponentType<Props> = ({ children }) => {
+const Viewport: React.ComponentType<{}> = ({ children }) => {
   const query = new URLSearchParams(useLocation().search);
   const screenSide: ScreenSide | null = query.get("screen_side") as ScreenSide;
 
@@ -40,4 +36,4 @@ const TopLevelSwitch: React.ComponentType<Props> = ({ children }) => {
   );
 };
 
-export default TopLevelSwitch;
+export default Viewport;

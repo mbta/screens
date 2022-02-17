@@ -13,7 +13,7 @@ import {
   BlinkConfigContext,
 } from "Components/v2/screen_container";
 import { MappingContext } from "Components/v2/widget";
-import TopLevelSwitch from "Components/v2/pre_fare/top_level_switch";
+import Viewport from "Components/v2/pre_fare/viewport";
 
 import Placeholder from "Components/v2/placeholder";
 import NormalScreen from "Components/v2/pre_fare/normal_screen";
@@ -77,9 +77,9 @@ const App = (): JSX.Element => {
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <BlinkConfigContext.Provider value={blinkConfig}>
-                <TopLevelSwitch>
+                <Viewport>
                   <ScreenPage />
-                </TopLevelSwitch>
+                </Viewport>
               </BlinkConfigContext.Provider>
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
