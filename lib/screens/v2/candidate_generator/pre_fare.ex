@@ -12,28 +12,19 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   def screen_template do
     {:screen,
      %{
-       top_level: [
-         {:left,
+       screen_normal: [
+         :header,
+         {:body,
           %{
-            screen_normal_left: [
-              :header_left,
+            body_normal: [
               {:body_left,
                %{
-                 body_normal_left: [:main_content_left],
-                 body_takeover_left: [:full_body_left]
-               }}
-            ],
-            screen_takeover_left: [
-              :full_screen_left
-            ]
-          }},
-         {:right,
-          %{
-            screen_normal_right: [
-              :header_right,
+                 body_left_normal: [:main_content_left],
+                 body_left_takeover: [:full_body_left]
+               }},
               {:body_right,
                %{
-                 body_normal_right: [
+                 body_right_normal: [
                    Builder.with_paging(
                      {:upper_right,
                       %{
@@ -44,14 +35,13 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
                    ),
                    :lower_right
                  ],
-                 body_takeover_right: [:full_body_right]
+                 body_right_takeover: [:full_body_right]
                }}
             ],
-            screen_takeover_right: [
-              :full_screen_right
-            ]
+            body_takeover: [:full_body]
           }}
-       ]
+       ],
+       screen_takeover: [:full_screen]
      }}
     |> Builder.build_template()
   end
@@ -74,15 +64,14 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
 
   defp placeholder_instances do
     [
-      %Placeholder{color: :green, slot_names: [:header_left]},
-      %Placeholder{color: :blue, slot_names: [:header_right]},
+      %Placeholder{color: :green, slot_names: [:header]},
       %Placeholder{color: :red, slot_names: [:main_content_left]},
       %Placeholder{color: :red, slot_names: [:large]},
       %Placeholder{color: :red, slot_names: [:medium_left]},
       %Placeholder{color: :red, slot_names: [:medium_right]},
       %Placeholder{color: :black, slot_names: [:lower_right]},
-      %Placeholder{color: :gray, slot_names: [:full_screen_right]},
-      %Placeholder{color: :gray, slot_names: [:full_screen_left]},
+      %Placeholder{color: :gray, slot_names: [:full_screen]},
+      %Placeholder{color: :blue, slot_names: [:full_body]},
       %Placeholder{color: :orange, slot_names: [:full_body_left]},
       %Placeholder{color: :orange, slot_names: [:full_body_right]}
     ]

@@ -1,19 +1,22 @@
 defmodule Screens.V2.WidgetInstance.Placeholder do
   @moduledoc false
 
+  alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.Placeholder
 
   defstruct color: nil,
-            slot_names: []
+            slot_names: [],
+            priority: [100]
 
   @type color :: :grey | :blue | :green | :red
   @type t :: %__MODULE__{
           color: color(),
-          slot_names: list(atom())
+          slot_names: list(atom()),
+          priority: WidgetInstance.priority()
         }
 
   defimpl Screens.V2.WidgetInstance do
-    def priority(_), do: [100]
+    def priority(%Placeholder{priority: priority}), do: priority
     def serialize(%Placeholder{color: color}), do: %{color: color}
     def slot_names(%Placeholder{slot_names: slot_names}), do: slot_names
     def widget_type(_), do: :placeholder

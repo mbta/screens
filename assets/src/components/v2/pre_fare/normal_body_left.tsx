@@ -10,8 +10,8 @@ const NormalBodyLeft: React.ComponentType<Props> = ({
   main_content_left: mainContentLeft,
 }) => {
   return (
-    <div className="body-normal-left">
-      <div className="body-normal-left__main-content">
+    <div className="body-left-normal">
+      <div className="body-left-normal__main-content">
         <Widget data={mainContentLeft} />
       </div>
     </div>

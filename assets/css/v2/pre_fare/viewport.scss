@@ -1,0 +1,27 @@
+.pre-fare-screen-viewport {
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+
+  .pre-fare-shifter {
+    width: 2160px;
+    height: 1920px;
+    overflow: hidden;
+    position: absolute;
+  }
+    
+  .pre-fare-shifter--left {
+    left: 0;
+  }
+  
+  .pre-fare-shifter--right {
+    right: 0;
+  }
+}
+
+.pre-fare-screen-viewport--both {
+  width: 2160px;
+}
