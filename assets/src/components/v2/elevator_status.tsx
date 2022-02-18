@@ -152,6 +152,7 @@ const RouteModeHereIcon = ({
         .sort((i1) => (subwayIcons.includes(i1) ? -1 : 1))
         .map((icon) => (
           <img
+            key={icon}
             className="detail-page__closure-route-mode-icons"
             src={imagePath(`elevator-status-${icon}.svg`)}
           />
