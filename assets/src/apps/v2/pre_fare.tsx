@@ -13,39 +13,36 @@ import {
   BlinkConfigContext,
 } from "Components/v2/screen_container";
 import { MappingContext } from "Components/v2/widget";
+import Viewport from "Components/v2/pre_fare/viewport";
 
 import Placeholder from "Components/v2/placeholder";
-import NormalScreenLeft from "Components/v2/pre_fare/normal_screen_left";
-import NormalScreenRight from "Components/v2/pre_fare/normal_screen_right";
+import NormalScreen from "Components/v2/pre_fare/normal_screen";
+import NormalBody from "Components/v2/pre_fare/normal_body";
+import NormalBodyLeft from "Components/v2/pre_fare/normal_body_left";
 import NormalBodyRight from "Components/v2/pre_fare/normal_body_right";
-import NormalHeaderLeft from "Components/v2/pre_fare/normal_header_left";
-import NormalHeaderRight from "Components/v2/pre_fare/normal_header_right";
-import TopLevelSwitch from "Components/v2/pre_fare/top_level_switch";
-import ElevatorStatus from "Components/v2/elevator_status";
+import NormalHeader from "Components/v2/lcd/normal_header";
 import OneLarge from "Components/v2/pre_fare/flex/one_large";
 import TwoMedium from "Components/v2/pre_fare/flex/two_medium";
-import NormalBodyLeft from "Components/v2/pre_fare/normal_body_left";
-import BodyTakeoverLeft from "Components/v2/pre_fare/body_takeover_left";
-import BodyTakeoverRight from "Components/v2/pre_fare/body_takeover_right";
-import ScreenTakeoverLeft from "Components/v2/pre_fare/screen_takeover_left";
-import ScreenTakeoverRight from "Components/v2/pre_fare/screen_takeover_right";
+import BodyLeftTakeover from "Components/v2/pre_fare/body_left_takeover";
+import BodyRightTakeover from "Components/v2/pre_fare/body_right_takeover";
+import BodyTakeover from "Components/v2/pre_fare/body_takeover";
+import ScreenTakeover from "Components/v2/pre_fare/screen_takeover";
+import ElevatorStatus from "Components/v2/elevator_status";
 
 const TYPE_TO_COMPONENT = {
-  screen_normal_left: NormalScreenLeft,
-  screen_normal_right: NormalScreenRight,
-  body_normal_left: NormalBodyLeft,
-  body_normal_right: NormalBodyRight,
-  header_left: NormalHeaderLeft,
-  elevator_status: ElevatorStatus,
-  header_right: NormalHeaderRight,
-  top_level: TopLevelSwitch,
+  screen_normal: NormalScreen,
+  screen_takeover: ScreenTakeover,
+  body_normal: NormalBody,
+  body_takeover: BodyTakeover,
+  body_left_normal: NormalBodyLeft,
+  body_left_takeover: BodyLeftTakeover,
+  body_right_normal: NormalBodyRight,
+  body_right_takeover: BodyRightTakeover,
+  header: NormalHeader,
   one_large: OneLarge,
   two_medium: TwoMedium,
-  body_takeover_left: BodyTakeoverLeft,
-  body_takeover_right: BodyTakeoverRight,
-  screen_takeover_left: ScreenTakeoverLeft,
-  screen_takeover_right: ScreenTakeoverRight,
   placeholder: Placeholder,
+  elevator_status: ElevatorStatus,
 };
 
 const DISABLED_LAYOUT = {
@@ -82,7 +79,9 @@ const App = (): JSX.Element => {
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <BlinkConfigContext.Provider value={blinkConfig}>
-                <ScreenPage />
+                <Viewport>
+                  <ScreenPage />
+                </Viewport>
               </BlinkConfigContext.Provider>
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>

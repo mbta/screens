@@ -25,48 +25,36 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
     test "returns template" do
       assert {:screen,
               %{
-                top_level: [
-                  {:left,
+                screen_normal: [
+                  :header,
+                  {:body,
                    %{
-                     screen_normal_left: [
-                       :header_left,
-                       {:body_left,
-                        %{
-                          body_normal_left: [:main_content_left],
-                          body_takeover_left: [:full_body_left]
-                        }}
+                     body_normal: [
+                       body_left: %{
+                         body_left_normal: [:main_content_left],
+                         body_left_takeover: [:full_body_left]
+                       },
+                       body_right: %{
+                         body_right_normal: [
+                           {{0, :upper_right},
+                            %{
+                              one_large: [{0, :large}],
+                              two_medium: [{0, :medium_left}, {0, :medium_right}]
+                            }},
+                           {{1, :upper_right},
+                            %{
+                              one_large: [{1, :large}],
+                              two_medium: [{1, :medium_left}, {1, :medium_right}]
+                            }},
+                           :lower_right
+                         ],
+                         body_right_takeover: [:full_body_right]
+                       }
                      ],
-                     screen_takeover_left: [
-                       :full_screen_left
-                     ]
-                   }},
-                  {:right,
-                   %{
-                     screen_normal_right: [
-                       :header_right,
-                       {:body_right,
-                        %{
-                          body_normal_right: [
-                            {{0, :upper_right},
-                             %{
-                               one_large: [{0, :large}],
-                               two_medium: [{0, :medium_left}, {0, :medium_right}]
-                             }},
-                            {{1, :upper_right},
-                             %{
-                               one_large: [{1, :large}],
-                               two_medium: [{1, :medium_left}, {1, :medium_right}]
-                             }},
-                            :lower_right
-                          ],
-                          body_takeover_right: [:full_body_right]
-                        }}
-                     ],
-                     screen_takeover_right: [
-                       :full_screen_right
-                     ]
+                     body_takeover: [:full_body]
                    }}
-                ]
+                ],
+                screen_takeover: [:full_screen]
               }} == PreFare.screen_template()
     end
   end
