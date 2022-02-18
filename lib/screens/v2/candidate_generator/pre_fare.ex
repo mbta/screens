@@ -55,7 +55,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       ) do
     [
       fn -> elevator_status_instances_fn.(config, now) end,
-      fn -> line_map_instances_fn(config) end,
+      fn -> line_map_instances_fn.(config) end,
       fn -> placeholder_instances() end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
