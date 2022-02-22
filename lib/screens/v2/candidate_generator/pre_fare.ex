@@ -51,7 +51,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         config,
         now \\ DateTime.utc_now(),
         elevator_status_instances_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2,
-        line_map_instances_fn \\ &Widgets.LineMap.line_map_instances/1
+        line_map_instances_fn \\ &Widgets.PreFareLineMap.line_map_instances/1
       ) do
     [
       fn -> elevator_status_instances_fn.(config, now) end,
