@@ -1,0 +1,12 @@
+.screen-takeover {
+  position: relative;
+}
+
+.screen-takeover__full-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2160px;
+  height: 1920px;
+  overflow: hidden;
+}

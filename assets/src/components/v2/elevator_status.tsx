@@ -1,4 +1,5 @@
 import React, { ComponentType, useEffect, useState } from "react";
+import makePersistent from "./persistent_wrapper";
 
 type Page = ListPage | DetailPage;
 
@@ -99,4 +100,4 @@ const ListPageComponent: ComponentType<ListPageProps> = ({ listPage }) => {
   return null;
 };
 
-export default ElevatorStatus;
+export default makePersistent(ElevatorStatus);
