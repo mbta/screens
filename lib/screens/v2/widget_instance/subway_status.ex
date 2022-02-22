@@ -542,7 +542,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     alert_whole_line_stops =
       informed_entities
       |> Enum.map(fn e -> Map.get(e, :route) end)
-      |> Enum.reject(&is_nil/1)
       |> Enum.filter(fn
         "Green-" <> _ -> true
         _ -> false
