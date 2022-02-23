@@ -2,7 +2,7 @@ import moment from "moment";
 import React, { ComponentType, useEffect, useState } from "react";
 import { classWithModifier, imagePath } from "Util/util";
 import FlexZonePageIndicator from "./flex/page_indicator";
-import makePersistent from "./persistent_wrapper";
+import makePersistentCarousel from "./persistent_carousel";
 
 const subwayIcons = ["red", "blue", "orange", "green", "silver"];
 
@@ -50,34 +50,12 @@ type Icon =
   | "mattapan";
 
 interface Props {
-  pages: Page[];
-  lastUpdate: number;
-  onFinish: Function;
+  page: Page;
+  pageIndex: number;
+  numPages: number;
 }
 
-const ElevatorStatus: ComponentType<Props> = ({
-  pages,
-  lastUpdate,
-  onFinish,
-}) => {
-  const [isFirstRender, setIsFirstRender] = useState(true);
-  const [pageIndex, setPageIndex] = useState(0);
-
-  useEffect(() => {
-    if (isFirstRender) {
-      setIsFirstRender(false);
-    } else {
-      setPageIndex((i) => i + 1);
-    }
-  }, [lastUpdate]);
-
-  useEffect(() => {
-    if (pageIndex === pages.length - 1) {
-      onFinish();
-    }
-  }, [pageIndex]);
-
-  const page = pages[pageIndex];
+const ElevatorStatus: ComponentType<Props> = ({ page, pageIndex, numPages }) => {
   let pageToRender;
   if (instanceOfDetailPage(page)) {
     pageToRender = <DetailPageComponent {...page} />;
@@ -102,7 +80,7 @@ const ElevatorStatus: ComponentType<Props> = ({
           </div>
         </div>
       </div>
-      <FlexZonePageIndicator numPages={pages.length} pageIndex={pageIndex} />
+      <FlexZonePageIndicator numPages={numPages} pageIndex={pageIndex} />
     </>
   );
 };
@@ -294,4 +272,4 @@ const ListPageComponent: ComponentType<ListPageProps> = ({ listPage }) => {
   return null;
 };
 
-export default makePersistent(ElevatorStatus);
+export default makePersistentCarousel(ElevatorStatus);
