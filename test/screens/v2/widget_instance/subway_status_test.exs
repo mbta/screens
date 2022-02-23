@@ -316,6 +316,34 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       assert %{status: "Normal Service", type: :single} =
                SubwayStatus.serialize_green_line(grouped_alerts)
     end
+
+    test "handles alert affecting all branches" do
+      alert = [
+        %Alert{
+          effect: :delay,
+          severity: 3,
+          informed_entities: [
+            %{route: "Green-B", direction_id: nil, stop: nil},
+            %{route: "Green-C", direction_id: nil, stop: nil},
+            %{route: "Green-D", direction_id: nil, stop: nil},
+            %{route: "Green-E", direction_id: nil, stop: nil}
+          ]
+        }
+      ]
+
+      grouped_alerts = %{
+        "Green-B" => alert,
+        "Green-C" => alert,
+        "Green-D" => alert,
+        "Green-E" => alert
+      }
+
+      assert %{
+               location: nil,
+               status: "Delays up to 10 minutes",
+               type: :single
+             } = SubwayStatus.serialize_green_line(grouped_alerts)
+    end
   end
 
   describe "slot_names/1" do

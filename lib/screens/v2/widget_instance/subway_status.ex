@@ -215,6 +215,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     "Green" => [@green_line_trunk_stops]
   }
 
+  @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
+
   defimpl Screens.V2.WidgetInstance do
     def priority(_instance), do: [2, 1]
 
@@ -525,7 +527,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     |> Enum.sort_by(fn [[first_route | _other_routes], _status] -> first_route end)
   end
 
-  defp alert_affects_gl_trunk?(%Alert{informed_entities: informed_entities}) do
+  defp alert_affects_gl_trunk_or_whole_line?(%Alert{informed_entities: informed_entities}) do
     gl_trunk_stops =
       @route_stop_sequences |> Map.get("Green") |> hd() |> Enum.map(&elem(&1, 0)) |> MapSet.new()
 
@@ -537,7 +539,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       |> Enum.into(MapSet.new())
       |> MapSet.intersection(gl_trunk_stops)
 
-    MapSet.size(alert_trunk_stops) > 0
+    alert_whole_line_stops =
+      informed_entities
+      |> Enum.map(fn e -> Map.get(e, :route) end)
+      |> Enum.filter(fn
+        "Green-" <> _ -> true
+        _ -> false
+      end)
+      |> Enum.uniq()
+      |> Enum.sort()
+
+    MapSet.size(alert_trunk_stops) > 0 or
+      alert_whole_line_stops == @green_line_branches
   end
 
   defp is_multi_route?(alert) do
@@ -546,13 +559,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   def serialize_green_line(grouped_alerts) do
     green_line_alerts =
-      ["Green-B", "Green-C", "Green-D", "Green-E"]
+      @green_line_branches
       |> Enum.flat_map(fn route -> Map.get(grouped_alerts, route, []) end)
       |> Enum.uniq()
 
     multi_route_alerts = Enum.filter(green_line_alerts, &is_multi_route?/1)
     single_route_alerts = Enum.reject(green_line_alerts, &is_multi_route?/1)
-    trunk_alerts = Enum.filter(multi_route_alerts, &alert_affects_gl_trunk?/1)
+    trunk_alerts = Enum.filter(multi_route_alerts, &alert_affects_gl_trunk_or_whole_line?/1)
     alert_count = length(green_line_alerts)
 
     statuses =
