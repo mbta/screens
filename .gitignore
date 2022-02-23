@@ -39,6 +39,7 @@ npm-debug.log
 
 # local environment variables
 /priv/local.env
+.envrc
 
 /assets/coverage
 

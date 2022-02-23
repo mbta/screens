@@ -35,13 +35,13 @@ const NormalHeaderIcon = ({ icon }) => {
   );
 };
 
-const NormalHeaderTitle = forwardRef(({ icon, text, size, showTo }, ref) => {
+const NormalHeaderTitle = forwardRef(({ icon, text, size, showTo, fullName }, ref) => {
   const modifiers = [size];
   if (icon) {
     modifiers.push("with-icon");
   }
 
-  const abbreviatedText = abbreviateText(text);
+  const abbreviatedText = fullName ? text : abbreviateText(text);
 
   return (
     <div className="normal-header-title">
@@ -90,6 +90,7 @@ const NormalHeader = ({
   versionNumber,
   maxHeight,
   showTo,
+  fullName
 }) => {
   const SIZES = ["small", "large"];
   const ref = useRef(null);
@@ -116,6 +117,7 @@ const NormalHeader = ({
         size={SIZES[stopSize]}
         ref={ref}
         showTo={showTo}
+        fullName={fullName}
       />
       <NormalHeaderTime time={time} />
       {versionNumber && <NormalHeaderVersion versionNumber={versionNumber} />}

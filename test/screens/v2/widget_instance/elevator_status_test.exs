@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{ElevatorStatus, PreFare}
+  alias Screens.Config.V2.Header.CurrentStopName
 
   setup do
     %{
@@ -14,7 +15,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             elevator_status: %ElevatorStatus{
               parent_station_id: "place-foo",
               platform_stop_ids: []
-            }
+            },
+            header: %CurrentStopName{stop_name: "Test Station"}
           },
           vendor: nil,
           device_id: nil,
@@ -49,7 +51,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             elevator_status: %ElevatorStatus{
               parent_station_id: "place-foo",
               platform_stop_ids: []
-            }
+            },
+            header: %CurrentStopName{stop_name: "Test Station"}
           },
           vendor: nil,
           device_id: nil,
@@ -77,7 +80,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             elevator_status: %ElevatorStatus{
               parent_station_id: "place-foo",
               platform_stop_ids: []
-            }
+            },
+            header: %CurrentStopName{stop_name: "Test Station"}
           },
           vendor: nil,
           device_id: nil,
@@ -105,7 +109,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             elevator_status: %ElevatorStatus{
               parent_station_id: "place-foo",
               platform_stop_ids: []
-            }
+            },
+            header: %CurrentStopName{stop_name: "Test Station"}
           },
           vendor: nil,
           device_id: nil,
@@ -133,7 +138,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             elevator_status: %ElevatorStatus{
               parent_station_id: "place-foo",
               platform_stop_ids: []
-            }
+            },
+            header: %CurrentStopName{stop_name: "Test Station"}
           },
           vendor: nil,
           device_id: nil,
