@@ -1,11 +1,15 @@
 import React, { ComponentType, useEffect, useState } from "react";
-import makePersistent from "./persistent_wrapper";
+import makePersistent, { WrappedComponentProps } from "./persistent_wrapper";
 
-interface Props {
-  PageRenderer: ComponentType<any>;
+interface PageRendererProps {
+  page: any;
+  pageIndex: number;
+  numPages: number;
+}
+
+interface Props extends WrappedComponentProps {
+  PageRenderer: ComponentType<PageRendererProps>;
   pages: any[];
-  onFinish: () => void;
-  lastUpdate: number | null;
 }
 
 const Carousel: ComponentType<Props> = ({ PageRenderer, pages, onFinish, lastUpdate }) => {
@@ -33,12 +37,15 @@ const Carousel: ComponentType<Props> = ({ PageRenderer, pages, onFinish, lastUpd
   );
 }
 
-const PersistentCarousel = makePersistent(Carousel);
+const PersistentCarousel = makePersistent(Carousel as ComponentType<WrappedComponentProps>);
 
 /**
  * Call this function on a `PageRenderer` component to wrap it in a persistent component that
  * expects a `pages` prop containing an array of data, and passes one element of the array at a time to
  * `PageRenderer`.
+ *
+ * Consider extending the `PageRendererProps` type exported by this module when
+ * defining your `PageRenderer`'s props.
  *
  * Example:
  * ```tsx
@@ -55,8 +62,9 @@ const PersistentCarousel = makePersistent(Carousel);
  * ```
  */
 const makePersistentCarousel =
-  (Component) =>
+  (Component: ComponentType<PageRendererProps>) =>
     ({ ...data }) =>
       <PersistentCarousel {...data} PageRenderer={Component} />;
 
 export default makePersistentCarousel;
+export { PageRendererProps };

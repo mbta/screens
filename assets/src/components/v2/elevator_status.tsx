@@ -2,7 +2,7 @@ import moment from "moment";
 import React, { ComponentType, useEffect, useState } from "react";
 import { classWithModifier, imagePath } from "Util/util";
 import FlexZonePageIndicator from "./flex/page_indicator";
-import makePersistentCarousel from "./persistent_carousel";
+import makePersistentCarousel, { PageRendererProps } from "./persistent_carousel";
 
 const subwayIcons = ["red", "blue", "orange", "green", "silver"];
 
@@ -49,10 +49,8 @@ type Icon =
   | "bus"
   | "mattapan";
 
-interface Props {
+interface Props extends PageRendererProps {
   page: Page;
-  pageIndex: number;
-  numPages: number;
 }
 
 const ElevatorStatus: ComponentType<Props> = ({ page, pageIndex, numPages }) => {
