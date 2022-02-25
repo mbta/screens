@@ -2,18 +2,13 @@ defmodule Screens.V2.WidgetInstance.FullLineMap do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.V2.WidgetInstance
 
   defstruct screen: nil,
-            asset_url: nil,
-            slot_names: nil,
-            priority: nil
+            asset_url: nil
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          asset_url: String.t(),
-          slot_names: list(WidgetInstance.slot_id()),
-          priority: WidgetInstance.priority()
+          asset_url: String.t()
         }
 
   def serialize(%__MODULE__{asset_url: asset_url}), do: %{asset_url: asset_url}
@@ -43,7 +38,6 @@ defmodule Screens.V2.WidgetInstance.FullLineMap do
     def widget_type(instance), do: FullLineMap.widget_type(instance)
     def valid_candidate?(instance), do: FullLineMap.valid_candidate?(instance)
     def audio_serialize(instance), do: FullLineMap.audio_serialize(instance)
-    @spec audio_sort_key(Screens.V2.WidgetInstance.FullLineMap.t()) :: 0
     def audio_sort_key(instance), do: FullLineMap.audio_sort_key(instance)
     def audio_valid_candidate?(instance), do: FullLineMap.audio_valid_candidate?(instance)
     def audio_view(instance), do: FullLineMap.audio_view(instance)
