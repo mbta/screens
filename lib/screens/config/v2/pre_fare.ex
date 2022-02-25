@@ -2,19 +2,23 @@ defmodule Screens.Config.V2.PreFare do
   @moduledoc false
 
   alias Screens.Config.V2.{ElevatorStatus, FullLineMap}
+  alias Screens.Config.V2.Header.CurrentStopName
 
   @type t :: %__MODULE__{
+          header: CurrentStopName.t(),
           elevator_status: ElevatorStatus.t(),
           full_line_map: list(FullLineMap.t())
         }
 
-  @enforce_keys [:elevator_status, :full_line_map]
-  defstruct elevator_status: nil,
+  @enforce_keys [:header, :elevator_status, :full_line_map]
+  defstruct header: nil,
+            elevator_status: nil,
             full_line_map: []
 
   use Screens.Config.Struct,
     children: [
       elevator_status: ElevatorStatus,
-      full_line_map: {:list, FullLineMap}
+      full_line_map: {:list, FullLineMap},
+      header: CurrentStopName
     ]
 end

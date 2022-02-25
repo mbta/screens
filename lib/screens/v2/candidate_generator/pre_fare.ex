@@ -1,10 +1,13 @@
 defmodule Screens.V2.CandidateGenerator.PreFare do
   @moduledoc false
 
+  alias Screens.Config.Screen
+  alias Screens.Config.V2.Header.CurrentStopName
+  alias Screens.Config.V2.PreFare
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.Placeholder
+  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
 
@@ -54,6 +57,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         line_map_instances_fn \\ &Widgets.FullLineMap.line_map_instances/1
       ) do
     [
+      fn -> header_instances(config, now) end,
       fn -> elevator_status_instances_fn.(config, now) end,
       fn -> line_map_instances_fn.(config) end,
       fn -> placeholder_instances() end
@@ -62,10 +66,16 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
+  defp header_instances(config, now) do
+    %Screen{app_params: %PreFare{header: %CurrentStopName{stop_name: stop_name}}} = config
+
+    [%NormalHeader{screen: config, text: stop_name, time: now}]
+  end
+
   defp placeholder_instances do
     [
-      %Placeholder{color: :green, slot_names: [:header]},
       %Placeholder{color: :red, slot_names: [:main_content_left]},
+      %Placeholder{color: :red, slot_names: [:upper_right]},
       %Placeholder{color: :red, slot_names: [:large]},
       %Placeholder{color: :red, slot_names: [:medium_left]},
       %Placeholder{color: :red, slot_names: [:medium_right]},
