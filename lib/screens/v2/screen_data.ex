@@ -26,6 +26,12 @@ defmodule Screens.V2.ScreenData do
             {page_index :: non_neg_integer(), num_pages :: pos_integer()}
         }
 
+  @spec outdated_response() :: response_map()
+  def outdated_response, do: response(force_reload: true)
+
+  @spec disabled_response() :: response_map()
+  def disabled_response, do: response(disabled: true)
+
   @spec by_screen_id(screen_id()) :: response_map()
   def by_screen_id(screen_id) do
     config = get_config(screen_id)
@@ -328,9 +334,6 @@ defmodule Screens.V2.ScreenData do
     |> WidgetInstance.serialize()
     |> Map.merge(%{type: WidgetInstance.widget_type(instance)})
   end
-
-  def outdated_response, do: response(force_reload: true)
-  def disabled_response, do: response(disabled: true)
 
   @spec response(keyword()) :: response_map()
   defp response(fields) do
