@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="44px" height="44px" viewBox="0 0 44 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>OL Circle</title>
+    <g id="OL-Circle" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Pill" fill="#ED8B00" x="7.10542736e-15" y="0" width="44" height="44" rx="22"></rect>
+        <text id="Line" font-family="HelveticaNeue-Bold, Helvetica Neue" font-size="24" font-weight="bold" fill="#FFFFFF">
+            <tspan x="5.130397" y="30.7040884">OL</tspan>
+        </text>
+    </g>
+</svg>
