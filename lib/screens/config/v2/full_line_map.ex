@@ -1,4 +1,4 @@
-defmodule Screens.Config.V2.PreFareLineMap do
+defmodule Screens.Config.V2.FullLineMap do
   @moduledoc false
 
   @type t :: %__MODULE__{
