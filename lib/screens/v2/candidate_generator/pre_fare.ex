@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Config.V2.PreFare
+  alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
@@ -73,7 +74,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   defp header_instances(config, now) do
     %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}} = config
 
-    stop_name = Screens.V2.CandidateGenerator.BusShelter.fetch_stop_name(stop_id)
+    stop_name = Stop.fetch_stop_name(stop_id)
 
     [%NormalHeader{screen: config, text: stop_name, time: now}]
   end
