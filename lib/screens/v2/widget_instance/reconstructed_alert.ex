@@ -9,7 +9,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           alert: String.t()
         }
 
-  # todo: Temporarily using subway alert type
+  # Temporarily using subway alert type
   def serialize(%__MODULE__{alert: %Screens.Alerts.Alert{header: header}}) do
     %{alert_header: header}
   end
