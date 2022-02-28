@@ -55,14 +55,16 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         now \\ DateTime.utc_now(),
         subway_status_instance_fn \\ &Widgets.SubwayStatus.subway_status_instances/1,
         reconstructed_alert_instances_fn \\ &Widgets.ReconstructedAlert.reconstructed_alert_instances/1,
-        elevator_status_instances_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2
+        elevator_status_instance_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2,
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
       fn -> header_instances(config, now) end,
       fn -> subway_status_instance_fn.(config) end,
       fn -> reconstructed_alert_instances_fn.(config) end,
-      fn -> elevator_status_instances_fn.(config, now) end,
-      fn -> placeholder_instances() end
+      fn -> elevator_status_instance_fn.(config, now) end,
+      fn -> evergreen_content_instances_fn.(config) end,
+      fn -> placeholder_instances() end,
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
@@ -79,6 +81,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   defp placeholder_instances do
     [
       %Placeholder{color: :red, slot_names: [:main_content_left]},
+      %Placeholder{color: :red, slot_names: [:upper_right]},
       %Placeholder{color: :red, slot_names: [:large]},
       %Placeholder{color: :red, slot_names: [:medium_left]},
       %Placeholder{color: :red, slot_names: [:medium_right]},
