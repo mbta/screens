@@ -2,7 +2,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.FullLineMap do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{PreFare, FullLineMap}
+  alias Screens.Config.V2.{FullLineMap, PreFare}
   alias Screens.V2.WidgetInstance.FullLineMap, as: FullLineMapWidget
   alias Screens.Util.Assets
 
