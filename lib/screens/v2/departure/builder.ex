@@ -66,7 +66,7 @@ defmodule Screens.V2.Departure.Builder do
 
     departures_without_trip
     |> Kernel.++(deduplicated_predictions_with_trip)
-    |> Enum.sort_by(& &1.departure_time)
+    |> Enum.sort_by(& &1.departure_time, DateTime)
   end
 
   def merge_predictions_and_schedules(predictions, schedules) do
