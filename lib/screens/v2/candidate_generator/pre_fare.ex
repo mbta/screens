@@ -2,7 +2,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.CurrentStopName
+  alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Config.V2.PreFare
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
@@ -34,7 +34,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
                         one_large: [:large],
                         two_medium: [:medium_left, :medium_right]
                       }},
-                     2
+                     4
                    ),
                    :lower_right
                  ],
@@ -53,10 +53,14 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
+        subway_status_instance_fn \\ &Widgets.SubwayStatus.subway_status_instances/1,
+        reconstructed_alert_instances_fn \\ &Widgets.ReconstructedAlert.reconstructed_alert_instances/1,
         elevator_status_instances_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2
       ) do
     [
       fn -> header_instances(config, now) end,
+      fn -> subway_status_instance_fn.(config) end,
+      fn -> reconstructed_alert_instances_fn.(config) end,
       fn -> elevator_status_instances_fn.(config, now) end,
       fn -> placeholder_instances() end
     ]
@@ -65,7 +69,9 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   end
 
   defp header_instances(config, now) do
-    %Screen{app_params: %PreFare{header: %CurrentStopName{stop_name: stop_name}}} = config
+    %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}} = config
+
+    stop_name = Screens.V2.CandidateGenerator.BusShelter.fetch_stop_name(stop_id)
 
     [%NormalHeader{screen: config, text: stop_name, time: now}]
   end

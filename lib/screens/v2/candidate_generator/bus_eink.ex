@@ -87,6 +87,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
     [%BottomScreenFiller{screen: config}]
   end
 
+  # todo: this can be a utility.  See bus_shelter.ex line 112
   defp fetch_stop_name(stop_id) do
     case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do
       {:ok, %{"data" => [stop_data]}} ->

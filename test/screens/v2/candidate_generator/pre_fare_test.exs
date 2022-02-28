@@ -8,7 +8,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
   setup do
     config = %Screen{
       app_params: %V2.PreFare{
-        header: %V2.Header.CurrentStopName{stop_name: "Test Station"},
+        header: %V2.Header.CurrentStopId{stop_id: "place-gover"},
         elevator_status: %V2.ElevatorStatus{parent_station_id: "111"}
       },
       vendor: :gds,
@@ -45,6 +45,8 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
                               one_large: [{1, :large}],
                               two_medium: [{1, :medium_left}, {1, :medium_right}]
                             }},
+                            {{2, :upper_right}, %{one_large: [{2, :large}], two_medium: [{2, :medium_left}, {2, :medium_right}]}},
+                            {{3, :upper_right}, %{one_large: [{3, :large}], two_medium: [{3, :medium_left}, {3, :medium_right}]}},
                            :lower_right
                          ],
                          body_right_takeover: [:full_body_right]
@@ -61,13 +63,15 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
   describe "candidate_instances/3" do
     test "returns expected header", %{config: config} do
       now = ~U[2020-04-06T10:00:00Z]
+      subway_status_instance_fn = fn _ -> [] end
+      reconstructed_alert_instances_fn = fn _ -> [] end
       elevator_status_instances_fn = fn _, _ -> [] end
 
       expected_header = [
         %NormalHeader{
           screen: config,
           icon: nil,
-          text: "Test Station",
+          text: "Government Center",
           time: ~U[2020-04-06T10:00:00Z]
         }
       ]
@@ -76,6 +80,8 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
         PreFare.candidate_instances(
           config,
           now,
+          subway_status_instance_fn,
+          reconstructed_alert_instances_fn,
           elevator_status_instances_fn
         )
 

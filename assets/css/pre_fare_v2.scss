@@ -25,6 +25,10 @@
 @import "v2/placeholder.scss";
 @import "v2/pre_fare/elevator_status";
 
+// Can this scss be generic?
+@import "v2/bus_shelter/subway_status";
+@import "v2/bus_shelter/route_pill";
+
 body {
   margin: 0px;
 }

@@ -109,7 +109,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
     ]
   end
 
-  defp fetch_stop_name(stop_id) do
+  # todo: this can be a utility.  See bus_eink.ex line 91
+  def fetch_stop_name(stop_id) do
     case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do
       {:ok, %{"data" => [stop_data]}} ->
         %{"attributes" => %{"name" => stop_name}} = stop_data

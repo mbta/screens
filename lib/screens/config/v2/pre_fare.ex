@@ -2,10 +2,10 @@ defmodule Screens.Config.V2.PreFare do
   @moduledoc false
 
   alias Screens.Config.V2.ElevatorStatus
-  alias Screens.Config.V2.Header.CurrentStopName
+  alias Screens.Config.V2.Header.CurrentStopId
 
   @type t :: %__MODULE__{
-          header: CurrentStopName.t(),
+          header: CurrentStopId.t(),
           elevator_status: ElevatorStatus.t()
         }
 
@@ -16,6 +16,6 @@ defmodule Screens.Config.V2.PreFare do
   use Screens.Config.Struct,
     children: [
       elevator_status: ElevatorStatus,
-      header: CurrentStopName
+      header: CurrentStopId
     ]
 end
