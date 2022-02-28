@@ -26,24 +26,21 @@ defmodule Screens.V2.ScreenData do
             {page_index :: non_neg_integer(), num_pages :: pos_integer()}
         }
 
-  @spec by_screen_id(screen_id(), String.t()) :: response_map()
-  def by_screen_id(screen_id, last_refresh) do
-    cond do
-      outdated?(screen_id, last_refresh) ->
-        outdated_response()
+  @spec outdated_response() :: response_map()
+  def outdated_response, do: response(force_reload: true)
 
-      disabled?(screen_id) ->
-        disabled_response()
+  @spec disabled_response() :: response_map()
+  def disabled_response, do: response(disabled: true)
 
-      true ->
-        config = get_config(screen_id)
-        refresh_rate = Parameters.get_refresh_rate(config)
+  @spec by_screen_id(screen_id()) :: response_map()
+  def by_screen_id(screen_id) do
+    config = get_config(screen_id)
+    refresh_rate = Parameters.get_refresh_rate(config)
 
-        config
-        |> fetch_data()
-        |> resolve_paging(refresh_rate)
-        |> serialize()
-    end
+    config
+    |> fetch_data()
+    |> resolve_paging(refresh_rate)
+    |> serialize()
   end
 
   @spec fetch_data(Screens.Config.Screen.t()) :: {Template.layout(), selected_instances_map()}
@@ -337,23 +334,6 @@ defmodule Screens.V2.ScreenData do
     |> WidgetInstance.serialize()
     |> Map.merge(%{type: WidgetInstance.widget_type(instance)})
   end
-
-  defp outdated?(screen_id, client_refresh_timestamp) do
-    {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
-    refresh_if_loaded_before_time = Screens.Config.State.refresh_if_loaded_before(screen_id)
-
-    case refresh_if_loaded_before_time do
-      nil -> false
-      _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
-    end
-  end
-
-  defp disabled?(screen_id) do
-    Screens.Config.State.disabled?(screen_id)
-  end
-
-  defp outdated_response, do: response(force_reload: true)
-  defp disabled_response, do: response(disabled: true)
 
   @spec response(keyword()) :: response_map()
   defp response(fields) do

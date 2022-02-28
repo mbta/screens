@@ -54,13 +54,15 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         config,
         now \\ DateTime.utc_now(),
         elevator_status_instances_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2,
-        full_line_map_instances_fn \\ &Widgets.FullLineMap.full_line_map_instances/1
+        full_line_map_instances_fn \\ &Widgets.FullLineMap.full_line_map_instances/1,
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
-      fn -> header_instances(config, now) end,
       fn -> elevator_status_instances_fn.(config, now) end,
       fn -> full_line_map_instances_fn.(config) end,
-      fn -> placeholder_instances() end
+      fn -> evergreen_content_instances_fn.(config) end,
+      fn -> placeholder_instances() end,
+      fn -> header_instances(config, now) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
