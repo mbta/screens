@@ -29,6 +29,7 @@ import BodyRightTakeover from "Components/v2/pre_fare/body_right_takeover";
 import BodyTakeover from "Components/v2/pre_fare/body_takeover";
 import ScreenTakeover from "Components/v2/pre_fare/screen_takeover";
 import ElevatorStatus from "Components/v2/elevator_status";
+import FullLineMap from "Components/v2/full_line_map";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -45,6 +46,7 @@ const TYPE_TO_COMPONENT = {
   placeholder: Placeholder,
   evergreen_content: EvergreenContent,
   elevator_status: ElevatorStatus,
+  full_line_map: FullLineMap,
 };
 
 const DISABLED_LAYOUT = {
