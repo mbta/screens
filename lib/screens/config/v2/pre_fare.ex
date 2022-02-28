@@ -6,7 +6,7 @@ defmodule Screens.Config.V2.PreFare do
 
   @type t :: %__MODULE__{
           header: CurrentStopId.t(),
-          elevator_status: ElevatorStatus.t()
+          elevator_status: ElevatorStatus.t(),
           evergreen_content: list(EvergreenContentItem.t())
         }
 
@@ -16,7 +16,7 @@ defmodule Screens.Config.V2.PreFare do
   use Screens.Config.Struct,
     children: [
       elevator_status: ElevatorStatus,
-      evergreen_content: {:list, EvergreenContentItem},      
+      evergreen_content: {:list, EvergreenContentItem},
       header: CurrentStopId
     ]
 end

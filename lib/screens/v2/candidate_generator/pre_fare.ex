@@ -64,7 +64,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       fn -> reconstructed_alert_instances_fn.(config) end,
       fn -> elevator_status_instance_fn.(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end,
-      fn -> placeholder_instances() end,
+      fn -> placeholder_instances() end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
