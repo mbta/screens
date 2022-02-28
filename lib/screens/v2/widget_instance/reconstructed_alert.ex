@@ -18,7 +18,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   #     or 1 if a takeover
 
   # slot_names will be :large if it's a regular alert
-  #     or body_left_takeover / body_right_takeover if a takeover (how can 1 alert fill both sides??)
+  #     or :full_body if a takeover
 
   defimpl Screens.V2.WidgetInstance do
     def priority(_instance), do: [3]
@@ -28,7 +28,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def valid_candidate?(_instance), do: true
     def audio_serialize(_instance), do: %{}
     def audio_sort_key(_instance), do: 0
-    def audio_valid_candidate?(_instance), do: true
+    def audio_valid_candidate?(_instance), do: false
     def audio_view(_instance), do: ScreensWeb.V2.Audio.ReconstructedAlertView
   end
 end
