@@ -1,11 +1,23 @@
-import React, { ComponentType } from "react";
+import React, { ComponentType, useState, useEffect } from "react";
 
 interface Props {
-  asset_url: string;
+  asset_urls: string[];
 }
 
-const FullLineMap: ComponentType<Props> = ({ asset_url: assetUrl }) => {
-  return <Image assetUrl={assetUrl} />;
+const intervalInMs = 10000
+
+const FullLineMap: ComponentType<Props> = ({asset_urls}) => {
+  const [assetIndex, setAssetIndex] = useState(0);
+
+  useEffect(() => {
+  if (assetIndex === asset_urls.length - 1) {
+    setTimeout(() => {setAssetIndex(0)}, intervalInMs)
+  } else {
+    setTimeout(() => {setAssetIndex((i) => i + 1)}, intervalInMs)
+  }
+}, [assetIndex])
+
+  return <Image assetUrl={asset_urls[assetIndex]} />;
 }
 
 interface ProperProps {

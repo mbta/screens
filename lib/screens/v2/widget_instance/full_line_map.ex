@@ -4,14 +4,13 @@ defmodule Screens.V2.WidgetInstance.FullLineMap do
   alias Screens.Config.Screen
 
   defstruct screen: nil,
-            asset_url: nil
+            asset_urls: nil
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          asset_url: String.t()
+          asset_urls: list(String.t())
         }
-
-  def serialize(%__MODULE__{asset_url: asset_url}), do: %{asset_url: asset_url}
+  def serialize(%__MODULE__{asset_urls: asset_urls}), do: %{asset_urls: asset_urls}
 
   def slot_names(_instance), do: [:main_content_left]
 

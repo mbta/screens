@@ -7,15 +7,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.FullLineMap do
   alias Screens.Util.Assets
 
   def full_line_map_instances(
-        %Screen{app_params: %PreFare{full_line_map: full_line_maps}} = config
+        %Screen{app_params: %PreFare{full_line_map: full_line_map}} = config
       ) do
-    Enum.map(full_line_maps, &full_line_map_instance(&1, config))
-  end
-
-  defp full_line_map_instance(%FullLineMap{asset_path: asset_path}, config) do
-    %FullLineMapWidget{
-      screen: config,
-      asset_url: Assets.s3_asset_url(asset_path)
-    }
+    [
+      %FullLineMapWidget{
+        screen: config,
+        asset_urls:
+          Enum.map(full_line_map, fn %FullLineMap{asset_path: asset_path} ->
+            Assets.s3_asset_url(asset_path)
+          end)
+      }
+    ]
   end
 end
