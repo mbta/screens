@@ -240,30 +240,27 @@ defmodule Screens.V2.ScreenData do
   end
 
   defp filter_empty_slots({_slot_id, {_layout_type, children}}, selected_instances_slots) do
-    new_children =
-      children
-      |> Enum.map(fn
-        slot_id when is_atom(slot_id) ->
-          if slot_id in selected_instances_slots do
-            slot_id
-          end
+    children
+    |> Enum.map(fn
+      slot_id when is_atom(slot_id) ->
+        if slot_id in selected_instances_slots do
+          slot_id
+        end
 
-        nested_child when is_paged_slot_id(nested_child) ->
-          if nested_child in selected_instances_slots do
-            nested_child
-          end
+      nested_child when is_paged_slot_id(nested_child) ->
+        if nested_child in selected_instances_slots do
+          nested_child
+        end
 
-        {slot_id, {layout_type, _children}} = nested_layout ->
-          case filter_empty_slots(nested_layout, selected_instances_slots) do
-            [nil] ->
-              nil
+      {slot_id, {layout_type, _children}} = nested_layout ->
+        case filter_empty_slots(nested_layout, selected_instances_slots) do
+          [nil] ->
+            nil
 
-            child ->
-              {slot_id, {layout_type, child}}
-          end
-      end)
-
-    new_children
+          child ->
+            {slot_id, {layout_type, child}}
+        end
+    end)
     |> Enum.filter(fn
       nil -> false
       {_, {_, []}} -> false
