@@ -239,19 +239,24 @@ defmodule Screens.V2.ScreenData do
     rem(periods_since_midnight, num_pages)
   end
 
+  # Function to remove slots from the layout if there are no candidates available to populate it
+  # Specifically added to help introduce variable paging
   defp filter_empty_slots({_slot_id, {_layout_type, children}}, selected_instances_slots) do
     children
     |> Enum.map(fn
+      # Static slots: :main_content, :header, etc.
       slot_id when is_atom(slot_id) ->
         if slot_id in selected_instances_slots do
           slot_id
         end
 
+      # Paged slots: :flex_zone
       nested_child when is_paged_slot_id(nested_child) ->
         if nested_child in selected_instances_slots do
           nested_child
         end
 
+      # A nested layout. Take the nested layout and feed it back into this function to process its children.
       {slot_id, {layout_type, _children}} = nested_layout ->
         case filter_empty_slots(nested_layout, selected_instances_slots) do
           [nil] ->
@@ -261,6 +266,7 @@ defmodule Screens.V2.ScreenData do
             {slot_id, {layout_type, child}}
         end
     end)
+    # Remove all nil/empty pages from the original children.
     |> Enum.filter(fn
       nil -> false
       {_, {_, []}} -> false
