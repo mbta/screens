@@ -22,7 +22,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   #     or :full_body if a takeover
 
   defimpl Screens.V2.WidgetInstance do
-    def priority(_instance), do: [2]
+    def priority(_instance), do: [3]
     def serialize(t), do: ReconstructedAlert.serialize(t)
     def slot_names(_instance), do: [:large]
     def widget_type(_instance), do: :reconstructed_alert
