@@ -77,13 +77,17 @@ defmodule Screens.V2.ScreenData do
       |> Enum.map(fn t -> {t, %{}} end)
       |> Enum.into(%{})
 
-    {{_, selected_layout}, selected_instances} =
+    {{_, {slot_id, {layout_type, _children}} = selected_layout}, selected_instances} =
       prioritized_instances
       |> Enum.reduce(candidate_placements, &place_instance/2)
       |> log_mismatched_placement_widgets()
       |> select_best_placement()
 
-    {selected_layout, selected_instances}
+    filtered_children =
+      selected_layout
+      |> filter_empty_slots(Map.keys(selected_instances))
+
+    {{slot_id, {layout_type, filtered_children}}, selected_instances}
   end
 
   defp place_instance(instance, placements) do
@@ -233,6 +237,38 @@ defmodule Screens.V2.ScreenData do
     seconds_since_midnight = now.hour * 60 * 60 + now.minute * 60 + now.second
     periods_since_midnight = div(seconds_since_midnight, refresh_rate)
     rem(periods_since_midnight, num_pages)
+  end
+
+  defp filter_empty_slots({_slot_id, {_layout_type, children}}, selected_instances_slots) do
+    new_children =
+      children
+      |> Enum.map(fn
+        slot_id when is_atom(slot_id) ->
+          if slot_id in selected_instances_slots do
+            slot_id
+          end
+
+        nested_child when is_paged_slot_id(nested_child) ->
+          if nested_child in selected_instances_slots do
+            nested_child
+          end
+
+        {slot_id, {layout_type, _children}} = nested_layout ->
+          case filter_empty_slots(nested_layout, selected_instances_slots) do
+            [nil] ->
+              nil
+
+            child ->
+              {slot_id, {layout_type, child}}
+          end
+      end)
+
+    new_children
+    |> Enum.filter(fn
+      nil -> false
+      {_, {_, []}} -> false
+      _ -> true
+    end)
   end
 
   @spec choose_visible_slot_ids(Template.layout(), integer(), DateTime.t()) ::
