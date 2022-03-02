@@ -4,10 +4,12 @@ import React, {
   useLayoutEffect,
   useRef,
   useEffect,
+  useContext,
 } from "react";
 
 import NormalSection from "Components/v2/departures/normal_section";
 import NoticeSection from "Components/v2/departures/notice_section";
+import { LastFetchContext } from "../screen_container";
 
 const NormalDeparturesRenderer = forwardRef(
   ({ sections, sectionSizes }, ref) => {
@@ -116,6 +118,7 @@ const NormalDeparturesSizer = ({ sections, onDoneSizing }) => {
 
 const NormalDepartures = ({ sections }) => {
   const [sectionSizes, setSectionSizes] = useState([]);
+  const lastFetch = useContext(LastFetchContext);
 
   // Reset state each time we receive new props,
   // so that section sizes are recalculated from scratch.
@@ -128,6 +131,7 @@ const NormalDepartures = ({ sections }) => {
       <NormalDeparturesRenderer
         sections={sections}
         sectionSizes={sectionSizes}
+        key={lastFetch}
       />
     );
   } else {
@@ -135,6 +139,7 @@ const NormalDepartures = ({ sections }) => {
       <NormalDeparturesSizer
         sections={sections}
         onDoneSizing={setSectionSizes}
+        key={lastFetch}
       />
     );
   }
