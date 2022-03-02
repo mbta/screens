@@ -2,10 +2,10 @@ defmodule Screens.Config.V2.PreFare do
   @moduledoc false
 
   alias Screens.Config.V2.{ElevatorStatus, EvergreenContentItem}
-  alias Screens.Config.V2.Header.CurrentStopName
+  alias Screens.Config.V2.Header.CurrentStopId
 
   @type t :: %__MODULE__{
-          header: CurrentStopName.t(),
+          header: CurrentStopId.t(),
           elevator_status: ElevatorStatus.t(),
           evergreen_content: list(EvergreenContentItem.t())
         }
@@ -17,6 +17,6 @@ defmodule Screens.Config.V2.PreFare do
     children: [
       elevator_status: ElevatorStatus,
       evergreen_content: {:list, EvergreenContentItem},
-      header: CurrentStopName
+      header: CurrentStopId
     ]
 end

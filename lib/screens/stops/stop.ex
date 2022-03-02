@@ -78,4 +78,15 @@ defmodule Screens.Stops.Stop do
         end
     end
   end
+
+  def fetch_stop_name(stop_id) do
+    case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do
+      {:ok, %{"data" => [stop_data]}} ->
+        %{"attributes" => %{"name" => stop_name}} = stop_data
+        stop_name
+
+      _ ->
+        nil
+    end
+  end
 end
