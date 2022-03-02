@@ -12,7 +12,12 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
           parent_station_id: "place-foo",
           platform_stop_ids: []
         },
-        header: %V2.Header.CurrentStopName{stop_name: "Test Station"}
+        header: %V2.Header.CurrentStopName{stop_name: "Test Station"},
+        full_line_map: [
+          %V2.FullLineMap{
+            asset_path: "test/path"
+          }
+        ]
       },
       vendor: :gds,
       device_id: "TEST",
