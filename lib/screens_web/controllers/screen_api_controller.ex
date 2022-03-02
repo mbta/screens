@@ -11,15 +11,19 @@ defmodule ScreensWeb.ScreenApiController do
       conn
     else
       conn
-      |> put_status(:not_found)
+      |> not_found_response()
       |> halt()
     end
   end
 
   def show(conn, %{"id" => screen_id, "last_refresh" => _last_refresh, "datetime" => datetime}) do
-    data = Screens.ScreenData.by_screen_id_with_datetime(screen_id, datetime)
+    if nonexistent_screen?(screen_id) do
+      not_found_response(conn)
+    else
+      data = Screens.ScreenData.by_screen_id_with_datetime(screen_id, datetime)
 
-    json(conn, data)
+      json(conn, data)
+    end
   end
 
   def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh}) do
@@ -27,13 +31,17 @@ defmodule ScreensWeb.ScreenApiController do
 
     _ = Screens.LogScreenData.log_data_request(screen_id, last_refresh, is_screen)
 
-    data =
-      Screens.ScreenData.by_screen_id(screen_id, is_screen,
-        check_disabled: true,
-        last_refresh: last_refresh
-      )
+    if nonexistent_screen?(screen_id) do
+      not_found_response(conn)
+    else
+      data =
+        Screens.ScreenData.by_screen_id(screen_id, is_screen,
+          check_disabled: true,
+          last_refresh: last_refresh
+        )
 
-    json(conn, data)
+      json(conn, data)
+    end
   end
 
   def show_dup(conn, %{"id" => screen_id, "rotation_index" => rotation_index}) do
@@ -41,8 +49,22 @@ defmodule ScreensWeb.ScreenApiController do
 
     _ = Screens.LogScreenData.log_data_request(screen_id, nil, is_screen)
 
-    data = Screens.DupScreenData.by_screen_id(screen_id, rotation_index)
+    if nonexistent_screen?(screen_id) do
+      not_found_response(conn)
+    else
+      data = Screens.DupScreenData.by_screen_id(screen_id, rotation_index)
 
-    json(conn, data)
+      json(conn, data)
+    end
+  end
+
+  defp nonexistent_screen?(screen_id) do
+    is_nil(State.screen(screen_id))
+  end
+
+  defp not_found_response(conn) do
+    conn
+    |> put_status(:not_found)
+    |> text("Not found")
   end
 end

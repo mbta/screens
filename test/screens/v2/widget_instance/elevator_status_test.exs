@@ -4,7 +4,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   alias Screens.V2.WidgetInstance
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{ElevatorStatus, PreFare}
+  alias Screens.Config.V2.{ElevatorStatus, FullLineMap, PreFare}
   alias Screens.Config.V2.Header.CurrentStopName
 
   setup do
@@ -16,7 +16,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               parent_station_id: "place-foo",
               platform_stop_ids: []
             },
-            header: %CurrentStopName{stop_name: "Test Station"}
+            header: %CurrentStopName{stop_name: "Test Station"},
+            full_line_map: [
+              %FullLineMap{
+                asset_path: "test/path"
+              }
+            ]
           },
           vendor: nil,
           device_id: nil,
@@ -52,7 +57,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               parent_station_id: "place-foo",
               platform_stop_ids: []
             },
-            header: %CurrentStopName{stop_name: "Test Station"}
+            header: %CurrentStopName{stop_name: "Test Station"},
+            full_line_map: [
+              %FullLineMap{
+                asset_path: "test/path"
+              }
+            ]
           },
           vendor: nil,
           device_id: nil,
@@ -81,7 +91,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               parent_station_id: "place-foo",
               platform_stop_ids: []
             },
-            header: %CurrentStopName{stop_name: "Test Station"}
+            header: %CurrentStopName{stop_name: "Test Station"},
+            full_line_map: [
+              %FullLineMap{
+                asset_path: "test/path"
+              }
+            ]
           },
           vendor: nil,
           device_id: nil,
@@ -110,7 +125,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               parent_station_id: "place-foo",
               platform_stop_ids: []
             },
-            header: %CurrentStopName{stop_name: "Test Station"}
+            header: %CurrentStopName{stop_name: "Test Station"},
+            full_line_map: [
+              %FullLineMap{
+                asset_path: "test/path"
+              }
+            ]
           },
           vendor: nil,
           device_id: nil,
@@ -139,7 +159,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               parent_station_id: "place-foo",
               platform_stop_ids: []
             },
-            header: %CurrentStopName{stop_name: "Test Station"}
+            header: %CurrentStopName{stop_name: "Test Station"},
+            full_line_map: [
+              %FullLineMap{
+                asset_path: "test/path"
+              }
+            ]
           },
           vendor: nil,
           device_id: nil,
