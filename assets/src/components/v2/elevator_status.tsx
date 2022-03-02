@@ -1,12 +1,12 @@
 import moment from "moment";
-import React, { ComponentType, useEffect, useState } from "react";
+import React, { ComponentType } from "react";
 import { classWithModifier, imagePath } from "Util/util";
 import FlexZonePageIndicator from "./flex/page_indicator";
 import makePersistentCarousel, { PageRendererProps } from "./persistent_carousel";
 
 const subwayIcons = ["red", "blue", "orange", "green", "silver"];
 
-type Page = ListPage | DetailPage;
+type ElevatorStatusPage = ListPage | DetailPage;
 
 interface DetailPage {
   station: Station;
@@ -49,9 +49,7 @@ type Icon =
   | "bus"
   | "mattapan";
 
-interface Props extends PageRendererProps {
-  page: Page;
-}
+type Props = PageRendererProps<ElevatorStatusPage>;
 
 const ElevatorStatus: ComponentType<Props> = ({ page, pageIndex, numPages }) => {
   let pageToRender;
@@ -83,11 +81,11 @@ const ElevatorStatus: ComponentType<Props> = ({ page, pageIndex, numPages }) => 
   );
 };
 
-const instanceOfDetailPage = (page: Page): page is DetailPage => {
+const instanceOfDetailPage = (page: ElevatorStatusPage): page is DetailPage => {
   return (page as DetailPage).station !== undefined;
 };
 
-const instanceOfListPage = (page: Page): page is ListPage => {
+const instanceOfListPage = (page: ElevatorStatusPage): page is ListPage => {
   return (page as ListPage).stations !== undefined;
 };
 
@@ -262,11 +260,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
   );
 };
 
-interface ListPageProps {
-  listPage: ListPage;
-}
-
-const ListPageComponent: ComponentType<ListPageProps> = ({ listPage }) => {
+const ListPageComponent: ComponentType<ListPage> = ({ stations }) => {
   return null;
 };
 

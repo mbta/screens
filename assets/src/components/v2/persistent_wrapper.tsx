@@ -44,7 +44,7 @@ const PersistentWrapper: ComponentType<Props> = ({ WrappedComponent, ...data }) 
  * data refreshes.
  *
  * Consider extending the `WrappedComponentProps` type exported by this module when
- * defining your `WrappedComponent`'s props.
+ * defining your `WrappedComponent`'s prop types.
  *
  * `WrappedComponent` must expect the following props:
  * - `onFinish`: A callback that `WrappedComponent` can call to indicate that it is ready to receive
