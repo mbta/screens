@@ -12,7 +12,12 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
         elevator_status: %V2.ElevatorStatus{
           parent_station_id: "place-foo",
           platform_stop_ids: []
-        }
+        },
+        full_line_map: [
+          %V2.FullLineMap{
+            asset_path: "test/path"
+          }
+        ]
       },
       vendor: :gds,
       device_id: "TEST",
