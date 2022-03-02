@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
   alias Screens.Config.Screen
   alias Screens.Config.V2.{BusEink, Footer}
   alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
@@ -44,7 +45,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
-        fetch_stop_name_fn \\ &fetch_stop_name/1,
+        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/1,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
@@ -85,16 +86,5 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
 
   defp bottom_screen_filler_instances(config) do
     [%BottomScreenFiller{screen: config}]
-  end
-
-  defp fetch_stop_name(stop_id) do
-    case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do
-      {:ok, %{"data" => [stop_data]}} ->
-        %{"attributes" => %{"name" => stop_name}} = stop_data
-        stop_name
-
-      _ ->
-        nil
-    end
   end
 end
