@@ -44,8 +44,8 @@ defmodule Screens.Routes.Route do
   """
   @spec fetch_routes_at_stop(String.t()) ::
           {:ok, list(%{route_id: id(), active?: boolean()})} | :error
-  def fetch_routes_at_stop(stop_id, now \\ DateTime.utc_now(), get_json_fn \\ &V3Api.get_json/2) do
-    with {:ok, all_route_ids} <- fetch_all_route_ids(stop_id, get_json_fn),
+  def fetch_routes_at_stop(stop_id, now \\ DateTime.utc_now(), type_filter \\ nil, get_json_fn \\ &V3Api.get_json/2) do
+    with {:ok, all_route_ids} <- fetch_all_route_ids(stop_id, get_json_fn, type_filter),
          {:ok, active_route_ids} <- fetch_active_route_ids(stop_id, now, get_json_fn) do
       active_set = MapSet.new(active_route_ids)
 
@@ -76,9 +76,15 @@ defmodule Screens.Routes.Route do
 
   defp format_query_param(_), do: []
 
-  defp fetch_all_route_ids(stop_id, get_json_fn) do
+  defp fetch_all_route_ids(stop_id, get_json_fn, type_filter) do
     case fetch([stop_id: stop_id], get_json_fn) do
-      {:ok, routes} -> {:ok, Enum.map(routes, & &1.id)}
+      {:ok, routes} -> {:ok,
+        if type_filter do
+          Enum.filter(routes, fn route -> Map.get(route, :type) === type_filter end)
+        else
+          routes
+        end
+        |> Enum.map(& &1.id)}
       :error -> :error
     end
   end

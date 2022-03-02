@@ -1,27 +1,41 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   @moduledoc false
 
+  alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Config.V2.PreFare
+  alias Screens.Routes.Route
   alias Screens.V2.WidgetInstance.ReconstructedAlert
 
-  def reconstructed_alert_instances(%Screen{
-        app_params: %PreFare{header: %CurrentStopId{stop_id: _stop_id}}
-      }) do
-    # Given the stop id, determine relevant routes
-    temp_route_ids = ["Red", "Green-B", "Green-C", "Green-D", "Green-E"]
+  @relevant_effects ~w[shuttle suspension station_closure delay]a
 
-    # Given route ids, fetch alerts
-    case Screens.Alerts.Alert.fetch(route_ids: temp_route_ids) do
-      {:ok, alerts} ->
-        Enum.map(
-          alerts,
-          fn alert -> %ReconstructedAlert{alert: alert} end
-        )
+  @doc """
+  Given the stop_id defined in the header, determine relevant routes
+  Given the routes, fetch all alerts for the route
+  """
+  def reconstructed_alert_instances(
+        %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}},
+        now \\ DateTime.utc_now(),
+        fetch_routes_at_stop_fn \\ &Route.fetch_routes_at_stop/3
+      ) do
+    with {:ok, routes_at_stop} <- fetch_routes_at_stop_fn.(stop_id, now, :subway),
+         route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id) do
 
-      :error ->
-        []
+      case Alert.fetch(route_ids: route_ids_at_stop) do
+        {:ok, alerts} ->
+          alerts
+          |> Enum.filter(fn alert ->
+              Enum.member?(@relevant_effects, Map.get(alert, :effect))
+            end)
+          |> Enum.map(
+            fn alert -> %ReconstructedAlert{alert: alert} end
+          )
+
+        :error -> []
+      end
+    else
+      :error -> []
     end
   end
 end
