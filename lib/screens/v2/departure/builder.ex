@@ -62,11 +62,13 @@ defmodule Screens.V2.Departure.Builder do
     deduplicated_predictions_with_trip =
       departures_with_trip
       |> Enum.group_by(fn %{trip: %Trip{id: trip_id}} -> trip_id end)
-      |> Enum.map(fn {_trip_id, departures} -> Enum.min_by(departures, & &1.departure_time) end)
+      |> Enum.map(fn {_trip_id, departures} ->
+        Enum.min_by(departures, &(&1.departure_time || &1.arrival_time), DateTime)
+      end)
 
     departures_without_trip
     |> Kernel.++(deduplicated_predictions_with_trip)
-    |> Enum.sort_by(& &1.departure_time, DateTime)
+    |> Enum.sort_by(&(&1.departure_time || &1.arrival_time), DateTime)
   end
 
   def merge_predictions_and_schedules(predictions, schedules) do
