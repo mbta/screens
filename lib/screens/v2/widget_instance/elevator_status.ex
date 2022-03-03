@@ -29,6 +29,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     defstruct stations: nil
   end
 
+  @subway_icons ~w[red blue orange green silver]a
+
   # To be replaced by more detailed values for fitting rows in the list view
   @max_rows_per_page 4
 
@@ -50,7 +52,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           | :orange
           | :green
           | :silver
-          | :green
           | :rail
           | :bus
           | :mattapan
@@ -286,6 +287,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     icons =
       station_id_to_icons
       |> Map.fetch!(parent_station_id)
+      # Prioritize subway (and Silver Line) route icons
+      |> Enum.sort_by(&if(&1 in @subway_icons, do: 0, else: 1))
       |> Enum.take(3)
 
     %{
