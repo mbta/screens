@@ -36,6 +36,10 @@ defmodule Screens.Routes.RouteTest do
           _, %{"filter[stop]" => ^stop_id} ->
             {:ok, %{"data" => all_routes}}
         end,
+        fetch_all_route_ids_fn: fn
+          _, _, :subway -> {:ok, []}
+          _, _, _ -> {:ok, [route_json("22"), route_json("29"), route_json("44")]}
+        end,
         x_get_json_fn1: fn
           _, %{"filter[stop]" => ^stop_id, "filter[date]" => ^today_iso8601} -> :error
           _, %{"filter[stop]" => ^stop_id} -> {:ok, %{"data" => all_routes}}
@@ -46,6 +50,9 @@ defmodule Screens.Routes.RouteTest do
 
           _, %{"filter[stop]" => ^stop_id} ->
             :error
+        end,
+        x_fetch_all_route_ids_fn: fn
+          _, _, _ -> :error
         end
       }
     end
@@ -63,20 +70,37 @@ defmodule Screens.Routes.RouteTest do
         %{route_id: "44", active?: true}
       ]
 
-      assert {:ok, expected_routes} == fetch_routes_at_stop(stop_id, today, get_json_fn)
+      assert {:ok, expected_routes} == fetch_routes_at_stop(stop_id, today, nil, get_json_fn)
     end
 
     test "returns :error if either fetch function returns :error", context do
       %{
         stop_id: stop_id,
         today: today,
+        get_json_fn: get_json_fn,
         x_get_json_fn1: x_get_json_fn1,
-        x_get_json_fn2: x_get_json_fn2
+        x_get_json_fn2: x_get_json_fn2,
+        x_fetch_all_route_ids_fn: x_fetch_all_route_ids_fn
       } = context
 
-      assert :error == fetch_routes_at_stop(stop_id, today, x_get_json_fn1)
+      assert :error == fetch_routes_at_stop(stop_id, today, nil, x_get_json_fn1)
 
-      assert :error == fetch_routes_at_stop(stop_id, today, x_get_json_fn2)
+      assert :error == fetch_routes_at_stop(stop_id, today, nil, x_get_json_fn2)
+
+      assert :error ==
+               fetch_routes_at_stop(stop_id, today, nil, get_json_fn, x_fetch_all_route_ids_fn)
+    end
+
+    test "filters routes by type if provided", context do
+      %{
+        stop_id: stop_id,
+        today: today,
+        fetch_all_route_ids_fn: fetch_all_route_ids_fn,
+        get_json_fn: get_json_fn
+      } = context
+
+      assert {:ok, []} ==
+               fetch_routes_at_stop(stop_id, today, :subway, get_json_fn, fetch_all_route_ids_fn)
     end
   end
 end

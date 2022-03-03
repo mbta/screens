@@ -17,23 +17,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   def reconstructed_alert_instances(
         %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}},
         now \\ DateTime.utc_now(),
-        fetch_routes_at_stop_fn \\ &Route.fetch_routes_at_stop/3
+        fetch_routes_at_stop_fn \\ &Route.fetch_routes_at_stop/3,
+        fetch_alerts_fn \\ &Alert.fetch/1
       ) do
     with {:ok, routes_at_stop} <- fetch_routes_at_stop_fn.(stop_id, now, :subway),
-         route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id) do
-
-      case Alert.fetch(route_ids: route_ids_at_stop) do
-        {:ok, alerts} ->
-          alerts
-          |> Enum.filter(fn alert ->
-              Enum.member?(@relevant_effects, Map.get(alert, :effect))
-            end)
-          |> Enum.map(
-            fn alert -> %ReconstructedAlert{alert: alert} end
-          )
-
-        :error -> []
-      end
+         route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
+         {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids_at_stop) do
+      alerts
+      |> Enum.filter(fn alert ->
+        Enum.member?(@relevant_effects, Map.get(alert, :effect))
+      end)
+      |> Enum.map(fn alert -> %ReconstructedAlert{alert: alert} end)
     else
       :error -> []
     end
