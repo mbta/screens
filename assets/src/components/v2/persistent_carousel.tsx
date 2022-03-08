@@ -54,6 +54,7 @@ const PersistentCarousel = makePersistent(Carousel as ComponentType<WrappedCompo
  *
  * Example:
  * ```tsx
+ * //// in persistent_image_carousel.tsx
  * // Define a type for the data our component requires in order to render one page of content.
  * interface ImageData {
  *   url: string;
@@ -76,18 +77,23 @@ const PersistentCarousel = makePersistent(Carousel as ComponentType<WrappedCompo
  *
  * export default makePersistentCarousel(Image);
  *
- * // in some containing component's render...
- * const pages = [
- *   {url: "/psa.png", caption: "It's a PSA!"},
- *   {url: "/squirrel.jpg", caption: "Beware."},
- *   {url: "/survey.png", caption: "Penny for your thoughts?"}
- * ];
+ * //// in some other module...
+ * import PersistentImageCarousel from "persistent_image_carousel";
  *
- * return (
- *   <div>
- *     <PersistentImageCarousel pages={pages} />
- *   </div>
- * );
+ * const Container = ({}) => {
+ *   const pages = [
+ *     {url: "/psa.png", caption: "It's a PSA!"},
+ *     {url: "/squirrel.jpg", caption: "Beware."},
+ *     {url: "/survey.png", caption: "Penny for your thoughts?"}
+ *   ];
+ *
+ *   return (
+ *     <div>
+ *       <PersistentImageCarousel pages={pages} />
+ *       <OtherStuff  />
+ *     </div>
+ *   );
+ * };
  * ```
  */
 const makePersistentCarousel =
