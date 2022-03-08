@@ -37,18 +37,24 @@ const rawResponseToApiResponse = ({
 };
 
 const doFailureBuffer = (
-  lastSuccess: number,
+  lastSuccess: number | null,
   failureModeElapsedMs: number,
   setApiResponse: React.Dispatch<React.SetStateAction<ApiResponse>>,
   apiResponse: ApiResponse = FAILURE_RESPONSE
 ) => {
-  const elapsedMs = Date.now() - lastSuccess;
-
-  if (elapsedMs < failureModeElapsedMs) {
+  if (lastSuccess == null) {
+    // We haven't had a successful request since initial page load.
+    // Continue showing the initial "no data" state.
     setApiResponse((state) => state);
-  }
-  if (elapsedMs >= failureModeElapsedMs) {
-    setApiResponse(apiResponse);
+  } else {
+    const elapsedMs = Date.now() - lastSuccess;
+
+    if (elapsedMs < failureModeElapsedMs) {
+      setApiResponse((state) => state);
+    }
+    if (elapsedMs >= failureModeElapsedMs) {
+      setApiResponse(apiResponse);
+    }
   }
 };
 
@@ -68,14 +74,20 @@ interface UseApiResponseArgs {
   failureModeElapsedMs?: number;
 }
 
+interface UseApiResponseReturn {
+  apiResponse: ApiResponse;
+  requestCount: number;
+  lastSuccess: number | null;
+}
+
 const useApiResponse = ({
   id,
   failureModeElapsedMs = MINUTE_IN_MS,
-}: UseApiResponseArgs): { apiResponse: ApiResponse, requestCount: number, lastSuccess: number } => {
+}: UseApiResponseArgs): UseApiResponseReturn => {
   const isRealScreenParam = useIsRealScreenParam()
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
-  const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
+  const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const { lastRefresh, refreshRate } = document.getElementById("app").dataset;
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}${isRealScreenParam}`;
