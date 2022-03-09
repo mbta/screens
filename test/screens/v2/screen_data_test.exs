@@ -172,6 +172,57 @@ defmodule Screens.V2.ScreenDataTest do
                {1, :content2_large} => %MockWidget{content: "4"}
              } = actual_instance_placement
     end
+
+    test "filters out blank pages" do
+      candidate_template =
+        {:screen,
+         %{
+           normal: [
+             :header,
+             {{0, :flex_zone},
+              %{
+                one_large: [{0, :large}],
+                two_medium: [{0, :medium_left}, {0, :medium_right}],
+                one_medium_two_small: [
+                  {0, :medium_left},
+                  {0, :small_upper_right},
+                  {0, :small_lower_right}
+                ]
+              }},
+             {{1, :flex_zone},
+              %{
+                one_large: [{1, :large}],
+                two_medium: [{1, :medium_left}, {1, :medium_right}],
+                one_medium_two_small: [
+                  {1, :medium_left},
+                  {1, :small_upper_right},
+                  {1, :small_lower_right}
+                ]
+              }}
+           ],
+           takeover: [:full_screen]
+         }}
+
+      candidate_instances = [
+        %MockWidget{slot_names: [:large], priority: [2], content: "1"},
+        %MockWidget{slot_names: [:header], priority: [2], content: "header"}
+      ]
+
+      {actual_layout, actual_instance_placement} =
+        ScreenData.pick_instances(candidate_template, candidate_instances)
+
+      assert {:screen,
+              {:normal,
+               [
+                 :header,
+                 {{0, :flex_zone}, {:one_large, [{0, :large}]}}
+               ]}} == actual_layout
+
+      assert %{
+               :header => %MockWidget{content: "header"},
+               {0, :large} => %MockWidget{content: "1"}
+             } = actual_instance_placement
+    end
   end
 
   describe "serialize/1" do
