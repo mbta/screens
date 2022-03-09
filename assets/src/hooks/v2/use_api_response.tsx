@@ -1,4 +1,5 @@
 import { WidgetData } from "Components/v2/widget";
+import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -115,28 +116,15 @@ const useApiResponse = ({
     setRequestCount((count) => count + 1);
   };
 
-  const calculateMsToNextRefresh = () => {
-    const now = new Date();
-    // currentMs = milliseconds since last minute on the clock
-    const currentMs = now.getSeconds() * 1000 + now.getMilliseconds();
-    let nextRefreshMs = 0;
-    while (currentMs >= nextRefreshMs) {
-      nextRefreshMs += refreshMs;
-    }
-
-    return nextRefreshMs - currentMs + refreshRateOffsetMs;
-  };
-
+  // Fetch data once, immediately, on page load
   useEffect(() => {
-    // Initial fetch for first render
     fetchData();
-
-    // Schedule subsequent fetches
-    setTimeout(function setFetchDataInterval() {
-      fetchData();
-      setTimeout(setFetchDataInterval, calculateMsToNextRefresh());
-    }, calculateMsToNextRefresh());
   }, []);
+
+  // Schedule subsequent data fetches
+  useDriftlessInterval(() => {
+    fetchData();
+  }, refreshMs, refreshRateOffsetMs);
 
   return { apiResponse, requestCount, lastSuccess };
 };
