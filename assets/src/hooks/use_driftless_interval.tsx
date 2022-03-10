@@ -3,16 +3,32 @@ import { useEffect, useRef, useState } from "react";
 const noop = () => { };
 
 const calculateMsToNextCall = (periodMs: number, offsetMs: number) => {
-  // Milliseconds since Unix epoch
+  // Now, as a Unix timestamp (Milliseconds since Unix epoch)
   const now = Date.now();
-  // Count the number of periods elapsed since epoch, add one period, and convert back to milliseconds
-  const nextPeriodStart = (Math.floor(now / periodMs) + 1) * periodMs;
 
-  // p1 - - - - - - - - - - p2 - - - - - - - - - - p3 - - ...
-  //     ^prev call  ^NOW   ^nextPeriodStart
-  // |---|           |------|---|
-  // offset          time to next call
-  return nextPeriodStart - now + offsetMs;
+  // Timestamp of the start of the period we're currently in
+  const currentPeriodStart = Math.floor(now / periodMs) * periodMs;
+  // Timestamp of the call that happened (or will happen) this period
+  const timestampOfCallThisPeriod = currentPeriodStart + offsetMs;
+
+  let nextCallTimestamp;
+  if (now < timestampOfCallThisPeriod) {
+    // p1 - - - - - - - - - - p2 - - - - - - - - - - p3 - - ...
+    // NOW^  ^next call
+    // |-----|
+    //    ^offset
+    // The call during this period is still coming up
+    nextCallTimestamp = timestampOfCallThisPeriod;
+  } else {
+    // p1 - - - - - - - - - - p2 - - - - - - - - - - p3 - - ...
+    //       ^prev call  ^NOW       ^next call
+    // |-----|                |-----|
+    //    ^offset
+    // The call during this period has already happened, so the next call happens during the next period
+    nextCallTimestamp = timestampOfCallThisPeriod + periodMs;
+  }
+
+  return nextCallTimestamp - now;
 };
 
 const useDriftlessInterval = (callback: () => void, periodMs: number, offsetMs: number = 0) => {
