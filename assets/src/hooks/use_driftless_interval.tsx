@@ -45,9 +45,11 @@ const useDriftlessInterval = (callback: () => void, periodMs: number, offsetMs: 
       setTickSignal((value) => !value);
     };
 
-    const id = setTimeout(tick, calculateMsToNextCall(periodMs, offsetMs));
-
-    return () => clearTimeout(id);
+    if (periodMs > 0) {
+      const id = setTimeout(tick, calculateMsToNextCall(periodMs, offsetMs));
+      return () => clearTimeout(id);
+    }
+    return;
   }, [tickSignal, periodMs, offsetMs]);
 };
 
