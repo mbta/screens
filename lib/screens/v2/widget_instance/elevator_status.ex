@@ -7,16 +7,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     alias Screens.V2.WidgetInstance.ElevatorStatus
 
     @type t :: %__MODULE__{
-            header_text: String.t(),
-            icons: list(ElevatorStatus.icon()),
-            elevator_closure: ElevatorStatus.closure()
+            station: ElevatorStatus.station()
           }
 
     @derive Jason.Encoder
 
-    defstruct header_text: nil,
-              icons: nil,
-              elevator_closure: nil
+    defstruct station: nil
   end
 
   defmodule ListPage do
@@ -32,6 +28,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     defstruct stations: nil
   end
+
+  @subway_icons ~w[red blue orange green silver]a
 
   # To be replaced by more detailed values for fitting rows in the list view
   @max_rows_per_page 4
@@ -54,14 +52,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           | :orange
           | :green
           | :silver
-          | :green
           | :rail
           | :bus
           | :mattapan
 
   @type timeframe :: %{
           happening_now: boolean(),
-          active_period: list()
+          active_period: map()
         }
 
   @type closure :: %{
@@ -103,6 +100,16 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
         }
       }) do
     parent_station_id
+  end
+
+  def platform_stop_ids(%__MODULE__{
+        screen: %Screen{
+          app_params: %PreFare{
+            elevator_status: %ElevatorStatus{platform_stop_ids: platform_stop_ids}
+          }
+        }
+      }) do
+    platform_stop_ids
   end
 
   defp get_active_at_home_station(%__MODULE__{alerts: alerts} = t) do
@@ -182,16 +189,22 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
          %__MODULE__{now: now, stop_sequences: stop_sequences} = t
        ) do
-    stations = get_stations_from_entities(entities)
+    informed_platforms =
+      for %{stop: stop} when is_binary(stop) <- entities,
+          match?({_n, ""}, Integer.parse(stop)),
+          do: stop
+
     parent_station_id = parent_station_id(t)
+    platform_stop_ids = platform_stop_ids(t)
 
     flat_stop_sequences =
       stop_sequences
       |> List.flatten()
 
     Alert.happening_now?(alert, now) and
-      Enum.any?(stations, fn station ->
-        station in flat_stop_sequences and station != parent_station_id
+      Enum.any?(informed_platforms, fn platform ->
+        platform != parent_station_id and platform not in platform_stop_ids and
+          platform in flat_stop_sequences
       end)
   end
 
@@ -245,7 +258,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       elevator_name: name,
       elevator_id: id,
       timeframe: serialize_timeframe(alert, now),
-      description: alert.description
+      description: alert.description,
+      header_text: alert.header
     }
   end
 
@@ -270,18 +284,27 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
         serialize_closure(alert, facility, now)
       end)
 
+    icons =
+      station_id_to_icons
+      |> Map.fetch!(parent_station_id)
+      # Prioritize subway (and Silver Line) route icons
+      |> Enum.sort_by(&if(&1 in @subway_icons, do: 0, else: 1))
+      |> Enum.take(3)
+
     %{
       name: station_name,
-      icons: Map.fetch!(station_id_to_icons, parent_station_id),
+      icons: icons,
       elevator_closures: closures,
       is_at_home_stop: parent_station_id == parent_station_id(t)
     }
   end
 
   defp serialize_timeframe(%Alert{active_period: active_period} = alert, now) do
+    next_active_period = List.first(active_period)
+
     %{
       happening_now: Alert.happening_now?(alert, now),
-      active_period: Enum.map(active_period, &Alert.ap_to_map/1)
+      active_period: Alert.ap_to_map(next_active_period)
     }
   end
 
@@ -300,19 +323,17 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   end
 
   defp serialize_detail_page(
-         %Alert{header: header, informed_entities: entities} = alert,
-         %__MODULE__{
-           station_id_to_icons: station_id_to_icons,
-           facility_id_to_name: facility_id_to_name,
-           now: now
-         } = t
+         alert,
+         %__MODULE__{} = t
        ) do
-    facility = get_informed_facility(entities, facility_id_to_name)
+    station =
+      [alert]
+      |> alerts_by_station()
+      |> Enum.map(&serialize_station(&1, t))
+      |> hd()
 
     %DetailPage{
-      header_text: header,
-      icons: Map.fetch!(station_id_to_icons, parent_station_id(t)),
-      elevator_closure: serialize_closure(alert, facility, now)
+      station: station
     }
   end
 
@@ -387,7 +408,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     }
   end
 
-  def slot_names(_instance), do: [:main_content_right]
+  def slot_names(_instance), do: [:lower_right]
 
   def widget_type(_instance), do: :elevator_status
 

@@ -1,0 +1,25 @@
+// body total height: 1648px
+
+.body-right-normal {
+  position: relative;
+}
+
+.body-right-normal__upper {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 1080px;
+  height: 628px;
+  overflow: hidden;
+}
+
+.body-right-normal__lower {
+  position: absolute;
+  top: 628px;
+  left: 0;
+
+  width: 1080px;
+  height: 1092px;
+  overflow: hidden;
+}

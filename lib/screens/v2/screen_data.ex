@@ -26,24 +26,21 @@ defmodule Screens.V2.ScreenData do
             {page_index :: non_neg_integer(), num_pages :: pos_integer()}
         }
 
-  @spec by_screen_id(screen_id(), String.t()) :: response_map()
-  def by_screen_id(screen_id, last_refresh) do
-    cond do
-      outdated?(screen_id, last_refresh) ->
-        outdated_response()
+  @spec outdated_response() :: response_map()
+  def outdated_response, do: response(force_reload: true)
 
-      disabled?(screen_id) ->
-        disabled_response()
+  @spec disabled_response() :: response_map()
+  def disabled_response, do: response(disabled: true)
 
-      true ->
-        config = get_config(screen_id)
-        refresh_rate = Parameters.get_refresh_rate(config)
+  @spec by_screen_id(screen_id()) :: response_map()
+  def by_screen_id(screen_id) do
+    config = get_config(screen_id)
+    refresh_rate = Parameters.get_refresh_rate(config)
 
-        config
-        |> fetch_data()
-        |> resolve_paging(refresh_rate)
-        |> serialize()
-    end
+    config
+    |> fetch_data()
+    |> resolve_paging(refresh_rate)
+    |> serialize()
   end
 
   @spec fetch_data(Screens.Config.Screen.t()) :: {Template.layout(), selected_instances_map()}
@@ -77,13 +74,17 @@ defmodule Screens.V2.ScreenData do
       |> Enum.map(fn t -> {t, %{}} end)
       |> Enum.into(%{})
 
-    {{_, selected_layout}, selected_instances} =
+    {{_, {slot_id, {layout_type, _children}} = selected_layout}, selected_instances} =
       prioritized_instances
       |> Enum.reduce(candidate_placements, &place_instance/2)
       |> log_mismatched_placement_widgets()
       |> select_best_placement()
 
-    {selected_layout, selected_instances}
+    filtered_children =
+      selected_layout
+      |> filter_empty_slots(Map.keys(selected_instances))
+
+    {{slot_id, {layout_type, filtered_children}}, selected_instances}
   end
 
   defp place_instance(instance, placements) do
@@ -235,6 +236,41 @@ defmodule Screens.V2.ScreenData do
     rem(periods_since_midnight, num_pages)
   end
 
+  # Function to remove slots from the layout if there are no candidates available to populate it
+  # Specifically added to help introduce variable paging
+  defp filter_empty_slots({_slot_id, {_layout_type, children}}, selected_instances_slots) do
+    children
+    |> Enum.map(fn
+      # Static slots: :main_content, :header, etc.
+      slot_id when is_atom(slot_id) ->
+        if slot_id in selected_instances_slots do
+          slot_id
+        end
+
+      # Paged slots: :flex_zone
+      nested_child when is_paged_slot_id(nested_child) ->
+        if nested_child in selected_instances_slots do
+          nested_child
+        end
+
+      # A nested layout. Take the nested layout and feed it back into this function to process its children.
+      {slot_id, {layout_type, _children}} = nested_layout ->
+        case filter_empty_slots(nested_layout, selected_instances_slots) do
+          [nil] ->
+            nil
+
+          child ->
+            {slot_id, {layout_type, child}}
+        end
+    end)
+    # Remove all nil/empty pages from the original children.
+    |> Enum.filter(fn
+      nil -> false
+      {_, {_, []}} -> false
+      _ -> true
+    end)
+  end
+
   @spec choose_visible_slot_ids(Template.layout(), integer(), DateTime.t()) ::
           {Template.non_paged_layout(), MapSet.t(Template.paged_slot_id()), paging_metadata()}
   defp choose_visible_slot_ids(layout, refresh_rate, now)
@@ -337,23 +373,6 @@ defmodule Screens.V2.ScreenData do
     |> WidgetInstance.serialize()
     |> Map.merge(%{type: WidgetInstance.widget_type(instance)})
   end
-
-  defp outdated?(screen_id, client_refresh_timestamp) do
-    {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
-    refresh_if_loaded_before_time = Screens.Config.State.refresh_if_loaded_before(screen_id)
-
-    case refresh_if_loaded_before_time do
-      nil -> false
-      _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
-    end
-  end
-
-  defp disabled?(screen_id) do
-    Screens.Config.State.disabled?(screen_id)
-  end
-
-  defp outdated_response, do: response(force_reload: true)
-  defp disabled_response, do: response(disabled: true)
 
   @spec response(keyword()) :: response_map()
   defp response(fields) do

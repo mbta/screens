@@ -76,8 +76,8 @@ defmodule Screens.V3Api do
   defp base_url_for_environment(environment_name) do
     case environment_name do
       "screens-prod" -> "https://api-v3.mbta.com/"
-      "screens-dev" -> "https://dev.api.mbtace.com/"
-      "screens-dev-green" -> "https://green.dev.api.mbtace.com/"
+      "screens-dev" -> "https://api-dev.mbtace.com/"
+      "screens-dev-green" -> "https://api-dev-green.mbtace.com/"
       _ -> Application.get_env(:screens, :default_api_v3_url)
     end
   end

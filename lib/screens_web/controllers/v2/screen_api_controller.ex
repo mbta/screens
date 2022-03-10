@@ -2,6 +2,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   use ScreensWeb, :controller
 
   alias Screens.Config.State
+  alias Screens.V2.ScreenData
 
   plug(:check_config)
 
@@ -10,7 +11,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
       conn
     else
       conn
-      |> put_status(:not_found)
+      |> not_found_response()
       |> halt()
     end
   end
@@ -20,7 +21,42 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
     _ = Screens.LogScreenData.log_data_request(screen_id, last_refresh, is_screen)
 
-    data = Screens.V2.ScreenData.by_screen_id(screen_id, last_refresh)
-    json(conn, data)
+    cond do
+      nonexistent_screen?(screen_id) ->
+        not_found_response(conn)
+
+      outdated?(screen_id, last_refresh) ->
+        json(conn, ScreenData.outdated_response())
+
+      disabled?(screen_id) ->
+        json(conn, ScreenData.disabled_response())
+
+      true ->
+        json(conn, ScreenData.by_screen_id(screen_id))
+    end
+  end
+
+  defp nonexistent_screen?(screen_id) do
+    is_nil(State.screen(screen_id))
+  end
+
+  defp outdated?(screen_id, client_refresh_timestamp) do
+    {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
+    refresh_if_loaded_before_time = State.refresh_if_loaded_before(screen_id)
+
+    case refresh_if_loaded_before_time do
+      nil -> false
+      _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
+    end
+  end
+
+  defp disabled?(screen_id) do
+    State.disabled?(screen_id)
+  end
+
+  defp not_found_response(conn) do
+    conn
+    |> put_status(:not_found)
+    |> text("Not found")
   end
 end

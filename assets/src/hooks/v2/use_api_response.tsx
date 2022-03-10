@@ -37,18 +37,24 @@ const rawResponseToApiResponse = ({
 };
 
 const doFailureBuffer = (
-  lastSuccess: number,
+  lastSuccess: number | null,
   failureModeElapsedMs: number,
   setApiResponse: React.Dispatch<React.SetStateAction<ApiResponse>>,
   apiResponse: ApiResponse = FAILURE_RESPONSE
 ) => {
-  const elapsedMs = Date.now() - lastSuccess;
-
-  if (elapsedMs < failureModeElapsedMs) {
+  if (lastSuccess == null) {
+    // We haven't had a successful request since initial page load.
+    // Continue showing the initial "no data" state.
     setApiResponse((state) => state);
-  }
-  if (elapsedMs >= failureModeElapsedMs) {
-    setApiResponse(apiResponse);
+  } else {
+    const elapsedMs = Date.now() - lastSuccess;
+
+    if (elapsedMs < failureModeElapsedMs) {
+      setApiResponse((state) => state);
+    }
+    if (elapsedMs >= failureModeElapsedMs) {
+      setApiResponse(apiResponse);
+    }
   }
 };
 
@@ -122,9 +128,13 @@ const useApiResponse = ({
   }, []);
 
   // Schedule subsequent data fetches
-  useDriftlessInterval(() => {
-    fetchData();
-  }, refreshMs, refreshRateOffsetMs);
+  useDriftlessInterval(
+    () => {
+      fetchData();
+    },
+    refreshMs,
+    refreshRateOffsetMs
+  );
 
   return { apiResponse, requestCount, lastSuccess };
 };
