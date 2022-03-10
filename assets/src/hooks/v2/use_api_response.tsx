@@ -74,18 +74,20 @@ interface UseApiResponseArgs {
   failureModeElapsedMs?: number;
 }
 
+interface UseApiResponseReturn {
+  apiResponse: ApiResponse;
+  requestCount: number;
+  lastSuccess: number | null;
+}
+
 const useApiResponse = ({
   id,
   failureModeElapsedMs = MINUTE_IN_MS,
-}: UseApiResponseArgs): {
-  apiResponse: ApiResponse;
-  requestCount: number;
-  lastSuccess: number;
-} => {
+}: UseApiResponseArgs): UseApiResponseReturn => {
   const isRealScreenParam = useIsRealScreenParam();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
-  const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
+  const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const { lastRefresh, refreshRate, refreshRateOffset } =
     document.getElementById("app").dataset;
   const refreshMs = parseInt(refreshRate, 10) * 1000;
