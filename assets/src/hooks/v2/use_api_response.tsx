@@ -129,7 +129,7 @@ const useApiResponse = ({
     fetchData();
   }, []);
 
-  // Schedule subsequent data fetches
+  // Schedule subsequent data fetches, if we need to
   useDriftlessInterval(
     () => {
       fetchData();
