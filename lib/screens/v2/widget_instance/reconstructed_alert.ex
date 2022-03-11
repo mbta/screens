@@ -2,6 +2,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @moduledoc false
 
   alias Screens.Alerts.Alert
+  alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.ReconstructedAlert
 
