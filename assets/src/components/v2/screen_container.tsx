@@ -62,7 +62,7 @@ const AudioConfigContext = createContext<AudioConfig | null>(
   defaultAudioConfig
 );
 
-const LastFetchContext = createContext<number>(0)
+const LastFetchContext = createContext<number | null>(null)
 
 interface ScreenLayoutProps {
   apiResponse: ApiResponse;

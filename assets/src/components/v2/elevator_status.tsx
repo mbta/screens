@@ -1,15 +1,13 @@
 import moment from "moment";
-import React, { ComponentType, useEffect, useState } from "react";
+import React, { ComponentType } from "react";
 import { classWithModifier, imagePath } from "Util/util";
 import FlexZonePageIndicator from "./flex/page_indicator";
-import makePersistent from "./persistent_wrapper";
+import makePersistentCarousel, { PageRendererProps } from "./persistent_carousel";
 
-const subwayIcons = ["red", "blue", "orange", "green", "silver"];
-
-type Page = ListPage | DetailPage;
+type ElevatorStatusPage = ListPage | DetailPage;
 
 interface DetailPage {
-  station: Station;
+  station: DetailPageStation;
 }
 
 interface ListPage {
@@ -21,6 +19,10 @@ interface Station {
   icons: Icon[];
   elevator_closures: Closure[];
   is_at_home_stop: boolean;
+}
+
+interface DetailPageStation extends Station {
+  elevator_closures: [Closure];
 }
 
 interface Closure {
@@ -49,35 +51,9 @@ type Icon =
   | "bus"
   | "mattapan";
 
-interface Props {
-  pages: Page[];
-  lastUpdate: number;
-  onFinish: Function;
-}
+type Props = PageRendererProps<ElevatorStatusPage>;
 
-const ElevatorStatus: ComponentType<Props> = ({
-  pages,
-  lastUpdate,
-  onFinish,
-}) => {
-  const [isFirstRender, setIsFirstRender] = useState(true);
-  const [pageIndex, setPageIndex] = useState(0);
-
-  useEffect(() => {
-    if (isFirstRender) {
-      setIsFirstRender(false);
-    } else {
-      setPageIndex((i) => i + 1);
-    }
-  }, [lastUpdate]);
-
-  useEffect(() => {
-    if (pageIndex === pages.length - 1) {
-      onFinish();
-    }
-  }, [pageIndex]);
-
-  const page = pages[pageIndex];
+const ElevatorStatus: ComponentType<Props> = ({ page, pageIndex, numPages }) => {
   let pageToRender;
   if (instanceOfDetailPage(page)) {
     pageToRender = <DetailPageComponent {...page} />;
@@ -102,16 +78,16 @@ const ElevatorStatus: ComponentType<Props> = ({
           </div>
         </div>
       </div>
-      <FlexZonePageIndicator numPages={pages.length} pageIndex={pageIndex} />
+      <FlexZonePageIndicator numPages={numPages} pageIndex={pageIndex} />
     </>
   );
 };
 
-const instanceOfDetailPage = (page: Page): page is DetailPage => {
+const instanceOfDetailPage = (page: ElevatorStatusPage): page is DetailPage => {
   return (page as DetailPage).station !== undefined;
 };
 
-const instanceOfListPage = (page: Page): page is ListPage => {
+const instanceOfListPage = (page: ElevatorStatusPage): page is ListPage => {
   return (page as ListPage).stations !== undefined;
 };
 
@@ -134,31 +110,24 @@ const LocationHeadingIcon = ({
     />
   );
 
-const RouteModeHereIcon = ({
-  isAtHomeStop,
-  icons,
-}: {
-  isAtHomeStop: boolean;
-  icons: Icon[];
-}): JSX.Element =>
-  isAtHomeStop ? (
-    <img
-      className="detail-page__closure-you-are-here-icon"
-      src={imagePath("elevator-status-you-are-here.svg")}
-    />
-  ) : (
-    <>
-      {icons
-        .sort((i1) => (subwayIcons.includes(i1) ? -1 : 1))
-        .map((icon) => (
-          <img
-            key={icon}
-            className="detail-page__closure-route-mode-icons"
-            src={imagePath(`elevator-status-${icon}.svg`)}
-          />
-        ))}
-    </>
-  );
+const HereIcon: ComponentType<{}> = ({ }) => (
+  <img
+    className="elevator-status__closure-you-are-here-icon"
+    src={imagePath("elevator-status-you-are-here.svg")}
+  />
+);
+
+const RouteModeIcons: ComponentType<{ icons: Icon[] }> = ({ icons }) => (
+  <>
+    {icons.map((icon) => (
+      <img
+        key={icon}
+        className="elevator-status__closure-route-mode-icon"
+        src={imagePath(`elevator-status-${icon}.svg`)}
+      />
+    ))}
+  </>
+);
 
 const TimeframeHeadingIcon = ({
   isAtHomeStop,
@@ -222,22 +191,16 @@ const getTimeframeEndText = (
   return endText;
 };
 
-const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
-  const {
-    is_at_home_stop: isAtHomeStop,
-    name,
-    icons,
-    elevator_closures: elevatorClosures,
-  } = station;
-  const {
+const DetailPageComponent: ComponentType<DetailPage> = ({ station: {
+  is_at_home_stop: isAtHomeStop,
+  name,
+  icons,
+  elevator_closures: [{
     header_text: headerText,
     description,
-    timeframe,
-  } = elevatorClosures[0];
-
-  const { happening_now: happeningNow, active_period: activePeriod } =
-    timeframe;
-
+    timeframe: { happening_now: happeningNow, active_period: activePeriod },
+  }],
+} }) => {
   return (
     <div className="detail-page">
       <div
@@ -257,7 +220,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
             {isAtHomeStop ? "At this station" : name}
           </div>
           <div className="detail-page__closure-route-mode-here-icon-container">
-            <RouteModeHereIcon isAtHomeStop={isAtHomeStop} icons={icons} />
+            {isAtHomeStop ? <HereIcon /> : <RouteModeIcons icons={icons} />}
           </div>
         </div>
         <div className="detail-page__closure-header">{headerText}</div>
@@ -286,12 +249,67 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station }) => {
   );
 };
 
-interface ListPageProps {
-  listPage: ListPage;
-}
-
-const ListPageComponent: ComponentType<ListPageProps> = ({ listPage }) => {
-  return null;
+const ListPageComponent: ComponentType<ListPage> = ({ stations }) => {
+  return (
+    <div className="elevator-status__list-view">
+      {stations.map((station) => (
+        <StationRow {...station} key={station.name} />
+      ))}
+    </div>
+  );
 };
 
-export default makePersistent(ElevatorStatus);
+
+const StationRow: ComponentType<Station> = ({
+  name,
+  icons,
+  elevator_closures: elevatorClosures,
+  is_at_home_stop: isAtHomeStop,
+}) => {
+  let rowClass = "elevator-status__station-row";
+  if (isAtHomeStop) {
+    rowClass += " elevator-status__station-row--home-stop";
+  }
+
+  return (
+    <div className={rowClass}>
+      <div className="elevator-status__station-row__header">
+        <div className="elevator-status__station-row__icons"><RouteModeIcons icons={icons} /></div>
+        <div className="elevator-status__station-row__station-name">{name}</div>
+        <div className="elevator-status__station-row__ids">
+          {formatElevatorIds(elevatorClosures.map(({ elevator_id: id }) => id))}
+        </div>
+        {isAtHomeStop && (
+          <div className="elevator-status__station-row__you-are-here-icon">
+            <HereIcon />
+          </div>
+        )}
+      </div>
+      <div className="elevator-status__station-row__closures">
+        {elevatorClosures.map(({ elevator_name, elevator_id }) => (
+          <div className="elevator-status__station-row__closure" key={elevator_id}>
+            {elevator_name}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const formatElevatorIds = (ids: string[]) => {
+  switch (ids.length) {
+    case 0:
+      return "";
+    case 1:
+      return `#${ids[0]}`;
+    case 2:
+      return `#${ids[0]} and ${ids[1]}`;
+    default:
+      // a, b, ..., m, and n
+      const allButLast = ids.slice(0, ids.length - 1);
+      const last = ids[ids.length - 1];
+      return `#${allButLast.join(", ")}, and ${last}`;
+  }
+};
+
+export default makePersistentCarousel(ElevatorStatus);

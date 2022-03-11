@@ -19,10 +19,10 @@ defmodule Screens.V2.Template.Builder do
   Adds paging to a template or part of a template.
   Input must not already be paged or contain any paged elements.
   """
-  def with_paging(template, num_pages)
+  def with_paging(template, max_num_pages)
       when is_non_paged_slot_id(template)
       when is_non_paged_slot_id(elem(template, 0)) do
-    Enum.map(0..(num_pages - 1), &paged_template(template, &1))
+    Enum.map(0..(max_num_pages - 1), &paged_template(template, &1))
   end
 
   defp paged_template(template, page_index) when is_atom(template) do
