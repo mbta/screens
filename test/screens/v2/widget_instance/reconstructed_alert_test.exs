@@ -6,7 +6,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.Config.V2.{PreFare}
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.AlertTest, as: AlertTestUtilities
   alias Screens.V2.WidgetInstance.ReconstructedAlert
 
   setup :setup_base

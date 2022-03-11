@@ -112,20 +112,10 @@ defmodule Screens.Routes.Route do
 
   defp format_query_param(_), do: []
 
-  defp fetch_all_route_ids(stop_id, get_json_fn, type_filter) do
+  defp fetch_all_route_ids(stop_id, get_json_fn) do
     case fetch([stop_id: stop_id], get_json_fn) do
-      {:ok, routes} ->
-        {:ok,
-         if type_filter do
-           Enum.filter(routes, fn route -> Map.get(route, :type) === type_filter end)
-         else
-           routes
-         end
-         # credo:disable-for-next-line
-         |> Enum.map(& &1.id)}
-
-      :error ->
-        :error
+      {:ok, routes} -> {:ok, Enum.map(routes, & &1.id)}
+      :error -> :error
     end
   end
 
