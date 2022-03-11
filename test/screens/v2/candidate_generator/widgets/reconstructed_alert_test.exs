@@ -21,11 +21,46 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
       bad_config = struct(Screen, %{app_params: struct(Solari)})
 
       routes_at_stop = [
-        %{route_id: "Red", active?: true},
-        %{route_id: "Green-B", active?: false},
-        %{route_id: "Green-C", active?: true},
-        %{route_id: "Green-D", active?: true},
-        %{route_id: "Green-E", active?: true}
+        %{
+          route_id: "Red",
+          active?: true,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :subway
+        },
+        %{
+          route_id: "Green-B",
+          active?: false,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :light_rail
+        },
+        %{
+          route_id: "Green-C",
+          active?: true,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :light_rail
+        },
+        %{
+          route_id: "Green-D",
+          active?: true,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :light_rail
+        },
+        %{
+          route_id: "Green-E",
+          active?: true,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :light_rail
+        }
       ]
 
       alerts = [
@@ -36,14 +71,35 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         %Alert{id: "5", effect: :stop_closure, informed_entities: [ie(route: "Green-C")]}
       ]
 
+      stop_sequences = [
+        ["70260", "70258", "70256", "70254"],
+        ["70253", "70255", "70257", "70260"]
+      ]
+
+      station_sequences = [
+        ["place-hsmnl", "place-bckhl", "place-rvrwy", "place-mispk"]
+      ]
+
       %{
         config: config,
         bad_config: bad_config,
         routes_at_stop: routes_at_stop,
+        station_sequences: station_sequences,
         now: ~U[2021-01-01T00:00:00Z],
-        fetch_routes_at_stop_fn: fn _, _, _ -> {:ok, routes_at_stop} end,
+        fetch_routes_by_stop_fn: fn _, _, _ -> {:ok, routes_at_stop} end,
+        fetch_stop_sequences_by_stop_fn: fn _ -> {:ok, stop_sequences} end,
         fetch_alerts_fn: fn _ -> {:ok, alerts} end,
-        x_fetch_routes_at_stop_fn: fn _, _, _ -> :error end,
+        get_parent_station_id_fn: fn
+          "70260" -> {:ok, "place-hsmnl"}
+          "70258" -> {:ok, "place-bckhl"}
+          "70257" -> {:ok, "place-bckhl"}
+          "70256" -> {:ok, "place-rvrwy"}
+          "70255" -> {:ok, "place-rvrwy"}
+          "70254" -> {:ok, "place-mispk"}
+          "70253" -> {:ok, "place-mispk"}
+        end,
+        x_fetch_routes_by_stop_fn: fn _, _, _ -> :error end,
+        x_fetch_stop_sequences_by_stop_fn: fn _ -> :error end,
         x_fetch_alerts_fn: fn _ -> :error end
       }
     end
@@ -52,14 +108,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
       %{
         config: config,
         routes_at_stop: routes_at_stop,
+        station_sequences: station_sequences,
         now: now,
-        fetch_routes_at_stop_fn: fetch_routes_at_stop_fn,
-        fetch_alerts_fn: fetch_alerts_fn
+        fetch_routes_by_stop_fn: fetch_routes_by_stop_fn,
+        fetch_stop_sequences_by_stop_fn: fetch_stop_sequences_by_stop_fn,
+        fetch_alerts_fn: fetch_alerts_fn,
+        get_parent_station_id_fn: get_parent_station_id_fn
       } = context
 
       expected_common_data = %{
         screen: config,
         routes_at_stop: routes_at_stop,
+        stop_sequences: station_sequences,
         now: now
       }
 
@@ -102,8 +162,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                reconstructed_alert_instances(
                  config,
                  now,
-                 fetch_routes_at_stop_fn,
-                 fetch_alerts_fn
+                 fetch_routes_by_stop_fn,
+                 fetch_stop_sequences_by_stop_fn,
+                 fetch_alerts_fn,
+                 get_parent_station_id_fn
                )
     end
 
@@ -111,16 +173,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
       %{
         bad_config: bad_config,
         now: now,
-        fetch_routes_at_stop_fn: fetch_routes_at_stop_fn,
-        fetch_alerts_fn: fetch_alerts_fn
+        fetch_routes_by_stop_fn: fetch_routes_by_stop_fn,
+        fetch_stop_sequences_by_stop_fn: fetch_stop_sequences_by_stop_fn,
+        fetch_alerts_fn: fetch_alerts_fn,
+        get_parent_station_id_fn: get_parent_station_id_fn
       } = context
 
       assert_raise FunctionClauseError, fn ->
         reconstructed_alert_instances(
           bad_config,
           now,
-          fetch_routes_at_stop_fn,
-          fetch_alerts_fn
+          fetch_routes_by_stop_fn,
+          fetch_stop_sequences_by_stop_fn,
+          fetch_alerts_fn,
+          get_parent_station_id_fn
         )
       end
     end
@@ -129,9 +195,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
       %{
         config: config,
         now: now,
-        fetch_routes_at_stop_fn: fetch_routes_at_stop_fn,
+        fetch_routes_by_stop_fn: fetch_routes_by_stop_fn,
+        fetch_stop_sequences_by_stop_fn: fetch_stop_sequences_by_stop_fn,
+        get_parent_station_id_fn: get_parent_station_id_fn,
         fetch_alerts_fn: fetch_alerts_fn,
-        x_fetch_routes_at_stop_fn: x_fetch_routes_at_stop_fn,
+        x_fetch_routes_by_stop_fn: x_fetch_routes_by_stop_fn,
+        x_fetch_stop_sequences_by_stop_fn: x_fetch_stop_sequences_by_stop_fn,
         x_fetch_alerts_fn: x_fetch_alerts_fn
       } = context
 
@@ -139,16 +208,30 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                reconstructed_alert_instances(
                  config,
                  now,
-                 x_fetch_routes_at_stop_fn,
-                 fetch_alerts_fn
+                 x_fetch_routes_by_stop_fn,
+                 fetch_stop_sequences_by_stop_fn,
+                 fetch_alerts_fn,
+                 get_parent_station_id_fn
                )
 
       assert [] ==
                reconstructed_alert_instances(
                  config,
                  now,
-                 fetch_routes_at_stop_fn,
-                 x_fetch_alerts_fn
+                 fetch_routes_by_stop_fn,
+                 x_fetch_stop_sequences_by_stop_fn,
+                 fetch_alerts_fn,
+                 get_parent_station_id_fn
+               )
+
+      assert [] ==
+               reconstructed_alert_instances(
+                 config,
+                 now,
+                 fetch_routes_by_stop_fn,
+                 fetch_stop_sequences_by_stop_fn,
+                 x_fetch_alerts_fn,
+                 get_parent_station_id_fn
                )
     end
   end
