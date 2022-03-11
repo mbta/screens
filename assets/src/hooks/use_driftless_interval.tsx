@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
-const noop = () => { };
+const noop = () => {};
 
+/**
+ * @param periodMs The number of milliseconds between each fetch.
+ * @param offsetMs Number of milliseconds to delay fetch. Primarily used to reduce number of fetches performed at the same time.
+ * @returns Number of milliseconds until next fetch.
+ */
 const calculateMsToNextCall = (periodMs: number, offsetMs: number) => {
   // Now, as a Unix timestamp (Milliseconds since Unix epoch)
   const now = Date.now();
