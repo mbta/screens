@@ -2,7 +2,9 @@ import moment from "moment";
 import React, { ComponentType } from "react";
 import { classWithModifier, imagePath } from "Util/util";
 import FlexZonePageIndicator from "./flex/page_indicator";
-import makePersistentCarousel, { PageRendererProps } from "./persistent_carousel";
+import makePersistentCarousel, {
+  PageRendererProps,
+} from "./persistent_carousel";
 
 type ElevatorStatusPage = ListPage | DetailPage;
 
@@ -53,7 +55,11 @@ type Icon =
 
 type Props = PageRendererProps<ElevatorStatusPage>;
 
-const ElevatorStatus: ComponentType<Props> = ({ page, pageIndex, numPages }) => {
+const ElevatorStatus: ComponentType<Props> = ({
+  page,
+  pageIndex,
+  numPages,
+}) => {
   let pageToRender;
   if (instanceOfDetailPage(page)) {
     pageToRender = <DetailPageComponent {...page} />;
@@ -110,7 +116,7 @@ const LocationHeadingIcon = ({
     />
   );
 
-const HereIcon: ComponentType<{}> = ({ }) => (
+const HereIcon: ComponentType<{}> = ({}) => (
   <img
     className="elevator-status__closure-you-are-here-icon"
     src={imagePath("elevator-status-you-are-here.svg")}
@@ -136,12 +142,7 @@ const TimeframeHeadingIcon = ({
   isAtHomeStop: boolean;
   happeningNow: boolean;
 }): JSX.Element =>
-  isAtHomeStop && happeningNow ? (
-    <img
-      className="detail-page__closure-alert-icon"
-      src={imagePath("elevator-status-alert-red.svg")}
-    />
-  ) : isAtHomeStop ? (
+  !happeningNow && isAtHomeStop ? (
     <img
       className="detail-page__closure-alert-icon"
       src={imagePath("elevator-status-alert-gray.svg")}
@@ -191,16 +192,20 @@ const getTimeframeEndText = (
   return endText;
 };
 
-const DetailPageComponent: ComponentType<DetailPage> = ({ station: {
-  is_at_home_stop: isAtHomeStop,
-  name,
-  icons,
-  elevator_closures: [{
-    header_text: headerText,
-    description,
-    timeframe: { happening_now: happeningNow, active_period: activePeriod },
-  }],
-} }) => {
+const DetailPageComponent: ComponentType<DetailPage> = ({
+  station: {
+    is_at_home_stop: isAtHomeStop,
+    name,
+    icons,
+    elevator_closures: [
+      {
+        header_text: headerText,
+        description,
+        timeframe: { happening_now: happeningNow, active_period: activePeriod },
+      },
+    ],
+  },
+}) => {
   return (
     <div className="detail-page">
       <div
@@ -224,12 +229,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({ station: {
           </div>
         </div>
         <div className="detail-page__closure-header">{headerText}</div>
-        <div
-          className={
-            "detail-page__timeframe" +
-            (isAtHomeStop && happeningNow ? " active-here-and-now" : "")
-          }
-        >
+        <div className={"detail-page__timeframe"}>
           <div className="detail-page__closure-alert-icon-container">
             <TimeframeHeadingIcon
               isAtHomeStop={isAtHomeStop}
@@ -259,7 +259,6 @@ const ListPageComponent: ComponentType<ListPage> = ({ stations }) => {
   );
 };
 
-
 const StationRow: ComponentType<Station> = ({
   name,
   icons,
@@ -274,7 +273,9 @@ const StationRow: ComponentType<Station> = ({
   return (
     <div className={rowClass}>
       <div className="elevator-status__station-row__header">
-        <div className="elevator-status__station-row__icons"><RouteModeIcons icons={icons} /></div>
+        <div className="elevator-status__station-row__icons">
+          <RouteModeIcons icons={icons} />
+        </div>
         <div className="elevator-status__station-row__station-name">{name}</div>
         <div className="elevator-status__station-row__ids">
           {formatElevatorIds(elevatorClosures.map(({ elevator_id: id }) => id))}
@@ -287,7 +288,10 @@ const StationRow: ComponentType<Station> = ({
       </div>
       <div className="elevator-status__station-row__closures">
         {elevatorClosures.map(({ elevator_name, elevator_id }) => (
-          <div className="elevator-status__station-row__closure" key={elevator_id}>
+          <div
+            className="elevator-status__station-row__closure"
+            key={elevator_id}
+          >
             {elevator_name}
           </div>
         ))}
