@@ -44,15 +44,24 @@ defmodule ScreensWeb.V2.ScreenController do
 
     case config do
       %Screen{app_id: app_id} ->
+        refresh_rate = Parameters.get_refresh_rate(app_id)
+
         conn
         |> assign(:app_id, app_id)
-        |> assign(:refresh_rate, Parameters.get_refresh_rate(app_id))
+        |> assign(:refresh_rate, refresh_rate)
         |> assign(:audio_readout_interval, Parameters.get_audio_readout_interval(app_id))
         |> assign(
           :audio_interval_offset_seconds,
           Parameters.get_audio_interval_offset_seconds(config)
         )
         |> assign(:sentry_frontend_dsn, Application.get_env(:screens, :sentry_frontend_dsn))
+        |> assign(
+          :refresh_rate_offset,
+          screen_id
+          |> Base.encode16()
+          |> String.to_integer(16)
+          |> rem(refresh_rate)
+        )
         |> put_view(ScreensWeb.V2.ScreenView)
         |> render("index.html")
 
