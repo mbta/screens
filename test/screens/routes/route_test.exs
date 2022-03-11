@@ -72,7 +72,7 @@ defmodule Screens.Routes.RouteTest do
         stop_id: stop_id,
         today: today,
         x_get_json_fn1: x_get_json_fn1,
-        x_get_json_fn2: x_get_json_fn2,
+        x_get_json_fn2: x_get_json_fn2
       } = context
 
       assert :error == fetch_simplified_routes_at_stop(stop_id, today, x_get_json_fn1)
