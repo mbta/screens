@@ -26,11 +26,10 @@
   .elevator-status__footer {
     position: absolute;
     bottom: 0;
-    background: rgb(217, 214, 208);
+    background: #cccbc8;
     border-radius: 0px 0px 16px 16px;
-    height: 120px;
+    height: 124px;
     width: 1024px;
-    border-top: 4px solid rgb(204, 203, 200);
 
     .elevator-status__footer-text {
       color: rgb(23, 31, 38);
