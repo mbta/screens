@@ -22,7 +22,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     "Green-B" => ["Westbound", "Eastbound"],
     "Green-C" => ["Westbound", "Eastbound"],
     "Green-D" => ["Westbound", "Eastbound"],
-    "Green-E" => ["Westbound", "Eastbound"]
+    "Green-E" => ["Westbound", "Eastbound"],
+    "Green" => ["Westbound", "Eastbound"]
   }
 
   @blue_line_stops [
