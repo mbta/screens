@@ -214,7 +214,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
           <div className="detail-page__closure-location-text">
             {isAtHomeStop ? "At this station" : name}
           </div>
-          <div className="detail-page__closure-route-mode-here-icon-container">
+          <div className="detail-page__closure-route-mode-icon-container">
             {isAtHomeStop ? null : <RouteModeIcons icons={icons} />}
           </div>
         </div>
