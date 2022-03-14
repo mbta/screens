@@ -107,6 +107,8 @@
       letter-spacing: 0px;
       line-height: 44px;
       vertical-align: text-top;
+      // needs a tiiiiny nudge to align with station name
+      transform: translateY(1px);
       margin-left: 16px;
     }
 
