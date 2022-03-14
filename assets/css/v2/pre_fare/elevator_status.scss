@@ -62,7 +62,7 @@
   &__station-row {
     width: 1024px;
     border-top: 4px solid rgb(217, 214, 208);
-    padding-top: 16px;
+    padding-top: 24px;
     padding-left: 32px;
     padding-bottom: 20px;
     box-sizing: border-box;
@@ -71,11 +71,17 @@
       background-color: rgba(255, 255, 255, 0.68);
     }
 
+    &__header {
+      height: 44px;
+      margin-bottom: 16px;
+    }
+
     &__icons {
       display: inline-block;
       height: 44px;
+      line-height: 44px;
+      vertical-align: top;
       margin-right: 16px;
-      transform: translateY(8px);
     }
 
     &__station-name {
@@ -86,7 +92,8 @@
       font-family: Inter, sans-serif;
       font-weight: 700;
       letter-spacing: 0px;
-      line-height: 36px;
+      line-height: 44px;
+      vertical-align: top;
       margin-bottom: 12px;
     }
 
@@ -98,14 +105,18 @@
       font-family: Inter, sans-serif;
       font-weight: 500;
       letter-spacing: 0px;
-      line-height: 32px;
+      line-height: 44px;
+      vertical-align: text-top;
       margin-left: 16px;
     }
 
     &__you-are-here-icon {
       display: inline-block;
+      height: 44px;
       margin-left: 24px;
       transform: translateY(4px);
+      line-height: 44px;
+      vertical-align: top;
 
       .elevator-status__closure-you-are-here-icon {
         width: 34px;
