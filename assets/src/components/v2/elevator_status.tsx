@@ -97,24 +97,12 @@ const instanceOfListPage = (page: ElevatorStatusPage): page is ListPage => {
   return (page as ListPage).stations !== undefined;
 };
 
-const LocationHeadingIcon = ({
-  isAtHomeStop,
-  happeningNow,
-}: {
-  isAtHomeStop: boolean;
-  happeningNow: boolean;
-}): JSX.Element =>
-  isAtHomeStop && happeningNow ? (
-    <img
-      className="detail-page__closure-outage-icon"
-      src={imagePath("elevator-status-outage-red.svg")}
-    />
-  ) : (
-    <img
-      className="detail-page__closure-outage-icon"
-      src={imagePath("elevator-status-outage-black.svg")}
-    />
-  );
+const ElevatorOutageIcon = ({}: {}): JSX.Element => (
+  <img
+    className="detail-page__closure-outage-icon"
+    src={imagePath("elevator-status-outage-black.svg")}
+  />
+);
 
 const HereIcon: ComponentType<{}> = ({}) => (
   <img
@@ -221,16 +209,13 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
       >
         <div className="detail-page__closure-location">
           <div className="detail-page__closure-outage-icon-container">
-            <LocationHeadingIcon
-              isAtHomeStop={isAtHomeStop}
-              happeningNow={happeningNow}
-            />
+            {isAtHomeStop ? <HereIcon /> : <ElevatorOutageIcon />}
           </div>
           <div className="detail-page__closure-location-text">
             {isAtHomeStop ? "At this station" : name}
           </div>
           <div className="detail-page__closure-route-mode-here-icon-container">
-            {isAtHomeStop ? <HereIcon /> : <RouteModeIcons icons={icons} />}
+            {isAtHomeStop ? null : <RouteModeIcons icons={icons} />}
           </div>
         </div>
         <div className="detail-page__closure-header">{headerText}</div>
