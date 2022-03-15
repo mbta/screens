@@ -48,7 +48,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
 
     params =
       if length(type_filters) > 0 do
-        Map.merge(params, %{"filter[route]" => Enum.join(type_filters, ",")}) |> IO.inspect()
+        Map.merge(params, %{"filter[route]" => Enum.join(type_filters, ",")})
       else
         params
       end
