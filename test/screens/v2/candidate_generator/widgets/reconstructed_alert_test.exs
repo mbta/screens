@@ -87,7 +87,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         station_sequences: station_sequences,
         now: ~U[2021-01-01T00:00:00Z],
         fetch_routes_by_stop_fn: fn _, _, _ -> {:ok, routes_at_stop} end,
-        fetch_stop_sequences_by_stop_fn: fn _ -> {:ok, stop_sequences} end,
+        fetch_stop_sequences_by_stop_fn: fn _, _ -> {:ok, stop_sequences} end,
         fetch_alerts_fn: fn _ -> {:ok, alerts} end,
         get_parent_station_id_fn: fn
           "70260" -> {:ok, "place-hsmnl"}
@@ -99,7 +99,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
           "70253" -> {:ok, "place-mispk"}
         end,
         x_fetch_routes_by_stop_fn: fn _, _, _ -> :error end,
-        x_fetch_stop_sequences_by_stop_fn: fn _ -> :error end,
+        x_fetch_stop_sequences_by_stop_fn: fn _, _ -> :error end,
         x_fetch_alerts_fn: fn _ -> :error end
       }
     end
