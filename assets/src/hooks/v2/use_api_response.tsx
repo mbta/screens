@@ -1,5 +1,5 @@
 import { WidgetData } from "Components/v2/widget";
-import useInterval from "Hooks/use_interval";
+import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -59,15 +59,15 @@ const doFailureBuffer = (
 };
 
 const useQuery = () => {
-  return new URLSearchParams(useLocation().search)
-}
+  return new URLSearchParams(useLocation().search);
+};
 
 const useIsRealScreenParam = () => {
-  const query = useQuery()
-  const isRealScreen = query.get("is_real_screen")
+  const query = useQuery();
+  const isRealScreen = query.get("is_real_screen");
 
-  return isRealScreen === "true" ? "&is_real_screen=true" : ""
-}
+  return isRealScreen === "true" ? "&is_real_screen=true" : "";
+};
 
 interface UseApiResponseArgs {
   id: string;
@@ -84,12 +84,14 @@ const useApiResponse = ({
   id,
   failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs): UseApiResponseReturn => {
-  const isRealScreenParam = useIsRealScreenParam()
+  const isRealScreenParam = useIsRealScreenParam();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
-  const { lastRefresh, refreshRate } = document.getElementById("app").dataset;
+  const { lastRefresh, refreshRate, refreshRateOffset } =
+    document.getElementById("app").dataset;
   const refreshMs = parseInt(refreshRate, 10) * 1000;
+  const refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
   const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}${isRealScreenParam}`;
 
   const fetchData = async () => {
@@ -122,17 +124,19 @@ const useApiResponse = ({
     setRequestCount((count) => count + 1);
   };
 
-  // Perform initial data fetch once on component mount
+  // Fetch data once, immediately, on page load
   useEffect(() => {
     fetchData();
   }, []);
 
   // Schedule subsequent data fetches, if we need to
-  if (refreshMs != null) {
-    useInterval(() => {
+  useDriftlessInterval(
+    () => {
       fetchData();
-    }, refreshMs);
-  }
+    },
+    refreshMs,
+    refreshRateOffsetMs
+  );
 
   return { apiResponse, requestCount, lastSuccess };
 };
