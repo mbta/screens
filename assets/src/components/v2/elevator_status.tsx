@@ -136,21 +136,19 @@ const RouteModeIcons: ComponentType<{ icons: Icon[] }> = ({ icons }) => (
 );
 
 const TimeframeHeadingIcon = ({
-  isAtHomeStop,
   happeningNow,
 }: {
-  isAtHomeStop: boolean;
   happeningNow: boolean;
 }): JSX.Element =>
-  !happeningNow && isAtHomeStop ? (
+  happeningNow ? (
     <img
       className="detail-page__closure-alert-icon"
-      src={imagePath("elevator-status-alert-gray.svg")}
+      src={imagePath("elevator-status-alert-black.svg")}
     />
   ) : (
     <img
       className="detail-page__closure-alert-icon"
-      src={imagePath("elevator-status-alert-black.svg")}
+      src={imagePath("elevator-status-alert-gray.svg")}
     />
   );
 
@@ -231,10 +229,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
         <div className="detail-page__closure-header">{headerText}</div>
         <div className={"detail-page__timeframe"}>
           <div className="detail-page__closure-alert-icon-container">
-            <TimeframeHeadingIcon
-              isAtHomeStop={isAtHomeStop}
-              happeningNow={happeningNow}
-            />
+            <TimeframeHeadingIcon happeningNow={happeningNow} />
           </div>
           <div className="detail-page__timeframe-text-start">
             {happeningNow ? "NOW" : "Upcoming"}
