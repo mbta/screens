@@ -46,14 +46,14 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
       assert :error == fetch_stop_sequences_through_stop(stop_id, [], get_json_fn)
     end
 
-    test "returns filtered list if type_filters is provided" do
+    test "returns filtered list if route_filters is provided" do
       stop_id = "1265"
-      type_filters = ["Orange"]
+      route_filters = ["Orange"]
 
       params = %{
         "include" => "representative_trip.stops,route",
         "filter[stop]" => stop_id,
-        "filter[route]" => Enum.join(type_filters, ",")
+        "filter[route]" => Enum.join(route_filters, ",")
       }
 
       data = %{
@@ -73,7 +73,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
       expected_stop_sequences = [~w[5 6 7]]
 
       assert {:ok, expected_stop_sequences} ==
-               fetch_stop_sequences_through_stop(stop_id, type_filters, get_json_fn)
+               fetch_stop_sequences_through_stop(stop_id, route_filters, get_json_fn)
     end
   end
 end

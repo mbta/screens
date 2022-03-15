@@ -38,7 +38,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
   @spec fetch_stop_sequences_through_stop(Stop.id()) :: {:ok, list(list(Stop.id()))} | :error
   def fetch_stop_sequences_through_stop(
         stop_id,
-        type_filters \\ [],
+        route_filters \\ [],
         get_json_fn \\ &V3Api.get_json/2
       ) do
     params = %{
@@ -47,8 +47,8 @@ defmodule Screens.RoutePatterns.RoutePattern do
     }
 
     params =
-      if length(type_filters) > 0 do
-        Map.merge(params, %{"filter[route]" => Enum.join(type_filters, ",")})
+      if length(route_filters) > 0 do
+        Map.merge(params, %{"filter[route]" => Enum.join(route_filters, ",")})
       else
         params
       end
