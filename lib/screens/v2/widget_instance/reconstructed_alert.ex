@@ -6,7 +6,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
-  alias Screens.V2.WidgetInstance.Common.Alert, as: BaseAlert
+  alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
 
   defstruct screen: nil,
