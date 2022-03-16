@@ -15,23 +15,23 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   @type route_id :: String.t()
 
   @spec home_stop_id(AlertWidget.t() | ReconstructedAlert.t()) :: String.t()
-  def home_stop_id(%{
-        screen: %Screen{app_params: %app{alerts: %Alerts{stop_id: stop_id}}}
-      })
-      when app in [BusShelter, GlEink, BusEink] do
+  defp home_stop_id(%{
+         screen: %Screen{app_params: %app{alerts: %Alerts{stop_id: stop_id}}}
+       })
+       when app in [BusShelter, GlEink, BusEink] do
     stop_id
   end
 
-  def home_stop_id(%{
-        screen: %Screen{app_params: %app{header: %CurrentStopId{stop_id: stop_id}}}
-      })
-      when app in [PreFare] do
+  defp home_stop_id(%{
+         screen: %Screen{app_params: %app{header: %CurrentStopId{stop_id: stop_id}}}
+       })
+       when app in [PreFare] do
     stop_id
   end
 
   @spec upstream_stop_id_set(AlertWidget.t() | ReconstructedAlert.t()) ::
           MapSet.t(stop_id())
-  def upstream_stop_id_set(%{stop_sequences: stop_sequences} = t) do
+  defp upstream_stop_id_set(%{stop_sequences: stop_sequences} = t) do
     home_stop_id = home_stop_id(t)
 
     stop_sequences
@@ -41,7 +41,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
   @spec downstream_stop_id_set(AlertWidget.t() | ReconstructedAlert.t()) ::
           MapSet.t(stop_id())
-  def downstream_stop_id_set(%{stop_sequences: stop_sequences} = t) do
+  defp downstream_stop_id_set(%{stop_sequences: stop_sequences} = t) do
     home_stop_id = home_stop_id(t)
 
     stop_sequences
@@ -49,18 +49,18 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     |> MapSet.new()
   end
 
-  def all_routes_at_stop(%{routes_at_stop: routes}) do
+  defp all_routes_at_stop(%{routes_at_stop: routes}) do
     MapSet.new(routes, & &1.route_id)
   end
 
-  def route_type(%{screen: %Screen{app_id: :bus_shelter_v2}}), do: :bus
-  def route_type(%{screen: %Screen{app_id: :bus_eink_v2}}), do: :bus
-  def route_type(%{screen: %Screen{app_id: :gl_eink_v2}}), do: :light_rail
+  defp route_type(%{screen: %Screen{app_id: :bus_shelter_v2}}), do: :bus
+  defp route_type(%{screen: %Screen{app_id: :bus_eink_v2}}), do: :bus
+  defp route_type(%{screen: %Screen{app_id: :gl_eink_v2}}), do: :light_rail
 
-  def route_type(%{
-        screen: %Screen{app_id: :pre_fare_v2},
-        routes_at_stop: routes_at_stop
-      }) do
+  defp route_type(%{
+         screen: %Screen{app_id: :pre_fare_v2},
+         routes_at_stop: routes_at_stop
+       }) do
     routes_at_stop
     |> Enum.map(& &1.type)
     |> Enum.dedup()
