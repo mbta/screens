@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
+  alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.SubwayStatus
 
   defstruct screen: nil,
@@ -307,16 +308,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
-  defp stop_on_route?(%{stop: stop_id}, stop_sequence) when not is_nil(stop_id) do
-    Enum.any?(stop_sequence, fn {station_id, _} -> station_id == stop_id end)
-  end
-
-  defp stop_on_route?(_, _stop_sequence), do: false
-
-  defp to_stop_index(%{stop: stop_id}, stop_sequence) do
-    Enum.find_index(stop_sequence, fn {station_id, _} -> station_id == stop_id end)
-  end
-
   defp ie_is_whole_route?(%{route: route_id, direction_id: nil, stop: nil})
        when not is_nil(route_id),
        do: true
@@ -350,15 +341,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp get_endpoints(informed_entities, route_id) do
-    case get_stop_sequence(informed_entities, route_id) do
+    case Stop.get_stop_sequence(informed_entities, route_id) do
       nil ->
         nil
 
       stop_sequence ->
         {min_index, max_index} =
           informed_entities
-          |> Enum.filter(&stop_on_route?(&1, stop_sequence))
-          |> Enum.map(&to_stop_index(&1, stop_sequence))
+          |> Enum.filter(&Stop.stop_on_route?(&1, stop_sequence))
+          |> Enum.map(&Stop.to_stop_index(&1, stop_sequence))
           |> Enum.min_max()
 
         {_, min_station_name} = Enum.at(stop_sequence, min_index)
@@ -372,25 +363,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           abbrev: "#{min_abbreviated_name} to #{max_abbreviated_name}"
         }
     end
-  end
-
-  # Finds a stop sequence which contains all stations in informed_entities
-  defp get_stop_sequence(informed_entities, route_id) do
-    stop_sequences = Map.get(@route_stop_sequences, route_id)
-    Enum.find(stop_sequences, &sequence_match?(&1, informed_entities))
-  end
-
-  defp in_stop_sequence?(station_id, stop_sequence) do
-    Enum.any?(stop_sequence, fn {stop_id, _} -> stop_id == station_id end)
-  end
-
-  defp sequence_match?(stop_sequence, informed_entities) do
-    stations =
-      informed_entities
-      |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-      |> Enum.filter(&String.starts_with?(&1, "place-"))
-
-    Enum.all?(stations, &in_stop_sequence?(&1, stop_sequence))
   end
 
   defp get_location(informed_entities, route_id) do
