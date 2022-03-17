@@ -86,7 +86,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "No <SMPILL> trains",
       location: location_text,
       cause: cause_text,
-      remedy: "Seek alternate route",
       routes: affected_routes,
       effect: :suspension
     }
@@ -109,7 +108,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "No <SMPILL> trains",
       location: location_text,
       cause: cause_text,
-      remedy: "Use shuttle bus",
       routes: affected_routes,
       effect: :shuttle
     }
@@ -127,7 +125,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "Station Closure",
       location: "",
       cause: cause_text,
-      remedy: "Seek alternate route",
       routes: affected_routes,
       effect: :station_closure
     }
@@ -150,7 +147,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "No trains",
       location: "",
       cause: cause_text,
-      remedy: "Seek alternate route",
       routes: affected_routes,
       effect: :suspension
     }
@@ -166,7 +162,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "No trains",
       location: "",
       cause: cause_text,
-      remedy: "Use shuttle bus",
       routes: affected_routes,
       effect: :shuttle
     }
@@ -186,7 +181,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "<LINE> platform closed",
       location: "",
       cause: cause_text,
-      remedy: "Seek alternate route",
       routes: affected_routes,
       effect: :station_closure
     }
@@ -206,7 +200,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: header,
       location: "",
       cause: "",
-      remedy: "",
       routes: affected_routes,
       effect: :moderate_delay
     }
@@ -228,7 +221,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "Trains may be delayed #{delay_description} #{delay_minutes}",
       location: "",
       cause: cause_text,
-      remedy: "",
       routes: affected_routes,
       effect: :severe_delay
     }
@@ -284,7 +276,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: issue,
       location: "",
       cause: cause_text,
-      remedy: "Use shuttle bus",
       routes: affected_routes,
       effect: :shuttle
     }
@@ -306,7 +297,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: header,
       location: "",
       cause: "",
-      remedy: "",
       routes: affected_routes,
       effect: :moderate_delay
     }
@@ -334,7 +324,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "Trains may be delayed #{duration_text}",
       location: "",
       cause: cause_text,
-      remedy: "",
       routes: affected_routes,
       effect: :severe_delay
     }
@@ -374,7 +363,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: issue,
       location: location_text,
       cause: cause_text,
-      remedy: "Use shuttle bus",
       routes: affected_routes,
       effect: :shuttle
     }
@@ -392,7 +380,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "Trains will bypass <Station>",
       location: "",
       cause: cause_text,
-      remedy: "Seek alternate route",
       routes: affected_routes,
       effect: :station_closure
     }
@@ -405,7 +392,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: header,
       location: "",
       cause: "",
-      remedy: "",
       routes: affected_routes,
       effect: :delay
     }
