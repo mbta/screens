@@ -142,7 +142,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = cause |> get_cause_text()
+    cause_text = get_cause_text(cause)
 
     %{
       issue: "No trains",
@@ -158,7 +158,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = cause |> get_cause_text()
+    cause_text = get_cause_text(cause)
 
     %{
       issue: "No trains",
@@ -178,7 +178,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = cause |> get_cause_text()
+    cause_text = get_cause_text(cause)
 
     %{
       issue: "<LINE> platform closed",
@@ -219,7 +219,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = cause |> get_cause_text()
+    cause_text = get_cause_text(cause)
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
 
     %{
@@ -259,7 +259,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       }
     else
       destination = get_destination(t)
-      cause_text = cause |> get_cause_text()
+      cause_text = get_cause_text(cause)
 
       issue =
         if is_nil(destination) do
@@ -299,7 +299,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       }
     else
       destination = get_destination(t)
-      cause_text = cause |> get_cause_text()
+      cause_text = get_cause_text(cause)
 
       issue =
         if is_nil(destination) do
@@ -361,7 +361,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         urgent: true
       }
     else
-      cause_text = cause |> get_cause_text()
+      cause_text = get_cause_text(cause)
       {delay_description, delay_minutes} = Alert.interpret_severity(severity)
       destination = get_destination(t)
 
@@ -391,43 +391,68 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :delay}}), do: nil
 
-  defp serialize_outside_alert(%__MODULE__{alert: %Alert{effect: :suspension, cause: cause}} = t) do
+  defp serialize_outside_alert(
+         %__MODULE__{alert: %Alert{effect: :suspension, cause: cause, header: header}} = t
+       ) do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    location_text = get_endpoints(informed_entities, List.first(affected_routes))
 
-    destination = get_destination(t)
-    cause_text = cause |> get_cause_text()
+    if length(affected_routes) > 1 do
+      %{
+        issue: header,
+        location: "",
+        cause: "",
+        routes: affected_routes,
+        effect: :suspension,
+        urgent: false
+      }
+    else
+      destination = get_destination(t)
+      cause_text = get_cause_text(cause)
+      location_text = get_endpoints(informed_entities, List.first(affected_routes))
 
-    %{
-      issue: "No #{destination}trains",
-      location: location_text,
-      cause: cause_text,
-      remedy: "Seek alternate route",
-      routes: affected_routes,
-      effect: :suspension,
-      urgent: false
-    }
+      %{
+        issue: "No #{destination}trains",
+        location: location_text,
+        cause: cause_text,
+        routes: affected_routes,
+        effect: :suspension,
+        urgent: false
+      }
+    end
   end
 
-  defp serialize_outside_alert(%__MODULE__{alert: %Alert{effect: :shuttle, cause: cause}} = t) do
+  defp serialize_outside_alert(
+         %__MODULE__{alert: %Alert{effect: :shuttle, cause: cause, header: header}} = t
+       ) do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    location_text = get_endpoints(informed_entities, List.first(affected_routes))
 
-    destination = get_destination(t)
-    cause_text = cause |> get_cause_text()
+    if length(affected_routes) > 1 do
+      %{
+        issue: header,
+        location: "",
+        cause: "",
+        routes: affected_routes,
+        effect: :suspension,
+        urgent: false
+      }
+    else
+      destination = get_destination(t)
+      cause_text = get_cause_text(cause)
+      location_text = get_endpoints(informed_entities, List.first(affected_routes))
 
-    %{
-      issue: "No #{destination}trains",
-      location: location_text,
-      cause: cause_text,
-      routes: affected_routes,
-      effect: :shuttle,
-      urgent: false
-    }
+      %{
+        issue: "No #{destination}trains",
+        location: location_text,
+        cause: cause_text,
+        routes: affected_routes,
+        effect: :shuttle,
+        urgent: false
+      }
+    end
   end
 
   defp serialize_outside_alert(
@@ -436,7 +461,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = cause |> get_cause_text()
+    cause_text = get_cause_text(cause)
 
     %{
       issue: "Trains will bypass <Station>",
