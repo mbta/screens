@@ -325,6 +325,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
+  defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :station_closure}}), do: nil
+
   defp serialize_boundary_alert(
          %__MODULE__{
            alert: %Alert{effect: :delay, severity: severity, header: header}
@@ -373,6 +375,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
+  defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :delay}}), do: nil
+
   defp serialize_outside_alert(%__MODULE__{alert: %Alert{effect: :suspension, cause: cause}} = t) do
     informed_entities = BaseAlert.informed_entities(t)
     parent_stop_id = parent_stop_id(t)
@@ -409,7 +413,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       remedy: "Use shuttle bus",
       routes: affected_routes,
-      effect: :suspension
+      effect: :shuttle
     }
   end
 

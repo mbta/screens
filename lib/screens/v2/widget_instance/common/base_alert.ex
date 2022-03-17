@@ -128,7 +128,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     end
   end
 
-  @spec location(AlertWidget.t() | ReconstructedAlert.t()) ::
+  @spec location(AlertWidget.t() | ReconstructedAlert.t() | map()) ::
           :upstream
           | :boundary_upstream
           | :boundary_downstream

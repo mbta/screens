@@ -8,6 +8,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.V2.WidgetInstance.ReconstructedAlert
+  alias Screens.V2.WidgetInstance.Common.BaseAlert
 
   @relevant_effects ~w[shuttle suspension station_closure delay]a
 
@@ -46,9 +47,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         end)
 
       alerts
-      |> Enum.filter(fn alert ->
-        Enum.member?(@relevant_effects, Map.get(alert, :effect))
-      end)
+      |> filter_alerts(
+        config,
+        station_sequences,
+        routes_at_stop
+      )
       |> Enum.map(fn alert ->
         %ReconstructedAlert{
           screen: config,
@@ -61,6 +64,31 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     else
       :error -> []
     end
+  end
+
+  defp filter_alerts(alerts, config, stop_sequences, routes_at_stop) do
+    alerts
+    |> Enum.filter(fn %Alert{
+                        severity: severity,
+                        effect: effect
+                      } = alert ->
+      Enum.member?(@relevant_effects, Map.get(alert, :effect)) and
+        case BaseAlert.location(%{
+               screen: config,
+               alert: alert,
+               stop_sequences: stop_sequences,
+               routes_at_stop: routes_at_stop
+             }) do
+          location when location in [:downstream, :upstream] ->
+            true
+
+          :inside ->
+            effect != :delay or severity > 3
+
+          location when location in [:boundary_upstream, :boundary_downstream] ->
+            effect != :station_closure and (effect != :delay or severity > 3)
+        end
+    end)
   end
 
   # This slows things down... Should we store this like we do for elevator closures?
