@@ -523,13 +523,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def serialize(%__MODULE__{} = t) do
     case BaseAlert.location(t) do
       :inside ->
-        serialize_inside_alert(t) |> IO.inspect(label: "inside")
+        serialize_inside_alert(t)
 
       location when location in [:boundary_upstream, :boundary_downstream] ->
-        serialize_boundary_alert(t) |> IO.inspect(label: "boundary")
+        serialize_boundary_alert(t)
 
       location when location in [:downstream, :upstream] ->
-        serialize_outside_alert(t) |> IO.inspect(label: "outside")
+        serialize_outside_alert(t)
     end
   end
 
