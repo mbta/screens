@@ -60,10 +60,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if is_nil(direction_id) do
       nil
     else
-      destination =
-        @route_directions
-        |> Map.get(route_id)
-        |> Enum.at(direction_id)
+      @route_directions
+      |> Map.get(route_id)
+      |> Enum.at(direction_id)
     end
   end
 
