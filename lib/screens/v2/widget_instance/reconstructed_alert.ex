@@ -87,7 +87,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: location_text,
       cause: cause_text,
       routes: affected_routes,
-      effect: :suspension
+      effect: :suspension,
+      urgent: true
     }
   end
 
@@ -109,7 +110,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: location_text,
       cause: cause_text,
       routes: affected_routes,
-      effect: :shuttle
+      effect: :shuttle,
+      urgent: true
     }
   end
 
@@ -126,7 +128,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: cause_text,
       routes: affected_routes,
-      effect: :station_closure
+      effect: :station_closure,
+      urgent: true
     }
   end
 
@@ -148,7 +151,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: cause_text,
       routes: affected_routes,
-      effect: :suspension
+      effect: :suspension,
+      urgent: true
     }
   end
 
@@ -163,7 +167,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: cause_text,
       routes: affected_routes,
-      effect: :shuttle
+      effect: :shuttle,
+      urgent: true
     }
   end
 
@@ -182,7 +187,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: cause_text,
       routes: affected_routes,
-      effect: :station_closure
+      effect: :station_closure,
+      urgent: true
     }
   end
 
@@ -201,7 +207,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: "",
       routes: affected_routes,
-      effect: :moderate_delay
+      effect: :moderate_delay,
+      urgent: false
     }
   end
 
@@ -222,7 +229,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: cause_text,
       routes: affected_routes,
-      effect: :severe_delay
+      effect: :severe_delay,
+      urgent: true
     }
   end
 
@@ -250,7 +258,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         location: "",
         cause: "",
         routes: affected_routes,
-        effect: :suspension
+        effect: :suspension,
+        urgent: true
       }
     else
       issue = get_issue_with_destination(t)
@@ -260,7 +269,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         location: "",
         cause: cause_text,
         routes: affected_routes,
-        effect: :suspension
+        effect: :suspension,
+        urgent: true
       }
     end
   end
@@ -277,7 +287,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: cause_text,
       routes: affected_routes,
-      effect: :shuttle
+      effect: :shuttle,
+      urgent: true
     }
   end
 
@@ -298,7 +309,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: "",
       routes: affected_routes,
-      effect: :moderate_delay
+      effect: :moderate_delay,
+      urgent: false
     }
   end
 
@@ -325,7 +337,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: cause_text,
       routes: affected_routes,
-      effect: :severe_delay
+      effect: :severe_delay,
+      urgent: true
     }
   end
 
@@ -346,7 +359,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       remedy: "Seek alternate route",
       routes: affected_routes,
-      effect: :suspension
+      effect: :suspension,
+      urgent: false
     }
   end
 
@@ -364,7 +378,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: location_text,
       cause: cause_text,
       routes: affected_routes,
-      effect: :shuttle
+      effect: :shuttle,
+      urgent: false
     }
   end
 
@@ -381,7 +396,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: cause_text,
       routes: affected_routes,
-      effect: :station_closure
+      effect: :station_closure,
+      urgent: false
     }
   end
 
@@ -393,7 +409,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: "",
       routes: affected_routes,
-      effect: :delay
+      effect: :delay,
+      urgent: false
     }
   end
 
