@@ -37,12 +37,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Green-E" => ["Heath Street", "North Station"]
   }
 
-  defp parent_stop_id(%__MODULE__{
-         screen: %Screen{app_params: %_{header: %CurrentStopId{stop_id: parent_stop_id}}}
-       }) do
-    parent_stop_id
-  end
-
   defp get_affected_routes(informed_entities) do
     informed_entities |> Enum.map(fn %{route: route} -> route end) |> Enum.uniq()
   end
