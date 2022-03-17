@@ -27,72 +27,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           routes_at_stop: list(%{route_id: route_id(), active?: boolean()})
         }
 
-  @alert_headsign_matchers %{
-    # Kenmore
-    "place-kencl" => [
-      {"70149", ~w[70153 70211 70187], "Boston College"},
-      {"70211", ~w[70153 70149 70187], "Cleveland Circle"},
-      {"70187", ~w[70153 70149 70211], "Riverside"},
-      {~w[70149 70211], ~w[70153 70187], "BC/Clev. Circ."},
-      {~w[70149 70187], ~w[70153 70211], "BC/Riverside"},
-      {~w[70211 70187], ~w[70153 70149], "Clev. Circ./Riverside"},
-      {~w[70149 70211 70187], "70153", {:adj, "westbound"}},
-      {"70152", ~w[70148 70212 70186], "Park Street"}
-    ],
-    # Prudential
-    "place-prmnl" => [
-      {"70154", "70242", "Park Street"},
-      {"70241", "70155", "Heath Street"}
-    ],
-    # Haymarket
-    "place-haecl" => [
-      # GL
-      {"70205", "70201", "Northbound"},
-      {"70202", "70206", "Copley & West"},
-      # OL
-      {"70027", "70023", "Oak Grove"},
-      {"70022", "70026", "Forest Hills"}
-    ],
-    # Back Bay
-    "place-bbsta" => [
-      {"70017", "70013", "Oak Grove"},
-      {"70012", "70016", "Forest Hills"}
-    ],
-    # Tufts
-    "place-tumnl" => [
-      {"70019", "70015", "Oak Grove"},
-      {"70014", "70018", "Forest Hills"}
-    ],
-    # Sullivan
-    "place-sull" => [
-      {"70279", "70029", "Oak Grove"},
-      {"70028", "70278", "Forest Hills"}
-    ],
-    # Malden Center
-    "place-mlmnl" => [
-      {"70036", "70033", "Oak Grove"},
-      {"70032", "70036", "Forest Hills"}
-    ],
-    # Broadway
-    "place-brdwy" => [
-      {"70080", "70084", "Alewife"},
-      {"70083", "70079", "Ashmont/Braintree"}
-    ],
-    # Aquarium
-    "place-aqucl" => [
-      {"70046", "70042", "Wonderland"},
-      {"70041", "70045", "Bowdoin"}
-    ],
-    # Airport
-    "place-aport" => [
-      {"70050", "70046", "Wonderland"},
-      {"70045", "70049", "Bowdoin"}
-    ],
-    # Quincy Center
-    "place-qnctr" => [
-      {"70100", "70104", "Alewife"},
-      {"70103", "70099", "Braintree"}
-    ]
+  @route_directions %{
+    "Blue" => ["Bowdoin", "Wonderland"],
+    "Orange" => ["Forest Hills", "Oak Grove"],
+    "Red" => ["Ashmont/Braintree", "Alewife"],
+    "Green-B" => ["Boston College", "Government Center"],
+    "Green-C" => ["Cleveland Circle", "Government Center"],
+    "Green-D" => ["Riverside", "North Station"],
+    "Green-E" => ["Heath Street", "North Station"]
   }
 
   defp parent_stop_id(%__MODULE__{
@@ -105,12 +47,26 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities |> Enum.map(fn %{route: route} -> route end) |> Enum.uniq()
   end
 
-  defp get_destination(parent_stop_id) do
-    @alert_headsign_matchers
-    |> Map.get(parent_stop_id)
-    |> Enum.find_value({:inside, nil}, fn {_informed, _not_informed, headsign} ->
-      headsign
-    end)
+  # Using hd/1 because we know that only single line stations use this function.
+  defp get_issue_with_destination(%__MODULE__{} = t) do
+    informed_entities = BaseAlert.informed_entities(t)
+
+    {direction_id, route_id} =
+      informed_entities
+      |> Enum.map(fn %{direction_id: direction_id, route: route} -> {direction_id, route} end)
+      |> Enum.uniq()
+      |> hd()
+
+    if is_nil(direction_id) do
+      "No trains"
+    else
+      destination =
+        @route_directions
+        |> Map.get(route_id)
+        |> Enum.at(direction_id)
+
+      "No #{destination} trains"
+    end
   end
 
   defp serialize_takeover_alert(
@@ -287,36 +243,45 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp serialize_boundary_alert(
          %__MODULE__{
-           alert: %Alert{effect: :suspension, cause: cause}
+           alert: %Alert{effect: :suspension, cause: cause, header: header},
+           routes_at_stop: routes_at_stop
          } = t
        ) do
     informed_entities = BaseAlert.informed_entities(t)
-    parent_stop_id = parent_stop_id(t)
 
     affected_routes = get_affected_routes(informed_entities)
     cause_text = cause |> get_cause_text()
-    destination = parent_stop_id |> get_destination()
 
-    %{
-      issue: "No #{destination} trains",
-      location: "",
-      cause: cause_text,
-      remedy: "Seek alternate route",
-      routes: affected_routes,
-      effect: :suspension
-    }
+    if length(routes_at_stop) > 1 do
+      %{
+        issue: header,
+        location: "",
+        cause: "",
+        routes: affected_routes,
+        effect: :suspension
+      }
+    else
+      issue = get_issue_with_destination(t)
+
+      %{
+        issue: issue,
+        location: "",
+        cause: cause_text,
+        routes: affected_routes,
+        effect: :suspension
+      }
+    end
   end
 
   defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :shuttle, cause: cause}} = t) do
     informed_entities = BaseAlert.informed_entities(t)
-    parent_stop_id = parent_stop_id(t)
 
     affected_routes = get_affected_routes(informed_entities)
     cause_text = cause |> get_cause_text()
-    destination = parent_stop_id |> get_destination()
+    issue = get_issue_with_destination(t)
 
     %{
-      issue: "No #{destination} trains",
+      issue: issue,
       location: "",
       cause: cause_text,
       remedy: "Use shuttle bus",
@@ -379,16 +344,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp serialize_outside_alert(%__MODULE__{alert: %Alert{effect: :suspension, cause: cause}} = t) do
     informed_entities = BaseAlert.informed_entities(t)
-    parent_stop_id = parent_stop_id(t)
 
     affected_routes = get_affected_routes(informed_entities)
     location_text = get_endpoints(informed_entities, List.first(affected_routes))
 
     cause_text = cause |> get_cause_text()
-    destination = parent_stop_id |> get_destination()
+    issue = get_issue_with_destination(t)
 
     %{
-      issue: "No #{destination} trains",
+      issue: issue,
       location: location_text,
       cause: cause_text,
       remedy: "Seek alternate route",
@@ -399,16 +363,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp serialize_outside_alert(%__MODULE__{alert: %Alert{effect: :shuttle, cause: cause}} = t) do
     informed_entities = BaseAlert.informed_entities(t)
-    parent_stop_id = parent_stop_id(t)
 
     affected_routes = get_affected_routes(informed_entities)
     location_text = get_endpoints(informed_entities, List.first(affected_routes))
 
     cause_text = cause |> get_cause_text()
-    destination = parent_stop_id |> get_destination()
+    issue = get_issue_with_destination(t)
 
     %{
-      issue: "No #{destination} trains",
+      issue: issue,
       location: location_text,
       cause: cause_text,
       remedy: "Use shuttle bus",
