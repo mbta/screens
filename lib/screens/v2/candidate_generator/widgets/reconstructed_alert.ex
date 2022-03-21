@@ -87,6 +87,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
           location when location in [:boundary_upstream, :boundary_downstream] ->
             effect != :station_closure and (effect != :delay or severity > 3)
+
+          _ ->
+            false
         end
     end)
   end
