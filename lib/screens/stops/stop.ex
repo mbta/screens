@@ -306,4 +306,16 @@ defmodule Screens.Stops.Stop do
 
     Enum.all?(stations, &in_stop_sequence?(&1, stop_sequence))
   end
+
+  def gl_trunk_stops do
+    @route_stop_sequences |> Map.get("Green") |> hd() |> Enum.map(&elem(&1, 0)) |> MapSet.new()
+  end
+
+  def stop_id_to_name(route_id) do
+    @route_stop_sequences
+    |> Map.get(route_id)
+    |> Enum.flat_map(fn x -> x end)
+    |> Enum.uniq()
+    |> Enum.into(%{})
+  end
 end
