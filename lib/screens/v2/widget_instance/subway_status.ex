@@ -207,12 +207,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
          route_id
        ) do
     # Get closed station names from informed entities
-    stop_id_to_name =
-      @route_stop_sequences
-      |> Map.get(route_id)
-      |> Enum.flat_map(fn x -> x end)
-      |> Enum.uniq()
-      |> Enum.into(%{})
+    stop_id_to_name = Stop.stop_id_to_name(route_id)
 
     stop_names =
       informed_entities
@@ -311,8 +306,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp alert_affects_gl_trunk_or_whole_line?(%Alert{informed_entities: informed_entities}) do
-    gl_trunk_stops =
-      @route_stop_sequences |> Map.get("Green") |> hd() |> Enum.map(&elem(&1, 0)) |> MapSet.new()
+    gl_trunk_stops = Stop.gl_trunk_stops()
 
     alert_trunk_stops =
       informed_entities
