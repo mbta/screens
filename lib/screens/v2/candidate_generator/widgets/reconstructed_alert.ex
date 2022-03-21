@@ -7,8 +7,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.Config.V2.PreFare
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
-  alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Common.BaseAlert
+  alias Screens.V2.WidgetInstance.ReconstructedAlert
 
   @relevant_effects ~w[shuttle suspension station_closure delay]a
 
@@ -73,11 +73,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
                         effect: effect
                       } = alert ->
       Enum.member?(@relevant_effects, Map.get(alert, :effect)) and
-        case BaseAlert.location(%{
+        case BaseAlert.location(%ReconstructedAlert{
                screen: config,
                alert: alert,
                stop_sequences: stop_sequences,
-               routes_at_stop: routes_at_stop
+               routes_at_stop: routes_at_stop,
+               now: DateTime.utc_now()
              }) do
           location when location in [:downstream, :upstream] ->
             true

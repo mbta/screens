@@ -346,52 +346,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   defp informs_all_active_routes_at_home_stop?(t) do
-    MapSet.subset?(active_routes_at_stop(t), informed_routes_at_home_stop(t))
-  end
-
-  defp informed_routes_at_home_stop(t) do
-    rt = route_type(t)
-    home_stop = home_stop_id(t)
-    route_set = all_routes_at_stop(t)
-
-    # allows us to pattern match against the empty set
-    empty_set = MapSet.new()
-
-    uninformed_routes =
-      Enum.reduce_while(informed_entities(t), route_set, fn
-        _ie, ^empty_set ->
-          {:halt, empty_set}
-
-        %{route_type: nil, stop: nil, route: nil}, uninformed ->
-          {:cont, uninformed}
-
-        %{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
-          # Route type might be a single atom or list of atoms
-          cond do
-            is_list(rt) and RouteType.from_id(route_type_id) in rt ->
-              {:halt, empty_set}
-
-            RouteType.from_id(route_type_id) == rt ->
-              {:halt, empty_set}
-
-            true ->
-              {:cont, uninformed}
-          end
-
-        %{stop: ^home_stop, route: nil}, _uninformed ->
-          {:halt, empty_set}
-
-        %{stop: ^home_stop, route: route}, uninformed ->
-          {:cont, MapSet.delete(uninformed, route)}
-
-        %{stop: nil, route: route}, uninformed ->
-          {:cont, MapSet.delete(uninformed, route)}
-
-        _ie, uninformed ->
-          {:cont, uninformed}
-      end)
-
-    MapSet.difference(route_set, uninformed_routes)
+    MapSet.subset?(active_routes_at_stop(t), BaseAlert.informed_routes_at_home_stop(t))
   end
 
   defp informed_routes(t) do

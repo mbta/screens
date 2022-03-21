@@ -128,13 +128,21 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     end
   end
 
-  @spec location(AlertWidget.t() | ReconstructedAlert.t() | map()) ::
-          :upstream
+  @spec location(%{
+          __struct__:
+            Screens.V2.WidgetInstance.Alert | Screens.V2.WidgetInstance.ReconstructedAlert | map(),
+          alert: Screens.Alerts.Alert.t(),
+          now: DateTime.t(),
+          routes_at_stop: [map],
+          screen: Screens.Config.Screen.t(),
+          stop_sequences: [list]
+        }) ::
+          :boundary_downstream
           | :boundary_upstream
-          | :boundary_downstream
-          | :inside
           | :downstream
           | :elsewhere
+          | :inside
+          | :upstream
   def location(%{} = t) do
     location_context = %{
       home_stop: home_stop_id(t),
@@ -182,7 +190,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     |> MapSet.new(& &1.route_id)
   end
 
-  defp informed_routes_at_home_stop(t) do
+  def informed_routes_at_home_stop(t) do
     rt = route_type(t)
     home_stop = home_stop_id(t)
     route_set = all_routes_at_stop(t)
