@@ -193,8 +193,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     affected_routes = get_affected_routes(informed_entities)
     cause_text = get_cause_text(cause)
 
+    line =
+      case affected_routes do
+        ["Green-" <> branch] -> "Green Line #{branch}"
+        [affected_line] -> affected_line
+      end
+
     %{
-      issue: "<LINE> platform closed",
+      issue: "#{line} platform closed",
       location: "",
       cause: cause_text,
       routes: affected_routes,
