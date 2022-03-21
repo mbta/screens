@@ -194,7 +194,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     line =
       case affected_routes do
         ["Green-" <> branch] -> "Green Line #{branch}"
-        [affected_line] -> affected_line
+        [affected_line] -> "#{affected_line} line"
       end
 
     %{
