@@ -26,11 +26,10 @@
   .elevator-status__footer {
     position: absolute;
     bottom: 0;
-    background: rgb(217, 214, 208);
+    background: #cccbc8;
     border-radius: 0px 0px 16px 16px;
-    height: 120px;
+    height: 124px;
     width: 1024px;
-    border-top: 4px solid rgb(204, 203, 200);
 
     .elevator-status__footer-text {
       color: rgb(23, 31, 38);
@@ -44,11 +43,14 @@
 
   &__closure-you-are-here-icon {
     object-fit: contain;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   &__closure-route-mode-icon {
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     &:not(:last-child) {
       padding-right: 12px;
     }
@@ -162,12 +164,15 @@
       .detail-page__closure-outage-icon-container {
         position: absolute;
         left: -68px;
-        height: 45px;
-        width: 45px;
+        height: 50px;
+        width: 50px;
         transform: translateY(10px);
 
         .detail-page__closure-outage-icon {
           object-fit: contain;
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
         }
       }
       .detail-page__closure-location-text {
@@ -178,14 +183,10 @@
         line-height: 67px;
       }
 
-      .detail-page__closure-route-mode-here-icon-container {
+      .detail-page__closure-route-mode-icon-container {
         display: inline-block;
         padding-left: 30px;
-
-        .elevator-status__closure-you-are-here-icon {
-          width: 45px;
-          height: 45px;
-        }
+        margin: auto;
       }
     }
 
@@ -200,15 +201,19 @@
     .detail-page__timeframe {
       padding-bottom: 24px;
       position: relative;
+      color: #171f26;
 
       .detail-page__closure-alert-icon-container {
         position: absolute;
         left: -68px;
-        height: 45px;
-        width: 45px;
+        height: 50px;
+        width: 50px;
 
         .detail-page__closure-alert-icon {
           object-fit: contain;
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
         }
       }
       .detail-page__timeframe-text-start {
