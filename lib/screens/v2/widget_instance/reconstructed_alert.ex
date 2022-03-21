@@ -2,8 +2,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @moduledoc false
 
   alias Screens.Alerts.Alert
+  alias Screens.Config.Dup.Override.FreeTextLine
   alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.Common.BaseAlert
@@ -73,8 +73,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     location_text =
       get_endpoints(informed_entities, List.first(affected_routes)) |> String.capitalize()
 
+    issue_text =
+      ["No"] ++
+        (affected_routes
+         |> Enum.map(fn route -> %{icon: route} end)
+         |> Enum.to_list()) ++
+        ["trains"]
+
     %{
-      issue: "No <SMPILL> trains",
+      issue: %FreeTextLine{
+        icon: nil,
+        text: issue_text
+      },
       location: location_text,
       cause: cause_text,
       routes: affected_routes,
@@ -96,8 +106,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     location_text =
       get_endpoints(informed_entities, List.first(affected_routes)) |> String.capitalize()
 
+    issue_text =
+      ["No"] ++
+        (affected_routes
+         |> Enum.map(fn route -> %{icon: route} end)
+         |> Enum.to_list()) ++
+        ["trains"]
+
     %{
-      issue: "No <SMPILL> trains",
+      issue: %FreeTextLine{
+        icon: nil,
+        text: issue_text
+      },
       location: location_text,
       cause: cause_text,
       routes: affected_routes,
