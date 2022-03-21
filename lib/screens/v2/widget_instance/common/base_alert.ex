@@ -31,7 +31,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
   @spec upstream_stop_id_set(AlertWidget.t() | ReconstructedAlert.t()) ::
           MapSet.t(stop_id())
-  defp upstream_stop_id_set(%{stop_sequences: stop_sequences} = t) do
+  def upstream_stop_id_set(%{stop_sequences: stop_sequences} = t) do
     home_stop_id = home_stop_id(t)
 
     stop_sequences
@@ -170,7 +170,6 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     happening_now?.(alert, now)
   end
 
-  @spec effect(%{alert: Alert.t()}) :: Alert.effect()
   def effect(%{alert: %Alert{effect: effect}}), do: effect
 
   def informs_all_active_routes_at_home_stop?(t) do

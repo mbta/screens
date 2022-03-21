@@ -499,26 +499,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     end
   end
 
-  describe "upstream_stop_id_set/1" do
-    setup @alert_widget_context_setup_group
-
-    test "collects all stops upstream of the home stop into a set", %{widget: widget} do
-      expected_upstream_stops = MapSet.new(~w[0 1 2 3 4] ++ ~w[10 20 30 4] ++ ~w[200 40])
-
-      assert MapSet.equal?(expected_upstream_stops, AlertWidget.upstream_stop_id_set(widget))
-    end
-  end
-
-  describe "downstream_stop_id_set/1" do
-    setup @alert_widget_context_setup_group
-
-    test "collects all stops downstream of the home stop into a set", %{widget: widget} do
-      expected_downstream_stops = MapSet.new(~w[6 7 8 9] ++ ~w[7] ++ ~w[6 90])
-
-      assert MapSet.equal?(expected_downstream_stops, AlertWidget.downstream_stop_id_set(widget))
-    end
-  end
-
   describe "effect/1" do
     test "returns effect from the widget's alert", %{widget: widget} do
       effect = :detour
