@@ -500,8 +500,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     affected_routes = get_affected_routes(informed_entities)
     cause_text = get_cause_text(cause)
 
+    station =
+      case get_stations(informed_entities) do
+        [station | _] -> Stop.fetch_stop_name(station)
+      end
+
     %{
-      issue: "Trains will bypass <Station>",
+      issue: "Trains will bypass #{station}",
       location: "",
       cause: cause_text,
       routes: affected_routes,
@@ -521,6 +526,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: :delay,
       urgent: false
     }
+  end
+
+  defp get_stations(informed_entities) do
+    informed_entities
+    |> Enum.map(fn %{stop: stop_id} -> stop_id end)
+    |> Enum.filter(&String.starts_with?(&1, "place-"))
   end
 
   defp get_cause_text(cause) do

@@ -615,7 +615,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
 
       expected = %{
-        issue: "Trains will bypass <Station>",
+        issue: "Trains will bypass Alewife",
         location: "",
         cause: "",
         routes: ["Red", "Orange"],
@@ -659,7 +659,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:construction)
 
       expected = %{
-        issue: "Trains will bypass <Station>",
+        issue: "Trains will bypass Alewife",
         location: "",
         cause: "Due to construction",
         routes: ["Red", "Orange"],
