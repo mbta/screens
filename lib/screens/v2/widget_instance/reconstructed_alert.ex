@@ -70,8 +70,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     affected_routes = get_affected_routes(informed_entities)
     cause_text = cause |> get_cause_text() |> String.capitalize()
 
-    location_text =
-      get_endpoints(informed_entities, List.first(affected_routes)) |> String.capitalize()
+    location_text = get_endpoints(informed_entities, hd(affected_routes))
 
     issue_text =
       ["No"] ++
@@ -103,8 +102,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     affected_routes = get_affected_routes(informed_entities)
     cause_text = cause |> get_cause_text() |> String.capitalize()
 
-    location_text =
-      get_endpoints(informed_entities, List.first(affected_routes)) |> String.capitalize()
+    location_text = get_endpoints(informed_entities, hd(affected_routes))
 
     issue_text =
       ["No"] ++
@@ -241,8 +239,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     cause_text = get_cause_text(cause)
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
 
+    duration_text =
+      case delay_description do
+        :up_to -> "up to #{delay_minutes} minutes"
+        :more_than -> "over #{delay_minutes} minutes"
+      end
+
     %{
-      issue: "Trains may be delayed #{delay_description} #{delay_minutes}",
+      issue: "Trains may be delayed #{duration_text}",
       location: "",
       cause: cause_text,
       routes: affected_routes,
@@ -429,10 +433,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     else
       destination = get_destination(t)
       cause_text = get_cause_text(cause)
-      location_text = get_endpoints(informed_entities, List.first(affected_routes))
+      location_text = get_endpoints(informed_entities, hd(affected_routes))
+
+      issue =
+        if is_nil(destination) do
+          "No trains"
+        else
+          "No #{destination} trains"
+        end
 
       %{
-        issue: "No #{destination}trains",
+        issue: issue,
         location: location_text,
         cause: cause_text,
         routes: affected_routes,
@@ -463,8 +474,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause_text = get_cause_text(cause)
       location_text = get_endpoints(informed_entities, List.first(affected_routes))
 
+      issue =
+        if is_nil(destination) do
+          "No trains"
+        else
+          "No #{destination} trains"
+        end
+
       %{
-        issue: "No #{destination}trains",
+        issue: issue,
         location: location_text,
         cause: cause_text,
         routes: affected_routes,
