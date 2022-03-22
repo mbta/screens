@@ -8,6 +8,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
+  alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct screen: nil,
             alert: nil,
@@ -60,6 +61,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  defp get_route_pills(routes) do
+    routes
+    |> Enum.group_by(fn
+      "Green" <> _ -> "Green"
+      route -> route
+    end)
+    |> Enum.map(
+      &RoutePill.serialize_route_for_reconstructed_alert(&1, %{
+        gl_branch: true,
+        large: length(routes) == 1
+      })
+    )
+  end
+
   defp serialize_takeover_alert(
          %__MODULE__{
            alert: %Alert{effect: :suspension, cause: cause}
@@ -86,7 +101,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       },
       location: location_text,
       cause: cause_text,
-      routes: affected_routes,
+      routes: get_route_pills(affected_routes),
       effect: :suspension,
       urgent: true
     }
@@ -118,7 +133,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       },
       location: location_text,
       cause: cause_text,
-      routes: affected_routes,
+      routes: get_route_pills(affected_routes),
       effect: :shuttle,
       urgent: true
     }
@@ -136,7 +151,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "Station Closure",
       location: "",
       cause: cause_text,
-      routes: affected_routes,
+      routes: get_route_pills(affected_routes),
       effect: :station_closure,
       urgent: true
     }
@@ -151,7 +166,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        ) do
     informed_entities = BaseAlert.informed_entities(t)
-
     affected_routes = get_affected_routes(informed_entities)
     cause_text = get_cause_text(cause)
 
@@ -159,7 +173,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "No trains",
       location: "",
       cause: cause_text,
-      routes: affected_routes,
+      routes: get_route_pills(affected_routes),
       effect: :suspension,
       urgent: true
     }
@@ -175,7 +189,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "No trains",
       location: "",
       cause: cause_text,
-      routes: affected_routes,
+      routes: get_route_pills(affected_routes),
       effect: :shuttle,
       urgent: true
     }
@@ -193,15 +207,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     line =
       case affected_routes do
-        ["Green-" <> branch] -> "Green Line #{branch}"
-        [affected_line] -> "#{affected_line} line"
+        ["Green-" <> branch | _] -> "Green Line #{branch}"
+        [affected_line | _] -> "#{affected_line} line"
       end
 
     %{
       issue: "#{line} platform closed",
       location: "",
       cause: cause_text,
-      routes: affected_routes,
+      routes: get_route_pills(affected_routes),
       effect: :station_closure,
       urgent: true
     }
@@ -221,7 +235,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: header,
       location: "",
       cause: "",
-      routes: affected_routes,
+      routes: get_route_pills(affected_routes),
       effect: :moderate_delay,
       urgent: false
     }
@@ -249,7 +263,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "Trains may be delayed #{duration_text}",
       location: "",
       cause: cause_text,
-      routes: affected_routes,
+      routes: get_route_pills(affected_routes),
       effect: :severe_delay,
       urgent: true
     }
@@ -276,7 +290,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         issue: header,
         location: "",
         cause: "",
-        routes: affected_routes,
+        routes: get_route_pills(affected_routes),
         effect: :suspension,
         urgent: true
       }
@@ -295,7 +309,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         issue: issue,
         location: "",
         cause: cause_text,
-        routes: affected_routes,
+        routes: get_route_pills(affected_routes),
         effect: :suspension,
         urgent: true
       }
@@ -316,7 +330,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         issue: header,
         location: "",
         cause: "",
-        routes: affected_routes,
+        routes: get_route_pills(affected_routes),
         effect: :shuttle,
         urgent: true
       }
@@ -335,7 +349,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         issue: issue,
         location: "",
         cause: cause_text,
-        routes: affected_routes,
+        routes: get_route_pills(affected_routes),
         effect: :shuttle,
         urgent: true
       }
@@ -358,7 +372,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: header,
       location: "",
       cause: "",
-      routes: affected_routes,
+      routes: get_route_pills(affected_routes),
       effect: :moderate_delay,
       urgent: false
     }
@@ -379,7 +393,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         issue: header,
         location: "",
         cause: "",
-        routes: affected_routes,
+        routes: get_route_pills(affected_routes),
         effect: :severe_delay,
         urgent: true
       }
@@ -405,7 +419,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         issue: issue,
         location: "",
         cause: cause_text,
-        routes: affected_routes,
+        routes: get_route_pills(affected_routes),
         effect: :severe_delay,
         urgent: true
       }
@@ -426,7 +440,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         issue: header,
         location: "",
         cause: "",
-        routes: affected_routes,
+        routes: get_route_pills(affected_routes),
         effect: :suspension,
         urgent: false
       }
@@ -446,7 +460,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         issue: issue,
         location: location_text,
         cause: cause_text,
-        routes: affected_routes,
+        routes: get_route_pills(affected_routes),
         effect: :suspension,
         urgent: false
       }
@@ -465,7 +479,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         issue: header,
         location: "",
         cause: "",
-        routes: affected_routes,
+        routes: get_route_pills(affected_routes),
         effect: :suspension,
         urgent: false
       }
@@ -485,7 +499,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         issue: issue,
         location: location_text,
         cause: cause_text,
-        routes: affected_routes,
+        routes: get_route_pills(affected_routes),
         effect: :shuttle,
         urgent: false
       }
@@ -509,7 +523,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "Trains will bypass #{station}",
       location: "",
       cause: cause_text,
-      routes: affected_routes,
+      routes: get_route_pills(affected_routes),
       effect: :station_closure,
       urgent: false
     }
@@ -522,7 +536,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: header,
       location: "",
       cause: "",
-      routes: affected_routes,
+      routes: get_route_pills(affected_routes),
       effect: :delay,
       urgent: false
     }
