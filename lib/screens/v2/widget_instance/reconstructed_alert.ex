@@ -68,10 +68,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       route -> route
     end)
     |> Enum.map(
-      &RoutePill.serialize_route_for_reconstructed_alert(&1, %{
-        gl_branch: true,
-        large: length(routes) == 1
-      })
+      &RoutePill.serialize_route_for_reconstructed_alert(&1, %{large: length(routes) == 1})
     )
   end
 
