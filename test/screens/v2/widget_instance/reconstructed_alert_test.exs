@@ -8,6 +8,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
+  alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   setup :setup_base
 
@@ -236,7 +237,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: %FreeTextLine{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
         location: "at Downtown Crossing",
         cause: "",
-        routes: ["Red", "Orange"],
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
         effect: :suspension,
         urgent: true
       }
@@ -258,7 +262,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: %FreeTextLine{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
         location: "at Downtown Crossing",
         cause: "",
-        routes: ["Red", "Orange"],
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
         effect: :shuttle,
         urgent: true
       }
@@ -280,7 +287,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Station Closure",
         location: "",
         cause: "",
-        routes: ["Red", "Orange"],
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
         effect: :station_closure,
         urgent: true
       }
@@ -302,7 +312,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: %FreeTextLine{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
         location: "at Downtown Crossing",
         cause: "Due to construction",
-        routes: ["Red", "Orange"],
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
         effect: :suspension,
         urgent: true
       }
@@ -327,7 +340,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No trains",
         location: "",
         cause: "",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
         urgent: true
       }
@@ -348,7 +361,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No trains",
         location: "",
         cause: "",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :shuttle,
         urgent: true
       }
@@ -369,7 +382,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Red line platform closed",
         location: "",
         cause: "",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :station_closure,
         urgent: true
       }
@@ -392,7 +405,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Test Alert",
         location: "",
         cause: "",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :moderate_delay,
         urgent: false
       }
@@ -414,7 +427,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Trains may be delayed over 60 minutes",
         location: "",
         cause: "",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
         urgent: true
       }
@@ -436,7 +449,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Trains may be delayed over 60 minutes",
         location: "",
         cause: "Due to construction",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
         urgent: true
       }
@@ -462,7 +475,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No Alewife trains",
         location: "",
         cause: "",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
         urgent: true
       }
@@ -484,7 +497,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No Alewife trains",
         location: "",
         cause: "",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :shuttle,
         urgent: true
       }
@@ -508,7 +521,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Test Alert",
         location: "",
         cause: "",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :moderate_delay,
         urgent: false
       }
@@ -531,7 +544,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Alewife trains may be delayed over 60 minutes",
         location: "",
         cause: "",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
         urgent: true
       }
@@ -554,7 +567,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Alewife trains may be delayed over 60 minutes",
         location: "",
         cause: "Due to construction",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
         urgent: true
       }
@@ -577,7 +590,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No Alewife trains",
         location: "at Alewife",
         cause: "",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
         urgent: false
       }
@@ -596,7 +609,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No Alewife trains",
         location: "at Alewife",
         cause: "",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :shuttle,
         urgent: false
       }
@@ -618,7 +631,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Trains will bypass Alewife",
         location: "",
         cause: "",
-        routes: ["Red", "Orange"],
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
         effect: :station_closure,
         urgent: false
       }
@@ -640,7 +656,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Test Alert",
         location: "",
         cause: "",
-        routes: ["Red"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :delay,
         urgent: false
       }
@@ -662,7 +678,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Trains will bypass Alewife",
         location: "",
         cause: "Due to construction",
-        routes: ["Red", "Orange"],
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
         effect: :station_closure,
         urgent: false
       }
