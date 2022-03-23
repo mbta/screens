@@ -10,17 +10,23 @@
   color: #171f26;
 
   .elevator-status__header {
-    height: 56px;
-    padding: 32px;
+    height: 120px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 
     .elevator-status__header-text {
+      padding: 32px;
       font-size: 72px;
       font-weight: 800;
       line-height: 56px;
       font-family: Inter, sans-serif;
+    }
+
+    .elevator-status__wayfinding-icon {
+      padding-top: 12px;
+      padding-right: 28px;
+      padding-bottom: 12px;
     }
   }
 
