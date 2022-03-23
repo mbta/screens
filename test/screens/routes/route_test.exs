@@ -88,7 +88,7 @@ defmodule Screens.Routes.RouteTest do
       all_routes = [route_json("22"), route_json("29"), route_json("44")]
 
       stop_id = "1265"
-      today = ~D[2021-01-01]
+      now = ~U[2021-01-01T00:00:00Z]
 
       today_iso8601 = Date.to_iso8601(today)
 
