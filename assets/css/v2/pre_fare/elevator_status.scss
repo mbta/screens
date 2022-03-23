@@ -7,6 +7,7 @@
   margin: 16px 28px;
   position: relative;
   overflow: hidden;
+  color: #171f26;
 
   .elevator-status__header {
     height: 56px;
@@ -32,7 +33,6 @@
     width: 1024px;
 
     .elevator-status__footer-text {
-      color: rgb(23, 31, 38);
       font-size: 32px;
       font-family: Inter, sans-serif;
       line-height: 40px;
@@ -84,7 +84,6 @@
     &__station-name {
       display: inline-block;
       height: 44px;
-      color: rgb(23, 31, 38);
       font-size: 40px;
       font-family: Inter, sans-serif;
       font-weight: 700;
@@ -124,7 +123,6 @@
       width: 960px;
       height: 40px;
 
-      color: rgb(23, 31, 38);
       font-size: 32px;
       font-family: Inter, sans-serif;
       font-weight: 400;
@@ -201,7 +199,6 @@
     .detail-page__timeframe {
       padding-bottom: 24px;
       position: relative;
-      color: #171f26;
 
       .detail-page__closure-alert-icon-container {
         position: absolute;
@@ -243,8 +240,4 @@
       padding-right: 32px;
     }
   }
-}
-
-.active-here-and-now {
-  color: rgb(186, 25, 14);
 }
