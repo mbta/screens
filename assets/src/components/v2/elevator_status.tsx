@@ -76,7 +76,7 @@ const ElevatorStatus: ComponentType<Props> = ({
           <div className="elevator-status__header-text">Elevator Closures</div>
           <img
             className="elevator-status__wayfinding-icon"
-            src={imagePath("elevator-status-elevator.svg")}
+            src={imagePath("elevator-status-wayfinding-elevator.svg")}
           />
         </div>
         {pageToRender}
