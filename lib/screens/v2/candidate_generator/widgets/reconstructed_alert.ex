@@ -23,14 +23,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         fetch_alerts_fn \\ &Alert.fetch/1,
         get_parent_station_id_fn \\ &get_parent_station/1
       ) do
-    with {:ok, routes_at_stop} <- fetch_routes_by_stop_fn.(stop_id, now, [:subway, :light_rail]),
+    # Filtering by subway and light_rail types
+    with {:ok, routes_at_stop} <- fetch_routes_by_stop_fn.(stop_id, now, [0, 1]),
          route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids_at_stop),
          {:ok, stop_sequences} <- fetch_stop_sequences_by_stop_fn.(stop_id, route_ids_at_stop) do
       station_sequences =
         stop_sequences
         |> Enum.map(fn stop_sequence ->
-          stop_group
+          stop_sequence
           |> Enum.map(fn stop ->
             case get_parent_station_id_fn.(stop) do
               {:ok, parent_stop} -> parent_stop
