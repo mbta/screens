@@ -1,3 +1,4 @@
+import useTextResizer from "Hooks/v2/use_text_resizer";
 import moment from "moment";
 import React, { ComponentType } from "react";
 import { classWithModifier, imagePath } from "Util/util";
@@ -192,6 +193,13 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
     ],
   },
 }) => {
+  const DESCRIPTION_SIZES = ["extra-small", "small", "large", "extra-large"];
+  const { ref: descriptionRef, size: descriptionSize } = useTextResizer({
+    sizes: DESCRIPTION_SIZES,
+    maxHeight: 450,
+    resetDependencies: [description],
+  });
+
   return (
     <div className="detail-page">
       <div
@@ -223,7 +231,15 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
             {getTimeframeEndText(happeningNow, activePeriod)}
           </div>
         </div>
-        <div className="detail-page__description">{description}</div>
+        <div
+          className={classWithModifier(
+            "detail-page__description",
+            descriptionSize
+          )}
+          ref={descriptionRef}
+        >
+          {description}
+        </div>
       </div>
     </div>
   );

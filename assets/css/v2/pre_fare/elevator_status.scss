@@ -238,9 +238,29 @@
 
     .detail-page__description {
       font-family: Inter, sans-serif;
-      font-size: 24px;
-      line-height: 32px;
       padding-right: 32px;
+
+      &--extra-large {
+        font-size: 36px;
+        line-height: 48px;
+      }
+
+      &--large {
+        font-size: 36px;
+        line-height: 44px;
+      }
+
+      &--small {
+        font-size: 28px;
+        line-height: 40px;
+        letter-spacing: -0.4px;
+      }
+
+      &--extra-small {
+        font-size: 24px;
+        line-height: 32px;
+        letter-spacing: -0.4px;
+      }
     }
   }
 }
