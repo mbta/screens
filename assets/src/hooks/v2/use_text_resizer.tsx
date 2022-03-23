@@ -24,9 +24,11 @@ const useTextResizer = ({
   }, resetDependencies);
 
   useLayoutEffect(() => {
-    const height = ref.current.clientHeight;
-    if (height > maxHeight && sizeIndex > 0) {
-      setSizeIndex(sizeIndex - 1);
+    if (ref.current !== null) {
+      const height = ref.current.clientHeight;
+      if (height > maxHeight && sizeIndex > 0) {
+        setSizeIndex(sizeIndex - 1);
+      }
     }
   });
 
