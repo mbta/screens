@@ -22,13 +22,13 @@ defmodule Screens.Routes.RouteTest do
       all_routes = [route_json("22"), route_json("29"), route_json("44")]
 
       stop_id = "1265"
-      today = ~D[2021-01-01]
+      now = ~U[2021-01-01T00:00:00Z]
 
-      today_iso8601 = Date.to_iso8601(today)
+      today_iso8601 = Date.to_iso8601(now)
 
       %{
         stop_id: stop_id,
-        today: today,
+        now: now,
         get_json_fn: fn
           _, %{"filter[stop]" => ^stop_id, "filter[date]" => ^today_iso8601} ->
             {:ok, %{"data" => active_routes}}
@@ -53,7 +53,7 @@ defmodule Screens.Routes.RouteTest do
     test "returns {:ok, routes} when requests succeed", context do
       %{
         stop_id: stop_id,
-        today: today,
+        now: now,
         get_json_fn: get_json_fn
       } = context
 
@@ -64,20 +64,20 @@ defmodule Screens.Routes.RouteTest do
       ]
 
       assert {:ok, expected_routes} ==
-               fetch_simplified_routes_at_stop(stop_id, today, get_json_fn)
+               fetch_simplified_routes_at_stop(stop_id, now, get_json_fn)
     end
 
     test "returns :error if either fetch function returns :error", context do
       %{
         stop_id: stop_id,
-        today: today,
+        now: now,
         x_get_json_fn1: x_get_json_fn1,
         x_get_json_fn2: x_get_json_fn2
       } = context
 
-      assert :error == fetch_simplified_routes_at_stop(stop_id, today, x_get_json_fn1)
+      assert :error == fetch_simplified_routes_at_stop(stop_id, now, x_get_json_fn1)
 
-      assert :error == fetch_simplified_routes_at_stop(stop_id, today, x_get_json_fn2)
+      assert :error == fetch_simplified_routes_at_stop(stop_id, now, x_get_json_fn2)
     end
   end
 
@@ -90,11 +90,11 @@ defmodule Screens.Routes.RouteTest do
       stop_id = "1265"
       now = ~U[2021-01-01T00:00:00Z]
 
-      today_iso8601 = Date.to_iso8601(today)
+      today_iso8601 = Date.to_iso8601(now)
 
       %{
         stop_id: stop_id,
-        today: today,
+        now: now,
         get_json_fn: fn
           _, %{"filter[stop]" => ^stop_id, "filter[date]" => ^today_iso8601} ->
             {:ok, %{"data" => active_routes}}
@@ -126,7 +126,7 @@ defmodule Screens.Routes.RouteTest do
     test "returns {:ok, routes} when requests succeed", context do
       %{
         stop_id: stop_id,
-        today: today,
+        now: now,
         get_json_fn: get_json_fn
       } = context
 
@@ -157,37 +157,37 @@ defmodule Screens.Routes.RouteTest do
         }
       ]
 
-      assert {:ok, expected_routes} == fetch_routes_by_stop(stop_id, today, [], get_json_fn)
+      assert {:ok, expected_routes} == fetch_routes_by_stop(stop_id, now, [], get_json_fn)
     end
 
     test "returns :error if either fetch function returns :error", context do
       %{
         stop_id: stop_id,
-        today: today,
+        now: now,
         get_json_fn: get_json_fn,
         x_get_json_fn1: x_get_json_fn1,
         x_get_json_fn2: x_get_json_fn2,
         x_fetch_routes_fn: x_fetch_routes_fn
       } = context
 
-      assert :error == fetch_routes_by_stop(stop_id, today, [], x_get_json_fn1)
+      assert :error == fetch_routes_by_stop(stop_id, now, [], x_get_json_fn1)
 
-      assert :error == fetch_routes_by_stop(stop_id, today, [], x_get_json_fn2)
+      assert :error == fetch_routes_by_stop(stop_id, now, [], x_get_json_fn2)
 
       assert :error ==
-               fetch_routes_by_stop(stop_id, today, [], get_json_fn, x_fetch_routes_fn)
+               fetch_routes_by_stop(stop_id, now, [], get_json_fn, x_fetch_routes_fn)
     end
 
     test "filters routes by type if provided", context do
       %{
         stop_id: stop_id,
-        today: today,
+        now: now,
         fetch_routes_fn: fetch_routes_fn,
         get_json_fn: get_json_fn
       } = context
 
       assert {:ok, []} ==
-               fetch_routes_by_stop(stop_id, today, :subway, get_json_fn, fetch_routes_fn)
+               fetch_routes_by_stop(stop_id, now, :subway, get_json_fn, fetch_routes_fn)
     end
   end
 end
