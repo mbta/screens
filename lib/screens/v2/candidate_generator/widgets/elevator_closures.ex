@@ -19,8 +19,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     with {:ok, stop_sequences} <-
            RoutePattern.fetch_stop_sequences_through_stop(parent_station_id),
          {:ok, parent_station_map} <- Stop.fetch_parent_station_name_map(),
-         {:ok, elevator_closures, facility_id_to_name} <- fetch_elevator_closures(),
-         icon_map <- get_icon_map(elevator_closures) do
+         {:ok, elevator_closures, facility_id_to_name} <- fetch_elevator_closures() do
+      icon_map = get_icon_map(elevator_closures, parent_station_id)
+
       [
         %ElevatorStatusWidget{
           alerts: elevator_closures,
@@ -32,6 +33,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
           station_id_to_icons: icon_map
         }
       ]
+    else
+      :error -> []
     end
   end
 
@@ -64,9 +67,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     end
   end
 
-  defp get_icon_map(elevator_closures) do
+  defp get_icon_map(elevator_closures, home_parent_station_id) do
     elevator_closures
     |> get_parent_station_ids_from_entities()
+    |> MapSet.new()
+    |> MapSet.put(home_parent_station_id)
     |> Enum.map(fn station_id ->
       {station_id, station_id |> Stop.create_station_with_routes_map() |> routes_to_icons()}
     end)

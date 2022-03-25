@@ -29,10 +29,30 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     defstruct stations: nil
   end
 
-  @subway_icons ~w[red blue orange green silver]a
+  defmodule AnnotatedStationRow do
+    @moduledoc false
 
-  # To be replaced by more detailed values for fitting rows in the list view
-  @max_rows_per_page 4
+    alias Screens.V2.WidgetInstance.ElevatorStatus
+
+    @type t :: %__MODULE__{
+            station: ElevatorStatus.station(),
+            height: non_neg_integer()
+          }
+
+    @enforce_keys ~w[station height]a
+    defstruct @enforce_keys
+
+    @station_row_base_height 100
+    @closure_height 48
+
+    def new(station), do: %__MODULE__{station: station, height: height(station)}
+
+    defp height({_station_id, alerts}) do
+      @station_row_base_height + @closure_height * length(alerts)
+    end
+  end
+
+  @subway_icons ~w[red blue orange green silver]a
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
@@ -189,23 +209,24 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
          %__MODULE__{now: now, stop_sequences: stop_sequences} = t
        ) do
+    # This assumes platform-level stop IDs are always numeric strings, e.g. "70045"
     informed_platforms =
       for %{stop: stop} when is_binary(stop) <- entities,
           match?({_n, ""}, Integer.parse(stop)),
           do: stop
 
-    parent_station_id = parent_station_id(t)
-    platform_stop_ids = platform_stop_ids(t)
-
-    flat_stop_sequences =
+    connecting_platform_ids =
       stop_sequences
       |> List.flatten()
+      |> MapSet.new()
+      |> MapSet.difference(
+        t
+        |> platform_stop_ids()
+        |> MapSet.new()
+      )
 
     Alert.happening_now?(alert, now) and
-      Enum.any?(informed_platforms, fn platform ->
-        platform != parent_station_id and platform not in platform_stop_ids and
-          platform in flat_stop_sequences
-      end)
+      Enum.any?(informed_platforms, &(&1 in connecting_platform_ids))
   end
 
   defp sort_elsewhere(e1, _e2, %__MODULE__{stop_sequences: stop_sequences}) do
@@ -215,6 +236,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       stop_sequences
       |> List.flatten()
 
+    # NOTE: fix this, stop sequences never contain parent station IDs
+    # https://app.asana.com/0/1185117109217422/1202001224916109/f
     Enum.any?(stations, fn station ->
       station in flat_stop_sequences
     end)
@@ -222,24 +245,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   defp get_stations_from_entities(entities) do
     for %{stop: "place-" <> _ = stop_id} <- entities, do: stop_id
-  end
-
-  defp trim_and_page_alerts(pages) do
-    pages
-    |> Enum.flat_map(fn
-      %ListPage{} = page ->
-        split_list_page(page)
-
-      %DetailPage{} = page ->
-        [page]
-    end)
-    |> Enum.take(4)
-  end
-
-  defp split_list_page(%ListPage{stations: stations}) do
-    stations
-    |> Enum.chunk_every(@max_rows_per_page)
-    |> Enum.map(&%ListPage{stations: &1})
   end
 
   defp get_informed_facility(entities, facilities) do
@@ -276,6 +281,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     closures =
       alerts
+      |> Enum.sort_by(&get_informed_facility(&1.informed_entities, facility_id_to_name))
       |> Enum.map(fn %Alert{
                        informed_entities: entities
                      } = alert ->
@@ -308,10 +314,26 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     }
   end
 
-  # produces %{parent_station_id => [%Alert{}, ...]}
-  defp alerts_by_station(alerts) do
+  # Groups alerts by their informed parent station ID, and then sorts the station groups
+  # by number of subway routes shared between that station and the home station, descending.
+  defp sorted_alerts_by_station(alerts, t) do
+    subway_routes_at_home_station =
+      t.station_id_to_icons[parent_station_id(t)]
+      |> Enum.filter(&(&1 in @subway_icons))
+      |> MapSet.new()
+
     alerts
     |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
+    |> Enum.sort_by(
+      fn {station_id, _} ->
+        routes_at_alerted_station = MapSet.new(t.station_id_to_icons[station_id])
+
+        routes_at_alerted_station
+        |> MapSet.intersection(subway_routes_at_home_station)
+        |> MapSet.size()
+      end,
+      :desc
+    )
   end
 
   defp get_parent_station_id_from_informed_entities(entities) do
@@ -328,7 +350,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
        ) do
     station =
       [alert]
-      |> alerts_by_station()
+      |> sorted_alerts_by_station(t)
       |> Enum.map(&serialize_station(&1, t))
       |> hd()
 
@@ -337,75 +359,126 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     }
   end
 
-  defp serialize_list_page(
-         alerts,
-         %__MODULE__{} = t
-       ) do
-    stations =
-      alerts
-      |> alerts_by_station()
-      |> Enum.map(&serialize_station(&1, t))
-      # This sort_by does a last minute sort to put home station alerts at the top.
-      # Eventually, this will need to be more complex to properly sort elsewhere.
-      |> Enum.sort_by(
-        fn %{
-             is_at_home_stop: is_at_home_stop
-           } ->
-          is_at_home_stop
-        end,
-        fn s1, _s2 ->
-          s1
-        end
-      )
+  defp serialize_list_pages(alerts, pinned_alerts \\ [], t) do
+    pinned_stations = sorted_alerts_by_station(pinned_alerts, t)
 
-    %ListPage{
-      stations: stations
-    }
+    stations = sorted_alerts_by_station(alerts, t)
+
+    pages = split_station_pages(stations, pinned_stations)
+
+    Enum.map(pages, fn stations ->
+      %ListPage{stations: Enum.map(stations, &serialize_station(&1, t))}
+    end)
   end
 
-  def priority(_instance), do: [2]
+  @max_page_height 760
 
-  @spec serialize(t()) :: %{pages: list(DetailPage.t() | ListPage.t())}
-  def serialize(%__MODULE__{} = t) do
-    active_at_home =
+  # Splits a list of station rows into several lists, each small enough to fit on a page.
+  # list(station_row) -> list(list(station_row))
+  defp split_station_pages(stations, pinned_stations) do
+    annotated_stations = Enum.map(stations, &AnnotatedStationRow.new/1)
+
+    annotated_pinned_stations = Enum.map(pinned_stations, &AnnotatedStationRow.new/1)
+
+    pages =
+      split_station_pages(
+        annotated_stations,
+        annotated_pinned_stations,
+        [annotated_pinned_stations]
+      )
+
+    # Get the station rows back from the AnnotatedStationRow structs
+    Enum.map(pages, fn annotated_stations ->
+      Enum.map(annotated_stations, & &1.station)
+    end)
+  end
+
+  defp split_station_pages([], _pinned_stations, acc), do: Enum.reverse(acc)
+
+  defp split_station_pages(
+         [station | rest_stations] = stations,
+         pinned_stations,
+         [acc_page | rest_acc_pages] = acc_pages
+       ) do
+    # If the station row fits on the page we're populating,
+    if page_height(acc_page) + station.height <= @max_page_height do
+      # Append it on the page and continue fitting the rest of the station rows
+      split_station_pages(rest_stations, pinned_stations, [acc_page ++ [station] | rest_acc_pages])
+    else
+      # Create a new page populated with the pinned station rows, and try again
+      split_station_pages(stations, pinned_stations, [pinned_stations | acc_pages])
+    end
+  end
+
+  defp page_height(annotated_station_rows) do
+    annotated_station_rows
+    |> Enum.map(& &1.height)
+    |> Enum.sum()
+  end
+
+  @max_page_count 3
+
+  defp scenario_b_pages(t) do
+    active_at_home = get_active_at_home_station(t)
+
+    active_at_home_detail_pages = Enum.map(active_at_home, &serialize_detail_page(&1, t))
+
+    pages =
+      if length(active_at_home_detail_pages) >= @max_page_count do
+        # Skip the extra work to populate list view pages if they're completely displaced by detail pages
+        active_at_home_detail_pages
+      else
+        active_elsewhere = get_active_elsewhere(t)
+
+        list_pages = serialize_list_pages(active_elsewhere, active_at_home, t)
+
+        active_at_home_detail_pages ++ list_pages
+      end
+
+    Enum.take(pages, @max_page_count)
+  end
+
+  defp scenario_c_pages(t) do
+    list_pages =
       t
-      |> get_active_at_home_station()
-      |> Enum.map(&serialize_detail_page(&1, t))
+      |> get_active_elsewhere()
+      |> serialize_list_pages(t)
 
-    active_elsewhere =
-      t
-      |> get_active_at_home_station()
-      |> Enum.concat(get_active_elsewhere(t))
-      |> serialize_list_page(t)
-
-    upcoming_at_home =
+    upcoming_at_home_detail_pages =
       t
       |> get_upcoming_at_home_station()
       |> Enum.map(&serialize_detail_page(&1, t))
 
-    active_on_connecting_lines =
+    active_on_connecting_lines_detail_pages =
       t
       |> get_active_on_connecting_lines()
       |> Enum.map(&serialize_detail_page(&1, t))
 
-    # first show detail pages for each closure at this station
-    # then if there is still space, show list pages for _all_ active closures across the system
-    # then if there is still space, show detail pages for upcoming closures at this station
-    # then if there is still space, show detail pages for active closures along lines serving this station
+    (list_pages ++ upcoming_at_home_detail_pages ++ active_on_connecting_lines_detail_pages)
+    |> Enum.take(@max_page_count)
+  end
 
+  # Determines the scenario we're currently in, as defined at
+  # https://app.abstract.com/projects/c04b5940-4805-11e8-8262-510af7fd49fe/branches/f6705d99-fa8b-4115-a97f-188ea9e01a11/collections/91521734-0e0f-434b-bf25-13516d47b1f3
+  #
+  # To summarize:
+  # Scenario A: This screen's "home elevator" is closed. (Only possible on elevator screens)
+  # Scenario B: One or more elevators at this screen's home station are closed.
+  # Scenario C: All elevators at this screen's home station are operational.
+  defp scenario(%__MODULE__{alerts: alerts} = t) do
+    if Enum.any?(alerts, &active_at_home_station?(&1, t)), do: :b, else: :c
+  end
+
+  def priority(_instance), do: [2]
+
+  def serialize(%__MODULE__{} = t) do
     pages =
-      [
-        active_at_home,
-        [active_elsewhere],
-        upcoming_at_home,
-        active_on_connecting_lines
-      ]
-      |> Enum.concat()
-      |> trim_and_page_alerts()
+      case scenario(t) do
+        :b -> scenario_b_pages(t)
+        :c -> scenario_c_pages(t)
+      end
 
-    %{
-      pages: pages
-    }
+    %{pages: pages}
   end
 
   def slot_names(_instance), do: [:lower_right]
