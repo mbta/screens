@@ -6,8 +6,8 @@ defmodule Screens.Departures.Departure do
   alias Screens.Predictions.Prediction
   alias Screens.Schedules.Schedule
   alias Screens.Trips.Trip
-  alias Screens.Vehicles.Vehicle
   alias Screens.Util
+  alias Screens.Vehicles.Vehicle
 
   defstruct id: nil,
             stop_name: nil,
