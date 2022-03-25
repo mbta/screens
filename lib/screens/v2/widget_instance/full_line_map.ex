@@ -10,7 +10,9 @@ defmodule Screens.V2.WidgetInstance.FullLineMap do
           screen: Screen.t(),
           asset_urls: list(String.t())
         }
-  def serialize(%__MODULE__{asset_urls: asset_urls}), do: %{asset_urls: asset_urls}
+  def serialize(%__MODULE__{asset_urls: asset_urls}) do
+    %{pages: Enum.map(asset_urls, &%{asset_url: &1})}
+  end
 
   def slot_names(_instance), do: [:main_content_left]
 
