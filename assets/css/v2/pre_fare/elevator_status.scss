@@ -1,3 +1,15 @@
+// *** HEADS UP ***
+// The backend logic that fits list view rows onto pages
+// makes assumptions based on styles defined here.
+//
+// Currently, each row for a station in the list view has its height
+// calculated as:
+//     100px + (48px * length(station.closures))
+//
+// If any changes to this stylesheet affect that, be sure to update
+// the backend page-fitting logic as well.
+// *** HEADS UP ***
+
 .elevator-status {
   width: 1024px;
   height: 1000px;
