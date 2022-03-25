@@ -30,6 +30,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   end
 
   defmodule AnnotatedStationRow do
+    @moduledoc false
+
     alias Screens.V2.WidgetInstance.ElevatorStatus
 
     @type t :: %__MODULE__{
@@ -234,7 +236,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       stop_sequences
       |> List.flatten()
 
-    # TODO: fix this, stop sequences never contain parent station IDs
+    # NOTE: fix this, stop sequences never contain parent station IDs
     # https://app.asana.com/0/1185117109217422/1202001224916109/f
     Enum.any?(stations, fn station ->
       station in flat_stop_sequences
@@ -326,7 +328,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       fn {station_id, _} ->
         routes_at_alerted_station = MapSet.new(t.station_id_to_icons[station_id])
 
-        MapSet.intersection(routes_at_alerted_station, subway_routes_at_home_station)
+        routes_at_alerted_station
+        |> MapSet.intersection(subway_routes_at_home_station)
         |> MapSet.size()
       end,
       :desc
@@ -377,12 +380,15 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     annotated_pinned_stations = Enum.map(pinned_stations, &AnnotatedStationRow.new/1)
 
-    split_station_pages(
-      annotated_stations,
-      annotated_pinned_stations,
-      [annotated_pinned_stations]
-    )
-    |> Enum.map(fn annotated_stations ->
+    pages =
+      split_station_pages(
+        annotated_stations,
+        annotated_pinned_stations,
+        [annotated_pinned_stations]
+      )
+
+    # Get the station rows back from the AnnotatedStationRow structs
+    Enum.map(pages, fn annotated_stations ->
       Enum.map(annotated_stations, & &1.station)
     end)
   end
@@ -411,9 +417,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   end
 
   @max_page_count 3
-
-  # To be un-stubbed when this widget is updated to support appearing on elevator screens
-  defp scenario_a_pages(_t), do: []
 
   defp scenario_b_pages(t) do
     active_at_home = get_active_at_home_station(t)
@@ -463,22 +466,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   # Scenario B: One or more elevators at this screen's home station are closed.
   # Scenario C: All elevators at this screen's home station are operational.
   defp scenario(%__MODULE__{alerts: alerts} = t) do
-    cond do
-      has_closure_at_home_elevator?(t) -> :a
-      Enum.any?(alerts, &active_at_home_station?(&1, t)) -> :b
-      true -> :c
-    end
+    if Enum.any?(alerts, &active_at_home_station?(&1, t)), do: :b, else: :c
   end
-
-  # To be un-stubbed when this widget is updated to support appearing on elevator screens
-  defp has_closure_at_home_elevator?(_t), do: false
 
   def priority(_instance), do: [2]
 
   def serialize(%__MODULE__{} = t) do
     pages =
       case scenario(t) do
-        :a -> scenario_a_pages(t)
         :b -> scenario_b_pages(t)
         :c -> scenario_c_pages(t)
       end
