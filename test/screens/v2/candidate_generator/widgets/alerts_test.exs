@@ -45,10 +45,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         routes_at_stop: routes_at_stop,
         stop_sequences: stop_sequences,
         now: ~U[2021-01-01T00:00:00Z],
-        fetch_routes_at_stop_fn: fn _, _ -> {:ok, routes_at_stop} end,
+        fetch_simplified_routes_at_stop_fn: fn _, _ -> {:ok, routes_at_stop} end,
         fetch_stop_sequences_fn: fn _ -> {:ok, stop_sequences} end,
         fetch_alerts_fn: fn _, _ -> {:ok, alerts} end,
-        x_fetch_routes_at_stop_fn: fn _, _ -> :error end,
+        x_fetch_simplified_routes_at_stop_fn: fn _, _ -> :error end,
         x_fetch_stop_sequences_fn: fn _ -> :error end,
         x_fetch_alerts_fn: fn _, _ -> :error end
       }
@@ -60,7 +60,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         routes_at_stop: routes_at_stop,
         stop_sequences: stop_sequences,
         now: now,
-        fetch_routes_at_stop_fn: fetch_routes_at_stop_fn,
+        fetch_simplified_routes_at_stop_fn: fetch_simplified_routes_at_stop_fn,
         fetch_stop_sequences_fn: fetch_stop_sequences_fn,
         fetch_alerts_fn: fetch_alerts_fn
       } = context
@@ -91,7 +91,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
                alert_instances(
                  config,
                  now,
-                 fetch_routes_at_stop_fn,
+                 fetch_simplified_routes_at_stop_fn,
                  fetch_stop_sequences_fn,
                  fetch_alerts_fn
                )
@@ -101,7 +101,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       %{
         bad_config: bad_config,
         now: now,
-        fetch_routes_at_stop_fn: fetch_routes_at_stop_fn,
+        fetch_simplified_routes_at_stop_fn: fetch_simplified_routes_at_stop_fn,
         fetch_stop_sequences_fn: fetch_stop_sequences_fn,
         fetch_alerts_fn: fetch_alerts_fn
       } = context
@@ -110,7 +110,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         alert_instances(
           bad_config,
           now,
-          fetch_routes_at_stop_fn,
+          fetch_simplified_routes_at_stop_fn,
           fetch_stop_sequences_fn,
           fetch_alerts_fn
         )
@@ -121,10 +121,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       %{
         config: config,
         now: now,
-        fetch_routes_at_stop_fn: fetch_routes_at_stop_fn,
+        fetch_simplified_routes_at_stop_fn: fetch_simplified_routes_at_stop_fn,
         fetch_stop_sequences_fn: fetch_stop_sequences_fn,
         fetch_alerts_fn: fetch_alerts_fn,
-        x_fetch_routes_at_stop_fn: x_fetch_routes_at_stop_fn,
+        x_fetch_simplified_routes_at_stop_fn: x_fetch_simplified_routes_at_stop_fn,
         x_fetch_stop_sequences_fn: x_fetch_stop_sequences_fn,
         x_fetch_alerts_fn: x_fetch_alerts_fn
       } = context
@@ -133,7 +133,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
                alert_instances(
                  config,
                  now,
-                 x_fetch_routes_at_stop_fn,
+                 x_fetch_simplified_routes_at_stop_fn,
                  fetch_stop_sequences_fn,
                  fetch_alerts_fn
                )
@@ -142,7 +142,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
                alert_instances(
                  config,
                  now,
-                 fetch_routes_at_stop_fn,
+                 fetch_simplified_routes_at_stop_fn,
                  x_fetch_stop_sequences_fn,
                  fetch_alerts_fn
                )
@@ -151,7 +151,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
                alert_instances(
                  config,
                  now,
-                 fetch_routes_at_stop_fn,
+                 fetch_simplified_routes_at_stop_fn,
                  fetch_stop_sequences_fn,
                  x_fetch_alerts_fn
                )

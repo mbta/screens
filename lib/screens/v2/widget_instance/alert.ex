@@ -3,7 +3,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{Alerts, BusEink, BusShelter, GlEink}
+  alias Screens.Config.V2.{Alerts, BusEink, BusShelter, GlEink, PreFare}
+  alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.RouteType
   alias Screens.Util
   alias Screens.V2.WidgetInstance
@@ -142,15 +143,20 @@ defmodule Screens.V2.WidgetInstance.Alert do
     if takeover_alert?(t), do: takeover_slot_names(t), else: normal_slot_names(t)
   end
 
-  defp takeover_alert?(%__MODULE__{screen: %Screen{app_id: bus_app_id}} = t)
-       when bus_app_id in [:bus_shelter_v2, :bus_eink_v2] do
+  def takeover_alert?(%__MODULE__{screen: %Screen{app_id: bus_app_id}} = t)
+      when bus_app_id in [:bus_shelter_v2, :bus_eink_v2] do
     active?(t) and effect(t) in [:stop_closure, :stop_move, :stop_moved, :suspension, :detour] and
       informs_all_active_routes_at_home_stop?(t)
   end
 
-  defp takeover_alert?(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
+  def takeover_alert?(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
     active?(t) and effect(t) in [:station_closure, :suspension, :shuttle] and
       location(t) == :inside
+  end
+
+  def takeover_alert?(%{screen: %Screen{app_id: :pre_fare_v2}} = t) do
+    active?(t) and effect(t) in [:station_closure, :suspension, :shuttle] and
+      location(t) == :inside and informs_all_active_routes_at_home_stop?(t)
   end
 
   defp takeover_slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}) do
@@ -186,7 +192,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     priority(t) != :no_render
   end
 
-  def active?(%__MODULE__{alert: alert, now: now}, happening_now? \\ &Alert.happening_now?/2) do
+  def active?(%{alert: alert, now: now}, happening_now? \\ &Alert.happening_now?/2) do
     happening_now?.(alert, now)
   end
 
@@ -216,20 +222,27 @@ defmodule Screens.V2.WidgetInstance.Alert do
   def seconds_to_next_active_period(_t), do: :infinity
 
   @spec home_stop_id(t()) :: String.t()
-  def home_stop_id(%__MODULE__{
+  def home_stop_id(%{
         screen: %Screen{app_params: %app{alerts: %Alerts{stop_id: stop_id}}}
       })
       when app in [BusShelter, GlEink, BusEink] do
     stop_id
   end
 
+  def home_stop_id(%{
+        screen: %Screen{app_params: %app{header: %CurrentStopId{stop_id: stop_id}}}
+      })
+      when app in [PreFare] do
+    stop_id
+  end
+
   @spec informed_entities(t()) :: list(Alert.informed_entity())
-  def informed_entities(%__MODULE__{alert: %Alert{informed_entities: informed_entities}}) do
+  def informed_entities(%{alert: %Alert{informed_entities: informed_entities}}) do
     informed_entities
   end
 
   @spec upstream_stop_id_set(t()) :: MapSet.t(stop_id())
-  def upstream_stop_id_set(%__MODULE__{} = t) do
+  def upstream_stop_id_set(%{} = t) do
     home_stop_id = home_stop_id(t)
 
     t.stop_sequences
@@ -238,7 +251,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   @spec downstream_stop_id_set(t()) :: MapSet.t(stop_id())
-  def downstream_stop_id_set(%__MODULE__{} = t) do
+  def downstream_stop_id_set(%{} = t) do
     home_stop_id = home_stop_id(t)
 
     t.stop_sequences
@@ -253,7 +266,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
           | :inside
           | :downstream
           | :elsewhere
-  def location(%__MODULE__{} = t) do
+  def location(%{} = t) do
     location_context = %{
       home_stop: home_stop_id(t),
       upstream_stops: upstream_stop_id_set(t),
@@ -285,13 +298,13 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   @spec effect(t()) :: Alert.effect()
-  def effect(%__MODULE__{alert: %Alert{effect: effect}}), do: effect
+  def effect(%{alert: %Alert{effect: effect}}), do: effect
 
-  def all_routes_at_stop(%__MODULE__{routes_at_stop: routes}) do
+  def all_routes_at_stop(%{routes_at_stop: routes}) do
     MapSet.new(routes, & &1.route_id)
   end
 
-  def active_routes_at_stop(%__MODULE__{routes_at_stop: routes}) do
+  def active_routes_at_stop(%{routes_at_stop: routes}) do
     routes
     |> Enum.filter(& &1.active?)
     |> MapSet.new(& &1.route_id)
@@ -300,6 +313,15 @@ defmodule Screens.V2.WidgetInstance.Alert do
   def route_type(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}), do: :bus
   def route_type(%__MODULE__{screen: %Screen{app_id: :bus_eink_v2}}), do: :bus
   def route_type(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}}), do: :light_rail
+
+  def route_type(%{
+        screen: %Screen{app_id: :pre_fare_v2},
+        routes_at_stop: routes_at_stop
+      }) do
+    routes_at_stop
+    |> Enum.map(& &1.type)
+    |> Enum.dedup()
+  end
 
   # Time units in seconds
   @hour 60 * 60
@@ -381,10 +403,16 @@ defmodule Screens.V2.WidgetInstance.Alert do
           {:cont, uninformed}
 
         %{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
-          if RouteType.from_id(route_type_id) == rt do
-            {:halt, empty_set}
-          else
-            {:cont, uninformed}
+          # Route type might be a single atom or list of atoms
+          cond do
+            is_list(rt) and RouteType.from_id(route_type_id) in rt ->
+              {:halt, empty_set}
+
+            RouteType.from_id(route_type_id) == rt ->
+              {:halt, empty_set}
+
+            true ->
+              {:cont, uninformed}
           end
 
         %{stop: ^home_stop, route: nil}, _uninformed ->
@@ -421,10 +449,16 @@ defmodule Screens.V2.WidgetInstance.Alert do
           {:cont, uninformed}
 
         %{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
-          if RouteType.from_id(route_type_id) == rt do
-            {:halt, empty_set}
-          else
-            {:cont, uninformed}
+          # Route type might be a single atom or list of atoms
+          cond do
+            is_list(rt) and RouteType.from_id(route_type_id) in rt ->
+              {:halt, empty_set}
+
+            RouteType.from_id(route_type_id) == rt ->
+              {:halt, empty_set}
+
+            true ->
+              {:cont, uninformed}
           end
 
         %{stop: ^home_stop, route: nil}, _uninformed ->
@@ -465,6 +499,17 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   # Only route type is not nil--this is the only time we consider route type,
   # since it's implied by other values when they are not nil
+  defp informed_entity_to_zone(%{stop: nil, route: nil, route_type: route_type_id}, %{
+         route_type: route_type
+       })
+       when is_list(route_type) do
+    if RouteType.from_id(route_type_id) in route_type do
+      [:upstream, :home_stop, :downstream]
+    else
+      []
+    end
+  end
+
   defp informed_entity_to_zone(%{stop: nil, route: nil, route_type: route_type_id}, context) do
     if RouteType.from_id(route_type_id) == context.route_type do
       [:upstream, :home_stop, :downstream]
