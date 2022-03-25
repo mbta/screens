@@ -71,7 +71,7 @@ defmodule Screens.Audio do
   defp merge_section_departures(sections) do
     sections
     |> Enum.flat_map(& &1.departures)
-    |> Enum.sort_by(& &1.time)
+    |> Enum.sort_by(& &1.time, DateTime)
     |> Util.group_by_with_order(&{&1.route, &1.route_id, &1.destination})
     |> Enum.map(fn {key, departures} ->
       {key,

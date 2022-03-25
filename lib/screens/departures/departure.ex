@@ -7,6 +7,7 @@ defmodule Screens.Departures.Departure do
   alias Screens.Schedules.Schedule
   alias Screens.Trips.Trip
   alias Screens.Vehicles.Vehicle
+  alias Screens.Util
 
   defstruct id: nil,
             stop_name: nil,
@@ -190,7 +191,7 @@ defmodule Screens.Departures.Departure do
 
     merged =
       (predicted_departures ++ scheduled_departures)
-      |> Enum.sort_by(& &1.time)
+      |> Enum.sort_by(&Util.parse_time_string(&1.time), DateTime)
 
     {:ok, merged}
   end
@@ -429,11 +430,13 @@ defmodule Screens.Departures.Departure do
       predictions_with_trip
       |> Enum.group_by(fn %{trip: %Trip{id: trip_id}} -> trip_id end)
       |> log_unexpected_groups()
-      |> Enum.map(fn {_trip_id, predictions} -> Enum.min_by(predictions, & &1.departure_time) end)
+      |> Enum.map(fn {_trip_id, predictions} ->
+        Enum.min_by(predictions, & &1.departure_time, DateTime)
+      end)
 
     deduplicated_predictions =
       (predictions_without_trip ++ deduplicated_predictions_with_trip)
-      |> Enum.sort_by(& &1.departure_time)
+      |> Enum.sort_by(& &1.departure_time, DateTime)
 
     {:ok, deduplicated_predictions}
   end
