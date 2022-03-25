@@ -83,6 +83,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         ["place-hsmnl", "place-bckhl", "place-rvrwy", "place-mispk"]
       ]
 
+      stop_sequences = [
+        ["70260", "70258", "70256", "70254"],
+        ["70253", "70255", "70257", "70260"]
+      ]
+
+      station_sequences = [
+        ["place-hsmnl", "place-bckhl", "place-rvrwy", "place-mispk"]
+      ]
+
       %{
         config: config,
         bad_config: bad_config,

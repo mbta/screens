@@ -83,6 +83,7 @@ defmodule Screens.Routes.Route do
         Enum.map(
           routes,
           &(&1
+            |> Map.from_struct()
             |> Map.put(:active?, MapSet.member?(active_set, &1.id))
             |> Map.put(:route_id, &1.id)
             |> Map.delete(:id))
@@ -110,6 +111,10 @@ defmodule Screens.Routes.Route do
     format_query_param({:date, DateTime.to_date(dt)})
   end
 
+  defp format_query_param({:route_types, route_types}) when is_list(route_types) do
+    [{"filter[type]", Enum.join(route_types, ",")}]
+  end
+
   defp format_query_param(_), do: []
 
   defp fetch_all_route_ids(stop_id, get_json_fn) do
@@ -120,19 +125,9 @@ defmodule Screens.Routes.Route do
   end
 
   defp fetch_routes(stop_id, get_json_fn, type_filters) do
-    case fetch([stop_id: stop_id], get_json_fn) do
-      {:ok, routes} ->
-        filtered_routes =
-          if length(type_filters) > 0 do
-            Enum.filter(routes, fn route -> Map.get(route, :type) in type_filters end)
-          else
-            routes
-          end
-
-        {:ok, Enum.map(filtered_routes, &Map.from_struct(&1))}
-
-      :error ->
-        :error
+    case fetch([stop_id: stop_id, route_types: type_filters], get_json_fn) do
+      {:ok, routes} -> {:ok, routes}
+      :error -> :error
     end
   end
 
