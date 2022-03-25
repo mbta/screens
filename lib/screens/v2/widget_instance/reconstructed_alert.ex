@@ -24,9 +24,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           routes_at_stop: list(%{route_id: route_id(), active?: boolean()})
         }
 
-  def serialize(%__MODULE__{alert: %Alert{header: header}}) do
+  def serialize(%__MODULE__{alert: %Alert{header: header} = alert}) do
     %{
-      alert_header: header
+      # issue: FreeTextLine | String,
+      issue: "No trains",
+      # location: String,
+      location: "Between Hynes Convention Center and Park St",
+      # cause: String,
+      cause: "Due to a medical emergency",
+      # remedy: built frontend
+      # routes: list(String),
+      routes: ["Orange"],
+      # urgent: boolean,
+      urgent: false,
+      # effect: atom
+      effect: :shuttle
+      
       # issue (no <TYPE> trains or station closed for takeover; reconstructed or full PIO alert for regular)
       # location range (optional)
       # cause
@@ -45,11 +58,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if AlertWidget.takeover_alert?(t), do: [:full_body], else: [:large]
   end
 
+  def widget_type(%__MODULE__{} = t) do
+    if AlertWidget.takeover_alert?(t), do: :reconstructed_takeover, else: :reconstructed_large_alert
+  end
+
   defimpl Screens.V2.WidgetInstance do
     def priority(t), do: ReconstructedAlert.priority(t)
     def serialize(t), do: ReconstructedAlert.serialize(t)
     def slot_names(t), do: ReconstructedAlert.slot_names(t)
-    def widget_type(_instance), do: :reconstructed_alert
+    def widget_type(t), do: ReconstructedAlert.widget_type(t)
     def valid_candidate?(_instance), do: true
     def audio_serialize(_instance), do: %{}
     def audio_sort_key(_instance), do: 0

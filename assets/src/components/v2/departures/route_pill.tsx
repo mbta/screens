@@ -70,6 +70,7 @@ const SlashedRoutePill: ComponentType<SlashedPill> = ({ part1, part2 }) => {
 
 const RoutePill: ComponentType<Pill> = (pill) => {
   const modifiers: string[] = [pill.color];
+  // I don't think outline is actually used...?
   if (pill.outline) {
     modifiers.push("outline");
   }
@@ -86,10 +87,28 @@ const RoutePill: ComponentType<Pill> = (pill) => {
       innerContent = <SlashedRoutePill {...pill} />;
   }
 
+  let branches = null;
+  if (pill.branches) {
+    branches = pill.branches.map((branch: string) => (
+      <div key={branch} className={classWithModifiers("route-pill", modifiers.concat(["branch"]))}>
+        <TextRoutePill {...pill} text={branch} />
+      </div>
+    ))
+  }
+
   return (
-    <div className={classWithModifiers("route-pill", modifiers)}>
-      {innerContent}
-    </div>
+    <>
+      <div className={classWithModifiers("route-pill", modifiers)}>
+        {innerContent}
+        
+      </div>
+      {branches && 
+        <div className="route-pills__branches">
+          <span className="route-pills__branches__dot"></span>
+          {branches}
+        </div>
+      }
+    </>
   );
 };
 

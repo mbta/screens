@@ -1,0 +1,269 @@
+// Is this the good kind of organized, or bad?
+// Is it useful to set screen height as a variable?
+$takeover-card-height: 1600px;
+$takeover-card-footer-height: 176px;
+
+$alert-card-height: 576px;
+$alert-card-footer-height: 80px;
+
+.alert-container {
+  /* Background colors */
+  &--blue {
+    background-color: $line-color-blue;
+  }
+
+  &--red {
+    background-color: $line-color-red;
+  }
+
+  &--orange {
+    background-color: $line-color-orange;
+  }
+
+  &--yellow {
+    background-color: $alert-yellow;
+  }
+
+  &--green {
+    background-color: $line-color-green;
+  }
+
+  // Base fonts
+  color: #171f26;
+  font-family: Inter;
+
+  .x-large-text {
+    font-size: 200px;
+    font-weight: 800;
+    line-height: 220px;
+  }
+  .large-text {
+    font-size: 120px;
+    line-height: 144px;
+  }
+  .medium-text {
+    font-size: 72px;
+    line-height: 86px;
+  }
+  .small-text {
+    font-size: 56px;
+    line-height: 68px;
+  }
+}
+
+.alert-container--large-flex {
+  padding: 26px 28px;
+  height: 522px;
+  box-sizing: border-box;
+
+  /* Alert contents */
+  .alert-card {
+    // Move the card so that it fits in the medium flex zone slot and only its drop-shadow extends outside.
+    transform: translateX(-20px) translateY(-10px);
+  }
+
+  .alert-card__body {
+    height: $alert-card-height - $alert-card-footer-height;
+    padding: 40px 120px 20px 44px;
+    box-sizing: border-box;
+
+    .bold { font-weight: 800; }
+  }
+  .alert-card__body__content {
+    padding: 56px 0 0 8px;
+    &--small {
+      font-size: 56px;
+      line-height: 68px;
+      .alert-card__body__isa-icon {
+        height: 51px;
+        padding-left: 16px;
+      }
+    }
+    &--regular {
+      font-size: 72px;
+      line-height: 86px;
+      .alert-card__body__isa-icon {
+        height: 65px;
+        padding-left: 16px;
+      }
+    }
+  }
+  .alert-card__body__route-pills {
+    .route-pill {
+      display: inline-block;
+    }
+    &--regular .route-pill {
+      &:not(:first-child) {
+        margin-left: 16px;
+      }
+    }
+    &--small {
+      box-sizing: border-box;
+      padding-top: 20px;
+
+      .route-pill {
+        &:not(:first-child) {
+          margin-left: 16px;
+        }
+      }
+    }
+    &--large {
+      .route-pill {
+        width: fit-content;
+        height: 80px;
+      }
+    
+      .route-pill__text {
+        position: relative;
+        width: fit-content;
+        padding: 0 40px;
+        font-size: 60px;
+        line-height: 80px;
+        text-transform: uppercase;
+        font-family: HelveticaNeue-Bold;
+      }
+    }
+
+    .route-pills__branches {
+      display: inline-flex;
+      margin-left: -16px;
+
+      .route-pills__branches__dot {
+        height: 92px;
+        width: 92px;
+        border-radius: 50%;
+        position: absolute;
+        margin: -6px;
+        background-color: #e6e4e1;
+      }
+
+      .route-pill--branch {
+        width: 80px;
+        display: inline-flex;
+        justify-content: center;
+        margin-right: 6px;
+
+        .route-pill__text {
+          padding: 0;
+        }
+      }
+    }
+  }
+  .alert-card__body__icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    &-image {
+      height: 176px;
+    }
+  }
+  .alert-card__body__remedy {
+    font-weight: 800;
+    padding-top: 32px;
+  }
+  .alert-card__footer {
+    background-color: #cccbc8;
+    border-radius: 0px 0px 32px 32px;
+    height: $alert-card-footer-height;
+  }
+  .alert-card__footer__alerts-url {
+    color: black;
+    font-size: 40px;
+    text-align: right;
+    padding: 16px 34px 24px 0;
+  }
+}
+
+.alert-container--takeover {
+  color: white;
+  height: 100%;
+  width: 1080px;
+  padding: 60px;
+  box-sizing: border-box;
+
+  /* Alert contents */
+  .alert-card {
+    width: 960px;
+    height: $takeover-card-height;
+    border-radius: 32px;
+    box-shadow: 0px 10px 20px 0px rgba(23, 31, 38, 0.25);
+    background-color: #171f26;
+  }
+
+  .alert-card__body {
+    height: $takeover-card-height - $takeover-card-footer-height;
+    padding: 72px;
+    box-sizing: border-box;
+  }
+
+  .alert-card__body__icon {
+    height: 280px;
+    padding-bottom: 80px;
+  }
+
+  .alert-card__body__location {
+    margin: 40px 0 24px 0;
+    font-weight: 800;
+  }
+
+  .alert-card__body__cause {
+    font-weight: 500;
+  }
+
+  .alert-card__body__remedy {
+    font-weight: 800;
+    padding-top: 352px;
+  }
+
+  .alert-card__body__accessibility-info {
+    margin-top: 90px;
+    display: flex;
+    &--text {
+      width: 524px;
+      color: #e6e4e1;
+    }
+  }
+
+  .alert-card__body__isa-icon {
+    height: 136px;
+    padding-right: 36px;
+  }
+    
+  .alert-card__footer {
+    background-color: #2e3e4d;
+    border-radius: 0px 0px 32px 32px;
+    height: $takeover-card-footer-height;
+  }
+  .alert-card__footer__t-icon {
+    height: 102px;
+    padding: 37px 47px;
+  }
+  .alert-card__footer__alerts-url {
+    font-size: 64px;
+    font-weight: 800;
+    text-align: right;
+    padding: 41px 52px 55px 0;
+  }
+}
+
+.alert-container--right {
+  position: absolute;
+  top: 0;
+  left: 1080px;
+}
+
+// Color overrides for urgent style
+.alert-container--large-flex.alert-container--urgent {
+  color: white;
+
+  .alert-card__footer {
+    background-color: black;
+  }
+  .alert-card__footer__alerts-url {
+    color: white;
+    font-weight: 500;
+  }
+  .route-pills__branches__dot {
+    background-color: #171f26;
+  }
+}
