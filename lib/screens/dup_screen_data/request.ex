@@ -9,6 +9,7 @@ defmodule Screens.DupScreenData.Request do
   alias Screens.Departures.Departure
   alias Screens.DupScreenData.Response
   alias Screens.SignsUiConfig
+  alias Screens.Util
 
   # Filters for the types of alerts we care about
   @alert_route_types ~w[light_rail subway]a
@@ -174,7 +175,7 @@ defmodule Screens.DupScreenData.Request do
         section_departures =
           departures
           |> Enum.map(&Map.from_struct/1)
-          |> Enum.sort_by(& &1.time)
+          |> Enum.sort_by(&Util.parse_time_string(&1.time), DateTime)
           |> Enum.take(num_rows)
           |> Enum.map(&replace_long_headsigns/1)
 
