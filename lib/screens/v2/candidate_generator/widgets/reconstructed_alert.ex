@@ -44,11 +44,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         |> Enum.uniq_by(&MapSet.new/1)
 
       alerts
-      |> filter_alerts(
-        config,
-        station_sequences,
-        routes_at_stop
-      )
+      |> Enum.filter(&relevant?(&1, config, station_sequences, routes_at_stop))
       |> Enum.map(fn alert ->
         %ReconstructedAlert{
           screen: config,
@@ -63,33 +59,32 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     end
   end
 
-  defp filter_alerts(alerts, config, stop_sequences, routes_at_stop) do
-    alerts
-    |> Enum.filter(fn %Alert{
-                        severity: severity,
-                        effect: effect
-                      } = alert ->
-      Enum.member?(@relevant_effects, Map.get(alert, :effect)) and
-        case BaseAlert.location(%ReconstructedAlert{
-               screen: config,
-               alert: alert,
-               stop_sequences: stop_sequences,
-               routes_at_stop: routes_at_stop,
-               now: DateTime.utc_now()
-             }) do
-          location when location in [:downstream, :upstream] ->
-            true
+  defp relevant?(
+         %Alert{severity: severity, effect: effect} = alert,
+         config,
+         stop_sequences,
+         routes_at_stop
+       ) do
+    Enum.member?(@relevant_effects, Map.get(alert, :effect)) and
+      case BaseAlert.location(%ReconstructedAlert{
+             screen: config,
+             alert: alert,
+             stop_sequences: stop_sequences,
+             routes_at_stop: routes_at_stop,
+             now: DateTime.utc_now()
+           }) do
+        location when location in [:downstream, :upstream] ->
+          true
 
-          :inside ->
-            effect != :delay or severity > 3
+        :inside ->
+          effect != :delay or severity > 3
 
-          location when location in [:boundary_upstream, :boundary_downstream] ->
-            effect != :station_closure and (effect != :delay or severity > 3)
+        location when location in [:boundary_upstream, :boundary_downstream] ->
+          effect != :station_closure and (effect != :delay or severity > 3)
 
-          _ ->
-            false
-        end
-    end)
+        _ ->
+          false
+      end
   end
 
   # This slows things down... Should we store this like we do for elevator closures?
