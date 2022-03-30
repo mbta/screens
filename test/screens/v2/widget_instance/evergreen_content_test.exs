@@ -73,8 +73,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
   end
 
   describe "audio_sort_key/1" do
-    test "returns 0", %{widget: widget} do
-      assert 0 == WidgetInstance.audio_sort_key(widget)
+    test "returns [0]", %{widget: widget} do
+      assert [0] == WidgetInstance.audio_sort_key(widget)
     end
   end
 

@@ -7,7 +7,7 @@ defmodule Screens.V2.WidgetInstance.MockWidget do
             content: nil,
             slot_names: nil,
             valid_candidate?: true,
-            audio_sort_key: 0,
+            audio_sort_key: [0],
             audio_valid_candidate?: false
 
   @type t :: %__MODULE__{
@@ -16,7 +16,7 @@ defmodule Screens.V2.WidgetInstance.MockWidget do
           content: any(),
           slot_names: list(atom()),
           valid_candidate?: boolean(),
-          audio_sort_key: non_neg_integer(),
+          audio_sort_key: nonempty_list(integer()),
           audio_valid_candidate?: boolean()
         }
 

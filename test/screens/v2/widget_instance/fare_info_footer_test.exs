@@ -69,12 +69,12 @@ defmodule Screens.V2.WidgetInstance.FareInfoFooterTest do
   end
 
   describe "audio_sort_key/1" do
-    test "returns 0 for bus", %{bus_instance: instance} do
-      assert 0 == WidgetInstance.audio_sort_key(instance)
+    test "returns [0] for bus", %{bus_instance: instance} do
+      assert [0] == WidgetInstance.audio_sort_key(instance)
     end
 
-    test "returns 0 for subway", %{subway_instance: instance} do
-      assert 0 == WidgetInstance.audio_sort_key(instance)
+    test "returns [0] for subway", %{subway_instance: instance} do
+      assert [0] == WidgetInstance.audio_sort_key(instance)
     end
   end
 
