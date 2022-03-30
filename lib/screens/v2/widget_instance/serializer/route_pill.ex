@@ -84,7 +84,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
           do_serialize(route_id, %{route_name: route_name})
       end
 
-    Map.merge(route, %{color: get_color_for_route(route_id, route_type)})
+    Map.put(route, :color, get_color_for_route(route_id, route_type))
   end
 
   @spec serialize_for_audio_departure(Route.id(), String.t(), RouteType.t(), pos_integer() | nil) ::
