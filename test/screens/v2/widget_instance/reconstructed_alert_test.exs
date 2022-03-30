@@ -283,7 +283,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
 
       expected = %{
-        issue: "Station Closure",
+        issue: "Station Closed",
         location: "",
         cause: "",
         routes: [
@@ -308,7 +308,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:construction)
 
       expected = %{
-        issue: %FreeTextLine{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
+        issue: %{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
         location: "at Downtown Crossing",
         cause: "Due to construction",
         routes: [
@@ -447,7 +447,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains may be delayed over 60 minutes",
         location: "",
-        cause: "Due to construction",
+        cause: "due to construction",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
         urgent: true
@@ -565,7 +565,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Alewife trains may be delayed over 60 minutes",
         location: "",
-        cause: "Due to construction",
+        cause: "due to construction",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
         urgent: true
@@ -676,7 +676,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains will bypass Alewife",
         location: "",
-        cause: "Due to construction",
+        cause: "due to construction",
         routes: [
           %{color: :orange, text: "OL", type: :text},
           %{color: :red, text: "RL", type: :text}

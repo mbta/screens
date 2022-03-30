@@ -164,7 +164,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     cause_text = cause |> get_cause_text() |> String.capitalize()
 
     %{
-      issue: "Station Closure",
+      issue: "Station Closed",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
