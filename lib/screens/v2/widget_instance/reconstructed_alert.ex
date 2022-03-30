@@ -84,18 +84,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     location_text = get_endpoints(informed_entities, hd(affected_routes))
 
-    issue_text =
-      ["No"] ++
-        (affected_routes
-         |> Enum.map(fn route -> %{icon: route} end)
-         |> Enum.to_list()) ++
-        ["trains"]
+    issue = %FreeTextLine{
+      icon: nil,
+      text:
+        ["No"] ++
+          (affected_routes
+           |> Enum.map(fn route -> %{icon: route} end)
+           |> Enum.to_list()) ++
+          ["trains"]
+    }
 
     %{
-      issue: %FreeTextLine{
-        icon: nil,
-        text: issue_text
-      },
+      issue: FreeTextLine.to_json(issue),
       location: location_text,
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -116,18 +116,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     location_text = get_endpoints(informed_entities, hd(affected_routes))
 
-    issue_text =
-      ["No"] ++
-        (affected_routes
-         |> Enum.map(fn route -> %{icon: route} end)
-         |> Enum.to_list()) ++
-        ["trains"]
+    issue = %FreeTextLine{
+      icon: nil,
+      text:
+        ["No"] ++
+          (affected_routes
+           |> Enum.map(fn route -> %{icon: route} end)
+           |> Enum.to_list()) ++
+          ["trains"]
+    }
 
     %{
-      issue: %FreeTextLine{
-        icon: nil,
-        text: issue_text
-      },
+      issue: FreeTextLine.to_json(issue),
       location: location_text,
       cause: cause_text,
       routes: get_route_pills(affected_routes),
