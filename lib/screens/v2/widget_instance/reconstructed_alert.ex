@@ -567,7 +567,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp get_cause_text(cause) do
     if cause != :unknown do
       cause_text = Map.get(@alert_cause_mapping, cause)
-      "Due to #{cause_text}"
+      "due to #{cause_text}"
     else
       ""
     end
