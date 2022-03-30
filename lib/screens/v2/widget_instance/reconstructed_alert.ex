@@ -286,9 +286,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp serialize_inside_alert(%__MODULE__{} = t) do
-    case AlertWidget.takeover_alert?(t) do
-      true -> serialize_takeover_alert(t)
-      _ -> serialize_inside_flex_alert(t)
+    if AlertWidget.takeover_alert?(t) do
+      serialize_takeover_alert(t)
+    else
+      serialize_inside_flex_alert(t)
     end
   end
 
