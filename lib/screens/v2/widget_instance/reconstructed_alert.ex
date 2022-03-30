@@ -38,6 +38,25 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Green-E" => ["Heath Street", "North Station"]
   }
 
+  @alert_cause_mapping %{
+    accident: "an accident",
+    construction: "construction",
+    disabled_train: "a disabled train",
+    fire: "a fire",
+    holiday: "the holiday",
+    maintenance: "maintenance",
+    medical_emergency: "a medical emergency",
+    police_action: "police action",
+    power_problem: "a power issue",
+    signal_problem: "a signal problem",
+    snow: "snow conditions",
+    special_event: "special event",
+    switch_problem: "a switch problem",
+    track_problem: "a track problem",
+    traffic: "traffic",
+    weather: "weather conditions"
+  }
+
   defp get_affected_routes(informed_entities) do
     informed_entities |> Enum.map(fn %{route: route} -> route end) |> Enum.uniq()
   end
@@ -547,7 +566,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp get_cause_text(cause) do
     if cause != :unknown do
-      "Due to #{cause}"
+      cause_text = Map.get(@alert_cause_mapping, cause)
+      "Due to #{cause_text}"
     else
       ""
     end
