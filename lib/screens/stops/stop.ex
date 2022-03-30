@@ -280,7 +280,7 @@ defmodule Screens.Stops.Stop do
     end
   end
 
-  def stop_on_route?(%{stop: stop_id}, stop_sequence) when not is_nil(stop_id) do
+  def stop_on_route?(stop_id, stop_sequence) when not is_nil(stop_id) do
     Enum.any?(stop_sequence, fn {station_id, _} -> station_id == stop_id end)
   end
 
@@ -296,17 +296,13 @@ defmodule Screens.Stops.Stop do
     Enum.find(stop_sequences, &sequence_match?(&1, informed_entities))
   end
 
-  defp in_stop_sequence?(station_id, stop_sequence) do
-    Enum.any?(stop_sequence, fn {stop_id, _} -> stop_id == station_id end)
-  end
-
   defp sequence_match?(stop_sequence, informed_entities) do
     stations =
       informed_entities
       |> Enum.map(fn %{stop: stop_id} -> stop_id end)
       |> Enum.filter(&String.starts_with?(&1, "place-"))
 
-    Enum.all?(stations, &in_stop_sequence?(&1, stop_sequence))
+    Enum.all?(stations, &stop_on_route?(&1, stop_sequence))
   end
 
   def gl_trunk_stops do

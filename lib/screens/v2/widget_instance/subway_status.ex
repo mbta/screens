@@ -159,7 +159,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       stop_sequence ->
         {min_index, max_index} =
           informed_entities
-          |> Enum.filter(&Stop.stop_on_route?(&1, stop_sequence))
+          |> Enum.filter(&Stop.stop_on_route?(&1.stop, stop_sequence))
           |> Enum.map(&Stop.to_stop_index(&1, stop_sequence))
           |> Enum.min_max()
 
