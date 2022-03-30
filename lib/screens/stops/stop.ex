@@ -288,7 +288,9 @@ defmodule Screens.Stops.Stop do
     Enum.find_index(stop_sequence, fn {station_id, _} -> station_id == stop_id end)
   end
 
-  # Finds a stop sequence which contains all stations in informed_entities
+  @doc """
+  Finds a stop sequence which contains all stations in informed_entities.
+  """
   def get_stop_sequence(informed_entities, route_id) do
     stop_sequences = Map.get(@route_stop_sequences, route_id)
     Enum.find(stop_sequences, &sequence_match?(&1, informed_entities))
