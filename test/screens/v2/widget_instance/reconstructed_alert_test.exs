@@ -2,7 +2,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Dup.Override.FreeTextLine
   alias Screens.Config.Screen
   alias Screens.Config.V2.{PreFare}
   alias Screens.Config.V2.Header.CurrentStopId
@@ -234,7 +233,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
 
       expected = %{
-        issue: %FreeTextLine{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
+        issue: %{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
         location: "at Downtown Crossing",
         cause: "",
         routes: [
@@ -259,7 +258,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
 
       expected = %{
-        issue: %FreeTextLine{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
+        issue: %{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
         location: "at Downtown Crossing",
         cause: "",
         routes: [
