@@ -577,15 +577,15 @@ const elevatorStatusColumn = {
 
 const reconstructedAlertWidgetColumn = {
   Header: "Alert Widget",
-  accessor: buildAppParamAccessor("alert_widget"),
-  mutator: buildAppParamMutator("alert_widget"),
+  accessor: buildAppParamAccessor("reconstructed_alert_widget"),
+  mutator: buildAppParamMutator("reconstructed_alert_widget"),
   Cell: EditableTextarea,
   disableFilters: true,
   FormCell: FormTextarea,
 };
 
 const lineMapColumn = {
-  Header: "Line Map",
+  Header: "Full Line Map",
   accessor: buildAppParamAccessor("full_line_map"),
   mutator: buildAppParamMutator("full_line_map"),
   Cell: EditableTextarea,

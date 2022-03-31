@@ -16,7 +16,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   Given the routes, fetch all alerts for the route
   """
   def reconstructed_alert_instances(
-        %Screen{app_params: %PreFare{alert_widget: %CurrentStopId{stop_id: stop_id}}} = config,
+        %Screen{app_params: %PreFare{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}}} = config,
         now \\ DateTime.utc_now(),
         fetch_routes_by_stop_fn \\ &Route.fetch_routes_by_stop/3,
         fetch_stop_sequences_by_stop_fn \\ &RoutePattern.fetch_stop_sequences_through_stop/2,
