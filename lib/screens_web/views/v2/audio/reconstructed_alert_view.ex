@@ -56,6 +56,12 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
   end
 
   defp parse_routes(routes) do
+    # non_gl_lines = Enum.reject(routes, &(&1.color == :green))
+
+    # case length(non_gl_lines) do
+    #   1 ->
+    # end
+
     routes
     |> Enum.sort_by(fn
       %{branches: _} -> 1
