@@ -50,7 +50,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     power_problem: "a power issue",
     signal_problem: "a signal problem",
     snow: "snow conditions",
-    special_event: "special event",
+    special_event: "a special event",
     switch_problem: "a switch problem",
     track_problem: "a track problem",
     traffic: "traffic",
@@ -228,7 +228,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     line =
       case affected_routes do
-        ["Green-" <> branch | _] -> "Green Line #{branch}"
+        ["Green-" <> branch | _] -> "Green Line #{branch} branch"
         [affected_line | _] -> "#{affected_line} line"
       end
 

@@ -15,8 +15,9 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
         issue: issue,
         routes: routes,
         urgent: false,
-        effect: :delay
-      }) do
+        effect: effect
+      })
+      when effect in [:delay, :moderate_delay] do
     ~E|<p><%= render_affected_routes(routes) %> delay. <%= issue %>.</p>|
   end
 
