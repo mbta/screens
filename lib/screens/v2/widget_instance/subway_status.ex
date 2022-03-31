@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
+  alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.SubwayStatus
 
   defstruct screen: nil,
@@ -24,196 +25,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     "Green-D" => ["Westbound", "Eastbound"],
     "Green-E" => ["Westbound", "Eastbound"],
     "Green" => ["Westbound", "Eastbound"]
-  }
-
-  @blue_line_stops [
-    {"place-wondl", {"Wonderland", "Wonderland"}},
-    {"place-rbmnl", {"Revere Beach", "Revere Bch"}},
-    {"place-bmmnl", {"Beachmont", "Beachmont"}},
-    {"place-sdmnl", {"Suffolk Downs", "Suffolk Dns"}},
-    {"place-orhte", {"Orient Heights", "Orient Hts"}},
-    {"place-wimnl", {"Wood Island", "Wood Island"}},
-    {"place-aport", {"Airport", "Airport"}},
-    {"place-mvbcl", {"Maverick", "Maverick"}},
-    {"place-aqucl", {"Aquarium", "Aquarium"}},
-    {"place-state", {"State", "State"}},
-    {"place-gover", {"Government Center", "Gov't Ctr"}},
-    {"place-bomnl", {"Bowdoin", "Bowdoin"}}
-  ]
-
-  @orange_line_stops [
-    {"place-ogmnl", {"Oak Grove", "Oak Grove"}},
-    {"place-mlmnl", {"Malden Center", "Malden Ctr"}},
-    {"place-welln", {"Wellington", "Wellington"}},
-    {"place-astao", {"Assembly", "Assembly"}},
-    {"place-sull", {"Sullivan Square", "Sullivan Sq"}},
-    {"place-ccmnl", {"Community College", "Com College"}},
-    {"place-north", {"North Station", "North Sta"}},
-    {"place-haecl", {"Haymarket", "Haymarket"}},
-    {"place-state", {"State", "State"}},
-    {"place-dwnxg", {"Downtown Crossing", "Downt'n Xng"}},
-    {"place-chncl", {"Chinatown", "Chinatown"}},
-    {"place-tumnl", {"Tufts Medical Center", "Tufts Med"}},
-    {"place-bbsta", {"Back Bay", "Back Bay"}},
-    {"place-masta", {"Massachusetts Avenue", "Mass Ave"}},
-    {"place-rugg", {"Ruggles", "Ruggles"}},
-    {"place-rcmnl", {"Roxbury Crossing", "Roxbury Xng"}},
-    {"place-jaksn", {"Jackson Square", "Jackson Sq"}},
-    {"place-sbmnl", {"Stony Brook", "Stony Brook"}},
-    {"place-grnst", {"Green Street", "Green St"}},
-    {"place-forhl", {"Forest Hills", "Frst Hills"}}
-  ]
-
-  @red_line_trunk_stops [
-    {"place-alfcl", {"Alewife", "Alewife"}},
-    {"place-davis", {"Davis", "Davis"}},
-    {"place-portr", {"Porter", "Porter"}},
-    {"place-harsq", {"Harvard", "Harvard"}},
-    {"place-cntsq", {"Central", "Central"}},
-    {"place-knncl", {"Kendall/MIT", "Kendall/MIT"}},
-    {"place-chmnl", {"Charles/MGH", "Charles/MGH"}},
-    {"place-pktrm", {"Park Street", "Park St"}},
-    {"place-dwnxg", {"Downtown Crossing", "Downt'n Xng"}},
-    {"place-sstat", {"South Station", "South Sta"}},
-    {"place-brdwy", {"Broadway", "Broadway"}},
-    {"place-andrw", {"Andrew", "Andrew"}},
-    {"place-jfk", {"JFK/Umass", "JFK/Umass"}}
-  ]
-
-  @red_line_ashmont_branch_stops [
-    {"place-shmnl", {"Savin Hill", "Savin Hill"}},
-    {"place-fldcr", {"Fields Corner", "Fields Cnr"}},
-    {"place-smmnl", {"Shawmut", "Shawmut"}},
-    {"place-asmnl", {"Ashmont", "Ashmont"}}
-  ]
-
-  @red_line_braintree_branch_stops [
-    {"place-nqncy", {"North Quincy", "N Quincy"}},
-    {"place-wlsta", {"Wollaston", "Wollaston"}},
-    {"place-qnctr", {"Quincy Center", "Quincy Ctr"}},
-    {"place-qamnl", {"Quincy Adams", "Quincy Adms"}},
-    {"place-brntn", {"Braintree", "Braintree"}}
-  ]
-
-  @green_line_b_stops [
-    {"place-gover", {"Government Center", "Gov't Ctr"}},
-    {"place-pktrm", {"Park Street", "Park St"}},
-    {"place-boyls", {"Boylston", "Boylston"}},
-    {"place-armnl", {"Arlington", "Arlington"}},
-    {"place-coecl", {"Copley", "Copley"}},
-    {"place-hymnl", {"Hynes Convention Center", "Hynes"}},
-    {"place-kencl", {"Kenmore", "Kenmore"}},
-    {"place-bland", {"Blandford Street", "Blandford"}},
-    {"place-buest", {"Boston University East", "BU East"}},
-    {"place-bucen", {"Boston University Central", "BU Central"}},
-    {"place-amory", {"Amory Street", "Amory St"}},
-    {"place-babck", {"Babcock Street", "Babcock St"}},
-    {"place-brico", {"Packards Corner", "Packards Cn"}},
-    {"place-harvd", {"Harvard Avenue", "Harvard Ave"}},
-    {"place-grigg", {"Griggs Street", "Griggs St"}},
-    {"place-alsgr", {"Allston Street", "Allston St"}},
-    {"place-wrnst", {"Warren Street", "Warren St"}},
-    {"place-wascm", {"Washington Street", "Washington"}},
-    {"place-sthld", {"Sutherland Road", "Sutherland"}},
-    {"place-chswk", {"Chiswick Road", "Chiswick Rd"}},
-    {"place-chill", {"Chestnut Hill Avenue", "Chestnut Hl"}},
-    {"place-sougr", {"South Street", "South St"}},
-    {"place-lake", {"Boston College", "Boston Coll"}}
-  ]
-
-  @green_line_c_stops [
-    {"place-gover", {"Government Center", "Gov't Ctr"}},
-    {"place-pktrm", {"Park Street", "Park St"}},
-    {"place-boyls", {"Boylston", "Boylston"}},
-    {"place-armnl", {"Arlington", "Arlington"}},
-    {"place-coecl", {"Copley", "Copley"}},
-    {"place-hymnl", {"Hynes Convention Center", "Hynes"}},
-    {"place-kencl", {"Kenmore", "Kenmore"}},
-    {"place-smary", {"Saint Mary's Street", "St. Mary's"}},
-    {"place-hwsst", {"Hawes Street", "Hawes St"}},
-    {"place-kntst", {"Kent Street", "Kent St"}},
-    {"place-stpul", {"Saint Paul Street", "St. Paul St"}},
-    {"place-cool", {"Coolidge Corner", "Coolidge Cn"}},
-    {"place-sumav", {"Summit Avenue", "Summit Ave"}},
-    {"place-bndhl", {"Brandon Hall", "Brandon Hll"}},
-    {"place-fbkst", {"Fairbanks Street", "Fairbanks"}},
-    {"place-bcnwa", {"Wash Sq", "Washington"}},
-    {"place-tapst", {"Tappan Street", "Tappan St"}},
-    {"place-denrd", {"Dean Road", "Dean Rd"}},
-    {"place-engav", {"Englewood Avenue", "Englew'd Av"}},
-    {"place-clmnl", {"Clvlnd Circ", "Clvlnd Cir"}}
-  ]
-
-  @green_line_d_stops [
-    {"place-north", {"North Station", "North Sta"}},
-    {"place-haecl", {"Haymarket", "Haymarket"}},
-    {"place-gover", {"Government Center", "Gov't Ctr"}},
-    {"place-pktrm", {"Park Street", "Park St"}},
-    {"place-boyls", {"Boylston", "Boylston"}},
-    {"place-armnl", {"Arlington", "Arlington"}},
-    {"place-coecl", {"Copley", "Copley"}},
-    {"place-hymnl", {"Hynes Convention Center", "Hynes"}},
-    {"place-kencl", {"Kenmore", "Kenmore"}},
-    {"place-fenwy", {"Fenway", "Fenway"}},
-    {"place-longw", {"Longwood", "Longwood"}},
-    {"place-bvmnl", {"Brookline Village", "B'kline Vil"}},
-    {"place-brkhl", {"Brookline Hills", "B'kline Hls"}},
-    {"place-bcnfd", {"Beaconsfield", "B'consfield"}},
-    {"place-rsmnl", {"Reservoir", "Reservoir"}},
-    {"place-chhil", {"Chestnut Hill", "Chestnut Hl"}},
-    {"place-newto", {"Newton Centre", "Newton Ctr"}},
-    {"place-newtn", {"Newton Highlands", "Newton Hlnd"}},
-    {"place-eliot", {"Eliot", "Eliot"}},
-    {"place-waban", {"Waban", "Waban"}},
-    {"place-woodl", {"Woodland", "Woodland"}},
-    {"place-river", {"Riverside", "Riverside"}}
-  ]
-
-  @green_line_e_stops [
-    {"place-north", {"North Station", "North Sta"}},
-    {"place-haecl", {"Haymarket", "Haymarket"}},
-    {"place-gover", {"Government Center", "Gov't Ctr"}},
-    {"place-pktrm", {"Park Street", "Park St"}},
-    {"place-boyls", {"Boylston", "Boylston"}},
-    {"place-armnl", {"Arlington", "Arlington"}},
-    {"place-coecl", {"Copley", "Copley"}},
-    {"place-prmnl", {"Prudential", "Prudential"}},
-    {"place-symcl", {"Symphony", "Symphony"}},
-    {"place-nuniv", {"Northeastern University", "Northeast'n"}},
-    {"place-mfa", {"Museum of Fine Arts", "MFA"}},
-    {"place-lngmd", {"Longwood Medical Area", "Lngwd Med"}},
-    {"place-brmnl", {"Brigham Circle", "Brigham Cir"}},
-    {"place-fenwd", {"Fenwood Road", "Fenwood Rd"}},
-    {"place-mispk", {"Mission Park", "Mission Pk"}},
-    {"place-rvrwy", {"Riverway", "Riverway"}},
-    {"place-bckhl", {"Back of the Hill", "Back o'Hill"}},
-    {"place-hsmnl", {"Heath Street", "Heath St"}}
-  ]
-
-  @green_line_trunk_stops [
-    {"place-north", {"North Station", "North Sta"}},
-    {"place-haecl", {"Haymarket", "Haymarket"}},
-    {"place-gover", {"Government Center", "Gov't Ctr"}},
-    {"place-pktrm", {"Park Street", "Park St"}},
-    {"place-boyls", {"Boylston", "Boylston"}},
-    {"place-armnl", {"Arlington", "Arlington"}},
-    {"place-coecl", {"Copley", "Copley"}},
-    {"place-hymnl", {"Hynes Convention Center", "Hynes"}},
-    {"place-kencl", {"Kenmore", "Kenmore"}}
-  ]
-
-  @route_stop_sequences %{
-    "Blue" => [@blue_line_stops],
-    "Orange" => [@orange_line_stops],
-    "Red" => [
-      @red_line_trunk_stops ++ @red_line_ashmont_branch_stops,
-      @red_line_trunk_stops ++ @red_line_braintree_branch_stops
-    ],
-    "Green-B" => [@green_line_b_stops],
-    "Green-C" => [@green_line_c_stops],
-    "Green-D" => [@green_line_d_stops],
-    "Green-E" => [@green_line_e_stops],
-    "Green" => [@green_line_trunk_stops]
   }
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
@@ -308,16 +119,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
-  defp stop_on_route?(%{stop: stop_id}, stop_sequence) when not is_nil(stop_id) do
-    Enum.any?(stop_sequence, fn {station_id, _} -> station_id == stop_id end)
-  end
-
-  defp stop_on_route?(_, _stop_sequence), do: false
-
-  defp to_stop_index(%{stop: stop_id}, stop_sequence) do
-    Enum.find_index(stop_sequence, fn {station_id, _} -> station_id == stop_id end)
-  end
-
   defp ie_is_whole_route?(%{route: route_id, direction_id: nil, stop: nil})
        when not is_nil(route_id),
        do: true
@@ -351,15 +152,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp get_endpoints(informed_entities, route_id) do
-    case get_stop_sequence(informed_entities, route_id) do
+    case Stop.get_stop_sequence(informed_entities, route_id) do
       nil ->
         nil
 
       stop_sequence ->
         {min_index, max_index} =
           informed_entities
-          |> Enum.filter(&stop_on_route?(&1, stop_sequence))
-          |> Enum.map(&to_stop_index(&1, stop_sequence))
+          |> Enum.filter(&Stop.stop_on_route?(&1.stop, stop_sequence))
+          |> Enum.map(&Stop.to_stop_index(&1, stop_sequence))
           |> Enum.min_max()
 
         {_, min_station_name} = Enum.at(stop_sequence, min_index)
@@ -373,25 +174,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           abbrev: "#{min_abbreviated_name} to #{max_abbreviated_name}"
         }
     end
-  end
-
-  # Finds a stop sequence which contains all stations in informed_entities
-  defp get_stop_sequence(informed_entities, route_id) do
-    stop_sequences = Map.get(@route_stop_sequences, route_id)
-    Enum.find(stop_sequences, &sequence_match?(&1, informed_entities))
-  end
-
-  defp in_stop_sequence?(station_id, stop_sequence) do
-    Enum.any?(stop_sequence, fn {stop_id, _} -> stop_id == station_id end)
-  end
-
-  defp sequence_match?(stop_sequence, informed_entities) do
-    stations =
-      informed_entities
-      |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-      |> Enum.filter(&String.starts_with?(&1, "place-"))
-
-    Enum.all?(stations, &in_stop_sequence?(&1, stop_sequence))
   end
 
   defp get_location(informed_entities, route_id) do
@@ -425,12 +207,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
          route_id
        ) do
     # Get closed station names from informed entities
-    stop_id_to_name =
-      @route_stop_sequences
-      |> Map.get(route_id)
-      |> Enum.flat_map(fn x -> x end)
-      |> Enum.uniq()
-      |> Enum.into(%{})
+    stop_id_to_name = Stop.stop_id_to_name(route_id)
 
     stop_names =
       informed_entities
@@ -529,8 +306,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp alert_affects_gl_trunk_or_whole_line?(%Alert{informed_entities: informed_entities}) do
-    gl_trunk_stops =
-      @route_stop_sequences |> Map.get("Green") |> hd() |> Enum.map(&elem(&1, 0)) |> MapSet.new()
+    gl_trunk_stops = Stop.gl_trunk_stops()
 
     alert_trunk_stops =
       informed_entities

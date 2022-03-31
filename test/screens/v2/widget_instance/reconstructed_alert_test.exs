@@ -7,6 +7,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
+  alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   setup :setup_base
 
@@ -58,21 +59,54 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget | now: now}
   end
 
+  defp put_cause(widget, cause) do
+    %{widget | alert: %{widget.alert | cause: cause}}
+  end
+
+  defp put_alert_header(widget, header) do
+    %{widget | alert: %{widget.alert | header: header}}
+  end
+
+  defp put_severity(widget, severity) do
+    %{widget | alert: %{widget.alert | severity: severity}}
+  end
+
   defp ie(opts \\ []) do
-    %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}
+    %{
+      stop: opts[:stop],
+      route: opts[:route],
+      route_type: opts[:route_type],
+      direction_id: opts[:direction_id]
+    }
   end
 
   # Setting up screen location context
   defp setup_home_stop(%{widget: widget}) do
-    home_stop = "place-pktrm"
+    home_stop = "place-dwnxg"
 
     %{widget: put_home_stop(widget, PreFare, home_stop)}
   end
 
   defp setup_stop_sequences(%{widget: widget}) do
     stop_sequences = [
-      ["place-knncl", "place-chmnl", "place-pktrm", "place-dwnxg", "place-sstat"],
-      ["place-gover", "place-pktrm", "place-boyls", "place-armnl"]
+      [
+        "place-ogmnl",
+        "place-dwnxg",
+        "place-chncl",
+        "place-forhl"
+      ],
+      [
+        "place-asmnl",
+        "place-dwnxg",
+        "place-pktrm",
+        "place-alfcl"
+      ],
+      [
+        "place-alfcl",
+        "place-dwnxg",
+        "place-sstat",
+        "place-brntn"
+      ]
     ]
 
     %{widget: put_stop_sequences(widget, stop_sequences)}
@@ -81,7 +115,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   defp setup_routes(%{widget: widget}) do
     routes = [
       %{
-        route_id: "a",
+        route_id: "Red",
         active?: true,
         direction_destinations: nil,
         long_name: nil,
@@ -89,40 +123,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         type: :subway
       },
       %{
-        route_id: "b",
-        active?: false,
-        direction_destinations: nil,
-        long_name: nil,
-        short_name: nil,
-        type: :subway
-      },
-      %{
-        route_id: "c",
+        route_id: "Orange",
         active?: true,
         direction_destinations: nil,
         long_name: nil,
         short_name: nil,
-        type: :light_rail
+        type: :subway
       }
     ]
 
     %{widget: put_routes_at_stop(widget, routes)}
   end
-
-  # routes = [
-  #   %{route_id: "a", active?: true, direction_destinations: nil,
-  #   long_name: nil,
-  #   short_name: nil,
-  #   type: :subway},
-  #   %{route_id: "b", active?: false, direction_destinations: nil,
-  #   long_name: nil,
-  #   short_name: nil,
-  #   type: :subway},
-  #   %{route_id: "c", active?: true, direction_destinations: nil,
-  #   long_name: nil,
-  #   short_name: nil,
-  #   type: :subway}
-  # ]
 
   defp setup_screen_config(%{widget: widget}) do
     %{widget: put_app_id(widget, :pre_fare_v2)}
@@ -134,7 +145,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   # Setting up alert related stuff
   defp setup_informed_entities(%{widget: widget}) do
-    %{widget: put_informed_entities(widget, [ie(stop: "place-pktrm")])}
+    %{widget: put_informed_entities(widget, [ie(stop: "place-dwnxg")])}
   end
 
   defp setup_active_period(%{widget: widget}) do
@@ -176,7 +187,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     end
 
     test "returns takeover for a suspension that affects all station trips", %{widget: widget} do
-      widget = put_informed_entities(widget, [ie(route: "a"), ie(route: "c")])
+      widget = put_informed_entities(widget, [ie(route: "Red"), ie(route: "Orange")])
       assert [1] == WidgetInstance.priority(widget)
       assert [:full_body] == WidgetInstance.slot_names(widget)
     end
@@ -184,19 +195,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     test "returns flex zone alert for a suspension that affects some station trips", %{
       widget: widget
     } do
-      widget = put_informed_entities(widget, [ie(route: "a"), ie(route: "b")])
+      widget = put_informed_entities(widget, [ie(route: "Red")])
       assert [3] == WidgetInstance.priority(widget)
       assert [:large] == WidgetInstance.slot_names(widget)
     end
 
     test "returns flex zone alert for a downstream alert", %{widget: widget} do
-      widget = put_informed_entities(widget, [ie(stop: "place-gover")])
+      widget = put_informed_entities(widget, [ie(stop: "place-pktrm")])
       assert [3] == WidgetInstance.priority(widget)
       assert [:large] == WidgetInstance.slot_names(widget)
     end
 
     test "returns flex zone alert for a boundary alert", %{widget: widget} do
-      widget = put_informed_entities(widget, [ie(stop: "place-gover"), ie(stop: "place-pktrm")])
+      widget = put_informed_entities(widget, [ie(stop: "place-dwnxg"), ie(stop: "place-pktrm")])
       assert [3] == WidgetInstance.priority(widget)
       assert [:large] == WidgetInstance.slot_names(widget)
     end
@@ -208,62 +219,478 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     end
   end
 
-  # describe "serialize_route/2" do
-  #   test "returns normal service when there are no alerts" do
-  #   end
+  describe "serialize_takeover_alert/2" do
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
-  #   test "handles multiple alerts" do
-  #   end
+    test "handles suspension", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red"),
+          ie(stop: "place-dwnxg", route: "Orange")
+        ])
+        |> put_cause(:unknown)
 
-  #   test "handles shuttle alert" do
-  #   end
+      expected = %{
+        issue: %{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
+        location: "at Downtown Crossing",
+        cause: "",
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
+        effect: :suspension,
+        urgent: true
+      }
 
-  #   test "handles whole line shuttle alert" do
-  #   end
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
 
-  #   test "handles suspension alert" do
-  #   end
+    test "handles shuttle", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:shuttle)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red"),
+          ie(stop: "place-dwnxg", route: "Orange")
+        ])
+        |> put_cause(:unknown)
 
-  #   test "handles whole line suspension alert" do
-  #   end
+      expected = %{
+        issue: %{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
+        location: "at Downtown Crossing",
+        cause: "",
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
+        effect: :shuttle,
+        urgent: true
+      }
 
-  #   test "handles delay alert" do
-  #   end
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
 
-  #   test "handles directional delay alert" do
-  #   end
+    test "handles station closure", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red"),
+          ie(stop: "place-dwnxg", route: "Orange")
+        ])
+        |> put_cause(:unknown)
 
-  #   test "handles single station closure" do
-  #   end
+      expected = %{
+        issue: "Station Closed",
+        location: "",
+        cause: "",
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
+        effect: :station_closure,
+        urgent: true
+      }
 
-  #   test "handles 2 station closure" do
-  #   end
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
 
-  #   test "handles 3 station closure" do
-  # end
+    test "handles alert with cause", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red"),
+          ie(stop: "place-dwnxg", route: "Orange")
+        ])
+        |> put_cause(:construction)
 
-  # describe "serialize_green_line/1" do
-  #   test "handles single branch shuttle" do
-  #   end
+      expected = %{
+        issue: %{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
+        location: "at Downtown Crossing",
+        cause: "Due to construction",
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
+        effect: :suspension,
+        urgent: true
+      }
 
-  #   test "handles concurrent branch shuttles" do
-  #   end
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+  end
 
-  #   test "handles concurrent branch shuttle and suspension" do
-  #   end
+  describe "serialize_inside_flex_alert/1" do
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
-  #   test "handles trunk alert" do
-  #   end
+    test "handles suspension", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:unknown)
 
-  #   test "handles normal service" do
-  #   end
+      expected = %{
+        issue: "No trains",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :suspension,
+        urgent: true
+      }
 
-  #   test "handles alert affecting all branches" do
-  #   end
-  # end
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles shuttle", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:shuttle)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "No trains",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :shuttle,
+        urgent: true
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles station closure", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "Red line platform closed",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :station_closure,
+        urgent: true
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles moderate delay", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:unknown)
+        |> put_severity(5)
+        |> put_alert_header("Test Alert")
+
+      expected = %{
+        issue: "Test Alert",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :moderate_delay,
+        urgent: false
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles severe delay", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:unknown)
+        |> put_severity(10)
+
+      expected = %{
+        issue: "Trains may be delayed over 60 minutes",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :severe_delay,
+        urgent: true
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles alert with cause", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:construction)
+        |> put_severity(10)
+
+      expected = %{
+        issue: "Trains may be delayed over 60 minutes",
+        location: "",
+        cause: "due to construction",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :severe_delay,
+        urgent: true
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+  end
+
+  describe "serialize_boundary_alert/1" do
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
+
+    test "handles suspension", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
+        ])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "No Alewife trains",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :suspension,
+        urgent: true
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles shuttle", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:shuttle)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
+        ])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "No Alewife trains",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :shuttle,
+        urgent: true
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles moderate delay", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_severity(5)
+        |> put_alert_header("Test Alert")
+
+      expected = %{
+        issue: "Test Alert",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :moderate_delay,
+        urgent: false
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles severe delay", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_severity(10)
+
+      expected = %{
+        issue: "Alewife trains may be delayed over 60 minutes",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :severe_delay,
+        urgent: true
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles alert with cause", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
+        ])
+        |> put_cause(:construction)
+        |> put_severity(10)
+
+      expected = %{
+        issue: "Alewife trains may be delayed over 60 minutes",
+        location: "",
+        cause: "due to construction",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :severe_delay,
+        urgent: true
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+  end
+
+  describe "serialize_outside_alert/1" do
+    setup @alert_widget_context_setup_group
+
+    test "handles suspension at one stop", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([ie(stop: "place-alfcl", direction_id: 1, route: "Red")])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "No Alewife trains",
+        location: "at Alewife",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :suspension,
+        urgent: false
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles shuttle at one stop", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:shuttle)
+        |> put_informed_entities([ie(stop: "place-alfcl", direction_id: 1, route: "Red")])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "No Alewife trains",
+        location: "at Alewife",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :shuttle,
+        urgent: false
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles station closure", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-alfcl", route: "Red"),
+          ie(stop: "place-alfcl", route: "Orange")
+        ])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "Trains will bypass Alewife",
+        location: "",
+        cause: "",
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
+        effect: :station_closure,
+        urgent: false
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles delay", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-alfcl", route: "Red")
+        ])
+        |> put_cause(:unknown)
+        |> put_alert_header("Test Alert")
+
+      expected = %{
+        issue: "Test Alert",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :delay,
+        urgent: false
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles alert with cause", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-alfcl", route: "Red"),
+          ie(stop: "place-alfcl", route: "Orange")
+        ])
+        |> put_cause(:construction)
+
+      expected = %{
+        issue: "Trains will bypass Alewife",
+        location: "",
+        cause: "due to construction",
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
+        effect: :station_closure,
+        urgent: false
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+  end
 
   describe "widget_type/1" do
-    test "returns subway status", %{widget: widget} do
+    test "returns reconstructed_alert", %{widget: widget} do
       assert :reconstructed_alert == WidgetInstance.widget_type(widget)
     end
   end

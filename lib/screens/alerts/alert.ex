@@ -520,6 +520,15 @@ defmodule Screens.Alerts.Alert do
     end)
   end
 
+  # information -> 1
+  # up to 10 minutes -> 3
+  # up to 15 minutes -> 4
+  # up to 20 minutes -> 5
+  # up to 25 minutes -> 6
+  # up to 30 minutes -> 7
+  # more than 30 minutes -> 8
+  # more than an hour -> 9
+  # High priority (deliver to T-Alert subscribers immediately) -> 10
   def interpret_severity(severity) do
     cond do
       severity < 3 -> {:up_to, 10}
