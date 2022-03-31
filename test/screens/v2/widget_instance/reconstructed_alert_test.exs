@@ -743,9 +743,58 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   describe "audio_sort_key/1" do
-    test "returns [0]" do
-      instance = %ReconstructedAlert{}
-      assert [0] == WidgetInstance.audio_sort_key(instance)
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
+
+    test "returns [2] when alert is urgent", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:unknown)
+
+      assert [2] == WidgetInstance.audio_sort_key(widget)
+    end
+
+    test "returns [2, 1] when alert is not urgent", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-alfcl", route: "Red"),
+          ie(stop: "place-alfcl", route: "Orange")
+        ])
+        |> put_cause(:construction)
+
+      assert [2, 1] == WidgetInstance.audio_sort_key(widget)
+    end
+
+    test "returns [2, 2] when alert effect is :moderate_delay", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:unknown)
+        |> put_severity(5)
+        |> put_alert_header("Test Alert")
+
+      assert [2, 2] == WidgetInstance.audio_sort_key(widget)
+    end
+
+    test "returns [2, 2] when alert effect is :delay", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-alfcl", route: "Red")
+        ])
+        |> put_cause(:unknown)
+        |> put_alert_header("Test Alert")
+
+      assert [2, 2] == WidgetInstance.audio_sort_key(widget)
     end
   end
 

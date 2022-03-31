@@ -634,6 +634,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  def audio_sort_key(%__MODULE__{} = t) do
+    case serialize(t) do
+      %{urgent: true} -> [2]
+      %{effect: effect} when effect in [:moderate_delay, :delay] -> [2, 2]
+      _ -> [2, 1]
+    end
+  end
+
   def priority(%__MODULE__{} = t) do
     if AlertWidget.takeover_alert?(t), do: [1], else: [3]
   end
@@ -649,7 +657,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def widget_type(_instance), do: :reconstructed_alert
     def valid_candidate?(_instance), do: true
     def audio_serialize(t), do: ReconstructedAlert.serialize(t)
-    def audio_sort_key(_instance), do: [0]
+    def audio_sort_key(t), do: ReconstructedAlert.audio_sort_key(t)
     def audio_valid_candidate?(_instance), do: true
     def audio_view(_instance), do: ScreensWeb.V2.Audio.ReconstructedAlertView
   end
