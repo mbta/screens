@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="36px" height="36px" viewBox="0 0 36 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="36px" height="37px" viewBox="0 0 36 37" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>You are here</title>
-    <g id="You-are-here" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <rect id="Rectangle" fill="#BA190E" transform="translate(17.970563, 17.970563) rotate(45.000000) translate(-17.970563, -17.970563) " x="5.97056275" y="5.97056275" width="24" height="24"></rect>
+    <g id="01/2022-Pre-fare-final-polish" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Elevator-Widget-Row---Active-at-this-station" transform="translate(-677.000000, -34.000000)" fill="#EE2E24">
+            <g id="You-are-here" transform="translate(677.000000, 34.964021)">
+                <polygon id="Rectangle" transform="translate(18.000000, 18.000000) rotate(45.000000) translate(-18.000000, -18.000000) " points="5.27207794 5.27207794 30.7279221 5.27207794 30.7279221 30.7279221 5.27207794 30.7279221"></polygon>
+            </g>
+        </g>
     </g>
 </svg>

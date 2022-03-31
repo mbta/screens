@@ -27,7 +27,7 @@ defprotocol Screens.V2.WidgetInstance do
   @spec audio_serialize(t) :: map()
   def audio_serialize(instance)
 
-  @spec audio_sort_key(t) :: integer()
+  @spec audio_sort_key(t) :: priority()
   def audio_sort_key(instance)
 
   @spec audio_valid_candidate?(t) :: boolean()

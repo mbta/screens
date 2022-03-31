@@ -72,12 +72,12 @@ defmodule Screens.V2.WidgetInstance.AlertHeaderTest do
   end
 
   describe "audio_sort_key/1" do
-    test "returns 0 for header with time", %{instance_with_time: instance} do
-      assert 0 == WidgetInstance.audio_sort_key(instance)
+    test "returns [0] for header with time", %{instance_with_time: instance} do
+      assert [0] == WidgetInstance.audio_sort_key(instance)
     end
 
-    test "returns 0 for header without time", %{instance_no_time: instance} do
-      assert 0 == WidgetInstance.audio_sort_key(instance)
+    test "returns [0] for header without time", %{instance_no_time: instance} do
+      assert [0] == WidgetInstance.audio_sort_key(instance)
     end
   end
 

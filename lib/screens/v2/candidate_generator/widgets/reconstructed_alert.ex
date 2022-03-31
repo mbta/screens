@@ -7,6 +7,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.Config.V2.PreFare
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
+  alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
 
   @relevant_effects ~w[shuttle suspension station_closure delay]a
@@ -19,18 +20,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}} = config,
         now \\ DateTime.utc_now(),
         fetch_routes_by_stop_fn \\ &Route.fetch_routes_by_stop/3,
-        fetch_stop_sequences_by_stop_fn \\ &RoutePattern.fetch_stop_sequences_through_stop/1,
+        fetch_stop_sequences_by_stop_fn \\ &RoutePattern.fetch_stop_sequences_through_stop/2,
         fetch_alerts_fn \\ &Alert.fetch/1,
         get_parent_station_id_fn \\ &get_parent_station/1
       ) do
-    with {:ok, routes_at_stop} <- fetch_routes_by_stop_fn.(stop_id, now, [:subway, :light_rail]),
-         {:ok, stop_sequences} <- fetch_stop_sequences_by_stop_fn.(stop_id),
+    # Filtering by subway and light_rail types
+    with {:ok, routes_at_stop} <- fetch_routes_by_stop_fn.(stop_id, now, [0, 1]),
          route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
-         {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids_at_stop) do
+         {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids_at_stop),
+         {:ok, stop_sequences} <- fetch_stop_sequences_by_stop_fn.(stop_id, route_ids_at_stop) do
       station_sequences =
         stop_sequences
-        |> Enum.map(fn stop_group ->
-          stop_group
+        |> Enum.map(fn stop_sequence ->
+          stop_sequence
           |> Enum.map(fn stop ->
             case get_parent_station_id_fn.(stop) do
               {:ok, parent_stop} -> parent_stop
@@ -39,16 +41,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
           end)
         end)
         # Dedup the stop sequences (both directions are listed, but we only need 1)
-        |> Enum.reduce([], fn stop_group, acc ->
-          if Enum.find(acc, fn group -> Enum.sort(group) === Enum.sort(stop_group) end),
-            do: acc,
-            else: acc ++ [stop_group]
-        end)
+        |> Enum.uniq_by(&MapSet.new/1)
 
       alerts
-      |> Enum.filter(fn alert ->
-        Enum.member?(@relevant_effects, Map.get(alert, :effect))
-      end)
+      |> Enum.filter(&relevant?(&1, config, station_sequences, routes_at_stop))
       |> Enum.map(fn alert ->
         %ReconstructedAlert{
           screen: config,
@@ -61,6 +57,34 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     else
       :error -> []
     end
+  end
+
+  defp relevant?(
+         %Alert{severity: severity, effect: effect} = alert,
+         config,
+         stop_sequences,
+         routes_at_stop
+       ) do
+    Enum.member?(@relevant_effects, effect) and
+      case BaseAlert.location(%ReconstructedAlert{
+             screen: config,
+             alert: alert,
+             stop_sequences: stop_sequences,
+             routes_at_stop: routes_at_stop,
+             now: DateTime.utc_now()
+           }) do
+        location when location in [:downstream, :upstream] ->
+          true
+
+        :inside ->
+          effect != :delay or severity > 3
+
+        location when location in [:boundary_upstream, :boundary_downstream] ->
+          effect != :station_closure and (effect != :delay or severity > 3)
+
+        _ ->
+          false
+      end
   end
 
   # This slows things down... Should we store this like we do for elevator closures?

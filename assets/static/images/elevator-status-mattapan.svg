@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="44px" height="44px" viewBox="0 0 44 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Mattapan Circle</title>
+    <g id="Mattapan-Circle" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Pill" fill="#DA291C" x="7.10542736e-15" y="0" width="44" height="44" rx="22"></rect>
+        <g id="Line" transform="translate(12.003000, 13.205518)" fill="#FFFFFF" fill-rule="nonzero">
+            <polygon id="Path" points="0 0 0 18.564 3.822 18.564 3.822 5.538 3.874 5.538 8.424 18.564 11.57 18.564 16.12 5.408 16.172 5.408 16.172 18.564 19.994 18.564 19.994 0 14.248 0 10.14 12.766 10.088 12.766 5.746 0"></polygon>
+        </g>
+    </g>
+</svg>

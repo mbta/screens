@@ -36,11 +36,24 @@ defmodule Screens.RoutePatterns.RoutePattern do
   end
 
   @spec fetch_stop_sequences_through_stop(Stop.id()) :: {:ok, list(list(Stop.id()))} | :error
-  def fetch_stop_sequences_through_stop(stop_id, get_json_fn \\ &V3Api.get_json/2) do
-    case get_json_fn.("route_patterns", %{
-           "include" => "representative_trip.stops",
-           "filter[stop]" => stop_id
-         }) do
+  def fetch_stop_sequences_through_stop(
+        stop_id,
+        route_filters \\ [],
+        get_json_fn \\ &V3Api.get_json/2
+      ) do
+    params = %{
+      "include" => "representative_trip.stops,route",
+      "filter[stop]" => stop_id
+    }
+
+    params =
+      if length(route_filters) > 0 do
+        Map.put(params, "filter[route]", Enum.join(route_filters, ","))
+      else
+        params
+      end
+
+    case get_json_fn.("route_patterns", params) do
       {:ok, result} ->
         stop_sequences =
           get_in(result, [

@@ -9,14 +9,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
   alias Screens.Config.V2.{PreFare, Solari}
   alias Screens.V2.WidgetInstance.ReconstructedAlert, as: ReconstructedAlertWidget
 
-  defp ie(opts \\ []) do
+  defp ie(opts) do
     %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}
   end
 
   describe "reconstructed_alert_instances/5" do
     setup do
       config =
-        struct(Screen, %{app_params: struct(PreFare, %{header: %CurrentStopId{stop_id: "1265"}})})
+        struct(Screen, %{
+          app_id: :pre_fare_v2,
+          app_params: struct(PreFare, %{header: %CurrentStopId{stop_id: "place-hsmnl"}})
+        })
 
       bad_config = struct(Screen, %{app_params: struct(Solari)})
 
@@ -64,11 +67,29 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
       ]
 
       alerts = [
-        %Alert{id: "1", effect: :station_closure, informed_entities: [ie(stop: "1265")]},
-        %Alert{id: "2", effect: :station_closure, informed_entities: [ie(route: "Green-C")]},
-        %Alert{id: "3", effect: :delay, informed_entities: [ie(stop: "1265")]},
+        %Alert{id: "1", effect: :station_closure, informed_entities: [ie(stop: "place-hsmnl")]},
+        %Alert{id: "2", effect: :station_closure, informed_entities: [ie(stop: "place-bckhl")]},
+        %Alert{id: "3", effect: :delay, informed_entities: [ie(stop: "place-hsmnl")]},
         %Alert{id: "4", effect: :station_closure, informed_entities: []},
-        %Alert{id: "5", effect: :stop_closure, informed_entities: [ie(route: "Green-C")]}
+        %Alert{id: "5", effect: :stop_closure, informed_entities: [ie(stop: "place-rvrwy")]}
+      ]
+
+      stop_sequences = [
+        ["70260", "70258", "70256", "70254"],
+        ["70253", "70255", "70257", "70260"]
+      ]
+
+      station_sequences = [
+        ["place-hsmnl", "place-bckhl", "place-rvrwy", "place-mispk"]
+      ]
+
+      stop_sequences = [
+        ["70260", "70258", "70256", "70254"],
+        ["70253", "70255", "70257", "70260"]
+      ]
+
+      station_sequences = [
+        ["place-hsmnl", "place-bckhl", "place-rvrwy", "place-mispk"]
       ]
 
       stop_sequences = [
@@ -87,7 +108,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         station_sequences: station_sequences,
         now: ~U[2021-01-01T00:00:00Z],
         fetch_routes_by_stop_fn: fn _, _, _ -> {:ok, routes_at_stop} end,
-        fetch_stop_sequences_by_stop_fn: fn _ -> {:ok, stop_sequences} end,
+        fetch_stop_sequences_by_stop_fn: fn _, _ -> {:ok, stop_sequences} end,
         fetch_alerts_fn: fn _ -> {:ok, alerts} end,
         get_parent_station_id_fn: fn
           "70260" -> {:ok, "place-hsmnl"}
@@ -99,7 +120,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
           "70253" -> {:ok, "place-mispk"}
         end,
         x_fetch_routes_by_stop_fn: fn _, _, _ -> :error end,
-        x_fetch_stop_sequences_by_stop_fn: fn _ -> :error end,
+        x_fetch_stop_sequences_by_stop_fn: fn _, _ -> :error end,
         x_fetch_alerts_fn: fn _ -> :error end
       }
     end
@@ -129,7 +150,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "1",
               effect: :station_closure,
-              informed_entities: [ie(stop: "1265")]
+              informed_entities: [ie(stop: "place-hsmnl")]
             }
           },
           expected_common_data
@@ -139,20 +160,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :station_closure,
-              informed_entities: [ie(route: "Green-C")]
+              informed_entities: [ie(stop: "place-bckhl")]
             }
           },
           expected_common_data
         ),
         struct(
           %ReconstructedAlertWidget{
-            alert: %Alert{id: "3", effect: :delay, informed_entities: [ie(stop: "1265")]}
-          },
-          expected_common_data
-        ),
-        struct(
-          %ReconstructedAlertWidget{
-            alert: %Alert{id: "4", effect: :station_closure, informed_entities: []}
+            alert: %Alert{id: "3", effect: :delay, informed_entities: [ie(stop: "place-hsmnl")]}
           },
           expected_common_data
         )

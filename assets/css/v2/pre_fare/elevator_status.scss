@@ -1,3 +1,15 @@
+// *** HEADS UP ***
+// The backend logic that fits list view rows onto pages
+// makes assumptions based on styles defined here.
+//
+// Currently, each row for a station in the list view has its height
+// calculated as:
+//     100px + (48px * length(station.closures))
+//
+// If any changes to this stylesheet affect that, be sure to update
+// the backend page-fitting logic as well.
+// *** HEADS UP ***
+
 .elevator-status {
   width: 1024px;
   height: 1000px;
@@ -7,19 +19,26 @@
   margin: 16px 28px;
   position: relative;
   overflow: hidden;
+  color: #171f26;
 
   .elevator-status__header {
-    height: 56px;
-    padding: 32px;
+    height: 120px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 
     .elevator-status__header-text {
-      font-size: 56px;
+      padding: 32px;
+      font-size: 72px;
       font-weight: 800;
       line-height: 56px;
       font-family: Inter, sans-serif;
+    }
+
+    .elevator-status__wayfinding-icon {
+      padding-top: 12px;
+      padding-right: 28px;
+      padding-bottom: 12px;
     }
   }
 
@@ -32,7 +51,6 @@
     width: 1024px;
 
     .elevator-status__footer-text {
-      color: rgb(23, 31, 38);
       font-size: 32px;
       font-family: Inter, sans-serif;
       line-height: 40px;
@@ -43,11 +61,14 @@
 
   &__closure-you-are-here-icon {
     object-fit: contain;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   &__closure-route-mode-icon {
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     &:not(:last-child) {
       padding-right: 12px;
     }
@@ -62,7 +83,7 @@
   &__station-row {
     width: 1024px;
     border-top: 4px solid rgb(217, 214, 208);
-    padding-top: 16px;
+    padding-top: 24px;
     padding-left: 32px;
     padding-bottom: 20px;
     box-sizing: border-box;
@@ -71,22 +92,28 @@
       background-color: rgba(255, 255, 255, 0.68);
     }
 
+    &__header {
+      height: 44px;
+      margin-bottom: 16px;
+    }
+
     &__icons {
       display: inline-block;
       height: 44px;
+      line-height: 44px;
+      vertical-align: top;
       margin-right: 16px;
-      transform: translateY(8px);
     }
 
     &__station-name {
       display: inline-block;
       height: 44px;
-      color: rgb(23, 31, 38);
       font-size: 40px;
       font-family: Inter, sans-serif;
       font-weight: 700;
       letter-spacing: 0px;
-      line-height: 36px;
+      line-height: 44px;
+      vertical-align: top;
       margin-bottom: 12px;
     }
 
@@ -98,14 +125,20 @@
       font-family: Inter, sans-serif;
       font-weight: 500;
       letter-spacing: 0px;
-      line-height: 32px;
+      line-height: 44px;
+      vertical-align: text-top;
+      // needs a tiiiiny nudge to align with station name
+      transform: translateY(1px);
       margin-left: 16px;
     }
 
     &__you-are-here-icon {
       display: inline-block;
+      height: 44px;
       margin-left: 24px;
       transform: translateY(4px);
+      line-height: 44px;
+      vertical-align: top;
 
       .elevator-status__closure-you-are-here-icon {
         width: 34px;
@@ -121,7 +154,6 @@
       width: 960px;
       height: 40px;
 
-      color: rgb(23, 31, 38);
       font-size: 32px;
       font-family: Inter, sans-serif;
       font-weight: 400;
@@ -161,12 +193,15 @@
       .detail-page__closure-outage-icon-container {
         position: absolute;
         left: -68px;
-        height: 45px;
-        width: 45px;
+        height: 50px;
+        width: 50px;
         transform: translateY(10px);
 
         .detail-page__closure-outage-icon {
           object-fit: contain;
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
         }
       }
       .detail-page__closure-location-text {
@@ -177,14 +212,10 @@
         line-height: 67px;
       }
 
-      .detail-page__closure-route-mode-here-icon-container {
+      .detail-page__closure-route-mode-icon-container {
         display: inline-block;
         padding-left: 30px;
-
-        .elevator-status__closure-you-are-here-icon {
-          width: 45px;
-          height: 45px;
-        }
+        margin: auto;
       }
     }
 
@@ -203,11 +234,14 @@
       .detail-page__closure-alert-icon-container {
         position: absolute;
         left: -68px;
-        height: 45px;
-        width: 45px;
+        height: 50px;
+        width: 50px;
 
         .detail-page__closure-alert-icon {
           object-fit: contain;
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
         }
       }
       .detail-page__timeframe-text-start {
@@ -237,8 +271,4 @@
       padding-right: 32px;
     }
   }
-}
-
-.active-here-and-now {
-  color: rgb(186, 25, 14);
 }

@@ -111,4 +111,14 @@ defmodule Screens.Util do
       i -> Enum.drop(list, i + 1)
     end
   end
+
+  @doc """
+  Returns a DateTime object parsed from the given string.
+  String must already be in ISO8601 format.
+  """
+  @spec parse_time_string(String.t()) :: DateTime.t()
+  def parse_time_string(time) do
+    {:ok, dt, _} = DateTime.from_iso8601(time)
+    dt
+  end
 end

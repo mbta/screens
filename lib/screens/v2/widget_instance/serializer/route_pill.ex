@@ -84,7 +84,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
           do_serialize(route_id, %{route_name: route_name})
       end
 
-    Map.merge(route, %{color: get_color_for_route(route_id, route_type)})
+    Map.put(route, :color, get_color_for_route(route_id, route_type))
   end
 
   @spec serialize_for_audio_departure(Route.id(), String.t(), RouteType.t(), pos_integer() | nil) ::
@@ -133,19 +133,40 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     Map.merge(route, %{color: get_color_for_route(route_id)})
   end
 
+  def serialize_route_for_reconstructed_alert(route_id_group, opts \\ %{})
+
+  def serialize_route_for_reconstructed_alert({"Green", branches}, opts) do
+    route = do_serialize("Green", opts)
+
+    Map.merge(route, %{
+      color: :green,
+      branches: Enum.map(branches, fn "Green-" <> branch -> branch end)
+    })
+  end
+
+  def serialize_route_for_reconstructed_alert({route_id, _}, opts) do
+    route = do_serialize(route_id, opts)
+    Map.merge(route, %{color: get_color_for_route(route_id)})
+  end
+
   @typep serialize_opts :: %{
            optional(:gl_branch) => boolean(),
            optional(:gl_long) => boolean(),
            optional(:cr_abbrev) => boolean(),
-           optional(:route_name) => String.t()
+           optional(:route_name) => String.t(),
+           optional(:large) => boolean()
          }
 
   @spec do_serialize(Route.id(), serialize_opts()) :: map()
   defp do_serialize(route_id, opts)
 
+  defp do_serialize(route, %{large: true}),
+    do: %{type: :text, text: String.upcase("#{route} line")}
+
   defp do_serialize("Red", _), do: %{type: :text, text: "RL"}
   defp do_serialize("Mattapan", _), do: %{type: :text, text: "M"}
   defp do_serialize("Orange", _), do: %{type: :text, text: "OL"}
+  defp do_serialize("Green", _), do: %{type: :text, text: "GL"}
 
   defp do_serialize("Green-" <> branch, %{gl_branch: true} = opts) do
     %{type: :text, text: if(opts[:gl_long], do: "Green Line ", else: "GL·") <> branch}
