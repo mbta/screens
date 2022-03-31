@@ -56,7 +56,12 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
   end
 
   defp parse_routes(routes) do
-    Enum.map(routes, fn
+    routes
+    |> Enum.sort_by(fn
+      %{branches: _} -> 1
+      _ -> 0
+    end)
+    |> Enum.map(fn
       %{branches: [branch]} -> "Green Line: #{branch} Branch"
       %{branches: [b1, b2]} -> "Green Line: #{b1} and #{b2} Branches"
       %{branches: [b1, b2, b3]} -> "Green Line: #{b1}, #{b2}, and #{b3} Branches"
