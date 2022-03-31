@@ -115,6 +115,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: FreeTextLine.to_json(issue),
+      remedy: "Please seek an alternate route",
       location: location_text,
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -147,6 +148,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: FreeTextLine.to_json(issue),
+      remedy: "Use shuttle bus",
       location: location_text,
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -165,6 +167,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Station Closed",
+      remedy: "Please seek an alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -187,6 +190,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "No trains",
+      remedy: "Please seek an alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -203,6 +207,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "No trains",
+      remedy: "Use shuttle bus",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -229,6 +234,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "#{line} platform closed",
+      remedy: "Please seek an alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -249,6 +255,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: header,
+      remedy: "",
       location: "",
       cause: "",
       routes: get_route_pills(affected_routes),
@@ -277,6 +284,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Trains may be delayed #{duration_text}",
+      remedy: "",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -305,6 +313,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
+        remedy: "Please seek an alternate route",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -324,6 +333,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
+        remedy: "Please seek an alternate route",
         location: "",
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -345,6 +355,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
+        remedy: "Use shuttle bus",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -364,6 +375,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
+        remedy: "Use shuttle bus",
         location: "",
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -387,6 +399,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: header,
+      remedy: "",
       location: "",
       cause: "",
       routes: get_route_pills(affected_routes),
@@ -408,6 +421,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
+        remedy: "",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -434,6 +448,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
+        remedy: "",
         location: "",
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -455,6 +470,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
+        remedy: "Please seek an alternate route",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -475,6 +491,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
+        remedy: "Please seek an alternate route",
         location: location_text,
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -494,6 +511,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
+        remedy: "Use shuttle bus",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -514,6 +532,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
+        remedy: "Use shuttle bus",
         location: location_text,
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -538,6 +557,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Trains will bypass #{station}",
+      remedy: "Please seek an alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -551,6 +571,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: header,
+      remedy: "",
       location: "",
       cause: "",
       routes: get_route_pills(affected_routes),
@@ -603,13 +624,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def serialize(%__MODULE__{} = t) do
     case BaseAlert.location(t) do
       :inside ->
-        serialize_inside_alert(t)
+        t |> serialize_inside_alert() |> Map.put(:region, :inside)
 
       location when location in [:boundary_upstream, :boundary_downstream] ->
-        serialize_boundary_alert(t)
+        t |> serialize_boundary_alert() |> Map.put(:region, :boundary)
 
       location when location in [:downstream, :upstream] ->
-        serialize_outside_alert(t)
+        t |> serialize_outside_alert() |> Map.put(:region, :outside)
     end
   end
 

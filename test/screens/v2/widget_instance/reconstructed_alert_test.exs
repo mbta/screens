@@ -241,7 +241,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{color: :red, text: "RL", type: :text}
         ],
         effect: :suspension,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -266,7 +268,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{color: :red, text: "RL", type: :text}
         ],
         effect: :shuttle,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -291,7 +295,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{color: :red, text: "RL", type: :text}
         ],
         effect: :station_closure,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -316,7 +322,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{color: :red, text: "RL", type: :text}
         ],
         effect: :suspension,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -341,7 +349,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -362,7 +372,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :shuttle,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -383,7 +395,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :station_closure,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -406,7 +420,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :moderate_delay,
-        urgent: false
+        urgent: false,
+        region: :inside,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -428,7 +444,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -450,7 +468,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "due to construction",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -476,7 +496,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
-        urgent: true
+        urgent: true,
+        region: :boundary,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -498,7 +520,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :shuttle,
-        urgent: true
+        urgent: true,
+        region: :boundary,
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -522,7 +546,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :moderate_delay,
-        urgent: false
+        urgent: false,
+        region: :boundary,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -545,7 +571,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
-        urgent: true
+        urgent: true,
+        region: :boundary,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -568,7 +596,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "due to construction",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
-        urgent: true
+        urgent: true,
+        region: :boundary,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -591,7 +621,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
-        urgent: false
+        urgent: false,
+        region: :outside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -610,7 +642,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :shuttle,
-        urgent: false
+        urgent: false,
+        region: :outside,
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -635,7 +669,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{color: :red, text: "RL", type: :text}
         ],
         effect: :station_closure,
-        urgent: false
+        urgent: false,
+        region: :outside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -657,7 +693,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :delay,
-        urgent: false
+        urgent: false,
+        region: :outside,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -682,7 +720,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{color: :red, text: "RL", type: :text}
         ],
         effect: :station_closure,
-        urgent: false
+        urgent: false,
+        region: :outside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
