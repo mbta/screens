@@ -84,7 +84,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
         ""
 
       [route] ->
-        "#{route.color} Line"
+        "#{route} Line"
 
       routes when length(routes) == 2 ->
         joined_text =
