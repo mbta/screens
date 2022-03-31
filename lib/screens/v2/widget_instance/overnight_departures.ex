@@ -24,7 +24,7 @@ defmodule Screens.V2.WidgetInstance.OvernightDepartures do
     def widget_type(instance), do: OvernightDepartures.widget_type(instance)
     def valid_candidate?(instance), do: OvernightDepartures.valid_candidate?(instance)
     def audio_serialize(_instance), do: %{}
-    def audio_sort_key(_instance), do: 0
+    def audio_sort_key(_instance), do: [0]
     def audio_valid_candidate?(_instance), do: false
     def audio_view(_instance), do: ScreensWeb.V2.Audio.OvernightDeparturesView
   end

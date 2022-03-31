@@ -1443,8 +1443,8 @@ defmodule WidgetInstance.ElevatorStatusTest do
   end
 
   describe "audio_sort_key/1" do
-    test "returns 0", %{one_active_at_home_instance: instance} do
-      assert 0 == WidgetInstance.audio_sort_key(instance)
+    test "returns [0]", %{one_active_at_home_instance: instance} do
+      assert [0] == WidgetInstance.audio_sort_key(instance)
     end
   end
 
