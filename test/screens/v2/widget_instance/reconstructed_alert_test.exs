@@ -736,9 +736,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns empty string" do
-      instance = %ReconstructedAlert{}
-      assert %{} == WidgetInstance.audio_serialize(instance)
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
+
+    test "returns same result as serialize/1", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-alfcl", route: "Red"),
+          ie(stop: "place-alfcl", route: "Orange")
+        ])
+        |> put_cause(:construction)
+
+      assert WidgetInstance.serialize(widget) == WidgetInstance.audio_serialize(widget)
     end
   end
 
