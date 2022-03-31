@@ -6,13 +6,15 @@ defmodule Screens.Config.V2.PreFare do
 
   @type t :: %__MODULE__{
           header: CurrentStopId.t(),
+          alert_widget: CurrentStopId.t(),
           elevator_status: ElevatorStatus.t(),
           evergreen_content: list(EvergreenContentItem.t()),
           full_line_map: list(FullLineMap.t())
         }
 
-  @enforce_keys [:header, :elevator_status, :full_line_map]
+  @enforce_keys [:header, :alert_widget, :elevator_status, :full_line_map]
   defstruct header: nil,
+            alert_widget: nil,
             elevator_status: nil,
             full_line_map: [],
             evergreen_content: []
@@ -22,6 +24,7 @@ defmodule Screens.Config.V2.PreFare do
       elevator_status: ElevatorStatus,
       full_line_map: {:list, FullLineMap},
       evergreen_content: {:list, EvergreenContentItem},
-      header: CurrentStopId
+      header: CurrentStopId,
+      alert_widget: CurrentStopId
     ]
 end

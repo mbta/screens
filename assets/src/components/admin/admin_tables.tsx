@@ -575,6 +575,24 @@ const elevatorStatusColumn = {
   FormCell: FormTextarea,
 };
 
+const reconstructedAlertWidgetColumn = {
+  Header: "Alert Widget",
+  accessor: buildAppParamAccessor("alert_widget"),
+  mutator: buildAppParamMutator("alert_widget"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
+const lineMapColumn = {
+  Header: "Line Map",
+  accessor: buildAppParamAccessor("full_line_map"),
+  mutator: buildAppParamMutator("full_line_map"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
 const PreFareV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "pre_fare_v2";
@@ -582,7 +600,7 @@ const PreFareV2ScreensTable = (): JSX.Element => {
 
   return (
     <AdminTable
-      columns={[...v2Columns, elevatorStatusColumn]}
+      columns={[...v2Columns, lineMapColumn, elevatorStatusColumn, reconstructedAlertWidgetColumn]}
       dataFilter={dataFilter}
     />
   );
