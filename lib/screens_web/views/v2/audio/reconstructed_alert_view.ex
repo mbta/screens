@@ -80,6 +80,9 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
       |> Enum.map(fn %{color: color} -> color end)
 
     case non_gl_lines do
+      [] ->
+        ""
+
       [route] ->
         "#{route.color} Line"
 
