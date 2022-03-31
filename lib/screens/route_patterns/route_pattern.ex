@@ -102,7 +102,8 @@ defmodule Screens.RoutePatterns.RoutePattern do
   end
 
   defp get_platform_to_station_map_from_result(result) do
-    get_in(result, [
+    result
+    |> get_in([
       "included",
       Access.filter(&(&1["type"] == "stop"))
     ])
