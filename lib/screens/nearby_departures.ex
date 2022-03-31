@@ -22,7 +22,7 @@ defmodule Screens.NearbyDepartures do
         predictions
         |> Enum.group_by(& &1.stop.id)
         |> Enum.map(fn {stop_id, prediction_list} ->
-          {stop_id, Enum.min_by(prediction_list, & &1.departure_time, fn -> nil end)}
+          {stop_id, Enum.min_by(prediction_list, & &1.departure_time, DateTime, fn -> nil end)}
         end)
         |> Enum.map(fn {_stop_id, prediction} -> format_prediction(prediction) end)
 

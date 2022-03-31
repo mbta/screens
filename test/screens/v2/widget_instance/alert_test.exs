@@ -666,8 +666,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   describe "audio_sort_key/1" do
-    test "returns 0", %{widget: widget} do
-      assert 0 == AlertWidget.audio_sort_key(widget)
+    test "returns [0]", %{widget: widget} do
+      assert [0] == AlertWidget.audio_sort_key(widget)
     end
   end
 

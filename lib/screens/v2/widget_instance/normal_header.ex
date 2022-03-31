@@ -47,7 +47,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
     def audio_serialize(%NormalHeader{text: text}), do: %{text: text}
 
-    def audio_sort_key(_instance), do: 0
+    def audio_sort_key(_instance), do: [0]
 
     def audio_valid_candidate?(_instance), do: true
 

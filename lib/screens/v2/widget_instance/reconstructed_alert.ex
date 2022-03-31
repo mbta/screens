@@ -649,7 +649,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def widget_type(_instance), do: :reconstructed_alert
     def valid_candidate?(_instance), do: true
     def audio_serialize(t), do: ReconstructedAlert.serialize(t)
-    def audio_sort_key(_instance), do: 0
+    def audio_sort_key(_instance), do: [0]
     def audio_valid_candidate?(_instance), do: true
     def audio_view(_instance), do: ScreensWeb.V2.Audio.ReconstructedAlertView
   end

@@ -7,6 +7,7 @@ defmodule Screens.BusScreenData do
   alias Screens.NearbyConnections
   alias Screens.Schedules.Schedule
   alias Screens.Config.{Bus, State}
+  alias Screens.Util
 
   def by_screen_id(screen_id, is_screen) do
     if State.mode_disabled?(:bus) do
@@ -34,7 +35,13 @@ defmodule Screens.BusScreenData do
     departures =
       case Departure.fetch(%{stop_ids: [stop_id]}) do
         {:ok, result} ->
-          result = Enum.sort_by(result, & &1.time)
+          result =
+            Enum.sort_by(
+              result,
+              &Util.parse_time_string(&1.time),
+              DateTime
+            )
+
           {:ok, Departure.associate_alerts_with_departures(result, inline_alerts)}
 
         :error ->
@@ -99,8 +106,11 @@ defmodule Screens.BusScreenData do
     schedules
     |> Enum.map(& &1.departure_time)
     |> case do
-      [] -> nil
-      departure_times -> {Enum.min(departure_times), Enum.max(departure_times)}
+      [] ->
+        nil
+
+      departure_times ->
+        {Enum.min(departure_times, DateTime), Enum.max(departure_times, DateTime)}
     end
   end
 

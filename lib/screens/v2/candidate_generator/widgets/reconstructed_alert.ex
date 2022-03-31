@@ -65,7 +65,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          stop_sequences,
          routes_at_stop
        ) do
-    Enum.member?(@relevant_effects, Map.get(alert, :effect)) and
+    Enum.member?(@relevant_effects, effect) and
       case BaseAlert.location(%ReconstructedAlert{
              screen: config,
              alert: alert,

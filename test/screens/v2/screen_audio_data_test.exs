@@ -87,19 +87,19 @@ defmodule Screens.V2.ScreenAudioDataTest do
         {0, :medium_left} => %MockWidget{
           slot_names: [:medium_left, :medium_right],
           audio_valid_candidate?: false,
-          audio_sort_key: 2,
+          audio_sort_key: [2],
           content: "Alert"
         },
         :main_content => %MockWidget{
           slot_names: [:main_content],
           audio_valid_candidate?: true,
-          audio_sort_key: 1,
+          audio_sort_key: [1],
           content: "Departures"
         },
         :header => %MockWidget{
           slot_names: [:header],
           audio_valid_candidate?: true,
-          audio_sort_key: 0,
+          audio_sort_key: [0],
           content: "Header"
         }
       }
@@ -126,19 +126,19 @@ defmodule Screens.V2.ScreenAudioDataTest do
         {0, :medium_left} => %MockWidget{
           slot_names: [:medium_left, :medium_right],
           audio_valid_candidate?: false,
-          audio_sort_key: 2,
+          audio_sort_key: [2],
           content: "Alert"
         },
         :main_content => %MockWidget{
           slot_names: [:main_content],
           audio_valid_candidate?: true,
-          audio_sort_key: 1,
+          audio_sort_key: [1],
           content: "Departures"
         },
         :header => %MockWidget{
           slot_names: [:header],
           audio_valid_candidate?: true,
-          audio_sort_key: 0,
+          audio_sort_key: [0],
           content: "Header"
         }
       }
@@ -162,19 +162,19 @@ defmodule Screens.V2.ScreenAudioDataTest do
         {0, :medium_left} => %MockWidget{
           slot_names: [:medium_left, :medium_right],
           audio_valid_candidate?: false,
-          audio_sort_key: 2,
+          audio_sort_key: [2],
           content: "Alert"
         },
         :main_content => %MockWidget{
           slot_names: [:main_content],
           audio_valid_candidate?: true,
-          audio_sort_key: 1,
+          audio_sort_key: [1],
           content: "Departures"
         },
         :header => %MockWidget{
           slot_names: [:header],
           audio_valid_candidate?: true,
-          audio_sort_key: 0,
+          audio_sort_key: [0],
           content: "Header"
         }
       }
@@ -198,19 +198,19 @@ defmodule Screens.V2.ScreenAudioDataTest do
         {0, :medium_left} => %MockWidget{
           slot_names: [:medium_left, :medium_right],
           audio_valid_candidate?: false,
-          audio_sort_key: 2,
+          audio_sort_key: [2],
           content: "Alert"
         },
         :main_content => %MockWidget{
           slot_names: [:main_content],
           audio_valid_candidate?: true,
-          audio_sort_key: 1,
+          audio_sort_key: [1],
           content: "Departures"
         },
         :header => %MockWidget{
           slot_names: [:header],
           audio_valid_candidate?: true,
-          audio_sort_key: 0,
+          audio_sort_key: [0],
           content: "Header"
         }
       }

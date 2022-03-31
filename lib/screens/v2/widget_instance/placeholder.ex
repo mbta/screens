@@ -22,7 +22,7 @@ defmodule Screens.V2.WidgetInstance.Placeholder do
     def widget_type(_), do: :placeholder
     def valid_candidate?(_instance), do: true
     def audio_serialize(_instance), do: %{}
-    def audio_sort_key(_instance), do: 0
+    def audio_sort_key(_instance), do: [0]
     def audio_valid_candidate?(_instance), do: false
     def audio_view(_instance), do: ScreensWeb.V2.Audio.PlaceholderView
   end

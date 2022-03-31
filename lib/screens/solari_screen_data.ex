@@ -7,8 +7,7 @@ defmodule Screens.SolariScreenData do
   alias Screens.Config.Solari.Section.{Headway, Layout}
   alias Screens.Config.Solari.Section.Layout.{Bidirectional, Upcoming}
   alias Screens.Departures.Departure
-  alias Screens.LogScreenData
-  alias Screens.SignsUiConfig
+  alias Screens.{LogScreenData, SignsUiConfig, Util}
 
   def by_screen_id(screen_id, is_screen, at_historical_datetime \\ nil) do
     if State.mode_disabled?(:bus) do
@@ -199,7 +198,10 @@ defmodule Screens.SolariScreenData do
     query_data
     |> filter_by_routes(layout_opts)
     |> filter_by_minutes(layout_opts)
-    |> Enum.sort_by(& &1.time)
+    |> Enum.sort_by(
+      &Util.parse_time_string(&1.time),
+      DateTime
+    )
     |> take_rows(num_rows)
     |> Enum.map(&Map.from_struct/1)
   end
@@ -209,11 +211,17 @@ defmodule Screens.SolariScreenData do
     query_data
     |> filter_by_routes(layout_opts)
     |> filter_by_minutes(layout_opts)
-    |> Enum.sort_by(& &1.time)
+    |> Enum.sort_by(
+      &Util.parse_time_string(&1.time),
+      DateTime
+    )
     |> Enum.split_with(fn %{direction_id: direction_id} -> direction_id == 0 end)
     |> Tuple.to_list()
     |> Enum.flat_map(&Enum.slice(&1, 0, 1))
-    |> Enum.sort_by(& &1.time)
+    |> Enum.sort_by(
+      &Util.parse_time_string(&1.time),
+      DateTime
+    )
     |> Enum.map(&Map.from_struct/1)
   end
 
