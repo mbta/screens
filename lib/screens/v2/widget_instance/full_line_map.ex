@@ -24,7 +24,7 @@ defmodule Screens.V2.WidgetInstance.FullLineMap do
 
   def audio_serialize(_instance), do: %{}
 
-  def audio_sort_key(_instance), do: 0
+  def audio_sort_key(_instance), do: [0]
 
   def audio_valid_candidate?(_instance), do: false
 

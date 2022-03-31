@@ -338,9 +338,9 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
   end
 
   describe "audio_sort_key/1" do
-    test "returns 0" do
+    test "returns [0]" do
       instance = %LineMap{}
-      assert 0 == WidgetInstance.audio_sort_key(instance)
+      assert [0] == WidgetInstance.audio_sort_key(instance)
     end
   end
 

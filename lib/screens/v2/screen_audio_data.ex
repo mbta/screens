@@ -2,7 +2,7 @@ defmodule Screens.V2.ScreenAudioData do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{Audio, BusShelter}
+  alias Screens.Config.V2.{Audio, BusShelter, PreFare}
   alias Screens.V2.ScreenData
   alias Screens.V2.WidgetInstance
 
@@ -19,7 +19,7 @@ defmodule Screens.V2.ScreenAudioData do
     {:ok, now} = DateTime.shift_zone(now, "America/New_York")
 
     case config do
-      %Screen{app_params: %app{}} when app not in [BusShelter] ->
+      %Screen{app_params: %app{}} when app not in [BusShelter, PreFare] ->
         :error
 
       %Screen{app_params: %_app{audio: audio}} ->

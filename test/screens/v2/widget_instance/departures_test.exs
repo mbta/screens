@@ -561,9 +561,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   end
 
   describe "audio_sort_key/1" do
-    test "returns 1" do
+    test "returns [1]" do
       instance = %Departures{}
-      assert 1 == WidgetInstance.audio_sort_key(instance)
+      assert [1] == WidgetInstance.audio_sort_key(instance)
     end
   end
 

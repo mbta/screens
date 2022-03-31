@@ -48,7 +48,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       %{sections: Enum.map(section_data, &Departures.audio_serialize_section(&1, screen))}
     end
 
-    def audio_sort_key(_instance), do: 1
+    def audio_sort_key(_instance), do: [1]
 
     def audio_valid_candidate?(_instance), do: true
 
