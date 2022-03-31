@@ -750,9 +750,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns false" do
+    test "returns true" do
       instance = %ReconstructedAlert{}
-      refute WidgetInstance.audio_valid_candidate?(instance)
+      assert WidgetInstance.audio_valid_candidate?(instance)
     end
   end
 
