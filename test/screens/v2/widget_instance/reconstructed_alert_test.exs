@@ -30,7 +30,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget
       | screen: %{
           widget.screen
-          | app_params: struct(app_config_module, %{header: %CurrentStopId{stop_id: stop_id}})
+          | app_params: struct(app_config_module, %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}})
         }
     }
   end

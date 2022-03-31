@@ -231,7 +231,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   def home_stop_id(%{
-        screen: %Screen{app_params: %app{header: %CurrentStopId{stop_id: stop_id}}}
+        screen: %Screen{app_params: %app{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}}}
       })
       when app in [PreFare] do
     stop_id
