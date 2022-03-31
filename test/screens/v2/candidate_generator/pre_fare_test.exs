@@ -17,7 +17,8 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
           %V2.FullLineMap{
             asset_path: "test/path"
           }
-        ]
+        ],
+        reconstructed_alert_widget: %V2.Header.CurrentStopId{stop_id: "place-gover"}
       },
       vendor: :gds,
       device_id: "TEST",
