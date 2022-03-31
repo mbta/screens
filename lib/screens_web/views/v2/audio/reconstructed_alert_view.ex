@@ -48,32 +48,56 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
   end
 
   defp render_affected_routes(routes) do
-    case parse_routes(routes) do
-      lines when length(lines) == 1 -> hd(lines)
-      [l1, l2] -> "#{l1} and #{l2} line"
-      [l1, l2, l3] -> "#{l1}, #{l2}, and #{l3} line"
+    non_gl_text = get_non_gl_text(routes)
+
+    gl_text = get_gl_text(routes)
+
+    cond do
+      String.length(non_gl_text) == 0 -> gl_text
+      String.length(gl_text) == 0 -> gl_text
+      true -> non_gl_text <> " and " <> gl_text
     end
   end
 
-  defp parse_routes(routes) do
-    # non_gl_lines = Enum.reject(routes, &(&1.color == :green))
-
-    # case length(non_gl_lines) do
-    #   1 ->
-    # end
-
+  # Builds the text for GL as long as at least one branch is not affected.
+  # Uses hd() because there will only ever be one GL item in routes.
+  defp get_gl_text(routes) do
     routes
-    |> Enum.sort_by(fn
-      %{branches: _} -> 1
-      _ -> 0
-    end)
+    |> Enum.filter(&(&1.color == :green and length(&1.branches) < 4))
     |> Enum.map(fn
       %{branches: [branch]} -> "Green Line: #{branch} Branch"
       %{branches: [b1, b2]} -> "Green Line: #{b1} and #{b2} Branches"
       %{branches: [b1, b2, b3]} -> "Green Line: #{b1}, #{b2}, and #{b3} Branches"
-      %{branches: _branches} -> "Green Line"
-      %{color: color} -> "#{color} Line"
     end)
+    |> hd()
+  end
+
+  # Builds the text for non-GL lines and/or GL where all branches are affected.
+  defp get_non_gl_text(routes) do
+    non_gl_lines =
+      routes
+      |> Enum.reject(&(&1.color == :green and length(&1.branches) < 4))
+      |> Enum.map(fn %{color: color} -> color end)
+
+    case non_gl_lines do
+      [route] ->
+        "#{route.color} Line"
+
+      routes when length(routes) == 2 ->
+        joined_text =
+          routes
+          |> Enum.join(" and ")
+
+        joined_text <> " Lines"
+
+      routes when length(routes) > 2 ->
+        all_but_last =
+          routes
+          |> Enum.take(length(routes) - 1)
+          |> Enum.join(", ")
+
+        all_but_last <> ", and #{List.last(routes)} Lines"
+    end
   end
 
   defp render_additional_info_for_effect(effect) do
