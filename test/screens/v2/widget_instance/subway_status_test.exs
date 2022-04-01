@@ -388,23 +388,26 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns empty string" do
-      instance = %SubwayStatus{}
-      assert %{} == WidgetInstance.audio_serialize(instance)
+    test "returns same result as serialize/1" do
+      instance = %SubwayStatus{
+        subway_alerts: []
+      }
+
+      assert WidgetInstance.serialize(instance) == WidgetInstance.audio_serialize(instance)
     end
   end
 
   describe "audio_sort_key/1" do
-    test "returns [0]" do
+    test "returns [1]" do
       instance = %SubwayStatus{}
-      assert [0] == WidgetInstance.audio_sort_key(instance)
+      assert [1] == WidgetInstance.audio_sort_key(instance)
     end
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns false" do
+    test "returns true" do
       instance = %SubwayStatus{}
-      refute WidgetInstance.audio_valid_candidate?(instance)
+      assert WidgetInstance.audio_valid_candidate?(instance)
     end
   end
 
