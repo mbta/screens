@@ -11,9 +11,10 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
       |> Enum.all?(&(&1 == "Normal Service"))
 
     if all_normal do
-      ~E|All lines have normal service.|
+      ~E|<%= render_intro() %>: All lines have normal service.|
     else
       ~E|
+        <p><%= render_intro() %></p>
         <p><%= render_route(blue) %></p>
         <p><%= render_route(orange) %></p>
         <p><%= render_route(red) %></p>
@@ -22,6 +23,8 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
         |
     end
   end
+
+  defp render_intro, do: "Subway service overview"
 
   defp render_route(%{route: %{color: color}, status: status} = route) do
     "#{color} line: #{status}: #{render_location(route)}"
