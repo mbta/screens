@@ -57,6 +57,8 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     render_health_check(unaffected_branches)
   end
 
+  defp render_gl_branch_health_check(_), do: ""
+
   defp render_health_check(["Green-" <> unaffected_branch]),
     do: "Green Line #{unaffected_branch}: Normal Service"
 
