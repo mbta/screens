@@ -3,14 +3,24 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
-  def render("_widget.ssml", %{blue: blue, orange: orange, red: red, green: green}) do
-    ~E|
-    <p><%= render_route(blue) %></p>
-    <p><%= render_route(orange) %></p>
-    <p><%= render_route(red) %></p>
-    <p><%= render_green_line(green) %></p>
-    <p><%= render_gl_branch_health_check(green) %></p>
-    |
+  def render("_widget.ssml", %{blue: blue, orange: orange, red: red, green: green} = instance) do
+    all_normal =
+      instance
+      |> Map.values()
+      |> Enum.map(fn %{status: status} -> status end)
+      |> Enum.all?(&(&1 == "Normal Service"))
+
+    if all_normal do
+      ~E|All lines have normal service.|
+    else
+      ~E|
+        <p><%= render_route(blue) %></p>
+        <p><%= render_route(orange) %></p>
+        <p><%= render_route(red) %></p>
+        <p><%= render_green_line(green) %></p>
+        <p><%= render_gl_branch_health_check(green) %></p>
+        |
+    end
   end
 
   defp render_route(%{route: %{color: color}, status: status} = route) do
