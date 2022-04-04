@@ -81,8 +81,24 @@ defmodule Screens.RoutePatterns.RoutePattern do
 
     case get_json_fn.("route_patterns", params) do
       {:ok, result} ->
-        {:ok, get_stop_sequences_from_result(result),
-         get_platform_to_station_map_from_result(result)}
+        platform_to_station_map = get_platform_to_station_map_from_result(result)
+
+        station_sequences =
+          result
+          |> get_stop_sequences_from_result()
+          |> Enum.map(fn stop_sequence ->
+            stop_sequence
+            |> Enum.map(fn stop ->
+              case Map.fetch(platform_to_station_map, stop) do
+                {:ok, parent_stop} -> parent_stop
+                :error -> nil
+              end
+            end)
+          end)
+          # Dedup the stop sequences (both directions are listed, but we only need 1)
+          |> Enum.uniq_by(&MapSet.new/1)
+
+        {:ok, station_sequences}
 
       _ ->
         :error

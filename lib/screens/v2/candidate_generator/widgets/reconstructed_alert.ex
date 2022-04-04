@@ -27,22 +27,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     with {:ok, routes_at_stop} <- fetch_routes_by_stop_fn.(stop_id, now, [0, 1]),
          route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids_at_stop),
-         {:ok, stop_sequences, platform_to_station_map} <-
+         {:ok, station_sequences} <-
            fetch_stop_sequences_by_stop_fn.(stop_id, route_ids_at_stop) do
-      station_sequences =
-        stop_sequences
-        |> Enum.map(fn stop_sequence ->
-          stop_sequence
-          |> Enum.map(fn stop ->
-            case Map.fetch(platform_to_station_map, stop) do
-              {:ok, parent_stop} -> parent_stop
-              :error -> nil
-            end
-          end)
-        end)
-        # Dedup the stop sequences (both directions are listed, but we only need 1)
-        |> Enum.uniq_by(&MapSet.new/1)
-
       alerts
       |> Enum.filter(&relevant?(&1, config, station_sequences, routes_at_stop))
       |> Enum.map(fn alert ->

@@ -74,24 +74,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         %Alert{id: "5", effect: :stop_closure, informed_entities: [ie(stop: "place-rvrwy")]}
       ]
 
-      stop_sequences = [
-        ["70260", "70258", "70256", "70254"],
-        ["70253", "70255", "70257", "70260"]
-      ]
-
       station_sequences = [
         ["place-hsmnl", "place-bckhl", "place-rvrwy", "place-mispk"]
       ]
-
-      platform_to_station_map = %{
-        "70260" => "place-hsmnl",
-        "70258" => "place-bckhl",
-        "70256" => "place-rvrwy",
-        "70254" => "place-mispk",
-        "70253" => "place-mispk",
-        "70255" => "place-rvrwy",
-        "70257" => "place-bckhl"
-      }
 
       %{
         config: config,
@@ -101,7 +86,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         now: ~U[2021-01-01T00:00:00Z],
         fetch_routes_by_stop_fn: fn _, _, _ -> {:ok, routes_at_stop} end,
         fetch_parent_station_sequences_through_stop_fn: fn _, _ ->
-          {:ok, stop_sequences, platform_to_station_map}
+          {:ok, station_sequences}
         end,
         fetch_alerts_fn: fn _ -> {:ok, alerts} end,
         x_fetch_routes_by_stop_fn: fn _, _, _ -> :error end,
