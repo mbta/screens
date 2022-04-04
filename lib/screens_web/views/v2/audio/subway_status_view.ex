@@ -7,7 +7,10 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     all_normal =
       instance
       |> Map.values()
-      |> Enum.map(fn %{status: status} -> status end)
+      |> Enum.map(fn
+        %{status: status} -> status
+        _ -> ""
+      end)
       |> Enum.all?(&(&1 == "Normal Service"))
 
     if all_normal do
