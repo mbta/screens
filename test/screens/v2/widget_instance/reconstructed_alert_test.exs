@@ -241,7 +241,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{color: :red, text: "RL", type: :text}
         ],
         effect: :suspension,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -266,7 +268,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{color: :red, text: "RL", type: :text}
         ],
         effect: :shuttle,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -291,7 +295,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{color: :red, text: "RL", type: :text}
         ],
         effect: :station_closure,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -316,7 +322,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{color: :red, text: "RL", type: :text}
         ],
         effect: :suspension,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -341,7 +349,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -362,7 +372,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :shuttle,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -383,7 +395,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :station_closure,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -406,7 +420,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :moderate_delay,
-        urgent: false
+        urgent: false,
+        region: :inside,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -428,7 +444,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -450,7 +468,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "due to construction",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
-        urgent: true
+        urgent: true,
+        region: :inside,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -476,7 +496,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
-        urgent: true
+        urgent: true,
+        region: :boundary,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -498,7 +520,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :shuttle,
-        urgent: true
+        urgent: true,
+        region: :boundary,
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -522,7 +546,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :moderate_delay,
-        urgent: false
+        urgent: false,
+        region: :boundary,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -545,7 +571,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
-        urgent: true
+        urgent: true,
+        region: :boundary,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -568,7 +596,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "due to construction",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :severe_delay,
-        urgent: true
+        urgent: true,
+        region: :boundary,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -591,7 +621,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
-        urgent: false
+        urgent: false,
+        region: :outside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -610,7 +642,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :shuttle,
-        urgent: false
+        urgent: false,
+        region: :outside,
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -635,7 +669,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{color: :red, text: "RL", type: :text}
         ],
         effect: :station_closure,
-        urgent: false
+        urgent: false,
+        region: :outside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -657,7 +693,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :delay,
-        urgent: false
+        urgent: false,
+        region: :outside,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -682,7 +720,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{color: :red, text: "RL", type: :text}
         ],
         effect: :station_closure,
-        urgent: false
+        urgent: false,
+        region: :outside,
+        remedy: "Please seek an alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -696,23 +736,82 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns empty string" do
-      instance = %ReconstructedAlert{}
-      assert %{} == WidgetInstance.audio_serialize(instance)
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
+
+    test "returns same result as serialize/1", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-alfcl", route: "Red"),
+          ie(stop: "place-alfcl", route: "Orange")
+        ])
+        |> put_cause(:construction)
+
+      assert WidgetInstance.serialize(widget) == WidgetInstance.audio_serialize(widget)
     end
   end
 
   describe "audio_sort_key/1" do
-    test "returns [0]" do
-      instance = %ReconstructedAlert{}
-      assert [0] == WidgetInstance.audio_sort_key(instance)
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
+
+    test "returns [2] when alert is urgent", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:unknown)
+
+      assert [2] == WidgetInstance.audio_sort_key(widget)
+    end
+
+    test "returns [2, 1] when alert is not urgent", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-alfcl", route: "Red"),
+          ie(stop: "place-alfcl", route: "Orange")
+        ])
+        |> put_cause(:construction)
+
+      assert [2, 1] == WidgetInstance.audio_sort_key(widget)
+    end
+
+    test "returns [2, 2] when alert effect is :moderate_delay", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:unknown)
+        |> put_severity(5)
+        |> put_alert_header("Test Alert")
+
+      assert [2, 2] == WidgetInstance.audio_sort_key(widget)
+    end
+
+    test "returns [2, 2] when alert effect is :delay", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-alfcl", route: "Red")
+        ])
+        |> put_cause(:unknown)
+        |> put_alert_header("Test Alert")
+
+      assert [2, 2] == WidgetInstance.audio_sort_key(widget)
     end
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns false" do
+    test "returns true" do
       instance = %ReconstructedAlert{}
-      refute WidgetInstance.audio_valid_candidate?(instance)
+      assert WidgetInstance.audio_valid_candidate?(instance)
     end
   end
 

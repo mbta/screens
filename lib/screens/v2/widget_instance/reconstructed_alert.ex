@@ -50,7 +50,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     power_problem: "a power issue",
     signal_problem: "a signal problem",
     snow: "snow conditions",
-    special_event: "special event",
+    special_event: "a special event",
     switch_problem: "a switch problem",
     track_problem: "a track problem",
     traffic: "traffic",
@@ -115,6 +115,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: FreeTextLine.to_json(issue),
+      remedy: "Please seek an alternate route",
       location: location_text,
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -147,6 +148,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: FreeTextLine.to_json(issue),
+      remedy: "Use shuttle bus",
       location: location_text,
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -165,6 +167,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Station Closed",
+      remedy: "Please seek an alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -187,6 +190,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "No trains",
+      remedy: "Please seek an alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -203,6 +207,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "No trains",
+      remedy: "Use shuttle bus",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -223,12 +228,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     line =
       case affected_routes do
-        ["Green-" <> branch | _] -> "Green Line #{branch}"
+        ["Green-" <> branch | _] -> "Green Line #{branch} branch"
         [affected_line | _] -> "#{affected_line} line"
       end
 
     %{
       issue: "#{line} platform closed",
+      remedy: "Please seek an alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -249,6 +255,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: header,
+      remedy: "",
       location: "",
       cause: "",
       routes: get_route_pills(affected_routes),
@@ -277,6 +284,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Trains may be delayed #{duration_text}",
+      remedy: "",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -305,6 +313,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
+        remedy: "Please seek an alternate route",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -324,6 +333,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
+        remedy: "Please seek an alternate route",
         location: "",
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -345,6 +355,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
+        remedy: "Use shuttle bus",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -364,6 +375,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
+        remedy: "Use shuttle bus",
         location: "",
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -387,6 +399,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: header,
+      remedy: "",
       location: "",
       cause: "",
       routes: get_route_pills(affected_routes),
@@ -408,6 +421,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
+        remedy: "",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -434,6 +448,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
+        remedy: "",
         location: "",
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -455,6 +470,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
+        remedy: "Please seek an alternate route",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -475,6 +491,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
+        remedy: "Please seek an alternate route",
         location: location_text,
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -494,6 +511,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
+        remedy: "Use shuttle bus",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -514,6 +532,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
+        remedy: "Use shuttle bus",
         location: location_text,
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -538,6 +557,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Trains will bypass #{station}",
+      remedy: "Please seek an alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -551,6 +571,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: header,
+      remedy: "",
       location: "",
       cause: "",
       routes: get_route_pills(affected_routes),
@@ -603,13 +624,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def serialize(%__MODULE__{} = t) do
     case BaseAlert.location(t) do
       :inside ->
-        serialize_inside_alert(t)
+        t |> serialize_inside_alert() |> Map.put(:region, :inside)
 
       location when location in [:boundary_upstream, :boundary_downstream] ->
-        serialize_boundary_alert(t)
+        t |> serialize_boundary_alert() |> Map.put(:region, :boundary)
 
       location when location in [:downstream, :upstream] ->
-        serialize_outside_alert(t)
+        t |> serialize_outside_alert() |> Map.put(:region, :outside)
+    end
+  end
+
+  def audio_sort_key(%__MODULE__{} = t) do
+    case serialize(t) do
+      %{urgent: true} -> [2]
+      %{effect: effect} when effect in [:moderate_delay, :delay] -> [2, 2]
+      _ -> [2, 1]
     end
   end
 
@@ -630,9 +659,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def slot_names(t), do: ReconstructedAlert.slot_names(t)
     def widget_type(t), do: ReconstructedAlert.widget_type(t)
     def valid_candidate?(_instance), do: true
-    def audio_serialize(_instance), do: %{}
-    def audio_sort_key(_instance), do: [0]
-    def audio_valid_candidate?(_instance), do: false
+    def audio_serialize(t), do: ReconstructedAlert.serialize(t)
+    def audio_sort_key(t), do: ReconstructedAlert.audio_sort_key(t)
+    def audio_valid_candidate?(_instance), do: true
     def audio_view(_instance), do: ScreensWeb.V2.Audio.ReconstructedAlertView
   end
 end
