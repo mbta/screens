@@ -64,4 +64,6 @@ In English:
 - sort them by their "audio sort key",
 - and serialize all audio widgets' data for SSML rendering.
 
+(All code is added inline in the above example, but it might help to break it out into its own function for readability.)
+
 All other framework logic will remain unchanged.
