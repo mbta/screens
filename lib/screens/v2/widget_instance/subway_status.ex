@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
+  alias Screens.Config.V2.PreFare
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.SubwayStatus
 
@@ -53,7 +54,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
     def audio_sort_key(_instance), do: [1]
 
-    def audio_valid_candidate?(_instance), do: true
+    def audio_valid_candidate?(%{screen: %Screen{app_params: %PreFare{}}}), do: true
+    def audio_valid_candidate?(_instance), do: false
 
     def audio_view(_instance), do: ScreensWeb.V2.Audio.SubwayStatusView
   end
