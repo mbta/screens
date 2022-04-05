@@ -24,7 +24,7 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusView do
   end
 
   defp render_active_at_home(pages) do
-    if length(pages) == 0 do
+    if Enum.empty?(pages) do
       "All elevators are working at this station."
     else
       Enum.map(pages, &render_page/1)
