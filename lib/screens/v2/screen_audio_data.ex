@@ -4,6 +4,7 @@ defmodule Screens.V2.ScreenAudioData do
   alias Screens.Config.Screen
   alias Screens.Config.V2.{Audio, BusShelter, PreFare}
   alias Screens.V2.ScreenData
+  alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.WidgetInstance
 
   @type screen_id :: String.t()
@@ -24,11 +25,15 @@ defmodule Screens.V2.ScreenAudioData do
 
       %Screen{app_params: %_app{audio: audio}} ->
         if date_in_range?(audio, now) do
+          candidate_generator = Parameters.get_candidate_generator(config)
+
           config
           |> fetch_data_fn.()
           |> elem(1)
           |> Map.values()
           |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
+          |> Enum.sort_by(&WidgetInstance.audio_sort_key/1)
+          |> candidate_generator.insert_global_audio_instances(config)
           |> Enum.sort_by(&WidgetInstance.audio_sort_key/1)
           |> Enum.map(&{WidgetInstance.audio_view(&1), WidgetInstance.audio_serialize(&1)})
         else

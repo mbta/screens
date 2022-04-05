@@ -67,6 +67,9 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
+  @impl CandidateGenerator
+  def insert_global_audio_instances(widgets, _config), do: widgets
+
   defp header_instances(config, now, fetch_stop_name_fn) do
     %Screen{app_params: %BusShelter{header: header_config}} = config
 

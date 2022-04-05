@@ -73,6 +73,9 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
+  @impl CandidateGenerator
+  def insert_global_audio_instances(widgets, _config), do: widgets
+
   defp header_instances(config, now) do
     %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}} = config
 

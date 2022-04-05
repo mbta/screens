@@ -37,6 +37,9 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
+  @impl CandidateGenerator
+  def insert_global_audio_instances(widgets, _config), do: widgets
+
   defp header_instances(config, now) do
     %Screen{
       app_params: %SolariLarge{header: %CurrentStopName{stop_name: stop_name}}
