@@ -35,6 +35,10 @@ Each module that adopts the `CandidateGenerator` behaviour must define `insert_g
 ### WidgetInstance
 Global audio `WidgetInstance` module files will live in the namespace `Screens.V2.WidgetInstance.GlobalAudio`. E.g. `Screens.V2.WidgetInstance.GlobalAudio.AlertsSummary`.
 
+Global audio `WidgetInstance` defs will behave about the same as other modules implementing the `WidgetInstance` protocol, but in most cases their struct will have a `widgets_snapshot` field that receives the list of normal widgets with defined audio equivalence.
+
+They can do whatever they need to with that list, but ideally would not dig too deeply into any of the widgets within, since the intended use case is producing summary content.
+
 #### Differences from normal widgets
 - These widgets get to have insight into other normal widgets. When instantiated, they are passed a snapshot of the entire list of normal `WidgetInstance` structs that made it onto the screen and have defined audio equivalence. While this breaks the rule of keeping widgets' data isolated, it's necessary in order to build "summary" content in the readout.
 - While these audio-only widgets will still implement the `WidgetInstance` protocol on the backend, their visual-specific callbacks like `priority/1` and `serialize/1` will never be called. Only the audio-specific callbacks will be called. We prefer to implement them this way for consistency with the rest of the framework.
