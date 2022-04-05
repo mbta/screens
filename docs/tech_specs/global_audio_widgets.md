@@ -33,7 +33,7 @@ and return a new list with global audio widgets inserted at any location(s) with
 Each module that adopts the `CandidateGenerator` behaviour must define `insert_global_audio_instances/2`. In most cases, it will return the input list unchanged: `def insert_global_audio_instances(widgets, _config), do: widgets`.
 
 ### WidgetInstance
-Global audio `WidgetInstance` module files will live in the namespace
+Global audio `WidgetInstance` module files will live in the namespace `Screens.V2.WidgetInstance.GlobalAudio`. E.g. `Screens.V2.WidgetInstance.GlobalAudio.AlertsSummary`.
 
 #### Differences from normal widgets
 - These widgets get to have insight into other normal widgets. When instantiated, they are passed a snapshot of the entire list of normal `WidgetInstance` structs that made it onto the screen and have defined audio equivalence. While this breaks the rule of keeping widgets' data isolated, it's necessary in order to build "summary" content in the readout.
