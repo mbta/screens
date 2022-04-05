@@ -25,15 +25,12 @@ defmodule Screens.V2.ScreenAudioData do
 
       %Screen{app_params: %_app{audio: audio}} ->
         if date_in_range?(audio, now) do
-          candidate_generator = Parameters.get_candidate_generator(config)
-
           config
           |> fetch_data_fn.()
           |> elem(1)
           |> Map.values()
           |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
-          |> Enum.sort_by(&WidgetInstance.audio_sort_key/1)
-          |> candidate_generator.insert_global_audio_instances(config)
+          |> then(&(&1 ++ get_audio_only_instances(&1, config)))
           |> Enum.sort_by(&WidgetInstance.audio_sort_key/1)
           |> Enum.map(&{WidgetInstance.audio_view(&1), WidgetInstance.audio_serialize(&1)})
         else
@@ -58,6 +55,15 @@ defmodule Screens.V2.ScreenAudioData do
       %Screen{app_params: %_app{audio: audio}} ->
         {:ok, get_volume(audio, now)}
     end
+  end
+
+  defp get_audio_only_instances(visual_widgets_with_audio_equivalence, config) do
+    candidate_generator = Parameters.get_candidate_generator(config)
+
+    candidate_generator.audio_only_instances(
+      visual_widgets_with_audio_equivalence,
+      config
+    )
   end
 
   defp get_volume(

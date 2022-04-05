@@ -82,7 +82,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   end
 
   @impl CandidateGenerator
-  def insert_global_audio_instances(widgets, _config), do: widgets
+  def audio_only_instances(_widgets, _config), do: []
 
   def line_map_instances(
         %Screen{

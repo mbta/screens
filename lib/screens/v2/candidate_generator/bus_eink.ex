@@ -63,7 +63,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
   end
 
   @impl CandidateGenerator
-  def insert_global_audio_instances(widgets, _config), do: widgets
+  def audio_only_instances(_widgets, _config), do: []
 
   defp header_instances(config, now, fetch_stop_name_fn) do
     %Screen{app_params: %BusEink{header: %CurrentStopId{stop_id: stop_id}}} = config

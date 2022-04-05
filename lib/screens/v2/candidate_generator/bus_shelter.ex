@@ -68,7 +68,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   end
 
   @impl CandidateGenerator
-  def insert_global_audio_instances(widgets, _config), do: widgets
+  def audio_only_instances(_widgets, _config), do: []
 
   defp header_instances(config, now, fetch_stop_name_fn) do
     %Screen{app_params: %BusShelter{header: header_config}} = config

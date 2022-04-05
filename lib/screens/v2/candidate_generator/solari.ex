@@ -38,7 +38,7 @@ defmodule Screens.V2.CandidateGenerator.Solari do
   end
 
   @impl CandidateGenerator
-  def insert_global_audio_instances(widgets, _config), do: widgets
+  def audio_only_instances(_widgets, _config), do: []
 
   defp header_instances(config, now) do
     %Screen{app_params: %Solari{header: %CurrentStopName{stop_name: stop_name}}} = config
