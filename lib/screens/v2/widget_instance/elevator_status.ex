@@ -487,11 +487,55 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   def valid_candidate?(_instance), do: true
 
-  def audio_serialize(_instance), do: %{}
+  def audio_serialize(t) do
+    %{pages: pages} = serialize(t)
+
+    active_at_home_pages =
+      Enum.filter(pages, fn
+        %DetailPage{
+          station: %{
+            is_at_home_stop: true,
+            elevator_closures: [%{timeframe: %{happening_now: true}}]
+          }
+        } ->
+          true
+
+        _ ->
+          false
+      end)
+
+    list_pages =
+      Enum.filter(pages, fn
+        %ListPage{stations: _} -> true
+        _ -> false
+      end)
+
+    upcoming_pages =
+      Enum.filter(pages, fn
+        %DetailPage{station: %{elevator_closures: [%{timeframe: %{happening_now: false}}]}} ->
+          true
+
+        _ ->
+          false
+      end)
+
+    elsewhere_pages =
+      Enum.filter(pages, fn
+        %DetailPage{station: %{is_at_home_stop: false}} -> true
+        _ -> false
+      end)
+
+    %{
+      active_at_home_pages: active_at_home_pages,
+      list_pages: list_pages,
+      upcoming_at_home_pages: upcoming_pages,
+      elsewhere_pages: elsewhere_pages
+    }
+  end
 
   def audio_sort_key(_instance), do: [0]
 
-  def audio_valid_candidate?(_instance), do: false
+  def audio_valid_candidate?(_instance), do: true
 
   def audio_view(_instance), do: ScreensWeb.V2.Audio.ElevatorStatusView
 
