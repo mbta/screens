@@ -5,6 +5,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   alias Screens.Config.Screen
   alias Screens.Config.V2.{ElevatorStatus, PreFare}
   alias Screens.RoutePatterns.RoutePattern
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.ElevatorStatus, as: ElevatorStatusWidget
 
@@ -16,8 +17,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
         } = config,
         now
       ) do
-    with {:ok, stop_sequences} <-
-           RoutePattern.fetch_stop_sequences_through_stop(parent_station_id),
+    with {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(parent_station_id, now, [0, 1]),
+         route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
+         {:ok, stop_sequences} <-
+           RoutePattern.fetch_parent_station_sequences_through_stop(
+             parent_station_id,
+             route_ids_at_stop
+           ),
          {:ok, parent_station_map} <- Stop.fetch_parent_station_name_map(),
          {:ok, elevator_closures, facility_id_to_name} <- fetch_elevator_closures() do
       icon_map = get_icon_map(elevator_closures, parent_station_id)
