@@ -160,8 +160,6 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
       |> Enum.uniq()
       |> Enum.sort()
 
-    import MapSet, only: [equal?: 2, new: 1]
-
     get_location_atom(informed_zones_set, t.alert.effect)
   end
 
@@ -199,7 +197,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
        when informed_zones_set == [:downstream, :upstream],
        do: :downstream
 
-  defp get_location_atom(one, two), do: :elsewhere
+  defp get_location_atom(_, _), do: :elsewhere
 
   def active?(%{alert: alert, now: now}, happening_now? \\ &Alert.happening_now?/2) do
     happening_now?.(alert, now)
