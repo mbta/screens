@@ -1437,20 +1437,173 @@ defmodule WidgetInstance.ElevatorStatusTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns empty map", %{one_active_at_home_instance: instance} do
-      assert %{} == WidgetInstance.audio_serialize(instance)
+    test "returns map with grouped results from serialize/1", %{
+      one_active_at_home_many_active_elsewhere_instance: instance
+    } do
+      expected_result = %{
+        active_at_home_pages: [
+          %WidgetInstance.ElevatorStatus.DetailPage{
+            station: %{
+              elevator_closures: [
+                %{
+                  description: nil,
+                  elevator_id: "1",
+                  elevator_name: "Elevator 1",
+                  header_text: nil,
+                  timeframe: %{
+                    active_period: %{
+                      "end" => "2022-01-01T22:00:00Z",
+                      "start" => "2022-01-01T00:00:00Z"
+                    },
+                    happening_now: true
+                  }
+                }
+              ],
+              icons: [:red],
+              is_at_home_stop: true,
+              name: "Foo Station"
+            }
+          }
+        ],
+        list_pages: [
+          %WidgetInstance.ElevatorStatus.ListPage{
+            stations: [
+              %{
+                elevator_closures: [
+                  %{
+                    description: nil,
+                    elevator_id: "2",
+                    elevator_name: "Elevator 2",
+                    header_text: nil,
+                    timeframe: %{
+                      active_period: %{
+                        "end" => "2022-01-01T22:00:00Z",
+                        "start" => "2022-01-01T00:00:00Z"
+                      },
+                      happening_now: true
+                    }
+                  },
+                  %{
+                    description: nil,
+                    elevator_id: "6",
+                    elevator_name: "Elevator 6",
+                    header_text: nil,
+                    timeframe: %{
+                      active_period: %{
+                        "end" => "2022-01-01T22:00:00Z",
+                        "start" => "2022-01-01T00:00:00Z"
+                      },
+                      happening_now: true
+                    }
+                  }
+                ],
+                icons: [:red, :orange, :bus],
+                is_at_home_stop: false,
+                name: "Bar Station"
+              },
+              %{
+                elevator_closures: [
+                  %{
+                    description: nil,
+                    elevator_id: "3",
+                    elevator_name: "Elevator 3",
+                    header_text: nil,
+                    timeframe: %{
+                      active_period: %{
+                        "end" => "2022-01-01T22:00:00Z",
+                        "start" => "2022-01-01T00:00:00Z"
+                      },
+                      happening_now: true
+                    }
+                  },
+                  %{
+                    description: nil,
+                    elevator_id: "7",
+                    elevator_name: "Elevator 7",
+                    header_text: nil,
+                    timeframe: %{
+                      active_period: %{
+                        "end" => "2022-01-01T22:00:00Z",
+                        "start" => "2022-01-01T00:00:00Z"
+                      },
+                      happening_now: true
+                    }
+                  }
+                ],
+                icons: [:green],
+                is_at_home_stop: false,
+                name: "Baz Station"
+              }
+            ]
+          },
+          %WidgetInstance.ElevatorStatus.ListPage{
+            stations: [
+              %{
+                elevator_closures: [
+                  %{
+                    description: nil,
+                    elevator_id: "4",
+                    elevator_name: "Elevator 4",
+                    header_text: nil,
+                    timeframe: %{
+                      active_period: %{
+                        "end" => "2022-01-01T22:00:00Z",
+                        "start" => "2022-01-01T00:00:00Z"
+                      },
+                      happening_now: true
+                    }
+                  },
+                  %{
+                    description: nil,
+                    elevator_id: "8",
+                    elevator_name: "Elevator 8",
+                    header_text: nil,
+                    timeframe: %{
+                      active_period: %{
+                        "end" => "2022-01-01T22:00:00Z",
+                        "start" => "2022-01-01T00:00:00Z"
+                      },
+                      happening_now: true
+                    }
+                  },
+                  %{
+                    description: nil,
+                    elevator_id: "9",
+                    elevator_name: "Elevator 9",
+                    header_text: nil,
+                    timeframe: %{
+                      active_period: %{
+                        "end" => "2022-01-01T22:00:00Z",
+                        "start" => "2022-01-01T00:00:00Z"
+                      },
+                      happening_now: true
+                    }
+                  }
+                ],
+                icons: [:green],
+                is_at_home_stop: false,
+                name: "Qux Station"
+              }
+            ]
+          }
+        ],
+        upcoming_at_home_pages: [],
+        elsewhere_pages: []
+      }
+
+      assert expected_result == WidgetInstance.audio_serialize(instance)
     end
   end
 
   describe "audio_sort_key/1" do
-    test "returns [0]", %{one_active_at_home_instance: instance} do
-      assert [0] == WidgetInstance.audio_sort_key(instance)
+    test "returns [3]", %{one_active_at_home_instance: instance} do
+      assert [3] == WidgetInstance.audio_sort_key(instance)
     end
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns false", %{one_active_at_home_instance: instance} do
-      refute WidgetInstance.audio_valid_candidate?(instance)
+    test "returns true", %{one_active_at_home_instance: instance} do
+      assert WidgetInstance.audio_valid_candidate?(instance)
     end
   end
 
