@@ -35,7 +35,7 @@ import SubwayStatus from "Components/v2/subway_status";
 import EvergreenContent from "Components/v2/evergreen_content";
 import Survey from "Components/v2/survey";
 
-import NoData from "Components/v2/bus_shelter/no_data";
+import NoData from "Components/v2/lcd/no_data";
 import DeparturesNoData from "Components/v2/bus_shelter/departures_no_data";
 
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/bus_shelter/alert";
