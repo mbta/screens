@@ -32,6 +32,7 @@ import ElevatorStatus from "Components/v2/elevator_status";
 import FullLineMap from "Components/v2/full_line_map";
 import SubwayStatus from "Components/v2/subway_status";
 import ReconstructedAlert from "Components/v2/reconstructed_alert";
+import NoData from "Components/v2/pre_fare/no_data";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -51,6 +52,7 @@ const TYPE_TO_COMPONENT = {
   full_line_map: FullLineMap,
   subway_status: SubwayStatus,
   reconstructed_alert: ReconstructedAlert,
+  no_data: NoData,
 };
 
 const DISABLED_LAYOUT = {
