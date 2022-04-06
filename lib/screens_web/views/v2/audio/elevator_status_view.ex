@@ -86,11 +86,13 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusView do
 
   defp render_timeframe(%{
          happening_now: false,
-         active_period: %{"start" => start_dt_string, "end" => end_dt_string}
+         active_period: %{"start" => start_dt, "end" => end_dt}
        }) do
-    {:ok, start_dt, _} = DateTime.from_iso8601(start_dt_string)
-    {:ok, end_dt, _} = DateTime.from_iso8601(end_dt_string)
+    ~E|<%= render_datetime(start_dt) %> through <%= render_datetime(end_dt) %>|
+  end
 
-    ~E|<%= Calendar.strftime(start_dt, "%B %d") %> through <%= Calendar.strftime(end_dt, "%B %d") %>|
+  defp render_datetime(dt_string) do
+    {:ok, dt, _} = DateTime.from_iso8601(dt_string)
+    Calendar.strftime(dt, "%B %d")
   end
 end
