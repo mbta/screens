@@ -733,7 +733,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
     test "returns reconstructed_alert", %{widget: widget} do
-      assert :reconstructed_large_alert== WidgetInstance.widget_type(widget)
+      assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
     end
   end
 

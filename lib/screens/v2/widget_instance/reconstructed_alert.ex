@@ -68,7 +68,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         Enum.member?(["Red", "Orange", "Green", "Blue"] ++ @green_line_branches, e)
       end)
       |> Enum.uniq()
-      # |> Enum.sort()
+
+    # |> Enum.sort()
 
     # If the routes contain all the Green branches, consolidate to just Green Line
     if MapSet.subset?(MapSet.new(@green_line_branches), MapSet.new(affected_routes)) do

@@ -165,16 +165,40 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     get_location_atom(informed_zones_set, t.alert.effect)
   end
 
-  defp get_location_atom(informed_zones_set, _) when informed_zones_set==[:upstream], do: :upstream
-  defp get_location_atom(informed_zones_set, _) when informed_zones_set==[:downstream], do: :downstream
-  defp get_location_atom(informed_zones_set, _) when informed_zones_set==[:home_stop], do: :inside
-  defp get_location_atom(informed_zones_set, _) when informed_zones_set==[:downstream, :home_stop, :upstream], do: :inside
+  defp get_location_atom(informed_zones_set, _) when informed_zones_set == [:upstream],
+    do: :upstream
+
+  defp get_location_atom(informed_zones_set, _) when informed_zones_set == [:downstream],
+    do: :downstream
+
+  defp get_location_atom(informed_zones_set, _) when informed_zones_set == [:home_stop],
+    do: :inside
+
+  defp get_location_atom(informed_zones_set, _)
+       when informed_zones_set == [:downstream, :home_stop, :upstream],
+       do: :inside
+
   # If station closure, then a boundary_upstream / _downstream is actually :inside
-  defp get_location_atom(informed_zones_set, effect) when informed_zones_set==[:home_stop, :upstream] and effect === :station_closure, do: :inside
-  defp get_location_atom(informed_zones_set, effect) when informed_zones_set==[:downstream, :home_stop] and effect === :station_closure, do: :inside
-  defp get_location_atom(informed_zones_set, _) when informed_zones_set==[:home_stop, :upstream], do: :boundary_upstream
-  defp get_location_atom(informed_zones_set, _) when informed_zones_set==[:downstream, :home_stop], do: :boundary_downstream
-  defp get_location_atom(informed_zones_set, _) when informed_zones_set==[:downstream, :upstream], do: :downstream
+  defp get_location_atom(informed_zones_set, effect)
+       when informed_zones_set == [:home_stop, :upstream] and effect === :station_closure,
+       do: :inside
+
+  defp get_location_atom(informed_zones_set, effect)
+       when informed_zones_set == [:downstream, :home_stop] and effect === :station_closure,
+       do: :inside
+
+  defp get_location_atom(informed_zones_set, _)
+       when informed_zones_set == [:home_stop, :upstream],
+       do: :boundary_upstream
+
+  defp get_location_atom(informed_zones_set, _)
+       when informed_zones_set == [:downstream, :home_stop],
+       do: :boundary_downstream
+
+  defp get_location_atom(informed_zones_set, _)
+       when informed_zones_set == [:downstream, :upstream],
+       do: :downstream
+
   defp get_location_atom(one, two), do: :elsewhere
 
   def active?(%{alert: alert, now: now}, happening_now? \\ &Alert.happening_now?/2) do
