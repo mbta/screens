@@ -67,7 +67,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
   Assumes that all stop sequences in result are platforms.
   """
   @spec fetch_parent_station_sequences_through_stop(Stop.id(), list(String.t())) ::
-          {:ok, list(list(Stop.id())), map()} | :error
+          {:ok, list(list(Stop.id()))} | :error
   def fetch_parent_station_sequences_through_stop(
         stop_id,
         route_filters,

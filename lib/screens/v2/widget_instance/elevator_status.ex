@@ -209,21 +209,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
          %__MODULE__{now: now, stop_sequences: stop_sequences} = t
        ) do
-    # This assumes platform-level stop IDs are always numeric strings, e.g. "70045"
     informed_platforms =
       for %{stop: stop} when is_binary(stop) <- entities,
-          match?({_n, ""}, Integer.parse(stop)),
+          match?("place-" <> _, stop),
           do: stop
 
+    # Remove parent station so it does not show up as on a connecting line.
     connecting_platform_ids =
-      stop_sequences
-      |> List.flatten()
-      |> MapSet.new()
-      |> MapSet.difference(
-        t
-        |> platform_stop_ids()
-        |> MapSet.new()
-      )
+      stop_sequences |> List.flatten() |> List.delete(parent_station_id(t))
 
     Alert.happening_now?(alert, now) and
       Enum.any?(informed_platforms, &(&1 in connecting_platform_ids))
