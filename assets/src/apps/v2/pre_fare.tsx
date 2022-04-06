@@ -21,7 +21,7 @@ import NormalBody from "Components/v2/pre_fare/normal_body";
 import NormalBodyLeft from "Components/v2/pre_fare/normal_body_left";
 import NormalBodyRight from "Components/v2/pre_fare/normal_body_right";
 import EvergreenContent from "Components/v2/evergreen_content";
-import NormalHeader from "Components/v2/lcd/normal_header";
+import NormalHeader from "Components/v2/pre_fare/normal_header";
 import OneLarge from "Components/v2/pre_fare/flex/one_large";
 import TwoMedium from "Components/v2/pre_fare/flex/two_medium";
 import BodyLeftTakeover from "Components/v2/pre_fare/body_left_takeover";
