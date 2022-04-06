@@ -93,6 +93,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
       %Screens.Routes.Route{type: :subway, id: id} -> id |> String.downcase() |> String.to_atom()
       %Screens.Routes.Route{type: :light_rail, id: "Green-" <> _} -> :green
       %Screens.Routes.Route{type: :light_rail, id: "Mattapan" <> _} -> :mattapan
+      %Screens.Routes.Route{type: :bus, short_name: "SL" <> _} -> :silver
       %Screens.Routes.Route{type: type} -> type
     end)
     |> Enum.uniq()
