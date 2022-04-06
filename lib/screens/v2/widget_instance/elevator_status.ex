@@ -504,7 +504,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           false
       end)
 
-    list_pages = Enum.filter(pages, &match?(%ListPage{}, &1))
+    list_pages =
+      Enum.filter(pages, &match?(%ListPage{}, &1))
+      |> Enum.map(fn list_page ->
+        %{list_page | stations: Enum.reject(list_page.stations, & &1.is_at_home_stop)}
+      end)
 
     upcoming_pages =
       Enum.filter(pages, fn

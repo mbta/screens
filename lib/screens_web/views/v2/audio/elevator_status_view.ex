@@ -65,9 +65,7 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusView do
 
   # List pages
   defp render_page(%{stations: stations}) do
-    stations
-    |> Enum.filter(fn %{is_at_home_stop: is_at_home_stop} -> !is_at_home_stop end)
-    |> Enum.map(&render_list_page_station_row/1)
+    Enum.map(stations, &render_list_page_station_row/1)
   end
 
   defp render_list_page_station_row(%{name: station_name, elevator_closures: elevator_closures}) do
