@@ -1472,26 +1472,6 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
-                    elevator_id: "1",
-                    elevator_name: "Elevator 1",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:red],
-                is_at_home_stop: true,
-                name: "Foo Station"
-              },
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
                     elevator_id: "2",
                     elevator_name: "Elevator 2",
                     header_text: nil,
@@ -1558,26 +1538,6 @@ defmodule WidgetInstance.ElevatorStatusTest do
           },
           %WidgetInstance.ElevatorStatus.ListPage{
             stations: [
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    elevator_id: "1",
-                    elevator_name: "Elevator 1",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:red],
-                is_at_home_stop: true,
-                name: "Foo Station"
-              },
               %{
                 elevator_closures: [
                   %{
