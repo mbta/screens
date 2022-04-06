@@ -209,7 +209,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
          %__MODULE__{now: now, stop_sequences: stop_sequences} = t
        ) do
-    # This assumes platform-level stop IDs are always numeric strings, e.g. "70045"
     informed_platforms =
       for %{stop: stop} when is_binary(stop) <- entities,
           match?("place-" <> _, stop),
