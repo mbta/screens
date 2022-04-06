@@ -79,9 +79,8 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusView do
   defp render_timeframe(%{happening_now: true, active_period: %{"end" => nil}}),
     do: ~E|Until further notice|
 
-  defp render_timeframe(%{happening_now: true, active_period: %{"end" => end_dt_string}}) do
-    {:ok, end_dt, _} = DateTime.from_iso8601(end_dt_string)
-    ~E|Until <%= Calendar.strftime(end_dt, "%B %d") %>|
+  defp render_timeframe(%{happening_now: true, active_period: %{"end" => end_dt}}) do
+    ~E|Until <%= render_datetime(end_dt) %>|
   end
 
   defp render_timeframe(%{
