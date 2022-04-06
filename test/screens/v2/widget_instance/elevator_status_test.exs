@@ -56,8 +56,8 @@ defmodule WidgetInstance.ElevatorStatusTest do
     }
 
     stop_sequences = [
-      ["1001", "1003", "1005"],
-      ["1002", "1004", "1006"]
+      ["place-foo", "place-bar"],
+      ["place-foo", "place-bar"]
     ]
 
     station_id_to_icons = %{
@@ -1258,8 +1258,8 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
-                  elevator_id: "6",
-                  elevator_name: "Elevator 6",
+                  elevator_id: "2",
+                  elevator_name: "Elevator 2",
                   header_text: nil,
                   timeframe: %{
                     active_period: %{
@@ -1280,8 +1280,8 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
-                  elevator_id: "2",
-                  elevator_name: "Elevator 2",
+                  elevator_id: "6",
+                  elevator_name: "Elevator 6",
                   header_text: nil,
                   timeframe: %{
                     active_period: %{
