@@ -60,7 +60,7 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusView do
         "Upcoming elevator closure:"
       end
 
-    ~E|<s><%= upcoming_text %> At <%= station_text %>, <%= render_timeframe(timeframe) %>: Elevator Number <say-as interpret-as="telephone"><%= id %></say-as>, <%= name %>: <%= alternate_path_instructions %></s>|
+    ~E|<s><%= upcoming_text %> At <%= station_text %>, <%= render_timeframe(timeframe) %>: Elevator Number <say-as interpret-as="address"><%= id %></say-as>, <%= name %>: <%= alternate_path_instructions %></s>|
   end
 
   # List pages
@@ -73,7 +73,7 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusView do
   end
 
   defp render_list_page_elevator_row(%{elevator_id: id, elevator_name: name}, station_name) do
-    ~E|<%= station_name %> Elevator Number <say-as interpret-as="telephone"><%= id %></say-as>: <%= name %> is closed.<break/>|
+    ~E|<%= station_name %> Elevator Number <say-as interpret-as="address"><%= id %></say-as>: <%= name %> is closed.<break/>|
   end
 
   defp render_timeframe(%{happening_now: true, active_period: %{"end" => nil}}),
