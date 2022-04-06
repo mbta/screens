@@ -1,28 +1,31 @@
-import React, { ComponentType, useState, useLayoutEffect, useRef } from "react";
+import React, { ComponentType } from "react";
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 
 import RoutePill, {routePillKey} from "Components/v2/departures/route_pill";
 import { ReconAlertProps } from "./reconstructed_takeover";
+import useTextResizer from "Hooks/v2/use_text_resizer";
 
 interface AlertCardProps {
   urgent: boolean;
   children: React.ReactNode;
 }
 
+const isPIOAlert = (effect: string, urgent: boolean, routes: any[]) => {
+  return (effect==="delay" && !urgent) || (effect!=="station_closure" && routes.length > 1)
+}
 
-const ReconstructedAlert: ComponentType<ReconAlertProps> = ({ issue, cause, location, effect, urgent }) => {
+const ReconstructedAlert: ComponentType<ReconAlertProps> = (alert) => {
 
-  const routes = [
-    {
-      branches: ["b"],
-      color: "green",
-      text: "Green Line",
-      type: "text"
-    },
-    //{color: "blue", text: "Blue Line", type: "text"},
-    //{color: "red", text: "RL", type: "text"},
-    //{color: "orange", text: "OL", type: "text"}
-  ]
+  const { cause, effect, issue, location, remedy, routes, urgent } = alert
+
+  const BODY_SIZES = isPIOAlert(effect, urgent, routes) ?
+    ["extra-small", "small", "large"]
+    : ["small", "large", "extra-large"];
+  const { ref: descriptionRef, size: descriptionSize } = useTextResizer({
+    sizes: BODY_SIZES,
+    maxHeight: 360,
+    resetDependencies: [issue, cause],
+  });
 
   const modifiers = [
     "large-flex",
@@ -36,40 +39,42 @@ const ReconstructedAlert: ComponentType<ReconAlertProps> = ({ issue, cause, loca
       <FlexZoneAlertCard urgent={urgent}>
         <>
           <div className="alert-card__body">
-            <div
-              className={classWithModifier(
-                "alert-card__body__route-pills",
-                routes.length > 2 ? "small" : routes.length === 1 ? "large" : "regular"
-              )}
-            >
+            <div className={"alert-card__body__route-pills"}>
               {routes.map((pill) => (
                 <RoutePill {...pill} key={routePillKey(pill)} />
               ))}
             </div>
+            {effect === "delay" && <div className={"alert-card__body__delay-notice"}>
+              Delay
+            </div>}
             <div className="alert-card__body__icon">
               <img
                 className="alert-card__body__icon-image"
                 src={imagePath(filenameForFlexZoneIcon(effect, urgent))}
               />
             </div>
-            <BodyTextSizer maxHeight={350} key={issue+cause}>
+            <div className={classWithModifier(
+                "alert-card__body__content",
+                descriptionSize
+              )}
+              ref={descriptionRef}
+            >
               <div className="alert-card__body__issue">
-                <span className="bold">{ issue } {location}</span> { cause }
-              </div>
-              <div className="alert-card__body__remedy">
-                { effect==="shuttle" ?
-                  <>
-                    <span className="bold">Use shuttle bus</span>
-                    <img
-                      className="alert-card__body__isa-icon"
-                      src={imagePath("ISA_Blue.svg")}
-                    />
-                  </>
-                  : effect === "delay" ?
-                    <></> : <span className="bold">Seek alternate route</span>
+                { isPIOAlert(effect, urgent, routes) ?
+                  <span className="medium-bold">{issue}</span>
+                  : <><span className="bold">{ issue } {location}</span> { cause }</>
                 }
               </div>
-            </BodyTextSizer>
+              <div className="alert-card__body__remedy">
+                {remedy}
+                {effect === "shuttle" &&
+                  <img
+                    className="alert-card__body__isa-icon"
+                    src={imagePath("ISA_Blue.svg")}
+                  />
+                }
+              </div>
+            </div>
           </div>
           <div className="alert-card__footer">
             <div className="alert-card__footer__alerts-url">mbta.com/alerts</div>  
@@ -117,33 +122,5 @@ const filenameForFlexZoneIcon = (effect: string, urgent: boolean) => {
       return urgent ? "alert-widget-icon-x--color-urgent.svg" : "alert-widget-icon-x--color.svg";
   }
 }
-
-interface BodyTextSizerProps {
-  children: string;
-  maxHeight: number;
-}
-
-const BodyTextSizer: ComponentType<BodyTextSizerProps> = ({
-  children,
-  maxHeight,
-}) => {
-  const [isSmall, setSmall] = useState(false);
-  const ref = useRef(null);
-
-  useLayoutEffect(() => {
-    if (ref.current && !isSmall && ref.current.clientHeight > maxHeight) {
-      setSmall(true);
-    }
-  });
-
-  return (
-    <div
-      className={classWithModifier("alert-card__body__content",  isSmall ? "small" : "regular")}
-      ref={ref}
-    >
-      {children}
-    </div>
-  );
-};
 
 export default ReconstructedAlert;

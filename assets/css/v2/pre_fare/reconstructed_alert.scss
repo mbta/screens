@@ -28,7 +28,7 @@ $alert-card-footer-height: 80px;
     background-color: $line-color-green;
   }
 
-  // Base fonts
+  // Takeover fonts
   color: #171f26;
   font-family: Inter;
 
@@ -68,10 +68,27 @@ $alert-card-footer-height: 80px;
     box-sizing: border-box;
 
     .bold { font-weight: 800; }
+    .medium-bold { font-weight: 500; }
   }
   .alert-card__body__content {
     padding: 56px 0 0 8px;
+    &--extra-small {
+      font-size: 40px;
+      line-height: 52px;
+      .alert-card__body__isa-icon {
+        height: 51px;
+        padding-left: 16px;
+      }
+    }
     &--small {
+      font-size: 48px;
+      line-height: 60px;
+      .alert-card__body__isa-icon {
+        height: 51px;
+        padding-left: 16px;
+      }
+    }
+    &--large {
       font-size: 56px;
       line-height: 68px;
       .alert-card__body__isa-icon {
@@ -79,7 +96,7 @@ $alert-card-footer-height: 80px;
         padding-left: 16px;
       }
     }
-    &--regular {
+    &--extra-large {
       font-size: 72px;
       line-height: 86px;
       .alert-card__body__isa-icon {
@@ -89,39 +106,24 @@ $alert-card-footer-height: 80px;
     }
   }
   .alert-card__body__route-pills {
+    display: inline-flex;
     .route-pill {
       display: inline-block;
-    }
-    &--regular .route-pill {
+      width: fit-content;
+      height: 80px;
       &:not(:first-child) {
         margin-left: 16px;
       }
     }
-    &--small {
-      box-sizing: border-box;
-      padding-top: 20px;
-
-      .route-pill {
-        &:not(:first-child) {
-          margin-left: 16px;
-        }
-      }
-    }
-    &--large {
-      .route-pill {
-        width: fit-content;
-        height: 80px;
-      }
     
-      .route-pill__text {
-        position: relative;
-        width: fit-content;
-        padding: 0 40px;
-        font-size: 60px;
-        line-height: 80px;
-        text-transform: uppercase;
-        font-family: HelveticaNeue-Bold;
-      }
+    .route-pill__text {
+      position: relative;
+      width: fit-content;
+      padding: 0 40px;
+      font-size: 60px;
+      line-height: 80px;
+      text-transform: uppercase;
+      font-family: HelveticaNeue-Bold;
     }
 
     .route-pills__branches {
@@ -141,13 +143,21 @@ $alert-card-footer-height: 80px;
         width: 80px;
         display: inline-flex;
         justify-content: center;
-        margin-right: 6px;
-
+        margin-left: 6px;
+        &:nth-child(2) {
+          margin-left: 0;
+        }
         .route-pill__text {
           padding: 0;
         }
       }
     }
+  }
+  .alert-card__body__delay-notice {
+    font-size: 56px;
+    font-weight: 800;
+    margin-left: 32px;
+    display: inline-block;
   }
   .alert-card__body__icon {
     position: absolute;
@@ -160,6 +170,8 @@ $alert-card-footer-height: 80px;
   .alert-card__body__remedy {
     font-weight: 800;
     padding-top: 32px;
+    display: flex;
+    align-items: center;
   }
   .alert-card__footer {
     background-color: #cccbc8;
@@ -204,10 +216,12 @@ $alert-card-footer-height: 80px;
   .alert-card__body__location {
     margin: 40px 0 24px 0;
     font-weight: 800;
+    text-transform: capitalize;
   }
 
   .alert-card__body__cause {
     font-weight: 500;
+    text-transform: capitalize;
   }
 
   .alert-card__body__remedy {
@@ -263,6 +277,8 @@ $alert-card-footer-height: 80px;
     color: white;
     font-weight: 500;
   }
+  .alert-card__body__route-pills
+  .route-pills__branches
   .route-pills__branches__dot {
     background-color: #171f26;
   }

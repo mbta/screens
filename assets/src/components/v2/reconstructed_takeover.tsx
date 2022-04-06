@@ -1,30 +1,20 @@
 import React from "react";
 
 import { classWithModifiers, imagePath } from "Util/util";
+import FreeText from "./free_text";
 
 interface ReconAlertProps {
   issue: string | any, // shouldn't be "any"
   location: string,
   cause: string,
-  routes: string[],
+  remedy: string,
+  routes: any[], // shouldn't be "any"
   effect: string,
   urgent: boolean
 }
 
 const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
-  const {issue, location, cause, effect} = alert
-
-  const routes = [
-    {
-      branches: ["b"],
-      color: "green",
-      text: "Green Line",
-      type: "text"
-    },
-    //{color: "blue", text: "Blue Line", type: "text"},
-    //{color: "red", text: "RL", type: "text"},
-    //{color: "orange", text: "OL", type: "text"}
-  ]
+  const {cause, effect, issue, location, remedy, routes} = alert
 
   return (
     <>
@@ -36,7 +26,7 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
               src={imagePath("no-service-white.svg")}
             />
             <div className="x-large-text">
-              { issue }
+              <FreeText elements={issue.text} />
             </div>
             <div className="alert-card__body__location medium-text">{location}</div>
             <div className="alert-card__body__cause medium-text">{cause}</div>
@@ -59,7 +49,7 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
                   src={imagePath("bus-negative-white.svg")}
                 />
                 <div className="x-large-text">
-                  Use shuttle bus
+                  {remedy}
                 </div>
                 <div className="alert-card__body__accessibility-info">
                   <img
@@ -71,7 +61,7 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
                   </div>
                 </div>
               </>
-              : <div className="alert-card__body__remedy large-text">Seek alternate route</div>
+              : <div className="alert-card__body__remedy large-text">{remedy}</div>
             }
           </div>
           <div className="alert-card__footer">

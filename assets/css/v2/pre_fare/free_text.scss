@@ -1,0 +1,56 @@
+.free-text__element {
+  &:not(:last-child)::after {
+    content: " ";
+  }
+}
+
+.free-text__string {
+  &--bold {
+    font-weight: 700;
+  }
+}
+
+.free-text__route-pill {
+  display: inline-block;
+  font-family: Helvetica, sans-serif;
+  font-weight: 700;
+  text-align: center;
+
+  &--green,
+  &--green_b,
+  &--green_c,
+  &--green_d,
+  &--green_e {
+    background: $line-color-green;
+  }
+
+  &--blue {
+    background: $line-color-blue;
+  }
+
+  &--red {
+    background: $line-color-red;
+  }
+
+  &--orange {
+    background: $line-color-orange;
+  }
+
+  &--silver {
+    background: $line-color-silver;
+  }
+
+  &--cr {
+    background: $line-color-cr;
+  }
+}
+
+.free-text__route-pill {
+  height: 218px;
+  width: 423px;
+  border-radius: 109px;
+  .free-text__route-pill_text {
+    font-size: 96px;
+    line-height: unset;
+  }
+}
