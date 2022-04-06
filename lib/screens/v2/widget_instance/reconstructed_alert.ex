@@ -60,12 +60,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
   defp get_affected_routes(informed_entities) do
-    affected_routes = informed_entities
-    |> Enum.map(fn e -> Map.get(e, :route) end)
-    # If the alert impacts CR or other lines, weed that out
-    |> Enum.filter(fn e -> Enum.member?(["Red", "Orange", "Green", "Blue"] ++ @green_line_branches, e) end)
-    |> Enum.uniq()
-    |> Enum.sort()
+    affected_routes =
+      informed_entities
+      |> Enum.map(fn e -> Map.get(e, :route) end)
+      # If the alert impacts CR or other lines, weed that out
+      |> Enum.filter(fn e ->
+        Enum.member?(["Red", "Orange", "Green", "Blue"] ++ @green_line_branches, e)
+      end)
+      |> Enum.uniq()
+      # |> Enum.sort()
 
     # If the routes contain all the Green branches, consolidate to just Green Line
     if MapSet.subset?(MapSet.new(@green_line_branches), MapSet.new(affected_routes)) do
@@ -124,10 +127,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       text:
         ["No"] ++
           (affected_routes
-           |> Enum.map(fn route -> %{route:
-              String.replace(route, "-", "_")
-              |> String.downcase()
-            } end)
+           |> Enum.map(fn route ->
+             %{
+               route:
+                 route
+                 |> String.replace("-", "_")
+                 |> String.downcase()
+             }
+           end)
            |> Enum.to_list()) ++
           ["trains"]
     }
@@ -160,10 +167,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       text:
         ["No"] ++
           (affected_routes
-           |> Enum.map(fn route -> %{route:
-              String.replace(route, "-", "_")
-              |> String.downcase()
-            } end)
+           |> Enum.map(fn route ->
+             %{
+               route:
+                 route
+                 |> String.replace("-", "_")
+                 |> String.downcase()
+             }
+           end)
            |> Enum.to_list()) ++
           ["trains"]
     }
@@ -305,7 +316,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         :more_than -> "over #{delay_minutes} minutes"
       end
 
-    # Even if the screen is "inside" the alert range, the alert itself can 
+    # Even if the screen is "inside" the alert range, the alert itself can
     # still be one-directional. (Only westbound / eastbound is impacted)
     issue =
       if is_nil(destination) do
@@ -588,8 +599,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end
 
     %{
-      issue: "All trains bypass #{station}",
-      remedy: "Seek an alternate route",
+      issue: "Trains will bypass #{station}",
+      remedy: "Please seek an alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -683,7 +694,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def widget_type(%__MODULE__{} = t) do
-    if AlertWidget.takeover_alert?(t), do: :reconstructed_takeover, else: :reconstructed_large_alert
+    if AlertWidget.takeover_alert?(t),
+      do: :reconstructed_takeover,
+      else: :reconstructed_large_alert
   end
 
   defimpl Screens.V2.WidgetInstance do

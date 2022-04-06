@@ -7,7 +7,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
-  alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   setup :setup_base
 
@@ -206,8 +205,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert [:large] == WidgetInstance.slot_names(widget)
     end
 
-    test "returns flex zone alert for a boundary alert", %{widget: widget} do
+    test "returns flex zone alert for a boundary suspension", %{widget: widget} do
       widget = put_informed_entities(widget, [ie(stop: "place-dwnxg"), ie(stop: "place-pktrm")])
+      widget = put_effect(widget, :suspension)
       assert [3] == WidgetInstance.priority(widget)
       assert [:large] == WidgetInstance.slot_names(widget)
     end
@@ -233,7 +233,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
 
       expected = %{
-        issue: %{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
+        issue: %{icon: nil, text: ["No", %{route: "red"}, %{route: "orange"}, "trains"]},
         location: "at Downtown Crossing",
         cause: "",
         routes: [
@@ -260,7 +260,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
 
       expected = %{
-        issue: %{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
+        issue: %{icon: nil, text: ["No", %{route: "red"}, %{route: "orange"}, "trains"]},
         location: "at Downtown Crossing",
         cause: "",
         routes: [
@@ -314,7 +314,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:construction)
 
       expected = %{
-        issue: %{icon: nil, text: ["No", %{icon: "Red"}, %{icon: "Orange"}, "trains"]},
+        issue: %{icon: nil, text: ["No", %{route: "red"}, %{route: "orange"}, "trains"]},
         location: "at Downtown Crossing",
         cause: "Due to construction",
         routes: [
@@ -419,7 +419,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         location: "",
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
-        effect: :moderate_delay,
+        effect: :delay,
         urgent: false,
         region: :inside,
         remedy: ""
@@ -545,7 +545,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         location: "",
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
-        effect: :moderate_delay,
+        effect: :delay,
         urgent: false,
         region: :boundary,
         remedy: ""
@@ -730,8 +730,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   describe "widget_type/1" do
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
+
     test "returns reconstructed_alert", %{widget: widget} do
-      assert :reconstructed_alert == WidgetInstance.widget_type(widget)
+      assert :reconstructed_large_alert== WidgetInstance.widget_type(widget)
     end
   end
 

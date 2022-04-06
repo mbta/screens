@@ -135,7 +135,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   def serialize_route_for_reconstructed_alert(route_id_group, opts \\ %{})
 
-  def serialize_route_for_reconstructed_alert({"Green", branches}, opts) when branches != ["Green"] do
+  def serialize_route_for_reconstructed_alert({"Green", branches}, opts)
+      when branches != ["Green"] do
     route = do_serialize("Green", opts)
 
     Map.merge(route, %{
