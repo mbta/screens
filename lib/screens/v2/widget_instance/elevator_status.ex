@@ -214,6 +214,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           match?("place-" <> _, stop),
           do: stop
 
+    # Remove parent station so it does not show up as on a connecting line.
     connecting_platform_ids =
       stop_sequences |> List.flatten() |> List.delete(parent_station_id(t))
 
