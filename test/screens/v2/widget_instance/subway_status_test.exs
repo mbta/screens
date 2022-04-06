@@ -2,6 +2,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
+  alias Screens.Config.Screen
+  alias Screens.Config.V2.{BusShelter, Departures, ElevatorStatus, PreFare}
+  alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.SubwayStatus
 
@@ -388,22 +391,59 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns empty string" do
-      instance = %SubwayStatus{}
-      assert %{} == WidgetInstance.audio_serialize(instance)
+    test "returns same result as serialize/1" do
+      instance = %SubwayStatus{
+        subway_alerts: []
+      }
+
+      assert WidgetInstance.serialize(instance) == WidgetInstance.audio_serialize(instance)
     end
   end
 
   describe "audio_sort_key/1" do
-    test "returns [0]" do
+    test "returns [1]" do
       instance = %SubwayStatus{}
-      assert [0] == WidgetInstance.audio_sort_key(instance)
+      assert [1] == WidgetInstance.audio_sort_key(instance)
     end
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns false" do
-      instance = %SubwayStatus{}
+    test "returns true for PreFare" do
+      instance = %SubwayStatus{
+        screen: %Screen{
+          app_params: %PreFare{
+            elevator_status: %ElevatorStatus{parent_station_id: nil, platform_stop_ids: []},
+            header: %CurrentStopId{stop_id: nil},
+            full_line_map: []
+          },
+          vendor: nil,
+          device_id: nil,
+          name: nil,
+          app_id: nil
+        }
+      }
+
+      assert WidgetInstance.audio_valid_candidate?(instance)
+    end
+
+    test "returns false for BusShelter" do
+      instance = %SubwayStatus{
+        screen: %Screen{
+          app_params: %BusShelter{
+            departures: %Departures{
+              sections: []
+            },
+            header: nil,
+            footer: nil,
+            alerts: nil
+          },
+          vendor: nil,
+          device_id: nil,
+          name: nil,
+          app_id: nil
+        }
+      }
+
       refute WidgetInstance.audio_valid_candidate?(instance)
     end
   end
