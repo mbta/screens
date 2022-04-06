@@ -14,6 +14,7 @@ defmodule Screens.V2.ScreenAudioData do
         screen_id,
         get_config_fn \\ &ScreenData.get_config/1,
         fetch_data_fn \\ &ScreenData.fetch_data/1,
+        get_audio_only_instances_fn \\ &get_audio_only_instances/2,
         now \\ DateTime.utc_now()
       ) do
     config = get_config_fn.(screen_id)
@@ -30,7 +31,7 @@ defmodule Screens.V2.ScreenAudioData do
           |> elem(1)
           |> Map.values()
           |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
-          |> then(&(&1 ++ get_audio_only_instances(&1, config)))
+          |> then(&(&1 ++ get_audio_only_instances_fn.(&1, config)))
           |> Enum.sort_by(&WidgetInstance.audio_sort_key/1)
           |> Enum.map(&{WidgetInstance.audio_view(&1), WidgetInstance.audio_serialize(&1)})
         else
