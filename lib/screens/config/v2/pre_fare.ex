@@ -21,7 +21,13 @@ defmodule Screens.Config.V2.PreFare do
           audio: Audio.t()
         }
 
-  @enforce_keys [:header, :reconstructed_alert_widget, :elevator_status, :full_line_map, :content_summary]
+  @enforce_keys [
+    :header,
+    :reconstructed_alert_widget,
+    :elevator_status,
+    :full_line_map,
+    :content_summary
+  ]
   defstruct header: nil,
             reconstructed_alert_widget: nil,
             elevator_status: nil,

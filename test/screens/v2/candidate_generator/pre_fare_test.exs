@@ -19,7 +19,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
             asset_path: "test/path"
           }
         ],
-        reconstructed_alert_widget: %V2.Header.CurrentStopId{stop_id: "place-gover"}
+        reconstructed_alert_widget: %V2.Header.CurrentStopId{stop_id: "place-gover"},
         content_summary: %V2.ContentSummary{
           parent_station_id: "place-foo"
         }
