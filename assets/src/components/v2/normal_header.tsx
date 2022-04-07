@@ -1,3 +1,4 @@
+import useTextResizer from "Hooks/v2/use_text_resizer";
 import React, {
   forwardRef,
   useEffect,
@@ -35,27 +36,29 @@ const NormalHeaderIcon = ({ icon }) => {
   );
 };
 
-const NormalHeaderTitle = forwardRef(({ icon, text, size, showTo, fullName }, ref) => {
-  const modifiers = [size];
-  if (icon) {
-    modifiers.push("with-icon");
-  }
+const NormalHeaderTitle = forwardRef(
+  ({ icon, text, size, showTo, fullName }, ref) => {
+    const modifiers = [size];
+    if (icon) {
+      modifiers.push("with-icon");
+    }
 
-  const abbreviatedText = fullName ? text : abbreviateText(text);
+    const abbreviatedText = fullName ? text : abbreviateText(text);
 
-  return (
-    <div className="normal-header-title">
-      {showTo && <div className="normal-header-to__text">TO</div>}
-      {icon && <NormalHeaderIcon icon={icon} />}
-      <div
-        className={classWithModifiers("normal-header-title__text", modifiers)}
-        ref={ref}
-      >
-        {abbreviatedText}
+    return (
+      <div className="normal-header-title">
+        {showTo && <div className="normal-header-to__text">TO</div>}
+        {icon && <NormalHeaderIcon icon={icon} />}
+        <div
+          className={classWithModifiers("normal-header-title__text", modifiers)}
+          ref={ref}
+        >
+          {abbreviatedText}
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 const NormalHeaderTime = ({ time }) => {
   const currentTime = formatTimeString(time);
@@ -90,32 +93,21 @@ const NormalHeader = ({
   versionNumber,
   maxHeight,
   showTo,
-  fullName
+  fullName,
 }) => {
   const SIZES = ["small", "large"];
-  const ref = useRef(null);
-  const [stopSize, setStopSize] = useState(1);
-
-  // Reset state when relevant props change,
-  // so that we recalculate size from scratch.
-  useEffect(() => {
-    setStopSize(1);
-  }, [icon, text]);
-
-  useLayoutEffect(() => {
-    const height = ref.current.clientHeight;
-    if (height > maxHeight) {
-      setStopSize(stopSize - 1);
-    }
+  const { ref: headerRef, size: headerSize } = useTextResizer({
+    sizes: SIZES,
+    maxHeight: maxHeight,
+    resetDependencies: [text],
   });
-
   return (
     <div className="normal-header">
       <NormalHeaderTitle
         icon={icon}
         text={text}
-        size={SIZES[stopSize]}
-        ref={ref}
+        size={headerSize}
+        ref={headerRef}
         showTo={showTo}
         fullName={fullName}
       />
