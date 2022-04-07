@@ -13,6 +13,7 @@ defmodule Screens.Config.V2.PreFare do
 
   @type t :: %__MODULE__{
           header: CurrentStopId.t(),
+          reconstructed_alert_widget: CurrentStopId.t(),
           elevator_status: ElevatorStatus.t(),
           full_line_map: list(FullLineMap.t()),
           evergreen_content: list(EvergreenContentItem.t()),
@@ -20,8 +21,15 @@ defmodule Screens.Config.V2.PreFare do
           audio: Audio.t()
         }
 
-  @enforce_keys [:header, :elevator_status, :full_line_map, :content_summary]
+  @enforce_keys [
+    :header,
+    :reconstructed_alert_widget,
+    :elevator_status,
+    :full_line_map,
+    :content_summary
+  ]
   defstruct header: nil,
+            reconstructed_alert_widget: nil,
             elevator_status: nil,
             full_line_map: [],
             evergreen_content: [],
@@ -34,6 +42,7 @@ defmodule Screens.Config.V2.PreFare do
       elevator_status: ElevatorStatus,
       full_line_map: {:list, FullLineMap},
       evergreen_content: {:list, EvergreenContentItem},
+      reconstructed_alert_widget: CurrentStopId,
       content_summary: ContentSummary,
       audio: Audio
     ]
