@@ -110,6 +110,8 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
     end
   end
 
-  defp adjust_remedy(remedy) when remedy === "Seek alternate route", do: "Please seek an alternate route"
+  defp adjust_remedy(remedy) when remedy === "Seek alternate route",
+    do: "Please seek an alternate route"
+
   defp adjust_remedy(remedy), do: remedy
 end
