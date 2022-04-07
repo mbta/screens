@@ -4,11 +4,13 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Config.V2.PreFare
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
 
   @behaviour CandidateGenerator
 
@@ -74,7 +76,13 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   end
 
   @impl CandidateGenerator
-  def audio_only_instances(_widgets, _config), do: []
+  def audio_only_instances(widgets, config) do
+    [
+      fn -> content_summary_instances(widgets, config) end
+    ]
+    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
+    |> Enum.flat_map(fn {:ok, instances} -> instances end)
+  end
 
   defp header_instances(config, now) do
     %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}} = config
@@ -82,6 +90,35 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     stop_name = Stop.fetch_stop_name(stop_id)
 
     [%NormalHeader{screen: config, text: stop_name, time: now}]
+  end
+
+  defp content_summary_instances(widgets, config) do
+    config.app_params.content_summary.parent_station_id
+    |> Route.fetch_routes_by_stop()
+    |> case do
+      {:ok, routes_at_station} ->
+        subway_lines_at_station =
+          routes_at_station
+          |> Enum.map(fn
+            "Red" -> :red
+            "Orange" -> :orange
+            "Green" <> _ -> :green
+            "Blue" -> :blue
+            _ -> nil
+          end)
+          |> Enum.reject(&is_nil/1)
+          |> Enum.uniq()
+
+        %ContentSummary{
+          screen: config,
+          widgets_snapshot: widgets,
+          lines_at_station: subway_lines_at_station
+        }
+
+      :error ->
+        nil
+    end
+    |> List.wrap()
   end
 
   defp placeholder_instances do
