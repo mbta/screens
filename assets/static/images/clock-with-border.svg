@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="176px" height="176px" viewBox="0 0 176 176" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Delay/Black with Warm White Border</title>
+  <g id="Delay/Black-with-Warm-White-Border" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="Icons/Border/Closed-Copy">
+      <circle id="light-area" fill="#E6E4E1" cx="88" cy="88" r="88"></circle>
+      <g id="dark-area" transform="translate(22.000000, 22.000000)" fill="#171F26">
+        <path d="M66,0 C29.5492065,0 0,29.5492065 0,66 C0,102.450793 29.5492065,132 66,132 C102.450793,132 132,102.450793 132,66 C131.960593,29.5655418 102.434458,0.0394066619 66,0 Z M98.2135,85.3325 C96.5885985,87.8524868 93.2851084,88.6759515 90.6675,87.2135 L63.1675,70.7135 C61.5693798,69.6652488 60.575882,67.9097279 60.5,66 L60.5,33 C60.5,29.9624339 62.9624339,27.5 66,27.5 C69.0375661,27.5 71.5,29.9624339 71.5,33 L71.5,62.887 L96.3325,77.7865 C98.9352634,79.3511652 99.7773166,82.7292266 98.2135,85.3325 Z" id="Delay"></path>
+      </g>
+    </g>
+  </g>
+</svg>

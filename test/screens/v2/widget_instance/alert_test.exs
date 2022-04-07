@@ -364,8 +364,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
             else: [{~U[2021-01-02T00:00:00Z], ~U[2021-01-02T22:00:00Z]}]
           )
 
-        effect =
-          if(unquote(set_high_impact_effect?), do: :station_closure, else: :elevator_closure)
+        effect = if(unquote(set_high_impact_effect?), do: :suspension, else: :elevator_closure)
 
         informed_entities =
           if(unquote(set_location_inside?),
