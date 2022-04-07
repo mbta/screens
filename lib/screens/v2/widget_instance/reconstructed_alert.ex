@@ -57,8 +57,26 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     weather: "weather conditions"
   }
 
+  @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
+
   defp get_affected_routes(informed_entities) do
-    informed_entities |> Enum.map(fn %{route: route} -> route end) |> Enum.uniq()
+    affected_routes =
+      informed_entities
+      |> Enum.map(fn e -> Map.get(e, :route) end)
+      # If the alert impacts CR or other lines, weed that out
+      |> Enum.filter(fn e ->
+        Enum.member?(["Red", "Orange", "Green", "Blue"] ++ @green_line_branches, e)
+      end)
+      |> Enum.uniq()
+
+    # If the routes contain all the Green branches, consolidate to just Green Line
+    if MapSet.subset?(MapSet.new(@green_line_branches), MapSet.new(affected_routes)) do
+      affected_routes
+      |> Enum.reject(fn route -> String.contains?(route, "Green") end)
+      |> Enum.concat(["Green"])
+    else
+      affected_routes
+    end
   end
 
   # Using hd/1 because we know that only single line stations use this function.
@@ -108,7 +126,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       text:
         ["No"] ++
           (affected_routes
-           |> Enum.map(fn route -> %{icon: route} end)
+           |> Enum.map(fn route ->
+             %{
+               route:
+                 route
+                 |> String.replace("-", "_")
+                 |> String.downcase()
+             }
+           end)
            |> Enum.to_list()) ++
           ["trains"]
     }
@@ -141,7 +166,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       text:
         ["No"] ++
           (affected_routes
-           |> Enum.map(fn route -> %{icon: route} end)
+           |> Enum.map(fn route ->
+             %{
+               route:
+                 route
+                 |> String.replace("-", "_")
+                 |> String.downcase()
+             }
+           end)
            |> Enum.to_list()) ++
           ["trains"]
     }
@@ -259,7 +291,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: "",
       routes: get_route_pills(affected_routes),
-      effect: :moderate_delay,
+      effect: :delay,
       urgent: false
     }
   end
@@ -275,6 +307,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     affected_routes = get_affected_routes(informed_entities)
     cause_text = get_cause_text(cause)
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
+    destination = get_destination(t)
 
     duration_text =
       case delay_description do
@@ -282,8 +315,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         :more_than -> "over #{delay_minutes} minutes"
       end
 
+    # Even if the screen is "inside" the alert range, the alert itself can
+    # still be one-directional. (Only westbound / eastbound is impacted)
+    issue =
+      if is_nil(destination) do
+        "Trains may be delayed #{duration_text}"
+      else
+        "#{destination} trains may be delayed #{duration_text}"
+      end
+
     %{
-      issue: "Trains may be delayed #{duration_text}",
+      issue: issue,
       remedy: "",
       location: "",
       cause: cause_text,
@@ -403,7 +445,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location: "",
       cause: "",
       routes: get_route_pills(affected_routes),
-      effect: :moderate_delay,
+      effect: :delay,
       urgent: false
     }
   end
@@ -637,7 +679,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def audio_sort_key(%__MODULE__{} = t) do
     case serialize(t) do
       %{urgent: true} -> [2]
-      %{effect: effect} when effect in [:moderate_delay, :delay] -> [2, 2]
+      %{effect: effect} when effect in [:delay] -> [2, 2]
       _ -> [2, 1]
     end
   end
@@ -650,11 +692,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if AlertWidget.takeover_alert?(t), do: [:full_body], else: [:large]
   end
 
+  def widget_type(%__MODULE__{} = t) do
+    if AlertWidget.takeover_alert?(t),
+      do: :reconstructed_takeover,
+      else: :reconstructed_large_alert
+  end
+
   defimpl Screens.V2.WidgetInstance do
     def priority(t), do: ReconstructedAlert.priority(t)
     def serialize(t), do: ReconstructedAlert.serialize(t)
     def slot_names(t), do: ReconstructedAlert.slot_names(t)
-    def widget_type(_instance), do: :reconstructed_alert
+    def widget_type(t), do: ReconstructedAlert.widget_type(t)
     def valid_candidate?(_instance), do: true
     def audio_serialize(t), do: ReconstructedAlert.serialize(t)
     def audio_sort_key(t), do: ReconstructedAlert.audio_sort_key(t)

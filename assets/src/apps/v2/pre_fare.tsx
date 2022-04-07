@@ -33,6 +33,7 @@ import FullLineMap from "Components/v2/full_line_map";
 import SubwayStatus from "Components/v2/subway_status";
 import ReconstructedAlert from "Components/v2/reconstructed_alert";
 import NoData from "Components/v2/pre_fare/no_data";
+import ReconstructedTakeover from "Components/v2/reconstructed_takeover";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -51,8 +52,9 @@ const TYPE_TO_COMPONENT = {
   elevator_status: ElevatorStatus,
   full_line_map: FullLineMap,
   subway_status: SubwayStatus,
-  reconstructed_alert: ReconstructedAlert,
   no_data: NoData,
+  reconstructed_large_alert: ReconstructedAlert,
+  reconstructed_takeover: ReconstructedTakeover,
 };
 
 const DISABLED_LAYOUT = {

@@ -3,8 +3,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusShelter, Departures, ElevatorStatus, PreFare}
-  alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Config.V2.{BusShelter, Departures, PreFare}
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.SubwayStatus
 
@@ -411,11 +410,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
     test "returns true for PreFare" do
       instance = %SubwayStatus{
         screen: %Screen{
-          app_params: %PreFare{
-            elevator_status: %ElevatorStatus{parent_station_id: nil, platform_stop_ids: []},
-            header: %CurrentStopId{stop_id: nil},
-            full_line_map: []
-          },
+          app_params: struct(PreFare),
           vendor: nil,
           device_id: nil,
           name: nil,

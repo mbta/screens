@@ -18,7 +18,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
       config =
         struct(Screen, %{
           app_id: :pre_fare_v2,
-          app_params: struct(PreFare, %{header: %CurrentStopId{stop_id: "place-hsmnl"}})
+          app_params:
+            struct(PreFare, %{reconstructed_alert_widget: %CurrentStopId{stop_id: "place-hsmnl"}})
         })
 
       bad_config = struct(Screen, %{app_params: struct(Solari)})
