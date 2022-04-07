@@ -16,6 +16,7 @@ interface ReconAlertProps {
 const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
   const {cause, effect, issue, location, remedy, routes} = alert
 
+  console.log('issue', issue)
   return (
     <>
       <div className={classWithModifiers("alert-container", ["takeover", "urgent", routes.length > 1 ? "yellow" : routes[0].color])}>
@@ -26,7 +27,7 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
               src={imagePath("no-service-white.svg")}
             />
             <div className="x-large-text">
-              <FreeText elements={issue.text} />
+              {issue.text ? <FreeText elements={issue.text} /> : issue}
             </div>
             <div className="alert-card__body__location medium-text">{location}</div>
             <div className="alert-card__body__cause medium-text">{cause}</div>
