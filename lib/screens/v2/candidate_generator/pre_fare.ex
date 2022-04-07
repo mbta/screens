@@ -76,9 +76,13 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   end
 
   @impl CandidateGenerator
-  def audio_only_instances(widgets, config) do
+  def audio_only_instances(
+        widgets,
+        config,
+        fetch_routes_by_stop_fn \\ &Route.fetch_routes_by_stop/1
+      ) do
     [
-      fn -> content_summary_instances(widgets, config) end
+      fn -> content_summary_instances(widgets, config, fetch_routes_by_stop_fn) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
@@ -92,13 +96,14 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     [%NormalHeader{screen: config, text: stop_name, time: now}]
   end
 
-  defp content_summary_instances(widgets, config) do
+  defp content_summary_instances(widgets, config, fetch_routes_by_stop_fn) do
     config.app_params.content_summary.parent_station_id
-    |> Route.fetch_routes_by_stop()
+    |> fetch_routes_by_stop_fn.()
     |> case do
       {:ok, routes_at_station} ->
         subway_lines_at_station =
           routes_at_station
+          |> Enum.map(& &1.route_id)
           |> Enum.map(fn
             "Red" -> :red
             "Orange" -> :orange
