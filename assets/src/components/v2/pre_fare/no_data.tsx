@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import { default as LcdNoData } from "Components/v2/lcd/no_data";
+import LcdNoData from "Components/v2/lcd/no_data";
 
 interface Props {
   show_alternatives: boolean;
