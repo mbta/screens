@@ -26,12 +26,19 @@ defmodule Screens.V2.ScreenAudioData do
 
       %Screen{app_params: %_app{audio: audio}} ->
         if date_in_range?(audio, now) do
-          config
-          |> fetch_data_fn.()
-          |> elem(1)
-          |> Map.values()
-          |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
-          |> then(&(&1 ++ get_audio_only_instances_fn.(&1, config)))
+          visual_widgets_with_audio_equivalence =
+            config
+            |> fetch_data_fn.()
+            |> elem(1)
+            |> Map.values()
+            |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
+
+          audio_only_widgets =
+            visual_widgets_with_audio_equivalence
+            |> get_audio_only_instances_fn.(config)
+            |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
+
+          (visual_widgets_with_audio_equivalence ++ audio_only_widgets)
           |> Enum.sort_by(&WidgetInstance.audio_sort_key/1)
           |> Enum.map(&{WidgetInstance.audio_view(&1), WidgetInstance.audio_serialize(&1)})
         else

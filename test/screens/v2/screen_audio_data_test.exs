@@ -302,6 +302,12 @@ defmodule Screens.V2.ScreenAudioDataTest do
             audio_valid_candidate?: true,
             audio_sort_key: [1, 1],
             content: "Alerts Summary"
+          },
+          %MockWidget{
+            slot_names: [:nothing],
+            audio_valid_candidate?: false,
+            audio_sort_key: [0],
+            content: "SoundOfNailsOnChalkboard Widget"
           }
         ]
       end
