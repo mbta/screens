@@ -140,7 +140,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: FreeTextLine.to_json(issue),
-      remedy: "Please seek an alternate route",
+      remedy: "Seek alternate route",
       location: location_text,
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -199,7 +199,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Station Closed",
-      remedy: "Please seek an alternate route",
+      remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -222,7 +222,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "No trains",
-      remedy: "Please seek an alternate route",
+      remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -266,7 +266,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "#{line} platform closed",
-      remedy: "Please seek an alternate route",
+      remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -355,7 +355,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
-        remedy: "Please seek an alternate route",
+        remedy: "Seek alternate route",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -375,7 +375,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
-        remedy: "Please seek an alternate route",
+        remedy: "Seek alternate route",
         location: "",
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -512,7 +512,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
-        remedy: "Please seek an alternate route",
+        remedy: "Seek alternate route",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -533,7 +533,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
-        remedy: "Please seek an alternate route",
+        remedy: "Seek alternate route",
         location: location_text,
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -599,7 +599,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Trains will bypass #{station}",
-      remedy: "Please seek an alternate route",
+      remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
