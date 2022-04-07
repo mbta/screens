@@ -197,10 +197,17 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
   },
 }) => {
   const DESCRIPTION_SIZES = ["extra-small", "small", "large", "extra-large"];
+  const HEADER_SIZES = ["small", "large"];
   const { ref: descriptionRef, size: descriptionSize } = useTextResizer({
     sizes: DESCRIPTION_SIZES,
     maxHeight: 450,
     resetDependencies: [description],
+  });
+
+  const { ref: headerRef, size: headerSize } = useTextResizer({
+    sizes: HEADER_SIZES,
+    maxHeight: 144,
+    resetDependencies: [headerText],
   });
 
   return (
@@ -222,7 +229,15 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
             {isAtHomeStop ? null : <RouteModeIcons icons={icons} />}
           </div>
         </div>
-        <div className="detail-page__closure-header">{headerText}</div>
+        <div
+          className={classWithModifier(
+            "detail-page__closure-header",
+            headerSize
+          )}
+          ref={headerRef}
+        >
+          {headerText}
+        </div>
         <div className={"detail-page__timeframe"}>
           <div className="detail-page__closure-alert-icon-container">
             <TimeframeHeadingIcon happeningNow={happeningNow} />

@@ -221,10 +221,18 @@
 
     .detail-page__closure-header {
       font-family: Inter, sans-serif;
-      font-size: 32px;
       font-weight: 500;
-      line-height: 40px;
       padding-bottom: 32px;
+
+      &--small {
+        font-size: 32px;
+        line-height: 40px;
+      }
+
+      &--large {
+        font-size: 36px;
+        line-height: 48px;
+      }
     }
 
     .detail-page__timeframe {
