@@ -22,7 +22,7 @@ config :screens, ScreensWeb.Endpoint,
   ]
 
 config :screens,
-  default_api_v3_url: System.get_env("API_V3_URL", "https://api-dev-green.mbtace.com/"),
+  default_api_v3_url: System.get_env("API_V3_URL", "https://api-v3.mbta.com/"),
   api_v3_key: System.get_env("API_V3_KEY"),
   config_fetcher: Screens.Config.State.LocalFetch,
   local_config_file_spec: {:priv, "local.json"},
