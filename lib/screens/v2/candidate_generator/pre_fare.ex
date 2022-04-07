@@ -9,7 +9,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
+  alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, ContentSummary}
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
@@ -82,7 +82,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         fetch_routes_by_stop_fn \\ &Route.fetch_routes_by_stop/1
       ) do
     [
-      fn -> content_summary_instances(widgets, config, fetch_routes_by_stop_fn) end
+      fn -> content_summary_instances(widgets, config, fetch_routes_by_stop_fn) end,
+      fn -> alerts_intro_instances(widgets, config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
@@ -124,6 +125,10 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         nil
     end
     |> List.wrap()
+  end
+
+  defp alerts_intro_instances(widgets, config) do
+    [%AlertsIntro{screen: config, widgets_snapshot: widgets}]
   end
 
   defp placeholder_instances do
