@@ -9,8 +9,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
   alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
+  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
 
