@@ -11,10 +11,10 @@ const NoData: ComponentType<Props> = ({
   return (
     <>
       <div className="no-data-left">
-        <LcdNoData show_alternatives={showAlternatives} />{" "}
+        <LcdNoData show_alternatives={showAlternatives} />
       </div>
       <div className="no-data-right">
-        <LcdNoData show_alternatives={showAlternatives} />{" "}
+        <LcdNoData show_alternatives={showAlternatives} />
       </div>
     </>
   );
