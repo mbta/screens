@@ -217,7 +217,6 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   defp get_color_for_route("Red", _), do: :red
   defp get_color_for_route("Mattapan", _), do: :red
   defp get_color_for_route("Orange", _), do: :orange
-  defp get_color_for_route("Green-" <> _, _), do: :green
   defp get_color_for_route("Green" <> _, _), do: :green
   defp get_color_for_route("Blue", _), do: :blue
   defp get_color_for_route("CR-" <> _, _), do: :purple

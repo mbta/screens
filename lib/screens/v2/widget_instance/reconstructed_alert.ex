@@ -69,13 +69,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end)
       |> Enum.uniq()
 
-    # |> Enum.sort()
-
     # If the routes contain all the Green branches, consolidate to just Green Line
     if MapSet.subset?(MapSet.new(@green_line_branches), MapSet.new(affected_routes)) do
       affected_routes
       |> Enum.reject(fn route -> String.contains?(route, "Green") end)
-      |> Kernel.++(["Green"])
+      |> Enum.concat(["Green"])
     else
       affected_routes
     end

@@ -70,10 +70,6 @@ const SlashedRoutePill: ComponentType<SlashedPill> = ({ part1, part2 }) => {
 
 const RoutePill: ComponentType<Pill> = (pill) => {
   const modifiers: string[] = [pill.color];
-  // I don't think outline is actually used...?
-  if (pill.outline) {
-    modifiers.push("outline");
-  }
 
   let innerContent = null;
   switch (pill.type) {
