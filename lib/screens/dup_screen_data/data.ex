@@ -15,7 +15,7 @@ defmodule Screens.DupScreenData.Data do
 
     {region, headsign} =
       :screens
-      |> Application.get_env(:dup_alert_headsign_matchers)
+      |> Application.get_env(:reconstructed_alert_headsign_matchers)
       |> Map.get(parent_stop_id)
       |> Enum.find_value({:inside, nil}, fn {informed, not_informed, headsign} ->
         if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),

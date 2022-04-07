@@ -80,7 +80,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Using hd/1 because we know that only single line stations use this function.
-  defp get_destination(%__MODULE__{} = t) do
+  defp get_destination(%__MODULE__{screen: %Screen{app_params: %{reconstructed_alert_widget: %{stop_id: stop_id}}}} = t) do
     informed_entities = BaseAlert.informed_entities(t)
 
     {direction_id, route_id} =
@@ -90,12 +90,30 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       |> hd()
 
     if is_nil(direction_id) do
-      nil
+      informed_stop_ids = Enum.into(informed_entities, MapSet.new(), & &1.stop)
+
+      :screens
+      |> Application.get_env(:reconstructed_alert_headsign_matchers)
+      |> Map.get(stop_id)
+      |> Enum.find_value(nil, fn {informed, not_informed, headsign} ->
+        if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
+          do: headsign,
+          else: false
+      end)
     else
       @route_directions
       |> Map.get(route_id)
       |> Enum.at(direction_id)
     end
+  end
+
+  defp to_set(stop_id) when is_binary(stop_id), do: MapSet.new([stop_id])
+  defp to_set(stop_ids) when is_list(stop_ids), do: MapSet.new(stop_ids)
+  defp to_set(%MapSet{} = already_a_set), do: already_a_set
+
+  defp alert_region_match?(informed, not_informed, informed_stop_ids) do
+    MapSet.subset?(informed, informed_stop_ids) and
+      MapSet.disjoint?(not_informed, informed_stop_ids)
   end
 
   defp get_route_pills(routes) do
