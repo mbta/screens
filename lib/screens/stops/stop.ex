@@ -159,6 +159,9 @@ defmodule Screens.Stops.Stop do
   ]
 
   @green_line_e_stops [
+    {"place-unsqu", {"Union Square", "Union Sq"}},
+    {"place-lech", {"Lechmere", "Lechmere"}},
+    {"place-spmnl", {"Science Park/West End", "Science Pk"}},
     {"place-north", {"North Station", "North Sta"}},
     {"place-haecl", {"Haymarket", "Haymarket"}},
     {"place-gover", {"Government Center", "Gov't Ctr"}},
