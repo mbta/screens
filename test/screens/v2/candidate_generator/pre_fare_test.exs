@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
   alias Screens.Config.{Screen, V2}
   alias Screens.V2.CandidateGenerator.PreFare
   alias Screens.V2.WidgetInstance.NormalHeader
+  alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
 
   setup do
     config = %Screen{
@@ -19,6 +20,9 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
           }
         ],
         reconstructed_alert_widget: %V2.Header.CurrentStopId{stop_id: "place-gover"}
+        content_summary: %V2.ContentSummary{
+          parent_station_id: "place-foo"
+        }
       },
       vendor: :gds,
       device_id: "TEST",
@@ -103,6 +107,36 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
         )
 
       assert Enum.all?(expected_header, fn x -> x in actual_instances end)
+    end
+  end
+
+  describe "audio_only_instances/3" do
+    test "returns a ContentSummary widget if we successfully fetch routes serving the home station",
+         %{config: config} do
+      widgets = []
+
+      fetch_routes_by_stop_fn = fn "place-foo" ->
+        {:ok,
+         [%{route_id: "Red"}, %{route_id: "Green-B"}, %{route_id: "Green-C"}, %{route_id: "Blue"}]}
+      end
+
+      assert [
+               %ContentSummary{
+                 widgets_snapshot: ^widgets,
+                 screen: ^config,
+                 lines_at_station: [:red, :green, :blue]
+               }
+             ] = PreFare.audio_only_instances(widgets, config, fetch_routes_by_stop_fn)
+    end
+
+    test "returns empty list if we fail to fetch routes serving the home station", %{
+      config: config
+    } do
+      widgets = []
+
+      fetch_routes_by_stop_fn = fn "place-foo" -> :error end
+
+      assert [] = PreFare.audio_only_instances(widgets, config, fetch_routes_by_stop_fn)
     end
   end
 end

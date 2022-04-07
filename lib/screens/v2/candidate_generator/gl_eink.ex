@@ -81,6 +81,9 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
+  @impl CandidateGenerator
+  def audio_only_instances(_widgets, _config), do: []
+
   def line_map_instances(
         %Screen{
           app_params: %GlEink{

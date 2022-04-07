@@ -55,21 +55,78 @@ defmodule Screens.RoutePatterns.RoutePattern do
 
     case get_json_fn.("route_patterns", params) do
       {:ok, result} ->
-        stop_sequences =
-          get_in(result, [
-            "included",
-            Access.filter(&(&1["type"] == "trip")),
-            "relationships",
-            "stops",
-            "data",
-            Access.all(),
-            "id"
-          ])
-
-        {:ok, stop_sequences}
+        {:ok, get_stop_sequences_from_result(result)}
 
       _ ->
         :error
     end
+  end
+
+  @doc """
+  Gets the list of stop sequences for stop and creates a map of platform IDs to parent station name.
+  Assumes that all stop sequences in result are platforms.
+  """
+  @spec fetch_parent_station_sequences_through_stop(Stop.id(), list(String.t())) ::
+          {:ok, list(list(Stop.id()))} | :error
+  def fetch_parent_station_sequences_through_stop(
+        stop_id,
+        route_filters,
+        get_json_fn \\ &V3Api.get_json/2
+      ) do
+    params = %{
+      "include" => "representative_trip.stops,route",
+      "filter[stop]" => stop_id,
+      "filter[route]" => Enum.join(route_filters, ",")
+    }
+
+    case get_json_fn.("route_patterns", params) do
+      {:ok, result} ->
+        {:ok, convert_platform_to_parent_station(result)}
+
+      _ ->
+        :error
+    end
+  end
+
+  defp get_stop_sequences_from_result(result) do
+    get_in(result, [
+      "included",
+      Access.filter(&(&1["type"] == "trip")),
+      "relationships",
+      "stops",
+      "data",
+      Access.all(),
+      "id"
+    ])
+  end
+
+  defp get_platform_to_station_map_from_result(result) do
+    result
+    |> get_in([
+      "included",
+      Access.filter(&(&1["type"] == "stop"))
+    ])
+    |> Enum.map(fn %{
+                     "relationships" => %{
+                       "parent_station" => %{"data" => %{"id" => parent_station_name}}
+                     },
+                     "id" => platform_id
+                   } ->
+      {platform_id, parent_station_name}
+    end)
+    |> Enum.into(%{})
+  end
+
+  defp convert_platform_to_parent_station(result) do
+    platform_to_station_map = get_platform_to_station_map_from_result(result)
+
+    result
+    |> get_stop_sequences_from_result()
+    |> Enum.map(fn stop_sequence ->
+      stop_sequence
+      |> Enum.map(&Map.fetch!(platform_to_station_map, &1))
+    end)
+    # Dedup the stop sequences (both directions are listed, but we only need 1)
+    |> Enum.uniq_by(&MapSet.new/1)
   end
 end

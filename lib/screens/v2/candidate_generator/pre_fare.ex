@@ -4,10 +4,12 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Config.V2.PreFare
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
+  alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
@@ -73,12 +75,55 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
+  @impl CandidateGenerator
+  def audio_only_instances(
+        widgets,
+        config,
+        fetch_routes_by_stop_fn \\ &Route.fetch_routes_by_stop/1
+      ) do
+    [
+      fn -> content_summary_instances(widgets, config, fetch_routes_by_stop_fn) end
+    ]
+    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
+    |> Enum.flat_map(fn {:ok, instances} -> instances end)
+  end
+
   defp header_instances(config, now) do
     %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}} = config
 
     stop_name = Stop.fetch_stop_name(stop_id)
 
     [%NormalHeader{screen: config, text: stop_name, time: now}]
+  end
+
+  defp content_summary_instances(widgets, config, fetch_routes_by_stop_fn) do
+    config.app_params.content_summary.parent_station_id
+    |> fetch_routes_by_stop_fn.()
+    |> case do
+      {:ok, routes_at_station} ->
+        subway_lines_at_station =
+          routes_at_station
+          |> Enum.map(& &1.route_id)
+          |> Enum.map(fn
+            "Red" -> :red
+            "Orange" -> :orange
+            "Green" <> _ -> :green
+            "Blue" -> :blue
+            _ -> nil
+          end)
+          |> Enum.reject(&is_nil/1)
+          |> Enum.uniq()
+
+        %ContentSummary{
+          screen: config,
+          widgets_snapshot: widgets,
+          lines_at_station: subway_lines_at_station
+        }
+
+      :error ->
+        nil
+    end
+    |> List.wrap()
   end
 
   defp placeholder_instances do
