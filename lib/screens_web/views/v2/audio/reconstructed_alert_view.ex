@@ -54,7 +54,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
 
     cond do
       String.length(non_gl_text) == 0 -> gl_text
-      String.length(gl_text) == 0 -> gl_text
+      String.length(gl_text) == 0 -> non_gl_text
       true -> non_gl_text <> " and " <> gl_text
     end
   end
@@ -69,7 +69,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
       %{branches: [b1, b2]} -> "Green Line: #{b1} and #{b2} Branches"
       %{branches: [b1, b2, b3]} -> "Green Line: #{b1}, #{b2}, and #{b3} Branches"
     end)
-    |> hd()
+    |> List.first("")
   end
 
   # Builds the text for non-GL lines and/or GL where all branches are affected.

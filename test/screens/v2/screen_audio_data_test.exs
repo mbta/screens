@@ -108,12 +108,20 @@ defmodule Screens.V2.ScreenAudioDataTest do
 
       fetch_data_fn = fn _config_valid_audio -> {:layout, selected_instances} end
 
+      get_audio_only_instances_fn = fn _widgets, _config -> [] end
+
       audio_view = ScreensWeb.V2.Audio.MockWidgetView
 
       expected_data = [{audio_view, %{content: "Header"}}, {audio_view, %{content: "Departures"}}]
 
       assert expected_data ==
-               ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn, now)
+               ScreenAudioData.by_screen_id(
+                 screen_id,
+                 get_config_fn,
+                 fetch_data_fn,
+                 get_audio_only_instances_fn,
+                 now
+               )
     end
 
     test "returns an empty list if audio not in valid date range", %{
@@ -147,16 +155,25 @@ defmodule Screens.V2.ScreenAudioDataTest do
 
       fetch_data_fn = fn _config_audio_inactive -> {:layout, selected_instances} end
 
+      get_audio_only_instances_fn = fn _widgets, _config -> [] end
+
       expected_data = []
 
       assert expected_data ==
-               ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn, now)
+               ScreenAudioData.by_screen_id(
+                 screen_id,
+                 get_config_fn,
+                 fetch_data_fn,
+                 get_audio_only_instances_fn,
+                 now
+               )
     end
 
     test "returns an empty list if audio config is missing", %{
       config_no_audio: config_no_audio
     } do
       screen_id = "123"
+      now = ~U[2021-10-18T15:00:00Z]
 
       selected_instances = %{
         {0, :medium_left} => %MockWidget{
@@ -183,16 +200,25 @@ defmodule Screens.V2.ScreenAudioDataTest do
 
       fetch_data_fn = fn _config_no_audio -> {:layout, selected_instances} end
 
+      get_audio_only_instances_fn = fn _widgets, _config -> [] end
+
       expected_data = []
 
       assert expected_data ==
-               ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn)
+               ScreenAudioData.by_screen_id(
+                 screen_id,
+                 get_config_fn,
+                 fetch_data_fn,
+                 get_audio_only_instances_fn,
+                 now
+               )
     end
 
-    test "returns an error if not a BusShelter screen", %{
+    test "returns an error if not a screen with defined audio equivalence", %{
       config_eink: config_eink
     } do
       screen_id = "123"
+      now = ~U[2021-10-18T15:00:00Z]
 
       selected_instances = %{
         {0, :medium_left} => %MockWidget{
@@ -219,10 +245,85 @@ defmodule Screens.V2.ScreenAudioDataTest do
 
       fetch_data_fn = fn _config_eink -> {:layout, selected_instances} end
 
+      get_audio_only_instances_fn = fn _widgets, _config -> [] end
+
       expected_data = :error
 
       assert expected_data ==
-               ScreenAudioData.by_screen_id(screen_id, get_config_fn, fetch_data_fn)
+               ScreenAudioData.by_screen_id(
+                 screen_id,
+                 get_config_fn,
+                 fetch_data_fn,
+                 get_audio_only_instances_fn,
+                 now
+               )
+    end
+
+    test "adds audio-only widgets to the readout data as defined by the audio_only_instances candidate generator function",
+         %{config_valid_audio: config_valid_audio} do
+      screen_id = "123"
+      now = ~U[2021-10-18T05:00:00Z]
+
+      selected_instances = %{
+        {0, :medium_left} => %MockWidget{
+          slot_names: [:medium_left, :medium_right],
+          audio_valid_candidate?: true,
+          audio_sort_key: [2],
+          content: "Alert"
+        },
+        :main_content => %MockWidget{
+          slot_names: [:main_content],
+          audio_valid_candidate?: true,
+          audio_sort_key: [1],
+          content: "Departures"
+        },
+        :header => %MockWidget{
+          slot_names: [:header],
+          audio_valid_candidate?: true,
+          audio_sort_key: [0],
+          content: "Header"
+        }
+      }
+
+      get_config_fn = fn _screen_id -> config_valid_audio end
+
+      fetch_data_fn = fn _config_valid_audio -> {:layout, selected_instances} end
+
+      get_audio_only_instances_fn = fn _widgets, _config ->
+        [
+          %MockWidget{
+            slot_names: [:nothing],
+            audio_valid_candidate?: true,
+            audio_sort_key: [0, 1],
+            content: "Content Summary"
+          },
+          %MockWidget{
+            slot_names: [:nothing],
+            audio_valid_candidate?: true,
+            audio_sort_key: [1, 1],
+            content: "Alerts Summary"
+          }
+        ]
+      end
+
+      audio_view = ScreensWeb.V2.Audio.MockWidgetView
+
+      expected_data = [
+        {audio_view, %{content: "Header"}},
+        {audio_view, %{content: "Content Summary"}},
+        {audio_view, %{content: "Departures"}},
+        {audio_view, %{content: "Alerts Summary"}},
+        {audio_view, %{content: "Alert"}}
+      ]
+
+      assert expected_data ==
+               ScreenAudioData.by_screen_id(
+                 screen_id,
+                 get_config_fn,
+                 fetch_data_fn,
+                 get_audio_only_instances_fn,
+                 now
+               )
     end
   end
 

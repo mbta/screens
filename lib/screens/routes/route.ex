@@ -63,7 +63,7 @@ defmodule Screens.Routes.Route do
   end
 
   @doc """
-  Fetches route type of routes that serve the given stop. `today` is used to determine whether
+  Fetches routes that serve the given stop. `now` is used to determine whether
   each route is actively running on the current day.
   """
   @spec fetch_routes_by_stop(String.t()) ::

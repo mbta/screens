@@ -37,6 +37,9 @@ defmodule Screens.V2.CandidateGenerator.Solari do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
+  @impl CandidateGenerator
+  def audio_only_instances(_widgets, _config), do: []
+
   defp header_instances(config, now) do
     %Screen{app_params: %Solari{header: %CurrentStopName{stop_name: stop_name}}} = config
 

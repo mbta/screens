@@ -62,6 +62,9 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
+  @impl CandidateGenerator
+  def audio_only_instances(_widgets, _config), do: []
+
   defp header_instances(config, now, fetch_stop_name_fn) do
     %Screen{app_params: %BusEink{header: %CurrentStopId{stop_id: stop_id}}} = config
 
