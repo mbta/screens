@@ -38,7 +38,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
       %{text: text} ->
         text
         |> Enum.map_join(" ", fn
-          %{icon: icon} -> "#{icon} line"
+          %{route: route} -> "#{route} line"
           text -> text
         end)
 
