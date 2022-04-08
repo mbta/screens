@@ -63,7 +63,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
   # Uses hd() because there will only ever be one GL item in routes.
   defp get_gl_text(routes) do
     routes
-    |> Enum.filter(&(&1.color == :green and length(&1.branches) < 4))
+    |> Enum.filter(&Map.has_key?(&1, :branches))
     |> Enum.map(fn
       %{branches: [branch]} -> "Green Line: #{branch} Branch"
       %{branches: [b1, b2]} -> "Green Line: #{b1} and #{b2} Branches"
@@ -76,7 +76,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
   defp get_non_gl_text(routes) do
     non_gl_lines =
       routes
-      |> Enum.reject(&(&1.color == :green and length(&1.branches) < 4))
+      |> Enum.reject(&Map.has_key?(&1, :branches))
       |> Enum.map(fn %{color: color} -> color end)
 
     case non_gl_lines do
