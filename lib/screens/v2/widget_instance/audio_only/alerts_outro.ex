@@ -5,7 +5,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsOutro do
 
   alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.{Alert, ReconstructedAlert}
+  alias Screens.V2.WidgetInstance.ReconstructedAlert
 
   require Logger
 
@@ -72,7 +72,6 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsOutro do
 
   def audio_view(_instance), do: ScreensWeb.V2.Audio.AlertsOutroView
 
-  defp alert_widget?(%Alert{}), do: true
   defp alert_widget?(%ReconstructedAlert{}), do: true
   defp alert_widget?(%_other_widget_instance{}), do: false
 
