@@ -106,6 +106,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   end
 
   defp parse_facility_data(nil), do: %{}
+
   defp parse_facility_data(facilities) do
     facilities
     |> Enum.map(fn %{"attributes" => %{"short_name" => short_name}, "id" => id} ->
