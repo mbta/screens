@@ -8,7 +8,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
         region: :outside,
         effect: :station_closure
       }) do
-    ~E|<p><%= issue %> <%= cause %>. <%= remedy %>.</p>|
+    ~E|<p><%= issue %> <%= cause %>. <%= adjust_remedy(remedy) %>.</p>|
   end
 
   def render("_widget.ssml", %{
@@ -30,7 +30,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
         routes: routes,
         effect: effect
       }) do
-    ~E|<p><%= render_affected_routes(routes) %> alert. <%= render_issue(issue) %> <%= location %> <%= cause %>. <%= remedy %>. <%= render_additional_info_for_effect(effect) %>.</p>|
+    ~E|<p><%= render_affected_routes(routes) %> alert. <%= render_issue(issue) %> <%= location %> <%= cause %>. <%= adjust_remedy(remedy) %>. <%= render_additional_info_for_effect(effect) %>.</p>|
   end
 
   defp render_issue(issue) do
@@ -109,4 +109,8 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
       _ -> ""
     end
   end
+
+  defp adjust_remedy("Seek alternate route"), do: "Please seek an alternate route"
+
+  defp adjust_remedy(remedy), do: remedy
 end

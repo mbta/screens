@@ -80,7 +80,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Using hd/1 because we know that only single line stations use this function.
-  defp get_destination(%__MODULE__{} = t) do
+  defp get_destination(
+         %__MODULE__{
+           screen: %Screen{app_params: %{reconstructed_alert_widget: %{stop_id: stop_id}}}
+         } = t
+       ) do
     informed_entities = BaseAlert.informed_entities(t)
 
     {direction_id, route_id} =
@@ -90,12 +94,29 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       |> hd()
 
     if is_nil(direction_id) do
-      nil
+      informed_stop_ids = Enum.into(informed_entities, MapSet.new(), & &1.stop)
+
+      :screens
+      |> Application.get_env(:reconstructed_alert_headsign_matchers)
+      |> Map.get(stop_id)
+      |> Enum.find_value(nil, fn {informed, not_informed, headsign} ->
+        if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
+          do: headsign,
+          else: false
+      end)
     else
       @route_directions
       |> Map.get(route_id)
       |> Enum.at(direction_id)
     end
+  end
+
+  defp to_set(stop_id) when is_binary(stop_id), do: MapSet.new([stop_id])
+  defp to_set(stop_ids), do: MapSet.new(stop_ids)
+
+  defp alert_region_match?(informed, not_informed, informed_stop_ids) do
+    MapSet.subset?(informed, informed_stop_ids) and
+      MapSet.disjoint?(not_informed, informed_stop_ids)
   end
 
   defp get_route_pills(routes) do
@@ -140,7 +161,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: FreeTextLine.to_json(issue),
-      remedy: "Please seek an alternate route",
+      remedy: "Seek alternate route",
       location: location_text,
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -199,7 +220,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Station Closed",
-      remedy: "Please seek an alternate route",
+      remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -222,7 +243,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "No trains",
-      remedy: "Please seek an alternate route",
+      remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -266,7 +287,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "#{line} platform closed",
-      remedy: "Please seek an alternate route",
+      remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),
@@ -355,7 +376,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
-        remedy: "Please seek an alternate route",
+        remedy: "Seek alternate route",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -375,7 +396,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
-        remedy: "Please seek an alternate route",
+        remedy: "Seek alternate route",
         location: "",
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -512,7 +533,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if length(affected_routes) > 1 do
       %{
         issue: header,
-        remedy: "Please seek an alternate route",
+        remedy: "Seek alternate route",
         location: "",
         cause: "",
         routes: get_route_pills(affected_routes),
@@ -533,7 +554,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
-        remedy: "Please seek an alternate route",
+        remedy: "Seek alternate route",
         location: location_text,
         cause: cause_text,
         routes: get_route_pills(affected_routes),
@@ -599,7 +620,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Trains will bypass #{station}",
-      remedy: "Please seek an alternate route",
+      remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
       routes: get_route_pills(affected_routes),

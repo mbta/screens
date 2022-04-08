@@ -68,7 +68,7 @@ config :screens,
   # Maps alert informed entity contents to the appropriate headsign to show for that alert.
   # List elements must be of the shape {informed_stop_ids, not_informed_stop_ids, headsign}.
   # Each set of stop IDs can be either a single string or a list of strings.
-  dup_alert_headsign_matchers: %{
+  reconstructed_alert_headsign_matchers: %{
     # Kenmore
     "place-kencl" => [
       {"70149", ~w[70153 70211 70187], "Boston College"},
@@ -93,6 +93,15 @@ config :screens,
       # OL
       {"70027", "70023", "Oak Grove"},
       {"70022", "70026", "Forest Hills"}
+    ],
+    # Government Center
+    "place-gover" => [
+      # GL
+      {"70203", "70200", "Northbound"},
+      {"~w[70199 70198 70197 70196]", "70204", "Copley & West"},
+      # BL
+      {"70042", "70038", "Wonderland"},
+      {"70038", "70041", "Bowdoin"}
     ],
     # Back Bay
     "place-bbsta" => [
@@ -123,6 +132,11 @@ config :screens,
     "place-aqucl" => [
       {"70046", "70042", "Wonderland"},
       {"70041", "70045", "Bowdoin"}
+    ],
+    # Maverick
+    "place-mvbcl" => [
+      {"70048", "70044", "Wonderland"},
+      {"70043", "70047", "Bowdoin"}
     ],
     # Airport
     "place-aport" => [

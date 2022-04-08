@@ -252,7 +252,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         urgent: true,
         region: :inside,
-        remedy: "Please seek an alternate route"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -306,7 +306,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :station_closure,
         urgent: true,
         region: :inside,
-        remedy: "Please seek an alternate route"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -333,7 +333,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         urgent: true,
         region: :inside,
-        remedy: "Please seek an alternate route"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -360,7 +360,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         urgent: true,
         region: :inside,
-        remedy: "Please seek an alternate route"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -406,7 +406,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :station_closure,
         urgent: true,
         region: :inside,
-        remedy: "Please seek an alternate route"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -507,7 +507,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         urgent: true,
         region: :boundary,
-        remedy: "Please seek an alternate route"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -632,7 +632,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         urgent: false,
         region: :outside,
-        remedy: "Please seek an alternate route"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -680,7 +680,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :station_closure,
         urgent: false,
         region: :outside,
-        remedy: "Please seek an alternate route"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -731,7 +731,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :station_closure,
         urgent: false,
         region: :outside,
-        remedy: "Please seek an alternate route"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)

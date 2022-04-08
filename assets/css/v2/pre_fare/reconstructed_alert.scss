@@ -5,27 +5,6 @@ $alert-card-height: 576px;
 $alert-card-footer-height: 80px;
 
 .alert-container {
-  /* Background colors */
-  &--blue {
-    background-color: $line-color-blue;
-  }
-
-  &--red {
-    background-color: $line-color-red;
-  }
-
-  &--orange {
-    background-color: $line-color-orange;
-  }
-
-  &--yellow {
-    background-color: $alert-yellow;
-  }
-
-  &--green {
-    background-color: $line-color-green;
-  }
-
   // Takeover fonts
   color: #171f26;
   font-family: Inter;
@@ -279,5 +258,28 @@ $alert-card-footer-height: 80px;
   .route-pills__branches
   .route-pills__branches__dot {
     background-color: #171f26;
+  }
+}
+
+.alert-container--takeover, .alert-container--urgent {
+  /* Background colors */
+  &.alert-container--blue {
+    background-color: $line-color-blue;
+  }
+
+  &.alert-container--red {
+    background-color: $line-color-red;
+  }
+
+  &.alert-container--orange {
+    background-color: $line-color-orange;
+  }
+
+  &.alert-container--yellow {
+    background-color: $alert-yellow;
+  }
+
+  &.alert-container--green {
+    background-color: $line-color-green;
   }
 }
