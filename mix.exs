@@ -71,8 +71,8 @@ defmodule Screens.MixProject do
       {:timex, "~> 3.6"},
       {:hackney, "== 1.17.4"},
       {:guardian, "~> 2.0"},
-      {:ueberauth, "~> 0.6"},
-      {:ueberauth_cognito, "~> 0.2"},
+      {:ueberauth, "~> 0.7"},
+      {:ueberauth_cognito, "~> 0.4"},
       {:corsica, "~> 1.0"},
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false}
     ]
