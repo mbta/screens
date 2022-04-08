@@ -50,7 +50,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsOutro do
         slot_names_fn
       ) do
     # On pre-fare screens, we only include this widget when
-    # there's no takeover content and at least alert widget in the readout queue.
+    # there's no takeover content and at least one alert widget in the readout queue.
     takeover_slots = MapSet.new(~w[full_body_left full_body_right full_body full_screen]a)
 
     no_takeover_content? =
