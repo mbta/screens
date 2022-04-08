@@ -112,8 +112,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp to_set(stop_id) when is_binary(stop_id), do: MapSet.new([stop_id])
-  defp to_set(stop_ids) when is_list(stop_ids), do: MapSet.new(stop_ids)
-  defp to_set(%MapSet{} = already_a_set), do: already_a_set
+  defp to_set(stop_ids), do: MapSet.new(stop_ids)
 
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do
     MapSet.subset?(informed, informed_stop_ids) and
