@@ -5,7 +5,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntro do
 
   alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.{Alert, ReconstructedAlert, SubwayStatus}
+  alias Screens.V2.WidgetInstance.{ReconstructedAlert, SubwayStatus}
 
   require Logger
 
