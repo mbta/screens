@@ -20,3 +20,14 @@ config :ueberauth, Ueberauth,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :screens,
+  # See config.exs for details
+  reconstructed_alert_headsign_matchers: %{
+    # Downtown Crossing
+    "place-dwnxg" => [
+      # RL
+      {"70076", "70080", "Alewife"},
+      {"70079", "70075", "Ashmont/Braintree"}
+    ]
+  }

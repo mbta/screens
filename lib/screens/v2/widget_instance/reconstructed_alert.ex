@@ -80,7 +80,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Using hd/1 because we know that only single line stations use this function.
-  defp get_destination(%__MODULE__{screen: %Screen{app_params: %{reconstructed_alert_widget: %{stop_id: stop_id}}}} = t) do
+  defp get_destination(
+         %__MODULE__{
+           screen: %Screen{app_params: %{reconstructed_alert_widget: %{stop_id: stop_id}}}
+         } = t
+       ) do
     informed_entities = BaseAlert.informed_entities(t)
 
     {direction_id, route_id} =
