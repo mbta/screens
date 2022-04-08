@@ -87,7 +87,6 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntro do
 
   def audio_view(_instance), do: ScreensWeb.V2.Audio.AlertsIntroView
 
-  defp service_alert_widget?(%Alert{}), do: true
   defp service_alert_widget?(%ReconstructedAlert{}), do: true
   defp service_alert_widget?(%SubwayStatus{}), do: true
   defp service_alert_widget?(%_other_widget_instance{}), do: false
