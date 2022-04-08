@@ -64,7 +64,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntro do
         %__MODULE__{screen: %Screen{app_id: :pre_fare_v2}} = t,
         slot_names_fn
       ) do
-    # On pre-fare screens, we only include an alerts intro when
+    # On pre-fare screens, we only include this widget when
     # there's no takeover content and at least one service alert widget in the readout queue.
     takeover_slots = MapSet.new(~w[full_body_left full_body_right full_body full_screen]a)
 

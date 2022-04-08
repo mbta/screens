@@ -4,7 +4,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
   alias Screens.Config.{Screen, V2}
   alias Screens.V2.CandidateGenerator.PreFare
   alias Screens.V2.WidgetInstance.NormalHeader
-  alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, ContentSummary}
+  alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
 
   setup do
     config = %Screen{
@@ -155,6 +155,17 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
       assert Enum.any?(
                PreFare.audio_only_instances(widgets, config, fetch_routes_by_stop_fn),
                &match?(%AlertsIntro{}, &1)
+             )
+    end
+
+    test "always returns list containing alerts outro", %{config: config} do
+      widgets = []
+
+      fetch_routes_by_stop_fn = fn "place-foo" -> {:ok, []} end
+
+      assert Enum.any?(
+               PreFare.audio_only_instances(widgets, config, fetch_routes_by_stop_fn),
+               &match?(%AlertsOutro{}, &1)
              )
     end
   end
