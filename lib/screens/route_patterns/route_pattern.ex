@@ -76,6 +76,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
     params = %{
       "include" => "representative_trip.stops,route",
       "filter[stop]" => stop_id,
+      "filter[direction_id]" => 0,
       "filter[route]" => Enum.join(route_filters, ",")
     }
 
