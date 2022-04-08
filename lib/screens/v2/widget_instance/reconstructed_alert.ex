@@ -97,7 +97,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       informed_stop_ids = Enum.into(informed_entities, MapSet.new(), & &1.stop)
 
       :screens
-      |> Application.get_env(:reconstructed_alert_headsign_matchers)
+      |> Application.get_env(:prefare_alert_headsign_matchers)
       |> Map.get(stop_id)
       |> Enum.find_value(nil, fn {informed, not_informed, headsign} ->
         if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),

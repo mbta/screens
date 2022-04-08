@@ -23,7 +23,7 @@ config :logger, level: :warn
 
 config :screens,
   # See config.exs for details
-  reconstructed_alert_headsign_matchers: %{
+  prefare_alert_headsign_matchers: %{
     # Downtown Crossing
     "place-dwnxg" => [
       # RL
