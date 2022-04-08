@@ -20,6 +20,12 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
   @enforce_keys [:screen, :widgets_snapshot, :lines_at_station]
   defstruct @enforce_keys
 
+  # This value is appended to the target widget in order to insert this one
+  # immediately after the target, and is unique among other audio-only widgets'
+  # sort keys so that there is a definite ordering should two audio-only widgets
+  # end up adjacent to each other.
+  @audio_sort_key_part [0]
+
   def audio_serialize(%__MODULE__{screen: %Screen{app_id: :pre_fare_v2}} = t) do
     %{lines_at_station: t.lines_at_station}
   end
@@ -32,7 +38,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
         [0]
 
       header ->
-        WidgetInstance.audio_sort_key(header) ++ [0]
+        WidgetInstance.audio_sort_key(header) ++ @audio_sort_key_part
     end
   end
 

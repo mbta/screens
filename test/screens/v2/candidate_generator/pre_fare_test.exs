@@ -4,7 +4,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
   alias Screens.Config.{Screen, V2}
   alias Screens.V2.CandidateGenerator.PreFare
   alias Screens.V2.WidgetInstance.NormalHeader
-  alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
+  alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, ContentSummary}
 
   setup do
     config = %Screen{
@@ -111,7 +111,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
   end
 
   describe "audio_only_instances/3" do
-    test "returns a ContentSummary widget if we successfully fetch routes serving the home station",
+    test "returns list containing a ContentSummary widget if we successfully fetch routes serving the home station",
          %{config: config} do
       widgets = []
 
@@ -120,23 +120,42 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
          [%{route_id: "Red"}, %{route_id: "Green-B"}, %{route_id: "Green-C"}, %{route_id: "Blue"}]}
       end
 
-      assert [
-               %ContentSummary{
-                 widgets_snapshot: ^widgets,
-                 screen: ^config,
-                 lines_at_station: [:red, :green, :blue]
-               }
-             ] = PreFare.audio_only_instances(widgets, config, fetch_routes_by_stop_fn)
+      expected_content_summary = %ContentSummary{
+        widgets_snapshot: widgets,
+        screen: config,
+        lines_at_station: [:red, :green, :blue]
+      }
+
+      assert expected_content_summary in PreFare.audio_only_instances(
+               widgets,
+               config,
+               fetch_routes_by_stop_fn
+             )
     end
 
-    test "returns empty list if we fail to fetch routes serving the home station", %{
-      config: config
-    } do
+    test "returns list without content summary if we fail to fetch routes serving the home station",
+         %{
+           config: config
+         } do
       widgets = []
 
       fetch_routes_by_stop_fn = fn "place-foo" -> :error end
 
-      assert [] = PreFare.audio_only_instances(widgets, config, fetch_routes_by_stop_fn)
+      refute Enum.any?(
+               PreFare.audio_only_instances(widgets, config, fetch_routes_by_stop_fn),
+               &match?(%ContentSummary{}, &1)
+             )
+    end
+
+    test "always returns list containing alerts intro", %{config: config} do
+      widgets = []
+
+      fetch_routes_by_stop_fn = fn "place-foo" -> {:ok, []} end
+
+      assert Enum.any?(
+               PreFare.audio_only_instances(widgets, config, fetch_routes_by_stop_fn),
+               &match?(%AlertsIntro{}, &1)
+             )
     end
   end
 end
