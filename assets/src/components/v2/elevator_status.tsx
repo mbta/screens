@@ -200,7 +200,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
   const HEADER_SIZES = ["small", "large"];
   const { ref: descriptionRef, size: descriptionSize } = useTextResizer({
     sizes: DESCRIPTION_SIZES,
-    maxHeight: 450,
+    maxHeight: 425,
     resetDependencies: [description],
   });
 
