@@ -6,7 +6,7 @@
   height: 20px;
   text-align: center;
   padding-top: 16px;
-  padding-bottom: 16px;
+  padding-bottom: 24px;
 }
 
 .flex-zone-page-indicator__page__progress-bar {
@@ -21,10 +21,13 @@
   width: 144px;
   height: 16px;
   border-radius: 24px;
-  margin-left: 44px;
   overflow: hidden;
   background: #cccbc8;
   box-shadow: inset 1px 2px 6px 0px #bfbebb;
+
+  &:not(:first-child) {
+    margin-left: 44px;
+  }
 
   &--past {
     .flex-zone-page-indicator__page__progress-bar {
