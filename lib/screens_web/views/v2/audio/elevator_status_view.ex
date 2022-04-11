@@ -60,7 +60,7 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusView do
         "Upcoming elevator closure:"
       end
 
-    ~E|<s><%= upcoming_text %> At <%= station_text %>, <%= render_timeframe(timeframe) %>: Elevator Number <say-as interpret-as="address"><%= id %></say-as>, <%= name %>: <%= alternate_path_instructions %></s>|
+    ~E|<s><%= upcoming_text %> At <%= station_text %>, <%= render_timeframe(timeframe) %>: Elevator Number <say-as interpret-as="address"><%= id %></say-as>, <%= name %></s><%= alternate_path_instructions %>|
   end
 
   # List pages
