@@ -34,7 +34,7 @@ const useTextResizer = ({
     setSizeIndex(sizes.length - 1);
   }, resetDependencies);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (ref.current !== null) {
       const height = ref.current.clientHeight;
       if (height > maxHeight && sizeIndex > 0) {
