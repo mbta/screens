@@ -1,7 +1,6 @@
 import React from "react";
 
 import Widget, { WidgetData } from "Components/v2/widget";
-import FlexZonePageIndicator from "Components/v2/flex/page_indicator";
 
 interface Props {
   medium_left: WidgetData;
@@ -24,7 +23,6 @@ const TwoMedium: React.ComponentType<Props> = ({
       <div className="flex-two-medium__right">
         <Widget data={mediumRight} />
       </div>
-      <FlexZonePageIndicator pageIndex={pageIndex} numPages={numPages} />
     </div>
   );
 };

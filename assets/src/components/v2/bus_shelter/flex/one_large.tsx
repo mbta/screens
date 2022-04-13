@@ -1,7 +1,6 @@
 import React from "react";
 
 import Widget, { WidgetData } from "Components/v2/widget";
-import FlexZonePageIndicator from "Components/v2/flex/page_indicator";
 
 interface Props {
   large: WidgetData;
@@ -19,7 +18,6 @@ const OneLarge: React.ComponentType<Props> = ({
       <div className="flex-one-large__large">
         <Widget data={large} />
       </div>
-      <FlexZonePageIndicator pageIndex={pageIndex} numPages={numPages} />
     </div>
   );
 };
