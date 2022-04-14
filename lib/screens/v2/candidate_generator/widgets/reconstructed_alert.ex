@@ -7,6 +7,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.Config.V2.PreFare
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
+  alias Screens.Stops.Stop
+  alias Screens.Util
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
 
@@ -23,7 +25,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         now \\ DateTime.utc_now(),
         fetch_routes_by_stop_fn \\ &Route.fetch_routes_by_stop/3,
         fetch_stop_sequences_by_stop_fn \\ &RoutePattern.fetch_parent_station_sequences_through_stop/2,
-        fetch_alerts_fn \\ &Alert.fetch/1
+        fetch_alerts_fn \\ &Alert.fetch/1,
+        get_stations_fn \\ &get_stations/1
       ) do
     # Filtering by subway and light_rail types
     with {:ok, routes_at_stop} <- fetch_routes_by_stop_fn.(stop_id, now, [0, 1]),
@@ -39,7 +42,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
           alert: alert,
           now: now,
           stop_sequences: station_sequences,
-          routes_at_stop: routes_at_stop
+          routes_at_stop: routes_at_stop,
+          informed_station_string: get_stations_fn.(alert)
         }
       end)
     else
@@ -73,5 +77,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         _ ->
           false
       end
+  end
+
+  defp get_stations(alert) do
+    %{alert: alert}
+    |> BaseAlert.informed_entities()
+    |> Enum.map(fn %{stop: stop_id} -> stop_id end)
+    |> Enum.filter(&String.starts_with?(&1, "place-"))
+    |> Enum.uniq()
+    |> Enum.map(
+      case &Stop.fetch_stop_name(&1) do
+        :error -> ""
+        name -> name
+      end)
+    |> Util.format_name_list_to_string()
   end
 end

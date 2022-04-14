@@ -85,14 +85,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         routes_at_stop: routes_at_stop,
         station_sequences: station_sequences,
         now: ~U[2021-01-01T00:00:00Z],
+        informed_station_string: "Alewife",
         fetch_routes_by_stop_fn: fn _, _, _ -> {:ok, routes_at_stop} end,
         fetch_parent_station_sequences_through_stop_fn: fn _, _ ->
           {:ok, station_sequences}
         end,
         fetch_alerts_fn: fn _ -> {:ok, alerts} end,
+        get_stations_fn: fn _ -> "Alewife" end,
         x_fetch_routes_by_stop_fn: fn _, _, _ -> :error end,
         x_fetch_parent_station_sequences_through_stop_fn: fn _, _ -> :error end,
-        x_fetch_alerts_fn: fn _ -> :error end
+        x_fetch_alerts_fn: fn _ -> :error end,
+        x_get_stations_fn: fn _ -> :error end,
       }
     end
 
@@ -102,17 +105,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         routes_at_stop: routes_at_stop,
         station_sequences: station_sequences,
         now: now,
+        informed_station_string: informed_station_string,
         fetch_routes_by_stop_fn: fetch_routes_by_stop_fn,
         fetch_parent_station_sequences_through_stop_fn:
           fetch_parent_station_sequences_through_stop_fn,
-        fetch_alerts_fn: fetch_alerts_fn
+        fetch_alerts_fn: fetch_alerts_fn,
+        get_stations_fn: get_stations_fn
       } = context
 
       expected_common_data = %{
         screen: config,
         routes_at_stop: routes_at_stop,
         stop_sequences: station_sequences,
-        now: now
+        now: now,
+        informed_station_string: informed_station_string
       }
 
       expected_widgets = [
@@ -150,7 +156,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_routes_by_stop_fn,
                  fetch_parent_station_sequences_through_stop_fn,
-                 fetch_alerts_fn
+                 fetch_alerts_fn,
+                 get_stations_fn
                )
     end
 
@@ -161,7 +168,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         fetch_routes_by_stop_fn: fetch_routes_by_stop_fn,
         fetch_parent_station_sequences_through_stop_fn:
           fetch_parent_station_sequences_through_stop_fn,
-        fetch_alerts_fn: fetch_alerts_fn
+        fetch_alerts_fn: fetch_alerts_fn,
+        get_stations_fn: get_stations_fn
       } = context
 
       assert_raise FunctionClauseError, fn ->
@@ -170,7 +178,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
           now,
           fetch_routes_by_stop_fn,
           fetch_parent_station_sequences_through_stop_fn,
-          fetch_alerts_fn
+          fetch_alerts_fn,
+          get_stations_fn
         )
       end
     end
@@ -183,10 +192,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         fetch_parent_station_sequences_through_stop_fn:
           fetch_parent_station_sequences_through_stop_fn,
         fetch_alerts_fn: fetch_alerts_fn,
+        get_stations_fn: get_stations_fn,
         x_fetch_routes_by_stop_fn: x_fetch_routes_by_stop_fn,
         x_fetch_parent_station_sequences_through_stop_fn:
           x_fetch_parent_station_sequences_through_stop_fn,
-        x_fetch_alerts_fn: x_fetch_alerts_fn
+        x_fetch_alerts_fn: x_fetch_alerts_fn,
+        x_get_stations_fn: x_get_stations_fn
       } = context
 
       assert [] ==
@@ -195,7 +206,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  x_fetch_routes_by_stop_fn,
                  fetch_parent_station_sequences_through_stop_fn,
-                 fetch_alerts_fn
+                 fetch_alerts_fn,
+                 get_stations_fn
                )
 
       assert [] ==
@@ -204,7 +216,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_routes_by_stop_fn,
                  x_fetch_parent_station_sequences_through_stop_fn,
-                 fetch_alerts_fn
+                 fetch_alerts_fn,
+                 get_stations_fn
                )
 
       assert [] ==
@@ -213,7 +226,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_routes_by_stop_fn,
                  fetch_parent_station_sequences_through_stop_fn,
-                 x_fetch_alerts_fn
+                 x_fetch_alerts_fn,
+                 get_stations_fn
                )
     end
   end
