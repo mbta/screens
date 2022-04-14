@@ -62,7 +62,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       now: now
     }
 
-    relevant_effect?(effect) and relevant_location?(reconstructed_alert) and active?(alert, now)
+    relevant_effect?(effect) and relevant_location?(reconstructed_alert) and
+      Alert.happening_now?(alert, now)
   end
 
   defp relevant_effect?(effect) do
@@ -83,9 +84,5 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       _ ->
         false
     end
-  end
-
-  defp active?(alert, now) do
-    Alert.happening_now?(alert, now)
   end
 end
