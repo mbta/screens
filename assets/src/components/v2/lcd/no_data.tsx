@@ -1,6 +1,6 @@
 import NoConnection from "Components/v2/bundled_svg/no_connection";
-import Phone from "Components/v2/bundled_svg/phone";
 import React, { ComponentType } from "react";
+import TLogo from "Components/v2/bundled_svg/t_logo";
 
 interface Props {
   show_alternatives: boolean;
@@ -31,19 +31,14 @@ const NoData: ComponentType<Props> = ({
         <>
           <div className="no-data__hairline" />
           <div className="no-data__alternatives-container">
-            <div className="no-data__phone-icon-container">
-              <Phone className="no-data__phone-icon" colorHex={coolBlack} />
-            </div>
             <div className="no-data__alternatives__message">
               For schedules, go to{" "}
               <span className="no-data__alternatives__message__em">
                 mbta.com/schedules
               </span>{" "}
-              or{" "}
-              <span className="no-data__alternatives__message__em">
-                Transit
-              </span>{" "}
-              app
+            </div>
+            <div className="no-data__t-logo-icon-container">
+              <TLogo className="no-data__t-logo-icon" colorHex={coolBlack} />
             </div>
           </div>
         </>
