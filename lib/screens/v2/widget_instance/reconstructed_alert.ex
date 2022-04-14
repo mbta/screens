@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Config.Dup.Override.FreeTextLine
   alias Screens.Config.Screen
   alias Screens.Stops.Stop
+  alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
@@ -613,10 +614,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     affected_routes = get_affected_routes(informed_entities)
     cause_text = get_cause_text(cause)
 
-    station =
-      case get_stations(informed_entities) do
-        [station | _] -> Stop.fetch_stop_name(station)
-      end
+    station = get_stations(informed_entities)
 
     %{
       issue: "Trains will bypass #{station}",
@@ -647,6 +645,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities
     |> Enum.map(fn %{stop: stop_id} -> stop_id end)
     |> Enum.filter(&String.starts_with?(&1, "place-"))
+    |> Enum.uniq()
+    |> Enum.map(&Stop.fetch_stop_name(&1))
+    |> Util.format_name_list_to_string()
   end
 
   defp get_cause_text(cause) do

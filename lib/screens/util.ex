@@ -121,4 +121,17 @@ defmodule Screens.Util do
     {:ok, dt, _} = DateTime.from_iso8601(time)
     dt
   end
+
+  @doc """
+  Takes a list of proper noun strings and
+  returns a string (with Oxford comma when necessary)
+  """
+  @spec format_name_list_to_string([String.t()]) :: String.t()
+  def format_name_list_to_string([string]), do: "#{string}"
+  def format_name_list_to_string([s1, s2]), do: "#{s1} and #{s2}"
+  def format_name_list_to_string(list) do
+    new_list = list
+    |> List.replace_at(length(list), &"and #{&1}")
+    |> Enum.join(", ")
+  end
 end
