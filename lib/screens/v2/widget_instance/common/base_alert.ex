@@ -68,10 +68,8 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     |> Enum.dedup()
   end
 
-  @spec informed_entities(AlertWidget.t() | ReconstructedAlert.t()) ::
-          list(Alert.informed_entity())
-  def informed_entities(%{alert: %Alert{informed_entities: informed_entities}}) do
-    informed_entities
+  def informed_entities(t) do
+    t.alert.informed_entities
   end
 
   @spec informed_entity_to_zone(Alert.informed_entity(), map()) ::
@@ -130,15 +128,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     end
   end
 
-  @spec location(%{
-          __struct__:
-            Screens.V2.WidgetInstance.Alert | Screens.V2.WidgetInstance.ReconstructedAlert | map(),
-          alert: Screens.Alerts.Alert.t(),
-          now: DateTime.t(),
-          routes_at_stop: [map],
-          screen: Screens.Config.Screen.t(),
-          stop_sequences: [list]
-        }) ::
+  @spec location(AlertWidget.t() | ReconstructedAlert.t()) ::
           :boundary_downstream
           | :boundary_upstream
           | :downstream

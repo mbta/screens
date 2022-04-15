@@ -63,7 +63,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       alert: alert,
       stop_sequences: stop_sequences,
       routes_at_stop: routes_at_stop,
-      now: now
+      now: now,
+      informed_stations_string: "A Station"
     }
 
     relevant_effect?(effect) and relevant_location?(reconstructed_alert) and
