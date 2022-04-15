@@ -608,7 +608,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp serialize_outside_alert(
-         %__MODULE__{alert: %Alert{effect: :station_closure, cause: cause}, informed_station_string: informed_station_string} = t
+         %__MODULE__{
+           alert: %Alert{effect: :station_closure, cause: cause},
+           informed_station_string: informed_station_string
+         } = t
        ) do
     informed_entities = BaseAlert.informed_entities(t)
 

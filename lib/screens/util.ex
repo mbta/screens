@@ -132,7 +132,7 @@ defmodule Screens.Util do
 
   def format_name_list_to_string(list) do
     list
-    |> List.update_at((length(list) - 1), &("and #{&1}"))
+    |> List.update_at(length(list) - 1, &"and #{&1}")
     |> Enum.join(", ")
   end
 end

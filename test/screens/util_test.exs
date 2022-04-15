@@ -13,7 +13,8 @@ defmodule Screens.UtilTest do
     end
 
     test "returns 'X, Y, and Z' if list has length >= 3" do
-      assert "Alewife, Davis, Porter, and Harvard" === format_name_list_to_string(["Alewife", "Davis", "Porter", "Harvard"])
+      assert "Alewife, Davis, Porter, and Harvard" ===
+               format_name_list_to_string(["Alewife", "Davis", "Porter", "Harvard"])
     end
   end
 end

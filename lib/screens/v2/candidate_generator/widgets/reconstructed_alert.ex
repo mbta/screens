@@ -89,7 +89,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       &case fetch_stop_name_fn.(&1) do
         :error -> []
         name -> name
-      end)
+      end
+    )
     |> Util.format_name_list_to_string()
   end
 end

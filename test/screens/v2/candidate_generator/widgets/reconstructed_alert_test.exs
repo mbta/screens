@@ -95,7 +95,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         x_fetch_routes_by_stop_fn: fn _, _, _ -> :error end,
         x_fetch_parent_station_sequences_through_stop_fn: fn _, _ -> :error end,
         x_fetch_alerts_fn: fn _ -> :error end,
-        x_fetch_stop_name_fn: fn _ -> :error end,
+        x_fetch_stop_name_fn: fn _ -> :error end
       }
     end
 
