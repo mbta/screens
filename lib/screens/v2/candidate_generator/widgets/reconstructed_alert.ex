@@ -85,10 +85,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     |> Enum.map(fn %{stop: stop_id} -> stop_id end)
     |> Enum.filter(&String.starts_with?(&1, "place-"))
     |> Enum.uniq()
-    |> Enum.map(
+    |> Enum.flat_map(
       &case fetch_stop_name_fn.(&1) do
         :error -> []
-        name -> name
+        name -> [name]
       end
     )
     |> Util.format_name_list_to_string()
