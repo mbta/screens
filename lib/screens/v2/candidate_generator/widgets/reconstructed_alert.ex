@@ -86,7 +86,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     |> Enum.filter(&String.starts_with?(&1, "place-"))
     |> Enum.uniq()
     |> Enum.map(
-      case &Stop.fetch_stop_name(&1) do
+      &case Stop.fetch_stop_name(&1) do
         :error -> ""
         name -> name
       end)
