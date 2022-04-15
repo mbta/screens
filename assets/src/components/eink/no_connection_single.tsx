@@ -1,7 +1,7 @@
 import React from "react";
 import { imagePath } from "Util/util";
 
-const ConnectionError = (): JSX.Element => {
+const NoConnectionSingle = (): JSX.Element => {
   return (
     <div className="connection-error">
       <img src={imagePath("no-data-static-single.png")} />
@@ -9,4 +9,4 @@ const ConnectionError = (): JSX.Element => {
   );
 };
 
-export default ConnectionError;
+export default NoConnectionSingle;
