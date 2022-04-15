@@ -317,7 +317,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         ),
         struct(
           %ReconstructedAlertWidget{
-            alert: %Alert{id: "3", effect: :delay, informed_entities: [ie(stop: "place-hsmnl")], active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]}
+            alert: %Alert{
+              id: "3",
+              effect: :delay,
+              informed_entities: [ie(stop: "place-hsmnl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            }
           },
           expected_common_data
         )
