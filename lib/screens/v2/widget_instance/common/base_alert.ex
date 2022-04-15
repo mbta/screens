@@ -68,6 +68,8 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     |> Enum.dedup()
   end
 
+  @spec informed_entities(AlertWidget.t() | ReconstructedAlert.t() | %{alert: Alert.t()}) ::
+          list(Alert.informed_entity())
   def informed_entities(t) do
     t.alert.informed_entities
   end
