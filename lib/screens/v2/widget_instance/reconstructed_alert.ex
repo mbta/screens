@@ -14,7 +14,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             alert: nil,
             now: nil,
             stop_sequences: nil,
-            routes_at_stop: nil
+            routes_at_stop: nil,
+            informed_stations_string: nil
 
   @type stop_id :: String.t()
 
@@ -25,7 +26,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           alert: Alert.t(),
           now: DateTime.t(),
           stop_sequences: list(list(stop_id())),
-          routes_at_stop: list(%{route_id: route_id(), active?: boolean()})
+          routes_at_stop: list(%{route_id: route_id(), active?: boolean()}),
+          informed_stations_string: String.t()
         }
 
   @route_directions %{
@@ -606,20 +608,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp serialize_outside_alert(
-         %__MODULE__{alert: %Alert{effect: :station_closure, cause: cause}} = t
+         %__MODULE__{
+           alert: %Alert{effect: :station_closure, cause: cause},
+           informed_stations_string: informed_stations_string
+         } = t
        ) do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
     cause_text = get_cause_text(cause)
 
-    station =
-      case get_stations(informed_entities) do
-        [station | _] -> Stop.fetch_stop_name(station)
-      end
-
     %{
-      issue: "Trains will bypass #{station}",
+      issue: "Trains will bypass #{informed_stations_string}",
       remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
@@ -641,12 +641,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: :delay,
       urgent: false
     }
-  end
-
-  defp get_stations(informed_entities) do
-    informed_entities
-    |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-    |> Enum.filter(&String.starts_with?(&1, "place-"))
   end
 
   defp get_cause_text(cause) do

@@ -119,14 +119,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         routes_at_stop: routes_at_stop,
         station_sequences: station_sequences,
         now: ~U[2021-01-01T00:00:00Z],
+        informed_stations_string: "Alewife",
         fetch_routes_by_stop_fn: fn _, _, _ -> {:ok, routes_at_stop} end,
         fetch_parent_station_sequences_through_stop_fn: fn _, _ ->
           {:ok, station_sequences}
         end,
         fetch_alerts_fn: fn _ -> {:ok, alerts} end,
+        fetch_stop_name_fn: fn _ -> "Alewife" end,
         x_fetch_routes_by_stop_fn: fn _, _, _ -> :error end,
         x_fetch_parent_station_sequences_through_stop_fn: fn _, _ -> :error end,
-        x_fetch_alerts_fn: fn _ -> :error end
+        x_fetch_alerts_fn: fn _ -> :error end,
+        x_fetch_stop_name_fn: fn _ -> :error end
       }
     end
 
@@ -136,17 +139,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         routes_at_stop: routes_at_stop,
         station_sequences: station_sequences,
         now: now,
+        informed_stations_string: informed_stations_string,
         fetch_routes_by_stop_fn: fetch_routes_by_stop_fn,
         fetch_parent_station_sequences_through_stop_fn:
           fetch_parent_station_sequences_through_stop_fn,
-        fetch_alerts_fn: fetch_alerts_fn
+        fetch_alerts_fn: fetch_alerts_fn,
+        fetch_stop_name_fn: fetch_stop_name_fn
       } = context
 
       expected_common_data = %{
         screen: config,
         routes_at_stop: routes_at_stop,
         stop_sequences: station_sequences,
-        now: now
+        now: now,
+        informed_stations_string: informed_stations_string
       }
 
       expected_widgets = [
@@ -191,7 +197,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_routes_by_stop_fn,
                  fetch_parent_station_sequences_through_stop_fn,
-                 fetch_alerts_fn
+                 fetch_alerts_fn,
+                 fetch_stop_name_fn
                )
     end
 
@@ -202,7 +209,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         fetch_routes_by_stop_fn: fetch_routes_by_stop_fn,
         fetch_parent_station_sequences_through_stop_fn:
           fetch_parent_station_sequences_through_stop_fn,
-        fetch_alerts_fn: fetch_alerts_fn
+        fetch_alerts_fn: fetch_alerts_fn,
+        fetch_stop_name_fn: fetch_stop_name_fn
       } = context
 
       assert_raise FunctionClauseError, fn ->
@@ -211,7 +219,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
           now,
           fetch_routes_by_stop_fn,
           fetch_parent_station_sequences_through_stop_fn,
-          fetch_alerts_fn
+          fetch_alerts_fn,
+          fetch_stop_name_fn
         )
       end
     end
@@ -224,6 +233,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         fetch_parent_station_sequences_through_stop_fn:
           fetch_parent_station_sequences_through_stop_fn,
         fetch_alerts_fn: fetch_alerts_fn,
+        fetch_stop_name_fn: fetch_stop_name_fn,
         x_fetch_routes_by_stop_fn: x_fetch_routes_by_stop_fn,
         x_fetch_parent_station_sequences_through_stop_fn:
           x_fetch_parent_station_sequences_through_stop_fn,
@@ -236,7 +246,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  x_fetch_routes_by_stop_fn,
                  fetch_parent_station_sequences_through_stop_fn,
-                 fetch_alerts_fn
+                 fetch_alerts_fn,
+                 fetch_stop_name_fn
                )
 
       assert [] ==
@@ -245,7 +256,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_routes_by_stop_fn,
                  x_fetch_parent_station_sequences_through_stop_fn,
-                 fetch_alerts_fn
+                 fetch_alerts_fn,
+                 fetch_stop_name_fn
                )
 
       assert [] ==
@@ -254,7 +266,76 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_routes_by_stop_fn,
                  fetch_parent_station_sequences_through_stop_fn,
-                 x_fetch_alerts_fn
+                 x_fetch_alerts_fn,
+                 fetch_stop_name_fn
+               )
+    end
+
+    test "fails gracefully if get_station query fails", context do
+      %{
+        config: config,
+        routes_at_stop: routes_at_stop,
+        station_sequences: station_sequences,
+        now: now,
+        fetch_routes_by_stop_fn: fetch_routes_by_stop_fn,
+        fetch_parent_station_sequences_through_stop_fn:
+          fetch_parent_station_sequences_through_stop_fn,
+        fetch_alerts_fn: fetch_alerts_fn,
+        x_fetch_stop_name_fn: x_fetch_stop_name_fn
+      } = context
+
+      expected_common_data = %{
+        screen: config,
+        routes_at_stop: routes_at_stop,
+        stop_sequences: station_sequences,
+        now: now,
+        informed_stations_string: ""
+      }
+
+      expected_widgets = [
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "1",
+              effect: :station_closure,
+              informed_entities: [ie(stop: "place-hsmnl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            }
+          },
+          expected_common_data
+        ),
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "2",
+              effect: :station_closure,
+              informed_entities: [ie(stop: "place-bckhl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            }
+          },
+          expected_common_data
+        ),
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "3",
+              effect: :delay,
+              informed_entities: [ie(stop: "place-hsmnl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            }
+          },
+          expected_common_data
+        )
+      ]
+
+      assert expected_widgets ==
+               reconstructed_alert_instances(
+                 config,
+                 now,
+                 fetch_routes_by_stop_fn,
+                 fetch_parent_station_sequences_through_stop_fn,
+                 fetch_alerts_fn,
+                 x_fetch_stop_name_fn
                )
     end
   end

@@ -49,6 +49,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget | routes_at_stop: routes}
   end
 
+  defp put_informed_stations_string(widget, string) do
+    %{widget | informed_stations_string: string}
+  end
+
   defp put_app_id(widget, app_id) do
     %{widget | screen: %{widget.screen | app_id: app_id}}
   end
@@ -114,6 +118,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget: put_stop_sequences(widget, stop_sequences)}
   end
 
+  defp setup_informed_entities_string(%{widget: widget}) do
+    %{widget: put_informed_stations_string(widget, "Alewife")}
+  end
+
   defp setup_routes(%{widget: widget}) do
     routes = [
       %{
@@ -169,7 +177,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     :setup_stop_sequences,
     :setup_routes,
     :setup_screen_config,
-    :setup_now
+    :setup_now,
+    :setup_informed_entities_string
   ]
 
   # Pass this to `setup` to set up a stop_closure alert that is currently active (just started) and affects the home stop.
