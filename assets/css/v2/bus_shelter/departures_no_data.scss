@@ -4,21 +4,19 @@
   width: 1080px;
   height: 832px;
   background-color: #e6e4e1;
-  padding-top: 104px;
-  padding-left: 232px;
+  padding-top: 96px;
+  padding-left: 104px;
   overflow: hidden;
 }
 
 .departures-no-data__main-content {
-  margin-bottom: 47px;
+  margin-bottom: 36px;
 }
 
 .departures-no-data__main-content__no-connection-icon-container {
-  position: absolute;
-  top: 104px;
-  left: 44px;
   width: 135px;
   height: 135px;
+  margin-bottom: 48px;
 }
 
 .departures-no-data__main-content__heading {
@@ -33,19 +31,6 @@
   line-height: 80px;
 }
 
-.departures-no-data__main-content__subheading {
-  margin-top: 28px;
-  width: 752px;
-  height: 64px;
-
-  color: rgb(23, 31, 38);
-  font-size: 48px;
-  font-family: Inter, sans-serif;
-  font-weight: normal;
-  letter-spacing: 0px;
-  line-height: 64px;
-}
-
 .departures-no-data__hairline {
   content: "";
   background: #737373;
@@ -54,7 +39,7 @@
 }
 
 .departures-no-data__alternatives-container {
-  margin-top: 43px;
+  margin-top: 23px;
 }
 
 .departures-no-data__phone-icon-container {

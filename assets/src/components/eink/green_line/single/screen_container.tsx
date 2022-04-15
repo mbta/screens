@@ -1,6 +1,6 @@
 import React from "react";
 
-import ConnectionError from "Components/eink/connection_error";
+import NoConnectionSingle from "Components/eink/no_connection_single";
 import DigitalBridge from "Components/eink/digital_bridge";
 import Departures from "Components/eink/green_line/departures";
 import Header from "Components/eink/green_line/header";
@@ -92,7 +92,7 @@ const NoDeparturesScreenLayout = ({ apiResponse }): JSX.Element => {
 
 const NoConnectionScreenLayout = (): JSX.Element => {
   // We weren't able to fetch data. Show a connection error message.
-  return <ConnectionError />;
+  return <NoConnectionSingle />;
 };
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {

@@ -77,7 +77,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget | alert: %{widget.alert | severity: severity}}
   end
 
-  defp ie(opts \\ []) do
+  defp ie(opts) do
     %{
       stop: opts[:stop],
       route: opts[:route],

@@ -35,7 +35,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          {:ok, station_sequences} <-
            fetch_stop_sequences_by_stop_fn.(stop_id, route_ids_at_stop) do
       alerts
-      |> Enum.filter(&relevant?(&1, config, station_sequences, routes_at_stop))
+      |> Enum.filter(&relevant?(&1, config, station_sequences, routes_at_stop, now))
       |> Enum.map(fn alert ->
         %ReconstructedAlert{
           screen: config,
@@ -52,31 +52,42 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   end
 
   defp relevant?(
-         %Alert{severity: severity, effect: effect} = alert,
+         %Alert{effect: effect} = alert,
          config,
          stop_sequences,
-         routes_at_stop
+         routes_at_stop,
+         now
        ) do
-    Enum.member?(@relevant_effects, effect) and
-      case BaseAlert.location(%ReconstructedAlert{
-             screen: config,
-             alert: alert,
-             stop_sequences: stop_sequences,
-             routes_at_stop: routes_at_stop,
-             now: DateTime.utc_now()
-           }) do
-        location when location in [:downstream, :upstream] ->
-          true
+    reconstructed_alert = %ReconstructedAlert{
+      screen: config,
+      alert: alert,
+      stop_sequences: stop_sequences,
+      routes_at_stop: routes_at_stop,
+      now: now
+    }
 
-        :inside ->
-          effect != :delay or severity > 3
+    relevant_effect?(effect) and relevant_location?(reconstructed_alert) and
+      Alert.happening_now?(alert, now)
+  end
 
-        location when location in [:boundary_upstream, :boundary_downstream] ->
-          effect != :station_closure and (effect != :delay or severity > 3)
+  defp relevant_effect?(effect) do
+    Enum.member?(@relevant_effects, effect)
+  end
 
-        _ ->
-          false
-      end
+  defp relevant_location?(%ReconstructedAlert{alert: alert} = reconstructed_alert) do
+    case BaseAlert.location(reconstructed_alert) do
+      location when location in [:downstream, :upstream] ->
+        true
+
+      :inside ->
+        alert.effect != :delay or alert.severity > 3
+
+      location when location in [:boundary_upstream, :boundary_downstream] ->
+        alert.effect != :station_closure and (alert.effect != :delay or alert.severity > 3)
+
+      _ ->
+        false
+    end
   end
 
   defp get_stations(alert, fetch_stop_name_fn) do

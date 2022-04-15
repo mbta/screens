@@ -11,11 +11,6 @@ const BottomScreenFiller: ComponentType = () => (
         <span className="bottom-screen-filler__alternatives__message__em">
           mbta.com/schedules
         </span>{" "}
-        or{" "}
-        <span className="bottom-screen-filler__alternatives__message__em">
-          Transit
-        </span>{" "}
-        app
       </div>
     </div>
     <div className="bottom-screen-filler__phone-image-container">
