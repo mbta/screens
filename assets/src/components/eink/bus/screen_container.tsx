@@ -4,7 +4,6 @@ import Departures from "Components/eink/bus/departures";
 import FareInfo from "Components/eink/bus/fare_info";
 import FlexZoneContainer from "Components/eink/bus/flex_zone_container";
 import Header from "Components/eink/bus/header";
-import ConnectionError from "Components/eink/connection_error";
 import DigitalBridge from "Components/eink/digital_bridge";
 import NoService from "Components/eink/no_service";
 import OvernightDepartures from "Components/eink/overnight_departures";
@@ -15,6 +14,8 @@ import useFitDepartures from "Hooks/use_fit_departures";
 
 import { EINK_REFRESH_MS } from "Constants";
 import useSentry from "Hooks/use_sentry";
+import NoConnectionBottom from "Components/eink/no_connection_bottom";
+import NoConnectionTop from "Components/eink/no_connection_top";
 
 const TopScreenLayout = forwardRef(
   ({ currentTimeString, stopName, departures }, ref): JSX.Element => {
@@ -117,8 +118,8 @@ const NoConnectionScreenLayout = (): JSX.Element => {
   // We weren't able to fetch data. Show a connection error message.
   return (
     <div>
-      <ConnectionError />
-      <ConnectionError />
+      <NoConnectionTop />
+      <NoConnectionBottom />
     </div>
   );
 };
