@@ -298,7 +298,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "1",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-hsmnl")]
+              informed_entities: [ie(stop: "place-hsmnl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             }
           },
           expected_common_data
@@ -308,14 +309,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-bckhl")]
+              informed_entities: [ie(stop: "place-bckhl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             }
           },
           expected_common_data
         ),
         struct(
           %ReconstructedAlertWidget{
-            alert: %Alert{id: "3", effect: :delay, informed_entities: [ie(stop: "place-hsmnl")]}
+            alert: %Alert{id: "3", effect: :delay, informed_entities: [ie(stop: "place-hsmnl")], active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]}
           },
           expected_common_data
         )
