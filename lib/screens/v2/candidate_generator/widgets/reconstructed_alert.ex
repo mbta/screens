@@ -43,7 +43,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
           now: now,
           stop_sequences: station_sequences,
           routes_at_stop: routes_at_stop,
-          informed_station_string: get_stations(alert, fetch_stop_name_fn)
+          informed_stations_string: get_stations(alert, fetch_stop_name_fn)
         }
       end)
     else

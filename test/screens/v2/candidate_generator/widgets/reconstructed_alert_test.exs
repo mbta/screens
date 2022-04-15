@@ -85,7 +85,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         routes_at_stop: routes_at_stop,
         station_sequences: station_sequences,
         now: ~U[2021-01-01T00:00:00Z],
-        informed_station_string: "Alewife",
+        informed_stations_string: "Alewife",
         fetch_routes_by_stop_fn: fn _, _, _ -> {:ok, routes_at_stop} end,
         fetch_parent_station_sequences_through_stop_fn: fn _, _ ->
           {:ok, station_sequences}
@@ -105,7 +105,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         routes_at_stop: routes_at_stop,
         station_sequences: station_sequences,
         now: now,
-        informed_station_string: informed_station_string,
+        informed_stations_string: informed_stations_string,
         fetch_routes_by_stop_fn: fetch_routes_by_stop_fn,
         fetch_parent_station_sequences_through_stop_fn:
           fetch_parent_station_sequences_through_stop_fn,
@@ -118,7 +118,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         routes_at_stop: routes_at_stop,
         stop_sequences: station_sequences,
         now: now,
-        informed_station_string: informed_station_string
+        informed_stations_string: informed_stations_string
       }
 
       expected_widgets = [
@@ -248,7 +248,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         routes_at_stop: routes_at_stop,
         stop_sequences: station_sequences,
         now: now,
-        informed_station_string: ""
+        informed_stations_string: ""
       }
 
       expected_widgets = [

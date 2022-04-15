@@ -15,7 +15,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             now: nil,
             stop_sequences: nil,
             routes_at_stop: nil,
-            informed_station_string: nil
+            informed_stations_string: nil
 
   @type stop_id :: String.t()
 
@@ -27,7 +27,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           now: DateTime.t(),
           stop_sequences: list(list(stop_id())),
           routes_at_stop: list(%{route_id: route_id(), active?: boolean()}),
-          informed_station_string: String.t()
+          informed_stations_string: String.t()
         }
 
   @route_directions %{
@@ -610,7 +610,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_outside_alert(
          %__MODULE__{
            alert: %Alert{effect: :station_closure, cause: cause},
-           informed_station_string: informed_station_string
+           informed_stations_string: informed_stations_string
          } = t
        ) do
     informed_entities = BaseAlert.informed_entities(t)
@@ -619,7 +619,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     cause_text = get_cause_text(cause)
 
     %{
-      issue: "Trains will bypass #{informed_station_string}",
+      issue: "Trains will bypass #{informed_stations_string}",
       remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
