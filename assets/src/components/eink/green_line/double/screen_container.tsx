@@ -1,6 +1,5 @@
 import React from "react";
 
-import ConnectionError from "Components/eink/connection_error";
 import DigitalBridge from "Components/eink/digital_bridge";
 import GlobalAlert from "Components/eink/global_alert";
 import Departures from "Components/eink/green_line/departures";
@@ -17,6 +16,8 @@ import useApiResponse from "Hooks/use_api_response";
 
 import { EINK_REFRESH_MS } from "Constants";
 import useSentry from "Hooks/use_sentry";
+import NoConnectionTop from "Components/eink/no_connection_top";
+import NoConnectionBottom from "Components/eink/no_connection_bottom";
 
 const TopScreenLayout = ({
   currentTimeString,
@@ -132,8 +133,8 @@ const NoConnectionScreenLayout = (): JSX.Element => {
   // We weren't able to fetch data. Show a connection error message.
   return (
     <div>
-      <ConnectionError />
-      <ConnectionError />
+      <NoConnectionTop />
+      <NoConnectionBottom />
     </div>
   );
 };
