@@ -3,20 +3,29 @@ defmodule Screens.LogScreenData do
   require Logger
   alias Screens.Config.{Screen, State}
 
-  def log_page_load(screen_id, is_screen) do
+  def log_page_load(screen_id, is_screen, screen_side \\ nil) do
     if is_screen do
       data = %{screen_id: screen_id, screen_name: screen_name_for_id(screen_id)}
+
+      if not is_nil(screen_side) do
+        Map.put(data, :screen_side, screen_side)
+      end
+
       log_message("[screen page load]", data)
     end
   end
 
-  def log_data_request(screen_id, last_refresh, is_screen) do
+  def log_data_request(screen_id, last_refresh, is_screen, screen_side \\ nil) do
     if is_screen do
       data = %{
         screen_id: screen_id,
         screen_name: screen_name_for_id(screen_id),
         last_refresh: last_refresh
       }
+
+      if not is_nil(screen_side) do
+        Map.put(data, :screen_side, screen_side)
+      end
 
       log_message("[screen data request]", data)
     end
@@ -33,19 +42,27 @@ defmodule Screens.LogScreenData do
     end
   end
 
-  def log_api_response(%{force_reload: true}, screen_id, last_refresh, is_screen) do
-    log_api_response_success(screen_id, last_refresh, is_screen)
+  def log_api_response(response, screen_id, last_refresh, is_screen, screen_side \\ nil)
+
+  def log_api_response(
+        %{force_reload: true},
+        screen_id,
+        last_refresh,
+        is_screen,
+        screen_side
+      ) do
+    log_api_response_success(screen_id, last_refresh, is_screen, screen_side)
   end
 
-  def log_api_response(%{success: true}, screen_id, last_refresh, is_screen) do
-    log_api_response_success(screen_id, last_refresh, is_screen)
+  def log_api_response(%{success: true}, screen_id, last_refresh, is_screen, screen_side) do
+    log_api_response_success(screen_id, last_refresh, is_screen, screen_side)
   end
 
-  def log_api_response(_response, _screen_id, _last_refresh, _is_screen) do
+  def log_api_response(_response, _screen_id, _last_refresh, _is_screen, _screen_side) do
     :ok
   end
 
-  defp log_api_response_success(screen_id, last_refresh, is_screen) do
+  defp log_api_response_success(screen_id, last_refresh, is_screen, screen_side) do
     _ =
       if is_screen do
         data = %{
@@ -53,6 +70,10 @@ defmodule Screens.LogScreenData do
           screen_name: screen_name_for_id(screen_id),
           last_refresh: last_refresh
         }
+
+        if not is_nil(screen_side) do
+          Map.put(data, :screen_side, screen_side)
+        end
 
         log_message("[screen api response success]", data)
       end
