@@ -2,8 +2,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoData do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.BusShelter
-  alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Config.V2.Alerts
 
   defstruct screen: nil, show_alternatives?: nil
 
@@ -23,7 +22,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoData do
   def valid_candidate?(_instance), do: true
 
   defp stop_id(%__MODULE__{
-         screen: %Screen{app_params: %BusShelter{header: %CurrentStopId{stop_id: stop_id}}}
+         screen: %Screen{app_params: %_app{alerts: %Alerts{stop_id: stop_id}}}
        }) do
     stop_id
   end
