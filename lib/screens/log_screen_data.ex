@@ -7,9 +7,10 @@ defmodule Screens.LogScreenData do
     if is_screen do
       data = %{screen_id: screen_id, screen_name: screen_name_for_id(screen_id)}
 
-      if not is_nil(screen_side) do
-        Map.put(data, :screen_side, screen_side)
-      end
+      _ =
+        if not is_nil(screen_side) do
+          Map.put(data, :screen_side, screen_side)
+        end
 
       log_message("[screen page load]", data)
     end
@@ -23,9 +24,10 @@ defmodule Screens.LogScreenData do
         last_refresh: last_refresh
       }
 
-      if not is_nil(screen_side) do
-        Map.put(data, :screen_side, screen_side)
-      end
+      _ =
+        if not is_nil(screen_side) do
+          Map.put(data, :screen_side, screen_side)
+        end
 
       log_message("[screen data request]", data)
     end
@@ -71,9 +73,10 @@ defmodule Screens.LogScreenData do
           last_refresh: last_refresh
         }
 
-        if not is_nil(screen_side) do
-          Map.put(data, :screen_side, screen_side)
-        end
+        _ =
+          if not is_nil(screen_side) do
+            Map.put(data, :screen_side, screen_side)
+          end
 
         log_message("[screen api response success]", data)
       end
