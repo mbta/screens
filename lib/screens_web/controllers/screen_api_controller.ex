@@ -32,6 +32,8 @@ defmodule ScreensWeb.ScreenApiController do
     _ = Screens.LogScreenData.log_data_request(screen_id, last_refresh, is_screen)
 
     if nonexistent_screen?(screen_id) do
+      Screens.LogScreenData.log_api_response(:nonexistent, screen_id, last_refresh, is_screen)
+
       not_found_response(conn)
     else
       data =

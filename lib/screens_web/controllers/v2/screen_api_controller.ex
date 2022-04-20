@@ -23,15 +23,19 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
     cond do
       nonexistent_screen?(screen_id) ->
+        Screens.LogScreenData.log_api_response(:nonexistent, screen_id, last_refresh, is_screen)
         not_found_response(conn)
 
       outdated?(screen_id, last_refresh) ->
+        Screens.LogScreenData.log_api_response(:outdated, screen_id, last_refresh, is_screen)
         json(conn, ScreenData.outdated_response())
 
       disabled?(screen_id) ->
+        Screens.LogScreenData.log_api_response(:disabled, screen_id, last_refresh, is_screen)
         json(conn, ScreenData.disabled_response())
 
       true ->
+        Screens.LogScreenData.log_api_response(:success, screen_id, last_refresh, is_screen)
         json(conn, ScreenData.by_screen_id(screen_id))
     end
   end

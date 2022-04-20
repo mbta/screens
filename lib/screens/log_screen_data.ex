@@ -33,29 +33,34 @@ defmodule Screens.LogScreenData do
     end
   end
 
-  def log_api_response(%{force_reload: true}, screen_id, last_refresh, is_screen) do
-    log_api_response_success(screen_id, last_refresh, is_screen)
+  def log_api_response(%{force_reload: true, status: status}, screen_id, last_refresh, is_screen) do
+    log_api_response_success(screen_id, last_refresh, is_screen, status)
   end
 
-  def log_api_response(%{success: true}, screen_id, last_refresh, is_screen) do
-    log_api_response_success(screen_id, last_refresh, is_screen)
+  def log_api_response(%{success: true, status: status}, screen_id, last_refresh, is_screen) do
+    log_api_response_success(screen_id, last_refresh, is_screen, status)
+  end
+
+  def log_api_response(status, screen_id, last_refresh, is_screen)
+      when is_atom(status) do
+    log_api_response_success(screen_id, last_refresh, is_screen, status)
   end
 
   def log_api_response(_response, _screen_id, _last_refresh, _is_screen) do
     :ok
   end
 
-  defp log_api_response_success(screen_id, last_refresh, is_screen) do
-    _ =
-      if is_screen do
-        data = %{
-          screen_id: screen_id,
-          screen_name: screen_name_for_id(screen_id),
-          last_refresh: last_refresh
-        }
+  defp log_api_response_success(screen_id, last_refresh, is_screen, status) do
+    if is_screen do
+      data = %{
+        screen_id: screen_id,
+        screen_name: screen_name_for_id(screen_id),
+        last_refresh: last_refresh,
+        status: status
+      }
 
-        log_message("[screen api response success]", data)
-      end
+      log_message("[screen api response #{status}]", data)
+    end
 
     :ok
   end
