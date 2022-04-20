@@ -35,7 +35,7 @@ defmodule ScreensWeb.V2.ScreenController do
     put_layout(conn, {ScreensWeb.V2.LayoutView, "app.html"})
   end
 
-  def index(%{params: params} = conn, %{"id" => screen_id}) do
+  def index(conn, %{"id" => screen_id} = params) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
     screen_side = get_screen_side(params)
 

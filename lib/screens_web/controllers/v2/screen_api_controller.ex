@@ -16,7 +16,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     end
   end
 
-  def show(%{params: params} = conn, %{"id" => screen_id, "last_refresh" => last_refresh}) do
+  def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
     screen_side = get_screen_side(params)
 
