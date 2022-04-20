@@ -37,9 +37,8 @@ defmodule ScreensWeb.V2.ScreenController do
 
   def index(conn, %{"id" => screen_id} = params) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
-    screen_side = get_screen_side(params)
 
-    _ = Screens.LogScreenData.log_page_load(screen_id, is_screen, screen_side)
+    _ = Screens.LogScreenData.log_page_load(screen_id, is_screen, params["screen_side"])
 
     config = State.screen(screen_id)
 
@@ -82,7 +81,4 @@ defmodule ScreensWeb.V2.ScreenController do
     |> put_view(ScreensWeb.ErrorView)
     |> render("404.html")
   end
-
-  defp get_screen_side(%{"screen_side" => screen_side}), do: screen_side
-  defp get_screen_side(_), do: nil
 end

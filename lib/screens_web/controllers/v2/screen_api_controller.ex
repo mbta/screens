@@ -18,9 +18,13 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
-    screen_side = get_screen_side(params)
 
-    _ = Screens.LogScreenData.log_data_request(screen_id, last_refresh, is_screen, screen_side)
+    Screens.LogScreenData.log_data_request(
+      screen_id,
+      last_refresh,
+      is_screen,
+      params["screen_side"]
+    )
 
     cond do
       nonexistent_screen?(screen_id) ->
@@ -60,7 +64,4 @@ defmodule ScreensWeb.V2.ScreenApiController do
     |> put_status(:not_found)
     |> text("Not found")
   end
-
-  defp get_screen_side(%{"screen_side" => screen_side}), do: screen_side
-  defp get_screen_side(_), do: nil
 end
