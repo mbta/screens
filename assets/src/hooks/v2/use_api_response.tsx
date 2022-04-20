@@ -69,6 +69,13 @@ const useIsRealScreenParam = () => {
   return isRealScreen === "true" ? "&is_real_screen=true" : "";
 };
 
+const useScreenSideParam = () => {
+  const query = useQuery();
+  const screenSide = query.get("screen_side");
+
+  return screenSide ? `&screen_side=${screenSide}` : "";
+};
+
 interface UseApiResponseArgs {
   id: string;
   failureModeElapsedMs?: number;
@@ -85,6 +92,7 @@ const useApiResponse = ({
   failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs): UseApiResponseReturn => {
   const isRealScreenParam = useIsRealScreenParam();
+  const screenSideParam = useScreenSideParam();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
@@ -92,7 +100,7 @@ const useApiResponse = ({
     document.getElementById("app").dataset;
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   const refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
-  const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}${isRealScreenParam}`;
+  const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}`;
 
   const fetchData = async () => {
     try {
