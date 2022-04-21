@@ -2,12 +2,10 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoDataTest do
   use ExUnit.Case, async: true
   alias Screens.V2.WidgetInstance
   alias Screens.Config.Screen
-  alias Screens.Config.V2.BusShelter
-  alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Config.V2.{Alerts, BusShelter}
 
   @instance %WidgetInstance.DeparturesNoData{
-    screen:
-      struct(Screen, %{app_params: struct(BusShelter, %{header: %CurrentStopId{stop_id: "1"}})}),
+    screen: struct(Screen, %{app_params: struct(BusShelter, %{alerts: %Alerts{stop_id: "1"}})}),
     show_alternatives?: true
   }
 
