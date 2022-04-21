@@ -12,9 +12,9 @@ defmodule Screens.ScreenData do
     dup: Screens.DupScreenData
   }
 
-  @disabled_response %{force_reload: false, success: false}
+  @disabled_response %{force_reload: false, success: false, status: :disabled}
 
-  @outdated_response %{force_reload: true}
+  @outdated_response %{force_reload: true, status: :outdated}
 
   def by_screen_id(screen_id, is_screen, opts \\ []) do
     check_disabled = Keyword.get(opts, :check_disabled, false)
@@ -26,7 +26,7 @@ defmodule Screens.ScreenData do
       cond do
         check_outdated and outdated?(screen_id, last_refresh) -> @outdated_response
         check_disabled and disabled?(screen_id) -> @disabled_response
-        true -> fetch_data(screen_id, is_screen)
+        true -> screen_id |> fetch_data(is_screen) |> Map.put(:status, :success)
       end
 
     _ = LogScreenData.log_api_response(response, screen_id, last_refresh, is_screen)

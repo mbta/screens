@@ -47,39 +47,44 @@ defmodule Screens.LogScreenData do
   def log_api_response(response, screen_id, last_refresh, is_screen, screen_side \\ nil)
 
   def log_api_response(
-        %{force_reload: true},
+        %{force_reload: true, status: status},
         screen_id,
         last_refresh,
         is_screen,
         screen_side
       ) do
-    log_api_response_success(screen_id, last_refresh, is_screen, screen_side)
+    log_api_response_success(screen_id, last_refresh, is_screen, status, screen_side)
   end
 
-  def log_api_response(%{success: true}, screen_id, last_refresh, is_screen, screen_side) do
-    log_api_response_success(screen_id, last_refresh, is_screen, screen_side)
+  def log_api_response(
+        %{success: true, status: status},
+        screen_id,
+        last_refresh,
+        is_screen,
+        screen_side
+      ) do
+    log_api_response_success(screen_id, last_refresh, is_screen, status, screen_side)
   end
 
-  def log_api_response(_response, _screen_id, _last_refresh, _is_screen, _screen_side) do
-    :ok
+  def log_api_response(status, screen_id, last_refresh, is_screen, screen_side) do
+    log_api_response_success(screen_id, last_refresh, is_screen, status, screen_side)
   end
 
-  defp log_api_response_success(screen_id, last_refresh, is_screen, screen_side) do
-    _ =
-      if is_screen do
-        data = %{
-          screen_id: screen_id,
-          screen_name: screen_name_for_id(screen_id),
-          last_refresh: last_refresh
-        }
+  defp log_api_response_success(screen_id, last_refresh, is_screen, status, screen_side) do
+    if is_screen do
+      data = %{
+        screen_id: screen_id,
+        screen_name: screen_name_for_id(screen_id),
+        last_refresh: last_refresh
+      }
 
-        _ =
-          if not is_nil(screen_side) do
-            Map.put(data, :screen_side, screen_side)
-          end
+      _ =
+        if not is_nil(screen_side) do
+          Map.put(data, :screen_side, screen_side)
+        end
 
-        log_message("[screen api response success]", data)
-      end
+      log_message("[screen api response #{status}]", data)
+    end
 
     :ok
   end
