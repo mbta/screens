@@ -55,8 +55,7 @@ defmodule Screens.LogScreenData do
       data = %{
         screen_id: screen_id,
         screen_name: screen_name_for_id(screen_id),
-        last_refresh: last_refresh,
-        status: status
+        last_refresh: last_refresh
       }
 
       log_message("[screen api response #{status}]", data)
