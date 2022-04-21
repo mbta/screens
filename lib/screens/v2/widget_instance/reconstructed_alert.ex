@@ -113,6 +113,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  defp to_set(nil), do: MapSet.new([])
   defp to_set(stop_id) when is_binary(stop_id), do: MapSet.new([stop_id])
   defp to_set(stop_ids), do: MapSet.new(stop_ids)
 
