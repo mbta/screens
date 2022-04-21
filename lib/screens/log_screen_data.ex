@@ -41,13 +41,8 @@ defmodule Screens.LogScreenData do
     log_api_response_success(screen_id, last_refresh, is_screen, status)
   end
 
-  def log_api_response(status, screen_id, last_refresh, is_screen)
-      when is_atom(status) do
+  def log_api_response(status, screen_id, last_refresh, is_screen) do
     log_api_response_success(screen_id, last_refresh, is_screen, status)
-  end
-
-  def log_api_response(_response, _screen_id, _last_refresh, _is_screen) do
-    :ok
   end
 
   defp log_api_response_success(screen_id, last_refresh, is_screen, status) do
