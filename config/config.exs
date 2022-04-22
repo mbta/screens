@@ -157,7 +157,7 @@ config :screens,
     ],
     # Forest Hills
     "place-forhl" => [
-      {"70003", nil, "Oak Grove"},
+      {"70003", nil, "Oak Grove"}
     ],
     # Maverick
     "place-mvbcl" => [
@@ -166,7 +166,7 @@ config :screens,
     ],
     # Ashmont
     "place-asmnl" => [
-      {"70092", nil, "Alewife"},
+      {"70092", nil, "Alewife"}
     ],
     # Charles/MGH
     "place-chmnl" => [

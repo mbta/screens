@@ -30,10 +30,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       ) do
     # Filtering by subway and light_rail types
     with {:ok, routes_at_stop} <- fetch_routes_by_stop_fn.(stop_id, now, [0, 1]),
-         route_ids_at_stop = routes_at_stop
-         |> Enum.map(& &1.route_id)
-         # We shouldn't handle Mattapan outages at this time
-         |> Enum.reject(fn id -> id === "Mattapan" end),
+         route_ids_at_stop =
+           routes_at_stop
+           |> Enum.map(& &1.route_id)
+           # We shouldn't handle Mattapan outages at this time
+           |> Enum.reject(fn id -> id === "Mattapan" end),
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids_at_stop),
          {:ok, stop_sequences} <-
            fetch_stop_sequences_by_stop_fn.(stop_id, route_ids_at_stop) do
