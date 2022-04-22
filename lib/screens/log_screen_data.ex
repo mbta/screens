@@ -5,12 +5,9 @@ defmodule Screens.LogScreenData do
 
   def log_page_load(screen_id, is_screen, screen_side \\ nil) do
     if is_screen do
-      data = %{screen_id: screen_id, screen_name: screen_name_for_id(screen_id)}
-
-      _ =
-        if not is_nil(screen_side) do
-          Map.put(data, :screen_side, screen_side)
-        end
+      data =
+        %{screen_id: screen_id, screen_name: screen_name_for_id(screen_id)}
+        |> insert_screen_side(screen_side)
 
       log_message("[screen page load]", data)
     end
@@ -18,16 +15,13 @@ defmodule Screens.LogScreenData do
 
   def log_data_request(screen_id, last_refresh, is_screen, screen_side \\ nil) do
     if is_screen do
-      data = %{
-        screen_id: screen_id,
-        screen_name: screen_name_for_id(screen_id),
-        last_refresh: last_refresh
-      }
-
-      _ =
-        if not is_nil(screen_side) do
-          Map.put(data, :screen_side, screen_side)
-        end
+      data =
+        %{
+          screen_id: screen_id,
+          screen_name: screen_name_for_id(screen_id),
+          last_refresh: last_refresh
+        }
+        |> insert_screen_side(screen_side)
 
       log_message("[screen data request]", data)
     end
@@ -72,16 +66,13 @@ defmodule Screens.LogScreenData do
 
   defp log_api_response_success(screen_id, last_refresh, is_screen, status, screen_side) do
     if is_screen do
-      data = %{
-        screen_id: screen_id,
-        screen_name: screen_name_for_id(screen_id),
-        last_refresh: last_refresh
-      }
-
-      _ =
-        if not is_nil(screen_side) do
-          Map.put(data, :screen_side, screen_side)
-        end
+      data =
+        %{
+          screen_id: screen_id,
+          screen_name: screen_name_for_id(screen_id),
+          last_refresh: last_refresh
+        }
+        |> insert_screen_side(screen_side)
 
       log_message("[screen api response #{status}]", data)
     end
@@ -129,4 +120,7 @@ defmodule Screens.LogScreenData do
     %Screen{name: name} = State.screen(screen_id)
     name
   end
+
+  defp insert_screen_side(data, nil), do: data
+  defp insert_screen_side(data, screen_side), do: Map.put(data, :screen_side, screen_side)
 end
