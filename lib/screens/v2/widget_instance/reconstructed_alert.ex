@@ -108,7 +108,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           do: headsign,
           else: false
       end)
-    # Otherwise, direction is provided, and we can find the destination tag from @route_directions
+
+      # Otherwise, direction is provided, and we can find the destination tag from @route_directions
     else
       @route_directions
       |> Map.get(route_id)
