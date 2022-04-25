@@ -150,10 +150,33 @@ config :screens,
       {"70019", "70015", "Oak Grove"},
       {"70014", "70018", "Forest Hills"}
     ],
+    # Back Bay
+    "place-bbsta" => [
+      {"70017", "70013", "Oak Grove"},
+      {"70012", "70016", "Forest Hills"}
+    ],
+    # Forest Hills
+    "place-forhl" => [
+      {"70003", nil, "Oak Grove"}
+    ],
     # Maverick
     "place-mvbcl" => [
       {"70048", "70044", "Wonderland"},
       {"70043", "70047", "Bowdoin"}
+    ],
+    # Ashmont
+    "place-asmnl" => [
+      {"70092", nil, "Alewife"}
+    ],
+    # Charles/MGH
+    "place-chmnl" => [
+      {"70072", "70076", "Alewife"},
+      {"70075", "70071", "Ashmont/Braintree"}
+    ],
+    # Porter
+    "place-portr" => [
+      {"70064", "70068", "Alewife"},
+      {"70067", "70063", "Ashmont/Braintree"}
     ]
   },
   # Stop IDs at stations serviced by two subway lines, where we also have DUP screens.

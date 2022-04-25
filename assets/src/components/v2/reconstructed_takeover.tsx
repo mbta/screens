@@ -16,7 +16,6 @@ interface ReconAlertProps {
 const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
   const {cause, effect, issue, location, remedy, routes} = alert
 
-  console.log('issue', issue)
   return (
     <>
       <div className={classWithModifiers("alert-container", ["takeover", "urgent", routes.length > 1 ? "yellow" : routes[0].color])}>

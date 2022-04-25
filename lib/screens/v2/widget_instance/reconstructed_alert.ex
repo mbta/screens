@@ -95,6 +95,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       |> Enum.uniq()
       |> hd()
 
+    # When the alert is non-directional but the station is at the boundary:
+    # direction_id will be nil, but we still want to show the alert impacts one direction only
     if is_nil(direction_id) do
       informed_stop_ids = Enum.into(informed_entities, MapSet.new(), & &1.stop)
 
@@ -106,6 +108,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           do: headsign,
           else: false
       end)
+
+      # Otherwise, direction is provided, and we can find the destination tag from @route_directions
     else
       @route_directions
       |> Map.get(route_id)
@@ -113,6 +117,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  defp to_set(nil), do: MapSet.new([])
   defp to_set(stop_id) when is_binary(stop_id), do: MapSet.new([stop_id])
   defp to_set(stop_ids), do: MapSet.new(stop_ids)
 
