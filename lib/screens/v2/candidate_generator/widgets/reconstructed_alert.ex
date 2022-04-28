@@ -96,17 +96,26 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   end
 
   defp get_stations(alert, fetch_stop_name_fn) do
-    %{alert: alert}
-    |> BaseAlert.informed_entities()
-    |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-    |> Enum.filter(&String.starts_with?(&1, "place-"))
-    |> Enum.uniq()
-    |> Enum.flat_map(
-      &case fetch_stop_name_fn.(&1) do
-        :error -> []
-        name -> [name]
-      end
-    )
-    |> Util.format_name_list_to_string()
+    stop_ids =
+      %{alert: alert}
+      |> BaseAlert.informed_entities()
+      |> Enum.map(fn %{stop: stop_id} -> stop_id end)
+
+    case stop_ids do
+      [nil] ->
+        nil
+
+      _ ->
+        stop_ids
+        |> Enum.filter(&String.starts_with?(&1, "place-"))
+        |> Enum.uniq()
+        |> Enum.flat_map(
+          &case fetch_stop_name_fn.(&1) do
+            :error -> []
+            name -> [name]
+          end
+        )
+        |> Util.format_name_list_to_string()
+    end
   end
 end
