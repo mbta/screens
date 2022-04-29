@@ -35,6 +35,11 @@ config :ueberauth, Ueberauth,
     cognito: {Screens.Ueberauth.Strategy.Fake, []}
   ]
 
+config :sentry,
+  tags: %{
+    env: "dev"
+  }
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

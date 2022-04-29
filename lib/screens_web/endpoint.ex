@@ -1,4 +1,5 @@
 defmodule ScreensWeb.Endpoint do
+  use Sentry.PlugCapture
   use Phoenix.Endpoint, otp_app: :screens
 
   socket "/socket", ScreensWeb.UserSocket,
@@ -31,6 +32,7 @@ defmodule ScreensWeb.Endpoint do
     parsers: [:urlencoded, {:multipart, length: 20_000_000}, :json],
     pass: ["*/*"],
     json_decoder: Phoenix.json_library()
+  plug Sentry.PlugContext
 
   plug Plug.MethodOverride
   plug Plug.Head
