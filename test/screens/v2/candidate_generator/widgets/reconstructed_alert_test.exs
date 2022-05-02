@@ -114,6 +114,27 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         }
       ]
 
+      directional_alerts = [
+        %Alert{
+          id: "1",
+          effect: :delay,
+          informed_entities: [ie(stop: "place-hsmnl", direction_id: 0)],
+          active_period: happening_now_active_period
+        },
+        %Alert{
+          id: "2",
+          effect: :delay,
+          informed_entities: [ie(stop: "place-hsmnl")],
+          active_period: happening_now_active_period
+        },
+        %Alert{
+          id: "3",
+          effect: :delay,
+          informed_entities: [ie(stop: "place-hsmnl", direction_id: 1)],
+          active_period: happening_now_active_period
+        }
+      ]
+
       station_sequences = [
         ["place-hsmnl", "place-bckhl", "place-rvrwy", "place-mispk"]
       ]
@@ -130,6 +151,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
           {:ok, station_sequences}
         end,
         fetch_alerts_fn: fn _ -> {:ok, alerts} end,
+        fetch_directional_alerts_fn: fn _ -> {:ok, directional_alerts} end,
         fetch_stop_name_fn: fn _ -> "Alewife" end,
         x_fetch_routes_by_stop_fn: fn _, _, _ -> :error end,
         x_fetch_parent_station_sequences_through_stop_fn: fn _, _ -> :error end,
@@ -341,6 +363,64 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  fetch_parent_station_sequences_through_stop_fn,
                  fetch_alerts_fn,
                  x_fetch_stop_name_fn
+               )
+    end
+
+    test "filters delay alerts in irrelevant direction", context do
+      %{
+        config: config,
+        routes_at_stop: routes_at_stop,
+        station_sequences: station_sequences,
+        now: now,
+        informed_stations_string: informed_stations_string,
+        fetch_routes_by_stop_fn: fetch_routes_by_stop_fn,
+        fetch_parent_station_sequences_through_stop_fn:
+          fetch_parent_station_sequences_through_stop_fn,
+        fetch_directional_alerts_fn: fetch_directional_alerts_fn,
+        fetch_stop_name_fn: fetch_stop_name_fn
+      } = context
+
+      expected_common_data = %{
+        screen: config,
+        routes_at_stop: routes_at_stop,
+        stop_sequences: station_sequences,
+        now: now,
+        informed_stations_string: informed_stations_string
+      }
+
+      expected_widgets = [
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "1",
+              effect: :delay,
+              informed_entities: [ie(stop: "place-hsmnl", direction_id: 0)],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            }
+          },
+          expected_common_data
+        ),
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "2",
+              effect: :delay,
+              informed_entities: [ie(stop: "place-hsmnl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            }
+          },
+          expected_common_data
+        )
+      ]
+
+      assert expected_widgets ==
+               reconstructed_alert_instances(
+                 config,
+                 now,
+                 fetch_routes_by_stop_fn,
+                 fetch_parent_station_sequences_through_stop_fn,
+                 fetch_directional_alerts_fn,
+                 fetch_stop_name_fn
                )
     end
   end
