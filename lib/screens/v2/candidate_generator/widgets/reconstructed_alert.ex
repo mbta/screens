@@ -79,23 +79,31 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     Enum.member?(@relevant_effects, effect)
   end
 
-  defp relevant_location?(%ReconstructedAlert{alert: alert} = reconstructed_alert) do
+  defp relevant_location?(%ReconstructedAlert{} = reconstructed_alert) do
     case BaseAlert.location(reconstructed_alert) do
       location when location in [:downstream, :upstream] ->
         true
 
       :inside ->
-        alert.effect != :delay or
-          (alert.severity > 3 and relevant_direction?(reconstructed_alert))
+        relevant_inside_alert?(reconstructed_alert)
 
       location when location in [:boundary_upstream, :boundary_downstream] ->
-        alert.effect != :station_closure and
-          (alert.effect != :delay or
-             (alert.severity > 3 and relevant_direction?(reconstructed_alert)))
+        relevant_boundary_alert?(reconstructed_alert)
 
       _ ->
         false
     end
+  end
+
+  defp relevant_inside_alert?(%ReconstructedAlert{alert: alert} = reconstructed_alert) do
+    alert.effect != :delay or
+      (alert.severity > 3 and relevant_direction?(reconstructed_alert))
+  end
+
+  defp relevant_boundary_alert?(%ReconstructedAlert{alert: alert} = reconstructed_alert) do
+    alert.effect != :station_closure and
+      (alert.effect != :delay or
+         (alert.severity > 3 and relevant_direction?(reconstructed_alert)))
   end
 
   # This function assumes that stop_sequences is ordered by direction north/east -> south/west.
