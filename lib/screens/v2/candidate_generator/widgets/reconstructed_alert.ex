@@ -85,15 +85,54 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         true
 
       :inside ->
-        alert.effect != :delay or alert.severity > 3
+        alert.effect != :delay or
+          (alert.severity > 3 and relevant_direction?(reconstructed_alert))
 
       location when location in [:boundary_upstream, :boundary_downstream] ->
-        alert.effect != :station_closure and (alert.effect != :delay or alert.severity > 3)
+        alert.effect != :station_closure and
+          (alert.effect != :delay or
+             (alert.severity > 3 and relevant_direction?(reconstructed_alert)))
 
       _ ->
         false
     end
   end
+
+  # This function assumes that stop_sequences is ordered by direction north/east -> south/west.
+  # If the current station has only one stop sequence and the stop_id is the first or last entry in the stop_sequence,
+  # it is a terminal. Delay alerts heading in the direction of the station are not relevant.
+  defp relevant_direction?(
+         %ReconstructedAlert{
+           screen: %Screen{
+             app_params: %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}}
+           },
+           stop_sequences: [stop_sequence]
+         } = t
+       ) do
+    informed_entities = BaseAlert.informed_entities(t)
+
+    direction_id =
+      informed_entities
+      |> Enum.map(fn %{direction_id: direction_id} -> direction_id end)
+      |> Enum.uniq()
+      |> hd()
+
+    relevant_direction_for_terminal =
+      cond do
+        # Alert affects both directions
+        is_nil(direction_id) -> nil
+        # North/East side terminals
+        stop_id == List.first(stop_sequence) -> 0
+        # South/West side terminals
+        stop_id == List.last(stop_sequence) -> 1
+        # Single line stations that are not terminals
+        true -> nil
+      end
+
+    relevant_direction_for_terminal == nil or relevant_direction_for_terminal == direction_id
+  end
+
+  defp relevant_direction?(_), do: true
 
   defp get_stations(alert, fetch_stop_name_fn) do
     stop_ids =

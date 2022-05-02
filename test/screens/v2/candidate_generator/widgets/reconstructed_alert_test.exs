@@ -10,7 +10,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
   alias Screens.V2.WidgetInstance.ReconstructedAlert, as: ReconstructedAlertWidget
 
   defp ie(opts) do
-    %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}
+    %{
+      stop: opts[:stop],
+      route: opts[:route],
+      route_type: opts[:route_type],
+      direction_id: opts[:direction_id]
+    }
   end
 
   describe "reconstructed_alert_instances/5" do
