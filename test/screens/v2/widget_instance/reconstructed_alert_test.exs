@@ -77,6 +77,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget | alert: %{widget.alert | severity: severity}}
   end
 
+  defp put_is_terminal(widget, is_terminal) do
+    %{widget | is_terminal: is_terminal}
+  end
+
   defp ie(opts) do
     %{
       stop: opts[:stop],
@@ -221,12 +225,25 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
     end
 
-    test "returns flex zone alert for a boundary suspension", %{widget: widget} do
-      widget = put_informed_entities(widget, [ie(stop: "place-dwnxg"), ie(stop: "place-pktrm")])
-      widget = put_effect(widget, :suspension)
-      assert [3] == WidgetInstance.priority(widget)
-      assert [:large] == WidgetInstance.slot_names(widget)
-      assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
+    test "returns takeover for a terminal boundary suspension", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-forhl")
+        |> put_informed_entities([ie(stop: "place-dwnxg"), ie(stop: "place-pktrm")])
+        |> put_effect(:suspension)
+        |> put_stop_sequences([
+          [
+            "place-ogmnl",
+            "place-dwnxg",
+            "place-chncl",
+            "place-forhl"
+          ]
+        ])
+        |> put_is_terminal(true)
+
+      assert [1] == WidgetInstance.priority(widget)
+      assert [:full_body] == WidgetInstance.slot_names(widget)
+      assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
     end
 
     test "returns flex zone alert for a severe delay", %{widget: widget} do
@@ -343,6 +360,76 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         urgent: true,
         region: :inside,
         remedy: "Seek alternate route"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles terminal boundary suspension", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-forhl")
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-grnst", route: "Orange", direction_id: 1),
+          ie(stop: "place-forhl", route: "Orange", direction_id: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_stop_sequences([
+          [
+            "place-jaksn",
+            "place-sbmnl",
+            "place-grnst",
+            "place-forhl"
+          ]
+        ])
+        |> put_is_terminal(true)
+
+      expected = %{
+        issue: %{icon: nil, text: ["No", %{route: "orange"}, "trains"]},
+        location: "between Green Street and Forest Hills",
+        cause: "",
+        routes: [
+          %{color: :orange, text: "ORANGE LINE", type: :text}
+        ],
+        effect: :suspension,
+        urgent: true,
+        region: :inside,
+        remedy: "Seek alternate route"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles terminal boundary shuttle", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-forhl")
+        |> put_effect(:shuttle)
+        |> put_informed_entities([
+          ie(stop: "place-grnst", route: "Orange", direction_id: 1),
+          ie(stop: "place-forhl", route: "Orange", direction_id: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_stop_sequences([
+          [
+            "place-jaksn",
+            "place-sbmnl",
+            "place-grnst",
+            "place-forhl"
+          ]
+        ])
+        |> put_is_terminal(true)
+
+      expected = %{
+        issue: %{icon: nil, text: ["No", %{route: "orange"}, "trains"]},
+        location: "between Green Street and Forest Hills",
+        cause: "",
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        effect: :shuttle,
+        urgent: true,
+        region: :inside,
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -498,54 +585,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   describe "serialize_boundary_alert/1" do
     setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
-    test "handles suspension", %{widget: widget} do
-      widget =
-        widget
-        |> put_effect(:suspension)
-        |> put_informed_entities([
-          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
-          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
-        ])
-        |> put_cause(:unknown)
-
-      expected = %{
-        issue: "No Alewife trains",
-        location: "",
-        cause: "",
-        routes: [%{color: :red, text: "RED LINE", type: :text}],
-        effect: :suspension,
-        urgent: true,
-        region: :boundary,
-        remedy: "Seek alternate route"
-      }
-
-      assert expected == ReconstructedAlert.serialize(widget)
-    end
-
-    test "handles shuttle", %{widget: widget} do
-      widget =
-        widget
-        |> put_effect(:shuttle)
-        |> put_informed_entities([
-          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
-          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
-        ])
-        |> put_cause(:unknown)
-
-      expected = %{
-        issue: "No Alewife trains",
-        location: "",
-        cause: "",
-        routes: [%{color: :red, text: "RED LINE", type: :text}],
-        effect: :shuttle,
-        urgent: true,
-        region: :boundary,
-        remedy: "Use shuttle bus"
-      }
-
-      assert expected == ReconstructedAlert.serialize(widget)
-    end
-
     test "handles moderate delay", %{widget: widget} do
       widget =
         widget
@@ -624,7 +663,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   describe "serialize_outside_alert/1" do
-    setup @alert_widget_context_setup_group
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
     test "handles suspension at one stop", %{widget: widget} do
       widget =

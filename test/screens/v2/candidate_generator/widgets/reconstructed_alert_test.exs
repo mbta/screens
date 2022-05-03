@@ -152,7 +152,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         routes_at_stop: routes_at_stop,
         stop_sequences: station_sequences,
         now: now,
-        informed_stations_string: informed_stations_string
+        informed_stations_string: informed_stations_string,
+        is_terminal: true
       }
 
       expected_widgets = [
@@ -289,7 +290,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         routes_at_stop: routes_at_stop,
         stop_sequences: station_sequences,
         now: now,
-        informed_stations_string: ""
+        informed_stations_string: "",
+        is_terminal: true
       }
 
       expected_widgets = [
