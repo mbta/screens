@@ -365,14 +365,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_inside_alert(%__MODULE__{} = t) do
-    if AlertWidget.takeover_alert?(t) do
-      serialize_takeover_alert(t)
-    else
-      serialize_inside_flex_alert(t)
-    end
-  end
-
   defp serialize_boundary_alert(
          %__MODULE__{
            alert: %Alert{effect: :suspension, cause: cause, header: header}
@@ -686,15 +678,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def serialize(%__MODULE__{} = t) do
-    case BaseAlert.location(t) do
-      :inside ->
-        t |> serialize_inside_alert() |> Map.put(:region, :inside)
+    # Boundary suspensions and shuttles should be full screen, so we need to catch those early
+    if AlertWidget.takeover_alert?(t) do
+      t |> serialize_takeover_alert() |> Map.put(:region, :inside)
+    else
+      case BaseAlert.location(t) do
+        :inside ->
+          t |> serialize_inside_flex_alert() |> Map.put(:region, :inside)
 
-      location when location in [:boundary_upstream, :boundary_downstream] ->
-        t |> serialize_boundary_alert() |> Map.put(:region, :boundary)
+        location when location in [:boundary_upstream, :boundary_downstream] ->
+          t |> serialize_boundary_alert() |> Map.put(:region, :boundary)
 
-      location when location in [:downstream, :upstream] ->
-        t |> serialize_outside_alert() |> Map.put(:region, :outside)
+        location when location in [:downstream, :upstream] ->
+          t |> serialize_outside_alert() |> Map.put(:region, :outside)
+      end
     end
   end
 

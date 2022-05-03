@@ -8,6 +8,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.RouteType
   alias Screens.Util
   alias Screens.V2.WidgetInstance
+  alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
@@ -155,9 +156,12 @@ defmodule Screens.V2.WidgetInstance.Alert do
       BaseAlert.location(t) == :inside
   end
 
-  def takeover_alert?(%{screen: %Screen{app_id: :pre_fare_v2}} = t) do
+  def takeover_alert?(
+        %ReconstructedAlert{screen: %Screen{app_id: :pre_fare_v2}, is_terminal: is_terminal} = t
+      ) do
     active?(t) and effect(t) in [:station_closure, :suspension, :shuttle] and
-      BaseAlert.location(t) == :inside and informs_all_active_routes_at_home_stop?(t)
+      ((BaseAlert.location(t) == :inside and informs_all_active_routes_at_home_stop?(t)) or
+         is_terminal)
   end
 
   defp takeover_slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}) do
@@ -262,7 +266,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     |> MapSet.new()
   end
 
-  @spec effect(t()) :: Alert.effect()
+  @spec effect(t() | ReconstructedAlert.t()) :: Alert.effect()
   def effect(%{alert: %Alert{effect: effect}}), do: effect
 
   def all_routes_at_stop(%{routes_at_stop: routes}) do
