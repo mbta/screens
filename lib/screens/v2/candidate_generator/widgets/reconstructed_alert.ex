@@ -47,7 +47,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
           now: now,
           stop_sequences: stop_sequences,
           routes_at_stop: routes_at_stop,
-          informed_stations_string: get_stations(alert, fetch_stop_name_fn)
+          informed_stations_string: get_stations(alert, fetch_stop_name_fn),
+          is_terminal: is_terminal?(stop_id, stop_sequences)
         }
       end)
     else
@@ -118,4 +119,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         |> Util.format_name_list_to_string()
     end
   end
+
+  defp is_terminal?(stop_id, [stop_sequence]) do
+    List.first(stop_sequence) == stop_id or List.last(stop_sequence) == stop_id
+  end
+
+  defp is_terminal?(_, _), do: false
 end
