@@ -8,8 +8,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.RouteType
   alias Screens.Util
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Common.BaseAlert
+  alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct screen: nil,
