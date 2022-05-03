@@ -65,10 +65,11 @@ config :sentry,
   root_source_code_path: File.cwd!(),
   included_environments: [:prod, :dev],
   tags: %{
-    env: (case System.get_env("SENTRY_ENVIRONMENT") do
-      nil -> Mix.env()
-      env -> String.to_existing_atom(env)
-    end)
+    env:
+      case System.get_env("SENTRY_ENVIRONMENT") do
+        nil -> Mix.env()
+        env -> String.to_existing_atom(env)
+      end
   }
 
 config :screens,
