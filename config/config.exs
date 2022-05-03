@@ -63,7 +63,7 @@ config :sentry,
      end),
   enable_source_code_context: true,
   root_source_code_path: File.cwd!(),
-  included_environments: [:prod, :dev]
+  included_environments: [:prod, :dev],
   tags: %{
     env: (case System.get_env("SENTRY_ENVIRONMENT") do
       nil -> Mix.env()
