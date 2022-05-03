@@ -136,8 +136,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     direction_id =
       informed_entities
       |> Enum.map(fn %{direction_id: direction_id} -> direction_id end)
-      |> Enum.uniq()
-      |> hd()
+      |> Enum.find(fn direction_id -> not is_nil(direction_id) end)
 
     relevant_direction_for_terminal =
       cond do
