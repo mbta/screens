@@ -95,15 +95,29 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     end
   end
 
-  defp relevant_inside_alert?(%ReconstructedAlert{alert: alert} = reconstructed_alert) do
-    alert.effect != :delay or
-      (alert.severity > 3 and relevant_direction?(reconstructed_alert))
-  end
+  defp relevant_inside_alert?(
+         %ReconstructedAlert{alert: %Alert{effect: :delay}} = reconstructed_alert
+       ),
+       do: relevant_delay?(reconstructed_alert)
 
-  defp relevant_boundary_alert?(%ReconstructedAlert{alert: alert} = reconstructed_alert) do
-    alert.effect != :station_closure and
-      (alert.effect != :delay or
-         (alert.severity > 3 and relevant_direction?(reconstructed_alert)))
+  defp relevant_inside_alert?(_), do: true
+
+  defp relevant_boundary_alert?(%ReconstructedAlert{alert: %Alert{effect: :station_closure}}),
+    do: false
+
+  defp relevant_boundary_alert?(
+         %ReconstructedAlert{
+           alert: %Alert{effect: :delay}
+         } = reconstructed_alert
+       ),
+       do: relevant_delay?(reconstructed_alert)
+
+  defp relevant_boundary_alert?(_), do: true
+
+  defp relevant_delay?(
+         %ReconstructedAlert{alert: %Alert{severity: severity}} = reconstructed_alert
+       ) do
+    severity > 3 and relevant_direction?(reconstructed_alert)
   end
 
   # This function assumes that stop_sequences is ordered by direction north/east -> south/west.
