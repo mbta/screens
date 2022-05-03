@@ -9,7 +9,7 @@ defmodule Screens.Application do
     import Supervisor.Spec, warn: false
 
     Logger.add_backend(Sentry.LoggerBackend)
-    
+
     # List all child processes to be supervised
     children = [
       # Start the PubSub system
