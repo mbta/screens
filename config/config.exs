@@ -55,15 +55,21 @@ config :ueberauth, Ueberauth.Strategy.Cognito,
 
 # Centralize Error reporting
 config :sentry,
-  dsn: System.get_env("SENTRY_DSN") || "",
+  dsn: System.get_env("SENTRY_DSN_BACKEND") || "",
   environment_name:
     (case System.get_env("SENTRY_ENVIRONMENT") do
        nil -> Mix.env()
        env -> String.to_existing_atom(env)
      end),
-  enable_source_code_context: false,
+  enable_source_code_context: true,
   root_source_code_path: File.cwd!(),
   included_environments: [:prod, :dev]
+  tags: %{
+    env: (case System.get_env("SENTRY_ENVIRONMENT") do
+      nil -> Mix.env()
+      env -> String.to_existing_atom(env)
+    end)
+  }
 
 config :screens,
   gds_dms_username: "mbtadata@gmail.com",

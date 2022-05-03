@@ -24,11 +24,6 @@ config :ehmon, :report_mf, {:ehmon, :info_report}
 config :screens,
   record_sentry: true
 
-config :sentry,
-  tags: %{
-    env: "production"
-  }
-
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

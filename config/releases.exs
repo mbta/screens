@@ -52,7 +52,7 @@ config :screens,
   api_v3_key: api_v3_key,
   environment_name: eb_env_name,
   signs_ui_s3_bucket: signs_ui_s3_bucket,
-  sentry_frontend_dsn: System.get_env("SENTRY_DSN")
+  sentry_frontend_dsn: System.get_env("SENTRY_DSN_FRONTEND")
 
 config :ueberauth, Ueberauth.Strategy.Cognito, client_secret: cognito_client_secret
 config :screens, ScreensWeb.AuthManager, secret_key: screens_auth_secret
