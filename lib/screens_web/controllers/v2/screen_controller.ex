@@ -106,7 +106,8 @@ defmodule ScreensWeb.V2.ScreenController do
         screen_id
       end
 
-    Enum.sort(ids, &id_sort_fn/2)
+    ids
+    |> Enum.sort(&id_sort_fn/2)
     |> Enum.map(fn id ->
       %{id: id, refresh_rate_offset: calculate_refresh_rate_offset(id, refresh_rate)}
     end)
