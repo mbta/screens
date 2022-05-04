@@ -53,23 +53,21 @@ config :ueberauth, Ueberauth.Strategy.Cognito,
   user_pool_id: {System, :get_env, ["COGNITO_USER_POOL_ID"]},
   aws_region: {System, :get_env, ["COGNITO_AWS_REGION"]}
 
+env_name =
+  case System.get_env("SENTRY_ENVIRONMENT") do
+    nil -> Mix.env()
+    env -> String.to_existing_atom(env)
+  end
+
 # Centralize Error reporting
 config :sentry,
   dsn: System.get_env("SENTRY_DSN_BACKEND") || "",
-  environment_name:
-    (case System.get_env("SENTRY_ENVIRONMENT") do
-       nil -> Mix.env()
-       env -> String.to_existing_atom(env)
-     end),
+  environment_name: env_name,
   enable_source_code_context: true,
   root_source_code_path: File.cwd!(),
   included_environments: [:prod, :dev],
   tags: %{
-    env:
-      case System.get_env("SENTRY_ENVIRONMENT") do
-        nil -> Mix.env()
-        env -> String.to_existing_atom(env)
-      end
+    env: env_name
   }
 
 config :screens,
