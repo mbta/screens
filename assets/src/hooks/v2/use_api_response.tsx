@@ -102,7 +102,6 @@ const useApiResponse = ({
     refreshRateOffset,
     screenIdsWithOffsetMap,
   } = document.getElementById("app").dataset;
-  console.log(screenIdsWithOffsetMap);
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
   if (!refreshRateOffsetMs && screenIdsWithOffsetMap) {
