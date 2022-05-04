@@ -11,7 +11,7 @@ defmodule Screens.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       dialyzer: [
-        plt_add_deps: :transitive,
+        plt_add_deps: :app_tree,
         flags: [
           :race_conditions,
           :unmatched_returns
@@ -74,7 +74,8 @@ defmodule Screens.MixProject do
       {:ueberauth, "~> 0.7"},
       {:ueberauth_cognito, "~> 0.4"},
       {:corsica, "~> 1.0"},
-      {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false}
+      {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
+      {:sentry, "~> 8.0"}
     ]
   end
 end
