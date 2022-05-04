@@ -1,5 +1,6 @@
 import React from "react";
 import ScreenContainer, {
+  defaultResponseMapper,
   ResponseMapper,
   ResponseMapperContext,
 } from "Components/v2/screen_container";
@@ -7,10 +8,10 @@ import { MappingContext } from "Components/v2/widget";
 
 const MultiScreenPage = ({
   components,
-  responseMapper,
+  responseMapper = defaultResponseMapper,
 }: {
   components: any;
-  responseMapper: ResponseMapper;
+  responseMapper?: ResponseMapper;
 }) => {
   const screenIds = JSON.parse(
     document.getElementById("app").dataset.screenIdsWithOffsetMap
