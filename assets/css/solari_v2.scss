@@ -6,6 +6,12 @@
 @import "v2/placeholder";
 @import "v2/solari/normal_header";
 
+@import "v2/multi_screen_page";
+
 body {
   margin: 0px;
+}
+
+.multi-screen-page {
+  grid-auto-rows: 1920px;
 }
