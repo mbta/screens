@@ -5,6 +5,8 @@ defmodule ScreensWeb.V2.ScreenController do
   alias Screens.V2.ScreenData.Parameters
 
   @default_app_id :bus_eink
+  @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 dup_v2 gl_eink_v2 solari_v2 solari_large_v2 pre_fare_v2]a
+  @app_id_strings Enum.map(@recognized_app_ids, &Atom.to_string/1)
 
   plug(:check_config)
   plug(:environment_name)
@@ -35,6 +37,18 @@ defmodule ScreensWeb.V2.ScreenController do
     put_layout(conn, {ScreensWeb.V2.LayoutView, "app.html"})
   end
 
+  def index(conn, %{"id" => app_id})
+      when app_id in @app_id_strings do
+    app_id = String.to_existing_atom(app_id)
+    refresh_rate = Parameters.get_refresh_rate(app_id)
+
+    conn
+    |> assign(:app_id, app_id)
+    |> assign(:refresh_rate, refresh_rate)
+    |> assign(:screen_ids_with_offset_map, screen_ids(app_id, refresh_rate))
+    |> render("index_multi.html")
+  end
+
   def index(conn, %{"id" => screen_id} = params) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
@@ -57,10 +71,7 @@ defmodule ScreensWeb.V2.ScreenController do
         |> assign(:sentry_frontend_dsn, Application.get_env(:screens, :sentry_frontend_dsn))
         |> assign(
           :refresh_rate_offset,
-          screen_id
-          |> Base.encode16()
-          |> String.to_integer(16)
-          |> rem(refresh_rate)
+          calculate_refresh_rate_offset(screen_id, refresh_rate)
         )
         |> put_view(ScreensWeb.V2.ScreenView)
         |> render("index.html")
@@ -80,5 +91,34 @@ defmodule ScreensWeb.V2.ScreenController do
     |> put_status(:not_found)
     |> put_view(ScreensWeb.ErrorView)
     |> render("404.html")
+  end
+
+  defp calculate_refresh_rate_offset(screen_id, refresh_rate) do
+    screen_id
+    |> Base.encode16()
+    |> String.to_integer(16)
+    |> rem(refresh_rate)
+  end
+
+  defp screen_ids(target_app_id, refresh_rate) do
+    ids =
+      for {screen_id, %Screen{app_id: ^target_app_id}} <- State.screens() do
+        screen_id
+      end
+
+    Enum.sort(ids, &id_sort_fn/2)
+    |> Enum.map(fn id ->
+      %{id: id, refresh_rate_offset: calculate_refresh_rate_offset(id, refresh_rate)}
+    end)
+  end
+
+  defp id_sort_fn(a, b) do
+    case {Integer.parse(a), Integer.parse(b)} do
+      {{m, ""}, {n, ""}} ->
+        m <= n
+
+      _ ->
+        a <= b
+    end
   end
 end
