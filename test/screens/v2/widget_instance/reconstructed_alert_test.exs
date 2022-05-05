@@ -77,8 +77,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget | alert: %{widget.alert | severity: severity}}
   end
 
-  defp put_is_terminal(widget, is_terminal) do
-    %{widget | is_terminal: is_terminal}
+  defp put_is_terminal_station(widget, is_terminal_station) do
+    %{widget | is_terminal_station: is_terminal_station}
   end
 
   defp ie(opts) do
@@ -229,7 +229,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget =
         widget
         |> put_home_stop(PreFare, "place-forhl")
-        |> put_informed_entities([ie(stop: "place-dwnxg"), ie(stop: "place-pktrm")])
+        |> put_informed_entities([ie(stop: "place-chncl"), ie(stop: "place-forhl")])
         |> put_effect(:suspension)
         |> put_stop_sequences([
           [
@@ -239,7 +239,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             "place-forhl"
           ]
         ])
-        |> put_is_terminal(true)
+        |> put_is_terminal_station(true)
 
       assert [1] == WidgetInstance.priority(widget)
       assert [:full_body] == WidgetInstance.slot_names(widget)
@@ -383,7 +383,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             "place-forhl"
           ]
         ])
-        |> put_is_terminal(true)
+        |> put_is_terminal_station(true)
+        |> put_routes_at_stop([
+          %{
+            route_id: "Orange",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
 
       expected = %{
         issue: %{icon: nil, text: ["No", %{route: "orange"}, "trains"]},
@@ -419,7 +429,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             "place-forhl"
           ]
         ])
-        |> put_is_terminal(true)
+        |> put_is_terminal_station(true)
+        |> put_routes_at_stop([
+          %{
+            route_id: "Orange",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
 
       expected = %{
         issue: %{icon: nil, text: ["No", %{route: "orange"}, "trains"]},

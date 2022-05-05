@@ -153,7 +153,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         stop_sequences: station_sequences,
         now: now,
         informed_stations_string: informed_stations_string,
-        is_terminal: true
+        is_terminal_station: true
       }
 
       expected_widgets = [
@@ -291,7 +291,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         stop_sequences: station_sequences,
         now: now,
         informed_stations_string: "",
-        is_terminal: true
+        is_terminal_station: true
       }
 
       expected_widgets = [
