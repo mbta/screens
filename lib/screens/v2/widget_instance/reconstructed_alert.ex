@@ -16,7 +16,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             stop_sequences: nil,
             routes_at_stop: nil,
             informed_stations_string: nil,
-            is_terminal: false
+            is_terminal_station: false
 
   @type stop_id :: String.t()
 
@@ -29,7 +29,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           stop_sequences: list(list(stop_id())),
           routes_at_stop: list(%{route_id: route_id(), active?: boolean()}),
           informed_stations_string: String.t(),
-          is_terminal: boolean()
+          is_terminal_station: boolean()
         }
 
   @route_directions %{
@@ -365,6 +365,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
+  defp serialize_inside_alert(%__MODULE__{} = t) do
+    if AlertWidget.takeover_alert?(t) do
+      serialize_takeover_alert(t)
+    else
+      serialize_inside_flex_alert(t)
+    end
+  end
+
   defp serialize_boundary_alert(
          %__MODULE__{
            alert: %Alert{effect: :suspension, cause: cause, header: header}
@@ -677,21 +685,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def serialize(%__MODULE__{} = t) do
-    # Boundary suspensions and shuttles should be full screen, so we need to catch those early
-    if AlertWidget.takeover_alert?(t) do
-      t |> serialize_takeover_alert() |> Map.put(:region, :inside)
-    else
-      case BaseAlert.location(t) do
-        :inside ->
-          t |> serialize_inside_flex_alert() |> Map.put(:region, :inside)
+  def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
+    case BaseAlert.location(t, is_terminal_station) do
+      :inside ->
+        t |> serialize_inside_alert() |> Map.put(:region, :inside)
 
-        location when location in [:boundary_upstream, :boundary_downstream] ->
-          t |> serialize_boundary_alert() |> Map.put(:region, :boundary)
+      location when location in [:boundary_upstream, :boundary_downstream] ->
+        t |> serialize_boundary_alert() |> Map.put(:region, :boundary)
 
-        location when location in [:downstream, :upstream] ->
-          t |> serialize_outside_alert() |> Map.put(:region, :outside)
-      end
+      location when location in [:downstream, :upstream] ->
+        t |> serialize_outside_alert() |> Map.put(:region, :outside)
     end
   end
 

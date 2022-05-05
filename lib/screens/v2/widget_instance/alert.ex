@@ -157,11 +157,11 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   def takeover_alert?(
-        %ReconstructedAlert{screen: %Screen{app_id: :pre_fare_v2}, is_terminal: is_terminal} = t
+        %{screen: %Screen{app_id: :pre_fare_v2}, is_terminal_station: is_terminal_station} = t
       ) do
     active?(t) and effect(t) in [:station_closure, :suspension, :shuttle] and
-      ((BaseAlert.location(t) == :inside and informs_all_active_routes_at_home_stop?(t)) or
-         is_terminal)
+      BaseAlert.location(t, is_terminal_station) == :inside and
+      informs_all_active_routes_at_home_stop?(t)
   end
 
   defp takeover_slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}) do
