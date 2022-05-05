@@ -26,7 +26,12 @@ defmodule Screens.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Screens.Supervisor]
-    Supervisor.start_link(children, opts)
+    start_return = Supervisor.start_link(children, opts)
+
+    # Logger needed for Sentry; must be started after start_link
+    Logger.add_backend(Sentry.LoggerBackend)
+
+    start_return
   end
 
   # Tell Phoenix to update the endpoint configuration
