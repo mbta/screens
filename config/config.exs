@@ -14,6 +14,10 @@ config :screens, ScreensWeb.Endpoint,
   render_errors: [view: ScreensWeb.ErrorView, accepts: ~w(html json)],
   pubsub_server: ScreensWeb.PubSub
 
+# Include 2 logger backends
+config :logger,
+  backends: [:console, Sentry.LoggerBackend]
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
