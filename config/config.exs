@@ -14,6 +14,10 @@ config :screens, ScreensWeb.Endpoint,
   render_errors: [view: ScreensWeb.ErrorView, accepts: ~w(html json)],
   pubsub_server: ScreensWeb.PubSub
 
+# Include 2 logger backends
+config :logger,
+  backends: [:console, Sentry.LoggerBackend]
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
@@ -58,17 +62,6 @@ env_name =
     nil -> Mix.env()
     env -> String.to_existing_atom(env)
   end
-
-# Centralize Error reporting
-config :sentry,
-  dsn: System.get_env("SENTRY_DSN") || "",
-  environment_name: env_name,
-  enable_source_code_context: true,
-  root_source_code_path: File.cwd!(),
-  included_environments: [env_name],
-  tags: %{
-    env: env_name
-  }
 
 config :screens,
   gds_dms_username: "mbtadata@gmail.com",
