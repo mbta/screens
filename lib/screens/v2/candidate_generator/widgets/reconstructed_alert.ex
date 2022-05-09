@@ -120,9 +120,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     end
   end
 
-  defp is_terminal?(stop_id, [stop_sequence]) do
-    List.first(stop_sequence) == stop_id or List.last(stop_sequence) == stop_id
+  defp is_terminal?(stop_id, stop_sequences) do
+    Enum.any?(stop_sequences, fn stop_sequence ->
+      List.first(stop_sequence) == stop_id or List.last(stop_sequence) == stop_id
+    end)
   end
-
-  defp is_terminal?(_, _), do: false
 end
