@@ -246,8 +246,66 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
     end
 
+    test "returns takeover for a terminal boundary shuttle", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-forhl")
+        |> put_informed_entities([ie(stop: "place-chncl"), ie(stop: "place-forhl")])
+        |> put_effect(:shuttle)
+        |> put_stop_sequences([
+          [
+            "place-ogmnl",
+            "place-dwnxg",
+            "place-chncl",
+            "place-forhl"
+          ]
+        ])
+        |> put_is_terminal_station(true)
+
+      assert [1] == WidgetInstance.priority(widget)
+      assert [:full_body] == WidgetInstance.slot_names(widget)
+      assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
+    end
+
     test "returns flex zone alert for a severe delay", %{widget: widget} do
       widget = put_effect(widget, :severe_delay)
+      assert [3] == WidgetInstance.priority(widget)
+      assert [:large] == WidgetInstance.slot_names(widget)
+      assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
+    end
+
+    test "returns flex zone alert for a boundary suspension", %{widget: widget} do
+      widget = put_informed_entities(widget, [ie(stop: "place-dwnxg"), ie(stop: "place-pktrm")])
+      widget = put_effect(widget, :suspension)
+      assert [3] == WidgetInstance.priority(widget)
+      assert [:large] == WidgetInstance.slot_names(widget)
+      assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
+    end
+
+    test "returns flex zone alert for a boundary shuttle", %{widget: widget} do
+      widget = put_informed_entities(widget, [ie(stop: "place-dwnxg"), ie(stop: "place-pktrm")])
+      widget = put_effect(widget, :shuttle)
+      assert [3] == WidgetInstance.priority(widget)
+      assert [:large] == WidgetInstance.slot_names(widget)
+      assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
+    end
+
+    test "returns flex zone alert for a terminal boundary delay", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-forhl")
+        |> put_informed_entities([ie(stop: "place-chncl"), ie(stop: "place-forhl")])
+        |> put_effect(:severe_delay)
+        |> put_stop_sequences([
+          [
+            "place-ogmnl",
+            "place-dwnxg",
+            "place-chncl",
+            "place-forhl"
+          ]
+        ])
+        |> put_is_terminal_station(true)
+
       assert [3] == WidgetInstance.priority(widget)
       assert [:large] == WidgetInstance.slot_names(widget)
       assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
