@@ -663,6 +663,54 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   describe "serialize_boundary_alert/1" do
     setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
+    test "handles suspension", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
+        ])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "No Alewife trains",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :suspension,
+        urgent: true,
+        region: :boundary,
+        remedy: "Seek alternate route"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles shuttle", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:shuttle)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
+        ])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "No Alewife trains",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :shuttle,
+        urgent: true,
+        region: :boundary,
+        remedy: "Use shuttle bus"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
     test "handles moderate delay", %{widget: widget} do
       widget =
         widget
