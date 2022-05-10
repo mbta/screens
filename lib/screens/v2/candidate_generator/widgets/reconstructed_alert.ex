@@ -121,14 +121,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   end
 
   # This function assumes that stop_sequences is ordered by direction north/east -> south/west.
-  # If the current station has only one stop sequence and the stop_id is the first or last entry in the stop_sequence,
-  # it is a terminal. Delay alerts heading in the direction of the station are not relevant.
+  # If the current station's stop_id is the first or last entry in all stop_sequences,
+  # it is a terminal station. Delay alerts heading in the direction of the station are not relevant.
   defp relevant_direction?(
          %ReconstructedAlert{
            screen: %Screen{
              app_params: %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}}
            },
-           stop_sequences: [stop_sequence]
+           stop_sequences: stop_sequences
          } = t
        ) do
     informed_entities = BaseAlert.informed_entities(t)
@@ -141,19 +141,30 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     relevant_direction_for_terminal =
       cond do
         # Alert affects both directions
-        is_nil(direction_id) -> nil
-        # North/East side terminals
-        stop_id == List.first(stop_sequence) -> 0
-        # South/West side terminals
-        stop_id == List.last(stop_sequence) -> 1
-        # Single line stations that are not terminals
-        true -> nil
+        is_nil(direction_id) ->
+          nil
+
+        # North/East side terminal stations
+        Enum.all?(
+          stop_sequences,
+          fn stop_sequence -> stop_id == List.first(stop_sequence) end
+        ) ->
+          0
+
+        # South/West side terminal stations
+        Enum.all?(
+          stop_sequences,
+          fn stop_sequence -> stop_id == List.last(stop_sequence) end
+        ) ->
+          1
+
+        # Single line stations that are not terminal stations
+        true ->
+          nil
       end
 
     relevant_direction_for_terminal == nil or relevant_direction_for_terminal == direction_id
   end
-
-  defp relevant_direction?(_), do: true
 
   defp get_stations(alert, fetch_stop_name_fn) do
     stop_ids =
