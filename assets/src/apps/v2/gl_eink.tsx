@@ -31,6 +31,7 @@ import {
 } from "Components/v2/eink/alert";
 import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 import OvernightDepartures from "Components/v2/eink/overnight_departures";
+import MultiScreenPage from "Components/v2/multi_screen_page";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -76,6 +77,12 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
+        <Route exact path="/v2/screen/gl_eink_v2">
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
+        </Route>
         <Route path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>

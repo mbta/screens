@@ -62,7 +62,7 @@ const AudioConfigContext = createContext<AudioConfig | null>(
   defaultAudioConfig
 );
 
-const LastFetchContext = createContext<number | null>(null)
+const LastFetchContext = createContext<number | null>(null);
 
 interface ScreenLayoutProps {
   apiResponse: ApiResponse;
@@ -109,11 +109,11 @@ const ScreenContainer = ({ id }) => {
     <LastFetchContext.Provider value={lastSuccess}>
       <ScreenLayout apiResponse={apiResponse} showBlink={showBlink} />
     </LastFetchContext.Provider>
-  )
+  );
 };
 
 export default ScreenContainer;
-export { ResponseMapper, ResponseMapperContext };
+export { ResponseMapper, ResponseMapperContext, defaultResponseMapper };
 export { BlinkConfig, BlinkConfigContext };
 export { AudioConfig, AudioConfigContext };
 export { LastFetchContext };

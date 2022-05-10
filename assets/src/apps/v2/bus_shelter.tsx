@@ -39,6 +39,7 @@ import NoData from "Components/v2/lcd/no_data";
 import DeparturesNoData from "Components/v2/bus_shelter/departures_no_data";
 
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/bus_shelter/alert";
+import MultiScreenPage from "Components/v2/multi_screen_page";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -100,6 +101,12 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
+        <Route exact path="/v2/screen/bus_shelter_v2">
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
+        </Route>
         <Route path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>

@@ -39,6 +39,12 @@
 @import "v2/lcd_common_styles/no_data";
 @import "v2/bus_shelter/departures_no_data";
 
+@import "v2/multi_screen_page";
+
 body {
   margin: 0px;
+}
+
+.multi-screen-page {
+  grid-auto-rows: 1920px;
 }
