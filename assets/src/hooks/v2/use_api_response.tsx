@@ -96,11 +96,22 @@ const useApiResponse = ({
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
-  const { lastRefresh, refreshRate, refreshRateOffset } =
-    document.getElementById("app").dataset;
+  const {
+    lastRefresh,
+    refreshRate,
+    refreshRateOffset,
+    screenIdsWithOffsetMap,
+  } = document.getElementById("app").dataset;
   const refreshMs = parseInt(refreshRate, 10) * 1000;
-  const refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
+  let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
   const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}`;
+
+  if (screenIdsWithOffsetMap) {
+    const screens = JSON.parse(screenIdsWithOffsetMap);
+
+    refreshRateOffsetMs =
+      screens.find((screen) => screen.id === id).refresh_rate_offset * 1000;
+  }
 
   const fetchData = async () => {
     try {

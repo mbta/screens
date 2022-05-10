@@ -30,6 +30,12 @@
 
 @import "v2/gl_eink/evergreen/image";
 
+@import "v2/multi_screen_page";
+
 body {
   margin: 0px;
+}
+
+.multi-screen-page {
+  grid-auto-rows: 3200px;
 }

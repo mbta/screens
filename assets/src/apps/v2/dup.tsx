@@ -13,6 +13,7 @@ import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/dup/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
+import MultiScreenPage from "Components/v2/multi_screen_page";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -26,6 +27,9 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
+        <Route exact path="/v2/screen/dup_v2">
+          <MultiScreenPage components={TYPE_TO_COMPONENT} />
+        </Route>
         <Route path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ScreenPage />

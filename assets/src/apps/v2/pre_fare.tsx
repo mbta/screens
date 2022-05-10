@@ -34,6 +34,7 @@ import SubwayStatus from "Components/v2/subway_status";
 import ReconstructedAlert from "Components/v2/reconstructed_alert";
 import NoData from "Components/v2/pre_fare/no_data";
 import ReconstructedTakeover from "Components/v2/reconstructed_takeover";
+import MultiScreenPage from "Components/v2/multi_screen_page";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -87,6 +88,12 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
+        <Route exact path="/v2/screen/pre_fare_v2">
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
+        </Route>
         <Route path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>

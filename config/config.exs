@@ -14,6 +14,10 @@ config :screens, ScreensWeb.Endpoint,
   render_errors: [view: ScreensWeb.ErrorView, accepts: ~w(html json)],
   pubsub_server: ScreensWeb.PubSub
 
+# Include 2 logger backends
+config :logger,
+  backends: [:console, Sentry.LoggerBackend]
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
@@ -52,6 +56,12 @@ config :ueberauth, Ueberauth.Strategy.Cognito,
   client_id: {System, :get_env, ["COGNITO_CLIENT_ID"]},
   user_pool_id: {System, :get_env, ["COGNITO_USER_POOL_ID"]},
   aws_region: {System, :get_env, ["COGNITO_AWS_REGION"]}
+
+env_name =
+  case System.get_env("ENVIRONMENT_NAME") do
+    nil -> Mix.env()
+    env -> String.to_existing_atom(env)
+  end
 
 config :screens,
   gds_dms_username: "mbtadata@gmail.com",

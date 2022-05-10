@@ -1,0 +1,7 @@
+<div
+  id="app"
+  data-last-refresh="<%= @last_refresh %>"
+  data-environment-name="<%= @environment_name %>"
+  data-refresh-rate="<%= @refresh_rate %>"
+  data-screen-ids-with-offset-map="<%= Jason.encode!(@screen_ids_with_offset_map) %>"
+></div>
