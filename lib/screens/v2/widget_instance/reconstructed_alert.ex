@@ -15,7 +15,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             now: nil,
             stop_sequences: nil,
             routes_at_stop: nil,
-            informed_stations_string: nil
+            informed_stations_string: nil,
+            is_terminal_station: false
 
   @type stop_id :: String.t()
 
@@ -27,7 +28,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           now: DateTime.t(),
           stop_sequences: list(list(stop_id())),
           routes_at_stop: list(%{route_id: route_id(), active?: boolean()}),
-          informed_stations_string: String.t()
+          informed_stations_string: String.t(),
+          is_terminal_station: boolean()
         }
 
   @route_directions %{
@@ -683,8 +685,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def serialize(%__MODULE__{} = t) do
-    case BaseAlert.location(t) do
+  def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
+    case BaseAlert.location(t, is_terminal_station) do
       :inside ->
         t |> serialize_inside_alert() |> Map.put(:region, :inside)
 

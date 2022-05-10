@@ -137,7 +137,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
           | :elsewhere
           | :inside
           | :upstream
-  def location(%{} = t) do
+  def location(%{} = t, is_terminal_station \\ false) do
     location_context = %{
       home_stop: home_stop_id(t),
       upstream_stops: upstream_stop_id_set(t),
@@ -154,44 +154,49 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
       |> Enum.uniq()
       |> Enum.sort()
 
-    get_location_atom(informed_zones_set, t.alert.effect)
+    get_location_atom(informed_zones_set, t.alert.effect, is_terminal_station)
   end
 
-  defp get_location_atom(informed_zones_set, _) when informed_zones_set == [:upstream],
+  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:upstream],
     do: :upstream
 
-  defp get_location_atom(informed_zones_set, _) when informed_zones_set == [:downstream],
+  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:downstream],
     do: :downstream
 
-  defp get_location_atom(informed_zones_set, _) when informed_zones_set == [:home_stop],
+  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:home_stop],
     do: :inside
 
-  defp get_location_atom(informed_zones_set, _)
+  defp get_location_atom(informed_zones_set, _, _)
        when informed_zones_set == [:downstream, :home_stop, :upstream],
        do: :inside
 
   # If station closure, then a boundary_upstream / _downstream is actually :inside
-  defp get_location_atom(informed_zones_set, effect)
+  defp get_location_atom(informed_zones_set, effect, _)
        when informed_zones_set == [:home_stop, :upstream] and effect === :station_closure,
        do: :inside
 
-  defp get_location_atom(informed_zones_set, effect)
+  defp get_location_atom(informed_zones_set, effect, _)
        when informed_zones_set == [:downstream, :home_stop] and effect === :station_closure,
        do: :inside
 
-  defp get_location_atom(informed_zones_set, _)
+  defp get_location_atom(informed_zones_set, effect, true)
+       when informed_zones_set in [[:home_stop, :upstream], [:downstream, :home_stop]] and
+              effect in [:suspension, :shuttle],
+       do: :inside
+
+  defp get_location_atom(informed_zones_set, _, _)
        when informed_zones_set == [:home_stop, :upstream],
        do: :boundary_upstream
 
-  defp get_location_atom(informed_zones_set, _)
+  defp get_location_atom(informed_zones_set, _, _)
        when informed_zones_set == [:downstream, :home_stop],
        do: :boundary_downstream
 
-  defp get_location_atom(informed_zones_set, _)
+  defp get_location_atom(informed_zones_set, _, _)
        when informed_zones_set == [:downstream, :upstream],
        do: :downstream
 
-  defp get_location_atom(_, _), do: :elsewhere
+  defp get_location_atom(_, _, _), do: :elsewhere
 
   def active?(%{alert: alert, now: now}, happening_now? \\ &Alert.happening_now?/2) do
     happening_now?.(alert, now)
