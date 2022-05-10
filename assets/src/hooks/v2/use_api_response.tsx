@@ -104,13 +104,14 @@ const useApiResponse = ({
   } = document.getElementById("app").dataset;
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
-  if (!refreshRateOffsetMs && screenIdsWithOffsetMap) {
+  const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}`;
+
+  if (screenIdsWithOffsetMap) {
     const screens = JSON.parse(screenIdsWithOffsetMap);
 
     refreshRateOffsetMs =
       screens.find((screen) => screen.id === id).refresh_rate_offset * 1000;
   }
-  const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}`;
 
   const fetchData = async () => {
     try {
