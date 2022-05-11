@@ -80,20 +80,91 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     Enum.member?(@relevant_effects, effect)
   end
 
-  defp relevant_location?(%ReconstructedAlert{alert: alert} = reconstructed_alert) do
+  defp relevant_location?(%ReconstructedAlert{} = reconstructed_alert) do
     case BaseAlert.location(reconstructed_alert) do
       location when location in [:downstream, :upstream] ->
         true
 
       :inside ->
-        alert.effect != :delay or alert.severity > 3
+        relevant_inside_alert?(reconstructed_alert)
 
       location when location in [:boundary_upstream, :boundary_downstream] ->
-        alert.effect != :station_closure and (alert.effect != :delay or alert.severity > 3)
+        relevant_boundary_alert?(reconstructed_alert)
 
       _ ->
         false
     end
+  end
+
+  defp relevant_inside_alert?(
+         %ReconstructedAlert{alert: %Alert{effect: :delay}} = reconstructed_alert
+       ),
+       do: relevant_delay?(reconstructed_alert)
+
+  defp relevant_inside_alert?(_), do: true
+
+  defp relevant_boundary_alert?(%ReconstructedAlert{alert: %Alert{effect: :station_closure}}),
+    do: false
+
+  defp relevant_boundary_alert?(
+         %ReconstructedAlert{
+           alert: %Alert{effect: :delay}
+         } = reconstructed_alert
+       ),
+       do: relevant_delay?(reconstructed_alert)
+
+  defp relevant_boundary_alert?(_), do: true
+
+  defp relevant_delay?(
+         %ReconstructedAlert{alert: %Alert{severity: severity}} = reconstructed_alert
+       ) do
+    severity > 3 and relevant_direction?(reconstructed_alert)
+  end
+
+  # This function assumes that stop_sequences is ordered by direction north/east -> south/west.
+  # If the current station's stop_id is the first or last entry in all stop_sequences,
+  # it is a terminal station. Delay alerts heading in the direction of the station are not relevant.
+  defp relevant_direction?(
+         %ReconstructedAlert{
+           screen: %Screen{
+             app_params: %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}}
+           },
+           stop_sequences: stop_sequences
+         } = t
+       ) do
+    informed_entities = BaseAlert.informed_entities(t)
+
+    direction_id =
+      informed_entities
+      |> Enum.map(fn %{direction_id: direction_id} -> direction_id end)
+      |> Enum.find(fn direction_id -> not is_nil(direction_id) end)
+
+    relevant_direction_for_terminal =
+      cond do
+        # Alert affects both directions
+        is_nil(direction_id) ->
+          nil
+
+        # North/East side terminal stations
+        Enum.all?(
+          stop_sequences,
+          fn stop_sequence -> stop_id == List.first(stop_sequence) end
+        ) ->
+          0
+
+        # South/West side terminal stations
+        Enum.all?(
+          stop_sequences,
+          fn stop_sequence -> stop_id == List.last(stop_sequence) end
+        ) ->
+          1
+
+        # Single line stations that are not terminal stations
+        true ->
+          nil
+      end
+
+    relevant_direction_for_terminal == nil or relevant_direction_for_terminal == direction_id
   end
 
   defp get_stations(alert, fetch_stop_name_fn) do
