@@ -10,7 +10,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
-  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.NormalHeader
 
   @behaviour CandidateGenerator
 
@@ -68,8 +68,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       fn -> reconstructed_alert_instances_fn.(config) end,
       fn -> elevator_status_instance_fn.(config, now) end,
       fn -> full_line_map_instances_fn.(config) end,
-      fn -> evergreen_content_instances_fn.(config) end,
-      fn -> placeholder_instances() end
+      fn -> evergreen_content_instances_fn.(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
@@ -134,17 +133,5 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
 
   defp alerts_outro_instances(widgets, config) do
     [%AlertsOutro{screen: config, widgets_snapshot: widgets}]
-  end
-
-  defp placeholder_instances do
-    [
-      %Placeholder{color: :red, slot_names: [:main_content_left]},
-      %Placeholder{color: :red, slot_names: [:upper_right]},
-      %Placeholder{color: :black, slot_names: [:lower_right]},
-      %Placeholder{color: :gray, slot_names: [:full_screen]},
-      %Placeholder{color: :blue, slot_names: [:full_body]},
-      %Placeholder{color: :orange, slot_names: [:full_body_left]},
-      %Placeholder{color: :orange, slot_names: [:full_body_right]}
-    ]
   end
 end
