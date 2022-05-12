@@ -99,12 +99,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     stop_ids =
       %{alert: alert}
       |> BaseAlert.informed_entities()
-      |> Enum.flat_map(fn %{stop: stop_id} -> 
-          case stop_id do
-            nil -> []
-            id -> [id]
-          end
-        end)
+      |> Enum.flat_map(fn %{stop: stop_id} ->
+        case stop_id do
+          nil -> []
+          id -> [id]
+        end
+      end)
 
     case stop_ids do
       [] ->
