@@ -57,11 +57,9 @@ config :ueberauth, Ueberauth.Strategy.Cognito,
   user_pool_id: {System, :get_env, ["COGNITO_USER_POOL_ID"]},
   aws_region: {System, :get_env, ["COGNITO_AWS_REGION"]}
 
-env_name =
-  case System.get_env("ENVIRONMENT_NAME") do
-    nil -> Mix.env()
-    env -> String.to_existing_atom(env)
-  end
+config :sentry,
+  enable_source_code_context: true,
+  root_source_code_path: File.cwd!()
 
 config :screens,
   gds_dms_username: "mbtadata@gmail.com",
