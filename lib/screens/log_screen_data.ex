@@ -41,17 +41,7 @@ defmodule Screens.LogScreenData do
   def log_api_response(response, screen_id, last_refresh, is_screen, screen_side \\ nil)
 
   def log_api_response(
-        %{force_reload: true, status: status},
-        screen_id,
-        last_refresh,
-        is_screen,
-        screen_side
-      ) do
-    log_api_response_success(screen_id, last_refresh, is_screen, status, screen_side)
-  end
-
-  def log_api_response(
-        %{success: true, status: status},
+        %{status: status},
         screen_id,
         last_refresh,
         is_screen,
