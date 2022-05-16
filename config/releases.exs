@@ -57,7 +57,9 @@ config :screens,
 config :sentry,
   dsn: System.get_env("SENTRY_DSN"),
   environment_name: eb_env_name,
-  included_environments: [eb_env_name]
+  included_environments: [eb_env_name],
+  enable_source_code_context: true,
+  root_source_code_path: File.cwd!()
 
 config :ueberauth, Ueberauth.Strategy.Cognito, client_secret: cognito_client_secret
 config :screens, ScreensWeb.AuthManager, secret_key: screens_auth_secret

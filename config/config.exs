@@ -57,10 +57,6 @@ config :ueberauth, Ueberauth.Strategy.Cognito,
   user_pool_id: {System, :get_env, ["COGNITO_USER_POOL_ID"]},
   aws_region: {System, :get_env, ["COGNITO_AWS_REGION"]}
 
-config :sentry,
-  enable_source_code_context: true,
-  root_source_code_path: File.cwd!()
-
 config :screens,
   gds_dms_username: "mbtadata@gmail.com",
   config_fetcher: Screens.Config.State.S3Fetch,
