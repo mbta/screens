@@ -30,6 +30,12 @@ config :screens,
 
 config :screens, ScreensWeb.AuthManager, secret_key: "secret key"
 
+# Do not send local errors to Sentry
+config :sentry,
+  dsn: "",
+  environment_name: "dev",
+  included_environments: []
+
 config :ueberauth, Ueberauth,
   providers: [
     cognito: {Screens.Ueberauth.Strategy.Fake, []}
