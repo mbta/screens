@@ -166,7 +166,9 @@ const getTimeframeEndText = (
     if (activePeriod.end === null) {
       endText = `Starting ${startDate.format("MMM D")}`;
     } else {
-      const endDate = moment(activePeriod.end).tz("America/New_York");
+      // We use the Los Angeles TZ whenever we want "end of service" to reflect
+      // the previous day's date.
+      const endDate = moment(activePeriod.end).tz("America/Los_Angeles");
       if (startDate.month() === endDate.month()) {
         if (startDate.day() === endDate.day()) {
           endText = `${startDate.format("MMM D")}`;
