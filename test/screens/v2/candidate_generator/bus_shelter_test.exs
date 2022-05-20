@@ -79,6 +79,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       fetch_stop_fn = fn "1216" -> "Columbus Ave @ Dimock St" end
       now = ~U[2020-04-06T10:00:00Z]
       evergreen_content_instances_fn = fn _ -> [] end
+      subway_status_instances_fn = fn _ -> [] end
 
       expected_header = %NormalHeader{
         screen: config,
@@ -96,7 +97,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
           fetch_stop_fn,
           departures_instances_fn,
           alert_instances_fn,
-          evergreen_content_instances_fn
+          evergreen_content_instances_fn,
+          subway_status_instances_fn
         )
 
       assert expected_header in actual_instances
@@ -112,6 +114,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       fetch_stop_fn = fn "1216" -> raise "This should not be called!" end
       now = ~U[2020-04-06T10:00:00Z]
       evergreen_content_instances_fn = fn _ -> [] end
+      subway_status_instances_fn = fn _ -> [] end
 
       expected_header = %NormalHeader{
         screen: config,
@@ -127,7 +130,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
           fetch_stop_fn,
           departures_instances_fn,
           alert_instances_fn,
-          evergreen_content_instances_fn
+          evergreen_content_instances_fn,
+          subway_status_instances_fn
         )
 
       assert expected_header in actual_instances
