@@ -59,22 +59,16 @@ defmodule Screens.V2.CandidateGenerator.GlEinkTest do
     end
   end
 
-  describe "candidate_instances/3" do
+  describe "header_instances/3" do
     test "returns expected header", %{config: config} do
-      departures_instances_fn = fn _, _, _ -> [] end
-      alerts_instances_fn = fn _ -> [] end
       fetch_destination_fn = fn "Green-C", 0 -> "Cleveland Circle" end
       now = ~U[2020-04-06T10:00:00Z]
-      evergreen_content_instances_fn = fn _ -> [] end
 
       actual_instances =
-        GlEink.candidate_instances(
+        GlEink.header_instances(
           config,
           now,
-          fetch_destination_fn,
-          departures_instances_fn,
-          alerts_instances_fn,
-          evergreen_content_instances_fn
+          fetch_destination_fn
         )
 
       expected_header = %NormalHeader{
@@ -84,6 +78,14 @@ defmodule Screens.V2.CandidateGenerator.GlEinkTest do
         time: ~U[2020-04-06T10:00:00Z]
       }
 
+      assert expected_header in actual_instances
+    end
+  end
+
+  describe "footer_instances/1" do
+    test "returns expected footer", %{config: config} do
+      actual_instances = GlEink.footer_instances(config)
+
       expected_footer = %FareInfoFooter{
         screen: config,
         mode: :subway,
@@ -91,7 +93,6 @@ defmodule Screens.V2.CandidateGenerator.GlEinkTest do
         url: "mbta.com/stops/1722"
       }
 
-      assert expected_header in actual_instances
       assert expected_footer in actual_instances
     end
   end

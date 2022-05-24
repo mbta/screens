@@ -89,10 +89,14 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
-  defp header_instances(config, now) do
+  def header_instances(
+        config,
+        now,
+        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1
+      ) do
     %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}} = config
 
-    stop_name = Stop.fetch_stop_name(stop_id)
+    stop_name = fetch_stop_name_fn.(stop_id)
 
     [%NormalHeader{screen: config, text: stop_name, time: now}]
   end

@@ -81,29 +81,25 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
     end
   end
 
-  describe "candidate_instances/3" do
+  describe "header_instances/3" do
     test "returns expected header", %{config: config} do
       now = ~U[2020-04-06T10:00:00Z]
-      subway_status_instance_fn = fn _ -> [] end
-      reconstructed_alert_instances_fn = fn _ -> [] end
-      elevator_status_instances_fn = fn _, _ -> [] end
+      fetch_stop_name_fn = fn _ -> "Test Stop" end
 
       expected_header = [
         %NormalHeader{
           screen: config,
           icon: nil,
-          text: "Government Center",
+          text: "Test Stop",
           time: ~U[2020-04-06T10:00:00Z]
         }
       ]
 
       actual_instances =
-        PreFare.candidate_instances(
+        PreFare.header_instances(
           config,
           now,
-          subway_status_instance_fn,
-          reconstructed_alert_instances_fn,
-          elevator_status_instances_fn
+          fetch_stop_name_fn
         )
 
       assert Enum.all?(expected_header, fn x -> x in actual_instances end)

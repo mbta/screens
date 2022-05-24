@@ -84,22 +84,24 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
 
-  def line_map_instances(
-        %Screen{
-          app_params: %GlEink{
-            line_map: %V2.LineMap{
-              station_id: station_id,
-              direction_id: direction_id,
-              route_id: route_id
-            }
-          }
-        } = config
-      ) do
-    {:ok, stops} = RoutePattern.stops_by_route_and_direction(route_id, direction_id)
-    {:ok, reverse_stops} = RoutePattern.stops_by_route_and_direction(route_id, 1 - direction_id)
+  defp line_map_instances(
+         %Screen{
+           app_params: %GlEink{
+             line_map: %V2.LineMap{
+               station_id: station_id,
+               direction_id: direction_id,
+               route_id: route_id
+             }
+           }
+         } = config,
+         stops_by_route_and_direction_fn \\ &RoutePattern.stops_by_route_and_direction/2,
+         fetch_departures_fn \\ &Screens.V2.Departure.fetch/2
+       ) do
+    {:ok, stops} = stops_by_route_and_direction_fn.(route_id, direction_id)
+    {:ok, reverse_stops} = stops_by_route_and_direction_fn.(route_id, 1 - direction_id)
 
     {:ok, departures} =
-      Screens.V2.Departure.fetch(%{stop_ids: [station_id]},
+      fetch_departures_fn.(%{stop_ids: [station_id]},
         include_schedules: true,
         now: DateTime.add(DateTime.utc_now(), -@scheduled_terminal_departure_lookback_seconds)
       )
@@ -139,7 +141,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
     end
   end
 
-  defp footer_instances(config) do
+  def footer_instances(config) do
     %Screen{
       app_params: %GlEink{footer: %Footer{stop_id: stop_id}}
     } = config
