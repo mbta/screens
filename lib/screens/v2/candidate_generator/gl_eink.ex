@@ -85,18 +85,18 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   def audio_only_instances(_widgets, _config), do: []
 
   defp line_map_instances(
-        %Screen{
-          app_params: %GlEink{
-            line_map: %V2.LineMap{
-              station_id: station_id,
-              direction_id: direction_id,
-              route_id: route_id
-            }
-          }
-        } = config,
-        stops_by_route_and_direction_fn \\ &RoutePattern.stops_by_route_and_direction/2,
-        fetch_departures_fn \\ &Screens.V2.Departure.fetch/2
-      ) do
+         %Screen{
+           app_params: %GlEink{
+             line_map: %V2.LineMap{
+               station_id: station_id,
+               direction_id: direction_id,
+               route_id: route_id
+             }
+           }
+         } = config,
+         stops_by_route_and_direction_fn \\ &RoutePattern.stops_by_route_and_direction/2,
+         fetch_departures_fn \\ &Screens.V2.Departure.fetch/2
+       ) do
     {:ok, stops} = stops_by_route_and_direction_fn.(route_id, direction_id)
     {:ok, reverse_stops} = stops_by_route_and_direction_fn.(route_id, 1 - direction_id)
 

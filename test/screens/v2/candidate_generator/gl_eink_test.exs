@@ -84,7 +84,6 @@ defmodule Screens.V2.CandidateGenerator.GlEinkTest do
 
   describe "footer_instances/1" do
     test "returns expected footer", %{config: config} do
-
       actual_instances = GlEink.footer_instances(config)
 
       expected_footer = %FareInfoFooter{

@@ -93,7 +93,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         config,
         now,
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1
-    ) do
+      ) do
     %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}} = config
 
     stop_name = fetch_stop_name_fn.(stop_id)
