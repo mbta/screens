@@ -5,7 +5,7 @@ defmodule Screens.Checks.UntestableDateTime do
     base_priority: :high,
     category: :warning,
     explanations: [
-      check: """
+      check: ~S"""
       Creating representations of "now" within a function's body
       via `DateTime.utc_now/1` and similar functions causes the
       function to be untestable. It's not possible to control the
@@ -24,7 +24,7 @@ defmodule Screens.Checks.UntestableDateTime do
 
       Testable:
 
-          def after_noon_utc?(now \\\\ DateTime.utc_now()), do: now.hour >= 12
+          def after_noon_utc?(now \\ DateTime.utc_now()), do: now.hour >= 12
 
       Using the testable function in production code:
 

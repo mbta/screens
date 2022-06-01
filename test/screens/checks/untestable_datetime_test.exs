@@ -4,7 +4,7 @@ defmodule Screens.Checks.UntestableDateTimeTest do
   alias Screens.Checks.UntestableDateTime
 
   test "it should not report 'now' function calls used as default values in a function's parameters" do
-    """
+    ~S"""
     defmodule MyTestableCode do
       @type t :: %__MODULE__{
         value: integer()
@@ -13,7 +13,7 @@ defmodule Screens.Checks.UntestableDateTimeTest do
       @enforce_keys [:value]
       defstruct @enforce_keys
 
-      def get_current_value(t, utc_now \\\\ Time.utc_now())
+      def get_current_value(t, utc_now \\ Time.utc_now())
 
       def get_current_value(%__MODULE__{value: value} = t, utc_now)
         when is_integer(value)
@@ -38,7 +38,7 @@ defmodule Screens.Checks.UntestableDateTimeTest do
   end
 
   test "it should report 'now' function calls within function body" do
-    """
+    ~S"""
     defmodule MyUntestableCode do
       @type t :: %__MODULE__{
         value: integer()
@@ -64,6 +64,19 @@ defmodule Screens.Checks.UntestableDateTimeTest do
         now7 = Time.utc_now()
 
         [now1, now2, now3, now4, now5, now6, now7]
+      rescue
+        exception ->
+          IO.inspect(DateTime.utc_now())
+          reraise(exception)
+      catch
+        thrown_value ->
+          IO.puts("#{thrown_value} was thrown at #{DateTime.utc_now()}")
+      after
+        IO.puts("One more DateTime for good measure: #{DateTime.utc_now()}")
+      else
+        list_of_datetimes ->
+          IO.puts("A big list of datetimes was returned by this function at #{DateTime.utc_now()}!")
+          list_of_datetimes
       end
 
       defp morning(value) do
@@ -80,14 +93,14 @@ defmodule Screens.Checks.UntestableDateTimeTest do
     |> to_source_file()
     |> run_check(UntestableDateTime)
     |> assert_issues(fn issues ->
-      assert Enum.count(issues) == 10
+      assert Enum.count(issues) == 14
 
       expected_trigger_counts = %{
         "Time.utc_now/0" => 2,
         "Date.utc_today/0" => 1,
         "DateTime.now!/1" => 1,
         "DateTime.now/1" => 1,
-        "DateTime.utc_now/0" => 3,
+        "DateTime.utc_now/0" => 7,
         "NaiveDateTime.local_now/0" => 1,
         "NaiveDateTime.utc_now/0" => 1
       }
