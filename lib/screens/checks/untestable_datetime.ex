@@ -69,27 +69,25 @@ defmodule Screens.Checks.UntestableDateTime do
   end
 
   @function_denylist [
-    {:DateTime, :utc_now, 0},
-    {:DateTime, :now, 1},
-    {:DateTime, :now!, 1},
-    {:Date, :utc_tody, 0},
-    {:NaiveDateTime, :local_now, 0},
-    {:NaiveDateTime, :utc_now, 0},
-    {:Time, :utc_now, 0}
+    {:DateTime, :utc_now},
+    {:DateTime, :now},
+    {:DateTime, :now!},
+    {:Date, :utc_today},
+    {:NaiveDateTime, :local_now},
+    {:NaiveDateTime, :utc_now},
+    {:Time, :utc_now}
   ]
 
-  for {module, function, arity} = mfa <- @function_denylist do
-    quoted_mfa = Macro.escape(mfa)
-
+  for {module, function} = mf <- @function_denylist do
     # This function is only called once we're already looking inside a function's body.
     # Any usages of one of the "now" functions that we find here are not allowed.
     defp traverse_function_body(
            {{:., _, [{:__aliases__, _, [unquote(module)]}, unquote(function)]}, meta, args} = ast,
            issues,
            issue_meta
-         )
-         when length(args) == unquote(arity) do
-      {ast, issues ++ [issue_for(unquote(quoted_mfa), meta[:line], issue_meta)]}
+         ) do
+      mfa = Tuple.append(unquote(mf), length(args))
+      {ast, issues ++ [issue_for(mfa, meta[:line], issue_meta)]}
     end
   end
 
