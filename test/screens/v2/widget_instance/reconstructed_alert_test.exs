@@ -912,6 +912,64 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     end
   end
 
+  describe "alert edge cases" do
+    setup [:setup_screen_config, :setup_now]
+
+    test "handles GL alert affecting all branches", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-gover")
+        |> put_effect(:shuttle)
+        |> put_informed_entities([
+          ie(stop: "place-north", route: "Green-B"),
+          ie(stop: "place-north", route: "Green-C"),
+          ie(stop: "place-north", route: "Green-D"),
+          ie(stop: "place-north", route: "Green-E"),
+          ie(stop: "place-spmnl", route: "Green-E")
+        ])
+        |> put_cause(:unknown)
+        |> put_stop_sequences([
+          [
+            "place-smpmnl",
+            "place-north",
+            "place-haecl",
+            "place-gover"
+          ]
+        ])
+        |> put_routes_at_stop([
+          %{
+            route_id: "Green-D",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          },
+          %{
+            route_id: "Green-E",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
+
+      expected = %{
+        issue: "No trains",
+        location: "between Science Park/West End and North Station",
+        cause: "",
+        routes: [%{color: :green, text: "GREEN LINE", type: :text}],
+        effect: :shuttle,
+        urgent: false,
+        region: :outside,
+        remedy: "Use shuttle bus"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+  end
+
   describe "audio_serialize/1" do
     setup @alert_widget_context_setup_group ++ [:setup_active_period]
 

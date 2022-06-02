@@ -659,6 +659,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  def get_endpoints(ie, "Green") do
+    Enum.find_value(@green_line_branches, fn branch ->
+      get_endpoints(ie, branch)
+    end)
+  end
+
   def get_endpoints(informed_entities, route_id) do
     case Stop.get_stop_sequence(informed_entities, route_id) do
       nil ->
