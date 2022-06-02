@@ -36,5 +36,13 @@ config :screens,
       # RL
       {"70076", "70080", "Alewife"},
       {"70079", "70075", "Ashmont/Braintree"}
+    ],
+    "place-gover" => [
+      # GL
+      {"70203", "70200", "North Station & North"},
+      {~w[70199 70198 70197 70196], "70204", "Copley & West"},
+      # BL
+      {"70042", "70038", "Wonderland"},
+      {"70038", "70041", "Bowdoin"}
     ]
   }
