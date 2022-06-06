@@ -263,11 +263,13 @@ defmodule Screens.Stops.Stop do
         case fetch_routes_serving_stop(station_id, [{"if-modified-since", date}]) do
           {:ok, new_routes} -> new_routes
           :not_modified -> routes
+          :error -> []
         end
 
       nil ->
         case fetch_routes_serving_stop(station_id) do
           {:ok, new_routes} -> new_routes
+          :error -> []
         end
     end
   end
