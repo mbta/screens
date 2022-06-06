@@ -7,7 +7,7 @@ defmodule Screens.Checks.UntestableDateTime do
     explanations: [
       check: ~S"""
       Creating representations of "now" within a function's body
-      via `DateTime.utc_now/1` and similar functions causes the
+      via `DateTime.utc_now/0` and similar functions causes the
       function to be untestable. It's not possible to control the
       "now" value from unit tests, so their outcomes can vary depending
       on when they are run--that is, they become "flaky".
