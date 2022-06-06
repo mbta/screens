@@ -54,7 +54,7 @@ defmodule Screens.DupScreenData do
   end
 
   defp primary_screen_response(primary_departures, rotation_index, current_time) do
-    case SpecialCases.handle_special_cases(primary_departures, rotation_index) do
+    case SpecialCases.handle_special_cases(primary_departures, rotation_index, current_time) do
       {:ok, response} ->
         response
 
