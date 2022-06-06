@@ -18,11 +18,9 @@ defmodule Screens.Config do
 
   use Screens.Config.Struct, children: [screens: {:map, Screen}, devops: Devops]
 
-  @spec schedule_refresh_for_screen_ids(t(), list(String.t())) :: t()
-  def schedule_refresh_for_screen_ids(config, screen_ids) do
+  @spec schedule_refresh_for_screen_ids(t(), list(String.t()), DateTime.t()) :: t()
+  def schedule_refresh_for_screen_ids(config, screen_ids, now \\ DateTime.utc_now()) do
     %__MODULE__{screens: current_screens, devops: devops} = config
-
-    now = DateTime.utc_now()
 
     new_screens =
       current_screens

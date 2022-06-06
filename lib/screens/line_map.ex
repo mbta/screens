@@ -56,6 +56,7 @@ defmodule Screens.LineMap do
   end
 
   defp next_scheduled_departure(origin_stop_id, route_id, predictions) do
+    # credo:disable-for-next-line Screens.Checks.UntestableDateTime
     time = DateTime.add(DateTime.utc_now(), -180)
 
     case Screens.Schedules.Schedule.fetch(%{
