@@ -17,6 +17,8 @@ defmodule Screens.V2.Departure do
             schedule: nil
 
   def fetch(params, opts \\ []) do
+    # This is equivalent to an argument with a default value, so it's fine
+    # credo:disable-for-next-line Screens.Checks.UntestableDateTime
     now = Keyword.get(opts, :now, DateTime.utc_now())
 
     if opts[:include_schedules] do

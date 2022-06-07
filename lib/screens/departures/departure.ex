@@ -451,8 +451,8 @@ defmodule Screens.Departures.Departure do
     end)
   end
 
-  def departure_in_past(%{departure_time: departure_time}) do
-    DateTime.compare(departure_time, DateTime.utc_now()) == :lt
+  def departure_in_past(%{departure_time: departure_time}, now \\ DateTime.utc_now()) do
+    DateTime.compare(departure_time, now) == :lt
   end
 
   def associate_alerts_with_departures(departures, alerts) do

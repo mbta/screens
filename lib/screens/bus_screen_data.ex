@@ -9,18 +9,18 @@ defmodule Screens.BusScreenData do
   alias Screens.Config.{Bus, State}
   alias Screens.Util
 
-  def by_screen_id(screen_id, is_screen) do
+  def by_screen_id(screen_id, is_screen, now \\ DateTime.utc_now()) do
     if State.mode_disabled?(:bus) do
       %{
         force_reload: false,
         success: false
       }
     else
-      by_enabled_screen_id(screen_id, is_screen)
+      by_enabled_screen_id(screen_id, is_screen, now)
     end
   end
 
-  defp by_enabled_screen_id(screen_id, is_screen) do
+  defp by_enabled_screen_id(screen_id, is_screen, now) do
     %Bus{stop_id: stop_id} = State.app_params(screen_id)
 
     # If we are unable to fetch alerts:
@@ -64,7 +64,6 @@ defmodule Screens.BusScreenData do
 
     {psa_type, psa_url} = Screens.Psa.current_psa_for(screen_id)
 
-    now = DateTime.utc_now()
     in_service_day? = in_service_day_at_stop?(stop_id, now)
 
     case departures do

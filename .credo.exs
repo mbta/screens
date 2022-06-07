@@ -2,11 +2,13 @@
   configs: [
     %{
       name: "default",
+      requires: ["lib/screens/checks/**/*.ex"],
       files: %{
         included: ["lib/"],
         excluded: []
       },
       checks: [
+        {Screens.Checks.UntestableDateTime},
         {Credo.Check.Design.AliasUsage, false},
         {Credo.Check.Readability.MaxLineLength, false},
         {Credo.Check.Consistency.ExceptionNames},

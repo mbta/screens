@@ -391,16 +391,18 @@ defmodule Screens.Alerts.Alert do
 
   # NEW INFO
   # defined as: created_at or updated_at is within the last two weeks
-  def new_info_in_last_two_weeks(%{created_at: created_at, updated_at: updated_at}) do
-    now = DateTime.utc_now()
+  def new_info_in_last_two_weeks(
+        %{created_at: created_at, updated_at: updated_at},
+        now \\ DateTime.utc_now()
+      ) do
     new_info = within_two_weeks(now, created_at) || within_two_weeks(now, updated_at)
     if new_info, do: 1, else: 0
   end
 
   # NEW SERVICE
   # defined as: next active_period start in the future is within two weeks of now
-  def new_service_in_next_two_weeks(%{active_period: active_period}) do
-    next_t = first_future_active_period_start(active_period)
+  def new_service_in_next_two_weeks(%{active_period: active_period}, now \\ DateTime.utc_now()) do
+    next_t = first_future_active_period_start(active_period, now)
 
     case next_t do
       :infinity ->
@@ -410,7 +412,7 @@ defmodule Screens.Alerts.Alert do
         soon =
           next_t
           |> DateTime.from_unix!()
-          |> within_two_weeks(DateTime.utc_now())
+          |> within_two_weeks(now)
 
         if soon, do: 1, else: 0
     end
@@ -418,10 +420,9 @@ defmodule Screens.Alerts.Alert do
 
   # (from dotcom)
   # atoms are greater than any integer
-  defp first_future_active_period_start([]), do: :infinity
+  defp first_future_active_period_start([], _now), do: :infinity
 
-  defp first_future_active_period_start(periods) do
-    now = DateTime.utc_now()
+  defp first_future_active_period_start(periods, now) do
     now_unix = DateTime.to_unix(now, :second)
 
     future_periods =

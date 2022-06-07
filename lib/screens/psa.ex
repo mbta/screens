@@ -37,6 +37,7 @@ defmodule Screens.Psa do
   end
 
   defp get_active_psa_list(scheduled_overrides, default_list) do
+    # credo:disable-for-next-line Screens.Checks.UntestableDateTime
     now = DateTime.utc_now()
 
     Enum.find_value(scheduled_overrides, default_list, fn override ->
@@ -84,6 +85,7 @@ defmodule Screens.Psa do
   defp choose_from_rotating_list([psa], _), do: psa
 
   defp choose_from_rotating_list(list, seconds_to_show) do
+    # credo:disable-for-next-line Screens.Checks.UntestableDateTime
     t = DateTime.utc_now()
     seconds_since_midnight = t.hour * 60 * 60 + t.minute * 60 + t.second
     periods_since_midnight = div(seconds_since_midnight, seconds_to_show)

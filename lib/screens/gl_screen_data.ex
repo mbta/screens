@@ -32,6 +32,7 @@ defmodule Screens.GLScreenData do
       %{
         force_reload: false,
         success: true,
+        # credo:disable-for-next-line Screens.Checks.UntestableDateTime
         current_time: Screens.Util.format_time(DateTime.utc_now()),
         stop_name: destination,
         stop_id: stop_id,

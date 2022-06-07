@@ -23,9 +23,9 @@ defmodule ScreensWeb.ScreenController do
     end
   end
 
-  defp last_refresh(conn, _) do
-    now = DateTime.utc_now() |> DateTime.to_iso8601()
-    assign(conn, :last_refresh, now)
+  defp last_refresh(conn, _, now \\ DateTime.utc_now()) do
+    timestamp = DateTime.to_iso8601(now)
+    assign(conn, :last_refresh, timestamp)
   end
 
   defp environment_name(conn, _) do

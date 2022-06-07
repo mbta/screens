@@ -28,10 +28,10 @@ defmodule Screens.MixProject do
     apps = [:logger, :runtime_tools]
 
     apps =
-      if Mix.env() == :prod do
-        [:ehmon | apps]
-      else
-        apps
+      case Mix.env() do
+        :prod -> [:ehmon | apps]
+        :test -> [:credo | apps]
+        _ -> apps
       end
 
     [

@@ -11,28 +11,28 @@ defmodule Screens.DupScreenData do
 
   alias Screens.DupScreenData.{Data, Request, Response, SpecialCases}
 
-  def by_screen_id(screen_id, rotation_index)
+  def by_screen_id(screen_id, rotation_index, now \\ DateTime.utc_now())
 
-  def by_screen_id(screen_id, rotation_index) when rotation_index in ~w[0 1] do
+  def by_screen_id(screen_id, rotation_index, now) when rotation_index in ~w[0 1] do
     %Dup{primary: primary_departures, override: override} = State.app_params(screen_id)
     disabled = State.disabled?(screen_id)
 
     case {override, rotation_index, disabled} do
       {_, _, true} ->
-        disabled_response()
+        disabled_response(now)
 
       {nil, _, _} ->
-        primary_screen_response(primary_departures, rotation_index)
+        primary_screen_response(primary_departures, rotation_index, now)
 
       {{screen0, _}, "0", _} ->
-        primary_screen_response_with_override(primary_departures, rotation_index, screen0)
+        primary_screen_response_with_override(primary_departures, rotation_index, screen0, now)
 
       {{_, screen1}, "1", _} ->
-        primary_screen_response_with_override(primary_departures, rotation_index, screen1)
+        primary_screen_response_with_override(primary_departures, rotation_index, screen1, now)
     end
   end
 
-  def by_screen_id(screen_id, "2") do
+  def by_screen_id(screen_id, "2", now) do
     %Dup{secondary: secondary_departures} = State.app_params(screen_id)
 
     case secondary_departures do
@@ -40,14 +40,11 @@ defmodule Screens.DupScreenData do
         by_screen_id(screen_id, "0")
 
       _ ->
-        current_time = DateTime.utc_now()
-        fetch_departures_response(secondary_departures, %{}, current_time)
+        fetch_departures_response(secondary_departures, %{}, now)
     end
   end
 
-  defp disabled_response do
-    current_time = DateTime.utc_now()
-
+  defp disabled_response(current_time) do
     %{
       force_reload: false,
       success: true,
@@ -56,23 +53,21 @@ defmodule Screens.DupScreenData do
     }
   end
 
-  defp primary_screen_response(primary_departures, rotation_index) do
-    case SpecialCases.handle_special_cases(primary_departures, rotation_index) do
+  defp primary_screen_response(primary_departures, rotation_index, current_time) do
+    case SpecialCases.handle_special_cases(primary_departures, rotation_index, current_time) do
       {:ok, response} ->
         response
 
       nil ->
-        default_primary_screen_response(primary_departures, rotation_index)
+        default_primary_screen_response(primary_departures, rotation_index, current_time)
     end
   end
 
-  defp default_primary_screen_response(primary_departures, rotation_index) do
+  defp default_primary_screen_response(primary_departures, rotation_index, current_time) do
     alerts_by_section = fetch_and_interpret_alerts(primary_departures)
     alerts = flatten_alerts(alerts_by_section)
 
     line_count = Data.station_line_count(primary_departures)
-
-    current_time = DateTime.utc_now()
 
     case Data.response_type(alerts, line_count, rotation_index) do
       :departures ->
@@ -89,14 +84,13 @@ defmodule Screens.DupScreenData do
   defp primary_screen_response_with_override(
          primary_departures,
          rotation_index,
-         %PartialAlertList{} = override
+         %PartialAlertList{} = override,
+         current_time
        ) do
     alerts_by_section = fetch_and_interpret_alerts(primary_departures)
     alerts = flatten_alerts(alerts_by_section)
 
     line_count = Data.station_line_count(primary_departures)
-
-    current_time = DateTime.utc_now()
 
     case Data.response_type(alerts, line_count, rotation_index) do
       :fullscreen_alert ->
@@ -107,7 +101,12 @@ defmodule Screens.DupScreenData do
     end
   end
 
-  defp primary_screen_response_with_override(primary_departures, _, %FullscreenAlert{} = override) do
+  defp primary_screen_response_with_override(
+         primary_departures,
+         _,
+         %FullscreenAlert{} = override,
+         _current_time
+       ) do
     alert_response = FullscreenAlert.to_json(override)
 
     Map.merge(
@@ -124,10 +123,9 @@ defmodule Screens.DupScreenData do
   defp primary_screen_response_with_override(
          _primary_departures,
          _,
-         %FullscreenImage{image_url: image_url}
+         %FullscreenImage{image_url: image_url},
+         current_time
        ) do
-    current_time = DateTime.utc_now()
-
     %{
       force_reload: false,
       success: true,

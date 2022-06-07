@@ -11,6 +11,8 @@ defmodule Screens.DupScreenData.SpecialCases do
 
   alias Screens.DupScreenData.{Data, Request}
 
+  def handle_special_cases(primary_departures, rotation_index, current_time \\ DateTime.utc_now())
+
   def handle_special_cases(
         %Dup.Departures{
           sections: [
@@ -21,7 +23,8 @@ defmodule Screens.DupScreenData.SpecialCases do
             }
           ]
         } = primary_departures,
-        rotation_index
+        rotation_index,
+        current_time
       ) do
     alerts = Request.fetch_alerts(stop_ids, route_ids)
 
@@ -34,15 +37,13 @@ defmodule Screens.DupScreenData.SpecialCases do
       end)
       |> Enum.sort_by(& &1.routes)
 
-    render_kenmore_alerts(interpreted_alerts, primary_departures, rotation_index)
+    render_kenmore_alerts(interpreted_alerts, primary_departures, rotation_index, current_time)
   end
 
-  def handle_special_cases(_, _), do: nil
+  def handle_special_cases(_, _, _), do: nil
 
-  defp render_kenmore_alerts(interpreted_alerts, primary_departures, "0") do
-    current_time = DateTime.utc_now()
-
-    case kenmore_partial_alert_text(interpreted_alerts) do
+  defp render_kenmore_alerts(interpreted_alerts, primary_departures, "0", current_time) do
+    case kenmore_partial_alert_text(interpreted_alerts, current_time) do
       {:ok, text} ->
         line = %FreeTextLine{icon: :warning, text: text}
         override = %PartialAlertList{alerts: [%PartialAlert{color: :green, content: line}]}
@@ -56,14 +57,14 @@ defmodule Screens.DupScreenData.SpecialCases do
          )}
 
       {:ok, text, headway_message} ->
-        render_kenmore_headway_alert(text, headway_message)
+        render_kenmore_headway_alert(text, headway_message, current_time)
 
       _ ->
         nil
     end
   end
 
-  defp render_kenmore_alerts(interpreted_alerts, _primary_departures, "1") do
+  defp render_kenmore_alerts(interpreted_alerts, _primary_departures, "1", _current_time) do
     case kenmore_fullscreen_alert_text(interpreted_alerts) do
       nil ->
         nil
@@ -94,8 +95,7 @@ defmodule Screens.DupScreenData.SpecialCases do
     end
   end
 
-  defp render_kenmore_headway_alert(text, headway_message) do
-    current_time = DateTime.utc_now()
+  defp render_kenmore_headway_alert(text, headway_message, current_time) do
     line = %FreeTextLine{icon: :warning, text: text}
     override = %PartialAlertList{alerts: [%PartialAlert{color: :green, content: line}]}
 
@@ -112,75 +112,119 @@ defmodule Screens.DupScreenData.SpecialCases do
     {:ok, response}
   end
 
-  defp kenmore_partial_alert_text([
-         %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
-         %{effect: :shuttle, region: :boundary, routes: ["Green-C"], headsign: "Cleveland Circle"}
-       ]) do
+  defp kenmore_partial_alert_text(
+         [
+           %{
+             effect: :shuttle,
+             region: :boundary,
+             routes: ["Green-B"],
+             headsign: "Boston College"
+           },
+           %{
+             effect: :shuttle,
+             region: :boundary,
+             routes: ["Green-C"],
+             headsign: "Cleveland Circle"
+           }
+         ],
+         _current_time
+       ) do
     kenmore_bc_partial_alert_text()
   end
 
-  defp kenmore_partial_alert_text([
-         %{effect: :shuttle, region: :boundary, headsign: "BC/Clev. Circ."}
-       ]) do
+  defp kenmore_partial_alert_text(
+         [
+           %{effect: :shuttle, region: :boundary, headsign: "BC/Clev. Circ."}
+         ],
+         _current_time
+       ) do
     kenmore_bc_partial_alert_text()
   end
 
-  defp kenmore_partial_alert_text([
-         %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
-         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
-       ]) do
+  defp kenmore_partial_alert_text(
+         [
+           %{
+             effect: :shuttle,
+             region: :boundary,
+             routes: ["Green-B"],
+             headsign: "Boston College"
+           },
+           %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
+         ],
+         _current_time
+       ) do
     kenmore_bd_partial_alert_text()
   end
 
-  defp kenmore_partial_alert_text([
-         %{effect: :shuttle, region: :boundary, headsign: "BC/Riverside"}
-       ]) do
+  defp kenmore_partial_alert_text(
+         [
+           %{effect: :shuttle, region: :boundary, headsign: "BC/Riverside"}
+         ],
+         _current_time
+       ) do
     kenmore_bd_partial_alert_text()
   end
 
-  defp kenmore_partial_alert_text([
-         %{
-           effect: :shuttle,
-           region: :boundary,
-           routes: ["Green-C"],
-           headsign: "Cleveland Circle"
-         },
-         %{
-           effect: :shuttle,
-           region: :boundary,
-           routes: ["Green-D"],
-           headsign: "Riverside"
-         }
-       ]) do
+  defp kenmore_partial_alert_text(
+         [
+           %{
+             effect: :shuttle,
+             region: :boundary,
+             routes: ["Green-C"],
+             headsign: "Cleveland Circle"
+           },
+           %{
+             effect: :shuttle,
+             region: :boundary,
+             routes: ["Green-D"],
+             headsign: "Riverside"
+           }
+         ],
+         _current_time
+       ) do
     kenmore_cd_partial_alert_text()
   end
 
-  defp kenmore_partial_alert_text([
-         %{effect: :shuttle, region: :boundary, headsign: "Clev. Circ./Riverside"}
-       ]) do
+  defp kenmore_partial_alert_text(
+         [
+           %{effect: :shuttle, region: :boundary, headsign: "Clev. Circ./Riverside"}
+         ],
+         _current_time
+       ) do
     kenmore_cd_partial_alert_text()
   end
 
-  defp kenmore_partial_alert_text([
-         %{effect: :shuttle, region: :boundary, routes: ["Green-B"], headsign: "Boston College"},
-         %{
-           effect: :shuttle,
-           region: :boundary,
-           routes: ["Green-C"],
-           headsign: "Cleveland Circle"
-         },
-         %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
-       ]) do
-    kenmore_bcd_partial_alert_text()
+  defp kenmore_partial_alert_text(
+         [
+           %{
+             effect: :shuttle,
+             region: :boundary,
+             routes: ["Green-B"],
+             headsign: "Boston College"
+           },
+           %{
+             effect: :shuttle,
+             region: :boundary,
+             routes: ["Green-C"],
+             headsign: "Cleveland Circle"
+           },
+           %{effect: :shuttle, region: :boundary, routes: ["Green-D"], headsign: "Riverside"}
+         ],
+         current_time
+       ) do
+    kenmore_bcd_partial_alert_text(current_time)
   end
 
-  defp kenmore_partial_alert_text([
-         %{effect: :shuttle, region: :boundary, headsign: {:adj, "westbound"}}
-       ]) do
-    kenmore_bcd_partial_alert_text()
+  defp kenmore_partial_alert_text(
+         [
+           %{effect: :shuttle, region: :boundary, headsign: {:adj, "westbound"}}
+         ],
+         current_time
+       ) do
+    kenmore_bcd_partial_alert_text(current_time)
   end
 
-  defp kenmore_partial_alert_text(_), do: nil
+  defp kenmore_partial_alert_text(_, _current_time), do: nil
 
   defp kenmore_bc_partial_alert_text do
     {:ok, ["No", %{format: :bold, text: "Bost Coll/Clvlnd Cir"}]}
@@ -194,12 +238,12 @@ defmodule Screens.DupScreenData.SpecialCases do
     {:ok, ["No", %{format: :bold, text: "Clvlnd Cir/Riverside"}]}
   end
 
-  defp kenmore_bcd_partial_alert_text do
+  defp kenmore_bcd_partial_alert_text(current_time) do
     partial_alert_text = ["No", %{format: :bold, text: "Westbound"}, "trains"]
 
     kenmore_headway_id = "green_trunk"
     time_ranges = Screens.SignsUiConfig.State.time_ranges(kenmore_headway_id)
-    current_time_period = DateTime.utc_now() |> Screens.Util.time_period()
+    current_time_period = Screens.Util.time_period(current_time)
 
     case time_ranges do
       %{^current_time_period => {lo, hi}} ->

@@ -73,7 +73,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
       end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
-      fn -> line_map_instances(config) end,
+      fn -> line_map_instances(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end,
       fn -> bottom_screen_filler_instances(config) end
     ]
@@ -94,6 +94,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
              }
            }
          } = config,
+         now,
          stops_by_route_and_direction_fn \\ &RoutePattern.stops_by_route_and_direction/2,
          fetch_departures_fn \\ &Screens.V2.Departure.fetch/2
        ) do
@@ -103,7 +104,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
     {:ok, departures} =
       fetch_departures_fn.(%{stop_ids: [station_id]},
         include_schedules: true,
-        now: DateTime.add(DateTime.utc_now(), -@scheduled_terminal_departure_lookback_seconds)
+        now: DateTime.add(now, -@scheduled_terminal_departure_lookback_seconds)
       )
 
     [%LineMap{screen: config, stops: stops, reverse_stops: reverse_stops, departures: departures}]

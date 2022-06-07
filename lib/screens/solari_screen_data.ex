@@ -27,6 +27,7 @@ defmodule Screens.SolariScreenData do
 
     current_time =
       case at_historical_datetime do
+        # credo:disable-for-next-line Screens.Checks.UntestableDateTime
         nil -> DateTime.utc_now()
         dt -> dt
       end
@@ -229,6 +230,7 @@ defmodule Screens.SolariScreenData do
   defp filter_by_minutes(query_data, %{max_minutes: :infinity}), do: query_data
 
   defp filter_by_minutes(query_data, %{max_minutes: max_minutes}) do
+    # credo:disable-for-next-line Screens.Checks.UntestableDateTime
     max_departure_time = DateTime.add(DateTime.utc_now(), 60 * max_minutes)
 
     Enum.reject(query_data, fn %{time: time_str} ->
