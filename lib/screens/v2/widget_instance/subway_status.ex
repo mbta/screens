@@ -263,8 +263,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
     duration_text =
       case delay_description do
-        :up_to -> "up to #{delay_minutes} minutes"
-        :more_than -> "over #{delay_minutes} minutes"
+        :up_to -> "up to #{delay_minutes}m"
+        :more_than -> "over #{delay_minutes}m"
       end
 
     %{status: "Delays #{duration_text}", location: get_location(informed_entities, route_id)}

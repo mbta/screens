@@ -110,7 +110,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       grouped_alerts = %{"Blue" => blue_line_alerts}
 
-      assert %{status: "Delays up to 10 minutes", location: nil} =
+      assert %{status: "Delays up to 10m", location: nil} =
                SubwayStatus.serialize_route(grouped_alerts, "Blue")
     end
 
@@ -126,7 +126,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       grouped_alerts = %{"Blue" => blue_line_alerts}
 
       assert %{
-               status: "Delays over 60 minutes",
+               status: "Delays over 60m",
                location: %{full: "Eastbound", abbrev: "Eastbound"}
              } = SubwayStatus.serialize_route(grouped_alerts, "Blue")
     end
@@ -342,7 +342,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       assert %{
                location: nil,
-               status: "Delays up to 10 minutes",
+               status: "Delays up to 10m",
                type: :single
              } = SubwayStatus.serialize_green_line(grouped_alerts)
     end
@@ -369,7 +369,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       assert %{
-               status: "Delays over 60 minutes",
+               status: "Delays over 60m",
                location: %{full: "Eastbound", abbrev: "Eastbound"}
              } = SubwayStatus.serialize_green_line(grouped_alerts)
     end
