@@ -11,15 +11,6 @@ defmodule ScreensWeb.UserAgentTest do
       assert ScreensWeb.UserAgent.is_screen_conn?(conn)
     end
 
-    test "returns true if user_agent matches DUPs" do
-      conn =
-        :get
-        |> build_conn("/api/screen/405")
-        |> put_req_header("user-agent", "okhttp/3.8.0")
-
-      assert ScreensWeb.UserAgent.is_screen_conn?(conn)
-    end
-
     test "returns false if is_real_screen query param is set to false" do
       conn =
         :get
