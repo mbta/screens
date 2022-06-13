@@ -8,7 +8,16 @@ defmodule ScreensWeb.UserAgentTest do
         |> build_conn("/v2/api/screen/1", %{"is_real_screen" => "true"})
         |> put_req_header("user-agent", "fake")
 
-      assert ScreensWeb.UserAgent.is_screen_conn?(conn, "1")
+      assert ScreensWeb.UserAgent.is_screen_conn?(conn)
+    end
+
+    test "returns true if user_agent matches DUPs" do
+      conn =
+        :get
+        |> build_conn("/api/screen/405")
+        |> put_req_header("user-agent", "okhttp/3.8.0")
+
+      assert ScreensWeb.UserAgent.is_screen_conn?(conn)
     end
 
     test "returns false if is_real_screen query param is set to false" do
@@ -17,7 +26,7 @@ defmodule ScreensWeb.UserAgentTest do
         |> build_conn("/v2/api/screen/1", %{"is_real_screen" => "false"})
         |> put_req_header("user-agent", "fake")
 
-      refute ScreensWeb.UserAgent.is_screen_conn?(conn, "1")
+      refute ScreensWeb.UserAgent.is_screen_conn?(conn)
     end
 
     test "returns false if is_real_screen query param is not set to true and user-agent unrecognized" do
@@ -26,7 +35,7 @@ defmodule ScreensWeb.UserAgentTest do
         |> build_conn("/v2/api/screen/1")
         |> put_req_header("user-agent", "fake")
 
-      refute ScreensWeb.UserAgent.is_screen_conn?(conn, "1")
+      refute ScreensWeb.UserAgent.is_screen_conn?(conn)
     end
   end
 end
