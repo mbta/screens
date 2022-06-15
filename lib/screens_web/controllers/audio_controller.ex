@@ -28,7 +28,7 @@ defmodule ScreensWeb.AudioController do
       |> Map.get("disposition")
       |> disposition_atom()
 
-    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn)
+    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
     _ = Screens.LogScreenData.log_audio_request(screen_id, is_screen)
 
