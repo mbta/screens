@@ -137,10 +137,6 @@ const SubwayStatusNormalRow: ComponentType<SubwayStatusNormalRowProps> = ({
     }
   });
 
-  if (abbreviate) {
-    status = status.replace(" minutes", "m");
-  }
-
   if (dropTimes && status.startsWith("Delays")) {
     status = "Delays";
   }
@@ -178,74 +174,75 @@ interface GlMultipleProps {
   statuses: [IconRouteId[] | null, string][];
 }
 
-const SubwayStatusGreenLineMultipleAlertsRow: ComponentType<GlMultipleProps> =
-  ({ statuses }) => {
-    const [dropTimes, setDropTimes] = useState(false);
-    const [doneSizing, setDoneSizing] = useState(false);
-    const ref = useRef<HTMLElement>(null);
+const SubwayStatusGreenLineMultipleAlertsRow: ComponentType<
+  GlMultipleProps
+> = ({ statuses }) => {
+  const [dropTimes, setDropTimes] = useState(false);
+  const [doneSizing, setDoneSizing] = useState(false);
+  const ref = useRef<HTMLElement>(null);
 
-    const includesStopClosure = statuses.some(([_, status]) =>
-      status.toLowerCase().startsWith("bypassing")
-    );
-    const modifier = includesStopClosure ? "small" : "normal";
+  const includesStopClosure = statuses.some(([_, status]) =>
+    status.toLowerCase().startsWith("bypassing")
+  );
+  const modifier = includesStopClosure ? "small" : "normal";
 
-    useLayoutEffect(() => {
-      if (ref.current) {
-        if (ref.current.clientHeight > 122) {
-          if (!dropTimes) {
-            setDropTimes(true);
-            setDoneSizing(true);
-          }
-        } else {
+  useLayoutEffect(() => {
+    if (ref.current) {
+      if (ref.current.clientHeight > 122) {
+        if (!dropTimes) {
+          setDropTimes(true);
           setDoneSizing(true);
         }
+      } else {
+        setDoneSizing(true);
       }
-    });
-
-    if (dropTimes) {
-      statuses = statuses.map(([routes, status]) => [
-        routes,
-        status.startsWith("Delays") ? "Delays" : status,
-      ]);
     }
+  });
 
-    const rowClassName = doneSizing
-      ? classWithModifier("subway-status-row", "done")
-      : "subway-status-row";
+  if (dropTimes) {
+    statuses = statuses.map(([routes, status]) => [
+      routes,
+      status.startsWith("Delays") ? "Delays" : status,
+    ]);
+  }
 
-    return (
-      <div className={rowClassName} ref={ref}>
-        <div className="subway-status-branch-row__route">
-          <RoutePill type="text" color="green" text="GL" />
-        </div>
-        <div className="subway-status-branch-row__groups">
-          {statuses.map(([routes, status]) => (
-            <div className="subway-status-branch-row__group" key={status}>
-              {routes && (
-                <div className="subway-status-branch-row__group-routes">
-                  {routes.map((route) => (
-                    <IconForRoute
-                      className="subway-status-branch-row__route-icon"
-                      routeId={route}
-                      key={route}
-                    />
-                  ))}
-                </div>
-              )}
-              <div
-                className={classWithModifier(
-                  "subway-status-branch-row__group-status",
-                  modifier
-                )}
-              >
-                {status}
-              </div>
-            </div>
-          ))}
-        </div>
+  const rowClassName = doneSizing
+    ? classWithModifier("subway-status-row", "done")
+    : "subway-status-row";
+
+  return (
+    <div className={rowClassName} ref={ref}>
+      <div className="subway-status-branch-row__route">
+        <RoutePill type="text" color="green" text="GL" />
       </div>
-    );
-  };
+      <div className="subway-status-branch-row__groups">
+        {statuses.map(([routes, status]) => (
+          <div className="subway-status-branch-row__group" key={status}>
+            {routes && (
+              <div className="subway-status-branch-row__group-routes">
+                {routes.map((route) => (
+                  <IconForRoute
+                    className="subway-status-branch-row__route-icon"
+                    routeId={route}
+                    key={route}
+                  />
+                ))}
+              </div>
+            )}
+            <div
+              className={classWithModifier(
+                "subway-status-branch-row__group-status",
+                modifier
+              )}
+            >
+              {status}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 type GlRowProps =
   | (SubwayStatusNormalRowProps & { type: "single" })
