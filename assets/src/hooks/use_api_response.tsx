@@ -31,7 +31,7 @@ const useIsRealScreenParam = () => {
   const query = useQuery();
   const isRealScreen = query.get("is_real_screen");
 
-  return isRealScreen === "true" ? "&is_real_screen=true" : "";
+  return isRealScreen === "true" || isDup() ? "&is_real_screen=true" : "";
 };
 
 interface UseApiResponseArgs {
