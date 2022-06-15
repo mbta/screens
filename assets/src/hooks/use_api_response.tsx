@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { isDup } from "Util/util";
 import useInterval from "Hooks/use_interval";
-import { useLocation } from "react-router-dom";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -21,17 +20,6 @@ const doFailureBuffer = (
   if (elapsedMs >= failureModeElapsedMs) {
     setApiResponse(apiResponse);
   }
-};
-
-const useQuery = () => {
-  return new URLSearchParams(useLocation().search);
-};
-
-const useIsRealScreenParam = () => {
-  const query = useQuery();
-  const isRealScreen = query.get("is_real_screen");
-
-  return isRealScreen === "true" ? "&is_real_screen=true" : "";
 };
 
 interface UseApiResponseArgs {
@@ -54,15 +42,8 @@ const useApiResponse = ({
   const [apiResponse, setApiResponse] = useState<object | null>(null);
   const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
   const lastRefresh = document.getElementById("app").dataset.lastRefresh;
-  const isRealScreenParam = useIsRealScreenParam();
 
-  const apiPath = buildApiPath({
-    id,
-    datetime,
-    rotationIndex,
-    lastRefresh,
-    isRealScreenParam,
-  });
+  const apiPath = buildApiPath({ id, datetime, rotationIndex, lastRefresh });
 
   const fetchData = async () => {
     try {
@@ -111,7 +92,6 @@ interface BuildApiPathArgs {
   datetime?: string;
   rotationIndex?: number;
   lastRefresh?: string;
-  isRealScreenParam: string;
 }
 
 const buildApiPath = ({
@@ -119,7 +99,6 @@ const buildApiPath = ({
   datetime,
   rotationIndex,
   lastRefresh,
-  isRealScreenParam,
 }: BuildApiPathArgs) => {
   let apiPath = `/api/screen/${id}`;
 
@@ -127,7 +106,7 @@ const buildApiPath = ({
     apiPath += `/${rotationIndex}`;
   }
 
-  apiPath += `?last_refresh=${lastRefresh}${isRealScreenParam}`;
+  apiPath += `?last_refresh=${lastRefresh}`;
 
   if (datetime != null) {
     apiPath += `&datetime=${datetime}`;
