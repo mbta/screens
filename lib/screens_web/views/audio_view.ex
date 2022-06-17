@@ -5,8 +5,7 @@ defmodule ScreensWeb.AudioView do
 
   @spec render_pill_header(atom(), String.t() | nil) :: Phoenix.HTML.safe()
   defp render_pill_header(pill, wayfinding) do
-    ~E|<s><%= render_pill(pill) %> trips<%= render_wayfinding(wayfinding) %></s>
-|
+    ~E|<s><%= render_pill(pill) %> trips<%= render_wayfinding(wayfinding) %></s>|
   end
 
   @spec render_pill(atom()) :: Phoenix.HTML.safe()
@@ -17,17 +16,19 @@ defmodule ScreensWeb.AudioView do
   defp render_pill(:orange), do: ~E"Orange Line"
   defp render_pill(:red), do: ~E"Red Line"
   defp render_pill(:silver), do: ~E"Silver Line"
+  defp render_pill(:green), do: ~E"Green Line"
 
   @spec render_pill_mode(atom(), non_neg_integer()) :: Phoenix.HTML.safe()
-  defp render_pill_mode(pill, 1) when pill in ~w[blue orange red cr]a, do: ~E"train"
-  defp render_pill_mode(pill, _) when pill in ~w[blue orange red cr]a, do: ~E"trains"
+  defp render_pill_mode(pill, 1) when pill in ~w[blue orange red green cr]a, do: ~E"train"
+  defp render_pill_mode(pill, _) when pill in ~w[blue orange red green cr]a, do: ~E"trains"
   defp render_pill_mode(pill, 1) when pill in ~w[bus silver]a, do: ~E"bus"
   defp render_pill_mode(pill, _) when pill in ~w[bus silver]a, do: ~E"buses"
   defp render_pill_mode(:mattapan, 1), do: ~E"trolley"
   defp render_pill_mode(:mattapan, _), do: ~E"trolleys"
 
   defp render_route_descriptor({route, route_id, destination}) do
-    if route_id in ~w[Blue Red Mattapan Orange] or String.starts_with?(route_id, "CR") do
+    if route_id in ~w[Blue Red Mattapan Orange Green-B Green-C Green-D Green-E] or
+         String.starts_with?(route_id, "CR") do
       ~E|<%= render_route_id(route_id) %> to <%= destination %>|
     else
       ~E|<%= render_route(route) %> to <%= destination %>|
@@ -44,6 +45,10 @@ defmodule ScreensWeb.AudioView do
   end
 
   defp render_route_id("Mattapan"), do: ~E"Mattapan Trolley"
+
+  defp render_route_id("Green-" <> branch) do
+    ~E|Green Line <%= branch %> branch|
+  end
 
   @spec render_route(String.t()) :: Phoenix.HTML.safe()
   defp render_route("SL" <> route_number) do
@@ -64,15 +69,13 @@ defmodule ScreensWeb.AudioView do
   end
 
   defp render_departure_groups([]) do
-    ~E|<s>No departures currently available</s>
-|
+    ~E|<s>No departures currently available</s>|
   end
 
   defp render_departure_groups(departure_groups) do
     departure_groups
     |> Enum.map(&render_departure_group/1)
-    |> Enum.intersperse(~E|<break strength="x-strong"/>
-|)
+    |> Enum.intersperse(~E|<break strength="x-strong"/>|)
   end
 
   defp render_departure_group(
@@ -105,8 +108,7 @@ defmodule ScreensWeb.AudioView do
 
     times = render_departure_time_group(time_group)
 
-    ~E|<s><%= route_destination %><%= track_number_rendered %><%= wayfinding_rendered %><%= times %></s>
-|
+    ~E|<s><%= route_destination %><%= track_number_rendered %><%= wayfinding_rendered %><%= times %></s>|
   end
 
   defp render_departure_time_group_with_prefix(%{pill: pill, type: type, values: values}) do
@@ -120,8 +122,7 @@ defmodule ScreensWeb.AudioView do
 
     time_group_rendered = render_departure_time_group(%{type: type, values: values})
 
-    ~E|<s><%= prefix %> <%= time_group_rendered %></s>
-|
+    ~E|<s><%= prefix %> <%= time_group_rendered %></s>|
   end
 
   defp render_departure_time_group(%{type: type, values: values}) do
@@ -177,8 +178,7 @@ defmodule ScreensWeb.AudioView do
   end
 
   defp render_alert(:delay, route_descriptor) do
-    ~E|<s>There are delays on <%= render_route_descriptor(route_descriptor) %></s>
-|
+    ~E|<s>There are delays on <%= render_route_descriptor(route_descriptor) %></s>|
   end
 
   defp render_alert(_, _), do: ~E""
