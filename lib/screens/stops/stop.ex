@@ -66,7 +66,7 @@ defmodule Screens.Stops.Stop do
     {"place-sstat", {"South Station", "South Sta"}},
     {"place-brdwy", {"Broadway", "Broadway"}},
     {"place-andrw", {"Andrew", "Andrew"}},
-    {"place-jfk", {"JFK/Umass", "JFK/Umass"}}
+    {"place-jfk", {"JFK/UMass", "JFK/UMass"}}
   ]
 
   @red_line_ashmont_branch_stops [
