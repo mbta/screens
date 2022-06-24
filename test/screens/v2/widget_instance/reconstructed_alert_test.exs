@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.Config.Screen
   alias Screens.Config.V2.{PreFare}
   alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
 
@@ -791,7 +792,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   describe "serialize_outside_alert/1" do
     setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
-    test "handles suspension at one stop", %{widget: widget} do
+    test "handles downstream suspension at one stop", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
@@ -801,6 +802,54 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "No Alewife trains",
         location: "at Alewife",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :suspension,
+        urgent: false,
+        region: :outside,
+        remedy: "Seek alternate route"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles downstream suspension range", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-alfcl", route: "Red"),
+          ie(stop: "place-davis", route: "Red")
+        ])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "No trains",
+        location: "between Alewife and Davis",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :suspension,
+        urgent: false,
+        region: :outside,
+        remedy: "Seek alternate route"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles downstream suspension range, one direction only", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-alfcl", direction_id: 1, route: "Red"),
+          ie(stop: "place-davis", direction_id: 1, route: "Red")
+        ])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "No Alewife trains",
+        location: "between Alewife and Davis",
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
@@ -1081,6 +1130,260 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     test "returns ReconstructedAlertView" do
       instance = %ReconstructedAlert{}
       assert ScreensWeb.V2.Audio.ReconstructedAlertView == WidgetInstance.audio_view(instance)
+    end
+  end
+
+  describe "Real-world alerts:" do
+    setup do
+      %{
+        station_sequences: %{
+          orange: [
+            [
+              "place-forhl",
+              "place-grnst",
+              "place-sbmnl",
+              "place-jaksn",
+              "place-rcmnl",
+              "place-rugg",
+              "place-masta",
+              "place-bbsta",
+              "place-tumnl",
+              "place-chncl",
+              "place-dwnxg",
+              "place-state",
+              "place-haecl",
+              "place-north",
+              "place-ccmnl",
+              "place-sull",
+              "place-astao",
+              "place-welln",
+              "place-mlmnl",
+              "placeo-ogmnl"
+            ]
+          ]
+        }
+      }
+    end
+
+    test "handles OL downstream suspension", context do
+      config =
+        struct(Screen, %{
+          app_id: :pre_fare_v2,
+          app_params:
+            struct(PreFare, %{reconstructed_alert_widget: %CurrentStopId{stop_id: "place-welln"}})
+        })
+
+      routes_at_stop = [
+        %{
+          route_id: "Orange",
+          active?: true,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :subway
+        }
+      ]
+
+      alerts = [
+        %Alert{
+          active_period: [{~U[2022-06-24 09:13:15Z], nil}],
+          cause: :unknown,
+          created_at: ~U[2022-06-24 09:13:17Z],
+          description:
+            "Orange Line Service is running between Oak Grove and North Station and between Forest Hills and Back Bay. \r\nCustomers can use Green Line service through Downtown. \r\n\r\nAffected stops:\r\nHaymarket\r\nState\r\nDowntown Crossing\r\nChinatown\r\nTufts Medical Center",
+          effect: :suspension,
+          header:
+            "Orange Line is suspended between North Station and Back Bay due to a structural issue with the Government Center garage. ",
+          id: "450523",
+          informed_entities: [
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70014"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70015"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70016"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70017"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70018"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70019"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70020"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70021"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70022"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70023"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70024"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70025"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70026"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "70027"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "place-bbsta"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "place-chncl"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "place-dwnxg"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "place-haecl"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "place-north"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "place-state"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Orange",
+              route_type: 1,
+              stop: "place-tumnl"
+            }
+          ],
+          lifecycle: "NEW",
+          severity: 7,
+          timeframe: nil,
+          updated_at: ~U[2022-06-24 09:14:52Z],
+          url: nil
+        }
+      ]
+
+      now = ~U[2022-06-24 12:00:00Z]
+
+      fetch_parent_station_sequences_through_stop_fn = fn _, _ ->
+        {:ok, context.station_sequences[:orange]}
+      end
+
+      fetch_routes_by_stop_fn = fn _, _, _ -> {:ok, routes_at_stop} end
+      fetch_alerts_fn = fn _ -> {:ok, alerts} end
+      fetch_stop_name_fn = fn _ -> "Wellington" end
+
+      alert_widgets =
+        CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
+          config,
+          now,
+          fetch_routes_by_stop_fn,
+          fetch_parent_station_sequences_through_stop_fn,
+          fetch_alerts_fn,
+          fetch_stop_name_fn
+        )
+
+      expected = %{
+        issue: "No trains",
+        location: "between North Station and Back Bay",
+        cause: "",
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        effect: :suspension,
+        urgent: false,
+        region: :outside,
+        remedy: "Seek alternate route"
+      }
+
+      assert expected == ReconstructedAlert.serialize(List.first(alert_widgets))
     end
   end
 end
