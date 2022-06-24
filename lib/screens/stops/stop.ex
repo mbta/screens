@@ -310,12 +310,18 @@ defmodule Screens.Stops.Stop do
   end
 
   defp sequence_match?(stop_sequence, informed_entities) do
-    stations =
+    ie_stops =
       informed_entities
       |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-      |> Enum.filter(&String.starts_with?(&1, "place-"))
+      |> Enum.reject(&is_nil/1)
 
-    Enum.all?(stations, &stop_on_route?(&1, stop_sequence))
+    if Enum.empty?(ie_stops) do
+      nil
+    else
+      ie_stops
+      |> Enum.filter(&String.starts_with?(&1, "place-"))
+      |> Enum.all?(&stop_on_route?(&1, stop_sequence))
+    end
   end
 
   def gl_trunk_stops do
