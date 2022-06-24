@@ -532,6 +532,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :delay}}), do: nil
 
+  # The suspension is downstream of the current station
   defp serialize_outside_alert(
          %__MODULE__{alert: %Alert{effect: :suspension, cause: cause, header: header}} = t
        ) do
@@ -550,16 +551,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         urgent: false
       }
     else
-      destination = get_destination(t)
       cause_text = get_cause_text(cause)
       location_text = get_endpoints(informed_entities, hd(affected_routes))
-
-      issue =
-        if is_nil(destination) do
-          "No trains"
-        else
-          "No #{destination} trains"
-        end
+      issue = "No trains"
 
       %{
         issue: issue,
