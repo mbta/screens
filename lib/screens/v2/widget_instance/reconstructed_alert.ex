@@ -107,11 +107,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         :screens
         |> Application.get_env(:prefare_alert_headsign_matchers)
         |> Map.get(stop_id)
-        |> Enum.find_value(nil, fn {informed, not_informed, headsign} ->
-          if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
-            do: headsign,
-            else: false
-        end)
+        |> Enum.find_value(nil, &do_get_boundary_headsign/1)
 
       # When the alert is non-directional and the station is outside the alert range
       is_nil(direction_id) ->
@@ -123,6 +119,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         |> Map.get(route_id)
         |> Enum.at(direction_id)
     end
+  end
+
+  defp do_get_boundary_headsign({informed, not_informed, headsign}) do
+    if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
+      do: headsign,
+      else: false
   end
 
   defp to_set(nil), do: MapSet.new([])
