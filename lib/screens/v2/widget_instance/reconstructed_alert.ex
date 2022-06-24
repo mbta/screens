@@ -87,7 +87,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp get_destination(
          %__MODULE__{
            screen: %Screen{app_params: %{reconstructed_alert_widget: %{stop_id: stop_id}}}
-         } = t
+         } = t,
+         location
        ) do
     informed_entities = BaseAlert.informed_entities(t)
 
@@ -97,25 +98,27 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       |> Enum.uniq()
       |> hd()
 
-    # When the alert is non-directional but the station is at the boundary:
-    # direction_id will be nil, but we still want to show the alert impacts one direction only
-    if is_nil(direction_id) do
-      informed_stop_ids = Enum.into(informed_entities, MapSet.new(), & &1.stop)
+    cond do
+      # When the alert is non-directional but the station is at the boundary:
+      # direction_id will be nil, but we still want to show the alert impacts one direction only
+      is_nil(direction_id) and location == :boundary ->
+        informed_stop_ids = Enum.into(informed_entities, MapSet.new(), & &1.stop)
 
-      :screens
-      |> Application.get_env(:prefare_alert_headsign_matchers)
-      |> Map.get(stop_id)
-      |> Enum.find_value(nil, fn {informed, not_informed, headsign} ->
-        if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
-          do: headsign,
-          else: false
-      end)
-
+        :screens
+        |> Application.get_env(:prefare_alert_headsign_matchers)
+        |> Map.get(stop_id)
+        |> Enum.find_value(nil, fn {informed, not_informed, headsign} ->
+          if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
+            do: headsign,
+            else: false
+        end)
+      # When the alert is non-directional and the station is outside the alert range
+      is_nil(direction_id) -> nil
       # Otherwise, direction is provided, and we can find the destination tag from @route_directions
-    else
-      @route_directions
-      |> Map.get(route_id)
-      |> Enum.at(direction_id)
+      true ->
+        @route_directions
+        |> Map.get(route_id)
+        |> Enum.at(direction_id)
     end
   end
 
@@ -337,7 +340,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     affected_routes = get_affected_routes(informed_entities)
     cause_text = get_cause_text(cause)
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
-    destination = get_destination(t)
+    destination = get_destination(t, :inside)
 
     duration_text =
       case delay_description do
@@ -393,7 +396,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         urgent: true
       }
     else
-      destination = get_destination(t)
+      destination = get_destination(t, :boundary)
       cause_text = get_cause_text(cause)
 
       issue =
@@ -435,7 +438,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         urgent: true
       }
     else
-      destination = get_destination(t)
+      destination = get_destination(t, :boundary)
       cause_text = get_cause_text(cause)
 
       issue =
@@ -503,7 +506,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     else
       cause_text = get_cause_text(cause)
       {delay_description, delay_minutes} = Alert.interpret_severity(severity)
-      destination = get_destination(t)
+      destination = get_destination(t, :boundary)
 
       duration_text =
         case delay_description do
@@ -532,7 +535,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :delay}}), do: nil
 
-  # The suspension is downstream of the current station
   defp serialize_outside_alert(
          %__MODULE__{alert: %Alert{effect: :suspension, cause: cause, header: header}} = t
        ) do
@@ -551,9 +553,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         urgent: false
       }
     else
+      destination = get_destination(t, :outside)
       cause_text = get_cause_text(cause)
       location_text = get_endpoints(informed_entities, hd(affected_routes))
-      issue = "No trains"
+
+      issue =
+        if is_nil(destination) do
+          "No trains"
+        else
+          "No #{destination} trains"
+        end
 
       %{
         issue: issue,
@@ -585,7 +594,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         urgent: false
       }
     else
-      destination = get_destination(t)
+      destination = get_destination(t, :outside)
       cause_text = get_cause_text(cause)
       location_text = get_endpoints(informed_entities, List.first(affected_routes))
 
