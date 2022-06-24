@@ -301,6 +301,14 @@ defmodule Screens.Stops.Stop do
     Enum.find(stop_sequences, &sequence_match?(&1, informed_entities))
   end
 
+  def get_route_stop_sequence(route_id) do
+    @route_stop_sequences
+    |> Map.get(route_id)
+    |> Enum.flat_map(fn x -> x end)
+    |> Enum.map(fn {k, _v} -> k end)
+    |> Enum.uniq()
+  end
+
   defp sequence_match?(stop_sequence, informed_entities) do
     stations =
       informed_entities
