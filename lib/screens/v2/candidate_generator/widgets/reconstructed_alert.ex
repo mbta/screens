@@ -197,7 +197,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   end
 
   defp is_terminal?(stop_id, stop_sequences) do
-    Enum.any?(stop_sequences, fn stop_sequence ->
+    # Can't use Enum.any, because then Govt Center will be seen as a terminal
+    # Using all is ok because no station is the terminal of one line and NOT the terminal of another line
+    # excluding GL branches
+    Enum.all?(stop_sequences, fn stop_sequence ->
       List.first(stop_sequence) == stop_id or List.last(stop_sequence) == stop_id
     end)
   end

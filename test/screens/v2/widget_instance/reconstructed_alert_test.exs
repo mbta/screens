@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.Config.Screen
   alias Screens.Config.V2.{PreFare}
   alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
@@ -1134,38 +1135,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   describe "Real-world alerts:" do
-    setup do
-      %{
-        station_sequences: %{
-          orange: [
-            [
-              "place-forhl",
-              "place-grnst",
-              "place-sbmnl",
-              "place-jaksn",
-              "place-rcmnl",
-              "place-rugg",
-              "place-masta",
-              "place-bbsta",
-              "place-tumnl",
-              "place-chncl",
-              "place-dwnxg",
-              "place-state",
-              "place-haecl",
-              "place-north",
-              "place-ccmnl",
-              "place-sull",
-              "place-astao",
-              "place-welln",
-              "place-mlmnl",
-              "placeo-ogmnl"
-            ]
-          ]
-        }
-      }
-    end
-
-    test "handles OL downstream suspension", context do
+    test "handles OL downstream suspension" do
       config =
         struct(Screen, %{
           app_id: :pre_fare_v2,
@@ -1353,9 +1323,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       ]
 
       now = ~U[2022-06-24 12:00:00Z]
+      station_sequences = Stop.get_route_stop_sequence("Orange")
 
       fetch_parent_station_sequences_through_stop_fn = fn _, _ ->
-        {:ok, context.station_sequences[:orange]}
+        {:ok, [station_sequences]}
       end
 
       fetch_routes_by_stop_fn = fn _, _, _ -> {:ok, routes_at_stop} end
@@ -1381,6 +1352,365 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         urgent: false,
         region: :outside,
         remedy: "Seek alternate route"
+      }
+
+      assert expected == ReconstructedAlert.serialize(List.first(alert_widgets))
+    end
+
+    test "handles GL boundary shuttle at Govt Center" do
+      config =
+        struct(Screen, %{
+          app_id: :pre_fare_v2,
+          app_params:
+            struct(PreFare, %{reconstructed_alert_widget: %CurrentStopId{stop_id: "place-gover"}})
+        })
+
+      routes_at_stop = [
+        %{
+          route_id: "Green-B",
+          active?: false,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :light_rail
+        },
+        %{
+          route_id: "Green-C",
+          active?: true,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :light_rail
+        },
+        %{
+          route_id: "Green-D",
+          active?: true,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :light_rail
+        },
+        %{
+          route_id: "Green-E",
+          active?: true,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :light_rail
+        },
+        %{
+          route_id: "Blue",
+          active?: true,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :subway
+        }
+      ]
+
+      alerts = [
+        %Screens.Alerts.Alert{
+          active_period: [{~U[2022-06-24 09:12:00Z], nil}],
+          cause: :unknown,
+          created_at: ~U[2022-06-24 09:12:47Z],
+          description:
+            "Affected stops:\r\nLechmere\r\nScience Park/West End\r\nNorth Station\r\nHaymarket\r\nGovernment Center",
+          effect: :shuttle,
+          header:
+            "Green Line is replaced by shuttle buses between Government Center and Union Square due to a structural issue with the Government Center Garage. Shuttle buses are not servicing Haymarket Station.",
+          id: "450522",
+          informed_entities: [
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-D",
+              route_type: 0,
+              stop: "place-north"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-E",
+              route_type: 0,
+              stop: "70504"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-E",
+              route_type: 0,
+              stop: "place-unsqu"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-C",
+              route_type: 0,
+              stop: "place-spmnl"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-C",
+              route_type: 0,
+              stop: "70204"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-D",
+              route_type: 0,
+              stop: "70202"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-D",
+              route_type: 0,
+              stop: "70501"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-B",
+              route_type: 0,
+              stop: "70202"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-D",
+              route_type: 0,
+              stop: "70207"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-D",
+              route_type: 0,
+              stop: "place-unsqu"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-E",
+              route_type: 0,
+              stop: "place-north"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-D",
+              route_type: 0,
+              stop: "70208"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-E",
+              route_type: 0,
+              stop: "70208"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-B",
+              route_type: 0,
+              stop: "70206"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-B",
+              route_type: 0,
+              stop: "place-lech"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-B",
+              route_type: 0,
+              stop: "70205"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-B",
+              route_type: 0,
+              stop: "place-north"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-B",
+              route_type: 0,
+              stop: "70203"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-C",
+              route_type: 0,
+              stop: "70201"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-B",
+              route_type: 0,
+              stop: "place-gover"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-C",
+              route_type: 0,
+              stop: "70206"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-C",
+              route_type: 0,
+              stop: "place-unsqu"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-C",
+              route_type: 0,
+              stop: "70504"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-C",
+              route_type: 0,
+              stop: "70202"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-C",
+              route_type: 0,
+              stop: "place-gover"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-B",
+              route_type: 0,
+              stop: "70201"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-B",
+              route_type: 0,
+              stop: "70504"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-C",
+              route_type: 0,
+              stop: "place-lech"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-B",
+              route_type: 0,
+              stop: "70501"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-E",
+              route_type: 0,
+              stop: "70202"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-B",
+              route_type: 0,
+              stop: "70208"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-D",
+              route_type: 0,
+              stop: "place-gover"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-D",
+              route_type: 0,
+              stop: "place-spmnl"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-E",
+              route_type: 0,
+              stop: "70207"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-B",
+              route_type: 0,
+              stop: "70204"
+            },
+            %{
+              direction_id: nil,
+              facility: nil,
+              route: "Green-C",
+              route_type: 0,
+              stop: "70203"
+            }
+          ],
+          lifecycle: "NEW",
+          severity: 7,
+          timeframe: nil,
+          updated_at: ~U[2022-06-24 18:24:03Z],
+          url: nil
+        }
+      ]
+
+      now = ~U[2022-06-24 12:00:00Z]
+      station_sequences = Stop.get_route_stop_sequence("Green")
+
+      fetch_parent_station_sequences_through_stop_fn = fn _, _ ->
+        {:ok, [station_sequences]}
+      end
+
+      fetch_routes_by_stop_fn = fn _, _, _ -> {:ok, routes_at_stop} end
+      fetch_alerts_fn = fn _ -> {:ok, alerts} end
+      fetch_stop_name_fn = fn _ -> "Government Center" end
+
+      alert_widgets =
+        CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
+          config,
+          now,
+          fetch_routes_by_stop_fn,
+          fetch_parent_station_sequences_through_stop_fn,
+          fetch_alerts_fn,
+          fetch_stop_name_fn
+        )
+
+      expected = %{
+        issue: "No North Station & North trains",
+        location: "",
+        cause: "",
+        routes: [%{color: :green, text: "GREEN LINE", type: :text}],
+        effect: :shuttle,
+        urgent: true,
+        region: :boundary,
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(List.first(alert_widgets))
