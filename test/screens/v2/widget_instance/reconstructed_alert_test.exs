@@ -913,7 +913,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   describe "alert edge cases" do
-    setup [:setup_screen_config, :setup_now]
+    setup [:setup_screen_config, :setup_now, :setup_active_period]
 
     test "handles GL alert affecting all branches", %{widget: widget} do
       widget =
@@ -964,6 +964,47 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         urgent: false,
         region: :outside,
         remedy: "Use shuttle bus"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles alert affecting all stops on a line", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-tumnl")
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: nil, route: "Orange")
+        ])
+        |> put_cause(:unknown)
+        |> put_stop_sequences([
+          [
+            "place-chncl",
+            "place-tumnl",
+            "place-bbsta"
+          ]
+        ])
+        |> put_routes_at_stop([
+          %{
+            route_id: "Orange",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
+
+      expected = %{
+        issue: %{icon: nil, text: ["No", %{route: "orange"}, "trains"]},
+        location: nil,
+        cause: "",
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        effect: :suspension,
+        urgent: true,
+        region: :inside,
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
