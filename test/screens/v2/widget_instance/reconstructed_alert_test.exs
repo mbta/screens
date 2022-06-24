@@ -800,7 +800,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
 
       expected = %{
-        issue: "No trains",
+        issue: "No Alewife trains",
         location: "at Alewife",
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
@@ -825,6 +825,30 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected = %{
         issue: "No trains",
+        location: "between Alewife and Davis",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :suspension,
+        urgent: false,
+        region: :outside,
+        remedy: "Seek alternate route"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles downstream suspension range, one direction only", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-alfcl", direction_id: 1, route: "Red"),
+          ie(stop: "place-davis", direction_id: 1, route: "Red")
+        ])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "No Alewife trains",
         location: "between Alewife and Davis",
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
@@ -1070,10 +1094,32 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   describe "Real-world alerts:" do
     setup do
-
       %{
         station_sequences: %{
-          orange: [["place-forhl", "place-grnst", "place-sbmnl", "place-jaksn", "place-rcmnl", "place-rugg", "place-masta", "place-bbsta", "place-tumnl", "place-chncl", "place-dwnxg", "place-state", "place-haecl", "place-north", "place-ccmnl", "place-sull", "place-astao", "place-welln", "place-mlmnl", "placeo-ogmnl"]]
+          orange: [
+            [
+              "place-forhl",
+              "place-grnst",
+              "place-sbmnl",
+              "place-jaksn",
+              "place-rcmnl",
+              "place-rugg",
+              "place-masta",
+              "place-bbsta",
+              "place-tumnl",
+              "place-chncl",
+              "place-dwnxg",
+              "place-state",
+              "place-haecl",
+              "place-north",
+              "place-ccmnl",
+              "place-sull",
+              "place-astao",
+              "place-welln",
+              "place-mlmnl",
+              "placeo-ogmnl"
+            ]
+          ]
         }
       }
     end
@@ -1102,9 +1148,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           active_period: [{~U[2022-06-24 09:13:15Z], nil}],
           cause: :unknown,
           created_at: ~U[2022-06-24 09:13:17Z],
-          description: "Orange Line Service is running between Oak Grove and North Station and between Forest Hills and Back Bay. \r\nCustomers can use Green Line service through Downtown. \r\n\r\nAffected stops:\r\nHaymarket\r\nState\r\nDowntown Crossing\r\nChinatown\r\nTufts Medical Center",
+          description:
+            "Orange Line Service is running between Oak Grove and North Station and between Forest Hills and Back Bay. \r\nCustomers can use Green Line service through Downtown. \r\n\r\nAffected stops:\r\nHaymarket\r\nState\r\nDowntown Crossing\r\nChinatown\r\nTufts Medical Center",
           effect: :suspension,
-          header: "Orange Line is suspended between North Station and Back Bay due to a structural issue with the Government Center garage. ",
+          header:
+            "Orange Line is suspended between North Station and Back Bay due to a structural issue with the Government Center garage. ",
           id: "450523",
           informed_entities: [
             %{
@@ -1264,19 +1312,24 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       ]
 
       now = ~U[2022-06-24 12:00:00Z]
-      fetch_parent_station_sequences_through_stop_fn = fn _, _ -> {:ok, context.station_sequences[:orange]} end
+
+      fetch_parent_station_sequences_through_stop_fn = fn _, _ ->
+        {:ok, context.station_sequences[:orange]}
+      end
+
       fetch_routes_by_stop_fn = fn _, _, _ -> {:ok, routes_at_stop} end
       fetch_alerts_fn = fn _ -> {:ok, alerts} end
       fetch_stop_name_fn = fn _ -> "Wellington" end
 
-      alert_widgets = CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
-        config,
-        now,
-        fetch_routes_by_stop_fn,
-        fetch_parent_station_sequences_through_stop_fn,
-        fetch_alerts_fn,
-        fetch_stop_name_fn
-      )
+      alert_widgets =
+        CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
+          config,
+          now,
+          fetch_routes_by_stop_fn,
+          fetch_parent_station_sequences_through_stop_fn,
+          fetch_alerts_fn,
+          fetch_stop_name_fn
+        )
 
       expected = %{
         issue: "No trains",

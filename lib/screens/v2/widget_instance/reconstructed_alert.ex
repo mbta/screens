@@ -112,8 +112,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             do: headsign,
             else: false
         end)
+
       # When the alert is non-directional and the station is outside the alert range
-      is_nil(direction_id) -> nil
+      is_nil(direction_id) ->
+        nil
+
       # Otherwise, direction is provided, and we can find the destination tag from @route_directions
       true ->
         @route_directions
