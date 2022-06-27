@@ -7,7 +7,7 @@ defmodule Screens.V3Api do
 
   @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool]]
 
-  @retry with: constant_backoff(500) |> Stream.take(3)
+  @retry with: Stream.take(constant_backoff(500), 3)
   def get_json(
         route,
         params \\ %{},
