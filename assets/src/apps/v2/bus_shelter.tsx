@@ -43,7 +43,6 @@ import DeparturesNoData from "Components/v2/bus_shelter/departures_no_data";
 
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/bus_shelter/alert";
 import MultiScreenPage from "Components/v2/multi_screen_page";
-import NaughtyButton from "Components/naughty_button";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -103,30 +102,27 @@ const audioConfig: AudioConfig = {
 
 const App = (): JSX.Element => {
   return (
-    <>
-      <NaughtyButton appID="bus_shelter_v2" />
-      <Router>
-        <Switch>
-          <Route exact path="/v2/screen/bus_shelter_v2">
-            <MultiScreenPage
-              components={TYPE_TO_COMPONENT}
-              responseMapper={responseMapper}
-            />
-          </Route>
-          <Route path="/v2/screen/:id">
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <ResponseMapperContext.Provider value={responseMapper}>
-                <BlinkConfigContext.Provider value={blinkConfig}>
-                  <AudioConfigContext.Provider value={audioConfig}>
-                    <ScreenPage />
-                  </AudioConfigContext.Provider>
-                </BlinkConfigContext.Provider>
-              </ResponseMapperContext.Provider>
-            </MappingContext.Provider>
-          </Route>
-        </Switch>
-      </Router>
-    </>
+    <Router>
+      <Switch>
+        <Route exact path="/v2/screen/bus_shelter_v2">
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
+        </Route>
+        <Route path="/v2/screen/:id">
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <BlinkConfigContext.Provider value={blinkConfig}>
+                <AudioConfigContext.Provider value={audioConfig}>
+                  <ScreenPage />
+                </AudioConfigContext.Provider>
+              </BlinkConfigContext.Provider>
+            </ResponseMapperContext.Provider>
+          </MappingContext.Provider>
+        </Route>
+      </Switch>
+    </Router>
   );
 };
 

@@ -35,7 +35,6 @@ import {
 import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 import OvernightDepartures from "Components/v2/eink/overnight_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
-import NaughtyButton from "Components/naughty_button";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -79,26 +78,23 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 
 const App = (): JSX.Element => {
   return (
-    <>
-      <NaughtyButton appID="gl_eink_v2" />
-      <Router>
-        <Switch>
-          <Route exact path="/v2/screen/gl_eink_v2">
-            <MultiScreenPage
-              components={TYPE_TO_COMPONENT}
-              responseMapper={responseMapper}
-            />
-          </Route>
-          <Route path="/v2/screen/:id">
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <ResponseMapperContext.Provider value={responseMapper}>
-                <ScreenPage />
-              </ResponseMapperContext.Provider>
-            </MappingContext.Provider>
-          </Route>
-        </Switch>
-      </Router>
-    </>
+    <Router>
+      <Switch>
+        <Route exact path="/v2/screen/gl_eink_v2">
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
+        </Route>
+        <Route path="/v2/screen/:id">
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <ScreenPage />
+            </ResponseMapperContext.Provider>
+          </MappingContext.Provider>
+        </Route>
+      </Switch>
+    </Router>
   );
 };
 
