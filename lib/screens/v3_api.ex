@@ -42,8 +42,7 @@ defmodule Screens.V3Api do
         :not_modified
 
       {:response_success, %{status_code: status_code}} = response ->
-        {:bad_response_code, _} =
-          log_api_error({:bad_response_code, response}, status_code: status_code)
+        _ = log_api_error({:bad_response_code, response}, status_code: status_code)
 
         :bad_response_code
 
