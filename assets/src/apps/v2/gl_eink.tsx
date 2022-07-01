@@ -1,3 +1,6 @@
+import initSentry from "Util/sentry";
+initSentry();
+
 declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/gl_eink_v2.scss");
