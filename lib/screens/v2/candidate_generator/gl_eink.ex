@@ -207,6 +207,9 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
 
       {:ok, departures} ->
         {:ok, departures}
+
+      :error ->
+        :error
     end)
   end
 end
