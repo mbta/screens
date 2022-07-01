@@ -18,22 +18,26 @@ import {
   MultiScreenPage,
   ScreenPage,
 } from "Components/eink/screen_page";
+import NaughtyButton from "Components/naughty_button";
 
 const App = (): JSX.Element => {
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/screen/solari">
-          <MultiScreenPage screenContainer={ScreenContainer} />
-        </Route>
-        <Route exact path="/audit/solari">
-          <AuditScreenPage screenLayout={ScreenLayout} />
-        </Route>
-        <Route path="/screen/:id">
-          <ScreenPage screenContainer={ScreenContainer} />
-        </Route>
-      </Switch>
-    </Router>
+    <>
+      <NaughtyButton appID="solari" />
+      <Router>
+        <Switch>
+          <Route exact path="/screen/solari">
+            <MultiScreenPage screenContainer={ScreenContainer} />
+          </Route>
+          <Route exact path="/audit/solari">
+            <AuditScreenPage screenLayout={ScreenLayout} />
+          </Route>
+          <Route path="/screen/:id">
+            <ScreenPage screenContainer={ScreenContainer} />
+          </Route>
+        </Switch>
+      </Router>
+    </>
   );
 };
 

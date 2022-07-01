@@ -17,6 +17,7 @@ import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/dup/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
+import NaughtyButton from "Components/naughty_button";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -28,18 +29,21 @@ const TYPE_TO_COMPONENT = {
 
 const App = (): JSX.Element => {
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/v2/screen/dup_v2">
-          <MultiScreenPage components={TYPE_TO_COMPONENT} />
-        </Route>
-        <Route path="/v2/screen/:id">
-          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <ScreenPage />
-          </MappingContext.Provider>
-        </Route>
-      </Switch>
-    </Router>
+    <>
+      <NaughtyButton appID="dup_v2" />
+      <Router>
+        <Switch>
+          <Route exact path="/v2/screen/dup_v2">
+            <MultiScreenPage components={TYPE_TO_COMPONENT} />
+          </Route>
+          <Route path="/v2/screen/:id">
+            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+              <ScreenPage />
+            </MappingContext.Provider>
+          </Route>
+        </Switch>
+      </Router>
+    </>
   );
 };
 

@@ -38,6 +38,7 @@ import ReconstructedAlert from "Components/v2/reconstructed_alert";
 import NoData from "Components/v2/pre_fare/no_data";
 import ReconstructedTakeover from "Components/v2/reconstructed_takeover";
 import MultiScreenPage from "Components/v2/multi_screen_page";
+import NaughtyButton from "Components/naughty_button";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -89,27 +90,30 @@ const blinkConfig: BlinkConfig = {
 
 const App = (): JSX.Element => {
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/v2/screen/pre_fare_v2">
-          <MultiScreenPage
-            components={TYPE_TO_COMPONENT}
-            responseMapper={responseMapper}
-          />
-        </Route>
-        <Route path="/v2/screen/:id">
-          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <ResponseMapperContext.Provider value={responseMapper}>
-              <BlinkConfigContext.Provider value={blinkConfig}>
-                <Viewport>
-                  <ScreenPage />
-                </Viewport>
-              </BlinkConfigContext.Provider>
-            </ResponseMapperContext.Provider>
-          </MappingContext.Provider>
-        </Route>
-      </Switch>
-    </Router>
+    <>
+      <NaughtyButton appID="pre_fare_v2" />
+      <Router>
+        <Switch>
+          <Route exact path="/v2/screen/pre_fare_v2">
+            <MultiScreenPage
+              components={TYPE_TO_COMPONENT}
+              responseMapper={responseMapper}
+            />
+          </Route>
+          <Route path="/v2/screen/:id">
+            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+              <ResponseMapperContext.Provider value={responseMapper}>
+                <BlinkConfigContext.Provider value={blinkConfig}>
+                  <Viewport>
+                    <ScreenPage />
+                  </Viewport>
+                </BlinkConfigContext.Provider>
+              </ResponseMapperContext.Provider>
+            </MappingContext.Provider>
+          </Route>
+        </Switch>
+      </Router>
+    </>
   );
 };
 

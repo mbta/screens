@@ -17,25 +17,29 @@ import {
   MultiRotationPage,
 } from "Components/dup/dup_screen_page";
 import { isDup } from "Util/util";
+import NaughtyButton from "Components/naughty_button";
 
 const App = (): JSX.Element => {
   if (isDup()) {
     return <ScreenPage screenContainer={ScreenContainer} />;
   } else {
     return (
-      <Router>
-        <Switch>
-          <Route exact path="/screen/dup">
-            <MultiRotationPage screenContainer={ScreenContainer} />
-          </Route>
-          <Route path="/screen/:id/:rotationIndex">
-            <ScreenPage screenContainer={ScreenContainer} />
-          </Route>
-          <Route path="/screen/:id">
-            <RotationPage screenContainer={ScreenContainer} />
-          </Route>
-        </Switch>
-      </Router>
+      <>
+        <NaughtyButton appID="dup" />
+        <Router>
+          <Switch>
+            <Route exact path="/screen/dup">
+              <MultiRotationPage screenContainer={ScreenContainer} />
+            </Route>
+            <Route path="/screen/:id/:rotationIndex">
+              <ScreenPage screenContainer={ScreenContainer} />
+            </Route>
+            <Route path="/screen/:id">
+              <RotationPage screenContainer={ScreenContainer} />
+            </Route>
+          </Switch>
+        </Router>
+      </>
     );
   }
 };
