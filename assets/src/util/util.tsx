@@ -22,3 +22,10 @@ export const isDup = () => location.href.startsWith("file:");
 
 export const imagePath = (fileName: string): string =>
   isDup() ? `images/${fileName}` : `/images/${fileName}`;
+
+const hasTrueIsRealScreenParam = () => {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("is_real_screen") === "true";
+};
+
+export const isRealScreen = () => (isDup() || hasTrueIsRealScreenParam());
