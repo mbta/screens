@@ -6,16 +6,10 @@ import { isRealScreen } from "Util/util";
  * a real production screen.
  */
 const initSentry = () => {
-  console.log("called initSentry");
-
   const dataset = document.getElementById("app")?.dataset ?? {};
   const { sentry: sentryDsn, environmentName: env } = dataset;
 
-  console.log("sentryDsn =", sentryDsn);
-  console.log("env =", env);
-
   if (sentryDsn && isRealScreen()) {
-    console.log("starting Sentry");
     Sentry.init({
       dsn: sentryDsn,
       environment: env,
