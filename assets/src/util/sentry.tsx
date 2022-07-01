@@ -9,7 +9,7 @@ const initSentry = () => {
   console.log("called initSentry");
 
   const dataset = document.getElementById("app")?.dataset ?? {};
-  const { sentryDsn, env } = dataset;
+  const { sentry: sentryDsn, environmentName: env } = dataset;
 
   console.log("sentryDsn =", sentryDsn);
   console.log("env =", env);
