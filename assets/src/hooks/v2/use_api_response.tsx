@@ -2,6 +2,8 @@ import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { isRealScreen } from "Util/util";
+import * as Sentry from "@sentry/react";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -40,6 +42,7 @@ const doFailureBuffer = (
   lastSuccess: number | null,
   failureModeElapsedMs: number,
   setApiResponse: React.Dispatch<React.SetStateAction<ApiResponse>>,
+  setLastResponseWasFailure: React.Dispatch<React.SetStateAction<boolean>>,
   apiResponse: ApiResponse = FAILURE_RESPONSE
 ) => {
   if (lastSuccess == null) {
@@ -49,11 +52,20 @@ const doFailureBuffer = (
   } else {
     const elapsedMs = Date.now() - lastSuccess;
 
+    // Because we recycle state when a failure occurs,
+    // we need to track failures in a separate state variable.
+    setLastResponseWasFailure(true);
+
     if (elapsedMs < failureModeElapsedMs) {
       setApiResponse((state) => state);
     }
     if (elapsedMs >= failureModeElapsedMs) {
       setApiResponse(apiResponse);
+    }
+
+    // This will trigger until a success API response is received.
+    if (isRealScreen()) {
+      Sentry.captureMessage("API response failure encountered.");
     }
   }
 };
@@ -96,6 +108,7 @@ const useApiResponse = ({
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
+  const [_, setLastResponseWasFailure] = useState(false);
   const {
     lastRefresh,
     refreshRate,
@@ -130,14 +143,28 @@ const useApiResponse = ({
           lastSuccess,
           failureModeElapsedMs,
           setApiResponse,
+          setLastResponseWasFailure,
           apiResponse
         );
       } else {
+        setLastResponseWasFailure((prevState) => {
+          // If the last response was a failure, log that we are no longer failing.
+          if (prevState) {
+            Sentry.captureMessage("Recovered from API response failure.");
+          }
+
+          return false;
+        });
         setApiResponse(apiResponse);
         setLastSuccess(now);
       }
     } catch (err) {
-      doFailureBuffer(lastSuccess, failureModeElapsedMs, setApiResponse);
+      doFailureBuffer(
+        lastSuccess,
+        failureModeElapsedMs,
+        setApiResponse,
+        setLastResponseWasFailure
+      );
     }
 
     setRequestCount((count) => count + 1);

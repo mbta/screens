@@ -1,25 +1,42 @@
 import { useEffect, useState } from "react";
-import { isDup } from "Util/util";
+import { isDup, isRealScreen } from "Util/util";
 import useInterval from "Hooks/use_interval";
 import { useLocation } from "react-router-dom";
+import * as Sentry from "@sentry/react";
 
 const MINUTE_IN_MS = 60_000;
 
-const FAILURE_RESPONSE = { success: false };
+const FAILURE_RESPONSE = { success: false, lastSuccess: null };
 
 const doFailureBuffer = (
-  lastSuccess: number,
+  lastSuccess: number | null,
   failureModeElapsedMs: number,
   setApiResponse: React.Dispatch<React.SetStateAction<object>>,
+  setLastResponseWasFailure: React.Dispatch<React.SetStateAction<boolean>>,
   apiResponse: object = FAILURE_RESPONSE
 ) => {
-  const elapsedMs = Date.now() - lastSuccess;
-
-  if (elapsedMs < failureModeElapsedMs) {
+  if (lastSuccess == null) {
+    // We haven't had a successful request since initial page load.
+    // Continue showing the initial "no data" state.
     setApiResponse((state) => state);
-  }
-  if (elapsedMs >= failureModeElapsedMs) {
-    setApiResponse(apiResponse);
+  } else {
+    const elapsedMs = Date.now() - lastSuccess;
+
+    // Because we recycle state when a failure occurs,
+    // we need to track failures in a separate state variable.
+    setLastResponseWasFailure(true);
+
+    if (elapsedMs < failureModeElapsedMs) {
+      setApiResponse((state) => state);
+    }
+    if (elapsedMs >= failureModeElapsedMs) {
+      setApiResponse(apiResponse);
+    }
+
+    // This will trigger until a success API response is received.
+    if (isRealScreen()) {
+      Sentry.captureMessage("API response failure encountered.");
+    }
   }
 };
 
@@ -51,7 +68,8 @@ const useApiResponse = ({
   failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs) => {
   const [apiResponse, setApiResponse] = useState<object | null>(null);
-  const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
+  const [lastSuccess, setLastSuccess] = useState<number | null>(null);
+  const [_, setLastResponseWasFailure] = useState(false);
   const lastRefresh = document.getElementById("app")?.dataset.lastRefresh;
   const isRealScreenParam = useIsRealScreenParam();
 
@@ -75,6 +93,15 @@ const useApiResponse = ({
       if (withWatchdog) updateSolariWatchdog();
 
       if (json.success) {
+        // If the last response was a failure, log that we are no longer failing.
+        setLastResponseWasFailure((prevState) => {
+          if (prevState) {
+            Sentry.captureMessage("Recovered from API response failure.");
+          }
+
+          return false;
+        });
+
         setApiResponse(json);
         setLastSuccess(now);
       } else {
@@ -82,11 +109,17 @@ const useApiResponse = ({
           lastSuccess,
           failureModeElapsedMs,
           setApiResponse,
+          setLastResponseWasFailure,
           json
         );
       }
     } catch (err) {
-      doFailureBuffer(lastSuccess, failureModeElapsedMs, setApiResponse);
+      doFailureBuffer(
+        lastSuccess,
+        failureModeElapsedMs,
+        setApiResponse,
+        setLastResponseWasFailure
+      );
     }
   };
 
