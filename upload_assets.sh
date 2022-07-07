@@ -5,12 +5,12 @@ BUILD_TAG=${1}
 TEMP_DIR=$(mktemp -d)
 STATIC_DIR=$TEMP_DIR/priv/static
 
+# the ">" merely redirects the printout. It shushes it.
 pushd "$TEMP_DIR" > /dev/null
-sh -c "docker run --rm ${BUILD_TAG} tar -c ./priv/static" | tar -x --strip-components 2
-popd> /dev/null
+sh -c "docker run --rm ${BUILD_TAG} tar -c /home/runner/work/screens/screens/priv/static" | tar -x --strip-components 2
+popd > /dev/null
 
 echo "just printing out the current directory and contents"
-pwd
 ls -al
 
 echo "now printing the static dir / js"
