@@ -12,7 +12,7 @@
     "check": "npm run lint:check && npm run format:check"
   },
   "dependencies": {
-    "@sentry/react": "^6.14.3",
+    "@sentry/react": "^7.5.1",
     "core-js": "^3.15.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
