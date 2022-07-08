@@ -23,12 +23,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           docker-repo: ${{ secrets.DOCKER_REPO }}
-      - name: Upload source map
-        run: bash upload_assets.sh ${{ steps.build-push.outputs.docker-tag }}
-        env:
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - id: deployment-package
         uses: mbta/actions/eb-ecr-dockerrun@v1
         with:
