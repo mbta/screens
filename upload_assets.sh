@@ -18,8 +18,8 @@ popd > /dev/null
 echo "just printing out the current directory and contents"
 ls -al
 
-echo "now printing the static dir / js"
-ls -al "$STATIC_DIR/js"
+echo "now printing the static dir"
+ls -al "$STATIC_DIR"
 
 # upload source maps to Sentry
 SENTRY_RELEASE=$(npx @sentry/cli releases propose-version)
