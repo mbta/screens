@@ -19,8 +19,8 @@ popd > /dev/null
 echo "just printing out the current directory and contents"
 ls -al
 
-echo "now printing the static dir"
-ls -al "$STATIC_DIR"
+echo "now printing temp dir / static"
+ls -al "$TEMP_DIR/static"
 
 # upload source maps to Sentry
 SENTRY_RELEASE=$(npx @sentry/cli releases propose-version)
