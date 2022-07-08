@@ -10,9 +10,9 @@ pushd "$TEMP_DIR" > /dev/null
 # ls -al /home/screens
 # ls -al /home/screens/priv
 # ls -al /home/screens/priv/static
-ls -al /home/runner/work/screens/screens
-ls -al /home/runner/work/screens/screens/priv
-sh -c "docker run --rm ${BUILD_TAG} tar -c /home/screens/priv/static" | tar -x --strip-components 2
+# ls -al /home/runner/work/screens/screens
+# ls -al /home/runner/work/screens/screens/priv
+sh -c "docker run --rm ${BUILD_TAG} tar -c /root/priv/static" | tar -x --strip-components 2
 popd > /dev/null
 
 echo "just printing out the current directory and contents"
