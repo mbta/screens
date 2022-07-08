@@ -21,4 +21,4 @@ ls -al "$STATIC_DIR"
 
 # upload source maps to Sentry
 SENTRY_RELEASE=$(npx @sentry/cli releases propose-version)
-npx @sentry/cli releases files "$SENTRY_RELEASE" upload-sourcemaps "$STATIC_DIR/js"
+npx @sentry/cli releases files "$SENTRY_RELEASE" upload-sourcemaps "$STATIC_DIR/js" --log-level=[debug]
