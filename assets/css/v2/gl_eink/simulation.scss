@@ -1,0 +1,43 @@
+.simulation-screen-container {
+  display: flex;
+  background: #3d5366;
+
+  .simulation__full-page {
+    height: 480px;
+    width: 180px;
+    margin-right: 24px;
+    background-color: white;
+
+    & > * {
+      transform-origin: top left;
+      transform: scale(15%);
+    }
+  }
+
+  .simulation__flex-zone {
+    background: #2e3f4d;
+    display: flex;
+    margin-top: auto;
+    margin-bottom: auto;
+    border-radius: 8px;
+  }
+
+  .simulation__flex-zone-widget {
+    width: 300px;
+    height: 286px;
+
+    &:not(:last-child) {
+      margin-right: 24px;
+    }
+
+    .flex-one-medium {
+      //   margin: -8px;
+      & > * {
+        width: 1200px;
+        height: 1164px;
+        transform-origin: top left;
+        transform: scale(25%);
+      }
+    }
+  }
+}
