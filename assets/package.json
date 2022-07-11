@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@sentry/react": "^7.5.1",
-    "core-js": "^3.15.2",
+    "core-js": "^3.23.4",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",
