@@ -23,6 +23,17 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
     const slots = Object.keys(page);
 
     if (slots.length === 1) {
+      // E-Ink flex-zones have one medium instead of one large.
+      if (slots[0] === "medium") {
+        return (
+          <div className="flex-one-medium">
+            <div className="flex-one-medium__medium">
+              <Widget data={page[slots[0]]} />
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className="flex-one-large">
           <div className="flex-one-large__large">
