@@ -74,6 +74,25 @@ defmodule ScreensWeb.V2.ScreenApiController do
     end
   end
 
+  def simulation(conn, %{"id" => screen_id, "last_refresh" => last_refresh}) do
+    cond do
+      nonexistent_screen?(screen_id) ->
+        not_found_response(conn)
+
+      outdated?(screen_id, last_refresh) ->
+        json(conn, ScreenData.outdated_response())
+
+      disabled?(screen_id) ->
+        json(conn, ScreenData.disabled_response())
+
+      true ->
+        json(conn, %{
+          full_page: ScreenData.by_screen_id(screen_id),
+          flex_zone: ScreenData.paged_slots_by_screen_id(screen_id)
+        })
+    end
+  end
+
   defp nonexistent_screen?(screen_id) do
     is_nil(State.screen(screen_id))
   end

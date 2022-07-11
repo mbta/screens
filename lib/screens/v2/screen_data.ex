@@ -43,6 +43,15 @@ defmodule Screens.V2.ScreenData do
     |> serialize()
   end
 
+  def paged_slots_by_screen_id(screen_id) do
+    config = get_config(screen_id)
+
+    config
+    |> fetch_data()
+    |> get_paged_slots()
+    |> serialize_paged_slots()
+  end
+
   @spec fetch_data(Screens.Config.Screen.t()) :: {Template.layout(), selected_instances_map()}
   def fetch_data(config) do
     candidate_generator = Parameters.get_candidate_generator(config)
@@ -230,6 +239,18 @@ defmodule Screens.V2.ScreenData do
     {unpaged_layout, instance_map, paging_metadata}
   end
 
+  def get_paged_slots({_layout, instance_map}) do
+    instance_map
+    |> Enum.filter(fn
+      {slot_id, _instance} when is_paged_slot_id(slot_id) ->
+        true
+
+      _ ->
+        false
+    end)
+    |> Enum.into(%{})
+  end
+
   defp select_page_index(num_pages, refresh_rate, now) do
     seconds_since_midnight = now.hour * 60 * 60 + now.minute * 60 + now.second
     periods_since_midnight = div(seconds_since_midnight, refresh_rate)
@@ -366,6 +387,36 @@ defmodule Screens.V2.ScreenData do
 
     data = Template.position_widget_instances(layout, serialized_instance_map, paging_metadata)
     response(data: data)
+  end
+
+  def serialize_paged_slots(instance_map) do
+    # instance_map looks like:
+    # %{{page_index, slot_id} => instance}
+
+    # we want:
+    # %{page_index => %{slot_id => instance}}
+
+    serialized_instance_map =
+      instance_map
+      |> Enum.group_by(
+        fn {paged_slot_id, _} -> Template.get_page(paged_slot_id) end,
+        fn {paged_slot_id, instance} -> {Template.unpage(paged_slot_id), instance} end
+      )
+      # %{page_index => [{slot_id, instance}]}
+      |> Enum.map(fn {page_index, instances} -> {page_index, Map.new(instances)} end)
+      # %{page_index => %{slot_id => instance}}
+      |> Enum.sort_by(fn {page_index, _} -> page_index end)
+      # [{page_index, %{slot_id => instance}}]
+      |> Enum.map(fn {_page_index, page_data} ->
+        Enum.into(page_data, %{}, fn {slot_id, instance} ->
+          {slot_id, serialize_instance_with_type(instance)}
+        end)
+      end)
+
+    # Now we have a list of serialized page data, sorted by page index
+    # [%{slot_id => serialized_instance}]
+
+    response(data: serialized_instance_map)
   end
 
   defp serialize_instance_with_type(instance) do
