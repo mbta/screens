@@ -1,5 +1,5 @@
 import initSentry from "Util/sentry";
-initSentry();
+initSentry("bus_shelter");
 
 declare function require(name: string): string;
 // tslint:disable-next-line
