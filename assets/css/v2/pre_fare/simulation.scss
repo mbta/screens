@@ -5,9 +5,12 @@
   .simulation__full-page {
     height: 344px;
     width: 387px;
-    transform-origin: top left;
-    transform: scale(17.92%);
     margin-right: 24px;
+
+    & > * {
+      transform-origin: top left;
+      transform: scale(17.92%);
+    }
   }
 
   .simulation__flex-zone {
