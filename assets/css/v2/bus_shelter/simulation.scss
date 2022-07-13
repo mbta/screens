@@ -1,6 +1,9 @@
 .simulation-screen-container {
   display: flex;
   background: #3d5366;
+  overflow-y: hidden;
+  overflow-x: auto;
+  justify-content: center;
 
   .simulation__full-page {
     height: 344px;
