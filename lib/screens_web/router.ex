@@ -131,4 +131,10 @@ defmodule ScreensWeb.Router do
 
     get "/:id", AlertPriorityController, :show
   end
+
+  scope "/debug", ScreensWeb do
+    pipe_through [:redirect_prod_http, :api, :browser]
+
+    get "/log_sentry_init_failure", DebugController, :log_sentry_init_failure
+  end
 end

@@ -6,15 +6,29 @@ import { isRealScreen } from "Util/util";
  * a real production screen.
  */
 const initSentry = (appString: string) => {
-  const dataset = document.getElementById("app")?.dataset ?? {};
-  const { sentry: sentryDsn, environmentName: env } = dataset;
+  try {
+    const dataset = document.getElementById("app")?.dataset ?? {};
+    const { sentry: sentryDsn, environmentName: env } = dataset;
 
-  if (sentryDsn && isRealScreen()) {
-    Sentry.init({
-      dsn: sentryDsn,
-      environment: env,
-    });
-    Sentry.captureMessage(`Sentry intialized for app: ${appString}`);
+    if (sentryDsn && isRealScreen()) {
+      Sentry.init({
+        dsn: sentryDsn,
+        environment: env,
+      });
+      Sentry.captureMessage(`Sentry intialized for app: ${appString}`);
+    }
+  } catch (e) {
+    const failureLogUrl = new URL("/debug/log_sentry_init_failure", window.location.href);
+    failureLogUrl.searchParams.set("app_id", appString);
+    if (e instanceof Error) {
+      failureLogUrl.searchParams.set("message", e.message);
+    } else if (typeof e == "string") {
+      failureLogUrl.searchParams.set("message", e);
+    } else {
+      failureLogUrl.searchParams.set("message", JSON.stringify(e));
+    }
+
+    fetch(failureLogUrl);
   }
 };
 
