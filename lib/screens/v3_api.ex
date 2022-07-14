@@ -5,7 +5,11 @@ defmodule Screens.V3Api do
 
   require Logger
 
-  @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool]]
+  @default_opts [
+    timeout: 2000,
+    recv_timeout: 2000,
+    hackney: [pool: :api_v3_pool, checkout_timeout: 4000]
+  ]
 
   @retry with: Stream.take(constant_backoff(500), 3), atoms: [:bad_response_code]
   def get_json(

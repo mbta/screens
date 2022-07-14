@@ -1,5 +1,5 @@
 import initSentry from "Util/sentry";
-initSentry();
+initSentry("dup");
 
 declare function require(name: string): string;
 // tslint:disable-next-line
