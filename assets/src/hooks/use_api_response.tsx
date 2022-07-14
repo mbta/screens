@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { isDup, isRealScreen } from "Util/util";
+import { isDup } from "Util/util";
 import useInterval from "Hooks/use_interval";
 import { useLocation } from "react-router-dom";
 import * as Sentry from "@sentry/react";
@@ -34,9 +34,7 @@ const doFailureBuffer = (
     }
 
     // This will trigger until a success API response is received.
-    if (isRealScreen()) {
-      Sentry.captureMessage("API response failure encountered.");
-    }
+    Sentry.captureMessage("API response failure encountered.");
   }
 };
 

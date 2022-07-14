@@ -2,7 +2,6 @@ import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { isRealScreen } from "Util/util";
 import * as Sentry from "@sentry/react";
 
 const MINUTE_IN_MS = 60_000;
@@ -64,9 +63,7 @@ const doFailureBuffer = (
     }
 
     // This will trigger until a success API response is received.
-    if (isRealScreen()) {
-      Sentry.captureMessage("API response failure encountered.");
-    }
+    Sentry.captureMessage("API response failure encountered.");
   }
 };
 
