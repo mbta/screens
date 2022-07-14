@@ -43,13 +43,16 @@ defmodule Screens.V2.ScreenData do
     |> serialize()
   end
 
-  def paged_slots_by_screen_id(screen_id) do
+  @spec simulation_by_screen_id(screen_id()) :: {response_map(), response_map()}
+  def simulation_by_screen_id(screen_id) do
     config = get_config(screen_id)
+    refresh_rate = Parameters.get_refresh_rate(config)
+    screen_data = fetch_data(config)
 
-    config
-    |> fetch_data()
-    |> get_paged_slots()
-    |> serialize_paged_slots()
+    full_page_data = screen_data |> resolve_paging(refresh_rate) |> serialize()
+    page_slot_data = screen_data |> get_paged_slots() |> serialize_paged_slots()
+
+    {full_page_data, page_slot_data}
   end
 
   @spec fetch_data(Screens.Config.Screen.t()) :: {Template.layout(), selected_instances_map()}
