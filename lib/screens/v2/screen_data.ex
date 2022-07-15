@@ -43,8 +43,8 @@ defmodule Screens.V2.ScreenData do
     |> serialize()
   end
 
-  @spec simulation_by_screen_id(screen_id()) :: {response_map(), response_map()}
-  def simulation_by_screen_id(screen_id) do
+  @spec simulation_data_by_screen_id(screen_id()) :: {response_map(), response_map()}
+  def simulation_data_by_screen_id(screen_id) do
     config = get_config(screen_id)
     refresh_rate = Parameters.get_refresh_rate(config)
     screen_data = fetch_data(config)
