@@ -5,6 +5,7 @@ import useOutfrontStation from "Hooks/use_outfront_station";
 import { ROTATION_INDEX } from "./rotation_index";
 import { NoDataLayout } from "Components/dup/screen_container";
 import { isDup } from "Util/util";
+import { fetchDatasetValue } from "Util/dataset";
 
 const DupScreenPage = ({
   screenContainer: ScreenContainer,
@@ -61,9 +62,7 @@ const MultiRotationPage = ({
 }: {
   screenContainer: React.ComponentType;
 }): JSX.Element => {
-  const screenIds = JSON.parse(
-    document.getElementById("app").dataset.screenIds
-  );
+  const screenIds = JSON.parse(fetchDatasetValue("screenIds")) as string[];
 
   return (
     <div className="rotation-page">

@@ -1,15 +1,14 @@
 import DebugErrorBoundary from "Components/helpers/debug_error_boundary";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import { fetchDatasetValue } from "Util/dataset";
 
 const MultiScreenPage = ({
   screenContainer: ScreenContainer,
 }: {
   screenContainer: React.ComponentType;
 }): JSX.Element => {
-  const screenIds = JSON.parse(
-    document.getElementById("app").dataset.screenIds
-  );
+  const screenIds = JSON.parse(fetchDatasetValue("screenIds"));
 
   return (
     <div className="multi-screen-page">

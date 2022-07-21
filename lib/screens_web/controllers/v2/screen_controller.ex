@@ -37,6 +37,14 @@ defmodule ScreensWeb.V2.ScreenController do
     put_layout(conn, {ScreensWeb.V2.LayoutView, "app.html"})
   end
 
+  defp screen_side(params) do
+    case params["screen_side"] do
+      "left" -> "left"
+      "right" -> "right"
+      _ -> nil
+    end
+  end
+
   def index(conn, %{"id" => app_id})
       when app_id in @app_id_strings do
     app_id = String.to_existing_atom(app_id)
@@ -52,7 +60,7 @@ defmodule ScreensWeb.V2.ScreenController do
   def index(conn, %{"id" => screen_id} = params) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
-    _ = Screens.LogScreenData.log_page_load(screen_id, is_screen, params["screen_side"])
+    _ = Screens.LogScreenData.log_page_load(screen_id, is_screen, screen_side(params))
 
     config = State.screen(screen_id)
 
@@ -73,6 +81,8 @@ defmodule ScreensWeb.V2.ScreenController do
           :refresh_rate_offset,
           calculate_refresh_rate_offset(screen_id, refresh_rate)
         )
+        |> assign(:is_real_screen, match?(%{"is_real_screen" => "true"}, params))
+        |> assign(:screen_side, screen_side(params))
         |> put_view(ScreensWeb.V2.ScreenView)
         |> render("index.html")
 

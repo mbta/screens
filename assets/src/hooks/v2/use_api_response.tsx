@@ -1,7 +1,8 @@
 import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { getDataset } from "Util/dataset";
+import { getScreenSide, isRealScreen } from "Util/util";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -58,21 +59,12 @@ const doFailureBuffer = (
   }
 };
 
-const useQuery = () => {
-  return new URLSearchParams(useLocation().search);
+const getIsRealScreenParam = () => {
+  return isRealScreen() ? "&is_real_screen=true" : "";
 };
 
-const useIsRealScreenParam = () => {
-  const query = useQuery();
-  const isRealScreen = query.get("is_real_screen");
-
-  return isRealScreen === "true" ? "&is_real_screen=true" : "";
-};
-
-const useScreenSideParam = () => {
-  const query = useQuery();
-  const screenSide = query.get("screen_side");
-
+const getScreenSideParam = () => {
+  const screenSide = getScreenSide();
   return screenSide ? `&screen_side=${screenSide}` : "";
 };
 
@@ -91,8 +83,8 @@ const useApiResponse = ({
   id,
   failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs): UseApiResponseReturn => {
-  const isRealScreenParam = useIsRealScreenParam();
-  const screenSideParam = useScreenSideParam();
+  const isRealScreenParam = getIsRealScreenParam();
+  const screenSideParam = getScreenSideParam();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
@@ -101,7 +93,7 @@ const useApiResponse = ({
     refreshRate,
     refreshRateOffset,
     screenIdsWithOffsetMap,
-  } = document.getElementById("app").dataset;
+  } = getDataset();
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
   const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}`;

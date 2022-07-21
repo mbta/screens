@@ -72,7 +72,7 @@ defmodule ScreensWeb.ScreenController do
     |> render("index_multi.html")
   end
 
-  def index(conn, %{"id" => screen_id}) do
+  def index(conn, %{"id" => screen_id} = params) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
     _ = Screens.LogScreenData.log_page_load(screen_id, is_screen)
@@ -82,6 +82,7 @@ defmodule ScreensWeb.ScreenController do
         conn
         |> assign(:app_id, app_id)
         |> assign(:sentry_frontend_dsn, Application.get_env(:screens, :sentry_frontend_dsn))
+        |> assign(:is_real_screen, match?(%{"is_real_screen" => "true"}, params))
         |> render("index.html")
 
       nil ->
