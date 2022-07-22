@@ -25,11 +25,14 @@ const doFailureBuffer = (
       setApiResponse((state) => state);
     }
     if (elapsedMs >= failureModeElapsedMs) {
-      setApiResponse(apiResponse);
+      // This will trigger until a success API response is received.
+      setApiResponse((prevApiResponse) => {
+        if (prevApiResponse != null && prevApiResponse.success) {
+          Sentry.captureMessage("Entering no-data state.");
+        }
+        return apiResponse;
+      });
     }
-
-    // This will trigger until a success API response is received.
-    Sentry.captureMessage("API response failure encountered.");
   }
 };
 
@@ -88,7 +91,7 @@ const useApiResponse = ({
         // If the last response was a failure, log that we are no longer failing.
         setApiResponse((prevApiResponse) => {
           if (prevApiResponse != null && !prevApiResponse.success) {
-            Sentry.captureMessage("Recovered from API response failure.");
+            Sentry.captureMessage("Exiting no-data state.");
           }
           return json;
         });
