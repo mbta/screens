@@ -6,7 +6,7 @@ import * as Sentry from "@sentry/react";
 
 const MINUTE_IN_MS = 60_000;
 
-const FAILURE_RESPONSE = { success: false, lastSuccess: null };
+const FAILURE_RESPONSE = { success: false };
 
 const doFailureBuffer = (
   lastSuccess: number | null,
