@@ -12,7 +12,6 @@ const doFailureBuffer = (
   lastSuccess: number | null,
   failureModeElapsedMs: number,
   setApiResponse: React.Dispatch<React.SetStateAction<object>>,
-  setLastResponseWasFailure: React.Dispatch<React.SetStateAction<boolean>>,
   apiResponse: object = FAILURE_RESPONSE
 ) => {
   if (lastSuccess == null) {
@@ -21,10 +20,6 @@ const doFailureBuffer = (
     setApiResponse((state) => state);
   } else {
     const elapsedMs = Date.now() - lastSuccess;
-
-    // Because we recycle state when a failure occurs,
-    // we need to track failures in a separate state variable.
-    setLastResponseWasFailure(true);
 
     if (elapsedMs < failureModeElapsedMs) {
       setApiResponse((state) => state);
@@ -67,7 +62,6 @@ const useApiResponse = ({
 }: UseApiResponseArgs) => {
   const [apiResponse, setApiResponse] = useState<object | null>(null);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
-  const [_, setLastResponseWasFailure] = useState(false);
   const lastRefresh = document.getElementById("app")?.dataset.lastRefresh;
   const isRealScreenParam = useIsRealScreenParam();
 
@@ -92,32 +86,23 @@ const useApiResponse = ({
 
       if (json.success) {
         // If the last response was a failure, log that we are no longer failing.
-        setLastResponseWasFailure((prevState) => {
-          if (prevState) {
+        setApiResponse((prevApiResponse) => {
+          if (prevApiResponse != null && !prevApiResponse.success) {
             Sentry.captureMessage("Recovered from API response failure.");
           }
-
-          return false;
+          return json;
         });
-
-        setApiResponse(json);
         setLastSuccess(now);
       } else {
         doFailureBuffer(
           lastSuccess,
           failureModeElapsedMs,
           setApiResponse,
-          setLastResponseWasFailure,
           json
         );
       }
     } catch (err) {
-      doFailureBuffer(
-        lastSuccess,
-        failureModeElapsedMs,
-        setApiResponse,
-        setLastResponseWasFailure
-      );
+      doFailureBuffer(lastSuccess, failureModeElapsedMs, setApiResponse);
     }
   };
 

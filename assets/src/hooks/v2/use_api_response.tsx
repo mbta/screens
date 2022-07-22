@@ -41,7 +41,6 @@ const doFailureBuffer = (
   lastSuccess: number | null,
   failureModeElapsedMs: number,
   setApiResponse: React.Dispatch<React.SetStateAction<ApiResponse>>,
-  setLastResponseWasFailure: React.Dispatch<React.SetStateAction<boolean>>,
   apiResponse: ApiResponse = FAILURE_RESPONSE
 ) => {
   if (lastSuccess == null) {
@@ -50,10 +49,6 @@ const doFailureBuffer = (
     setApiResponse((state) => state);
   } else {
     const elapsedMs = Date.now() - lastSuccess;
-
-    // Because we recycle state when a failure occurs,
-    // we need to track failures in a separate state variable.
-    setLastResponseWasFailure(true);
 
     if (elapsedMs < failureModeElapsedMs) {
       setApiResponse((state) => state);
@@ -105,7 +100,6 @@ const useApiResponse = ({
   const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
-  const [_, setLastResponseWasFailure] = useState(false);
   const {
     lastRefresh,
     refreshRate,
@@ -140,28 +134,19 @@ const useApiResponse = ({
           lastSuccess,
           failureModeElapsedMs,
           setApiResponse,
-          setLastResponseWasFailure,
           apiResponse
         );
       } else {
-        setLastResponseWasFailure((prevState) => {
-          // If the last response was a failure, log that we are no longer failing.
-          if (prevState) {
+        setApiResponse((prevApiResponse) => {
+          if (prevApiResponse != null && prevApiResponse.state !== "success") {
             Sentry.captureMessage("Recovered from API response failure.");
           }
-
-          return false;
+          return apiResponse;
         });
-        setApiResponse(apiResponse);
         setLastSuccess(now);
       }
     } catch (err) {
-      doFailureBuffer(
-        lastSuccess,
-        failureModeElapsedMs,
-        setApiResponse,
-        setLastResponseWasFailure
-      );
+      doFailureBuffer(lastSuccess, failureModeElapsedMs, setApiResponse);
     }
 
     setRequestCount((count) => count + 1);
