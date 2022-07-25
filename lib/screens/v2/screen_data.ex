@@ -50,9 +50,9 @@ defmodule Screens.V2.ScreenData do
     screen_data = fetch_data(config)
 
     full_page_data = screen_data |> resolve_paging(refresh_rate) |> serialize()
-    page_slot_data = screen_data |> get_paged_slots() |> serialize_paged_slots()
+    paged_slot_data = screen_data |> get_paged_slots() |> serialize_paged_slots()
 
-    {full_page_data, page_slot_data}
+    {full_page_data, paged_slot_data}
   end
 
   @spec fetch_data(Screens.Config.Screen.t()) :: {Template.layout(), selected_instances_map()}
