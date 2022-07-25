@@ -391,7 +391,7 @@ defmodule Screens.V2.ScreenData do
     response(data: data)
   end
 
-  def serialize_paged_slots(instance_map) do
+  defp serialize_paged_slots(instance_map) do
     # instance_map looks like:
     # %{{page_index, slot_id} => instance}
 
