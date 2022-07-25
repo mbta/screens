@@ -2,24 +2,37 @@ import { useEffect, useState } from "react";
 import { isDup } from "Util/util";
 import useInterval from "Hooks/use_interval";
 import { useLocation } from "react-router-dom";
+import * as Sentry from "@sentry/react";
 
 const MINUTE_IN_MS = 60_000;
 
 const FAILURE_RESPONSE = { success: false };
 
 const doFailureBuffer = (
-  lastSuccess: number,
+  lastSuccess: number | null,
   failureModeElapsedMs: number,
   setApiResponse: React.Dispatch<React.SetStateAction<object>>,
   apiResponse: object = FAILURE_RESPONSE
 ) => {
-  const elapsedMs = Date.now() - lastSuccess;
-
-  if (elapsedMs < failureModeElapsedMs) {
+  if (lastSuccess == null) {
+    // We haven't had a successful request since initial page load.
+    // Continue showing the initial "no data" state.
     setApiResponse((state) => state);
-  }
-  if (elapsedMs >= failureModeElapsedMs) {
-    setApiResponse(apiResponse);
+  } else {
+    const elapsedMs = Date.now() - lastSuccess;
+
+    if (elapsedMs < failureModeElapsedMs) {
+      setApiResponse((state) => state);
+    }
+    if (elapsedMs >= failureModeElapsedMs) {
+      // This will trigger until a success API response is received.
+      setApiResponse((prevApiResponse) => {
+        if (prevApiResponse != null && prevApiResponse.success) {
+          Sentry.captureMessage("Entering no-data state.");
+        }
+        return apiResponse;
+      });
+    }
   }
 };
 
@@ -51,7 +64,7 @@ const useApiResponse = ({
   failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs) => {
   const [apiResponse, setApiResponse] = useState<object | null>(null);
-  const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
+  const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const lastRefresh = document.getElementById("app")?.dataset.lastRefresh;
   const isRealScreenParam = useIsRealScreenParam();
 
@@ -75,7 +88,13 @@ const useApiResponse = ({
       if (withWatchdog) updateSolariWatchdog();
 
       if (json.success) {
-        setApiResponse(json);
+        // If the last response was a failure, log that we are no longer failing.
+        setApiResponse((prevApiResponse) => {
+          if (prevApiResponse != null && !prevApiResponse.success) {
+            Sentry.captureMessage("Exiting no-data state.");
+          }
+          return json;
+        });
         setLastSuccess(now);
       } else {
         doFailureBuffer(
