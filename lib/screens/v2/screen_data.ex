@@ -244,14 +244,13 @@ defmodule Screens.V2.ScreenData do
 
   def get_paged_slots({_layout, instance_map}) do
     instance_map
-    |> Enum.filter(fn
+    |> Map.filter(fn
       {slot_id, _instance} when is_paged_slot_id(slot_id) ->
         true
 
       _ ->
         false
     end)
-    |> Enum.into(%{})
   end
 
   defp select_page_index(num_pages, refresh_rate, now) do
