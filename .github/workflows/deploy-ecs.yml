@@ -12,6 +12,7 @@ on:
 
 jobs:
   call-workflow:
+    name: ${{ github.event.inputs.environment }} deploy
     uses: mbta/workflows/.github/workflows/deploy-ecs.yml@main
     with:
       app-name: screens
