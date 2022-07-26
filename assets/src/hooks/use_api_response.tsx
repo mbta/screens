@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { isDup } from "Util/util";
 import useInterval from "Hooks/use_interval";
 import { useLocation } from "react-router-dom";
-import * as Sentry from "@sentry/react";
+// import * as Sentry from "@sentry/react";
+import * as Sentry from "@sentry/browser";
 
 const MINUTE_IN_MS = 60_000;
 

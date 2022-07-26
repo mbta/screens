@@ -1,5 +1,6 @@
-import * as Sentry from "@sentry/react";
+// import * as Sentry from "@sentry/react";
 import { isRealScreen } from "Util/util";
+import * as Sentry from "@sentry/browser";
 
 /**
  * Initializes Sentry if the DSN is defined and this client is running on
