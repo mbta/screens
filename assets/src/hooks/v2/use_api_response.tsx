@@ -2,7 +2,6 @@ import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import * as Sentry from "@sentry/react";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -57,7 +56,7 @@ const doFailureBuffer = (
       // This will trigger until a success API response is received.
       setApiResponse((prevApiResponse) => {
         if (prevApiResponse != null && prevApiResponse.state === "success") {
-          Sentry.captureMessage("Entering no-data state.");
+          // Sentry.captureMessage("Entering no-data state.");
         }
         return apiResponse;
       });
@@ -142,7 +141,7 @@ const useApiResponse = ({
       } else {
         setApiResponse((prevApiResponse) => {
           if (prevApiResponse != null && prevApiResponse.state !== "success") {
-            Sentry.captureMessage("Exiting no-data state.");
+            // Sentry.captureMessage("Exiting no-data state.");
           }
           return apiResponse;
         });

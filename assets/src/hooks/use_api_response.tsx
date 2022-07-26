@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { isDup } from "Util/util";
 import useInterval from "Hooks/use_interval";
 import { useLocation } from "react-router-dom";
-import * as Sentry from "@sentry/react";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -28,7 +27,7 @@ const doFailureBuffer = (
       // This will trigger until a success API response is received.
       setApiResponse((prevApiResponse) => {
         if (prevApiResponse != null && prevApiResponse.success) {
-          Sentry.captureMessage("Entering no-data state.");
+          // Sentry.captureMessage("Entering no-data state.");
         }
         return apiResponse;
       });
@@ -91,7 +90,7 @@ const useApiResponse = ({
         // If the last response was a failure, log that we are no longer failing.
         setApiResponse((prevApiResponse) => {
           if (prevApiResponse != null && !prevApiResponse.success) {
-            Sentry.captureMessage("Exiting no-data state.");
+            // Sentry.captureMessage("Exiting no-data state.");
           }
           return json;
         });
