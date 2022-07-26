@@ -10,6 +10,8 @@ const initSentry = (appString: string) => {
     const dataset = document.getElementById("app")?.dataset ?? {};
     const { sentry: sentryDsn, environmentName: env } = dataset;
 
+    // Note: passing an empty string as the DSN sets up a "no-op SDK" that captures errors and lets you call its methods,
+    // but does not actually log anything to the Sentry service.
     if (sentryDsn && isRealScreen()) {
       Sentry.init({
         dsn: sentryDsn,

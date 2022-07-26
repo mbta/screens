@@ -4,7 +4,11 @@ const useCurrentPage = () => {
   const [page, setPage] = useState(0);
   const [paging, setPaging] = useState(false);
 
-  const mraid = parent?.parent?.mraid;
+  let mraid;
+
+  try {
+    mraid = parent?.parent?.mraid;
+  } catch (_) {}
 
   useEffect(() => {
     if (mraid) {

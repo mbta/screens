@@ -2,3 +2,23 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
 }
+
+.simulation-page {
+  background: #3d5366;
+  height: 100%;
+  .projection {
+    display: grid;
+    grid-template-columns: 280px 280px 280px;
+    background: #2e3f4d;
+    border: 8px solid #2e3f4d;
+    border-radius: 8px;
+    width: 816px;
+    height: 144px;
+
+    & > * {
+      transform-origin: top left;
+      transform: scale(13.33%);
+      margin-right: 24px;
+    }
+  }
+}

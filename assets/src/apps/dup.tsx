@@ -15,6 +15,7 @@ import {
   ScreenPage,
   RotationPage,
   MultiRotationPage,
+  SimulationPage,
 } from "Components/dup/dup_screen_page";
 import { isDup } from "Util/util";
 
@@ -27,6 +28,9 @@ const App = (): JSX.Element => {
         <Switch>
           <Route exact path="/screen/dup">
             <MultiRotationPage screenContainer={ScreenContainer} />
+          </Route>
+          <Route exact path="/screen/:id/simulation">
+            <SimulationPage screenContainer={ScreenContainer} />
           </Route>
           <Route path="/screen/:id/:rotationIndex">
             <ScreenPage screenContainer={ScreenContainer} />
