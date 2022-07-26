@@ -1,6 +1,3 @@
-import initSentry from "Util/sentry";
-initSentry("bus_shelter");
-
 declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/bus_shelter_v2.scss");

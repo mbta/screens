@@ -1,6 +1,3 @@
-import initSentry from "Util/sentry";
-initSentry("dup");
-
 declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../css/dup.scss");

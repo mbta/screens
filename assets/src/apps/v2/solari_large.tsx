@@ -1,6 +1,3 @@
-import initSentry from "Util/sentry";
-initSentry("solari_large");
-
 declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/solari_large_v2.scss");

@@ -1,6 +1,3 @@
-import initSentry from "Util/sentry";
-initSentry("gl_eink_double");
-
 declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../css/gl_eink_double.scss");

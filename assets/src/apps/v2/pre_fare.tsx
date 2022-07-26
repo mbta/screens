@@ -1,6 +1,3 @@
-import initSentry from "Util/sentry";
-initSentry("pre_fare");
-
 declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/pre_fare_v2.scss");
