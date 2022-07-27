@@ -56,6 +56,23 @@ const RotationPage = ({
   );
 };
 
+const SimulationPage = ({
+  screenContainer: ScreenContainer,
+}: {
+  screenContainer: React.ComponentType;
+}): JSX.Element => {
+  const { id } = useParams();
+  return (
+    <div className="simulation-page">
+      <div className="projection">
+        <ScreenContainer id={id} rotationIndex={0} />
+        <ScreenContainer id={id} rotationIndex={1} />
+        <ScreenContainer id={id} rotationIndex={2} />
+      </div>
+    </div>
+  );
+};
+
 const MultiRotationPage = ({
   screenContainer: ScreenContainer,
 }: {
@@ -78,4 +95,4 @@ const MultiRotationPage = ({
   );
 };
 
-export { ScreenPage, RotationPage, MultiRotationPage };
+export { ScreenPage, RotationPage, MultiRotationPage, SimulationPage };
