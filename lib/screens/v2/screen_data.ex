@@ -242,15 +242,18 @@ defmodule Screens.V2.ScreenData do
     {unpaged_layout, instance_map, paging_metadata}
   end
 
-  def get_paged_slots({_layout, instance_map}) do
-    instance_map
-    |> Map.filter(fn
-      {slot_id, _instance} when is_paged_slot_id(slot_id) ->
-        true
+  def get_paged_slots({layout, instance_map}) do
+    paged_instances =
+      instance_map
+      |> Map.filter(fn
+        {slot_id, _instance} when is_paged_slot_id(slot_id) ->
+          true
 
-      _ ->
-        false
-    end)
+        _ ->
+          false
+      end)
+
+    {paged_instances, layout}
   end
 
   defp select_page_index(num_pages, refresh_rate, now) do
@@ -391,7 +394,7 @@ defmodule Screens.V2.ScreenData do
     response(data: data)
   end
 
-  defp serialize_paged_slots(instance_map) do
+  defp serialize_paged_slots({instance_map, layout}) do
     # instance_map looks like:
     # %{{page_index, slot_id} => instance}
 
@@ -415,8 +418,14 @@ defmodule Screens.V2.ScreenData do
         end)
       end)
 
-    # Now we have a list of serialized page data, sorted by page index
-    # [%{slot_id => serialized_instance}]
+      # Now we have a list of serialized page data, sorted by page index
+      # [%{slot_id => serialized_instance}]
+      # We just need to add the type of the containing slot
+      |> Enum.map(fn instance_map ->
+        slot_ids = Map.keys(instance_map)
+        containing_slot_id = get_containing_slot(layout, slot_ids)
+        Map.put(instance_map, :type, containing_slot_id)
+      end)
 
     response(data: serialized_instance_map)
   end
@@ -434,5 +443,34 @@ defmodule Screens.V2.ScreenData do
       force_reload: Keyword.get(fields, :force_reload, false),
       disabled: Keyword.get(fields, :disabled, false)
     }
+  end
+
+  @spec get_containing_slot(Template.layout(), list(Template.non_paged_slot_id())) ::
+          Template.non_paged_slot_id()
+
+  defp get_containing_slot(layout, target_slot_ids)
+
+  defp get_containing_slot(slot_id, _target_slot_ids) when is_slot_id(slot_id) do
+    nil
+  end
+
+  defp get_containing_slot({_slot_id, {layout_type, children}}, target_slot_ids) do
+    # if all children are "leaf nodes", look for the target_slot_id in the children.
+    if Enum.all?(children, &is_slot_id(&1)) do
+      match =
+        children
+        |> Enum.map(&Template.unpage/1)
+        |> MapSet.new()
+        |> MapSet.equal?(MapSet.new(target_slot_ids))
+
+      # if found, return it.
+      # otherwise, go down a level.
+      if match,
+        do: layout_type,
+        else: Enum.find_value(children, &get_containing_slot(&1, target_slot_ids))
+    else
+      # some children are not "leaf nodes". go down a level.
+      Enum.find_value(children, &get_containing_slot(&1, target_slot_ids))
+    end
   end
 end
