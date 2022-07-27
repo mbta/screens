@@ -3,7 +3,7 @@ import {
   LastFetchContext,
   ResponseMapperContext,
 } from "Components/v2/screen_container";
-import Widget from "./widget";
+import Widget, { WidgetData } from "./widget";
 import useSimulationApiResponse, {
   SimulationApiResponse,
 } from "Hooks/v2/use_simulation_api_response";
@@ -19,44 +19,6 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
   const fullPage = responseMapper(apiResponse.fullPage);
   const flexZone = responseMapper(apiResponse.flexZone);
 
-  const renderFlexPage = (page) => {
-    const slots = Object.keys(page);
-
-    if (slots.length === 1) {
-      // E-Ink flex-zones have one medium instead of one large.
-      if (slots[0] === "medium") {
-        return (
-          <div className="flex-one-medium">
-            <div className="flex-one-medium__medium">
-              <Widget data={page[slots[0]]} />
-            </div>
-          </div>
-        );
-      }
-
-      return (
-        <div className="flex-one-large">
-          <div className="flex-one-large__large">
-            <Widget data={page[slots[0]]} />
-          </div>
-        </div>
-      );
-    }
-
-    if (slots.length === 2) {
-      return (
-        <div className="flex-two-medium">
-          <div className="flex-two-medium__left">
-            <Widget data={page[slots[0]]} />
-          </div>
-          <div className="flex-two-medium__right">
-            <Widget data={page[slots[1]]} />
-          </div>
-        </div>
-      );
-    }
-  };
-
   return (
     <div className="simulation-screen-container">
       {apiResponse && (
@@ -65,14 +27,14 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
         </div>
       )}
       <div className="simulation__flex-zone">
-        {flexZone.length &&
-          flexZone.map((flexZonePage: any, index: number) => {
+        {flexZone.length > 0 &&
+          flexZone.map((flexZonePage: WidgetData, index: number) => {
             return (
               <div
                 key={`page${index}`}
                 className="simulation__flex-zone-widget"
               >
-                {renderFlexPage(flexZonePage)}
+                <Widget data={flexZonePage} />
               </div>
             );
           })}
