@@ -86,8 +86,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
         json(conn, ScreenData.disabled_response())
 
       true ->
-        {full_page, flex_zone} = ScreenData.simulation_data_by_screen_id(screen_id)
-        json(conn, %{full_page: full_page, flex_zone: flex_zone})
+        json(conn, ScreenData.simulation_data_by_screen_id(screen_id))
     end
   end
 

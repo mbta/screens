@@ -37,13 +37,16 @@ defmodule Screens.V2.ScreenData do
     config = get_config(screen_id)
     refresh_rate = Parameters.get_refresh_rate(config)
 
-    config
-    |> fetch_data()
-    |> resolve_paging(refresh_rate)
-    |> serialize()
+    data =
+      config
+      |> fetch_data()
+      |> resolve_paging(refresh_rate)
+      |> serialize()
+
+    response(data: data)
   end
 
-  @spec simulation_data_by_screen_id(screen_id()) :: {response_map(), response_map()}
+  @spec simulation_data_by_screen_id(screen_id()) :: response_map()
   def simulation_data_by_screen_id(screen_id) do
     config = get_config(screen_id)
     refresh_rate = Parameters.get_refresh_rate(config)
@@ -52,7 +55,7 @@ defmodule Screens.V2.ScreenData do
     full_page_data = screen_data |> resolve_paging(refresh_rate) |> serialize()
     paged_slot_data = screen_data |> get_paged_slots() |> serialize_paged_slots()
 
-    {full_page_data, paged_slot_data}
+    response(data: %{full_page: full_page_data, flex_zone: paged_slot_data})
   end
 
   @spec fetch_data(Screens.Config.Screen.t()) :: {Template.layout(), selected_instances_map()}
@@ -383,15 +386,14 @@ defmodule Screens.V2.ScreenData do
 
   @spec serialize(
           {Template.non_paged_layout(), non_paged_selected_instances_map(), paging_metadata()}
-        ) :: response_map()
+        ) :: map() | nil
   def serialize({layout, instance_map, paging_metadata}) do
     serialized_instance_map =
       instance_map
       |> Enum.map(fn {slot_id, instance} -> {slot_id, serialize_instance_with_type(instance)} end)
       |> Enum.into(%{})
 
-    data = Template.position_widget_instances(layout, serialized_instance_map, paging_metadata)
-    response(data: data)
+    Template.position_widget_instances(layout, serialized_instance_map, paging_metadata)
   end
 
   defp serialize_paged_slots({instance_map, layout}) do
@@ -401,33 +403,30 @@ defmodule Screens.V2.ScreenData do
     # we want:
     # %{page_index => %{slot_id => instance}}
 
-    serialized_instance_map =
-      instance_map
-      |> Enum.group_by(
-        fn {paged_slot_id, _} -> Template.get_page(paged_slot_id) end,
-        fn {paged_slot_id, instance} -> {Template.unpage(paged_slot_id), instance} end
-      )
-      # %{page_index => [{slot_id, instance}]}
-      |> Enum.map(fn {page_index, instances} -> {page_index, Map.new(instances)} end)
-      # %{page_index => %{slot_id => instance}}
-      |> Enum.sort_by(fn {page_index, _} -> page_index end)
-      # [{page_index, %{slot_id => instance}}]
-      |> Enum.map(fn {_page_index, page_data} ->
-        Enum.into(page_data, %{}, fn {slot_id, instance} ->
-          {slot_id, serialize_instance_with_type(instance)}
-        end)
+    instance_map
+    |> Enum.group_by(
+      fn {paged_slot_id, _} -> Template.get_page(paged_slot_id) end,
+      fn {paged_slot_id, instance} -> {Template.unpage(paged_slot_id), instance} end
+    )
+    # %{page_index => [{slot_id, instance}]}
+    |> Enum.map(fn {page_index, instances} -> {page_index, Map.new(instances)} end)
+    # %{page_index => %{slot_id => instance}}
+    |> Enum.sort_by(fn {page_index, _} -> page_index end)
+    # [{page_index, %{slot_id => instance}}]
+    |> Enum.map(fn {_page_index, page_data} ->
+      Enum.into(page_data, %{}, fn {slot_id, instance} ->
+        {slot_id, serialize_instance_with_type(instance)}
       end)
+    end)
 
-      # Now we have a list of serialized page data, sorted by page index
-      # [%{slot_id => serialized_instance}]
-      # We just need to add the type of the containing slot
-      |> Enum.map(fn instance_map ->
-        slot_ids = Map.keys(instance_map)
-        containing_slot_id = get_containing_slot(layout, slot_ids)
-        Map.put(instance_map, :type, containing_slot_id)
-      end)
-
-    response(data: serialized_instance_map)
+    # Now we have a list of serialized page data, sorted by page index
+    # [%{slot_id => serialized_instance}]
+    # We just need to add the type of the containing slot
+    |> Enum.map(fn instance_map ->
+      slot_ids = Map.keys(instance_map)
+      containing_slot_id = get_containing_slot(layout, slot_ids)
+      Map.put(instance_map, :type, containing_slot_id)
+    end)
   end
 
   defp serialize_instance_with_type(instance) do
