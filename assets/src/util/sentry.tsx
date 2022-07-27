@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/react";
+import * as Sentry from "@sentry/browser";
 import { isRealScreen } from "Util/util";
 
 /**
