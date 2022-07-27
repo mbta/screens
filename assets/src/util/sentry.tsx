@@ -17,7 +17,6 @@ const initSentry = (appString: string) => {
   });
 
   Sentry.captureMessage(`Sentry intialized for app: ${appString}`);
-
 };
 
 export default initSentry;
