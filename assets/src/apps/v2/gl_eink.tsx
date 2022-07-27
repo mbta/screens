@@ -69,6 +69,7 @@ const FAILURE_LAYOUT = DISABLED_LAYOUT;
 const responseMapper: ResponseMapper = (apiResponse) => {
   switch (apiResponse.state) {
     case "success":
+    case "simulation_success":
       return apiResponse.data;
     case "disabled":
       return DISABLED_LAYOUT;
@@ -89,9 +90,7 @@ const App = (): JSX.Element => {
         </Route>
         <Route exact path="/v2/screen/:id/simulation">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <ResponseMapperContext.Provider value={responseMapper}>
-              <SimulationScreenPage />
-            </ResponseMapperContext.Provider>
+            <SimulationScreenPage />
           </MappingContext.Provider>
         </Route>
         <Route path="/v2/screen/:id">
