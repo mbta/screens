@@ -2,10 +2,7 @@ import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-// import * as Sentry from "@sentry/react";
-// import * as Sentry from "@sentry/browser";
-import Raven from "raven-js";
-Raven.config("https://45a59d5eb11a418f857e838eb4d6e73d@o89189.ingest.sentry.io/6061747").install();
+import * as Sentry from "@sentry/react";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -60,7 +57,7 @@ const doFailureBuffer = (
       // This will trigger until a success API response is received.
       setApiResponse((prevApiResponse) => {
         if (prevApiResponse != null && prevApiResponse.state === "success") {
-          Raven.captureMessage("Entering no-data state.");
+          Sentry.captureMessage("Entering no-data state.");
         }
         return apiResponse;
       });
@@ -145,7 +142,7 @@ const useApiResponse = ({
       } else {
         setApiResponse((prevApiResponse) => {
           if (prevApiResponse != null && prevApiResponse.state !== "success") {
-            Raven.captureMessage("Exiting no-data state.");
+            Sentry.captureMessage("Exiting no-data state.");
           }
           return apiResponse;
         });
