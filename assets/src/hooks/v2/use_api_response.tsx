@@ -91,7 +91,7 @@ const doFailureBuffer = (
     if (elapsedMs >= MINUTE_IN_MS) {
       // This will trigger until a success API response is received.
       setApiResponse((prevApiResponse) => {
-        if (prevApiResponse != null && prevApiResponse.state === "success") {
+        if (isSuccess(prevApiResponse)) {
           Sentry.captureMessage("Entering no-data state.");
         }
         return apiResponse;
@@ -99,6 +99,9 @@ const doFailureBuffer = (
     }
   }
 };
+
+const isSuccess = (response: ApiResponse) =>
+  response != null && response.state === "success";
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -174,8 +177,10 @@ const useBaseApiResponse = ({
         doFailureBuffer(lastSuccess, setApiResponse, apiResponse);
       } else {
         setApiResponse((prevApiResponse) => {
-          // Prevent on simulation_success
-          if (prevApiResponse != null && prevApiResponse.state !== "success") {
+          if (
+            !isSuccess(prevApiResponse) &&
+            prevApiResponse.state !== "simulation_success"
+          ) {
             Sentry.captureMessage("Exiting no-data state.");
           }
           return apiResponse;
