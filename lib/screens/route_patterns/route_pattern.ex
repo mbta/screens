@@ -24,14 +24,16 @@ defmodule Screens.RoutePatterns.RoutePattern do
         }
 
   def stops_by_route_and_direction(route_id, direction_id) do
-    with {:ok, route_patterns} <- V3Api.get_json("route_patterns", %{
-        "filter[route]" => route_id,
-        "filter[direction_id]" => direction_id,
-        "sort" => "typicality",
-        "include" => "representative_trip.stops"
-      }),
-      parsed_result when parsed_result != :error <- RoutePatterns.Parser.parse_result(route_patterns, route_id) do
-        {:ok, parsed_result}
+    with {:ok, route_patterns} <-
+           V3Api.get_json("route_patterns", %{
+             "filter[route]" => route_id,
+             "filter[direction_id]" => direction_id,
+             "sort" => "typicality",
+             "include" => "representative_trip.stops"
+           }),
+         parsed_result when parsed_result != :error <-
+           RoutePatterns.Parser.parse_result(route_patterns, route_id) do
+      {:ok, parsed_result}
     else
       :error -> :error
     end
