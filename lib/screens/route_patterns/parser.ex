@@ -63,7 +63,9 @@ defmodule Screens.RoutePatterns.Parser do
 
     case parsed do
       # If `trip` is present, but the stop array is empty, there's a problem with the trip in the API
-      [] -> :error
+      [] -> 
+        Logger.warn("Trip data doesn't contain stop ids. trip_id: #{trip_id}")
+        :error
       _ -> parsed
     end
   end
