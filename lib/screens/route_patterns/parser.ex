@@ -55,8 +55,16 @@ defmodule Screens.RoutePatterns.Parser do
          },
          included_data
        ) do
-    included_data
+    # The only way this function output an empty array is if the trip data has an empty stop list
+    # This happens occasionally in dev-green
+    parsed = included_data
     |> Map.get({"trip", trip_id})
     |> Enum.map(fn stop_id -> Map.get(included_data, {"stop", stop_id}) end)
+
+    case parsed do
+      # If `trip` is present, but the stop array is empty, there's a problem with the trip in the API
+      [] -> :error
+      _ -> parsed
+    end
   end
 end
