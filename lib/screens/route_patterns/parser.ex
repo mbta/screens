@@ -1,9 +1,16 @@
 defmodule Screens.RoutePatterns.Parser do
   @moduledoc false
 
+  require Logger
+
   def parse_result(%{"data" => data, "included" => included}, route_id) do
     included_data = parse_included_data(included)
     parse_data(data, included_data, route_id)
+  end
+
+  def parse_result(_, _) do
+    Logger.warn("Unrecognized format of route_pattern data.")
+    :error
   end
 
   defp parse_included_data(data) do
