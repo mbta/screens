@@ -101,7 +101,8 @@ const doFailureBuffer = (
 };
 
 const isSuccess = (response: ApiResponse) =>
-  response != null && response.state === "success";
+  response != null &&
+  ["success", "simulation_success"].includes(response.state);
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -177,10 +178,7 @@ const useBaseApiResponse = ({
         doFailureBuffer(lastSuccess, setApiResponse, apiResponse);
       } else {
         setApiResponse((prevApiResponse) => {
-          if (
-            !isSuccess(prevApiResponse) &&
-            prevApiResponse.state !== "simulation_success"
-          ) {
+          if (!isSuccess(prevApiResponse)) {
             Sentry.captureMessage("Exiting no-data state.");
           }
           return apiResponse;
