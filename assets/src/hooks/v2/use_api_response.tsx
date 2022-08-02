@@ -12,15 +12,32 @@ interface RawResponse {
   disabled: boolean;
 }
 
+interface SimulationRawResponse {
+  data: {
+    full_page: WidgetData;
+    flex_zone: WidgetData[];
+  };
+  force_reload: boolean;
+  disabled: boolean;
+}
+
 type ApiResponse =
   // The request was successful.
   | { state: "success"; data: WidgetData }
+  | { state: "simulation_success"; data: SimulationApiResponse }
   // The request was successful, but this screen is currently disabled via config.
   | { state: "disabled" }
   // Either:
   // - The request failed.
   // - The server responded, but did not successfully fetch data. Riders may still be able to find data from other sources.
   | { state: "failure" };
+
+type SimulationApiResponse =
+  // The request was successful.
+  {
+    fullPage: WidgetData;
+    flexZone: WidgetData[];
+  };
 
 const FAILURE_RESPONSE: ApiResponse = { state: "failure" };
 
@@ -37,9 +54,27 @@ const rawResponseToApiResponse = ({
   }
 };
 
+const rawResponseToSimulationApiResponse = ({
+  data,
+  disabled,
+}: SimulationRawResponse): ApiResponse => {
+  if (disabled) {
+    return { state: "disabled" };
+  } else if (data != null) {
+    return {
+      state: "simulation_success",
+      data: {
+        fullPage: data.full_page,
+        flexZone: data.flex_zone,
+      },
+    };
+  } else {
+    return { state: "failure" };
+  }
+};
+
 const doFailureBuffer = (
   lastSuccess: number | null,
-  failureModeElapsedMs: number,
   setApiResponse: React.Dispatch<React.SetStateAction<ApiResponse>>,
   apiResponse: ApiResponse = FAILURE_RESPONSE
 ) => {
@@ -50,13 +85,13 @@ const doFailureBuffer = (
   } else {
     const elapsedMs = Date.now() - lastSuccess;
 
-    if (elapsedMs < failureModeElapsedMs) {
+    if (elapsedMs < MINUTE_IN_MS) {
       setApiResponse((state) => state);
     }
-    if (elapsedMs >= failureModeElapsedMs) {
+    if (elapsedMs >= MINUTE_IN_MS) {
       // This will trigger until a success API response is received.
       setApiResponse((prevApiResponse) => {
-        if (prevApiResponse != null && prevApiResponse.state === "success") {
+        if (isSuccess(prevApiResponse)) {
           Sentry.captureMessage("Entering no-data state.");
         }
         return apiResponse;
@@ -64,6 +99,10 @@ const doFailureBuffer = (
     }
   }
 };
+
+const isSuccess = (response: ApiResponse) =>
+  response != null &&
+  ["success", "simulation_success"].includes(response.state);
 
 const useQuery = () => {
   return new URLSearchParams(useLocation().search);
@@ -86,6 +125,8 @@ const useScreenSideParam = () => {
 interface UseApiResponseArgs {
   id: string;
   failureModeElapsedMs?: number;
+  routePart?: string;
+  responseHandler?: (json: any) => ApiResponse;
 }
 
 interface UseApiResponseReturn {
@@ -94,9 +135,10 @@ interface UseApiResponseReturn {
   lastSuccess: number | null;
 }
 
-const useApiResponse = ({
+const useBaseApiResponse = ({
   id,
-  failureModeElapsedMs = MINUTE_IN_MS,
+  routePart = "",
+  responseHandler = rawResponseToApiResponse,
 }: UseApiResponseArgs): UseApiResponseReturn => {
   const isRealScreenParam = useIsRealScreenParam();
   const screenSideParam = useScreenSideParam();
@@ -111,7 +153,7 @@ const useApiResponse = ({
   } = document.getElementById("app").dataset;
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
-  const apiPath = `/v2/api/screen/${id}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}`;
+  const apiPath = `/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}`;
 
   if (screenIdsWithOffsetMap) {
     const screens = JSON.parse(screenIdsWithOffsetMap);
@@ -124,24 +166,19 @@ const useApiResponse = ({
     try {
       const now = Date.now();
       const result = await fetch(apiPath);
-      const json = (await result.json()) as RawResponse;
+      const json = await result.json();
 
       if (json.force_reload) {
         window.location.reload();
       }
 
-      const apiResponse = rawResponseToApiResponse(json);
+      const apiResponse = responseHandler(json);
 
       if (apiResponse.state == "failure") {
-        doFailureBuffer(
-          lastSuccess,
-          failureModeElapsedMs,
-          setApiResponse,
-          apiResponse
-        );
+        doFailureBuffer(lastSuccess, setApiResponse, apiResponse);
       } else {
         setApiResponse((prevApiResponse) => {
-          if (prevApiResponse != null && prevApiResponse.state !== "success") {
+          if (!isSuccess(prevApiResponse)) {
             Sentry.captureMessage("Exiting no-data state.");
           }
           return apiResponse;
@@ -149,7 +186,7 @@ const useApiResponse = ({
         setLastSuccess(now);
       }
     } catch (err) {
-      doFailureBuffer(lastSuccess, failureModeElapsedMs, setApiResponse);
+      doFailureBuffer(lastSuccess, setApiResponse);
     }
 
     setRequestCount((count) => count + 1);
@@ -172,5 +209,20 @@ const useApiResponse = ({
   return { apiResponse, requestCount, lastSuccess };
 };
 
+const useApiResponse = ({ id }) =>
+  useBaseApiResponse({
+    id,
+    routePart: "",
+    responseHandler: rawResponseToApiResponse,
+  });
+
+const useSimulationApiResponse = ({ id }) =>
+  useBaseApiResponse({
+    id,
+    routePart: "/simulation",
+    responseHandler: rawResponseToSimulationApiResponse,
+  });
+
 export default useApiResponse;
-export { ApiResponse };
+export { ApiResponse, SimulationApiResponse };
+export { useSimulationApiResponse };
