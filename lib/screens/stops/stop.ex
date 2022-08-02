@@ -126,11 +126,11 @@ defmodule Screens.Stops.Stop do
     {"place-sumav", {"Summit Avenue", "Summit Ave"}},
     {"place-bndhl", {"Brandon Hall", "Brandon Hll"}},
     {"place-fbkst", {"Fairbanks Street", "Fairbanks"}},
-    {"place-bcnwa", {"Wash Sq", "Washington"}},
+    {"place-bcnwa", {"Washington Square", "Washington"}},
     {"place-tapst", {"Tappan Street", "Tappan St"}},
     {"place-denrd", {"Dean Road", "Dean Rd"}},
     {"place-engav", {"Englewood Avenue", "Englew'd Av"}},
-    {"place-clmnl", {"Clvlnd Circ", "Clvlnd Cir"}}
+    {"place-clmnl", {"Cleveland Circle", "Clvlnd Cir"}}
   ]
 
   @green_line_d_stops [
