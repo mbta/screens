@@ -9,13 +9,14 @@ import { getDataset } from "Util/dataset";
 const initSentry = (appString: string) => {
   const { sentry: sentryDsn, environmentName: env } = getDataset();
 
-  if (sentryDsn && isRealScreen()) {
-    Sentry.init({
-      dsn: sentryDsn,
-      environment: env,
-    });
-    Sentry.captureMessage(`Sentry intialized for app: ${appString}`);
-  }
+  // Note: passing an empty string as the DSN sets up a "no-op SDK" that captures errors and lets you call its methods,
+  // but does not actually log anything to the Sentry service.
+  Sentry.init({
+    dsn: sentryDsn && isRealScreen() ? sentryDsn : "",
+    environment: env,
+  });
+
+  Sentry.captureMessage(`Sentry intialized for app: ${appString}`);
 };
 
 export default initSentry;

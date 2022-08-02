@@ -262,20 +262,16 @@ defmodule Screens.V2.ScreenDataTest do
       paging_metadata = %{flex_zone: {1, 3}, footer: {0, 2}}
 
       expected = %{
-        data: %{
-          type: :normal,
-          main_content: %{type: :departures, content: []},
-          flex_zone: %{
-            type: :two_medium,
-            page_index: 1,
-            num_pages: 3,
-            medium_left: %{type: :static_image, content: "face_covering.png"},
-            medium_right: %{type: :static_image, content: "autopay.png"}
-          },
-          footer: %{type: :normal_footer, page_index: 0, num_pages: 2, content: "fare info"}
+        type: :normal,
+        main_content: %{type: :departures, content: []},
+        flex_zone: %{
+          type: :two_medium,
+          page_index: 1,
+          num_pages: 3,
+          medium_left: %{type: :static_image, content: "face_covering.png"},
+          medium_right: %{type: :static_image, content: "autopay.png"}
         },
-        force_reload: false,
-        disabled: false
+        footer: %{type: :normal_footer, page_index: 0, num_pages: 2, content: "fare info"}
       }
 
       assert expected == ScreenData.serialize({layout, selected_widgets, paging_metadata})
