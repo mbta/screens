@@ -44,6 +44,7 @@ import DeparturesNoData from "Components/v2/bus_shelter/departures_no_data";
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/bus_shelter/alert";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
+import { fetchDatasetValue } from "Util/dataset";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -94,12 +95,8 @@ const blinkConfig: BlinkConfig = {
 };
 
 const audioConfig: AudioConfig = {
-  intervalOffsetSeconds: parseInt(
-    document.getElementById("app").dataset.audioIntervalOffsetSeconds
-  ),
-  readoutIntervalMinutes: parseInt(
-    document.getElementById("app").dataset.audioReadoutInterval
-  ),
+  intervalOffsetSeconds: parseInt(fetchDatasetValue("audioIntervalOffsetSeconds")),
+  readoutIntervalMinutes: parseInt(fetchDatasetValue("audioReadoutInterval")),
 };
 
 const App = (): JSX.Element => {

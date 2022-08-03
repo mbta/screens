@@ -5,6 +5,7 @@ import ScreenContainer, {
   ResponseMapperContext,
 } from "Components/v2/screen_container";
 import { MappingContext } from "Components/v2/widget";
+import { fetchDatasetValue } from "Util/dataset";
 
 const MultiScreenPage = ({
   components,
@@ -13,9 +14,7 @@ const MultiScreenPage = ({
   components: any;
   responseMapper?: ResponseMapper;
 }) => {
-  const screenIds = JSON.parse(
-    document.getElementById("app").dataset.screenIdsWithOffsetMap
-  );
+  const screenIds = JSON.parse(fetchDatasetValue("screenIdsWithOffsetMap"));
 
   return (
     <div className="multi-screen-page">
