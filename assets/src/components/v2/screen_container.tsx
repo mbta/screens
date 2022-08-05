@@ -17,7 +17,6 @@ type ResponseMapper = (
 ) => WidgetData | SimulationApiResponse;
 
 const defaultResponseMapper: ResponseMapper = (apiResponse) => {
-  console.log(apiResponse);
   switch (apiResponse.state) {
     case "success":
       return apiResponse.data;
