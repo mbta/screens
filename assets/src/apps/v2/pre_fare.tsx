@@ -14,6 +14,7 @@ import {
   ResponseMapperContext,
   BlinkConfig,
   BlinkConfigContext,
+  LOADING_LAYOUT,
 } from "Components/v2/screen_container";
 import { MappingContext } from "Components/v2/widget";
 import Viewport from "Components/v2/pre_fare/viewport";
@@ -36,6 +37,7 @@ import FullLineMap from "Components/v2/full_line_map";
 import SubwayStatus from "Components/v2/subway_status";
 import ReconstructedAlert from "Components/v2/reconstructed_alert";
 import NoData from "Components/v2/pre_fare/no_data";
+import PageLoadNoData from "Components/v2/pre_fare/page_load_no_data";
 import ReconstructedTakeover from "Components/v2/reconstructed_takeover";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
@@ -58,6 +60,7 @@ const TYPE_TO_COMPONENT = {
   full_line_map: FullLineMap,
   subway_status: SubwayStatus,
   no_data: NoData,
+  page_load_no_data: PageLoadNoData,
   reconstructed_large_alert: ReconstructedAlert,
   reconstructed_takeover: ReconstructedTakeover,
 };
@@ -81,6 +84,8 @@ const responseMapper: ResponseMapper = (apiResponse) => {
       return DISABLED_LAYOUT;
     case "failure":
       return FAILURE_LAYOUT;
+    case "loading":
+      return LOADING_LAYOUT;
   }
 };
 
