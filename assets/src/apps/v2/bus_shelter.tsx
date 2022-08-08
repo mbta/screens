@@ -16,6 +16,7 @@ import {
   BlinkConfigContext,
   AudioConfigContext,
   AudioConfig,
+  LOADING_LAYOUT,
 } from "Components/v2/screen_container";
 import { MappingContext } from "Components/v2/widget";
 
@@ -45,6 +46,7 @@ import { FlexZoneAlert, FullBodyAlert } from "Components/v2/bus_shelter/alert";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import { fetchDatasetValue } from "Util/dataset";
+import PageLoadNoData from "Components/v2/lcd/page_load_no_data";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -64,6 +66,7 @@ const TYPE_TO_COMPONENT = {
   evergreen_content: EvergreenContent,
   survey: Survey,
   no_data: NoData,
+  page_load_no_data: PageLoadNoData,
   departures_no_data: DeparturesNoData,
 };
 
@@ -86,6 +89,8 @@ const responseMapper: ResponseMapper = (apiResponse) => {
       return DISABLED_LAYOUT;
     case "failure":
       return FAILURE_LAYOUT;
+    case "loading":
+      return LOADING_LAYOUT;
   }
 };
 
@@ -95,7 +100,9 @@ const blinkConfig: BlinkConfig = {
 };
 
 const audioConfig: AudioConfig = {
-  intervalOffsetSeconds: parseInt(fetchDatasetValue("audioIntervalOffsetSeconds")),
+  intervalOffsetSeconds: parseInt(
+    fetchDatasetValue("audioIntervalOffsetSeconds")
+  ),
   readoutIntervalMinutes: parseInt(fetchDatasetValue("audioReadoutInterval")),
 };
 
