@@ -31,7 +31,8 @@ type ApiResponse =
   // Either:
   // - The request failed.
   // - The server responded, but did not successfully fetch data. Riders may still be able to find data from other sources.
-  | { state: "failure" };
+  | { state: "failure" }
+  | { state: "loading" };
 
 type SimulationApiResponse =
   // The request was successful.
@@ -41,6 +42,7 @@ type SimulationApiResponse =
   };
 
 const FAILURE_RESPONSE: ApiResponse = { state: "failure" };
+const LOADING_RESPONSE: ApiResponse = { state: "loading" };
 
 const rawResponseToApiResponse = ({
   data,
@@ -81,8 +83,8 @@ const doFailureBuffer = (
 ) => {
   if (lastSuccess == null) {
     // We haven't had a successful request since initial page load.
-    // Continue showing the initial "no data" state.
-    setApiResponse((state) => state);
+    // Show the "no data" state.
+    setApiResponse(FAILURE_RESPONSE);
   } else {
     const elapsedMs = Date.now() - lastSuccess;
 
@@ -134,7 +136,7 @@ const useBaseApiResponse = ({
 }: UseApiResponseArgs): UseApiResponseReturn => {
   const isRealScreenParam = getIsRealScreenParam();
   const screenSideParam = getScreenSideParam();
-  const [apiResponse, setApiResponse] = useState<ApiResponse>(FAILURE_RESPONSE);
+  const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const {
