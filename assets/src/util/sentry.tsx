@@ -1,6 +1,16 @@
 import { isRealScreen } from "Util/util";
 import Raven from "raven-js";
 
+// https://docs.sentry.io/clients/javascript/usage/#raven-js-additional-context
+type LogLevel = "info" | "warning" | "error";
+
+const log = (message: string, level: LogLevel) => {
+  Raven.captureMessage(message, {level});
+};
+const info = (message: string) => log(message, "info");
+const warn = (message: string) => log(message, "warning");
+const error = (message: string) => log(message, "error");
+
 /**
  * Initializes Sentry if the DSN is defined and this client is running on
  * a real production screen.
@@ -14,8 +24,9 @@ const initSentry = (appString: string) => {
 
   if (sentryDsn && isRealScreen()) {
     Raven.config(sentryDsn, {environment: env}).install();
-    Raven.captureMessage(`Sentry intialized for app: ${appString}`, {level: "info"});
+    info(`Sentry intialized for app: ${appString}`)
   }
 };
 
 export default initSentry;
+export {info, warn, error}
