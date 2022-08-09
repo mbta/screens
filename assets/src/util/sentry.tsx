@@ -1,4 +1,6 @@
 import { isRealScreen } from "Util/util";
+// Previously tried @sentry/react and @sentry/browser as the SDK, but the QtWeb browser on e-inks could not 
+// use them. Raven is an older stable SDK that better works with older browsers.
 import Raven from "raven-js";
 
 // https://docs.sentry.io/clients/javascript/usage/#raven-js-additional-context
