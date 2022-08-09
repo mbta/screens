@@ -39,9 +39,13 @@
 
   .simulation__flex-zone-widget {
     width: 256px;
-    height: 145px;
+    height: 144px;
     margin-top: auto;
     margin-bottom: auto;
+
+    &:last-child {
+      margin-right: 8px;
+    }
 
     &:not(:last-child) {
       margin-right: 24px;

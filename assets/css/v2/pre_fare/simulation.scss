@@ -38,10 +38,14 @@
   }
 
   .simulation__flex-zone-widget {
-    width: 270px;
-    height: 145px;
+    width: 256px;
+    height: 144px;
     margin-top: auto;
     margin-bottom: auto;
+
+    &:last-child {
+      margin-right: 8px;
+    }
 
     &:not(:last-child) {
       margin-right: 24px;
@@ -49,14 +53,17 @@
 
     .flex-one-large,
     .flex-two-medium {
-      & > * {
-        width: 1080px;
-        height: 628px;
-        transform-origin: top left;
-        transform: scale(25%);
+      transform-origin: top left;
+      transform: scale(25%);
 
+      & > * {
+        position: unset;
+
+        // Pre-Fare flex-zones are a little weird.
+        // For some reason, the subway status has margins that throw off the positioning in the sim.
+        // Removing margins in the widget fixes it.
         & > * {
-          margin: auto;
+          margin: 0;
         }
       }
     }
