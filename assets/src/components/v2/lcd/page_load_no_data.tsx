@@ -1,5 +1,5 @@
-import NoConnection from "Components/v2/bundled_svg/no_connection";
 import React, { ComponentType } from "react";
+import LoadingHourglass from "Components/v2/bundled_svg/loading_hourglass";
 
 const coolBlack = "#171F26";
 
@@ -7,9 +7,9 @@ const PageLoadNoData: ComponentType = () => {
   return (
     <div className="page-load-no-data-container">
       <div className="no-data__main-content">
-        <div className="page-load-no-data__main-content__no-connection-icon-container">
-          <NoConnection
-            className="page-load-no-data__main-content__no-connection-icon"
+        <div className="page-load-no-data__main-content__loading-hourglass-container">
+          <LoadingHourglass
+            className="page-load-no-data__main-content__loading-hourglass-icon"
             colorHex={coolBlack}
           />
         </div>

@@ -1,7 +1,7 @@
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
-import NoConnection from "Components/v2/bundled_svg/no_connection";
 import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
+import LoadingHourglass from "Components/v2/bundled_svg/loading_hourglass";
 
 const PageLoadNoData: ComponentType = () => {
   return (
@@ -21,9 +21,9 @@ const PageLoadNoData: ComponentType = () => {
           </div>
         </div>
         <div className="page-load-no-data__main-content">
-          <div className="page-load-no-data__main-content__no-connection-icon-container">
-            <NoConnection
-              className="page-load-no-data__main-content__no-connection-icon"
+          <div className="page-load-no-data__main-content__loading-hourglass-icon-container">
+            <LoadingHourglass
+              className="page-load-no-data__main-content__loading-hourglass-icon"
               colorHex="#000000"
             />
           </div>
