@@ -60,10 +60,11 @@
         position: unset;
 
         // Pre-Fare flex-zones are a little weird.
-        // For some reason, the subway status has margins that throw off the positioning in the sim.
-        // Removing margins in the widget fixes it.
+        // For some reason, some widgets have padding or margin that throw off the positioning in the sim.
+        // Removing margin and padding in the widget fixes it.
         & > * {
           margin: 0;
+          padding: 0;
         }
       }
     }
