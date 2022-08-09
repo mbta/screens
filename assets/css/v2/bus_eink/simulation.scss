@@ -23,22 +23,30 @@
     margin-top: auto;
     margin-bottom: auto;
     border-radius: 8px;
+    height: 316px;
+    border-radius: 0 8px 8px 0;
   }
 
   .simulation__flex-zone-widget {
     width: 300px;
     height: 286px;
+    margin-top: auto;
+    margin-bottom: auto;
+
+    &:last-child {
+      margin-right: 8px;
+    }
 
     &:not(:last-child) {
       margin-right: 24px;
     }
 
     .flex-one-medium {
+      transform-origin: top left;
+      transform: scale(25%);
+
       & > * {
-        width: 1200px;
-        height: 1164px;
-        transform-origin: top left;
-        transform: scale(25%);
+        position: unset;
       }
     }
   }
