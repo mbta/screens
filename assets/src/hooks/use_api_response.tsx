@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { isDup } from "Util/util";
+import { isDup, isRealScreen } from "Util/util";
 import useInterval from "Hooks/use_interval";
-import { useLocation } from "react-router-dom";
+import { getDatasetValue } from "Util/dataset";
 import * as SentryLogger from "Util/sentry";
 
 const MINUTE_IN_MS = 60_000;
@@ -36,12 +36,8 @@ const doFailureBuffer = (
   }
 };
 
-const useQuery = () => {
-  return new URLSearchParams(useLocation().search);
-};
-
 const useIsRealScreenParam = () => {
-  return isDup() || useQuery().get("is_real_screen") === "true"
+  return isRealScreen()
     ? "&is_real_screen=true"
     : "";
 };
@@ -65,7 +61,7 @@ const useApiResponse = ({
 }: UseApiResponseArgs) => {
   const [apiResponse, setApiResponse] = useState<object | null>(null);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
-  const lastRefresh = document.getElementById("app")?.dataset.lastRefresh;
+  const lastRefresh = getDatasetValue("lastRefresh");
   const isRealScreenParam = useIsRealScreenParam();
 
   const apiPath = buildApiPath({

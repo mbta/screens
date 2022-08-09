@@ -1,4 +1,5 @@
 import { isRealScreen } from "Util/util";
+import { getDataset } from "Util/dataset";
 // Previously tried @sentry/react and @sentry/browser as the SDK, but the QtWeb browser on e-inks could not 
 // use them. Raven is an older stable SDK that better works with older browsers.
 import Raven from "raven-js";
@@ -18,8 +19,7 @@ const error = (message: string) => log(message, "error");
  * a real production screen.
  */
 const initSentry = (appString: string) => {
-  const dataset = document.getElementById("app")?.dataset ?? {};
-  const { sentry: sentryDsn, environmentName: env } = dataset;
+  const { sentry: sentryDsn, environmentName: env } = getDataset();
 
   // Note: passing an empty string as the DSN sets up a "no-op SDK" that captures errors and lets you call its methods,
   // but does not actually log anything to the Sentry service.

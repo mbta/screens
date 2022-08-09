@@ -43,6 +43,8 @@ import DeparturesNoData from "Components/v2/bus_shelter/departures_no_data";
 
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/bus_shelter/alert";
 import MultiScreenPage from "Components/v2/multi_screen_page";
+import SimulationScreenPage from "Components/v2/simulation_screen_page";
+import { fetchDatasetValue } from "Util/dataset";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -78,6 +80,7 @@ const FAILURE_LAYOUT = DISABLED_LAYOUT;
 const responseMapper: ResponseMapper = (apiResponse) => {
   switch (apiResponse.state) {
     case "success":
+    case "simulation_success":
       return apiResponse.data;
     case "disabled":
       return DISABLED_LAYOUT;
@@ -92,12 +95,8 @@ const blinkConfig: BlinkConfig = {
 };
 
 const audioConfig: AudioConfig = {
-  intervalOffsetSeconds: parseInt(
-    document.getElementById("app").dataset.audioIntervalOffsetSeconds
-  ),
-  readoutIntervalMinutes: parseInt(
-    document.getElementById("app").dataset.audioReadoutInterval
-  ),
+  intervalOffsetSeconds: parseInt(fetchDatasetValue("audioIntervalOffsetSeconds")),
+  readoutIntervalMinutes: parseInt(fetchDatasetValue("audioReadoutInterval")),
 };
 
 const App = (): JSX.Element => {
@@ -109,6 +108,11 @@ const App = (): JSX.Element => {
             components={TYPE_TO_COMPONENT}
             responseMapper={responseMapper}
           />
+        </Route>
+        <Route exact path="/v2/screen/:id/simulation">
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <SimulationScreenPage />
+          </MappingContext.Provider>
         </Route>
         <Route path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
