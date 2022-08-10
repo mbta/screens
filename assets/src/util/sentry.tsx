@@ -1,4 +1,4 @@
-import { isRealScreen } from "Util/util";
+import { isDup, isRealScreen } from "Util/util";
 import { getDataset } from "Util/dataset";
 // Previously tried @sentry/react and @sentry/browser as the SDK, but the QtWeb browser on e-inks could not 
 // use them. Raven is an older stable SDK that better works with older browsers.
@@ -26,7 +26,14 @@ const initSentry = (appString: string) => {
 
   if (sentryDsn && isRealScreen()) {
     Raven.config(sentryDsn, {environment: env}).install();
-    info(`Sentry intialized for app: ${appString}`)
+    if (isDup()) {
+      const today = new Date()
+      const hour = today.getHours()
+      const min = today.getMinutes();
+      if (hour === 8 && min >= 0 && min < 10) info(`Sentry intialized for app: ${appString}`)
+    } else {
+      info(`Sentry intialized for app: ${appString}`)
+    }
   }
 };
 
