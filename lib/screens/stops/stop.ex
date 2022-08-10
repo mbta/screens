@@ -1,5 +1,12 @@
 defmodule Screens.Stops.Stop do
-  @moduledoc false
+  @moduledoc """
+  This file handles involves stop-related fetching / enrichment.
+  For a while, all stop-related data was fetched from the API, until we needed to provide consistent
+  abbreviations in the reconstructed alert. Now it's valuable to have a local copy of these stop sequences.
+  A lot of our code still collects these sequences from the API, though, whether in functions here
+  or in functions in `route_pattern.ex` (see fetch_parent_station_sequences_through_stop).
+  So there's inconsistent use of this local data.
+  """
 
   alias Screens.Routes
   alias Screens.Stops.StationsWithRoutesAgent
@@ -208,6 +215,10 @@ defmodule Screens.Stops.Stop do
     "Green" => [@green_line_trunk_stops]
   }
 
+  
+
+  # --- These functions involve the API ---
+
   def fetch_parent_station_name_map(get_json_fn \\ &V3Api.get_json/2) do
     case get_json_fn.("stops", %{
            "filter[location_type]" => 1
@@ -285,6 +296,8 @@ defmodule Screens.Stops.Stop do
     end
   end
 
+  # --- END API functions ---
+
   def stop_on_route?(stop_id, stop_sequence) when not is_nil(stop_id) do
     Enum.any?(stop_sequence, fn {station_id, _} -> station_id == stop_id end)
   end
@@ -292,6 +305,8 @@ defmodule Screens.Stops.Stop do
   def to_stop_index(%{stop: stop_id}, stop_sequence) do
     Enum.find_index(stop_sequence, fn {station_id, _} -> station_id == stop_id end)
   end
+
+  # --- These use the local version of the stop_sequences from the top of this file ---
 
   @doc """
   Finds a stop sequence which contains all stations in informed_entities.
@@ -334,5 +349,14 @@ defmodule Screens.Stops.Stop do
     |> Enum.flat_map(fn x -> x end)
     |> Enum.uniq()
     |> Enum.into(%{})
+  end
+
+  def get_all_routes_stop_sequence() do
+    @route_stop_sequences
+  end
+
+  def get_all_subway_stops() do
+    @blue_line_stops ++ @orange_line_stops ++ @red_line_trunk_stops ++ @red_line_ashmont_branch_stops ++
+    @red_line_braintree_branch_stops ++ @green_line_b_stops ++ @green_line_c_stops ++ @green_line_d_stops ++ @green_line_e_stops ++ @green_line_trunk_stops
   end
 end

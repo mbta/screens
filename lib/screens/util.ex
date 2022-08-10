@@ -135,4 +135,18 @@ defmodule Screens.Util do
     |> List.update_at(length(list) - 1, &"and #{&1}")
     |> Enum.join(", ")
   end
+
+  @doc """
+  Takes route id, returns route type. 
+  Not the favorite way of getting route type, but useful for property testing.
+  """
+  @spec route_type_from_id(String.t()) :: atom()
+  def route_type_from_id("Green-" <> _), do: :light_rail
+  def route_type_from_id("Mattapan" <> _), do: :light_rail
+  def route_type_from_id("Red"), do: :subway
+  def route_type_from_id("Orange"), do: :subway
+  def route_type_from_id("Blue"), do: :subway
+  def route_type_from_id("CR-" <> _), do: :commuter_rail
+  def route_type_from_id("Boat-" <> _), do: :ferry
+  def route_type_from_id(_), do: :bus
 end
