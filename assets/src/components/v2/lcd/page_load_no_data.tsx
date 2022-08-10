@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import LoadingHourglass from "Components/v2/bundled_svg/loading_hourglass";
+import Loading from "Components/v2/bundled_svg/loading";
 
 const coolBlack = "#171F26";
 
@@ -7,15 +7,17 @@ const PageLoadNoData: ComponentType = () => {
   return (
     <div className="page-load-no-data-container">
       <div className="no-data__main-content">
-        <div className="page-load-no-data__main-content__loading-hourglass-container">
-          <LoadingHourglass
-            className="page-load-no-data__main-content__loading-hourglass-icon"
+        <div className="page-load-no-data__main-content__loading-icon-container">
+          <Loading
+            className="page-load-no-data__main-content__loading-icon"
             colorHex={coolBlack}
           />
         </div>
-        <div className="page-load-no-data__main-content__text">
-          <p>Loading...</p>
-          <p>This should only take a moment</p>
+        <div className="page-load-no-data__main-content__heading">
+          Loading...
+        </div>
+        <div className="page-load-no-data__main-content__subheading">
+          This should only take a moment.
         </div>
       </div>
     </div>

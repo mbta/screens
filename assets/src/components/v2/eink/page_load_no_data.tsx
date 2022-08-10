@@ -1,7 +1,7 @@
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
 import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
-import LoadingHourglass from "Components/v2/bundled_svg/loading_hourglass";
+import Loading from "Components/v2/bundled_svg/loading";
 
 const PageLoadNoData: ComponentType = () => {
   return (
@@ -21,9 +21,9 @@ const PageLoadNoData: ComponentType = () => {
           </div>
         </div>
         <div className="page-load-no-data__main-content">
-          <div className="page-load-no-data__main-content__loading-hourglass-icon-container">
-            <LoadingHourglass
-              className="page-load-no-data__main-content__loading-hourglass-icon"
+          <div className="page-load-no-data__main-content__loading-icon-container">
+            <Loading
+              className="page-load-no-data__main-content__loading-icon"
               colorHex="#000000"
             />
           </div>
