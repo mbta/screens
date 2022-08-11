@@ -189,8 +189,8 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   }
 };
 
-const ScreenContainer = ({ id, rotationIndex }): JSX.Element => {
-  const apiResponse = useApiResponse({ id, rotationIndex });
+const ScreenContainer = ({ id, rotationIndex, refreshMs }): JSX.Element => {
+  const apiResponse = useApiResponse({ id, rotationIndex, refreshMs });
 
   return <ScreenLayout apiResponse={apiResponse} />;
 };

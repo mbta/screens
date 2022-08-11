@@ -37,9 +37,7 @@ const doFailureBuffer = (
 };
 
 const useIsRealScreenParam = () => {
-  return isRealScreen()
-    ? "&is_real_screen=true"
-    : "";
+  return isRealScreen() ? "&is_real_screen=true" : "";
 };
 
 interface UseApiResponseArgs {
