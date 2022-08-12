@@ -1,4 +1,5 @@
 import React from "react";
+import { getDatasetValue } from "Util/dataset";
 
 import { classWithModifier, formatTimeString, imagePath } from "Util/util";
 import { DUP_VERSION } from "./version";
@@ -34,8 +35,7 @@ const Header = ({
   color,
   code,
 }): JSX.Element => {
-  const environmentName =
-    document.getElementById("app").dataset.environmentName;
+  const environmentName = getDatasetValue("environmentName");
 
   const className = color
     ? classWithModifier("header", `color-${color}`)

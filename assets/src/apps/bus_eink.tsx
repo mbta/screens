@@ -1,3 +1,6 @@
+import initSentry from "Util/sentry";
+initSentry("bus_eink");
+
 declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../css/bus_eink.scss");

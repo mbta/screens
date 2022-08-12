@@ -1,21 +1,29 @@
 # Script to find connecting routes for stops along a given route pattern.
 # Used to determine which connections should be shown on vehicle screens.
 #
-# Example usage: API_V3_KEY=<your_key_here> mix run scripts/connecting_routes.exs --route-pattern Orange-3-0
+# Edited on 06/23/22 to get stop data from the trips endpoint instead of route_patterns, so that we can use a date filter.
+# The date filter is necessary to get service for a particular rating (even when both old/new ratings are in prod)
+#
+# TODO: Now that the date filter is added, we can get the old and new ratings at the same time and compare them automatically instead of manually.
+# TODO: The script is largely correct, but there were a couple oddities... For example: CR-Foxboro was left out as a current transfer option at South Station
+# but that trip still seems to be running. Why was it left out?
+#
+# Example usage: API_V3_KEY=<your_key_here> mix run scripts/connecting_routes.exs --route-pattern Orange-3-0 --service-date 2022-06-25
 
 {opts, _, _ } =
   System.argv()
-  |> OptionParser.parse(strict: [route_pattern: :string])
+  |> OptionParser.parse(strict: [route_pattern: :string, service_date: :string])
 
 route_pattern_id = Keyword.get(opts, :route_pattern)
+service_date = Keyword.get(opts, :service_date)
 api_v3_key = System.get_env("API_V3_KEY")
 
-url = "https://api-v3.mbta.com/route_patterns/#{route_pattern_id}?include=representative_trip.stops.parent_station.connecting_stops,representative_trip.stops.parent_station.child_stops"
 headers = [{"x-api-key", api_v3_key}]
-{:ok, %{status_code: 200, body: body}} = HTTPoison.get(url, headers)
+
+{:ok, %{status_code: 200, body: body}} = HTTPoison.get("https://api-v3.mbta.com/trips?filter[route_pattern]=#{route_pattern_id}&filter[date]=#{service_date}&include=stops.parent_station.connecting_stops,stops.parent_station.child_stops", headers)
 {:ok, parsed} = Jason.decode(body)
 
-%{"data" => data, "included" => included} = parsed
+%{"included" => included} = parsed
 
 included_stops =
   included
@@ -23,14 +31,13 @@ included_stops =
   |> Enum.map(fn %{"id" => id} = stop -> {id, stop} end)
   |> Enum.into(%{})
 
-representative_trip_id = Kernel.get_in(data, ["relationships", "representative_trip", "data", "id"])
-representative_trip = Enum.find(included, fn %{"id" => id, "type" => type} -> id == representative_trip_id && type == "trip" end)
-route_pattern_stop_data = Kernel.get_in(representative_trip, ["relationships", "stops", "data"])
-route_pattern_stop_ids = Enum.map(route_pattern_stop_data, fn %{"id" => id} -> id end)
-route_pattern_station_ids = Enum.map(route_pattern_stop_ids, fn stop_id ->
-  Kernel.get_in(included_stops, [stop_id, "relationships", "parent_station", "data", "id"])
-end)
+route_pattern_station_ids = 
+  included
+  |> Enum.filter(fn %{"relationships" => relationships} -> Map.has_key?(relationships, "connecting_stops") end)
+  |> Enum.map(fn %{"id" => id} -> id end)
 
+# This bit makes sense for us: we need all the routes for all stops at this station
+# including child stops and nearby stops (called connecting stops)
 transfer_stops_by_station = Enum.map(route_pattern_station_ids, fn station_id ->
   station = Map.get(included_stops, station_id)
 
@@ -57,6 +64,7 @@ transfer_stops_by_station = Enum.map(route_pattern_station_ids, fn station_id ->
   stops = connecting_stops ++ child_stops
   {station_id, Enum.map(stops, fn %{"id" => id} -> id end)}
 end)
+|> Enum.sort()
 
 transfer_stop_list = Enum.flat_map(transfer_stops_by_station, fn {_station_id, stops} -> stops end)
 

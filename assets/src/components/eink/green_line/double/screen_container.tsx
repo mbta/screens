@@ -15,7 +15,6 @@ import TakeoverScreenLayout from "Components/eink/takeover_screen_layout";
 import useApiResponse from "Hooks/use_api_response";
 
 import { EINK_REFRESH_MS } from "Constants";
-import useSentry from "Hooks/use_sentry";
 import NoConnectionTop from "Components/eink/no_connection_top";
 import NoConnectionBottom from "Components/eink/no_connection_bottom";
 
@@ -140,7 +139,6 @@ const NoConnectionScreenLayout = (): JSX.Element => {
 };
 
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
-  useSentry();
   switch (true) {
     case !apiResponse || apiResponse.success === false:
       return <NoConnectionScreenLayout />;

@@ -66,7 +66,7 @@ defmodule Screens.Stops.Stop do
     {"place-sstat", {"South Station", "South Sta"}},
     {"place-brdwy", {"Broadway", "Broadway"}},
     {"place-andrw", {"Andrew", "Andrew"}},
-    {"place-jfk", {"JFK/Umass", "JFK/Umass"}}
+    {"place-jfk", {"JFK/UMass", "JFK/UMass"}}
   ]
 
   @red_line_ashmont_branch_stops [
@@ -126,11 +126,11 @@ defmodule Screens.Stops.Stop do
     {"place-sumav", {"Summit Avenue", "Summit Ave"}},
     {"place-bndhl", {"Brandon Hall", "Brandon Hll"}},
     {"place-fbkst", {"Fairbanks Street", "Fairbanks"}},
-    {"place-bcnwa", {"Wash Sq", "Washington"}},
+    {"place-bcnwa", {"Washington Square", "Washington"}},
     {"place-tapst", {"Tappan Street", "Tappan St"}},
     {"place-denrd", {"Dean Road", "Dean Rd"}},
     {"place-engav", {"Englewood Avenue", "Englew'd Av"}},
-    {"place-clmnl", {"Clvlnd Circ", "Clvlnd Cir"}}
+    {"place-clmnl", {"Cleveland Circle", "Clvlnd Cir"}}
   ]
 
   @green_line_d_stops [
@@ -301,13 +301,27 @@ defmodule Screens.Stops.Stop do
     Enum.find(stop_sequences, &sequence_match?(&1, informed_entities))
   end
 
+  def get_route_stop_sequence(route_id) do
+    @route_stop_sequences
+    |> Map.get(route_id)
+    |> Enum.flat_map(fn x -> x end)
+    |> Enum.map(fn {k, _v} -> k end)
+    |> Enum.uniq()
+  end
+
   defp sequence_match?(stop_sequence, informed_entities) do
-    stations =
+    ie_stops =
       informed_entities
       |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-      |> Enum.filter(&String.starts_with?(&1, "place-"))
+      |> Enum.reject(&is_nil/1)
 
-    Enum.all?(stations, &stop_on_route?(&1, stop_sequence))
+    if Enum.empty?(ie_stops) do
+      nil
+    else
+      ie_stops
+      |> Enum.filter(&String.starts_with?(&1, "place-"))
+      |> Enum.all?(&stop_on_route?(&1, stop_sequence))
+    end
   end
 
   def gl_trunk_stops do

@@ -1,10 +1,17 @@
 defmodule Screens.V3Api do
   @moduledoc false
 
+  use Retry.Annotation
+
   require Logger
 
-  @default_opts [timeout: 2000, recv_timeout: 2000, hackney: [pool: :api_v3_pool]]
+  @default_opts [
+    timeout: 2000,
+    recv_timeout: 2000,
+    hackney: [pool: :api_v3_pool, checkout_timeout: 4000]
+  ]
 
+  @retry with: Stream.take(constant_backoff(500), 3), atoms: [:bad_response_code]
   def get_json(
         route,
         params \\ %{},
@@ -39,7 +46,9 @@ defmodule Screens.V3Api do
         :not_modified
 
       {:response_success, %{status_code: status_code}} = response ->
-        log_api_error({:bad_response_code, response}, status_code: status_code)
+        _ = log_api_error({:bad_response_code, response}, status_code: status_code)
+
+        :bad_response_code
 
       {:parse, {:error, e}} ->
         log_api_error({:parse_error, e})

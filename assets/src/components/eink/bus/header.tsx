@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
+import { getDatasetValue } from "Util/dataset";
 
 import { classWithModifier, formatTimeString, imagePath } from "Util/util";
 
@@ -17,8 +18,7 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
     }
   });
 
-  const environmentName =
-    document.getElementById("app").dataset.environmentName;
+  const environmentName = getDatasetValue("environmentName");
 
   return (
     <div className="header">

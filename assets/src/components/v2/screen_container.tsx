@@ -5,15 +5,21 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import useApiResponse, { ApiResponse } from "Hooks/v2/use_api_response";
+import useApiResponse, {
+  ApiResponse,
+  SimulationApiResponse,
+} from "Hooks/v2/use_api_response";
 import Widget, { WidgetData } from "Components/v2/widget";
 import useAudioReadout from "Hooks/v2/use_audio_readout";
 
-type ResponseMapper = (apiResponse: ApiResponse) => WidgetData;
+type ResponseMapper = (
+  apiResponse: ApiResponse
+) => WidgetData | SimulationApiResponse;
 
 const defaultResponseMapper: ResponseMapper = (apiResponse) => {
   switch (apiResponse.state) {
     case "success":
+    case "simulation_success":
       return apiResponse.data;
     case "disabled":
     case "failure":

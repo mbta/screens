@@ -1,9 +1,6 @@
 name: Deploy to dev
 
-on:
-  workflow_dispatch:
-  push:
-    branches: [master]
+on: workflow_dispatch
 
 jobs:
   deploy:
@@ -30,6 +27,12 @@ jobs:
         uses: mbta/actions/eb-ecr-dockerrun@v1
         with:
           docker-tag: ${{ steps.build-push.outputs.docker-tag }}
+      - name: Upload source map
+        run: bash upload_assets.sh ${{ steps.build-push.outputs.docker-tag }}
+        env:
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Deploy to EB
         uses: mbta/beanstalk-deploy@v18
         with:

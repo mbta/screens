@@ -10,7 +10,6 @@ import useOutfrontStation from "Hooks/use_outfront_station";
 import useCurrentPage from "Hooks/use_current_dup_page";
 
 import { formatTimeString, classWithModifier, imagePath } from "Util/util";
-import useSentry from "Hooks/use_sentry";
 
 const LinkArrow = ({ width, color }) => {
   const height = 40;
@@ -190,9 +189,8 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   }
 };
 
-const ScreenContainer = ({ id, rotationIndex }): JSX.Element => {
-  const apiResponse = useApiResponse({ id, rotationIndex });
-  useSentry();
+const ScreenContainer = ({ id, rotationIndex, refreshMs }): JSX.Element => {
+  const apiResponse = useApiResponse({ id, rotationIndex, refreshMs });
 
   return <ScreenLayout apiResponse={apiResponse} />;
 };

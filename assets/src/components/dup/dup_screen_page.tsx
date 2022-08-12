@@ -5,6 +5,8 @@ import useOutfrontStation from "Hooks/use_outfront_station";
 import { ROTATION_INDEX } from "./rotation_index";
 import { NoDataLayout } from "Components/dup/screen_container";
 import { isDup } from "Util/util";
+import { fetchDatasetValue } from "Util/dataset";
+import { DUP_SIMULATION_REFRESH_MS } from "Constants";
 
 const DupScreenPage = ({
   screenContainer: ScreenContainer,
@@ -56,14 +58,41 @@ const RotationPage = ({
   );
 };
 
+const SimulationPage = ({
+  screenContainer: ScreenContainer,
+}: {
+  screenContainer: React.ComponentType;
+}): JSX.Element => {
+  const { id } = useParams();
+  return (
+    <div className="simulation-page">
+      <div className="projection">
+        <ScreenContainer
+          id={id}
+          rotationIndex={0}
+          refreshMs={DUP_SIMULATION_REFRESH_MS}
+        />
+        <ScreenContainer
+          id={id}
+          rotationIndex={1}
+          refreshMs={DUP_SIMULATION_REFRESH_MS}
+        />
+        <ScreenContainer
+          id={id}
+          rotationIndex={2}
+          refreshMs={DUP_SIMULATION_REFRESH_MS}
+        />
+      </div>
+    </div>
+  );
+};
+
 const MultiRotationPage = ({
   screenContainer: ScreenContainer,
 }: {
   screenContainer: React.ComponentType;
 }): JSX.Element => {
-  const screenIds = JSON.parse(
-    document.getElementById("app").dataset.screenIds
-  );
+  const screenIds = JSON.parse(fetchDatasetValue("screenIds")) as string[];
 
   return (
     <div className="rotation-page">
@@ -78,4 +107,4 @@ const MultiRotationPage = ({
   );
 };
 
-export { ScreenPage, RotationPage, MultiRotationPage };
+export { ScreenPage, RotationPage, MultiRotationPage, SimulationPage };

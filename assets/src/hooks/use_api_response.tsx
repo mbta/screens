@@ -1,36 +1,43 @@
 import { useEffect, useState } from "react";
-import { isDup } from "Util/util";
+import { isDup, isRealScreen } from "Util/util";
 import useInterval from "Hooks/use_interval";
-import { useLocation } from "react-router-dom";
+import { getDatasetValue } from "Util/dataset";
+import * as SentryLogger from "Util/sentry";
 
 const MINUTE_IN_MS = 60_000;
 
 const FAILURE_RESPONSE = { success: false };
 
 const doFailureBuffer = (
-  lastSuccess: number,
+  lastSuccess: number | null,
   failureModeElapsedMs: number,
   setApiResponse: React.Dispatch<React.SetStateAction<object>>,
   apiResponse: object = FAILURE_RESPONSE
 ) => {
-  const elapsedMs = Date.now() - lastSuccess;
-
-  if (elapsedMs < failureModeElapsedMs) {
+  if (lastSuccess == null) {
+    // We haven't had a successful request since initial page load.
+    // Continue showing the initial "no data" state.
     setApiResponse((state) => state);
-  }
-  if (elapsedMs >= failureModeElapsedMs) {
-    setApiResponse(apiResponse);
-  }
-};
+  } else {
+    const elapsedMs = Date.now() - lastSuccess;
 
-const useQuery = () => {
-  return new URLSearchParams(useLocation().search);
+    if (elapsedMs < failureModeElapsedMs) {
+      setApiResponse((state) => state);
+    }
+    if (elapsedMs >= failureModeElapsedMs) {
+      // This will trigger until a success API response is received.
+      setApiResponse((prevApiResponse) => {
+        if (prevApiResponse != null && prevApiResponse.success) {
+          SentryLogger.info("Entering no-data state.");
+        }
+        return apiResponse;
+      });
+    }
+  }
 };
 
 const useIsRealScreenParam = () => {
-  return isDup() || useQuery().get("is_real_screen") === "true"
-    ? "&is_real_screen=true"
-    : "";
+  return isRealScreen() ? "&is_real_screen=true" : "";
 };
 
 interface UseApiResponseArgs {
@@ -51,8 +58,8 @@ const useApiResponse = ({
   failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs) => {
   const [apiResponse, setApiResponse] = useState<object | null>(null);
-  const [lastSuccess, setLastSuccess] = useState<number>(Date.now());
-  const lastRefresh = document.getElementById("app")?.dataset.lastRefresh;
+  const [lastSuccess, setLastSuccess] = useState<number | null>(null);
+  const lastRefresh = getDatasetValue("lastRefresh");
   const isRealScreenParam = useIsRealScreenParam();
 
   const apiPath = buildApiPath({
@@ -75,7 +82,13 @@ const useApiResponse = ({
       if (withWatchdog) updateSolariWatchdog();
 
       if (json.success) {
-        setApiResponse(json);
+        // If the last response was a failure, log that we are no longer failing.
+        setApiResponse((prevApiResponse) => {
+          if (prevApiResponse != null && !prevApiResponse.success) {
+            SentryLogger.info("Exiting no-data state.");
+          }
+          return json;
+        });
         setLastSuccess(now);
       } else {
         doFailureBuffer(

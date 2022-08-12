@@ -3,16 +3,24 @@ import { useEffect, useState } from "react";
 const useOutfrontTags = () => {
   const [tags, setTags] = useState(null);
 
-  useEffect(() => {
-    if (parent?.parent?.mraid ?? false) {
-      try {
-        const rawTags = parent.parent.mraid.getTags();
-        setTags(JSON.parse(rawTags).tags);
-      } catch (err) {
-        setTags(null);
+  let mraid;
+
+  try {
+    mraid = parent?.parent?.mraid;
+  } catch (_) {}
+
+  if (mraid) {
+    useEffect(() => {
+      if (parent?.parent?.mraid ?? false) {
+        try {
+          const rawTags = parent.parent.mraid.getTags();
+          setTags(JSON.parse(rawTags).tags);
+        } catch (err) {
+          setTags(null);
+        }
       }
-    }
-  }, [parent?.parent?.mraid]);
+    }, [parent?.parent?.mraid]);
+  }
 
   return tags;
 };
