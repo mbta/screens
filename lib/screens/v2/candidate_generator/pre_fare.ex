@@ -25,6 +25,11 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
             body_normal: [
               {:body_left,
                %{
+                 body_left_normal: [:main_content_left],
+                 body_left_takeover: [:full_body_left]
+               }},
+              {:body_right,
+               %{
                  body_right_normal: [
                    Builder.with_paging(
                      {:upper_right,
@@ -37,11 +42,6 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
                    :lower_right
                  ],
                  body_right_takeover: [:full_body_right]
-               }},
-              {:body_right,
-               %{
-                 body_left_normal: [:main_content_left],
-                 body_left_takeover: [:full_body_left]
                }}
             ],
             body_takeover: [:full_body]
