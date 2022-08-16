@@ -28,7 +28,9 @@ defmodule ScreensWeb.V2.Audio.BlueBikesView do
   end
 
   defp render_station(%{status: :out_of_service} = station) do
-    ~E|<s>The bike station at <%= station.name %> is currently not in service</s>|
+    ~E|
+    <s>The bike station at <%= station.name %> is currently not in service</s>
+    |
   end
 end
 
