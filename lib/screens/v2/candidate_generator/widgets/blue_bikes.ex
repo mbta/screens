@@ -1,10 +1,10 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.BlueBikes do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.PreFare
-  alias Screens.Config.V2.BlueBikes, as: BlueBikesConfig
   alias Screens.BlueBikes, as: BlueBikesData
+  alias Screens.Config.Screen
+  alias Screens.Config.V2.BlueBikes, as: BlueBikesConfig
+  alias Screens.Config.V2.PreFare
   alias Screens.V2.WidgetInstance.BlueBikes, as: BlueBikesWidget
 
   def blue_bikes_instances(config, fetch_statuses_fn \\ &BlueBikesData.get_station_statuses/1)

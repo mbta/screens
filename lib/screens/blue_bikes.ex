@@ -2,8 +2,8 @@ defmodule Screens.BlueBikes do
   @moduledoc """
   Provides real-time data about BlueBikes stations.
   """
-  alias Screens.BlueBikes.StationStatus
   alias Screens.BlueBikes.State
+  alias Screens.BlueBikes.StationStatus
 
   @type t :: %__MODULE__{
           stations_by_id: %{station_id => StationStatus.t()}

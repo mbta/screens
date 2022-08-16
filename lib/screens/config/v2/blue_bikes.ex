@@ -1,8 +1,8 @@
 defmodule Screens.Config.V2.BlueBikes do
   @moduledoc false
 
-  alias Screens.V2.WidgetInstance
   alias Screens.Config.V2.BlueBikes.Station
+  alias Screens.V2.WidgetInstance
 
   @type t :: %__MODULE__{
           enabled: boolean(),

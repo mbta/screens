@@ -1,4 +1,6 @@
 defmodule Screens.BlueBikes.ClientBehaviour do
+  @moduledoc false
+
   @callback fetch_station_information() :: {:ok, map()} | :error
   @callback fetch_station_status() :: {:ok, map()} | :error
 end
@@ -33,9 +35,8 @@ defmodule Screens.BlueBikes.Client do
 
   defp do_fetch(url) do
     with {:ok, response} <- request(url),
-         {:ok, body} <- check_response(response),
-         {:ok, decoded} <- decode_body(body) do
-      {:ok, decoded}
+         {:ok, body} <- check_response(response) do
+      decode_body(body)
     end
   end
 
@@ -88,6 +89,8 @@ defmodule Screens.BlueBikes.Client do
 end
 
 defmodule Screens.BlueBikes.FakeClient do
+  @moduledoc false
+
   @behaviour Screens.BlueBikes.ClientBehaviour
 
   @response %{"data" => %{"stations" => []}, "last_updated" => 0}

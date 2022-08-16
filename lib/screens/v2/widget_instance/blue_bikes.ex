@@ -2,10 +2,10 @@ defmodule Screens.V2.WidgetInstance.BlueBikes do
   @moduledoc """
   A widget that displays real-time info about nearby BlueBikes stations.
   """
-  alias Screens.Config.Screen
-  alias Screens.BlueBikes.StationStatus
-  alias Screens.Config.V2.PreFare
   alias Screens.BlueBikes
+  alias Screens.BlueBikes.StationStatus
+  alias Screens.Config.Screen
+  alias Screens.Config.V2.PreFare
 
   @type t :: %__MODULE__{
           screen: Screen.t(),

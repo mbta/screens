@@ -105,23 +105,7 @@ defmodule Screens.BlueBikes.State do
 
     # Asynchronously update state so that the server is not blocked while waiting for the request to complete.
     # If an error occurs during fetching/parsing, no problem. We'll try again soon.
-    _ =
-      Task.start(fn ->
-        case fetch_data() do
-          {:ok, stations_data, new_info_last_updated, new_status_last_updated} ->
-            if new_info_last_updated > info_last_updated or
-                 new_status_last_updated > status_last_updated do
-              put_state(pid, %__MODULE__{
-                data: stations_data,
-                info_last_updated: new_info_last_updated,
-                status_last_updated: new_status_last_updated
-              })
-            end
-
-          :error ->
-            nil
-        end
-      end)
+    _ = Task.start(fn -> fetch_and_put(pid, info_last_updated, status_last_updated) end)
 
     {:noreply, state}
   end
@@ -130,6 +114,23 @@ defmodule Screens.BlueBikes.State do
     with {:ok, station_information} <- @api_client.fetch_station_information(),
          {:ok, station_status} <- @api_client.fetch_station_status() do
       Parser.parse(station_information, station_status)
+    end
+  end
+
+  defp fetch_and_put(pid, info_last_updated, status_last_updated) do
+    case fetch_data() do
+      {:ok, stations_data, new_info_last_updated, new_status_last_updated} ->
+        if new_info_last_updated > info_last_updated or
+             new_status_last_updated > status_last_updated do
+          put_state(pid, %__MODULE__{
+            data: stations_data,
+            info_last_updated: new_info_last_updated,
+            status_last_updated: new_status_last_updated
+          })
+        end
+
+      :error ->
+        nil
     end
   end
 end
