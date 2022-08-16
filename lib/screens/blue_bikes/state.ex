@@ -83,16 +83,25 @@ defmodule Screens.BlueBikes.State do
   end
 
   @impl true
-  def handle_info(:refresh, state) do
+  def handle_info(:refresh, %__MODULE__{} = state) do
     schedule_refresh(self())
 
-    pid = self()
+    continue = {:do_refresh, state.info_last_updated, state.status_last_updated}
 
-    {info_last_updated, status_last_updated} =
-      case state do
-        %__MODULE__{} -> {state.info_last_updated, state.status_last_updated}
-        :error -> {0, 0}
-      end
+    {:noreply, state, {:continue, continue}}
+  end
+
+  def handle_info(:refresh, :error) do
+    schedule_refresh(self())
+
+    continue = {:do_refresh, 0, 0}
+
+    {:noreply, :error, {:continue, continue}}
+  end
+
+  @impl true
+  def handle_continue({:do_refresh, info_last_updated, status_last_updated}, state) do
+    pid = self()
 
     # Asynchronously update state so that the server is not blocked while waiting for the request to complete.
     # If an error occurs during fetching/parsing, no problem. We'll try again soon.
