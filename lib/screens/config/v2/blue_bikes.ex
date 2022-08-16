@@ -4,13 +4,15 @@ defmodule Screens.Config.V2.BlueBikes do
   alias Screens.V2.WidgetInstance
 
   @type t :: %__MODULE__{
-          nearby_dock_ids: list(String.t()),
+          enabled: boolean(),
+          nearby_station_ids: list(String.t()),
           destination: String.t() | nil,
           minutes_to_destination: pos_integer() | nil,
           priority: WidgetInstance.priority()
         }
 
-  defstruct nearby_dock_ids: [],
+  defstruct enabled: false,
+            nearby_station_ids: [],
             destination: nil,
             minutes_to_destination: nil,
             priority: [99]
