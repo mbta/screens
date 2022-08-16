@@ -6,17 +6,24 @@ defmodule Screens.Config.V2.ShuttleBusInfo do
   @type t :: %__MODULE__{
           eta: String.t(),
           destination: String.t(),
-          direction: String.t(),
+          arrow: arrow(),
           priority: WidgetInstance.priority()
         }
 
-  @enforce_keys [:eta, :destination, :direction, :priority]
+  @type arrow :: :n | :ne | :e | :se | :s | :sw | :w | :nw | nil
+
+  @enforce_keys [:eta, :destination, :arrow, :priority]
   defstruct eta: nil,
             destination: nil,
-            direction: nil,
+            arrow: nil,
             priority: nil
 
   use Screens.Config.Struct
+
+  for arrow <- ~w[n ne e se s sw w nw nil]a do
+    arrow_string = Atom.to_string(arrow)
+    defp value_from_json("arrow", unquote(arrow_string)), do: unquote(arrow)
+  end
 
   defp value_from_json(_, value), do: value
 

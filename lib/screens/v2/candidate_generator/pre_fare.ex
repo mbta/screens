@@ -109,7 +109,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
             shuttle_bus_info: %ShuttleBusInfo{
               eta: eta,
               destination: destination,
-              direction: direction,
+              arrow: arrow,
               priority: priority
             }
           }
@@ -120,7 +120,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         screen: config,
         eta: eta,
         destination: destination,
-        direction: direction,
+        arrow: arrow,
         priority: priority
       }
     ]

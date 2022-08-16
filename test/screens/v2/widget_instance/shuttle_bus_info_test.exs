@@ -4,7 +4,6 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
   alias Screens.V2.WidgetInstance
   alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance.ShuttleBusInfo
-  alias Screens.Config.V2.Schedule
 
   setup do
     %{
@@ -16,10 +15,9 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
           name: nil,
           app_id: :pre_fare_v2
         },
-        slot_names: [:large],
         eta: "35-45",
         destination: "Test Station",
-        direction: "north",
+        arrow: :n,
         priority: [2, 3, 1]
       },
       widget_not_pre_fare: %ShuttleBusInfo{
@@ -29,7 +27,11 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
           device_id: nil,
           name: nil,
           app_id: :bus_shelter_v2
-        }
+        },
+        eta: "35-45",
+        destination: "Test Station",
+        arrow: :n,
+        priority: [2, 3, 1]
       }
     }
   end
@@ -45,14 +47,14 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
       assert %{
                eta: "35-45",
                destination: "Test Station",
-               direction: "north"
+               arrow: :n
              } == WidgetInstance.serialize(widget)
     end
   end
 
   describe "slot_names/1" do
     test "returns slot names defined on the struct", %{widget: widget} do
-      assert [:large] == WidgetInstance.slot_names(widget)
+      assert [:tbd] == WidgetInstance.slot_names(widget)
     end
   end
 

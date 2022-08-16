@@ -2,27 +2,28 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
   @moduledoc false
 
   alias Screens.Config.Screen
+  alias Screens.Config.V2.ShuttleBusInfo
   alias Screens.V2.WidgetInstance
 
-  @enforce_keys ~w[screen eta destination direction priority]a
+  @enforce_keys ~w[screen eta destination arrow priority]a
   defstruct screen: nil,
             eta: nil,
             destination: nil,
-            direction: nil,
+            arrow: nil,
             priority: nil
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
           eta: String.t(),
           destination: String.t(),
-          direction: String.t(),
+          arrow: atom(),
           priority: WidgetInstance.priority()
         }
 
   def priority(instance), do: instance.priority
 
-  def serialize(%__MODULE__{eta: eta, destination: destination}),
-    do: %{eta: eta, destination: destination}
+  def serialize(%__MODULE__{eta: eta, destination: destination, arrow: arrow}),
+    do: %{eta: eta, destination: destination, arrow: arrow}
 
   def widget_type(_instance), do: :shuttle_bus_info
 
