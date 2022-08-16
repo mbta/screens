@@ -36,6 +36,14 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
 
   def slot_names(_instance), do: [:tbd]
 
+  def audio_serialize(instance), do: serialize(instance)
+
+  def audio_sort_key(_instance), do: [2]
+
+  def audio_valid_candidate?(_instance), do: true
+
+  def audio_view(_instance), do: ScreensWeb.V2.Audio.ShuttleBusInfoView
+
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.ShuttleBusInfo
 
@@ -44,9 +52,9 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
     def slot_names(instance), do: ShuttleBusInfo.slot_names(instance)
     def widget_type(instance), do: ShuttleBusInfo.widget_type(instance)
     def valid_candidate?(instance), do: ShuttleBusInfo.valid_candidate?(instance)
-    def audio_serialize(_instance), do: %{}
-    def audio_sort_key(_instance), do: [0]
-    def audio_valid_candidate?(_instance), do: false
-    def audio_view(_instance), do: ScreensWeb.V2.Audio.ShuttleBusInfoView
+    def audio_serialize(instance), do: ShuttleBusInfo.audio_serialize(instance)
+    def audio_sort_key(instance), do: ShuttleBusInfo.audio_sort_key(instance)
+    def audio_valid_candidate?(instance), do: ShuttleBusInfo.audio_valid_candidate?(instance)
+    def audio_view(instance), do: ShuttleBusInfo.audio_view(instance)
   end
 end
