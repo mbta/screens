@@ -48,27 +48,27 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
                        },
                        body_right: %{
                          body_right_normal: [
-                           {{0, :upper_right},
+                           :upper_right,
+                           {{0, :lower_right},
                             %{
                               one_large: [{0, :large}],
                               two_medium: [{0, :medium_left}, {0, :medium_right}]
                             }},
-                           {{1, :upper_right},
+                           {{1, :lower_right},
                             %{
                               one_large: [{1, :large}],
                               two_medium: [{1, :medium_left}, {1, :medium_right}]
                             }},
-                           {{2, :upper_right},
+                           {{2, :lower_right},
                             %{
                               one_large: [{2, :large}],
                               two_medium: [{2, :medium_left}, {2, :medium_right}]
                             }},
-                           {{3, :upper_right},
+                           {{3, :lower_right},
                             %{
                               one_large: [{3, :large}],
                               two_medium: [{3, :medium_left}, {3, :medium_right}]
-                            }},
-                           :lower_right
+                            }}
                          ],
                          body_right_takeover: [:full_body_right]
                        }
