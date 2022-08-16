@@ -7,15 +7,15 @@ defmodule Screens.Config.V2.BlueBikes do
   @type t :: %__MODULE__{
           enabled: boolean(),
           stations: list(Station.t()),
-          destination: String.t() | nil,
-          minutes_to_destination: pos_integer() | nil,
+          destination: String.t(),
+          minutes_range_to_destination: String.t(),
           priority: WidgetInstance.priority()
         }
 
   defstruct enabled: false,
             stations: [],
             destination: nil,
-            minutes_to_destination: nil,
+            minutes_range_to_destination: nil,
             priority: [99]
 
   use Screens.Config.Struct,

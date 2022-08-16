@@ -35,7 +35,7 @@ defmodule Screens.BlueBikes.State do
   end
 
   def get_station_statuses(pid \\ __MODULE__, station_ids) when is_list(station_ids) do
-    GenServer.call(pid, {:get_stations, station_ids})
+    GenServer.call(pid, {:get_station_statuses, station_ids})
   end
 
   def schedule_refresh(pid, ms \\ @refresh_ms) do
@@ -69,11 +69,11 @@ defmodule Screens.BlueBikes.State do
   end
 
   @impl true
-  def handle_call({:get_stations, station_ids}, _from, %__MODULE__{} = state) do
+  def handle_call({:get_station_statuses, station_ids}, _from, %__MODULE__{} = state) do
     {:reply, Map.take(state.data.stations_by_id, station_ids), state}
   end
 
-  def handle_call({:get_stations, _station_ids}, _from, :error) do
+  def handle_call({:get_station_statuses, _station_ids}, _from, :error) do
     {:reply, [], :error}
   end
 
