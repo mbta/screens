@@ -7,7 +7,7 @@ import * as SentryLogger from "Util/sentry";
 const MINUTE_IN_MS = 60_000;
 
 const FAILURE_RESPONSE = { success: false };
-const LOADING_RESPONSE = { loading: true };
+const LOADING_RESPONSE = { type: "loading" };
 
 const doFailureBuffer = (
   lastSuccess: number | null,

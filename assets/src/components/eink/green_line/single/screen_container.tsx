@@ -104,7 +104,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   switch (true) {
     case !apiResponse || apiResponse.success === false:
       return <NoConnectionScreenLayout />;
-    case apiResponse.loading:
+    case apiResponse.type === "loading":
       return <LoadingScreenLayout />;
     case apiResponse.psa_type === "takeover":
       return <TakeoverScreenLayout apiResponse={apiResponse} />;
