@@ -80,20 +80,20 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns empty string", %{widget: widget} do
-      assert %{} == WidgetInstance.audio_serialize(widget)
+    test "returns same result as serialize/1", %{widget: widget} do
+      assert WidgetInstance.serialize(widget) == WidgetInstance.audio_serialize(widget)
     end
   end
 
   describe "audio_sort_key/1" do
-    test "returns [0]", %{widget: widget} do
-      assert [0] == WidgetInstance.audio_sort_key(widget)
+    test "returns [2]", %{widget: widget} do
+      assert [2] == WidgetInstance.audio_sort_key(widget)
     end
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns false", %{widget: widget} do
-      refute WidgetInstance.audio_valid_candidate?(widget)
+    test "returns true", %{widget: widget} do
+      assert WidgetInstance.audio_valid_candidate?(widget)
     end
   end
 
