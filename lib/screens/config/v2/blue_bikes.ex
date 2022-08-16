@@ -5,14 +5,14 @@ defmodule Screens.Config.V2.BlueBikes do
 
   @type t :: %__MODULE__{
           enabled: boolean(),
-          nearby_station_ids: list(String.t()),
+          station_ids: list(String.t()),
           destination: String.t() | nil,
           minutes_to_destination: pos_integer() | nil,
           priority: WidgetInstance.priority()
         }
 
   defstruct enabled: false,
-            nearby_station_ids: [],
+            station_ids: [],
             destination: nil,
             minutes_to_destination: nil,
             priority: [99]
