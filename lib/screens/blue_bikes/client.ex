@@ -1,4 +1,4 @@
-defmodule Screens.BlueBikes.ClientProtocol do
+defmodule Screens.BlueBikes.ClientBehaviour do
   @callback fetch_station_information() :: {:ok, map()} | :error
   @callback fetch_station_status() :: {:ok, map()} | :error
 end
@@ -7,7 +7,7 @@ defmodule Screens.BlueBikes.Client do
   @moduledoc """
   Fetches data from the BlueBikes GBFS feed.
   """
-  @behaviour Screens.BlueBikes.ClientProtocol
+  @behaviour Screens.BlueBikes.ClientBehaviour
 
   require Logger
 
@@ -88,7 +88,7 @@ defmodule Screens.BlueBikes.Client do
 end
 
 defmodule Screens.BlueBikes.FakeClient do
-  @behaviour Screens.BlueBikes.ClientProtocol
+  @behaviour Screens.BlueBikes.ClientBehaviour
 
   @response %{"data" => %{"stations" => []}, "last_updated" => 0}
 
