@@ -1,6 +1,6 @@
-defmodule Screens.BlueBikes.Station do
+defmodule Screens.BlueBikes.StationStatus do
   @moduledoc """
-  Models one BlueBikes station's state.
+  Models one BlueBikes station's status.
   """
 
   @type t :: %__MODULE__{

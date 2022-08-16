@@ -34,7 +34,7 @@ defmodule Screens.BlueBikes.State do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  def get_stations(pid \\ __MODULE__, station_ids) when is_list(station_ids) do
+  def get_station_statuses(pid \\ __MODULE__, station_ids) when is_list(station_ids) do
     GenServer.call(pid, {:get_stations, station_ids})
   end
 

@@ -4,7 +4,7 @@ defmodule Screens.BlueBikes.Parser do
   """
 
   alias Screens.BlueBikes
-  alias Screens.BlueBikes.Station
+  alias Screens.BlueBikes.StationStatus
 
   @spec parse(map, map) :: {:ok, BlueBikes.t(), pos_integer(), pos_integer()} | :error
   def parse(station_information_json, station_status_json) do
@@ -17,7 +17,7 @@ defmodule Screens.BlueBikes.Parser do
         # station_information.json and station_status.json should always contain matching
         # IDs, but in case they ever don't for some reason, this will remove entries missing
         # from one or the other.
-        |> Map.filter(fn {_k, v} -> is_struct(v, Station) end)
+        |> Map.filter(fn {_k, v} -> is_struct(v, StationStatus) end)
 
       {:ok, %BlueBikes{stations_by_id: stations_by_id}, info_last_updated, status_last_updated}
     end
@@ -26,15 +26,15 @@ defmodule Screens.BlueBikes.Parser do
   defp merge_station_data_into_struct(id, information, status)
 
   defp merge_station_data_into_struct(_id, information, %{station_status: "out_of_service"}) do
-    %Station{name: information.name, status: :out_of_service}
+    %StationStatus{name: information.name, status: :out_of_service}
   end
 
   defp merge_station_data_into_struct(_id, information, %{valet_active?: true}) do
-    %Station{name: information.name, status: :valet}
+    %StationStatus{name: information.name, status: :valet}
   end
 
   defp merge_station_data_into_struct(_id, information, status) do
-    %Station{
+    %StationStatus{
       name: information.name,
       status: {:normal, Map.take(status, [:num_docks_available, :num_bikes_available])}
     }
