@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
 
   alias Screens.Config.Screen
   alias Screens.Config.V2.Header.CurrentStopId
-  alias Screens.Config.V2.PreFare
+  alias Screens.Config.V2.{PreFare, ShuttleBusInfo}
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
@@ -11,6 +11,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
   alias Screens.V2.WidgetInstance.NormalHeader
+  alias Screens.V2.WidgetInstance.ShuttleBusInfo, as: ShuttleBusInfoWidget
 
   @behaviour CandidateGenerator
 
@@ -68,7 +69,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       fn -> reconstructed_alert_instances_fn.(config) end,
       fn -> elevator_status_instance_fn.(config, now) end,
       fn -> full_line_map_instances_fn.(config) end,
-      fn -> evergreen_content_instances_fn.(config) end
+      fn -> evergreen_content_instances_fn.(config) end,
+      fn -> shuttle_bus_info_instances(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
@@ -99,6 +101,29 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     stop_name = fetch_stop_name_fn.(stop_id)
 
     [%NormalHeader{screen: config, text: stop_name, time: now}]
+  end
+
+  def shuttle_bus_info_instances(
+        %Screen{
+          app_params: %PreFare{
+            shuttle_bus_info: %ShuttleBusInfo{
+              eta: eta,
+              destination: destination,
+              direction: direction,
+              priority: priority
+            }
+          }
+        } = config
+      ) do
+    [
+      %ShuttleBusInfoWidget{
+        screen: config,
+        eta: eta,
+        destination: destination,
+        direction: direction,
+        priority: priority
+      }
+    ]
   end
 
   defp content_summary_instances(widgets, config, fetch_routes_by_stop_fn) do
