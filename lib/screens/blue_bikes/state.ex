@@ -16,10 +16,6 @@ defmodule Screens.BlueBikes.State do
           status_last_updated: pos_integer()
         }
 
-  @type stations_by_id :: %{station_id => Station.t()}
-
-  @type station_id :: String.t()
-
   @enforce_keys [:data, :info_last_updated, :status_last_updated]
   defstruct @enforce_keys
 
