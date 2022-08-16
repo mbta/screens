@@ -7,15 +7,26 @@ defmodule Screens.Config.V2.ShuttleBusInfo do
           minutes_range_to_destination: String.t(),
           destination: String.t(),
           arrow: arrow(),
+          english_boarding_instructions: String.t(),
+          spanish_boarding_instructions: String.t(),
           priority: WidgetInstance.priority()
         }
 
   @type arrow :: :n | :ne | :e | :se | :s | :sw | :w | :nw | nil
 
-  @enforce_keys [:minutes_range_to_destination, :destination, :arrow, :priority]
+  @enforce_keys [
+    :minutes_range_to_destination,
+    :destination,
+    :arrow,
+    :english_boarding_instructions,
+    :spanish_boarding_instructions,
+    :priority
+  ]
   defstruct minutes_range_to_destination: nil,
             destination: nil,
             arrow: nil,
+            english_boarding_instructions: nil,
+            spanish_boarding_instructions: nil,
             priority: nil
 
   use Screens.Config.Struct

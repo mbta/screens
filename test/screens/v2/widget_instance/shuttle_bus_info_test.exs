@@ -18,6 +18,8 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
                   minutes_range_to_destination: "35-45",
                   destination: "Test Station",
                   arrow: :n,
+                  english_boarding_instructions: "",
+                  spanish_boarding_instructions: "",
                   priority: [2, 3, 1]
                 }
               })
@@ -32,6 +34,8 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
                 shuttle_bus_info: %ShuttleBusInfo{
                   minutes_range_to_destination: "35-45",
                   destination: "Test Station",
+                  english_boarding_instructions: "",
+                  spanish_boarding_instructions: "",
                   arrow: :n,
                   priority: [2, 3, 1]
                 }
@@ -54,7 +58,9 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
       assert %{
                minutes_range_to_destination: "35-45",
                destination: "Test Station",
-               arrow: :n
+               arrow: :n,
+               english_boarding_instructions: "",
+               spanish_boarding_instructions: ""
              } == WidgetInstance.serialize(widget)
     end
   end

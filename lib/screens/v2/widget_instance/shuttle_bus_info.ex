@@ -24,7 +24,9 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
             shuttle_bus_info: %ShuttleBusInfo{
               minutes_range_to_destination: minutes_range_to_destination,
               destination: destination,
-              arrow: arrow
+              arrow: arrow,
+              english_boarding_instructions: english_boarding_instructions,
+              spanish_boarding_instructions: spanish_boarding_instructions
             }
           }
         }
@@ -32,7 +34,9 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
       do: %{
         minutes_range_to_destination: minutes_range_to_destination,
         destination: destination,
-        arrow: arrow
+        arrow: arrow,
+        english_boarding_instructions: english_boarding_instructions,
+        spanish_boarding_instructions: spanish_boarding_instructions
       }
 
   def widget_type(_instance), do: :shuttle_bus_info
