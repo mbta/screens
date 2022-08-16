@@ -2,39 +2,41 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
   use ExUnit.Case, async: true
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.ShuttleBusInfo
+  alias Screens.Config.V2.{PreFare, ShuttleBusInfo}
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ShuttleBusInfo, as: ShuttleBusInfoWidget
 
   setup do
     %{
       widget: %ShuttleBusInfoWidget{
-        screen: %Screen{
-          app_params: %ShuttleBusInfo{
-            minutes_range_to_destination: "35-45",
-            destination: "Test Station",
-            arrow: :n,
-            priority: [2, 3, 1]
-          },
-          vendor: nil,
-          device_id: nil,
-          name: nil,
-          app_id: :pre_fare_v2
-        }
+        screen:
+          struct(Screen, %{
+            app_id: :pre_fare_v2,
+            app_params:
+              struct(PreFare, %{
+                shuttle_bus_info: %ShuttleBusInfo{
+                  minutes_range_to_destination: "35-45",
+                  destination: "Test Station",
+                  arrow: :n,
+                  priority: [2, 3, 1]
+                }
+              })
+          })
       },
       widget_not_pre_fare: %ShuttleBusInfoWidget{
-        screen: %Screen{
-          app_params: %ShuttleBusInfo{
-            minutes_range_to_destination: "35-45",
-            destination: "Test Station",
-            arrow: :n,
-            priority: [2, 3, 1]
-          },
-          vendor: nil,
-          device_id: nil,
-          name: nil,
-          app_id: :bus_shelter_v2
-        }
+        screen:
+          struct(Screen, %{
+            app_id: :bus_shelter_v2,
+            app_params:
+              struct(PreFare, %{
+                shuttle_bus_info: %ShuttleBusInfo{
+                  minutes_range_to_destination: "35-45",
+                  destination: "Test Station",
+                  arrow: :n,
+                  priority: [2, 3, 1]
+                }
+              })
+          })
       }
     }
   end
