@@ -31,15 +31,15 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
               {:body_right,
                %{
                  body_right_normal: [
-                   :upper_right,
                    Builder.with_paging(
-                     {:lower_right,
+                     {:upper_right,
                       %{
                         one_large: [:large],
                         two_medium: [:medium_left, :medium_right]
                       }},
                      4
-                   )
+                   ),
+                   :lower_right
                  ],
                  body_right_takeover: [:full_body_right]
                }}
