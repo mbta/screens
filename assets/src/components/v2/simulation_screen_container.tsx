@@ -20,31 +20,28 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
   const data = responseMapper(apiResponse);
   const { fullPage, flexZone } = data;
 
-  return fullPage ? (
-    <>
-      <div className="simulation-screen-container">
-        {apiResponse && (
-          <div className="simulation__full-page">
-            <Widget data={fullPage} />
-          </div>
-        )}
-        <div className="simulation__flex-zone">
-          {flexZone.length > 0 &&
-            flexZone.map((flexZonePage: WidgetData, index: number) => {
-              return (
-                <div
-                  key={`page${index}`}
-                  className="simulation__flex-zone-widget"
-                >
-                  <Widget data={flexZonePage} />
-                </div>
-              );
-            })}
+  return (
+    <div className="simulation-screen-container">
+      {apiResponse && (
+        <div className="simulation__full-page">
+          {fullPage ? <Widget data={fullPage} /> : <div>Loading</div>}
         </div>
-      </div>
-    </>
-  ) : (
-    <Widget data={data as WidgetData} />
+      )}
+      {flexZone?.length > 0 && (
+        <div className="simulation__flex-zone">
+          {flexZone.map((flexZonePage: WidgetData, index: number) => {
+            return (
+              <div
+                key={`page${index}`}
+                className="simulation__flex-zone-widget"
+              >
+                <Widget data={flexZonePage} />
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 };
 

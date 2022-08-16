@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { isDup, isRealScreen } from "Util/util";
 import useInterval from "Hooks/use_interval";
 import { getDatasetValue } from "Util/dataset";
-import * as Sentry from "@sentry/react";
+import * as SentryLogger from "Util/sentry";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -28,7 +28,7 @@ const doFailureBuffer = (
       // This will trigger until a success API response is received.
       setApiResponse((prevApiResponse) => {
         if (prevApiResponse != null && prevApiResponse.success) {
-          Sentry.captureMessage("Entering no-data state.");
+          SentryLogger.info("Entering no-data state.");
         }
         return apiResponse;
       });
@@ -37,9 +37,7 @@ const doFailureBuffer = (
 };
 
 const useIsRealScreenParam = () => {
-  return isRealScreen()
-    ? "&is_real_screen=true"
-    : "";
+  return isRealScreen() ? "&is_real_screen=true" : "";
 };
 
 interface UseApiResponseArgs {
@@ -87,7 +85,7 @@ const useApiResponse = ({
         // If the last response was a failure, log that we are no longer failing.
         setApiResponse((prevApiResponse) => {
           if (prevApiResponse != null && !prevApiResponse.success) {
-            Sentry.captureMessage("Exiting no-data state.");
+            SentryLogger.info("Exiting no-data state.");
           }
           return json;
         });

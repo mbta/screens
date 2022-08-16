@@ -9,6 +9,7 @@
     height: 344px;
     width: 387px;
     margin-right: 24px;
+    z-index: 999;
 
     & > * {
       transform-origin: top left;
@@ -21,13 +22,30 @@
     display: flex;
     margin-top: auto;
     margin-bottom: auto;
-    border: 8px solid #2e3f4d;
-    border-radius: 8px;
+    height: 160px;
+    border-radius: 0 8px 8px 0;
+    position: relative;
+
+    &:before {
+      content: "";
+      position: absolute;
+      right: 100%;
+      // NO HEIGHT
+      border-top: 80px solid transparent;
+      border-right: 100px solid #2e3f4d;
+      border-bottom: 80px solid transparent;
+    }
   }
 
   .simulation__flex-zone-widget {
-    width: 270px;
-    height: 157px;
+    width: 256px;
+    height: 144px;
+    margin-top: auto;
+    margin-bottom: auto;
+
+    &:last-child {
+      margin-right: 8px;
+    }
 
     &:not(:last-child) {
       margin-right: 24px;
@@ -35,14 +53,18 @@
 
     .flex-one-large,
     .flex-two-medium {
-      & > * {
-        width: 1080px;
-        height: 628px;
-        transform-origin: top left;
-        transform: scale(25%);
+      transform-origin: top left;
+      transform: scale(25%);
 
+      & > * {
+        position: unset;
+
+        // Pre-Fare flex-zones are a little weird.
+        // For some reason, some widgets have padding or margin that throw off the positioning in the sim.
+        // Removing margin and padding in the widget fixes it.
         & > * {
-          margin: auto;
+          margin: 0;
+          padding: 0;
         }
       }
     }

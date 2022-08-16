@@ -19,12 +19,8 @@ type ResponseMapper = (
 const defaultResponseMapper: ResponseMapper = (apiResponse) => {
   switch (apiResponse.state) {
     case "success":
-      return apiResponse.data;
     case "simulation_success":
-      return {
-        fullPage: apiResponse.data.fullPage,
-        flexZone: apiResponse.data.flexZone,
-      };
+      return apiResponse.data;
     case "disabled":
     case "failure":
       return { type: "no_data" };

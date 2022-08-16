@@ -6,6 +6,7 @@ import { ROTATION_INDEX } from "./rotation_index";
 import { NoDataLayout } from "Components/dup/screen_container";
 import { isDup } from "Util/util";
 import { fetchDatasetValue } from "Util/dataset";
+import { DUP_SIMULATION_REFRESH_MS } from "Constants";
 
 const DupScreenPage = ({
   screenContainer: ScreenContainer,
@@ -66,9 +67,21 @@ const SimulationPage = ({
   return (
     <div className="simulation-page">
       <div className="projection">
-        <ScreenContainer id={id} rotationIndex={0} />
-        <ScreenContainer id={id} rotationIndex={1} />
-        <ScreenContainer id={id} rotationIndex={2} />
+        <ScreenContainer
+          id={id}
+          rotationIndex={0}
+          refreshMs={DUP_SIMULATION_REFRESH_MS}
+        />
+        <ScreenContainer
+          id={id}
+          rotationIndex={1}
+          refreshMs={DUP_SIMULATION_REFRESH_MS}
+        />
+        <ScreenContainer
+          id={id}
+          rotationIndex={2}
+          refreshMs={DUP_SIMULATION_REFRESH_MS}
+        />
       </div>
     </div>
   );
