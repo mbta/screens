@@ -47,19 +47,20 @@ defmodule Screens.V2.WidgetInstance.BlueBikes do
     |> Map.merge(status_data)
   end
 
-  def slot_names(_instance), do: [:to_be_determined]
+  def slot_names(_instance), do: [:lower_right]
 
   def widget_type(_instance), do: :blue_bikes
 
   def valid_candidate?(_instance), do: true
 
-  def audio_serialize(_instance), do: %{}
+  def audio_serialize(t), do: serialize(t)
 
-  def audio_sort_key(_instance), do: [99]
+  # Unsure for this one--it will partly depend on priority of other new widgets!
+  def audio_sort_key(_instance), do: [2]
 
-  def audio_valid_candidate?(_instance), do: false
+  def audio_valid_candidate?(_instance), do: true
 
-  def audio_view(_instance), do: nil
+  def audio_view(_instance), do: ScreensWeb.V2.Audio.BlueBikesView
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.BlueBikes
