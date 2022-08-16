@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
 
   alias Screens.Config.Screen
   alias Screens.Config.V2.Header.CurrentStopId
-  alias Screens.Config.V2.{PreFare, ShuttleBusInfo}
+  alias Screens.Config.V2.PreFare
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
@@ -103,27 +103,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     [%NormalHeader{screen: config, text: stop_name, time: now}]
   end
 
-  def shuttle_bus_info_instances(
-        %Screen{
-          app_params: %PreFare{
-            shuttle_bus_info: %ShuttleBusInfo{
-              eta: eta,
-              destination: destination,
-              arrow: arrow,
-              priority: priority
-            }
-          }
-        } = config
-      ) do
-    [
-      %ShuttleBusInfoWidget{
-        screen: config,
-        eta: eta,
-        destination: destination,
-        arrow: arrow,
-        priority: priority
-      }
-    ]
+  def shuttle_bus_info_instances(config) do
+    [%ShuttleBusInfoWidget{screen: config}]
   end
 
   defp content_summary_instances(widgets, config, fetch_routes_by_stop_fn) do

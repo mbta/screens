@@ -1,37 +1,40 @@
 defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
   use ExUnit.Case, async: true
 
-  alias Screens.V2.WidgetInstance
   alias Screens.Config.Screen
-  alias Screens.V2.WidgetInstance.ShuttleBusInfo
+  alias Screens.Config.V2.ShuttleBusInfo
+  alias Screens.V2.WidgetInstance
+  alias Screens.V2.WidgetInstance.ShuttleBusInfo, as: ShuttleBusInfoWidget
 
   setup do
     %{
-      widget: %ShuttleBusInfo{
+      widget: %ShuttleBusInfoWidget{
         screen: %Screen{
-          app_params: nil,
+          app_params: %ShuttleBusInfo{
+            minutes_range_to_destination: "35-45",
+            destination: "Test Station",
+            arrow: :n,
+            priority: [2, 3, 1]
+          },
           vendor: nil,
           device_id: nil,
           name: nil,
           app_id: :pre_fare_v2
-        },
-        eta: "35-45",
-        destination: "Test Station",
-        arrow: :n,
-        priority: [2, 3, 1]
+        }
       },
-      widget_not_pre_fare: %ShuttleBusInfo{
+      widget_not_pre_fare: %ShuttleBusInfoWidget{
         screen: %Screen{
-          app_params: nil,
+          app_params: %ShuttleBusInfo{
+            minutes_range_to_destination: "35-45",
+            destination: "Test Station",
+            arrow: :n,
+            priority: [2, 3, 1]
+          },
           vendor: nil,
           device_id: nil,
           name: nil,
           app_id: :bus_shelter_v2
-        },
-        eta: "35-45",
-        destination: "Test Station",
-        arrow: :n,
-        priority: [2, 3, 1]
+        }
       }
     }
   end
@@ -43,9 +46,11 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
   end
 
   describe "serialize/1" do
-    test "returns map with eta, destination, and direction", %{widget: widget} do
+    test "returns map with minutes_range_to_destination, destination, and direction", %{
+      widget: widget
+    } do
       assert %{
-               eta: "35-45",
+               minutes_range_to_destination: "35-45",
                destination: "Test Station",
                arrow: :n
              } == WidgetInstance.serialize(widget)

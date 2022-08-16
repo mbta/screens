@@ -4,7 +4,7 @@ defmodule Screens.Config.V2.ShuttleBusInfo do
   alias Screens.V2.WidgetInstance
 
   @type t :: %__MODULE__{
-          eta: String.t(),
+          minutes_range_to_destination: String.t(),
           destination: String.t(),
           arrow: arrow(),
           priority: WidgetInstance.priority()
@@ -12,8 +12,8 @@ defmodule Screens.Config.V2.ShuttleBusInfo do
 
   @type arrow :: :n | :ne | :e | :se | :s | :sw | :w | :nw | nil
 
-  @enforce_keys [:eta, :destination, :arrow, :priority]
-  defstruct eta: nil,
+  @enforce_keys [:minutes_range_to_destination, :destination, :arrow, :priority]
+  defstruct minutes_range_to_destination: nil,
             destination: nil,
             arrow: nil,
             priority: nil
