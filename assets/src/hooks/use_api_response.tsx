@@ -18,7 +18,7 @@ const doFailureBuffer = (
   if (lastSuccess == null) {
     // We haven't had a successful request since initial page load.
     // Continue showing the initial "no data" state.
-    setApiResponse((state) => state);
+    setApiResponse(FAILURE_RESPONSE);
   } else {
     const elapsedMs = Date.now() - lastSuccess;
 
