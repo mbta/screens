@@ -5,6 +5,6 @@ defmodule ScreensWeb.V2.Audio.ShuttleBusInfoView do
         minutes_range_to_destination: minutes_range_to_destination,
         destination: destination
       }) do
-    ~E""
+    ~E|<p>Estimated <%= minutes_range_to_destination %> minute to <%= destination %></p>|
   end
 end

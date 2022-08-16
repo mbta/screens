@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.ShuttleBusInfo
+  alias Screens.Config.V2.{PreFare, ShuttleBusInfo}
 
   @enforce_keys ~w[screen]a
   defstruct screen: nil
@@ -11,15 +11,21 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
           screen: Screen.t()
         }
 
-  def priority(%__MODULE__{screen: %Screen{app_params: %ShuttleBusInfo{priority: priority}}}),
-    do: priority
+  def priority(%__MODULE__{
+        screen: %Screen{
+          app_params: %PreFare{shuttle_bus_info: %ShuttleBusInfo{priority: priority}}
+        }
+      }),
+      do: priority
 
   def serialize(%__MODULE__{
         screen: %Screen{
-          app_params: %ShuttleBusInfo{
-            minutes_range_to_destination: minutes_range_to_destination,
-            destination: destination,
-            arrow: arrow
+          app_params: %PreFare{
+            shuttle_bus_info: %ShuttleBusInfo{
+              minutes_range_to_destination: minutes_range_to_destination,
+              destination: destination,
+              arrow: arrow
+            }
           }
         }
       }),
