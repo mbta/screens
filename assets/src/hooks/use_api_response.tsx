@@ -7,6 +7,7 @@ import * as SentryLogger from "Util/sentry";
 const MINUTE_IN_MS = 60_000;
 
 const FAILURE_RESPONSE = { success: false };
+const LOADING_RESPONSE = { loading: true };
 
 const doFailureBuffer = (
   lastSuccess: number | null,
@@ -57,7 +58,9 @@ const useApiResponse = ({
   withWatchdog = false,
   failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs) => {
-  const [apiResponse, setApiResponse] = useState<object | null>(null);
+  const [apiResponse, setApiResponse] = useState<object | null>(
+    LOADING_RESPONSE
+  );
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const lastRefresh = getDatasetValue("lastRefresh");
   const isRealScreenParam = useIsRealScreenParam();

@@ -15,6 +15,7 @@ import useFitDepartures from "Hooks/use_fit_departures";
 import { EINK_REFRESH_MS } from "Constants";
 import NoConnectionBottom from "Components/eink/no_connection_bottom";
 import NoConnectionTop from "Components/eink/no_connection_top";
+import LoadingTop from "Components/eink/loading_top";
 
 const TopScreenLayout = forwardRef(
   ({ currentTimeString, stopName, departures }, ref): JSX.Element => {
@@ -123,12 +124,24 @@ const NoConnectionScreenLayout = (): JSX.Element => {
   );
 };
 
+const LoadingScreenLayout = (): JSX.Element => {
+  // We haven't recieved a response since page load. Show a loading message.
+  return (
+    <div>
+      <LoadingTop />
+      <NoConnectionBottom />
+    </div>
+  );
+};
+
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
   const noDepartures = (apiResponse?.departures?.length ?? 0) === 0;
 
   switch (true) {
     case !apiResponse || apiResponse.success === false:
       return <NoConnectionScreenLayout />;
+    case apiResponse.loading:
+      return <LoadingScreenLayout />;
     case apiResponse.psa_type === "takeover":
       return <TakeoverScreenLayout apiResponse={apiResponse} />;
     case apiResponse.service_level === 5:
