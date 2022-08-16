@@ -87,8 +87,12 @@ defmodule Screens.BlueBikes.State do
     schedule_refresh(self())
 
     pid = self()
-    info_last_updated = state.info_last_updated
-    status_last_updated = state.status_last_updated
+
+    {info_last_updated, status_last_updated} =
+      case state do
+        %__MODULE__{} -> {state.info_last_updated, state.status_last_updated}
+        :error -> {0, 0}
+      end
 
     # Asynchronously update state so that the server is not blocked while waiting for the request to complete.
     # If an error occurs during fetching/parsing, no problem. We'll try again soon.
