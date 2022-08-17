@@ -7,7 +7,8 @@ defmodule Screens.Config.V2.PreFare do
     ContentSummary,
     ElevatorStatus,
     EvergreenContentItem,
-    FullLineMap
+    FullLineMap,
+    ShuttleBusInfo
   }
 
   alias Screens.Config.V2.Header.CurrentStopId
@@ -20,7 +21,8 @@ defmodule Screens.Config.V2.PreFare do
           evergreen_content: list(EvergreenContentItem.t()),
           blue_bikes: BlueBikes.t(),
           content_summary: ContentSummary.t(),
-          audio: Audio.t()
+          audio: Audio.t(),
+          shuttle_bus_info: ShuttleBusInfo.t()
         }
 
   @enforce_keys [
@@ -37,7 +39,8 @@ defmodule Screens.Config.V2.PreFare do
             evergreen_content: [],
             blue_bikes: BlueBikes.from_json(:default),
             content_summary: nil,
-            audio: Audio.from_json(:default)
+            audio: Audio.from_json(:default),
+            shuttle_bus_info: ShuttleBusInfo.from_json(:default)
 
   use Screens.Config.Struct,
     children: [
@@ -48,6 +51,7 @@ defmodule Screens.Config.V2.PreFare do
       blue_bikes: BlueBikes,
       reconstructed_alert_widget: CurrentStopId,
       content_summary: ContentSummary,
-      audio: Audio
+      audio: Audio,
+      shuttle_bus_info: ShuttleBusInfo
     ]
 end
