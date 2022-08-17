@@ -188,16 +188,7 @@ config :screens,
       {"70064", "70068", "Alewife"},
       {"70067", "70063", "Ashmont/Braintree"}
     ]
-  },
-  # Stop IDs at stations serviced by two subway lines, where we also have DUP screens.
-  two_line_stops: [
-    # Haymarket
-    "70024",
-    "70025",
-    "70203",
-    "70204",
-    "place-haecl"
-  ]
+  }
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
