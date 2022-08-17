@@ -39,6 +39,7 @@ import NoData from "Components/v2/pre_fare/no_data";
 import ReconstructedTakeover from "Components/v2/reconstructed_takeover";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
+import SurgeBodyRight from "Components/v2/pre_fare/surge_body_right";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -48,6 +49,7 @@ const TYPE_TO_COMPONENT = {
   body_left_normal: NormalBodyLeft,
   body_left_takeover: BodyLeftTakeover,
   body_right_normal: NormalBodyRight,
+  body_right_surge: SurgeBodyRight,
   body_right_takeover: BodyRightTakeover,
   normal_header: NormalHeader,
   one_large: OneLarge,
