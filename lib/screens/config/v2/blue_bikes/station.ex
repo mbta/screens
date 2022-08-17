@@ -4,12 +4,13 @@ defmodule Screens.Config.V2.BlueBikes.Station do
   @type t :: %__MODULE__{
           id: String.t(),
           arrow: arrow(),
-          walk_distance_minutes: non_neg_integer()
+          walk_distance_minutes: non_neg_integer(),
+          walk_distance_feet: non_neg_integer()
         }
 
   @type arrow :: :n | :ne | :e | :se | :s | :sw | :w | :nw | nil
 
-  @enforce_keys [:id, :arrow, :walk_distance_minutes]
+  @enforce_keys [:id, :arrow, :walk_distance_minutes, :walk_distance_feet]
   defstruct @enforce_keys
 
   use Screens.Config.Struct
