@@ -26,7 +26,7 @@ defmodule Screens.Config.V2.ShuttleBusInfo do
 
   use Screens.Config.Struct
 
-  for arrow <- ~w[n ne e se s sw w nw nil]a do
+  for arrow <- ~w[n ne e se s sw w nw]a do
     arrow_string = Atom.to_string(arrow)
     defp value_from_json("arrow", unquote(arrow_string)), do: unquote(arrow)
   end
