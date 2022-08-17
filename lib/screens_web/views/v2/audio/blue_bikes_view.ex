@@ -33,38 +33,3 @@ defmodule ScreensWeb.V2.Audio.BlueBikesView do
     |
   end
 end
-
-[
-  %{
-    arrow: :n,
-    id: "273",
-    name: "Forest Hills",
-    num_bikes_available: 7,
-    num_docks_available: 32,
-    status: :normal,
-    walk_distance_minutes: 1
-  },
-  %{
-    arrow: :e,
-    id: "279",
-    name: "Williams St at Washington St",
-    num_bikes_available: 3,
-    num_docks_available: 16,
-    status: :normal,
-    walk_distance_minutes: 10
-  },
-  %{
-    arrow: :ne,
-    id: "11",
-    name: "Longwood Ave at Binney St",
-    status: :valet,
-    walk_distance_minutes: 30
-  },
-  %{
-    arrow: :e,
-    id: "61",
-    name: "Boylston St at Fairfield St",
-    status: :out_of_service,
-    walk_distance_minutes: 45
-  }
-]

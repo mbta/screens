@@ -15,6 +15,6 @@ defmodule Screens.BlueBikes do
   defstruct @enforce_keys
 
   @doc "Gets stations corresponding to the given list of station IDs."
-  @spec get_station_statuses(list(String.t())) :: %{station_id => StationStatus.t()}
+  @spec get_station_statuses(list(station_id)) :: %{station_id => StationStatus.t()}
   defdelegate get_station_statuses(station_ids), to: State
 end

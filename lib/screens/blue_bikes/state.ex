@@ -1,8 +1,7 @@
 defmodule Screens.BlueBikes.State do
   @moduledoc """
-  GenServer that server up-to-date BlueBikes station data.
+  GenServer that serves up-to-date BlueBikes station data.
   """
-
   alias Screens.BlueBikes
   alias Screens.BlueBikes.Parser
 
