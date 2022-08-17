@@ -55,6 +55,8 @@ defmodule Screens.BlueBikes.Parser do
     {:ok, Enum.into(stations, %{}, &parse_status_kv/1), last_updated}
   end
 
+  defp parse_station_status(_), do: :error
+
   defp parse_information_kv(%{"station_id" => id, "name" => name}) do
     {id, %{name: name}}
   end
