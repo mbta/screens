@@ -6,7 +6,7 @@ defmodule Screens.Config.Dup do
   @type t :: %__MODULE__{
           primary: Departures.t(),
           secondary: Departures.t(),
-          override: {Override.screen0(), Override.screen1(), Override.scrren2()} | nil
+          override: {Override.screen0(), Override.screen1(), Override.screen2()} | nil
         }
 
   defstruct primary: Departures.from_json(:default),
