@@ -67,7 +67,7 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
 
   describe "slot_names/1" do
     test "returns slot names defined on the struct", %{widget: widget} do
-      assert [:tbd] == WidgetInstance.slot_names(widget)
+      assert [:orange_line_surge_lower] == WidgetInstance.slot_names(widget)
     end
   end
 

@@ -44,7 +44,7 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
   def valid_candidate?(%__MODULE__{screen: %Screen{app_id: :pre_fare_v2}}), do: true
   def valid_candidate?(_), do: false
 
-  def slot_names(_instance), do: [:tbd]
+  def slot_names(_instance), do: [:orange_line_surge_lower]
 
   def audio_serialize(instance), do: serialize(instance)
 
