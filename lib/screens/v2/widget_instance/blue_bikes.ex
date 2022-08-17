@@ -23,12 +23,17 @@ defmodule Screens.V2.WidgetInstance.BlueBikes do
 
     station_statuses = t.station_statuses
 
+    stations_data =
+      widget_config.stations
+      |> Enum.map(&serialize_station(&1, station_statuses))
+      |> Enum.sort_by(& &1.walk_distance_minutes)
+
     # get name and current status from station_status
     # get arrow and walk distance from config
     %{
       destination: widget_config.destination,
       minutes_range_to_destination: widget_config.minutes_range_to_destination,
-      stations: Enum.map(widget_config.stations, &serialize_station(&1, station_statuses))
+      stations: stations_data
     }
   end
 
