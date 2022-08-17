@@ -37,7 +37,7 @@ defmodule Screens.Config.V2.PreFare do
             evergreen_content: [],
             content_summary: nil,
             audio: Audio.from_json(:default),
-            shuttle_bus_info: nil
+            shuttle_bus_info: ShuttleBusInfo.from_json(:default)
 
   use Screens.Config.Struct,
     children: [
