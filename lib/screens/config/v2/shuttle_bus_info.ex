@@ -22,12 +22,7 @@ defmodule Screens.Config.V2.ShuttleBusInfo do
     :spanish_boarding_instructions,
     :priority
   ]
-  defstruct minutes_range_to_destination: nil,
-            destination: nil,
-            arrow: nil,
-            english_boarding_instructions: nil,
-            spanish_boarding_instructions: nil,
-            priority: nil
+  defstruct @enforce_keys
 
   use Screens.Config.Struct
 
