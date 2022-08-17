@@ -14,7 +14,6 @@ const OneLarge: React.ComponentType<Props> = ({
   num_pages: numPages,
   page_index: pageIndex,
 }) => {
-  console.log(numPages);
   return (
     <div className="flex-one-large">
       <div className="flex-one-large__large">
