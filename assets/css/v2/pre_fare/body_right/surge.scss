@@ -1,0 +1,25 @@
+// body total height: 1648px
+
+.body-right-surge {
+  position: relative;
+}
+
+.body-right-surge__upper {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 1080px;
+  height: 876px;
+  overflow: hidden;
+}
+
+.body-right-surge__lower {
+  position: absolute;
+  top: 918px;
+  left: 0;
+
+  width: 1080px;
+  height: 876px;
+  overflow: hidden;
+}
