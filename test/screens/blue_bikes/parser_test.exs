@@ -55,7 +55,10 @@ defmodule Screens.BlueBikes.ParserTest do
   end
 
   describe "parse/2" do
-    test "parses information and status", %{information: information, status: status} do
+    test "parses information and status, omitting any station IDs missing from either", %{
+      information: information,
+      status: status
+    } do
       expected_data = %BlueBikes{
         stations_by_id: %{
           "1" => %StationStatus{
