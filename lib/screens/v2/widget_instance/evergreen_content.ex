@@ -11,7 +11,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
             asset_url: nil,
             priority: nil,
             schedule: [%Schedule{}],
-            now: nil
+            now: nil,
+            text_for_audio: nil
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
@@ -19,7 +20,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
           asset_url: String.t(),
           priority: WidgetInstance.priority(),
           schedule: list(Schedule.t()),
-          now: DateTime.t()
+          now: DateTime.t(),
+          text_for_audio: String.t()
         }
 
   def priority(%__MODULE__{} = instance), do: instance.priority
@@ -47,6 +49,17 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
     end)
   end
 
+  def audio_serialize(%__MODULE__{text_for_audio: text_for_audio}),
+    do: %{text_for_audio: text_for_audio}
+
+  def audio_sort_key(_instance), do: [99]
+
+  def audio_valid_candidate?(%__MODULE__{text_for_audio: text_for_audio})
+      when not is_nil(text_for_audio),
+      do: true
+
+  def audio_valid_candidate?(_), do: false
+
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.EvergreenContent
 
@@ -55,9 +68,12 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
     def slot_names(instance), do: EvergreenContent.slot_names(instance)
     def widget_type(instance), do: EvergreenContent.widget_type(instance)
     def valid_candidate?(instance), do: EvergreenContent.valid_candidate?(instance)
-    def audio_serialize(_instance), do: %{}
-    def audio_sort_key(_instance), do: [0]
-    def audio_valid_candidate?(_instance), do: false
+    def audio_serialize(instance), do: EvergreenContent.audio_serialize(instance)
+    def audio_sort_key(instance), do: EvergreenContent.audio_sort_key(instance)
+
+    def audio_valid_candidate?(instance),
+      do: EvergreenContent.audio_valid_candidate?(instance)
+
     def audio_view(_instance), do: ScreensWeb.V2.Audio.EvergreenContentView
   end
 end
