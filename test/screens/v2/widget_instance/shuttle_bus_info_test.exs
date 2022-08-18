@@ -31,8 +31,9 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
                   ],
                   destination: "Test Station",
                   arrow: :n,
-                  english_boarding_instructions: "",
-                  spanish_boarding_instructions: "",
+                  english_boarding_instructions: "Hello",
+                  spanish_boarding_instructions: "Hola",
+                  audio_boarding_instructions: "Hi",
                   priority: [2, 3, 1]
                 }
               })
@@ -61,8 +62,9 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
                     }
                   ],
                   destination: "Test Station",
-                  english_boarding_instructions: "",
-                  spanish_boarding_instructions: "",
+                  english_boarding_instructions: "Hello",
+                  spanish_boarding_instructions: "Hola",
+                  audio_boarding_instructions: "Hi",
                   arrow: :n,
                   priority: [2, 3, 1]
                 }
@@ -83,15 +85,16 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
   end
 
   describe "serialize/1" do
-    test "returns map with minutes_range_to_destination, destination, and direction", %{
-      widget: widget
-    } do
+    test "returns map with minutes_range_to_destination, destination, arrow, and boarding_instructions",
+         %{
+           widget: widget
+         } do
       assert %{
                minutes_range_to_destination: "35-45",
                destination: "Test Station",
                arrow: :n,
-               english_boarding_instructions: "",
-               spanish_boarding_instructions: ""
+               english_boarding_instructions: "Hello",
+               spanish_boarding_instructions: "Hola"
              } == WidgetInstance.serialize(widget)
 
       widget = put_now(widget, ~U[2022-08-18T20:00:00Z])
@@ -100,8 +103,8 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
                minutes_range_to_destination: "15-25",
                destination: "Test Station",
                arrow: :n,
-               english_boarding_instructions: "",
-               spanish_boarding_instructions: ""
+               english_boarding_instructions: "Hello",
+               spanish_boarding_instructions: "Hola"
              } == WidgetInstance.serialize(widget)
     end
   end
@@ -129,8 +132,23 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns same result as serialize/1", %{widget: widget} do
-      assert WidgetInstance.serialize(widget) == WidgetInstance.audio_serialize(widget)
+    test "returns map with minutes_range_to_destination, destination, and boarding_instructions",
+         %{
+           widget: widget
+         } do
+      assert %{
+               minutes_range_to_destination: "35-45",
+               destination: "Test Station",
+               boarding_instructions: "Hi"
+             } == WidgetInstance.audio_serialize(widget)
+
+      widget = put_now(widget, ~U[2022-08-18T20:00:00Z])
+
+      assert %{
+               minutes_range_to_destination: "15-25",
+               destination: "Test Station",
+               boarding_instructions: "Hi"
+             } == WidgetInstance.audio_serialize(widget)
     end
   end
 
