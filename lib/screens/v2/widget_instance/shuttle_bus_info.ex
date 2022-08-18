@@ -58,6 +58,8 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
   def audio_view(_instance), do: ScreensWeb.V2.Audio.ShuttleBusInfoView
 
   defp get_minute_range(schedule, now) do
+    {:ok, now} = DateTime.shift_zone(now, "America/New_York")
+
     %ShuttleBusSchedule{minute_range: minutes_range_to_destination} =
       Enum.find(schedule, fn %ShuttleBusSchedule{
                                days: days,
