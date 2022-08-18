@@ -42,7 +42,11 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
                    ),
                    :lower_right
                  ],
-                 body_right_takeover: [:full_body_right]
+                 body_right_takeover: [:full_body_right],
+                 body_right_surge: [
+                   :orange_line_surge_upper,
+                   :orange_line_surge_lower
+                 ]
                }}
             ],
             body_takeover: [:full_body]
