@@ -41,6 +41,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
     [departures_instance]
   end
 
+  def departures_instances(_, _), do: []
+
   defp fetch_departures(opts, params) do
     Departure.fetch(params, Keyword.new(opts))
   end
