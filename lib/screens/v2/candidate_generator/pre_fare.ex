@@ -32,15 +32,15 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
               {:body_right,
                %{
                  body_right_normal: [
-                   :upper_right,
                    Builder.with_paging(
-                     {:lower_right,
+                     {:upper_right,
                       %{
                         one_large: [:large],
                         two_medium: [:medium_left, :medium_right]
                       }},
                      4
-                   )
+                   ),
+                   :lower_right
                  ],
                  body_right_takeover: [:full_body_right],
                  body_right_surge: [
@@ -65,7 +65,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         reconstructed_alert_instances_fn \\ &Widgets.ReconstructedAlert.reconstructed_alert_instances/1,
         elevator_status_instance_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2,
         full_line_map_instances_fn \\ &Widgets.FullLineMap.full_line_map_instances/1,
-        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
+        blue_bikes_instances_fn \\ &Widgets.BlueBikes.blue_bikes_instances/1
       ) do
     [
       fn -> header_instances(config, now) end,
@@ -74,6 +75,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       fn -> elevator_status_instance_fn.(config, now) end,
       fn -> full_line_map_instances_fn.(config) end,
       fn -> evergreen_content_instances_fn.(config) end,
+      fn -> blue_bikes_instances_fn.(config) end,
       fn -> shuttle_bus_info_instances(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)

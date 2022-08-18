@@ -478,7 +478,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   def widget_type(_instance), do: :elevator_status
 
-  def valid_candidate?(_instance), do: false
+  def valid_candidate?(_instance), do: true
 
   def audio_serialize(t) do
     %{pages: pages} = serialize(t)

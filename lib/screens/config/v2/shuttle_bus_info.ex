@@ -14,17 +14,14 @@ defmodule Screens.Config.V2.ShuttleBusInfo do
 
   @type arrow :: :n | :ne | :e | :se | :s | :sw | :w | :nw | nil
 
-  @enforce_keys [
-    :minutes_range_to_destination,
-    :destination,
-    :arrow,
-    :english_boarding_instructions,
-    :spanish_boarding_instructions,
-    :priority
-  ]
-  defstruct @enforce_keys
+  defstruct minutes_range_to_destination: nil,
+            destination: nil,
+            arrow: nil,
+            english_boarding_instructions: nil,
+            spanish_boarding_instructions: nil,
+            priority: [99]
 
-  use Screens.Config.Struct
+  use Screens.Config.Struct, with_default: true
 
   for arrow <- ~w[n ne e se s sw w nw]a do
     arrow_string = Atom.to_string(arrow)
