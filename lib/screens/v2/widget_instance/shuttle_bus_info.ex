@@ -64,7 +64,7 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
     %{
       minutes_range_to_destination: get_minute_range(minutes_range_to_destination_schedule, now),
       destination: destination,
-      audio_boarding_instructions: boarding_instructions
+      boarding_instructions: boarding_instructions
     }
   end
 

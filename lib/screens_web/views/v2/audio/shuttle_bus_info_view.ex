@@ -4,7 +4,7 @@ defmodule ScreensWeb.V2.Audio.ShuttleBusInfoView do
   def render("_widget.ssml", %{
         minutes_range_to_destination: minutes_range_to_destination,
         destination: destination,
-        audio_boarding_instructions: boarding_instructions
+        boarding_instructions: boarding_instructions
       }) do
     ~E|
     <p>Shuttle buses.</p>
