@@ -10,6 +10,7 @@ defmodule Screens.Config.V2.ShuttleBusInfo do
           arrow: arrow(),
           english_boarding_instructions: String.t(),
           spanish_boarding_instructions: String.t(),
+          audio_boarding_instructions: String.t(),
           priority: WidgetInstance.priority()
         }
 
@@ -20,6 +21,7 @@ defmodule Screens.Config.V2.ShuttleBusInfo do
             arrow: nil,
             english_boarding_instructions: nil,
             spanish_boarding_instructions: nil,
+            audio_boarding_instructions: nil,
             priority: [99]
 
   use Screens.Config.Struct,
