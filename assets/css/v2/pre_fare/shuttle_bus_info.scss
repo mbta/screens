@@ -116,26 +116,39 @@
     }
 
     .shuttle-bus-info__trip-info-price {
-      position: absolute;
-      top: 534px;
-      left: 216px;
+      .shuttle-bus-info__trip-info-price-icon-container {
+        position: absolute;
+        top: 534px;
+        left: 64px;
 
-      &--english {
-        margin-right: 24px;
-        color: rgb(23, 31, 38);
-        font-size: 40px;
-        font-family: Inter;
-        font-weight: bold;
-        line-height: 52px;
+        .shuttle-bus-info__trip-info-price-icon {
+          height: 56px;
+          width: 56px;
+        }
       }
 
-      &--spanish {
-        color: rgb(23, 31, 38);
-        font-size: 32px;
-        font-family: Inter;
-        font-weight: normal;
-        line-height: 44px;
-        opacity: 90%;
+      .shuttle-bus-info__trip-info-price-text {
+        position: absolute;
+        top: 534px;
+        left: 216px;
+
+        &--english {
+          margin-right: 24px;
+          color: rgb(23, 31, 38);
+          font-size: 40px;
+          font-family: Inter;
+          font-weight: bold;
+          line-height: 52px;
+        }
+
+        &--spanish {
+          color: rgb(23, 31, 38);
+          font-size: 32px;
+          font-family: Inter;
+          font-weight: normal;
+          line-height: 44px;
+          opacity: 90%;
+        }
       }
     }
 

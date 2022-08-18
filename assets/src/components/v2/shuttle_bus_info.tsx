@@ -2,6 +2,7 @@ import Arrow, { Direction } from "Components/solari/arrow";
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
 import Accessible from "Components/v2/bundled_svg/accessible";
+import Free from "Components/v2/bundled_svg/free";
 
 interface Props {
   minutes_range_to_destination: string;
@@ -58,12 +59,20 @@ const ShuttleBusInfo: ComponentType<Props> = ({
           <span className="shuttle-bus-info__trip-info-time--spanish">{`paseo a ${destination}`}</span>
         </div>
         <div className="shuttle-bus-info__trip-info-price">
-          <span className="shuttle-bus-info__trip-info-price--english">
-            Free
-          </span>
-          <span className="shuttle-bus-info__trip-info-price--spanish">
-            gratis
-          </span>
+          <div className="shuttle-bus-info__trip-info-price-icon-container">
+            <Free
+              className="shuttle-bus-info__trip-info-price-icon"
+              colorHex="#00843d"
+            />
+          </div>
+          <div className="shuttle-bus-info__trip-info-price-text">
+            <span className="shuttle-bus-info__trip-info-price-text--english">
+              Free
+            </span>
+            <span className="shuttle-bus-info__trip-info-price-text--spanish">
+              gratis
+            </span>
+          </div>
         </div>
         <div className="shuttle-bus-info__trip-info-accessibility">
           <div className="shuttle-bus-info__trip-info-accessibility-icon-container">
