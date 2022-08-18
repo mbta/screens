@@ -140,25 +140,38 @@
     }
 
     .shuttle-bus-info__trip-info-accessibility {
-      position: absolute;
-      top: 622px;
-      left: 216px;
-      margin-right: 44px;
+      .shuttle-bus-info__trip-info-accessibility-icon-container {
+        position: absolute;
+        top: 622px;
+        left: 64px;
 
-      &--english {
-        color: rgb(23, 31, 38);
-        font-size: 32px;
-        font-family: Inter;
-        font-weight: bold;
-        line-height: 44px;
+        .shuttle-bus-info__trip-info-accessibility-icon {
+          height: 56px;
+          width: 56px;
+        }
       }
 
-      &--spanish {
-        color: rgb(23, 31, 38);
-        font-size: 24px;
-        font-family: Inter;
-        font-weight: normal;
-        line-height: 36px;
+      .shuttle-bus-info__trip-info-accessibility-text {
+        position: absolute;
+        top: 622px;
+        left: 216px;
+        margin-right: 44px;
+
+        &--english {
+          color: rgb(23, 31, 38);
+          font-size: 32px;
+          font-family: Inter;
+          font-weight: bold;
+          line-height: 44px;
+        }
+
+        &--spanish {
+          color: rgb(23, 31, 38);
+          font-size: 24px;
+          font-family: Inter;
+          font-weight: normal;
+          line-height: 36px;
+        }
       }
     }
   }

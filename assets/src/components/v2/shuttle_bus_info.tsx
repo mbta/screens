@@ -1,6 +1,7 @@
 import Arrow, { Direction } from "Components/solari/arrow";
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
+import Accessible from "Components/v2/bundled_svg/accessible";
 
 interface Props {
   minutes_range_to_destination: string;
@@ -65,13 +66,21 @@ const ShuttleBusInfo: ComponentType<Props> = ({
           </span>
         </div>
         <div className="shuttle-bus-info__trip-info-accessibility">
-          <div className="shuttle-bus-info__trip-info-accessibility--english">
-            All shuttle buses are accessible. Accessible vans also available
-            upon request.
+          <div className="shuttle-bus-info__trip-info-accessibility-icon-container">
+            <Accessible
+              className="shuttle-bus-info__trip-info-accessibility-icon"
+              colorHex="#165c96"
+            />
           </div>
-          <div className="shuttle-bus-info__trip-info-accessibility--spanish">
-            Todos los autobuses de enlace son accesibles. Furgonetas accesibles
-            también están disponibles a petición del cliente.
+          <div className="shuttle-bus-info__trip-info-accessibility-text">
+            <div className="shuttle-bus-info__trip-info-accessibility-text--english">
+              All shuttle buses are accessible. Accessible vans also available
+              upon request.
+            </div>
+            <div className="shuttle-bus-info__trip-info-accessibility-text--spanish">
+              Todos los autobuses de enlace son accesibles. Furgonetas
+              accesibles también están disponibles a petición del cliente.
+            </div>
           </div>
         </div>
       </div>
