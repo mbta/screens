@@ -66,7 +66,14 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
                                start_time: start_time,
                                end_time: end_time
                              } ->
-        Date.day_of_week(now) in days and
+        day_range =
+          case days do
+            :weekday -> 1..5
+            :saturday -> [6]
+            :sunday -> [7]
+          end
+
+        Date.day_of_week(now) in day_range and
           Util.time_in_range?(DateTime.to_time(now), start_time, end_time)
       end)
 
