@@ -2,7 +2,8 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{PreFare, ShuttleBusInfo}
+  alias Screens.Config.V2.{PreFare, ShuttleBusInfo, ShuttleBusSchedule}
+  alias Screens.Util
 
   @enforce_keys ~w[screen]a
   defstruct screen: nil
@@ -18,26 +19,30 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
       }),
       do: priority
 
-  def serialize(%__MODULE__{
-        screen: %Screen{
-          app_params: %PreFare{
-            shuttle_bus_info: %ShuttleBusInfo{
-              minutes_range_to_destination: minutes_range_to_destination,
-              destination: destination,
-              arrow: arrow,
-              english_boarding_instructions: english_boarding_instructions,
-              spanish_boarding_instructions: spanish_boarding_instructions
+  def serialize(
+        %__MODULE__{
+          screen: %Screen{
+            app_params: %PreFare{
+              shuttle_bus_info: %ShuttleBusInfo{
+                minutes_range_to_destination_schedule: minutes_range_to_destination_schedule,
+                destination: destination,
+                arrow: arrow,
+                english_boarding_instructions: english_boarding_instructions,
+                spanish_boarding_instructions: spanish_boarding_instructions
+              }
             }
           }
-        }
-      }),
-      do: %{
-        minutes_range_to_destination: minutes_range_to_destination,
-        destination: destination,
-        arrow: arrow,
-        english_boarding_instructions: english_boarding_instructions,
-        spanish_boarding_instructions: spanish_boarding_instructions
-      }
+        },
+        now \\ DateTime.utc_now()
+      ) do
+    %{
+      minutes_range_to_destination: get_minute_range(minutes_range_to_destination_schedule, now),
+      destination: destination,
+      arrow: arrow,
+      english_boarding_instructions: english_boarding_instructions,
+      spanish_boarding_instructions: spanish_boarding_instructions
+    }
+  end
 
   def widget_type(_instance), do: :shuttle_bus_info
 
@@ -53,6 +58,20 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
   def audio_valid_candidate?(_instance), do: true
 
   def audio_view(_instance), do: ScreensWeb.V2.Audio.ShuttleBusInfoView
+
+  defp get_minute_range(schedule, now) do
+    %ShuttleBusSchedule{minute_range: minutes_range_to_destination} =
+      Enum.find(schedule, fn %ShuttleBusSchedule{
+                               days: days,
+                               start_time: start_time,
+                               end_time: end_time
+                             } ->
+        Date.day_of_week(now) in days and
+          Util.time_in_range?(DateTime.to_time(now), start_time, end_time)
+      end)
+
+    minutes_range_to_destination
+  end
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.ShuttleBusInfo
