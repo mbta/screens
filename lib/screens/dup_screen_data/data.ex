@@ -1,8 +1,6 @@
 defmodule Screens.DupScreenData.Data do
   @moduledoc false
 
-  alias Screens.Config.Dup
-
   def choose_alert([]), do: nil
 
   def choose_alert(alerts) do
@@ -46,11 +44,6 @@ defmodule Screens.DupScreenData.Data do
     alert.informed_entities
     |> Enum.filter(filter_fn)
     |> Enum.flat_map(route_fn)
-  end
-
-  def station_line_count(%Dup.Departures{sections: [section | _]}) do
-    stop_id = hd(section.stop_ids)
-    if stop_id in Application.get_env(:screens, :two_line_stops), do: 2, else: 1
   end
 
   def limit_three_departures([[d1, d2], [d3, _d4]]), do: [[d1, d2], [d3]]
