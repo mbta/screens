@@ -19,13 +19,13 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
                     %ShuttleBusSchedule{
                       start_time: ~T[00:00:00],
                       end_time: ~T[10:00:00],
-                      days: [1, 2, 3, 4, 5, 6, 7],
+                      days: :weekday,
                       minute_range: "35-45"
                     },
                     %ShuttleBusSchedule{
                       start_time: ~T[11:00:00],
                       end_time: ~T[23:00:00],
-                      days: [1, 2, 3, 4, 5, 6, 7],
+                      days: :weekday,
                       minute_range: "15-25"
                     }
                   ],
@@ -50,13 +50,13 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
                     %ShuttleBusSchedule{
                       start_time: "00:00:00",
                       end_time: "10:00:00",
-                      days: [1, 2, 3, 4, 5, 6, 7],
+                      days: :weekday,
                       minute_range: "35-45"
                     },
                     %ShuttleBusSchedule{
                       start_time: "11:00:00",
                       end_time: "23:00:00",
-                      days: [1, 2, 3, 4, 5, 6, 7],
+                      days: :weekday,
                       minute_range: "15-25"
                     }
                   ],
