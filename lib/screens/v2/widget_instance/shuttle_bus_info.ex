@@ -5,11 +5,11 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
   alias Screens.Config.V2.{PreFare, ShuttleBusInfo, ShuttleBusSchedule}
   alias Screens.Util
 
-  @enforce_keys ~w[screen]a
-  defstruct screen: nil
+  defstruct screen: nil, now: nil
 
   @type t :: %__MODULE__{
-          screen: Screen.t()
+          screen: Screen.t(),
+          now: DateTime.t()
         }
 
   def priority(%__MODULE__{
@@ -19,22 +19,20 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
       }),
       do: priority
 
-  def serialize(
-        %__MODULE__{
-          screen: %Screen{
-            app_params: %PreFare{
-              shuttle_bus_info: %ShuttleBusInfo{
-                minutes_range_to_destination_schedule: minutes_range_to_destination_schedule,
-                destination: destination,
-                arrow: arrow,
-                english_boarding_instructions: english_boarding_instructions,
-                spanish_boarding_instructions: spanish_boarding_instructions
-              }
+  def serialize(%__MODULE__{
+        screen: %Screen{
+          app_params: %PreFare{
+            shuttle_bus_info: %ShuttleBusInfo{
+              minutes_range_to_destination_schedule: minutes_range_to_destination_schedule,
+              destination: destination,
+              arrow: arrow,
+              english_boarding_instructions: english_boarding_instructions,
+              spanish_boarding_instructions: spanish_boarding_instructions
             }
           }
         },
-        now \\ DateTime.utc_now()
-      ) do
+        now: now
+      }) do
     %{
       minutes_range_to_destination: get_minute_range(minutes_range_to_destination_schedule, now),
       destination: destination,
