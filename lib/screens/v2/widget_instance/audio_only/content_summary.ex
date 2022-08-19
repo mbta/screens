@@ -7,7 +7,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
 
   alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.NormalHeader
+  alias Screens.V2.WidgetInstance.{BlueBikes, NormalHeader, ShuttleBusInfo}
 
   @type subway_line :: :red | :orange | :green | :blue
 
@@ -59,7 +59,20 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
     false
   end
 
-  def audio_view(_instance), do: ScreensWeb.V2.Audio.ContentSummaryView
+  def audio_view(%__MODULE__{widgets_snapshot: widgets}) do
+    if has_surge_widgets?(widgets) do
+      ScreensWeb.V2.Audio.SurgeContentSummaryView
+    else
+      ScreensWeb.V2.Audio.ContentSummaryView
+    end
+  end
+
+  defp has_surge_widgets?(widgets) do
+    Enum.any?(widgets, fn
+      %widget{} when widget in [ShuttleBusInfo, BlueBikes] -> true
+      _ -> false
+    end)
+  end
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
