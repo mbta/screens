@@ -113,8 +113,8 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
                minutes_range_to_destination: "15-25",
                destination: "Test Station",
                arrow: :n,
-               english_boarding_instructions: "",
-               spanish_boarding_instructions: ""
+               english_boarding_instructions: "Hello",
+               spanish_boarding_instructions: "Hola"
              } == WidgetInstance.serialize(widget)
     end
   end
