@@ -17,7 +17,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
 
   def departures_instances(
         %Screen{
-          app_params: %app{
+          app_params: %PreFare{cr_departures: %CRDepartures{enabled: false}}
+        },
+        _,
+        _,
+        _
+      ) do
+    []
+  end
+
+  def departures_instances(
+        %Screen{
+          app_params: %PreFare{
             cr_departures:
               %CRDepartures{direction_to_destination: direction_to_destination, station: station} =
                 cr_departures
@@ -26,8 +37,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
         fetch_departures_fn,
         fetch_stop_name_fn,
         now
-      )
-      when app in [PreFare] do
+      ) do
     case fetch_departures_fn.(direction_to_destination, station) do
       {:ok, departures_data} ->
         destination = fetch_stop_name_fn.(cr_departures.destination)
