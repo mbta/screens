@@ -61,9 +61,9 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
 
     track =
       if track_number do
-        "on track " <> Integer.to_string(track_number) <> "."
+        "on track " <> Integer.to_string(track_number) <> ". "
       else
-        ". We will announce the track for this train soon."
+        ". We will announce the track for this train soon. "
       end
 
     content =
@@ -76,7 +76,7 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
         track
       ])
 
-    ~E|<s><%= content %></s>|
+    ~E|<%= content %>|
   end
 
   defp render_departures(departures) do
