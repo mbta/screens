@@ -2,13 +2,14 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{PreFare, ShuttleBusInfo}
+  alias Screens.Config.V2.{PreFare, ShuttleBusInfo, ShuttleBusSchedule}
+  alias Screens.Util
 
-  @enforce_keys ~w[screen]a
-  defstruct screen: nil
+  defstruct screen: nil, now: nil
 
   @type t :: %__MODULE__{
-          screen: Screen.t()
+          screen: Screen.t(),
+          now: DateTime.t()
         }
 
   def priority(%__MODULE__{
@@ -22,22 +23,24 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
         screen: %Screen{
           app_params: %PreFare{
             shuttle_bus_info: %ShuttleBusInfo{
-              minutes_range_to_destination: minutes_range_to_destination,
+              minutes_range_to_destination_schedule: minutes_range_to_destination_schedule,
               destination: destination,
               arrow: arrow,
               english_boarding_instructions: english_boarding_instructions,
               spanish_boarding_instructions: spanish_boarding_instructions
             }
           }
-        }
-      }),
-      do: %{
-        minutes_range_to_destination: minutes_range_to_destination,
-        destination: destination,
-        arrow: arrow,
-        english_boarding_instructions: english_boarding_instructions,
-        spanish_boarding_instructions: spanish_boarding_instructions
-      }
+        },
+        now: now
+      }) do
+    %{
+      minutes_range_to_destination: get_minute_range(minutes_range_to_destination_schedule, now),
+      destination: destination,
+      arrow: arrow,
+      english_boarding_instructions: english_boarding_instructions,
+      spanish_boarding_instructions: spanish_boarding_instructions
+    }
+  end
 
   def widget_type(_instance), do: :shuttle_bus_info
 
@@ -53,6 +56,29 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
   def audio_valid_candidate?(_instance), do: true
 
   def audio_view(_instance), do: ScreensWeb.V2.Audio.ShuttleBusInfoView
+
+  defp get_minute_range(schedule, now) do
+    {:ok, now} = DateTime.shift_zone(now, "America/Los_Angeles")
+
+    %ShuttleBusSchedule{minute_range: minutes_range_to_destination} =
+      Enum.find(schedule, fn %ShuttleBusSchedule{
+                               days: days,
+                               start_time: start_time,
+                               end_time: end_time
+                             } ->
+        day_range =
+          case days do
+            :weekday -> 1..5
+            :saturday -> [6]
+            :sunday -> [7]
+          end
+
+        Date.day_of_week(now) in day_range and
+          Util.time_in_range?(DateTime.to_time(now), start_time, end_time)
+      end)
+
+    minutes_range_to_destination
+  end
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.ShuttleBusInfo

@@ -135,4 +135,17 @@ defmodule Screens.Util do
     |> List.update_at(length(list) - 1, &"and #{&1}")
     |> Enum.join(", ")
   end
+
+  @doc """
+  Returns true if given Time object falls between start_time and end_time.
+  """
+  def time_in_range?(t, start_time, stop_time) do
+    if Time.compare(start_time, stop_time) in [:lt, :eq] do
+      # The range exists within a single day starting/ending at midnight
+      Time.compare(start_time, t) in [:lt, :eq] and Time.compare(stop_time, t) == :gt
+    else
+      # The range crosses midnight, e.g. start: 5am, stop: 1am
+      Time.compare(start_time, t) in [:lt, :eq] or Time.compare(stop_time, t) == :gt
+    end
+  end
 end
