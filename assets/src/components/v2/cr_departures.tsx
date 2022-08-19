@@ -114,7 +114,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
         </div>
         <div className="departures-card__body">
           <DeparturesTable departures={departures} />
-          {show_via_headsigns_message && (
+          {show_via_headsigns_message ? (
             <div className="departures-card__info-row">
               <img className="small-svg" src={imagePath(`logo-black.svg`)} />
               <div className="departures-card__info-text">
@@ -133,6 +133,24 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
                 <div className="departures-card__body-spanish">
                   Trenes a través de Forest Hills paradas en Ruggles y Forest
                   Hills
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="departures-card__info-row">
+              <img className="small-svg" src={imagePath(`logo-black.svg`)} />
+              <div className="departures-card__info-text">
+                <div className="departures-card__body-english">
+                  <div>
+                    All trains to <strong>South</strong> Station stop at
+                  </div>
+                  <div>
+                    <strong>Ruggles</strong> and <strong>Back Bay</strong>
+                  </div>
+                </div>
+                <div className="departures-card__body-spanish">
+                  <div>Todos los trenes hacia South Station parán en</div>
+                  <div>Ruggles y Back Bay.</div>
                 </div>
               </div>
             </div>
