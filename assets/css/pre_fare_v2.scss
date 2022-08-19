@@ -1,7 +1,10 @@
 @import url("https://rsms.me/inter/inter.css");
 
 @import "colors";
-@import "fonts_inter";
+// Don't import from solari... put in common place!
+@import "solari/arrow";
+@import "solari/departure_time";
+@import "v2/clock_icon";
 
 @import "v2/pre_fare/viewport";
 @import "v2/pre_fare/screen_container";
@@ -34,6 +37,7 @@
 @import "v2/pre_fare/reconstructed_alert";
 @import "v2/pre_fare/free_text";
 @import "v2/pre_fare/cr_departures";
+@import "v2/pre_fare/shuttle_bus_info";
 
 @import "v2/pre_fare/subway_status";
 @import "v2/lcd_common_styles/route_pill";
@@ -45,9 +49,7 @@
 
 @import "v2/pre_fare/simulation";
 
-// Don't import from solari... put in common place!
-@import "solari/arrow";
-@import "solari/departure_time";
+@import "v2/blue_bikes";
 
 body {
   margin: 0px;
