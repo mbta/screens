@@ -11,7 +11,8 @@ defmodule Screens.Config.V2.ShuttleBusInfo do
           english_boarding_instructions: String.t(),
           spanish_boarding_instructions: String.t(),
           audio_boarding_instructions: String.t(),
-          priority: WidgetInstance.priority()
+          priority: WidgetInstance.priority(),
+          enabled: boolean()
         }
 
   @type arrow :: :n | :ne | :e | :se | :s | :sw | :w | :nw | nil
@@ -22,7 +23,8 @@ defmodule Screens.Config.V2.ShuttleBusInfo do
             english_boarding_instructions: nil,
             spanish_boarding_instructions: nil,
             audio_boarding_instructions: nil,
-            priority: [99]
+            priority: [99],
+            enabled: false
 
   use Screens.Config.Struct,
     children: [minutes_range_to_destination_schedule: {:list, ShuttleBusSchedule}],

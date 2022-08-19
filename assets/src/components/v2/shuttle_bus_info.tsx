@@ -40,7 +40,7 @@ const ShuttleBusInfo: ComponentType<Props> = ({
               Shuttle Buses
             </div>
             <div className="shuttle-bus-info__header-text--spanish">
-              Autobuses de Enlace
+              Autobuses de enlace
             </div>
           </div>
         </div>
@@ -103,8 +103,8 @@ const ShuttleBusInfo: ComponentType<Props> = ({
                 upon request.
               </div>
               <div className="shuttle-bus-info__trip-info-accessibility-text--spanish">
-                Todos los autobuses de enlace son accesibles. Furgonetas
-                accesibles también están disponibles a petición del cliente.
+                Todos los autobuses de enlace son accesibles. Microbuses
+                accesibles estarán disponibles a su petición.
               </div>
             </div>
           </div>
