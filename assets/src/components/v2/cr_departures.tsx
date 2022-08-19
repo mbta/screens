@@ -3,6 +3,7 @@ import Arrow from "Components/solari/arrow";
 import React from "react";
 import { classWithModifier, imagePath } from "Util/util";
 import CRIcon from "./bundled_svg/cr_icon";
+import ClockIcon from "./clock_icon";
 
 interface CRDeparturesProps {
   departures: any,
@@ -12,7 +13,11 @@ interface CRDeparturesProps {
 
 const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
   const { departures, destination, time_to_destination } = props
-  console.log(props)
+
+  let maxMinutes = parseInt(time_to_destination.split("-")[1]);
+  if (isNaN(maxMinutes)) {
+    maxMinutes = 15;
+  }
   
   return (
     <div className="departures-container">
@@ -43,7 +48,6 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
                   return (
                     <tr key={i}>
                       <td>{departure.arrow ? <Arrow direction={departure.arrow} className="departure__arrow-image" /> : "" }</td>
-                      {/* fix this so it flashes */}
                       <td className="headsign">{departure.headsign.headsign}</td>
                       <td className="arrival">
                         <div
@@ -74,10 +78,9 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
         </div>
         <div className="departures-card__footer">
           <div className="departures-card__info-row">
-            <img
-              className="small-svg"
-              src={imagePath(`logo-black.svg`)}
-            />
+            <div className="small-svg">
+              <ClockIcon minutes={maxMinutes} fgColor="rgb(23, 31, 38)" bgColor="transparent" />
+            </div>
             <div className="departures-card__footer-english">{time_to_destination} to {destination}</div>
             <div className="departures-card__footer-spanish">paseo a {destination}</div>
           </div>

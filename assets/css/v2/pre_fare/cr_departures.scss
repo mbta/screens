@@ -95,6 +95,10 @@
 .departures-card__footer {
   height: 376px;
   padding: 24px 40px 76px 40px;
+  .departures-card__footer__clock-icon-container {
+    height: 56px;
+    width: 56px;
+  }
   .departures-card__footer-english {
     font-size: 40px;
     font-weight: bold;
@@ -115,6 +119,7 @@
   padding-top: 34px;
   .small-svg {
     height: 56px;
+    width: 56px;
     margin: 0 96px 0 24px;
     &.free-cr {
       fill: #00843d;

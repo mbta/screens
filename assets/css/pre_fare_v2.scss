@@ -1,9 +1,12 @@
 @import url("https://rsms.me/inter/inter.css");
 
 @import "colors";
+
 // Don't import from solari... put in common place!
+@import "fonts";
 @import "solari/arrow";
 @import "solari/departure_time";
+
 @import "v2/clock_icon";
 
 @import "v2/pre_fare/viewport";
