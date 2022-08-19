@@ -6,30 +6,37 @@ defmodule ScreensWeb.V2.Audio.BlueBikesView do
         minutes_range_to_destination: minutes_range_to_destination,
         stations: stations
       }) do
+    stations = Enum.reject(stations, &(&1.status == :out_of_service))
+
     ~E|
-    <p>Nearby Blue Bikes stations.</p>
-    <p>It's about a <%= minutes_range_to_destination %> minute bike ride to <%= destination %></p>
-    <p><%= Enum.map(stations, &render_station/1) %></p>
+    <%= render_stations(stations) %>
+    <p>
+      <s>It's a <%= minutes_range_to_destination %> minute bike ride to <%= destination %></s>
+      <s>Free passes are available</s>
+    </p>
     |
   end
 
-  defp render_station(%{status: :normal} = station) do
+  defp render_stations([station1, station2]) do
     ~E|
-    <s>The bike station at <%= station.name %> is a <%= station.walk_distance_minutes %> minute walk from here</s>
-    <s>It currently has <%= station.num_bikes_available %> bikes available, and <%= station.num_docks_available %> docks available</s>
+    <p>
+      <s>A nearby <%= render_station(station1) %></s>
+      <s>Another <%= render_station(station2) %></s>
+    </p>
     |
+  end
+
+  defp render_stations([station]) do
+    ~E|<p><s>A nearby <%= render_station(station) %></s></p>|
+  end
+
+  defp render_stations([]), do: ~E""
+
+  defp render_station(%{status: :normal} = station) do
+    ~E|Blue Bikes station is a <%= station.walk_distance_minutes %>-minute walk, or <%= station.walk_distance_feet %> feet away, with <%= station.num_bikes_available %> bikes and <%= station.num_docks_available %> docks|
   end
 
   defp render_station(%{status: :valet} = station) do
-    ~E|
-    <s>The bike station at <%= station.name %> is a <%= station.walk_distance_minutes %> minute walk from here</s>
-    <s>It currently has valet service, with unlimited bikes available</s>
-    |
-  end
-
-  defp render_station(%{status: :out_of_service} = station) do
-    ~E|
-    <s>The bike station at <%= station.name %> is currently not in service</s>
-    |
+    ~E|Blue Bikes station is a <%= station.walk_distance_minutes %>-minute walk, or <%= station.walk_distance_feet %> feet away, with unlimited bikes available|
   end
 end
