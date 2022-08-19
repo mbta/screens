@@ -5,11 +5,40 @@ defmodule Screens.V2.WidgetInstance.BlueBikes do
   alias Screens.BlueBikes
   alias Screens.BlueBikes.StationStatus
   alias Screens.Config.Screen
+  alias Screens.Config.V2.BlueBikes.Station
   alias Screens.Config.V2.PreFare
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
           station_statuses: %{BlueBikes.station_id() => StationStatus.t()}
+        }
+
+  @type widget_data :: %{
+          destination: String.t(),
+          minutes_range_to_destination: String.t(),
+          stations: list(station_data)
+        }
+
+  @type station_data :: normal_station | special_station
+
+  @type normal_station :: %{
+          status: :normal,
+          id: String.t(),
+          arrow: Station.arrow(),
+          walk_distance_minutes: non_neg_integer(),
+          walk_distance_feet: non_neg_integer(),
+          name: String.t(),
+          num_bikes_available: non_neg_integer(),
+          num_docks_available: non_neg_integer()
+        }
+
+  @type special_station :: %{
+          status: :valet | :out_of_service,
+          id: String.t(),
+          arrow: Station.arrow(),
+          walk_distance_minutes: non_neg_integer(),
+          walk_distance_feet: non_neg_integer(),
+          name: String.t()
         }
 
   defstruct screen: nil, station_statuses: []
@@ -18,6 +47,7 @@ defmodule Screens.V2.WidgetInstance.BlueBikes do
     t.screen.app_params.blue_bikes.priority
   end
 
+  @spec serialize(t()) :: widget_data()
   def serialize(%__MODULE__{screen: %Screen{app_params: %PreFare{}}} = t) do
     widget_config = t.screen.app_params.blue_bikes
 
@@ -27,6 +57,7 @@ defmodule Screens.V2.WidgetInstance.BlueBikes do
       widget_config.stations
       |> Enum.map(&serialize_station(&1, station_statuses))
       |> Enum.sort_by(& &1.walk_distance_minutes)
+      |> Enum.take(2)
 
     # get name and current status from station_status
     # get arrow and walk distance from config
@@ -52,7 +83,7 @@ defmodule Screens.V2.WidgetInstance.BlueBikes do
     |> Map.merge(status_data)
   end
 
-  def slot_names(_instance), do: [:lower_right]
+  def slot_names(_instance), do: [:orange_line_surge_upper]
 
   def widget_type(_instance), do: :blue_bikes
 
