@@ -9,7 +9,7 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
     ~E|<p>Upcoming trips:</p><%= Enum.map(departures, &render_departure/1) %>|
   end
 
-  defp render_departure(departure) do
+  defp render_departure(_departure) do
     # %{
     #   headsign: headsign,
     #   time: time,
