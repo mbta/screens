@@ -76,7 +76,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       fn -> full_line_map_instances_fn.(config) end,
       fn -> evergreen_content_instances_fn.(config) end,
       fn -> blue_bikes_instances_fn.(config) end,
-      fn -> shuttle_bus_info_instances(config) end
+      fn -> shuttle_bus_info_instances(config, now) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
@@ -109,8 +109,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     [%NormalHeader{screen: config, text: stop_name, time: now}]
   end
 
-  def shuttle_bus_info_instances(config) do
-    [%ShuttleBusInfoWidget{screen: config}]
+  def shuttle_bus_info_instances(config, now) do
+    [%ShuttleBusInfoWidget{screen: config, now: now}]
   end
 
   defp content_summary_instances(widgets, config, fetch_routes_by_stop_fn) do
