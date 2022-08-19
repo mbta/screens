@@ -17,7 +17,6 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
         }
 
   defimpl Screens.V2.WidgetInstance do
-
     alias Screens.V2.WidgetInstance.CRDepartures, as: CRDeparturesWidget
 
     def priority(%CRDeparturesWidget{config: config}), do: config.priority
