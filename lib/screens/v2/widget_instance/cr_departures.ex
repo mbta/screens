@@ -25,10 +25,10 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
         }) do
       %{
         departures:
-          Enum.map(
-            departures_data,
-            &CRDeparturesWidget.serialize_departure(&1, config.wayfinding_arrows)
-          ),
+          departures_data
+           |> Enum.map(&CRDeparturesWidget.serialize_departure(&1, config.wayfinding_arrows))
+           |> Enum.slice(0..2),
+        show_via_headsigns_message: config.show_via_headsigns_message,
         destination: destination,
         time_to_destination: config.travel_time_to_destination
       }
@@ -47,10 +47,10 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
         }) do
       %{
         departures:
-          Enum.map(
-            departures_data,
-            &CRDeparturesWidget.serialize_departure(&1, config.wayfinding_arrows)
-          ),
+          departures_data
+           |> Enum.map(&CRDeparturesWidget.serialize_departure(&1, config.wayfinding_arrows))
+           |> Enum.slice(0..2),
+        show_via_headsigns_message: config.show_via_headsigns_message,
         destination: destination,
         time_to_destination: config.travel_time_to_destination
       }

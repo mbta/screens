@@ -9,11 +9,12 @@ import ClockIcon from "./clock_icon";
 interface CRDeparturesProps {
   departures: any,
   destination: string,
-  time_to_destination: string
+  time_to_destination: string,
+  show_via_headsigns_message: boolean
 }
 
 const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
-  const { departures, destination, time_to_destination } = props
+  const { departures, destination, time_to_destination, show_via_headsigns_message, } = props
 
   let maxMinutes = parseInt(time_to_destination.split("-")[1]);
   if (isNaN(maxMinutes)) {
@@ -45,7 +46,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
                   <div className="table-header__spanish">Pista</div>
                 </td>
               </tr>
-              { departures.slice(0, 3).map((departure, i) => {
+              { departures.map((departure, i) => {
                   return (
                     <tr key={i}>
                       <td>{departure.arrow ? <Arrow direction={departure.arrow} className="departure__arrow-image" /> : "" }</td>
@@ -63,7 +64,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
               })}
             </tbody>
           </table>
-          <div className="departures-card__info-row">
+          { show_via_headsigns_message && <div className="departures-card__info-row">
             <img
               className="small-svg"
               src={imagePath(`logo-black.svg`)}
@@ -74,8 +75,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
               <div className="departures-card__body-english"><strong>Trains via Forest Hills</strong> stop at Ruggles and Forest Hills</div>
               <div className="departures-card__body-spanish">Trenes a través de Forest Hills paradas en Ruggles y Forest Hills</div>
             </div>
-          </div>
-          
+          </div> }  
         </div>
         <div className="departures-card__footer">
           <div className="departures-card__info-row">
