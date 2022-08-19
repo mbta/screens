@@ -4,6 +4,7 @@ import { TimeRepresentation } from "Util/time_representation";
 
 interface BaseDepartureTimeProps {
   time: TimeRepresentation;
+  hideAmPm?: boolean;
 }
 
 const BaseDepartureTime = ({
