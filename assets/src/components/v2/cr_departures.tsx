@@ -49,7 +49,6 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
           </td>
         </tr>
         {departures.slice(0, 3).map((departure, i) => {
-          console.log(departure.route_id);
           return (
             <tr key={departure.route_id}>
               <td>
