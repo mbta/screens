@@ -8,23 +8,24 @@ import Free from "./bundled_svg/free";
 import ClockIcon from "./clock_icon";
 
 interface Departure {
-  arrow: string,
+  arrow: string;
   headsign: {
-    headsign: string,
-    variation: string
-  },
-  time: any,
-  track_number: number
+    headsign: string;
+    variation: string;
+  };
+  time: any;
+  track_number: number;
+  route_id: string;
 }
 interface CRDeparturesProps {
-  departures: Departure[],
-  destination: string,
-  time_to_destination: string,
-  show_via_headsigns_message: boolean
+  departures: Departure[];
+  destination: string;
+  time_to_destination: string;
+  show_via_headsigns_message: boolean;
 }
 
 const DeparturesTable: React.ComponentType<any> = (props) => {
-  const {departures} = props
+  const { departures } = props;
 
   let [headsignPageOne, setHeadsignPageOne] = useState(true);
 
@@ -47,78 +48,116 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
             <div className="table-header__spanish">Pista</div>
           </td>
         </tr>
-        { departures.slice(0, 3).map((departure, i) => {
-            return (
-              <tr key={i}>
-                <td>{departure.arrow ? <Arrow direction={departure.arrow} className="departure__arrow-image" /> : "" }</td>
-                {headsignPageOne
-                  ? <td className="headsign">{departure.headsign.headsign}</td>
-                  : <td className="headsign">... {departure.headsign.variation}</td>
-                }
-                <td className="arrival">
-                  <div
-                    className={classWithModifier("departure-time", departure.time.type === "text" ? "animated" : "static")}
-                  >
-                    <BaseDepartureTime time={departure.time} hideAmPm/>
-                  </div>
-                </td>
-                <td className="track">{departure.track_number ?? ""}</td>
-              </tr>
-            )
+        {departures.slice(0, 3).map((departure, i) => {
+          console.log(departure.route_id);
+          return (
+            <tr key={departure.route_id}>
+              <td>
+                {departure.arrow ? (
+                  <Arrow
+                    direction={departure.arrow}
+                    className="departure__arrow-image"
+                  />
+                ) : (
+                  ""
+                )}
+              </td>
+              {headsignPageOne ? (
+                <td className="headsign">{departure.headsign.headsign}</td>
+              ) : (
+                <td className="headsign">... {departure.headsign.variation}</td>
+              )}
+              <td className="arrival">
+                <div
+                  className={classWithModifier(
+                    "departure-time",
+                    departure.time.type === "text" ? "animated" : "static"
+                  )}
+                >
+                  <BaseDepartureTime time={departure.time} hideAmPm />
+                </div>
+              </td>
+              <td className="track">{departure.track_number ?? ""}</td>
+            </tr>
+          );
         })}
       </tbody>
     </table>
-  )
-}
+  );
+};
 
 const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
-  const { departures, destination, time_to_destination, show_via_headsigns_message } = props
+  const {
+    departures,
+    destination,
+    time_to_destination,
+    show_via_headsigns_message,
+  } = props;
 
   let maxMinutes = parseInt(time_to_destination.split("-")[1]);
   if (isNaN(maxMinutes)) {
     maxMinutes = 15;
   }
-  
+
   return (
     <div className="departures-container">
       <div className="departures-card">
         <div className="departures-card__header">
-          <CRIcon className="commuter-rail-icon" colorHex="#d9d6d0"/>
+          <CRIcon className="commuter-rail-icon" colorHex="#d9d6d0" />
           <div className="departures-card__header-text">
-            <div className="departures-card__header-text-english">Commuter Rail</div>
-            <div className="departures-card__header-text-spanish">Tren de Cercanías</div>
+            <div className="departures-card__header-text-english">
+              Commuter Rail
+            </div>
+            <div className="departures-card__header-text-spanish">
+              Tren de Cercanías
+            </div>
           </div>
         </div>
         <div className="departures-card__body">
           <DeparturesTable departures={departures} />
-          { show_via_headsigns_message && <div className="departures-card__info-row">
-            <img
-              className="small-svg"
-              src={imagePath(`logo-black.svg`)}
-            />
-            <div className="departures-card__info-text">
-              <div className="departures-card__body-english"><strong>Trains via Ruggles</strong> stop at Ruggles, but <strong>not</strong> Forest Hills</div>
-              <div className="departures-card__body-spanish">Trenes a través de Ruggles se detiene en Ruggles, pero no en Forest Hills</div>
-              <div className="departures-card__body-english"><strong>Trains via Forest Hills</strong> stop at Ruggles and Forest Hills</div>
-              <div className="departures-card__body-spanish">Trenes a través de Forest Hills paradas en Ruggles y Forest Hills</div>
+          {show_via_headsigns_message && (
+            <div className="departures-card__info-row">
+              <img className="small-svg" src={imagePath(`logo-black.svg`)} />
+              <div className="departures-card__info-text">
+                <div className="departures-card__body-english">
+                  <strong>Trains via Ruggles</strong> stop at Ruggles, but{" "}
+                  <strong>not</strong> Forest Hills
+                </div>
+                <div className="departures-card__body-spanish">
+                  Trenes a través de Ruggles se detiene en Ruggles, pero no en
+                  Forest Hills
+                </div>
+                <div className="departures-card__body-english">
+                  <strong>Trains via Forest Hills</strong> stop at Ruggles and
+                  Forest Hills
+                </div>
+                <div className="departures-card__body-spanish">
+                  Trenes a través de Forest Hills paradas en Ruggles y Forest
+                  Hills
+                </div>
+              </div>
             </div>
-          </div> }
-          
+          )}
         </div>
         <div className="departures-card__footer">
           <div className="departures-card__info-row">
             <div className="small-svg">
-              <ClockIcon minutes={maxMinutes} fgColor="rgb(23, 31, 38)" bgColor="transparent" />
+              <ClockIcon
+                minutes={maxMinutes}
+                fgColor="rgb(23, 31, 38)"
+                bgColor="transparent"
+              />
             </div>
-            <div className="departures-card__footer-english">{time_to_destination} to {destination}</div>
-            <div className="departures-card__footer-spanish">paseo a {destination}</div>
+            <div className="departures-card__footer-english">
+              {time_to_destination} to {destination}
+            </div>
+            <div className="departures-card__footer-spanish">
+              paseo a {destination}
+            </div>
           </div>
           <div className="departures-card__info-row">
             <div className="free-cr">
-              <Free
-                className="small-svg"
-                colorHex="#00843d"
-              />
+              <Free className="small-svg" colorHex="#00843d" />
             </div>
             <div>
               <div className="departures-card__footer-english ride-free">
@@ -132,7 +171,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default CRDepartures;
