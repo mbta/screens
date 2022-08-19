@@ -42,7 +42,7 @@ defmodule Screens.Config.V2.PreFare do
             blue_bikes: BlueBikes.from_json(:default),
             content_summary: nil,
             audio: Audio.from_json(:default),
-            cr_departures: nil,
+            cr_departures: CRDepartures.from_json(:default),
             shuttle_bus_info: ShuttleBusInfo.from_json(:default)
 
   use Screens.Config.Struct,
