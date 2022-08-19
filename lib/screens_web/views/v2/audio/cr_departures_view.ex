@@ -10,11 +10,11 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
   end
 
   defp render_departure(departure) do
-    %{
-      headsign: headsign,
-      time: time,
-      track_number: track_number
-    } = departure
+    # %{
+    #   headsign: headsign,
+    #   time: time,
+    #   track_number: track_number
+    # } = departure
 
     ~E|<p>To be determined</p>|
   end

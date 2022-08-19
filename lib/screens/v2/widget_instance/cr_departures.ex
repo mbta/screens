@@ -1,31 +1,38 @@
 defmodule Screens.V2.WidgetInstance.CRDepartures do
   @moduledoc false
 
-  alias Screens.Alerts.Alert
-  alias Screens.Config.Dup.Override.FreeTextLine
-  alias Screens.Config.Screen
   alias Screens.Config.V2.CRDepartures
-  alias Screens.Util
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.CRDepartures, as: CRDeparturesWidget
-  alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct config: nil,
-            departures_data: []
+            departures_data: [],
+            destination: nil
 
   @type t :: %__MODULE__{
           config: CRDepartures.t(),
-          departures_data: list(Departure.t())
+          departures_data: list(Departure.t()),
+          destination: String.t()
         }
 
   defimpl Screens.V2.WidgetInstance do
     def priority(%CRDeparturesWidget{config: config}), do: config.priority
 
-    def serialize(%CRDeparturesWidget{departures_data: departures_data}) do
-      %{departures: Enum.map(departures_data, &CRDeparturesWidget.serialize_departure/1)}
+    def serialize(%CRDeparturesWidget{
+          config: config,
+          departures_data: departures_data,
+          destination: destination
+        }) do
+      %{
+        departures:
+          Enum.map(
+            departures_data,
+            &CRDeparturesWidget.serialize_departure(&1, config.wayfinding_arrows)
+          ),
+        destination: destination,
+        time_to_destination: config.travel_time_to_destination
+      }
     end
-
-    # TODO: review below
 
     def slot_names(_instance), do: [:main_content_left]
 
@@ -33,8 +40,20 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
     def valid_candidate?(_instance), do: true
 
-    def audio_serialize(%CRDeparturesWidget{departures_data: departures_data, config: config}) do
-      %{departures: Enum.map(departures_data, &CRDeparturesWidget.serialize_departure/1)}
+    def audio_serialize(%CRDeparturesWidget{
+          departures_data: departures_data,
+          config: config,
+          destination: destination
+        }) do
+      %{
+        departures:
+          Enum.map(
+            departures_data,
+            &CRDeparturesWidget.serialize_departure(&1, config.wayfinding_arrows)
+          ),
+        destination: destination,
+        time_to_destination: config.travel_time_to_destination
+      }
     end
 
     def audio_sort_key(_instance), do: [1]
@@ -44,11 +63,29 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     def audio_view(_instance), do: ScreensWeb.V2.Audio.CRDeparturesView
   end
 
-  def serialize_departure(%Departure{} = departure, now \\ DateTime.utc_now()) do
+  def serialize_departure(%Departure{} = departure, wayfinding_arrows, now \\ DateTime.utc_now()) do
+    track_number = Departure.track_number(departure)
+
+    arrow =
+      cond do
+        is_map(wayfinding_arrows) and track_number ->
+          wayfinding_arrows
+          |> Enum.find(fn {_k, v} -> Enum.member?(v, track_number) end)
+          |> Kernel.then(fn {k, _v} -> k end)
+
+        is_map(wayfinding_arrows) ->
+          nil
+
+        true ->
+          wayfinding_arrows
+      end
+
     %{
       headsign: serialize_headsign(departure),
-      time: serialize_time_with_schedule(departure, now),
-      track_number: Departure.track_number(departure)
+      time: serialize_time(departure, now),
+      # I don't think these this is returning expected results... fix
+      track_number: track_number,
+      arrow: arrow
     }
   end
 
@@ -77,52 +114,25 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     departure_time = Departure.time(departure)
     vehicle_status = Departure.vehicle_status(departure)
     stop_type = Departure.stop_type(departure)
-    route_type = Departure.route_type(departure)
 
     second_diff = DateTime.diff(departure_time, now)
     minute_diff = round(second_diff / 60)
 
-    time =
-      cond do
-        vehicle_status == :stopped_at and second_diff < 90 ->
-          %{type: :text, text: "BRD"}
+    cond do
+      vehicle_status == :stopped_at and second_diff < 90 ->
+        %{type: :text, text: "BRD"}
 
-        second_diff < 30 and stop_type == :first_stop ->
-          %{type: :text, text: "BRD"}
+      second_diff < 30 and stop_type == :first_stop ->
+        %{type: :text, text: "BRD"}
 
-        second_diff < 30 ->
-          %{type: :text, text: "ARR"}
+      second_diff < 30 ->
+        %{type: :text, text: "ARR"}
 
-        minute_diff < 60 and route_type not in [:rail, :ferry] ->
-          %{type: :minutes, minutes: minute_diff}
+      minute_diff < 60 ->
+        %{type: :minutes, minutes: minute_diff}
 
-        true ->
-          serialize_timestamp(departure_time)
-      end
-
-    %{time: time}
-  end
-
-  defp serialize_time_with_schedule(departure, now) do
-    %{time: serialized_time} = serialize_time(departure, now)
-
-    scheduled_time = Departure.scheduled_time(departure)
-
-    if is_nil(scheduled_time) do
-      %{time: serialized_time}
-    else
-      serialized_scheduled_time = serialize_timestamp(scheduled_time)
-
-      case serialized_time do
-        %{type: :text} ->
-          %{time: serialized_time}
-
-        ^serialized_scheduled_time ->
-          %{time: serialized_time}
-
-        _ ->
-          %{time: serialized_time, scheduled_time: serialized_scheduled_time}
-      end
+      true ->
+        serialize_timestamp(departure_time)
     end
   end
 
@@ -131,6 +141,11 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
     minute = local_time.minute
     am_pm = if local_time.hour >= 12, do: :pm, else: :am
-    %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm}
+
+    %{
+      type: :timestamp,
+      timestamp: Integer.to_string(hour) <> ":" <> Integer.to_string(minute),
+      ampm: am_pm
+    }
   end
 end
