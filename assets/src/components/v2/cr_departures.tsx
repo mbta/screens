@@ -31,7 +31,7 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
 
   useInterval(() => {
     setHeadsignPageOne(!headsignPageOne);
-  }, 2000);
+  }, 4000);
 
   return (
     <table>
