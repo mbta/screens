@@ -64,7 +64,7 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
               {headsignPageOne ? (
                 <td className="headsign">{departure.headsign.headsign}</td>
               ) : (
-                <td className="headsign">... {departure.headsign.variation}</td>
+                <td className="headsign">{departure.headsign.variation ? "... "+departure.headsign.variation : departure.headsign.headsign}</td>
               )}
               <td className="arrival">
                 <div

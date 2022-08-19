@@ -98,8 +98,12 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           [headsign, nil]
       end
 
-    %{headsign: headsign, variation: variation}
+    %{headsign: shorten_headsign(headsign), variation: variation}
   end
+
+  defp shorten_headsign("Needham Heights"), do: "Needham Hts"
+  defp shorten_headsign("Wickford Junction"), do: "Wickford Jct"
+  defp shorten_headsign(h), do: h
 
   defp serialize_time(departure, now) do
     departure_time = Departure.time(departure)
