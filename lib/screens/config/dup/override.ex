@@ -55,6 +55,10 @@ defmodule Screens.Config.Dup.Override do
     FullscreenImage.to_json(screen0)
   end
 
+  def screen0_to_json(_) do
+    nil
+  end
+
   def screen1_to_json(%FullscreenAlert{} = screen1) do
     FullscreenAlert.to_json(screen1)
   end
@@ -63,7 +67,15 @@ defmodule Screens.Config.Dup.Override do
     FullscreenImage.to_json(screen1)
   end
 
+  def screen1_to_json(_) do
+    nil
+  end
+
   def screen2_to_json(%PartialAlertList{} = screen2) do
     PartialAlertList.to_json(screen2)
+  end
+
+  def screen2_to_json(_) do
+    nil
   end
 end
