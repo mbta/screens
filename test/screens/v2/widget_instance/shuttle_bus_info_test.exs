@@ -106,6 +106,16 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
                english_boarding_instructions: "Hello",
                spanish_boarding_instructions: "Hola"
              } == WidgetInstance.serialize(widget)
+
+      widget = put_now(widget, ~U[2022-08-18T20:00:00Z])
+
+      assert %{
+               minutes_range_to_destination: "15-25",
+               destination: "Test Station",
+               arrow: :n,
+               english_boarding_instructions: "",
+               spanish_boarding_instructions: ""
+             } == WidgetInstance.serialize(widget)
     end
   end
 
