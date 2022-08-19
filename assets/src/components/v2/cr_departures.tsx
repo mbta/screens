@@ -1,15 +1,73 @@
 import BaseDepartureTime from "Components/eink/base_departure_time";
 import Arrow from "Components/solari/arrow";
-import React from "react";
+import useInterval from "Hooks/use_interval";
+import React, { useState } from "react";
 import { classWithModifier, imagePath } from "Util/util";
 import CRIcon from "./bundled_svg/cr_icon";
 import Free from "./bundled_svg/free";
 import ClockIcon from "./clock_icon";
 
+interface Departure {
+  arrow: string,
+  headsign: {
+    headsign: string,
+    variation: string
+  },
+  time: any,
+  track_number: number
+}
 interface CRDeparturesProps {
-  departures: any,
+  departures: Departure,
   destination: string,
   time_to_destination: string
+}
+
+const DeparturesTable: React.ComponentType<any> = (props) => {
+  const {departures} = props
+
+  let [headsignPageOne, setHeadsignPageOne] = useState(true);
+
+  useInterval(() => {
+    setHeadsignPageOne(!headsignPageOne);
+  }, 2000);
+
+  return (
+    <table>
+      <tbody>
+        <tr>
+          <td className="wayfinding-arrow-column"></td>
+          <td className="headsign-column">
+            <div className="table-header__english">Upcoming departures</div>
+            <div className="table-header__spanish">Próximas salidas</div>
+          </td>
+          <td className="arrival-column"></td>
+          <td className="track-column">
+            <div className="table-header__english">Track</div>
+            <div className="table-header__spanish">Pista</div>
+          </td>
+        </tr>
+        { departures.slice(0, 3).map((departure, i) => {
+            return (
+              <tr key={i}>
+                <td>{departure.arrow ? <Arrow direction={departure.arrow} className="departure__arrow-image" /> : "" }</td>
+                {headsignPageOne
+                  ? <td className="headsign">{departure.headsign.headsign}</td>
+                  : <td className="headsign">... {departure.headsign.variation}</td>
+                }
+                <td className="arrival">
+                  <div
+                    className={classWithModifier("departure-time", departure.time.type === "text" ? "animated" : "static")}
+                  >
+                    <BaseDepartureTime time={departure.time} hideAmPm/>
+                  </div>
+                </td>
+                <td className="track">{departure.track_number ?? ""}</td>
+              </tr>
+            )
+        })}
+      </tbody>
+    </table>
+  )
 }
 
 const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
@@ -31,38 +89,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
           </div>
         </div>
         <div className="departures-card__body">
-          <table>
-            <tbody>
-              <tr>
-                <td className="wayfinding-arrow-column"></td>
-                <td className="headsign-column">
-                  <div className="table-header__english">Upcoming departures</div>
-                  <div className="table-header__spanish">Próximas salidas</div>
-                </td>
-                <td className="arrival-column"></td>
-                <td className="track-column">
-                  <div className="table-header__english">Track</div>
-                  <div className="table-header__spanish">Pista</div>
-                </td>
-              </tr>
-              { departures.slice(0, 3).map((departure, i) => {
-                  return (
-                    <tr key={i}>
-                      <td>{departure.arrow ? <Arrow direction={departure.arrow} className="departure__arrow-image" /> : "" }</td>
-                      <td className="headsign">{departure.headsign.headsign}</td>
-                      <td className="arrival">
-                        <div
-                          className={classWithModifier("departure-time", departure.time.type === "text" ? "animated" : "static")}
-                        >
-                          <BaseDepartureTime time={departure.time} hideAmPm/>
-                        </div>
-                      </td>
-                      <td className="track">{departure.track_number ?? ""}</td>
-                    </tr>
-                  )
-              })}
-            </tbody>
-          </table>
+          <DeparturesTable departures={departures} />
           <div className="departures-card__info-row">
             <img
               className="small-svg"
