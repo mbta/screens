@@ -207,17 +207,15 @@ const Distance: ComponentType<DistanceProps> = ({
     : (className: string) => className;
 
   return (
-    <>
-      <div className="blue-bikes__distance-minutes">
-        <div className={mod("blue-bikes__distance-minutes-value")}>
-          {walkDistanceMinutes}
-        </div>
-        <div className={mod("blue-bikes__distance-minutes-unit")}> min</div>
+    <div className="blue-bikes__distance">
+      <div className={mod("blue-bikes__distance-minutes-value")}>
+        {walkDistanceMinutes}
       </div>
+      <div className={mod("blue-bikes__distance-minutes-unit")}> min</div>
       <div className={mod("blue-bikes__distance-feet")}>
         {walkDistanceFeet} ft
       </div>
-    </>
+    </div>
   );
 };
 
