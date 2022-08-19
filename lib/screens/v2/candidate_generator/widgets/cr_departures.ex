@@ -20,7 +20,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
         fetch_stop_name_fn
       )
       when app in [PreFare] do
-    # Main departures widaget has mode_disabled option. Need for CR departures?
     opts = %{include_schedules: true}
 
     params = %{

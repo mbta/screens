@@ -58,6 +58,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   end
 
   @impl CandidateGenerator
+  # Error of "arity is too high"
+  # credo:disable-for-next-line
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),

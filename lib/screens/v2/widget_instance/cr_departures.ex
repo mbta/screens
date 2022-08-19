@@ -83,7 +83,6 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     %{
       headsign: serialize_headsign(departure),
       time: serialize_time(departure, now),
-      # I don't think these this is returning expected results... fix
       track_number: track_number,
       arrow: arrow
     }
