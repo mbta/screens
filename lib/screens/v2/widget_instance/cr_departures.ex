@@ -55,6 +55,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
   def serialize_departure(%Departure{} = departure, wayfinding_arrows, now) do
     track_number = Departure.track_number(departure)
+    prediction_or_schedule_id = Departure.id(departure)
 
     arrow =
       cond do
@@ -74,6 +75,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       headsign: serialize_headsign(departure),
       time: serialize_time(departure, now),
       track_number: track_number,
+      prediction_or_schedule_id: prediction_or_schedule_id,
       arrow: arrow
     }
   end

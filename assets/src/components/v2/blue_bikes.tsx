@@ -97,7 +97,7 @@ const Stations: ComponentType<StationsProps> = ({ stations }) => {
         </div>
         <div className="blue-bikes__stations-header__docks">
           <div className="blue-bikes__stations-header__main-text">Docks</div>
-          <div className="blue-bikes__stations-header__alt-text">Espacios</div>
+          <div className="blue-bikes__stations-header__alt-text">Puestos</div>
         </div>
       </div>
       {stations.map((station) => (
@@ -251,7 +251,7 @@ const Footer: ComponentType<FooterProps> = (props) => {
           Free passes
         </div>
         <div className="blue-bikes__footer__alt-text">
-          pases gratuitos
+          pases gratis
         </div>
       </div>
     </div>
