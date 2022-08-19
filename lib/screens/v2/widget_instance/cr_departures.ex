@@ -3,31 +3,36 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
   alias Screens.Config.V2.CRDepartures
   alias Screens.V2.Departure
-  alias Screens.V2.WidgetInstance.CRDepartures, as: CRDeparturesWidget
 
   defstruct config: nil,
             departures_data: [],
-            destination: nil
+            destination: nil,
+            now: nil
 
   @type t :: %__MODULE__{
           config: CRDepartures.t(),
           departures_data: list(Departure.t()),
-          destination: String.t()
+          destination: String.t(),
+          now: DateTime.t()
         }
 
   defimpl Screens.V2.WidgetInstance do
+
+    alias Screens.V2.WidgetInstance.CRDepartures, as: CRDeparturesWidget
+
     def priority(%CRDeparturesWidget{config: config}), do: config.priority
 
     def serialize(%CRDeparturesWidget{
           config: config,
           departures_data: departures_data,
-          destination: destination
+          destination: destination,
+          now: now
         }) do
       %{
         departures:
           Enum.map(
             departures_data,
-            &CRDeparturesWidget.serialize_departure(&1, config.wayfinding_arrows)
+            &CRDeparturesWidget.serialize_departure(&1, config.wayfinding_arrows, now)
           ),
         destination: destination,
         time_to_destination: config.travel_time_to_destination
@@ -43,13 +48,14 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     def audio_serialize(%CRDeparturesWidget{
           departures_data: departures_data,
           config: config,
-          destination: destination
+          destination: destination,
+          now: now
         }) do
       %{
         departures:
           Enum.map(
             departures_data,
-            &CRDeparturesWidget.serialize_departure(&1, config.wayfinding_arrows)
+            &CRDeparturesWidget.serialize_departure(&1, config.wayfinding_arrows, now)
           ),
         destination: destination,
         time_to_destination: config.travel_time_to_destination
@@ -63,7 +69,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     def audio_view(_instance), do: ScreensWeb.V2.Audio.CRDeparturesView
   end
 
-  def serialize_departure(%Departure{} = departure, wayfinding_arrows, now \\ DateTime.utc_now()) do
+  def serialize_departure(%Departure{} = departure, wayfinding_arrows, now) do
     track_number = Departure.track_number(departure)
 
     arrow =
