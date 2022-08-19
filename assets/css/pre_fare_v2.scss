@@ -1,6 +1,7 @@
 @import url("https://rsms.me/inter/inter.css");
 
 @import "colors";
+@import "fonts_inter";
 
 @import "v2/pre_fare/viewport";
 @import "v2/pre_fare/screen_container";
@@ -32,6 +33,7 @@
 @import "v2/pre_fare/full_line_map";
 @import "v2/pre_fare/reconstructed_alert";
 @import "v2/pre_fare/free_text";
+@import "v2/pre_fare/cr_departures";
 
 @import "v2/pre_fare/subway_status";
 @import "v2/lcd_common_styles/route_pill";
@@ -42,6 +44,10 @@
 @import "v2/multi_screen_page";
 
 @import "v2/pre_fare/simulation";
+
+// Don't import from solari... put in common place!
+@import "solari/arrow";
+@import "solari/departure_time";
 
 body {
   margin: 0px;

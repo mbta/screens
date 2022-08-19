@@ -37,6 +37,7 @@ import SubwayStatus from "Components/v2/subway_status";
 import ReconstructedAlert from "Components/v2/reconstructed_alert";
 import NoData from "Components/v2/pre_fare/no_data";
 import ReconstructedTakeover from "Components/v2/reconstructed_takeover";
+import CRDepartures from "Components/v2/cr_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import SurgeBodyRight from "Components/v2/pre_fare/surge_body_right";
@@ -62,6 +63,7 @@ const TYPE_TO_COMPONENT = {
   no_data: NoData,
   reconstructed_large_alert: ReconstructedAlert,
   reconstructed_takeover: ReconstructedTakeover,
+  cr_departures: CRDepartures
 };
 
 const DISABLED_LAYOUT = {
