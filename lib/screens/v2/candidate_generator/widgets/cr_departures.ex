@@ -28,30 +28,32 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
         now
       )
       when app in [PreFare] do
-    with {:ok, departures_data} <- fetch_departures_fn.(direction_to_destination, station) do
-      destination = fetch_stop_name_fn.(cr_departures.destination)
+    case fetch_departures_fn.(direction_to_destination, station) do
+      {:ok, departures_data} ->
+        destination = fetch_stop_name_fn.(cr_departures.destination)
 
-      # The Overnight and NoData widgets may not be relevant here
-      departures_instance =
-        cond do
-          departures_data == :error ->
-            %DeparturesNoData{screen: config, show_alternatives?: true}
+        # The Overnight and NoData widgets may not be relevant here
+        departures_instance =
+          cond do
+            departures_data == :error ->
+              %DeparturesNoData{screen: config, show_alternatives?: true}
 
-          departures_data == :overnight ->
-            %OvernightDepartures{}
+            departures_data == :overnight ->
+              %OvernightDepartures{}
 
-          true ->
-            %CRDeparturesWidget{
-              config: cr_departures,
-              departures_data: departures_data,
-              destination: destination,
-              now: now
-            }
-        end
+            true ->
+              %CRDeparturesWidget{
+                config: cr_departures,
+                departures_data: departures_data,
+                destination: destination,
+                now: now
+              }
+          end
 
-      [departures_instance]
-    else
-      :error -> []
+        [departures_instance]
+
+      :error ->
+        []
     end
   end
 
