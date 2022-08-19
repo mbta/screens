@@ -60,6 +60,8 @@ defmodule Screens.V2.WidgetInstance.BlueBikesTest do
 
   describe "serialize/1" do
     test "serializes data", %{widget: widget} do
+      # We expect stations list to be sorted by walk_distance_minutes ascending,
+      # and limited to only 2 stations.
       expected = %{
         destination: "Back Bay",
         minutes_range_to_destination: "15-20",
@@ -81,14 +83,6 @@ defmodule Screens.V2.WidgetInstance.BlueBikesTest do
             status: :valet,
             walk_distance_minutes: 10,
             walk_distance_feet: 2820
-          },
-          %{
-            arrow: :ne,
-            id: "11",
-            name: "station 11",
-            status: :out_of_service,
-            walk_distance_minutes: 30,
-            walk_distance_feet: 8460
           }
         ]
       }
@@ -99,7 +93,7 @@ defmodule Screens.V2.WidgetInstance.BlueBikesTest do
 
   describe "slot_names/1" do
     test "returns [:lower_right]", %{widget: widget} do
-      assert [:lower_right] == WidgetInstance.slot_names(widget)
+      assert [:orange_line_surge_upper] == WidgetInstance.slot_names(widget)
     end
   end
 
