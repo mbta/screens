@@ -2,7 +2,7 @@ import React, { ComponentType } from "react";
 
 import LoopingVideoPlayer from "Components/v2/looping_video_player";
 
-const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "svg"];
+const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "svg", "gif"];
 const VIDEO_EXTENSIONS = ["mp4", "ogg", "ogv", "webm"];
 
 interface Props {
