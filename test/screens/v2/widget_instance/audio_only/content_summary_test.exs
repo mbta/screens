@@ -6,7 +6,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
   alias Screens.V2.WidgetInstance.MockWidget
-  alias Screens.V2.WidgetInstance.NormalHeader
+  alias Screens.V2.WidgetInstance.{NormalHeader, ShuttleBusInfo}
 
   setup do
     pre_fare_config = struct(Screen, %{app_id: :pre_fare_v2})
@@ -24,6 +24,12 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
       lines_at_station: [:red, :orange]
     }
 
+    instance_with_surge_widgets = %ContentSummary{
+      screen: nil,
+      widgets_snapshot: [struct(ShuttleBusInfo)],
+      lines_at_station: []
+    }
+
     instance_with_takeover_content = %ContentSummary{
       screen: nil,
       widgets_snapshot: [%MockWidget{slot_names: [:full_body]}],
@@ -35,7 +41,8 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
       other_config: other_config,
       instance_with_header: instance_with_header,
       instance_without_header: instance_without_header,
-      instance_with_takeover_content: instance_with_takeover_content
+      instance_with_takeover_content: instance_with_takeover_content,
+      instance_with_surge_widgets: instance_with_surge_widgets
     }
   end
 
@@ -117,8 +124,16 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
   end
 
   describe "audio_view/1" do
-    test "returns widget's audio view", %{instance_with_header: widget} do
+    test "returns ContentSummaryView for instances without surge widgets", %{
+      instance_with_header: widget
+    } do
       assert ScreensWeb.V2.Audio.ContentSummaryView == WidgetInstance.audio_view(widget)
+    end
+
+    test "returns SurgeContentSummaryView for instances with surge widgets", %{
+      instance_with_surge_widgets: widget
+    } do
+      assert ScreensWeb.V2.Audio.SurgeContentSummaryView == WidgetInstance.audio_view(widget)
     end
   end
 end
