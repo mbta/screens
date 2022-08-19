@@ -20,15 +20,6 @@ defmodule Screens.Config.V2.CRDepartures do
           wayfinding_arrows: platform_directions()
         }
 
-  @enforce_keys [
-    :station,
-    :destination,
-    :direction_to_destination,
-    :priority,
-    :travel_time_to_destination,
-    :show_via_headsigns_message,
-    :wayfinding_arrows
-  ]
   defstruct station: nil,
             destination: nil,
             direction_to_destination: nil,
@@ -37,7 +28,7 @@ defmodule Screens.Config.V2.CRDepartures do
             show_via_headsigns_message: nil,
             wayfinding_arrows: nil
 
-  use Screens.Config.Struct
+  use Screens.Config.Struct, with_default: true
 
   defp value_from_json(_, value), do: value
 
