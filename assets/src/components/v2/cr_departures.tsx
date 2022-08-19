@@ -52,7 +52,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
                           <BaseDepartureTime time={departure.time} hideAmPm/>
                         </div>
                       </td>
-                      <td className="track">{departure.track_number ? departure.track_number : ""}</td>
+                      <td className="track">{departure.track_number ?? ""}</td>
                     </tr>
                   )
               })}
