@@ -71,6 +71,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
 
     params = %{
       direction_id: direction_to_destination,
+      route_ids: [
+        "CR-Franklin",
+        "CR-Needham",
+        "CR-Providence"
+      ],
       route_type: :rail,
       stop_ids: [station]
     }
