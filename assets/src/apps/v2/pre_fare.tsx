@@ -40,6 +40,7 @@ import ReconstructedTakeover from "Components/v2/reconstructed_takeover";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import SurgeBodyRight from "Components/v2/pre_fare/surge_body_right";
+import BlueBikes from "Components/v2/blue_bikes";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -62,6 +63,7 @@ const TYPE_TO_COMPONENT = {
   no_data: NoData,
   reconstructed_large_alert: ReconstructedAlert,
   reconstructed_takeover: ReconstructedTakeover,
+  blue_bikes: BlueBikes,
 };
 
 const DISABLED_LAYOUT = {
