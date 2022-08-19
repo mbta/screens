@@ -7,7 +7,6 @@ defmodule ScreensWeb.V2.Audio.ShuttleBusInfoView do
         boarding_instructions: boarding_instructions
       }) do
     ~E|
-    <p>Shuttle buses.</p>
     <p><%= boarding_instructions %></p>
     <p><%= render_time_estimate(minutes_range_to_destination, destination) %></p>
     <p>All shuttle buses are accessible and free.</p>
