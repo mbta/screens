@@ -3,6 +3,7 @@ defmodule Screens.V2.ScreenAudioData do
 
   alias Screens.Config.Screen
   alias Screens.Config.V2.{Audio, BusShelter, PreFare}
+  alias Screens.Util
   alias Screens.V2.ScreenData
   alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.WidgetInstance
@@ -83,7 +84,7 @@ defmodule Screens.V2.ScreenAudioData do
          },
          now
        ) do
-    if time_in_range?(now, daytime_start_time, daytime_stop_time),
+    if Util.time_in_range?(now, daytime_start_time, daytime_stop_time),
       do: daytime_volume,
       else: nighttime_volume
   end
@@ -97,16 +98,6 @@ defmodule Screens.V2.ScreenAudioData do
          dt
        ) do
     Date.day_of_week(dt) in days_active and
-      time_in_range?(DateTime.to_time(dt), start_time, stop_time)
-  end
-
-  def time_in_range?(t, start_time, stop_time) do
-    if Time.compare(start_time, stop_time) in [:lt, :eq] do
-      # The range exists within a single day starting/ending at midnight
-      Time.compare(start_time, t) in [:lt, :eq] and Time.compare(stop_time, t) == :gt
-    else
-      # The range crosses midnight, e.g. start: 5am, stop: 1am
-      Time.compare(start_time, t) in [:lt, :eq] or Time.compare(stop_time, t) == :gt
-    end
+      Util.time_in_range?(DateTime.to_time(dt), start_time, stop_time)
   end
 end

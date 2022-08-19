@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
   use ExUnit.Case, async: true
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{PreFare, ShuttleBusInfo}
+  alias Screens.Config.V2.{PreFare, ShuttleBusInfo, ShuttleBusSchedule}
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ShuttleBusInfo, as: ShuttleBusInfoWidget
 
@@ -15,7 +15,20 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
             app_params:
               struct(PreFare, %{
                 shuttle_bus_info: %ShuttleBusInfo{
-                  minutes_range_to_destination: "35-45",
+                  minutes_range_to_destination_schedule: [
+                    %ShuttleBusSchedule{
+                      start_time: ~T[00:00:00],
+                      end_time: ~T[10:00:00],
+                      days: :weekday,
+                      minute_range: "35-45"
+                    },
+                    %ShuttleBusSchedule{
+                      start_time: ~T[11:00:00],
+                      end_time: ~T[23:00:00],
+                      days: :weekday,
+                      minute_range: "15-25"
+                    }
+                  ],
                   destination: "Test Station",
                   arrow: :n,
                   english_boarding_instructions: "",
@@ -23,7 +36,8 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
                   priority: [2, 3, 1]
                 }
               })
-          })
+          }),
+        now: ~U[2022-08-18T08:00:00Z]
       },
       widget_not_pre_fare: %ShuttleBusInfoWidget{
         screen:
@@ -32,7 +46,20 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
             app_params:
               struct(PreFare, %{
                 shuttle_bus_info: %ShuttleBusInfo{
-                  minutes_range_to_destination: "35-45",
+                  minutes_range_to_destination_schedule: [
+                    %ShuttleBusSchedule{
+                      start_time: "00:00:00",
+                      end_time: "10:00:00",
+                      days: :weekday,
+                      minute_range: "35-45"
+                    },
+                    %ShuttleBusSchedule{
+                      start_time: "11:00:00",
+                      end_time: "23:00:00",
+                      days: :weekday,
+                      minute_range: "15-25"
+                    }
+                  ],
                   destination: "Test Station",
                   english_boarding_instructions: "",
                   spanish_boarding_instructions: "",
@@ -43,6 +70,10 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
           })
       }
     }
+  end
+
+  defp put_now(widget, now) do
+    %{widget | now: now}
   end
 
   describe "priority/1" do
@@ -57,6 +88,16 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
     } do
       assert %{
                minutes_range_to_destination: "35-45",
+               destination: "Test Station",
+               arrow: :n,
+               english_boarding_instructions: "",
+               spanish_boarding_instructions: ""
+             } == WidgetInstance.serialize(widget)
+
+      widget = put_now(widget, ~U[2022-08-18T20:00:00Z])
+
+      assert %{
+               minutes_range_to_destination: "15-25",
                destination: "Test Station",
                arrow: :n,
                english_boarding_instructions: "",
