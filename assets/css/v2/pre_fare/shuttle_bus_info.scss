@@ -60,7 +60,7 @@
       .shuttle-bus-info__boarding-instructions-arrow-icon-container {
         position: absolute;
         top: 264px;
-        left: 65px;
+        left: 64px;
 
         .shuttle-bus-info__boarding-instructions-arrow-icon {
           height: 56px;
@@ -98,7 +98,15 @@
     .shuttle-bus-info__trip-info {
       height: 441px;
 
-      .shuttle-bus-info__trip-info-time {
+      .shuttle-bus-info__trip-info-time-icon-container {
+        position: absolute;
+        top: 444px;
+        left: 64px;
+        height: 56px;
+        width: 56px;
+      }
+
+      .shuttle-bus-info__trip-info-time-text {
         position: absolute;
         top: 446px;
         left: 216px;
