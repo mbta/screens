@@ -602,6 +602,15 @@ const contentSummaryColumn = {
   FormCell: FormTextarea,
 };
 
+const crDeparturesColumn = {
+  Header: "Commuter Rail",
+  accessor: buildAppParamAccessor("cr_departures"),
+  mutator: buildAppParamMutator("cr_departures"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
 const blueBikesColumn = {
   Header: "BlueBikes",
   accessor: buildAppParamAccessor("blue_bikes"),
@@ -633,6 +642,7 @@ const PreFareV2ScreensTable = (): JSX.Element => {
         elevatorStatusColumn,
         reconstructedAlertWidgetColumn,
         contentSummaryColumn,
+        crDeparturesColumn,
         blueBikesColumn,
         shuttleBusInfoColumn,
       ]}
