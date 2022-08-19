@@ -14,7 +14,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
         asset_url: "https://mbta-screens.s3.amazonaws.com/screens-dev/videos/some-video.mp4",
         priority: [2, 3, 1],
         schedule: [%Schedule{}],
-        now: ~U[2021-02-01T00:00:00Z]
+        now: ~U[2021-02-01T00:00:00Z],
+        text_for_audio: "This is text."
       },
       widget_old_schedule: %EvergreenContent{
         screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
@@ -24,6 +25,14 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
         schedule: [
           %Schedule{start_dt: ~U[2021-01-01T00:00:00Z], end_dt: ~U[2021-01-02T00:00:00Z]}
         ],
+        now: ~U[2021-02-01T00:00:00Z]
+      },
+      widget_no_audio: %EvergreenContent{
+        screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
+        slot_names: [:medium_left, :medium_right],
+        asset_url: "https://mbta-screens.s3.amazonaws.com/screens-dev/videos/some-video.mp4",
+        priority: [2, 3, 1],
+        schedule: [%Schedule{}],
         now: ~U[2021-02-01T00:00:00Z]
       }
     }
@@ -67,20 +76,24 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns empty string", %{widget: widget} do
-      assert %{} == WidgetInstance.audio_serialize(widget)
+    test "returns map with text to read out", %{widget: widget} do
+      assert %{text_for_audio: "This is text."} == WidgetInstance.audio_serialize(widget)
     end
   end
 
   describe "audio_sort_key/1" do
-    test "returns [0]", %{widget: widget} do
-      assert [0] == WidgetInstance.audio_sort_key(widget)
+    test "returns [99]", %{widget: widget} do
+      assert [99] == WidgetInstance.audio_sort_key(widget)
     end
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns false", %{widget: widget} do
-      refute WidgetInstance.audio_valid_candidate?(widget)
+    test "returns true for widgets with configured text", %{widget: widget} do
+      assert WidgetInstance.audio_valid_candidate?(widget)
+    end
+
+    test "returns false for widgets without configured audio", %{widget_no_audio: widget_no_audio} do
+      refute WidgetInstance.audio_valid_candidate?(widget_no_audio)
     end
   end
 

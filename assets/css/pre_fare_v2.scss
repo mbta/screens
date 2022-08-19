@@ -1,6 +1,8 @@
 @import url("https://rsms.me/inter/inter.css");
 
 @import "colors";
+@import "solari/arrow";
+@import "v2/clock_icon";
 
 @import "v2/pre_fare/viewport";
 @import "v2/pre_fare/screen_container";
@@ -44,7 +46,7 @@
 
 @import "v2/pre_fare/simulation";
 
-@import "solari/arrow";
+@import "v2/blue_bikes";
 
 body {
   margin: 0px;
