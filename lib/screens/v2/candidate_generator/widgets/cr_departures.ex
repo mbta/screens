@@ -11,13 +11,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
   def departures_instances(
         config,
         fetch_departures_fn \\ &fetch_departures/2,
-        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1
+        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
+        now \\ DateTime.utc_now()
       )
 
   def departures_instances(
         %Screen{app_params: %app{cr_departures: %CRDepartures{} = cr_departures}} = config,
         fetch_departures_fn,
-        fetch_stop_name_fn
+        fetch_stop_name_fn,
+        now
       )
       when app in [PreFare] do
     opts = %{include_schedules: true}
@@ -45,14 +47,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
           %CRDeparturesWidget{
             config: cr_departures,
             departures_data: departures_data,
-            destination: destination
+            destination: destination,
+            now: now
           }
       end
 
     [departures_instance]
   end
 
-  def departures_instances(_, _, _), do: []
+  def departures_instances(_, _, _, _), do: []
 
   defp fetch_departures(opts, params) do
     Departure.fetch(params, Keyword.new(opts))
