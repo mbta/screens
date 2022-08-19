@@ -48,7 +48,7 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
             <div className="table-header__spanish">Pista</div>
           </td>
         </tr>
-        {departures.slice(0, 3).map((departure, i) => {
+        {departures.slice(0, 3).map((departure) => {
           return (
             <tr key={departure.prediction_or_schedule_id}>
               <td>
@@ -148,7 +148,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
               />
             </div>
             <div className="departures-card__footer-english">
-              {time_to_destination} to {destination}
+              {time_to_destination}m to {destination}
             </div>
             <div className="departures-card__footer-spanish">
               paseo a {destination}
