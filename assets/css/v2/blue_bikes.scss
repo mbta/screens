@@ -232,12 +232,14 @@
 
     .blue-bikes__distance-minutes-value {
       display: inline-block;
+      width: 94px;
       height: 64px;
       color: rgb(23, 31, 38);
       font-family: Inter, sans-serif;
       font-size: 72px;
       font-weight: 800;
       line-height: 64px;
+      text-align: right;
     }
 
     .blue-bikes__distance-minutes-unit {
