@@ -58,6 +58,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   end
 
   @impl CandidateGenerator
+  # Error of "arity is too high"
+  # credo:disable-for-next-line
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
@@ -66,6 +68,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         elevator_status_instance_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2,
         full_line_map_instances_fn \\ &Widgets.FullLineMap.full_line_map_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
+        commuter_rail_departures_instance_fn \\ &Widgets.CRDepartures.departures_instances/1,
         blue_bikes_instances_fn \\ &Widgets.BlueBikes.blue_bikes_instances/1
       ) do
     [
@@ -75,6 +78,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       fn -> elevator_status_instance_fn.(config, now) end,
       fn -> full_line_map_instances_fn.(config) end,
       fn -> evergreen_content_instances_fn.(config) end,
+      fn -> commuter_rail_departures_instance_fn.(config) end,
       fn -> blue_bikes_instances_fn.(config) end,
       fn -> shuttle_bus_info_instances(config, now) end
     ]
