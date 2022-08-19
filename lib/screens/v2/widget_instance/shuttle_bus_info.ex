@@ -49,7 +49,24 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
 
   def slot_names(_instance), do: [:orange_line_surge_lower]
 
-  def audio_serialize(instance), do: serialize(instance)
+  def audio_serialize(%__MODULE__{
+        screen: %Screen{
+          app_params: %PreFare{
+            shuttle_bus_info: %ShuttleBusInfo{
+              minutes_range_to_destination_schedule: minutes_range_to_destination_schedule,
+              destination: destination,
+              audio_boarding_instructions: boarding_instructions
+            }
+          }
+        },
+        now: now
+      }) do
+    %{
+      minutes_range_to_destination: get_minute_range(minutes_range_to_destination_schedule, now),
+      destination: destination,
+      boarding_instructions: boarding_instructions
+    }
+  end
 
   def audio_sort_key(_instance), do: [2]
 
