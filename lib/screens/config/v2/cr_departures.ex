@@ -3,26 +3,39 @@ defmodule Screens.Config.V2.CRDepartures do
 
   alias Screens.V2.WidgetInstance
 
+  @type platform_directions ::
+          %{
+            left: list(pos_integer()),
+            right: list(pos_integer())
+          }
+          | String.t()
+
   @type t :: %__MODULE__{
           station: String.t(),
-          destination_station: String.t(),
+          destination: String.t(),
           direction_to_destination: 0 | 1,
-          wayfinding_arrow: String.t(),
-          priority: WidgetInstance.priority()
+          priority: WidgetInstance.priority(),
+          travel_time_to_destination: String.t(),
+          show_via_headsigns_message: true | false,
+          wayfinding_arrows: platform_directions()
         }
 
   @enforce_keys [
     :station,
-    :destination_station,
+    :destination,
     :direction_to_destination,
-    :wayfinding_arrow,
-    :priority
+    :priority,
+    :travel_time_to_destination,
+    :show_via_headsigns_message,
+    :wayfinding_arrows
   ]
   defstruct station: nil,
-            destination_station: nil,
+            destination: nil,
             direction_to_destination: nil,
-            wayfinding_arrow: nil,
-            priority: nil
+            priority: nil,
+            travel_time_to_destination: nil,
+            show_via_headsigns_message: nil,
+            wayfinding_arrows: nil
 
   use Screens.Config.Struct
 

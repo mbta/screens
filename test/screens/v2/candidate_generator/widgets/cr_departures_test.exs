@@ -20,10 +20,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDeparturesTest do
         app_params: %PreFare{
           cr_departures: %CRDeparturesConfig{
             station: "place-forhl",
-            destination_station: "place-bbsta",
+            destination: "place-bbsta",
             direction_to_destination: 1,
-            wayfinding_arrow: "right-down",
-            priority: [1]
+            wayfinding_arrows: "right-down",
+            priority: [1],
+            travel_time_to_destination: "9-12m",
+            show_via_headsigns_message: false
           },
           header: nil,
           reconstructed_alert_widget: nil,
