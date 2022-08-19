@@ -1,142 +1,126 @@
 defmodule ScreensWeb.V2.Audio.CRDeparturesView do
   use ScreensWeb, :view
+  alias ScreensWeb.V2.Audio.DeparturesView
 
   def render("_widget.ssml", %{departures: []}) do
     ~E|<p>There are no upcoming trips at this time</p>|
   end
 
-  def render("_widget.ssml", %{departures: departures}) do
-    ~E|<p>Upcoming trips:</p><%= Enum.map(departures, &render_departure/1) %>|
+  def render("_widget.ssml", %{
+        departures: departures,
+        destination: destination,
+        time_to_destination: time_to_destination,
+        show_via_headsigns_message: show_via_headsigns_message
+      }) do
+    ~E|
+    <p>Upcoming Commuter Rail trips:</p>
+    <%= render_departures(departures) %>
+    <%= render_via_headsign_message(show_via_headsigns_message) %>
+    <%= render_eta(time_to_destination, destination) %>
+    <p>Riders can take the Commuter Rail free of charge.</p>
+    |
   end
 
-  defp render_departure(_departure) do
-    # %{
-    #   headsign: headsign,
-    #   time: time,
-    #   track_number: track_number
-    # } = departure
-
-    ~E|<p>To be determined</p>|
+  defp render_via_headsign_message(true) do
+    ~E|<p>Trains via Ruggles stop at Ruggles, but not at Forest Hills.
+    Trains via Forest Hills stop at Ruggles and Forest Hills.</p>|
   end
 
-  # defp render_time_with_crowding({%{crowding: crowding, time: time}, 0}, route, headsign) do
-  #   route_headsign_rendered = render_route_headsign(route, headsign)
-  #   crowding_rendered = render_crowding_level(crowding)
-  #   preposition = preposition_for_time_type(time.type)
+  defp render_via_headsign_message(_), do: ""
 
-  #   content =
-  #     build_text([
-  #       "The next",
-  #       route_headsign_rendered,
-  #       if(time_is_arr_brd?(time), do: nil, else: "arrives"),
-  #       preposition,
-  #       {time, &render_time/1},
-  #       {crowding_rendered, fn c -> ~E|<break strength="medium"/> and <%= c %>| end}
-  #     ])
+  # Number starts with vowel / consonant
+  defp render_eta(eta, destination) do
+    first_number =
+      eta
+      |> String.split("-")
+      |> List.first()
 
-  #   ~E|<s><%= content %></s>|
-  # end
+    article =
+      if first_number in ["8", "11", "18"] do
+        "an"
+      else
+        "a"
+      end
 
-  # defp render_time_with_crowding({%{crowding: crowding, time: time}, _}, route, _headsign) do
-  #   route_headsign_rendered = render_route_headsign(route, nil)
-  #   crowding_rendered = render_crowding_level(crowding)
-  #   preposition = preposition_for_time_type(time.type)
+    ~E|<p>It's <%= article %> <%= eta %> minute train ride to <%= destination %>.</p>|
+  end
 
-  #   prefix =
-  #     case time.type do
-  #       :timestamp -> "A later"
-  #       _ -> "The following"
-  #     end
+  defp render_departure(departure, previous_departure) do
+    %{
+      headsign: headsign,
+      time: time,
+      track_number: track_number
+    } = departure
 
-  #   content =
-  #     build_text([
-  #       prefix,
-  #       route_headsign_rendered,
-  #       if(time_is_arr_brd?(time), do: nil, else: "arrives"),
-  #       preposition,
-  #       {time, &render_time/1},
-  #       {crowding_rendered, fn c -> ~E|<break strength="medium"/> and <%= c %>| end}
-  #     ])
+    prefix =
+      if not is_nil(previous_departure) and headsign === previous_departure.headsign do
+        "The following train to"
+      else
+        "The next train to"
+      end
 
-  #   ~E|<s><%= content %></s>|
-  # end
+    track =
+      if track_number do
+        "on track " <> Integer.to_string(track_number) <> "."
+      else
+        ". We will announce the track for this train soon."
+      end
 
-  # defp render_route_headsign(
-  #        %{route_text: route_text, vehicle_type: vehicle_type, track_number: track_number},
-  #        headsign
-  #      ) do
-  #   build_text([
-  #     {route_text, &render_route/1},
-  #     {vehicle_type || "trip", fn v -> ~E|<%= v %>| end},
-  #     {headsign, fn h -> ~E|to <%= render_headsign(h) %>| end},
-  #     {track_number, fn tn -> ~E|on track <%= tn %>| end}
-  #   ])
-  # end
+    content =
+      DeparturesView.build_text([
+        prefix,
+        render_headsign(headsign),
+        if(time_is_arr_brd?(time), do: nil, else: "arrives"),
+        preposition_for_time_type(time.type),
+        {time, &render_time/1},
+        track
+      ])
 
-  # defp render_route(route_text) do
-  #   cond do
-  #     String.contains?(route_text, "/") and match?([_, _], String.split(route_text, "/")) ->
-  #       [part1, part2] = String.split(route_text, "/")
+    ~E|<s><%= content %></s>|
+  end
 
-  #       ~E|<say-as interpret-as="address"><%= part1 %></say-as><say-as interpret-as="address"><%= part2 %></say-as>|
+  defp render_departures(departures) do
+    departures_with_index = Enum.with_index(departures)
 
-  #     match?({_bus_route, ""}, Integer.parse(route_text)) ->
-  #       ~E|<say-as interpret-as="address"><%= route_text %></say-as>|
+    # Is this the best way to iterate and track previous item in array?
+    departures_with_index
+    |> Enum.map(fn {departure, i} ->
+      if i === 0 do
+        render_departure(departure, nil)
+      else
+        render_departure(departure, Enum.at(departures, i - 1))
+      end
+    end)
+  end
 
-  #     true ->
-  #       ~E|<%= route_text %>|
-  #   end
-  # end
+  defp render_time(%{type: :text, text: "BRD"}), do: "is now boarding"
+  defp render_time(%{type: :text, text: "ARR"}), do: "is now arriving"
+  defp render_time(%{type: :text, text: "Now"}), do: "is now arriving"
 
-  # defp render_headsign(%{headsign: headsign, variation: nil}) do
-  #   ~E|<%= headsign %>|
-  # end
+  defp render_time(%{type: :minutes, minutes: minute_diff}) do
+    ~E|<%= minute_diff %> <%= pluralize_minutes(minute_diff) %>|
+  end
 
-  # defp render_headsign(%{headsign: headsign, variation: variation}) do
-  #   ~E|<%= headsign %> <%= variation %>|
-  # end
+  defp render_time(%{type: :timestamp, timestamp: timestamp, ampm: ampm}) do
+    ~E|<%= timestamp %><%= ampm %>|
+  end
 
-  # defp render_time(%{type: :text, text: "BRD"}), do: "is now boarding"
-  # defp render_time(%{type: :text, text: "ARR"}), do: "is now arriving"
-  # defp render_time(%{type: :text, text: "Now"}), do: "is now arriving"
+  defp preposition_for_time_type(:text), do: nil
+  defp preposition_for_time_type(:minutes), do: "in"
+  defp preposition_for_time_type(:timestamp), do: "at"
 
-  # defp render_time(%{type: :minutes, minutes: minute_diff}) do
-  #   ~E|<%= minute_diff %> <%= pluralize_minutes(minute_diff) %>|
-  # end
+  defp render_headsign(%{headsign: headsign, variation: nil}) do
+    ~E|<%= headsign %>|
+  end
 
-  # defp render_time(%{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm}) do
-  #   minute_string = if minute < 10, do: "0#{minute}", else: "#{minute}"
-  #   ~E|<%= hour %>:<%= minute_string %><%= am_pm %>|
-  # end
+  defp render_headsign(%{headsign: headsign, variation: variation}) do
+    ~E|<%= headsign %> <%= variation %>|
+  end
 
-  # defp pluralize_minutes(1), do: "minute"
-  # defp pluralize_minutes(_), do: "minutes"
+  defp pluralize_minutes(1), do: "minute"
+  defp pluralize_minutes(_), do: "minutes"
 
-  # defp preposition_for_time_type(:text), do: nil
-  # defp preposition_for_time_type(:minutes), do: "in"
-  # defp preposition_for_time_type(:timestamp), do: "at"
-
-  # defp render_crowding_level(1), do: "is currently not crowded"
-  # defp render_crowding_level(2), do: "currently has some crowding"
-  # defp render_crowding_level(3), do: "is currently crowded"
-  # defp render_crowding_level(nil), do: nil
-
-  # defp time_is_arr_brd?(time) do
-  #   match?(%{type: :text}, time)
-  # end
-
-  # defp identity_render(value), do: ~E|<%= value %>|
-
-  # defp build_text(value_renderers) do
-  #   value_renderers
-  #   |> Enum.reject(fn
-  #     {value, renderer} when is_function(renderer) -> is_nil(value)
-  #     value -> is_nil(value)
-  #   end)
-  #   |> Enum.map(fn
-  #     {value, renderer} when is_function(renderer) -> renderer.(value)
-  #     value -> identity_render(value)
-  #   end)
-  #   |> Enum.intersperse(~E| |)
-  # end
+  defp time_is_arr_brd?(time) do
+    match?(%{type: :text}, time)
+  end
 end

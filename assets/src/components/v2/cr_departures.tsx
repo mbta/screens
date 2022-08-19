@@ -17,9 +17,10 @@ interface Departure {
   track_number: number
 }
 interface CRDeparturesProps {
-  departures: Departure,
+  departures: Departure[],
   destination: string,
-  time_to_destination: string
+  time_to_destination: string,
+  show_via_headsigns_message: boolean
 }
 
 const DeparturesTable: React.ComponentType<any> = (props) => {
@@ -71,7 +72,7 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
 }
 
 const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
-  const { departures, destination, time_to_destination } = props
+  const { departures, destination, time_to_destination, show_via_headsigns_message } = props
 
   let maxMinutes = parseInt(time_to_destination.split("-")[1]);
   if (isNaN(maxMinutes)) {
@@ -90,7 +91,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
         </div>
         <div className="departures-card__body">
           <DeparturesTable departures={departures} />
-          <div className="departures-card__info-row">
+          { show_via_headsigns_message && <div className="departures-card__info-row">
             <img
               className="small-svg"
               src={imagePath(`logo-black.svg`)}
@@ -101,7 +102,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
               <div className="departures-card__body-english"><strong>Trains via Forest Hills</strong> stop at Ruggles and Forest Hills</div>
               <div className="departures-card__body-spanish">Trenes a través de Forest Hills paradas en Ruggles y Forest Hills</div>
             </div>
-          </div>
+          </div> }
           
         </div>
         <div className="departures-card__footer">
