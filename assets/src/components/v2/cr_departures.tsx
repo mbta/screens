@@ -3,6 +3,7 @@ import Arrow from "Components/solari/arrow";
 import React from "react";
 import { classWithModifier, imagePath } from "Util/util";
 import CRIcon from "./bundled_svg/cr_icon";
+import Free from "./bundled_svg/free";
 import ClockIcon from "./clock_icon";
 
 interface CRDeparturesProps {
@@ -85,10 +86,12 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
             <div className="departures-card__footer-spanish">paseo a {destination}</div>
           </div>
           <div className="departures-card__info-row">
-            <img
-              className="small-svg free-cr"
-              src={imagePath(`free-cr.svg`)}
-            />
+            <div className="free-cr">
+              <Free
+                className="small-svg"
+                colorHex="#00843d"
+              />
+            </div>
             <div>
               <div className="departures-card__footer-english ride-free">
                 Show your Charlie Card or Charlie Ticket to ride free of charge
