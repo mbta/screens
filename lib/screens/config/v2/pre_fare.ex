@@ -5,6 +5,7 @@ defmodule Screens.Config.V2.PreFare do
     Audio,
     BlueBikes,
     ContentSummary,
+    CRDepartures,
     ElevatorStatus,
     EvergreenContentItem,
     FullLineMap,
@@ -22,6 +23,7 @@ defmodule Screens.Config.V2.PreFare do
           blue_bikes: BlueBikes.t(),
           content_summary: ContentSummary.t(),
           audio: Audio.t(),
+          cr_departures: CRDepartures.t(),
           shuttle_bus_info: ShuttleBusInfo.t()
         }
 
@@ -40,6 +42,7 @@ defmodule Screens.Config.V2.PreFare do
             blue_bikes: BlueBikes.from_json(:default),
             content_summary: nil,
             audio: Audio.from_json(:default),
+            cr_departures: nil,
             shuttle_bus_info: ShuttleBusInfo.from_json(:default)
 
   use Screens.Config.Struct,
@@ -52,6 +55,7 @@ defmodule Screens.Config.V2.PreFare do
       reconstructed_alert_widget: CurrentStopId,
       content_summary: ContentSummary,
       audio: Audio,
+      cr_departures: CRDepartures,
       shuttle_bus_info: ShuttleBusInfo
     ]
 end

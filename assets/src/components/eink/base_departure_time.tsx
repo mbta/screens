@@ -10,20 +10,20 @@ const BaseDepartureTime = ({
   time,
   hideAmPm,
 }: BaseDepartureTimeProps): JSX.Element => {
-  if (time.type === "TEXT") {
+  if (time.type.toUpperCase() === "TEXT") {
     return (
       <div className="base-departure-time">
         <span className="base-departure-time__text">{time.text}</span>
       </div>
     );
-  } else if (time.type === "MINUTES") {
+  } else if (time.type.toUpperCase() === "MINUTES") {
     return (
       <div className="base-departure-time">
         <span className="base-departure-time__minutes">{time.minutes}</span>
         <span className="base-departure-time__minutes-label">m</span>
       </div>
     );
-  } else if (time.type === "TIMESTAMP") {
+  } else if (time.type.toUpperCase() === "TIMESTAMP") {
     return (
       <div className="base-departure-time">
         <span className="base-departure-time__timestamp">{time.timestamp}</span>
