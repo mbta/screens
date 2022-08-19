@@ -190,6 +190,14 @@ defmodule Screens.V2.Departure do
 
   def track_number(_), do: nil
 
+  def prediction_or_schedule_id(%__MODULE__{prediction: %Prediction{id: id}}) do
+    id
+  end
+
+  def prediction_or_schedule_id(%__MODULE__{schedule: %Schedule{id: id}}) do
+    id
+  end
+
   def vehicle_status(%__MODULE__{
         prediction: %Prediction{vehicle: %Vehicle{current_status: current_status}}
       }) do

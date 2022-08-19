@@ -15,7 +15,7 @@ interface Departure {
   };
   time: any;
   track_number: number;
-  route_id: string;
+  prediction_or_schedule_id: string;
 }
 interface CRDeparturesProps {
   departures: Departure[];
@@ -50,7 +50,7 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
         </tr>
         {departures.slice(0, 3).map((departure, i) => {
           return (
-            <tr key={departure.route_id}>
+            <tr key={departure.prediction_or_schedule_id}>
               <td>
                 {departure.arrow ? (
                   <Arrow
