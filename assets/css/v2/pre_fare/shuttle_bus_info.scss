@@ -1,135 +1,106 @@
-.shuttle-bus-info__container {
-  height: 845px;
-  background: rgb(217, 214, 208);
-  box-shadow: 0px 10px 20px 0px rgba(23, 31, 38, 0.25);
-  border-radius: 16px;
-  margin: 16px 32px 32px 32px;
+.shuttle-bus-info {
   position: relative;
+  width: 1080px;
+  height: 890px;
+  background-color: rgb(237, 139, 0);
   overflow: hidden;
 
-  .shuttle-bus-info__header {
-    height: 232px;
+  .shuttle-bus-info__container {
+    height: 845px;
+    background: rgb(217, 214, 208);
+    box-shadow: 0px 10px 20px 0px rgba(23, 31, 38, 0.25);
+    border-radius: 16px;
+    margin: 16px 32px 32px 32px;
+    position: relative;
+    overflow: hidden;
 
-    .shuttle-bus-info__header-icon-container {
-      position: absolute;
-      top: 40px;
-      left: 40px;
+    .shuttle-bus-info__header {
+      height: 232px;
 
-      .shuttle-bus-info__header-icon {
-        height: 102px;
-        width: 102px;
-      }
-    }
-
-    .shuttle-bus-info__header-text {
-      position: absolute;
-      top: 47px;
-      left: 216px;
-
-      &--english {
-        color: rgb(23, 31, 38);
-        font-size: 80px;
-        font-family: Inter;
-        font-weight: bold;
-        line-height: 80px;
-      }
-
-      &--spanish {
-        color: rgb(23, 31, 38);
-        font-size: 48px;
-        font-family: Inter;
-        font-weight: normal;
-        line-height: 66px;
-        margin-top: 8px;
-        opacity: 90%;
-      }
-    }
-  }
-
-  .shuttle-bus-info__boarding-instructions {
-    height: 172px;
-    background: rgb(235, 234, 232);
-
-    .shuttle-bus-info__boarding-instructions-arrow-icon-container {
-      position: absolute;
-      top: 264px;
-      left: 65px;
-
-      .shuttle-bus-info__boarding-instructions-arrow-icon {
-        height: 56px;
-        width: 56px;
-        margin: 0 auto;
-      }
-    }
-
-    .shuttle-bus-info__boarding-instructions-text {
-      position: absolute;
-      top: 256px;
-      left: 216px;
-
-      &--english {
-        color: rgb(23, 31, 38);
-        font-size: 48px;
-        font-family: Inter;
-        font-weight: bold;
-        letter-spacing: 0px;
-        line-height: 64px;
-      }
-
-      &--spanish {
-        color: rgb(23, 31, 38);
-        font-size: 36px;
-        font-family: Inter;
-        font-weight: normal;
-        line-height: 44px;
-        margin-top: 8px;
-        opacity: 90%;
-      }
-    }
-  }
-
-  .shuttle-bus-info__trip-info {
-    height: 441px;
-
-    .shuttle-bus-info__trip-info-time {
-      position: absolute;
-      top: 446px;
-      left: 216px;
-
-      &--english {
-        margin-right: 24px;
-        color: rgb(23, 31, 38);
-        font-size: 40px;
-        font-family: Inter;
-        font-weight: bold;
-        line-height: 52px;
-      }
-
-      &--spanish {
-        color: rgb(23, 31, 38);
-        font-size: 32px;
-        font-family: Inter;
-        font-weight: normal;
-        line-height: 44px;
-        opacity: 90%;
-      }
-    }
-
-    .shuttle-bus-info__trip-info-price {
-      .shuttle-bus-info__trip-info-price-icon-container {
+      .shuttle-bus-info__header-icon-container {
         position: absolute;
-        top: 534px;
-        left: 64px;
+        top: 40px;
+        left: 40px;
 
-        .shuttle-bus-info__trip-info-price-icon {
-          height: 56px;
-          width: 56px;
+        .shuttle-bus-info__header-icon {
+          height: 102px;
+          width: 102px;
         }
       }
 
-      .shuttle-bus-info__trip-info-price-text {
+      .shuttle-bus-info__header-text {
         position: absolute;
-        top: 534px;
+        top: 47px;
+        left: 216px;
+
+        &--english {
+          color: rgb(23, 31, 38);
+          font-size: 80px;
+          font-family: Inter;
+          font-weight: bold;
+          line-height: 80px;
+        }
+
+        &--spanish {
+          color: rgb(23, 31, 38);
+          font-size: 48px;
+          font-family: Inter;
+          font-weight: normal;
+          line-height: 66px;
+          margin-top: 8px;
+          opacity: 90%;
+        }
+      }
+    }
+
+    .shuttle-bus-info__boarding-instructions {
+      height: 172px;
+      background: rgb(235, 234, 232);
+
+      .shuttle-bus-info__boarding-instructions-arrow-icon-container {
+        position: absolute;
+        top: 264px;
+        left: 65px;
+
+        .shuttle-bus-info__boarding-instructions-arrow-icon {
+          height: 56px;
+          width: 56px;
+          margin: 0 auto;
+        }
+      }
+
+      .shuttle-bus-info__boarding-instructions-text {
+        position: absolute;
+        top: 256px;
+        left: 216px;
+
+        &--english {
+          color: rgb(23, 31, 38);
+          font-size: 48px;
+          font-family: Inter;
+          font-weight: bold;
+          letter-spacing: 0px;
+          line-height: 64px;
+        }
+
+        &--spanish {
+          color: rgb(23, 31, 38);
+          font-size: 36px;
+          font-family: Inter;
+          font-weight: normal;
+          line-height: 44px;
+          margin-top: 8px;
+          opacity: 90%;
+        }
+      }
+    }
+
+    .shuttle-bus-info__trip-info {
+      height: 441px;
+
+      .shuttle-bus-info__trip-info-time {
+        position: absolute;
+        top: 446px;
         left: 216px;
 
         &--english {
@@ -150,40 +121,77 @@
           opacity: 90%;
         }
       }
-    }
 
-    .shuttle-bus-info__trip-info-accessibility {
-      .shuttle-bus-info__trip-info-accessibility-icon-container {
-        position: absolute;
-        top: 622px;
-        left: 64px;
+      .shuttle-bus-info__trip-info-price {
+        .shuttle-bus-info__trip-info-price-icon-container {
+          position: absolute;
+          top: 534px;
+          left: 64px;
 
-        .shuttle-bus-info__trip-info-accessibility-icon {
-          height: 56px;
-          width: 56px;
+          .shuttle-bus-info__trip-info-price-icon {
+            height: 56px;
+            width: 56px;
+          }
+        }
+
+        .shuttle-bus-info__trip-info-price-text {
+          position: absolute;
+          top: 534px;
+          left: 216px;
+
+          &--english {
+            margin-right: 24px;
+            color: rgb(23, 31, 38);
+            font-size: 40px;
+            font-family: Inter;
+            font-weight: bold;
+            line-height: 52px;
+          }
+
+          &--spanish {
+            color: rgb(23, 31, 38);
+            font-size: 32px;
+            font-family: Inter;
+            font-weight: normal;
+            line-height: 44px;
+            opacity: 90%;
+          }
         }
       }
 
-      .shuttle-bus-info__trip-info-accessibility-text {
-        position: absolute;
-        top: 622px;
-        left: 216px;
-        margin-right: 44px;
+      .shuttle-bus-info__trip-info-accessibility {
+        .shuttle-bus-info__trip-info-accessibility-icon-container {
+          position: absolute;
+          top: 622px;
+          left: 64px;
 
-        &--english {
-          color: rgb(23, 31, 38);
-          font-size: 32px;
-          font-family: Inter;
-          font-weight: bold;
-          line-height: 44px;
+          .shuttle-bus-info__trip-info-accessibility-icon {
+            height: 56px;
+            width: 56px;
+          }
         }
 
-        &--spanish {
-          color: rgb(23, 31, 38);
-          font-size: 24px;
-          font-family: Inter;
-          font-weight: normal;
-          line-height: 36px;
+        .shuttle-bus-info__trip-info-accessibility-text {
+          position: absolute;
+          top: 622px;
+          left: 216px;
+          margin-right: 44px;
+
+          &--english {
+            color: rgb(23, 31, 38);
+            font-size: 32px;
+            font-family: Inter;
+            font-weight: bold;
+            line-height: 44px;
+          }
+
+          &--spanish {
+            color: rgb(23, 31, 38);
+            font-size: 24px;
+            font-family: Inter;
+            font-weight: normal;
+            line-height: 36px;
+          }
         }
       }
     }
