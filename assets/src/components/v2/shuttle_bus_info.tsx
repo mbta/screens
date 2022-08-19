@@ -3,6 +3,7 @@ import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
 import Accessible from "Components/v2/bundled_svg/accessible";
 import Free from "Components/v2/bundled_svg/free";
+import ClockIcon from "Components/v2/clock_icon";
 
 interface Props {
   minutes_range_to_destination: string;
@@ -19,6 +20,11 @@ const ShuttleBusInfo: ComponentType<Props> = ({
   english_boarding_instructions: englighBoardingInstructions,
   spanish_boarding_instructions: spanishBoardingInstructions,
 }) => {
+  let maxMinutes = parseInt(minutesRangeToDestination.split("-")[1]);
+  if (isNaN(maxMinutes)) {
+    maxMinutes = 15;
+  }
+
   return (
     <div className="shuttle-bus-info">
       <div className="shuttle-bus-info__container">
@@ -56,8 +62,17 @@ const ShuttleBusInfo: ComponentType<Props> = ({
         </div>
         <div className="shuttle-bus-info__trip-info">
           <div className="shuttle-bus-info__trip-info-time">
-            <span className="shuttle-bus-info__trip-info-time--english">{`${minutesRangeToDestination}m to ${destination}`}</span>
-            <span className="shuttle-bus-info__trip-info-time--spanish">{`paseo a ${destination}`}</span>
+            <div className="shuttle-bus-info__trip-info-time-icon-container">
+              <ClockIcon
+                minutes={maxMinutes}
+                fgColor="rgb(23, 31, 38)"
+                bgColor="transparent"
+              />
+            </div>
+            <div className="shuttle-bus-info__trip-info-time-text">
+              <span className="shuttle-bus-info__trip-info-time-text--english">{`${minutesRangeToDestination}m to ${destination}`}</span>
+              <span className="shuttle-bus-info__trip-info-time-text--spanish">{`paseo a ${destination}`}</span>
+            </div>
           </div>
           <div className="shuttle-bus-info__trip-info-price">
             <div className="shuttle-bus-info__trip-info-price-icon-container">
