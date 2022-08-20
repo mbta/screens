@@ -140,29 +140,31 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
         </div>
         <div className="departures-card__footer">
           <div className="departures-card__info-row">
-            <div className="small-svg">
+            <div className="small-svg clock-icon">
               <ClockIcon
                 minutes={maxMinutes}
                 fgColor="rgb(23, 31, 38)"
                 bgColor="transparent"
               />
             </div>
-            <div className="departures-card__footer-english">
-              {time_to_destination}m to {destination}
-            </div>
-            <div className="departures-card__footer-spanish">
-              paseo a {destination}
+            <div className="departures-card__time-to-destination">
+              <span className="departures-card__footer-english time-to-destination">
+                {time_to_destination}m to {destination}
+              </span>
+              <span className="departures-card__footer-spanish time-to-destination">
+                paseo a {destination}
+              </span>
             </div>
           </div>
           <div className="departures-card__info-row">
             <div className="free-cr">
               <Free className="small-svg" colorHex="#00843d" />
             </div>
-            <div>
+            <div className="departures-card__footer-ride-free">
               <div className="departures-card__footer-english ride-free">
                 Show your Charlie Card or Charlie Ticket to ride free of charge
               </div>
-              <div className="departures-card__footer-spanish">
+              <div className="departures-card__footer-spanish ride-free">
                 Viajar gratis
               </div>
             </div>
