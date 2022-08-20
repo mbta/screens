@@ -9,7 +9,8 @@ defmodule Screens.Config.V2.EvergreenContentItem do
           asset_path: String.t(),
           priority: WidgetInstance.priority(),
           schedule: list(Schedule.t()),
-          text_for_audio: String.t()
+          text_for_audio: String.t(),
+          audio_priority: WidgetInstance.priority()
         }
 
   @enforce_keys ~w[slot_names asset_path priority]a
@@ -17,7 +18,8 @@ defmodule Screens.Config.V2.EvergreenContentItem do
             asset_path: nil,
             priority: nil,
             schedule: [%Schedule{}],
-            text_for_audio: nil
+            text_for_audio: nil,
+            audio_priority: nil
 
   use Screens.Config.Struct, children: [schedule: {:list, Schedule}]
 

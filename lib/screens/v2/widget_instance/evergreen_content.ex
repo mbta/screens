@@ -12,7 +12,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
             priority: nil,
             schedule: [%Schedule{}],
             now: nil,
-            text_for_audio: nil
+            text_for_audio: nil,
+            audio_priority: nil
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
@@ -21,7 +22,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
           priority: WidgetInstance.priority(),
           schedule: list(Schedule.t()),
           now: DateTime.t(),
-          text_for_audio: String.t()
+          text_for_audio: String.t(),
+          audio_priority: WidgetInstance.priority()
         }
 
   def priority(%__MODULE__{} = instance), do: instance.priority
@@ -52,7 +54,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
   def audio_serialize(%__MODULE__{text_for_audio: text_for_audio}),
     do: %{text_for_audio: text_for_audio}
 
-  def audio_sort_key(_instance), do: [99]
+  def audio_sort_key(%__MODULE__{} = instance), do: instance.audio_priority
 
   def audio_valid_candidate?(%__MODULE__{text_for_audio: text_for_audio})
       when not is_nil(text_for_audio),
