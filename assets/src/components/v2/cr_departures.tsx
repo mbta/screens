@@ -112,7 +112,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
             </div>
           </div>
         </div>
-        <div className="departures-card__body">
+        { departures.length ? <div className="departures-card__body">
           <DeparturesTable departures={departures} />
           {show_via_headsigns_message ? (
             <div className="departures-card__info-row">
@@ -155,7 +155,14 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
               </div>
             </div>
           )}
-        </div>
+        </div> :
+          <div>
+            <img
+              className="alert-widget__content__icon-image"
+              src={imagePath("Commuter-Rail-LateNight.png")}
+            />
+          </div>
+        }
         <div className="departures-card__footer">
           <div className="departures-card__info-row">
             <div className="small-svg">
