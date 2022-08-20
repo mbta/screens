@@ -142,7 +142,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
               <div className="departures-card__info-text">
                 <div className="departures-card__body-english">
                   <div>
-                    All trains to <strong>South</strong> Station stop at
+                    All trains to <strong>South Station</strong> stop at
                   </div>
                   <div>
                     <strong>Ruggles</strong> and <strong>Back Bay</strong>
