@@ -37,13 +37,13 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
     <table>
       <tbody>
         <tr>
-          <td className="wayfinding-arrow-column"></td>
-          <td className="headsign-column">
+          <td className="arrow"></td>
+          <td className="headsign">
             <div className="table-header__english">Upcoming departures</div>
             <div className="table-header__spanish">Próximas salidas</div>
           </td>
-          <td className="arrival-column"></td>
-          <td className="track-column">
+          <td className="arrival"></td>
+          <td className="track">
             <div className="table-header__english">Track</div>
             <div className="table-header__spanish">Pista</div>
           </td>
@@ -51,7 +51,7 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
         {departures.slice(0, 3).map((departure) => {
           return (
             <tr key={departure.prediction_or_schedule_id}>
-              <td>
+              <td className="arrow">
                 {departure.arrow ? (
                   <Arrow
                     direction={departure.arrow}

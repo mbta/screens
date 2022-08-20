@@ -135,12 +135,13 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   defp serialize_timestamp(departure_time) do
     {:ok, local_time} = DateTime.shift_zone(departure_time, "America/New_York")
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
-    minute = local_time.minute
+    string_minute = Integer.to_string(local_time.minute)
+    updated_minute = if local_time.minute < 10, do: "0" <> string_minute, else: string_minute
     am_pm = if local_time.hour >= 12, do: :pm, else: :am
 
     %{
       type: :timestamp,
-      timestamp: Integer.to_string(hour) <> ":" <> Integer.to_string(minute),
+      timestamp: Integer.to_string(hour) <> ":" <> updated_minute,
       ampm: am_pm
     }
   end
