@@ -21,7 +21,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
            asset_path: asset_path,
            priority: priority,
            schedule: schedule,
-           text_for_audio: text_for_audio
+           text_for_audio: text_for_audio,
+           audio_priority: audio_priority
          },
          config,
          now
@@ -33,7 +34,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
       priority: priority,
       schedule: schedule,
       now: now,
-      text_for_audio: text_for_audio
+      text_for_audio: text_for_audio,
+      audio_priority: audio_priority
     }
   end
 end

@@ -15,7 +15,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
         priority: [2, 3, 1],
         schedule: [%Schedule{}],
         now: ~U[2021-02-01T00:00:00Z],
-        text_for_audio: "This is text."
+        text_for_audio: "This is text.",
+        audio_priority: [1, 3, 2]
       },
       widget_old_schedule: %EvergreenContent{
         screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
@@ -82,8 +83,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
   end
 
   describe "audio_sort_key/1" do
-    test "returns [99]", %{widget: widget} do
-      assert [99] == WidgetInstance.audio_sort_key(widget)
+    test "returns audio_priority defined on the struct", %{widget: widget} do
+      assert [1, 3, 2] == WidgetInstance.audio_sort_key(widget)
     end
   end
 
