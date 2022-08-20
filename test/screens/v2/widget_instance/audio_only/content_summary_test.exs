@@ -3,13 +3,20 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
   import ExUnit.CaptureLog
 
   alias Screens.Config.Screen
+  alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Config.V2.PreFare
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
   alias Screens.V2.WidgetInstance.MockWidget
   alias Screens.V2.WidgetInstance.{NormalHeader, ShuttleBusInfo}
 
   setup do
-    pre_fare_config = struct(Screen, %{app_id: :pre_fare_v2})
+    pre_fare_config =
+      struct(Screen, %{
+        app_id: :pre_fare_v2,
+        app_params: struct(PreFare, %{header: %CurrentStopId{stop_id: "place-test"}})
+      })
+
     other_config = struct(Screen, %{app_id: :bus_e_ink_v2})
 
     instance_with_header = %ContentSummary{
@@ -26,7 +33,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
 
     instance_with_surge_widgets = %ContentSummary{
       screen: nil,
-      widgets_snapshot: [struct(ShuttleBusInfo)],
+      widgets_snapshot: [struct(NormalHeader), struct(ShuttleBusInfo)],
       lines_at_station: []
     }
 
@@ -47,6 +54,16 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
   end
 
   defp put_config(instance, config), do: %{instance | screen: config}
+
+  defp put_stop_id(widget, stop_id) do
+    %{
+      widget
+      | screen: %{
+          widget.screen
+          | app_params: %{widget.screen.app_params | header: %CurrentStopId{stop_id: stop_id}}
+        }
+    }
+  end
 
   describe "audio_serialize/1" do
     test "returns map with lines_at_station for pre-fare screens", %{
@@ -99,9 +116,18 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
       pre_fare_config: pre_fare_config,
       instance_with_header: widget
     } do
-      widget = put_config(widget, pre_fare_config)
+      widget = widget |> put_config(pre_fare_config) |> put_stop_id("place-gover")
 
       assert WidgetInstance.audio_valid_candidate?(widget)
+    end
+
+    test "on pre-fare screens, skip Wellington during OL Surge", %{
+      pre_fare_config: pre_fare_config,
+      instance_with_surge_widgets: widget
+    } do
+      widget = widget |> put_config(pre_fare_config) |> put_stop_id("place-welln")
+
+      refute WidgetInstance.audio_valid_candidate?(widget)
     end
 
     test "on pre-fare screens, widget is not valid if there is any takeover content", %{
