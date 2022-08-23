@@ -168,7 +168,13 @@ defmodule Screens.DupScreenData.Request do
   end
 
   defp fetch_section_departures(stop_ids, route_ids, route_type, direction_id, pill, num_rows) do
-    query_params = %{stop_ids: stop_ids, route_ids: route_ids, route_type: route_type, direction_id: direction_id}
+    query_params = %{
+      stop_ids: stop_ids,
+      route_ids: route_ids,
+      route_type: route_type,
+      direction_id: direction_id
+    }
+
     include_schedules? = Enum.member?([:cr, :ferry], pill)
 
     case Departure.fetch(query_params, include_schedules?) do
