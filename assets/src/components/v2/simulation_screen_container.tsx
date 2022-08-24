@@ -21,7 +21,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
   const { fullPage, flexZone } = data;
 
   return (
-    <div className="simulation-screen-container">
+    <div className="simulation-screen-container" style={{"--page-number": flexZone?.length} as React.CSSProperties}>
       {apiResponse && (
         <div className="simulation__full-page">
           {fullPage ? <Widget data={fullPage} /> : <div>Loading</div>}

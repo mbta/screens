@@ -1,14 +1,36 @@
+$SIMULATION_FULL_PAGE_WIDTH: 387px;
+$SIMULATION_FLEX_PAGE_WIDTH: 256px;
+
+$SIMULATION_PRIMARY_MARGIN: 24px;
+$SIMULATION_SECONDARY_MARGIN: 8px;
+
 .simulation-screen-container {
+
+  // Would love to read number of flex pages from the element JSX
+  // $flex_pages: var(--page-number);
+
+  // Could calculate the width of the simulation-screen-container, hypothetically
+  // $SIMULATION_SCREEN_CONTAINER_WIDTH:
+  //     $SIMULATION_FULL_PAGE_WIDTH + $SIMULATION_PRIMARY_MARGIN
+  //     + ($FLEX_PAGES * $SIMULATION_FLEX_PAGE_WIDTH)
+  //     + ($FLEX_PAGES - 1) * $SIMULATION_PRIMARY_MARGIN
+  //     + $SIMULATION_SECONDARY_MARGIN;
+
   display: flex;
   background: #3d5366;
   overflow-y: hidden;
   overflow-x: auto;
-  justify-content: center;
+  // justify-content: center;
+  // left: calc((100vw - $SIMULATION_SCREEN_CONTAINER_WIDTH)/2);
+
+  ::-webkit-scrollbar-track {
+    background: #2E3F4D;
+  }
 
   .simulation__full-page {
     height: 344px;
-    width: 387px;
-    margin-right: 24px;
+    width: $SIMULATION_FULL_PAGE_WIDTH;
+    margin-right: $SIMULATION_PRIMARY_MARGIN;
     z-index: 999;
 
     & > * {
@@ -38,17 +60,17 @@
   }
 
   .simulation__flex-zone-widget {
-    width: 256px;
+    width: $SIMULATION_FLEX_PAGE_WIDTH;
     height: 144px;
     margin-top: auto;
     margin-bottom: auto;
 
     &:last-child {
-      margin-right: 8px;
+      margin-right: $SIMULATION_SECONDARY_MARGIN;
     }
 
     &:not(:last-child) {
-      margin-right: 24px;
+      margin-right: $SIMULATION_PRIMARY_MARGIN;
     }
 
     .flex-one-large,
