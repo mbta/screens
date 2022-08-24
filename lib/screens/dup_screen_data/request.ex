@@ -86,7 +86,8 @@ defmodule Screens.DupScreenData.Request do
             route_ids: route_ids,
             route_type: route_type,
             pill: pill,
-            headway: headway
+            headway: headway,
+            direction_id: direction_id
           } = section, section_alert},
          num_rows,
          current_time
@@ -96,7 +97,7 @@ defmodule Screens.DupScreenData.Request do
         {:ok, %{pill: pill, headway: Response.render_headway_lines(pill, {lo, hi}, num_rows)}}
 
       :inactive ->
-        fetch_section_departures(stop_ids, route_ids, route_type, pill, num_rows)
+        fetch_section_departures(stop_ids, route_ids, route_type, direction_id, pill, num_rows)
     end
   end
 
@@ -166,8 +167,14 @@ defmodule Screens.DupScreenData.Request do
     Logger.info("[dup empty section] stop_ids=#{stop_id_string} route_ids=#{route_id_string}")
   end
 
-  defp fetch_section_departures(stop_ids, route_ids, route_type, pill, num_rows) do
-    query_params = %{stop_ids: stop_ids, route_ids: route_ids, route_type: route_type}
+  defp fetch_section_departures(stop_ids, route_ids, route_type, direction_id, pill, num_rows) do
+    query_params = %{
+      stop_ids: stop_ids,
+      route_ids: route_ids,
+      route_type: route_type,
+      direction_id: direction_id
+    }
+
     include_schedules? = Enum.member?([:cr, :ferry], pill)
 
     case Departure.fetch(query_params, include_schedules?) do
