@@ -56,6 +56,23 @@
       transform-origin: top left;
       transform: scale(25%);
 
+      .flex-one-large__large {
+        .evergreen-content-image__container,
+        .evergreen-content-image__image {
+          max-width: 1024px;
+          max-height: 576px;
+        }
+      }
+
+      .flex-two-medium__left,
+      .flex-two-medium__right {
+        .evergreen-content-image__container,
+        .evergreen-content-image__image {
+          max-width: 480px;
+          max-height: 580px;
+        }
+      }
+
       & > * {
         position: unset;
       }
