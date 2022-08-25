@@ -1,36 +1,35 @@
-$SIMULATION_FULL_PAGE_WIDTH: 387px;
-$SIMULATION_FLEX_PAGE_WIDTH: 256px;
-
-$SIMULATION_PRIMARY_MARGIN: 24px;
-$SIMULATION_SECONDARY_MARGIN: 8px;
-
-.simulation-screen-container {
-
-  // Would love to read number of flex pages from the element JSX
-  // $flex_pages: var(--page-number);
-
-  // Could calculate the width of the simulation-screen-container, hypothetically
-  // $SIMULATION_SCREEN_CONTAINER_WIDTH:
-  //     $SIMULATION_FULL_PAGE_WIDTH + $SIMULATION_PRIMARY_MARGIN
-  //     + ($FLEX_PAGES * $SIMULATION_FLEX_PAGE_WIDTH)
-  //     + ($FLEX_PAGES - 1) * $SIMULATION_PRIMARY_MARGIN
-  //     + $SIMULATION_SECONDARY_MARGIN;
-
+.simulation-screen-centering-container {
   display: flex;
+  justify-content: center;
   background: #3d5366;
+}
+
+.simulation-screen-scrolling-container {
+  &::-webkit-scrollbar {
+    width: 12px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #607180;
+    border-radius: 12px;
+    border: 2px solid #2E3F4D;
+  }
+  &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    background-color: #2E3F4D;
+  }
+}
+
+.simulation-screen-scrolling-container {
+  display: flex;
   overflow-y: hidden;
   overflow-x: auto;
-  // justify-content: center;
-  // left: calc((100vw - $SIMULATION_SCREEN_CONTAINER_WIDTH)/2);
-
-  ::-webkit-scrollbar-track {
-    background: #2E3F4D;
-  }
+  padding-bottom: 8px;
 
   .simulation__full-page {
     height: 344px;
-    width: $SIMULATION_FULL_PAGE_WIDTH;
-    margin-right: $SIMULATION_PRIMARY_MARGIN;
+    width: 387px;
+    margin-right: 24px;
     z-index: 999;
 
     & > * {
@@ -60,17 +59,17 @@ $SIMULATION_SECONDARY_MARGIN: 8px;
   }
 
   .simulation__flex-zone-widget {
-    width: $SIMULATION_FLEX_PAGE_WIDTH;
+    width: 256px;
     height: 144px;
     margin-top: auto;
     margin-bottom: auto;
 
     &:last-child {
-      margin-right: $SIMULATION_SECONDARY_MARGIN;
+      margin-right: 8px;
     }
 
     &:not(:last-child) {
-      margin-right: $SIMULATION_PRIMARY_MARGIN;
+      margin-right: 24px;
     }
 
     .flex-one-large,

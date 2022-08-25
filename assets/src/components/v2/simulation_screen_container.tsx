@@ -21,26 +21,28 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
   const { fullPage, flexZone } = data;
 
   return (
-    <div className="simulation-screen-container" style={{"--page-number": flexZone?.length} as React.CSSProperties}>
-      {apiResponse && (
-        <div className="simulation__full-page">
-          {fullPage ? <Widget data={fullPage} /> : <div>Loading</div>}
-        </div>
-      )}
-      {flexZone?.length > 0 && (
-        <div className="simulation__flex-zone">
-          {flexZone.map((flexZonePage: WidgetData, index: number) => {
-            return (
-              <div
-                key={`page${index}`}
-                className="simulation__flex-zone-widget"
-              >
-                <Widget data={flexZonePage} />
-              </div>
-            );
-          })}
-        </div>
-      )}
+    <div className="simulation-screen-centering-container">
+      <div className="simulation-screen-scrolling-container">
+        {apiResponse && (
+          <div className="simulation__full-page">
+            {fullPage ? <Widget data={fullPage} /> : <div>Loading</div>}
+          </div>
+        )}
+        {flexZone?.length > 0 && (
+          <div className="simulation__flex-zone">
+            {flexZone.map((flexZonePage: WidgetData, index: number) => {
+              return (
+                <div
+                  key={`page${index}`}
+                  className="simulation__flex-zone-widget"
+                >
+                  <Widget data={flexZonePage} />
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
