@@ -65,23 +65,25 @@ const SimulationPage = ({
 }): JSX.Element => {
   const { id } = useParams();
   return (
-    <div className="simulation-page">
-      <div className="projection">
-        <ScreenContainer
-          id={id}
-          rotationIndex={0}
-          refreshMs={DUP_SIMULATION_REFRESH_MS}
-        />
-        <ScreenContainer
-          id={id}
-          rotationIndex={1}
-          refreshMs={DUP_SIMULATION_REFRESH_MS}
-        />
-        <ScreenContainer
-          id={id}
-          rotationIndex={2}
-          refreshMs={DUP_SIMULATION_REFRESH_MS}
-        />
+    <div className="simulation-screen-centering-container">
+      <div className="simulation-screen-scrolling-container">
+        <div className="projection">
+          <ScreenContainer
+            id={id}
+            rotationIndex={0}
+            refreshMs={DUP_SIMULATION_REFRESH_MS}
+          />
+          <ScreenContainer
+            id={id}
+            rotationIndex={1}
+            refreshMs={DUP_SIMULATION_REFRESH_MS}
+          />
+          <ScreenContainer
+            id={id}
+            rotationIndex={2}
+            refreshMs={DUP_SIMULATION_REFRESH_MS}
+          />
+        </div>
       </div>
     </div>
   );
