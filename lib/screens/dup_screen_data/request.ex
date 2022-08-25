@@ -37,7 +37,15 @@ defmodule Screens.DupScreenData.Request do
     "Wickford Junction" => "Wickford Jct",
     "Needham Heights" => "Needham Hts",
     "Houghs Neck via McGrath & Germantown" => "Houghs Neck via McGth & Gtwn",
-    "Houghs Neck via Germantown" => "Houghs Neck via Germntwn"
+    "Houghs Neck via Germantown" => "Houghs Neck via Germntwn",
+
+    # The following are special headsigns for the 2022 Orange Line surge
+    "Needham Heights via Ruggles" => "Needham Hts via Ruggles",
+    "Needham Heights via Forest Hills" => "Needham Hts via Forest Hills",
+    "Wickford Junction via Ruggles" => "Wickford Jct via Ruggles",
+    "Wickford Junction via Forest Hills" => "Wickford Jct via Forest Hills",
+    "Providence & Needham via Forest Hills" => "Providence via Forest Hills",
+    "Norwood Central via Ruggles" => "Norwood Cntrl via Ruggles"
   }
 
   def fetch_alerts(stop_ids, route_ids) do
