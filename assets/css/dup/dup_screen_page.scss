@@ -10,6 +10,8 @@
 }
 
 .simulation-screen-scrolling-container {
+  scrollbar-color: #607180 #2E3F4D;
+
   &::-webkit-scrollbar {
     width: 12px;
   }
