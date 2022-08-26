@@ -25,7 +25,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
       <div className="simulation-screen-scrolling-container">
         {apiResponse && (
           <div className="simulation__full-page">
-            {fullPage ? <Widget data={fullPage} /> : <div>Loading</div>}
+            <Widget data={fullPage ?? data} />
           </div>
         )}
         {flexZone?.length > 0 && (
