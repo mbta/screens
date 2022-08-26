@@ -10,6 +10,7 @@ import useOutfrontStation from "Hooks/use_outfront_station";
 import useCurrentPage from "Hooks/use_current_dup_page";
 
 import { formatTimeString, classWithModifier, imagePath } from "Util/util";
+import Loading from "Components/v2/bundled_svg/loading";
 
 const LinkArrow = ({ width, color }) => {
   const height = 40;
@@ -87,6 +88,32 @@ const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
           <LinkArrow width="375" color="#a2a3a3" />
         </div>
         <div className="no-data__link-text">mbta.com/schedules</div>
+      </div>
+    </div>
+  );
+};
+
+const LoadingLayout = (): JSX.Element => {
+  let stationName = useOutfrontStation() || "Transit information";
+  stationName = REPLACEMENTS[stationName] || stationName;
+
+  return (
+    <div className={classWithModifier("screen-container", "loading")}>
+      <Header text={stationName} />
+      <div className="loading__body">
+        <div className="loading__icon-container">
+          <Loading colorHex={"#171F26"} />
+        </div>
+        <div className="loading__heading">Loading...</div>
+        <div className="loading__sub-heading">
+          This should only take a moment.
+        </div>
+      </div>
+      <div className="loading__link">
+        <div className="loading__link-arrow">
+          <LinkArrow width="375" color="#a2a3a3" />
+        </div>
+        <div className="loading__link-text">mbta.com/schedules</div>
       </div>
     </div>
   );
@@ -175,6 +202,8 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
   switch (apiResponse.type) {
     case "disabled":
       return <DisabledLayout apiResponse={apiResponse} />;
+    case "loading":
+      return <LoadingLayout />;
     case "static_image":
       return <StaticImageLayout srcUrl={apiResponse.image_url} />;
     case "full_screen_alert":

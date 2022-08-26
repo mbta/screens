@@ -24,7 +24,16 @@ const defaultResponseMapper: ResponseMapper = (apiResponse) => {
     case "disabled":
     case "failure":
       return { type: "no_data" };
+    case "loading":
+      return { type: "page_load_no_data" };
   }
+};
+
+const LOADING_LAYOUT = {
+  full_screen: {
+    type: "page_load_no_data",
+  },
+  type: "screen_takeover",
 };
 
 const ResponseMapperContext = createContext<ResponseMapper>(
@@ -119,7 +128,12 @@ const ScreenContainer = ({ id }) => {
 };
 
 export default ScreenContainer;
-export { ResponseMapper, ResponseMapperContext, defaultResponseMapper };
+export {
+  ResponseMapper,
+  ResponseMapperContext,
+  defaultResponseMapper,
+  LOADING_LAYOUT,
+};
 export { BlinkConfig, BlinkConfigContext };
 export { AudioConfig, AudioConfigContext };
 export { LastFetchContext };

@@ -12,6 +12,7 @@ import TakeoverScreenLayout from "Components/eink/takeover_screen_layout";
 import useApiResponse from "Hooks/use_api_response";
 
 import { EINK_REFRESH_MS } from "Constants";
+import LoadingTop from "Components/eink/loading_top";
 
 const TopScreenLayout = ({
   currentTimeString,
@@ -94,10 +95,17 @@ const NoConnectionScreenLayout = (): JSX.Element => {
   return <NoConnectionSingle />;
 };
 
+const LoadingScreenLayout = (): JSX.Element => {
+  // We haven't recieved a response since page load. Show a loading message.
+  return <LoadingTop />;
+};
+
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
   switch (true) {
     case !apiResponse || apiResponse.success === false:
       return <NoConnectionScreenLayout />;
+    case apiResponse.type === "loading":
+      return <LoadingScreenLayout />;
     case apiResponse.psa_type === "takeover":
       return <TakeoverScreenLayout apiResponse={apiResponse} />;
     case apiResponse.service_level === 5:

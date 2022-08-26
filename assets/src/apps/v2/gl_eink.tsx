@@ -24,7 +24,9 @@ import NormalDepartures from "Components/v2/departures/normal_departures";
 import LineMap from "Components/v2/gl_eink_double/line_map";
 import EvergreenContent from "Components/v2/evergreen_content";
 import NoData from "Components/v2/eink/no_data";
+import PageLoadNoData from "Components/v2/eink/page_load_no_data";
 import {
+  LOADING_LAYOUT,
   ResponseMapper,
   ResponseMapperContext,
 } from "Components/v2/screen_container";
@@ -53,6 +55,7 @@ const TYPE_TO_COMPONENT = {
   line_map: LineMap,
   evergreen_content: EvergreenContent,
   no_data: NoData,
+  page_load_no_data: PageLoadNoData,
   bottom_screen_filler: BottomScreenFiller,
   overnight_departures: OvernightDepartures,
 };
@@ -75,6 +78,8 @@ const responseMapper: ResponseMapper = (apiResponse) => {
       return DISABLED_LAYOUT;
     case "failure":
       return FAILURE_LAYOUT;
+    case "loading":
+      return LOADING_LAYOUT;
   }
 };
 

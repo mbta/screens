@@ -10,6 +10,7 @@ import useApiResponse from "Hooks/use_api_response";
 
 import { SOLARI_REFRESH_MS } from "Constants";
 import { useLocation } from "react-router-dom";
+import LoadingLayout from "Components/solari/loading_layout";
 
 const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
   const sizeModifier = apiResponse.overhead ? "size-large" : "size-normal";
@@ -55,9 +56,17 @@ const TakeoverScreenLayout = ({ apiResponse }): JSX.Element => {
   return <FullScreenImageLayout srcPath={apiResponse.psa_url} />;
 };
 
+const LoadingScreenLayout = (): JSX.Element => {
+  return <LoadingLayout />;
+};
+
 const ScreenLayout = ({ apiResponse }): JSX.Element => {
   if (!apiResponse || apiResponse.success === false) {
     return <NoConnectionScreenLayout />;
+  }
+
+  if (apiResponse.type === "loading") {
+    return <LoadingScreenLayout />;
   }
 
   if (apiResponse.psa_type === "takeover") {
