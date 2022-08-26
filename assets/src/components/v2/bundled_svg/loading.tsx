@@ -19,15 +19,15 @@ const Loading: ComponentType<Props> = ({ className, colorHex }) => (
     <g
       id="Icon/Loading"
       stroke="none"
-      stroke-width="1"
+      strokeWidth="1"
       fill="none"
-      fill-rule="evenodd"
+      fillRule="evenodd"
     >
       <g
         id="Group"
         transform="translate(3.000000, 1.000000)"
         fill={colorHex}
-        fill-rule="nonzero"
+        fillRule="nonzero"
       >
         <path
           d="M62,0 C67.452938,0 71.8864868,4.34188029 71.9978548,9.73998485 L72,9.94811816 L72,36.0518818 C72,41.5460758 67.5228475,46 62,46 C56.547062,46 52.1135132,41.6581197 52.0021452,36.2600151 L52,36.0518818 L52,9.94811816 C52,4.45392421 56.4771525,0 62,0 Z"
