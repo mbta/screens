@@ -19,9 +19,9 @@ const Loading: ComponentType<Props> = ({ className, colorHex }) => (
     <g
       id="Icon/Loading"
       stroke="none"
-      stroke-width="1"
+      strokeWidth="1"
       fill="none"
-      fill-rule="evenodd"
+      fillRule="evenodd"
     >
       <g
         id="Group"
