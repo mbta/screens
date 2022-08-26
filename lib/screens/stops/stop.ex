@@ -183,6 +183,10 @@ defmodule Screens.Stops.Stop do
   ]
 
   @green_line_trunk_stops [
+    # These 3 eventually will NOT be trunk stops, but are until Medford opens
+    {"place-unsqu", {"Union Square", "Union Sq"}},
+    {"place-lech", {"Lechmere", "Lechmere"}},
+    {"place-spmnl", {"Science Park/West End", "Science Pk"}},
     {"place-north", {"North Station", "North Sta"}},
     {"place-haecl", {"Haymarket", "Haymarket"}},
     {"place-gover", {"Government Center", "Gov't Ctr"}},
@@ -298,6 +302,8 @@ defmodule Screens.Stops.Stop do
   """
   def get_stop_sequence(informed_entities, route_id) do
     stop_sequences = Map.get(@route_stop_sequences, route_id)
+    |> IO.inspect(label: "stop sequences")
+    IO.inspect(informed_entities, label: "informed entities")
     Enum.find(stop_sequences, &sequence_match?(&1, informed_entities))
   end
 
