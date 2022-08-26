@@ -39,8 +39,12 @@ import ReconstructedAlert from "Components/v2/reconstructed_alert";
 import NoData from "Components/v2/pre_fare/no_data";
 import PageLoadNoData from "Components/v2/pre_fare/page_load_no_data";
 import ReconstructedTakeover from "Components/v2/reconstructed_takeover";
+import CRDepartures from "Components/v2/cr_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
+import SurgeBodyRight from "Components/v2/pre_fare/surge_body_right";
+import ShuttleBusInfo from "Components/v2/shuttle_bus_info";
+import BlueBikes from "Components/v2/blue_bikes";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -50,6 +54,7 @@ const TYPE_TO_COMPONENT = {
   body_left_normal: NormalBodyLeft,
   body_left_takeover: BodyLeftTakeover,
   body_right_normal: NormalBodyRight,
+  body_right_surge: SurgeBodyRight,
   body_right_takeover: BodyRightTakeover,
   normal_header: NormalHeader,
   one_large: OneLarge,
@@ -63,6 +68,9 @@ const TYPE_TO_COMPONENT = {
   page_load_no_data: PageLoadNoData,
   reconstructed_large_alert: ReconstructedAlert,
   reconstructed_takeover: ReconstructedTakeover,
+  cr_departures: CRDepartures,
+  shuttle_bus_info: ShuttleBusInfo,
+  blue_bikes: BlueBikes,
 };
 
 const DISABLED_LAYOUT = {

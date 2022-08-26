@@ -20,7 +20,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
            slot_names: slot_names,
            asset_path: asset_path,
            priority: priority,
-           schedule: schedule
+           schedule: schedule,
+           text_for_audio: text_for_audio,
+           audio_priority: audio_priority
          },
          config,
          now
@@ -31,7 +33,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
       asset_url: Assets.s3_asset_url(asset_path),
       priority: priority,
       schedule: schedule,
-      now: now
+      now: now,
+      text_for_audio: text_for_audio,
+      audio_priority: audio_priority
     }
   end
 end

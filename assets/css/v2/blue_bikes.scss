@@ -1,0 +1,335 @@
+.body-right-surge__upper {
+  .blue-bikes {
+    position: relative;
+    width: 1080px;
+    height: 830px;
+    background-color: rgb(237, 139, 0);
+    overflow: hidden;
+
+    .blue-bikes__card {
+      position: absolute;
+      top: 32px;
+      left: 32px;
+      width: 1016px;
+      height: 778px;
+      background: rgb(217, 214, 208);
+      box-shadow: 0px 10px 20px 0px rgba(23, 31, 38, 0.25);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .blue-bikes__header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 1016px;
+      height: 178px;
+      overflow: hidden;
+    }
+
+    .blue-bikes__header__bike-icon-container {
+      position: absolute;
+      top: 40px;
+      left: 40px;
+      width: 102px;
+      height: 102px;
+      border-radius: 51px;
+      background: rgb(0, 61, 165);
+    }
+
+    .blue-bikes__header__bike-icon {
+      position: absolute;
+      top: 13.5px;
+      left: 13.5px;
+      width: 75px;
+      height: 75px;
+    }
+
+    .blue-bikes__header__wordmark-icon-container {
+      position: absolute;
+      top: 59px;
+      left: 216px;
+      width: 462px;
+      height: 69px;
+    }
+
+    .blue-bikes__header__wordmark-icon {
+      width: 462px;
+      height: 69px;
+    }
+
+    .blue-bikes__header__qr-container {
+      position: absolute;
+      top: 52px;
+      left: 892px;
+      width: 80px;
+      height: 80px;
+    }
+
+    .blue-bikes__header__qr {
+      width: 80px;
+      height: 80px;
+    }
+
+    .blue-bikes__stations {
+      position: absolute;
+      top: 178px;
+      left: 0;
+      width: 1016px;
+      height: 388px;
+      background: rgb(235, 234, 232);
+      overflow: hidden;
+    }
+
+    .blue-bikes__stations-header {
+      position: relative;
+      height: 120px;
+    }
+
+    .blue-bikes__stations-header__distance {
+      position: absolute;
+      top: 24px;
+      left: 216px;
+      width: 300px;
+    }
+
+    .blue-bikes__stations-header__bikes {
+      position: absolute;
+      top: 24px;
+      left: 671px;
+      width: 300px;
+    }
+
+    .blue-bikes__stations-header__docks {
+      position: absolute;
+      top: 24px;
+      left: 841px;
+      width: 300px;
+    }
+
+    .blue-bikes__stations-header__main-text {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 44px;
+      line-height: 44px;
+      color: rgb(23, 31, 38);
+      font-family: Inter, sans-serif;
+      font-size: 32px;
+      font-weight: bold;
+    }
+
+    .blue-bikes__stations-header__alt-text {
+      position: absolute;
+      top: 44px;
+      left: 0;
+      height: 36px;
+      line-height: 36px;
+      color: rgb(23, 31, 38);
+      font-family: Inter, sans-serif;
+      font-size: 24px;
+      font-weight: normal;
+    }
+
+    .blue-bikes__station-hairline {
+      width: 928px;
+      height: 4px;
+      margin-left: 44px;
+      background: rgb(204, 203, 200);
+      border-radius: 2px;
+    }
+
+    .blue-bikes__station {
+      position: relative;
+      width: 928px;
+      height: 124px;
+      overflow: hidden;
+    }
+
+    .blue-bikes__station__arrow-image {
+      position: absolute;
+      top: 35px;
+      left: 64px;
+      width: 56px;
+      height: 56px;
+    }
+
+    .blue-bikes__station__bikes,
+    .blue-bikes__station__docks {
+      position: absolute;
+      top: 36px;
+      height: 64px;
+      line-height: 64px;
+      color: rgb(23, 31, 38);
+      font-family: Inter, sans-serif;
+      font-size: 56px;
+      font-weight: normal;
+    }
+
+    .blue-bikes__station__bikes {
+      left: 671px;
+    }
+
+    .blue-bikes__station__docks {
+      left: 847px;
+    }
+
+    .blue-bikes__station__valet-main-text {
+      position: absolute;
+      top: 52px;
+      left: 565px;
+      color: rgb(23, 31, 38);
+      font-family: Inter, sans-serif;
+      font-size: 40px;
+      font-weight: 500;
+      height: 44px;
+      line-height: 44px;
+    }
+
+    .blue-bikes__station__valet-alt-text {
+      position: absolute;
+      top: 55px;
+      left: 780px;
+      color: rgb(23, 31, 38);
+      font-family: Inter;
+      font-size: 32px;
+      font-weight: normal;
+      height: 44px;
+      line-height: 44px;
+    }
+
+    .blue-bikes__station__out-of-service {
+      position: absolute;
+      top: 18px;
+      left: 568px;
+      width: 300px;
+    }
+
+    .blue-bikes__station__out-of-service-main-text {
+      color: rgb(153, 152, 150);
+      font-family: Inter, sans-serif;
+      font-size: 40px;
+      font-weight: 500;
+      height: 44px;
+      line-height: 44px;
+    }
+
+    .blue-bikes__station__out-of-service-alt-text {
+      color: rgb(153, 152, 150);
+      font-family: Inter;
+      font-size: 32px;
+      font-weight: normal;
+      height: 44px;
+      line-height: 44px;
+    }
+
+    .blue-bikes__distance {
+      position: absolute;
+      top: 30px;
+      left: 213px;
+    }
+
+    .blue-bikes__distance-minutes-value {
+      display: inline-block;
+      width: 94px;
+      height: 64px;
+      color: rgb(23, 31, 38);
+      font-family: Inter, sans-serif;
+      font-size: 72px;
+      font-weight: 800;
+      line-height: 64px;
+      text-align: right;
+    }
+
+    .blue-bikes__distance-minutes-unit {
+      display: inline-block;
+      margin-left: 8px;
+      color: rgb(23, 31, 38);
+      font-family: Inter, sans-serif;
+      font-size: 56px;
+      font-weight: normal;
+      height: 56px;
+      line-height: 56px;
+    }
+
+    .blue-bikes__distance-feet {
+      display: inline-block;
+      margin-left: 24px;
+      color: rgb(23, 31, 38);
+      font-family: Inter, sans-serif;
+      font-size: 40px;
+      font-weight: normal;
+      height: 44px;
+      line-height: 44px;
+    }
+
+    .blue-bikes--out-of-service {
+      color: #999896;
+    }
+
+    .blue-bikes__footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 1016px;
+      height: 212px;
+      overflow: hidden;
+    }
+
+    .blue-bikes__footer__clock-icon-container {
+      position: absolute;
+      top: 32px;
+      left: 64px;
+      width: 56px;
+      height: 56px;
+    }
+
+    .blue-bikes__footer__free-icon-container {
+      position: absolute;
+      top: 110px;
+      left: 62px;
+    }
+
+    .blue-bikes__footer__free-icon {
+      width: 60px;
+      height: 60px;
+    }
+
+    .blue-bikes__footer__distance-to-destination,
+    .blue-bikes__footer__passes {
+      position: absolute;
+      left: 216px;
+      width: 800px;
+      height: 52px;
+    }
+
+    .blue-bikes__footer__distance-to-destination {
+      top: 34px;
+    }
+
+    .blue-bikes__footer__passes {
+      top: 114px;
+    }
+
+    .blue-bikes__footer__main-text {
+      display: inline-block;
+      height: 52px;
+      color: rgb(23, 31, 38);
+      font-size: 40px;
+      font-family: Inter, sans-serif;
+      font-weight: bold;
+      line-height: 52px;
+    }
+
+    .blue-bikes__footer__alt-text {
+      display: inline-block;
+      margin-left: 24px;
+      height: 44px;
+      color: rgb(23, 31, 38);
+      font-size: 32px;
+      font-family: Inter, sans-serif;
+      font-weight: normal;
+      line-height: 44px;
+    }
+  }
+}

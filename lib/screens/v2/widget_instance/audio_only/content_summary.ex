@@ -6,8 +6,10 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
   require Logger
 
   alias Screens.Config.Screen
+  alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Config.V2.PreFare
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.NormalHeader
+  alias Screens.V2.WidgetInstance.{BlueBikes, NormalHeader, ShuttleBusInfo}
 
   @type subway_line :: :red | :orange | :green | :blue
 
@@ -42,24 +44,50 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
     end
   end
 
-  def audio_valid_candidate?(%__MODULE__{screen: %Screen{app_id: :pre_fare_v2}} = t) do
-    # On pre-fare screens, we only include a content summary when
-    # there's no takeover content.
-    takeover_slots = MapSet.new(~w[full_body_left full_body_right full_body full_screen]a)
+  def audio_valid_candidate?(
+        %__MODULE__{
+          screen: %Screen{
+            app_id: :pre_fare_v2,
+            app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}
+          },
+          widgets_snapshot: widgets
+        } = t
+      ) do
+    # Need to skip this readout for Wellington during the OL Surge
+    if has_surge_widgets?(widgets) and stop_id in ["place-welln"] do
+      false
+    else
+      # On pre-fare screens, we only include a content summary when
+      # there's no takeover content.
+      takeover_slots = MapSet.new(~w[full_body_left full_body_right full_body full_screen]a)
 
-    Enum.all?(t.widgets_snapshot, fn widget ->
-      widget
-      |> WidgetInstance.slot_names()
-      |> MapSet.new()
-      |> MapSet.disjoint?(takeover_slots)
-    end)
+      Enum.all?(t.widgets_snapshot, fn widget ->
+        widget
+        |> WidgetInstance.slot_names()
+        |> MapSet.new()
+        |> MapSet.disjoint?(takeover_slots)
+      end)
+    end
   end
 
   def audio_valid_candidate?(_t) do
     false
   end
 
-  def audio_view(_instance), do: ScreensWeb.V2.Audio.ContentSummaryView
+  def audio_view(%__MODULE__{widgets_snapshot: widgets}) do
+    if has_surge_widgets?(widgets) do
+      ScreensWeb.V2.Audio.SurgeContentSummaryView
+    else
+      ScreensWeb.V2.Audio.ContentSummaryView
+    end
+  end
+
+  defp has_surge_widgets?(widgets) do
+    Enum.any?(widgets, fn
+      %widget{} when widget in [ShuttleBusInfo, BlueBikes] -> true
+      _ -> false
+    end)
+  end
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
