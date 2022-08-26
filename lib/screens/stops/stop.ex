@@ -302,8 +302,6 @@ defmodule Screens.Stops.Stop do
   """
   def get_stop_sequence(informed_entities, route_id) do
     stop_sequences = Map.get(@route_stop_sequences, route_id)
-    |> IO.inspect(label: "stop sequences")
-    IO.inspect(informed_entities, label: "informed entities")
     Enum.find(stop_sequences, &sequence_match?(&1, informed_entities))
   end
 
