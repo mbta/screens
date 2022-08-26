@@ -21,25 +21,28 @@ defmodule Screens.DupScreenData do
       {_, _, true} ->
         disabled_response(now)
 
-      {nil, _, _} ->
-        primary_screen_response(primary_departures, rotation_index, now)
-
-      {{screen0, _}, "0", _} ->
+      {{screen0, _, _}, "0", _} when not is_nil(screen0) ->
         primary_screen_response_with_override(primary_departures, rotation_index, screen0, now)
 
-      {{_, screen1}, "1", _} ->
+      {{_, screen1, _}, "1", _} when not is_nil(screen1) ->
         primary_screen_response_with_override(primary_departures, rotation_index, screen1, now)
+
+      {_, _, _} ->
+        primary_screen_response(primary_departures, rotation_index, now)
     end
   end
 
   def by_screen_id(screen_id, "2", now) do
-    %Dup{secondary: secondary_departures} = State.app_params(screen_id)
+    %Dup{secondary: secondary_departures, override: override} = State.app_params(screen_id)
 
-    case secondary_departures do
-      %Dup.Departures{sections: []} ->
+    case {secondary_departures, override} do
+      {%Dup.Departures{sections: []}, _} ->
         by_screen_id(screen_id, "0")
 
-      _ ->
+      {_, {_, _, screen2}} ->
+        fetch_partial_alert_response(secondary_departures, screen2, now, override: true)
+
+      {_, _} ->
         fetch_departures_response(secondary_departures, %{}, now)
     end
   end
@@ -67,9 +70,9 @@ defmodule Screens.DupScreenData do
     alerts_by_section = fetch_and_interpret_alerts(primary_departures)
     alerts = flatten_alerts(alerts_by_section)
 
-    line_count = Data.station_line_count(primary_departures)
+    mode_or_line_count = length(primary_departures.sections)
 
-    case Data.response_type(alerts, line_count, rotation_index) do
+    case Data.response_type(alerts, mode_or_line_count, rotation_index) do
       :departures ->
         fetch_departures_response(primary_departures, alerts_by_section, current_time)
 
@@ -77,7 +80,7 @@ defmodule Screens.DupScreenData do
         fetch_partial_alert_response(primary_departures, alerts_by_section, current_time)
 
       :fullscreen_alert ->
-        fetch_fullscreen_alert_response(primary_departures, alerts, line_count)
+        fetch_fullscreen_alert_response(primary_departures, alerts, mode_or_line_count)
     end
   end
 
@@ -90,7 +93,7 @@ defmodule Screens.DupScreenData do
     alerts_by_section = fetch_and_interpret_alerts(primary_departures)
     alerts = flatten_alerts(alerts_by_section)
 
-    line_count = Data.station_line_count(primary_departures)
+    line_count = length(primary_departures.sections)
 
     case Data.response_type(alerts, line_count, rotation_index) do
       :fullscreen_alert ->

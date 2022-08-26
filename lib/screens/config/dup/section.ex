@@ -9,7 +9,8 @@ defmodule Screens.Config.Dup.Section do
           route_ids: list(route_id()),
           route_type: RouteType.t() | nil,
           pill: :bus | :red | :orange | :green | :blue | :cr | :mattapan | :silver | :ferry,
-          headway: Headway.t()
+          headway: Headway.t(),
+          direction_id: 0 | 1 | nil
         }
 
   @type stop_id :: String.t()
@@ -20,7 +21,8 @@ defmodule Screens.Config.Dup.Section do
             route_ids: [],
             route_type: nil,
             pill: nil,
-            headway: Headway.from_json(:default)
+            headway: Headway.from_json(:default),
+            direction_id: nil
 
   use Screens.Config.Struct, children: [headway: Headway]
 

@@ -72,6 +72,10 @@ config :screens,
   signs_ui_s3_path: "config.json",
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.S3Fetch,
   default_api_v3_url: "https://api-v3.mbta.com/",
+  blue_bikes_api_client: Screens.BlueBikes.Client,
+  blue_bikes_station_information_url:
+    "https://gbfs.bluebikes.com/gbfs/en/station_information.json",
+  blue_bikes_station_status_url: "https://gbfs.bluebikes.com/gbfs/en/station_status.json",
   record_sentry: false
 
 config :screens,
@@ -188,16 +192,7 @@ config :screens,
       {"70064", "70068", "Alewife"},
       {"70067", "70063", "Ashmont/Braintree"}
     ]
-  },
-  # Stop IDs at stations serviced by two subway lines, where we also have DUP screens.
-  two_line_stops: [
-    # Haymarket
-    "70024",
-    "70025",
-    "70203",
-    "70204",
-    "place-haecl"
-  ]
+  }
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

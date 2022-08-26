@@ -602,6 +602,33 @@ const contentSummaryColumn = {
   FormCell: FormTextarea,
 };
 
+const crDeparturesColumn = {
+  Header: "Commuter Rail",
+  accessor: buildAppParamAccessor("cr_departures"),
+  mutator: buildAppParamMutator("cr_departures"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
+const blueBikesColumn = {
+  Header: "BlueBikes",
+  accessor: buildAppParamAccessor("blue_bikes"),
+  mutator: buildAppParamMutator("blue_bikes"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
+const shuttleBusInfoColumn = {
+  Header: "Shuttle Bus Info",
+  accessor: buildAppParamAccessor("shuttle_bus_info"),
+  mutator: buildAppParamMutator("shuttle_bus_info"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
 const PreFareV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "pre_fare_v2";
@@ -609,7 +636,16 @@ const PreFareV2ScreensTable = (): JSX.Element => {
 
   return (
     <AdminTable
-      columns={[...v2Columns, lineMapColumn, elevatorStatusColumn, reconstructedAlertWidgetColumn, contentSummaryColumn]}
+      columns={[
+        ...v2Columns,
+        lineMapColumn,
+        elevatorStatusColumn,
+        reconstructedAlertWidgetColumn,
+        contentSummaryColumn,
+        crDeparturesColumn,
+        blueBikesColumn,
+        shuttleBusInfoColumn,
+      ]}
       dataFilter={dataFilter}
     />
   );
