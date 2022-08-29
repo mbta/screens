@@ -24,15 +24,23 @@ defmodule Screens.V2.WidgetInstance.CRDeparturesTest do
     test "handles default" do
       departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Ruggles"}}}
 
-      assert %{headsign: "Ruggles", variation: nil} ==
-               CRDeparturesWidget.serialize_headsign(departure)
+      assert %{headsign: "Ruggles", station_service_list: []} ==
+               CRDeparturesWidget.serialize_headsign(departure, "Nowhere")
     end
 
     test "handles via variations" do
-      departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Nubian via Allston"}}}
+      departure = %Departure{
+        prediction: %Prediction{trip: %Trip{headsign: "South Station via Back Bay"}}
+      }
 
-      assert %{headsign: "Nubian", variation: "via Allston"} ==
-               CRDeparturesWidget.serialize_headsign(departure)
+      assert %{
+               headsign: "South Station",
+               station_service_list: [
+                 %{name: "Ruggles", service: true},
+                 %{name: "Back Bay", service: true}
+               ]
+             } ==
+               CRDeparturesWidget.serialize_headsign(departure, "Back Bay")
     end
 
     test "handles parenthesized variations" do
@@ -40,8 +48,8 @@ defmodule Screens.V2.WidgetInstance.CRDeparturesTest do
         prediction: %Prediction{trip: %Trip{headsign: "Beth Israel (Limited Stops)"}}
       }
 
-      assert %{headsign: "Beth Israel", variation: "(Limited Stops)"} ==
-               CRDeparturesWidget.serialize_headsign(departure)
+      assert %{headsign: "Beth Israel", station_service_list: []} ==
+               CRDeparturesWidget.serialize_headsign(departure, "Somewhere")
     end
   end
 
