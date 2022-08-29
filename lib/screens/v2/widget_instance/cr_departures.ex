@@ -106,15 +106,10 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       end
 
     %{
-      headsign: shorten_headsign(headsign),
+      headsign: headsign,
       via_station_list: serialize_via_station_list(via_string, destination)
     }
   end
-
-  defp shorten_headsign("Needham Heights"), do: "Needham Hts"
-  defp shorten_headsign("Wickford Junction"), do: "Wickford Jct"
-  defp shorten_headsign("Providence & Needham"), do: "Providence"
-  defp shorten_headsign(h), do: h
 
   defp serialize_time(departure, now) do
     departure_time = Departure.time(departure)
