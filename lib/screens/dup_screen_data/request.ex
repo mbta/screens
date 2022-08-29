@@ -37,7 +37,15 @@ defmodule Screens.DupScreenData.Request do
     "Wickford Junction" => "Wickford Jct",
     "Needham Heights" => "Needham Hts",
     "Houghs Neck via McGrath & Germantown" => "Houghs Neck via McGth & Gtwn",
-    "Houghs Neck via Germantown" => "Houghs Neck via Germntwn"
+    "Houghs Neck via Germantown" => "Houghs Neck via Germntwn",
+
+    # The following are special headsigns for the 2022 Orange Line surge
+    "Needham Heights via Ruggles" => "Needham Hts via Ruggles",
+    "Needham Heights via Forest Hills" => "Needham Hts via Forest Hills",
+    "Wickford Junction via Ruggles" => "Wickford Jct via Ruggles",
+    "Wickford Junction via Forest Hills" => "Wickford Jct via Forest Hills",
+    "Providence & Needham via Forest Hills" => "Providence via Forest Hills",
+    "Norwood Central via Ruggles" => "Norwood Cntrl via Ruggles"
   }
 
   def fetch_alerts(stop_ids, route_ids) do
@@ -86,7 +94,8 @@ defmodule Screens.DupScreenData.Request do
             route_ids: route_ids,
             route_type: route_type,
             pill: pill,
-            headway: headway
+            headway: headway,
+            direction_id: direction_id
           } = section, section_alert},
          num_rows,
          current_time
@@ -96,7 +105,7 @@ defmodule Screens.DupScreenData.Request do
         {:ok, %{pill: pill, headway: Response.render_headway_lines(pill, {lo, hi}, num_rows)}}
 
       :inactive ->
-        fetch_section_departures(stop_ids, route_ids, route_type, pill, num_rows)
+        fetch_section_departures(stop_ids, route_ids, route_type, direction_id, pill, num_rows)
     end
   end
 
@@ -166,8 +175,14 @@ defmodule Screens.DupScreenData.Request do
     Logger.info("[dup empty section] stop_ids=#{stop_id_string} route_ids=#{route_id_string}")
   end
 
-  defp fetch_section_departures(stop_ids, route_ids, route_type, pill, num_rows) do
-    query_params = %{stop_ids: stop_ids, route_ids: route_ids, route_type: route_type}
+  defp fetch_section_departures(stop_ids, route_ids, route_type, direction_id, pill, num_rows) do
+    query_params = %{
+      stop_ids: stop_ids,
+      route_ids: route_ids,
+      route_type: route_type,
+      direction_id: direction_id
+    }
+
     include_schedules? = Enum.member?([:cr, :ferry], pill)
 
     case Departure.fetch(query_params, include_schedules?) do

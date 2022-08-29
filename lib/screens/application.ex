@@ -19,8 +19,10 @@ defmodule Screens.Application do
       Screens.Config.State.Supervisor,
       Screens.SignsUiConfig.State.Supervisor,
       :hackney_pool.child_spec(:ex_aws_pool, []),
+      :hackney_pool.child_spec(:blue_bikes_pool, []),
       :hackney_pool.child_spec(:api_v3_pool, max_connections: 100),
-      {Screens.Stops.StationsWithRoutesAgent, %{}}
+      {Screens.Stops.StationsWithRoutesAgent, %{}},
+      {Screens.BlueBikes.State, name: Screens.BlueBikes.State}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

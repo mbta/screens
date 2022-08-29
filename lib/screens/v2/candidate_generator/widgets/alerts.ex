@@ -82,6 +82,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
     |> Enum.to_list()
   end
 
+  defp local_and_downstream_stop_ids(nil, home_stop) do
+    [home_stop]
+  end
+
   defp local_and_downstream_stop_ids(stop_sequences, home_stop) do
     downstream_stop_ids =
       stop_sequences

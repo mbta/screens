@@ -111,7 +111,9 @@ const App = (): JSX.Element => {
         </Route>
         <Route exact path="/v2/screen/:id/simulation">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <SimulationScreenPage />
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <SimulationScreenPage />
+            </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
         <Route path="/v2/screen/:id">
