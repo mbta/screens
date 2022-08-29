@@ -1,7 +1,6 @@
 import BaseDepartureTime from "Components/eink/base_departure_time";
 import Arrow, { Direction } from "Components/solari/arrow";
-import useInterval from "Hooks/use_interval";
-import React, { useState } from "react";
+import React from "react";
 import { classWithModifier, imagePath } from "Util/util";
 import CRIcon from "./bundled_svg/cr_icon";
 import Free from "./bundled_svg/free";
@@ -26,12 +25,6 @@ interface CRDeparturesProps {
 
 const DeparturesTable: React.ComponentType<any> = (props) => {
   const { departures } = props;
-
-  let [headsignPageOne, setHeadsignPageOne] = useState(true);
-
-  useInterval(() => {
-    setHeadsignPageOne(!headsignPageOne);
-  }, 4000);
 
   const getArrowOrTbd = (arrow: string) => {
     if (arrow) {
@@ -69,15 +62,7 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
                 {getArrowOrTbd(departure.arrow)}
                 <div>{departure.track_number ?? ""}</div>
               </td>
-              {headsignPageOne ? (
-                <td className="headsign">{departure.headsign.headsign}</td>
-              ) : (
-                <td className="headsign">
-                  {departure.headsign.variation
-                    ? "... " + departure.headsign.variation
-                    : departure.headsign.headsign}
-                </td>
-              )}
+              <td className="headsign">{departure.headsign.headsign}</td>
               <td className="arrival">
                 <div
                   className={classWithModifier(
