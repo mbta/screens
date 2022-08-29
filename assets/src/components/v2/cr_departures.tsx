@@ -61,15 +61,25 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
               <td className="track">
                 {getArrowOrTbd(departure.arrow)}
                 <div className="track-number-text">
-                  {departure.track_number ?? ""}
+                  {departure.track_number}
                 </div>
               </td>
               <td className="headsign">
                 <div className="headsign-text">
                   {departure.headsign.headsign}
                 </div>
-                <div className="stops-at-text">Ruggles</div>
-                <div className="stops-at-text">Back Bay</div>
+                <div className="stops-at-text">
+                  <div className="via-service-icon">
+                    <img src={imagePath("cr-service.svg")} />
+                  </div>
+                  <div className="via-stop-name">Ruggles</div>
+                </div>
+                <div className="stops-at-text">
+                  <div className="via-service-icon">
+                    <img src={imagePath("cr-no-service.svg")} />
+                  </div>
+                  <div className="via-stop-name">Back Bay</div>
+                </div>
               </td>
               <td className="arrival">
                 <div

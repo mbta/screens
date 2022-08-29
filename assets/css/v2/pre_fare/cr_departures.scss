@@ -42,8 +42,13 @@
     border-collapse: collapse;
     margin: 0 44px;
     table-layout: fixed;
-    tr:not(:last-child) {
-      border-bottom: 4px solid #cccbc8;
+    tr {
+      &:not(:first-child) {
+        height: 272px;
+      }
+      &:not(:last-child) {
+        border-bottom: 4px solid #cccbc8;
+      }
     }
     td {
       padding: 30px 0;
@@ -54,15 +59,20 @@
     .headsign {
       padding-left: 82px;
       width: 516px;
-      font-size: 48px;
-      font-weight: 500;
+      font-size: 56px;
+      font-weight: bold;
+      letter-spacing: 0px;
+      line-height: 56px;
     }
     .arrival {
       padding-left: 84px;
       width: 180px;
+      height: 64px;
       font-size: 72px;
       font-weight: 800;
       text-align: right;
+      line-height: 64px;
+      vertical-align: text-top;
     }
     .track,
     .track-column {
@@ -70,9 +80,11 @@
       font-size: 56px;
     }
     .track-tbd {
+      width: 90px;
+      height: 90px;
+      text-align: center;
       font-size: 36px;
       font-weight: normal;
-      text-align: center;
       letter-spacing: 0px;
       line-height: 32px;
     }
@@ -82,13 +94,13 @@
       letter-spacing: 0px;
       line-height: 40px;
       margin-top: 16px;
-      margin-left: 16px;
     }
     .headsign-text {
       margin-bottom: 7px;
     }
     .track-number-text {
       text-align: center;
+      height: 56px;
     }
     .arrow-image {
       width: 90px;
@@ -99,6 +111,15 @@
         height: 64px;
         width: 64px;
       }
+    }
+    .via-service-icon {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .via-stop-name {
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 24px;
     }
   }
   .table-header__english {
