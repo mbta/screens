@@ -97,12 +97,7 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
 };
 
 const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
-  const {
-    departures,
-    destination,
-    time_to_destination,
-    show_via_headsigns_message,
-  } = props;
+  const { departures, destination, time_to_destination } = props;
 
   let maxMinutes = parseInt(time_to_destination.split("-")[1]);
   if (isNaN(maxMinutes)) {
@@ -126,47 +121,6 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
         {departures.length ? (
           <div className="departures-card__body">
             <DeparturesTable departures={departures} />
-            {show_via_headsigns_message ? (
-              <div className="departures-card__info-row">
-                <img className="small-svg" src={imagePath(`logo-black.svg`)} />
-                <div className="departures-card__info-text">
-                  <div className="departures-card__body-english">
-                    <strong>Trains via Ruggles</strong> stop at Ruggles, but{" "}
-                    <strong>not</strong> Forest Hills
-                  </div>
-                  <div className="departures-card__body-spanish">
-                    Trenes a través de Ruggles se detiene en Ruggles, pero no en
-                    Forest Hills
-                  </div>
-                  <div className="departures-card__body-english">
-                    <strong>Trains via Forest Hills</strong> stop at Ruggles and
-                    Forest Hills
-                  </div>
-                  <div className="departures-card__body-spanish">
-                    Trenes a través de Forest Hills paradas en Ruggles y Forest
-                    Hills
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="departures-card__info-row">
-                <img className="small-svg" src={imagePath(`logo-black.svg`)} />
-                <div className="departures-card__info-text">
-                  <div className="departures-card__body-english">
-                    <div>
-                      All trains to <strong>South Station</strong> stop at
-                    </div>
-                    <div>
-                      <strong>Ruggles</strong> and <strong>Back Bay</strong>
-                    </div>
-                  </div>
-                  <div className="departures-card__body-spanish">
-                    <div>Todos los trenes hacia South Station parán en</div>
-                    <div>Ruggles y Back Bay.</div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         ) : (
           <div>
