@@ -107,7 +107,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
     %{
       headsign: headsign,
-      via_station_list: serialize_via_station_list(via_string, destination)
+      station_service_list: serialize_station_service_list(via_string, destination)
     }
   end
 
@@ -151,21 +151,21 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     }
   end
 
-  defp serialize_via_station_list(via_string, destination) do
+  defp serialize_station_service_list(via_string, destination) do
     via_station = String.replace(via_string, "via ", "")
 
     case {destination, via_station} do
-      {"Back Bay", "Ruggles"} ->
-        [%{station: "Ruggles", service: true}, %{station: "Forest Hills", service: false}]
-
-      {"Back Bay", "Back Bay"} ->
-        [%{station: "Ruggles", service: true}, %{station: "Forest Hills", service: true}]
+      {"Back Bay", _} ->
+        [%{name: "Ruggles", service: true}, %{name: "Back Bay", service: true}]
 
       {"Forest Hills", "Ruggles"} ->
-        [%{station: "Ruggles", service: true}, %{station: "Back Bay", service: false}]
+        [%{name: "Ruggles", service: true}, %{name: "Forest Hills", service: false}]
 
       {"Forest Hills", "Forest Hills"} ->
-        [%{station: "Ruggles", service: true}, %{station: "Back Bay", service: true}]
+        [%{name: "Ruggles", service: true}, %{name: "Forest Hills", service: true}]
+
+      _ ->
+        []
     end
   end
 end
