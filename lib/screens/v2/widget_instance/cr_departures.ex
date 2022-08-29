@@ -151,6 +151,8 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     }
   end
 
+  defp serialize_station_service_list(nil, _), do: []
+
   defp serialize_station_service_list(via_string, destination) do
     via_station = String.replace(via_string, "via ", "")
 
