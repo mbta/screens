@@ -67,6 +67,13 @@
       width: 90px;
       font-size: 56px;
     }
+    .track-tbd {
+      font-size: 36px;
+      font-weight: normal;
+      text-align: center;
+      letter-spacing: 0px;
+      line-height: 32px;
+    }
   }
   .table-header__english {
     @include font--text--75bold;

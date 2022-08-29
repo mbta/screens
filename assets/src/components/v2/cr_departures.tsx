@@ -1,5 +1,5 @@
 import BaseDepartureTime from "Components/eink/base_departure_time";
-import Arrow from "Components/solari/arrow";
+import Arrow, { Direction } from "Components/solari/arrow";
 import useInterval from "Hooks/use_interval";
 import React, { useState } from "react";
 import { classWithModifier, imagePath } from "Util/util";
@@ -33,6 +33,21 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
     setHeadsignPageOne(!headsignPageOne);
   }, 4000);
 
+  const getArrowOrTbd = (arrow: string) => {
+    if (arrow) {
+      return (
+        <div className="arrow">
+          <Arrow
+            direction={arrow as Direction}
+            className="departure__arrow-image"
+          />
+        </div>
+      );
+    }
+
+    return <div className="track-tbd">TBD</div>;
+  };
+
   return (
     <table>
       <tbody>
@@ -47,20 +62,11 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
           </td>
           <td className="arrival"></td>
         </tr>
-        {departures.slice(0, 3).map((departure) => {
+        {departures.slice(0, 3).map((departure: Departure) => {
           return (
             <tr key={departure.prediction_or_schedule_id}>
               <td className="track">
-                <div>
-                  {departure.arrow ? (
-                    <Arrow
-                      direction={departure.arrow}
-                      className="departure__arrow-image"
-                    />
-                  ) : (
-                    ""
-                  )}
-                </div>
+                {getArrowOrTbd(departure.arrow)}
                 <div>{departure.track_number ?? ""}</div>
               </td>
               {headsignPageOne ? (
