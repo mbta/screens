@@ -6,11 +6,15 @@ import CRIcon from "./bundled_svg/cr_icon";
 import Free from "./bundled_svg/free";
 import ClockIcon from "./clock_icon";
 
+interface StationService {
+  name: string;
+  service: boolean;
+}
 interface Departure {
   arrow: string;
   headsign: {
     headsign: string;
-    variation: string;
+    station_service_list: StationService[];
   };
   time: any;
   track_number: number;
@@ -41,6 +45,23 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
     return <div className="track-tbd">TBD</div>;
   };
 
+  const getStationServiceList = (stationServiceList: StationService[]) => {
+    return stationServiceList.map((station: StationService) => {
+      return (
+        <div className="stops-at-text" key={station.name}>
+          <div className="via-service-icon">
+            <img
+              src={imagePath(
+                station.service ? "cr-service.svg" : "cr-no-service.svg"
+              )}
+            />
+          </div>
+          <div className="via-stop-name">{station.name}</div>
+        </div>
+      );
+    });
+  };
+
   return (
     <table>
       <tbody>
@@ -68,18 +89,7 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
                 <div className="headsign-text">
                   {departure.headsign.headsign}
                 </div>
-                <div className="stops-at-text">
-                  <div className="via-service-icon">
-                    <img src={imagePath("cr-service.svg")} />
-                  </div>
-                  <div className="via-stop-name">Ruggles</div>
-                </div>
-                <div className="stops-at-text">
-                  <div className="via-service-icon">
-                    <img src={imagePath("cr-no-service.svg")} />
-                  </div>
-                  <div className="via-stop-name">Back Bay</div>
-                </div>
+                {getStationServiceList(departure.headsign.station_service_list)}
               </td>
               <td className="arrival">
                 <div
