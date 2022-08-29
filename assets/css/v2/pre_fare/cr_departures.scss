@@ -42,12 +42,14 @@
     border-collapse: collapse;
     margin: 0 44px;
     table-layout: fixed;
-    td {
+    tr:not(:last-child) {
       border-bottom: 4px solid #cccbc8;
+    }
+    td {
       padding: 30px 0;
     }
     .arrow {
-      width: 150px;
+      width: 90px;
     }
     .headsign {
       padding-left: 82px;
@@ -73,6 +75,30 @@
       text-align: center;
       letter-spacing: 0px;
       line-height: 32px;
+    }
+    .stops-at-text {
+      font-size: 40px;
+      font-weight: 600;
+      letter-spacing: 0px;
+      line-height: 40px;
+      margin-top: 16px;
+      margin-left: 16px;
+    }
+    .headsign-text {
+      margin-bottom: 7px;
+    }
+    .track-number-text {
+      text-align: center;
+    }
+    .arrow-image {
+      width: 90px;
+      height: 90px;
+      text-align: center;
+
+      .departure__arrow-image {
+        height: 64px;
+        width: 64px;
+      }
     }
   }
   .table-header__english {

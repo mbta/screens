@@ -29,7 +29,7 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
   const getArrowOrTbd = (arrow: string) => {
     if (arrow) {
       return (
-        <div className="arrow">
+        <div className="arrow-image">
           <Arrow
             direction={arrow as Direction}
             className="departure__arrow-image"
@@ -60,9 +60,17 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
             <tr key={departure.prediction_or_schedule_id}>
               <td className="track">
                 {getArrowOrTbd(departure.arrow)}
-                <div>{departure.track_number ?? ""}</div>
+                <div className="track-number-text">
+                  {departure.track_number ?? ""}
+                </div>
               </td>
-              <td className="headsign">{departure.headsign.headsign}</td>
+              <td className="headsign">
+                <div className="headsign-text">
+                  {departure.headsign.headsign}
+                </div>
+                <div className="stops-at-text">Ruggles</div>
+                <div className="stops-at-text">Back Bay</div>
+              </td>
               <td className="arrival">
                 <div
                   className={classWithModifier(
