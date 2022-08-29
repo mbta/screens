@@ -30,7 +30,14 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       %{
         departures:
           departures_data
-          |> Enum.map(&CRDeparturesWidget.serialize_departure(&1, config.wayfinding_arrows, now))
+          |> Enum.map(
+            &CRDeparturesWidget.serialize_departure(
+              &1,
+              destination,
+              config.wayfinding_arrows,
+              now
+            )
+          )
           |> Enum.slice(0..2),
         show_via_headsigns_message: config.show_via_headsigns_message,
         destination: destination,
@@ -53,7 +60,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     def audio_view(_instance), do: ScreensWeb.V2.Audio.CRDeparturesView
   end
 
-  def serialize_departure(%Departure{} = departure, wayfinding_arrows, now) do
+  def serialize_departure(%Departure{} = departure, destination, wayfinding_arrows, now) do
     track_number = Departure.track_number(departure)
     prediction_or_schedule_id = Departure.id(departure)
 
@@ -72,7 +79,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       end
 
     %{
-      headsign: serialize_headsign(departure),
+      headsign: serialize_headsign(departure, destination),
       time: serialize_time(departure, now),
       track_number: track_number,
       prediction_or_schedule_id: prediction_or_schedule_id,
@@ -80,13 +87,13 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     }
   end
 
-  def serialize_headsign(departure) do
+  def serialize_headsign(departure, destination) do
     headsign = Departure.headsign(departure)
 
     via_pattern = ~r/(.+) (via .+)/
     paren_pattern = ~r/(.+) (\(.+)/
 
-    [headsign, variation] =
+    [headsign, via_string] =
       cond do
         String.match?(headsign, via_pattern) ->
           Regex.run(via_pattern, headsign, capture: :all_but_first)
@@ -98,7 +105,10 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           [headsign, nil]
       end
 
-    %{headsign: shorten_headsign(headsign), variation: variation}
+    %{
+      headsign: shorten_headsign(headsign),
+      via_station_list: serialize_via_station_list(via_string, destination)
+    }
   end
 
   defp shorten_headsign("Needham Heights"), do: "Needham Hts"
@@ -144,5 +154,23 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       timestamp: Integer.to_string(hour) <> ":" <> updated_minute,
       ampm: am_pm
     }
+  end
+
+  defp serialize_via_station_list(via_string, destination) do
+    via_station = String.replace(via_string, "via ", "")
+
+    case {destination, via_station} do
+      {"Back Bay", "Ruggles"} ->
+        [%{station: "Ruggles", service: true}, %{station: "Forest Hills", service: false}]
+
+      {"Back Bay", "Back Bay"} ->
+        [%{station: "Ruggles", service: true}, %{station: "Forest Hills", service: true}]
+
+      {"Forest Hills", "Ruggles"} ->
+        [%{station: "Ruggles", service: true}, %{station: "Back Bay", service: false}]
+
+      {"Forest Hills", "Forest Hills"} ->
+        [%{station: "Ruggles", service: true}, %{station: "Back Bay", service: true}]
+    end
   end
 end
