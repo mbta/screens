@@ -147,7 +147,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
             </div>
             <div className="departures-card__footer-ride-free">
               <div className="departures-card__footer-english ride-free">
-                Show your CharlieCard or CharlieTicket to ride at no charge
+                Show your Charlie Card or Charlie Ticket to ride free of charge
               </div>
               <div className="departures-card__footer-spanish ride-free">
                 Viajar gratis
