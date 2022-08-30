@@ -2,8 +2,11 @@ import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
 import NoConnection from "Components/v2/bundled_svg/no_connection";
 import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
+import moment from "moment";
 
 const NoData: ComponentType = () => {
+  const currentTime = moment().tz("America/New_York").format("h:mm");
+
   return (
     <div className="no-data-container">
       <div className="no-data__top-screen">
@@ -19,6 +22,7 @@ const NoData: ComponentType = () => {
               Thank you for your patience
             </div>
           </div>
+          <div className="no-data__time">{currentTime}</div>
         </div>
         <div className="no-data__main-content">
           <div className="no-data__main-content__no-connection-icon-container">
