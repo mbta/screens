@@ -24,7 +24,7 @@ interface CRDeparturesProps {
   departures: Departure[];
   destination: string;
   time_to_destination: string;
-  show_via_headsigns_message: boolean;
+  overnight_asset_url: string;
 }
 
 const DeparturesTable: React.ComponentType<any> = (props) => {
@@ -110,7 +110,8 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
 };
 
 const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
-  const { departures, destination, time_to_destination } = props;
+  const { departures, destination, time_to_destination, overnight_asset_url } =
+    props;
 
   let maxMinutes = parseInt(time_to_destination.split("-")[1]);
   if (isNaN(maxMinutes)) {
@@ -139,7 +140,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
           <div>
             <img
               className="alert-widget__content__icon-image"
-              src={imagePath("Commuter-Rail-LateNight.png")}
+              src={overnight_asset_url}
             />
           </div>
         )}
