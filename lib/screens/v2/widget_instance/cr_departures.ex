@@ -2,18 +2,23 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   @moduledoc false
 
   alias Screens.Config.V2.CRDepartures
+  alias Screens.Util.Assets
   alias Screens.V2.Departure
 
   defstruct config: nil,
             departures_data: [],
             destination: nil,
-            now: nil
+            now: nil,
+            overnight_weekday_asset_path: nil,
+            overnight_weekend_asset_path: nil
 
   @type t :: %__MODULE__{
           config: CRDepartures.t(),
           departures_data: list(Departure.t()),
           destination: String.t(),
-          now: DateTime.t()
+          now: DateTime.t(),
+          overnight_weekday_asset_path: String.t(),
+          overnight_weekend_asset_path: String.t()
         }
 
   defimpl Screens.V2.WidgetInstance do
@@ -25,7 +30,9 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           config: config,
           departures_data: departures_data,
           destination: destination,
-          now: now
+          now: now,
+          overnight_weekday_asset_path: overnight_weekday_asset_path,
+          overnight_weekend_asset_path: overnight_weekend_asset_path
         }) do
       %{
         departures:
@@ -41,7 +48,13 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           |> Enum.slice(0..2),
         show_via_headsigns_message: config.show_via_headsigns_message,
         destination: destination,
-        time_to_destination: config.travel_time_to_destination
+        time_to_destination: config.travel_time_to_destination,
+        overnight_asset_url:
+          CRDeparturesWidget.get_overnight_asset_url(
+            overnight_weekday_asset_path,
+            overnight_weekend_asset_path,
+            now
+          )
       }
     end
 
@@ -58,6 +71,17 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     def audio_valid_candidate?(_instance), do: true
 
     def audio_view(_instance), do: ScreensWeb.V2.Audio.CRDeparturesView
+  end
+
+  def get_overnight_asset_url(overnight_weekday_asset_path, overnight_weekend_asset_path, now) do
+    day_of_week = now |> DateTime.to_date() |> Date.day_of_week()
+    show_weekend_image? = day_of_week in 5..6
+
+    if show_weekend_image? do
+      Assets.s3_asset_url(overnight_weekend_asset_path)
+    else
+      Assets.s3_asset_url(overnight_weekday_asset_path)
+    end
   end
 
   def serialize_departure(%Departure{} = departure, destination, wayfinding_arrows, now) do

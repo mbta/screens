@@ -18,7 +18,9 @@ defmodule Screens.Config.V2.CRDepartures do
           travel_time_to_destination: String.t(),
           show_via_headsigns_message: true | false,
           wayfinding_arrows: platform_directions(),
-          enabled: boolean()
+          enabled: boolean(),
+          overnight_weekday_asset_path: String.t(),
+          overnight_weekend_asset_path: String.t()
         }
 
   defstruct station: nil,
@@ -28,7 +30,9 @@ defmodule Screens.Config.V2.CRDepartures do
             travel_time_to_destination: nil,
             show_via_headsigns_message: nil,
             wayfinding_arrows: nil,
-            enabled: false
+            enabled: false,
+            overnight_weekday_asset_path: nil,
+            overnight_weekend_asset_path: nil
 
   use Screens.Config.Struct, with_default: true
 
