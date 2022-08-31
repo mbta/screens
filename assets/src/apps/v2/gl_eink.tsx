@@ -15,6 +15,7 @@ import NormalScreen from "Components/v2/gl_eink_double/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
 import NormalBody from "Components/v2/gl_eink_double/normal_body";
 import TakeoverBody from "Components/v2/eink/takeover_body";
+import TopTakeoverBody from "Components/v2/gl_eink_double/top_takeover_body";
 import BottomTakeoverBody from "Components/v2/gl_eink_double/bottom_takeover_body";
 import OneMedium from "Components/v2/eink/flex/one_medium";
 import Placeholder from "Components/v2/placeholder";
@@ -44,6 +45,7 @@ const TYPE_TO_COMPONENT = {
   screen_takeover: TakeoverScreen,
   body_normal: NormalBody,
   body_takeover: TakeoverBody,
+  top_takeover: TopTakeoverBody,
   bottom_takeover: BottomTakeoverBody,
   one_medium: OneMedium,
   placeholder: Placeholder,
