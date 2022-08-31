@@ -107,6 +107,6 @@ defmodule Screens.V2.Departure.Builder do
 
     predicted_departures
     |> Kernel.++(unpredicted_departures)
-    |> Enum.sort_by(&Departure.time/1)
+    |> Enum.sort_by(&Departure.time/1, DateTime)
   end
 end
