@@ -25,6 +25,7 @@ import NormalDepartures from "Components/v2/departures/normal_departures";
 import LineMap from "Components/v2/gl_eink_double/line_map";
 import EvergreenContent from "Components/v2/evergreen_content";
 import NoData from "Components/v2/eink/no_data";
+import DeparturesNoData from "Components/v2/eink/departures_no_data";
 import PageLoadNoData from "Components/v2/eink/page_load_no_data";
 import {
   LOADING_LAYOUT,
@@ -60,6 +61,7 @@ const TYPE_TO_COMPONENT = {
   page_load_no_data: PageLoadNoData,
   bottom_screen_filler: BottomScreenFiller,
   overnight_departures: OvernightDepartures,
+  departures_no_data: DeparturesNoData,
 };
 
 const DISABLED_LAYOUT = {
