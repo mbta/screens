@@ -178,7 +178,8 @@ defmodule Screens.V2.Departure.BuilderTest do
         %Departure{prediction: p2, schedule: s1}
       ]
 
-      assert expected == Builder.merge_predictions_and_schedules(predictions, schedules)
+      assert expected ==
+               Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
     end
 
     test "returns predictions without matching schedules" do
@@ -194,7 +195,8 @@ defmodule Screens.V2.Departure.BuilderTest do
         %Departure{prediction: p2, schedule: nil}
       ]
 
-      assert expected == Builder.merge_predictions_and_schedules(predictions, schedules)
+      assert expected ==
+               Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
     end
 
     test "returns schedules without matching predictions" do
@@ -210,7 +212,8 @@ defmodule Screens.V2.Departure.BuilderTest do
         %Departure{prediction: nil, schedule: s1}
       ]
 
-      assert expected == Builder.merge_predictions_and_schedules(predictions, schedules)
+      assert expected ==
+               Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
     end
 
     test "returns departures in increasing time order" do
@@ -249,7 +252,8 @@ defmodule Screens.V2.Departure.BuilderTest do
         %Departure{prediction: p3, schedule: nil}
       ]
 
-      assert expected == Builder.merge_predictions_and_schedules(predictions, schedules)
+      assert expected ==
+               Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
     end
   end
 end
