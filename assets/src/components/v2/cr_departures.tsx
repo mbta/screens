@@ -139,7 +139,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
         ) : (
           <div>
             <img
-              className="alert-widget__content__icon-image"
+              className="departures-card__overnight-image"
               src={overnight_asset_url}
             />
           </div>
