@@ -170,7 +170,7 @@ defmodule Screens.Departures.Departure do
     filtered_predictions = filter_predictions_or_schedules(all_predictions)
     filtered_schedules = filter_predictions_or_schedules(all_schedules)
 
-    filtered_predictions = copy_stop_headsigns(filtered_predictions, filtered_schedules)
+    filtered_predictions = copy_stop_headsigns(filtered_predictions, all_schedules)
 
     predicted_trip_ids =
       filtered_predictions
