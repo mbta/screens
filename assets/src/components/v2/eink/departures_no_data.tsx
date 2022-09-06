@@ -6,7 +6,7 @@ interface Props {
   stop_id: string;
 }
 
-const coolBlack = "#171F26";
+const black = "#000000";
 
 const DeparturesNoData: ComponentType<Props> = ({
   show_alternatives: showAlternatives,
@@ -18,7 +18,7 @@ const DeparturesNoData: ComponentType<Props> = ({
         <div className="departures-no-data__main-content__no-connection-icon-container">
           <NoConnection
             className="departures-no-data__main-content__no-connection-icon"
-            colorHex={coolBlack}
+            colorHex={black}
           />
         </div>
         <div className="departures-no-data__main-content__heading">
