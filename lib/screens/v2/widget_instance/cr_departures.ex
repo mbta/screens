@@ -196,6 +196,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     end
   end
 
+  # Forrest Hills should not show a track number, only wayfinding arrow.
   defp get_track_number(_, "place-forhl"), do: nil
   defp get_track_number(departure, _station), do: Departure.track_number(departure)
 end
