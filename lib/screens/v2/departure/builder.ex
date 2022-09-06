@@ -71,21 +71,21 @@ defmodule Screens.V2.Departure.Builder do
     |> Enum.sort_by(&(&1.departure_time || &1.arrival_time), DateTime)
   end
 
-  def merge_predictions_and_schedules(filtered_predictions, filtered_schedules, all_schedules) do
+  def merge_predictions_and_schedules(predictions, schedules) do
     predicted_trip_ids =
-      filtered_predictions
+      predictions
       |> Enum.reject(&is_nil(&1.trip))
       |> Enum.map(& &1.trip.id)
       |> Enum.reject(&is_nil/1)
       |> Enum.into(MapSet.new())
 
     schedules_by_trip_id =
-      all_schedules
+      schedules
       |> Enum.map(fn %{trip: %{id: trip_id}} = s -> {trip_id, s} end)
       |> Enum.into(%{})
 
     predicted_departures =
-      filtered_predictions
+      predictions
       |> Enum.map(fn
         %{trip: %{id: trip_id}} = p when not is_nil(trip_id) ->
           %Departure{prediction: p, schedule: Map.get(schedules_by_trip_id, trip_id)}
@@ -95,7 +95,7 @@ defmodule Screens.V2.Departure.Builder do
       end)
 
     unpredicted_departures =
-      filtered_schedules
+      schedules
       |> Enum.filter(fn
         %{trip: %{id: trip_id}} when not is_nil(trip_id) ->
           trip_id not in predicted_trip_ids

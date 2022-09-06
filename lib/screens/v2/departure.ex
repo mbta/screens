@@ -35,11 +35,7 @@ defmodule Screens.V2.Departure do
       relevant_schedules = Builder.get_relevant_departures(schedules, now)
 
       departures =
-        Builder.merge_predictions_and_schedules(
-          relevant_predictions,
-          relevant_schedules,
-          schedules
-        )
+        Builder.merge_predictions_and_schedules(relevant_predictions, relevant_schedules)
 
       {:ok, departures}
     else
