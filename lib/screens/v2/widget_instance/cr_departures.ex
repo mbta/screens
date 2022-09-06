@@ -2,18 +2,23 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   @moduledoc false
 
   alias Screens.Config.V2.CRDepartures
+  alias Screens.Util.Assets
   alias Screens.V2.Departure
 
   defstruct config: nil,
             departures_data: [],
             destination: nil,
-            now: nil
+            now: nil,
+            overnight_weekday_asset_path: nil,
+            overnight_weekend_asset_path: nil
 
   @type t :: %__MODULE__{
           config: CRDepartures.t(),
           departures_data: list(Departure.t()),
           destination: String.t(),
-          now: DateTime.t()
+          now: DateTime.t(),
+          overnight_weekday_asset_path: String.t(),
+          overnight_weekend_asset_path: String.t()
         }
 
   defimpl Screens.V2.WidgetInstance do
@@ -25,16 +30,31 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           config: config,
           departures_data: departures_data,
           destination: destination,
-          now: now
+          now: now,
+          overnight_weekday_asset_path: overnight_weekday_asset_path,
+          overnight_weekend_asset_path: overnight_weekend_asset_path
         }) do
       %{
         departures:
           departures_data
-          |> Enum.map(&CRDeparturesWidget.serialize_departure(&1, config.wayfinding_arrows, now))
+          |> Enum.map(
+            &CRDeparturesWidget.serialize_departure(
+              &1,
+              destination,
+              config.wayfinding_arrows,
+              now
+            )
+          )
           |> Enum.slice(0..2),
         show_via_headsigns_message: config.show_via_headsigns_message,
         destination: destination,
-        time_to_destination: config.travel_time_to_destination
+        time_to_destination: config.travel_time_to_destination,
+        overnight_asset_url:
+          CRDeparturesWidget.get_overnight_asset_url(
+            overnight_weekday_asset_path,
+            overnight_weekend_asset_path,
+            now
+          )
       }
     end
 
@@ -53,7 +73,18 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     def audio_view(_instance), do: ScreensWeb.V2.Audio.CRDeparturesView
   end
 
-  def serialize_departure(%Departure{} = departure, wayfinding_arrows, now) do
+  def get_overnight_asset_url(overnight_weekday_asset_path, overnight_weekend_asset_path, now) do
+    day_of_week = now |> DateTime.to_date() |> Date.day_of_week()
+    show_weekend_image? = day_of_week in 5..6
+
+    if show_weekend_image? do
+      Assets.s3_asset_url(overnight_weekend_asset_path)
+    else
+      Assets.s3_asset_url(overnight_weekday_asset_path)
+    end
+  end
+
+  def serialize_departure(%Departure{} = departure, destination, wayfinding_arrows, now) do
     track_number = Departure.track_number(departure)
     prediction_or_schedule_id = Departure.id(departure)
 
@@ -72,7 +103,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       end
 
     %{
-      headsign: serialize_headsign(departure),
+      headsign: serialize_headsign(departure, destination),
       time: serialize_time(departure, now),
       track_number: track_number,
       prediction_or_schedule_id: prediction_or_schedule_id,
@@ -80,13 +111,13 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     }
   end
 
-  def serialize_headsign(departure) do
+  def serialize_headsign(departure, destination) do
     headsign = Departure.headsign(departure)
 
     via_pattern = ~r/(.+) (via .+)/
     paren_pattern = ~r/(.+) (\(.+)/
 
-    [headsign, variation] =
+    [headsign, via_string] =
       cond do
         String.match?(headsign, via_pattern) ->
           Regex.run(via_pattern, headsign, capture: :all_but_first)
@@ -98,13 +129,11 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           [headsign, nil]
       end
 
-    %{headsign: shorten_headsign(headsign), variation: variation}
+    %{
+      headsign: headsign,
+      station_service_list: serialize_station_service_list(via_string, destination)
+    }
   end
-
-  defp shorten_headsign("Needham Heights"), do: "Needham Hts"
-  defp shorten_headsign("Wickford Junction"), do: "Wickford Jct"
-  defp shorten_headsign("Providence & Needham"), do: "Providence"
-  defp shorten_headsign(h), do: h
 
   defp serialize_time(departure, now) do
     departure_time = Departure.time(departure)
@@ -144,5 +173,25 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       timestamp: Integer.to_string(hour) <> ":" <> updated_minute,
       ampm: am_pm
     }
+  end
+
+  defp serialize_station_service_list(nil, _), do: []
+
+  defp serialize_station_service_list(via_string, destination) do
+    via_station = String.replace(via_string, "via ", "")
+
+    case {destination, via_station} do
+      {"Back Bay", _} ->
+        [%{name: "Ruggles", service: true}, %{name: "Back Bay", service: true}]
+
+      {"Forest Hills", "Ruggles"} ->
+        [%{name: "Ruggles", service: true}, %{name: "Forest Hills", service: false}]
+
+      {"Forest Hills", "Forest Hills"} ->
+        [%{name: "Ruggles", service: true}, %{name: "Forest Hills", service: true}]
+
+      _ ->
+        []
+    end
   end
 end

@@ -1,17 +1,20 @@
 import BaseDepartureTime from "Components/eink/base_departure_time";
-import Arrow from "Components/solari/arrow";
-import useInterval from "Hooks/use_interval";
-import React, { useState } from "react";
+import Arrow, { Direction } from "Components/solari/arrow";
+import React from "react";
 import { classWithModifier, imagePath } from "Util/util";
 import CRIcon from "./bundled_svg/cr_icon";
 import Free from "./bundled_svg/free";
 import ClockIcon from "./clock_icon";
 
+interface StationService {
+  name: string;
+  service: boolean;
+}
 interface Departure {
   arrow: string;
   headsign: {
     headsign: string;
-    variation: string;
+    station_service_list: StationService[];
   };
   time: any;
   track_number: number;
@@ -21,51 +24,73 @@ interface CRDeparturesProps {
   departures: Departure[];
   destination: string;
   time_to_destination: string;
-  show_via_headsigns_message: boolean;
+  overnight_asset_url: string;
 }
 
 const DeparturesTable: React.ComponentType<any> = (props) => {
   const { departures } = props;
 
-  let [headsignPageOne, setHeadsignPageOne] = useState(true);
+  const getArrowOrTbd = (arrow: string) => {
+    if (arrow) {
+      return (
+        <div className="arrow-image">
+          <Arrow
+            direction={arrow as Direction}
+            className="departure__arrow-image"
+          />
+        </div>
+      );
+    }
 
-  useInterval(() => {
-    setHeadsignPageOne(!headsignPageOne);
-  }, 4000);
+    return <div className="track-tbd">TBD</div>;
+  };
+
+  const getStationServiceList = (stationServiceList: StationService[]) => {
+    return stationServiceList.map((station: StationService) => {
+      return (
+        <div className="stops-at-text" key={station.name}>
+          <div className="via-service-icon">
+            <img
+              src={imagePath(
+                station.service ? "cr-service.svg" : "cr-no-service.svg"
+              )}
+            />
+          </div>
+          <div className="via-stop-name">{station.name}</div>
+        </div>
+      );
+    });
+  };
 
   return (
     <table>
       <tbody>
         <tr>
-          <td className="arrow"></td>
+          <td className="track">
+            <div className="table-header__english">Track</div>
+            <div className="table-header__spanish">Pista</div>
+          </td>
           <td className="headsign">
             <div className="table-header__english">Upcoming departures</div>
             <div className="table-header__spanish">Próximas salidas</div>
           </td>
           <td className="arrival"></td>
-          <td className="track">
-            <div className="table-header__english">Track</div>
-            <div className="table-header__spanish">Pista</div>
-          </td>
         </tr>
-        {departures.slice(0, 3).map((departure) => {
+        {departures.map((departure: Departure) => {
           return (
             <tr key={departure.prediction_or_schedule_id}>
-              <td className="arrow">
-                {departure.arrow ? (
-                  <Arrow
-                    direction={departure.arrow}
-                    className="departure__arrow-image"
-                  />
-                ) : (
-                  ""
-                )}
+              <td className="track">
+                {getArrowOrTbd(departure.arrow)}
+                <div className="track-number-text">
+                  {departure.track_number}
+                </div>
               </td>
-              {headsignPageOne ? (
-                <td className="headsign">{departure.headsign.headsign}</td>
-              ) : (
-                <td className="headsign">{departure.headsign.variation ? "... "+departure.headsign.variation : departure.headsign.headsign}</td>
-              )}
+              <td className="headsign">
+                <div className="headsign-text">
+                  {departure.headsign.headsign}
+                </div>
+                {getStationServiceList(departure.headsign.station_service_list)}
+              </td>
               <td className="arrival">
                 <div
                   className={classWithModifier(
@@ -76,7 +101,6 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
                   <BaseDepartureTime time={departure.time} hideAmPm />
                 </div>
               </td>
-              <td className="track">{departure.track_number ?? ""}</td>
             </tr>
           );
         })}
@@ -86,12 +110,8 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
 };
 
 const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
-  const {
-    departures,
-    destination,
-    time_to_destination,
-    show_via_headsigns_message,
-  } = props;
+  const { departures, destination, time_to_destination, overnight_asset_url } =
+    props;
 
   let maxMinutes = parseInt(time_to_destination.split("-")[1]);
   if (isNaN(maxMinutes)) {
@@ -112,57 +132,18 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
             </div>
           </div>
         </div>
-        { departures.length ? <div className="departures-card__body">
-          <DeparturesTable departures={departures} />
-          {show_via_headsigns_message ? (
-            <div className="departures-card__info-row">
-              <img className="small-svg" src={imagePath(`logo-black.svg`)} />
-              <div className="departures-card__info-text">
-                <div className="departures-card__body-english">
-                  <strong>Trains via Ruggles</strong> stop at Ruggles, but{" "}
-                  <strong>not</strong> Forest Hills
-                </div>
-                <div className="departures-card__body-spanish">
-                  Trenes a través de Ruggles se detiene en Ruggles, pero no en
-                  Forest Hills
-                </div>
-                <div className="departures-card__body-english">
-                  <strong>Trains via Forest Hills</strong> stop at Ruggles and
-                  Forest Hills
-                </div>
-                <div className="departures-card__body-spanish">
-                  Trenes a través de Forest Hills paradas en Ruggles y Forest
-                  Hills
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="departures-card__info-row">
-              <img className="small-svg" src={imagePath(`logo-black.svg`)} />
-              <div className="departures-card__info-text">
-                <div className="departures-card__body-english">
-                  <div>
-                    All trains to <strong>South Station</strong> stop at
-                  </div>
-                  <div>
-                    <strong>Ruggles</strong> and <strong>Back Bay</strong>
-                  </div>
-                </div>
-                <div className="departures-card__body-spanish">
-                  <div>Todos los trenes hacia South Station parán en</div>
-                  <div>Ruggles y Back Bay.</div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div> :
+        {departures.length ? (
+          <div className="departures-card__body">
+            <DeparturesTable departures={departures} />
+          </div>
+        ) : (
           <div>
             <img
-              className="alert-widget__content__icon-image"
-              src={imagePath("Commuter-Rail-LateNight.png")}
+              className="departures-card__overnight-image"
+              src={overnight_asset_url}
             />
           </div>
-        }
+        )}
         <div className="departures-card__footer">
           <div className="departures-card__info-row">
             <div className="small-svg clock-icon">
