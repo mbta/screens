@@ -27,7 +27,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     def priority(%CRDeparturesWidget{config: config}), do: config.priority
 
     def serialize(%CRDeparturesWidget{
-          config: config,
+          config: %CRDepartures{station: station} = config,
           departures_data: departures_data,
           destination: destination,
           now: now,
@@ -42,6 +42,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
               &1,
               destination,
               config.wayfinding_arrows,
+              station,
               now
             )
           )
@@ -84,8 +85,8 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     end
   end
 
-  def serialize_departure(%Departure{} = departure, destination, wayfinding_arrows, now) do
-    track_number = Departure.track_number(departure)
+  def serialize_departure(%Departure{} = departure, destination, wayfinding_arrows, station, now) do
+    track_number = get_track_number(departure, station)
     prediction_or_schedule_id = Departure.id(departure)
 
     arrow =
@@ -194,4 +195,8 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
         []
     end
   end
+
+  # Forrest Hills should not show a track number, only wayfinding arrow.
+  defp get_track_number(_, "place-forhl"), do: nil
+  defp get_track_number(departure, _station), do: Departure.track_number(departure)
 end
