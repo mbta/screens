@@ -54,7 +54,6 @@
   object-fit: contain;
 }
 
-
 .no-data__main-content {
   margin-left: 208px;
 }
@@ -91,4 +90,14 @@
   font-weight: normal;
   letter-spacing: 0px;
   line-height: 92px;
+}
+
+.no-data__time {
+  position: absolute;
+  right: 40px;
+  top: 40px;
+  font-family: Inter;
+  color: #ffffff;
+  font-size: 72px;
+  line-height: 72px;
 }
