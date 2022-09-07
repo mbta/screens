@@ -219,8 +219,6 @@ defmodule Screens.Stops.Stop do
     "Green" => [@green_line_trunk_stops]
   }
 
-  
-
   # --- These functions involve the API ---
 
   def fetch_parent_station_name_map(get_json_fn \\ &V3Api.get_json/2) do
@@ -355,12 +353,7 @@ defmodule Screens.Stops.Stop do
     |> Enum.into(%{})
   end
 
-  def get_all_routes_stop_sequence() do
+  def get_all_routes_stop_sequence do
     @route_stop_sequences
-  end
-
-  def get_all_subway_stops() do
-    @blue_line_stops ++ @orange_line_stops ++ @red_line_trunk_stops ++ @red_line_ashmont_branch_stops ++
-    @red_line_braintree_branch_stops ++ @green_line_b_stops ++ @green_line_c_stops ++ @green_line_d_stops ++ @green_line_e_stops ++ @green_line_trunk_stops
   end
 end

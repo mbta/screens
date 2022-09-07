@@ -538,9 +538,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
       active_period: [{~U[2022-08-20 01:00:00Z], ~U[2022-09-19 06:30:00Z]}],
       cause: :unknown,
       created_at: ~U[2022-08-03 17:32:41Z],
-      description: "Alternative Travel Options for Riders:\r\n\r\nRiders commuting to downtown are encouraged to use the Commuter Rail. Zone 1A, 1, and 2 fares can be paid simply by showing a CharlieCard or CharlieTicket on ALL Commuter Rail lines. \r\n\r\nMost Needham and Providence Line Commuter Rail trains will stop at Forest Hills, Ruggles, Back Bay, and South Station.\r\nHaverhill Line Commuter Rail trains will stop at Oak Grove, Malden Center, and North Station. \r\n\r\nRiders can use other existing MBTA bus and subway services to complete their trips.\r\n\r\nShuttle bus service will operate in both directions, connecting Oak Grove and Forest Hills stations to downtown Boston. \r\n\r\nA Rider's Guide is available on mbta.com",
+      description:
+        "Alternative Travel Options for Riders:\r\n\r\nRiders commuting to downtown are encouraged to use the Commuter Rail. Zone 1A, 1, and 2 fares can be paid simply by showing a CharlieCard or CharlieTicket on ALL Commuter Rail lines. \r\n\r\nMost Needham and Providence Line Commuter Rail trains will stop at Forest Hills, Ruggles, Back Bay, and South Station.\r\nHaverhill Line Commuter Rail trains will stop at Oak Grove, Malden Center, and North Station. \r\n\r\nRiders can use other existing MBTA bus and subway services to complete their trips.\r\n\r\nShuttle bus service will operate in both directions, connecting Oak Grove and Forest Hills stations to downtown Boston. \r\n\r\nA Rider's Guide is available on mbta.com",
       effect: :suspension,
-      header: "Orange Line service is suspended through Sun, Sep 18. This suspension will allow for upgrades and improvements of track and signal systems along the line.",
+      header:
+        "Orange Line service is suspended through Sun, Sep 18. This suspension will allow for upgrades and improvements of track and signal systems along the line.",
       id: "456090",
       informed_entities: [
         %{
@@ -561,9 +563,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
       active_period: [{~U[2022-08-22 08:30:00Z], ~U[2022-09-19 06:30:00Z]}],
       cause: :unknown,
       created_at: ~U[2022-08-08 15:11:48Z],
-      description: "All shuttle buses will be accessible for passengers with disabilities. Haymarket station will not be serviced by shuttles due to the proximity to Government Center Garage demolition work. \r\n\r\nAffected stops:\r\nUnion Square\r\nLechmere\r\nScience Park/West End\r\nNorth Station\r\nHaymarket\r\nGovernment Center",
+      description:
+        "All shuttle buses will be accessible for passengers with disabilities. Haymarket station will not be serviced by shuttles due to the proximity to Government Center Garage demolition work. \r\n\r\nAffected stops:\r\nUnion Square\r\nLechmere\r\nScience Park/West End\r\nNorth Station\r\nHaymarket\r\nGovernment Center",
       effect: :shuttle,
-      header: "Shuttle buses replace Green Line service between Union Square and Government Center through Sun, Sep 18. This is to allow for work on the Green Line Extension, the Lechmere Viaduct, and the Government Center Garage project.",
+      header:
+        "Shuttle buses replace Green Line service between Union Square and Government Center through Sun, Sep 18. This is to allow for work on the Green Line Extension, the Lechmere Viaduct, and the Government Center Garage project.",
       id: "456774",
       informed_entities: [
         %{
@@ -1094,11 +1098,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
 
   property "reconstructed alert serialization" do
     # This runs the test 100 times
-    check all {stop_id, _abbrev} = stop <- StreamData.member_of(@stops_with_screens),
-              random_pos_integer <- StreamData.positive_integer(),
-              alert <- StreamData.member_of(@alerts),
-              max_runs: 1000 do
-
+    check all(
+            {stop_id, _abbrev} = stop <- StreamData.member_of(@stops_with_screens),
+            random_pos_integer <- StreamData.positive_integer(),
+            alert <- StreamData.member_of(@alerts),
+            max_runs: 1000
+          ) do
       config =
         struct(Screen, %{
           app_id: :pre_fare_v2,
@@ -1109,37 +1114,42 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
       # Randomly setting current time to Thu Jul 31 2025 23:59:59 GMT-0400 (Eastern Daylight Time)
       # We're not to worried about serialization differences based on time of alert
       # So as long as alerts don't have an end time, the alert should still be considered active on this date
-      {:ok, now_datetime} = DateTime.from_unix(1659299615)
+      {:ok, now_datetime} = DateTime.from_unix(1_659_299_615)
 
-      route_ids_at_stop = 
+      route_ids_at_stop =
         Stop.get_all_routes_stop_sequence()
-        |> Enum.filter(fn {_k, v} -> 
-          Enum.any?(v, fn sequence -> 
-            Enum.any?(sequence, fn stop_object -> 
-              stop_object === stop 
+        |> Enum.filter(fn {_k, v} ->
+          Enum.any?(v, fn sequence ->
+            Enum.any?(sequence, fn stop_object ->
+              stop_object === stop
             end)
           end)
         end)
         |> Enum.map(fn {route_id, _} -> route_id end)
 
-      routes_at_stop = 
+      routes_at_stop =
         route_ids_at_stop
-        |> Enum.map(fn route_id -> %{
-          route_id: route_id,
-          type: Util.route_type_from_id(route_id),
-          # Don't need to test a lot of inactive routes, since that's rarer
-          active?: rem(random_pos_integer, 4) > 0
-        } end)
+        |> Enum.map(fn route_id ->
+          %{
+            route_id: route_id,
+            type: Util.route_type_from_id(route_id),
+            # Don't need to test a lot of inactive routes, since that's rarer
+            active?: rem(random_pos_integer, 4) > 0
+          }
+        end)
 
-      station_sequences = Enum.map(route_ids_at_stop, fn id -> Stop.get_route_stop_sequence(id) end)
+      station_sequences =
+        Enum.map(route_ids_at_stop, fn id -> Stop.get_route_stop_sequence(id) end)
 
       fetch_routes_by_stop_fn = fn _, _, _ -> {:ok, routes_at_stop} end
+
       fetch_parent_station_sequences_through_stop_fn = fn _, _ ->
         {:ok, station_sequences}
       end
+
       fetch_alerts_fn = fn _ -> {:ok, [alert]} end
       fetch_stop_name_fn = fn _ -> "Test" end
-      
+
       alert_widgets =
         CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
           config,
@@ -1150,10 +1160,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
           fetch_stop_name_fn
         )
 
-      Enum.each(alert_widgets, fn widget -> 
+      Enum.each(alert_widgets, fn widget ->
         assert %{issue: _, location: _, routes: _} = ReconstructedAlert.serialize(widget)
       end)
-
     end
   end
 end

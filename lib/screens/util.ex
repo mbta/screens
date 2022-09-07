@@ -154,7 +154,7 @@ defmodule Screens.Util do
   Not the favorite way of getting route type, but useful for property testing.
   """
   @spec route_type_from_id(String.t()) :: atom()
-  def route_type_from_id("Green-" <> _), do: :light_rail
+  def route_type_from_id("Green" <> _), do: :light_rail
   def route_type_from_id("Mattapan" <> _), do: :light_rail
   def route_type_from_id("Red"), do: :subway
   def route_type_from_id("Orange"), do: :subway
