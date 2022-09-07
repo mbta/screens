@@ -75,10 +75,11 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
   def audio_view(_instance), do: ScreensWeb.V2.Audio.ShuttleBusInfoView
 
   defp get_minute_range(schedule, now) do
-    # Shift to find current service day. i.e. 1AM Monday is actually still in the Sunday service day.
-    {:ok, service_day_now} = DateTime.shift_zone(now, "America/Los_Angeles")
     # Shift the time to local time.
     {:ok, local_time_now} = DateTime.shift_zone(now, "America/New_York")
+
+    # Shift to find current service day. i.e. 1AM Monday is actually still in the Sunday service day.
+    service_day_now = DateTime.add(local_time_now, -3 * 60 * 60, :second)
 
     %ShuttleBusSchedule{minute_range: minutes_range_to_destination} =
       Enum.find(schedule, fn %ShuttleBusSchedule{
