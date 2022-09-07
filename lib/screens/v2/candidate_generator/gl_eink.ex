@@ -37,6 +37,11 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
               Builder.with_paging({:flex_zone, %{one_medium: [:medium]}}, 2),
               :footer
             ],
+            top_takeover: [
+              :full_body_top_screen,
+              Builder.with_paging({:flex_zone, %{one_medium: [:medium]}}, 2),
+              :footer
+            ],
             body_takeover: [
               :full_body_top_screen,
               :full_body_bottom_screen

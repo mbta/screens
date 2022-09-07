@@ -29,6 +29,7 @@ import {
   ResponseMapperContext,
 } from "Components/v2/screen_container";
 import NoData from "Components/v2/eink/no_data";
+import DeparturesNoData from "Components/v2/eink/departures_no_data";
 import PageLoadNoData from "Components/v2/eink/page_load_no_data";
 import {
   MediumFlexAlert,
@@ -55,6 +56,7 @@ const TYPE_TO_COMPONENT = {
   no_data: NoData,
   page_load_no_data: PageLoadNoData,
   bottom_screen_filler: BottomScreenFiller,
+  departures_no_data: DeparturesNoData,
 };
 
 const DISABLED_LAYOUT = {
