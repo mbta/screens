@@ -40,6 +40,7 @@ import NoData from "Components/v2/pre_fare/no_data";
 import PageLoadNoData from "Components/v2/pre_fare/page_load_no_data";
 import ReconstructedTakeover from "Components/v2/reconstructed_takeover";
 import CRDepartures from "Components/v2/cr_departures";
+import OvernightCRDepartures from "Components/v2/overnight_cr_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import SurgeBodyRight from "Components/v2/pre_fare/surge_body_right";
@@ -69,6 +70,7 @@ const TYPE_TO_COMPONENT = {
   reconstructed_large_alert: ReconstructedAlert,
   reconstructed_takeover: ReconstructedTakeover,
   cr_departures: CRDepartures,
+  overnight_cr_departures: OvernightCRDepartures,
   shuttle_bus_info: ShuttleBusInfo,
   blue_bikes: BlueBikes,
 };
