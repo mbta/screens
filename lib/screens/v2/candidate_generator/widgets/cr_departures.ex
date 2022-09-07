@@ -3,9 +3,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
 
   alias Screens.Config.Screen
   alias Screens.Config.V2.{CRDepartures, PreFare}
+  alias Screens.Schedules.Schedule
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.CRDepartures, as: CRDeparturesWidget
-  alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightCRDepartures}
 
   def departures_instances(
         config,
@@ -47,8 +48,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
             departures_data == :error ->
               %DeparturesNoData{screen: config, show_alternatives?: true}
 
-            departures_data == :overnight ->
-              %OvernightDepartures{}
+            Enum.empty?(departures_data) ->
+              last_schedule_tomorrow =
+                fetch_last_schedule_tomorrow(direction_to_destination, station, now)
+
+              %OvernightCRDepartures{
+                screen: config,
+                direction_to_destination: direction_to_destination,
+                last_tomorrow_schedule: last_schedule_tomorrow,
+                priority: cr_departures.priority,
+                now: now
+              }
 
             true ->
               %CRDeparturesWidget{
@@ -85,5 +95,28 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
     }
 
     Departure.fetch(params, Keyword.new(opts))
+  end
+
+  defp fetch_last_schedule_tomorrow(direction_to_destination, station, now) do
+    tomorrow =
+      now
+      |> Timex.to_datetime("America/New_York")
+      |> Timex.shift(days: 1)
+      |> Timex.format!("{YYYY}-{0M}-{0D}")
+
+    params = %{
+      direction_id: direction_to_destination,
+      route_ids: [
+        "CR-Franklin",
+        "CR-Needham",
+        "CR-Providence"
+      ],
+      route_type: :rail,
+      stop_ids: [station],
+      sort: "-departure_time"
+    }
+
+    {:ok, schedules} = Schedule.fetch(params, tomorrow)
+    List.first(schedules)
   end
 end
