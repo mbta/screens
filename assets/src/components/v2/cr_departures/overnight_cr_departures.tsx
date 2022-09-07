@@ -1,4 +1,5 @@
 import React, { ComponentType } from "react";
+import CRDeparturesHeader from "./cr_departures_header";
 
 interface Props {
   direction: string;
@@ -13,7 +14,7 @@ const OvernightCRDepartures: ComponentType<Props> = ({
 }) => {
   return (
     <div className="overnight-cr-departures-container">
-      <div className="overnight-cr-departures__header">{direction}</div>
+      <CRDeparturesHeader />
       <div className="overnight-cr-departures__body">
         {lastScheduleDepartureTime}
       </div>

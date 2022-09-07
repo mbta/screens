@@ -2,9 +2,9 @@ import BaseDepartureTime from "Components/eink/base_departure_time";
 import Arrow, { Direction } from "Components/solari/arrow";
 import React from "react";
 import { classWithModifier, imagePath } from "Util/util";
-import CRIcon from "./bundled_svg/cr_icon";
-import Free from "./bundled_svg/free";
-import ClockIcon from "./clock_icon";
+import Free from "Components/v2/bundled_svg/free";
+import ClockIcon from "Components/v2/clock_icon";
+import CRDeparturesHeader from "Components/v2/cr_departures/cr_departures_header";
 
 interface StationService {
   name: string;
@@ -121,17 +121,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
   return (
     <div className="departures-container">
       <div className="departures-card">
-        <div className="departures-card__header">
-          <CRIcon className="commuter-rail-icon" colorHex="#d9d6d0" />
-          <div className="departures-card__header-text">
-            <div className="departures-card__header-text-english">
-              Commuter Rail
-            </div>
-            <div className="departures-card__header-text-spanish">
-              Tren de Cercanías
-            </div>
-          </div>
-        </div>
+        <CRDeparturesHeader />
         {departures.length ? (
           <div className="departures-card__body">
             <DeparturesTable departures={departures} />
