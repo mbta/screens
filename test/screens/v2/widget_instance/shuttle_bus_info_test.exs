@@ -138,6 +138,21 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
                spanish_boarding_instructions: "Hola"
              } == WidgetInstance.serialize(widget)
     end
+
+    test "returns map with minutes_range_to_destination for correct day outside of DST",
+         %{
+           widget: widget
+         } do
+      widget = put_now(widget, ~U[2023-01-02T01:00:00Z])
+
+      assert %{
+               minutes_range_to_destination: "17-27",
+               destination: "Test Station",
+               arrow: :n,
+               english_boarding_instructions: "Hello",
+               spanish_boarding_instructions: "Hola"
+             } == WidgetInstance.serialize(widget)
+    end
   end
 
   describe "slot_names/1" do
