@@ -13,13 +13,15 @@ const OvernightCRDepartures: ComponentType<Props> = ({
   last_schedule_headsign: lastScheduleHeadsign,
 }) => {
   return (
-    <div className="overnight-cr-departures-container">
-      <CRDeparturesHeader />
-      <div className="overnight-cr-departures__body">
-        {lastScheduleDepartureTime}
-      </div>
-      <div className="overnight-cr-departures__footer">
-        {lastScheduleHeadsign}
+    <div className="overnight-cr-departures__container">
+      <div className="overnight-cr-departures__card">
+        <CRDeparturesHeader />
+        <div className="overnight-cr-departures__body">
+          {lastScheduleDepartureTime}
+        </div>
+        <div className="overnight-cr-departures__footer">
+          {lastScheduleHeadsign}
+        </div>
       </div>
     </div>
   );

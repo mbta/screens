@@ -1,0 +1,25 @@
+.departures-card__header {
+  display: flex;
+  padding: 40px;
+  height: 264px;
+  box-sizing: border-box;
+  .commuter-rail-icon {
+    height: 80px;
+    width: 80px;
+    border-radius: 51px;
+    padding: 11px;
+    background-color: #80276c;
+    margin-right: 74px;
+  }
+  .departures-card__header-text-english {
+    font-size: 80px;
+    font-weight: 700;
+    line-height: 80px;
+    padding-bottom: 8px;
+  }
+  .departures-card__header-text-spanish {
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 66px;
+  }
+}
