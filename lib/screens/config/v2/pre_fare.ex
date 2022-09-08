@@ -6,10 +6,10 @@ defmodule Screens.Config.V2.PreFare do
     BlueBikes,
     ContentSummary,
     CRDepartures,
-    OvernightCRDepartures,
     ElevatorStatus,
     EvergreenContentItem,
     FullLineMap,
+    OvernightCRDepartures,
     ShuttleBusInfo
   }
 
