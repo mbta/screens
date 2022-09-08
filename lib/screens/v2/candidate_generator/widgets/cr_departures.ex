@@ -94,11 +94,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
   end
 
   defp fetch_last_schedule_tomorrow(direction_to_destination, station, now) do
-    tomorrow =
-      now
-      |> Timex.to_datetime("America/New_York")
-      |> Timex.shift(days: 1)
-      |> Timex.format!("{YYYY}-{0M}-{0D}")
+    {:ok, local_datetime} = DateTime.shift_zone(now, "America/New_York")
+    local_time_am_pm = local_datetime |> DateTime.to_time() |> Timex.format!("{AM}")
+
+    # If we are already in the AM, get today's last schedule. Otherwise, shift to tomorrow.
+    date_to_format =
+      if local_time_am_pm == "PM" do
+        Timex.shift(local_datetime, days: 1)
+      else
+        local_datetime
+      end
+
+    date_param = Timex.format!(date_to_format, "{YYYY}-{0M}-{0D}")
 
     params = %{
       direction_id: direction_to_destination,
@@ -112,7 +119,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
       sort: "-departure_time"
     }
 
-    {:ok, schedules} = Schedule.fetch(params, tomorrow)
+    {:ok, schedules} = Schedule.fetch(params, date_param)
     List.first(schedules)
   end
 end
