@@ -70,9 +70,9 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
     day_of_week =
       now |> DateTime.shift_zone!("America/New_York") |> DateTime.to_date() |> Date.day_of_week()
 
-    show_weekend_text? = day_of_week in 5..6
+    show_weekend_text = day_of_week in 5..6
 
-    if show_weekend_text? do
+    if show_weekend_text do
       {config.overnight_weekend_text_english, config.overnight_weekend_text_spanish}
     else
       {config.overnight_weekday_text_english, config.overnight_weekday_text_spanish}
