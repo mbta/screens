@@ -22,12 +22,10 @@ interface CRDeparturesProps {
   departures: Departure[];
   destination: string;
   time_to_destination: string;
-  overnight_asset_url: string;
 }
 
 const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
-  const { departures, destination, time_to_destination, overnight_asset_url } =
-    props;
+  const { departures, destination, time_to_destination } = props;
 
   let maxMinutes = parseInt(time_to_destination.split("-")[1]);
   if (isNaN(maxMinutes)) {
@@ -38,18 +36,9 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
     <div className="departures-container">
       <div className="departures-card">
         <CRDeparturesHeader />
-        {departures.length ? (
-          <div className="departures-card__body">
-            <DeparturesTable departures={departures} />
-          </div>
-        ) : (
-          <div>
-            <img
-              className="departures-card__overnight-image"
-              src={overnight_asset_url}
-            />
-          </div>
-        )}
+        <div className="departures-card__body">
+          <DeparturesTable departures={departures} />
+        </div>
         <div className="departures-card__footer">
           <div className="departures-card__info-row">
             <div className="small-svg clock-icon">

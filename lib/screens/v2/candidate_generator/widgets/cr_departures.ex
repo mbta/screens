@@ -31,9 +31,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
               %CRDepartures{
                 direction_to_destination: direction_to_destination,
                 station: station,
-                destination: destination,
-                overnight_weekday_asset_path: overnight_weekday_asset_path,
-                overnight_weekend_asset_path: overnight_weekend_asset_path
+                destination: destination
               } = cr_departures
           }
         } = config,
@@ -65,9 +63,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
                 config: cr_departures,
                 departures_data: departures_data,
                 destination: destination,
-                now: now,
-                overnight_weekday_asset_path: overnight_weekday_asset_path,
-                overnight_weekend_asset_path: overnight_weekend_asset_path
+                now: now
               }
           end
 
