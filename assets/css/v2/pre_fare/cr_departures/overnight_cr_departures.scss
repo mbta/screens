@@ -8,5 +8,42 @@
     border-radius: 16px;
     background-color: #d9d6d0;
     height: 1656px;
+
+    .overnight-cr-departures__body {
+      height: 625px;
+      background: rgb(235, 234, 232);
+      box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.12);
+
+      .cr-departures-table {
+        color: rgb(153, 152, 150);
+      }
+
+      .overnight-cr-departures__body-text {
+        margin-left: 216px;
+        margin-top: 92px;
+        margin-right: 148px;
+
+        &--english {
+          color: rgb(128, 39, 108);
+          font-size: 48px;
+          font-family: Inter, sans-serif;
+          font-weight: bold;
+          line-height: 64px;
+        }
+
+        &--spanish {
+          margin-top: 25px;
+          color: rgb(23, 31, 38);
+          font-size: 40px;
+          font-family: Inter, sans-serif;
+          font-weight: normal;
+          line-height: 56px;
+        }
+      }
+    }
+
+    .overnight-cr-departures__footer {
+      height: 767px;
+    }
   }
 }
