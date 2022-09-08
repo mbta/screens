@@ -27,6 +27,18 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
                       end_time: ~T[23:00:00],
                       days: :weekday,
                       minute_range: "15-25"
+                    },
+                    %ShuttleBusSchedule{
+                      start_time: ~T[00:00:00],
+                      end_time: ~T[10:59:59],
+                      days: :sunday,
+                      minute_range: "18-28"
+                    },
+                    %ShuttleBusSchedule{
+                      start_time: ~T[11:00:00],
+                      end_time: ~T[23:59:59],
+                      days: :sunday,
+                      minute_range: "17-27"
                     }
                   ],
                   destination: "Test Station",
@@ -111,6 +123,51 @@ defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
 
       assert %{
                minutes_range_to_destination: "15-25",
+               destination: "Test Station",
+               arrow: :n,
+               english_boarding_instructions: "Hello",
+               spanish_boarding_instructions: "Hola"
+             } == WidgetInstance.serialize(widget)
+    end
+
+    test "returns map with minutes_range_to_destination for correct service day",
+         %{
+           widget: widget
+         } do
+      widget = put_now(widget, ~U[2022-09-05T01:00:00Z])
+
+      assert %{
+               minutes_range_to_destination: "17-27",
+               destination: "Test Station",
+               arrow: :n,
+               english_boarding_instructions: "Hello",
+               spanish_boarding_instructions: "Hola"
+             } == WidgetInstance.serialize(widget)
+    end
+
+    test "returns map with minutes_range_to_destination for correct day outside of DST",
+         %{
+           widget: widget
+         } do
+      widget = put_now(widget, ~U[2023-01-02T01:00:00Z])
+
+      assert %{
+               minutes_range_to_destination: "17-27",
+               destination: "Test Station",
+               arrow: :n,
+               english_boarding_instructions: "Hello",
+               spanish_boarding_instructions: "Hola"
+             } == WidgetInstance.serialize(widget)
+    end
+
+    test "returns map with minutes_range_to_destination for correct day just before DST",
+         %{
+           widget: widget
+         } do
+      widget = put_now(widget, ~U[2022-03-13T08:00:00Z])
+
+      assert %{
+               minutes_range_to_destination: "18-28",
                destination: "Test Station",
                arrow: :n,
                english_boarding_instructions: "Hello",
