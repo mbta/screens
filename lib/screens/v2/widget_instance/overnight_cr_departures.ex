@@ -31,11 +31,13 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
       }) do
     {:ok, local_departure_time} = DateTime.shift_zone(departure_time, "America/New_York")
     {overnight_text_english, overnight_text_spanish} = get_overnight_text(config, now)
+    {headsign_stop, headsign_via} = format_headsign(headsign)
 
     %{
       direction: serialize_direction(direction_to_destination),
       last_schedule_departure_time: local_departure_time,
-      last_schedule_headsign: headsign,
+      last_schedule_headsign_stop: headsign_stop,
+      last_schedule_headsign_via: headsign_via,
       overnight_text_english: overnight_text_english,
       overnight_text_spanish: overnight_text_spanish
     }
@@ -75,6 +77,19 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
     else
       {config.overnight_weekday_text_english, config.overnight_weekday_text_spanish}
     end
+  end
+
+  defp format_headsign(headsign) do
+    via_pattern = ~r/(.+) (via .+)/
+
+    [headsign, via_string] =
+      if String.match?(headsign, via_pattern) do
+        Regex.run(via_pattern, headsign, capture: :all_but_first)
+      else
+        [headsign, nil]
+      end
+
+    {headsign, via_string}
   end
 
   defimpl Screens.V2.WidgetInstance do

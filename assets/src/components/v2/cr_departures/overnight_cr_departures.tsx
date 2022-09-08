@@ -8,7 +8,8 @@ import { imagePath } from "Util/util";
 interface Props {
   direction: string;
   last_schedule_departure_time: string;
-  last_schedule_headsign: string;
+  last_schedule_headsign_stop: string;
+  last_schedule_headsign_via: string;
   overnight_text_english: string;
   overnight_text_spanish: string;
 }
@@ -16,7 +17,8 @@ interface Props {
 const OvernightCRDepartures: ComponentType<Props> = ({
   direction,
   last_schedule_departure_time: lastScheduleDepartureTime,
-  last_schedule_headsign: lastScheduleHeadsign,
+  last_schedule_headsign_stop: lastScheduleHeadsignStop,
+  last_schedule_headsign_via: lastScheduleHeadsignVia,
   overnight_text_english: overnightTextEnglish,
   overnight_text_spanish: overnightTextSpanish,
 }) => {
@@ -76,7 +78,12 @@ const OvernightCRDepartures: ComponentType<Props> = ({
               </div>
             </div>
             <div className="overnight-cr-departures__schedule-headsign">
-              {lastScheduleHeadsign}
+              <div className="overnight-cr-departures__schedule-headsign--stop">
+                {lastScheduleHeadsignStop}
+              </div>
+              <div className="overnight-cr-departures__schedule-headsign--via">
+                {lastScheduleHeadsignVia}
+              </div>
             </div>
           </div>
           <div className="overnight-cr-departures__footer-hairline"></div>
