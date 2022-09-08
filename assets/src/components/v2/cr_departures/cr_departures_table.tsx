@@ -45,7 +45,7 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
   return (
     <table className="cr-departures-table">
       <tbody>
-        <tr>
+        <tr className="cr-departures-table__header-row">
           <td className="track">
             <div className="table-header__english">Track</div>
             <div className="table-header__spanish">Pista</div>

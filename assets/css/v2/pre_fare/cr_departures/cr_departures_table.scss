@@ -2,12 +2,15 @@
   border-collapse: collapse;
   margin: 0 44px;
   table-layout: fixed;
+  .cr-departures-table__header-row {
+    border-bottom: 4px solid #cccbc8;
+  }
   tr {
     &:not(:first-child) {
       height: 272px;
     }
-    &:not(:last-child) {
-      border-bottom: 4px solid #cccbc8;
+    &:not(:first-child) {
+      border-top: 4px solid #cccbc8;
     }
   }
   td {
