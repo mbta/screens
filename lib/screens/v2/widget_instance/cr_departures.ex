@@ -37,6 +37,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       %{
         departures:
           departures_data
+          |> Enum.slice(0..2)
           |> Enum.map(
             &CRDeparturesWidget.serialize_departure(
               &1,
@@ -45,8 +46,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
               station,
               now
             )
-          )
-          |> Enum.slice(0..2),
+          ),
         show_via_headsigns_message: config.show_via_headsigns_message,
         destination: destination,
         time_to_destination: config.travel_time_to_destination,
@@ -105,7 +105,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
     %{
       headsign: serialize_headsign(departure, destination),
-      time: serialize_time(departure, now),
+      time: serialize_time(departure, station, now),
       track_number: track_number,
       prediction_or_schedule_id: prediction_or_schedule_id,
       arrow: arrow
@@ -136,16 +136,21 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     }
   end
 
-  defp serialize_time(%Departure{prediction: prediction, schedule: schedule} = departure, now) do
+  defp serialize_time(
+         %Departure{prediction: prediction, schedule: schedule} = departure,
+         station,
+         now
+       ) do
     {:ok, scheduled_departure_time} =
       %Departure{schedule: schedule}
       |> Departure.time()
       |> DateTime.shift_zone("America/New_York")
 
+    IO.inspect(departure)
+
     if is_nil(prediction) or is_nil(prediction.vehicle) do
       serialize_schedule_departure_time(scheduled_departure_time)
     else
-      vehicle_status = Departure.vehicle_status(departure)
       stop_type = Departure.stop_type(departure)
 
       {:ok, predicted_departure_time} =
@@ -153,12 +158,11 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
         |> Departure.time()
         |> DateTime.shift_zone("America/New_York")
 
-      is_delayed = DateTime.compare(scheduled_departure_time, predicted_departure_time) == :lt
-
       serialize_prediction_departure_time(
         predicted_departure_time,
-        is_delayed,
-        vehicle_status,
+        scheduled_departure_time,
+        prediction.vehicle,
+        station,
         stop_type,
         now
       )
@@ -170,37 +174,44 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   end
 
   defp serialize_prediction_departure_time(
-         departure_time,
-         is_delayed,
-         vehicle_status,
+         predicted_departure_time,
+         scheduled_departure_time,
+         vehicle,
+         station,
          stop_type,
          now
        ) do
-    second_diff = DateTime.diff(departure_time, now)
+    second_diff = DateTime.diff(predicted_departure_time, now)
     minute_diff = round(second_diff / 60)
+    is_delayed = DateTime.compare(scheduled_departure_time, predicted_departure_time) == :lt
 
     departure_time =
       cond do
-        vehicle_status == :stopped_at and second_diff < 90 ->
+        vehicle.current_status == :stopped_at and vehicle.parent_stop_id === station and
+            second_diff < 90 ->
           %{type: :text, text: "BRD"}
 
         second_diff < 30 and stop_type == :first_stop ->
           %{type: :text, text: "BRD"}
 
-        second_diff < 30 ->
-          %{type: :text, text: "ARR"}
+        vehicle.current_status === :in_transit_to and vehicle.parent_stop_id === station and
+            minute_diff < 1 ->
+          %{type: :text, text: "NOW"}
+
+        is_delayed ->
+          scheduled_departure_time
 
         minute_diff < 60 ->
-          %{type: :minutes, minutes: minute_diff, delayed: is_delayed}
+          %{type: :minutes, minutes: minute_diff}
 
         true ->
-          serialize_timestamp(departure_time, is_delayed)
+          serialize_timestamp(predicted_departure_time)
       end
 
-    %{departure_time: departure_time, departure_type: :prediction}
+    %{departure_time: departure_time, departure_type: :prediction, is_delayed: is_delayed}
   end
 
-  defp serialize_timestamp(departure_time, is_delayed) do
+  defp serialize_timestamp(departure_time) do
     hour = 1 + Integer.mod(departure_time.hour - 1, 12)
     string_minute = Integer.to_string(departure_time.minute)
     updated_minute = if departure_time.minute < 10, do: "0" <> string_minute, else: string_minute
@@ -209,8 +220,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     %{
       type: :timestamp,
       timestamp: Integer.to_string(hour) <> ":" <> updated_minute,
-      ampm: am_pm,
-      delayed: is_delayed
+      ampm: am_pm
     }
   end
 

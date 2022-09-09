@@ -6,6 +6,7 @@ defmodule Screens.Vehicles.Vehicle do
             current_status: nil,
             trip_id: nil,
             stop_id: nil,
+            parent_stop_id: nil,
             occupancy_status: nil
 
   @type current_status :: :incoming_at | :stopped_at | :in_transit_to | nil
@@ -17,6 +18,7 @@ defmodule Screens.Vehicles.Vehicle do
           current_status: current_status,
           trip_id: Screens.Trips.Trip.id() | nil,
           stop_id: Screens.Stops.Stop.id() | nil,
+          parent_stop_id: Screens.Stops.Stop.id() | nil,
           occupancy_status: occupancy_status
         }
 
