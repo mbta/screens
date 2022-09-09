@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDeparturesTest do
   use ExUnit.Case, async: true
   alias Screens.V2.WidgetInstance
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{OvernightCRDepartures, PreFare}
+  alias Screens.Config.V2.PreFare
   alias Screens.Schedules.Schedule
 
   setup do
@@ -10,15 +10,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDeparturesTest do
       inbound_widget: %WidgetInstance.OvernightCRDepartures{
         screen:
           struct(Screen, %{
-            app_params:
-              struct(PreFare, %{
-                overnight_cr_departures: %OvernightCRDepartures{
-                  overnight_weekday_text_english: "Monday",
-                  overnight_weekday_text_spanish: "Lunes",
-                  overnight_weekend_text_english: "Saturday",
-                  overnight_weekend_text_spanish: "Sábado"
-                }
-              })
+            app_params: struct(PreFare)
           }),
         direction_to_destination: 1,
         last_tomorrow_schedule:
@@ -32,15 +24,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDeparturesTest do
       outbound_widget: %WidgetInstance.OvernightCRDepartures{
         screen:
           struct(Screen, %{
-            app_params:
-              struct(PreFare, %{
-                overnight_cr_departures: %OvernightCRDepartures{
-                  overnight_weekday_text_english: "Monday",
-                  overnight_weekday_text_spanish: "Lunes",
-                  overnight_weekend_text_english: "Saturday",
-                  overnight_weekend_text_spanish: "Sábado"
-                }
-              })
+            app_params: struct(PreFare)
           }),
         direction_to_destination: 0,
         last_tomorrow_schedule:
@@ -65,7 +49,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDeparturesTest do
   end
 
   describe "serialize/1" do
-    test "returns map for inbound on weekday", %{
+    test "returns map for inbound", %{
       inbound_widget: widget
     } do
       widget = put_now(widget, ~U[2022-09-05T08:00:00Z])
@@ -76,30 +60,11 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDeparturesTest do
                direction: "inbound",
                last_schedule_departure_time: shifted_datetime,
                last_schedule_headsign_stop: "Test Stop",
-               last_schedule_headsign_via: "via Test Station",
-               overnight_text_english: "Monday",
-               overnight_text_spanish: "Lunes"
+               last_schedule_headsign_via: "via Test Station"
              } == WidgetInstance.serialize(widget)
     end
 
-    test "returns map for inbound on weekend", %{
-      inbound_widget: widget
-    } do
-      widget = put_now(widget, ~U[2022-09-03T08:00:00Z])
-      %{departure_time: departure_time} = widget.last_tomorrow_schedule
-      shifted_datetime = DateTime.shift_zone!(departure_time, "America/New_York")
-
-      assert %{
-               direction: "inbound",
-               last_schedule_departure_time: shifted_datetime,
-               last_schedule_headsign_stop: "Test Stop",
-               last_schedule_headsign_via: "via Test Station",
-               overnight_text_english: "Saturday",
-               overnight_text_spanish: "Sábado"
-             } == WidgetInstance.serialize(widget)
-    end
-
-    test "returns map for outbound on weekday", %{
+    test "returns map for outbound", %{
       outbound_widget: widget
     } do
       widget = put_now(widget, ~U[2022-09-05T08:00:00Z])
@@ -110,26 +75,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDeparturesTest do
                direction: "outbound",
                last_schedule_departure_time: shifted_datetime,
                last_schedule_headsign_stop: "Test Stop",
-               last_schedule_headsign_via: "via Test Station",
-               overnight_text_english: "Monday",
-               overnight_text_spanish: "Lunes"
-             } == WidgetInstance.serialize(widget)
-    end
-
-    test "returns map for outbound on weekend", %{
-      outbound_widget: widget
-    } do
-      widget = put_now(widget, ~U[2022-09-03T08:00:00Z])
-      %{departure_time: departure_time} = widget.last_tomorrow_schedule
-      shifted_datetime = DateTime.shift_zone!(departure_time, "America/New_York")
-
-      assert %{
-               direction: "outbound",
-               last_schedule_departure_time: shifted_datetime,
-               last_schedule_headsign_stop: "Test Stop",
-               last_schedule_headsign_via: "via Test Station",
-               overnight_text_english: "Saturday",
-               overnight_text_spanish: "Sábado"
+               last_schedule_headsign_via: "via Test Station"
              } == WidgetInstance.serialize(widget)
     end
   end
