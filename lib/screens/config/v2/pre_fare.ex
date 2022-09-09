@@ -9,7 +9,6 @@ defmodule Screens.Config.V2.PreFare do
     ElevatorStatus,
     EvergreenContentItem,
     FullLineMap,
-    OvernightCRDepartures,
     ShuttleBusInfo
   }
 
@@ -25,7 +24,6 @@ defmodule Screens.Config.V2.PreFare do
           content_summary: ContentSummary.t(),
           audio: Audio.t(),
           cr_departures: CRDepartures.t(),
-          overnight_cr_departures: OvernightCRDepartures.t(),
           shuttle_bus_info: ShuttleBusInfo.t()
         }
 
@@ -45,7 +43,6 @@ defmodule Screens.Config.V2.PreFare do
             content_summary: nil,
             audio: Audio.from_json(:default),
             cr_departures: CRDepartures.from_json(:default),
-            overnight_cr_departures: OvernightCRDepartures.from_json(:default),
             shuttle_bus_info: ShuttleBusInfo.from_json(:default)
 
   use Screens.Config.Struct,
@@ -59,7 +56,6 @@ defmodule Screens.Config.V2.PreFare do
       content_summary: ContentSummary,
       audio: Audio,
       cr_departures: CRDepartures,
-      overnight_cr_departures: OvernightCRDepartures,
       shuttle_bus_info: ShuttleBusInfo
     ]
 end

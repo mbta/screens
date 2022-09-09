@@ -19,9 +19,25 @@ const OvernightCRDepartures: ComponentType<Props> = ({
   last_schedule_departure_time: lastScheduleDepartureTime,
   last_schedule_headsign_stop: lastScheduleHeadsignStop,
   last_schedule_headsign_via: lastScheduleHeadsignVia,
-  overnight_text_english: overnightTextEnglish,
-  overnight_text_spanish: overnightTextSpanish,
 }) => {
+  const getTableText = (language: string) => {
+    if (direction === "inbound") {
+      if (language === "english") {
+        return "No more inbound trains to Boston this evening";
+      }
+
+      return "No más trenes entrantes a Boston esta noche";
+    } else if (direction === "outbound") {
+      if (language === "english") {
+        return "No more outbound trains from Boston this evening";
+      }
+
+      return "No más trenes saliendo de Boston esta noche";
+    }
+
+    return "";
+  };
+
   const getDirectionText = (language: string) => {
     if (direction === "inbound") {
       if (language === "english") {
@@ -48,10 +64,10 @@ const OvernightCRDepartures: ComponentType<Props> = ({
           <DeparturesTable departures={[]} />
           <div className="overnight-cr-departures__body-text">
             <div className="overnight-cr-departures__body-text--english">
-              {overnightTextEnglish}
+              {getTableText("english")}
             </div>
             <div className="overnight-cr-departures__body-text--spanish">
-              {overnightTextSpanish}
+              {getTableText("spanish")}
             </div>
           </div>
         </div>

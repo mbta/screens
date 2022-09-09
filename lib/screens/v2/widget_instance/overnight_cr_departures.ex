@@ -24,22 +24,17 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
   def priority(%__MODULE__{} = config), do: config.priority
 
   def serialize(%__MODULE__{
-        screen: %Screen{app_params: %PreFare{overnight_cr_departures: config}},
         direction_to_destination: direction_to_destination,
-        last_tomorrow_schedule: %Schedule{departure_time: departure_time, stop_headsign: headsign},
-        now: now
+        last_tomorrow_schedule: %Schedule{departure_time: departure_time, stop_headsign: headsign}
       }) do
     {:ok, local_departure_time} = DateTime.shift_zone(departure_time, "America/New_York")
-    {overnight_text_english, overnight_text_spanish} = get_overnight_text(config, now)
     {headsign_stop, headsign_via} = format_headsign(headsign)
 
     %{
       direction: serialize_direction(direction_to_destination),
       last_schedule_departure_time: local_departure_time,
       last_schedule_headsign_stop: headsign_stop,
-      last_schedule_headsign_via: headsign_via,
-      overnight_text_english: overnight_text_english,
-      overnight_text_spanish: overnight_text_spanish
+      last_schedule_headsign_via: headsign_via
     }
   end
 
@@ -60,22 +55,6 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
       "outbound"
     else
       "inbound"
-    end
-  end
-
-  defp get_overnight_text(
-         %OvernightCRDepartures{} = config,
-         now
-       ) do
-    day_of_week =
-      now |> DateTime.shift_zone!("America/New_York") |> DateTime.to_date() |> Date.day_of_week()
-
-    show_weekend_text = day_of_week in 5..6
-
-    if show_weekend_text do
-      {config.overnight_weekend_text_english, config.overnight_weekend_text_spanish}
-    else
-      {config.overnight_weekday_text_english, config.overnight_weekday_text_spanish}
     end
   end
 
