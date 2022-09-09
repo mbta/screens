@@ -99,7 +99,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
       now |> DateTime.shift_zone!("America/New_York") |> DateTime.add(-3 * 60 * 60, :second)
 
     next_service_day =
-      DateTime.add(service_datetime, 60 * 60 * 24, :second) |> Timex.format!("{YYYY}-{0M}-{0D}")
+      service_datetime |> DateTime.add(60 * 60 * 24, :second) |> Timex.format!("{YYYY}-{0M}-{0D}")
 
     params = %{
       direction_id: direction_to_destination,
