@@ -12,7 +12,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDeparturesTest do
           struct(Screen, %{
             app_params: struct(PreFare)
           }),
-        direction_to_destination: 1,
+        direction_to_destination: "inbound",
         last_tomorrow_schedule:
           struct(Schedule, %{
             departure_time: ~U[2022-01-02T21:00:00Z],
@@ -26,7 +26,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDeparturesTest do
           struct(Screen, %{
             app_params: struct(PreFare)
           }),
-        direction_to_destination: 0,
+        direction_to_destination: "outbound",
         last_tomorrow_schedule:
           struct(Schedule, %{
             departure_time: ~U[2022-01-02T21:00:00Z],

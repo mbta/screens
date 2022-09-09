@@ -40,6 +40,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
       ) do
     case fetch_departures_fn.(direction_to_destination, station) do
       {:ok, departures_data} ->
+        inbound_outbound =
+          if direction_to_destination == 0 do
+            "outbound"
+          else
+            "inbound"
+          end
+
         # The Overnight and NoData widgets may not be relevant here
         departures_instance =
           cond do
@@ -52,7 +59,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
 
               %OvernightCRDepartures{
                 screen: config,
-                direction_to_destination: direction_to_destination,
+                direction_to_destination: inbound_outbound,
                 last_tomorrow_schedule: last_schedule_tomorrow,
                 priority: cr_departures.priority,
                 now: now
@@ -63,6 +70,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
                 config: cr_departures,
                 departures_data: departures_data,
                 destination: destination,
+                direction_to_destination: inbound_outbound,
                 now: now
               }
           end

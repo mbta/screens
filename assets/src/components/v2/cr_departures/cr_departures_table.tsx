@@ -1,21 +1,28 @@
 import BaseDepartureTime from "Components/eink/base_departure_time";
-import Arrow, { Direction } from "Components/solari/arrow";
+import Arrow, { Direction as ArrowDirection } from "Components/solari/arrow";
 import React from "react";
 import { imagePath, classWithModifier } from "Util/util";
 import {
   Departure,
+  Direction,
   StationService,
 } from "Components/v2/cr_departures/cr_departures";
 
-const DeparturesTable: React.ComponentType<any> = (props) => {
-  const { departures } = props;
+interface Props {
+  departures: Departure[];
+  direction: Direction;
+}
 
+const DeparturesTable: React.ComponentType<Props> = ({
+  departures,
+  direction,
+}) => {
   const getArrowOrTbd = (arrow: string) => {
     if (arrow) {
       return (
         <div className="arrow-image">
           <Arrow
-            direction={arrow as Direction}
+            direction={arrow as ArrowDirection}
             className="departure__arrow-image"
           />
         </div>
@@ -42,6 +49,18 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
     });
   };
 
+  const getHeaderDirection = (language: string) => {
+    if (language === "english") {
+      return direction;
+    }
+
+    if (direction === "inbound") {
+      return "a";
+    } else {
+      return "que salen de";
+    }
+  };
+
   return (
     <table className="cr-departures-table">
       <tbody>
@@ -51,8 +70,12 @@ const DeparturesTable: React.ComponentType<any> = (props) => {
             <div className="table-header__spanish">Pista</div>
           </td>
           <td className="headsign">
-            <div className="table-header__english">Upcoming departures</div>
-            <div className="table-header__spanish">Próximas salidas</div>
+            <div className="table-header__english">
+              Upcoming {getHeaderDirection("english")} departures
+            </div>
+            <div className="table-header__spanish">
+              Próximos {getHeaderDirection("spanish")} Boston
+            </div>
           </td>
           <td className="arrival"></td>
         </tr>

@@ -4,6 +4,7 @@ import ClockIcon from "Components/v2/clock_icon";
 import CRDeparturesHeader from "Components/v2/cr_departures/cr_departures_header";
 import DeparturesTable from "Components/v2/cr_departures/cr_departures_table";
 
+type Direction = "inbound" | "outbound";
 interface StationService {
   name: string;
   service: boolean;
@@ -22,10 +23,11 @@ interface CRDeparturesProps {
   departures: Departure[];
   destination: string;
   time_to_destination: string;
+  direction: Direction;
 }
 
 const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
-  const { departures, destination, time_to_destination } = props;
+  const { departures, destination, time_to_destination, direction } = props;
 
   let maxMinutes = parseInt(time_to_destination.split("-")[1]);
   if (isNaN(maxMinutes)) {
@@ -37,7 +39,7 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
       <div className="departures-card">
         <CRDeparturesHeader />
         <div className="departures-card__body">
-          <DeparturesTable departures={departures} />
+          <DeparturesTable departures={departures} direction={direction} />
         </div>
         <div className="departures-card__footer">
           <div className="departures-card__info-row">
@@ -76,5 +78,5 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
   );
 };
 
-export { Departure, StationService };
+export { Departure, Direction, StationService };
 export default CRDepartures;

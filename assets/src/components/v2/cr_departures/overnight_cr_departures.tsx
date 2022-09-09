@@ -4,14 +4,13 @@ import CRDeparturesHeader from "Components/v2/cr_departures/cr_departures_header
 import OvernightMoon from "../bundled_svg/overnight_moon";
 import moment from "moment";
 import { imagePath } from "Util/util";
+import { Direction } from "./cr_departures";
 
 interface Props {
-  direction: string;
+  direction: Direction;
   last_schedule_departure_time: string;
   last_schedule_headsign_stop: string;
   last_schedule_headsign_via: string;
-  overnight_text_english: string;
-  overnight_text_spanish: string;
 }
 
 const OvernightCRDepartures: ComponentType<Props> = ({
@@ -61,7 +60,7 @@ const OvernightCRDepartures: ComponentType<Props> = ({
       <div className="overnight-cr-departures__card">
         <CRDeparturesHeader />
         <div className="overnight-cr-departures__body">
-          <DeparturesTable departures={[]} />
+          <DeparturesTable departures={[]} direction={direction} />
           <div className="overnight-cr-departures__body-text">
             <div className="overnight-cr-departures__body-text--english">
               {getTableText("english")}

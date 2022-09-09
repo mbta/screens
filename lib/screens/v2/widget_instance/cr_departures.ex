@@ -7,12 +7,14 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   defstruct config: nil,
             departures_data: [],
             destination: nil,
+            direction_to_destination: nil,
             now: nil
 
   @type t :: %__MODULE__{
           config: CRDepartures.t(),
           departures_data: list(Departure.t()),
           destination: String.t(),
+          direction_to_destination: String.t(),
           now: DateTime.t()
         }
 
@@ -25,6 +27,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           config: %CRDepartures{station: station} = config,
           departures_data: departures_data,
           destination: destination,
+          direction_to_destination: direction_to_destination,
           now: now
         }) do
       %{
@@ -42,7 +45,8 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           |> Enum.slice(0..2),
         show_via_headsigns_message: config.show_via_headsigns_message,
         destination: destination,
-        time_to_destination: config.travel_time_to_destination
+        time_to_destination: config.travel_time_to_destination,
+        direction: direction_to_destination
       }
     end
 

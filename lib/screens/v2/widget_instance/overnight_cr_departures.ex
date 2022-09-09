@@ -30,7 +30,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
     {headsign_stop, headsign_via} = format_headsign(headsign)
 
     %{
-      direction: serialize_direction(direction_to_destination),
+      direction: direction_to_destination,
       last_schedule_departure_time: local_departure_time,
       last_schedule_headsign_stop: headsign_stop,
       last_schedule_headsign_via: headsign_via
@@ -48,14 +48,6 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
   def audio_sort_key(_instance), do: [0]
 
   def audio_valid_candidate?(_instance), do: false
-
-  defp serialize_direction(direction_id) do
-    if direction_id == 0 do
-      "outbound"
-    else
-      "inbound"
-    end
-  end
 
   defp format_headsign(headsign) do
     via_pattern = ~r/(.+) (via .+)/
