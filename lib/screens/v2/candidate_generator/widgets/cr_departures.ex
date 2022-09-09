@@ -3,9 +3,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
 
   alias Screens.Config.Screen
   alias Screens.Config.V2.{CRDepartures, PreFare}
+  alias Screens.Schedules.Schedule
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.CRDepartures, as: CRDeparturesWidget
-  alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightCRDepartures}
 
   def departures_instances(
         config,
@@ -30,9 +31,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
               %CRDepartures{
                 direction_to_destination: direction_to_destination,
                 station: station,
-                destination: destination,
-                overnight_weekday_asset_path: overnight_weekday_asset_path,
-                overnight_weekend_asset_path: overnight_weekend_asset_path
+                destination: destination
               } = cr_departures
           }
         } = config,
@@ -41,23 +40,38 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
       ) do
     case fetch_departures_fn.(direction_to_destination, station) do
       {:ok, departures_data} ->
+        inbound_outbound =
+          if direction_to_destination == 0 do
+            "outbound"
+          else
+            "inbound"
+          end
+
         # The Overnight and NoData widgets may not be relevant here
         departures_instance =
           cond do
             departures_data == :error ->
               %DeparturesNoData{screen: config, show_alternatives?: true}
 
-            departures_data == :overnight ->
-              %OvernightDepartures{}
+            Enum.empty?(departures_data) ->
+              last_schedule_tomorrow =
+                fetch_last_schedule_tomorrow(direction_to_destination, station, now)
+
+              %OvernightCRDepartures{
+                screen: config,
+                direction_to_destination: inbound_outbound,
+                last_tomorrow_schedule: last_schedule_tomorrow,
+                priority: cr_departures.priority,
+                now: now
+              }
 
             true ->
               %CRDeparturesWidget{
                 config: cr_departures,
                 departures_data: departures_data,
                 destination: destination,
-                now: now,
-                overnight_weekday_asset_path: overnight_weekday_asset_path,
-                overnight_weekend_asset_path: overnight_weekend_asset_path
+                direction_to_destination: inbound_outbound,
+                now: now
               }
           end
 
@@ -85,5 +99,29 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
     }
 
     Departure.fetch(params, Keyword.new(opts))
+  end
+
+  defp fetch_last_schedule_tomorrow(direction_to_destination, station, now) do
+    # Any time between midnight and 3AM should be considered part of yesterday's service day.
+    service_datetime =
+      now |> DateTime.shift_zone!("America/New_York") |> DateTime.add(-3 * 60 * 60, :second)
+
+    next_service_day =
+      service_datetime |> DateTime.add(60 * 60 * 24, :second) |> Timex.format!("{YYYY}-{0M}-{0D}")
+
+    params = %{
+      direction_id: direction_to_destination,
+      route_ids: [
+        "CR-Franklin",
+        "CR-Needham",
+        "CR-Providence"
+      ],
+      route_type: :rail,
+      stop_ids: [station],
+      sort: "-departure_time"
+    }
+
+    {:ok, schedules} = Schedule.fetch(params, next_service_day)
+    List.first(schedules)
   end
 end

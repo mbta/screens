@@ -39,8 +39,12 @@
 @import "v2/pre_fare/full_line_map";
 @import "v2/pre_fare/reconstructed_alert";
 @import "v2/pre_fare/free_text";
-@import "v2/pre_fare/cr_departures";
 @import "v2/pre_fare/shuttle_bus_info";
+
+@import "v2/pre_fare/cr_departures/cr_departures";
+@import "v2/pre_fare/cr_departures/overnight_cr_departures";
+@import "v2/pre_fare/cr_departures/cr_departures_header";
+@import "v2/pre_fare/cr_departures/cr_departures_table";
 
 @import "v2/pre_fare/subway_status";
 @import "v2/lcd_common_styles/route_pill";
