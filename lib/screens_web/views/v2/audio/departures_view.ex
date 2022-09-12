@@ -150,6 +150,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   defp identity_render(value), do: ~E|<%= value %>|
 
   def build_text(value_renderers) do
+    IO.inspect(value_renderers)
     value_renderers
     |> Enum.reject(fn
       {value, renderer} when is_function(renderer) -> is_nil(value)
