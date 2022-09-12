@@ -109,13 +109,6 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
   defp preposition_for_time_type(:minutes), do: "in"
   defp preposition_for_time_type(:timestamp), do: "at"
 
-  defp render_headsign(%{
-         headsign: headsign,
-         station_service_list: [%{service: false}, %{service: false}]
-       }) do
-    ~E|<%= headsign %>|
-  end
-
   defp render_headsign(%{headsign: headsign, station_service_list: [station1, station2]}) do
     via_string =
       cond do
