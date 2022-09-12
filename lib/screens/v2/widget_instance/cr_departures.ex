@@ -165,11 +165,12 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
     departure_time =
       cond do
-        vehicle.current_status == :stopped_at and vehicle.parent_stop_id === station and
-            second_diff < 90 ->
-          %{type: :text, text: "BRD"}
-
-        second_diff < 30 and stop_type == :first_stop ->
+        is_boarding?(
+          vehicle,
+          stop_type,
+          station,
+          second_diff
+        ) ->
           %{type: :text, text: "BRD"}
 
         vehicle.current_status === :in_transit_to and vehicle.parent_stop_id === station and
@@ -188,6 +189,17 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
     %{departure_time: departure_time, departure_type: :prediction, is_delayed: is_delayed}
   end
+
+  defp is_boarding?(
+         vehicle,
+         stop_type,
+         home_station_id,
+         second_diff
+       ),
+       do:
+         (vehicle.current_status == :stopped_at and vehicle.parent_stop_id === home_station_id and
+            second_diff < 90) or
+           (stop_type == :first_stop and second_diff < 30)
 
   defp serialize_timestamp(departure_time) do
     hour = 1 + Integer.mod(departure_time.hour - 1, 12)
