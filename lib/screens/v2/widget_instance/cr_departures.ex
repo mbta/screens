@@ -3,6 +3,8 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
   alias Screens.Config.V2.CRDepartures
   alias Screens.V2.Departure
+  alias Screens.Predictions.Prediction
+  alias Screens.Stops.Stop
 
   defstruct config: nil,
             departures_data: [],
@@ -85,7 +87,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
     %{
       headsign: serialize_headsign(departure, destination),
-      time: serialize_time(departure, station, now),
+      time: serialize_time(departure, now),
       track_number: track_number,
       prediction_or_schedule_id: prediction_or_schedule_id,
       arrow: arrow
@@ -117,8 +119,10 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   end
 
   defp serialize_time(
-         %Departure{prediction: prediction, schedule: schedule} = departure,
-         station,
+         %Departure{
+           prediction: prediction,
+           schedule: schedule
+         } = departure,
          now
        ) do
     {:ok, scheduled_departure_time} =
@@ -129,19 +133,10 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     if is_nil(prediction) or is_nil(prediction.vehicle) do
       serialize_schedule_departure_time(scheduled_departure_time)
     else
-      stop_type = Departure.stop_type(departure)
-
-      {:ok, predicted_departure_time} =
-        %Departure{prediction: prediction}
-        |> Departure.time()
-        |> DateTime.shift_zone("America/New_York")
-
       serialize_prediction_departure_time(
-        predicted_departure_time,
+        departure,
         scheduled_departure_time,
         prediction.vehicle,
-        station,
-        stop_type,
         now
       )
     end
@@ -152,13 +147,19 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   end
 
   defp serialize_prediction_departure_time(
-         predicted_departure_time,
+         %Departure{prediction: prediction} = departure,
          scheduled_departure_time,
          vehicle,
-         station,
-         stop_type,
          now
        ) do
+    %Prediction{stop: %Stop{id: stop_id}} = prediction
+
+    {:ok, predicted_departure_time} =
+      departure
+      |> Departure.time()
+      |> DateTime.shift_zone("America/New_York")
+
+    stop_type = Departure.stop_type(departure)
     second_diff = DateTime.diff(predicted_departure_time, now)
     minute_diff = round(second_diff / 60)
     is_delayed = DateTime.compare(scheduled_departure_time, predicted_departure_time) == :lt
@@ -168,13 +169,13 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
         is_boarding?(
           vehicle,
           stop_type,
-          station,
+          stop_id,
           second_diff
         ) ->
           %{type: :text, text: "BRD"}
 
-        vehicle.current_status === :in_transit_to and vehicle.parent_stop_id === station and
-            minute_diff < 1 ->
+        vehicle.current_status === :in_transit_to and vehicle.stop_id === stop_id and
+            minute_diff <= 1 ->
           %{type: :text, text: "NOW"}
 
         is_delayed ->

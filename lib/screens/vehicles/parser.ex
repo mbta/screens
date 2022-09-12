@@ -1,8 +1,6 @@
 defmodule Screens.Vehicles.Parser do
   @moduledoc false
 
-  alias Screens.Stops.Stop
-
   def parse_result(%{"data" => data}) do
     data
     |> Enum.map(&parse_vehicle/1)
@@ -24,8 +22,7 @@ defmodule Screens.Vehicles.Parser do
       current_status: parse_current_status(current_status),
       occupancy_status: parse_occupancy_status(occupancy_status),
       trip_id: trip_id_from_trip_data(trip_data),
-      stop_id: stop_id_from_stop_data(stop_data),
-      parent_stop_id: parent_stop_id_from_stop_data(stop_data)
+      stop_id: stop_id_from_stop_data(stop_data)
     }
   end
 
@@ -34,13 +31,6 @@ defmodule Screens.Vehicles.Parser do
 
   defp stop_id_from_stop_data(%{"data" => %{"id" => stop_id}}), do: stop_id
   defp stop_id_from_stop_data(_), do: nil
-
-  defp parent_stop_id_from_stop_data(%{"data" => %{"id" => stop_id}}) do
-    {:ok, parent_stop_id} = Stop.fetch_parent_station_id(stop_id)
-    parent_stop_id
-  end
-
-  defp parent_stop_id_from_stop_data(_), do: nil
 
   defp parse_current_status("STOPPED_AT"), do: :stopped_at
   defp parse_current_status("INCOMING_AT"), do: :incoming_at

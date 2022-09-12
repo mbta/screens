@@ -238,23 +238,6 @@ defmodule Screens.Stops.Stop do
     end
   end
 
-  def fetch_parent_station_id(stop_id, get_json_fn \\ &V3Api.get_json/1) do
-    case get_json_fn.("stops/#{stop_id}") do
-      {:ok, %{"data" => data}} ->
-        %{"relationships" => %{"parent_station" => %{"data" => parent_station_data}}} = data
-
-        if is_nil(parent_station_data) do
-          {:ok, nil}
-        else
-          %{"id" => parent_station_id} = parent_station_data
-          {:ok, parent_station_id}
-        end
-
-      _ ->
-        :error
-    end
-  end
-
   def fetch_routes_serving_stop(station_id, headers \\ [], get_json_fn \\ &V3Api.get_json/5) do
     case get_json_fn.(
            "routes",
