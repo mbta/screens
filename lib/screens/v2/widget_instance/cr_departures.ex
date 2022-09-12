@@ -2,6 +2,8 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   @moduledoc false
 
   alias Screens.Config.V2.CRDepartures
+  alias Screens.Predictions.Prediction
+  alias Screens.Stops.Stop
   alias Screens.V2.Departure
 
   defstruct config: nil,
@@ -33,6 +35,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       %{
         departures:
           departures_data
+          |> Enum.slice(0..2)
           |> Enum.map(
             &CRDeparturesWidget.serialize_departure(
               &1,
@@ -41,8 +44,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
               station,
               now
             )
-          )
-          |> Enum.slice(0..2),
+          ),
         show_via_headsigns_message: config.show_via_headsigns_message,
         destination: destination,
         time_to_destination: config.travel_time_to_destination,
@@ -116,38 +118,109 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     }
   end
 
-  defp serialize_time(departure, now) do
-    departure_time = Departure.time(departure)
-    vehicle_status = Departure.vehicle_status(departure)
-    stop_type = Departure.stop_type(departure)
-
-    second_diff = DateTime.diff(departure_time, now)
-    minute_diff = round(second_diff / 60)
+  defp serialize_time(
+         %Departure{
+           prediction: prediction,
+           schedule: schedule
+         } = departure,
+         now
+       ) do
+    {:ok, scheduled_departure_time} =
+      %Departure{schedule: schedule}
+      |> Departure.time()
+      |> DateTime.shift_zone("America/New_York")
 
     cond do
-      vehicle_status == :stopped_at and second_diff < 90 ->
-        %{type: :text, text: "BRD"}
+      is_nil(prediction) ->
+        serialize_schedule_departure_time(scheduled_departure_time)
 
-      second_diff < 30 and stop_type == :first_stop ->
-        %{type: :text, text: "BRD"}
-
-      second_diff < 30 ->
-        %{type: :text, text: "ARR"}
-
-      minute_diff < 60 ->
-        %{type: :minutes, minutes: minute_diff}
+      is_nil(prediction.vehicle) ->
+        serialize_prediction_missing_vehicle(scheduled_departure_time, prediction)
 
       true ->
-        serialize_timestamp(departure_time)
+        serialize_prediction_departure_time(
+          departure,
+          scheduled_departure_time,
+          now
+        )
     end
   end
 
+  # Prediction is missing. Show schedule.
+  defp serialize_schedule_departure_time(scheduled_departure_time) do
+    %{departure_time: scheduled_departure_time, departure_type: :schedule, is_delayed: false}
+  end
+
+  # Prediction is missing a vehicle so is not valuable to us. Show schedule but flag as delayed if departure time for prediction is after schedule.
+  defp serialize_prediction_missing_vehicle(scheduled_departure_time, prediction) do
+    {:ok, predicted_departure_time} =
+      %Departure{prediction: prediction}
+      |> Departure.time()
+      |> DateTime.shift_zone("America/New_York")
+
+    is_delayed = DateTime.compare(scheduled_departure_time, predicted_departure_time) == :lt
+
+    %{departure_time: scheduled_departure_time, departure_type: :schedule, is_delayed: is_delayed}
+  end
+
+  # Prediction is present and should be reliable.
+  defp serialize_prediction_departure_time(
+         %Departure{prediction: prediction} = departure,
+         scheduled_departure_time,
+         now
+       ) do
+    %Prediction{stop: %Stop{id: stop_id}, vehicle: vehicle} = prediction
+
+    {:ok, predicted_departure_time} =
+      departure
+      |> Departure.time()
+      |> DateTime.shift_zone("America/New_York")
+
+    stop_type = Departure.stop_type(departure)
+    second_diff = DateTime.diff(predicted_departure_time, now)
+    minute_diff = round(second_diff / 60)
+    is_delayed = DateTime.compare(scheduled_departure_time, predicted_departure_time) == :lt
+
+    departure_time =
+      cond do
+        is_boarding?(
+          vehicle,
+          stop_type,
+          stop_id,
+          second_diff
+        ) ->
+          %{type: :text, text: "BRD"}
+
+        vehicle.current_status === :in_transit_to and vehicle.stop_id === stop_id and
+            minute_diff <= 1 ->
+          %{type: :text, text: "Now"}
+
+        minute_diff < 60 ->
+          %{type: :minutes, minutes: minute_diff}
+
+        true ->
+          serialize_timestamp(predicted_departure_time)
+      end
+
+    %{departure_time: departure_time, departure_type: :prediction, is_delayed: is_delayed}
+  end
+
+  defp is_boarding?(
+         vehicle,
+         stop_type,
+         home_station_id,
+         second_diff
+       ),
+       do:
+         (vehicle.current_status == :stopped_at and vehicle.parent_stop_id === home_station_id and
+            second_diff < 90) or
+           (stop_type == :first_stop and second_diff < 30)
+
   defp serialize_timestamp(departure_time) do
-    {:ok, local_time} = DateTime.shift_zone(departure_time, "America/New_York")
-    hour = 1 + Integer.mod(local_time.hour - 1, 12)
-    string_minute = Integer.to_string(local_time.minute)
-    updated_minute = if local_time.minute < 10, do: "0" <> string_minute, else: string_minute
-    am_pm = if local_time.hour >= 12, do: :pm, else: :am
+    hour = 1 + Integer.mod(departure_time.hour - 1, 12)
+    string_minute = Integer.to_string(departure_time.minute)
+    updated_minute = if departure_time.minute < 10, do: "0" <> string_minute, else: string_minute
+    am_pm = if departure_time.hour >= 12, do: :pm, else: :am
 
     %{
       type: :timestamp,
