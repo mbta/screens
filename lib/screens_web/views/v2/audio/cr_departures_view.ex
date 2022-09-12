@@ -73,7 +73,6 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
     ~E|<%= content %>|
   end
 
-
   defp render_departures(departures, station) do
     departures_with_index = Enum.with_index(departures)
 
@@ -100,8 +99,12 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
     Timex.format!(time, "{h12}:{m} {AM}")
   end
 
-  defp scheduling_phrase(%{departure_type: :schedule, is_delayed: false}), do: "is scheduled to arrive at"
-  defp scheduling_phrase(%{departure_type: :schedule, is_delayed: true}), do: "was scheduled to arrive at"
+  defp scheduling_phrase(%{departure_type: :schedule, is_delayed: false}),
+    do: "is scheduled to arrive at"
+
+  defp scheduling_phrase(%{departure_type: :schedule, is_delayed: true}),
+    do: "was scheduled to arrive at"
+
   defp scheduling_phrase(%{departure_time: %{type: :text}}), do: nil
   defp scheduling_phrase(%{departure_time: %{type: :minutes}}), do: "departs in"
   defp scheduling_phrase(_), do: "arrives at"
@@ -110,7 +113,9 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
   defp preposition_for_time_type(%{type: :minutes}), do: "in"
   defp preposition_for_time_type(_), do: "at"
 
-  defp delayed_clause(%{departure_type: :schedule, is_delayed: true}), do: "but is currently delayed."
+  defp delayed_clause(%{departure_type: :schedule, is_delayed: true}),
+    do: "but is currently delayed."
+
   defp delayed_clause(_), do: ""
 
   defp render_headsign(%{headsign: headsign, station_service_list: [station1, station2]}) do
