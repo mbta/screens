@@ -109,12 +109,23 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
   defp preposition_for_time_type(:minutes), do: "in"
   defp preposition_for_time_type(:timestamp), do: "at"
 
-  defp render_headsign(%{headsign: headsign, variation: nil}) do
+  defp render_headsign(%{
+         headsign: headsign,
+         station_service_list: [%{service: false}, %{service: false}]
+       }) do
     ~E|<%= headsign %>|
   end
 
-  defp render_headsign(%{headsign: headsign, variation: variation}) do
-    ~E|<%= headsign %> <%= variation %>|
+  defp render_headsign(%{headsign: headsign, station_service_list: [station1, station2]}) do
+    via_string =
+      cond do
+        station1.service and station2.service -> "via #{station1.name} and #{station2.name}"
+        station1.service -> "via #{station1.name}"
+        station2.service -> "via #{station2.name}"
+        true -> ""
+      end
+
+    ~E|<%= headsign %> <%= via_string %>|
   end
 
   defp pluralize_minutes(1), do: "minute"
