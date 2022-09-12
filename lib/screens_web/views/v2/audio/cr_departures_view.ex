@@ -45,8 +45,6 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
       track_number: track_number
     } = departure
 
-    departure_time = time.departure_time
-
     prefix =
       if not is_nil(previous_departure) and headsign === previous_departure.headsign do
         "The following train to"
@@ -54,32 +52,41 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
         "The next train to"
       end
 
-    track = cond do
-      track_number -> "on track " <> Integer.to_string(track_number) <> ". "
-      # Omit track number at Forest Hills
-      station === "place-forhl" -> ". "
-      true -> ". We will announce the track for this train soon. "
-    end
+    track =
+      cond do
+        track_number -> "on track " <> Integer.to_string(track_number) <> ". "
+        # Omit track number at Forest Hills
+        station === "place-forhl" -> ". "
+        true -> ". We will announce the track for this train soon. "
+      end
 
     content =
       DeparturesView.build_text([
         prefix,
         render_headsign(headsign),
-        if(time.departure_type === :schedule, do: render_schedule(time), else: render_prediction(time)),
+        if(time.departure_type === :schedule,
+          do: render_schedule(time),
+          else: render_prediction(time)
+        ),
         track
       ])
 
     ~E|<%= content %>|
   end
 
-  defp render_schedule(%{departure_time: departure_time, is_delayed: false}), do: "is scheduled to arrive at " <> render_time(departure_time)
-  defp render_schedule(%{departure_time: departure_time, is_delayed: true}), do: "was scheduled to arrive at " <> render_time(departure_time) <> ", but is currently delayed."
+  defp render_schedule(%{departure_time: departure_time, is_delayed: false}),
+    do: "is scheduled to arrive at " <> render_time(departure_time)
+
+  defp render_schedule(%{departure_time: departure_time, is_delayed: true}),
+    do:
+      "was scheduled to arrive at " <>
+        render_time(departure_time) <> ", but is currently delayed."
 
   defp render_prediction(departure_time) do
     [
       if(time_is_arr_brd?(departure_time), do: nil, else: "arrives"),
       preposition_for_time_type(departure_time),
-      {departure_time, &render_time/1},
+      {departure_time, &render_time/1}
     ]
   end
 

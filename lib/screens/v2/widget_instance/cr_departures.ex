@@ -200,7 +200,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
         true ->
           predicted_departure_time
-        end
+      end
 
     %{departure_time: departure_time, departure_type: :prediction, is_delayed: is_delayed}
   end
