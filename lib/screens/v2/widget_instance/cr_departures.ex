@@ -130,29 +130,43 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       |> Departure.time()
       |> DateTime.shift_zone("America/New_York")
 
-    if is_nil(prediction) or is_nil(prediction.vehicle) do
-      serialize_schedule_departure_time(scheduled_departure_time)
-    else
-      serialize_prediction_departure_time(
-        departure,
-        scheduled_departure_time,
-        prediction.vehicle,
-        now
-      )
+    cond do
+      is_nil(prediction) ->
+        serialize_schedule_departure_time(scheduled_departure_time)
+
+      is_nil(prediction.vehicle) ->
+        serialize_prediction_missing_vehicle(scheduled_departure_time, prediction)
+
+      true ->
+        serialize_prediction_departure_time(
+          departure,
+          scheduled_departure_time,
+          now
+        )
     end
   end
 
   defp serialize_schedule_departure_time(scheduled_departure_time) do
-    %{departure_time: scheduled_departure_time, departure_type: :schedule}
+    %{departure_time: scheduled_departure_time, departure_type: :schedule, is_delayed: false}
+  end
+
+  defp serialize_prediction_missing_vehicle(scheduled_departure_time, prediction) do
+    {:ok, predicted_departure_time} =
+      %Departure{prediction: prediction}
+      |> Departure.time()
+      |> DateTime.shift_zone("America/New_York")
+
+    is_delayed = DateTime.compare(scheduled_departure_time, predicted_departure_time) == :lt
+
+    %{departure_time: scheduled_departure_time, departure_type: :schedule, is_delayed: is_delayed}
   end
 
   defp serialize_prediction_departure_time(
          %Departure{prediction: prediction} = departure,
          scheduled_departure_time,
-         vehicle,
          now
        ) do
-    %Prediction{stop: %Stop{id: stop_id}} = prediction
+    %Prediction{stop: %Stop{id: stop_id}, vehicle: vehicle} = prediction
 
     {:ok, predicted_departure_time} =
       departure
@@ -177,9 +191,6 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
         vehicle.current_status === :in_transit_to and vehicle.stop_id === stop_id and
             minute_diff <= 1 ->
           %{type: :text, text: "NOW"}
-
-        is_delayed ->
-          scheduled_departure_time
 
         minute_diff < 60 ->
           %{type: :minutes, minutes: minute_diff}

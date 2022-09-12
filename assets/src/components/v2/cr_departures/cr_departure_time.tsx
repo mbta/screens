@@ -21,34 +21,20 @@ const CRDepartureTime = ({
   if (departureType === "schedule") {
     return (
       <div className="cr-departure-time">
-        <div className="cr-departure-time__text">{formattedTime}</div>
+        <div
+          className={`cr-departure-time__text ${isDelayed ? "delayed" : ""}`}
+        >
+          {formattedTime}
+        </div>
         <div
           className={classWithModifier("cr-departure-time__subtext", "english")}
         >
-          Scheduled
+          {isDelayed ? "Delayed" : "Scheduled"}
         </div>
         <div
           className={classWithModifier("cr-departure-time__subtext", "spanish")}
         >
-          Programada
-        </div>
-      </div>
-    );
-  }
-
-  if (typeof time === "string" && isDelayed) {
-    return (
-      <div className="cr-departure-time">
-        <div className="cr-departure-time__text delayed">{formattedTime}</div>
-        <div
-          className={classWithModifier("cr-departure-time__subtext", "english")}
-        >
-          Delayed
-        </div>
-        <div
-          className={classWithModifier("cr-departure-time__subtext", "spanish")}
-        >
-          Atrasado
+          {isDelayed ? "Atrasado" : "Programada"}
         </div>
       </div>
     );
