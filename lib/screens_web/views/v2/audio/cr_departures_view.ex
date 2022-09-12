@@ -109,10 +109,6 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
   defp scheduling_phrase(%{departure_time: %{type: :minutes}}), do: "departs in"
   defp scheduling_phrase(_), do: "arrives at"
 
-  defp preposition_for_time_type(%{type: :text}), do: nil
-  defp preposition_for_time_type(%{type: :minutes}), do: "in"
-  defp preposition_for_time_type(_), do: "at"
-
   defp delayed_clause(%{departure_type: :schedule, is_delayed: true}),
     do: "but is currently delayed."
 
