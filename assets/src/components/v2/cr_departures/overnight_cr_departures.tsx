@@ -97,7 +97,7 @@ const OvernightCRDepartures: ComponentType<Props> = ({
                 {lastScheduleHeadsignStop}
               </div>
               <div className="overnight-cr-departures__schedule-headsign--via">
-                {lastScheduleHeadsignVia}
+                via {lastScheduleHeadsignVia}
               </div>
             </div>
           </div>

@@ -38,7 +38,7 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
     ~E|<p>It's <%= article %> <%= eta %> minute train ride to <%= destination %>.</p>|
   end
 
-  defp render_departure(departure, previous_departure, station) do
+  defp render_departure(departure, previous_departure, station, station) do
     %{
       headsign: headsign,
       time: time,
@@ -81,9 +81,9 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
     departures_with_index
     |> Enum.map(fn {departure, i} ->
       if i === 0 do
-        render_departure(departure, nil, station)
+        render_departure(departure, nil, station, station)
       else
-        render_departure(departure, Enum.at(departures, i - 1), station)
+        render_departure(departure, Enum.at(departures, i - 1), station, station)
       end
     end)
   end

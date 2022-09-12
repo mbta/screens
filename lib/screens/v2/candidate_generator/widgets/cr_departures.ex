@@ -10,8 +10,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
 
   def departures_instances(
         config,
-        fetch_departures_fn \\ &fetch_departures/2,
-        now \\ DateTime.utc_now()
+        now \\ DateTime.utc_now(),
+        fetch_departures_fn \\ &fetch_departures/3
       )
 
   def departures_instances(
@@ -35,10 +35,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
               } = cr_departures
           }
         } = config,
-        fetch_departures_fn,
-        now
+        now,
+        fetch_departures_fn
       ) do
-    case fetch_departures_fn.(direction_to_destination, station) do
+    case fetch_departures_fn.(direction_to_destination, station, now) do
       {:ok, departures_data} ->
         inbound_outbound =
           if direction_to_destination == 0 do
@@ -58,7 +58,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
                 fetch_last_schedule_tomorrow(direction_to_destination, station, now)
 
               %OvernightCRDepartures{
-                screen: config,
+                destination: destination,
                 direction_to_destination: inbound_outbound,
                 last_tomorrow_schedule: last_schedule_tomorrow,
                 priority: cr_departures.priority,
@@ -84,8 +84,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
 
   def departures_instances(_, _, _), do: []
 
-  defp fetch_departures(direction_to_destination, station) do
-    opts = %{include_schedules: true}
+  defp fetch_departures(direction_to_destination, station, now) do
+    opts = %{include_schedules: true, now: now}
 
     params = %{
       direction_id: direction_to_destination,
