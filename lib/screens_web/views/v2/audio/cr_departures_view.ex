@@ -8,25 +8,18 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
 
   def render("_widget.ssml", %{
         departures: departures,
+        station: station,
         destination: destination,
         time_to_destination: time_to_destination,
-        show_via_headsigns_message: show_via_headsigns_message
+        direction: direction
       }) do
     ~E|
-    <p>Upcoming Commuter Rail trips:</p>
-    <%= render_departures(departures) %>
-    <%= render_via_headsign_message(show_via_headsigns_message) %>
+    <p>Upcoming <%= direction %> Commuter Rail trains:</p>
+    <%= render_departures(departures, station) %>
     <%= render_eta(time_to_destination, destination) %>
     <p>Riders can take the Commuter Rail free of charge.</p>
     |
   end
-
-  defp render_via_headsign_message(true) do
-    ~E|<p>Trains via Ruggles stop at Ruggles, but not at Forest Hills.
-    Trains via Forest Hills stop at Ruggles and Forest Hills.</p>|
-  end
-
-  defp render_via_headsign_message(_), do: ""
 
   # Number starts with vowel / consonant
   defp render_eta(eta, destination) do
@@ -45,12 +38,14 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
     ~E|<p>It's <%= article %> <%= eta %> minute train ride to <%= destination %>.</p>|
   end
 
-  defp render_departure(departure, previous_departure) do
+  defp render_departure(departure, previous_departure, station) do
     %{
       headsign: headsign,
       time: time,
       track_number: track_number
     } = departure
+
+    departure_time = time.departure_time
 
     prefix =
       if not is_nil(previous_departure) and headsign === previous_departure.headsign do
@@ -59,36 +54,45 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
         "The next train to"
       end
 
-    track =
-      if track_number do
-        "on track " <> Integer.to_string(track_number) <> ". "
-      else
-        ". We will announce the track for this train soon. "
-      end
+    track = cond do
+      track_number -> "on track " <> Integer.to_string(track_number) <> ". "
+      # Omit track number at Forest Hills
+      station === "place-forhl" -> ". "
+      true -> ". We will announce the track for this train soon. "
+    end
 
     content =
       DeparturesView.build_text([
         prefix,
         render_headsign(headsign),
-        if(time_is_arr_brd?(time), do: nil, else: "arrives"),
-        preposition_for_time_type(time.type),
-        {time, &render_time/1},
+        if(time.departure_type === :schedule, do: render_schedule(time), else: render_prediction(time)),
         track
       ])
 
     ~E|<%= content %>|
   end
 
-  defp render_departures(departures) do
+  defp render_schedule(%{departure_time: departure_time, is_delayed: false}), do: "is scheduled to arrive at " <> render_time(departure_time)
+  defp render_schedule(%{departure_time: departure_time, is_delayed: true}), do: "was scheduled to arrive at " <> render_time(departure_time) <> ", but is currently delayed."
+
+  defp render_prediction(departure_time) do
+    [
+      if(time_is_arr_brd?(departure_time), do: nil, else: "arrives"),
+      preposition_for_time_type(departure_time),
+      {departure_time, &render_time/1},
+    ]
+  end
+
+  defp render_departures(departures, station) do
     departures_with_index = Enum.with_index(departures)
 
     # Is this the best way to iterate and track previous item in array?
     departures_with_index
     |> Enum.map(fn {departure, i} ->
       if i === 0 do
-        render_departure(departure, nil)
+        render_departure(departure, nil, station)
       else
-        render_departure(departure, Enum.at(departures, i - 1))
+        render_departure(departure, Enum.at(departures, i - 1), station)
       end
     end)
   end
@@ -101,13 +105,13 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
     ~E|<%= minute_diff %> <%= pluralize_minutes(minute_diff) %>|
   end
 
-  defp render_time(%{type: :timestamp, timestamp: timestamp, ampm: ampm}) do
-    ~E|<%= timestamp %><%= ampm %>|
+  defp render_time(time) do
+    Timex.format!(time, "{h12}:{m} {AM}")
   end
 
-  defp preposition_for_time_type(:text), do: nil
-  defp preposition_for_time_type(:minutes), do: "in"
-  defp preposition_for_time_type(:timestamp), do: "at"
+  defp preposition_for_time_type(%{type: :text}), do: nil
+  defp preposition_for_time_type(%{type: :minutes}), do: "in"
+  defp preposition_for_time_type(_), do: "at"
 
   defp render_headsign(%{headsign: headsign, station_service_list: [station1, station2]}) do
     via_string =

@@ -45,7 +45,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
               now
             )
           ),
-        show_via_headsigns_message: config.show_via_headsigns_message,
+        station: station,
         destination: destination,
         time_to_destination: config.travel_time_to_destination,
         direction: direction_to_destination
@@ -199,8 +199,8 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           %{type: :minutes, minutes: minute_diff}
 
         true ->
-          serialize_timestamp(predicted_departure_time)
-      end
+          predicted_departure_time
+        end
 
     %{departure_time: departure_time, departure_type: :prediction, is_delayed: is_delayed}
   end
@@ -215,19 +215,6 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
          (vehicle.current_status == :stopped_at and vehicle.parent_stop_id === home_station_id and
             second_diff < 90) or
            (stop_type == :first_stop and second_diff < 30)
-
-  defp serialize_timestamp(departure_time) do
-    hour = 1 + Integer.mod(departure_time.hour - 1, 12)
-    string_minute = Integer.to_string(departure_time.minute)
-    updated_minute = if departure_time.minute < 10, do: "0" <> string_minute, else: string_minute
-    am_pm = if departure_time.hour >= 12, do: :pm, else: :am
-
-    %{
-      type: :timestamp,
-      timestamp: Integer.to_string(hour) <> ":" <> updated_minute,
-      ampm: am_pm
-    }
-  end
 
   defp serialize_station_service_list(nil, _), do: []
 
