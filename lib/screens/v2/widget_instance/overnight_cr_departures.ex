@@ -5,15 +5,15 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
   alias Screens.Schedules.Schedule
   alias Screens.V2.WidgetInstance
 
-  @enforce_keys ~w[screen last_tomorrow_schedule direction_to_destination priority now]a
-  defstruct screen: nil,
+  @enforce_keys ~w[destination last_tomorrow_schedule direction_to_destination priority now]a
+  defstruct destination: nil,
             last_tomorrow_schedule: nil,
             direction_to_destination: nil,
             priority: nil,
             now: nil
 
   @type t :: %__MODULE__{
-          screen: Screen.t(),
+          destination: String.t(),
           last_tomorrow_schedule: Schedule.t(),
           direction_to_destination: 0 | 1,
           priority: WidgetInstance.priority(),
@@ -23,6 +23,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
   def priority(%__MODULE__{} = config), do: config.priority
 
   def serialize(%__MODULE__{
+        destination: destination,
         direction_to_destination: direction_to_destination,
         last_tomorrow_schedule: %Schedule{departure_time: departure_time, stop_headsign: headsign}
       }) do
@@ -33,8 +34,26 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
       direction: direction_to_destination,
       last_schedule_departure_time: local_departure_time,
       last_schedule_headsign_stop: headsign_stop,
-      last_schedule_headsign_via: headsign_via
+      last_schedule_headsign_via: serialize_via_string(destination, headsign_via)
     }
+  end
+
+  defp serialize_via_string(destination, via_string) do
+    via_station = String.replace(via_string, "via ", "")
+
+    case {destination, via_station} do
+      {"Back Bay", _} ->
+        "Ruggles and Back Bay"
+
+      {"Forest Hills", "Ruggles"} ->
+        "Ruggles"
+
+      {"Forest Hills", "Forest Hills"} ->
+        "Ruggles and Forest Hills"
+
+      _ ->
+        ""
+    end
   end
 
   def slot_names(_instance), do: [:main_content_left]
@@ -43,11 +62,11 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
 
   def valid_candidate?(_instance), do: true
 
-  def audio_serialize(_instance), do: %{}
+  def audio_serialize(instance), do: serialize(instance)
 
-  def audio_sort_key(_instance), do: [0]
+  def audio_sort_key(_instance), do: [1]
 
-  def audio_valid_candidate?(_instance), do: false
+  def audio_valid_candidate?(_instance), do: true
 
   defp format_headsign(headsign) do
     via_pattern = ~r/(.+) (via .+)/
