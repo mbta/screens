@@ -193,7 +193,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
         vehicle.current_status === :in_transit_to and vehicle.stop_id === stop_id and
             minute_diff <= 1 ->
-          %{type: :text, text: "NOW"}
+          %{type: :text, text: "Now"}
 
         minute_diff < 60 ->
           %{type: :minutes, minutes: minute_diff}
