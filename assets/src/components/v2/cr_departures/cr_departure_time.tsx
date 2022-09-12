@@ -3,6 +3,7 @@ import moment from "moment";
 import React from "react";
 import { TimeRepresentation } from "Util/time_representation";
 import { classWithModifier } from "Util/util";
+import LiveData from "Components/v2/bundled_svg/live_data";
 
 interface CRDepartureTimeProps {
   departureType: "schedule" | "prediction";
@@ -55,7 +56,12 @@ const CRDepartureTime = ({
 
   return (
     <div className="cr-departure-time">
-      <BaseDepartureTime time={time as TimeRepresentation} hideAmPm />
+      <span style={{ display: "inline-block" }}>
+        <BaseDepartureTime time={time as TimeRepresentation} hideAmPm />
+      </span>
+      <span style={{ display: "inline-block", marginLeft: "19px" }}>
+        <LiveData colorHex="#737373" />
+      </span>
     </div>
   );
 };
