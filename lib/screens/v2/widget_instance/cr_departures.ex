@@ -2,9 +2,9 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   @moduledoc false
 
   alias Screens.Config.V2.CRDepartures
-  alias Screens.V2.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
+  alias Screens.V2.Departure
 
   defstruct config: nil,
             departures_data: [],
