@@ -1,7 +1,6 @@
 defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
   @moduledoc false
 
-  alias Screens.Config.Screen
   alias Screens.Schedules.Schedule
   alias Screens.V2.WidgetInstance
 
