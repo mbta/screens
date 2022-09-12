@@ -55,9 +55,9 @@ const DeparturesTable: React.ComponentType<Props> = ({
     }
 
     if (direction === "inbound") {
-      return "a";
+      return "entrantes a";
     } else {
-      return "que salen de";
+      return "saliendo de";
     }
   };
 
@@ -74,7 +74,7 @@ const DeparturesTable: React.ComponentType<Props> = ({
               Upcoming {getHeaderDirection("english")} departures
             </div>
             <div className="table-header__spanish">
-              Próximos {getHeaderDirection("spanish")} Boston
+              Trenes {getHeaderDirection("spanish")} Boston
             </div>
           </td>
           <td className="arrival"></td>
