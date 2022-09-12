@@ -146,10 +146,12 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     end
   end
 
+  # Prediction is missing. Show schedule.
   defp serialize_schedule_departure_time(scheduled_departure_time) do
     %{departure_time: scheduled_departure_time, departure_type: :schedule, is_delayed: false}
   end
 
+  # Prediction is missing a vehicle so is not valuable to us. Show schedule but flag as delayed if departure time for prediction is after schedule.
   defp serialize_prediction_missing_vehicle(scheduled_departure_time, prediction) do
     {:ok, predicted_departure_time} =
       %Departure{prediction: prediction}
@@ -161,6 +163,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     %{departure_time: scheduled_departure_time, departure_type: :schedule, is_delayed: is_delayed}
   end
 
+  # Prediction is present and should be reliable.
   defp serialize_prediction_departure_time(
          %Departure{prediction: prediction} = departure,
          scheduled_departure_time,
