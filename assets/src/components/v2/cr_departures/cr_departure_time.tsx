@@ -35,8 +35,6 @@ const CRDepartureTime = ({
     );
   }
 
-  console.log(typeof time);
-
   if (typeof time === "string" && isDelayed) {
     return (
       <div className="cr-departure-time">

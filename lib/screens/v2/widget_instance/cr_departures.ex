@@ -126,8 +126,6 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       |> Departure.time()
       |> DateTime.shift_zone("America/New_York")
 
-    IO.inspect(departure)
-
     if is_nil(prediction) or is_nil(prediction.vehicle) do
       serialize_schedule_departure_time(scheduled_departure_time)
     else

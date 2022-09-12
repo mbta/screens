@@ -1,4 +1,3 @@
-import BaseDepartureTime from "Components/eink/base_departure_time";
 import Arrow, { Direction as ArrowDirection } from "Components/solari/arrow";
 import React from "react";
 import { imagePath, classWithModifier } from "Util/util";
@@ -7,6 +6,7 @@ import {
   Direction,
   StationService,
 } from "Components/v2/cr_departures/cr_departures";
+import CRDepartureTime from "Components/v2/cr_departures/cr_departure_time";
 
 interface Props {
   departures: Departure[];
@@ -98,10 +98,17 @@ const DeparturesTable: React.ComponentType<Props> = ({
                 <div
                   className={classWithModifier(
                     "departure-time",
-                    departure.time.type === "text" ? "animated" : "static"
+                    departure.time.departure_type === "prediction" &&
+                      departure.time.departure_time.type === "text"
+                      ? "animated"
+                      : "static"
                   )}
                 >
-                  <BaseDepartureTime time={departure.time} hideAmPm />
+                  <CRDepartureTime
+                    departureType={departure.time.departure_type}
+                    time={departure.time.departure_time}
+                    isDelayed={departure.time.is_delayed}
+                  />
                 </div>
               </td>
             </tr>

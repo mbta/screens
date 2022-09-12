@@ -9,16 +9,24 @@ interface StationService {
   name: string;
   service: boolean;
 }
+
+interface DepartureTime {
+  departure_type: "prediction" | "schedule";
+  departure_time: any;
+  is_delayed: boolean;
+}
+
 interface Departure {
   arrow: string;
   headsign: {
     headsign: string;
     station_service_list: StationService[];
   };
-  time: any;
+  time: DepartureTime;
   track_number: number;
   prediction_or_schedule_id: string;
 }
+
 interface CRDeparturesProps {
   departures: Departure[];
   destination: string;
