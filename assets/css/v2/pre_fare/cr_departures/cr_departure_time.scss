@@ -32,4 +32,10 @@
       font-weight: 500;
     }
   }
+
+  .cr-departure-time__live-data-icon {
+    transform: scaleX(-1);
+    height: 36px;
+    width: 36px;
+  }
 }

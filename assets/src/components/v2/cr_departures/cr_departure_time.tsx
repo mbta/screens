@@ -46,7 +46,10 @@ const CRDepartureTime = ({
         <BaseDepartureTime time={time as TimeRepresentation} hideAmPm />
       </span>
       <span style={{ display: "inline-block", marginLeft: "19px" }}>
-        <LiveData colorHex="#737373" />
+        <LiveData
+          className="cr-departure-time__live-data-icon"
+          colorHex="#737373"
+        />
       </span>
     </div>
   );
