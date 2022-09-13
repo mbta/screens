@@ -38,7 +38,7 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
     ~E|<p>It's <%= article %> <%= eta %> minute train ride to <%= destination %>.</p>|
   end
 
-  defp render_departure(departure, previous_departure, station) do
+  defp render_departure(departure, previous_departure, station, station) do
     %{
       headsign: headsign,
       time: time,
@@ -64,30 +64,13 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
       DeparturesView.build_text([
         prefix,
         render_headsign(headsign),
-        if(time.departure_type === :schedule,
-          do: render_schedule(time),
-          else: render_prediction(time)
-        ),
+        if(time_is_arr_brd?(time), do: nil, else: scheduling_phrase(time)),
+        {time.departure_time, &render_time/1},
+        delayed_clause(time),
         track
       ])
 
     ~E|<%= content %>|
-  end
-
-  defp render_schedule(%{departure_time: departure_time, is_delayed: false}),
-    do: "is scheduled to arrive at " <> render_time(departure_time)
-
-  defp render_schedule(%{departure_time: departure_time, is_delayed: true}),
-    do:
-      "was scheduled to arrive at " <>
-        render_time(departure_time) <> ", but is currently delayed."
-
-  defp render_prediction(departure_time) do
-    [
-      if(time_is_arr_brd?(departure_time), do: nil, else: "arrives"),
-      preposition_for_time_type(departure_time),
-      {departure_time, &render_time/1}
-    ]
   end
 
   defp render_departures(departures, station) do
@@ -97,9 +80,9 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
     departures_with_index
     |> Enum.map(fn {departure, i} ->
       if i === 0 do
-        render_departure(departure, nil, station)
+        render_departure(departure, nil, station, station)
       else
-        render_departure(departure, Enum.at(departures, i - 1), station)
+        render_departure(departure, Enum.at(departures, i - 1), station, station)
       end
     end)
   end
@@ -116,9 +99,20 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
     Timex.format!(time, "{h12}:{m} {AM}")
   end
 
-  defp preposition_for_time_type(%{type: :text}), do: nil
-  defp preposition_for_time_type(%{type: :minutes}), do: "in"
-  defp preposition_for_time_type(_), do: "at"
+  defp scheduling_phrase(%{departure_type: :schedule, is_delayed: false}),
+    do: "is scheduled to arrive at"
+
+  defp scheduling_phrase(%{departure_type: :schedule, is_delayed: true}),
+    do: "was scheduled to arrive at"
+
+  defp scheduling_phrase(%{departure_time: %{type: :text}}), do: nil
+  defp scheduling_phrase(%{departure_time: %{type: :minutes}}), do: "departs in"
+  defp scheduling_phrase(_), do: "arrives at"
+
+  defp delayed_clause(%{departure_type: :schedule, is_delayed: true}),
+    do: "but is currently delayed."
+
+  defp delayed_clause(_), do: ""
 
   defp render_headsign(%{headsign: headsign, station_service_list: [station1, station2]}) do
     via_string =
