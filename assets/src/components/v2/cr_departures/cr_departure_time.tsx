@@ -40,11 +40,18 @@ const CRDepartureTime = ({
     );
   }
 
-  return (
-    <div className="cr-departure-time">
+  const predictionTime =
+    typeof time === "string" ? (
+      <span style={{ display: "inline-block" }}>{formattedTime}</span>
+    ) : (
       <span style={{ display: "inline-block" }}>
         <BaseDepartureTime time={time as TimeRepresentation} hideAmPm />
       </span>
+    );
+
+  return (
+    <div className="cr-departure-time">
+      {predictionTime}
       <span style={{ display: "inline-block", marginLeft: "19px" }}>
         <LiveData
           className="cr-departure-time__live-data-icon"
