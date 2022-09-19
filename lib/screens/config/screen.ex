@@ -28,6 +28,7 @@ defmodule Screens.Config.Screen do
           app_id: app_id(),
           refresh_if_loaded_before: DateTime.t() | nil,
           disabled: boolean(),
+          hidden_from_screenplay: boolean(),
           app_params:
             Bus.t()
             | Dup.t()
@@ -72,6 +73,7 @@ defmodule Screens.Config.Screen do
             app_id: nil,
             refresh_if_loaded_before: nil,
             disabled: false,
+            hidden_from_screenplay: false,
             app_params: nil,
             tags: []
 

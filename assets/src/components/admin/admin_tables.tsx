@@ -87,6 +87,13 @@ const AllScreensTable = (): JSX.Element => {
       FormCell: FormBoolean,
     },
     {
+      Header: "Hidden from Screenplay",
+      accessor: "hidden_from_screenplay",
+      Cell: EditableCheckbox,
+      Filter: DefaultColumnFilter,
+      FormCell: FormBoolean,
+    },
+    {
       Header: "Tags",
       accessor: "tags",
       Cell: EditableList,
