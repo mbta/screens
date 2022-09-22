@@ -71,7 +71,7 @@ requests the screens-by-alert mapping, this process provides that data.</sup>
 
 Since the primary mechanism for keeping this data source up to date is the Screens server responding to requests from Screens clients, we run into problems when a client goes down for some reason.
 
-We propose implementing a per-screen TTL and automatic self-refresh to avoid having parts of the data source go out of date.
+We propose implementing a per-screen [TTL][wiki:TTL] and automatic self-refresh to avoid having parts of the data source go out of date.
 
 More details on this in [_Shape of the data_](#shape-of-the-data) below.
 
@@ -155,3 +155,4 @@ end
 [screenplay simulation with flex widgets list]: ../assets/screenplay_simulation_with_flex_widgets_list.png
 [wiki:memoization]: https://en.wikipedia.org/wiki/Memoization
 [solution diagram]: ../assets/screenplay_screens_by_alert_implementation_diagram.png
+[wiki:TTL]: https://en.wikipedia.org/wiki/Time_to_live
