@@ -104,7 +104,7 @@ Data structure:
 ```ex
 %{
   screens_by_alert: %{alert_id => list(screen_id)},
-  timers: %{screen_id => reference()}
+  ttl_timers: %{screen_id => timer_id :: reference()}
 }
 ```
 
