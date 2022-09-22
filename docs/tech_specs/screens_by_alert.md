@@ -113,11 +113,11 @@ Sample code for the stateful process:
 def handle_cast({:put_data, screen_id, data}, state) do
   state = cancel_and_delete_ttl_timer(state, screen_id)
 
-  timer = Process.send_after(self(), {:expire_and_refresh_data, screen_id}, @ttl_ms)
+  timer_id = Process.send_after(self(), {:expire_and_refresh_data, screen_id}, @ttl_ms)
 
   state =
     state
-    |> put_ttl_timer(screen_id, timer)
+    |> put_ttl_timer(screen_id, timer_id)
     |> put_data(screen_id, data)
 
   {:noreply, state}
@@ -125,7 +125,7 @@ end
 
 
 def handle_info({:expire_and_refresh_data, screen_id}, state) do
-  timer = Process.send_after(self(), {:expire_and_refresh_data, screen_id}, @ttl_ms)
+  timer_id = Process.send_after(self(), {:expire_and_refresh_data, screen_id}, @ttl_ms)
 
   # We most likely wouldn't put the whole response data into state, but this is a simplified example.
   #
@@ -136,7 +136,7 @@ def handle_info({:expire_and_refresh_data, screen_id}, state) do
   state =
     state
     |> delete_data(screen_id)
-    |> put_ttl_timer(screen_id, timer)
+    |> put_ttl_timer(screen_id, timer_id)
     |> put_data(screen_id, data)
 
   {:noreply, state}
