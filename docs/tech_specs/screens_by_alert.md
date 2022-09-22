@@ -127,6 +127,10 @@ end
 def handle_info({:expire_and_refresh_data, screen_id}, state) do
   timer = Process.send_after(self(), {:expire_and_refresh_data, screen_id}, @ttl_ms)
 
+  # We most likely wouldn't put the whole response data into state, but this is a simplified example.
+  #
+  # We would likely also want to do this (expensive) work in a separate process to prevent the
+  # state process from being blocked while waiting for the result.
   data = ScreenData.by_screen_id(screen_id)
 
   state =
