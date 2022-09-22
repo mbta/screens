@@ -98,7 +98,7 @@ We will also most likely need to store some metadata in order to implement per-s
 
 One potential alternative to this timestamp-based approach is to schedule the
 expiration and automatic self-refresh of each piece of data at the same time
-as it's added, and cancel any scheduled expirations whenever new data comes in.
+as it's added, and cancel+reset the appropriate scheduled expiration whenever new data comes in.
 
 Data structure:
 ```ex
