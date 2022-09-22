@@ -147,6 +147,11 @@ end
 1. Is the concern about multiple prod server instances causing duplicated/incomplete data valid?\
    Is there a way to have the instances communicate to maintain a consistent and complete picture of the state, rather than having each instance independently keep its own Agent/GenServer up to date?
 2. (If we choose this approach) How to set up a Redis cache, DB, or other separate data store for use by an instance deployed to ECS?
+3. Application startup concerns and edge cases.
+   - The current implementation plan for automatic self-refresh depends on there being a pre-existing entry for a given screen, which
+     expires. If a screen client is not active at application startup, we will need a way to detect that and initiate a self-refresh some other way. (Perhaps the state can be initialized with every screen having a starting TTL of a minute or two?)
+     Is there a way to avoid this? Is there a better approach?
+   - If the mapping data is requested shortly after application startup (30 sec to 2 minutes depending on answer to previous bullet), the mapping will be incomplete. Is that ok?
 
 
 [screenplay]: https://github.com/mbta/screenplay
