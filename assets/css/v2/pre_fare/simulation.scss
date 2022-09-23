@@ -65,6 +65,10 @@
     margin-top: auto;
     margin-bottom: auto;
 
+    .alert-container--urgent {
+      background-color: unset;
+    }
+
     &:last-child {
       margin-right: 8px;
     }
