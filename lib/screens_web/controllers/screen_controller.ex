@@ -83,6 +83,7 @@ defmodule ScreensWeb.ScreenController do
         |> assign(:app_id, app_id)
         |> assign(:sentry_frontend_dsn, Application.get_env(:screens, :sentry_frontend_dsn))
         |> assign(:is_real_screen, match?(%{"is_real_screen" => "true"}, params))
+        |> assign(:source, params["source"])
         |> render("index.html")
 
       nil ->

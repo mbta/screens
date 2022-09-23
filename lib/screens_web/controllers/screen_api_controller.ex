@@ -26,10 +26,11 @@ defmodule ScreensWeb.ScreenApiController do
     end
   end
 
-  def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh}) do
+  def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
-    _ = Screens.LogScreenData.log_data_request(screen_id, last_refresh, is_screen)
+    _ =
+      Screens.LogScreenData.log_data_request(screen_id, last_refresh, is_screen, params["source"])
 
     if nonexistent_screen?(screen_id) do
       Screens.LogScreenData.log_api_response(:nonexistent, screen_id, last_refresh, is_screen)
@@ -46,10 +47,10 @@ defmodule ScreensWeb.ScreenApiController do
     end
   end
 
-  def show_dup(conn, %{"id" => screen_id, "rotation_index" => rotation_index}) do
+  def show_dup(conn, %{"id" => screen_id, "rotation_index" => rotation_index} = params) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
-    _ = Screens.LogScreenData.log_data_request(screen_id, nil, is_screen)
+    _ = Screens.LogScreenData.log_data_request(screen_id, nil, is_screen, params["source"])
 
     if nonexistent_screen?(screen_id) do
       not_found_response(conn)
