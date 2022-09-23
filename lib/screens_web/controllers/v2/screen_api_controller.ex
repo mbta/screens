@@ -24,6 +24,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
       screen_id,
       last_refresh,
       is_screen,
+      params["source"],
       screen_side
     )
 
@@ -74,7 +75,15 @@ defmodule ScreensWeb.V2.ScreenApiController do
     end
   end
 
-  def simulation(conn, %{"id" => screen_id, "last_refresh" => last_refresh}) do
+  def simulation(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
+    Screens.LogScreenData.log_data_request(
+      screen_id,
+      last_refresh,
+      false,
+      params["source"],
+      params["screen_side"]
+    )
+
     cond do
       nonexistent_screen?(screen_id) ->
         not_found_response(conn)

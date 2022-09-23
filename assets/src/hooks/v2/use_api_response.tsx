@@ -1,8 +1,8 @@
 import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useState } from "react";
-import { getDataset } from "Util/dataset";
-import { getScreenSide, isRealScreen } from "Util/util";
+import { getDataset, getDatasetValue } from "Util/dataset";
+import { getScreenSide, isDup, isRealScreen } from "Util/util";
 import * as SentryLogger from "Util/sentry";
 
 const MINUTE_IN_MS = 60_000;
@@ -116,6 +116,18 @@ const getScreenSideParam = () => {
   return screenSide ? `&screen_side=${screenSide}` : "";
 };
 
+const getSourceParam = () => {
+  // Adding this to v2 because we will eventually widgetize DUPs.
+  if (isDup()) return `&source=real_screen`;
+
+  let source = getDatasetValue("source");
+  if (!source && isRealScreen()) {
+    source = "real_screen";
+  }
+
+  return source ? `&source=${source}` : "";
+};
+
 interface UseApiResponseArgs {
   id: string;
   failureModeElapsedMs?: number;
@@ -136,6 +148,7 @@ const useBaseApiResponse = ({
 }: UseApiResponseArgs): UseApiResponseReturn => {
   const isRealScreenParam = getIsRealScreenParam();
   const screenSideParam = getScreenSideParam();
+  const sourceParam = getSourceParam();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
@@ -147,7 +160,7 @@ const useBaseApiResponse = ({
   } = getDataset();
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
-  const apiPath = `/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}`;
+  const apiPath = `/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${sourceParam}`;
 
   if (screenIdsWithOffsetMap) {
     const screens = JSON.parse(screenIdsWithOffsetMap);
