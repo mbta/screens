@@ -41,6 +41,17 @@ const useIsRealScreenParam = () => {
   return isRealScreen() ? "&is_real_screen=true" : "";
 };
 
+const useSourceParam = () => {
+  if (isDup()) return `&source=real_screen`;
+
+  let source = getDatasetValue("source");
+  if (!source && isRealScreen()) {
+    source = "real_screen";
+  }
+
+  return source ? `&source=${source}` : "";
+};
+
 interface UseApiResponseArgs {
   id: string;
   datetime?: string;
@@ -64,6 +75,7 @@ const useApiResponse = ({
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const lastRefresh = getDatasetValue("lastRefresh");
   const isRealScreenParam = useIsRealScreenParam();
+  const sourceParam = useSourceParam();
 
   const apiPath = buildApiPath({
     id,
@@ -71,6 +83,7 @@ const useApiResponse = ({
     rotationIndex,
     lastRefresh,
     isRealScreenParam,
+    sourceParam,
   });
 
   const fetchData = async () => {
@@ -127,6 +140,7 @@ interface BuildApiPathArgs {
   rotationIndex?: number;
   lastRefresh?: string;
   isRealScreenParam: string;
+  sourceParam: string;
 }
 
 const buildApiPath = ({
@@ -135,6 +149,7 @@ const buildApiPath = ({
   rotationIndex,
   lastRefresh,
   isRealScreenParam,
+  sourceParam,
 }: BuildApiPathArgs) => {
   let apiPath = `/api/screen/${id}`;
 
@@ -142,7 +157,7 @@ const buildApiPath = ({
     apiPath += `/${rotationIndex}`;
   }
 
-  apiPath += `?last_refresh=${lastRefresh}${isRealScreenParam}`;
+  apiPath += `?last_refresh=${lastRefresh}${isRealScreenParam}${sourceParam}`;
 
   if (datetime != null) {
     apiPath += `&datetime=${datetime}`;
