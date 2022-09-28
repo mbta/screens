@@ -103,16 +103,24 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
          stops_by_route_and_direction_fn \\ &RoutePattern.stops_by_route_and_direction/2,
          fetch_departures_fn \\ &Screens.V2.Departure.fetch/2
        ) do
-    {:ok, stops} = stops_by_route_and_direction_fn.(route_id, direction_id)
-    {:ok, reverse_stops} = stops_by_route_and_direction_fn.(route_id, 1 - direction_id)
-
-    {:ok, departures} =
-      fetch_departures_fn.(%{stop_ids: [station_id]},
-        include_schedules: true,
-        now: DateTime.add(now, -@scheduled_terminal_departure_lookback_seconds)
-      )
-
-    [%LineMap{screen: config, stops: stops, reverse_stops: reverse_stops, departures: departures}]
+    with {:ok, stops} <- stops_by_route_and_direction_fn.(route_id, direction_id),
+         {:ok, reverse_stops} <- stops_by_route_and_direction_fn.(route_id, 1 - direction_id),
+         {:ok, departures} <-
+           fetch_departures_fn.(%{stop_ids: [station_id]},
+             include_schedules: true,
+             now: DateTime.add(now, -@scheduled_terminal_departure_lookback_seconds)
+           ) do
+      [
+        %LineMap{
+          screen: config,
+          stops: stops,
+          reverse_stops: reverse_stops,
+          departures: departures
+        }
+      ]
+    else
+      _ -> []
+    end
   end
 
   def header_instances(config, now, fetch_destination_fn) do
