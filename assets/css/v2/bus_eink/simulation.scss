@@ -26,7 +26,7 @@
   display: flex;
   overflow-y: hidden;
   overflow-x: auto;
-  padding-bottom: 8px;
+  padding-bottom: 20px;
 
   .simulation__full-page {
     height: 480px;
@@ -45,8 +45,7 @@
   .simulation__flex-zone {
     background: #2e3f4d;
     display: flex;
-    margin-top: auto;
-    margin-bottom: auto;
+    margin: auto 2px auto 0;
     height: 316px;
     border-radius: 0 8px 8px 0;
     position: relative;

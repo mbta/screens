@@ -26,7 +26,7 @@
   display: flex;
   overflow-y: hidden;
   overflow-x: auto;
-  padding-bottom: 8px;
+  padding-bottom: 20px;
 
   .simulation__full-page {
     height: 344px;
@@ -44,8 +44,7 @@
   .simulation__flex-zone {
     background: #2e3f4d;
     display: flex;
-    margin-top: auto;
-    margin-bottom: auto;
+    margin: auto 2px auto 0;
     height: 160px;
     border-radius: 0 8px 8px 0;
     position: relative;
@@ -66,6 +65,10 @@
     height: 144px;
     margin-top: auto;
     margin-bottom: auto;
+
+    .alert-container--urgent {
+      background-color: unset;
+    }
 
     &:last-child {
       margin-right: 8px;
