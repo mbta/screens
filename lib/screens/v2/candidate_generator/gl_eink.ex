@@ -119,7 +119,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         }
       ]
     else
-      :error -> []
+      _ -> []
     end
   end
 
