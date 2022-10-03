@@ -32,6 +32,17 @@ TTL for `screens_by_alert.*` cache keys will be a number just over the "self-ref
 TTL for `screens_last_updated.*` keys will be something large, like 1 day. These values should only expire when a screen is deleted from the config and
 the self-refresh logic stops caring about it.
 
+We will use `System.monotonic_time/0` to produce timestamps for the cache. Elapsed time in seconds between two monotonic time values can be computed as follows:
+```ex
+time1 = System.monotonic_time()
+time2 = System.monotonic_time()
+
+System.convert_time_unit(time2 - time1, :native, :second)
+```
+
+[Elixir docs on monotonic time][hexdocs:monotonic time]\
+[Erlang's dos and don'ts on monotonic time][erldocs:monotonic time]
+
 <details>
   <summary>Detailed reasoning (long, sorry!)</summary>
 
@@ -110,7 +121,7 @@ The plan is broken into steps corresponding to the numbered labels in this diagr
 
 Add new terraform configuration to attach an ElastiCache service to the Screens application.
 
-[Relevant slack thread][api elasticache slack thread]
+[Relevant slack thread][api elasticache slack thread]\
 [How this is done for V3 API][api elasticache terraform config]
 
 **Note: the `cache.m3.medium` node type used in the referenced config is deprecated; we should use a different node type when setting ours up. Check with Ian on this!
@@ -131,8 +142,7 @@ The behaviour should have the following callbacks (and modules that adopt it sho
 2. Read data for one `screens_by_alert.*` cache key.
 3. Read data for one `screens_last_updated.*` cache key.
 
-[Some V3 API code that interfaces with memcached][api memcached code]
-
+[Some V3 API code that interfaces with memcached][api memcached code]\
 [List of available memcached commands][memcached commands doc]
 
 ### 3. Write new GenServer to handle "self-refresh" of expired data
@@ -160,7 +170,7 @@ If no alert IDs are provided in the request, the response JSON should contain an
 
 ### 5. Write Screenplay logic to fetch and use screens-by-alert data
 
-Write a function to fetch this data in the Screenplay client. Any Screenplay features that depend on this data can now be implemented using this function.
+TBD on how we will implement this in Screenplay. It could happen on the client or the server, and the data may be combined with other data from the V3 API or otherwise. The important thing is that the data is now available!
 
 
 [implementation diagram]: /docs/assets/screenplay_screens_by_alert_final_implementation_diagram.png
@@ -173,3 +183,5 @@ Write a function to fetch this data in the Screenplay client. Any Screenplay fea
 [api rate limiter modules]: https://github.com/mbta/api/tree/5863e82aec29f7b7fe5e13e39b2e0e39339df52d/apps/api_web/lib/api_web/rate_limiter
 [memcached commands doc]: https://github.com/memcached/memcached/wiki/Commands
 [data structure diagram]: /docs/assets/screens_by_alert_cached_data_structure.png
+[hexdocs:monotonic time]: https://hexdocs.pm/elixir/System.html#module-time
+[erldocs:monotonic time]: https://www.erlang.org/doc/apps/erts/time_correction.html#how-to-work-with-the-new-api
