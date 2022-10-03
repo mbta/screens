@@ -17,7 +17,7 @@ Cached values will be as follows, defined as Elixir typespecs:
 ```ex
 @type alert_id :: String.t()
 @type screen_id :: String.t()
-@type timestamp :: DateTime.t()
+@type timestamp :: integer()  # we'll use System.monotonic_time/0 to produce these
 @type timestamped_screen_id :: {screen_id, timestamp}
 
 @type cache :: %{
