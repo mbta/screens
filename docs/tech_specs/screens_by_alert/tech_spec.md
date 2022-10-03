@@ -35,6 +35,8 @@ the self-refresh logic stops caring about it.
 <details>
   <summary>Detailed reasoning (long, sorry!)</summary>
 
+  - - -
+
   ## What we're _not_ doing, and why
 
   Ideally, the data structure being stored is a "bipartite graph", or a "bidirectional map". We need to be able to look up values in two directions:
@@ -63,6 +65,8 @@ the self-refresh logic stops caring about it.
 
   In order to track when each screen update last happened and make the "self-refresh" mechanism possible, we will also store screen ID => timestamp values.
 
+  - - -
+
 </details>
 
 ### Serialization format
@@ -79,6 +83,8 @@ Memcache.start_link([coder: {Memcache.Coder.Erlang, [:safe]}], <genserver_opts>)
 <details>
   <summary>Reasoning</summary>
 
+  - - -
+
   Since the following are true:
   - The cache is only accessible to our application; that is, it's a trusted source
   - The cache is only used to store and retrieve Elixir terms
@@ -88,6 +94,8 @@ Memcache.start_link([coder: {Memcache.Coder.Erlang, [:safe]}], <genserver_opts>)
 
   1. Serialization/deserialization runs about twice as fast as `Jason.encode!/1` and `Jason.decode!/1`, per some quick tests I ran
   2. We aren't limited to JSON-serializable values. We can store and retrieve structs unchanged—e.g. `DateTime`s and `MapSet`s—as well as maps with atom keys, without any extra logic on the deserialization side. `:erlang.binary_to_term/2` will fully restore any term for us.
+
+  - - -
 
 </details>
 
