@@ -1,4 +1,4 @@
-# Screens by alert real-time data source
+# Screens by alert real-time data source - problem description & proposed solution
 
 ## The need
 [Screenplay][screenplay] designs include several features that **depend on the ability to know, in real time,
@@ -153,11 +153,20 @@ end
      Is there a way to avoid this? Is there a better approach?
    - If the mapping data is requested shortly after application startup (30 sec to 2 minutes depending on answer to previous bullet), the mapping will be incomplete. Is that ok?
 
+---
+
+## Feedback from discussion
+
+- The general approach looks good
+- Normally would not recommend self-refreshes/"pretend requests", but given the product needs of Screenplay it makes sense
+- Recommends keeping the cached values in memcached or redis (memcached is probably enough for our needs) to avoid the issues highlighted in the doc re: multiple server instances keeping separate state in memory
+- Recommends implementing TTL as "last_updated" timestamps. Server will periodically read the cache data and do self-refreshes for any values that are past a given age, to keep them up to date
+  - It's ok for some duplicated work to happen here. We hopefully do not have too many broken/malfunctioning screens at any given moment.
 
 [screenplay]: https://github.com/mbta/screenplay
 [screenplay design]: https://github.com/mbta/screenplay
-[screenplay places with alert]: ../assets/screenplay_places_with_alert.png
-[screenplay simulation with flex widgets list]: ../assets/screenplay_simulation_with_flex_widgets_list.png
+[screenplay places with alert]: /docs/assets/screenplay_places_with_alert.png
+[screenplay simulation with flex widgets list]: /docs/assets/screenplay_simulation_with_flex_widgets_list.png
 [wiki:memoization]: https://en.wikipedia.org/wiki/Memoization
-[solution diagram]: ../assets/screenplay_screens_by_alert_implementation_diagram.png
+[solution diagram]: /docs/assets/screenplay_screens_by_alert_proposed_implementation_diagram.png
 [wiki:TTL]: https://en.wikipedia.org/wiki/Time_to_live
