@@ -97,8 +97,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
       route_pills: serialize_route_pills(t),
       icon: serialize_icon(e),
       header: serialize_header(e),
-      body: t.alert.header,
-      url: clean_up_url(t.alert.url || "mbta.com/alerts")
+      body: t.alert.header
     }
   end
 
@@ -131,14 +130,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   for {e, icon} <- @effect_icons do
     defp serialize_icon(unquote(e)), do: unquote(icon)
-  end
-
-  # Removes leading scheme specifier ("http[s]"), www. prefix, and trailing "/" from url.
-  defp clean_up_url(url) do
-    url
-    |> String.replace(~r|^https?://|i, "")
-    |> String.replace(~r|^www\.|i, "")
-    |> String.replace(~r|/$|, "")
   end
 
   def slot_names(t) do

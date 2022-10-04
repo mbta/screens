@@ -11,7 +11,6 @@ interface Props {
   icon: AlertIcon;
   header: string;
   body: string;
-  url: string;
 }
 
 interface BaseAlertProps {
@@ -31,7 +30,7 @@ type AlertIcon = "bus" | "x" | "warning" | "snowflake";
 
 const BaseAlert: ComponentType<BaseAlertProps> = ({
   classModifier,
-  alertProps: { route_pills: routePills, icon, header, body, url },
+  alertProps: { route_pills: routePills, icon, header, body },
   CardComponent,
   LinkArrowComponent,
   bodyTextMaxHeight,
@@ -73,7 +72,7 @@ const BaseAlert: ComponentType<BaseAlertProps> = ({
                 <LinkArrowComponent />
               </div>
             )}
-            <div className="alert-widget__content__cta__url">{url}</div>
+            <div className="alert-widget__content__cta__url">mbta.com/alerts</div>
           </div>
         </div>
       </CardComponent>
