@@ -5,6 +5,8 @@
 Screenplay (and maybe other services, in the future) needs real-time insight into which screens are
 displaying info about a given service alert.
 
+As an added requirement, this data should represent the "idealized state" of the screens ecosystem—that is, if a particular screen client is down for some reason (hardware issues, network issues, a client code bug that we haven't addressed yet), the data should still represent what that screen _would be_ showing if the client were running properly.
+
 ## High-level architecture
 
 To store and provide this new data, we will add a new caching layer to the Screens application.
