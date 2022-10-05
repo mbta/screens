@@ -27,22 +27,6 @@ Cached values will be as follows, defined as Elixir typespecs:
 }
 ```
 
-TTL for `screens_by_alert.*` cache keys will be a number just over the "self-refresh" interval, so that in the case of a screen client going down we don't inaccurately report it as showing no alerts for a short period before the "self-refresh" mechanism kicks in.
-
-TTL for `screens_last_updated.*` keys will be something large, like 1 day. These values should only expire when a screen is deleted from the config and
-the self-refresh logic stops caring about it.
-
-We will use `System.monotonic_time/0` to produce timestamps for the cache. Elapsed time in seconds between two monotonic time values can be computed as follows:
-```ex
-time1 = System.monotonic_time()
-time2 = System.monotonic_time()
-
-System.convert_time_unit(time2 - time1, :native, :second)
-```
-
-[Elixir docs on monotonic time][hexdocs:monotonic time]\
-[Erlang's dos and don'ts on monotonic time][erldocs:monotonic time]
-
 <details>
   <summary>Detailed reasoning (long, sorry!)</summary>
 
@@ -79,6 +63,37 @@ System.convert_time_unit(time2 - time1, :native, :second)
   - - -
 
 </details>
+
+### Timers and TTLs
+
+In addition to the actual structure of the data being stored in the cache, we also need to carefully choose various timings and cache TTLs to properly keep that data up to date.
+
+TTLs in our case are also somewhat tricky, because some of them will be carried out internally by memcached, and others will need to be carried out by us in Elixir code.
+
+**Timers**
+| timer | interval (sec) | Why? |
+| - | - | - |
+| "self-refresh" job-runner GenServer | 70 | Job should give the slowest screen clients (e-ink, 30 sec refresh rate) time to retry after 1 missing request. |
+
+**TTLs**
+| value | Handled by | TTL (sec) | Why? |
+| - | - | - | - |
+| `screens_by_alert.*` cache items | memcached | 75 seconds | A key should expire shortly after a self-refresh runs without updating that key. |
+| screen IDs listed under a `screens_by_alert.*` key | application logic | 75 seconds | A screen ID should expire from the list shortly after a self-refresh runs without reaffirming the ID's place in the list. |
+| `screens_last_updated.*` cache items | memcached | 1 hour to 1 day | Value not very important as we will just stop looking up screen IDs that have been removed from the config/hidden from Screenplay. TTL is mainly for "cleanup" purposes |
+
+TTLs handled by our application logic will be implemented by storing timestamp values in the cache, and comparing those timestamps with the current time when we read them again sometime later.
+
+We will use `System.monotonic_time/0` to produce timestamps. Elapsed time in seconds between two monotonic time values can be computed as follows:
+```ex
+time1 = System.monotonic_time()
+time2 = System.monotonic_time()
+
+System.convert_time_unit(time2 - time1, :native, :second)
+```
+
+[Elixir docs on monotonic time][hexdocs:monotonic time]\
+[Erlang's dos and don'ts on monotonic time][erldocs:monotonic time]
 
 ### Serialization format
 
