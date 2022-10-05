@@ -181,7 +181,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
         ],
         icon: :x,
         header: "Stop Closed",
-        body: "Stop is closed."
+        body: "Stop is closed.",
+        url: "mbta.com/alerts"
       }
 
       assert expected_json_map == AlertWidget.serialize(widget)
@@ -198,7 +199,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
         ],
         icon: :x,
         header: "Stop Closed",
-        body: "Stop is closed."
+        body: "Stop is closed.",
+        url: "mbta.com/alerts"
       }
 
       assert expected_json_map == AlertWidget.serialize(widget)
@@ -220,7 +222,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
         route_pills: [%{type: :icon, icon: :bus, color: :yellow}],
         icon: :x,
         header: "Stop Closed",
-        body: "Stop is closed."
+        body: "Stop is closed.",
+        url: "mbta.com/alerts"
       }
 
       assert expected_json_map == AlertWidget.serialize(widget)
