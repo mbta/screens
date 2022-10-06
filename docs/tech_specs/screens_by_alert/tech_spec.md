@@ -75,16 +75,16 @@ TTLs in our case are also somewhat tricky, because some of them will be carried 
 **Timers**
 | timer | interval (sec) | Why? |
 | - | - | - |
-| "self-refresh" job-runner GenServer | 70 | Job should give the slowest screen clients (e-ink, 30 sec refresh rate) time to retry after 1 missing request. |
+| "self-refresh" job-runner GenServer | 35 | Job should give the slowest screen clients (e-ink, 30 sec refresh rate) time to make their requests. |
 
 **TTLs**
 | value | Handled by | TTL (sec) | Why? |
 | - | - | - | - |
-| `screens_by_alert.*` cache items | memcached | 75 seconds | A key should expire shortly after a self-refresh runs without updating that key. |
-| screen IDs listed under a `screens_by_alert.*` key | application logic | 75 seconds | A screen ID should expire from the list shortly after a self-refresh runs without reaffirming the ID's place in the list. |
+| `screens_by_alert.*` cache items | memcached | 40 seconds | A key should expire shortly after a self-refresh runs without updating that key. |
+| screen IDs listed under a `screens_by_alert.*` key | application logic | 40 seconds | A screen ID should expire from the list shortly after a self-refresh runs without reaffirming the ID's place in the list. |
 | `screens_last_updated.*` cache items | memcached | 1 hour to 1 day | Value not very important as we will just stop looking up screen IDs that have been removed from the config/hidden from Screenplay. TTL is mainly for "cleanup" purposes |
 
-TTLs handled by our application logic will be implemented by storing timestamp values in the cache, and comparing those timestamps with the current time when we read them again sometime later.
+TTLs handled by our application logic will be implemented by storing timestamp values in the cache, and comparing those timestamps with the current time when we read them again sometime later. I.e., whenever we update the list of screen IDs under an alert ID key, we'll also clear out any expired items. This cleanup can also happen when the list is read while responding to a `GET /api/screens_by_alert` request.
 
 We will use `System.system_time(:second)` to produce unix timestamps. Elapsed time in seconds between two unix timestamps can be computed as follows:
 ```ex
