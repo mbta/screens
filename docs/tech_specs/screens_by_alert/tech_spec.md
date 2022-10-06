@@ -86,12 +86,12 @@ TTLs in our case are also somewhat tricky, because some of them will be carried 
 
 TTLs handled by our application logic will be implemented by storing timestamp values in the cache, and comparing those timestamps with the current time when we read them again sometime later.
 
-We will use `System.monotonic_time/0` to produce timestamps. Elapsed time in seconds between two monotonic time values can be computed as follows:
+We will use `System.system_time(:second)` to produce unix timestamps. Elapsed time in seconds between two unix timestamps can be computed as follows:
 ```ex
-time1 = System.monotonic_time()
-time2 = System.monotonic_time()
+time1 = System.system_time(:second)
+time2 = System.system_time(:second)
 
-System.convert_time_unit(time2 - time1, :native, :second)
+time2 - time1
 ```
 
 [Elixir docs on monotonic time][hexdocs:monotonic time]\
