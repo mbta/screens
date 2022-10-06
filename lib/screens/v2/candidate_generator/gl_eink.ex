@@ -195,14 +195,14 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
 
     Enum.map(sections, fn
       {:ok, departures} when length(departures) <= 1 ->
-        {:ok, format_headway(route_id, stop_id, direction_id, departures)}
+        format_headway(route_id, stop_id, direction_id, departures)
 
       {:ok, departures} ->
         {:ok, departures}
 
       # Show headway instead of nothing when API fetch fails
       :error ->
-        {:ok, format_headway(route_id, stop_id, direction_id)}
+        format_headway(route_id, stop_id, direction_id)
     end)
   end
 
@@ -214,19 +214,20 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         :overnight
 
       headway ->
-        departures_to_concat ++
-          [
-            %{
-              text: %FreeTextLine{
-                icon: nil,
-                text: [
-                  "Trains to #{destination} every",
-                  %{format: :bold, text: "#{headway - 2}-#{headway + 2}"},
-                  "minutes"
-                ]
-              }
-            }
-          ]
+        {:ok,
+         departures_to_concat ++
+           [
+             %{
+               text: %FreeTextLine{
+                 icon: nil,
+                 text: [
+                   "Trains to #{destination} every",
+                   %{format: :bold, text: "#{headway - 2}-#{headway + 2}"},
+                   "minutes"
+                 ]
+               }
+             }
+           ]}
     end
   end
 end
