@@ -3,6 +3,15 @@ defmodule Screens.ScreensByAlert do
     Tracks visible alerts by screen.
 
     The ScreensByAlert server will keep track of all alerts that are currently visible on a screen.
+
+    ### Cache data structure shape:
+    ```
+      %{
+        "screens_by_alert." <> alert_id => list(timestamped_screen_id),
+        # metadata to make the "self-refresh" mechanism possible
+        "screens_last_updated." <> screen_id => timestamp
+      }
+    ```
   """
 
   @behaviour Screens.ScreensByAlert.Behaviour
