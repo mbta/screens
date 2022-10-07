@@ -7,9 +7,9 @@ defmodule Screens.ScreensByAlert.Memcache do
 
   @impl true
   def start_link(_opts \\ []) do
-    connection_opts = Screens.Application.config(ScreensByAlert.Memcache, :connection_opts)
+    {:ok, config} = Application.fetch_env(:screens, ScreensByAlert.Memcache)
 
-    Memcache.start_link(connection_opts)
+    Memcache.start_link(config[:connection_opts])
   end
 
   @impl true

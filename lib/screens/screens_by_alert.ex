@@ -15,7 +15,7 @@ defmodule Screens.ScreensByAlert do
   """
 
   @behaviour Screens.ScreensByAlert.Behaviour
-  @cache_module Screens.Application.config(:screens_by_alert, :cache_module)
+  @cache_module Application.compile_env(:screens, :screens_by_alert)[:cache_module]
 
   # Need to define a child_spec since this module does not itself use GenServer or Supervisor,
   # but is a simple wrapper for @cache_module

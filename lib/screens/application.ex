@@ -38,34 +38,4 @@ defmodule Screens.Application do
     ScreensWeb.Endpoint.config_change(changed, removed)
     :ok
   end
-
-  @doc """
-  Fetches a configuration value and raises if missing.
-
-  ## Examples
-
-      iex> Screens.Application.config(ScreensByAlert.Memcache, :connection_opts)
-      [
-        namespace: "localhost:4000",
-        hostname: "localhost"
-      ]
-  """
-  def config(root_key, sub_key) do
-    root_key
-    |> config()
-    |> Keyword.fetch(sub_key)
-    |> case do
-      {:ok, val} ->
-        val
-
-      :error ->
-        raise """
-        missing :screens mix configuration for key #{sub_key}
-        """
-    end
-  end
-
-  def config(root_key) do
-    Application.fetch_env!(:screens, root_key)
-  end
 end
