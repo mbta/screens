@@ -14,7 +14,7 @@ defmodule Screens.ScreensByAlert.Behaviour do
   @type timestamp :: integer()
   @type timestamped_screen_id :: {screen_id, timestamp}
 
-  @callback start_link(Keyword.t()) :: {:ok, pid}
+  @callback start_link(Keyword.t()) :: {:ok, pid()}
   @callback put_data(screen_id(), list(alert_id())) :: :ok
   @callback get_screens_by_alert(alert_id()) :: list(timestamped_screen_id())
   @callback get_screens_last_updated(screen_id()) :: timestamp()
