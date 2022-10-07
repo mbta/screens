@@ -6,6 +6,19 @@ defmodule Screens.ScreensByAlert.GenServer do
   @behaviour Screens.ScreensByAlert.Behaviour
   use GenServer
 
+  @type screen_id :: String.t()
+  @type alert_id :: String.t()
+  @type timestamp :: integer()
+
+  @type state :: t | :error
+
+  @type t :: %__MODULE__{
+          screens_by_alert: %{alert_id() => list(screen_id())},
+          screens_last_updated: %{screen_id() => timestamp()}
+        }
+
+  defstruct screens_by_alert: %{}, screens_last_updated: %{}
+
   @impl Screens.ScreensByAlert.Behaviour
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, :ok, opts)
@@ -28,9 +41,7 @@ defmodule Screens.ScreensByAlert.GenServer do
 
   @impl GenServer
   def init(:ok) do
-    state = %{}
-
-    {:ok, state}
+    {:ok, %__MODULE__{}}
   end
 
   @impl GenServer
