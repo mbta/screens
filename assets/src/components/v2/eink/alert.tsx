@@ -3,10 +3,15 @@ import React, { ComponentType } from "react";
 import BaseAlert, { Props, AlertCardProps, AlertIcon } from "Components/v2/alert";
 import LinkArrow from "Components/v2/bundled_svg/link_arrow";
 
+// E-Ink alert widget always displays the same URL, even when a different one
+// is supplied in the alert data. This is because we can't dynamically resize
+// the right-pointing arrow that shares the line with the URL.
+const propsWithStaticUrl = (props: Props): Props => ({ ...props, url: "mbta.com/alerts" });
+
 const MediumFlexAlert: ComponentType<Props> = (props) => {
   return (
     <BaseAlert
-      alertProps={props}
+      alertProps={propsWithStaticUrl(props)}
       classModifier="flex-zone"
       CardComponent={MediumFlexAlertCard}
       LinkArrowComponent={() => <LinkArrow width={473} colorHex="#ffffff" />}
@@ -19,7 +24,7 @@ const MediumFlexAlert: ComponentType<Props> = (props) => {
 const FullBodyTopScreenAlert: ComponentType<Props> = (props) => {
   return (
     <BaseAlert
-      alertProps={props}
+      alertProps={propsWithStaticUrl(props)}
       classModifier="full-body"
       CardComponent={FullBodyTopScreenAlertCard}
       LinkArrowComponent={() => <LinkArrow width={422} colorHex="#000000" />}
