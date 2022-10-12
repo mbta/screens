@@ -15,7 +15,14 @@ defmodule Screens.ScreensByAlert.Behaviour do
   @type timestamped_screen_id :: {screen_id, timestamp}
 
   @callback start_link(Keyword.t()) :: {:ok, pid()}
+
+  @doc """
+  Takes a screen ID and a list of alert IDs as parameters. With these, it will get an existing object
+  or create a new object in the cache using each alert_id. The key of each object is the `alert_id`, the value
+  is the list of `screen_id`s.
+  """
   @callback put_data(screen_id(), list(alert_id())) :: :ok
+
   @callback get_screens_by_alert(alert_id()) :: list(timestamped_screen_id())
   @callback get_screens_last_updated(screen_id()) :: timestamp()
 end
