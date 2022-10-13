@@ -64,12 +64,6 @@ config :sentry,
 config :ueberauth, Ueberauth.Strategy.Cognito, client_secret: cognito_client_secret
 config :screens, ScreensWeb.AuthManager, secret_key: screens_auth_secret
 
-config :screens, ScreensByAlert.Memcache,
-  connection_opts: [
-    namespace: System.get_env("HOST"),
-    hostname: System.get_env("MEMCACHED_HOST")
-  ]
-
 # ## Using releases (Elixir v1.9+)
 #
 # If you are doing OTP releases, you need to instruct Phoenix

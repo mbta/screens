@@ -77,8 +77,7 @@ defmodule Screens.MixProject do
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
       {:sentry, "~> 8.0"},
       {:retry, "~> 0.16.0"},
-      {:stream_data, "~> 0.5", only: :test},
-      {:memcachex, "~> 0.5.4"}
+      {:stream_data, "~> 0.5", only: :test}
     ]
   end
 end
