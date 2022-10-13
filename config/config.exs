@@ -194,8 +194,6 @@ config :screens,
     ]
   }
 
-config :screens, :screens_by_alert, cache_module: Screens.ScreensByAlert.GenServer
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
