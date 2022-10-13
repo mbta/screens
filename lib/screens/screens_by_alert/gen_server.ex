@@ -50,12 +50,33 @@ defmodule Screens.ScreensByAlert.GenServer do
   end
 
   @impl GenServer
-  def handle_call({:get_screens_by_alert, _alert_id}, _from, state) do
-    {:reply, [], state}
+  def handle_call(
+        {:get_screens_by_alert, alert_id},
+        _from,
+        %__MODULE__{
+          screens_by_alert: screens_by_alert,
+          screens_last_updated: screens_last_updated
+        } = state
+      ) do
+    result =
+      screens_by_alert
+      |> Map.get(alert_id, [])
+      |> Enum.map(fn screen_id ->
+        last_updated = Map.get(screens_last_updated, screen_id)
+        {screen_id, last_updated}
+      end)
+
+    {:reply, result, state}
   end
 
   @impl GenServer
-  def handle_call({:get_screens_last_updated, _screen_id}, _from, state) do
-    {:reply, 0, state}
+  def handle_call(
+        {:get_screens_last_updated, screen_id},
+        _from,
+        %__MODULE__{
+          screens_last_updated: screens_last_updated
+        } = state
+      ) do
+    {:reply, Map.get(screens_last_updated, screen_id), state}
   end
 end
