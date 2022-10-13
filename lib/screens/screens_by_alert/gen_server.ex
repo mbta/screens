@@ -45,8 +45,29 @@ defmodule Screens.ScreensByAlert.GenServer do
   end
 
   @impl GenServer
-  def handle_call({:put_data, _screen_id, _alert_ids}, _from, state) do
-    {:reply, :ok, state}
+  def handle_call(
+        {:put_data, screen_id, alert_ids},
+        _from,
+        %__MODULE__{
+          screens_by_alert: screens_by_alert,
+          screens_last_updated: screens_last_updated
+        }
+      ) do
+    updated_screens_by_alert =
+      alert_ids
+      |> Enum.map(fn alert_id ->
+        {alert_id, [screen_id]}
+      end)
+      |> Map.new()
+      |> Map.merge(screens_by_alert, fn _key, screen_ids1, screen_ids2 ->
+        Enum.uniq(screen_ids1 ++ screen_ids2)
+      end)
+
+    {:reply, :ok,
+     %__MODULE__{
+       screens_by_alert: updated_screens_by_alert,
+       screens_last_updated: Map.put(screens_last_updated, screen_id, System.system_time(:second))
+     }}
   end
 
   @impl GenServer
