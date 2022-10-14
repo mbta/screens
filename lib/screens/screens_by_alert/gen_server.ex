@@ -13,15 +13,23 @@ defmodule Screens.ScreensByAlert.GenServer do
   @type state :: t | :error
 
   @type t :: %__MODULE__{
-          screens_by_alert: %{alert_id() => list(screen_id())},
-          screens_last_updated: %{screen_id() => timestamp()}
+          screens_by_alert: %{
+            alert_id() => %{screen_ids: list(screen_id()), created_at: timestamp()}
+          },
+          screens_last_updated: %{screen_id() => timestamp()},
+          screens_by_alert_ttl_seconds: non_neg_integer(),
+          screens_last_updated_ttl_seconds: non_neg_integer()
         }
 
-  defstruct screens_by_alert: %{}, screens_last_updated: %{}
+  @enforce_keys [:screens_by_alert_ttl_seconds, :screens_last_updated_ttl_seconds]
+  defstruct screens_by_alert: %{},
+            screens_last_updated: %{},
+            screens_by_alert_ttl_seconds: nil,
+            screens_last_updated_ttl_seconds: nil
 
   @impl Screens.ScreensByAlert.Behaviour
   def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok, opts)
+    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
   @impl Screens.ScreensByAlert.Behaviour
@@ -40,8 +48,12 @@ defmodule Screens.ScreensByAlert.GenServer do
   end
 
   @impl GenServer
-  def init(:ok) do
-    {:ok, %__MODULE__{}}
+  def init(opts) do
+    {:ok,
+     %__MODULE__{
+       screens_by_alert_ttl_seconds: opts[:screens_by_alert_ttl_seconds],
+       screens_last_updated_ttl_seconds: opts[:screens_last_updated_ttl_seconds]
+     }}
   end
 
   @impl GenServer
@@ -51,22 +63,27 @@ defmodule Screens.ScreensByAlert.GenServer do
         %__MODULE__{
           screens_by_alert: screens_by_alert,
           screens_last_updated: screens_last_updated
-        }
+        } = state
       ) do
     updated_screens_by_alert =
       alert_ids
       |> Enum.map(fn alert_id ->
-        {alert_id, [screen_id]}
+        {alert_id, %{screen_ids: [screen_id], created_at: System.system_time(:second)}}
       end)
       |> Map.new()
-      |> Map.merge(screens_by_alert, fn _key, screen_ids1, screen_ids2 ->
-        Enum.uniq(screen_ids1 ++ screen_ids2)
+      |> Map.merge(screens_by_alert, fn
+        _, %{screen_ids: screens1, created_at: created_at}, %{screen_ids: screens2} ->
+          %{screen_ids: Enum.uniq(screens1 ++ screens2), created_at: created_at}
       end)
+
+    updated_screens_last_updated =
+      Map.put(screens_last_updated, screen_id, System.system_time(:second))
 
     {:reply, :ok,
      %__MODULE__{
-       screens_by_alert: updated_screens_by_alert,
-       screens_last_updated: Map.put(screens_last_updated, screen_id, System.system_time(:second))
+       state
+       | screens_by_alert: updated_screens_by_alert,
+         screens_last_updated: updated_screens_last_updated
      }}
   end
 
@@ -80,12 +97,17 @@ defmodule Screens.ScreensByAlert.GenServer do
         } = state
       ) do
     result =
-      screens_by_alert
-      |> Map.get(alert_id, [])
-      |> Enum.map(fn screen_id ->
-        last_updated = Map.get(screens_last_updated, screen_id)
-        {screen_id, last_updated}
-      end)
+      case Map.get(screens_by_alert, alert_id) do
+        %{screen_ids: screen_ids} ->
+          Enum.map(screen_ids, fn
+            screen_id when screen_ids != [] ->
+              last_updated = Map.get(screens_last_updated, screen_id)
+              {screen_id, last_updated}
+          end)
+
+        _ ->
+          []
+      end
 
     {:reply, result, state}
   end
