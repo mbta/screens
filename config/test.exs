@@ -31,8 +31,7 @@ config :ueberauth, Ueberauth,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
-config :screens, ScreensByAlert.Memcache,
-  connection_opts: [
-    namespace: "api_test_rate_limit",
-    hostname: "localhost"
-  ]
+config :screens, :screens_by_alert,
+  cache_module: Screens.ScreensByAlert.Memcache,
+  screens_by_alert_ttl_seconds: 1,
+  screens_last_updated_ttl_seconds: 3

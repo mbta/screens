@@ -24,7 +24,10 @@ config :ehmon, :report_mf, {:ehmon, :info_report}
 config :screens,
   record_sentry: true
 
-config :screens, :screens_by_alert, cache_module: Screens.ScreensByAlert.Memcache
+config :screens, :screens_by_alert,
+  cache_module: Screens.ScreensByAlert.Memcache,
+  screens_by_alert_ttl_seconds: 40,
+  screens_last_updated_ttl_seconds: 3600
 
 # ## SSL Support
 #
