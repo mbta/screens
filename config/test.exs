@@ -32,6 +32,6 @@ config :ueberauth, Ueberauth,
 config :logger, level: :warn
 
 config :screens, :screens_by_alert,
-  cache_module: Screens.ScreensByAlert.Memcache,
+  cache_module: Screens.ScreensByAlert.GenServer,
   screens_by_alert_ttl_seconds: 1,
   screens_last_updated_ttl_seconds: 3
