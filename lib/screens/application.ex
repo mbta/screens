@@ -22,7 +22,8 @@ defmodule Screens.Application do
       :hackney_pool.child_spec(:blue_bikes_pool, []),
       :hackney_pool.child_spec(:api_v3_pool, max_connections: 100),
       {Screens.Stops.StationsWithRoutesAgent, %{}},
-      {Screens.BlueBikes.State, name: Screens.BlueBikes.State}
+      {Screens.BlueBikes.State, name: Screens.BlueBikes.State},
+      Screens.ScreensByAlert
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
