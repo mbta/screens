@@ -26,7 +26,7 @@
     "react-router-dom": "^5.2.0",
     "react-table": "^7.7.0",
     "react-transition-group": "^4.4.2",
-    "regenerator-runtime": "^0.13.7"
+    "regenerator-runtime": "^0.13.10"
   },
   "devDependencies": {
     "@babel/core": "^7.14.8",
