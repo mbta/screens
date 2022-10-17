@@ -133,4 +133,10 @@ defmodule ScreensWeb.Router do
 
     get "/:id", AlertPriorityController, :show
   end
+
+  scope "/api", ScreensWeb do
+    pipe_through [:redirect_prod_http, :api]
+
+    get "/screens_by_alert", ScreensByAlertController, :index
+  end
 end
