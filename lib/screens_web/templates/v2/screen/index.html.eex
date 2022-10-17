@@ -13,5 +13,5 @@
   <%= if record_sentry?() do %>
     data-sentry="<%= @sentry_frontend_dsn %>"
   <% end %>
-  data-source="<%= @source %>"
+  data-requestor="<%= @requestor %>"
 ></div>
