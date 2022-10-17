@@ -3,7 +3,7 @@
   data-last-refresh="<%= @last_refresh %>"
   data-environment-name="<%= @environment_name %>"
   data-is-real-screen="<%= @is_real_screen %>"
-  data-source="<%= @source %>"
+  data-requestor="<%= @requestor %>"
   <%= if record_sentry?() do %>
     data-sentry="<%= @sentry_frontend_dsn %>"
   <% end %>
