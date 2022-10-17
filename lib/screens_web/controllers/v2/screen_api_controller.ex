@@ -24,7 +24,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
       screen_id,
       last_refresh,
       is_screen,
-      params["source"],
+      params["requestor"],
       screen_side
     )
 
@@ -80,7 +80,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
       screen_id,
       last_refresh,
       false,
-      params["source"],
+      params["requestor"],
       params["screen_side"]
     )
 
