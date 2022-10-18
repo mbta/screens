@@ -84,6 +84,7 @@ defmodule ScreensWeb.V2.ScreenController do
         |> assign(:is_real_screen, match?(%{"is_real_screen" => "true"}, params))
         |> assign(:screen_side, screen_side(params))
         |> assign(:requestor, params["requestor"])
+        |> assign(:disable_sentry, params["disable_sentry"])
         |> put_view(ScreensWeb.V2.ScreenView)
         |> render("index.html")
 
