@@ -10,8 +10,6 @@ defmodule Screens.ScreensByAlert.GenServer do
   @type alert_id :: String.t()
   @type timestamp :: integer()
 
-  @type state :: t | :error
-
   @type t :: %__MODULE__{
           screens_by_alert: %{
             alert_id() => %{screen_ids: list(screen_id()), created_at: timestamp()}
