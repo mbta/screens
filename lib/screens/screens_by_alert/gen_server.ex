@@ -25,6 +25,8 @@ defmodule Screens.ScreensByAlert.GenServer do
             screens_by_alert_ttl_seconds: nil,
             screens_last_updated_ttl_seconds: nil
 
+  ### Client
+
   @impl Screens.ScreensByAlert.Behaviour
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
@@ -44,6 +46,8 @@ defmodule Screens.ScreensByAlert.GenServer do
   def get_screens_last_updated(pid \\ __MODULE__, screen_id) do
     GenServer.call(pid, {:get_screens_last_updated, screen_id})
   end
+
+  ### Server
 
   @impl GenServer
   def init(opts) do
