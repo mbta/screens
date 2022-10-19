@@ -13,14 +13,14 @@ defmodule Screens.ScreensByAlertTest do
 
   describe "start_link/1" do
     test "returns {:ok, pid} when start_link is called" do
-      assert {:ok, pid} = ScreensByAlert.start_link()
+      assert {:ok, pid} = ScreensByAlert.start_link([])
       on_exit(fn -> Process.exit(pid, :done) end)
     end
   end
 
   describe "put_data/2" do
     test "returns :ok" do
-      {:ok, pid} = ScreensByAlert.start_link()
+      {:ok, pid} = ScreensByAlert.start_link([])
       assert :ok = ScreensByAlert.put_data(1, [1])
       on_exit(fn -> Process.exit(pid, :done) end)
     end
@@ -28,7 +28,7 @@ defmodule Screens.ScreensByAlertTest do
 
   describe "get_screens_by_alert/1" do
     setup do
-      {:ok, pid} = ScreensByAlert.start_link()
+      {:ok, pid} = ScreensByAlert.start_link([])
       ScreensByAlert.put_data(1, [1])
       on_exit(fn -> Process.exit(pid, :done) end)
 
@@ -50,7 +50,7 @@ defmodule Screens.ScreensByAlertTest do
 
   describe "get_screens_last_updated/1" do
     setup do
-      {:ok, pid} = ScreensByAlert.start_link()
+      {:ok, pid} = ScreensByAlert.start_link([])
       ScreensByAlert.put_data(1, [1])
       on_exit(fn -> Process.exit(pid, :done) end)
 
