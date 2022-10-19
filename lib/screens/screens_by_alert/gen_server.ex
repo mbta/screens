@@ -82,7 +82,7 @@ defmodule Screens.ScreensByAlert.GenServer do
         _,
         %{screen_ids: screens1, timer_reference: new_timer},
         %{screen_ids: screens2, timer_reference: old_timer} ->
-          Process.cancel_timer(old_timer)
+          _ = Process.cancel_timer(old_timer)
           %{screen_ids: Enum.uniq(screens1 ++ screens2), timer_reference: new_timer}
       end)
 
@@ -162,9 +162,10 @@ defmodule Screens.ScreensByAlert.GenServer do
     existing_last_updated = Map.get(screens_last_updated, screen_id)
 
     # Cancel existing timer is screen_id was already in map.
-    if not is_nil(existing_last_updated) do
-      Process.cancel_timer(existing_last_updated.timer_reference)
-    end
+    _ =
+      if not is_nil(existing_last_updated) do
+        Process.cancel_timer(existing_last_updated.timer_reference)
+      end
 
     # Create a new timer to expire object in #{screens_last_updated_ttl_seconds} seconds
     reference =
