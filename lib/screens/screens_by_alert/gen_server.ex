@@ -110,10 +110,9 @@ defmodule Screens.ScreensByAlert.GenServer do
     result =
       case Map.get(state.screens_by_alert, alert_id) do
         %{screen_ids: screen_ids} ->
-          Enum.map(screen_ids, fn
-            screen_id when screen_ids != [] ->
-              %{last_updated: last_updated} = Map.get(state.screens_last_updated, screen_id)
-              {screen_id, last_updated}
+          Enum.map(screen_ids, fn screen_id ->
+            %{last_updated: last_updated} = Map.get(state.screens_last_updated, screen_id)
+            {screen_id, last_updated}
           end)
 
         # Alert either expired or never existed.
