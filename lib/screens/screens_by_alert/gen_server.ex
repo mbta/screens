@@ -59,39 +59,36 @@ defmodule Screens.ScreensByAlert.GenServer do
   end
 
   @impl GenServer
-  def handle_cast(
-        {:put_data, screen_id, alert_ids},
-        %__MODULE__{
-          screens_by_alert: screens_by_alert,
-          screens_last_updated: screens_last_updated,
-          screens_by_alert_ttl_seconds: screens_by_alert_ttl_seconds,
-          screens_last_updated_ttl_seconds: screens_last_updated_ttl_seconds
-        } = state
-      ) do
+  def handle_cast({:put_data, screen_id, alert_ids}, %__MODULE__{} = state) do
     updated_screens_by_alert =
       alert_ids
       |> Enum.map(fn alert_id ->
         # Check if object should expire in #{screens_by_alert_ttl_seconds} seconds
-        Process.send_after(self(), {:expire_alert, alert_id}, screens_by_alert_ttl_seconds * 1000)
+        Process.send_after(
+          self(),
+          {:expire_alert, alert_id},
+          state.screens_by_alert_ttl_seconds * 1000
+        )
+
         {alert_id, %{screen_ids: [screen_id], created_at: System.system_time(:second)}}
       end)
       |> Map.new()
       # Combine list of screen_ids if alert already exists.
       # Otherwise, create a new alert.
-      |> Map.merge(screens_by_alert, fn
+      |> Map.merge(state.screens_by_alert, fn
         _, %{screen_ids: screens1, created_at: created_at}, %{screen_ids: screens2} ->
           %{screen_ids: Enum.uniq(screens1 ++ screens2), created_at: created_at}
       end)
 
     # Overwrites previous last_updated if screen_id is already in map.
     updated_screens_last_updated =
-      Map.put(screens_last_updated, screen_id, System.system_time(:second))
+      Map.put(state.screens_last_updated, screen_id, System.system_time(:second))
 
     # Check if object should expire in #{screens_last_updated_ttl_seconds} seconds
     Process.send_after(
       self(),
       {:expire_last_updated, screen_id},
-      screens_last_updated_ttl_seconds * 1000
+      state.screens_last_updated_ttl_seconds * 1000
     )
 
     {:noreply,
@@ -106,17 +103,14 @@ defmodule Screens.ScreensByAlert.GenServer do
   def handle_call(
         {:get_screens_by_alert, alert_id},
         _from,
-        %__MODULE__{
-          screens_by_alert: screens_by_alert,
-          screens_last_updated: screens_last_updated
-        } = state
+        %__MODULE__{} = state
       ) do
     result =
-      case Map.get(screens_by_alert, alert_id) do
+      case Map.get(state.screens_by_alert, alert_id) do
         %{screen_ids: screen_ids} ->
           Enum.map(screen_ids, fn
             screen_id when screen_ids != [] ->
-              last_updated = Map.get(screens_last_updated, screen_id)
+              last_updated = Map.get(state.screens_last_updated, screen_id)
               {screen_id, last_updated}
           end)
 
@@ -132,24 +126,21 @@ defmodule Screens.ScreensByAlert.GenServer do
   def handle_call(
         {:get_screens_last_updated, screen_id},
         _from,
-        %__MODULE__{
-          screens_last_updated: screens_last_updated
-        } = state
+        %__MODULE__{} = state
       ) do
-    {:reply, Map.get(screens_last_updated, screen_id), state}
+    {:reply, Map.get(state.screens_last_updated, screen_id), state}
   end
 
   @impl GenServer
   def handle_info(
         {:expire_alert, alert_id},
-        %__MODULE__{screens_by_alert: screens_by_alert, screens_by_alert_ttl_seconds: ttl_seconds} =
-          state
+        %__MODULE__{} = state
       ) do
     new_state =
-      case Map.get(screens_by_alert, alert_id) do
+      case Map.get(state.screens_by_alert, alert_id) do
         %{created_at: created_at} ->
-          if created_at + ttl_seconds <= System.system_time(:second) do
-            %{state | screens_by_alert: Map.delete(screens_by_alert, alert_id)}
+          if created_at + state.screens_by_alert_ttl_seconds <= System.system_time(:second) do
+            %{state | screens_by_alert: Map.delete(state.screens_by_alert, alert_id)}
           else
             state
           end
@@ -161,16 +152,13 @@ defmodule Screens.ScreensByAlert.GenServer do
   @impl GenServer
   def handle_info(
         {:expire_last_updated, screen_id},
-        %__MODULE__{
-          screens_last_updated: screens_last_updated,
-          screens_last_updated_ttl_seconds: ttl_seconds
-        } = state
+        %__MODULE__{} = state
       ) do
     new_state =
-      case Map.get(screens_last_updated, screen_id) do
+      case Map.get(state.screens_last_updated, screen_id) do
         last_updated ->
-          if last_updated + ttl_seconds <= System.system_time(:second) do
-            %{state | screens_last_updated: Map.delete(screens_last_updated, screen_id)}
+          if last_updated + state.screens_last_updated_ttl_seconds <= System.system_time(:second) do
+            %{state | screens_last_updated: Map.delete(state.screens_last_updated, screen_id)}
           else
             state
           end
