@@ -34,7 +34,7 @@ defmodule Screens.ScreensByAlert.GenServer do
 
   @impl Screens.ScreensByAlert.Behaviour
   def put_data(pid \\ __MODULE__, screen_id, alert_ids) do
-    GenServer.call(pid, {:put_data, screen_id, alert_ids})
+    GenServer.cast(pid, {:put_data, screen_id, alert_ids})
   end
 
   @impl Screens.ScreensByAlert.Behaviour
@@ -59,9 +59,8 @@ defmodule Screens.ScreensByAlert.GenServer do
   end
 
   @impl GenServer
-  def handle_call(
+  def handle_cast(
         {:put_data, screen_id, alert_ids},
-        _from,
         %__MODULE__{
           screens_by_alert: screens_by_alert,
           screens_last_updated: screens_last_updated,
@@ -95,7 +94,7 @@ defmodule Screens.ScreensByAlert.GenServer do
       screens_last_updated_ttl_seconds * 1000
     )
 
-    {:reply, :ok,
+    {:noreply,
      %__MODULE__{
        state
        | screens_by_alert: updated_screens_by_alert,
