@@ -12,9 +12,11 @@ defmodule Screens.ScreensByAlert.GenServer do
 
   @type t :: %__MODULE__{
           screens_by_alert: %{
-            alert_id() => %{screen_ids: list(screen_id()), created_at: timestamp()}
+            alert_id() => %{screen_ids: list(screen_id()), timer_reference: reference()}
           },
-          screens_last_updated: %{screen_id() => timestamp()},
+          screens_last_updated: %{
+            screen_id() => %{last_updated: timestamp(), timer_reference: reference()}
+          },
           screens_by_alert_ttl_seconds: non_neg_integer(),
           screens_last_updated_ttl_seconds: non_neg_integer()
         }
@@ -63,33 +65,33 @@ defmodule Screens.ScreensByAlert.GenServer do
     updated_screens_by_alert =
       alert_ids
       |> Enum.map(fn alert_id ->
-        # Check if object should expire in #{screens_by_alert_ttl_seconds} seconds
-        Process.send_after(
-          self(),
-          {:expire_alert, alert_id},
-          state.screens_by_alert_ttl_seconds * 1000
-        )
+        # Create a new timer to expire object in #{screens_by_alert_ttl_seconds} seconds
+        reference =
+          Process.send_after(
+            self(),
+            {:expire_alert, alert_id},
+            state.screens_by_alert_ttl_seconds * 1000
+          )
 
-        {alert_id, %{screen_ids: [screen_id], created_at: System.system_time(:second)}}
+        {alert_id, %{screen_ids: [screen_id], timer_reference: reference}}
       end)
       |> Map.new()
       # Combine list of screen_ids if alert already exists.
       # Otherwise, create a new alert.
       |> Map.merge(state.screens_by_alert, fn
-        _, %{screen_ids: screens1, created_at: created_at}, %{screen_ids: screens2} ->
-          %{screen_ids: Enum.uniq(screens1 ++ screens2), created_at: created_at}
+        _,
+        %{screen_ids: screens1, timer_reference: new_timer},
+        %{screen_ids: screens2, timer_reference: old_timer} ->
+          Process.cancel_timer(old_timer)
+          %{screen_ids: Enum.uniq(screens1 ++ screens2), timer_reference: new_timer}
       end)
 
-    # Overwrites previous last_updated if screen_id is already in map.
     updated_screens_last_updated =
-      Map.put(state.screens_last_updated, screen_id, System.system_time(:second))
-
-    # Check if object should expire in #{screens_last_updated_ttl_seconds} seconds
-    Process.send_after(
-      self(),
-      {:expire_last_updated, screen_id},
-      state.screens_last_updated_ttl_seconds * 1000
-    )
+      get_updated_screens_last_updated(
+        screen_id,
+        state.screens_last_updated,
+        state.screens_last_updated_ttl_seconds
+      )
 
     {:noreply,
      %__MODULE__{
@@ -110,7 +112,7 @@ defmodule Screens.ScreensByAlert.GenServer do
         %{screen_ids: screen_ids} ->
           Enum.map(screen_ids, fn
             screen_id when screen_ids != [] ->
-              last_updated = Map.get(state.screens_last_updated, screen_id)
+              %{last_updated: last_updated} = Map.get(state.screens_last_updated, screen_id)
               {screen_id, last_updated}
           end)
 
@@ -128,7 +130,9 @@ defmodule Screens.ScreensByAlert.GenServer do
         _from,
         %__MODULE__{} = state
       ) do
-    {:reply, Map.get(state.screens_last_updated, screen_id), state}
+    %{last_updated: last_updated} = Map.get(state.screens_last_updated, screen_id)
+
+    {:reply, last_updated, state}
   end
 
   @impl GenServer
@@ -136,17 +140,7 @@ defmodule Screens.ScreensByAlert.GenServer do
         {:expire_alert, alert_id},
         %__MODULE__{} = state
       ) do
-    new_state =
-      case Map.get(state.screens_by_alert, alert_id) do
-        %{created_at: created_at} ->
-          if created_at + state.screens_by_alert_ttl_seconds <= System.system_time(:second) do
-            %{state | screens_by_alert: Map.delete(state.screens_by_alert, alert_id)}
-          else
-            state
-          end
-      end
-
-    {:noreply, new_state}
+    {:noreply, %{state | screens_by_alert: Map.delete(state.screens_by_alert, alert_id)}}
   end
 
   @impl GenServer
@@ -154,16 +148,34 @@ defmodule Screens.ScreensByAlert.GenServer do
         {:expire_last_updated, screen_id},
         %__MODULE__{} = state
       ) do
-    new_state =
-      case Map.get(state.screens_last_updated, screen_id) do
-        last_updated ->
-          if last_updated + state.screens_last_updated_ttl_seconds <= System.system_time(:second) do
-            %{state | screens_last_updated: Map.delete(state.screens_last_updated, screen_id)}
-          else
-            state
-          end
-      end
+    {:noreply, %{state | screens_last_updated: Map.delete(state.screens_last_updated, screen_id)}}
+  end
 
-    {:noreply, new_state}
+  defp get_updated_screens_last_updated(
+         screen_id,
+         screens_last_updated,
+         screens_last_updated_ttl_seconds
+       ) do
+    existing_last_updated = Map.get(screens_last_updated, screen_id)
+
+    # Cancel existing timer is screen_id was already in map.
+    if not is_nil(existing_last_updated) do
+      Process.cancel_timer(existing_last_updated.timer_reference)
+    end
+
+    # Create a new timer to expire object in #{screens_last_updated_ttl_seconds} seconds
+    reference =
+      Process.send_after(
+        self(),
+        {:expire_last_updated, screen_id},
+        screens_last_updated_ttl_seconds * 1000
+      )
+
+    # Overwrites previous last_updated if screen_id is already in map.
+
+    Map.put(screens_last_updated, screen_id, %{
+      last_updated: System.system_time(:second),
+      timer_reference: reference
+    })
   end
 end
