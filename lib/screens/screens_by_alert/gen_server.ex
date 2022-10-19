@@ -130,9 +130,13 @@ defmodule Screens.ScreensByAlert.GenServer do
         _from,
         %__MODULE__{} = state
       ) do
-    %{last_updated: last_updated} = Map.get(state.screens_last_updated, screen_id)
+    screen_last_updated = Map.get(state.screens_last_updated, screen_id)
 
-    {:reply, last_updated, state}
+    if is_nil(screen_last_updated) do
+      {:reply, nil, state}
+    else
+      {:reply, screen_last_updated.last_updated, state}
+    end
   end
 
   @impl GenServer
