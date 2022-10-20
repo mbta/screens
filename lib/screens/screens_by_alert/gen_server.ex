@@ -128,12 +128,9 @@ defmodule Screens.ScreensByAlert.GenServer do
         _from,
         %__MODULE__{} = state
       ) do
-    screen_last_updated = Map.get(state.screens_last_updated, screen_id)
-
-    if is_nil(screen_last_updated) do
-      {:reply, nil, state}
-    else
-      {:reply, screen_last_updated.last_updated, state}
+    case Map.fetch(state.screens_last_updated, screen_id) do
+      {:ok, screen_last_updated} -> {:reply, screen_last_updated.last_updated, state}
+      :error -> {:reply, nil, state}
     end
   end
 
