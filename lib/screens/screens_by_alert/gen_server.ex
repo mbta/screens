@@ -204,13 +204,13 @@ defmodule Screens.ScreensByAlert.GenServer do
     })
   end
 
-  defp combine_screen_ids(screens1, screens2, ttl, now) do
-    screens2
+  defp combine_screen_ids(new_screens, old_screens, ttl, now) do
+    old_screens
     # Remove expired screen_ids based on TTL
     |> Enum.reject(fn {_screen_id, created_at} ->
       created_at + ttl <= now
     end)
     # Combine this list with the new list
-    |> Kernel.++(screens1)
+    |> Kernel.++(new_screens)
   end
 end
