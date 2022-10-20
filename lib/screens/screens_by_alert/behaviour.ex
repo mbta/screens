@@ -24,5 +24,5 @@ defmodule Screens.ScreensByAlert.Behaviour do
   @callback put_data(screen_id(), list(alert_id())) :: :ok
 
   @callback get_screens_by_alert(alert_id()) :: list(timestamped_screen_id())
-  @callback get_screens_last_updated(screen_id()) :: timestamp()
+  @callback get_screens_last_updated(screen_id()) :: timestamp() | nil
 end

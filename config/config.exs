@@ -194,7 +194,11 @@ config :screens,
     ]
   }
 
-config :screens, :screens_by_alert, cache_module: Screens.ScreensByAlert.GenServer
+config :screens, :screens_by_alert,
+  cache_module: Screens.ScreensByAlert.GenServer,
+  screens_by_alert_ttl_seconds: 40,
+  screens_last_updated_ttl_seconds: 3600,
+  screens_ttl_seconds: 40
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
