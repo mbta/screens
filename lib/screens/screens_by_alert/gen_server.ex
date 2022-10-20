@@ -161,7 +161,7 @@ defmodule Screens.ScreensByAlert.GenServer do
        ) do
     existing_last_updated = Map.get(screens_last_updated, screen_id)
 
-    # Cancel existing timer is screen_id was already in map.
+    # Cancel existing timer if screen_id was already in map.
     _ =
       if not is_nil(existing_last_updated) do
         Process.cancel_timer(existing_last_updated.timer_reference, async: true, info: false)
