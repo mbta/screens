@@ -4,6 +4,7 @@
   data-environment-name="<%= @environment_name %>"
   data-is-real-screen="<%= @is_real_screen %>"
   data-requestor="<%= @requestor %>"
+  data-disable-sentry="<%= @disable_sentry %>"
   <%= if record_sentry?() do %>
     data-sentry="<%= @sentry_frontend_dsn %>"
   <% end %>
