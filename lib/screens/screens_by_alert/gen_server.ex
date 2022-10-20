@@ -12,7 +12,10 @@ defmodule Screens.ScreensByAlert.GenServer do
 
   @type t :: %__MODULE__{
           screens_by_alert: %{
-            alert_id() => %{screen_ids: list(screen_id()), timer_reference: reference()}
+            alert_id() => %{
+              screen_ids: list({screen_id(), timestamp()}),
+              timer_reference: reference()
+            }
           },
           screens_last_updated: %{
             screen_id() => %{last_updated: timestamp(), timer_reference: reference()}
@@ -69,6 +72,8 @@ defmodule Screens.ScreensByAlert.GenServer do
 
   @impl GenServer
   def handle_cast({:put_data, screen_id, alert_ids}, %__MODULE__{} = state) do
+    now = System.system_time(:second)
+
     updated_screens_by_alert =
       alert_ids
       |> Enum.map(fn alert_id ->
@@ -80,7 +85,7 @@ defmodule Screens.ScreensByAlert.GenServer do
             state.screens_by_alert_ttl_seconds * 1000
           )
 
-        {alert_id, %{screen_ids: [screen_id], timer_reference: reference}}
+        {alert_id, %{screen_ids: [{screen_id, now}], timer_reference: reference}}
       end)
       |> Map.new()
       # Combine list of screen_ids if alert already exists.
@@ -90,14 +95,19 @@ defmodule Screens.ScreensByAlert.GenServer do
         %{screen_ids: screens1, timer_reference: new_timer},
         %{screen_ids: screens2, timer_reference: old_timer} ->
           _ = Process.cancel_timer(old_timer, async: true, info: false)
-          %{screen_ids: Enum.uniq(screens1 ++ screens2), timer_reference: new_timer}
+
+          updated_screen_ids =
+            combine_screen_ids(screens1, screens2, state.screens_ttl_seconds, now)
+
+          %{screen_ids: updated_screen_ids, timer_reference: new_timer}
       end)
 
     updated_screens_last_updated =
       get_updated_screens_last_updated(
         screen_id,
         state.screens_last_updated,
-        state.screens_last_updated_ttl_seconds
+        state.screens_last_updated_ttl_seconds,
+        now
       )
 
     {:noreply,
@@ -117,7 +127,14 @@ defmodule Screens.ScreensByAlert.GenServer do
     result =
       case Map.get(state.screens_by_alert, alert_id) do
         %{screen_ids: screen_ids} ->
-          Enum.map(screen_ids, fn screen_id ->
+          screen_ids
+          # Reject expired screen_ids just in case.
+          |> Enum.reject(fn {_id, created_at} ->
+            created_at + state.screens_ttl_seconds < System.system_time(:second)
+          end)
+          # Put in MapSet to remove duplicates
+          |> MapSet.new(fn {id, _created_at} -> id end)
+          |> Enum.map(fn screen_id ->
             {screen_id, state.screens_last_updated[screen_id].last_updated}
           end)
 
@@ -160,7 +177,8 @@ defmodule Screens.ScreensByAlert.GenServer do
   defp get_updated_screens_last_updated(
          screen_id,
          screens_last_updated,
-         screens_last_updated_ttl_seconds
+         screens_last_updated_ttl_seconds,
+         now
        ) do
     existing_last_updated = Map.get(screens_last_updated, screen_id)
 
@@ -181,8 +199,18 @@ defmodule Screens.ScreensByAlert.GenServer do
     # Overwrites previous last_updated if screen_id is already in map.
 
     Map.put(screens_last_updated, screen_id, %{
-      last_updated: System.system_time(:second),
+      last_updated: now,
       timer_reference: reference
     })
+  end
+
+  defp combine_screen_ids(screens1, screens2, ttl, now) do
+    screens2
+    # Remove expired screen_ids based on TTL
+    |> Enum.reject(fn {_screen_id, created_at} ->
+      created_at + ttl <= now
+    end)
+    # Combine this list with the new list and remove duplicate screen_ids.
+    |> Kernel.++(screens1)
   end
 end
