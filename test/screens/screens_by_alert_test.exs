@@ -33,7 +33,9 @@ defmodule Screens.ScreensByAlertTest do
       on_exit(fn -> Process.exit(pid, :done) end)
 
       %{
-        ttl: Application.get_env(:screens, :screens_by_alert)[:screens_by_alert_ttl_seconds]
+        screens_by_alert_ttl:
+          Application.get_env(:screens, :screens_by_alert)[:screens_by_alert_ttl_seconds],
+        screens_ttl: Application.get_env(:screens, :screens_by_alert)[:screens_ttl_seconds]
       }
     end
 
@@ -41,10 +43,17 @@ defmodule Screens.ScreensByAlertTest do
       assert [{1, _}] = ScreensByAlert.get_screens_by_alert(1)
     end
 
-    test "returns empty list when called after expiration", %{ttl: ttl} do
+    test "returns empty list when called after expiration", %{screens_by_alert_ttl: ttl} do
       assert [{1, _}] = ScreensByAlert.get_screens_by_alert(1)
       Process.sleep((ttl + 1) * 1000)
       assert [] = ScreensByAlert.get_screens_by_alert(1)
+    end
+
+    test "returns list with no expired screens", %{screens_ttl: ttl} do
+      assert [{1, _}] = ScreensByAlert.get_screens_by_alert(1)
+      Process.sleep(ttl * 1000)
+      assert :ok = ScreensByAlert.put_data(2, [1])
+      assert [{2, _}] = ScreensByAlert.get_screens_by_alert(1)
     end
   end
 
