@@ -41,15 +41,15 @@ const useIsRealScreenParam = () => {
   return isRealScreen() ? "&is_real_screen=true" : "";
 };
 
-const useSourceParam = () => {
-  if (isDup()) return `&source=real_screen`;
+const useRequestorParam = () => {
+  if (isDup()) return `&requestor=real_screen`;
 
-  let source = getDatasetValue("source");
-  if (!source && isRealScreen()) {
-    source = "real_screen";
+  let requestor = getDatasetValue("requestor");
+  if (!requestor && isRealScreen()) {
+    requestor = "real_screen";
   }
 
-  return source ? `&source=${source}` : "";
+  return requestor ? `&requestor=${requestor}` : "";
 };
 
 interface UseApiResponseArgs {
@@ -75,7 +75,7 @@ const useApiResponse = ({
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const lastRefresh = getDatasetValue("lastRefresh");
   const isRealScreenParam = useIsRealScreenParam();
-  const sourceParam = useSourceParam();
+  const requestorParam = useRequestorParam();
 
   const apiPath = buildApiPath({
     id,
@@ -83,7 +83,7 @@ const useApiResponse = ({
     rotationIndex,
     lastRefresh,
     isRealScreenParam,
-    sourceParam,
+    requestorParam,
   });
 
   const fetchData = async () => {
@@ -140,7 +140,7 @@ interface BuildApiPathArgs {
   rotationIndex?: number;
   lastRefresh?: string;
   isRealScreenParam: string;
-  sourceParam: string;
+  requestorParam: string;
 }
 
 const buildApiPath = ({
@@ -149,7 +149,7 @@ const buildApiPath = ({
   rotationIndex,
   lastRefresh,
   isRealScreenParam,
-  sourceParam,
+  requestorParam,
 }: BuildApiPathArgs) => {
   let apiPath = `/api/screen/${id}`;
 
@@ -157,7 +157,7 @@ const buildApiPath = ({
     apiPath += `/${rotationIndex}`;
   }
 
-  apiPath += `?last_refresh=${lastRefresh}${isRealScreenParam}${sourceParam}`;
+  apiPath += `?last_refresh=${lastRefresh}${isRealScreenParam}${requestorParam}`;
 
   if (datetime != null) {
     apiPath += `&datetime=${datetime}`;

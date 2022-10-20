@@ -30,7 +30,12 @@ defmodule ScreensWeb.ScreenApiController do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
     _ =
-      Screens.LogScreenData.log_data_request(screen_id, last_refresh, is_screen, params["source"])
+      Screens.LogScreenData.log_data_request(
+        screen_id,
+        last_refresh,
+        is_screen,
+        params["requestor"]
+      )
 
     if nonexistent_screen?(screen_id) do
       Screens.LogScreenData.log_api_response(:nonexistent, screen_id, last_refresh, is_screen)
@@ -55,7 +60,7 @@ defmodule ScreensWeb.ScreenApiController do
         screen_id,
         nil,
         is_screen,
-        params["source"],
+        params["requestor"],
         nil,
         rotation_index
       )
