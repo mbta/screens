@@ -210,7 +210,7 @@ defmodule Screens.ScreensByAlert.GenServer do
     |> Enum.reject(fn {_screen_id, created_at} ->
       created_at + ttl <= now
     end)
-    # Combine this list with the new list and remove duplicate screen_ids.
+    # Combine this list with the new list
     |> Kernel.++(screens1)
   end
 end
