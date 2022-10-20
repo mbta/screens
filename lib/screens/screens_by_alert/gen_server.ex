@@ -12,7 +12,7 @@ defmodule Screens.ScreensByAlert.GenServer do
 
   @type t :: %__MODULE__{
           screens_by_alert: %{
-            alert_id() => %{screen_ids: MapSet.t(screen_id()), timer_reference: reference()}
+            alert_id() => %{screen_ids: list(screen_id()), timer_reference: reference()}
           },
           screens_last_updated: %{
             screen_id() => %{last_updated: timestamp(), timer_reference: reference()}
@@ -73,7 +73,7 @@ defmodule Screens.ScreensByAlert.GenServer do
             state.screens_by_alert_ttl_seconds * 1000
           )
 
-        {alert_id, %{screen_ids: MapSet.new([screen_id]), timer_reference: reference}}
+        {alert_id, %{screen_ids: [screen_id], timer_reference: reference}}
       end)
       |> Map.new()
       # Combine list of screen_ids if alert already exists.
@@ -83,7 +83,7 @@ defmodule Screens.ScreensByAlert.GenServer do
         %{screen_ids: screens1, timer_reference: new_timer},
         %{screen_ids: screens2, timer_reference: old_timer} ->
           _ = Process.cancel_timer(old_timer, async: true, info: false)
-          %{screen_ids: MapSet.union(screens1, screens2), timer_reference: new_timer}
+          %{screen_ids: Enum.uniq(screens1 ++ screens2), timer_reference: new_timer}
       end)
 
     updated_screens_last_updated =
