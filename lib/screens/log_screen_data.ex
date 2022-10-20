@@ -13,7 +13,14 @@ defmodule Screens.LogScreenData do
     end
   end
 
-  def log_data_request(screen_id, last_refresh, is_screen, requestor, screen_side \\ nil) do
+  def log_data_request(
+        screen_id,
+        last_refresh,
+        is_screen,
+        requestor,
+        screen_side \\ nil,
+        rotation_index \\ nil
+      ) do
     if is_screen or not is_nil(requestor) do
       data =
         %{
@@ -23,6 +30,7 @@ defmodule Screens.LogScreenData do
         }
         |> insert_screen_side(screen_side)
         |> insert_requestor(requestor)
+        |> insert_dup_rotation_index(rotation_index)
 
       log_message("[screen data request]", data)
     end
@@ -117,4 +125,9 @@ defmodule Screens.LogScreenData do
 
   defp insert_requestor(data, nil), do: data
   defp insert_requestor(data, requestor), do: Map.put(data, :requestor, requestor)
+
+  defp insert_dup_rotation_index(data, nil), do: data
+
+  defp insert_dup_rotation_index(data, rotation_index),
+    do: Map.put(data, :page_number, rotation_index)
 end
