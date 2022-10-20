@@ -32,7 +32,8 @@ defmodule Screens.ScreensByAlert do
   def start_link(_opts) do
     @cache_module.start_link(
       screens_by_alert_ttl_seconds: @config[:screens_by_alert_ttl_seconds],
-      screens_last_updated_ttl_seconds: @config[:screens_last_updated_ttl_seconds]
+      screens_last_updated_ttl_seconds: @config[:screens_last_updated_ttl_seconds],
+      screens_ttl_seconds: @config[:screens_ttl_seconds]
     )
   end
 

@@ -18,14 +18,20 @@ defmodule Screens.ScreensByAlert.GenServer do
             screen_id() => %{last_updated: timestamp(), timer_reference: reference()}
           },
           screens_by_alert_ttl_seconds: non_neg_integer(),
-          screens_last_updated_ttl_seconds: non_neg_integer()
+          screens_last_updated_ttl_seconds: non_neg_integer(),
+          screens_ttl_seconds: non_neg_integer()
         }
 
-  @enforce_keys [:screens_by_alert_ttl_seconds, :screens_last_updated_ttl_seconds]
+  @enforce_keys [
+    :screens_by_alert_ttl_seconds,
+    :screens_last_updated_ttl_seconds,
+    :screens_ttl_seconds
+  ]
   defstruct screens_by_alert: %{},
             screens_last_updated: %{},
             screens_by_alert_ttl_seconds: nil,
-            screens_last_updated_ttl_seconds: nil
+            screens_last_updated_ttl_seconds: nil,
+            screens_ttl_seconds: nil
 
   ### Client
 
@@ -56,7 +62,8 @@ defmodule Screens.ScreensByAlert.GenServer do
     {:ok,
      %__MODULE__{
        screens_by_alert_ttl_seconds: opts[:screens_by_alert_ttl_seconds],
-       screens_last_updated_ttl_seconds: opts[:screens_last_updated_ttl_seconds]
+       screens_last_updated_ttl_seconds: opts[:screens_last_updated_ttl_seconds],
+       screens_ttl_seconds: opts[:screens_ttl_seconds]
      }}
   end
 
