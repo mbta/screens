@@ -15,8 +15,8 @@ const warn = (message: string) => log(message, "warning");
 const error = (message: string) => log(message, "error");
 
 /**
- * Initializes Sentry if the DSN is defined and this client is running on
- * a real production screen.
+ * Initializes Sentry if the DSN is defined AND this client is running on
+ * a real production screen AND the URL does not contain the disable_sentry param.
  */
 const initSentry = (appString: string) => {
   const {
