@@ -472,4 +472,21 @@ defmodule Screens.V2.ScreenData do
       Enum.find_value(children, &get_containing_slot(&1, target_slot_ids))
     end
   end
+
+  def cache_visible_alert_widgets({layout, instance_map}, screen_id) do
+    alert_ids =
+      instance_map
+      |> Enum.filter(fn
+        {_slot_id, %widget{}} ->
+          widget in @alert_widgets
+
+        _ ->
+          false
+      end)
+      |> Enum.map(fn {_slot_id, %{alert: %Screens.Alerts.Alert{id: id}}} -> id end)
+
+    :ok = ScreensByAlert.put_data(screen_id, alert_ids)
+
+    {layout, instance_map}
+  end
 end
