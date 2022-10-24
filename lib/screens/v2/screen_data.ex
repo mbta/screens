@@ -3,12 +3,16 @@ defmodule Screens.V2.ScreenData do
 
   require Logger
 
+  alias Screens.ScreensByAlert
   alias Screens.Util
   alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
+  alias Screens.V2.WidgetInstance.{Alert, ReconstructedAlert}
 
   import Screens.V2.Template.Guards
+
+  @alert_widgets [Alert, ReconstructedAlert]
 
   @type screen_id :: String.t()
   @type config :: Screens.Config.Screen.t()
@@ -40,6 +44,7 @@ defmodule Screens.V2.ScreenData do
     data =
       config
       |> fetch_data()
+      |> cache_visible_alert_widgets(screen_id)
       |> resolve_paging(refresh_rate)
       |> serialize()
 
