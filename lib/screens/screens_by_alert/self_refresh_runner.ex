@@ -6,7 +6,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
 
   alias Screens.ScreensByAlert
 
-  # (Not a real module--just a name assigned to the Task.Supervisor that supervises each simulated data request run)
+  # (Not a real module--just a name assigned to the Task.Supervisor process that supervises each simulated data request run)
   alias Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor
 
   require Logger
@@ -16,6 +16,14 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
 
   # The server is not stateful.
   defstruct []
+
+  ### Client
+
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, :ok, opts)
+  end
+
+  ### Server
 
   # Maximum number of screen updates that can happen per run.
   # Assuming a worst case of .5 sec per screen update, a max
@@ -29,14 +37,6 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   @job_run_interval_ms @screens_ttl_seconds * 1_000
 
   @screen_data_fn Application.compile_env(:screens, :screens_by_alert)[:screen_data_fn]
-
-  ### Client
-
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, :ok, opts)
-  end
-
-  ### Server
 
   @impl true
   def init(:ok) do
@@ -97,6 +97,6 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
     Process.send_after(self(), :run, @job_run_interval_ms)
   end
 
-  # A fake screen-data-fetching function to be used during tests, to avoid making requests.
+  @doc "A fake screen-data-fetching function to be used during tests, to avoid making requests."
   def fake_screen_data_fn(_screen_id, _opts), do: nil
 end
