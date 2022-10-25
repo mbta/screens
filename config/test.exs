@@ -33,6 +33,7 @@ config :logger, level: :warn
 
 config :screens, :screens_by_alert,
   cache_module: Screens.ScreensByAlert.GenServer,
+  screen_data_fn: &Screens.ScreensByAlert.SelfRefreshRunner.fake_screen_data_fn/2,
   screens_by_alert_ttl_seconds: 2,
   screens_last_updated_ttl_seconds: 2,
   screens_ttl_seconds: 1

@@ -58,6 +58,12 @@ defmodule Screens.Config.State do
     GenServer.call(pid, :config)
   end
 
+  @spec v2_screens_visible_to_screenplay(GenServer.server()) ::
+          list(screen_id :: String.t()) | :error
+  def v2_screens_visible_to_screenplay(pid \\ __MODULE__) do
+    GenServer.call(pid, :v2_screens_visible_to_screenplay)
+  end
+
   def mode_disabled?(pid \\ __MODULE__, mode) do
     GenServer.call(pid, {:mode_disabled?, mode})
   end
@@ -147,6 +153,16 @@ defmodule Screens.Config.State do
     %Devops{disabled_modes: disabled_modes} = config.devops
 
     {:reply, Enum.member?(disabled_modes, mode), state}
+  end
+
+  def handle_call(:v2_screens_visible_to_screenplay, _from, %__MODULE__{config: config} = state) do
+    screen_ids =
+      config.screens
+      |> Stream.reject(fn {_screen_id, screen_config} -> screen_config.hidden_from_screenplay end)
+      |> Stream.filter(fn {_screen_id, screen_config} -> Screen.v2_screen?(screen_config) end)
+      |> Enum.map(fn {screen_id, _screen_config} -> screen_id end)
+
+    {:reply, screen_ids, state}
   end
 
   # If we're in an error state, all queries on the state get an :error response

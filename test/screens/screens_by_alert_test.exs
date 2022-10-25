@@ -39,21 +39,23 @@ defmodule Screens.ScreensByAlertTest do
       }
     end
 
-    test "returns list with data when called before expiration" do
-      assert [{1, _}] = ScreensByAlert.get_screens_by_alert(1)
+    test "returns map with data when called before expiration" do
+      assert %{1 => [1]} == ScreensByAlert.get_screens_by_alert([1])
     end
 
-    test "returns empty list when called after expiration", %{screens_by_alert_ttl: ttl} do
-      assert [{1, _}] = ScreensByAlert.get_screens_by_alert(1)
+    test "returns map with default empty list when called after expiration", %{
+      screens_by_alert_ttl: ttl
+    } do
+      assert %{1 => [1]} == ScreensByAlert.get_screens_by_alert([1])
       Process.sleep((ttl + 1) * 1000)
-      assert [] = ScreensByAlert.get_screens_by_alert(1)
+      assert %{1 => []} == ScreensByAlert.get_screens_by_alert([1])
     end
 
-    test "returns list with no expired screens", %{screens_ttl: ttl} do
-      assert [{1, _}] = ScreensByAlert.get_screens_by_alert(1)
+    test "returns map with no expired", %{screens_ttl: ttl} do
+      assert %{1 => [1]} == ScreensByAlert.get_screens_by_alert([1])
       Process.sleep(ttl * 1000)
       assert :ok = ScreensByAlert.put_data(2, [1])
-      assert [{2, _}] = ScreensByAlert.get_screens_by_alert(1)
+      assert %{1 => [2]} == ScreensByAlert.get_screens_by_alert([1])
     end
   end
 
@@ -70,13 +72,16 @@ defmodule Screens.ScreensByAlertTest do
     end
 
     test "returns when screen was last updated", %{last_updated: last_updated} do
-      assert last_updated == ScreensByAlert.get_screens_last_updated(1)
+      assert %{1 => last_updated} == ScreensByAlert.get_screens_last_updated([1])
     end
 
-    test "returns nil after expiration", %{last_updated: last_updated, ttl: ttl} do
-      assert last_updated == ScreensByAlert.get_screens_last_updated(1)
+    test "returns map with default timestamp of 0 after expiration", %{
+      last_updated: last_updated,
+      ttl: ttl
+    } do
+      assert %{1 => last_updated} == ScreensByAlert.get_screens_last_updated([1])
       Process.sleep((ttl + 1) * 1000)
-      assert is_nil(ScreensByAlert.get_screens_last_updated(1))
+      assert %{1 => 0} == ScreensByAlert.get_screens_last_updated([1])
     end
   end
 end

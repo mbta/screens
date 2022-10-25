@@ -32,18 +32,20 @@ defmodule Screens.V2.ScreenData do
   @spec disabled_response() :: response_map()
   def disabled_response, do: response(disabled: true)
 
-  @spec by_screen_id(screen_id()) :: response_map()
-  def by_screen_id(screen_id) do
+  @spec by_screen_id(screen_id(), Keyword.t()) :: response_map() | nil
+  def by_screen_id(screen_id, opts \\ []) do
     config = get_config(screen_id)
     refresh_rate = Parameters.get_refresh_rate(config)
 
-    data =
+    layout_and_widgets =
       config
       |> fetch_data()
       |> resolve_paging(refresh_rate)
-      |> serialize()
 
-    response(data: data)
+    unless opts[:skip_serialize] do
+      data = serialize(layout_and_widgets)
+      response(data: data)
+    end
   end
 
   @spec simulation_data_by_screen_id(screen_id()) :: response_map()
