@@ -3,7 +3,9 @@ defmodule Screens.V2.ScreenData do
 
   require Logger
 
+  alias Screens.ScreensByAlert
   alias Screens.Util
+  alias Screens.V2.AlertWidgetInstance
   alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
@@ -40,6 +42,7 @@ defmodule Screens.V2.ScreenData do
     data =
       config
       |> fetch_data()
+      |> tap(&cache_visible_alert_widgets(&1, screen_id))
       |> resolve_paging(refresh_rate)
       |> serialize()
 
@@ -471,5 +474,17 @@ defmodule Screens.V2.ScreenData do
       # some children are not "leaf nodes". go down a level.
       Enum.find_value(children, &get_containing_slot(&1, target_slot_ids))
     end
+  end
+
+  def cache_visible_alert_widgets({_layout, instance_map}, screen_id) do
+    alert_ids =
+      instance_map
+      |> Map.values()
+      |> Enum.filter(fn widget_struct ->
+        not is_nil(AlertWidgetInstance.impl_for(widget_struct))
+      end)
+      |> Enum.map(fn alert_widget_struct -> AlertWidgetInstance.alert_id(alert_widget_struct) end)
+
+    :ok = ScreensByAlert.put_data(screen_id, alert_ids)
   end
 end

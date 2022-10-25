@@ -734,6 +734,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       else: :reconstructed_large_alert
   end
 
+  def alert_id(%__MODULE__{} = t), do: t.alert.id
+
   defimpl Screens.V2.WidgetInstance do
     def priority(t), do: ReconstructedAlert.priority(t)
     def serialize(t), do: ReconstructedAlert.serialize(t)
@@ -744,5 +746,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def audio_sort_key(t), do: ReconstructedAlert.audio_sort_key(t)
     def audio_valid_candidate?(_instance), do: true
     def audio_view(_instance), do: ScreensWeb.V2.Audio.ReconstructedAlertView
+  end
+
+  defimpl Screens.V2.AlertWidgetInstance do
+    def alert_id(t), do: ReconstructedAlert.alert_id(t)
   end
 end
