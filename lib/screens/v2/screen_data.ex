@@ -44,7 +44,7 @@ defmodule Screens.V2.ScreenData do
     data =
       config
       |> fetch_data()
-      |> cache_visible_alert_widgets(screen_id)
+      |> tap(&cache_visible_alert_widgets(&1, screen_id))
       |> resolve_paging(refresh_rate)
       |> serialize()
 
@@ -478,7 +478,7 @@ defmodule Screens.V2.ScreenData do
     end
   end
 
-  def cache_visible_alert_widgets({layout, instance_map}, screen_id) do
+  def cache_visible_alert_widgets({_layout, instance_map}, screen_id) do
     alert_ids =
       instance_map
       |> Enum.filter(fn
@@ -491,7 +491,5 @@ defmodule Screens.V2.ScreenData do
       |> Enum.map(fn {_slot_id, %{alert: %Screens.Alerts.Alert{id: id}}} -> id end)
 
     :ok = ScreensByAlert.put_data(screen_id, alert_ids)
-
-    {layout, instance_map}
   end
 end
