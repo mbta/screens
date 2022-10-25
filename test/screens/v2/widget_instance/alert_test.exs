@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{BusEink, BusShelter, GlEink, Solari}
+  alias Screens.V2.AlertWidgetInstance
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
   setup :setup_base
@@ -679,6 +680,12 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   describe "audio_view/1" do
     test "returns AlertView", %{widget: widget} do
       assert ScreensWeb.V2.Audio.AlertView == AlertWidget.audio_view(widget)
+    end
+  end
+
+  describe "alert_id/1" do
+    test "returns alert_id", %{widget: widget} do
+      assert widget.alert.id == AlertWidgetInstance.alert_id(widget)
     end
   end
 end

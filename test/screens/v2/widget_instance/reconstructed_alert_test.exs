@@ -6,6 +6,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.Config.V2.{PreFare}
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Stops.Stop
+  alias Screens.V2.AlertWidgetInstance
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
@@ -1131,6 +1132,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     test "returns ReconstructedAlertView" do
       instance = %ReconstructedAlert{}
       assert ScreensWeb.V2.Audio.ReconstructedAlertView == WidgetInstance.audio_view(instance)
+    end
+  end
+
+  describe "alert_id/1" do
+    test "returns alert_id", %{widget: widget} do
+      assert widget.alert.id == AlertWidgetInstance.alert_id(widget)
     end
   end
 

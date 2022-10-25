@@ -5,14 +5,12 @@ defmodule Screens.V2.ScreenData do
 
   alias Screens.ScreensByAlert
   alias Screens.Util
+  alias Screens.V2.AlertWidgetInstance
   alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.{Alert, ReconstructedAlert}
 
   import Screens.V2.Template.Guards
-
-  @alert_widgets [Alert, ReconstructedAlert]
 
   @type screen_id :: String.t()
   @type config :: Screens.Config.Screen.t()
@@ -482,8 +480,10 @@ defmodule Screens.V2.ScreenData do
     alert_ids =
       instance_map
       |> Map.values()
-      |> Enum.filter(fn %widget{} -> widget in @alert_widgets end)
-      |> Enum.map(fn %{alert: %Screens.Alerts.Alert{id: id}} -> id end)
+      |> Enum.filter(fn widget_struct ->
+        not is_nil(AlertWidgetInstance.impl_for(widget_struct))
+      end)
+      |> Enum.map(fn alert_widget_struct -> AlertWidgetInstance.alert_id(alert_widget_struct) end)
 
     :ok = ScreensByAlert.put_data(screen_id, alert_ids)
   end
