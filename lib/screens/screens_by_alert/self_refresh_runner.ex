@@ -73,12 +73,11 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
     # Doing the work in a separate, unlinked task process protects this GenServer
     # process from going down if an exception is raised while running
     # ScreenData.by_screen_id/1 for some screen.
-    for screen_id <- screen_ids_to_refresh do
-      _ =
-        Task.Supervisor.start_child(TaskSupervisor, fn ->
-          @screen_data_fn.(screen_id, skip_serialize: true)
-        end)
-    end
+    Enum.each(screen_ids_to_refresh, fn screen_id ->
+      Task.Supervisor.start_child(TaskSupervisor, fn ->
+        @screen_data_fn.(screen_id, skip_serialize: true)
+      end)
+    end)
 
     {:noreply, state}
   end
