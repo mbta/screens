@@ -83,7 +83,4 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   defp schedule_run do
     Process.send_after(self(), :run, @job_run_interval_ms)
   end
-
-  @doc "A fake screen-data-fetching function to be used during tests, to avoid making requests."
-  def fake_screen_data_fn(_screen_id, _opts), do: nil
 end
