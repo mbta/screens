@@ -35,14 +35,9 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
 
   @impl true
   def init(:ok) do
-    {:ok, nil, {:continue, :schedule_first_run}}
-  end
-
-  @impl true
-  def handle_continue(:schedule_first_run, state) do
     schedule_run()
 
-    {:noreply, state}
+    {:ok, nil}
   end
 
   @impl true
