@@ -1,6 +1,6 @@
 defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   @moduledoc """
-  A "job-runner" GenServer that routinely checks for out-of-date
+  A stateless "job-runner" GenServer that routinely checks for out-of-date
   screen data, and simulates data requests for any that it finds.
   """
 
@@ -11,11 +11,6 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
 
   require Logger
   use GenServer
-
-  @type state :: %__MODULE__{}
-
-  # The server is not stateful.
-  defstruct []
 
   ### Client
 
@@ -40,7 +35,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
 
   @impl true
   def init(:ok) do
-    {:ok, %__MODULE__{}, {:continue, :schedule_first_run}}
+    {:ok, nil, {:continue, :schedule_first_run}}
   end
 
   @impl true
