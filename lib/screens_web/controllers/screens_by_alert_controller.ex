@@ -7,6 +7,8 @@ defmodule ScreensWeb.ScreensByAlertController do
     json(conn, %{})
   end
 
+  # `ids` must be a comma-separated list of integers.
+  # If any item in the list is an invalid integer, 400 is returned.
   def index(conn, %{"ids" => alert_ids_string}) do
     alert_ids =
       alert_ids_string
