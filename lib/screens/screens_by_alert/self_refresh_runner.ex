@@ -58,7 +58,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
       |> Enum.split(@max_screen_updates_per_run)
 
     Logger.info(
-      ~s|[running screens_by_alert self refresh] screen_ids_being_refreshed_now="#{Enum.join(screen_ids_to_refresh, ",")}" remaining_screen_ids_to_refresh="#{Enum.join(overflow, ",")}"|
+      "[running screens_by_alert self refresh] screen_ids_being_refreshed_now=#{Enum.join(screen_ids_to_refresh, ",")} count_of_remaining_screen_ids_to_refresh=#{length(overflow)}"
     )
 
     # We don't care about the result of the work, just its side-effect
