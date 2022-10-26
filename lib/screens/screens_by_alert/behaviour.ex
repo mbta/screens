@@ -12,7 +12,6 @@ defmodule Screens.ScreensByAlert.Behaviour do
   @type screen_id :: String.t()
   @type alert_id :: String.t()
   @type timestamp :: integer()
-  @type timestamped_screen_id :: {screen_id, timestamp}
 
   @doc """
   Starts the process that interfaces with the screens-by-alert cache.
