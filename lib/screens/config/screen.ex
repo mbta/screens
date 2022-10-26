@@ -43,6 +43,9 @@ defmodule Screens.Config.Screen do
           tags: list(String.t())
         }
 
+  # If a Screens client app uses widgets, its ID must end with this suffix.
+  @v2_app_id_suffix "_v2"
+
   @recognized_app_ids ~w[bus_eink dup gl_eink_single gl_eink_double solari solari_large]a
   @recognized_v2_app_ids ~w[bus_eink_v2 bus_shelter_v2 dup_v2 gl_eink_v2 solari_v2 solari_large_v2 pre_fare_v2]a
   @recognized_app_id_strings Enum.map(
@@ -106,6 +109,13 @@ defmodule Screens.Config.Screen do
   @spec schedule_refresh_at_time(t(), DateTime.t()) :: t()
   def schedule_refresh_at_time(screen_config, time) do
     %__MODULE__{screen_config | refresh_if_loaded_before: time}
+  end
+
+  @spec v2_screen?(t()) :: boolean()
+  def v2_screen?(screen_config) do
+    screen_config.app_id
+    |> Atom.to_string()
+    |> String.ends_with?(@v2_app_id_suffix)
   end
 
   for vendor <- ~w[gds mercury solari c3ms outfront]a do

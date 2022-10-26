@@ -18,12 +18,12 @@ defmodule Screens.ScreensByAlert.Memcache do
   end
 
   @impl true
-  def get_screens_by_alert(_alert_id) do
-    []
+  def get_screens_by_alert(alert_ids) do
+    Map.new(alert_ids, &{&1, []})
   end
 
   @impl true
-  def get_screens_last_updated(_screen_id) do
-    0
+  def get_screens_last_updated(screen_ids) do
+    Map.new(screen_ids, &{&1, 0})
   end
 end

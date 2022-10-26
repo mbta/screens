@@ -49,13 +49,13 @@ defmodule Screens.ScreensByAlert.GenServer do
   end
 
   @impl Screens.ScreensByAlert.Behaviour
-  def get_screens_by_alert(pid \\ __MODULE__, alert_id) do
-    GenServer.call(pid, {:get_screens_by_alert, alert_id})
+  def get_screens_by_alert(pid \\ __MODULE__, alert_ids) when is_list(alert_ids) do
+    GenServer.call(pid, {:get_screens_by_alert, alert_ids})
   end
 
   @impl Screens.ScreensByAlert.Behaviour
-  def get_screens_last_updated(pid \\ __MODULE__, screen_id) do
-    GenServer.call(pid, {:get_screens_last_updated, screen_id})
+  def get_screens_last_updated(pid \\ __MODULE__, screen_ids) when is_list(screen_ids) do
+    GenServer.call(pid, {:get_screens_last_updated, screen_ids})
   end
 
   ### Server
@@ -120,42 +120,51 @@ defmodule Screens.ScreensByAlert.GenServer do
 
   @impl GenServer
   def handle_call(
-        {:get_screens_by_alert, alert_id},
+        {:get_screens_by_alert, alert_ids},
         _from,
         %__MODULE__{} = state
       ) do
-    result =
-      case Map.get(state.screens_by_alert, alert_id) do
-        %{screen_ids: screen_ids} ->
-          screen_ids
+    now = System.system_time(:second)
+
+    default_map = Map.new(alert_ids, &{&1, []})
+
+    found_items =
+      state.screens_by_alert
+      |> Map.take(alert_ids)
+      |> Map.new(fn {alert_id, %{screen_ids: timestamped_screen_ids}} ->
+        screen_ids =
+          timestamped_screen_ids
           # Reject expired screen_ids just in case.
           |> Enum.reject(fn {_id, created_at} ->
-            created_at + state.screens_ttl_seconds < System.system_time(:second)
+            created_at + state.screens_ttl_seconds < now
           end)
-          # Put in MapSet to remove duplicates
-          |> MapSet.new(fn {id, _created_at} -> id end)
-          |> Enum.map(fn screen_id ->
-            {screen_id, state.screens_last_updated[screen_id].last_updated}
-          end)
+          |> Enum.map(fn {id, _created_at} -> id end)
+          |> Enum.uniq()
 
-        # Alert either expired or never existed.
-        _ ->
-          []
-      end
+        {alert_id, screen_ids}
+      end)
+
+    result = Map.merge(default_map, found_items)
 
     {:reply, result, state}
   end
 
   @impl GenServer
   def handle_call(
-        {:get_screens_last_updated, screen_id},
+        {:get_screens_last_updated, screen_ids},
         _from,
         %__MODULE__{} = state
       ) do
-    case Map.fetch(state.screens_last_updated, screen_id) do
-      {:ok, screen_last_updated} -> {:reply, screen_last_updated.last_updated, state}
-      :error -> {:reply, nil, state}
-    end
+    default_map = Map.new(screen_ids, &{&1, 0})
+
+    found_items =
+      state.screens_last_updated
+      |> Map.take(screen_ids)
+      |> Map.new(fn {id, data} -> {id, data.last_updated} end)
+
+    result = Map.merge(default_map, found_items)
+
+    {:reply, result, state}
   end
 
   @impl GenServer

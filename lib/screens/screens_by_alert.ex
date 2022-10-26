@@ -46,12 +46,12 @@ defmodule Screens.ScreensByAlert do
   end
 
   @impl true
-  def get_screens_by_alert(alert_id) do
-    @cache_module.get_screens_by_alert(alert_id)
+  def get_screens_by_alert(alert_ids) do
+    @cache_module.get_screens_by_alert(alert_ids)
   end
 
   @impl true
-  def get_screens_last_updated(screen_id) do
-    @cache_module.get_screens_last_updated(screen_id)
+  def get_screens_last_updated(screen_ids) do
+    @cache_module.get_screens_last_updated(screen_ids)
   end
 end
