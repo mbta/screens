@@ -57,10 +57,8 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
       |> Enum.map(fn {screen_id, _timestamp} -> screen_id end)
       |> Enum.split(@max_screen_updates_per_run)
 
-    max_refreshes_per_run_exceeded = match?([_ | _], overflow)
-
     Logger.info(
-      "[running screens_by_alert self refresh] refreshing_screen_ids=#{Enum.join(screen_ids_to_refresh, ",")} max_refreshes_per_run_exceeded=#{max_refreshes_per_run_exceeded}"
+      ~s|[running screens_by_alert self refresh] screen_ids_being_refreshed_now="#{Enum.join(screen_ids_to_refresh, ",")}" remaining_screen_ids_to_refresh="#{Enum.join(overflow, ",")}"|
     )
 
     # We don't care about the result of the work, just its side-effect
