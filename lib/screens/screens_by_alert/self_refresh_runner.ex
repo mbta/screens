@@ -26,10 +26,17 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   # plenty of space to avoid overlapping runs.
   @max_screen_updates_per_run 20
 
-  @screens_ttl_seconds Application.compile_env(:screens, :screens_by_alert)[:screens_ttl_seconds]
+  @config Application.compile_env(:screens, :screens_by_alert)
 
-  # The job runs at the same rate as screen data expiration from the cache (though these "windows" will be offset from one another)
-  @job_run_interval_ms @screens_ttl_seconds * 1_000
+  @screens_ttl_seconds @config[:screens_ttl_seconds]
+
+  # Unless a `self_refresh_run_interval_ms` value is defined,
+  # the job runs at the same rate as screen data expiration from the cache (though these "windows" will be offset from one another)
+  @job_run_interval_ms Keyword.get(
+                         @config,
+                         :self_refresh_run_interval_ms,
+                         @screens_ttl_seconds * 1_000
+                       )
 
   @screen_data_fn Application.compile_env(:screens, :screens_by_alert)[:screen_data_fn]
 

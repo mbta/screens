@@ -81,3 +81,9 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 config :screens, :redirect_http?, false
+
+config :screens, :screens_by_alert,
+  screens_by_alert_ttl_seconds: 600,
+  screens_last_updated_ttl_seconds: 3600,
+  screens_ttl_seconds: 600,
+  self_refresh_run_interval_ms: 40_000
