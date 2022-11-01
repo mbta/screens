@@ -67,7 +67,8 @@ config :screens, ScreensWeb.AuthManager, secret_key: screens_auth_secret
 config :screens, ScreensByAlert.Memcache,
   connection_opts: [
     namespace: System.get_env("HOST"),
-    hostname: System.get_env("MEMCACHED_HOST")
+    hostname: System.get_env("MEMCACHED_HOST"),
+    coder: {Memcache.Coder.Erlang, [:safe]}
   ]
 
 # ## Using releases (Elixir v1.9+)
