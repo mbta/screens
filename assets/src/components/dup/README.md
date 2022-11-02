@@ -7,27 +7,31 @@
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
   - `ScreenPage` component in dup_screen_page.tsx should render `DupScreenPage` rather than `DevelopmentScreenPage`.
 - Create priv/static/dup-app.html if it doesn’t already exist. Copy paste the following contents in:
+
   ```html
   <!DOCTYPE html>
   <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Screens</title>
+      <link rel="stylesheet" href="inter_font_face.css" />
+      <link rel="stylesheet" href="dup.css" />
+    </head>
 
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Screens</title>
-    <link rel="stylesheet" href="dup_font_face.css">
-    <link rel="stylesheet" href="dup.css">
-  </head>
-
-  <body>
-    <div id="app" data-last-refresh="2020-09-25T17:23:00Z" data-environment-name="screens-prod"></div>
-    <script type="text/javascript" src="polyfills.js"></script>
-    <script type="text/javascript" src="dup.js"></script>
-  </body>
-
+    <body>
+      <div
+        id="app"
+        data-last-refresh="2020-09-25T17:23:00Z"
+        data-environment-name="screens-prod"
+      ></div>
+      <script type="text/javascript" src="polyfills.js"></script>
+      <script type="text/javascript" src="dup.js"></script>
+    </body>
   </html>
   ```
+
 - Set the version string in assets/src/components/dup/version.tsx to `current_year.current_month.current_day.1`.
 - In assets/webpack.config.js, change `publicPath` in the font config to have value `'fonts/'`.
 - **Only if you are packaging for local testing**, replace `const station = useOutfrontStation();` in assets/src/components/dup/dup_screen_page.tsx with `const station = "Broadway";` (or any other station name from one of the DUP screen IDs (`DUP-${name}`)). This data is provided by Outfront's "wrapper" app that runs on the real DUP screens, but we need to set it ourselves during testing. Think of it as a sort of frontend environment variable.
@@ -36,8 +40,8 @@
   for ROTATION_INDEX in {0..2}; do
     echo "export const ROTATION_INDEX = ${ROTATION_INDEX};" > ../../assets/src/components/dup/rotation_index.tsx
     npm --prefix ../../assets run deploy
-    cp -r css/dup.css js/polyfills.js js/dup.js ../dup_font_face.css ../fonts ../template.json ../preview.png .
-    zip -r dup-app-${ROTATION_INDEX}.zip dup.css polyfills.js dup.js dup_font_face.css fonts images dup-app.html template.json preview.png
+  cp -r css/dup.css js/polyfills.js js/dup.js ../inter_font_face.css ../fonts ../template.json ../preview.png .
+    zip -r dup-app-${ROTATION_INDEX}.zip dup.css polyfills.js dup.js inter_font_face.css fonts images dup-app.html template.json preview.png
   done
   ```
 - Commit the version bump on a branch, push it, and create a PR to mark the deploy.
@@ -46,6 +50,7 @@
 
 To assist with debugging on the DUP screens, you can paste this at the module scope in dup.tsx to have console logs
 show up on the screen:
+
 ```js
 const dEl = document.createElement("div");
 dEl.id = "debug";
