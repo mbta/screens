@@ -12,8 +12,8 @@ defmodule ScreensWeb.ScreensByAlertController do
   def index(conn, %{"ids" => alert_ids_string}) do
     alert_ids =
       alert_ids_string
-      |> String.trim()
-      |> String.split(",")
+      |> String.split(",", trim: true)
+      |> Enum.map(&String.trim/1)
 
     if valid_alert_ids_param?(alert_ids) do
       json(conn, ScreensByAlert.get_screens_by_alert(alert_ids))
