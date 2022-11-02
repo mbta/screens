@@ -27,6 +27,6 @@ defmodule ScreensWeb.ScreensByAlertController do
   end
 
   defp valid_alert_ids_param?(alert_ids) do
-    Enum.all?(alert_ids, &(Integer.parse(&1) != :error))
+    Enum.all?(alert_ids, &match?({_n, ""}, Integer.parse(&1)))
   end
 end
