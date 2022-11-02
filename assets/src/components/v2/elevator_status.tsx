@@ -153,7 +153,7 @@ const getTimeframeEndText = (
     if (activePeriod.end === null) {
       endText = "Until further notice";
     } else {
-      const endDate = moment(activePeriod.end).tz("America/New_York");
+      const endDate = moment(activePeriod.end).subtract(3, "hours");
 
       if (endDate.date() === moment().tz("America/New_York").date()) {
         endText = "Until later today";
@@ -168,7 +168,7 @@ const getTimeframeEndText = (
     } else {
       // We use the Los Angeles TZ whenever we want "end of service" to reflect
       // the previous day's date.
-      const endDate = moment(activePeriod.end).tz("America/Los_Angeles");
+      const endDate = moment(activePeriod.end).subtract(3, "hours");
       if (startDate.month() === endDate.month()) {
         if (startDate.day() === endDate.day()) {
           endText = `${startDate.format("MMM D")}`;
