@@ -18,7 +18,7 @@ defmodule ScreensWeb.ScreensByAlertController do
     if valid_alert_ids_param?(alert_ids) do
       json(conn, ScreensByAlert.get_screens_by_alert(alert_ids))
     else
-      Plug.Conn.send_resp(conn, 400, "Invalid alert ID found")
+      send_resp(conn, 400, "Invalid alert ID found")
     end
   end
 
