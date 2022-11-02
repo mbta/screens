@@ -25,4 +25,18 @@ defmodule ScreensWeb.ScreensByAlertControllerTest do
     conn = get(conn, "/api/screens_by_alert?ids=1,2,3")
     assert %{status: 200} = conn
   end
+
+  test "returns 200 in status when query param is provided with excess whitespace", %{
+    conn: conn
+  } do
+    conn = get(conn, "/api/screens_by_alert?ids=1,  2,3  ,, 5")
+    assert %{status: 200} = conn
+  end
+
+  test "returns 400 in status when query param contains a nonnumeric string", %{
+    conn: conn
+  } do
+    conn = get(conn, "/api/screens_by_alert?ids=test,2,3")
+    assert %{status: 400} = conn
+  end
 end
