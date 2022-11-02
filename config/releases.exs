@@ -68,7 +68,7 @@ config :screens, Screens.ScreensByAlert.Memcache,
   connection_opts: [
     namespace: System.get_env("HOST"),
     hostname: System.get_env("MEMCACHED_HOST"),
-    coder: {Memcache.Coder.Erlang, [:safe]}
+    coder: Screens.ScreensByAlert.Memcache.SafeErlangCoder
   ]
 
 # ## Using releases (Elixir v1.9+)
