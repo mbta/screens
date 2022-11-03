@@ -52,6 +52,10 @@ defmodule Screens.ScreensByAlert.Memcache do
 
   @impl true
   def put_data(screen_id, alert_ids) when is_binary(screen_id) and is_list(alert_ids) do
+    Logger.info(
+      "[put_data called] screen_id=#{screen_id} alert_ids=[#{Enum.join(alert_ids, ",")}]"
+    )
+
     # To avoid bottlenecks and unnecessarily blocking the caller, run in a separate task process
     _ = Task.Supervisor.start_child(TaskSupervisor, fn -> do_put(screen_id, alert_ids) end)
 
@@ -60,6 +64,7 @@ defmodule Screens.ScreensByAlert.Memcache do
 
   @impl true
   def get_screens_by_alert(alert_ids) when is_list(alert_ids) do
+    Logger.info("[get_screens_by_alert called] alert_ids=[#{Enum.join(alert_ids, ",")}]")
     now = System.system_time(:second)
     default_map = Map.new(alert_ids, &{&1, []})
     cache_keys = Enum.map(alert_ids, &alert_key/1)
@@ -78,6 +83,10 @@ defmodule Screens.ScreensByAlert.Memcache do
 
   @impl true
   def get_screens_last_updated(screen_ids) when is_list(screen_ids) do
+    Logger.info(
+      "[get_screens_last_updated called] screen_ids=alert_ids=[#{Enum.join(screen_ids, ",")}]"
+    )
+
     default_map = Map.new(screen_ids, &{&1, 0})
     cache_keys = Enum.map(screen_ids, &last_updated_key/1)
 
