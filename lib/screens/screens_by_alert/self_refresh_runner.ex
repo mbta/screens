@@ -22,21 +22,14 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
 
   # Maximum number of screen updates that can happen per run.
   # Assuming a worst case of .5 sec per screen update, a max
-  # of 20 has the job take 10 seconds max per run, giving
+  # of 20 has the job take 10 seconds max per run synchronously.
+  # With concurrency, we get some more padding. 30 per run should give us
   # plenty of space to avoid overlapping runs.
-  @max_screen_updates_per_run 20
+  @max_screen_updates_per_run 30
 
-  @config Application.compile_env(:screens, :screens_by_alert)
-
-  @screens_ttl_seconds @config[:screens_ttl_seconds]
-
-  # Unless a `self_refresh_run_interval_ms` value is defined,
-  # the job runs at the same rate as screen data expiration from the cache (though these "windows" will be offset from one another)
-  @job_run_interval_ms Keyword.get(
-                         @config,
-                         :self_refresh_run_interval_ms,
-                         @screens_ttl_seconds * 1_000
-                       )
+  # The job should run just slower than the slowest screen client refresh rate (e-ink, 30 sec)
+  @job_run_interval_ms 31_000
+  @data_ttl_seconds 31
 
   @screen_data_fn Application.compile_env(:screens, :screens_by_alert)[:screen_data_fn]
 
@@ -58,7 +51,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
       # get a mapping from each ID to its last updated time
       |> ScreensByAlert.get_screens_last_updated()
       # filter to outdated IDs
-      |> Enum.filter(fn {_screen_id, timestamp} -> now - timestamp > @screens_ttl_seconds end)
+      |> Enum.filter(fn {_screen_id, timestamp} -> now - timestamp > @data_ttl_seconds end)
       # sort by age, oldest first
       |> Enum.sort_by(fn {_screen_id, timestamp} -> timestamp end)
       |> Enum.map(fn {screen_id, _timestamp} -> screen_id end)
