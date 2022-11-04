@@ -52,8 +52,14 @@ defmodule Screens.ScreensByAlert.Memcache do
 
   @impl true
   def put_data(screen_id, alert_ids) when is_binary(screen_id) and is_list(alert_ids) do
+    now = System.system_time(:second)
+
     # To avoid bottlenecks and unnecessarily blocking the caller, run in a separate task process
-    _ = Task.Supervisor.start_child(TaskSupervisor, fn -> do_put(screen_id, alert_ids) end)
+    _ =
+      Task.Supervisor.start_child(TaskSupervisor, fn ->
+        update_screens_last_updated_key(screen_id, now)
+        Enum.each(alert_ids, &update_alert_key(&1, screen_id, now))
+      end)
 
     :ok
   end
@@ -93,10 +99,7 @@ defmodule Screens.ScreensByAlert.Memcache do
     end
   end
 
-  defp do_put(screen_id, alert_ids) do
-    now = System.system_time(:second)
-
-    # Put last updated timestamp under screens_last_updated.<id>
+  defp update_screens_last_updated_key(screen_id, now) do
     set_result =
       Memcache.set(@server, last_updated_key(screen_id), now, ttl: @screens_last_updated_ttl)
 
@@ -110,8 +113,6 @@ defmodule Screens.ScreensByAlert.Memcache do
         _ ->
           :ok
       end
-
-    Enum.each(alert_ids, &update_alert_key(&1, screen_id, now))
   end
 
   # Creates or updates the cache item for the given alert ID with the given screen ID, retrying until success.
@@ -119,22 +120,15 @@ defmodule Screens.ScreensByAlert.Memcache do
   # any screen IDs that have expired.
   defp update_alert_key(alert_id, screen_id, now) do
     key = alert_key(alert_id)
-    timestamped_screen_id = {screen_id, now}
+    new_timestamped_screen_id = {screen_id, now}
 
     cas_result =
       Memcache.cas(
         @server,
         key,
-        fn timestamped_screen_ids ->
-          unexpired_ids =
-            Enum.reject(timestamped_screen_ids, fn {_id, timestamp} ->
-              timestamp + @screens_ttl < now
-            end)
-
-          [timestamped_screen_id | unexpired_ids]
-        end,
+        timestamped_screens_updater_fn(new_timestamped_screen_id),
         retry: true,
-        default: [timestamped_screen_id],
+        default: [new_timestamped_screen_id],
         ttl: @screens_by_alert_ttl
       )
 
@@ -146,6 +140,17 @@ defmodule Screens.ScreensByAlert.Memcache do
 
       _ ->
         :ok
+    end
+  end
+
+  defp timestamped_screens_updater_fn({_id, now} = new_timestamped_screen_id) do
+    fn timestamped_screen_ids ->
+      unexpired_ids =
+        Enum.reject(timestamped_screen_ids, fn {_id, timestamp} ->
+          timestamp + @screens_ttl < now
+        end)
+
+      [new_timestamped_screen_id | unexpired_ids]
     end
   end
 
