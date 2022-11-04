@@ -23,9 +23,15 @@ defmodule Screens.Application do
       :hackney_pool.child_spec(:api_v3_pool, max_connections: 100),
       {Screens.Stops.StationsWithRoutesAgent, %{}},
       {Screens.BlueBikes.State, name: Screens.BlueBikes.State},
-      Screens.ScreensByAlert
-      # {Task.Supervisor, name: Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor},
-      # {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner}
+      # Task supervisor for ScreensByAlert async updates
+      # This supervisor is only used in deployment envs, but it's harmless to start it anyway in local dev.
+      {Task.Supervisor, name: Screens.ScreensByAlert.Memcache.TaskSupervisor},
+      # ScreensByAlert server process
+      Screens.ScreensByAlert,
+      # Task supervisor for ScreensByAlert self-refresh jobs
+      {Task.Supervisor, name: Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor},
+      # ScreensByAlert self-refresh job runner
+      {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

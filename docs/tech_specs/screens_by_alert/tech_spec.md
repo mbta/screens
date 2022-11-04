@@ -19,7 +19,7 @@ Cached values will be as follows, defined as Elixir typespecs:
 ```ex
 @type alert_id :: String.t()
 @type screen_id :: String.t()
-@type timestamp :: integer()  # we'll use System.monotonic_time/0 to produce these
+@type timestamp :: integer()  # we'll use System.system_time(:second) to produce these
 @type timestamped_screen_id :: {screen_id, timestamp}
 
 @type cache :: %{
@@ -93,9 +93,6 @@ time2 = System.system_time(:second)
 
 time2 - time1
 ```
-
-[Elixir docs on monotonic time][hexdocs:monotonic time]\
-[Erlang's dos and don'ts on monotonic time][erldocs:monotonic time]
 
 ### Serialization format
 
@@ -200,5 +197,3 @@ TBD on how we will implement this in Screenplay. It could happen on the client o
 [api rate limiter modules]: https://github.com/mbta/api/tree/5863e82aec29f7b7fe5e13e39b2e0e39339df52d/apps/api_web/lib/api_web/rate_limiter
 [memcached commands doc]: https://github.com/memcached/memcached/wiki/Commands
 [data structure diagram]: /docs/assets/screens_by_alert_cached_data_structure.png
-[hexdocs:monotonic time]: https://hexdocs.pm/elixir/System.html#module-time
-[erldocs:monotonic time]: https://www.erlang.org/doc/apps/erts/time_correction.html#how-to-work-with-the-new-api
