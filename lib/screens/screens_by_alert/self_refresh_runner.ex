@@ -23,8 +23,8 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   # Maximum number of screen updates that can happen per run
   @max_screen_updates_per_run 30
 
-  # The job should run just slower than the slowest screen client refresh rate (e-ink, 30 sec)
-  @job_run_interval_ms 31_000
+  # The job should run a bit slower than the slowest screen client refresh rate (e-ink, 30 sec)
+  @job_run_interval_ms 40_000
 
   @data_ttl_seconds 30
 
