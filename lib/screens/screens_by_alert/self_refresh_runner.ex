@@ -20,16 +20,13 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
 
   ### Server
 
-  # Maximum number of screen updates that can happen per run.
-  # Assuming a worst case of .5 sec per screen update, a max
-  # of 20 has the job take 10 seconds max per run synchronously.
-  # With concurrency, we get some more padding. 30 per run should give us
-  # plenty of space to avoid overlapping runs.
+  # Maximum number of screen updates that can happen per run
   @max_screen_updates_per_run 30
 
   # The job should run just slower than the slowest screen client refresh rate (e-ink, 30 sec)
   @job_run_interval_ms 31_000
-  @data_ttl_seconds 31
+
+  @data_ttl_seconds 30
 
   @screen_data_fn Application.compile_env(:screens, :screens_by_alert)[:screen_data_fn]
 
