@@ -7,6 +7,10 @@ defmodule Screens.Alerts.Parser do
     |> Enum.reject(&is_nil/1)
   end
 
+  def parse_alert(%{"id" => id, "attributes" => attributes}) when map_size(attributes) == 0 do
+    %Screens.Alerts.Alert{id: id}
+  end
+
   def parse_alert(%{"id" => id, "attributes" => attributes}) do
     case attributes do
       %{
