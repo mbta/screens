@@ -239,6 +239,16 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
+  defp format_query_param({:fields, fields}) when is_list(fields) do
+    [
+      {"fields[alert]", Enum.join(fields, ",")}
+    ]
+  end
+
+  defp format_query_param({:field, field}) when is_binary(field) do
+    format_query_param({:fields, [field]})
+  end
+
   defp format_query_param({:stop_ids, stop_ids}) when is_list(stop_ids) do
     [
       {"filter[stop]", Enum.join(stop_ids, ",")}
