@@ -141,6 +141,9 @@ defmodule Screens.Stops.Stop do
   ]
 
   @green_line_d_stops [
+    {"place-unsqu", {"Union Square", "Union Sq"}},
+    {"place-lech", {"Lechmere", "Lechmere"}},
+    {"place-spmnl", {"Science Park/West End", "Science Pk"}},
     {"place-north", {"North Station", "North Sta"}},
     {"place-haecl", {"Haymarket", "Haymarket"}},
     {"place-gover", {"Government Center", "Gov't Ctr"}},
@@ -166,7 +169,11 @@ defmodule Screens.Stops.Stop do
   ]
 
   @green_line_e_stops [
-    {"place-unsqu", {"Union Square", "Union Sq"}},
+    {"place-mdftf", {"Medford / Tufts", "Medfd/Tufts"}},
+    {"place-balsq", {"Ball Square", "Ball Sq"}},
+    {"place-mgngl", {"Magoun Square", "Magoun Sq"}},
+    {"place-gilmn", {"Gilman Square", "Gilman Sq"}},
+    {"place-esomr", {"East Somerville", "E Somerville"}},
     {"place-lech", {"Lechmere", "Lechmere"}},
     {"place-spmnl", {"Science Park/West End", "Science Pk"}},
     {"place-north", {"North Station", "North Sta"}},
