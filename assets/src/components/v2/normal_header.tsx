@@ -43,7 +43,8 @@ const NormalHeaderTitle = forwardRef(
       modifiers.push("with-icon");
     }
 
-    const abbreviatedText = fullName ? text : abbreviateText(text);
+    let abbreviatedText = fullName ? text : abbreviateText(text);
+    abbreviatedText = abbreviatedText === "Medford/Tufts" ? "Lechmere" : abbreviatedText;
 
     return (
       <div className="normal-header-title">
