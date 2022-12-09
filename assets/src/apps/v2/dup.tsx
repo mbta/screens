@@ -18,6 +18,7 @@ import NormalHeader from "Components/v2/dup/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import NormalBody from "Components/v2/dup/normal_body";
+import Viewport from "Components/v2/dup/viewport";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -37,7 +38,9 @@ const App = (): JSX.Element => {
         </Route>
         <Route path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <ScreenPage />
+            <Viewport>
+              <ScreenPage />
+            </Viewport>
           </MappingContext.Provider>
         </Route>
       </Switch>

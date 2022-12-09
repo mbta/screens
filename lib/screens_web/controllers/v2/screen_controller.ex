@@ -45,6 +45,15 @@ defmodule ScreensWeb.V2.ScreenController do
     end
   end
 
+  defp rotation_index(params) do
+    case params["rotation_index"] do
+      "0" -> "0"
+      "1" -> "1"
+      "2" -> "2"
+      _ -> nil
+    end
+  end
+
   def index(conn, %{"id" => app_id})
       when app_id in @app_id_strings do
     app_id = String.to_existing_atom(app_id)
@@ -85,6 +94,7 @@ defmodule ScreensWeb.V2.ScreenController do
         |> assign(:screen_side, screen_side(params))
         |> assign(:requestor, params["requestor"])
         |> assign(:disable_sentry, params["disable_sentry"])
+        |> assign(:rotation_index, rotation_index(params))
         |> put_view(ScreensWeb.V2.ScreenView)
         |> render("index.html")
 
