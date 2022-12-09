@@ -17,9 +17,11 @@ import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/dup/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
+import NormalBody from "Components/v2/dup/normal_body";
 
 const TYPE_TO_COMPONENT = {
-  normal: NormalScreen,
+  screen_normal: NormalScreen,
+  body_normal: NormalBody,
   full_takeover: TakeoverScreen,
   placeholder: Placeholder,
   normal_header: NormalHeader,

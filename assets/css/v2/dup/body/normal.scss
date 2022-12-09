@@ -1,0 +1,19 @@
+.body-normal {
+  position: relative;
+}
+
+.body-normal__header {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 1920px;
+  height: 248px;
+}
+
+.body-normal__main-content {
+  position: absolute;
+  top: 248px;
+  left: 0px;
+  width: 1920px;
+  height: 832px;
+}
