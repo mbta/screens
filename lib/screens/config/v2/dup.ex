@@ -1,7 +1,8 @@
 defmodule Screens.Config.V2.Dup do
   @moduledoc false
 
-  alias Screens.Config.V2.{CurrentStopId, Departures, EvergreenContentItem}
+  alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Config.V2.{Departures, EvergreenContentItem}
 
   @type t :: %__MODULE__{
           header: CurrentStopId.t(),
