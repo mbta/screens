@@ -116,7 +116,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
           _ -> route_id
         end
       end)
-      |> Enum.map(&RoutePill.serialize_route_for_alert/1)
+      |> Enum.map(&RoutePill.serialize_route_for_alert(&1, MapSet.size(routes) == 1))
     else
       t
       |> route_type()

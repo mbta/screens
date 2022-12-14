@@ -126,9 +126,9 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     %{type: :icon, icon: :boat, color: :teal}
   end
 
-  @spec serialize_route_for_alert(Route.id()) :: t()
-  def serialize_route_for_alert(route_id) do
-    route = do_serialize(route_id, %{gl_long: false, gl_branch: true, cr_abbrev: true})
+  @spec serialize_route_for_alert(Route.id(), boolean()) :: t()
+  def serialize_route_for_alert(route_id, gl_long) do
+    route = do_serialize(route_id, %{gl_long: gl_long, gl_branch: true, cr_abbrev: true})
 
     Map.merge(route, %{color: get_color_for_route(route_id)})
   end
