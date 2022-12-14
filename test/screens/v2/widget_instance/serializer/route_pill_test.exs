@@ -86,6 +86,13 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
     end
   end
 
+  describe "serialize_route_for_alert/2" do
+    test "Includes branch name and short text for Green Line" do
+      assert %{type: :text, text: "GL·B", color: :green} ==
+               serialize_route_for_alert("Green-B", false)
+    end
+  end
+
   describe "serialize_route_for_reconstructed_alert/1" do
     test "Returns RL for Red Line" do
       assert %{type: :text, text: "RL", color: :red} ==
