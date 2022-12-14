@@ -355,6 +355,23 @@ defmodule Screens.V2.WidgetInstance.Alert do
     MapSet.subset?(active_routes_at_stop(t), BaseAlert.informed_routes_at_home_stop(t))
   end
 
+  defp informed_routes(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
+    Enum.filter(informed_entities(t), fn
+      %{route: "Green" <> _} -> true
+      _ -> false
+    end)
+    |> Enum.map(fn %{route: route} -> route end)
+    |> Enum.into(MapSet.new())
+    |> Enum.reduce_while(MapSet.new(), fn
+      route, acc ->
+        if MapSet.size(acc) == 2 do
+          {:halt, MapSet.new(["Green"])}
+        else
+          {:cont, MapSet.put(acc, route)}
+        end
+    end)
+  end
+
   defp informed_routes(t) do
     rt = route_type(t)
     home_stop = home_stop_id(t)
