@@ -53,6 +53,9 @@ defmodule Screens.V2.WidgetInstance.Alert do
                       :elevator_closure ->
                         "Elevator Closed"
 
+                      :shuttle ->
+                        "Shuttle Buses"
+
                       effect ->
                         effect
                         |> Atom.to_string()
