@@ -15,7 +15,7 @@ const TEXT_LEFT_MARGIN = 18;
 const TEXT_TOP_MARGIN = 10;
 const VEHICLE_ICON_SIZE = 44;
 const SCHEDULED_DEPARTURE_SIZE = 192;
-const MAXIMUM_STOP_LABEL_LENGTH = 18;
+const MAXIMUM_STOP_LABEL_LENGTH = 16;
 
 const abbreviateStop = (stop) => {
   if (stop === "Heath Street") {
