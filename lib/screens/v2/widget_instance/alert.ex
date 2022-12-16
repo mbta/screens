@@ -156,7 +156,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   def takeover_alert?(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
     active?(t) and effect(t) in [:station_closure, :suspension, :shuttle] and
-      BaseAlert.location(t) == :inside
+      BaseAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
   end
 
   def takeover_alert?(

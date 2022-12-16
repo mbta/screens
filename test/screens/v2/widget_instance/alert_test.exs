@@ -321,15 +321,15 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       %{widget: widget}
     end
 
-    # active | high-impact | location :inside || full-screen?
-    # n      | n           | n                || n
-    # y      | n           | n                || n
-    # n      | y           | n                || n
-    # y      | y           | n                || n
-    # n      | n           | y                || n
-    # y      | n           | y                || n
-    # n      | y           | y                || n
-    # y      | y           | y                || y
+    # active | high-impact | location [:inside, :boundary_downstream, :boundary_upstream]  || full-screen?
+    # n      | n           | n                                                             || n
+    # y      | n           | n                                                             || n
+    # n      | y           | n                                                             || n
+    # y      | y           | n                                                             || n
+    # n      | n           | y                                                             || n
+    # y      | n           | y                                                             || n
+    # n      | y           | y                                                             || n
+    # y      | y           | y                                                             || y
 
     @gl_slot_names_cases %{
       {false, false, false} => [:medium],
@@ -342,7 +342,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       {true, true, true} => [:full_body_top_screen]
     }
 
-    for {{set_active?, set_high_impact_effect?, set_location_inside?}, expected_slot_names} <-
+    for {{set_active?, set_high_impact_effect?, set_location_inside_or_boundary?},
+         expected_slot_names} <-
           @gl_slot_names_cases do
       false_to_not = fn
         true -> " "
@@ -355,7 +356,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
           "active and does" <>
           false_to_not.(set_high_impact_effect?) <>
           "have a high-impact effect and does" <>
-          false_to_not.(set_location_inside?) <>
+          false_to_not.(set_location_inside_or_boundary?) <>
           "contain home stop in informed region"
 
       test test_description, %{widget: widget} do
@@ -368,9 +369,9 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
         effect = if(unquote(set_high_impact_effect?), do: :suspension, else: :elevator_closure)
 
         informed_entities =
-          if(unquote(set_location_inside?),
+          if(unquote(set_location_inside_or_boundary?),
             do: [ie(stop: "4"), ie(stop: "5"), ie(stop: "6")],
-            else: [ie(stop: "5"), ie(stop: "6")]
+            else: [ie(stop: "6"), ie(stop: "7")]
           )
 
         widget =
