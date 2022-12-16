@@ -42,7 +42,7 @@ defmodule Screens.V2.ScreenData do
     layout_and_widgets =
       config
       |> fetch_data()
-      |> tap(&cache_visible_alert_widgets(&1, screen_id))
+      |> tap(&cache_visible_alert_widgets(&1, screen_id, config.hidden_from_screenplay))
       |> resolve_paging(refresh_rate)
 
     unless opts[:skip_serialize] do
@@ -478,7 +478,9 @@ defmodule Screens.V2.ScreenData do
     end
   end
 
-  def cache_visible_alert_widgets({_layout, instance_map}, screen_id) do
+  def cache_visible_alert_widgets(_, _, true), do: nil
+
+  def cache_visible_alert_widgets({_layout, instance_map}, screen_id, _) do
     alert_ids =
       instance_map
       |> Map.values()
