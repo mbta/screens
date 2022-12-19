@@ -7,7 +7,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias Screens.Config.V2.{BusEink, BusShelter, Departures, GlEink, Solari, SolariLarge}
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
 
   def departures_instances(
         %Screen{app_params: %app{}} = config,
@@ -29,7 +29,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   end
 
   defp do_departures_instances(
-         %{app_params: %{departures: %Departures{sections: sections}}} = config,
+         %Screen{app_params: %{departures: %Departures{sections: sections}}, app_id: app_id} =
+           config,
          fetch_section_departures_fn,
          post_processing_fn
        ) do
@@ -46,6 +47,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
         sections_data == [:overnight] ->
           %OvernightDepartures{}
+
+        sections_data == [ok: []] and app_id == :bus_eink_v2 ->
+          %DeparturesNoService{screen: config}
 
         true ->
           sections =
