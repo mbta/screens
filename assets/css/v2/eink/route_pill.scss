@@ -15,6 +15,10 @@
   font-family: "neue-haas-grotesk-text";
   font-weight: 700;
   color: white;
+
+  &--small {
+    font-size: 112px;
+  }
 }
 
 .route-pill__slashed-text {

@@ -14,6 +14,7 @@ interface BasePill {
 
 interface TextPill extends BasePill {
   text: string;
+  size?: string;
 }
 
 interface IconPill extends BasePill {
@@ -29,10 +30,19 @@ type Color = "red" | "orange" | "green" | "blue" | "purple" | "yellow" | "teal";
 
 type PillIcon = "bus" | "light_rail" | "rail" | "boat";
 
-const TextRoutePill: ComponentType<TextPill> = ({ color, text, outline }) => {
+const TextRoutePill: ComponentType<TextPill> = ({
+  color,
+  text,
+  outline,
+  size,
+}) => {
   const modifiers: string[] = [color];
   if (outline) {
     modifiers.push("outline");
+  }
+
+  if (size) {
+    modifiers.push(size);
   }
 
   return (
@@ -86,24 +96,29 @@ const RoutePill: ComponentType<Pill> = (pill) => {
   let branches = null;
   if (pill.branches) {
     branches = pill.branches.map((branch: string) => (
-      <div key={branch} className={classWithModifiers("route-pill", modifiers.concat(["branch"]))}>
+      <div
+        key={branch}
+        className={classWithModifiers(
+          "route-pill",
+          modifiers.concat(["branch"])
+        )}
+      >
         <TextRoutePill {...pill} text={branch} />
       </div>
-    ))
+    ));
   }
 
   return (
     <>
       <div className={classWithModifiers("route-pill", modifiers)}>
         {innerContent}
-        
       </div>
-      {branches && 
+      {branches && (
         <div className="route-pills__branches">
           <span className="route-pills__branches__dot"></span>
           {branches}
         </div>
-      }
+      )}
     </>
   );
 };
