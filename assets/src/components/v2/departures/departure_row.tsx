@@ -11,10 +11,14 @@ const DepartureRow = ({
   times_with_crowding: timesWithCrowding,
   inline_alerts: inlineAlerts,
 }) => {
+  const routeText = Number(route.text);
   return (
     <div className="departure-row">
       <div className="departure-row__route">
-        <RoutePill {...route} />
+        <RoutePill
+          {...route}
+          size={isNaN(routeText) || routeText > 200 ? "small" : "large"}
+        />
       </div>
       <div className="departure-row__destination">
         <Destination {...headsign} />
