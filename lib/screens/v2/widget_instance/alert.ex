@@ -355,6 +355,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
     MapSet.subset?(active_routes_at_stop(t), BaseAlert.informed_routes_at_home_stop(t))
   end
 
+  # For GL, we want to list all affected branches for the alert and not just the branch serving the home stop.
+  # This allows us to show a pill for each branch in the informed_entities of the alert (or GL pill if all branches are affected).
   defp informed_routes(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
     Enum.filter(informed_entities(t), fn
       %{route: "Green" <> _} -> true
@@ -372,6 +374,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
     end)
   end
 
+  # Takes all_routes_at_stop and removes any route that is not affected by the alert.
+  # Remaining routes show as pills on the alert component.
   defp informed_routes(t) do
     rt = route_type(t)
     home_stop = home_stop_id(t)
