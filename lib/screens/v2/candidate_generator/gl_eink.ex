@@ -37,11 +37,17 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
               Builder.with_paging({:flex_zone, %{one_medium: [:medium]}}, 2),
               :footer
             ],
+            # This layout variant is necessary for the DeparturesNoData widget
+            # to take up both the usual main_content slot, and the left_sidebar
+            # slot to its left, while still allowing the normal flex zone
+            # to appear on the bottom screen.
             top_takeover: [
-              :full_body_top_screen,
+              :full_main_content,
               Builder.with_paging({:flex_zone, %{one_medium: [:medium]}}, 2),
               :footer
             ],
+            # This layout allows takeover alerts (or other non-fullscreen takeover content)
+            # to be paired with filler content on the bottom screen.
             body_takeover: [
               :full_body_top_screen,
               :full_body_bottom_screen
