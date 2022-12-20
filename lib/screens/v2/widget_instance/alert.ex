@@ -358,7 +358,9 @@ defmodule Screens.V2.WidgetInstance.Alert do
   # For GL, we want to list all affected branches for the alert and not just the branch serving the home stop.
   # This allows us to show a pill for each branch in the informed_entities of the alert (or GL pill if all branches are affected).
   defp informed_routes(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
-    Enum.filter(informed_entities(t), fn
+    t
+    |> informed_entities()
+    |> Enum.filter(fn
       %{route: "Green" <> _} -> true
       _ -> false
     end)
