@@ -31,6 +31,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
           section_data: list(section | notice_section)
         }
 
+  # The maximum number of departures to send back to the client.
+  # ("Departures" here can be either an actual departure, or a "notice row")
+  @max_departures 15
+
   defimpl Screens.V2.WidgetInstance do
     def priority(_instance), do: [2]
 
@@ -60,9 +64,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(%{type: :normal_section, rows: departures}, screen) do
-    rows = group_consecutive_departures(departures)
+    rows =
+      departures
+      |> Enum.take(@max_departures)
+      |> group_consecutive_departures()
+      |> Enum.map(&serialize_row(&1, screen))
 
-    %{type: :normal_section, rows: Enum.map(rows, &serialize_row(&1, screen))}
+    %{type: :normal_section, rows: rows}
   end
 
   def audio_serialize_section(%{type: :notice_section, text: text}, _screen) do
