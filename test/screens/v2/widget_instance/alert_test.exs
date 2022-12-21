@@ -189,6 +189,74 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       assert expected_json_map == AlertWidget.serialize(widget)
     end
 
+    test "serializes a GL alert widget for alert affecting all branches", %{widget: widget} do
+      widget =
+        widget
+        |> put_informed_entities([
+          ie(route: "Green-B"),
+          ie(route: "Green-C"),
+          ie(route: "Green-D"),
+          ie(route: "Green-E")
+        ])
+        |> put_app_id(:gl_eink_v2)
+
+      expected_json_map = %{
+        route_pills: [
+          %{type: :text, text: "Green Line", color: :green}
+        ],
+        icon: :x,
+        header: "Stop Closed",
+        body: "Stop is closed.",
+        url: "mbta.com/alerts"
+      }
+
+      assert expected_json_map == AlertWidget.serialize(widget)
+    end
+
+    test "serializes a GL alert widget for alert affecting 2 branches", %{widget: widget} do
+      widget =
+        widget
+        |> put_informed_entities([
+          ie(route: "Green-B"),
+          ie(route: "Green-C")
+        ])
+        |> put_app_id(:gl_eink_v2)
+
+      expected_json_map = %{
+        route_pills: [
+          %{type: :text, text: "GL·B", color: :green},
+          %{type: :text, text: "GL·C", color: :green}
+        ],
+        icon: :x,
+        header: "Stop Closed",
+        body: "Stop is closed.",
+        url: "mbta.com/alerts"
+      }
+
+      assert expected_json_map == AlertWidget.serialize(widget)
+    end
+
+    test "serializes a GL alert widget for alert affecting 1 branches", %{widget: widget} do
+      widget =
+        widget
+        |> put_informed_entities([
+          ie(route: "Green-B")
+        ])
+        |> put_app_id(:gl_eink_v2)
+
+      expected_json_map = %{
+        route_pills: [
+          %{type: :text, text: "Green Line B", color: :green}
+        ],
+        icon: :x,
+        header: "Stop Closed",
+        body: "Stop is closed.",
+        url: "mbta.com/alerts"
+      }
+
+      assert expected_json_map == AlertWidget.serialize(widget)
+    end
+
     test "converts non-route informed entities to route pills as expected", %{widget: widget} do
       # widget has informed_entities: [%{stop: "5", route: nil, route_type: nil}]
 
