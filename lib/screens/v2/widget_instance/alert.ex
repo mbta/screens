@@ -189,6 +189,13 @@ defmodule Screens.V2.WidgetInstance.Alert do
     if takeover_alert?(t), do: :full_body_alert, else: :alert
   end
 
+  # Refer to https://mbta.sharepoint.com/:w:/s/CTDpublic/Eb_yKasCL9xKu_D9Xd1O5d0BG1GoHfplwoI-fpnru42M9w for how PIOs create alerts.
+  # For bus alerts, we assume that alerts are created using this guide.
+
+  # For bus suspensions, the endpoints of the alert are not directly affected by the suspension.
+  # This means that `boundary_upstream` and `boundary_downstream` stops are present in the `informed_entities` of the alerts,
+  # But the alert itself is not relevant for riders at the `boundary_upstream` stop.
+  # Because of this, we will not show a suspension alert at on a screen if the current stop is located on the `boundary_upstream`.
   def valid_candidate?(
         %__MODULE__{screen: %Screen{app_id: screen_type}, alert: %Alert{effect: :suspension}} = t
       )
@@ -198,6 +205,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
       active?(t)
   end
 
+  # For all other bus alert effects, all stops in the `informed_entities` are directly affected by the alert and would be useful for riders to see.
   def valid_candidate?(%__MODULE__{screen: %Screen{app_id: screen_type}} = t)
       when screen_type in [:bus_shelter_v2, :bus_eink_v2] do
     priority(t) != :no_render and
@@ -205,6 +213,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
       active?(t)
   end
 
+  # Any subway alert that is not filtered out in the candidate_generator is valid and should appear on screens›.
   def valid_candidate?(t) do
     priority(t) != :no_render
   end
