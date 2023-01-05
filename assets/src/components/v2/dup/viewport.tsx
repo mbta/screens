@@ -22,7 +22,7 @@ const Viewport: React.ComponentType<{}> = ({ children }) => {
       shifterClassName += " dup-shifter--rotation-two";
       break;
     default:
-      viewportClassName += " dup-screen-viewport--both";
+      viewportClassName += " dup-screen-viewport--all";
   }
 
   return (
