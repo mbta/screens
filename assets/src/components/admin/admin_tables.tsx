@@ -450,6 +450,41 @@ const DupScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
+const DupV2ScreensTable = (): JSX.Element => {
+  const columns = [
+    { Header: "Screen ID", accessor: "id", Filter: DefaultColumnFilter },
+    {
+      Header: "Primary Departures",
+      accessor: buildAppParamAccessor("primary_departures"),
+      mutator: buildAppParamMutator("primary_departures"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Secondary Departures",
+      accessor: buildAppParamAccessor("secondary_departures"),
+      mutator: buildAppParamMutator("secondary_departures"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Evergreen Content",
+      accessor: buildAppParamAccessor("evergreen_content"),
+      mutator: buildAppParamMutator("evergreen_content"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+  ];
+
+  const dataFilter = ({ app_id }) => {
+    return app_id === "dup_v2";
+  };
+  return <AdminTable columns={columns} dataFilter={dataFilter} />;
+};
+
 const v2Columns = [
   {
     Header: "Screen ID",
@@ -714,6 +749,7 @@ export {
   SolariScreensTable,
   SolariLargeScreensTable,
   DupScreensTable,
+  DupV2ScreensTable,
   BusEinkV2ScreensTable,
   GLEinkV2ScreensTable,
   SolariV2ScreensTable,
