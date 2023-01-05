@@ -17,9 +17,13 @@
 
 .departure-row__route {
   display: inline-block;
-  vertical-align: middle;
+  vertical-align: top;
   margin-left: 32px;
   margin-top: 32px;
+
+  &.center {
+    vertical-align: middle;
+  }
 }
 
 .departure-row__destination {
@@ -27,6 +31,7 @@
   vertical-align: middle;
   margin-left: 32px;
   margin-top: 32px;
+  margin-right: 20px;
 }
 
 .departure-row__time {

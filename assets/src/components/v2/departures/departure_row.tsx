@@ -11,10 +11,19 @@ const DepartureRow = ({
   times_with_crowding: timesWithCrowding,
   inline_alerts: inlineAlerts,
 }) => {
+  const routeText = Number(route.text);
   return (
     <div className="departure-row">
-      <div className="departure-row__route">
-        <RoutePill {...route} />
+      <div // Keep pill aligned to top if there is a variation for the headsign.
+        // Always aligning to top shifts destination text.
+        className={
+          "departure-row__route" + (headsign.variation ? "" : " center")
+        }
+      >
+        <RoutePill
+          {...route}
+          size={isNaN(routeText) || routeText > 200 ? "small" : "large"}
+        />
       </div>
       <div className="departure-row__destination">
         <Destination {...headsign} />

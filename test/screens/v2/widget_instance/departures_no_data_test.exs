@@ -36,7 +36,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoDataTest do
 
   describe "slot_names/1" do
     test "returns full_body_top_screen for gl_eink_v2", %{gl_eink_widget: gl_eink_widget} do
-      assert [:full_body_top_screen] == WidgetInstance.slot_names(gl_eink_widget)
+      assert [:full_main_content] == WidgetInstance.slot_names(gl_eink_widget)
     end
 
     test "returns main_content", %{widget: widget} do

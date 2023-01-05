@@ -12,7 +12,7 @@ const FareInfo = ({ modeIcon, modeText, modeCost }) => {
       <div className="fare-info__message">
         <div className="fare-info__message-header">{modeText} One-Way</div>
         <div className="fare-info__message-body">
-          CharlieCard, CharlieTicket, or Cash payment accepted on board
+          CharlieCard, CharlieTicket, or cash payment accepted on board
         </div>
       </div>
       <div className="fare-info__cost">{modeCost}</div>

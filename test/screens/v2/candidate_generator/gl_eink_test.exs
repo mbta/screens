@@ -44,7 +44,7 @@ defmodule Screens.V2.CandidateGenerator.GlEinkTest do
                        :footer
                      ],
                      top_takeover: [
-                       :full_body_top_screen,
+                       :full_main_content,
                        {{0, :flex_zone}, %{one_medium: [{0, :medium}]}},
                        {{1, :flex_zone}, %{one_medium: [{1, :medium}]}},
                        :footer
