@@ -2,8 +2,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Config.V2.Dup
+  alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.Template.Builder
