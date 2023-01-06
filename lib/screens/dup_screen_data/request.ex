@@ -37,6 +37,7 @@ defmodule Screens.DupScreenData.Request do
     "Needham Heights" => "Needham Hts",
     "Houghs Neck via McGrath & Germantown" => "Houghs Neck via McGth & Gtwn",
     "Houghs Neck via Germantown" => "Houghs Neck via Germntwn",
+    "Middleborough/Lakeville" => "Middleborough / Lakeville",
 
     # The following are special headsigns for the 2022 Orange Line surge
     "Needham Heights via Ruggles" => "Needham Hts via Ruggles",
@@ -207,14 +208,7 @@ defmodule Screens.DupScreenData.Request do
   end
 
   defp replace_long_headsigns(%{destination: destination} = departure_map) do
-    replaced_destination =
-      @headsign_replacements
-      |> Map.get(destination, destination)
-      # Find any headsign with a slash that does NOT have a space on each side and add spaces
-      # i.e. String.replace("Middleborough/ Lakeville", ~r/([^[:space:]])([\/])(.)/, "\\1 / \\3") => "Middleborough / Lakeville"
-      # i.e. String.replace("Middleborough/Lakeville", ~r/([^[:space:]])([\/])(.)/, "\\1 / \\3") => "Middleborough /  Lakeville"
-      |> String.replace(~r/[[:space:]]?\/[[:space:]]?/, "\\1 / \\2")
-
+    replaced_destination = Map.get(@headsign_replacements, destination, destination)
     %{departure_map | destination: replaced_destination}
   end
 
