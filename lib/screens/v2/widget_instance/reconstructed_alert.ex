@@ -739,7 +739,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def temporarily_override_alert(%__MODULE__{} = t) do
     # Only override a particular alert ID at Porter and Charles/MGH
     # To test: use alert 135553 in dev-green
-    not (t.alert.id == "478816" && t.screen.app_params.reconstructed_alert_widget.stop_id in ["place-portr", "place-chmnl"])
+    not (t.alert.id == "478816" &&
+           t.screen.app_params.reconstructed_alert_widget.stop_id in [
+             "place-portr",
+             "place-chmnl"
+           ])
   end
 
   defimpl Screens.V2.WidgetInstance do
