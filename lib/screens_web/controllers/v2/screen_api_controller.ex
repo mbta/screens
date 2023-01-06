@@ -99,6 +99,17 @@ defmodule ScreensWeb.V2.ScreenApiController do
     end
   end
 
+  def log_frontend_error(conn, %{
+        "id" => screen_id,
+        "errorMessage" => error_message,
+        "stacktrace" => stack_trace
+      }) do
+    IO.inspect(screen_id)
+    IO.inspect(error_message)
+    IO.inspect(stack_trace)
+    json(conn, %{success: true})
+  end
+
   defp nonexistent_screen?(screen_id) do
     is_nil(State.screen(screen_id))
   end
