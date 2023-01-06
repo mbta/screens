@@ -47,16 +47,14 @@ defmodule Screens.LogScreenData do
     end
   end
 
-  def log_frontend_error(screen_id, error_message, stack_trace, is_screen) do
-    if is_screen do
-      data = %{
-        screen_id: screen_id,
-        error_message: error_message,
-        stack_trace: stack_trace
-      }
+  def log_frontend_error(screen_id, error_message, stack_trace) do
+    data = %{
+      screen_id: screen_id,
+      error_message: error_message,
+      stack_trace: stack_trace
+    }
 
-      log_message("[screen frontend error]", data)
-    end
+    log_message("[screen frontend error]", data)
   end
 
   def log_api_response(response, screen_id, last_refresh, is_screen, screen_side \\ nil)

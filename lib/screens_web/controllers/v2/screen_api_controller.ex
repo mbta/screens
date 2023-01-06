@@ -104,8 +104,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
         "errorMessage" => error_message,
         "stacktrace" => stack_trace
       }) do
-    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
-    Screens.LogScreenData.log_frontend_error(screen_id, error_message, stack_trace, is_screen)
+    Screens.LogScreenData.log_frontend_error(screen_id, error_message, stack_trace)
     json(conn, %{success: true})
   end
 
