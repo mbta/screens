@@ -210,9 +210,10 @@ defmodule Screens.DupScreenData.Request do
     replaced_destination =
       @headsign_replacements
       |> Map.get(destination, destination)
-      # Find any headsign with a slash that does NOT have spaces around it and add spaces
-      # i.e. String.replace("Middleborough/Lakeville", ~r/([^[:space:]])([\/])([^[:space:]])/, "\\1 / \\3") => "Middleborough / Lakeville"
-      |> String.replace(~r/([^[:space:]])([\/])([^[:space:]])/, "\\1 / \\3")
+      # Find any headsign with a slash that does NOT have a space on each side and add spaces
+      # i.e. String.replace("Middleborough/ Lakeville", ~r/([^[:space:]])([\/])(.)/, "\\1 / \\3") => "Middleborough / Lakeville"
+      # i.e. String.replace("Middleborough/Lakeville", ~r/([^[:space:]])([\/])(.)/, "\\1 / \\3") => "Middleborough /  Lakeville"
+      |> String.replace(~r/([^[:space:]])([\/])(.)/, "\\1 / \\3")
 
     %{departure_map | destination: replaced_destination}
   end
