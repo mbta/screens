@@ -26,7 +26,6 @@ defmodule Screens.DupScreenData.Request do
   ]
 
   @headsign_replacements %{
-    "Holbrook/Randolph" => "Holbrook / Randolph",
     "Charlestown Navy Yard" => "Charlestown",
     "Saugus Center via Kennedy Dr & Square One Mall" => "Saugus Center via Kndy Dr & Square One",
     "Malden via Square One Mall & Kennedy Dr" => "Malden via Square One Mall & Kndy Dr",
@@ -208,7 +207,14 @@ defmodule Screens.DupScreenData.Request do
   end
 
   defp replace_long_headsigns(%{destination: destination} = departure_map) do
-    replaced_destination = Map.get(@headsign_replacements, destination, destination)
+    replaced_destination =
+      @headsign_replacements
+      |> Map.get(destination, destination)
+      # Find any headsign with a slash that does NOT have a space on each side and add spaces
+      # i.e. String.replace("Middleborough/ Lakeville", ~r/([^[:space:]])([\/])(.)/, "\\1 / \\3") => "Middleborough / Lakeville"
+      # i.e. String.replace("Middleborough/Lakeville", ~r/([^[:space:]])([\/])(.)/, "\\1 / \\3") => "Middleborough /  Lakeville"
+      |> String.replace(~r/[[:space:]]?\/[[:space:]]?/, "\\1 / \\2")
+
     %{departure_map | destination: replaced_destination}
   end
 
