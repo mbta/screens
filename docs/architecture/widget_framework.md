@@ -65,7 +65,7 @@ The recursive case is a tuple representing a region containing one or more layou
 
 - `region_id`: the region's name. For example: `:body`, `:flex_zone`, `:screen`.
 - `layout_id`: a name for one possible set of slots that can fill this region. For example: `:body_normal`, `:body_takeover`; `:one_large`, `:two_medium`.
-` `list(template)`: the set of slots, or even further nested regions, that fill this region under the given layout variation.
+- `list(template)`: the set of slots, or even further nested regions, that fill this region under the given layout variation.
 
 Layout variations provide a mechanism for high-priority widgets, like urgent alerts, to take over large portions of a screen. They also allow paged regions to hold widgets of different sizes per page.
 
