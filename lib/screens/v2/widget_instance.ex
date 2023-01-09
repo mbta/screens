@@ -87,6 +87,13 @@ defprotocol Screens.V2.WidgetInstance do
 
   @doc """
   Indicates whether the widget is valid for inclusion in the audio readout.
+
+  Note that (except for audio-only widgets) a widget must be included in the visual
+  layout as a prerequisite for consideration in the audio readout.
+
+  That is, if a widget does not make it into the visual layout--due to having a low
+  priority, for example--then it will not make it into the audio readout even if
+  this function returns `true`.
   """
   @spec audio_valid_candidate?(t) :: boolean()
   def audio_valid_candidate?(instance)
