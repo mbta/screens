@@ -83,7 +83,7 @@ Because audio readouts are not space constrained in the same way as the visual U
 
 ## Feature: Audio-only widgets
 
-Because the semantics of speech don't allow for the same "scanability" as a visual UI, we occasiona5lly need to provide a summary of content before it's read out, so that the rider can decide whether it's relevant to them.
+Because the semantics of speech don't allow for the same "scanability" as a visual UI, we occasionally need to provide a summary of content before it's read out, so that the rider can decide whether it's relevant to them.
 
 To achieve this, we support "audio-only widgets". These are special "privileged" widgets that come into play after all other widgets have been placed, and each receive a full snapshot of all of the visual widgets being displayed.
 
