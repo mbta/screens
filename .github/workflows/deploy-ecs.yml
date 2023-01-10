@@ -10,14 +10,26 @@ on:
   push:
     branches: ["master"]
 
+env:
+  ENV_NAME: ${{ github.event.inputs.environment || 'dev' }}
+  SCREENS_URL: "https://screens-${{ env.ENV_NAME }}.${{ env.ENV_NAME == 'prod' && 'mbta' || 'mbtace' }}.com"
+
 jobs:
   call-workflow:
     uses: mbta/workflows/.github/workflows/deploy-ecs.yml@main
     with:
       app-name: screens
-      environment: ${{ github.event.inputs.environment || 'dev' }}
+      environment: ${{ env.ENV_NAME }}
     secrets:
       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       docker-repo: ${{ secrets.DOCKER_REPO }}
       slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+  refresh:
+    needs: call-workflow
+    runs-on: ubuntu-latest
+    name: Refresh Clients
+    uses: fjogeleit/http-request-action@v1
+    with:
+      url: "${{ env.SCREENS_URL }}/api/admin/refresh_all"
+      method: "GET"
