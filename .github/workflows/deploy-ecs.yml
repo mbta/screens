@@ -28,8 +28,9 @@ jobs:
   refresh:
     needs: call-workflow
     runs-on: ubuntu-latest
-    name: Refresh Clients
-    uses: fjogeleit/http-request-action@v1
-    with:
-      url: "${{ env.SCREENS_URL }}/api/admin/refresh_all"
-      method: "GET"
+    steps:
+      - name: Refresh Clients
+        uses: fjogeleit/http-request-action@v1.12.0
+        with:
+          url: "${{ env.SCREENS_URL }}/api/admin/refresh_all"
+          method: "GET"
