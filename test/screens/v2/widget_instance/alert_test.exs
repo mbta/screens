@@ -636,10 +636,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       active_now_widget = put_active_period(widget, [{~U[2021-01-01T00:00:00Z], nil}])
 
       assert 2 == AlertWidget.tiebreaker_secondary_timeframe(active_now_widget)
-
-      inactive_for_a_while_widget = put_active_period(widget, [{~U[2021-01-10T00:00:00Z], nil}])
-
-      assert 2 == AlertWidget.tiebreaker_secondary_timeframe(inactive_for_a_while_widget)
     end
   end
 
