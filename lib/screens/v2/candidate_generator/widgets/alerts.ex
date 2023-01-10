@@ -21,7 +21,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
         now \\ DateTime.utc_now(),
         fetch_simplified_routes_at_stop_fn \\ &Route.fetch_simplified_routes_at_stop/2,
         fetch_stop_sequences_through_stop_fn \\ &RoutePattern.fetch_stop_sequences_through_stop/1,
-        fetch_alerts_by_stop_and_route_fn \\ &Alert.fetch_by_stop_and_route/2
+        fetch_alerts_by_stop_and_route_fn \\ &Alert.fetch_by_stop_and_route/3
       )
       when app in @alert_supporting_screen_types do
     with {:ok, routes_at_stop} <- fetch_simplified_routes_at_stop_fn.(stop_id, now),
@@ -29,7 +29,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
          reachable_stop_ids = local_and_downstream_stop_ids(stop_sequences, stop_id),
          route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
          {:ok, alerts} <-
-           fetch_alerts_by_stop_and_route_fn.(reachable_stop_ids, route_ids_at_stop) do
+           fetch_alerts_by_stop_and_route_fn.(reachable_stop_ids, route_ids_at_stop,
+             datetime: "NOW"
+           ) do
       alerts
       |> filter_alerts(reachable_stop_ids, route_ids_at_stop)
       |> Enum.map(fn alert ->

@@ -223,11 +223,12 @@ defmodule Screens.Alerts.Alert do
   you're looking for.
   https://app.asana.com/0/0/1200476247539238/f
   """
-  @spec fetch_by_stop_and_route(list(Stop.id()), list(Route.id())) :: {:ok, list(t())} | :error
-  def fetch_by_stop_and_route(stop_ids, route_ids, get_json_fn \\ &V3Api.get_json/2) do
+  @spec fetch_by_stop_and_route(list(Stop.id()), list(Route.id()), keyword()) ::
+          {:ok, list(t())} | :error
+  def fetch_by_stop_and_route(stop_ids, route_ids, opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
     with {:ok, stop_based_alerts} <-
-           fetch([stop_ids: stop_ids, route_ids: route_ids], get_json_fn),
-         {:ok, route_based_alerts} <- fetch([route_ids: route_ids], get_json_fn) do
+           fetch(opts ++ [stop_ids: stop_ids, route_ids: route_ids], get_json_fn),
+         {:ok, route_based_alerts} <- fetch(opts ++ [route_ids: route_ids], get_json_fn) do
       merged_alerts =
         [stop_based_alerts, route_based_alerts]
         |> Enum.concat()
@@ -275,6 +276,10 @@ defmodule Screens.Alerts.Alert do
     [
       {"filter[route_type]", route_type_ids}
     ]
+  end
+
+  defp format_query_param({:datetime, datetime}) do
+    [{"filter[datetime]", datetime}]
   end
 
   defp format_query_param(_), do: []
