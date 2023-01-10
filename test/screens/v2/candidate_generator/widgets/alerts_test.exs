@@ -47,10 +47,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         now: ~U[2021-01-01T00:00:00Z],
         fetch_simplified_routes_at_stop_fn: fn _, _ -> {:ok, routes_at_stop} end,
         fetch_stop_sequences_fn: fn _ -> {:ok, stop_sequences} end,
-        fetch_alerts_fn: fn _, _ -> {:ok, alerts} end,
+        fetch_alerts_fn: fn _, _, _ -> {:ok, alerts} end,
         x_fetch_simplified_routes_at_stop_fn: fn _, _ -> :error end,
         x_fetch_stop_sequences_fn: fn _ -> :error end,
-        x_fetch_alerts_fn: fn _, _ -> :error end
+        x_fetch_alerts_fn: fn _, _, _ -> :error end
       }
     end
 

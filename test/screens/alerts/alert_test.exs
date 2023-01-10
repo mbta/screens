@@ -23,7 +23,7 @@ defmodule Screens.Alerts.AlertTest do
     }
   end
 
-  describe "fetch_by_stop_and_route/3" do
+  describe "fetch_by_stop_and_route/4" do
     setup do
       stop_based_alerts = [alert_json("1"), alert_json("2"), alert_json("3")]
       route_based_alerts = [alert_json("4"), alert_json("3"), alert_json("5")]
@@ -72,7 +72,7 @@ defmodule Screens.Alerts.AlertTest do
                 %Alert{id: "3"},
                 %Alert{id: "4"},
                 %Alert{id: "5"}
-              ]} = Alert.fetch_by_stop_and_route(stop_ids, route_ids, get_json_fn)
+              ]} = Alert.fetch_by_stop_and_route(stop_ids, route_ids, [], get_json_fn)
     end
 
     test "returns :error if fetch function returns :error", context do
@@ -83,8 +83,8 @@ defmodule Screens.Alerts.AlertTest do
         x_get_json_fn2: x_get_json_fn2
       } = context
 
-      assert :error == Alert.fetch_by_stop_and_route(stop_ids, route_ids, x_get_json_fn1)
-      assert :error == Alert.fetch_by_stop_and_route(stop_ids, route_ids, x_get_json_fn2)
+      assert :error == Alert.fetch_by_stop_and_route(stop_ids, route_ids, [], x_get_json_fn1)
+      assert :error == Alert.fetch_by_stop_and_route(stop_ids, route_ids, [], x_get_json_fn2)
     end
   end
 end
