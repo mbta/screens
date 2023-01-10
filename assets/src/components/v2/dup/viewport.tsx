@@ -3,10 +3,10 @@ import React from "react";
 import { getRotationIndex } from "Util/util";
 
 /**
- * Shifts either the left or right side of the screen content into
- * view, based on a `data-screen-side` data attribute on the #app div.
+ * Shifts one of the three rotations into view
+ * based on a `data-rotation-index` data attribute on the #app div.
  * If the param is missing, this will show the full
- * screen content (2160px x 1920px).
+ * screen content (5760px x 1080px).
  */
 const Viewport: React.ComponentType<{}> = ({ children }) => {
   let viewportClassName = "dup-screen-viewport";
