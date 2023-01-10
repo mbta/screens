@@ -45,7 +45,7 @@ import DeparturesNoData from "Components/v2/bus_shelter/departures_no_data";
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/bus_shelter/alert";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
-import { fetchDatasetValue } from "Util/dataset";
+import { getDatasetValue } from "Util/dataset";
 import PageLoadNoData from "Components/v2/lcd/page_load_no_data";
 
 const TYPE_TO_COMPONENT = {
@@ -99,11 +99,23 @@ const blinkConfig: BlinkConfig = {
   durationMs: 34,
 };
 
-const audioConfig: AudioConfig = {
-  intervalOffsetSeconds: parseInt(
-    fetchDatasetValue("audioIntervalOffsetSeconds")
-  ),
-  readoutIntervalMinutes: parseInt(fetchDatasetValue("audioReadoutInterval")),
+const getAudioConfig = (): AudioConfig | null => {
+  const audioIntervalOffsetSeconds = getDatasetValue(
+    "audioIntervalOffsetSeconds"
+  );
+  const audioReadoutInterval = getDatasetValue("audioReadoutInterval");
+
+  if (
+    audioIntervalOffsetSeconds === undefined ||
+    audioReadoutInterval === undefined
+  ) {
+    return null;
+  }
+
+  return {
+    intervalOffsetSeconds: parseInt(audioIntervalOffsetSeconds),
+    readoutIntervalMinutes: parseInt(audioReadoutInterval),
+  };
 };
 
 const App = (): JSX.Element => {
@@ -127,7 +139,7 @@ const App = (): JSX.Element => {
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <BlinkConfigContext.Provider value={blinkConfig}>
-                <AudioConfigContext.Provider value={audioConfig}>
+                <AudioConfigContext.Provider value={getAudioConfig()}>
                   <ScreenPage />
                 </AudioConfigContext.Provider>
               </BlinkConfigContext.Provider>
