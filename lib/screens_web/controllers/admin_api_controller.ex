@@ -48,15 +48,18 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   def refresh(conn, %{"screen_ids" => screen_ids}) do
-    current_config = Config.State.config()
-    new_config = Config.schedule_refresh_for_screen_ids(current_config, screen_ids)
-    {:ok, new_config_json} = Jason.encode(Config.to_json(new_config), pretty: true)
+    success = refresh_screens(screen_ids)
 
-    success =
-      case @config_fetcher.put_config(new_config_json) do
-        :ok -> true
-        :error -> false
-      end
+    json(conn, %{success: success})
+  end
+
+  def refresh_all(conn, _params) do
+    screen_ids =
+      Enum.map(Config.State.screens(), fn {screen_id, _} ->
+        screen_id
+      end)
+
+    success = refresh_screens(screen_ids)
 
     json(conn, %{success: success})
   end
@@ -84,5 +87,17 @@ defmodule ScreensWeb.AdminApiController do
       end
 
     json(conn, response)
+  end
+
+  defp refresh_screens(screen_ids) do
+    current_config = Config.State.config()
+
+    new_config = Config.schedule_refresh_for_screen_ids(current_config, screen_ids)
+    {:ok, new_config_json} = Jason.encode(Config.to_json(new_config), pretty: true)
+
+    case @config_fetcher.put_config(new_config_json) do
+      :ok -> true
+      :error -> false
+    end
   end
 end
