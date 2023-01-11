@@ -17,12 +17,16 @@ import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/dup/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
-import NormalBody from "Components/v2/dup/normal_body";
+import NormalBodyZero from "Components/v2/dup/normal_body_zero";
+import NormalBodyOne from "Components/v2/dup/normal_body_one";
+import NormalBodyTwo from "Components/v2/dup/normal_body_two";
 import Viewport from "Components/v2/dup/viewport";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
-  body_normal: NormalBody,
+  body_normal_zero: NormalBodyZero,
+  body_normal_one: NormalBodyOne,
+  body_normal_two: NormalBodyTwo,
   full_takeover: TakeoverScreen,
   placeholder: Placeholder,
   normal_header: NormalHeader,

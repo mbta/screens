@@ -18,30 +18,29 @@ defmodule Screens.V2.CandidateGenerator.Dup do
        screen_normal: [
          {:rotation_zero,
           %{
-            body_normal: [
+            body_normal_zero: [
               :header,
               :main_content_primary,
-              :inline_alert
+              :inline_alert_zero
             ],
-            body_takeover: [:full_body]
+            body_takeover_one: [:full_body_zero]
           }},
          {:rotation_one,
           %{
-            body_normal: [
+            body_normal_one: [
               :header,
-              :main_content_primary,
-              :inline_alert
+              :main_content_primary
             ],
-            body_takeover: [:full_body]
+            body_takeover_one: [:full_body_one]
           }},
          {:rotation_two,
           %{
-            body_normal: [
+            body_normal_two: [
               :header,
               :main_content_secondary,
-              :inline_alert
+              :inline_alert_two
             ],
-            body_takeover: [:full_body]
+            body_takeover_two: [:full_body_two]
           }}
        ],
        screen_takeover: [:full_screen]
