@@ -23,7 +23,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
               :main_content_primary,
               :inline_alert_zero
             ],
-            screen_takeover_one: [:full_screen_zero]
+            screen_takeover_zero: [:full_screen_zero]
           }},
          {:rotation_one,
           %{
@@ -57,11 +57,11 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
 
-  defp header_instances(
-         config,
-         now,
-         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1
-       ) do
+  def header_instances(
+        config,
+        now,
+        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1
+      ) do
     %Screen{app_params: %Dup{header: %CurrentStopId{stop_id: stop_id}}} = config
 
     stop_name = fetch_stop_name_fn.(stop_id)
