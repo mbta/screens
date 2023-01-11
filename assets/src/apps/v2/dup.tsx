@@ -21,12 +21,18 @@ import NormalBodyZero from "Components/v2/dup/normal_body_zero";
 import NormalBodyOne from "Components/v2/dup/normal_body_one";
 import NormalBodyTwo from "Components/v2/dup/normal_body_two";
 import Viewport from "Components/v2/dup/viewport";
+import ScreenTakeoverZero from "Components/v2/dup/screen_takeover_zero";
+import ScreenTakeoverOne from "Components/v2/dup/screen_takeover_one";
+import ScreenTakeoverTwo from "Components/v2/dup/screen_takeover_two";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
   body_normal_zero: NormalBodyZero,
   body_normal_one: NormalBodyOne,
   body_normal_two: NormalBodyTwo,
+  screen_takeover_zero: ScreenTakeoverZero,
+  screen_takeover_one: ScreenTakeoverOne,
+  screen_takeover_two: ScreenTakeoverTwo,
   full_takeover: TakeoverScreen,
   placeholder: Placeholder,
   normal_header: NormalHeader,

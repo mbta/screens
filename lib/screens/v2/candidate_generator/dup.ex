@@ -23,7 +23,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
               :main_content_primary,
               :inline_alert_zero
             ],
-            body_takeover_one: [:full_body_zero]
+            screen_takeover_one: [:full_screen_zero]
           }},
          {:rotation_one,
           %{
@@ -31,7 +31,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
               :header,
               :main_content_primary
             ],
-            body_takeover_one: [:full_body_one]
+            screen_takeover_one: [:full_screen_one]
           }},
          {:rotation_two,
           %{
@@ -40,10 +40,9 @@ defmodule Screens.V2.CandidateGenerator.Dup do
               :main_content_secondary,
               :inline_alert_two
             ],
-            body_takeover_two: [:full_body_two]
+            screen_takeover_two: [:full_screen_two]
           }}
-       ],
-       screen_takeover: [:full_screen]
+       ]
      }}
     |> Builder.build_template()
   end
