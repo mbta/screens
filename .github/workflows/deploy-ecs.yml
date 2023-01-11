@@ -12,7 +12,6 @@ on:
 
 env:
   ENV_NAME: ${{ github.event.inputs.environment || 'dev' }}
-  SCREENS_URL: "https://screens-${{ env.ENV_NAME }}.${{ env.ENV_NAME == 'prod' && 'mbta' || 'mbtace' }}.com"
 
 jobs:
   call-workflow:
