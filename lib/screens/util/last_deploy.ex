@@ -3,7 +3,7 @@ defmodule Screens.Util.LastDeployTime do
 
   @bucket "mbta-screens"
 
-  def get_last_deploy_time() do
+  def get_last_deploy_time do
     env = Application.get_env(:screens, :environment_name, "screens-prod")
     path = "/#{env}/LAST_DEPLOY"
 
