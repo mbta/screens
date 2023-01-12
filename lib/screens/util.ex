@@ -167,31 +167,11 @@ defmodule Screens.Util do
 
   def outdated?(screen_id, client_refresh_timestamp) do
     {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
-    last_deploy_timestamp = Screens.Util.LastDeployTime.get_last_deploy_time()
-    refresh_if_loaded_before_time = State.refresh_if_loaded_before(screen_id)
+    refresh_if_loaded_before_time = State.refresh_if_loaded_before(screen_id) |> IO.inspect()
 
-    refresh_if_loaded_before =
-      case {last_deploy_timestamp, refresh_if_loaded_before_time} do
-        {nil, nil} ->
-          nil
-
-        {nil, refresh_if_loaded_before_time} ->
-          refresh_if_loaded_before_time
-
-        {last_deploy_timestamp, nil} ->
-          last_deploy_timestamp
-
-        {last_deploy_timestamp, refresh_if_loaded_before_time} ->
-          if DateTime.compare(last_deploy_timestamp, refresh_if_loaded_before_time) == :gt do
-            last_deploy_timestamp
-          else
-            refresh_if_loaded_before_time
-          end
-      end
-
-    case refresh_if_loaded_before do
+    case refresh_if_loaded_before_time do
       nil -> false
-      _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before) == :lt
+      _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
     end
   end
 end
