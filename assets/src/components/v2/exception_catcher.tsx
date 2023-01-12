@@ -2,16 +2,12 @@ import React, { ErrorInfo, ReactElement } from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { getDataset } from "Util/dataset";
 import { isRealScreen } from "Util/util";
-interface ExceptionCatcherState {
-  hasError: boolean;
-  errorMessage?: Error;
-}
+
 interface ExceptionCatcherProps {
   children: ReactElement;
 }
 class ExceptionCatcher extends React.Component<
-  ExceptionCatcherProps & RouteComponentProps<any>,
-  ExceptionCatcherState
+  ExceptionCatcherProps & RouteComponentProps<any>
 > {
   constructor(props: ExceptionCatcherProps & RouteComponentProps<any>) {
     super(props);
