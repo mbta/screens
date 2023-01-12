@@ -18,13 +18,13 @@ class ExceptionCatcher extends React.Component<
   }
 
   // Make an API call to log the error before rethrowing.
-  async componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     const { disableSentry } = getDataset();
     if (isRealScreen() && disableSentry) {
       const csrfToken = document.head.querySelector(
         "[name~=csrf-token][content]"
       ).content;
-      await fetch("/v2/api/screen/log_frontend_error", {
+      fetch("/v2/api/screen/log_frontend_error", {
         method: "POST",
         headers: {
           "content-type": "application/json",
