@@ -8,6 +8,7 @@ config :screens, ScreensWeb.Endpoint,
 
 config :screens,
   config_fetcher: Screens.Config.State.LocalFetch,
+  last_deploy_fetcher: Screens.Util.LastDeploy.LocalFetch,
   local_config_file_spec: {:test, "config.json"},
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.LocalFetch,
   # This will help us write testable functions.
