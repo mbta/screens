@@ -6,6 +6,7 @@ defmodule Screens.Config.State do
   alias Screens.ConfigCache.State.Fetch
 
   @config_fetcher Application.compile_env(:screens, :config_fetcher)
+  @last_deploy_fetcher Application.compile_env(:screens, :last_deploy_fetcher)
 
   @type t ::
           %__MODULE__{
@@ -26,7 +27,8 @@ defmodule Screens.Config.State do
     config_module: Screens.Config.State,
     fetch_config_fn: &@config_fetcher.fetch_config/1,
     refresh_ms: 15 * 1000,
-    fetch_failure_error_threshold_minutes: 2
+    fetch_failure_error_threshold_minutes: 2,
+    fetch_last_deploy_fn: &@last_deploy_fetcher.get_last_deploy_time/0
 
   def ok?(pid \\ __MODULE__) do
     GenServer.call(pid, :ok?)

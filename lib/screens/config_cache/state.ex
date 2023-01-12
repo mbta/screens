@@ -5,7 +5,8 @@ defmodule Screens.ConfigCache.State do
              config_module: config_module,
              fetch_config_fn: fetch_config,
              refresh_ms: refresh_ms,
-             fetch_failure_error_threshold_minutes: fetch_failure_error_threshold_minutes
+             fetch_failure_error_threshold_minutes: fetch_failure_error_threshold_minutes,
+             fetch_last_deploy_fn: fetch_last_deploy
            ) do
     quote do
       use GenServer
@@ -32,7 +33,7 @@ defmodule Screens.ConfigCache.State do
       ###
       @impl true
       def init(:ok) do
-        last_deploy_timestamp = Screens.Util.LastDeployTime.get_last_deploy_time()
+        last_deploy_timestamp = unquote(fetch_last_deploy).()
 
         init_state =
           case unquote(fetch_config).(nil) do
@@ -61,7 +62,7 @@ defmodule Screens.ConfigCache.State do
 
         schedule_refresh(pid)
 
-        last_deploy_timestamp = Screens.Util.LastDeployTime.get_last_deploy_time()
+        last_deploy_timestamp = unquote(fetch_last_deploy).()
 
         async_fetch = fn ->
           case unquote(fetch_config).(current_version) do

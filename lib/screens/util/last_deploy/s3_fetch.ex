@@ -1,4 +1,4 @@
-defmodule Screens.Util.LastDeployTime do
+defmodule Screens.Util.LastDeploy.S3Fetch do
   @moduledoc false
 
   @bucket "mbta-screens"

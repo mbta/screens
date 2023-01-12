@@ -25,6 +25,7 @@ config :screens,
   default_api_v3_url: System.get_env("API_V3_URL", "https://api-v3.mbta.com/"),
   api_v3_key: System.get_env("API_V3_KEY"),
   config_fetcher: Screens.Config.State.LocalFetch,
+  last_deploy_fetcher: Screens.Util.LastDeploy.LocalFetch,
   local_config_file_spec: {:priv, "local.json"},
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.LocalFetch
 
