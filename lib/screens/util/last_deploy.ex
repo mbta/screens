@@ -10,8 +10,20 @@ defmodule Screens.Util.LastDeployTime do
     get_operation = ExAws.S3.get_object(@bucket, path)
 
     case ExAws.request(get_operation) do
-      {:ok, %{last_modified: last_modified}} ->
-        last_modified
+      {:ok, %{headers: headers}} ->
+        # Example format: Thu, 12 Jan 2023 17:38:08 GMT
+        last_modified_string =
+          headers
+          |> Enum.into(%{})
+          |> Map.get("Last-Modified")
+
+        case Timex.parse(
+               last_modified_string,
+               "{WDshort}, {D} {Mshort} {YYYY} {h24}:{m}:{s} {Zname}"
+             ) do
+          {:ok, last_modified_dt} -> Timex.to_datetime(last_modified_dt)
+          _ -> nil
+        end
 
       {:error, _} ->
         nil
