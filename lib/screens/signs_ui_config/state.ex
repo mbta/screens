@@ -14,14 +14,16 @@ defmodule Screens.SignsUiConfig.State do
           %__MODULE__{
             config: config,
             retry_count: non_neg_integer(),
-            version_id: Fetch.version_id()
+            version_id: Fetch.version_id(),
+            last_deploy_timestamp: nil
           }
           | :error
 
   @enforce_keys [:config]
   defstruct config: nil,
             retry_count: 0,
-            version_id: nil
+            version_id: nil,
+            last_deploy_timestamp: nil
 
   use Screens.ConfigCache.State,
     config_module: Screens.SignsUiConfig.State,
