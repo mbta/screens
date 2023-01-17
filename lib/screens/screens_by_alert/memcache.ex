@@ -148,7 +148,7 @@ defmodule Screens.ScreensByAlert.Memcache do
           timestamp + @screens_ttl < now
         end)
 
-      if store_screen_id, do: [new_timestamped_screen_id | unexpired_ids], else: [unexpired_ids]
+      if store_screen_id, do: [new_timestamped_screen_id | unexpired_ids], else: unexpired_ids
     end
   end
 
