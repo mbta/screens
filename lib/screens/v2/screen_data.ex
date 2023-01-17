@@ -41,7 +41,7 @@ defmodule Screens.V2.ScreenData do
 
     layout_and_widgets =
       config
-      |> fetch_data()
+      |> fetch_data(screen_id, true)
       |> tap(&cache_visible_alert_widgets(&1, screen_id, config.hidden_from_screenplay))
       |> resolve_paging(refresh_rate)
 
@@ -55,7 +55,7 @@ defmodule Screens.V2.ScreenData do
   def simulation_data_by_screen_id(screen_id) do
     config = get_config(screen_id)
     refresh_rate = Parameters.get_refresh_rate(config)
-    screen_data = fetch_data(config)
+    screen_data = fetch_data(screen_id, config)
 
     full_page_data = screen_data |> resolve_paging(refresh_rate) |> serialize()
     paged_slot_data = screen_data |> get_paged_slots() |> serialize_paged_slots()
@@ -63,8 +63,8 @@ defmodule Screens.V2.ScreenData do
     response(data: %{full_page: full_page_data, flex_zone: paged_slot_data})
   end
 
-  @spec fetch_data(Screens.Config.Screen.t()) :: {Template.layout(), selected_instances_map()}
-  def fetch_data(config) do
+  @spec fetch_data(Screens.Config.Screen.t(), screen_id(), boolean | nil) :: {Template.layout(), selected_instances_map()}
+  def fetch_data(config, screen_id, run_cache \\ false) do
     candidate_generator = Parameters.get_candidate_generator(config)
     screen_template = candidate_generator.screen_template()
 
@@ -72,6 +72,8 @@ defmodule Screens.V2.ScreenData do
       config
       |> candidate_generator.candidate_instances()
       |> Enum.filter(&WidgetInstance.valid_candidate?/1)
+      # Cache the valid alert widgets, even before the pick is run
+      |> tap(&cache_valid_alert_widgets(&1, screen_id, run_cache))
 
     pick_instances(screen_template, candidate_instances)
   end
@@ -490,5 +492,18 @@ defmodule Screens.V2.ScreenData do
       |> Enum.map(fn alert_widget_struct -> AlertWidgetInstance.alert_id(alert_widget_struct) end)
 
     :ok = ScreensByAlert.put_data(screen_id, alert_ids)
+  end
+
+  def cache_valid_alert_widgets(_, _, false), do: nil
+
+  def cache_valid_alert_widgets(candidate_instances, screen_id, _) do
+    alert_ids =
+      candidate_instances
+      |> Enum.filter(fn widget_struct ->
+        not is_nil(AlertWidgetInstance.impl_for(widget_struct))
+      end)
+      |> Enum.map(fn alert_widget_struct -> AlertWidgetInstance.alert_id(alert_widget_struct) end)
+
+    :ok = ScreensByAlert.put_data(screen_id, alert_ids, true)
   end
 end

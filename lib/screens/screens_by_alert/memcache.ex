@@ -51,14 +51,14 @@ defmodule Screens.ScreensByAlert.Memcache do
   end
 
   @impl true
-  def put_data(screen_id, alert_ids) when is_binary(screen_id) and is_list(alert_ids) do
+  def put_data(screen_id, alert_ids, store_screen_id) when is_binary(screen_id) and is_list(alert_ids) do
     now = System.system_time(:second)
 
     # To avoid bottlenecks and unnecessarily blocking the caller, run in a separate task process
     _ =
       Task.Supervisor.start_child(TaskSupervisor, fn ->
         update_screens_last_updated_key(screen_id, now)
-        Enum.each(alert_ids, &update_alert_key(&1, screen_id, now))
+        Enum.each(alert_ids, &update_alert_key(&1, screen_id, now, store_screen_id))
       end)
 
     :ok
@@ -67,18 +67,16 @@ defmodule Screens.ScreensByAlert.Memcache do
   @impl true
   def get_screens_by_alert(alert_ids) when is_list(alert_ids) do
     now = System.system_time(:second)
-    default_map = Map.new(alert_ids, &{&1, []})
     cache_keys = Enum.map(alert_ids, &alert_key/1)
 
     case Memcache.multi_get(@server, cache_keys) do
       {:ok, cache_result_map} ->
-        found_items = Map.new(cache_result_map, &clean_up_alert_cache_item(&1, now))
-        Map.merge(default_map, found_items)
+        Map.new(cache_result_map, &clean_up_alert_cache_item(&1, now))
 
       {:error, message} ->
         Logger.warn("[get_screens_by_alert memcache error] message=\"#{message}\"")
         # Should we return an error tuple instead of the default map?
-        default_map
+        # TODO: return the error tuple
     end
   end
 
@@ -118,7 +116,7 @@ defmodule Screens.ScreensByAlert.Memcache do
   # Creates or updates the cache item for the given alert ID with the given screen ID, retrying until success.
   # In the process of updating existing screen IDs under the alert key, this also removes
   # any screen IDs that have expired.
-  defp update_alert_key(alert_id, screen_id, now) do
+  defp update_alert_key(alert_id, screen_id, now, store_screen_id) do
     key = alert_key(alert_id)
     new_timestamped_screen_id = {screen_id, now}
 
@@ -126,7 +124,7 @@ defmodule Screens.ScreensByAlert.Memcache do
       Memcache.cas(
         @server,
         key,
-        timestamped_screens_updater_fn(new_timestamped_screen_id),
+        timestamped_screens_updater_fn(new_timestamped_screen_id, store_screen_id),
         retry: true,
         default: [new_timestamped_screen_id],
         ttl: @screens_by_alert_ttl
@@ -143,14 +141,14 @@ defmodule Screens.ScreensByAlert.Memcache do
     end
   end
 
-  defp timestamped_screens_updater_fn({_id, now} = new_timestamped_screen_id) do
+  defp timestamped_screens_updater_fn({_id, now} = new_timestamped_screen_id, store_screen_id) do
     fn timestamped_screen_ids ->
       unexpired_ids =
         Enum.reject(timestamped_screen_ids, fn {_id, timestamp} ->
           timestamp + @screens_ttl < now
         end)
 
-      [new_timestamped_screen_id | unexpired_ids]
+      if store_screen_id, do: [new_timestamped_screen_id | unexpired_ids], else: [unexpired_ids]
     end
   end
 

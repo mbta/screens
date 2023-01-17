@@ -38,10 +38,11 @@ defmodule Screens.ScreensByAlert do
   end
 
   @impl true
-  def put_data(screen_id, alert_ids) do
+  def put_data(screen_id, alert_ids, store_screen_id \\ false) do
     @cache_module.put_data(
       screen_id,
-      alert_ids
+      alert_ids,
+      store_screen_id
     )
   end
 

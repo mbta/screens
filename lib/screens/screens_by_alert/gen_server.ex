@@ -44,8 +44,8 @@ defmodule Screens.ScreensByAlert.GenServer do
   end
 
   @impl Screens.ScreensByAlert.Behaviour
-  def put_data(pid \\ __MODULE__, screen_id, alert_ids) do
-    GenServer.cast(pid, {:put_data, screen_id, alert_ids})
+  def put_data(pid \\ __MODULE__, screen_id, alert_ids, store_screen_id) do
+    GenServer.cast(pid, {:put_data, screen_id, alert_ids, store_screen_id})
   end
 
   @impl Screens.ScreensByAlert.Behaviour
@@ -71,7 +71,7 @@ defmodule Screens.ScreensByAlert.GenServer do
   end
 
   @impl GenServer
-  def handle_cast({:put_data, screen_id, alert_ids}, %__MODULE__{} = state) do
+  def handle_cast({:put_data, screen_id, alert_ids, store_screen_id}, %__MODULE__{} = state) do
     now = System.system_time(:second)
 
     updated_screens_by_alert =
@@ -85,7 +85,10 @@ defmodule Screens.ScreensByAlert.GenServer do
             state.screens_by_alert_ttl_seconds * 1000
           )
 
-        {alert_id, %{screen_ids: [{screen_id, now}], timer_reference: reference}}
+        # Allow for alerts to be stored in the cache, if valid and not visible on screens
+        screen_id_list = if store_screen_id, do: [{screen_id, now}], else: []
+
+        {alert_id, %{screen_ids: screen_id_list, timer_reference: reference}}
       end)
       |> Map.new()
       # Combine list of screen_ids if alert already exists.
@@ -126,8 +129,6 @@ defmodule Screens.ScreensByAlert.GenServer do
       ) do
     now = System.system_time(:second)
 
-    default_map = Map.new(alert_ids, &{&1, []})
-
     found_items =
       state.screens_by_alert
       |> Map.take(alert_ids)
@@ -144,9 +145,7 @@ defmodule Screens.ScreensByAlert.GenServer do
         {alert_id, screen_ids}
       end)
 
-    result = Map.merge(default_map, found_items)
-
-    {:reply, result, state}
+    {:reply, found_items, state}
   end
 
   @impl GenServer
@@ -216,8 +215,9 @@ defmodule Screens.ScreensByAlert.GenServer do
   defp combine_screen_ids(new_screens, old_screens, ttl, now) do
     old_screens
     # Remove expired screen_ids based on TTL
-    |> Enum.reject(fn {_screen_id, created_at} ->
-      created_at + ttl <= now
+    # as well as nil entries (which represent valid but not visible candidates)
+    |> Enum.reject(fn {screen_id, created_at} ->
+      created_at + ttl <= now || screen_id === nil
     end)
     # Combine this list with the new list
     |> Kernel.++(new_screens)
