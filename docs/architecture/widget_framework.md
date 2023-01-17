@@ -1,6 +1,6 @@
 # Widget framework
 
-The widget framework comprises common code that provides a "backbone" to our application.
+The widget framework comprises common code that provides a "backbone structure" to our business logic.
 
 Each screen's content is composed entirely of widgets, and when a screen requests new data, no matter which type it is, the same backend logic is used to look up the screen's configuration, fetch the appropriate real-time data, transform that data into "candidate" widgets, and then assemble some of those candidates together to be sent back to the client and rendered.
 
