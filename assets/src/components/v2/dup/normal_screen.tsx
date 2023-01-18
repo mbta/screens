@@ -3,7 +3,6 @@ import React from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
-  header_normal: WidgetData;
   rotation_zero: WidgetData;
   rotation_one: WidgetData;
   rotation_two: WidgetData;

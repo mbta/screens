@@ -19,8 +19,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
          {:rotation_zero,
           %{
             body_normal_zero: [
-              :header,
-              :main_content_primary,
+              :header_zero,
+              :main_content_primary_zero,
               :inline_alert_zero
             ],
             screen_takeover_zero: [:full_screen_zero]
@@ -28,16 +28,16 @@ defmodule Screens.V2.CandidateGenerator.Dup do
          {:rotation_one,
           %{
             body_normal_one: [
-              :header,
-              :main_content_primary
+              :header_one,
+              :main_content_primary_one
             ],
             screen_takeover_one: [:full_screen_one]
           }},
          {:rotation_two,
           %{
             body_normal_two: [
-              :header,
-              :main_content_secondary,
+              :header_two,
+              :main_content_secondary_two,
               :inline_alert_two
             ],
             screen_takeover_two: [:full_screen_two]
@@ -71,8 +71,9 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
   defp placeholder_instances do
     [
-      %Placeholder{slot_names: [:main_content_primary], color: :grey},
-      %Placeholder{slot_names: [:main_content_secondary], color: :green}
+      %Placeholder{slot_names: [:main_content_primary_zero], color: :grey},
+      %Placeholder{slot_names: [:main_content_primary_one], color: :blue},
+      %Placeholder{slot_names: [:main_content_secondary_two], color: :green}
     ]
   end
 end

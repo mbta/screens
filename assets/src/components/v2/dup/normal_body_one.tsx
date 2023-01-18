@@ -3,13 +3,13 @@ import React from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
-  header: WidgetData;
-  main_content_primary: WidgetData;
+  header_one: WidgetData;
+  main_content_primary_one: WidgetData;
 }
 
 const NormalBodyOne: React.ComponentType<Props> = ({
-  header,
-  main_content_primary: mainContentPrimary,
+  header_one: header,
+  main_content_primary_one: mainContentPrimary,
 }) => {
   return (
     <div className="body-normal">

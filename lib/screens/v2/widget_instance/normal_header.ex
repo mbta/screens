@@ -39,7 +39,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
       NormalHeader.serialize(t)
     end
 
-    def slot_names(_instance), do: [:header]
+    def slot_names(_instance), do: [:header, :header_zero, :header_one, :header_two]
 
     def widget_type(_instance), do: :normal_header
 

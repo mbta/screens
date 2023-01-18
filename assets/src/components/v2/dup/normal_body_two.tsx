@@ -3,15 +3,15 @@ import React from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
-  header: WidgetData;
-  main_content_secondary: WidgetData;
-  inline_alert: WidgetData;
+  header_two: WidgetData;
+  main_content_secondary_two: WidgetData;
+  inline_alert_two: WidgetData;
 }
 
 const NormalBodyTwo: React.ComponentType<Props> = ({
-  header,
-  main_content_secondary: mainContentSecondary,
-  inline_alert: inlineAlert,
+  header_two: header,
+  main_content_secondary_two: mainContentSecondary,
+  inline_alert_two: inlineAlert,
 }) => {
   return (
     <div className="body-normal">
