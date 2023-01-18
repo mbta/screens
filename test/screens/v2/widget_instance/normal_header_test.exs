@@ -31,8 +31,9 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
   end
 
   describe "slot_names/1" do
-    test "returns header", %{instance: instance} do
-      assert [:header] == WidgetInstance.slot_names(instance)
+    test "returns headers", %{instance: instance} do
+      assert [:header, :header_zero, :header_one, :header_two] ==
+               WidgetInstance.slot_names(instance)
     end
   end
 
