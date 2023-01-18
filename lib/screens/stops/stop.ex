@@ -169,7 +169,7 @@ defmodule Screens.Stops.Stop do
   ]
 
   @green_line_e_stops [
-    {"place-mdftf", {"Medford / Tufts", "Medfd/Tufts"}},
+    {"place-mdftf", {"Medford / Tufts", "Medford"}},
     {"place-balsq", {"Ball Square", "Ball Sq"}},
     {"place-mgngl", {"Magoun Square", "Magoun Sq"}},
     {"place-gilmn", {"Gilman Square", "Gilman Sq"}},

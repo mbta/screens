@@ -86,6 +86,7 @@ defmodule ScreensWeb.Router do
 
       get "/:id", ScreenApiController, :show
       get "/:id/simulation", ScreenApiController, :simulation
+      post "/log_frontend_error", ScreenApiController, :log_frontend_error
     end
 
     scope "/audio" do

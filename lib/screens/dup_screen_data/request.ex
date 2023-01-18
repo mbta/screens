@@ -26,7 +26,6 @@ defmodule Screens.DupScreenData.Request do
   ]
 
   @headsign_replacements %{
-    "Holbrook/Randolph" => "Holbrook / Randolph",
     "Charlestown Navy Yard" => "Charlestown",
     "Saugus Center via Kennedy Dr & Square One Mall" => "Saugus Center via Kndy Dr & Square One",
     "Malden via Square One Mall & Kennedy Dr" => "Malden via Square One Mall & Kndy Dr",
@@ -38,6 +37,7 @@ defmodule Screens.DupScreenData.Request do
     "Needham Heights" => "Needham Hts",
     "Houghs Neck via McGrath & Germantown" => "Houghs Neck via McGth & Gtwn",
     "Houghs Neck via Germantown" => "Houghs Neck via Germntwn",
+    "Middleborough/Lakeville" => "Middleborough / Lakeville",
 
     # The following are special headsigns for the 2022 Orange Line surge
     "Needham Heights via Ruggles" => "Needham Hts via Ruggles",
