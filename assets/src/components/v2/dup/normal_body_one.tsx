@@ -13,10 +13,10 @@ const NormalBodyOne: React.ComponentType<Props> = ({
 }) => {
   return (
     <div className="body-normal">
-      <div className="body-normal__header">
+      <div className="widget-slot body-normal__header">
         <Widget data={header} />
       </div>
-      <div className="body-normal__main-content">
+      <div className="widget-slot body-normal__main-content">
         <Widget data={mainContentPrimary} />
       </div>
     </div>

@@ -16,13 +16,13 @@ const NormalScreen: React.ComponentType<Props> = ({
 }) => {
   return (
     <div className="screen-normal">
-      <div className="screen-normal__rotation-zero">
+      <div className="widget-slot screen-normal__rotation-zero">
         <Widget data={rotationZero} />
       </div>
-      <div className="screen-normal__rotation-one">
+      <div className="widget-slot screen-normal__rotation-one">
         <Widget data={rotationOne} />
       </div>
-      <div className="screen-normal__rotation-two">
+      <div className="widget-slot screen-normal__rotation-two">
         <Widget data={rotationTwo} />
       </div>
     </div>

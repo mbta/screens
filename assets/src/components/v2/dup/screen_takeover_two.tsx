@@ -11,7 +11,7 @@ const ScreenTakeoverTwo: React.ComponentType<Props> = ({
 }) => {
   return (
     <div className="screen-takeover">
-      <div className="screen-takeover__rotation-two">
+      <div className="widget-slot screen-takeover__rotation-two">
         <Widget data={fullScreenTwo} />
       </div>
     </div>
