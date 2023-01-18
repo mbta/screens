@@ -66,7 +66,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
     stop_name = fetch_stop_name_fn.(stop_id)
 
-    for _ <- 1..3, do: %NormalHeader{screen: config, text: stop_name, time: now}
+    List.duplicate(%NormalHeader{screen: config, text: stop_name, time: now}, 3)
   end
 
   defp placeholder_instances do
