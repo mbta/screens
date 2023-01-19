@@ -1,0 +1,17 @@
+.body-split {
+  position: relative;
+}
+
+.body-split__main-content-reduced {
+  top: 0px;
+  left: 0px;
+  width: 1920px;
+  height: 432px;
+}
+
+.body-split__bottom-pane {
+  top: 432px;
+  left: 0px;
+  width: 1920px;
+  height: 400px;
+}

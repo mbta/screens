@@ -27,6 +27,8 @@ import ScreenTakeoverTwo from "Components/v2/dup/screen_takeover_two";
 import RotationNormalZero from "Components/v2/dup/rotation_normal_zero";
 import RotationNormalOne from "Components/v2/dup/rotation_normal_one";
 import RotationNormalTwo from "Components/v2/dup/rotation_normal_two";
+import SplitBodyZero from "Components/v2/dup/split_body_zero";
+import SplitBodyTwo from "Components/v2/dup/split_body_two";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -36,6 +38,8 @@ const TYPE_TO_COMPONENT = {
   body_normal_zero: NormalBodyZero,
   body_normal_one: NormalBodyOne,
   body_normal_two: NormalBodyTwo,
+  body_split_zero: SplitBodyZero,
+  body_split_two: SplitBodyTwo,
   screen_takeover_zero: ScreenTakeoverZero,
   screen_takeover_one: ScreenTakeoverOne,
   screen_takeover_two: ScreenTakeoverTwo,
