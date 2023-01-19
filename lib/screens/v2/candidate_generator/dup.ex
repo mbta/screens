@@ -18,29 +18,48 @@ defmodule Screens.V2.CandidateGenerator.Dup do
        screen_normal: [
          {:rotation_zero,
           %{
-            body_normal_zero: [
+            rotation_normal_zero: [
               :header_zero,
-              :main_content_primary_zero,
-              :inline_alert_zero
+              {:body_zero,
+               %{
+                 body_normal_zero: [
+                   :main_content_zero
+                 ],
+                 body_split_zero: [
+                   :main_content_reduced_zero,
+                   :bottom_pane_zero
+                 ]
+               }}
             ],
-            screen_takeover_zero: [:full_screen_zero]
+            rotation_takeover_zero: [:full_rotation_zero]
           }},
          {:rotation_one,
           %{
-            body_normal_one: [
+            rotation_normal_one: [
               :header_one,
-              :main_content_primary_one
+              {:body_one,
+               %{
+                 body_normal_one: [:main_content_one]
+               }}
             ],
-            screen_takeover_one: [:full_screen_one]
+            rotation_takeover_one: [:full_rotation_one]
           }},
          {:rotation_two,
           %{
-            body_normal_two: [
+            rotation_normal_two: [
               :header_two,
-              :main_content_secondary_two,
-              :inline_alert_two
+              {:body_two,
+               %{
+                 body_normal_two: [
+                   :main_content_two
+                 ],
+                 body_split_two: [
+                   :main_content_reduced_two,
+                   :bottom_pane_two
+                 ]
+               }}
             ],
-            screen_takeover_two: [:full_screen_two]
+            rotation_takeover_two: [:full_rotation_two]
           }}
        ]
      }}
@@ -71,9 +90,9 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
   defp placeholder_instances do
     [
-      %Placeholder{slot_names: [:main_content_primary_zero], color: :grey},
-      %Placeholder{slot_names: [:main_content_primary_one], color: :blue},
-      %Placeholder{slot_names: [:main_content_secondary_two], color: :green}
+      %Placeholder{slot_names: [:main_content_zero], color: :grey},
+      %Placeholder{slot_names: [:main_content_one], color: :blue},
+      %Placeholder{slot_names: [:main_content_two], color: :green}
     ]
   end
 end
