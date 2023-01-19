@@ -90,8 +90,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
   defp placeholder_instances do
     [
-      %Placeholder{slot_names: [:main_content_reduced_zero], color: :grey},
-      %Placeholder{slot_names: [:bottom_pane_zero], color: :blue},
+      %Placeholder{slot_names: [:full_rotation_zero], color: :green, priority: 1},
       %Placeholder{slot_names: [:main_content_one], color: :orange},
       %Placeholder{slot_names: [:main_content_reduced_two], color: :green},
       %Placeholder{slot_names: [:bottom_pane_two], color: :red}
