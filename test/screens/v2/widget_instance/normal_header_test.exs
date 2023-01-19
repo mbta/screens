@@ -9,6 +9,12 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
         icon: :logo,
         text: "Ruggles",
         time: ~U[2021-03-04 11:00:00Z]
+      },
+      dup_instance: %WidgetInstance.NormalHeader{
+        screen: struct(Screens.Config.Screen, %{app_id: :dup_v2}),
+        icon: :logo,
+        text: "Ruggles",
+        time: ~U[2021-03-04 11:00:00Z]
       }
     }
   end
@@ -31,9 +37,12 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
   end
 
   describe "slot_names/1" do
-    test "returns headers", %{instance: instance} do
-      assert [:header, :header_zero, :header_one, :header_two] ==
-               WidgetInstance.slot_names(instance)
+    test "returns header slot", %{instance: instance} do
+      assert [:header] == WidgetInstance.slot_names(instance)
+    end
+
+    test "returns DUP-specific header slot for DUP screens", %{dup_instance: dup_instance} do
+      assert [:header_zero, :header_one, :header_two] == WidgetInstance.slot_names(dup_instance)
     end
   end
 
