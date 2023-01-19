@@ -12,7 +12,6 @@ import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
 
 import NormalScreen from "Components/v2/dup/normal_screen";
-import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/dup/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
@@ -21,9 +20,6 @@ import NormalBodyZero from "Components/v2/dup/normal_body_zero";
 import NormalBodyOne from "Components/v2/dup/normal_body_one";
 import NormalBodyTwo from "Components/v2/dup/normal_body_two";
 import Viewport from "Components/v2/dup/viewport";
-import ScreenTakeoverZero from "Components/v2/dup/screen_takeover_zero";
-import ScreenTakeoverOne from "Components/v2/dup/screen_takeover_one";
-import ScreenTakeoverTwo from "Components/v2/dup/screen_takeover_two";
 import RotationNormalZero from "Components/v2/dup/rotation_normal_zero";
 import RotationNormalOne from "Components/v2/dup/rotation_normal_one";
 import RotationNormalTwo from "Components/v2/dup/rotation_normal_two";
@@ -46,10 +42,6 @@ const TYPE_TO_COMPONENT = {
   body_normal_two: NormalBodyTwo,
   body_split_zero: SplitBodyZero,
   body_split_two: SplitBodyTwo,
-  screen_takeover_zero: ScreenTakeoverZero,
-  screen_takeover_one: ScreenTakeoverOne,
-  screen_takeover_two: ScreenTakeoverTwo,
-  full_takeover: TakeoverScreen,
   placeholder: Placeholder,
   normal_header: NormalHeader,
   departures: NormalDepartures,
