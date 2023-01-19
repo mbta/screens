@@ -340,5 +340,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
 
       assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
     end
+
+    test "filters out upcoming alerts", %{
+      stop_ids: stop_ids,
+      route_ids: route_ids,
+      now: now
+    } do
+      alerts = [
+        %Alert{
+          id: "1",
+          effect: :extra_service,
+          informed_entities: [ie(stop: "1")],
+          active_period: [{~U[3021-01-01T00:00:00Z], nil}]
+        }
+      ]
+
+      assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
+    end
   end
 end
