@@ -15,15 +15,9 @@ const NormalScreen: React.ComponentType<Props> = ({
 }) => {
   return (
     <div className="screen-normal">
-      <div className="widget-slot screen-normal__rotation-zero">
-        <Widget data={rotationZero} />
-      </div>
-      <div className="widget-slot screen-normal__rotation-one">
-        <Widget data={rotationOne} />
-      </div>
-      <div className="widget-slot screen-normal__rotation-two">
-        <Widget data={rotationTwo} />
-      </div>
+      <Widget data={rotationZero} />
+      <Widget data={rotationOne} />
+      <Widget data={rotationTwo} />
     </div>
   );
 };

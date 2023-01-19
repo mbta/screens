@@ -24,9 +24,15 @@ import Viewport from "Components/v2/dup/viewport";
 import ScreenTakeoverZero from "Components/v2/dup/screen_takeover_zero";
 import ScreenTakeoverOne from "Components/v2/dup/screen_takeover_one";
 import ScreenTakeoverTwo from "Components/v2/dup/screen_takeover_two";
+import RotationNormalZero from "Components/v2/dup/rotation_normal_zero";
+import RotationNormalOne from "Components/v2/dup/rotation_normal_one";
+import RotationNormalTwo from "Components/v2/dup/rotation_normal_two";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
+  rotation_normal_zero: RotationNormalZero,
+  rotation_normal_one: RotationNormalOne,
+  rotation_normal_two: RotationNormalTwo,
   body_normal_zero: NormalBodyZero,
   body_normal_one: NormalBodyOne,
   body_normal_two: NormalBodyTwo,
