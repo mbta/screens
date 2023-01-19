@@ -14,6 +14,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
 
   describe "alert_instances/5" do
     setup do
+      now = ~U[2021-01-01T00:00:00Z]
+
       config =
         struct(Screen, %{app_params: struct(BusShelter, %{alerts: %Alerts{stop_id: "1265"}})})
 
@@ -33,10 +35,25 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       ]
 
       alerts = [
-        %Alert{id: "1", effect: :stop_closure, informed_entities: [ie(stop: "1265")]},
-        %Alert{id: "2", effect: :stop_closure, informed_entities: [ie(route: "22")]},
-        %Alert{id: "3", effect: :delay, informed_entities: [ie(stop: "1265")]},
-        %Alert{id: "4", effect: :stop_closure, informed_entities: []}
+        %Alert{
+          id: "1",
+          effect: :stop_closure,
+          informed_entities: [ie(stop: "1265")],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "2",
+          effect: :stop_closure,
+          informed_entities: [ie(route: "22")],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "3",
+          effect: :delay,
+          informed_entities: [ie(stop: "1265")],
+          active_period: [{now, nil}]
+        },
+        %Alert{id: "4", effect: :stop_closure, informed_entities: [], active_period: [{now, nil}]}
       ]
 
       %{
@@ -44,7 +61,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         bad_config: bad_config,
         routes_at_stop: routes_at_stop,
         stop_sequences: stop_sequences,
-        now: ~U[2021-01-01T00:00:00Z],
+        now: now,
         fetch_simplified_routes_at_stop_fn: fn _, _ -> {:ok, routes_at_stop} end,
         fetch_stop_sequences_fn: fn _ -> {:ok, stop_sequences} end,
         fetch_alerts_fn: fn _, _ -> {:ok, alerts} end,
@@ -75,13 +92,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       expected_widgets = [
         struct(
           %AlertWidget{
-            alert: %Alert{id: "1", effect: :stop_closure, informed_entities: [ie(stop: "1265")]}
+            alert: %Alert{
+              id: "1",
+              effect: :stop_closure,
+              informed_entities: [ie(stop: "1265")],
+              active_period: [{now, nil}]
+            }
           },
           expected_common_data
         ),
         struct(
           %AlertWidget{
-            alert: %Alert{id: "2", effect: :stop_closure, informed_entities: [ie(route: "22")]}
+            alert: %Alert{
+              id: "2",
+              effect: :stop_closure,
+              informed_entities: [ie(route: "22")],
+              active_period: [{now, nil}]
+            }
           },
           expected_common_data
         )
@@ -158,79 +185,160 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
     end
   end
 
-  describe "filter_alerts/3" do
+  describe "filter_alerts/4" do
     setup do
       %{
         stop_ids: ~w[1 2 3],
-        route_ids: ~w[11 22 33]
+        route_ids: ~w[11 22 33],
+        now: DateTime.utc_now()
       }
     end
 
     test "filters out alerts that inform routes that do not serve the home stop", %{
       stop_ids: stop_ids,
-      route_ids: route_ids
+      route_ids: route_ids,
+      now: now
     } do
       alerts = [
-        %Alert{id: "1", effect: :suspension, informed_entities: [ie(stop: "1")]},
-        %Alert{id: "2", effect: :suspension, informed_entities: [ie(route: "11")]},
-        %Alert{id: "3", effect: :suspension, informed_entities: [ie(stop: "1", route: "11")]},
-        %Alert{id: "4", effect: :suspension, informed_entities: [ie(route: "88")]},
-        %Alert{id: "5", effect: :suspension, informed_entities: [ie(stop: "1", route: "99")]}
+        %Alert{
+          id: "1",
+          effect: :suspension,
+          informed_entities: [ie(stop: "1")],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "2",
+          effect: :suspension,
+          informed_entities: [ie(route: "11")],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "3",
+          effect: :suspension,
+          informed_entities: [ie(stop: "1", route: "11")],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "4",
+          effect: :suspension,
+          informed_entities: [ie(route: "88")],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "5",
+          effect: :suspension,
+          informed_entities: [ie(stop: "1", route: "99")],
+          active_period: [{now, nil}]
+        }
       ]
 
       assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
-               filter_alerts(alerts, stop_ids, route_ids)
+               filter_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "filters out alerts that inform stops that are not downstream of the home stop", %{
       stop_ids: stop_ids,
-      route_ids: route_ids
+      route_ids: route_ids,
+      now: now
     } do
       alerts = [
-        %Alert{id: "1", effect: :suspension, informed_entities: [ie(stop: "1")]},
-        %Alert{id: "2", effect: :suspension, informed_entities: [ie(route: "11")]},
-        %Alert{id: "3", effect: :suspension, informed_entities: [ie(stop: "1", route: "22")]},
-        %Alert{id: "4", effect: :suspension, informed_entities: [ie(stop: "8")]},
-        %Alert{id: "5", effect: :suspension, informed_entities: [ie(stop: "9", route: "33")]}
+        %Alert{
+          id: "1",
+          effect: :suspension,
+          informed_entities: [ie(stop: "1")],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "2",
+          effect: :suspension,
+          informed_entities: [ie(route: "11")],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "3",
+          effect: :suspension,
+          informed_entities: [ie(stop: "1", route: "22")],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "4",
+          effect: :suspension,
+          informed_entities: [ie(stop: "8")],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "5",
+          effect: :suspension,
+          informed_entities: [ie(stop: "9", route: "33")],
+          active_period: [{now, nil}]
+        }
       ]
 
       assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
-               filter_alerts(alerts, stop_ids, route_ids)
+               filter_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "keeps alerts that inform an entire route type", %{
       stop_ids: stop_ids,
-      route_ids: route_ids
+      route_ids: route_ids,
+      now: now
     } do
       alerts = [
-        %Alert{id: "1", effect: :suspension, informed_entities: [ie(route_type: 1)]},
-        %Alert{id: "2", effect: :suspension, informed_entities: [ie(stop: "9", route_type: 1)]},
-        %Alert{id: "3", effect: :suspension, informed_entities: [ie(route: "99", route_type: 1)]}
+        %Alert{
+          id: "1",
+          effect: :suspension,
+          informed_entities: [ie(route_type: 1)],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "2",
+          effect: :suspension,
+          informed_entities: [ie(stop: "9", route_type: 1)],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "3",
+          effect: :suspension,
+          informed_entities: [ie(route: "99", route_type: 1)],
+          active_period: [{now, nil}]
+        }
       ]
 
-      assert [%Alert{id: "1"}] = filter_alerts(alerts, stop_ids, route_ids)
+      assert [%Alert{id: "1"}] = filter_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "filters out alerts with other informed entities", %{
       stop_ids: stop_ids,
-      route_ids: route_ids
+      route_ids: route_ids,
+      now: now
     } do
       alerts = [
-        %Alert{id: "1", effect: :suspension, informed_entities: [ie()]}
+        %Alert{
+          id: "1",
+          effect: :suspension,
+          informed_entities: [ie()],
+          active_period: [{now, nil}]
+        }
       ]
 
-      assert [] = filter_alerts(alerts, stop_ids, route_ids)
+      assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "filters out alerts that do not have a relevant effect", %{
       stop_ids: stop_ids,
-      route_ids: route_ids
+      route_ids: route_ids,
+      now: now
     } do
       alerts = [
-        %Alert{id: "1", effect: :extra_service, informed_entities: [ie(stop: "1")]}
+        %Alert{
+          id: "1",
+          effect: :extra_service,
+          informed_entities: [ie(stop: "1")],
+          active_period: [{now, nil}]
+        }
       ]
 
-      assert [] = filter_alerts(alerts, stop_ids, route_ids)
+      assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
     end
   end
 end
