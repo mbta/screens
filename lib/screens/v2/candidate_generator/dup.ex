@@ -39,7 +39,11 @@ defmodule Screens.V2.CandidateGenerator.Dup do
               :header_one,
               {:body_one,
                %{
-                 body_normal_one: [:main_content_one]
+                 body_normal_one: [:main_content_one],
+                 body_split_one: [
+                   :main_content_reduced_one,
+                   :bottom_pane_one
+                 ]
                }}
             ],
             rotation_takeover_one: [:full_rotation_one]

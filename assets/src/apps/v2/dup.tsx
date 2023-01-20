@@ -24,6 +24,7 @@ import RotationNormalZero from "Components/v2/dup/rotation_normal_zero";
 import RotationNormalOne from "Components/v2/dup/rotation_normal_one";
 import RotationNormalTwo from "Components/v2/dup/rotation_normal_two";
 import SplitBodyZero from "Components/v2/dup/split_body_zero";
+import SplitBodyOne from "Components/v2/dup/split_body_one";
 import SplitBodyTwo from "Components/v2/dup/split_body_two";
 import RotationTakeoverZero from "Components/v2/dup/rotation_takeover_zero";
 import RotationTakeoverOne from "Components/v2/dup/rotation_takeover_one";
@@ -41,6 +42,7 @@ const TYPE_TO_COMPONENT = {
   body_normal_one: NormalBodyOne,
   body_normal_two: NormalBodyTwo,
   body_split_zero: SplitBodyZero,
+  body_split_one: SplitBodyOne,
   body_split_two: SplitBodyTwo,
   placeholder: Placeholder,
   normal_header: NormalHeader,
