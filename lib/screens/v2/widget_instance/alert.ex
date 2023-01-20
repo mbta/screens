@@ -150,19 +150,19 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   def takeover_alert?(%__MODULE__{screen: %Screen{app_id: bus_app_id}} = t)
       when bus_app_id in [:bus_shelter_v2, :bus_eink_v2] do
-    active?(t) and effect(t) in [:stop_closure, :stop_move, :stop_moved, :suspension, :detour] and
+    effect(t) in [:stop_closure, :stop_move, :stop_moved, :suspension, :detour] and
       informs_all_active_routes_at_home_stop?(t)
   end
 
   def takeover_alert?(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
-    active?(t) and effect(t) in [:station_closure, :suspension, :shuttle] and
+    effect(t) in [:station_closure, :suspension, :shuttle] and
       BaseAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
   end
 
   def takeover_alert?(
         %{screen: %Screen{app_id: :pre_fare_v2}, is_terminal_station: is_terminal_station} = t
       ) do
-    active?(t) and effect(t) in [:station_closure, :suspension, :shuttle] and
+    effect(t) in [:station_closure, :suspension, :shuttle] and
       BaseAlert.location(t, is_terminal_station) == :inside and
       informs_all_active_routes_at_home_stop?(t)
   end
@@ -201,25 +201,19 @@ defmodule Screens.V2.WidgetInstance.Alert do
       )
       when screen_type in [:bus_shelter_v2, :bus_eink_v2] do
     priority(t) != :no_render and
-      BaseAlert.location(t) in [:inside, :boundary_downstream] and
-      active?(t)
+      BaseAlert.location(t) in [:inside, :boundary_downstream]
   end
 
   # For all other bus alert effects, all stops in the `informed_entities` are directly affected by the alert and would be useful for riders to see.
   def valid_candidate?(%__MODULE__{screen: %Screen{app_id: screen_type}} = t)
       when screen_type in [:bus_shelter_v2, :bus_eink_v2] do
     priority(t) != :no_render and
-      BaseAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream] and
-      active?(t)
+      BaseAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
   end
 
   # Any subway alert that is not filtered out in the candidate_generator is valid and should appear on screens›.
   def valid_candidate?(t) do
     priority(t) != :no_render
-  end
-
-  def active?(%{alert: alert, now: now}, happening_now? \\ &Alert.happening_now?/2) do
-    happening_now?.(alert, now)
   end
 
   @spec seconds_from_onset(t()) :: integer()
@@ -319,22 +313,13 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @spec tiebreaker_primary_timeframe(t()) :: pos_integer() | WidgetInstance.no_render()
   def tiebreaker_primary_timeframe(%__MODULE__{} = t) do
-    if active?(t) do
-      from_onset = seconds_from_onset(t)
+    from_onset = seconds_from_onset(t)
 
-      cond do
-        from_onset < 4 * @week -> 1
-        from_onset in (4 * @week)..(12 * @week - 1) -> 2
-        from_onset in (12 * @week)..(24 * @week - 1) -> 4
-        true -> :no_render
-      end
-    else
-      to_next = seconds_to_next_active_period(t)
-
-      cond do
-        to_next < 36 * @hour -> 2
-        to_next >= 36 * @hour -> 3
-      end
+    cond do
+      from_onset < 4 * @week -> 1
+      from_onset in (4 * @week)..(12 * @week - 1) -> 2
+      from_onset in (12 * @week)..(24 * @week - 1) -> 4
+      true -> :no_render
     end
   end
 
@@ -355,15 +340,10 @@ defmodule Screens.V2.WidgetInstance.Alert do
   """
   @spec tiebreaker_secondary_timeframe(t()) :: pos_integer()
   def tiebreaker_secondary_timeframe(%__MODULE__{} = t) do
-    cond do
-      not active?(t) and seconds_to_next_active_period(t) < 36 * @hour ->
-        1
-
-      active?(t) and seconds_from_onset(t) in (4 * @week)..(12 * @week - 1) ->
-        2
-
-      true ->
-        3
+    if seconds_from_onset(t) in (4 * @week)..(12 * @week - 1) do
+      1
+    else
+      2
     end
   end
 

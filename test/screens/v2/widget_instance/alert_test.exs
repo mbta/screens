@@ -302,49 +302,35 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   describe "slot_names/1 for bus apps (Bus Shelter and Bus E-Ink)" do
     setup @alert_widget_context_setup_group
 
-    # active | high-impact | informs all routes || full-screen?
-    # n      | n           | n                  || n
-    # y      | n           | n                  || n
-    # n      | y           | n                  || n
-    # y      | y           | n                  || n
-    # n      | n           | y                  || n
-    # y      | n           | y                  || n
-    # n      | y           | y                  || n
-    # y      | y           | y                  || y
+    # high-impact | informs all routes || full-screen?
+    # n           | n                  || n
+    # y           | n                  || n
+    # n           | y                  || n
+    # y           | y                  || y
 
     @bus_slot_names_cases %{
-      {false, false, false} => [:medium_left, :medium_right],
-      {true, false, false} => [:medium_left, :medium_right],
-      {false, true, false} => [:medium_left, :medium_right],
-      {true, true, false} => [:medium_left, :medium_right],
-      {false, false, true} => [:medium_left, :medium_right],
-      {true, false, true} => [:medium_left, :medium_right],
-      {false, true, true} => [:medium_left, :medium_right],
-      {true, true, true} => [:full_body]
+      {false, false} => [:medium_left, :medium_right],
+      {true, false} => [:medium_left, :medium_right],
+      {false, true} => [:medium_left, :medium_right],
+      {true, true} => [:full_body]
     }
 
-    for {{set_active?, set_high_impact_effect?, set_informs_all_active_routes?},
-         expected_slot_names} <- @bus_slot_names_cases do
+    for {{set_high_impact_effect?, set_informs_all_active_routes?}, expected_slot_names} <-
+          @bus_slot_names_cases do
       false_to_not = fn
         true -> ""
         false -> "not "
       end
 
       test_description =
-        "returns #{inspect(expected_slot_names)} if alert is " <>
-          false_to_not.(set_active?) <>
-          "active and does " <>
+        "returns #{inspect(expected_slot_names)} if alert does " <>
           false_to_not.(set_high_impact_effect?) <>
           "have a high-impact effect and does " <>
           false_to_not.(set_informs_all_active_routes?) <>
           "inform all active routes at home stop"
 
       test test_description, %{widget: widget} do
-        active_period =
-          if(unquote(set_active?),
-            do: [{~U[2021-01-01T00:00:00Z], ~U[2021-01-01T22:00:00Z]}],
-            else: [{~U[2021-01-02T00:00:00Z], ~U[2021-01-02T22:00:00Z]}]
-          )
+        active_period = [{~U[2021-01-01T00:00:00Z], ~U[2021-01-01T22:00:00Z]}]
 
         effect = if(unquote(set_high_impact_effect?), do: :stop_closure, else: :snow_route)
 
@@ -389,29 +375,20 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       %{widget: widget}
     end
 
-    # active | high-impact | location [:inside, :boundary_downstream, :boundary_upstream]  || full-screen?
-    # n      | n           | n                                                             || n
-    # y      | n           | n                                                             || n
-    # n      | y           | n                                                             || n
-    # y      | y           | n                                                             || n
-    # n      | n           | y                                                             || n
-    # y      | n           | y                                                             || n
-    # n      | y           | y                                                             || n
-    # y      | y           | y                                                             || y
+    # high-impact | location [:inside, :boundary_downstream, :boundary_upstream]  || full-screen?
+    # n           | n                                                             || n
+    # y           | n                                                             || n
+    # n           | y                                                             || n
+    # y           | y                                                             || y
 
     @gl_slot_names_cases %{
-      {false, false, false} => [:medium],
-      {true, false, false} => [:medium],
-      {false, true, false} => [:medium],
-      {true, true, false} => [:medium],
-      {false, false, true} => [:medium],
-      {true, false, true} => [:medium],
-      {false, true, true} => [:medium],
-      {true, true, true} => [:full_body_top_screen]
+      {false, false} => [:medium],
+      {true, false} => [:medium],
+      {false, true} => [:medium],
+      {true, true} => [:full_body_top_screen]
     }
 
-    for {{set_active?, set_high_impact_effect?, set_location_inside_or_boundary?},
-         expected_slot_names} <-
+    for {{set_high_impact_effect?, set_location_inside_or_boundary?}, expected_slot_names} <-
           @gl_slot_names_cases do
       false_to_not = fn
         true -> " "
@@ -419,20 +396,14 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       end
 
       test_description =
-        "returns #{inspect(expected_slot_names)} if alert is " <>
-          false_to_not.(set_active?) <>
-          "active and does" <>
+        "returns #{inspect(expected_slot_names)} if alert does " <>
           false_to_not.(set_high_impact_effect?) <>
           "have a high-impact effect and does" <>
           false_to_not.(set_location_inside_or_boundary?) <>
           "contain home stop in informed region"
 
       test test_description, %{widget: widget} do
-        active_period =
-          if(unquote(set_active?),
-            do: [{~U[2021-01-01T00:00:00Z], ~U[2021-01-01T22:00:00Z]}],
-            else: [{~U[2021-01-02T00:00:00Z], ~U[2021-01-02T22:00:00Z]}]
-          )
+        active_period = [{~U[2021-01-01T00:00:00Z], ~U[2021-01-01T22:00:00Z]}]
 
         effect = if(unquote(set_high_impact_effect?), do: :suspension, else: :elevator_closure)
 
@@ -450,16 +421,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
         assert unquote(expected_slot_names) == AlertWidget.slot_names(widget)
       end
-    end
-  end
-
-  describe "active?/2" do
-    test "simply calls Alert.happening_now?/1 on the widget's alert", %{widget: widget} do
-      yes_happening_now = fn %Alert{id: "123"}, _ -> true end
-      not_happening_now = fn %Alert{id: "123"}, _ -> false end
-
-      assert AlertWidget.active?(widget, yes_happening_now)
-      assert not AlertWidget.active?(widget, not_happening_now)
     end
   end
 
@@ -599,23 +560,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       assert 2 == AlertWidget.tiebreaker_primary_timeframe(widget)
     end
 
-    test "returns 2 for alerts that are inactive and next active period starts in less than 36 hours",
-         %{widget: widget} do
-      widget =
-        put_active_period(widget, [
-          {~U[2021-01-02T00:00:00Z], nil}
-        ])
-
-      assert 2 == AlertWidget.tiebreaker_primary_timeframe(widget)
-    end
-
-    test "returns 3 for alerts that are inactive and next active period starts in 36 hours or more",
-         %{widget: widget} do
-      widget = put_active_period(widget, [{~U[2021-01-10T00:00:00Z], nil}])
-
-      assert 3 == AlertWidget.tiebreaker_primary_timeframe(widget)
-    end
-
     test "returns 4 for alerts that are active and started 12-24 weeks ago", %{widget: widget} do
       widget =
         put_active_period(widget, [
@@ -678,34 +622,20 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   describe "tiebreaker_secondary_timeframe/1" do
     setup @valid_alert_setup_group
 
-    test "returns 1 for alerts that are inactive and next active period starts in less than 36 hours",
-         %{widget: widget} do
-      widget =
-        put_active_period(widget, [
-          {~U[2021-01-02T00:00:00Z], nil}
-        ])
-
-      assert 1 == AlertWidget.tiebreaker_secondary_timeframe(widget)
-    end
-
-    test "returns 2 for alerts that are active and started 4-12 weeks ago", %{widget: widget} do
+    test "returns 1 for alerts that are active and started 4-12 weeks ago", %{widget: widget} do
       widget =
         put_active_period(widget, [
           {~U[2020-11-01T00:00:00Z], ~U[2020-11-01T20:00:00Z]},
           {~U[2021-01-01T00:00:00Z], nil}
         ])
 
-      assert 2 == AlertWidget.tiebreaker_secondary_timeframe(widget)
+      assert 1 == AlertWidget.tiebreaker_secondary_timeframe(widget)
     end
 
-    test "returns 3 in all other cases", %{widget: widget} do
+    test "returns 2 in all other cases", %{widget: widget} do
       active_now_widget = put_active_period(widget, [{~U[2021-01-01T00:00:00Z], nil}])
 
-      assert 3 == AlertWidget.tiebreaker_secondary_timeframe(active_now_widget)
-
-      inactive_for_a_while_widget = put_active_period(widget, [{~U[2021-01-10T00:00:00Z], nil}])
-
-      assert 3 == AlertWidget.tiebreaker_secondary_timeframe(inactive_for_a_while_widget)
+      assert 2 == AlertWidget.tiebreaker_secondary_timeframe(active_now_widget)
     end
   end
 
