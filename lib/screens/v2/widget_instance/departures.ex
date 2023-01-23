@@ -10,7 +10,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct screen: nil,
-            section_data: []
+            section_data: [],
+            slot_names: []
 
   @type section :: %{
           type: :normal_section,
@@ -28,7 +29,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          section_data: list(section | notice_section)
+          section_data: list(section | notice_section),
+          slot_names: list(atom())
         }
 
   # The maximum number of departures to send back to the client.
@@ -42,7 +44,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
       %{sections: Enum.map(section_data, &Departures.serialize_section(&1, screen))}
     end
 
-    def slot_names(_instance), do: [:main_content]
+    def slot_names(%Departures{slot_names: slot_names}) when length(slot_names) > 0,
+      do: slot_names
+
+    def slot_names(_instance), do: [:main_content, :main_content_zero]
 
     def widget_type(_instance), do: :departures
 
