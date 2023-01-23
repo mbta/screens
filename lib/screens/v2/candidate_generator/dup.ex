@@ -73,8 +73,17 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(config, now \\ DateTime.utc_now()) do
-    [fn -> header_instances(config, now) end, fn -> placeholder_instances() end]
+  def candidate_instances(
+        config,
+        now \\ DateTime.utc_now()
+      ) do
+    [
+      fn -> header_instances(config, now) end,
+      fn -> placeholder_instances() end,
+      fn ->
+        departures_instances(config)
+      end
+    ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
@@ -96,7 +105,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
   defp placeholder_instances do
     [
-      %Placeholder{slot_names: [:full_rotation_zero], color: :green, priority: 1},
       %Placeholder{slot_names: [:main_content_one], color: :orange},
       %Placeholder{slot_names: [:main_content_reduced_two], color: :green},
       %Placeholder{slot_names: [:bottom_pane_two], color: :red}
