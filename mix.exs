@@ -57,7 +57,7 @@ defmodule Screens.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.5"},
-      {:httpoison, "~> 1.8.0"},
+      {:httpoison, "~> 2.0.0"},
       {:tzdata, "~> 1.1"},
       {:credo, "~> 1.6.0"},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
