@@ -2,12 +2,14 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.Dup
+  alias Screens.Config.V2.{Departures, Dup}
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
 
@@ -99,5 +101,74 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       %Placeholder{slot_names: [:main_content_reduced_two], color: :green},
       %Placeholder{slot_names: [:bottom_pane_two], color: :red}
     ]
+  end
+
+  defp departures_instances(
+         %Screen{
+           app_params: %Dup{
+             primary_departures: %Departures{sections: primary_sections},
+             secondary_departures: %Departures{sections: secondary_sections}
+           }
+         } = config,
+         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1
+       ) do
+    primary_sections_data =
+      primary_sections
+      |> Task.async_stream(fetch_section_departures_fn, timeout: :infinity)
+      |> Enum.map(fn {:ok, data} -> data end)
+      |> Enum.take(4)
+
+    secondary_sections_data =
+      if secondary_sections == [] do
+        primary_sections_data
+      else
+        secondary_sections
+        |> Task.async_stream(fetch_section_departures_fn, timeout: :infinity)
+        |> Enum.map(fn {:ok, data} -> data end)
+        |> Enum.take(4)
+      end
+
+    primary_departures_instances =
+      if Enum.any?(primary_sections_data, &(&1 == :error)) do
+        %DeparturesNoData{screen: config, show_alternatives?: true}
+      else
+        sections =
+          Enum.map(primary_sections_data, fn {:ok, departures} ->
+            %{type: :normal_section, rows: departures}
+          end)
+
+        [
+          %DeparturesWidget{
+            screen: config,
+            section_data: sections,
+            slot_names: [:main_content_zero]
+          },
+          %DeparturesWidget{
+            screen: config,
+            section_data: sections,
+            slot_names: [:main_content_one]
+          }
+        ]
+      end
+
+    secondary_departures_instances =
+      if Enum.any?(secondary_sections_data, &(&1 == :error)) do
+        %DeparturesNoData{screen: config, show_alternatives?: true}
+      else
+        sections =
+          Enum.map(secondary_sections_data, fn {:ok, departures} ->
+            %{type: :normal_section, rows: departures}
+          end)
+
+        [
+          %DeparturesWidget{
+            screen: config,
+            section_data: sections,
+            slot_names: [:main_content_two]
+          }
+        ]
+      end
+
+    primary_departures_instances ++ secondary_departures_instances
   end
 end
