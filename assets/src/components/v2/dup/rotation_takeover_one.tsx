@@ -10,7 +10,7 @@ const RotationTakeoverOne: React.ComponentType<Props> = ({
   full_rotation_one: fullRotation,
 }) => {
   return (
-    <div className="rotation-one">
+    <div className="widget-slot rotation-one">
       <div className="widget-slot rotation-takeover">
         <Widget data={fullRotation} />
       </div>
