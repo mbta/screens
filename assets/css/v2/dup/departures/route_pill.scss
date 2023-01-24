@@ -59,6 +59,7 @@
   font-weight: 700;
   transform: translateY(8px);
   letter-spacing: 0.0277em;
+  color: white;
 
   &--yellow {
     font-family: Inter, sans-serif;
@@ -68,14 +69,8 @@
     font-size: 128px;
   }
 
-  &--blue,
-  &--green,
-  &--orange,
-  &--purple,
-  &--red,
-  &--silver,
-  &--teal {
-    color: white;
+  &--green {
+    font-size: 84px;
   }
 }
 
