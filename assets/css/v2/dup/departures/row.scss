@@ -6,7 +6,7 @@
     content: "";
     position: absolute;
     bottom: 0px;
-    left: 0px;
+    left: 302px;
     height: 4px;
     width: 1586px;
     background-color: #cccbc8;
@@ -15,19 +15,20 @@
 
 .departure-row__route {
   display: inline-block;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .departure-row__destination {
   display: inline-block;
   vertical-align: middle;
-  margin-right: 20px;
 }
 
 .departure-row__time {
-  display: inline-block;
   color: #171f26;
+  display: inline-block;
   text-align: right;
   vertical-align: middle;
+  width: 400px;
+  margin-right: 32px;
   font-size: 138px;
 }

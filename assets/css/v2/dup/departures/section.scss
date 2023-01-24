@@ -1,4 +1,6 @@
 .departures-section {
+  position: relative;
+
   &:not(:first-child):before {
     content: "";
     position: absolute;

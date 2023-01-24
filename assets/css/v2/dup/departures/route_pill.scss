@@ -6,6 +6,7 @@
   margin-left: 32px;
   margin-right: 32px;
   margin-top: 32px;
+  margin-bottom: 32px;
 
   &--blue {
     background-color: $line-color-blue;
@@ -42,8 +43,9 @@
     height: 168px;
     border-radius: 0 20px 20px 0;
     letter-spacing: -2px;
-    margin-top: 20px;
     margin-left: 0px;
+    margin-top: 20px;
+    margin-bottom: 20px;
   }
 }
 
@@ -55,7 +57,7 @@
   font-size: 96px;
   line-height: 144px;
   font-weight: 700;
-  transform: translateY(4px);
+  transform: translateY(8px);
   letter-spacing: 0.0277em;
 
   &--yellow {

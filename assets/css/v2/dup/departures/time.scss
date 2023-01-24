@@ -1,16 +1,9 @@
-.departure-times {
-  width: 400px;
-}
-
 .departure-time {
   color: #171f26;
   text-align: right;
-  display: inline-block;
-  vertical-align: middle;
+  font-size: 138px;
   line-height: 1em;
-  margin-top: 32px;
-  margin-right: 32px;
-  font-family: Inter;
+  font-family: Inter, sans-serif;
 
   &:not(:first-child) {
     margin-top: 32px;
