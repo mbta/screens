@@ -224,7 +224,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       end
 
     crowding =
-      if crowding_compatible?(serialized_time) do
+      if crowding_compatible?(serialized_time, screen) do
         serialize_crowding(departure)
       else
         nil
@@ -239,9 +239,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
   # Timestamps represent a time further in the future (except for CR, which doesn't have crowding)
   # and can't physically fit on the same row as crowding icons.
   # All other time representations are compatible.
-  defp crowding_compatible?(serialized_time)
-  defp crowding_compatible?(%{time: %{type: :timestamp}}), do: false
-  defp crowding_compatible?(_), do: true
+  defp crowding_compatible?(serialized_time, screen)
+  defp crowding_compatible?(%{time: %{type: :timestamp}}, _), do: false
+  defp crowding_compatible?(_, %Screen{app_id: :dup_v2}), do: false
+  defp crowding_compatible?(_, _), do: true
 
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defp serialize_time(departure, %Screen{app_id: app_id}, now)
