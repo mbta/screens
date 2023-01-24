@@ -10,6 +10,12 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.{DeparturesNoData, NormalHeader, Placeholder}
+  alias Screens.Config.V2.Dup
+  alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Stops.Stop
+  alias Screens.V2.CandidateGenerator
+  alias Screens.V2.Template.Builder
+  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
 

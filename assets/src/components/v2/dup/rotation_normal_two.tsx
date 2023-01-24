@@ -12,7 +12,7 @@ const RotationNormalTwo: React.ComponentType<Props> = ({
   body_two: body,
 }) => {
   return (
-    <div className="rotation-two">
+    <div className="widget-slot rotation-two">
       <div className="widget-slot rotation-normal__header">
         <Widget data={header} />
       </div>
