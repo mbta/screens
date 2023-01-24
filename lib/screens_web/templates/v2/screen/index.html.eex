@@ -13,6 +13,9 @@
   <%= if record_sentry?() do %>
     data-sentry="<%= @sentry_frontend_dsn %>"
   <% end %>
+  <%= if not is_nil(@rotation_index) do %>
+    data-rotation-index="<%= @rotation_index %>"
+  <% end %>
   data-requestor="<%= @requestor %>"
   data-disable-sentry="<%= @disable_sentry %>"
 ></div>

@@ -39,7 +39,8 @@ defmodule Screens.Config.Screen do
             | V2.GlEink.t()
             | V2.Solari.t()
             | V2.SolariLarge.t()
-            | V2.PreFare.t(),
+            | V2.PreFare.t()
+            | V2.Dup.t(),
           tags: list(String.t())
         }
 

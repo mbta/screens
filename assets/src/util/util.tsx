@@ -25,7 +25,7 @@ export const imagePath = (fileName: string): string =>
   isDup() ? `images/${fileName}` : `/images/${fileName}`;
 
 export const isRealScreen = () =>
-  (isDup() || getDatasetValue("isRealScreen") === "true");
+  isDup() || getDatasetValue("isRealScreen") === "true";
 
 type ScreenSide = "left" | "right";
 const isScreenSide = (value: any): value is ScreenSide => {
@@ -35,10 +35,19 @@ const isScreenSide = (value: any): value is ScreenSide => {
 /**
  * For screen types that are split across two separate displays (pre-fare),
  * this gets the value of the data attribute dictating which side to show.
- * 
+ *
  * Returns null if the data attribute is missing or not a valid screen side value.
  */
 export const getScreenSide = (): ScreenSide | null => {
   const screenSide = getDatasetValue("screenSide");
   return isScreenSide(screenSide) ? screenSide : null;
+};
+
+type RotationIndex = "0" | "1" | "2";
+const isRotationIndex = (value: any): value is RotationIndex => {
+  return value === "0" || value === "1" || value === "2";
+};
+export const getRotationIndex = (): RotationIndex | null => {
+  const rotationIndex = getDatasetValue("rotationIndex");
+  return isRotationIndex(rotationIndex) ? rotationIndex : null;
 };

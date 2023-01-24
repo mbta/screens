@@ -11,7 +11,8 @@ defmodule Screens.V2.ScreenData.Parameters do
     gl_eink_v2: CandidateGenerator.GlEink,
     solari_v2: CandidateGenerator.Solari,
     solari_large_v2: CandidateGenerator.SolariLarge,
-    pre_fare_v2: CandidateGenerator.PreFare
+    pre_fare_v2: CandidateGenerator.PreFare,
+    dup_v2: CandidateGenerator.Dup
   }
 
   @app_id_to_refresh_rate %{
@@ -20,7 +21,8 @@ defmodule Screens.V2.ScreenData.Parameters do
     gl_eink_v2: 30,
     solari_v2: 15,
     solari_large_v2: 15,
-    pre_fare_v2: 20
+    pre_fare_v2: 20,
+    dup_v2: 30
   }
 
   @app_id_to_audio_readout_interval %{
@@ -29,16 +31,8 @@ defmodule Screens.V2.ScreenData.Parameters do
     gl_eink_v2: 0,
     solari_v2: 0,
     solari_large_v2: 0,
-    pre_fare_v2: 0
-  }
-
-  @app_id_to_audio_interval_offset_seconds %{
-    bus_eink_v2: 0,
-    bus_shelter_v2: 0,
-    gl_eink_v2: 0,
-    solari_v2: 0,
-    solari_large_v2: 0,
-    pre_fare_v2: 0
+    pre_fare_v2: 0,
+    dup_v2: 0
   }
 
   @spec get_candidate_generator(Screens.Config.Screen.t() | atom()) :: candidate_generator()
@@ -77,7 +71,5 @@ defmodule Screens.V2.ScreenData.Parameters do
     interval_offset_seconds
   end
 
-  def get_audio_interval_offset_seconds(%Screens.Config.Screen{app_id: app_id}) do
-    Map.get(@app_id_to_audio_interval_offset_seconds, app_id)
-  end
+  def get_audio_interval_offset_seconds(_screen), do: 0
 end

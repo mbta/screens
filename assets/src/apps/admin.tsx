@@ -22,6 +22,7 @@ import {
   SolariLargeV2ScreensTable,
   BusShelterV2ScreensTable,
   PreFareV2ScreensTable,
+  DupV2ScreensTable,
 } from "Components/admin/admin_tables";
 import ImageManager from "Components/admin/admin_image_manager";
 import Devops from "Components/admin/devops";
@@ -54,6 +55,9 @@ const App = (): JSX.Element => {
         </Route>
         <Route exact path="/dup-screens">
           <DupScreensTable />
+        </Route>
+        <Route exact path="/dup-v2-screens">
+          <DupV2ScreensTable />
         </Route>
         <Route exact path="/bus-eink-v2-screens">
           <BusEinkV2ScreensTable />

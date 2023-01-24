@@ -3,22 +3,21 @@ import React from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
-  header_normal: WidgetData;
-  main_content_normal: WidgetData;
+  rotation_zero: WidgetData;
+  rotation_one: WidgetData;
+  rotation_two: WidgetData;
 }
 
 const NormalScreen: React.ComponentType<Props> = ({
-  header: header,
-  main_content: mainContent,
+  rotation_zero: rotationZero,
+  rotation_one: rotationOne,
+  rotation_two: rotationTwo,
 }) => {
   return (
     <div className="screen-normal">
-      <div className="screen-normal__header">
-        <Widget data={header} />
-      </div>
-      <div className="screen-normal__main-content">
-        <Widget data={mainContent} />
-      </div>
+      <Widget data={rotationZero} />
+      <Widget data={rotationOne} />
+      <Widget data={rotationTwo} />
     </div>
   );
 };

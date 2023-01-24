@@ -1,0 +1,31 @@
+.dup-screen-viewport {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+
+  .dup-shifter {
+    width: 5760px;
+    height: 1080px;
+    overflow: hidden;
+    position: absolute;
+  }
+
+  .dup-shifter--rotation-zero {
+    left: 0;
+  }
+
+  .dup-shifter--rotation-one {
+    left: -1920px;
+  }
+
+  .dup-shifter--rotation-two {
+    right: 0px;
+  }
+}
+
+.dup-screen-viewport--all {
+  width: 5760px;
+}

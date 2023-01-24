@@ -1,7 +1,14 @@
 @import url("https://rsms.me/inter/inter.css");
 
+@import "colors";
+@import "v2/common/widget";
+
 @import "v2/dup/screen/normal";
-@import "v2/dup/screen/takeover";
+@import "v2/dup/rotation/normal";
+@import "v2/dup/rotation/takeover";
+@import "v2/dup/body/normal";
+@import "v2/dup/body/split";
+@import "v2/dup/viewport";
 
 @import "v2/placeholder";
 @import "v2/dup/normal_header";
