@@ -1,11 +1,10 @@
-// .departures-section {
-//   &:first-child::after {
-//     content: "";
-//     position: absolute;
-//     left: 302px;
-//     top: -2px;
-//     height: 4px;
-//     width: 1586px;
-//     background-color: #cccbc8;
-//   }
-// }
+.departures-section {
+  &:not(:first-child):before {
+    content: "";
+    position: absolute;
+    left: 0px;
+    height: 6px;
+    width: 1920px;
+    background-color: #bfbebb;
+  }
+}

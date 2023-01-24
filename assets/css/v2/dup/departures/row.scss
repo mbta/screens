@@ -2,11 +2,11 @@
   position: relative;
   height: 208px;
 
-  &::after {
+  &:not(:last-child):after {
     content: "";
     position: absolute;
-    left: 302px;
-    top: -2px;
+    bottom: 0px;
+    left: 0px;
     height: 4px;
     width: 1586px;
     background-color: #cccbc8;
