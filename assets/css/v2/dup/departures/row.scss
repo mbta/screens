@@ -1,0 +1,33 @@
+.departure-row {
+  position: relative;
+  height: 208px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 302px;
+    top: -2px;
+    height: 4px;
+    width: 1586px;
+    background-color: #cccbc8;
+  }
+}
+
+.departure-row__route {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.departure-row__destination {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 20px;
+}
+
+.departure-row__time {
+  display: inline-block;
+  color: #171f26;
+  text-align: right;
+  vertical-align: middle;
+  font-size: 138px;
+}

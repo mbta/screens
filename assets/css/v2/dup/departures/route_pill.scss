@@ -1,0 +1,129 @@
+.route-pill {
+  position: relative;
+  width: 248px;
+  height: 144px;
+  border-radius: 100px;
+  margin-left: 32px;
+  margin-right: 32px;
+  margin-top: 32px;
+
+  &--blue {
+    background-color: $line-color-blue;
+  }
+
+  &--green {
+    background-color: $line-color-green;
+  }
+
+  &--orange {
+    background-color: $line-color-orange;
+  }
+
+  &--purple {
+    background-color: $line-color-cr;
+  }
+
+  &--red {
+    background-color: $line-color-red;
+  }
+
+  &--silver {
+    background-color: $line-color-silver;
+  }
+
+  &--teal {
+    background-color: $line-color-ferry;
+  }
+
+  &--yellow {
+    background-color: $line-color-bus;
+    color: black;
+    width: 280px;
+    height: 168px;
+    border-radius: 0 20px 20px 0;
+    letter-spacing: -2px;
+    margin-top: 20px;
+    margin-left: 0px;
+  }
+}
+
+.route-pill__text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-family: Helvetica, sans-serif;
+  font-size: 96px;
+  line-height: 144px;
+  font-weight: 700;
+  transform: translateY(4px);
+  letter-spacing: 0.0277em;
+
+  &--yellow {
+    font-family: Inter, sans-serif;
+    transform: translateY(8px);
+    color: black;
+    line-height: 168px;
+    font-size: 128px;
+  }
+
+  &--blue,
+  &--green,
+  &--orange,
+  &--purple,
+  &--red,
+  &--silver,
+  &--teal {
+    color: white;
+  }
+}
+
+.route-pill__icon {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}
+
+.route-pill__icon-image {
+  height: 112.5px;
+  margin-top: 15.75px;
+}
+
+.route-pill__slashed-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-family: "neue-haas-grotesk-text";
+  font-size: 32px;
+  line-height: 74px;
+  font-weight: 700;
+}
+
+.route-pill__slashed-part-1 {
+  display: inline-block;
+}
+
+.route-pill__slashed-part-2 {
+  display: inline-block;
+}
+
+.alert-widget__content__route-pills--small {
+  .route-pill {
+    width: 104px;
+    height: 64px;
+  }
+
+  .route-pill__text {
+    font-size: 42px;
+    line-height: 64px;
+  }
+
+  .route-pill__icon-image {
+    height: 52px;
+    margin-top: 6px;
+  }
+
+  .route-pill__slashed-text {
+    font-size: 28px;
+    line-height: 64px;
+  }
+}
