@@ -72,7 +72,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     rows =
       departures
       |> Enum.take(@max_departures)
-      |> group_consecutive_departures()
+      |> group_consecutive_departures(screen)
       |> Enum.map(&serialize_row(&1, screen))
 
     %{type: :normal_section, rows: rows}
@@ -106,13 +106,20 @@ defmodule Screens.V2.WidgetInstance.Departures do
   Groups consecutive departures that have the same route and headsign.
   `notice` rows are never grouped.
   """
-  @spec group_consecutive_departures(list(Departure.t() | notice)) ::
+  @spec group_consecutive_departures(list(Departure.t() | notice), Screen.t()) ::
           list(list(Departure.t() | notice))
-  def group_consecutive_departures(departures) do
+  def group_consecutive_departures(departures, %Screen{app_id: app_id}) do
     departures
     |> Enum.chunk_by(fn
-      %{text: %FreeTextLine{}} -> make_ref()
-      d -> {Departure.route_id(d), Departure.headsign(d)}
+      %{text: %FreeTextLine{}} ->
+        make_ref()
+
+      d ->
+        if app_id == :dup_v2 do
+          make_ref()
+        else
+          {Departure.route_id(d), Departure.headsign(d)}
+        end
     end)
   end
 
