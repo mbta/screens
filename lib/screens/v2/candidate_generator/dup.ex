@@ -124,7 +124,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       primary_sections
       |> Task.async_stream(fetch_section_departures_fn, timeout: :infinity)
       |> Enum.map(fn {:ok, data} -> data end)
-      |> Enum.take(4)
 
     secondary_sections_data =
       if secondary_sections == [] do
@@ -142,7 +141,14 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       else
         sections =
           Enum.map(primary_sections_data, fn {:ok, departures} ->
-            %{type: :normal_section, rows: departures}
+            visible_departures =
+              if length(primary_sections_data) > 1 do
+                Enum.take(departures, 2)
+              else
+                Enum.take(departures, 4)
+              end
+
+            %{type: :normal_section, rows: visible_departures}
           end)
 
         [
