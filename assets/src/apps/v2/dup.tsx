@@ -14,7 +14,7 @@ import { MappingContext } from "Components/v2/widget";
 import NormalScreen from "Components/v2/dup/normal_screen";
 import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/dup/normal_header";
-import NormalDepartures from "Components/v2/departures/normal_departures";
+import NormalDepartures from "Components/v2/dup/departures/normal_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import NormalBodyZero from "Components/v2/dup/normal_body_zero";
 import NormalBodyOne from "Components/v2/dup/normal_body_one";
