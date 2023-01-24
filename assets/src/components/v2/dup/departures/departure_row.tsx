@@ -2,7 +2,7 @@ import React from "react";
 
 import RoutePill from "Components/v2/departures/route_pill";
 import Destination from "Components/v2/dup/departures/destination";
-import DepartureTimes from "Components/v2/departures/departure_times";
+import DepartureTimes from "Components/v2/dup/departures/departure_times";
 import DepartureAlerts from "Components/v2/departures/departure_alerts";
 
 const DepartureRow = ({
