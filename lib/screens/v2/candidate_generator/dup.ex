@@ -172,7 +172,14 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       else
         sections =
           Enum.map(secondary_sections_data, fn {:ok, departures} ->
-            %{type: :normal_section, rows: departures}
+            visible_departures =
+              if length(secondary_sections_data) > 1 do
+                Enum.take(departures, 2)
+              else
+                Enum.take(departures, 4)
+              end
+
+            %{type: :normal_section, rows: visible_departures}
           end)
 
         [
