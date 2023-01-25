@@ -43,17 +43,12 @@ const RenderedDestination = ({ parts, index1, index2, currentPageIndex }) => {
   );
 };
 
-const Destination = ({ headsign, variation }) => {
-  let fullHeadsign = headsign;
-  if (variation) {
-    fullHeadsign = `${headsign} ${variation}`;
-  }
-
+const Destination = ({ headsign }) => {
   const firstLineRef = useRef(null);
   const secondLineRef = useRef(null);
   const currentPage = useCurrentPage();
 
-  let parts = fullHeadsign.split(" ");
+  let parts = headsign.split(" ");
 
   const [index1, setIndex1] = useState(parts.length);
   const [index2, setIndex2] = useState(parts.length);
