@@ -47,7 +47,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def slot_names(%Departures{slot_names: slot_names}) when length(slot_names) > 0,
       do: slot_names
 
-    def slot_names(_instance), do: [:main_content, :main_content_zero]
+    def slot_names(_instance), do: [:main_content]
 
     def widget_type(_instance), do: :departures
 
