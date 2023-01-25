@@ -21,28 +21,58 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   end
 
   describe "serialize_section/1" do
-    test "returns serialized normal_section" do
-      section = %{type: :normal_section, rows: []}
-      assert %{type: :normal_section, rows: []} == Departures.serialize_section(section, nil)
+    setup do
+      %{
+        bus_shelter_screen: %Screen{
+          app_id: :bus_shelter_v2,
+          vendor: :lg_mri,
+          device_id: "TEST",
+          name: "TEST",
+          app_params: nil
+        }
+      }
     end
 
-    test "returns serialized notice_section" do
+    test "returns serialized normal_section", %{bus_shelter_screen: bus_shelter_screen} do
+      section = %{type: :normal_section, rows: []}
+
+      assert %{type: :normal_section, rows: []} ==
+               Departures.serialize_section(section, bus_shelter_screen)
+    end
+
+    test "returns serialized notice_section", %{bus_shelter_screen: bus_shelter_screen} do
       section = %{type: :notice_section, text: %{icon: :warning, text: []}}
 
       assert %{type: :notice_section, text: %{icon: :warning, text: []}} ==
-               Departures.serialize_section(section, nil)
+               Departures.serialize_section(section, bus_shelter_screen)
     end
 
-    test "returns serialized normal_section with notice" do
+    test "returns serialized normal_section with notice", %{
+      bus_shelter_screen: bus_shelter_screen
+    } do
       section = %{type: :normal_section, rows: [%{text: %FreeTextLine{icon: nil, text: []}}]}
 
       assert %{type: :normal_section, rows: [%{type: :notice_row, text: %{icon: nil, text: []}}]} ==
-               Departures.serialize_section(section, nil)
+               Departures.serialize_section(section, bus_shelter_screen)
     end
   end
 
-  describe "group_consecutive_departures/1" do
-    test "groups consecutive departures with matching routes and headsigns" do
+  describe "group_consecutive_departures/2" do
+    setup do
+      %{
+        bus_shelter_screen: %Screen{
+          app_id: :bus_shelter_v2,
+          vendor: :lg_mri,
+          device_id: "TEST",
+          name: "TEST",
+          app_params: nil
+        }
+      }
+    end
+
+    test "groups consecutive departures with matching routes and headsigns", %{
+      bus_shelter_screen: bus_shelter_screen
+    } do
       d1 = %Departure{
         prediction: %Prediction{route: %Route{id: "1"}, trip: %Trip{headsign: "Nubian"}}
       }
@@ -79,10 +109,10 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       departures = [d1, d2, d3, d4, d5, d6, d7]
       expected = [[d1, d2], [d3], [d4], [d5], [d6, d7]]
-      assert expected == Departures.group_consecutive_departures(departures)
+      assert expected == Departures.group_consecutive_departures(departures, bus_shelter_screen)
     end
 
-    test "groups departures and ignores notices" do
+    test "groups departures and ignores notices", %{bus_shelter_screen: bus_shelter_screen} do
       d1 = %Departure{
         prediction: %Prediction{route: %Route{id: "1"}, trip: %Trip{headsign: "Nubian"}}
       }
@@ -99,7 +129,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       departures = [d1, d2, d3, n1]
       expected = [[d1, d2], [d3], [n1]]
-      assert expected == Departures.group_consecutive_departures(departures)
+      assert expected == Departures.group_consecutive_departures(departures, bus_shelter_screen)
     end
   end
 
@@ -124,7 +154,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert %{type: :text, text: "GL", color: :green} ==
+      assert %{type: :text, text: "GL·B", color: :green} ==
                Departures.serialize_route([departure], serializer)
 
       departure = %Departure{
@@ -179,26 +209,40 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
   end
 
-  describe "serialize_headsign/1" do
-    test "handles default" do
-      departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Ruggles"}}}
-      assert %{headsign: "Ruggles", variation: nil} == Departures.serialize_headsign([departure])
+  describe "serialize_headsign/2" do
+    setup do
+      %{
+        bus_shelter_screen: %Screen{
+          app_id: :bus_shelter_v2,
+          vendor: :lg_mri,
+          device_id: "TEST",
+          name: "TEST",
+          app_params: nil
+        }
+      }
     end
 
-    test "handles via variations" do
+    test "handles default", %{bus_shelter_screen: bus_shelter_screen} do
+      departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Ruggles"}}}
+
+      assert %{headsign: "Ruggles", variation: nil} ==
+               Departures.serialize_headsign([departure], bus_shelter_screen)
+    end
+
+    test "handles via variations", %{bus_shelter_screen: bus_shelter_screen} do
       departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Nubian via Allston"}}}
 
       assert %{headsign: "Nubian", variation: "via Allston"} ==
-               Departures.serialize_headsign([departure])
+               Departures.serialize_headsign([departure], bus_shelter_screen)
     end
 
-    test "handles parenthesized variations" do
+    test "handles parenthesized variations", %{bus_shelter_screen: bus_shelter_screen} do
       departure = %Departure{
         prediction: %Prediction{trip: %Trip{headsign: "Beth Israel (Limited Stops)"}}
       }
 
       assert %{headsign: "Beth Israel", variation: "(Limited Stops)"} ==
-               Departures.serialize_headsign([departure])
+               Departures.serialize_headsign([departure], bus_shelter_screen)
     end
   end
 
