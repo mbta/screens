@@ -169,7 +169,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       id: row_id,
       type: :departure_row,
       route: serialize_route(departures, route_pill_serializer),
-      headsign: serialize_headsign(departures),
+      headsign: serialize_headsign(departures, screen),
       times_with_crowding: serialize_times_with_crowding(departures, screen),
       inline_alerts: serialize_inline_alerts(departures)
     }
@@ -191,7 +191,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
     route_pill_serializer.(route_id, route_name, route_type, track_number)
   end
 
-  def serialize_headsign([first_departure | _]) do
+  def serialize_headsign([first_departure | _], %Screen{app_id: :dup_v2}) do
+    headsign = Departure.headsign(first_departure)
+    headsign_replacements = Application.get_env(:screens, :dup_headsign_replacements)
+
+    %{headsign: Map.get(headsign_replacements, headsign, headsign)}
+  end
+
+  def serialize_headsign([first_departure | _], _) do
     headsign = Departure.headsign(first_departure)
 
     via_pattern = ~r/(.+) (via .+)/
