@@ -71,6 +71,7 @@ config :screens,
   audio_psa_s3_directory: "/screens/audio_assets/psa/",
   signs_ui_s3_path: "config.json",
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.S3Fetch,
+  last_deploy_fetcher: Screens.Util.LastDeploy.S3Fetch,
   default_api_v3_url: "https://api-v3.mbta.com/",
   blue_bikes_api_client: Screens.BlueBikes.Client,
   blue_bikes_station_information_url:

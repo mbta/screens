@@ -3,6 +3,7 @@ defmodule Screens.ScreenData do
 
   alias Screens.LogScreenData
   alias Screens.Config.{Screen, State}
+  alias Screens.Util
 
   @modules_by_app_id %{
     bus_eink: Screens.BusScreenData,
@@ -24,7 +25,7 @@ defmodule Screens.ScreenData do
 
     response =
       cond do
-        check_outdated and outdated?(screen_id, last_refresh) -> @outdated_response
+        check_outdated and Util.outdated?(screen_id, last_refresh) -> @outdated_response
         check_disabled and disabled?(screen_id) -> @disabled_response
         true -> screen_id |> fetch_data(is_screen) |> Map.put(:status, :success)
       end
@@ -46,16 +47,6 @@ defmodule Screens.ScreenData do
 
   defp disabled?(screen_id) do
     State.disabled?(screen_id)
-  end
-
-  defp outdated?(screen_id, client_refresh_timestamp) do
-    {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
-    refresh_if_loaded_before_time = State.refresh_if_loaded_before(screen_id)
-
-    case refresh_if_loaded_before_time do
-      nil -> false
-      _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
-    end
   end
 
   defp fetch_data(screen_id, is_screen) do
