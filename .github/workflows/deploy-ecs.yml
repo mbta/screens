@@ -10,15 +10,12 @@ on:
   push:
     branches: ["master"]
 
-env:
-  ENV_NAME: ${{ github.event.inputs.environment || 'dev' }}
-
 jobs:
   call-workflow:
     uses: mbta/workflows/.github/workflows/deploy-ecs.yml@main
     with:
       app-name: screens
-      environment: ${{ env.ENV_NAME }}
+      environment: ${{ github.event.inputs.environment || 'dev' }}
     secrets:
       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -38,4 +35,4 @@ jobs:
         run: |
           touch LAST_DEPLOY
           echo "This file's modified date is used by Screens app to determine when the last successful deploy happened" > LAST_DEPLOY
-          aws s3 cp .last-deploy-time s3://mbta-screens/${{ env.ENV_NAME }}/
+          aws s3 cp .last-deploy-time s3://mbta-screens/${{ github.event.inputs.environment || 'dev' }}/
