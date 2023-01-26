@@ -35,4 +35,4 @@ jobs:
         run: |
           touch LAST_DEPLOY
           echo "This file's modified date is used by Screens app to determine when the last successful deploy happened" > LAST_DEPLOY
-          aws s3 cp .last-deploy-time s3://mbta-screens/${{ github.event.inputs.environment || 'dev' }}/
+          aws s3 cp LAST_DEPLOY s3://mbta-screens/${{ github.event.inputs.environment || 'dev' }}/
