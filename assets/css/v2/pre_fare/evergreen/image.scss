@@ -18,6 +18,7 @@
 }
 
 .flex-one-large__large {
+
   .evergreen-content-image__container,
   .evergreen-content-image__image {
     width: 1080px;
@@ -28,6 +29,7 @@
 .body-takeover-left__full-body,
 .body-takeover-right__full-body,
 .body-left-normal__main-content {
+
   .evergreen-content-image__container,
   .evergreen-content-image__image {
     width: 1080px;
@@ -36,6 +38,7 @@
 }
 
 .screen-normal__header {
+
   .evergreen-content-image__container,
   .evergreen-content-image__image {
     width: 1080px;
@@ -43,8 +46,18 @@
   }
 }
 
-.screen-takeover-left__full-screen,
-.screen-takeover-right__full-screen {
+.screen-takeover__full-screen {
+
+  .evergreen-content-image__container,
+  .evergreen-content-image__image {
+    width: 2160px;
+    height: 1920px;
+  }
+}
+
+.screen-split-takeover__full-left-screen,
+.screen-split-takeover__full-right-screen {
+
   .evergreen-content-image__container,
   .evergreen-content-image__image {
     width: 1080px;
