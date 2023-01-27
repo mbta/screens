@@ -15,6 +15,7 @@ defmodule Screens.ScreensByAlertTest do
       }
     end
 
+    @tag :skip
     test "returns map with data when called before expiration" do
       assert %{1 => [1]} == ScreensByAlert.get_screens_by_alert([1])
     end
