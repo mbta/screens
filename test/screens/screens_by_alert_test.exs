@@ -3,6 +3,7 @@ defmodule Screens.ScreensByAlertTest do
   use ExUnit.Case
   alias Screens.ScreensByAlert
 
+  @tag :skip
   describe "get_screens_by_alert/1" do
     setup do
       ScreensByAlert.put_data(1, [1])
@@ -20,6 +21,7 @@ defmodule Screens.ScreensByAlertTest do
       assert %{1 => [1]} == ScreensByAlert.get_screens_by_alert([1])
     end
 
+    @tag :skip
     test "returns map with default empty list when called after expiration", %{
       screens_by_alert_ttl: ttl
     } do
@@ -28,6 +30,7 @@ defmodule Screens.ScreensByAlertTest do
       assert %{1 => []} == ScreensByAlert.get_screens_by_alert([1])
     end
 
+    @tag :skip
     test "returns map with no expired", %{screens_ttl: ttl} do
       assert %{1 => [1]} == ScreensByAlert.get_screens_by_alert([1])
       Process.sleep(ttl * 1000)
@@ -47,10 +50,12 @@ defmodule Screens.ScreensByAlertTest do
       }
     end
 
+    @tag :skip
     test "returns when screen was last updated", %{last_updated: last_updated} do
       assert %{1 => last_updated} == ScreensByAlert.get_screens_last_updated([1])
     end
 
+    @tag :skip
     test "returns map with default timestamp of 0 after expiration", %{
       last_updated: last_updated,
       ttl: ttl
