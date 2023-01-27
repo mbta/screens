@@ -1122,9 +1122,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns true" do
-      instance = %ReconstructedAlert{}
-      assert WidgetInstance.audio_valid_candidate?(instance)
+    test "returns true", %{widget: widget} do
+      assert WidgetInstance.audio_valid_candidate?(widget)
     end
   end
 
