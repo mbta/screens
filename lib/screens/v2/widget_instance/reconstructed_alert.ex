@@ -751,7 +751,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def valid_candidate?(t), do: ReconstructedAlert.temporarily_override_alert(t)
     def audio_serialize(t), do: ReconstructedAlert.serialize(t)
     def audio_sort_key(t), do: ReconstructedAlert.audio_sort_key(t)
-    def audio_valid_candidate?(_instance), do: ReconstructedAlert.temporarily_override_alert(t)
+    def audio_valid_candidate?(t), do: ReconstructedAlert.temporarily_override_alert(t)
     def audio_view(_instance), do: ScreensWeb.V2.Audio.ReconstructedAlertView
   end
 
