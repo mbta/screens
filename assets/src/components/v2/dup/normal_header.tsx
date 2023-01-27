@@ -9,9 +9,9 @@ const NormalHeader = ({ icon, text, time }) => {
       icon={icon}
       text={text}
       time={time}
-      showUpdated={false}
-      versionNumber={DUP_VERSION}
+      version={DUP_VERSION}
       maxHeight={208}
+      showTo={false}
     />
   );
 };

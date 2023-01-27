@@ -1,15 +1,25 @@
 import useTextResizer from "Hooks/v2/use_text_resizer";
 import React, {
   forwardRef,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
+  ComponentType
 } from "react";
 
 import { classWithModifiers, formatTimeString, imagePath } from "Util/util";
 
-const ICON_TO_SRC = {
+enum Icon {
+  green_b = "green_b",
+  green_c = "green_c",
+  green_d = "green_d",
+  green_e = "green_e",
+  logo = "logo"
+}
+
+enum TitleSize {
+  small = "small",
+  large = "large"
+}
+
+const ICON_TO_SRC: Record<Icon, string> = {
   green_b: "GL-B.svg",
   green_c: "GL-C.svg",
   green_d: "GL-D.svg",
@@ -17,7 +27,7 @@ const ICON_TO_SRC = {
   logo: "logo-white.svg",
 };
 
-const abbreviateText = (text) => {
+const abbreviateText = (text: string) => {
   if (text === "Government Center") {
     return "Government Ctr";
   }
@@ -25,7 +35,11 @@ const abbreviateText = (text) => {
   return text;
 };
 
-const NormalHeaderIcon = ({ icon }) => {
+interface NormalHeaderIconProps {
+  icon: Icon;
+}
+
+const NormalHeaderIcon: ComponentType<NormalHeaderIconProps> = ({ icon }) => {
   return (
     <div className="normal-header-icon">
       <img
@@ -36,9 +50,17 @@ const NormalHeaderIcon = ({ icon }) => {
   );
 };
 
-const NormalHeaderTitle = forwardRef(
+interface NormalHeaderTitleProps {
+  icon?: Icon;
+  text: string;
+  size: TitleSize;
+  showTo: boolean;
+  fullName: boolean;
+}
+
+const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = forwardRef(
   ({ icon, text, size, showTo, fullName }, ref) => {
-    const modifiers = [size];
+    const modifiers: string[] = [size];
     if (icon) {
       modifiers.push("with-icon");
     }
@@ -60,7 +82,11 @@ const NormalHeaderTitle = forwardRef(
   }
 );
 
-const NormalHeaderTime = ({ time }) => {
+interface NormalHeaderTimeProps {
+  time: string;
+}
+
+const NormalHeaderTime: ComponentType<NormalHeaderTimeProps> = ({ time }) => {
   const currentTime = formatTimeString(time);
   return <div className="normal-header-time">{currentTime}</div>;
 };
@@ -81,23 +107,38 @@ const NormalHeaderUpdated = () => {
   );
 };
 
-const NormalHeaderVersion = ({ versionNumber }) => {
-  return <div className="normal-header-version">{versionNumber}</div>;
+interface NormalHeaderVersionProps {
+  version: string;
+}
+
+const NormalHeaderVersion: ComponentType<NormalHeaderVersionProps> = ({ version }) => {
+  return <div className="normal-header-version">{version}</div>;
 };
 
-const NormalHeader = ({
+interface Props {
+  icon?: Icon;
+  text: string;
+  time: string;
+  showUpdated?: boolean;
+  version?: string;
+  maxHeight: number;
+  showTo?: boolean;
+  fullName?: boolean;
+}
+
+const NormalHeader: ComponentType<Props> = ({
   icon,
   text,
   time,
-  showUpdated,
-  versionNumber,
+  showUpdated = false,
+  version,
   maxHeight,
-  showTo,
-  fullName,
+  showTo = false,
+  fullName = false,
 }) => {
-  const SIZES = ["small", "large"];
+
   const { ref: headerRef, size: headerSize } = useTextResizer({
-    sizes: SIZES,
+    sizes: Object.keys(TitleSize),
     maxHeight: maxHeight,
     resetDependencies: [text],
   });
@@ -106,16 +147,17 @@ const NormalHeader = ({
       <NormalHeaderTitle
         icon={icon}
         text={text}
-        size={headerSize}
+        size={headerSize as TitleSize}
         ref={headerRef}
         showTo={showTo}
         fullName={fullName}
       />
       <NormalHeaderTime time={time} />
-      {versionNumber && <NormalHeaderVersion versionNumber={versionNumber} />}
+      {version && <NormalHeaderVersion version={version} />}
       {showUpdated && <NormalHeaderUpdated />}
     </div>
   );
 };
 
 export default NormalHeader;
+export { Icon };
