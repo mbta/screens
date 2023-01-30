@@ -10,7 +10,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
             text: nil,
             time: nil
 
-  @type icon :: :logo | :x | :green_b | :green_c | :green_d | :green_e
+  @type icon :: :logo | :green_b | :green_c | :green_d | :green_e
   @type t :: %__MODULE__{
           screen: Screens.Config.Screen.t(),
           icon: icon | nil,
