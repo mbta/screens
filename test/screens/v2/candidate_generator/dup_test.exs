@@ -72,14 +72,14 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       now = ~U[2020-04-06T10:00:00Z]
       fetch_stop_name_fn = fn _ -> "Test Stop" end
 
-      expected_header = [
+      expected_headers =
         %NormalHeader{
           screen: config,
-          icon: nil,
+          icon: :logo,
           text: "Test Stop",
-          time: ~U[2020-04-06T10:00:00Z]
+          time: now
         }
-      ]
+        |> List.duplicate(3)
 
       actual_instances =
         Dup.header_instances(
@@ -88,7 +88,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           fetch_stop_name_fn
         )
 
-      assert Enum.all?(expected_header, fn x -> x in actual_instances end)
+      assert expected_headers == actual_instances
     end
   end
 end
