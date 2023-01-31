@@ -30,7 +30,7 @@ The DUP alerts widget needs to resolve a scenario specific to DUP screens: the s
 
 ### WidgetInstance
 
-The DUP alert `WidgetInstance` is responsible for choosing alert type and serializing the alert data for the frontend to consume. The alert type will chosen based on rotation and how impactful the alert is.
+The DUP alert `WidgetInstance` is responsible for choosing alert type and serializing the alert data for the frontend to consume. The alert type will be chosen based on rotation and how impactful the alert is.
 
 # Reference-level explanation
 
