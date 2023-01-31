@@ -48,7 +48,7 @@ opts = [
     ]
 ```
 
-Each section will make a separate alerts fetch. With the two sets of results from these queries, we will apply a filter to eliminate alerts we do not want on screens: `Enum.filter(&relevant?/1)`. `relevant?/1` will return a list of active and applicable alerts[^1]. After we have a list (or lists if there are two sections) of alerts that are eligible for display, we choose the alert to display for each section based on a priority[^4]. The pipeline for these steps for each section will be the following:
+Each section will make a separate alerts fetch. With the one or two sets of results from these queries, we will apply a filter to eliminate alerts we do not want on screens: `Enum.filter(&relevant?/1)`. `relevant?/1` will return `true` if an alert is active and applicable[^1]. After we have a list (or lists if there are two sections) of alerts that are eligible for display, we choose the alert to display for each section based on a priority[^4]. The pipeline for these steps for each section will be the following:
 
 ```
 first_section_alerts =
