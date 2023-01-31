@@ -2,7 +2,7 @@
 
 This doc gives a high-level overview of how Screens works.
 
-Links to more detailed documentation can be found in [Detailed docs](#detailed-docs).
+Links to more detailed documentation can be found in [**Detailed docs**](#detailed-docs).
 
 ## Bird's eye view
 
@@ -34,7 +34,7 @@ Server:
 | Module or directory | Description |
 | - | - |
 | [`ScreenData`](/lib/screens/v2/screen_data.ex) | Common logic to answer all screen data requests. We try to keep this code agnostic of widget implementation details and free of business logic. Code changes infrequently. If a new feature is needed on _all_ screen types, the change might happen here. |
-| [`config` directory](/lib/screens/config/) | Contains modules that define the config schema for each screen type. Most modules `use` a macro from [`config/struct.ex`](/lib/screens/config/struct.ex) to simplify defining their data structures. |
+| [`config` directory](/lib/screens/config/) | Contains modules that define the config schema for each screen type, and how to convert it to/from JSON. Most modules `use` a macro from [`config/struct.ex`](/lib/screens/config/struct.ex) to simplify defining their data structures. |
 | [Candidate generators](/lib/screens/v2/candidate_generator/) | These modules define "step 1" for producing the data response for each screen type. Each one adopts the [`CandidateGenerator`](/lib/screens/v2/candidate_generator.ex) behaviour, and contains code that defines the screen's visual template as well as functions to fetch data and transform it into widgets to populate that template. |
 | [`Template`](/lib/screens/v2/template.ex) | Contains types and functions related to screen templates.  |
 | [`WidgetInstance`](/lib/screens/v2/widget_instance.ex) | Defines the common protocol that all widgets must implement. The framework code in `ScreenData` calls these protocol functions on widgets to fit them into a screen template and produce the JSON response. |

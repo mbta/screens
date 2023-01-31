@@ -2,7 +2,7 @@
 
 This application serves real-time information to all of our browser-based screens posted at stops and stations around the system.
 
-If you're looking for the application that controls the LED countdown clocks and the in-station PA system, please see [mbta/realtime_signs](https://github.com/mbta/realtime_signs).
+If you're looking for the applications that control the LED countdown clocks and the in-station PA system, please see [mbta/realtime_signs](https://github.com/mbta/realtime_signs) and [mbta/signs_ui](https://github.com/mbta/signs_ui).
 
 Some examples of the various client apps, as of January 2023:
 
@@ -12,7 +12,7 @@ Some examples of the various client apps, as of January 2023:
 | [Green Line E-Ink][gl_eink sample] | solar-powered E-Ink screens at surface-level Green Line stops |
 | [Bus corridor LCD][bus_shelter sample] | currently used at stops on the Columbus Ave bus corridor |
 | [Multimodal LCD][solari sample] | used at high-traffic transfer stations served by many routes/modes |
-| [Pre-fare duo LCD][pre_fare sample] | posted outside of fare gates at rapid transit stations |
+| [Pre-fare duo LCD][pre_fare sample] | posted outside of fare gates at rapid transit stations; content is split across two portrait-oriented 1080p physical displays |
 | ["Digital Urban Panel" LCD][dup sample] | content appears in rotation with ads on screens posted outside rapid transit station entrances |
 
 and more to come!
