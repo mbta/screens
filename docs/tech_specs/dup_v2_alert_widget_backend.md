@@ -1,6 +1,6 @@
 - Feature Name: `dup_v2_alert_widget_backend`
 - Start Date: 2023-01-30
-- RFC PR: https://github.com/mbta/screens/pull/1616
+- RFC PR: [#1616](https://github.com/mbta/screens/pull/1616)
 - Asana task: [[DUP v2] Plan backend for DUP alerts](https://app.asana.com/0/1185117109217413/1203830054341498/f)
 - Status: Proposed
 
@@ -24,11 +24,11 @@ Converting the DUP app from v1 to v2 requires a different approach to alerts and
 
 The DUP alerts widget needs to resolve a scenario specific to DUP screens: the screen "rotates" between three separate pages. When an applicable[^1] alert exists, each rotation has specific logic that determines which "type" of alert widget to display: `partial`[^2] or `takeover`[^3].
 
-### CandidateGenerator
+## CandidateGenerator
 
 `CandidateGenerator.Dup` is responsible for deciding what alert should appear on a screen. It fetches all active alerts affecting the screen's `stop_ids` listed in each section of the `primary_departures` config, filters out all alerts that do not directly affect the current stop (no downstream alerts), and selects the alert with the highest priority[^4]. If an alert (or alerts if configured with two sections) meets all criteria, the `CandidateGenerator` will then create three `WidgetInstance`s for the alert(s) (one for each rotation).
 
-### WidgetInstance
+## WidgetInstance
 
 The DUP alert `WidgetInstance` is responsible for choosing alert type and serializing the alert data for the frontend to consume. The alert type will be chosen based on rotation and how impactful the alert is.
 
@@ -36,7 +36,7 @@ The DUP alert `WidgetInstance` is responsible for choosing alert type and serial
 
 [reference-level-explanation]: #reference-level-explanation
 
-### CandidateGenerator
+## CandidateGenerator
 
 `CandidateGenerator.Dup` is responsible for fetching relevant alerts from the API. The API query will contain an `opts` array for each section:
 
@@ -81,7 +81,7 @@ With this list, we create three `WidgetInstance` objects for each rotation:
 ]
 ```
 
-### WidgetInstance
+## WidgetInstance
 
 In `WidgetInstance.DupAlert`, the following type will be used for the struct:
 
