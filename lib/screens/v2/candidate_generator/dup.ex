@@ -6,6 +6,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
 
@@ -71,8 +72,16 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(config, now \\ DateTime.utc_now()) do
-    [fn -> header_instances(config, now) end, fn -> placeholder_instances() end]
+  def candidate_instances(
+        config,
+        now \\ DateTime.utc_now(),
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
+      ) do
+    [
+      fn -> header_instances(config, now) end,
+      fn -> placeholder_instances() end,
+      fn -> evergreen_content_instances_fn.(config) end
+    ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
