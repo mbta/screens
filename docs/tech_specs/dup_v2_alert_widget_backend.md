@@ -75,9 +75,9 @@ With this list, we create three `WidgetInstance` objects for each rotation:
 
 ```
 [
-  %DupAlert{screen: config, rotation_index: 0, alerts: alerts},
-  %DupAlert{screen: config, rotation_index: 1, alerts: alerts},
-  %DupAlert{screen: config, rotation_index: 2, alerts: alerts}
+  %DupAlert{screen: config, rotation_index: :zero, alerts: alerts},
+  %DupAlert{screen: config, rotation_index: :one, alerts: alerts},
+  %DupAlert{screen: config, rotation_index: :two, alerts: alerts}
 ]
 ```
 
@@ -89,7 +89,7 @@ In `WidgetInstance.DupAlert`, the following type will be used for the struct:
 @type t :: %__MODULE__{
           screen: Screen.t(),
           alerts: [Alert.t()] | [Alert.t(), Alert.t()],
-          rotation_index: 0 | 1 | 2
+          rotation_index: :zero | :one | :two
         }
 ```
 
