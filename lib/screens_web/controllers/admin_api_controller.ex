@@ -49,6 +49,7 @@ defmodule ScreensWeb.AdminApiController do
 
   def refresh(conn, %{"screen_ids" => screen_ids}) do
     current_config = Config.State.config()
+
     new_config = Config.schedule_refresh_for_screen_ids(current_config, screen_ids)
     {:ok, new_config_json} = Jason.encode(Config.to_json(new_config), pretty: true)
 

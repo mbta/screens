@@ -9,25 +9,29 @@ defmodule Screens.SignsUiConfig.State do
   @typep time_range_map :: %{peak: time_range, off_peak: time_range}
   @type config :: {signs_mode_map, time_range_map}
   @config_fetcher Application.compile_env(:screens, :signs_ui_config_fetcher)
+  @last_deploy_fetcher Application.compile_env(:screens, :last_deploy_fetcher)
 
   @type t ::
           %__MODULE__{
             config: config,
             retry_count: non_neg_integer(),
-            version_id: Fetch.version_id()
+            version_id: Fetch.version_id(),
+            last_deploy_timestamp: nil
           }
           | :error
 
   @enforce_keys [:config]
   defstruct config: nil,
             retry_count: 0,
-            version_id: nil
+            version_id: nil,
+            last_deploy_timestamp: nil
 
   use Screens.ConfigCache.State,
     config_module: Screens.SignsUiConfig.State,
     fetch_config_fn: &@config_fetcher.fetch_config/1,
     refresh_ms: 60 * 1000,
-    fetch_failure_error_threshold_minutes: 2
+    fetch_failure_error_threshold_minutes: 2,
+    fetch_last_deploy_fn: &@last_deploy_fetcher.get_last_deploy_time/0
 
   def all_signs_in_headway_mode?(pid \\ __MODULE__, sign_ids) do
     all_signs_in_modes?(pid, sign_ids, [:headway])

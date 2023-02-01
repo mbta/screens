@@ -16,7 +16,7 @@ export const classWithModifiers = (baseClass, modifiers) => {
   }
 };
 
-export const formatTimeString = (timeString) =>
+export const formatTimeString = (timeString: string) =>
   moment(timeString).tz("America/New_York").format("h:mm");
 
 export const isDup = () => location.href.startsWith("file:");

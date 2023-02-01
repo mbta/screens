@@ -1,6 +1,8 @@
 defmodule Screens.Util do
   @moduledoc false
 
+  alias Screens.Config.State
+
   def format_time(t) do
     t |> DateTime.truncate(:second) |> DateTime.to_iso8601()
   end
@@ -150,7 +152,7 @@ defmodule Screens.Util do
   end
 
   @doc """
-  Takes route id, returns route type. 
+  Takes route id, returns route type.
   Not the favorite way of getting route type, but useful for property testing.
   """
   @spec route_type_from_id(String.t()) :: atom()
@@ -162,4 +164,14 @@ defmodule Screens.Util do
   def route_type_from_id("CR-" <> _), do: :commuter_rail
   def route_type_from_id("Boat-" <> _), do: :ferry
   def route_type_from_id(_), do: :bus
+
+  def outdated?(screen_id, client_refresh_timestamp) do
+    {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
+    refresh_if_loaded_before_time = State.refresh_if_loaded_before(screen_id)
+
+    case refresh_if_loaded_before_time do
+      nil -> false
+      _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
+    end
+  end
 end

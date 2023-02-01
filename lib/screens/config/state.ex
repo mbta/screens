@@ -6,25 +6,29 @@ defmodule Screens.Config.State do
   alias Screens.ConfigCache.State.Fetch
 
   @config_fetcher Application.compile_env(:screens, :config_fetcher)
+  @last_deploy_fetcher Application.compile_env(:screens, :last_deploy_fetcher)
 
   @type t ::
           %__MODULE__{
             config: Config.t(),
             retry_count: non_neg_integer(),
-            version_id: Fetch.version_id()
+            version_id: Fetch.version_id(),
+            last_deploy_timestamp: DateTime.t() | nil
           }
           | :error
 
   @enforce_keys [:config]
   defstruct config: nil,
             retry_count: 0,
-            version_id: nil
+            version_id: nil,
+            last_deploy_timestamp: nil
 
   use Screens.ConfigCache.State,
     config_module: Screens.Config.State,
     fetch_config_fn: &@config_fetcher.fetch_config/1,
     refresh_ms: 15 * 1000,
-    fetch_failure_error_threshold_minutes: 2
+    fetch_failure_error_threshold_minutes: 2,
+    fetch_last_deploy_fn: &@last_deploy_fetcher.get_last_deploy_time/0
 
   def ok?(pid \\ __MODULE__) do
     GenServer.call(pid, :ok?)
@@ -82,7 +86,7 @@ defmodule Screens.Config.State do
   def handle_call(
         {:refresh_if_loaded_before, screen_id},
         _from,
-        %__MODULE__{config: config} = state
+        %__MODULE__{config: config, last_deploy_timestamp: last_deploy_timestamp} = state
       ) do
     screen = Map.get(config.screens, screen_id)
 
@@ -92,7 +96,23 @@ defmodule Screens.Config.State do
         _ -> nil
       end
 
-    {:reply, refresh_if_loaded_before, state}
+    case {last_deploy_timestamp, refresh_if_loaded_before} do
+      {nil, nil} ->
+        {:reply, nil, state}
+
+      {nil, refresh_if_loaded_before} ->
+        {:reply, refresh_if_loaded_before, state}
+
+      {last_deploy_timestamp, nil} ->
+        {:reply, last_deploy_timestamp, state}
+
+      {last_deploy_timestamp, refresh_if_loaded_before} ->
+        if DateTime.compare(last_deploy_timestamp, refresh_if_loaded_before) == :gt do
+          {:reply, last_deploy_timestamp, state}
+        else
+          {:reply, refresh_if_loaded_before, state}
+        end
+    end
   end
 
   def handle_call({:service_level, screen_id}, _from, %__MODULE__{config: config} = state) do

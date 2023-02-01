@@ -21,3 +21,18 @@ jobs:
       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       docker-repo: ${{ secrets.DOCKER_REPO }}
       slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+  refresh:
+    needs: call-workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Create LAST_DEPLOY and upload to S3
+        run: |
+          touch LAST_DEPLOY
+          echo "This file's modified date is used by Screens app to determine when the last successful deploy happened" > LAST_DEPLOY
+          aws s3 cp LAST_DEPLOY s3://mbta-screens/screens-${{ github.event.inputs.environment || 'dev' }}/

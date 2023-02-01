@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 
-import DefaultNormalHeader from "Components/v2/normal_header";
+import DefaultNormalHeader, { Icon } from "Components/v2/normal_header";
 
 interface Props {
   icon: Icon;
@@ -9,21 +9,13 @@ interface Props {
   show_to: boolean;
 }
 
-type Icon =
-  | "logo"
-  | "x"
-  | "green_b"
-  | "green_c"
-  | "green_d"
-  | "green_e";
-
 const NormalHeader: ComponentType<Props> = ({ icon, text, time, show_to: showTo }) => {
   return (
     <DefaultNormalHeader
       icon={icon}
       text={text}
       time={time}
-      showUpdated={true}
+      showUpdated
       maxHeight={208}
       showTo={showTo}
     />

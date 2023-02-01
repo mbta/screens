@@ -4,6 +4,7 @@
   width: 100%;
   background: rgb(23, 31, 38);
 }
+
 .normal-header-icon {
   display: inline-block;
   vertical-align: middle;
@@ -24,7 +25,7 @@
 .normal-header-title__text {
   display: inline-block;
   vertical-align: middle;
-  font-family: Helvetica;
+  font-family: Helvetica, sans-serif;
   font-weight: 700;
   color: #ffffff;
   font-size: 144px;
@@ -35,14 +36,14 @@
   position: absolute;
   right: 32px;
   top: 70px;
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   font-size: 108px;
   line-height: 108px;
   color: #ffffff;
 }
 
 .normal-header-version {
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   font-size: 32px;
   font-weight: 500;
   position: absolute;
