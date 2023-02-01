@@ -1,7 +1,7 @@
 import React from "react";
 
 import DepartureRow from "Components/v2/dup/departures/departure_row";
-import NoticeRow from "./notice_row";
+import NoticeRow from "Components/v2/departures/notice_row";
 
 const NormalSection = ({ rows }) => {
   return (

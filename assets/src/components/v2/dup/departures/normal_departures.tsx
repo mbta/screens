@@ -1,7 +1,7 @@
 import React from "react";
 
 import NormalSection from "Components/v2/dup/departures/normal_section";
-import NoticeSection from "Components/v2/dup/departures/notice_section";
+import NoticeSection from "Components/v2/departures/notice_section";
 
 const NormalDepartures = ({ sections }) => {
   return (
