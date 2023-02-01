@@ -29,6 +29,7 @@ import SplitBodyTwo from "Components/v2/dup/split_body_two";
 import RotationTakeoverZero from "Components/v2/dup/rotation_takeover_zero";
 import RotationTakeoverOne from "Components/v2/dup/rotation_takeover_one";
 import RotationTakeoverTwo from "Components/v2/dup/rotation_takeover_two";
+import EvergreenContent from "Components/v2/evergreen_content";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -47,6 +48,7 @@ const TYPE_TO_COMPONENT = {
   placeholder: Placeholder,
   normal_header: NormalHeader,
   departures: NormalDepartures,
+  evergreen_content: EvergreenContent,
 };
 
 const App = (): JSX.Element => {

@@ -1,0 +1,44 @@
+.evergreen-content-video {
+  background-color: #e4e6e1;
+  overflow: hidden;
+}
+
+.rotation-normal__header {
+  .evergreen-content-video,
+  .looping-video {
+    width: 1920px;
+    height: 248px;
+  }
+}
+
+.body-normal__main-content {
+  .evergreen-content-video,
+  .looping-video {
+    width: 1920px;
+    height: 832px;
+  }
+}
+
+.body-split__main-content-reduced {
+  .evergreen-content-video,
+  .looping-video {
+    width: 1920px;
+    height: 624px;
+  }
+}
+
+.body-split__bottom-pane {
+  .evergreen-content-video,
+  .looping-video {
+    width: 1920px;
+    height: 208px;
+  }
+}
+
+.rotation-takeover {
+  .evergreen-content-video,
+  .looping-video {
+    width: 1920px;
+    height: 1080px;
+  }
+}
