@@ -108,18 +108,24 @@ defmodule Screens.V2.WidgetInstance.Departures do
   """
   @spec group_consecutive_departures(list(Departure.t() | notice), Screen.t()) ::
           list(list(Departure.t() | notice))
-  def group_consecutive_departures(departures, %Screen{app_id: app_id}) do
+  def group_consecutive_departures(departures, screen)
+
+  def group_consecutive_departures(departures, %Screen{app_id: :dup_v2}) do
+    departures
+    |> Enum.chunk_by(fn
+      _ ->
+        make_ref()
+    end)
+  end
+
+  def group_consecutive_departures(departures, _screen) do
     departures
     |> Enum.chunk_by(fn
       %{text: %FreeTextLine{}} ->
         make_ref()
 
       d ->
-        if app_id == :dup_v2 do
-          make_ref()
-        else
-          {Departure.route_id(d), Departure.headsign(d)}
-        end
+        {Departure.route_id(d), Departure.headsign(d)}
     end)
   end
 
