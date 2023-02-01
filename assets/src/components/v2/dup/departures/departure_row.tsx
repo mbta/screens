@@ -12,7 +12,7 @@ const DepartureRow = ({
   const routeText = Number(route.text);
   return (
     <div className="departure-row">
-      <div className={"departure-row__route"}>
+      <div className="departure-row__route">
         <RoutePill
           {...route}
           size={isNaN(routeText) || routeText > 200 ? "small" : "large"}
