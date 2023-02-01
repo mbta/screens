@@ -120,7 +120,14 @@ Two serialize functions will be created: `serialize_partial_alert/1` and `serial
 %{
     alert_text: %FreeTextLine{icon: :warning, text: ...},
     color: :red | :orange | :green | :blue,
-    remedy: %FreeTextLine{icon: :shuttle | nil, text: ...}
+    remedy: %FreeTextLine{icon: :shuttle | nil, text: ...},
+    header: %{
+        icon: :logo,
+        text: String.t(),
+        time: String.t(),
+        pattern: :hatched | :x | :chevron,
+        color: :red | :orange | :green | :blue | :silver | :purple | :yellow
+    }
 }
 ```
 
@@ -134,6 +141,8 @@ The value of `alert_text` is the same as for `serialize_partial_alert/1`. `remed
     station_closure: "Seek alternate route"
 }
 ```
+
+`header.text` is the stop name for the screen. `header.time` is the current time. `header.pattern` is based on `alert.effect`: `:station_closure -> :x`, `:suspension -> :chevron`, all others are `:hatched`. `header.color` is the route color unless all predictions are suspended due to active alerts. In that case, it is `:yellow`.
 
 [^1]: An applicable alert is an alert with an effect of `delay` with `severity` >= 5, `shuttle`, `suspension`, or `station_closure` that affects a `stop_id` from the `primary_departures` section of the DUP config.
 [^2]: A `partial` alert takes up only a small amount of the screen to allow for other departures to remain visible.
