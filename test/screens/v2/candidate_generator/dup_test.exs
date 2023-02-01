@@ -3,13 +3,18 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
 
   alias Screens.Config.{Screen, V2}
   alias Screens.V2.CandidateGenerator.Dup
-  alias Screens.V2.WidgetInstance.NormalHeader
+  alias Screens.V2.WidgetInstance.{Departures, NormalHeader}
 
   setup do
     config = %Screen{
       app_params: %V2.Dup{
         header: %V2.Header.CurrentStopId{stop_id: "place-gover"},
-        primary_departures: %V2.Departures{sections: []},
+        primary_departures: %V2.Departures{
+          sections: [
+            %V2.Departures.Section{query: "query A", filter: nil},
+            %V2.Departures.Section{query: "query B", filter: nil}
+          ]
+        },
         secondary_departures: %V2.Departures{sections: []}
       },
       vendor: :outfront,
@@ -64,6 +69,67 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
                    }}
                 ]
               }} == Dup.screen_template()
+    end
+  end
+
+  describe "candidate_instances/4" do
+    test "returns expected header and departures", %{config: config} do
+      now = ~U[2020-04-06T10:00:00Z]
+      fetch_stop_fn = fn "place-gover" -> "Government Center" end
+
+      fetch_section_departures_fn = fn
+        %V2.Departures.Section{query: "query A"} -> {:ok, []}
+        %V2.Departures.Section{query: "query B"} -> {:ok, []}
+      end
+
+      expected_header =
+        List.duplicate(
+          %NormalHeader{
+            screen: config,
+            icon: :logo,
+            text: "Government Center",
+            time: ~U[2020-04-06T10:00:00Z]
+          },
+          3
+        )
+
+      expected_departures = [
+        %Departures{
+          screen: config,
+          section_data: [
+            %{type: :normal_section, rows: []},
+            %{type: :normal_section, rows: []}
+          ],
+          slot_names: [:main_content_zero]
+        },
+        %Departures{
+          screen: config,
+          section_data: [
+            %{type: :normal_section, rows: []},
+            %{type: :normal_section, rows: []}
+          ],
+          slot_names: [:main_content_one]
+        },
+        %Departures{
+          screen: config,
+          section_data: [
+            %{type: :normal_section, rows: []},
+            %{type: :normal_section, rows: []}
+          ],
+          slot_names: [:main_content_two]
+        }
+      ]
+
+      actual_instances =
+        Dup.candidate_instances(
+          config,
+          now,
+          fetch_stop_fn,
+          fetch_section_departures_fn
+        )
+
+      assert Enum.all?(expected_header, &Enum.member?(actual_instances, &1))
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
   end
 

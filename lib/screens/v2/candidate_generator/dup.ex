@@ -76,13 +76,15 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   @impl CandidateGenerator
   def candidate_instances(
         config,
-        now \\ DateTime.utc_now()
+        now \\ DateTime.utc_now(),
+        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
+        fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1
       ) do
     [
-      fn -> header_instances(config, now) end,
+      fn -> header_instances(config, now, fetch_stop_name_fn) end,
       fn -> placeholder_instances() end,
       fn ->
-        departures_instances(config)
+        departures_instances(config, fetch_section_departures_fn)
       end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
@@ -95,7 +97,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   def header_instances(
         config,
         now,
-        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1
+        fetch_stop_name_fn
       ) do
     %Screen{app_params: %Dup{header: %CurrentStopId{stop_id: stop_id}}} = config
 
@@ -119,7 +121,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
              secondary_departures: %Departures{sections: secondary_sections}
            }
          } = config,
-         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1
+         fetch_section_departures_fn
        ) do
     primary_sections_data =
       primary_sections
