@@ -106,23 +106,15 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     List.duplicate(%NormalHeader{screen: config, icon: :logo, text: stop_name, time: now}, 3)
   end
 
-  defp placeholder_instances do
-    [
-      %Placeholder{slot_names: [:main_content_one], color: :orange},
-      %Placeholder{slot_names: [:main_content_reduced_two], color: :green},
-      %Placeholder{slot_names: [:bottom_pane_two], color: :red}
-    ]
-  end
-
-  defp departures_instances(
-         %Screen{
-           app_params: %Dup{
-             primary_departures: %Departures{sections: primary_sections},
-             secondary_departures: %Departures{sections: secondary_sections}
-           }
-         } = config,
-         fetch_section_departures_fn
-       ) do
+  def departures_instances(
+        %Screen{
+          app_params: %Dup{
+            primary_departures: %Departures{sections: primary_sections},
+            secondary_departures: %Departures{sections: secondary_sections}
+          }
+        } = config,
+        fetch_section_departures_fn
+      ) do
     primary_sections_data =
       primary_sections
       |> Task.async_stream(fetch_section_departures_fn, timeout: :infinity)
@@ -194,5 +186,13 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       end
 
     primary_departures_instances ++ secondary_departures_instances
+  end
+
+  defp placeholder_instances do
+    [
+      %Placeholder{slot_names: [:main_content_one], color: :orange},
+      %Placeholder{slot_names: [:main_content_reduced_two], color: :green},
+      %Placeholder{slot_names: [:bottom_pane_two], color: :red}
+    ]
   end
 end
