@@ -1,4 +1,3 @@
-import useCurrentPage from "Hooks/use_current_dup_page";
 import React from "react";
 import { classWithModifier, classWithModifiers } from "Util/util";
 
@@ -22,7 +21,7 @@ const TimestampDepartureTime = ({ hour, minute }) => {
   return <div className="departure-time__timestamp">{timestamp}</div>;
 };
 
-const DepartureTime = ({ scheduled_time, time }) => {
+const DepartureTime = ({ scheduled_time, time, currentPage }) => {
   let predictedTime;
 
   if (time.type === "text") {
@@ -41,7 +40,6 @@ const DepartureTime = ({ scheduled_time, time }) => {
     );
   }
 
-  const currentPage = useCurrentPage();
   let scheduledTime;
 
   if (time.type === "text") {

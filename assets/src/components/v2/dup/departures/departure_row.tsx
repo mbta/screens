@@ -8,6 +8,7 @@ const DepartureRow = ({
   headsign,
   route,
   times_with_crowding: timesWithCrowding,
+  currentPage,
 }) => {
   const routeText = Number(route.text);
   return (
@@ -19,10 +20,13 @@ const DepartureRow = ({
         />
       </div>
       <div className="departure-row__destination">
-        <Destination {...headsign} />
+        <Destination {...headsign} currentPage={currentPage} />
       </div>
       <div className="departure-row__time">
-        <DepartureTimes timesWithCrowding={timesWithCrowding} />
+        <DepartureTimes
+          timesWithCrowding={timesWithCrowding}
+          currentPage={currentPage}
+        />
       </div>
     </div>
   );

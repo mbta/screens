@@ -1,5 +1,4 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
-import useCurrentPage from "Hooks/use_current_dup_page";
 
 const LINE_HEIGHT = 138; // px
 
@@ -43,10 +42,9 @@ const RenderedDestination = ({ parts, index1, index2, currentPageIndex }) => {
   );
 };
 
-const Destination = ({ headsign }) => {
+const Destination = ({ headsign, currentPage }) => {
   const firstLineRef = useRef(null);
   const secondLineRef = useRef(null);
-  const currentPage = useCurrentPage();
 
   let parts = headsign.split(" ");
 
