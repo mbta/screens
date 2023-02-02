@@ -1,6 +1,6 @@
 - Feature Name: `dup_v2_alert_widget_backend`
 - Start Date: 2023-01-30
-- RFC PR: #1616
+- RFC PR: [#1616](https://github.com/mbta/screens/pull/1616)
 - Asana task: [[DUP v2] Plan backend for DUP alerts](https://app.asana.com/0/1185117109217413/1203830054341498/f)
 - Status: Proposed
 
