@@ -124,7 +124,6 @@ Two serialize functions will be created: `serialize_partial_alert/1` and `serial
     header: %{
         icon: :logo,
         text: String.t(),
-        time: String.t(),
         pattern: :hatched | :x | :chevron,
         color: :red | :orange | :green | :blue | :silver | :purple | :yellow
     }
