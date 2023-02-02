@@ -143,6 +143,16 @@ The value of `alert_text` is the same as for `serialize_partial_alert/1`. `remed
 
 `header.text` is the stop name for the screen. `header.time` is the current time. `header.pattern` is based on `alert.effect`: `:station_closure -> :x`, `:suspension -> :chevron`, all others are `:hatched`. `header.color` is the route color unless all predictions are suspended due to active alerts. In that case, it is `:yellow`.
 
+# Considered Alternatives
+
+## Two separate widgets
+
+For this approach, there would be two separate `WidgetInstance`s: one for `partial`, one for `takeover`. The `CandidateGenerator` would use similar logic to what is laid out above. The key difference is instead `WidgetInstance` making the decision on alert type, the `CandidateGenerator` would hold that logic and create a `WidgetInstance` object based on the result.
+
+### Reason for rejection
+
+This approach would require giving the `CandidateGenerator` business logic needed to determine type. This pushes back on some framework fundamentals that are laid out in our [architecture doc](/docs/architecture/widget_framework.md). It is best that we give the `CandidateGenerator` the responsibility of fetching data needed for our widgets and not have it make decisions on how a widget should work.
+
 [^1]: An applicable alert is an alert with an effect of `delay` with `severity` >= 5, `shuttle`, `suspension`, or `station_closure` that affects a `stop_id` from the `primary_departures` section of the DUP config.
 [^2]: A `partial` alert takes up only a small amount of the screen to allow for other departures to remain visible.
 [^3]: A `takeover` alert displays over the whole screen including the departures.
