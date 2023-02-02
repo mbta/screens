@@ -57,14 +57,15 @@ first_section_alerts =
     |> Enum.filter(&relevant?/1)
     |> choose_alert()
 
-second_section_alerts = []
-if length(sections) == 2 do
-    second_section_alerts =
-        opts
-        |> Alert.fetch()
-        |> Enum.filter(&relevant?/1)
-        |> choose_alert()
-end
+second_section_alerts =
+  if length(sections) == 2 do
+    opts
+    |> Alert.fetch()
+    |> Enum.filter(&relevant?/1)
+    |> choose_alert()
+  else
+    []
+  end
 
 alerts = first_section_alerts ++ second_section_alerts
 ```
