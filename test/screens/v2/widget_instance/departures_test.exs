@@ -66,6 +66,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
           device_id: "TEST",
           name: "TEST",
           app_params: nil
+        },
+        dup_screen: %Screen{
+          app_id: :dup_v2,
+          vendor: :outfront,
+          device_id: "TEST",
+          name: "TEST",
+          app_params: nil
         }
       }
     end
@@ -130,6 +137,28 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       departures = [d1, d2, d3, n1]
       expected = [[d1, d2], [d3], [n1]]
       assert expected == Departures.group_consecutive_departures(departures, bus_shelter_screen)
+    end
+
+    test "keeps departures ungrouped for DUPs", %{dup_screen: dup_screen} do
+      d1 = %Departure{
+        prediction: %Prediction{route: %Route{id: "1"}, trip: %Trip{headsign: "Nubian"}}
+      }
+
+      d2 = %Departure{
+        prediction: %Prediction{route: %Route{id: "1"}, trip: %Trip{headsign: "Nubian"}}
+      }
+
+      d3 = %Departure{
+        schedule: %Schedule{route: %Route{id: "22"}, trip: %Trip{headsign: "Ruggles"}}
+      }
+
+      d4 = %Departure{
+        schedule: %Schedule{route: %Route{id: "22"}, trip: %Trip{headsign: "Ruggles"}}
+      }
+
+      departures = [d1, d2, d3, d4]
+      expected = [[d1], [d2], [d3], [d4]]
+      assert expected == Departures.group_consecutive_departures(departures, dup_screen)
     end
   end
 
@@ -218,6 +247,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
           device_id: "TEST",
           name: "TEST",
           app_params: nil
+        },
+        dup_screen: %Screen{
+          app_id: :dup_v2,
+          vendor: :outfront,
+          device_id: "TEST",
+          name: "TEST",
+          app_params: nil
         }
       }
     end
@@ -243,6 +279,22 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       assert %{headsign: "Beth Israel", variation: "(Limited Stops)"} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
+    end
+
+    test "handles DUPs", %{dup_screen: dup_screen} do
+      departure = %Departure{
+        prediction: %Prediction{trip: %Trip{headsign: "Test 1"}}
+      }
+
+      assert %{headsign: "T1"} ==
+               Departures.serialize_headsign([departure], dup_screen)
+
+      departure = %Departure{
+        prediction: %Prediction{trip: %Trip{headsign: "Test 2"}}
+      }
+
+      assert %{headsign: "Test 2"} ==
+               Departures.serialize_headsign([departure], dup_screen)
     end
   end
 

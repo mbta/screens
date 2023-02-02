@@ -47,12 +47,35 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       app_id: :dup_v2
     }
 
+    config_one_section = %Screen{
+      app_params: %V2.Dup{
+        header: %V2.Header.CurrentStopId{stop_id: "place-gover"},
+        primary_departures: %V2.Departures{
+          sections: [
+            %V2.Departures.Section{query: "query B", filter: nil}
+          ]
+        },
+        secondary_departures: %V2.Departures{sections: []}
+      },
+      vendor: :outfront,
+      device_id: "TEST",
+      name: "TEST",
+      app_id: :dup_v2
+    }
+
     fetch_section_departures_fn = fn
       %V2.Departures.Section{query: "query A"} ->
         {:ok, [%Departure{prediction: %Prediction{id: "A"}}]}
 
       %V2.Departures.Section{query: "query B"} ->
-        {:ok, [%Departure{prediction: %Prediction{id: "B"}}]}
+        {:ok,
+         [
+           %Departure{prediction: %Prediction{id: "B1"}},
+           %Departure{prediction: %Prediction{id: "B2"}},
+           %Departure{prediction: %Prediction{id: "B3"}},
+           %Departure{prediction: %Prediction{id: "B4"}},
+           %Departure{prediction: %Prediction{id: "B5"}}
+         ]}
 
       %V2.Departures.Section{query: "query C"} ->
         {:ok, [%Departure{prediction: %Prediction{id: "C"}}]}
@@ -64,6 +87,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
     %{
       config_primary_and_secondary: config_primary_and_secondary,
       config_only_primary: config_only_primary,
+      config_one_section: config_one_section,
       fetch_section_departures_fn: fetch_section_departures_fn
     }
   end
@@ -226,7 +250,11 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
               type: :normal_section,
               rows: [
                 %Screens.V2.Departure{
-                  prediction: struct(Prediction, id: "B"),
+                  prediction: struct(Prediction, id: "B1"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B2"),
                   schedule: nil
                 }
               ]
@@ -250,7 +278,11 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
               type: :normal_section,
               rows: [
                 %Screens.V2.Departure{
-                  prediction: struct(Prediction, id: "B"),
+                  prediction: struct(Prediction, id: "B1"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B2"),
                   schedule: nil
                 }
               ]
@@ -314,7 +346,11 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
               type: :normal_section,
               rows: [
                 %Screens.V2.Departure{
-                  prediction: struct(Prediction, id: "B"),
+                  prediction: struct(Prediction, id: "B1"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B2"),
                   schedule: nil
                 }
               ]
@@ -338,7 +374,11 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
               type: :normal_section,
               rows: [
                 %Screens.V2.Departure{
-                  prediction: struct(Prediction, id: "B"),
+                  prediction: struct(Prediction, id: "B1"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B2"),
                   schedule: nil
                 }
               ]
@@ -362,7 +402,108 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
               type: :normal_section,
               rows: [
                 %Screens.V2.Departure{
-                  prediction: struct(Prediction, id: "B"),
+                  prediction: struct(Prediction, id: "B1"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B2"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_two]
+        }
+      ]
+
+      actual_instances =
+        Dup.departures_instances(
+          config,
+          fetch_section_departures_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns 4 departures if only one section", %{
+      config_one_section: config,
+      fetch_section_departures_fn: fetch_section_departures_fn
+    } do
+      expected_departures = [
+        %Departures{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B1"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B2"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B3"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B4"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_zero]
+        },
+        %Departures{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B1"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B2"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B3"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B4"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_one]
+        },
+        %Departures{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B1"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B2"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B3"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B4"),
                   schedule: nil
                 }
               ]
