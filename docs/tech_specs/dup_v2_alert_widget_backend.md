@@ -30,7 +30,7 @@ A new config key, `alerts`, will be used to provide us with the `route_ids` and 
 
 ## CandidateGenerator
 
-`CandidateGenerator.Dup` is responsible for deciding what alert should appear on a screen. It fetches all active alerts affecting the screen's `stop_ids` listed in each section of the `primary_departures` config, filters out all alerts that do not directly affect the current stop (no downstream alerts), and selects the alert with the highest priority[^4]. If an alert (or alerts if configured with two sections) meets all criteria, the `CandidateGenerator` will then create three `WidgetInstance`s for the alert(s) (one for each rotation).
+`CandidateGenerator.Dup` is responsible for deciding what alert should appear on a screen. It fetches all active alerts using the `route_ids` and `stop_ids` listed in the `alerts` config, filters out all alerts that do not directly affect the current stop (no downstream alerts), and selects the alert with the highest priority[^4]. If an alert meets all criteria, the `CandidateGenerator` will then create three `WidgetInstance`s for the alert (one for each rotation).
 
 ## WidgetInstance
 
@@ -63,37 +63,23 @@ opts = [
     ]
 ```
 
-Each section will make a separate alerts fetch. With the one or two sets of results from these queries, we will apply a filter to eliminate alerts we do not want on screens: `Enum.filter(&relevant?/1)`. `relevant?/1` will return `true` if an alert is active and applicable[^1]. After we have a list (or lists if there are two sections) of alerts that are eligible for display, we choose the alert to display for each section based on a priority[^4]. The pipeline for these steps for each section will be the following:
+A single alerts fetch will be made to retrieve all alerts. After the fetch, we will apply a filter to eliminate alerts we do not want on screens: `Enum.filter(&relevant?/1)`. `relevant?/1` will return `true` if an alert is active and applicable[^1]. Unless we need special logic for the screen (Kenmore has a file of special logic [here](/lib/screens/dup_screen_data/special_cases.ex)), we choose the alert to display based on a priority[^4]. The pipeline for this step will be the following:
 
 ```
-first_section_alerts =
+alert =
     opts
     |> Alert.fetch()
     |> Enum.filter(&relevant?/1)
     |> choose_alert()
-
-second_section_alerts =
-  if length(sections) == 2 do
-    opts
-    |> Alert.fetch()
-    |> Enum.filter(&relevant?/1)
-    |> choose_alert()
-  else
-    []
-  end
-
-alerts = first_section_alerts ++ second_section_alerts
 ```
 
-If screen is configured with only one section, `alerts` will contain up to one item. If there are two sections configured, `alerts` will contain up to two items.
-
-With this list, we create three `WidgetInstance` objects for each rotation:
+With this alert, we create three `WidgetInstance` objects for each rotation:
 
 ```
 [
-  %DupAlert{screen: config, rotation_index: :zero, alerts: alerts},
-  %DupAlert{screen: config, rotation_index: :one, alerts: alerts},
-  %DupAlert{screen: config, rotation_index: :two, alerts: alerts}
+  %DupAlert{screen: config, rotation_index: :zero, alert: alert},
+  %DupAlert{screen: config, rotation_index: :one, alert: alert},
+  %DupAlert{screen: config, rotation_index: :two, alert: alert}
 ]
 ```
 
@@ -104,12 +90,10 @@ In `WidgetInstance.DupAlert`, the following type will be used for the struct:
 ```
 @type t :: %__MODULE__{
           screen: Screen.t(),
-          alerts: [Alert.t()] | [Alert.t(), Alert.t()],
+          alert: Alert.t(),
           rotation_index: :zero | :one | :two
         }
 ```
-
-\*Although the struct can take a list of two alerts, only the first alert in the list will ever be displayed on the screen.
 
 Because irrelevant alerts are filtered out in the `CandidateGenerator`, we are able to always return `true` from `valid_candidate?/1`.
 
@@ -141,7 +125,7 @@ Two serialize functions will be created: `serialize_partial_alert/1` and `serial
         icon: :logo,
         text: String.t(),
         pattern: :hatched | :x | :chevron,
-        color: :red | :orange | :green | :blue | :silver | :purple | :yellow
+        color: :red | :orange | :green | :blue
     }
 }
 ```
@@ -157,7 +141,7 @@ The value of `alert_text` is the same as for `serialize_partial_alert/1`. `remed
 }
 ```
 
-`header.text` is the stop name for the screen. `header.time` is the current time. `header.pattern` is based on `alert.effect`: `:station_closure -> :x`, `:suspension -> :chevron`, all others are `:hatched`. `header.color` is the route color unless all predictions are suspended due to active alerts. In that case, it is `:yellow`.
+`header.text` is the stop name for the screen. `header.time` is the current time. `header.pattern` is based on `alert.effect`: `:station_closure -> :x`, `:suspension -> :chevron`, all others are `:hatched`. `header.color` is the route color.
 
 # Considered Alternatives
 
@@ -169,7 +153,7 @@ For this approach, there would be two separate `WidgetInstance`s: one for `parti
 
 This approach would require giving the `CandidateGenerator` business logic needed to determine type. This pushes back on some framework fundamentals that are laid out in our [architecture doc](/docs/architecture/widget_framework.md). It is best that we give the `CandidateGenerator` the responsibility of fetching data needed for our widgets and not have it make decisions on how a widget should work.
 
-[^1]: An applicable alert is an alert with an effect of `delay` with `severity` >= 5, `shuttle`, `suspension`, or `station_closure` that affects a `stop_id` from the `primary_departures` section of the DUP config.
+[^1]: An applicable alert is an alert with an effect of `delay` with `severity` >= 5, `shuttle`, `suspension`, or `station_closure` that affects the `route_ids` and `stop_ids` from the `alerts` section of the DUP config.
 [^2]: A `partial` alert takes up only a small amount of the screen to allow for other departures to remain visible.
 [^3]: A `takeover` alert displays over the whole screen including the departures.
 [^4]: Priority for DUP alerts is pick a shuttle alert if present. Otherwise, pick the first in the list.
