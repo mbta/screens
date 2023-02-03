@@ -53,7 +53,7 @@ DUPs will get a new config key, `alerts`, that will provide us with the values n
 
 ## CandidateGenerator
 
-`CandidateGenerator.Dup` is responsible for fetching relevant alerts from the API. The API query will contain an `opts` array for each section:
+`CandidateGenerator.Dup` is responsible for fetching relevant alerts from the API. The API query will have the following `opts` array:
 
 ```
 opts = [
