@@ -10,7 +10,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct screen: nil,
-            section_data: []
+            section_data: [],
+            slot_names: []
 
   @type section :: %{
           type: :normal_section,
@@ -28,7 +29,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          section_data: list(section | notice_section)
+          section_data: list(section | notice_section),
+          slot_names: list(atom())
         }
 
   # The maximum number of departures to send back to the client.
@@ -41,6 +43,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def serialize(%Departures{section_data: section_data, screen: screen}) do
       %{sections: Enum.map(section_data, &Departures.serialize_section(&1, screen))}
     end
+
+    def slot_names(%Departures{slot_names: slot_names}) when length(slot_names) > 0,
+      do: slot_names
 
     def slot_names(_instance), do: [:main_content]
 
@@ -67,7 +72,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     rows =
       departures
       |> Enum.take(@max_departures)
-      |> group_consecutive_departures()
+      |> group_consecutive_departures(screen)
       |> Enum.map(&serialize_row(&1, screen))
 
     %{type: :normal_section, rows: rows}
@@ -101,13 +106,26 @@ defmodule Screens.V2.WidgetInstance.Departures do
   Groups consecutive departures that have the same route and headsign.
   `notice` rows are never grouped.
   """
-  @spec group_consecutive_departures(list(Departure.t() | notice)) ::
+  @spec group_consecutive_departures(list(Departure.t() | notice), Screen.t()) ::
           list(list(Departure.t() | notice))
-  def group_consecutive_departures(departures) do
+  def group_consecutive_departures(departures, screen)
+
+  def group_consecutive_departures(departures, %Screen{app_id: :dup_v2}) do
     departures
     |> Enum.chunk_by(fn
-      %{text: %FreeTextLine{}} -> make_ref()
-      d -> {Departure.route_id(d), Departure.headsign(d)}
+      _ ->
+        make_ref()
+    end)
+  end
+
+  def group_consecutive_departures(departures, _screen) do
+    departures
+    |> Enum.chunk_by(fn
+      %{text: %FreeTextLine{}} ->
+        make_ref()
+
+      d ->
+        {Departure.route_id(d), Departure.headsign(d)}
     end)
   end
 
@@ -157,7 +175,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       id: row_id,
       type: :departure_row,
       route: serialize_route(departures, route_pill_serializer),
-      headsign: serialize_headsign(departures),
+      headsign: serialize_headsign(departures, screen),
       times_with_crowding: serialize_times_with_crowding(departures, screen),
       inline_alerts: serialize_inline_alerts(departures)
     }
@@ -179,7 +197,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
     route_pill_serializer.(route_id, route_name, route_type, track_number)
   end
 
-  def serialize_headsign([first_departure | _]) do
+  def serialize_headsign([first_departure | _], %Screen{app_id: :dup_v2}) do
+    headsign = Departure.headsign(first_departure)
+    headsign_replacements = Application.get_env(:screens, :dup_headsign_replacements)
+
+    %{headsign: Map.get(headsign_replacements, headsign, headsign)}
+  end
+
+  def serialize_headsign([first_departure | _], _) do
     headsign = Departure.headsign(first_departure)
 
     via_pattern = ~r/(.+) (via .+)/
@@ -212,7 +237,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       end
 
     crowding =
-      if crowding_compatible?(serialized_time) do
+      if crowding_compatible?(serialized_time, screen) do
         serialize_crowding(departure)
       else
         nil
@@ -227,9 +252,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
   # Timestamps represent a time further in the future (except for CR, which doesn't have crowding)
   # and can't physically fit on the same row as crowding icons.
   # All other time representations are compatible.
-  defp crowding_compatible?(serialized_time)
-  defp crowding_compatible?(%{time: %{type: :timestamp}}), do: false
-  defp crowding_compatible?(_), do: true
+  defp crowding_compatible?(serialized_time, screen)
+  defp crowding_compatible?(%{time: %{type: :timestamp}}, _), do: false
+  defp crowding_compatible?(_, %Screen{app_id: :dup_v2}), do: false
+  defp crowding_compatible?(_, _), do: true
 
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defp serialize_time(departure, %Screen{app_id: app_id}, now)

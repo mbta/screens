@@ -20,7 +20,10 @@ config :screens,
   default_api_v3_url: [:no_api_requests_allowed_during_testing],
   blue_bikes_station_information_url: [:no_api_requests_allowed_during_testing],
   blue_bikes_station_status_url: [:no_api_requests_allowed_during_testing],
-  blue_bikes_api_client: Screens.BlueBikes.FakeClient
+  blue_bikes_api_client: Screens.BlueBikes.FakeClient,
+  dup_headsign_replacements: %{
+    "Test 1" => "T1"
+  }
 
 config :screens, ScreensWeb.AuthManager, secret_key: "test key"
 

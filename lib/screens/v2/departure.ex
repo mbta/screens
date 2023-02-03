@@ -156,7 +156,7 @@ defmodule Screens.V2.Departure do
   end
 
   def scheduled_time(%__MODULE__{schedule: s}) when not is_nil(s) do
-    select_departure_time(s)
+    select_arrival_time(s)
   end
 
   def scheduled_time(_), do: nil
@@ -175,11 +175,11 @@ defmodule Screens.V2.Departure do
   end
 
   def time(%__MODULE__{prediction: p}) when not is_nil(p) do
-    select_departure_time(p)
+    select_arrival_time(p)
   end
 
   def time(%__MODULE__{prediction: nil, schedule: s}) do
-    select_departure_time(s)
+    select_arrival_time(s)
   end
 
   def track_number(%__MODULE__{prediction: %Prediction{track_number: track_number}})
@@ -227,8 +227,8 @@ defmodule Screens.V2.Departure do
   defp crowding_level_from_occupancy_status(:full), do: 3
   defp crowding_level_from_occupancy_status(nil), do: nil
 
-  defp select_departure_time(%{arrival_time: t, departure_time: nil}), do: t
-  defp select_departure_time(%{arrival_time: _, departure_time: t}), do: t
+  defp select_arrival_time(%{arrival_time: nil, departure_time: t}), do: t
+  defp select_arrival_time(%{arrival_time: t, departure_time: _}), do: t
 
   defp identify_stop_type_from_times(arrival_time, departure_time)
   defp identify_stop_type_from_times(nil, _), do: :first_stop

@@ -1,0 +1,12 @@
+.departures-section {
+  position: relative;
+
+  &:not(:first-child):before {
+    content: "";
+    position: absolute;
+    left: 0px;
+    height: 6px;
+    width: 1920px;
+    background-color: #bfbebb;
+  }
+}
