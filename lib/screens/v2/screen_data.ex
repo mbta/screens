@@ -487,7 +487,7 @@ defmodule Screens.V2.ScreenData do
       |> Enum.filter(fn widget_struct ->
         not is_nil(AlertWidgetInstance.impl_for(widget_struct))
       end)
-      |> Enum.map(fn alert_widget_struct -> AlertWidgetInstance.alert_id(alert_widget_struct) end)
+      |> Enum.flat_map(&AlertWidgetInstance.alert_ids/1)
 
     :ok = ScreensByAlert.put_data(screen_id, alert_ids)
   end

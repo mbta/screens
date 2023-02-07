@@ -343,6 +343,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "1",
                   elevator_name: "Elevator 1",
                   timeframe: %{
@@ -366,6 +367,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     timeframe: %{
@@ -400,6 +402,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "1",
                   elevator_name: "Elevator 1",
                   timeframe: %{
@@ -422,6 +425,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "5",
                   elevator_name: "Elevator 5",
                   timeframe: %{
@@ -445,6 +449,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     timeframe: %{
@@ -458,6 +463,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "5",
                     elevator_name: "Elevator 5",
                     timeframe: %{
@@ -492,6 +498,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "1",
                   elevator_name: "Elevator 1",
                   timeframe: %{
@@ -514,6 +521,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "5",
                   elevator_name: "Elevator 5",
                   timeframe: %{
@@ -537,6 +545,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     timeframe: %{
@@ -550,6 +559,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "5",
                     elevator_name: "Elevator 5",
                     timeframe: %{
@@ -570,6 +580,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "2",
                     elevator_name: "Elevator 2",
                     timeframe: %{
@@ -583,6 +594,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "6",
                     elevator_name: "Elevator 6",
                     timeframe: %{
@@ -603,6 +615,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "3",
                     elevator_name: "Elevator 3",
                     timeframe: %{
@@ -616,6 +629,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "7",
                     elevator_name: "Elevator 7",
                     timeframe: %{
@@ -651,6 +665,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "1",
                   elevator_name: "Elevator 1",
                   header_text: nil,
@@ -674,6 +689,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     header_text: nil,
@@ -694,6 +710,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "2",
                     elevator_name: "Elevator 2",
                     header_text: nil,
@@ -714,6 +731,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "3",
                     elevator_name: "Elevator 3",
                     header_text: nil,
@@ -734,6 +752,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "4",
                     elevator_name: "Elevator 4",
                     header_text: nil,
@@ -765,6 +784,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "1",
                   elevator_name: "Elevator 1",
                   header_text: nil,
@@ -788,6 +808,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     header_text: nil,
@@ -808,6 +829,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "2",
                     elevator_name: "Elevator 2",
                     header_text: nil,
@@ -821,6 +843,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "6",
                     elevator_name: "Elevator 6",
                     header_text: nil,
@@ -841,6 +864,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "3",
                     elevator_name: "Elevator 3",
                     header_text: nil,
@@ -854,6 +878,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "7",
                     elevator_name: "Elevator 7",
                     header_text: nil,
@@ -878,6 +903,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "1",
                     elevator_name: "Elevator 1",
                     header_text: nil,
@@ -898,6 +924,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "4",
                     elevator_name: "Elevator 4",
                     header_text: nil,
@@ -911,6 +938,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "8",
                     elevator_name: "Elevator 8",
                     header_text: nil,
@@ -924,6 +952,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "9",
                     elevator_name: "Elevator 9",
                     header_text: nil,
@@ -962,6 +991,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "1",
                   elevator_name: "Elevator 1",
                   timeframe: %{
@@ -998,6 +1028,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "1",
                   elevator_name: "Elevator 1",
                   header_text: nil,
@@ -1020,6 +1051,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "5",
                   elevator_name: "Elevator 5",
                   header_text: nil,
@@ -1054,6 +1086,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "2",
                     elevator_name: "Elevator 2",
                     timeframe: %{
@@ -1077,6 +1110,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "2",
                   elevator_name: "Elevator 2",
                   timeframe: %{
@@ -1111,6 +1145,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "3",
                     elevator_name: "Elevator 3",
                     timeframe: %{
@@ -1143,6 +1178,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "2",
                     elevator_name: "Elevator 2",
                     header_text: nil,
@@ -1156,6 +1192,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "6",
                     elevator_name: "Elevator 6",
                     header_text: nil,
@@ -1176,6 +1213,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "3",
                     elevator_name: "Elevator 3",
                     header_text: nil,
@@ -1189,6 +1227,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "7",
                     elevator_name: "Elevator 7",
                     header_text: nil,
@@ -1209,6 +1248,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "4",
                     elevator_name: "Elevator 4",
                     header_text: nil,
@@ -1222,6 +1262,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "8",
                     elevator_name: "Elevator 8",
                     header_text: nil,
@@ -1235,6 +1276,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "9",
                     elevator_name: "Elevator 9",
                     header_text: nil,
@@ -1258,6 +1300,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "2",
                   elevator_name: "Elevator 2",
                   header_text: nil,
@@ -1280,6 +1323,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "6",
                   elevator_name: "Elevator 6",
                   header_text: nil,
@@ -1324,6 +1368,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "2",
                     elevator_name: "Elevator 2",
                     header_text: nil,
@@ -1344,6 +1389,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "3",
                     elevator_name: "Elevator 3",
                     header_text: nil,
@@ -1364,6 +1410,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "4",
                     elevator_name: "Elevator 4",
                     header_text: nil,
@@ -1377,6 +1424,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "9",
                     elevator_name: "Elevator 9",
                     header_text: nil,
@@ -1400,6 +1448,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "2",
                   elevator_name: "Elevator 2",
                   header_text: nil,
@@ -1447,6 +1496,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
               elevator_closures: [
                 %{
                   description: nil,
+                  alert_id: nil,
                   elevator_id: "1",
                   elevator_name: "Elevator 1",
                   header_text: nil,
@@ -1472,6 +1522,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "2",
                     elevator_name: "Elevator 2",
                     header_text: nil,
@@ -1485,6 +1536,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "6",
                     elevator_name: "Elevator 6",
                     header_text: nil,
@@ -1505,6 +1557,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "3",
                     elevator_name: "Elevator 3",
                     header_text: nil,
@@ -1518,6 +1571,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "7",
                     elevator_name: "Elevator 7",
                     header_text: nil,
@@ -1542,6 +1596,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                 elevator_closures: [
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "4",
                     elevator_name: "Elevator 4",
                     header_text: nil,
@@ -1555,6 +1610,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "8",
                     elevator_name: "Elevator 8",
                     header_text: nil,
@@ -1568,6 +1624,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
                   },
                   %{
                     description: nil,
+                    alert_id: nil,
                     elevator_id: "9",
                     elevator_name: "Elevator 9",
                     header_text: nil,
