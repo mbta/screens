@@ -3,13 +3,15 @@ import React from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
-  main_content_reduced_one: WidgetData;
-  bottom_pane_one: WidgetData;
+  main_content_reduced: WidgetData;
+  bottom_pane: WidgetData;
+  // Rotation is added via the wrapper, but it's not used for this component
+  rotation: string;
 }
 
-const SplitBodyOne: React.ComponentType<Props> = ({
-  main_content_reduced_one: mainContentReduced,
-  bottom_pane_one: bottomPane,
+const SplitBody: React.ComponentType<Props> = ({
+  main_content_reduced: mainContentReduced,
+  bottom_pane: bottomPane,
 }) => {
   return (
     <div className="body-split">
@@ -23,4 +25,4 @@ const SplitBodyOne: React.ComponentType<Props> = ({
   );
 };
 
-export default SplitBodyOne;
+export default SplitBody;
