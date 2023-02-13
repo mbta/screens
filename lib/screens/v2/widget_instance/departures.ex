@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Dup.Override.FreeTextLine
+  alias Screens.Config.V2.FreeTextLine
   alias Screens.Config.Screen
   alias Screens.Util
   alias Screens.V2.Departure

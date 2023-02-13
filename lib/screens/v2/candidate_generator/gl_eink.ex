@@ -1,7 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.GlEink do
   @moduledoc false
 
-  alias Screens.Config.Dup.Override.FreeTextLine
+  alias Screens.Config.V2.FreeTextLine
   alias Screens.Config.V2.Departures
   alias Screens.Config.V2.Departures.{Query, Section}
   alias Screens.Config.V2.Departures.Query.Params
