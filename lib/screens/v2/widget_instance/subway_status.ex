@@ -17,6 +17,31 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           subway_alerts: list(Alert.t())
         }
 
+  @type serialized_response :: %{
+          blue: route_status(),
+          orange: route_status(),
+          red: route_status(),
+          green: route_status()
+        }
+
+  @type route_status :: %{
+          alerts: list(alert())
+        }
+
+  @type route_pill :: %{
+          type: :text,
+          text: String.t(),
+          color: route_color()
+        }
+
+  @type route_color :: :red | :orange | :green | :blue
+
+  @type alert :: %{
+          route_pill: route_pill(),
+          text: String.t(),
+          subtext: String.t()
+        }
+
   @route_directions %{
     "Blue" => ["Westbound", "Eastbound"],
     "Orange" => ["Southbound", "Northbound"],
@@ -33,6 +58,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defimpl Screens.V2.WidgetInstance do
     def priority(_instance), do: [2, 1]
 
+    @spec serialize(SubwayStatus.t()) :: SubwayStatus.serialized_response()
     def serialize(%SubwayStatus{subway_alerts: alerts}) do
       grouped_alerts = SubwayStatus.get_relevant_alerts_by_route(alerts)
 
@@ -89,10 +115,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     data =
       case alerts do
         nil ->
-          %{status: "Normal Service"}
+          # %{status: "Normal Service"}
+          %{route_pill: serialize_route_pill(route_id), text: "Normal Service"}
 
         [] ->
-          %{status: "Normal Service"}
+          %{route_pill: serialize_route_pill(route_id), text: "Normal Service"}
 
         [alert] ->
           serialize_alert(alert, route_id)
