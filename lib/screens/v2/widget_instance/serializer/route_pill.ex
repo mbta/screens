@@ -81,7 +81,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
           %{type: :slashed, part1: part1, part2: part2}
 
         true ->
-          do_serialize(route_id, %{route_name: route_name})
+          do_serialize(route_id, %{route_name: route_name, gl_branch: true})
       end
 
     Map.put(route, :color, get_color_for_route(route_id, route_type))

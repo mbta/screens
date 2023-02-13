@@ -14,37 +14,30 @@ import { MappingContext } from "Components/v2/widget";
 import NormalScreen from "Components/v2/dup/normal_screen";
 import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/dup/normal_header";
-import NormalDepartures from "Components/v2/departures/normal_departures";
+import NormalDepartures from "Components/v2/dup/departures/normal_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
-import NormalBodyZero from "Components/v2/dup/normal_body_zero";
-import NormalBodyOne from "Components/v2/dup/normal_body_one";
-import NormalBodyTwo from "Components/v2/dup/normal_body_two";
 import Viewport from "Components/v2/dup/viewport";
-import RotationNormalZero from "Components/v2/dup/rotation_normal_zero";
-import RotationNormalOne from "Components/v2/dup/rotation_normal_one";
-import RotationNormalTwo from "Components/v2/dup/rotation_normal_two";
-import SplitBodyZero from "Components/v2/dup/split_body_zero";
-import SplitBodyOne from "Components/v2/dup/split_body_one";
-import SplitBodyTwo from "Components/v2/dup/split_body_two";
-import RotationTakeoverZero from "Components/v2/dup/rotation_takeover_zero";
-import RotationTakeoverOne from "Components/v2/dup/rotation_takeover_one";
-import RotationTakeoverTwo from "Components/v2/dup/rotation_takeover_two";
 import EvergreenContent from "Components/v2/evergreen_content";
+import RotationNormal from "Components/v2/dup/rotation_normal";
+import RotationTakeover from "Components/v2/dup/rotation_takeover";
+import NormalBody from "Components/v2/dup/normal_body";
+import SplitBody from "Components/v2/dup/split_body";
+import { splitRotationFromPropNames } from "Components/v2/dup/dup_rotation_wrapper";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
-  rotation_normal_zero: RotationNormalZero,
-  rotation_normal_one: RotationNormalOne,
-  rotation_normal_two: RotationNormalTwo,
-  rotation_takeover_zero: RotationTakeoverZero,
-  rotation_takeover_one: RotationTakeoverOne,
-  rotation_takeover_two: RotationTakeoverTwo,
-  body_normal_zero: NormalBodyZero,
-  body_normal_one: NormalBodyOne,
-  body_normal_two: NormalBodyTwo,
-  body_split_zero: SplitBodyZero,
-  body_split_one: SplitBodyOne,
-  body_split_two: SplitBodyTwo,
+  rotation_normal_zero: splitRotationFromPropNames(RotationNormal, "zero"),
+  rotation_normal_one: splitRotationFromPropNames(RotationNormal, "one"),
+  rotation_normal_two: splitRotationFromPropNames(RotationNormal, "two"),
+  rotation_takeover_zero: splitRotationFromPropNames(RotationTakeover, "zero"),
+  rotation_takeover_one: splitRotationFromPropNames(RotationTakeover, "one"),
+  rotation_takeover_two: splitRotationFromPropNames(RotationTakeover, "two"),
+  body_normal_zero: splitRotationFromPropNames(NormalBody, "zero"),
+  body_normal_one: splitRotationFromPropNames(NormalBody, "one"),
+  body_normal_two: splitRotationFromPropNames(NormalBody, "two"),
+  body_split_zero: splitRotationFromPropNames(SplitBody, "zero"),
+  body_split_one: splitRotationFromPropNames(SplitBody, "one"),
+  body_split_two: splitRotationFromPropNames(SplitBody, "two"),
   placeholder: Placeholder,
   normal_header: NormalHeader,
   departures: NormalDepartures,
