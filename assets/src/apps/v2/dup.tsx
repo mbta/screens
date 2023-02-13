@@ -22,6 +22,8 @@ import RotationTakeover from "Components/v2/dup/rotation_takeover";
 import NormalBody from "Components/v2/dup/normal_body";
 import SplitBody from "Components/v2/dup/split_body";
 import { splitRotationFromPropNames } from "Components/v2/dup/dup_rotation_wrapper";
+import PartialAlert from "Components/v2/dup/partial_alert";
+import TakeoverAlert from "Components/v2/dup/takeover_alert";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -40,6 +42,8 @@ const TYPE_TO_COMPONENT = {
   placeholder: Placeholder,
   normal_header: NormalHeader,
   departures: NormalDepartures,
+  partial_alert: PartialAlert,
+  takeover_alert: TakeoverAlert
 };
 
 const App = (): JSX.Element => {
