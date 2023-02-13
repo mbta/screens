@@ -1,4 +1,4 @@
-defmodule Screens.Config.Dup.Override.FreeText do
+defmodule Screens.Config.V2.FreeText do
   @moduledoc false
 
   @behaviour Screens.Config.Behaviour
@@ -9,7 +9,7 @@ defmodule Screens.Config.Dup.Override.FreeText do
           | %{route: route_pill}
           | %{color: color, text: String.t()}
           | %{special: special}
-          | %{icon: Screens.Config.Dup.Override.FreeTextLine.icon()}
+          | %{icon: Screens.Config.V2.FreeTextLine.icon()}
 
   @type format :: :bold | :small
   @type route_pill ::
