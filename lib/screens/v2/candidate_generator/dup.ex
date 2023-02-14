@@ -131,61 +131,46 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       end
 
     primary_departures_instances =
-      if Enum.any?(primary_sections_data, &(&1 == :error)) do
-        %DeparturesNoData{screen: config, show_alternatives?: true}
-      else
-        sections =
-          Enum.map(primary_sections_data, fn {:ok, departures} ->
-            visible_departures =
-              if length(primary_sections_data) > 1 do
-                Enum.take(departures, 2)
-              else
-                Enum.take(departures, 4)
-              end
-
-            %{type: :normal_section, rows: visible_departures}
-          end)
-
-        [
-          %DeparturesWidget{
-            screen: config,
-            section_data: sections,
-            slot_names: [:main_content_zero]
-          },
-          %DeparturesWidget{
-            screen: config,
-            section_data: sections,
-            slot_names: [:main_content_one]
-          }
-        ]
-      end
+      sections_data_to_departure_instances(
+        config,
+        primary_sections_data,
+        [:main_content_zero, :main_content_one]
+      )
 
     secondary_departures_instances =
-      if Enum.any?(secondary_sections_data, &(&1 == :error)) do
-        %DeparturesNoData{screen: config, show_alternatives?: true}
-      else
-        sections =
-          Enum.map(secondary_sections_data, fn {:ok, departures} ->
-            visible_departures =
-              if length(secondary_sections_data) > 1 do
-                Enum.take(departures, 2)
-              else
-                Enum.take(departures, 4)
-              end
-
-            %{type: :normal_section, rows: visible_departures}
-          end)
-
-        [
-          %DeparturesWidget{
-            screen: config,
-            section_data: sections,
-            slot_names: [:main_content_two]
-          }
-        ]
-      end
+      sections_data_to_departure_instances(
+        config,
+        secondary_sections_data,
+        [:main_content_two]
+      )
 
     primary_departures_instances ++ secondary_departures_instances
+  end
+
+  defp sections_data_to_departure_instances(config, sections_data, slot_ids) do
+    if Enum.any?(sections_data, &(&1 == :error)) do
+      %DeparturesNoData{screen: config, show_alternatives?: true}
+    else
+      sections =
+        Enum.map(sections_data, fn {:ok, departures} ->
+          visible_departures =
+            if length(sections_data) > 1 do
+              Enum.take(departures, 2)
+            else
+              Enum.take(departures, 4)
+            end
+
+          %{type: :normal_section, rows: visible_departures}
+        end)
+
+      Enum.map(slot_ids, fn slot_id ->
+        %DeparturesWidget{
+          screen: config,
+          section_data: sections,
+          slot_names: [slot_id]
+        }
+      end)
+    end
   end
 
   defp placeholder_instances do
