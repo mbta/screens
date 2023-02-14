@@ -154,7 +154,11 @@ defmodule Screens.V2.CandidateGenerator.Dup do
               Enum.take(departures, 4)
             end
 
-          %{type: :normal_section, rows: visible_departures}
+          if visible_departures == [] do
+            %{type: :headway_section, pill: pill}
+          else
+            %{type: :normal_section, rows: visible_departures}
+          end
         end)
 
       Enum.map(slot_ids, fn slot_id ->
