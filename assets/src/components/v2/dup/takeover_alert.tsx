@@ -1,6 +1,5 @@
 import React from "react";
 
-import { Icon } from "../normal_header";
 import FreeText, { FreeTextType } from "./dup_free_text";
 import NormalHeader from "./normal_header";
 
@@ -55,7 +54,6 @@ interface TakeoverAlertProps {
   text: FreeTextType,
   remedy: FreeTextType,
   header: {
-    icon: Icon,
     text: string,
     color: string
   }
@@ -67,10 +65,9 @@ const TakeoverAlert = (alert: TakeoverAlertProps) => {
   return (
     <>
       <NormalHeader
-        icon={header.icon}
         text={header.text}
         color={header.color}
-        accentPattern
+        accentPattern="dup-accent-pattern.svg"
       />
       <div className="full-screen-alert__body">
         <div className="full-screen-alert-text">

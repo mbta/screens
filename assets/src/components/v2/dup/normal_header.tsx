@@ -7,7 +7,7 @@ interface NormalHeaderProps {
   text: string;
   time?: string;
   color?: string;
-  accentPattern?: boolean;
+  accentPattern?: string;
 }
 
 const NormalHeader = ({text, time, color, accentPattern}: NormalHeaderProps) => {

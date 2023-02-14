@@ -115,9 +115,9 @@ const NormalHeaderVersion: ComponentType<NormalHeaderVersionProps> = ({ version 
   return <div className="normal-header-version">{version}</div>;
 };
 
-const NormalHeaderAccent = () => (
+const NormalHeaderAccent = ({accentPatternFile}: {accentPatternFile: string}) => (
   <div className="normal-header__accent-pattern-container">
-    <img className="normal-header__accent-pattern-image" src={imagePath(`dup-accent-pattern.svg`)} />
+    <img className="normal-header__accent-pattern-image" src={imagePath(accentPatternFile)} />
   </div>
 )
 
@@ -131,7 +131,7 @@ interface Props {
   showTo?: boolean;
   fullName?: boolean;
   classModifiers?: string;
-  accentPattern?: boolean
+  accentPattern?: string;
 }
 
 const NormalHeader: ComponentType<Props> = ({
@@ -144,7 +144,7 @@ const NormalHeader: ComponentType<Props> = ({
   showTo = false,
   fullName = false,
   classModifiers,
-  accentPattern = false,
+  accentPattern,
 }) => {
 
   const { ref: headerRef, size: headerSize } = useTextResizer({
@@ -165,7 +165,7 @@ const NormalHeader: ComponentType<Props> = ({
       {time && <NormalHeaderTime time={time} />}
       {version && <NormalHeaderVersion version={version} />}
       {showUpdated && <NormalHeaderUpdated />}
-      {accentPattern && <NormalHeaderAccent />}
+      {accentPattern && <NormalHeaderAccent accentPatternFile={accentPattern}/>}
     </div>
   );
 };
