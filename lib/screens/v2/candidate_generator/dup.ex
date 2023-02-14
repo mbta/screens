@@ -115,19 +115,13 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         } = config,
         fetch_section_departures_fn
       ) do
-    primary_sections_data =
-      primary_sections
-      |> Task.async_stream(fetch_section_departures_fn, timeout: :infinity)
-      |> Enum.map(fn {:ok, data} -> data end)
+    primary_sections_data = get_sections_data(primary_sections, fetch_section_departures_fn)
 
     secondary_sections_data =
       if secondary_sections == [] do
         primary_sections_data
       else
-        secondary_sections
-        |> Task.async_stream(fetch_section_departures_fn, timeout: :infinity)
-        |> Enum.map(fn {:ok, data} -> data end)
-        |> Enum.take(4)
+        get_sections_data(secondary_sections, fetch_section_departures_fn)
       end
 
     primary_departures_instances =
@@ -152,7 +146,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       %DeparturesNoData{screen: config, show_alternatives?: true}
     else
       sections =
-        Enum.map(sections_data, fn {:ok, departures} ->
+        Enum.map(sections_data, fn %{departures: departures, pill: pill} ->
           visible_departures =
             if length(sections_data) > 1 do
               Enum.take(departures, 2)
@@ -171,6 +165,15 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         }
       end)
     end
+  end
+
+  defp get_sections_data(sections, fetch_section_departures_fn) do
+    Enum.map(sections, fn %Departures.Section{
+                            headway: %Departures.Headway{pill: pill}
+                          } = section ->
+      {:ok, data} = section |> fetch_section_departures_fn.()
+      %{departures: data, pill: pill}
+    end)
   end
 
   defp placeholder_instances do
