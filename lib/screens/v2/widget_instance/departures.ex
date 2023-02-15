@@ -101,7 +101,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
           ]
         }
       else
-        %FreeTextLine{icon: :orange, text: ["every", %{format: :bold, text: "2-4"}, "minutes"]}
+        %FreeTextLine{
+          icon: :orange,
+          text: ["every", %{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
+        }
       end
 
     %{type: :headway_section, text: FreeTextLine.to_json(text)}
