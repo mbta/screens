@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
 
   alias Screens.Config.Screen
   alias Screens.Config.V2.{Departures, Header}
+  alias Screens.Config.V2.Departures.{Section, Query}
   alias Screens.Config.V2.Dup, as: DupConfig
   alias Screens.Predictions.Prediction
   alias Screens.V2.Departure
@@ -16,14 +17,14 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
         header: %Header.CurrentStopId{stop_id: "place-gover"},
         primary_departures: %Departures{
           sections: [
-            %Departures.Section{query: "query A", filter: nil},
-            %Departures.Section{query: "query B", filter: nil}
+            %Section{query: %Query{params: %Query.Params{stop_ids: ["stop A"]}}, filter: nil},
+            %Section{query: %Query{params: %Query.Params{stop_ids: ["stop B"]}}, filter: nil}
           ]
         },
         secondary_departures: %Departures{
           sections: [
-            %Departures.Section{query: "query C", filter: nil},
-            %Departures.Section{query: "query D", filter: nil}
+            %Section{query: %Query{params: %Query.Params{stop_ids: ["stop C"]}}, filter: nil},
+            %Section{query: %Query{params: %Query.Params{stop_ids: ["stop D"]}}, filter: nil}
           ]
         }
       },
@@ -38,8 +39,8 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
         header: %Header.CurrentStopId{stop_id: "place-gover"},
         primary_departures: %Departures{
           sections: [
-            %Departures.Section{query: "query A", filter: nil},
-            %Departures.Section{query: "query B", filter: nil}
+            %Section{query: %Query{params: %Query.Params{stop_ids: ["stop A"]}}, filter: nil},
+            %Section{query: %Query{params: %Query.Params{stop_ids: ["stop B"]}}, filter: nil}
           ]
         },
         secondary_departures: %Departures{sections: []}
@@ -55,7 +56,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
         header: %Header.CurrentStopId{stop_id: "place-gover"},
         primary_departures: %Departures{
           sections: [
-            %Departures.Section{query: "query B", filter: nil}
+            %Section{query: %Query{params: %Query.Params{stop_ids: ["stop B"]}}, filter: nil}
           ]
         },
         secondary_departures: %Departures{sections: []}
@@ -67,10 +68,10 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
     }
 
     fetch_section_departures_fn = fn
-      %Departures.Section{query: "query A"} ->
+      %Section{query: %Query{params: %Query.Params{stop_ids: ["stop A"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "A"}}]}
 
-      %Departures.Section{query: "query B"} ->
+      %Section{query: %Query{params: %Query.Params{stop_ids: ["stop B"]}}} ->
         {:ok,
          [
            %Departure{prediction: %Prediction{id: "B1"}},
@@ -80,10 +81,10 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
            %Departure{prediction: %Prediction{id: "B5"}}
          ]}
 
-      %Departures.Section{query: "query C"} ->
+      %Section{query: %Query{params: %Query.Params{stop_ids: ["stop C"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "C"}}]}
 
-      %Departures.Section{query: "query D"} ->
+      %Section{query: %Query{params: %Query.Params{stop_ids: ["stop D"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "D"}}]}
     end
 
@@ -149,10 +150,10 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       fetch_stop_fn = fn "place-gover" -> "Government Center" end
 
       fetch_section_departures_fn = fn
-        %Departures.Section{query: "query A"} -> {:ok, []}
-        %Departures.Section{query: "query B"} -> {:ok, []}
-        %Departures.Section{query: "query C"} -> {:ok, []}
-        %Departures.Section{query: "query D"} -> {:ok, []}
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["stop A"]}}} -> {:ok, []}
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["stop B"]}}} -> {:ok, []}
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["stop C"]}}} -> {:ok, []}
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["stop D"]}}} -> {:ok, []}
       end
 
       expected_headers =
