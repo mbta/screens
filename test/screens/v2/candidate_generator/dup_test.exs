@@ -1,9 +1,10 @@
 defmodule Screens.V2.CandidateGenerator.DupTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{Departures, Header}
-  alias Screens.Config.V2.Departures.{Section, Query}
+  alias Screens.Config.V2.Departures.{Headway, Section, Query}
   alias Screens.Config.V2.Dup, as: DupConfig
   alias Screens.Predictions.Prediction
   alias Screens.V2.Departure
@@ -56,7 +57,11 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
         header: %Header.CurrentStopId{stop_id: "place-gover"},
         primary_departures: %Departures{
           sections: [
-            %Section{query: %Query{params: %Query.Params{stop_ids: ["stop B"]}}, filter: nil}
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["stop B"]}},
+              filter: nil,
+              headway: %Headway{headway_id: "red_trunk", pill: :red}
+            }
           ]
         },
         secondary_departures: %Departures{sections: []}
@@ -87,8 +92,6 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       %Section{query: %Query{params: %Query.Params{stop_ids: ["stop D"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "D"}}]}
     end
-
-    # params = Map.from_struct(struct(Query.Params))
 
     fetch_alerts_or_empty_list_fn = fn
       _ -> []
@@ -533,6 +536,72 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
                   schedule: nil
                 }
               ]
+            }
+          ],
+          slot_names: [:main_content_two]
+        }
+      ]
+
+      actual_instances =
+        Dup.departures_instances(
+          config,
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_or_empty_list_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns headway sections for temporary terminal", %{
+      config_one_section: config,
+      fetch_section_departures_fn: fetch_section_departures_fn
+    } do
+      now = ~U[2020-04-06T10:00:00Z]
+
+      fetch_alerts_or_empty_list_fn = fn
+        [direction_id: :both, route_ids: [], route_type: nil, stop_ids: ["stop B"]] ->
+          [
+            struct(Alert,
+              effect: :suspension,
+              informed_entities: [%{stop: "stop B"}, %{stop: "stop C"}]
+            )
+          ]
+      end
+
+      expected_departures = [
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :headway_section,
+              pill: :red,
+              time_range: {12, 16},
+              headsign: "Test"
+            }
+          ],
+          slot_names: [:main_content_zero]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :headway_section,
+              pill: :red,
+              time_range: {12, 16},
+              headsign: "Test"
+            }
+          ],
+          slot_names: [:main_content_one]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :headway_section,
+              pill: :red,
+              time_range: {12, 16},
+              headsign: "Test"
             }
           ],
           slot_names: [:main_content_two]

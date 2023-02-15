@@ -24,6 +24,9 @@ config :screens,
   blue_bikes_api_client: Screens.BlueBikes.FakeClient,
   dup_headsign_replacements: %{
     "Test 1" => "T1"
+  },
+  dup_alert_headsign_matchers: %{
+    "stop B" => [{"stop B", "not_informed", "Test"}]
   }
 
 config :screens, ScreensWeb.AuthManager, secret_key: "test key"
