@@ -79,7 +79,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :notice_section, text: text}
   end
 
-  def serialize_section(%{type: :headway_section, pill: pill}, _screen, is_only_section) do
+  def serialize_section(
+        %{type: :headway_section, pill: pill, time_range: {lo, hi}, headsign: headsign},
+        _screen,
+        is_only_section
+      ) do
     text =
       if is_only_section do
         %FreeTextLine{
@@ -89,10 +93,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
               color: pill,
               text: "#{String.capitalize("#{pill}")} Line"
             },
-            "Forest Hills trains",
+            "#{headsign} trains",
             %{special: :break},
             "every",
-            %{format: :bold, text: "2-4"},
+            %{format: :bold, text: "#{lo}-#{hi}"},
             "minutes"
           ]
         }
