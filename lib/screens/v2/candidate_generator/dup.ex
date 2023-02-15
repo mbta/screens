@@ -98,7 +98,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
       fn -> placeholder_instances() end,
       fn ->
-        departures_instances(config, fetch_section_departures_fn)
+        departures_instances(config, now, fetch_section_departures_fn)
       end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
@@ -127,6 +127,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
             secondary_departures: %Departures{sections: secondary_sections}
           }
         } = config,
+        now,
         fetch_section_departures_fn
       ) do
     primary_sections_data = get_sections_data(primary_sections, fetch_section_departures_fn)
@@ -142,25 +143,33 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       sections_data_to_departure_instances(
         config,
         primary_sections_data,
-        [:main_content_zero, :main_content_one]
+        [:main_content_zero, :main_content_one],
+        now
       )
 
     secondary_departures_instances =
       sections_data_to_departure_instances(
         config,
         secondary_sections_data,
-        [:main_content_two]
+        [:main_content_two],
+        now
       )
 
     primary_departures_instances ++ secondary_departures_instances
   end
 
-  defp sections_data_to_departure_instances(config, sections_data, slot_ids) do
+  defp sections_data_to_departure_instances(config, sections_data, slot_ids, now) do
     if Enum.any?(sections_data, &(&1 == :error)) do
       %DeparturesNoData{screen: config, show_alternatives?: true}
     else
       sections =
-        Enum.map(sections_data, fn %{departures: departures, pill: pill} ->
+        Enum.map(sections_data, fn %{
+                                     departures: departures,
+                                     pill: pill,
+                                     alerts: alerts,
+                                     headway: headway,
+                                     stop_ids: stop_ids
+                                   } ->
           visible_departures =
             if length(sections_data) > 1 do
               Enum.take(departures, 2)
@@ -168,10 +177,12 @@ defmodule Screens.V2.CandidateGenerator.Dup do
               Enum.take(departures, 4)
             end
 
-          if visible_departures == [] do
-            %{type: :headway_section, pill: pill}
-          else
-            %{type: :normal_section, rows: visible_departures}
+          case fetch_headway_mode(stop_ids, headway, alerts, now) do
+            {:active, time_range, headsign} ->
+              %{type: :headway_section, pill: pill, time_range: time_range, headsign: headsign}
+
+            :inactive ->
+              %{type: :normal_section, rows: visible_departures}
           end
         end)
 
@@ -186,11 +197,29 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   end
 
   defp get_sections_data(sections, fetch_section_departures_fn) do
-    Enum.map(sections, fn %Departures.Section{
-                            headway: %Departures.Headway{pill: pill}
+    Enum.map(sections, fn %Section{
+                            query: %Query{params: %Params{stop_ids: stop_ids} = params},
+                            headway: %Headway{pill: pill} = headway
                           } = section ->
-      {:ok, data} = section |> fetch_section_departures_fn.()
-      %{departures: data, pill: pill}
+      alert_fetch_params = params |> Map.from_struct() |> Enum.into([])
+
+      section_alerts =
+        alert_fetch_params
+        |> Alert.fetch_or_empty_list()
+        |> Enum.filter(fn
+          %Alert{effect: effect} when effect in [:suspension, :shuttle] -> true
+          _ -> false
+        end)
+
+      {:ok, section_departures} = section |> fetch_section_departures_fn.()
+
+      %{
+        departures: section_departures,
+        pill: pill,
+        alerts: section_alerts,
+        headway: headway,
+        stop_ids: stop_ids
+      }
     end)
   end
 
