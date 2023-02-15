@@ -1,10 +1,14 @@
 defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
+  alias Screens.Config.V2.Departures.Query.Params
+  alias Screens.Alerts.Alert
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{Departures, Dup}
+  alias Screens.Config.V2.Departures
+  alias Screens.Config.V2.Departures.{Headway, Query, Section}
   alias Screens.Config.V2.Dup
   alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.SignsUiConfig
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
@@ -13,6 +17,16 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.V2.WidgetInstance.{DeparturesNoData, NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
+
+  @branch_stations ["place-kencl", "place-jfk", "place-coecl"]
+  @branch_terminals [
+    "Boston College",
+    "Cleveland Circle",
+    "Riverside",
+    "Heath Street",
+    "Ashmont",
+    "Braintree"
+  ]
 
   @impl CandidateGenerator
   def screen_template do
@@ -186,5 +200,86 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       %Placeholder{slot_names: [:main_content_reduced_two], color: :green},
       %Placeholder{slot_names: [:bottom_pane_two], color: :red}
     ]
+  end
+
+  defp fetch_headway_mode(_, _, [], _), do: :inactive
+
+  defp fetch_headway_mode(
+         stop_ids,
+         %{sign_ids: sign_ids, headway_id: headway_id},
+         [section_alert | _],
+         current_time
+       ) do
+    interpreted_alert = interpret_alert(section_alert, stop_ids)
+
+    non_branch_temporary_terminal? =
+      temporary_terminal?(interpreted_alert) and
+        not (branch_station?(stop_ids) and branch_alert?(interpreted_alert))
+
+    signs_ui_headways? = SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids)
+    headway_mode? = non_branch_temporary_terminal? or signs_ui_headways?
+
+    if headway_mode? do
+      time_ranges = SignsUiConfig.State.time_ranges(headway_id)
+      current_time_period = Screens.Util.time_period(current_time)
+
+      case time_ranges do
+        %{^current_time_period => {lo, hi}} ->
+          {:active, {lo, hi}, interpreted_alert.headsign}
+
+        _ ->
+          :inactive
+      end
+    else
+      :inactive
+    end
+  end
+
+  defp temporary_terminal?(section_alert) do
+    # NB: There aren't currently any DUPs at permanent terminals, so we assume all
+    # terminals are temporary. In the future, we'll need to check that the boundary
+    # isn't a normal terminal.
+    match?(%{region: :boundary}, section_alert)
+  end
+
+  defp branch_station?(stop_ids) do
+    case stop_ids do
+      [parent_station_id] -> parent_station_id in MapSet.new(@branch_stations)
+      _ -> false
+    end
+  end
+
+  defp branch_alert?(%{headsign: headsign}) do
+    headsign in MapSet.new(@branch_terminals)
+  end
+
+  defp interpret_alert(alert, [parent_stop_id]) do
+    informed_stop_ids = Enum.into(alert.informed_entities, MapSet.new(), & &1.stop)
+
+    {region, headsign} =
+      :screens
+      |> Application.get_env(:dup_alert_headsign_matchers)
+      |> Map.get(parent_stop_id)
+      |> Enum.find_value({:inside, nil}, fn {informed, not_informed, headsign} ->
+        if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
+          do: {:boundary, headsign},
+          else: false
+      end)
+
+    %{
+      cause: alert.cause,
+      effect: alert.effect,
+      region: region,
+      headsign: headsign
+    }
+  end
+
+  defp to_set(stop_id) when is_binary(stop_id), do: MapSet.new([stop_id])
+  defp to_set(stop_ids) when is_list(stop_ids), do: MapSet.new(stop_ids)
+  defp to_set(%MapSet{} = already_a_set), do: already_a_set
+
+  defp alert_region_match?(informed, not_informed, informed_stop_ids) do
+    MapSet.subset?(informed, informed_stop_ids) and
+      MapSet.disjoint?(not_informed, informed_stop_ids)
   end
 end
