@@ -1,26 +1,29 @@
 defmodule Screens.V2.CandidateGenerator.DupTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config.{Screen, V2}
+  alias Screens.Config.Screen
+  alias Screens.Config.V2.{Departures, Header}
+  alias Screens.Config.V2.Dup, as: DupConfig
   alias Screens.Predictions.Prediction
   alias Screens.V2.Departure
   alias Screens.V2.CandidateGenerator.Dup
-  alias Screens.V2.WidgetInstance.{Departures, NormalHeader}
+  alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.NormalHeader
 
   setup do
     config_primary_and_secondary = %Screen{
-      app_params: %V2.Dup{
-        header: %V2.Header.CurrentStopId{stop_id: "place-gover"},
-        primary_departures: %V2.Departures{
+      app_params: %DupConfig{
+        header: %Header.CurrentStopId{stop_id: "place-gover"},
+        primary_departures: %Departures{
           sections: [
-            %V2.Departures.Section{query: "query A", filter: nil},
-            %V2.Departures.Section{query: "query B", filter: nil}
+            %Departures.Section{query: "query A", filter: nil},
+            %Departures.Section{query: "query B", filter: nil}
           ]
         },
-        secondary_departures: %V2.Departures{
+        secondary_departures: %Departures{
           sections: [
-            %V2.Departures.Section{query: "query C", filter: nil},
-            %V2.Departures.Section{query: "query D", filter: nil}
+            %Departures.Section{query: "query C", filter: nil},
+            %Departures.Section{query: "query D", filter: nil}
           ]
         }
       },
@@ -31,15 +34,15 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
     }
 
     config_only_primary = %Screen{
-      app_params: %V2.Dup{
-        header: %V2.Header.CurrentStopId{stop_id: "place-gover"},
-        primary_departures: %V2.Departures{
+      app_params: %DupConfig{
+        header: %Header.CurrentStopId{stop_id: "place-gover"},
+        primary_departures: %Departures{
           sections: [
-            %V2.Departures.Section{query: "query A", filter: nil},
-            %V2.Departures.Section{query: "query B", filter: nil}
+            %Departures.Section{query: "query A", filter: nil},
+            %Departures.Section{query: "query B", filter: nil}
           ]
         },
-        secondary_departures: %V2.Departures{sections: []}
+        secondary_departures: %Departures{sections: []}
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -48,14 +51,14 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
     }
 
     config_one_section = %Screen{
-      app_params: %V2.Dup{
-        header: %V2.Header.CurrentStopId{stop_id: "place-gover"},
-        primary_departures: %V2.Departures{
+      app_params: %DupConfig{
+        header: %Header.CurrentStopId{stop_id: "place-gover"},
+        primary_departures: %Departures{
           sections: [
-            %V2.Departures.Section{query: "query B", filter: nil}
+            %Departures.Section{query: "query B", filter: nil}
           ]
         },
-        secondary_departures: %V2.Departures{sections: []}
+        secondary_departures: %Departures{sections: []}
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -64,10 +67,10 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
     }
 
     fetch_section_departures_fn = fn
-      %V2.Departures.Section{query: "query A"} ->
+      %Departures.Section{query: "query A"} ->
         {:ok, [%Departure{prediction: %Prediction{id: "A"}}]}
 
-      %V2.Departures.Section{query: "query B"} ->
+      %Departures.Section{query: "query B"} ->
         {:ok,
          [
            %Departure{prediction: %Prediction{id: "B1"}},
@@ -77,10 +80,10 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
            %Departure{prediction: %Prediction{id: "B5"}}
          ]}
 
-      %V2.Departures.Section{query: "query C"} ->
+      %Departures.Section{query: "query C"} ->
         {:ok, [%Departure{prediction: %Prediction{id: "C"}}]}
 
-      %V2.Departures.Section{query: "query D"} ->
+      %Departures.Section{query: "query D"} ->
         {:ok, [%Departure{prediction: %Prediction{id: "D"}}]}
     end
 
@@ -146,10 +149,10 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       fetch_stop_fn = fn "place-gover" -> "Government Center" end
 
       fetch_section_departures_fn = fn
-        %V2.Departures.Section{query: "query A"} -> {:ok, []}
-        %V2.Departures.Section{query: "query B"} -> {:ok, []}
-        %V2.Departures.Section{query: "query C"} -> {:ok, []}
-        %V2.Departures.Section{query: "query D"} -> {:ok, []}
+        %Departures.Section{query: "query A"} -> {:ok, []}
+        %Departures.Section{query: "query B"} -> {:ok, []}
+        %Departures.Section{query: "query C"} -> {:ok, []}
+        %Departures.Section{query: "query D"} -> {:ok, []}
       end
 
       expected_headers =
@@ -164,7 +167,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
         )
 
       expected_departures = [
-        %Departures{
+        %DeparturesWidget{
           screen: config,
           section_data: [
             %{type: :normal_section, rows: []},
@@ -172,7 +175,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           ],
           slot_names: [:main_content_zero]
         },
-        %Departures{
+        %DeparturesWidget{
           screen: config,
           section_data: [
             %{type: :normal_section, rows: []},
@@ -180,7 +183,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           ],
           slot_names: [:main_content_one]
         },
-        %Departures{
+        %DeparturesWidget{
           screen: config,
           section_data: [
             %{type: :normal_section, rows: []},
@@ -234,7 +237,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       fetch_section_departures_fn: fetch_section_departures_fn
     } do
       expected_departures = [
-        %Departures{
+        %DeparturesWidget{
           screen: config,
           section_data: [
             %{
@@ -262,7 +265,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           ],
           slot_names: [:main_content_zero]
         },
-        %Departures{
+        %DeparturesWidget{
           screen: config,
           section_data: [
             %{
@@ -290,7 +293,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           ],
           slot_names: [:main_content_one]
         },
-        %Departures{
+        %DeparturesWidget{
           screen: config,
           section_data: [
             %{
@@ -330,7 +333,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       fetch_section_departures_fn: fetch_section_departures_fn
     } do
       expected_departures = [
-        %Departures{
+        %DeparturesWidget{
           screen: config,
           section_data: [
             %{
@@ -358,7 +361,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           ],
           slot_names: [:main_content_zero]
         },
-        %Departures{
+        %DeparturesWidget{
           screen: config,
           section_data: [
             %{
@@ -386,7 +389,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           ],
           slot_names: [:main_content_one]
         },
-        %Departures{
+        %DeparturesWidget{
           screen: config,
           section_data: [
             %{
@@ -430,7 +433,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       fetch_section_departures_fn: fetch_section_departures_fn
     } do
       expected_departures = [
-        %Departures{
+        %DeparturesWidget{
           screen: config,
           section_data: [
             %{
@@ -457,7 +460,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           ],
           slot_names: [:main_content_zero]
         },
-        %Departures{
+        %DeparturesWidget{
           screen: config,
           section_data: [
             %{
@@ -484,7 +487,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           ],
           slot_names: [:main_content_one]
         },
-        %Departures{
+        %DeparturesWidget{
           screen: config,
           section_data: [
             %{
