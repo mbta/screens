@@ -174,4 +174,8 @@ defmodule Screens.Util do
       _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
     end
   end
+
+  def append_if(list, condition, item) do
+    if condition, do: list ++ [item], else: list
+  end
 end
