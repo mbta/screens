@@ -104,7 +104,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         }
       else
         %FreeTextLine{
-          icon: :orange,
+          icon: pill,
           text: ["every", %{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
         }
       end
