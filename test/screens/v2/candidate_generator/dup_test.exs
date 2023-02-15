@@ -4,7 +4,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{Departures, Header}
-  alias Screens.Config.V2.Departures.{Headway, Section, Query}
+  alias Screens.Config.V2.Departures.{Headway, Query, Section}
   alias Screens.Config.V2.Dup, as: DupConfig
   alias Screens.Predictions.Prediction
   alias Screens.V2.Departure

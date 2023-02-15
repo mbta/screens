@@ -1,11 +1,11 @@
 defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
-  alias Screens.Config.V2.Departures.Query.Params
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.Departures
   alias Screens.Config.V2.Departures.{Headway, Query, Section}
+  alias Screens.Config.V2.Departures.Query.Params
   alias Screens.Config.V2.Dup
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.SignsUiConfig
