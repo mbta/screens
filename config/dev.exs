@@ -27,6 +27,7 @@ config :screens,
   config_fetcher: Screens.Config.State.LocalFetch,
   last_deploy_fetcher: Screens.Util.LastDeploy.LocalFetch,
   local_config_file_spec: {:priv, "local.json"},
+  local_signs_ui_config_file_spec: {:priv, "signs_ui_config.json"},
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.LocalFetch
 
 config :screens, ScreensWeb.AuthManager, secret_key: "secret key"
