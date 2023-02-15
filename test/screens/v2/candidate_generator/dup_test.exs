@@ -88,11 +88,18 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
         {:ok, [%Departure{prediction: %Prediction{id: "D"}}]}
     end
 
+    # params = Map.from_struct(struct(Query.Params))
+
+    fetch_alerts_or_empty_list_fn = fn
+      _ -> []
+    end
+
     %{
       config_primary_and_secondary: config_primary_and_secondary,
       config_only_primary: config_only_primary,
       config_one_section: config_one_section,
-      fetch_section_departures_fn: fetch_section_departures_fn
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_alerts_or_empty_list_fn: fetch_alerts_or_empty_list_fn
     }
   end
 
@@ -144,7 +151,8 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
 
   describe "candidate_instances/4" do
     test "returns expected header and departures", %{
-      config_primary_and_secondary: config
+      config_primary_and_secondary: config,
+      fetch_alerts_or_empty_list_fn: fetch_alerts_or_empty_list_fn
     } do
       now = ~U[2020-04-06T10:00:00Z]
       fetch_stop_fn = fn "place-gover" -> "Government Center" end
@@ -199,7 +207,8 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           config,
           now,
           fetch_stop_fn,
-          fetch_section_departures_fn
+          fetch_section_departures_fn,
+          fetch_alerts_or_empty_list_fn
         )
 
       assert Enum.all?(expected_headers, &Enum.member?(actual_instances, &1))
@@ -232,11 +241,14 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
     end
   end
 
-  describe "departures_instances/2" do
+  describe "departures_instances/4" do
     test "returns primary and secondary departures", %{
       config_primary_and_secondary: config,
-      fetch_section_departures_fn: fetch_section_departures_fn
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_alerts_or_empty_list_fn: fetch_alerts_or_empty_list_fn
     } do
+      now = ~U[2020-04-06T10:00:00Z]
+
       expected_departures = [
         %DeparturesWidget{
           screen: config,
@@ -323,7 +335,9 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       actual_instances =
         Dup.departures_instances(
           config,
-          fetch_section_departures_fn
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_or_empty_list_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -331,8 +345,11 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
 
     test "returns only primary departures if secondary is missing", %{
       config_only_primary: config,
-      fetch_section_departures_fn: fetch_section_departures_fn
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_alerts_or_empty_list_fn: fetch_alerts_or_empty_list_fn
     } do
+      now = ~U[2020-04-06T10:00:00Z]
+
       expected_departures = [
         %DeparturesWidget{
           screen: config,
@@ -423,7 +440,9 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       actual_instances =
         Dup.departures_instances(
           config,
-          fetch_section_departures_fn
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_or_empty_list_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -431,8 +450,11 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
 
     test "returns 4 departures if only one section", %{
       config_one_section: config,
-      fetch_section_departures_fn: fetch_section_departures_fn
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_alerts_or_empty_list_fn: fetch_alerts_or_empty_list_fn
     } do
+      now = ~U[2020-04-06T10:00:00Z]
+
       expected_departures = [
         %DeparturesWidget{
           screen: config,
@@ -520,7 +542,9 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       actual_instances =
         Dup.departures_instances(
           config,
-          fetch_section_departures_fn
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_or_empty_list_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
