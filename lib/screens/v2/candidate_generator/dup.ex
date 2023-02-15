@@ -257,12 +257,9 @@ defmodule Screens.V2.CandidateGenerator.Dup do
        ) do
     interpreted_alert = interpret_alert(section_alert, stop_ids)
 
-    non_branch_temporary_terminal? =
+    headway_mode? =
       temporary_terminal?(interpreted_alert) and
         not (branch_station?(stop_ids) and branch_alert?(interpreted_alert))
-
-    signs_ui_headways? = SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids)
-    headway_mode? = non_branch_temporary_terminal? or signs_ui_headways?
 
     if headway_mode? do
       time_ranges = SignsUiConfig.State.time_ranges(headway_id)
