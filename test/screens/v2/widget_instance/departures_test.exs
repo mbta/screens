@@ -79,9 +79,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         icon: "subway-negative-black",
         text: [
           %{color: :red, text: "Red Line"},
-          "Test trains",
           %{special: :break},
-          "every",
+          "Test trains every",
           %{format: :bold, text: "1-2"},
           "minutes"
         ]
