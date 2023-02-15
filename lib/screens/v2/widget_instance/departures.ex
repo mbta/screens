@@ -95,9 +95,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
               color: pill,
               text: "#{String.capitalize("#{pill}")} Line"
             },
-            "#{headsign} trains",
             %{special: :break},
-            "every",
+            "#{headsign} trains every",
             %{format: :bold, text: "#{lo}-#{hi}"},
             "minutes"
           ]
