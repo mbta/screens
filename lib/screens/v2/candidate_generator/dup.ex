@@ -92,13 +92,19 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         config,
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
-        fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1
+        fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
+        fetch_alerts_or_empty_list_fn \\ Alert.fetch_or_empty_list() / 1
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
       fn -> placeholder_instances() end,
       fn ->
-        departures_instances(config, now, fetch_section_departures_fn)
+        departures_instances(
+          config,
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_or_empty_list_fn
+        )
       end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
@@ -128,15 +134,25 @@ defmodule Screens.V2.CandidateGenerator.Dup do
           }
         } = config,
         now,
-        fetch_section_departures_fn
+        fetch_section_departures_fn,
+        fetch_alerts_or_empty_list_fn
       ) do
-    primary_sections_data = get_sections_data(primary_sections, fetch_section_departures_fn)
+    primary_sections_data =
+      get_sections_data(
+        primary_sections,
+        fetch_section_departures_fn,
+        fetch_alerts_or_empty_list_fn
+      )
 
     secondary_sections_data =
       if secondary_sections == [] do
         primary_sections_data
       else
-        get_sections_data(secondary_sections, fetch_section_departures_fn)
+        get_sections_data(
+          secondary_sections,
+          fetch_section_departures_fn,
+          fetch_alerts_or_empty_list_fn
+        )
       end
 
     primary_departures_instances =
@@ -196,7 +212,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     end
   end
 
-  defp get_sections_data(sections, fetch_section_departures_fn) do
+  defp get_sections_data(sections, fetch_section_departures_fn, fetch_alerts_or_empty_list_fn) do
     Enum.map(sections, fn %Section{
                             query: %Query{params: %Params{stop_ids: stop_ids} = params},
                             headway: %Headway{pill: pill} = headway
@@ -205,7 +221,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
       section_alerts =
         alert_fetch_params
-        |> Alert.fetch_or_empty_list()
+        |> fetch_alerts_or_empty_list_fn.()
         |> Enum.filter(fn
           %Alert{effect: effect} when effect in [:suspension, :shuttle] -> true
           _ -> false
