@@ -75,6 +75,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def audio_view(_instance), do: ScreensWeb.V2.Audio.DeparturesView
   end
 
+  def serialize_section(section, screen, is_only_section \\ false)
+
   def serialize_section(%{type: :notice_section, text: text}, _screen, _) do
     %{type: :notice_section, text: text}
   end

@@ -20,7 +20,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
   end
 
-  describe "serialize_section/1" do
+  describe "serialize_section/2" do
     setup do
       %{
         bus_shelter_screen: %Screen{
