@@ -182,7 +182,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         Enum.map(sections_data, fn %{
                                      departures: departures,
                                      pill: pill,
-                                     alerts: alerts,
+                                     alert: alert,
                                      headway: headway,
                                      stop_ids: stop_ids
                                    } ->
@@ -193,7 +193,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
               Enum.take(departures, 4)
             end
 
-          case fetch_headway_mode(stop_ids, headway, alerts, now) do
+          case fetch_headway_mode(stop_ids, headway, alert, now) do
             {:active, time_range, headsign} ->
               %{type: :headway_section, pill: pill, time_range: time_range, headsign: headsign}
 
@@ -219,20 +219,21 @@ defmodule Screens.V2.CandidateGenerator.Dup do
                           } = section ->
       alert_fetch_params = params |> Map.from_struct() |> Enum.into([])
 
-      section_alerts =
+      section_alert =
         alert_fetch_params
         |> fetch_alerts_or_empty_list_fn.()
         |> Enum.filter(fn
           %Alert{effect: effect} when effect in [:suspension, :shuttle] -> true
           _ -> false
         end)
+        |> List.first()
 
       {:ok, section_departures} = section |> fetch_section_departures_fn.()
 
       %{
         departures: section_departures,
         pill: pill,
-        alerts: section_alerts,
+        alert: section_alert,
         headway: headway,
         stop_ids: stop_ids
       }
@@ -247,12 +248,12 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     ]
   end
 
-  defp fetch_headway_mode(_, _, [], _), do: :inactive
+  defp fetch_headway_mode(_, _, nil, _), do: :inactive
 
   defp fetch_headway_mode(
          stop_ids,
-         %{sign_ids: sign_ids, headway_id: headway_id},
-         [section_alert | _],
+         %Headway{headway_id: headway_id},
+         section_alert,
          current_time
        ) do
     interpreted_alert = interpret_alert(section_alert, stop_ids)
