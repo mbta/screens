@@ -157,3 +157,20 @@ This approach would require giving the `CandidateGenerator` business logic neede
 [^2]: A `partial` alert takes up only a small amount of the screen to allow for other departures to remain visible.
 [^3]: A `takeover` alert displays over the whole screen including the departures.
 [^4]: Priority for DUP alerts is pick a shuttle alert if present. Otherwise, pick the first in the list.
+
+# Addendums
+
+2.7.23: The DUP spec has been adjusted, so the takeover alert serialization function was adjusted. 
+
+`serialize_takeover_alert/1` returns:
+
+```
+%{
+    alert_text: %FreeTextLine{icon: :warning, text: ...},
+    remedy: %FreeTextLine{icon: :shuttle | nil, text: ...},
+    header: %{
+        text: String.t(),
+        color: :red | :orange | :green | :blue
+    }
+}
+```

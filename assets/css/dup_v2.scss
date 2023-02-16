@@ -22,6 +22,10 @@
 @import "v2/dup/departures/alerts";
 @import "v2/dup/departures/route_pill";
 
+@import "v2/dup/alert/partial_alert.scss";
+@import "v2/dup/alert/full_screen_alert.scss";
+@import "v2/dup/alert/free_text.scss";
+
 @import "v2/multi_screen_page";
 
 body {
