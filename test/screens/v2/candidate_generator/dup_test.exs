@@ -563,7 +563,6 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
         [
           direction_id: :both,
           route_ids: [],
-          route_type: nil,
           route_types: [:light_rail, :subway],
           stop_ids: ["stop B"]
         ] ->
