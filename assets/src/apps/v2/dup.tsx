@@ -17,6 +17,7 @@ import NormalHeader from "Components/v2/dup/normal_header";
 import NormalDepartures from "Components/v2/dup/departures/normal_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import Viewport from "Components/v2/dup/viewport";
+import EvergreenContent from "Components/v2/evergreen_content";
 import RotationNormal from "Components/v2/dup/rotation_normal";
 import RotationTakeover from "Components/v2/dup/rotation_takeover";
 import NormalBody from "Components/v2/dup/normal_body";
@@ -42,8 +43,9 @@ const TYPE_TO_COMPONENT = {
   placeholder: Placeholder,
   normal_header: NormalHeader,
   departures: NormalDepartures,
+  evergreen_content: EvergreenContent,
   partial_alert: PartialAlert,
-  takeover_alert: TakeoverAlert
+  takeover_alert: TakeoverAlert,
 };
 
 const App = (): JSX.Element => {
