@@ -10,12 +10,14 @@ const HeadwaySection = ({ text, isOnlySection }) => {
       <div className={className}>
         <FreeText lines={text} />
       </div>
-      <div className="headway-section__link">
-        <div className="headway-section__link-arrow">
-          <LinkArrow width={375} colorHex="#a2a3a3" />
+      {isOnlySection && (
+        <div className="headway-section__link">
+          <div className="headway-section__link-arrow">
+            <LinkArrow width={375} colorHex="#a2a3a3" />
+          </div>
+          <div className="headway-section__link-text">mbta.com/schedules</div>
         </div>
-        <div className="headway-section__link-text">mbta.com/schedules</div>
-      </div>
+      )}
     </div>
   );
 };
