@@ -73,7 +73,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   @impl CandidateGenerator
   def candidate_instances(config, now \\ DateTime.utc_now()) do
     [fn -> header_instances(config, now) end, fn -> placeholder_instances() end]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
+    |> Task.async_stream(& &1.(), ordered: false, timeout: 30_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
