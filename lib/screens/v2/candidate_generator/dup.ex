@@ -299,12 +299,11 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     end
   end
 
-  defp temporary_terminal?(section_alert) do
-    # NB: There aren't currently any DUPs at permanent terminals, so we assume all
-    # terminals are temporary. In the future, we'll need to check that the boundary
-    # isn't a normal terminal.
-    match?(%{region: :boundary}, section_alert)
-  end
+  # NB: There aren't currently any DUPs at permanent terminals, so we assume all
+  # terminals are temporary. In the future, we'll need to check that the boundary
+  # isn't a normal terminal.
+  defp temporary_terminal?(%{region: :boundary}), do: true
+  defp temporary_terminal?(_), do: false
 
   defp branch_station?(stop_ids) do
     case stop_ids do
