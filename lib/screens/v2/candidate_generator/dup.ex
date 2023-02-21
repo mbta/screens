@@ -94,7 +94,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
-        fetch_alerts_or_empty_list_fn \\ &Alert.fetch_or_empty_list/1,
+        fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
@@ -105,7 +105,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_or_empty_list_fn
+          fetch_alerts_fn
         )
       end,
       fn -> evergreen_content_instances_fn.(config) end
@@ -138,13 +138,13 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         } = config,
         now,
         fetch_section_departures_fn,
-        fetch_alerts_or_empty_list_fn
+        fetch_alerts_fn
       ) do
     primary_sections_data =
       get_sections_data(
         primary_sections,
         fetch_section_departures_fn,
-        fetch_alerts_or_empty_list_fn
+        fetch_alerts_fn
       )
 
     secondary_sections_data =
@@ -154,7 +154,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         get_sections_data(
           secondary_sections,
           fetch_section_departures_fn,
-          fetch_alerts_or_empty_list_fn
+          fetch_alerts_fn
         )
       end
 
@@ -215,13 +215,13 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     end
   end
 
-  defp get_sections_data(sections, fetch_section_departures_fn, fetch_alerts_or_empty_list_fn) do
+  defp get_sections_data(sections, fetch_section_departures_fn, fetch_alerts_fn) do
     sections
     |> Task.async_stream(fn %Section{
                               query: %Query{params: %Params{stop_ids: stop_ids} = params},
                               headway: %Headway{pill: pill} = headway
                             } = section ->
-      section_alert = get_section_alert(params, fetch_alerts_or_empty_list_fn)
+      section_alert = get_section_alert(params, fetch_alerts_fn)
 
       section_departures =
         case fetch_section_departures_fn.(section) do
@@ -247,7 +247,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
            direction_id: direction_id,
            route_type: route_type
          },
-         fetch_alerts_or_empty_list_fn
+         fetch_alerts_fn
        ) do
     alert_fetch_params = [
       direction_id: direction_id,
@@ -257,7 +257,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     ]
 
     alert_fetch_params
-    |> fetch_alerts_or_empty_list_fn.()
+    |> fetch_alerts_fn.()
     |> Enum.filter(fn
       # Show a headway message only during shuttles and suspensions at temporary terminals.
       # https://www.notion.so/mbta-downtown-crossing/Departures-Widget-Specification-20da46cd70a44192a568e49ea47e09ac?pvs=4#e43086abaadd465ea8072502d6980d8d
