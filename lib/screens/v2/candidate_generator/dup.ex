@@ -94,7 +94,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
-        fetch_alerts_or_empty_list_fn \\ &Alert.fetch_or_empty_list/1
+        fetch_alerts_or_empty_list_fn \\ &Alert.fetch_or_empty_list/1,
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
@@ -106,7 +107,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
           fetch_section_departures_fn,
           fetch_alerts_or_empty_list_fn
         )
-      end
+      end,
+      fn -> evergreen_content_instances_fn.(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)

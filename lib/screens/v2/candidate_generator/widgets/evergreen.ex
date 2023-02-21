@@ -4,14 +4,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
   alias Screens.Config.Screen
   alias Screens.Config.V2.EvergreenContentItem
   alias Screens.V2.WidgetInstance.EvergreenContent
-  alias Screens.Config.V2.{BusEink, BusShelter, GlEink, PreFare}
+  alias Screens.Config.V2.{BusEink, BusShelter, Dup, GlEink, PreFare}
   alias Screens.Util.Assets
 
   def evergreen_content_instances(
         %Screen{app_params: %app{evergreen_content: evergreen_content}} = config,
         now \\ DateTime.utc_now()
       )
-      when app in [BusEink, BusShelter, GlEink, PreFare] do
+      when app in [BusEink, BusShelter, Dup, GlEink, PreFare] do
     Enum.map(evergreen_content, &evergreen_content_instance(&1, config, now))
   end
 
