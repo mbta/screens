@@ -216,10 +216,11 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   end
 
   defp get_sections_data(sections, fetch_section_departures_fn, fetch_alerts_or_empty_list_fn) do
-    Enum.map(sections, fn %Section{
-                            query: %Query{params: %Params{stop_ids: stop_ids} = params},
-                            headway: %Headway{pill: pill} = headway
-                          } = section ->
+    sections
+    |> Task.async_stream(fn %Section{
+                              query: %Query{params: %Params{stop_ids: stop_ids} = params},
+                              headway: %Headway{pill: pill} = headway
+                            } = section ->
       section_alert = get_section_alert(params, fetch_alerts_or_empty_list_fn)
 
       {:ok, section_departures} = section |> fetch_section_departures_fn.()
@@ -232,6 +233,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         stop_ids: stop_ids
       }
     end)
+    |> Enum.map(fn {:ok, data} -> data end)
   end
 
   defp get_section_alert(
