@@ -1,8 +1,23 @@
 .normal-header {
   position: relative;
-  height: 100%;
+  height: 248px;
   width: 100%;
   background: rgb(23, 31, 38);
+  &--red {
+    background-color: $line-color-red;
+  }
+  &--orange {
+    background-color: $line-color-orange;
+  }
+  &--green {
+    background-color: $line-color-green;
+  }
+  &--blue {
+    background-color: $line-color-blue;
+  }
+  &--teal {
+    background-color: $line-color-ferry;
+  }
 }
 
 .normal-header-icon {
@@ -51,4 +66,14 @@
   left: 8px;
   color: #ffffff;
   opacity: 0.33;
+}
+
+.normal-header__accent-pattern-container {
+  position: absolute;
+  right: 0;
+  display: inline-block;
+}
+
+.normal-header__accent-pattern-image {
+  height: 248px;
 }

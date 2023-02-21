@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
+  alias Screens.Util
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.Departures
@@ -93,7 +94,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
-        fetch_alerts_or_empty_list_fn \\ &Alert.fetch_or_empty_list/1
+        fetch_alerts_or_empty_list_fn \\ &Alert.fetch_or_empty_list/1,
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
@@ -105,7 +107,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
           fetch_section_departures_fn,
           fetch_alerts_or_empty_list_fn
         )
-      end
+      end,
+      fn -> evergreen_content_instances_fn.(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
@@ -217,16 +220,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
                             query: %Query{params: %Params{stop_ids: stop_ids} = params},
                             headway: %Headway{pill: pill} = headway
                           } = section ->
-      alert_fetch_params = params |> Map.from_struct() |> Enum.into([])
-
-      section_alert =
-        alert_fetch_params
-        |> fetch_alerts_or_empty_list_fn.()
-        |> Enum.filter(fn
-          %Alert{effect: effect} when effect in [:suspension, :shuttle] -> true
-          _ -> false
-        end)
-        |> List.first()
+      section_alert = get_section_alert(params, fetch_alerts_or_empty_list_fn)
 
       {:ok, section_departures} = section |> fetch_section_departures_fn.()
 
@@ -238,6 +232,31 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         stop_ids: stop_ids
       }
     end)
+  end
+
+  defp get_section_alert(
+         %Params{
+           stop_ids: stop_ids,
+           route_ids: route_ids,
+           direction_id: direction_id,
+           route_type: route_type
+         },
+         fetch_alerts_or_empty_list_fn
+       ) do
+    alert_fetch_params = [
+      direction_id: direction_id,
+      route_ids: route_ids,
+      route_types: Util.append_if([:light_rail, :subway], not is_nil(route_type), route_type),
+      stop_ids: stop_ids
+    ]
+
+    alert_fetch_params
+    |> fetch_alerts_or_empty_list_fn.()
+    |> Enum.filter(fn
+      %Alert{effect: effect} when effect in [:suspension, :shuttle] -> true
+      _ -> false
+    end)
+    |> List.first()
   end
 
   defp placeholder_instances do

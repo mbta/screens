@@ -32,6 +32,7 @@ import BodyLeftTakeover from "Components/v2/pre_fare/body_left_takeover";
 import BodyRightTakeover from "Components/v2/pre_fare/body_right_takeover";
 import BodyTakeover from "Components/v2/pre_fare/body_takeover";
 import ScreenTakeover from "Components/v2/pre_fare/screen_takeover";
+import ScreenSplitTakeover from "Components/v2/pre_fare/screen_split_takeover";
 import ElevatorStatus from "Components/v2/elevator_status";
 import FullLineMap from "Components/v2/full_line_map";
 import SubwayStatus from "Components/v2/subway_status";
@@ -50,6 +51,7 @@ import BlueBikes from "Components/v2/blue_bikes";
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
   screen_takeover: ScreenTakeover,
+  screen_split_takeover: ScreenSplitTakeover,
   body_normal: NormalBody,
   body_takeover: BodyTakeover,
   body_left_normal: NormalBodyLeft,

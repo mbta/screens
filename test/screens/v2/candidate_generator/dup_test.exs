@@ -560,7 +560,12 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       now = ~U[2020-04-06T10:00:00Z]
 
       fetch_alerts_or_empty_list_fn = fn
-        [direction_id: :both, route_ids: [], route_type: nil, stop_ids: ["stop B"]] ->
+        [
+          direction_id: :both,
+          route_ids: [],
+          route_types: [:light_rail, :subway],
+          stop_ids: ["stop B"]
+        ] ->
           [
             struct(Alert,
               effect: :suspension,
