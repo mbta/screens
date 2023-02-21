@@ -1,7 +1,6 @@
 defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
-  alias Screens.Util
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.Departures
@@ -11,6 +10,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.SignsUiConfig
   alias Screens.Stops.Stop
+  alias Screens.Util
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
