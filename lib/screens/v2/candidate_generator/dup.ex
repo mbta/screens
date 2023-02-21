@@ -255,6 +255,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     alert_fetch_params
     |> fetch_alerts_or_empty_list_fn.()
     |> Enum.filter(fn
+      # Show a headway message only during shuttles and suspensions at temporary terminals.
+      # https://www.notion.so/mbta-downtown-crossing/Departures-Widget-Specification-20da46cd70a44192a568e49ea47e09ac?pvs=4#e43086abaadd465ea8072502d6980d8d
       %Alert{effect: effect} when effect in [:suspension, :shuttle] -> true
       _ -> false
     end)
