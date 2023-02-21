@@ -1,0 +1,21 @@
+.screen-split-takeover {
+  position: relative;
+}
+
+.screen-split-takeover__full-left-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+}
+
+.screen-split-takeover__full-right-screen {
+  position: absolute;
+  top: 0;
+  left: 1080px;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+}
