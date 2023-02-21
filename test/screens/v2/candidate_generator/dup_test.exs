@@ -58,9 +58,9 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
         primary_departures: %Departures{
           sections: [
             %Section{
-              query: %Query{params: %Query.Params{stop_ids: ["stop B"]}},
+              query: %Query{params: %Query.Params{stop_ids: ["stop B"], route_ids: ["Red"]}},
               filter: nil,
-              headway: %Headway{headway_id: "red_trunk", pill: :red}
+              headway: %Headway{headway_id: "red_trunk"}
             }
           ]
         },
@@ -562,8 +562,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       fetch_alerts_fn = fn
         [
           direction_id: :both,
-          route_ids: [],
-          route_types: [:light_rail, :subway],
+          route_ids: ["Red"],
           stop_ids: ["stop B"]
         ] ->
           [

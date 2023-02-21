@@ -10,7 +10,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.SignsUiConfig
   alias Screens.Stops.Stop
-  alias Screens.Util
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
@@ -218,20 +217,24 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   defp get_sections_data(sections, fetch_section_departures_fn, fetch_alerts_fn) do
     sections
     |> Task.async_stream(fn %Section{
-                              query: %Query{params: %Params{stop_ids: stop_ids} = params},
-                              headway: %Headway{pill: pill} = headway
+                              query: %Query{
+                                params: %Params{stop_ids: stop_ids, route_ids: route_ids} = params
+                              },
+                              headway: headway
                             } = section ->
-      section_alert = get_section_alert(params, fetch_alerts_fn)
-
       section_departures =
         case fetch_section_departures_fn.(section) do
           {:ok, section_departures} -> section_departures
           _ -> []
         end
 
+      section_route = get_section_route(route_ids)
+
+      section_alert = get_section_alert(params, section_route, fetch_alerts_fn)
+
       %{
         departures: section_departures,
-        pill: pill,
+        pill: section_route,
         alert: section_alert,
         headway: headway,
         stop_ids: stop_ids
@@ -240,19 +243,30 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     |> Enum.map(fn {:ok, data} -> data end)
   end
 
+  defp get_section_route(route_ids) do
+    case route_ids do
+      ["Orange"] -> :orange
+      ["Red"] -> :red
+      ["Blue"] -> :blue
+      ["Green" <> _ | _] -> :green
+      _ -> nil
+    end
+  end
+
+  defp get_section_alert(_, nil, _), do: nil
+
   defp get_section_alert(
          %Params{
            stop_ids: stop_ids,
            route_ids: route_ids,
-           direction_id: direction_id,
-           route_type: route_type
+           direction_id: direction_id
          },
+         _route_id,
          fetch_alerts_fn
        ) do
     alert_fetch_params = [
       direction_id: direction_id,
       route_ids: route_ids,
-      route_types: Util.append_if([:light_rail, :subway], not is_nil(route_type), route_type),
       stop_ids: stop_ids
     ]
 
