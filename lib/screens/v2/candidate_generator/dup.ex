@@ -223,7 +223,11 @@ defmodule Screens.V2.CandidateGenerator.Dup do
                             } = section ->
       section_alert = get_section_alert(params, fetch_alerts_or_empty_list_fn)
 
-      {:ok, section_departures} = section |> fetch_section_departures_fn.()
+      section_departures =
+        case fetch_section_departures_fn.(section) do
+          {:ok, section_departures} -> section_departures
+          _ -> []
+        end
 
       %{
         departures: section_departures,
