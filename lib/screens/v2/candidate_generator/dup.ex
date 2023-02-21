@@ -196,7 +196,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
               Enum.take(departures, 4)
             end
 
-          case fetch_headway_mode(stop_ids, headway, alert, now) do
+          case get_headway_mode(stop_ids, headway, alert, now) do
             {:active, time_range, headsign} ->
               %{type: :headway_section, pill: pill, time_range: time_range, headsign: headsign}
 
@@ -269,9 +269,9 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     ]
   end
 
-  defp fetch_headway_mode(_, _, nil, _), do: :inactive
+  defp get_headway_mode(_, _, nil, _), do: :inactive
 
-  defp fetch_headway_mode(
+  defp get_headway_mode(
          stop_ids,
          %Headway{headway_id: headway_id},
          section_alert,
