@@ -10,7 +10,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.SignsUiConfig
   alias Screens.Stops.Stop
-  alias Screens.Util
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
@@ -94,7 +93,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
-        fetch_alerts_or_empty_list_fn \\ &Alert.fetch_or_empty_list/1,
+        fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
@@ -105,7 +104,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_or_empty_list_fn
+          fetch_alerts_fn
         )
       end,
       fn -> evergreen_content_instances_fn.(config) end
@@ -138,13 +137,13 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         } = config,
         now,
         fetch_section_departures_fn,
-        fetch_alerts_or_empty_list_fn
+        fetch_alerts_fn
       ) do
     primary_sections_data =
       get_sections_data(
         primary_sections,
         fetch_section_departures_fn,
-        fetch_alerts_or_empty_list_fn
+        fetch_alerts_fn
       )
 
     secondary_sections_data =
@@ -154,7 +153,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         get_sections_data(
           secondary_sections,
           fetch_section_departures_fn,
-          fetch_alerts_or_empty_list_fn
+          fetch_alerts_fn
         )
       end
 
@@ -196,7 +195,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
               Enum.take(departures, 4)
             end
 
-          case fetch_headway_mode(stop_ids, headway, alert, now) do
+          case get_headway_mode(stop_ids, headway, alert, now) do
             {:active, time_range, headsign} ->
               %{type: :headway_section, pill: pill, time_range: time_range, headsign: headsign}
 
@@ -215,44 +214,67 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     end
   end
 
-  defp get_sections_data(sections, fetch_section_departures_fn, fetch_alerts_or_empty_list_fn) do
-    Enum.map(sections, fn %Section{
-                            query: %Query{params: %Params{stop_ids: stop_ids} = params},
-                            headway: %Headway{pill: pill} = headway
-                          } = section ->
-      section_alert = get_section_alert(params, fetch_alerts_or_empty_list_fn)
+  defp get_sections_data(sections, fetch_section_departures_fn, fetch_alerts_fn) do
+    sections
+    |> Task.async_stream(fn %Section{
+                              query: %Query{
+                                params: %Params{stop_ids: stop_ids, route_ids: route_ids} = params
+                              },
+                              headway: headway
+                            } = section ->
+      section_departures =
+        case fetch_section_departures_fn.(section) do
+          {:ok, section_departures} -> section_departures
+          _ -> []
+        end
 
-      {:ok, section_departures} = section |> fetch_section_departures_fn.()
+      section_route = get_section_route(route_ids)
+
+      section_alert = get_section_alert(params, section_route, fetch_alerts_fn)
 
       %{
         departures: section_departures,
-        pill: pill,
+        pill: section_route,
         alert: section_alert,
         headway: headway,
         stop_ids: stop_ids
       }
     end)
+    |> Enum.map(fn {:ok, data} -> data end)
   end
+
+  defp get_section_route(route_ids) do
+    case route_ids do
+      ["Orange"] -> :orange
+      ["Red"] -> :red
+      ["Blue"] -> :blue
+      ["Green" <> _ | _] -> :green
+      _ -> nil
+    end
+  end
+
+  defp get_section_alert(_, nil, _), do: nil
 
   defp get_section_alert(
          %Params{
            stop_ids: stop_ids,
            route_ids: route_ids,
-           direction_id: direction_id,
-           route_type: route_type
+           direction_id: direction_id
          },
-         fetch_alerts_or_empty_list_fn
+         _route_id,
+         fetch_alerts_fn
        ) do
     alert_fetch_params = [
       direction_id: direction_id,
       route_ids: route_ids,
-      route_types: Util.append_if([:light_rail, :subway], not is_nil(route_type), route_type),
       stop_ids: stop_ids
     ]
 
     alert_fetch_params
-    |> fetch_alerts_or_empty_list_fn.()
+    |> fetch_alerts_fn.()
     |> Enum.filter(fn
+      # Show a headway message only during shuttles and suspensions at temporary terminals.
+      # https://www.notion.so/mbta-downtown-crossing/Departures-Widget-Specification-20da46cd70a44192a568e49ea47e09ac?pvs=4#e43086abaadd465ea8072502d6980d8d
       %Alert{effect: effect} when effect in [:suspension, :shuttle] -> true
       _ -> false
     end)
@@ -267,9 +289,9 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     ]
   end
 
-  defp fetch_headway_mode(_, _, nil, _), do: :inactive
+  defp get_headway_mode(_, _, nil, _), do: :inactive
 
-  defp fetch_headway_mode(
+  defp get_headway_mode(
          stop_ids,
          %Headway{headway_id: headway_id},
          section_alert,
@@ -297,12 +319,11 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     end
   end
 
-  defp temporary_terminal?(section_alert) do
-    # NB: There aren't currently any DUPs at permanent terminals, so we assume all
-    # terminals are temporary. In the future, we'll need to check that the boundary
-    # isn't a normal terminal.
-    match?(%{region: :boundary}, section_alert)
-  end
+  # NB: There aren't currently any DUPs at permanent terminals, so we assume all
+  # terminals are temporary. In the future, we'll need to check that the boundary
+  # isn't a normal terminal.
+  defp temporary_terminal?(%{region: :boundary}), do: true
+  defp temporary_terminal?(_), do: false
 
   defp branch_station?(stop_ids) do
     case stop_ids do

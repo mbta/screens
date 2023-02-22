@@ -58,9 +58,9 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
         primary_departures: %Departures{
           sections: [
             %Section{
-              query: %Query{params: %Query.Params{stop_ids: ["stop B"]}},
+              query: %Query{params: %Query.Params{stop_ids: ["stop B"], route_ids: ["Red"]}},
               filter: nil,
-              headway: %Headway{headway_id: "red_trunk", pill: :red}
+              headway: %Headway{headway_id: "red_trunk"}
             }
           ]
         },
@@ -93,7 +93,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
         {:ok, [%Departure{prediction: %Prediction{id: "D"}}]}
     end
 
-    fetch_alerts_or_empty_list_fn = fn
+    fetch_alerts_fn = fn
       _ -> []
     end
 
@@ -102,7 +102,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       config_only_primary: config_only_primary,
       config_one_section: config_one_section,
       fetch_section_departures_fn: fetch_section_departures_fn,
-      fetch_alerts_or_empty_list_fn: fetch_alerts_or_empty_list_fn
+      fetch_alerts_fn: fetch_alerts_fn
     }
   end
 
@@ -155,7 +155,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
   describe "candidate_instances/4" do
     test "returns expected header and departures", %{
       config_primary_and_secondary: config,
-      fetch_alerts_or_empty_list_fn: fetch_alerts_or_empty_list_fn
+      fetch_alerts_fn: fetch_alerts_fn
     } do
       now = ~U[2020-04-06T10:00:00Z]
       fetch_stop_fn = fn "place-gover" -> "Government Center" end
@@ -211,7 +211,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           now,
           fetch_stop_fn,
           fetch_section_departures_fn,
-          fetch_alerts_or_empty_list_fn
+          fetch_alerts_fn
         )
 
       assert Enum.all?(expected_headers, &Enum.member?(actual_instances, &1))
@@ -248,7 +248,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
     test "returns primary and secondary departures", %{
       config_primary_and_secondary: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
-      fetch_alerts_or_empty_list_fn: fetch_alerts_or_empty_list_fn
+      fetch_alerts_fn: fetch_alerts_fn
     } do
       now = ~U[2020-04-06T10:00:00Z]
 
@@ -340,7 +340,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_or_empty_list_fn
+          fetch_alerts_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -349,7 +349,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
     test "returns only primary departures if secondary is missing", %{
       config_only_primary: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
-      fetch_alerts_or_empty_list_fn: fetch_alerts_or_empty_list_fn
+      fetch_alerts_fn: fetch_alerts_fn
     } do
       now = ~U[2020-04-06T10:00:00Z]
 
@@ -445,7 +445,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_or_empty_list_fn
+          fetch_alerts_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -454,7 +454,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
     test "returns 4 departures if only one section", %{
       config_one_section: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
-      fetch_alerts_or_empty_list_fn: fetch_alerts_or_empty_list_fn
+      fetch_alerts_fn: fetch_alerts_fn
     } do
       now = ~U[2020-04-06T10:00:00Z]
 
@@ -547,7 +547,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_or_empty_list_fn
+          fetch_alerts_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -559,11 +559,10 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
     } do
       now = ~U[2020-04-06T10:00:00Z]
 
-      fetch_alerts_or_empty_list_fn = fn
+      fetch_alerts_fn = fn
         [
           direction_id: :both,
-          route_ids: [],
-          route_types: [:light_rail, :subway],
+          route_ids: ["Red"],
           stop_ids: ["stop B"]
         ] ->
           [
@@ -618,7 +617,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_or_empty_list_fn
+          fetch_alerts_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))

@@ -7,13 +7,11 @@ defmodule Screens.Config.V2.Departures.Headway do
 
   @type t :: %__MODULE__{
           headway_id: headway_id,
-          override: override,
-          pill: :red | :orange | :green | :blue
+          override: override
         }
 
   defstruct headway_id: nil,
-            override: nil,
-            pill: nil
+            override: nil
 
   use Screens.Config.Struct, with_default: true
 
