@@ -251,6 +251,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       %{route: route, stop: ^stop_id} -> route
       _ -> nil
     end)
+    |> String.downcase()
     |> String.to_atom()
   end
 
