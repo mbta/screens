@@ -218,7 +218,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     sections
     |> Task.async_stream(fn %Section{
                               query: %Query{
-                                params: %Params{stop_ids: stop_ids, route_ids: route_ids} = params
+                                params: %Params{stop_ids: stop_ids} = params
                               },
                               headway: headway
                             } = section ->
@@ -228,9 +228,9 @@ defmodule Screens.V2.CandidateGenerator.Dup do
           _ -> []
         end
 
-      section_route = get_section_route(route_ids, stop_ids)
+      section_alert = get_section_alert(params, fetch_alerts_fn)
 
-      section_alert = get_section_alert(params, section_route, fetch_alerts_fn)
+      section_route = get_section_route_from_alert(stop_ids, section_alert)
 
       %{
         departures: section_departures,
@@ -243,30 +243,18 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     |> Enum.map(fn {:ok, data} -> data end)
   end
 
-  defp get_section_route([], ["place-" <> _ = stop_id]) do
-    case Screens.Stops.Stop.fetch_routes_serving_stop(stop_id) do
-      {:ok, routes} ->
-        routes
-        |> Enum.filter(&(&1.type in [:light_rail, :subway]))
-        |> Enum.map(& &1.id)
-        |> List.first()
-
-      _ ->
-        nil
-    end
-  end
-
-  defp get_section_route(route_ids, _stop_ids) do
-    case route_ids do
-      ["Orange"] -> :orange
-      ["Red"] -> :red
-      ["Blue"] -> :blue
-      ["Green" <> _ | _] -> :green
+  defp get_section_route_from_alert(["place-" <> _ = stop_id], %Alert{
+         informed_entities: informed_entities
+       }) do
+    informed_entities
+    |> Enum.find_value(fn
+      %{route: route, stop: ^stop_id} -> route
       _ -> nil
-    end
+    end)
+    |> String.to_atom()
   end
 
-  defp get_section_alert(_, nil, _), do: nil
+  defp get_section_route_from_alert(_, _), do: nil
 
   defp get_section_alert(
          %Params{
@@ -274,7 +262,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
            route_ids: route_ids,
            direction_id: direction_id
          },
-         _route_id,
          fetch_alerts_fn
        ) do
     alert_fetch_params = [
