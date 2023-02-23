@@ -114,6 +114,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
+  ### Start Header
+
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
 
@@ -128,6 +130,10 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
     List.duplicate(%NormalHeader{screen: config, icon: :logo, text: stop_name, time: now}, 3)
   end
+
+  ### End Header
+
+  ### Start Departures
 
   def departures_instances(
         %Screen{
@@ -366,4 +372,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     MapSet.subset?(informed, informed_stop_ids) and
       MapSet.disjoint?(not_informed, informed_stop_ids)
   end
+
+  ### End Departures
 end
