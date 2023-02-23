@@ -244,6 +244,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     |> Enum.map(fn {:ok, data} -> data end)
   end
 
+  # Alert will only have a value for sections that are configured for a station's ID
   defp get_section_route_from_alert(["place-" <> _ = stop_id], %Alert{
          informed_entities: informed_entities
        }) do
