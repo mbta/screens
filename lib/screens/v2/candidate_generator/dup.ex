@@ -10,6 +10,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.SignsUiConfig
   alias Screens.Stops.Stop
+  alias Screens.Util
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
@@ -345,22 +346,20 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       |> Application.get_env(:dup_alert_headsign_matchers)
       |> Map.get(parent_stop_id)
       |> Enum.find_value({:inside, nil}, fn {informed, not_informed, headsign} ->
-        if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
-          do: {:boundary, headsign},
-          else: false
+        if alert_region_match?(
+             Util.to_set(informed),
+             Util.to_set(not_informed),
+             informed_stop_ids
+           ),
+           do: {:boundary, headsign},
+           else: false
       end)
 
     %{
-      cause: alert.cause,
-      effect: alert.effect,
       region: region,
       headsign: headsign
     }
   end
-
-  defp to_set(stop_id) when is_binary(stop_id), do: MapSet.new([stop_id])
-  defp to_set(stop_ids) when is_list(stop_ids), do: MapSet.new(stop_ids)
-  defp to_set(%MapSet{} = already_a_set), do: already_a_set
 
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do
     MapSet.subset?(informed, informed_stop_ids) and
