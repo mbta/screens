@@ -228,7 +228,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
           _ -> []
         end
 
-      section_route = get_section_route(route_ids)
+      section_route = get_section_route(route_ids, stop_ids)
 
       section_alert = get_section_alert(params, section_route, fetch_alerts_fn)
 
@@ -243,7 +243,20 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     |> Enum.map(fn {:ok, data} -> data end)
   end
 
-  defp get_section_route(route_ids) do
+  defp get_section_route([], ["place-" <> _ = stop_id]) do
+    case Screens.Stops.Stop.fetch_routes_serving_stop(stop_id) do
+      {:ok, routes} ->
+        routes
+        |> Enum.filter(&(&1.type in [:light_rail, :subway]))
+        |> Enum.map(& &1.id)
+        |> List.first()
+
+      _ ->
+        nil
+    end
+  end
+
+  defp get_section_route(route_ids, _stop_ids) do
     case route_ids do
       ["Orange"] -> :orange
       ["Red"] -> :red
