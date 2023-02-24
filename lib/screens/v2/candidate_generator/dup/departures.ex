@@ -32,7 +32,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         } = config,
         now,
         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
-        fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1
+        fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1,
+        fetch_schedules_fn \\ &Screens.Schedules.Schedule.fetch/2
       ) do
     primary_departures_instances =
       primary_sections
@@ -40,7 +41,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> sections_data_to_departure_instances(
         config,
         [:main_content_zero, :main_content_one],
-        now
+        now,
+        fetch_schedules_fn
       )
 
     secondary_sections =
@@ -56,13 +58,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> sections_data_to_departure_instances(
         config,
         [:main_content_two],
-        now
+        now,
+        fetch_schedules_fn
       )
 
     primary_departures_instances ++ secondary_departures_instances
   end
 
-  defp sections_data_to_departure_instances(sections_data, config, slot_ids, now) do
+  defp sections_data_to_departure_instances(
+         sections_data,
+         config,
+         slot_ids,
+         now,
+         fetch_schedules_fn
+       ) do
     if Enum.any?(sections_data, &(&1 == :error)) do
       %DeparturesNoData{screen: config, show_alternatives?: true}
     else
@@ -71,7 +80,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
                                      departures: departures,
                                      alert: alert,
                                      headway: headway,
-                                     stop_ids: stop_ids
+                                     stop_ids: stop_ids,
+                                     params: params
                                    } ->
           visible_departures =
             if length(sections_data) > 1 do
@@ -79,6 +89,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
             else
               Enum.take(departures, 4)
             end
+
+          show_overnight_mode?([], params, alert, now, fetch_schedules_fn)
 
           case get_headway_mode(stop_ids, headway, alert, now) do
             {:active, time_range, headsign} ->
@@ -107,9 +119,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   defp get_sections_data(sections, fetch_section_departures_fn, fetch_alerts_fn, now) do
     sections
     |> Task.async_stream(fn %Section{
-                              query: %Query{
-                                params: %Params{stop_ids: stop_ids} = params
-                              },
+                              query: %Query{params: %Params{stop_ids: stop_ids} = params},
                               headway: headway
                             } = section ->
       section_departures =
@@ -124,7 +134,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         departures: section_departures,
         alert: section_alert,
         headway: headway,
-        stop_ids: stop_ids
+        stop_ids: stop_ids,
+        params: params
       }
     end)
     |> Enum.map(fn {:ok, data} -> data end)
@@ -248,5 +259,60 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do
     MapSet.subset?(informed, informed_stop_ids) and
       MapSet.disjoint?(not_informed, informed_stop_ids)
+  end
+
+  # No predictions AND no active alerts for the section
+  defp show_overnight_mode?(
+         [],
+         %{stop_ids: stop_ids, direction_id: direction_id, route_ids: route_ids},
+         nil,
+         now,
+         fetch_schedules_fn
+       ) do
+    if Enum.all?(stop_ids, &is_bus_or_sl_only?/1) do
+      Enum.all?(stop_ids, fn stop_id ->
+        fetch_params = %{stop_ids: [stop_id], direction_id: direction_id, route_ids: route_ids}
+
+        last_schedule_today =
+          case fetch_schedules_fn.(fetch_params, nil) do
+            {:ok, schedules} ->
+              schedules
+              |> Enum.map(fn schedule -> schedule.arrival_time end)
+              |> Enum.reverse()
+              |> List.first()
+
+            _ ->
+              # default to now to avoid app crashing when fetch fails
+              now
+          end
+
+        tomorrow = Util.get_service_day_tomorrow(now)
+
+        first_schedule_tomorrow =
+          case fetch_schedules_fn.(fetch_params, tomorrow) do
+            {:ok, schedules} ->
+              schedules
+              |> Enum.map(fn schedule -> schedule.arrival_time end)
+              |> List.first()
+
+            _ ->
+              now
+          end
+
+        DateTime.compare(now, last_schedule_today) == :gt and
+          DateTime.compare(now, first_schedule_tomorrow) == :lt
+      end)
+    else
+      false
+    end
+  end
+
+  defp show_overnight_mode?(_, _, _, _, _), do: false
+
+  defp is_bus_or_sl_only?(stop_id) do
+    case Screens.Stops.Stop.fetch_routes_serving_stop(stop_id) do
+      {:ok, data} -> Enum.all?(data, &match?(%{type: :bus}, &1))
+      _ -> false
+    end
   end
 end
