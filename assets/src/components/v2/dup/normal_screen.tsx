@@ -22,4 +22,21 @@ const NormalScreen: React.ComponentType<Props> = ({
   );
 };
 
+export const NormalSimulation: React.ComponentType<Props> = ({
+  rotation_zero: rotationZero,
+  rotation_one: rotationOne,
+  rotation_two: rotationTwo,
+}) => {
+  return (
+    <div className="screen-normal">
+      <div className="projection">
+        <Widget data={rotationZero} />
+        <Widget data={rotationOne} />
+        <Widget data={rotationTwo} />
+      </div>
+      
+    </div>
+  );
+};
+
 export default NormalScreen;
