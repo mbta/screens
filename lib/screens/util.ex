@@ -179,4 +179,11 @@ defmodule Screens.Util do
   def to_set(id) when is_binary(id), do: MapSet.new([id])
   def to_set(ids) when is_list(ids), do: MapSet.new(ids)
   def to_set(%MapSet{} = already_a_set), do: already_a_set
+
+  # Service day for MBTA ends at 3am
+  # now must be in UTC
+  @spec get_service_day_tomorrow(DateTime.t()) :: DateTime.t()
+  def get_service_day_tomorrow(now) do
+    DateTime.add(now, -3 * 60 * 60)
+  end
 end
