@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Config.Screen
   alias Screens.Config.V2.FreeTextLine
   alias Screens.Stops.Stop
+  alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
@@ -122,14 +123,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp do_get_boundary_headsign({informed, not_informed, headsign}, informed_stop_ids) do
-    if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
+    if alert_region_match?(Util.to_set(informed), Util.to_set(not_informed), informed_stop_ids),
       do: headsign,
       else: false
   end
-
-  defp to_set(nil), do: MapSet.new([])
-  defp to_set(stop_id) when is_binary(stop_id), do: MapSet.new([stop_id])
-  defp to_set(stop_ids), do: MapSet.new(stop_ids)
 
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do
     MapSet.subset?(informed, informed_stop_ids) and

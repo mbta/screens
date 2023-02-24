@@ -10,6 +10,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.SignsUiConfig
   alias Screens.Stops.Stop
+  alias Screens.Util
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
@@ -113,6 +114,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
+  ### Start Header
+
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
 
@@ -127,6 +130,10 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
     List.duplicate(%NormalHeader{screen: config, icon: :logo, text: stop_name, time: now}, 3)
   end
+
+  ### End Header
+
+  ### Start Departures
 
   def departures_instances(
         %Screen{
@@ -218,7 +225,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     sections
     |> Task.async_stream(fn %Section{
                               query: %Query{
-                                params: %Params{stop_ids: stop_ids, route_ids: route_ids} = params
+                                params: %Params{stop_ids: stop_ids} = params
                               },
                               headway: headway
                             } = section ->
@@ -228,9 +235,9 @@ defmodule Screens.V2.CandidateGenerator.Dup do
           _ -> []
         end
 
-      section_route = get_section_route(route_ids)
+      section_alert = get_section_alert(params, fetch_alerts_fn)
 
-      section_alert = get_section_alert(params, section_route, fetch_alerts_fn)
+      section_route = get_section_route_from_alert(stop_ids, section_alert)
 
       %{
         departures: section_departures,
@@ -243,17 +250,20 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     |> Enum.map(fn {:ok, data} -> data end)
   end
 
-  defp get_section_route(route_ids) do
-    case route_ids do
-      ["Orange"] -> :orange
-      ["Red"] -> :red
-      ["Blue"] -> :blue
-      ["Green" <> _ | _] -> :green
+  # Alert will only have a value for sections that are configured for a station's ID
+  defp get_section_route_from_alert(["place-" <> _ = stop_id], %Alert{
+         informed_entities: informed_entities
+       }) do
+    informed_entities
+    |> Enum.find_value(fn
+      %{route: route, stop: ^stop_id} -> route
       _ -> nil
-    end
+    end)
+    |> String.downcase()
+    |> String.to_atom()
   end
 
-  defp get_section_alert(_, nil, _), do: nil
+  defp get_section_route_from_alert(_, _), do: nil
 
   defp get_section_alert(
          %Params{
@@ -261,7 +271,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
            route_ids: route_ids,
            direction_id: direction_id
          },
-         _route_id,
          fetch_alerts_fn
        ) do
     alert_fetch_params = [
@@ -344,25 +353,25 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       |> Application.get_env(:dup_alert_headsign_matchers)
       |> Map.get(parent_stop_id)
       |> Enum.find_value({:inside, nil}, fn {informed, not_informed, headsign} ->
-        if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
-          do: {:boundary, headsign},
-          else: false
+        if alert_region_match?(
+             Util.to_set(informed),
+             Util.to_set(not_informed),
+             informed_stop_ids
+           ),
+           do: {:boundary, headsign},
+           else: false
       end)
 
     %{
-      cause: alert.cause,
-      effect: alert.effect,
       region: region,
       headsign: headsign
     }
   end
 
-  defp to_set(stop_id) when is_binary(stop_id), do: MapSet.new([stop_id])
-  defp to_set(stop_ids) when is_list(stop_ids), do: MapSet.new(stop_ids)
-  defp to_set(%MapSet{} = already_a_set), do: already_a_set
-
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do
     MapSet.subset?(informed, informed_stop_ids) and
       MapSet.disjoint?(not_informed, informed_stop_ids)
   end
+
+  ### End Departures
 end
