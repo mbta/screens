@@ -184,6 +184,6 @@ defmodule Screens.Util do
   # now must be in UTC
   @spec get_service_day_tomorrow(DateTime.t()) :: DateTime.t()
   def get_service_day_tomorrow(now) do
-    DateTime.add(now, -3 * 60 * 60)
+    now |> Timex.shift(hours: -3) |> Timex.shift(days: 1)
   end
 end
