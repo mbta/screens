@@ -385,8 +385,12 @@ defmodule Screens.Departures.Departure do
     {"include", Enum.join(relationships, ",")}
   end
 
+  defp format_query_param({:date, %DateTime{} = date}) do
+    {"filter[date]", Timex.format!(date, "{YYYY}-{0M}-{D}")}
+  end
+
   defp format_query_param({:date, date}) do
-    {"date", date}
+    {"filter[date]", date}
   end
 
   defp format_query_param({:route_type, nil}) do
