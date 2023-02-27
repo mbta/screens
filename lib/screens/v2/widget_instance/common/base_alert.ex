@@ -1,5 +1,7 @@
 defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
-  @moduledoc false
+  @moduledoc """
+  Common logic for widgets that display a single alert.
+  """
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
@@ -9,12 +11,13 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.ReconstructedAlert
+  alias Screens.V2.WidgetInstance.DupAlert
 
   @type stop_id :: String.t()
 
   @type route_id :: String.t()
 
-  @spec home_stop_id(AlertWidget.t() | ReconstructedAlert.t()) :: String.t()
+  @spec home_stop_id(AlertWidget.t() | ReconstructedAlert.t() | DupAlert.t()) :: String.t()
   defp home_stop_id(%{
          screen: %Screen{app_params: %app{alerts: %Alerts{stop_id: stop_id}}}
        })
@@ -31,7 +34,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     stop_id
   end
 
-  @spec upstream_stop_id_set(AlertWidget.t() | ReconstructedAlert.t()) ::
+  @spec upstream_stop_id_set(AlertWidget.t() | ReconstructedAlert.t() | DupAlert.t()) ::
           MapSet.t(stop_id())
   def upstream_stop_id_set(%{stop_sequences: stop_sequences} = t) do
     home_stop_id = home_stop_id(t)
@@ -55,20 +58,26 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     MapSet.new(routes, & &1.route_id)
   end
 
-  defp route_type(%{screen: %Screen{app_id: :bus_shelter_v2}}), do: :bus
-  defp route_type(%{screen: %Screen{app_id: :bus_eink_v2}}), do: :bus
-  defp route_type(%{screen: %Screen{app_id: :gl_eink_v2}}), do: :light_rail
+  defp route_types(%{screen: %Screen{app_id: :bus_shelter_v2}}), do: [:bus]
+  defp route_types(%{screen: %Screen{app_id: :bus_eink_v2}}), do: [:bus]
+  defp route_types(%{screen: %Screen{app_id: :gl_eink_v2}}), do: [:light_rail]
 
-  defp route_type(%{
-         screen: %Screen{app_id: :pre_fare_v2},
+  defp route_types(%{
+         screen: %Screen{app_id: multi_route_type_app},
          routes_at_stop: routes_at_stop
-       }) do
+       })
+       when multi_route_type_app in [:pre_fare_v2, :dup_v2] do
     routes_at_stop
     |> Enum.map(& &1.type)
     |> Enum.dedup()
   end
 
-  @spec informed_entities(AlertWidget.t() | ReconstructedAlert.t() | %{alert: Alert.t()}) ::
+  @spec informed_entities(
+          AlertWidget.t()
+          | ReconstructedAlert.t()
+          | DupAlert.t()
+          | %{alert: Alert.t()}
+        ) ::
           list(Alert.informed_entity())
   def informed_entities(t) do
     t.alert.informed_entities
@@ -86,18 +95,9 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   # Only route type is not nil--this is the only time we consider route type,
   # since it's implied by other values when they are not nil
   defp informed_entity_to_zone(%{stop: nil, route: nil, route_type: route_type_id}, %{
-         route_type: route_type
-       })
-       when is_list(route_type) do
-    if RouteType.from_id(route_type_id) in route_type do
-      [:upstream, :home_stop, :downstream]
-    else
-      []
-    end
-  end
-
-  defp informed_entity_to_zone(%{stop: nil, route: nil, route_type: route_type_id}, context) do
-    if RouteType.from_id(route_type_id) == context.route_type do
+         route_types: route_types
+       }) do
+    if RouteType.from_id(route_type_id) in route_types do
       [:upstream, :home_stop, :downstream]
     else
       []
@@ -130,7 +130,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     end
   end
 
-  @spec location(AlertWidget.t() | ReconstructedAlert.t()) ::
+  @spec location(AlertWidget.t() | ReconstructedAlert.t() | DupAlert.t()) ::
           :boundary_downstream
           | :boundary_upstream
           | :downstream
@@ -143,7 +143,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
       upstream_stops: upstream_stop_id_set(t),
       downstream_stops: downstream_stop_id_set(t),
       routes: all_routes_at_stop(t),
-      route_type: route_type(t)
+      route_types: route_types(t)
     }
 
     informed_entities = informed_entities(t)
@@ -215,7 +215,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   end
 
   def informed_routes_at_home_stop(t) do
-    rt = route_type(t)
+    rts = route_types(t)
     home_stop = home_stop_id(t)
     route_set = all_routes_at_stop(t)
 
@@ -231,17 +231,9 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
           {:cont, uninformed}
 
         %{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
-          # Route type might be a single atom or list of atoms
-          cond do
-            is_list(rt) and RouteType.from_id(route_type_id) in rt ->
-              {:halt, empty_set}
-
-            RouteType.from_id(route_type_id) == rt ->
-              {:halt, empty_set}
-
-            true ->
-              {:cont, uninformed}
-          end
+          if RouteType.from_id(route_type_id) in rts,
+            do: {:halt, empty_set},
+            else: {:cont, uninformed}
 
         %{stop: ^home_stop, route: nil}, _uninformed ->
           {:halt, empty_set}
