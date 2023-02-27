@@ -43,12 +43,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         now
       )
 
-    secondary_departures_instances =
+    secondary_sections =
       if secondary_sections == [] do
         primary_sections
       else
         secondary_sections
       end
+
+    secondary_departures_instances =
+      secondary_sections
       |> get_sections_data(fetch_section_departures_fn, fetch_alerts_fn, now)
       |> sections_data_to_departure_instances(
         config,
