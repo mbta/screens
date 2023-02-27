@@ -9,8 +9,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.Config.V2.Dup
   alias Screens.SignsUiConfig
   alias Screens.Util
+  alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.DeparturesNoData
+
+  @branch_stations ["place-kencl", "place-jfk", "place-coecl"]
+  @branch_terminals [
+    "Boston College",
+    "Cleveland Circle",
+    "Riverside",
+    "Heath Street",
+    "Ashmont",
+    "Braintree"
+  ]
 
   def departures_instances(
         %Screen{
@@ -20,8 +31,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           }
         } = config,
         now,
-        fetch_section_departures_fn,
-        fetch_alerts_fn
+        fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
+        fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1
       ) do
     primary_sections_data =
       get_sections_data(

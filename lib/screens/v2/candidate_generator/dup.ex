@@ -1,7 +1,6 @@
 defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
-  alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.Dup
   alias Screens.Config.V2.Header.CurrentStopId
@@ -13,16 +12,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
 
   @behaviour CandidateGenerator
-
-  @branch_stations ["place-kencl", "place-jfk", "place-coecl"]
-  @branch_terminals [
-    "Boston College",
-    "Cleveland Circle",
-    "Riverside",
-    "Heath Street",
-    "Ashmont",
-    "Braintree"
-  ]
 
   @impl CandidateGenerator
   def screen_template do
@@ -88,22 +77,13 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         config,
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
-        fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
-        fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
-        departures_instances_fn \\ &DeparturesInstances.departures_instances/4
+        departures_instances_fn \\ &DeparturesInstances.departures_instances/2
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
       fn -> placeholder_instances() end,
-      fn ->
-        departures_instances_fn.(
-          config,
-          now,
-          fetch_section_departures_fn,
-          fetch_alerts_fn
-        )
-      end,
+      fn -> departures_instances_fn.(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
