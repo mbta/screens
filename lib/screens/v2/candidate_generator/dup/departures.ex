@@ -153,7 +153,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     alert_fetch_params = [
       direction_id: direction_id,
       route_ids: route_ids,
-      stop_ids: stop_ids
+      stop_ids: stop_ids,
+      route_types: [:light_rail, :subway]
     ]
 
     alert_fetch_params

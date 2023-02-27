@@ -424,7 +424,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         [
           direction_id: :both,
           route_ids: [],
-          stop_ids: ["place-B"]
+          stop_ids: ["place-B"],
+          route_types: [:light_rail, :subway]
         ] ->
           [
             struct(Alert,
@@ -498,7 +499,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         [
           direction_id: :both,
           route_ids: [],
-          stop_ids: ["place-B"]
+          stop_ids: ["place-B"],
+          route_types: [:light_rail, :subway]
         ] ->
           [
             struct(Alert,
