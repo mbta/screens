@@ -39,7 +39,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> get_sections_data(fetch_section_departures_fn, fetch_alerts_fn)
       |> sections_data_to_departure_instances(
         config,
-        &1,
         [:main_content_zero, :main_content_one],
         now
       )
@@ -52,7 +51,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         |> get_sections_data(fetch_section_departures_fn, fetch_alerts_fn)
         |> sections_data_to_departure_instances(
           config,
-          &1,
           [:main_content_two],
           now
         )
@@ -61,7 +59,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     primary_departures_instances ++ secondary_departures_instances
   end
 
-  defp sections_data_to_departure_instances(config, sections_data, slot_ids, now) do
+  defp sections_data_to_departure_instances(sections_data, config, slot_ids, now) do
     if Enum.any?(sections_data, &(&1 == :error)) do
       %DeparturesNoData{screen: config, show_alternatives?: true}
     else
