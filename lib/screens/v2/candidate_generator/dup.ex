@@ -1,15 +1,22 @@
 defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
+  alias Screens.V2.WidgetInstance.Common.BaseAlert
+  alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.Dup
+  alias Screens.Config.V2.Alerts, as: AlertsConfig
   alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Routes.Route
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Dup.Departures, as: DeparturesInstances
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.{DupAlert, NormalHeader, Placeholder}
+
+  require Logger
 
   @behaviour CandidateGenerator
 
@@ -82,6 +89,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
+      fn -> alert_instances(config, now) end,
       fn -> placeholder_instances() end,
       fn -> departures_instances_fn.(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end
@@ -108,6 +116,125 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   end
 
   ### End Header
+
+  def alert_instances(config, now \\ DateTime.utc_now()) do
+    # In this function:
+    # - Fetch relevant alerts for all SUBWAY/LIGHT RAIL routes serving this stop
+    # - Check for special cases. If there is one, just use that. Otherwise:
+    # - Select one alert
+    # - Create 3 candidate structs from the alert, one for each rotation
+    %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}}} = config
+
+    stop_name = Stop.fetch_stop_name(config.app_params.header.stop_id)
+
+    route_type_filter = Enum.map([:light_rail, :subway], &Screens.RouteType.to_id/1)
+
+    with {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, route_type_filter),
+         route_ids_at_stop = for(%{route_id: id} <- routes_at_stop, id != "Mattapan", do: id),
+         {:ok, alerts} <- Alert.fetch(route_ids: route_ids_at_stop),
+         {:ok, stop_sequences} <-
+           RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids_at_stop) do
+      alerts
+      |> Enum.filter(&relevant_alert?(&1, config, stop_sequences, routes_at_stop, now))
+      |> alert_special_cases(config)
+      |> create_alert_widgets(config, stop_sequences, routes_at_stop, stop_name)
+    else
+      :error -> []
+    end
+  end
+
+  defp create_alert_widgets({:normal, alerts}, config, stop_sequences, routes_at_stop, stop_name) do
+    alert = choose_alert(alerts)
+
+    if is_nil(alert) do
+      []
+    else
+      for rotation_index <- [:zero, :one, :two] do
+        %DupAlert{
+          screen: config,
+          alert: alert,
+          stop_sequences: stop_sequences,
+          routes_at_stop: routes_at_stop,
+          rotation_index: rotation_index,
+          stop_name: stop_name
+        }
+      end
+    end
+  end
+
+  defp create_alert_widgets({:special, widgets}, _, _, _, _), do: widgets
+
+  defp relevant_alert?(alert, config, stop_sequences, routes_at_stop, now) do
+    dup_alert = %DupAlert{
+      screen: config,
+      alert: alert,
+      stop_sequences: stop_sequences,
+      routes_at_stop: routes_at_stop,
+      rotation_index: :zero,
+      stop_name: "A Station"
+    }
+
+    relevant_effect?(alert) and Alert.happening_now?(alert, now) and relevant_location?(dup_alert)
+  end
+
+  defp relevant_effect?(%{effect: :delay, severity: severity}) do
+    severity >= 5
+  end
+
+  defp relevant_effect?(%{effect: effect}) do
+    effect in [:station_closure, :shuttle, :suspension]
+  end
+
+  defp relevant_location?(dup_alert) do
+    BaseAlert.location(dup_alert) in [:inside, :boundary_upstream, :boundary_downstream]
+  end
+
+  # If this is a special case, this function returns the widgets that should be used for it.
+  # Otherwise, returns the alerts unchanged.
+  @spec alert_special_cases(list(Alert.t()), Screens.Config.Screen.t()) ::
+          {:normal, list(Alert.t())} | {:special, list(Screens.V2.WidgetInstance.t())}
+  defp alert_special_cases(alerts, _config) do
+    # Special cases go here!
+    # Use the DupSpecialCaseAlert widget to directly specify the serialized data.
+
+    {:normal, alerts}
+  end
+
+  @spec choose_alert(list(Alert.t())) :: Alert.t() | nil
+  defp choose_alert([alert]), do: alert
+
+  defp choose_alert(alerts) do
+    # When there are multiple relevant alerts, we prioritize first by
+    # effect (shuttle with highest priority, down to delay with lowest priority),
+    # then by severity, then by alert ID.
+    alerts_by_effect = Enum.group_by(alerts, & &1.effect)
+
+    [:shuttle, :suspension, :station_closure, :delay]
+    |> Enum.map(&alerts_by_effect[&1])
+    |> Enum.reject(&(&1 == nil))
+    |> List.first()
+    |> case do
+      nil ->
+        nil
+
+      [alert] ->
+        alert
+
+      alerts ->
+        # There are multiple alerts with the same effect type.
+        # Choose the alert with the highest severity.
+        # If two have the same severity, choose the one with the highest alert ID.
+        Enum.max_by(alerts, &{&1.severity, &1.id})
+    end
+    |> tap(fn
+      nil ->
+        nil
+
+      alert ->
+        alert_ids = Enum.map_join(alerts, ",", & &1.id)
+        Logger.info("[dup alert selected] selected_id=#{alert.id} all_relevant_ids=#{alert_ids}")
+    end)
+  end
 
   defp placeholder_instances do
     [
