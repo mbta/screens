@@ -34,39 +34,29 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
         fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1
       ) do
-    primary_sections_data =
-      get_sections_data(
-        primary_sections,
-        fetch_section_departures_fn,
-        fetch_alerts_fn
-      )
-
-    secondary_sections_data =
-      if secondary_sections == [] do
-        primary_sections_data
-      else
-        get_sections_data(
-          secondary_sections,
-          fetch_section_departures_fn,
-          fetch_alerts_fn
-        )
-      end
-
     primary_departures_instances =
-      sections_data_to_departure_instances(
+      primary_sections
+      |> get_sections_data(fetch_section_departures_fn, fetch_alerts_fn)
+      |> sections_data_to_departure_instances(
         config,
-        primary_sections_data,
+        &1,
         [:main_content_zero, :main_content_one],
         now
       )
 
     secondary_departures_instances =
-      sections_data_to_departure_instances(
-        config,
-        secondary_sections_data,
-        [:main_content_two],
-        now
-      )
+      if secondary_sections == [] do
+        primary_departures_instances
+      else
+        secondary_sections
+        |> get_sections_data(fetch_section_departures_fn, fetch_alerts_fn)
+        |> sections_data_to_departure_instances(
+          config,
+          &1,
+          [:main_content_two],
+          now
+        )
+      end
 
     primary_departures_instances ++ secondary_departures_instances
   end
