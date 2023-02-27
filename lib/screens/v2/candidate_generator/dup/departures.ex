@@ -269,50 +269,39 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          now,
          fetch_schedules_fn
        ) do
-    if Enum.all?(stop_ids, &is_bus_or_sl_only?/1) do
-      Enum.all?(stop_ids, fn stop_id ->
-        fetch_params = %{stop_ids: [stop_id], direction_id: direction_id, route_ids: route_ids}
+    Enum.all?(stop_ids, fn stop_id ->
+      fetch_params = %{stop_ids: [stop_id], direction_id: direction_id, route_ids: route_ids}
 
-        last_schedule_today =
-          case fetch_schedules_fn.(fetch_params, nil) do
-            {:ok, schedules} ->
-              schedules
-              |> Enum.map(fn schedule -> schedule.arrival_time end)
-              |> Enum.reverse()
-              |> List.first()
+      last_schedule_today =
+        case fetch_schedules_fn.(fetch_params, nil) do
+          {:ok, schedules} ->
+            schedules
+            |> Enum.map(fn schedule -> schedule.arrival_time end)
+            |> Enum.reverse()
+            |> List.first()
 
-            _ ->
-              # default to now to avoid app crashing when fetch fails
-              now
-          end
+          _ ->
+            # default to now to avoid app crashing when fetch fails
+            now
+        end
 
-        tomorrow = Util.get_service_day_tomorrow(now)
+      tomorrow = Util.get_service_day_tomorrow(now)
 
-        first_schedule_tomorrow =
-          case fetch_schedules_fn.(fetch_params, tomorrow) do
-            {:ok, schedules} ->
-              schedules
-              |> Enum.map(fn schedule -> schedule.arrival_time end)
-              |> List.first()
+      first_schedule_tomorrow =
+        case fetch_schedules_fn.(fetch_params, tomorrow) do
+          {:ok, schedules} ->
+            schedules
+            |> Enum.map(fn schedule -> schedule.arrival_time end)
+            |> List.first()
 
-            _ ->
-              now
-          end
+          _ ->
+            now
+        end
 
-        DateTime.compare(now, last_schedule_today) == :gt and
-          DateTime.compare(now, first_schedule_tomorrow) == :lt
-      end)
-    else
-      false
-    end
+      DateTime.compare(now, last_schedule_today) == :gt and
+        DateTime.compare(now, first_schedule_tomorrow) == :lt
+    end)
   end
 
   defp show_overnight_mode?(_, _, _, _, _), do: false
-
-  defp is_bus_or_sl_only?(stop_id) do
-    case Screens.Stops.Stop.fetch_routes_serving_stop(stop_id) do
-      {:ok, data} -> Enum.all?(data, &match?(%{type: :bus}, &1))
-      _ -> false
-    end
-  end
 end
