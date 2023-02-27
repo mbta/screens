@@ -432,7 +432,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               informed_entities: [
                 %{stop: "place-B", route: "Red"},
                 %{stop: "place-C", route: "Red"}
-              ]
+              ],
+              active_period: [{~U[2020-04-06T09:00:00Z], nil}]
             )
           ]
       end
@@ -470,6 +471,125 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               pill: :red,
               time_range: {12, 16},
               headsign: "Test"
+            }
+          ],
+          slot_names: [:main_content_two]
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns normal sections for upcoming alert", %{
+      config_one_section: config,
+      fetch_section_departures_fn: fetch_section_departures_fn
+    } do
+      now = ~U[2020-04-06T10:00:00Z]
+
+      fetch_alerts_fn = fn
+        [
+          direction_id: :both,
+          route_ids: [],
+          stop_ids: ["place-B"]
+        ] ->
+          [
+            struct(Alert,
+              effect: :suspension,
+              informed_entities: [
+                %{stop: "place-B", route: "Red"},
+                %{stop: "place-C", route: "Red"}
+              ],
+              active_period: [{~U[2020-05-06T09:00:00Z], nil}]
+            )
+          ]
+      end
+
+      expected_departures = [
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B1"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B2"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B3"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B4"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_zero]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B1"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B2"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B3"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B4"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_one]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B1"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B2"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B3"),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "B4"),
+                  schedule: nil
+                }
+              ]
             }
           ],
           slot_names: [:main_content_two]
