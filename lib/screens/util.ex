@@ -175,10 +175,6 @@ defmodule Screens.Util do
     end
   end
 
-  def append_if(list, condition, item) do
-    if condition, do: list ++ [item], else: list
-  end
-
   def to_set(nil), do: MapSet.new([])
   def to_set(id) when is_binary(id), do: MapSet.new([id])
   def to_set(ids) when is_list(ids), do: MapSet.new(ids)
