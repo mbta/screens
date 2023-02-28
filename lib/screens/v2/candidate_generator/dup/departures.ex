@@ -135,9 +135,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          informed_entities: informed_entities
        }) do
     informed_entities
-    |> Enum.find_value(fn
+    |> Enum.find_value("", fn
       %{route: route, stop: ^stop_id} -> route
-      _ -> ""
+      _ -> nil
     end)
     |> String.downcase()
     |> String.to_atom()
