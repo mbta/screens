@@ -1,17 +1,17 @@
 defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   @moduledoc false
 
-  alias Screens.Schedules.Schedule
-  alias Screens.V2.Departure
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.Departures
   alias Screens.Config.V2.Departures.{Headway, Query, Section}
   alias Screens.Config.V2.Departures.Query.Params
   alias Screens.Config.V2.Dup
+  alias Screens.Schedules.Schedule
   alias Screens.SignsUiConfig
   alias Screens.Util
   alias Screens.V2.CandidateGenerator.Widgets
+  alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.DeparturesNoData
 
