@@ -34,36 +34,27 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
         fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1
       ) do
-    primary_sections_data =
-      get_sections_data(
-        primary_sections,
-        fetch_section_departures_fn,
-        fetch_alerts_fn
-      )
-
-    secondary_sections_data =
-      if secondary_sections == [] do
-        primary_sections_data
-      else
-        get_sections_data(
-          secondary_sections,
-          fetch_section_departures_fn,
-          fetch_alerts_fn
-        )
-      end
-
     primary_departures_instances =
-      sections_data_to_departure_instances(
+      primary_sections
+      |> get_sections_data(fetch_section_departures_fn, fetch_alerts_fn, now)
+      |> sections_data_to_departure_instances(
         config,
-        primary_sections_data,
         [:main_content_zero, :main_content_one],
         now
       )
 
+    secondary_sections =
+      if secondary_sections == [] do
+        primary_sections
+      else
+        secondary_sections
+      end
+
     secondary_departures_instances =
-      sections_data_to_departure_instances(
+      secondary_sections
+      |> get_sections_data(fetch_section_departures_fn, fetch_alerts_fn, now)
+      |> sections_data_to_departure_instances(
         config,
-        secondary_sections_data,
         [:main_content_two],
         now
       )
@@ -71,7 +62,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     primary_departures_instances ++ secondary_departures_instances
   end
 
-  defp sections_data_to_departure_instances(config, sections_data, slot_ids, now) do
+  defp sections_data_to_departure_instances(sections_data, config, slot_ids, now) do
     if Enum.any?(sections_data, &(&1 == :error)) do
       %DeparturesNoData{screen: config, show_alternatives?: true}
     else
@@ -109,7 +100,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     end
   end
 
-  defp get_sections_data(sections, fetch_section_departures_fn, fetch_alerts_fn) do
+  defp get_sections_data(sections, fetch_section_departures_fn, fetch_alerts_fn, now) do
     sections
     |> Task.async_stream(fn %Section{
                               query: %Query{
@@ -123,7 +114,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           _ -> []
         end
 
-      section_alert = get_section_alert(params, fetch_alerts_fn)
+      section_alert = get_section_alert(params, fetch_alerts_fn, now)
 
       section_route = get_section_route_from_alert(stop_ids, section_alert)
 
@@ -159,12 +150,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
            route_ids: route_ids,
            direction_id: direction_id
          },
-         fetch_alerts_fn
+         fetch_alerts_fn,
+         now
        ) do
     alert_fetch_params = [
       direction_id: direction_id,
       route_ids: route_ids,
-      stop_ids: stop_ids
+      stop_ids: stop_ids,
+      route_types: [:light_rail, :subway]
     ]
 
     alert_fetch_params
@@ -172,8 +165,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     |> Enum.filter(fn
       # Show a headway message only during shuttles and suspensions at temporary terminals.
       # https://www.notion.so/mbta-downtown-crossing/Departures-Widget-Specification-20da46cd70a44192a568e49ea47e09ac?pvs=4#e43086abaadd465ea8072502d6980d8d
-      %Alert{effect: effect} when effect in [:suspension, :shuttle] -> true
-      _ -> false
+      %Alert{effect: effect} = alert when effect in [:suspension, :shuttle] ->
+        Alert.happening_now?(alert, now)
+
+      _ ->
+        false
     end)
     |> List.first()
   end
