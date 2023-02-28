@@ -1,6 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   @moduledoc false
 
+  alias Screens.Schedules.Schedule
+  alias Screens.V2.Departure
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.Departures
@@ -83,14 +85,22 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
                                      stop_ids: stop_ids,
                                      params: params
                                    } ->
+          overnight_schedules_for_section =
+            get_overnight_schedules_for_section([], params, nil, now, fetch_schedules_fn)
+
+          departures =
+            if show_overnight_mode?(overnight_schedules_for_section) do
+              overnight_schedules_for_section
+            else
+              departures
+            end
+
           visible_departures =
             if length(sections_data) > 1 do
               Enum.take(departures, 2)
             else
               Enum.take(departures, 4)
             end
-
-          show_overnight_mode?([], params, alert, now, fetch_schedules_fn)
 
           case get_headway_mode(stop_ids, headway, alert, now) do
             {:active, time_range, headsign} ->
@@ -142,9 +152,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   # Alert will only have a value for sections that are configured for a station's ID
-  defp get_section_route_from_alert(["place-" <> _ = stop_id], %Alert{
-         informed_entities: informed_entities
-       }) do
+  defp get_section_route_from_alert(
+         ["place-" <> _ = stop_id],
+         %Alert{informed_entities: informed_entities}
+       ) do
     informed_entities
     |> Enum.find_value("", fn
       %{route: route, stop: ^stop_id} -> route
@@ -261,47 +272,73 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       MapSet.disjoint?(not_informed, informed_stop_ids)
   end
 
+  defp show_overnight_mode?(overnight_schedules) do
+    not Enum.any?(overnight_schedules, &is_nil/1) and overnight_schedules != []
+  end
+
   # No predictions AND no active alerts for the section
-  defp show_overnight_mode?(
+  defp get_overnight_schedules_for_section(
          [],
          %{stop_ids: stop_ids, direction_id: direction_id, route_ids: route_ids},
          nil,
          now,
          fetch_schedules_fn
        ) do
-    Enum.all?(stop_ids, fn stop_id ->
-      fetch_params = %{stop_ids: [stop_id], direction_id: direction_id, route_ids: route_ids}
+    routes_for_section =
+      if route_ids == [] do
+        Screens.Stops.Stop.get_routes_serving_stop_ids(stop_ids)
+      else
+        route_ids
+      end
 
-      last_schedule_today =
-        case fetch_schedules_fn.(fetch_params, nil) do
-          {:ok, schedules} ->
-            schedules
-            |> Enum.map(fn schedule -> schedule.arrival_time end)
-            |> Enum.reverse()
-            |> List.first()
+    Enum.flat_map(routes_for_section, fn route_id ->
+      fetch_params = %{stop_ids: stop_ids, direction_id: direction_id, route_ids: [route_id]}
 
-          _ ->
-            # default to now to avoid app crashing when fetch fails
-            now
-        end
+      last_schedules_today = get_schedules(fetch_params, fetch_schedules_fn, now)
 
-      tomorrow = Util.get_service_day_tomorrow(now)
+      first_schedules_tomorrow =
+        get_schedules(fetch_params, fetch_schedules_fn, now, Util.get_service_day_tomorrow(now))
 
-      first_schedule_tomorrow =
-        case fetch_schedules_fn.(fetch_params, tomorrow) do
-          {:ok, schedules} ->
-            schedules
-            |> Enum.map(fn schedule -> schedule.arrival_time end)
-            |> List.first()
-
-          _ ->
-            now
-        end
-
-      DateTime.compare(now, last_schedule_today) == :gt and
-        DateTime.compare(now, first_schedule_tomorrow) == :lt
+      if Enum.all?(last_schedules_today, &(DateTime.compare(now, &1.departure_time) == :gt)) and
+           Enum.all?(first_schedules_tomorrow, &(DateTime.compare(now, &1.departure_time) == :lt)) do
+        Enum.map(first_schedules_tomorrow, fn schedule -> %Departure{schedule: schedule} end)
+      else
+        []
+      end
     end)
   end
 
-  defp show_overnight_mode?(_, _, _, _, _), do: false
+  defp get_overnight_schedules_for_section(_, _, _, _, _), do: []
+
+  defp get_schedules(fetch_params, fetch_schedules_fn, now, tomorrow \\ nil) do
+    schedules =
+      case fetch_schedules_fn.(fetch_params, tomorrow) do
+        {:ok, schedules} when schedules != [] ->
+          schedules_reversed = Enum.reverse(schedules)
+
+          # Get the schedule
+          if fetch_params.direction_id == :both do
+            schedule_0 =
+              schedules_reversed
+              |> Enum.filter(&(&1.direction_id == 0))
+              |> List.first()
+
+            schedule_1 =
+              schedules_reversed
+              |> Enum.filter(&(&1.direction_id == 1))
+              |> List.first()
+
+            [schedule_0, schedule_1]
+          else
+            [List.first(schedules_reversed)]
+          end
+
+        _ ->
+          [struct(Schedule, departure_time: now)]
+      end
+
+    schedules
+    |> Enum.reject(&is_nil/1)
+    |> Enum.sort_by(& &1.departure_time)
+  end
 end
