@@ -83,7 +83,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
           case get_headway_mode(stop_ids, headway, alert, now) do
             {:active, time_range, headsign} ->
-              %{type: :headway_section, pill: pill, time_range: time_range, headsign: headsign}
+              %{
+                type: :headway_section,
+                pill: get_section_route_from_alert(stop_ids, alert),
+                time_range: time_range,
+                headsign: headsign
+              }
 
             :inactive ->
               %{type: :normal_section, rows: visible_departures}
@@ -116,11 +121,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
       section_alert = get_section_alert(params, fetch_alerts_fn, now)
 
-      section_route = get_section_route_from_alert(stop_ids, section_alert)
-
       %{
         departures: section_departures,
-        pill: section_route,
         alert: section_alert,
         headway: headway,
         stop_ids: stop_ids
