@@ -294,6 +294,16 @@ defmodule Screens.Stops.Stop do
     end
   end
 
+  def get_routes_serving_stop_ids(stop_ids) do
+    stop_ids
+    |> Enum.flat_map(fn stop_id ->
+      stop_id
+      |> create_station_with_routes_map()
+      |> Enum.map(& &1.id)
+    end)
+    |> Enum.uniq()
+  end
+
   def fetch_stop_name(stop_id) do
     case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do
       {:ok, %{"data" => [stop_data]}} ->
