@@ -69,7 +69,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       sections =
         Enum.map(sections_data, fn %{
                                      departures: departures,
-                                     pill: pill,
                                      alert: alert,
                                      headway: headway,
                                      stop_ids: stop_ids
