@@ -86,7 +86,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
                                      params: params
                                    } ->
           overnight_schedules_for_section =
-            get_overnight_schedules_for_section([], params, nil, now, fetch_schedules_fn)
+            get_overnight_schedules_for_section(
+              departures,
+              params,
+              alert,
+              now,
+              fetch_schedules_fn
+            )
 
           departures =
             if show_overnight_mode?(overnight_schedules_for_section) do
@@ -276,10 +282,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     not Enum.any?(overnight_schedules, &is_nil/1) and overnight_schedules != []
   end
 
+  # If we are currently overnight, returns the first schedule of the day for each route_id and direction for each stop.
+  # Otherwise, return an empty list.
+  defp get_overnight_schedules_for_section(departures, params, alert, now, fetch_schedules_fn)
+
   # No predictions AND no active alerts for the section
   defp get_overnight_schedules_for_section(
          [],
-         %{stop_ids: stop_ids, direction_id: direction_id, route_ids: route_ids},
+         %{stop_ids: stop_ids, route_ids: route_ids},
          nil,
          now,
          fetch_schedules_fn
@@ -291,17 +301,36 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         route_ids
       end
 
+    fetch_params = %{stop_ids: stop_ids}
+
+    last_schedules_today = get_schedules(fetch_params, fetch_schedules_fn)
+
+    first_schedules_tomorrow =
+      get_schedules(fetch_params, fetch_schedules_fn, Util.get_service_day_tomorrow(now))
+
+    # Get schedules for each route in both directions for all stop_ids in config
     Enum.flat_map(routes_for_section, fn route_id ->
-      fetch_params = %{stop_ids: stop_ids, direction_id: direction_id, route_ids: [route_id]}
+      schedules_today =
+        get_first_schedule_for_route_each_direction(
+          last_schedules_today,
+          route_id,
+          now
+        )
 
-      last_schedules_today = get_schedules(fetch_params, fetch_schedules_fn, now)
+      schedules_tomorrow =
+        get_first_schedule_for_route_each_direction(
+          first_schedules_tomorrow,
+          route_id,
+          now
+        )
 
-      first_schedules_tomorrow =
-        get_schedules(fetch_params, fetch_schedules_fn, now, Util.get_service_day_tomorrow(now))
-
-      if Enum.all?(last_schedules_today, &(DateTime.compare(now, &1.departure_time) == :gt)) and
-           Enum.all?(first_schedules_tomorrow, &(DateTime.compare(now, &1.departure_time) == :lt)) do
-        Enum.map(first_schedules_tomorrow, fn schedule -> %Departure{schedule: schedule} end)
+      # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
+      # we do not display overnight mode.
+      if Enum.all?(schedules_today, &(DateTime.compare(now, &1.departure_time) == :gt)) and
+           Enum.all?(schedules_tomorrow, &(DateTime.compare(now, &1.departure_time) == :lt)) do
+        schedules_tomorrow
+        |> Enum.sort_by(& &1.departure_time)
+        |> Enum.map(fn schedule -> %Departure{schedule: schedule} end)
       else
         []
       end
@@ -310,35 +339,40 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp get_overnight_schedules_for_section(_, _, _, _, _), do: []
 
-  defp get_schedules(fetch_params, fetch_schedules_fn, now, tomorrow \\ nil) do
-    schedules =
-      case fetch_schedules_fn.(fetch_params, tomorrow) do
-        {:ok, schedules} when schedules != [] ->
-          schedules_reversed = Enum.reverse(schedules)
+  defp get_schedules(fetch_params, fetch_schedules_fn, tomorrow \\ nil) do
+    case fetch_schedules_fn.(fetch_params, tomorrow) do
+      {:ok, schedules} when schedules != [] ->
+        # If tomorrow is nil, we want the last schedules of the current day.
+        # Need to reverse the list of fetched schedules so that List.first/1 looks at the correct time of day.
+        if is_nil(tomorrow) do
+          Enum.reverse(schedules)
+        else
+          schedules
+        end
 
-          # Get the schedule
-          if fetch_params.direction_id == :both do
-            schedule_0 =
-              schedules_reversed
-              |> Enum.filter(&(&1.direction_id == 0))
-              |> List.first()
+      # fetch error or empty schedules
+      _ ->
+        []
+    end
+  end
 
-            schedule_1 =
-              schedules_reversed
-              |> Enum.filter(&(&1.direction_id == 1))
-              |> List.first()
+  defp get_first_schedule_for_route_each_direction(schedules, route_id, now) do
+    direction_zero =
+      schedules
+      |> Enum.filter(fn
+        %Schedule{route: %Screens.Routes.Route{id: ^route_id}, direction_id: 0} -> true
+        _ -> false
+      end)
+      |> List.first(struct(Schedule, departure_time: now))
 
-            [schedule_0, schedule_1]
-          else
-            [List.first(schedules_reversed)]
-          end
+    direction_one =
+      schedules
+      |> Enum.filter(fn
+        %Schedule{route: %Screens.Routes.Route{id: ^route_id}, direction_id: 1} -> true
+        _ -> false
+      end)
+      |> List.first(struct(Schedule, departure_time: now))
 
-        _ ->
-          [struct(Schedule, departure_time: now)]
-      end
-
-    schedules
-    |> Enum.reject(&is_nil/1)
-    |> Enum.sort_by(& &1.departure_time)
+    [direction_zero, direction_one]
   end
 end
