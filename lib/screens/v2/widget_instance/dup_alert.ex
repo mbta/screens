@@ -178,63 +178,66 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   end
 
   # Inputs/outputs are stored as a table for readability.
+  # Table is adapted from the one in the product spec: https://www.notion.so/mbta-downtown-crossing/DUP-Alert-Widget-Specification-a82acff850ed4f2eb98a04e5f3e0fe52
   # Compile-time code converts each table row to `do_alert_layout` function clauses.
-  # The two header rows are ignored by the code that parses this table.
-  @alert_layout_table """
-  INPUTS                                                       || OUTPUTS
-  Effect          Location            AffectedLines TotalLines || LayoutZero  LayoutOne   LayoutTwo
-  station_closure inside              1             1             full_screen full_screen partial
-  station_closure inside              1             2             partial     full_screen partial
-  station_closure inside              2             2             full_screen full_screen partial
-  shuttle         inside              1             1             full_screen full_screen partial
-  shuttle         inside              1             2             partial     full_screen partial
-  shuttle         inside              2             2             full_screen full_screen partial
-  shuttle         boundary_upstream   1             1             partial     full_screen partial
-  shuttle         boundary_downstream 1             1             partial     full_screen partial
-  shuttle         boundary_upstream   1             2             partial     full_screen partial
-  shuttle         boundary_downstream 1             2             partial     full_screen partial
-  suspension      inside              1             1             full_screen full_screen partial
-  suspension      inside              1             2             partial     full_screen partial
-  suspension      inside              2             2             full_screen full_screen partial
-  suspension      boundary_upstream   1             1             partial     full_screen partial
-  suspension      boundary_downstream 1             1             partial     full_screen partial
-  suspension      boundary_upstream   1             2             partial     full_screen partial
-  suspension      boundary_downstream 1             2             partial     full_screen partial
+  alert_layout_table = """
+  # INPUTS                                                       || OUTPUTS
+  # Effect          Location            AffectedLines TotalLines || LayoutZero  LayoutOne   LayoutTwo
+    station_closure inside              1             1             full_screen full_screen partial
+    station_closure inside              1             2             partial     full_screen partial
+    station_closure inside              2             2             full_screen full_screen partial
+  # "Boundary" location is not possible for station closures.
+    shuttle         inside              1             1             full_screen full_screen partial
+    shuttle         inside              1             2             partial     full_screen partial
+    shuttle         inside              2             2             full_screen full_screen partial
+    shuttle         boundary_upstream   1             1             partial     full_screen partial
+    shuttle         boundary_downstream 1             1             partial     full_screen partial
+    shuttle         boundary_upstream   1             2             partial     full_screen partial
+    shuttle         boundary_downstream 1             2             partial     full_screen partial
+    suspension      inside              1             1             full_screen full_screen partial
+    suspension      inside              1             2             partial     full_screen partial
+    suspension      inside              2             2             full_screen full_screen partial
+    suspension      boundary_upstream   1             1             partial     full_screen partial
+    suspension      boundary_downstream 1             1             partial     full_screen partial
+    suspension      boundary_upstream   1             2             partial     full_screen partial
+    suspension      boundary_downstream 1             2             partial     full_screen partial
+  # Delay alerts are handled separately, see `defp do_alert_layout({:delay, ...` below.
   """
 
-  @parameters_to_layout @alert_layout_table
-                        |> String.split("\n", trim: true)
-                        |> Enum.drop(2)
-                        |> Enum.flat_map(fn line ->
-                          [
-                            effect,
-                            location,
-                            affected_lines,
-                            total_lines,
-                            layout_zero,
-                            layout_one,
-                            layout_two
-                          ] = String.split(line, ~r/\s+/, trim: true)
+  parameters_to_layout =
+    alert_layout_table
+    |> String.split("\n", trim: true)
+    |> Enum.reject(&String.starts_with?(&1, "#"))
+    |> Enum.flat_map(fn line ->
+      [
+        effect,
+        location,
+        affected_lines,
+        total_lines,
+        layout_zero,
+        layout_one,
+        layout_two
+      ] = String.split(line, ~r/\s+/, trim: true)
 
-                          # Convert strings to appropriate types
-                          [effect, location, layout_zero, layout_one, layout_two] =
-                            Enum.map(
-                              [effect, location, layout_zero, layout_one, layout_two],
-                              &String.to_existing_atom/1
-                            )
+      # Convert strings to appropriate types
+      [effect, location, layout_zero, layout_one, layout_two] =
+        Enum.map(
+          [effect, location, layout_zero, layout_one, layout_two],
+          &String.to_existing_atom/1
+        )
 
-                          [affected_lines, total_lines] =
-                            Enum.map([affected_lines, total_lines], &String.to_integer/1)
+      [affected_lines, total_lines] =
+        Enum.map([affected_lines, total_lines], &String.to_integer/1)
 
-                          base_parameters = {effect, location, affected_lines, total_lines}
+      base_parameters = {effect, location, affected_lines, total_lines}
 
-                          [
-                            {Tuple.append(base_parameters, :zero), layout_zero},
-                            {Tuple.append(base_parameters, :one), layout_one},
-                            {Tuple.append(base_parameters, :two), layout_two}
-                          ]
-                        end)
-                        |> Enum.into(%{})
+      [
+        {Tuple.append(base_parameters, :zero), layout_zero},
+        {Tuple.append(base_parameters, :one), layout_one},
+        {Tuple.append(base_parameters, :two), layout_two}
+      ]
+    end)
+    |> Enum.into(%{})
 
   @type layout_parameters ::
           {Alert.effect(), location :: atom, affected_lines :: 1..2, total_lines :: 1..2,
@@ -242,7 +245,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   # Now, define function clauses for each row in the table.
   @spec do_alert_layout(layout_parameters) :: :full_screen | :partial | :no_render
-  for {parameters, layout} <- @parameters_to_layout do
+  for {parameters, layout} <- parameters_to_layout do
     parameters_ast = Macro.escape(parameters)
     defp do_alert_layout(unquote(parameters_ast)), do: unquote(layout)
   end
