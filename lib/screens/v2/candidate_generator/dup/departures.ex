@@ -13,16 +13,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.DeparturesNoData
 
-  @branch_stations ["place-kencl", "place-jfk", "place-coecl"]
-  @branch_terminals [
-    "Boston College",
-    "Cleveland Circle",
-    "Riverside",
-    "Heath Street",
-    "Ashmont",
-    "Braintree"
-  ]
-
   def departures_instances(
         %Screen{
           app_params: %Dup{
@@ -212,14 +202,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   defp temporary_terminal?(_), do: false
 
   defp branch_station?(stop_ids) do
+    branch_stations = Application.get_env(:screens, :dup_headway_branch_stations)
+
     case stop_ids do
-      [parent_station_id] -> parent_station_id in MapSet.new(@branch_stations)
+      [parent_station_id] -> parent_station_id in MapSet.new(branch_stations)
       _ -> false
     end
   end
 
   defp branch_alert?(%{headsign: headsign}) do
-    headsign in MapSet.new(@branch_terminals)
+    branch_terminals = Application.get_env(:screens, :dup_headway_branch_terminals)
+    headsign in MapSet.new(branch_terminals)
   end
 
   defp interpret_alert(alert, [parent_stop_id]) do
