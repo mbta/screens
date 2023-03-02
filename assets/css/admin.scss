@@ -12,6 +12,7 @@
   font-size: 14px;
 
   tbody {
+
     input,
     select {
       padding: 0;
@@ -28,8 +29,7 @@
   height: 40px;
   transition: height 0.2s;
 
-  &:focus,
-  &:hover {
+  &:focus {
     height: 400px;
   }
 }

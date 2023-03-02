@@ -3,16 +3,18 @@ import React from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
-  header_one: WidgetData;
-  body_one: WidgetData;
+  header: WidgetData;
+  body: WidgetData;
+  rotation: string;
 }
 
-const RotationNormalOne: React.ComponentType<Props> = ({
-  header_one: header,
-  body_one: body,
+const RotationNormal: React.ComponentType<Props> = ({
+  header: header,
+  body: body,
+  rotation: rotation
 }) => {
   return (
-    <div className="widget-slot rotation-one">
+    <div className={`widget-slot rotation-${rotation}`}>
       <div className="widget-slot rotation-normal__header">
         <Widget data={header} />
       </div>
@@ -23,4 +25,4 @@ const RotationNormalOne: React.ComponentType<Props> = ({
   );
 };
 
-export default RotationNormalOne;
+export default RotationNormal;

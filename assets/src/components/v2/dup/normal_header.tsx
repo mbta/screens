@@ -1,17 +1,27 @@
 import React from "react";
 
-import DefaultNormalHeader from "Components/v2/normal_header";
+import DefaultNormalHeader, { Icon } from "Components/v2/normal_header";
 import { DUP_VERSION } from "Components/dup/version";
 
-const NormalHeader = ({ icon, text, time }) => {
+interface NormalHeaderProps {
+  text: string;
+  time?: string;
+  color?: string;
+  accentPattern?: string;
+}
+
+const NormalHeader = ({text, time, color, accentPattern}: NormalHeaderProps) => {
+
   return (
     <DefaultNormalHeader
-      icon={icon}
+      icon={Icon.logo}
       text={text}
       time={time}
       version={DUP_VERSION}
       maxHeight={208}
       showTo={false}
+      classModifiers={color}
+      accentPattern={accentPattern}
     />
   );
 };

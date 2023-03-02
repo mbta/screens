@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
+  alias Screens.Config.V2.{Departures, Dup}
   alias Screens.Config.V2.Dup
   alias Screens.Config.V2.Alerts, as: AlertsConfig
   alias Screens.Config.V2.Header.CurrentStopId
@@ -11,8 +12,10 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{DupAlert, NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.{DupAlert, DeparturesNoData, NormalHeader, Placeholder}
 
   require Logger
 
@@ -77,14 +80,21 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     |> Builder.build_template()
   end
 
-  @impl CandidateGenerator
-  def candidate_instances(config, now \\ DateTime.utc_now()) do
+  def candidate_instances(
+        config,
+        now \\ DateTime.utc_now(),
+        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
+        fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
+      ) do
     [
-      fn -> header_instances(config, now) end,
+      fn -> header_instances(config, now, fetch_stop_name_fn) end,
+      fn -> placeholder_instances() end,
+      fn -> departures_instances(config, fetch_section_departures_fn) end,
       fn -> alert_instances(config, now) end,
-      fn -> placeholder_instances() end
+      fn -> evergreen_content_instances_fn.(config) end
     ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: 30_000)
+    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
@@ -94,7 +104,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   def header_instances(
         config,
         now,
-        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1
+        fetch_stop_name_fn
       ) do
     %Screen{app_params: %Dup{header: %CurrentStopId{stop_id: stop_id}}} = config
 
@@ -222,9 +232,90 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     end)
   end
 
+  def departures_instances(
+        %Screen{
+          app_params: %Dup{
+            primary_departures: %Departures{sections: primary_sections},
+            secondary_departures: %Departures{sections: secondary_sections}
+          }
+        } = config,
+        fetch_section_departures_fn
+      ) do
+    primary_sections_data =
+      primary_sections
+      |> Task.async_stream(fetch_section_departures_fn, timeout: :infinity)
+      |> Enum.map(fn {:ok, data} -> data end)
+
+    secondary_sections_data =
+      if secondary_sections == [] do
+        primary_sections_data
+      else
+        secondary_sections
+        |> Task.async_stream(fetch_section_departures_fn, timeout: :infinity)
+        |> Enum.map(fn {:ok, data} -> data end)
+        |> Enum.take(4)
+      end
+
+    primary_departures_instances =
+      if Enum.any?(primary_sections_data, &(&1 == :error)) do
+        %DeparturesNoData{screen: config, show_alternatives?: true}
+      else
+        sections =
+          Enum.map(primary_sections_data, fn {:ok, departures} ->
+            visible_departures =
+              if length(primary_sections_data) > 1 do
+                Enum.take(departures, 2)
+              else
+                Enum.take(departures, 4)
+              end
+
+            %{type: :normal_section, rows: visible_departures}
+          end)
+
+        [
+          %DeparturesWidget{
+            screen: config,
+            section_data: sections,
+            slot_names: [:main_content_zero]
+          },
+          %DeparturesWidget{
+            screen: config,
+            section_data: sections,
+            slot_names: [:main_content_one]
+          }
+        ]
+      end
+
+    secondary_departures_instances =
+      if Enum.any?(secondary_sections_data, &(&1 == :error)) do
+        %DeparturesNoData{screen: config, show_alternatives?: true}
+      else
+        sections =
+          Enum.map(secondary_sections_data, fn {:ok, departures} ->
+            visible_departures =
+              if length(secondary_sections_data) > 1 do
+                Enum.take(departures, 2)
+              else
+                Enum.take(departures, 4)
+              end
+
+            %{type: :normal_section, rows: visible_departures}
+          end)
+
+        [
+          %DeparturesWidget{
+            screen: config,
+            section_data: sections,
+            slot_names: [:main_content_two]
+          }
+        ]
+      end
+
+    primary_departures_instances ++ secondary_departures_instances
+  end
+
   defp placeholder_instances do
     [
-      %Placeholder{slot_names: [:full_rotation_zero], color: :green, priority: 1},
       %Placeholder{slot_names: [:main_content_one], color: :orange},
       %Placeholder{slot_names: [:main_content_reduced_two], color: :green},
       %Placeholder{slot_names: [:bottom_pane_two], color: :red}

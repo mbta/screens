@@ -1136,7 +1136,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   describe "alert_id/1" do
     test "returns alert_id", %{widget: widget} do
-      assert widget.alert.id == AlertWidgetInstance.alert_id(widget)
+      assert [widget.alert.id] == AlertWidgetInstance.alert_ids(widget)
     end
   end
 

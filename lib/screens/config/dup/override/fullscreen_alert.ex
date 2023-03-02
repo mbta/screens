@@ -1,7 +1,7 @@
 defmodule Screens.Config.Dup.Override.FullscreenAlert do
   @moduledoc false
 
-  alias Screens.Config.Dup.Override.FreeTextLine
+  alias Screens.Config.V2.FreeTextLine
 
   @type t :: %__MODULE__{
           header: String.t() | nil,

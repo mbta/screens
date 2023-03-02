@@ -4,7 +4,7 @@ import React, {
   ComponentType
 } from "react";
 
-import { classWithModifiers, formatTimeString, imagePath } from "Util/util";
+import { classWithModifier, classWithModifiers, formatTimeString, imagePath } from "Util/util";
 
 enum Icon {
   green_b = "green_b",
@@ -115,15 +115,23 @@ const NormalHeaderVersion: ComponentType<NormalHeaderVersionProps> = ({ version 
   return <div className="normal-header-version">{version}</div>;
 };
 
+const NormalHeaderAccent = ({accentPatternFile}: {accentPatternFile: string}) => (
+  <div className="normal-header__accent-pattern-container">
+    <img className="normal-header__accent-pattern-image" src={imagePath(accentPatternFile)} />
+  </div>
+)
+
 interface Props {
   icon?: Icon;
   text: string;
-  time: string;
+  time?: string;
   showUpdated?: boolean;
   version?: string;
   maxHeight: number;
   showTo?: boolean;
   fullName?: boolean;
+  classModifiers?: string;
+  accentPattern?: string;
 }
 
 const NormalHeader: ComponentType<Props> = ({
@@ -135,6 +143,8 @@ const NormalHeader: ComponentType<Props> = ({
   maxHeight,
   showTo = false,
   fullName = false,
+  classModifiers,
+  accentPattern,
 }) => {
 
   const { ref: headerRef, size: headerSize } = useTextResizer({
@@ -143,7 +153,7 @@ const NormalHeader: ComponentType<Props> = ({
     resetDependencies: [text],
   });
   return (
-    <div className="normal-header">
+    <div className={classWithModifier("normal-header", classModifiers)}>
       <NormalHeaderTitle
         icon={icon}
         text={text}
@@ -152,9 +162,10 @@ const NormalHeader: ComponentType<Props> = ({
         showTo={showTo}
         fullName={fullName}
       />
-      <NormalHeaderTime time={time} />
+      {time && <NormalHeaderTime time={time} />}
       {version && <NormalHeaderVersion version={version} />}
       {showUpdated && <NormalHeaderUpdated />}
+      {accentPattern && <NormalHeaderAccent accentPatternFile={accentPattern}/>}
     </div>
   );
 };

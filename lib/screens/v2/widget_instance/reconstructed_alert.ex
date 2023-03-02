@@ -2,8 +2,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Dup.Override.FreeTextLine
   alias Screens.Config.Screen
+  alias Screens.Config.V2.FreeTextLine
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.Common.BaseAlert
@@ -734,7 +734,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       else: :reconstructed_large_alert
   end
 
-  def alert_id(%__MODULE__{} = t), do: t.alert.id
+  def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
   def temporarily_override_alert(%__MODULE__{} = t) do
     # All screens that would show either of the following alerts
@@ -756,6 +756,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defimpl Screens.V2.AlertWidgetInstance do
-    def alert_id(t), do: ReconstructedAlert.alert_id(t)
+    def alert_ids(t), do: ReconstructedAlert.alert_ids(t)
   end
 end

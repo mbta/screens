@@ -77,7 +77,8 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
                      body_takeover: [:full_body]
                    }}
                 ],
-                screen_takeover: [:full_screen]
+                screen_takeover: [:full_screen],
+                screen_split_takeover: [:full_left_screen, :full_right_screen]
               }} == PreFare.screen_template()
     end
   end

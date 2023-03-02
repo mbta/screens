@@ -1,6 +1,10 @@
 defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   @moduledoc false
 
+  ##################
+  # HELPER MODULES #
+  ##################
+
   defmodule DetailPage do
     @moduledoc false
 
@@ -13,6 +17,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     @derive Jason.Encoder
 
     defstruct station: nil
+
+    defimpl Screens.V2.AlertWidgetInstance do
+      def alert_ids(page) do
+        Enum.map(page.station.elevator_closures, & &1.alert_id)
+      end
+    end
   end
 
   defmodule ListPage do
@@ -27,6 +37,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     @derive Jason.Encoder
 
     defstruct stations: nil
+
+    defimpl Screens.V2.AlertWidgetInstance do
+      def alert_ids(page) do
+        Enum.flat_map(page.stations, fn station ->
+          Enum.map(station.elevator_closures, & &1.alert_id)
+        end)
+      end
+    end
   end
 
   defmodule AnnotatedStationRow do
@@ -52,11 +70,16 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     end
   end
 
+  ###############
+  # MAIN MODULE #
+  ###############
+
   @subway_icons ~w[red blue orange green silver]a
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{ElevatorStatus, PreFare}
+  alias Screens.V2.AlertWidgetInstance
 
   defstruct screen: nil,
             now: nil,
@@ -82,6 +105,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
         }
 
   @type closure :: %{
+          alert_id: String.t(),
           elevator_name: String.t(),
           elevator_id: String.t(),
           timeframe: timeframe(),
@@ -253,6 +277,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   defp serialize_closure(alert, %{name: name, id: id}, now) do
     %{
+      alert_id: alert.id,
       elevator_name: name,
       elevator_id: id,
       timeframe: serialize_timeframe(alert, now),
@@ -533,6 +558,16 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   def audio_view(_instance), do: ScreensWeb.V2.Audio.ElevatorStatusView
 
+  def alert_ids(%__MODULE__{} = t) do
+    # Unfortunately, we have to re-serialize the widget to determine
+    # which alerts made it onto its limited number of pages.
+    %{pages: pages} = serialize(t)
+
+    pages
+    |> Enum.flat_map(&AlertWidgetInstance.alert_ids/1)
+    |> Enum.uniq()
+  end
+
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.ElevatorStatus
 
@@ -545,5 +580,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     def audio_sort_key(instance), do: ElevatorStatus.audio_sort_key(instance)
     def audio_valid_candidate?(instance), do: ElevatorStatus.audio_valid_candidate?(instance)
     def audio_view(instance), do: ElevatorStatus.audio_view(instance)
+  end
+
+  defimpl Screens.V2.AlertWidgetInstance do
+    alias Screens.V2.WidgetInstance.ElevatorStatus
+
+    def alert_ids(instance), do: ElevatorStatus.alert_ids(instance)
   end
 end

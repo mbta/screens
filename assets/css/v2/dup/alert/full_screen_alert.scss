@@ -1,0 +1,29 @@
+.full-screen-alert__body {
+  background-color: #171f26;
+  box-sizing: border-box;
+  width: 1920px;
+  height: 832px;
+  padding-top: 72px;
+  padding-left: 64px;
+  padding-right: 64px;
+}
+
+.full-screen-alert__link {
+  position: absolute;
+  bottom: 56px;
+  right: 72px;
+}
+
+.full-screen-alert__link-arrow {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.full-screen-alert__link-text {
+  display: inline-block;
+  vertical-align: middle;
+  color: #ffffff;
+  font-family: Inter, sans-serif;
+  font-size: 108px;
+  margin-left: 72px;
+}

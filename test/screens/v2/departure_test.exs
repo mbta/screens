@@ -229,7 +229,7 @@ defmodule Screens.V2.DepartureTest do
   end
 
   describe "scheduled_time/1" do
-    test "returns departure_time from schedule when present" do
+    test "returns arrival_time from schedule when present" do
       prediction = %Prediction{
         arrival_time: ~U[2020-01-01T00:00:00Z],
         departure_time: ~U[2020-01-01T00:01:00Z]
@@ -242,18 +242,18 @@ defmodule Screens.V2.DepartureTest do
 
       departure = %Departure{prediction: prediction, schedule: schedule}
 
-      assert ~U[2020-02-01T00:01:00Z] == Departure.scheduled_time(departure)
+      assert ~U[2020-02-01T00:00:00Z] == Departure.scheduled_time(departure)
     end
 
-    test "returns arrival_time from schedule when departure_time is nil" do
+    test "returns departure_time from schedule when arrival_time is nil" do
       prediction = %Prediction{
         arrival_time: ~U[2020-01-01T00:00:00Z],
         departure_time: ~U[2020-01-01T00:01:00Z]
       }
 
       schedule = %Schedule{
-        arrival_time: ~U[2020-02-01T00:00:00Z],
-        departure_time: nil
+        arrival_time: nil,
+        departure_time: ~U[2020-02-01T00:00:00Z]
       }
 
       departure = %Departure{prediction: prediction, schedule: schedule}
@@ -346,7 +346,7 @@ defmodule Screens.V2.DepartureTest do
   end
 
   describe "time/1" do
-    test "returns departure_time from prediction when present" do
+    test "returns arrival_time from prediction when present" do
       prediction = %Prediction{
         arrival_time: ~U[2020-01-01T00:00:00Z],
         departure_time: ~U[2020-01-01T00:01:00Z]
@@ -359,13 +359,13 @@ defmodule Screens.V2.DepartureTest do
 
       departure = %Departure{prediction: prediction, schedule: schedule}
 
-      assert ~U[2020-01-01T00:01:00Z] == Departure.time(departure)
+      assert ~U[2020-01-01T00:00:00Z] == Departure.time(departure)
     end
 
-    test "returns arrival_time from prediction when departure_time is nil" do
+    test "returns departure_time from prediction when arrival_time is nil" do
       prediction = %Prediction{
-        arrival_time: ~U[2020-01-01T00:00:00Z],
-        departure_time: nil
+        arrival_time: nil,
+        departure_time: ~U[2020-01-01T00:00:00Z]
       }
 
       schedule = %Schedule{
@@ -378,7 +378,7 @@ defmodule Screens.V2.DepartureTest do
       assert ~U[2020-01-01T00:00:00Z] == Departure.time(departure)
     end
 
-    test "returns departure_time from schedule when prediction is nil" do
+    test "returns arrival_time from schedule when prediction is nil" do
       schedule = %Schedule{
         arrival_time: ~U[2020-02-01T00:00:00Z],
         departure_time: ~U[2020-02-01T00:01:00Z]
@@ -386,7 +386,7 @@ defmodule Screens.V2.DepartureTest do
 
       departure = %Departure{prediction: nil, schedule: schedule}
 
-      assert ~U[2020-02-01T00:01:00Z] == Departure.time(departure)
+      assert ~U[2020-02-01T00:00:00Z] == Departure.time(departure)
     end
 
     test "returns arrival_time from schedule when prediction and departure_time are nil" do

@@ -3,11 +3,13 @@ import React from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
-  main_content_zero: WidgetData;
+  main_content: WidgetData;
+  // Rotation is added via the wrapper, but it's not used for this component
+  rotation: string;
 }
 
-const NormalBodyZero: React.ComponentType<Props> = ({
-  main_content_zero: mainContent,
+const NormalBody: React.ComponentType<Props> = ({
+  main_content: mainContent,
 }) => {
   return (
     <div className="body-normal">
@@ -18,4 +20,4 @@ const NormalBodyZero: React.ComponentType<Props> = ({
   );
 };
 
-export default NormalBodyZero;
+export default NormalBody;

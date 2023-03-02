@@ -1,0 +1,21 @@
+.departure-crowding {
+  display: inline-block;
+  vertical-align: middle;
+
+  margin-right: 24px;
+}
+
+.departure-crowding__icon {
+  width: 62px;
+  height: 48px;
+}
+
+.departure-crowding__icon-person {
+  &--active {
+    fill: #000000;
+  }
+
+  &--inactive {
+    fill: #cccccc;
+  }
+}

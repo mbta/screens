@@ -1,7 +1,7 @@
-defmodule Screens.Config.Dup.Override.FreeTextLine do
+defmodule Screens.Config.V2.FreeTextLine do
   @moduledoc false
 
-  alias Screens.Config.Dup.Override.FreeText
+  alias Screens.Config.V2.FreeText
 
   @type t :: %__MODULE__{
           icon: icon,

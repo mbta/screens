@@ -1,0 +1,40 @@
+.partial-alerts {
+  position: absolute;
+  bottom: 0;
+  border-top: 6px solid #bfbebb;
+}
+
+.partial-alert {
+
+  &--green {
+    background: $line-color-green;
+  }
+
+  &--blue {
+    background: $line-color-blue;
+  }
+
+  &--red {
+    background: $line-color-red;
+  }
+
+  &--orange {
+    background: $line-color-orange;
+  }
+
+  &--silver {
+    background: $line-color-silver;
+  }
+
+  &--purple {
+    background: $line-color-cr;
+  }
+
+  &--yellow {
+    background: $alert-yellow;
+  }
+
+  &--teal {
+    background: $line-color-ferry;
+  }
+}

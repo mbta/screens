@@ -193,6 +193,28 @@ config :screens,
       {"70064", "70068", "Alewife"},
       {"70067", "70063", "Ashmont/Braintree"}
     ]
+  },
+  dup_headsign_replacements: %{
+    "Charlestown Navy Yard" => "Charlestown",
+    "Saugus Center via Kennedy Dr & Square One Mall" => "Saugus Center via Kndy Dr & Square One",
+    "Malden via Square One Mall & Kennedy Dr" => "Malden via Square One Mall & Kndy Dr",
+    "Washington St & Pleasant St Weymouth" => "Washington St & Plsnt St Weymouth",
+    "Woodland Rd via Gateway Center" => "Woodland Rd via Gatew'y Center",
+    "Sullivan (Limited Stops)" => "Sullivan",
+    "Ruggles (Limited Stops)" => "Ruggles",
+    "Wickford Junction" => "Wickford Jct",
+    "Needham Heights" => "Needham Hts",
+    "Houghs Neck via McGrath & Germantown" => "Houghs Neck via McGth & Gtwn",
+    "Houghs Neck via Germantown" => "Houghs Neck via Germntwn",
+    "Middleborough/Lakeville" => "Middleborough / Lakeville",
+
+    # The following are special headsigns for the 2022 Orange Line surge
+    "Needham Heights via Ruggles" => "Needham Hts via Ruggles",
+    "Needham Heights via Forest Hills" => "Needham Hts via Forest Hills",
+    "Wickford Junction via Ruggles" => "Wickford Jct via Ruggles",
+    "Wickford Junction via Forest Hills" => "Wickford Jct via Forest Hills",
+    "Providence & Needham via Forest Hills" => "Providence via Forest Hills",
+    "Norwood Central via Ruggles" => "Norwood Cntrl via Ruggles"
   }
 
 config :screens, :screens_by_alert,

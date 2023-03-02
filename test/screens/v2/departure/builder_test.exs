@@ -238,8 +238,8 @@ defmodule Screens.V2.Departure.BuilderTest do
 
       s2 = %Schedule{
         id: "earliest",
-        arrival_time: ~U[2020-02-02T00:00:00Z],
-        departure_time: ~U[2020-02-01T00:00:00Z],
+        arrival_time: ~U[2020-02-01T00:00:00Z],
+        departure_time: ~U[2020-02-02T00:00:00Z],
         trip: %Trip{id: "t4"}
       }
 

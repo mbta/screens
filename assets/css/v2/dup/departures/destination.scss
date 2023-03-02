@@ -1,0 +1,22 @@
+.departure-destination {
+  font-family: Inter, sans-serif;
+  color: #171f26;
+  display: inline-block;
+  vertical-align: middle;
+  width: 1176px;
+  font-size: 138px;
+}
+
+.departure-destination__headsign {
+  line-height: 1em;
+  font-weight: 600;
+  color: black;
+  font-size: 138px;
+}
+
+.departure-destination__variation {
+  font-size: 48px;
+  line-height: 48px;
+  font-weight: 400;
+  color: black;
+}

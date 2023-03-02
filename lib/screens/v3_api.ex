@@ -69,11 +69,18 @@ defmodule Screens.V3Api do
   end
 
   defp build_url(route, params) when map_size(params) == 0 do
-    base_url() <> route
+    base_url()
+    |> URI.parse()
+    |> URI.merge(route)
+    |> URI.to_string()
   end
 
   defp build_url(route, params) do
-    "#{base_url()}#{route}?#{URI.encode_query(params)}"
+    base_url()
+    |> URI.parse()
+    |> URI.merge(route)
+    |> URI.to_string()
+    |> then(&"#{&1}?#{URI.encode_query(params)}")
   end
 
   defp base_url do

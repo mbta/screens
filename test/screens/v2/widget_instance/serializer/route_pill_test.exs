@@ -31,6 +31,11 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
 
     test "Does not include branch name for Green Line" do
       assert %{type: :text, text: "GL", color: :green} ==
+               serialize_for_departure("Green", "", :light_rail, nil)
+    end
+
+    test "Includes branch name for Green Line" do
+      assert %{type: :text, text: "GL·B", color: :green} ==
                serialize_for_departure("Green-B", "", :light_rail, nil)
     end
 

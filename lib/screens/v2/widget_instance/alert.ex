@@ -444,7 +444,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   def audio_view(_instance), do: ScreensWeb.V2.Audio.AlertView
 
-  def alert_id(%__MODULE__{} = instance), do: instance.alert.id
+  def alert_ids(%__MODULE__{} = instance), do: [instance.alert.id]
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.Alert
@@ -463,6 +463,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
   defimpl Screens.V2.AlertWidgetInstance do
     alias Screens.V2.WidgetInstance.Alert
 
-    def alert_id(instance), do: Alert.alert_id(instance)
+    def alert_ids(instance), do: Alert.alert_ids(instance)
   end
 end
