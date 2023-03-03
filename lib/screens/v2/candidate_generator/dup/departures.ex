@@ -13,16 +13,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.DeparturesNoData
 
-  @branch_stations ["place-kencl", "place-jfk", "place-coecl"]
-  @branch_terminals [
-    "Boston College",
-    "Cleveland Circle",
-    "Riverside",
-    "Heath Street",
-    "Ashmont",
-    "Braintree"
-  ]
-
   def departures_instances(
         %Screen{
           app_params: %Dup{
@@ -69,7 +59,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       sections =
         Enum.map(sections_data, fn %{
                                      departures: departures,
-                                     pill: pill,
                                      alert: alert,
                                      headway: headway,
                                      stop_ids: stop_ids
@@ -83,7 +72,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
           case get_headway_mode(stop_ids, headway, alert, now) do
             {:active, time_range, headsign} ->
-              %{type: :headway_section, pill: pill, time_range: time_range, headsign: headsign}
+              %{
+                type: :headway_section,
+                pill: get_section_route_from_alert(stop_ids, alert),
+                time_range: time_range,
+                headsign: headsign
+              }
 
             :inactive ->
               %{type: :normal_section, rows: visible_departures}
@@ -116,11 +110,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
       section_alert = get_section_alert(params, fetch_alerts_fn, now)
 
-      section_route = get_section_route_from_alert(stop_ids, section_alert)
-
       %{
         departures: section_departures,
-        pill: section_route,
         alert: section_alert,
         headway: headway,
         stop_ids: stop_ids
@@ -134,7 +125,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          informed_entities: informed_entities
        }) do
     informed_entities
-    |> Enum.find_value(fn
+    |> Enum.find_value("", fn
       %{route: route, stop: ^stop_id} -> route
       _ -> nil
     end)
@@ -211,14 +202,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   defp temporary_terminal?(_), do: false
 
   defp branch_station?(stop_ids) do
+    branch_stations = Application.get_env(:screens, :dup_headway_branch_stations)
+
     case stop_ids do
-      [parent_station_id] -> parent_station_id in MapSet.new(@branch_stations)
+      [parent_station_id] -> parent_station_id in MapSet.new(branch_stations)
       _ -> false
     end
   end
 
   defp branch_alert?(%{headsign: headsign}) do
-    headsign in MapSet.new(@branch_terminals)
+    branch_terminals = Application.get_env(:screens, :dup_headway_branch_terminals)
+    headsign in MapSet.new(branch_terminals)
   end
 
   defp interpret_alert(alert, [parent_stop_id]) do

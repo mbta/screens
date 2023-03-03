@@ -71,6 +71,26 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       app_id: :dup_v2
     }
 
+    config_branch_station = %Screen{
+      app_params: %DupConfig{
+        header: %Header.CurrentStopId{stop_id: "place-kencl"},
+        primary_departures: %Departures{
+          sections: [
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}},
+              filter: nil,
+              headway: %Headway{headway_id: "green_trunk"}
+            }
+          ]
+        },
+        secondary_departures: %Departures{sections: []}
+      },
+      vendor: :outfront,
+      device_id: "TEST",
+      name: "TEST",
+      app_id: :dup_v2
+    }
+
     fetch_section_departures_fn = fn
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "A"}}]}
@@ -90,6 +110,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-D"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "D"}}]}
+
+      %Section{query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}}} ->
+        {:ok, [%Departure{prediction: %Prediction{id: "Kenmore"}}]}
     end
 
     fetch_alerts_fn = fn
@@ -100,6 +123,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config_primary_and_secondary: config_primary_and_secondary,
       config_only_primary: config_only_primary,
       config_one_section: config_one_section,
+      config_branch_station: config_branch_station,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn
     }
@@ -592,6 +616,247 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                   schedule: nil
                 }
               ]
+            }
+          ],
+          slot_names: [:main_content_two]
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns normal sections for branch station for alert with branch terminal headsign", %{
+      config_branch_station: config,
+      fetch_section_departures_fn: fetch_section_departures_fn
+    } do
+      now = ~U[2020-04-06T10:00:00Z]
+
+      fetch_alerts_fn = fn
+        [
+          direction_id: :both,
+          route_ids: [],
+          stop_ids: ["place-kencl"],
+          route_types: [:light_rail, :subway]
+        ] ->
+          [
+            # Suspension alert from Kenmore to Saint Mary's Street
+            struct(Alert,
+              effect: :suspension,
+              informed_entities: [
+                %{
+                  direction_id: nil,
+                  facility: nil,
+                  route: "Green-C",
+                  route_type: 0,
+                  stop: "70150"
+                },
+                %{
+                  direction_id: nil,
+                  facility: nil,
+                  route: "Green-C",
+                  route_type: 0,
+                  stop: "70151"
+                },
+                %{
+                  direction_id: nil,
+                  facility: nil,
+                  route: "Green-C",
+                  route_type: 0,
+                  stop: "70211"
+                },
+                %{
+                  direction_id: nil,
+                  facility: nil,
+                  route: "Green-C",
+                  route_type: 0,
+                  stop: "70212"
+                },
+                %{
+                  direction_id: nil,
+                  facility: nil,
+                  route: "Green-C",
+                  route_type: 0,
+                  stop: "place-kencl"
+                },
+                %{
+                  direction_id: nil,
+                  facility: nil,
+                  route: "Green-C",
+                  route_type: 0,
+                  stop: "place-smary"
+                }
+              ],
+              active_period: [{~U[2020-04-06T09:00:00Z], nil}]
+            )
+          ]
+      end
+
+      expected_departures = [
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "Kenmore"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_zero]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "Kenmore"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_one]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "Kenmore"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_two]
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns headway sections for branch station for alert with trunk headsign", %{
+      config_branch_station: config,
+      fetch_section_departures_fn: fetch_section_departures_fn
+    } do
+      now = ~U[2020-04-06T10:00:00Z]
+
+      fetch_alerts_fn = fn
+        [
+          direction_id: :both,
+          route_ids: [],
+          stop_ids: ["place-kencl"],
+          route_types: [:light_rail, :subway]
+        ] ->
+          [
+            # Suspension alert from Kenmore to Hynes
+            struct(Alert,
+              effect: :suspension,
+              informed_entities: [
+                %{
+                  direction_id: nil,
+                  facility: nil,
+                  route: "Green-C",
+                  route_type: 0,
+                  stop: "70150"
+                },
+                %{
+                  direction_id: nil,
+                  facility: nil,
+                  route: "Green-C",
+                  route_type: 0,
+                  stop: "70151"
+                },
+                %{
+                  direction_id: nil,
+                  facility: nil,
+                  route: "Green-C",
+                  route_type: 0,
+                  stop: "70152"
+                },
+                %{
+                  direction_id: nil,
+                  facility: nil,
+                  route: "Green-C",
+                  route_type: 0,
+                  stop: "70153"
+                },
+                %{
+                  direction_id: nil,
+                  facility: nil,
+                  route: "Green-C",
+                  route_type: 0,
+                  stop: "place-hymnl"
+                },
+                %{
+                  direction_id: nil,
+                  facility: nil,
+                  route: "Green-C",
+                  route_type: 0,
+                  stop: "place-kencl"
+                }
+              ],
+              active_period: [{~U[2020-04-06T09:00:00Z], nil}]
+            )
+          ]
+      end
+
+      expected_departures = [
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :headway_section,
+              pill: :"green-c",
+              time_range: {7, 13},
+              headsign: "Park Street"
+            }
+          ],
+          slot_names: [:main_content_zero]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :headway_section,
+              pill: :"green-c",
+              time_range: {7, 13},
+              headsign: "Park Street"
+            }
+          ],
+          slot_names: [:main_content_one]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :headway_section,
+              pill: :"green-c",
+              time_range: {7, 13},
+              headsign: "Park Street"
             }
           ],
           slot_names: [:main_content_two]
