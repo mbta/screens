@@ -20,7 +20,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
   end
 
-  describe "serialize_section/1" do
+  describe "serialize_section/2" do
     setup do
       %{
         bus_shelter_screen: %Screen{
@@ -54,6 +54,54 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       assert %{type: :normal_section, rows: [%{type: :notice_row, text: %{icon: nil, text: []}}]} ==
                Departures.serialize_section(section, bus_shelter_screen)
+    end
+  end
+
+  describe "serialize_section/3" do
+    setup do
+      %{
+        dup_screen: %Screen{
+          app_id: :dup_v2,
+          vendor: :outfront,
+          device_id: "TEST",
+          name: "TEST",
+          app_params: nil
+        }
+      }
+    end
+
+    test "returns serialized headway_section for one configured section", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :headway_section, pill: :red, time_range: {1, 2}, headsign: "Test"}
+
+      expected_text = %{
+        icon: "subway-negative-black",
+        text: [
+          %{color: :red, text: "Red Line"},
+          %{special: :break},
+          "Test trains every",
+          %{format: :bold, text: "1-2"},
+          "minutes"
+        ]
+      }
+
+      assert %{type: :headway_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
+    test "returns serialized headway_section for multiple configured sections", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :headway_section, pill: :red, time_range: {1, 2}, headsign: "Test"}
+
+      expected_text = %{
+        icon: :red,
+        text: ["every", %{format: :bold, text: "1-2"}, "minutes"]
+      }
+
+      assert %{type: :headway_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, false)
     end
   end
 

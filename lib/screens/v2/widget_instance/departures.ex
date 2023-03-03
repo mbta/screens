@@ -23,13 +23,18 @@ defmodule Screens.V2.WidgetInstance.Departures do
           text: FreeTextLine.t()
         }
 
+  @type headway_section :: %{
+          type: :headway_section,
+          pill: :red | :orange | :green | :blue
+        }
+
   @type notice :: %{
           text: FreeTextLine.t()
         }
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          section_data: list(section | notice_section),
+          section_data: list(section | notice_section | headway_section()),
           slot_names: list(atom())
         }
 
@@ -41,7 +46,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def priority(_instance), do: [2]
 
     def serialize(%Departures{section_data: section_data, screen: screen}) do
-      %{sections: Enum.map(section_data, &Departures.serialize_section(&1, screen))}
+      %{
+        sections:
+          Enum.map(
+            section_data,
+            &Departures.serialize_section(&1, screen, length(section_data) == 1)
+          )
+      }
     end
 
     def slot_names(%Departures{slot_names: slot_names}) when length(slot_names) > 0,
@@ -64,11 +75,43 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def audio_view(_instance), do: ScreensWeb.V2.Audio.DeparturesView
   end
 
-  def serialize_section(%{type: :notice_section, text: text}, _screen) do
+  def serialize_section(section, screen, is_only_section \\ false)
+
+  def serialize_section(%{type: :notice_section, text: text}, _screen, _) do
     %{type: :notice_section, text: text}
   end
 
-  def serialize_section(%{type: :normal_section, rows: departures}, screen) do
+  def serialize_section(
+        %{type: :headway_section, pill: pill, time_range: {lo, hi}, headsign: headsign},
+        _screen,
+        is_only_section
+      ) do
+    text =
+      if is_only_section do
+        %FreeTextLine{
+          icon: "subway-negative-black",
+          text: [
+            %{
+              color: pill,
+              text: "#{String.capitalize("#{pill}")} Line"
+            },
+            %{special: :break},
+            "#{headsign} trains every",
+            %{format: :bold, text: "#{lo}-#{hi}"},
+            "minutes"
+          ]
+        }
+      else
+        %FreeTextLine{
+          icon: pill,
+          text: ["every", %{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
+        }
+      end
+
+    %{type: :headway_section, text: FreeTextLine.to_json(text)}
+  end
+
+  def serialize_section(%{type: :normal_section, rows: departures}, screen, _) do
     rows =
       departures
       |> Enum.take(@max_departures)
