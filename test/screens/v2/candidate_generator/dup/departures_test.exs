@@ -870,7 +870,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn
         )
-        |> IO.inspect()
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
