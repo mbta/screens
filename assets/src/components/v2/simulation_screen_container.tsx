@@ -11,21 +11,29 @@ import {
 
 interface SimulationScreenLayoutProps {
   apiResponse: ApiResponse;
+  opts: { [key: string]: any };
 }
 
 const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
   apiResponse,
+  opts,
 }) => {
   const responseMapper = useContext(ResponseMapperContext);
   const data = responseMapper(apiResponse);
   const { fullPage, flexZone } = data;
+
+  // If "alternateView" was provided as an option, we use the simulation version of screen normal
+  // Currently only applies to DUPs
+  const widgetData = opts.alternateView
+    ? { ...fullPage, type: "simulation_screen_normal" }
+    : { fullPage };
 
   return (
     <div className="simulation-screen-centering-container">
       <div className="simulation-screen-scrolling-container">
         {apiResponse && (
           <div className="simulation__full-page">
-            <Widget data={fullPage ?? data} />
+            <Widget data={widgetData} />
           </div>
         )}
         {flexZone?.length > 0 && (
@@ -47,12 +55,18 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
   );
 };
 
-const SimulationScreenContainer = ({ id }) => {
+const SimulationScreenContainer = ({
+  id,
+  opts = {},
+}: {
+  id: string;
+  opts?: { [key: string]: any };
+}) => {
   const { apiResponse, lastSuccess } = useSimulationApiResponse({ id });
 
   return (
     <LastFetchContext.Provider value={lastSuccess}>
-      <SimulationScreenLayout apiResponse={apiResponse} />
+      <SimulationScreenLayout apiResponse={apiResponse} opts={opts} />
     </LastFetchContext.Provider>
   );
 };
