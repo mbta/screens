@@ -82,18 +82,20 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
-        %{type: :headway_section, pill: pill, time_range: {lo, hi}, headsign: headsign},
+        %{type: :headway_section, route: route, time_range: {lo, hi}, headsign: headsign},
         _screen,
         is_only_section
       ) do
+    pill_color = Util.get_color_for_route(route)
+
     text =
       if is_only_section do
         %FreeTextLine{
           icon: "subway-negative-black",
           text: [
             %{
-              color: pill,
-              text: "#{String.capitalize("#{pill}")} Line"
+              color: pill_color,
+              text: "#{String.upcase(route)} LINE"
             },
             %{special: :break},
             "#{headsign} trains every",
@@ -103,7 +105,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         }
       else
         %FreeTextLine{
-          icon: pill,
+          icon: pill_color,
           text: ["every", %{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
         }
       end

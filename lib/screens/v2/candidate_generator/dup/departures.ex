@@ -74,7 +74,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
             {:active, time_range, headsign} ->
               %{
                 type: :headway_section,
-                pill: get_section_route_from_alert(stop_ids, alert),
+                route: get_section_route_from_alert(stop_ids, alert),
                 time_range: time_range,
                 headsign: headsign
               }
@@ -124,13 +124,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   defp get_section_route_from_alert(["place-" <> _ = stop_id], %Alert{
          informed_entities: informed_entities
        }) do
-    informed_entities
-    |> Enum.find_value("", fn
+    Enum.find_value(informed_entities, "", fn
+      %{route: "Green" <> _, stop: ^stop_id} -> "Green"
       %{route: route, stop: ^stop_id} -> route
       _ -> nil
     end)
-    |> String.downcase()
-    |> String.to_atom()
   end
 
   defp get_section_route_from_alert(_, _), do: nil
