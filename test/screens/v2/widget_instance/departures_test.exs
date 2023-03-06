@@ -73,12 +73,12 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     test "returns serialized headway_section for one configured section", %{
       dup_screen: dup_screen
     } do
-      section = %{type: :headway_section, pill: :red, time_range: {1, 2}, headsign: "Test"}
+      section = %{type: :headway_section, route: "Red", time_range: {1, 2}, headsign: "Test"}
 
       expected_text = %{
         icon: "subway-negative-black",
         text: [
-          %{color: :red, text: "Red Line"},
+          %{color: :red, text: "RED LINE"},
           %{special: :break},
           "Test trains every",
           %{format: :bold, text: "1-2"},
@@ -93,7 +93,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     test "returns serialized headway_section for multiple configured sections", %{
       dup_screen: dup_screen
     } do
-      section = %{type: :headway_section, pill: :red, time_range: {1, 2}, headsign: "Test"}
+      section = %{type: :headway_section, route: "Red", time_range: {1, 2}, headsign: "Test"}
 
       expected_text = %{
         icon: :red,
