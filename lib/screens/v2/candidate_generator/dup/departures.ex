@@ -8,6 +8,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.Config.V2.Departures.Query.Params
   alias Screens.Config.V2.Dup
   alias Screens.SignsUiConfig
+  alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
@@ -22,11 +23,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         } = config,
         now,
         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
-        fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1
+        fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1,
+        create_station_with_routes_map_fn \\ &Stop.create_station_with_routes_map/1
       ) do
     primary_departures_instances =
       primary_sections
-      |> get_sections_data(fetch_section_departures_fn, fetch_alerts_fn, now)
+      |> get_sections_data(
+        fetch_section_departures_fn,
+        fetch_alerts_fn,
+        create_station_with_routes_map_fn,
+        now
+      )
       |> sections_data_to_departure_instances(
         config,
         [:main_content_zero, :main_content_one],
@@ -42,7 +49,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
     secondary_departures_instances =
       secondary_sections
-      |> get_sections_data(fetch_section_departures_fn, fetch_alerts_fn, now)
+      |> get_sections_data(
+        fetch_section_departures_fn,
+        fetch_alerts_fn,
+        create_station_with_routes_map_fn,
+        now
+      )
       |> sections_data_to_departure_instances(
         config,
         [:main_content_two],
@@ -57,31 +69,35 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       %DeparturesNoData{screen: config, show_alternatives?: true}
     else
       sections =
-        Enum.map(sections_data, fn %{
-                                     departures: departures,
-                                     alert: alert,
-                                     headway: headway,
-                                     stop_ids: stop_ids
-                                   } ->
-          visible_departures =
-            if length(sections_data) > 1 do
-              Enum.take(departures, 2)
-            else
-              Enum.take(departures, 4)
+        Enum.map(sections_data, fn
+          %{error: true, route: route} ->
+            %{type: :no_data_section, route: route}
+
+          %{
+            departures: departures,
+            alert: alert,
+            headway: headway,
+            stop_ids: stop_ids
+          } ->
+            visible_departures =
+              if length(sections_data) > 1 do
+                Enum.take(departures, 2)
+              else
+                Enum.take(departures, 4)
+              end
+
+            case get_headway_mode(stop_ids, headway, alert, now) do
+              {:active, time_range, headsign} ->
+                %{
+                  type: :headway_section,
+                  pill: get_section_route_from_alert(stop_ids, alert),
+                  time_range: time_range,
+                  headsign: headsign
+                }
+
+              :inactive ->
+                %{type: :normal_section, rows: visible_departures}
             end
-
-          case get_headway_mode(stop_ids, headway, alert, now) do
-            {:active, time_range, headsign} ->
-              %{
-                type: :headway_section,
-                pill: get_section_route_from_alert(stop_ids, alert),
-                time_range: time_range,
-                headsign: headsign
-              }
-
-            :inactive ->
-              %{type: :normal_section, rows: visible_departures}
-          end
         end)
 
       Enum.map(slot_ids, fn slot_id ->
@@ -94,28 +110,41 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     end
   end
 
-  defp get_sections_data(sections, fetch_section_departures_fn, fetch_alerts_fn, now) do
+  defp get_sections_data(
+         sections,
+         fetch_section_departures_fn,
+         fetch_alerts_fn,
+         create_station_with_routes_map_fn,
+         now
+       ) do
     sections
     |> Task.async_stream(fn %Section{
                               query: %Query{
-                                params: %Params{stop_ids: stop_ids} = params
+                                params: %Params{stop_ids: stop_ids, route_ids: route_ids} = params
                               },
                               headway: headway
                             } = section ->
-      section_departures =
-        case fetch_section_departures_fn.(section) do
-          {:ok, section_departures} -> section_departures
-          _ -> []
-        end
+      route =
+        get_primary_route_for_section(stop_ids, route_ids, create_station_with_routes_map_fn)
 
-      section_alert = get_section_alert(params, fetch_alerts_fn, now)
+      if Screens.Config.State.mode_disabled?(route.type) do
+        %{error: true, route: route}
+      else
+        section_departures =
+          case fetch_section_departures_fn.(section) do
+            {:ok, section_departures} -> section_departures
+            _ -> []
+          end
 
-      %{
-        departures: section_departures,
-        alert: section_alert,
-        headway: headway,
-        stop_ids: stop_ids
-      }
+        section_alert = get_section_alert(params, fetch_alerts_fn, now)
+
+        %{
+          departures: section_departures,
+          alert: section_alert,
+          headway: headway,
+          stop_ids: stop_ids
+        }
+      end
     end)
     |> Enum.map(fn {:ok, data} -> data end)
   end
@@ -241,5 +270,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do
     MapSet.subset?(informed, informed_stop_ids) and
       MapSet.disjoint?(not_informed, informed_stop_ids)
+  end
+
+  defp get_primary_route_for_section([stop_id | _], route_ids, create_station_with_routes_map_fn) do
+    all_routes = create_station_with_routes_map_fn.(stop_id)
+
+    if route_ids != [] do
+      Enum.find(all_routes, fn route -> route.id in route_ids end)
+    else
+      List.first(all_routes)
+    end
   end
 end
