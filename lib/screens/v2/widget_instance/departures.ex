@@ -81,6 +81,15 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :notice_section, text: text}
   end
 
+  def serialize_section(%{type: :no_data_section, route: route}, _screen, _) do
+    text = %FreeTextLine{
+      icon: Util.get_color_for_route(route.id),
+      text: ["Updates unavailable"]
+    }
+
+    %{type: :no_data_section, text: FreeTextLine.to_json(text)}
+  end
+
   def serialize_section(
         %{type: :headway_section, pill: pill, time_range: {lo, hi}, headsign: headsign},
         _screen,
