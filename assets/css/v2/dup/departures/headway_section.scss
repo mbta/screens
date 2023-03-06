@@ -1,7 +1,7 @@
 .headway-section {
-  .full-screen-alert-text {
+  .full-screen-headway {
     padding-top: 72px;
-    padding-left: 64px;
+    padding-left: 72px;
     padding-right: 64px;
   }
 
@@ -15,24 +15,5 @@
 
   .free-text__text-pill {
     color: #ffffff;
-  }
-
-  &__link {
-    position: absolute;
-    bottom: 56px;
-    right: 72px;
-  }
-
-  &__link-arrow {
-    display: inline-block;
-    vertical-align: middle;
-  }
-
-  &__link-text {
-    display: inline-block;
-    vertical-align: middle;
-    font-family: Inter;
-    font-size: 108px;
-    margin-left: 72px;
   }
 }
