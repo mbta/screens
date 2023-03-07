@@ -3,7 +3,8 @@ import _ from "lodash";
 
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 
-const pillIcons = ["red", "blue", "orange", "green", "silver", "cr", "bus"];
+const textPills = ["red", "blue", "orange", "green", "silver"];
+const iconPills = ["cr", "bus"];
 
 const iconPaths: { [key: string]: string } = _.mapValues(
   {
@@ -48,8 +49,10 @@ const Icon = ({ icon }: { icon: string }) => {
 
   if (icon === null) {
     iconElt = null;
-  } else if (pillIcons.includes(icon)) {
-    iconElt = <RoutePill route={icon} />;
+  } else if (textPills.includes(icon)) {
+    iconElt = <TextRoutePill route={icon} />;
+  } else if (iconPills.includes(icon)) {
+    iconElt = <IconRoutePill route={icon} />;
   } else {
     iconElt = <img className="free-text__icon-image" src={srcForIcon(icon)} />;
   }
@@ -75,8 +78,7 @@ const FormatString = ({ format, text }: { format: string; text: string }) => {
   return <span className={className}>{text}</span>;
 };
 
-const RoutePill = ({ route }: { route: string }) => {
-  // If routeName is null, assume it should be an icon.
+const TextRoutePill = ({ route }: { route: string }) => {
   const routeName = {
     red: "RL",
     blue: "BL",
@@ -97,12 +99,18 @@ const RoutePill = ({ route }: { route: string }) => {
         <div
           className={classWithModifier("free-text__route-pill__text", branch)}
         >
-          {routeName ? (
-            routeName
-          ) : (
-            <img className="free-text__icon-image" src={srcForIcon(route)} />
-          )}
+          {routeName}
         </div>
+      </div>
+    </span>
+  );
+};
+
+const IconRoutePill = ({ route }: { route: string }) => {
+  return (
+    <span className="free-text__element free-text__route-container">
+      <div className={classWithModifier("free-text__route-pill", route)}>
+        <img className="free-text__icon-image" src={srcForIcon(route)} />
       </div>
     </span>
   );
