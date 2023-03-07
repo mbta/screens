@@ -283,15 +283,13 @@
     width: 248px;
     border-radius: 72px;
     margin: 0 32px 0 0;
-    display: table;
   }
 
   .free-text__route-pill__text {
     font-size: 96px;
     font-weight: 700;
-    display: table-cell;
-    vertical-align: middle;
-    transform: unset;
+    line-height: 117px;
+    margin-top: 10px;
   }
 
   .free-text__icon-container {
@@ -299,5 +297,10 @@
     height: 144px;
     margin-right: 32px;
     vertical-align: top;
+  }
+
+  .free-text__icon-image {
+    height: 112.5px;
+    margin-top: 15.75px;
   }
 }
