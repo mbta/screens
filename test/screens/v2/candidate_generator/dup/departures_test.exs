@@ -100,11 +100,21 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               query: %Query{params: %Query.Params{stop_ids: ["Boat"]}},
               filter: nil,
               headway: %Headway{headway_id: "ferry"}
-            },
-            %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil}
+            }
           ]
         },
-        secondary_departures: %Departures{sections: []}
+        secondary_departures: %Departures{
+          sections: [
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Orange"]}},
+              filter: nil
+            },
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Green"]}},
+              filter: nil
+            }
+          ]
+        }
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -142,6 +152,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     create_station_with_routes_map_fn = fn
       "Boat" -> [%{id: "Ferry", type: :ferry}]
+      "place-A" -> [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]
       _ -> [%{type: :test}]
     end
 
@@ -931,15 +942,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :no_data_section,
               route: %{id: "Ferry", type: :ferry}
-            },
-            %{
-              type: :normal_section,
-              rows: [
-                %Screens.V2.Departure{
-                  prediction: struct(Prediction, id: "A"),
-                  schedule: nil
-                }
-              ]
             }
           ],
           slot_names: [:main_content_zero]
@@ -950,15 +952,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :no_data_section,
               route: %{id: "Ferry", type: :ferry}
-            },
-            %{
-              type: :normal_section,
-              rows: [
-                %Screens.V2.Departure{
-                  prediction: struct(Prediction, id: "A"),
-                  schedule: nil
-                }
-              ]
             }
           ],
           slot_names: [:main_content_one]
@@ -967,10 +960,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           screen: config,
           section_data: [
             %{
-              type: :no_data_section,
-              route: %{id: "Ferry", type: :ferry}
-            },
-            %{
               type: :normal_section,
               rows: [
                 %Screens.V2.Departure{
@@ -978,6 +967,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                   schedule: nil
                 }
               ]
+            },
+            %{
+              type: :no_data_section,
+              route: %{id: "Green", type: :light_rail}
             }
           ],
           slot_names: [:main_content_two]

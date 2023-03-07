@@ -1,6 +1,6 @@
 {
   "devops": {
-    "disabled_modes": ["ferry"]
+    "disabled_modes": ["ferry", "light_rail"]
   },
   "screens": {
     "111": {
