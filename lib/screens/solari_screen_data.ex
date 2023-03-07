@@ -101,7 +101,7 @@ defmodule Screens.SolariScreenData do
 
     subway_section? = pill in ~w[red orange blue]a
 
-    commuter_rail_disabled? = State.mode_disabled?(:commuter_rail)
+    commuter_rail_disabled? = State.mode_disabled?(:rail)
     commuter_rail_section? = pill === :cr
 
     light_rail_disabled? = State.mode_disabled?(:light_rail)
