@@ -103,6 +103,58 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{type: :headway_section, text: expected_text} ==
                Departures.serialize_section(section, dup_screen, false)
     end
+
+    test "returns serialized no_data_section for subway/light rail", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :no_data_section, route: %{id: "Orange", type: :subway}}
+
+      expected_text = %{
+        icon: :orange,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+
+      section = %{type: :no_data_section, route: %{id: "Green", type: :light_rail}}
+
+      expected_text = %{
+        icon: :green,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
+    test "returns serialized no_data_section for bus", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :no_data_section, route: %{id: "555", type: :bus}}
+
+      expected_text = %{
+        icon: :bus,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
+    test "returns serialized no_data_section for CR", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :no_data_section, route: %{id: "CR-Test", type: :rail}}
+
+      expected_text = %{
+        icon: :cr,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
   end
 
   describe "group_consecutive_departures/2" do
