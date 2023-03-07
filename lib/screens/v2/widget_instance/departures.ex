@@ -85,6 +85,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     icon =
       case route do
         %{type: :rail} -> :cr
+        %{short_name: "SL" <> _} -> :silver
         %{type: :bus} -> :bus
         %{id: id} -> Util.get_color_for_route(id)
       end

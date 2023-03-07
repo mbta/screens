@@ -142,6 +142,20 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                Departures.serialize_section(section, dup_screen, true)
     end
 
+    test "returns serialized no_data_section for SL", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :no_data_section, route: %{short_name: "SL1", type: :bus}}
+
+      expected_text = %{
+        icon: :silver,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
     test "returns serialized no_data_section for CR", %{
       dup_screen: dup_screen
     } do
