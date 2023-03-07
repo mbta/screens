@@ -12,7 +12,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.Util
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.DeparturesNoData
 
   def departures_instances(
         %Screen{
@@ -65,49 +64,45 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   defp sections_data_to_departure_instances(sections_data, config, slot_ids, now) do
-    if Enum.any?(sections_data, &(&1 == :error)) do
-      %DeparturesNoData{screen: config, show_alternatives?: true}
-    else
-      sections =
-        Enum.map(sections_data, fn
-          %{error: true, route: route} ->
-            %{type: :no_data_section, route: route}
+    sections =
+      Enum.map(sections_data, fn
+        %{type: :no_data_section} = no_data_section ->
+          no_data_section
 
-          %{
-            departures: departures,
-            alert: alert,
-            headway: headway,
-            stop_ids: stop_ids
-          } ->
-            visible_departures =
-              if length(sections_data) > 1 do
-                Enum.take(departures, 2)
-              else
-                Enum.take(departures, 4)
-              end
-
-            case get_headway_mode(stop_ids, headway, alert, now) do
-              {:active, time_range, headsign} ->
-                %{
-                  type: :headway_section,
-                  pill: get_section_route_from_alert(stop_ids, alert),
-                  time_range: time_range,
-                  headsign: headsign
-                }
-
-              :inactive ->
-                %{type: :normal_section, rows: visible_departures}
+        %{
+          departures: departures,
+          alert: alert,
+          headway: headway,
+          stop_ids: stop_ids
+        } ->
+          visible_departures =
+            if length(sections_data) > 1 do
+              Enum.take(departures, 2)
+            else
+              Enum.take(departures, 4)
             end
-        end)
 
-      Enum.map(slot_ids, fn slot_id ->
-        %DeparturesWidget{
-          screen: config,
-          section_data: sections,
-          slot_names: [slot_id]
-        }
+          case get_headway_mode(stop_ids, headway, alert, now) do
+            {:active, time_range, headsign} ->
+              %{
+                type: :headway_section,
+                pill: get_section_route_from_alert(stop_ids, alert),
+                time_range: time_range,
+                headsign: headsign
+              }
+
+            :inactive ->
+              %{type: :normal_section, rows: visible_departures}
+          end
       end)
-    end
+
+    Enum.map(slot_ids, fn slot_id ->
+      %DeparturesWidget{
+        screen: config,
+        section_data: sections,
+        slot_names: [slot_id]
+      }
+    end)
   end
 
   defp get_sections_data(
@@ -127,8 +122,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       route =
         get_primary_route_for_section(stop_ids, route_ids, create_station_with_routes_map_fn)
 
+      # If we know the predictions are unreliable, don't even bother fetching them.
       if Screens.Config.State.mode_disabled?(route.type) do
-        %{error: true, route: route}
+        %{type: :no_data_section, route: route}
       else
         section_departures =
           case fetch_section_departures_fn.(section) do
@@ -272,6 +268,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       MapSet.disjoint?(not_informed, informed_stop_ids)
   end
 
+  # DUP sections will always show one mode.
+  # For subway, each route will have its own section.
+  # If the stop is served by two different subway/light rail routes, route_ids must be populated for each section
+  # Otherwise, we only need the first route in the list of routes serving the stop.
   defp get_primary_route_for_section([stop_id | _], route_ids, create_station_with_routes_map_fn) do
     all_routes = create_station_with_routes_map_fn.(stop_id)
 
