@@ -12,6 +12,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.Util
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.DeparturesNoData
 
   def departures_instances(
         %Screen{
@@ -73,7 +74,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           departures: departures,
           alert: alert,
           headway: headway,
-          stop_ids: stop_ids
+          stop_ids: stop_ids,
+          route: route
         } ->
           visible_departures =
             if length(sections_data) > 1 do
@@ -92,16 +94,24 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
               }
 
             :inactive ->
-              %{type: :normal_section, rows: visible_departures}
+              if visible_departures == [] do
+                %{type: :no_data_section, route: route}
+              else
+                %{type: :normal_section, rows: visible_departures}
+              end
           end
       end)
 
     Enum.map(slot_ids, fn slot_id ->
-      %DeparturesWidget{
-        screen: config,
-        section_data: sections,
-        slot_names: [slot_id]
-      }
+      if Enum.all?(sections, &(&1.type == :no_data_section)) do
+        %DeparturesNoData{screen: config, show_alternatives?: true, slot_names: [slot_id]}
+      else
+        %DeparturesWidget{
+          screen: config,
+          section_data: sections,
+          slot_names: [slot_id]
+        }
+      end
     end)
   end
 
@@ -123,7 +133,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         get_primary_route_for_section(stop_ids, route_ids, create_station_with_routes_map_fn)
 
       # If we know the predictions are unreliable, don't even bother fetching them.
-      if Screens.Config.State.mode_disabled?(route.type) do
+      if not is_nil(route) and Screens.Config.State.mode_disabled?(route.type) do
         %{type: :no_data_section, route: route}
       else
         section_departures =
@@ -138,7 +148,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           departures: section_departures,
           alert: section_alert,
           headway: headway,
-          stop_ids: stop_ids
+          stop_ids: stop_ids,
+          route: route
         }
       end
     end)
