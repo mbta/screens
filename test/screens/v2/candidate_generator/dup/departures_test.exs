@@ -10,6 +10,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.V2.Departure
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.DeparturesNoData
 
   setup do
     config_primary_and_secondary = %Screen{
@@ -100,6 +101,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               query: %Query{params: %Query.Params{stop_ids: ["Boat"]}},
               filter: nil,
               headway: %Headway{headway_id: "ferry"}
+            },
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Orange"]}},
+              filter: nil
             }
           ]
         },
@@ -108,6 +113,37 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %Section{
               query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Orange"]}},
               filter: nil
+            },
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Green"]}},
+              filter: nil
+            }
+          ]
+        }
+      },
+      vendor: :outfront,
+      device_id: "TEST",
+      name: "TEST",
+      app_id: :dup_v2
+    }
+
+    config_no_data = %Screen{
+      app_params: %DupConfig{
+        header: %Header.CurrentStopId{stop_id: "Boat"},
+        primary_departures: %Departures{
+          sections: [
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["place-E"], route_ids: []}},
+              filter: nil
+            }
+          ]
+        },
+        secondary_departures: %Departures{
+          sections: [
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["Boat"]}},
+              filter: nil,
+              headway: %Headway{headway_id: "ferry"}
             },
             %Section{
               query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Green"]}},
@@ -142,6 +178,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-D"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "D"}}]}
 
+      %Section{query: %Query{params: %Query.Params{stop_ids: ["place-E"]}}} ->
+        {:ok, []}
+
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "Kenmore"}}]}
     end
@@ -162,6 +201,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config_one_section: config_one_section,
       config_branch_station: config_branch_station,
       config_disabled_mode: config_disabled_mode,
+      config_no_data: config_no_data,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn
@@ -942,6 +982,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :no_data_section,
               route: %{id: "Ferry", type: :ferry}
+            },
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "A"),
+                  schedule: nil
+                }
+              ]
             }
           ],
           slot_names: [:main_content_zero]
@@ -952,6 +1001,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :no_data_section,
               route: %{id: "Ferry", type: :ferry}
+            },
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "A"),
+                  schedule: nil
+                }
+              ]
             }
           ],
           slot_names: [:main_content_one]
@@ -973,6 +1031,44 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               route: %{id: "Green", type: :light_rail}
             }
           ],
+          slot_names: [:main_content_two]
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_fn,
+          create_station_with_routes_map_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns DeparturesNoData if all sections have no data", %{
+      config_no_data: config,
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_alerts_fn: fetch_alerts_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+    } do
+      now = ~U[2020-04-06T10:00:00Z]
+
+      expected_departures = [
+        %DeparturesNoData{
+          screen: config,
+          show_alternatives?: nil,
+          slot_names: [:main_content_zero]
+        },
+        %DeparturesNoData{
+          screen: config,
+          show_alternatives?: nil,
+          slot_names: [:main_content_one]
+        },
+        %DeparturesNoData{
+          screen: config,
+          show_alternatives?: nil,
           slot_names: [:main_content_two]
         }
       ]
