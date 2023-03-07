@@ -1,6 +1,6 @@
 {
   "devops": {
-    "disabled_modes": []
+    "disabled_modes": ["ferry"]
   },
   "screens": {
     "111": {
@@ -8,10 +8,7 @@
       "app_params": {
         "direction_id": 1,
         "headway_mode": false,
-        "nearby_departures": [
-          "941",
-          "951"
-        ],
+        "nearby_departures": ["941", "951"],
         "platform_id": "70148",
         "psa_config": {
           "default_list": {
@@ -38,15 +35,14 @@
         "overhead": false,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "normal",
-        "sections": [{
+        "sections": [
+          {
             "arrow": "w",
             "audio": {
               "wayfinding": "Upper Busway"
@@ -63,7 +59,8 @@
                 "paged": true,
                 "routes": {
                   "action": "exclude",
-                  "route_list": [{
+                  "route_list": [
+                    {
                       "direction_id": 0,
                       "route": "90"
                     },
@@ -159,68 +156,67 @@
         "overhead": true,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "normal",
-        "sections": [{
-          "arrow": null,
-          "audio": {
-            "wayfinding": "Platform C"
-          },
-          "headway": {
-            "headsigns": [],
-            "headway_id": null,
-            "sign_ids": []
-          },
-          "layout": {
-            "opts": {
-              "max_minutes": "infinity",
-              "num_rows": 8,
-              "paged": false,
-              "routes": {
-                "action": "include",
-                "route_list": [{
-                    "direction_id": 1,
-                    "route": "14"
-                  },
-                  {
-                    "direction_id": 0,
-                    "route": "41"
-                  },
-                  {
-                    "direction_id": 0,
-                    "route": "42"
-                  },
-                  {
-                    "direction_id": 0,
-                    "route": "66"
-                  }
-                ]
+        "sections": [
+          {
+            "arrow": null,
+            "audio": {
+              "wayfinding": "Platform C"
+            },
+            "headway": {
+              "headsigns": [],
+              "headway_id": null,
+              "sign_ids": []
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 8,
+                "paged": false,
+                "routes": {
+                  "action": "include",
+                  "route_list": [
+                    {
+                      "direction_id": 1,
+                      "route": "14"
+                    },
+                    {
+                      "direction_id": 0,
+                      "route": "41"
+                    },
+                    {
+                      "direction_id": 0,
+                      "route": "42"
+                    },
+                    {
+                      "direction_id": 0,
+                      "route": "66"
+                    }
+                  ]
+                },
+                "visible_rows": 1
               },
-              "visible_rows": 1
+              "type": "upcoming"
             },
-            "type": "upcoming"
-          },
-          "name": "Platform C",
-          "pill": "bus",
-          "query": {
-            "opts": {
-              "include_schedules": false
-            },
-            "params": {
-              "direction_id": "both",
-              "route_ids": [],
-              "stop_ids": [
-                "place-dudly"
-              ]
+            "name": "Platform C",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": "both",
+                "route_ids": [],
+                "stop_ids": ["place-dudly"]
+              }
             }
           }
-        }],
+        ],
         "station_name": "Nubian"
       },
       "device_id": "SOL04",
@@ -233,20 +229,13 @@
     "10": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "8",
-              "47",
-              "CT3"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["8", "47", "CT3"],
             "stop": "1790"
           },
           {
-            "routes_at_stop": [
-              "SL4",
-              "SL5",
-              "8"
-            ],
+            "routes_at_stop": ["SL4", "SL5", "8"],
             "stop": "5"
           }
         ],
@@ -270,12 +259,12 @@
     "14": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-          "routes_at_stop": [
-            "Orange Line"
-          ],
-          "stop": "place-rcmnl"
-        }],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["Orange Line"],
+            "stop": "place-rcmnl"
+          }
+        ],
         "psa_config": {
           "default_list": {
             "paths": [],
@@ -300,15 +289,14 @@
         "overhead": false,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "normal",
-        "sections": [{
+        "sections": [
+          {
             "arrow": "e",
             "audio": {
               "wayfinding": "Upper Busway"
@@ -325,7 +313,8 @@
                 "paged": true,
                 "routes": {
                   "action": "exclude",
-                  "route_list": [{
+                  "route_list": [
+                    {
                       "direction_id": 1,
                       "route": "74"
                     },
@@ -360,10 +349,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "20761",
-                  "20762"
-                ]
+                "stop_ids": ["20761", "20762"]
               }
             }
           },
@@ -384,7 +370,8 @@
                 "paged": false,
                 "routes": {
                   "action": "exclude",
-                  "route_list": [{
+                  "route_list": [
+                    {
                       "direction_id": 1,
                       "route": "74"
                     },
@@ -419,9 +406,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "2076"
-                ]
+                "stop_ids": ["2076"]
               }
             }
           }
@@ -440,13 +425,13 @@
       "app_params": {
         "primary": {
           "header": "Long Wharf South",
-          "sections": [{
-            "pill": "ferry",
-            "route_ids": [],
-            "stop_ids": [
-              "Boat-Long-South"
-            ]
-          }]
+          "sections": [
+            {
+              "pill": "ferry",
+              "route_ids": [],
+              "stop_ids": ["Boat-Long-South"]
+            }
+          ]
         },
         "secondary": {
           "header": "",
@@ -463,18 +448,13 @@
     "12": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "Green Line"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["Green Line"],
             "stop": "place-coecl"
           },
           {
-            "routes_at_stop": [
-              "9",
-              "39",
-              "55"
-            ],
+            "routes_at_stop": ["9", "39", "55"],
             "stop": "175"
           }
         ],
@@ -502,15 +482,14 @@
         "overhead": false,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "none",
-        "sections": [{
+        "sections": [
+          {
             "arrow": "e",
             "audio": {
               "wayfinding": null
@@ -538,10 +517,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "70045",
-                  "70046"
-                ]
+                "stop_ids": ["70045", "70046"]
               }
             }
           },
@@ -577,10 +553,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "5740",
-                  "57400"
-                ]
+                "stop_ids": ["5740", "57400"]
               }
             }
           }
@@ -597,16 +570,13 @@
     "16": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "44"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["44"],
             "stop": "1346"
           },
           {
-            "routes_at_stop": [
-              "45"
-            ],
+            "routes_at_stop": ["45"],
             "stop": "1583"
           }
         ],
@@ -630,17 +600,13 @@
     "4": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "CR-Fitchburg"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["CR-Fitchburg"],
             "stop": "place-FR-0074"
           },
           {
-            "routes_at_stop": [
-              "74",
-              "75"
-            ],
+            "routes_at_stop": ["74", "75"],
             "stop": "2137"
           }
         ],
@@ -664,19 +630,13 @@
     "8": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "33",
-              "40/50",
-              "50"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["33", "40/50", "50"],
             "stop": "26531"
           },
           {
-            "routes_at_stop": [
-              "CR-Franklin",
-              "CR-Providence"
-            ],
+            "routes_at_stop": ["CR-Franklin", "CR-Providence"],
             "stop": "place-NEC-2203"
           }
         ],
@@ -700,19 +660,13 @@
     "5": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "Red Line",
-              "Bus"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["Red Line", "Bus"],
             "stop": "place-harsq"
           },
           {
-            "routes_at_stop": [
-              "1",
-              "68",
-              "69"
-            ],
+            "routes_at_stop": ["1", "68", "69"],
             "stop": "110"
           }
         ],
@@ -740,15 +694,14 @@
         "overhead": false,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "normal",
-        "sections": [{
+        "sections": [
+          {
             "arrow": "nw",
             "audio": {
               "wayfinding": "Back Bay"
@@ -780,9 +733,7 @@
               "params": {
                 "direction_id": 0,
                 "route_ids": [],
-                "stop_ids": [
-                  "Back Bay"
-                ]
+                "stop_ids": ["Back Bay"]
               }
             }
           },
@@ -818,11 +769,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "145",
-                  "1241",
-                  "9983"
-                ]
+                "stop_ids": ["145", "1241", "9983"]
               }
             }
           }
@@ -841,10 +788,7 @@
       "app_params": {
         "direction_id": 1,
         "headway_mode": false,
-        "nearby_departures": [
-          "1276",
-          "1292"
-        ],
+        "nearby_departures": ["1276", "1292"],
         "platform_id": "70230",
         "psa_config": {
           "default_list": {
@@ -867,14 +811,12 @@
     "3": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-          "routes_at_stop": [
-            "99",
-            "105",
-            "106"
-          ],
-          "stop": "5403"
-        }],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["99", "105", "106"],
+            "stop": "5403"
+          }
+        ],
         "psa_config": {
           "default_list": {
             "paths": [],
@@ -895,19 +837,13 @@
     "19": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "52",
-              "57",
-              "502",
-              "504"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["52", "57", "502", "504"],
             "stop": "900"
           },
           {
-            "routes_at_stop": [
-              "70"
-            ],
+            "routes_at_stop": ["70"],
             "stop": "8297"
           }
         ],
@@ -933,10 +869,7 @@
       "app_params": {
         "direction_id": 0,
         "headway_mode": false,
-        "nearby_departures": [
-          "941",
-          "951"
-        ],
+        "nearby_departures": ["941", "951"],
         "platform_id": "70149",
         "psa_config": {
           "default_list": {
@@ -959,17 +892,13 @@
     "9": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "14",
-              "41"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["14", "41"],
             "stop": "1144"
           },
           {
-            "routes_at_stop": [
-              "Orange Line"
-            ],
+            "routes_at_stop": ["Orange Line"],
             "stop": "place-rcmnl"
           }
         ],
@@ -995,10 +924,7 @@
       "app_params": {
         "direction_id": 0,
         "headway_mode": false,
-        "nearby_departures": [
-          "1276",
-          "1292"
-        ],
+        "nearby_departures": ["1276", "1292"],
         "platform_id": "70229",
         "psa_config": {
           "default_list": {
@@ -1021,16 +947,13 @@
     "7": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "SL3"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["SL3"],
             "stop": "place-belsq"
           },
           {
-            "routes_at_stop": [
-              "CR-Newburyport"
-            ],
+            "routes_at_stop": ["CR-Newburyport"],
             "stop": "place-ER-0046"
           }
         ],
@@ -1056,10 +979,7 @@
       "app_params": {
         "direction_id": 1,
         "headway_mode": false,
-        "nearby_departures": [
-          "1276",
-          "1292"
-        ],
+        "nearby_departures": ["1276", "1292"],
         "platform_id": "70230",
         "psa_config": {
           "default_list": {
@@ -1084,10 +1004,7 @@
       "app_params": {
         "direction_id": 0,
         "headway_mode": false,
-        "nearby_departures": [
-          "51317",
-          "71391"
-        ],
+        "nearby_departures": ["51317", "71391"],
         "platform_id": "70245",
         "psa_config": {
           "default_list": {
@@ -1114,15 +1031,14 @@
         "overhead": false,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "normal",
-        "sections": [{
+        "sections": [
+          {
             "arrow": "e",
             "audio": {
               "wayfinding": "Lower Busway"
@@ -1154,10 +1070,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "17862",
-                  "17863"
-                ]
+                "stop_ids": ["17862", "17863"]
               }
             }
           },
@@ -1193,9 +1106,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "Ruggles"
-                ]
+                "stop_ids": ["Ruggles"]
               }
             }
           }
@@ -1212,16 +1123,13 @@
     "2": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "16"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["16"],
             "stop": "2923"
           },
           {
-            "routes_at_stop": [
-              "19"
-            ],
+            "routes_at_stop": ["19"],
             "stop": "568"
           }
         ],
@@ -1245,16 +1153,13 @@
     "11": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "Green Line • E"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["Green Line • E"],
             "stop": "place-rvrwy"
           },
           {
-            "routes_at_stop": [
-              "66"
-            ],
+            "routes_at_stop": ["66"],
             "stop": "1314"
           }
         ],
@@ -1278,16 +1183,13 @@
     "15": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "44"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["44"],
             "stop": "1332"
           },
           {
-            "routes_at_stop": [
-              "45"
-            ],
+            "routes_at_stop": ["45"],
             "stop": "1569"
           }
         ],
@@ -1311,16 +1213,13 @@
     "17": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "SL3"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["SL3"],
             "stop": "place-belsq"
           },
           {
-            "routes_at_stop": [
-              "CR-Newburyport"
-            ],
+            "routes_at_stop": ["CR-Newburyport"],
             "stop": "place-ER-0046"
           }
         ],
@@ -1346,17 +1245,13 @@
       "app_params": {
         "primary": {
           "header": "Kenmore",
-          "sections": [{
-            "pill": "green",
-            "route_ids": [
-              "Green-B",
-              "Green-C",
-              "Green-D"
-            ],
-            "stop_ids": [
-              "place-kencl"
-            ]
-          }]
+          "sections": [
+            {
+              "pill": "green",
+              "route_ids": ["Green-B", "Green-C", "Green-D"],
+              "stop_ids": ["place-kencl"]
+            }
+          ]
         },
         "secondary": {
           "header": "",
@@ -1373,17 +1268,13 @@
     "18": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "14",
-              "30"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["14", "30"],
             "stop": "6428"
           },
           {
-            "routes_at_stop": [
-              "CR-Needham"
-            ],
+            "routes_at_stop": ["CR-Needham"],
             "stop": "place-NB-0064"
           }
         ],
@@ -1409,26 +1300,16 @@
       "app_params": {
         "primary": {
           "header": "Haymarket",
-          "sections": [{
+          "sections": [
+            {
               "pill": "green",
-              "route_ids": [
-                "Green-B",
-                "Green-C",
-                "Green-D",
-                "Green-E"
-              ],
-              "stop_ids": [
-                "place-haecl"
-              ]
+              "route_ids": ["Green-B", "Green-C", "Green-D", "Green-E"],
+              "stop_ids": ["place-haecl"]
             },
             {
               "pill": "orange",
-              "route_ids": [
-                "Orange"
-              ],
-              "stop_ids": [
-                "place-haecl"
-              ]
+              "route_ids": ["Orange"],
+              "stop_ids": ["place-haecl"]
             }
           ]
         },
@@ -1451,29 +1332,22 @@
         "overhead": false,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "none",
-        "sections": [{
+        "sections": [
+          {
             "arrow": null,
             "audio": {
               "wayfinding": null
             },
             "headway": {
-              "headsigns": [
-                "Alewife",
-                "Southbound"
-              ],
+              "headsigns": ["Alewife", "Southbound"],
               "headway_id": "red_trunk",
-              "sign_ids": [
-                "central_northbound",
-                "central_southbound"
-              ]
+              "sign_ids": ["central_northbound", "central_southbound"]
             },
             "layout": {
               "opts": {
@@ -1493,10 +1367,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "70069",
-                  "70070"
-                ]
+                "stop_ids": ["70069", "70070"]
               }
             }
           },
@@ -1517,7 +1388,8 @@
                 "paged": true,
                 "routes": {
                   "action": "exclude",
-                  "route_list": [{
+                  "route_list": [
+                    {
                       "direction_id": 1,
                       "route": "70"
                     },
@@ -1540,12 +1412,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "72",
-                  "102",
-                  "1060",
-                  "1123"
-                ]
+                "stop_ids": ["72", "102", "1060", "1123"]
               }
             }
           }
@@ -1566,58 +1433,50 @@
         "overhead": true,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "normal",
-        "sections": [{
-          "arrow": null,
-          "audio": {
-            "wayfinding": "Platform A"
-          },
-          "headway": {
-            "headsigns": [],
-            "headway_id": null,
-            "sign_ids": []
-          },
-          "layout": {
-            "opts": {
-              "max_minutes": "infinity",
-              "num_rows": 8,
-              "paged": false,
-              "routes": {
-                "action": "exclude",
-                "route_list": []
+        "sections": [
+          {
+            "arrow": null,
+            "audio": {
+              "wayfinding": "Platform A"
+            },
+            "headway": {
+              "headsigns": [],
+              "headway_id": null,
+              "sign_ids": []
+            },
+            "layout": {
+              "opts": {
+                "max_minutes": "infinity",
+                "num_rows": 8,
+                "paged": false,
+                "routes": {
+                  "action": "exclude",
+                  "route_list": []
+                },
+                "visible_rows": 1
               },
-              "visible_rows": 1
+              "type": "upcoming"
             },
-            "type": "upcoming"
-          },
-          "name": "Platform A",
-          "pill": "bus",
-          "query": {
-            "opts": {
-              "include_schedules": false
-            },
-            "params": {
-              "direction_id": 1,
-              "route_ids": [
-                "15",
-                "23",
-                "28",
-                "44",
-                "45"
-              ],
-              "stop_ids": [
-                "place-dudly"
-              ]
+            "name": "Platform A",
+            "pill": "bus",
+            "query": {
+              "opts": {
+                "include_schedules": false
+              },
+              "params": {
+                "direction_id": 1,
+                "route_ids": ["15", "23", "28", "44", "45"],
+                "stop_ids": ["place-dudly"]
+              }
             }
           }
-        }],
+        ],
         "station_name": "Nubian"
       },
       "device_id": "SOL03",
@@ -1634,15 +1493,14 @@
         "overhead": false,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "normal",
-        "sections": [{
+        "sections": [
+          {
             "arrow": "se",
             "audio": {
               "wayfinding": "Busway"
@@ -1659,7 +1517,8 @@
                 "paged": true,
                 "routes": {
                   "action": "exclude",
-                  "route_list": [{
+                  "route_list": [
+                    {
                       "direction_id": 1,
                       "route": "92"
                     },
@@ -1682,9 +1541,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "8310"
-                ]
+                "stop_ids": ["8310"]
               }
             }
           },
@@ -1705,10 +1562,12 @@
                 "paged": true,
                 "routes": {
                   "action": "exclude",
-                  "route_list": [{
-                    "direction_id": 0,
-                    "route": "4"
-                  }]
+                  "route_list": [
+                    {
+                      "direction_id": 0,
+                      "route": "4"
+                    }
+                  ]
                 },
                 "visible_rows": 4
               },
@@ -1723,9 +1582,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "117"
-                ]
+                "stop_ids": ["117"]
               }
             }
           }
@@ -1765,15 +1622,14 @@
         "overhead": false,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "none",
-        "sections": [{
+        "sections": [
+          {
             "arrow": "w",
             "audio": {
               "wayfinding": null
@@ -1801,9 +1657,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "Forest Hills"
-                ]
+                "stop_ids": ["Forest Hills"]
               }
             }
           },
@@ -1839,9 +1693,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "10642"
-                ]
+                "stop_ids": ["10642"]
               }
             }
           }
@@ -1860,17 +1712,13 @@
       "app_params": {
         "primary": {
           "header": "Tufts Medical Ctr",
-          "sections": [{
-            "pill": "silver",
-            "route_ids": [
-              "749",
-              "751"
-            ],
-            "stop_ids": [
-              "49002",
-              "6565"
-            ]
-          }]
+          "sections": [
+            {
+              "pill": "silver",
+              "route_ids": ["749", "751"],
+              "stop_ids": ["49002", "6565"]
+            }
+          ]
         },
         "secondary": {
           "header": "",
@@ -1891,15 +1739,14 @@
         "overhead": false,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "normal",
-        "sections": [{
+        "sections": [
+          {
             "arrow": "w",
             "audio": {
               "wayfinding": "South Station"
@@ -1931,9 +1778,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "South Station"
-                ]
+                "stop_ids": ["South Station"]
               }
             }
           },
@@ -1965,10 +1810,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "70016",
-                  "70017"
-                ]
+                "stop_ids": ["70016", "70017"]
               }
             }
           },
@@ -1986,7 +1828,8 @@
               "opts": {
                 "routes": {
                   "action": "exclude",
-                  "route_list": [{
+                  "route_list": [
+                    {
                       "direction_id": 0,
                       "route": "11"
                     },
@@ -2008,10 +1851,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "49002",
-                  "6565"
-                ]
+                "stop_ids": ["49002", "6565"]
               }
             }
           },
@@ -2047,9 +1887,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "9983"
-                ]
+                "stop_ids": ["9983"]
               }
             }
           }
@@ -2066,20 +1904,13 @@
     "6": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "1",
-              "66",
-              "68",
-              "69"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["1", "66", "68", "69"],
             "stop": "2168"
           },
           {
-            "routes_at_stop": [
-              "Red Line",
-              "Bus"
-            ],
+            "routes_at_stop": ["Red Line", "Bus"],
             "stop": "place-harsq"
           }
         ],
@@ -2105,13 +1936,13 @@
       "app_params": {
         "primary": {
           "header": "Haymarket",
-          "sections": [{
-            "pill": "bus",
-            "route_ids": [],
-            "stop_ids": [
-              "8310"
-            ]
-          }]
+          "sections": [
+            {
+              "pill": "bus",
+              "route_ids": [],
+              "stop_ids": ["8310"]
+            }
+          ]
         },
         "secondary": {
           "header": "",
@@ -2130,29 +1961,30 @@
       "app_params": {
         "primary": {
           "header": "Aquarium",
-          "sections": [{
-            "pill": "blue",
-            "route_ids": [],
-            "stop_ids": [
-              "place-aqucl"
-            ]
-          }]
+          "sections": [
+            {
+              "pill": "blue",
+              "route_ids": [],
+              "stop_ids": ["place-aqucl"]
+            }
+          ]
         },
         "secondary": {
           "header": "",
           "sections": []
         },
-        "override": [{
+        "override": [
+          {
             "type": "partial",
-            "alerts": [{
-              "color": "blue",
-              "content": {
-                "icon": "warning",
-                "text": [
-                  "No Blue Line service"
-                ]
+            "alerts": [
+              {
+                "color": "blue",
+                "content": {
+                  "icon": "warning",
+                  "text": ["No Blue Line service"]
+                }
               }
-            }]
+            ]
           },
           {
             "type": "fullscreen",
@@ -2161,15 +1993,11 @@
             "color": "blue",
             "issue": {
               "icon": "warning",
-              "text": [
-                "No Blue Line service"
-              ]
+              "text": ["No Blue Line service"]
             },
             "remedy": {
               "icon": "shuttle",
-              "text": [
-                "Use shuttle bus"
-              ]
+              "text": ["Use shuttle bus"]
             }
           }
         ]
@@ -2188,15 +2016,14 @@
         "overhead": false,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "none",
-        "sections": [{
+        "sections": [
+          {
             "arrow": "e",
             "audio": {
               "wayfinding": null
@@ -2228,9 +2055,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "70094"
-                ]
+                "stop_ids": ["70094"]
               }
             }
           },
@@ -2266,9 +2091,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "70261"
-                ]
+                "stop_ids": ["70261"]
               }
             }
           },
@@ -2304,9 +2127,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "334"
-                ]
+                "stop_ids": ["334"]
               }
             }
           }
@@ -2325,10 +2146,7 @@
       "app_params": {
         "direction_id": 0,
         "headway_mode": false,
-        "nearby_departures": [
-          "1276",
-          "1292"
-        ],
+        "nearby_departures": ["1276", "1292"],
         "platform_id": "70229",
         "psa_config": {
           "default_list": {
@@ -2353,10 +2171,7 @@
       "app_params": {
         "direction_id": 0,
         "headway_mode": false,
-        "nearby_departures": [
-          "51317",
-          "71391"
-        ],
+        "nearby_departures": ["51317", "71391"],
         "platform_id": "70245",
         "psa_config": {
           "default_list": {
@@ -2383,15 +2198,14 @@
         "overhead": false,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "none",
-        "sections": [{
+        "sections": [
+          {
             "arrow": "se",
             "audio": {
               "wayfinding": null
@@ -2423,9 +2237,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "70059"
-                ]
+                "stop_ids": ["70059"]
               }
             }
           },
@@ -2461,9 +2273,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "15795"
-                ]
+                "stop_ids": ["15795"]
               }
             }
           }
@@ -2482,10 +2292,7 @@
       "app_params": {
         "direction_id": 1,
         "headway_mode": false,
-        "nearby_departures": [
-          "941",
-          "951"
-        ],
+        "nearby_departures": ["941", "951"],
         "platform_id": "70148",
         "psa_config": {
           "default_list": {
@@ -2508,17 +2315,13 @@
     "1": {
       "app_id": "bus_eink",
       "app_params": {
-        "nearby_connections": [{
-            "routes_at_stop": [
-              "Mattapan",
-              "Bus"
-            ],
+        "nearby_connections": [
+          {
+            "routes_at_stop": ["Mattapan", "Bus"],
             "stop": "place-matt"
           },
           {
-            "routes_at_stop": [
-              "CR-Fairmount"
-            ],
+            "routes_at_stop": ["CR-Fairmount"],
             "stop": "place-DB-2222"
           }
         ],
@@ -2546,15 +2349,14 @@
         "overhead": false,
         "psa_config": {
           "default_list": {
-            "paths": [
-              "solari-feedback.png"
-            ],
+            "paths": ["solari-feedback.png"],
             "type": "slide_in"
           },
           "scheduled_overrides": []
         },
         "section_headers": "vertical",
-        "sections": [{
+        "sections": [
+          {
             "arrow": "e",
             "audio": {
               "wayfinding": "Upper Busway"
@@ -2586,9 +2388,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "10642"
-                ]
+                "stop_ids": ["10642"]
               }
             }
           },
@@ -2624,9 +2424,7 @@
               "params": {
                 "direction_id": "both",
                 "route_ids": [],
-                "stop_ids": [
-                  "875"
-                ]
+                "stop_ids": ["875"]
               }
             }
           }
@@ -2645,10 +2443,7 @@
       "app_params": {
         "direction_id": 0,
         "headway_mode": false,
-        "nearby_departures": [
-          "941",
-          "951"
-        ],
+        "nearby_departures": ["941", "951"],
         "platform_id": "70149",
         "psa_config": {
           "default_list": {
@@ -2673,14 +2468,11 @@
       "app_params": {
         "primary": {
           "header": "Back Bay",
-          "sections": [{
+          "sections": [
+            {
               "pill": "orange",
-              "route_ids": [
-                "Orange"
-              ],
-              "stop_ids": [
-                "place-bbsta"
-              ]
+              "route_ids": ["Orange"],
+              "stop_ids": ["place-bbsta"]
             },
             {
               "pill": "cr",
@@ -2690,9 +2482,7 @@
                 "CR-Needham",
                 "CR-Providence"
               ],
-              "stop_ids": [
-                "place-bbsta"
-              ]
+              "stop_ids": ["place-bbsta"]
             }
           ]
         },
@@ -2712,27 +2502,27 @@
       "app_id": "bus_eink_v2",
       "app_params": {
         "departures": {
-          "sections": [{
-            "filter": null,
-            "headway": {
-              "headway_id": null,
-              "override": null,
-              "sign_ids": []
-            },
-            "query": {
-              "opts": {
-                "include_schedules": false
+          "sections": [
+            {
+              "filter": null,
+              "headway": {
+                "headway_id": null,
+                "override": null,
+                "sign_ids": []
               },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [
-                  "1722"
-                ],
-                "route_type": null,
-                "stop_ids": []
+              "query": {
+                "opts": {
+                  "include_schedules": false
+                },
+                "params": {
+                  "direction_id": "both",
+                  "route_ids": ["1722"],
+                  "route_type": null,
+                  "stop_ids": []
+                }
               }
             }
-          }]
+          ]
         },
         "footer": {
           "stop_id": "1722"
@@ -2755,27 +2545,27 @@
       "app_id": "bus_eink_v2",
       "app_params": {
         "departures": {
-          "sections": [{
-            "filter": null,
-            "headway": {
-              "headway_id": null,
-              "override": null,
-              "sign_ids": []
-            },
-            "query": {
-              "opts": {
-                "include_schedules": false
+          "sections": [
+            {
+              "filter": null,
+              "headway": {
+                "headway_id": null,
+                "override": null,
+                "sign_ids": []
               },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [
-                  "383"
-                ],
-                "route_type": null,
-                "stop_ids": []
+              "query": {
+                "opts": {
+                  "include_schedules": false
+                },
+                "params": {
+                  "direction_id": "both",
+                  "route_ids": ["383"],
+                  "route_type": null,
+                  "stop_ids": []
+                }
               }
             }
-          }]
+          ]
         },
         "footer": {
           "stop_id": "383"
@@ -2798,27 +2588,27 @@
       "app_id": "solari_v2",
       "app_params": {
         "departures": {
-          "sections": [{
-            "filter": null,
-            "headway": {
-              "headway_id": null,
-              "override": null,
-              "sign_ids": []
-            },
-            "query": {
-              "opts": {
-                "include_schedules": false
+          "sections": [
+            {
+              "filter": null,
+              "headway": {
+                "headway_id": null,
+                "override": null,
+                "sign_ids": []
               },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [
-                  "1722"
-                ],
-                "route_type": null,
-                "stop_ids": []
+              "query": {
+                "opts": {
+                  "include_schedules": false
+                },
+                "params": {
+                  "direction_id": "both",
+                  "route_ids": ["1722"],
+                  "route_type": null,
+                  "stop_ids": []
+                }
               }
             }
-          }]
+          ]
         },
         "header": {
           "stop_name": "Ashmont"
@@ -2835,27 +2625,27 @@
       "app_id": "solari_large_v2",
       "app_params": {
         "departures": {
-          "sections": [{
-            "filter": null,
-            "headway": {
-              "headway_id": null,
-              "override": null,
-              "sign_ids": []
-            },
-            "query": {
-              "opts": {
-                "include_schedules": false
+          "sections": [
+            {
+              "filter": null,
+              "headway": {
+                "headway_id": null,
+                "override": null,
+                "sign_ids": []
               },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [
-                  "1722"
-                ],
-                "route_type": null,
-                "stop_ids": []
+              "query": {
+                "opts": {
+                  "include_schedules": false
+                },
+                "params": {
+                  "direction_id": "both",
+                  "route_ids": ["1722"],
+                  "route_type": null,
+                  "stop_ids": []
+                }
               }
             }
-          }]
+          ]
         },
         "header": {
           "stop_name": "Nubian"
@@ -2878,27 +2668,27 @@
           "days_active": []
         },
         "departures": {
-          "sections": [{
-            "filter": null,
-            "headway": {
-              "headway_id": null,
-              "override": null,
-              "sign_ids": []
-            },
-            "query": {
-              "opts": {
-                "include_schedules": false
+          "sections": [
+            {
+              "filter": null,
+              "headway": {
+                "headway_id": null,
+                "override": null,
+                "sign_ids": []
               },
-              "params": {
-                "direction_id": "both",
-                "route_ids": [
-                  "1722"
-                ],
-                "route_type": null,
-                "stop_ids": []
+              "query": {
+                "opts": {
+                  "include_schedules": false
+                },
+                "params": {
+                  "direction_id": "both",
+                  "route_ids": ["1722"],
+                  "route_type": null,
+                  "stop_ids": []
+                }
               }
             }
-          }]
+          ]
         },
         "footer": {
           "stop_id": "1722"

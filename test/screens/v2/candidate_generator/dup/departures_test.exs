@@ -91,6 +91,27 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       app_id: :dup_v2
     }
 
+    config_disabled_mode = %Screen{
+      app_params: %DupConfig{
+        header: %Header.CurrentStopId{stop_id: "Boat"},
+        primary_departures: %Departures{
+          sections: [
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["Boat"]}},
+              filter: nil,
+              headway: %Headway{headway_id: "ferry"}
+            },
+            %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil}
+          ]
+        },
+        secondary_departures: %Departures{sections: []}
+      },
+      vendor: :outfront,
+      device_id: "TEST",
+      name: "TEST",
+      app_id: :dup_v2
+    }
+
     fetch_section_departures_fn = fn
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "A"}}]}
@@ -119,13 +140,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       _ -> []
     end
 
-    create_station_with_routes_map_fn = fn _ -> [%{type: :test}] end
+    create_station_with_routes_map_fn = fn
+      "Boat" -> [%{id: "Ferry", type: :ferry}]
+      _ -> [%{type: :test}]
+    end
 
     %{
       config_primary_and_secondary: config_primary_and_secondary,
       config_only_primary: config_only_primary,
       config_one_section: config_one_section,
       config_branch_station: config_branch_station,
+      config_disabled_mode: config_disabled_mode,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn
@@ -873,6 +898,86 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               pill: :"green-c",
               time_range: {7, 13},
               headsign: "Park Street"
+            }
+          ],
+          slot_names: [:main_content_two]
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_fn,
+          create_station_with_routes_map_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns no data sections for disabled mode", %{
+      config_disabled_mode: config,
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_alerts_fn: fetch_alerts_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+    } do
+      now = ~U[2020-04-06T10:00:00Z]
+
+      expected_departures = [
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :no_data_section,
+              route: %{id: "Ferry", type: :ferry}
+            },
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "A"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_zero]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :no_data_section,
+              route: %{id: "Ferry", type: :ferry}
+            },
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "A"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_one]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :no_data_section,
+              route: %{id: "Ferry", type: :ferry}
+            },
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "A"),
+                  schedule: nil
+                }
+              ]
             }
           ],
           slot_names: [:main_content_two]
