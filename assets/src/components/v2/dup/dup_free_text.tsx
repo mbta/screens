@@ -3,7 +3,7 @@ import _ from "lodash";
 
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 
-const pillIcons = ["red", "blue", "orange", "green", "silver"];
+const pillIcons = ["red", "blue", "orange", "green", "silver", "cr", "bus"];
 
 const iconPaths: { [key: string]: string } = _.mapValues(
   {
@@ -18,6 +18,7 @@ const iconPaths: { [key: string]: string } = _.mapValues(
     green_c: "gl-c-color.svg",
     green_d: "gl-d-color.svg",
     green_e: "gl-e-color.svg",
+    bus: "bus-black.svg",
   },
   imagePath
 );
@@ -42,7 +43,7 @@ const getKey = (elt: string | FreeTextElementType) => {
   }
 };
 
-const Icon = ({ icon }: {icon: string}) => {
+const Icon = ({ icon }: { icon: string }) => {
   let iconElt;
 
   if (icon === null) {
@@ -56,7 +57,7 @@ const Icon = ({ icon }: {icon: string}) => {
   return <div className="free-text__icon-container">{iconElt}</div>;
 };
 
-const InlineIcon = ({ icon }: {icon: string}) => {
+const InlineIcon = ({ icon }: { icon: string }) => {
   return (
     <span className="free-text__element free-text__inline-icon">
       <img className="free-text__inline-icon-image" src={srcForIcon(icon)} />
@@ -64,7 +65,7 @@ const InlineIcon = ({ icon }: {icon: string}) => {
   );
 };
 
-const FormatString = ({ format, text }: {format: string, text: string}) => {
+const FormatString = ({ format, text }: { format: string; text: string }) => {
   const modifiers = format === null ? [] : [format];
   const className = `free-text__element ${classWithModifiers(
     "free-text__string",
@@ -74,14 +75,14 @@ const FormatString = ({ format, text }: {format: string, text: string}) => {
   return <span className={className}>{text}</span>;
 };
 
-const RoutePill = ({ route }: {route: string}) => {
+const RoutePill = ({ route }: { route: string }) => {
+  // If routeName is null, assume it should be an icon.
   const routeName = {
     red: "RL",
     blue: "BL",
     orange: "OL",
     green: "GL",
     silver: "SL",
-    cr: "CR",
     green_b: "GL·B",
     green_c: "GL·C",
     green_d: "GL·D",
@@ -96,14 +97,18 @@ const RoutePill = ({ route }: {route: string}) => {
         <div
           className={classWithModifier("free-text__route-pill__text", branch)}
         >
-          {routeName}
+          {routeName ? (
+            routeName
+          ) : (
+            <img className="free-text__icon-image" src={srcForIcon(route)} />
+          )}
         </div>
       </div>
     </span>
   );
 };
 
-const TextPill = ({ color, text }: {color: string, text: string}) => {
+const TextPill = ({ color, text }: { color: string; text: string }) => {
   return (
     <span className="free-text__element free-text__pill-container">
       <div className={classWithModifier("free-text__text-pill", color)}>
@@ -113,7 +118,7 @@ const TextPill = ({ color, text }: {color: string, text: string}) => {
   );
 };
 
-const Special = ({ data }: {data: string}) => {
+const Special = ({ data }: { data: string }) => {
   if (data === "break") {
     return <br />;
   }
@@ -122,15 +127,15 @@ const Special = ({ data }: {data: string}) => {
 };
 
 interface FreeTextElementType {
-    text?: string;
-    format?: string;
-    route?: string;
-    color?: string;
-    special?: string;
-    icon?: string;
+  text?: string;
+  format?: string;
+  route?: string;
+  color?: string;
+  special?: string;
+  icon?: string;
 }
 
-const FreeTextElement = ({elt}: {elt: string | FreeTextElementType}) => {
+const FreeTextElement = ({ elt }: { elt: string | FreeTextElementType }) => {
   if (typeof elt === "string") {
     return <FormatString text={elt} format={null} />;
   } else if (elt.format !== undefined) {
@@ -148,7 +153,13 @@ const FreeTextElement = ({elt}: {elt: string | FreeTextElementType}) => {
   return null;
 };
 
-const FreeTextLine = ({ icon, text }: {icon: string, text: (string | FreeTextElementType)[]}) => {
+const FreeTextLine = ({
+  icon,
+  text,
+}: {
+  icon: string;
+  text: (string | FreeTextElementType)[];
+}) => {
   return (
     <div className="free-text__line-container">
       <Icon icon={icon} />
@@ -163,14 +174,14 @@ const FreeTextLine = ({ icon, text }: {icon: string, text: (string | FreeTextEle
 
 export interface FreeTextType {
   icon: string;
-  text: FreeTextElementType[]
+  text: FreeTextElementType[];
 }
 
 interface FreeTextProps {
-  lines: FreeTextType | FreeTextType[]
+  lines: FreeTextType | FreeTextType[];
 }
 
-const FreeText = ({lines}: FreeTextProps) => {
+const FreeText = ({ lines }: FreeTextProps) => {
   if (Array.isArray(lines)) {
     const [{ icon: icon1, text: text1 }, { icon: icon2, text: text2 }] = lines;
     return (
