@@ -66,41 +66,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp sections_data_to_departure_instances(sections_data, config, slot_ids, now) do
     sections =
-      Enum.map(sections_data, fn
-        %{type: :no_data_section} = no_data_section ->
-          no_data_section
-
-        %{
-          departures: departures,
-          alert: alert,
-          headway: headway,
-          stop_ids: stop_ids,
-          route: route
-        } ->
-          visible_departures =
-            if length(sections_data) > 1 do
-              Enum.take(departures, 2)
-            else
-              Enum.take(departures, 4)
-            end
-
-          case get_headway_mode(stop_ids, headway, alert, now) do
-            {:active, time_range, headsign} ->
-              %{
-                type: :headway_section,
-                pill: get_section_route_from_alert(stop_ids, alert),
-                time_range: time_range,
-                headsign: headsign
-              }
-
-            :inactive ->
-              if visible_departures == [] do
-                %{type: :no_data_section, route: route}
-              else
-                %{type: :normal_section, rows: visible_departures}
-              end
-          end
-      end)
+      Enum.map(
+        sections_data,
+        &get_departure_instance_for_section(&1, length(sections_data) == 1, now)
+      )
 
     Enum.map(slot_ids, fn slot_id ->
       if Enum.all?(sections, &(&1.type == :no_data_section)) do
@@ -113,6 +82,44 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         }
       end
     end)
+  end
+
+  defp get_departure_instance_for_section(%{type: :no_data_section} = section, _, _), do: section
+
+  defp get_departure_instance_for_section(
+         %{
+           departures: departures,
+           alert: alert,
+           headway: headway,
+           stop_ids: stop_ids,
+           route: route
+         },
+         is_only_section,
+         now
+       ) do
+    visible_departures =
+      if is_only_section do
+        Enum.take(departures, 4)
+      else
+        Enum.take(departures, 2)
+      end
+
+    case get_headway_mode(stop_ids, headway, alert, now) do
+      {:active, time_range, headsign} ->
+        %{
+          type: :headway_section,
+          pill: get_section_route_from_alert(stop_ids, alert),
+          time_range: time_range,
+          headsign: headsign
+        }
+
+      :inactive ->
+        if visible_departures == [] do
+          %{type: :no_data_section, route: route}
+        else
+          %{type: :normal_section, rows: visible_departures}
+        end
+    end
   end
 
   defp get_sections_data(
