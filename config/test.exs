@@ -26,7 +26,11 @@ config :screens,
     "Test 1" => "T1"
   },
   dup_alert_headsign_matchers: %{
-    "place-B" => [{"place-B", "not_informed", "Test"}]
+    "place-B" => [{"place-B", "not_informed", "Test"}],
+    "place-kencl" => [
+      {"70211", ~w[70153 70149 70187], "Cleveland Circle"},
+      {"70152", ~w[70148 70212 70186], "Park Street"}
+    ]
   }
 
 config :screens, ScreensWeb.AuthManager, secret_key: "test key"
