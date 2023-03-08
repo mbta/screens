@@ -84,28 +84,38 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
               fetch_schedules_fn
             )
 
-          # Add overnight departures to the end.
-          # This allows overnight departures to appear as we start to run out of predictions to show.
-          departures = departures ++ overnight_schedules_for_section
+          headway_mode = get_headway_mode(stop_ids, headway, alert, now)
 
-          visible_departures =
-            if length(sections_data) > 1 do
-              Enum.take(departures, 2)
-            else
-              Enum.take(departures, 4)
-            end
+          cond do
+            # All routes in section are overnight
+            overnight_schedules_for_section != [] and departures == [] ->
+              %{type: :overnight_section}
 
-          case get_headway_mode(stop_ids, headway, alert, now) do
-            {:active, time_range, headsign} ->
+            # There are still predictions to show
+            headway_mode == :inactive ->
+              # Add overnight departures to the end.
+              # This allows overnight departures to appear as we start to run out of predictions to show.
+              departures = departures ++ overnight_schedules_for_section
+
+              visible_departures =
+                if length(sections_data) > 1 do
+                  Enum.take(departures, 2)
+                else
+                  Enum.take(departures, 4)
+                end
+
+              %{type: :normal_section, rows: visible_departures}
+
+            # Headway mode
+            true ->
+              {:active, time_range, headsign} = headway_mode
+
               %{
                 type: :headway_section,
                 pill: get_section_route_from_alert(stop_ids, alert),
                 time_range: time_range,
                 headsign: headsign
               }
-
-            :inactive ->
-              %{type: :normal_section, rows: visible_departures}
           end
         end)
 
