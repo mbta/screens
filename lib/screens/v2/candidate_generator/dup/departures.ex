@@ -25,7 +25,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         now,
         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
         fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1,
-        fetch_schedules_fn \\ &Screens.Schedules.Schedule.fetch/2
+        fetch_schedules_fn \\ &Screens.Schedules.Schedule.fetch/2,
+        create_station_with_routes_map_fn \\ &Screens.Stops.Stop.create_station_with_routes_map/1
       ) do
     primary_departures_instances =
       primary_sections
@@ -34,7 +35,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         config,
         [:main_content_zero, :main_content_one],
         now,
-        fetch_schedules_fn
+        fetch_schedules_fn,
+        create_station_with_routes_map_fn
       )
 
     secondary_sections =
@@ -51,7 +53,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         config,
         [:main_content_two],
         now,
-        fetch_schedules_fn
+        fetch_schedules_fn,
+        create_station_with_routes_map_fn
       )
 
     primary_departures_instances ++ secondary_departures_instances
@@ -62,7 +65,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          config,
          slot_ids,
          now,
-         fetch_schedules_fn
+         fetch_schedules_fn,
+         create_station_with_routes_map_fn
        ) do
     if Enum.any?(sections_data, &(&1 == :error)) do
       %DeparturesNoData{screen: config, show_alternatives?: true}
@@ -75,10 +79,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
                                      stop_ids: stop_ids,
                                      params: params
                                    } ->
+          routes_serving_section =
+            get_routes_serving_section(params, create_station_with_routes_map_fn)
+
+          routes_with_live_departures =
+            departures |> Enum.map(&Departure.route_id/1) |> Enum.uniq()
+
           overnight_schedules_for_section =
             get_overnight_schedules_for_section(
-              departures,
-              params,
+              routes_with_live_departures,
+              stop_ids,
+              routes_serving_section,
               alert,
               now,
               fetch_schedules_fn
@@ -280,23 +291,24 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   # If we are currently overnight, returns the first schedule of the day for each route_id and direction for each stop.
   # Otherwise, return an empty list.
-  defp get_overnight_schedules_for_section(departures, params, alert, now, fetch_schedules_fn)
+  defp get_overnight_schedules_for_section(
+         routes_with_live_departures,
+         stop_ids,
+         routes_serving_section,
+         alert,
+         now,
+         fetch_schedules_fn
+       )
 
   # No predictions AND no active alerts for the section
   defp get_overnight_schedules_for_section(
-         [],
-         %{stop_ids: stop_ids, route_ids: route_ids},
+         routes_with_live_departures,
+         stop_ids,
+         [%{type: :bus} | _] = routes_serving_section,
          nil,
          now,
          fetch_schedules_fn
        ) do
-    routes_for_section =
-      if route_ids == [] do
-        Screens.Stops.Stop.get_routes_serving_stop_ids(stop_ids)
-      else
-        route_ids
-      end
-
     fetch_params = %{stop_ids: stop_ids}
 
     {today_schedules, tomorrow_schedules} =
@@ -307,8 +319,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       )
 
     # Get schedules for each route for all stop_ids in config
-    routes_for_section
-    |> Enum.map(fn route_id ->
+    routes_serving_section
+    |> Enum.reject(&(&1 in routes_with_live_departures))
+    |> Enum.map(fn %{id: route_id} ->
       # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
       # we do not display overnight mode.
 
@@ -336,7 +349,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     |> Enum.sort_by(fn %Departure{schedule: schedule} -> schedule.departure_time end)
   end
 
-  defp get_overnight_schedules_for_section(_, _, _, _, _), do: []
+  defp get_overnight_schedules_for_section(_, _, _, _, _, _), do: []
 
   defp get_today_tomorrow_schedules(fetch_params, fetch_schedules_fn, tomorrow) do
     today =
@@ -363,4 +376,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
     {today, tomorrow}
   end
+
+  defp get_routes_serving_section(
+         %{route_ids: [], stop_ids: stop_ids},
+         create_station_with_routes_map_fn
+       ) do
+    stop_ids
+    |> Enum.flat_map(&create_station_with_routes_map_fn.(&1))
+    |> Enum.uniq()
+  end
+
+  defp get_routes_serving_section(%{route_ids: route_ids}, _), do: route_ids
 end
