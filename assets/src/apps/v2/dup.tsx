@@ -26,7 +26,9 @@ import { splitRotationFromPropNames } from "Components/v2/dup/dup_rotation_wrapp
 import PartialAlert from "Components/v2/dup/partial_alert";
 import TakeoverAlert from "Components/v2/dup/takeover_alert";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
-import { LOADING_LAYOUT, ResponseMapper, ResponseMapperContext } from "Components/v2/screen_container";
+import { ResponseMapper, ResponseMapperContext } from "Components/v2/screen_container";
+import PageLoadNoData from "Components/v2/dup/page_load_no_data";
+import NoData from "Components/v2/dup/no_data";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -49,17 +51,9 @@ const TYPE_TO_COMPONENT = {
   evergreen_content: EvergreenContent,
   partial_alert: PartialAlert,
   takeover_alert: TakeoverAlert,
+  page_load_no_data: PageLoadNoData,
+  no_data: NoData,
 };
-
-const DISABLED_LAYOUT = {
-  full_screen: {
-    type: "no_data",
-    show_alternatives: true,
-  },
-  type: "screen_takeover",
-};
-
-const FAILURE_LAYOUT = DISABLED_LAYOUT;
 
 const responseMapper: ResponseMapper = (apiResponse) => {
   switch (apiResponse.state) {
@@ -67,11 +61,50 @@ const responseMapper: ResponseMapper = (apiResponse) => {
     case "simulation_success":
       return apiResponse.data;
     case "disabled":
-      return DISABLED_LAYOUT;
     case "failure":
-      return FAILURE_LAYOUT;
+      return {
+        rotation_one: {
+          full_rotation: {
+            type: "no_data"
+          },
+          type: "rotation_takeover_one"
+        },
+        rotation_two: {
+          full_rotation: {
+            type: "no_data"
+          },
+          type: "rotation_takeover_two"
+        },
+        rotation_zero: {
+          full_rotation: {
+            type: "no_data"
+          },
+          type: "rotation_takeover_zero"
+        },
+        type: "screen_normal"
+      };
     case "loading":
-      return LOADING_LAYOUT;
+      return {
+        rotation_one: {
+          full_rotation: {
+            type: "page_load_no_data"
+          },
+          type: "rotation_takeover_one"
+        },
+        rotation_two: {
+          full_rotation: {
+            type: "page_load_no_data"
+          },
+          type: "rotation_takeover_two"
+        },
+        rotation_zero: {
+          full_rotation: {
+            type: "page_load_no_data"
+          },
+          type: "rotation_takeover_zero"
+        },
+        type: "screen_normal"
+      };
   }
 };
 
