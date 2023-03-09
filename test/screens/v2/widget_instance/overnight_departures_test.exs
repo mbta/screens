@@ -17,7 +17,7 @@ defmodule Screens.V2.WidgetInstance.OvernightDeparturesTest do
 
   describe "serialize/1" do
     test "returns empty map", %{instance: instance} do
-      assert %{} == WidgetInstance.serialize(instance)
+      assert %{routes: []} == WidgetInstance.serialize(instance)
     end
   end
 

@@ -163,7 +163,7 @@ defmodule Screens.Util do
   def route_type_from_id("Red"), do: :subway
   def route_type_from_id("Orange"), do: :subway
   def route_type_from_id("Blue"), do: :subway
-  def route_type_from_id("CR-" <> _), do: :commuter_rail
+  def route_type_from_id("CR-" <> _), do: :rail
   def route_type_from_id("Boat-" <> _), do: :ferry
   def route_type_from_id(_), do: :bus
 
