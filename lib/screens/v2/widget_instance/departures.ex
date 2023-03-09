@@ -121,6 +121,15 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :normal_section, rows: rows}
   end
 
+  def serialize_section(%{type: :overnight_section}, _, _) do
+    text = %FreeTextLine{
+      icon: :bus,
+      text: ["Services resumes in the morning"]
+    }
+
+    %{type: :overnight_section, text: FreeTextLine.to_json(text)}
+  end
+
   def audio_serialize_section(%{type: :notice_section, text: text}, _screen) do
     %{type: :notice_section, text: FreeTextLine.to_plaintext(text)}
   end
