@@ -8,83 +8,41 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.Config.V2.Dup, as: DupConfig
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
+  alias Screens.Schedules.Schedule
   alias Screens.V2.Departure
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
 
+  defp put_primary_departures(widget, primary_departures_sections) do
+    %{
+      widget
+      | app_params: %{
+          widget.app_params
+          | primary_departures: %Departures{sections: primary_departures_sections}
+        }
+    }
+  end
+
+  defp put_secondary_departures_sections(widget, secondary_departures_sections) do
+    %{
+      widget
+      | app_params: %{
+          widget.app_params
+          | secondary_departures: %Departures{sections: secondary_departures_sections}
+        }
+    }
+  end
+
   setup do
-    config_primary_and_secondary = %Screen{
+    config = %Screen{
       app_params: %DupConfig{
-        header: %Header.CurrentStopId{stop_id: "place-gover"},
+        header: %Header.CurrentStopId{stop_id: "place-test"},
         primary_departures: %Departures{
-          sections: [
-            %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil},
-            %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}, filter: nil}
-          ]
+          sections: []
         },
         secondary_departures: %Departures{
-          sections: [
-            %Section{query: %Query{params: %Query.Params{stop_ids: ["place-C"]}}, filter: nil},
-            %Section{query: %Query{params: %Query.Params{stop_ids: ["place-D"]}}, filter: nil}
-          ]
+          sections: []
         }
-      },
-      vendor: :outfront,
-      device_id: "TEST",
-      name: "TEST",
-      app_id: :dup_v2
-    }
-
-    config_only_primary = %Screen{
-      app_params: %DupConfig{
-        header: %Header.CurrentStopId{stop_id: "place-gover"},
-        primary_departures: %Departures{
-          sections: [
-            %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil},
-            %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}, filter: nil}
-          ]
-        },
-        secondary_departures: %Departures{sections: []}
-      },
-      vendor: :outfront,
-      device_id: "TEST",
-      name: "TEST",
-      app_id: :dup_v2
-    }
-
-    config_one_section = %Screen{
-      app_params: %DupConfig{
-        header: %Header.CurrentStopId{stop_id: "place-gover"},
-        primary_departures: %Departures{
-          sections: [
-            %Section{
-              query: %Query{params: %Query.Params{stop_ids: ["place-B"]}},
-              filter: nil,
-              headway: %Headway{headway_id: "red_trunk"}
-            }
-          ]
-        },
-        secondary_departures: %Departures{sections: []}
-      },
-      vendor: :outfront,
-      device_id: "TEST",
-      name: "TEST",
-      app_id: :dup_v2
-    }
-
-    config_branch_station = %Screen{
-      app_params: %DupConfig{
-        header: %Header.CurrentStopId{stop_id: "place-kencl"},
-        primary_departures: %Departures{
-          sections: [
-            %Section{
-              query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}},
-              filter: nil,
-              headway: %Headway{headway_id: "green_trunk"}
-            }
-          ]
-        },
-        secondary_departures: %Departures{sections: []}
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -114,25 +72,41 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "Kenmore", route: %Route{id: "Test"}}}]}
+
+      %Section{query: %Query{params: %Query.Params{stop_ids: ["bus-A", "bus-B"]}}} ->
+        {:ok,
+         [
+           %Departure{
+             prediction: %Prediction{id: "Bus A", route: %Route{id: "Bus A", type: :bus}}
+           }
+         ]}
     end
 
     fetch_alerts_fn = fn
       _ -> []
     end
 
-    fetch_schedules_fn = fn _ -> [] end
+    fetch_schedules_fn = fn
+      %{stop_ids: ["bus-A", "bus-B"]}, nil ->
+        {:ok, [%Schedule{departure_time: ~U[2020-04-06T09:00:00Z], route: %Route{id: "Bus B"}}]}
+
+      %{stop_ids: ["bus-A", "bus-B"]}, _ ->
+        {:ok, [%Schedule{departure_time: ~U[2020-04-07T09:00:00Z], route: %Route{id: "Bus B"}}]}
+
+      _, _ ->
+        []
+    end
 
     create_station_with_routes_map_fn = fn
       "Boat" -> [%{id: "Ferry", type: :ferry}]
       "place-A" -> [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]
+      "bus-A" -> [%{id: "Bus A", type: :bus}]
+      "bus-B" -> [%{id: "Bus B", type: :bus}]
       _ -> [%{type: :test}]
     end
 
     %{
-      config_primary_and_secondary: config_primary_and_secondary,
-      config_only_primary: config_only_primary,
-      config_one_section: config_one_section,
-      config_branch_station: config_branch_station,
+      config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
@@ -142,12 +116,23 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
   describe "departures_instances/4" do
     test "returns primary and secondary departures", %{
-      config_primary_and_secondary: config,
+      config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
+      config =
+        config
+        |> put_primary_departures([
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil},
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}, filter: nil}
+        ])
+        |> put_secondary_departures_sections([
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-C"]}}, filter: nil},
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-D"]}}, filter: nil}
+        ])
+
       now = ~U[2020-04-06T10:00:00Z]
 
       expected_departures = [
@@ -247,12 +232,18 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     end
 
     test "returns only primary departures if secondary is missing", %{
-      config_only_primary: config,
+      config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
+      config =
+        put_primary_departures(config, [
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil},
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}, filter: nil}
+        ])
+
       now = ~U[2020-04-06T10:00:00Z]
 
       expected_departures = [
@@ -356,12 +347,21 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     end
 
     test "returns 4 departures if only one section", %{
-      config_one_section: config,
+      config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
+      config =
+        put_primary_departures(config, [
+          %Section{
+            query: %Query{params: %Query.Params{stop_ids: ["place-B"]}},
+            filter: nil,
+            headway: %Headway{headway_id: "red_trunk"}
+          }
+        ])
+
       now = ~U[2020-04-06T10:00:00Z]
 
       expected_departures = [
@@ -462,11 +462,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     end
 
     test "returns headway sections for temporary terminal", %{
-      config_one_section: config,
+      config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
+      config =
+        put_primary_departures(config, [
+          %Section{
+            query: %Query{params: %Query.Params{stop_ids: ["place-B"]}},
+            filter: nil,
+            headway: %Headway{headway_id: "red_trunk"}
+          }
+        ])
+
       now = ~U[2020-04-06T10:00:00Z]
 
       fetch_alerts_fn = fn
@@ -541,11 +550,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     end
 
     test "returns normal sections for upcoming alert", %{
-      config_one_section: config,
+      config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
+      config =
+        put_primary_departures(config, [
+          %Section{
+            query: %Query{params: %Query.Params{stop_ids: ["place-B"]}},
+            filter: nil,
+            headway: %Headway{headway_id: "red_trunk"}
+          }
+        ])
+
       now = ~U[2020-04-06T10:00:00Z]
 
       fetch_alerts_fn = fn
@@ -665,11 +683,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     end
 
     test "returns normal sections for branch station for alert with branch terminal headsign", %{
-      config_branch_station: config,
+      config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
+      config =
+        put_primary_departures(config, [
+          %Section{
+            query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}},
+            filter: nil,
+            headway: %Headway{headway_id: "green_trunk"}
+          }
+        ])
+
       now = ~U[2020-04-06T10:00:00Z]
 
       fetch_alerts_fn = fn
@@ -794,11 +821,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     end
 
     test "returns headway sections for branch station for alert with trunk headsign", %{
-      config_branch_station: config,
+      config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
+      config =
+        put_primary_departures(config, [
+          %Section{
+            query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}},
+            filter: nil,
+            headway: %Headway{headway_id: "green_trunk"}
+          }
+        ])
+
       now = ~U[2020-04-06T10:00:00Z]
 
       fetch_alerts_fn = fn
