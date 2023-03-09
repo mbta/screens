@@ -395,13 +395,18 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   defp get_routes_serving_section(
-         %{route_ids: [], stop_ids: stop_ids},
+         %{route_ids: route_ids, stop_ids: stop_ids},
          create_station_with_routes_map_fn
        ) do
-    stop_ids
-    |> Enum.flat_map(&create_station_with_routes_map_fn.(&1))
-    |> Enum.uniq()
-  end
+    routes =
+      stop_ids
+      |> Enum.flat_map(&create_station_with_routes_map_fn.(&1))
+      |> Enum.uniq()
 
-  defp get_routes_serving_section(%{route_ids: route_ids}, _), do: route_ids
+    if route_ids == [] do
+      routes
+    else
+      Enum.filter(routes, &(&1.id in route_ids))
+    end
+  end
 end
