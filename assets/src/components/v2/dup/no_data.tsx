@@ -5,7 +5,7 @@ import LinkArrow from "../bundled_svg/link_arrow";
 import NormalHeader from "./normal_header";
 
 // Fix station name tags without rider-facing names
-const REPLACEMENTS = {
+export const REPLACEMENTS = {
   WTC: "World Trade Center",
   Malden: "Malden Center",
 } as {[key:string]: string};

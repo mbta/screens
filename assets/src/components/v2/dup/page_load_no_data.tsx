@@ -3,12 +3,7 @@ import React, { ComponentType } from "react";
 import LinkArrow from "../bundled_svg/link_arrow";
 import Loading from "../bundled_svg/loading";
 import NormalHeader from "./normal_header";
-
-// Fix station name tags without rider-facing names
-const REPLACEMENTS = {
-  WTC: "World Trade Center",
-  Malden: "Malden Center",
-} as {[key:string]: string};
+import { REPLACEMENTS } from "./no_data";
 
 const PageLoadNoData: ComponentType = () => {
   let stationName = useOutfrontStation() || "Transit information";
