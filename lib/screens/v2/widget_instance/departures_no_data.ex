@@ -19,7 +19,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoData do
   end
 
   def slot_names(%__MODULE__{slot_name: slot_name}) when not is_nil(slot_name),
-    do: slot_name
+    do: [slot_name]
 
   def slot_names(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}}), do: [:full_main_content]
   def slot_names(_instance), do: [:main_content]
