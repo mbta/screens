@@ -1060,19 +1060,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           screen: config,
           show_alternatives?: nil,
           slot_name: :main_content_zero,
-          routes: [:test]
+          route_types: [:test]
         },
         %DeparturesNoData{
           screen: config,
           show_alternatives?: nil,
           slot_name: :main_content_one,
-          routes: [:test]
+          route_types: [:test]
         },
         %DeparturesNoData{
           screen: config,
           show_alternatives?: nil,
           slot_name: :main_content_two,
-          routes: [:ferry, :light_rail]
+          route_types: [:ferry, :light_rail]
         }
       ]
 

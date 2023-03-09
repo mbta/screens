@@ -4,13 +4,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoData do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Alerts
 
-  defstruct screen: nil, show_alternatives?: nil, slot_name: nil, routes: []
+  defstruct screen: nil, show_alternatives?: nil, slot_name: nil, route_types: []
 
   @type t :: %__MODULE__{
           screen: Screens.Config.Screen.t(),
           show_alternatives?: boolean(),
           slot_name: atom(),
-          routes: list(atom())
+          route_types: list(atom())
         }
 
   def priority(_instance), do: [2]
@@ -19,7 +19,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoData do
     %{
       show_alternatives: instance.show_alternatives?,
       stop_id: stop_id(instance),
-      routes: instance.routes
+      route_types: instance.route_types
     }
   end
 

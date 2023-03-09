@@ -76,7 +76,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         %DeparturesNoData{
           screen: config,
           slot_name: slot_id,
-          routes: Enum.map(sections, & &1.route.type)
+          route_types: Enum.map(sections, & &1.route.type)
         }
       else
         %DeparturesWidget{
