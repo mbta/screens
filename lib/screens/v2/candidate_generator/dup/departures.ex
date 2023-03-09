@@ -202,6 +202,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
                               headway: headway
                             } = section ->
       routes = get_routes_serving_section(params, create_station_with_routes_map_fn)
+      # DUP sections will always show one mode.
+      # For subway, each route will have its own section.
+      # If the stop is served by two different subway/light rail routes, route_ids must be populated for each section
+      # Otherwise, we only need the first route in the list of routes serving the stop.
       route_type_for_section = List.first(routes).type
 
       # If we know the predictions are unreliable, don't even bother fetching them.
@@ -456,9 +460,4 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       Enum.filter(routes, &(&1.id in route_ids))
     end
   end
-
-  # DUP sections will always show one mode.
-  # For subway, each route will have its own section.
-  # If the stop is served by two different subway/light rail routes, route_ids must be populated for each section
-  # Otherwise, we only need the first route in the list of routes serving the stop.
 end
