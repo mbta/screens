@@ -320,7 +320,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
     # Get schedules for each route for all stop_ids in config
     routes_serving_section
-    |> Enum.reject(&(&1 in routes_with_live_departures))
+    |> Enum.reject(&(&1.id in routes_with_live_departures))
     |> Enum.map(fn %{id: route_id} ->
       # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
       # we do not display overnight mode.
