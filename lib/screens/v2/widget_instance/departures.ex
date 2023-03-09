@@ -121,9 +121,20 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :normal_section, rows: rows}
   end
 
-  def serialize_section(%{type: :overnight_section}, _, _) do
+  def serialize_section(%{type: :overnight_section, routes: routes}, _, _) do
+    route_pill =
+      routes
+      |> Enum.map(fn
+        %{type: :rail} -> :cr
+        %{short_name: "SL" <> _} -> :silver
+        %{type: :bus} -> :bus
+        %{id: id} -> Util.get_color_for_route(id)
+        _ -> nil
+      end)
+      |> List.first()
+
     text = %FreeTextLine{
-      icon: :bus,
+      icon: route_pill,
       text: ["Services resumes in the morning"]
     }
 

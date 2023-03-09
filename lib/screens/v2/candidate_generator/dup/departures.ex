@@ -100,7 +100,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           cond do
             # All routes in section are overnight
             overnight_schedules_for_section != [] and departures == [] ->
-              %{type: :overnight_section}
+              %{type: :overnight_section, routes: routes_serving_section}
 
             # There are still predictions to show
             headway_mode == :inactive ->
@@ -132,7 +132,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
       Enum.map(slot_ids, fn slot_id ->
         if Enum.all?(sections, &(&1.type == :overnight_section)) do
-          %OvernightDepartures{screen: config, slot_names: [slot_id]}
+          route_pills =
+            sections
+            |> Enum.flat_map(fn %{routes: routes} ->
+              Enum.map(routes, fn
+                %{type: :rail} -> :cr
+                %{short_name: "SL" <> _} -> :silver
+                %{type: :bus} -> :bus
+                %{id: id} -> Util.get_color_for_route(id)
+                _ -> nil
+              end)
+            end)
+            |> Enum.uniq()
+
+          %OvernightDepartures{screen: config, slot_names: [slot_id], routes: route_pills}
         else
           %DeparturesWidget{
             screen: config,
