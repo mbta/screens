@@ -4,18 +4,23 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoData do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Alerts
 
-  defstruct screen: nil, show_alternatives?: nil, slot_name: nil
+  defstruct screen: nil, show_alternatives?: nil, slot_name: nil, routes: []
 
   @type t :: %__MODULE__{
           screen: Screens.Config.Screen.t(),
           show_alternatives?: boolean(),
-          slot_name: atom()
+          slot_name: atom(),
+          routes: list(atom())
         }
 
   def priority(_instance), do: [2]
 
   def serialize(%__MODULE__{} = instance) do
-    %{show_alternatives: instance.show_alternatives?, stop_id: stop_id(instance)}
+    %{
+      show_alternatives: instance.show_alternatives?,
+      stop_id: stop_id(instance),
+      routes: instance.routes
+    }
   end
 
   def slot_names(%__MODULE__{slot_name: slot_name}) when not is_nil(slot_name),
