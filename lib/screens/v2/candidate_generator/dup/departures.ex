@@ -13,7 +13,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.DeparturesNoData
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
 
   def departures_instances(
         %Screen{
@@ -131,11 +131,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         end)
 
       Enum.map(slot_ids, fn slot_id ->
-        %DeparturesWidget{
-          screen: config,
-          section_data: sections,
-          slot_names: [slot_id]
-        }
+        if Enum.all?(sections, &(&1.type == :overnight_section)) do
+          %OvernightDepartures{screen: config, slot_names: [slot_id]}
+        else
+          %DeparturesWidget{
+            screen: config,
+            section_data: sections,
+            slot_names: [slot_id]
+          }
+        end
       end)
     end
   end
