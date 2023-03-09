@@ -11,7 +11,9 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
 
-import NormalScreen, { NormalSimulation } from "Components/v2/dup/normal_screen";
+import NormalScreen, {
+  NormalSimulation,
+} from "Components/v2/dup/normal_screen";
 import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/dup/normal_header";
 import NormalDepartures from "Components/v2/dup/departures/normal_departures";
@@ -26,7 +28,10 @@ import { splitRotationFromPropNames } from "Components/v2/dup/dup_rotation_wrapp
 import PartialAlert from "Components/v2/dup/partial_alert";
 import TakeoverAlert from "Components/v2/dup/takeover_alert";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
-import { ResponseMapper, ResponseMapperContext } from "Components/v2/screen_container";
+import {
+  ResponseMapper,
+  ResponseMapperContext,
+} from "Components/v2/screen_container";
 import PageLoadNoData from "Components/v2/dup/page_load_no_data";
 import NoData from "Components/v2/dup/no_data";
 
@@ -53,6 +58,7 @@ const TYPE_TO_COMPONENT = {
   takeover_alert: TakeoverAlert,
   page_load_no_data: PageLoadNoData,
   no_data: NoData,
+  departures_no_data: NoData,
 };
 
 const responseMapper: ResponseMapper = (apiResponse) => {
@@ -65,45 +71,48 @@ const responseMapper: ResponseMapper = (apiResponse) => {
       return {
         rotation_one: {
           full_rotation: {
-            type: "no_data"
+            type: "no_data",
+            include_header: true,
           },
-          type: "rotation_takeover_one"
+          type: "rotation_takeover_one",
         },
         rotation_two: {
           full_rotation: {
-            type: "no_data"
+            type: "no_data",
+            include_header: true,
           },
-          type: "rotation_takeover_two"
+          type: "rotation_takeover_two",
         },
         rotation_zero: {
           full_rotation: {
-            type: "no_data"
+            type: "no_data",
+            include_header: true,
           },
-          type: "rotation_takeover_zero"
+          type: "rotation_takeover_zero",
         },
-        type: "screen_normal"
+        type: "screen_normal",
       };
     case "loading":
       return {
         rotation_one: {
           full_rotation: {
-            type: "page_load_no_data"
+            type: "page_load_no_data",
           },
-          type: "rotation_takeover_one"
+          type: "rotation_takeover_one",
         },
         rotation_two: {
           full_rotation: {
-            type: "page_load_no_data"
+            type: "page_load_no_data",
           },
-          type: "rotation_takeover_two"
+          type: "rotation_takeover_two",
         },
         rotation_zero: {
           full_rotation: {
-            type: "page_load_no_data"
+            type: "page_load_no_data",
           },
-          type: "rotation_takeover_zero"
+          type: "rotation_takeover_zero",
         },
-        type: "screen_normal"
+        type: "screen_normal",
       };
   }
 };
@@ -118,7 +127,7 @@ const App = (): JSX.Element => {
         <Route exact path="/v2/screen/:id/simulation">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
-              <SimulationScreenPage opts={{alternateView: true}} />
+              <SimulationScreenPage opts={{ alternateView: true }} />
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
