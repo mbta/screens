@@ -8,6 +8,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.Config.V2.Departures.Query.Params
   alias Screens.Config.V2.Dup
   alias Screens.SignsUiConfig
+  alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
@@ -22,11 +23,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         } = config,
         now,
         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
-        fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1
+        fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1,
+        create_station_with_routes_map_fn \\ &Stop.create_station_with_routes_map/1
       ) do
     primary_departures_instances =
       primary_sections
-      |> get_sections_data(fetch_section_departures_fn, fetch_alerts_fn, now)
+      |> get_sections_data(
+        fetch_section_departures_fn,
+        fetch_alerts_fn,
+        create_station_with_routes_map_fn,
+        now
+      )
       |> sections_data_to_departure_instances(
         config,
         [:main_content_zero, :main_content_one],
@@ -42,7 +49,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
     secondary_departures_instances =
       secondary_sections
-      |> get_sections_data(fetch_section_departures_fn, fetch_alerts_fn, now)
+      |> get_sections_data(
+        fetch_section_departures_fn,
+        fetch_alerts_fn,
+        create_station_with_routes_map_fn,
+        now
+      )
       |> sections_data_to_departure_instances(
         config,
         [:main_content_two],
@@ -53,69 +65,104 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   defp sections_data_to_departure_instances(sections_data, config, slot_ids, now) do
-    if Enum.any?(sections_data, &(&1 == :error)) do
-      %DeparturesNoData{screen: config, show_alternatives?: true}
-    else
-      sections =
-        Enum.map(sections_data, fn %{
-                                     departures: departures,
-                                     alert: alert,
-                                     headway: headway,
-                                     stop_ids: stop_ids
-                                   } ->
-          visible_departures =
-            if length(sections_data) > 1 do
-              Enum.take(departures, 2)
-            else
-              Enum.take(departures, 4)
-            end
+    sections =
+      Enum.map(
+        sections_data,
+        &get_departure_instance_for_section(&1, length(sections_data) == 1, now)
+      )
 
-          case get_headway_mode(stop_ids, headway, alert, now) do
-            {:active, time_range, headsign} ->
-              %{
-                type: :headway_section,
-                pill: get_section_route_from_alert(stop_ids, alert),
-                time_range: time_range,
-                headsign: headsign
-              }
-
-            :inactive ->
-              %{type: :normal_section, rows: visible_departures}
-          end
-        end)
-
-      Enum.map(slot_ids, fn slot_id ->
+    Enum.map(slot_ids, fn slot_id ->
+      if Enum.all?(sections, &(&1.type == :no_data_section)) do
+        %DeparturesNoData{
+          screen: config,
+          slot_name: slot_id,
+          route_types: Enum.map(sections, & &1.route.type)
+        }
+      else
         %DeparturesWidget{
           screen: config,
           section_data: sections,
           slot_names: [slot_id]
         }
-      end)
+      end
+    end)
+  end
+
+  defp get_departure_instance_for_section(%{type: :no_data_section} = section, _, _), do: section
+
+  defp get_departure_instance_for_section(
+         %{
+           departures: departures,
+           alert: alert,
+           headway: headway,
+           stop_ids: stop_ids,
+           route: route
+         },
+         is_only_section,
+         now
+       ) do
+    visible_departures =
+      if is_only_section do
+        Enum.take(departures, 4)
+      else
+        Enum.take(departures, 2)
+      end
+
+    case get_headway_mode(stop_ids, headway, alert, now) do
+      {:active, time_range, headsign} ->
+        %{
+          type: :headway_section,
+          pill: get_section_route_from_alert(stop_ids, alert),
+          time_range: time_range,
+          headsign: headsign
+        }
+
+      :inactive ->
+        if visible_departures == [] do
+          %{type: :no_data_section, route: route}
+        else
+          %{type: :normal_section, rows: visible_departures}
+        end
     end
   end
 
-  defp get_sections_data(sections, fetch_section_departures_fn, fetch_alerts_fn, now) do
+  defp get_sections_data(
+         sections,
+         fetch_section_departures_fn,
+         fetch_alerts_fn,
+         create_station_with_routes_map_fn,
+         now
+       ) do
     sections
     |> Task.async_stream(fn %Section{
                               query: %Query{
-                                params: %Params{stop_ids: stop_ids} = params
+                                params: %Params{stop_ids: stop_ids, route_ids: route_ids} = params
                               },
                               headway: headway
                             } = section ->
-      section_departures =
-        case fetch_section_departures_fn.(section) do
-          {:ok, section_departures} -> section_departures
-          _ -> []
-        end
+      route =
+        get_primary_route_for_section(stop_ids, route_ids, create_station_with_routes_map_fn)
 
-      section_alert = get_section_alert(params, fetch_alerts_fn, now)
+      # If we know the predictions are unreliable, don't even bother fetching them.
+      if not is_nil(route) and Screens.Config.State.mode_disabled?(route.type) do
+        %{type: :no_data_section, route: route}
+      else
+        section_departures =
+          case fetch_section_departures_fn.(section) do
+            {:ok, section_departures} -> section_departures
+            _ -> []
+          end
 
-      %{
-        departures: section_departures,
-        alert: section_alert,
-        headway: headway,
-        stop_ids: stop_ids
-      }
+        section_alert = get_section_alert(params, fetch_alerts_fn, now)
+
+        %{
+          departures: section_departures,
+          alert: section_alert,
+          headway: headway,
+          stop_ids: stop_ids,
+          route: route
+        }
+      end
     end)
     |> Enum.map(fn {:ok, data} -> data end)
   end
@@ -241,5 +288,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do
     MapSet.subset?(informed, informed_stop_ids) and
       MapSet.disjoint?(not_informed, informed_stop_ids)
+  end
+
+  # DUP sections will always show one mode.
+  # For subway, each route will have its own section.
+  # If the stop is served by two different subway/light rail routes, route_ids must be populated for each section
+  # Otherwise, we only need the first route in the list of routes serving the stop.
+  defp get_primary_route_for_section([stop_id | _], route_ids, create_station_with_routes_map_fn) do
+    all_routes = create_station_with_routes_map_fn.(stop_id)
+
+    if route_ids != [] do
+      Enum.find(all_routes, fn route -> route.id in route_ids end)
+    else
+      List.first(all_routes)
+    end
   end
 end

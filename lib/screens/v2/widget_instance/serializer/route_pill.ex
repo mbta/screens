@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   alias Screens.Routes.Route
   alias Screens.RouteType
+  alias Screens.Util
 
   @type t :: text_pill() | icon_pill() | slashed_route_pill()
 
@@ -34,8 +35,6 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   @type icon :: :bus | :light_rail | :rail | :boat
 
   @type color :: :red | :orange | :green | :blue | :purple | :yellow | :teal
-
-  @sl_route_ids ~w[741 742 743 746 749 751]
 
   @cr_line_abbreviations %{
     "Haverhill" => "HVL",
@@ -84,7 +83,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
           do_serialize(route_id, %{route_name: route_name, gl_branch: true})
       end
 
-    Map.put(route, :color, get_color_for_route(route_id, route_type))
+    Map.put(route, :color, Util.get_color_for_route(route_id, route_type))
   end
 
   @spec serialize_for_audio_departure(Route.id(), String.t(), RouteType.t(), pos_integer() | nil) ::
@@ -130,7 +129,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   def serialize_route_for_alert(route_id, gl_long \\ true) do
     route = do_serialize(route_id, %{gl_long: gl_long, gl_branch: true, cr_abbrev: true})
 
-    Map.merge(route, %{color: get_color_for_route(route_id)})
+    Map.merge(route, %{color: Util.get_color_for_route(route_id)})
   end
 
   def serialize_route_for_reconstructed_alert(route_id_group, opts \\ %{})
@@ -147,7 +146,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   def serialize_route_for_reconstructed_alert({route_id, _}, opts) do
     route = do_serialize(route_id, opts)
-    Map.merge(route, %{color: get_color_for_route(route_id)})
+    Map.merge(route, %{color: Util.get_color_for_route(route_id)})
   end
 
   @typep serialize_opts :: %{
@@ -212,22 +211,4 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
       text: if(route_name != "", do: route_name, else: route_id)
     }
   end
-
-  defp get_color_for_route(route_id, route_type \\ nil)
-
-  defp get_color_for_route("Red", _), do: :red
-  defp get_color_for_route("Mattapan", _), do: :red
-  defp get_color_for_route("Orange", _), do: :orange
-  defp get_color_for_route("Green" <> _, _), do: :green
-  defp get_color_for_route("Blue", _), do: :blue
-  defp get_color_for_route("CR-" <> _, _), do: :purple
-  defp get_color_for_route("Boat-" <> _, _), do: :teal
-
-  defp get_color_for_route(route_id, _)
-       when route_id in @sl_route_ids,
-       do: :silver
-
-  defp get_color_for_route(_, :rail), do: :purple
-  defp get_color_for_route(_, :ferry), do: :teal
-  defp get_color_for_route(_, _), do: :yellow
 end
