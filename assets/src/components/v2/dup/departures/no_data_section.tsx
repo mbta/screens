@@ -1,7 +1,7 @@
 import React from "react";
 
-import FreeText from "Components/v2/dup/dup_free_text";
 import NoConnection from "Components/v2/bundled_svg/no_connection";
+import FreeText from "Components/v2/free_text";
 
 const NoDataSection = ({ text }) => {
   return (
