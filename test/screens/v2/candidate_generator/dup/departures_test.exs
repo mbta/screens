@@ -7,6 +7,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.Config.V2.Departures.{Headway, Query, Section}
   alias Screens.Config.V2.Dup, as: DupConfig
   alias Screens.Predictions.Prediction
+  alias Screens.Trips.Trip
   alias Screens.V2.Departure
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
@@ -42,6 +43,23 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           sections: [
             %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil},
             %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}, filter: nil}
+          ]
+        },
+        secondary_departures: %Departures{sections: []}
+      },
+      vendor: :outfront,
+      device_id: "TEST",
+      name: "TEST",
+      app_id: :dup_v2
+    }
+
+    config_bidirectional_primary = %Screen{
+      app_params: %DupConfig{
+        header: %Header.CurrentStopId{stop_id: "place-gover"},
+        primary_departures: %Departures{
+          sections: [
+            %Section{bidirectional: true, query: %Query{params: %Query.Params{stop_ids: ["place-F"]}}, filter: nil},
+            %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil}
           ]
         },
         secondary_departures: %Departures{sections: []}
@@ -181,6 +199,16 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-E"]}}} ->
         {:ok, []}
 
+      %Section{query: %Query{params: %Query.Params{stop_ids: ["place-F"]}}} ->
+        {:ok,
+          [
+            %Departure{prediction: %Prediction{id: "F1", trip: %Trip{direction_id: 0}}},
+            %Departure{prediction: %Prediction{id: "F2", trip: %Trip{direction_id: 0}}},
+            %Departure{prediction: %Prediction{id: "F3", trip: %Trip{direction_id: 0}}},
+            %Departure{prediction: %Prediction{id: "F4", trip: %Trip{direction_id: 1}}},
+            %Departure{prediction: %Prediction{id: "F5", trip: %Trip{direction_id: 1}}}
+          ]}
+
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "Kenmore"}}]}
     end
@@ -198,6 +226,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     %{
       config_primary_and_secondary: config_primary_and_secondary,
       config_only_primary: config_only_primary,
+      config_bidirectional_primary: config_bidirectional_primary,
       config_one_section: config_one_section,
       config_branch_station: config_branch_station,
       config_disabled_mode: config_disabled_mode,
@@ -398,6 +427,113 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 },
                 %Screens.V2.Departure{
                   prediction: struct(Prediction, id: "B2"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_two]
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_fn,
+          create_station_with_routes_map_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns only bidirectional departures if configured for that", %{
+      config_bidirectional_primary: config,
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_alerts_fn: fetch_alerts_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+    } do
+      now = ~U[2020-04-06T10:00:00Z]
+
+      expected_departures = [
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "F1", trip: struct(Trip, direction_id: 0)),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "F4", trip: struct(Trip, direction_id: 1)),
+                  schedule: nil
+                }
+              ]
+            },
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "A"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_zero]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "F1", trip: struct(Trip, direction_id: 0)),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "F4", trip: struct(Trip, direction_id: 1)),
+                  schedule: nil
+                }
+              ]
+            },
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "A"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_one]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "F1", trip: struct(Trip, direction_id: 0)),
+                  schedule: nil
+                },
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "F4", trip: struct(Trip, direction_id: 1)),
+                  schedule: nil
+                }
+              ]
+            },
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "A"),
                   schedule: nil
                 }
               ]
