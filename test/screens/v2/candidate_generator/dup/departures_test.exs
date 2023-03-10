@@ -58,7 +58,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         header: %Header.CurrentStopId{stop_id: "place-gover"},
         primary_departures: %Departures{
           sections: [
-            %Section{bidirectional: true, query: %Query{params: %Query.Params{stop_ids: ["place-F"]}}, filter: nil},
+            %Section{
+              bidirectional: true,
+              query: %Query{params: %Query.Params{stop_ids: ["place-F"]}},
+              filter: nil
+            },
             %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil}
           ]
         },
@@ -201,13 +205,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-F"]}}} ->
         {:ok,
-          [
-            %Departure{prediction: %Prediction{id: "F1", trip: %Trip{direction_id: 0}}},
-            %Departure{prediction: %Prediction{id: "F2", trip: %Trip{direction_id: 0}}},
-            %Departure{prediction: %Prediction{id: "F3", trip: %Trip{direction_id: 0}}},
-            %Departure{prediction: %Prediction{id: "F4", trip: %Trip{direction_id: 1}}},
-            %Departure{prediction: %Prediction{id: "F5", trip: %Trip{direction_id: 1}}}
-          ]}
+         [
+           %Departure{prediction: %Prediction{id: "F1", trip: %Trip{direction_id: 0}}},
+           %Departure{prediction: %Prediction{id: "F2", trip: %Trip{direction_id: 0}}},
+           %Departure{prediction: %Prediction{id: "F3", trip: %Trip{direction_id: 0}}},
+           %Departure{prediction: %Prediction{id: "F4", trip: %Trip{direction_id: 1}}},
+           %Departure{prediction: %Prediction{id: "F5", trip: %Trip{direction_id: 1}}}
+         ]}
 
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "Kenmore"}}]}
