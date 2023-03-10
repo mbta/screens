@@ -10,33 +10,13 @@ export const REPLACEMENTS = {
   Malden: "Malden Center",
 } as { [key: string]: string };
 
-const routeTypes = {
-  subway: "Subway",
-  light_rail: "Green Line",
-  bus: "Bus",
-  rail: "Commuter Rail",
-} as { [key: string]: string };
-
 interface Props {
   include_header?: boolean;
-  route_types?: string[];
 }
 
-const NoData: ComponentType<Props> = ({ include_header, route_types }) => {
+const NoData: ComponentType<Props> = ({ include_header }) => {
   let stationName = useOutfrontStation() || "Transit information";
   stationName = REPLACEMENTS[stationName] || stationName;
-
-  let routeTypeString;
-  if (route_types) {
-    const formattedTypes = route_types.map(
-      (routeType) => routeTypes[routeType]
-    );
-    if (formattedTypes.length == 2) {
-      routeTypeString = `${formattedTypes[0]} and ${formattedTypes[1]}`;
-    } else {
-      routeTypeString = formattedTypes[0];
-    }
-  }
 
   return (
     <div className="no-data__container">
@@ -49,7 +29,7 @@ const NoData: ComponentType<Props> = ({ include_header, route_types }) => {
           />
         </div>
         <div className="no-data__message">
-          Live {routeTypeString} updates are temporarily unavailable
+          Live updates are temporarily unavailable
         </div>
       </div>
       <div className="no-data__link">

@@ -30,7 +30,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoDataTest do
 
   describe "serialize/1" do
     test "returns stop ID and `show_alternatives?`", %{widget: widget} do
-      assert %{stop_id: "1", show_alternatives: true, route_types: []} ==
+      assert %{stop_id: "1", show_alternatives: true} ==
                WidgetInstance.serialize(widget)
     end
   end

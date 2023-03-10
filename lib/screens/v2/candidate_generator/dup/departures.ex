@@ -75,8 +75,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       if Enum.all?(sections, &(&1.type == :no_data_section)) do
         %DeparturesNoData{
           screen: config,
-          slot_name: slot_id,
-          route_types: Enum.map(sections, & &1.route.type)
+          slot_name: slot_id
         }
       else
         %DeparturesWidget{
