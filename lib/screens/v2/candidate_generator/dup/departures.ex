@@ -91,8 +91,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         Enum.all?(sections, &(&1.type == :no_data_section)) ->
           %DeparturesNoData{
             screen: config,
-            slot_name: slot_id,
-            route_types: Enum.map(sections, & &1.route_type)
+            slot_name: slot_id
           }
 
         Enum.all?(sections, &(&1.type == :overnight_section)) ->
@@ -169,7 +168,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           end
 
         if visible_departures == [] do
-          %{type: :no_data_section, route_type: List.first(routes).type}
+          %{type: :no_data_section, route: List.first(routes)}
         else
           %{type: :normal_section, rows: visible_departures}
         end
@@ -206,11 +205,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       # For subway, each route will have its own section.
       # If the stop is served by two different subway/light rail routes, route_ids must be populated for each section
       # Otherwise, we only need the first route in the list of routes serving the stop.
-      route_type_for_section = List.first(routes).type
+      primary_route_for_section = List.first(routes)
 
       # If we know the predictions are unreliable, don't even bother fetching them.
-      if Screens.Config.State.mode_disabled?(route_type_for_section) do
-        %{type: :no_data_section, route_type: route_type_for_section}
+      if Screens.Config.State.mode_disabled?(primary_route_for_section.type) do
+        %{type: :no_data_section, route: primary_route_for_section}
       else
         section_departures =
           case fetch_section_departures_fn.(section) do
