@@ -1,21 +1,21 @@
 import React from "react";
 import LinkArrow from "../bundled_svg/link_arrow";
+import FreeText, { FreeTextType } from "Components/v2/free_text";
 
-import FreeText, { FreeTextType } from "./dup_free_text";
 import NormalHeader from "./normal_header";
 
 interface TakeoverAlertProps {
-  text: FreeTextType,
-  remedy: FreeTextType,
+  text: FreeTextType;
+  remedy: FreeTextType;
   header: {
-    text: string,
-    color: string
-  }
+    text: string;
+    color: string;
+  };
 }
 
 const TakeoverAlert = (alert: TakeoverAlertProps) => {
-  const {text, remedy, header} = alert
-  
+  const { text, remedy, header } = alert;
+
   return (
     <>
       <NormalHeader
@@ -34,7 +34,7 @@ const TakeoverAlert = (alert: TakeoverAlertProps) => {
           <div className="full-screen-alert__link-text">mbta.com/alerts</div>
         </div>
       </div>
-      </>
+    </>
   );
 };
 

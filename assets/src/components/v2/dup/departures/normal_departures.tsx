@@ -2,6 +2,7 @@ import React from "react";
 
 import NormalSection from "Components/v2/dup/departures/normal_section";
 import NoticeSection from "Components/v2/departures/notice_section";
+import NoDataSection from "Components/v2/dup/departures/no_data_section";
 
 const NormalDepartures = ({ sections }) => {
   return (
@@ -13,6 +14,9 @@ const NormalDepartures = ({ sections }) => {
             return <NormalSection rows={rows} key={i} />;
           } else if (type === "notice_section") {
             return <NoticeSection {...data} key={i} />;
+          } else if (type === "no_data_section") {
+            const { text } = data;
+            return <NoDataSection text={text} key={i} />;
           }
         })}
       </div>
