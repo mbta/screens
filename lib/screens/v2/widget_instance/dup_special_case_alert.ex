@@ -6,8 +6,22 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
   Its serialized data must be valid for a DUP full-screen or partial alert on the client.
   """
 
-  @enforce_keys [:serialize_map, :slot_names, :widget_type, :rotation_index]
+  alias Screens.V2.WidgetInstance
+
+  @enforce_keys [:alert_ids, :serialize_map, :slot_names, :widget_type, :rotation_index]
   defstruct @enforce_keys
+
+  @type t :: %__MODULE__{
+          # IDs of alert(s) represented by this widget, so that we can properly report
+          # to ScreensByAlert
+          alert_ids: list(alert_id),
+          serialize_map: map(),
+          slot_names: list(WidgetInstance.slot_id()),
+          widget_type: WidgetInstance.widget_type(),
+          rotation_index: :one | :two | :three
+        }
+
+  @type alert_id :: String.t()
 
   def slot_names(%__MODULE__{} = t) do
     Enum.map(t.slot_names, &:"#{&1}_#{t.rotation_index}")
@@ -25,5 +39,9 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
     def audio_sort_key(_t), do: [0]
     def audio_valid_candidate?(_t), do: false
     def audio_view(_t), do: nil
+  end
+
+  defimpl Screens.V2.AlertsWidget do
+    def alert_ids(instance), do: instance.alert_ids
   end
 end
