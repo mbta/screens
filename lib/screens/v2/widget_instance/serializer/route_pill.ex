@@ -3,7 +3,6 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   alias Screens.Routes.Route
   alias Screens.RouteType
-  alias Screens.Util
 
   @type t :: text_pill() | icon_pill() | slashed_route_pill()
 
