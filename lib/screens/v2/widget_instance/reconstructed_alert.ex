@@ -85,12 +85,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Using hd/1 because we know that only single line stations use this function.
-  defp get_destination(
-         %__MODULE__{
-           screen: %Screen{app_params: %{reconstructed_alert_widget: %{stop_id: stop_id}}}
-         } = t,
-         location
-       ) do
+  defp get_destination(t, location) do
     informed_entities = BaseAlert.informed_entities(t)
 
     {direction_id, route_id} =
@@ -103,12 +98,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       # When the alert is non-directional but the station is at the boundary:
       # direction_id will be nil, but we still want to show the alert impacts one direction only
       is_nil(direction_id) and location == :boundary ->
-        informed_stop_ids = Enum.into(informed_entities, MapSet.new(), & &1.stop)
-
-        :screens
-        |> Application.get_env(:prefare_alert_headsign_matchers)
-        |> Map.get(stop_id)
-        |> Enum.find_value(nil, &do_get_boundary_headsign(&1, informed_stop_ids))
+        BaseAlert.get_headsign_from_informed_entities(t)
 
       # When the alert is non-directional and the station is outside the alert range
       is_nil(direction_id) ->
@@ -120,17 +110,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         |> Map.get(route_id)
         |> Enum.at(direction_id)
     end
-  end
-
-  defp do_get_boundary_headsign({informed, not_informed, headsign}, informed_stop_ids) do
-    if alert_region_match?(Util.to_set(informed), Util.to_set(not_informed), informed_stop_ids),
-      do: headsign,
-      else: false
-  end
-
-  defp alert_region_match?(informed, not_informed, informed_stop_ids) do
-    MapSet.subset?(informed, informed_stop_ids) and
-      MapSet.disjoint?(not_informed, informed_stop_ids)
   end
 
   defp get_route_pills(routes) do
@@ -752,7 +731,25 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def audio_view(_instance), do: ScreensWeb.V2.Audio.ReconstructedAlertView
   end
 
-  defimpl Screens.V2.AlertWidgetInstance do
+  defimpl Screens.V2.SingleAlertWidget do
+    alias Screens.V2.WidgetInstance.ReconstructedAlert
+
+    def alert(instance), do: instance.alert
+
+    def screen(instance), do: instance.screen
+
+    def home_stop_id(instance), do: instance.screen.app_params.reconstructed_alert_widget.stop_id
+
+    def routes_at_stop(instance), do: instance.routes_at_stop
+
+    def stop_sequences(instance), do: instance.stop_sequences
+
+    def headsign_matchers(_instance) do
+      Application.get_env(:screens, :prefare_alert_headsign_matchers)
+    end
+  end
+
+  defimpl Screens.V2.AlertsWidget do
     def alert_ids(t), do: ReconstructedAlert.alert_ids(t)
   end
 end
