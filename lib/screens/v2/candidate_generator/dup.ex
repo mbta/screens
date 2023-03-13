@@ -129,21 +129,32 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
     route_type_filter = Enum.map([:light_rail, :subway], &Screens.RouteType.to_id/1)
 
-    with {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, route_type_filter),
-         route_ids_at_stop = for(%{route_id: id} <- routes_at_stop, id != "Mattapan", do: id),
-         {:ok, alerts} <- Alert.fetch(route_ids: route_ids_at_stop),
+    with {:ok, subway_routes_at_stop} <-
+           Route.fetch_routes_by_stop(stop_id, now, route_type_filter),
+         subway_route_ids_at_stop =
+           for(%{route_id: id} <- subway_routes_at_stop, id != "Mattapan", do: id),
+         {:ok, alerts} <- Alert.fetch(route_ids: subway_route_ids_at_stop),
          {:ok, stop_sequences} <-
-           RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids_at_stop) do
+           RoutePattern.fetch_parent_station_sequences_through_stop(
+             stop_id,
+             subway_route_ids_at_stop
+           ) do
       alerts
-      |> Enum.filter(&relevant_alert?(&1, config, stop_sequences, routes_at_stop, now))
+      |> Enum.filter(&relevant_alert?(&1, config, stop_sequences, subway_routes_at_stop, now))
       |> alert_special_cases(config)
-      |> create_alert_widgets(config, stop_sequences, routes_at_stop, stop_name)
+      |> create_alert_widgets(config, stop_sequences, subway_routes_at_stop, stop_name)
     else
       :error -> []
     end
   end
 
-  defp create_alert_widgets({:normal, alerts}, config, stop_sequences, routes_at_stop, stop_name) do
+  defp create_alert_widgets(
+         {:normal, alerts},
+         config,
+         stop_sequences,
+         subway_routes_at_stop,
+         stop_name
+       ) do
     alert = choose_alert(alerts)
 
     if is_nil(alert) do
@@ -154,7 +165,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
           screen: config,
           alert: alert,
           stop_sequences: stop_sequences,
-          routes_at_stop: routes_at_stop,
+          subway_routes_at_stop: subway_routes_at_stop,
           rotation_index: rotation_index,
           stop_name: stop_name
         }
@@ -164,12 +175,12 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
   defp create_alert_widgets({:special, widgets}, _, _, _, _), do: widgets
 
-  defp relevant_alert?(alert, config, stop_sequences, routes_at_stop, now) do
+  defp relevant_alert?(alert, config, stop_sequences, subway_routes_at_stop, now) do
     dup_alert = %DupAlert{
       screen: config,
       alert: alert,
       stop_sequences: stop_sequences,
-      routes_at_stop: routes_at_stop,
+      subway_routes_at_stop: subway_routes_at_stop,
       rotation_index: :zero,
       stop_name: "A Station"
     }
@@ -201,39 +212,25 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   end
 
   @spec choose_alert(list(Alert.t())) :: Alert.t() | nil
+  defp choose_alert([]), do: nil
   defp choose_alert([alert]), do: alert
 
   defp choose_alert(alerts) do
     # When there are multiple relevant alerts, we prioritize first by
     # effect (shuttle with highest priority, down to delay with lowest priority),
-    # then by severity, then by alert ID.
-    alerts_by_effect = Enum.group_by(alerts, & &1.effect)
+    # then by severity descending, then by alert ID descending.
 
-    [:shuttle, :suspension, :station_closure, :delay]
-    |> Enum.map(&alerts_by_effect[&1])
-    |> Enum.reject(&(&1 == nil))
-    |> List.first()
-    |> case do
-      nil ->
-        nil
-
-      [alert] ->
-        alert
-
-      alerts ->
-        # There are multiple alerts with the same effect type.
-        # Choose the alert with the highest severity.
-        # If two have the same severity, choose the one with the highest alert ID.
-        Enum.max_by(alerts, &{&1.severity, &1.id})
-    end
-    |> tap(fn
-      nil ->
-        nil
-
-      alert ->
-        alert_ids = Enum.map_join(alerts, ",", & &1.id)
-        Logger.info("[dup alert selected] selected_id=#{alert.id} all_relevant_ids=#{alert_ids}")
+    # This function assumes we've already filtered to alerts with relevant effects only.
+    alerts
+    |> Enum.min_by(&{effect_key(&1.effect), -&1.severity, -&1.id})
+    |> tap(fn alert ->
+      alert_ids = Enum.map_join(alerts, ",", & &1.id)
+      Logger.info("[dup alert selected] selected_id=#{alert.id} all_relevant_ids=#{alert_ids}")
     end)
+  end
+
+  for {effect, key} <- Enum.with_index([:shuttle, :suspension, :station_closure, :delay]) do
+    defp effect_key(unquote(effect)), do: unquote(key)
   end
 
   defp placeholder_instances do
