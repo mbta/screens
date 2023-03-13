@@ -398,7 +398,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           struct(Schedule, departure_time: now),
           &(&1.route.id == route_id)
         )
-        |> IO.inspect()
 
       if DateTime.compare(now, last_schedule_today.departure_time) == :gt and
            DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt do
