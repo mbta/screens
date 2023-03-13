@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.FreeTextLine
+  alias Screens.Routes.Route
   alias Screens.Util
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
@@ -83,7 +84,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   def serialize_section(%{type: :no_data_section, route: route}, _screen, _) do
     text = %FreeTextLine{
-      icon: Util.get_icon_from_route(route),
+      icon: Route.get_icon_from_route(route),
       text: ["Updates unavailable"]
     }
 
@@ -91,18 +92,20 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
-        %{type: :headway_section, pill: pill, time_range: {lo, hi}, headsign: headsign},
+        %{type: :headway_section, route: route, time_range: {lo, hi}, headsign: headsign},
         _screen,
         is_only_section
       ) do
+    pill_color = Route.get_color_for_route(route)
+
     text =
       if is_only_section do
         %FreeTextLine{
           icon: "subway-negative-black",
           text: [
             %{
-              color: pill,
-              text: "#{String.capitalize("#{pill}")} Line"
+              color: pill_color,
+              text: "#{String.upcase(route)} LINE"
             },
             %{special: :break},
             "#{headsign} trains every",
@@ -112,7 +115,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         }
       else
         %FreeTextLine{
-          icon: pill,
+          icon: pill_color,
           text: ["every", %{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
         }
       end
@@ -133,7 +136,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   def serialize_section(%{type: :overnight_section, routes: routes}, _, _) do
     route_pill =
       routes
-      |> Enum.map(&Util.get_icon_from_route/1)
+      |> Enum.map(&Route.get_icon_from_route/1)
       |> List.first()
 
     text = %FreeTextLine{

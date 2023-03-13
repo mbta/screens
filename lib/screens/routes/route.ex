@@ -3,6 +3,8 @@ defmodule Screens.Routes.Route do
 
   alias Screens.V3Api
 
+  @sl_route_ids ~w[741 742 743 746 749 751]
+
   defstruct id: nil,
             short_name: nil,
             long_name: nil,
@@ -137,4 +139,28 @@ defmodule Screens.Routes.Route do
       :error -> :error
     end
   end
+
+  def get_color_for_route(route_id, route_type \\ nil)
+
+  def get_color_for_route("Red", _), do: :red
+  def get_color_for_route("Mattapan", _), do: :red
+  def get_color_for_route("Orange", _), do: :orange
+  def get_color_for_route("Green" <> _, _), do: :green
+  def get_color_for_route("Blue", _), do: :blue
+  def get_color_for_route("CR-" <> _, _), do: :purple
+  def get_color_for_route("Boat-" <> _, _), do: :teal
+
+  def get_color_for_route(route_id, _)
+      when route_id in @sl_route_ids,
+      do: :silver
+
+  def get_color_for_route(_, :rail), do: :purple
+  def get_color_for_route(_, :ferry), do: :teal
+  def get_color_for_route(_, _), do: :yellow
+
+  def get_icon_from_route(%{type: :rail}), do: :cr
+  def get_icon_from_route(%{short_name: "SL" <> _}), do: :silver
+  def get_icon_from_route(%{type: :bus}), do: :bus
+  def get_icon_from_route(%{id: id}), do: get_color_for_route(id)
+  def get_icon_from_route(_), do: :yellow
 end

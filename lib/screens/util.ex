@@ -3,8 +3,6 @@ defmodule Screens.Util do
 
   alias Screens.Config.State
 
-  @sl_route_ids ~w[741 742 743 746 749 751]
-
   def format_time(t) do
     t |> DateTime.truncate(:second) |> DateTime.to_iso8601()
   end
@@ -182,34 +180,10 @@ defmodule Screens.Util do
   def to_set(ids) when is_list(ids), do: MapSet.new(ids)
   def to_set(%MapSet{} = already_a_set), do: already_a_set
 
-  def get_color_for_route(route_id, route_type \\ nil)
-
-  def get_color_for_route("Red", _), do: :red
-  def get_color_for_route("Mattapan", _), do: :red
-  def get_color_for_route("Orange", _), do: :orange
-  def get_color_for_route("Green" <> _, _), do: :green
-  def get_color_for_route("Blue", _), do: :blue
-  def get_color_for_route("CR-" <> _, _), do: :purple
-  def get_color_for_route("Boat-" <> _, _), do: :teal
-
-  def get_color_for_route(route_id, _)
-      when route_id in @sl_route_ids,
-      do: :silver
-
-  def get_color_for_route(_, :rail), do: :purple
-  def get_color_for_route(_, :ferry), do: :teal
-  def get_color_for_route(_, _), do: :yellow
-
   # Service day for MBTA ends at 3am
   # now must be in UTC
   @spec get_service_day_tomorrow(DateTime.t()) :: DateTime.t()
   def get_service_day_tomorrow(now) do
     now |> Timex.shift(hours: -3) |> Timex.shift(days: 1)
   end
-
-  def get_icon_from_route(%{type: :rail}), do: :cr
-  def get_icon_from_route(%{short_name: "SL" <> _}), do: :silver
-  def get_icon_from_route(%{type: :bus}), do: :bus
-  def get_icon_from_route(%{id: id}), do: get_color_for_route(id)
-  def get_icon_from_route(_), do: :yellow
 end

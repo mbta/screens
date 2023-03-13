@@ -3,12 +3,17 @@ import React, { ComponentType } from "react";
 interface Props {
   width: number;
   colorHex: string;
+  className?: string;
 }
 
 /**
  * A 40px high right-pointing arrow. You specify its width and color.
  */
-const LinkArrow: ComponentType<Props> = ({ width, colorHex }) => {
+const LinkArrow: ComponentType<Props> = ({
+  width,
+  colorHex,
+  className = "",
+}) => {
   const height = 40;
   const stroke = 8;
   const headWidth = 40;
@@ -42,6 +47,7 @@ const LinkArrow: ComponentType<Props> = ({ width, colorHex }) => {
       width={`${width}px`}
       height={`${height}px`}
       version="1.1"
+      className={className}
     >
       <path
         stroke={colorHex}
