@@ -8,15 +8,19 @@ import NormalHeader from "./normal_header";
 export const REPLACEMENTS = {
   WTC: "World Trade Center",
   Malden: "Malden Center",
-} as {[key:string]: string};
+} as { [key: string]: string };
 
-const NoData: ComponentType = () => {
+interface Props {
+  include_header?: boolean;
+}
+
+const NoData: ComponentType<Props> = ({ include_header }) => {
   let stationName = useOutfrontStation() || "Transit information";
   stationName = REPLACEMENTS[stationName] || stationName;
 
   return (
     <div className="no-data__container">
-      <NormalHeader text={stationName} />
+      {include_header && <NormalHeader text={stationName} />}
       <div className="no-data__body">
         <div className="no-data__icon-container">
           <img

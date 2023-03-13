@@ -58,6 +58,7 @@ const TYPE_TO_COMPONENT = {
   takeover_alert: TakeoverAlert,
   page_load_no_data: PageLoadNoData,
   no_data: NoData,
+  departures_no_data: NoData,
 };
 
 const responseMapper: ResponseMapper = (apiResponse) => {
@@ -71,18 +72,21 @@ const responseMapper: ResponseMapper = (apiResponse) => {
         rotation_one: {
           full_rotation: {
             type: "no_data",
+            include_header: true,
           },
           type: "rotation_takeover_one",
         },
         rotation_two: {
           full_rotation: {
             type: "no_data",
+            include_header: true,
           },
           type: "rotation_takeover_two",
         },
         rotation_zero: {
           full_rotation: {
             type: "no_data",
+            include_header: true,
           },
           type: "rotation_takeover_zero",
         },
