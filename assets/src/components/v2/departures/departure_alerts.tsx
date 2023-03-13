@@ -11,7 +11,7 @@ const DepartureAlert = ({ color, icon, text }) => {
         <img className="departure-alert__icon-image" src={imgSrc} />
       </div>
       <div className="departure-alert__text">
-        <FreeText elements={text} />
+        <FreeText lines={{ text: text }} />
       </div>
     </div>
   );

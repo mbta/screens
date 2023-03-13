@@ -4,18 +4,25 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoData do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Alerts
 
-  defstruct screen: nil, show_alternatives?: nil
+  defstruct screen: nil, show_alternatives?: nil, slot_name: nil
 
   @type t :: %__MODULE__{
           screen: Screens.Config.Screen.t(),
-          show_alternatives?: boolean()
+          show_alternatives?: boolean(),
+          slot_name: atom()
         }
 
   def priority(_instance), do: [2]
 
   def serialize(%__MODULE__{} = instance) do
-    %{show_alternatives: instance.show_alternatives?, stop_id: stop_id(instance)}
+    %{
+      show_alternatives: instance.show_alternatives?,
+      stop_id: stop_id(instance)
+    }
   end
+
+  def slot_names(%__MODULE__{slot_name: slot_name}) when not is_nil(slot_name),
+    do: [slot_name]
 
   def slot_names(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}}), do: [:full_main_content]
   def slot_names(_instance), do: [:main_content]
@@ -27,6 +34,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoData do
        }) do
     stop_id
   end
+
+  defp stop_id(_), do: nil
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.DeparturesNoData

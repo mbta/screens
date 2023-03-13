@@ -10,6 +10,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.V2.Departure
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.DeparturesNoData
 
   setup do
     config_primary_and_secondary = %Screen{
@@ -91,6 +92,72 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       app_id: :dup_v2
     }
 
+    config_disabled_mode = %Screen{
+      app_params: %DupConfig{
+        header: %Header.CurrentStopId{stop_id: "Boat"},
+        primary_departures: %Departures{
+          sections: [
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["Boat"]}},
+              filter: nil,
+              headway: %Headway{headway_id: "ferry"}
+            },
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Orange"]}},
+              filter: nil
+            }
+          ]
+        },
+        secondary_departures: %Departures{
+          sections: [
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Orange"]}},
+              filter: nil
+            },
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Green"]}},
+              filter: nil
+            }
+          ]
+        }
+      },
+      vendor: :outfront,
+      device_id: "TEST",
+      name: "TEST",
+      app_id: :dup_v2
+    }
+
+    config_no_data = %Screen{
+      app_params: %DupConfig{
+        header: %Header.CurrentStopId{stop_id: "Boat"},
+        primary_departures: %Departures{
+          sections: [
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["place-E"], route_ids: []}},
+              filter: nil
+            }
+          ]
+        },
+        secondary_departures: %Departures{
+          sections: [
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["Boat"]}},
+              filter: nil,
+              headway: %Headway{headway_id: "ferry"}
+            },
+            %Section{
+              query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Green"]}},
+              filter: nil
+            }
+          ]
+        }
+      },
+      vendor: :outfront,
+      device_id: "TEST",
+      name: "TEST",
+      app_id: :dup_v2
+    }
+
     fetch_section_departures_fn = fn
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "A"}}]}
@@ -111,6 +178,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-D"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "D"}}]}
 
+      %Section{query: %Query{params: %Query.Params{stop_ids: ["place-E"]}}} ->
+        {:ok, []}
+
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}}} ->
         {:ok, [%Departure{prediction: %Prediction{id: "Kenmore"}}]}
     end
@@ -119,13 +189,22 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       _ -> []
     end
 
+    create_station_with_routes_map_fn = fn
+      "Boat" -> [%{id: "Ferry", type: :ferry}]
+      "place-A" -> [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]
+      _ -> [%{type: :test}]
+    end
+
     %{
       config_primary_and_secondary: config_primary_and_secondary,
       config_only_primary: config_only_primary,
       config_one_section: config_one_section,
       config_branch_station: config_branch_station,
+      config_disabled_mode: config_disabled_mode,
+      config_no_data: config_no_data,
       fetch_section_departures_fn: fetch_section_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn
+      fetch_alerts_fn: fetch_alerts_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
     }
   end
 
@@ -133,7 +212,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     test "returns primary and secondary departures", %{
       config_primary_and_secondary: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn
+      fetch_alerts_fn: fetch_alerts_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
       now = ~U[2020-04-06T10:00:00Z]
 
@@ -225,7 +305,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_fn
+          fetch_alerts_fn,
+          create_station_with_routes_map_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -234,7 +315,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     test "returns only primary departures if secondary is missing", %{
       config_only_primary: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn
+      fetch_alerts_fn: fetch_alerts_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
       now = ~U[2020-04-06T10:00:00Z]
 
@@ -330,7 +412,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_fn
+          fetch_alerts_fn,
+          create_station_with_routes_map_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -339,7 +422,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     test "returns 4 departures if only one section", %{
       config_one_section: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn
+      fetch_alerts_fn: fetch_alerts_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
       now = ~U[2020-04-06T10:00:00Z]
 
@@ -432,7 +516,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_fn
+          fetch_alerts_fn,
+          create_station_with_routes_map_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -440,7 +525,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns headway sections for temporary terminal", %{
       config_one_section: config,
-      fetch_section_departures_fn: fetch_section_departures_fn
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
       now = ~U[2020-04-06T10:00:00Z]
 
@@ -507,7 +593,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_fn
+          fetch_alerts_fn,
+          create_station_with_routes_map_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -515,7 +602,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns normal sections for upcoming alert", %{
       config_one_section: config,
-      fetch_section_departures_fn: fetch_section_departures_fn
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
       now = ~U[2020-04-06T10:00:00Z]
 
@@ -627,7 +715,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_fn
+          fetch_alerts_fn,
+          create_station_with_routes_map_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -635,7 +724,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns normal sections for branch station for alert with branch terminal headsign", %{
       config_branch_station: config,
-      fetch_section_departures_fn: fetch_section_departures_fn
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
       now = ~U[2020-04-06T10:00:00Z]
 
@@ -752,7 +842,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_fn
+          fetch_alerts_fn,
+          create_station_with_routes_map_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -760,7 +851,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns headway sections for branch station for alert with trunk headsign", %{
       config_branch_station: config,
-      fetch_section_departures_fn: fetch_section_departures_fn
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
     } do
       now = ~U[2020-04-06T10:00:00Z]
 
@@ -868,7 +960,126 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           config,
           now,
           fetch_section_departures_fn,
-          fetch_alerts_fn
+          fetch_alerts_fn,
+          create_station_with_routes_map_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns no data sections for disabled mode", %{
+      config_disabled_mode: config,
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_alerts_fn: fetch_alerts_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+    } do
+      now = ~U[2020-04-06T10:00:00Z]
+
+      expected_departures = [
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :no_data_section,
+              route: %{id: "Ferry", type: :ferry}
+            },
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "A"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_zero]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :no_data_section,
+              route: %{id: "Ferry", type: :ferry}
+            },
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "A"),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_one]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction: struct(Prediction, id: "A"),
+                  schedule: nil
+                }
+              ]
+            },
+            %{
+              type: :no_data_section,
+              route: %{id: "Green", type: :light_rail}
+            }
+          ],
+          slot_names: [:main_content_two]
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_fn,
+          create_station_with_routes_map_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns DeparturesNoData if all sections have no data", %{
+      config_no_data: config,
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_alerts_fn: fetch_alerts_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+    } do
+      now = ~U[2020-04-06T10:00:00Z]
+
+      expected_departures = [
+        %DeparturesNoData{
+          screen: config,
+          show_alternatives?: nil,
+          slot_name: :main_content_zero
+        },
+        %DeparturesNoData{
+          screen: config,
+          show_alternatives?: nil,
+          slot_name: :main_content_one
+        },
+        %DeparturesNoData{
+          screen: config,
+          show_alternatives?: nil,
+          slot_name: :main_content_two
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_fn,
+          create_station_with_routes_map_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
