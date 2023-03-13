@@ -555,7 +555,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :headway_section,
-              pill: :red,
+              route: "Red",
               time_range: {12, 16},
               headsign: "Test"
             }
@@ -567,7 +567,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :headway_section,
-              pill: :red,
+              route: "Red",
               time_range: {12, 16},
               headsign: "Test"
             }
@@ -579,7 +579,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :headway_section,
-              pill: :red,
+              route: "Red",
               time_range: {12, 16},
               headsign: "Test"
             }
@@ -922,7 +922,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :headway_section,
-              pill: :"green-c",
+              route: "Green",
               time_range: {7, 13},
               headsign: "Park Street"
             }
@@ -934,7 +934,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :headway_section,
-              pill: :"green-c",
+              route: "Green",
               time_range: {7, 13},
               headsign: "Park Street"
             }
@@ -946,7 +946,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :headway_section,
-              pill: :"green-c",
+              route: "Green",
               time_range: {7, 13},
               headsign: "Park Street"
             }
