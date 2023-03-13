@@ -82,17 +82,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(%{type: :no_data_section, route: route}, _screen, _) do
-    icon =
-      case route do
-        %{type: :rail} -> :cr
-        %{short_name: "SL" <> _} -> :silver
-        %{type: :bus} -> :bus
-        %{id: id} -> Util.get_color_for_route(id)
-        _ -> ""
-      end
-
     text = %FreeTextLine{
-      icon: icon,
+      icon: Util.get_icon_from_route(route),
       text: ["Updates unavailable"]
     }
 
@@ -142,13 +133,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   def serialize_section(%{type: :overnight_section, routes: routes}, _, _) do
     route_pill =
       routes
-      |> Enum.map(fn
-        %{type: :rail} -> :cr
-        %{short_name: "SL" <> _} -> :silver
-        %{type: :bus} -> :bus
-        %{id: id} -> Util.get_color_for_route(id)
-        _ -> nil
-      end)
+      |> Enum.map(&Util.get_icon_from_route/1)
       |> List.first()
 
     text = %FreeTextLine{

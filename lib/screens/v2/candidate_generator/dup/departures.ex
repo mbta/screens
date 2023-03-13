@@ -98,13 +98,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           route_pills =
             sections
             |> Enum.flat_map(fn %{routes: routes} ->
-              Enum.map(routes, fn
-                %{type: :rail} -> :cr
-                %{short_name: "SL" <> _} -> :silver
-                %{type: :bus} -> :bus
-                %{id: id} -> Util.get_color_for_route(id)
-                _ -> nil
-              end)
+              Enum.map(routes, &Util.get_icon_from_route/1)
             end)
             |> Enum.uniq()
 
