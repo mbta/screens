@@ -2,7 +2,6 @@ defmodule Screens.Util do
   @moduledoc false
 
   alias Screens.Config.State
-  alias Screens.Routes.Route
 
   @sl_route_ids ~w[741 742 743 746 749 751]
 
@@ -208,9 +207,9 @@ defmodule Screens.Util do
     now |> Timex.shift(hours: -3) |> Timex.shift(days: 1)
   end
 
-  def get_icon_from_route(%Route{type: :rail}), do: :cr
-  def get_icon_from_route(%Route{short_name: "SL" <> _}), do: :silver
-  def get_icon_from_route(%Route{type: :bus}), do: :bus
-  def get_icon_from_route(%Route{id: id}), do: get_color_for_route(id)
+  def get_icon_from_route(%{type: :rail}), do: :cr
+  def get_icon_from_route(%{short_name: "SL" <> _}), do: :silver
+  def get_icon_from_route(%{type: :bus}), do: :bus
+  def get_icon_from_route(%{id: id}), do: get_color_for_route(id)
   def get_icon_from_route(_), do: :yellow
 end
