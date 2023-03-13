@@ -18,7 +18,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     defstruct station: nil
 
-    defimpl Screens.V2.AlertWidgetInstance do
+    defimpl Screens.V2.AlertsWidget do
       def alert_ids(page) do
         Enum.map(page.station.elevator_closures, & &1.alert_id)
       end
@@ -38,7 +38,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     defstruct stations: nil
 
-    defimpl Screens.V2.AlertWidgetInstance do
+    defimpl Screens.V2.AlertsWidget do
       def alert_ids(page) do
         Enum.flat_map(page.stations, fn station ->
           Enum.map(station.elevator_closures, & &1.alert_id)
@@ -79,7 +79,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{ElevatorStatus, PreFare}
-  alias Screens.V2.AlertWidgetInstance
+  alias Screens.V2.AlertsWidget
 
   defstruct screen: nil,
             now: nil,
@@ -564,7 +564,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     %{pages: pages} = serialize(t)
 
     pages
-    |> Enum.flat_map(&AlertWidgetInstance.alert_ids/1)
+    |> Enum.flat_map(&AlertsWidget.alert_ids/1)
     |> Enum.uniq()
   end
 
@@ -582,7 +582,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     def audio_view(instance), do: ElevatorStatus.audio_view(instance)
   end
 
-  defimpl Screens.V2.AlertWidgetInstance do
+  defimpl Screens.V2.AlertsWidget do
     alias Screens.V2.WidgetInstance.ElevatorStatus
 
     def alert_ids(instance), do: ElevatorStatus.alert_ids(instance)

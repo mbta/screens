@@ -460,7 +460,23 @@ defmodule Screens.V2.WidgetInstance.Alert do
     def audio_view(instance), do: Alert.audio_view(instance)
   end
 
-  defimpl Screens.V2.AlertWidgetInstance do
+  defimpl Screens.V2.SingleAlertWidget do
+    alias Screens.V2.WidgetInstance.Alert
+
+    def alert(instance), do: instance.alert
+
+    def screen(instance), do: instance.screen
+
+    def home_stop_id(instance), do: instance.screen.app_params.alerts.stop_id
+
+    def routes_at_stop(instance), do: instance.routes_at_stop
+
+    def stop_sequences(instance), do: instance.stop_sequences
+
+    def headsign_matchers(_instance), do: nil
+  end
+
+  defimpl Screens.V2.AlertsWidget do
     alias Screens.V2.WidgetInstance.Alert
 
     def alert_ids(instance), do: Alert.alert_ids(instance)
