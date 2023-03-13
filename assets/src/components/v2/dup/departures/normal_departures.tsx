@@ -17,13 +17,7 @@ const NormalDepartures = ({ sections }) => {
             return <NoticeSection {...data} key={i} />;
           } else if (type === "headway_section") {
             const { text } = data;
-            return (
-              <HeadwaySection
-                text={text}
-                isOnlySection={sections.length === 1}
-                key={i}
-              />
-            );
+            return <HeadwaySection text={text} key={i} />;
           } else if (type === "no_data_section") {
             const { text } = data;
             return <NoDataSection text={text} key={i} />;

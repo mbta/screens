@@ -1,12 +1,12 @@
 .headway-section {
-  .full-screen-headway {
+  &:only-child {
     padding-top: 72px;
     padding-left: 72px;
     padding-right: 64px;
   }
 
   .free-text {
-    color: #171f26;
+    color: #171f26 !important;
   }
 
   .free-text__route-pill {

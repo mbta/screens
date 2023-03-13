@@ -1,14 +1,10 @@
 import React from "react";
 import FreeText from "Components/v2/free_text";
 
-const HeadwaySection = ({ text, isOnlySection }) => {
-  const className = isOnlySection ? "full-screen-headway" : "partial-alert";
-
+const HeadwaySection = ({ text }) => {
   return (
     <div className="headway-section">
-      <div className={className}>
-        <FreeText lines={text} />
-      </div>
+      <FreeText lines={text} />
     </div>
   );
 };

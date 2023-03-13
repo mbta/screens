@@ -129,7 +129,8 @@
   transform: translateY(12px);
 }
 
-.partial-alert {
+.partial-alert,
+.headway-section:not(:only-child) {
   .free-text {
     font-size: 136px;
     color: #ffffff;
@@ -197,7 +198,7 @@
   }
 }
 
-.full-screen-alert-text {
+.headway-section:only-child {
   .free-text {
     // prolly needs to be 136px
     font-size: 138px;
