@@ -986,7 +986,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :no_data_section,
-              route_type: :ferry
+              route: %{id: "Ferry", type: :ferry}
             },
             %{
               type: :normal_section,
@@ -1005,7 +1005,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :no_data_section,
-              route_type: :ferry
+              route: %{id: "Ferry", type: :ferry}
             },
             %{
               type: :normal_section,
@@ -1033,7 +1033,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             },
             %{
               type: :no_data_section,
-              route_type: :light_rail
+              route: %{id: "Green", type: :light_rail}
             }
           ],
           slot_names: [:main_content_two]
@@ -1086,20 +1086,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         %DeparturesNoData{
           screen: config,
           show_alternatives?: nil,
-          slot_name: :main_content_zero,
-          route_types: [:test]
+          slot_name: :main_content_zero
         },
         %DeparturesNoData{
           screen: config,
           show_alternatives?: nil,
-          slot_name: :main_content_one,
-          route_types: [:test]
+          slot_name: :main_content_one
         },
         %DeparturesNoData{
           screen: config,
           show_alternatives?: nil,
-          slot_name: :main_content_two,
-          route_types: [:ferry, :light_rail]
+          slot_name: :main_content_two
         }
       ]
 

@@ -8,10 +8,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.Config.V2.Departures.Query.Params
   alias Screens.Config.V2.Dup
   alias Screens.Schedules.Schedule
-  alias Screens.V2.Departure
   alias Screens.SignsUiConfig
   alias Screens.Util
   alias Screens.V2.CandidateGenerator.Widgets
+  alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
 
@@ -95,14 +95,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           }
 
         Enum.all?(sections, &(&1.type == :overnight_section)) ->
-          route_pills =
-            sections
-            |> Enum.flat_map(fn %{routes: routes} ->
-              Enum.map(routes, &Util.get_icon_from_route/1)
-            end)
-            |> Enum.uniq()
-
-          %OvernightDepartures{screen: config, slot_names: [slot_id], routes: route_pills}
+          %OvernightDepartures{
+            screen: config,
+            slot_names: [slot_id],
+            routes: get_route_pills_for_rotation(sections)
+          }
 
         true ->
           %DeparturesWidget{
@@ -451,5 +448,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     else
       Enum.filter(routes, &(&1.id in route_ids))
     end
+  end
+
+  defp get_route_pills_for_rotation(sections) do
+    sections
+    |> Enum.flat_map(fn %{routes: routes} ->
+      Enum.map(routes, &Util.get_icon_from_route/1)
+    end)
+    |> Enum.uniq()
   end
 end
