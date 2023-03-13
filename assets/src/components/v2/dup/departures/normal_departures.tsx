@@ -10,17 +10,15 @@ const NormalDepartures = ({ sections }) => {
     <div className="departures-container">
       <div className="departures">
         {sections.map(({ type, ...data }, i) => {
-          if (type === "normal_section") {
-            const { rows } = data;
-            return <NormalSection rows={rows} key={i} />;
-          } else if (type === "notice_section") {
-            return <NoticeSection {...data} key={i} />;
-          } else if (type === "headway_section") {
-            const { text } = data;
-            return <HeadwaySection text={text} key={i} />;
-          } else if (type === "no_data_section") {
-            const { text } = data;
-            return <NoDataSection text={text} key={i} />;
+          switch (type) {
+            case "normal_section":
+              return <NormalSection rows={data.rows} key={i} />;
+            case "notice_section":
+              return <NoticeSection {...data} key={i} />;
+            case "headway_section":
+              return <HeadwaySection text={data.text} key={i} />;
+            case "no_data_section":
+              return <NoDataSection text={data.text} key={i} />;
           }
         })}
       </div>
