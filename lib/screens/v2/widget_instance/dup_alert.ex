@@ -3,27 +3,28 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   A widget that displays an alert (either full-screen or partial) on a DUP screen.
   """
 
-  require Logger
-
-  alias Screens.Config.Dup.Override.FreeText
-  alias Screens.Config.Dup.Override.FreeTextLine
-  alias Screens.Config.Screen
   alias Screens.Alerts.Alert
+  alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.DupAlert.Serialize
 
-  @enforce_keys [:screen, :alert, :stop_sequences, :routes_at_stop, :rotation_index, :stop_name]
+  require Logger
+
+  @enforce_keys [
+    :screen,
+    :alert,
+    :stop_sequences,
+    :subway_routes_at_stop,
+    :rotation_index,
+    :stop_name
+  ]
   defstruct @enforce_keys
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
           alert: Alert.t(),
           stop_sequences: list(list(stop_id)),
-          # Only subway routes are listed in this field.
-          # TODO: rename to something more descriptive once BaseAlert
-          # is updated to not directly access struct fields of alert widgets
-          # by name (it expects the field to be named `routes_at_stop`).
-          routes_at_stop: list(%{route_id: route_id, active?: boolean}),
+          subway_routes_at_stop: list(%{route_id: route_id, active?: boolean}),
           rotation_index: rotation_index,
           stop_name: String.t()
         }
@@ -44,8 +45,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   @spec serialize(t()) :: map()
   def serialize(t) do
     case alert_layout(t) do
-      :full_screen -> serialize_full_screen(t)
-      :partial -> serialize_partial(t)
+      :full_screen -> Serialize.serialize_full_screen(t)
+      :partial -> Serialize.serialize_partial(t)
       # This case will never match since it would be filtered out at `valid_candidate?`,
       # but Dialyzer doesn't know that.
       :no_render -> %{}
@@ -82,58 +83,15 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     alert_layout(t) != :no_render
   end
 
-  @spec serialize_full_screen(t()) :: %{
-          alert_text: %FreeTextLine{icon: :warning, text: list(FreeText.t())},
-          color: :red | :orange | :green | :blue,
-          remedy: %FreeTextLine{icon: :shuttle | nil, text: list(FreeText.t())},
-          header: %{
-            icon: :logo,
-            text: String.t(),
-            pattern: :hatched,
-            color: :red | :orange | :green | :blue
-          }
-        }
-  defp serialize_full_screen(t) do
-    color = Serialize.route_color(t)
-    remedy_icon = Serialize.remedy_icon(t)
-    issue_text = Serialize.issue_free_text(t)
-    remedy_text = Serialize.remedy_free_text(t)
-
-    %{
-      alert_text: %FreeTextLine{icon: :warning, text: issue_text},
-      color: color,
-      remedy: %FreeTextLine{icon: remedy_icon, text: remedy_text},
-      header: %{
-        text: t.stop_name,
-        pattern: :hatched,
-        color: color
-      }
-    }
-  end
-
-  @spec serialize_partial(t()) :: %{
-          alert_text: %FreeTextLine{icon: :warning, text: list(FreeText.t())},
-          color: :red | :orange | :green | :blue
-        }
-  defp serialize_partial(t) do
-    text = Serialize.partial_alert_free_text(t)
-    color = Serialize.route_color(t)
-
-    %{
-      alert_text: %FreeTextLine{icon: :warning, text: text},
-      color: color
-    }
-  end
-
   @spec alert_layout(t()) :: :full_screen | :partial | :no_render
   defp alert_layout(t) do
     effect = t.alert.effect
     location = BaseAlert.location(t)
-    affected_lines = MapSet.size(BaseAlert.informed_routes_at_home_stop(t))
-    total_lines = MapSet.size(BaseAlert.active_routes_at_stop(t))
+    affected_line_count = length(get_affected_lines(t))
+    total_line_count = length(get_total_lines(t))
     rotation_index = t.rotation_index
 
-    parameters = {effect, location, affected_lines, total_lines, rotation_index}
+    parameters = {effect, location, affected_line_count, total_line_count, rotation_index}
 
     delay_severity = t.alert.severity
 
@@ -157,14 +115,14 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   # we generate DUP alert widgets for, but in case one slips through, we
   # should know about it!
   defp log_layout_mismatch(t, parameters, delay_severity) do
-    {effect, location, affected_lines, total_lines, rotation_index} = parameters
+    {effect, location, affected_line_count, total_line_count, rotation_index} = parameters
 
     labeled_parameters = [
       effect: effect,
       delay_severity: delay_severity,
       location: location,
-      affected_lines: affected_lines,
-      total_lines: total_lines,
+      affected_line_count: affected_line_count,
+      total_line_count: total_line_count,
       rotation_index: rotation_index
     ]
 
@@ -212,8 +170,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
       [
         effect,
         location,
-        affected_lines,
-        total_lines,
+        affected_line_count,
+        total_line_count,
         layout_zero,
         layout_one,
         layout_two
@@ -226,10 +184,10 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
           &String.to_existing_atom/1
         )
 
-      [affected_lines, total_lines] =
-        Enum.map([affected_lines, total_lines], &String.to_integer/1)
+      [affected_line_count, total_line_count] =
+        Enum.map([affected_line_count, total_line_count], &String.to_integer/1)
 
-      base_parameters = {effect, location, affected_lines, total_lines}
+      base_parameters = {effect, location, affected_line_count, total_line_count}
 
       [
         {Tuple.append(base_parameters, :zero), layout_zero},
@@ -240,8 +198,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     |> Enum.into(%{})
 
   @type layout_parameters ::
-          {Alert.effect(), location :: atom, affected_lines :: 1..2, total_lines :: 1..2,
-           rotation_index}
+          {Alert.effect(), location :: atom, affected_line_count :: 1..2,
+           total_line_count :: 1..2, rotation_index}
 
   # Now, define function clauses for each row in the table.
   @spec do_alert_layout(layout_parameters) :: :full_screen | :partial | :no_render
@@ -251,19 +209,44 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   end
 
   # Delays always use partial alerts on all 3 rotations of the screen.
-  defp do_alert_layout({:delay, _location, _affected_lines, _total_lines, _rotation_index}) do
+  defp do_alert_layout(
+         {:delay, _location, _affected_line_count, _total_line_count, _rotation_index}
+       ) do
     :partial
   end
 
   # If matching inputs aren't found in the table, we assume the alert isn't relevant and do not render it.
   defp do_alert_layout(_parameters), do: :no_render
 
-  def alert_id(%__MODULE__{} = t), do: t.alert.id
+  def get_affected_lines(t) do
+    t
+    |> BaseAlert.informed_routes_at_home_stop()
+    |> routes_to_lines()
+  end
+
+  def get_total_lines(t) do
+    t
+    |> BaseAlert.active_routes_at_stop()
+    |> routes_to_lines()
+  end
+
+  # For certain parts of the DUP alert logic, we're only interested in subway lines,
+  # not routes. This merges all of the "Green-B/C/D/E" routes into just "Green".
+  defp routes_to_lines(route_ids) do
+    route_ids
+    |> Enum.map(fn
+      "Green-" <> _branch -> "Green"
+      other_subway_route -> other_subway_route
+    end)
+    |> Enum.uniq()
+  end
+
+  def alert_ids(%__MODULE__{} = t), do: t.alert.id
 
   ### Required audio callbacks. The widget does not have audio equivalence, so these are "stubbed".
 
   def audio_serialize(_t) do
-    nil
+    %{}
   end
 
   def audio_sort_key(_t) do
@@ -292,9 +275,25 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     def audio_view(instance), do: DupAlert.audio_view(instance)
   end
 
-  defimpl Screens.V2.AlertWidgetInstance do
+  defimpl Screens.V2.SingleAlertWidget do
+    def alert(instance), do: instance.alert
+
+    def screen(instance), do: instance.screen
+
+    def home_stop_id(instance), do: instance.screen.app_params.alerts.stop_id
+
+    def routes_at_stop(instance), do: instance.subway_routes_at_stop
+
+    def stop_sequences(instance), do: instance.stop_sequences
+
+    def headsign_matchers(_instance) do
+      Application.get_env(:screens, :dup_alert_headsign_matchers)
+    end
+  end
+
+  defimpl Screens.V2.AlertsWidget do
     alias Screens.V2.WidgetInstance.DupAlert
 
-    def alert_id(instance), do: DupAlert.alert_id(instance)
+    def alert_ids(instance), do: DupAlert.alert_ids(instance)
   end
 end
