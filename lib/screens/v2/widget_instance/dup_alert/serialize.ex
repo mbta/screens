@@ -177,11 +177,11 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
   for {cause, cause_text} <- @alert_cause_mapping do
     defp get_cause_string(unquote(cause)) do
-      "due to #{unquote(cause_text)}")
+      "due to #{unquote(cause_text)}"
     end
   end
 
-  defp get_cause_text(_), do: []
+  defp get_cause_string(_), do: ""
 
   defp partial_headsign_special_cases(["No", bold("Ashmont/Braintree"), "trains"]) do
     ["No", bold("Ashmont/Braintree")]
