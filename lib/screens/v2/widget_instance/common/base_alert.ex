@@ -12,6 +12,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Util
 
@@ -240,6 +241,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     |> MapSet.new(& &1.route_id)
   end
 
+  @spec informed_routes_at_home_stop(t()) :: MapSet.t(Route.id())
   def informed_routes_at_home_stop(t) do
     rts = route_types(t)
     home_stop = SAW.home_stop_id(t)
