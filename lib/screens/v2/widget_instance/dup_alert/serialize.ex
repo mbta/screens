@@ -72,32 +72,30 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
       [line_color1, line_color2] ->
         fn and_or -> [bold("#{line_color1} Line"), and_or, bold("#{line_color2} Line")] end
-        # ^^^ This follows the spec, but does not appear to be intended for use in partial alert
-        # text despite partial alert treatment for an alert informing both lines at a 2-stop station
-        # being valid based on the layout table.
-        # The text probably would not fit in a partial alert.
-        # TODO ask Paul
-
-        # Spec is also slightly ambiguous as to whether this case should be paired with
-        # "service" rather than "trains".
     end
   end
 
   defp partial_alert_free_text(t) do
     build_line_text = get_line_text_builder(t)
 
-    case {t.alert.effect, BaseAlert.location(t)} do
-      {:delay, _} ->
-        build_line_text.("and") ++ ["delays"]
+    case length(DupAlert.get_affected_lines(t)) do
+      1 ->
+        case {t.alert.effect, BaseAlert.location(t)} do
+          {:delay, _} ->
+            build_line_text.("and") ++ ["delays"]
 
-      {_, :inside} ->
-        ["No"] ++ build_line_text.("or") ++ ["trains"]
+          {_, :inside} ->
+            ["No"] ++ build_line_text.("or") ++ ["trains"]
 
-      {_, boundary} when boundary in [:boundary_upstream, :boundary_downstream] ->
-        headsign = get_headsign(t)
+          {_, boundary} when boundary in [:boundary_upstream, :boundary_downstream] ->
+            headsign = get_headsign(t)
 
-        ["No", bold(headsign), "trains"]
-        |> partial_headsign_special_cases()
+            ["No", bold(headsign), "trains"]
+            |> partial_headsign_special_cases()
+        end
+
+      2 ->
+        ["No train service"]
     end
   end
 
