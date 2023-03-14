@@ -360,7 +360,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   defp get_overnight_schedules_for_section(
          stops_with_live_departures,
          stop_ids,
-         [%{type: :bus} | _],
+         [%{type: :bus} | _] = routes,
          nil,
          now,
          fetch_schedules_fn
@@ -371,7 +371,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       get_today_tomorrow_schedules(
         fetch_params,
         fetch_schedules_fn,
-        Util.get_service_day_tomorrow(now)
+        Util.get_service_day_tomorrow(now),
+        Enum.map(routes, & &1.id)
       )
 
     # Get schedules for each stop_id in config
@@ -407,7 +408,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp get_overnight_schedules_for_section(_, _, _, _, _, _), do: []
 
-  defp get_today_tomorrow_schedules(fetch_params, fetch_schedules_fn, tomorrow) do
+  defp get_today_tomorrow_schedules(
+         fetch_params,
+         fetch_schedules_fn,
+         tomorrow,
+         route_ids_serving_section
+       ) do
     today =
       case fetch_schedules_fn.(fetch_params, nil) do
         {:ok, schedules} when schedules != [] ->
@@ -415,6 +421,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           # Need to reverse the list of fetched schedules so that List.first/1 looks at the correct time of day.
           schedules
           |> Enum.reverse()
+          |> Enum.filter(&(&1.route.id in route_ids_serving_section))
           |> Enum.uniq_by(fn %{route: %{id: route_id}, direction_id: direction_id} ->
             {route_id, direction_id}
           end)
@@ -427,7 +434,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     tomorrow =
       case fetch_schedules_fn.(fetch_params, tomorrow) do
         {:ok, schedules} when schedules != [] ->
-          Enum.uniq_by(schedules, fn %{route: %{id: route_id}, direction_id: direction_id} ->
+          schedules
+          |> Enum.filter(&(&1.route.id in route_ids_serving_section))
+          |> Enum.uniq_by(fn %{route: %{id: route_id}, direction_id: direction_id} ->
             {route_id, direction_id}
           end)
 
