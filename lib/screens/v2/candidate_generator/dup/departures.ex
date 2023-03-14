@@ -127,11 +127,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          now,
          fetch_schedules_fn
        ) do
-    routes_with_live_departures = departures |> Enum.map(&Departure.route_id/1) |> Enum.uniq()
+    stops_with_live_departures = departures |> Enum.map(&Departure.stop_id/1) |> Enum.uniq()
 
     overnight_schedules_for_section =
       get_overnight_schedules_for_section(
-        routes_with_live_departures,
+        stops_with_live_departures,
         stop_ids,
         routes,
         alert,
@@ -348,7 +348,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   # If we are currently overnight, returns the first schedule of the day for each route_id and direction for each stop.
   # Otherwise, return an empty list.
   defp get_overnight_schedules_for_section(
-         routes_with_live_departures,
+         stops_with_live_departures,
          stop_ids,
          routes_serving_section,
          alert,
@@ -358,9 +358,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   # No predictions AND no active alerts for the section
   defp get_overnight_schedules_for_section(
-         routes_with_live_departures,
+         stops_with_live_departures,
          stop_ids,
-         [%{type: :bus} | _] = routes_serving_section,
+         [%{type: :bus} | _],
          nil,
          now,
          fetch_schedules_fn
@@ -374,10 +374,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         Util.get_service_day_tomorrow(now)
       )
 
-    # Get schedules for each route for all stop_ids in config
-    routes_serving_section
-    |> Enum.reject(&(&1.id in routes_with_live_departures))
-    |> Enum.map(fn %{id: route_id} ->
+    # Get schedules for each stop_id in config
+    stop_ids
+    |> Enum.reject(&(&1 in stops_with_live_departures))
+    |> Enum.map(fn stop_id ->
       # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
       # we do not display overnight mode.
 
@@ -385,17 +385,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         Enum.find(
           today_schedules,
           struct(Schedule, departure_time: now),
-          &(&1.route.id == route_id)
+          &(&1.stop.id == stop_id)
         )
 
       first_schedule_tomorrow =
         Enum.find(
           tomorrow_schedules,
           struct(Schedule, departure_time: now),
-          &(&1.route.id == route_id)
+          &(&1.stop.id == stop_id)
         )
 
-      if DateTime.compare(now, last_schedule_today.departure_time) == :gt and
+      if DateTime.compare(now, last_schedule_today.departure_time) == :gt or
            DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt do
         %Departure{schedule: first_schedule_tomorrow}
       end
@@ -413,7 +413,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         {:ok, schedules} when schedules != [] ->
           # We want the last schedules of the current day.
           # Need to reverse the list of fetched schedules so that List.first/1 looks at the correct time of day.
-          Enum.reverse(schedules)
+          schedules
+          |> Enum.reverse()
+          |> Enum.uniq_by(fn %{route: %{id: route_id}, direction_id: direction_id} ->
+            {route_id, direction_id}
+          end)
 
         # fetch error or empty schedules
         _ ->
@@ -423,7 +427,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     tomorrow =
       case fetch_schedules_fn.(fetch_params, tomorrow) do
         {:ok, schedules} when schedules != [] ->
-          schedules
+          Enum.uniq_by(schedules, fn %{route: %{id: route_id}, direction_id: direction_id} ->
+            {route_id, direction_id}
+          end)
 
         # fetch error or empty schedules
         _ ->
