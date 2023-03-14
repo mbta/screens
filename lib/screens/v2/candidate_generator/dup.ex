@@ -1,20 +1,21 @@
 defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
-  alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
-  alias Screens.Config.V2.Dup
   alias Screens.Config.V2.Alerts, as: AlertsConfig
+  alias Screens.Config.V2.{Departures, Dup}
   alias Screens.Config.V2.Header.CurrentStopId
-  alias Screens.Routes.Route
   alias Screens.RoutePatterns.RoutePattern
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Dup.Departures, as: DeparturesInstances
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{DupAlert, NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.Common.BaseAlert
+  alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, DupAlert, NormalHeader, Placeholder}
 
   require Logger
 
@@ -173,7 +174,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     end
   end
 
-  defp create_alert_widgets({:special, widgets}, _, _, _, _), do: widgets
+  # Commented out to stop dialyzer from complaining until we fill in relevant logic
+  # defp create_alert_widgets({:special, widgets}, _, _, _, _), do: widgets
 
   defp relevant_alert?(alert, config, stop_sequences, subway_routes_at_stop, now) do
     dup_alert = %DupAlert{
