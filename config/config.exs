@@ -215,7 +215,16 @@ config :screens,
     "Wickford Junction via Forest Hills" => "Wickford Jct via Forest Hills",
     "Providence & Needham via Forest Hills" => "Providence via Forest Hills",
     "Norwood Central via Ruggles" => "Norwood Cntrl via Ruggles"
-  }
+  },
+  dup_headway_branch_stations: ["place-kencl", "place-jfk", "place-coecl"],
+  dup_headway_branch_terminals: [
+    "Boston College",
+    "Cleveland Circle",
+    "Riverside",
+    "Heath Street",
+    "Ashmont",
+    "Braintree"
+  ]
 
 config :screens, :screens_by_alert,
   cache_module: Screens.ScreensByAlert.GenServer,

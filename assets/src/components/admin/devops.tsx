@@ -46,7 +46,7 @@ const Devops = () => {
     { name: "Bus", id: "bus" },
     { name: "Subway", id: "subway" },
     { name: "Light Rail", id: "light_rail" },
-    { name: "Commuter Rail", id: "commuter_rail" },
+    { name: "Commuter Rail", id: "rail" },
   ];
 
   return (

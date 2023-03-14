@@ -69,15 +69,11 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     headsign_matchers
     |> Map.get(SAW.home_stop_id(t))
     |> Enum.find_value(fn {informed, not_informed, headsign} ->
-      if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
+      if alert_region_match?(Util.to_set(informed), Util.to_set(not_informed), informed_stop_ids),
         do: headsign,
         else: false
     end)
   end
-
-  defp to_set(nil), do: MapSet.new([])
-  defp to_set(stop_id) when is_binary(stop_id), do: MapSet.new([stop_id])
-  defp to_set(stop_ids), do: MapSet.new(stop_ids)
 
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do
     MapSet.subset?(informed, informed_stop_ids) and

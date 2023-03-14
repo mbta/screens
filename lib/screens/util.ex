@@ -161,7 +161,7 @@ defmodule Screens.Util do
   def route_type_from_id("Red"), do: :subway
   def route_type_from_id("Orange"), do: :subway
   def route_type_from_id("Blue"), do: :subway
-  def route_type_from_id("CR-" <> _), do: :commuter_rail
+  def route_type_from_id("CR-" <> _), do: :rail
   def route_type_from_id("Boat-" <> _), do: :ferry
   def route_type_from_id(_), do: :bus
 
@@ -174,4 +174,9 @@ defmodule Screens.Util do
       _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
     end
   end
+
+  def to_set(nil), do: MapSet.new([])
+  def to_set(id) when is_binary(id), do: MapSet.new([id])
+  def to_set(ids) when is_list(ids), do: MapSet.new(ids)
+  def to_set(%MapSet{} = already_a_set), do: already_a_set
 end

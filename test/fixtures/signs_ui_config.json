@@ -1,0 +1,95 @@
+{
+  "configured_headways": {
+    "blue_trunk": {
+      "off_peak": {
+        "range_high": 13,
+        "range_low": 9
+      },
+      "peak": {
+        "range_high": 7,
+        "range_low": 5
+      }
+    },
+    "green_d": {
+      "off_peak": {
+        "range_high": 13,
+        "range_low": 7
+      },
+      "peak": {
+        "range_high": 7,
+        "range_low": 6
+      }
+    },
+    "green_e": {
+      "off_peak": {
+        "range_high": 13,
+        "range_low": 7
+      },
+      "peak": {
+        "range_high": 7,
+        "range_low": 6
+      }
+    },
+    "green_trunk": {
+      "off_peak": {
+        "range_high": 13,
+        "range_low": 7
+      },
+      "peak": {
+        "range_high": 7,
+        "range_low": 6
+      }
+    },
+    "mattapan_trunk": {
+      "off_peak": {
+        "range_high": 26,
+        "range_low": 22
+      },
+      "peak": {
+        "range_high": 7,
+        "range_low": 5
+      }
+    },
+    "orange_trunk": {
+      "off_peak": {
+        "range_high": 11,
+        "range_low": 9
+      },
+      "peak": {
+        "range_high": 8,
+        "range_low": 6
+      }
+    },
+    "red_ashmont": {
+      "off_peak": {
+        "range_high": 32,
+        "range_low": 24
+      },
+      "peak": {
+        "range_high": 22,
+        "range_low": 18
+      }
+    },
+    "red_braintree": {
+      "off_peak": {
+        "range_high": 32,
+        "range_low": 24
+      },
+      "peak": {
+        "range_high": 22,
+        "range_low": 18
+      }
+    },
+    "red_trunk": {
+      "off_peak": {
+        "range_high": 16,
+        "range_low": 12
+      },
+      "peak": {
+        "range_high": 11,
+        "range_low": 9
+      }
+    }
+  },
+  "signs": {}
+}

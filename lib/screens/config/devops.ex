@@ -1,13 +1,13 @@
 defmodule Screens.Config.Devops do
   @moduledoc false
 
-  @typep mode :: :subway | :light_rail | :commuter_rail | :bus | :ferry
+  @typep mode :: :subway | :light_rail | :rail | :bus | :ferry
 
   @type t :: %__MODULE__{
           disabled_modes: [mode]
         }
 
-  @modes ~w[subway light_rail commuter_rail bus ferry]a
+  @modes ~w[subway light_rail rail bus ferry]a
 
   defstruct disabled_modes: []
 

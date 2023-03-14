@@ -1,7 +1,7 @@
 .departures-section {
   position: relative;
 
-  &:not(:first-child):before {
+  &:not(:last-child):after {
     content: "";
     position: absolute;
     left: 0px;

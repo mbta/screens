@@ -20,7 +20,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
   end
 
-  describe "serialize_section/1" do
+  describe "serialize_section/2" do
     setup do
       %{
         bus_shelter_screen: %Screen{
@@ -54,6 +54,120 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       assert %{type: :normal_section, rows: [%{type: :notice_row, text: %{icon: nil, text: []}}]} ==
                Departures.serialize_section(section, bus_shelter_screen)
+    end
+  end
+
+  describe "serialize_section/3" do
+    setup do
+      %{
+        dup_screen: %Screen{
+          app_id: :dup_v2,
+          vendor: :outfront,
+          device_id: "TEST",
+          name: "TEST",
+          app_params: nil
+        }
+      }
+    end
+
+    test "returns serialized headway_section for one configured section", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :headway_section, route: "Red", time_range: {1, 2}, headsign: "Test"}
+
+      expected_text = %{
+        icon: "subway-negative-black",
+        text: [
+          %{color: :red, text: "RED LINE"},
+          %{special: :break},
+          "Test trains every",
+          %{format: :bold, text: "1-2"},
+          "minutes"
+        ]
+      }
+
+      assert %{type: :headway_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
+    test "returns serialized headway_section for multiple configured sections", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :headway_section, route: "Red", time_range: {1, 2}, headsign: "Test"}
+
+      expected_text = %{
+        icon: :red,
+        text: ["every", %{format: :bold, text: "1-2"}, "minutes"]
+      }
+
+      assert %{type: :headway_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, false)
+    end
+
+    test "returns serialized no_data_section for subway/light rail", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :no_data_section, route: %{id: "Orange", type: :subway}}
+
+      expected_text = %{
+        icon: :orange,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+
+      section = %{type: :no_data_section, route: %{id: "Green", type: :light_rail}}
+
+      expected_text = %{
+        icon: :green,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
+    test "returns serialized no_data_section for bus", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :no_data_section, route: %{id: "555", type: :bus}}
+
+      expected_text = %{
+        icon: :bus,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
+    test "returns serialized no_data_section for SL", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :no_data_section, route: %{short_name: "SL1", type: :bus}}
+
+      expected_text = %{
+        icon: :silver,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
+    test "returns serialized no_data_section for CR", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :no_data_section, route: %{id: "CR-Test", type: :rail}}
+
+      expected_text = %{
+        icon: :cr,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
     end
   end
 

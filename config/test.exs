@@ -10,6 +10,7 @@ config :screens,
   config_fetcher: Screens.Config.State.LocalFetch,
   last_deploy_fetcher: Screens.Util.LastDeploy.LocalFetch,
   local_config_file_spec: {:test, "config.json"},
+  local_signs_ui_config_file_spec: {:test, "signs_ui_config.json"},
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.LocalFetch,
   # This will help us write testable functions.
   # Functions that request external data cause flaky tests, so to stop us from writing tests that execute API requests,
@@ -23,6 +24,13 @@ config :screens,
   blue_bikes_api_client: Screens.BlueBikes.FakeClient,
   dup_headsign_replacements: %{
     "Test 1" => "T1"
+  },
+  dup_alert_headsign_matchers: %{
+    "place-B" => [{"place-B", "not_informed", "Test"}],
+    "place-kencl" => [
+      {"70211", ~w[70153 70149 70187], "Cleveland Circle"},
+      {"70152", ~w[70148 70212 70186], "Park Street"}
+    ]
   }
 
 config :screens, ScreensWeb.AuthManager, secret_key: "test key"
