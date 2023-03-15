@@ -1,0 +1,26 @@
+.overnight-departures__container {
+  .overnight-departures__image {
+    width: 1920px;
+    height: 314px;
+  }
+
+  .overnight-departures__text-container {
+    margin-left: 71px;
+    .overnight-departures__route-pill-container {
+      .route-pill {
+        display: inline-block;
+        height: 144px;
+        width: 279px;
+        border-radius: 100px;
+      }
+    }
+
+    .overnight-departures__text {
+      width: 1182px;
+      font-family: Inter, sans-serif;
+      font-weight: 600;
+      font-size: 138px;
+      line-height: 148px;
+    }
+  }
+}
