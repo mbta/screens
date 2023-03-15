@@ -121,7 +121,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
            alert: alert,
            headway: headway,
            stop_ids: stop_ids,
-           routes: routes
+           routes: routes,
+           params: params
          },
          is_only_section,
          now,
@@ -132,7 +133,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     overnight_schedules_for_section =
       get_overnight_schedules_for_section(
         stops_with_live_departures,
-        stop_ids,
+        params,
         routes,
         alert,
         now,
@@ -216,7 +217,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           alert: section_alert,
           headway: headway,
           stop_ids: stop_ids,
-          routes: routes
+          routes: routes,
+          params: params
         }
       end
     end)
@@ -359,24 +361,23 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   # No predictions AND no active alerts for the section
   defp get_overnight_schedules_for_section(
          stops_with_live_departures,
-         stop_ids,
+         params,
          [%{type: :bus} | _] = routes,
          nil,
          now,
          fetch_schedules_fn
        ) do
-    fetch_params = %{stop_ids: stop_ids}
-
     {today_schedules, tomorrow_schedules} =
       get_today_tomorrow_schedules(
-        fetch_params,
+        Map.from_struct(params),
         fetch_schedules_fn,
         Util.get_service_day_tomorrow(now),
         Enum.map(routes, & &1.id)
       )
 
     # Get schedules for each stop_id in config
-    stop_ids
+    today_schedules
+    |> Enum.map(& &1.stop.id)
     |> Enum.reject(&(&1 in stops_with_live_departures))
     |> Enum.map(fn stop_id ->
       # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
