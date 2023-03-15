@@ -1,5 +1,6 @@
 defmodule Screens.V2.WidgetInstance.OvernightDepartures do
   @moduledoc false
+  alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct screen: nil, slot_names: [], routes: []
 
@@ -8,7 +9,7 @@ defmodule Screens.V2.WidgetInstance.OvernightDepartures do
   def priority(_instance), do: [1]
 
   def serialize(%__MODULE__{routes: routes}) do
-    %{routes: routes}
+    %{routes: Enum.map(routes, &RoutePill.serialize_icon/1)}
   end
 
   def slot_names(%__MODULE__{slot_names: slot_names}) when length(slot_names) > 0,
