@@ -343,7 +343,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           %{type: :minutes, minutes: minute_diff}
 
         true ->
-          serialize_timestamp(departure_time)
+          serialize_timestamp(departure_time, now)
       end
 
     %{time: time}
@@ -373,7 +373,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           %{type: :minutes, minutes: minute_diff}
 
         true ->
-          serialize_timestamp(departure_time)
+          serialize_timestamp(departure_time, now)
       end
 
     %{time: time}
@@ -387,7 +387,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     if is_nil(scheduled_time) do
       %{time: serialized_time}
     else
-      serialized_scheduled_time = serialize_timestamp(scheduled_time)
+      serialized_scheduled_time = serialize_timestamp(scheduled_time, now)
 
       case serialized_time do
         %{type: :text} ->
@@ -402,12 +402,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
   end
 
-  defp serialize_timestamp(departure_time) do
+  defp serialize_timestamp(departure_time, now) do
     {:ok, local_time} = DateTime.shift_zone(departure_time, "America/New_York")
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
     minute = local_time.minute
     am_pm = if local_time.hour >= 12, do: :pm, else: :am
-    %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm}
+    show_am_pm = Util.get_service_day_tomorrow(now).day == local_time.day
+    %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm, show_am_pm: show_am_pm}
   end
 
   defp serialize_crowding(departure) do
