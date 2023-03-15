@@ -12,6 +12,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Util
 
@@ -68,15 +69,11 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     headsign_matchers
     |> Map.get(SAW.home_stop_id(t))
     |> Enum.find_value(fn {informed, not_informed, headsign} ->
-      if alert_region_match?(to_set(informed), to_set(not_informed), informed_stop_ids),
+      if alert_region_match?(Util.to_set(informed), Util.to_set(not_informed), informed_stop_ids),
         do: headsign,
         else: false
     end)
   end
-
-  defp to_set(nil), do: MapSet.new([])
-  defp to_set(stop_id) when is_binary(stop_id), do: MapSet.new([stop_id])
-  defp to_set(stop_ids), do: MapSet.new(stop_ids)
 
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do
     MapSet.subset?(informed, informed_stop_ids) and
@@ -125,18 +122,9 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   # Only route type is not nil--this is the only time we consider route type,
   # since it's implied by other values when they are not nil
   defp informed_entity_to_zone(%{stop: nil, route: nil, route_type: route_type_id}, %{
-         route_type: route_type
-       })
-       when is_list(route_type) do
-    if RouteType.from_id(route_type_id) in route_type do
-      [:upstream, :home_stop, :downstream]
-    else
-      []
-    end
-  end
-
-  defp informed_entity_to_zone(%{stop: nil, route: nil, route_type: route_type_id}, context) do
-    if RouteType.from_id(route_type_id) == context.route_type do
+         route_types: route_types
+       }) do
+    if RouteType.from_id(route_type_id) in route_types do
       [:upstream, :home_stop, :downstream]
     else
       []
@@ -182,7 +170,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
       upstream_stops: upstream_stop_id_set(t),
       downstream_stops: downstream_stop_id_set(t),
       routes: all_routes_at_stop(t),
-      route_type: route_type(t)
+      route_types: route_types(t)
     }
 
     informed_entities = informed_entities(t)
@@ -249,6 +237,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     |> MapSet.new(& &1.route_id)
   end
 
+  @spec informed_routes_at_home_stop(t()) :: MapSet.t(Route.id())
   def informed_routes_at_home_stop(t) do
     rts = route_types(t)
     home_stop = SAW.home_stop_id(t)
@@ -266,17 +255,9 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
           {:cont, uninformed}
 
         %{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
-          # Route type might be a single atom or list of atoms
-          cond do
-            is_list(rt) and RouteType.from_id(route_type_id) in rt ->
-              {:halt, empty_set}
-
-            RouteType.from_id(route_type_id) == rt ->
-              {:halt, empty_set}
-
-            true ->
-              {:cont, uninformed}
-          end
+          if RouteType.from_id(route_type_id) in rts,
+            do: {:halt, empty_set},
+            else: {:cont, uninformed}
 
         %{stop: ^home_stop, route: nil}, _uninformed ->
           {:halt, empty_set}
