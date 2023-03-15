@@ -78,23 +78,25 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   defp partial_alert_free_text(t) do
     build_line_text = get_line_text_builder(t)
 
-    case length(DupAlert.get_affected_lines(t)) do
-      1 ->
-        case {t.alert.effect, BaseAlert.location(t)} do
-          {:delay, _} ->
-            build_line_text.("and") ++ ["delays"]
+    affected_line_count = length(DupAlert.get_affected_lines(t))
 
-          {_, :inside} ->
-            ["No"] ++ build_line_text.("or") ++ ["trains"]
+    case {affected_line_count, t.alert.effect, BaseAlert.location(t)} do
+      {1, :delay, _} ->
+        build_line_text.("and") ++ ["delays"]
 
-          {_, boundary} when boundary in [:boundary_upstream, :boundary_downstream] ->
-            headsign = get_headsign(t)
+      {1, _, :inside} ->
+        ["No"] ++ build_line_text.("or") ++ ["trains"]
 
-            ["No", bold(headsign), "trains"]
-            |> partial_headsign_special_cases()
-        end
+      {1, _, boundary} when boundary in [:boundary_upstream, :boundary_downstream] ->
+        headsign = get_headsign(t)
 
-      2 ->
+        ["No", bold(headsign), "trains"]
+        |> partial_headsign_special_cases()
+
+      {2, :delay, _} ->
+        ["Train delays"]
+
+      {2, _, _} ->
         ["No train service"]
     end
   end
