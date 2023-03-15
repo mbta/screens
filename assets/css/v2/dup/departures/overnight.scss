@@ -1,17 +1,28 @@
 .overnight-departures__container {
+  height: 832px;
   .overnight-departures__image {
     width: 1920px;
-    height: 314px;
+
+    &--full {
+      height: 472px;
+    }
+
+    &--partial {
+      height: 314px;
+    }
   }
 
   .overnight-departures__text-container {
     margin-left: 71px;
+    margin-top: 33px;
+
     .overnight-departures__route-pill-container {
       .route-pill {
         display: inline-block;
         height: 144px;
         width: 279px;
         border-radius: 100px;
+        margin: 0;
       }
     }
 
