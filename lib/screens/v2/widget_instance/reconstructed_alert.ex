@@ -5,7 +5,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Config.Screen
   alias Screens.Config.V2.FreeTextLine
   alias Screens.Stops.Stop
-  alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
