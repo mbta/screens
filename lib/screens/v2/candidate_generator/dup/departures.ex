@@ -66,7 +66,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         fetch_schedules_fn
       )
 
-    primary_departures_instances ++ secondary_departures_instances
+    widget_instances = primary_departures_instances ++ secondary_departures_instances
+
+    if Enum.all?(widget_instances, &is_struct(&1, OvernightDepartures)) do
+      Enum.map(widget_instances, &%{&1 | routes: []})
+    else
+      widget_instances
+    end
   end
 
   defp sections_data_to_departure_instances(
