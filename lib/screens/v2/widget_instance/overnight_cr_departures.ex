@@ -1,8 +1,8 @@
 defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
   @moduledoc false
 
-  alias Screens.V2.Departure
   alias Screens.Schedules.Schedule
+  alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance
 
   @enforce_keys ~w[destination last_tomorrow_schedule direction_to_destination priority now]a
