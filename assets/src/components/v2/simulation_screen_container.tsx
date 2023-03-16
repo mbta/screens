@@ -26,7 +26,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
   // Currently only applies to DUPs
   const widgetData = opts.alternateView
     ? { ...fullPage, type: "simulation_screen_normal" }
-    : { fullPage };
+    : fullPage;
 
   return (
     <div className="simulation-screen-centering-container">

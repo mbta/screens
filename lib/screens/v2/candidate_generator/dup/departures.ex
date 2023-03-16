@@ -11,6 +11,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.CandidateGenerator.Widgets
+  alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.DeparturesNoData
 
@@ -137,7 +138,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
                               query: %Query{
                                 params: %Params{stop_ids: stop_ids, route_ids: route_ids} = params
                               },
-                              headway: headway
+                              headway: headway,
+                              bidirectional: is_bidirectional
                             } = section ->
       route =
         get_primary_route_for_section(stop_ids, route_ids, create_station_with_routes_map_fn)
@@ -148,8 +150,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       else
         section_departures =
           case fetch_section_departures_fn.(section) do
-            {:ok, section_departures} -> section_departures
-            _ -> []
+            {:ok, section_departures} ->
+              # If the section is configured as bidirectional,
+              # it needs to show one departure in each direction
+              if is_bidirectional,
+                do: get_bidirectional_departures(section_departures),
+                else: section_departures
+
+            _ ->
+              []
           end
 
         section_alert = get_section_alert(params, fetch_alerts_fn, now)
@@ -178,6 +187,18 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   defp get_section_route_from_alert(_, _), do: nil
+
+  defp get_bidirectional_departures(section_departures) do
+    first_row = List.first(section_departures)
+    first_direction_id = Departure.direction_id(first_row)
+
+    second_row =
+      Enum.find(section_departures, Enum.at(section_departures, 1), fn departure ->
+        Departure.direction_id(departure) === 1 - first_direction_id
+      end)
+
+    [first_row] ++ [second_row]
+  end
 
   defp get_section_alert(
          %Params{

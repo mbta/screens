@@ -6,13 +6,15 @@ defmodule Screens.Config.V2.Departures.Section do
   @type t :: %__MODULE__{
           query: Query.t(),
           filter: Filter.t() | nil,
-          headway: Headway.t()
+          headway: Headway.t(),
+          bidirectional: boolean() | nil
         }
 
   @enforce_keys [:query]
   defstruct query: nil,
             filter: nil,
-            headway: Headway.from_json(:default)
+            headway: Headway.from_json(:default),
+            bidirectional: false
 
   use Screens.Config.Struct, children: [query: Query, filter: Filter, headway: Headway]
 
