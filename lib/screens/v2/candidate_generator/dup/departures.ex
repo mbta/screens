@@ -68,6 +68,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
     widget_instances = primary_departures_instances ++ secondary_departures_instances
 
+    # If every rotation is showing OvernightDepartures, we don't need to render any route pills.
     if Enum.all?(widget_instances, &is_struct(&1, OvernightDepartures)) do
       Enum.map(widget_instances, &%{&1 | routes: []})
     else
