@@ -14,9 +14,10 @@
 
   .overnight-departures__text-container {
     margin-left: 71px;
-    margin-top: 33px;
 
     .overnight-departures__route-pill-container {
+      padding-top: 33px;
+
       .route-pill {
         display: inline-block;
         height: 144px;
@@ -32,6 +33,12 @@
       font-weight: 600;
       font-size: 138px;
       line-height: 148px;
+
+      &:only-child {
+        font-weight: 700;
+        font-size: 138px;
+        line-height: 148px;
+      }
     }
   }
 }

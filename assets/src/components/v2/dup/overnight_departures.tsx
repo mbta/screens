@@ -7,28 +7,30 @@ interface Props {
 }
 
 const OvernightDepartures: ComponentType<Props> = ({ routes }) => {
+  const getImage = () =>
+    routes.length ? (
+      <img
+        className={classWithModifier("overnight-departures__image", "partial")}
+        src={imagePath(`dup_overnight_partial.png`)}
+      />
+    ) : (
+      <img
+        className={classWithModifier("overnight-departures__image", "full")}
+        src={imagePath(`dup_overnight_full.png`)}
+      />
+    );
+
   return (
     <div className="overnight-departures__container">
-      {routes.length ? (
-        <img
-          className={classWithModifier(
-            "overnight-departures__image",
-            "partial"
-          )}
-          src={imagePath(`dup_overnight_partial.png`)}
-        />
-      ) : (
-        <img
-          className={classWithModifier("overnight-departures__image", "full")}
-          src={imagePath(`dup_overnight_full.png`)}
-        />
-      )}
+      {getImage()}
       <div className="overnight-departures__text-container">
-        <div className="overnight-departures__route-pill-container">
-          {routes.map((route) => (
-            <RoutePill {...route} key={route.color} />
-          ))}
-        </div>
+        {routes.length > 0 && (
+          <div className="overnight-departures__route-pill-container">
+            {routes.map((route) => (
+              <RoutePill {...route} key={route.color} />
+            ))}
+          </div>
+        )}
         <div className="overnight-departures__text">
           Service resumes in the morning
         </div>
