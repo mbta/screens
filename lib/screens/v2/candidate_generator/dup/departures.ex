@@ -405,6 +405,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     # Get schedules for each stop_id in config
     today_schedules
     |> Enum.map(& &1.stop.id)
+    |> Enum.uniq()
     |> Enum.reject(&(&1 in stops_with_live_departures))
     |> Enum.map(fn stop_id ->
       # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
