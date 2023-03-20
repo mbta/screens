@@ -4,7 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.Alerts, as: AlertsConfig
-  alias Screens.Config.V2.{Departures, Dup}
+  alias Screens.Config.V2.Dup
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
@@ -14,8 +14,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.Common.BaseAlert
-  alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.{DeparturesNoData, DupAlert, NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.{DupAlert, NormalHeader, Placeholder}
 
   require Logger
 
