@@ -5,7 +5,7 @@ defmodule Screens.V2.ScreenData do
 
   alias Screens.ScreensByAlert
   alias Screens.Util
-  alias Screens.V2.AlertWidgetInstance
+  alias Screens.V2.AlertsWidget
   alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
@@ -484,10 +484,7 @@ defmodule Screens.V2.ScreenData do
     alert_ids =
       instance_map
       |> Map.values()
-      |> Enum.filter(fn widget_struct ->
-        not is_nil(AlertWidgetInstance.impl_for(widget_struct))
-      end)
-      |> Enum.flat_map(&AlertWidgetInstance.alert_ids/1)
+      |> Enum.flat_map(&AlertsWidget.alert_ids/1)
 
     :ok = ScreensByAlert.put_data(screen_id, alert_ids)
   end

@@ -169,7 +169,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   defp get_stations(alert, fetch_stop_name_fn) do
     stop_ids =
-      %{alert: alert}
+      %ReconstructedAlert{alert: alert}
       |> BaseAlert.informed_entities()
       |> Enum.flat_map(fn %{stop: stop_id} ->
         case stop_id do
