@@ -1,8 +1,8 @@
 defmodule Screens.Routes.Route do
   @moduledoc false
 
-  alias Screens.V3Api
   alias Screens.RouteType
+  alias Screens.V3Api
 
   require Screens.RouteType
 
