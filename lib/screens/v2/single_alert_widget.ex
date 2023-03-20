@@ -1,6 +1,11 @@
 defprotocol Screens.V2.SingleAlertWidget do
   @moduledoc """
   Protocol for a widget that models exactly one alert.
+
+  This includes but is not limited to:
+  - `Screens.V2.WidgetInstance.Alert`
+  - `Screens.V2.WidgetInstance.ReconstructedAlert`
+  - `Screens.V2.WidgetInstance.DupAlert`
   """
 
   alias Screens.Alerts.Alert
