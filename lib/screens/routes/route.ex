@@ -2,6 +2,9 @@ defmodule Screens.Routes.Route do
   @moduledoc false
 
   alias Screens.V3Api
+  alias Screens.RouteType
+
+  require Screens.RouteType
 
   @sl_route_ids ~w[741 742 743 746 749 751]
 
@@ -114,7 +117,17 @@ defmodule Screens.Routes.Route do
   end
 
   defp format_query_param({:route_types, route_types}) when is_list(route_types) do
-    [{"filter[type]", Enum.join(route_types, ",")}]
+    route_type_ids =
+      Enum.map_join(route_types, ",", fn
+        rt when RouteType.is_route_type(rt) -> RouteType.to_id(rt)
+        id when RouteType.is_route_type_id(id) -> id
+      end)
+
+    [{"filter[type]", route_type_ids}]
+  end
+
+  defp format_query_param({:route_types, route_type}) do
+    format_query_param({:route_types, [route_type]})
   end
 
   defp format_query_param(_), do: []

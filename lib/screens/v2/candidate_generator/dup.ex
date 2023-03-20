@@ -127,10 +127,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
     stop_name = Stop.fetch_stop_name(config.app_params.header.stop_id)
 
-    route_type_filter = Enum.map([:light_rail, :subway], &Screens.RouteType.to_id/1)
-
     with {:ok, subway_routes_at_stop} <-
-           Route.fetch_routes_by_stop(stop_id, now, route_type_filter),
+           Route.fetch_routes_by_stop(stop_id, now, [:light_rail, :subway]),
          subway_route_ids_at_stop =
            for(%{route_id: id} <- subway_routes_at_stop, id != "Mattapan", do: id),
          {:ok, alerts} <- Alert.fetch(route_ids: subway_route_ids_at_stop),

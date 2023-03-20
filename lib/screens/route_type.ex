@@ -6,6 +6,12 @@ defmodule Screens.RouteType do
   @route_type_mapping %{light_rail: 0, subway: 1, rail: 2, bus: 3, ferry: 4}
   @inverted_mapping Enum.into(@route_type_mapping, %{}, fn {k, v} -> {v, k} end)
 
+  @route_types Map.keys(@route_type_mapping)
+  @route_type_ids Map.values(@route_type_mapping)
+
+  defguard is_route_type(term) when term in @route_types
+  defguard is_route_type_id(term) when term in @route_type_ids
+
   @spec to_id(t()) :: non_neg_integer() | nil
   def to_id(t) do
     Map.get(@route_type_mapping, t)
