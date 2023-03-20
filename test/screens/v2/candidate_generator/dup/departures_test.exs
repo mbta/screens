@@ -59,7 +59,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
          [
            %Departure{
              prediction:
-               struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop))
+               struct(Prediction,
+                 id: "A",
+                 route: %Route{id: "Test"},
+                 stop: struct(Stop),
+                 trip: struct(Trip)
+               )
            }
          ]}
 
@@ -68,23 +73,48 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
          [
            %Departure{
              prediction:
-               struct(Prediction, id: "B1", route: %Route{id: "Test"}, stop: struct(Stop))
+               struct(Prediction,
+                 id: "B1",
+                 route: %Route{id: "Test"},
+                 stop: struct(Stop),
+                 trip: struct(Trip)
+               )
            },
            %Departure{
              prediction:
-               struct(Prediction, id: "B2", route: %Route{id: "Test"}, stop: struct(Stop))
+               struct(Prediction,
+                 id: "B2",
+                 route: %Route{id: "Test"},
+                 stop: struct(Stop),
+                 trip: struct(Trip)
+               )
            },
            %Departure{
              prediction:
-               struct(Prediction, id: "B3", route: %Route{id: "Test"}, stop: struct(Stop))
+               struct(Prediction,
+                 id: "B3",
+                 route: %Route{id: "Test"},
+                 stop: struct(Stop),
+                 trip: struct(Trip)
+               )
            },
            %Departure{
              prediction:
-               struct(Prediction, id: "B4", route: %Route{id: "Test"}, stop: struct(Stop))
+               struct(Prediction,
+                 id: "B4",
+                 route: %Route{id: "Test"},
+                 stop: struct(Stop),
+                 trip: struct(Trip)
+               )
            },
            %Departure{
              prediction:
-               struct(Prediction, id: "B5", route: %Route{id: "Test"}, stop: struct(Stop))
+               struct(Prediction,
+                 id: "B5",
+                 route: %Route{id: "Test"},
+                 stop: struct(Stop),
+                 trip: struct(Trip)
+               )
            }
          ]}
 
@@ -93,7 +123,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
          [
            %Departure{
              prediction:
-               struct(Prediction, id: "C", route: %Route{id: "Test"}, stop: struct(Stop))
+               struct(Prediction,
+                 id: "C",
+                 route: %Route{id: "Test"},
+                 stop: struct(Stop),
+                 trip: struct(Trip)
+               )
            }
          ]}
 
@@ -102,7 +137,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
          [
            %Departure{
              prediction:
-               struct(Prediction, id: "D", route: %Route{id: "Test"}, stop: struct(Stop))
+               struct(Prediction,
+                 id: "D",
+                 route: %Route{id: "Test"},
+                 stop: struct(Stop),
+                 trip: struct(Trip)
+               )
            }
          ]}
 
@@ -156,7 +196,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
          [
            %Departure{
              prediction:
-               struct(Prediction, id: "Kenmore", route: %Route{id: "Test"}, stop: struct(Stop))
+               struct(Prediction,
+                 id: "Kenmore",
+                 route: %Route{id: "Test"},
+                 stop: struct(Stop),
+                 trip: struct(Trip)
+               )
            }
          ]}
 
@@ -168,7 +213,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                struct(Prediction,
                  id: "Bus A",
                  route: %Route{id: "Bus A", type: :bus},
-                 stop: struct(Stop)
+                 stop: struct(Stop),
+                 trip: struct(Trip)
                )
            }
          ]}
@@ -191,7 +237,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       "place-A" -> [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]
       "bus-A" -> [%{id: "Bus A", type: :bus}]
       "bus-B" -> [%{id: "Bus B", type: :bus}]
-      _ -> [%{type: :test}]
+      _ -> [%{id: "test", type: :test}]
     end
 
     %{
@@ -233,7 +279,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -243,12 +294,22 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B1", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B1",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B2", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B2",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -264,7 +325,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -274,12 +340,22 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B1", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B1",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B2", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B2",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -295,7 +371,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "C", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "C",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -305,7 +386,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "D", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "D",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -352,7 +438,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -362,12 +453,22 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B1", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B1",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B2", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B2",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -383,7 +484,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -393,12 +499,22 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B1", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B1",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B2", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B2",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -414,7 +530,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -424,12 +545,22 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B1", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B1",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B2", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B2",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -505,7 +636,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", stop: struct(Stop), route: %Route{id: "Test"}),
+                    struct(Prediction,
+                      id: "A",
+                      stop: struct(Stop),
+                      route: %Route{id: "Test"},
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -546,7 +682,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", stop: struct(Stop), route: %Route{id: "Test"}),
+                    struct(Prediction,
+                      id: "A",
+                      stop: struct(Stop),
+                      route: %Route{id: "Test"},
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -587,7 +728,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", stop: struct(Stop), route: %Route{id: "Test"}),
+                    struct(Prediction,
+                      id: "A",
+                      stop: struct(Stop),
+                      route: %Route{id: "Test"},
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -637,22 +783,42 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B1", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B1",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B2", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B2",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B3", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B3",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B4", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B4",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -668,22 +834,42 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B1", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B1",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B2", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B2",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B3", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B3",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B4", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B4",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -699,22 +885,42 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B1", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B1",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B2", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B2",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B3", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B3",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B4", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B4",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -870,22 +1076,42 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B1", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B1",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B2", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B2",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B3", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B3",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B4", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B4",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -901,22 +1127,42 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B1", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B1",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B2", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B2",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B3", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B3",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B4", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B4",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -932,17 +1178,32 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B1", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B1",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B2", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B2",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "B3", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "B3",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 },
                 %Screens.V2.Departure{
@@ -951,7 +1212,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                       id: "B4",
                       route: %Route{id: "Test"},
                       stop: struct(Stop),
-                      stop: struct(Stop)
+                      trip: struct(Trip)
                     ),
                   schedule: nil
                 }
@@ -1064,7 +1325,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                     struct(Prediction,
                       id: "Kenmore",
                       route: %Route{id: "Test"},
-                      stop: struct(Stop)
+                      stop: struct(Stop),
+                      trip: struct(Trip)
                     ),
                   schedule: nil
                 }
@@ -1084,7 +1346,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                     struct(Prediction,
                       id: "Kenmore",
                       route: %Route{id: "Test"},
-                      stop: struct(Stop)
+                      stop: struct(Stop),
+                      trip: struct(Trip)
                     ),
                   schedule: nil
                 }
@@ -1104,7 +1367,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                     struct(Prediction,
                       id: "Kenmore",
                       route: %Route{id: "Test"},
-                      stop: struct(Stop)
+                      stop: struct(Stop),
+                      trip: struct(Trip)
                     ),
                   schedule: nil
                 }
@@ -1303,7 +1567,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -1323,7 +1592,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -1339,7 +1613,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -1483,7 +1762,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -1499,7 +1783,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -1518,7 +1807,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                     struct(Prediction,
                       id: "Bus A",
                       route: %Route{id: "Bus A", type: :bus},
-                      stop: struct(Stop)
+                      stop: struct(Stop),
+                      trip: struct(Trip)
                     ),
                   schedule: nil
                 },
@@ -1606,7 +1896,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
@@ -1622,7 +1917,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               rows: [
                 %Screens.V2.Departure{
                   prediction:
-                    struct(Prediction, id: "A", route: %Route{id: "Test"}, stop: struct(Stop)),
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
                   schedule: nil
                 }
               ]
