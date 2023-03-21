@@ -11,6 +11,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
+  alias Screens.Vehicles.Vehicle
   alias Screens.V2.Departure
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
@@ -232,13 +233,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         []
     end
 
-    fetch_vehicles_fn = fn _, _ -> [] end
+    fetch_vehicles_fn = fn _, _ -> [struct(Vehicle)] end
 
     create_station_with_routes_map_fn = fn
       "Boat" -> [%{id: "Ferry", type: :ferry}]
       "place-A" -> [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]
       "bus-A" -> [%{id: "Bus A", type: :bus}]
       "bus-B" -> [%{id: "Bus B", type: :bus}]
+      "place-overnight" -> [%{id: "Red", type: :subway}]
       _ -> [%{id: "test", type: :test}]
     end
 
@@ -1729,7 +1731,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     end
   end
 
-  describe "overnight mode for bus" do
+  describe "overnight mode" do
     test "returns normal sections with normal rows and overnight rows for routes in overnight mode",
          %{
            config: config,
@@ -2013,6 +2015,89 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
              }
            ]}
       end
+
+      expected_departures = [
+        %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_zero]},
+        %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_one]},
+        %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_two]}
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_fn,
+          fetch_schedules_fn,
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns OvernightDepartures for rail sections with active alert and no active vehicles",
+         %{
+           config: config,
+           fetch_section_departures_fn: fetch_section_departures_fn,
+           create_station_with_routes_map_fn: create_station_with_routes_map_fn
+         } do
+      config =
+        config
+        |> put_primary_departures([
+          %Section{
+            query: %Query{params: %Query.Params{stop_ids: ["place-overnight"]}},
+            filter: nil
+          }
+        ])
+
+      now = ~U[2020-04-06T10:00:00Z]
+
+      fetch_schedules_fn = fn
+        _, nil ->
+          {:ok,
+           [
+             %Schedule{
+               departure_time: ~U[2020-04-06T09:00:00Z],
+               route: %Route{id: "Red"},
+               stop: struct(Stop, id: "place-overnight")
+             }
+           ]}
+
+        _, _ ->
+          {:ok,
+           [
+             %Schedule{
+               departure_time: ~U[2020-04-07T09:00:00Z],
+               route: %Route{id: "Red"},
+               stop: struct(Stop, id: "place-overnight")
+             }
+           ]}
+      end
+
+      fetch_alerts_fn = fn
+        [
+          direction_id: :both,
+          route_ids: [],
+          stop_ids: ["place-overnight"],
+          route_types: [:light_rail, :subway]
+        ] ->
+          [
+            struct(Alert,
+              effect: :suspension,
+              informed_entities: [
+                %{
+                  route: %{id: "Red"},
+                  route_type: 0,
+                  stop: "place-overnight"
+                }
+              ],
+              active_period: [{~U[2020-04-06T09:00:00Z], nil}]
+            )
+          ]
+      end
+
+      fetch_vehicles_fn = fn _, _ -> [] end
 
       expected_departures = [
         %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_zero]},
