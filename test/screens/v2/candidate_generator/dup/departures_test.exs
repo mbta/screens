@@ -232,6 +232,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         []
     end
 
+    fetch_vehicles_fn = fn _, _ -> [] end
+
     create_station_with_routes_map_fn = fn
       "Boat" -> [%{id: "Ferry", type: :ferry}]
       "place-A" -> [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]
@@ -245,7 +247,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
     }
   end
 
@@ -255,7 +258,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
         config
@@ -408,7 +412,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -419,7 +424,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
         put_primary_departures(config, [
@@ -577,7 +583,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -588,7 +595,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
         put_primary_departures(config, [
@@ -750,7 +758,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -761,7 +770,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
         put_primary_departures(config, [
@@ -937,7 +947,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -947,7 +958,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
         put_primary_departures(config, [
@@ -1025,7 +1037,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -1035,7 +1048,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
         put_primary_departures(config, [
@@ -1230,7 +1244,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -1240,7 +1255,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
         put_primary_departures(config, [
@@ -1386,7 +1402,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -1396,7 +1413,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
         put_primary_departures(config, [
@@ -1515,7 +1533,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -1526,7 +1545,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
-      fetch_schedules_fn: fetch_schedules_fn
+      fetch_schedules_fn: fetch_schedules_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
         config
@@ -1639,7 +1659,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -1650,7 +1671,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
         config
@@ -1699,7 +1721,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -1712,7 +1735,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            config: config,
            fetch_section_departures_fn: fetch_section_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
-           create_station_with_routes_map_fn: create_station_with_routes_map_fn
+           create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+           fetch_vehicles_fn: fetch_vehicles_fn
          } do
       config =
         config
@@ -1835,7 +1859,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -1846,7 +1871,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            config: config,
            fetch_section_departures_fn: fetch_section_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
-           create_station_with_routes_map_fn: create_station_with_routes_map_fn
+           create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+           fetch_vehicles_fn: fetch_vehicles_fn
          } do
       config =
         config
@@ -1940,7 +1966,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
@@ -1951,7 +1978,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            config: config,
            fetch_section_departures_fn: fetch_section_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
-           create_station_with_routes_map_fn: create_station_with_routes_map_fn
+           create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+           fetch_vehicles_fn: fetch_vehicles_fn
          } do
       config =
         config
@@ -1999,7 +2027,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_section_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
