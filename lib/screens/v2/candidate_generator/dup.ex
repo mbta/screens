@@ -94,7 +94,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       fn -> alert_instances(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end
     ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
+    |> Task.async_stream(& &1.(), ordered: false, timeout: 30_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 

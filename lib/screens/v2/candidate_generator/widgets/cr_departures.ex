@@ -92,7 +92,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
       route_ids: [
         "CR-Franklin",
         "CR-Needham",
-        "CR-Providence"
+        "CR-Providence",
+        "CR-Fitchburg"
       ],
       route_type: :rail,
       stop_ids: [station]
@@ -114,7 +115,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
       route_ids: [
         "CR-Franklin",
         "CR-Needham",
-        "CR-Providence"
+        "CR-Providence",
+        "CR-Fitchburg"
       ],
       route_type: :rail,
       stop_ids: [station],

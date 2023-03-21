@@ -59,20 +59,27 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   Determines the headsign of the affected direction of an alert using
   stop IDs in its informed entities.
 
-  Returns nil if the home stop is not on the boundary of the alert's affected region.
+  Returns nil if either of the following is true:
+  - the home stop is not on the boundary of the alert's affected region.
+  - the widget does not have a map of headsign matchers (`SingleAlertWidget.headsign_matchers(t)` returns nil)
   """
   @spec get_headsign_from_informed_entities(t()) :: headsign | nil
   def get_headsign_from_informed_entities(t) do
-    headsign_matchers = SAW.headsign_matchers(t)
-    informed_stop_ids = MapSet.new(informed_entities(t), & &1.stop)
+    with headsign_matchers when is_map(headsign_matchers) <- SAW.headsign_matchers(t) do
+      informed_stop_ids = MapSet.new(informed_entities(t), & &1.stop)
 
-    headsign_matchers
-    |> Map.get(SAW.home_stop_id(t))
-    |> Enum.find_value(fn {informed, not_informed, headsign} ->
-      if alert_region_match?(Util.to_set(informed), Util.to_set(not_informed), informed_stop_ids),
-        do: headsign,
-        else: false
-    end)
+      headsign_matchers
+      |> Map.get(SAW.home_stop_id(t))
+      |> Enum.find_value(fn {informed, not_informed, headsign} ->
+        if alert_region_match?(
+             Util.to_set(informed),
+             Util.to_set(not_informed),
+             informed_stop_ids
+           ),
+           do: headsign,
+           else: false
+      end)
+    end
   end
 
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do

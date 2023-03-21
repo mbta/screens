@@ -33,20 +33,18 @@ const DeparturesTable: React.ComponentType<Props> = ({
   };
 
   const getStationServiceList = (stationServiceList: StationService[]) => {
-    return stationServiceList.map((station: StationService) => {
-      return (
-        <div className="stops-at-text" key={station.name}>
-          <div className="via-service-icon">
-            <img
-              src={imagePath(
-                station.service ? "cr-service.svg" : "cr-no-service.svg"
-              )}
-            />
-          </div>
-          <div className="via-stop-name">{station.name}</div>
+    return stationServiceList.map((station: StationService) => (
+      <div className="stops-at-text" key={station.name}>
+        <div className="via-service-icon">
+          <img
+            src={imagePath(
+              station.service ? "cr-service.svg" : "cr-no-service.svg"
+            )}
+          />
         </div>
-      );
-    });
+        <div className="via-stop-name">{station.name}</div>
+      </div>
+    ));
   };
 
   const getHeaderDirection = (language: string) => {
@@ -84,9 +82,11 @@ const DeparturesTable: React.ComponentType<Props> = ({
             <tr key={departure.prediction_or_schedule_id}>
               <td className="track">
                 {getArrowOrTbd(departure.arrow)}
-                <div className="track-number-text">
-                  {departure.track_number}
-                </div>
+                {departure.track_number && (
+                  <div className="track-number-text">
+                    {departure.track_number}
+                  </div>
+                )}
               </td>
               <td className="headsign">
                 <div className="headsign-text">

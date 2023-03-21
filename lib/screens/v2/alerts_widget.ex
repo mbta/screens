@@ -1,6 +1,11 @@
 defprotocol Screens.V2.AlertsWidget do
   @moduledoc """
   Protocol for a widget that models zero or more alerts.
+
+  This includes but is not limited to:
+  - `Screens.V2.WidgetInstance.Alert`
+  - `Screens.V2.WidgetInstance.ReconstructedAlert`
+  - `Screens.V2.WidgetInstance.ElevatorStatus`
   """
 
   # https://hexdocs.pm/elixir/Protocol.html#module-fallback-to-any

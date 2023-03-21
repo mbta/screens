@@ -39,10 +39,14 @@
 }
 
 .free-text__route-pill {
+  text-align: center;
+}
+
+.free-text__route-pill,
+.free-text__text-pill {
   display: inline-block;
   font-family: Helvetica, sans-serif;
   font-weight: 700;
-  text-align: center;
 
   &--green,
   &--green_b,
@@ -68,7 +72,8 @@
     background: $line-color-silver;
   }
 
-  &--cr {
+  &--cr,
+  &--purple {
     background: $line-color-cr;
   }
 
@@ -78,12 +83,16 @@
   }
 }
 
-.free-text__route-pill__text {
+.free-text__route-pill__text,
+.free-text__text-pill__text {
   display: inline-block;
   font-family: Helvetica, sans-serif;
   font-weight: 700;
-  text-align: center;
   transform: translateY(12px);
+}
+
+.free-text__route-pill__text {
+  text-align: center;
 
   &--branch {
     font-size: 84px;
@@ -92,41 +101,7 @@
 }
 
 .free-text__text-pill {
-  display: inline-block;
-  font-family: Helvetica, sans-serif;
-  font-weight: 700;
   transform: translateY(-20px);
-
-  &--green {
-    background: $line-color-green;
-  }
-
-  &--blue {
-    background: $line-color-blue;
-  }
-
-  &--red {
-    background: $line-color-red;
-  }
-
-  &--orange {
-    background: $line-color-orange;
-  }
-
-  &--silver {
-    background: $line-color-silver;
-  }
-
-  &--purple {
-    background: $line-color-cr;
-  }
-}
-
-.free-text__text-pill__text {
-  display: inline-block;
-  font-family: Helvetica, sans-serif;
-  font-weight: 700;
-  transform: translateY(12px);
 }
 
 .partial-alert,
@@ -200,7 +175,6 @@
 
 .headway-section:only-child {
   .free-text {
-    // prolly needs to be 136px
     font-size: 138px;
     color: #ffffff;
   }
@@ -212,12 +186,13 @@
 
   .free-text__line {
     width: 1517px;
+    line-height: initial;
   }
 
   .free-text__icon-container {
-    width: 184px;
-    height: 184px;
-    margin-right: 64px;
+    width: 168px;
+    height: 168px;
+    margin-right: 72px;
     vertical-align: top;
   }
 
@@ -237,83 +212,14 @@
 
   .free-text__text-pill {
     border-radius: 84px;
+    transform: translateY(-16px);
+  }
+
+  .free-text__text-pill__text {
     font-size: 126px;
     line-height: 168px;
-    padding-left: 84px;
-    padding-right: 84px;
-  }
-
-  .free-text__inline-icon {
-    height: 168px;
-    line-height: 168px;
-  }
-
-  .free-text__inline-icon-image {
-    transform: translateY(20px);
-    height: 139px;
-  }
-
-  &--dark {
-    .free-text {
-      color: #171f26;
-    }
-
-    .free-text__route-pill {
-      color: #ffffff;
-    }
-
-    .free-text__text-pill {
-      color: #ffffff;
-    }
-  }
-}
-
-.full-screen-headway {
-  .free-text {
-    font-size: 138px;
-    color: #ffffff;
-  }
-
-  .free-text__line-container {
-    margin-bottom: 56px;
-  }
-
-  .free-text__line {
-    width: 1544px;
-    font-size: 144px;
-    font-weight: 400;
-    line-height: 188px;
-    letter-spacing: 0px;
-    text-align: left;
-  }
-
-  .free-text__icon-container {
-    width: 168px;
-    height: 168px;
-    margin-right: 72px;
-    vertical-align: top;
-  }
-
-  .free-text__icon-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-
-  .free-text__route-pill {
-    height: 128px;
-    width: 248px;
-    border-radius: 72px;
-    font-size: 96px;
-    line-height: 117px;
-  }
-
-  .free-text__text-pill {
-    border-radius: 1168px;
-    font-size: 132px;
-    line-height: 161.17px;
-    padding-left: 99px;
-    padding-right: 99px;
+    margin-left: 84px;
+    margin-right: 84px;
   }
 
   .free-text__inline-icon {
