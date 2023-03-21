@@ -2,8 +2,11 @@ defmodule Screens.Alerts.Alert do
   @moduledoc false
 
   alias Screens.Routes.Route
+  alias Screens.RouteType
   alias Screens.Stops.Stop
   alias Screens.V3Api
+
+  require Screens.RouteType
 
   defstruct id: nil,
             cause: nil,
@@ -269,12 +272,20 @@ defmodule Screens.Alerts.Alert do
     format_query_param({:route_ids, [route_id]})
   end
 
-  defp format_query_param({:route_types, route_types}) do
-    route_type_ids = Enum.map_join(route_types, ",", &Screens.RouteType.to_id/1)
+  defp format_query_param({:route_types, route_types}) when is_list(route_types) do
+    route_type_ids =
+      Enum.map_join(route_types, ",", fn
+        rt when RouteType.is_route_type(rt) -> RouteType.to_id(rt)
+        id when RouteType.is_route_type_id(id) -> id
+      end)
 
     [
       {"filter[route_type]", route_type_ids}
     ]
+  end
+
+  defp format_query_param({:route_types, route_type}) do
+    format_query_param({:route_types, [route_type]})
   end
 
   defp format_query_param(_), do: []
