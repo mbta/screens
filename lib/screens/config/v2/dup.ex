@@ -33,14 +33,10 @@ defmodule Screens.Config.V2.Dup do
   end
 
   defp value_to_json(:header, %CurrentStopId{} = header) do
-    header
-    |> CurrentStopId.to_json()
-    |> Map.put(:type, :current_stop_id)
+    CurrentStopId.to_json(header)
   end
 
   defp value_to_json(:header, %CurrentStopName{} = header) do
-    header
-    |> CurrentStopName.to_json()
-    |> Map.put(:type, :current_stop_name)
+    CurrentStopName.to_json(header)
   end
 end
