@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
   alias Screens.Config.Screen
   alias Screens.Config.V2.Dup
-  alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.Config.V2.Header.{CurrentStopId, CurrentStopName}
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Dup.Departures, as: DeparturesInstances
@@ -100,9 +100,19 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         now,
         fetch_stop_name_fn
       ) do
-    %Screen{app_params: %Dup{header: %CurrentStopId{stop_id: stop_id}}} = config
+    %Screen{app_params: %Dup{header: header_config}} = config
 
-    stop_name = fetch_stop_name_fn.(stop_id)
+    stop_name =
+      case header_config do
+        %CurrentStopId{stop_id: stop_id} ->
+          case fetch_stop_name_fn.(stop_id) do
+            nil -> []
+            stop_name -> stop_name
+          end
+
+        %CurrentStopName{stop_name: stop_name} ->
+          stop_name
+      end
 
     List.duplicate(%NormalHeader{screen: config, icon: :logo, text: stop_name, time: now}, 3)
   end

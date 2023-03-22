@@ -20,7 +20,19 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       app_id: :dup_v2
     }
 
-    %{config: config}
+    config_stop_name = %Screen{
+      app_params: %DupConfig{
+        header: %Header.CurrentStopName{stop_name: "Gov Center"},
+        primary_departures: struct(Departures),
+        secondary_departures: struct(Departures)
+      },
+      vendor: :outfront,
+      device_id: "TEST",
+      name: "TEST",
+      app_id: :dup_v2
+    }
+
+    %{config: config, config_stop_name: config_stop_name}
   end
 
   describe "screen_template/0" do
@@ -101,7 +113,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
   end
 
   describe "header_instances/3" do
-    test "returns expected header", %{config: config} do
+    test "returns expected header for stop_id", %{config: config} do
       now = ~U[2020-04-06T10:00:00Z]
       fetch_stop_name_fn = fn _ -> "Test Stop" end
 
@@ -110,6 +122,29 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           screen: config,
           icon: :logo,
           text: "Test Stop",
+          time: now
+        }
+        |> List.duplicate(3)
+
+      actual_instances =
+        Dup.header_instances(
+          config,
+          now,
+          fetch_stop_name_fn
+        )
+
+      Enum.all?(expected_headers, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns expected header for stop_name", %{config_stop_name: config} do
+      now = ~U[2020-04-06T10:00:00Z]
+      fetch_stop_name_fn = fn _ -> nil end
+
+      expected_headers =
+        %NormalHeader{
+          screen: config,
+          icon: :logo,
+          text: "Gov Center",
           time: now
         }
         |> List.duplicate(3)
