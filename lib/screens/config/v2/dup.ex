@@ -24,17 +24,12 @@ defmodule Screens.Config.V2.Dup do
       evergreen_content: {:list, EvergreenContentItem}
     ]
 
-  defp value_from_json("header", %{"type" => "current_stop_id"} = header) do
+  defp value_from_json("header", %{"stop_id" => _} = header) do
     CurrentStopId.from_json(header)
   end
 
-  defp value_from_json("header", %{"type" => "current_stop_name"} = header) do
+  defp value_from_json("header", %{"stop_name" => _} = header) do
     CurrentStopName.from_json(header)
-  end
-
-  # When no type is provided, default to current_stop_id
-  defp value_from_json("header", header) do
-    CurrentStopId.from_json(header)
   end
 
   defp value_to_json(:header, %CurrentStopId{} = header) do
