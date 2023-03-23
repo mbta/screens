@@ -32,7 +32,9 @@
 
 - Set the version string in assets/src/components/v2/dup/version.tsx to `current_year.current_month.current_day.1`.
 - In assets/webpack.config.js, change `publicPath` in the font config to have value `'fonts/'`.
-- **Only if you are packaging for local testing**, replace `const station = useOutfrontStation();` in assets/src/apps/v2/dup.tsx with `const station = "Broadway";` (or any other station name from one of the DUP screen IDs (`DUP-${name}-V2`)). This data is provided by Outfront's "wrapper" app that runs on the real DUP screens, but we need to set it ourselves during testing. Think of it as a sort of frontend environment variable.
+- **Only if you are packaging for local testing**
+  - replace `const station = useOutfrontStation();` in assets/src/apps/v2/dup.tsx with `const station = "Broadway";` (or any other station name from one of the DUP screen IDs (`DUP-${name}-V2`)). This data is provided by Outfront's "wrapper" app that runs on the real DUP screens, but we need to set it ourselves during testing. Think of it as a sort of frontend environment variable.
+  - replace `apiPath = "https://screens.mbta.com" + apiPath;` in assets/src/hooks/v2/use_api_response.tsx with `apiPath = "http://localhost:4000" + apiPath;`.
 - `cd` to priv/static and run the following:
   ```sh
   for ROTATION_INDEX in {0..2}; do
