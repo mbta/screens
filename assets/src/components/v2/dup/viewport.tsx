@@ -12,13 +12,13 @@ const Viewport: React.ComponentType<{}> = ({ children }) => {
   let viewportClassName = "dup-screen-viewport";
   let shifterClassName = "dup-shifter";
   switch (getRotationIndex()) {
-    case 0:
+    case "0":
       shifterClassName += " dup-shifter--rotation-zero";
       break;
-    case 1:
+    case "1":
       shifterClassName += " dup-shifter--rotation-one";
       break;
-    case 2:
+    case "2":
       shifterClassName += " dup-shifter--rotation-two";
       break;
     default:

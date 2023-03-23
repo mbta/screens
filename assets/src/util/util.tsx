@@ -44,13 +44,13 @@ export const getScreenSide = (): ScreenSide | null => {
   return isScreenSide(screenSide) ? screenSide : null;
 };
 
-type RotationIndex = 0 | 1 | 2;
-const isRotationIndex = (value: any): value is RotationIndex => {
-  return value === 0 || value === 1 || value === 2;
+const isRotationIndex = (value: string | undefined) => {
+  return value === "0" || value === "1" || value === "2";
 };
-export const getRotationIndex = (): RotationIndex | null => {
+
+export const getRotationIndex = () => {
   const rotationIndex = isDup()
-    ? ROTATION_INDEX
+    ? ROTATION_INDEX.toString()
     : getDatasetValue("rotationIndex");
 
   return isRotationIndex(rotationIndex) ? rotationIndex : null;
