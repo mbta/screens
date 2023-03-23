@@ -8,9 +8,11 @@ import React, {
 import useApiResponse, {
   ApiResponse,
   SimulationApiResponse,
+  useDupApiResponse,
 } from "Hooks/v2/use_api_response";
 import Widget, { WidgetData } from "Components/v2/widget";
 import useAudioReadout from "Hooks/v2/use_audio_readout";
+import { isDup } from "Util/util";
 
 type ResponseMapper = (
   apiResponse: ApiResponse
@@ -102,8 +104,9 @@ const ScreenContainer = ({ id }) => {
   const blinkConfig = useContext(BlinkConfigContext);
   const audioConfig = useContext(AudioConfigContext);
   const [showBlink, setShowBlink] = useState(false);
+  const hook = isDup() ? useDupApiResponse : useApiResponse;
 
-  const { apiResponse, requestCount, lastSuccess } = useApiResponse({ id });
+  const { apiResponse, requestCount, lastSuccess } = hook({ id });
 
   useAudioReadout({ id, config: audioConfig });
 
