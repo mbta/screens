@@ -34,6 +34,7 @@ import {
 } from "Components/v2/screen_container";
 import PageLoadNoData from "Components/v2/dup/page_load_no_data";
 import NoData from "Components/v2/dup/no_data";
+import useOutfrontStation from "Hooks/use_outfront_station";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -118,6 +119,21 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
+  const station = useOutfrontStation();
+
+  if (station !== null) {
+    const id = `DUP-${station.replace(/\s/g, "")}-V2`;
+    return (
+      <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+        <ResponseMapperContext.Provider value={responseMapper}>
+          <Viewport>
+            <ScreenPage id={id} />
+          </Viewport>
+        </ResponseMapperContext.Provider>
+      </MappingContext.Provider>
+    );
+  }
+
   return (
     <Router>
       <Switch>
