@@ -12,8 +12,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
 
-  require Logger
-
   @behaviour CandidateGenerator
 
   @impl CandidateGenerator
@@ -94,8 +92,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
-
-  ### Start Header
 
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
