@@ -534,6 +534,33 @@ defmodule Screens.Alerts.Alert do
     end)
   end
 
+  @alert_cause_mapping %{
+    accident: "an accident",
+    construction: "construction",
+    disabled_train: "a disabled train",
+    fire: "a fire",
+    holiday: "the holiday",
+    maintenance: "maintenance",
+    medical_emergency: "a medical emergency",
+    police_action: "police action",
+    power_problem: "a power issue",
+    signal_problem: "a signal problem",
+    snow: "snow conditions",
+    special_event: "a special event",
+    switch_problem: "a switch problem",
+    track_problem: "a track problem",
+    traffic: "traffic",
+    weather: "weather conditions"
+  }
+
+  for {cause, cause_text} <- @alert_cause_mapping do
+    def get_cause_string(unquote(cause)) do
+      "due to #{unquote(cause_text)}"
+    end
+  end
+
+  def get_cause_string(_), do: ""
+
   # information -> 1
   # up to 10 minutes -> 3
   # up to 15 minutes -> 4
