@@ -11,7 +11,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.Common.BaseAlert
-  alias Screens.V2.WidgetInstance.DupAlert
+  alias Screens.V2.WidgetInstance.{DupAlert, DupSpecialCaseAlert}
 
   require Logger
 
@@ -29,8 +29,16 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
     stop_name = Stop.fetch_stop_name(config.app_params.header.stop_id)
 
+    # WTC is a special bus-only case
+    route_type_filter =
+      if stop_id === "place-wtcst",
+        do: [:bus],
+        else:
+          [:light_rail, :subway]
+          |> Enum.map(&Screens.RouteType.to_id/1)
+
     with {:ok, subway_routes_at_stop} <-
-           Route.fetch_routes_by_stop(stop_id, now, [:light_rail, :subway]),
+           Route.fetch_routes_by_stop(stop_id, now, route_type_filter),
          subway_route_ids_at_stop =
            for(%{route_id: id} <- subway_routes_at_stop, id != "Mattapan", do: id),
          {:ok, alerts} <- Alert.fetch(route_ids: subway_route_ids_at_stop),
@@ -63,15 +71,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   def choose_alert(alerts) do
     alerts
-    |> Enum.min_by(&{effect_key(&1.effect), -&1.severity, -&1.id})
+    |> Enum.min_by(&{effect_key(&1.effect), -&1.severity, -String.to_integer(&1.id)})
     |> tap(fn alert ->
       alert_ids = Enum.map_join(alerts, ",", & &1.id)
       Logger.info("[dup alert selected] selected_id=#{alert.id} all_relevant_ids=#{alert_ids}")
     end)
   end
 
-  # Commented out to stop dialyzer from complaining until we fill in relevant logic
-  # defp create_alert_widgets({:special, widgets}, _, _, _, _), do: widgets
+  defp create_alert_widgets({:special, widgets}, _, _, _, _), do: widgets
 
   defp create_alert_widgets(
          {:normal, alerts},
@@ -108,14 +115,22 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
       stop_name: "A Station"
     }
 
-    relevant_effect?(alert) and Alert.happening_now?(alert, now) and relevant_location?(dup_alert)
+    relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
+      relevant_location?(dup_alert)
   end
 
   defp relevant_effect?(%{effect: :delay, severity: severity}) do
     severity >= 5
   end
 
-  defp relevant_effect?(%{effect: effect}) do
+  # WTC special case
+  defp relevant_effect?(%{effect: effect}, %Screen{
+         app_params: %Dup{alerts: %AlertsConfig{stop_id: "place-wtcst"}}
+       }) do
+    effect in [:detour]
+  end
+
+  defp relevant_effect?(%{effect: effect}, _) do
     effect in [:station_closure, :shuttle, :suspension]
   end
 
@@ -127,14 +142,195 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   # Otherwise, returns the alerts unchanged.
   @spec alert_special_cases(list(Alert.t()), Screens.Config.Screen.t()) ::
           {:normal, list(Alert.t())} | {:special, list(Screens.V2.WidgetInstance.t())}
-  defp alert_special_cases(alerts, _config) do
-    # Special cases go here!
-    # Use the DupSpecialCaseAlert widget to directly specify the serialized data.
+  defp alert_special_cases([], _), do: {:normal, []}
 
-    {:normal, alerts}
+  defp alert_special_cases(
+         alerts,
+         %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}}} = config
+       ) do
+    cond do
+      stop_id === "place-kencl" -> kenmore_special_case(alerts)
+      stop_id === "place-wtcst" -> wtc_special_case(alerts)
+      # precise case where there is an SL alert detouring through a particular location
+      # -> {:special, widgets}
+      true -> {:normal, alerts}
+    end
   end
 
-  for {effect, key} <- Enum.with_index([:shuttle, :suspension, :station_closure, :delay]) do
+  # In the case where Kenmore has 2 or more boundary shuttles / suspensions to the west,
+  # don't only select 1 alert; instead look at all alerts and make custom text
+  @spec kenmore_special_case(list(Alert.t())) :: {:special, list(Screens.V2.WidgetInstance.t())}
+  def kenmore_special_case(alerts) do
+    branches =
+      alerts
+      |> Enum.filter(fn a -> a.effect === :shuttle end)
+      |> Enum.map(
+        &check_entities_for_stops(&1, [
+          %{branch: "b", stop: "70149"},
+          %{branch: "c", stop: "70211"},
+          %{branch: "d", stop: "70187"}
+        ])
+      )
+      |> Enum.sort()
+      |> Enum.uniq()
+
+    if length(branches) > 1 do
+      alert_ids = Enum.map(alerts, fn a -> a.id end)
+
+      {:special,
+       [
+         %DupSpecialCaseAlert{
+           alert_ids: alert_ids,
+           serialize_map: %{
+             text: %Screens.Config.V2.FreeTextLine{
+               icon: :warning,
+               text: get_kenmore_special_text(branches, :partial_alert)
+             },
+             color: :green
+           },
+           widget_type: :partial_alert,
+           slot_names: [:bottom_pane_zero]
+         },
+         %DupSpecialCaseAlert{
+           alert_ids: alert_ids,
+           serialize_map: %{
+             text: %Screens.Config.V2.FreeTextLine{
+               icon: :warning,
+               text: get_kenmore_special_text(branches, :takeover_alert)
+             },
+             header: %{color: :green, text: "Kenmore"},
+             remedy: %Screens.Config.V2.FreeTextLine{
+               icon: :shuttle,
+               text: [%{format: :bold, text: "Use shuttle bus"}]
+             }
+           },
+           widget_type: :takeover_alert,
+           slot_names: [:full_rotation_one]
+         },
+         %DupSpecialCaseAlert{
+           alert_ids: alert_ids,
+           serialize_map: %{
+             text: %Screens.Config.V2.FreeTextLine{
+               icon: :warning,
+               text: get_kenmore_special_text(branches, :partial_alert)
+             },
+             color: :green
+           },
+           widget_type: :partial_alert,
+           slot_names: [:bottom_pane_two]
+         }
+       ]}
+    else
+      {:normal, alerts}
+    end
+  end
+
+  # In the case where we're at WTC and there's a detour affecting routes SL1/2/3, make custom text
+  # Ignore all other SL alerts
+  @spec wtc_special_case(list(Alert.t())) :: {:special, list(Screens.V2.WidgetInstance.t())}
+  def wtc_special_case(alerts) do
+    alert = choose_alert(alerts)
+
+    detoured_routes =
+      alert
+      |> Map.get(:informed_entities)
+      |> Enum.map(fn entity -> if entity.stop === "place-wtcst", do: entity.route end)
+      |> Enum.filter(& &1)
+      |> Enum.sort()
+
+    if detoured_routes === ["741", "742", "743", "746"] do
+      {:special,
+       for rotation_index <- [:full_rotation_zero, :full_rotation_one, :full_rotation_two] do
+         %DupSpecialCaseAlert{
+           alert_ids: [alert.id],
+           serialize_map: %{
+             text: %Screens.Config.V2.FreeTextLine{
+               icon: :warning,
+               text: ["Building closed"]
+             },
+             header: %{color: :silver, text: "World Trade Ctr"},
+             remedy: %Screens.Config.V2.FreeTextLine{
+               icon: :shuttle,
+               text: [%{format: :bold, text: "Board Silver Line on street"}]
+             }
+           },
+           widget_type: :takeover_alert,
+           slot_names: [rotation_index]
+         }
+       end}
+    else
+      {:normal, []}
+    end
+  end
+
+  @spec check_entities_for_stops(Alert.t(), list(%{branch: String.t(), stop: String.t()})) ::
+          atom()
+  def check_entities_for_stops(%{informed_entities: informed_entities} = alert, stop_matchers) do
+    Enum.find(stop_matchers, fn stop ->
+      Enum.any?(informed_entities, fn e ->
+        stop.stop === e.stop
+      end)
+    end)
+    |> Map.get(:branch)
+  end
+
+  @spec get_kenmore_special_text(list(atom()), atom()) :: list(FreeText.t())
+  def get_kenmore_special_text(["b", "c"], :partial_alert),
+    do: ["No", %{format: :bold, text: "Bost Coll/Clvlnd Cir"}]
+
+  def get_kenmore_special_text(["b", "c"], :takeover_alert),
+    do: [
+      "No",
+      %{icon: "green_b"},
+      %{format: :bold, text: "Bost Coll"},
+      "or",
+      %{icon: "green_c"},
+      %{format: :bold, text: "Cleveland Cir"},
+      "trains"
+    ]
+
+  def get_kenmore_special_text(["b", "d"], :partial_alert),
+    do: ["No", %{format: :bold, text: "Bost Coll / Riverside"}]
+
+  def get_kenmore_special_text(["b", "d"], :takeover_alert),
+    do: [
+      "No",
+      %{icon: "green_b"},
+      %{format: :bold, text: "Bost Coll"},
+      "or",
+      %{icon: "green_d"},
+      %{format: :bold, text: "Riverside"},
+      "trains"
+    ]
+
+  def get_kenmore_special_text(["c", "d"], :partial_alert),
+    do: ["No", %{format: :bold, text: "Clvlnd Cir/Riverside"}]
+
+  def get_kenmore_special_text(["c", "d"], :takeover_alert),
+    do: [
+      "No",
+      %{icon: "green_c"},
+      %{format: :bold, text: "Cleveland Cir"},
+      "or",
+      %{icon: "green_d"},
+      %{format: :bold, text: "Riverside"},
+      "trains"
+    ]
+
+  def get_kenmore_special_text(["b", "c", "d"], :partial_alert),
+    do: ["No", %{format: :bold, text: "Westbound"}, "trains"]
+
+  def get_kenmore_special_text(["b", "c", "d"], :takeover_alert),
+    do: [
+      "No",
+      %{icon: "green_b"},
+      %{icon: "green_c"},
+      %{icon: "green_d"},
+      %{format: :bold, text: "Westbound"},
+      "trains"
+    ]
+
+  for {effect, key} <- Enum.with_index([:shuttle, :suspension, :station_closure, :detour, :delay]) do
     defp effect_key(unquote(effect)), do: unquote(key)
   end
 end

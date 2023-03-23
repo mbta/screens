@@ -8,7 +8,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
 
   alias Screens.V2.WidgetInstance
 
-  @enforce_keys [:alert_ids, :serialize_map, :slot_names, :widget_type, :rotation_index]
+  @enforce_keys [:alert_ids, :serialize_map, :slot_names, :widget_type]
   defstruct @enforce_keys
 
   @type t :: %__MODULE__{
@@ -17,22 +17,17 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
           alert_ids: list(alert_id),
           serialize_map: map(),
           slot_names: list(WidgetInstance.slot_id()),
-          widget_type: WidgetInstance.widget_type(),
-          rotation_index: :one | :two | :three
+          widget_type: WidgetInstance.widget_type()
         }
 
   @type alert_id :: String.t()
-
-  def slot_names(%__MODULE__{} = t) do
-    Enum.map(t.slot_names, &:"#{&1}_#{t.rotation_index}")
-  end
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.DupSpecialCaseAlert
 
     def priority(_t), do: [1, 2]
     def serialize(t), do: t.serialize_map
-    def slot_names(t), do: DupSpecialCaseAlert.slot_names(t)
+    def slot_names(t), do: t.slot_names
     def widget_type(t), do: t.widget_type
     def valid_candidate?(_t), do: true
     def audio_serialize(_t), do: %{}
