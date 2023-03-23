@@ -95,8 +95,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
-  ### Start Header
-
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
 
