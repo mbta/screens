@@ -41,6 +41,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     }
   end
 
+  # TODO: Move these closer to the FreeText modules and make public so they're generally available
+  #       https://app.asana.com/0/1185117109217422/1204252210980218/f
   # Provides a pattern-matchable shorthand for bolding some text
   defmacrop bold(str) do
     quote do
