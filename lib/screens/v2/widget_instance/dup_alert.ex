@@ -241,7 +241,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     |> Enum.uniq()
   end
 
-  def alert_ids(%__MODULE__{} = t), do: t.alert.id
+  def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
   ### Required audio callbacks. The widget does not have audio equivalence, so these are "stubbed".
 
