@@ -113,11 +113,13 @@ defmodule Screens.RoutePatterns.RoutePattern do
     ])
     |> Enum.map(fn %{
                      "relationships" => %{
-                       "parent_station" => %{"data" => %{"id" => parent_station_name}}
+                       "parent_station" => %{"data" => parent_station_data}
                      },
                      "id" => platform_id
                    } ->
-      {platform_id, parent_station_name}
+      if parent_station_data,
+        do: {platform_id, parent_station_data["id"]},
+        else: {platform_id, platform_id}
     end)
     |> Enum.into(%{})
   end
