@@ -1,6 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   @moduledoc false
 
+  require Logger
+
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.Departures
@@ -415,6 +417,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
       cond do
         is_nil(last_schedule_today) or is_nil(first_schedule_tomorrow) ->
+          nil
+
+        DateTime.compare(now, first_schedule_tomorrow.departure_time) == :gt ->
+          Logger.warn(
+            "[get_overnight_schedules_for_section] now is after first_schedule_tomorrow."
+          )
+
           nil
 
         DateTime.compare(now, last_schedule_today.departure_time) == :gt and
