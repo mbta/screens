@@ -8,7 +8,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.Config.V2.Departures.Query.Params
   alias Screens.Config.V2.Dup
   alias Screens.Routes.Route
-  alias Screens.Schedules.Schedule
   alias Screens.SignsUiConfig
   alias Screens.Util
   alias Screens.V2.CandidateGenerator.Widgets
