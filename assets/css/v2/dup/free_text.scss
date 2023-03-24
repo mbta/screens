@@ -383,6 +383,7 @@
 
 .overnight-section {
   .free-text {
+    color: #171f26;
     display: inline-block;
     margin: 32px;
   }
@@ -396,6 +397,7 @@
   }
 
   .free-text__route-pill {
+    color: #ffffff;
     height: 128px;
     width: 248px;
     border-radius: 100px;
@@ -418,5 +420,9 @@
   .free-text__icon-image {
     height: 112.5px;
     margin-top: 15.75px;
+  }
+
+  .free-text__text-pill {
+    color: #ffffff;
   }
 }
