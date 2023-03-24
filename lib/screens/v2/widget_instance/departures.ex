@@ -141,7 +141,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     text = %FreeTextLine{
       icon: route_pill,
-      text: ["Services resumes in the morning"]
+      text: ["Service resumes in the morning"]
     }
 
     %{type: :overnight_section, text: FreeTextLine.to_json(text)}
