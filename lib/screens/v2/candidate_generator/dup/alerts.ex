@@ -119,7 +119,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
       relevant_location?(dup_alert)
   end
 
-  defp relevant_effect?(%{effect: :delay, severity: severity}) do
+  defp relevant_effect?(%{effect: :delay, severity: severity}, _) do
     severity >= 5
   end
 
@@ -146,7 +146,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   defp alert_special_cases(
          alerts,
-         %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}}} = config
+         %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}}}
        ) do
     cond do
       stop_id === "place-kencl" -> kenmore_special_case(alerts)
@@ -265,7 +265,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   @spec check_entities_for_stops(Alert.t(), list(%{branch: String.t(), stop: String.t()})) ::
           atom()
-  def check_entities_for_stops(%{informed_entities: informed_entities} = alert, stop_matchers) do
+  def check_entities_for_stops(%{informed_entities: informed_entities}, stop_matchers) do
     Enum.find(stop_matchers, fn stop ->
       Enum.any?(informed_entities, fn e ->
         stop.stop === e.stop

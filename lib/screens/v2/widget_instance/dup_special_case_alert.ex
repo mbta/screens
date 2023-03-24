@@ -23,8 +23,6 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
   @type alert_id :: String.t()
 
   defimpl Screens.V2.WidgetInstance do
-    alias Screens.V2.WidgetInstance.DupSpecialCaseAlert
-
     def priority(_t), do: [1, 2]
     def serialize(t), do: t.serialize_map
     def slot_names(t), do: t.slot_names
