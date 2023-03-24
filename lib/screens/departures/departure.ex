@@ -386,7 +386,7 @@ defmodule Screens.Departures.Departure do
   end
 
   defp format_query_param({:date, %DateTime{} = date}) do
-    {"filter[date]", Timex.format!(date, "{YYYY}-{0M}-{0D}")}
+    {"filter[date]", Date.to_iso8601(date)}
   end
 
   defp format_query_param({:date, date}) do

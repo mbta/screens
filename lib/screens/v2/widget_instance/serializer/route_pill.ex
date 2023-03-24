@@ -150,11 +150,21 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   def serialize_icon(icon) do
     case icon do
-      :bus -> %{type: :icon, icon: :bus, color: :yellow}
-      :cr -> %{type: :icon, icon: :rail, color: :purple}
-      :silver -> %{type: :text, text: "SL", color: :silver}
-      :ferry -> %{type: :icon, icon: :boat, color: :teal}
-      route_color -> do_serialize("#{String.capitalize(route_color)}", %{})
+      :bus ->
+        %{type: :icon, icon: :bus, color: :yellow}
+
+      :cr ->
+        %{type: :icon, icon: :rail, color: :purple}
+
+      :silver ->
+        %{type: :text, text: "SL", color: :silver}
+
+      :ferry ->
+        %{type: :icon, icon: :boat, color: :teal}
+
+      route_color ->
+        pill = route_color |> to_string |> String.capitalize() |> do_serialize(%{})
+        Map.merge(pill, %{color: route_color})
     end
   end
 

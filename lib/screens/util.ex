@@ -180,10 +180,15 @@ defmodule Screens.Util do
   def to_set(ids) when is_list(ids), do: MapSet.new(ids)
   def to_set(%MapSet{} = already_a_set), do: already_a_set
 
-  # Service day for MBTA ends at 3am
-  # now must be in UTC
+  @doc """
+    Calculates the service day after the given DateTime (which must be in UTC).
+    For context, MBTA service days end at 3am, not at midnight.
+    So getting the next service day means adding 21 hours to current date, not 24.
+    To avoid duplicate DateTime calculations existing throughout the code,
+    this function will handle the actual calculations needed to get the next service day.
+  """
   @spec get_service_day_tomorrow(DateTime.t()) :: DateTime.t()
   def get_service_day_tomorrow(now) do
-    now |> Timex.shift(hours: -3) |> Timex.shift(days: 1)
+    DateTime.add(now, 60 * 60 * 21)
   end
 end
