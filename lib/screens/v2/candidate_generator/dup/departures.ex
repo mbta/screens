@@ -411,23 +411,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
       # we do not display overnight mode.
 
-      last_schedule_today =
-        Enum.find(
-          today_schedules,
-          struct(Schedule, departure_time: now),
-          &(&1.stop.id == stop_id)
-        )
+      last_schedule_today = Enum.find(today_schedules, &(&1.stop.id == stop_id))
+      first_schedule_tomorrow = Enum.find(tomorrow_schedules, &(&1.stop.id == stop_id))
 
-      first_schedule_tomorrow =
-        Enum.find(
-          tomorrow_schedules,
-          struct(Schedule, departure_time: now),
-          &(&1.stop.id == stop_id)
-        )
+      cond do
+        is_nil(last_schedule_today) or is_nil(first_schedule_tomorrow) ->
+          nil
 
-      if DateTime.compare(now, last_schedule_today.departure_time) == :gt and
-           DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt do
-        %Departure{schedule: first_schedule_tomorrow}
+        DateTime.compare(now, last_schedule_today.departure_time) == :gt and
+            DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt ->
+          %Departure{schedule: first_schedule_tomorrow}
+
+        true ->
+          nil
       end
     end)
     # Routes not in overnight mode will be nil. Can ignore those.
