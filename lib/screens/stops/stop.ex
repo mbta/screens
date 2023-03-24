@@ -277,6 +277,8 @@ defmodule Screens.Stops.Stop do
     end
   end
 
+  # Returns a list of Route structs that serve the provided ID
+  @spec create_station_with_routes_map(String.t()) :: list(Routes.Route.t())
   def create_station_with_routes_map(station_id) do
     case StationsWithRoutesAgent.get(station_id) do
       {routes, date} ->
