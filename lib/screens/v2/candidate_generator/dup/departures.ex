@@ -413,8 +413,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
       # we do not display overnight mode.
 
-      last_schedule_today = Enum.find(today_schedules, &(&1.stop.id == stop_id))
-      first_schedule_tomorrow = Enum.find(tomorrow_schedules, &(&1.stop.id == stop_id))
+      last_schedule_today =
+        Enum.find(today_schedules, &(&1.stop.id == stop_id and &1.direction_id == direction_id))
+
+      first_schedule_tomorrow =
+        Enum.find(
+          tomorrow_schedules,
+          &(&1.stop.id == stop_id and &1.direction_id == direction_id)
+        )
 
       cond do
         is_nil(last_schedule_today) or is_nil(first_schedule_tomorrow) ->
