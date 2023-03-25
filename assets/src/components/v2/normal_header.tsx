@@ -66,8 +66,15 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = forwardRef(
     }
 
     const abbreviatedText = fullName ? text : abbreviateText(text);
+    const environmentName = getDatasetValue("environmentName");
 
     return (
+      <div>
+        <div className="normal-header__environment">
+          {["screens-dev", "screens-dev-green"].includes(environmentName)
+            ? environmentName
+            : ""}
+        </div>
       <div className="normal-header-title">
         {showTo && <div className="normal-header-to__text">TO</div>}
         {icon && <NormalHeaderIcon icon={icon} />}
@@ -76,6 +83,7 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = forwardRef(
           ref={ref}
         >
           {abbreviatedText}
+          </div>
         </div>
       </div>
     );
