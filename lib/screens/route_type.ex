@@ -6,8 +6,8 @@ defmodule Screens.RouteType do
   @route_types [:light_rail, :subway, :rail, :bus, :ferry]
   @route_type_ids 0..4
 
-  @route_type_mapping Enum.zip(@route_types, @route_type_ids) |> Enum.into(%{})
-  @inverted_mapping Enum.zip(@route_type_ids, @route_types) |> Enum.into(%{})
+  @route_type_mapping Enum.into(Enum.zip(@route_types, @route_type_ids), %{})
+  @inverted_mapping Enum.into(Enum.zip(@route_type_ids, @route_types), %{})
 
   defguard is_route_type(term) when term in @route_types
   defguard is_route_type_id(term) when term in @route_type_ids
