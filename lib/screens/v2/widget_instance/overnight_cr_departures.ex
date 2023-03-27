@@ -2,6 +2,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
   @moduledoc false
 
   alias Screens.Schedules.Schedule
+  alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance
 
   @enforce_keys ~w[destination last_tomorrow_schedule direction_to_destination priority now]a
@@ -24,10 +25,15 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
   def serialize(%__MODULE__{
         destination: destination,
         direction_to_destination: direction_to_destination,
-        last_tomorrow_schedule: %Schedule{departure_time: departure_time, stop_headsign: headsign}
+        last_tomorrow_schedule:
+          %Schedule{
+            departure_time: departure_time
+          } = schedule
       }) do
     {:ok, local_departure_time} = DateTime.shift_zone(departure_time, "America/New_York")
-    {headsign_stop, headsign_via} = format_headsign(headsign)
+
+    {headsign_stop, headsign_via} =
+      format_headsign(Departure.headsign(%Departure{schedule: schedule}))
 
     %{
       direction: direction_to_destination,
@@ -36,6 +42,8 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
       last_schedule_headsign_via: serialize_via_string(destination, headsign_via)
     }
   end
+
+  defp serialize_via_string(_destination, nil), do: nil
 
   defp serialize_via_string(destination, via_string) do
     via_station = String.replace(via_string, "via ", "")

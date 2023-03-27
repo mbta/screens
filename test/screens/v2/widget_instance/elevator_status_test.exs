@@ -1,4 +1,4 @@
-defmodule WidgetInstance.ElevatorStatusTest do
+defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.WidgetInstance

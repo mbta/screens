@@ -1,6 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   @moduledoc false
 
+  require Logger
+
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.Departures
@@ -141,12 +143,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          fetch_schedules_fn,
          fetch_vehicles_fn
        ) do
-    stops_with_live_departures =
-      departures |> Enum.map(&{Departure.stop_id(&1), Departure.direction_id(&1)}) |> Enum.uniq()
+    routes_with_live_departures =
+      departures |> Enum.map(&{Departure.route_id(&1), Departure.direction_id(&1)}) |> Enum.uniq()
 
     overnight_schedules_for_section =
       get_overnight_schedules_for_section(
-        stops_with_live_departures,
+        routes_with_live_departures,
         params,
         routes,
         alert,
@@ -396,7 +398,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   # No predictions AND no active alerts for the section
   defp get_overnight_schedules_for_section(
-         stops_with_live_departures,
+         routes_with_live_departures,
          params,
          routes,
          nil,
@@ -412,32 +414,41 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         Enum.map(routes, & &1.id)
       )
 
-    # Get schedules for each stop_id in config
+    # Get schedules for each route_id in config
     today_schedules
-    |> Enum.map(&{&1.stop.id, &1.direction_id})
+    |> Enum.map(&{&1.route.id, &1.direction_id})
     |> Enum.uniq()
-    |> Enum.reject(&(&1 in stops_with_live_departures))
-    |> Enum.map(fn {stop_id, direction_id} ->
+    |> Enum.reject(&(&1 in routes_with_live_departures))
+    |> Enum.map(fn {route_id, direction_id} ->
       # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
       # we do not display overnight mode.
 
       last_schedule_today =
-        Enum.find(
-          today_schedules,
-          struct(Schedule, departure_time: now),
-          &(&1.stop.id == stop_id and &1.direction_id == direction_id)
-        )
+        Enum.find(today_schedules, &(&1.route.id == route_id and &1.direction_id == direction_id))
 
       first_schedule_tomorrow =
         Enum.find(
           tomorrow_schedules,
-          struct(Schedule, departure_time: now),
-          &(&1.stop.id == stop_id and &1.direction_id == direction_id)
+          &(&1.route.id == route_id and &1.direction_id == direction_id)
         )
 
-      if DateTime.compare(now, last_schedule_today.departure_time) == :gt and
-           DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt do
-        %Departure{schedule: first_schedule_tomorrow}
+      cond do
+        is_nil(last_schedule_today) or is_nil(first_schedule_tomorrow) ->
+          nil
+
+        DateTime.compare(now, first_schedule_tomorrow.departure_time) == :gt ->
+          Logger.warn(
+            "[get_overnight_schedules_for_section] now is after first_schedule_tomorrow."
+          )
+
+          nil
+
+        DateTime.compare(now, last_schedule_today.departure_time) == :gt and
+            DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt ->
+          %Departure{schedule: first_schedule_tomorrow}
+
+        true ->
+          nil
       end
     end)
     # Routes not in overnight mode will be nil. Can ignore those.
@@ -533,7 +544,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   defp get_route_pills_for_rotation(sections) do
     sections
     |> Enum.flat_map(fn %{routes: routes} ->
-      Enum.map(routes, &Route.get_icon_from_route/1)
+      Enum.map(routes, &Route.get_icon_or_color_from_route/1)
     end)
     |> Enum.uniq()
   end

@@ -114,6 +114,8 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
 
   defp delayed_clause(_), do: ""
 
+  defp render_headsign(%{headsign: headsign, station_service_list: []}), do: ~E|<%= headsign %>|
+
   defp render_headsign(%{headsign: headsign, station_service_list: [station1, station2]}) do
     via_string =
       cond do
