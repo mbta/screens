@@ -22,7 +22,7 @@ defmodule Screens.Schedules.Schedule do
           departure_time: DateTime.t() | nil,
           stop_headsign: String.t() | nil,
           track_number: pos_integer() | nil,
-          direction_id: 0 | 1 | :both
+          direction_id: 0 | 1
         }
 
   @spec fetch(Departure.query_params(), String.t() | nil) :: {:ok, list(t())} | :error
