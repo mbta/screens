@@ -47,7 +47,7 @@ const getKey = (elt: string | FreeTextElementType) => {
 const Icon = ({ icon }: { icon: string }) => {
   let iconElt;
 
-  if (icon === null) {
+  if (!icon) {
     iconElt = null;
   } else if (textPills.includes(icon)) {
     iconElt = <TextRoutePill route={icon} />;
