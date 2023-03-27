@@ -187,8 +187,17 @@ defmodule Screens.Util do
     To avoid duplicate DateTime calculations existing throughout the code,
     this function will handle the actual calculations needed to get the next service day.
   """
-  @spec get_service_day_tomorrow(DateTime.t()) :: DateTime.t()
+  @spec get_service_day_tomorrow(DateTime.t()) :: Date.t()
   def get_service_day_tomorrow(now) do
-    DateTime.add(now, 60 * 60 * 21)
+    {:ok, now_eastern} = DateTime.shift_zone(now, "America/New_York")
+
+    # If it is at least 3am, the current date matches the service date. Adding a day will give the current service day for tomorrow.
+    # If current time is between 12am and 3am, the date has changed but we are still in service for the previous day.
+    # That means the current day represents tomorrow's service day.
+    if now_eastern.hour >= 3 do
+      Date.add(now_eastern, 1)
+    else
+      DateTime.to_date(now_eastern)
+    end
   end
 end
