@@ -26,7 +26,15 @@ interface SlashedPill extends BasePill {
   part2: string;
 }
 
-type Color = "red" | "orange" | "green" | "blue" | "purple" | "yellow" | "teal";
+type Color =
+  | "red"
+  | "orange"
+  | "green"
+  | "blue"
+  | "purple"
+  | "yellow"
+  | "teal"
+  | "silver";
 
 type PillIcon = "bus" | "light_rail" | "rail" | "boat";
 

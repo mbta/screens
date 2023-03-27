@@ -36,7 +36,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
        ) do
     sections_data =
       sections
-      |> Task.async_stream(fetch_section_departures_fn, timeout: :infinity)
+      |> Task.async_stream(fetch_section_departures_fn, timeout: 30_000)
       |> Enum.map(fn {:ok, data} -> data end)
       |> post_processing_fn.(config)
 

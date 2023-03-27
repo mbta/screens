@@ -41,7 +41,8 @@ defmodule Screens.Schedules.Parser do
     %{
       "arrival_time" => arrival_time_string,
       "departure_time" => departure_time_string,
-      "stop_headsign" => stop_headsign
+      "stop_headsign" => stop_headsign,
+      "direction_id" => direction_id
     } = attributes
 
     arrival_time = parse_time(arrival_time_string)
@@ -67,7 +68,8 @@ defmodule Screens.Schedules.Parser do
       arrival_time: arrival_time,
       departure_time: departure_time,
       stop_headsign: stop_headsign,
-      track_number: track_number
+      track_number: track_number,
+      direction_id: direction_id
     }
   end
 
