@@ -470,7 +470,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
        when type in [:subway, :light_rail] do
     informed_route = get_section_route_from_alert(params.stop_ids, alert)
     # If there are no vehicles operating on the route, assume we are overnight.
-    if fetch_vehicles_fn.(informed_route.id, nil) == [] do
+    if not is_nil(informed_route) and fetch_vehicles_fn.(informed_route, nil) == [] do
       get_overnight_schedules_for_section(
         stops_with_live_departures,
         params,
