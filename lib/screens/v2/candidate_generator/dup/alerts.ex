@@ -19,7 +19,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   Fetches alerts + related data from the API and transforms them to candidate
   widgets for a DUP screen.
   """
-  def alert_instances(config, now \\ DateTime.utc_now()) do
+  def alert_instances(
+        config,
+        now \\ DateTime.utc_now(),
+        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
+        fetch_routes_by_stop_fn \\ &Route.fetch_routes_by_stop/3,
+        fetch_alerts_fn \\ &Alert.fetch/1,
+        fetch_parent_station_sequences_fn \\ &RoutePattern.fetch_parent_station_sequences_through_stop/2
+      ) do
     # In this function:
     # - Fetch relevant alerts for all SUBWAY/LIGHT RAIL routes serving this stop
     # - Check for special cases. If there is one, just use that. Otherwise:
@@ -27,18 +34,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     # - Create 3 candidate structs from the alert, one for each rotation
     %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}}} = config
 
-    stop_name = Stop.fetch_stop_name(config.app_params.header.stop_id)
+    stop_name = fetch_stop_name_fn.(config.app_params.header.stop_id)
 
     with {:ok, subway_routes_at_stop} <-
-           Route.fetch_routes_by_stop(stop_id, now, [:light_rail, :subway]),
+           fetch_routes_by_stop_fn.(stop_id, now, [:light_rail, :subway]),
          subway_route_ids_at_stop =
            for(%{route_id: id} <- subway_routes_at_stop, id != "Mattapan", do: id),
-         {:ok, alerts} <- Alert.fetch(route_ids: subway_route_ids_at_stop),
+         {:ok, alerts} <- fetch_alerts_fn.(route_ids: subway_route_ids_at_stop),
          {:ok, stop_sequences} <-
-           RoutePattern.fetch_parent_station_sequences_through_stop(
-             stop_id,
-             subway_route_ids_at_stop
-           ) do
+           fetch_parent_station_sequences_fn.(stop_id, subway_route_ids_at_stop) do
       alerts
       |> Enum.filter(&relevant_alert?(&1, config, stop_sequences, subway_routes_at_stop, now))
       |> alert_special_cases(config)

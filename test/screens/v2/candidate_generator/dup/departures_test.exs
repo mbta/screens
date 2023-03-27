@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{Departures, Header}
+  alias Screens.Config.V2.{Alerts, Departures, Header}
   alias Screens.Config.V2.Departures.{Headway, Query, Section}
   alias Screens.Config.V2.Dup, as: DupConfig
   alias Screens.Predictions.Prediction
@@ -28,7 +28,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %Section{query: %Query{params: %Query.Params{stop_ids: ["place-C"]}}, filter: nil},
             %Section{query: %Query{params: %Query.Params{stop_ids: ["place-D"]}}, filter: nil}
           ]
-        }
+        },
+        alerts: struct(Alerts)
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -45,7 +46,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}, filter: nil}
           ]
         },
-        secondary_departures: %Departures{sections: []}
+        secondary_departures: %Departures{sections: []},
+        alerts: struct(Alerts)
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -66,7 +68,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil}
           ]
         },
-        secondary_departures: %Departures{sections: []}
+        secondary_departures: %Departures{sections: []},
+        alerts: struct(Alerts)
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -86,7 +89,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             }
           ]
         },
-        secondary_departures: %Departures{sections: []}
+        secondary_departures: %Departures{sections: []},
+        alerts: struct(Alerts)
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -106,7 +110,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             }
           ]
         },
-        secondary_departures: %Departures{sections: []}
+        secondary_departures: %Departures{sections: []},
+        alerts: struct(Alerts)
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -141,7 +146,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               filter: nil
             }
           ]
-        }
+        },
+        alerts: struct(Alerts)
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -172,7 +178,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               filter: nil
             }
           ]
-        }
+        },
+        alerts: struct(Alerts)
       },
       vendor: :outfront,
       device_id: "TEST",
