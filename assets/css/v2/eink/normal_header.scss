@@ -97,3 +97,14 @@
   width: 25px;
   margin-right: 4px;
 }
+
+.normal-header__environment {
+  @include font--text--75bold;
+  position: relative;
+  padding-left: 40px;
+  padding-top: 10px;
+  font-size: 36px;
+  color: #ffffff;
+  letter-spacing: 0;
+  line-height: 48px;
+}
