@@ -386,6 +386,11 @@ defmodule Screens.Departures.Departure do
   end
 
   defp format_query_param({:date, %DateTime{} = date}) do
+    {:ok, dt_in_local_time} = DateTime.shift_zone(date, "America/New_York")
+    {"filter[date]", Date.to_iso8601(dt_in_local_time)}
+  end
+
+  defp format_query_param({:date, %Date{} = date}) do
     {"filter[date]", Date.to_iso8601(date)}
   end
 
