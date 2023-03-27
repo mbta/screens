@@ -136,11 +136,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          now,
          fetch_schedules_fn
        ) do
-    stops_with_live_departures = departures |> Enum.map(&Departure.stop_id/1) |> Enum.uniq()
+    routes_with_live_departures =
+      departures |> Enum.map(&{Departure.route_id(&1), Departure.direction_id(&1)}) |> Enum.uniq()
 
     overnight_schedules_for_section =
       get_overnight_schedules_for_section(
-        stops_with_live_departures,
+        routes_with_live_departures,
         params,
         routes,
         alert,
@@ -378,8 +379,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   # If we are currently overnight, returns the first schedule of the day for each route_id and direction for each stop.
   # Otherwise, return an empty list.
   defp get_overnight_schedules_for_section(
-         stops_with_live_departures,
-         stop_ids,
+         routes_with_live_departures,
+         params,
          routes_serving_section,
          alert,
          now,
@@ -388,9 +389,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   # No predictions AND no active alerts for the section
   defp get_overnight_schedules_for_section(
-         stops_with_live_departures,
+         routes_with_live_departures,
          params,
-         [%{type: :bus} | _] = routes,
+         routes,
          nil,
          now,
          fetch_schedules_fn
@@ -403,17 +404,23 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         Enum.map(routes, & &1.id)
       )
 
-    # Get schedules for each stop_id in config
+    # Get schedules for each route_id in config
     today_schedules
-    |> Enum.map(& &1.stop.id)
+    |> Enum.map(&{&1.route.id, &1.direction_id})
     |> Enum.uniq()
-    |> Enum.reject(&(&1 in stops_with_live_departures))
-    |> Enum.map(fn stop_id ->
+    |> Enum.reject(&(&1 in routes_with_live_departures))
+    |> Enum.map(fn {route_id, direction_id} ->
       # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
       # we do not display overnight mode.
 
-      last_schedule_today = Enum.find(today_schedules, &(&1.stop.id == stop_id))
-      first_schedule_tomorrow = Enum.find(tomorrow_schedules, &(&1.stop.id == stop_id))
+      last_schedule_today =
+        Enum.find(today_schedules, &(&1.route.id == route_id and &1.direction_id == direction_id))
+
+      first_schedule_tomorrow =
+        Enum.find(
+          tomorrow_schedules,
+          &(&1.route.id == route_id and &1.direction_id == direction_id)
+        )
 
       cond do
         is_nil(last_schedule_today) or is_nil(first_schedule_tomorrow) ->
