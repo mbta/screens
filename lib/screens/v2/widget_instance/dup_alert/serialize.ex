@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   Functions to serialize data for the DUP alert widget.
   """
 
+  alias Screens.Alerts.Alert
   alias Screens.Config.V2.FreeTextLine
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.DupAlert
@@ -41,6 +42,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     }
   end
 
+  # TO BE DONE: Move these closer to the FreeText modules and make public so they're generally available
+  #       https://app.asana.com/0/1185117109217422/1204252210980218/f
   # Provides a pattern-matchable shorthand for bolding some text
   defmacrop bold(str) do
     quote do
@@ -111,7 +114,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
           ["No"] ++ build_line_text.("or") ++ ["trains to #{headsign}"]
         else
-          ["No"] ++ build_line_text.("or") ++ ["trains", small(get_cause_string(t.alert.cause))]
+          ["No"] ++
+            build_line_text.("or") ++ ["trains", small(Alert.get_cause_string(t.alert.cause))]
         end
 
       2 ->
@@ -155,33 +159,6 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
       hs -> hs
     end
   end
-
-  @alert_cause_mapping %{
-    accident: "an accident",
-    construction: "construction",
-    disabled_train: "a disabled train",
-    fire: "a fire",
-    holiday: "the holiday",
-    maintenance: "maintenance",
-    medical_emergency: "a medical emergency",
-    police_action: "police action",
-    power_problem: "a power issue",
-    signal_problem: "a signal problem",
-    snow: "snow conditions",
-    special_event: "a special event",
-    switch_problem: "a switch problem",
-    track_problem: "a track problem",
-    traffic: "traffic",
-    weather: "weather conditions"
-  }
-
-  for {cause, cause_text} <- @alert_cause_mapping do
-    defp get_cause_string(unquote(cause)) do
-      "due to #{unquote(cause_text)}"
-    end
-  end
-
-  defp get_cause_string(_), do: ""
 
   defp partial_headsign_special_cases(["No", bold("Ashmont/Braintree"), "trains"]) do
     ["No", bold("Ashmont/Braintree")]

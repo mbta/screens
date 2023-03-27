@@ -2,7 +2,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
   use ExUnit.Case, async: true
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{Departures, Header}
+  alias Screens.Config.V2.{Alerts, Departures, Header}
   alias Screens.Config.V2.Dup, as: DupConfig
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.WidgetInstance.NormalHeader
@@ -12,7 +12,8 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       app_params: %DupConfig{
         header: %Header.CurrentStopId{stop_id: "place-gover"},
         primary_departures: struct(Departures),
-        secondary_departures: struct(Departures)
+        secondary_departures: struct(Departures),
+        alerts: struct(Alerts)
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -24,7 +25,8 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       app_params: %DupConfig{
         header: %Header.CurrentStopName{stop_name: "Gov Center"},
         primary_departures: struct(Departures),
-        secondary_departures: struct(Departures)
+        secondary_departures: struct(Departures),
+        alerts: struct(Alerts)
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -87,6 +89,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       fetch_stop_fn = fn "place-gover" -> "Government Center" end
       departures_instances_fn = fn _, _ -> [] end
       evergreen_content_instances_fn = fn _ -> [] end
+      alerts_instances_fn = fn _, _ -> [] end
 
       expected_headers =
         List.duplicate(
@@ -105,7 +108,8 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           now,
           fetch_stop_fn,
           evergreen_content_instances_fn,
-          departures_instances_fn
+          departures_instances_fn,
+          alerts_instances_fn
         )
 
       assert Enum.all?(expected_headers, &Enum.member?(actual_instances, &1))
