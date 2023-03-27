@@ -223,6 +223,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       else
         section_departures =
           case fetch_section_departures_fn.(section) do
+            {:ok, []} ->
+              []
+
             {:ok, section_departures} ->
               # If the section is configured as bidirectional,
               # it needs to show one departure in each direction
