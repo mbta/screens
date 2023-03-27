@@ -148,6 +148,16 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     Map.merge(route, %{color: Route.get_color_for_route(route_id)})
   end
 
+  def serialize_icon(icon) do
+    case icon do
+      :bus -> %{type: :icon, icon: :bus, color: :yellow}
+      :cr -> %{type: :icon, icon: :rail, color: :purple}
+      :silver -> %{type: :text, text: "SL", color: :silver}
+      :ferry -> %{type: :icon, icon: :boat, color: :teal}
+      route_color -> do_serialize("#{String.capitalize(route_color)}", %{})
+    end
+  end
+
   @typep serialize_opts :: %{
            optional(:gl_branch) => boolean(),
            optional(:gl_long) => boolean(),

@@ -4,6 +4,7 @@ defmodule Screens.V2.Departure do
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
+  alias Screens.Stops.Stop
   alias Screens.Trips.Trip
   alias Screens.V2.Departure.Builder
   alias Screens.Vehicles.Vehicle
@@ -160,6 +161,14 @@ defmodule Screens.V2.Departure do
   end
 
   def scheduled_time(_), do: nil
+
+  def stop_id(%__MODULE__{prediction: %Prediction{stop: %Stop{id: stop_id}}}) do
+    stop_id
+  end
+
+  def stop_id(%__MODULE__{prediction: nil, schedule: %Schedule{stop: %Stop{id: stop_id}}}) do
+    stop_id
+  end
 
   def stop_type(%__MODULE__{
         prediction: %Prediction{arrival_time: arrival_time, departure_time: departure_time}

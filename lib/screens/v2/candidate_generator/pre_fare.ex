@@ -83,7 +83,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       fn -> blue_bikes_instances_fn.(config) end,
       fn -> shuttle_bus_info_instances(config, now) end
     ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
+    |> Task.async_stream(& &1.(), ordered: false, timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
@@ -98,7 +98,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       fn -> alerts_intro_instances(widgets, config) end,
       fn -> alerts_outro_instances(widgets, config) end
     ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
+    |> Task.async_stream(& &1.(), ordered: false, timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 

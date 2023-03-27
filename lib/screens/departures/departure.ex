@@ -385,8 +385,17 @@ defmodule Screens.Departures.Departure do
     {"include", Enum.join(relationships, ",")}
   end
 
+  defp format_query_param({:date, %DateTime{} = date}) do
+    {:ok, dt_in_local_time} = DateTime.shift_zone(date, "America/New_York")
+    {"filter[date]", Date.to_iso8601(dt_in_local_time)}
+  end
+
+  defp format_query_param({:date, %Date{} = date}) do
+    {"filter[date]", Date.to_iso8601(date)}
+  end
+
   defp format_query_param({:date, date}) do
-    {"date", date}
+    {"filter[date]", date}
   end
 
   defp format_query_param({:route_type, nil}) do

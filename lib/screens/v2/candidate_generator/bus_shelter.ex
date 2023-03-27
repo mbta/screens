@@ -63,7 +63,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
       fn -> evergreen_content_instances_fn.(config) end,
       fn -> survey_instances(config) end
     ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
+    |> Task.async_stream(& &1.(), ordered: false, timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
