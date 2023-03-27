@@ -25,7 +25,8 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       app_params: %DupConfig{
         header: %Header.CurrentStopName{stop_name: "Gov Center"},
         primary_departures: struct(Departures),
-        secondary_departures: struct(Departures)
+        secondary_departures: struct(Departures),
+        alerts: struct(Alerts)
       },
       vendor: :outfront,
       device_id: "TEST",
