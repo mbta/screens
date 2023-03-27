@@ -157,4 +157,11 @@ defmodule Screens.Routes.Route do
   def get_color_for_route(_, :rail), do: :purple
   def get_color_for_route(_, :ferry), do: :teal
   def get_color_for_route(_, _), do: :yellow
+
+  def get_icon_or_color_from_route(%{type: :rail}), do: :cr
+  def get_icon_or_color_from_route(%{short_name: "SL" <> _}), do: :silver
+  def get_icon_or_color_from_route(%{type: :bus}), do: :bus
+  def get_icon_or_color_from_route(%{type: :ferry}), do: :ferry
+  def get_icon_or_color_from_route(%{id: id}), do: get_color_for_route(id)
+  def get_icon_or_color_from_route(_), do: :yellow
 end

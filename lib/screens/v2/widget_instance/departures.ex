@@ -83,17 +83,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(%{type: :no_data_section, route: route}, _screen, _) do
-    icon =
-      case route do
-        %{type: :rail} -> :cr
-        %{short_name: "SL" <> _} -> :silver
-        %{type: :bus} -> :bus
-        %{id: id} -> Route.get_color_for_route(id)
-        _ -> ""
-      end
-
     text = %FreeTextLine{
-      icon: icon,
+      icon: Route.get_icon_or_color_from_route(route),
       text: ["Updates unavailable"]
     }
 
@@ -140,6 +131,20 @@ defmodule Screens.V2.WidgetInstance.Departures do
       |> Enum.map(&serialize_row(&1, screen))
 
     %{type: :normal_section, rows: rows}
+  end
+
+  def serialize_section(%{type: :overnight_section, routes: routes}, _, _) do
+    route_pill =
+      routes
+      |> Enum.map(&Route.get_icon_or_color_from_route/1)
+      |> List.first()
+
+    text = %FreeTextLine{
+      icon: route_pill,
+      text: ["Service resumes in the morning"]
+    }
+
+    %{type: :overnight_section, text: FreeTextLine.to_json(text)}
   end
 
   def audio_serialize_section(%{type: :notice_section, text: text}, _screen) do
@@ -338,7 +343,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           %{type: :minutes, minutes: minute_diff}
 
         true ->
-          serialize_timestamp(departure_time)
+          serialize_timestamp(departure_time, now)
       end
 
     %{time: time}
@@ -368,7 +373,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           %{type: :minutes, minutes: minute_diff}
 
         true ->
-          serialize_timestamp(departure_time)
+          serialize_timestamp(departure_time, now)
       end
 
     %{time: time}
@@ -382,7 +387,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     if is_nil(scheduled_time) do
       %{time: serialized_time}
     else
-      serialized_scheduled_time = serialize_timestamp(scheduled_time)
+      serialized_scheduled_time = serialize_timestamp(scheduled_time, now)
 
       case serialized_time do
         %{type: :text} ->
@@ -397,12 +402,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
   end
 
-  defp serialize_timestamp(departure_time) do
+  defp serialize_timestamp(departure_time, now) do
     {:ok, local_time} = DateTime.shift_zone(departure_time, "America/New_York")
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
     minute = local_time.minute
     am_pm = if local_time.hour >= 12, do: :pm, else: :am
-    %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm}
+    show_am_pm = Util.get_service_day_tomorrow(now).day == local_time.day
+    %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm, show_am_pm: show_am_pm}
   end
 
   defp serialize_crowding(departure) do
