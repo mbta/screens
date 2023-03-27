@@ -162,7 +162,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
       alerts
       |> Enum.filter(fn a -> a.effect === :shuttle end)
       |> Enum.map(
-        &check_entities_for_stops(&1, [
+        &get_branch_if_entity_matches_stop(&1, [
           %{branch: "b", stop: "70149"},
           %{branch: "c", stop: "70211"},
           %{branch: "d", stop: "70187"}
@@ -260,9 +260,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     end
   end
 
-  @spec check_entities_for_stops(Alert.t(), list(%{branch: String.t(), stop: String.t()})) ::
+  # Given an alert, see if any of its informed entities match a list of stops-of-interest (called stop_matchers here).
+  # If it has an informed entity on the list, return its branch.
+  @spec get_branch_if_entity_matches_stop(Alert.t(), list(%{branch: String.t(), stop: String.t()})) ::
           atom()
-  def check_entities_for_stops(%{informed_entities: informed_entities}, stop_matchers) do
+  def get_branch_if_entity_matches_stop(%{informed_entities: informed_entities}, stop_matchers) do
     Enum.find(stop_matchers, fn stop ->
       Enum.any?(informed_entities, fn e ->
         stop.stop === e.stop
