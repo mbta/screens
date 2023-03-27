@@ -51,7 +51,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   end
 
   # WTC is a special bus-only case
-  @spec get_route_type_filter(String.t())
+  @spec get_route_type_filter(String.t()) :: list(atom())
   defp get_route_type_filter("place-wtcst"), do: [:bus]
   defp get_route_type_filter(stop_id), do: [:light_rail, :subway]
 
@@ -147,12 +147,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
          alerts,
          %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}}}
        ) do
-    cond do
-      stop_id === "place-kencl" -> kenmore_special_case(alerts)
-      stop_id === "place-wtcst" -> wtc_special_case(alerts)
-      # precise case where there is an SL alert detouring through a particular location
-      # -> {:special, widgets}
-      true -> {:normal, alerts}
+    case stop_id do
+      "place-kencl" -> kenmore_special_case(alerts)
+      "place-wtcst" -> wtc_special_case(alerts)
+      _ -> {:normal, alerts}
     end
   end
 
