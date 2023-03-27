@@ -29,13 +29,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
     stop_name = Stop.fetch_stop_name(config.app_params.header.stop_id)
 
-    # WTC is a special bus-only case
-    route_type_filter =
-      if stop_id === "place-wtcst",
-        do: [:bus],
-        else:
-          [:light_rail, :subway]
-          |> Enum.map(&Screens.RouteType.to_id/1)
+    route_type_filter = get_route_type_filter(stop_id)
 
     with {:ok, subway_routes_at_stop} <-
            Route.fetch_routes_by_stop(stop_id, now, route_type_filter),
@@ -55,6 +49,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
       :error -> []
     end
   end
+
+  # WTC is a special bus-only case
+  @spec get_route_type_filter(String.t())
+  defp get_route_type_filter("place-wtcst"), do: [:bus]
+  defp get_route_type_filter(stop_id), do: [:light_rail, :subway]
 
   @doc """
   Chooses the most "important" alert to show on a DUP screen when there are several.
