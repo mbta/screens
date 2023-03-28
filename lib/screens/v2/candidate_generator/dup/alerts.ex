@@ -57,7 +57,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   # WTC is a special bus-only case
   @spec get_route_type_filter(String.t()) :: list(atom())
   defp get_route_type_filter("place-wtcst"), do: [:bus]
-  defp get_route_type_filter(stop_id), do: [:light_rail, :subway]
+  defp get_route_type_filter(_stop_id), do: [:light_rail, :subway]
 
   @doc """
   Chooses the most "important" alert to show on a DUP screen when there are several.
@@ -266,7 +266,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   # Given an alert, see if any of its informed entities match a list of stops-of-interest (called stop_matchers here).
   # If it has an informed entity on the list, return its branch.
-  @spec get_branch_if_entity_matches_stop(Alert.t(), list(%{branch: String.t(), stop: String.t()})) ::
+  @spec get_branch_if_entity_matches_stop(
+          Alert.t(),
+          list(%{branch: String.t(), stop: String.t()})
+        ) ::
           atom()
   def get_branch_if_entity_matches_stop(%{informed_entities: informed_entities}, stop_matchers) do
     Enum.find(stop_matchers, fn stop ->
