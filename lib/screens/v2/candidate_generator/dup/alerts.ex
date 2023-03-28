@@ -7,6 +7,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Alerts, as: AlertsConfig
   alias Screens.Config.V2.Dup
+  alias Screens.Config.V2.FreeText
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
@@ -281,7 +282,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     |> Map.get(:branch)
   end
 
-  @spec get_kenmore_special_text(list(atom()), atom()) :: list(FreeText.t())
+  @spec get_kenmore_special_text(list(String.t()), atom()) :: list(FreeText.t())
   def get_kenmore_special_text(["b", "c"], :partial_alert),
     do: ["No", %{format: :bold, text: "Bost Coll/Clvlnd Cir"}]
 
