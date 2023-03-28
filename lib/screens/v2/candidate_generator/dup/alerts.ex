@@ -7,7 +7,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Alerts, as: AlertsConfig
   alias Screens.Config.V2.Dup
-  alias Screens.Config.V2.FreeText
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
@@ -183,43 +182,24 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
        [
          %DupSpecialCaseAlert{
            alert_ids: alert_ids,
-           serialize_map: %{
-             text: %Screens.Config.V2.FreeTextLine{
-               icon: :warning,
-               text: get_kenmore_special_text(branches, :partial_alert)
-             },
-             color: :green
-           },
            widget_type: :partial_alert,
-           slot_names: [:bottom_pane_zero]
+           slot_names: [:bottom_pane_zero],
+           branches: branches,
+           special_case: :kenmore_westbound_shuttles
          },
          %DupSpecialCaseAlert{
            alert_ids: alert_ids,
-           serialize_map: %{
-             text: %Screens.Config.V2.FreeTextLine{
-               icon: :warning,
-               text: get_kenmore_special_text(branches, :takeover_alert)
-             },
-             header: %{color: :green, text: "Kenmore"},
-             remedy: %Screens.Config.V2.FreeTextLine{
-               icon: :shuttle,
-               text: [%{format: :bold, text: "Use shuttle bus"}]
-             }
-           },
            widget_type: :takeover_alert,
-           slot_names: [:full_rotation_one]
+           slot_names: [:full_rotation_one],
+           branches: branches,
+           special_case: :kenmore_westbound_shuttles
          },
          %DupSpecialCaseAlert{
            alert_ids: alert_ids,
-           serialize_map: %{
-             text: %Screens.Config.V2.FreeTextLine{
-               icon: :warning,
-               text: get_kenmore_special_text(branches, :partial_alert)
-             },
-             color: :green
-           },
            widget_type: :partial_alert,
-           slot_names: [:bottom_pane_two]
+           slot_names: [:bottom_pane_two],
+           branches: branches,
+           special_case: :kenmore_westbound_shuttles
          }
        ]}
     else
@@ -245,19 +225,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
        for rotation_index <- [:full_rotation_zero, :full_rotation_one, :full_rotation_two] do
          %DupSpecialCaseAlert{
            alert_ids: [alert.id],
-           serialize_map: %{
-             text: %Screens.Config.V2.FreeTextLine{
-               icon: :warning,
-               text: ["Building closed"]
-             },
-             header: %{color: :silver, text: "World Trade Ctr"},
-             remedy: %Screens.Config.V2.FreeTextLine{
-               icon: :shuttle,
-               text: [%{format: :bold, text: "Board Silver Line on street"}]
-             }
-           },
            widget_type: :takeover_alert,
-           slot_names: [rotation_index]
+           slot_names: [rotation_index],
+           special_case: :wtc_detour
          }
        end}
     else
@@ -281,62 +251,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     end)
     |> Map.get(:branch)
   end
-
-  @spec get_kenmore_special_text(list(String.t()), atom()) :: list(FreeText.t())
-  def get_kenmore_special_text(["b", "c"], :partial_alert),
-    do: ["No", %{format: :bold, text: "Bost Coll/Clvlnd Cir"}]
-
-  def get_kenmore_special_text(["b", "c"], :takeover_alert),
-    do: [
-      "No",
-      %{icon: "green_b"},
-      %{format: :bold, text: "Bost Coll"},
-      "or",
-      %{icon: "green_c"},
-      %{format: :bold, text: "Cleveland Cir"},
-      "trains"
-    ]
-
-  def get_kenmore_special_text(["b", "d"], :partial_alert),
-    do: ["No", %{format: :bold, text: "Bost Coll / Riverside"}]
-
-  def get_kenmore_special_text(["b", "d"], :takeover_alert),
-    do: [
-      "No",
-      %{icon: "green_b"},
-      %{format: :bold, text: "Bost Coll"},
-      "or",
-      %{icon: "green_d"},
-      %{format: :bold, text: "Riverside"},
-      "trains"
-    ]
-
-  def get_kenmore_special_text(["c", "d"], :partial_alert),
-    do: ["No", %{format: :bold, text: "Clvlnd Cir/Riverside"}]
-
-  def get_kenmore_special_text(["c", "d"], :takeover_alert),
-    do: [
-      "No",
-      %{icon: "green_c"},
-      %{format: :bold, text: "Cleveland Cir"},
-      "or",
-      %{icon: "green_d"},
-      %{format: :bold, text: "Riverside"},
-      "trains"
-    ]
-
-  def get_kenmore_special_text(["b", "c", "d"], :partial_alert),
-    do: ["No", %{format: :bold, text: "Westbound"}, "trains"]
-
-  def get_kenmore_special_text(["b", "c", "d"], :takeover_alert),
-    do: [
-      "No",
-      %{icon: "green_b"},
-      %{icon: "green_c"},
-      %{icon: "green_d"},
-      %{format: :bold, text: "Westbound"},
-      "trains"
-    ]
 
   for {effect, key} <- Enum.with_index([:shuttle, :suspension, :station_closure, :detour, :delay]) do
     defp effect_key(unquote(effect)), do: unquote(key)
