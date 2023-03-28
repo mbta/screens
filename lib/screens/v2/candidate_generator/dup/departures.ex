@@ -29,7 +29,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
         fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1,
         fetch_schedules_fn \\ &Screens.Schedules.Schedule.fetch/2,
-        create_station_with_routes_map_fn \\ &Screens.Stops.Stop.create_station_with_routes_map/1
+        create_station_with_routes_map_fn \\ &Screens.Stops.Stop.create_station_with_routes_map/1,
+        fetch_vehicles_fn \\ &Screens.Vehicles.Vehicle.by_route_and_direction/2
       ) do
     primary_departures_instances =
       primary_sections
@@ -48,7 +49,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           :main_content_reduced_one
         ],
         now,
-        fetch_schedules_fn
+        fetch_schedules_fn,
+        fetch_vehicles_fn
       )
 
     secondary_sections =
@@ -70,7 +72,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         config,
         [:main_content_two, :main_content_reduced_two],
         now,
-        fetch_schedules_fn
+        fetch_schedules_fn,
+        fetch_vehicles_fn
       )
 
     widget_instances = primary_departures_instances ++ secondary_departures_instances
@@ -88,7 +91,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          config,
          slot_ids,
          now,
-         fetch_schedules_fn
+         fetch_schedules_fn,
+         fetch_vehicles_fn
        ) do
     sections =
       Enum.map(
@@ -97,7 +101,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           &1,
           length(sections_data) == 1,
           now,
-          fetch_schedules_fn
+          fetch_schedules_fn,
+          fetch_vehicles_fn
         )
       )
 
@@ -126,7 +131,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     end)
   end
 
-  defp get_departure_instance_for_section(%{type: :no_data_section} = section, _, _, _),
+  defp get_departure_instance_for_section(%{type: :no_data_section} = section, _, _, _, _),
     do: section
 
   defp get_departure_instance_for_section(
@@ -140,7 +145,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          },
          is_only_section,
          now,
-         fetch_schedules_fn
+         fetch_schedules_fn,
+         fetch_vehicles_fn
        ) do
     routes_with_live_departures =
       departures |> Enum.map(&{Departure.route_id(&1), Departure.direction_id(&1)}) |> Enum.uniq()
@@ -152,7 +158,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         routes,
         alert,
         now,
-        fetch_schedules_fn
+        fetch_schedules_fn,
+        fetch_vehicles_fn
       )
 
     headway_mode = get_headway_mode(stop_ids, headway, alert, now)
@@ -388,12 +395,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   # If we are currently overnight, returns the first schedule of the day for each route_id and direction for each stop.
   # Otherwise, return an empty list.
   defp get_overnight_schedules_for_section(
-         routes_with_live_departures,
-         params,
+         stops_with_live_departures,
+         stop_ids,
          routes_serving_section,
          alert,
          now,
-         fetch_schedules_fn
+         fetch_schedules_fn,
+         fetch_vehicles_fn
        )
 
   # No predictions AND no active alerts for the section
@@ -403,7 +411,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          routes,
          nil,
          now,
-         fetch_schedules_fn
+         fetch_schedules_fn,
+         _
        ) do
     {today_schedules, tomorrow_schedules} =
       get_today_tomorrow_schedules(
@@ -455,7 +464,34 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     |> Enum.sort_by(fn %Departure{schedule: schedule} -> schedule.departure_time end)
   end
 
-  defp get_overnight_schedules_for_section(_, _, _, _, _, _), do: []
+  defp get_overnight_schedules_for_section(
+         stops_with_live_departures,
+         params,
+         [%{type: type} | _] = routes,
+         alert,
+         now,
+         fetch_schedules_fn,
+         fetch_vehicles_fn
+       )
+       when type in [:subway, :light_rail] do
+    informed_route = get_section_route_from_alert(params.stop_ids, alert)
+    # If there are no vehicles operating on the route, assume we are overnight.
+    if not is_nil(informed_route) and fetch_vehicles_fn.(informed_route, nil) == [] do
+      get_overnight_schedules_for_section(
+        stops_with_live_departures,
+        params,
+        routes,
+        nil,
+        now,
+        fetch_schedules_fn,
+        fetch_vehicles_fn
+      )
+    else
+      []
+    end
+  end
+
+  defp get_overnight_schedules_for_section(_, _, _, _, _, _, _), do: []
 
   defp get_today_tomorrow_schedules(
          fetch_params,

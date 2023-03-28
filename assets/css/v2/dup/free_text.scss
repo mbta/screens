@@ -307,3 +307,43 @@
     line-height: 117px;
   }
 }
+
+.overnight-section {
+  .free-text {
+    display: inline-block;
+    margin: 32px;
+  }
+
+  .free-text__line {
+    font-weight: 600;
+    font-size: 138px;
+    line-height: 128px;
+    color: #171f26;
+    width: 1576px;
+  }
+
+  .free-text__route-pill {
+    height: 128px;
+    width: 248px;
+    border-radius: 100px;
+    margin: 0 32px 0 0;
+  }
+
+  .free-text__route-pill__text {
+    font-size: 96px;
+    font-weight: 700;
+    line-height: 117px;
+  }
+
+  .free-text__icon-container {
+    width: 248px;
+    height: 144px;
+    margin-right: 32px;
+    vertical-align: top;
+  }
+
+  .free-text__icon-image {
+    height: 112.5px;
+    margin-top: 15.75px;
+  }
+}
