@@ -29,8 +29,6 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
   def serialize(t) do
     case t do
       %{special_case: :kenmore_westbound_shuttles, widget_type: :partial_alert} ->
-        IO.inspect("(1)")
-
         %{
           text: %Screens.Config.V2.FreeTextLine{
             icon: :warning,
