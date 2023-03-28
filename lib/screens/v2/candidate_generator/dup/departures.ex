@@ -12,6 +12,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.Routes.Route
   alias Screens.SignsUiConfig
   alias Screens.Util
+  alias Screens.V2.CandidateGenerator.Dup.Alerts, as: AlertsInstances
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
@@ -305,7 +306,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       _ ->
         false
     end)
-    |> List.first()
+    |> AlertsInstances.choose_alert()
   end
 
   defp get_headway_mode(_, _, nil, _), do: :inactive
