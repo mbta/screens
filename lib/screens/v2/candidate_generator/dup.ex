@@ -6,10 +6,13 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.Config.V2.Header.{CurrentStopId, CurrentStopName}
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Dup.Alerts, as: AlertsInstances
   alias Screens.V2.CandidateGenerator.Dup.Departures, as: DeparturesInstances
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
+
+  require Logger
 
   @behaviour CandidateGenerator
 
@@ -78,10 +81,12 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
-        departures_instances_fn \\ &DeparturesInstances.departures_instances/2
+        departures_instances_fn \\ &DeparturesInstances.departures_instances/2,
+        alerts_instances_fn \\ &AlertsInstances.alert_instances/2
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
+      fn -> alerts_instances_fn.(config, now) end,
       fn -> placeholder_instances() end,
       fn -> departures_instances_fn.(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end
@@ -89,8 +94,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     |> Task.async_stream(& &1.(), ordered: false, timeout: 30_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
-
-  ### Start Header
 
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
@@ -116,8 +119,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
     List.duplicate(%NormalHeader{screen: config, icon: :logo, text: stop_name, time: now}, 3)
   end
-
-  ### End Header
 
   defp placeholder_instances do
     [
