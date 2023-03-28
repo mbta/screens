@@ -192,6 +192,10 @@ config :screens,
     "place-portr" => [
       {"70064", "70068", "Alewife"},
       {"70067", "70063", "Ashmont/Braintree"}
+    ],
+    "place-welln" => [
+      {"70278", "70034", "Forest Hills"},
+      {"70035", "70279", "Oak Grove"}
     ]
   },
   dup_headsign_replacements: %{
