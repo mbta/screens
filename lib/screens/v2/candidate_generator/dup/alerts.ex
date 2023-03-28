@@ -272,7 +272,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
         ) ::
           atom()
   def get_branch_if_entity_matches_stop(%{informed_entities: informed_entities}, stop_matchers) do
-    Enum.find(stop_matchers, fn stop ->
+    stop_matchers
+    |> Enum.find(fn stop ->
       Enum.any?(informed_entities, fn e ->
         stop.stop === e.stop
       end)
