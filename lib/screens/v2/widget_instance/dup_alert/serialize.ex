@@ -9,7 +9,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   alias Screens.V2.WidgetInstance.DupAlert
 
   @type full_screen_alert_map :: %{
-          alert_text: FreeTextLine.t(),
+          text: FreeTextLine.t(),
           remedy: FreeTextLine.t(),
           header: %{
             text: String.t(),
@@ -18,14 +18,14 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
         }
 
   @type partial_alert_map :: %{
-          alert_text: FreeTextLine.t(),
+          text: FreeTextLine.t(),
           color: :red | :orange | :green | :blue
         }
 
   @spec serialize_full_screen(DupAlert.t()) :: full_screen_alert_map
   def serialize_full_screen(t) do
     %{
-      alert_text: %FreeTextLine{icon: :warning, text: issue_free_text(t)},
+      text: %FreeTextLine{icon: :warning, text: issue_free_text(t)},
       remedy: remedy_free_text_line(t),
       header: %{
         text: t.stop_name,
@@ -37,7 +37,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   @spec serialize_partial(DupAlert.t()) :: partial_alert_map
   def serialize_partial(t) do
     %{
-      alert_text: %FreeTextLine{icon: :warning, text: partial_alert_free_text(t)},
+      text: %FreeTextLine{icon: :warning, text: partial_alert_free_text(t)},
       color: line_color(t)
     }
   end

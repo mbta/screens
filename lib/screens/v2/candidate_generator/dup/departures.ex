@@ -42,7 +42,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       )
       |> sections_data_to_departure_instances(
         config,
-        [:main_content_zero, :main_content_one],
+        [
+          :main_content_zero,
+          :main_content_one,
+          :main_content_reduced_zero,
+          :main_content_reduced_one
+        ],
         now,
         fetch_schedules_fn,
         fetch_vehicles_fn
@@ -65,7 +70,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       )
       |> sections_data_to_departure_instances(
         config,
-        [:main_content_two],
+        [:main_content_two, :main_content_reduced_two],
         now,
         fetch_schedules_fn,
         fetch_vehicles_fn

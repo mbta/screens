@@ -17,7 +17,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
         } = config,
         now
       ) do
-    with {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(parent_station_id, now, [0, 1]),
+    with {:ok, routes_at_stop} <-
+           Route.fetch_routes_by_stop(parent_station_id, now, [:light_rail, :subway]),
          route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
          {:ok, stop_sequences} <-
            RoutePattern.fetch_parent_station_sequences_through_stop(
