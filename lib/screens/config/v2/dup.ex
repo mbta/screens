@@ -9,8 +9,7 @@ defmodule Screens.Config.V2.Dup do
           evergreen_content: list(EvergreenContentItem.t()),
           primary_departures: Departures.t(),
           secondary_departures: Departures.t(),
-          alerts: Alerts.t(),
-          evergreen_content: list(EvergreenContentItem.t())
+          alerts: Alerts.t()
         }
 
   @enforce_keys [:header, :primary_departures, :secondary_departures, :alerts]
