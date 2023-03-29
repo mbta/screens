@@ -191,12 +191,12 @@
 .no-data-section {
   .free-text {
     display: inline-block;
-    margin: 32px;
   }
 
   .free-text__line {
     font-weight: 600;
     line-height: 128px;
+    font-size: 138px;
     color: #171f26;
   }
 
@@ -204,7 +204,8 @@
     height: 144px;
     width: 248px;
     border-radius: 72px;
-    margin: 0 32px 0 0;
+    font-size: 96px;
+    line-height: 117px;
   }
 
   .free-text__route-pill__text {
@@ -215,10 +216,8 @@
   }
 
   .free-text__icon-container {
-    width: 248px;
-    height: 144px;
-    margin-right: 32px;
-    vertical-align: top;
+    width: 312px;
+    height: 208px;
   }
 
   .free-text__icon-image {
