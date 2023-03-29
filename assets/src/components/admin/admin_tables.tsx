@@ -470,6 +470,14 @@ const DupV2ScreensTable = (): JSX.Element => {
       FormCell: FormTextarea,
     },
     {
+      Header: "Alerts",
+      accessor: buildAppParamAccessor("alerts"),
+      mutator: buildAppParamMutator("alerts"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
       Header: "Evergreen Content",
       accessor: buildAppParamAccessor("evergreen_content"),
       mutator: buildAppParamMutator("evergreen_content"),
