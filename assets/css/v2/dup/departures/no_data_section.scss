@@ -1,12 +1,16 @@
 .no-data-section {
   width: 1920px;
-  height: 416px;
+
+  &__icon-container {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    margin-left: 32px;
+  }
 
   &__no-connection-icon {
-    display: inline-block;
     height: 144px;
     width: 144px;
-    vertical-align: middle;
   }
 
   &__row {

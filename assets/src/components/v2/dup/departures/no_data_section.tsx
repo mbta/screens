@@ -8,10 +8,12 @@ const NoDataSection = ({ text }) => {
     <div className="departures-section no-data-section">
       <div className="no-data-section__row">
         <FreeText lines={text} />
-        <NoConnection
-          className="no-data-section__no-connection-icon"
-          colorHex="#171F26"
-        />
+        <div className="no-data-section__icon-container">
+          <NoConnection
+            className="no-data-section__no-connection-icon"
+            colorHex="#171F26"
+          />
+        </div>
       </div>
     </div>
   );
