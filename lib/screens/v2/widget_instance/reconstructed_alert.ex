@@ -42,25 +42,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Green-E" => ["Heath Street", "Union Square"]
   }
 
-  @alert_cause_mapping %{
-    accident: "an accident",
-    construction: "construction",
-    disabled_train: "a disabled train",
-    fire: "a fire",
-    holiday: "the holiday",
-    maintenance: "maintenance",
-    medical_emergency: "a medical emergency",
-    police_action: "police action",
-    power_problem: "a power issue",
-    signal_problem: "a signal problem",
-    snow: "snow conditions",
-    special_event: "a special event",
-    switch_problem: "a switch problem",
-    track_problem: "a track problem",
-    traffic: "traffic",
-    weather: "weather conditions"
-  }
-
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
   defp get_affected_routes(informed_entities) do
@@ -130,7 +111,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = cause |> get_cause_text() |> String.capitalize()
+    cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
 
     location_text = get_endpoints(informed_entities, hd(affected_routes))
 
@@ -170,7 +151,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = cause |> get_cause_text() |> String.capitalize()
+    cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
 
     location_text = get_endpoints(informed_entities, hd(affected_routes))
 
@@ -208,7 +189,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = cause |> get_cause_text() |> String.capitalize()
+    cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
 
     %{
       issue: "Station Closed",
@@ -231,7 +212,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        ) do
     informed_entities = BaseAlert.informed_entities(t)
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = get_cause_text(cause)
+    cause_text = Alert.get_cause_string(cause)
 
     %{
       issue: "No trains",
@@ -248,7 +229,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = get_cause_text(cause)
+    cause_text = Alert.get_cause_string(cause)
 
     %{
       issue: "No trains",
@@ -269,7 +250,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = get_cause_text(cause)
+    cause_text = Alert.get_cause_string(cause)
 
     line =
       case affected_routes do
@@ -318,7 +299,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = get_cause_text(cause)
+    cause_text = Alert.get_cause_string(cause)
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
     destination = get_destination(t, :inside)
 
@@ -377,7 +358,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       }
     else
       destination = get_destination(t, :boundary)
-      cause_text = get_cause_text(cause)
+      cause_text = Alert.get_cause_string(cause)
 
       issue =
         if is_nil(destination) do
@@ -419,7 +400,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       }
     else
       destination = get_destination(t, :boundary)
-      cause_text = get_cause_text(cause)
+      cause_text = Alert.get_cause_string(cause)
 
       issue =
         if is_nil(destination) do
@@ -484,7 +465,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         urgent: true
       }
     else
-      cause_text = get_cause_text(cause)
+      cause_text = Alert.get_cause_string(cause)
       {delay_description, delay_minutes} = Alert.interpret_severity(severity)
       destination = get_destination(t, :boundary)
 
@@ -534,7 +515,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       }
     else
       destination = get_destination(t, :outside)
-      cause_text = get_cause_text(cause)
+      cause_text = Alert.get_cause_string(cause)
       location_text = get_endpoints(informed_entities, hd(affected_routes))
 
       issue =
@@ -575,7 +556,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       }
     else
       destination = get_destination(t, :outside)
-      cause_text = get_cause_text(cause)
+      cause_text = Alert.get_cause_string(cause)
       location_text = get_endpoints(informed_entities, List.first(affected_routes))
 
       issue =
@@ -606,7 +587,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = BaseAlert.informed_entities(t)
 
     affected_routes = get_affected_routes(informed_entities)
-    cause_text = get_cause_text(cause)
+    cause_text = Alert.get_cause_string(cause)
 
     %{
       issue: "Trains will bypass #{informed_stations_string}",
@@ -631,15 +612,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: :delay,
       urgent: false
     }
-  end
-
-  defp get_cause_text(cause) do
-    if cause != :unknown do
-      cause_text = Map.get(@alert_cause_mapping, cause)
-      "due to #{cause_text}"
-    else
-      ""
-    end
   end
 
   def get_endpoints(ie, "Green") do

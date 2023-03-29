@@ -38,8 +38,19 @@
 }
 
 .departure-time__timestamp {
-  font-weight: 700;
-  font-size: 1em;
-  margin-right: 0.0694em;
-  line-height: 1.185em;
+  direction: rtl;
+}
+
+.departure-time__time {
+  font-weight: 800;
+  font-size: 138px;
+  line-height: 128px;
+}
+
+.departure-time__ampm {
+  margin-left: 20px;
+  font-weight: 400;
+  font-size: 96px;
+  line-height: 108px;
+  letter-spacing: 2px;
 }

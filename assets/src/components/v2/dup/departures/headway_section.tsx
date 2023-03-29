@@ -3,7 +3,7 @@ import FreeText from "Components/v2/free_text";
 
 const HeadwaySection = ({ text }) => {
   return (
-    <div className="headway-section">
+    <div className="departures-section headway-section">
       <FreeText lines={text} />
     </div>
   );

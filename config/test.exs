@@ -30,7 +30,8 @@ config :screens,
     "place-kencl" => [
       {"70211", ~w[70153 70149 70187], "Cleveland Circle"},
       {"70152", ~w[70148 70212 70186], "Park Street"}
-    ]
+    ],
+    "place-overnight" => [{"place-overnight", "not_informed", "Test"}]
   }
 
 config :screens, ScreensWeb.AuthManager, secret_key: "test key"

@@ -101,4 +101,20 @@ defmodule Screens.UtilTest do
       assert time_in_range?(t, start_time, stop_time)
     end
   end
+
+  describe "get_service_day_tomorrow/1" do
+    test "returns the next day if current day matches service day" do
+      now_eastern = DateTime.new!(~D[2022-01-01], ~T[09:00:00], "America/New_York")
+      now = DateTime.shift_zone!(now_eastern, "Etc/UTC")
+      expected = ~D[2022-01-02]
+      assert(expected == get_service_day_tomorrow(now))
+    end
+
+    test "returns the current day if between 12am and 3am" do
+      now_eastern = DateTime.new!(~D[2022-01-01], ~T[00:00:00], "America/New_York")
+      now = DateTime.shift_zone!(now_eastern, "Etc/UTC")
+      expected = ~D[2022-01-01]
+      assert expected == get_service_day_tomorrow(now)
+    end
+  end
 end

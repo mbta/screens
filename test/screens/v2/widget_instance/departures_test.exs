@@ -613,7 +613,17 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
     test "correctly serializes timestamps", %{bus_shelter_screen: screen} do
       serialized_timestamp = [
-        %{id: nil, crowding: nil, time: %{type: :timestamp, am_pm: :am, hour: 12, minute: 20}}
+        %{
+          id: nil,
+          crowding: nil,
+          time: %{
+            type: :timestamp,
+            am_pm: :am,
+            hour: 12,
+            minute: 20,
+            show_am_pm: true
+          }
+        }
       ]
 
       now = ~U[2020-01-01T00:00:00Z]
@@ -650,8 +660,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                %{
                  id: nil,
                  crowding: nil,
-                 time: %{am_pm: :pm, hour: 9, minute: 20, type: :timestamp},
-                 scheduled_time: %{am_pm: :pm, hour: 9, minute: 15, type: :timestamp}
+                 time: %{am_pm: :pm, hour: 9, minute: 20, type: :timestamp, show_am_pm: false},
+                 scheduled_time: %{
+                   am_pm: :pm,
+                   hour: 9,
+                   minute: 15,
+                   type: :timestamp,
+                   show_am_pm: false
+                 }
                }
              ] ==
                Departures.serialize_times_with_crowding([departure], screen, now)

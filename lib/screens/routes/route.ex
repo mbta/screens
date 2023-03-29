@@ -1,6 +1,7 @@
 defmodule Screens.Routes.Route do
   @moduledoc false
 
+  alias Screens.RouteType
   alias Screens.V3Api
 
   @sl_route_ids ~w[741 742 743 746 749 751]
@@ -18,7 +19,7 @@ defmodule Screens.Routes.Route do
           short_name: String.t(),
           long_name: String.t(),
           direction_destinations: list(String.t()),
-          type: Screens.RouteType.t()
+          type: RouteType.t()
         }
 
   def by_id(route_id) do
@@ -114,7 +115,11 @@ defmodule Screens.Routes.Route do
   end
 
   defp format_query_param({:route_types, route_types}) when is_list(route_types) do
-    [{"filter[type]", Enum.join(route_types, ",")}]
+    [{"filter[type]", Enum.map_join(route_types, ",", &RouteType.to_id/1)}]
+  end
+
+  defp format_query_param({:route_types, route_type}) do
+    format_query_param({:route_types, [route_type]})
   end
 
   defp format_query_param(_), do: []
@@ -157,4 +162,11 @@ defmodule Screens.Routes.Route do
   def get_color_for_route(_, :rail), do: :purple
   def get_color_for_route(_, :ferry), do: :teal
   def get_color_for_route(_, _), do: :yellow
+
+  def get_icon_or_color_from_route(%{type: :rail}), do: :cr
+  def get_icon_or_color_from_route(%{short_name: "SL" <> _}), do: :silver
+  def get_icon_or_color_from_route(%{type: :bus}), do: :bus
+  def get_icon_or_color_from_route(%{type: :ferry}), do: :ferry
+  def get_icon_or_color_from_route(%{id: id}), do: get_color_for_route(id)
+  def get_icon_or_color_from_route(_), do: :yellow
 end

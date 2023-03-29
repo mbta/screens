@@ -1,0 +1,44 @@
+.overnight-departures__container {
+  height: 832px;
+  .overnight-departures__image {
+    width: 1920px;
+
+    &--full {
+      height: 472px;
+    }
+
+    &--partial {
+      height: 314px;
+    }
+  }
+
+  .overnight-departures__text-container {
+    margin-left: 71px;
+
+    .overnight-departures__route-pill-container {
+      padding-top: 33px;
+
+      .route-pill {
+        display: inline-block;
+        height: 144px;
+        width: 279px;
+        border-radius: 100px;
+        margin: 0 40px 0 0;
+      }
+    }
+
+    .overnight-departures__text {
+      width: 1182px;
+      font-family: Inter, sans-serif;
+      font-weight: 600;
+      font-size: 138px;
+      line-height: 148px;
+
+      &:only-child {
+        font-weight: 700;
+        font-size: 138px;
+        line-height: 148px;
+      }
+    }
+  }
+}

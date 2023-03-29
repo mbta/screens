@@ -277,6 +277,8 @@ defmodule Screens.Stops.Stop do
     end
   end
 
+  # Returns a list of Route structs that serve the provided ID
+  @spec create_station_with_routes_map(String.t()) :: list(Routes.Route.t())
   def create_station_with_routes_map(station_id) do
     case StationsWithRoutesAgent.get(station_id) do
       {routes, date} ->
@@ -292,6 +294,16 @@ defmodule Screens.Stops.Stop do
           :error -> []
         end
     end
+  end
+
+  def get_routes_serving_stop_ids(stop_ids) do
+    stop_ids
+    |> Enum.flat_map(fn stop_id ->
+      stop_id
+      |> create_station_with_routes_map()
+      |> Enum.map(& &1.id)
+    end)
+    |> Enum.uniq()
   end
 
   def fetch_stop_name(stop_id) do

@@ -26,6 +26,8 @@ defmodule Screens.Config.V2.FreeTextLine do
           | :green_e
           | nil
 
+  @derive Jason.Encoder
+
   @enforce_keys ~w[icon text]a
   defstruct @enforce_keys
 
