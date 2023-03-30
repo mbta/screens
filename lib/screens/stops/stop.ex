@@ -8,6 +8,8 @@ defmodule Screens.Stops.Stop do
   So there's inconsistent use of this local data.
   """
 
+  use Retry.Annotation
+
   alias Screens.Routes
   alias Screens.Stops.StationsWithRoutesAgent
   alias Screens.V3Api
@@ -245,6 +247,7 @@ defmodule Screens.Stops.Stop do
     end
   end
 
+  @retry with: Stream.take(constant_backoff(500), 3), atoms: [:bad_response]
   def fetch_routes_serving_stop(station_id, headers \\ [], get_json_fn \\ &V3Api.get_json/5) do
     case get_json_fn.(
            "routes",
@@ -255,6 +258,9 @@ defmodule Screens.Stops.Stop do
            [],
            true
          ) do
+      {:ok, %{"data" => []}, _} ->
+        :bad_response
+
       {:ok, %{"data" => data}, headers} ->
         date =
           headers
@@ -282,14 +288,7 @@ defmodule Screens.Stops.Stop do
   def create_station_with_routes_map(station_id) do
     case StationsWithRoutesAgent.get(station_id) do
       {routes, date} ->
-        headers =
-          if routes == [] do
-            []
-          else
-            [{"if-modified-since", date}]
-          end
-
-        case fetch_routes_serving_stop(station_id, headers) do
+        case fetch_routes_serving_stop(station_id, [{"if-modified-since", date}]) do
           {:ok, new_routes} -> new_routes
           :not_modified -> routes
           :error -> []
