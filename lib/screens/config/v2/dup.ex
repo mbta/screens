@@ -17,7 +17,6 @@ defmodule Screens.Config.V2.Dup do
 
   use Screens.Config.Struct,
     children: [
-      header: CurrentStopId,
       primary_departures: Departures,
       secondary_departures: Departures,
       alerts: Alerts,

@@ -32,9 +32,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     # - Check for special cases. If there is one, just use that. Otherwise:
     # - Select one alert
     # - Create 3 candidate structs from the alert, one for each rotation
-    %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}}} = config
+    %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}, header: header_config}} =
+      config
 
-    stop_name = fetch_stop_name_fn.(config.app_params.header.stop_id)
+    stop_name =
+      case header_config do
+        %{stop_id: stop_id} ->
+          case fetch_stop_name_fn.(stop_id) do
+            nil -> []
+            stop_name -> stop_name
+          end
+
+        %{stop_name: stop_name} ->
+          stop_name
+      end
 
     route_type_filter = get_route_type_filter(stop_id)
 
