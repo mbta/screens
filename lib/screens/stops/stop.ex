@@ -282,7 +282,14 @@ defmodule Screens.Stops.Stop do
   def create_station_with_routes_map(station_id) do
     case StationsWithRoutesAgent.get(station_id) do
       {routes, date} ->
-        case fetch_routes_serving_stop(station_id, [{"if-modified-since", date}]) do
+        headers =
+          if routes == [] do
+            []
+          else
+            [{"if-modified-since", date}]
+          end
+
+        case fetch_routes_serving_stop(station_id, headers) do
           {:ok, new_routes} -> new_routes
           :not_modified -> routes
           :error -> []
