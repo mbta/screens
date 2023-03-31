@@ -301,47 +301,41 @@ defmodule Screens.Stops.Stop do
   def create_station_with_routes_map(station_id) do
     case StationsWithRoutesAgent.get(station_id) do
       {routes, date} ->
-        case fetch_routes_serving_stop(station_id, [{"if-modified-since", date}]) do
-          {:ok, new_routes} ->
-            new_routes
-
-          :not_modified ->
-            routes
-
-          :bad_response ->
-            Logger.error(
-              "[create_station_with_routes_map no routes] Received an empty list from API: stop_id=#{station_id}"
-            )
-
-            []
-
-          :error ->
-            Logger.error(
-              "[create_station_with_routes_map fetch error] Received an error from API: stop_id=#{station_id}"
-            )
-
-            []
-        end
+        get_routes_serving_stop(station_id, routes, date)
 
       nil ->
-        case fetch_routes_serving_stop(station_id) do
-          {:ok, new_routes} ->
-            new_routes
+        get_routes_serving_stop(station_id)
+    end
+  end
 
-          :bad_response ->
-            Logger.error(
-              "[create_station_with_routes_map no routes] Received an empty list from API: stop_id=#{station_id}"
-            )
+  defp get_routes_serving_stop(station_id, default_routes \\ [], date \\ nil) do
+    headers =
+      if is_nil(date) do
+        []
+      else
+        [{"if-modified-since", date}]
+      end
 
-            []
+    case fetch_routes_serving_stop(station_id, headers) do
+      {:ok, new_routes} ->
+        new_routes
 
-          :error ->
-            Logger.error(
-              "[create_station_with_routes_map fetch error] Received an error from API: stop_id=#{station_id}"
-            )
+      :not_modified ->
+        default_routes
 
-            []
-        end
+      :bad_response ->
+        Logger.error(
+          "[create_station_with_routes_map no routes] Received an empty list from API: stop_id=#{station_id}"
+        )
+
+        default_routes
+
+      :error ->
+        Logger.error(
+          "[create_station_with_routes_map fetch error] Received an error from API: stop_id=#{station_id}"
+        )
+
+        default_routes
     end
   end
 
