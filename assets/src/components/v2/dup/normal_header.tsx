@@ -6,6 +6,7 @@ import { DUP_VERSION } from "Components/dup/version";
 interface NormalHeaderProps {
   text: string;
   time?: string;
+  color?: string;
   accentPattern?: string;
   code?: string;
 }
@@ -13,6 +14,7 @@ interface NormalHeaderProps {
 const NormalHeader = ({
   text,
   time,
+  color,
   accentPattern,
   code,
 }: NormalHeaderProps) => {
@@ -26,6 +28,7 @@ const NormalHeader = ({
       version={DUP_VERSION + (code ? "; Maintenance code: " + code : "")}
       maxHeight={208}
       showTo={false}
+      classModifiers={color}
       accentPattern={accentPattern}
     />
   );
