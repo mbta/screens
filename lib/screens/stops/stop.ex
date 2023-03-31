@@ -10,6 +10,8 @@ defmodule Screens.Stops.Stop do
 
   use Retry.Annotation
 
+  require Logger
+
   alias Screens.Routes
   alias Screens.Stops.StationsWithRoutesAgent
   alias Screens.V3Api
@@ -289,15 +291,45 @@ defmodule Screens.Stops.Stop do
     case StationsWithRoutesAgent.get(station_id) do
       {routes, date} ->
         case fetch_routes_serving_stop(station_id, [{"if-modified-since", date}]) do
-          {:ok, new_routes} -> new_routes
-          :not_modified -> routes
-          :error -> []
+          {:ok, new_routes} ->
+            new_routes
+
+          :not_modified ->
+            routes
+
+          :bad_response ->
+            Logger.error(
+              "[create_station_with_routes_map no routes] Received an empty list from API: stop_id=#{station_id}"
+            )
+
+            []
+
+          :error ->
+            Logger.error(
+              "[create_station_with_routes_map fetch error] Received an error from API: stop_id=#{station_id}"
+            )
+
+            []
         end
 
       nil ->
         case fetch_routes_serving_stop(station_id) do
-          {:ok, new_routes} -> new_routes
-          :error -> []
+          {:ok, new_routes} ->
+            new_routes
+
+          :bad_response ->
+            Logger.error(
+              "[create_station_with_routes_map no routes] Received an empty list from API: stop_id=#{station_id}"
+            )
+
+            []
+
+          :error ->
+            Logger.error(
+              "[create_station_with_routes_map fetch error] Received an error from API: stop_id=#{station_id}"
+            )
+
+            []
         end
     end
   end
