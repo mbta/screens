@@ -8,8 +8,6 @@ defmodule Screens.Stops.Stop do
   So there's inconsistent use of this local data.
   """
 
-  use Retry.Annotation
-
   require Logger
 
   alias Screens.Routes
@@ -249,8 +247,21 @@ defmodule Screens.Stops.Stop do
     end
   end
 
-  @retry with: Stream.take(constant_backoff(500), 3), atoms: [:bad_response]
-  def fetch_routes_serving_stop(station_id, headers \\ [], get_json_fn \\ &V3Api.get_json/5) do
+  def fetch_routes_serving_stop(
+        station_id,
+        headers \\ [],
+        get_json_fn \\ &V3Api.get_json/5,
+        attempts_left \\ 3
+      )
+
+  def fetch_routes_serving_stop(_station_id, _headers, _get_json_fn, 0), do: :bad_response
+
+  def fetch_routes_serving_stop(
+        station_id,
+        headers,
+        get_json_fn,
+        attempts_left
+      ) do
     case get_json_fn.(
            "routes",
            %{
@@ -261,7 +272,7 @@ defmodule Screens.Stops.Stop do
            true
          ) do
       {:ok, %{"data" => []}, _} ->
-        :bad_response
+        fetch_routes_serving_stop(station_id, headers, get_json_fn, attempts_left - 1)
 
       {:ok, %{"data" => data}, headers} ->
         date =
