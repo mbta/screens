@@ -81,121 +81,121 @@ config :screens,
 
 config :screens,
   # Maps alert informed entity contents to the appropriate headsign to show for that alert.
-  # List elements must be of the shape {informed_stop_ids, not_informed_stop_ids, headsign}.
+  # List elements must be of the shape {informed_stop_ids, not_informed_stop_ids, headsign, headway}.
   # Each set of stop IDs can be either a single string or a list of strings.
   dup_alert_headsign_matchers: %{
     # Kenmore
     "place-kencl" => [
-      {"70149", ~w[70153 70211 70187], "Boston College"},
-      {"70211", ~w[70153 70149 70187], "Cleveland Circle"},
-      {"70187", ~w[70153 70149 70211], "Riverside"},
-      {~w[70149 70211], ~w[70153 70187], "BC/Clev. Circ."},
-      {~w[70149 70187], ~w[70153 70211], "BC/Riverside"},
-      {~w[70211 70187], ~w[70153 70149], "Clev. Circ./Riverside"},
-      {~w[70149 70211 70187], "70153", {:adj, "westbound"}},
-      {"70152", ~w[70148 70212 70186], "Park Street"}
+      {"70149", ~w[70153 70211 70187], "Boston College", nil},
+      {"70211", ~w[70153 70149 70187], "Cleveland Circle", nil},
+      {"70187", ~w[70153 70149 70211], "Riverside", nil},
+      {~w[70149 70211], ~w[70153 70187], "BC/Clev. Circ.", nil},
+      {~w[70149 70187], ~w[70153 70211], "BC/Riverside", nil},
+      {~w[70211 70187], ~w[70153 70149], "Clev. Circ./Riverside", nil},
+      {~w[70149 70211 70187], "70153", {:adj, "westbound"}, "Park Street"},
+      {"70152", ~w[70148 70212 70186], "Park Street", "Westbound"}
     ],
     # Prudential
     "place-prmnl" => [
-      {"70154", "70242", "Park Street"},
-      {"70241", "70155", "Heath Street"}
+      {"70154", "70242", "Park Street", "Heath Street"},
+      {"70241", "70155", "Heath Street", "Park Street"}
     ],
     # Haymarket
     "place-haecl" => [
       # GL
-      {"70205", "70201", "Northbound"},
-      {"70202", "70206", "Copley & West"},
+      {"70205", "70201", "Northbound", "Copley & West"},
+      {"70202", "70206", "Copley & West", "Northbound"},
       # OL
-      {"70027", "70023", "Oak Grove"},
-      {"70022", "70026", "Forest Hills"}
+      {"70027", "70023", "Oak Grove", "Forest Hills"},
+      {"70022", "70026", "Forest Hills", "Oak Grove"}
     ],
     # Back Bay
     "place-bbsta" => [
-      {"70017", "70013", "Oak Grove"},
-      {"70012", "70016", "Forest Hills"}
+      {"70017", "70013", "Oak Grove", "Forest Hills"},
+      {"70012", "70016", "Forest Hills", "Oak Grove"}
     ],
     # Tufts
     "place-tumnl" => [
-      {"70019", "70015", "Oak Grove"},
-      {"70014", "70018", "Forest Hills"}
+      {"70019", "70015", "Oak Grove", "Forest Hills"},
+      {"70014", "70018", "Forest Hills", "Oak Grove"}
     ],
     # Sullivan
     "place-sull" => [
-      {"70279", "70029", "Oak Grove"},
-      {"70028", "70278", "Forest Hills"}
+      {"70279", "70029", "Oak Grove", "Forest Hills"},
+      {"70028", "70278", "Forest Hills", "Oak Grove"}
     ],
     # Malden Center
     "place-mlmnl" => [
-      {"70036", "70033", "Oak Grove"},
-      {"70032", "70036", "Forest Hills"}
+      {"70036", "70033", "Oak Grove", "Forest Hills"},
+      {"70032", "70036", "Forest Hills", "Oak Grove"}
     ],
     # Broadway
     "place-brdwy" => [
-      {"70080", "70084", "Alewife"},
-      {"70083", "70079", "Ashmont/Braintree"}
+      {"70080", "70084", "Alewife", "Ashmont/Braintree"},
+      {"70083", "70079", "Ashmont/Braintree", "Alewife"}
     ],
     # Aquarium
     "place-aqucl" => [
-      {"70046", "70042", "Wonderland"},
-      {"70041", "70045", "Bowdoin"}
+      {"70046", "70042", "Wonderland", "Bowdoin"},
+      {"70041", "70045", "Bowdoin", "Wonderland"}
     ],
     # Airport
     "place-aport" => [
-      {"70050", "70046", "Wonderland"},
-      {"70045", "70049", "Bowdoin"}
+      {"70050", "70046", "Wonderland", "Bowdoin"},
+      {"70045", "70049", "Bowdoin", "Wonderland"}
     ],
     # Quincy Center
     "place-qnctr" => [
-      {"70100", "70104", "Alewife"},
-      {"70103", "70099", "Braintree"}
+      {"70100", "70104", "Alewife", "Braintree"},
+      {"70103", "70099", "Braintree", "Alewife"}
     ]
   },
   prefare_alert_headsign_matchers: %{
     # Government Center
     "place-gover" => [
       # GL
-      {"70203", "70200", "North Station & North"},
-      {~w[70199 70198 70197 70196], "70204", "Copley & West"},
+      {"70203", "70200", "North Station & North", nil},
+      {~w[70199 70198 70197 70196], "70204", "Copley & West", nil},
       # BL
-      {"70042", "70038", "Wonderland"},
-      {"70038", "70041", "Bowdoin"}
+      {"70042", "70038", "Wonderland", nil},
+      {"70038", "70041", "Bowdoin", nil}
     ],
     # Tufts
     "place-tumnl" => [
-      {"70019", "70015", "Oak Grove"},
-      {"70014", "70018", "Forest Hills"}
+      {"70019", "70015", "Oak Grove", nil},
+      {"70014", "70018", "Forest Hills", nil}
     ],
     # Back Bay
     "place-bbsta" => [
-      {"70017", "70013", "Oak Grove"},
-      {"70012", "70016", "Forest Hills"}
+      {"70017", "70013", "Oak Grove", nil},
+      {"70012", "70016", "Forest Hills", nil}
     ],
     # Forest Hills
     "place-forhl" => [
-      {"70003", nil, "Oak Grove"}
+      {"70003", nil, "Oak Grove", nil}
     ],
     # Maverick
     "place-mvbcl" => [
-      {"70048", "70044", "Wonderland"},
-      {"70043", "70047", "Bowdoin"}
+      {"70048", "70044", "Wonderland", nil},
+      {"70043", "70047", "Bowdoin", nil}
     ],
     # Ashmont
     "place-asmnl" => [
-      {"70092", nil, "Alewife"}
+      {"70092", nil, "Alewife", nil}
     ],
     # Charles/MGH
     "place-chmnl" => [
-      {"70072", "70076", "Alewife"},
-      {"70075", "70071", "Ashmont/Braintree"}
+      {"70072", "70076", "Alewife", nil},
+      {"70075", "70071", "Ashmont/Braintree", nil}
     ],
     # Porter
     "place-portr" => [
-      {"70064", "70068", "Alewife"},
-      {"70067", "70063", "Ashmont/Braintree"}
+      {"70064", "70068", "Alewife", nil},
+      {"70067", "70063", "Ashmont/Braintree", nil}
     ],
     "place-welln" => [
-      {"70278", "70034", "Forest Hills"},
-      {"70035", "70279", "Oak Grove"}
+      {"70278", "70034", "Forest Hills", nil},
+      {"70035", "70279", "Oak Grove", nil}
     ]
   },
   dup_headsign_replacements: %{

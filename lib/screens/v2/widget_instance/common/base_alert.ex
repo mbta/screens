@@ -70,13 +70,13 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
       headsign_matchers
       |> Map.get(SAW.home_stop_id(t))
-      |> Enum.find_value(fn {informed, not_informed, headsign} ->
+      |> Enum.find_value(fn {informed, not_informed, alert_headsign, _headway_headsign} ->
         if alert_region_match?(
              Util.to_set(informed),
              Util.to_set(not_informed),
              informed_stop_ids
            ),
-           do: headsign,
+           do: alert_headsign,
            else: false
       end)
     end
