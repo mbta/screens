@@ -27,14 +27,41 @@ config :screens,
   },
   dup_alert_headsign_matchers: %{
     "place-B" => [
-      {"place-A", "not_informed", "Test A", "Test B"},
-      {"place-B", "not_informed", "Test B", "Test A"}
+      %{
+        informed: "place-A",
+        not_informed: "not_informed",
+        alert_headsign: "Test A",
+        headway_headsign: "Test B"
+      },
+      %{
+        informed: "place-B",
+        not_informed: "not_informed",
+        alert_headsign: "Test B",
+        headway_headsign: "Test A"
+      }
     ],
     "place-kencl" => [
-      {~w[70149 70211 70187], "70153", {:adj, "westbound"}, "Park Street"},
-      {"70152", ~w[70148 70212 70186], "Park Street", "Westbound"}
+      %{
+        informed: ~w[70149 70211 70187],
+        not_informed: "70153",
+        alert_headsign: {:adj, "westbound"},
+        headway_headsign: "Park Street"
+      },
+      %{
+        informed: "70152",
+        not_informed: ~w[70148 70212 70186],
+        alert_headsign: "Park Street",
+        headway_headsign: "Westbound"
+      }
     ],
-    "place-overnight" => [{"place-overnight", "not_informed", "Test", nil}]
+    "place-overnight" => [
+      %{
+        informed: "place-overnight",
+        not_informed: "not_informed",
+        alert_headsign: "Test",
+        headway_headsign: "Test"
+      }
+    ]
   }
 
 config :screens, ScreensWeb.AuthManager, secret_key: "test key"

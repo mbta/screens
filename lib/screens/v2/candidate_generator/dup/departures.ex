@@ -371,15 +371,22 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       :screens
       |> Application.get_env(:dup_alert_headsign_matchers)
       |> Map.get(parent_stop_id)
-      |> Enum.find_value({:inside, nil}, fn {informed, not_informed, _alert_headsign,
-                                             headway_headsign} ->
-        if alert_region_match?(
-             Util.to_set(informed),
-             Util.to_set(not_informed),
-             informed_stop_ids
-           ),
-           do: {:boundary, headway_headsign},
-           else: false
+      |> Enum.find_value({:inside, nil}, fn
+        %{
+          informed: informed,
+          not_informed: not_informed,
+          headway_headsign: headsign
+        } ->
+          if alert_region_match?(
+               Util.to_set(informed),
+               Util.to_set(not_informed),
+               informed_stop_ids
+             ),
+             do: {:boundary, headsign},
+             else: false
+
+        _ ->
+          false
       end)
 
     %{
