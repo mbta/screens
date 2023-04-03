@@ -20,6 +20,7 @@ const iconPaths: { [key: string]: string } = _.mapValues(
     green_d: "gl-d-color.svg",
     green_e: "gl-e-color.svg",
     bus: "bus-black.svg",
+    delay: "clock.svg",
   },
   imagePath
 );
@@ -68,7 +69,13 @@ const InlineIcon = ({ icon }: { icon: string }) => {
   );
 };
 
-const FormatString = ({ format, text }: { format: string | null; text?: string }) => {
+const FormatString = ({
+  format,
+  text,
+}: {
+  format: string | null;
+  text?: string;
+}) => {
   const modifiers = format === null ? [] : [format];
   const className = `free-text__element ${classWithModifiers(
     "free-text__string",
