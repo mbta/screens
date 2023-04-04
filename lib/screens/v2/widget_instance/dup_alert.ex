@@ -139,6 +139,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   # Inputs/outputs are stored as a table for readability.
   # Table is adapted from the one in the product spec: https://www.notion.so/mbta-downtown-crossing/DUP-Alert-Widget-Specification-a82acff850ed4f2eb98a04e5f3e0fe52
   # Compile-time code converts each table row to `do_alert_layout` function clauses.
+  # TotalSections refers to the number of sections in `primary_departures` of DUP configs.
   alert_layout_table = """
   # INPUTS                                                          || OUTPUTS
   # Effect          Location            AffectedLines TotalSections || LayoutZero  LayoutOne   LayoutTwo
