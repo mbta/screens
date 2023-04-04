@@ -986,8 +986,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             struct(Alert,
               effect: :suspension,
               informed_entities: [
-                %{stop: "place-B", route: "Red"},
-                %{stop: "place-C", route: "Red"}
+                %{stop: "place-B", route: "Red"}
               ],
               active_period: [{~U[2020-04-06T09:00:00Z], nil}]
             )
@@ -1002,7 +1001,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               type: :headway_section,
               route: "Red",
               time_range: {12, 16},
-              headsign: "Test"
+              headsign: "Test A"
             }
           ],
           slot_names: [:main_content_zero]
@@ -1014,7 +1013,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               type: :headway_section,
               route: "Red",
               time_range: {12, 16},
-              headsign: "Test"
+              headsign: "Test A"
             }
           ],
           slot_names: [:main_content_one]
@@ -1026,7 +1025,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               type: :headway_section,
               route: "Red",
               time_range: {12, 16},
-              headsign: "Test"
+              headsign: "Test A"
             }
           ],
           slot_names: [:main_content_two]
@@ -1447,13 +1446,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                   facility: nil,
                   route: "Green-C",
                   route_type: 0,
-                  stop: "70150"
-                },
-                %{
-                  direction_id: nil,
-                  facility: nil,
-                  route: "Green-C",
-                  route_type: 0,
                   stop: "70151"
                 },
                 %{
@@ -1468,7 +1460,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                   facility: nil,
                   route: "Green-C",
                   route_type: 0,
-                  stop: "70153"
+                  stop: "place-kencl"
                 },
                 %{
                   direction_id: nil,
@@ -1476,13 +1468,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                   route: "Green-C",
                   route_type: 0,
                   stop: "place-hymnl"
-                },
-                %{
-                  direction_id: nil,
-                  facility: nil,
-                  route: "Green-C",
-                  route_type: 0,
-                  stop: "place-kencl"
                 }
               ],
               active_period: [{~U[2020-04-06T09:00:00Z], nil}]
@@ -1498,10 +1483,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               type: :headway_section,
               route: "Green",
               time_range: {7, 13},
-              headsign: "Park Street"
+              headsign: "Westbound"
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_reduced_zero]
         },
         %DeparturesWidget{
           screen: config,
@@ -1510,10 +1495,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               type: :headway_section,
               route: "Green",
               time_range: {7, 13},
-              headsign: "Park Street"
+              headsign: "Westbound"
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_reduced_one]
         },
         %DeparturesWidget{
           screen: config,
@@ -1522,10 +1507,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               type: :headway_section,
               route: "Green",
               time_range: {7, 13},
-              headsign: "Park Street"
+              headsign: "Westbound"
             }
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_reduced_two]
         }
       ]
 

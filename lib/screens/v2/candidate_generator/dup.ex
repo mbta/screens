@@ -10,7 +10,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.V2.CandidateGenerator.Dup.Departures, as: DeparturesInstances
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.NormalHeader
 
   @behaviour CandidateGenerator
 
@@ -85,7 +85,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
       fn -> alerts_instances_fn.(config, now) end,
-      fn -> placeholder_instances() end,
       fn -> departures_instances_fn.(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end
     ]
@@ -116,13 +115,5 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       end
 
     List.duplicate(%NormalHeader{screen: config, icon: :logo, text: stop_name, time: now}, 3)
-  end
-
-  defp placeholder_instances do
-    [
-      %Placeholder{slot_names: [:main_content_one], color: :orange},
-      %Placeholder{slot_names: [:main_content_reduced_two], color: :green},
-      %Placeholder{slot_names: [:bottom_pane_two], color: :red}
-    ]
   end
 end

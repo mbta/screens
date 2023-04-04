@@ -15,6 +15,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     :alert,
     :stop_sequences,
     :subway_routes_at_stop,
+    :primary_section_count,
     :rotation_index,
     :stop_name
   ]
@@ -25,6 +26,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
           alert: Alert.t(),
           stop_sequences: list(list(stop_id)),
           subway_routes_at_stop: list(%{route_id: route_id, active?: boolean}),
+          primary_section_count: pos_integer(),
           rotation_index: rotation_index,
           stop_name: String.t()
         }
@@ -88,10 +90,9 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     effect = t.alert.effect
     location = BaseAlert.location(t)
     affected_line_count = length(get_affected_lines(t))
-    total_line_count = length(get_total_lines(t))
     rotation_index = t.rotation_index
 
-    parameters = {effect, location, affected_line_count, total_line_count, rotation_index}
+    parameters = {effect, location, affected_line_count, t.primary_section_count, rotation_index}
 
     special_case = alert_layout_special_case(t, parameters)
 
@@ -113,14 +114,14 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   # we generate DUP alert widgets for, but in case one slips through, we
   # should know about it!
   defp log_layout_mismatch(t, parameters, delay_severity) do
-    {effect, location, affected_line_count, total_line_count, rotation_index} = parameters
+    {effect, location, affected_line_count, total_section_count, rotation_index} = parameters
 
     labeled_parameters = [
       effect: effect,
       delay_severity: delay_severity,
       location: location,
       affected_line_count: affected_line_count,
-      total_line_count: total_line_count,
+      total_section_count: total_section_count,
       rotation_index: rotation_index
     ]
 
@@ -136,27 +137,28 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   # Inputs/outputs are stored as a table for readability.
   # Table is adapted from the one in the product spec: https://www.notion.so/mbta-downtown-crossing/DUP-Alert-Widget-Specification-a82acff850ed4f2eb98a04e5f3e0fe52
   # Compile-time code converts each table row to `do_alert_layout` function clauses.
+  # TotalSections refers to the number of sections in `primary_departures` of DUP configs.
   alert_layout_table = """
-  # INPUTS                                                       || OUTPUTS
-  # Effect          Location            AffectedLines TotalLines || LayoutZero  LayoutOne
-    station_closure inside              1             1             full_screen full_screen
-    station_closure inside              1             2             partial     full_screen
-    station_closure inside              2             2             full_screen full_screen
+  # INPUTS                                                          || OUTPUTS
+  # Effect          Location            AffectedLines TotalSections || LayoutZero  LayoutOne
+    station_closure inside              1             1                full_screen full_screen
+    station_closure inside              1             2                partial     full_screen
+    station_closure inside              2             2                full_screen full_screen
   # "Boundary" location is not possible for station closures.
-    shuttle         inside              1             1             full_screen full_screen
-    shuttle         inside              1             2             partial     full_screen
-    shuttle         inside              2             2             full_screen full_screen
-    shuttle         boundary_upstream   1             1             partial     full_screen
-    shuttle         boundary_downstream 1             1             partial     full_screen
-    shuttle         boundary_upstream   1             2             partial     full_screen
-    shuttle         boundary_downstream 1             2             partial     full_screen
-    suspension      inside              1             1             full_screen full_screen
-    suspension      inside              1             2             partial     full_screen
-    suspension      inside              2             2             full_screen full_screen
-    suspension      boundary_upstream   1             1             partial     full_screen
-    suspension      boundary_downstream 1             1             partial     full_screen
-    suspension      boundary_upstream   1             2             partial     full_screen
-    suspension      boundary_downstream 1             2             partial     full_screen
+    shuttle         inside              1             1                full_screen full_screen
+    shuttle         inside              1             2                partial     full_screen
+    shuttle         inside              2             2                full_screen full_screen
+    shuttle         boundary_upstream   1             1                partial     full_screen
+    shuttle         boundary_downstream 1             1                partial     full_screen
+    shuttle         boundary_upstream   1             2                partial     full_screen
+    shuttle         boundary_downstream 1             2                partial     full_screen
+    suspension      inside              1             1                full_screen full_screen
+    suspension      inside              1             2                partial     full_screen
+    suspension      inside              2             2                full_screen full_screen
+    suspension      boundary_upstream   1             1                partial     full_screen
+    suspension      boundary_downstream 1             1                partial     full_screen
+    suspension      boundary_upstream   1             2                partial     full_screen
+    suspension      boundary_downstream 1             2                partial     full_screen
   # Other cases are handled separately, see `alert_layout_special_case` below.
   """
 
@@ -165,7 +167,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     |> String.split("\n", trim: true)
     |> Enum.reject(&String.starts_with?(&1, "#"))
     |> Enum.flat_map(fn line ->
-      [effect, location, affected_line_count, total_line_count, layout_zero, layout_one] =
+      [effect, location, affected_line_count, total_section_count, layout_zero, layout_one] =
         String.split(line, ~r/\s+/, trim: true)
 
       # Convert strings to appropriate types
@@ -175,10 +177,10 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
           &String.to_existing_atom/1
         )
 
-      [affected_line_count, total_line_count] =
-        Enum.map([affected_line_count, total_line_count], &String.to_integer/1)
+      [affected_line_count, total_section_count] =
+        Enum.map([affected_line_count, total_section_count], &String.to_integer/1)
 
-      base_parameters = {effect, location, affected_line_count, total_line_count}
+      base_parameters = {effect, location, affected_line_count, total_section_count}
 
       [
         {Tuple.append(base_parameters, :zero), layout_zero},
@@ -189,7 +191,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   @type layout_parameters ::
           {Alert.effect(), location :: atom, affected_line_count :: 1..2,
-           total_line_count :: 1..2, rotation_index}
+           total_section_count :: 1..2, rotation_index}
 
   # Now, define function clauses for each row in the table.
   @spec do_alert_layout(layout_parameters) :: :full_screen | :partial | :no_render
@@ -243,12 +245,6 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   def get_affected_lines(t) do
     t
     |> BaseAlert.informed_routes_at_home_stop()
-    |> routes_to_lines()
-  end
-
-  def get_total_lines(t) do
-    t
-    |> BaseAlert.active_routes_at_stop()
     |> routes_to_lines()
   end
 
