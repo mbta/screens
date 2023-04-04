@@ -81,121 +81,258 @@ config :screens,
 
 config :screens,
   # Maps alert informed entity contents to the appropriate headsign to show for that alert.
-  # List elements must be of the shape {informed_stop_ids, not_informed_stop_ids, headsign}.
+  # List elements must be of the shape
+  # %{informed: informed_stop_ids, not_informed: not_informed_stop_ids, alert_headsign: alert_headsign, headway_headsign: optional(headway_headsign)}.
   # Each set of stop IDs can be either a single string or a list of strings.
   dup_alert_headsign_matchers: %{
     # Kenmore
     "place-kencl" => [
-      {"70149", ~w[70153 70211 70187], "Boston College"},
-      {"70211", ~w[70153 70149 70187], "Cleveland Circle"},
-      {"70187", ~w[70153 70149 70211], "Riverside"},
-      {~w[70149 70211], ~w[70153 70187], "BC/Clev. Circ."},
-      {~w[70149 70187], ~w[70153 70211], "BC/Riverside"},
-      {~w[70211 70187], ~w[70153 70149], "Clev. Circ./Riverside"},
-      {~w[70149 70211 70187], "70153", {:adj, "westbound"}},
-      {"70152", ~w[70148 70212 70186], "Park Street"}
+      %{informed: "70149", not_informed: ~w[70153 70211 70187], alert_headsign: "Boston College"},
+      %{
+        informed: "70211",
+        not_informed: ~w[70153 70149 70187],
+        alert_headsign: "Cleveland Circle"
+      },
+      %{informed: "70187", not_informed: ~w[70153 70149 70211], alert_headsign: "Riverside"},
+      %{
+        informed: ~w[70149 70211],
+        not_informed: ~w[70153 70187],
+        alert_headsign: "BC/Clev. Circ."
+      },
+      %{informed: ~w[70149 70187], not_informed: ~w[70153 70211], alert_headsign: "BC/Riverside"},
+      %{
+        informed: ~w[70211 70187],
+        not_informed: ~w[70153 70149],
+        alert_headsign: "Clev. Circ./Riverside"
+      },
+      %{
+        informed: ~w[70149 70211 70187],
+        not_informed: "70153",
+        alert_headsign: {:adj, "westbound"},
+        headway_headsign: "Park Street"
+      },
+      %{
+        informed: "70152",
+        not_informed: ~w[70148 70212 70186],
+        alert_headsign: "Park Street",
+        headway_headsign: "Westbound"
+      }
     ],
     # Prudential
     "place-prmnl" => [
-      {"70154", "70242", "Park Street"},
-      {"70241", "70155", "Heath Street"}
+      %{
+        informed: "70154",
+        not_informed: "70242",
+        alert_headsign: "Park Street",
+        headway_headsign: "Heath Street"
+      },
+      %{
+        informed: "70241",
+        not_informed: "70155",
+        alert_headsign: "Heath Street",
+        headway_headsign: "Park Street"
+      }
     ],
     # Haymarket
     "place-haecl" => [
       # GL
-      {"70205", "70201", "Northbound"},
-      {"70202", "70206", "Copley & West"},
+      %{
+        informed: "70205",
+        not_informed: "70201",
+        alert_headsign: "Northbound",
+        headway_headsign: "Copley & West"
+      },
+      %{
+        informed: "70202",
+        not_informed: "70206",
+        alert_headsign: "Copley & West",
+        headway_headsign: "Northbound"
+      },
       # OL
-      {"70027", "70023", "Oak Grove"},
-      {"70022", "70026", "Forest Hills"}
+      %{
+        informed: "70027",
+        not_informed: "70023",
+        alert_headsign: "Oak Grove",
+        headway_headsign: "Forest Hills"
+      },
+      %{
+        informed: "70022",
+        not_informed: "70026",
+        alert_headsign: "Forest Hills",
+        headway_headsign: "Oak Grove"
+      }
     ],
     # Back Bay
     "place-bbsta" => [
-      {"70017", "70013", "Oak Grove"},
-      {"70012", "70016", "Forest Hills"}
+      %{
+        informed: "70017",
+        not_informed: "70013",
+        alert_headsign: "Oak Grove",
+        headway_headsign: "Forest Hills"
+      },
+      %{
+        informed: "70012",
+        not_informed: "70016",
+        alert_headsign: "Forest Hills",
+        headway_headsign: "Oak Grove"
+      }
     ],
     # Tufts
     "place-tumnl" => [
-      {"70019", "70015", "Oak Grove"},
-      {"70014", "70018", "Forest Hills"}
+      %{
+        informed: "70019",
+        not_informed: "70015",
+        alert_headsign: "Oak Grove",
+        headway_headsign: "Forest Hills"
+      },
+      %{
+        informed: "70014",
+        not_informed: "70018",
+        alert_headsign: "Forest Hills",
+        headway_headsign: "Oak Grove"
+      }
     ],
     # Sullivan
     "place-sull" => [
-      {"70279", "70029", "Oak Grove"},
-      {"70028", "70278", "Forest Hills"}
+      %{
+        informed: "70279",
+        not_informed: "70029",
+        alert_headsign: "Oak Grove",
+        headway_headsign: "Forest Hills"
+      },
+      %{
+        informed: "70028",
+        not_informed: "70278",
+        alert_headsign: "Forest Hills",
+        headway_headsign: "Oak Grove"
+      }
     ],
     # Malden Center
     "place-mlmnl" => [
-      {"70036", "70033", "Oak Grove"},
-      {"70032", "70036", "Forest Hills"}
+      %{
+        informed: "70036",
+        not_informed: "70033",
+        alert_headsign: "Oak Grove",
+        headway_headsign: "Forest Hills"
+      },
+      %{
+        informed: "70032",
+        not_informed: "70036",
+        alert_headsign: "Forest Hills",
+        headway_headsign: "Oak Grove"
+      }
     ],
     # Broadway
     "place-brdwy" => [
-      {"70080", "70084", "Alewife"},
-      {"70083", "70079", "Ashmont/Braintree"}
+      %{
+        informed: "70080",
+        not_informed: "70084",
+        alert_headsign: "Alewife",
+        headway_headsign: "Ashmont/Braintree"
+      },
+      %{
+        informed: "70083",
+        not_informed: "70079",
+        alert_headsign: "Ashmont/Braintree",
+        headway_headsign: "Alewife"
+      }
     ],
     # Aquarium
     "place-aqucl" => [
-      {"70046", "70042", "Wonderland"},
-      {"70041", "70045", "Bowdoin"}
+      %{
+        informed: "70046",
+        not_informed: "70042",
+        alert_headsign: "Wonderland",
+        headway_headsign: "Bowdoin"
+      },
+      %{
+        informed: "70041",
+        not_informed: "70045",
+        alert_headsign: "Bowdoin",
+        headway_headsign: "Wonderland"
+      }
     ],
     # Airport
     "place-aport" => [
-      {"70050", "70046", "Wonderland"},
-      {"70045", "70049", "Bowdoin"}
+      %{
+        informed: "70050",
+        not_informed: "70046",
+        alert_headsign: "Wonderland",
+        headway_headsign: "Bowdoin"
+      },
+      %{
+        informed: "70045",
+        not_informed: "70049",
+        alert_headsign: "Bowdoin",
+        headway_headsign: "Wonderland"
+      }
     ],
     # Quincy Center
     "place-qnctr" => [
-      {"70100", "70104", "Alewife"},
-      {"70103", "70099", "Braintree"}
+      %{
+        informed: "70100",
+        not_informed: "70104",
+        alert_headsign: "Alewife",
+        headway_headsign: "Braintree"
+      },
+      %{
+        informed: "70103",
+        not_informed: "70099",
+        alert_headsign: "Braintree",
+        headway_headsign: "Alewife"
+      }
     ]
   },
   prefare_alert_headsign_matchers: %{
     # Government Center
     "place-gover" => [
       # GL
-      {"70203", "70200", "North Station & North"},
-      {~w[70199 70198 70197 70196], "70204", "Copley & West"},
+      %{informed: "70203", not_informed: "70200", alert_headsign: "North Station & North"},
+      %{
+        informed: ~w[70199 70198 70197 70196],
+        not_informed: "70204",
+        alert_headsign: "Copley & West"
+      },
       # BL
-      {"70042", "70038", "Wonderland"},
-      {"70038", "70041", "Bowdoin"}
+      %{informed: "70042", not_informed: "70038", alert_headsign: "Wonderland"},
+      %{informed: "70038", not_informed: "70041", alert_headsign: "Bowdoin"}
     ],
     # Tufts
     "place-tumnl" => [
-      {"70019", "70015", "Oak Grove"},
-      {"70014", "70018", "Forest Hills"}
+      %{informed: "70019", not_informed: "70015", alert_headsign: "Oak Grove"},
+      %{informed: "70014", not_informed: "70018", alert_headsign: "Forest Hills"}
     ],
     # Back Bay
     "place-bbsta" => [
-      {"70017", "70013", "Oak Grove"},
-      {"70012", "70016", "Forest Hills"}
+      %{informed: "70017", not_informed: "70013", alert_headsign: "Oak Grove"},
+      %{informed: "70012", not_informed: "70016", alert_headsign: "Forest Hills"}
     ],
     # Forest Hills
     "place-forhl" => [
-      {"70003", nil, "Oak Grove"}
+      %{informed: "70003", not_informed: nil, alert_headsign: "Oak Grove"}
     ],
     # Maverick
     "place-mvbcl" => [
-      {"70048", "70044", "Wonderland"},
-      {"70043", "70047", "Bowdoin"}
+      %{informed: "70048", not_informed: "70044", alert_headsign: "Wonderland"},
+      %{informed: "70043", not_informed: "70047", alert_headsign: "Bowdoin"}
     ],
     # Ashmont
     "place-asmnl" => [
-      {"70092", nil, "Alewife"}
+      %{informed: "70092", not_informed: nil, alert_headsign: "Alewife"}
     ],
     # Charles/MGH
     "place-chmnl" => [
-      {"70072", "70076", "Alewife"},
-      {"70075", "70071", "Ashmont/Braintree"}
+      %{informed: "70072", not_informed: "70076", alert_headsign: "Alewife"},
+      %{informed: "70075", not_informed: "70071", alert_headsign: "Ashmont/Braintree"}
     ],
     # Porter
     "place-portr" => [
-      {"70064", "70068", "Alewife"},
-      {"70067", "70063", "Ashmont/Braintree"}
+      %{informed: "70064", not_informed: "70068", alert_headsign: "Alewife"},
+      %{informed: "70067", not_informed: "70063", alert_headsign: "Ashmont/Braintree"}
     ],
     "place-welln" => [
-      {"70278", "70034", "Forest Hills"},
-      {"70035", "70279", "Oak Grove"}
+      %{informed: "70278", not_informed: "70034", alert_headsign: "Forest Hills"},
+      %{informed: "70035", not_informed: "70279", alert_headsign: "Oak Grove"}
     ]
   },
   dup_headsign_replacements: %{
