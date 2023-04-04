@@ -96,7 +96,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   defp create_alert_widgets(
          {:normal, alerts},
-         config,
+         %Screen{app_params: %Dup{primary_departures: %{sections: sections}}} = config,
          stop_sequences,
          subway_routes_at_stop,
          stop_name
@@ -112,6 +112,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
           alert: alert,
           stop_sequences: stop_sequences,
           subway_routes_at_stop: subway_routes_at_stop,
+          primary_section_count: length(sections),
           rotation_index: rotation_index,
           stop_name: stop_name
         }
@@ -119,12 +120,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     end
   end
 
-  defp relevant_alert?(alert, config, stop_sequences, subway_routes_at_stop, now) do
+  defp relevant_alert?(
+         alert,
+         %Screen{app_params: %Dup{primary_departures: %{sections: sections}}} = config,
+         stop_sequences,
+         subway_routes_at_stop,
+         now
+       ) do
     dup_alert = %DupAlert{
       screen: config,
       alert: alert,
       stop_sequences: stop_sequences,
       subway_routes_at_stop: subway_routes_at_stop,
+      primary_section_count: length(sections),
       rotation_index: :zero,
       stop_name: "A Station"
     }
