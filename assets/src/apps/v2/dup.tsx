@@ -14,7 +14,6 @@ import { MappingContext } from "Components/v2/widget";
 import NormalScreen, {
   NormalSimulation,
 } from "Components/v2/dup/normal_screen";
-import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/dup/normal_header";
 import NormalDepartures from "Components/v2/dup/departures/normal_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
@@ -51,7 +50,6 @@ const TYPE_TO_COMPONENT = {
   body_split_zero: splitRotationFromPropNames(SplitBody, "zero"),
   body_split_one: splitRotationFromPropNames(SplitBody, "one"),
   body_split_two: splitRotationFromPropNames(SplitBody, "two"),
-  placeholder: Placeholder,
   normal_header: NormalHeader,
   departures: NormalDepartures,
   evergreen_content: EvergreenContent,
