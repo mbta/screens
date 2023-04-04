@@ -93,16 +93,14 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
     parameters = {effect, location, affected_line_count, total_line_count, rotation_index}
 
-    delay_severity = t.alert.severity
+    special_case = alert_layout_special_case(t, parameters)
 
-    if effect == :delay and delay_severity < 5 do
-      # We don't show delays < 20 minutes
-      log_layout_mismatch(t, parameters, delay_severity)
-      :no_render
+    if special_case do
+      special_case
     else
       case do_alert_layout(parameters) do
         :no_render ->
-          log_layout_mismatch(t, parameters, delay_severity)
+          log_layout_mismatch(t, parameters, :not_applicable)
           :no_render
 
         layout ->
@@ -140,26 +138,26 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   # Compile-time code converts each table row to `do_alert_layout` function clauses.
   alert_layout_table = """
   # INPUTS                                                       || OUTPUTS
-  # Effect          Location            AffectedLines TotalLines || LayoutZero  LayoutOne   LayoutTwo
-    station_closure inside              1             1             full_screen full_screen partial
-    station_closure inside              1             2             partial     full_screen partial
-    station_closure inside              2             2             full_screen full_screen partial
+  # Effect          Location            AffectedLines TotalLines || LayoutZero  LayoutOne
+    station_closure inside              1             1             full_screen full_screen
+    station_closure inside              1             2             partial     full_screen
+    station_closure inside              2             2             full_screen full_screen
   # "Boundary" location is not possible for station closures.
-    shuttle         inside              1             1             full_screen full_screen partial
-    shuttle         inside              1             2             partial     full_screen partial
-    shuttle         inside              2             2             full_screen full_screen partial
-    shuttle         boundary_upstream   1             1             partial     full_screen partial
-    shuttle         boundary_downstream 1             1             partial     full_screen partial
-    shuttle         boundary_upstream   1             2             partial     full_screen partial
-    shuttle         boundary_downstream 1             2             partial     full_screen partial
-    suspension      inside              1             1             full_screen full_screen partial
-    suspension      inside              1             2             partial     full_screen partial
-    suspension      inside              2             2             full_screen full_screen partial
-    suspension      boundary_upstream   1             1             partial     full_screen partial
-    suspension      boundary_downstream 1             1             partial     full_screen partial
-    suspension      boundary_upstream   1             2             partial     full_screen partial
-    suspension      boundary_downstream 1             2             partial     full_screen partial
-  # Delay alerts are handled separately, see `defp do_alert_layout({:delay, ...` below.
+    shuttle         inside              1             1             full_screen full_screen
+    shuttle         inside              1             2             partial     full_screen
+    shuttle         inside              2             2             full_screen full_screen
+    shuttle         boundary_upstream   1             1             partial     full_screen
+    shuttle         boundary_downstream 1             1             partial     full_screen
+    shuttle         boundary_upstream   1             2             partial     full_screen
+    shuttle         boundary_downstream 1             2             partial     full_screen
+    suspension      inside              1             1             full_screen full_screen
+    suspension      inside              1             2             partial     full_screen
+    suspension      inside              2             2             full_screen full_screen
+    suspension      boundary_upstream   1             1             partial     full_screen
+    suspension      boundary_downstream 1             1             partial     full_screen
+    suspension      boundary_upstream   1             2             partial     full_screen
+    suspension      boundary_downstream 1             2             partial     full_screen
+  # Other cases are handled separately, see `alert_layout_special_case` below.
   """
 
   parameters_to_layout =
@@ -167,20 +165,13 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     |> String.split("\n", trim: true)
     |> Enum.reject(&String.starts_with?(&1, "#"))
     |> Enum.flat_map(fn line ->
-      [
-        effect,
-        location,
-        affected_line_count,
-        total_line_count,
-        layout_zero,
-        layout_one,
-        layout_two
-      ] = String.split(line, ~r/\s+/, trim: true)
+      [effect, location, affected_line_count, total_line_count, layout_zero, layout_one] =
+        String.split(line, ~r/\s+/, trim: true)
 
       # Convert strings to appropriate types
-      [effect, location, layout_zero, layout_one, layout_two] =
+      [effect, location, layout_zero, layout_one] =
         Enum.map(
-          [effect, location, layout_zero, layout_one, layout_two],
+          [effect, location, layout_zero, layout_one],
           &String.to_existing_atom/1
         )
 
@@ -191,8 +182,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
       [
         {Tuple.append(base_parameters, :zero), layout_zero},
-        {Tuple.append(base_parameters, :one), layout_one},
-        {Tuple.append(base_parameters, :two), layout_two}
+        {Tuple.append(base_parameters, :one), layout_one}
       ]
     end)
     |> Enum.into(%{})
@@ -208,15 +198,47 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     defp do_alert_layout(unquote(parameters_ast)), do: unquote(layout)
   end
 
-  # Delays always use partial alerts on all 3 rotations of the screen.
-  defp do_alert_layout(
-         {:delay, _location, _affected_line_count, _total_line_count, _rotation_index}
-       ) do
-    :partial
-  end
-
   # If matching inputs aren't found in the table, we assume the alert isn't relevant and do not render it.
   defp do_alert_layout(_parameters), do: :no_render
+
+  # Handles special cases that don't directly adhere to the table-based approach.
+  # Specifically, this determines the layout for:
+  #  - All delay alerts
+  #  - The third rotation
+  defp alert_layout_special_case(t, parameters) do
+    {effect, _location, _affected_line_count, _total_line_count, rotation_index} = parameters
+
+    delay_severity = t.alert.severity
+
+    cond do
+      effect == :delay ->
+        if delay_severity >= 5 do
+          # All delays >= 20 minutes get a partial alert on all 3 rotations
+          :partial
+        else
+          # We don't show delays < 20 minutes
+          log_layout_mismatch(t, parameters, delay_severity)
+          :no_render
+        end
+
+      rotation_index == :two ->
+        # For the third rotation, the layout depends on whether or not
+        # the screen has secondary departures configured.
+        #
+        # If the screen has secondary departures configured, it always gets a partial alert.
+        # If the screen does not have secondary departures configured, it gets the same layout as the first rotation.
+        #
+        # This is because we do not want to hide secondary departures (e.g. bus, CR) if they exist.
+        has_secondary_departures = t.screen.app_params.secondary_departures.sections != []
+
+        if has_secondary_departures,
+          do: :partial,
+          else: alert_layout(%{t | rotation_index: :zero})
+
+      true ->
+        false
+    end
+  end
 
   def get_affected_lines(t) do
     t
