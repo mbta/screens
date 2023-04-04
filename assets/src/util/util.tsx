@@ -3,7 +3,11 @@ import "moment-timezone";
 import { getDatasetValue } from "Util/dataset";
 
 export const classWithModifier = (baseClass, modifier) => {
-  return `${baseClass} ${baseClass}--${modifier}`;
+  if (!modifier) {
+    return baseClass;
+  } else {
+    return `${baseClass} ${baseClass}--${modifier}`;
+  }
 };
 
 export const classWithModifiers = (baseClass, modifiers) => {
