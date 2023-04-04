@@ -15,6 +15,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     :alert,
     :stop_sequences,
     :subway_routes_at_stop,
+    :primary_section_count,
     :rotation_index,
     :stop_name
   ]
@@ -25,6 +26,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
           alert: Alert.t(),
           stop_sequences: list(list(stop_id)),
           subway_routes_at_stop: list(%{route_id: route_id, active?: boolean}),
+          primary_section_count: pos_integer(),
           rotation_index: rotation_index,
           stop_name: String.t()
         }
@@ -88,10 +90,9 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     effect = t.alert.effect
     location = BaseAlert.location(t)
     affected_line_count = length(get_affected_lines(t))
-    total_line_count = length(get_total_lines(t))
     rotation_index = t.rotation_index
 
-    parameters = {effect, location, affected_line_count, total_line_count, rotation_index}
+    parameters = {effect, location, affected_line_count, t.primary_section_count, rotation_index}
 
     delay_severity = t.alert.severity
 
@@ -115,14 +116,14 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   # we generate DUP alert widgets for, but in case one slips through, we
   # should know about it!
   defp log_layout_mismatch(t, parameters, delay_severity) do
-    {effect, location, affected_line_count, total_line_count, rotation_index} = parameters
+    {effect, location, affected_line_count, total_section_count, rotation_index} = parameters
 
     labeled_parameters = [
       effect: effect,
       delay_severity: delay_severity,
       location: location,
       affected_line_count: affected_line_count,
-      total_line_count: total_line_count,
+      total_section_count: total_section_count,
       rotation_index: rotation_index
     ]
 
@@ -139,26 +140,26 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   # Table is adapted from the one in the product spec: https://www.notion.so/mbta-downtown-crossing/DUP-Alert-Widget-Specification-a82acff850ed4f2eb98a04e5f3e0fe52
   # Compile-time code converts each table row to `do_alert_layout` function clauses.
   alert_layout_table = """
-  # INPUTS                                                       || OUTPUTS
-  # Effect          Location            AffectedLines TotalLines || LayoutZero  LayoutOne   LayoutTwo
-    station_closure inside              1             1             full_screen full_screen partial
-    station_closure inside              1             2             partial     full_screen partial
-    station_closure inside              2             2             full_screen full_screen partial
+  # INPUTS                                                          || OUTPUTS
+  # Effect          Location            AffectedLines TotalSections || LayoutZero  LayoutOne   LayoutTwo
+    station_closure inside              1             1                full_screen full_screen partial
+    station_closure inside              1             2                partial     full_screen partial
+    station_closure inside              2             2                full_screen full_screen partial
   # "Boundary" location is not possible for station closures.
-    shuttle         inside              1             1             full_screen full_screen partial
-    shuttle         inside              1             2             partial     full_screen partial
-    shuttle         inside              2             2             full_screen full_screen partial
-    shuttle         boundary_upstream   1             1             partial     full_screen partial
-    shuttle         boundary_downstream 1             1             partial     full_screen partial
-    shuttle         boundary_upstream   1             2             partial     full_screen partial
-    shuttle         boundary_downstream 1             2             partial     full_screen partial
-    suspension      inside              1             1             full_screen full_screen partial
-    suspension      inside              1             2             partial     full_screen partial
-    suspension      inside              2             2             full_screen full_screen partial
-    suspension      boundary_upstream   1             1             partial     full_screen partial
-    suspension      boundary_downstream 1             1             partial     full_screen partial
-    suspension      boundary_upstream   1             2             partial     full_screen partial
-    suspension      boundary_downstream 1             2             partial     full_screen partial
+    shuttle         inside              1             1                full_screen full_screen partial
+    shuttle         inside              1             2                partial     full_screen partial
+    shuttle         inside              2             2                full_screen full_screen partial
+    shuttle         boundary_upstream   1             1                partial     full_screen partial
+    shuttle         boundary_downstream 1             1                partial     full_screen partial
+    shuttle         boundary_upstream   1             2                partial     full_screen partial
+    shuttle         boundary_downstream 1             2                partial     full_screen partial
+    suspension      inside              1             1                full_screen full_screen partial
+    suspension      inside              1             2                partial     full_screen partial
+    suspension      inside              2             2                full_screen full_screen partial
+    suspension      boundary_upstream   1             1                partial     full_screen partial
+    suspension      boundary_downstream 1             1                partial     full_screen partial
+    suspension      boundary_upstream   1             2                partial     full_screen partial
+    suspension      boundary_downstream 1             2                partial     full_screen partial
   # Delay alerts are handled separately, see `defp do_alert_layout({:delay, ...` below.
   """
 
@@ -171,7 +172,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
         effect,
         location,
         affected_line_count,
-        total_line_count,
+        total_section_count,
         layout_zero,
         layout_one,
         layout_two
@@ -184,10 +185,10 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
           &String.to_existing_atom/1
         )
 
-      [affected_line_count, total_line_count] =
-        Enum.map([affected_line_count, total_line_count], &String.to_integer/1)
+      [affected_line_count, total_section_count] =
+        Enum.map([affected_line_count, total_section_count], &String.to_integer/1)
 
-      base_parameters = {effect, location, affected_line_count, total_line_count}
+      base_parameters = {effect, location, affected_line_count, total_section_count}
 
       [
         {Tuple.append(base_parameters, :zero), layout_zero},
@@ -199,7 +200,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   @type layout_parameters ::
           {Alert.effect(), location :: atom, affected_line_count :: 1..2,
-           total_line_count :: 1..2, rotation_index}
+           total_section_count :: 1..2, rotation_index}
 
   # Now, define function clauses for each row in the table.
   @spec do_alert_layout(layout_parameters) :: :full_screen | :partial | :no_render
@@ -210,7 +211,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   # Delays always use partial alerts on all 3 rotations of the screen.
   defp do_alert_layout(
-         {:delay, _location, _affected_line_count, _total_line_count, _rotation_index}
+         {:delay, _location, _affected_line_count, _total_section_count, _rotation_index}
        ) do
     :partial
   end
@@ -221,12 +222,6 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   def get_affected_lines(t) do
     t
     |> BaseAlert.informed_routes_at_home_stop()
-    |> routes_to_lines()
-  end
-
-  def get_total_lines(t) do
-    t
-    |> BaseAlert.active_routes_at_stop()
     |> routes_to_lines()
   end
 
