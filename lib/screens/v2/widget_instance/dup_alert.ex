@@ -208,7 +208,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   #  - All delay alerts
   #  - The third rotation
   defp alert_layout_special_case(t, parameters) do
-    {effect, _location, _affected_line_count, _total_line_count, rotation_index} = parameters
+    {effect, _location, _affected_line_count, _total_section_count, rotation_index} = parameters
 
     delay_severity = t.alert.severity
 
