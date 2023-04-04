@@ -37,7 +37,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   @spec serialize_partial(DupAlert.t()) :: partial_alert_map
   def serialize_partial(t) do
     %{
-      text: %FreeTextLine{icon: :warning, text: partial_alert_free_text(t)},
+      text: %FreeTextLine{icon: partial_alert_icon(t), text: partial_alert_free_text(t)},
       color: line_color(t)
     }
   end
@@ -103,6 +103,9 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
         ["No train service"]
     end
   end
+
+  defp partial_alert_icon(t) when t.alert.effect == :delay, do: :delay
+  defp partial_alert_icon(_t), do: :warning
 
   defp issue_free_text(t) do
     build_line_text = get_line_text_builder(t)
