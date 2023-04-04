@@ -81,7 +81,8 @@ config :screens,
 
 config :screens,
   # Maps alert informed entity contents to the appropriate headsign to show for that alert.
-  # List elements must be of the shape {informed_stop_ids, not_informed_stop_ids, headsign, headway}.
+  # List elements must be of the shape
+  # %{informed: informed_stop_ids, not_informed: not_informed_stop_ids, alert_headsign: alert_headsign, headway_headsign: optional(headway_headsign)}.
   # Each set of stop IDs can be either a single string or a list of strings.
   dup_alert_headsign_matchers: %{
     # Kenmore
