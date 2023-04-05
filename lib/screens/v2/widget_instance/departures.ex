@@ -351,29 +351,34 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp serialize_time(departure, _screen, now) do
     departure_time = Departure.time(departure)
-    vehicle_status = Departure.vehicle_status(departure)
-    stop_type = Departure.stop_type(departure)
-    route_type = Departure.route_type(departure)
-
-    second_diff = DateTime.diff(departure_time, now)
-    minute_diff = round(second_diff / 60)
 
     time =
-      cond do
-        vehicle_status == :stopped_at and second_diff < 90 ->
-          %{type: :text, text: "BRD"}
+      if is_nil(departure_time) do
+        %{type: :icon, icon: :overnight}
+      else
+        vehicle_status = Departure.vehicle_status(departure)
+        stop_type = Departure.stop_type(departure)
+        route_type = Departure.route_type(departure)
 
-        second_diff < 30 and stop_type == :first_stop ->
-          %{type: :text, text: "BRD"}
+        second_diff = DateTime.diff(departure_time, now)
+        minute_diff = round(second_diff / 60)
 
-        second_diff < 30 ->
-          %{type: :text, text: "ARR"}
+        cond do
+          vehicle_status == :stopped_at and second_diff < 90 ->
+            %{type: :text, text: "BRD"}
 
-        minute_diff < 60 and route_type not in [:rail, :ferry] ->
-          %{type: :minutes, minutes: minute_diff}
+          second_diff < 30 and stop_type == :first_stop ->
+            %{type: :text, text: "BRD"}
 
-        true ->
-          serialize_timestamp(departure_time, now)
+          second_diff < 30 ->
+            %{type: :text, text: "ARR"}
+
+          minute_diff < 60 and route_type not in [:rail, :ferry] ->
+            %{type: :minutes, minutes: minute_diff}
+
+          true ->
+            serialize_timestamp(departure_time, now)
+        end
       end
 
     %{time: time}

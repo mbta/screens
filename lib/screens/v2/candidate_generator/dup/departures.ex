@@ -449,8 +449,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         )
 
       cond do
-        is_nil(last_schedule_today) or is_nil(first_schedule_tomorrow) ->
+        is_nil(last_schedule_today) ->
           nil
+
+        DateTime.compare(now, last_schedule_today.departure_time) == :gt and
+            is_nil(first_schedule_tomorrow) ->
+          %Departure{
+            schedule: %{last_schedule_today | departure_time: nil, arrival_time: nil}
+          }
 
         DateTime.compare(now, first_schedule_tomorrow.departure_time) == :gt ->
           Logger.warn(
