@@ -98,6 +98,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
       ) do
     pill_color = Route.get_color_for_route(route)
 
+    formatted_route =
+      case route do
+        "Green" <> _ -> "Green"
+        route -> route
+      end
+
     text =
       if is_only_section do
         %FreeTextLine{
@@ -105,7 +111,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           text: [
             %{
               color: pill_color,
-              text: "#{String.upcase(route)} LINE"
+              text: "#{String.upcase(formatted_route)} LINE"
             },
             %{special: :break},
             "#{headsign} trains every",
