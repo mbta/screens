@@ -105,7 +105,9 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   end
 
   defp partial_alert_icon(t) when t.alert.effect == :delay, do: :delay
-  defp partial_alert_icon(_t), do: :warning
+
+  defp partial_alert_icon(t),
+    do: if(line_color(t) === :yellow, do: :warning_negative, else: :warning)
 
   defp issue_free_text(t) do
     build_line_text = get_line_text_builder(t)
