@@ -184,8 +184,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     branches =
       alerts
       |> Enum.filter(fn a -> a.effect === :shuttle end)
-      |> Enum.map(
-        &get_branch_if_entity_matches_stop(&1, [
+      |> Enum.flat_map(
+        &get_branches_if_entity_matches_stop(&1, [
           %{branch: "b", stop: "70149"},
           %{branch: "c", stop: "70211"},
           %{branch: "d", stop: "70187"}
@@ -254,21 +254,21 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     end
   end
 
-  # Given an alert, see if any of its informed entities match a list of stops-of-interest (called stop_matchers here).
-  # If it has an informed entity on the list, return its branch.
-  @spec get_branch_if_entity_matches_stop(
+  # Given an alert, see if its informed entities match a list of stops-of-interest (called stop_matchers here).
+  # If a stop matcher is found, the branch is added the the returned list.
+  @spec get_branches_if_entity_matches_stop(
           Alert.t(),
           list(%{branch: String.t(), stop: String.t()})
         ) ::
           atom()
-  def get_branch_if_entity_matches_stop(%{informed_entities: informed_entities}, stop_matchers) do
+  def get_branches_if_entity_matches_stop(%{informed_entities: informed_entities}, stop_matchers) do
     stop_matchers
-    |> Enum.find(fn stop ->
-      Enum.any?(informed_entities, fn e ->
-        stop.stop === e.stop
+    |> Enum.map(fn stop ->
+      Enum.find_value(informed_entities, fn e ->
+        if stop.stop === e.stop, do: Map.get(stop, :branch)
       end)
     end)
-    |> Map.get(:branch)
+    |> Enum.reject(&is_nil(&1))
   end
 
   for {effect, key} <- Enum.with_index([:shuttle, :suspension, :station_closure, :detour, :delay]) do
