@@ -11,11 +11,16 @@ interface NormalHeaderProps {
   code?: string;
 }
 
-const NormalHeader = ({text, time, color, accentPattern, code}: NormalHeaderProps) => {
-
+const NormalHeader = ({
+  text,
+  time,
+  color,
+  accentPattern,
+  code,
+}: NormalHeaderProps) => {
   return (
     <DefaultNormalHeader
-      icon={Icon.logo}
+      icon={color === 'yellow' ? Icon.logo_negative : Icon.logo}
       text={text}
       time={time}
       // Currently, we don't use different codes that populating this would be useful...

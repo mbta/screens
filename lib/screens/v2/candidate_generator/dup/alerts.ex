@@ -32,9 +32,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     # - Check for special cases. If there is one, just use that. Otherwise:
     # - Select one alert
     # - Create 3 candidate structs from the alert, one for each rotation
-    %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}}} = config
+    %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}, header: header_config}} =
+      config
 
-    stop_name = fetch_stop_name_fn.(config.app_params.header.stop_id)
+    stop_name =
+      case header_config do
+        %{stop_id: stop_id} ->
+          case fetch_stop_name_fn.(stop_id) do
+            nil -> []
+            stop_name -> stop_name
+          end
+
+        %{stop_name: stop_name} ->
+          stop_name
+      end
 
     route_type_filter = get_route_type_filter(stop_id)
 
@@ -85,7 +96,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   defp create_alert_widgets(
          {:normal, alerts},
-         config,
+         %Screen{app_params: %Dup{primary_departures: %{sections: sections}}} = config,
          stop_sequences,
          subway_routes_at_stop,
          stop_name
@@ -101,6 +112,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
           alert: alert,
           stop_sequences: stop_sequences,
           subway_routes_at_stop: subway_routes_at_stop,
+          primary_section_count: length(sections),
           rotation_index: rotation_index,
           stop_name: stop_name
         }
@@ -108,12 +120,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     end
   end
 
-  defp relevant_alert?(alert, config, stop_sequences, subway_routes_at_stop, now) do
+  defp relevant_alert?(
+         alert,
+         %Screen{app_params: %Dup{primary_departures: %{sections: sections}}} = config,
+         stop_sequences,
+         subway_routes_at_stop,
+         now
+       ) do
     dup_alert = %DupAlert{
       screen: config,
       alert: alert,
       stop_sequences: stop_sequences,
       subway_routes_at_stop: subway_routes_at_stop,
+      primary_section_count: length(sections),
       rotation_index: :zero,
       stop_name: "A Station"
     }

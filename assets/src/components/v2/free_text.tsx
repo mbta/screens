@@ -9,6 +9,7 @@ const iconPills = ["cr", "bus"];
 const iconPaths: { [key: string]: string } = _.mapValues(
   {
     warning: "alert.svg",
+    warning_negative: "alert-black.svg",
     x: "no-service-white.svg",
     shuttle: "bus-white.svg",
     subway: "subway-white.svg",
@@ -20,6 +21,7 @@ const iconPaths: { [key: string]: string } = _.mapValues(
     green_d: "gl-d-color.svg",
     green_e: "gl-e-color.svg",
     bus: "bus-black.svg",
+    delay: "clock.svg",
   },
   imagePath
 );
@@ -68,7 +70,13 @@ const InlineIcon = ({ icon }: { icon: string }) => {
   );
 };
 
-const FormatString = ({ format, text }: { format: string | null; text?: string }) => {
+const FormatString = ({
+  format,
+  text,
+}: {
+  format: string | null;
+  text?: string;
+}) => {
   const modifiers = format === null ? [] : [format];
   const className = `free-text__element ${classWithModifiers(
     "free-text__string",
