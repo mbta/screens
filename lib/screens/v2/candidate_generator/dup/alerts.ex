@@ -260,7 +260,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
           Alert.t(),
           list(%{branch: String.t(), stop: String.t()})
         ) ::
-          atom()
+          [String.t()]
   def get_branches_if_entity_matches_stop(%{informed_entities: informed_entities}, stop_matchers) do
     stop_matchers
     |> Enum.filter(fn stop ->
