@@ -8,6 +8,8 @@ defmodule Screens.Stops.Stop do
   So there's inconsistent use of this local data.
   """
 
+  require Logger
+
   alias Screens.Routes
   alias Screens.Stops.StationsWithRoutesAgent
   alias Screens.V3Api
@@ -245,7 +247,21 @@ defmodule Screens.Stops.Stop do
     end
   end
 
-  def fetch_routes_serving_stop(station_id, headers \\ [], get_json_fn \\ &V3Api.get_json/5) do
+  def fetch_routes_serving_stop(
+        station_id,
+        headers \\ [],
+        get_json_fn \\ &V3Api.get_json/5,
+        attempts_left \\ 3
+      )
+
+  def fetch_routes_serving_stop(_station_id, _headers, _get_json_fn, 0), do: :bad_response
+
+  def fetch_routes_serving_stop(
+        station_id,
+        headers,
+        get_json_fn,
+        attempts_left
+      ) do
     case get_json_fn.(
            "routes",
            %{
@@ -255,6 +271,9 @@ defmodule Screens.Stops.Stop do
            [],
            true
          ) do
+      {:ok, %{"data" => []}, _} ->
+        fetch_routes_serving_stop(station_id, headers, get_json_fn, attempts_left - 1)
+
       {:ok, %{"data" => data}, headers} ->
         date =
           headers
@@ -282,17 +301,41 @@ defmodule Screens.Stops.Stop do
   def create_station_with_routes_map(station_id) do
     case StationsWithRoutesAgent.get(station_id) do
       {routes, date} ->
-        case fetch_routes_serving_stop(station_id, [{"if-modified-since", date}]) do
-          {:ok, new_routes} -> new_routes
-          :not_modified -> routes
-          :error -> []
-        end
+        get_routes_serving_stop(station_id, routes, date)
 
       nil ->
-        case fetch_routes_serving_stop(station_id) do
-          {:ok, new_routes} -> new_routes
-          :error -> []
-        end
+        get_routes_serving_stop(station_id)
+    end
+  end
+
+  defp get_routes_serving_stop(station_id, default_routes \\ [], date \\ nil) do
+    headers =
+      if is_nil(date) do
+        []
+      else
+        [{"if-modified-since", date}]
+      end
+
+    case fetch_routes_serving_stop(station_id, headers) do
+      {:ok, new_routes} ->
+        new_routes
+
+      :not_modified ->
+        default_routes
+
+      :bad_response ->
+        Logger.error(
+          "[create_station_with_routes_map no routes] Received an empty list from API: stop_id=#{station_id}"
+        )
+
+        default_routes
+
+      :error ->
+        Logger.error(
+          "[create_station_with_routes_map fetch error] Received an error from API: stop_id=#{station_id}"
+        )
+
+        default_routes
     end
   end
 
