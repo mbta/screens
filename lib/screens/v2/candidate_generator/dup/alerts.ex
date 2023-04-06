@@ -263,12 +263,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
           atom()
   def get_branches_if_entity_matches_stop(%{informed_entities: informed_entities}, stop_matchers) do
     stop_matchers
-    |> Enum.map(fn stop ->
-      Enum.find_value(informed_entities, fn e ->
-        if stop.stop === e.stop, do: Map.get(stop, :branch)
+    |> Enum.filter(fn stop ->
+      Enum.any?(informed_entities, fn e ->
+        stop.stop === e.stop
       end)
     end)
-    |> Enum.reject(&is_nil(&1))
+    |> Enum.map(&Map.get(&1, :branch))
   end
 
   for {effect, key} <- Enum.with_index([:shuttle, :suspension, :station_closure, :detour, :delay]) do
