@@ -151,6 +151,12 @@
   }
 }
 
+.partial-alert--yellow {
+  .free-text {
+    color: #171f26;
+  }
+}
+
 .headway-section:only-child {
   .free-text__line-container {
     margin-bottom: 56px;

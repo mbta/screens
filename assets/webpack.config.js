@@ -85,6 +85,7 @@ module.exports = (env, options) => ({
       },
       {
         test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        exclude: path.resolve(__dirname, "static/images/test"),
         use: [
           {
             loader: 'file-loader',
@@ -96,6 +97,32 @@ module.exports = (env, options) => ({
             }
           }
         ]
+      },
+      // {
+      //   test: /\.svg$/,
+      //   include: path.resolve(__dirname, "static/images/test"),
+      //   use: [
+      //     {
+      //       loader: "babel-loader",
+      //       options: {
+      //         presets: [
+      //           ["@babel/preset-env", { targets: "> 0.25%" }],
+      //           "@babel/preset-react",
+      //           "@babel/preset-typescript"
+      //         ]
+      //       }
+      //     },
+      //     {
+      //       loader: "react-svg-loader",
+      //       options: {
+      //         jsx: true // true outputs JSX tags
+      //       }
+      //     }
+      //   ]
+      // },
+      {
+        test: /\.svg$/,
+        use: ['@svgr/webpack'],
       }
     ]
   },

@@ -2,6 +2,7 @@ import React from "react";
 import _ from "lodash";
 
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
+import SvgBundler from "./bundled_svg/svg_bundler";
 
 const textPills = ["red", "blue", "orange", "green", "silver"];
 const iconPills = ["cr", "bus"];
@@ -55,7 +56,9 @@ const Icon = ({ icon }: { icon: string }) => {
   } else if (iconPills.includes(icon)) {
     iconElt = <IconRoutePill route={icon} />;
   } else {
-    iconElt = <img className="free-text__icon-image" src={srcForIcon(icon)} />;
+    iconElt = icon === "warning" ?
+      <SvgBundler svgString="assets/static/images/alert.svg"/>
+      : <img className="free-text__icon-image" src={srcForIcon(icon)} />;
   }
 
   return <div className="free-text__icon-container">{iconElt}</div>;
