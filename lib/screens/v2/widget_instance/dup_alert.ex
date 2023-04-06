@@ -162,10 +162,9 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   @spec alert_layout(t()) :: :full_screen | :partial | :no_render
   defp alert_layout(t) do
-    case t.alert.effect do
-      :delay -> delay_alert_layout(t)
-      _ -> non_delay_alert_layout(t)
-    end
+    if t.alert.effect == :delay,
+      do: delay_alert_layout(t),
+      else: non_delay_alert_layout(t)
   end
 
   defp delay_alert_layout(t) do
@@ -184,7 +183,9 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   defp non_delay_alert_layout(t) do
     parameters = get_layout_parameters(t)
 
-    case {t.rotation_index, Map.fetch(@parameters_to_layout_zero, parameters)} do
+    lookup_result = Map.fetch(@parameters_to_layout_zero, parameters)
+
+    case {t.rotation_index, lookup_result} do
       {:zero, {:ok, layout_zero}} ->
         # The first page's layout maps directly from `parameters`.
         layout_zero
