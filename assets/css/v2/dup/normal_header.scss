@@ -21,6 +21,9 @@
   &--silver {
     background-color: $line-color-silver;
   }
+  &--yellow {
+    background-color: $alert-yellow;
+  }
 }
 
 .normal-header-icon {
@@ -87,7 +90,6 @@
 }
 
 .normal-header--yellow {
-  background-color: $alert-yellow;
   .normal-header-title__text {
     color: #171F26;
   }
