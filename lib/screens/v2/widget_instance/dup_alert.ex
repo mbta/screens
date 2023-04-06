@@ -198,7 +198,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
         # The third page's layout depends on whether or not the screen has secondary departures configured.
         #
         # If the screen has secondary departures configured, it always gets a partial alert.
-        # If the screen does not have secondary departures configured, it gets the same layout as the first rotation.
+        # If the screen does not have secondary departures configured, it gets the same layout as the first page.
         #
         # This is because we do not want to hide secondary departures (e.g. bus, CR) if they exist.
         has_secondary_departures = t.screen.app_params.secondary_departures.sections != []
