@@ -85,3 +85,10 @@
   color: white;
   position: absolute;
 }
+
+.normal-header--yellow {
+  background-color: $alert-yellow;
+  .normal-header-title__text {
+    color: #1C1E23;
+  }
+}

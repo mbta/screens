@@ -9,6 +9,7 @@ const iconPills = ["cr", "bus"];
 const iconPaths: { [key: string]: string } = _.mapValues(
   {
     warning: "alert.svg",
+    warning_negative: "alert-black.svg",
     x: "no-service-white.svg",
     shuttle: "bus-white.svg",
     subway: "subway-white.svg",
