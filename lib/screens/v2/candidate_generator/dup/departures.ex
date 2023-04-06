@@ -436,9 +436,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     |> Enum.uniq()
     |> Enum.reject(&(&1 in routes_with_live_departures))
     |> Enum.map(fn {route_id, direction_id} ->
-      # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
-      # we do not display overnight mode.
-
       last_schedule_today =
         Enum.find(today_schedules, &(&1.route.id == route_id and &1.direction_id == direction_id))
 
@@ -448,30 +445,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           &(&1.route.id == route_id and &1.direction_id == direction_id)
         )
 
-      cond do
-        is_nil(last_schedule_today) ->
-          nil
-
-        DateTime.compare(now, last_schedule_today.departure_time) == :gt and
-            is_nil(first_schedule_tomorrow) ->
-          %Departure{
-            schedule: %{last_schedule_today | departure_time: nil, arrival_time: nil}
-          }
-
-        DateTime.compare(now, first_schedule_tomorrow.departure_time) == :gt ->
-          Logger.warn(
-            "[get_overnight_schedules_for_section] now is after first_schedule_tomorrow."
-          )
-
-          nil
-
-        DateTime.compare(now, last_schedule_today.departure_time) == :gt and
-            DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt ->
-          %Departure{schedule: first_schedule_tomorrow}
-
-        true ->
-          nil
-      end
+      get_overnight_departure_for_route(
+        last_schedule_today,
+        first_schedule_tomorrow,
+        route_id,
+        direction_id,
+        now
+      )
     end)
     # Routes not in overnight mode will be nil. Can ignore those.
     |> Enum.reject(&is_nil/1)
@@ -506,6 +486,52 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   defp get_overnight_schedules_for_section(_, _, _, _, _, _, _), do: []
+
+  defp get_overnight_departure_for_route(
+         nil,
+         _first_schedule_tomorrow,
+         route_id,
+         direction_id,
+         now
+       ) do
+    Logger.warn(
+      "[get_overnight_schedules_for_section] last_schedule_today not found. route_id=#{route_id} direction_id=#{direction_id} now=#{now}"
+    )
+
+    nil
+  end
+
+  # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case)
+  # we do not display overnight mode.
+  defp get_overnight_departure_for_route(
+         last_schedule_today,
+         first_schedule_tomorrow,
+         route_id,
+         direction_id,
+         now
+       ) do
+    cond do
+      DateTime.compare(now, last_schedule_today.departure_time) == :gt and
+          is_nil(first_schedule_tomorrow) ->
+        %Departure{
+          schedule: %{last_schedule_today | departure_time: nil, arrival_time: nil}
+        }
+
+      DateTime.compare(now, first_schedule_tomorrow.departure_time) == :gt ->
+        Logger.warn(
+          "[get_overnight_schedules_for_section] now is after first_schedule_tomorrow. route_id=#{route_id} direction_id=#{direction_id} now=#{now}"
+        )
+
+        nil
+
+      DateTime.compare(now, last_schedule_today.departure_time) == :gt and
+          DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt ->
+        %Departure{schedule: first_schedule_tomorrow}
+
+      true ->
+        nil
+    end
+  end
 
   defp get_today_tomorrow_schedules(
          fetch_params,
