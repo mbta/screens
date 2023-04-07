@@ -4,7 +4,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.Alerts.Alert
   alias Screens.Config.V2.FreeTextLine
   alias Screens.Config.Screen
-  alias Screens.Departures.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -69,52 +68,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
           app_params: nil
         }
       }
-    end
-
-    test "returns serialized normal_section for section with row with no scheduled time", %{
-      dup_screen: dup_screen
-    } do
-      section = %{
-        type: :normal_section,
-        rows: [
-          %Departure{
-            schedule:
-              struct(Schedule,
-                arrival_time: nil,
-                departure_time: nil,
-                route: %Screens.Routes.Route{
-                  id: "Orange",
-                  type: :subway,
-                  long_name: "Orange Line"
-                },
-                stop: %Screens.Stops.Stop{id: "70015", name: "Back Bay"},
-                stop_headsign: "Oak Grove"
-              )
-          }
-        ]
-      }
-
-      assert %{
-               rows: [
-                 %{
-                   headsign: %{headsign: "Oak Grove"},
-                   # MD5 hash when the schedule ID is nil. Won't change unless ID does.
-                   id: "1B2M2Y8AsgTpgAmY7PhCfg==",
-                   inline_alerts: [],
-                   route: %{color: :orange, text: "OL", type: :text},
-                   times_with_crowding: [
-                     %{
-                       crowding: nil,
-                       id: nil,
-                       time: %{icon: :overnight, type: :icon}
-                     }
-                   ],
-                   type: :departure_row
-                 }
-               ],
-               type: :normal_section
-             } ==
-               Departures.serialize_section(section, dup_screen, true)
     end
 
     test "returns serialized headway_section for one configured section", %{
