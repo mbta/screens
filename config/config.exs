@@ -139,14 +139,14 @@ config :screens,
       %{
         informed: "70205",
         not_informed: "70201",
-        alert_headsign: "Northbound",
+        alert_headsign: "North Station & North",
         headway_headsign: "Copley & West"
       },
       %{
         informed: "70202",
         not_informed: "70206",
         alert_headsign: "Copley & West",
-        headway_headsign: "Northbound"
+        headway_headsign: "North Station & North"
       },
       # OL
       %{
