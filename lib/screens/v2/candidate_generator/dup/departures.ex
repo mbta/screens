@@ -536,8 +536,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
         nil
 
-      DateTime.compare(now, last_schedule_today.departure_time) == :gt and
-          DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt ->
+      DateTime.compare(now, last_schedule_today.departure_time) == :gt ->
         %Departure{schedule: first_schedule_tomorrow}
 
       true ->
