@@ -386,7 +386,7 @@ defmodule Screens.Departures.Departure do
   end
 
   defp format_query_param({:date, %DateTime{} = date}) do
-    {"filter[date]", Util.get_service_day_today(date)}
+    {"filter[date]", Util.get_service_date_today(date)}
   end
 
   defp format_query_param({:date, %Date{} = date}) do
