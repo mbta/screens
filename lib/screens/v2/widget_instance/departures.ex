@@ -100,18 +100,24 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     text =
       if is_only_section do
+        time_range =
+          if headsign == "Ashmont/Braintree" do
+            [%{format: :bold, text: "#{lo}-#{hi}m"}]
+          else
+            [%{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
+          end
+
         %FreeTextLine{
           icon: "subway-negative-black",
-          text: [
-            %{
-              color: pill_color,
-              text: "#{String.upcase(route)} LINE"
-            },
-            %{special: :break},
-            "#{headsign} trains every",
-            %{format: :bold, text: "#{lo}-#{hi}"},
-            "minutes"
-          ]
+          text:
+            [
+              %{
+                color: pill_color,
+                text: "#{String.upcase(route)} LINE"
+              },
+              %{special: :break},
+              "#{headsign} trains every"
+            ] ++ time_range
         }
       else
         %FreeTextLine{
