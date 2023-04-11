@@ -90,6 +90,31 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                Departures.serialize_section(section, dup_screen, true)
     end
 
+    test "returns serialized headway_section for one configured section with Ashmont/Braintree headsign",
+         %{
+           dup_screen: dup_screen
+         } do
+      section = %{
+        type: :headway_section,
+        route: "Red",
+        time_range: {1, 2},
+        headsign: "Ashmont/Braintree"
+      }
+
+      expected_text = %{
+        icon: "subway-negative-black",
+        text: [
+          %{color: :red, text: "RED LINE"},
+          %{special: :break},
+          "Ashmont/Braintree trains every",
+          %{format: :bold, text: "1-2m"}
+        ]
+      }
+
+      assert %{type: :headway_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
     test "returns serialized headway_section for multiple configured sections", %{
       dup_screen: dup_screen
     } do
