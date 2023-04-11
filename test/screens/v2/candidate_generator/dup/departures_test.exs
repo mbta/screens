@@ -1880,7 +1880,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       now = ~U[2020-04-06T10:00:00Z]
 
       fetch_schedules_fn = fn
-        _, nil ->
+        _, ^now ->
           {:ok,
            [
              %Schedule{
