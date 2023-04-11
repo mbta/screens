@@ -2,7 +2,7 @@
   position: relative;
   height: 208px;
 
-  &:not(:last-child):after {
+  &:not(:last-child):not(:only-child):after {
     content: "";
     position: absolute;
     bottom: 0px;
