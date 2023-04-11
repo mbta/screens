@@ -90,7 +90,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
     do: [
       "No",
       %{icon: "green_b"},
-      %{format: :bold, text: "Bost Coll"},
+      %{format: :bold, text: "Boston College"},
       "or",
       %{icon: "green_d"},
       %{format: :bold, text: "Riverside"},
@@ -120,6 +120,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
       %{icon: "green_b"},
       %{icon: "green_c"},
       %{icon: "green_d"},
+      %{special: "break"},
       %{format: :bold, text: "Westbound"},
       "trains"
     ]
