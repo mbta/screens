@@ -26,7 +26,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type headway_section :: %{
           type: :headway_section,
-          pill: :red | :orange | :green | :blue
+          route: :red | :orange | :green | :blue,
+          time_range: {integer(), integer()},
+          headsign: String.t()
+        }
+
+  @type overnight_section :: %{
+          type: :overnight_section,
+          routes: list(Route.t())
         }
 
   @type notice :: %{
@@ -35,7 +42,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          section_data: list(section | notice_section | headway_section()),
+          section_data: list(section | notice_section | headway_section() | overnight_section()),
           slot_names: list(atom())
         }
 
