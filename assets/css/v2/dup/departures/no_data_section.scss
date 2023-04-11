@@ -15,16 +15,5 @@
 
   &__row {
     height: 208px;
-    position: relative;
-
-    &:after {
-      content: "";
-      position: absolute;
-      bottom: -2px;
-      left: 312px;
-      height: 4px;
-      width: 1576px;
-      background-color: #cccbc8;
-    }
   }
 }
