@@ -516,14 +516,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   # If now is after today's last schedule and there are no schedules tomorrow,
   # we still want a departure row without a time (will show a moon icon)
   defp get_overnight_departure_for_route(
-         _first_schedule_today,
+         first_schedule_today,
          last_schedule_today,
          nil,
          _route_id,
          _direction_id,
          now
        ) do
-    if DateTime.compare(now, last_schedule_today.departure_time) == :gt do
+    if DateTime.compare(now, last_schedule_today.departure_time) == :gt or
+         DateTime.compare(now, first_schedule_today.departure_time) == :lt do
       %Departure{
         schedule: %{last_schedule_today | departure_time: nil, arrival_time: nil}
       }
