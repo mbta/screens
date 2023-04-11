@@ -416,7 +416,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
     minute = local_time.minute
     am_pm = if local_time.hour >= 12, do: :pm, else: :am
-    show_am_pm = Util.get_service_day_tomorrow(now).day == local_time.day
+    show_am_pm = Util.get_service_date_tomorrow(now).day == local_time.day
     %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm, show_am_pm: show_am_pm}
   end
 
