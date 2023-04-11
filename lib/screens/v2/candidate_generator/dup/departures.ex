@@ -541,7 +541,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         %Departure{schedule: first_schedule_tomorrow}
 
       # After 3am but before the first scheduled trip of the day.
-      DateTime.compare(now, first_schedule_today.departure_time) == :lt ->
+      not is_nil(first_schedule_today) and
+          DateTime.compare(now, first_schedule_today.departure_time) == :lt ->
         %Departure{schedule: first_schedule_today}
 
       true ->
