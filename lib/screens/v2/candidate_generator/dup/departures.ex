@@ -558,8 +558,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     today =
       case fetch_schedules_fn.(fetch_params, now) do
         {:ok, schedules} when schedules != [] ->
-          # We want the last schedules of the current day.
-          # Need to reverse the list of fetched schedules so that List.first/1 looks at the correct time of day.
           Enum.filter(schedules, &(&1.route.id in route_ids_serving_section))
 
         # fetch error or empty schedules
