@@ -311,7 +311,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     # This will help us decide whether a headway in one direction is still useful
     # if there are two alerts that could be in different directions.
     |> Enum.reduce([], fn alert, acc -> acc ++ alert.informed_entities end)
-    |> Enum.dedup()
+    |> Enum.uniq()
   end
 
   defp get_headway_mode(_, _, [], _), do: :inactive
