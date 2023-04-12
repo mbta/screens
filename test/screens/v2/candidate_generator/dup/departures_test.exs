@@ -1481,7 +1481,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :headway_section,
-              route: "Green",
+              route: "Green-C",
               time_range: {7, 13},
               headsign: "Westbound"
             }
@@ -1493,7 +1493,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :headway_section,
-              route: "Green",
+              route: "Green-C",
               time_range: {7, 13},
               headsign: "Westbound"
             }
@@ -1505,7 +1505,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :headway_section,
-              route: "Green",
+              route: "Green-C",
               time_range: {7, 13},
               headsign: "Westbound"
             }
