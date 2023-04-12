@@ -147,7 +147,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          fetch_schedules_fn,
          fetch_vehicles_fn
        ) do
-        departures = Enum.filter(departures, fn departures -> if departures.prediction, do: departures.prediction.route.type != :ferry, else: departures.schedule.route.type != :ferry end)
     routes_with_live_departures =
       departures |> Enum.map(&{Departure.route_id(&1), Departure.direction_id(&1)}) |> Enum.uniq()
 
