@@ -36,12 +36,15 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   @type rotation_index :: :zero | :one | :two
 
   @spec priority(t()) :: Screens.V2.WidgetInstance.priority()
-  def priority(_t) do
-    # For DUP alerts, priority is constant.
-    # Barring manually configured override content, a valid alert will appear
-    # on screen and is the sole decider of what template layout is used for
-    # each rotation.
-    [1, 2]
+  def priority(t) do
+    # For DUP alerts, priority is based on layout.
+    # Overnight mode should take priority over partial alerts but not full_screen.
+    # Giving full_screen the highest priority so it will always show over overnight.
+    if alert_layout(t) == :full_screen do
+      [1]
+    else
+      [1, 2]
+    end
   end
 
   @spec serialize(t()) :: map()
