@@ -147,6 +147,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          fetch_schedules_fn,
          fetch_vehicles_fn
        ) do
+        departures = Enum.filter(departures, fn departures -> if departures.prediction, do: departures.prediction.route.type != :ferry, else: departures.schedule.route.type != :ferry end)
     routes_with_live_departures =
       departures |> Enum.map(&{Departure.route_id(&1), Departure.direction_id(&1)}) |> Enum.uniq()
 
@@ -294,6 +295,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       route_types: [:light_rail, :subway]
     ]
 
+    # This section gets alert entities, which are used to decide whether we should be in headway mode or overnight mode
     alert_fetch_params
     |> fetch_alerts_fn.()
     |> Enum.filter(fn
@@ -405,7 +407,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   # If we are currently overnight, returns the first schedule of the day for each route_id and direction for each stop.
   # Otherwise, return an empty list.
   defp get_overnight_schedules_for_section(
-         stops_with_live_departures,
+         routes_with_live_departures,
          stop_ids,
          routes_serving_section,
          alert_informed_entities,
@@ -419,7 +421,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          routes_with_live_departures,
          params,
          routes,
-         nil,
+         [],
          now,
          fetch_schedules_fn,
          _
@@ -438,9 +440,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     |> Enum.uniq()
     |> Enum.reject(&(&1 in routes_with_live_departures))
     |> Enum.map(fn {route_id, direction_id} ->
-      # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
-      # we do not display overnight mode.
-
       # This variable will be used when now is after 3am.
       first_schedule_today =
         Enum.find(
@@ -475,7 +474,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   defp get_overnight_schedules_for_section(
-         stops_with_live_departures,
+         routes_with_live_departures,
          params,
          [%{type: type} | _] = routes,
          alert_informed_entities,
@@ -488,10 +487,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     # If there are no vehicles operating on the route, assume we are overnight.
     if not is_nil(informed_route) and fetch_vehicles_fn.(informed_route, nil) == [] do
       get_overnight_schedules_for_section(
-        stops_with_live_departures,
+        routes_with_live_departures,
         params,
         routes,
-        nil,
+        [],
         now,
         fetch_schedules_fn,
         fetch_vehicles_fn
@@ -503,6 +502,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp get_overnight_schedules_for_section(_, _, _, _, _, _, _), do: []
 
+  # Verifies we are meeting the timeframe conditions for overnight mode and generates the departure widget
   defp get_overnight_departure_for_route(
          _first_schedule_today,
          nil,
