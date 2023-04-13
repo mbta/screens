@@ -122,7 +122,10 @@ const App = (): JSX.Element => {
     <Router>
       <Switch>
         <Route exact path="/v2/screen/dup_v2">
-          <MultiScreenPage components={TYPE_TO_COMPONENT} />
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
         </Route>
         <Route exact path="/v2/screen/:id/simulation">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
