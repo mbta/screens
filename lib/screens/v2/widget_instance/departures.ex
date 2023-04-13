@@ -126,7 +126,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
             [
               %{
                 color: pill_color,
-                text: "#{String.upcase(route)} LINE"
+                text: "#{String.upcase(formatted_route)} LINE"
               },
               %{special: :break},
               "#{headsign} trains every"
