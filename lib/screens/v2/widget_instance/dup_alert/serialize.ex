@@ -177,5 +177,9 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     ["No", bold("Cleveland Cir"), "trains"]
   end
 
+  defp partial_headsign_special_cases(["No", bold("North Station & North"), "trains"]) do
+    ["No", bold("Northbound"), "trains"]
+  end
+
   defp partial_headsign_special_cases(other), do: other
 end

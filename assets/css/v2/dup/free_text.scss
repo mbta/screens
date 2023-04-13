@@ -86,6 +86,16 @@
   }
 }
 
+.free-text__inline-icon {
+  height: 208px;
+  line-height: 168px;
+}
+
+.free-text__inline-icon-image {
+  height: 139px;
+  transform: translateY(20px);
+}
+
 .free-text__route-pill__text,
 .free-text__text-pill__text {
   display: inline-block;

@@ -105,6 +105,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
       ) do
     pill_color = Route.get_color_for_route(route)
 
+    formatted_route =
+      case route do
+        "Green" <> _ -> "Green"
+        route -> route
+      end
+
     text =
       if is_only_section do
         time_range =
