@@ -178,6 +178,11 @@
     line-height: initial;
   }
 
+  .free-text__pill-container {
+    display: inline-block;
+    height: 168px;
+  }
+
   .free-text__icon-container {
     width: 168px;
     height: 168px;
@@ -193,7 +198,7 @@
 
   .free-text__text-pill {
     border-radius: 84px;
-    transform: translateY(-16px);
+    transform: translateY(-18px);
   }
 
   .free-text__text-pill__text {
