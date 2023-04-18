@@ -1968,7 +1968,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     end
 
     @tag capture_log: true
-    test "returns DeparturesNoData if now is after tomorrow's first schedule",
+    test "returns empty departures if now is after tomorrow's first schedule",
          %{
            config: config,
            fetch_section_departures_fn: fetch_section_departures_fn,
@@ -2010,20 +2010,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       end
 
       expected_departures = [
-        %DeparturesNoData{
+        %DeparturesWidget{
           screen: config,
-          show_alternatives?: nil,
-          slot_name: :main_content_zero
+          section_data: [%{rows: [], type: :normal_section}],
+          slot_names: [:main_content_zero]
         },
-        %DeparturesNoData{
+        %DeparturesWidget{
           screen: config,
-          show_alternatives?: nil,
-          slot_name: :main_content_one
+          section_data: [%{rows: [], type: :normal_section}],
+          slot_names: [:main_content_one]
         },
-        %DeparturesNoData{
+        %DeparturesWidget{
           screen: config,
-          show_alternatives?: nil,
-          slot_name: :main_content_two
+          section_data: [%{rows: [], type: :normal_section}],
+          slot_names: [:main_content_two]
         }
       ]
 
@@ -2041,7 +2041,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
 
-    test "returns DeparturesNoData if now is before today's last schedule and there are no schedules tomorrow",
+    test "returns empty departures if now is before today's last schedule and there are no schedules tomorrow",
          %{
            config: config,
            fetch_section_departures_fn: fetch_section_departures_fn,
@@ -2076,20 +2076,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       end
 
       expected_departures = [
-        %DeparturesNoData{
+        %DeparturesWidget{
           screen: config,
-          show_alternatives?: nil,
-          slot_name: :main_content_zero
+          section_data: [%{rows: [], type: :normal_section}],
+          slot_names: [:main_content_zero]
         },
-        %DeparturesNoData{
+        %DeparturesWidget{
           screen: config,
-          show_alternatives?: nil,
-          slot_name: :main_content_one
+          section_data: [%{rows: [], type: :normal_section}],
+          slot_names: [:main_content_one]
         },
-        %DeparturesNoData{
+        %DeparturesWidget{
           screen: config,
-          show_alternatives?: nil,
-          slot_name: :main_content_two
+          section_data: [%{rows: [], type: :normal_section}],
+          slot_names: [:main_content_two]
         }
       ]
 
