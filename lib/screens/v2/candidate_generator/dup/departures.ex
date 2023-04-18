@@ -502,15 +502,16 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   # Verifies we are meeting the timeframe conditions for overnight mode and generates the departure widget
   defp get_overnight_departure_for_route(
-         _first_schedule_today,
-         nil,
+         first_schedule_today,
+         second_schedule_today,
          _first_schedule_tomorrow,
          route_id,
          direction_id,
          now
-       ) do
-    Logger.warn(
-      "[get_overnight_schedules_for_section] last_schedule_today not found. route_id=#{route_id} direction_id=#{direction_id} now=#{now}"
+       )
+       when is_nil(first_schedule_today) or is_nil(second_schedule_today) do
+    Logger.info(
+      "[get_overnight_schedules_for_section] No schedules for today found. route_id=#{route_id} direction_id=#{direction_id} now=#{now}"
     )
 
     nil
