@@ -42,19 +42,13 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     }
   end
 
-  # TO BE DONE: Move these closer to the FreeText modules and make public so they're generally available
+  # TO BE DONE: Move this closer to the FreeText modules and make public so it's generally available.
+  #             Also define similar macros for other formattings, e.g. `small`
   #       https://app.asana.com/0/1185117109217422/1204252210980218/f
   # Provides a pattern-matchable shorthand for bolding some text
   defmacrop bold(str) do
     quote do
       %{format: :bold, text: unquote(str)}
-    end
-  end
-
-  # Provides a pattern-matchable shorthand for shrinking some text
-  defmacrop small(str) do
-    quote do
-      %{format: :small, text: unquote(str)}
     end
   end
 
@@ -119,8 +113,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
           ["No"] ++ build_line_text.("or") ++ ["trains to #{headsign}"]
         else
-          ["No"] ++
-            build_line_text.("or") ++ ["trains", small(Alert.get_cause_string(t.alert.cause))]
+          ["No"] ++ build_line_text.("or") ++ ["trains #{Alert.get_cause_string(t.alert.cause)}"]
         end
 
       2 ->
