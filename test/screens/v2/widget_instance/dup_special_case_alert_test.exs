@@ -1,8 +1,8 @@
 defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
   use ExUnit.Case, async: true
-  
+
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{Alerts, Departures, Dup, FreeTextLine} 
+  alias Screens.Config.V2.{Alerts, Departures, Dup, FreeTextLine}
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: DupAlerts
   alias Screens.V2.WidgetInstance.DupSpecialCaseAlert
 
@@ -18,6 +18,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           },
           app_id: :dup_v2
         })
+
       config_wtc =
         struct(Screen, %{
           app_params: %Dup{
@@ -91,7 +92,8 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           active_period: [{~U[2023-04-14 10:29:51Z], ~U[2023-04-14 21:30:05Z]}],
           cause: :unknown,
           created_at: ~U[2023-04-14 10:29:52Z],
-          description: "Affected stops:\r\nKenmore\r\nBlandford Street\r\nBoston University East\r\nBoston University Central",
+          description:
+            "Affected stops:\r\nKenmore\r\nBlandford Street\r\nBoston University East\r\nBoston University Central",
           effect: :shuttle,
           header: "Shuttle buses replacing Green Line B branch service",
           id: "137269",
@@ -331,7 +333,8 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           active_period: [{~U[2023-04-14 10:53:53Z], ~U[2023-04-14 21:53:59Z]}],
           cause: :unknown,
           created_at: ~U[2023-04-14 10:53:54Z],
-          description: "Affected stops:\r\nKenmore\r\nBlandford Street\r\nSaint Mary's Street\r\nFenway",
+          description:
+            "Affected stops:\r\nKenmore\r\nBlandford Street\r\nSaint Mary's Street\r\nFenway",
           effect: :shuttle,
           header: "Shuttle buses replacing Green Line service",
           id: "137273",
@@ -602,7 +605,8 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           active_period: [{~U[2023-04-14 10:48:05Z], ~U[2023-04-14 16:53:05Z]}],
           cause: :unknown,
           created_at: ~U[2023-04-14 10:48:06Z],
-          description: "Affected stops:\r\nSouth Station (outbound)\r\nCourthouse (outbound)\r\nWorld Trade Center (outbound)",
+          description:
+            "Affected stops:\r\nSouth Station (outbound)\r\nCourthouse (outbound)\r\nWorld Trade Center (outbound)",
           effect: :detour,
           header: "Silver Line - SL1, Silver Line - SL2 and Silver Line - SL3 detoured",
           id: "137327",
@@ -785,27 +789,95 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
       ]
 
       kenmore_stop_sequences = [
-        ["place-unsqu", "place-lech", "place-spmnl", "place-north", "place-haecl",
-         "place-gover", "place-pktrm", "place-boyls", "place-armnl", "place-coecl",
-         "place-hymnl", "place-kencl", "place-fenwy", "place-longw", "place-bvmnl",
-         "place-brkhl", "place-bcnfd", "place-rsmnl", "place-chhil", "place-newto",
-         "place-newtn", "place-eliot", "place-waban", "place-woodl", "place-river"],
-        ["place-gover", "place-pktrm", "place-boyls", "place-armnl", "place-coecl",
-         "place-hymnl", "place-kencl", "place-bland", "place-buest", "place-bucen",
-         "place-amory", "place-babck", "place-brico", "place-harvd", "place-grigg",
-         "place-alsgr", "place-wrnst", "place-wascm", "place-sthld", "place-chswk",
-         "place-chill", "place-sougr", "place-lake"],
-        ["place-gover", "place-pktrm", "place-boyls", "place-armnl", "place-coecl",
-         "place-hymnl", "place-kencl", "place-smary", "place-hwsst", "place-kntst",
-         "place-stpul", "place-cool", "place-sumav", "place-bndhl", "place-fbkst",
-         "place-bcnwa", "place-tapst", "place-denrd", "place-engav", "place-clmnl"]
+        [
+          "place-unsqu",
+          "place-lech",
+          "place-spmnl",
+          "place-north",
+          "place-haecl",
+          "place-gover",
+          "place-pktrm",
+          "place-boyls",
+          "place-armnl",
+          "place-coecl",
+          "place-hymnl",
+          "place-kencl",
+          "place-fenwy",
+          "place-longw",
+          "place-bvmnl",
+          "place-brkhl",
+          "place-bcnfd",
+          "place-rsmnl",
+          "place-chhil",
+          "place-newto",
+          "place-newtn",
+          "place-eliot",
+          "place-waban",
+          "place-woodl",
+          "place-river"
+        ],
+        [
+          "place-gover",
+          "place-pktrm",
+          "place-boyls",
+          "place-armnl",
+          "place-coecl",
+          "place-hymnl",
+          "place-kencl",
+          "place-bland",
+          "place-buest",
+          "place-bucen",
+          "place-amory",
+          "place-babck",
+          "place-brico",
+          "place-harvd",
+          "place-grigg",
+          "place-alsgr",
+          "place-wrnst",
+          "place-wascm",
+          "place-sthld",
+          "place-chswk",
+          "place-chill",
+          "place-sougr",
+          "place-lake"
+        ],
+        [
+          "place-gover",
+          "place-pktrm",
+          "place-boyls",
+          "place-armnl",
+          "place-coecl",
+          "place-hymnl",
+          "place-kencl",
+          "place-smary",
+          "place-hwsst",
+          "place-kntst",
+          "place-stpul",
+          "place-cool",
+          "place-sumav",
+          "place-bndhl",
+          "place-fbkst",
+          "place-bcnwa",
+          "place-tapst",
+          "place-denrd",
+          "place-engav",
+          "place-clmnl"
+        ]
       ]
 
       wtc_stop_sequences = [
-        ["place-sstat", "place-crtst", "place-wtcst", "place-conrd", "place-aport",
-         "place-estav", "place-boxdt", "place-belsq", "place-chels"],
-        ["place-sstat", "place-crtst", "place-wtcst", "place-conrd", "247", "30249",
-         "30250"],
+        [
+          "place-sstat",
+          "place-crtst",
+          "place-wtcst",
+          "place-conrd",
+          "place-aport",
+          "place-estav",
+          "place-boxdt",
+          "place-belsq",
+          "place-chels"
+        ],
+        ["place-sstat", "place-crtst", "place-wtcst", "place-conrd", "247", "30249", "30250"],
         ["place-sstat", "place-crtst", "place-wtcst", "place-conrd", "17091"]
       ]
 
@@ -815,15 +887,15 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         now: now,
         fetch_stop_name_fn: fn _ -> "Test" end,
         fetch_routes_by_stop_fn: fn
-            "place-kencl", _, [:light_rail, :subway] -> {:ok, kenmore_routes}
-            "place-wtcst", _, [:bus] -> {:ok, wtc_routes}
-          end,
+          "place-kencl", _, [:light_rail, :subway] -> {:ok, kenmore_routes}
+          "place-wtcst", _, [:bus] -> {:ok, wtc_routes}
+        end,
         kenmore_alerts: kenmore_alerts,
         wtc_alerts: wtc_alerts,
         fetch_parent_station_sequences_fn: fn
-            "place-kencl", ["Green-B", "Green-C", "Green-D"] -> {:ok, kenmore_stop_sequences}
-            "place-wtcst", ["741", "742", "743"] -> {:ok, wtc_stop_sequences}
-          end
+          "place-kencl", ["Green-B", "Green-C", "Green-D"] -> {:ok, kenmore_stop_sequences}
+          "place-wtcst", ["741", "742", "743"] -> {:ok, wtc_stop_sequences}
+        end
       }
     end
 
@@ -832,14 +904,15 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
 
       fetch_alerts_fn = fn route_ids: ["Green-B", "Green-C", "Green-D"] -> {:ok, alerts} end
 
-      actual_widgets = DupAlerts.alert_instances(
-        context.config_kenmore,
-        context.now,
-        context.fetch_stop_name_fn,
-        context.fetch_routes_by_stop_fn,
-        fetch_alerts_fn,
-        context.fetch_parent_station_sequences_fn
-      )
+      actual_widgets =
+        DupAlerts.alert_instances(
+          context.config_kenmore,
+          context.now,
+          context.fetch_stop_name_fn,
+          context.fetch_routes_by_stop_fn,
+          fetch_alerts_fn,
+          context.fetch_parent_station_sequences_fn
+        )
 
       expected_serialized_json = [
         %{
@@ -877,26 +950,33 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         }
       ]
 
-      assert Enum.at(expected_serialized_json, 0) == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 0))
-      assert Enum.at(expected_serialized_json, 1) == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 1))
-      assert Enum.at(expected_serialized_json, 2) == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 2))
+      assert Enum.at(expected_serialized_json, 0) ==
+               DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 0))
+
+      assert Enum.at(expected_serialized_json, 1) ==
+               DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 1))
+
+      assert Enum.at(expected_serialized_json, 2) ==
+               DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 2))
     end
 
     test "serializes Kenmore special case: C / D, multiple alerts", context do
-      alerts = context.kenmore_alerts
+      alerts =
+        context.kenmore_alerts
         |> Enum.drop(1)
         |> Enum.drop(-1)
 
       fetch_alerts_fn = fn route_ids: ["Green-B", "Green-C", "Green-D"] -> {:ok, alerts} end
 
-      actual_widgets = DupAlerts.alert_instances(
-        context.config_kenmore,
-        context.now,
-        context.fetch_stop_name_fn,
-        context.fetch_routes_by_stop_fn,
-        fetch_alerts_fn,
-        context.fetch_parent_station_sequences_fn
-      )
+      actual_widgets =
+        DupAlerts.alert_instances(
+          context.config_kenmore,
+          context.now,
+          context.fetch_stop_name_fn,
+          context.fetch_routes_by_stop_fn,
+          fetch_alerts_fn,
+          context.fetch_parent_station_sequences_fn
+        )
 
       expected_serialized_json = [
         %{
@@ -934,9 +1014,14 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         }
       ]
 
-      assert Enum.at(expected_serialized_json, 0) == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 0))
-      assert Enum.at(expected_serialized_json, 1) == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 1))
-      assert Enum.at(expected_serialized_json, 2) == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 2))
+      assert Enum.at(expected_serialized_json, 0) ==
+               DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 0))
+
+      assert Enum.at(expected_serialized_json, 1) ==
+               DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 1))
+
+      assert Enum.at(expected_serialized_json, 2) ==
+               DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 2))
     end
 
     test "serializes Kenmore special case: B / D, single alert ", context do
@@ -944,14 +1029,15 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
 
       fetch_alerts_fn = fn route_ids: ["Green-B", "Green-C", "Green-D"] -> {:ok, alerts} end
 
-      actual_widgets = DupAlerts.alert_instances(
-        context.config_kenmore,
-        context.now,
-        context.fetch_stop_name_fn,
-        context.fetch_routes_by_stop_fn,
-        fetch_alerts_fn,
-        context.fetch_parent_station_sequences_fn
-      )
+      actual_widgets =
+        DupAlerts.alert_instances(
+          context.config_kenmore,
+          context.now,
+          context.fetch_stop_name_fn,
+          context.fetch_routes_by_stop_fn,
+          fetch_alerts_fn,
+          context.fetch_parent_station_sequences_fn
+        )
 
       expected_serialized_json = [
         %{
@@ -989,9 +1075,14 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         }
       ]
 
-      assert Enum.at(expected_serialized_json, 0) == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 0))
-      assert Enum.at(expected_serialized_json, 1) == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 1))
-      assert Enum.at(expected_serialized_json, 2) == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 2))
+      assert Enum.at(expected_serialized_json, 0) ==
+               DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 0))
+
+      assert Enum.at(expected_serialized_json, 1) ==
+               DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 1))
+
+      assert Enum.at(expected_serialized_json, 2) ==
+               DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 2))
     end
 
     test "serializes Kenmore special case: B / C / D, single alert", context do
@@ -999,14 +1090,15 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
 
       fetch_alerts_fn = fn route_ids: ["Green-B", "Green-C", "Green-D"] -> {:ok, alerts} end
 
-      actual_widgets = DupAlerts.alert_instances(
-        context.config_kenmore,
-        context.now,
-        context.fetch_stop_name_fn,
-        context.fetch_routes_by_stop_fn,
-        fetch_alerts_fn,
-        context.fetch_parent_station_sequences_fn
-      )
+      actual_widgets =
+        DupAlerts.alert_instances(
+          context.config_kenmore,
+          context.now,
+          context.fetch_stop_name_fn,
+          context.fetch_routes_by_stop_fn,
+          fetch_alerts_fn,
+          context.fetch_parent_station_sequences_fn
+        )
 
       expected_serialized_json = [
         %{
@@ -1044,9 +1136,14 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         }
       ]
 
-      assert Enum.at(expected_serialized_json, 0) == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 0))
-      assert Enum.at(expected_serialized_json, 1) == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 1))
-      assert Enum.at(expected_serialized_json, 2) == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 2))
+      assert Enum.at(expected_serialized_json, 0) ==
+               DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 0))
+
+      assert Enum.at(expected_serialized_json, 1) ==
+               DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 1))
+
+      assert Enum.at(expected_serialized_json, 2) ==
+               DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 2))
     end
 
     test "serializes WTC special case: WTC is detoured", context do
@@ -1054,14 +1151,15 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
 
       fetch_alerts_fn = fn route_ids: ["741", "742", "743"] -> {:ok, alerts} end
 
-      actual_widgets = DupAlerts.alert_instances(
-        context.config_wtc,
-        context.now,
-        context.fetch_stop_name_fn,
-        context.fetch_routes_by_stop_fn,
-        fetch_alerts_fn,
-        context.fetch_parent_station_sequences_fn
-      )
+      actual_widgets =
+        DupAlerts.alert_instances(
+          context.config_wtc,
+          context.now,
+          context.fetch_stop_name_fn,
+          context.fetch_routes_by_stop_fn,
+          fetch_alerts_fn,
+          context.fetch_parent_station_sequences_fn
+        )
 
       expected_serialized_json = %{
         text: %Screens.Config.V2.FreeTextLine{
@@ -1079,6 +1177,5 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
       assert expected_serialized_json == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 1))
       assert expected_serialized_json == DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 2))
     end
-
   end
 end
