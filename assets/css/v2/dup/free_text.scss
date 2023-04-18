@@ -8,10 +8,6 @@
 .free-text__line {
   display: inline-block;
   vertical-align: middle;
-
-  .free-text__route-pill {
-    transform: translateY(-20px);
-  }
 }
 
 .free-text__icon-container {
@@ -86,12 +82,20 @@
   }
 }
 
+.free-text__inline-icon {
+  height: 208px;
+  line-height: 168px;
+}
+
+.free-text__inline-icon-image {
+  height: 139px;
+}
+
 .free-text__route-pill__text,
 .free-text__text-pill__text {
   display: inline-block;
   font-family: Helvetica, sans-serif;
   font-weight: 700;
-  transform: translateY(12px);
 }
 
 .free-text__route-pill__text {
@@ -99,12 +103,7 @@
 
   &--branch {
     font-size: 84px;
-    transform: translateY(8px);
   }
-}
-
-.free-text__text-pill {
-  transform: translateY(-20px);
 }
 
 .partial-alert,
@@ -124,17 +123,17 @@
   }
 
   .free-text__icon-image {
-    height: 128px;
+    height: 144px;
     padding-top: 40px;
     padding-bottom: 40px;
   }
 
   .free-text__route-pill {
-    height: 128px;
+    height: 144px;
     width: 248px;
     border-radius: 72px;
     font-size: 96px;
-    line-height: 117px;
+    line-height: 144px;
   }
 
   .free-text__text-pill {
@@ -168,6 +167,11 @@
     line-height: initial;
   }
 
+  .free-text__pill-container {
+    display: inline-block;
+    height: 168px;
+  }
+
   .free-text__icon-container {
     width: 168px;
     height: 168px;
@@ -183,7 +187,6 @@
 
   .free-text__text-pill {
     border-radius: 84px;
-    transform: translateY(-16px);
   }
 
   .free-text__text-pill__text {
@@ -217,8 +220,7 @@
   .free-text__route-pill__text {
     font-size: 96px;
     font-weight: 700;
-    line-height: 117px;
-    margin-top: 10px;
+    line-height: 144px;
   }
 
   .free-text__icon-container {
@@ -229,48 +231,6 @@
   .free-text__icon-image {
     height: 112.5px;
     margin-top: 15.75px;
-  }
-}
-
-.overnight-section {
-  .free-text {
-    color: #171f26;
-    display: inline-block;
-    margin: 32px;
-  }
-
-  .free-text__line {
-    font-weight: 600;
-    font-size: 138px;
-    line-height: 148px;
-    color: #171f26;
-    width: 1268px;
-  }
-
-  .free-text__route-pill {
-    color: #ffffff;
-    height: 128px;
-    width: 248px;
-    border-radius: 100px;
-    margin: 0 32px 0 0;
-  }
-
-  .free-text__route-pill__text {
-    font-size: 96px;
-    font-weight: 700;
-    line-height: 117px;
-  }
-
-  .free-text__icon-container {
-    width: 248px;
-    height: 144px;
-    margin-right: 32px;
-    height: 112.5px;
-    margin-top: 15.75px;
-  }
-
-  .free-text__text-pill {
-    color: #ffffff;
   }
 }
 
@@ -316,39 +276,42 @@
 .overnight-section {
   .free-text {
     display: inline-block;
-    margin: 32px;
+    line-height: unset;
   }
 
   .free-text__line {
     font-weight: 600;
     font-size: 138px;
-    line-height: 128px;
     color: #171f26;
-    width: 1576px;
+    width: 1145px;
   }
 
   .free-text__route-pill {
-    height: 128px;
+    height: 144px;
     width: 248px;
-    border-radius: 100px;
-    margin: 0 32px 0 0;
+    border-radius: 72px;
+    font-size: 96px;
+    line-height: 144px;
   }
 
   .free-text__route-pill__text {
     font-size: 96px;
     font-weight: 700;
-    line-height: 117px;
+    line-height: 144px;
   }
 
   .free-text__icon-container {
-    width: 248px;
-    height: 144px;
-    margin-right: 32px;
+    width: 312px;
+    height: 208px;
     vertical-align: top;
   }
 
   .free-text__icon-image {
     height: 112.5px;
     margin-top: 15.75px;
+  }
+
+  .free-text__string {
+    line-height: unset;
   }
 }

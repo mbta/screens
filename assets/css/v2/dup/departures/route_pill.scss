@@ -46,6 +46,7 @@
     margin-left: 0px;
     margin-top: 20px;
     margin-bottom: 20px;
+    box-shadow: 2px 4px 2px rgba(0, 0, 0, 0.25);
   }
 }
 
@@ -57,13 +58,11 @@
   font-size: 96px;
   line-height: 144px;
   font-weight: 700;
-  transform: translateY(8px);
   letter-spacing: 0.0277em;
   color: white;
 
   &--yellow {
     font-family: Inter, sans-serif;
-    transform: translateY(8px);
     color: black;
     line-height: 168px;
     font-size: 128px;
