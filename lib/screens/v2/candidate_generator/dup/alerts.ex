@@ -180,7 +180,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   # In the case where Kenmore has 2 or more boundary shuttles / suspensions to the west,
   # don't only select 1 alert; instead look at all alerts and make custom text
   @spec kenmore_special_case(list(Alert.t())) :: {:special, list(Screens.V2.WidgetInstance.t())}
-  def kenmore_special_case(alerts) do
+  defp kenmore_special_case(alerts) do
     branches =
       alerts
       |> Enum.filter(fn a -> a.effect === :shuttle end)
@@ -229,7 +229,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   # In the case where we're at WTC and there's a detour affecting routes SL1/2/3, make custom text
   # Ignore all other SL alerts
   @spec wtc_special_case(list(Alert.t())) :: {:special, list(Screens.V2.WidgetInstance.t())}
-  def wtc_special_case(alerts) do
+  defp wtc_special_case(alerts) do
     alert = choose_alert(alerts)
 
     detoured_routes =
@@ -261,7 +261,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
           list(%{branch: String.t(), stop: String.t()})
         ) ::
           [String.t()]
-  def get_branches_if_entity_matches_stop(%{informed_entities: informed_entities}, stop_matchers) do
+  defp get_branches_if_entity_matches_stop(%{informed_entities: informed_entities}, stop_matchers) do
     stop_matchers
     |> Enum.filter(fn stop ->
       Enum.any?(informed_entities, fn e ->
