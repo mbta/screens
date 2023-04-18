@@ -12,7 +12,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.Routes.Route
   alias Screens.SignsUiConfig
   alias Screens.Util
-  alias Screens.V2.CandidateGenerator.Dup.Alerts, as: AlertsInstances
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
@@ -137,7 +136,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   defp get_departure_instance_for_section(
          %{
            departures: departures,
-           alert: alert,
+           alert_informed_entities: alert_informed_entities,
            headway: headway,
            stop_ids: stop_ids,
            routes: routes,
@@ -156,13 +155,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         routes_with_live_departures,
         params,
         routes,
-        alert,
+        alert_informed_entities,
         now,
         fetch_schedules_fn,
         fetch_vehicles_fn
       )
 
-    headway_mode = get_headway_mode(stop_ids, headway, alert, now)
+    headway_mode = get_headway_mode(stop_ids, headway, alert_informed_entities, now)
 
     cond do
       # All routes in section are overnight
@@ -182,11 +181,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
             Enum.take(departures, 2)
           end
 
-        if visible_departures == [] do
-          %{type: :no_data_section, route: List.first(routes)}
-        else
-          %{type: :normal_section, rows: visible_departures}
-        end
+        %{type: :normal_section, rows: visible_departures}
 
       # Headway mode
       true ->
@@ -194,7 +189,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
         %{
           type: :headway_section,
-          route: get_section_route_from_alert(stop_ids, alert),
+          route: get_section_route_from_entities(stop_ids, alert_informed_entities),
           time_range: time_range,
           headsign: headsign
         }
@@ -243,11 +238,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
               []
           end
 
-        section_alert = get_section_alert(params, fetch_alerts_fn, now)
+        alert_informed_entities = get_section_entities(params, fetch_alerts_fn, now)
 
         %{
           departures: section_departures,
-          alert: section_alert,
+          alert_informed_entities: alert_informed_entities,
           headway: headway,
           stop_ids: stop_ids,
           routes: routes,
@@ -258,19 +253,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     |> Enum.map(fn {:ok, data} -> data end)
   end
 
-  # Alert will only have a value for sections that are configured for a station's ID
-  defp get_section_route_from_alert(
+  defp get_section_route_from_entities(
          ["place-" <> _ = stop_id],
-         %Alert{informed_entities: informed_entities}
+         informed_entities
        ) do
     Enum.find_value(informed_entities, "", fn
-      %{route: "Green" <> _, stop: ^stop_id} -> "Green"
       %{route: route, stop: ^stop_id} -> route
       _ -> nil
     end)
   end
 
-  defp get_section_route_from_alert(_, _), do: nil
+  defp get_section_route_from_entities(_, _), do: nil
 
   defp get_bidirectional_departures(section_departures) do
     first_row = List.first(section_departures)
@@ -284,7 +277,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     [first_row] ++ [second_row]
   end
 
-  defp get_section_alert(
+  defp get_section_entities(
          %Params{
            stop_ids: stop_ids,
            route_ids: route_ids,
@@ -300,6 +293,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       route_types: [:light_rail, :subway]
     ]
 
+    # This section gets alert entities, which are used to decide whether we should be in headway mode or overnight mode
     alert_fetch_params
     |> fetch_alerts_fn.()
     |> Enum.filter(fn
@@ -311,18 +305,26 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       _ ->
         false
     end)
-    |> AlertsInstances.choose_alert()
+    # Condense all alerts into just a list of informed entities
+    # This will help us decide whether a headway in one direction is still useful
+    # if there are two alerts that could be in different directions.
+    |> Enum.reduce([], fn alert, acc -> acc ++ alert.informed_entities end)
+    |> Enum.uniq()
   end
 
-  defp get_headway_mode(_, _, nil, _), do: :inactive
+  defp get_headway_mode(_, _, [], _), do: :inactive
 
   defp get_headway_mode(
          stop_ids,
          %Headway{headway_id: headway_id},
-         section_alert,
+         informed_entities,
          current_time
        ) do
-    interpreted_alert = interpret_alert(section_alert, stop_ids)
+    # Use all informed_entities from relevant alerts to decide whether there's
+    # any reason to go into headway mode.
+    # For example, a NB suspension and SB shuttle from Aquarium shouldn't use headway mode
+    # but if all the WB branches are shuttling at Kenmore, there should be a headway
+    interpreted_alert = interpret_entities(informed_entities, stop_ids)
 
     headway_mode? =
       temporary_terminal?(interpreted_alert) and
@@ -364,8 +366,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     headsign in MapSet.new(branch_terminals)
   end
 
-  defp interpret_alert(alert, [parent_stop_id]) do
-    informed_stop_ids = Enum.into(alert.informed_entities, MapSet.new(), & &1.stop)
+  defp interpret_entities(entities, [parent_stop_id]) do
+    informed_stop_ids = Enum.into(entities, MapSet.new(), & &1.stop)
 
     {region, headsign} =
       :screens
@@ -403,10 +405,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   # If we are currently overnight, returns the first schedule of the day for each route_id and direction for each stop.
   # Otherwise, return an empty list.
   defp get_overnight_schedules_for_section(
-         stops_with_live_departures,
+         routes_with_live_departures,
          stop_ids,
          routes_serving_section,
-         alert,
+         alert_informed_entities,
          now,
          fetch_schedules_fn,
          fetch_vehicles_fn
@@ -417,7 +419,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          routes_with_live_departures,
          params,
          routes,
-         nil,
+         [],
          now,
          fetch_schedules_fn,
          _
@@ -426,7 +428,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       get_today_tomorrow_schedules(
         Map.from_struct(params),
         fetch_schedules_fn,
-        Util.get_service_day_tomorrow(now),
+        now,
         Enum.map(routes, & &1.id)
       )
 
@@ -436,11 +438,18 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     |> Enum.uniq()
     |> Enum.reject(&(&1 in routes_with_live_departures))
     |> Enum.map(fn {route_id, direction_id} ->
-      # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case),
-      # we do not display overnight mode.
+      # This variable will be used when now is after 3am.
+      first_schedule_today =
+        Enum.find(
+          today_schedules,
+          &(&1.route.id == route_id and &1.direction_id == direction_id)
+        )
 
       last_schedule_today =
-        Enum.find(today_schedules, &(&1.route.id == route_id and &1.direction_id == direction_id))
+        Enum.find(
+          Enum.reverse(today_schedules),
+          &(&1.route.id == route_id and &1.direction_id == direction_id)
+        )
 
       first_schedule_tomorrow =
         Enum.find(
@@ -448,24 +457,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           &(&1.route.id == route_id and &1.direction_id == direction_id)
         )
 
-      cond do
-        is_nil(last_schedule_today) or is_nil(first_schedule_tomorrow) ->
-          nil
-
-        DateTime.compare(now, first_schedule_tomorrow.departure_time) == :gt ->
-          Logger.warn(
-            "[get_overnight_schedules_for_section] now is after first_schedule_tomorrow."
-          )
-
-          nil
-
-        DateTime.compare(now, last_schedule_today.departure_time) == :gt and
-            DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt ->
-          %Departure{schedule: first_schedule_tomorrow}
-
-        true ->
-          nil
-      end
+      get_overnight_departure_for_route(
+        first_schedule_today,
+        last_schedule_today,
+        first_schedule_tomorrow,
+        route_id,
+        direction_id,
+        now
+      )
     end)
     # Routes not in overnight mode will be nil. Can ignore those.
     |> Enum.reject(&is_nil/1)
@@ -473,23 +472,23 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   defp get_overnight_schedules_for_section(
-         stops_with_live_departures,
+         routes_with_live_departures,
          params,
          [%{type: type} | _] = routes,
-         alert,
+         alert_informed_entities,
          now,
          fetch_schedules_fn,
          fetch_vehicles_fn
        )
        when type in [:subway, :light_rail] do
-    informed_route = get_section_route_from_alert(params.stop_ids, alert)
+    informed_route = get_section_route_from_entities(params.stop_ids, alert_informed_entities)
     # If there are no vehicles operating on the route, assume we are overnight.
     if not is_nil(informed_route) and fetch_vehicles_fn.(informed_route, nil) == [] do
       get_overnight_schedules_for_section(
-        stops_with_live_departures,
+        routes_with_live_departures,
         params,
         routes,
-        nil,
+        [],
         now,
         fetch_schedules_fn,
         fetch_vehicles_fn
@@ -501,23 +500,66 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp get_overnight_schedules_for_section(_, _, _, _, _, _, _), do: []
 
+  # Verifies we are meeting the timeframe conditions for overnight mode and generates the departure widget
+  defp get_overnight_departure_for_route(
+         _first_schedule_today,
+         nil,
+         _first_schedule_tomorrow,
+         route_id,
+         direction_id,
+         now
+       ) do
+    Logger.warn(
+      "[get_overnight_schedules_for_section] last_schedule_today not found. route_id=#{route_id} direction_id=#{direction_id} now=#{now}"
+    )
+
+    nil
+  end
+
+  defp get_overnight_departure_for_route(
+         first_schedule_today,
+         last_schedule_today,
+         first_schedule_tomorrow,
+         route_id,
+         direction_id,
+         now
+       ) do
+    cond do
+      is_nil(first_schedule_tomorrow) ->
+        nil
+
+      DateTime.compare(now, first_schedule_tomorrow.departure_time) == :gt ->
+        Logger.warn(
+          "[get_overnight_schedules_for_section] now is after first_schedule_tomorrow. route_id=#{route_id} direction_id=#{direction_id} now=#{now}"
+        )
+
+        nil
+
+      # Before 3am and between the `departure_time` for today's last schedule and tomorrow's first schedule
+      DateTime.compare(now, last_schedule_today.departure_time) == :gt and
+          DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt ->
+        %Departure{schedule: first_schedule_tomorrow}
+
+      # After 3am but before the first scheduled trip of the day.
+      not is_nil(first_schedule_today) and
+          DateTime.compare(now, first_schedule_today.departure_time) == :lt ->
+        %Departure{schedule: first_schedule_today}
+
+      true ->
+        nil
+    end
+  end
+
   defp get_today_tomorrow_schedules(
          fetch_params,
          fetch_schedules_fn,
-         tomorrow,
+         now,
          route_ids_serving_section
        ) do
     today =
-      case fetch_schedules_fn.(fetch_params, nil) do
+      case fetch_schedules_fn.(fetch_params, now) do
         {:ok, schedules} when schedules != [] ->
-          # We want the last schedules of the current day.
-          # Need to reverse the list of fetched schedules so that List.first/1 looks at the correct time of day.
-          schedules
-          |> Enum.reverse()
-          |> Enum.filter(&(&1.route.id in route_ids_serving_section))
-          |> Enum.uniq_by(fn %{route: %{id: route_id}, direction_id: direction_id} ->
-            {route_id, direction_id}
-          end)
+          Enum.filter(schedules, &(&1.route.id in route_ids_serving_section))
 
         # fetch error or empty schedules
         _ ->
@@ -525,13 +567,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       end
 
     tomorrow =
-      case fetch_schedules_fn.(fetch_params, tomorrow) do
+      case fetch_schedules_fn.(fetch_params, Util.get_service_date_tomorrow(now)) do
         {:ok, schedules} when schedules != [] ->
-          schedules
-          |> Enum.filter(&(&1.route.id in route_ids_serving_section))
-          |> Enum.uniq_by(fn %{route: %{id: route_id}, direction_id: direction_id} ->
-            {route_id, direction_id}
-          end)
+          Enum.filter(schedules, &(&1.route.id in route_ids_serving_section))
 
         # fetch error or empty schedules
         _ ->

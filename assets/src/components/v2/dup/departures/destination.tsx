@@ -149,7 +149,7 @@ const Destination = ({ headsign, currentPage }) => {
       <div className="departure-destination__headsign" ref={firstLineRef}>
         {firstLine}
       </div>
-      <div className="departure-destination__variation" ref={secondLineRef}>
+      <div className="departure-destination__headsign" ref={secondLineRef}>
         {secondLine}
       </div>
     </div>

@@ -26,7 +26,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type headway_section :: %{
           type: :headway_section,
-          pill: :red | :orange | :green | :blue
+          route: :red | :orange | :green | :blue,
+          time_range: {integer(), integer()},
+          headsign: String.t()
+        }
+
+  @type overnight_section :: %{
+          type: :overnight_section,
+          routes: list(Route.t())
         }
 
   @type notice :: %{
@@ -35,7 +42,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          section_data: list(section | notice_section | headway_section()),
+          section_data: list(section | notice_section | headway_section() | overnight_section()),
           slot_names: list(atom())
         }
 
@@ -98,20 +105,32 @@ defmodule Screens.V2.WidgetInstance.Departures do
       ) do
     pill_color = Route.get_color_for_route(route)
 
+    formatted_route =
+      case route do
+        "Green" <> _ -> "Green"
+        route -> route
+      end
+
     text =
       if is_only_section do
+        time_range =
+          if headsign == "Ashmont/Braintree" do
+            [%{format: :bold, text: "#{lo}-#{hi}m"}]
+          else
+            [%{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
+          end
+
         %FreeTextLine{
           icon: "subway-negative-black",
-          text: [
-            %{
-              color: pill_color,
-              text: "#{String.upcase(route)} LINE"
-            },
-            %{special: :break},
-            "#{headsign} trains every",
-            %{format: :bold, text: "#{lo}-#{hi}"},
-            "minutes"
-          ]
+          text:
+            [
+              %{
+                color: pill_color,
+                text: "#{String.upcase(formatted_route)} LINE"
+              },
+              %{special: :break},
+              "#{headsign} trains every"
+            ] ++ time_range
         }
       else
         %FreeTextLine{
@@ -407,7 +426,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
     minute = local_time.minute
     am_pm = if local_time.hour >= 12, do: :pm, else: :am
-    show_am_pm = Util.get_service_day_tomorrow(now).day == local_time.day
+    show_am_pm = Util.get_service_date_tomorrow(now).day == local_time.day
     %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm, show_am_pm: show_am_pm}
   end
 

@@ -15,7 +15,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.V2.Departure
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
+  alias Screens.V2.WidgetInstance.OvernightDepartures
 
   defp put_primary_departures(widget, primary_departures_sections) do
     %{
@@ -1481,7 +1481,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :headway_section,
-              route: "Green",
+              route: "Green-C",
               time_range: {7, 13},
               headsign: "Westbound"
             }
@@ -1493,7 +1493,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :headway_section,
-              route: "Green",
+              route: "Green-C",
               time_range: {7, 13},
               headsign: "Westbound"
             }
@@ -1505,7 +1505,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{
               type: :headway_section,
-              route: "Green",
+              route: "Green-C",
               time_range: {7, 13},
               headsign: "Westbound"
             }
@@ -1654,7 +1654,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
 
-    test "returns DeparturesNoData if all sections have no data", %{
+    test "returns empty departures list if sections have no departures", %{
       config: config,
       fetch_section_departures_fn: fetch_section_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
@@ -1684,23 +1684,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
       now = ~U[2020-04-06T10:00:00Z]
 
-      expected_departures = [
-        %DeparturesNoData{
-          screen: config,
-          show_alternatives?: nil,
-          slot_name: :main_content_zero
-        },
-        %DeparturesNoData{
-          screen: config,
-          show_alternatives?: nil,
-          slot_name: :main_content_one
-        },
-        %DeparturesNoData{
-          screen: config,
-          show_alternatives?: nil,
-          slot_name: :main_content_two
-        }
-      ]
+      expected_departures = []
 
       actual_instances =
         Dup.Departures.departures_instances(
