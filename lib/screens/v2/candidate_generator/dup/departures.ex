@@ -502,20 +502,43 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   # Verifies we are meeting the timeframe conditions for overnight mode and generates the departure widget
   defp get_overnight_departure_for_route(
-         _first_schedule_today,
-         nil,
+         first_schedule_today,
+         second_schedule_today,
          _first_schedule_tomorrow,
          route_id,
          direction_id,
          now
-       ) do
-    Logger.warn(
-      "[get_overnight_schedules_for_section] last_schedule_today not found. route_id=#{route_id} direction_id=#{direction_id} now=#{now}"
+       )
+       when is_nil(first_schedule_today) or is_nil(second_schedule_today) do
+    Logger.info(
+      "[get_overnight_schedules_for_section] No schedules for today found. route_id=#{route_id} direction_id=#{direction_id} now=#{now}"
     )
 
     nil
   end
 
+  # If now is after today's last schedule and there are no schedules tomorrow,
+  # we still want a departure row without a time (will show a moon icon)
+  defp get_overnight_departure_for_route(
+         first_schedule_today,
+         last_schedule_today,
+         nil,
+         _route_id,
+         _direction_id,
+         now
+       ) do
+    if DateTime.compare(now, last_schedule_today.departure_time) == :gt or
+         DateTime.compare(now, first_schedule_today.departure_time) == :lt do
+      %Departure{
+        schedule: %{last_schedule_today | departure_time: nil, arrival_time: nil}
+      }
+    else
+      nil
+    end
+  end
+
+  # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case)
+  # we do not display overnight mode.
   defp get_overnight_departure_for_route(
          first_schedule_today,
          last_schedule_today,
@@ -525,9 +548,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          now
        ) do
     cond do
-      is_nil(first_schedule_tomorrow) ->
-        nil
-
       DateTime.compare(now, first_schedule_tomorrow.departure_time) == :gt ->
         Logger.warn(
           "[get_overnight_schedules_for_section] now is after first_schedule_tomorrow. route_id=#{route_id} direction_id=#{direction_id} now=#{now}"

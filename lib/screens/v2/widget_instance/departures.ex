@@ -4,7 +4,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.FreeTextLine
+  alias Screens.Departures.Departure
   alias Screens.Routes.Route
+  alias Screens.Schedules.Schedule
   alias Screens.Util
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
@@ -367,6 +369,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{time: time}
   end
+
+  defp serialize_time(
+         %Departure{schedule: %Schedule{arrival_time: nil, departure_time: nil}},
+         _screen,
+         _now
+       ),
+       do: %{time: %{type: :icon, icon: :overnight}}
 
   defp serialize_time(departure, _screen, now) do
     departure_time = Departure.time(departure)
