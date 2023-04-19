@@ -196,6 +196,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     end
   end
 
+  # Could be a useful function outside of this file.
   defp is_terminal?(stop_id, stop_sequences) do
     # Can't use Enum.any, because then Govt Center will be seen as a terminal
     # Using all is ok because no station is the terminal of one line and NOT the terminal of another line

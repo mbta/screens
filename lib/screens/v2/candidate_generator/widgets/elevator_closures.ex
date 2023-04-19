@@ -45,6 +45,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     end
   end
 
+  # Should live in Screens.Alerts.Alert along with other alert fetches.
   def fetch_elevator_closures do
     case Screens.V3Api.get_json("alerts", %{
            "filter[activity]" => "USING_WHEELCHAIR",
@@ -74,6 +75,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     end
   end
 
+  # No real reason this function is specific to elevator alerts. Could be placed in a common file.
   defp get_icon_map(elevator_closures, home_parent_station_id) do
     elevator_closures
     |> get_parent_station_ids_from_entities()
@@ -85,6 +87,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     |> Enum.into(%{})
   end
 
+  # Seems like a good util function that can live in Screens.Alerts.Alert.
   defp get_parent_station_ids_from_entities(alerts) do
     alerts
     |> Enum.flat_map(fn %Alert{informed_entities: informed_entities} ->
@@ -94,6 +97,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     end)
   end
 
+  # Should probably live in Screens.Routes.Route. Similar code already exists there.
   defp routes_to_icons(routes) do
     routes
     |> Enum.map(fn
