@@ -7,6 +7,7 @@
     height: 100%;
     vertical-align: middle;
     margin-left: 32px;
+    margin-right: 32px;
   }
   .no-data-section__no-connection-icon {
     height: 144px;
@@ -15,6 +16,10 @@
 
   .no-data-section__row {
     height: 208px;
+
+    .free-text__line {
+      width: 1400px;
+    }
   }
 }
 
