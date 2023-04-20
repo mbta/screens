@@ -76,43 +76,42 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     |> String.to_existing_atom()
   end
 
-  defp get_line_text_builder(t) do
-    line_pill_atoms =
-      t
-      |> DupAlert.get_affected_lines()
-      |> Enum.map(&line_to_pill_atom/1)
+  defp get_affected_lines_as_strings(t) do
+    t
+    |> DupAlert.get_affected_lines()
+    |> Enum.map(&"#{&1} Line")
+  end
 
-    case line_pill_atoms do
-      [pill_atom] ->
-        fn _ -> [free_text_pill(pill_atom)] end
-
-      [pill_atom1, pill_atom2] ->
-        fn and_or -> [free_text_pill(pill_atom1), bold(and_or), free_text_pill(pill_atom2)] end
-    end
+  defp get_affected_lines_as_pills(t) do
+    t
+    |> DupAlert.get_affected_lines()
+    |> Enum.map(fn line ->
+      line
+      |> line_to_pill_atom()
+      |> free_text_pill()
+    end)
   end
 
   defp partial_alert_free_text(t) do
-    build_line_text = get_line_text_builder(t)
+    affected_lines = get_affected_lines_as_strings(t)
 
-    affected_line_count = length(DupAlert.get_affected_lines(t))
+    case {affected_lines, t.alert.effect, BaseAlert.location(t)} do
+      {[line], :delay, _} ->
+        [bold(line), "delays"]
 
-    case {affected_line_count, t.alert.effect, BaseAlert.location(t)} do
-      {1, :delay, _} ->
-        build_line_text.("and") ++ ["delays"]
+      {[line], _, :inside} ->
+        ["No", bold(line), "trains"]
 
-      {1, _, :inside} ->
-        ["No"] ++ build_line_text.("or") ++ ["trains"]
-
-      {1, _, boundary} when boundary in [:boundary_upstream, :boundary_downstream] ->
+      {[_line], _, boundary} when boundary in [:boundary_upstream, :boundary_downstream] ->
         headsign = get_headsign(t)
 
         ["No", bold(headsign), "trains"]
         |> partial_headsign_special_cases()
 
-      {2, :delay, _} ->
+      {[_line1, _line2], :delay, _} ->
         ["Train delays"]
 
-      {2, _, _} ->
+      {[_line1, _line2], _, _} ->
         ["No train service"]
     end
   end
@@ -123,14 +122,12 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     do: if(line_color(t) == :yellow, do: :warning_negative, else: :warning)
 
   defp issue_free_text(t) do
-    build_line_text = get_line_text_builder(t)
+    affected_lines = get_affected_lines_as_pills(t)
 
-    affected_line_count = length(DupAlert.get_affected_lines(t))
+    case affected_lines do
+      [line_pill] ->
+        no_trains = ["No", line_pill, "trains"]
 
-    no_trains = [bold("No")] ++ build_line_text.("or") ++ [bold("trains")]
-
-    case affected_line_count do
-      1 ->
         if BaseAlert.location(t) in [:boundary_upstream, :boundary_downstream] do
           headsign = get_headsign(t)
 
@@ -139,8 +136,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
           no_trains ++ [Alert.get_cause_string(t.alert.cause)]
         end
 
-      2 ->
-        no_trains
+      [line_pill1, line_pill2] ->
+        ["No", line_pill1, "or", line_pill2, "trains"]
     end
   end
 
