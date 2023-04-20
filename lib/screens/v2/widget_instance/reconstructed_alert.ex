@@ -44,6 +44,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
+  # Sounds similar to `informed_routes_at_home_stop`
   defp get_affected_routes(informed_entities) do
     affected_routes =
       informed_entities
@@ -64,6 +65,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  # Sounds like a reusable function (even if it's not reused anywhere right now)
   # Using hd/1 because we know that only single line stations use this function.
   defp get_destination(t, location) do
     informed_entities = BaseAlert.informed_entities(t)
@@ -92,6 +94,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  # Probably needs renaming to express it's a serializer.
   defp get_route_pills(routes) do
     routes
     |> Enum.group_by(fn
@@ -614,6 +617,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
+  # Ever needed elsewhere? Should probably be put in common code, in case it is reusable
   def get_endpoints(ie, "Green") do
     Enum.find_value(@green_line_branches, fn branch ->
       get_endpoints(ie, branch)
