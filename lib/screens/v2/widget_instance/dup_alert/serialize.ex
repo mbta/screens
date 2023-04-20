@@ -42,13 +42,21 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     }
   end
 
-  # TO BE DONE: Move this closer to the FreeText modules and make public so it's generally available.
-  #             Also define similar macros for other formattings, e.g. `small`
+  # TO BE DONE: Move these closer to the FreeText modules and make public so they're generally available.
+  #             Also define similar macros for other free-text elements, e.g. `small`
   #       https://app.asana.com/0/1185117109217422/1204252210980218/f
+
   # Provides a pattern-matchable shorthand for bolding some text
   defmacrop bold(str) do
     quote do
       %{format: :bold, text: unquote(str)}
+    end
+  end
+
+  # Provides a pattern-matchable shorthand for an inline route/line pill icon
+  defmacrop free_text_pill(pill_atom) do
+    quote do
+      %{route: unquote(pill_atom)}
     end
   end
 
@@ -62,38 +70,48 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     end
   end
 
-  defp get_line_text_builder(t) do
-    case DupAlert.get_affected_lines(t) do
-      [line_color] ->
-        fn _ -> [bold("#{line_color} Line")] end
+  defp line_to_pill_atom(line_string) do
+    line_string
+    |> String.downcase()
+    |> String.to_existing_atom()
+  end
 
-      [line_color1, line_color2] ->
-        fn and_or -> [bold("#{line_color1} Line"), and_or, bold("#{line_color2} Line")] end
-    end
+  defp get_affected_lines_as_strings(t) do
+    t
+    |> DupAlert.get_affected_lines()
+    |> Enum.map(&"#{&1} Line")
+  end
+
+  defp get_affected_lines_as_pills(t) do
+    t
+    |> DupAlert.get_affected_lines()
+    |> Enum.map(fn line ->
+      line
+      |> line_to_pill_atom()
+      |> free_text_pill()
+    end)
   end
 
   defp partial_alert_free_text(t) do
-    build_line_text = get_line_text_builder(t)
+    affected_lines = get_affected_lines_as_strings(t)
 
-    affected_line_count = length(DupAlert.get_affected_lines(t))
+    case {affected_lines, t.alert.effect, BaseAlert.location(t)} do
+      {[line], :delay, _} ->
+        [bold(line), "delays"]
 
-    case {affected_line_count, t.alert.effect, BaseAlert.location(t)} do
-      {1, :delay, _} ->
-        build_line_text.("and") ++ ["delays"]
+      {[line], _, :inside} ->
+        ["No", bold(line), "trains"]
 
-      {1, _, :inside} ->
-        ["No"] ++ build_line_text.("or") ++ ["trains"]
-
-      {1, _, boundary} when boundary in [:boundary_upstream, :boundary_downstream] ->
+      {[_line], _, boundary} when boundary in [:boundary_upstream, :boundary_downstream] ->
         headsign = get_headsign(t)
 
         ["No", bold(headsign), "trains"]
         |> partial_headsign_special_cases()
 
-      {2, :delay, _} ->
+      {[_line1, _line2], :delay, _} ->
         ["Train delays"]
 
-      {2, _, _} ->
+      {[_line1, _line2], _, _} ->
         ["No train service"]
     end
   end
@@ -101,23 +119,25 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   defp partial_alert_icon(t) when t.alert.effect == :delay, do: :delay
 
   defp partial_alert_icon(t),
-    do: if(line_color(t) === :yellow, do: :warning_negative, else: :warning)
+    do: if(line_color(t) == :yellow, do: :warning_negative, else: :warning)
 
   defp issue_free_text(t) do
-    build_line_text = get_line_text_builder(t)
+    affected_lines = get_affected_lines_as_pills(t)
 
-    case length(DupAlert.get_affected_lines(t)) do
-      1 ->
+    case affected_lines do
+      [line_pill] ->
+        no_trains = ["No", line_pill, "trains"]
+
         if BaseAlert.location(t) in [:boundary_upstream, :boundary_downstream] do
           headsign = get_headsign(t)
 
-          ["No"] ++ build_line_text.("or") ++ ["trains to #{headsign}"]
+          no_trains ++ ["to #{headsign}"]
         else
-          ["No"] ++ build_line_text.("or") ++ ["trains #{Alert.get_cause_string(t.alert.cause)}"]
+          no_trains ++ [Alert.get_cause_string(t.alert.cause)]
         end
 
-      2 ->
-        ["No"] ++ build_line_text.("or") ++ ["trains"]
+      [line_pill1, line_pill2] ->
+        ["No", line_pill1, "or", line_pill2, "trains"]
     end
   end
 
