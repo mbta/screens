@@ -129,6 +129,7 @@ defmodule ScreensWeb.Router do
     get "/:id/debug", AudioController, :debug
   end
 
+  # The "Alert priority" piece in question
   scope "/alert_priority", ScreensWeb do
     pipe_through [:redirect_prod_http, :api, :browser]
 

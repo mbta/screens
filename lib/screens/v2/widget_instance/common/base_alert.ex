@@ -248,9 +248,15 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     |> MapSet.new(& &1.route_id)
   end
 
+  # Include a comment to define "informed routes": the routes affected by an alert that also exist at the current stop
+  #
+  # This is the updated version of "informed_routes" from alert.ex
+  # The other should be deleted
+  # Note: this does NOT reference downstream stops. Make sure that's fine and we don't need it
   @spec informed_routes_at_home_stop(t()) :: MapSet.t(Route.id())
   def informed_routes_at_home_stop(t) do
     rts = route_types(t)
+    # Currently references SingleAlertWidget, but can just 
     home_stop = SAW.home_stop_id(t)
     route_set = all_routes_at_stop(t)
 

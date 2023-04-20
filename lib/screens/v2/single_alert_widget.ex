@@ -1,3 +1,6 @@
+# Rename "ContextualAlert"? "EnrichedAlert"?
+# Just "Alert" - would that work? We'd need to rename the other module, then
+
 defprotocol Screens.V2.SingleAlertWidget do
   @moduledoc """
   Protocol for a widget that models exactly one alert.
@@ -18,6 +21,7 @@ defprotocol Screens.V2.SingleAlertWidget do
   @doc """
   Gets the Screens.Alerts.Alert struct that this widget contains.
   """
+  # What to change this to?
   @spec alert(t()) :: Alert.t()
   def alert(widget)
 

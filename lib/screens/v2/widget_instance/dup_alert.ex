@@ -238,6 +238,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     )
   end
 
+  # Seems like this could be generalized in BaseAlert, too
+  # If a function could hypothetically be an alert util eventually should go in a common file
   def get_affected_lines(t) do
     t
     |> BaseAlert.informed_routes_at_home_stop()
@@ -246,6 +248,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   # For certain parts of the DUP alert logic, we're only interested in subway lines,
   # not routes. This merges all of the "Green-B/C/D/E" routes into just "Green".
+  # If we make the above a util, maybe we could/should combine this with it? 
+  # But making it a separate util is fine, too
   defp routes_to_lines(route_ids) do
     route_ids
     |> Enum.map(fn

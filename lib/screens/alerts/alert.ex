@@ -1,3 +1,6 @@
+# This file has primarily v1 stuff, but there are a couple of utils we use in v2.
+# Namely: happening_now?
+
 defmodule Screens.Alerts.Alert do
   @moduledoc false
 
@@ -289,6 +292,7 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
+  # This was only used for the AlertPriorityController. What was that? Is it still used?
   def priority_by_stop_id(stop_id) do
     [stop_id: stop_id]
     |> fetch_or_empty_list()
@@ -463,6 +467,7 @@ defmodule Screens.Alerts.Alert do
 
   ###
 
+  # Only used by bus_eink (v1)
   def by_stop_id(stop_id) do
     {inline_alerts, global_alerts} =
       [stop_id: stop_id]
@@ -514,6 +519,7 @@ defmodule Screens.Alerts.Alert do
   end
 
   ###
+  # Used by gl_eink (v1)
   def by_route_id(route_id, stop_id) do
     {inline_alerts, global_alerts} =
       [route_id: route_id]
@@ -525,6 +531,7 @@ defmodule Screens.Alerts.Alert do
     {inline_alerts, global_alert}
   end
 
+  # This was only used for the AlertPriorityController.
   def priority_by_route_id(route_id, stop_id) do
     [route_id: route_id]
     |> fetch_or_empty_list()

@@ -38,6 +38,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     defstruct stations: nil
 
+    # all alert widgets need to identify the alerts they rep
     defimpl Screens.V2.AlertsWidget do
       def alert_ids(page) do
         Enum.flat_map(page.stations, fn station ->
@@ -136,6 +137,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           station_id_to_icons: %{String.t() => list(icon)}
         }
 
+  # Same vibe as SAW.home_stop_id
   def parent_station_id(%__MODULE__{
         screen: %Screen{
           app_params: %PreFare{
@@ -156,6 +158,15 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     platform_stop_ids
   end
 
+  # The next four functions run a filter that checks each alert for whether it is relevant
+  # for any of these reasons:
+  # active here now, active elsewhere now, upcoming here, active now for connecting stations
+
+  # Other alerts for other widget types are filtered out earlier, in the candidate generator.
+  # For elevators, we have a lot of valid kinds of alerts that only get filtered out if there
+  # isn't enough room to show them all.
+
+  # but anyway, happening_now is a util that is useful for all alerts, but at different stages in our logic
   defp get_active_at_home_station(%__MODULE__{alerts: alerts} = t) do
     alerts
     |> Enum.filter(&active_at_home_station?(&1, t))
@@ -187,6 +198,24 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       &sort_elsewhere(&1, &2, t)
     )
   end
+
+  # The next 4 functions are almost identical. Worth consolidating? Esp because the above functions
+  # are already named in a descriptive way
+
+  # @spec alert_is_relevant?(Alert.t(), DateTime.t(), atom()) :: boolean()
+  # defp alert_is_relevant?(alert, now, option) do
+    # parent_station_id = parent_station_id(t)
+
+    # active = Alert.happening_now?(alert, now)
+
+    # case option do 
+    #   :upcoming -> not active and Enum.any?(entities, fn e -> e.stop == parent_station_id end)
+    #   :here -> active and Enum.any?(entities, fn e -> e.stop == parent_station_id end)
+    #   :connecting -> more complicated logic OR run BaseAlert.location === :upstream / :downstream
+    #   :elsewhere -> 
+    #     get the parent stations for the entities
+    #     active and Enum.any?(parent_stations, fn station != parent_station_id end)
+  # end
 
   defp active_at_home_station?(
          %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
@@ -229,6 +258,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       end)
   end
 
+  # Essentially, this function does the same thing as checking if an alert is_upstream / is_downstream
+  # Does this do a better job of it?
   defp active_on_connecting_lines?(
          %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
          %__MODULE__{now: now, stop_sequences: stop_sequences} = t
@@ -260,6 +291,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     end)
   end
 
+  # Seems familiar... keep an eye out for duplicate,
   defp get_stations_from_entities(entities) do
     for %{stop: "place-" <> _ = stop_id} <- entities, do: stop_id
   end

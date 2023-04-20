@@ -37,8 +37,10 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @automated_override_priority [1, 2]
 
   # Keep these in descending order of priority--highest priority (lowest integer value) first
+  # Effect definition is common across screen types. (Are they always as follows?)
   @relevant_effects ~w[shuttle stop_closure suspension station_closure detour stop_move stop_moved snow_route elevator_closure]a
 
+  # Common
   @effect_priorities Enum.with_index(@relevant_effects, 1)
 
   @effect_headers Enum.zip(
@@ -64,6 +66,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
                     end)
                   )
 
+  # This mapping also happens elsewhere
   @effect_icons Enum.zip(
                   @relevant_effects,
                   Enum.map(@relevant_effects, fn
@@ -136,6 +139,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     defp serialize_icon(unquote(e)), do: unquote(icon)
   end
 
+  # possibly useful for other alerts
   # Removes leading scheme specifier ("http[s]"), www. prefix, and trailing "/" from url.
   defp clean_up_url(url) do
     url
@@ -148,6 +152,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     if takeover_alert?(t), do: takeover_slot_names(t), else: normal_slot_names(t)
   end
 
+  # "is takeover alert" is kinda common, but maybe more widgety than alerty (not relevant for elevator status)
   def takeover_alert?(%__MODULE__{screen: %Screen{app_id: bus_app_id}} = t)
       when bus_app_id in [:bus_shelter_v2, :bus_eink_v2] do
     effect(t) in [:stop_closure, :stop_move, :stop_moved, :suspension, :detour] and
@@ -241,6 +246,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   def seconds_to_next_active_period(_t), do: :infinity
 
+  # Same vibe as SAW.home_stop_id
   @spec home_stop_id(t()) :: String.t()
   def home_stop_id(%{
         screen: %Screen{app_params: %app{alerts: %Alerts{stop_id: stop_id}}}
@@ -258,6 +264,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     stop_id
   end
 
+  # Next several functions all found in base_alert, up until the time functions
   @spec informed_entities(t()) :: list(Alert.informed_entity())
   def informed_entities(%{alert: %Alert{informed_entities: informed_entities}}) do
     informed_entities
@@ -358,6 +365,11 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   # For GL, we want to list all affected branches for the alert and not just the branch serving the home stop.
   # This allows us to show a pill for each branch in the informed_entities of the alert (or GL pill if all branches are affected).
+  
+  # This is a special exception to how informed_routes are generated for other screens.
+  # I'm not sure that these should be two clauses of the same function, because they aim to return different kinds of values
+  # One is informed routes at the home stop (seen in BaseAlert also)
+  # The other is informed routes for the alert
   defp informed_routes(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
     t
     |> informed_entities()
@@ -379,6 +391,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   # Takes all_routes_at_stop and removes any route that is not affected by the alert.
   # Remaining routes show as pills on the alert component.
+  # Appears in BaseAlert. Do we replicate this elsewhere?
   defp informed_routes(t) do
     rt = route_type(t)
     home_stop = home_stop_id(t)
