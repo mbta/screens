@@ -132,7 +132,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
               },
               %{special: :break},
               "#{headsign} trains every",
-              %{special: :break},
+              %{special: :break}
             ] ++ time_range
         }
       else
