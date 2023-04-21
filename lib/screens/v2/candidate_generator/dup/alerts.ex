@@ -138,7 +138,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     }
 
     relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
-      relevant_location?(dup_alert)
+      relevant_location?(dup_alert) and not directional_shuttle_or_suspension?(alert)
   end
 
   defp relevant_effect?(%{effect: :delay, severity: severity}, _) do
@@ -158,6 +158,23 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   defp relevant_location?(dup_alert) do
     BaseAlert.location(dup_alert) in [:inside, :boundary_upstream, :boundary_downstream]
+  end
+
+  defp directional_shuttle_or_suspension?(alert) do
+    directional =
+      alert.effect in [:shuttle, :suspension] and
+        Enum.any?(alert.informed_entities, &(&1.direction_id in 0..1))
+
+    _ =
+      if directional do
+        Sentry.capture_message(
+          "DUP logic encountered a directional shuttle or suspension alert. Discarding.",
+          level: "warning",
+          extra: %{alert_id: alert.id, alert_effect: alert.effect}
+        )
+      end
+
+    directional
   end
 
   # If this is a special case, this function returns the widgets that should be used for it.
