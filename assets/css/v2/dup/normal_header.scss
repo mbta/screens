@@ -18,6 +18,12 @@
   &--teal {
     background-color: $line-color-ferry;
   }
+  &--silver {
+    background-color: $line-color-silver;
+  }
+  &--yellow {
+    background-color: $alert-yellow;
+  }
 }
 
 .normal-header-icon {
@@ -76,4 +82,15 @@
 
 .normal-header__accent-pattern-image {
   height: 248px;
+}
+
+.normal-header__environment {
+  color: white;
+  position: absolute;
+}
+
+.normal-header--yellow {
+  .normal-header-title__text {
+    color: #171F26;
+  }
 }

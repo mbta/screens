@@ -454,6 +454,14 @@ const DupV2ScreensTable = (): JSX.Element => {
   const columns = [
     { Header: "Screen ID", accessor: "id", Filter: DefaultColumnFilter },
     {
+      Header: "Header",
+      accessor: buildAppParamAccessor("header"),
+      mutator: buildAppParamMutator("header"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
       Header: "Primary Departures",
       accessor: buildAppParamAccessor("primary_departures"),
       mutator: buildAppParamMutator("primary_departures"),
@@ -465,6 +473,14 @@ const DupV2ScreensTable = (): JSX.Element => {
       Header: "Secondary Departures",
       accessor: buildAppParamAccessor("secondary_departures"),
       mutator: buildAppParamMutator("secondary_departures"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Alerts",
+      accessor: buildAppParamAccessor("alerts"),
+      mutator: buildAppParamMutator("alerts"),
       Cell: EditableTextarea,
       disableFilters: true,
       FormCell: FormTextarea,

@@ -2,25 +2,24 @@ defmodule Screens.Config.V2.Dup do
   @moduledoc false
 
   alias Screens.Config.V2.Header.{CurrentStopId, CurrentStopName}
-  alias Screens.Config.V2.{Departures, EvergreenContentItem}
+  alias Screens.Config.V2.{Alerts, Departures, EvergreenContentItem}
 
   @type t :: %__MODULE__{
           header: CurrentStopId.t() | CurrentStopName.t(),
           evergreen_content: list(EvergreenContentItem.t()),
           primary_departures: Departures.t(),
-          secondary_departures: Departures.t()
+          secondary_departures: Departures.t(),
+          alerts: Alerts.t()
         }
 
-  @enforce_keys [:primary_departures, :secondary_departures, :header]
-  defstruct primary_departures: nil,
-            secondary_departures: nil,
-            header: nil,
-            evergreen_content: []
+  @enforce_keys [:header, :primary_departures, :secondary_departures, :alerts]
+  defstruct @enforce_keys ++ [evergreen_content: []]
 
   use Screens.Config.Struct,
     children: [
       primary_departures: Departures,
       secondary_departures: Departures,
+      alerts: Alerts,
       evergreen_content: {:list, EvergreenContentItem}
     ]
 

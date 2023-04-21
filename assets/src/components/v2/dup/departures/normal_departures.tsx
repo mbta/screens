@@ -2,8 +2,9 @@ import React from "react";
 
 import NormalSection from "Components/v2/dup/departures/normal_section";
 import NoticeSection from "Components/v2/departures/notice_section";
-import HeadwaySection from "Components/v2/departures/headway_section";
+import HeadwaySection from "Components/v2/dup/departures/headway_section";
 import NoDataSection from "Components/v2/dup/departures/no_data_section";
+import OvernightSection from "./overnight_section";
 
 const NormalDepartures = ({ sections }) => {
   return (
@@ -19,6 +20,8 @@ const NormalDepartures = ({ sections }) => {
               return <HeadwaySection text={data.text} key={i} />;
             case "no_data_section":
               return <NoDataSection text={data.text} key={i} />;
+            case "overnight_section":
+              return <OvernightSection text={data.text} key={i} />;
           }
         })}
       </div>

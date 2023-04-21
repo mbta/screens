@@ -181,4 +181,30 @@ defmodule Screens.Util do
   def to_set(id) when is_binary(id), do: MapSet.new([id])
   def to_set(ids) when is_list(ids), do: MapSet.new(ids)
   def to_set(%MapSet{} = already_a_set), do: already_a_set
+
+  @doc """
+    Calculates the service day for the given DateTime.
+    For context, MBTA service days end at 3am, not at midnight.
+    So getting the service day means subtracting 3 hours from the current time.
+    To avoid duplicate DateTime calculations existing throughout the code,
+    this function will handle the actual calculations needed to get the service day.
+  """
+  @spec get_service_date_today(DateTime.t()) :: Date.t()
+  def get_service_date_today(now) do
+    {:ok, now_eastern} = DateTime.shift_zone(now, "America/New_York")
+
+    # If it is at least 3am, the current date matches the service date.
+    # If current time is between 12am and 3am, the date has changed but we are still in service for the previous day.
+    # That means we need to subtract 1 day to get the current service date.
+    if now_eastern.hour >= 3 do
+      DateTime.to_date(now_eastern)
+    else
+      Date.add(now_eastern, -1)
+    end
+  end
+
+  @spec get_service_date_tomorrow(DateTime.t()) :: Date.t()
+  def get_service_date_tomorrow(now) do
+    Date.add(get_service_date_today(now), 1)
+  end
 end

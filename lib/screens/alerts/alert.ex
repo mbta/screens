@@ -2,6 +2,7 @@ defmodule Screens.Alerts.Alert do
   @moduledoc false
 
   alias Screens.Routes.Route
+  alias Screens.RouteType
   alias Screens.Stops.Stop
   alias Screens.V3Api
 
@@ -269,12 +270,14 @@ defmodule Screens.Alerts.Alert do
     format_query_param({:route_ids, [route_id]})
   end
 
-  defp format_query_param({:route_types, route_types}) do
-    route_type_ids = Enum.map_join(route_types, ",", &Screens.RouteType.to_id/1)
-
+  defp format_query_param({:route_types, route_types}) when is_list(route_types) do
     [
-      {"filter[route_type]", route_type_ids}
+      {"filter[route_type]", Enum.map_join(route_types, ",", &RouteType.to_id/1)}
     ]
+  end
+
+  defp format_query_param({:route_types, route_type}) do
+    format_query_param({:route_types, [route_type]})
   end
 
   defp format_query_param(_), do: []
@@ -530,6 +533,33 @@ defmodule Screens.Alerts.Alert do
       %{alert: to_full_map(alert), priority: to_priority_map(alert, stop_id)}
     end)
   end
+
+  @alert_cause_mapping %{
+    accident: "an accident",
+    construction: "construction",
+    disabled_train: "a disabled train",
+    fire: "a fire",
+    holiday: "the holiday",
+    maintenance: "maintenance",
+    medical_emergency: "a medical emergency",
+    police_action: "police action",
+    power_problem: "a power issue",
+    signal_problem: "a signal problem",
+    snow: "snow conditions",
+    special_event: "a special event",
+    switch_problem: "a switch problem",
+    track_problem: "a track problem",
+    traffic: "traffic",
+    weather: "weather conditions"
+  }
+
+  for {cause, cause_text} <- @alert_cause_mapping do
+    def get_cause_string(unquote(cause)) do
+      "due to #{unquote(cause_text)}"
+    end
+  end
+
+  def get_cause_string(_), do: ""
 
   # information -> 1
   # up to 10 minutes -> 3

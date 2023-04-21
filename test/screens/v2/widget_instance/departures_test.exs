@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.Alerts.Alert
   alias Screens.Config.V2.FreeTextLine
   alias Screens.Config.Screen
+  alias Screens.Departures.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -70,6 +71,52 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       }
     end
 
+    test "returns serialized normal_section for section with row with no scheduled time", %{
+      dup_screen: dup_screen
+    } do
+      section = %{
+        type: :normal_section,
+        rows: [
+          %Departure{
+            schedule:
+              struct(Schedule,
+                arrival_time: nil,
+                departure_time: nil,
+                route: %Screens.Routes.Route{
+                  id: "Orange",
+                  type: :subway,
+                  long_name: "Orange Line"
+                },
+                stop: %Screens.Stops.Stop{id: "70015", name: "Back Bay"},
+                stop_headsign: "Oak Grove"
+              )
+          }
+        ]
+      }
+
+      assert %{
+               rows: [
+                 %{
+                   headsign: %{headsign: "Oak Grove"},
+                   # MD5 hash when the schedule ID is nil. Won't change unless ID does.
+                   id: "1B2M2Y8AsgTpgAmY7PhCfg==",
+                   inline_alerts: [],
+                   route: %{color: :orange, text: "OL", type: :text},
+                   times_with_crowding: [
+                     %{
+                       crowding: nil,
+                       id: nil,
+                       time: %{icon: :overnight, type: :icon}
+                     }
+                   ],
+                   type: :departure_row
+                 }
+               ],
+               type: :normal_section
+             } ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
     test "returns serialized headway_section for one configured section", %{
       dup_screen: dup_screen
     } do
@@ -83,6 +130,31 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
           "Test trains every",
           %{format: :bold, text: "1-2"},
           "minutes"
+        ]
+      }
+
+      assert %{type: :headway_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
+    test "returns serialized headway_section for one configured section with Ashmont/Braintree headsign",
+         %{
+           dup_screen: dup_screen
+         } do
+      section = %{
+        type: :headway_section,
+        route: "Red",
+        time_range: {1, 2},
+        headsign: "Ashmont/Braintree"
+      }
+
+      expected_text = %{
+        icon: "subway-negative-black",
+        text: [
+          %{color: :red, text: "RED LINE"},
+          %{special: :break},
+          "Ashmont/Braintree trains every",
+          %{format: :bold, text: "1-2m"}
         ]
       }
 
@@ -613,7 +685,17 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
     test "correctly serializes timestamps", %{bus_shelter_screen: screen} do
       serialized_timestamp = [
-        %{id: nil, crowding: nil, time: %{type: :timestamp, am_pm: :am, hour: 12, minute: 20}}
+        %{
+          id: nil,
+          crowding: nil,
+          time: %{
+            type: :timestamp,
+            am_pm: :am,
+            hour: 12,
+            minute: 20,
+            show_am_pm: true
+          }
+        }
       ]
 
       now = ~U[2020-01-01T00:00:00Z]
@@ -650,8 +732,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                %{
                  id: nil,
                  crowding: nil,
-                 time: %{am_pm: :pm, hour: 9, minute: 20, type: :timestamp},
-                 scheduled_time: %{am_pm: :pm, hour: 9, minute: 15, type: :timestamp}
+                 time: %{am_pm: :pm, hour: 9, minute: 20, type: :timestamp, show_am_pm: false},
+                 scheduled_time: %{
+                   am_pm: :pm,
+                   hour: 9,
+                   minute: 15,
+                   type: :timestamp,
+                   show_am_pm: false
+                 }
                }
              ] ==
                Departures.serialize_times_with_crowding([departure], screen, now)

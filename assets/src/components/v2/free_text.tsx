@@ -9,6 +9,7 @@ const iconPills = ["cr", "bus"];
 const iconPaths: { [key: string]: string } = _.mapValues(
   {
     warning: "alert.svg",
+    warning_negative: "alert-black.svg",
     x: "no-service-white.svg",
     shuttle: "bus-white.svg",
     subway: "subway-white.svg",
@@ -20,6 +21,7 @@ const iconPaths: { [key: string]: string } = _.mapValues(
     green_d: "gl-d-color.svg",
     green_e: "gl-e-color.svg",
     bus: "bus-black.svg",
+    delay: "clock.svg",
   },
   imagePath
 );
@@ -47,7 +49,7 @@ const getKey = (elt: string | FreeTextElementType) => {
 const Icon = ({ icon }: { icon: string }) => {
   let iconElt;
 
-  if (icon === null) {
+  if (!icon) {
     iconElt = null;
   } else if (textPills.includes(icon)) {
     iconElt = <TextRoutePill route={icon} />;
@@ -68,7 +70,13 @@ const InlineIcon = ({ icon }: { icon: string }) => {
   );
 };
 
-const FormatString = ({ format, text }: { format: string; text: string }) => {
+const FormatString = ({
+  format,
+  text,
+}: {
+  format: string | null;
+  text?: string;
+}) => {
   const modifiers = format === null ? [] : [format];
   const className = `free-text__element ${classWithModifiers(
     "free-text__string",
@@ -116,7 +124,7 @@ const IconRoutePill = ({ route }: { route: string }) => {
   );
 };
 
-const TextPill = ({ color, text }: { color: string; text: string }) => {
+const TextPill = ({ color, text }: { color: string; text?: string }) => {
   return (
     <span className="free-text__element free-text__pill-container">
       <div className={classWithModifier("free-text__text-pill", color)}>
@@ -165,12 +173,12 @@ const FreeTextLine = ({
   icon,
   text,
 }: {
-  icon?: string;
+  icon: string;
   text: (string | FreeTextElementType)[];
 }) => {
   return (
     <div className="free-text__line-container">
-      {icon && <Icon icon={icon} />}
+      <Icon icon={icon} />
       <div className="free-text__line">
         {text.map((elt: string | FreeTextElementType) => (
           <FreeTextElement elt={elt} key={getKey(elt)} />
@@ -181,7 +189,7 @@ const FreeTextLine = ({
 };
 
 export interface FreeTextType {
-  icon?: string;
+  icon: string;
   text: FreeTextElementType[];
 }
 

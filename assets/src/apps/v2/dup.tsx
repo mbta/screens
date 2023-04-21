@@ -14,7 +14,6 @@ import { MappingContext } from "Components/v2/widget";
 import NormalScreen, {
   NormalSimulation,
 } from "Components/v2/dup/normal_screen";
-import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/dup/normal_header";
 import NormalDepartures from "Components/v2/dup/departures/normal_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
@@ -35,6 +34,7 @@ import {
 import PageLoadNoData from "Components/v2/dup/page_load_no_data";
 import NoData from "Components/v2/dup/no_data";
 import useOutfrontStation from "Hooks/use_outfront_station";
+import OvernightDepartures from "Components/v2/dup/overnight_departures";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -51,7 +51,6 @@ const TYPE_TO_COMPONENT = {
   body_split_zero: splitRotationFromPropNames(SplitBody, "zero"),
   body_split_one: splitRotationFromPropNames(SplitBody, "one"),
   body_split_two: splitRotationFromPropNames(SplitBody, "two"),
-  placeholder: Placeholder,
   normal_header: NormalHeader,
   departures: NormalDepartures,
   evergreen_content: EvergreenContent,
@@ -60,6 +59,7 @@ const TYPE_TO_COMPONENT = {
   page_load_no_data: PageLoadNoData,
   no_data: NoData,
   departures_no_data: NoData,
+  overnight_departures: OvernightDepartures,
 };
 
 const responseMapper: ResponseMapper = (apiResponse) => {
@@ -138,7 +138,10 @@ const App = (): JSX.Element => {
     <Router>
       <Switch>
         <Route exact path="/v2/screen/dup_v2">
-          <MultiScreenPage components={TYPE_TO_COMPONENT} />
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
         </Route>
         <Route exact path="/v2/screen/:id/simulation">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>

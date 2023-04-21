@@ -1,7 +1,11 @@
 .departures-section {
   position: relative;
 
-  &:not(:last-child):after {
+  &:not(:only-child) {
+    height: 416px;
+  }
+
+  &:not(:first-child):before {
     content: "";
     position: absolute;
     left: 0px;
