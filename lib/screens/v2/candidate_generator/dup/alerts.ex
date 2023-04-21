@@ -165,12 +165,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
       alert.effect in [:shuttle, :suspension] and
         Enum.any?(alert.informed_entities, &(&1.direction_id in 0..1))
 
-    if directional do
-      Sentry.capture_message(
-        "DUP logic encountered a directional shuttle or suspension alert. Discarding. alert_id=#{alert.id} alert_effect=#{alert.effect}",
-        level: "warning"
-      )
-    end
+    _ =
+      if directional do
+        Sentry.capture_message(
+          "DUP logic encountered a directional shuttle or suspension alert. Discarding. alert_id=#{alert.id} alert_effect=#{alert.effect}",
+          level: "warning"
+        )
+      end
 
     directional
   end
