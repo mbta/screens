@@ -131,7 +131,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
                 text: "#{String.upcase(formatted_route)} LINE"
               },
               %{special: :break},
-              "#{headsign} trains every"
+              "#{headsign} trains every",
+              %{special: :break},
             ] ++ time_range
         }
       else
@@ -162,7 +163,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     text = %FreeTextLine{
       icon: route_pill,
-      text: ["Service resumes in the morning"]
+      text: [
+        "Service resumes",
+        %{special: :break},
+        "in the morning"
+      ]
     }
 
     %{type: :overnight_section, text: FreeTextLine.to_json(text)}

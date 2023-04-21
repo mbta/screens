@@ -156,13 +156,10 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   end
 
   defp remedy_free_text(t) do
-    text =
-      case t.alert.effect do
-        :shuttle -> "Use shuttle bus"
-        _ -> "Seek alternate route"
-      end
-
-    [bold(text)]
+    case t.alert.effect do
+      :shuttle -> [bold("Use shuttle bus")]
+      _ -> ["Seek alternate route"]
+    end
   end
 
   defp get_headsign(t) do

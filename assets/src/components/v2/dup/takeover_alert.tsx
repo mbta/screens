@@ -24,7 +24,7 @@ const TakeoverAlert = (alert: TakeoverAlertProps) => {
         accentPattern="dup-accent-pattern.svg"
       />
       <div className="full-screen-alert__body">
-        <div className="full-screen-alert-text">
+        <div className="full-screen-alert__body-text">
           <FreeText lines={[text, remedy]} />
         </div>
         <div className="full-screen-alert__link">
