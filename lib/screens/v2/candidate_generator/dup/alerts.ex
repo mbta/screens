@@ -168,8 +168,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     _ =
       if directional do
         Sentry.capture_message(
-          "DUP logic encountered a directional shuttle or suspension alert. Discarding. alert_id=#{alert.id} alert_effect=#{alert.effect}",
-          level: "warning"
+          "DUP logic encountered a directional shuttle or suspension alert. Discarding.",
+          level: "warning",
+          extra: %{alert_id: alert.id, alert_effect: Atom.to_string(alert.effect)}
         )
       end
 
