@@ -33,8 +33,8 @@ import {
 } from "Components/v2/screen_container";
 import PageLoadNoData from "Components/v2/dup/page_load_no_data";
 import NoData from "Components/v2/dup/no_data";
-import useOutfrontStation from "Hooks/use_outfront_station";
 import OvernightDepartures from "Components/v2/dup/overnight_departures";
+import useOutfrontStation from "Hooks/use_outfront_station";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
