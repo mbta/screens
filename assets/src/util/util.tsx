@@ -1,3 +1,4 @@
+import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
 import moment from "moment";
 import "moment-timezone";
 import { getDatasetValue } from "Util/dataset";
@@ -47,11 +48,14 @@ export const getScreenSide = (): ScreenSide | null => {
   return isScreenSide(screenSide) ? screenSide : null;
 };
 
-type RotationIndex = "0" | "1" | "2";
-const isRotationIndex = (value: any): value is RotationIndex => {
+const isRotationIndex = (value: string | undefined) => {
   return value === "0" || value === "1" || value === "2";
 };
-export const getRotationIndex = (): RotationIndex | null => {
-  const rotationIndex = getDatasetValue("rotationIndex");
+
+export const getRotationIndex = () => {
+  const rotationIndex = isDup()
+    ? ROTATION_INDEX.toString()
+    : getDatasetValue("rotationIndex");
+
   return isRotationIndex(rotationIndex) ? rotationIndex : null;
 };

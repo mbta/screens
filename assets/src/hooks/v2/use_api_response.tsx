@@ -160,7 +160,11 @@ const useBaseApiResponse = ({
   } = getDataset();
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
-  const apiPath = `/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}`;
+  let apiPath = `/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}`;
+
+  if (isDup()) {
+    apiPath = "https://screens.mbta.com" + apiPath;
+  }
 
   if (screenIdsWithOffsetMap) {
     const screens = JSON.parse(screenIdsWithOffsetMap);
@@ -230,6 +234,13 @@ const useSimulationApiResponse = ({ id }) =>
     responseHandler: rawResponseToSimulationApiResponse,
   });
 
+const useDupApiResponse = ({ id }) =>
+  useBaseApiResponse({
+    id,
+    routePart: "/dup",
+    responseHandler: rawResponseToApiResponse,
+  });
+
 export default useApiResponse;
 export { ApiResponse, SimulationApiResponse };
-export { useSimulationApiResponse };
+export { useSimulationApiResponse, useDupApiResponse };

@@ -165,6 +165,8 @@ defmodule Screens.Util do
   def route_type_from_id("Boat-" <> _), do: :ferry
   def route_type_from_id(_), do: :bus
 
+  def outdated?("DUP-" <> _, _), do: false
+
   def outdated?(screen_id, client_refresh_timestamp) do
     {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
     refresh_if_loaded_before_time = State.refresh_if_loaded_before(screen_id)

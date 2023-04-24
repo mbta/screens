@@ -1,7 +1,7 @@
 import React from "react";
 
 import DefaultNormalHeader, { Icon } from "Components/v2/normal_header";
-import { DUP_VERSION } from "Components/dup/version";
+import { DUP_VERSION } from "Components/v2/dup/version";
 
 interface NormalHeaderProps {
   text: string;
