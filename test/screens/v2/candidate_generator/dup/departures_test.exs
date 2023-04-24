@@ -193,6 +193,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            }
          ]}
 
+      %Section{query: %Query{params: %Query.Params{stop_ids: ["place-G"]}}} ->
+        {:ok,
+         [
+           %Departure{
+             prediction: %Prediction{
+               id: "G1",
+               trip: %Trip{direction_id: 1},
+               stop: struct(Stop),
+               route: %Route{id: "Test"}
+             }
+           }
+         ]}
+
       %Section{query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}}} ->
         {:ok,
          [
@@ -744,6 +757,105 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                       stop: struct(Stop),
                       route: %Route{id: "Test"},
                       trip: struct(Trip)
+                    ),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_two]
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_section_departures_fn,
+          fetch_alerts_fn,
+          fetch_schedules_fn,
+          create_station_with_routes_map_fn,
+          fetch_vehicles_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns one row for bidirectional departures if only one departure exists", %{
+      config: config,
+      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_alerts_fn: fetch_alerts_fn,
+      fetch_schedules_fn: fetch_schedules_fn,
+      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
+    } do
+      config =
+        put_primary_departures(config, [
+          %Section{
+            bidirectional: true,
+            query: %Query{params: %Query.Params{stop_ids: ["place-G"]}},
+            filter: nil
+          }
+        ])
+
+      now = ~U[2020-04-06T10:00:00Z]
+
+      expected_departures = [
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction:
+                    struct(Prediction,
+                      id: "G1",
+                      stop: struct(Stop),
+                      route: %Route{id: "Test"},
+                      trip: struct(Trip, direction_id: 1)
+                    ),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_zero]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction:
+                    struct(Prediction,
+                      id: "G1",
+                      stop: struct(Stop),
+                      route: %Route{id: "Test"},
+                      trip: struct(Trip, direction_id: 1)
+                    ),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_one]
+        },
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{
+              type: :normal_section,
+              rows: [
+                %Screens.V2.Departure{
+                  prediction:
+                    struct(Prediction,
+                      id: "G1",
+                      stop: struct(Stop),
+                      route: %Route{id: "Test"},
+                      trip: struct(Trip, direction_id: 1)
                     ),
                   schedule: nil
                 }
