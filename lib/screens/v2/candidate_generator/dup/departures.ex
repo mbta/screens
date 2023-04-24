@@ -148,7 +148,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          fetch_vehicles_fn
        ) do
     routes_with_live_departures =
-      departures |> Enum.map(&{Departure.route_id(&1), Departure.direction_id(&1)}) |> Enum.uniq()
+      departures
+      |> Enum.map(&{Departure.route_id(&1), Departure.direction_id(&1)})
+      |> Enum.uniq()
 
     overnight_schedules_for_section =
       get_overnight_schedules_for_section(
@@ -274,7 +276,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         Departure.direction_id(departure) === 1 - first_direction_id
       end)
 
-    [first_row] ++ [second_row]
+    # Towards the end of service, there can exist a scenario where one direction is done and the other only has one more departure.
+    # When this happens, the default above is nil because section_departures only has one departure in the list.
+    # In that scenario, only return first_row and let the overnight logic determine what row should be displayed.
+    if is_nil(second_row) do
+      [first_row]
+    else
+      [first_row, second_row]
+    end
   end
 
   defp get_section_entities(
