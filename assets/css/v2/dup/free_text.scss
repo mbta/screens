@@ -1,3 +1,4 @@
+// General styles for free text / route pills
 .free-text {
   font-family: Inter;
   font-size: 138px;
@@ -15,6 +16,7 @@
   vertical-align: middle;
   text-align: center;
 
+  // Needed if we use a route pill as the leading icon for the row
   .free-text__route-pill {
     margin-top: 30px;
     color: #ffffff;
@@ -37,15 +39,10 @@
   }
 }
 
-.free-text__route-pill {
-  text-align: center;
-}
-
 .free-text__route-pill,
 .free-text__text-pill {
   display: inline-block;
-  font-family: Helvetica, sans-serif;
-  font-weight: 700;
+  text-align: center;
 
   &--green,
   &--green_b,
@@ -82,39 +79,50 @@
   }
 }
 
-.free-text__inline-icon {
-  height: 208px;
-  line-height: 168px;
-}
-
-.free-text__inline-icon-image {
-  height: 139px;
-}
-
 .free-text__route-pill__text,
 .free-text__text-pill__text {
-  display: inline-block;
   font-family: Helvetica, sans-serif;
-  font-weight: 700;
-}
-
-.free-text__route-pill__text {
-  text-align: center;
 
   &--branch {
     font-size: 84px;
   }
 }
 
+.free-text__line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  // Needed to keep y's from getting cut off!
+  line-height: initial;
+}
+
+.free-text__inline-icon-image {
+  // This is not a Helvetica transform
+  // This is because FreeText centering for inline icons is weird
+  transform: translateY(20px);
+}
+
+.free-text__route-pill {
+  height: 144px;
+  width: 248px;
+  border-radius: 72px;
+  font-size: 96px;
+  line-height: 144px;
+}
+
+.free-text__text-pill {
+  border-radius: 84px;
+  font-size: 126px;
+  line-height: 168px;
+  padding-left: 84px;
+  padding-right: 84px;
+}
+
+// Partial alert and one-line headway have similar styles
 .partial-alert,
 .headway-section:not(:only-child) {
   .free-text__line {
     width: 1608px;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
-    line-height: 208px;
-    font-weight: 400;
   }
 
   .free-text__icon-container {
@@ -123,30 +131,9 @@
   }
 
   .free-text__icon-image {
-    height: 144px;
+    height: 128px;
     padding-top: 40px;
     padding-bottom: 40px;
-  }
-
-  .free-text__route-pill {
-    height: 144px;
-    width: 248px;
-    border-radius: 72px;
-    font-size: 96px;
-    line-height: 144px;
-  }
-
-  .free-text__text-pill {
-    border-radius: 84px;
-    font-size: 126px;
-    line-height: 168px;
-    padding-left: 84px;
-    padding-right: 84px;
-  }
-
-  .free-text__inline-icon {
-    height: 208px;
-    line-height: 208px;
   }
 }
 
@@ -156,20 +143,11 @@
   }
 }
 
-.headway-section:only-child {
-  .free-text__line-container {
-    margin-bottom: 56px;
-    line-height: 144px;
-  }
-
+// Full page headway and Full page alert have similar styles
+.headway-section:only-child,
+.full-screen-alert__body-text {
   .free-text__line {
     width: 1517px;
-    line-height: initial;
-  }
-
-  .free-text__pill-container {
-    display: inline-block;
-    height: 168px;
   }
 
   .free-text__icon-container {
@@ -183,17 +161,55 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
+    padding: 0;
+  }
+}
+
+.headway-section {
+  .free-text {
+    color: #171f26;
+  }
+}
+
+.full-screen-alert__body-text {
+  .free-text__line {
+    width: 1544px;
+    line-height: 156px;
   }
 
-  .free-text__text-pill {
-    border-radius: 84px;
+  .free-text__line-container {
+    margin-bottom: 52px;
   }
 
-  .free-text__text-pill__text {
-    font-size: 126px;
-    line-height: 168px;
-    margin-left: 84px;
-    margin-right: 84px;
+  .free-text__icon-container {
+    margin-right: 64px;
+  }
+
+  .free-text__route-pill {
+    height: 128px;
+    line-height: 128px;
+    vertical-align: bottom;
+    transform: translateY(-10px);
+  }
+}
+
+// No Data and Overnight sections have similar styles
+.no-data-section,
+.overnight-section {
+  .free-text__line {
+    width: 1400px;
+    font-weight: 600;
+    color: #171f26;
+  }
+
+  .free-text__icon-container {
+    width: 312px;
+    height: 208px;
+  }
+
+  .free-text__icon-image {
+    height: 112.5px;
+    margin-top: 15.75px;
   }
 }
 
@@ -201,120 +217,14 @@
   .free-text {
     display: inline-block;
   }
-
-  .free-text__line {
-    width: 1400px;
-    font-weight: 600;
-    line-height: 128px;
-    font-size: 138px;
-    color: #171f26;
-  }
-
-  .free-text__route-pill {
-    height: 144px;
-    width: 248px;
-    border-radius: 72px;
-    font-size: 96px;
-    line-height: 117px;
-  }
-
-  .free-text__route-pill__text {
-    font-size: 96px;
-    font-weight: 700;
-    line-height: 144px;
-  }
-
-  .free-text__icon-container {
-    width: 312px;
-    height: 208px;
-  }
-
-  .free-text__icon-image {
-    height: 112.5px;
-    margin-top: 15.75px;
-  }
-}
-
-.full-screen-alert-text {
-  .free-text__line {
-    width: 1544px;
-  }
-
-  .free-text__line-container {
-    margin-bottom: 56px;
-  }
-
-  .free-text__icon-container {
-    width: 184px;
-    height: 184px;
-    margin-right: 64px;
-    vertical-align: top;
-  }
-
-  .free-text__icon-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-
-  .free-text__text-pill {
-    border-radius: 84px;
-    font-size: 126px;
-    line-height: 168px;
-    padding-left: 84px;
-    padding-right: 84px;
-  }
-
-  .free-text__route-pill {
-    height: 128px;
-    width: 248px;
-    border-radius: 72px;
-    font-size: 96px;
-    line-height: 128px;
-    vertical-align: bottom;
-  }
 }
 
 .overnight-section {
-  .free-text {
-    display: inline-block;
-    line-height: unset;
-  }
-
   .free-text__line {
-    font-weight: 600;
-    font-size: 138px;
-    color: #171f26;
-    width: 1145px;
     margin-top: 24px;
   }
 
-  .free-text__route-pill {
-    height: 144px;
-    width: 248px;
-    border-radius: 72px;
-    font-size: 96px;
-    line-height: 144px;
-  }
-
-  .free-text__route-pill__text {
-    font-size: 96px;
-    font-weight: 700;
-    line-height: 144px;
-  }
-
   .free-text__icon-container {
-    width: 312px;
-    height: 208px;
     vertical-align: top;
-  }
-
-  .free-text__icon-image {
-    height: 112.5px;
-    margin-top: 15.75px;
-  }
-
-  .free-text__string {
-    line-height: unset;
   }
 }
