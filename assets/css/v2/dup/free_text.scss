@@ -17,8 +17,9 @@
   text-align: center;
 
   // Needed if we use a route pill as the leading icon for the row
+  // which we do for one-row headways
   .free-text__route-pill {
-    margin-top: 30px;
+    margin-top: 35px;
     color: #ffffff;
   }
 }
@@ -93,6 +94,9 @@
   text-overflow: ellipsis;
   // Needed to keep y's from getting cut off!
   line-height: initial;
+  .free-text__element {
+    line-height: initial;
+  }
 }
 
 .free-text__inline-icon-image {
@@ -137,10 +141,18 @@
   }
 }
 
-.partial-alert--yellow {
-  .free-text {
-    color: #171f26;
+.partial-alert {
+  &--yellow {
+    .free-text {
+      color: #171f26;
+    }
   }
+
+  // slight edits for partial alert because of the top border
+  .free-text__icon-container {height: 202px;}
+  .free-text__icon-image {padding-top: 37px;}
+  .free-text__line {height: 202px;}
+  .free-text__element{vertical-align: middle;}
 }
 
 // Full page headway and Full page alert have similar styles
@@ -169,6 +181,9 @@
   .free-text {
     color: #171f26;
   }
+  .free-text__text-pill {
+    color: #ffffff;
+  }
 }
 
 .full-screen-alert__body-text {
@@ -178,7 +193,7 @@
   }
 
   .free-text__line-container {
-    margin-bottom: 52px;
+    margin-bottom: 40px;
   }
 
   .free-text__icon-container {
