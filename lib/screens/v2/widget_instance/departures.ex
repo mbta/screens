@@ -131,7 +131,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
                 text: "#{String.upcase(formatted_route)} LINE"
               },
               %{special: :break},
-              "#{headsign} trains every",
+              "#{headsign} trains every"
             ] ++ time_range
         }
       else
