@@ -51,3 +51,6 @@ npm-debug.log
 
 # Ignore .env file used for Devcontainer local development
 /.devcontainer/devcontainer.env
+
+# Ignore file used for packaging DUP app. Gets created when script is executed.
+assets/src/components/v2/dup/rotation_index.tsx
