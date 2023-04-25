@@ -106,6 +106,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         is_only_section
       ) do
     pill_color = Route.get_color_for_route(route)
+    layout = if is_only_section, do: :full_screen, else: :row
 
     formatted_route =
       case route do
@@ -141,7 +142,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         }
       end
 
-    %{type: :headway_section, text: FreeTextLine.to_json(text)}
+    %{type: :headway_section, text: FreeTextLine.to_json(text), layout: layout}
   end
 
   def serialize_section(%{type: :normal_section, rows: departures}, screen, _) do
