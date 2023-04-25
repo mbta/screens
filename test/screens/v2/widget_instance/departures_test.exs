@@ -128,7 +128,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
           %{color: :red, text: "RED LINE"},
           %{special: :break},
           "Test trains every",
-          %{special: :break},
           %{format: :bold, text: "1-2"},
           "minutes"
         ]
@@ -155,7 +154,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
           %{color: :red, text: "RED LINE"},
           %{special: :break},
           "Ashmont/Braintree trains every",
-          %{special: :break},
           %{format: :bold, text: "1-2m"}
         ]
       }
