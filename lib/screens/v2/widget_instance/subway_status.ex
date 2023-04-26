@@ -218,7 +218,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp serialize_alert(%Alert{effect: :shuttle, informed_entities: informed_entities}, route_id) do
-    %{status: "Shuttle Buses", location: get_location(informed_entities, route_id)}
+    %{status: "Shuttles", location: get_location(informed_entities, route_id)}
   end
 
   defp serialize_alert(
