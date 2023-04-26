@@ -123,7 +123,7 @@
 
 // Partial alert and one-line headway have similar styles
 .partial-alert,
-.headway-section:not(:only-child) {
+.headway-section--row {
   .free-text__line {
     width: 1608px;
     white-space: nowrap;
@@ -149,14 +149,22 @@
   }
 
   // slight edits for partial alert because of the top border
-  .free-text__icon-container {height: 202px;}
-  .free-text__icon-image {padding-top: 37px;}
-  .free-text__line {height: 202px;}
-  .free-text__element{vertical-align: middle;}
+  .free-text__icon-container {
+    height: 202px;
+  }
+  .free-text__icon-image {
+    padding-top: 37px;
+  }
+  .free-text__line {
+    height: 202px;
+  }
+  .free-text__element {
+    vertical-align: middle;
+  }
 }
 
 // Full page headway and Full page alert have similar styles
-.headway-section:only-child,
+.headway-section--full_screen,
 .full-screen-alert__body-text {
   .free-text__line {
     width: 1517px;
