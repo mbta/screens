@@ -133,7 +133,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         ]
       }
 
-      assert %{type: :headway_section, text: expected_text} ==
+      assert %{type: :headway_section, text: expected_text, layout: :full_screen} ==
                Departures.serialize_section(section, dup_screen, true)
     end
 
@@ -158,7 +158,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         ]
       }
 
-      assert %{type: :headway_section, text: expected_text} ==
+      assert %{type: :headway_section, text: expected_text, layout: :full_screen} ==
                Departures.serialize_section(section, dup_screen, true)
     end
 
@@ -172,7 +172,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         text: ["every", %{format: :bold, text: "1-2"}, "minutes"]
       }
 
-      assert %{type: :headway_section, text: expected_text} ==
+      assert %{type: :headway_section, text: expected_text, layout: :row} ==
                Departures.serialize_section(section, dup_screen, false)
     end
 
