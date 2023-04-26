@@ -133,12 +133,36 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   def serialize_routes_multiple_alerts(grouped_alerts) do
-    %{
-      blue: serialize_route(grouped_alerts, "Blue", :contracted),
-      orange: serialize_route(grouped_alerts, "Orange", :contracted),
-      red: serialize_route(grouped_alerts, "Red", :contracted),
-      green: serialize_route(grouped_alerts, "Green", :contracted)
-    }
+    routes_with_alerts = Map.keys(grouped_alerts)
+    total_alerts = grouped_alerts |> Enum.flat_map(&elem(&1, 1)) |> length()
+
+    if "Green" in routes_with_alerts do
+      %{
+        blue: serialize_route(grouped_alerts, "Blue", :contracted),
+        orange: serialize_route(grouped_alerts, "Orange", :contracted),
+        red: serialize_route(grouped_alerts, "Red", :contracted),
+        green: serialize_route(grouped_alerts, "Green", :contracted)
+      }
+    else
+      if length(routes_with_alerts) == 1 do
+        if total_alerts == 2 do
+        else
+          %{
+            blue: serialize_route(grouped_alerts, "Blue", :contracted),
+            orange: serialize_route(grouped_alerts, "Orange", :contracted),
+            red: serialize_route(grouped_alerts, "Red", :contracted),
+            green: serialize_route(grouped_alerts, "Green", :contracted)
+          }
+        end
+      else
+        %{
+          blue: serialize_route(grouped_alerts, "Blue", :contracted),
+          orange: serialize_route(grouped_alerts, "Orange", :contracted),
+          red: serialize_route(grouped_alerts, "Red", :contracted),
+          green: serialize_route(grouped_alerts, "Green", :contracted)
+        }
+      end
+    end
   end
 
   def serialize_route(grouped_alerts, route_id, type) do
