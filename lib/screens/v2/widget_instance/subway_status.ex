@@ -61,12 +61,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     def serialize(%SubwayStatus{subway_alerts: alerts}) do
       grouped_alerts = SubwayStatus.get_relevant_alerts_by_route(alerts)
 
-      %{
-        blue: SubwayStatus.serialize_route(grouped_alerts, "Blue"),
-        orange: SubwayStatus.serialize_route(grouped_alerts, "Orange"),
-        red: SubwayStatus.serialize_route(grouped_alerts, "Red"),
-        green: SubwayStatus.serialize_green_line(grouped_alerts)
-      }
+      multi_alert_routes =
+        grouped_alerts
+        |> Enum.into([])
+        |> Enum.filter(fn {_route, alerts} -> length(alerts) > 1 end)
+
+      if Enum.any?(multi_alert_routes) do
+        # check GL
+        SubwayStatus.serialize_routes(grouped_alerts)
+      else
+        SubwayStatus.serialize_routes(grouped_alerts)
+      end
     end
 
     def slot_names(_instance), do: [:large]
@@ -92,7 +97,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     |> Stream.flat_map(fn alert ->
       Enum.map(alert_routes(alert), fn route -> {alert, route} end)
     end)
-    |> Enum.group_by(fn {_alert, route} -> route end, fn {alert, _route} -> alert end)
+    |> Enum.group_by(
+      fn
+        {_alert, "Green" <> _} -> "Green"
+        {_alert, route} -> route
+      end,
+      fn {alert, _route} -> alert end
+    )
   end
 
   defp relevant_effect?(%Alert{effect: :suspension}), do: true
@@ -108,34 +119,44 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     |> Enum.uniq()
   end
 
-  def serialize_route(grouped_alerts, route_id) do
+  def serialize_routes(grouped_alerts) do
+    total_alerts = grouped_alerts |> Enum.flat_map(&elem(&1, 1)) |> length()
+    row_type = if total_alerts in 1..2, do: :extended, else: :contracted
+
+    %{
+      blue: serialize_route(grouped_alerts, "Blue", row_type),
+      orange: serialize_route(grouped_alerts, "Orange", row_type),
+      red: serialize_route(grouped_alerts, "Red", row_type),
+      green: serialize_route(grouped_alerts, "Green", row_type)
+    }
+  end
+
+  # 0 or 1 alerts affecting a route
+  def serialize_route(grouped_alerts, route_id, type) do
     alerts = Map.get(grouped_alerts, route_id)
 
     data =
       case alerts do
-        nil ->
-          # %{status: "Normal Service"}
-          %{route_pill: serialize_route_pill(route_id), text: "Normal Service"}
-
-        [] ->
-          %{route_pill: serialize_route_pill(route_id), text: "Normal Service"}
+        alerts when is_nil(alerts) or alerts == [] ->
+          %{status: "Normal Service"}
 
         [alert] ->
           serialize_alert(alert, route_id)
 
-        alerts ->
-          _ =
-            Logger.info(
-              "[subway_status_multiple_alerts] route=#{route_id} count=#{length(alerts)}"
-            )
+          # move this
+          # alerts ->
+          #   _ =
+          #     Logger.info(
+          #       "[subway_status_multiple_alerts] route=#{route_id} count=#{length(alerts)}"
+          #     )
 
-          %{
-            status: "#{length(alerts)} alerts",
-            location: %{full: "mbta.com/alerts/subway", abbrev: "mbta.com/alerts/subway"}
-          }
+          #   %{
+          #     status: "#{length(alerts)} alerts",
+          #     location: %{full: "mbta.com/alerts/subway", abbrev: "mbta.com/alerts/subway"}
+          #   }
       end
 
-    Map.merge(%{route: serialize_route_pill(route_id)}, data)
+    [Map.merge(%{route_pill: serialize_route_pill(route_id), type: type, location: nil}, data)]
   end
 
   defp serialize_route_pill(route_id) do
