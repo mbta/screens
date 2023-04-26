@@ -18,14 +18,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         }
 
   @type serialized_response :: %{
-          blue: route_status(),
-          orange: route_status(),
-          red: route_status(),
-          green: route_status()
-        }
-
-  @type route_status :: %{
-          alerts: list(alert())
+          blue: list(alert()),
+          orange: list(alert()),
+          red: list(alert()),
+          green: list(alert())
         }
 
   @type route_pill :: %{
@@ -38,9 +34,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   @type alert :: %{
           route_pill: route_pill(),
-          text: String.t(),
-          subtext: String.t()
+          status: String.t(),
+          location: String.t() | location_map() | nil,
+          type: :extended | :contracted
         }
+
+  @type location_map :: %{full: String.t(), abbrev: String.t()}
 
   @route_directions %{
     "Blue" => ["Westbound", "Eastbound"],
