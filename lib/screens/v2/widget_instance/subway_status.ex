@@ -125,52 +125,84 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     |> Enum.uniq()
   end
 
+  def serialize_one_row_for_all_routes(grouped_alerts) do
+    %{
+      blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", :contracted),
+      orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange", :contracted),
+      red: serialize_single_alert_row_for_route(grouped_alerts, "Red", :contracted),
+      green: serialize_single_alert_row_for_route(grouped_alerts, "Green", :contracted)
+    }
+  end
+
+  # At most 1 alert on any route
   def serialize_routes_zero_or_one_alert(grouped_alerts) do
     total_alerts = grouped_alerts |> Enum.flat_map(&elem(&1, 1)) |> length()
     row_type = if total_alerts in 1..2, do: :extended, else: :contracted
 
     %{
-      blue: serialize_route(grouped_alerts, "Blue", row_type),
-      orange: serialize_route(grouped_alerts, "Orange", row_type),
-      red: serialize_route(grouped_alerts, "Red", row_type),
-      green: serialize_route(grouped_alerts, "Green", row_type)
+      blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", row_type),
+      orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange", row_type),
+      red: serialize_single_alert_row_for_route(grouped_alerts, "Red", row_type),
+      green: serialize_single_alert_row_for_route(grouped_alerts, "Green", row_type)
     }
   end
 
+  # More than 1 alert on any one route
   def serialize_routes_multiple_alerts(grouped_alerts) do
     routes_with_alerts = Map.keys(grouped_alerts)
     total_alerts = grouped_alerts |> Enum.flat_map(&elem(&1, 1)) |> length()
 
     if "Green" in routes_with_alerts do
+      # Collapse all non-GL routes and display as many GL alerts as possible.
       %{
-        blue: serialize_route(grouped_alerts, "Blue", :contracted),
-        orange: serialize_route(grouped_alerts, "Orange", :contracted),
-        red: serialize_route(grouped_alerts, "Red", :contracted),
-        green: serialize_route(grouped_alerts, "Green", :contracted)
+        blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", :contracted),
+        orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange", :contracted),
+        red: serialize_single_alert_row_for_route(grouped_alerts, "Red", :contracted),
+        green: serialize_green_line(grouped_alerts)
       }
     else
-      if length(routes_with_alerts) == 1 do
-        if total_alerts == 2 do
-        else
-          %{
-            blue: serialize_route(grouped_alerts, "Blue", :contracted),
-            orange: serialize_route(grouped_alerts, "Orange", :contracted),
-            red: serialize_route(grouped_alerts, "Red", :contracted),
-            green: serialize_route(grouped_alerts, "Green", :contracted)
-          }
-        end
-      else
+      if length(routes_with_alerts) == 1 and total_alerts == 2 do
+        # Show both alerts in two rows
         %{
-          blue: serialize_route(grouped_alerts, "Blue", :contracted),
-          orange: serialize_route(grouped_alerts, "Orange", :contracted),
-          red: serialize_route(grouped_alerts, "Red", :contracted),
-          green: serialize_route(grouped_alerts, "Green", :contracted)
+          blue: serialize_multiple_alert_rows_for_route(grouped_alerts, "Blue"),
+          orange: serialize_multiple_alert_rows_for_route(grouped_alerts, "Orange"),
+          red: serialize_multiple_alert_rows_for_route(grouped_alerts, "Red"),
+          green: serialize_multiple_alert_rows_for_route(grouped_alerts, "Green")
         }
+      else
+        # Collapse all routes
+        serialize_one_row_for_all_routes(grouped_alerts)
       end
     end
   end
 
-  def serialize_route(grouped_alerts, route_id, type) do
+  # Only executed if one non-GL route has exactly 2 alerts
+  def serialize_multiple_alert_rows_for_route(grouped_alerts, route_id) do
+    alerts = Map.get(grouped_alerts, route_id)
+
+    alert_rows =
+      if is_nil(alerts) or alerts == [] do
+        [%{status: "Normal Service"}]
+      else
+        [alert1, alert2] = alerts
+
+        [
+          Map.merge(
+            %{route_pill: serialize_route_pill(route_id), location: nil},
+            serialize_alert(alert1, route_id)
+          ),
+          serialize_alert(alert2, route_id)
+        ]
+      end
+
+    %{
+      type: :contracted,
+      alerts: alert_rows
+    }
+  end
+
+  # Only executed when route displays one status.
+  def serialize_single_alert_row_for_route(grouped_alerts, route_id, type) do
     alerts = Map.get(grouped_alerts, route_id)
 
     data =
