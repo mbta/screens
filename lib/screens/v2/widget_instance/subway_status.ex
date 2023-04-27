@@ -258,6 +258,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
+  defp serialize_gl_pill_with_branches(route_ids) do
+    branches =
+      route_ids
+      |> Enum.filter(&String.contains?(&1, "Green-"))
+      |> Enum.map(fn "Green-" <> branch ->
+        branch |> String.downcase() |> String.to_existing_atom()
+      end)
+
+    %{type: :text, color: :green, text: "GL", branches: branches}
+  end
+
   defp ie_is_whole_route?(%{route: route_id, direction_id: nil, stop: nil})
        when not is_nil(route_id),
        do: true
