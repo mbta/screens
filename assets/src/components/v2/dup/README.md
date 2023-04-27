@@ -14,7 +14,6 @@
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Screens</title>
-      <link rel="stylesheet" href="inter_font_face.css" />
       <link rel="stylesheet" href="dup_v2.css" />
     </head>
 
