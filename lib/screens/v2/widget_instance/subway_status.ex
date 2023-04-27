@@ -236,10 +236,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           }
       end
 
-    %{
-      type: type,
-      alerts: [Map.merge(%{route_pill: serialize_route_pill(route_id), location: nil}, data)]
-    }
+    if type == :extended do
+      %{
+        type: type,
+        alert: Map.merge(%{route_pill: serialize_route_pill(route_id), location: nil}, data)
+      }
+    else
+      %{
+        type: type,
+        alerts: [Map.merge(%{route_pill: serialize_route_pill(route_id), location: nil}, data)]
+      }
+    end
   end
 
   defp serialize_route_pill(route_id) do
