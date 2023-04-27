@@ -15,13 +15,15 @@ defmodule Screens.Stops.Stop do
   alias Screens.V3Api
 
   defstruct id: nil,
-            name: nil
+            name: nil,
+            platform_code: nil
 
   @type id :: String.t()
 
   @type t :: %__MODULE__{
           id: id,
-          name: String.t()
+          name: String.t(),
+          platform_code: String.t() | nil
         }
 
   @blue_line_stops [
