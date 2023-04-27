@@ -68,7 +68,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         |> Enum.filter(fn {_route, alerts} -> length(alerts) > 1 end)
 
       if Enum.any?(multi_alert_routes) do
-        # check GL
         SubwayStatus.serialize_routes_multiple_alerts(grouped_alerts)
       else
         SubwayStatus.serialize_routes_zero_or_one_alert(grouped_alerts)
@@ -96,7 +95,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     |> Stream.filter(&Alert.happening_now?/1)
     |> Stream.filter(&relevant_effect?/1)
     |> Stream.flat_map(fn alert ->
-      Enum.map(alert_routes(alert), fn route -> {alert, route} end)
+      alert
+      |> alert_routes()
+      |> Enum.map(fn
+        "Green-" <> _ -> {alert, "Green"}
+        route -> {alert, route}
+      end)
+      |> Enum.uniq()
     end)
     |> Enum.group_by(
       fn
@@ -354,7 +359,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   def get_green_line_branch_status(%Alert{effect: :suspension}), do: "Suspension"
-  def get_green_line_branch_status(%Alert{effect: :shuttle}), do: "Shuttle Buses"
+  def get_green_line_branch_status(%Alert{effect: :shuttle}), do: "Shuttles"
   def get_green_line_branch_status(%Alert{effect: :delay}), do: "Delays"
 
   def get_green_line_branch_status(%Alert{
