@@ -24,7 +24,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           green: section()
         }
 
-  @type section :: %{type: :extended | :contracted, alerts: list(alert())}
+  @type section :: extended_section() | contracted_section()
+
+  @type extended_section :: %{
+          type: :extended,
+          alert: alert()
+        }
+
+  @type contracted_section :: %{type: :contracted, alerts: list(alert())}
 
   @type alert :: %{
           route_pill: route_pill() | nil,
@@ -37,8 +44,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   @type route_pill :: %{
           type: :text,
           text: String.t(),
-          color: route_color()
+          color: route_color(),
+          branches: list(branch()) | nil
         }
+
+  @type branch :: :b | :c | :d | :e
 
   @type route_color :: :red | :orange | :green | :blue
 
