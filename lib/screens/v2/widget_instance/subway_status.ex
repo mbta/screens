@@ -102,8 +102,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   def get_relevant_alerts_by_route(alerts) do
     alerts
-    |> Stream.filter(&Alert.happening_now?/1)
-    |> Stream.filter(&relevant_effect?/1)
     |> Stream.flat_map(fn alert ->
       alert
       |> alert_routes()
@@ -121,12 +119,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       fn {alert, _route} -> alert end
     )
   end
-
-  defp relevant_effect?(%Alert{effect: :suspension}), do: true
-  defp relevant_effect?(%Alert{effect: :shuttle}), do: true
-  defp relevant_effect?(%Alert{effect: :delay}), do: true
-  defp relevant_effect?(%Alert{effect: :station_closure}), do: true
-  defp relevant_effect?(_), do: false
 
   defp alert_routes(%Alert{informed_entities: entities}) do
     entities
