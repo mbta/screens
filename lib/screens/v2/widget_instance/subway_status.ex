@@ -1,8 +1,6 @@
 defmodule Screens.V2.WidgetInstance.SubwayStatus do
   @moduledoc false
 
-  require Logger
-
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.PreFare
@@ -209,11 +207,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
         # move this
         alerts ->
-          _ =
-            Logger.info(
-              "[subway_status_multiple_alerts] route=#{route_id} count=#{length(alerts)}"
-            )
-
           serialize_alert_summary(length(alerts), serialize_route_pill(route_id))
       end
 
@@ -357,7 +350,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     location =
       case stop_names do
         [] ->
-          _ = Logger.info("[subway_status_empty_bypassing]")
           nil
 
         [stop_name] ->
@@ -408,11 +400,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       ) do
     stations = get_stations(informed_entities)
     station_count = length(stations)
-
-    _ =
-      if station_count == 0 do
-        Logger.info("[subway_status_station_count_zero]")
-      end
 
     %{
       route_pill: serialize_gl_pill_with_branches(route_ids),
@@ -505,9 +492,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         # 2+ trunk alerts w/ 1+ branch alert or 3+ trunk alerts
         # show alert count summary
         {_, _} ->
-          _ =
-            Logger.info("[subway_status_multiple_alerts] route=Green-Trunk count=#{alert_count}")
-
           %{
             type: :contracted,
             alerts: [serialize_alert_summary(alert_count, serialize_route_pill("Green"))]
