@@ -1,21 +1,25 @@
 import React from "react";
 
-import CRIcon from "Components/v2/bundled_svg/cr_icon";
+import Free from "Components/v2/bundled_svg/free";
+import { pillPath } from "Util/util";
 
 const CRDeparturesHeader = () => {
   return (
     <div className="departures-card__header">
-      <CRIcon className="commuter-rail-icon" colorHex="#d9d6d0" />
+      <img src={pillPath("commuter-rail.svg")}></img>
       <div className="departures-card__header-text">
-        <div className="departures-card__header-text-english">
-          Commuter Rail
+        <span>Consider Commuter Rail during</span>
+        <span className="pill-container"><img className="inline-ol-pill" src={pillPath("ol.svg")}></img></span>
+        <span>delays</span>
+      </div>
+      <div className="departures-card__sub-header">
+        <div>
+          <Free className="free-cr" colorHex="#171F26" />
         </div>
-        <div className="departures-card__header-text-spanish">
-          Tren de Cercanías
-        </div>
+        Show your CharlieCard or CharlieTicket to ride at no charge
       </div>
     </div>
-  );
+  );0
 };
 
 export default CRDeparturesHeader;
