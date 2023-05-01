@@ -1,1 +1,1 @@
-export const ROTATION_INDEX = 1;
+export const ROTATION_INDEX = 2;
