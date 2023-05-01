@@ -39,7 +39,7 @@ defmodule Screens.Departures.Departure do
           time: DateTime.t(),
           crowding_level: crowding_level,
           inline_badges: list(map()),
-          track_number: pos_integer() | nil
+          track_number: String.t() | nil
         }
 
   @type query_params :: %{

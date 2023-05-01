@@ -61,8 +61,7 @@ defmodule Screens.Predictions.Parser do
     trip = Map.get(included_data, {"trip", trip_id})
     stop = Map.get(included_data, {"stop", stop_id})
     route = Map.get(included_data, {"route", route_id})
-
-    track_number = Map.get(included_data, {"stop", stop_id}).platform_code |> parse_platform_code
+    track_number = Map.get(included_data, {"stop", stop_id}).platform_code
 
     vehicle =
       case get_in(relationships, ["vehicle", "data", "id"]) do
@@ -99,11 +98,5 @@ defmodule Screens.Predictions.Parser do
   defp parse_time(s) do
     {:ok, time, _} = DateTime.from_iso8601(s)
     time
-  end
-
-  defp parse_platform_code(nil), do: nil
-
-  defp parse_platform_code(platform_code) do
-    String.to_integer(platform_code)
   end
 end
