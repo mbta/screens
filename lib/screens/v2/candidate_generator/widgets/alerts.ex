@@ -9,6 +9,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
+  @behaviour Screens.V2.AlertsCandidateGeneratorBehaviour
+
   @alert_supporting_screen_types [BusEink, BusShelter, GlEink]
 
   @relevant_effects MapSet.new(
@@ -21,7 +23,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
         now \\ DateTime.utc_now(),
         fetch_simplified_routes_at_stop_fn \\ &Route.fetch_simplified_routes_at_stop/2,
         fetch_stop_sequences_through_stop_fn \\ &RoutePattern.fetch_stop_sequences_through_stop/1,
-        fetch_alerts_by_stop_and_route_fn \\ &Alert.fetch_by_stop_and_route/2
+        fetch_alerts_by_stop_and_route_fn \\ &Alert.fetch_by_stop_and_route/1
       )
       when app in @alert_supporting_screen_types do
     with {:ok, routes_at_stop} <- fetch_simplified_routes_at_stop_fn.(stop_id, now),
@@ -29,9 +31,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
          reachable_stop_ids = local_and_downstream_stop_ids(stop_sequences, stop_id),
          route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
          {:ok, alerts} <-
-           fetch_alerts_by_stop_and_route_fn.(reachable_stop_ids, route_ids_at_stop) do
+           fetch(
+             [reachable_stop_ids: reachable_stop_ids, route_ids_at_stop: route_ids_at_stop],
+             fetch_alerts_by_stop_and_route_fn
+           ) do
       alerts
-      |> filter_alerts(reachable_stop_ids, route_ids_at_stop, now)
+      |> relevant_alerts(config,
+        stop_ids: reachable_stop_ids,
+        route_ids: route_ids_at_stop,
+        now: now
+      )
       |> Enum.map(fn alert ->
         %AlertWidget{
           alert: alert,
@@ -46,6 +55,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
     end
   end
 
+  @impl true
+  def fetch(opts, fetch_fn), do: fetch_fn.(opts)
+
   @doc """
   Filters out alerts whose effects we are not interested in, as well as those that do not inform at least one of:
   - an entire route type, e.g. bus or light rail
@@ -55,7 +67,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
 
   (list describes the `relevant_ie?` function clauses in order)
   """
-  def filter_alerts(alerts, stop_ids, route_ids, now) do
+  @impl true
+  def relevant_alerts(alerts, _config, stop_ids: stop_ids, route_ids: route_ids, now: now) do
     stop_id_set = MapSet.new(stop_ids)
     route_id_set = MapSet.new(route_ids)
 

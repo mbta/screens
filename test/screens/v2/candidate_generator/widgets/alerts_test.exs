@@ -64,10 +64,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         now: now,
         fetch_simplified_routes_at_stop_fn: fn _, _ -> {:ok, routes_at_stop} end,
         fetch_stop_sequences_fn: fn _ -> {:ok, stop_sequences} end,
-        fetch_alerts_fn: fn _, _ -> {:ok, alerts} end,
+        fetch_alerts_fn: fn _ -> {:ok, alerts} end,
         x_fetch_simplified_routes_at_stop_fn: fn _, _ -> :error end,
         x_fetch_stop_sequences_fn: fn _ -> :error end,
-        x_fetch_alerts_fn: fn _, _ -> :error end
+        x_fetch_alerts_fn: fn _ -> :error end
       }
     end
 
@@ -185,19 +185,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
     end
   end
 
-  describe "filter_alerts/4" do
+  describe "relevant_alerts/3" do
     setup do
       %{
         stop_ids: ~w[1 2 3],
         route_ids: ~w[11 22 33],
-        now: DateTime.utc_now()
+        now: DateTime.utc_now(),
+        config: struct(Screen)
       }
     end
 
     test "filters out alerts that inform routes that do not serve the home stop", %{
       stop_ids: stop_ids,
       route_ids: route_ids,
-      now: now
+      now: now,
+      config: config
     } do
       alerts = [
         %Alert{
@@ -233,13 +235,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       ]
 
       assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
-               filter_alerts(alerts, stop_ids, route_ids, now)
+               relevant_alerts(alerts, config, stop_ids: stop_ids, route_ids: route_ids, now: now)
     end
 
     test "filters out alerts that inform stops that are not downstream of the home stop", %{
       stop_ids: stop_ids,
       route_ids: route_ids,
-      now: now
+      now: now,
+      config: config
     } do
       alerts = [
         %Alert{
@@ -275,13 +278,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       ]
 
       assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
-               filter_alerts(alerts, stop_ids, route_ids, now)
+               relevant_alerts(alerts, config, stop_ids: stop_ids, route_ids: route_ids, now: now)
     end
 
     test "keeps alerts that inform an entire route type", %{
       stop_ids: stop_ids,
       route_ids: route_ids,
-      now: now
+      now: now,
+      config: config
     } do
       alerts = [
         %Alert{
@@ -304,13 +308,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [%Alert{id: "1"}] = filter_alerts(alerts, stop_ids, route_ids, now)
+      assert [%Alert{id: "1"}] =
+               relevant_alerts(alerts, config, stop_ids: stop_ids, route_ids: route_ids, now: now)
     end
 
     test "filters out alerts with other informed entities", %{
       stop_ids: stop_ids,
       route_ids: route_ids,
-      now: now
+      now: now,
+      config: config
     } do
       alerts = [
         %Alert{
@@ -321,13 +327,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
+      assert [] =
+               relevant_alerts(alerts, config, stop_ids: stop_ids, route_ids: route_ids, now: now)
     end
 
     test "filters out alerts that do not have a relevant effect", %{
       stop_ids: stop_ids,
       route_ids: route_ids,
-      now: now
+      now: now,
+      config: config
     } do
       alerts = [
         %Alert{
@@ -338,13 +346,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
+      assert [] =
+               relevant_alerts(alerts, config, stop_ids: stop_ids, route_ids: route_ids, now: now)
     end
 
     test "filters out upcoming alerts", %{
       stop_ids: stop_ids,
       route_ids: route_ids,
-      now: now
+      now: now,
+      config: config
     } do
       alerts = [
         %Alert{
@@ -355,7 +365,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
+      assert [] =
+               relevant_alerts(alerts, config, stop_ids: stop_ids, route_ids: route_ids, now: now)
     end
   end
 end
