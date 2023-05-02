@@ -12,6 +12,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
 
+  @behaviour Screens.V2.AlertsCandidateGeneratorBehaviour
+
   @relevant_effects ~w[shuttle suspension station_closure delay]a
 
   @doc """
@@ -35,11 +37,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
            |> Enum.map(& &1.route_id)
            # We shouldn't handle Mattapan outages at this time
            |> Enum.reject(fn id -> id === "Mattapan" end),
-         {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids_at_stop),
+         {:ok, alerts} <- fetch([route_ids: route_ids_at_stop], fetch_alerts_fn),
          {:ok, stop_sequences} <-
            fetch_stop_sequences_by_stop_fn.(stop_id, route_ids_at_stop) do
       alerts
-      |> Enum.filter(&relevant?(&1, config, stop_sequences, routes_at_stop, now))
+      |> relevant_alerts(config,
+        stop_sequences: stop_sequences,
+        routes_at_stop: routes_at_stop,
+        now: now
+      )
       |> Enum.map(fn alert ->
         %ReconstructedAlert{
           screen: config,
@@ -56,24 +62,28 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     end
   end
 
-  defp relevant?(
-         %Alert{effect: effect} = alert,
-         config,
-         stop_sequences,
-         routes_at_stop,
-         now
-       ) do
-    reconstructed_alert = %ReconstructedAlert{
-      screen: config,
-      alert: alert,
-      stop_sequences: stop_sequences,
-      routes_at_stop: routes_at_stop,
-      now: now,
-      informed_stations_string: "A Station"
-    }
+  @impl true
+  def fetch(opts, fetch_fn), do: fetch_fn.(opts)
 
-    relevant_effect?(effect) and relevant_location?(reconstructed_alert) and
-      Alert.happening_now?(alert, now)
+  @impl true
+  def relevant_alerts(alerts, config,
+        stop_sequences: stop_sequences,
+        routes_at_stop: routes_at_stop,
+        now: now
+      ) do
+    Enum.filter(alerts, fn %Alert{effect: effect} = alert ->
+      reconstructed_alert = %ReconstructedAlert{
+        screen: config,
+        alert: alert,
+        stop_sequences: stop_sequences,
+        routes_at_stop: routes_at_stop,
+        now: now,
+        informed_stations_string: "A Station"
+      }
+
+      relevant_effect?(effect) and relevant_location?(reconstructed_alert) and
+        Alert.happening_now?(alert, now)
+    end)
   end
 
   defp relevant_effect?(effect) do
