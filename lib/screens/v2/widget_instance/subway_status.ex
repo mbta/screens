@@ -287,16 +287,20 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           |> Enum.map(&Stop.to_stop_index(&1, stop_sequence))
           |> Enum.min_max()
 
-        {_, min_station_name} = Enum.at(stop_sequence, min_index)
-        {_, max_station_name} = Enum.at(stop_sequence, max_index)
+        {_, {min_full_name, min_abbreviated_name}} = Enum.at(stop_sequence, min_index)
+        {_, {max_full_name, max_abbreviated_name}} = Enum.at(stop_sequence, max_index)
 
-        {min_full_name, min_abbreviated_name} = min_station_name
-        {max_full_name, max_abbreviated_name} = max_station_name
-
-        %{
-          full: "#{min_full_name} to #{max_full_name}",
-          abbrev: "#{min_abbreviated_name} to #{max_abbreviated_name}"
-        }
+        if min_full_name == max_full_name and min_abbreviated_name == max_abbreviated_name do
+          %{
+            full: "#{min_full_name}",
+            abbrev: "#{min_abbreviated_name}"
+          }
+        else
+          %{
+            full: "#{min_full_name} to #{max_full_name}",
+            abbrev: "#{min_abbreviated_name} to #{max_abbreviated_name}"
+          }
+        end
     end
   end
 

@@ -186,9 +186,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           %Alert{
             effect: :suspension,
             informed_entities: [
-              %{route: "Blue", stop: "place-aport"},
-              %{route: "Blue", stop: "place-mvbcl"},
-              %{route: "Blue", stop: "place-aqucl"}
+              %{route: "Blue", stop: "place-aport"}
             ]
           },
           %Alert{
@@ -210,7 +208,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               route_pill: %{type: :text, text: "BL", color: :blue},
               status: "Suspension",
-              location: %{abbrev: "Airport to Aquarium", full: "Airport to Aquarium"}
+              location: %{abbrev: "Airport", full: "Airport"}
             },
             %{
               status: "Delays up to 20m",
