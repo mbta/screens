@@ -9,6 +9,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.ElevatorStatus, as: ElevatorStatusWidget
 
+  @behaviour Screens.V2.AlertsCandidateGeneratorBehaviour
+
   def elevator_status_instances(
         %Screen{
           app_params: %PreFare{
@@ -28,8 +30,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
            ),
          {:ok, parent_station_map} <- Stop.fetch_parent_station_name_map(),
          {:ok, alerts, facility_id_to_name} <-
-           fetch_with_facilities_fn.(activity: "USING_WHEELCHAIR") do
-      elevator_closures = relevant?(alerts)
+           fetch([activity: "USING_WHEELCHAIR"], fetch_with_facilities_fn) do
+      elevator_closures = relevant_alerts(alerts, config)
       icon_map = get_icon_map(elevator_closures, parent_station_id)
 
       [
@@ -48,7 +50,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     end
   end
 
-  def relevant?(alerts) do
+  @impl true
+  def fetch(opts, fetch_fn), do: fetch_fn.(opts)
+
+  @impl true
+  def relevant_alerts(alerts, _config, _opts \\ []) do
     Enum.filter(alerts, fn
       %Alert{effect: :elevator_closure} = alert -> alert
       _ -> false
