@@ -13,6 +13,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.{DupAlert, DupSpecialCaseAlert}
 
+  @behaviour Screens.V2.AlertsCandidateGeneratorBehaviour
+
   require Logger
 
   @doc """
@@ -53,17 +55,24 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
            fetch_routes_by_stop_fn.(stop_id, now, route_type_filter),
          subway_route_ids_at_stop =
            for(%{route_id: id} <- subway_routes_at_stop, id != "Mattapan", do: id),
-         {:ok, alerts} <- fetch_alerts_fn.(route_ids: subway_route_ids_at_stop),
+         {:ok, alerts} <- fetch([route_ids: subway_route_ids_at_stop], fetch_alerts_fn),
          {:ok, stop_sequences} <-
            fetch_parent_station_sequences_fn.(stop_id, subway_route_ids_at_stop) do
       alerts
-      |> Enum.filter(&relevant_alert?(&1, config, stop_sequences, subway_routes_at_stop, now))
+      |> relevant_alerts(config,
+        stop_sequences: stop_sequences,
+        subway_routes_at_stop: subway_routes_at_stop,
+        now: now
+      )
       |> alert_special_cases(config)
       |> create_alert_widgets(config, stop_sequences, subway_routes_at_stop, stop_name)
     else
       :error -> []
     end
   end
+
+  @impl true
+  def fetch(opts, fetch_fn), do: fetch_fn.(opts)
 
   # WTC is a special bus-only case
   @spec get_route_type_filter(String.t()) :: list(atom())
@@ -89,6 +98,30 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     |> tap(fn alert ->
       alert_ids = Enum.map_join(alerts, ",", & &1.id)
       Logger.info("[dup alert selected] selected_id=#{alert.id} all_relevant_ids=#{alert_ids}")
+    end)
+  end
+
+  @impl true
+  def relevant_alerts(
+        alerts,
+        %Screen{app_params: %Dup{primary_departures: %{sections: sections}}} = config,
+        stop_sequences: stop_sequences,
+        subway_routes_at_stop: subway_routes_at_stop,
+        now: now
+      ) do
+    Enum.filter(alerts, fn alert ->
+      dup_alert = %DupAlert{
+        screen: config,
+        alert: alert,
+        stop_sequences: stop_sequences,
+        subway_routes_at_stop: subway_routes_at_stop,
+        primary_section_count: length(sections),
+        rotation_index: :zero,
+        stop_name: "A Station"
+      }
+
+      relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
+        relevant_location?(dup_alert) and not directional_shuttle_or_suspension?(alert)
     end)
   end
 
@@ -118,27 +151,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
         }
       end
     end
-  end
-
-  defp relevant_alert?(
-         alert,
-         %Screen{app_params: %Dup{primary_departures: %{sections: sections}}} = config,
-         stop_sequences,
-         subway_routes_at_stop,
-         now
-       ) do
-    dup_alert = %DupAlert{
-      screen: config,
-      alert: alert,
-      stop_sequences: stop_sequences,
-      subway_routes_at_stop: subway_routes_at_stop,
-      primary_section_count: length(sections),
-      rotation_index: :zero,
-      stop_name: "A Station"
-    }
-
-    relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
-      relevant_location?(dup_alert) and not directional_shuttle_or_suspension?(alert)
   end
 
   defp relevant_effect?(%{effect: :delay, severity: severity}, _) do
