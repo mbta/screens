@@ -32,7 +32,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   @type contracted_section :: %{type: :contracted, alerts: list(alert())}
 
   @type alert :: %{
-          route_pill: route_pill() | nil,
+          optional(:route_pill) => route_pill(),
           status: String.t(),
           location: String.t() | location_map() | nil
         }
@@ -40,10 +40,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   @type location_map :: %{full: String.t(), abbrev: String.t()}
 
   @type route_pill :: %{
+          optional(:branches) => list(branch()),
           type: :text,
           text: String.t(),
-          color: route_color(),
-          branches: list(branch()) | nil
+          color: route_color()
         }
 
   @type branch :: :b | :c | :d | :e
