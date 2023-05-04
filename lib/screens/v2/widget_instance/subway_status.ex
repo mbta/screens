@@ -318,7 +318,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp serialize_alert(%Alert{effect: :shuttle, informed_entities: informed_entities}, route_id) do
-    %{status: "Shuttles", location: get_location(informed_entities, route_id)}
+    %{status: "Shuttle Bus", location: get_location(informed_entities, route_id)}
   end
 
   defp serialize_alert(
@@ -336,44 +336,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
        ) do
     # Get closed station names from informed entities
     stop_id_to_name = Stop.stop_id_to_name(route_id)
+    stop_names = get_stop_names_from_informed_entities(informed_entities, stop_id_to_name)
 
-    stop_names =
-      informed_entities
-      |> Enum.flat_map(fn
-        %{stop: stop_id} ->
-          case Map.get(stop_id_to_name, stop_id) do
-            nil -> []
-            name -> [name]
-          end
-
-        _ ->
-          []
-      end)
-      |> Enum.uniq()
-
-    location =
-      case stop_names do
-        [] ->
-          nil
-
-        [stop_name] ->
-          {full_name, abbreviated_name} = stop_name
-          %{full: full_name, abbrev: abbreviated_name}
-
-        [stop_name1, stop_name2] ->
-          {full_name1, abbreviated_name1} = stop_name1
-          {full_name2, abbreviated_name2} = stop_name2
-
-          %{
-            full: "#{full_name1} and #{full_name2}",
-            abbrev: "#{abbreviated_name1} and #{abbreviated_name2}"
-          }
-
-        stop_names ->
-          %{full: "#{length(stop_names)} stops", abbrev: "#{length(stop_names)} stops"}
-      end
-
-    %{status: "Bypassing", location: location}
+    %{status: "Bypassing", location: format_stop_name_list(stop_names)}
   end
 
   defp serialize_alert(
@@ -402,12 +367,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         },
         route_ids
       ) do
-    stations = get_stations(informed_entities)
-    station_count = length(stations)
+    stop_id_to_name = route_ids |> Enum.flat_map(&Stop.stop_id_to_name/1) |> Enum.into(%{})
+    stop_names = get_stop_names_from_informed_entities(informed_entities, stop_id_to_name)
 
     %{
       route_pill: serialize_gl_pill_with_branches(route_ids),
-      status: "Bypassing #{station_count} #{if station_count == 1, do: "stop", else: "stops"}"
+      status: "Bypassing",
+      location: format_stop_name_list(stop_names)
     }
   end
 
@@ -417,12 +383,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         %{route_pill: serialize_gl_pill_with_branches(route_ids)},
         serialize_alert(alert, "Green")
       )
-
-  def get_stations(informed_entities) do
-    informed_entities
-    |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-    |> Enum.filter(&String.starts_with?(&1, "place-"))
-  end
 
   defp alert_affects_gl_trunk_or_whole_line?(%Alert{informed_entities: informed_entities}) do
     gl_trunk_stops = Stop.gl_trunk_stops()
@@ -514,7 +474,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp serialize_alert_summary(alert_count, route_pill) do
     %{
       route_pill: route_pill,
-      status: "#{alert_count} alerts",
+      status: "#{alert_count} current alerts",
       location: %{full: "mbta.com/alerts/subway", abbrev: "mbta.com/alerts/subway"}
     }
   end
@@ -558,6 +518,54 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         [
           serialize_alert_summary(alert_count, serialize_gl_pill_with_branches(route_ids))
         ]
+    end
+  end
+
+  defp get_stop_names_from_informed_entities(informed_entities, stop_id_to_name) do
+    informed_entities
+    |> Enum.flat_map(fn
+      %{stop: stop_id} ->
+        case Map.get(stop_id_to_name, stop_id) do
+          nil -> []
+          name -> [name]
+        end
+
+      _ ->
+        []
+    end)
+    |> Enum.uniq()
+  end
+
+  defp format_stop_name_list(stop_names) do
+    case stop_names do
+      [] ->
+        nil
+
+      [stop_name] ->
+        {full_name, abbreviated_name} = stop_name
+        %{full: full_name, abbrev: abbreviated_name}
+
+      [stop_name1, stop_name2] ->
+        {full_name1, abbreviated_name1} = stop_name1
+        {full_name2, abbreviated_name2} = stop_name2
+
+        %{
+          full: "#{full_name1} and #{full_name2}",
+          abbrev: "#{abbreviated_name1} and #{abbreviated_name2}"
+        }
+
+      [stop_name1, stop_name2, stop_name3] ->
+        {full_name1, abbreviated_name1} = stop_name1
+        {full_name2, abbreviated_name2} = stop_name2
+        {full_name3, abbreviated_name3} = stop_name3
+
+        %{
+          full: "#{full_name1}, #{full_name2} & #{full_name3}",
+          abbrev: "#{abbreviated_name1}, #{abbreviated_name2} & #{abbreviated_name3}"
+        }
+
+      stop_names ->
+        %{full: "#{length(stop_names)} stops", abbrev: "#{length(stop_names)} stops"}
     end
   end
 end
