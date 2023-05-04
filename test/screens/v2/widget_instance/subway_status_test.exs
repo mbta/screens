@@ -288,7 +288,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           type: :extended,
           alert: %{
             route_pill: %{type: :text, text: "GL", color: :green},
-            status: "Delays up to 20m",
+            status: "Delays up to 20 minutes",
             location: nil
           }
         }
@@ -328,7 +328,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               location: %{abbrev: "Airport", full: "Airport"}
             },
             %{
-              status: "Delays up to 20m",
+              status: "Delays up to 20 minutes",
               location: %{abbrev: "Airport to Aquarium", full: "Airport to Aquarium"}
             }
           ]
@@ -729,7 +729,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               location: %{abbrev: "Lechmere to North Sta", full: "Lechmere to North Station"},
               route_pill: %{color: :green, text: "GL", type: :text},
-              status: "Delays up to 20m"
+              status: "Delays up to 20 minutes"
             }
           ]
         }
@@ -791,12 +791,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           alerts: [
             %{
               route_pill: %{type: :text, text: "GL", color: :green, branches: [:b]},
-              status: "Delays up to 20m",
+              status: "Delays up to 20 minutes",
               location: nil
             },
             %{
               route_pill: %{type: :text, text: "GL", color: :green, branches: [:c]},
-              status: "Delays over 60m",
+              status: "Delays over 60 minutes",
               location: nil
             }
           ]
@@ -936,12 +936,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           alerts: [
             %{
               route_pill: %{type: :text, text: "GL", color: :green, branches: [:b]},
-              status: "Delays up to 20m",
+              status: "Delays up to 20 minutes",
               location: nil
             },
             %{
               route_pill: %{type: :text, text: "GL", color: :green, branches: [:c]},
-              status: "Delays over 60m",
+              status: "Delays over 60 minutes",
               location: nil
             }
           ]
@@ -1089,12 +1089,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           alerts: [
             %{
               route_pill: %{type: :text, text: "GL", color: :green, branches: [:b]},
-              status: "Delays up to 20m",
+              status: "Delays up to 20 minutes",
               location: nil
             },
             %{
               route_pill: %{type: :text, text: "GL", color: :green, branches: [:c]},
-              status: "Delays over 60m",
+              status: "Delays over 60 minutes",
               location: nil
             }
           ]
