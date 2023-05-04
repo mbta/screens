@@ -54,7 +54,7 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
 
     track =
       cond do
-        track_number -> "on track " <> Integer.to_string(track_number) <> ". "
+        track_number -> "on track " <> track_number <> ". "
         # Omit track number at Forest Hills
         station === "place-forhl" -> ". "
         true -> ". We will announce the track for this train soon. "
