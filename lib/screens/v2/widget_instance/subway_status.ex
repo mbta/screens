@@ -337,8 +337,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     # Get closed station names from informed entities
     stop_id_to_name = Stop.stop_id_to_name(route_id)
     stop_names = get_stop_names_from_informed_entities(informed_entities, stop_id_to_name)
+    {status, location} = format_station_closure(stop_names)
 
-    %{status: "Bypassing", location: format_stop_name_list(stop_names)}
+    %{status: status, location: location}
   end
 
   defp serialize_alert(
@@ -370,10 +371,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     stop_id_to_name = route_ids |> Enum.flat_map(&Stop.stop_id_to_name/1) |> Enum.into(%{})
     stop_names = get_stop_names_from_informed_entities(informed_entities, stop_id_to_name)
 
+    {status, location} = format_station_closure(stop_names)
+
     %{
       route_pill: serialize_gl_pill_with_branches(route_ids),
-      status: "Bypassing",
-      location: format_stop_name_list(stop_names)
+      status: status,
+      location: location
     }
   end
 
@@ -536,36 +539,39 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     |> Enum.uniq()
   end
 
-  defp format_stop_name_list(stop_names) do
+  defp format_station_closure(stop_names) do
     case stop_names do
       [] ->
-        nil
+        {"Bypassing", nil}
 
       [stop_name] ->
         {full_name, abbreviated_name} = stop_name
-        %{full: full_name, abbrev: abbreviated_name}
+        {"Bypassing", %{full: full_name, abbrev: abbreviated_name}}
 
       [stop_name1, stop_name2] ->
         {full_name1, abbreviated_name1} = stop_name1
         {full_name2, abbreviated_name2} = stop_name2
 
-        %{
-          full: "#{full_name1} and #{full_name2}",
-          abbrev: "#{abbreviated_name1} and #{abbreviated_name2}"
-        }
+        {"Bypassing",
+         %{
+           full: "#{full_name1} and #{full_name2}",
+           abbrev: "#{abbreviated_name1} and #{abbreviated_name2}"
+         }}
 
       [stop_name1, stop_name2, stop_name3] ->
         {full_name1, abbreviated_name1} = stop_name1
         {full_name2, abbreviated_name2} = stop_name2
         {full_name3, abbreviated_name3} = stop_name3
 
-        %{
-          full: "#{full_name1}, #{full_name2} & #{full_name3}",
-          abbrev: "#{abbreviated_name1}, #{abbreviated_name2} & #{abbreviated_name3}"
-        }
+        {"Bypassing",
+         %{
+           full: "#{full_name1}, #{full_name2} & #{full_name3}",
+           abbrev: "#{abbreviated_name1}, #{abbreviated_name2} & #{abbreviated_name3}"
+         }}
 
       stop_names ->
-        %{full: "#{length(stop_names)} stops", abbrev: "#{length(stop_names)} stops"}
+        {"Bypassing #{length(stop_names)} stops",
+         %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"}}
     end
   end
 end
