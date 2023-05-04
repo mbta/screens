@@ -126,12 +126,12 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
     case affected_lines do
       [line_pill] ->
-        no_trains = ["No", line_pill, "trains"]
+        no_trains = [bold("No"), line_pill, bold("trains")]
 
         if BaseAlert.location(t) in [:boundary_upstream, :boundary_downstream] do
           headsign = get_headsign(t)
 
-          no_trains ++ ["to #{headsign}"]
+          no_trains ++ [bold("to #{headsign}")]
         else
           no_trains ++ [Alert.get_cause_string(t.alert.cause)]
         end
