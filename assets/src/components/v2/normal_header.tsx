@@ -170,7 +170,7 @@ const NormalHeader: ComponentType<Props> = ({
   accentPattern,
 }) => {
   const { ref: headerRef, size: headerSize } = useTextResizer({
-    sizes: Object.keys(TitleSize),
+    sizes: [TitleSize.small, TitleSize.large],
     maxHeight: maxHeight,
     resetDependencies: [text],
   });
