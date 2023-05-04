@@ -261,13 +261,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
        ) do
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
 
-    duration_text =
+    {duration_text, duration_audio} =
       case delay_description do
-        :up_to -> "up to #{delay_minutes}m"
-        :more_than -> "over #{delay_minutes}m"
+        :up_to -> {"up to #{delay_minutes}m", "up to #{delay_minutes} minutes"}
+        :more_than -> {"over #{delay_minutes}m", "over #{delay_minutes} minutes"}
       end
 
-    %{status: "Delays #{duration_text}", location: get_location(informed_entities, route_id)}
+    %{
+      status: "Delays #{duration_text}",
+      status_readout: "Delays #{duration_audio}",
+      location: get_location(informed_entities, route_id)
+    }
   end
 
   def get_green_line_branch_status(%Alert{effect: :suspension}), do: "Suspension"
