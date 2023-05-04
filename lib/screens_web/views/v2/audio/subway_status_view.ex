@@ -29,12 +29,26 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
 
   defp render_intro, do: "Subway service overview"
 
+  defp render_route(%{route: %{color: color}, status_readout: status} = route) do
+    render_route_status(color, status, route)
+  end
+
   defp render_route(%{route: %{color: color}, status: status} = route) do
+    render_route_status(color, status, route)
+  end
+
+  defp render_route_status(color, status, route) do
     "#{color} line: #{status}: #{render_location(route)}"
   end
 
+  defp render_green_line(
+         %{route: %{color: :green}, status_readout: status, type: :single} = route
+       ) do
+    render_gl_status(route, status)
+  end
+
   defp render_green_line(%{route: %{color: :green}, status: status, type: :single} = route) do
-    "Green Line: #{render_branches(route)} #{status}: #{render_location(route)}"
+    render_gl_status(route, status)
   end
 
   defp render_green_line(%{statuses: statuses, type: :multiple}) do
@@ -43,6 +57,10 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
 
   defp render_gl_status([branches, status]) do
     "Green Line: #{render_branches(branches)}: #{status}"
+  end
+
+  defp render_gl_status(route, status) do
+    "Green Line: #{render_branches(route)} #{status}: #{render_location(route)}"
   end
 
   defp render_branches(%{branch: "Green-" <> branch}), do: "#{branch} Branch"
