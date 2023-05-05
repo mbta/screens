@@ -29,6 +29,9 @@ export const isDup = () => location.href.startsWith("file:");
 export const imagePath = (fileName: string): string =>
   isDup() ? `images/${fileName}` : `/images/${fileName}`;
 
+export const pillPath = (fileName: string): string =>
+isDup() ? `images/pills/${fileName}` : `/images/pills/${fileName}`;
+
 export const isRealScreen = () =>
   isDup() || getDatasetValue("isRealScreen") === "true";
 
