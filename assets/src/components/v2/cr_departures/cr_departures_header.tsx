@@ -16,7 +16,7 @@ const CRDeparturesHeader = () => {
         <div>
           <Free className="free-cr" colorHex="#171F26" />
         </div>
-        Show your CharlieCard or CharlieTicket to ride at no charge
+        Show any type of CharlieCard or CharlieTicket to ride free of charge
       </div>
     </div>
   );

@@ -56,11 +56,12 @@ const DeparturesTable: React.ComponentType<Props> = ({
           <th className="arrival"></th>
         </tr>
         {departures.map((departure: Departure) => {
-          const withStationList = departure.headsign.station_service_list.length > 0
+          const withStations = departure.headsign.station_service_list.length > 0 
+            ? "with-stations" : ""
 
           return (
             <tr key={departure.prediction_or_schedule_id}>
-              <td className={`track ${withStationList ? "with-stations" : ""}`}>
+              <td className={`track ${withStations}`}>
                 {getArrowOrTbd(departure.arrow)}
                 {departure.track_number && (
                   <div className="track-number-text">
@@ -68,13 +69,13 @@ const DeparturesTable: React.ComponentType<Props> = ({
                   </div>
                 )}
               </td>
-              <td className={`headsign ${withStationList ? "with-stations" : ""}`}>
+              <td className={`headsign ${withStations}`}>
                 <div className="headsign-text">
                   {departure.headsign.headsign}
                 </div>
                 {getStationServiceList(departure.headsign.station_service_list)}
               </td>
-              <td className={`arrival ${withStationList ? "with-stations" : ""}`}>
+              <td className={`arrival ${withStations}`}>
                 <div
                   className={classWithModifier(
                     "departure-time",

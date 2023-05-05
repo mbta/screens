@@ -34,6 +34,9 @@
     .base-departure-time {
       padding-top: 24px;
     }
+    .cr-departure-time__prediction {
+      padding-top: 35px;
+    }
   }
   // END alignment code
 
@@ -75,7 +78,6 @@
   .headsign-text {
     font-size: 56px;
     width: 516px;
-    margin-bottom: 7px;
   }
   .track-number-text {
     padding-top: 40px;
