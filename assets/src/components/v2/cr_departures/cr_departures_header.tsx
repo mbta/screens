@@ -19,7 +19,7 @@ const CRDeparturesHeader = () => {
         Show your CharlieCard or CharlieTicket to ride at no charge
       </div>
     </div>
-  );0
+  );
 };
 
 export default CRDeparturesHeader;
