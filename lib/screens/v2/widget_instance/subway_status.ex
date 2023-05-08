@@ -139,7 +139,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   # More than 1 alert on any one route
   def serialize_routes_multiple_alerts(grouped_alerts) do
     routes_with_alerts = Map.keys(grouped_alerts)
-    total_alerts = grouped_alerts |> Enum.flat_map(&elem(&1, 1)) |> length()
 
     cond do
       Enum.any?(routes_with_alerts, &String.starts_with?(&1, "Green")) ->
@@ -151,7 +150,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           green: serialize_green_line(grouped_alerts)
         }
 
-      length(routes_with_alerts) == 1 and total_alerts == 2 ->
+      length(routes_with_alerts) == 1 and get_total_alerts(grouped_alerts) == 2 ->
         # Show both alerts in two rows
         %{
           blue: serialize_multiple_alert_rows_for_route(grouped_alerts, "Blue"),
@@ -194,7 +193,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   # Only executed when route displays one status.
   def serialize_single_alert_row_for_route(grouped_alerts, route_id) do
     alerts = Map.get(grouped_alerts, route_id)
-    total_alerts = grouped_alerts |> Enum.flat_map(&elem(&1, 1)) |> Enum.uniq() |> length()
 
     data =
       case alerts do
@@ -208,7 +206,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           serialize_alert_summary(length(alerts), serialize_route_pill(route_id))
       end
 
-    if total_alerts in 1..2 and data.status != "Normal Service" do
+    if get_total_alerts(grouped_alerts) in 1..2 and data.status != "Normal Service" do
       %{
         type: :extended,
         alert: Map.merge(%{route_pill: serialize_route_pill(route_id)}, data)
@@ -570,5 +568,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         {"Bypassing #{length(stop_names)} stops",
          %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"}}
     end
+  end
+
+  defp get_total_alerts(grouped_alerts) do
+    grouped_alerts
+    |> Enum.flat_map(&elem(&1, 1))
+    |> Enum.uniq_by(fn
+      "Green-" <> _ -> "Green"
+      route_id -> route_id
+    end)
+    |> length()
   end
 end
