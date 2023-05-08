@@ -22,8 +22,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
           screen: Screen.t(),
           alert: Alert.t(),
           location_context: LocationContext.t(),
-          # stop_sequences: list(list(stop_id())),
-          # routes_at_stop: list(%{route_id: route_id(), active?: boolean()}),
           now: DateTime.t()
         }
 
@@ -33,7 +31,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @automated_override_priority [1, 2]
 
-  # TODO: not sure if there's anything to be done here
   # Keep these in descending order of priority--highest priority (lowest integer value) first
   @relevant_effects ~w[shuttle stop_closure suspension station_closure detour stop_moved snow_route elevator_closure]a
 
@@ -103,7 +100,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
     }
   end
 
-  # Only runs for THIS widget (bus shelter, e-ink. not prefare / dup)
   defp serialize_route_pills(%__MODULE__{screen: %Screen{app_id: app_id}} = t) do
     routes = if app_id === :gl_eink_v2 do
       # Get route pills for alert, including that on connecting GL branches
@@ -298,22 +294,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
     def audio_valid_candidate?(instance), do: Alert.audio_valid_candidate?(instance)
     def audio_view(instance), do: Alert.audio_view(instance)
   end
-
-  # defimpl Screens.V2.SingleAlertWidget do
-  #   alias Screens.V2.WidgetInstance.Alert
-
-  #   def alert(instance), do: instance.alert
-
-  #   def screen(instance), do: instance.screen
-
-  #   def home_stop_id(instance), do: instance.screen.app_params.alerts.stop_id
-
-  #   def routes_at_stop(instance), do: instance.routes_at_stop
-
-  #   def stop_sequences(instance), do: instance.stop_sequences
-
-  #   def headsign_matchers(_instance), do: nil
-  # end
 
   defimpl Screens.V2.AlertsWidget do
     alias Screens.V2.WidgetInstance.Alert

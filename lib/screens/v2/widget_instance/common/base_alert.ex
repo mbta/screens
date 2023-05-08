@@ -1,14 +1,6 @@
 defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   @moduledoc """
-  Common logic for structs that implement the `Screens.V2.SingleAlertWidget` protocol.
-
-  ***
-  None of the code in this module should access struct fields directly.
-
-  In order to maintain clarity on what values these functions require,
-  use only callbacks from `Screens.V2.SingleAlertWidget` to interact with inputs.
-  If new values are required, add new callbacks to the protocol and update implementing modules accordingly.
-  ***
+  Common logic for Alerts.
   """
 
   alias Screens.Alerts.Alert
@@ -144,11 +136,9 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
     informed_zones_set =
       informed_entities
-      # |> IO.inspect(label: "informed entities")
       |> Enum.flat_map(&informed_entity_to_zone(&1, location_context))
       |> Enum.uniq()
       |> Enum.sort()
-      # |> IO.inspect(label: "informed zones")
 
     get_location_atom(informed_zones_set, alert.effect, is_terminal_station)
   end
@@ -218,9 +208,11 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     |> consolidate_GL(app_id)
   end
 
+  @doc """
+  GL E-ink consolidates the GL branches to Green Line if there are > 2 branches
+  We wdant to list all affected branches for the alert and not just the one serving the home stop
+  """
   @spec consolidate_GL(list(String.t()), atom()) :: list(String.t())
-  # GL E-ink consolidates the GL branches to Green Line if there are > 2 branches
-  # We wdant to list all affected branches for the alert and not just the one serving the home stop
   defp consolidate_GL(affected_routes, :gl_eink_v2) do
     green_routes = Enum.filter(affected_routes, fn
         "Green" <> _ -> true
@@ -229,6 +221,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
     if length(green_routes) > 2, do: ["Green"], else: green_routes
   end
+
   # PreFare consolidates the GL branches if all branches are present
   defp consolidate_GL(affected_routes, :pre_fare_v2) do
     if MapSet.subset?(MapSet.new(@green_line_branches), MapSet.new(affected_routes)) do
@@ -242,12 +235,13 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
   defp consolidate_GL(affected_routes, _), do: affected_routes
 
-  # This gets used by bus shelter, bus eink, DUP, prefare
-  #  - to help decide if we need a high-stakes takeover alert (bus, dup, prefare)
-  #  - to serialize route pills on an alert (bus shelter & bus eink)
+  @doc """
+  This gets used by bus shelter, bus eink, DUP, prefare:
+  - to help decide if we need a high-stakes takeover alert (bus, dup, prefare)
+  - to serialize route pills on an alert (bus shelter & bus eink)
 
-  # Gets the routes affected by an alert that also exist at the current stop.
-  # NO downstream
+  Gets the routes affected by an alert that also exist at the current stop. No downstream
+  """
   @spec informed_routes_at_home_stop(t()) :: MapSet.t(Route.id())
   def informed_routes_at_home_stop(t) do
     rts = t.location_context.alert_route_types
@@ -268,7 +262,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
         # For a systemwide alert (affecting all bus or all subway/light rail)
         # entity has route type, but no stop or route
-        # BUG: currently breaks for pre-fare, dups (because they are multimodal, and alerts UI lumps
+        # TODO bug: currently breaks for pre-fare, dups (because they are multimodal, and alerts UI lumps
         # together subway and light rail)
         %{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
           if RouteType.from_id(route_type_id) in rts,

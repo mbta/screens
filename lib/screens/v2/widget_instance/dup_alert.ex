@@ -288,22 +288,6 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     def audio_view(instance), do: DupAlert.audio_view(instance)
   end
 
-  # defimpl Screens.V2.SingleAlertWidget do
-  #   def alert(instance), do: instance.alert
-
-  #   def screen(instance), do: instance.screen
-
-  #   def home_stop_id(instance), do: instance.screen.app_params.alerts.stop_id
-
-  #   def routes_at_stop(instance), do: instance.subway_routes_at_stop
-
-  #   def stop_sequences(instance), do: instance.stop_sequences
-
-  #   def headsign_matchers(_instance) do
-  #     Application.get_env(:screens, :dup_alert_headsign_matchers)
-  #   end
-  # end
-
   defimpl Screens.V2.AlertsWidget do
     alias Screens.V2.WidgetInstance.DupAlert
 
