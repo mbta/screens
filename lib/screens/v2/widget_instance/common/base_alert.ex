@@ -12,37 +12,22 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Config.Screen
+  alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Util
 
-  alias Screens.V2.SingleAlertWidget, as: SAW
-
-  @type t :: SAW.t()
+  @type t :: %{
+    alert: %Alert{},
+    location_context: %LocationContext{}
+  }
 
   @type stop_id :: String.t()
 
   @type route_id :: String.t()
 
-  @spec upstream_stop_id_set(t()) :: MapSet.t(stop_id())
-  def upstream_stop_id_set(t) do
-    home_stop_id = SAW.home_stop_id(t)
-
-    t
-    |> SAW.stop_sequences()
-    |> Enum.flat_map(fn stop_sequence -> Util.slice_before(stop_sequence, home_stop_id) end)
-    |> MapSet.new()
-  end
-
-  @spec downstream_stop_id_set(t()) :: MapSet.t(stop_id())
-  defp downstream_stop_id_set(t) do
-    home_stop_id = SAW.home_stop_id(t)
-
-    t
-    |> SAW.stop_sequences()
-    |> Enum.flat_map(fn stop_sequence -> Util.slice_after(stop_sequence, home_stop_id) end)
-    |> MapSet.new()
-  end
+  @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
   @typedoc """
   A headsign indicating the direction a vehicle is headed in.
@@ -64,12 +49,12 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   - the widget does not have a map of headsign matchers (`SingleAlertWidget.headsign_matchers(t)` returns nil)
   """
   @spec get_headsign_from_informed_entities(t()) :: headsign | nil
-  def get_headsign_from_informed_entities(t) do
-    with headsign_matchers when is_map(headsign_matchers) <- SAW.headsign_matchers(t) do
+  def get_headsign_from_informed_entities(%{screen: %Screen{app_id: app_id}} = t) when app_id in [:dup_v2, :pre_fare_v2] do
+    with headsign_matchers when is_map(headsign_matchers) <- headsign_matchers(t) do
       informed_stop_ids = MapSet.new(informed_entities(t), & &1.stop)
 
       headsign_matchers
-      |> Map.get(SAW.home_stop_id(t))
+      |> Map.get(t.location_context.home_stop)
       |> Enum.find_value(fn %{
                               informed: informed,
                               not_informed: not_informed,
@@ -86,42 +71,19 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     end
   end
 
+  defp headsign_matchers(%{screen: %Screen{app_id: :dup_v2}}), do: Application.get_env(:screens, :dup_alert_headsign_matchers)
+  defp headsign_matchers(%{screen: %Screen{app_id: :pre_fare_v2}}), do: Application.get_env(:screens, :prefare_alert_headsign_matchers)
+
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do
     MapSet.subset?(informed, informed_stop_ids) and
       MapSet.disjoint?(not_informed, informed_stop_ids)
   end
 
-  defp all_routes_at_stop(t) do
-    t
-    |> SAW.routes_at_stop()
-    |> MapSet.new(& &1.route_id)
+  def informed_entities(%{alert: %Alert{informed_entities: informed_entities}}) do
+    informed_entities
   end
 
-  defp route_types(t) do
-    case SAW.screen(t).app_id do
-      :bus_shelter_v2 ->
-        [:bus]
-
-      :bus_eink_v2 ->
-        [:bus]
-
-      :gl_eink_v2 ->
-        [:light_rail]
-
-      multi_route_type_app when multi_route_type_app in [:pre_fare_v2, :dup_v2] ->
-        t
-        |> SAW.routes_at_stop()
-        |> Enum.map(& &1.type)
-        |> Enum.uniq()
-    end
-  end
-
-  @spec informed_entities(t()) :: list(Alert.informed_entity())
-  def informed_entities(t) do
-    SAW.alert(t).informed_entities
-  end
-
-  @spec informed_entity_to_zone(Alert.informed_entity(), map()) ::
+  @spec informed_entity_to_zone(Alert.informed_entity(), LocationContext.t()) ::
           list(:upstream | :home_stop | :downstream)
   defp informed_entity_to_zone(informed_entity, location_context)
 
@@ -133,9 +95,9 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   # Only route type is not nil--this is the only time we consider route type,
   # since it's implied by other values when they are not nil
   defp informed_entity_to_zone(%{stop: nil, route: nil, route_type: route_type_id}, %{
-         route_types: route_types
+        alert_route_types: alert_route_types
        }) do
-    if RouteType.from_id(route_type_id) in route_types do
+    if RouteType.from_id(route_type_id) in alert_route_types do
       [:upstream, :home_stop, :downstream]
     else
       []
@@ -156,12 +118,12 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
   # Only route is not nil (route type ignored)
   defp informed_entity_to_zone(%{stop: nil, route: route}, context) do
-    if route in context.routes, do: [:upstream, :home_stop, :downstream], else: []
+    if route in context.route_ids_at_stop, do: [:upstream, :home_stop, :downstream], else: []
   end
 
   # Both stop and route are not nil (route type ignored)
   defp informed_entity_to_zone(%{stop: _stop, route: route} = informed_entity, context) do
-    if route in context.routes do
+    if route in context.route_ids_at_stop do
       informed_entity_to_zone(%{informed_entity | route: nil}, context)
     else
       []
@@ -175,24 +137,20 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
           | :elsewhere
           | :inside
           | :upstream
-  def location(%{} = t, is_terminal_station \\ false) do
-    location_context = %{
-      home_stop: SAW.home_stop_id(t),
-      upstream_stops: upstream_stop_id_set(t),
-      downstream_stops: downstream_stop_id_set(t),
-      routes: all_routes_at_stop(t),
-      route_types: route_types(t)
-    }
-
+  def location(%{alert: %Alert{} = alert, location_context: %LocationContext{} = location_context} = t, is_terminal_station \\ false) do
     informed_entities = informed_entities(t)
+
+    IO.inspect(location_context, label: "location context")
 
     informed_zones_set =
       informed_entities
+      # |> IO.inspect(label: "informed entities")
       |> Enum.flat_map(&informed_entity_to_zone(&1, location_context))
       |> Enum.uniq()
       |> Enum.sort()
+      # |> IO.inspect(label: "informed zones")
 
-    get_location_atom(informed_zones_set, SAW.alert(t).effect, is_terminal_station)
+    get_location_atom(informed_zones_set, alert.effect, is_terminal_station)
   end
 
   defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:upstream],
@@ -236,23 +194,65 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
   defp get_location_atom(_, _, _), do: :elsewhere
 
+  # Only used to decide "takeover_alert" for bus shelter, bus einks, and prefare screens
   def informs_all_active_routes_at_home_stop?(t) do
-    MapSet.subset?(active_routes_at_stop(t), informed_routes_at_home_stop(t))
+    MapSet.subset?(active_routes_at_stop(t), MapSet.new(informed_routes_at_home_stop(t)))
   end
 
   @spec active_routes_at_stop(t()) :: MapSet.t(route_id())
-  def active_routes_at_stop(t) do
-    t
-    |> SAW.routes_at_stop()
+  def active_routes_at_stop(%{location_context: %{routes: routes}}) do
+    routes
     |> Enum.filter(& &1.active?)
     |> MapSet.new(& &1.route_id)
   end
 
+  def informed_subway_routes(%{screen: %Screen{app_id: app_id}} = t) do
+    t
+    |> informed_entities() 
+    |> Enum.map(fn %{route: route} -> route end)
+    # If the alert impacts CR or other lines, weed that out
+    |> Enum.filter(fn e ->
+      Enum.member?(["Red", "Orange", "Green", "Blue"] ++ @green_line_branches, e)
+    end)
+    |> Enum.uniq()
+    |> consolidate_GL(app_id)
+  end
+
+  @spec consolidate_GL(list(String.t()), atom()) :: list(String.t())
+  # GL E-ink consolidates the GL branches to Green Line if there are > 2 branches
+  # We wdant to list all affected branches for the alert and not just the one serving the home stop
+  defp consolidate_GL(affected_routes, :gl_eink_v2) do
+    green_routes = Enum.filter(affected_routes, fn
+        "Green" <> _ -> true
+        _ -> false
+      end)
+
+    if length(green_routes) > 2, do: ["Green"], else: green_routes
+  end
+  # PreFare consolidates the GL branches if all branches are present
+  defp consolidate_GL(affected_routes, :pre_fare_v2) do
+    if MapSet.subset?(MapSet.new(@green_line_branches), MapSet.new(affected_routes)) do
+      affected_routes
+      |> Enum.reject(fn route -> String.contains?(route, "Green") end)
+      |> Enum.concat(["Green"])
+    else
+      affected_routes
+    end
+  end
+
+  defp consolidate_GL(affected_routes, _), do: affected_routes
+
+  # This gets used by bus shelter, bus eink, DUP, prefare
+  #  - to help decide if we need a high-stakes takeover alert (bus, dup, prefare)
+  #  - to serialize route pills on an alert (bus shelter & bus eink)
+
+  # Gets the routes affected by an alert that also exist at the current stop.
+  # NO downstream
   @spec informed_routes_at_home_stop(t()) :: MapSet.t(Route.id())
   def informed_routes_at_home_stop(t) do
-    rts = route_types(t)
-    home_stop = SAW.home_stop_id(t)
-    route_set = all_routes_at_stop(t)
+    rts = t.location_context.alert_route_types
+    home_stop = t.location_context.stop_id
+    route_set = t.location_context.routes
 
     # allows us to pattern match against the empty set
     empty_set = MapSet.new()
@@ -262,20 +262,32 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
         _ie, ^empty_set ->
           {:halt, empty_set}
 
+        # If entity has no route indicator, don't mark any route as informed
         %{route_type: nil, stop: nil, route: nil}, uninformed ->
           {:cont, uninformed}
 
+        # For a systemwide alert (affecting all bus or all subway/light rail)
+        # entity has route type, but no stop or route
+        # BUG: currently breaks for pre-fare, dups (because they are multimodal, and alerts UI lumps
+        # together subway and light rail)
         %{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
           if RouteType.from_id(route_type_id) in rts,
             do: {:halt, empty_set},
             else: {:cont, uninformed}
 
-        %{stop: ^home_stop, route: nil}, _uninformed ->
-          {:halt, empty_set}
+        # If entity is home stop and NO route, indicate all routes are informed
+        # Might not be feasible with Alerts UI
+        %{stop: ^home_stop, route: nil}, _uninformed -> {:halt, empty_set}
 
+        # If entity is home stop AND a route, then just that route is marked informed
         %{stop: ^home_stop, route: route}, uninformed ->
           {:cont, MapSet.delete(uninformed, route)}
 
+        # Removed the case with downstream alerts because:
+        #  - we don't want to consider downstream alerts for a takeover (bus, prefare, dup)
+        #  - we don't want ever show downstream alerts on bus shelter / bus e-ink
+
+        # If the entity has a route, but no stop, that route is marked informed
         %{stop: nil, route: route}, uninformed ->
           {:cont, MapSet.delete(uninformed, route)}
 
@@ -284,5 +296,6 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
       end)
 
     MapSet.difference(route_set, uninformed_routes)
+    |> Enum.to_list()
   end
 end

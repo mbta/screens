@@ -18,6 +18,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     defstruct station: nil
 
+    # Do the separate `alert_ids` definitions lead to double-counting of how many times
+    # an elevator closure appears on a pre-fare?
     defimpl Screens.V2.AlertsWidget do
       def alert_ids(page) do
         Enum.map(page.station.elevator_closures, & &1.alert_id)
@@ -79,12 +81,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{ElevatorStatus, PreFare}
+  alias Screens.LocationContext
   alias Screens.V2.AlertsWidget
+  alias Screens.V2.WidgetInstance.Common.BaseAlert
 
   defstruct screen: nil,
             now: nil,
             alerts: nil,
-            stop_sequences: nil,
+            location_context: nil,
             facility_id_to_name: nil,
             station_id_to_name: nil,
             station_id_to_icons: nil
@@ -130,21 +134,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           screen: Screen.t(),
           now: DateTime.t(),
           alerts: list(Alert.t()),
-          stop_sequences: list(list(stop_id())),
+          location_context: LocationContext.t(),
           facility_id_to_name: %{String.t() => String.t()},
           station_id_to_name: %{String.t() => String.t()},
           station_id_to_icons: %{String.t() => list(icon)}
         }
-
-  def parent_station_id(%__MODULE__{
-        screen: %Screen{
-          app_params: %PreFare{
-            elevator_status: %ElevatorStatus{parent_station_id: parent_station_id}
-          }
-        }
-      }) do
-    parent_station_id
-  end
 
   def platform_stop_ids(%__MODULE__{
         screen: %Screen{
@@ -156,18 +150,25 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     platform_stop_ids
   end
 
+  # Next 4 functions are used to get relevant alerts that follow different tiers of priority:
+  #   - active here
+  #   - active somewhere else
+  #   - upcoming here
+  #   - active downstream
   defp get_active_at_home_station(%__MODULE__{alerts: alerts} = t) do
     alerts
-    |> Enum.filter(&active_at_home_station?(&1, t))
+    |> Enum.filter(&alert_is_relevant?(&1, t, :here))
   end
 
+  # The definition of this "elsewhere" is different than the output of BaseAlert.Location.
+  # This elsewhere means "anywhere but here"
   defp get_active_elsewhere(
          %__MODULE__{
            alerts: alerts
          } = t
        ) do
     alerts
-    |> Enum.filter(&active_elsewhere?(&1, t))
+    |> Enum.filter(&alert_is_relevant?(&1, t, :elsewhere))
     |> Enum.sort_by(
       fn %Alert{informed_entities: entities} -> entities end,
       &sort_elsewhere(&1, &2, t)
@@ -176,77 +177,42 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   defp get_upcoming_at_home_station(%__MODULE__{alerts: alerts} = t) do
     alerts
-    |> Enum.filter(&upcoming_at_home_station?(&1, t))
+    |> Enum.filter(&alert_is_relevant?(&1, t, :upcoming))
   end
 
   defp get_active_on_connecting_lines(%__MODULE__{alerts: alerts} = t) do
     alerts
-    |> Enum.filter(&active_on_connecting_lines?(&1, t))
+    |> Enum.filter(&alert_is_relevant?(&1, t, :downstream))
     |> Enum.sort_by(
       fn %Alert{informed_entities: entities} -> entities end,
       &sort_elsewhere(&1, &2, t)
     )
   end
 
-  defp active_at_home_station?(
-         %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
-         %__MODULE__{
-           now: now
-         } = t
-       ) do
-    parent_station_id = parent_station_id(t)
+  @spec alert_is_relevant?(Alert.t(), t(), atom()) :: boolean()
+  defp alert_is_relevant?(%Alert{effect: :elevator_closure, informed_entities: entities} = alert,
+      %__MODULE__{location_context: location_context, now: now},
+      option
+    ) do
 
-    Alert.happening_now?(alert, now) and
-      Enum.any?(entities, fn entity ->
-        entity.stop == parent_station_id
-      end)
+    active = Alert.happening_now?(alert, now)
+    here = Enum.any?(entities, fn e -> e.stop == location_context.home_stop end)
+
+    case option do 
+      :upcoming -> not active and here
+      :here -> active and here
+      :downstream -> 
+        alert_location = BaseAlert.location(%{alert: alert, location_context: location_context})
+        active and alert_location === :upstream or alert_location === :downstream
+      :elsewhere ->
+        active and entities
+            |> get_stations_from_entities()
+            |> Enum.any?(fn station -> station != location_context.home_stop end)
+    end
   end
 
-  defp active_elsewhere?(
-         %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
-         %__MODULE__{
-           now: now
-         } = t
-       ) do
-    stations = get_stations_from_entities(entities)
-    parent_station_id = parent_station_id(t)
 
-    Alert.happening_now?(alert, now) and
-      Enum.any?(stations, fn station ->
-        station != parent_station_id
-      end)
-  end
-
-  defp upcoming_at_home_station?(
-         %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
-         %__MODULE__{now: now} = t
-       ) do
-    parent_station_id = parent_station_id(t)
-
-    not Alert.happening_now?(alert, now) and
-      Enum.any?(entities, fn entity ->
-        entity.stop == parent_station_id
-      end)
-  end
-
-  defp active_on_connecting_lines?(
-         %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
-         %__MODULE__{now: now, stop_sequences: stop_sequences} = t
-       ) do
-    informed_platforms =
-      for %{stop: stop} when is_binary(stop) <- entities,
-          match?("place-" <> _, stop),
-          do: stop
-
-    # Remove parent station so it does not show up as on a connecting line.
-    connecting_platform_ids =
-      stop_sequences |> List.flatten() |> List.delete(parent_station_id(t))
-
-    Alert.happening_now?(alert, now) and
-      Enum.any?(informed_platforms, &(&1 in connecting_platform_ids))
-  end
-
-  defp sort_elsewhere(e1, _e2, %__MODULE__{stop_sequences: stop_sequences}) do
+  defp sort_elsewhere(e1, _e2, %__MODULE__{location_context: %{stop_sequences: stop_sequences}}) do
     stations = get_stations_from_entities(e1)
 
     flat_stop_sequences =
@@ -289,11 +255,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   defp serialize_station(
          {parent_station_id, alerts},
          %__MODULE__{
+           location_context: location_context,
            facility_id_to_name: facility_id_to_name,
            station_id_to_name: station_id_to_name,
            station_id_to_icons: station_id_to_icons,
            now: now
-         } = t
+         }
        ) do
     station_name = Map.fetch!(station_id_to_name, parent_station_id)
 
@@ -319,7 +286,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       name: station_name,
       icons: icons,
       elevator_closures: closures,
-      is_at_home_stop: parent_station_id == parent_station_id(t)
+      is_at_home_stop: parent_station_id == location_context.home_stop
     }
   end
 
@@ -336,7 +303,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   # by number of subway routes shared between that station and the home station, descending.
   defp sorted_alerts_by_station(alerts, t) do
     subway_routes_at_home_station =
-      t.station_id_to_icons[parent_station_id(t)]
+      t.station_id_to_icons[t.location_context.home_stop]
       |> Enum.filter(&(&1 in @subway_icons))
       |> MapSet.new()
 
@@ -484,7 +451,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   # Scenario B: One or more elevators at this screen's home station are closed.
   # Scenario C: All elevators at this screen's home station are operational.
   defp scenario(%__MODULE__{alerts: alerts} = t) do
-    if Enum.any?(alerts, &active_at_home_station?(&1, t)), do: :b, else: :c
+    if Enum.any?(alerts, &alert_is_relevant?(&1, t, :here)), do: :b, else: :c
   end
 
   def priority(_instance), do: [2]

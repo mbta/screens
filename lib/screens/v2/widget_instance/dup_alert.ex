@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
+  alias Screens.LocationContext
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.DupAlert.Serialize
 
@@ -13,8 +14,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   @enforce_keys [
     :screen,
     :alert,
-    :stop_sequences,
-    :subway_routes_at_stop,
+    :location_context,
     :primary_section_count,
     :rotation_index,
     :stop_name
@@ -24,8 +24,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   @type t :: %__MODULE__{
           screen: Screen.t(),
           alert: Alert.t(),
-          stop_sequences: list(list(stop_id)),
-          subway_routes_at_stop: list(%{route_id: route_id, active?: boolean}),
+          location_context: LocationContext.t(),
           primary_section_count: pos_integer(),
           rotation_index: rotation_index,
           stop_name: String.t()
@@ -289,21 +288,21 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     def audio_view(instance), do: DupAlert.audio_view(instance)
   end
 
-  defimpl Screens.V2.SingleAlertWidget do
-    def alert(instance), do: instance.alert
+  # defimpl Screens.V2.SingleAlertWidget do
+  #   def alert(instance), do: instance.alert
 
-    def screen(instance), do: instance.screen
+  #   def screen(instance), do: instance.screen
 
-    def home_stop_id(instance), do: instance.screen.app_params.alerts.stop_id
+  #   def home_stop_id(instance), do: instance.screen.app_params.alerts.stop_id
 
-    def routes_at_stop(instance), do: instance.subway_routes_at_stop
+  #   def routes_at_stop(instance), do: instance.subway_routes_at_stop
 
-    def stop_sequences(instance), do: instance.stop_sequences
+  #   def stop_sequences(instance), do: instance.stop_sequences
 
-    def headsign_matchers(_instance) do
-      Application.get_env(:screens, :dup_alert_headsign_matchers)
-    end
-  end
+  #   def headsign_matchers(_instance) do
+  #     Application.get_env(:screens, :dup_alert_headsign_matchers)
+  #   end
+  # end
 
   defimpl Screens.V2.AlertsWidget do
     alias Screens.V2.WidgetInstance.DupAlert

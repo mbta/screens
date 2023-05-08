@@ -5,8 +5,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Config.V2.PreFare
-  alias Screens.RoutePatterns.RoutePattern
-  alias Screens.Routes.Route
+  alias Screens.LocationContext
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Common.BaseAlert
@@ -23,34 +22,39 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
           app_params: %PreFare{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}}
         } = config,
         now \\ DateTime.utc_now(),
-        fetch_routes_by_stop_fn \\ &Route.fetch_routes_by_stop/3,
-        fetch_stop_sequences_by_stop_fn \\ &RoutePattern.fetch_parent_station_sequences_through_stop/2,
         fetch_alerts_fn \\ &Alert.fetch/1,
-        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1
+        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
+        fetch_location_context_fn \\ &Stop.fetch_location_context/3
       ) do
     # Filtering by subway and light_rail types
-    with {:ok, routes_at_stop} <- fetch_routes_by_stop_fn.(stop_id, now, [:light_rail, :subway]),
-         route_ids_at_stop =
-           routes_at_stop
-           |> Enum.map(& &1.route_id)
-           # We shouldn't handle Mattapan outages at this time
-           |> Enum.reject(fn id -> id === "Mattapan" end),
-         {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids_at_stop),
-         {:ok, stop_sequences} <-
-           fetch_stop_sequences_by_stop_fn.(stop_id, route_ids_at_stop) do
+    with location_context <- fetch_location_context_fn.(PreFare, stop_id, now),
+        #  {:ok, routes_at_stop} <- fetch_routes_by_stop_fn.(stop_id, now, [:light_rail, :subway]),
+        #  route_ids_at_stop =
+        #    routes_at_stop
+        #    |> Enum.map(& &1.route_id)
+        #    # We shouldn't handle Mattapan outages at this time
+        #    |> Enum.reject(fn id -> id === "Mattapan" end),
+         {:ok, alerts} <- fetch_alerts_fn.(route_ids: location_context.route_ids_at_stop) do
+        #  {:ok, stop_sequences} <-
+        #    fetch_stop_sequences_by_stop_fn.(stop_id, route_ids_at_stop) do
       alerts
-      |> Enum.filter(&relevant?(&1, config, stop_sequences, routes_at_stop, now))
+      # |> IO.inspect(label: "alerts")
+      |> Enum.filter(&relevant?(&1, config, location_context, now))
+      # |> IO.inspect(label: "filtered alerts")
       |> Enum.map(fn alert ->
         %ReconstructedAlert{
           screen: config,
           alert: alert,
           now: now,
-          stop_sequences: stop_sequences,
-          routes_at_stop: routes_at_stop,
+          location_context: location_context,
+          # stop_sequences: stop_sequences,
+          # routes_at_stop: routes_at_stop,
+          # TODO: these two items look like location stuff. Check em
           informed_stations_string: get_stations(alert, fetch_stop_name_fn),
-          is_terminal_station: is_terminal?(stop_id, stop_sequences)
+          is_terminal_station: is_terminal?(stop_id, location_context.stop_sequences)
         }
       end)
+      # |> IO.inspect(label: "recon alert widgets")
     else
       :error -> []
     end
@@ -59,15 +63,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   defp relevant?(
          %Alert{effect: effect} = alert,
          config,
-         stop_sequences,
-         routes_at_stop,
+         %LocationContext{} = location_context,
          now
        ) do
+        # IO.inspect(location_context, label: "location")
     reconstructed_alert = %ReconstructedAlert{
       screen: config,
       alert: alert,
-      stop_sequences: stop_sequences,
-      routes_at_stop: routes_at_stop,
+      location_context: location_context,
       now: now,
       informed_stations_string: "A Station"
     }
@@ -80,7 +83,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     Enum.member?(@relevant_effects, effect)
   end
 
-  defp relevant_location?(%ReconstructedAlert{} = reconstructed_alert) do
+  defp relevant_location?(reconstructed_alert) do
+    IO.inspect(reconstructed_alert, label: "reconstructed alert")
+    IO.inspect(BaseAlert.location(reconstructed_alert), label: "output of location")
     case BaseAlert.location(reconstructed_alert) do
       location when location in [:downstream, :upstream] ->
         true
@@ -126,10 +131,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   # it is a terminal station. Delay alerts heading in the direction of the station are not relevant.
   defp relevant_direction?(
          %ReconstructedAlert{
-           screen: %Screen{
-             app_params: %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}}
-           },
-           stop_sequences: stop_sequences
+           location_context: %{home_stop: stop_id, stop_sequences: stop_sequences}
          } = t
        ) do
     informed_entities = BaseAlert.informed_entities(t)
