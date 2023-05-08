@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.FreeTextLine
+  alias Screens.LocationContext
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.Common.BaseAlert
@@ -13,8 +14,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defstruct screen: nil,
             alert: nil,
             now: nil,
-            stop_sequences: nil,
-            routes_at_stop: nil,
+            location_context: nil,
+            # stop_sequences: nil,
+            # routes_at_stop: nil,
             informed_stations_string: nil,
             is_terminal_station: false
 
@@ -26,8 +28,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           screen: Screen.t(),
           alert: Alert.t(),
           now: DateTime.t(),
-          stop_sequences: list(list(stop_id())),
-          routes_at_stop: list(%{route_id: route_id(), active?: boolean()}),
+          location_context: LocationContext.t(),
+          # stop_sequences: list(list(stop_id())),
+          # routes_at_stop: list(%{route_id: route_id(), active?: boolean()}),
           informed_stations_string: String.t(),
           is_terminal_station: boolean()
         }
@@ -43,26 +46,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   }
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
-
-  defp get_affected_routes(informed_entities) do
-    affected_routes =
-      informed_entities
-      |> Enum.map(fn e -> Map.get(e, :route) end)
-      # If the alert impacts CR or other lines, weed that out
-      |> Enum.filter(fn e ->
-        Enum.member?(["Red", "Orange", "Green", "Blue"] ++ @green_line_branches, e)
-      end)
-      |> Enum.uniq()
-
-    # If the routes contain all the Green branches, consolidate to just Green Line
-    if MapSet.subset?(MapSet.new(@green_line_branches), MapSet.new(affected_routes)) do
-      affected_routes
-      |> Enum.reject(fn route -> String.contains?(route, "Green") end)
-      |> Enum.concat(["Green"])
-    else
-      affected_routes
-    end
-  end
 
   # Using hd/1 because we know that only single line stations use this function.
   defp get_destination(t, location) do
@@ -109,8 +92,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        ) do
     informed_entities = BaseAlert.informed_entities(t)
-
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
     cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
 
     location_text = get_endpoints(informed_entities, hd(affected_routes))
@@ -149,8 +131,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        ) do
     informed_entities = BaseAlert.informed_entities(t)
-
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
     cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
 
     location_text = get_endpoints(informed_entities, hd(affected_routes))
@@ -186,9 +167,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_takeover_alert(
          %__MODULE__{alert: %Alert{effect: :station_closure, cause: cause}} = t
        ) do
-    informed_entities = BaseAlert.informed_entities(t)
-
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
     cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
 
     %{
@@ -210,8 +189,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
            }
          } = t
        ) do
-    informed_entities = BaseAlert.informed_entities(t)
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
     cause_text = Alert.get_cause_string(cause)
 
     %{
@@ -226,9 +204,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp serialize_inside_flex_alert(%__MODULE__{alert: %Alert{effect: :shuttle, cause: cause}} = t) do
-    informed_entities = BaseAlert.informed_entities(t)
-
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
     cause_text = Alert.get_cause_string(cause)
 
     %{
@@ -247,9 +223,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
            alert: %Alert{effect: :station_closure, cause: cause}
          } = t
        ) do
-    informed_entities = BaseAlert.informed_entities(t)
-
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
     cause_text = Alert.get_cause_string(cause)
 
     line =
@@ -275,9 +249,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        )
        when severity > 3 and severity < 7 do
-    informed_entities = BaseAlert.informed_entities(t)
-
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
 
     %{
       issue: header,
@@ -296,9 +268,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        )
        when severity >= 7 do
-    informed_entities = BaseAlert.informed_entities(t)
-
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
     cause_text = Alert.get_cause_string(cause)
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
     destination = get_destination(t, :inside)
@@ -342,9 +312,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
            alert: %Alert{effect: :suspension, cause: cause, header: header}
          } = t
        ) do
-    informed_entities = BaseAlert.informed_entities(t)
-
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
       %{
@@ -384,9 +352,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
            alert: %Alert{effect: :shuttle, cause: cause, header: header}
          } = t
        ) do
-    informed_entities = BaseAlert.informed_entities(t)
-
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
       %{
@@ -429,9 +395,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        )
        when severity > 3 and severity < 7 do
-    informed_entities = BaseAlert.informed_entities(t)
-
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
 
     %{
       issue: header,
@@ -450,9 +414,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        )
        when severity >= 7 do
-    informed_entities = BaseAlert.informed_entities(t)
-
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
       %{
@@ -501,7 +463,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        ) do
     informed_entities = BaseAlert.informed_entities(t)
 
-    affected_routes = get_affected_routes(informed_entities)
+    affected_routes = BaseAlert.informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
       %{
@@ -541,8 +503,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          %__MODULE__{alert: %Alert{effect: :shuttle, cause: cause, header: header}} = t
        ) do
     informed_entities = BaseAlert.informed_entities(t)
-
-    affected_routes = get_affected_routes(informed_entities)
+  
+    affected_routes = BaseAlert.informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
       %{
@@ -584,9 +546,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
            informed_stations_string: informed_stations_string
          } = t
        ) do
-    informed_entities = BaseAlert.informed_entities(t)
+    affected_routes = BaseAlert.informed_subway_routes(t)
 
-    affected_routes = get_affected_routes(informed_entities)
     cause_text = Alert.get_cause_string(cause)
 
     %{
@@ -601,7 +562,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp serialize_outside_alert(%__MODULE__{alert: %Alert{effect: :delay, header: header}} = t) do
-    affected_routes = t |> BaseAlert.informed_entities() |> get_affected_routes()
+    affected_routes = BaseAlert.informed_subway_routes(t)
 
     %{
       issue: header,
@@ -705,23 +666,23 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def audio_view(_instance), do: ScreensWeb.V2.Audio.ReconstructedAlertView
   end
 
-  defimpl Screens.V2.SingleAlertWidget do
-    alias Screens.V2.WidgetInstance.ReconstructedAlert
+  # defimpl Screens.V2.SingleAlertWidget do
+  #   alias Screens.V2.WidgetInstance.ReconstructedAlert
 
-    def alert(instance), do: instance.alert
+  #   def alert(instance), do: instance.alert
 
-    def screen(instance), do: instance.screen
+  #   def screen(instance), do: instance.screen
 
-    def home_stop_id(instance), do: instance.screen.app_params.reconstructed_alert_widget.stop_id
+  #   def home_stop_id(instance), do: instance.screen.app_params.reconstructed_alert_widget.stop_id
 
-    def routes_at_stop(instance), do: instance.routes_at_stop
+  #   def routes_at_stop(instance), do: instance.routes_at_stop
 
-    def stop_sequences(instance), do: instance.stop_sequences
+  #   def stop_sequences(instance), do: instance.stop_sequences
 
-    def headsign_matchers(_instance) do
-      Application.get_env(:screens, :prefare_alert_headsign_matchers)
-    end
-  end
+  #   def headsign_matchers(_instance) do
+  #     Application.get_env(:screens, :prefare_alert_headsign_matchers)
+  #   end
+  # end
 
   defimpl Screens.V2.AlertsWidget do
     def alert_ids(t), do: ReconstructedAlert.alert_ids(t)
