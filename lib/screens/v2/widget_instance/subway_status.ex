@@ -143,16 +143,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     routes_with_alerts = Map.keys(grouped_alerts)
     total_alerts = grouped_alerts |> Enum.flat_map(&elem(&1, 1)) |> length()
 
-    if Enum.any?(routes_with_alerts, &String.starts_with?(&1, "Green")) do
-      # Collapse all non-GL routes and display as many GL alerts as possible.
-      %{
-        blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue"),
-        orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange"),
-        red: serialize_single_alert_row_for_route(grouped_alerts, "Red"),
-        green: serialize_green_line(grouped_alerts)
-      }
-    else
-      if length(routes_with_alerts) == 1 and total_alerts == 2 do
+    cond do
+      Enum.any?(routes_with_alerts, &String.starts_with?(&1, "Green")) ->
+        # Collapse all non-GL routes and display as many GL alerts as possible.
+        %{
+          blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue"),
+          orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange"),
+          red: serialize_single_alert_row_for_route(grouped_alerts, "Red"),
+          green: serialize_green_line(grouped_alerts)
+        }
+
+      length(routes_with_alerts) == 1 and total_alerts == 2 ->
         # Show both alerts in two rows
         %{
           blue: serialize_multiple_alert_rows_for_route(grouped_alerts, "Blue"),
@@ -160,10 +161,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           red: serialize_multiple_alert_rows_for_route(grouped_alerts, "Red"),
           green: serialize_multiple_alert_rows_for_route(grouped_alerts, "Green")
         }
-      else
-        # Collapse all routes
+
+      # Collapse all routes
+      true ->
         serialize_one_row_for_all_routes(grouped_alerts)
-      end
     end
   end
 
@@ -205,7 +206,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         [alert] ->
           serialize_alert(alert, route_id)
 
-        # move this
         alerts ->
           serialize_alert_summary(length(alerts), serialize_route_pill(route_id))
       end
