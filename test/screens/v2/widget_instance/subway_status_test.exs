@@ -412,7 +412,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               route_pill: %{type: :text, text: "BL", color: :blue},
               status: "2 current alerts",
-              location: %{full: "mbta.com/alerts/subway", abbrev: "mbta.com/alerts/subway"}
+              location: "mbta.com/alerts"
             }
           ]
         },
@@ -422,7 +422,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               route_pill: %{type: :text, text: "OL", color: :orange},
               status: "2 current alerts",
-              location: %{full: "mbta.com/alerts/subway", abbrev: "mbta.com/alerts/subway"}
+              location: "mbta.com/alerts"
             }
           ]
         },
@@ -495,7 +495,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               route_pill: %{type: :text, text: "OL", color: :orange},
               status: "2 current alerts",
-              location: %{full: "mbta.com/alerts/subway", abbrev: "mbta.com/alerts/subway"}
+              location: "mbta.com/alerts"
             }
           ]
         },
@@ -658,7 +658,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               route_pill: %{type: :text, text: "GL", color: :green, branches: [:b, :e]},
               status: "2 current alerts",
-              location: %{abbrev: "mbta.com/alerts/subway", full: "mbta.com/alerts/subway"}
+              location: "mbta.com/alerts"
             }
           ]
         }
@@ -867,7 +867,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               route_pill: %{type: :text, text: "GL", color: :green, branches: [:b, :c, :e]},
               status: "3 current alerts",
-              location: %{abbrev: "mbta.com/alerts/subway", full: "mbta.com/alerts/subway"}
+              location: "mbta.com/alerts"
             }
           ]
         }
@@ -1013,7 +1013,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               route_pill: %{type: :text, text: "GL", color: :green},
               status: "3 current alerts",
-              location: %{abbrev: "mbta.com/alerts/subway", full: "mbta.com/alerts/subway"}
+              location: "mbta.com/alerts"
             }
           ]
         }
@@ -1071,7 +1071,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               route_pill: %{type: :text, text: "OL", color: :orange},
               status: "2 current alerts",
-              location: %{abbrev: "mbta.com/alerts/subway", full: "mbta.com/alerts/subway"}
+              location: "mbta.com/alerts"
             }
           ]
         },

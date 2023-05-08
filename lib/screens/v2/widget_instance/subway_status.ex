@@ -481,7 +481,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{
       route_pill: route_pill,
       status: "#{alert_count} current alerts",
-      location: %{full: "mbta.com/alerts/subway", abbrev: "mbta.com/alerts/subway"}
+      location: "mbta.com/alerts"
     }
   end
 
