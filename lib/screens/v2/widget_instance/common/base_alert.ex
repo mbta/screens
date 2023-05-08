@@ -251,8 +251,8 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   @spec informed_routes_at_home_stop(t()) :: MapSet.t(Route.id())
   def informed_routes_at_home_stop(t) do
     rts = t.location_context.alert_route_types
-    home_stop = t.location_context.stop_id
-    route_set = t.location_context.routes
+    home_stop = t.location_context.home_stop
+    route_set = MapSet.new(t.location_context.route_ids_at_stop)
 
     # allows us to pattern match against the empty set
     empty_set = MapSet.new()
