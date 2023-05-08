@@ -15,7 +15,6 @@ defmodule Screens.Config.V2.CRDepartures do
           destination: String.t(),
           direction_to_destination: 0 | 1,
           priority: WidgetInstance.priority(),
-          travel_time_to_destination: String.t(),
           wayfinding_arrows: platform_directions(),
           enabled: boolean(),
           header_pill: :red | :blue | :green | :orange
@@ -25,7 +24,6 @@ defmodule Screens.Config.V2.CRDepartures do
             destination: nil,
             direction_to_destination: nil,
             priority: nil,
-            travel_time_to_destination: nil,
             wayfinding_arrows: nil,
             enabled: false,
             header_pill: nil
