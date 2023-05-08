@@ -71,9 +71,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       grouped_alerts = SubwayStatus.get_relevant_alerts_by_route(alerts)
 
       multi_alert_routes =
-        grouped_alerts
-        |> Enum.into([])
-        |> Enum.filter(fn {_route, alerts} -> length(alerts) > 1 end)
+        Enum.filter(grouped_alerts, fn {_route, alerts} -> length(alerts) > 1 end)
 
       if Enum.any?(multi_alert_routes) do
         SubwayStatus.serialize_routes_multiple_alerts(grouped_alerts)
@@ -103,8 +101,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     |> Stream.flat_map(fn alert ->
       alert
       |> alert_routes()
-      |> Enum.map(fn route -> {alert, route} end)
       |> Enum.uniq()
+      |> Enum.map(fn route -> {alert, route} end)
     end)
     |> Enum.group_by(
       fn {_alert, route} -> route end,
@@ -426,12 +424,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     if alert_count == 0 do
       serialize_single_alert_row_for_route(grouped_alerts, "Green")
     else
-      trunk_alerts =
-        Enum.filter(green_line_alerts, fn alert ->
-          alert_affects_gl_trunk_or_whole_line?(alert)
-        end)
-
-      branch_alerts = green_line_alerts -- trunk_alerts
+      {trunk_alerts, branch_alerts} =
+        Enum.split_with(green_line_alerts, &alert_affects_gl_trunk_or_whole_line?/1)
 
       case {trunk_alerts, branch_alerts} do
         # If there are no alerts for the GL trunk, serialize any alerts on the branches
