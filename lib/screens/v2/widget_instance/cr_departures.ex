@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
   alias Screens.V2.Departure
+  alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct config: nil,
             departures_data: [],
@@ -52,7 +53,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
         destination: destination,
         time_to_destination: config.travel_time_to_destination,
         direction: direction_to_destination,
-        header_pill: header_pill
+        header_pill: RoutePill.serialize_icon(header_pill)
       }
     end
 
