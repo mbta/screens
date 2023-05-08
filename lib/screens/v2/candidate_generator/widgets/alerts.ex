@@ -18,20 +18,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
   def alert_instances(
         %Screen{app_params: %app{alerts: %Alerts{stop_id: stop_id}}} = config,
         now \\ DateTime.utc_now(),
-        # By making generic, I ended up changing 2 things
-        #    - swapped to fetch_routes_by_stop instead of fetch_simplified_routes_at_stop
-        #    - swapped to fetch_parent_station_sequences_through_stop instead of fetch_stop_sequences_through_stop
-        # Make sure that's fine
         fetch_alerts_by_stop_and_route_fn \\ &Alert.fetch_by_stop_and_route/2,
         fetch_location_context_fn \\ &Stop.fetch_location_context/3
       )
       when app in @alert_supporting_screen_types do
     with location_context <- fetch_location_context_fn.(app, stop_id, now),
-        
-         # {:ok, routes_at_stop} <- fetch_simplified_routes_at_stop_fn.(stop_id, now),
-         # {:ok, stop_sequences} <- fetch_stop_sequences_through_stop_fn.(stop_id),
          reachable_stop_ids = local_and_downstream_stop_ids(location_context.stop_sequences, stop_id),
-         # route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
          {:ok, alerts} <-
            fetch_alerts_by_stop_and_route_fn.(reachable_stop_ids, location_context.route_ids_at_stop) do
       alerts
@@ -41,8 +33,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
           alert: alert,
           screen: config,
           location_context: location_context,
-          # routes_at_stop: routes_at_stop,
-          # stop_sequences: stop_sequences,
           now: now
         }
       end)
@@ -50,10 +40,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
       :error -> []
     end
   end
-
-  # # The route types we care about for alerts at this screen
-  # defp get_route_type_filter(app_id) when app_id in [BusEink, BusShelter], do: [:bus]
-  # defp get_route_type_filter(GlEink), do: [:light_rail]
 
   @doc """
   Filters out alerts whose effects we are not interested in, as well as those that do not inform at least one of:

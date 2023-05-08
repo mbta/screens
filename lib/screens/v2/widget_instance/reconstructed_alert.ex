@@ -15,8 +15,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             alert: nil,
             now: nil,
             location_context: nil,
-            # stop_sequences: nil,
-            # routes_at_stop: nil,
             informed_stations_string: nil,
             is_terminal_station: false
 
@@ -29,8 +27,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           alert: Alert.t(),
           now: DateTime.t(),
           location_context: LocationContext.t(),
-          # stop_sequences: list(list(stop_id())),
-          # routes_at_stop: list(%{route_id: route_id(), active?: boolean()}),
           informed_stations_string: String.t(),
           is_terminal_station: boolean()
         }
@@ -503,7 +499,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          %__MODULE__{alert: %Alert{effect: :shuttle, cause: cause, header: header}} = t
        ) do
     informed_entities = BaseAlert.informed_entities(t)
-  
+
     affected_routes = BaseAlert.informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
@@ -665,24 +661,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def audio_valid_candidate?(t), do: ReconstructedAlert.temporarily_override_alert(t)
     def audio_view(_instance), do: ScreensWeb.V2.Audio.ReconstructedAlertView
   end
-
-  # defimpl Screens.V2.SingleAlertWidget do
-  #   alias Screens.V2.WidgetInstance.ReconstructedAlert
-
-  #   def alert(instance), do: instance.alert
-
-  #   def screen(instance), do: instance.screen
-
-  #   def home_stop_id(instance), do: instance.screen.app_params.reconstructed_alert_widget.stop_id
-
-  #   def routes_at_stop(instance), do: instance.routes_at_stop
-
-  #   def stop_sequences(instance), do: instance.stop_sequences
-
-  #   def headsign_matchers(_instance) do
-  #     Application.get_env(:screens, :prefare_alert_headsign_matchers)
-  #   end
-  # end
 
   defimpl Screens.V2.AlertsWidget do
     def alert_ids(t), do: ReconstructedAlert.alert_ids(t)

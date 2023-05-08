@@ -26,35 +26,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         fetch_location_context_fn \\ &Stop.fetch_location_context/3
       ) do
-    # Filtering by subway and light_rail types
     with location_context <- fetch_location_context_fn.(PreFare, stop_id, now),
-        #  {:ok, routes_at_stop} <- fetch_routes_by_stop_fn.(stop_id, now, [:light_rail, :subway]),
-        #  route_ids_at_stop =
-        #    routes_at_stop
-        #    |> Enum.map(& &1.route_id)
-        #    # We shouldn't handle Mattapan outages at this time
-        #    |> Enum.reject(fn id -> id === "Mattapan" end),
+        # TODO: make sure we're handling Mattapan outages correctly even without the "reject"
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: location_context.route_ids_at_stop) do
-        #  {:ok, stop_sequences} <-
-        #    fetch_stop_sequences_by_stop_fn.(stop_id, route_ids_at_stop) do
+
       alerts
-      # |> IO.inspect(label: "alerts")
       |> Enum.filter(&relevant?(&1, config, location_context, now))
-      # |> IO.inspect(label: "filtered alerts")
       |> Enum.map(fn alert ->
         %ReconstructedAlert{
           screen: config,
           alert: alert,
           now: now,
           location_context: location_context,
-          # stop_sequences: stop_sequences,
-          # routes_at_stop: routes_at_stop,
-          # TODO: these two items look like location stuff. Check em
+          # TODO: these two items look like location stuff? Should they be?
           informed_stations_string: get_stations(alert, fetch_stop_name_fn),
           is_terminal_station: is_terminal?(stop_id, location_context.stop_sequences)
         }
       end)
-      # |> IO.inspect(label: "recon alert widgets")
     else
       :error -> []
     end
@@ -66,7 +54,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          %LocationContext{} = location_context,
          now
        ) do
-        # IO.inspect(location_context, label: "location")
     reconstructed_alert = %ReconstructedAlert{
       screen: config,
       alert: alert,
@@ -84,8 +71,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   end
 
   defp relevant_location?(reconstructed_alert) do
-    IO.inspect(reconstructed_alert, label: "reconstructed alert")
-    IO.inspect(BaseAlert.location(reconstructed_alert), label: "output of location")
     case BaseAlert.location(reconstructed_alert) do
       location when location in [:downstream, :upstream] ->
         true
