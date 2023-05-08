@@ -28,22 +28,17 @@ interface Departure {
 interface CRDeparturesProps {
   departures: Departure[];
   destination: string;
-  time_to_destination: string;
   direction: Direction;
+  header_pill: string;
 }
 
 const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
-  const { departures, time_to_destination, direction } = props;
-
-  let maxMinutes = parseInt(time_to_destination.split("-")[1]);
-  if (isNaN(maxMinutes)) {
-    maxMinutes = 15;
-  }
+  const { departures, direction, header_pill } = props;
 
   return (
     <div className="departures-container">
       <div className="departures-card">
-        <CRDeparturesHeader />
+        <CRDeparturesHeader headerPill={header_pill} />
         <div className="departures-card__body">
           <DeparturesTable departures={departures} direction={direction} />
         </div>

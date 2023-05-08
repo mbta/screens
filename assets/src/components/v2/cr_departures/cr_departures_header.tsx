@@ -2,14 +2,17 @@ import React from "react";
 
 import Free from "Components/v2/bundled_svg/free";
 import { pillPath } from "Util/util";
+import RoutePill from "../departures/route_pill";
 
-const CRDeparturesHeader = () => {
+const CRDeparturesHeader = ({ headerPill }) => {
   return (
     <div className="departures-card__header">
       <img src={pillPath("commuter-rail.svg")}></img>
       <div className="departures-card__header-text">
         <span>Consider Commuter Rail during</span>
-        <span className="pill-container"><img className="inline-ol-pill" src={pillPath("ol.svg")}></img></span>
+        <span className="pill-container">
+          <RoutePill {...headerPill} />
+        </span>
         <span>delays</span>
       </div>
       <div className="departures-card__sub-header">

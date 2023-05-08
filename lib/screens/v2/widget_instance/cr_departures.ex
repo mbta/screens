@@ -5,11 +5,13 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
   alias Screens.V2.Departure
+  alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct config: nil,
             departures_data: [],
             destination: nil,
             direction_to_destination: nil,
+            header_pill: nil,
             now: nil
 
   @type t :: %__MODULE__{
@@ -17,6 +19,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           departures_data: list(Departure.t()),
           destination: String.t(),
           direction_to_destination: String.t(),
+          header_pill: :red | :blue | :green | :orange,
           now: DateTime.t()
         }
 
@@ -30,6 +33,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           departures_data: departures_data,
           destination: destination,
           direction_to_destination: direction_to_destination,
+          header_pill: header_pill,
           now: now
         }) do
       %{
@@ -47,8 +51,8 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           ),
         station: station,
         destination: destination,
-        time_to_destination: config.travel_time_to_destination,
-        direction: direction_to_destination
+        direction: direction_to_destination,
+        header_pill: RoutePill.serialize_icon(header_pill)
       }
     end
 
