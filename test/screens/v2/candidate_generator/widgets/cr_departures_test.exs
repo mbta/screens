@@ -23,7 +23,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDeparturesTest do
             destination: "place-bbsta",
             direction_to_destination: 1,
             wayfinding_arrows: "right-down",
-            priority: [1]
+            priority: [1],
+            header_pill: "orange"
           },
           header: nil,
           reconstructed_alert_widget: nil,
