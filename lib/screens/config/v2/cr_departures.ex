@@ -16,9 +16,9 @@ defmodule Screens.Config.V2.CRDepartures do
           direction_to_destination: 0 | 1,
           priority: WidgetInstance.priority(),
           travel_time_to_destination: String.t(),
-          show_via_headsigns_message: true | false,
           wayfinding_arrows: platform_directions(),
-          enabled: boolean()
+          enabled: boolean(),
+          header_pill: :red | :blue | :green | :orange
         }
 
   defstruct station: nil,
@@ -26,9 +26,9 @@ defmodule Screens.Config.V2.CRDepartures do
             direction_to_destination: nil,
             priority: nil,
             travel_time_to_destination: nil,
-            show_via_headsigns_message: nil,
             wayfinding_arrows: nil,
-            enabled: false
+            enabled: false,
+            header_pill: nil
 
   use Screens.Config.Struct, with_default: true
 
