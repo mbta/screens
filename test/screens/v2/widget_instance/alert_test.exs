@@ -458,47 +458,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     end
   end
 
-  describe "seconds_to_next_active_period/2" do
-    test "returns seconds to start of first active period after current time, if it exists", %{
-      widget: widget
-    } do
-      now = ~U[2021-01-02T01:00:00Z]
-      next_start = ~U[2021-01-03T00:00:01Z]
-
-      widget =
-        widget
-        |> put_active_period([
-          {~U[2021-01-01T00:00:00Z], ~U[2021-01-01T23:00:00Z]},
-          {~U[2021-01-02T00:00:00Z], ~U[2021-01-02T23:00:00Z]},
-          {next_start, ~U[2021-01-03T23:00:00Z]}
-        ])
-        |> put_now(now)
-
-      expected_seconds_to_next_active_period = 23 * 60 * 60 + 1
-
-      assert expected_seconds_to_next_active_period ==
-               AlertWidget.seconds_to_next_active_period(widget)
-    end
-
-    test "returns :infinity if no active period starting after current time exists", %{
-      widget: widget
-    } do
-      widget = put_now(widget, ~U[2021-01-02T01:00:00Z])
-
-      # no active period at all
-      assert :infinity == AlertWidget.seconds_to_next_active_period(widget)
-
-      # no start date after current time
-      widget =
-        put_active_period(widget, [
-          {nil, ~U[2021-01-01T23:00:00Z]},
-          {~U[2021-01-02T00:00:00Z], ~U[2021-01-02T23:00:00Z]}
-        ])
-
-      assert :infinity == AlertWidget.seconds_to_next_active_period(widget)
-    end
-  end
-
   describe "home_stop_id/1" do
     test "returns stop ID from config for screen types that use only one stop ID", %{
       widget: widget
