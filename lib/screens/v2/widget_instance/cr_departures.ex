@@ -51,7 +51,6 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           ),
         station: station,
         destination: destination,
-        time_to_destination: config.travel_time_to_destination,
         direction: direction_to_destination,
         header_pill: RoutePill.serialize_icon(header_pill)
       }
