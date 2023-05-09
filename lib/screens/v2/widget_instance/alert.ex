@@ -3,7 +3,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
-  alias Screens.LocationContext  
+  alias Screens.LocationContext
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
@@ -101,13 +101,14 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   defp serialize_route_pills(%__MODULE__{screen: %Screen{app_id: app_id}} = t) do
-    routes = if app_id === :gl_eink_v2 do
-      # Get route pills for alert, including that on connecting GL branches
-      BaseAlert.informed_subway_routes(t)
-    else
-      # Get route pills for an alert, but only the routes that are at this stop
-      BaseAlert.informed_routes_at_home_stop(t)
-    end
+    routes =
+      if app_id === :gl_eink_v2 do
+        # Get route pills for alert, including that on connecting GL branches
+        BaseAlert.informed_subway_routes(t)
+      else
+        # Get route pills for an alert, but only the routes that are at this stop
+        BaseAlert.informed_routes_at_home_stop(t)
+      end
 
     if length(routes) <= 3 do
       routes

@@ -430,24 +430,22 @@ defmodule Screens.Stops.Stop do
   @doc """
   Fetches all the location context for a screen given its app type, stop id, and time
   """
-  @spec fetch_location_context(BusEink | BusShelter | GlEink | PreFare | Dup, DateTime.t(), list(atom())) :: LocationContext.t()
+  @spec fetch_location_context(
+          BusEink | BusShelter | GlEink | PreFare | Dup,
+          Stop.id(),
+          DateTime.t()
+        ) :: LocationContext.t()
   def fetch_location_context(app, stop_id, now) do
     alert_route_types = get_route_type_filter(app, stop_id)
     {:ok, routes_at_stop} = Route.fetch_routes_by_stop(stop_id, now, alert_route_types)
     route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id)
-    {:ok, stop_sequences} = if app in [BusEink, BusShelter, GlEink] do
-      RoutePattern.fetch_stop_sequences_through_stop(stop_id)
-    else
-      RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids_at_stop)
-    end
-    
-    alert_route_types = if alert_route_types === [] do
-      routes_at_stop
-      |> Enum.map(& &1.type)
-      |> Enum.uniq()
-    else
-      alert_route_types
-    end
+
+    {:ok, stop_sequences} =
+      if app in [BusEink, BusShelter, GlEink] do
+        RoutePattern.fetch_stop_sequences_through_stop(stop_id)
+      else
+        RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids_at_stop)
+      end
 
     %LocationContext{
       home_stop: stop_id,
@@ -460,10 +458,9 @@ defmodule Screens.Stops.Stop do
     }
   end
 
-  @doc """
-  Returns the route types we care about for the alerts of this screen type / place
-  """
-  @spec get_route_type_filter(BusEink | BusShelter | GlEink | PreFare | Dup, String.t()) :: list(atom())
+  # Returns the route types we care about for the alerts of this screen type / place
+  @spec get_route_type_filter(BusEink | BusShelter | GlEink | PreFare | Dup, String.t()) ::
+          list(atom())
   defp get_route_type_filter(app, _) when app in [BusEink, BusShelter], do: [:bus]
   defp get_route_type_filter(GlEink, _), do: [:light_rail]
   defp get_route_type_filter(PreFare, _), do: [:light_rail, :subway]

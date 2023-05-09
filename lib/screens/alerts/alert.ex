@@ -282,7 +282,7 @@ defmodule Screens.Alerts.Alert do
       -new_service_in_next_two_weeks(alert),
       -happening_now_key(alert),
       -new_info_in_last_two_weeks(alert),
-      effect_index(alert),
+      effect_index(alert.effect),
       alert.id
     }
   end
