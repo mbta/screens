@@ -14,364 +14,1094 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
     end
   end
 
-  describe "serialize_route/2" do
+  describe "serialize/1" do
     test "returns normal service when there are no alerts" do
-      blue_line_alerts = []
-      grouped_alerts = %{"Blue" => blue_line_alerts}
-      assert %{status: "Normal Service"} = SubwayStatus.serialize_route(grouped_alerts, "Blue")
-    end
-
-    test "handles multiple alerts" do
-      blue_line_alerts = [
-        %Alert{effect: :shuttle},
-        %Alert{effect: :suspension}
-      ]
-
-      grouped_alerts = %{"Blue" => blue_line_alerts}
-      assert %{status: "2 alerts"} = SubwayStatus.serialize_route(grouped_alerts, "Blue")
-    end
-
-    test "handles shuttle alert" do
-      blue_line_alerts = [
-        %Alert{
-          effect: :shuttle,
-          informed_entities: [
-            %{stop: "place-aport"},
-            %{stop: "place-mvbcl"},
-            %{stop: "place-aqucl"}
-          ]
-        }
-      ]
-
-      grouped_alerts = %{"Blue" => blue_line_alerts}
-
-      assert %{
-               status: "Shuttle Buses",
-               location: %{full: "Airport to Aquarium", abbrev: "Airport to Aquarium"}
-             } = SubwayStatus.serialize_route(grouped_alerts, "Blue")
-    end
-
-    test "handles whole line shuttle alert" do
-      blue_line_alerts = [
-        %Alert{
-          effect: :shuttle,
-          informed_entities: [%{route: "Blue", stop: nil, direction_id: nil}]
-        }
-      ]
-
-      grouped_alerts = %{"Blue" => blue_line_alerts}
-
-      assert %{status: "Shuttle Buses", location: nil} =
-               SubwayStatus.serialize_route(grouped_alerts, "Blue")
-    end
-
-    test "handles suspension alert" do
-      blue_line_alerts = [
-        %Alert{
-          effect: :suspension,
-          informed_entities: [
-            %{stop: "place-aport"},
-            %{stop: "place-mvbcl"},
-            %{stop: "place-aqucl"}
-          ]
-        }
-      ]
-
-      grouped_alerts = %{"Blue" => blue_line_alerts}
-
-      assert %{
-               status: "Suspension",
-               location: %{full: "Airport to Aquarium", abbrev: "Airport to Aquarium"}
-             } = SubwayStatus.serialize_route(grouped_alerts, "Blue")
-    end
-
-    test "handles whole line suspension alert" do
-      blue_line_alerts = [
-        %Alert{
-          effect: :suspension,
-          informed_entities: [%{route: "Blue", stop: nil, direction_id: nil}]
-        }
-      ]
-
-      grouped_alerts = %{"Blue" => blue_line_alerts}
-
-      assert %{status: "SERVICE SUSPENDED", location: nil} =
-               SubwayStatus.serialize_route(grouped_alerts, "Blue")
-    end
-
-    test "handles delay alert" do
-      blue_line_alerts = [
-        %Alert{
-          effect: :delay,
-          severity: 3,
-          informed_entities: [%{route: "Blue", stop: nil, direction_id: nil}]
-        }
-      ]
-
-      grouped_alerts = %{"Blue" => blue_line_alerts}
-
-      assert %{status: "Delays up to 10m", location: nil} =
-               SubwayStatus.serialize_route(grouped_alerts, "Blue")
-    end
-
-    test "handles directional delay alert" do
-      blue_line_alerts = [
-        %Alert{
-          effect: :delay,
-          severity: 9,
-          informed_entities: [%{route: "Blue", stop: nil, direction_id: 1}]
-        }
-      ]
-
-      grouped_alerts = %{"Blue" => blue_line_alerts}
-
-      assert %{
-               status: "Delays over 60m",
-               location: %{full: "Eastbound", abbrev: "Eastbound"}
-             } = SubwayStatus.serialize_route(grouped_alerts, "Blue")
-    end
-
-    test "handles single station closure" do
-      blue_line_alerts = [
-        %Alert{effect: :station_closure, informed_entities: [%{stop: "place-orhte"}]}
-      ]
-
-      grouped_alerts = %{"Blue" => blue_line_alerts}
-
-      assert %{status: "Bypassing", location: %{full: "Orient Heights", abbrev: "Orient Hts"}} =
-               SubwayStatus.serialize_route(grouped_alerts, "Blue")
-    end
-
-    test "handles 2 station closure" do
-      blue_line_alerts = [
-        %Alert{
-          effect: :station_closure,
-          informed_entities: [%{stop: "place-orhte"}, %{stop: "place-rbmnl"}]
-        }
-      ]
-
-      grouped_alerts = %{"Blue" => blue_line_alerts}
-
-      assert %{
-               status: "Bypassing",
-               location: %{
-                 full: "Orient Heights and Revere Beach",
-                 abbrev: "Orient Hts and Revere Bch"
-               }
-             } = SubwayStatus.serialize_route(grouped_alerts, "Blue")
-    end
-
-    test "handles 3 station closure" do
-      blue_line_alerts = [
-        %Alert{
-          effect: :station_closure,
-          informed_entities: [
-            %{stop: "place-orhte"},
-            %{stop: "place-rbmnl"},
-            %{stop: "place-gover"}
-          ]
-        }
-      ]
-
-      grouped_alerts = %{"Blue" => blue_line_alerts}
-
-      assert %{status: "Bypassing", location: %{full: "3 stops", abbrev: "3 stops"}} =
-               SubwayStatus.serialize_route(grouped_alerts, "Blue")
-    end
-  end
-
-  describe "serialize_green_line/1" do
-    test "handles single branch shuttle" do
-      green_b_alerts = [
-        %Alert{
-          effect: :shuttle,
-          informed_entities: [
-            %{route: "Green-B", stop: "place-chill"},
-            %{route: "Green-B", stop: "place-sougr"},
-            %{route: "Green-B", stop: "place-lake"}
-          ]
-        }
-      ]
-
-      grouped_alerts = %{"Green-B" => green_b_alerts}
-
-      assert %{
-               branch: "Green-B",
-               location: %{
-                 full: "Chestnut Hill Avenue to Boston College",
-                 abbrev: "Chestnut Hl to Boston Coll"
-               },
-               status: "Shuttle Buses",
-               type: :single
-             } = SubwayStatus.serialize_green_line(grouped_alerts)
-    end
-
-    test "handles concurrent branch shuttles" do
-      green_b_alerts = [
-        %Alert{
-          effect: :shuttle,
-          informed_entities: [
-            %{route: "Green-B", stop: "place-chill"},
-            %{route: "Green-B", stop: "place-sougr"},
-            %{route: "Green-B", stop: "place-lake"}
-          ]
-        }
-      ]
-
-      green_d_alerts = [
-        %Alert{
-          effect: :shuttle,
-          informed_entities: [
-            %{route: "Green-D", stop: "place-newto"},
-            %{route: "Green-D", stop: "place-newtn"},
-            %{route: "Green-D", stop: "place-eliot"}
-          ]
-        }
-      ]
-
-      grouped_alerts = %{
-        "Green-B" => green_b_alerts,
-        "Green-D" => green_d_alerts
+      instance = %SubwayStatus{
+        subway_alerts: []
       }
 
-      assert %{statuses: [[["Green-B", "Green-D"], "Shuttle Buses"]], type: :multiple} ==
-               SubwayStatus.serialize_green_line(grouped_alerts)
-    end
-
-    test "handles concurrent branch shuttle and suspension" do
-      green_b_alerts = [
-        %Alert{
-          effect: :shuttle,
-          informed_entities: [
-            %{route: "Green-B", stop: "place-chill"},
-            %{route: "Green-B", stop: "place-sougr"},
-            %{route: "Green-B", stop: "place-lake"}
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Normal Service"
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green},
+              status: "Normal Service"
+            }
           ]
         }
-      ]
-
-      green_d_alerts = [
-        %Alert{
-          effect: :suspension,
-          informed_entities: [
-            %{route: "Green-D", stop: "place-newto"},
-            %{route: "Green-D", stop: "place-newtn"},
-            %{route: "Green-D", stop: "place-eliot"}
-          ]
-        }
-      ]
-
-      grouped_alerts = %{
-        "Green-B" => green_b_alerts,
-        "Green-D" => green_d_alerts
       }
 
-      assert %{
-               statuses: [[["Green-B"], "Shuttle Buses"], [["Green-D"], "Suspension"]],
-               type: :multiple
-             } ==
-               SubwayStatus.serialize_green_line(grouped_alerts)
+      assert expected == WidgetInstance.serialize(instance)
     end
 
-    test "handles trunk alert" do
-      trunk_alerts = [
-        %Alert{
-          effect: :shuttle,
-          informed_entities: [
-            %{route: "Green-B", stop: "place-pktrm"},
-            %{route: "Green-B", stop: "place-boyls"},
-            %{route: "Green-B", stop: "place-armnl"},
-            %{route: "Green-B", stop: "place-coecl"},
-            %{route: "Green-C", stop: "place-pktrm"},
-            %{route: "Green-C", stop: "place-boyls"},
-            %{route: "Green-C", stop: "place-armnl"},
-            %{route: "Green-C", stop: "place-coecl"},
-            %{route: "Green-D", stop: "place-pktrm"},
-            %{route: "Green-D", stop: "place-boyls"},
-            %{route: "Green-D", stop: "place-armnl"},
-            %{route: "Green-D", stop: "place-coecl"},
-            %{route: "Green-E", stop: "place-pktrm"},
-            %{route: "Green-E", stop: "place-boyls"},
-            %{route: "Green-E", stop: "place-armnl"},
-            %{route: "Green-E", stop: "place-coecl"}
-          ]
-        }
-      ]
-
-      grouped_alerts = %{
-        "Green-B" => trunk_alerts,
-        "Green-C" => trunk_alerts,
-        "Green-D" => trunk_alerts,
-        "Green-E" => trunk_alerts
+    test "handles station closure alert with 4+ stops" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :station_closure,
+            informed_entities: [
+              %{route: "Blue", stop: "place-aport"},
+              %{route: "Blue", stop: "place-mvbcl"},
+              %{route: "Blue", stop: "place-aqucl"},
+              %{route: "Blue", stop: "place-state"}
+            ]
+          }
+        ]
       }
 
-      assert %{
-               location: %{full: "Park Street to Copley", abbrev: "Park St to Copley"},
-               status: "Shuttle Buses",
-               type: :single
-             } = SubwayStatus.serialize_green_line(grouped_alerts)
-    end
-
-    test "handles normal service" do
-      grouped_alerts = %{}
-
-      assert %{status: "Normal Service", type: :single} =
-               SubwayStatus.serialize_green_line(grouped_alerts)
-    end
-
-    test "handles alert affecting all branches" do
-      alert = [
-        %Alert{
-          effect: :delay,
-          severity: 3,
-          informed_entities: [
-            %{route: "Green-B", direction_id: nil, stop: nil},
-            %{route: "Green-C", direction_id: nil, stop: nil},
-            %{route: "Green-D", direction_id: nil, stop: nil},
-            %{route: "Green-E", direction_id: nil, stop: nil}
+      expected = %{
+        blue: %{
+          type: :extended,
+          alert: %{
+            route_pill: %{type: :text, text: "BL", color: :blue},
+            status: "Bypassing 4 stops",
+            location: %{
+              abbrev: "mbta.com/alerts",
+              full: "mbta.com/alerts"
+            }
+          }
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green},
+              status: "Normal Service"
+            }
           ]
         }
-      ]
-
-      grouped_alerts = %{
-        "Green-B" => alert,
-        "Green-C" => alert,
-        "Green-D" => alert,
-        "Green-E" => alert
       }
 
-      assert %{
-               location: nil,
-               status: "Delays up to 10m",
-               type: :single
-             } = SubwayStatus.serialize_green_line(grouped_alerts)
+      assert expected == WidgetInstance.serialize(instance)
     end
 
-    test "handles directional delay alert" do
-      alert = [
-        %Alert{
-          effect: :delay,
-          severity: 9,
-          informed_entities: [
-            %{route: "Green-B", direction_id: 1, stop: nil},
-            %{route: "Green-C", direction_id: 1, stop: nil},
-            %{route: "Green-D", direction_id: 1, stop: nil},
-            %{route: "Green-E", direction_id: 1, stop: nil}
-          ]
-        }
-      ]
-
-      grouped_alerts = %{
-        "Green-B" => alert,
-        "Green-C" => alert,
-        "Green-D" => alert,
-        "Green-E" => alert
+    test "handles station closure alert with 3 stops" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :station_closure,
+            informed_entities: [
+              %{route: "Blue", stop: "place-aport"},
+              %{route: "Blue", stop: "place-mvbcl"},
+              %{route: "Blue", stop: "place-aqucl"}
+            ]
+          }
+        ]
       }
 
-      assert %{
-               status: "Delays over 60m",
-               location: %{full: "Eastbound", abbrev: "Eastbound"}
-             } = SubwayStatus.serialize_green_line(grouped_alerts)
+      expected = %{
+        blue: %{
+          type: :extended,
+          alert: %{
+            route_pill: %{type: :text, text: "BL", color: :blue},
+            status: "Bypassing",
+            location: %{
+              abbrev: "Airport, Maverick & Aquarium",
+              full: "Airport, Maverick & Aquarium"
+            }
+          }
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green},
+              status: "Normal Service"
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 1 alert" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :station_closure,
+            informed_entities: [
+              %{route: "Blue", stop: "place-aport"},
+              %{route: "Blue", stop: "place-mvbcl"}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :extended,
+          alert: %{
+            route_pill: %{type: :text, text: "BL", color: :blue},
+            status: "Bypassing",
+            location: %{abbrev: "Airport and Maverick", full: "Airport and Maverick"}
+          }
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green},
+              status: "Normal Service"
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 2 alerts, 2 routes" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :suspension,
+            informed_entities: [
+              %{route: "Blue", stop: "place-aport"},
+              %{route: "Blue", stop: "place-mvbcl"},
+              %{route: "Blue", stop: "place-aqucl"}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Green-B", stop: nil},
+              %{route: "Green-C", stop: nil},
+              %{route: "Green-D", stop: nil},
+              %{route: "Green-E", stop: nil}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :extended,
+          alert: %{
+            route_pill: %{type: :text, text: "BL", color: :blue},
+            status: "Suspension",
+            location: %{abbrev: "Airport to Aquarium", full: "Airport to Aquarium"}
+          }
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :extended,
+          alert: %{
+            route_pill: %{type: :text, text: "GL", color: :green},
+            status: "Delays up to 20 minutes",
+            location: nil
+          }
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 2 alerts, 1 non-GL route" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :suspension,
+            informed_entities: [
+              %{route: "Blue", stop: "place-aport"}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Blue", stop: "place-aport"},
+              %{route: "Blue", stop: "place-mvbcl"},
+              %{route: "Blue", stop: "place-aqucl"}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Suspension",
+              location: %{abbrev: "Airport", full: "Airport"}
+            },
+            %{
+              status: "Delays up to 20 minutes",
+              location: %{abbrev: "Airport to Aquarium", full: "Airport to Aquarium"}
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green},
+              status: "Normal Service"
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 4 alerts, 2 non-GL routes" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :suspension,
+            informed_entities: [
+              %{route: "Blue", stop: "place-aport"},
+              %{route: "Blue", stop: "place-mvbcl"},
+              %{route: "Blue", stop: "place-aqucl"}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Blue", stop: "place-aport"},
+              %{route: "Blue", stop: "place-mvbcl"},
+              %{route: "Blue", stop: "place-aqucl"}
+            ]
+          },
+          %Alert{
+            effect: :suspension,
+            informed_entities: [
+              %{route: "Orange", stop: "place-ogmnl"},
+              %{route: "Orange", stop: "place-mlmnl"},
+              %{route: "Orange", stop: "place-welln"}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Orange", stop: "place-ogmnl"},
+              %{route: "Orange", stop: "place-mlmnl"},
+              %{route: "Orange", stop: "place-welln"}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "2 current alerts",
+              location: "mbta.com/alerts"
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "2 current alerts",
+              location: "mbta.com/alerts"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green},
+              status: "Normal Service"
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 3 alerts, 2 non-GL routes" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :station_closure,
+            informed_entities: [
+              %{route: "Blue", stop: "place-aport"}
+            ]
+          },
+          %Alert{
+            effect: :suspension,
+            informed_entities: [
+              %{route: "Orange", stop: "place-ogmnl"},
+              %{route: "Orange", stop: "place-mlmnl"},
+              %{route: "Orange", stop: "place-welln"}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Orange", stop: "place-ogmnl"},
+              %{route: "Orange", stop: "place-mlmnl"},
+              %{route: "Orange", stop: "place-welln"}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Bypassing",
+              location: %{abbrev: "Airport", full: "Airport"}
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "2 current alerts",
+              location: "mbta.com/alerts"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green},
+              status: "Normal Service"
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 1 alert on GL trunk and 1 alert on GL branch" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :suspension,
+            informed_entities: [
+              %{route: "Green-C", stop: "place-gover"},
+              %{route: "Green-C", stop: "place-pktrm"},
+              %{route: "Green-C", stop: "place-boyls"}
+            ]
+          },
+          %Alert{
+            effect: :station_closure,
+            informed_entities: [
+              %{route: "Green-D", stop: "place-woodl"},
+              %{route: "Green-D", stop: "place-river"}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Normal Service"
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green},
+              status: "Suspension",
+              location: %{abbrev: "Gov't Ctr to Boylston", full: "Government Center to Boylston"}
+            },
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:d]},
+              status: "Bypassing",
+              location: %{abbrev: "Woodland and Riverside", full: "Woodland and Riverside"}
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 1 alert on GL trunk and 2 alerts on GL branch" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :suspension,
+            informed_entities: [
+              %{route: "Green-C", stop: "place-gover"},
+              %{route: "Green-C", stop: "place-pktrm"},
+              %{route: "Green-C", stop: "place-boyls"}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Green-B", stop: nil}
+            ]
+          },
+          %Alert{
+            effect: :station_closure,
+            informed_entities: [
+              %{route: "Green-E", stop: "place-symcl"},
+              %{route: "Green-E", stop: "place-nuniv"}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Normal Service"
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green},
+              status: "Suspension",
+              location: %{abbrev: "Gov't Ctr to Boylston", full: "Government Center to Boylston"}
+            },
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:b, :e]},
+              status: "2 current alerts",
+              location: "mbta.com/alerts"
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 2 alerts on GL trunk" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :suspension,
+            informed_entities: [
+              %{route: "Green-C", stop: "place-gover"},
+              %{route: "Green-C", stop: "place-pktrm"},
+              %{route: "Green-C", stop: "place-boyls"}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Green-E", stop: "place-lech"},
+              %{route: "Green-E", stop: "place-spmnl"},
+              %{route: "Green-E", stop: "place-north"}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Normal Service"
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              location: %{abbrev: "Gov't Ctr to Boylston", full: "Government Center to Boylston"},
+              route_pill: %{color: :green, text: "GL", type: :text},
+              status: "Suspension"
+            },
+            %{
+              location: %{abbrev: "Lechmere to North Sta", full: "Lechmere to North Station"},
+              route_pill: %{color: :green, text: "GL", type: :text},
+              status: "Delays up to 20 minutes"
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 2 alerts on GL branches" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :delay,
+            severity: 9,
+            informed_entities: [
+              %{route: "Green-C", stop: nil}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Green-B", stop: nil}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Normal Service"
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:b]},
+              status: "Delays up to 20 minutes",
+              location: nil
+            },
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:c]},
+              status: "Delays over 60 minutes",
+              location: nil
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 3+ alerts on GL branches" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :delay,
+            severity: 9,
+            informed_entities: [
+              %{route: "Green-C", stop: nil}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Green-B", stop: nil}
+            ]
+          },
+          %Alert{
+            effect: :station_closure,
+            informed_entities: [
+              %{route: "Green-E", stop: "place-symcl"},
+              %{route: "Green-E", stop: "place-nuniv"}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Normal Service"
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:b, :c, :e]},
+              status: "3 current alerts",
+              location: "mbta.com/alerts"
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 2 alerts on GL branches and 1 alert on non-GL route" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :delay,
+            severity: 9,
+            informed_entities: [
+              %{route: "Green-C", stop: nil}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Green-B", stop: nil}
+            ]
+          },
+          %Alert{
+            effect: :station_closure,
+            informed_entities: [
+              %{route: "Orange", stop: "place-ogmnl"}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Normal Service"
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Bypassing",
+              location: %{abbrev: "Oak Grove", full: "Oak Grove"}
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:b]},
+              status: "Delays up to 20 minutes",
+              location: nil
+            },
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:c]},
+              status: "Delays over 60 minutes",
+              location: nil
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 2 alerts on GL trunk and 1 alert on GL branch" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :delay,
+            severity: 9,
+            informed_entities: [
+              %{route: "Green-C", stop: nil}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Green-D", stop: "place-gover"},
+              %{route: "Green-D", stop: "place-pktrm"},
+              %{route: "Green-D", stop: "place-boyls"}
+            ]
+          },
+          %Alert{
+            effect: :station_closure,
+            informed_entities: [
+              %{route: "Green-D", stop: "place-unsqu"}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Normal Service"
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green},
+              status: "3 current alerts",
+              location: "mbta.com/alerts"
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 2 alerts on GL branches and 2 alerts on non-GL route" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :delay,
+            severity: 9,
+            informed_entities: [
+              %{route: "Green-C", stop: nil}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Green-B", stop: nil}
+            ]
+          },
+          %Alert{
+            effect: :station_closure,
+            informed_entities: [
+              %{route: "Orange", stop: "place-ogmnl"}
+            ]
+          },
+          %Alert{
+            effect: :delay,
+            severity: 5,
+            informed_entities: [
+              %{route: "Orange", stop: nil}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Normal Service"
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "2 current alerts",
+              location: "mbta.com/alerts"
+            }
+          ]
+        },
+        red: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "RL", color: :red},
+              status: "Normal Service"
+            }
+          ]
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:b]},
+              status: "Delays up to 20 minutes",
+              location: nil
+            },
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:c]},
+              status: "Delays over 60 minutes",
+              location: nil
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
     end
   end
 
