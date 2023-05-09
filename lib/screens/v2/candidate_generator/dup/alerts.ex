@@ -46,7 +46,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
       end
 
     with location_context <- fetch_location_context_fn.(Dup, stop_id, now),
-        # TODO: check to see if mattapan ids are passing to alerts fetch
+         # TODO: check to see if mattapan ids are passing to alerts fetch
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: location_context.route_ids_at_stop) do
       alerts
       |> Enum.filter(&relevant_alert?(&1, config, location_context, now))
@@ -142,6 +142,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   # TODO: This is using a "WidgetInstance" function in the candidate_generator
   # Does this mean we should move some BaseAlert utils to just the Alert util func?
+  @spec relevant_location?(DupAlert.t()) :: boolean()
   defp relevant_location?(dup_alert) do
     BaseAlert.location(dup_alert) in [:inside, :boundary_upstream, :boundary_downstream]
   end

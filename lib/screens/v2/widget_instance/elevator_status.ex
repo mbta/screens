@@ -190,27 +190,32 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   end
 
   @spec alert_is_relevant?(Alert.t(), t(), atom()) :: boolean()
-  defp alert_is_relevant?(%Alert{effect: :elevator_closure, informed_entities: entities} = alert,
-      %__MODULE__{location_context: location_context, now: now},
-      option
-    ) do
-
+  defp alert_is_relevant?(
+         %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
+         %__MODULE__{location_context: location_context, now: now},
+         option
+       ) do
     active = Alert.happening_now?(alert, now)
     here = Enum.any?(entities, fn e -> e.stop == location_context.home_stop end)
 
-    case option do 
-      :upcoming -> not active and here
-      :here -> active and here
-      :downstream -> 
+    case option do
+      :upcoming ->
+        not active and here
+
+      :here ->
+        active and here
+
+      :downstream ->
         alert_location = BaseAlert.location(%{alert: alert, location_context: location_context})
-        active and alert_location === :upstream or alert_location === :downstream
+        (active and alert_location === :upstream) or (alert_location === :downstream)
+
       :elsewhere ->
-        active and entities
-            |> get_stations_from_entities()
-            |> Enum.any?(fn station -> station != location_context.home_stop end)
+        active and
+          entities
+          |> get_stations_from_entities()
+          |> Enum.any?(fn station -> station != location_context.home_stop end)
     end
   end
-
 
   defp sort_elsewhere(e1, _e2, %__MODULE__{location_context: %{stop_sequences: stop_sequences}}) do
     stations = get_stations_from_entities(e1)

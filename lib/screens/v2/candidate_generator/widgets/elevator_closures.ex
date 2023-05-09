@@ -16,7 +16,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
         now \\ DateTime.utc_now(),
         fetch_location_context_fn \\ &Stop.fetch_location_context/3
       ) do
-    with  location_context <- fetch_location_context_fn.(PreFare, parent_station_id, now),
+    with location_context <- fetch_location_context_fn.(PreFare, parent_station_id, now),
          {:ok, parent_station_map} <- Stop.fetch_parent_station_name_map(),
          {:ok, elevator_closures, facility_id_to_name} <- fetch_elevator_closures() do
       icon_map = get_icon_map(elevator_closures, parent_station_id)
