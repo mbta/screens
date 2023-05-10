@@ -1,0 +1,148 @@
+.subway-status {
+  /// Reusable values for the component
+  /// (Defined here to avoid polluting the global namespace)
+  $text-dark-gray: #171f26;
+  $widget-background: #e4e6e1;
+  $rule-color: #cccbc8;
+
+  /// End variables
+  /// Begin styles
+
+  width: 1024px;
+  height: 576px;
+  overflow: hidden;
+
+  box-sizing: border-box;
+  padding-top: 6px;
+
+  background: $widget-background;
+  color: $text-dark-gray;
+  font-family: Inter, sans-serif;
+
+  // Check with design on these--couldn't get these values
+  // out of figma inspector so they're copy-pasted from the v1 styles
+  border-radius: 16px;
+  box-shadow: 0px 12px 24px 0px rgba(23, 31, 38, 0.25);
+
+  .subway-status_status {
+    position: relative;
+
+    width: 100%;
+
+    box-sizing: border-box;
+    padding-top: 18px;
+    padding-left: 24px;
+
+    overflow: hidden;
+  }
+
+  .subway-status_status--contracted.subway-status_status--one-alert {
+    height: 114px;
+  }
+
+  .subway-status_status--contracted.subway-status_status--two-alerts:not(.subway-status_status--has-second-pill) {
+    height: 228px;
+  }
+
+  // height not needed for 2 alerts + 2 pills because this can only happen for the GL status,
+  // which always appears last and has nothing below it (not even the last
+  // rule, since the 2nd pill means we don't show it--see `shouldShowLastRule` JS function)
+  //
+  // &--contracted.subway-status_status--two-alerts.subway-status_status--has-second-pill {}
+
+  .subway-status_status--extended {
+    height: 163px;
+  }
+
+  // Since the rule is positioned absolutely over the row without
+  // adding any height, we can't use an ::after pseudo-element.
+  // Instead, whether to include the rule or not is determined
+  // in the React code and it's rendered as a real element.
+  .subway-status_status_rule {
+    content: "";
+
+    position: absolute;
+    bottom: 0;
+    right: 24px;
+
+    width: 808px;
+    height: 4px;
+
+    background: $rule-color;
+    border-radius: 2px;
+  }
+
+  .subway-status_alert {
+    // TODO: any common styles?
+  }
+
+  // The top margin for the second contracted alert
+  // in a section depends on whether it has a pill or not.
+  .subway-status_alert:nth-of-type(2) {
+    &.subway-status_alert--has-pill {
+      margin-top: 32px;
+    }
+
+    &.subway-status_alert--no-pill {
+      margin-top: 7px;
+    }
+  }
+
+  .subway-status_alert_route-pill-container {
+    display: inline-block;
+    // If the row has no pill, we still keep this element as a pill-sized
+    // spacer to maintain consistent positioning of everything else in the row.
+    min-width: 144px;
+    height: 74px;
+  }
+
+  .subway-status_alert_text-container {
+    display: inline-block;
+    vertical-align: top;
+    width: fit-content;
+    max-width: 100%;
+    margin-left: 24px;
+  }
+
+  .subway-status_status--contracted .subway-status_alert_text-container {
+    height: 74px;
+  }
+
+  .subway-status_alert_text-container.subway-status_alert_text-container--hide-overflow {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
+  }
+
+  span.subway-status_alert_status-text {
+    // common text styles go here!
+    font-weight: 800;
+    line-height: 74px;
+    font-size: 48px;
+  }
+
+  span.subway-status_alert_status-text.subway-status_alert_status-text--normal-service {
+    // "Normal Service" gets thinner text
+    font-weight: 500;
+    font-size: 40px;
+  }
+
+  span.subway-status_alert_location-text {
+    font-weight: 500;
+    font-size: 32px;
+    line-height: 74px;
+  }
+
+  .subway-status_status--contracted span.subway-status_alert_location-text {
+    margin-left: 16px;
+  }
+
+  .subway-status_status--extended span.subway-status_alert_location-text {
+    display: block;
+    margin-top: 4px;
+  }
+
+  .branch-icon {
+    margin-left: 5px;
+  }
+}
