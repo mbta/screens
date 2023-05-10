@@ -83,7 +83,7 @@ const isExtended = (section: Section): section is ExtendedSection =>
 ////////////////
 
 const SubwayStatus: ComponentType<SubwayStatusData> = (props) => {
-  const { blue, orange, red, green } = props;
+  const { blue, orange, red, green } = cleanUpServerData(props);
 
   return (
     <div className="subway-status">
@@ -305,10 +305,24 @@ const GLBranchPillGroup: ComponentType<Pick<GLMultiPill, "branches">> = ({ branc
 /////////////
 
 /**
+ * Tweaks the widget data received from the server to avoid awkward presentation in exceptional cases:
+ * - Converts extended statuses with no location text to single-row contracted statuses
+ */
+const cleanUpServerData = (data: SubwayStatusData): SubwayStatusData => ({
+  blue: convertLocationlessExtendedAlertToContracted(data.blue),
+  orange: convertLocationlessExtendedAlertToContracted(data.orange),
+  red: convertLocationlessExtendedAlertToContracted(data.red),
+  green: convertLocationlessExtendedAlertToContracted(data.green)
+});
+
+const convertLocationlessExtendedAlertToContracted = (section: Section): Section =>
+  isExtendedWithNoLocation(section) ? { type: "contracted", alerts: [section.alert] } : section;
+
+/**
  * Uniquely identifies an alert line so that if anything changes, the text-
  * resizing logic resets.
  */
-const getAlertID = (alert: Alert, statusType: "contracted" | "extended", index: number): string => {
+const getAlertID = (alert: Alert, statusType: Section["type"], index: number): string => {
   const location = isAlertLocationMap(alert.location)
     ? `${alert.location.abbrev}-${alert.location.full}`
     : alert.location;
@@ -368,8 +382,11 @@ const shouldShowLastRule = ({ blue, orange, red, green }: SubwayStatusData) => {
 const getStandardLinePillPath = (lineColor: LineColor) =>
   pillPath(`${lineColor}-line.svg`);
 
-const isContractedWith1Alert = (section: Section) =>
+const isContractedWith1Alert = (section: Section): section is ContractedSection =>
   isContracted(section) && section.alerts.length === 1;
+
+const isExtendedWithNoLocation = (section: Section): section is ExtendedSection =>
+  isExtended(section) && !section.alert.location;
 
 const getGLComboPillPath = (branch: GLBranch) =>
   pillPath(`gl-${branch}.svg`);
