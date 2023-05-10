@@ -391,6 +391,23 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     }
   end
 
+  # If only one branch is affected, we can still determine a stop
+  # range to show, for applicable alert types
+  def serialize_green_line_branch_alert(alert, [route_id]) do
+    Map.merge(
+      %{route_pill: serialize_gl_pill_with_branches([route_id])},
+      serialize_alert(alert, route_id)
+    )
+  end
+
+  # Otherwise, give up on determining a stop range.
+  def serialize_green_line_branch_alert(alert, route_ids) do
+    Map.merge(
+      %{route_pill: serialize_gl_pill_with_branches(route_ids)},
+      serialize_alert(alert, "Green")
+    )
+  end
+
   def serialize_green_line_branch_alert(alert, route_ids),
     do:
       Map.merge(
