@@ -2,7 +2,7 @@
   /// Reusable values for the component
   /// (Defined here to avoid polluting the global namespace)
   $text-dark-gray: #171f26;
-  $widget-background: #e4e6e1;
+  $widget-background: #e5e4e1;
   $rule-color: #cccbc8;
 
   /// End variables
@@ -102,7 +102,7 @@
     margin-left: 24px;
   }
 
-  .subway-status_status--contracted .subway-status_alert_text-container {
+  .subway-status_status--contracted .subway-status_alert_text-container.subway-status_alert_text-container--hide-overflow {
     height: 74px;
   }
 
