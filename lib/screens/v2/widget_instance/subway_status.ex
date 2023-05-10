@@ -80,7 +80,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       end
     end
 
-    def slot_names(_instance), do: [:large]
+    def slot_names(_instance), do: [:large, :medium]
 
     def widget_type(_instance), do: :subway_status
 
