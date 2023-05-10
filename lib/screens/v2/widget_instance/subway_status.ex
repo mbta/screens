@@ -323,10 +323,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
        ) do
     location = get_location(informed_entities, route_id)
 
-    status =
-      if is_nil(location) or location == "Entire line",
-        do: "SERVICE SUSPENDED",
-        else: "Suspension"
+    status = if location == "Entire line", do: "SERVICE SUSPENDED", else: "Suspension"
 
     %{status: status, location: location}
   end
