@@ -19,8 +19,6 @@
   color: $text-dark-gray;
   font-family: Inter, sans-serif;
 
-  // Check with design on these--couldn't get these values
-  // out of figma inspector so they're copy-pasted from the v1 styles
   border-radius: 16px;
   box-shadow: 0px 12px 24px 0px rgba(23, 31, 38, 0.25);
 
@@ -115,10 +113,16 @@
   }
 
   span.subway-status_alert_status-text {
-    // common text styles go here!
+    // common styles for status text
     font-weight: 800;
     line-height: 74px;
     font-size: 48px;
+  }
+
+  .subway-status_status--extended span.subway-status_alert_status-text {
+    // extended-specific styles for status text
+    display: block;
+    height: 68px;
   }
 
   span.subway-status_alert_status-text.subway-status_alert_status-text--normal-service {
@@ -128,18 +132,23 @@
   }
 
   span.subway-status_alert_location-text {
+    // common styles for location text
     font-weight: 500;
     font-size: 32px;
-    line-height: 74px;
   }
 
   .subway-status_status--contracted span.subway-status_alert_location-text {
+    // contracted-specific styles for location text
     margin-left: 16px;
+    line-height: 74px;
   }
 
   .subway-status_status--extended span.subway-status_alert_location-text {
+    // extended-specific styles for location text
     display: block;
     margin-top: 4px;
+    height: 48px;
+    line-height: 48px;
   }
 
   .branch-icon {
