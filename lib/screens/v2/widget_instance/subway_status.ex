@@ -408,13 +408,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     )
   end
 
-  def serialize_green_line_branch_alert(alert, route_ids),
-    do:
-      Map.merge(
-        %{route_pill: serialize_gl_pill_with_branches(route_ids)},
-        serialize_alert(alert, "Green")
-      )
-
   defp alert_affects_gl_trunk_or_whole_line?(%Alert{informed_entities: informed_entities}) do
     gl_trunk_stops = Stop.gl_trunk_stops()
 
