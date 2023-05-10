@@ -303,7 +303,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp get_location(informed_entities, route_id) do
     cond do
       alert_is_whole_route?(informed_entities) ->
-        nil
+        "Entire line"
 
       alert_is_whole_direction?(informed_entities) ->
         get_direction(informed_entities, route_id)
@@ -322,7 +322,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
          route_id
        ) do
     location = get_location(informed_entities, route_id)
-    status = if is_nil(location), do: "SERVICE SUSPENDED", else: "Suspension"
+
+    status =
+      if is_nil(location) or location == "Entire line",
+        do: "SERVICE SUSPENDED",
+        else: "Suspension"
+
     %{status: status, location: location}
   end
 
@@ -354,9 +359,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         :more_than -> "over #{delay_minutes} minutes"
       end
 
+    location =
+      case get_location(informed_entities, route_id) do
+        # Most delays apply to the whole line. It's not necessary to specify it.
+        "Entire line" -> nil
+        other -> other
+      end
+
     %{
       status: "Delays #{duration_text}",
-      location: get_location(informed_entities, route_id)
+      location: location
     }
   end
 

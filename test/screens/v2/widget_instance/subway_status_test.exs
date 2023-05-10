@@ -1103,6 +1103,186 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       assert expected == WidgetInstance.serialize(instance)
     end
+
+    test "uses 'Entire line' location text for whole-line shuttles" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :shuttle,
+            informed_entities: [
+              %{route: "Blue", route_type: 1, direction_id: nil, stop: nil}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :extended,
+          alert: %{
+            route_pill: %{type: :text, text: "BL", color: :blue},
+            status: "Shuttle Bus",
+            location: "Entire line"
+          }
+        },
+        green: %{
+          alerts: [
+            %{route_pill: %{color: :green, text: "GL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        },
+        orange: %{
+          alerts: [
+            %{route_pill: %{color: :orange, text: "OL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        },
+        red: %{
+          alerts: [
+            %{route_pill: %{color: :red, text: "RL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "uses 'Entire line' location text for whole-line suspensions" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :suspension,
+            informed_entities: [
+              %{route: "Blue", route_type: 1, direction_id: nil, stop: nil}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :extended,
+          alert: %{
+            route_pill: %{type: :text, text: "BL", color: :blue},
+            status: "SERVICE SUSPENDED",
+            location: "Entire line"
+          }
+        },
+        green: %{
+          alerts: [
+            %{route_pill: %{color: :green, text: "GL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        },
+        orange: %{
+          alerts: [
+            %{route_pill: %{color: :orange, text: "OL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        },
+        red: %{
+          alerts: [
+            %{route_pill: %{color: :red, text: "RL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "uses 'Entire line' location text for whole-Green Line suspensions" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :suspension,
+            informed_entities: [
+              %{route: "Green-B", route_type: 0, direction_id: nil, stop: nil},
+              %{route: "Green-C", route_type: 0, direction_id: nil, stop: nil},
+              %{route: "Green-D", route_type: 0, direction_id: nil, stop: nil},
+              %{route: "Green-E", route_type: 0, direction_id: nil, stop: nil}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          alerts: [
+            %{route_pill: %{color: :blue, text: "BL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        },
+        green: %{
+          type: :extended,
+          alert: %{
+            route_pill: %{type: :text, text: "GL", color: :green},
+            status: "SERVICE SUSPENDED",
+            location: "Entire line"
+          }
+        },
+        orange: %{
+          alerts: [
+            %{route_pill: %{color: :orange, text: "OL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        },
+        red: %{
+          alerts: [
+            %{route_pill: %{color: :red, text: "RL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "does _not_ use 'Entire line' location text for whole-line delays" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :delay,
+            severity: 9,
+            informed_entities: [
+              %{route: "Blue", route_type: 1, direction_id: nil, stop: nil}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :extended,
+          alert: %{
+            route_pill: %{type: :text, text: "BL", color: :blue},
+            status: "Delays over 60 minutes",
+            location: nil
+          }
+        },
+        green: %{
+          alerts: [
+            %{route_pill: %{color: :green, text: "GL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        },
+        orange: %{
+          alerts: [
+            %{route_pill: %{color: :orange, text: "OL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        },
+        red: %{
+          alerts: [
+            %{route_pill: %{color: :red, text: "RL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
   end
 
   describe "slot_names/1" do
