@@ -684,10 +684,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
   def temporarily_override_alert(%__MODULE__{} = t) do
-    # All screens that would show either of the following alerts
-    # will show static Evergreen content instead
-    # https://app.asana.com/0/1185117109217413/1203840359759366/f
-    t.alert.id not in ["482408", "482406"]
+    # Prevent Porter and Charles/MGH pre-fare screens from incorrectly communicating
+    # a RL alert that affects both the Ashmont and Braintree branches.
+    not (t.alert.id == "495152" and
+           t.screen.app_params.reconstructed_alert_widget.stop_id in [
+             "place-portr",
+             "place-chmnl"
+           ])
   end
 
   defimpl Screens.V2.WidgetInstance do
