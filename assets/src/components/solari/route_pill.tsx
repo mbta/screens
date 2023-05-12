@@ -12,7 +12,7 @@ interface PillType {
 const routeToPill = (
   route: string,
   routeId: string,
-  trackNumber: number | null
+  trackNumber: string | null
 ): PillType => {
   if (route === null) {
     return { routeName: null, routePillColor: null };
@@ -107,7 +107,7 @@ const DepartureRoutePill = ({
 }: {
   route: string;
   routeId: string;
-  trackNumber: number | null;
+  trackNumber: string | null;
 }): JSX.Element => <Pill {...routeToPill(route, routeId, trackNumber)} />;
 
 const sectionPillMapping: Record<string, PillType> = {

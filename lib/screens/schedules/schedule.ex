@@ -21,7 +21,7 @@ defmodule Screens.Schedules.Schedule do
           arrival_time: DateTime.t() | nil,
           departure_time: DateTime.t() | nil,
           stop_headsign: String.t() | nil,
-          track_number: pos_integer() | nil,
+          track_number: String.t() | nil,
           direction_id: 0 | 1
         }
 

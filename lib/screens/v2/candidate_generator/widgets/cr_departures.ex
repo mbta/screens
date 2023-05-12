@@ -31,7 +31,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
               %CRDepartures{
                 direction_to_destination: direction_to_destination,
                 station: station,
-                destination: destination
+                destination: destination,
+                header_pill: header_pill
               } = cr_departures
           }
         } = config,
@@ -71,6 +72,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
                 departures_data: departures_data,
                 destination: destination,
                 direction_to_destination: inbound_outbound,
+                header_pill: header_pill,
                 now: now
               }
           end

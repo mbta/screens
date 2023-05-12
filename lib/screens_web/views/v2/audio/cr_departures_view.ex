@@ -9,33 +9,13 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
   def render("_widget.ssml", %{
         departures: departures,
         station: station,
-        destination: destination,
-        time_to_destination: time_to_destination,
-        direction: direction
+        header_pill: header_pill
       }) do
     ~E|
-    <p>Upcoming <%= direction %> Commuter Rail trains:</p>
+    <p>Consider taking Commuter Rail during <%= render_route_pill(header_pill) %> delays:</p>
     <%= render_departures(departures, station) %>
-    <%= render_eta(time_to_destination, destination) %>
     <p>Riders can take the Commuter Rail free of charge.</p>
     |
-  end
-
-  # Number starts with vowel / consonant
-  defp render_eta(eta, destination) do
-    first_number =
-      eta
-      |> String.split("-")
-      |> List.first()
-
-    article =
-      if first_number in ["8", "11", "18"] do
-        "an"
-      else
-        "a"
-      end
-
-    ~E|<p>It's <%= article %> <%= eta %> minute train ride to <%= destination %>.</p>|
   end
 
   defp render_departure(departure, previous_departure, station, station) do
@@ -54,7 +34,7 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
 
     track =
       cond do
-        track_number -> "on track " <> Integer.to_string(track_number) <> ". "
+        track_number -> "on track #{track_number}. "
         # Omit track number at Forest Hills
         station === "place-forhl" -> ". "
         true -> ". We will announce the track for this train soon. "
@@ -134,4 +114,6 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
   defp time_is_arr_brd?(time) do
     match?(%{type: :text}, time)
   end
+
+  defp render_route_pill(%{color: color}), do: "#{color} line"
 end
