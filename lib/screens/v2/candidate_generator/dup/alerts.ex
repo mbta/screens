@@ -45,7 +45,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
           stop_name
       end
 
-    with location_context <- fetch_location_context_fn.(Dup, stop_id, now),
+    with {:ok, location_context} <- fetch_location_context_fn.(Dup, stop_id, now),
          # TODO: check to see if mattapan ids are passing to alerts fetch
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: location_context.route_ids_at_stop) do
       alerts

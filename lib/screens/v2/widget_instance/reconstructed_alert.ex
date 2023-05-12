@@ -6,7 +6,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Config.V2.FreeTextLine
   alias Screens.LocationContext
   alias Screens.Stops.Stop
-  alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
@@ -80,6 +79,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     |> Enum.map(
       &RoutePill.serialize_route_for_reconstructed_alert(&1, %{large: length(routes) == 1})
     )
+  end
+
+  def takeover_alert?(
+        %{screen: %Screen{app_id: :pre_fare_v2}, is_terminal_station: is_terminal_station} = t
+      ) do
+    BaseAlert.effect(t) in [:station_closure, :suspension, :shuttle] and
+      BaseAlert.location(t, is_terminal_station) == :inside and
+      BaseAlert.informs_all_active_routes_at_home_stop?(t)
   end
 
   defp serialize_takeover_alert(
@@ -296,7 +303,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp serialize_inside_alert(%__MODULE__{} = t) do
-    if AlertWidget.takeover_alert?(t) do
+    if takeover_alert?(t) do
       serialize_takeover_alert(t)
     else
       serialize_inside_flex_alert(t)
@@ -625,15 +632,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def priority(%__MODULE__{} = t) do
-    if AlertWidget.takeover_alert?(t), do: [1], else: [3]
+    if takeover_alert?(t), do: [1], else: [3]
   end
 
   def slot_names(%__MODULE__{} = t) do
-    if AlertWidget.takeover_alert?(t), do: [:full_body], else: [:large]
+    if takeover_alert?(t), do: [:full_body], else: [:large]
   end
 
   def widget_type(%__MODULE__{} = t) do
-    if AlertWidget.takeover_alert?(t),
+    if takeover_alert?(t),
       do: :reconstructed_takeover,
       else: :reconstructed_large_alert
   end

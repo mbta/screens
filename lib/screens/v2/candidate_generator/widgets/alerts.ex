@@ -22,7 +22,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
         fetch_location_context_fn \\ &Stop.fetch_location_context/3
       )
       when app in @alert_supporting_screen_types do
-    with location_context <- fetch_location_context_fn.(app, stop_id, now),
+    with {:ok, location_context} <- fetch_location_context_fn.(app, stop_id, now),
          reachable_stop_ids =
            local_and_downstream_stop_ids(location_context.stop_sequences, stop_id),
          {:ok, alerts} <-
