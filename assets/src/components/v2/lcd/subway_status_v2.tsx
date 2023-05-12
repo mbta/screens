@@ -168,10 +168,11 @@ enum FittingStep {
 }
 
 /**
- * Pixel height of a ContractedAlert. This should match the height of the route pill, since
- * it's the tallest element in the row.
+ * Max pixel height of a ContractedAlert's outermost div element when content doesn't wrap.
+ *
+ * When the text wraps to a second line it's more than that, which is all we care about to detect overflows.
  */
-const CONTRACTED_ROW_HEIGHT = 74;
+const CONTRACTED_ALERT_MAX_HEIGHT = 80;
 
 const ALERTS_URL = "mbta.com/alerts";
 
@@ -187,7 +188,7 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
       FittingStep.Abbrev,
       FittingStep.FullSize,
     ],
-    maxHeight: CONTRACTED_ROW_HEIGHT,
+    maxHeight: CONTRACTED_ALERT_MAX_HEIGHT,
     resetDependencies: [id],
   });
 
@@ -296,11 +297,11 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
     }
 
     return (
-      <div className={containerClassName}>
+      <div className={containerClassName} ref={ref}>
         <div className="subway-status_alert_route-pill-container">
           {routePill && <SubwayStatusRoutePill routePill={routePill} />}
         </div>
-        <div className={textContainerClassName} ref={ref}>
+        <div className={textContainerClassName}>
           {status && <span className={statusTextClassName}>{status}</span>}
           {location && (
             <span className="subway-status_alert_location-text">
@@ -381,9 +382,8 @@ const getAlertID = (
     ? `${alert.location.abbrev}-${alert.location.full}`
     : alert.location;
 
-  const routePill = `${alert?.route_pill?.color ?? ""}-${
-    alert?.route_pill?.branches?.join("") ?? ""
-  }`;
+  const routePill = `${alert?.route_pill?.color ?? ""}-${alert?.route_pill?.branches?.join("") ?? ""
+    }`;
 
   return `${statusType}-${index}-${location}-${routePill}`;
 };
