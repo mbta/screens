@@ -3,8 +3,165 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
 
   alias Screens.Config.Screen
   alias Screens.Config.V2.{Alerts, Departures, Dup, FreeTextLine}
+  alias Screens.LocationContext
+  alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: DupAlerts
   alias Screens.V2.WidgetInstance.DupSpecialCaseAlert
+
+  defp routes("place-kencl") do
+    [
+      %{
+        active?: true,
+        direction_destinations: ["Boston College", "Government Center"],
+        long_name: "Green Line B",
+        route_id: "Green-B",
+        short_name: "B",
+        type: :light_rail
+      },
+      %{
+        active?: true,
+        direction_destinations: ["Cleveland Circle", "Government Center"],
+        long_name: "Green Line C",
+        route_id: "Green-C",
+        short_name: "C",
+        type: :light_rail
+      },
+      %{
+        active?: true,
+        direction_destinations: ["Riverside", "Union Square"],
+        long_name: "Green Line D",
+        route_id: "Green-D",
+        short_name: "D",
+        type: :light_rail
+      }
+    ]
+  end
+
+  defp routes("place-wtcst") do
+    [
+      %{
+        active?: true,
+        direction_destinations: ["Logan Airport Terminals", "South Station"],
+        long_name: "Logan Airport Terminals - South Station",
+        route_id: "741",
+        short_name: "SL1",
+        type: :bus
+      },
+      %{
+        active?: true,
+        direction_destinations: ["Drydock Avenue", "South Station"],
+        long_name: "Drydock Avenue - South Station",
+        route_id: "742",
+        short_name: "SL2",
+        type: :bus
+      },
+      %{
+        active?: true,
+        direction_destinations: ["Chelsea Station", "South Station"],
+        long_name: "Chelsea Station - South Station",
+        route_id: "743",
+        short_name: "SL3",
+        type: :bus
+      }
+    ]
+  end
+
+  defp stop_sequences("place-kencl") do
+    [
+      [
+        "place-unsqu",
+        "place-lech",
+        "place-spmnl",
+        "place-north",
+        "place-haecl",
+        "place-gover",
+        "place-pktrm",
+        "place-boyls",
+        "place-armnl",
+        "place-coecl",
+        "place-hymnl",
+        "place-kencl",
+        "place-fenwy",
+        "place-longw",
+        "place-bvmnl",
+        "place-brkhl",
+        "place-bcnfd",
+        "place-rsmnl",
+        "place-chhil",
+        "place-newto",
+        "place-newtn",
+        "place-eliot",
+        "place-waban",
+        "place-woodl",
+        "place-river"
+      ],
+      [
+        "place-gover",
+        "place-pktrm",
+        "place-boyls",
+        "place-armnl",
+        "place-coecl",
+        "place-hymnl",
+        "place-kencl",
+        "place-bland",
+        "place-buest",
+        "place-bucen",
+        "place-amory",
+        "place-babck",
+        "place-brico",
+        "place-harvd",
+        "place-grigg",
+        "place-alsgr",
+        "place-wrnst",
+        "place-wascm",
+        "place-sthld",
+        "place-chswk",
+        "place-chill",
+        "place-sougr",
+        "place-lake"
+      ],
+      [
+        "place-gover",
+        "place-pktrm",
+        "place-boyls",
+        "place-armnl",
+        "place-coecl",
+        "place-hymnl",
+        "place-kencl",
+        "place-smary",
+        "place-hwsst",
+        "place-kntst",
+        "place-stpul",
+        "place-cool",
+        "place-sumav",
+        "place-bndhl",
+        "place-fbkst",
+        "place-bcnwa",
+        "place-tapst",
+        "place-denrd",
+        "place-engav",
+        "place-clmnl"
+      ]
+    ]
+  end
+
+  defp stop_sequences("place-wtcst") do
+    [
+      [
+        "place-sstat",
+        "place-crtst",
+        "place-wtcst",
+        "place-conrd",
+        "place-aport",
+        "place-estav",
+        "place-boxdt",
+        "place-belsq",
+        "place-chels"
+      ],
+      ["place-sstat", "place-crtst", "place-wtcst", "place-conrd", "247", "30249", "30250"],
+      ["place-sstat", "place-crtst", "place-wtcst", "place-conrd", "17091"]
+    ]
+  end
 
   describe "dup alert_instances/6 > serialize/1" do
     setup do
@@ -31,60 +188,6 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         })
 
       now = ~U[2023-04-14T12:00:00Z]
-
-      kenmore_routes = [
-        %{
-          active?: true,
-          direction_destinations: ["Boston College", "Government Center"],
-          long_name: "Green Line B",
-          route_id: "Green-B",
-          short_name: "B",
-          type: :light_rail
-        },
-        %{
-          active?: true,
-          direction_destinations: ["Cleveland Circle", "Government Center"],
-          long_name: "Green Line C",
-          route_id: "Green-C",
-          short_name: "C",
-          type: :light_rail
-        },
-        %{
-          active?: true,
-          direction_destinations: ["Riverside", "Union Square"],
-          long_name: "Green Line D",
-          route_id: "Green-D",
-          short_name: "D",
-          type: :light_rail
-        }
-      ]
-
-      wtc_routes = [
-        %{
-          active?: true,
-          direction_destinations: ["Logan Airport Terminals", "South Station"],
-          long_name: "Logan Airport Terminals - South Station",
-          route_id: "741",
-          short_name: "SL1",
-          type: :bus
-        },
-        %{
-          active?: true,
-          direction_destinations: ["Drydock Avenue", "South Station"],
-          long_name: "Drydock Avenue - South Station",
-          route_id: "742",
-          short_name: "SL2",
-          type: :bus
-        },
-        %{
-          active?: true,
-          direction_destinations: ["Chelsea Station", "South Station"],
-          long_name: "Chelsea Station - South Station",
-          route_id: "743",
-          short_name: "SL3",
-          type: :bus
-        }
-      ]
 
       kenmore_alerts = [
         # WB B shuttle alert at Kenmore
@@ -788,113 +891,25 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         }
       ]
 
-      kenmore_stop_sequences = [
-        [
-          "place-unsqu",
-          "place-lech",
-          "place-spmnl",
-          "place-north",
-          "place-haecl",
-          "place-gover",
-          "place-pktrm",
-          "place-boyls",
-          "place-armnl",
-          "place-coecl",
-          "place-hymnl",
-          "place-kencl",
-          "place-fenwy",
-          "place-longw",
-          "place-bvmnl",
-          "place-brkhl",
-          "place-bcnfd",
-          "place-rsmnl",
-          "place-chhil",
-          "place-newto",
-          "place-newtn",
-          "place-eliot",
-          "place-waban",
-          "place-woodl",
-          "place-river"
-        ],
-        [
-          "place-gover",
-          "place-pktrm",
-          "place-boyls",
-          "place-armnl",
-          "place-coecl",
-          "place-hymnl",
-          "place-kencl",
-          "place-bland",
-          "place-buest",
-          "place-bucen",
-          "place-amory",
-          "place-babck",
-          "place-brico",
-          "place-harvd",
-          "place-grigg",
-          "place-alsgr",
-          "place-wrnst",
-          "place-wascm",
-          "place-sthld",
-          "place-chswk",
-          "place-chill",
-          "place-sougr",
-          "place-lake"
-        ],
-        [
-          "place-gover",
-          "place-pktrm",
-          "place-boyls",
-          "place-armnl",
-          "place-coecl",
-          "place-hymnl",
-          "place-kencl",
-          "place-smary",
-          "place-hwsst",
-          "place-kntst",
-          "place-stpul",
-          "place-cool",
-          "place-sumav",
-          "place-bndhl",
-          "place-fbkst",
-          "place-bcnwa",
-          "place-tapst",
-          "place-denrd",
-          "place-engav",
-          "place-clmnl"
-        ]
-      ]
-
-      wtc_stop_sequences = [
-        [
-          "place-sstat",
-          "place-crtst",
-          "place-wtcst",
-          "place-conrd",
-          "place-aport",
-          "place-estav",
-          "place-boxdt",
-          "place-belsq",
-          "place-chels"
-        ],
-        ["place-sstat", "place-crtst", "place-wtcst", "place-conrd", "247", "30249", "30250"],
-        ["place-sstat", "place-crtst", "place-wtcst", "place-conrd", "17091"]
-      ]
-
       %{
         config_kenmore: config_kenmore,
         config_wtc: config_wtc,
         now: now,
         fetch_stop_name_fn: fn _ -> "Test" end,
-        fetch_routes_by_stop_fn: fn
-          "place-kencl", _, [:light_rail, :subway] -> {:ok, kenmore_routes}
-          "place-wtcst", _, [:bus] -> {:ok, wtc_routes}
-        end,
         kenmore_alerts: kenmore_alerts,
         wtc_alerts: wtc_alerts,
-        fetch_parent_station_sequences_fn: fn
-          "place-kencl", ["Green-B", "Green-C", "Green-D"] -> {:ok, kenmore_stop_sequences}
-          "place-wtcst", ["741", "742", "743"] -> {:ok, wtc_stop_sequences}
+        fetch_location_context_fn: fn
+          _, stop_id, _ ->
+            {:ok,
+             %LocationContext{
+               home_stop: stop_id,
+               stop_sequences: stop_sequences(stop_id),
+               upstream_stops: Stop.upstream_stop_id_set(stop_id, stop_sequences(stop_id)),
+               downstream_stops: Stop.downstream_stop_id_set(stop_id, stop_sequences(stop_id)),
+               routes: routes(stop_id),
+               route_ids_at_stop: Enum.map(routes(stop_id), & &1.route_id),
+               alert_route_types: Stop.get_route_type_filter(Dup, stop_id)
+             }}
         end
       }
     end
@@ -909,9 +924,8 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           context.config_kenmore,
           context.now,
           context.fetch_stop_name_fn,
-          context.fetch_routes_by_stop_fn,
           fetch_alerts_fn,
-          context.fetch_parent_station_sequences_fn
+          context.fetch_location_context_fn
         )
 
       expected_serialized_json = [
@@ -973,9 +987,8 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           context.config_kenmore,
           context.now,
           context.fetch_stop_name_fn,
-          context.fetch_routes_by_stop_fn,
           fetch_alerts_fn,
-          context.fetch_parent_station_sequences_fn
+          context.fetch_location_context_fn
         )
 
       expected_serialized_json = [
@@ -1034,9 +1047,8 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           context.config_kenmore,
           context.now,
           context.fetch_stop_name_fn,
-          context.fetch_routes_by_stop_fn,
           fetch_alerts_fn,
-          context.fetch_parent_station_sequences_fn
+          context.fetch_location_context_fn
         )
 
       expected_serialized_json = [
@@ -1095,9 +1107,8 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           context.config_kenmore,
           context.now,
           context.fetch_stop_name_fn,
-          context.fetch_routes_by_stop_fn,
           fetch_alerts_fn,
-          context.fetch_parent_station_sequences_fn
+          context.fetch_location_context_fn
         )
 
       expected_serialized_json = [
@@ -1156,9 +1167,8 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           context.config_wtc,
           context.now,
           context.fetch_stop_name_fn,
-          context.fetch_routes_by_stop_fn,
           fetch_alerts_fn,
-          context.fetch_parent_station_sequences_fn
+          context.fetch_location_context_fn
         )
 
       expected_serialized_json = %{

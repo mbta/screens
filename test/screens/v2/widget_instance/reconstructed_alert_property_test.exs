@@ -13,6 +13,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
   alias Screens.Config.Screen
   alias Screens.Config.V2.{PreFare}
   alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.LocationContext
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.CandidateGenerator
@@ -1141,23 +1142,29 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
       station_sequences =
         Enum.map(route_ids_at_stop, fn id -> Stop.get_route_stop_sequence(id) end)
 
-      fetch_routes_by_stop_fn = fn _, _, _ -> {:ok, routes_at_stop} end
-
-      fetch_parent_station_sequences_through_stop_fn = fn _, _ ->
-        {:ok, station_sequences}
-      end
-
       fetch_alerts_fn = fn _ -> {:ok, [alert]} end
       fetch_stop_name_fn = fn _ -> "Test" end
+
+      fetch_location_context_fn = fn _, _, _ ->
+        {:ok,
+         %LocationContext{
+           home_stop: stop_id,
+           stop_sequences: station_sequences,
+           upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
+           downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
+           routes: routes_at_stop,
+           route_ids_at_stop: Enum.map(routes_at_stop, & &1.route_id),
+           alert_route_types: Stop.get_route_type_filter(PreFare, stop_id)
+         }}
+      end
 
       alert_widgets =
         CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
           config,
           now_datetime,
-          fetch_routes_by_stop_fn,
-          fetch_parent_station_sequences_through_stop_fn,
           fetch_alerts_fn,
-          fetch_stop_name_fn
+          fetch_stop_name_fn,
+          fetch_location_context_fn
         )
 
       Enum.each(alert_widgets, fn widget ->

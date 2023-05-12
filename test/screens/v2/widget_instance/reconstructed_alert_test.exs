@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.Config.Screen
   alias Screens.Config.V2.{PreFare}
   alias Screens.Config.V2.Header.CurrentStopId
+  alias Screens.LocationContext
   alias Screens.Stops.Stop
   alias Screens.V2.AlertsWidget
   alias Screens.V2.CandidateGenerator
@@ -18,7 +19,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{
       widget: %ReconstructedAlert{
         alert: %Alert{id: "123"},
-        screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil}
+        screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
+        location_context: %LocationContext{
+          home_stop: nil,
+          stop_sequences: nil,
+          upstream_stops: nil,
+          downstream_stops: nil,
+          routes: nil,
+          route_ids_at_stop: nil,
+          alert_route_types: nil
+        }
       }
     }
   end
@@ -30,12 +40,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   defp put_home_stop(widget, app_config_module, stop_id) do
     %{
       widget
-      | screen: %{
-          widget.screen
-          | app_params:
-              struct(app_config_module, %{
-                reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}
-              })
+      | location_context: %{
+          widget.location_context
+          | alert_route_types: Stop.get_route_type_filter(app_config_module, stop_id),
+            home_stop: stop_id
         }
     }
   end
@@ -45,11 +53,28 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   defp put_stop_sequences(widget, sequences) do
-    %{widget | stop_sequences: sequences}
+    %{
+      widget
+      | location_context: %{
+          widget.location_context
+          | stop_sequences: sequences,
+            upstream_stops:
+              Stop.upstream_stop_id_set(widget.location_context.home_stop, sequences),
+            downstream_stops:
+              Stop.downstream_stop_id_set(widget.location_context.home_stop, sequences)
+        }
+    }
   end
 
   defp put_routes_at_stop(widget, routes) do
-    %{widget | routes_at_stop: routes}
+    %{
+      widget
+      | location_context: %{
+          widget.location_context
+          | routes: routes,
+            route_ids_at_stop: Enum.map(routes, & &1.route_id)
+        }
+    }
   end
 
   defp put_informed_stations_string(widget, string) do
@@ -129,6 +154,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget: put_informed_stations_string(widget, "Alewife")}
   end
 
+  defp setup_location_context(%{widget: widget}) do
+    %{widget: widget}
+    |> setup_home_stop()
+    |> setup_stop_sequences()
+    |> setup_routes()
+  end
+
   defp setup_routes(%{widget: widget}) do
     routes = [
       %{
@@ -180,9 +212,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   # Pass this to `setup` to set up "context" data on the alert widget, without setting up the API alert itself.
   @alert_widget_context_setup_group [
-    :setup_home_stop,
-    :setup_stop_sequences,
-    :setup_routes,
+    :setup_location_context,
     :setup_screen_config,
     :setup_now,
     :setup_informed_entities_string
@@ -1142,11 +1172,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   describe "Real-world alerts:" do
     test "handles OL downstream suspension" do
+      stop_id = "place-welln"
+
       config =
         struct(Screen, %{
           app_id: :pre_fare_v2,
           app_params:
-            struct(PreFare, %{reconstructed_alert_widget: %CurrentStopId{stop_id: "place-welln"}})
+            struct(PreFare, %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}})
         })
 
       routes_at_stop = [
@@ -1329,24 +1361,31 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       ]
 
       now = ~U[2022-06-24 12:00:00Z]
-      station_sequences = Stop.get_route_stop_sequence("Orange")
+      station_sequences = [Stop.get_route_stop_sequence("Orange")]
 
-      fetch_parent_station_sequences_through_stop_fn = fn _, _ ->
-        {:ok, [station_sequences]}
-      end
-
-      fetch_routes_by_stop_fn = fn _, _, _ -> {:ok, routes_at_stop} end
       fetch_alerts_fn = fn _ -> {:ok, alerts} end
       fetch_stop_name_fn = fn _ -> "Wellington" end
+
+      fetch_location_context_fn = fn _, _, _ ->
+        {:ok,
+         %LocationContext{
+           home_stop: stop_id,
+           stop_sequences: station_sequences,
+           upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
+           downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
+           routes: routes_at_stop,
+           route_ids_at_stop: Enum.map(routes_at_stop, & &1.route_id),
+           alert_route_types: Stop.get_route_type_filter(PreFare, stop_id)
+         }}
+      end
 
       alert_widgets =
         CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
           config,
           now,
-          fetch_routes_by_stop_fn,
-          fetch_parent_station_sequences_through_stop_fn,
           fetch_alerts_fn,
-          fetch_stop_name_fn
+          fetch_stop_name_fn,
+          fetch_location_context_fn
         )
 
       expected = %{
@@ -1364,11 +1403,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     end
 
     test "handles GL boundary shuttle at Govt Center" do
+      stop_id = "place-gover"
+
       config =
         struct(Screen, %{
           app_id: :pre_fare_v2,
           app_params:
-            struct(PreFare, %{reconstructed_alert_widget: %CurrentStopId{stop_id: "place-gover"}})
+            struct(PreFare, %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}})
         })
 
       routes_at_stop = [
@@ -1688,24 +1729,31 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       ]
 
       now = ~U[2022-06-24 12:00:00Z]
-      station_sequences = Stop.get_route_stop_sequence("Green")
+      station_sequences = [Stop.get_route_stop_sequence("Green")]
 
-      fetch_parent_station_sequences_through_stop_fn = fn _, _ ->
-        {:ok, [station_sequences]}
-      end
-
-      fetch_routes_by_stop_fn = fn _, _, _ -> {:ok, routes_at_stop} end
       fetch_alerts_fn = fn _ -> {:ok, alerts} end
       fetch_stop_name_fn = fn _ -> "Government Center" end
+
+      fetch_location_context_fn = fn _, _, _ ->
+        {:ok,
+         %LocationContext{
+           home_stop: stop_id,
+           stop_sequences: station_sequences,
+           upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
+           downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
+           routes: routes_at_stop,
+           route_ids_at_stop: Enum.map(routes_at_stop, & &1.route_id),
+           alert_route_types: Stop.get_route_type_filter(PreFare, stop_id)
+         }}
+      end
 
       alert_widgets =
         CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
           config,
           now,
-          fetch_routes_by_stop_fn,
-          fetch_parent_station_sequences_through_stop_fn,
           fetch_alerts_fn,
-          fetch_stop_name_fn
+          fetch_stop_name_fn,
+          fetch_location_context_fn
         )
 
       expected = %{
