@@ -10,13 +10,12 @@ defmodule Screens.Stops.Stop do
 
   require Logger
 
-  alias Screens.Config.V2.{BusEink, BusShelter, GlEink, PreFare, Dup}
+  alias Screens.Config.V2.{BusEink, BusShelter, Dup, GlEink, PreFare}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes
   alias Screens.Routes.Route
   alias Screens.Stops.StationsWithRoutesAgent
-  alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V3Api
 
@@ -432,9 +431,9 @@ defmodule Screens.Stops.Stop do
   """
   @spec fetch_location_context(
           BusEink | BusShelter | GlEink | PreFare | Dup,
-          Stop.id(),
+          id(),
           DateTime.t()
-        ) :: LocationContext.t()
+        ) :: {:ok, LocationContext.t()}
   def fetch_location_context(app, stop_id, now) do
     alert_route_types = get_route_type_filter(app, stop_id)
     {:ok, routes_at_stop} = Route.fetch_routes_by_stop(stop_id, now, alert_route_types)
@@ -447,36 +446,37 @@ defmodule Screens.Stops.Stop do
         RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids_at_stop)
       end
 
-    %LocationContext{
-      home_stop: stop_id,
-      stop_sequences: stop_sequences,
-      upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
-      downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
-      routes: routes_at_stop,
-      route_ids_at_stop: route_ids_at_stop,
-      alert_route_types: alert_route_types
-    }
+    {:ok,
+     %LocationContext{
+       home_stop: stop_id,
+       stop_sequences: stop_sequences,
+       upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
+       downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
+       routes: routes_at_stop,
+       route_ids_at_stop: route_ids_at_stop,
+       alert_route_types: alert_route_types
+     }}
   end
 
   # Returns the route types we care about for the alerts of this screen type / place
   @spec get_route_type_filter(BusEink | BusShelter | GlEink | PreFare | Dup, String.t()) ::
           list(atom())
-  defp get_route_type_filter(app, _) when app in [BusEink, BusShelter], do: [:bus]
-  defp get_route_type_filter(GlEink, _), do: [:light_rail]
-  defp get_route_type_filter(PreFare, _), do: [:light_rail, :subway]
+  def get_route_type_filter(app, _) when app in [BusEink, BusShelter], do: [:bus]
+  def get_route_type_filter(GlEink, _), do: [:light_rail]
+  def get_route_type_filter(PreFare, _), do: [:light_rail, :subway]
   # WTC is a special bus-only case
-  defp get_route_type_filter(Dup, "place-wtcst"), do: [:bus]
-  defp get_route_type_filter(Dup, _), do: [:light_rail, :subway]
+  def get_route_type_filter(Dup, "place-wtcst"), do: [:bus]
+  def get_route_type_filter(Dup, _), do: [:light_rail, :subway]
 
-  @spec upstream_stop_id_set(String.t(), list(list(Stop.id()))) :: MapSet.t(Stop.id())
+  @spec upstream_stop_id_set(String.t(), list(list(id()))) :: MapSet.t(id())
   def upstream_stop_id_set(stop_id, stop_sequences) do
     stop_sequences
     |> Enum.flat_map(fn stop_sequence -> Util.slice_before(stop_sequence, stop_id) end)
     |> MapSet.new()
   end
 
-  @spec downstream_stop_id_set(String.t(), list(list(Stop.id()))) :: MapSet.t(Stop.id())
-  defp downstream_stop_id_set(stop_id, stop_sequences) do
+  @spec downstream_stop_id_set(String.t(), list(list(id()))) :: MapSet.t(id())
+  def downstream_stop_id_set(stop_id, stop_sequences) do
     stop_sequences
     |> Enum.flat_map(fn stop_sequence -> Util.slice_after(stop_sequence, stop_id) end)
     |> MapSet.new()

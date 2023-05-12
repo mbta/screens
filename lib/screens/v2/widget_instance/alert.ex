@@ -6,7 +6,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.LocationContext
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.Common.BaseAlert
-  alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct screen: nil,
@@ -89,7 +88,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @spec serialize(t()) :: map()
   def serialize(t) do
-    e = effect(t)
+    e = BaseAlert.effect(t)
 
     %{
       route_pills: serialize_route_pills(t),
@@ -152,21 +151,13 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   def takeover_alert?(%__MODULE__{screen: %Screen{app_id: bus_app_id}} = t)
       when bus_app_id in [:bus_shelter_v2, :bus_eink_v2] do
-    effect(t) in [:stop_closure, :stop_moved, :suspension, :detour] and
+    BaseAlert.effect(t) in [:stop_closure, :stop_moved, :suspension, :detour] and
       BaseAlert.informs_all_active_routes_at_home_stop?(t)
   end
 
   def takeover_alert?(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
-    effect(t) in [:station_closure, :suspension, :shuttle] and
+    BaseAlert.effect(t) in [:station_closure, :suspension, :shuttle] and
       BaseAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
-  end
-
-  def takeover_alert?(
-        %{screen: %Screen{app_id: :pre_fare_v2}, is_terminal_station: is_terminal_station} = t
-      ) do
-    effect(t) in [:station_closure, :suspension, :shuttle] and
-      BaseAlert.location(t, is_terminal_station) == :inside and
-      BaseAlert.informs_all_active_routes_at_home_stop?(t)
   end
 
   defp takeover_slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}) do
@@ -218,9 +209,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
     priority(t) != :no_render
   end
 
-  @spec effect(t() | ReconstructedAlert.t()) :: Alert.effect()
-  def effect(%{alert: %Alert{effect: effect}}), do: effect
-
   # Time units in seconds
   @hour 60 * 60
   @week 24 * @hour * 7
@@ -263,7 +251,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @spec tiebreaker_effect(t()) :: pos_integer() | WidgetInstance.no_render()
   def tiebreaker_effect(%__MODULE__{} = t) do
-    Keyword.get(@effect_priorities, effect(t), :no_render)
+    Keyword.get(@effect_priorities, BaseAlert.effect(t), :no_render)
   end
 
   @spec seconds_from_onset(t()) :: integer()

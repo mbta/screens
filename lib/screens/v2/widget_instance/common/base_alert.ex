@@ -12,8 +12,12 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.{DupAlert, ElevatorStatus, ReconstructedAlert}
 
-  @type t :: AlertWidget.t() | DupAlert.t() | ReconstructedAlert.t() | ElevatorStatus.t() |
-      %{alert: Alert.t(), location_context: LocationContext.t()}
+  @type t ::
+          AlertWidget.t()
+          | DupAlert.t()
+          | ReconstructedAlert.t()
+          | ElevatorStatus.t()
+          | %{alert: Alert.t(), location_context: LocationContext.t()}
 
   @type stop_id :: String.t()
 
@@ -79,6 +83,9 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     informed_entities
   end
 
+  @spec effect(t()) :: Alert.effect()
+  def effect(%{alert: %Alert{effect: effect}}), do: effect
+
   @spec informed_entity_to_zone(Alert.informed_entity(), LocationContext.t()) ::
           list(:upstream | :home_stop | :downstream)
   defp informed_entity_to_zone(informed_entity, location_context)
@@ -115,6 +122,10 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   # Only route is not nil (route type ignored)
   defp informed_entity_to_zone(%{stop: nil, route: route}, context) do
     if route in context.route_ids_at_stop, do: [:upstream, :home_stop, :downstream], else: []
+  end
+
+  defp informed_entity_to_zone(%{stop: _stop} = entity, context) do
+    informed_entity_to_zone(Map.put(entity, :route, nil), context)
   end
 
   # Both stop and route are not nil (route type ignored)
@@ -210,13 +221,13 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
       Enum.member?(["Red", "Orange", "Green", "Blue"] ++ @green_line_branches, e)
     end)
     |> Enum.uniq()
-    |> consolidate_GL(app_id)
+    |> consolidate_gl(app_id)
   end
 
   # GL E-ink consolidates the GL branches to Green Line if there are > 2 branches
   # We wdant to list all affected branches for the alert and not just the one serving the home stop
-  @spec consolidate_GL(list(String.t()), atom()) :: list(String.t())
-  defp consolidate_GL(affected_routes, :gl_eink_v2) do
+  @spec consolidate_gl(list(String.t()), atom()) :: list(String.t())
+  defp consolidate_gl(affected_routes, :gl_eink_v2) do
     green_routes =
       Enum.filter(affected_routes, fn
         "Green" <> _ -> true
@@ -227,7 +238,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   end
 
   # PreFare consolidates the GL branches if all branches are present
-  defp consolidate_GL(affected_routes, :pre_fare_v2) do
+  defp consolidate_gl(affected_routes, :pre_fare_v2) do
     if MapSet.subset?(MapSet.new(@green_line_branches), MapSet.new(affected_routes)) do
       affected_routes
       |> Enum.reject(fn route -> String.contains?(route, "Green") end)
@@ -237,7 +248,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     end
   end
 
-  defp consolidate_GL(affected_routes, _), do: affected_routes
+  defp consolidate_gl(affected_routes, _), do: affected_routes
 
   @doc """
   This gets used by bus shelter, bus eink, DUP, prefare:
@@ -294,7 +305,8 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
           {:cont, uninformed}
       end)
 
-    MapSet.difference(route_set, uninformed_routes)
+    route_set
+    |> MapSet.difference(uninformed_routes)
     |> Enum.to_list()
   end
 end

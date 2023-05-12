@@ -157,7 +157,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   #   - active downstream
   defp get_active_at_home_station(%__MODULE__{alerts: alerts} = t) do
     alerts
-    |> Enum.filter(&alert_is_relevant?(&1, t, :here))
+    |> Enum.filter(&active_at_home_station?(&1, t))
   end
 
   # The definition of this "elsewhere" is different than the output of BaseAlert.Location.
@@ -168,7 +168,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          } = t
        ) do
     alerts
-    |> Enum.filter(&alert_is_relevant?(&1, t, :elsewhere))
+    |> Enum.filter(&active_elsewhere?(&1, t))
     |> Enum.sort_by(
       fn %Alert{informed_entities: entities} -> entities end,
       &sort_elsewhere(&1, &2, t)
@@ -177,44 +177,55 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   defp get_upcoming_at_home_station(%__MODULE__{alerts: alerts} = t) do
     alerts
-    |> Enum.filter(&alert_is_relevant?(&1, t, :upcoming))
+    |> Enum.filter(&upcoming_at_home_station?(&1, t))
   end
 
   defp get_active_on_connecting_lines(%__MODULE__{alerts: alerts} = t) do
     alerts
-    |> Enum.filter(&alert_is_relevant?(&1, t, :downstream))
+    |> Enum.filter(&active_on_connecting_lines?(&1, t))
     |> Enum.sort_by(
       fn %Alert{informed_entities: entities} -> entities end,
       &sort_elsewhere(&1, &2, t)
     )
   end
 
-  @spec alert_is_relevant?(Alert.t(), t(), atom()) :: boolean()
-  defp alert_is_relevant?(
+  defp active_at_home_station?(
          %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
-         %__MODULE__{location_context: location_context, now: now},
-         option
+         %__MODULE__{location_context: location_context, now: now}
+       ) do
+    Alert.happening_now?(alert, now) and
+      Enum.any?(entities, fn e ->
+        e.stop == location_context.home_stop
+      end)
+  end
+
+  defp active_elsewhere?(
+         %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
+         %__MODULE__{location_context: location_context, now: now}
+       ) do
+    Alert.happening_now?(alert, now) and
+      entities
+      |> get_stations_from_entities()
+      |> Enum.any?(fn station -> station != location_context.home_stop end)
+  end
+
+  defp upcoming_at_home_station?(
+         %Alert{effect: :elevator_closure, informed_entities: entities} = alert,
+         %__MODULE__{location_context: location_context, now: now}
+       ) do
+    not Alert.happening_now?(alert, now) and
+      Enum.any?(entities, fn e ->
+        e.stop == location_context.home_stop
+      end)
+  end
+
+  defp active_on_connecting_lines?(
+         %Alert{effect: :elevator_closure} = alert,
+         %__MODULE__{location_context: location_context, now: now}
        ) do
     active = Alert.happening_now?(alert, now)
-    here = Enum.any?(entities, fn e -> e.stop == location_context.home_stop end)
-
-    case option do
-      :upcoming ->
-        not active and here
-
-      :here ->
-        active and here
-
-      :downstream ->
-        alert_location = BaseAlert.location(%{alert: alert, location_context: location_context})
-        (active and alert_location === :upstream) or (alert_location === :downstream)
-
-      :elsewhere ->
-        active and
-          entities
-          |> get_stations_from_entities()
-          |> Enum.any?(fn station -> station != location_context.home_stop end)
-    end
+    alert_location = BaseAlert.location(%{alert: alert, location_context: location_context})
+    active and (alert_location === :upstream or alert_location === :downstream)
   end
 
   defp sort_elsewhere(e1, _e2, %__MODULE__{location_context: %{stop_sequences: stop_sequences}}) do
@@ -456,7 +467,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   # Scenario B: One or more elevators at this screen's home station are closed.
   # Scenario C: All elevators at this screen's home station are operational.
   defp scenario(%__MODULE__{alerts: alerts} = t) do
-    if Enum.any?(alerts, &alert_is_relevant?(&1, t, :here)), do: :b, else: :c
+    if Enum.any?(alerts, &active_at_home_station?(&1, t)), do: :b, else: :c
   end
 
   def priority(_instance), do: [2]
