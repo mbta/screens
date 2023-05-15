@@ -156,7 +156,7 @@ const ExtendedStatus: ComponentType<ExtendedStatusProps> = ({
 };
 
 interface AlertWithID extends Alert {
-  // needed to ensure stateful components (e.g. SizedAlertLine) reset when appropriate
+  // needed to ensure stateful components (e.g. ContractedAlert) reset when appropriate
   id: string;
 }
 
@@ -168,7 +168,7 @@ enum FittingStep {
 }
 
 /**
- * Max pixel height of a ContractedAlert's outermost div element when content doesn't wrap.
+ * Max pixel height of a ContractedAlert's "subway-status_alert-sizer" div element when content doesn't wrap.
  *
  * When the text wraps to a second line it's more than that, which is all we care about to detect overflows.
  */
