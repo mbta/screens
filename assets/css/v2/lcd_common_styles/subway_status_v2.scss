@@ -5,6 +5,15 @@
   $widget-background: #e5e4e1;
   $rule-color: #cccbc8;
 
+  $status-top-padding: 18px;
+  $status-left-padding: 24px;
+  $pill-height: 74px;
+  $intra-alert-margin-without-second-pill: 7px;
+  $intra-alert-margin-with-second-pill: 32px;
+  $contracted-status-with-one-alert-bottom-padding: 22px;
+  $contracted-status-with-two-alerts-bottom-padding: 20px;
+  $extended-status-bottom-padding: 71px;
+
   /// End variables
   /// Begin styles
 
@@ -28,28 +37,32 @@
     width: 100%;
 
     box-sizing: border-box;
-    padding-top: 18px;
-    padding-left: 24px;
+    padding-top: $status-top-padding;
+    padding-left: $status-left-padding;
 
     overflow: hidden;
   }
 
   .subway-status_status--contracted.subway-status_status--one-alert {
-    height: 114px;
+    // 114px
+    height: $status-top-padding + $pill-height + $contracted-status-with-one-alert-bottom-padding;
   }
 
   .subway-status_status--contracted.subway-status_status--two-alerts:not(.subway-status_status--has-second-pill) {
-    height: 228px;
+    // 193px
+    // Second alert still gets the height of a pill, despite not having one visible
+    height: $status-top-padding + (2 * $pill-height) + $intra-alert-margin-without-second-pill + $contracted-status-with-two-alerts-bottom-padding;
   }
 
-  // height not needed for 2 alerts + 2 pills because this can only happen for the GL status,
-  // which always appears last and has nothing below it (not even the last
-  // rule, since the 2nd pill means we don't show it--see `shouldShowLastRule` JS function)
-  //
   // &--contracted.subway-status_status--two-alerts.subway-status_status--has-second-pill {}
+  // ^
+  // Height is not needed for statuses with 2 alerts + 2 pills because this can only happen
+  // for the GL status, which always appears last and has nothing below it (not even the last
+  // rule, since the 2nd pill means we don't show it--see `shouldShowLastRule` JS function)
 
   .subway-status_status--extended {
-    height: 163px;
+    // 163px
+    height: $status-top-padding + $pill-height + $extended-status-bottom-padding;
   }
 
   // Since the rule is positioned absolutely over the row without
@@ -74,11 +87,11 @@
   // in a section depends on whether it has a pill or not.
   .subway-status_alert:nth-of-type(2) {
     &.subway-status_alert--has-pill {
-      margin-top: 32px;
+      margin-top: $intra-alert-margin-with-second-pill;
     }
 
     &.subway-status_alert--no-pill {
-      margin-top: 7px;
+      margin-top: $intra-alert-margin-without-second-pill;
     }
   }
 
@@ -87,7 +100,7 @@
     // If the row has no pill, we still keep this element as a pill-sized
     // spacer to maintain consistent positioning of everything else in the row.
     min-width: 144px;
-    height: 74px;
+    height: $pill-height;
   }
 
   .subway-status_alert_text-container {
@@ -98,9 +111,8 @@
     margin-left: 24px;
   }
 
-  .subway-status_status--contracted
-    .subway-status_alert_text-container.subway-status_alert_text-container--hide-overflow {
-    height: 74px;
+  .subway-status_status--contracted .subway-status_alert_text-container.subway-status_alert_text-container--hide-overflow {
+    height: $pill-height;
   }
 
   .subway-status_alert_text-container.subway-status_alert_text-container--hide-overflow {
@@ -112,7 +124,7 @@
   span.subway-status_alert_status-text {
     // common styles for status text
     font-weight: 800;
-    line-height: 74px;
+    line-height: $pill-height;
     font-size: 48px;
   }
 
@@ -137,7 +149,7 @@
   .subway-status_status--contracted span.subway-status_alert_location-text {
     // contracted-specific styles for location text
     margin-left: 16px;
-    line-height: 74px;
+    line-height: $pill-height;
   }
 
   .subway-status_status--extended span.subway-status_alert_location-text {
