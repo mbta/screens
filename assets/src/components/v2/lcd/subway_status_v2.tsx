@@ -297,17 +297,19 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
     }
 
     return (
-      <div className={containerClassName} ref={ref}>
-        <div className="subway-status_alert_route-pill-container">
-          {routePill && <SubwayStatusRoutePill routePill={routePill} />}
-        </div>
-        <div className={textContainerClassName}>
-          {status && <span className={statusTextClassName}>{status}</span>}
-          {location && (
-            <span className="subway-status_alert_location-text">
-              {location}
-            </span>
-          )}
+      <div className={containerClassName} >
+        <div className="subway-status_alert-sizer" ref={ref}>
+          <div className="subway-status_alert_route-pill-container">
+            {routePill && <SubwayStatusRoutePill routePill={routePill} />}
+          </div>
+          <div className={textContainerClassName}>
+            {status && <span className={statusTextClassName}>{status}</span>}
+            {location && (
+              <span className="subway-status_alert_location-text">
+                {location}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     );

@@ -7,6 +7,7 @@
 
   $status-top-padding: 18px;
   $status-left-padding: 24px;
+  $pill-width: 144px;
   $pill-height: 74px;
   $intra-alert-margin-without-second-pill: 7px;
   $intra-alert-margin-with-second-pill: 32px;
@@ -83,7 +84,12 @@
     border-radius: 2px;
   }
 
-  // The top margin for the second contracted alert
+  .subway-status_status--contracted .subway-status_alert {
+    height: 74px;
+    overflow: hidden;
+  }
+
+  // The top margin value for the second contracted alert
   // in a section depends on whether it has a pill or not.
   .subway-status_alert:nth-of-type(2) {
     &.subway-status_alert--has-pill {
@@ -99,7 +105,7 @@
     display: inline-block;
     // If the row has no pill, we still keep this element as a pill-sized
     // spacer to maintain consistent positioning of everything else in the row.
-    min-width: 144px;
+    min-width: $pill-width;
     height: $pill-height;
   }
 
