@@ -1,0 +1,93 @@
+.subway-status {
+  position: relative;
+  height: 1200px;
+  width: 1144px;
+  padding: 29px 32px 32px 32px;
+  overflow: hidden;
+
+  .subway-status__header {
+    font-family: Helvetica, sans-serif;
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 96px;
+    letter-spacing: 0px;
+  }
+
+  .subway-status_row {
+    position: relative;
+    padding-top: 44px;
+
+    .subway-status_status_rule {
+      content: "";
+
+      position: relative;
+      bottom: 0;
+      right: 10px;
+
+      width: 1116px;
+      height: 2px;
+
+      background: #000000;
+      border-radius: 1px;
+      margin-top: 42px;
+    }
+
+    &:last-child {
+      .subway-status_status_rule {
+        height: 4px;
+      }
+    }
+  }
+}
+
+.subway-status_route-pill-container {
+  // margin-top: 44px;
+  margin-bottom: 24px;
+  min-width: 144px;
+  height: 64px;
+}
+
+.subway-status_status {
+  position: relative;
+
+  width: 100%;
+
+  box-sizing: border-box;
+  padding-left: 36px;
+
+  overflow: hidden;
+
+  .subway-status_alert:not(:first-child) {
+    margin-top: 24px;
+  }
+
+  .subway-status_alert_text-container {
+    font-family: Inter, sans-serif;
+    vertical-align: top;
+    width: fit-content;
+    max-width: 830px;
+    margin-left: 24px;
+    font-weight: 800;
+    line-height: 56px;
+    font-size: 56px;
+    height: 56px;
+
+    &--normal-service {
+      font-weight: 500;
+      font-size: 48px;
+      line-height: 43px;
+    }
+
+    span.subway-status_alert_location-text {
+      // common styles for location text
+      font-weight: 500;
+      font-size: 40px;
+      line-height: 40px;
+    }
+
+    .subway-status_alert_location-text {
+      margin-left: 24px;
+      line-height: 40px;
+    }
+  }
+}
