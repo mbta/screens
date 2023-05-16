@@ -14,6 +14,7 @@ import {
   firstWord,
   getAlertID,
   isAlertLocationMap,
+  isContracted,
   isContractedWith1Alert,
   isExtended,
   isGLMultiPill,
@@ -42,43 +43,79 @@ const SubwayStatus: ComponentType<SubwayStatusData> = (props) => {
 type LineStatusProps = { section: Section; color: LineColor };
 
 const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
-  let row;
-  switch (section.type) {
-    case "contracted":
-      row = <ContractedStatus alerts={section.alerts} />;
-      break;
-    case "extended":
-      row = <ContractedStatus alerts={[section.alert]} />;
-  }
+  let alerts: [Alert] | [Alert, Alert] = isContracted(section)
+    ? section.alerts
+    : [section.alert];
+
+  const routePill = getRoutePillObject(section, color);
+  const showInlineBranches =
+    color === LineColor.Green &&
+    ((isContracted(section) && section.alerts.length > 1) ||
+      isExtended(section));
 
   return (
     <div className="subway-status_row">
       <div className="subway-status_route-pill-container">
-        <SubwayStatusRoutePill routePill={{ color: color }} />
+        <SubwayStatusRoutePill routePill={routePill} />
       </div>
-      {row}
+      <ContractedStatus
+        alerts={alerts}
+        showInlineBranches={showInlineBranches}
+      />
       <div className="subway-status_status_rule" />
     </div>
   );
 };
 
-type ContractedStatusProps = Pick<ContractedSection, "alerts">;
+const getRoutePillObject = (
+  section: Section,
+  color: LineColor
+): SubwayStatusPill => {
+  if (color === "green") {
+    if (isContractedWith1Alert(section)) {
+      return {
+        color: color,
+        branches: section.alerts.flatMap(
+          (alert) => alert.route_pill?.branches ?? []
+        ),
+      };
+    } else if (isExtended(section)) {
+      return { color: color, branches: section.alert.route_pill?.branches };
+    }
+  }
 
-const ContractedStatus: ComponentType<ContractedStatusProps> = ({ alerts }) => {
+  return { color: color };
+};
+
+type ContractedStatusProps = Pick<ContractedSection, "alerts"> & {
+  showInlineBranches: boolean;
+};
+
+const ContractedStatus: ComponentType<ContractedStatusProps> = ({
+  alerts,
+  showInlineBranches,
+}) => {
   return (
     <div className="subway-status_status">
       {alerts.map((alert, index) => {
         const adjustedAlert = adjustAlertForContractedStatus(alert);
         const id = getAlertID(adjustedAlert, "contracted", index);
-        return <ContractedAlert {...adjustedAlert} id={id} key={id} />;
+        return (
+          <ContractedAlert
+            {...adjustedAlert}
+            id={id}
+            key={id}
+            showInlineBranches={showInlineBranches}
+          />
+        );
       })}
     </div>
   );
 };
 
-interface AlertWithID extends Alert {
-  // needed to ensure stateful components (e.g. SizedAlertLine) reset when appropriate
+interface ContractedAlertProps extends Alert {
   id: string;
+  showInlineBranches: boolean;
 }
 
 // Ordered from "smallest" to "largest"
@@ -96,11 +133,12 @@ const CONTRACTED_ROW_HEIGHT = 70;
 
 const ALERTS_URL = "mbta.com/alerts";
 
-const ContractedAlert: ComponentType<AlertWithID> = ({
+const ContractedAlert: ComponentType<ContractedAlertProps> = ({
   route_pill: routePill,
   status,
   location,
   id,
+  showInlineBranches,
 }) => {
   const { ref, size: fittingStep } = useTextResizer({
     sizes: [
@@ -147,16 +185,11 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
     locationText = location;
   }
 
-  // If we're on the last attempt to fit text in the row and it still overflows,
-  // we prevent it from wrapping or pushing other content out of place.
-  const hideOverflow = fittingStep === FittingStep.PerAlertEffect;
-
   return (
     <BasicAlert
-      routePill={routePill}
+      routePill={showInlineBranches ? routePill : undefined}
       status={truncateStatus ? firstWord(status) : status}
       location={locationText}
-      hideOverflow={hideOverflow}
       ref={ref}
     />
   );
@@ -167,7 +200,6 @@ const NORMAL_STATUS = "Normal Service";
 interface BasicAlertProps extends Omit<Alert, "route_pill"> {
   routePill?: Alert["route_pill"];
   location: string | null;
-  hideOverflow?: boolean;
 }
 
 const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
@@ -218,11 +250,12 @@ const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
 };
 
 const GLBranchPillGroup: ComponentType<Pick<GLMultiPill, "branches">> = ({
-  branches,
+  branches: [firstBranch, ...rest],
 }) => {
   return (
     <>
-      {branches.map((branch) => (
+      <img src={getGLComboPillPath(firstBranch)} className="pill-icon" />
+      {rest.map((branch) => (
         <img
           src={getGLBranchLetterPillPath(branch)}
           className="branch-icon"
