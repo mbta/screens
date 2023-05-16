@@ -41,7 +41,6 @@
 }
 
 .subway-status_route-pill-container {
-  // margin-top: 44px;
   margin-bottom: 24px;
   min-width: 144px;
   height: 64px;
@@ -63,14 +62,11 @@
 
   .subway-status_alert_text-container {
     font-family: Inter, sans-serif;
-    vertical-align: top;
-    width: fit-content;
-    max-width: 830px;
+    max-width: 1024px;
     margin-left: 24px;
     font-weight: 800;
-    line-height: 56px;
+    line-height: 63px;
     font-size: 56px;
-    height: 56px;
 
     &--normal-service {
       font-weight: 500;
