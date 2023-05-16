@@ -303,7 +303,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp get_location(informed_entities, route_id) do
     cond do
       alert_is_whole_route?(informed_entities) ->
-        nil
+        "Entire line"
 
       alert_is_whole_direction?(informed_entities) ->
         get_direction(informed_entities, route_id)
@@ -322,7 +322,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
          route_id
        ) do
     location = get_location(informed_entities, route_id)
-    status = if is_nil(location), do: "SERVICE SUSPENDED", else: "Suspension"
+
+    status = if location == "Entire line", do: "SERVICE SUSPENDED", else: "Suspension"
+
     %{status: status, location: location}
   end
 
@@ -354,9 +356,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         :more_than -> "over #{delay_minutes} minutes"
       end
 
+    location =
+      case get_location(informed_entities, route_id) do
+        # Most delays apply to the whole line. It's not necessary to specify it.
+        "Entire line" -> nil
+        other -> other
+      end
+
     %{
       status: "Delays #{duration_text}",
-      location: get_location(informed_entities, route_id)
+      location: location
     }
   end
 
@@ -379,12 +388,22 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     }
   end
 
-  def serialize_green_line_branch_alert(alert, route_ids),
-    do:
-      Map.merge(
-        %{route_pill: serialize_gl_pill_with_branches(route_ids)},
-        serialize_alert(alert, "Green")
-      )
+  # If only one branch is affected, we can still determine a stop
+  # range to show, for applicable alert types
+  def serialize_green_line_branch_alert(alert, [route_id]) do
+    Map.merge(
+      %{route_pill: serialize_gl_pill_with_branches([route_id])},
+      serialize_alert(alert, route_id)
+    )
+  end
+
+  # Otherwise, give up on determining a stop range.
+  def serialize_green_line_branch_alert(alert, route_ids) do
+    Map.merge(
+      %{route_pill: serialize_gl_pill_with_branches(route_ids)},
+      serialize_alert(alert, "Green")
+    )
+  end
 
   defp alert_affects_gl_trunk_or_whole_line?(%Alert{informed_entities: informed_entities}) do
     gl_trunk_stops = Stop.gl_trunk_stops()
