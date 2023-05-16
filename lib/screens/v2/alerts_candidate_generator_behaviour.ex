@@ -16,12 +16,11 @@ defmodule Screens.V2.AlertsCandidateGeneratorBehaviour do
   # Returns
   @type alerts :: list(Alert.t())
   @type facilities :: map()
-  @type fetch_result :: alerts() | {alerts(), facilities()}
 
   @doc """
   Fetches a list of alerts using the function provided in parameters.
   """
-  @callback fetch(opts(), fetch_alerts_fn()) :: {:ok, fetch_result()}
+  @callback fetch(opts(), fetch_alerts_fn()) :: {:ok, alerts()}
 
   @doc """
   Filters alerts so only relevant alerts are considered when creating a WidgetInstance struct.
