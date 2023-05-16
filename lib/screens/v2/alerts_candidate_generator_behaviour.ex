@@ -4,7 +4,7 @@ defmodule Screens.V2.AlertsCandidateGeneratorBehaviour do
   @moduledoc """
   Behavior for fetching and filtering alerts in a CandidateGenerator.
 
-  - `fetch(opts, fetch_alerts_fn)` is called fetch alerts.
+  - `fetch(opts, fetch_alerts_fn)` is called to fetch alerts.
   - `relevant_alerts(alerts, config, opts)` filters the list of alerts.
   """
 
