@@ -10,7 +10,6 @@
     font-size: 72px;
     font-weight: 700;
     line-height: 96px;
-    letter-spacing: 0px;
   }
 
   .subway-status_row {
@@ -60,12 +59,28 @@
     margin-top: 24px;
   }
 
+  .subway-status_alert_route-pill-container {
+    display: inline-block;
+
+    .branch-icon {
+      display: inline-block;
+      height: 64px;
+      width: 64px;
+
+      &:first-child:not(:only-child) {
+        margin-right: 8px;
+      }
+    }
+  }
+
   .subway-status_alert_text-container {
+    display: inline-block;
+    vertical-align: top;
     font-family: Inter, sans-serif;
     max-width: 1024px;
     margin-left: 24px;
     font-weight: 800;
-    line-height: 63px;
+    line-height: 64px;
     font-size: 56px;
 
     &--normal-service {
@@ -74,16 +89,11 @@
       line-height: 43px;
     }
 
-    span.subway-status_alert_location-text {
-      // common styles for location text
+    .subway-status_alert_location-text {
       font-weight: 500;
       font-size: 40px;
       line-height: 40px;
-    }
-
-    .subway-status_alert_location-text {
       margin-left: 24px;
-      line-height: 40px;
     }
   }
 }

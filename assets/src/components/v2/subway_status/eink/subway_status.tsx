@@ -187,9 +187,10 @@ const ContractedAlert: ComponentType<ContractedAlertProps> = ({
 
   return (
     <BasicAlert
-      routePill={showInlineBranches ? routePill : undefined}
+      routePill={routePill}
       status={truncateStatus ? firstWord(status) : status}
       location={locationText}
+      showInlineBranches={showInlineBranches}
       ref={ref}
     />
   );
@@ -200,10 +201,11 @@ const NORMAL_STATUS = "Normal Service";
 interface BasicAlertProps extends Omit<Alert, "route_pill"> {
   routePill?: Alert["route_pill"];
   location: string | null;
+  showInlineBranches: boolean;
 }
 
 const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
-  ({ routePill, status, location }, ref) => {
+  ({ routePill, status, location, showInlineBranches }, ref) => {
     let textContainerClassName = "subway-status_alert_text-container";
 
     if (status === NORMAL_STATUS) {
@@ -217,7 +219,10 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
       <div className="subway-status_alert">
         {routePill?.branches && (
           <div className="subway-status_alert_route-pill-container">
-            <SubwayStatusRoutePill routePill={routePill} />
+            <SubwayStatusRoutePill
+              routePill={routePill}
+              showInlineBranches={showInlineBranches}
+            />
           </div>
         )}
         <div className={textContainerClassName} ref={ref}>
@@ -233,12 +238,18 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
   }
 );
 
-const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
-  routePill,
-}) => {
+const SubwayStatusRoutePill: ComponentType<{
+  routePill: SubwayStatusPill;
+  showInlineBranches: boolean;
+}> = ({ routePill, showInlineBranches }) => {
   if (isGLMultiPill(routePill)) {
     const sortedUniqueBranches = Array.from(new Set(routePill.branches)).sort();
-    return <GLBranchPillGroup branches={sortedUniqueBranches} />;
+    return (
+      <GLBranchPillGroup
+        branches={sortedUniqueBranches}
+        showInlineBranches={showInlineBranches}
+      />
+    );
   } else {
     return (
       <img
@@ -249,9 +260,24 @@ const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
   }
 };
 
-const GLBranchPillGroup: ComponentType<Pick<GLMultiPill, "branches">> = ({
-  branches: [firstBranch, ...rest],
-}) => {
+const GLBranchPillGroup: ComponentType<
+  Pick<GLMultiPill, "branches"> & { showInlineBranches: boolean }
+> = ({ branches, showInlineBranches }) => {
+  if (showInlineBranches) {
+    return (
+      <>
+        {branches.map((branch) => (
+          <img
+            src={getGLBranchLetterPillPath(branch)}
+            className="branch-icon"
+            key={branch}
+          />
+        ))}
+      </>
+    );
+  }
+
+  const [firstBranch, ...rest] = branches;
   return (
     <>
       <img src={getGLComboPillPath(firstBranch)} className="pill-icon" />
