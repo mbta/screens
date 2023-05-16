@@ -39,7 +39,7 @@ import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import DeparturesNoService from "Components/v2/eink/departures_no_service";
-import SubwayStatus from "Components/v2/eink/subway_status";
+import SubwayStatus from "Components/v2/subway_status/eink/subway_status";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,

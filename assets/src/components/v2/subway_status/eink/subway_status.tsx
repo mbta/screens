@@ -1,84 +1,23 @@
 import React, { ComponentType, forwardRef } from "react";
-import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
+import { classWithModifier, imagePath } from "Util/util";
 import useTextResizer from "Hooks/v2/use_text_resizer";
-
-///////////////////////
-// SERVER DATA TYPES //
-///////////////////////
-
-interface SubwayStatusData {
-  blue: Section;
-  orange: Section;
-  red: Section;
-  green: Section;
-}
-
-type Section = ContractedSection | ExtendedSection;
-
-interface ContractedSection {
-  type: "contracted";
-  alerts: [Alert] | [Alert, Alert];
-}
-
-interface ExtendedSection {
-  type: "extended";
-  alert: Alert;
-}
-
-interface Alert {
-  route_pill?: SubwayStatusPill;
-  status: string;
-  location: AlertLocation;
-}
-
-interface SubwayStatusPill {
-  color: LineColor;
-  branches?: GLBranch[];
-}
-
-interface GLMultiPill extends SubwayStatusPill {
-  // Specifically, a non-empty array
-  branches: GLBranch[];
-}
-
-type AlertLocation = string | AlertLocationMap | null;
-
-interface AlertLocationMap {
-  full: string;
-  abbrev: string;
-}
-
-enum LineColor {
-  Blue = "blue",
-  Orange = "orange",
-  Red = "red",
-  Green = "green",
-}
-
-enum GLBranch {
-  B = "b",
-  C = "c",
-  D = "d",
-  E = "e",
-}
-
-/////////////////
-// TYPE GUARDS //
-/////////////////
-
-const isGLMultiPill = (pill?: SubwayStatusPill): pill is GLMultiPill =>
-  (pill?.branches?.length ?? 0) > 0;
-
-const isAlertLocationMap = (
-  location: AlertLocation
-): location is AlertLocationMap =>
-  location !== null && typeof location === "object";
-
-const isContracted = (section: Section): section is ContractedSection =>
-  section.type === "contracted";
-
-const isExtended = (section: Section): section is ExtendedSection =>
-  section.type === "extended";
+import {
+  Alert,
+  ContractedSection,
+  GLBranch,
+  GLMultiPill,
+  LineColor,
+  Section,
+  SubwayStatusData,
+  SubwayStatusPill,
+  adjustAlertForContractedStatus,
+  firstWord,
+  getAlertID,
+  isAlertLocationMap,
+  isContractedWith1Alert,
+  isExtended,
+  isGLMultiPill,
+} from "../subway_status_common";
 
 ////////////////
 // COMPONENTS //
@@ -89,7 +28,9 @@ const SubwayStatus: ComponentType<SubwayStatusData> = (props) => {
 
   return (
     <div className="subway-status">
-      {/* <span className="subway-status__header">Current Subway Service</span> */}
+      {shouldShowHeader(props) && (
+        <span className="subway-status__header">Current Subway Service</span>
+      )}
       <LineStatus section={blue} color={LineColor.Blue} />
       <LineStatus section={orange} color={LineColor.Orange} />
       <LineStatus section={red} color={LineColor.Red} />
@@ -107,7 +48,7 @@ const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
       row = <ContractedStatus alerts={section.alerts} />;
       break;
     case "extended":
-      row = <ExtendedStatus alert={section.alert} />;
+      row = <ContractedStatus alerts={[section.alert]} />;
   }
 
   return (
@@ -135,17 +76,6 @@ const ContractedStatus: ComponentType<ContractedStatusProps> = ({ alerts }) => {
   );
 };
 
-type ExtendedStatusProps = Pick<ExtendedSection, "alert">;
-
-const ExtendedStatus: ComponentType<ExtendedStatusProps> = ({ alert }) => {
-  return (
-    <div className={classWithModifier("subway-status_status", "extended")}>
-      <ExtendedAlert {...alert} />
-      <div className="subway-status_status_rule" />
-    </div>
-  );
-};
-
 interface AlertWithID extends Alert {
   // needed to ensure stateful components (e.g. SizedAlertLine) reset when appropriate
   id: string;
@@ -162,7 +92,7 @@ enum FittingStep {
  * Pixel height of a ContractedAlert. This should match the height of the route pill, since
  * it's the tallest element in the row.
  */
-const CONTRACTED_ROW_HEIGHT = 64;
+const CONTRACTED_ROW_HEIGHT = 70;
 
 const ALERTS_URL = "mbta.com/alerts";
 
@@ -232,28 +162,6 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   );
 };
 
-const ExtendedAlert: ComponentType<Alert> = ({
-  route_pill: routePill,
-  status,
-  location,
-}) => {
-  let locationText: string | null;
-  if (isAlertLocationMap(location)) {
-    locationText = location.full;
-  } else {
-    locationText = location;
-  }
-
-  return (
-    <BasicAlert
-      routePill={routePill}
-      status={status}
-      location={locationText}
-      hideOverflow
-    />
-  );
-};
-
 const NORMAL_STATUS = "Normal Service";
 
 interface BasicAlertProps extends Omit<Alert, "route_pill"> {
@@ -263,7 +171,7 @@ interface BasicAlertProps extends Omit<Alert, "route_pill"> {
 }
 
 const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
-  ({ routePill, status, location, hideOverflow = false }, ref) => {
+  ({ routePill, status, location }, ref) => {
     let textContainerClassName = "subway-status_alert_text-container";
 
     if (status === NORMAL_STATUS) {
@@ -310,12 +218,11 @@ const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
 };
 
 const GLBranchPillGroup: ComponentType<Pick<GLMultiPill, "branches">> = ({
-  branches: [firstBranch, ...rest],
+  branches,
 }) => {
   return (
     <>
-      <img src={getGLComboPillPath(firstBranch)} className="pill-icon" />
-      {rest.map((branch) => (
+      {branches.map((branch) => (
         <img
           src={getGLBranchLetterPillPath(branch)}
           className="branch-icon"
@@ -330,62 +237,14 @@ const GLBranchPillGroup: ComponentType<Pick<GLMultiPill, "branches">> = ({
 // HELPERS //
 /////////////
 
-/**
- * Uniquely identifies an alert line so that if anything changes, the text-
- * resizing logic resets.
- */
-const getAlertID = (
-  alert: Alert,
-  statusType: "contracted" | "extended",
-  index: number
-): string => {
-  const location = isAlertLocationMap(alert.location)
-    ? `${alert.location.abbrev}-${alert.location.full}`
-    : alert.location;
-
-  const routePill = `${alert?.route_pill?.color ?? ""}-${
-    alert?.route_pill?.branches?.join("") ?? ""
-  }`;
-
-  return `${statusType}-${index}-${location}-${routePill}`;
+const shouldShowHeader = ({ blue, orange, red, green }: SubwayStatusData) => {
+  return [blue, orange, red, green].every(
+    (data) => isContractedWith1Alert(data) || isExtended(data)
+  );
 };
-
-/**
- * When appearing in a contracted status, we always make these changes to alert content:
- * - Replace " minute(s)" with "m" in `alert.status`, if it's a delay
- * - Clear the `location` entirely, if the alert's pill uses all 4 GL branches
- */
-const adjustAlertForContractedStatus = (alert: Alert): Alert => ({
-  ...alert,
-  status: delayMinutesToM(alert.status),
-  location: clearLocationForAllGLBranchesAlert(
-    alert.location,
-    alert.route_pill
-  ),
-});
-
-const delayMinutesToM = (status: string): string =>
-  status.startsWith("Delays")
-    ? status.replace(/(?<N>\d+) minutes?$/i, "$<N>m")
-    : status;
-
-const clearLocationForAllGLBranchesAlert = (
-  location: AlertLocation,
-  routePill?: SubwayStatusPill
-): AlertLocation => {
-  if (isGLMultiPill(routePill) && new Set(routePill.branches).size === 4) {
-    return null;
-  }
-  return location;
-};
-
-const firstWord = (str: string): string => str.split(" ")[0];
 
 const getStandardLinePillPath = (lineColor: LineColor) =>
   pillPath(`${lineColor}-line.svg`);
-
-const isContractedWith1Alert = (section: Section) =>
-  isContracted(section) && section.alerts.length === 1;
 
 const getGLComboPillPath = (branch: GLBranch) => pillPath(`gl-${branch}.svg`);
 

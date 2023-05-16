@@ -35,7 +35,7 @@ import ScreenTakeover from "Components/v2/pre_fare/screen_takeover";
 import ScreenSplitTakeover from "Components/v2/pre_fare/screen_split_takeover";
 import ElevatorStatus from "Components/v2/elevator_status";
 import FullLineMap from "Components/v2/full_line_map";
-import SubwayStatus from "Components/v2/lcd/subway_status_v2";
+import SubwayStatus from "Components/v2/subway_status/lcd/subway_status_v2";
 import ReconstructedAlert from "Components/v2/reconstructed_alert";
 import NoData from "Components/v2/pre_fare/no_data";
 import PageLoadNoData from "Components/v2/pre_fare/page_load_no_data";

@@ -1,84 +1,26 @@
 import React, { ComponentType, forwardRef } from "react";
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 import useTextResizer from "Hooks/v2/use_text_resizer";
-
-///////////////////////
-// SERVER DATA TYPES //
-///////////////////////
-
-interface SubwayStatusData {
-  blue: Section;
-  orange: Section;
-  red: Section;
-  green: Section;
-}
-
-type Section = ContractedSection | ExtendedSection;
-
-interface ContractedSection {
-  type: "contracted";
-  alerts: [Alert] | [Alert, Alert];
-}
-
-interface ExtendedSection {
-  type: "extended";
-  alert: Alert;
-}
-
-interface Alert {
-  route_pill?: SubwayStatusPill;
-  status: string;
-  location: AlertLocation;
-}
-
-interface SubwayStatusPill {
-  color: LineColor;
-  branches?: GLBranch[];
-}
-
-interface GLMultiPill extends SubwayStatusPill {
-  // Specifically, a non-empty array
-  branches: GLBranch[];
-}
-
-type AlertLocation = string | AlertLocationMap | null;
-
-interface AlertLocationMap {
-  full: string;
-  abbrev: string;
-}
-
-enum LineColor {
-  Blue = "blue",
-  Orange = "orange",
-  Red = "red",
-  Green = "green",
-}
-
-enum GLBranch {
-  B = "b",
-  C = "c",
-  D = "d",
-  E = "e",
-}
-
-/////////////////
-// TYPE GUARDS //
-/////////////////
-
-const isGLMultiPill = (pill?: SubwayStatusPill): pill is GLMultiPill =>
-  (pill?.branches?.length ?? 0) > 0;
-
-const isAlertLocationMap = (
-  location: AlertLocation
-): location is AlertLocationMap =>
-  location !== null && typeof location === "object";
-
-const isContracted = (section: Section): section is ContractedSection =>
-  section.type === "contracted";
-
-const isExtended = (section: Section): section is ExtendedSection =>
-  section.type === "extended";
+import {
+  Alert,
+  ContractedSection,
+  ExtendedSection,
+  GLBranch,
+  GLMultiPill,
+  LineColor,
+  Section,
+  SubwayStatusData,
+  SubwayStatusPill,
+  adjustAlertForContractedStatus,
+  firstWord,
+  getAlertID,
+  isAlertLocationMap,
+  isContracted,
+  isContractedWith1Alert,
+  isExtended,
+  isExtendedWithNoLocation,
+  isGLMultiPill,
+} from "../subway_status_common";
 
 ////////////////
 // COMPONENTS //
@@ -297,7 +239,7 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
     }
 
     return (
-      <div className={containerClassName} >
+      <div className={containerClassName}>
         <div className="subway-status_alert-sizer" ref={ref}>
           <div className="subway-status_alert_route-pill-container">
             {routePill && <SubwayStatusRoutePill routePill={routePill} />}
@@ -372,56 +314,6 @@ const convertLocationlessExtendedAlertToContracted = (
     : section;
 
 /**
- * Uniquely identifies an alert line so that if anything changes, the text-
- * resizing logic resets.
- */
-const getAlertID = (
-  alert: Alert,
-  statusType: Section["type"],
-  index: number
-): string => {
-  const location = isAlertLocationMap(alert.location)
-    ? `${alert.location.abbrev}-${alert.location.full}`
-    : alert.location;
-
-  const routePill = `${alert?.route_pill?.color ?? ""}-${alert?.route_pill?.branches?.join("") ?? ""
-    }`;
-
-  return `${statusType}-${index}-${location}-${routePill}`;
-};
-
-/**
- * When appearing in a contracted status, we always make these changes to alert content:
- * - Replace " minute(s)" with "m" in `alert.status`, if it's a delay
- * - Clear the `location` entirely, if the alert's pill uses all 4 GL branches
- */
-const adjustAlertForContractedStatus = (alert: Alert): Alert => ({
-  ...alert,
-  status: delayMinutesToM(alert.status),
-  location: clearLocationForAllGLBranchesAlert(
-    alert.location,
-    alert.route_pill
-  ),
-});
-
-const delayMinutesToM = (status: string): string =>
-  status.startsWith("Delays")
-    ? status.replace(/(?<N>\d+) minutes?$/i, "$<N>m")
-    : status;
-
-const clearLocationForAllGLBranchesAlert = (
-  location: AlertLocation,
-  routePill?: SubwayStatusPill
-): AlertLocation => {
-  if (isGLMultiPill(routePill) && new Set(routePill.branches).size === 4) {
-    return null;
-  }
-  return location;
-};
-
-const firstWord = (str: string): string => str.split(" ")[0];
-
-/**
  * Determines whether we should show the last rule, below the Green Line section.
  *
  * We show the last rule as long as the last pill in the pill column is no lower
@@ -448,15 +340,6 @@ const shouldShowLastRule = ({ blue, orange, red, green }: SubwayStatusData) => {
 
 const getStandardLinePillPath = (lineColor: LineColor) =>
   pillPath(`${lineColor}-line.svg`);
-
-const isContractedWith1Alert = (
-  section: Section
-): section is ContractedSection =>
-  isContracted(section) && section.alerts.length === 1;
-
-const isExtendedWithNoLocation = (
-  section: Section
-): section is ExtendedSection => isExtended(section) && !section.alert.location;
 
 const getGLComboPillPath = (branch: GLBranch) => pillPath(`gl-${branch}.svg`);
 
