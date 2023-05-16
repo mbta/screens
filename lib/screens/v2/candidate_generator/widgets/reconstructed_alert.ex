@@ -37,7 +37,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
           alert: alert,
           now: now,
           location_context: location_context,
-          # TODO: these two items look like location stuff? Should they be?
           informed_stations_string: get_stations(alert, fetch_stop_name_fn),
           is_terminal_station: is_terminal?(stop_id, location_context.stop_sequences)
         }
