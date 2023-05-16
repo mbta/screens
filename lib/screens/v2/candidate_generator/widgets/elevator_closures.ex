@@ -29,7 +29,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
              route_ids_at_stop
            ),
          {:ok, parent_station_map} <- Stop.fetch_parent_station_name_map(),
-         {:ok, alerts, facility_id_to_name} <-
+         {:ok, alerts} <-
            fetch([activity: "USING_WHEELCHAIR"], fetch_with_facilities_fn) do
       elevator_closures = relevant_alerts(alerts, config)
       icon_map = get_icon_map(elevator_closures, parent_station_id)
@@ -37,7 +37,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
       [
         %ElevatorStatusWidget{
           alerts: elevator_closures,
-          facility_id_to_name: facility_id_to_name,
           stop_sequences: stop_sequences,
           screen: config,
           now: now,

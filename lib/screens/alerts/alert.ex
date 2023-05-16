@@ -248,8 +248,8 @@ defmodule Screens.Alerts.Alert do
     query_opts = opts ++ [include: ~w[facilities]]
 
     case fetch(query_opts, get_json_fn) do
-      {:ok, {alerts, facilities}} ->
-        {:ok, alerts, facilities}
+      {:ok, alerts} ->
+        {:ok, alerts}
 
       _ ->
         :error

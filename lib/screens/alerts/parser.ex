@@ -4,12 +4,9 @@ defmodule Screens.Alerts.Parser do
   def parse_result(%{"data" => data, "included" => included}) when is_list(data) do
     facility_data = parse_facility_data(included)
 
-    alerts =
-      data
-      |> Enum.map(&parse_alert/1)
-      |> Enum.reject(&is_nil/1)
-
-    {alerts, facility_data}
+    data
+    |> Enum.map(&parse_alert(&1, facility_data))
+    |> Enum.reject(&is_nil/1)
   end
 
   def parse_result(%{"data" => data}) when is_list(data) do
@@ -18,11 +15,13 @@ defmodule Screens.Alerts.Parser do
     |> Enum.reject(&is_nil/1)
   end
 
-  def parse_alert(%{"id" => id, "attributes" => attributes}) when map_size(attributes) == 0 do
+  def parse_alert(alert, facilities \\ %{})
+
+  def parse_alert(%{"id" => id, "attributes" => attributes}, _) when map_size(attributes) == 0 do
     %Screens.Alerts.Alert{id: id}
   end
 
-  def parse_alert(%{"id" => id, "attributes" => attributes}) do
+  def parse_alert(%{"id" => id, "attributes" => attributes}, facilities) do
     case attributes do
       %{
         "active_period" => active_period,
@@ -44,7 +43,7 @@ defmodule Screens.Alerts.Parser do
           effect: parse_effect(effect),
           severity: severity,
           header: header,
-          informed_entities: parse_informed_entities(informed_entities),
+          informed_entities: parse_informed_entities(informed_entities, facilities),
           active_period: parse_and_sort_active_periods(active_period),
           lifecycle: lifecycle,
           timeframe: timeframe,
@@ -59,7 +58,11 @@ defmodule Screens.Alerts.Parser do
     end
   end
 
-  defp parse_informed_entities(ies) do
+  defp parse_informed_entities(ies, facilities) when map_size(facilities) > 0 do
+    Enum.map(ies, &parse_informed_entity_with_facilities(&1, facilities))
+  end
+
+  defp parse_informed_entities(ies, _) do
     Enum.map(ies, &parse_informed_entity/1)
   end
 
@@ -68,8 +71,25 @@ defmodule Screens.Alerts.Parser do
       stop: get_in(ie, ["stop"]),
       route: get_in(ie, ["route"]),
       route_type: get_in(ie, ["route_type"]),
+      direction_id: get_in(ie, ["direction_id"])
+    }
+  end
+
+  defp parse_informed_entity_with_facilities(ie, facilities) do
+    facility_id = get_in(ie, ["facility"])
+
+    facility_name =
+      case Map.fetch(facilities, facility_id) do
+        {:ok, name} -> name
+        :error -> nil
+      end
+
+    %{
+      stop: get_in(ie, ["stop"]),
+      route: get_in(ie, ["route"]),
+      route_type: get_in(ie, ["route_type"]),
       direction_id: get_in(ie, ["direction_id"]),
-      facility: get_in(ie, ["facility"])
+      facility: %{id: facility_id, name: facility_name}
     }
   end
 
