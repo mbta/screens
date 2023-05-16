@@ -1,4 +1,6 @@
 defmodule Screens.V2.AlertsCandidateGeneratorBehaviour do
+  alias Screens.Alerts.Alert
+
   @moduledoc """
   Behavior for fetching and filtering alerts in a CandidateGenerator.
 
@@ -12,7 +14,7 @@ defmodule Screens.V2.AlertsCandidateGeneratorBehaviour do
   @type config :: Screens.Config.Screen.t()
 
   # Returns
-  @type alerts :: list()
+  @type alerts :: list(Alert.t())
   @type facilities :: map()
   @type fetch_result :: alerts() | {alerts(), facilities()}
 
