@@ -31,6 +31,8 @@ defmodule Screens.Stops.Stop do
           platform_code: String.t() | nil
         }
 
+  @type screen_type :: BusEink | BusShelter | GlEink | PreFare | Dup
+
   @blue_line_stops [
     {"place-wondl", {"Wonderland", "Wonderland"}},
     {"place-rbmnl", {"Revere Beach", "Revere Bch"}},
@@ -430,7 +432,7 @@ defmodule Screens.Stops.Stop do
   Fetches all the location context for a screen given its app type, stop id, and time
   """
   @spec fetch_location_context(
-          BusEink | BusShelter | GlEink | PreFare | Dup,
+          screen_type(),
           id(),
           DateTime.t()
         ) :: {:ok, LocationContext.t()}
@@ -459,7 +461,7 @@ defmodule Screens.Stops.Stop do
   end
 
   # Returns the route types we care about for the alerts of this screen type / place
-  @spec get_route_type_filter(BusEink | BusShelter | GlEink | PreFare | Dup, String.t()) ::
+  @spec get_route_type_filter(screen_type(), String.t()) ::
           list(atom())
   def get_route_type_filter(app, _) when app in [BusEink, BusShelter], do: [:bus]
   def get_route_type_filter(GlEink, _), do: [:light_rail]
