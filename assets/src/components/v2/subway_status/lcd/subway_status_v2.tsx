@@ -1,5 +1,10 @@
 import React, { ComponentType, forwardRef } from "react";
-import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
+import {
+  classWithModifier,
+  classWithModifiers,
+  firstWord,
+  imagePath,
+} from "Util/util";
 import useTextResizer from "Hooks/v2/use_text_resizer";
 import {
   Alert,
@@ -12,13 +17,11 @@ import {
   SubwayStatusData,
   SubwayStatusPill,
   adjustAlertForContractedStatus,
-  firstWord,
   getAlertID,
   isAlertLocationMap,
   isContracted,
   isContractedWith1Alert,
   isExtended,
-  isExtendedWithNoLocation,
   isGLMultiPill,
 } from "../subway_status_common";
 
@@ -347,5 +350,9 @@ const getGLBranchLetterPillPath = (branch: GLBranch) =>
   pillPath(`green-${branch}-circle.svg`);
 
 const pillPath = (pillFilename: string) => imagePath(`pills/${pillFilename}`);
+
+const isExtendedWithNoLocation = (
+  section: Section
+): section is ExtendedSection => isExtended(section) && !section.alert.location;
 
 export default SubwayStatus;

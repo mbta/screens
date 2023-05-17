@@ -1,5 +1,5 @@
 import React, { ComponentType, forwardRef } from "react";
-import { classWithModifier, imagePath } from "Util/util";
+import { classWithModifier, firstWord, imagePath } from "Util/util";
 import useTextResizer from "Hooks/v2/use_text_resizer";
 import {
   Alert,
@@ -11,7 +11,6 @@ import {
   SubwayStatusData,
   SubwayStatusPill,
   adjustAlertForContractedStatus,
-  firstWord,
   getAlertID,
   isAlertLocationMap,
   isContracted,

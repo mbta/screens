@@ -129,13 +129,7 @@ export const getAlertID = (
   return `${statusType}-${index}-${location}-${routePill}`;
 };
 
-export const firstWord = (str: string): string => str.split(" ")[0];
-
 export const isContractedWith1Alert = (
   section: Section
 ): section is ContractedSection =>
   isContracted(section) && section.alerts.length === 1;
-
-export const isExtendedWithNoLocation = (
-  section: Section
-): section is ExtendedSection => isExtended(section) && !section.alert.location;
