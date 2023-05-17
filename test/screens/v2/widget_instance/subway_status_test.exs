@@ -1286,9 +1286,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   end
 
   describe "slot_names/1" do
-    test "returns large flex zone" do
+    test "returns medium and large flex zone" do
       instance = %SubwayStatus{subway_alerts: []}
-      assert [:large] == WidgetInstance.slot_names(instance)
+      assert [:medium, :large] == WidgetInstance.slot_names(instance)
     end
   end
 

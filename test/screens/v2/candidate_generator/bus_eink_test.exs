@@ -58,6 +58,7 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
       fetch_stop_fn = fn "1722" -> "1624 Blue Hill Ave @ Mattapan Sq" end
       now = ~U[2020-04-06T10:00:00Z]
       evergreen_content_instances_fn = fn _ -> [] end
+      subway_status_instances_fn = fn _, _ -> [] end
 
       actual_instances =
         BusEink.candidate_instances(
@@ -66,7 +67,8 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
           fetch_stop_fn,
           departures_instances_fn,
           alerts_instances_fn,
-          evergreen_content_instances_fn
+          evergreen_content_instances_fn,
+          subway_status_instances_fn
         )
 
       expected_header = %NormalHeader{
