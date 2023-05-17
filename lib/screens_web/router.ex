@@ -78,7 +78,7 @@ defmodule ScreensWeb.Router do
       pipe_through [:redirect_prod_http, :browser]
 
       get "/:id", ScreenController, :index
-      get "/:id/simulation", ScreenController, :index
+      get "/:id/simulation", ScreenController, :simulation
     end
 
     scope "/api/screen" do

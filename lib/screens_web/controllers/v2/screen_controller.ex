@@ -107,6 +107,11 @@ defmodule ScreensWeb.V2.ScreenController do
     render_not_found(conn)
   end
 
+  def simulation(conn, params) do
+    conn = assign(conn, :fullstory_org_id, Application.get_env(:screenplay, :fullstory_org_id))
+    index(conn, params)
+  end
+
   defp render_not_found(conn) do
     conn
     |> assign(:app_id, @default_app_id)
