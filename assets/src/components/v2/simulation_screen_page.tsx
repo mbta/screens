@@ -5,7 +5,7 @@ import { getDatasetValue } from "Util/dataset";
 
 const SimulationScreenPage = ({ opts = {} }) => {
   const environmentName = getDatasetValue("environmentName");
-  if (environmentName !== "screens-prod") {
+  if (environmentName === "screens-prod") {
     window["_fs_run_in_iframe"] = true;
   }
 
