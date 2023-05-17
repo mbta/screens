@@ -1,6 +1,9 @@
 import initSentry from "Util/sentry";
 initSentry("solari");
 
+import initFullstory from "Util/fullstory";
+initFullstory();
+
 declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../css/solari.scss");
@@ -54,6 +57,6 @@ const handleWatchdogMessage = (ev: MessageEvent) => {
   if (ev.data.type === "watchdog") {
     (ev?.source as Window)?.postMessage(ev.data, "*");
   }
-}
+};
 
 ReactDOM.render(<App />, document.getElementById("app"));
