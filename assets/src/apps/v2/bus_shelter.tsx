@@ -34,7 +34,7 @@ import Placeholder from "Components/v2/placeholder";
 import LinkFooter from "Components/v2/bus_shelter/link_footer";
 import NormalHeader from "Components/v2/lcd/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
-import SubwayStatus from "Components/v2/subway_status/lcd/subway_status_v2";
+import SubwayStatus from "Components/v2/subway_status/lcd/subway_status";
 
 import EvergreenContent from "Components/v2/evergreen_content";
 import Survey from "Components/v2/survey";
