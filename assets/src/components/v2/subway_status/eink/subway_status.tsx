@@ -217,12 +217,9 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
 
     return (
       <div className="subway-status_alert">
-        {routePill?.branches && (
+        {showInlineBranches && routePill?.branches && (
           <div className="subway-status_alert_route-pill-container">
-            <SubwayStatusRoutePill
-              routePill={routePill}
-              showInlineBranches={showInlineBranches}
-            />
+            <SubwayStatusRoutePill routePill={routePill} showInlineBranches />
           </div>
         )}
         <div className={textContainerClassName} ref={ref}>
@@ -240,7 +237,7 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
 
 const SubwayStatusRoutePill: ComponentType<{
   routePill: SubwayStatusPill;
-  showInlineBranches: boolean;
+  showInlineBranches?: boolean;
 }> = ({ routePill, showInlineBranches }) => {
   if (isGLMultiPill(routePill)) {
     const sortedUniqueBranches = Array.from(new Set(routePill.branches)).sort();
@@ -261,7 +258,7 @@ const SubwayStatusRoutePill: ComponentType<{
 };
 
 const GLBranchPillGroup: ComponentType<
-  Pick<GLMultiPill, "branches"> & { showInlineBranches: boolean }
+  Pick<GLMultiPill, "branches"> & { showInlineBranches?: boolean }
 > = ({ branches, showInlineBranches }) => {
   if (showInlineBranches) {
     return (
