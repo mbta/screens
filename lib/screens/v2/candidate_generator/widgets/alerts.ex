@@ -32,7 +32,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
          route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
          {:ok, alerts} <-
            fetch(
-             [reachable_stop_ids: reachable_stop_ids, route_ids_at_stop: route_ids_at_stop],
+             [stop_ids: reachable_stop_ids, route_ids: route_ids_at_stop],
              fetch_alerts_by_stop_and_route_fn
            ) do
       alerts
