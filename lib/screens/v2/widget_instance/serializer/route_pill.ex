@@ -65,7 +65,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   def serialize_for_departure(route_id, route_name, route_type, track_number) do
     route =
       cond do
-        not is_nil(track_number) ->
+        route_type == :rail and not is_nil(track_number) ->
           %{type: :text, text: "TR#{track_number}"}
 
         route_type == :rail ->
