@@ -68,7 +68,7 @@
       height: 64px;
       width: 64px;
 
-      &:first-child:not(:only-child) {
+      &:not(:last-child) {
         margin-right: 8px;
       }
     }
