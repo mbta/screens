@@ -27,7 +27,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
              route_ids_at_stop
            ),
          {:ok, parent_station_map} <- Stop.fetch_parent_station_name_map(),
-         {:ok, elevator_closures} <- fetch_elevator_alerts_with_facilities_fn.() do
+         {:ok, alerts} <- fetch_elevator_alerts_with_facilities_fn.() do
+      elevator_closures = relevant_alerts(alerts)
       icon_map = get_icon_map(elevator_closures, parent_station_id)
 
       [
@@ -43,6 +44,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     else
       :error -> []
     end
+  end
+
+  defp relevant_alerts(alerts) do
+    Enum.filter(alerts, fn
+      %Alert{effect: :elevator_closure} = alert -> alert
+      _ -> false
+    end)
   end
 
   defp get_icon_map(elevator_closures, home_parent_station_id) do
