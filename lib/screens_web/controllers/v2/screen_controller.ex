@@ -109,7 +109,10 @@ defmodule ScreensWeb.V2.ScreenController do
 
   def simulation(conn, params) do
     conn
-    |> assign(:fullstory_org_id, Application.get_env(:screenplay, :fullstory_org_id))
+    |> assign(
+      :screenplay_fullstory_org_id,
+      Application.get_env(:screens, :screenplay_fullstory_org_id)
+    )
     |> index(params)
   end
 

@@ -7,10 +7,13 @@ import { isRealScreen } from "./util";
  * a real production screen AND the URL does not contain the disable_sentry param.
  */
 const initFullstory = () => {
-  const fullstoryOrgId = getDatasetValue("fullstoryOrgId");
+  const screenplayFullstoryOrgId = getDatasetValue("screenplayFullstoryOrgId");
 
-  if (fullstoryOrgId && !isRealScreen()) {
-    FullStory.init({ orgId: fullstoryOrgId, recordCrossDomainIFrames: true });
+  if (screenplayFullstoryOrgId && !isRealScreen()) {
+    FullStory.init({
+      orgId: screenplayFullstoryOrgId,
+      recordCrossDomainIFrames: true,
+    });
   }
 };
 
