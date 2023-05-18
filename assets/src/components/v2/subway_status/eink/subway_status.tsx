@@ -57,50 +57,24 @@ const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
       <div className="subway-status_route-pill-container">
         <SubwayStatusRoutePill routePill={routePill} />
       </div>
-      <ContractedStatus
-        alerts={alerts}
-        showInlineBranches={showInlineBranches}
-      />
+      <Status alerts={alerts} showInlineBranches={showInlineBranches} />
       <div className="subway-status_status_rule" />
     </div>
   );
 };
 
-const getRoutePillObject = (
-  section: Section,
-  color: LineColor
-): SubwayStatusPill => {
-  if (color === "green") {
-    if (isContractedWith1Alert(section)) {
-      return {
-        color: color,
-        branches: section.alerts.flatMap(
-          (alert) => alert.route_pill?.branches ?? []
-        ),
-      };
-    } else if (isExtended(section)) {
-      return { color: color, branches: section.alert.route_pill?.branches };
-    }
-  }
-
-  return { color: color };
-};
-
-type ContractedStatusProps = Pick<ContractedSection, "alerts"> & {
+type StatusProps = Pick<ContractedSection, "alerts"> & {
   showInlineBranches: boolean;
 };
 
-const ContractedStatus: ComponentType<ContractedStatusProps> = ({
-  alerts,
-  showInlineBranches,
-}) => {
+const Status: ComponentType<StatusProps> = ({ alerts, showInlineBranches }) => {
   return (
     <div className="subway-status_status">
       {alerts.map((alert, index) => {
         const adjustedAlert = adjustAlertForContractedStatus(alert);
         const id = getAlertID(adjustedAlert, "contracted", index);
         return (
-          <ContractedAlert
+          <AlertRow
             {...adjustedAlert}
             id={id}
             key={id}
@@ -112,7 +86,7 @@ const ContractedStatus: ComponentType<ContractedStatusProps> = ({
   );
 };
 
-interface ContractedAlertProps extends Alert {
+interface AlertRowProps extends Alert {
   id: string;
   showInlineBranches: boolean;
 }
@@ -125,14 +99,14 @@ enum FittingStep {
 }
 
 /**
- * Pixel height of a ContractedAlert. This should match the height of the route pill, since
+ * Pixel height of an alert. This should match the height of the route pill, since
  * it's the tallest element in the row.
  */
-const CONTRACTED_ROW_HEIGHT = 70;
+const ROW_HEIGHT = 70;
 
 const ALERTS_URL = "mbta.com/alerts";
 
-const ContractedAlert: ComponentType<ContractedAlertProps> = ({
+const AlertRow: ComponentType<AlertRowProps> = ({
   route_pill: routePill,
   status,
   location,
@@ -145,7 +119,7 @@ const ContractedAlert: ComponentType<ContractedAlertProps> = ({
       FittingStep.Abbrev,
       FittingStep.FullSize,
     ],
-    maxHeight: CONTRACTED_ROW_HEIGHT,
+    maxHeight: ROW_HEIGHT,
     resetDependencies: [id],
   });
 
@@ -296,6 +270,26 @@ const shouldShowHeader = ({ blue, orange, red, green }: SubwayStatusData) => {
   return [blue, orange, red, green].every(
     (data) => isContractedWith1Alert(data) || isExtended(data)
   );
+};
+
+const getRoutePillObject = (
+  section: Section,
+  color: LineColor
+): SubwayStatusPill => {
+  if (color === "green") {
+    if (isContractedWith1Alert(section)) {
+      return {
+        color: color,
+        branches: section.alerts.flatMap(
+          (alert) => alert.route_pill?.branches ?? []
+        ),
+      };
+    } else if (isExtended(section)) {
+      return { color: color, branches: section.alert.route_pill?.branches };
+    }
+  }
+
+  return { color: color };
 };
 
 const getStandardLinePillPath = (lineColor: LineColor) =>
