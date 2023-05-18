@@ -52,7 +52,8 @@ config :screens,
   api_v3_key: api_v3_key,
   environment_name: eb_env_name,
   signs_ui_s3_bucket: signs_ui_s3_bucket,
-  sentry_frontend_dsn: System.get_env("SENTRY_DSN")
+  sentry_frontend_dsn: System.get_env("SENTRY_DSN"),
+  screenplay_fullstory_org_id: System.get_env("SCREENPLAY_FULLSTORY_ORG_ID")
 
 config :sentry,
   dsn: System.get_env("SENTRY_DSN"),

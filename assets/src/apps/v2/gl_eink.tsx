@@ -1,6 +1,9 @@
 import initSentry from "Util/sentry";
 initSentry("gl_eink_v2");
 
+import initFullstory from "Util/fullstory";
+initFullstory();
+
 declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/gl_eink_v2.scss");

@@ -1,6 +1,9 @@
 import initSentry from "Util/sentry";
 initSentry("bus_shelter");
 
+import initFullstory from "Util/fullstory";
+initFullstory();
+
 declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/bus_shelter_v2.scss");

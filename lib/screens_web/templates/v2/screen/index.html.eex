@@ -16,6 +16,9 @@
   <%= if not is_nil(@rotation_index) do %>
     data-rotation-index="<%= @rotation_index %>"
   <% end %>
+  <%= if assigns[:screenplay_fullstory_org_id] do %>
+    data-screenplay-fullstory-org-id="<%= assigns[:screenplay_fullstory_org_id] %>"
+  <% end %>
   data-requestor="<%= @requestor %>"
   data-disable-sentry="<%= @disable_sentry %>"
 ></div>
