@@ -3,8 +3,8 @@ import * as FullStory from "@fullstory/browser";
 import { isRealScreen } from "./util";
 
 /**
- * Initializes Sentry if the DSN is defined AND this client is running on
- * a real production screen AND the URL does not contain the disable_sentry param.
+ * Initializes Fullstory if the org ID is defined
+ * AND this client is running on a production screen simulation.
  */
 const initFullstory = () => {
   const screenplayFullstoryOrgId = getDatasetValue("screenplayFullstoryOrgId");
