@@ -686,7 +686,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def temporarily_override_alert(%__MODULE__{} = t) do
     # Prevent Porter and Charles/MGH pre-fare screens from incorrectly communicating
     # a RL alert that affects both the Ashmont and Braintree branches.
-    not (t.alert.id == "495152" and
+    not (t.alert.id == "495153" and
            t.screen.app_params.reconstructed_alert_widget.stop_id in [
              "place-portr",
              "place-chmnl"
