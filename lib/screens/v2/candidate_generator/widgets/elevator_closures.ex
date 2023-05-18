@@ -15,7 +15,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
             elevator_status: %ElevatorStatus{parent_station_id: parent_station_id}
           }
         } = config,
-        now
+        now,
+        fetch_elevator_alerts_with_facilities_fn \\ &Alert.fetch_elevator_alerts_with_facilities/0
       ) do
     with {:ok, routes_at_stop} <-
            Route.fetch_routes_by_stop(parent_station_id, now, [:light_rail, :subway]),
@@ -26,13 +27,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
              route_ids_at_stop
            ),
          {:ok, parent_station_map} <- Stop.fetch_parent_station_name_map(),
-         {:ok, elevator_closures, facility_id_to_name} <- fetch_elevator_closures() do
+         {:ok, elevator_closures} <- fetch_elevator_alerts_with_facilities_fn.() do
       icon_map = get_icon_map(elevator_closures, parent_station_id)
 
       [
         %ElevatorStatusWidget{
           alerts: elevator_closures,
-          facility_id_to_name: facility_id_to_name,
           stop_sequences: stop_sequences,
           screen: config,
           now: now,
@@ -42,35 +42,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
       ]
     else
       :error -> []
-    end
-  end
-
-  def fetch_elevator_closures do
-    case Screens.V3Api.get_json("alerts", %{
-           "filter[activity]" => "USING_WHEELCHAIR",
-           "include" => "facilities"
-         }) do
-      {:ok, result} ->
-        facilities =
-          result
-          |> get_in([
-            "included",
-            Access.filter(&(&1["type"] == "facility"))
-          ])
-          |> parse_facility_data()
-
-        elevator_closures =
-          result
-          |> Screens.Alerts.Parser.parse_result()
-          |> Enum.filter(fn
-            %Alert{effect: :elevator_closure} = alert -> alert
-            _ -> false
-          end)
-
-        {:ok, elevator_closures, facilities}
-
-      _ ->
-        :error
     end
   end
 
@@ -104,15 +75,5 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
       %Screens.Routes.Route{type: type} -> type
     end)
     |> Enum.uniq()
-  end
-
-  defp parse_facility_data(nil), do: %{}
-
-  defp parse_facility_data(facilities) do
-    facilities
-    |> Enum.map(fn %{"attributes" => %{"short_name" => short_name}, "id" => id} ->
-      {id, short_name}
-    end)
-    |> Enum.into(%{})
   end
 end
