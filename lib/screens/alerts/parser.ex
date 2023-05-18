@@ -1,17 +1,17 @@
 defmodule Screens.Alerts.Parser do
   @moduledoc false
 
-  def parse_result(%{"data" => data}) when is_list(data) do
-    data
-    |> Enum.map(&parse_alert/1)
-    |> Enum.reject(&is_nil/1)
-  end
-
   def parse_result(%{"data" => data, "included" => included}) when is_list(data) do
     facility_data = parse_facility_data(included)
 
     data
     |> Enum.map(&parse_alert(&1, facility_data))
+    |> Enum.reject(&is_nil/1)
+  end
+
+  def parse_result(%{"data" => data}) when is_list(data) do
+    data
+    |> Enum.map(&parse_alert/1)
     |> Enum.reject(&is_nil/1)
   end
 
