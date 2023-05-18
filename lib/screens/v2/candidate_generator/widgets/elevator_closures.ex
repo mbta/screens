@@ -15,7 +15,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
             elevator_status: %ElevatorStatus{parent_station_id: parent_station_id}
           }
         } = config,
-        now,
+        now \\ DateTime.utc_now(),
         fetch_elevator_alerts_with_facilities_fn \\ &Alert.fetch_elevator_alerts_with_facilities/0
       ) do
     with {:ok, routes_at_stop} <-
