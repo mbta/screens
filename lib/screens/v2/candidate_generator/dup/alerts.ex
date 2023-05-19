@@ -57,12 +57,35 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
          {:ok, stop_sequences} <-
            fetch_parent_station_sequences_fn.(stop_id, subway_route_ids_at_stop) do
       alerts
-      |> Enum.filter(&relevant_alert?(&1, config, stop_sequences, subway_routes_at_stop, now))
+      |> relevant_alerts(config, stop_sequences, subway_routes_at_stop, now)
       |> alert_special_cases(config)
-      |> create_alert_widgets(config, stop_sequences, subway_routes_at_stop, stop_name)
+      |> create_alert_widgets(config, stop_sequences, subway_route_ids_at_stop, stop_name)
     else
       :error -> []
     end
+  end
+
+  def relevant_alerts(
+        alerts,
+        %Screen{app_params: %Dup{primary_departures: %{sections: sections}}} = config,
+        stop_sequences,
+        subway_route_ids_at_stop,
+        now
+      ) do
+    Enum.filter(alerts, fn alert ->
+      dup_alert = %DupAlert{
+        screen: config,
+        alert: alert,
+        stop_sequences: stop_sequences,
+        subway_routes_at_stop: subway_route_ids_at_stop,
+        primary_section_count: length(sections),
+        rotation_index: :zero,
+        stop_name: "A Station"
+      }
+
+      relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
+        relevant_location?(dup_alert) and not directional_shuttle_or_suspension?(alert)
+    end)
   end
 
   # WTC is a special bus-only case
@@ -118,27 +141,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
         }
       end
     end
-  end
-
-  defp relevant_alert?(
-         alert,
-         %Screen{app_params: %Dup{primary_departures: %{sections: sections}}} = config,
-         stop_sequences,
-         subway_routes_at_stop,
-         now
-       ) do
-    dup_alert = %DupAlert{
-      screen: config,
-      alert: alert,
-      stop_sequences: stop_sequences,
-      subway_routes_at_stop: subway_routes_at_stop,
-      primary_section_count: length(sections),
-      rotation_index: :zero,
-      stop_name: "A Station"
-    }
-
-    relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
-      relevant_location?(dup_alert) and not directional_shuttle_or_suspension?(alert)
   end
 
   defp relevant_effect?(%{effect: :delay, severity: severity}, _) do

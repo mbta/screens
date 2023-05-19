@@ -31,7 +31,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
          {:ok, alerts} <-
            fetch_alerts_by_stop_and_route_fn.(reachable_stop_ids, route_ids_at_stop) do
       alerts
-      |> filter_alerts(reachable_stop_ids, route_ids_at_stop, now)
+      |> relevant_alerts(reachable_stop_ids, route_ids_at_stop, now)
       |> Enum.map(fn alert ->
         %AlertWidget{
           alert: alert,
@@ -55,7 +55,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
 
   (list describes the `relevant_ie?` function clauses in order)
   """
-  def filter_alerts(alerts, stop_ids, route_ids, now) do
+  def relevant_alerts(alerts, stop_ids, route_ids, now) do
     stop_id_set = MapSet.new(stop_ids)
     route_id_set = MapSet.new(route_ids)
 

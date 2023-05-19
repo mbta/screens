@@ -39,7 +39,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          {:ok, stop_sequences} <-
            fetch_stop_sequences_by_stop_fn.(stop_id, route_ids_at_stop) do
       alerts
-      |> Enum.filter(&relevant?(&1, config, stop_sequences, routes_at_stop, now))
+      |> relevant_alerts(config, stop_sequences, routes_at_stop, now)
       |> Enum.map(fn alert ->
         %ReconstructedAlert{
           screen: config,
@@ -56,24 +56,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     end
   end
 
-  defp relevant?(
-         %Alert{effect: effect} = alert,
-         config,
-         stop_sequences,
-         routes_at_stop,
-         now
-       ) do
-    reconstructed_alert = %ReconstructedAlert{
-      screen: config,
-      alert: alert,
-      stop_sequences: stop_sequences,
-      routes_at_stop: routes_at_stop,
-      now: now,
-      informed_stations_string: "A Station"
-    }
+  defp relevant_alerts(alerts, config, stop_sequences, routes_at_stop, now) do
+    Enum.filter(alerts, fn %Alert{effect: effect} = alert ->
+      reconstructed_alert = %ReconstructedAlert{
+        screen: config,
+        alert: alert,
+        stop_sequences: stop_sequences,
+        routes_at_stop: routes_at_stop,
+        now: now,
+        informed_stations_string: "A Station"
+      }
 
-    relevant_effect?(effect) and relevant_location?(reconstructed_alert) and
-      Alert.happening_now?(alert, now)
+      relevant_effect?(effect) and relevant_location?(reconstructed_alert) and
+        Alert.happening_now?(alert, now)
+    end)
   end
 
   defp relevant_effect?(effect) do

@@ -185,7 +185,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
     end
   end
 
-  describe "filter_alerts/4" do
+  describe "relevant_alerts/4" do
     setup do
       %{
         stop_ids: ~w[1 2 3],
@@ -233,7 +233,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       ]
 
       assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
-               filter_alerts(alerts, stop_ids, route_ids, now)
+               relevant_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "filters out alerts that inform stops that are not downstream of the home stop", %{
@@ -275,7 +275,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       ]
 
       assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
-               filter_alerts(alerts, stop_ids, route_ids, now)
+               relevant_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "keeps alerts that inform an entire route type", %{
@@ -304,7 +304,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [%Alert{id: "1"}] = filter_alerts(alerts, stop_ids, route_ids, now)
+      assert [%Alert{id: "1"}] = relevant_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "filters out alerts with other informed entities", %{
@@ -321,7 +321,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
+      assert [] = relevant_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "filters out alerts that do not have a relevant effect", %{
@@ -338,7 +338,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
+      assert [] = relevant_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "filters out upcoming alerts", %{
@@ -355,7 +355,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
+      assert [] = relevant_alerts(alerts, stop_ids, route_ids, now)
     end
   end
 end
