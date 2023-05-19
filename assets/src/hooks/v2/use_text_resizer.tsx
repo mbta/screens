@@ -9,6 +9,7 @@ interface UseTextResizerArgs<T> {
 interface UseTextResizerReturn<T> {
   ref: React.RefObject<HTMLDivElement>;
   size: T;
+  isDone: boolean;
 }
 
 /**
@@ -67,7 +68,9 @@ interface UseTextResizerReturn<T> {
  *              Elements should be ordered smallest to largest.
  * @param maxHeight The maximum height of the container in which the text will be placed.
  * @param resetDependencies A list of dependencies that should be used to reset the sizeIndex.
- * @returns A ref and the selected size value.
+ * @returns - A ref,
+ *          - the selected size value,
+ *          - and a boolean indicating whether the hook is done resizing--either because the text fits, or because the smallest size has been reached.
  */
 const useTextResizer = <T,>({
   sizes,
@@ -75,10 +78,12 @@ const useTextResizer = <T,>({
   resetDependencies,
 }: UseTextResizerArgs<T>): UseTextResizerReturn<T> => {
   const [sizeIndex, setSizeIndex] = useState(sizes.length - 1);
+  const [isDone, setIsDone] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setSizeIndex(sizes.length - 1);
+    setIsDone(false);
   }, resetDependencies);
 
   useEffect(() => {
@@ -87,12 +92,15 @@ const useTextResizer = <T,>({
       if (height > maxHeight && sizeIndex > 0) {
         setSizeIndex(sizeIndex - 1);
       }
+      if (height <= maxHeight || sizeIndex === 0) {
+        setIsDone(true);
+      }
     }
   });
 
   const size = sizes[sizeIndex];
 
-  return { ref, size };
+  return { ref, size, isDone };
 };
 
 export default useTextResizer;
