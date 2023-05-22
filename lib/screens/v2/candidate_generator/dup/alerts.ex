@@ -59,7 +59,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
       alerts
       |> relevant_alerts(config, stop_sequences, subway_routes_at_stop, now)
       |> alert_special_cases(config)
-      |> create_alert_widgets(config, stop_sequences, subway_route_ids_at_stop, stop_name)
+      |> create_alert_widgets(config, stop_sequences, subway_routes_at_stop, stop_name)
     else
       :error -> []
     end
@@ -69,7 +69,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
         alerts,
         %Screen{app_params: %Dup{primary_departures: %{sections: sections}}} = config,
         stop_sequences,
-        subway_route_ids_at_stop,
+        subway_routes_at_stop,
         now
       ) do
     Enum.filter(alerts, fn alert ->
@@ -77,7 +77,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
         screen: config,
         alert: alert,
         stop_sequences: stop_sequences,
-        subway_routes_at_stop: subway_route_ids_at_stop,
+        subway_routes_at_stop: subway_routes_at_stop,
         primary_section_count: length(sections),
         rotation_index: :zero,
         stop_name: "A Station"
