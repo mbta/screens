@@ -22,6 +22,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   @type route_id :: String.t()
 
+  # Need a new field to specify size of the widget (full screen vs flex zone)
+  # The different sizes will only occur when there are multiple alerts trying to fit on a screen.
+  # The main alert will be a full screen, and any other alerts will be flex zone,
+  # so this has to be decided in the candidate generator
   @type t :: %__MODULE__{
           screen: Screen.t(),
           alert: Alert.t(),
