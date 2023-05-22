@@ -442,10 +442,12 @@ defmodule Screens.Stops.Stop do
     route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id)
 
     {:ok, stop_sequences} =
-      if app in [BusEink, BusShelter, GlEink] do
-        RoutePattern.fetch_stop_sequences_through_stop(stop_id)
-      else
-        RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids_at_stop)
+      cond do
+        app in [BusEink, BusShelter, GlEink] ->
+          RoutePattern.fetch_stop_sequences_through_stop(stop_id)
+      
+        app in [PreFare, Dup] ->
+          RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids_at_stop)
       end
 
     {:ok,
