@@ -1,4 +1,4 @@
-# Changing the validity of this candidate to 0, so it will get tossed
+# Changing the validity of this candidate to false, so it will get tossed
 # in favor of the line map
 # ****  NOTE: if we ever want to bring this back, we'll need to update the visuals
 #       The visuals got messed up with later work.
