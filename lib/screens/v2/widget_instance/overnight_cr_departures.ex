@@ -1,3 +1,7 @@
+# Changing the validity of this candidate to false, so it will get tossed
+# in favor of the line map
+# ****  NOTE: if we ever want to bring this back, we'll need to update the visuals
+#       The visuals got messed up with later work.
 defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
   @moduledoc false
 
@@ -67,13 +71,13 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
 
   def widget_type(_instance), do: :overnight_cr_departures
 
-  def valid_candidate?(_instance), do: true
+  def valid_candidate?(_instance), do: false
 
   def audio_serialize(instance), do: serialize(instance)
 
   def audio_sort_key(_instance), do: [1]
 
-  def audio_valid_candidate?(_instance), do: true
+  def audio_valid_candidate?(_instance), do: false
 
   defp format_headsign(headsign) do
     via_pattern = ~r/(.+) (via .+)/
