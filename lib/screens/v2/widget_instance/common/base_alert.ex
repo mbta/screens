@@ -295,7 +295,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
         # Removed the case with downstream alerts because:
         #  - we don't want to consider downstream alerts for a takeover (bus, prefare, dup)
-        #  - we don't want ever show downstream alerts on bus shelter / bus e-ink
+        #  - we don't want to ever show downstream alerts on bus shelter / bus e-ink
 
         # If the entity has a route, but no stop, that route is marked informed
         %{stop: nil, route: route}, uninformed ->
