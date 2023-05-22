@@ -10,6 +10,7 @@ defprotocol Screens.V2.SingleAlertWidget do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
+  alias Screens.RouteType
 
   @type alert_id :: String.t()
   @type stop_id :: String.t()
@@ -38,7 +39,8 @@ defprotocol Screens.V2.SingleAlertWidget do
   @doc """
   Gets the list of routes that serve this widget's home stop.
   """
-  @spec routes_at_stop(t()) :: list(%{route_id: route_id(), active?: boolean()})
+  @spec routes_at_stop(t()) ::
+          list(%{route_id: route_id(), active?: boolean(), type: RouteType.t()})
   def routes_at_stop(widget)
 
   @doc """
