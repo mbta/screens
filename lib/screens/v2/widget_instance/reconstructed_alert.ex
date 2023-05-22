@@ -132,6 +132,47 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           ["trains"]
     }
 
+    # Can we typify the serialized structure?
+    # %{
+    #   issue: free text OR string,
+    #   remedy?: string,
+    #   location?: string
+    #   cause: string
+    #   routes?: not exactly sure what the type should be to fit both widget types
+    #   effect: atom
+    #   urgent?: boolean
+    # }
+
+    # Full screen:
+    # %{
+    #   issue: doesn't really NEED to be free-text (since the icon always stems from the effect),
+    #   remedy: string (icon is frontend, so I'm thinking do the same for `issue`)
+    #       ^ remedy will be styled differently for delays  
+    #   location: additional to whatever is in the issue; not used by bypassed station, delay, or downstream
+    #   cause
+    #   routes: can be used for the header (but route vs route+destination pill will be structured differently)
+    #   effect
+    #   *** which fields do we want to use for the fallback case? A unique fallback field?
+    # }
+
+    # EXCEPTION: "rare situation -- multiline station where one line is skipping the station and the other is not"
+    # %{
+    #   issue: free text - two "lines" would work for this, right?
+    #   cause: string
+    #   effect: atom
+    # }
+
+    # Flex zone:
+    # %{
+    #   issue: free text (currently, and let's not change that),
+    #   remedy: string,
+    #   location: string
+    #   cause: string
+    #   routes: serialized route_pills
+    #   effect: atom
+    #   urgent: boolean
+    # }
+
     %{
       issue: FreeTextLine.to_json(issue),
       remedy: "Seek alternate route",

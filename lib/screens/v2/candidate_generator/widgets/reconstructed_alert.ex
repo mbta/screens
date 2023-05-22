@@ -1,3 +1,4 @@
+# Mentioned renaming to PreFareAlert, but not sure that's necessary / helpful
 defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   @moduledoc false
 
