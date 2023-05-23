@@ -27,7 +27,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         fetch_location_context_fn \\ &Stop.fetch_location_context/3
       ) do
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, stop_id, now),
-         # TODO: make sure we're handling Mattapan outages correctly even without the "reject"
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: location_context.route_ids_at_stop) do
       alerts
       |> Enum.filter(&relevant?(&1, config, location_context, now))
