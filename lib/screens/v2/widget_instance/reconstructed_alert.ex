@@ -16,7 +16,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             stop_sequences: nil,
             routes_at_stop: nil,
             informed_stations_string: nil,
-            is_terminal_station: false
+            is_terminal_station: false,
+            is_full_screen: false
 
   @type stop_id :: String.t()
 
@@ -29,7 +30,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           stop_sequences: list(list(stop_id())),
           routes_at_stop: list(%{route_id: route_id(), active?: boolean()}),
           informed_stations_string: String.t(),
-          is_terminal_station: boolean()
+          is_terminal_station: boolean(),
+          is_full_screen: boolean()
         }
 
   @route_directions %{
