@@ -7,13 +7,12 @@ defmodule Screens.MixProject do
       version: "0.1.0",
       elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix, :gettext] ++ Mix.compilers(),
+      compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       dialyzer: [
         plt_add_deps: :app_tree,
         flags: [
-          :race_conditions,
           :unmatched_returns
         ]
       ],
@@ -54,9 +53,9 @@ defmodule Screens.MixProject do
       {:phoenix_html, "~> 3.0.4"},
       {:phoenix_live_reload, "~> 1.3", only: :dev},
       {:phoenix_live_view, "~> 0.16.4"},
-      {:gettext, "~> 0.11"},
+      {:gettext, "~> 0.22.1"},
       {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.5"},
+      {:plug_cowboy, "~> 2.6.1"},
       {:httpoison, "~> 1.8.0"},
       {:tzdata, "~> 1.1"},
       {:credo, "~> 1.6.0"},
@@ -70,7 +69,7 @@ defmodule Screens.MixProject do
       {:sweet_xml, "~> 0.7.0"},
       {:timex, "~> 3.6"},
       {:hackney, "== 1.17.4"},
-      {:guardian, "~> 2.0"},
+      {:guardian, "~> 2.3.1"},
       {:ueberauth, "~> 0.7"},
       {:ueberauth_cognito, "~> 0.4"},
       {:corsica, "~> 1.0"},
