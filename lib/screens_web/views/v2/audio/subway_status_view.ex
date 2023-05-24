@@ -44,7 +44,7 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
       ~E|<%= render_section(alert_keyed_section1) %><%= render_section(alert_keyed_section2) %>|
 
     normal_sections_rendered =
-      ~E|<s><%= normal_line_name1 %>, and <%= normal_line_name2 %>: normal service</s>|
+      ~E|<s>The <%= normal_line_name1 %> and the <%= normal_line_name2 %> have normal service</s>|
 
     ~E|<%= alert_sections_rendered %><%= normal_sections_rendered %>|
   end
@@ -55,7 +55,7 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     normal_section_rendered =
       case normal_keyed_sections do
         [] -> ~E||
-        [{line_key, _}] -> ~E|<s><%= key_to_line_name(line_key) %>: normal service</s>|
+        [{line_key, _}] -> ~E|<s>The <%= key_to_line_name(line_key) %> has normal service</s>|
       end
 
     alert_sections_rendered = Enum.map(alert_keyed_sections, &render_section/1)
@@ -63,9 +63,9 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     ~E|<%= alert_sections_rendered %><%= normal_section_rendered %>|
   end
 
-  # ============================================================================#
+  # =============================================================================#
   # render_section will only be called on sections that have at least one alert. #
-  # ============================================================================#
+  # =============================================================================#
   defp render_section({:green, section}) do
     # Special logic for the GL section:
     # - List out branches on alerts
@@ -73,14 +73,10 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     alerts = get_alerts(section)
 
     if length(alerts) == 2 and Enum.any?(alerts, &branch_alert?/1) do
-      Enum.map(alerts, fn alert ->
-        ~E|<s><%= render_gl_branch_or_line(alert) %>: <%= render_alert(alert) %></s>|
-      end)
+      Enum.map(alerts, fn alert -> ~E|<s><%= render_gl_alert(alert) %></s>| end)
     else
       alerts
-      |> Enum.map(fn alert ->
-        ~E|<%= render_gl_branch_or_line(alert) %>: <%= render_alert(alert) %>|
-      end)
+      |> Enum.map(&render_gl_alert/1)
       |> Enum.intersperse(~E|, and |)
       |> then(fn sentence -> ~E|<s><%= sentence %></s>| end)
     end
@@ -91,20 +87,29 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
 
     section
     |> get_alerts()
-    |> Enum.map(fn alert -> ~E|<%= line_name %>: <%= render_alert(alert) %>| end)
+    |> Enum.map(fn alert ->
+      {verb_atom, content} = render_status_and_location(alert)
+      ~E|The <%= line_name %> <%= conjugate(verb_atom, false) %> <%= content %>|
+    end)
     |> Enum.intersperse(~E|, and |)
     |> then(fn sentence -> ~E|<s><%= sentence %></s>| end)
+  end
+
+  defp render_gl_alert(alert) do
+    {verb_atom, content} = render_status_and_location(alert)
+    branch_count = get_branch_count(alert)
+    multi_branch_alert? = branch_count > 1
+    trunk? = branch_count == 0
+
+    maybe_the = if trunk?, do: "The ", else: ""
+
+    ~E|<%= maybe_the %><%= render_gl_branch_or_line(alert) %> <%= conjugate(verb_atom, multi_branch_alert?) %> <%= content %>|
   end
 
   @spec render_gl_branch_or_line(SubwayStatus.alert()) :: ssml_blob
   defp render_gl_branch_or_line(%{route_pill: %{branches: branches}}) when length(branches) > 0 do
     branch_or_branches = if length(branches) == 1, do: "branch", else: "branches"
 
-    # b
-    # b, and, c
-    # b, c, and, d
-    # b, c, d, and, e - exceptionally rare edge case
-    # (Excessive comma use makes Polly pronounce the letters more clearly.)
     {all_but_last, last} =
       branches
       |> Enum.map(fn letter ->
@@ -112,6 +117,11 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
       end)
       |> Enum.split(-1)
 
+    # b
+    # b, and, c
+    # b, c, and, d
+    # b, c, d, and, e - exceptionally rare edge case
+    # (Excessive comma use makes Polly pronounce the letters more clearly.)
     letters_rendered =
       if all_but_last == [] do
         last
@@ -123,15 +133,18 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     # This deviates slightly from designs. The letters are read out after "branch(es)"
     # instead of before, because Polly pronounces that ordering much more clearly for some reason.
     ~E|Green Line <%= branch_or_branches %>, <%= letters_rendered %>,|
+    #                                      ^                       ^
+    #                                      Added to improve clarity of the first and last letters
   end
 
   defp render_gl_branch_or_line(_non_branch_alert), do: ~E|Green Line|
 
-  defp render_alert(alert) do
-    location_string = get_location_string(alert.location)
+  @spec render_status_and_location(SubwayStatus.alert()) :: {:is | :has, ssml_blob}
+  defp render_status_and_location(%{status: status, location: location}) do
+    location_string = get_location_string(location)
 
     # To avoid awkward-sounding alert descriptions, we need to adjust wording/punctuation
-    # based on the values of alert.status and location_string.
+    # based on the values of status and location_string.
     #
     # alert.status                   ||| possible values of location_string
     # -------------------------------|||-----------------------------------
@@ -142,32 +155,63 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     # Bypassing                      ||| "" | $STOP | $STOP and $STOP | $STOP, $STOP, and $STOP
     # Bypassing $N stops             ||| ""
     # $N current alerts              ||| ""
+    verb_atom = get_verb_atom(status)
+    article = get_article(status, location_string)
+    content = get_content(status, location_string)
+
+    {verb_atom, ~E|<%= article %><%= content %>|}
+  end
+
+  defp conjugate(verb_atom, multi_branch_alert?)
+
+  defp conjugate(:is, false), do: "is"
+  defp conjugate(:is, true), do: "are"
+
+  defp conjugate(:has, false), do: "has"
+  defp conjugate(:has, true), do: "have"
+
+  defp get_verb_atom(status) do
+    if String.starts_with?(status, "Bypassing"), do: :is, else: :has
+  end
+
+  defp get_article(status, location_string) do
+    cond do
+      location_string == "Eastbound" -> "an "
+      status =~ ~r/^(?:Delays|Bypassing|SERVICE SUSPENDED|\d)/ -> ""
+      true -> "a "
+    end
+  end
+
+  defp get_content(status, location_string) do
     cond do
       location_string == "" ->
-        # E.g. "3 current alerts", "Bypassing 5 stops"
-        ~E|<%= alert.status %>|
+        # E.g. "3 current alerts", "Bypassing 5 stops", "Suspension"
+        ~E|<%= status %>|
 
       # Shuttle Bus/Suspension/Delays + Xbound
       location_string =~ ~r/^(?:North|East|South|West)bound$/ ->
         # E.g. "Southbound Shuttle bus", "Northbound Suspension", "Eastbound Delays up to 20 minutes"
-        ~E|<%= location_string %> <%= alert.status %>|
+        ~E|<%= location_string %> <%= status %>|
 
       # Shuttle Bus/Suspension/Delays + $STATION to $STATION
-      # Shuttle Bus + Entire line
-      # SERVICE SUSPENDED + Entire line
-      String.contains?(location_string, " to ") or location_string == "Entire line" ->
-        # E.g. "Suspension, Back Bay to North Station", "SERVICE SUSPENDED, Entire line"
-        ~E|<%= alert.status %>, <%= location_string %>|
+      String.contains?(location_string, " to ") ->
+        # E.g. "Suspension from Back Bay to North Station", "Shuttle Bus from Ashmont to JFK/UMass"
+        ~E|<%= status %> from <%= location_string %>|
+
+      # Shuttle Bus/SERVICE SUSPENDED + Entire line
+      location_string == "Entire line" ->
+        # "SERVICE SUSPENDED on the Entire line"
+        ~E|<%= status %> on the <%= location_string %>|
 
       # Shuttle Bus/Suspension/Delays + $STATION
-      alert.status =~ ~r/^(?:Shuttle Bus|Suspension|Delays)/ ->
+      status =~ ~r/^(?:Shuttle Bus|Suspension|Delays)/ ->
         # E.g. "Suspension at Quincy Center"
-        ~E|<%= alert.status %> at <%= location_string %>|
+        ~E|<%= status %> at <%= location_string %>|
 
       # Bypassing + $STOP | $STOP and $STOP | $STOP, $STOP, and $STOP
       true ->
         # E.g. "Bypassing Park Street, Downtown Crossing, and South Station"
-        ~E|<%= alert.status %> <%= location_string %>|
+        ~E|<%= status %> <%= location_string %>|
     end
   end
 
@@ -196,6 +240,9 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
   defp branch_alert?(alert) do
     match?(%{route_pill: %{branches: [_ | _]}}, alert)
   end
+
+  defp get_branch_count(%{route_pill: %{branches: branches}}), do: length(branches)
+  defp get_branch_count(_alert), do: 0
 
   @spec get_alerts(SubwayStatus.section()) :: list(SubwayStatus.alert())
   defp get_alerts(%{type: :contracted} = section) do
