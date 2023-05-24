@@ -191,18 +191,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               effect: :station_closure,
               informed_entities: [ie(stop: "place-hsmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            }
-          },
-          expected_common_data
-        ),
-        struct(
-          %ReconstructedAlertWidget{
-            alert: %Alert{
-              id: "2",
-              effect: :station_closure,
-              informed_entities: [ie(stop: "place-bckhl")],
-              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            }
+            },
+            is_full_screen: true
           },
           expected_common_data
         ),
@@ -212,6 +202,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               id: "3",
               effect: :delay,
               informed_entities: [ie(stop: "place-hsmnl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            is_full_screen: true
+          },
+          expected_common_data
+        ),
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "2",
+              effect: :station_closure,
+              informed_entities: [ie(stop: "place-bckhl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             }
           },
@@ -329,18 +331,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               effect: :station_closure,
               informed_entities: [ie(stop: "place-hsmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            }
-          },
-          expected_common_data
-        ),
-        struct(
-          %ReconstructedAlertWidget{
-            alert: %Alert{
-              id: "2",
-              effect: :station_closure,
-              informed_entities: [ie(stop: "place-bckhl")],
-              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            }
+            },
+            is_full_screen: true
           },
           expected_common_data
         ),
@@ -350,6 +342,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               id: "3",
               effect: :delay,
               informed_entities: [ie(stop: "place-hsmnl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            is_full_screen: true
+          },
+          expected_common_data
+        ),
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "2",
+              effect: :station_closure,
+              informed_entities: [ie(stop: "place-bckhl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             }
           },
@@ -388,7 +392,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         stop_sequences: station_sequences,
         now: now,
         informed_stations_string: informed_stations_string,
-        is_terminal_station: true
+        is_terminal_station: true,
+        is_full_screen: true
       }
 
       expected_widgets = [
