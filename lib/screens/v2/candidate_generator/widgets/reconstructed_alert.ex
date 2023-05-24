@@ -96,7 +96,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
             create_alert_instances(moderate_delays, false, common_parameters)
 
         Enum.any?(downstream_disruptions) ->
-          create_alert_instances(downstream_disruptions, true, common_parameters) ++
+          fullscreen_alerts =
+            find_closest_downstream_alerts(downstream_disruptions, stop_id, stop_sequences)
+
+          flex_zone_alerts = downstream_disruptions -- fullscreen_alerts
+
+          create_alert_instances(fullscreen_alerts, true, common_parameters) ++
+            create_alert_instances(flex_zone_alerts, false, common_parameters) ++
             create_alert_instances(moderate_delays, false, common_parameters)
 
         true ->
@@ -129,6 +135,48 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         is_full_screen: is_full_screen
       }
     end)
+  end
+
+  defp find_closest_downstream_alerts(alerts, stop_id, stop_sequences) do
+    # Map each alert with its distance from home.
+    Enum.map(alerts, fn %{informed_entities: ies} = alert ->
+      distance =
+        ies
+        |> Enum.filter(&String.starts_with?(&1.stop, "place-"))
+        |> Enum.map(&get_home_distance_from_ie(stop_id, &1, stop_sequences))
+        |> Enum.min()
+
+      {alert, distance}
+    end)
+    |> Enum.group_by(&elem(&1, 1), &elem(&1, 0))
+    |> Enum.into([])
+    |> Enum.sort_by(&elem(&1, 0))
+    # The first item will be all alerts with the shortest distance.
+    |> List.first()
+    |> elem(1)
+  end
+
+  # Find the closest informed station and calculate its distance from the home_stop_id.
+  # Assumes informed_entity is for a parent station.
+  defp get_home_distance_from_ie(home_stop_id, informed_entity, stop_sequences)
+
+  # GL distance logic to be done later.
+  defp get_home_distance_from_ie(_home_stop_id, %{route: "Green" <> _}, _stop_sequences), do: 99
+
+  # Loop through each stop_sequence to find the shortest distance between home and ie.
+  defp get_home_distance_from_ie(home_stop_id, %{stop: stop_id}, stop_sequences) do
+    stop_sequences
+    |> Enum.filter(&(home_stop_id in &1 and stop_id in &1))
+    |> Enum.map(&calculate_distance(&1, home_stop_id, stop_id))
+    |> Enum.min(fn -> 99 end)
+  end
+
+  # Alerts can be upstream or downstream. If it is an upstream alert, distance will be negative. Make it positive and use that as the distance.
+  defp calculate_distance(stop_sequence, home_stop_id, ie_stop_id) do
+    abs(
+      Enum.find_index(stop_sequence, &(&1 == home_stop_id)) -
+        Enum.find_index(stop_sequence, &(&1 == ie_stop_id))
+    )
   end
 
   defp relevant_alerts(alerts, config, stop_sequences, routes_at_stop, now) do
