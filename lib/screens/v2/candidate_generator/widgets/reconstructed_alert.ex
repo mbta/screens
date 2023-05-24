@@ -6,6 +6,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Config.V2.PreFare
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Common.BaseAlert
@@ -27,7 +28,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         fetch_location_context_fn \\ &Stop.fetch_location_context/3
       ) do
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, stop_id, now),
-         {:ok, alerts} <- fetch_alerts_fn.(route_ids: location_context.route_ids_at_stop) do
+         route_ids <- Route.route_ids(location_context.routes),
+         {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
       alerts
       |> Enum.filter(&relevant?(&1, config, location_context, now))
       |> Enum.map(fn alert ->

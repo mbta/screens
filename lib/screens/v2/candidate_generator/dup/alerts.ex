@@ -8,6 +8,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   alias Screens.Config.V2.Alerts, as: AlertsConfig
   alias Screens.Config.V2.Dup
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.{DupAlert, DupSpecialCaseAlert}
@@ -46,8 +47,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
       end
 
     with {:ok, location_context} <- fetch_location_context_fn.(Dup, stop_id, now),
-         # TODO: check to see if mattapan ids are passing to alerts fetch
-         {:ok, alerts} <- fetch_alerts_fn.(route_ids: location_context.route_ids_at_stop) do
+         route_ids <- Route.route_ids(location_context.routes),
+         {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
       alerts
       |> Enum.filter(&relevant_alert?(&1, config, location_context, now))
       |> alert_special_cases(config)

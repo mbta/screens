@@ -439,31 +439,30 @@ defmodule Screens.Stops.Stop do
   def fetch_location_context(app, stop_id, now) do
     with alert_route_types <- get_route_type_filter(app, stop_id),
          {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, alert_route_types),
-         route_ids_at_stop <- Enum.map(routes_at_stop, & &1.route_id),
+         route_ids <- Route.route_ids(routes_at_stop),
          {:ok, stop_sequences} <-
-            (cond do
+           (cond do
               app in [BusEink, BusShelter, GlEink] ->
                 RoutePattern.fetch_stop_sequences_through_stop(stop_id)
-            
+
               app in [PreFare, Dup] ->
-                RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids_at_stop)
-            end)
-          do
+                RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids)
+            end) do
       {:ok,
-        %LocationContext{
-          home_stop: stop_id,
-          stop_sequences: stop_sequences,
-          upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
-          downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
-          routes: routes_at_stop,
-          route_ids_at_stop: route_ids_at_stop,
-          alert_route_types: alert_route_types
-        }}
+       %LocationContext{
+         home_stop: stop_id,
+         stop_sequences: stop_sequences,
+         upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
+         downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
+         routes: routes_at_stop,
+         alert_route_types: alert_route_types
+       }}
     else
       :error ->
         Logger.error(
           "[fetch_location_context fetch error] Failed to get location context for an alert: stop_id=#{stop_id}"
         )
+
         :error
     end
   end

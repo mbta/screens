@@ -121,7 +121,8 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
   # Only route is not nil (route type ignored)
   defp informed_entity_to_zone(%{stop: nil, route: route}, context) do
-    if route in context.route_ids_at_stop, do: [:upstream, :home_stop, :downstream], else: []
+    route_ids = Route.route_ids(context.routes)
+    if route in route_ids, do: [:upstream, :home_stop, :downstream], else: []
   end
 
   defp informed_entity_to_zone(%{stop: _stop} = entity, context) do
@@ -130,7 +131,9 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
   # Both stop and route are not nil (route type ignored)
   defp informed_entity_to_zone(%{stop: _stop, route: route} = informed_entity, context) do
-    if route in context.route_ids_at_stop do
+    route_ids = Route.route_ids(context.routes)
+
+    if route in route_ids do
       informed_entity_to_zone(%{informed_entity | route: nil}, context)
     else
       []
@@ -200,18 +203,11 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
 
   defp get_location_atom(_, _, _), do: :elsewhere
 
-  # Only used to decide "takeover_alert" for bus shelter, bus einks, and prefare screens
-  def informs_all_active_routes_at_home_stop?(t) do
-    MapSet.subset?(active_routes_at_stop(t), MapSet.new(informed_routes_at_home_stop(t)))
-  end
-
-  @spec active_routes_at_stop(t()) :: MapSet.t(route_id())
-  def active_routes_at_stop(%{location_context: %{routes: routes}}) do
-    routes
-    |> Enum.filter(& &1.active?)
-    |> MapSet.new(& &1.route_id)
-  end
-
+  @doc """
+  Returns all routes affected by an alert.
+  Used to build route pills for GL e-ink and text for Pre-fare alerts
+  """
+  @spec informed_subway_routes(t()) :: list(String.t())
   def informed_subway_routes(%{screen: %Screen{app_id: app_id}} = t) do
     t
     |> informed_entities()
@@ -224,9 +220,10 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     |> consolidate_gl(app_id)
   end
 
-  # GL E-ink consolidates the GL branches to Green Line if there are > 2 branches
-  # We wdant to list all affected branches for the alert and not just the one serving the home stop
+  # Different screens may consolidate the GL branch alerts
   @spec consolidate_gl(list(String.t()), atom()) :: list(String.t())
+  # GL E-ink consolidates the GL branches to Green Line if there are > 2 branches
+  # We want to list all affected branches for the alert, not just the one serving the home stop
   defp consolidate_gl(affected_routes, :gl_eink_v2) do
     green_routes =
       Enum.filter(affected_routes, fn
@@ -251,6 +248,22 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   defp consolidate_gl(affected_routes, _), do: affected_routes
 
   @doc """
+  Used by bus shelter, bus einks, and prefare screens to decide whether an alert affects
+  all active routes, and therefore should be a takeover alert
+  """
+  @spec informs_all_active_routes_at_home_stop?(t()) :: boolean()
+  def informs_all_active_routes_at_home_stop?(t) do
+    MapSet.subset?(active_routes_at_stop(t), MapSet.new(informed_routes_at_home_stop(t)))
+  end
+
+  @spec active_routes_at_stop(t()) :: MapSet.t(route_id())
+  defp active_routes_at_stop(%{location_context: %{routes: routes}}) do
+    routes
+    |> Enum.filter(& &1.active?)
+    |> MapSet.new(& &1.route_id)
+  end
+
+  @doc """
   This gets used by bus shelter, bus eink, DUP, prefare:
   - to help decide if we need a high-stakes takeover alert (bus, dup, prefare)
   - to serialize route pills on an alert (bus shelter & bus eink)
@@ -261,7 +274,11 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   def informed_routes_at_home_stop(t) do
     rts = t.location_context.alert_route_types
     home_stop = t.location_context.home_stop
-    route_set = MapSet.new(t.location_context.route_ids_at_stop)
+
+    route_set =
+      t.location_context.routes
+      |> Route.route_ids()
+      |> MapSet.new()
 
     # allows us to pattern match against the empty set
     empty_set = MapSet.new()
