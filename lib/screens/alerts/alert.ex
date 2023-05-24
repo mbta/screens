@@ -624,7 +624,10 @@ defmodule Screens.Alerts.Alert do
       home_stop: stop_id,
       upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
       downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
-      routes: routes_at_stop,
+      routes:
+        routes_at_stop
+        |> Enum.map(& &1.route_id)
+        |> Enum.uniq(),
       route_types:
         routes_at_stop
         |> Enum.map(& &1.type)
