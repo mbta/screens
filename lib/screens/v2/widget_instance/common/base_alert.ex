@@ -223,7 +223,6 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   # Different screens may consolidate the GL branch alerts
   @spec consolidate_gl(list(String.t()), atom()) :: list(String.t())
   # GL E-ink consolidates the GL branches to Green Line if there are > 2 branches
-  # We want to list all affected branches for the alert, not just the one serving the home stop
   defp consolidate_gl(affected_routes, :gl_eink_v2) do
     green_routes =
       Enum.filter(affected_routes, fn
