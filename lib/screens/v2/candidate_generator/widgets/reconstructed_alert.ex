@@ -39,18 +39,35 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          {:ok, stop_sequences} <-
            fetch_stop_sequences_by_stop_fn.(stop_id, route_ids_at_stop) do
       relevant_alerts = relevant_alerts(alerts, config, stop_sequences, routes_at_stop, now)
+      is_terminal_station = is_terminal?(stop_id, stop_sequences)
 
       immediate_disruptions =
         Enum.filter(
           relevant_alerts,
-          &(BaseAlert.location(&1) in [:inside, :boundary_upstream, :boundary_downstream])
+          &(Alert.get_alert_location_for_stop_id(
+              &1,
+              stop_id,
+              stop_sequences,
+              routes_at_stop,
+              is_terminal_station
+            ) in [
+              :inside,
+              :boundary_upstream,
+              :boundary_downstream
+            ])
         )
 
       downstream_disruptions =
         Enum.filter(
           relevant_alerts,
-          &(BaseAlert.location(&1) in [:downstream, :upstream] or
-              (&1.effect == :delay and &1.severity >= 7))
+          &(Alert.get_alert_location_for_stop_id(
+              &1,
+              stop_id,
+              stop_sequences,
+              routes_at_stop,
+              is_terminal_station
+            ) in [:downstream, :upstream] and
+              (&1.effect != :delay or &1.severity >= 7))
         )
 
       moderate_delays =
@@ -61,43 +78,43 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
       common_parameters = [
         config: config,
-        stop_id: stop_id,
         stop_sequences: stop_sequences,
         routes_at_stop: routes_at_stop,
         fetch_stop_name_fn: fetch_stop_name_fn,
+        is_terminal_station: is_terminal_station,
         now: now
       ]
 
       cond do
         Enum.any?(immediate_disruptions) ->
-          create_alert_instance(
+          create_alert_instances(
             immediate_disruptions,
             true,
             common_parameters
           ) ++
-            create_alert_instance(downstream_disruptions, false, common_parameters) ++
-            create_alert_instance(moderate_delays, false, common_parameters)
+            create_alert_instances(downstream_disruptions, false, common_parameters) ++
+            create_alert_instances(moderate_delays, false, common_parameters)
 
         Enum.any?(downstream_disruptions) ->
-          create_alert_instance(downstream_disruptions, true, common_parameters) ++
-            create_alert_instance(moderate_delays, false, common_parameters)
+          create_alert_instances(downstream_disruptions, true, common_parameters) ++
+            create_alert_instances(moderate_delays, false, common_parameters)
 
         true ->
-          create_alert_instance(moderate_delays, true, common_parameters)
+          create_alert_instances(moderate_delays, true, common_parameters)
       end
     else
       :error -> []
     end
   end
 
-  defp create_alert_instance(
+  defp create_alert_instances(
          alerts,
          is_full_screen,
          config: config,
-         stop_id: stop_id,
          stop_sequences: stop_sequences,
          routes_at_stop: routes_at_stop,
          fetch_stop_name_fn: fetch_stop_name_fn,
+         is_terminal_station: is_terminal_station,
          now: now
        ) do
     Enum.map(alerts, fn alert ->
@@ -108,7 +125,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         stop_sequences: stop_sequences,
         routes_at_stop: routes_at_stop,
         informed_stations_string: get_stations(alert, fetch_stop_name_fn),
-        is_terminal_station: is_terminal?(stop_id, stop_sequences),
+        is_terminal_station: is_terminal_station,
         is_full_screen: is_full_screen
       }
     end)
