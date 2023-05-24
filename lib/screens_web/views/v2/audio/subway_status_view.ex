@@ -117,12 +117,12 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
         last
       else
         comma_separated_all_but_last = Enum.intersperse(all_but_last, ~E|, |)
-        ~E|<%= comma_separated_all_but_last %>, and, <%= last %> lines|
+        ~E|<%= comma_separated_all_but_last %>, and, <%= last %>|
       end
 
     # This deviates slightly from designs. The letters are read out after "branch(es)"
     # instead of before, because Polly pronounces that ordering much more clearly for some reason.
-    ~E|Green Line <%= branch_or_branches %> <%= letters_rendered %>|
+    ~E|Green Line <%= branch_or_branches %>, <%= letters_rendered %>,|
   end
 
   defp render_gl_branch_or_line(_non_branch_alert), do: ~E|Green Line|
