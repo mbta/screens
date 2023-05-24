@@ -44,7 +44,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   - the home stop is not on the boundary of the alert's affected region.
   - the widget does not have a map of headsign matchers (`SingleAlertWidget.headsign_matchers(t)` returns nil)
   """
-  @spec get_headsign_from_informed_entities(t()) :: headsign | nil
+  @spec get_headsign_from_informed_entities(t()) :: headsign
   def get_headsign_from_informed_entities(%{screen: %Screen{app_id: app_id}} = t)
       when app_id in [:dup_v2, :pre_fare_v2] do
     with headsign_matchers when is_map(headsign_matchers) <- headsign_matchers(t) do
