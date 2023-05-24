@@ -10,7 +10,7 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
   @type ssml_blob :: any
 
   def render("_widget.ssml", sections_map) do
-    ~E|<p><s>Subway service overview</s><%= render_sections(serialized_data) %></p>|
+    ~E|<p><s>Subway service overview</s><%= render_sections(sections_map) %></p>|
   end
 
   defp render_sections(sections_map) do
