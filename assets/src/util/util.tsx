@@ -30,7 +30,7 @@ export const imagePath = (fileName: string): string =>
   isDup() ? `images/${fileName}` : `/images/${fileName}`;
 
 export const pillPath = (fileName: string): string =>
-isDup() ? `images/pills/${fileName}` : `/images/pills/${fileName}`;
+  isDup() ? `images/pills/${fileName}` : `/images/pills/${fileName}`;
 
 export const isRealScreen = () =>
   isDup() || getDatasetValue("isRealScreen") === "true";
@@ -62,3 +62,5 @@ export const getRotationIndex = () => {
 
   return isRotationIndex(rotationIndex) ? rotationIndex : null;
 };
+
+export const firstWord = (str: string): string => str.split(" ")[0];
