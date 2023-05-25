@@ -17,7 +17,7 @@ import {
   isContractedWith1Alert,
   isExtended,
   isGLMultiPill,
-} from "../subway_status_common";
+} from "./subway_status_common";
 
 ////////////////
 // COMPONENTS //
@@ -212,6 +212,7 @@ const SubwayStatusRoutePill: ComponentType<{
   routePill: SubwayStatusPill;
   showInlineBranches?: boolean;
 }> = ({ routePill, showInlineBranches }) => {
+  // If there are branches, return a pill group with each branch icon.
   if (isGLMultiPill(routePill)) {
     const sortedUniqueBranches = Array.from(new Set(routePill.branches)).sort();
     return (
@@ -220,19 +221,19 @@ const SubwayStatusRoutePill: ComponentType<{
         showInlineBranches={showInlineBranches}
       />
     );
-  } else {
-    return (
-      <img
-        src={getStandardLinePillPath(routePill.color)}
-        className="pill-icon"
-      />
-    );
   }
+
+  // Return the route pill at the top of the section above alerts.
+  return (
+    <img src={getStandardLinePillPath(routePill.color)} className="pill-icon" />
+  );
 };
 
 const GLBranchPillGroup: ComponentType<
   Pick<GLMultiPill, "branches"> & { showInlineBranches?: boolean }
 > = ({ branches, showInlineBranches }) => {
+  // We only inline route pills for GL branches.
+  // Otherwise, we show a single route pill above alerts in each section.
   if (showInlineBranches) {
     return (
       <>
@@ -266,6 +267,7 @@ const GLBranchPillGroup: ComponentType<
 // HELPERS //
 /////////////
 
+// The header is displayed when every section has exactly 1 alert.
 const shouldShowHeader = ({ blue, orange, red, green }: SubwayStatusData) => {
   return [blue, orange, red, green].every(
     (data) => isContractedWith1Alert(data) || isExtended(data)
@@ -276,6 +278,8 @@ const getRoutePillObject = (
   section: Section,
   color: LineColor
 ): SubwayStatusPill => {
+  // If the current section is `green` and there is only one alert, see if there are any branches
+  // that can be added to the route pill. If no branches exist, the GL pill will be rendered with no branches.
   if (color === "green") {
     if (isContractedWith1Alert(section)) {
       return {
