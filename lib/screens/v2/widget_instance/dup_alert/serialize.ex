@@ -165,12 +165,6 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   defp get_headsign(t) do
     headsign = BaseAlert.get_headsign_from_informed_entities(t)
 
-    if is_nil(headsign) do
-      raise(
-        "[DUP v2 no headsign] Could not determine headsign for DUP alert alert_id=#{t.alert.id}"
-      )
-    end
-
     case headsign do
       {:adj, hs} -> hs
       hs -> hs

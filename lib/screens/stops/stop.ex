@@ -435,7 +435,7 @@ defmodule Screens.Stops.Stop do
           screen_type(),
           id(),
           DateTime.t()
-        ) :: {:ok, LocationContext.t()}
+        ) :: {:ok, LocationContext.t()} | :error
   def fetch_location_context(app, stop_id, now) do
     with alert_route_types <- get_route_type_filter(app, stop_id),
          {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, alert_route_types),
