@@ -23,7 +23,7 @@ import {
 // COMPONENTS //
 ////////////////
 
-const SubwayStatus: ComponentType<SubwayStatusData> = (props) => {
+const EinkSubwayStatus: ComponentType<SubwayStatusData> = (props) => {
   const { blue, orange, red, green } = props;
 
   return (
@@ -303,4 +303,4 @@ const getGLBranchLetterPillPath = (branch: GLBranch) =>
 const pillPath = (pillFilename: string) =>
   imagePath(`pills/eink/${pillFilename}`);
 
-export default SubwayStatus;
+export default EinkSubwayStatus;

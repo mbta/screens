@@ -29,7 +29,7 @@ import {
 // COMPONENTS //
 ////////////////
 
-const SubwayStatus: ComponentType<SubwayStatusData> = (props) => {
+const LcdSubwayStatus: ComponentType<SubwayStatusData> = (props) => {
   const { blue, orange, red, green } = cleanUpServerData(props);
 
   return (
@@ -355,4 +355,4 @@ const isExtendedWithNoLocation = (
   section: Section
 ): section is ExtendedSection => isExtended(section) && !section.alert.location;
 
-export default SubwayStatus;
+export default LcdSubwayStatus;
