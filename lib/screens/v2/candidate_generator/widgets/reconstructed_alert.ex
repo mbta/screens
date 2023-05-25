@@ -144,45 +144,35 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   end
 
   defp find_closest_downstream_alerts(alerts, stop_id, stop_sequences) do
+    home_stop_distance_map = build_distance_map(stop_id, stop_sequences)
     # Map each alert with its distance from home.
     Enum.map(alerts, fn %{informed_entities: ies} = alert ->
       distance =
         ies
         |> Enum.filter(&String.starts_with?(&1.stop, "place-"))
-        |> Enum.map(&get_home_distance_from_ie(stop_id, &1, stop_sequences))
+        |> Enum.map(&Map.fetch!(home_stop_distance_map, &1.stop))
         |> Enum.min()
 
       {alert, distance}
     end)
     |> Enum.group_by(&elem(&1, 1), &elem(&1, 0))
-    |> Enum.into([])
     |> Enum.sort_by(&elem(&1, 0))
     # The first item will be all alerts with the shortest distance.
     |> List.first()
     |> elem(1)
   end
 
-  # Find the closest informed station and calculate its distance from the home_stop_id.
-  # Assumes informed_entity is for a parent station.
-  defp get_home_distance_from_ie(home_stop_id, informed_entity, stop_sequences)
-
-  # GL distance logic to be done later.
-  defp get_home_distance_from_ie(_home_stop_id, %{route: "Green" <> _}, _stop_sequences), do: 99
-
-  # Loop through each stop_sequence to find the shortest distance between home and ie.
-  defp get_home_distance_from_ie(home_stop_id, %{stop: stop_id}, stop_sequences) do
-    stop_sequences
-    |> Enum.filter(&(home_stop_id in &1 and stop_id in &1))
-    |> Enum.map(&calculate_distance(&1, home_stop_id, stop_id))
-    |> Enum.min(fn -> 99 end)
-  end
-
-  # Alerts can be upstream or downstream. If it is an upstream alert, distance will be negative. Make it positive and use that as the distance.
-  defp calculate_distance(stop_sequence, home_stop_id, ie_stop_id) do
-    abs(
-      Enum.find_index(stop_sequence, &(&1 == home_stop_id)) -
-        Enum.find_index(stop_sequence, &(&1 == ie_stop_id))
-    )
+  defp build_distance_map(home_stop_id, stop_sequences) do
+    Enum.reduce(stop_sequences, %{}, fn stop_sequence, distances_by_stop ->
+      stop_sequence
+      # Index each element by its distance from home_stop_id. For example if home_stop_id is at position 2, then indices would start at -2.
+      |> Enum.with_index(-Enum.find_index(stop_sequence, &(&1 == home_stop_id)))
+      # Convert negative distances to positive, and put into a map.
+      |> Map.new(fn {stop, d} -> {stop, abs(d)} end)
+      # Merge with the distances recorded from previous stop sequences.
+      # If a stop already has a distance recorded, we use the smaller of the two. <-- *** Unsure if this is always what we'd want to do! ***
+      |> Map.merge(distances_by_stop, fn _stop, d1, d2 -> min(d1, d2) end)
+    end)
   end
 
   defp relevant_alerts(alerts, config, stop_sequences, routes_at_stop, now) do
