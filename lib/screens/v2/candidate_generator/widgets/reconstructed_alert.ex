@@ -14,6 +14,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   @relevant_effects ~w[shuttle suspension station_closure delay]a
 
+  @gl_eastbound_split_stops [
+    "place-mdftf",
+    "place-balsq",
+    "place-mgngl",
+    "place-gilmn",
+    "place-esomr",
+    "place-unsqu",
+    "place-lech"
+  ]
+
   @doc """
   Given the stop_id defined in the header, determine relevant routes
   Given the routes, fetch all alerts for the route
@@ -150,7 +160,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       distance =
         ies
         |> Enum.filter(&String.starts_with?(&1.stop, "place-"))
-        |> Enum.map(&Map.fetch!(home_stop_distance_map, &1.stop))
+        |> Enum.map(&get_distance(home_stop_distance_map, &1))
         |> Enum.min()
 
       {alert, distance}
@@ -174,6 +184,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       |> Map.merge(distances_by_stop, fn _stop, d1, d2 -> min(d1, d2) end)
     end)
   end
+
+  defp get_distance(home_stop_distance_map, %{route: "Green" <> _, stop: stop_id})
+       when stop_id in @gl_eastbound_split_stops,
+       do: Map.fetch!(home_stop_distance_map, "place-lech")
+
+  defp get_distance(home_stop_distance_map, %{route: "Green" <> _}),
+    do: Map.fetch!(home_stop_distance_map, "place-kencl")
+
+  defp get_distance(home_stop_distance_map, %{stop: stop_id}),
+    do: Map.fetch!(home_stop_distance_map, stop_id)
 
   defp relevant_alerts(alerts, config, stop_sequences, routes_at_stop, now) do
     Enum.filter(alerts, fn %Alert{effect: effect} = alert ->
