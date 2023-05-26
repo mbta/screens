@@ -6,7 +6,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.LocationContext
-  alias Screens.V2.WidgetInstance.Common.BaseAlert
+  alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert.Serialize
 
   require Logger
@@ -156,7 +156,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   defp get_layout_parameters(t) do
     %{
       effect: t.alert.effect,
-      location: BaseAlert.location(t),
+      location: LocalizedAlert.location(t),
       affected_line_count: length(get_affected_lines(t)),
       primary_section_count: t.primary_section_count
     }
@@ -239,7 +239,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   def get_affected_lines(t) do
     t
-    |> BaseAlert.informed_routes_at_home_stop()
+    |> LocalizedAlert.informed_routes_at_home_stop()
     |> routes_to_lines()
   end
 

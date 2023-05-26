@@ -9,7 +9,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.Util
-  alias Screens.V2.WidgetInstance.Common.BaseAlert
+  alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
 
   @relevant_effects ~w[shuttle suspension station_closure delay]a
@@ -70,7 +70,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   end
 
   defp relevant_location?(reconstructed_alert) do
-    case BaseAlert.location(reconstructed_alert) do
+    case LocalizedAlert.location(reconstructed_alert) do
       location when location in [:downstream, :upstream] ->
         true
 
@@ -118,7 +118,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
            location_context: %{home_stop: stop_id, stop_sequences: stop_sequences}
          } = t
        ) do
-    informed_entities = BaseAlert.informed_entities(t)
+    informed_entities = Alert.informed_entities(t)
 
     direction_id =
       informed_entities
@@ -156,7 +156,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   defp get_stations(alert, fetch_stop_name_fn) do
     stop_ids =
       %ReconstructedAlert{alert: alert}
-      |> BaseAlert.informed_entities()
+      |> Alert.informed_entities()
       |> Enum.flat_map(fn %{stop: stop_id} ->
         case stop_id do
           nil -> []

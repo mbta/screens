@@ -549,4 +549,10 @@ defmodule Screens.Alerts.Alert do
       true -> {:up_to, 5 * (severity - 1)}
     end
   end
+
+  def informed_entities(%{alert: %__MODULE__{informed_entities: informed_entities}}) do
+    informed_entities
+  end
+
+  def effect(%{alert: %__MODULE__{effect: effect}}), do: effect
 end

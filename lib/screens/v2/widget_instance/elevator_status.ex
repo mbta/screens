@@ -81,7 +81,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   alias Screens.Config.V2.{ElevatorStatus, PreFare}
   alias Screens.LocationContext
   alias Screens.V2.AlertsWidget
-  alias Screens.V2.WidgetInstance.Common.BaseAlert
+  alias Screens.V2.LocalizedAlert
 
   defstruct screen: nil,
             now: nil,
@@ -158,7 +158,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     |> Enum.filter(&active_at_home_station?(&1, t))
   end
 
-  # The definition of this "elsewhere" is different than the output of BaseAlert.Location.
+  # The definition of this "elsewhere" is different than the output of LocalizedAlert.location.
   # This elsewhere means "anywhere but here"
   defp get_active_elsewhere(
          %__MODULE__{
@@ -222,7 +222,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          %__MODULE__{location_context: location_context, now: now}
        ) do
     active = Alert.happening_now?(alert, now)
-    alert_location = BaseAlert.location(%{alert: alert, location_context: location_context})
+    alert_location = LocalizedAlert.location(%{alert: alert, location_context: location_context})
     active and (alert_location === :upstream or alert_location === :downstream)
   end
 

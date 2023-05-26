@@ -1,6 +1,6 @@
-defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
+defmodule Screens.V2.LocalizedAlert do
   @moduledoc """
-  Common logic for Alerts.
+  Common logic for Alerts with location and screen context.
   """
 
   alias Screens.Alerts.Alert
@@ -12,12 +12,11 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.{DupAlert, ElevatorStatus, ReconstructedAlert}
 
-  @type t ::
-          AlertWidget.t()
+  @type t :: AlertWidget.t()
           | DupAlert.t()
           | ReconstructedAlert.t()
           | ElevatorStatus.t()
-          | %{alert: Alert.t(), location_context: LocationContext.t()}
+          | %{alert: Alert.t(), location_context: LocationContext.t(), screen?: Screen.t()}
 
   @type stop_id :: String.t()
 
@@ -39,19 +38,15 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   @doc """
   Determines the headsign of the affected direction of an alert using
   stop IDs in its informed entities.
-
-  Returns nil if either of the following is true:
-  - the home stop is not on the boundary of the alert's affected region.
-  - the widget does not have a map of headsign matchers (`SingleAlertWidget.headsign_matchers(t)` returns nil)
   """
   @spec get_headsign_from_informed_entities(t()) :: headsign
-  def get_headsign_from_informed_entities(%{screen: %Screen{app_id: app_id}} = t)
+  def get_headsign_from_informed_entities(%{screen: %Screen{app_id: app_id}, location_context: location_context} = t)
       when app_id in [:dup_v2, :pre_fare_v2] do
     with headsign_matchers when is_map(headsign_matchers) <- headsign_matchers(t) do
-      informed_stop_ids = MapSet.new(informed_entities(t), & &1.stop)
+      informed_stop_ids = MapSet.new(Alert.informed_entities(t), & &1.stop)
 
       headsign_matchers
-      |> Map.get(t.location_context.home_stop)
+      |> Map.get(location_context.home_stop)
       |> Enum.find_value(fn %{
                               informed: informed,
                               not_informed: not_informed,
@@ -78,13 +73,6 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     MapSet.subset?(informed, informed_stop_ids) and
       MapSet.disjoint?(not_informed, informed_stop_ids)
   end
-
-  def informed_entities(%{alert: %Alert{informed_entities: informed_entities}}) do
-    informed_entities
-  end
-
-  @spec effect(t()) :: Alert.effect()
-  def effect(%{alert: %Alert{effect: effect}}), do: effect
 
   @spec informed_entity_to_zone(Alert.informed_entity(), LocationContext.t()) ::
           list(:upstream | :home_stop | :downstream)
@@ -148,10 +136,10 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
           | :inside
           | :upstream
   def location(
-        %{alert: %Alert{} = alert, location_context: %LocationContext{} = location_context} = t,
+        %{alert: alert, location_context: location_context} = t,
         is_terminal_station \\ false
       ) do
-    informed_entities = informed_entities(t)
+    informed_entities = Alert.informed_entities(t)
 
     informed_zones_set =
       informed_entities
@@ -210,7 +198,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   @spec informed_subway_routes(t()) :: list(String.t())
   def informed_subway_routes(%{screen: %Screen{app_id: app_id}} = t) do
     t
-    |> informed_entities()
+    |> Alert.informed_entities()
     |> Enum.map(fn %{route: route} -> route end)
     # If the alert impacts CR or other lines, weed that out
     |> Enum.filter(fn e ->
@@ -270,12 +258,12 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
   Gets the routes affected by an alert that also exist at the current stop. No downstream
   """
   @spec informed_routes_at_home_stop(t()) :: list(Route.id())
-  def informed_routes_at_home_stop(t) do
-    rts = t.location_context.alert_route_types
-    home_stop = t.location_context.home_stop
+  def informed_routes_at_home_stop(%{location_context: location_context} = t) do
+    rts = location_context.alert_route_types
+    home_stop = location_context.home_stop
 
     route_set =
-      t.location_context.routes
+      location_context.routes
       |> Route.route_ids()
       |> MapSet.new()
 
@@ -283,7 +271,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlert do
     empty_set = MapSet.new()
 
     uninformed_routes =
-      Enum.reduce_while(informed_entities(t), route_set, fn
+      Enum.reduce_while(Alert.informed_entities(t), route_set, fn
         _ie, ^empty_set ->
           {:halt, empty_set}
 
