@@ -5,7 +5,7 @@ defmodule Screens.V2.LocalizedAlertTest do
   alias Screens.Config.Screen
   alias Screens.Config.V2.BusShelter
   alias Screens.RouteType
-    alias Screens.V2.LocalizedAlert, as: LocalizedAlert
+  alias Screens.V2.LocalizedAlert, as: LocalizedAlert
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
   setup :setup_base

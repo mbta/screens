@@ -107,12 +107,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   end
 
   @spec relevant_alert?(Alert.t(), Screen.t(), LocationContext.t(), DateTime.t()) :: boolean()
-  defp relevant_alert?(
-         alert,
-         %Screen{app_params: %Dup{primary_departures: %{sections: sections}}} = config,
-         location_context,
-         now
-       ) do
+  defp relevant_alert?(alert, config, location_context, now) do
     relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
       relevant_location?(alert, location_context) and
       not directional_shuttle_or_suspension?(alert)

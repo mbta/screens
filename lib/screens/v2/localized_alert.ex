@@ -12,7 +12,8 @@ defmodule Screens.V2.LocalizedAlert do
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.{DupAlert, ElevatorStatus, ReconstructedAlert}
 
-  @type t :: AlertWidget.t()
+  @type t ::
+          AlertWidget.t()
           | DupAlert.t()
           | ReconstructedAlert.t()
           | ElevatorStatus.t()
@@ -40,7 +41,9 @@ defmodule Screens.V2.LocalizedAlert do
   stop IDs in its informed entities.
   """
   @spec get_headsign_from_informed_entities(t()) :: headsign
-  def get_headsign_from_informed_entities(%{screen: %Screen{app_id: app_id}, location_context: location_context} = t)
+  def get_headsign_from_informed_entities(
+        %{screen: %Screen{app_id: app_id}, location_context: location_context} = t
+      )
       when app_id in [:dup_v2, :pre_fare_v2] do
     with headsign_matchers when is_map(headsign_matchers) <- headsign_matchers(t) do
       informed_stop_ids = MapSet.new(Alert.informed_entities(t), & &1.stop)

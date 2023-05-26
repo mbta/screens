@@ -201,7 +201,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   def valid_candidate?(%__MODULE__{screen: %Screen{app_id: screen_type}} = t)
       when screen_type in [:bus_shelter_v2, :bus_eink_v2] do
     priority(t) != :no_render and
-    LocalizedAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
+      LocalizedAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
   end
 
   # Any subway alert that is not filtered out in the candidate_generator is valid and should appear on screens›.
