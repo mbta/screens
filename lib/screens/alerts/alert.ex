@@ -230,9 +230,6 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  # credo:disable-for-next-line
-  # Todo: These private format_query_params are the same in Departures and Route
-  # Consolidate? Doesn't matter?
   defp format_query_param({:fields, fields}) when is_list(fields) do
     [
       {"fields[alert]", Enum.join(fields, ",")}

@@ -281,6 +281,7 @@ defmodule Screens.V2.LocalizedAlert do
 
         # For a systemwide alert (affecting all bus or all subway/light rail)
         # entity has route type, but no stop or route
+        # credo:disable-for-next-line
         # TODO bug: currently breaks for pre-fare, dups (because they are multimodal, and alerts UI lumps
         # together subway and light rail)
         %{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
