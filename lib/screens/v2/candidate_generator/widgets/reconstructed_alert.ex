@@ -81,16 +81,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         )
 
       moderate_delays =
-        Enum.filter(
-          relevant_alerts,
-          &(Alert.get_alert_location_for_stop_id(
-              &1,
-              stop_id,
-              stop_sequences,
-              routes_at_stop,
-              is_terminal_station
-            ) in [:elsewhere] and (&1.effect == :delay and &1.severity >= 5))
-        )
+        Enum.filter(relevant_alerts, &(&1.effect == :delay and &1.severity in 5..6))
 
       common_parameters = [
         config: config,
