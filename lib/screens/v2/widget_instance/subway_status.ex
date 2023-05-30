@@ -153,6 +153,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{full: direction, abbrev: direction}
   end
 
+  # credo:disable-for-next-line
+  # TODO: get_endpoints is a common function; could be consolidated
   defp get_endpoints(informed_entities, route_id) do
     case Stop.get_stop_sequence(informed_entities, route_id) do
       nil ->

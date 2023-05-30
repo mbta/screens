@@ -145,6 +145,9 @@ defmodule Screens.Routes.Route do
     end
   end
 
+  @spec route_ids(list(%{route_id: id(), active?: boolean()})) :: list(id())
+  def route_ids(routes), do: Enum.map(routes, & &1.route_id)
+
   def get_color_for_route(route_id, route_type \\ nil)
 
   def get_color_for_route("Red", _), do: :red

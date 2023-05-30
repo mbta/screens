@@ -4,8 +4,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{ElevatorStatus, PreFare}
-  alias Screens.RoutePatterns.RoutePattern
-  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.ElevatorStatus, as: ElevatorStatusWidget
 
@@ -15,16 +13,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
             elevator_status: %ElevatorStatus{parent_station_id: parent_station_id}
           }
         } = config,
-        now
+        now \\ DateTime.utc_now(),
+        fetch_location_context_fn \\ &Stop.fetch_location_context/3
       ) do
-    with {:ok, routes_at_stop} <-
-           Route.fetch_routes_by_stop(parent_station_id, now, [:light_rail, :subway]),
-         route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
-         {:ok, stop_sequences} <-
-           RoutePattern.fetch_parent_station_sequences_through_stop(
-             parent_station_id,
-             route_ids_at_stop
-           ),
+    with {:ok, location_context} <- fetch_location_context_fn.(PreFare, parent_station_id, now),
          {:ok, parent_station_map} <- Stop.fetch_parent_station_name_map(),
          {:ok, elevator_closures, facility_id_to_name} <- fetch_elevator_closures() do
       icon_map = get_icon_map(elevator_closures, parent_station_id)
@@ -32,8 +24,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
       [
         %ElevatorStatusWidget{
           alerts: elevator_closures,
+          location_context: location_context,
           facility_id_to_name: facility_id_to_name,
-          stop_sequences: stop_sequences,
           screen: config,
           now: now,
           station_id_to_name: parent_station_map,

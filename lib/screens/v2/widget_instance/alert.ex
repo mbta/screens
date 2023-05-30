@@ -3,19 +3,14 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
-  alias Screens.Config.V2.{Alerts, BusEink, BusShelter, GlEink, PreFare}
-  alias Screens.Config.V2.Header.CurrentStopId
-  alias Screens.RouteType
-  alias Screens.Util
+  alias Screens.LocationContext
+  alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.Common.BaseAlert
-  alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct screen: nil,
             alert: nil,
-            stop_sequences: nil,
-            routes_at_stop: nil,
+            location_context: nil,
             now: nil
 
   @type stop_id :: String.t()
@@ -25,8 +20,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @type t :: %__MODULE__{
           screen: Screen.t(),
           alert: Alert.t(),
-          stop_sequences: list(list(stop_id())),
-          routes_at_stop: list(%{route_id: route_id(), active?: boolean()}),
+          location_context: LocationContext.t(),
           now: DateTime.t()
         }
 
@@ -37,7 +31,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @automated_override_priority [1, 2]
 
   # Keep these in descending order of priority--highest priority (lowest integer value) first
-  @relevant_effects ~w[shuttle stop_closure suspension station_closure detour stop_move stop_moved snow_route elevator_closure]a
+  @relevant_effects ~w[shuttle stop_closure suspension station_closure detour stop_moved snow_route elevator_closure]a
 
   @effect_priorities Enum.with_index(@relevant_effects, 1)
 
@@ -69,7 +63,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
                   Enum.map(@relevant_effects, fn
                     bus when bus in ~w[shuttle detour]a -> :bus
                     major when major in ~w[stop_closure suspension station_closure]a -> :x
-                    minor when minor in ~w[stop_move stop_moved elevator_closure]a -> :warning
+                    minor when minor in ~w[stop_moved elevator_closure]a -> :warning
                     :snow_route -> :snowflake
                   end)
                 )
@@ -94,7 +88,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @spec serialize(t()) :: map()
   def serialize(t) do
-    e = effect(t)
+    e = Alert.effect(t)
 
     %{
       route_pills: serialize_route_pills(t),
@@ -105,12 +99,18 @@ defmodule Screens.V2.WidgetInstance.Alert do
     }
   end
 
-  defp serialize_route_pills(t) do
-    routes = informed_routes(t)
+  defp serialize_route_pills(%__MODULE__{screen: %Screen{app_id: app_id}} = t) do
+    routes =
+      if app_id === :gl_eink_v2 do
+        # Get route pills for alert, including that on connecting GL branches
+        LocalizedAlert.informed_subway_routes(t)
+      else
+        # Get route pills for an alert, but only the routes that are at this stop
+        LocalizedAlert.informed_routes_at_home_stop(t)
+      end
 
-    if MapSet.size(routes) <= 3 do
+    if length(routes) <= 3 do
       routes
-      |> Enum.to_list()
       |> Enum.sort_by(fn route_id ->
         case Integer.parse(route_id) do
           # Bus route (including SL_, CT_)
@@ -119,10 +119,11 @@ defmodule Screens.V2.WidgetInstance.Alert do
           _ -> route_id
         end
       end)
-      |> Enum.map(&RoutePill.serialize_route_for_alert(&1, MapSet.size(routes) == 1))
+      |> Enum.map(&RoutePill.serialize_route_for_alert(&1, length(routes) == 1))
     else
-      t
-      |> route_type()
+      t.location_context.alert_route_types
+      # For bus shelter / e-ink, there's only 1 list item
+      |> List.first()
       |> RoutePill.serialize_route_type_for_alert()
       |> List.wrap()
     end
@@ -150,21 +151,13 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   def takeover_alert?(%__MODULE__{screen: %Screen{app_id: bus_app_id}} = t)
       when bus_app_id in [:bus_shelter_v2, :bus_eink_v2] do
-    effect(t) in [:stop_closure, :stop_move, :stop_moved, :suspension, :detour] and
-      informs_all_active_routes_at_home_stop?(t)
+    Alert.effect(t) in [:stop_closure, :stop_moved, :suspension, :detour] and
+      LocalizedAlert.informs_all_active_routes_at_home_stop?(t)
   end
 
   def takeover_alert?(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
-    effect(t) in [:station_closure, :suspension, :shuttle] and
-      BaseAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
-  end
-
-  def takeover_alert?(
-        %{screen: %Screen{app_id: :pre_fare_v2}, is_terminal_station: is_terminal_station} = t
-      ) do
-    effect(t) in [:station_closure, :suspension, :shuttle] and
-      BaseAlert.location(t, is_terminal_station) == :inside and
-      informs_all_active_routes_at_home_stop?(t)
+    Alert.effect(t) in [:station_closure, :suspension, :shuttle] and
+      LocalizedAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
   end
 
   defp takeover_slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}) do
@@ -201,110 +194,19 @@ defmodule Screens.V2.WidgetInstance.Alert do
       )
       when screen_type in [:bus_shelter_v2, :bus_eink_v2] do
     priority(t) != :no_render and
-      BaseAlert.location(t) in [:inside, :boundary_downstream]
+      LocalizedAlert.location(t) in [:inside, :boundary_downstream]
   end
 
   # For all other bus alert effects, all stops in the `informed_entities` are directly affected by the alert and would be useful for riders to see.
   def valid_candidate?(%__MODULE__{screen: %Screen{app_id: screen_type}} = t)
       when screen_type in [:bus_shelter_v2, :bus_eink_v2] do
     priority(t) != :no_render and
-      BaseAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
+      LocalizedAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
   end
 
   # Any subway alert that is not filtered out in the candidate_generator is valid and should appear on screens›.
   def valid_candidate?(t) do
     priority(t) != :no_render
-  end
-
-  @spec seconds_from_onset(t()) :: integer()
-  def seconds_from_onset(%__MODULE__{alert: %Alert{active_period: [{start, _} | _]}, now: now})
-      when not is_nil(start) do
-    DateTime.diff(now, start, :second)
-  end
-
-  @spec seconds_to_next_active_period(t()) :: integer() | :infinity
-  def seconds_to_next_active_period(%__MODULE__{
-        alert: %Alert{active_period: active_periods},
-        now: now
-      })
-      when not is_nil(active_periods) do
-    next_active_period =
-      Enum.find(active_periods, fn {start, _} ->
-        not is_nil(start) and DateTime.compare(now, start) in [:lt, :eq]
-      end)
-
-    case next_active_period do
-      nil -> :infinity
-      {start, _} -> DateTime.diff(start, now, :second)
-    end
-  end
-
-  def seconds_to_next_active_period(_t), do: :infinity
-
-  @spec home_stop_id(t()) :: String.t()
-  def home_stop_id(%{
-        screen: %Screen{app_params: %app{alerts: %Alerts{stop_id: stop_id}}}
-      })
-      when app in [BusShelter, GlEink, BusEink] do
-    stop_id
-  end
-
-  def home_stop_id(%{
-        screen: %Screen{
-          app_params: %app{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}}
-        }
-      })
-      when app in [PreFare] do
-    stop_id
-  end
-
-  @spec informed_entities(t()) :: list(Alert.informed_entity())
-  def informed_entities(%{alert: %Alert{informed_entities: informed_entities}}) do
-    informed_entities
-  end
-
-  @spec upstream_stop_id_set(t()) :: MapSet.t(stop_id())
-  def upstream_stop_id_set(%{} = t) do
-    home_stop_id = home_stop_id(t)
-
-    t.stop_sequences
-    |> Enum.flat_map(fn stop_sequence -> Util.slice_before(stop_sequence, home_stop_id) end)
-    |> MapSet.new()
-  end
-
-  @spec downstream_stop_id_set(t()) :: MapSet.t(stop_id())
-  def downstream_stop_id_set(%{} = t) do
-    home_stop_id = home_stop_id(t)
-
-    t.stop_sequences
-    |> Enum.flat_map(fn stop_sequence -> Util.slice_after(stop_sequence, home_stop_id) end)
-    |> MapSet.new()
-  end
-
-  @spec effect(t() | ReconstructedAlert.t()) :: Alert.effect()
-  def effect(%{alert: %Alert{effect: effect}}), do: effect
-
-  def all_routes_at_stop(%{routes_at_stop: routes}) do
-    MapSet.new(routes, & &1.route_id)
-  end
-
-  def active_routes_at_stop(%{routes_at_stop: routes}) do
-    routes
-    |> Enum.filter(& &1.active?)
-    |> MapSet.new(& &1.route_id)
-  end
-
-  def route_type(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}), do: :bus
-  def route_type(%__MODULE__{screen: %Screen{app_id: :bus_eink_v2}}), do: :bus
-  def route_type(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}}), do: :light_rail
-
-  def route_type(%{
-        screen: %Screen{app_id: :pre_fare_v2},
-        routes_at_stop: routes_at_stop
-      }) do
-    routes_at_stop
-    |> Enum.map(& &1.type)
-    |> Enum.dedup()
   end
 
   # Time units in seconds
@@ -325,7 +227,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @spec tiebreaker_location(t()) :: pos_integer() | WidgetInstance.no_render()
   def tiebreaker_location(%__MODULE__{} = t) do
-    case BaseAlert.location(t) do
+    case LocalizedAlert.location(t) do
       :inside -> 1
       :boundary_upstream -> 2
       :boundary_downstream -> 2
@@ -349,91 +251,13 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @spec tiebreaker_effect(t()) :: pos_integer() | WidgetInstance.no_render()
   def tiebreaker_effect(%__MODULE__{} = t) do
-    Keyword.get(@effect_priorities, effect(t), :no_render)
+    Keyword.get(@effect_priorities, Alert.effect(t), :no_render)
   end
 
-  defp informs_all_active_routes_at_home_stop?(t) do
-    MapSet.subset?(active_routes_at_stop(t), BaseAlert.informed_routes_at_home_stop(t))
-  end
-
-  # For GL, we want to list all affected branches for the alert and not just the branch serving the home stop.
-  # This allows us to show a pill for each branch in the informed_entities of the alert (or GL pill if all branches are affected).
-  defp informed_routes(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
-    t
-    |> informed_entities()
-    |> Enum.filter(fn
-      %{route: "Green" <> _} -> true
-      _ -> false
-    end)
-    |> Enum.map(fn %{route: route} -> route end)
-    |> Enum.into(MapSet.new())
-    |> Enum.reduce_while(MapSet.new(), fn
-      route, acc ->
-        if MapSet.size(acc) == 2 do
-          {:halt, MapSet.new(["Green"])}
-        else
-          {:cont, MapSet.put(acc, route)}
-        end
-    end)
-  end
-
-  # Takes all_routes_at_stop and removes any route that is not affected by the alert.
-  # Remaining routes show as pills on the alert component.
-  defp informed_routes(t) do
-    rt = route_type(t)
-    home_stop = home_stop_id(t)
-    downstream_stop_set = downstream_stop_id_set(t)
-    route_set = all_routes_at_stop(t)
-
-    # allows us to pattern match against the empty set
-    empty_set = MapSet.new()
-
-    uninformed_routes =
-      Enum.reduce_while(informed_entities(t), route_set, fn
-        _ie, ^empty_set ->
-          {:halt, empty_set}
-
-        %{route_type: nil, stop: nil, route: nil}, uninformed ->
-          {:cont, uninformed}
-
-        %{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
-          # Route type might be a single atom or list of atoms
-          cond do
-            is_list(rt) and RouteType.from_id(route_type_id) in rt ->
-              {:halt, empty_set}
-
-            RouteType.from_id(route_type_id) == rt ->
-              {:halt, empty_set}
-
-            true ->
-              {:cont, uninformed}
-          end
-
-        %{stop: ^home_stop, route: nil}, _uninformed ->
-          {:halt, empty_set}
-
-        # We can't handle this case properly until the struct is updated to record which routes serve which stops.
-        # %{stop: stop, route: nil}, uninformed when stop in downstream_stops ->
-        #   {:cont, MapSet.difference(uninformed, routes_by_stop[stop])}
-
-        %{stop: ^home_stop, route: route}, uninformed ->
-          {:cont, MapSet.delete(uninformed, route)}
-
-        %{stop: stop, route: route}, uninformed when is_binary(stop) ->
-          if stop in downstream_stop_set do
-            {:cont, MapSet.delete(uninformed, route)}
-          else
-            {:cont, uninformed}
-          end
-
-        %{stop: nil, route: route}, uninformed ->
-          {:cont, MapSet.delete(uninformed, route)}
-
-        _ie, uninformed ->
-          {:cont, uninformed}
-      end)
-
-    MapSet.difference(route_set, uninformed_routes)
+  @spec seconds_from_onset(t()) :: integer()
+  def seconds_from_onset(%__MODULE__{alert: %Alert{active_period: [{start, _} | _]}, now: now})
+      when not is_nil(start) do
+    DateTime.diff(now, start, :second)
   end
 
   def audio_serialize(_instance), do: %{}
@@ -458,22 +282,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
     def audio_sort_key(instance), do: Alert.audio_sort_key(instance)
     def audio_valid_candidate?(instance), do: Alert.audio_valid_candidate?(instance)
     def audio_view(instance), do: Alert.audio_view(instance)
-  end
-
-  defimpl Screens.V2.SingleAlertWidget do
-    alias Screens.V2.WidgetInstance.Alert
-
-    def alert(instance), do: instance.alert
-
-    def screen(instance), do: instance.screen
-
-    def home_stop_id(instance), do: instance.screen.app_params.alerts.stop_id
-
-    def routes_at_stop(instance), do: instance.routes_at_stop
-
-    def stop_sequences(instance), do: instance.stop_sequences
-
-    def headsign_matchers(_instance), do: nil
   end
 
   defimpl Screens.V2.AlertsWidget do
