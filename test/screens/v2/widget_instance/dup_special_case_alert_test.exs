@@ -907,7 +907,6 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
                upstream_stops: Stop.upstream_stop_id_set(stop_id, stop_sequences(stop_id)),
                downstream_stops: Stop.downstream_stop_id_set(stop_id, stop_sequences(stop_id)),
                routes: routes(stop_id),
-               route_ids_at_stop: Enum.map(routes(stop_id), & &1.route_id),
                alert_route_types: Stop.get_route_type_filter(Dup, stop_id)
              }}
         end

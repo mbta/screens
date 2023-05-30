@@ -547,9 +547,9 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  def informed_entities(%{alert: %__MODULE__{informed_entities: informed_entities}}) do
+  def informed_entities(%__MODULE__{informed_entities: informed_entities}) do
     informed_entities
   end
 
-  def effect(%{alert: %__MODULE__{effect: effect}}), do: effect
+  def effect(%__MODULE__{effect: effect}), do: effect
 end

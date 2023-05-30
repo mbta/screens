@@ -87,14 +87,14 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   @spec serialize(t()) :: map()
-  def serialize(t) do
-    e = Alert.effect(t)
+  def serialize(%{alert: alert} = t) do
+    e = Alert.effect(alert)
 
     %{
       route_pills: serialize_route_pills(t),
       icon: serialize_icon(e),
       header: serialize_header(e),
-      body: t.alert.header,
+      body: alert.header,
       url: clean_up_url(t.alert.url || "mbta.com/alerts")
     }
   end
@@ -149,14 +149,14 @@ defmodule Screens.V2.WidgetInstance.Alert do
     if takeover_alert?(t), do: takeover_slot_names(t), else: normal_slot_names(t)
   end
 
-  def takeover_alert?(%__MODULE__{screen: %Screen{app_id: bus_app_id}} = t)
+  def takeover_alert?(%__MODULE__{screen: %Screen{app_id: bus_app_id}, alert: alert} = t)
       when bus_app_id in [:bus_shelter_v2, :bus_eink_v2] do
-    Alert.effect(t) in [:stop_closure, :stop_moved, :suspension, :detour] and
+    Alert.effect(alert) in [:stop_closure, :stop_moved, :suspension, :detour] and
       LocalizedAlert.informs_all_active_routes_at_home_stop?(t)
   end
 
-  def takeover_alert?(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
-    Alert.effect(t) in [:station_closure, :suspension, :shuttle] and
+  def takeover_alert?(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}, alert: alert} = t) do
+    Alert.effect(alert) in [:station_closure, :suspension, :shuttle] and
       LocalizedAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
   end
 
@@ -250,8 +250,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   @spec tiebreaker_effect(t()) :: pos_integer() | WidgetInstance.no_render()
-  def tiebreaker_effect(%__MODULE__{} = t) do
-    Keyword.get(@effect_priorities, Alert.effect(t), :no_render)
+  def tiebreaker_effect(%__MODULE__{alert: alert} = t) do
+    Keyword.get(@effect_priorities, Alert.effect(alert), :no_render)
   end
 
   @spec seconds_from_onset(t()) :: integer()

@@ -1153,7 +1153,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
            upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
            downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
            routes: routes_at_stop,
-           route_ids_at_stop: Enum.map(routes_at_stop, & &1.route_id),
            alert_route_types: Stop.get_route_type_filter(PreFare, stop_id)
          }}
       end

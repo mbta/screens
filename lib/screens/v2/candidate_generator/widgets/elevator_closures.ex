@@ -23,7 +23,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
 
       [
         %ElevatorStatusWidget{
-          # TODO: put anything else into location context?
           alerts: elevator_closures,
           location_context: location_context,
           facility_id_to_name: facility_id_to_name,

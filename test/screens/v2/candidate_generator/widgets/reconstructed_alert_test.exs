@@ -77,8 +77,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         }
       ]
 
-      route_ids_at_stop = ["Red", "Green-B", "Green-C", "Green-D", "Green-E"]
-
       happening_now_active_period = [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
       upcoming_active_period = [{~U[2021-01-02T00:00:00Z], ~U[2021-01-03T00:00:00Z]}]
 
@@ -152,7 +150,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         upstream_stops: Stop.upstream_stop_id_set(stop_id, stop_sequences),
         downstream_stops: Stop.downstream_stop_id_set(stop_id, stop_sequences),
         routes: routes_at_stop,
-        route_ids_at_stop: route_ids_at_stop,
         alert_route_types: Stop.get_route_type_filter(app, stop_id)
       }
 

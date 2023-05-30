@@ -22,7 +22,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
           upstream_stops: nil,
           downstream_stops: nil,
           routes: nil,
-          route_ids_at_stop: nil,
           alert_route_types: nil
         }
       }
@@ -67,8 +66,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       widget
       | location_context: %{
           widget.location_context
-          | routes: routes,
-            route_ids_at_stop: Enum.map(routes, & &1.route_id)
+          | routes: routes
         }
     }
   end

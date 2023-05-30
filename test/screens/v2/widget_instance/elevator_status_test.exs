@@ -75,7 +75,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       upstream_stops: Stop.upstream_stop_id_set(home_station_id, stop_sequences),
       downstream_stops: Stop.downstream_stop_id_set(home_station_id, stop_sequences),
       routes: [],
-      route_ids_at_stop: [],
       alert_route_types: []
     }
 

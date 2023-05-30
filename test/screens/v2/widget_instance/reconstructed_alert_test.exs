@@ -26,7 +26,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           upstream_stops: nil,
           downstream_stops: nil,
           routes: nil,
-          route_ids_at_stop: nil,
           alert_route_types: nil
         }
       }
@@ -71,8 +70,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget
       | location_context: %{
           widget.location_context
-          | routes: routes,
-            route_ids_at_stop: Enum.map(routes, & &1.route_id)
+          | routes: routes
         }
     }
   end
@@ -1374,7 +1372,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
            upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
            downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
            routes: routes_at_stop,
-           route_ids_at_stop: Enum.map(routes_at_stop, & &1.route_id),
            alert_route_types: Stop.get_route_type_filter(PreFare, stop_id)
          }}
       end
@@ -1742,7 +1739,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
            upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
            downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
            routes: routes_at_stop,
-           route_ids_at_stop: Enum.map(routes_at_stop, & &1.route_id),
            alert_route_types: Stop.get_route_type_filter(PreFare, stop_id)
          }}
       end

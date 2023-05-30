@@ -14,7 +14,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
     %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}
   end
 
-  # TODO: GL e-ink needs to be tested here, because sometimes the alerts are rendered slightly differently
+  # credo:disable-for-next-line
+  # TODO: GL e-ink needs to be specifically tested here, because sometimes the alerts are rendered slightly differently
 
   describe "alert_instances/4" do
     setup do
@@ -33,8 +34,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %{route_id: "29", active?: false},
         %{route_id: "44", active?: true}
       ]
-
-      route_ids_at_stop = ["22", "29", "44"]
 
       stop_sequences = [
         ~w[11531 1265 1266],
@@ -71,7 +70,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         upstream_stops: Stop.upstream_stop_id_set(stop_id, stop_sequences),
         downstream_stops: Stop.downstream_stop_id_set(stop_id, stop_sequences),
         routes: routes_at_stop,
-        route_ids_at_stop: route_ids_at_stop,
         alert_route_types: Stop.get_route_type_filter(app, stop_id)
       }
 

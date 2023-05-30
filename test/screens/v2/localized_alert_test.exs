@@ -6,6 +6,7 @@ defmodule Screens.V2.LocalizedAlertTest do
   alias Screens.Config.V2.BusShelter
   alias Screens.LocationContext
   alias Screens.RouteType
+  alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert, as: LocalizedAlert
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
@@ -22,7 +23,6 @@ defmodule Screens.V2.LocalizedAlertTest do
           upstream_stops: nil,
           downstream_stops: nil,
           routes: nil,
-          route_ids_at_stop: nil,
           alert_route_types: nil
         }
       }
@@ -59,22 +59,11 @@ defmodule Screens.V2.LocalizedAlertTest do
   end
 
   defp put_routes_at_stop(widget, routes) do
-    %{
-      widget
-      | location_context: %{
-          widget.location_context
-          | routes: routes,
-            route_ids_at_stop: Enum.map(routes, & &1.route_id)
-        }
-    }
+    %{widget | location_context: %{widget.location_context | routes: routes}}
   end
 
   defp put_app_id(widget, app_id) do
     %{widget | screen: %{widget.screen | app_id: app_id}}
-  end
-
-  defp put_effect(widget, effect) do
-    %{widget | alert: %{widget.alert | effect: effect}}
   end
 
   defp put_now(widget, now) do
@@ -299,26 +288,6 @@ defmodule Screens.V2.LocalizedAlertTest do
         ])
 
       assert :downstream == LocalizedAlert.location(widget)
-    end
-  end
-
-  describe "informed_entities/1" do
-    test "returns informed entities list from the widget's alert", %{widget: widget} do
-      ies = [ie(stop: "123"), ie(stop: "1129", route: "39")]
-
-      widget = put_informed_entities(widget, ies)
-
-      assert ies == BaseAlertWidget.informed_entities(widget)
-    end
-  end
-
-  describe "effect/1" do
-    test "returns effect from the widget's alert", %{widget: widget} do
-      effect = :detour
-
-      widget = put_effect(widget, effect)
-
-      assert effect == BaseAlertWidget.effect(widget)
     end
   end
 end

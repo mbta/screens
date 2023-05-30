@@ -18,8 +18,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     defstruct station: nil
 
-    # TODO: just curious, do the separate `alert_ids` definitions lead to double-counting
-    # of how many times an elevator closure appears on a pre-fare?
     defimpl Screens.V2.AlertsWidget do
       def alert_ids(page) do
         Enum.map(page.station.elevator_closures, & &1.alert_id)
