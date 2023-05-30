@@ -1,4 +1,4 @@
-defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
+defmodule Screens.V2.LocalizedAlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
@@ -6,9 +6,8 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
   alias Screens.Config.V2.BusShelter
   alias Screens.LocationContext
   alias Screens.RouteType
-  alias Screens.Stops.Stop
+  alias Screens.V2.LocalizedAlert, as: LocalizedAlert
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
-  alias Screens.V2.WidgetInstance.Common.BaseAlert, as: BaseAlertWidget
 
   setup :setup_base
 
@@ -142,20 +141,20 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
     test "handles empty informed entities", %{widget: widget} do
       widget = put_informed_entities(widget, [])
 
-      assert :elsewhere == BaseAlertWidget.location(widget)
+      assert :elsewhere == LocalizedAlert.location(widget)
     end
 
     test "handles all-nil informed entities", %{widget: widget} do
       widget = put_informed_entities(widget, [ie()])
 
-      assert :elsewhere == BaseAlertWidget.location(widget)
+      assert :elsewhere == LocalizedAlert.location(widget)
     end
 
     test "returns :elsewhere if an alert's informed entities only apply to routes not serving this stop",
          %{widget: widget} do
       widget = put_informed_entities(widget, [ie(route: "x"), ie(route: "y")])
 
-      assert :elsewhere == BaseAlertWidget.location(widget)
+      assert :elsewhere == LocalizedAlert.location(widget)
     end
 
     test "returns :inside if any of an alert's informed entities is %{route_type: <route type of this screen>}",
@@ -169,7 +168,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
           ie()
         ])
 
-      assert :inside == BaseAlertWidget.location(widget)
+      assert :inside == LocalizedAlert.location(widget)
     end
 
     test "ignores route type if paired with any other specifier", %{widget: widget} do
@@ -180,13 +179,13 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
           ie(stop: "1", route: "x", route_type: RouteType.to_id(:bus))
         ])
 
-      assert :upstream == BaseAlertWidget.location(widget)
+      assert :upstream == LocalizedAlert.location(widget)
     end
 
     test "ignores route type if it doesn't match this screen's route type", %{widget: widget} do
       widget = put_informed_entities(widget, [ie(route_type: RouteType.to_id(:light_rail))])
 
-      assert :elsewhere == BaseAlertWidget.location(widget)
+      assert :elsewhere == LocalizedAlert.location(widget)
     end
 
     test "returns :inside if any of an alert's informed entities is %{route: <route that serves this stop>}",
@@ -198,17 +197,17 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
           ie(stop: "20", route: "a")
         ])
 
-      assert :inside == BaseAlertWidget.location(widget)
+      assert :inside == LocalizedAlert.location(widget)
     end
 
     test "treats active and inactive (not running on the current day) routes the same", %{
       widget: widget
     } do
       widget = put_informed_entities(widget, [ie(route: "a")])
-      assert :inside == BaseAlertWidget.location(widget)
+      assert :inside == LocalizedAlert.location(widget)
 
       widget = put_informed_entities(widget, [ie(route: "b")])
-      assert :inside == BaseAlertWidget.location(widget)
+      assert :inside == LocalizedAlert.location(widget)
     end
 
     test "ignores route if it doesn't serve this stop", %{widget: widget} do
@@ -218,7 +217,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
           ie(route: "x")
         ])
 
-      assert :upstream == BaseAlertWidget.location(widget)
+      assert :upstream == LocalizedAlert.location(widget)
     end
 
     test "returns :upstream for an alert that only affects upstream stops", %{widget: widget} do
@@ -228,7 +227,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
           ie(stop: "20", route: "a")
         ])
 
-      assert :upstream == BaseAlertWidget.location(widget)
+      assert :upstream == LocalizedAlert.location(widget)
     end
 
     test "returns :boundary_upstream for an alert that affects upstream stops and this stop", %{
@@ -241,7 +240,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
           ie(stop: "20", route: "a")
         ])
 
-      assert :boundary_upstream == BaseAlertWidget.location(widget)
+      assert :boundary_upstream == LocalizedAlert.location(widget)
     end
 
     test "returns :inside for an alert that only affects this stop", %{widget: widget} do
@@ -252,7 +251,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
           ie(stop: "5", route: "a")
         ])
 
-      assert :inside == BaseAlertWidget.location(widget)
+      assert :inside == LocalizedAlert.location(widget)
     end
 
     test "returns :inside for an alert that affects upstream stops, downstream stops, and this stop",
@@ -264,7 +263,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
           ie(stop: "6")
         ])
 
-      assert :inside == BaseAlertWidget.location(widget)
+      assert :inside == LocalizedAlert.location(widget)
     end
 
     test "returns :boundary_downstream for an alert that affects downstream stops and this stop",
@@ -278,7 +277,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
           ie(stop: "90", route: "a")
         ])
 
-      assert :boundary_downstream == BaseAlertWidget.location(widget)
+      assert :boundary_downstream == LocalizedAlert.location(widget)
     end
 
     test "returns :downstream for an alert that only affects downstream stops", %{widget: widget} do
@@ -288,7 +287,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
           ie(stop: "90", route: "a")
         ])
 
-      assert :downstream == BaseAlertWidget.location(widget)
+      assert :downstream == LocalizedAlert.location(widget)
     end
 
     test "returns :downstream for an alert that affects upstream and downstream stops, but not this stop",
@@ -299,7 +298,7 @@ defmodule Screens.V2.WidgetInstance.Common.BaseAlertTest do
           ie(stop: "6")
         ])
 
-      assert :downstream == BaseAlertWidget.location(widget)
+      assert :downstream == LocalizedAlert.location(widget)
     end
   end
 

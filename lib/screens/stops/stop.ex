@@ -31,6 +31,8 @@ defmodule Screens.Stops.Stop do
           platform_code: String.t() | nil
         }
 
+  @type screen_type :: BusEink | BusShelter | GlEink | PreFare | Dup
+
   @blue_line_stops [
     {"place-wondl", {"Wonderland", "Wonderland"}},
     {"place-rbmnl", {"Revere Beach", "Revere Bch"}},
@@ -430,39 +432,48 @@ defmodule Screens.Stops.Stop do
   Fetches all the location context for a screen given its app type, stop id, and time
   """
   @spec fetch_location_context(
-          BusEink | BusShelter | GlEink | PreFare | Dup,
+          screen_type(),
           id(),
           DateTime.t()
-        ) :: {:ok, LocationContext.t()}
+        ) :: {:ok, LocationContext.t()} | :error
   def fetch_location_context(app, stop_id, now) do
-    alert_route_types = get_route_type_filter(app, stop_id)
-    {:ok, routes_at_stop} = Route.fetch_routes_by_stop(stop_id, now, alert_route_types)
-    route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id)
+    with alert_route_types <- get_route_type_filter(app, stop_id),
+         {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, alert_route_types),
+         route_ids <- Route.route_ids(routes_at_stop),
+         {:ok, stop_sequences} <-
+           (cond do
+              app in [BusEink, BusShelter, GlEink] ->
+                RoutePattern.fetch_stop_sequences_through_stop(stop_id)
 
-    {:ok, stop_sequences} =
-      if app in [BusEink, BusShelter, GlEink] do
-        RoutePattern.fetch_stop_sequences_through_stop(stop_id)
-      else
-        RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids_at_stop)
-      end
+              app in [PreFare, Dup] ->
+                RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids)
+            end) do
+      {:ok,
+       %LocationContext{
+         home_stop: stop_id,
+         stop_sequences: stop_sequences,
+         upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
+         downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
+         routes: routes_at_stop,
+         alert_route_types: alert_route_types
+       }}
+    else
+      :error ->
+        Logger.error(
+          "[fetch_location_context fetch error] Failed to get location context for an alert: stop_id=#{stop_id}"
+        )
 
-    {:ok,
-     %LocationContext{
-       home_stop: stop_id,
-       stop_sequences: stop_sequences,
-       upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
-       downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
-       routes: routes_at_stop,
-       route_ids_at_stop: route_ids_at_stop,
-       alert_route_types: alert_route_types
-     }}
+        :error
+    end
   end
 
   # Returns the route types we care about for the alerts of this screen type / place
-  @spec get_route_type_filter(BusEink | BusShelter | GlEink | PreFare | Dup, String.t()) ::
+  @spec get_route_type_filter(screen_type(), String.t()) ::
           list(atom())
   def get_route_type_filter(app, _) when app in [BusEink, BusShelter], do: [:bus]
   def get_route_type_filter(GlEink, _), do: [:light_rail]
+  # Ashmont should not show Mattapan alerts for PreFare or Dup
+  def get_route_type_filter(app, "place-asmnl") when app in [PreFare, Dup], do: [:subway]
   def get_route_type_filter(PreFare, _), do: [:light_rail, :subway]
   # WTC is a special bus-only case
   def get_route_type_filter(Dup, "place-wtcst"), do: [:bus]

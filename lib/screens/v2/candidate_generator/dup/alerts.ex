@@ -8,8 +8,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   alias Screens.Config.V2.Alerts, as: AlertsConfig
   alias Screens.Config.V2.Dup
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
-  alias Screens.V2.WidgetInstance.Common.BaseAlert
+  alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.{DupAlert, DupSpecialCaseAlert}
 
   require Logger
@@ -46,8 +47,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
       end
 
     with {:ok, location_context} <- fetch_location_context_fn.(Dup, stop_id, now),
-         # TODO: check to see if mattapan ids are passing to alerts fetch
-         {:ok, alerts} <- fetch_alerts_fn.(route_ids: location_context.route_ids_at_stop) do
+         route_ids <- Route.route_ids(location_context.routes),
+         {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
       alerts
       |> Enum.filter(&relevant_alert?(&1, config, location_context, now))
       |> alert_special_cases(config)
@@ -106,23 +107,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   end
 
   @spec relevant_alert?(Alert.t(), Screen.t(), LocationContext.t(), DateTime.t()) :: boolean()
-  defp relevant_alert?(
-         alert,
-         %Screen{app_params: %Dup{primary_departures: %{sections: sections}}} = config,
-         location_context,
-         now
-       ) do
-    dup_alert = %DupAlert{
-      screen: config,
-      alert: alert,
-      location_context: location_context,
-      primary_section_count: length(sections),
-      rotation_index: :zero,
-      stop_name: "A Station"
-    }
-
+  defp relevant_alert?(alert, config, location_context, now) do
     relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
-      relevant_location?(dup_alert) and not directional_shuttle_or_suspension?(alert)
+      relevant_location?(alert, location_context) and
+      not directional_shuttle_or_suspension?(alert)
   end
 
   defp relevant_effect?(%{effect: :delay, severity: severity}, _) do
@@ -140,11 +128,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     effect in [:station_closure, :shuttle, :suspension]
   end
 
-  # TODO: This is using a "WidgetInstance" function in the candidate_generator
-  # Does this mean we should move some BaseAlert utils to just the Alert util func?
-  @spec relevant_location?(DupAlert.t()) :: boolean()
-  defp relevant_location?(dup_alert) do
-    BaseAlert.location(dup_alert) in [:inside, :boundary_upstream, :boundary_downstream]
+  @spec relevant_location?(Alert.t(), LocationContext.t()) :: boolean()
+  defp relevant_location?(alert, location_context) do
+    LocalizedAlert.location(%{alert: alert, location_context: location_context}) in [
+      :inside,
+      :boundary_upstream,
+      :boundary_downstream
+    ]
   end
 
   defp directional_shuttle_or_suspension?(alert) do

@@ -4,8 +4,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.LocationContext
+  alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.Common.BaseAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct screen: nil,
@@ -88,7 +88,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @spec serialize(t()) :: map()
   def serialize(t) do
-    e = BaseAlert.effect(t)
+    e = Alert.effect(t)
 
     %{
       route_pills: serialize_route_pills(t),
@@ -103,10 +103,10 @@ defmodule Screens.V2.WidgetInstance.Alert do
     routes =
       if app_id === :gl_eink_v2 do
         # Get route pills for alert, including that on connecting GL branches
-        BaseAlert.informed_subway_routes(t)
+        LocalizedAlert.informed_subway_routes(t)
       else
         # Get route pills for an alert, but only the routes that are at this stop
-        BaseAlert.informed_routes_at_home_stop(t)
+        LocalizedAlert.informed_routes_at_home_stop(t)
       end
 
     if length(routes) <= 3 do
@@ -151,13 +151,13 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   def takeover_alert?(%__MODULE__{screen: %Screen{app_id: bus_app_id}} = t)
       when bus_app_id in [:bus_shelter_v2, :bus_eink_v2] do
-    BaseAlert.effect(t) in [:stop_closure, :stop_moved, :suspension, :detour] and
-      BaseAlert.informs_all_active_routes_at_home_stop?(t)
+    Alert.effect(t) in [:stop_closure, :stop_moved, :suspension, :detour] and
+      LocalizedAlert.informs_all_active_routes_at_home_stop?(t)
   end
 
   def takeover_alert?(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}} = t) do
-    BaseAlert.effect(t) in [:station_closure, :suspension, :shuttle] and
-      BaseAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
+    Alert.effect(t) in [:station_closure, :suspension, :shuttle] and
+      LocalizedAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
   end
 
   defp takeover_slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}) do
@@ -194,14 +194,14 @@ defmodule Screens.V2.WidgetInstance.Alert do
       )
       when screen_type in [:bus_shelter_v2, :bus_eink_v2] do
     priority(t) != :no_render and
-      BaseAlert.location(t) in [:inside, :boundary_downstream]
+      LocalizedAlert.location(t) in [:inside, :boundary_downstream]
   end
 
   # For all other bus alert effects, all stops in the `informed_entities` are directly affected by the alert and would be useful for riders to see.
   def valid_candidate?(%__MODULE__{screen: %Screen{app_id: screen_type}} = t)
       when screen_type in [:bus_shelter_v2, :bus_eink_v2] do
     priority(t) != :no_render and
-      BaseAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
+      LocalizedAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
   end
 
   # Any subway alert that is not filtered out in the candidate_generator is valid and should appear on screens›.
@@ -227,7 +227,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @spec tiebreaker_location(t()) :: pos_integer() | WidgetInstance.no_render()
   def tiebreaker_location(%__MODULE__{} = t) do
-    case BaseAlert.location(t) do
+    case LocalizedAlert.location(t) do
       :inside -> 1
       :boundary_upstream -> 2
       :boundary_downstream -> 2
@@ -251,7 +251,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   @spec tiebreaker_effect(t()) :: pos_integer() | WidgetInstance.no_render()
   def tiebreaker_effect(%__MODULE__{} = t) do
-    Keyword.get(@effect_priorities, BaseAlert.effect(t), :no_render)
+    Keyword.get(@effect_priorities, Alert.effect(t), :no_render)
   end
 
   @spec seconds_from_onset(t()) :: integer()
