@@ -27,7 +27,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
               {:body_left,
                %{
                  body_left_normal: [:main_content_left],
-                 body_left_takeover: [:full_body_left]
+                 body_left_takeover: [:full_body_left],
+                 body_left_flex: Builder.with_paging(:paged_main_content_left, 4)
                }},
               {:body_right,
                %{
