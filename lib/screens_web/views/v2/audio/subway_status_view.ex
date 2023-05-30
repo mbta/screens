@@ -14,12 +14,12 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
   end
 
   defp render_sections(sections_map) do
-    sections_map
-    |> put_in_order()
-    |> Enum.split_with(fn {_line, section} -> has_at_least_one_alert?(section) end)
-    |> then(fn {alert_keyed_sections, normal_keyed_sections} ->
-      render_split_keyed_sections(alert_keyed_sections, normal_keyed_sections)
-    end)
+    {alert_keyed_sections, normal_keyed_sections} =
+      sections_map
+      |> put_in_order()
+      |> Enum.split_with(fn {_line, section} -> has_at_least_one_alert?(section) end)
+
+    render_split_keyed_sections(alert_keyed_sections, normal_keyed_sections)
   end
 
   # 0 system alerts.
@@ -66,13 +66,14 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
   # =============================================================================#
   # render_section will only be called on sections that have at least one alert. #
   # =============================================================================#
+  @spec render_section({line_atom, SubwayStatus.section()}) :: ssml_blob
   defp render_section({:green, section}) do
     # Special logic for the GL section:
     # - List out branches on alerts
-    # - If there are 2 alerts and at least one is a branch alert, read them out as separate sentences instead of connecting with ", and "
+    # - If there are multiple alerts and at least one is a branch alert, read them out as separate sentences instead of connecting with ", and "
     alerts = get_alerts(section)
 
-    if length(alerts) == 2 and Enum.any?(alerts, &branch_alert?/1) do
+    if length(alerts) > 1 and Enum.any?(alerts, &branch_alert?/1) do
       Enum.map(alerts, fn alert -> ~E|<s><%= render_gl_alert(alert) %></s>| end)
     else
       alerts
@@ -87,12 +88,15 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
 
     section
     |> get_alerts()
-    |> Enum.map(fn alert ->
-      {verb_atom, content} = render_status_and_location(alert)
-      ~E|The <%= line_name %> <%= conjugate(verb_atom, false) %> <%= content %>|
-    end)
+    |> Enum.map(&render_non_gl_alert(&1, line_name))
     |> Enum.intersperse(~E|, and |)
     |> then(fn sentence -> ~E|<s><%= sentence %></s>| end)
+  end
+
+  defp render_non_gl_alert(alert, line_name) do
+    {verb_atom, content} = render_status_and_location(alert)
+
+    ~E|The <%= line_name %> <%= conjugate(verb_atom, false) %> <%= content %>|
   end
 
   defp render_gl_alert(alert) do
@@ -113,7 +117,7 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     {all_but_last, last} =
       branches
       |> Enum.map(fn letter ->
-        ~E|<say-as interpret-as="spell-out"><%= String.upcase(Atom.to_string(letter)) %></say-as>|
+        ~E|<say-as interpret-as="spell-out"><%= String.upcase(to_string(letter)) %></say-as>|
       end)
       |> Enum.split(-1)
 
@@ -133,12 +137,19 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     # This deviates slightly from designs. The letters are read out after "branch(es)"
     # instead of before, because Polly pronounces that ordering much more clearly for some reason.
     ~E|Green Line <%= branch_or_branches %>, <%= letters_rendered %>,|
-    #                                      ^                       ^
+    #                                      ^                        ^
     #                                      Added to improve clarity of the first and last letters
   end
 
   defp render_gl_branch_or_line(_non_branch_alert), do: ~E|Green Line|
 
+  # Returns the text for the status and location (e.g. "Shuttle Bus from Back Bay to North Station"),
+  # as well as an atom indicating what verb should be used to link it to the text for the subway line/branches.
+  #
+  # The calling function is responsible for conjugating the verb according to the number of the subway line/branches.
+  # For example, if `render_status_and_location` returns `{:is, content}` and it's for a single line,
+  # the caller should conjugate the verb to "is".
+  # If it's for a set of 2 or more GL branches, the caller should conjugate the verb to "are".
   @spec render_status_and_location(SubwayStatus.alert()) :: {:is | :has, ssml_blob}
   defp render_status_and_location(%{status: status, location: location}) do
     location_string = get_location_string(location)
@@ -162,6 +173,10 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     {verb_atom, ~E|<%= article %><%= content %>|}
   end
 
+  defp get_verb_atom(status) do
+    if String.starts_with?(status, "Bypassing"), do: :is, else: :has
+  end
+
   defp conjugate(verb_atom, multi_branch_alert?)
 
   defp conjugate(:is, false), do: "is"
@@ -169,10 +184,6 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
 
   defp conjugate(:has, false), do: "has"
   defp conjugate(:has, true), do: "have"
-
-  defp get_verb_atom(status) do
-    if String.starts_with?(status, "Bypassing"), do: :is, else: :has
-  end
 
   defp get_article(status, location_string) do
     cond do
@@ -224,7 +235,7 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
   defp get_location_string(%{full: full}), do: full
   defp get_location_string(location_string), do: location_string
 
-  # Converts the serialized map into an ordered list, since we can't rely on consistent enumeration order for maps.
+  # Converts the serialized map to an ordered list, since we can't rely on consistent enumeration order for maps.
   @spec put_in_order(SubwayStatus.serialized_response()) ::
           list({line_atom, SubwayStatus.section()})
   defp put_in_order(sections_map) do
