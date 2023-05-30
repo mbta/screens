@@ -250,7 +250,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   @spec tiebreaker_effect(t()) :: pos_integer() | WidgetInstance.no_render()
-  def tiebreaker_effect(%__MODULE__{alert: alert} = t) do
+  def tiebreaker_effect(%__MODULE__{alert: alert}) do
     Keyword.get(@effect_priorities, Alert.effect(alert), :no_render)
   end
 

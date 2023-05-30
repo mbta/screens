@@ -143,7 +143,7 @@ defmodule Screens.V2.LocalizedAlert do
           | :inside
           | :upstream
   def location(
-        %{alert: alert, location_context: location_context} = t,
+        %{alert: alert, location_context: location_context},
         is_terminal_station \\ false
       ) do
     informed_entities = Alert.informed_entities(alert)
@@ -203,7 +203,7 @@ defmodule Screens.V2.LocalizedAlert do
   Used to build route pills for GL e-ink and text for Pre-fare alerts
   """
   @spec informed_subway_routes(t()) :: list(String.t())
-  def informed_subway_routes(%{screen: %Screen{app_id: app_id}, alert: alert} = t) do
+  def informed_subway_routes(%{screen: %Screen{app_id: app_id}, alert: alert}) do
     alert
     |> Alert.informed_entities()
     |> Enum.map(fn %{route: route} -> route end)
@@ -265,7 +265,7 @@ defmodule Screens.V2.LocalizedAlert do
   Gets the routes affected by an alert that also exist at the current stop. No downstream
   """
   @spec informed_routes_at_home_stop(t()) :: list(Route.id())
-  def informed_routes_at_home_stop(%{location_context: location_context, alert: alert} = t) do
+  def informed_routes_at_home_stop(%{location_context: location_context, alert: alert}) do
     rts = location_context.alert_route_types
     home_stop = location_context.home_stop
 

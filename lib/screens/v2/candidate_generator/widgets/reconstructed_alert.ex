@@ -117,7 +117,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          %ReconstructedAlert{
            alert: alert,
            location_context: %{home_stop: stop_id, stop_sequences: stop_sequences}
-         } = t
+         }
        ) do
     informed_entities = Alert.informed_entities(alert)
 
