@@ -17,7 +17,11 @@ defmodule Screens.V2.LocalizedAlert do
           | DupAlert.t()
           | ReconstructedAlert.t()
           | ElevatorStatus.t()
-          | %{optional(:screen) => Screen.t(), alert: Alert.t(), location_context: LocationContext.t()}
+          | %{
+              optional(:screen) => Screen.t(),
+              alert: Alert.t(),
+              location_context: LocationContext.t()
+            }
 
   @type stop_id :: String.t()
 
