@@ -147,7 +147,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   defp find_closest_downstream_alerts(alerts, stop_id, stop_sequences) do
     home_stop_distance_map = build_distance_map(stop_id, stop_sequences)
     # Map each alert with its distance from home.
-    Enum.map(alerts, fn %{informed_entities: ies} = alert ->
+    alerts
+    |> Enum.map(fn %{informed_entities: ies} = alert ->
       distance =
         ies
         |> Enum.filter(&String.starts_with?(&1.stop, "place-"))
