@@ -23,7 +23,7 @@ import {
   isContractedWith1Alert,
   isExtended,
   isGLMultiPill,
-} from "../subway_status_common";
+} from "./subway_status_common";
 
 ////////////////
 // COMPONENTS //
