@@ -5,7 +5,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.Config.Screen
   alias Screens.LocationContext
   alias Screens.V2.LocalizedAlert
-  alias Screens.V2.WidgetInstance  
+  alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   defstruct screen: nil,
