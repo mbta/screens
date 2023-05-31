@@ -4,7 +4,6 @@ defmodule Screens.Alerts.Alert do
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Stops.Stop
-  alias Screens.Util
   alias Screens.V3Api
 
   defstruct id: nil,
@@ -118,6 +117,7 @@ defmodule Screens.Alerts.Alert do
           description: String.t()
         }
 
+  # V1 only
   def to_map(nil), do: nil
 
   def to_map(alert) do
@@ -128,23 +128,7 @@ defmodule Screens.Alerts.Alert do
     }
   end
 
-  def to_full_map(alert) do
-    aps = Enum.map(alert.active_period, &ap_to_map/1)
-
-    %{
-      id: alert.id,
-      effect: alert.effect,
-      severity: alert.severity,
-      header: alert.header,
-      informed_entities: alert.informed_entities,
-      active_period: aps,
-      lifecycle: alert.lifecycle,
-      timeframe: alert.timeframe,
-      created_at: DateTime.to_iso8601(alert.created_at),
-      updated_at: DateTime.to_iso8601(alert.updated_at)
-    }
-  end
-
+  # Used by elevator status
   def ap_to_map({nil, end_t}) do
     %{"start" => nil, "end" => DateTime.to_iso8601(end_t)}
   end
@@ -157,6 +141,7 @@ defmodule Screens.Alerts.Alert do
     %{"start" => DateTime.to_iso8601(start_t), "end" => DateTime.to_iso8601(end_t)}
   end
 
+  # V1 only
   @effect_order [
     :amber_alert,
     :cancellation,
@@ -201,6 +186,8 @@ defmodule Screens.Alerts.Alert do
   as if there simply aren't any alerts for the given parameters.
 
   If the query fails for any reason, an empty list is returned.
+
+  Currently used for DUPs V1 / V2
   """
   @spec fetch_or_empty_list(keyword()) :: list(t())
   def fetch_or_empty_list(opts \\ []) do
@@ -211,6 +198,8 @@ defmodule Screens.Alerts.Alert do
   end
 
   @doc """
+  Used by V2 e-ink and bus shelter alerts
+
   Fetches:
   1) alerts filtered by the given list of stops AND the given list of routes
   2) alerts filtered by the given list of routes only
@@ -303,47 +292,16 @@ defmodule Screens.Alerts.Alert do
 
   defp format_query_param(_), do: []
 
-  def fetch_alerts_for_stop_id(stop_id) do
-    case Screens.V3Api.get_json("alerts", %{"filter[stop]" => stop_id}) do
-      {:ok, result} -> {:ok, result}
-      _ -> :error
-    end
-  end
-
-  def priority_by_stop_id(stop_id) do
-    [stop_id: stop_id]
-    |> fetch_or_empty_list()
-    |> sort(stop_id)
-    |> Enum.map(fn alert ->
-      %{alert: to_full_map(alert), priority: to_priority_map(alert, stop_id)}
-    end)
-  end
-
-  def sort(alerts, stop_id) do
-    Enum.sort_by(alerts, &sort_key(&1, stop_id))
-  end
-
-  def sort_key(alert, stop_id) do
+  # V1 only
+  defp sort_key(alert, stop_id) do
     {
       specificity(alert, stop_id),
       -high_severity(alert),
       -new_service_in_next_two_weeks(alert),
       -happening_now_key(alert),
       -new_info_in_last_two_weeks(alert),
-      effect_index(alert),
+      effect_index(alert.effect),
       alert.id
-    }
-  end
-
-  def to_priority_map(alert, stop_id) do
-    %{
-      specificity: specificity(alert, stop_id),
-      high_severity: -high_severity(alert),
-      effect_index: effect_index(alert.effect),
-      alert_id: alert.id,
-      new_service: -new_service_in_next_two_weeks(alert),
-      new_info: -new_info_in_last_two_weeks(alert),
-      happening_now: -happening_now_key(alert)
     }
   end
 
@@ -352,13 +310,15 @@ defmodule Screens.Alerts.Alert do
   # 1 if whole route
   # 2 if a different specific stop
   # 3 if no stop or route IE
-  def specificity(%{informed_entities: ies}, stop_id) do
+  # V1 only
+  defp specificity(%{informed_entities: ies}, stop_id) do
     ies
     |> Enum.map(&ie_specificity(&1, stop_id))
     |> Enum.min()
   end
 
-  def ie_specificity(ie, stop_id) do
+  # V1 only
+  defp ie_specificity(ie, stop_id) do
     case ie_target(ie) do
       {:stop, target_stop_id} ->
         if target_stop_id == stop_id, do: 0, else: 2
@@ -371,21 +331,23 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  def ie_target(%{stop: stop_id}) do
+  # V1 only
+  defp ie_target(%{stop: stop_id}) do
     {:stop, stop_id}
   end
 
-  def ie_target(%{route: route_id}) do
+  defp ie_target(%{route: route_id}) do
     {:route, route_id}
   end
 
-  def ie_target(_) do
+  defp ie_target(_) do
     :other
   end
 
   # HIGH SEVERITY
   # severity >= 7
   # Note that we differentiate among severities which are at least 7 (same as dotcom)
+  # V1 only
   def high_severity(%{severity: severity}) when severity >= 7 do
     severity
   end
@@ -398,33 +360,36 @@ defmodule Screens.Alerts.Alert do
 
   # HAPPENING NOW
   # defined as: some active period contains the current time
+  # V1 only
   defp happening_now_key(alert) do
     if happening_now?(alert), do: 1, else: 0
   end
 
+  # V1 & V2
   def happening_now?(%{active_period: aps}, now \\ DateTime.utc_now()) do
     Enum.any?(aps, &in_active_period(&1, now))
   end
 
-  def in_active_period({nil, end_t}, t) do
+  defp in_active_period({nil, end_t}, t) do
     DateTime.compare(t, end_t) in [:lt, :eq]
   end
 
-  def in_active_period({start_t, nil}, t) do
+  defp in_active_period({start_t, nil}, t) do
     DateTime.compare(t, start_t) in [:gt, :eq]
   end
 
-  def in_active_period({start_t, end_t}, t) do
+  defp in_active_period({start_t, end_t}, t) do
     DateTime.compare(t, start_t) in [:gt, :eq] && DateTime.compare(t, end_t) in [:lt, :eq]
   end
 
-  def within_two_weeks(time_1, time_2) do
+  defp within_two_weeks(time_1, time_2) do
     diff = DateTime.diff(time_1, time_2, :second)
     diff <= 14 * 24 * 60 * 60 && diff >= -14 * 24 * 60 * 60
   end
 
   # NEW INFO
   # defined as: created_at or updated_at is within the last two weeks
+  # V1 only
   def new_info_in_last_two_weeks(
         %{created_at: created_at, updated_at: updated_at},
         now \\ DateTime.utc_now()
@@ -435,6 +400,7 @@ defmodule Screens.Alerts.Alert do
 
   # NEW SERVICE
   # defined as: next active_period start in the future is within two weeks of now
+  # V1 only
   def new_service_in_next_two_weeks(%{active_period: active_period}, now \\ DateTime.utc_now()) do
     next_t = first_future_active_period_start(active_period, now)
 
@@ -454,6 +420,7 @@ defmodule Screens.Alerts.Alert do
 
   # (from dotcom)
   # atoms are greater than any integer
+  # V1 only
   defp first_future_active_period_start([], _now), do: :infinity
 
   defp first_future_active_period_start(periods, now) do
@@ -475,6 +442,7 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
+  # V1 only
   for {name, index} <- Enum.with_index(@effect_order) do
     defp effect_index(unquote(name)), do: unquote(index)
   end
@@ -484,6 +452,7 @@ defmodule Screens.Alerts.Alert do
 
   ###
 
+  # V1 only (bus_eink)
   def by_stop_id(stop_id) do
     {inline_alerts, global_alerts} =
       [stop_id: stop_id]
@@ -495,6 +464,7 @@ defmodule Screens.Alerts.Alert do
     {inline_alerts, global_alert}
   end
 
+  # V1 only
   defp is_inline?(%{effect: :delay}) do
     true
   end
@@ -503,15 +473,18 @@ defmodule Screens.Alerts.Alert do
     false
   end
 
+  # V1 only
   def build_delay_map(alerts) do
     Enum.reduce(alerts, %{}, &delay_map_reducer/2)
   end
 
+  # V1 only
   defp delay_map_reducer(%{informed_entities: ies, severity: severity}, delay_map) do
     route_ids = bus_route_informed_entities(ies)
     Enum.reduce(route_ids, delay_map, &delay_map_reducer_helper(&1, severity, &2))
   end
 
+  # V1 only
   defp delay_map_reducer_helper(route_id, severity, delay_map) do
     case delay_map do
       %{^route_id => current_severity} when current_severity >= severity ->
@@ -522,10 +495,12 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
+  # V1 only
   defp bus_route_informed_entities(informed_entities) do
     Enum.flat_map(informed_entities, &bus_route_informed_entity/1)
   end
 
+  # V1 only
   defp bus_route_informed_entity(%{route: route_id, route_type: 3}) do
     [route_id]
   end
@@ -535,6 +510,7 @@ defmodule Screens.Alerts.Alert do
   end
 
   ###
+  # V1 only (gl_eink)
   def by_route_id(route_id, stop_id) do
     {inline_alerts, global_alerts} =
       [route_id: route_id]
@@ -544,15 +520,6 @@ defmodule Screens.Alerts.Alert do
     global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
 
     {inline_alerts, global_alert}
-  end
-
-  def priority_by_route_id(route_id, stop_id) do
-    [route_id: route_id]
-    |> fetch_or_empty_list()
-    |> sort(stop_id)
-    |> Enum.map(fn alert ->
-      %{alert: to_full_map(alert), priority: to_priority_map(alert, stop_id)}
-    end)
   end
 
   @alert_cause_mapping %{
@@ -600,148 +567,9 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  @spec get_alert_location_for_stop_id(
-          t(),
-          String.t(),
-          list(list(String.t())),
-          list(%{route_id: String.t(), active?: boolean(), type: RouteType.t()}),
-          boolean()
-        ) ::
-          :boundary_downstream
-          | :boundary_upstream
-          | :downstream
-          | :elsewhere
-          | :inside
-          | :upstream
-  def get_alert_location_for_stop_id(
-        alert,
-        stop_id,
-        stop_sequences,
-        routes_at_stop,
-        is_terminal_station
-      ) do
-    location_context = %{
-      home_stop: stop_id,
-      upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
-      downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
-      routes:
-        routes_at_stop
-        |> Enum.map(& &1.route_id)
-        |> Enum.uniq(),
-      route_types:
-        routes_at_stop
-        |> Enum.map(& &1.type)
-        |> Enum.uniq()
-    }
-
-    informed_zones_set =
-      alert.informed_entities
-      |> Enum.flat_map(&informed_entity_to_zone(&1, location_context))
-      |> Enum.uniq()
-      |> Enum.sort()
-
-    get_location_atom(informed_zones_set, alert.effect, is_terminal_station)
+  def informed_entities(%__MODULE__{informed_entities: informed_entities}) do
+    informed_entities
   end
 
-  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:upstream],
-    do: :upstream
-
-  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:downstream],
-    do: :downstream
-
-  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:home_stop],
-    do: :inside
-
-  defp get_location_atom(informed_zones_set, _, _)
-       when informed_zones_set == [:downstream, :home_stop, :upstream],
-       do: :inside
-
-  # If station closure, then a boundary_upstream / _downstream is actually :inside
-  defp get_location_atom(informed_zones_set, effect, _)
-       when informed_zones_set == [:home_stop, :upstream] and effect === :station_closure,
-       do: :inside
-
-  defp get_location_atom(informed_zones_set, effect, _)
-       when informed_zones_set == [:downstream, :home_stop] and effect === :station_closure,
-       do: :inside
-
-  defp get_location_atom(informed_zones_set, effect, true)
-       when informed_zones_set in [[:home_stop, :upstream], [:downstream, :home_stop]] and
-              effect in [:suspension, :shuttle],
-       do: :inside
-
-  defp get_location_atom(informed_zones_set, _, _)
-       when informed_zones_set == [:home_stop, :upstream],
-       do: :boundary_upstream
-
-  defp get_location_atom(informed_zones_set, _, _)
-       when informed_zones_set == [:downstream, :home_stop],
-       do: :boundary_downstream
-
-  defp get_location_atom(informed_zones_set, _, _)
-       when informed_zones_set == [:downstream, :upstream],
-       do: :downstream
-
-  defp get_location_atom(_, _, _), do: :elsewhere
-
-  @spec informed_entity_to_zone(Alert.informed_entity(), map()) ::
-          list(:upstream | :home_stop | :downstream)
-  defp informed_entity_to_zone(informed_entity, location_context)
-
-  # All values nil
-  defp informed_entity_to_zone(%{stop: nil, route: nil, route_type: nil}, _location_context) do
-    []
-  end
-
-  # Only route type is not nil--this is the only time we consider route type,
-  # since it's implied by other values when they are not nil
-  defp informed_entity_to_zone(%{stop: nil, route: nil, route_type: route_type_id}, %{
-         route_types: route_types
-       }) do
-    if RouteType.from_id(route_type_id) in route_types do
-      [:upstream, :home_stop, :downstream]
-    else
-      []
-    end
-  end
-
-  # Only stop is not nil (route type ignored)
-  defp informed_entity_to_zone(%{stop: stop, route: nil}, context) do
-    cond do
-      stop == context.home_stop -> [:home_stop]
-      # Stops can be both upstream and downstream simultaneously, on different routes through the home stop.
-      # We check whether it's downstream first, since that takes priority.
-      stop in context.downstream_stops -> [:downstream]
-      stop in context.upstream_stops -> [:upstream]
-      true -> []
-    end
-  end
-
-  # Only route is not nil (route type ignored)
-  defp informed_entity_to_zone(%{stop: nil, route: route}, context) do
-    if route in context.routes, do: [:upstream, :home_stop, :downstream], else: []
-  end
-
-  # Both stop and route are not nil (route type ignored)
-  defp informed_entity_to_zone(%{stop: _stop, route: route} = informed_entity, context) do
-    if route in context.routes do
-      informed_entity_to_zone(%{informed_entity | route: nil}, context)
-    else
-      []
-    end
-  end
-
-  @spec upstream_stop_id_set(String.t(), list(list(String.t()))) :: MapSet.t(String.t())
-  def upstream_stop_id_set(stop_id, stop_sequences) do
-    stop_sequences
-    |> Enum.flat_map(fn stop_sequence -> Util.slice_before(stop_sequence, stop_id) end)
-    |> MapSet.new()
-  end
-
-  @spec downstream_stop_id_set(String.t(), list(list(String.t()))) :: MapSet.t(String.t())
-  defp downstream_stop_id_set(stop_id, stop_sequences) do
-    stop_sequences
-    |> Enum.flat_map(fn stop_sequence -> Util.slice_after(stop_sequence, stop_id) end)
-    |> MapSet.new()
-  end
+  def effect(%__MODULE__{effect: effect}), do: effect
 end

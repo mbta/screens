@@ -71,7 +71,8 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         fetch_destination_fn \\ &fetch_destination/2,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/3,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
-        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
+        subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/2
       ) do
     [
       fn -> header_instances(config, now, fetch_destination_fn) end,
@@ -86,7 +87,8 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
       fn -> footer_instances(config) end,
       fn -> line_map_instances(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end,
-      fn -> bottom_screen_filler_instances(config) end
+      fn -> bottom_screen_filler_instances(config) end,
+      fn -> subway_status_instances_fn.(config, now) end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: 30_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)

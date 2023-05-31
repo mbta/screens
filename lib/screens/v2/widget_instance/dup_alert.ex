@@ -5,7 +5,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
-  alias Screens.V2.WidgetInstance.Common.BaseAlert
+  alias Screens.LocationContext
+  alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert.Serialize
 
   require Logger
@@ -13,8 +14,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   @enforce_keys [
     :screen,
     :alert,
-    :stop_sequences,
-    :subway_routes_at_stop,
+    :location_context,
     :primary_section_count,
     :rotation_index,
     :stop_name
@@ -24,8 +24,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   @type t :: %__MODULE__{
           screen: Screen.t(),
           alert: Alert.t(),
-          stop_sequences: list(list(stop_id)),
-          subway_routes_at_stop: list(%{route_id: route_id, active?: boolean}),
+          location_context: LocationContext.t(),
           primary_section_count: pos_integer(),
           rotation_index: rotation_index,
           stop_name: String.t()
@@ -157,7 +156,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   defp get_layout_parameters(t) do
     %{
       effect: t.alert.effect,
-      location: BaseAlert.location(t),
+      location: LocalizedAlert.location(t),
       affected_line_count: length(get_affected_lines(t)),
       primary_section_count: t.primary_section_count
     }
@@ -240,7 +239,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   def get_affected_lines(t) do
     t
-    |> BaseAlert.informed_routes_at_home_stop()
+    |> LocalizedAlert.informed_routes_at_home_stop()
     |> routes_to_lines()
   end
 
@@ -287,22 +286,6 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     def audio_sort_key(instance), do: DupAlert.audio_sort_key(instance)
     def audio_valid_candidate?(instance), do: DupAlert.audio_valid_candidate?(instance)
     def audio_view(instance), do: DupAlert.audio_view(instance)
-  end
-
-  defimpl Screens.V2.SingleAlertWidget do
-    def alert(instance), do: instance.alert
-
-    def screen(instance), do: instance.screen
-
-    def home_stop_id(instance), do: instance.screen.app_params.alerts.stop_id
-
-    def routes_at_stop(instance), do: instance.subway_routes_at_stop
-
-    def stop_sequences(instance), do: instance.stop_sequences
-
-    def headsign_matchers(_instance) do
-      Application.get_env(:screens, :dup_alert_headsign_matchers)
-    end
   end
 
   defimpl Screens.V2.AlertsWidget do

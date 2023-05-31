@@ -32,13 +32,14 @@ import NormalHeader from "Components/v2/pre_fare/normal_header";
 import OneLarge from "Components/v2/pre_fare/flex/one_large";
 import TwoMedium from "Components/v2/pre_fare/flex/two_medium";
 import BodyLeftTakeover from "Components/v2/pre_fare/body_left_takeover";
+import BodyLeftFlex from "Components/v2/pre_fare/body_left_flex";
 import BodyRightTakeover from "Components/v2/pre_fare/body_right_takeover";
 import BodyTakeover from "Components/v2/pre_fare/body_takeover";
 import ScreenTakeover from "Components/v2/pre_fare/screen_takeover";
 import ScreenSplitTakeover from "Components/v2/pre_fare/screen_split_takeover";
 import ElevatorStatus from "Components/v2/elevator_status";
 import FullLineMap from "Components/v2/full_line_map";
-import SubwayStatus from "Components/v2/subway_status";
+import LcdSubwayStatus from "Components/v2/subway_status/lcd_subway_status";
 import ReconstructedAlert from "Components/v2/reconstructed_alert";
 import NoData from "Components/v2/pre_fare/no_data";
 import PageLoadNoData from "Components/v2/pre_fare/page_load_no_data";
@@ -59,6 +60,7 @@ const TYPE_TO_COMPONENT = {
   body_takeover: BodyTakeover,
   body_left_normal: NormalBodyLeft,
   body_left_takeover: BodyLeftTakeover,
+  body_left_flex: BodyLeftFlex,
   body_right_normal: NormalBodyRight,
   body_right_surge: SurgeBodyRight,
   body_right_takeover: BodyRightTakeover,
@@ -69,7 +71,7 @@ const TYPE_TO_COMPONENT = {
   evergreen_content: EvergreenContent,
   elevator_status: ElevatorStatus,
   full_line_map: FullLineMap,
-  subway_status: SubwayStatus,
+  subway_status: LcdSubwayStatus,
   no_data: NoData,
   page_load_no_data: PageLoadNoData,
   reconstructed_large_alert: ReconstructedAlert,

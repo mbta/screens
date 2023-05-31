@@ -27,7 +27,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
               {:body_left,
                %{
                  body_left_normal: [:main_content_left],
-                 body_left_takeover: [:full_body_left]
+                 body_left_takeover: [:full_body_left],
+                 body_left_flex: Builder.with_paging(:paged_main_content_left, 4)
                }},
               {:body_right,
                %{
@@ -64,7 +65,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
-        subway_status_instance_fn \\ &Widgets.SubwayStatus.subway_status_instances/1,
+        subway_status_instance_fn \\ &Widgets.SubwayStatus.subway_status_instances/2,
         reconstructed_alert_instances_fn \\ &Widgets.ReconstructedAlert.reconstructed_alert_instances/1,
         elevator_status_instance_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2,
         full_line_map_instances_fn \\ &Widgets.FullLineMap.full_line_map_instances/1,
@@ -74,7 +75,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       ) do
     [
       fn -> header_instances(config, now) end,
-      fn -> subway_status_instance_fn.(config) end,
+      fn -> subway_status_instance_fn.(config, now) end,
       fn -> reconstructed_alert_instances_fn.(config) end,
       fn -> elevator_status_instance_fn.(config, now) end,
       fn -> full_line_map_instances_fn.(config) end,

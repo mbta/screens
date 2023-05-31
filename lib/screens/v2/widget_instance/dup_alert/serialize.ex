@@ -5,7 +5,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.V2.FreeTextLine
-  alias Screens.V2.WidgetInstance.Common.BaseAlert
+  alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert
 
   @type full_screen_alert_map :: %{
@@ -95,7 +95,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   defp partial_alert_free_text(t) do
     affected_lines = get_affected_lines_as_strings(t)
 
-    case {affected_lines, t.alert.effect, BaseAlert.location(t)} do
+    case {affected_lines, t.alert.effect, LocalizedAlert.location(t)} do
       {[line], :delay, _} ->
         [bold(line), "delays"]
 
@@ -128,7 +128,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
       [line_pill] ->
         no_trains = [bold("No"), line_pill, bold("trains")]
 
-        if BaseAlert.location(t) in [:boundary_upstream, :boundary_downstream] do
+        if LocalizedAlert.location(t) in [:boundary_upstream, :boundary_downstream] do
           headsign = get_headsign(t)
 
           no_trains ++ [bold("to #{headsign}")]
@@ -163,13 +163,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   end
 
   defp get_headsign(t) do
-    headsign = BaseAlert.get_headsign_from_informed_entities(t)
-
-    if is_nil(headsign) do
-      raise(
-        "[DUP v2 no headsign] Could not determine headsign for DUP alert alert_id=#{t.alert.id}"
-      )
-    end
+    headsign = LocalizedAlert.get_headsign_from_informed_entities(t)
 
     case headsign do
       {:adj, hs} -> hs

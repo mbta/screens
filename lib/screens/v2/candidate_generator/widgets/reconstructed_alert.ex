@@ -5,11 +5,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Config.V2.PreFare
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.Util
-  alias Screens.V2.WidgetInstance.Common.BaseAlert
+  alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
 
   @relevant_effects ~w[shuttle suspension station_closure delay]a
@@ -24,6 +23,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     "place-lech"
   ]
 
+  @default_distance 99
+
   @doc """
   Given the stop_id defined in the header, determine relevant routes
   Given the routes, fetch all alerts for the route
@@ -33,34 +34,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
           app_params: %PreFare{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}}
         } = config,
         now \\ DateTime.utc_now(),
-        fetch_routes_by_stop_fn \\ &Route.fetch_routes_by_stop/3,
-        fetch_stop_sequences_by_stop_fn \\ &RoutePattern.fetch_parent_station_sequences_through_stop/2,
         fetch_alerts_fn \\ &Alert.fetch/1,
-        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1
+        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
+        fetch_location_context_fn \\ &Stop.fetch_location_context/3
       ) do
     # Filtering by subway and light_rail types
-    with {:ok, routes_at_stop} <- fetch_routes_by_stop_fn.(stop_id, now, [:light_rail, :subway]),
-         route_ids_at_stop =
-           routes_at_stop
-           |> Enum.map(& &1.route_id)
-           # We shouldn't handle Mattapan outages at this time
-           |> Enum.reject(fn id -> id === "Mattapan" end),
-         {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids_at_stop),
-         {:ok, stop_sequences} <-
-           fetch_stop_sequences_by_stop_fn.(stop_id, route_ids_at_stop) do
-      relevant_alerts = relevant_alerts(alerts, config, stop_sequences, routes_at_stop, now)
-      is_terminal_station = is_terminal?(stop_id, stop_sequences)
+    with {:ok, location_context} <- fetch_location_context_fn.(PreFare, stop_id, now),
+         route_ids <- Route.route_ids(location_context.routes),
+         {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
+      relevant_alerts = relevant_alerts(alerts, config, location_context, now)
+      is_terminal_station = is_terminal?(stop_id, location_context.stop_sequences)
 
       immediate_disruptions =
         Enum.filter(
           relevant_alerts,
-          &(Alert.get_alert_location_for_stop_id(
-              &1,
-              stop_id,
-              stop_sequences,
-              routes_at_stop,
-              is_terminal_station
-            ) in [
+          &(LocalizedAlert.location(%{alert: &1, location_context: location_context}) in [
               :inside,
               :boundary_upstream,
               :boundary_downstream
@@ -70,13 +58,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       downstream_disruptions =
         Enum.filter(
           relevant_alerts,
-          &(Alert.get_alert_location_for_stop_id(
-              &1,
-              stop_id,
-              stop_sequences,
-              routes_at_stop,
-              is_terminal_station
-            ) in [:downstream, :upstream] and
+          &(LocalizedAlert.location(%{alert: &1, location_context: location_context}) in [
+              :downstream,
+              :upstream
+            ] and
               (&1.effect != :delay or &1.severity >= 7))
         )
 
@@ -85,8 +70,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
       common_parameters = [
         config: config,
-        stop_sequences: stop_sequences,
-        routes_at_stop: routes_at_stop,
+        location_context: location_context,
         fetch_stop_name_fn: fetch_stop_name_fn,
         is_terminal_station: is_terminal_station,
         now: now
@@ -104,7 +88,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
         Enum.any?(downstream_disruptions) ->
           fullscreen_alerts =
-            find_closest_downstream_alerts(downstream_disruptions, stop_id, stop_sequences)
+            find_closest_downstream_alerts(
+              downstream_disruptions,
+              stop_id,
+              location_context.stop_sequences
+            )
 
           flex_zone_alerts = downstream_disruptions -- fullscreen_alerts
 
@@ -124,8 +112,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          alerts,
          is_full_screen,
          config: config,
-         stop_sequences: stop_sequences,
-         routes_at_stop: routes_at_stop,
+         location_context: location_context,
          fetch_stop_name_fn: fetch_stop_name_fn,
          is_terminal_station: is_terminal_station,
          now: now
@@ -135,8 +122,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         screen: config,
         alert: alert,
         now: now,
-        stop_sequences: stop_sequences,
-        routes_at_stop: routes_at_stop,
+        location_context: location_context,
         informed_stations_string: get_stations(alert, fetch_stop_name_fn),
         is_terminal_station: is_terminal_station,
         is_full_screen: is_full_screen
@@ -177,23 +163,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     end)
   end
 
+  # Default to 99 if stop_id is not in distance map.
   defp get_distance(home_stop_distance_map, %{route: "Green" <> _, stop: stop_id})
        when stop_id in @gl_eastbound_split_stops,
-       do: Map.fetch!(home_stop_distance_map, "place-lech")
+       do: Map.get(home_stop_distance_map, "place-lech", @default_distance)
 
   defp get_distance(home_stop_distance_map, %{route: "Green" <> _}),
-    do: Map.fetch!(home_stop_distance_map, "place-kencl")
+    do: Map.get(home_stop_distance_map, "place-kencl", @default_distance)
 
   defp get_distance(home_stop_distance_map, %{stop: stop_id}),
-    do: Map.fetch!(home_stop_distance_map, stop_id)
+    do: Map.get(home_stop_distance_map, stop_id, @default_distance)
 
-  defp relevant_alerts(alerts, config, stop_sequences, routes_at_stop, now) do
+  defp relevant_alerts(alerts, config, location_context, now) do
     Enum.filter(alerts, fn %Alert{effect: effect} = alert ->
       reconstructed_alert = %ReconstructedAlert{
         screen: config,
         alert: alert,
-        stop_sequences: stop_sequences,
-        routes_at_stop: routes_at_stop,
+        location_context: location_context,
         now: now,
         informed_stations_string: "A Station"
       }
@@ -207,8 +193,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     Enum.member?(@relevant_effects, effect)
   end
 
-  defp relevant_location?(%ReconstructedAlert{} = reconstructed_alert) do
-    case BaseAlert.location(reconstructed_alert) do
+  defp relevant_location?(reconstructed_alert) do
+    case LocalizedAlert.location(reconstructed_alert) do
       location when location in [:downstream, :upstream] ->
         true
 
@@ -251,15 +237,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   # This function assumes that stop_sequences is ordered by direction north/east -> south/west.
   # If the current station's stop_id is the first or last entry in all stop_sequences,
   # it is a terminal station. Delay alerts heading in the direction of the station are not relevant.
-  defp relevant_direction?(
-         %ReconstructedAlert{
-           screen: %Screen{
-             app_params: %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}}
-           },
-           stop_sequences: stop_sequences
-         } = t
-       ) do
-    informed_entities = BaseAlert.informed_entities(t)
+  defp relevant_direction?(%ReconstructedAlert{
+         alert: alert,
+         location_context: %{home_stop: stop_id, stop_sequences: stop_sequences}
+       }) do
+    informed_entities = Alert.informed_entities(alert)
 
     direction_id =
       informed_entities
@@ -296,8 +278,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   defp get_stations(alert, fetch_stop_name_fn) do
     stop_ids =
-      %ReconstructedAlert{alert: alert}
-      |> BaseAlert.informed_entities()
+      alert
+      |> Alert.informed_entities()
       |> Enum.flat_map(fn %{stop: stop_id} ->
         case stop_id do
           nil -> []
