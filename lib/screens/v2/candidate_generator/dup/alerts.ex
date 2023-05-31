@@ -50,12 +50,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
          route_ids <- Route.route_ids(location_context.routes),
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
       alerts
-      |> Enum.filter(&relevant_alert?(&1, config, location_context, now))
+      |> relevant_alerts(config, location_context, now)
       |> alert_special_cases(config)
       |> create_alert_widgets(config, location_context, stop_name)
     else
       :error -> []
     end
+  end
+
+  def relevant_alerts(alerts, config, location_context, now) do
+    Enum.filter(alerts, fn alert ->
+      relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
+        relevant_location?(alert, location_context) and
+        not directional_shuttle_or_suspension?(alert)
+    end)
   end
 
   @doc """
@@ -104,13 +112,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
         }
       end
     end
-  end
-
-  @spec relevant_alert?(Alert.t(), Screen.t(), LocationContext.t(), DateTime.t()) :: boolean()
-  defp relevant_alert?(alert, config, location_context, now) do
-    relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
-      relevant_location?(alert, location_context) and
-      not directional_shuttle_or_suspension?(alert)
   end
 
   defp relevant_effect?(%{effect: :delay, severity: severity}, _) do

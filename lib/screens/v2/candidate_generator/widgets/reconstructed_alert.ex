@@ -5,7 +5,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Config.V2.PreFare
-  alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.Util
@@ -31,7 +30,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          route_ids <- Route.route_ids(location_context.routes),
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
       alerts
-      |> Enum.filter(&relevant?(&1, config, location_context, now))
+      |> relevant_alerts(config, location_context, now)
       |> Enum.map(fn alert ->
         %ReconstructedAlert{
           screen: config,
@@ -47,22 +46,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     end
   end
 
-  defp relevant?(
-         %Alert{effect: effect} = alert,
-         config,
-         %LocationContext{} = location_context,
-         now
-       ) do
-    reconstructed_alert = %ReconstructedAlert{
-      screen: config,
-      alert: alert,
-      location_context: location_context,
-      now: now,
-      informed_stations_string: "A Station"
-    }
+  defp relevant_alerts(alerts, config, location_context, now) do
+    Enum.filter(alerts, fn %Alert{effect: effect} = alert ->
+      reconstructed_alert = %ReconstructedAlert{
+        screen: config,
+        alert: alert,
+        location_context: location_context,
+        now: now,
+        informed_stations_string: "A Station"
+      }
 
-    relevant_effect?(effect) and relevant_location?(reconstructed_alert) and
-      Alert.happening_now?(alert, now)
+      relevant_effect?(effect) and relevant_location?(reconstructed_alert) and
+        Alert.happening_now?(alert, now)
+    end)
   end
 
   defp relevant_effect?(effect) do

@@ -13,7 +13,7 @@
 .elevator-status {
   width: 1024px;
   height: 1000px;
-  background: rgb(230, 228, 225);
+  background: #e5e4e1;
   box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.25);
   border-radius: 16px;
   margin: 16px 28px;
@@ -69,6 +69,7 @@
   &__closure-route-mode-icon {
     width: 50px;
     height: 50px;
+
     &:not(:last-child) {
       padding-right: 12px;
     }
@@ -182,6 +183,7 @@
     padding-left: 100px;
     padding-top: 28px;
     padding-right: 38px;
+
     &--active-at-home {
       background: rgba(255, 255, 255, 0.44);
     }
@@ -204,6 +206,7 @@
           margin-right: auto;
         }
       }
+
       .detail-page__closure-location-text {
         display: inline-block;
         font-family: Inter, sans-serif;
@@ -252,6 +255,7 @@
           margin-right: auto;
         }
       }
+
       .detail-page__timeframe-text-start {
         display: inline-block;
         font-size: 36px;

@@ -48,7 +48,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
     happening_now_active_period = [{~U[2022-01-01T00:00:00Z], ~U[2022-01-01T22:00:00Z]}]
     upcoming_active_period = [{~U[2022-02-01T00:00:00Z], ~U[2022-02-01T22:00:00Z]}]
 
-    facility_id_to_name = for id <- 1..9, into: %{}, do: {to_string(id), "Elevator #{id}"}
+    facility_id_to_map = fn id -> %{id: to_string(id), name: "Elevator #{id}"} end
 
     station_id_to_name = %{
       "place-foo" => "Foo Station",
@@ -78,22 +78,30 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       alert_route_types: []
     }
 
-    home_ies = fn facility ->
+    home_ies = fn facility_id ->
+      facility = facility_id_to_map.(facility_id)
+
       [ie(stop: home_station_id, facility: facility)] ++
         Enum.map(home_platform_ids, &ie(stop: &1, facility: facility))
     end
 
-    connecting_ies = fn facility ->
+    connecting_ies = fn facility_id ->
+      facility = facility_id_to_map.(facility_id)
+
       [ie(stop: connecting_station_id, facility: facility)] ++
         Enum.map(connecting_platform_ids, &ie(stop: &1, facility: facility))
     end
 
-    elsewhere_ies = fn facility ->
+    elsewhere_ies = fn facility_id ->
+      facility = facility_id_to_map.(facility_id)
+
       [ie(stop: elsewhere_station_id, facility: facility)] ++
         Enum.map(elsewhere_platform_ids, &ie(stop: &1, facility: facility))
     end
 
-    other_elsewhere_ies = fn facility ->
+    other_elsewhere_ies = fn facility_id ->
+      facility = facility_id_to_map.(facility_id)
+
       [ie(stop: other_elsewhere_station_id, facility: facility)] ++
         Enum.map(other_elsewhere_platform_ids, &ie(stop: &1, facility: facility))
     end
@@ -210,7 +218,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       %WidgetInstance.ElevatorStatus{
         screen: screen_config,
         alerts: opts[:alerts] || [],
-        facility_id_to_name: facility_id_to_name,
         station_id_to_name: station_id_to_name,
         station_id_to_icons: station_id_to_icons,
         now: now,

@@ -13,7 +13,7 @@ defmodule ScreensWeb.Router do
   end
 
   pipeline :redirect_prod_http do
-    if Application.get_env(:screens, :redirect_http?) do
+    if Application.compile_env(:screens, :redirect_http?) do
       plug(Plug.SSL, rewrite_on: [:x_forwarded_proto])
     end
   end
@@ -78,7 +78,7 @@ defmodule ScreensWeb.Router do
       pipe_through [:redirect_prod_http, :browser]
 
       get "/:id", ScreenController, :index
-      get "/:id/simulation", ScreenController, :index
+      get "/:id/simulation", ScreenController, :simulation
     end
 
     scope "/api/screen" do

@@ -230,6 +230,18 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
+  def fetch_elevator_alerts_with_facilities(get_json_fn \\ &V3Api.get_json/2) do
+    query_opts = [activity: "USING_WHEELCHAIR", include: ~w[facilities]]
+
+    case fetch(query_opts, get_json_fn) do
+      {:ok, alerts} ->
+        {:ok, alerts}
+
+      _ ->
+        :error
+    end
+  end
+
   defp format_query_param({:fields, fields}) when is_list(fields) do
     [
       {"fields[alert]", Enum.join(fields, ",")}
@@ -268,6 +280,14 @@ defmodule Screens.Alerts.Alert do
 
   defp format_query_param({:route_types, route_type}) do
     format_query_param({:route_types, [route_type]})
+  end
+
+  defp format_query_param({:activity, activity}) do
+    [{"activity", activity}]
+  end
+
+  defp format_query_param({:include, relationships}) do
+    [{"include", Enum.join(relationships, ",")}]
   end
 
   defp format_query_param(_), do: []

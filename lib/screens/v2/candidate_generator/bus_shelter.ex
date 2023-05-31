@@ -52,14 +52,14 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
         departures_instances_fn \\ &Widgets.Departures.departures_instances/1,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
-        subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/1
+        subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/2
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
       fn -> departures_instances_fn.(config) end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
-      fn -> subway_status_instances_fn.(config) end,
+      fn -> subway_status_instances_fn.(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end,
       fn -> survey_instances(config) end
     ]

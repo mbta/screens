@@ -87,7 +87,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
             now: nil,
             alerts: nil,
             location_context: nil,
-            facility_id_to_name: nil,
             station_id_to_name: nil,
             station_id_to_icons: nil
 
@@ -133,7 +132,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           now: DateTime.t(),
           alerts: list(Alert.t()),
           location_context: LocationContext.t(),
-          facility_id_to_name: %{String.t() => String.t()},
           station_id_to_name: %{String.t() => String.t()},
           station_id_to_icons: %{String.t() => list(icon)}
         }
@@ -244,15 +242,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     for %{stop: "place-" <> _ = stop_id} <- entities, do: stop_id
   end
 
-  defp get_informed_facility(entities, facilities) do
-    informed_facility_id =
-      entities
-      |> Enum.find_value(fn
-        %{facility: facility} -> facility
-        _ -> false
-      end)
-
-    %{id: informed_facility_id, name: Map.fetch!(facilities, informed_facility_id)}
+  defp get_informed_facility(entities) do
+    entities
+    |> Enum.find_value(fn
+      %{facility: facility} -> facility
+      _ -> false
+    end)
   end
 
   defp serialize_closure(alert, %{name: name, id: id}, now) do
@@ -270,7 +265,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
          {parent_station_id, alerts},
          %__MODULE__{
            location_context: location_context,
-           facility_id_to_name: facility_id_to_name,
            station_id_to_name: station_id_to_name,
            station_id_to_icons: station_id_to_icons,
            now: now
@@ -280,11 +274,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     closures =
       alerts
-      |> Enum.sort_by(&get_informed_facility(&1.informed_entities, facility_id_to_name))
+      |> Enum.sort_by(&get_informed_facility(&1.informed_entities))
       |> Enum.map(fn %Alert{
                        informed_entities: entities
                      } = alert ->
-        facility = get_informed_facility(entities, facility_id_to_name)
+        facility = get_informed_facility(entities)
 
         serialize_closure(alert, facility, now)
       end)

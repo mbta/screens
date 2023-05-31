@@ -1,6 +1,9 @@
 import initSentry from "Util/sentry";
 initSentry("gl_eink_v2");
 
+import initFullstory from "Util/fullstory";
+initFullstory();
+
 declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/gl_eink_v2.scss");
@@ -41,6 +44,7 @@ import OvernightDepartures from "Components/v2/eink/overnight_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import ExceptionCatcher from "Components/v2/exception_catcher";
+import EinkSubwayStatus from "Components/v2/subway_status/eink_subway_status";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -63,6 +67,7 @@ const TYPE_TO_COMPONENT = {
   bottom_screen_filler: BottomScreenFiller,
   overnight_departures: OvernightDepartures,
   departures_no_data: DeparturesNoData,
+  subway_status: EinkSubwayStatus,
 };
 
 const DISABLED_LAYOUT = {

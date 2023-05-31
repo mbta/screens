@@ -1,6 +1,9 @@
 import initSentry from "Util/sentry";
 initSentry("bus_eink_v2");
 
+import initFullstory from "Util/fullstory";
+initFullstory();
+
 declare function require(name: string): string;
 // tslint:disable-next-line
 require("../../../css/bus_eink_v2.scss");
@@ -39,6 +42,7 @@ import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import DeparturesNoService from "Components/v2/eink/departures_no_service";
+import EinkSubwayStatus from "Components/v2/subway_status/eink_subway_status";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -59,6 +63,7 @@ const TYPE_TO_COMPONENT = {
   bottom_screen_filler: BottomScreenFiller,
   departures_no_data: DeparturesNoData,
   departures_no_service: DeparturesNoService,
+  subway_status: EinkSubwayStatus,
 };
 
 const DISABLED_LAYOUT = {
