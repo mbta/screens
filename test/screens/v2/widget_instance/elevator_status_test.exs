@@ -5,6 +5,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{ElevatorStatus, PreFare}
+  alias Screens.LocationContext
+  alias Screens.Stops.Stop
 
   # Convenience function to build an elevator alert
   defp alert(opts) do
@@ -65,6 +67,15 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       "place-bar" => [:red, :orange, :bus],
       "place-baz" => [:green],
       "place-qux" => [:green]
+    }
+
+    location_context = %LocationContext{
+      home_stop: home_station_id,
+      stop_sequences: stop_sequences,
+      upstream_stops: Stop.upstream_stop_id_set(home_station_id, stop_sequences),
+      downstream_stops: Stop.downstream_stop_id_set(home_station_id, stop_sequences),
+      routes: [],
+      alert_route_types: []
     }
 
     home_ies = fn facility ->
@@ -203,7 +214,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         station_id_to_name: station_id_to_name,
         station_id_to_icons: station_id_to_icons,
         now: now,
-        stop_sequences: stop_sequences
+        location_context: location_context
       }
     end
 

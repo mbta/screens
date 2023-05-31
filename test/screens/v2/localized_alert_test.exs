@@ -4,7 +4,9 @@ defmodule Screens.V2.LocalizedAlertTest do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.BusShelter
+  alias Screens.LocationContext
   alias Screens.RouteType
+  alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert, as: LocalizedAlert
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
@@ -14,19 +16,26 @@ defmodule Screens.V2.LocalizedAlertTest do
     %{
       widget: %AlertWidget{
         alert: %Alert{id: "123"},
-        screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil}
+        screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
+        location_context: %LocationContext{
+          home_stop: nil,
+          stop_sequences: nil,
+          upstream_stops: nil,
+          downstream_stops: nil,
+          routes: nil,
+          alert_route_types: nil
+        }
       }
     }
   end
 
   defp put_home_stop(widget, app_config_module, stop_id) do
-    alias Screens.Config.V2.Alerts
-
     %{
       widget
-      | screen: %{
-          widget.screen
-          | app_params: struct(app_config_module, %{alerts: %Alerts{stop_id: stop_id}})
+      | location_context: %{
+          widget.location_context
+          | alert_route_types: Stop.get_route_type_filter(app_config_module, stop_id),
+            home_stop: stop_id
         }
     }
   end
@@ -36,11 +45,21 @@ defmodule Screens.V2.LocalizedAlertTest do
   end
 
   defp put_stop_sequences(widget, sequences) do
-    %{widget | stop_sequences: sequences}
+    %{
+      widget
+      | location_context: %{
+          widget.location_context
+          | stop_sequences: sequences,
+            upstream_stops:
+              Stop.upstream_stop_id_set(widget.location_context.home_stop, sequences),
+            downstream_stops:
+              Stop.downstream_stop_id_set(widget.location_context.home_stop, sequences)
+        }
+    }
   end
 
   defp put_routes_at_stop(widget, routes) do
-    %{widget | routes_at_stop: routes}
+    %{widget | location_context: %{widget.location_context | routes: routes}}
   end
 
   defp put_app_id(widget, app_id) do
@@ -83,6 +102,13 @@ defmodule Screens.V2.LocalizedAlertTest do
     %{widget: put_routes_at_stop(widget, routes)}
   end
 
+  defp setup_location_context(%{widget: widget}) do
+    %{widget: widget}
+    |> setup_home_stop()
+    |> setup_stop_sequences()
+    |> setup_routes()
+  end
+
   defp setup_screen_config(%{widget: widget}) do
     %{widget: put_app_id(widget, :bus_shelter_v2)}
   end
@@ -93,9 +119,7 @@ defmodule Screens.V2.LocalizedAlertTest do
 
   # Pass this to `setup` to set up "context" data on the alert widget, without setting up the API alert itself.
   @alert_widget_context_setup_group [
-    :setup_home_stop,
-    :setup_stop_sequences,
-    :setup_routes,
+    :setup_location_context,
     :setup_screen_config,
     :setup_now
   ]
@@ -264,26 +288,6 @@ defmodule Screens.V2.LocalizedAlertTest do
         ])
 
       assert :downstream == LocalizedAlert.location(widget)
-    end
-  end
-
-  describe "upstream_stop_id_set/1" do
-    setup @alert_widget_context_setup_group
-
-    test "collects all stops upstream of the home stop into a set", %{widget: widget} do
-      expected_upstream_stops = MapSet.new(~w[0 1 2 3 4] ++ ~w[10 20 30 4] ++ ~w[200 40])
-
-      assert MapSet.equal?(expected_upstream_stops, AlertWidget.upstream_stop_id_set(widget))
-    end
-  end
-
-  describe "downstream_stop_id_set/1" do
-    setup @alert_widget_context_setup_group
-
-    test "collects all stops downstream of the home stop into a set", %{widget: widget} do
-      expected_downstream_stops = MapSet.new(~w[6 7 8 9] ++ ~w[7] ++ ~w[6 90])
-
-      assert MapSet.equal?(expected_downstream_stops, AlertWidget.downstream_stop_id_set(widget))
     end
   end
 end

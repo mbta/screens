@@ -43,8 +43,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
   # Using hd/1 because we know that only single line stations use this function.
-  defp get_destination(t, location) do
-    informed_entities = Alert.informed_entities(t)
+  defp get_destination(%{alert: alert} = t, location) do
+    informed_entities = Alert.informed_entities(alert)
 
     {direction_id, route_id} =
       informed_entities
@@ -82,19 +82,23 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def takeover_alert?(
-        %{screen: %Screen{app_id: :pre_fare_v2}, is_terminal_station: is_terminal_station} = t
+        %{
+          screen: %Screen{app_id: :pre_fare_v2},
+          is_terminal_station: is_terminal_station,
+          alert: alert
+        } = t
       ) do
-    Alert.effect(t) in [:station_closure, :suspension, :shuttle] and
+    Alert.effect(alert) in [:station_closure, :suspension, :shuttle] and
       LocalizedAlert.location(t, is_terminal_station) == :inside and
       LocalizedAlert.informs_all_active_routes_at_home_stop?(t)
   end
 
   defp serialize_takeover_alert(
          %__MODULE__{
-           alert: %Alert{effect: :suspension, cause: cause}
+           alert: %Alert{effect: :suspension, cause: cause} = alert
          } = t
        ) do
-    informed_entities = Alert.informed_entities(t)
+    informed_entities = Alert.informed_entities(alert)
     affected_routes = LocalizedAlert.informed_subway_routes(t)
     cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
 
@@ -130,10 +134,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp serialize_takeover_alert(
          %__MODULE__{
-           alert: %Alert{effect: :shuttle, cause: cause}
+           alert: %Alert{effect: :shuttle, cause: cause} = alert
          } = t
        ) do
-    informed_entities = Alert.informed_entities(t)
+    informed_entities = Alert.informed_entities(alert)
     affected_routes = LocalizedAlert.informed_subway_routes(t)
     cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
 
@@ -462,9 +466,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :delay}}), do: nil
 
   defp serialize_outside_alert(
-         %__MODULE__{alert: %Alert{effect: :suspension, cause: cause, header: header}} = t
+         %__MODULE__{alert: %Alert{effect: :suspension, cause: cause, header: header} = alert} = t
        ) do
-    informed_entities = Alert.informed_entities(t)
+    informed_entities = Alert.informed_entities(alert)
 
     affected_routes = LocalizedAlert.informed_subway_routes(t)
 
@@ -503,9 +507,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp serialize_outside_alert(
-         %__MODULE__{alert: %Alert{effect: :shuttle, cause: cause, header: header}} = t
+         %__MODULE__{alert: %Alert{effect: :shuttle, cause: cause, header: header} = alert} = t
        ) do
-    informed_entities = Alert.informed_entities(t)
+    informed_entities = Alert.informed_entities(alert)
 
     affected_routes = LocalizedAlert.informed_subway_routes(t)
 

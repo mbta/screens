@@ -113,12 +113,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   # This function assumes that stop_sequences is ordered by direction north/east -> south/west.
   # If the current station's stop_id is the first or last entry in all stop_sequences,
   # it is a terminal station. Delay alerts heading in the direction of the station are not relevant.
-  defp relevant_direction?(
-         %ReconstructedAlert{
-           location_context: %{home_stop: stop_id, stop_sequences: stop_sequences}
-         } = t
-       ) do
-    informed_entities = Alert.informed_entities(t)
+  defp relevant_direction?(%ReconstructedAlert{
+         alert: alert,
+         location_context: %{home_stop: stop_id, stop_sequences: stop_sequences}
+       }) do
+    informed_entities = Alert.informed_entities(alert)
 
     direction_id =
       informed_entities
@@ -155,7 +154,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   defp get_stations(alert, fetch_stop_name_fn) do
     stop_ids =
-      %ReconstructedAlert{alert: alert}
+      alert
       |> Alert.informed_entities()
       |> Enum.flat_map(fn %{stop: stop_id} ->
         case stop_id do
