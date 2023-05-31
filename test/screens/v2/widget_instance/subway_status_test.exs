@@ -1160,7 +1160,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               location: %{abbrev: "Oak Grove", full: "Oak Grove"},
               route_pill: %{color: :orange, text: "OL", type: :text},
-              status: "Bypassing"
+              status: "Bypassing",
+              station_count: 1
             },
             %{
               location: nil,
