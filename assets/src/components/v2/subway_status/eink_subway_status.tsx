@@ -53,7 +53,12 @@ const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
       isExtended(section));
 
   return (
-    <div className="subway-status_row">
+    <div
+      className={classWithModifier(
+        "subway-status_row",
+        alerts.length === 1 ? "single" : "multi"
+      )}
+    >
       <div className="subway-status_route-pill-container">
         <SubwayStatusRoutePill routePill={routePill} />
       </div>
