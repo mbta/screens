@@ -2,7 +2,7 @@ import { isDup, isRealScreen } from "Util/util";
 import { getDataset } from "Util/dataset";
 // Previously tried @sentry/react and @sentry/browser as the SDK, but the QtWeb browser on e-inks could not
 // use them. Raven is an older stable SDK that better works with older browsers.
-import Raven from "raven-js";
+import Raven, { RavenOptions } from "raven-js";
 
 // https://docs.sentry.io/clients/javascript/usage/#raven-js-additional-context
 type LogLevel = "info" | "warning" | "error";
@@ -13,6 +13,10 @@ const log = (message: string, level: LogLevel) => {
 const info = (message: string) => log(message, "info");
 const warn = (message: string) => log(message, "warning");
 const error = (message: string) => log(message, "error");
+
+const captureException = (ex: unknown, options?: RavenOptions) => {
+  Raven.captureException(ex, options);
+};
 
 /**
  * Initializes Sentry if the DSN is defined AND this client is running on
@@ -42,4 +46,4 @@ const initSentry = (appString: string) => {
 };
 
 export default initSentry;
-export { info, warn, error };
+export { info, warn, error, captureException };
