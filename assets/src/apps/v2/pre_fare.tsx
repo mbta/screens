@@ -32,6 +32,7 @@ import NormalHeader from "Components/v2/pre_fare/normal_header";
 import OneLarge from "Components/v2/pre_fare/flex/one_large";
 import TwoMedium from "Components/v2/pre_fare/flex/two_medium";
 import BodyLeftTakeover from "Components/v2/pre_fare/body_left_takeover";
+import BodyLeftFlex from "Components/v2/pre_fare/body_left_flex";
 import BodyRightTakeover from "Components/v2/pre_fare/body_right_takeover";
 import BodyTakeover from "Components/v2/pre_fare/body_takeover";
 import ScreenTakeover from "Components/v2/pre_fare/screen_takeover";
@@ -59,6 +60,7 @@ const TYPE_TO_COMPONENT = {
   body_takeover: BodyTakeover,
   body_left_normal: NormalBodyLeft,
   body_left_takeover: BodyLeftTakeover,
+  body_left_flex: BodyLeftFlex,
   body_right_normal: NormalBodyRight,
   body_right_surge: SurgeBodyRight,
   body_right_takeover: BodyRightTakeover,

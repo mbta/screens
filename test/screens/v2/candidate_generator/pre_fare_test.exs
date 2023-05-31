@@ -44,7 +44,13 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
                      body_normal: [
                        body_left: %{
                          body_left_normal: [:main_content_left],
-                         body_left_takeover: [:full_body_left]
+                         body_left_takeover: [:full_body_left],
+                         body_left_flex: [
+                           {0, :paged_main_content_left},
+                           {1, :paged_main_content_left},
+                           {2, :paged_main_content_left},
+                           {3, :paged_main_content_left}
+                         ]
                        },
                        body_right: %{
                          body_right_normal: [
