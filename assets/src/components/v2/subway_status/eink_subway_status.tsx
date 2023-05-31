@@ -1,6 +1,5 @@
 import React, { ComponentType, forwardRef } from "react";
 import { classWithModifier, firstWord, imagePath } from "Util/util";
-import useTextResizer from "Hooks/v2/use_text_resizer";
 import {
   Alert,
   ContractedSection,
@@ -17,6 +16,7 @@ import {
   isContractedWith1Alert,
   isExtended,
   isGLMultiPill,
+  useSubwayStatusTextResizer,
 } from "./subway_status_common";
 
 ////////////////
@@ -91,63 +91,20 @@ interface AlertRowProps extends Alert {
   showInlineBranches: boolean;
 }
 
-// Ordered from "smallest" to "largest"
-enum FittingStep {
-  PerAlertEffect,
-  Abbrev,
-  FullSize,
-}
-
-/**
- * Pixel height of an alert. This should match the height of the route pill, since
- * it's the tallest element in the row.
- */
-const ROW_HEIGHT = 70;
-
 const ALERTS_URL = "mbta.com/alerts";
 
 const AlertRow: ComponentType<AlertRowProps> = ({
   route_pill: routePill,
   status,
   location,
+  station_count: stationCount,
   id,
   showInlineBranches,
 }) => {
-  const { ref, size: fittingStep } = useTextResizer({
-    sizes: [
-      FittingStep.PerAlertEffect,
-      FittingStep.Abbrev,
-      FittingStep.FullSize,
-    ],
-    maxHeight: ROW_HEIGHT,
-    resetDependencies: [id],
-  });
-
-  let [abbrev, truncateStatus, replaceLocationWithUrl] = [false, false, false];
-  switch (fittingStep) {
-    case FittingStep.FullSize:
-      break;
-    case FittingStep.Abbrev:
-      abbrev = true;
-      break;
-    case FittingStep.PerAlertEffect:
-      abbrev = true;
-      switch (firstWord(status)) {
-        case "Delays":
-          truncateStatus = true;
-          break;
-        case "Suspension":
-        case "Bypassing":
-          // For "Bypassing", we also replace station names with a count in the status,
-          // but that decision happens on the server since it only depends on
-          // the number of stations bypassed--no pixel measurement necessary.
-          replaceLocationWithUrl = true;
-          break;
-        case "Shuttle":
-        default:
-          break;
-      }
-  }
+  // row height is a little taller when there is an inline GL branch pill
+  const rowHeight = showInlineBranches ? 70 : 60;
+  const { ref, abbrev, truncateStatus, replaceLocationWithUrl } =
+    useSubwayStatusTextResizer(rowHeight, id, status);
 
   let locationText: string | null;
   if (replaceLocationWithUrl) {
@@ -158,10 +115,16 @@ const AlertRow: ComponentType<AlertRowProps> = ({
     locationText = location;
   }
 
+  if (truncateStatus) {
+    const effect = firstWord(status);
+    status =
+      effect === "Bypassing" ? `Bypassing ${stationCount} stops` : effect;
+  }
+
   return (
     <BasicAlert
       routePill={routePill}
-      status={truncateStatus ? firstWord(status) : status}
+      status={status}
       location={locationText}
       showInlineBranches={showInlineBranches}
       ref={ref}

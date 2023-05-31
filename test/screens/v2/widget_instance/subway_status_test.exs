@@ -86,7 +86,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             location: %{
               abbrev: "mbta.com/alerts",
               full: "mbta.com/alerts"
-            }
+            },
+            station_count: 4
           }
         },
         orange: %{
@@ -144,7 +145,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             location: %{
               abbrev: "Airport, Maverick & Aquarium",
               full: "Airport, Maverick & Aquarium"
-            }
+            },
+            station_count: 3
           }
         },
         orange: %{
@@ -198,7 +200,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           alert: %{
             route_pill: %{type: :text, text: "BL", color: :blue},
             status: "Bypassing",
-            location: %{abbrev: "Airport and Maverick", full: "Airport and Maverick"}
+            location: %{abbrev: "Airport and Maverick", full: "Airport and Maverick"},
+            station_count: 2
           }
         },
         orange: %{
@@ -485,7 +488,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               route_pill: %{type: :text, text: "BL", color: :blue},
               status: "Bypassing",
-              location: %{abbrev: "Airport", full: "Airport"}
+              location: %{abbrev: "Airport", full: "Airport"},
+              station_count: 1
             }
           ]
         },
@@ -582,7 +586,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               route_pill: %{type: :text, text: "GL", color: :green, branches: [:d]},
               status: "Bypassing",
-              location: %{abbrev: "Woodland and Riverside", full: "Woodland and Riverside"}
+              location: %{abbrev: "Woodland and Riverside", full: "Woodland and Riverside"},
+              station_count: 2
             }
           ]
         }
@@ -918,7 +923,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %{
               route_pill: %{type: :text, text: "OL", color: :orange},
               status: "Bypassing",
-              location: %{abbrev: "Oak Grove", full: "Oak Grove"}
+              location: %{abbrev: "Oak Grove", full: "Oak Grove"},
+              station_count: 1
             }
           ]
         },

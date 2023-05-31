@@ -2,6 +2,9 @@
 // SERVER DATA TYPES //
 ///////////////////////
 
+import useTextResizer from "Hooks/v2/use_text_resizer";
+import { firstWord } from "Util/util";
+
 export interface SubwayStatusData {
   blue: Section;
   orange: Section;
@@ -25,6 +28,7 @@ export interface Alert {
   route_pill?: SubwayStatusPill;
   status: string;
   location: AlertLocation;
+  station_count?: number;
 }
 
 export interface SubwayStatusPill {
@@ -133,3 +137,50 @@ export const isContractedWith1Alert = (
   section: Section
 ): section is ContractedSection =>
   isContracted(section) && section.alerts.length === 1;
+
+// Ordered from "smallest" to "largest"
+enum FittingStep {
+  PerAlertEffect,
+  Abbrev,
+  FullSize,
+}
+
+export const useSubwayStatusTextResizer = (rowHeight, id, status) => {
+  const { ref, size: fittingStep } = useTextResizer({
+    sizes: [
+      FittingStep.PerAlertEffect,
+      FittingStep.Abbrev,
+      FittingStep.FullSize,
+    ],
+    maxHeight: rowHeight,
+    resetDependencies: [id],
+  });
+
+  let [abbrev, truncateStatus, replaceLocationWithUrl] = [false, false, false];
+  switch (fittingStep) {
+    case FittingStep.FullSize:
+      break;
+    case FittingStep.Abbrev:
+      abbrev = true;
+      break;
+    case FittingStep.PerAlertEffect:
+      abbrev = true;
+      switch (firstWord(status)) {
+        case "Delays":
+          truncateStatus = true;
+          break;
+        case "Bypassing":
+          truncateStatus = true;
+          replaceLocationWithUrl = true;
+          break;
+        case "Suspension":
+          replaceLocationWithUrl = true;
+          break;
+        case "Shuttle":
+        default:
+          break;
+      }
+  }
+
+  return { ref, abbrev, truncateStatus, replaceLocationWithUrl, fittingStep };
+};

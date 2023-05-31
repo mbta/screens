@@ -5,7 +5,6 @@ import {
   firstWord,
   imagePath,
 } from "Util/util";
-import useTextResizer from "Hooks/v2/use_text_resizer";
 import {
   Alert,
   ContractedSection,
@@ -23,6 +22,7 @@ import {
   isContractedWith1Alert,
   isExtended,
   isGLMultiPill,
+  useSubwayStatusTextResizer,
 } from "./subway_status_common";
 
 ////////////////
@@ -125,43 +125,11 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   route_pill: routePill,
   status,
   location,
+  station_count: stationCount,
   id,
 }) => {
-  const { ref, size: fittingStep } = useTextResizer({
-    sizes: [
-      FittingStep.PerAlertEffect,
-      FittingStep.Abbrev,
-      FittingStep.FullSize,
-    ],
-    maxHeight: CONTRACTED_ALERT_MAX_HEIGHT,
-    resetDependencies: [id],
-  });
-
-  let [abbrev, truncateStatus, replaceLocationWithUrl] = [false, false, false];
-  switch (fittingStep) {
-    case FittingStep.FullSize:
-      break;
-    case FittingStep.Abbrev:
-      abbrev = true;
-      break;
-    case FittingStep.PerAlertEffect:
-      abbrev = true;
-      switch (firstWord(status)) {
-        case "Delays":
-          truncateStatus = true;
-          break;
-        case "Suspension":
-        case "Bypassing":
-          // For "Bypassing", we also replace station names with a count in the status,
-          // but that decision happens on the server since it only depends on
-          // the number of stations bypassed--no pixel measurement necessary.
-          replaceLocationWithUrl = true;
-          break;
-        case "Shuttle":
-        default:
-          break;
-      }
-  }
+  const { ref, abbrev, truncateStatus, replaceLocationWithUrl, fittingStep } =
+    useSubwayStatusTextResizer(CONTRACTED_ALERT_MAX_HEIGHT, id, status);
 
   let locationText: string | null;
   if (replaceLocationWithUrl) {
@@ -172,6 +140,12 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
     locationText = location;
   }
 
+  if (truncateStatus) {
+    const effect = firstWord(status);
+    status =
+      effect === "Bypassing" ? `Bypassing ${stationCount} stops` : effect;
+  }
+
   // If we're on the last attempt to fit text in the row and it still overflows,
   // we prevent it from wrapping or pushing other content out of place.
   const hideOverflow = fittingStep === FittingStep.PerAlertEffect;
@@ -179,7 +153,7 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   return (
     <BasicAlert
       routePill={routePill}
-      status={truncateStatus ? firstWord(status) : status}
+      status={status}
       location={locationText}
       hideOverflow={hideOverflow}
       ref={ref}

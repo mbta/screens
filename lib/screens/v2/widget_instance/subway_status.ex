@@ -382,7 +382,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     stop_names = get_stop_names_from_informed_entities(informed_entities, stop_id_to_name)
     {status, location} = format_station_closure(stop_names)
 
-    %{status: status, location: location}
+    %{status: status, location: location, station_count: length(stop_names)}
   end
 
   defp serialize_alert(
@@ -429,7 +429,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{
       route_pill: serialize_gl_pill_with_branches(route_ids),
       status: status,
-      location: location
+      location: location,
+      station_count: length(stop_names)
     }
   end
 
