@@ -130,12 +130,6 @@ defmodule ScreensWeb.Router do
     get "/:id/debug", AudioController, :debug
   end
 
-  scope "/alert_priority", ScreensWeb do
-    pipe_through [:redirect_prod_http, :api, :browser]
-
-    get "/:id", AlertPriorityController, :show
-  end
-
   scope "/api", ScreensWeb do
     pipe_through [:redirect_prod_http, :api]
 
