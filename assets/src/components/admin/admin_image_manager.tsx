@@ -1,18 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import _ from "lodash";
+import getCsrfToken from "Util/csrf";
 
 interface FileWithPreview extends File {
   preview: string;
 }
 
 const fetchWithCsrf = (resource: RequestInfo, init: RequestInit = {}) => {
-  const csrfToken = document.head.querySelector(
-    "[name~=csrf-token][content]"
-  ).content;
   return fetch(resource, {
     ...init,
-    headers: { ...(init?.headers || {}), "x-csrf-token": csrfToken },
+    headers: { ...(init?.headers || {}), "x-csrf-token": getCsrfToken() },
     credentials: "include",
   });
 };

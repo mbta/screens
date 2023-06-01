@@ -8,6 +8,7 @@ import {
   ApiResponse,
   useSimulationApiResponse,
 } from "Hooks/v2/use_api_response";
+import WidgetTreeErrorBoundary from "Components/v2/widget_tree_error_boundary";
 
 interface SimulationScreenLayoutProps {
   apiResponse: ApiResponse;
@@ -33,22 +34,26 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
       <div className="simulation-screen-scrolling-container">
         {apiResponse && (
           <div className="simulation__full-page">
-            <Widget data={widgetData} />
+            <WidgetTreeErrorBoundary>
+              <Widget data={widgetData} />
+            </WidgetTreeErrorBoundary>
           </div>
         )}
         {flexZone?.length > 0 && (
-          <div className="simulation__flex-zone">
-            {flexZone.map((flexZonePage: WidgetData, index: number) => {
-              return (
-                <div
-                  key={`page${index}`}
-                  className="simulation__flex-zone-widget"
-                >
-                  <Widget data={flexZonePage} />
-                </div>
-              );
-            })}
-          </div>
+          <WidgetTreeErrorBoundary showFallbackOnError={false}>
+            <div className="simulation__flex-zone">
+              {flexZone.map((flexZonePage: WidgetData, index: number) => {
+                return (
+                  <div
+                    key={`page${index}`}
+                    className="simulation__flex-zone-widget"
+                  >
+                    <Widget data={flexZonePage} />
+                  </div>
+                );
+              })}
+            </div>
+          </WidgetTreeErrorBoundary>
         )}
       </div>
     </div>

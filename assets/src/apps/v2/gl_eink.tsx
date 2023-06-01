@@ -43,7 +43,6 @@ import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 import OvernightDepartures from "Components/v2/eink/overnight_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
-import ExceptionCatcher from "Components/v2/exception_catcher";
 import EinkSubwayStatus from "Components/v2/subway_status/eink_subway_status";
 
 const TYPE_TO_COMPONENT = {
@@ -113,9 +112,7 @@ const App = (): JSX.Element => {
         <Route path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
-              <ExceptionCatcher>
-                <ScreenPage />
-              </ExceptionCatcher>
+              <ScreenPage />
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>

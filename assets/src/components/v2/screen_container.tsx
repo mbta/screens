@@ -10,6 +10,7 @@ import useApiResponse, {
   SimulationApiResponse,
   useDupApiResponse,
 } from "Hooks/v2/use_api_response";
+import WidgetTreeErrorBoundary from "Components/v2/widget_tree_error_boundary";
 import Widget, { WidgetData } from "Components/v2/widget";
 import useAudioReadout from "Hooks/v2/use_audio_readout";
 import { isDup } from "Util/util";
@@ -94,7 +95,9 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
 
   return (
     <div className="screen-container">
-      {apiResponse && <Widget data={responseMapper(apiResponse)} />}
+      <WidgetTreeErrorBoundary>
+        {apiResponse && <Widget data={responseMapper(apiResponse)} />}
+      </WidgetTreeErrorBoundary>
       {showBlink && <div className="screen-container-blink" />}
     </div>
   );
