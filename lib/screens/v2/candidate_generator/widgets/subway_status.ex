@@ -22,7 +22,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
   end
 
   # Omit up to 10 minute delays.
-  defp relevant_effect?(%Alert{effect: :delay, severity: severity}), do: severity > 3
+  defp relevant_effect?(%Alert{effect: :delay, severity: severity}), do: severity >= 3
 
   defp relevant_effect?(%Alert{effect: effect}),
     do: effect in [:suspension, :shuttle, :station_closure]
