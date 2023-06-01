@@ -1371,6 +1371,53 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       assert expected == WidgetInstance.serialize(instance)
     end
+
+    test "finds correct endpoints if shuttle starts on trunk" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %Alert{
+            effect: :shuttle,
+            informed_entities: [
+              %{direction_id: nil, route: "Green-C", route_type: 0, stop: "place-kencl"},
+              %{direction_id: nil, route: "Green-C", route_type: 0, stop: "place-smary"},
+              %{direction_id: nil, route: "Green-C", route_type: 0, stop: "place-hwsst"},
+              %{direction_id: nil, route: "Green-C", route_type: 0, stop: "place-kntst"}
+            ]
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          alerts: [
+            %{route_pill: %{color: :blue, text: "BL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        },
+        green: %{
+          type: :extended,
+          alert: %{
+            location: %{abbrev: "Kenmore to Kent St", full: "Kenmore to Kent Street"},
+            route_pill: %{color: :green, text: "GL", type: :text},
+            status: "Shuttle Bus"
+          }
+        },
+        orange: %{
+          alerts: [
+            %{route_pill: %{color: :orange, text: "OL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        },
+        red: %{
+          alerts: [
+            %{route_pill: %{color: :red, text: "RL", type: :text}, status: "Normal Service"}
+          ],
+          type: :contracted
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
   end
 
   describe "slot_names/1" do
