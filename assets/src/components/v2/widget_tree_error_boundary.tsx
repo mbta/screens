@@ -3,7 +3,10 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 import getCsrfToken from "Util/csrf";
 import { getDataset } from "Util/dataset";
 import { isRealScreen } from "Util/util";
-import { ResponseMapperContext, LastFetchContext } from "Components/v2/screen_container";
+import {
+  ResponseMapperContext,
+  LastFetchContext,
+} from "Components/v2/screen_container";
 import Widget, { WidgetData } from "Components/v2/widget";
 import * as SentryLogger from "Util/sentry";
 
@@ -41,16 +44,22 @@ interface State {
 class WidgetTreeErrorBoundary extends React.Component<Props, State> {
   state = { hasError: false, prevLastFetch: this.props.lastFetch };
 
-  // When an error is thrown during render, make an API call to log it.
+  // When an error is thrown during render, log it.
   // Repeat logs have a cooldown of 10 minutes, to avoid overloading quotas.
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    if (isRealScreen() && LogTimeRecorder.noErrorsOfTypeInLast10Minutes(error)) {
-      this.doLog(error, errorInfo)
+    if (LogTimeRecorder.noErrorsOfTypeInLast10Minutes(error)) {
+      this.doLog(error, errorInfo);
     }
   }
 
   doLog(error: Error, errorInfo: ErrorInfo) {
     LogTimeRecorder.recordLogForError(error);
+
+    if (!isRealScreen()) {
+      // We're running in someone's browser. Log to the console so that the error isn't silently discarded.
+      console.error("WidgetTreeErrorBoundary caught an error during render", error, errorInfo);
+      return;
+    }
 
     if (getDataset().disableSentry) {
       // Log via the server. (to Splunk, at time of writing.)
@@ -69,7 +78,9 @@ class WidgetTreeErrorBoundary extends React.Component<Props, State> {
       });
     } else {
       // Log directly to Sentry.
-      SentryLogger.captureException(error, { extra: { componentStacktrace: errorInfo.componentStack } });
+      SentryLogger.captureException(error, {
+        extra: { componentStacktrace: errorInfo.componentStack },
+      });
     }
   }
 
@@ -131,7 +142,7 @@ const LogTimeRecorder = (() => {
     const now = Date.now();
     const lastLog = logTimestampByError[getKey(error)] ?? 0;
 
-    return (now - lastLog > 10 * MINUTE_IN_MS);
+    return now - lastLog > 10 * MINUTE_IN_MS;
   };
 
   return { recordLogForError, noErrorsOfTypeInLast10Minutes };
@@ -142,7 +153,9 @@ const LogTimeRecorder = (() => {
 // does not receive context as an argument.
 const withLastFetchContext = <T,>(Component: React.ComponentType<T>) => {
   const lastFetch = useContext(LastFetchContext);
-  const WrappedComponent = (props: T) => <Component {...props} lastFetch={lastFetch} />;
+  const WrappedComponent = (props: T) => (
+    <Component {...props} lastFetch={lastFetch} />
+  );
 
   return WrappedComponent;
 };
