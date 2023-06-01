@@ -155,13 +155,10 @@ const LogTimeRecorder = (() => {
 // It's necessary to get the context separately and pass it to the component
 // as a prop because we need this value in getDerivedStateFromProps, which
 // does not receive context as an argument.
-const withLastFetchContext = <T,>(Component: React.ComponentType<T>) => {
+const WrappedWithLastFetch: React.ComponentType<Omit<Props, "lastFetch">> = (props) => {
   const lastFetch = useContext(LastFetchContext);
-  const WrappedComponent = (props: T) => (
-    <Component {...props} lastFetch={lastFetch} />
-  );
 
-  return WrappedComponent;
+  return <WidgetTreeErrorBoundary {...props} lastFetch={lastFetch} />;
 };
 
-export default withRouter(withLastFetchContext(WidgetTreeErrorBoundary));
+export default withRouter(WrappedWithLastFetch);
