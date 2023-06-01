@@ -57,7 +57,11 @@ class WidgetTreeErrorBoundary extends React.Component<Props, State> {
 
     if (!isRealScreen()) {
       // We're running in someone's browser. Log to the console so that the error isn't silently discarded.
-      console.error("WidgetTreeErrorBoundary caught an error during render", error, errorInfo);
+      console.error(
+        "WidgetTreeErrorBoundary caught an error during render",
+        error,
+        errorInfo
+      );
       return;
     }
 
