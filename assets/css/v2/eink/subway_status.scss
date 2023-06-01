@@ -1,9 +1,10 @@
 .subway-status {
   position: relative;
-  height: 1200px;
-  width: 1144px;
+  height: 1080px;
+  width: 1136px;
   padding: 29px 32px 32px 32px;
   overflow: hidden;
+  background-color: white;
 
   .subway-status__header {
     font-family: Helvetica, sans-serif;
@@ -14,12 +15,17 @@
 
   .subway-status_row {
     position: relative;
-    padding-top: 44px;
+    min-height: 230px;
+    max-height: 320px;
+
+    &--multi {
+      height: 320px;
+    }
 
     .subway-status_status_rule {
       content: "";
 
-      position: relative;
+      position: absolute;
       bottom: 0;
       right: 10px;
 
@@ -28,7 +34,6 @@
 
       background: #000000;
       border-radius: 1px;
-      margin-top: 42px;
     }
 
     &:last-child {
@@ -41,20 +46,18 @@
 }
 
 .subway-status_route-pill-container {
-  margin-bottom: 24px;
   min-width: 144px;
   height: 64px;
+  padding-top: 44px;
 }
 
 .subway-status_status {
   position: relative;
-
   width: 100%;
-
   box-sizing: border-box;
-  padding-left: 36px;
-
+  margin-left: 36px;
   overflow: hidden;
+  margin-top: 24px;
 
   .subway-status_alert:not(:first-child) {
     margin-top: 24px;
@@ -81,7 +84,7 @@
     max-width: 1024px;
     margin-left: 24px;
     font-weight: 800;
-    line-height: 64px;
+    line-height: 65px;
     font-size: 56px;
 
     &--normal-service {
