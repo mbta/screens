@@ -53,7 +53,12 @@ const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
       isExtended(section));
 
   return (
-    <div className="subway-status_row">
+    <div
+      className={classWithModifier(
+        "subway-status_row",
+        alerts.length === 1 ? "single" : "multi"
+      )}
+    >
       <div className="subway-status_route-pill-container">
         <SubwayStatusRoutePill routePill={routePill} />
       </div>
@@ -99,10 +104,9 @@ enum FittingStep {
 }
 
 /**
- * Pixel height of an alert. This should match the height of the route pill, since
- * it's the tallest element in the row.
+ * Pixel height of an alert. All text containers have a height of 56px.
  */
-const ROW_HEIGHT = 70;
+const ROW_HEIGHT = 56;
 
 const ALERTS_URL = "mbta.com/alerts";
 
