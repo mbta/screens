@@ -61,6 +61,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     "Green" => ["Westbound", "Eastbound"]
   }
 
+  @subway_routes Map.keys(@route_directions)
+
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
   defimpl Screens.V2.WidgetInstance do
@@ -127,7 +129,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     entities
     |> Enum.map(fn e -> Map.get(e, :route) end)
     |> Enum.reject(&is_nil/1)
-    |> Enum.filter(&(&1 in Map.keys(@route_directions)))
+    |> Enum.filter(&(&1 in @subway_routes))
     |> Enum.uniq()
   end
 
