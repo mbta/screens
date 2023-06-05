@@ -497,9 +497,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           type: :contracted,
           alerts: [
             %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "2 current alerts",
-              location: "mbta.com/alerts"
+              location: %{abbrev: "Oak Grove to Wellington", full: "Oak Grove to Wellington"},
+              route_pill: %{color: :orange, text: "OL", type: :text},
+              status: "Suspension"
+            },
+            %{
+              location: %{abbrev: "Oak Grove to Wellington", full: "Oak Grove to Wellington"},
+              status: "Delays up to 20 minutes"
             }
           ]
         },

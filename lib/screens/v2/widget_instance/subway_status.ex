@@ -192,12 +192,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     alerts = Map.get(grouped_alerts, route_id)
 
     alert_rows =
-      if is_nil(alerts) or alerts == [] do
-        [serialize_alert_with_route_pill(nil, route_id)]
-      else
-        [alert1, alert2] = alerts
+      case alerts do
+        alerts when is_nil(alerts) or alerts == [] ->
+          [serialize_alert_with_route_pill(nil, route_id)]
 
-        [serialize_alert_with_route_pill(alert1, route_id), serialize_alert(alert2, route_id)]
+        [alert] ->
+          [serialize_alert_with_route_pill(alert, route_id)]
+
+        [alert1, alert2] ->
+          [serialize_alert_with_route_pill(alert1, route_id), serialize_alert(alert2, route_id)]
+
+        alerts ->
+          [serialize_alert_summary(length(alerts), serialize_route_pill(route_id))]
       end
 
     %{
