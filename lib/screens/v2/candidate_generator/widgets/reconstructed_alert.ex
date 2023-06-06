@@ -25,6 +25,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   @default_distance 99
 
+  @type stop_id :: String.t()
+  @type distance :: non_neg_integer()
+  @type home_stop_distance_map :: %{stop_id() => distance()}
+
   @doc """
   Given the stop_id defined in the header, determine relevant routes
   Given the routes, fetch all alerts for the route
@@ -182,6 +186,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   end
 
   # Default to 99 if stop_id is not in distance map.
+  @spec get_distance(home_stop_distance_map(), Alert.informed_entity()) :: distance()
+  defp get_distance(home_stop_distance_map, informed_entity)
+
   defp get_distance(home_stop_distance_map, %{route: "Green" <> _, stop: stop_id})
        when stop_id in @gl_eastbound_split_stops,
        do: Map.get(home_stop_distance_map, "place-lech", @default_distance)
