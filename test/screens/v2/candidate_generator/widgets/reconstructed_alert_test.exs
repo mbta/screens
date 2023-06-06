@@ -182,25 +182,25 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         struct(
           %ReconstructedAlertWidget{
             alert: %Alert{
-              id: "3",
-              effect: :delay,
-              informed_entities: [ie(stop: "place-ogmnl")],
-              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            },
-            is_full_screen: true,
-            informed_stations_string: "Oak Grove"
-          },
-          expected_common_data
-        ),
-        struct(
-          %ReconstructedAlertWidget{
-            alert: %Alert{
               id: "2",
               effect: :station_closure,
               informed_entities: [ie(stop: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             informed_stations_string: "Malden Center"
+          },
+          expected_common_data
+        ),
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "3",
+              effect: :delay,
+              informed_entities: [ie(stop: "place-ogmnl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            is_full_screen: false,
+            informed_stations_string: "Oak Grove"
           },
           expected_common_data
         )
@@ -449,23 +449,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         struct(
           %ReconstructedAlertWidget{
             alert: %Alert{
-              id: "3",
-              effect: :delay,
-              informed_entities: [ie(stop: "place-ogmnl")],
+              id: "2",
+              effect: :station_closure,
+              informed_entities: [ie(stop: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            },
-            is_full_screen: true
+            }
           },
           expected_common_data
         ),
         struct(
           %ReconstructedAlertWidget{
             alert: %Alert{
-              id: "2",
-              effect: :station_closure,
-              informed_entities: [ie(stop: "place-mlmnl")],
+              id: "3",
+              effect: :delay,
+              informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            }
+            },
+            is_full_screen: false
           },
           expected_common_data
         )

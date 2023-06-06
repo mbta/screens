@@ -45,28 +45,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       relevant_alerts = relevant_alerts(alerts, location_context, now)
       is_terminal_station = is_terminal?(stop_id, location_context.stop_sequences)
 
-      immediate_disruptions =
-        Enum.filter(
-          relevant_alerts,
-          &(LocalizedAlert.location(%{alert: &1, location_context: location_context}) in [
-              :inside,
-              :boundary_upstream,
-              :boundary_downstream
-            ])
-        )
-
-      downstream_disruptions =
-        Enum.filter(
-          relevant_alerts,
-          &(LocalizedAlert.location(%{alert: &1, location_context: location_context}) in [
-              :downstream,
-              :upstream
-            ] and
-              (&1.effect != :delay or &1.severity >= 7))
-        )
-
-      moderate_delays =
-        Enum.filter(relevant_alerts, &(&1.effect == :delay and &1.severity in 5..6))
+      immediate_disruptions = get_immediate_disruptions(relevant_alerts, location_context)
+      downstream_disruptions = get_downstream_disruptions(relevant_alerts, location_context)
+      moderate_delays = get_moderate_disruptions(relevant_alerts)
 
       common_parameters = [
         config: config,
@@ -106,6 +87,43 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     else
       :error -> []
     end
+  end
+
+  defp get_immediate_disruptions(relevant_alerts, location_context) do
+    Enum.filter(
+      relevant_alerts,
+      fn
+        %{effect: :delay} ->
+          false
+
+        alert ->
+          LocalizedAlert.location(%{alert: alert, location_context: location_context}) in [
+            :inside,
+            :boundary_upstream,
+            :boundary_downstream
+          ]
+      end
+    )
+  end
+
+  defp get_downstream_disruptions(relevant_alerts, location_context) do
+    Enum.filter(
+      relevant_alerts,
+      fn
+        %{effect: :delay} = alert ->
+          alert.severity >= 7
+
+        alert ->
+          LocalizedAlert.location(%{alert: alert, location_context: location_context}) in [
+            :downstream,
+            :upstream
+          ]
+      end
+    )
+  end
+
+  defp get_moderate_disruptions(relevant_alerts) do
+    Enum.filter(relevant_alerts, &(&1.effect == :delay and &1.severity in 5..6))
   end
 
   defp create_alert_instances(
