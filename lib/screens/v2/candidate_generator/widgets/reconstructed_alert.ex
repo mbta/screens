@@ -23,6 +23,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     "place-lech"
   ]
 
+  @gl_trunk_stop_ids [
+    "place-unsqu",
+    "place-lech",
+    "place-spmnl",
+    "place-north",
+    "place-haecl",
+    "place-gover",
+    "place-pktrm",
+    "place-boyls",
+    "place-armnl",
+    "place-coecl",
+    "place-hymnl",
+    "place-kencl"
+  ]
+
   @default_distance 99
 
   @type stop_id :: String.t()
@@ -160,7 +175,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       distance =
         ies
         |> Enum.filter(&String.starts_with?(&1.stop, "place-"))
-        |> Enum.map(&get_distance(home_stop_distance_map, &1))
+        |> Enum.map(&get_distance(stop_id, home_stop_distance_map, &1))
         |> Enum.min()
 
       {alert, distance}
@@ -186,17 +201,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   end
 
   # Default to 99 if stop_id is not in distance map.
-  @spec get_distance(home_stop_distance_map(), Alert.informed_entity()) :: distance()
-  defp get_distance(home_stop_distance_map, informed_entity)
+  @spec get_distance(stop_id(), home_stop_distance_map(), Alert.informed_entity()) :: distance()
+  defp get_distance(home_stop_id, home_stop_distance_map, informed_entity)
 
-  defp get_distance(home_stop_distance_map, %{route: "Green" <> _, stop: stop_id})
-       when stop_id in @gl_eastbound_split_stops,
+  defp get_distance(home_stop_id, home_stop_distance_map, %{route: "Green" <> _, stop: ie_stop_id})
+       when home_stop_id in @gl_trunk_stop_ids and ie_stop_id in @gl_eastbound_split_stops,
        do: Map.get(home_stop_distance_map, "place-lech", @default_distance)
 
-  defp get_distance(home_stop_distance_map, %{route: "Green" <> _}),
-    do: Map.get(home_stop_distance_map, "place-kencl", @default_distance)
+  defp get_distance(home_stop_id, home_stop_distance_map, %{route: "Green" <> _})
+       when home_stop_id in @gl_trunk_stop_ids,
+       do: Map.get(home_stop_distance_map, "place-kencl", @default_distance)
 
-  defp get_distance(home_stop_distance_map, %{stop: stop_id}),
+  defp get_distance(_, home_stop_distance_map, %{stop: stop_id}),
     do: Map.get(home_stop_distance_map, stop_id, @default_distance)
 
   defp relevant_alerts(alerts, location_context, now) do
