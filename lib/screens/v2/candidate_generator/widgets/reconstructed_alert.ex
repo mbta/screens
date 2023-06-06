@@ -130,7 +130,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       relevant_alerts,
       fn
         %{effect: :delay} = alert ->
-          alert.severity >= 7
+          get_severity_level(alert.severity) == :severe
 
         alert ->
           LocalizedAlert.location(%{alert: alert, location_context: location_context}) in [
@@ -142,7 +142,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   end
 
   defp get_moderate_disruptions(relevant_alerts) do
-    Enum.filter(relevant_alerts, &(&1.effect == :delay and &1.severity in 5..6))
+    Enum.filter(
+      relevant_alerts,
+      &(&1.effect == :delay and get_severity_level(&1.severity) == :moderate)
+    )
   end
 
   defp create_alert_instances(
@@ -258,7 +261,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   defp relevant_boundary_alert?(_), do: true
 
   defp relevant_delay?(%{alert: %Alert{severity: severity}} = reconstructed_alert) do
-    severity > 3 and relevant_direction?(reconstructed_alert)
+    get_severity_level(severity) != :low and relevant_direction?(reconstructed_alert)
   end
 
   # This function assumes that stop_sequences is ordered by direction north/east -> south/west.
@@ -339,5 +342,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     Enum.all?(stop_sequences, fn stop_sequence ->
       List.first(stop_sequence) == stop_id or List.last(stop_sequence) == stop_id
     end)
+  end
+
+  defp get_severity_level(severity) do
+    cond do
+      severity < 5 -> :low
+      severity < 7 -> :moderate
+      true -> :severe
+    end
   end
 end
