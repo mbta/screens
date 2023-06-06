@@ -42,7 +42,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, stop_id, now),
          route_ids <- Route.route_ids(location_context.routes),
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
-      relevant_alerts = relevant_alerts(alerts, config, location_context, now)
+      relevant_alerts = relevant_alerts(alerts, location_context, now)
       is_terminal_station = is_terminal?(stop_id, location_context.stop_sequences)
 
       immediate_disruptions =
@@ -174,15 +174,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   defp get_distance(home_stop_distance_map, %{stop: stop_id}),
     do: Map.get(home_stop_distance_map, stop_id, @default_distance)
 
-  defp relevant_alerts(alerts, config, location_context, now) do
+  defp relevant_alerts(alerts, location_context, now) do
     Enum.filter(alerts, fn %Alert{effect: effect} = alert ->
-      reconstructed_alert = %ReconstructedAlert{
-        screen: config,
-        alert: alert,
-        location_context: location_context,
-        now: now,
-        informed_stations_string: "A Station"
-      }
+      reconstructed_alert = %{alert: alert, location_context: location_context}
 
       relevant_effect?(effect) and relevant_location?(reconstructed_alert) and
         Alert.happening_now?(alert, now)
@@ -209,35 +203,27 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     end
   end
 
-  defp relevant_inside_alert?(
-         %ReconstructedAlert{alert: %Alert{effect: :delay}} = reconstructed_alert
-       ),
-       do: relevant_delay?(reconstructed_alert)
+  defp relevant_inside_alert?(%{alert: %Alert{effect: :delay}} = reconstructed_alert),
+    do: relevant_delay?(reconstructed_alert)
 
   defp relevant_inside_alert?(_), do: true
 
-  defp relevant_boundary_alert?(%ReconstructedAlert{alert: %Alert{effect: :station_closure}}),
+  defp relevant_boundary_alert?(%{alert: %Alert{effect: :station_closure}}),
     do: false
 
-  defp relevant_boundary_alert?(
-         %ReconstructedAlert{
-           alert: %Alert{effect: :delay}
-         } = reconstructed_alert
-       ),
-       do: relevant_delay?(reconstructed_alert)
+  defp relevant_boundary_alert?(%{alert: %Alert{effect: :delay}} = reconstructed_alert),
+    do: relevant_delay?(reconstructed_alert)
 
   defp relevant_boundary_alert?(_), do: true
 
-  defp relevant_delay?(
-         %ReconstructedAlert{alert: %Alert{severity: severity}} = reconstructed_alert
-       ) do
+  defp relevant_delay?(%{alert: %Alert{severity: severity}} = reconstructed_alert) do
     severity > 3 and relevant_direction?(reconstructed_alert)
   end
 
   # This function assumes that stop_sequences is ordered by direction north/east -> south/west.
   # If the current station's stop_id is the first or last entry in all stop_sequences,
   # it is a terminal station. Delay alerts heading in the direction of the station are not relevant.
-  defp relevant_direction?(%ReconstructedAlert{
+  defp relevant_direction?(%{
          alert: alert,
          location_context: %{home_stop: stop_id, stop_sequences: stop_sequences}
        }) do
