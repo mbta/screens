@@ -176,8 +176,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       # Convert negative distances to positive, and put into a map.
       |> Map.new(fn {stop, d} -> {stop, abs(d)} end)
       # Merge with the distances recorded from previous stop sequences.
-      # If a stop already has a distance recorded, we use the smaller of the two. <-- *** Unsure if this is always what we'd want to do! ***
-      |> Map.merge(distances_by_stop, fn _stop, d1, d2 -> min(d1, d2) end)
+      # If a stop already has a distance recorded, the distances should be the same. Use the first one.
+      |> Map.merge(distances_by_stop, fn _stop, d1, _d2 -> d1 end)
     end)
   end
 
