@@ -15,7 +15,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             now: nil,
             location_context: nil,
             informed_stations_string: nil,
-            is_terminal_station: false
+            is_terminal_station: false,
+            is_full_screen: false
 
   @type stop_id :: String.t()
 
@@ -27,7 +28,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           now: DateTime.t(),
           location_context: LocationContext.t(),
           informed_stations_string: String.t(),
-          is_terminal_station: boolean()
+          is_terminal_station: boolean(),
+          is_full_screen: boolean()
         }
 
   @route_directions %{
@@ -81,13 +83,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     )
   end
 
-  def takeover_alert?(
-        %{
-          screen: %Screen{app_id: :pre_fare_v2},
-          is_terminal_station: is_terminal_station,
-          alert: alert
-        } = t
-      ) do
+  def takeover_alert?(%__MODULE__{is_full_screen: false}), do: false
+
+  def takeover_alert?(%__MODULE__{is_terminal_station: is_terminal_station, alert: alert} = t) do
     Alert.effect(alert) in [:station_closure, :suspension, :shuttle] and
       LocalizedAlert.location(t, is_terminal_station) == :inside and
       LocalizedAlert.informs_all_active_routes_at_home_stop?(t)
