@@ -637,14 +637,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if takeover_alert?(t), do: [1], else: [3]
   end
 
+  def slot_names(%__MODULE__{is_full_screen: false}), do: [:large]
+
   def slot_names(%__MODULE__{} = t) do
-    if takeover_alert?(t), do: [:full_body], else: [:large]
+    if takeover_alert?(t),
+      do: [:full_body],
+      else: [:paged_main_content_left]
   end
+
+  def widget_type(%__MODULE__{is_full_screen: false}), do: [:reconstructed_large_alert]
 
   def widget_type(%__MODULE__{} = t) do
     if takeover_alert?(t),
       do: :reconstructed_takeover,
-      else: :reconstructed_large_alert
+      else: :reconstructed_full_body_alert
   end
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
