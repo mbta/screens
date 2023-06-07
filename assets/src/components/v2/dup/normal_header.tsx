@@ -2,6 +2,7 @@ import React from "react";
 
 import DefaultNormalHeader, { Icon } from "Components/v2/normal_header";
 import { DUP_VERSION } from "Components/v2/dup/version";
+import useOutfrontPlayerName from "Hooks/use_outfront_player_name";
 
 interface NormalHeaderProps {
   text: string;
@@ -18,9 +19,11 @@ const NormalHeader = ({
   accentPattern,
   code,
 }: NormalHeaderProps) => {
+  const playerName = useOutfrontPlayerName();
+
   return (
     <DefaultNormalHeader
-      icon={color === 'yellow' ? Icon.logo_negative : Icon.logo}
+      icon={color === "yellow" ? Icon.logo_negative : Icon.logo}
       text={text}
       time={time}
       // Currently, we don't use different codes that populating this would be useful...
@@ -30,6 +33,7 @@ const NormalHeader = ({
       showTo={false}
       classModifiers={color}
       accentPattern={accentPattern}
+      playerName={playerName}
     />
   );
 };

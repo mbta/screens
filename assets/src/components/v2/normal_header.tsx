@@ -15,7 +15,7 @@ enum Icon {
   green_d = "green_d",
   green_e = "green_e",
   logo = "logo",
-  logo_negative = "logo_negative"
+  logo_negative = "logo_negative",
 }
 
 enum TitleSize {
@@ -29,7 +29,7 @@ const ICON_TO_SRC: Record<Icon, string> = {
   green_d: "GL-D.svg",
   green_e: "GL-E.svg",
   logo: "logo-white.svg",
-  logo_negative: "logo-black.svg"
+  logo_negative: "logo-black.svg",
 };
 
 const abbreviateText = (text: string) => {
@@ -123,12 +123,15 @@ const NormalHeaderUpdated = () => {
 
 interface NormalHeaderVersionProps {
   version: string;
+  playerName?: string;
 }
 
 const NormalHeaderVersion: ComponentType<NormalHeaderVersionProps> = ({
   version,
+  playerName,
 }) => {
-  return <div className="normal-header-version">{version}</div>;
+  const text = version + (playerName ? `-${playerName}` : "");
+  return <div className="normal-header-version">{text}</div>;
 };
 
 const NormalHeaderAccent = ({
@@ -155,6 +158,7 @@ interface Props {
   fullName?: boolean;
   classModifiers?: string;
   accentPattern?: string;
+  playerName?: string;
 }
 
 const NormalHeader: ComponentType<Props> = ({
@@ -168,6 +172,7 @@ const NormalHeader: ComponentType<Props> = ({
   fullName = false,
   classModifiers,
   accentPattern,
+  playerName,
 }) => {
   const { ref: headerRef, size: headerSize } = useTextResizer({
     sizes: Object.keys(TitleSize),
@@ -185,7 +190,9 @@ const NormalHeader: ComponentType<Props> = ({
         fullName={fullName}
       />
       {time && <NormalHeaderTime time={time} />}
-      {version && <NormalHeaderVersion version={version} />}
+      {version && (
+        <NormalHeaderVersion version={version} playerName={playerName} />
+      )}
       {showUpdated && <NormalHeaderUpdated />}
       {accentPattern && (
         <NormalHeaderAccent accentPatternFile={accentPattern} />
