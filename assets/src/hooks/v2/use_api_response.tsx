@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { getDataset, getDatasetValue } from "Util/dataset";
 import { getScreenSide, isDup, isRealScreen } from "Util/util";
 import * as SentryLogger from "Util/sentry";
+import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -163,7 +164,7 @@ const useBaseApiResponse = ({
   let apiPath = `/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}`;
 
   if (isDup()) {
-    apiPath = "https://screens.mbta.com" + apiPath;
+    apiPath = `https://screens.mbta.com${apiPath}&rotation_index=${ROTATION_INDEX}`;
   }
 
   if (screenIdsWithOffsetMap) {
