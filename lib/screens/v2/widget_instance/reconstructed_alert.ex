@@ -32,6 +32,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           is_full_screen: boolean()
         }
 
+  @type serialized_response :: %{
+          issue: String.t(),
+          remedy: String.t(),
+          location: String.t(),
+          cause: String.t(),
+          routes: list(map()),
+          effect: :suspension | :shuttle | :station_closure | :delay,
+          urgent: boolean()
+        }
+
   @route_directions %{
     "Blue" => ["Bowdoin", "Wonderland"],
     "Orange" => ["Forest Hills", "Oak Grove"],
@@ -90,6 +100,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       LocalizedAlert.location(t, is_terminal_station) == :inside and
       LocalizedAlert.informs_all_active_routes_at_home_stop?(t)
   end
+
+  @spec serialize_takeover_alert(t()) :: serialized_response()
+  defp serialize_takeover_alert(t)
 
   defp serialize_takeover_alert(
          %__MODULE__{
@@ -185,6 +198,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       urgent: true
     }
   end
+
+  @spec serialize_inside_flex_alert(t()) :: serialized_response()
+  defp serialize_inside_flex_alert(t)
 
   defp serialize_inside_flex_alert(
          %__MODULE__{
@@ -304,6 +320,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
+  @spec serialize_inside_alert(t()) :: serialized_response()
   defp serialize_inside_alert(%__MODULE__{} = t) do
     if takeover_alert?(t) do
       serialize_takeover_alert(t)
@@ -311,6 +328,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       serialize_inside_flex_alert(t)
     end
   end
+
+  @spec serialize_boundary_alert(t()) :: serialized_response()
+  defp serialize_boundary_alert(t)
 
   defp serialize_boundary_alert(
          %__MODULE__{
@@ -462,6 +482,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :delay}}), do: nil
+
+  @spec serialize_outside_alert(t()) :: serialized_response()
+  defp serialize_outside_alert(t)
 
   defp serialize_outside_alert(
          %__MODULE__{alert: %Alert{effect: :suspension, cause: cause, header: header} = alert} = t
