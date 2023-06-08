@@ -229,15 +229,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     [route_id] = LocalizedAlert.informed_subway_routes(t)
     endpoint_text = get_endpoints(informed_entities, route_id)
 
-    headsign =
-      @route_directions
-      |> Map.get(route_id)
-      |> Enum.at(direction_id)
-
     issue =
-      if is_nil(headsign) do
+      if is_nil(direction_id) do
         "No trains"
       else
+        headsign =
+          @route_directions
+          |> Map.get(route_id)
+          |> Enum.at(direction_id)
+
         "No trains to #{headsign}"
       end
 
@@ -267,15 +267,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     [route_id] = LocalizedAlert.informed_subway_routes(t)
     endpoint_text = get_endpoints(informed_entities, route_id)
 
-    headsign =
-      @route_directions
-      |> Map.get(route_id)
-      |> Enum.at(direction_id)
-
     issue =
-      if is_nil(headsign) do
+      if is_nil(direction_id) do
         "No trains"
       else
+        headsign =
+          @route_directions
+          |> Map.get(route_id)
+          |> Enum.at(direction_id)
+
         "No trains to #{headsign}"
       end
 
