@@ -99,7 +99,8 @@ defmodule Screens.Alerts.Alert do
   @type informed_entity :: %{
           stop: String.t() | nil,
           route: String.t() | nil,
-          route_type: non_neg_integer() | nil
+          route_type: non_neg_integer() | nil,
+          direction_id: 0 | 1 | nil
         }
 
   @type t :: %__MODULE__{

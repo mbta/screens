@@ -131,21 +131,22 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     Map.merge(route, %{color: Route.get_color_for_route(route_id)})
   end
 
-  def serialize_route_for_reconstructed_alert(route_id_group, opts \\ %{})
+  def serialize_route_for_reconstructed_alert(route_id_direction_id_group, opts \\ %{})
 
-  def serialize_route_for_reconstructed_alert({"Green", branches}, opts)
+  def serialize_route_for_reconstructed_alert({{"Green", direction_id}, branches}, opts)
       when branches != ["Green"] do
     route = do_serialize("Green", opts)
 
     Map.merge(route, %{
       color: :green,
+      direction_id: direction_id,
       branches: Enum.map(branches, fn "Green-" <> branch -> branch end)
     })
   end
 
-  def serialize_route_for_reconstructed_alert({route_id, _}, opts) do
+  def serialize_route_for_reconstructed_alert({{route_id, direction_id}, _}, opts) do
     route = do_serialize(route_id, opts)
-    Map.merge(route, %{color: Route.get_color_for_route(route_id)})
+    Map.merge(route, %{color: Route.get_color_for_route(route_id), direction_id: direction_id})
   end
 
   def serialize_icon(icon) do
