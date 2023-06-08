@@ -204,6 +204,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   end
 
   # Default to 99 if stop_id is not in distance map.
+  # Stops will not be present in the map if informed_entity and home stop are on different branches.
+  # i.e. Braintree is not present in Ashmont stop_sequences, but is still a relevant alert.
   @spec get_distance(stop_id(), home_stop_distance_map(), Alert.informed_entity()) :: distance()
   defp get_distance(home_stop_id, home_stop_distance_map, informed_entity)
 
