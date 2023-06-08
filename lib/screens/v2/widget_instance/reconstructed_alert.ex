@@ -665,10 +665,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp format_updated_at(updated_at, now) do
-    if DateTime.compare(updated_at, now) == :lt do
+    if Date.compare(updated_at, now) == :lt do
       Timex.format!(updated_at, "{M}/{D}/{YY}")
     else
-      Timex.format!(updated_at, "{WDfull}, {h12}:{m}")
+      Timex.format!(updated_at, "{WDfull}, {h12}:{m} {am}")
     end
   end
 
