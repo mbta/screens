@@ -213,8 +213,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
        when home_stop_id in @gl_trunk_stop_ids and ie_stop_id in @gl_eastbound_split_stops,
        do: Map.get(home_stop_distance_map, "place-lech", @default_distance)
 
-  defp get_distance(home_stop_id, home_stop_distance_map, %{route: "Green" <> _})
-       when home_stop_id in @gl_trunk_stop_ids,
+  defp get_distance(home_stop_id, home_stop_distance_map, %{route: "Green" <> _, stop: ie_stop_id})
+       when home_stop_id in @gl_trunk_stop_ids and ie_stop_id not in @gl_trunk_stop_ids,
        do: Map.get(home_stop_distance_map, "place-kencl", @default_distance)
 
   defp get_distance(_, home_stop_distance_map, %{stop: stop_id}),
