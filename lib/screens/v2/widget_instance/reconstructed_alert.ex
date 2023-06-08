@@ -209,23 +209,39 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  @spec serialize_inside_flex_alert(t()) :: serialized_response()
-  defp serialize_inside_flex_alert(t)
+  @spec serialize_fullscreen_alert(t()) :: serialized_response()
+  defp serialize_fullscreen_alert(t)
 
-  defp serialize_inside_flex_alert(%__MODULE__{
-         alert:
-           %Alert{
-             effect: :suspension,
-             cause: cause,
-             updated_at: updated_at
-           } = alert,
-         now: now
-       }) do
+  defp serialize_fullscreen_alert(
+         %__MODULE__{
+           alert:
+             %Alert{
+               effect: :suspension,
+               cause: cause,
+               updated_at: updated_at
+             } = alert,
+           now: now
+         } = t
+       ) do
     informed_entities = Alert.informed_entities(alert)
     cause_text = Alert.get_cause_string(cause)
+    direction_id = Alert.direction_id(alert)
+    [route_id] = LocalizedAlert.informed_subway_routes(t)
+
+    headsign =
+      @route_directions
+      |> Map.get(route_id)
+      |> Enum.at(direction_id)
+
+    issue =
+      if is_nil(headsign) do
+        "No trains"
+      else
+        "No trains to #{headsign}"
+      end
 
     %{
-      issue: "No trains",
+      issue: issue,
       remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
@@ -236,7 +252,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_inside_flex_alert(%__MODULE__{
+  defp serialize_fullscreen_alert(%__MODULE__{
          alert: %Alert{effect: :shuttle, cause: cause, updated_at: updated_at} = alert,
          now: now
        }) do
@@ -255,7 +271,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_inside_flex_alert(
+  defp serialize_fullscreen_alert(
          %__MODULE__{
            alert: %Alert{effect: :station_closure, cause: cause, updated_at: updated_at} = alert,
            now: now
@@ -283,40 +299,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_inside_flex_alert(%__MODULE__{
-         alert:
-           %Alert{
-             effect: :delay,
-             severity: severity,
-             header: header,
-             updated_at: updated_at
-           } = alert,
-         now: now
-       })
-       when severity > 3 and severity < 7 do
-    informed_entities = Alert.informed_entities(alert)
-
-    %{
-      issue: header,
-      remedy: "",
-      location: "",
-      cause: "",
-      routes: get_route_pills(informed_entities),
-      effect: :delay,
-      urgent: false,
-      updated_at: format_updated_at(updated_at, now)
-    }
-  end
-
-  defp serialize_inside_flex_alert(
+  defp serialize_fullscreen_alert(
          %__MODULE__{
            alert:
              %Alert{effect: :delay, cause: cause, severity: severity, updated_at: updated_at} =
                alert,
            now: now
          } = t
-       )
-       when severity >= 7 do
+       ) do
     informed_entities = Alert.informed_entities(alert)
     cause_text = Alert.get_cause_string(cause)
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
@@ -347,15 +337,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       urgent: true,
       updated_at: format_updated_at(updated_at, now)
     }
-  end
-
-  @spec serialize_inside_alert(t()) :: serialized_response()
-  defp serialize_inside_alert(%__MODULE__{} = t) do
-    if takeover_alert?(t) do
-      serialize_takeover_alert(t)
-    else
-      serialize_inside_flex_alert(t)
-    end
   end
 
   @spec serialize_boundary_alert(t()) :: serialized_response()
@@ -723,11 +704,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  def serialize(%__MODULE__{is_full_screen: true} = t) do
+    if takeover_alert?(t) do
+      serialize_takeover_alert(t)
+    else
+      serialize_fullscreen_alert(t)
+    end
+  end
+
   def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
     case LocalizedAlert.location(t, is_terminal_station) do
-      :inside ->
-        t |> serialize_inside_alert() |> Map.put(:region, :inside)
-
       location when location in [:boundary_upstream, :boundary_downstream] ->
         t |> serialize_boundary_alert() |> Map.put(:region, :boundary)
 
