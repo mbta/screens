@@ -227,6 +227,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     cause_text = Alert.get_cause_string(cause)
     direction_id = Alert.direction_id(alert)
     [route_id] = LocalizedAlert.informed_subway_routes(t)
+    endpoint_text = get_endpoints(informed_entities, route_id)
 
     headsign =
       @route_directions
@@ -240,10 +241,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         "No trains to #{headsign}"
       end
 
+    location_text = if is_nil(endpoint_text), do: "", else: "Shuttle buses #{endpoint_text}"
+
     %{
       issue: issue,
       remedy: "Seek alternate route",
-      location: "",
+      location: location_text,
       cause: cause_text,
       routes: get_route_pills(informed_entities),
       effect: :suspension,
@@ -252,17 +255,36 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_fullscreen_alert(%__MODULE__{
-         alert: %Alert{effect: :shuttle, cause: cause, updated_at: updated_at} = alert,
-         now: now
-       }) do
+  defp serialize_fullscreen_alert(
+         %__MODULE__{
+           alert: %Alert{effect: :shuttle, cause: cause, updated_at: updated_at} = alert,
+           now: now
+         } = t
+       ) do
     informed_entities = Alert.informed_entities(alert)
     cause_text = Alert.get_cause_string(cause)
+    direction_id = Alert.direction_id(alert)
+    [route_id] = LocalizedAlert.informed_subway_routes(t)
+    endpoint_text = get_endpoints(informed_entities, route_id)
+
+    headsign =
+      @route_directions
+      |> Map.get(route_id)
+      |> Enum.at(direction_id)
+
+    issue =
+      if is_nil(headsign) do
+        "No trains"
+      else
+        "No trains to #{headsign}"
+      end
+
+    location_text = if is_nil(endpoint_text), do: "", else: "Shuttle buses #{endpoint_text}"
 
     %{
-      issue: "No trains",
+      issue: issue,
       remedy: "Use shuttle bus",
-      location: "",
+      location: location_text,
       cause: cause_text,
       routes: get_route_pills(informed_entities),
       effect: :shuttle,
@@ -271,24 +293,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_fullscreen_alert(
-         %__MODULE__{
-           alert: %Alert{effect: :station_closure, cause: cause, updated_at: updated_at} = alert,
-           now: now
-         } = t
-       ) do
+  defp serialize_fullscreen_alert(%__MODULE__{
+         alert: %Alert{effect: :station_closure, cause: cause, updated_at: updated_at} = alert,
+         informed_stations_string: informed_stations_string,
+         now: now
+       }) do
     informed_entities = Alert.informed_entities(alert)
-    affected_routes = LocalizedAlert.informed_subway_routes(t)
     cause_text = Alert.get_cause_string(cause)
 
-    line =
-      case affected_routes do
-        ["Green-" <> branch | _] -> "Green Line #{branch} branch"
-        [affected_line | _] -> "#{affected_line} line"
-      end
-
     %{
-      issue: "#{line} platform closed",
+      issue: "Trains skip #{informed_stations_string}",
       remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
