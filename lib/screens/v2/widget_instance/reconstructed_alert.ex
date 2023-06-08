@@ -115,32 +115,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        ) do
     informed_entities = Alert.informed_entities(alert)
-    affected_routes = LocalizedAlert.informed_subway_routes(t)
     cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
-
-    location_text = get_endpoints(informed_entities, hd(affected_routes))
-
-    issue = %FreeTextLine{
-      icon: nil,
-      text:
-        ["No"] ++
-          (affected_routes
-           |> Enum.map(fn route ->
-             %{
-               route:
-                 route
-                 |> String.replace("-", "_")
-                 |> String.downcase()
-             }
-           end)
-           |> Enum.to_list()) ++
-          ["trains"]
-    }
+    [route_id] = LocalizedAlert.informed_subway_routes(t)
+    endpoint_text = get_endpoints(informed_entities, route_id)
 
     %{
-      issue: FreeTextLine.to_json(issue),
+      issue: "No trains",
       remedy: "Seek alternate route",
-      location: location_text,
+      location: "No #{route_id} Line trains #{endpoint_text}",
       cause: cause_text,
       routes: get_route_pills(informed_entities),
       effect: :suspension,
@@ -156,32 +138,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        ) do
     informed_entities = Alert.informed_entities(alert)
-    affected_routes = LocalizedAlert.informed_subway_routes(t)
     cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
-
-    location_text = get_endpoints(informed_entities, hd(affected_routes))
-
-    issue = %FreeTextLine{
-      icon: nil,
-      text:
-        ["No"] ++
-          (affected_routes
-           |> Enum.map(fn route ->
-             %{
-               route:
-                 route
-                 |> String.replace("-", "_")
-                 |> String.downcase()
-             }
-           end)
-           |> Enum.to_list()) ++
-          ["trains"]
-    }
+    [route_id] = LocalizedAlert.informed_subway_routes(t)
+    endpoint_text = get_endpoints(informed_entities, route_id)
 
     %{
-      issue: FreeTextLine.to_json(issue),
+      issue: "No trains",
       remedy: "Use shuttle bus",
-      location: location_text,
+      location: "Shuttle buses replace #{route_id} trains #{endpoint_text}",
       cause: cause_text,
       routes: get_route_pills(informed_entities),
       effect: :shuttle,
@@ -192,15 +156,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp serialize_takeover_alert(%__MODULE__{
          alert: %Alert{effect: :station_closure, cause: cause, updated_at: updated_at} = alert,
+         informed_stations_string: informed_stations_string,
          now: now
        }) do
     informed_entities = Alert.informed_entities(alert)
     cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
 
     %{
-      issue: "Station Closed",
+      issue: "Station closed",
       remedy: "Seek alternate route",
-      location: "",
+      location: "Trains skip #{informed_stations_string}",
       cause: cause_text,
       routes: get_route_pills(informed_entities),
       effect: :station_closure,
