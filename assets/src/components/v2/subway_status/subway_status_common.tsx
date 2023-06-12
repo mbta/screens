@@ -145,8 +145,8 @@ enum FittingStep {
   FullSize,
 }
 
-export const useSubwayStatusTextResizer = (rowHeight, id, status) => {
-  const { ref, size: fittingStep } = useTextResizer({
+export const useSubwayStatusTextResizer = (rowHeight: number, id: string, status: string) => {
+  const { ref, size: fittingStep, isDone } = useTextResizer({
     sizes: [
       FittingStep.PerAlertEffect,
       FittingStep.Abbrev,
@@ -182,5 +182,5 @@ export const useSubwayStatusTextResizer = (rowHeight, id, status) => {
       }
   }
 
-  return { ref, abbrev, truncateStatus, replaceLocationWithUrl, fittingStep };
+  return { ref, abbrev, truncateStatus, replaceLocationWithUrl, fittingStep, isDone };
 };
