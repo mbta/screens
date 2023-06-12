@@ -310,8 +310,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_fullscreen_alert(
          %__MODULE__{
            alert:
-             %Alert{effect: :delay, cause: cause, severity: severity, updated_at: updated_at} =
-               alert,
+             %Alert{
+               effect: :delay,
+               cause: cause,
+               severity: severity,
+               updated_at: updated_at,
+               header: header
+             } = alert,
            now: now
          } = t
        ) do
@@ -338,12 +343,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: issue,
-      remedy: "",
+      remedy: header,
       location: "",
       cause: cause_text,
       routes: get_route_pills(informed_entities, affected_routes, true),
-      effect: :severe_delay,
-      urgent: true,
+      effect: :delay,
       updated_at: format_updated_at(updated_at, now)
     }
   end
