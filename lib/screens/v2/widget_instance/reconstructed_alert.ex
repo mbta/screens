@@ -32,13 +32,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         }
 
   @type serialized_response :: %{
+          optional(:urgent) => boolean(),
           issue: String.t(),
           remedy: String.t(),
           location: String.t(),
           cause: String.t(),
           routes: list(map()),
           effect: :suspension | :shuttle | :station_closure | :delay,
-          urgent: boolean(),
           updated_at: String.t()
         }
 
