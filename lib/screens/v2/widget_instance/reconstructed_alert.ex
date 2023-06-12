@@ -82,7 +82,23 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  defp get_route_pills(informed_entities, affected_routes) do
+  defp get_route_pills(informed_entities, affected_routes, is_full_screen \\ false)
+
+  defp get_route_pills(informed_entities, affected_routes, false) do
+    informed_entities
+    |> Enum.filter(&(&1.route_type in [0, 1]))
+    |> Enum.group_by(fn
+      %{route: "Green" <> _} -> "Green"
+      %{route: route} -> route
+    end)
+    |> Enum.map(
+      &RoutePill.serialize_route_for_reconstructed_alert(&1, %{
+        large: length(affected_routes) == 1
+      })
+    )
+  end
+
+  defp get_route_pills(informed_entities, _affected_routes, true) do
     informed_entities
     |> Enum.filter(&(&1.route_type in [0, 1]))
     |> Enum.group_by(fn
@@ -91,9 +107,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end)
     |> Enum.map(fn
       {{route_id, nil}, _} ->
-        RoutePill.serialize_route_for_reconstructed_alert(route_id, %{
-          large: length(affected_routes) == 1
-        })
+        RoutePill.serialize_route_for_reconstructed_alert(route_id)
 
       {{route_id, direction_id}, _} ->
         headsign =
@@ -102,7 +116,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           |> Enum.at(direction_id)
 
         RoutePill.serialize_route_for_reconstructed_alert(route_id, %{
-          large: length(informed_entities) == 1,
           headsign: headsign
         })
     end)
@@ -136,7 +149,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       remedy: "Seek alternate route",
       location: "No #{route_id} Line trains #{endpoint_text}",
       cause: cause_text,
-      routes: get_route_pills(informed_entities, affected_routes),
+      routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :suspension,
       urgent: true,
       updated_at: format_updated_at(updated_at, now)
@@ -160,7 +173,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       remedy: "Use shuttle bus",
       location: "Shuttle buses replace #{route_id} Line trains #{endpoint_text}",
       cause: cause_text,
-      routes: get_route_pills(informed_entities, affected_routes),
+      routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :shuttle,
       urgent: true,
       updated_at: format_updated_at(updated_at, now)
@@ -183,7 +196,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       remedy: "Seek alternate route",
       location: "Trains skip #{informed_stations_string}",
       cause: cause_text,
-      routes: get_route_pills(informed_entities, affected_routes),
+      routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :station_closure,
       urgent: true,
       updated_at: format_updated_at(updated_at, now)
@@ -230,7 +243,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       remedy: "Seek alternate route",
       location: location_text,
       cause: cause_text,
-      routes: get_route_pills(informed_entities, affected_routes),
+      routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :suspension,
       urgent: true,
       updated_at: format_updated_at(updated_at, now)
@@ -269,7 +282,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       remedy: "Use shuttle bus",
       location: location_text,
       cause: cause_text,
-      routes: get_route_pills(informed_entities, affected_routes),
+      routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :shuttle,
       urgent: true,
       updated_at: format_updated_at(updated_at, now)
@@ -292,7 +305,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
-      routes: get_route_pills(informed_entities, affected_routes),
+      routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :station_closure,
       urgent: true,
       updated_at: format_updated_at(updated_at, now)
@@ -333,7 +346,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       remedy: "",
       location: "",
       cause: cause_text,
-      routes: get_route_pills(informed_entities, affected_routes),
+      routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :severe_delay,
       urgent: true,
       updated_at: format_updated_at(updated_at, now)
