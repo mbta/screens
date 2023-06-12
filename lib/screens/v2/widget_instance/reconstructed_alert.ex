@@ -151,7 +151,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :suspension,
-      urgent: true,
       updated_at: format_updated_at(updated_at, now)
     }
   end
@@ -175,7 +174,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :shuttle,
-      urgent: true,
       updated_at: format_updated_at(updated_at, now)
     }
   end
@@ -198,7 +196,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :station_closure,
-      urgent: true,
       updated_at: format_updated_at(updated_at, now)
     }
   end
@@ -236,7 +233,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         "No trains to #{headsign}"
       end
 
-    location_text = if is_nil(endpoint_text), do: "", else: "Shuttle buses #{endpoint_text}"
+    location_text =
+      if is_nil(endpoint_text), do: "", else: "No #{route_id} Line trains #{endpoint_text}"
 
     %{
       issue: issue,
@@ -245,7 +243,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :suspension,
-      urgent: true,
       updated_at: format_updated_at(updated_at, now)
     }
   end
@@ -284,7 +281,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :shuttle,
-      urgent: true,
       updated_at: format_updated_at(updated_at, now)
     }
   end
@@ -307,7 +303,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: get_route_pills(informed_entities, affected_routes, true),
       effect: :station_closure,
-      urgent: true,
       updated_at: format_updated_at(updated_at, now)
     }
   end
