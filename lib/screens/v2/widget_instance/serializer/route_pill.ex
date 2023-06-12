@@ -131,22 +131,21 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     Map.merge(route, %{color: Route.get_color_for_route(route_id)})
   end
 
-  def serialize_route_for_reconstructed_alert(route_id_direction_id_group, opts \\ %{})
+  def serialize_route_for_reconstructed_alert(route_id, opts \\ %{})
 
-  def serialize_route_for_reconstructed_alert({{"Green", direction_id}, branches}, opts)
+  def serialize_route_for_reconstructed_alert({"Green", branches}, opts)
       when branches != ["Green"] do
-    route = do_serialize("Green", opts)
+    route = "Green" |> do_serialize(opts) |> append_headsign(opts)
 
     Map.merge(route, %{
       color: :green,
-      direction_id: direction_id,
       branches: Enum.map(branches, fn "Green-" <> branch -> branch end)
     })
   end
 
-  def serialize_route_for_reconstructed_alert({{route_id, direction_id}, _}, opts) do
-    route = do_serialize(route_id, opts)
-    Map.merge(route, %{color: Route.get_color_for_route(route_id), direction_id: direction_id})
+  def serialize_route_for_reconstructed_alert(route_id, opts) do
+    route = route_id |> do_serialize(opts) |> append_headsign(opts)
+    Map.merge(route, %{color: Route.get_color_for_route(route_id)})
   end
 
   def serialize_icon(icon) do
@@ -174,13 +173,14 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
            optional(:gl_long) => boolean(),
            optional(:cr_abbrev) => boolean(),
            optional(:route_name) => String.t(),
-           optional(:large) => boolean()
+           optional(:large) => boolean(),
+           optional(:headsign) => String.t()
          }
 
   @spec do_serialize(Route.id(), serialize_opts()) :: map()
   defp do_serialize(route_id, opts)
 
-  defp do_serialize(route, %{large: true}),
+  defp do_serialize(route, %{large: true, headsign: nil}),
     do: %{type: :text, text: String.upcase("#{route} line")}
 
   defp do_serialize("Red", _), do: %{type: :text, text: "RL"}
@@ -230,5 +230,15 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
       type: :text,
       text: if(route_name != "", do: route_name, else: route_id)
     }
+  end
+
+  defp append_headsign(%{type: :text, text: text} = pill, opts) do
+    headsign = Map.get(opts, :headsign)
+
+    if is_nil(headsign) do
+      pill
+    else
+      Map.merge(pill, %{text: "#{text} - #{headsign}"})
+    end
   end
 end
