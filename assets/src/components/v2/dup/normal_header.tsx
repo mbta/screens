@@ -21,11 +21,11 @@ const NormalHeader = ({
 }: NormalHeaderProps) => {
   const playerName = useOutfrontPlayerName();
   let version = DUP_VERSION;
-  if (code) {
-    version = `${version}; Maintenance code: ${code}`;
-  }
   if (playerName) {
     version = `${version}-${playerName}`;
+  }
+  if (code) {
+    version = `${version}; Maintenance code: ${code}`;
   }
 
   return (
