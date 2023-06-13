@@ -112,9 +112,9 @@ interface AlertWithID extends Alert {
  * When the text wraps to a second line it's more than that, which is all we care about to detect overflows.
  */
 const CONTRACTED_ALERT_MAX_HEIGHT = 80;
-const CONTRACTED_ALERT_FITTING_STEPS = [FittingStep.PerAlertEffect, FittingStep.Abbrev, FittingStep.FullSize];
-
 const EXTENDED_ALERT_MAX_HEIGHT = 120;
+
+const CONTRACTED_ALERT_FITTING_STEPS = [FittingStep.PerAlertEffect, FittingStep.Abbrev, FittingStep.FullSize];
 const EXTENDED_ALERT_FITTING_STEPS = [FittingStep.Abbrev, FittingStep.FullSize];
 
 const ALERTS_URL = "mbta.com/alerts";
