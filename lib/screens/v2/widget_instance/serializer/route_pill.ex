@@ -180,7 +180,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   @spec do_serialize(Route.id(), serialize_opts()) :: map()
   defp do_serialize(route_id, opts)
 
-  defp do_serialize(route, %{large: true, headsign: nil}),
+  defp do_serialize(route, %{large: true}),
     do: %{type: :text, text: String.upcase("#{route} line")}
 
   defp do_serialize("Red", _), do: %{type: :text, text: "RL"}
