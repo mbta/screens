@@ -42,6 +42,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           updated_at: String.t()
         }
 
+  @type region :: :inside | :boundary | :outside
+
   @route_directions %{
     "Blue" => ["Bowdoin", "Wonderland"],
     "Orange" => ["Forest Hills", "Oak Grove"],
@@ -199,8 +201,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  @spec serialize_fullscreen_alert(t()) :: serialized_response()
-  defp serialize_fullscreen_alert(t)
+  @spec serialize_fullscreen_alert(t(), region()) :: serialized_response()
+  defp serialize_fullscreen_alert(t, region)
 
   defp serialize_fullscreen_alert(
          %__MODULE__{
@@ -211,7 +213,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
                updated_at: updated_at
              } = alert,
            now: now
-         } = t
+         } = t,
+         _region
        ) do
     informed_entities = Alert.informed_entities(alert)
     affected_routes = LocalizedAlert.informed_subway_routes(t)
@@ -250,7 +253,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          %__MODULE__{
            alert: %Alert{effect: :shuttle, cause: cause, updated_at: updated_at} = alert,
            now: now
-         } = t
+         } = t,
+         _region
        ) do
     informed_entities = Alert.informed_entities(alert)
     affected_routes = LocalizedAlert.informed_subway_routes(t)
@@ -289,7 +293,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
            alert: %Alert{effect: :station_closure, cause: cause, updated_at: updated_at} = alert,
            informed_stations_string: informed_stations_string,
            now: now
-         } = t
+         } = t,
+         _region
        ) do
     informed_entities = Alert.informed_entities(alert)
     cause_text = Alert.get_cause_string(cause)
@@ -317,7 +322,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
                header: header
              } = alert,
            now: now
-         } = t
+         } = t,
+         _region
        ) do
     informed_entities = Alert.informed_entities(alert)
     affected_routes = LocalizedAlert.informed_subway_routes(t)
@@ -726,7 +732,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     if takeover_alert?(t) do
       serialize_takeover_alert(t)
     else
-      serialize_fullscreen_alert(t)
+      region =
+        case LocalizedAlert.location(t) do
+          :inside -> :inside
+          location when location in [:boundary_upstream, :boundary_downstream] -> :boundary
+          location when location in [:downstream, :upstream] -> :outside
+        end
+
+      serialize_fullscreen_alert(t, region)
     end
   end
 
