@@ -33,6 +33,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   @type alert :: %{
           optional(:route_pill) => route_pill(),
+          optional(:station_count) => integer(),
           status: String.t(),
           location: String.t() | location_map() | nil
         }
