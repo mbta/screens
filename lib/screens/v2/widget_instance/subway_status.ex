@@ -481,6 +481,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
       case {trunk_alerts, branch_alerts} do
         # If there are no alerts for the GL trunk, serialize any alerts on the branches
+        {[], [branch_alert]} ->
+          %{type: :extended, alert: serialize_green_line_branch_alerts([branch_alert], false)}
+
         {[], branch_alerts} ->
           %{type: :contracted, alerts: serialize_green_line_branch_alerts(branch_alerts, false)}
 
@@ -531,32 +534,34 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     }
   end
 
+  # One branch alert with trunk alerts
+  # Show the branch alert in a row under the trunk alert.
+  defp serialize_green_line_branch_alerts([branch_alert], true) do
+    Map.merge(
+      %{route_pill: serialize_gl_pill_with_branches(alert_routes(branch_alert))},
+      serialize_green_line_branch_alert(branch_alert, alert_routes(branch_alert))
+    )
+  end
+
+  # One branch alert, no trunk alerts
+  # Show the branch alert in a row under the trunk alert.
+  defp serialize_green_line_branch_alerts([branch_alert], false) do
+    route_ids = alert_routes(branch_alert)
+
+    Map.merge(
+      %{route_pill: serialize_gl_pill_with_branches(route_ids)},
+      serialize_alert(branch_alert, List.first(route_ids, "Green"))
+    )
+  end
+
   defp serialize_green_line_branch_alerts(branch_alerts, has_trunk_alert) do
     route_ids = Enum.flat_map(branch_alerts, &alert_routes/1)
     alert_count = length(branch_alerts)
 
     case {branch_alerts, has_trunk_alert} do
-      # Show the branch alert in a row under the trunk alert.
-      {[alert], true} ->
-        Map.merge(
-          %{route_pill: serialize_gl_pill_with_branches(alert_routes(alert))},
-          serialize_green_line_branch_alert(alert, alert_routes(alert))
-        )
-
       # Always consolidate 2+ branch alerts if there is a trunk alert
       {_alerts, true} ->
         serialize_alert_summary(alert_count, serialize_gl_pill_with_branches(route_ids))
-
-      # One branch alert, no trunk alerts
-      {[alert], false} ->
-        route_id = List.first(route_ids, "Green")
-
-        [
-          Map.merge(
-            %{route_pill: serialize_gl_pill_with_branches(route_ids)},
-            serialize_alert(alert, route_id)
-          )
-        ]
 
       # 2 branch alerts, no trunk alert
       {[alert1, alert2], false} ->
