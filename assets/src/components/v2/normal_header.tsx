@@ -15,7 +15,7 @@ enum Icon {
   green_d = "green_d",
   green_e = "green_e",
   logo = "logo",
-  logo_negative = "logo_negative"
+  logo_negative = "logo_negative",
 }
 
 enum TitleSize {
@@ -29,7 +29,7 @@ const ICON_TO_SRC: Record<Icon, string> = {
   green_d: "GL-D.svg",
   green_e: "GL-E.svg",
   logo: "logo-white.svg",
-  logo_negative: "logo-black.svg"
+  logo_negative: "logo-black.svg",
 };
 
 const abbreviateText = (text: string) => {
