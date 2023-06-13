@@ -101,12 +101,12 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
   describe "serialize_route_for_reconstructed_alert/1" do
     test "Returns RL for Red Line" do
       assert %{type: :text, text: "RL", color: :red} ==
-               serialize_route_for_reconstructed_alert({"Red", []})
+               serialize_route_for_reconstructed_alert("Red")
     end
 
     test "Returns RED LINE for large Red Line" do
       assert %{type: :text, text: "RED LINE", color: :red} ==
-               serialize_route_for_reconstructed_alert({"Red", []}, %{large: true})
+               serialize_route_for_reconstructed_alert("Red", %{large: true})
     end
 
     test "Includes branch list and text for Green Line" do
