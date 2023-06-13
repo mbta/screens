@@ -20,6 +20,13 @@ const NormalHeader = ({
   code,
 }: NormalHeaderProps) => {
   const playerName = useOutfrontPlayerName();
+  let version = DUP_VERSION;
+  if (code) {
+    version = `${version}; Maintenance code: ${code}`;
+  }
+  if (playerName) {
+    version = `${version}-${playerName}`;
+  }
 
   return (
     <DefaultNormalHeader
@@ -28,12 +35,11 @@ const NormalHeader = ({
       time={time}
       // Currently, we don't use different codes that populating this would be useful...
       // But this was a feature available in v1, so just set it up here.
-      version={DUP_VERSION + (code ? "; Maintenance code: " + code : "")}
+      version={version}
       maxHeight={208}
       showTo={false}
       classModifiers={color}
       accentPattern={accentPattern}
-      playerName={playerName}
     />
   );
 };

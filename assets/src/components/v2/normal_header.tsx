@@ -123,15 +123,12 @@ const NormalHeaderUpdated = () => {
 
 interface NormalHeaderVersionProps {
   version: string;
-  playerName?: string;
 }
 
 const NormalHeaderVersion: ComponentType<NormalHeaderVersionProps> = ({
   version,
-  playerName,
 }) => {
-  const text = version + (playerName ? `-${playerName}` : "");
-  return <div className="normal-header-version">{text}</div>;
+  return <div className="normal-header-version">{version}</div>;
 };
 
 const NormalHeaderAccent = ({
@@ -158,7 +155,6 @@ interface Props {
   fullName?: boolean;
   classModifiers?: string;
   accentPattern?: string;
-  playerName?: string;
 }
 
 const NormalHeader: ComponentType<Props> = ({
@@ -172,7 +168,6 @@ const NormalHeader: ComponentType<Props> = ({
   fullName = false,
   classModifiers,
   accentPattern,
-  playerName,
 }) => {
   const { ref: headerRef, size: headerSize } = useTextResizer({
     sizes: Object.keys(TitleSize),
@@ -190,9 +185,7 @@ const NormalHeader: ComponentType<Props> = ({
         fullName={fullName}
       />
       {time && <NormalHeaderTime time={time} />}
-      {version && (
-        <NormalHeaderVersion version={version} playerName={playerName} />
-      )}
+      {version && <NormalHeaderVersion version={version} />}
       {showUpdated && <NormalHeaderUpdated />}
       {accentPattern && (
         <NormalHeaderAccent accentPatternFile={accentPattern} />
