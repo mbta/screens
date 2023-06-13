@@ -125,7 +125,7 @@ const AlertRow: ComponentType<AlertRowProps> = ({
   if (truncateStatus) {
     const effect = firstWord(status);
     status =
-      effect === "Bypassing" ? `Bypassing ${stationCount} stops` : effect;
+      effect === "Bypassing" ? `Bypassing ${stationCount} ${stationCount === 1 ? "stop" : "stops"}` : effect;
   }
 
   return (
