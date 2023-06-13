@@ -138,6 +138,7 @@
     // extended-specific styles for status text
     display: block;
     height: 68px;
+    margin-bottom: 4px;
   }
 
   span.subway-status_alert_status-text.subway-status_alert_status-text--normal-service {
@@ -160,9 +161,6 @@
 
   .subway-status_status--extended span.subway-status_alert_location-text {
     // extended-specific styles for location text
-    display: block;
-    margin-top: 4px;
-    height: 48px;
     line-height: 48px;
   }
 
