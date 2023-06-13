@@ -471,9 +471,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       |> Enum.flat_map(fn route -> Map.get(grouped_alerts, route, []) end)
       |> Enum.uniq()
 
-    alert_count = length(green_line_alerts)
+    gl_alert_count = length(green_line_alerts)
+    total_alert_count = get_total_alerts(grouped_alerts)
 
-    if alert_count == 0 do
+    if gl_alert_count == 0 do
       serialize_single_alert_row_for_route(grouped_alerts, "Green")
     else
       {trunk_alerts, branch_alerts} =
@@ -481,8 +482,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
       case {trunk_alerts, branch_alerts} do
         # If there are no alerts for the GL trunk, serialize any alerts on the branches
-        {[], [branch_alert]} ->
-          %{type: :extended, alert: serialize_green_line_branch_alerts([branch_alert], false)}
+        {[], [branch_alert]} when total_alert_count < 3 ->
+          %{
+            type: :extended,
+            alert: serialize_green_line_branch_alert(branch_alert, alert_routes(branch_alert))
+          }
 
         {[], branch_alerts} ->
           %{type: :contracted, alerts: serialize_green_line_branch_alerts(branch_alerts, false)}
@@ -513,7 +517,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         {_, _} ->
           %{
             type: :contracted,
-            alerts: [serialize_alert_summary(alert_count, serialize_route_pill("Green"))]
+            alerts: [serialize_alert_summary(gl_alert_count, serialize_route_pill("Green"))]
           }
       end
     end
@@ -534,31 +538,29 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     }
   end
 
-  # One branch alert with trunk alerts
-  # Show the branch alert in a row under the trunk alert.
-  defp serialize_green_line_branch_alerts([branch_alert], true) do
-    Map.merge(
-      %{route_pill: serialize_gl_pill_with_branches(alert_routes(branch_alert))},
-      serialize_green_line_branch_alert(branch_alert, alert_routes(branch_alert))
-    )
-  end
-
-  # One branch alert, no trunk alerts
-  # Show the branch alert in a row under the trunk alert.
-  defp serialize_green_line_branch_alerts([branch_alert], false) do
-    route_ids = alert_routes(branch_alert)
-
-    Map.merge(
-      %{route_pill: serialize_gl_pill_with_branches(route_ids)},
-      serialize_alert(branch_alert, List.first(route_ids, "Green"))
-    )
-  end
-
   defp serialize_green_line_branch_alerts(branch_alerts, has_trunk_alert) do
     route_ids = Enum.flat_map(branch_alerts, &alert_routes/1)
     alert_count = length(branch_alerts)
 
     case {branch_alerts, has_trunk_alert} do
+      # One branch alert, no trunk alerts
+      # Only used if there are 3 or more total alerts
+      {[branch_alert], false} ->
+        [
+          Map.merge(
+            %{route_pill: serialize_gl_pill_with_branches(route_ids)},
+            serialize_alert(branch_alert, List.first(route_ids, "Green"))
+          )
+        ]
+
+      # One branch alert with trunk alerts
+      # Show the branch alert in a row under the trunk alert.
+      {[branch_alert], true} ->
+        Map.merge(
+          %{route_pill: serialize_gl_pill_with_branches(alert_routes(branch_alert))},
+          serialize_green_line_branch_alert(branch_alert, alert_routes(branch_alert))
+        )
+
       # Always consolidate 2+ branch alerts if there is a trunk alert
       {_alerts, true} ->
         serialize_alert_summary(alert_count, serialize_gl_pill_with_branches(route_ids))
