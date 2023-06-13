@@ -84,18 +84,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp get_route_pills(informed_entities, affected_routes, is_full_screen \\ false)
 
-  defp get_route_pills(informed_entities, affected_routes, false) do
-    informed_entities
-    |> Enum.filter(&(&1.route_type in [0, 1]))
+  defp get_route_pills(_informed_entities, affected_routes, false) do
+    affected_routes
     |> Enum.group_by(fn
-      %{route: "Green" <> _} -> "Green"
-      %{route: route} -> route
+      "Green" <> _ -> "Green"
+      route -> route
     end)
-    |> Enum.map(
-      &RoutePill.serialize_route_for_reconstructed_alert(&1, %{
+    |> Enum.map(fn {route_id, _} ->
+      RoutePill.serialize_route_for_reconstructed_alert(route_id, %{
         large: length(affected_routes) == 1
       })
-    )
+    end)
   end
 
   defp get_route_pills(informed_entities, _affected_routes, true) do
