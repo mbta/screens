@@ -198,6 +198,11 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
       routePill ? "has-pill" : "no-pill"
     );
 
+    let sizerClassName = "subway-status_alert-sizer";
+    if (hideOverflow) {
+      sizerClassName = classWithModifier(sizerClassName, "hide-overflow");
+    }
+
     let textContainerClassName = "subway-status_alert_text-container";
     if (hideOverflow) {
       textContainerClassName = classWithModifier(
@@ -216,7 +221,7 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
 
     return (
       <div className={containerClassName}>
-        <div className="subway-status_alert-sizer" ref={ref}>
+        <div className={sizerClassName} ref={ref}>
           <div className="subway-status_alert_route-pill-container">
             {routePill && <SubwayStatusRoutePill routePill={routePill} />}
           </div>

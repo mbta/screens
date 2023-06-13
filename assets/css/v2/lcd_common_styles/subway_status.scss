@@ -101,6 +101,14 @@
     }
   }
 
+  // Prevents text-container from wrapping to a second line below the pill
+  // if it's too long.
+  .subway-status_alert-sizer--hide-overflow {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
+  }
+
   .subway-status_alert_route-pill-container {
     display: inline-block;
     // If the row has no pill, we still keep this element as a pill-sized
@@ -121,6 +129,8 @@
     height: $pill-height;
   }
 
+  // Prevents location text from wrapping to a second line below the status
+  // if it's too long.
   .subway-status_alert_text-container.subway-status_alert_text-container--hide-overflow {
     overflow: hidden;
     white-space: nowrap;
