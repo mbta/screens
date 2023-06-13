@@ -740,6 +740,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  def audio_sort_key(%__MODULE__{is_full_screen: true}), do: [2]
+
   def audio_sort_key(%__MODULE__{} = t) do
     case serialize(t) do
       %{urgent: true} -> [2]
@@ -748,9 +750,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def priority(%__MODULE__{} = t) do
-    if takeover_alert?(t), do: [1], else: [3]
-  end
+  def priority(%__MODULE__{is_full_screen: true}), do: [1]
+  def priority(_t), do: [3]
 
   def slot_names(%__MODULE__{is_full_screen: false}), do: [:large]
 
@@ -760,7 +761,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       else: [:paged_main_content_left]
   end
 
-  def widget_type(%__MODULE__{is_full_screen: false}), do: [:reconstructed_large_alert]
+  def widget_type(%__MODULE__{is_full_screen: false}), do: :reconstructed_large_alert
 
   def widget_type(%__MODULE__{} = t) do
     if takeover_alert?(t),
