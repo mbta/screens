@@ -131,10 +131,20 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     Map.merge(route, %{color: Route.get_color_for_route(route_id)})
   end
 
-  def serialize_route_for_reconstructed_alert(route_id, opts \\ %{})
+  def serialize_route_for_reconstructed_alert(route_id_group, opts \\ %{})
+
+  def serialize_route_for_reconstructed_alert({"Green", branches}, opts)
+      when branches != ["Green"] do
+    route = do_serialize("Green", opts)
+
+    Map.merge(route, %{
+      color: :green,
+      branches: Enum.map(branches, fn "Green-" <> branch -> branch end)
+    })
+  end
 
   def serialize_route_for_reconstructed_alert(route_id, opts) do
-    route = route_id |> do_serialize(opts) |> append_headsign(opts)
+    route = do_serialize(route_id, opts)
     Map.merge(route, %{color: Route.get_color_for_route(route_id)})
   end
 
@@ -220,15 +230,5 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
       type: :text,
       text: if(route_name != "", do: route_name, else: route_id)
     }
-  end
-
-  defp append_headsign(%{type: :text, text: text} = pill, opts) do
-    headsign = Map.get(opts, :headsign)
-
-    if is_nil(headsign) do
-      pill
-    else
-      Map.merge(pill, %{text: "#{text} - #{headsign}"})
-    end
   end
 end
