@@ -18,7 +18,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   defp setup_base(_context) do
     %{
       widget: %ReconstructedAlert{
-        alert: %Alert{id: "123", updated_at: ~U[2023-06-09T09:00:00Z]},
+        alert: %Alert{id: "123"},
         screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
         location_context: %LocationContext{
           home_stop: nil,
@@ -107,10 +107,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget | is_terminal_station: is_terminal_station}
   end
 
-  defp put_is_full_screen(widget, is_full_screen) do
-    %{widget | is_full_screen: is_full_screen}
-  end
-
   defp ie(opts) do
     %{
       stop: opts[:stop],
@@ -118,92 +114,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       route_type: opts[:route_type],
       direction_id: opts[:direction_id]
     }
-  end
-
-  defp setup_transfer_station(%{widget: widget}) do
-    home_stop = "place-dwnxg"
-
-    stop_sequences = [
-      [
-        "place-ogmnl",
-        "place-haecl",
-        "place-dwnxg",
-        "place-forhl"
-      ],
-      [
-        "place-alfcl",
-        "place-pktrm",
-        "place-dwnxg",
-        "place-asmnl"
-      ],
-      [
-        "place-alfcl",
-        "place-dwnxg",
-        "place-sstat",
-        "place-brntn"
-      ]
-    ]
-
-    routes = [
-      %{
-        route_id: "Red",
-        active?: true,
-        direction_destinations: nil,
-        long_name: nil,
-        short_name: nil,
-        type: :subway
-      },
-      %{
-        route_id: "Orange",
-        active?: true,
-        direction_destinations: nil,
-        long_name: nil,
-        short_name: nil,
-        type: :subway
-      }
-    ]
-
-    widget =
-      widget
-      |> put_home_stop(PreFare, home_stop)
-      |> put_stop_sequences(stop_sequences)
-      |> put_informed_stations_string("Downtown Crossing")
-      |> put_routes_at_stop(routes)
-
-    %{widget: widget}
-  end
-
-  defp setup_single_line_station(%{widget: widget}) do
-    home_stop = "place-mlmnl"
-
-    stop_sequences = [
-      [
-        "place-ogmnl",
-        "place-mlmnl",
-        "place-welln",
-        "place-astao"
-      ]
-    ]
-
-    routes = [
-      %{
-        route_id: "Orange",
-        active?: true,
-        direction_destinations: nil,
-        long_name: nil,
-        short_name: nil,
-        type: :subway
-      }
-    ]
-
-    widget =
-      widget
-      |> put_home_stop(PreFare, home_stop)
-      |> put_stop_sequences(stop_sequences)
-      |> put_informed_stations_string("Malden Center")
-      |> put_routes_at_stop(routes)
-
-    %{widget: widget}
   end
 
   # Setting up screen location context
@@ -239,7 +149,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   defp setup_informed_entities_string(%{widget: widget}) do
-    %{widget: put_informed_stations_string(widget, "Downtown Crossing")}
+    %{widget: put_informed_stations_string(widget, "Alewife")}
   end
 
   defp setup_location_context(%{widget: widget}) do
@@ -299,18 +209,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   # Pass this to `setup` to set up "context" data on the alert widget, without setting up the API alert itself.
-  @transfer_stations_alert_widget_context_setup_group [
-    :setup_transfer_station,
-    :setup_screen_config,
-    :setup_now
-  ]
-
-  @one_line_station_alert_widget_context_setup_group [
-    :setup_single_line_station,
-    :setup_screen_config,
-    :setup_now
-  ]
-
   @alert_widget_context_setup_group [
     :setup_location_context,
     :setup_screen_config,
@@ -330,20 +228,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     setup @valid_alert_setup_group
 
     test "returns takeover for a closure alert at this station", %{widget: widget} do
-      widget = put_is_full_screen(widget, true)
       assert [1] == WidgetInstance.priority(widget)
       assert [:full_body] == WidgetInstance.slot_names(widget)
       assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
     end
 
     test "returns takeover for a suspension that affects all station trips", %{widget: widget} do
-      widget =
-        put_informed_entities(widget, [
-          ie(route: "Red", route_type: 1),
-          ie(route: "Orange", route_type: 1)
-        ])
-        |> put_is_full_screen(true)
-
+      widget = put_informed_entities(widget, [ie(route: "Red"), ie(route: "Orange")])
       assert [1] == WidgetInstance.priority(widget)
       assert [:full_body] == WidgetInstance.slot_names(widget)
       assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
@@ -352,7 +243,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     test "returns flex zone alert for a suspension that affects some station trips", %{
       widget: widget
     } do
-      widget = put_informed_entities(widget, [ie(route: "Red", route_type: 1)])
+      widget = put_informed_entities(widget, [ie(route: "Red")])
       assert [3] == WidgetInstance.priority(widget)
       assert [:large] == WidgetInstance.slot_names(widget)
       assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
@@ -380,7 +271,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ]
         ])
         |> put_is_terminal_station(true)
-        |> put_is_full_screen(true)
 
       assert [1] == WidgetInstance.priority(widget)
       assert [:full_body] == WidgetInstance.slot_names(widget)
@@ -402,7 +292,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ]
         ])
         |> put_is_terminal_station(true)
-        |> put_is_full_screen(true)
 
       assert [1] == WidgetInstance.priority(widget)
       assert [:full_body] == WidgetInstance.slot_names(widget)
@@ -454,26 +343,31 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     end
   end
 
-  describe "serialize_takeover_alert/1 single line station" do
-    setup @one_line_station_alert_widget_context_setup_group ++ [:setup_active_period]
+  describe "serialize_takeover_alert/2" do
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
     test "handles suspension", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red"),
+          ie(stop: "place-dwnxg", route: "Orange")
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
 
       expected = %{
-        issue: "No trains",
-        location: "No Orange Line trains at Malden Center",
+        issue: %{icon: nil, text: ["No", %{route: "red"}, %{route: "orange"}, "trains"]},
+        location: "at Downtown Crossing",
         cause: "",
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
         effect: :suspension,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        urgent: true,
+        region: :inside,
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -484,18 +378,23 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red"),
+          ie(stop: "place-dwnxg", route: "Orange")
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
 
       expected = %{
-        issue: "No trains",
-        location: "Shuttle buses replace Orange Line trains at Malden Center",
+        issue: %{icon: nil, text: ["No", %{route: "red"}, %{route: "orange"}, "trains"]},
+        location: "at Downtown Crossing",
         cause: "",
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
         effect: :shuttle,
-        remedy: "Use shuttle bus",
-        updated_at: "Friday, 9:00 am"
+        urgent: true,
+        region: :inside,
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -506,18 +405,23 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red"),
+          ie(stop: "place-dwnxg", route: "Orange")
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
 
       expected = %{
-        issue: "Station closed",
-        location: "Trains skip Malden Center",
+        issue: "Station Closed",
+        location: "",
         cause: "",
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
         effect: :station_closure,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        urgent: true,
+        region: :inside,
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -528,18 +432,23 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red"),
+          ie(stop: "place-dwnxg", route: "Orange")
         ])
         |> put_cause(:construction)
-        |> put_is_full_screen(true)
 
       expected = %{
-        issue: "No trains",
-        location: "No Orange Line trains at Malden Center",
+        issue: %{icon: nil, text: ["No", %{route: "red"}, %{route: "orange"}, "trains"]},
+        location: "at Downtown Crossing",
         cause: "Due to construction",
+        routes: [
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
+        ],
         effect: :suspension,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        urgent: true,
+        region: :inside,
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -548,22 +457,44 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     test "handles terminal boundary suspension", %{widget: widget} do
       widget =
         widget
+        |> put_home_stop(PreFare, "place-forhl")
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop: "place-ogmnl", route: "Orange", direction_id: 1, route_type: 1),
-          ie(stop: "place-mlmnl", route: "Orange", direction_id: 1, route_type: 1)
+          ie(stop: "place-grnst", route: "Orange", direction_id: 1),
+          ie(stop: "place-forhl", route: "Orange", direction_id: 1)
         ])
         |> put_cause(:unknown)
+        |> put_stop_sequences([
+          [
+            "place-jaksn",
+            "place-sbmnl",
+            "place-grnst",
+            "place-forhl"
+          ]
+        ])
         |> put_is_terminal_station(true)
-        |> put_is_full_screen(true)
+        |> put_routes_at_stop([
+          %{
+            route_id: "Orange",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
 
       expected = %{
-        issue: "No trains",
-        location: "No Orange Line trains between Oak Grove and Malden Center",
+        issue: %{icon: nil, text: ["No", %{route: "orange"}, "trains"]},
+        location: "between Green Street and Forest Hills",
         cause: "",
+        routes: [
+          %{color: :orange, text: "ORANGE LINE", type: :text}
+        ],
         effect: :suspension,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        urgent: true,
+        region: :inside,
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -572,74 +503,115 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     test "handles terminal boundary shuttle", %{widget: widget} do
       widget =
         widget
+        |> put_home_stop(PreFare, "place-forhl")
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop: "place-ogmnl", route: "Orange", direction_id: 1, route_type: 1),
-          ie(stop: "place-mlmnl", route: "Orange", direction_id: 1, route_type: 1)
+          ie(stop: "place-grnst", route: "Orange", direction_id: 1),
+          ie(stop: "place-forhl", route: "Orange", direction_id: 1)
         ])
         |> put_cause(:unknown)
+        |> put_stop_sequences([
+          [
+            "place-jaksn",
+            "place-sbmnl",
+            "place-grnst",
+            "place-forhl"
+          ]
+        ])
         |> put_is_terminal_station(true)
-        |> put_is_full_screen(true)
+        |> put_routes_at_stop([
+          %{
+            route_id: "Orange",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
 
       expected = %{
-        issue: "No trains",
-        location: "Shuttle buses replace Orange Line trains between Oak Grove and Malden Center",
+        issue: %{icon: nil, text: ["No", %{route: "orange"}, "trains"]},
+        location: "between Green Street and Forest Hills",
         cause: "",
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
         effect: :shuttle,
-        remedy: "Use shuttle bus",
-        updated_at: "Friday, 9:00 am"
+        urgent: true,
+        region: :inside,
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
     end
   end
 
-  describe "serialize_fullscreen_alert/1 one line" do
-    setup @one_line_station_alert_widget_context_setup_group ++ [:setup_active_period]
+  describe "serialize_inside_flex_alert/1" do
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
-    test "handles boundary suspension", %{widget: widget} do
+    test "handles suspension", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop: "place-ogmnl", route: "Orange", route_type: 1, direction_id: 1),
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1, direction_id: 1)
+          ie(stop: "place-dwnxg", route: "Red")
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
 
       expected = %{
-        issue: "No trains to Oak Grove",
-        location: "No Orange Line trains between Oak Grove and Malden Center",
+        issue: "No trains",
+        location: "",
         cause: "",
-        routes: ["ol-oak-grove"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        urgent: true,
+        region: :inside,
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
     end
 
-    test "handles boundary shuttle", %{widget: widget} do
+    test "handles shuttle", %{widget: widget} do
       widget =
         widget
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop: "place-ogmnl", route: "Orange", route_type: 1, direction_id: 1),
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1, direction_id: 1)
+          ie(stop: "place-dwnxg", route: "Red")
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
 
       expected = %{
-        issue: "No trains to Oak Grove",
-        location: "Shuttle buses between Oak Grove and Malden Center",
+        issue: "No trains",
+        location: "",
         cause: "",
-        routes: ["ol-oak-grove"],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :shuttle,
-        remedy: "Use shuttle bus",
-        updated_at: "Friday, 9:00 am"
+        urgent: true,
+        region: :inside,
+        remedy: "Use shuttle bus"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles station closure", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "Red line platform closed",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :station_closure,
+        urgent: true,
+        region: :inside,
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -650,21 +622,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red")
         ])
         |> put_cause(:unknown)
         |> put_severity(5)
-        |> put_alert_header("Delays are happening")
-        |> put_is_full_screen(true)
+        |> put_alert_header("Test Alert")
 
       expected = %{
-        issue: "Trains may be delayed up to 20 minutes",
+        issue: "Test Alert",
         location: "",
         cause: "",
-        routes: [%{color: :orange, text: "OL", type: :text}],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :delay,
-        remedy: "Delays are happening",
-        updated_at: "Friday, 9:00 am"
+        urgent: false,
+        region: :inside,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -675,46 +647,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red")
         ])
         |> put_cause(:unknown)
         |> put_severity(10)
-        |> put_is_full_screen(true)
-        |> put_alert_header("Delays are happening")
 
       expected = %{
         issue: "Trains may be delayed over 60 minutes",
         location: "",
         cause: "",
-        routes: [%{color: :orange, text: "OL", type: :text}],
-        effect: :delay,
-        remedy: "Delays are happening",
-        updated_at: "Friday, 9:00 am"
-      }
-
-      assert expected == ReconstructedAlert.serialize(widget)
-    end
-
-    test "handles directional delay", %{widget: widget} do
-      widget =
-        widget
-        |> put_effect(:delay)
-        |> put_informed_entities([
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1, direction_id: 0)
-        ])
-        |> put_cause(:unknown)
-        |> put_severity(5)
-        |> put_alert_header("Delays are happening")
-        |> put_is_full_screen(true)
-
-      expected = %{
-        issue: "Trains may be delayed up to 20 minutes",
-        location: "",
-        cause: "",
-        routes: ["ol-forest-hills"],
-        effect: :delay,
-        remedy: "Delays are happening",
-        updated_at: "Friday, 9:00 am"
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :severe_delay,
+        urgent: true,
+        region: :inside,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -725,161 +671,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red")
         ])
         |> put_cause(:construction)
         |> put_severity(10)
-        |> put_is_full_screen(true)
-        |> put_alert_header("Delays are happening")
 
       expected = %{
         issue: "Trains may be delayed over 60 minutes",
         location: "",
         cause: "due to construction",
-        routes: [%{color: :orange, text: "OL", type: :text}],
-        effect: :delay,
-        remedy: "Delays are happening",
-        updated_at: "Friday, 9:00 am"
-      }
-
-      assert expected == ReconstructedAlert.serialize(widget)
-    end
-
-    test "handles downstream delay", %{widget: widget} do
-      widget =
-        widget
-        |> put_effect(:delay)
-        |> put_informed_entities([
-          ie(stop: "place-swnxg", route: "Orange", route_type: 1)
-        ])
-        |> put_cause(:unknown)
-        |> put_severity(10)
-        |> put_is_full_screen(true)
-        |> put_alert_header("Delays are happening")
-
-      expected = %{
-        issue: "Trains may be delayed over 60 minutes",
-        location: "",
-        cause: "",
-        routes: [%{color: :orange, text: "OL", type: :text}],
-        effect: :delay,
-        remedy: "Delays are happening",
-        updated_at: "Friday, 9:00 am"
-      }
-
-      assert expected == ReconstructedAlert.serialize(widget)
-    end
-
-    test "handles downstream shuttle", %{widget: widget} do
-      widget =
-        widget
-        |> put_effect(:shuttle)
-        |> put_informed_entities([
-          ie(stop: "place-welln", route: "Orange", route_type: 1)
-        ])
-        |> put_cause(:unknown)
-        |> put_is_full_screen(true)
-
-      expected = %{
-        issue: %{
-          icon: nil,
-          text: [
-            %{format: :bold, text: "No trains"},
-            " at ",
-            %{format: :bold, text: "Wellington"}
-          ]
-        },
-        location: "",
-        cause: "",
-        routes: ["ol-forest-hills"],
-        effect: :shuttle,
-        remedy: "Shuttle buses available",
-        updated_at: "Friday, 9:00 am"
-      }
-
-      assert expected == ReconstructedAlert.serialize(widget)
-    end
-
-    test "handles downstream suspension", %{widget: widget} do
-      widget =
-        widget
-        |> put_effect(:suspension)
-        |> put_informed_entities([
-          ie(stop: "place-welln", route: "Orange", route_type: 1),
-          ie(stop: "place-astao", route: "Orange", route_type: 1)
-        ])
-        |> put_cause(:unknown)
-        |> put_is_full_screen(true)
-
-      expected = %{
-        issue: %{
-          icon: nil,
-          text: [
-            %{format: :bold, text: "No trains"},
-            " between ",
-            %{format: :bold, text: "Wellington"},
-            " & ",
-            %{format: :bold, text: "Assembly"}
-          ]
-        },
-        location: "",
-        cause: "",
-        routes: ["ol-forest-hills"],
-        effect: :suspension,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
-      }
-
-      assert expected == ReconstructedAlert.serialize(widget)
-    end
-  end
-
-  describe "serialize_fullscreen_alert/1 transfer station" do
-    setup @transfer_stations_alert_widget_context_setup_group ++ [:setup_active_period]
-
-    test "handles :inside station closure on 1 line", %{widget: widget} do
-      widget =
-        widget
-        |> put_effect(:station_closure)
-        |> put_informed_entities([
-          ie(stop: "place-dwnxg", route: "Orange", route_type: 1)
-        ])
-        |> put_cause(:unknown)
-        |> put_is_full_screen(true)
-
-      expected = %{
-        issue: "Trains skip Downtown Crossing",
-        location: "",
-        cause: "",
-        routes: [%{color: :orange, text: "OL", type: :text}],
-        effect: :station_closure,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
-      }
-
-      assert expected == ReconstructedAlert.serialize(widget)
-    end
-
-    test "handles multi line delay", %{widget: widget} do
-      widget =
-        widget
-        |> put_effect(:delay)
-        |> put_informed_entities([
-          ie(stop: "place-dwnxg", route: "Orange", route_type: 1),
-          ie(stop: "place-dwnxg", route: "Red", route_type: 0)
-        ])
-        |> put_cause(:unknown)
-        |> put_severity(5)
-        |> put_is_full_screen(true)
-
-      expected = %{
-        issue: "Trains may be delayed up to 20 minutes",
-        location: "",
-        cause: "",
-        routes: [],
-        effect: :delay,
-        remedy: nil,
-        updated_at: "Friday, 9:00 am"
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :severe_delay,
+        urgent: true,
+        region: :inside,
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -894,8 +699,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
         ])
         |> put_cause(:unknown)
 
@@ -907,8 +712,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         urgent: true,
         region: :boundary,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -919,8 +723,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
         ])
         |> put_cause(:unknown)
 
@@ -932,8 +736,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :shuttle,
         urgent: true,
         region: :boundary,
-        remedy: "Use shuttle bus",
-        updated_at: "Friday, 9:00 am"
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -944,8 +747,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
         ])
         |> put_cause(:unknown)
         |> put_severity(5)
@@ -959,8 +762,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :delay,
         urgent: false,
         region: :boundary,
-        remedy: "",
-        updated_at: "Friday, 9:00 am"
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -971,8 +773,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
         ])
         |> put_cause(:unknown)
         |> put_severity(10)
@@ -985,8 +787,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :severe_delay,
         urgent: true,
         region: :boundary,
-        remedy: "",
-        updated_at: "Friday, 9:00 am"
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -997,8 +798,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1)
         ])
         |> put_cause(:construction)
         |> put_severity(10)
@@ -1011,8 +812,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :severe_delay,
         urgent: true,
         region: :boundary,
-        remedy: "",
-        updated_at: "Friday, 9:00 am"
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -1020,27 +820,24 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   describe "serialize_outside_alert/1" do
-    setup @one_line_station_alert_widget_context_setup_group ++ [:setup_active_period]
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
     test "handles downstream suspension at one stop", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
-        |> put_informed_entities([
-          ie(stop: "place-welln", direction_id: 1, route: "Orange", route_type: 1)
-        ])
+        |> put_informed_entities([ie(stop: "place-alfcl", direction_id: 1, route: "Red")])
         |> put_cause(:unknown)
 
       expected = %{
-        issue: "No Oak Grove trains",
-        location: "at Wellington",
+        issue: "No Alewife trains",
+        location: "at Alewife",
         cause: "",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
         urgent: false,
         region: :outside,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -1051,21 +848,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop: "place-welln", route: "Orange", route_type: 1),
-          ie(stop: "place-astao", route: "Orange", route_type: 1)
+          ie(stop: "place-alfcl", route: "Red"),
+          ie(stop: "place-davis", route: "Red")
         ])
         |> put_cause(:unknown)
 
       expected = %{
         issue: "No trains",
-        location: "between Wellington and Assembly",
+        location: "between Alewife and Davis",
         cause: "",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
         urgent: false,
         region: :outside,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -1076,21 +872,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop: "place-welln", direction_id: 1, route: "Orange", route_type: 1),
-          ie(stop: "place-astao", direction_id: 1, route: "Orange", route_type: 1)
+          ie(stop: "place-alfcl", direction_id: 1, route: "Red"),
+          ie(stop: "place-davis", direction_id: 1, route: "Red")
         ])
         |> put_cause(:unknown)
 
       expected = %{
-        issue: "No Oak Grove trains",
-        location: "between Wellington and Assembly",
+        issue: "No Alewife trains",
+        location: "between Alewife and Davis",
         cause: "",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
         urgent: false,
         region: :outside,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -1100,21 +895,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget =
         widget
         |> put_effect(:shuttle)
-        |> put_informed_entities([
-          ie(stop: "place-welln", direction_id: 1, route: "Orange", route_type: 1)
-        ])
+        |> put_informed_entities([ie(stop: "place-alfcl", direction_id: 1, route: "Red")])
         |> put_cause(:unknown)
 
       expected = %{
-        issue: "No Oak Grove trains",
-        location: "at Wellington",
+        issue: "No Alewife trains",
+        location: "at Alewife",
         cause: "",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :shuttle,
         urgent: false,
         region: :outside,
-        remedy: "Use shuttle bus",
-        updated_at: "Friday, 9:00 am"
+        remedy: "Use shuttle bus"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -1125,23 +917,23 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop: "place-welln", route: "Orange", route_type: 1)
+          ie(stop: "place-alfcl", route: "Red"),
+          ie(stop: "place-alfcl", route: "Orange")
         ])
         |> put_cause(:unknown)
-        |> put_informed_stations_string("Wellington")
 
       expected = %{
-        issue: "Trains will bypass Wellington",
+        issue: "Trains will bypass Alewife",
         location: "",
         cause: "",
         routes: [
-          %{color: :orange, text: "ORANGE LINE", type: :text}
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
         ],
         effect: :station_closure,
         urgent: false,
         region: :outside,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -1152,7 +944,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop: "place-welln", route: "Orange", route_type: 1)
+          ie(stop: "place-alfcl", route: "Red")
         ])
         |> put_cause(:unknown)
         |> put_alert_header("Test Alert")
@@ -1161,12 +953,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Test Alert",
         location: "",
         cause: "",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :delay,
         urgent: false,
         region: :outside,
-        remedy: "",
-        updated_at: "Friday, 9:00 am"
+        remedy: ""
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -1177,23 +968,23 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop: "place-welln", route: "Orange", route_type: 1)
+          ie(stop: "place-alfcl", route: "Red"),
+          ie(stop: "place-alfcl", route: "Orange")
         ])
         |> put_cause(:construction)
-        |> put_informed_stations_string("Wellington")
 
       expected = %{
-        issue: "Trains will bypass Wellington",
+        issue: "Trains will bypass Alewife",
         location: "",
         cause: "due to construction",
         routes: [
-          %{color: :orange, text: "ORANGE LINE", type: :text}
+          %{color: :orange, text: "OL", type: :text},
+          %{color: :red, text: "RL", type: :text}
         ],
         effect: :station_closure,
         urgent: false,
         region: :outside,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -1209,11 +1000,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-gover")
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop: "place-north", route: "Green-B", route_type: 0),
-          ie(stop: "place-north", route: "Green-C", route_type: 0),
-          ie(stop: "place-north", route: "Green-D", route_type: 0),
-          ie(stop: "place-north", route: "Green-E", route_type: 0),
-          ie(stop: "place-spmnl", route: "Green-E", route_type: 0)
+          ie(stop: "place-north", route: "Green-B"),
+          ie(stop: "place-north", route: "Green-C"),
+          ie(stop: "place-north", route: "Green-D"),
+          ie(stop: "place-north", route: "Green-E"),
+          ie(stop: "place-spmnl", route: "Green-E")
         ])
         |> put_cause(:unknown)
         |> put_stop_sequences([
@@ -1251,8 +1042,48 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :shuttle,
         urgent: false,
         region: :outside,
-        remedy: "Use shuttle bus",
-        updated_at: "Friday, 9:00 am"
+        remedy: "Use shuttle bus"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles alert affecting all stops on a line", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-tumnl")
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: nil, route: "Orange")
+        ])
+        |> put_cause(:unknown)
+        |> put_stop_sequences([
+          [
+            "place-chncl",
+            "place-tumnl",
+            "place-bbsta"
+          ]
+        ])
+        |> put_routes_at_stop([
+          %{
+            route_id: "Orange",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
+
+      expected = %{
+        issue: %{icon: nil, text: ["No", %{route: "orange"}, "trains"]},
+        location: nil,
+        cause: "",
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        effect: :suspension,
+        urgent: true,
+        region: :inside,
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -1267,8 +1098,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop: "place-alfcl", route: "Red", route_type: 1),
-          ie(stop: "place-alfcl", route: "Orange", route_type: 1)
+          ie(stop: "place-alfcl", route: "Red"),
+          ie(stop: "place-alfcl", route: "Orange")
         ])
         |> put_cause(:construction)
 
@@ -1284,10 +1115,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop: "place-dwnxg", route: "Red", route_type: 1)
+          ie(stop: "place-dwnxg", route: "Red")
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
 
       assert [2] == WidgetInstance.audio_sort_key(widget)
     end
@@ -1297,8 +1127,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop: "place-alfcl", route: "Red", route_type: 1),
-          ie(stop: "place-alfcl", route: "Orange", route_type: 1)
+          ie(stop: "place-alfcl", route: "Red"),
+          ie(stop: "place-alfcl", route: "Orange")
         ])
         |> put_cause(:construction)
 
@@ -1310,7 +1140,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop: "place-alfcl", route: "Red", route_type: 1)
+          ie(stop: "place-alfcl", route: "Red")
         ])
         |> put_cause(:unknown)
         |> put_alert_header("Test Alert")
@@ -1546,15 +1376,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
          }}
       end
 
-      alert_widget =
-        config
-        |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
+      alert_widgets =
+        CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
+          config,
           now,
           fetch_alerts_fn,
           fetch_stop_name_fn,
           fetch_location_context_fn
         )
-        |> List.first()
 
       expected = %{
         issue: "No trains",
@@ -1564,250 +1393,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         urgent: false,
         region: :outside,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:14 am"
+        remedy: "Seek alternate route"
       }
 
-      assert expected == ReconstructedAlert.serialize(%{alert_widget | is_full_screen: false})
-    end
-
-    test "handles fullscreen OL downstream suspension" do
-      stop_id = "place-welln"
-
-      config =
-        struct(Screen, %{
-          app_id: :pre_fare_v2,
-          app_params:
-            struct(PreFare, %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}})
-        })
-
-      routes_at_stop = [
-        %{
-          route_id: "Orange",
-          active?: true,
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :subway
-        }
-      ]
-
-      alerts = [
-        %Alert{
-          active_period: [{~U[2022-06-24 09:13:15Z], nil}],
-          cause: :unknown,
-          created_at: ~U[2022-06-24 09:13:17Z],
-          description:
-            "Orange Line Service is running between Oak Grove and North Station and between Forest Hills and Back Bay. \r\nCustomers can use Green Line service through Downtown. \r\n\r\nAffected stops:\r\nHaymarket\r\nState\r\nDowntown Crossing\r\nChinatown\r\nTufts Medical Center",
-          effect: :suspension,
-          header:
-            "Orange Line is suspended between North Station and Back Bay due to a structural issue with the Government Center garage. ",
-          id: "450523",
-          informed_entities: [
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70014"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70015"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70016"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70017"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70018"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70019"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70020"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70021"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70022"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70023"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70024"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70025"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70026"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70027"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-bbsta"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-chncl"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-dwnxg"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-haecl"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-north"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-state"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-tumnl"
-            }
-          ],
-          lifecycle: "NEW",
-          severity: 7,
-          timeframe: nil,
-          updated_at: ~U[2022-06-24 09:14:52Z],
-          url: nil
-        }
-      ]
-
-      now = ~U[2022-06-24 12:00:00Z]
-      station_sequences = [Stop.get_route_stop_sequence("Orange")]
-
-      fetch_alerts_fn = fn _ -> {:ok, alerts} end
-      fetch_stop_name_fn = fn _ -> "Wellington" end
-
-      fetch_location_context_fn = fn _, _, _ ->
-        {:ok,
-         %LocationContext{
-           home_stop: stop_id,
-           stop_sequences: station_sequences,
-           upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
-           downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
-           routes: routes_at_stop,
-           alert_route_types: Stop.get_route_type_filter(PreFare, stop_id)
-         }}
-      end
-
-      alert_widget =
-        config
-        |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
-          now,
-          fetch_alerts_fn,
-          fetch_stop_name_fn,
-          fetch_location_context_fn
-        )
-        |> List.first()
-
-      expected = %{
-        issue: %{
-          icon: nil,
-          text: [
-            %{format: :bold, text: "No trains"},
-            " between ",
-            %{format: :bold, text: "North Station"},
-            " & ",
-            %{format: :bold, text: "Back Bay"}
-          ]
-        },
-        location: "",
-        cause: "",
-        routes: ["ol-forest-hills"],
-        effect: :suspension,
-        remedy: "Seek alternate route",
-        updated_at: "Friday, 9:14 am"
-      }
-
-      assert expected == ReconstructedAlert.serialize(alert_widget)
+      assert expected == ReconstructedAlert.serialize(List.first(alert_widgets))
     end
 
     test "handles GL boundary shuttle at Govt Center" do
@@ -2154,15 +1743,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
          }}
       end
 
-      alert_widget =
-        config
-        |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
+      alert_widgets =
+        CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
+          config,
           now,
           fetch_alerts_fn,
           fetch_stop_name_fn,
           fetch_location_context_fn
         )
-        |> List.first()
 
       expected = %{
         issue: "No North Station & North trains",
@@ -2172,378 +1760,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :shuttle,
         urgent: true,
         region: :boundary,
-        remedy: "Use shuttle bus",
-        updated_at: "Friday, 6:24 pm"
+        remedy: "Use shuttle bus"
       }
 
-      assert expected == ReconstructedAlert.serialize(%{alert_widget | is_full_screen: false})
-    end
-
-    test "handles fullscreen GL boundary shuttle at Govt Center" do
-      stop_id = "place-gover"
-
-      config =
-        struct(Screen, %{
-          app_id: :pre_fare_v2,
-          app_params:
-            struct(PreFare, %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}})
-        })
-
-      routes_at_stop = [
-        %{
-          route_id: "Green-B",
-          active?: false,
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :light_rail
-        },
-        %{
-          route_id: "Green-C",
-          active?: true,
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :light_rail
-        },
-        %{
-          route_id: "Green-D",
-          active?: true,
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :light_rail
-        },
-        %{
-          route_id: "Green-E",
-          active?: true,
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :light_rail
-        },
-        %{
-          route_id: "Blue",
-          active?: true,
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :subway
-        }
-      ]
-
-      alerts = [
-        %Screens.Alerts.Alert{
-          active_period: [{~U[2022-06-24 09:12:00Z], nil}],
-          cause: :unknown,
-          created_at: ~U[2022-06-24 09:12:47Z],
-          description:
-            "Affected stops:\r\nLechmere\r\nScience Park/West End\r\nNorth Station\r\nHaymarket\r\nGovernment Center",
-          effect: :shuttle,
-          header:
-            "Green Line is replaced by shuttle buses between Government Center and Union Square due to a structural issue with the Government Center Garage. Shuttle buses are not servicing Haymarket Station.",
-          id: "450522",
-          informed_entities: [
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "place-north"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70504"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "place-unsqu"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-spmnl"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70204"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70202"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70501"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70202"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70207"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "place-unsqu"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "place-north"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70208"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70208"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70206"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "place-lech"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70205"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "place-north"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70203"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70201"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "place-gover"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70206"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-unsqu"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70504"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70202"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-gover"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70201"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70504"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-lech"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70501"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70202"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70208"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "place-gover"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "place-spmnl"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70207"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70204"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70203"
-            }
-          ],
-          lifecycle: "NEW",
-          severity: 7,
-          timeframe: nil,
-          updated_at: ~U[2022-06-24 18:24:03Z],
-          url: nil
-        }
-      ]
-
-      now = ~U[2022-06-24 12:00:00Z]
-      station_sequences = [Stop.get_route_stop_sequence("Green")]
-
-      fetch_alerts_fn = fn _ -> {:ok, alerts} end
-      fetch_stop_name_fn = fn _ -> "Government Center" end
-
-      fetch_location_context_fn = fn _, _, _ ->
-        {:ok,
-         %LocationContext{
-           home_stop: stop_id,
-           stop_sequences: station_sequences,
-           upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
-           downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
-           routes: routes_at_stop,
-           alert_route_types: Stop.get_route_type_filter(PreFare, stop_id)
-         }}
-      end
-
-      alert_widget =
-        config
-        |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
-          now,
-          fetch_alerts_fn,
-          fetch_stop_name_fn,
-          fetch_location_context_fn
-        )
-        |> List.first()
-
-      expected = %{
-        issue: "No trains to North Station & North",
-        location: "Shuttle buses between Union Square and Government Center",
-        cause: "",
-        routes: ["gl-north-station-north"],
-        effect: :shuttle,
-        remedy: "Use shuttle bus",
-        updated_at: "Friday, 6:24 pm"
-      }
-
-      assert expected == ReconstructedAlert.serialize(alert_widget)
+      assert expected == ReconstructedAlert.serialize(List.first(alert_widgets))
     end
   end
 end
