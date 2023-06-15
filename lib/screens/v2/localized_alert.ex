@@ -251,7 +251,7 @@ defmodule Screens.V2.LocalizedAlert do
   end
 
   @spec active_routes_at_stop(t()) :: MapSet.t(route_id())
-  defp active_routes_at_stop(%{location_context: %{routes: routes}}) do
+  def active_routes_at_stop(%{location_context: %{routes: routes}}) do
     routes
     |> Enum.filter(& &1.active?)
     |> MapSet.new(& &1.route_id)

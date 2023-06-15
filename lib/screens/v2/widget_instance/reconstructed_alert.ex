@@ -3,7 +3,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
+  alias Screens.Config.V2.FreeTextLine
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
@@ -117,19 +119,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     informed_entities
     |> Enum.filter(&(&1.route_type in [0, 1]))
-    |> Enum.group_by(fn %{route: route, direction_id: direction_id} -> {route, direction_id} end)
+    |> Enum.group_by(fn %{route: route} -> route end)
     |> Enum.map(fn
-      {{route_id, nil}, _} when location not in [:downstream, :upstream] ->
-        RoutePill.serialize_route_for_reconstructed_alert(route_id)
-
-      {{route_id, _direction_id}, _} ->
+      {route_id, _} ->
         headsign = get_destination(t, location, route_id)
 
         RoutePill.serialize_route_for_reconstructed_alert(route_id, %{
-          gl_branch: true,
           headsign: headsign
         })
     end)
+    |> Enum.uniq()
   end
 
   def takeover_alert?(%__MODULE__{is_full_screen: false}), do: false
@@ -137,7 +136,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def takeover_alert?(%__MODULE__{is_terminal_station: is_terminal_station, alert: alert} = t) do
     Alert.effect(alert) in [:station_closure, :suspension, :shuttle] and
       LocalizedAlert.location(t, is_terminal_station) == :inside and
-      LocalizedAlert.informs_all_active_routes_at_home_stop?(t)
+      LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
+      (is_nil(Alert.direction_id(t.alert)) or is_terminal_station)
   end
 
   @spec serialize_takeover_alert(t()) :: serialized_response()
@@ -152,12 +152,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = Alert.informed_entities(alert)
     cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
     [route_id] = LocalizedAlert.informed_subway_routes(t)
-    endpoint_text = get_endpoints(informed_entities, route_id)
+    endpoints = get_endpoints(informed_entities, route_id)
 
     %{
       issue: "No trains",
       remedy: "Seek alternate route",
-      location: "No #{route_id} Line trains #{endpoint_text}",
+      location: "No #{route_id} Line trains #{format_endpoint_string(endpoints)}",
       cause: cause_text,
       effect: :suspension,
       updated_at: format_updated_at(updated_at, now)
@@ -173,12 +173,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = Alert.informed_entities(alert)
     cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
     [route_id] = LocalizedAlert.informed_subway_routes(t)
-    endpoint_text = get_endpoints(informed_entities, route_id)
+    endpoints = get_endpoints(informed_entities, route_id)
 
     %{
       issue: "No trains",
       remedy: "Use shuttle bus",
-      location: "Shuttle buses replace #{route_id} Line trains #{endpoint_text}",
+      location:
+        "Shuttle buses replace #{route_id} Line trains #{format_endpoint_string(endpoints)}",
       cause: cause_text,
       effect: :shuttle,
       updated_at: format_updated_at(updated_at, now)
@@ -219,24 +220,36 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        ) do
     informed_entities = Alert.informed_entities(alert)
     cause_text = Alert.get_cause_string(cause)
-    direction_id = Alert.direction_id(alert)
     [route_id] = LocalizedAlert.informed_subway_routes(t)
-    endpoint_text = get_endpoints(informed_entities, route_id)
+    endpoints = get_endpoints(informed_entities, route_id)
+    destination = get_destination(t, location)
 
-    issue =
-      if is_nil(direction_id) do
-        "No trains"
+    {issue, location_text} =
+      if location in [:downstream, :upstream] do
+        endpoint_text = format_endpoint_string_as_freetext(endpoints)
+
+        issue =
+          FreeTextLine.to_json(%FreeTextLine{
+            icon: nil,
+            text: [%{format: :bold, text: "No trains"}] ++ endpoint_text
+          })
+
+        {issue, ""}
       else
-        headsign =
-          @route_directions
-          |> Map.get(route_id)
-          |> Enum.at(direction_id)
+        endpoint_text = format_endpoint_string(endpoints)
 
-        "No trains to #{headsign}"
+        location =
+          if is_nil(endpoint_text), do: "", else: "No #{route_id} Line trains #{endpoint_text}"
+
+        issue =
+          if is_nil(destination) do
+            "No trains"
+          else
+            "No trains to #{destination}"
+          end
+
+        {issue, location}
       end
-
-    location_text =
-      if is_nil(endpoint_text), do: "", else: "No #{route_id} Line trains #{endpoint_text}"
 
     %{
       issue: issue,
@@ -258,27 +271,38 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        ) do
     informed_entities = Alert.informed_entities(alert)
     cause_text = Alert.get_cause_string(cause)
-    direction_id = Alert.direction_id(alert)
     [route_id] = LocalizedAlert.informed_subway_routes(t)
-    endpoint_text = get_endpoints(informed_entities, route_id)
+    endpoints = get_endpoints(informed_entities, route_id)
+    destination = get_destination(t, location)
 
-    issue =
-      if is_nil(direction_id) do
-        "No trains"
+    {issue, location_text, remedy} =
+      if location in [:downstream, :upstream] do
+        endpoint_text = format_endpoint_string_as_freetext(endpoints)
+
+        issue =
+          FreeTextLine.to_json(%FreeTextLine{
+            icon: nil,
+            text: [%{format: :bold, text: "No trains"}] ++ endpoint_text
+          })
+
+        {issue, "", "Shuttle buses available"}
       else
-        headsign =
-          @route_directions
-          |> Map.get(route_id)
-          |> Enum.at(direction_id)
+        endpoint_text = format_endpoint_string(endpoints)
+        location_text = if is_nil(endpoint_text), do: "", else: "Shuttle buses #{endpoint_text}"
 
-        "No trains to #{headsign}"
+        issue =
+          if is_nil(destination) do
+            "No trains"
+          else
+            "No trains to #{destination}"
+          end
+
+        {issue, location_text, "Use shuttle bus"}
       end
-
-    location_text = if is_nil(endpoint_text), do: "", else: "Shuttle buses #{endpoint_text}"
 
     %{
       issue: issue,
-      remedy: "Use shuttle bus",
+      remedy: remedy,
       location: location_text,
       cause: cause_text,
       routes: get_route_pills(t, location),
@@ -323,6 +347,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        ) do
     cause_text = Alert.get_cause_string(cause)
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
+    affected_routes = LocalizedAlert.informed_subway_routes(t)
 
     duration_text =
       case delay_description do
@@ -330,12 +355,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         :more_than -> "over #{delay_minutes} minutes"
       end
 
+    routes =
+      if length(affected_routes) > 1 do
+        []
+      else
+        get_route_pills(t, location)
+      end
+
     %{
       issue: "Trains may be delayed #{duration_text}",
       remedy: header,
       location: "",
       cause: cause_text,
-      routes: get_route_pills(t, location),
+      routes: routes,
       effect: :delay,
       updated_at: format_updated_at(updated_at, now)
     }
@@ -554,7 +586,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     else
       direction_id = Alert.direction_id(alert)
       cause_text = Alert.get_cause_string(cause)
-      location_text = get_endpoints(informed_entities, hd(affected_routes))
+
+      location_text =
+        informed_entities |> get_endpoints(hd(affected_routes)) |> format_endpoint_string()
 
       issue =
         if is_nil(direction_id) do
@@ -602,7 +636,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     else
       direction_id = Alert.direction_id(alert)
       cause_text = Alert.get_cause_string(cause)
-      location_text = get_endpoints(informed_entities, List.first(affected_routes))
+
+      location_text =
+        informed_entities |> get_endpoints(hd(affected_routes)) |> format_endpoint_string()
 
       issue =
         if is_nil(direction_id) do
@@ -697,11 +733,30 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         {min_full_name, _min_abbreviated_name} = min_station_name
         {max_full_name, _max_abbreviated_name} = max_station_name
 
-        if min_full_name == max_full_name do
-          "at #{min_full_name}"
-        else
-          "between #{min_full_name} and #{max_full_name}"
-        end
+        {min_full_name, max_full_name}
+    end
+  end
+
+  def format_endpoint_string(nil), do: nil
+
+  def format_endpoint_string({min_station, max_station}) do
+    if min_station == max_station do
+      "at #{min_station}"
+    else
+      "between #{min_station} and #{max_station}"
+    end
+  end
+
+  def format_endpoint_string_as_freetext(endpoints) do
+    case endpoints do
+      nil ->
+        []
+
+      {min, max} when min == max ->
+        [" at ", %{format: :bold, text: min}]
+
+      {min, max} ->
+        [" between ", %{format: :bold, text: min}, " & ", %{format: :bold, text: max}]
     end
   end
 
