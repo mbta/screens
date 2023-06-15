@@ -51,8 +51,10 @@ import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import SurgeBodyRight from "Components/v2/pre_fare/surge_body_right";
 import ShuttleBusInfo from "Components/v2/shuttle_bus_info";
 import BlueBikes from "Components/v2/blue_bikes";
+import PreFareSingleScreenAlert from "Components/v2/pre_fare_single_screen_alert";
 
 const TYPE_TO_COMPONENT = {
+  // Slots
   screen_normal: NormalScreen,
   screen_takeover: ScreenTakeover,
   screen_split_takeover: ScreenSplitTakeover,
@@ -67,6 +69,7 @@ const TYPE_TO_COMPONENT = {
   normal_header: NormalHeader,
   one_large: OneLarge,
   two_medium: TwoMedium,
+  // Widgets
   placeholder: Placeholder,
   evergreen_content: EvergreenContent,
   elevator_status: ElevatorStatus,
@@ -75,6 +78,7 @@ const TYPE_TO_COMPONENT = {
   no_data: NoData,
   page_load_no_data: PageLoadNoData,
   reconstructed_large_alert: ReconstructedAlert,
+  single_screen_alert: PreFareSingleScreenAlert,
   reconstructed_takeover: ReconstructedTakeover,
   cr_departures: CRDepartures,
   overnight_cr_departures: OvernightCRDepartures,

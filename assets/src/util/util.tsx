@@ -64,3 +64,5 @@ export const getRotationIndex = () => {
 };
 
 export const firstWord = (str: string): string => str.split(" ")[0];
+
+export const formatCause = (cause: string) => (cause.charAt(0).toUpperCase() + cause.substring(1)).replace("_", " ");
