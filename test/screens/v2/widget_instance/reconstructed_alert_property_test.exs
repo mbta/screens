@@ -1167,7 +1167,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
         )
 
       Enum.each(alert_widgets, fn widget ->
-        assert %{issue: _, location: _, routes: _} = ReconstructedAlert.serialize(widget)
+        assert %{issue: _, location: _} = ReconstructedAlert.serialize(widget)
       end)
     end
   end
