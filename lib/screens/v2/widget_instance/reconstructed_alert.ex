@@ -125,11 +125,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       "Green" <> _ -> "Green"
       route -> route
     end)
-    |> Enum.map(fn {route_id, _} ->
-      RoutePill.serialize_route_for_reconstructed_alert(route_id, %{
+    |> Enum.map(
+      &RoutePill.serialize_route_for_reconstructed_alert(&1, %{
         large: length(affected_routes) == 1
       })
-    end)
+    )
   end
 
   defp get_route_pills(%__MODULE__{alert: alert} = t, location) do

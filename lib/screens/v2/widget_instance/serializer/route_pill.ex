@@ -143,7 +143,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     })
   end
 
-  def serialize_route_for_reconstructed_alert(route_id, opts) do
+  def serialize_route_for_reconstructed_alert({route_id, _}, opts) do
     route = do_serialize(route_id, opts)
     Map.merge(route, %{color: Route.get_color_for_route(route_id)})
   end
@@ -173,8 +173,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
            optional(:gl_long) => boolean(),
            optional(:cr_abbrev) => boolean(),
            optional(:route_name) => String.t(),
-           optional(:large) => boolean(),
-           optional(:headsign) => String.t()
+           optional(:large) => boolean()
          }
 
   @spec do_serialize(Route.id(), serialize_opts()) :: map()
