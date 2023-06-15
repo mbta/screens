@@ -280,7 +280,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_full_screen: true,
-            informed_stations_string: "Malden Center and Wellington"
+            informed_stations_string: "Malden Center & Wellington"
           },
           expected_common_data
         ),
