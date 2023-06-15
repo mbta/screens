@@ -35,7 +35,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   @type serialized_response :: %{
           optional(:urgent) => boolean(),
-          optional(:routes) => list(map()),
+          optional(:routes) => list(map() | String.t()),
           issue: String.t(),
           remedy: String.t(),
           location: String.t(),
@@ -52,6 +52,24 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Green-C" => ["Cleveland Circle", "Government Center"],
     "Green-D" => ["Riverside", "North Station"],
     "Green-E" => ["Heath Street", "Union Square"]
+  }
+
+  @headsign_svg_map %{
+    "Bowdoin" => "bl-bowdoin",
+    "Wonderland" => "bl-wonderland",
+    "Government Center" => "gl-govt-center",
+    "North Station & North" => "gl-north-station-north",
+    "Boston College" => "glb-boston-college",
+    "Cleveland Circle" => "glc-cleveland-cir",
+    "Riverside" => "gld-riverside",
+    "Union Square" => "gld-union-sq",
+    "Heath Street" => "gle-heath-st",
+    "Medford/Tufts" => "gle-medford-tufts",
+    "Forest Hills" => "ol-forest-hills",
+    "Oak Grove" => "ol-oak-grove",
+    "Alewife" => "rl-alewife",
+    "Ashmont" => "rl-ashmont",
+    "Braintree" => "rl-braintree"
   }
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
@@ -124,12 +142,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       {route_id, _} ->
         headsign = get_destination(t, location, route_id)
 
-        RoutePill.serialize_route_for_reconstructed_alert(route_id, %{
-          headsign: headsign
-        })
+        if is_nil(headsign) do
+          RoutePill.serialize_route_for_reconstructed_alert(route_id)
+        else
+          format_for_svg_name(headsign)
+        end
     end)
     |> Enum.uniq()
   end
+
+  defp format_for_svg_name("Ashmont/Braintree"),
+    do: [Map.get(@headsign_svg_map, "Ashmont"), Map.get(@headsign_svg_map, "Braintree")]
+
+  defp format_for_svg_name(headsign), do: Map.get(@headsign_svg_map, headsign)
 
   def takeover_alert?(%__MODULE__{is_full_screen: false}), do: false
 
