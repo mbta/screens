@@ -139,11 +139,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     |> Enum.filter(&(&1.route_type in [0, 1]))
     |> Enum.group_by(fn %{route: route} -> route end)
     |> Enum.map(fn
-      {route_id, _} ->
+      {route_id, _} = route ->
         headsign = get_destination(t, location, route_id)
 
         if is_nil(headsign) do
-          RoutePill.serialize_route_for_reconstructed_alert(route_id)
+          RoutePill.serialize_route_for_reconstructed_alert(route)
         else
           format_for_svg_name(headsign)
         end
