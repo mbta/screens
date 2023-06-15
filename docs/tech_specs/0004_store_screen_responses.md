@@ -1,6 +1,6 @@
 - Feature Name: `store_screen_responses`
 - Start Date: 2023-06-12
-- RFC PR: [mbta/technology-docs#0000](https://github.com/mbta/technology-docs/pull/0000)
+- RFC PR: [mbta/screens#1786](https://github.com/mbta/screens/pull/1786)
 - Asana task: [Log and store all screen data responses](https://app.asana.com/0/1185117109217413/1204451311903806)
 - Status: Proposed
 
