@@ -625,13 +625,28 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
+  # If there is a single alert affecting multiple routes, we need to count that as multiple alerts.
+  # To get around that case, we can return either the total routes or total alerts, whichever is greater.
+  # This will allow us to better determine if :extended or :contracted is needed.
   defp get_total_alerts(grouped_alerts) do
-    grouped_alerts
-    |> Enum.flat_map(&elem(&1, 1))
-    |> Enum.uniq_by(fn
-      "Green-" <> _ -> "Green"
-      route_id -> route_id
-    end)
-    |> length()
+    total_affected_routes =
+      grouped_alerts
+      |> Map.keys()
+      |> Enum.uniq_by(fn
+        "Green-" <> _ -> "Green"
+        route_id -> route_id
+      end)
+      |> length()
+
+    total_alerts =
+      grouped_alerts
+      |> Enum.flat_map(&elem(&1, 1))
+      |> Enum.uniq_by(fn
+        "Green-" <> _ -> "Green"
+        route_id -> route_id
+      end)
+      |> length()
+
+    max(total_affected_routes, total_alerts)
   end
 end
