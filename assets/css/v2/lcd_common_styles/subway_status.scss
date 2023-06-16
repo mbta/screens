@@ -171,18 +171,19 @@
   span.subway-status_alert_location-text {
     // common styles for location text
     font-weight: 500;
-    font-size: 32px;
   }
 
   .subway-status_status--contracted span.subway-status_alert_location-text {
     // contracted-specific styles for location text
     margin-left: 16px;
     line-height: $pill-height;
+    font-size: 27px;
   }
 
   .subway-status_status--extended span.subway-status_alert_location-text {
     // extended-specific styles for location text
     line-height: 48px;
+    font-size: 32px;
   }
 
   .branch-icon {
