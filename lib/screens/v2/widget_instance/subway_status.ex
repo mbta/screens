@@ -488,6 +488,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
       case {trunk_alerts, branch_alerts} do
         # If there are no alerts for the GL trunk, serialize any alerts on the branches
+        {[], [_] = branch_alerts} when total_alert_count < 3 and gl_alert_count == 1 ->
+          [branch_alert] = serialize_green_line_branch_alerts(branch_alerts, false)
+          %{type: :extended, alert: branch_alert}
+
         {[], branch_alerts} ->
           %{type: :contracted, alerts: serialize_green_line_branch_alerts(branch_alerts, false)}
 
