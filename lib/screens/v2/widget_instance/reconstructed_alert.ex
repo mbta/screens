@@ -48,7 +48,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   @type fullscreen_serialized_response :: %{
           optional(:unaffected_routes) => list(route_id()),
-          optional(:location) => String.t(),
+          optional(:location) => String.t() | nil,
           optional(:remedy) => String.t(),
           issue: String.t(),
           cause: String.t(),
@@ -282,12 +282,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             text: [%{format: :bold, text: "No trains"}] ++ endpoint_text
           })
 
-        {issue, ""}
+        {issue, nil}
       else
         endpoint_text = format_endpoint_string(endpoints)
 
         location =
-          if is_nil(endpoint_text), do: "", else: "No #{route_id} Line trains #{endpoint_text}"
+          if is_nil(endpoint_text), do: nil, else: "No #{route_id} Line trains #{endpoint_text}"
 
         issue =
           if is_nil(destination) do
@@ -333,10 +333,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             text: [%{format: :bold, text: "No trains"}] ++ endpoint_text
           })
 
-        {issue, "", "Shuttle buses available"}
+        {issue, nil, "Shuttle buses available"}
       else
         endpoint_text = format_endpoint_string(endpoints)
-        location_text = if is_nil(endpoint_text), do: "", else: "Shuttle buses #{endpoint_text}"
+        location_text = if is_nil(endpoint_text), do: nil, else: "Shuttle buses #{endpoint_text}"
 
         issue =
           if is_nil(destination) do
