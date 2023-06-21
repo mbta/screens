@@ -237,6 +237,8 @@ defmodule Screens.Stops.Stop do
     "Green" => [@green_line_trunk_stops]
   }
 
+  @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
+
   # --- These functions involve the API ---
 
   def fetch_parent_station_name_map(get_json_fn \\ &V3Api.get_json/2) do
@@ -384,6 +386,12 @@ defmodule Screens.Stops.Stop do
   @doc """
   Finds a stop sequence which contains all stations in informed_entities.
   """
+  def get_stop_sequence(informed_entities, "Green") do
+    Enum.find_value(@green_line_branches, fn branch ->
+      get_stop_sequence(informed_entities, branch)
+    end)
+  end
+
   def get_stop_sequence(informed_entities, route_id) do
     stop_sequences = Map.get(@route_stop_sequences, route_id)
     Enum.find(stop_sequences, &sequence_match?(&1, informed_entities))

@@ -17,6 +17,7 @@ import {
   isExtended,
   isGLMultiPill,
   useSubwayStatusTextResizer,
+  FittingStep,
 } from "./subway_status_common";
 
 ////////////////
@@ -97,6 +98,7 @@ interface AlertRowProps extends Alert {
 }
 
 const ALERTS_URL = "mbta.com/alerts";
+const ALERT_FITTING_STEPS = [FittingStep.PerAlertEffect, FittingStep.Abbrev, FittingStep.FullSize];
 
 const AlertRow: ComponentType<AlertRowProps> = ({
   route_pill: routePill,
@@ -109,7 +111,7 @@ const AlertRow: ComponentType<AlertRowProps> = ({
   // row height is a little taller when there is an inline GL branch pill
   const rowHeight = showInlineBranches ? 70 : 60;
   const { ref, abbrev, truncateStatus, replaceLocationWithUrl } =
-    useSubwayStatusTextResizer(rowHeight, id, status);
+    useSubwayStatusTextResizer(rowHeight, ALERT_FITTING_STEPS, id, status);
 
   let locationText: string | null;
   if (replaceLocationWithUrl) {
@@ -123,7 +125,7 @@ const AlertRow: ComponentType<AlertRowProps> = ({
   if (truncateStatus) {
     const effect = firstWord(status);
     status =
-      effect === "Bypassing" ? `Bypassing ${stationCount} stops` : effect;
+      effect === "Bypassing" ? `Bypassing ${stationCount} ${stationCount === 1 ? "stop" : "stops"}` : effect;
   }
 
   return (
