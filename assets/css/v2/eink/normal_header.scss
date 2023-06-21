@@ -8,19 +8,15 @@
 .normal-header-icon {
   display: inline-block;
   vertical-align: middle;
-}
-
-.normal-header-icon__image {
   height: 128px;
   width: 128px;
-  margin-right: 28px;
+  margin: 120px 28px 40px 40px;
 }
 
 .normal-header-title {
-  width: 892px;
-  position: absolute;
-  left: 40px;
-  bottom: 40px;
+  width: 964px;
+  height: 100%;
+  position: relative;
 }
 
 .normal-header-title__text {
@@ -29,10 +25,15 @@
   font-family: Helvetica, sans-serif;
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: 1px;
 
   &--with-icon {
-    width: 736px;
+    width: 768px;
+  }
+
+  &--no-icon {
+    margin-left: 40px;
+    margin-top: 40px;
+    width: 864px;
   }
 
   &--large {
@@ -47,17 +48,13 @@
 }
 
 .normal-header-to__text {
-  position: absolute;
   font-family: Helvetica, sans-serif;
   color: #ffffff;
   letter-spacing: 2px;
   font-size: 56px;
   line-height: 64px;
   height: 64px;
-  width: 736px;
   font-weight: 500;
-  left: 156px;
-  bottom: 110px;
 }
 
 .normal-header-time {
@@ -78,13 +75,12 @@
 }
 
 .normal-header-updated__text {
-  display: inline-block;
-  vertical-align: top;
   text-align: right;
   font-family: Inter;
+  font-weight: 500;
   color: #ffffff;
   font-size: 24px;
-  line-height: 30px;
+  line-height: 28px;
 }
 
 .normal-header-updated__icon {
