@@ -362,6 +362,34 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_fullscreen_alert(
          %__MODULE__{
            alert: %Alert{effect: :station_closure, cause: cause, updated_at: updated_at},
+           now: now
+         } = t,
+         :inside
+       ) do
+    cause_text = Alert.get_cause_string(cause)
+    affected_routes = LocalizedAlert.informed_subway_routes(t)
+    routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
+
+    unaffected_routes =
+      if "Green" in affected_routes do
+        Enum.reject(routes_at_stop, &String.starts_with?(&1, "Green-"))
+      else
+        Enum.into(routes_at_stop, []) -- affected_routes
+      end
+
+    %{
+      issue: affected_routes,
+      unaffected_routes: unaffected_routes,
+      cause: cause_text,
+      routes: get_route_pills(t, :inside),
+      effect: :station_closure,
+      updated_at: format_updated_at(updated_at, now)
+    }
+  end
+
+  defp serialize_fullscreen_alert(
+         %__MODULE__{
+           alert: %Alert{effect: :station_closure, cause: cause, updated_at: updated_at},
            informed_stations_string: informed_stations_string,
            now: now
          } = t,
