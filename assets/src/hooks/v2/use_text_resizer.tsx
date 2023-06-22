@@ -82,21 +82,34 @@ const useTextResizer = <T,>({
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSizeIndex(sizes.length - 1);
-    setIsDone(false);
-  }, resetDependencies);
-
-  useEffect(() => {
     if (ref.current !== null) {
       const height = ref.current.clientHeight;
       if (height > maxHeight && sizeIndex > 0) {
         setSizeIndex(sizeIndex - 1);
+        setIsDone(false);
       }
       if (height <= maxHeight || sizeIndex === 0) {
         setIsDone(true);
       }
     }
   });
+
+  // This state-resetting effect must run *after* the height-measuring
+  // effect. Otherwise, we run into this problem case:
+  // 1. Current state: Resized properly, isDone is true
+  // 2. Data changes to something with long text that needs shrinking
+  // 3. State-resetting hook runs, sets isDone to false
+  // 4. Height-measuring hook runs *in the same render*, before the
+  //    content drawn on the page has changed to reflect the new data.
+  //    Sets isDone back to true because the previous content still fits.
+  // 5. Page re-renders with isDone still true. The component using this hook
+  //    sets some conditional styles that hide overflow, this hook measures
+  //    the ref'd element as fitting, and stops trying smaller sizes.
+  //    --> The new content doesn't get resized properly.
+  useEffect(() => {
+    setSizeIndex(sizes.length - 1);
+    setIsDone(false);
+  }, resetDependencies);
 
   const size = sizes[sizeIndex];
 

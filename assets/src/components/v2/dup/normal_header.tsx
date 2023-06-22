@@ -2,6 +2,7 @@ import React from "react";
 
 import DefaultNormalHeader, { Icon } from "Components/v2/normal_header";
 import { DUP_VERSION } from "Components/v2/dup/version";
+import useOutfrontPlayerName from "Hooks/use_outfront_player_name";
 
 interface NormalHeaderProps {
   text: string;
@@ -18,14 +19,23 @@ const NormalHeader = ({
   accentPattern,
   code,
 }: NormalHeaderProps) => {
+  const playerName = useOutfrontPlayerName();
+  let version = DUP_VERSION;
+  if (playerName) {
+    version = `${version}-${playerName}`;
+  }
+  if (code) {
+    version = `${version}; Maintenance code: ${code}`;
+  }
+
   return (
     <DefaultNormalHeader
-      icon={color === 'yellow' ? Icon.logo_negative : Icon.logo}
+      icon={color === "yellow" ? Icon.logo_negative : Icon.logo}
       text={text}
       time={time}
       // Currently, we don't use different codes that populating this would be useful...
       // But this was a feature available in v1, so just set it up here.
-      version={DUP_VERSION + (code ? "; Maintenance code: " + code : "")}
+      version={version}
       maxHeight={208}
       showTo={false}
       classModifiers={color}

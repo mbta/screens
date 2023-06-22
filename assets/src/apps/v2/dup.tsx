@@ -37,7 +37,7 @@ import {
 import PageLoadNoData from "Components/v2/dup/page_load_no_data";
 import NoData from "Components/v2/dup/no_data";
 import OvernightDepartures from "Components/v2/dup/overnight_departures";
-import useOutfrontStation from "Hooks/use_outfront_station";
+import useOutfrontPlayerName from "Hooks/use_outfront_player_name";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -122,10 +122,10 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
-  const station = useOutfrontStation();
+  const playerName = useOutfrontPlayerName();
 
-  if (station !== null) {
-    const id = `DUP-${station.replace(/\s/g, "")}-V2`;
+  if (playerName !== null) {
+    const id = `DUP-${playerName.trim()}`;
     return (
       <MappingContext.Provider value={TYPE_TO_COMPONENT}>
         <ResponseMapperContext.Provider value={responseMapper}>

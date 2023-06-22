@@ -23,6 +23,7 @@ import {
   isExtended,
   isGLMultiPill,
   useSubwayStatusTextResizer,
+  FittingStep,
 } from "./subway_status_common";
 
 ////////////////
@@ -94,7 +95,7 @@ const ExtendedStatus: ComponentType<ExtendedStatusProps> = ({
 }) => {
   return (
     <div className={classWithModifier("subway-status_status", "extended")}>
-      <ExtendedAlert {...alert} />
+      <ExtendedAlert {...alert} id={getAlertID(alert, "extended")} />
       {showRule && <div className="subway-status_status_rule" />}
     </div>
   );
@@ -105,19 +106,16 @@ interface AlertWithID extends Alert {
   id: string;
 }
 
-// Ordered from "smallest" to "largest"
-enum FittingStep {
-  PerAlertEffect,
-  Abbrev,
-  FullSize,
-}
-
 /**
- * Max pixel height of a ContractedAlert's "subway-status_alert-sizer" div element when content doesn't wrap.
+ * Max pixel height of each alert type's "subway-status_alert-sizer" div element when content doesn't wrap.
  *
  * When the text wraps to a second line it's more than that, which is all we care about to detect overflows.
  */
 const CONTRACTED_ALERT_MAX_HEIGHT = 80;
+const EXTENDED_ALERT_MAX_HEIGHT = 120;
+
+const CONTRACTED_ALERT_FITTING_STEPS = [FittingStep.PerAlertEffect, FittingStep.Abbrev, FittingStep.FullSize];
+const EXTENDED_ALERT_FITTING_STEPS = [FittingStep.Abbrev, FittingStep.FullSize];
 
 const ALERTS_URL = "mbta.com/alerts";
 
@@ -128,8 +126,8 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   station_count: stationCount,
   id,
 }) => {
-  const { ref, abbrev, truncateStatus, replaceLocationWithUrl, fittingStep } =
-    useSubwayStatusTextResizer(CONTRACTED_ALERT_MAX_HEIGHT, id, status);
+  const { ref, abbrev, truncateStatus, replaceLocationWithUrl, isDone } =
+    useSubwayStatusTextResizer(CONTRACTED_ALERT_MAX_HEIGHT, CONTRACTED_ALERT_FITTING_STEPS, id, status);
 
   let locationText: string | null;
   if (replaceLocationWithUrl) {
@@ -143,32 +141,32 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   if (truncateStatus) {
     const effect = firstWord(status);
     status =
-      effect === "Bypassing" ? `Bypassing ${stationCount} stops` : effect;
+      effect === "Bypassing" ? `Bypassing ${stationCount} ${stationCount === 1 ? "stop" : "stops"}` : effect;
   }
-
-  // If we're on the last attempt to fit text in the row and it still overflows,
-  // we prevent it from wrapping or pushing other content out of place.
-  const hideOverflow = fittingStep === FittingStep.PerAlertEffect;
 
   return (
     <BasicAlert
       routePill={routePill}
       status={status}
       location={locationText}
-      hideOverflow={hideOverflow}
+      hideOverflow={isDone}
       ref={ref}
     />
   );
 };
 
-const ExtendedAlert: ComponentType<Alert> = ({
+const ExtendedAlert: ComponentType<AlertWithID> = ({
   route_pill: routePill,
   status,
   location,
+  id,
 }) => {
+  const { ref, abbrev, isDone } =
+    useSubwayStatusTextResizer(EXTENDED_ALERT_MAX_HEIGHT, EXTENDED_ALERT_FITTING_STEPS, id, status);
+
   let locationText: string | null;
   if (isAlertLocationMap(location)) {
-    locationText = location.full;
+    locationText = abbrev ? location.abbrev : location.full;
   } else {
     locationText = location;
   }
@@ -178,7 +176,8 @@ const ExtendedAlert: ComponentType<Alert> = ({
       routePill={routePill}
       status={status}
       location={locationText}
-      hideOverflow
+      hideOverflow={isDone}
+      ref={ref}
     />
   );
 };
@@ -199,6 +198,11 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
       routePill ? "has-pill" : "no-pill"
     );
 
+    let sizerClassName = "subway-status_alert-sizer";
+    if (hideOverflow) {
+      sizerClassName = classWithModifier(sizerClassName, "hide-overflow");
+    }
+
     let textContainerClassName = "subway-status_alert_text-container";
     if (hideOverflow) {
       textContainerClassName = classWithModifier(
@@ -217,7 +221,7 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
 
     return (
       <div className={containerClassName}>
-        <div className="subway-status_alert-sizer" ref={ref}>
+        <div className={sizerClassName} ref={ref}>
           <div className="subway-status_alert_route-pill-container">
             {routePill && <SubwayStatusRoutePill routePill={routePill} />}
           </div>

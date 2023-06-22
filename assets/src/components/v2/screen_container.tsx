@@ -4,6 +4,7 @@ import React, {
   ComponentType,
   useState,
   useEffect,
+  Fragment,
 } from "react";
 import useApiResponse, {
   ApiResponse,
@@ -92,12 +93,13 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
   showBlink,
 }) => {
   const responseMapper = useContext(ResponseMapperContext);
+  const ErrorBoundaryOrFragment = isDup() ? Fragment : WidgetTreeErrorBoundary;
 
   return (
     <div className="screen-container">
-      <WidgetTreeErrorBoundary>
+      <ErrorBoundaryOrFragment>
         {apiResponse && <Widget data={responseMapper(apiResponse)} />}
-      </WidgetTreeErrorBoundary>
+      </ErrorBoundaryOrFragment>
       {showBlink && <div className="screen-container-blink" />}
     </div>
   );
