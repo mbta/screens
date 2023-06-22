@@ -9,7 +9,7 @@
 
 Problem statement:  The Screens team wants to be able to see visual renderings and data responses of past screen content in order to investigate rider reports of incorrect messages or do our own auditing of screen content.
 
-Suggested approach: we want to store the json screen data responses in S3, as frequently as the screen content updates (every 15-30s). With the screen responses stored, we can run the json through frontend rendering and get (at least an MVP view) of past screens. We only need to store 90 days of data, at most.
+Suggested approach: we want to store the json screen data responses in S3, as frequently as the screen content updates (every 15-30s). With the screen responses stored, we can run the json through frontend rendering and get (at least an MVP view) of past screens. We only need to store 90 days of data, at most. This json will only include content we display on screens and will never contain PII.
 
 Note: At the moment, this will be a tool used mainly by the dev team, so we're not going to be too sophisticated with the retrieval and rendering process of the json right now. We did ideate about making a beautiful "screen time-travel view", but there are a few challenges with it that are explained in the #rationale-and-alternatives section. So we're going with an MVP user story here: an engineer needs to be able to see the data responses for historic screen content and be able to locally render the screen at that time. This method of local rendering is already doable, so data storage will be the focus of this work.
 
