@@ -9,6 +9,7 @@ interface PreFareSingleScreenAlertProps {
   cause: string;
   remedy: string;
   routes: string[];
+  unaffected_routes: string[];
   effect: string;
   region: string;
   updated_at: string;
@@ -25,7 +26,7 @@ const doFallbackLayout = (issue: string | null, remedy: string | null, pioSecond
   </>
 )
 
-const issueSection = (issue: string, location: string | null, textSize: string) => (
+const standardIssueSection = (issue: string, location: string | null, textSize: string) => (
   <div className="alert-card__issue">
     <img
       className="alert-card__icon"
@@ -46,7 +47,7 @@ const downstreamIssueSection = (issue: string) => (
   </div>
 )
 
-const buildRemedySection = (effect: string, remedy: string | null, contentTextSize: string) => (
+const remedySection = (effect: string, remedy: string | null, contentTextSize: string) => (
   <div className="alert-card__remedy">
     { effect === "shuttle" ?
       <>
@@ -80,33 +81,42 @@ const buildRemedySection = (effect: string, remedy: string | null, contentTextSi
   </div>
 )
 
-const buildMapSection = () => {
+const mapSection = () => {
   <></>
 }
 
 const PreFareSingleScreenAlert: React.ComponentType<PreFareSingleScreenAlertProps> = (alert) => {
-  const { cause, region, effect, issue, location, remedy, routes, updated_at } = alert;
+  const { cause, region, effect, issue, location, remedy, routes, unaffected_routes, updated_at } = alert;
 
-  console.log(alert)
-
+  /** 
+  * This switch statement picks the alert layout
+  * - fallback: icon, followed by a summary & pio text, or just the pio text
+  * - multiline: icon + route pill + text explaining the lines that are closed at the station
+  *              and then icon + route pill + text explaining normal service. Finally, the map section
+  * - standard: icon + issue, and icon + remedy, and then map section
+  * - downstream: map, issue without icon, then icon + remedy
+  **/
   const layoutRenderer = () => {
     switch(true) {
       case effect === "delay":
         return fallbackLayout()
-      case effect === "station_closure" || region === "here":
+      case (effect === "station_closure" || effect === "stop_closure") && region === "here":
         return multiLineLayout()
-      case effect === "station_closure":
+      case effect === "station_closure" || effect === "stop_closure":
         return standardLayout()
       case (region === "boundary" || region === "here")
             && (effect === "shuttle" || effect === "suspension"):
-        return standardLayout()  
+        return standardLayout()
       case region === "outside" && (effect === "shuttle" || effect === "suspension"):
         return downstreamLayout()  
       default:
         return fallbackLayout()
     }
   }
-
+  
+  // For the standard layout, issue font can be medium or large. 
+  // If remedy is "Seek alternate route", font size is static. Otherwise, it uses the same font size as
+  // the issue.
   const standardLayout = () => {
     const { ref: contentBlockRef, size: contentTextSize } = useTextResizer({
       sizes: ["medium", "large"],
@@ -116,32 +126,61 @@ const PreFareSingleScreenAlert: React.ComponentType<PreFareSingleScreenAlertProp
 
     return (
       <div className="alert-card__content-block" ref={contentBlockRef}>
-        {issueSection(issue, location, contentTextSize)}
-        {buildRemedySection(effect, remedy, contentTextSize)}
-        {buildMapSection()}
+        {standardIssueSection(issue, location, contentTextSize)}
+        {remedySection(effect, remedy, contentTextSize)}
+        {mapSection()}
       </div>
     )
   }
 
-  const multiLineLayout = () => {
-    return (
-      <div className="alert-card__content-block">
-        {issueSection(issue, location, "large")}
-        {buildRemedySection(effect, remedy, "large")}
-        {buildMapSection()}
-      </div>
-    )
-  }
-
+  // In the downstream layout, the map is at the top, and the font size stays constant
   const downstreamLayout = () => (
     <div className={classWithModifier("alert-card__content-block", "downstream")}>
-      {buildMapSection()}
+      {mapSection()}
       {downstreamIssueSection(issue)}
-      {buildRemedySection(effect, remedy, "medium")}
+      {remedySection(effect, remedy, "medium")}
     </div>
   )
 
-  // Not sure this resizing logic is working correctly
+  // Covers the case where a station_closure only affects one line at a transfer station.
+  // In the even rarer case that there are multiple branches in the routes list or unaffected routes list
+  // the font size may need to shrink to accommodate.
+  const multiLineLayout = () => {
+    const { ref: contentBlockRef, size: contentTextSize } = useTextResizer({
+      sizes: ["medium", "large"],
+      maxHeight: 772,
+      resetDependencies: [issue, remedy],
+    });
+
+    return (
+      <div className="alert-card__content-block" ref={contentBlockRef}>
+        <div className="alert-card__issue">
+          <img
+            className="alert-card__icon"
+            src={imagePath("no-service-black.svg")}
+          />
+          <div className={classWithModifier("alert-card__content-block__text", contentTextSize)}>
+            <img src={pillPath(routes[0])} className="alert-card__content-block__route-pill" />
+            <span>trains are skipping this station</span>
+          </div>
+        </div>
+        <div className="alert-card__issue">
+          <img
+            className="alert-card__icon"
+            src={imagePath("info.svg")}
+          />
+          <div className={classWithModifier("alert-card__content-block__text", contentTextSize)}>
+            {unaffected_routes.map(route => 
+             <img src={pillPath(route)} key={route} className="alert-card__content-block__route-pill" />
+            )}
+           <span>trains stop as usual</span>
+          </div>
+        </div>
+        {mapSection()}
+      </div>
+    )
+  }
+
   const fallbackLayout = () => {
     // If there is more than 1 route in the banner, or the 1 route is longer than "GL·B"
     // the banner will be tall. Otherwise, it'll be 1-line
@@ -154,7 +193,7 @@ const PreFareSingleScreenAlert: React.ComponentType<PreFareSingleScreenAlertProp
     const { ref: pioTextBlockRef, size: pioSecondaryTextSize } = useTextResizer({
       sizes: ["small", "medium"],
       maxHeight: maxTextHeight,
-      resetDependencies: [remedy],
+      resetDependencies: [issue, remedy],
     });
 
     return (
@@ -164,12 +203,15 @@ const PreFareSingleScreenAlert: React.ComponentType<PreFareSingleScreenAlertProp
     )
   }
 
+  // TODO: When there is an SVG within the content-block, resize logic
+  // doesn't kick in until the next data fetch. Should be fixed with better SVG loading
+
   return (
     <div className="pre-fare-alert__page">
       <PreFareAlertBanner routes={routes} />
       <div
         className={classWithModifiers("alert-container", [
-          "takeover",
+          "single-page",
           getAlertColor(routes)
         ])}
       >

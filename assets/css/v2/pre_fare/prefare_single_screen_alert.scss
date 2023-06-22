@@ -16,7 +16,7 @@
   height: 100%;
 }
 
-.alert-container--takeover {
+.alert-container--single-page {
   font-family: Inter;
   flex-grow: 1;
   min-height: 0;
@@ -144,7 +144,17 @@
   left: 1080px;
 }
 
-.alert-container--takeover {
+.alert-card__content-block__route-pill {
+  height: 124px;
+  display: inline;
+  vertical-align: bottom;
+  margin-right: 9px;
+  &:last-of-type {
+    margin-right: 46px;
+  }
+}
+
+.alert-container--single-page {
   /* Background colors */
   &.alert-container--blue {
     background-color: $line-color-blue;
