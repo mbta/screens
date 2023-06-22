@@ -43,7 +43,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           location: String.t(),
           cause: String.t(),
           effect: :suspension | :shuttle | :station_closure,
-          updated_at: String.t()
+          updated_at: String.t(),
+          routes: list(map())
         }
 
   @type fullscreen_serialized_response :: %{
@@ -179,6 +180,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp format_for_svg_name(headsign), do: Map.get(@headsign_svg_map, headsign)
 
+  defp format_cause(:unknown), do: nil
+  defp format_cause(cause), do: cause |> to_string() |> String.replace("_", " ")
+
   def takeover_alert?(%__MODULE__{is_full_screen: false}), do: false
 
   def takeover_alert?(%__MODULE__{is_terminal_station: is_terminal_station, alert: alert} = t) do
@@ -198,7 +202,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        ) do
     informed_entities = Alert.informed_entities(alert)
-    cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
     [route_id] = LocalizedAlert.informed_subway_routes(t)
     endpoints = get_endpoints(informed_entities, route_id)
 
@@ -206,7 +209,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "No trains",
       remedy: "Seek alternate route",
       location: "No #{route_id} Line trains #{format_endpoint_string(endpoints)}",
-      cause: cause_text,
+      cause: format_cause(cause),
+      routes: get_route_pills(t),
       effect: :suspension,
       updated_at: format_updated_at(updated_at, now)
     }
@@ -219,7 +223,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        ) do
     informed_entities = Alert.informed_entities(alert)
-    cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
     [route_id] = LocalizedAlert.informed_subway_routes(t)
     endpoints = get_endpoints(informed_entities, route_id)
 
@@ -228,24 +231,28 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       remedy: "Use shuttle bus",
       location:
         "Shuttle buses replace #{route_id} Line trains #{format_endpoint_string(endpoints)}",
-      cause: cause_text,
+      cause: format_cause(cause),
+      routes: get_route_pills(t),
       effect: :shuttle,
       updated_at: format_updated_at(updated_at, now)
     }
   end
 
-  defp serialize_takeover_alert(%__MODULE__{
-         alert: %Alert{effect: :station_closure, cause: cause, updated_at: updated_at},
-         informed_stations_string: informed_stations_string,
-         now: now
-       }) do
-    cause_text = cause |> Alert.get_cause_string() |> String.capitalize()
+  defp serialize_takeover_alert(
+         %__MODULE__{
+           alert: %Alert{effect: :station_closure, cause: cause, updated_at: updated_at},
+           informed_stations_string: informed_stations_string,
+           now: now
+         } = t
+       ) do
+    [route_id] = LocalizedAlert.informed_subway_routes(t)
 
     %{
       issue: "Station closed",
       remedy: "Seek alternate route",
-      location: "Trains skip #{informed_stations_string}",
-      cause: cause_text,
+      location: "#{route_id} Line trains skip #{informed_stations_string}",
+      cause: format_cause(cause),
+      routes: get_route_pills(t),
       effect: :station_closure,
       updated_at: format_updated_at(updated_at, now)
     }
