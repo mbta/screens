@@ -1,29 +1,29 @@
-// Elements of `middle_nodes` and `edges` describe the diagram's pieces in order, from left to right.
-// `edges` will always have 1 more element than `middle_nodes`. For example:
-// [l_end] -edge- [node] -edge- [node] -edge- [node] -edge- [r_end]
-// 4 edges, 3 nodes
+// Elements of `middle_slots` and `edges` describe the diagram's pieces in order, from left to right.
+// `edges` will always have 1 more element than `middle_slots`. For example:
+// [l_end] -edge- [slot] -edge- [slot] -edge- [slot] -edge- [r_end]
+// 4 edges, 3 slots
 interface DisruptionDiagram {
-  l_end: End;
-  r_end: End;
-  middle_nodes: Node[];
+  l_end: EndSlot;
+  r_end: EndSlot;
+  middle_slots: MiddleSlot[];
   edges: Edge[];
 }
 
-type End = Destination | TerminalNode;
+type EndSlot = Destination | Terminal;
 
-interface Node {
+interface MiddleSlot {
   // Note the single ellipsis character, not 3 periods
   label: "…" | { full: string, abbrev: string };
-  symbol: Symbol | null;
+  symbol: SlotSymbol | null;
 }
 
 interface Destination {
   destination_id: TerminalStation | AggregateDestination;
 }
 
-interface TerminalNode {
+interface Terminal {
   station_id: TerminalStation;
-  symbol: Symbol;
+  symbol: SlotSymbol;
 }
 
 // End labels appear to need hardcoded representations--they have line
@@ -66,7 +66,7 @@ type DisruptionEdge =
   | "dashed"
   | "thin";
 
-type Symbol =
+type SlotSymbol =
   // Color is always "black" -- might change pending design example for you-are-here shuttled station
   | { icon: "closed" | "shuttled", color: DisruptionColor }
   | { icon: "open", color: LineColor }
@@ -113,7 +113,7 @@ Client is responsible for:
 Q: Do we need to hardcode the typesetting for all end labels, or is there some procedure to determine them automatically?
      - It seems like we do need to hardcode at least some of them, so I made the data structure reflect that by assigning each one an ID
        which the client will use to look up how to render it.
-Q: The rule for abbreviating middle-node labels** does not appear to be applied consistently in the figma examples. Is it correct?
+Q: The rule for abbreviating middle-slot labels** does not appear to be applied consistently in the figma examples. Is it correct?
    ** Abbreviate when label.height > 8 + max(l_end.label.height, r_end.label.height)
 Q: What's the treatment for when the you-are-here stop is in the middle of a shuttle or suspension?
 */

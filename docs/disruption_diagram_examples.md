@@ -13,7 +13,7 @@
     station_id: "place-gover",
     symbol: "you-are-here"
   },
-  middle_nodes: [
+  middle_slots: [
     {
       label: {full: "South Street", abbrev: "South St"},
       symbol: {icon: "shuttled", color: "black"}
@@ -70,7 +70,7 @@
   ]
 }
 ```
-**Notice that there's a fair amount of repetitionin both `middle_nodes` and `edges`**--my thinking
+**Notice that there's a fair amount of repetition in both `middle_slots` and `edges`**--my thinking
 here was that we will probably be constructing the diagram piece-by-piece, so it would be easiest
 if the client just received lists that it could iterate through to directly map each list element
 to a diagram piece.
@@ -80,7 +80,7 @@ If that approach seems weird or bad, I'm open to changing up the data to somethi
 {
   l_end: ...,
   r_end: ...,
-  middle_nodes: [
+  middle_slots: [
     {
       symbol: {icon: "shuttled", color: "black"},
       labels: [
@@ -112,7 +112,7 @@ If that approach seems weird or bad, I'm open to changing up the data to somethi
 {
   l_end: {destination_id: "place-alfcl",},
   r_end: {destination_id: "place-asmnl+place-brntn"},
-  middle_nodes: [
+  middle_slots: [
     {
       label: {full: "Kendall/MIT", abbrev: "Kendall/MIT"},
       symbol: {icon: "open", color: "red"}
@@ -157,7 +157,7 @@ If that approach seems weird or bad, I'm open to changing up the data to somethi
     station_id: "place-gover",
     symbol: "you-are-here"
   },
-  middle_nodes: [
+  middle_slots: [
     {
       label: {full: "Saint Paul Street", abbrev: "St. Paul St"},
       symbol: {icon: "open", color: "green"}

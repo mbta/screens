@@ -9,17 +9,17 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   @type t :: %__MODULE__{}
 
   @type serialized_response :: %{
-          l_end: end_node(),
-          r_end: end_node(),
-          middle_nodes: list(node()),
+          l_end: end_slot(),
+          r_end: end_slot(),
+          middle_slots: list(middle_slot()),
           edges: list(edge())
         }
 
-  @type end_node :: destination() | terminal_node()
+  @type end_slot :: destination() | terminal()
 
-  @type node :: %{
+  @type middle_slot :: %{
           label: ellipsis() | %{full: String.t(), abbrev: String.t()},
-          symbol: symbol() | nil
+          symbol: slot_symbol() | nil
         }
 
   # Literally the string "…", but you can't use string literals as types in elixir
@@ -29,9 +29,9 @@ defmodule Screens.V2.DisruptionDiagram.Model do
           destination_id: terminal_station() | aggregate_destination()
         }
 
-  @type terminal_node :: %{
+  @type terminal :: %{
           station_id: terminal_station(),
-          symbol: symbol()
+          symbol: slot_symbol()
         }
 
   # Parent station ID of a terminal station
@@ -42,15 +42,15 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   @type edge :: line_color() | disruption_edge()
 
-  @type disruption_edge :: :dashed | :thin
-
-  @type symbol ::
+  @type slot_symbol ::
           %{icon: :closed | :shuttled, color: disruption_color()}
           | %{icon: :open, color: line_color()}
           | :"you-are-here"
           | :"you-are-here--outline"
 
   @type line_color :: :blue | :orange | :red | :green
+
+  @type disruption_edge :: :dashed | :thin
 
   @type disruption_color :: :black | :"you-are-here"
 
