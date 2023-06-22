@@ -135,36 +135,42 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   def serialize_one_row_for_all_routes(grouped_alerts) do
+    total_alert_count = get_total_alerts(grouped_alerts)
+
     %{
-      blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue"),
-      orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange"),
-      red: serialize_single_alert_row_for_route(grouped_alerts, "Red"),
-      green: serialize_green_line(grouped_alerts)
+      blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", total_alert_count),
+      orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange", total_alert_count),
+      red: serialize_single_alert_row_for_route(grouped_alerts, "Red", total_alert_count),
+      green: serialize_green_line(grouped_alerts, total_alert_count)
     }
   end
 
   # At most 1 alert on any route
   def serialize_routes_zero_or_one_alert(grouped_alerts) do
+    total_alert_count = get_total_alerts(grouped_alerts)
+
     %{
-      blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue"),
-      orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange"),
-      red: serialize_single_alert_row_for_route(grouped_alerts, "Red"),
-      green: serialize_green_line(grouped_alerts)
+      blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", total_alert_count),
+      orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange", total_alert_count),
+      red: serialize_single_alert_row_for_route(grouped_alerts, "Red", total_alert_count),
+      green: serialize_green_line(grouped_alerts, total_alert_count)
     }
   end
 
   # More than 1 alert on any one route
   def serialize_routes_multiple_alerts(grouped_alerts, multi_alert_routes) do
     multi_alert_route_ids = Enum.map(multi_alert_routes, &elem(&1, 0))
+    total_alert_count = get_total_alerts(grouped_alerts)
 
     cond do
       "Green" in multi_alert_route_ids ->
         # Collapse all non-GL routes and display as many GL alerts as possible.
         %{
-          blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue"),
-          orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange"),
-          red: serialize_single_alert_row_for_route(grouped_alerts, "Red"),
-          green: serialize_green_line(grouped_alerts)
+          blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", total_alert_count),
+          orange:
+            serialize_single_alert_row_for_route(grouped_alerts, "Orange", total_alert_count),
+          red: serialize_single_alert_row_for_route(grouped_alerts, "Red", total_alert_count),
+          green: serialize_green_line(grouped_alerts, total_alert_count)
         }
 
       length(multi_alert_route_ids) == 1 ->
@@ -178,7 +184,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
             blue: serialize_multiple_alert_rows_for_route(grouped_alerts, "Blue"),
             orange: serialize_multiple_alert_rows_for_route(grouped_alerts, "Orange"),
             red: serialize_multiple_alert_rows_for_route(grouped_alerts, "Red"),
-            green: serialize_green_line(grouped_alerts)
+            green: serialize_green_line(grouped_alerts, total_alert_count)
           }
         else
           serialize_one_row_for_all_routes(grouped_alerts)
@@ -216,7 +222,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   # Only executed when route displays one status.
-  def serialize_single_alert_row_for_route(grouped_alerts, route_id) do
+  def serialize_single_alert_row_for_route(grouped_alerts, route_id, total_alert_count) do
     alerts = Map.get(grouped_alerts, route_id)
 
     data =
@@ -231,7 +237,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           serialize_alert_summary(length(alerts), serialize_route_pill(route_id))
       end
 
-    if get_total_alerts(grouped_alerts) in 1..2 and data.status != "Normal Service" do
+    if total_alert_count in 1..2 and data.status != "Normal Service" do
       %{
         type: :extended,
         alert: data
@@ -466,16 +472,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       alert_whole_line_stops == @green_line_branches
   end
 
-  def serialize_green_line(grouped_alerts) do
+  def serialize_green_line(grouped_alerts, total_alert_count) do
     green_line_alerts =
       @green_line_branches
       |> Enum.flat_map(fn route -> Map.get(grouped_alerts, route, []) end)
       |> Enum.uniq()
 
-    alert_count = length(green_line_alerts)
+    gl_alert_count = length(green_line_alerts)
 
-    if alert_count == 0 do
-      serialize_single_alert_row_for_route(grouped_alerts, "Green")
+    if gl_alert_count == 0 do
+      serialize_single_alert_row_for_route(grouped_alerts, "Green", total_alert_count)
     else
       {trunk_alerts, branch_alerts} =
         Enum.split_with(green_line_alerts, &alert_affects_gl_trunk_or_whole_line?/1)
@@ -483,10 +489,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       case {trunk_alerts, branch_alerts} do
         # If there are no alerts for the GL trunk, serialize any alerts on the branches
         {[], branch_alerts} ->
-          %{type: :contracted, alerts: serialize_green_line_branch_alerts(branch_alerts, false)}
+          serialize_green_line_branch_alerts(
+            branch_alerts,
+            false,
+            total_alert_count,
+            gl_alert_count
+          )
+
+        {[trunk_alert], []} when total_alert_count < 3 ->
+          %{type: :extended, alert: serialize_trunk_alert(trunk_alert)}
 
         {[trunk_alert], []} ->
-          %{type: :extended, alert: serialize_trunk_alert(trunk_alert)}
+          %{type: :contracted, alerts: [serialize_trunk_alert(trunk_alert)]}
 
         # If there is a single alert on the GL trunk, show it in its own row.
         # Show branch alert/summary on another row.
@@ -495,7 +509,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
             type: :contracted,
             alerts: [
               serialize_trunk_alert(trunk_alert),
-              serialize_green_line_branch_alerts(branch_alerts, true)
+              serialize_green_line_branch_alerts(
+                branch_alerts,
+                true,
+                total_alert_count,
+                gl_alert_count
+              )
             ]
           }
 
@@ -511,7 +530,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         {_, _} ->
           %{
             type: :contracted,
-            alerts: [serialize_alert_summary(alert_count, serialize_route_pill("Green"))]
+            alerts: [serialize_alert_summary(gl_alert_count, serialize_route_pill("Green"))]
           }
       end
     end
@@ -532,45 +551,71 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     }
   end
 
-  defp serialize_green_line_branch_alerts(branch_alerts, has_trunk_alert) do
-    route_ids = Enum.flat_map(branch_alerts, &alert_routes/1)
+  defp serialize_green_line_branch_alerts(branch_alerts, false, total_alert_count, gl_alert_count) do
+    route_ids =
+      branch_alerts
+      |> Enum.flat_map(&alert_routes/1)
+      |> Enum.filter(&String.starts_with?(&1, "Green"))
+
     alert_count = length(branch_alerts)
 
-    case {branch_alerts, has_trunk_alert} do
-      # Show the branch alert in a row under the trunk alert.
-      {[alert], true} ->
-        Map.merge(
-          %{route_pill: serialize_gl_pill_with_branches(alert_routes(alert))},
-          serialize_green_line_branch_alert(alert, alert_routes(alert))
-        )
-
-      # Always consolidate 2+ branch alerts if there is a trunk alert
-      {_alerts, true} ->
-        serialize_alert_summary(alert_count, serialize_gl_pill_with_branches(route_ids))
-
+    case branch_alerts do
       # One branch alert, no trunk alerts
-      {[alert], false} ->
+      [alert] ->
         route_id = List.first(route_ids, "Green")
 
-        [
+        serialized_alert =
           Map.merge(
             %{route_pill: serialize_gl_pill_with_branches(route_ids)},
             serialize_alert(alert, route_id)
           )
-        ]
+
+        if total_alert_count < 3 and gl_alert_count == 1 do
+          %{type: :extended, alert: serialized_alert}
+        else
+          %{type: :contracted, alerts: [serialized_alert]}
+        end
 
       # 2 branch alerts, no trunk alert
-      {[alert1, alert2], false} ->
-        [
-          serialize_green_line_branch_alert(alert1, alert_routes(alert1)),
-          serialize_green_line_branch_alert(alert2, alert_routes(alert2))
-        ]
+      [alert1, alert2] ->
+        %{
+          type: :contracted,
+          alerts: [
+            serialize_green_line_branch_alert(alert1, alert_routes(alert1)),
+            serialize_green_line_branch_alert(alert2, alert_routes(alert2))
+          ]
+        }
 
       # 3+ branch alerts
-      {_alerts, false} ->
-        [
-          serialize_alert_summary(alert_count, serialize_gl_pill_with_branches(route_ids))
-        ]
+      _alerts ->
+        %{
+          type: :contracted,
+          alerts: [
+            serialize_alert_summary(alert_count, serialize_gl_pill_with_branches(route_ids))
+          ]
+        }
+    end
+  end
+
+  defp serialize_green_line_branch_alerts(branch_alerts, true, _, _) do
+    route_ids =
+      branch_alerts
+      |> Enum.flat_map(&alert_routes/1)
+      |> Enum.filter(&String.starts_with?(&1, "Green"))
+
+    alert_count = length(branch_alerts)
+
+    case branch_alerts do
+      # Show the branch alert in a row under the trunk alert.
+      [branch_alert] ->
+        Map.merge(
+          %{route_pill: serialize_gl_pill_with_branches(alert_routes(branch_alert))},
+          serialize_green_line_branch_alert(branch_alert, route_ids)
+        )
+
+      # Always consolidate 2+ branch alerts if there is a trunk alert
+      _alerts ->
+        serialize_alert_summary(alert_count, serialize_gl_pill_with_branches(route_ids))
     end
   end
 
@@ -625,13 +670,28 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
+  # If there is a single alert affecting multiple routes, we need to count that as multiple alerts.
+  # To get around that case, we can return either the total routes or total alerts, whichever is greater.
+  # This will allow us to better determine if :extended or :contracted is needed.
   defp get_total_alerts(grouped_alerts) do
-    grouped_alerts
-    |> Enum.flat_map(&elem(&1, 1))
-    |> Enum.uniq_by(fn
-      "Green-" <> _ -> "Green"
-      route_id -> route_id
-    end)
-    |> length()
+    total_affected_routes =
+      grouped_alerts
+      |> Map.keys()
+      |> Enum.uniq_by(fn
+        "Green-" <> _ -> "Green"
+        route_id -> route_id
+      end)
+      |> length()
+
+    total_alerts =
+      grouped_alerts
+      |> Enum.flat_map(&elem(&1, 1))
+      |> Enum.uniq_by(fn
+        "Green-" <> _ -> "Green"
+        route_id -> route_id
+      end)
+      |> length()
+
+    max(total_affected_routes, total_alerts)
   end
 end
