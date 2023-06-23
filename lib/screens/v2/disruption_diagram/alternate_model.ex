@@ -11,41 +11,40 @@ defmodule Screens.V2.DisruptionDiagram.AlternateModel do
   @type serialized_response :: continuous_disruption_diagram() | discrete_disruption_diagram()
 
   @type continuous_disruption_diagram :: %{
-    effect: :shuttle | :suspension,
-    # A 2-element list, giving indices of the effect region's *first and last disrupted stops*.
-    # For example in this scenario:
-    #     0     1     2     3     4     5     6
-    #    <= === O - - X - - X - - X - - O === =>
-    #                 |---range---|
-    # The range is [2, 4].
-    effect_region_slot_index_range: list(non_neg_integer()),
-    line: line_color(),
-    current_station_slot_index: non_neg_integer() | nil,
-    # First and last elements of the list are `end_slot`s, middle elements are `middle_slot`s.
-    slots: list(slot())
-  }
+          effect: :shuttle | :suspension,
+          # A 2-element list, giving indices of the effect region's *first and last disrupted stops*.
+          # For example in this scenario:
+          #     0     1     2     3     4     5     6
+          #    <= === O - - X - - X - - X - - O === =>
+          #                 |---range---|
+          # The range is [2, 4].
+          effect_region_slot_index_range: list(non_neg_integer()),
+          line: line_color(),
+          current_station_slot_index: non_neg_integer() | nil,
+          # First and last elements of the list are `end_slot`s, middle elements are `middle_slot`s.
+          slots: list(slot())
+        }
 
   @type discrete_disruption_diagram :: %{
-    effect: :station_closure,
-    closed_station_slot_indices: list(non_neg_integer())
-    line: line_color(),
-    current_station_slot_index: non_neg_integer() | nil,
-    # First and last elements of the list are `end_slot`s, middle elements are `middle_slot`s.
-    slots: list(slot())
-  }
+          effect: :station_closure,
+          closed_station_slot_indices: list(non_neg_integer()),
+          line: line_color(),
+          current_station_slot_index: non_neg_integer() | nil,
+          # First and last elements of the list are `end_slot`s, middle elements are `middle_slot`s.
+          slots: list(slot())
+        }
 
   @type slot :: end_slot() | middle_slot()
 
   @type end_slot :: %{
-    type: :arrow | :terminal,
-    label_id: end_label_id()
-  }
+          type: :arrow | :terminal,
+          label_id: end_label_id()
+        }
 
   @type middle_slot :: %{
-    label: label(),
-    show_symbol: boolean()
-  }
-
+          label: label(),
+          show_symbol: boolean()
+        }
 
   @type label :: ellipsis() | %{full: String.t(), abbrev: String.t()}
 
