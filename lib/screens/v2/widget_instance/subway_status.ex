@@ -485,8 +485,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       end)
       |> Enum.uniq()
 
-    Enum.count(gl_stop_sequences, fn stop_sequence ->
-      alert_stops != [] and Enum.all?(alert_stops, &(&1 in stop_sequence))
+    alert_stops != [] and Enum.count(gl_stop_sequences, fn stop_sequence ->
+      Enum.all?(alert_stops, &(&1 in stop_sequence))
     end) > 1
   end
 
