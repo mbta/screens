@@ -464,14 +464,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
            effect: :station_closure,
            informed_entities: informed_entities
          },
-         gl_stop_sequences
+         gl_stop_sets
        ) do
     informed_entities
     |> Enum.map(fn e -> Map.get(e, :stop) end)
     |> Enum.reject(&is_nil/1)
     |> Enum.uniq()
     |> Enum.any?(fn informed_stop ->
-      Enum.count(gl_stop_sequences, &(informed_stop in &1)) > 1
+      Enum.count(gl_stop_sets, &(informed_stop in &1)) > 1
     end)
   end
 
@@ -485,13 +485,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       end)
       |> Enum.uniq()
 
-    alert_stops != [] and Enum.count(gl_stop_sequences, fn stop_sequence ->
-      Enum.all?(alert_stops, &(&1 in stop_sequence))
-    end) > 1
+    alert_stops != [] and
+      Enum.count(gl_stop_sequences, fn stop_sequence ->
+        Enum.all?(alert_stops, &(&1 in stop_sequence))
+      end) > 1
   end
 
-  defp alert_affects_gl_trunk_or_whole_line?(alert, gl_stop_sequences) do
-    alert_affects_gl_trunk?(alert, gl_stop_sequences) or
+  defp alert_affects_gl_trunk_or_whole_line?(alert, gl_stop_sets) do
+    alert_affects_gl_trunk?(alert, gl_stop_sets) or
       alert_affects_whole_green_line?(alert)
   end
 
@@ -506,12 +507,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     if gl_alert_count == 0 do
       serialize_single_alert_row_for_route(grouped_alerts, "Green", total_alert_count)
     else
-      gl_stop_sequences = Stop.get_gl_stop_sequences()
+      gl_stop_sets = Enum.map(Stop.get_gl_stop_sequences(), &MapSet.new/1)
 
       {trunk_alerts, branch_alerts} =
         Enum.split_with(
           green_line_alerts,
-          &alert_affects_gl_trunk_or_whole_line?(&1, gl_stop_sequences)
+          &alert_affects_gl_trunk_or_whole_line?(&1, gl_stop_sets)
         )
 
       case {trunk_alerts, branch_alerts} do
