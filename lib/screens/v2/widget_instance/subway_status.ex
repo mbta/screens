@@ -476,7 +476,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   #
-  defp alert_affects_gl_trunk?(%Alert{informed_entities: informed_entities}, gl_stop_sequences) do
+  defp alert_affects_gl_trunk?(%Alert{informed_entities: informed_entities}, gl_stop_sets) do
     alert_stops =
       informed_entities
       |> Enum.filter(fn
@@ -487,7 +487,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       |> MapSet.new()
 
     if MapSet.size(alert_stops) > 0 do
-      Enum.count(gl_stop_sequences, &MapSet.subset?(alert_stops, &1)) > 1
+      Enum.count(gl_stop_sets, &MapSet.subset?(alert_stops, &1)) > 1
     else
       false
     end
