@@ -622,13 +622,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             ]
           },
           %Alert{
-            effect: :station_closure,
+            effect: :delay,
+            severity: 6,
             informed_entities: [
-              %{route: "Green-B", stop: "place-gover"},
-              %{route: "Green-C", stop: "place-gover"},
-              %{route: "Green-D", stop: "place-gover"},
-              %{route: "Green-E", stop: "place-gover"},
-              %{route: "Green-E", stop: "place-nuniv"}
+              %{route: "Green-B", stop: nil},
+              %{route: "Green-C", stop: nil},
+              %{route: "Green-D", stop: nil},
+              %{route: "Green-E", stop: nil}
             ]
           }
         ]
@@ -666,13 +666,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           type: :contracted,
           alerts: [
             %{
-              location: %{
-                abbrev: "Gov't Ctr and Northeast'n",
-                full: "Government Center and Northeastern University"
-              },
+              location: nil,
               route_pill: %{color: :green, text: "GL", type: :text},
-              status: "Bypassing",
-              station_count: 2
+              status: "Delays up to 25 minutes"
             },
             %{
               route_pill: %{type: :text, text: "GL", color: :green, branches: [:b, :c]},
