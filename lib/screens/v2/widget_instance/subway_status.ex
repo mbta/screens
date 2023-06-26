@@ -484,12 +484,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         ie -> String.starts_with?(ie.stop, "place-") and String.starts_with?(ie.route, "Green-")
       end)
       |> Enum.map(& &1.stop)
-      |> Enum.uniq()
+      |> MapSet.new()
 
-    alert_stops != [] and
-      Enum.count(gl_stop_sequences, fn stop_sequence ->
-        Enum.all?(alert_stops, &(&1 in stop_sequence))
-      end) > 1
+    if MapSet.size(alert_stops) > 0 do
+      Enum.count(gl_stop_sequences, &MapSet.subset?(alert_stops, &1)) > 1
+    else
+      false
+    end
   end
 
   defp alert_affects_gl_trunk_or_whole_line?(alert, gl_stop_sets) do
