@@ -536,9 +536,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           %Alert{
             effect: :suspension,
             informed_entities: [
-              %{route: "Green-C", stop: "place-gover"},
-              %{route: "Green-C", stop: "place-pktrm"},
-              %{route: "Green-C", stop: "place-boyls"}
+              %{route: "Green-C", stop: "place-hwsst"},
+              %{route: "Green-C", stop: "place-kntst"},
+              %{route: "Green-C", stop: "place-stpul"}
             ]
           },
           %Alert{
@@ -592,7 +592,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               status: "Bypassing"
             },
             %{
-              location: %{abbrev: "Gov't Ctr to Boylston", full: "Government Center to Boylston"},
+              location: %{
+                abbrev: "Hawes St to St. Paul St",
+                full: "Hawes Street to Saint Paul Street"
+              },
               route_pill: %{branches: [:c], color: :green, text: "GL", type: :text},
               status: "Suspension"
             }
@@ -609,9 +612,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           %Alert{
             effect: :suspension,
             informed_entities: [
-              %{route: "Green-C", stop: "place-gover"},
-              %{route: "Green-C", stop: "place-pktrm"},
-              %{route: "Green-C", stop: "place-boyls"}
+              %{route: "Green-C", stop: "place-hwsst"},
+              %{route: "Green-C", stop: "place-kntst"},
+              %{route: "Green-C", stop: "place-stpul"}
             ]
           },
           %Alert{
@@ -689,8 +692,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             effect: :suspension,
             informed_entities: [
               %{route: "Green-C", stop: "place-gover"},
-              %{route: "Green-C", stop: "place-pktrm"},
-              %{route: "Green-C", stop: "place-boyls"}
+              %{route: "Green-C", stop: "place-pktrm"}
             ]
           },
           %Alert{
@@ -743,8 +745,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               status: "Delays up to 20 minutes"
             },
             %{
-              location: %{abbrev: "Gov't Ctr to Boylston", full: "Government Center to Boylston"},
-              route_pill: %{color: :green, text: "GL", type: :text, branches: [:c]},
+              location: %{
+                abbrev: "Gov't Ctr to Park St",
+                full: "Government Center to Park Street"
+              },
+              route_pill: %{color: :green, text: "GL", type: :text},
               status: "Suspension"
             }
           ]

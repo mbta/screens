@@ -483,6 +483,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         %{stop: nil} -> false
         ie -> String.starts_with?(ie.stop, "place-") and String.starts_with?(ie.route, "Green-")
       end)
+      |> Enum.map(& &1.stop)
       |> Enum.uniq()
 
     alert_stops != [] and
