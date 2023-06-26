@@ -475,7 +475,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end)
   end
 
-  #
+  # If the affected stops are fully contained in more than one branch, the alert affects the trunk
   defp alert_affects_gl_trunk?(%Alert{informed_entities: informed_entities}, gl_stop_sets) do
     alert_stops =
       informed_entities
