@@ -19,6 +19,7 @@ import {
   useSubwayStatusTextResizer,
   FittingStep,
 } from "./subway_status_common";
+import EinkSubwayStatusPill from "../bundled_svg/eink_subway_status_pill";
 
 ////////////////
 // COMPONENTS //
@@ -194,9 +195,7 @@ const SubwayStatusRoutePill: ComponentType<{
   }
 
   // Return the route pill at the top of the section above alerts.
-  return (
-    <img src={getStandardLinePillPath(routePill.color)} className="pill-icon" />
-  );
+  return getStandardLinePillPath(routePill.color)
 };
 
 const GLBranchPillGroup: ComponentType<
@@ -207,13 +206,7 @@ const GLBranchPillGroup: ComponentType<
   if (showInlineBranches) {
     return (
       <>
-        {branches.map((branch) => (
-          <img
-            src={getGLBranchLetterPillPath(branch)}
-            className="branch-icon"
-            key={branch}
-          />
-        ))}
+        {branches.map((branch) => getGLBranchLetterPillPath(branch)) }
       </>
     );
   }
@@ -221,14 +214,8 @@ const GLBranchPillGroup: ComponentType<
   const [firstBranch, ...rest] = branches;
   return (
     <>
-      <img src={getGLComboPillPath(firstBranch)} className="pill-icon" />
-      {rest.map((branch) => (
-        <img
-          src={getGLBranchLetterPillPath(branch)}
-          className="branch-icon"
-          key={branch}
-        />
-      ))}
+      {getGLComboPillPath(firstBranch)}
+      {rest.map((branch) => getGLBranchLetterPillPath(branch))}
     </>
   );
 };
@@ -266,15 +253,11 @@ const getRoutePillObject = (
   return { color: color };
 };
 
-const getStandardLinePillPath = (lineColor: LineColor) =>
-  pillPath(`${lineColor}-line.svg`);
+const getStandardLinePillPath = (lineColor: LineColor) => (<EinkSubwayStatusPill pill={`${lineColor}-line`} className="pill-icon" />)
 
-const getGLComboPillPath = (branch: GLBranch) => pillPath(`gl-${branch}.svg`);
+const getGLComboPillPath = (branch: GLBranch) => <EinkSubwayStatusPill pill={`gl-${branch}`} className="pill-icon" />
 
-const getGLBranchLetterPillPath = (branch: GLBranch) =>
-  pillPath(`green-${branch}-circle.svg`);
+const getGLBranchLetterPillPath = (branch: GLBranch) => <EinkSubwayStatusPill pill={`green-${branch}-circle`} className="branch-icon" />
 
-const pillPath = (pillFilename: string) =>
-  imagePath(`pills/eink/${pillFilename}`);
 
 export default EinkSubwayStatus;
