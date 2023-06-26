@@ -544,7 +544,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           %Alert{
             effect: :station_closure,
             informed_entities: [
-              %{route: "Green-D", stop: "place-woodl"},
+              %{route: "Green-D", stop: "place-gover"},
               %{route: "Green-D", stop: "place-river"}
             ]
           }
@@ -583,15 +583,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           type: :contracted,
           alerts: [
             %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "Suspension",
-              location: %{abbrev: "Gov't Ctr to Boylston", full: "Government Center to Boylston"}
+              location: %{
+                abbrev: "Gov't Ctr and Riverside",
+                full: "Government Center and Riverside"
+              },
+              route_pill: %{color: :green, text: "GL", type: :text},
+              station_count: 2,
+              status: "Bypassing"
             },
             %{
-              route_pill: %{type: :text, text: "GL", color: :green, branches: [:d]},
-              status: "Bypassing",
-              location: %{abbrev: "Woodland and Riverside", full: "Woodland and Riverside"},
-              station_count: 2
+              location: %{abbrev: "Gov't Ctr to Boylston", full: "Government Center to Boylston"},
+              route_pill: %{branches: [:c], color: :green, text: "GL", type: :text},
+              status: "Suspension"
             }
           ]
         }
@@ -621,7 +624,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           %Alert{
             effect: :station_closure,
             informed_entities: [
-              %{route: "Green-E", stop: "place-symcl"},
+              %{route: "Green-B", stop: "place-gover"},
+              %{route: "Green-C", stop: "place-gover"},
+              %{route: "Green-D", stop: "place-gover"},
+              %{route: "Green-E", stop: "place-gover"},
               %{route: "Green-E", stop: "place-nuniv"}
             ]
           }
@@ -660,12 +666,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           type: :contracted,
           alerts: [
             %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "Suspension",
-              location: %{abbrev: "Gov't Ctr to Boylston", full: "Government Center to Boylston"}
+              location: %{
+                abbrev: "Gov't Ctr and Northeast'n",
+                full: "Government Center and Northeastern University"
+              },
+              route_pill: %{color: :green, text: "GL", type: :text},
+              status: "Bypassing",
+              station_count: 2
             },
             %{
-              route_pill: %{type: :text, text: "GL", color: :green, branches: [:b, :e]},
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:b, :c]},
               status: "2 current alerts",
               location: "mbta.com/alerts"
             }
@@ -691,9 +701,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             effect: :delay,
             severity: 5,
             informed_entities: [
-              %{route: "Green-E", stop: "place-lech"},
-              %{route: "Green-E", stop: "place-spmnl"},
-              %{route: "Green-E", stop: "place-north"}
+              %{route: "Green-B", stop: nil},
+              %{route: "Green-C", stop: nil},
+              %{route: "Green-D", stop: nil},
+              %{route: "Green-E", stop: nil}
             ]
           }
         ]
@@ -731,14 +742,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           type: :contracted,
           alerts: [
             %{
-              location: %{abbrev: "Gov't Ctr to Boylston", full: "Government Center to Boylston"},
-              route_pill: %{color: :green, text: "GL", type: :text},
-              status: "Suspension"
-            },
-            %{
-              location: %{abbrev: "Lechmere to North Sta", full: "Lechmere to North Station"},
+              location: nil,
               route_pill: %{color: :green, text: "GL", type: :text},
               status: "Delays up to 20 minutes"
+            },
+            %{
+              location: %{abbrev: "Gov't Ctr to Boylston", full: "Government Center to Boylston"},
+              route_pill: %{color: :green, text: "GL", type: :text, branches: [:c]},
+              status: "Suspension"
             }
           ]
         }
@@ -975,15 +986,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             effect: :delay,
             severity: 5,
             informed_entities: [
-              %{route: "Green-D", stop: "place-gover"},
-              %{route: "Green-D", stop: "place-pktrm"},
-              %{route: "Green-D", stop: "place-boyls"}
+              %{route: "Green-B", stop: nil},
+              %{route: "Green-C", stop: nil},
+              %{route: "Green-D", stop: nil},
+              %{route: "Green-E", stop: nil}
             ]
           },
           %Alert{
             effect: :station_closure,
             informed_entities: [
-              %{route: "Green-D", stop: "place-unsqu"}
+              %{route: "Green-D", stop: "place-kencl"}
             ]
           }
         ]
@@ -1118,12 +1130,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       instance = %SubwayStatus{
         subway_alerts: [
           %Alert{
-            effect: :delay,
-            severity: 5,
+            effect: :station_closure,
             informed_entities: [
-              %{route: "Green-D", stop: "place-gover"},
-              %{route: "Green-D", stop: "place-pktrm"},
-              %{route: "Green-D", stop: "place-boyls"}
+              %{route: "Green-D", stop: "place-lech"},
+              %{route: "Green-E", stop: "place-lech"}
             ]
           },
           %Alert{
@@ -1176,9 +1186,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           type: :contracted,
           alerts: [
             %{
-              location: %{abbrev: "Gov't Ctr to Boylston", full: "Government Center to Boylston"},
+              location: %{abbrev: "Lechmere", full: "Lechmere"},
               route_pill: %{color: :green, text: "GL", type: :text},
-              status: "Delays up to 20 minutes"
+              status: "Bypassing",
+              station_count: 1
             }
           ]
         }
@@ -1513,7 +1524,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           type: :extended,
           alert: %{
             location: %{abbrev: "Kenmore to Kent St", full: "Kenmore to Kent Street"},
-            route_pill: %{color: :green, text: "GL", type: :text},
+            route_pill: %{color: :green, text: "GL", type: :text, branches: [:c]},
             status: "Shuttle Bus"
           }
         },

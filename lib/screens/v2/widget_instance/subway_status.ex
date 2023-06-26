@@ -371,11 +371,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   defp serialize_alert(
          %Alert{effect: :station_closure, informed_entities: informed_entities},
-         route_id
+         _route_id
        ) do
     # Get closed station names from informed entities
-    stop_id_to_name = Stop.stop_id_to_name(route_id)
-    stop_names = get_stop_names_from_informed_entities(informed_entities, stop_id_to_name)
+    stop_names = get_stop_names_from_informed_entities(informed_entities)
     {status, location} = format_station_closure(stop_names)
 
     %{status: status, location: location, station_count: length(stop_names)}
@@ -417,9 +416,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         },
         route_ids
       ) do
-    stop_id_to_name = route_ids |> Enum.flat_map(&Stop.stop_id_to_name/1) |> Enum.into(%{})
-    stop_names = get_stop_names_from_informed_entities(informed_entities, stop_id_to_name)
-
+    stop_names = get_stop_names_from_informed_entities(informed_entities)
     {status, location} = format_station_closure(stop_names)
 
     %{
@@ -447,17 +444,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     )
   end
 
-  defp alert_affects_gl_trunk_or_whole_line?(%Alert{informed_entities: informed_entities}) do
-    gl_trunk_stops = Stop.gl_trunk_stops()
-
-    alert_trunk_stops =
-      informed_entities
-      |> Enum.map(fn e -> Map.get(e, :stop) end)
-      |> Enum.reject(&is_nil/1)
-      |> Enum.uniq()
-      |> Enum.into(MapSet.new())
-      |> MapSet.intersection(gl_trunk_stops)
-
+  defp alert_affects_whole_green_line?(%Alert{informed_entities: informed_entities}) do
     alert_whole_line_stops =
       informed_entities
       |> Enum.map(fn e -> Map.get(e, :route) end)
@@ -468,8 +455,44 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       |> Enum.uniq()
       |> Enum.sort()
 
-    MapSet.size(alert_trunk_stops) > 0 or
-      alert_whole_line_stops == @green_line_branches
+    alert_whole_line_stops == @green_line_branches
+  end
+
+  # If any closed stop is served by more than one branch, the alert affects the trunk
+  defp alert_affects_gl_trunk?(
+         %Alert{
+           effect: :station_closure,
+           informed_entities: informed_entities
+         },
+         gl_stop_sequences
+       ) do
+    informed_entities
+    |> Enum.map(fn e -> Map.get(e, :stop) end)
+    |> Enum.reject(&is_nil/1)
+    |> Enum.uniq()
+    |> Enum.any?(fn informed_stop ->
+      Enum.count(gl_stop_sequences, &(informed_stop in &1)) > 1
+    end)
+  end
+
+  #
+  defp alert_affects_gl_trunk?(%Alert{informed_entities: informed_entities}, gl_stop_sequences) do
+    alert_stops =
+      informed_entities
+      |> Enum.filter(fn
+        %{stop: nil} -> false
+        ie -> String.starts_with?(ie.stop, "place-") and String.starts_with?(ie.route, "Green-")
+      end)
+      |> Enum.uniq()
+
+    Enum.count(gl_stop_sequences, fn stop_sequence ->
+      alert_stops != [] and Enum.all?(alert_stops, &(&1 in stop_sequence))
+    end) > 1
+  end
+
+  defp alert_affects_gl_trunk_or_whole_line?(alert, gl_stop_sequences) do
+    alert_affects_gl_trunk?(alert, gl_stop_sequences) or
+      alert_affects_whole_green_line?(alert)
   end
 
   def serialize_green_line(grouped_alerts, total_alert_count) do
@@ -483,8 +506,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     if gl_alert_count == 0 do
       serialize_single_alert_row_for_route(grouped_alerts, "Green", total_alert_count)
     else
+      gl_stop_sequences = Stop.get_gl_stop_sequences()
+
       {trunk_alerts, branch_alerts} =
-        Enum.split_with(green_line_alerts, &alert_affects_gl_trunk_or_whole_line?/1)
+        Enum.split_with(
+          green_line_alerts,
+          &alert_affects_gl_trunk_or_whole_line?(&1, gl_stop_sequences)
+        )
 
       case {trunk_alerts, branch_alerts} do
         # If there are no alerts for the GL trunk, serialize any alerts on the branches
@@ -619,10 +647,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
-  defp get_stop_names_from_informed_entities(informed_entities, stop_id_to_name) do
+  defp get_stop_names_from_informed_entities(informed_entities) do
     informed_entities
     |> Enum.flat_map(fn
-      %{stop: stop_id} ->
+      %{stop: stop_id, route: route_id} ->
+        stop_id_to_name = Stop.stop_id_to_name(route_id)
+
         case Map.get(stop_id_to_name, stop_id) do
           nil -> []
           name -> [name]
