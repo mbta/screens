@@ -201,7 +201,7 @@ const SubwayStatusRoutePill: ComponentType<{
   }
 
   // Return the route pill at the top of the section above alerts.
-  return getStandardLinePillPath(routePill.color)
+  return getStandardLinePillPath(routePill.color);
 };
 
 const GLBranchPillGroup: ComponentType<
@@ -210,11 +210,7 @@ const GLBranchPillGroup: ComponentType<
   // We only inline route pills for GL branches.
   // Otherwise, we show a single route pill above alerts in each section.
   if (showInlineBranches) {
-    return (
-      <>
-        {branches.map((branch) => getGLBranchLetterPillPath(branch)) }
-      </>
-    );
+    return <>{branches.map((branch) => getGLBranchLetterPillPath(branch))}</>;
   }
 
   const [firstBranch, ...rest] = branches;
@@ -259,11 +255,19 @@ const getRoutePillObject = (
   return { color: color };
 };
 
-const getStandardLinePillPath = (lineColor: LineColor) => (<EinkSubwayStatusPill pill={`${lineColor}-line`} className="pill-icon" />)
+const getStandardLinePillPath = (lineColor: LineColor) => (
+  <EinkSubwayStatusPill pill={`${lineColor}-line`} className="pill-icon" />
+);
 
-const getGLComboPillPath = (branch: GLBranch) => <EinkSubwayStatusPill pill={`gl-${branch}`} className="pill-icon" />
+const getGLComboPillPath = (branch: GLBranch) => (
+  <EinkSubwayStatusPill pill={`gl-${branch}`} className="pill-icon" />
+);
 
-const getGLBranchLetterPillPath = (branch: GLBranch) => <EinkSubwayStatusPill pill={`green-${branch}-circle`} className="branch-icon" />
-
+const getGLBranchLetterPillPath = (branch: GLBranch) => (
+  <EinkSubwayStatusPill
+    pill={`green-${branch}-circle`}
+    className="branch-icon"
+  />
+);
 
 export default EinkSubwayStatus;
