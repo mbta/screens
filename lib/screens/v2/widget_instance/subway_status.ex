@@ -371,10 +371,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   defp serialize_alert(
          %Alert{effect: :station_closure, informed_entities: informed_entities},
-         _route_id
+         route_id
        ) do
     # Get closed station names from informed entities
-    stop_names = get_stop_names_from_informed_entities(informed_entities)
+    stop_names = get_stop_names_from_informed_entities(informed_entities, route_id)
+
     {status, location} = format_station_closure(stop_names)
 
     %{status: status, location: location, station_count: length(stop_names)}
@@ -416,7 +417,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         },
         route_ids
       ) do
-    stop_names = get_stop_names_from_informed_entities(informed_entities)
+    stop_names =
+      Enum.flat_map(route_ids, &get_stop_names_from_informed_entities(informed_entities, &1))
+
     {status, location} = format_station_closure(stop_names)
 
     %{
@@ -650,8 +653,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
-  defp get_stop_names_from_informed_entities(informed_entities) do
+  defp get_stop_names_from_informed_entities(informed_entities, route_id) do
     informed_entities
+    |> Enum.filter(fn
+      %{route: "Green-" <> _} when route_id == "Green" -> true
+      %{route: route} -> route == route_id
+    end)
     |> Enum.flat_map(fn
       %{stop: stop_id, route: route_id} ->
         stop_id_to_name = Stop.stop_id_to_name(route_id)
