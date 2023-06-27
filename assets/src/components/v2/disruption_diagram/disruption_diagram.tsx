@@ -1,4 +1,6 @@
-type DisruptionDiagram = ContinuousDisruptionDiagram | DiscreteDisruptionDiagram;
+import React, { ComponentType } from "react";
+
+type DisruptionDiagramData = ContinuousDisruptionDiagram | DiscreteDisruptionDiagram;
 
 interface DisruptionDiagramBase {
   line: LineColor;
@@ -58,3 +60,11 @@ Client is responsible for:
 - abbreviating middle labels when they're more than 8px taller than the tallest end label
 - sizing, spacing, positioning of edges/end arrows/shuttle dashes/the diagram as a whole within its container
 */
+
+const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (_props) => {
+  return (
+    <div className="disruption-diagram">Diagram goes here!</div>
+  );
+};
+
+export default DisruptionDiagram;
