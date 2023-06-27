@@ -896,6 +896,59 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     end
   end
 
+  describe "serialize_inside_flex_alert/1" do
+    setup @alert_widget_context_setup_group ++ [:setup_active_period]
+
+    test "handles moderate delay", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:unknown)
+        |> put_severity(5)
+        |> put_alert_header("Test Alert")
+
+      expected = %{
+        issue: "Test Alert",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :delay,
+        urgent: false,
+        region: :inside,
+        remedy: ""
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles severe delay", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Red")
+        ])
+        |> put_cause(:unknown)
+        |> put_severity(10)
+
+      expected = %{
+        issue: "Trains may be delayed over 60 minutes",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :severe_delay,
+        urgent: true,
+        region: :inside,
+        remedy: ""
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+  end
+
   describe "serialize_boundary_alert/1" do
     setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
