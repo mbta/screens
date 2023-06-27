@@ -51,8 +51,8 @@ const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
   const routePill = getRoutePillObject(section, color);
   const showInlineBranches =
     color === LineColor.Green &&
-    ((isContracted(section) && section.alerts.length > 1) ||
-      isExtended(section));
+    isContracted(section) &&
+    section.alerts.length > 1;
 
   return (
     <div
