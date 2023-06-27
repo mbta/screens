@@ -482,6 +482,59 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
+  defp serialize_inside_flex_alert(
+         %__MODULE__{
+           alert: %Alert{effect: :delay, severity: severity, header: header}
+         } = t
+       )
+       when severity > 3 and severity < 7 do
+    %{
+      issue: header,
+      remedy: "",
+      location: "",
+      cause: "",
+      routes: get_route_pills(t),
+      effect: :delay,
+      urgent: false
+    }
+  end
+
+  defp serialize_inside_flex_alert(
+         %__MODULE__{
+           alert: %Alert{effect: :delay, cause: cause, severity: severity}
+         } = t
+       )
+       when severity >= 7 do
+    cause_text = Alert.get_cause_string(cause)
+    {delay_description, delay_minutes} = Alert.interpret_severity(severity)
+    destination = get_destination(t, :inside)
+
+    duration_text =
+      case delay_description do
+        :up_to -> "up to #{delay_minutes} minutes"
+        :more_than -> "over #{delay_minutes} minutes"
+      end
+
+    # Even if the screen is "inside" the alert range, the alert itself can
+    # still be one-directional. (Only westbound / eastbound is impacted)
+    issue =
+      if is_nil(destination) do
+        "Trains may be delayed #{duration_text}"
+      else
+        "#{destination} trains may be delayed #{duration_text}"
+      end
+
+    %{
+      issue: issue,
+      remedy: "",
+      location: "",
+      cause: cause_text,
+      routes: get_route_pills(t),
+      effect: :severe_delay,
+      urgent: true
+    }
+  end
+
   @spec serialize_boundary_alert(t(), any()) :: flex_serialized_response()
   defp serialize_boundary_alert(t, location)
 
@@ -855,6 +908,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
     case LocalizedAlert.location(t, is_terminal_station) do
+      :inside ->
+        t |> serialize_inside_flex_alert() |> Map.put(:region, :inside)
+
       location when location in [:boundary_upstream, :boundary_downstream] ->
         t |> serialize_boundary_alert(location) |> Map.put(:region, :boundary)
 
