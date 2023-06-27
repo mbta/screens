@@ -773,6 +773,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp format_updated_at(updated_at, now) do
+    updated_at = DateTime.shift_zone!(updated_at, "America/New_York")
+    now = DateTime.shift_zone!(now, "America/New_York")
+
     if Date.compare(updated_at, now) == :lt do
       Timex.format!(updated_at, "{M}/{D}/{YY}")
     else
