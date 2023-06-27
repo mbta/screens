@@ -10,10 +10,10 @@ interface ContinuousDisruptionDiagram extends DisruptionDiagramBase {
   effect: "shuttle" | "suspension";
   // Range starts and ends at the effect region's *first and last disrupted stops*.
   // For example in this scenario:
-  //     0     1     2     3     4     5     6
-  //    <= === O - - X - - X - - X - - O === =>
-  //                 |---range---|
-  // The range is [2, 4].
+  //     0     1     2     3     4     5     6     7     8
+  //    <= === O ========= O - - X - - X - - X - - O === O
+  //                             |---range---|
+  // The range is [4, 6].
   effect_region_slot_index_range: [range_start: number, range_end: number];
 }
 
@@ -49,9 +49,6 @@ type LineColor =
   | "orange"
   | "red"
   | "green";
-
-// We'll export additional types as needed
-export { DisruptionDiagram };
 
 /*
 Client is responsible for:
