@@ -473,7 +473,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         effect: :suspension,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am",
+        updated_at: "Friday, 5:00 am",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}]
       }
 
@@ -496,7 +496,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         effect: :shuttle,
         remedy: "Use shuttle bus",
-        updated_at: "Friday, 9:00 am",
+        updated_at: "Friday, 5:00 am",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}]
       }
 
@@ -519,7 +519,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         effect: :station_closure,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am",
+        updated_at: "Friday, 5:00 am",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}]
       }
 
@@ -542,7 +542,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: "construction",
         effect: :suspension,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am",
+        updated_at: "Friday, 5:00 am",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}]
       }
 
@@ -567,7 +567,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         effect: :suspension,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am",
+        updated_at: "Friday, 5:00 am",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}]
       }
 
@@ -592,7 +592,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         effect: :shuttle,
         remedy: "Use shuttle bus",
-        updated_at: "Friday, 9:00 am",
+        updated_at: "Friday, 5:00 am",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}]
       }
 
@@ -621,7 +621,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: ["ol-oak-grove"],
         effect: :suspension,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        updated_at: "Friday, 5:00 am",
+        region: :boundary
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -645,7 +646,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: ["ol-oak-grove"],
         effect: :shuttle,
         remedy: "Use shuttle bus",
-        updated_at: "Friday, 9:00 am"
+        updated_at: "Friday, 5:00 am",
+        region: :boundary
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -666,10 +668,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains may be delayed up to 20 minutes",
         cause: "",
-        routes: [%{color: :orange, text: "OL", type: :text}],
+        routes: ["orange-line"],
         effect: :delay,
         remedy: "Delays are happening",
-        updated_at: "Friday, 9:00 am"
+        updated_at: "Friday, 5:00 am",
+        region: :here
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -690,10 +693,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains may be delayed over 60 minutes",
         cause: "",
-        routes: [%{color: :orange, text: "OL", type: :text}],
+        routes: ["orange-line"],
         effect: :delay,
         remedy: "Delays are happening",
-        updated_at: "Friday, 9:00 am"
+        updated_at: "Friday, 5:00 am",
+        region: :here
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -717,7 +721,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: ["ol-forest-hills"],
         effect: :delay,
         remedy: "Delays are happening",
-        updated_at: "Friday, 9:00 am"
+        updated_at: "Friday, 5:00 am",
+        region: :here
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -738,10 +743,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains may be delayed over 60 minutes",
         cause: "due to construction",
-        routes: [%{color: :orange, text: "OL", type: :text}],
+        routes: ["orange-line"],
         effect: :delay,
         remedy: "Delays are happening",
-        updated_at: "Friday, 9:00 am"
+        updated_at: "Friday, 5:00 am",
+        region: :here
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -762,10 +768,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains may be delayed over 60 minutes",
         cause: "",
-        routes: [%{color: :orange, text: "OL", type: :text}],
+        routes: ["orange-line"],
         effect: :delay,
         remedy: "Delays are happening",
-        updated_at: "Friday, 9:00 am"
+        updated_at: "Friday, 5:00 am",
+        region: :outside
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -795,7 +802,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: ["ol-forest-hills"],
         effect: :shuttle,
         remedy: "Shuttle buses available",
-        updated_at: "Friday, 9:00 am"
+        updated_at: "Friday, 5:00 am",
+        region: :outside
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -828,7 +836,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: ["ol-forest-hills"],
         effect: :suspension,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 9:00 am"
+        updated_at: "Friday, 5:00 am",
+        region: :outside
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -849,12 +858,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_full_screen(true)
 
       expected = %{
-        issue: ["Orange"],
-        unaffected_routes: ["Red"],
+        issue: ["orange"],
+        unaffected_routes: ["red"],
         cause: "",
-        routes: [%{color: :orange, text: "OL", type: :text}],
+        routes: ["orange-line"],
         effect: :station_closure,
-        updated_at: "Friday, 9:00 am"
+        updated_at: "Friday, 5:00 am",
+        region: :here
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -878,7 +888,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [],
         effect: :delay,
         remedy: nil,
-        updated_at: "Friday, 9:00 am"
+        updated_at: "Friday, 5:00 am",
+        region: :here
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -1789,7 +1800,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: ["ol-forest-hills"],
         effect: :suspension,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 9:14 am"
+        updated_at: "Friday, 5:14 am",
+        region: :outside
       }
 
       assert expected == ReconstructedAlert.serialize(alert_widget)
@@ -2524,7 +2536,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: ["gl-north-station-north"],
         effect: :shuttle,
         remedy: "Use shuttle bus",
-        updated_at: "Friday, 6:24 pm"
+        updated_at: "Friday, 2:24 pm",
+        region: :boundary
       }
 
       assert expected == ReconstructedAlert.serialize(alert_widget)
