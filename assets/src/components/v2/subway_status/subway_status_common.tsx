@@ -120,15 +120,13 @@ const clearLocationForAllGLBranchesAlert = (
 export const getAlertID = (
   alert: Alert,
   statusType: Section["type"],
-  index: number
+  index: number = 0
 ): string => {
   const location = isAlertLocationMap(alert.location)
     ? `${alert.location.abbrev}-${alert.location.full}`
     : alert.location;
 
-  const routePill = `${alert?.route_pill?.color ?? ""}-${
-    alert?.route_pill?.branches?.join("") ?? ""
-  }`;
+  const routePill = `${alert?.route_pill?.color ?? ""}-${alert?.route_pill?.branches?.join("") ?? ""}`;
 
   return `${statusType}-${index}-${location}-${routePill}`;
 };
@@ -139,19 +137,15 @@ export const isContractedWith1Alert = (
   isContracted(section) && section.alerts.length === 1;
 
 // Ordered from "smallest" to "largest"
-enum FittingStep {
-  PerAlertEffect,
-  Abbrev,
-  FullSize,
+export enum FittingStep {
+  PerAlertEffect = "PerAlertEffect",
+  Abbrev = "Abbrev",
+  FullSize = "FullSize",
 }
 
-export const useSubwayStatusTextResizer = (rowHeight, id, status) => {
-  const { ref, size: fittingStep } = useTextResizer({
-    sizes: [
-      FittingStep.PerAlertEffect,
-      FittingStep.Abbrev,
-      FittingStep.FullSize,
-    ],
+export const useSubwayStatusTextResizer = (rowHeight: number, steps: FittingStep[], id: string, status: string) => {
+  const { ref, size: fittingStep, isDone } = useTextResizer({
+    sizes: steps,
     maxHeight: rowHeight,
     resetDependencies: [id],
   });
@@ -182,5 +176,5 @@ export const useSubwayStatusTextResizer = (rowHeight, id, status) => {
       }
   }
 
-  return { ref, abbrev, truncateStatus, replaceLocationWithUrl, fittingStep };
+  return { ref, abbrev, truncateStatus, replaceLocationWithUrl, fittingStep, isDone };
 };

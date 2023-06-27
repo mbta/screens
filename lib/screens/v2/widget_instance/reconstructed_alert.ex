@@ -55,7 +55,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           cause: String.t(),
           routes: list(map() | String.t()),
           effect: :suspension | :shuttle | :station_closure | :delay,
-          updated_at: String.t()
+          updated_at: String.t(),
+          region: :here | :boundary | :outside
         }
 
   @type flex_serialized_response :: %{
@@ -98,7 +99,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
-  # Using hd/1 because we know that only single line stations use this function.
   defp get_destination(
          %__MODULE__{alert: alert} = t,
          location,
@@ -158,16 +158,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp get_route_pills(%__MODULE__{alert: alert} = t, location) do
     informed_entities = Alert.informed_entities(alert)
+    routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
 
     informed_entities
-    |> Enum.filter(&(&1.route_type in [0, 1]))
+    |> Enum.filter(&(&1.route_type in [0, 1] and &1.route in routes_at_stop))
     |> Enum.group_by(fn %{route: route} -> route end)
     |> Enum.map(fn
-      {route_id, _} = route ->
+      {route_id, _} ->
         headsign = get_destination(t, location, route_id)
 
         if is_nil(headsign) do
-          RoutePill.serialize_route_for_reconstructed_alert(route)
+          String.downcase("#{route_id}-line")
         else
           format_for_svg_name(headsign)
         end
@@ -182,6 +183,24 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp format_cause(:unknown), do: nil
   defp format_cause(cause), do: cause |> to_string() |> String.replace("_", " ")
+
+  defp format_routes(routes) do
+    Enum.map(routes, fn
+      "Green-" <> branch ->
+        "gl-#{String.downcase(branch)}"
+
+      route_id ->
+        String.downcase(route_id)
+    end)
+  end
+
+  defp get_region_from_location(:inside), do: :here
+
+  defp get_region_from_location(location)
+       when location in [:boundary_upstream, :boundary_downstream],
+       do: :boundary
+
+  defp get_region_from_location(_location), do: :outside
 
   def takeover_alert?(%__MODULE__{is_full_screen: false}), do: false
 
@@ -313,7 +332,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: get_route_pills(t, location),
       effect: :suspension,
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      region: get_region_from_location(location)
     }
   end
 
@@ -362,7 +382,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: get_route_pills(t, location),
       effect: :shuttle,
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      region: get_region_from_location(location)
     }
   end
 
@@ -381,16 +402,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       if "Green" in affected_routes do
         Enum.reject(routes_at_stop, &String.starts_with?(&1, "Green-"))
       else
-        Enum.into(routes_at_stop, []) -- affected_routes
+        routes_at_stop
+        |> Enum.into([])
+        |> Kernel.--(affected_routes)
+        |> Enum.reject(&String.starts_with?(&1, "Green-"))
+        |> Enum.concat(["Green"])
       end
 
     %{
-      issue: affected_routes,
-      unaffected_routes: unaffected_routes,
+      issue: format_routes(affected_routes),
+      unaffected_routes: format_routes(unaffected_routes),
       cause: cause_text,
       routes: get_route_pills(t, :inside),
       effect: :station_closure,
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      region: :here
     }
   end
 
@@ -410,7 +436,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: get_route_pills(t, location),
       effect: :station_closure,
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      region: get_region_from_location(location)
     }
   end
 
@@ -450,7 +477,61 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: routes,
       effect: :delay,
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      region: get_region_from_location(location)
+    }
+  end
+
+  defp serialize_inside_flex_alert(
+         %__MODULE__{
+           alert: %Alert{effect: :delay, severity: severity, header: header}
+         } = t
+       )
+       when severity > 3 and severity < 7 do
+    %{
+      issue: header,
+      remedy: "",
+      location: "",
+      cause: "",
+      routes: get_route_pills(t),
+      effect: :delay,
+      urgent: false
+    }
+  end
+
+  defp serialize_inside_flex_alert(
+         %__MODULE__{
+           alert: %Alert{effect: :delay, cause: cause, severity: severity}
+         } = t
+       )
+       when severity >= 7 do
+    cause_text = Alert.get_cause_string(cause)
+    {delay_description, delay_minutes} = Alert.interpret_severity(severity)
+    destination = get_destination(t, :inside)
+
+    duration_text =
+      case delay_description do
+        :up_to -> "up to #{delay_minutes} minutes"
+        :more_than -> "over #{delay_minutes} minutes"
+      end
+
+    # Even if the screen is "inside" the alert range, the alert itself can
+    # still be one-directional. (Only westbound / eastbound is impacted)
+    issue =
+      if is_nil(destination) do
+        "Trains may be delayed #{duration_text}"
+      else
+        "#{destination} trains may be delayed #{duration_text}"
+      end
+
+    %{
+      issue: issue,
+      remedy: "",
+      location: "",
+      cause: cause_text,
+      routes: get_route_pills(t),
+      effect: :severe_delay,
+      urgent: true
     }
   end
 
@@ -755,6 +836,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp format_updated_at(updated_at, now) do
+    updated_at = DateTime.shift_zone!(updated_at, "America/New_York")
+    now = DateTime.shift_zone!(now, "America/New_York")
+
     if Date.compare(updated_at, now) == :lt do
       Timex.format!(updated_at, "{M}/{D}/{YY}")
     else
@@ -824,6 +908,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
     case LocalizedAlert.location(t, is_terminal_station) do
+      :inside ->
+        t |> serialize_inside_flex_alert() |> Map.put(:region, :inside)
+
       location when location in [:boundary_upstream, :boundary_downstream] ->
         t |> serialize_boundary_alert(location) |> Map.put(:region, :boundary)
 
@@ -858,7 +945,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def widget_type(%__MODULE__{} = t) do
     if takeover_alert?(t),
       do: :reconstructed_takeover,
-      else: :reconstructed_full_body_alert
+      else: :single_screen_alert
   end
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]

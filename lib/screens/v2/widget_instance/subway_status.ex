@@ -33,6 +33,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   @type alert :: %{
           optional(:route_pill) => route_pill(),
+          optional(:station_count) => integer(),
           status: String.t(),
           location: String.t() | location_map() | nil
         }
@@ -61,6 +62,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     "Green" => ["Westbound", "Eastbound"]
   }
 
+  @subway_routes Map.keys(@route_directions)
+
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
   defimpl Screens.V2.WidgetInstance do
@@ -72,7 +75,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       multi_alert_routes = SubwayStatus.get_multi_alert_routes(grouped_alerts)
 
       if Enum.any?(multi_alert_routes) do
-        SubwayStatus.serialize_routes_multiple_alerts(grouped_alerts)
+        SubwayStatus.serialize_routes_multiple_alerts(grouped_alerts, multi_alert_routes)
       else
         SubwayStatus.serialize_routes_zero_or_one_alert(grouped_alerts)
       end
@@ -95,7 +98,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   def get_multi_alert_routes(grouped_alerts) do
-    Enum.filter(grouped_alerts, fn {_route, alerts} -> length(alerts) > 1 end)
+    initial_acc = %{"Orange" => [], "Red" => [], "Blue" => [], "Green" => []}
+
+    # Treat all GL branch alerts the same.
+    grouped_alerts
+    |> Enum.reduce(initial_acc, fn
+      {"Green" <> _, alerts}, %{"Green" => gl_alerts} = acc ->
+        Map.put(acc, "Green", Enum.uniq(gl_alerts ++ alerts))
+
+      {route, alerts}, acc ->
+        Map.put(acc, route, alerts)
+    end)
+    |> Enum.filter(fn {_route, alerts} -> length(alerts) > 1 end)
   end
 
   def get_relevant_alerts_by_route(alerts) do
@@ -116,6 +130,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     entities
     |> Enum.map(fn e -> Map.get(e, :route) end)
     |> Enum.reject(&is_nil/1)
+    |> Enum.filter(&(&1 in @subway_routes))
     |> Enum.uniq()
   end
 
@@ -139,11 +154,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   # More than 1 alert on any one route
-  def serialize_routes_multiple_alerts(grouped_alerts) do
-    routes_with_alerts = Map.keys(grouped_alerts)
+  def serialize_routes_multiple_alerts(grouped_alerts, multi_alert_routes) do
+    multi_alert_route_ids = Enum.map(multi_alert_routes, &elem(&1, 0))
 
     cond do
-      Enum.any?(routes_with_alerts, &String.starts_with?(&1, "Green")) ->
+      "Green" in multi_alert_route_ids ->
         # Collapse all non-GL routes and display as many GL alerts as possible.
         %{
           blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue"),
@@ -152,14 +167,22 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           green: serialize_green_line(grouped_alerts)
         }
 
-      length(routes_with_alerts) == 1 and get_total_alerts(grouped_alerts) == 2 ->
-        # Show both alerts in two rows
-        %{
-          blue: serialize_multiple_alert_rows_for_route(grouped_alerts, "Blue"),
-          orange: serialize_multiple_alert_rows_for_route(grouped_alerts, "Orange"),
-          red: serialize_multiple_alert_rows_for_route(grouped_alerts, "Red"),
-          green: serialize_multiple_alert_rows_for_route(grouped_alerts, "Green")
-        }
+      length(multi_alert_route_ids) == 1 ->
+        # Make sure the one multi-alert route has only two alerts.
+        multi_alert_route_id = List.first(multi_alert_route_ids)
+        alerts_for_multi_alert_route = Map.get(grouped_alerts, multi_alert_route_id)
+
+        if length(alerts_for_multi_alert_route) == 2 do
+          # Show both alerts in two rows
+          %{
+            blue: serialize_multiple_alert_rows_for_route(grouped_alerts, "Blue"),
+            orange: serialize_multiple_alert_rows_for_route(grouped_alerts, "Orange"),
+            red: serialize_multiple_alert_rows_for_route(grouped_alerts, "Red"),
+            green: serialize_green_line(grouped_alerts)
+          }
+        else
+          serialize_one_row_for_all_routes(grouped_alerts)
+        end
 
       # Collapse all routes
       true ->
@@ -172,18 +195,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     alerts = Map.get(grouped_alerts, route_id)
 
     alert_rows =
-      if is_nil(alerts) or alerts == [] do
-        [serialize_alert_with_route_pill(nil, route_id)]
-      else
-        [alert1, alert2] = alerts
+      case alerts do
+        alerts when is_nil(alerts) or alerts == [] ->
+          [serialize_alert_with_route_pill(nil, route_id)]
 
-        [
-          Map.merge(
-            %{route_pill: serialize_route_pill(route_id)},
-            serialize_alert(alert1, route_id)
-          ),
-          serialize_alert(alert2, route_id)
-        ]
+        [alert] ->
+          [serialize_alert_with_route_pill(alert, route_id)]
+
+        [alert1, alert2] ->
+          [serialize_alert_with_route_pill(alert1, route_id), serialize_alert(alert2, route_id)]
+
+        alerts ->
+          [serialize_alert_summary(length(alerts), serialize_route_pill(route_id))]
       end
 
     %{
