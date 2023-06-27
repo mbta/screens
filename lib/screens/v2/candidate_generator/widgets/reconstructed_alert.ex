@@ -177,7 +177,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     |> Enum.map(fn %{informed_entities: ies} = alert ->
       distance =
         ies
-        |> Enum.filter(&String.starts_with?(&1.stop, "place-"))
+        |> Enum.filter(fn
+          %{stop: nil} -> true
+          ie -> String.starts_with?(ie.stop, "place-")
+        end)
         |> Enum.map(&get_distance(stop_id, home_stop_distance_map, &1))
         |> Enum.min()
 
@@ -208,6 +211,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   # i.e. Braintree is not present in Ashmont stop_sequences, but is still a relevant alert.
   @spec get_distance(stop_id(), home_stop_distance_map(), Alert.informed_entity()) :: distance()
   defp get_distance(home_stop_id, home_stop_distance_map, informed_entity)
+
+  defp get_distance(_home_stop_id, _home_stop_distance_map, %{stop: nil}), do: 0
 
   defp get_distance(home_stop_id, home_stop_distance_map, %{route: "Green" <> _, stop: ie_stop_id})
        when home_stop_id in @gl_trunk_stop_ids and ie_stop_id in @gl_eastbound_split_stops,
