@@ -158,16 +158,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp get_route_pills(%__MODULE__{alert: alert} = t, location) do
     informed_entities = Alert.informed_entities(alert)
+    routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
 
     informed_entities
-    |> Enum.filter(&(&1.route_type in [0, 1]))
+    |> Enum.filter(&(&1.route_type in [0, 1] and &1.route in routes_at_stop))
     |> Enum.group_by(fn %{route: route} -> route end)
     |> Enum.map(fn
-      {route_id, _} = route ->
+      {route_id, _} ->
         headsign = get_destination(t, location, route_id)
 
         if is_nil(headsign) do
-          RoutePill.serialize_route_for_reconstructed_alert(route)
+          String.downcase("#{route_id}-line")
         else
           format_for_svg_name(headsign)
         end
