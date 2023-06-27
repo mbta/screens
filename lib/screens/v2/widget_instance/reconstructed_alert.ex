@@ -184,6 +184,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp format_cause(:unknown), do: nil
   defp format_cause(cause), do: cause |> to_string() |> String.replace("_", " ")
 
+  defp format_routes(routes) do
+    Enum.map(routes, fn
+      "Green-" <> branch ->
+        "gl-#{String.downcase(branch)}"
+
+      route_id ->
+        String.downcase(route_id)
+    end)
+  end
+
   defp get_region_from_location(:inside), do: :here
 
   defp get_region_from_location(location)
