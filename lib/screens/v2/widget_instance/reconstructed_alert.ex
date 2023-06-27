@@ -402,11 +402,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       if "Green" in affected_routes do
         Enum.reject(routes_at_stop, &String.starts_with?(&1, "Green-"))
       else
-        routes_at_stop
-        |> Enum.into([])
-        |> Kernel.--(affected_routes)
-        |> Enum.reject(&String.starts_with?(&1, "Green-"))
-        |> Enum.concat(["Green"])
+        routes = Enum.into(routes_at_stop, []) -- affected_routes
+
+        if Enum.any?(routes, &String.starts_with?(&1, "Green-")) do
+          routes
+          |> Enum.reject(&String.starts_with?(&1, "Green-"))
+          |> Enum.concat(["Green"])
+        else
+          routes
+        end
       end
 
     %{
