@@ -55,7 +55,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           cause: String.t(),
           routes: list(map() | String.t()),
           effect: :suspension | :shuttle | :station_closure | :delay,
-          updated_at: String.t()
+          updated_at: String.t(),
+          region: :here | :boundary | :outside
         }
 
   @type flex_serialized_response :: %{
@@ -98,7 +99,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
-  # Using hd/1 because we know that only single line stations use this function.
   defp get_destination(
          %__MODULE__{alert: alert} = t,
          location,
@@ -182,6 +182,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp format_cause(:unknown), do: nil
   defp format_cause(cause), do: cause |> to_string() |> String.replace("_", " ")
+
+  defp get_region_from_location(:inside), do: :here
+
+  defp get_region_from_location(location)
+       when location in [:boundary_upstream, :boundary_downstream],
+       do: :boundary
+
+  defp get_region_from_location(_location), do: :outside
 
   def takeover_alert?(%__MODULE__{is_full_screen: false}), do: false
 
@@ -313,7 +321,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: get_route_pills(t, location),
       effect: :suspension,
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      region: get_region_from_location(location)
     }
   end
 
@@ -362,7 +371,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: get_route_pills(t, location),
       effect: :shuttle,
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      region: get_region_from_location(location)
     }
   end
 
@@ -381,16 +391,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       if "Green" in affected_routes do
         Enum.reject(routes_at_stop, &String.starts_with?(&1, "Green-"))
       else
-        Enum.into(routes_at_stop, []) -- affected_routes
+        routes_at_stop
+        |> Enum.into([])
+        |> Kernel.--(affected_routes)
+        |> Enum.reject(&String.starts_with?(&1, "Green-"))
+        |> Enum.concat(["Green"])
       end
 
     %{
-      issue: affected_routes,
-      unaffected_routes: unaffected_routes,
+      issue: format_routes(affected_routes),
+      unaffected_routes: format_routes(unaffected_routes),
       cause: cause_text,
       routes: get_route_pills(t, :inside),
       effect: :station_closure,
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      region: :here
     }
   end
 
@@ -410,7 +425,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: get_route_pills(t, location),
       effect: :station_closure,
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      region: get_region_from_location(location)
     }
   end
 
@@ -450,7 +466,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_text,
       routes: routes,
       effect: :delay,
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      region: get_region_from_location(location)
     }
   end
 
