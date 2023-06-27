@@ -945,7 +945,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def widget_type(%__MODULE__{} = t) do
     if takeover_alert?(t),
       do: :reconstructed_takeover,
-      else: :reconstructed_full_body_alert
+      else: :single_screen_alert
   end
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
