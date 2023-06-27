@@ -313,7 +313,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     relevant_direction_for_terminal == nil or relevant_direction_for_terminal == direction_id
   end
 
-  defp get_stations(alert, fetch_stop_name_fn) do
+  defp get_stations(%{effect: :station_closure} = alert, fetch_stop_name_fn) do
     stop_ids =
       alert
       |> Alert.informed_entities()
@@ -342,6 +342,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         |> Util.format_name_list_to_string()
     end
   end
+
+  defp get_stations(_alert, _fetch_stop_name_fn), do: ""
 
   defp is_terminal?(stop_id, stop_sequences) do
     # Can't use Enum.any, because then Govt Center will be seen as a terminal
