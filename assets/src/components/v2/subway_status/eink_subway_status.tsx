@@ -256,15 +256,24 @@ const getRoutePillObject = (
 };
 
 const getStandardLinePillPath = (lineColor: LineColor) => (
-  <EinkSubwayStatusPill pill={`${lineColor}-line`} className="pill-icon" />
+  <EinkSubwayStatusPill
+    key={lineColor}
+    pill={`${lineColor}-line`}
+    className="pill-icon"
+  />
 );
 
 const getGLComboPillPath = (branch: GLBranch) => (
-  <EinkSubwayStatusPill pill={`gl-${branch}`} className="pill-icon" />
+  <EinkSubwayStatusPill
+    key={`gl=${branch}`}
+    pill={`gl-${branch}`}
+    className="pill-icon"
+  />
 );
 
 const getGLBranchLetterPillPath = (branch: GLBranch) => (
   <EinkSubwayStatusPill
+    key={branch}
     pill={`green-${branch}-circle`}
     className="branch-icon"
   />
