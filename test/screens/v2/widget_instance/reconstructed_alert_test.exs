@@ -870,6 +870,54 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert expected == ReconstructedAlert.serialize(widget)
     end
 
+    test "handles :inside suspension on 1 line", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_full_screen(true)
+
+      expected = %{
+        issue: "No Orange Line trains",
+        remedy: "Seek alternate route",
+        cause: "",
+        location: "No Orange Line trains at Downtown Crossing",
+        routes: ["orange-line"],
+        effect: :suspension,
+        updated_at: "Friday, 5:00 am",
+        region: :here
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "handles :inside shuttle on 1 line", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:shuttle)
+        |> put_informed_entities([
+          ie(stop: "place-dwnxg", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_full_screen(true)
+
+      expected = %{
+        issue: "No Orange Line trains",
+        remedy: "Use shuttle bus",
+        cause: "",
+        location: "Shuttle buses at Downtown Crossing",
+        routes: ["orange-line"],
+        effect: :shuttle,
+        updated_at: "Friday, 5:00 am",
+        region: :here
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
     test "handles multi line delay", %{widget: widget} do
       widget =
         widget
