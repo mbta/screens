@@ -709,12 +709,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp get_total_alerts(grouped_alerts) do
     total_affected_routes =
       grouped_alerts
-      |> Map.keys()
-      |> Enum.uniq_by(fn
-        "Green-" <> _ -> "Green"
-        route_id -> route_id
-      end)
-      |> length()
+      |> Enum.flat_map(&elem(&1, 1))
+      |> Enum.uniq()
+      |> Enum.map(&get_total_affected_routes_for_alert/1)
+      |> Enum.sum()
 
     total_alerts =
       grouped_alerts
@@ -726,5 +724,31 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       |> length()
 
     max(total_affected_routes, total_alerts)
+  end
+
+  defp get_total_affected_routes_for_alert(%Alert{informed_entities: informed_entities} = alert) do
+    gl_stop_sets = Enum.map(Stop.get_gl_stop_sequences(), &MapSet.new/1)
+
+    # Get all unique routes in informed_entities
+    affected_routes =
+      informed_entities
+      |> Enum.map(fn %{route: route} -> route end)
+      |> Enum.filter(fn e ->
+        Enum.member?(["Red", "Orange", "Green", "Blue"] ++ @green_line_branches, e)
+      end)
+      |> Enum.uniq()
+
+    # If an alert affects the GL trunk, we need to treat it like it affects a single route.
+    # Otherwise, our count will be too high or low and will throw off extended vs. contracted logic.
+    affected_routes =
+      if alert_affects_gl_trunk_or_whole_line?(alert, gl_stop_sets) do
+        affected_routes
+        |> Enum.reject(fn route -> String.starts_with?(route, "Green") end)
+        |> Enum.concat(["Green"])
+      else
+        affected_routes
+      end
+
+    length(affected_routes)
   end
 end
