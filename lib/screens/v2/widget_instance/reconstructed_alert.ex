@@ -264,12 +264,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
            now: now
          } = t
        ) do
-    [route_id] = LocalizedAlert.informed_subway_routes(t)
+    location_text =
+      case LocalizedAlert.informed_subway_routes(t) do
+        [route_id] ->
+          "#{route_id} Line trains skip #{informed_stations_string}"
+
+        [route_id1, route_id2] ->
+          "The #{route_id1} Line and #{route_id2} Line skip #{informed_stations_string}"
+      end
 
     %{
       issue: "Station closed",
       remedy: "Seek alternate route",
-      location: "#{route_id} Line trains skip #{informed_stations_string}",
+      location: location_text,
       cause: format_cause(cause),
       routes: get_route_pills(t),
       effect: :station_closure,
