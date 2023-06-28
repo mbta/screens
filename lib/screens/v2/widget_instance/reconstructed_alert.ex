@@ -284,7 +284,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  @spec serialize_fullscreen_alert(t(), any()) :: fullscreen_serialized_response()
+  @spec serialize_fullscreen_alert(t(), LocalizedAlert.location()) ::
+          fullscreen_serialized_response()
   defp serialize_fullscreen_alert(t, location)
 
   defp serialize_fullscreen_alert(
@@ -319,17 +320,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       else
         endpoint_text = format_endpoint_string(endpoints)
 
-        location =
+        location_text =
           if is_nil(endpoint_text), do: nil, else: "No #{route_id} Line trains #{endpoint_text}"
 
         issue =
-          if is_nil(destination) do
-            "No trains"
-          else
-            "No trains to #{destination}"
+          cond do
+            location == :inside ->
+              "No #{route_id} Line trains"
+
+            is_nil(destination) ->
+              "No trains"
+
+            true ->
+              "No trains to #{destination}"
           end
 
-        {issue, location}
+        {issue, location_text}
       end
 
     %{
@@ -373,10 +379,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         location_text = if is_nil(endpoint_text), do: nil, else: "Shuttle buses #{endpoint_text}"
 
         issue =
-          if is_nil(destination) do
-            "No trains"
-          else
-            "No trains to #{destination}"
+          cond do
+            location == :inside ->
+              "No #{route_id} Line trains"
+
+            is_nil(destination) ->
+              "No trains"
+
+            true ->
+              "No trains to #{destination}"
           end
 
         {issue, location_text, "Use shuttle bus"}
