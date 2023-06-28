@@ -73,11 +73,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     def serialize(%SubwayStatus{subway_alerts: alerts}) do
       grouped_alerts = SubwayStatus.get_relevant_alerts_by_route(alerts)
       multi_alert_routes = SubwayStatus.get_multi_alert_routes(grouped_alerts)
+      total_alert_count = SubwayStatus.get_total_alerts(alerts)
 
       if Enum.any?(multi_alert_routes) do
-        SubwayStatus.serialize_routes_multiple_alerts(grouped_alerts, multi_alert_routes)
+        SubwayStatus.serialize_routes_multiple_alerts(
+          grouped_alerts,
+          multi_alert_routes,
+          total_alert_count
+        )
       else
-        SubwayStatus.serialize_routes_zero_or_one_alert(grouped_alerts)
+        SubwayStatus.serialize_routes_zero_or_one_alert(grouped_alerts, total_alert_count)
       end
     end
 
@@ -134,9 +139,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     |> Enum.uniq()
   end
 
-  def serialize_one_row_for_all_routes(grouped_alerts) do
-    total_alert_count = get_total_alerts(grouped_alerts)
-
+  def serialize_one_row_for_all_routes(grouped_alerts, total_alert_count) do
     %{
       blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", total_alert_count),
       orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange", total_alert_count),
@@ -146,9 +149,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   # At most 1 alert on any route
-  def serialize_routes_zero_or_one_alert(grouped_alerts) do
-    total_alert_count = get_total_alerts(grouped_alerts)
-
+  def serialize_routes_zero_or_one_alert(grouped_alerts, total_alert_count) do
     %{
       blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", total_alert_count),
       orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange", total_alert_count),
@@ -158,9 +159,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   # More than 1 alert on any one route
-  def serialize_routes_multiple_alerts(grouped_alerts, multi_alert_routes) do
+  def serialize_routes_multiple_alerts(grouped_alerts, multi_alert_routes, total_alert_count) do
     multi_alert_route_ids = Enum.map(multi_alert_routes, &elem(&1, 0))
-    total_alert_count = get_total_alerts(grouped_alerts)
 
     cond do
       "Green" in multi_alert_route_ids ->
@@ -187,12 +187,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
             green: serialize_green_line(grouped_alerts, total_alert_count)
           }
         else
-          serialize_one_row_for_all_routes(grouped_alerts)
+          serialize_one_row_for_all_routes(grouped_alerts, total_alert_count)
         end
 
       # Collapse all routes
       true ->
-        serialize_one_row_for_all_routes(grouped_alerts)
+        serialize_one_row_for_all_routes(grouped_alerts, total_alert_count)
     end
   end
 
@@ -706,17 +706,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   # If there is a single alert affecting multiple routes, we need to count that as multiple alerts.
   # To get around that case, we can return either the total routes or total alerts, whichever is greater.
   # This will allow us to better determine if :extended or :contracted is needed.
-  defp get_total_alerts(grouped_alerts) do
+  def get_total_alerts(alerts) do
     total_affected_routes =
-      grouped_alerts
-      |> Enum.flat_map(&elem(&1, 1))
+      alerts
       |> Enum.uniq()
       |> Enum.map(&get_total_affected_routes_for_alert/1)
       |> Enum.sum()
 
     total_alerts =
-      grouped_alerts
-      |> Enum.flat_map(&elem(&1, 1))
+      alerts
       |> Enum.uniq_by(fn
         "Green-" <> _ -> "Green"
         route_id -> route_id
