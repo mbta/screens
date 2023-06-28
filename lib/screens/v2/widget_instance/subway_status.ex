@@ -709,7 +709,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   def get_total_alerts(alerts) do
     total_affected_routes =
       alerts
-      |> Enum.uniq()
+      |> Enum.uniq_by(& &1.id)
       |> Enum.map(&get_total_affected_routes_for_alert/1)
       |> Enum.sum()
 
