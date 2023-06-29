@@ -71,7 +71,8 @@
   position: absolute;
   right: 40px;
   bottom: 56px;
-  width: 196px;
+  width: 210px;
+  display: flex;
 }
 
 .normal-header-updated__text {
@@ -83,16 +84,10 @@
   line-height: 28px;
 }
 
-.normal-header-updated__icon {
-  display: inline-block;
-  vertical-align: top;
-}
-
 .normal-header-updated__img {
-  position: absolute;
   height: 25px;
   width: 25px;
-  margin-right: 4px;
+  flex-shrink: 0;
 }
 
 .normal-header__environment {
