@@ -204,12 +204,19 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
     }
 
     let textContainerClassName = "subway-status_alert_text-container";
+    const textContainerModifiers = [];
     if (hideOverflow) {
-      textContainerClassName = classWithModifier(
-        textContainerClassName,
-        "hide-overflow"
-      );
+      textContainerModifiers.push("hide-overflow");
     }
+
+    if (routePill?.branches) {
+      textContainerModifiers.push(`${routePill.branches.length}-branches`);
+    }
+
+    textContainerClassName = classWithModifiers(
+      textContainerClassName,
+      textContainerModifiers
+    );
 
     let statusTextClassName = "subway-status_alert_status-text";
     if (status === NORMAL_STATUS) {

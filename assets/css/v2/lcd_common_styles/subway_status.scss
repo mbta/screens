@@ -134,6 +134,14 @@
     width: fit-content;
     max-width: 830px;
     margin-left: 24px;
+
+    &--2-branches {
+      max-width: 671px;
+    }
+
+    &--3-branches {
+      max-width: 605px;
+    }
   }
 
   .subway-status_status--contracted .subway-status_alert_text-container.subway-status_alert_text-container--hide-overflow {
