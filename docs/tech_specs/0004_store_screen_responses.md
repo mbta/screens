@@ -57,7 +57,7 @@ In the long term, we may have a total of 1000 screens (countdown signs, 125 pre-
 Considered alternatives:
 - Postgres with JSONB column
 - S3 in Parquet file format
-- Logging to Sentry using the json source_type
+- Logging to Splunk using the json source_type
 
 We stuck with the S3 solution rather than introduce a DB because:
 - It should cover our requirements
@@ -66,7 +66,7 @@ We stuck with the S3 solution rather than introduce a DB because:
 
 As for using Parquet (recommended by the LAMP team) that would just help make the data more queryable, which we don't really need for our use case.
 
-As for logging to Sentry, this was kind of a late-breaking idea, and I didn't immediately find anyone in CTD who has programmatically queried Sentry in this way before, so I just stuck with the S3 option as prime choice. (If the PR reviewers have other insight, this could be an interesting option.)
+As for logging to Splunk, this was kind of a late-breaking idea, and I didn't immediately find anyone in CTD who has programmatically queried Splunk in this way before, so I just stuck with the S3 option as prime choice. (If the PR reviewers have other insight, this could be an interesting option.)
 
 We also considered these alternatives to streamline the frontend rendering before deciding it was out of scope for this work:
 - Store jpgs of the screen content
