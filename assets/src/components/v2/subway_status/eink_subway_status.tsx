@@ -1,9 +1,9 @@
 import React, { ComponentType, forwardRef } from "react";
-import { classWithModifier, firstWord, imagePath } from "Util/util";
+import { classWithModifier, firstWord } from "Util/util";
+import { STRING_TO_SVG } from "Util/svg_utils";
 import {
   Alert,
   ContractedSection,
-  GLBranch,
   GLMultiPill,
   LineColor,
   Section,
@@ -19,7 +19,6 @@ import {
   useSubwayStatusTextResizer,
   FittingStep,
 } from "./subway_status_common";
-import EinkSubwayStatusPill from "../bundled_svg/eink_subway_status_pill";
 
 ////////////////
 // COMPONENTS //
@@ -201,7 +200,8 @@ const SubwayStatusRoutePill: ComponentType<{
   }
 
   // Return the route pill at the top of the section above alerts.
-  return getStandardLinePillPath(routePill.color)
+  const LinePill = STRING_TO_SVG[`${routePill.color}-line`]
+  return <LinePill height="65" />
 };
 
 const GLBranchPillGroup: ComponentType<
@@ -210,18 +210,27 @@ const GLBranchPillGroup: ComponentType<
   // We only inline route pills for GL branches.
   // Otherwise, we show a single route pill above alerts in each section.
   if (showInlineBranches) {
+    
     return (
       <>
-        {branches.map((branch) => getGLBranchLetterPillPath(branch)) }
+        {branches.map((branch) => {
+          const LinePill = STRING_TO_SVG[`green-${branch}-circle`]
+          return <LinePill width="64" height="64" key={branch} className="branch-icon" />        
+        })}
       </>
     );
   }
 
   const [firstBranch, ...rest] = branches;
+
+  const ComboLinePill = STRING_TO_SVG[`green-line-${firstBranch}`]
   return (
     <>
-      {getGLComboPillPath(firstBranch)}
-      {rest.map((branch) => getGLBranchLetterPillPath(branch))}
+      <ComboLinePill width="404" height="64" className="branch-icon" />
+      {rest.map((branch) => {
+        const BranchLinePill = STRING_TO_SVG[`green-${branch}-circle`]
+        return <BranchLinePill width="64" height="64" key={branch} className="branch-icon" />    
+      })}
     </>
   );
 };
@@ -258,12 +267,5 @@ const getRoutePillObject = (
 
   return { color: color };
 };
-
-const getStandardLinePillPath = (lineColor: LineColor) => (<EinkSubwayStatusPill pill={`${lineColor}-line`} className="pill-icon" />)
-
-const getGLComboPillPath = (branch: GLBranch) => <EinkSubwayStatusPill pill={`gl-${branch}`} className="pill-icon" />
-
-const getGLBranchLetterPillPath = (branch: GLBranch) => <EinkSubwayStatusPill pill={`green-${branch}-circle`} className="branch-icon" />
-
 
 export default EinkSubwayStatus;
