@@ -47,13 +47,16 @@
 
   .subway-status_status--contracted.subway-status_status--one-alert {
     // 114px
-    height: $status-top-padding + $pill-height + $contracted-status-with-one-alert-bottom-padding;
+    height: $status-top-padding + $pill-height +
+      $contracted-status-with-one-alert-bottom-padding;
   }
 
   .subway-status_status--contracted.subway-status_status--two-alerts:not(.subway-status_status--has-second-pill) {
     // 193px
     // Second alert still gets the height of a pill, despite not having one visible
-    height: $status-top-padding + (2 * $pill-height) + $intra-alert-margin-without-second-pill + $contracted-status-with-two-alerts-bottom-padding;
+    height: $status-top-padding + (2 * $pill-height) +
+      $intra-alert-margin-without-second-pill +
+      $contracted-status-with-two-alerts-bottom-padding;
   }
 
   // &--contracted.subway-status_status--two-alerts.subway-status_status--has-second-pill {}
@@ -144,7 +147,8 @@
     }
   }
 
-  .subway-status_status--contracted .subway-status_alert_text-container.subway-status_alert_text-container--hide-overflow {
+  .subway-status_status--contracted
+    .subway-status_alert_text-container.subway-status_alert_text-container--hide-overflow {
     height: $pill-height;
   }
 

@@ -111,10 +111,14 @@ interface AlertWithID extends Alert {
  *
  * When the text wraps to a second line it's more than that, which is all we care about to detect overflows.
  */
-const CONTRACTED_ALERT_MAX_HEIGHT = 80;
+const CONTRACTED_ALERT_MAX_HEIGHT = 82;
 const EXTENDED_ALERT_MAX_HEIGHT = 120;
 
-const CONTRACTED_ALERT_FITTING_STEPS = [FittingStep.PerAlertEffect, FittingStep.Abbrev, FittingStep.FullSize];
+const CONTRACTED_ALERT_FITTING_STEPS = [
+  FittingStep.PerAlertEffect,
+  FittingStep.Abbrev,
+  FittingStep.FullSize,
+];
 const EXTENDED_ALERT_FITTING_STEPS = [FittingStep.Abbrev, FittingStep.FullSize];
 
 const ALERTS_URL = "mbta.com/alerts";
@@ -127,7 +131,12 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   id,
 }) => {
   const { ref, abbrev, truncateStatus, replaceLocationWithUrl, isDone } =
-    useSubwayStatusTextResizer(CONTRACTED_ALERT_MAX_HEIGHT, CONTRACTED_ALERT_FITTING_STEPS, id, status);
+    useSubwayStatusTextResizer(
+      CONTRACTED_ALERT_MAX_HEIGHT,
+      CONTRACTED_ALERT_FITTING_STEPS,
+      id,
+      status
+    );
 
   let locationText: string | null;
   if (replaceLocationWithUrl) {
@@ -141,7 +150,9 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   if (truncateStatus) {
     const effect = firstWord(status);
     status =
-      effect === "Bypassing" ? `Bypassing ${stationCount} ${stationCount === 1 ? "stop" : "stops"}` : effect;
+      effect === "Bypassing"
+        ? `Bypassing ${stationCount} ${stationCount === 1 ? "stop" : "stops"}`
+        : effect;
   }
 
   return (
@@ -161,8 +172,12 @@ const ExtendedAlert: ComponentType<AlertWithID> = ({
   location,
   id,
 }) => {
-  const { ref, abbrev, isDone } =
-    useSubwayStatusTextResizer(EXTENDED_ALERT_MAX_HEIGHT, EXTENDED_ALERT_FITTING_STEPS, id, status);
+  const { ref, abbrev, isDone } = useSubwayStatusTextResizer(
+    EXTENDED_ALERT_MAX_HEIGHT,
+    EXTENDED_ALERT_FITTING_STEPS,
+    id,
+    status
+  );
 
   let locationText: string | null;
   if (isAlertLocationMap(location)) {
