@@ -220,7 +220,7 @@ const PreFareSingleScreenAlert: React.ComponentType<PreFareSingleScreenAlertProp
             {layoutRenderer()}
           </div>
           <div className="alert-card__footer">
-            <div className="alert-card__footer__cause">Cause: {formatCause(cause)}</div>
+            { cause && <div className="alert-card__footer__cause">Cause: {formatCause(cause)}</div> }
             <div>Updated <span className="alert-card__footer__datetime">{updated_at}</span></div>
           </div>
         </div>
