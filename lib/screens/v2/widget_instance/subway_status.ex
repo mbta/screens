@@ -596,12 +596,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     case branch_alerts do
       # One branch alert, no trunk alerts
       [alert] ->
-        route_id = List.first(route_ids, "Green")
-
         serialized_alert =
           Map.merge(
             %{route_pill: serialize_gl_pill_with_branches(route_ids)},
-            serialize_alert(alert, route_id)
+            serialize_green_line_branch_alert(alert, route_ids)
           )
 
         if total_alert_count < 3 and gl_alert_count == 1 do
