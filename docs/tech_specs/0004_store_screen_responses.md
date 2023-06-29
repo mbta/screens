@@ -70,4 +70,4 @@ As for logging to Splunk, this was kind of a late-breaking idea, and I didn't im
 
 We also considered these alternatives to streamline the frontend rendering before deciding it was out of scope for this work:
 - Store jpgs of the screen content
-- Store html of the screens (tricky, because some screens have frontend paging that will not be represented in the html.)
+- Store html of the screens
