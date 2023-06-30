@@ -202,6 +202,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp get_region_from_location(_location), do: :outside
 
+  defp get_cause(:unknown), do: nil
+  defp get_cause(cause), do: cause
+
   def takeover_alert?(%__MODULE__{is_full_screen: false}), do: false
 
   def takeover_alert?(%__MODULE__{is_terminal_station: is_terminal_station, alert: alert} = t) do
@@ -301,7 +304,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          location
        ) do
     informed_entities = Alert.informed_entities(alert)
-    cause_text = Alert.get_cause_string(cause)
     [route_id] = LocalizedAlert.informed_subway_routes(t)
     endpoints = get_endpoints(informed_entities, route_id)
     destination = get_destination(t, location)
@@ -342,7 +344,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: issue,
       remedy: "Seek alternate route",
       location: location_text,
-      cause: cause_text,
+      cause: get_cause(cause),
       routes: get_route_pills(t, location),
       effect: :suspension,
       updated_at: format_updated_at(updated_at, now),
@@ -358,7 +360,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          location
        ) do
     informed_entities = Alert.informed_entities(alert)
-    cause_text = Alert.get_cause_string(cause)
     [route_id] = LocalizedAlert.informed_subway_routes(t)
     endpoints = get_endpoints(informed_entities, route_id)
     destination = get_destination(t, location)
@@ -397,7 +398,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: issue,
       remedy: remedy,
       location: location_text,
-      cause: cause_text,
+      cause: get_cause(cause),
       routes: get_route_pills(t, location),
       effect: :shuttle,
       updated_at: format_updated_at(updated_at, now),
@@ -412,7 +413,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t,
          :inside
        ) do
-    cause_text = Alert.get_cause_string(cause)
     affected_routes = LocalizedAlert.informed_subway_routes(t)
     routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
 
@@ -434,7 +434,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %{
       issue: format_routes(affected_routes),
       unaffected_routes: format_routes(unaffected_routes),
-      cause: cause_text,
+      cause: get_cause(cause),
       routes: get_route_pills(t, :inside),
       effect: :station_closure,
       updated_at: format_updated_at(updated_at, now),
@@ -450,12 +450,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t,
          location
        ) do
-    cause_text = Alert.get_cause_string(cause)
-
     %{
       issue: "Trains skip #{informed_stations_string}",
       remedy: "Seek alternate route",
-      cause: cause_text,
+      cause: get_cause(cause),
       routes: get_route_pills(t, location),
       effect: :station_closure,
       updated_at: format_updated_at(updated_at, now),
@@ -476,7 +474,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t,
          location
        ) do
-    cause_text = Alert.get_cause_string(cause)
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
     affected_routes = LocalizedAlert.informed_subway_routes(t)
 
@@ -496,7 +493,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %{
       issue: "Trains may be delayed #{duration_text}",
       remedy: header,
-      cause: cause_text,
+      cause: get_cause(cause),
       routes: routes,
       effect: :delay,
       updated_at: format_updated_at(updated_at, now),
