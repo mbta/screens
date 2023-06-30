@@ -3,7 +3,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
-  alias Screens.Config.V2.FreeTextLine
   alias Screens.LocationContext
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
@@ -51,6 +50,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           optional(:unaffected_routes) => list(route_id()),
           optional(:location) => String.t() | nil,
           optional(:remedy) => String.t(),
+          optional(:endpoints) => list(String.t()),
           issue: String.t(),
           cause: Alert.cause() | nil,
           routes: list(String.t()),
@@ -310,15 +310,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     {issue, location_text} =
       if location in [:downstream, :upstream] do
-        endpoint_text = format_endpoint_string_as_freetext(endpoints)
-
-        issue =
-          FreeTextLine.to_json(%FreeTextLine{
-            icon: nil,
-            text: [%{format: :bold, text: "No trains"}] ++ endpoint_text
-          })
-
-        {issue, nil}
+        {"No trains", nil}
       else
         endpoint_text = format_endpoint_string(endpoints)
 
@@ -348,7 +340,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       routes: get_route_pills(t, location),
       effect: :suspension,
       updated_at: format_updated_at(updated_at, now),
-      region: get_region_from_location(location)
+      region: get_region_from_location(location),
+      endpoints: endpoints
     }
   end
 
@@ -366,15 +359,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     {issue, location_text, remedy} =
       if location in [:downstream, :upstream] do
-        endpoint_text = format_endpoint_string_as_freetext(endpoints)
-
-        issue =
-          FreeTextLine.to_json(%FreeTextLine{
-            icon: nil,
-            text: [%{format: :bold, text: "No trains"}] ++ endpoint_text
-          })
-
-        {issue, nil, "Shuttle buses available"}
+        {"No trains", nil, "Shuttle buses available"}
       else
         endpoint_text = format_endpoint_string(endpoints)
         location_text = if is_nil(endpoint_text), do: nil, else: "Shuttle buses #{endpoint_text}"
@@ -402,7 +387,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       routes: get_route_pills(t, location),
       effect: :shuttle,
       updated_at: format_updated_at(updated_at, now),
-      region: get_region_from_location(location)
+      region: get_region_from_location(location),
+      endpoints: endpoints
     }
   end
 
@@ -889,13 +875,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         {min_full_name, _min_abbreviated_name} = min_station_name
         {max_full_name, _max_abbreviated_name} = max_station_name
 
-        {min_full_name, max_full_name}
+        [min_full_name, max_full_name]
     end
   end
 
   def format_endpoint_string(nil), do: nil
 
-  def format_endpoint_string({min_station, max_station}) do
+  def format_endpoint_string([min_station, max_station]) do
     if min_station == max_station do
       "at #{min_station}"
     else
