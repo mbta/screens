@@ -168,7 +168,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         headsign = get_destination(t, location, route_id)
 
         if is_nil(headsign) do
-          String.downcase("#{route_id}-line")
+          route_id |> String.first() |> String.downcase() |> Kernel.<>("l")
         else
           format_for_svg_name(headsign)
         end
