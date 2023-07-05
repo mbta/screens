@@ -62,7 +62,7 @@
 
 .normal-header__environment {
   @include font--text--75bold;
-  position: relative;
+  position: absolute;
   font-size: 36px;
   color: #ffffff;
   letter-spacing: 0;

@@ -375,13 +375,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     headsign in MapSet.new(branch_terminals)
   end
 
-  defp interpret_entities(entities, [parent_stop_id]) do
+  defp interpret_entities(entities, parent_stop_ids) do
     informed_stop_ids = Enum.into(entities, MapSet.new(), & &1.stop)
+    parent_stop_id = List.first(parent_stop_ids)
 
     {region, headsign} =
       :screens
       |> Application.get_env(:dup_alert_headsign_matchers)
-      |> Map.get(parent_stop_id)
+      |> Map.get(parent_stop_id, [])
       |> Enum.find_value({:inside, nil}, fn
         %{
           informed: informed,

@@ -9,7 +9,12 @@ interface Props {
   show_to: boolean;
 }
 
-const NormalHeader: ComponentType<Props> = ({ icon, text, time, show_to: showTo }) => {
+const NormalHeader: ComponentType<Props> = ({
+  icon,
+  text,
+  time,
+  show_to: showTo,
+}) => {
   return (
     <DefaultNormalHeader
       icon={icon}

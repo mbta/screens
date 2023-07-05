@@ -22,7 +22,7 @@ import BottomTakeoverBody from "Components/v2/bus_eink/bottom_takeover_body";
 import OneMedium from "Components/v2/eink/flex/one_medium";
 
 import Placeholder from "Components/v2/placeholder";
-import NormalHeader from "Components/v2/eink/normal_header";
+import NormalHeader from "Components/v2/eink/bus_normal_header";
 import FareInfoFooter from "Components/v2/eink/fare_info_footer";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import EvergreenContent from "Components/v2/evergreen_content";

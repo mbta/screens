@@ -2,6 +2,8 @@ import useTextResizer from "Hooks/v2/use_text_resizer";
 import React, { forwardRef, ComponentType } from "react";
 import { getDatasetValue } from "Util/dataset";
 
+import LiveDataSvg from '../../../static/images/svgr_bundled/live-data-small.svg'
+
 import {
   classWithModifier,
   classWithModifiers,
@@ -68,6 +70,8 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = forwardRef(
     const modifiers: string[] = [size];
     if (icon) {
       modifiers.push("with-icon");
+    } else {
+      modifiers.push("no-icon");
     }
 
     const abbreviatedText = fullName ? text : abbreviateText(text);
@@ -79,7 +83,6 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = forwardRef(
           <div className="normal-header__environment">{environmentName}</div>
         )}
         <div className="normal-header-title">
-          {showTo && <div className="normal-header-to__text">TO</div>}
           {icon && <NormalHeaderIcon icon={icon} />}
           <div
             className={classWithModifiers(
@@ -88,6 +91,7 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = forwardRef(
             )}
             ref={ref}
           >
+            {showTo && <div className="normal-header-to__text">TO</div>}
             {abbreviatedText}
           </div>
         </div>
@@ -108,12 +112,7 @@ const NormalHeaderTime: ComponentType<NormalHeaderTimeProps> = ({ time }) => {
 const NormalHeaderUpdated = () => {
   return (
     <div className="normal-header-updated">
-      <div className="normal-header-updated__icon">
-        <img
-          className="normal-header-updated__img"
-          src={imagePath("live-data-small.svg")}
-        />
-      </div>
+      <LiveDataSvg color="white" width="25" height="25" viewBox="0 0 32 32" className="normal-header-updated__img" />
       <div className="normal-header-updated__text">
         UPDATED LIVE EVERY MINUTE
       </div>
