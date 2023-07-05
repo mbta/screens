@@ -1,6 +1,6 @@
-import NoConnection from "Components/v2/bundled_svg/no_connection";
+import NoConnection from "../../../../static/images/svgr_bundled/live-data-none.svg";
 import React, { ComponentType } from "react";
-import TLogo from "Components/v2/bundled_svg/t_logo";
+import TLogo from "../../../../static/images/svgr_bundled/logo.svg";
 
 interface Props {
   show_alternatives: boolean;
@@ -16,8 +16,10 @@ const NoData: ComponentType<Props> = ({
       <div className="no-data__main-content">
         <div className="no-data__main-content__no-connection-icon-container">
           <NoConnection
+            width="128"
+            height="128"
             className="no-data__main-content__no-connection-icon"
-            colorHex={coolBlack}
+            color={coolBlack}
           />
         </div>
         <div className="no-data__main-content__heading">
@@ -38,7 +40,7 @@ const NoData: ComponentType<Props> = ({
               </span>{" "}
             </div>
             <div className="no-data__t-logo-icon-container">
-              <TLogo className="no-data__t-logo-icon" colorHex={coolBlack} />
+              <TLogo width="1000" height="1000" className="no-data__t-logo-icon" color={coolBlack} />
             </div>
           </div>
         </>
