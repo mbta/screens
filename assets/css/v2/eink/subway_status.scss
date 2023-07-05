@@ -6,6 +6,13 @@
   overflow: hidden;
   background-color: white;
 
+  .branch-icon {
+    display: inline-block;
+    &:not(:last-child) {
+      margin-right: 8px;
+    }
+  }
+
   .subway-status__header {
     font-family: Helvetica, sans-serif;
     font-size: 72px;
@@ -66,16 +73,6 @@
   .subway-status_alert_route-pill-container {
     display: inline-block;
     margin-right: 16px;
-
-    .branch-icon {
-      display: inline-block;
-      height: 64px;
-      width: 64px;
-
-      &:not(:last-child) {
-        margin-right: 8px;
-      }
-    }
   }
 
   .subway-status_alert_text-container {
