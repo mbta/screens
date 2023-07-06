@@ -177,7 +177,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     |> Enum.map(fn %{informed_entities: ies} = alert ->
       distance =
         ies
-        |> Enum.filter(&String.starts_with?(&1.stop, "place-"))
+        |> Enum.filter(fn
+          %{stop: nil} -> true
+          ie -> String.starts_with?(ie.stop, "place-")
+        end)
         |> Enum.map(&get_distance(stop_id, home_stop_distance_map, &1))
         |> Enum.min()
 
@@ -208,6 +211,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   # i.e. Braintree is not present in Ashmont stop_sequences, but is still a relevant alert.
   @spec get_distance(stop_id(), home_stop_distance_map(), Alert.informed_entity()) :: distance()
   defp get_distance(home_stop_id, home_stop_distance_map, informed_entity)
+
+  defp get_distance(_home_stop_id, _home_stop_distance_map, %{stop: nil}), do: 0
 
   defp get_distance(home_stop_id, home_stop_distance_map, %{route: "Green" <> _, stop: ie_stop_id})
        when home_stop_id in @gl_trunk_stop_ids and ie_stop_id in @gl_eastbound_split_stops,
@@ -308,7 +313,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     relevant_direction_for_terminal == nil or relevant_direction_for_terminal == direction_id
   end
 
-  defp get_stations(alert, fetch_stop_name_fn) do
+  defp get_stations(%{effect: :station_closure} = alert, fetch_stop_name_fn) do
     stop_ids =
       alert
       |> Alert.informed_entities()
@@ -330,12 +335,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         |> Enum.flat_map(
           &case fetch_stop_name_fn.(&1) do
             :error -> []
+            "Massachusetts Avenue" -> ["Mass. Ave"]
             name -> [name]
           end
         )
         |> Util.format_name_list_to_string()
     end
   end
+
+  defp get_stations(_alert, _fetch_stop_name_fn), do: ""
 
   defp is_terminal?(stop_id, stop_sequences) do
     # Can't use Enum.any, because then Govt Center will be seen as a terminal
