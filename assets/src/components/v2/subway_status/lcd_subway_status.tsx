@@ -3,13 +3,15 @@ import {
   classWithModifier,
   classWithModifiers,
   firstWord,
+  imagePath,
 } from "Util/util";
-import { STRING_TO_SVG, getHexColor } from "Util/svg_utils";
 import {
   Alert,
   ContractedSection,
   ExtendedSection,
+  GLBranch,
   GLMultiPill,
+  LineColor,
   Section,
   SubwayStatusData,
   SubwayStatusPill,
@@ -266,9 +268,11 @@ const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
     const sortedUniqueBranches = Array.from(new Set(routePill.branches)).sort();
     return <GLBranchPillGroup branches={sortedUniqueBranches} />;
   } else {
-    const LinePill = STRING_TO_SVG[`${routePill.color[0]}l`]
     return (
-      <LinePill width="144" height="74" color={getHexColor(routePill.color)} />
+      <img
+        src={getStandardLinePillPath(routePill.color)}
+        className="pill-icon"
+      />
     );
   }
 };
@@ -276,15 +280,16 @@ const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
 const GLBranchPillGroup: ComponentType<Pick<GLMultiPill, "branches">> = ({
   branches: [firstBranch, ...rest],
 }) => {
-  const ComboLinePill = STRING_TO_SVG[`gl-${firstBranch}`]
-
   return (
     <>
-      <ComboLinePill width="203" height="74" color={getHexColor("green")} />
-      {rest.map((branch) => {
-        const BranchPill = STRING_TO_SVG[`green-${branch}-circle`]
-        return <BranchPill width="74" height="74" color={getHexColor("green")} className="branch-icon" key={ branch }/>
-      })}
+      <img src={getGLComboPillPath(firstBranch)} className="pill-icon" />
+      {rest.map((branch) => (
+        <img
+          src={getGLBranchLetterPillPath(branch)}
+          className="branch-icon"
+          key={branch}
+        />
+      ))}
     </>
   );
 };
@@ -335,6 +340,16 @@ const shouldShowLastRule = ({ blue, orange, red, green }: SubwayStatusData) => {
 
   return firstThreeContracted && (glExtended || glContractedWithNoSecondPill);
 };
+
+const getStandardLinePillPath = (lineColor: LineColor) =>
+  pillPath(`${lineColor}-line.svg`);
+
+const getGLComboPillPath = (branch: GLBranch) => pillPath(`gl-${branch}.svg`);
+
+const getGLBranchLetterPillPath = (branch: GLBranch) =>
+  pillPath(`green-${branch}-circle.svg`);
+
+const pillPath = (pillFilename: string) => imagePath(`pills/${pillFilename}`);
 
 const isExtendedWithNoLocation = (
   section: Section
