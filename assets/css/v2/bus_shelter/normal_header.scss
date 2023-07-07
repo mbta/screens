@@ -25,7 +25,7 @@
 .normal-header-title__text {
   display: inline-block;
   vertical-align: middle;
-  font-family: neue-haas-grotesk-display;
+  font-family: Helvetica, sans-serif;
   font-weight: 700;
   color: #ffffff;
 
@@ -56,7 +56,7 @@
 
 .normal-header__environment {
   @include font--text--75bold;
-  position: relative;
+  position: absolute;
   padding-left: 40px;
   padding-top: 10px;
   font-size: 36px;

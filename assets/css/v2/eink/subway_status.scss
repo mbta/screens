@@ -6,6 +6,13 @@
   overflow: hidden;
   background-color: white;
 
+  .branch-icon {
+    display: inline-block;
+    &:not(:last-child) {
+      margin-right: 8px;
+    }
+  }
+
   .subway-status__header {
     font-family: Helvetica, sans-serif;
     font-size: 72px;
@@ -49,6 +56,10 @@
   min-width: 144px;
   height: 64px;
   padding-top: 44px;
+
+  .pill-icon {
+    margin-right: 8px;
+  }
 }
 
 .subway-status_status {
@@ -66,23 +77,12 @@
   .subway-status_alert_route-pill-container {
     display: inline-block;
     margin-right: 16px;
-
-    .branch-icon {
-      display: inline-block;
-      height: 64px;
-      width: 64px;
-
-      &:not(:last-child) {
-        margin-right: 8px;
-      }
-    }
   }
 
   .subway-status_alert_text-container {
     display: inline-block;
     vertical-align: top;
     font-family: Inter, sans-serif;
-    max-width: 1024px;
     font-weight: 800;
     line-height: 65px;
     font-size: 56px;

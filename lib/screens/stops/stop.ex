@@ -409,6 +409,10 @@ defmodule Screens.Stops.Stop do
     @route_stop_sequences
   end
 
+  def get_gl_stop_sequences do
+    Enum.map(@green_line_branches, &get_route_stop_sequence/1)
+  end
+
   defp sequence_match?(stop_sequence, informed_entities) do
     ie_stops =
       informed_entities
@@ -425,7 +429,7 @@ defmodule Screens.Stops.Stop do
   end
 
   def gl_trunk_stops do
-    @route_stop_sequences |> Map.get("Green") |> hd() |> Enum.map(&elem(&1, 0)) |> MapSet.new()
+    @green_line_trunk_stops
   end
 
   def stop_id_to_name(route_id) do

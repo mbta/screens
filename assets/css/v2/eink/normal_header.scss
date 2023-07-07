@@ -8,31 +8,32 @@
 .normal-header-icon {
   display: inline-block;
   vertical-align: middle;
-}
-
-.normal-header-icon__image {
   height: 128px;
   width: 128px;
-  margin-right: 28px;
+  margin: 120px 28px 40px 40px;
 }
 
 .normal-header-title {
-  width: 892px;
-  position: absolute;
-  left: 40px;
-  bottom: 40px;
+  width: 964px;
+  height: 100%;
+  position: relative;
 }
 
 .normal-header-title__text {
   display: inline-block;
   vertical-align: middle;
-  font-family: neue-haas-grotesk-display;
+  font-family: Helvetica, sans-serif;
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: 1px;
 
   &--with-icon {
-    width: 736px;
+    width: 768px;
+  }
+
+  &--no-icon {
+    margin-left: 40px;
+    margin-top: 40px;
+    width: 864px;
   }
 
   &--large {
@@ -47,17 +48,13 @@
 }
 
 .normal-header-to__text {
-  position: absolute;
-  font-family: neue-haas-grotesk-display;
+  font-family: Helvetica, sans-serif;
   color: #ffffff;
   letter-spacing: 2px;
   font-size: 56px;
   line-height: 64px;
   height: 64px;
-  width: 736px;
   font-weight: 500;
-  left: 156px;
-  bottom: 110px;
 }
 
 .normal-header-time {
@@ -73,34 +70,30 @@
 .normal-header-updated {
   position: absolute;
   right: 40px;
-  bottom: 40px;
+  bottom: 56px;
+  width: 204px;
+  display: flex;
 }
 
 .normal-header-updated__text {
-  display: inline-block;
-  vertical-align: top;
-  width: 168px;
   text-align: right;
-  font-family: neue-haas-grotesk-display;
+  font-family: Inter;
+  font-weight: 500;
   color: #ffffff;
   font-size: 24px;
-  line-height: 30px;
-}
-
-.normal-header-updated__icon {
-  display: inline-block;
-  vertical-align: top;
+  line-height: 28px;
 }
 
 .normal-header-updated__img {
   height: 25px;
   width: 25px;
-  margin-right: 4px;
+  flex-shrink: 0;
 }
 
 .normal-header__environment {
-  @include font--text--75bold;
-  position: relative;
+  font-family: Helvetica, sans-serif;
+  font-weight: 700;
+  position: absolute;
   padding-left: 40px;
   padding-top: 10px;
   font-size: 36px;

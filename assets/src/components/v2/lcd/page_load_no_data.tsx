@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import Loading from "Components/v2/bundled_svg/loading";
+import Loading from "../../../../static/images/svgr_bundled/loading.svg";
 
 const coolBlack = "#171F26";
 
@@ -9,8 +9,10 @@ const PageLoadNoData: ComponentType = () => {
       <div className="no-data__main-content">
         <div className="page-load-no-data__main-content__loading-icon-container">
           <Loading
+            width="128"
+            height="128"
             className="page-load-no-data__main-content__loading-icon"
-            colorHex={coolBlack}
+            color={coolBlack}
           />
         </div>
         <div className="page-load-no-data__main-content__heading">

@@ -1,9 +1,9 @@
 import React, { ComponentType, forwardRef } from "react";
-import { classWithModifier, firstWord, imagePath } from "Util/util";
+import { classWithModifier, firstWord } from "Util/util";
+import { STRING_TO_SVG } from "Util/svg_utils";
 import {
   Alert,
   ContractedSection,
-  GLBranch,
   GLMultiPill,
   LineColor,
   Section,
@@ -50,8 +50,8 @@ const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
   const routePill = getRoutePillObject(section, color);
   const showInlineBranches =
     color === LineColor.Green &&
-    ((isContracted(section) && section.alerts.length > 1) ||
-      isExtended(section));
+    isContracted(section) &&
+    section.alerts.length > 1;
 
   return (
     <div
@@ -98,7 +98,11 @@ interface AlertRowProps extends Alert {
 }
 
 const ALERTS_URL = "mbta.com/alerts";
-const ALERT_FITTING_STEPS = [FittingStep.PerAlertEffect, FittingStep.Abbrev, FittingStep.FullSize];
+const ALERT_FITTING_STEPS = [
+  FittingStep.PerAlertEffect,
+  FittingStep.Abbrev,
+  FittingStep.FullSize,
+];
 
 const AlertRow: ComponentType<AlertRowProps> = ({
   route_pill: routePill,
@@ -109,7 +113,7 @@ const AlertRow: ComponentType<AlertRowProps> = ({
   showInlineBranches,
 }) => {
   // row height is a little taller when there is an inline GL branch pill
-  const rowHeight = showInlineBranches ? 70 : 60;
+  const rowHeight = showInlineBranches ? 70 : 65;
   const { ref, abbrev, truncateStatus, replaceLocationWithUrl } =
     useSubwayStatusTextResizer(rowHeight, ALERT_FITTING_STEPS, id, status);
 
@@ -125,7 +129,9 @@ const AlertRow: ComponentType<AlertRowProps> = ({
   if (truncateStatus) {
     const effect = firstWord(status);
     status =
-      effect === "Bypassing" ? `Bypassing ${stationCount} ${stationCount === 1 ? "stop" : "stops"}` : effect;
+      effect === "Bypassing"
+        ? `Bypassing ${stationCount} ${stationCount === 1 ? "stop" : "stops"}`
+        : effect;
   }
 
   return (
@@ -194,9 +200,8 @@ const SubwayStatusRoutePill: ComponentType<{
   }
 
   // Return the route pill at the top of the section above alerts.
-  return (
-    <img src={getStandardLinePillPath(routePill.color)} className="pill-icon" />
-  );
+  const LinePill = STRING_TO_SVG[`${routePill.color}-line`]
+  return <LinePill height="65" />
 };
 
 const GLBranchPillGroup: ComponentType<
@@ -205,30 +210,27 @@ const GLBranchPillGroup: ComponentType<
   // We only inline route pills for GL branches.
   // Otherwise, we show a single route pill above alerts in each section.
   if (showInlineBranches) {
+    
     return (
       <>
-        {branches.map((branch) => (
-          <img
-            src={getGLBranchLetterPillPath(branch)}
-            className="branch-icon"
-            key={branch}
-          />
-        ))}
+        {branches.map((branch) => {
+          const LinePill = STRING_TO_SVG[`green-${branch}-circle`]
+          return <LinePill width="64" height="64" key={branch} className="branch-icon" />        
+        })}
       </>
     );
   }
 
   const [firstBranch, ...rest] = branches;
+
+  const ComboLinePill = STRING_TO_SVG[`green-line-${firstBranch}`]
   return (
     <>
-      <img src={getGLComboPillPath(firstBranch)} className="pill-icon" />
-      {rest.map((branch) => (
-        <img
-          src={getGLBranchLetterPillPath(branch)}
-          className="branch-icon"
-          key={branch}
-        />
-      ))}
+      <ComboLinePill width="404" height="64" className="branch-icon" />
+      {rest.map((branch) => {
+        const BranchLinePill = STRING_TO_SVG[`green-${branch}-circle`]
+        return <BranchLinePill width="64" height="64" key={branch} className="branch-icon" />    
+      })}
     </>
   );
 };
@@ -265,16 +267,5 @@ const getRoutePillObject = (
 
   return { color: color };
 };
-
-const getStandardLinePillPath = (lineColor: LineColor) =>
-  pillPath(`${lineColor}-line.svg`);
-
-const getGLComboPillPath = (branch: GLBranch) => pillPath(`gl-${branch}.svg`);
-
-const getGLBranchLetterPillPath = (branch: GLBranch) =>
-  pillPath(`green-${branch}-circle.svg`);
-
-const pillPath = (pillFilename: string) =>
-  imagePath(`pills/eink/${pillFilename}`);
 
 export default EinkSubwayStatus;
