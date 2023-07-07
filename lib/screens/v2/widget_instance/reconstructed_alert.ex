@@ -36,6 +36,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           | fullscreen_serialized_response()
           | flex_serialized_response()
 
+  # Values shared in each response
+  # %{
+  #   issue: String.t(),
+  #   cause: String.t(),
+  #   effect: Alert.effect()
+  # }
+
   @type takeover_serialized_response :: %{
           issue: String.t(),
           remedy: String.t(),
@@ -47,12 +54,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         }
 
   @type fullscreen_serialized_response :: %{
+          # Unique to fullscreen station closures
           optional(:unaffected_routes) => list(route_id()),
           optional(:location) => String.t() | nil,
           optional(:remedy) => String.t(),
+          # Unique to fullscreen
           optional(:endpoints) => list(String.t()),
           issue: String.t() | list(String.t()),
           cause: Alert.cause() | nil,
+          # List of SVG filenames
           routes: list(String.t()),
           effect: :suspension | :shuttle | :station_closure | :delay,
           updated_at: String.t(),
