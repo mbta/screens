@@ -1,3 +1,4 @@
+import { classWithModifier } from "Util/util";
 import React, { ComponentType } from "react";
 
 const MAX_WIDTH = 904;
@@ -119,6 +120,7 @@ const FirstSlotComponent: ComponentType<EndSlotComponentProps> = ({
   if (slot.type === "arrow") {
     return (
       <path
+        className={classWithModifier("end-slot__arrow", line)}
         transform="translate(0 12)"
         d="M35 0V24L19.554 24C19.1915 24 18.8358 23.9015 18.525 23.715L1.85831 13.715C0.563633 12.9382 0.563633 11.0618 1.85831 10.285L18.525 0.285015C18.8358 0.0985165 19.1915 0 19.554 0L35 0Z"
         fill={line}
@@ -127,11 +129,11 @@ const FirstSlotComponent: ComponentType<EndSlotComponentProps> = ({
   } else {
     return (
       <circle
+        className={classWithModifier("end-slot__icon", line)}
         cx={L + SLOT_WIDTH / 2}
         cy="24"
         r="20"
         fill="white"
-        stroke="#171F26"
         strokeWidth="8"
       />
     );
@@ -147,7 +149,7 @@ const LastSlotComponent: ComponentType<
         transform={`translate(${x} 12)`}
         width={204}
         d="M0 24V0H59.446C59.8085 0 60.1642 0.0985159 60.475 0.285014L77.1417 10.285C78.4364 11.0618 78.4364 12.9382 77.1417 13.715L60.475 23.715C60.1642 23.9015 59.8085 24 59.446 24H0Z"
-        fill={line}
+        className={classWithModifier("end-slot__arrow", line)}
       />
     );
   } else {
@@ -157,7 +159,7 @@ const LastSlotComponent: ComponentType<
         cy="24"
         r="20"
         fill="white"
-        stroke="#171F26"
+        className={classWithModifier("end-slot__icon", line)}
         strokeWidth="8"
       />
     );
@@ -179,9 +181,9 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
 }) => {
   const background = (
     <rect
+      className={classWithModifier("middle-slot__background", line)}
       width={SLOT_WIDTH + spaceBetween}
       height={LINE_HEIGHT}
-      fill={line}
       x={x}
       y="12"
     />
@@ -195,7 +197,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
         cy="24"
         r="10"
         fill="white"
-        stroke={line}
+        className={classWithModifier("middle-slot__icon", line)}
         strokeWidth="4"
       />
     );
@@ -264,6 +266,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = ({
     >
       <FirstSlotComponent slot={beginning} line={line} />
       <rect
+        className={classWithModifier("end-slot__arrow", line)}
         width={SLOT_WIDTH / 2 + spaceBetween}
         height={LINE_HEIGHT}
         fill={line}

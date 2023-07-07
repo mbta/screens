@@ -1,0 +1,71 @@
+.end-slot__arrow {
+  &--red {
+    fill: $line-color-red;
+  }
+
+  &--blue {
+    fill: $line-color-blue;
+  }
+
+  &--orange {
+    fill: $line-color-orange;
+  }
+
+  &--green {
+    fill: $line-color-green;
+  }
+}
+
+.end-slot__icon {
+  &--red {
+    stroke: $line-color-red;
+  }
+
+  &--blue {
+    stroke: $line-color-blue;
+  }
+
+  &--orange {
+    stroke: $line-color-orange;
+  }
+
+  &--green {
+    stroke: $line-color-green;
+  }
+}
+
+.middle-slot__background {
+  &--red {
+    fill: $line-color-red;
+  }
+
+  &--blue {
+    fill: $line-color-blue;
+  }
+
+  &--orange {
+    fill: $line-color-orange;
+  }
+
+  &--green {
+    fill: $line-color-green;
+  }
+}
+
+.middle-slot__icon {
+  &--red {
+    stroke: $line-color-red;
+  }
+
+  &--blue {
+    stroke: $line-color-blue;
+  }
+
+  &--orange {
+    stroke: $line-color-orange;
+  }
+
+  &--green {
+    stroke: $line-color-green;
+  }
+}
