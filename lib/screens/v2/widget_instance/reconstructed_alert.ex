@@ -113,13 +113,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     {direction_id, route_id} =
       informed_entities
-      |> Enum.map(fn
+      |> hd()
+      |> case do
         %{direction_id: nil, route: route} when location == :downstream -> {0, route}
         %{direction_id: nil, route: route} when location == :upstream -> {1, route}
         %{direction_id: direction_id, route: route} -> {direction_id, route}
-      end)
-      |> Enum.uniq()
-      |> hd()
+      end
 
     cond do
       # When the alert is non-directional but the station is at the boundary:
