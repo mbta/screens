@@ -51,7 +51,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           optional(:location) => String.t() | nil,
           optional(:remedy) => String.t(),
           optional(:endpoints) => list(String.t()),
-          issue: String.t(),
+          issue: String.t() | list(String.t()),
           cause: Alert.cause() | nil,
           routes: list(String.t()),
           effect: :suspension | :shuttle | :station_closure | :delay,
