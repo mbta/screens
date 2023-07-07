@@ -171,6 +171,7 @@ interface MiddleSlotComponentProps {
   x: number;
   spaceBetween: number;
   line: LineColor;
+  isCurrentStop: boolean;
 }
 
 const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
@@ -178,6 +179,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   x,
   spaceBetween,
   line,
+  isCurrentStop,
 }) => {
   const background = (
     <rect
@@ -191,16 +193,38 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
 
   let icon;
   if (slot.show_symbol) {
-    icon = (
-      <circle
-        cx={x}
-        cy="24"
-        r="10"
-        fill="white"
-        className={classWithModifier("middle-slot__icon", line)}
-        strokeWidth="4"
-      />
-    );
+    if (isCurrentStop) {
+      icon = (
+        <>
+          <path
+            transform={`translate(${x} -4)`}
+            d="M32.6512 3.92661C30.0824 1.3578 25.9176 1.3578 23.3488 3.92661L3.92661 23.3488C1.3578 25.9176 1.3578 30.0824 3.92661 32.6512L23.3488 52.0734C25.9176 54.6422 30.0824 54.6422 32.6512 52.0734L52.0734 32.6512C54.6422 30.0824 54.6422 25.9176 52.0734 23.3488L32.6512 3.92661Z"
+            className={classWithModifier("middle-slot__background", line)}
+            stroke="#E6E4E1"
+            stroke-width="4"
+            stroke-linejoin="round"
+          />
+          <path
+            transform={`translate(${x} -4)`}
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M15.4855 29.219C14.7045 28.438 14.7045 27.1717 15.4855 26.3906L26.3906 15.4855C27.1717 14.7045 28.438 14.7045 29.219 15.4855L40.1242 26.3906C40.9052 27.1717 40.9052 28.438 40.1241 29.219L29.219 40.1242C28.438 40.9052 27.1717 40.9052 26.3906 40.1241L15.4855 29.219Z"
+            fill="white"
+          />
+        </>
+      );
+    } else {
+      icon = (
+        <circle
+          cx={x}
+          cy="24"
+          r="10"
+          fill="white"
+          className={classWithModifier("middle-slot__icon", line)}
+          strokeWidth="4"
+        />
+      );
+    }
   } else {
     icon = <div>…</div>;
   }
@@ -250,6 +274,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = ({
         x={x}
         spaceBetween={spaceBetween}
         line={line}
+        isCurrentStop={current_station_slot_index === i}
       />
     );
   });
