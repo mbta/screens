@@ -67,7 +67,9 @@
   }
 
   .alert-card__icon {
+    color: #171F26;
     height: 124px;
+    min-width: 124px;
     margin-right: 45px;
   }
 
@@ -89,6 +91,8 @@
   }
 
   .alert-card__pio-text__icon {
+    height: 192px;
+    color: #171F26;
     margin-bottom: 48px;
   }
   .alert-card__pio-text__main-text {
