@@ -837,19 +837,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def format_endpoint_string_as_freetext(endpoints) do
-    case endpoints do
-      nil ->
-        []
-
-      {min, max} when min == max ->
-        [" at ", %{format: :bold, text: min}]
-
-      {min, max} ->
-        [" between ", %{format: :bold, text: min}, " & ", %{format: :bold, text: max}]
-    end
-  end
-
   def serialize(%__MODULE__{is_full_screen: true} = t) do
     if takeover_alert?(t) do
       serialize_takeover_alert(t)
