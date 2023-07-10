@@ -10,13 +10,12 @@ defmodule Screens.V2.LocalizedAlert do
   alias Screens.RouteType
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
-  alias Screens.V2.WidgetInstance.{DupAlert, ElevatorStatus, ReconstructedAlert}
+  alias Screens.V2.WidgetInstance.{DupAlert, ReconstructedAlert}
 
   @type t ::
           AlertWidget.t()
           | DupAlert.t()
           | ReconstructedAlert.t()
-          | ElevatorStatus.t()
           | %{
               optional(:screen) => Screen.t(),
               alert: Alert.t(),
