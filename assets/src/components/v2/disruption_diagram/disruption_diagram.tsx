@@ -111,6 +111,7 @@ const homeStopTerminalIcon = (
 interface EndSlotComponentProps {
   slot: EndSlot;
   line: LineColor;
+  isCurrentStop: boolean;
 }
 
 const FirstSlotComponent: ComponentType<EndSlotComponentProps> = ({
@@ -142,7 +143,7 @@ const FirstSlotComponent: ComponentType<EndSlotComponentProps> = ({
 
 const LastSlotComponent: ComponentType<
   EndSlotComponentProps & { x: number }
-> = ({ slot, line, x }) => {
+> = ({ slot, line, x, isCurrentStop }) => {
   if (slot.type === "arrow") {
     return (
       <path
@@ -150,6 +151,16 @@ const LastSlotComponent: ComponentType<
         width={204}
         d="M0 24V0H59.446C59.8085 0 60.1642 0.0985159 60.475 0.285014L77.1417 10.285C78.4364 11.0618 78.4364 12.9382 77.1417 13.715L60.475 23.715C60.1642 23.9015 59.8085 24 59.446 24H0Z"
         className={classWithModifier("end-slot__arrow", line)}
+      />
+    );
+  } else if (isCurrentStop) {
+    return (
+      <path
+        transform={`translate(${x - SLOT_WIDTH} -8)`}
+        d="M3.13388 28.7629C1.74155 30.1552 1.74155 32.4126 3.13388 33.8049L28.2253 58.8964C29.6176 60.2887 31.8751 60.2887 33.2674 58.8964L58.3588 33.8049C59.7511 32.4126 59.7511 30.1552 58.3588 28.7629L33.2674 3.67141C31.8751 2.27909 29.6176 2.27909 28.2253 3.67141L3.13388 28.7629Z"
+        fill="#EE2E24"
+        stroke="#E6E4E1"
+        strokeWidth="3.58209"
       />
     );
   } else {
@@ -354,25 +365,35 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   x += spaceBetween + SLOT_WIDTH;
 
   return (
-    <svg
-      width="904px"
-      height="308px"
-      viewBox={[0, 0, 904, 308].join(" ")}
-      version="1.1"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <FirstSlotComponent slot={beginning} line={line} />
-      <rect
-        className={classWithModifier("end-slot__arrow", line)}
-        width={SLOT_WIDTH / 2 + spaceBetween}
-        height={LINE_HEIGHT}
-        fill={line}
-        x={L + SLOT_WIDTH / 2}
-        y="12"
-      />
-      {middleSlots}
-      <LastSlotComponent slot={end as EndSlot} x={x} line={line} />
-    </svg>
+    <div style={{ width: "904px", height: "308px" }}>
+      <svg
+        width="904px"
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ padding: "24px" }}
+      >
+        <FirstSlotComponent
+          slot={beginning}
+          line={line}
+          isCurrentStop={current_station_slot_index === 0}
+        />
+        <rect
+          className={classWithModifier("end-slot__arrow", line)}
+          width={SLOT_WIDTH / 2 + spaceBetween}
+          height={LINE_HEIGHT}
+          fill={line}
+          x={L + SLOT_WIDTH / 2}
+          y="12"
+        />
+        {middleSlots}
+        <LastSlotComponent
+          slot={end as EndSlot}
+          x={x}
+          line={line}
+          isCurrentStop={current_station_slot_index === slots.length - 1}
+        />
+      </svg>
+    </div>
   );
 };
 
