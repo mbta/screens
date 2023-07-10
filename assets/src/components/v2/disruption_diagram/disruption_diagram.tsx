@@ -172,6 +172,8 @@ interface MiddleSlotComponentProps {
   spaceBetween: number;
   line: LineColor;
   isCurrentStop: boolean;
+  isAffected: boolean;
+  effect: "shuttle" | "suspension" | "station_closure";
 }
 
 const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
@@ -180,16 +182,40 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   spaceBetween,
   line,
   isCurrentStop,
+  isAffected,
+  effect,
 }) => {
-  const background = (
-    <rect
-      className={classWithModifier("middle-slot__background", line)}
-      width={SLOT_WIDTH + spaceBetween}
-      height={LINE_HEIGHT}
-      x={x}
-      y="12"
-    />
-  );
+  let background;
+  if (isAffected) {
+    switch (effect) {
+      case "shuttle":
+        background = <></>;
+        break;
+      case "suspension":
+        background = (
+          <rect
+            width={SLOT_WIDTH + spaceBetween}
+            height="16"
+            x={x}
+            y="16"
+            fill="#AEAEAE"
+          />
+        );
+        break;
+      case "station_closure":
+        background = <></>;
+    }
+  } else {
+    background = (
+      <rect
+        className={classWithModifier("middle-slot__background", line)}
+        width={SLOT_WIDTH + spaceBetween}
+        height={LINE_HEIGHT}
+        x={x}
+        y="12"
+      />
+    );
+  }
 
   let icon;
   if (slot.show_symbol) {
@@ -197,33 +223,48 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
       icon = (
         <>
           <path
-            transform={`translate(${x} -4)`}
+            transform={`translate(${x - SLOT_WIDTH} -4)`}
             d="M32.6512 3.92661C30.0824 1.3578 25.9176 1.3578 23.3488 3.92661L3.92661 23.3488C1.3578 25.9176 1.3578 30.0824 3.92661 32.6512L23.3488 52.0734C25.9176 54.6422 30.0824 54.6422 32.6512 52.0734L52.0734 32.6512C54.6422 30.0824 54.6422 25.9176 52.0734 23.3488L32.6512 3.92661Z"
             className={classWithModifier("middle-slot__background", line)}
             stroke="#E6E4E1"
-            stroke-width="4"
-            stroke-linejoin="round"
+            strokeWidth="4"
+            strokeLinejoin="round"
           />
           <path
-            transform={`translate(${x} -4)`}
-            fill-rule="evenodd"
-            clip-rule="evenodd"
+            transform={`translate(${x - SLOT_WIDTH} -4)`}
+            fillRule="evenodd"
+            clipRule="evenodd"
             d="M15.4855 29.219C14.7045 28.438 14.7045 27.1717 15.4855 26.3906L26.3906 15.4855C27.1717 14.7045 28.438 14.7045 29.219 15.4855L40.1242 26.3906C40.9052 27.1717 40.9052 28.438 40.1241 29.219L29.219 40.1242C28.438 40.9052 27.1717 40.9052 26.3906 40.1241L15.4855 29.219Z"
             fill="white"
           />
         </>
       );
     } else {
-      icon = (
-        <circle
-          cx={x}
-          cy="24"
-          r="10"
-          fill="white"
-          className={classWithModifier("middle-slot__icon", line)}
-          strokeWidth="4"
-        />
-      );
+      if (isAffected && effect === "suspension") {
+        icon = (
+          <>
+            <rect x={x} y="16" width="17" height="16" fill="white" />
+            <path
+              transform={`translate(${x - 8} 8)`}
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M8.93886 0C8.76494 0 8.5985 0.0707868 8.47786 0.196069L0.178995 8.81412C0.0641567 8.93338 0 9.09249 0 9.25805V21.0682C0 21.238 0.0674284 21.4008 0.187452 21.5208L8.47922 29.8125C8.59924 29.9326 8.76202 30 8.93176 30H21.0611C21.2351 30 21.4015 29.9292 21.5221 29.8039L29.821 21.1859C29.9358 21.0666 30 20.9075 30 20.7419V8.93176C30 8.76202 29.9326 8.59924 29.8125 8.47922L21.5208 0.187452C21.4008 0.0674284 21.238 0 21.0682 0H8.93886ZM7.5935 10.0066C7.34658 10.2576 7.34866 10.6608 7.59816 10.9091L11.957 15.248L7.59623 19.6793C7.34824 19.9313 7.35156 20.3366 7.60365 20.5845L9.73397 22.6794C9.98593 22.9272 10.391 22.9239 10.6389 22.672L15 18.2404L19.3611 22.672C19.609 22.9239 20.0141 22.9272 20.266 22.6794L22.3964 20.5845C22.6484 20.3366 22.6518 19.9313 22.4038 19.6793L18.043 15.248L22.4018 10.9091C22.6513 10.6608 22.6534 10.2576 22.4065 10.0066L20.2613 7.82685C20.0124 7.5739 19.6052 7.5718 19.3537 7.82217L15 12.1559L10.6463 7.82217C10.3948 7.5718 9.98758 7.5739 9.73865 7.82685L7.5935 10.0066Z"
+              fill="#171F26"
+            />
+          </>
+        );
+      } else {
+        icon = (
+          <circle
+            cx={x}
+            cy="24"
+            r="10"
+            fill="white"
+            className={classWithModifier("middle-slot__icon", line)}
+            strokeWidth="4"
+          />
+        );
+      }
     }
   } else {
     icon = <div>…</div>;
@@ -250,11 +291,8 @@ Client is responsible for:
 // L=11
 // W=728
 
-const DisruptionDiagram: ComponentType<DisruptionDiagramData> = ({
-  slots,
-  current_station_slot_index,
-  line,
-}) => {
+const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
+  const { slots, current_station_slot_index, line, effect } = props;
   const numStops = slots.length;
   const spaceBetween = Math.min(
     60,
@@ -266,7 +304,11 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = ({
     x = (spaceBetween + SLOT_WIDTH) * (i + 1);
     const slot = s as MiddleSlot;
     const key = slot.label === "…" ? i : slot.label.full;
-    console.log(x);
+    const isAffected =
+      effect === "station_closure"
+        ? props.closed_station_slot_indices.includes(i)
+        : i >= props.effect_region_slot_index_range[0] - 2 &&
+          i <= props.effect_region_slot_index_range[1] - 1;
     return (
       <MiddleSlotComponent
         key={key}
@@ -274,7 +316,9 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = ({
         x={x}
         spaceBetween={spaceBetween}
         line={line}
-        isCurrentStop={current_station_slot_index === i}
+        isCurrentStop={current_station_slot_index === i + 1}
+        effect={effect}
+        isAffected={isAffected}
       />
     );
   });
