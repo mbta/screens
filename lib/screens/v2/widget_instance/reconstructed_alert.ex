@@ -229,7 +229,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_takeover_alert(%__MODULE__{alert: %Alert{effect: :suspension} = alert} = t) do
     %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
     informed_entities = Alert.informed_entities(alert)
-    [route_id] = LocalizedAlert.informed_subway_routes(t)
+
+    route_id =
+      case LocalizedAlert.informed_subway_routes(t) do
+        ["Green" <> _] -> "Green"
+        [route_id] -> route_id
+      end
+
     endpoints = get_endpoints(informed_entities, route_id)
 
     %{
@@ -246,7 +252,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_takeover_alert(%__MODULE__{alert: %Alert{effect: :shuttle} = alert} = t) do
     %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
     informed_entities = Alert.informed_entities(alert)
-    [route_id] = LocalizedAlert.informed_subway_routes(t)
+
+    route_id =
+      case LocalizedAlert.informed_subway_routes(t) do
+        ["Green" <> _] -> "Green"
+        [route_id] -> route_id
+      end
+
     endpoints = get_endpoints(informed_entities, route_id)
 
     %{
@@ -298,7 +310,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        ) do
     %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
     informed_entities = Alert.informed_entities(alert)
-    [route_id] = LocalizedAlert.informed_subway_routes(t)
+
+    route_id =
+      case LocalizedAlert.informed_subway_routes(t) do
+        ["Green" <> _] -> "Green"
+        [route_id] -> route_id
+      end
+
     endpoints = get_endpoints(informed_entities, route_id)
     destination = get_destination(t, location)
 
@@ -345,7 +363,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        ) do
     %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
     informed_entities = Alert.informed_entities(alert)
-    [route_id] = LocalizedAlert.informed_subway_routes(t)
+
+    route_id =
+      case LocalizedAlert.informed_subway_routes(t) do
+        ["Green" <> _] -> "Green"
+        [route_id] -> route_id
+      end
+
     endpoints = get_endpoints(informed_entities, route_id)
     destination = get_destination(t, location)
 
