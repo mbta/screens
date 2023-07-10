@@ -4,7 +4,7 @@ type DisruptionDiagramData = ContinuousDisruptionDiagram | DiscreteDisruptionDia
 
 interface DisruptionDiagramBase {
   line: LineColor;
-  current_station_slot_index: number | null;
+  current_station_slot_index: number;
   slots: [EndSlot, ...MiddleSlot[], EndSlot];
 }
 

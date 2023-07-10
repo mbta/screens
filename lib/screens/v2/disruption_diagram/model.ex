@@ -20,7 +20,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
           # The range is [4, 6].
           effect_region_slot_index_range: list(non_neg_integer()),
           line: line_color(),
-          current_station_slot_index: non_neg_integer() | nil,
+          current_station_slot_index: non_neg_integer(),
           # First and last elements of the list are `end_slot`s, middle elements are `middle_slot`s.
           slots: list(slot())
         }
@@ -29,7 +29,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
           effect: :station_closure,
           closed_station_slot_indices: list(non_neg_integer()),
           line: line_color(),
-          current_station_slot_index: non_neg_integer() | nil,
+          current_station_slot_index: non_neg_integer(),
           # First and last elements of the list are `end_slot`s, middle elements are `middle_slot`s.
           slots: list(slot())
         }
