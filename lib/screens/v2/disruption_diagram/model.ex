@@ -12,12 +12,22 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   @type continuous_disruption_diagram :: %{
           effect: :shuttle | :suspension,
-          # A 2-element list, giving indices of the effect region's *first and last disrupted stops*.
+          # A 2-element list, giving indices of the effect region's *boundary stops*, inclusive.
           # For example in this scenario:
           #     0     1     2     3     4     5     6     7     8
-          #    <= === O ========= O - - X - - X - - X - - O === =>
-          #                             |---range---|
-          # The range is [4, 6].
+          #    <= === O ========= O - - X - - X - - X - - O === O
+          #                       |---------range---------|
+          # The range is [3, 7].
+          #
+          # SPECIAL CASE:
+          # If the range starts at 0 or ends at the last element of the array,
+          # then the symbol for that terminal stop should use the appropriate
+          # disruption symbol, not the "normal service" symbol.
+          # For example if the range is [0, 5], the left end of the
+          # diagram should use a disruption symbol:
+          #     0     1     2     3     4     5     6     7     8
+          #     X - - X - - X - - X - - X - - O ========= O === =>
+          #     |------------range------------|
           effect_region_slot_index_range: list(non_neg_integer()),
           line: line_color(),
           current_station_slot_index: non_neg_integer(),

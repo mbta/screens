@@ -10,12 +10,22 @@ interface DisruptionDiagramBase {
 
 interface ContinuousDisruptionDiagram extends DisruptionDiagramBase {
   effect: "shuttle" | "suspension";
-  // Range starts and ends at the effect region's *first and last disrupted stops*.
+  // Range starts and ends at the effect region's *boundary stops*, inclusive.
   // For example in this scenario:
   //     0     1     2     3     4     5     6     7     8
   //    <= === O ========= O - - X - - X - - X - - O === O
-  //                             |---range---|
-  // The range is [4, 6].
+  //                       |---------range---------|
+  // The range is [3, 7].
+  //
+  // SPECIAL CASE:
+  // If the range starts at 0 or ends at the last element of the array,
+  // then the symbol for that terminal stop should use the appropriate
+  // disruption symbol, not the "normal service" symbol.
+  // For example if the range is [0, 5], the left end of the
+  // diagram should use a disruption symbol:
+  //     0     1     2     3     4     5     6     7     8
+  //     X - - X - - X - - X - - X - - O ========= O === =>
+  //     |------------range------------|
   effect_region_slot_index_range: [range_start: number, range_end: number];
 }
 
