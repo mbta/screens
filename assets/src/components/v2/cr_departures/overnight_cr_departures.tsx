@@ -1,7 +1,7 @@
 import React, { ComponentType } from "react";
 import DeparturesTable from "Components/v2/cr_departures/cr_departures_table";
 import CRDeparturesHeader from "Components/v2/cr_departures/cr_departures_header";
-import OvernightMoon from "../bundled_svg/overnight_moon";
+import OvernightMoon from "../../../../static/images/svgr_bundled/overnight.svg";
 import moment from "moment";
 import { imagePath } from "Util/util";
 import { Direction } from "./cr_departures";
@@ -72,8 +72,10 @@ const OvernightCRDepartures: ComponentType<Props> = ({
         </div>
         <div className="overnight-cr-departures__footer">
           <OvernightMoon
+            width="128"
+            height="128"
             className="overnight-cr-departures__overnight-icon"
-            colorHex="#262626"
+            color="#262626"
           />
           <div className="overnight-cr-departures__last-train-text">
             <div className="overnight-cr-departures__last-train-text--english">

@@ -2,6 +2,8 @@ import useTextResizer from "Hooks/v2/use_text_resizer";
 import React, { forwardRef, ComponentType } from "react";
 import { getDatasetValue } from "Util/dataset";
 
+import LiveDataSvg from '../../../static/images/svgr_bundled/live-data-small.svg'
+
 import {
   classWithModifier,
   classWithModifiers,
@@ -110,14 +112,9 @@ const NormalHeaderTime: ComponentType<NormalHeaderTimeProps> = ({ time }) => {
 const NormalHeaderUpdated = () => {
   return (
     <div className="normal-header-updated">
-      <div className="normal-header-updated__icon">
-        <img
-          className="normal-header-updated__img"
-          src={imagePath("live-data-small.svg")}
-        />
-        <div className="normal-header-updated__text">
-          UPDATED LIVE EVERY MINUTE
-        </div>
+      <LiveDataSvg color="white" width="25" height="25" viewBox="0 0 32 32" className="normal-header-updated__img" />
+      <div className="normal-header-updated__text">
+        UPDATED LIVE EVERY MINUTE
       </div>
     </div>
   );

@@ -574,7 +574,6 @@ defmodule Screens.Alerts.Alert do
 
   def effect(%__MODULE__{effect: effect}), do: effect
 
-  def direction_id(%__MODULE__{informed_entities: informed_entities}) do
-    informed_entities |> Enum.map(& &1.direction_id) |> Enum.uniq() |> List.first()
-  end
+  def direction_id(%__MODULE__{informed_entities: informed_entities}),
+    do: List.first(informed_entities).direction_id
 end

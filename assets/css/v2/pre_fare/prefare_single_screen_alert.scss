@@ -31,7 +31,7 @@
     flex-direction: column;
     border-radius: 4px;
     box-shadow: 0px 10px 20px 0px rgba(23, 31, 38, 0.25);
-    background-color: #E5E4E1;
+    background-color: #e5e4e1;
   }
 
   .alert-card__body {
@@ -41,9 +41,10 @@
     box-sizing: border-box;
   }
 
-  .alert-card__issue, .alert-card__remedy {
+  .alert-card__issue,
+  .alert-card__remedy {
     display: flex;
-  }  
+  }
   .alert-card__issue {
     margin-bottom: 48px;
   }
@@ -67,7 +68,9 @@
   }
 
   .alert-card__icon {
+    color: #171f26;
     height: 124px;
+    min-width: 124px;
     margin-right: 45px;
   }
 
@@ -89,6 +92,8 @@
   }
 
   .alert-card__pio-text__icon {
+    height: 192px;
+    color: #171f26;
     margin-bottom: 48px;
   }
   .alert-card__pio-text__main-text {
@@ -110,7 +115,7 @@
   .alert-card__body__accessibility-info {
     &--text {
       margin-top: 22px;
-      @include small-text()
+      @include small-text();
     }
   }
 
@@ -118,10 +123,10 @@
     height: 40px;
     margin: auto 45px 0 auto;
   }
-    
+
   .alert-card__footer {
     flex-shrink: 0;
-    background: #CCCBC8;
+    background: #cccbc8;
     border-radius: 0px 0px 4px 4px;
     height: 84px;
     display: flex;

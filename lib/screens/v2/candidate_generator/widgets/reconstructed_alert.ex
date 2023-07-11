@@ -178,7 +178,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       distance =
         ies
         |> Enum.filter(fn
-          %{stop: nil} -> true
+          # Alert affects entire line
+          %{stop: nil, route: route} -> is_binary(route)
           ie -> String.starts_with?(ie.stop, "place-")
         end)
         |> Enum.map(&get_distance(stop_id, home_stop_distance_map, &1))

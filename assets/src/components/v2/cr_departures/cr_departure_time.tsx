@@ -2,7 +2,7 @@ import BaseDepartureTime from "Components/eink/base_departure_time";
 import moment from "moment";
 import React from "react";
 import { TimeRepresentation } from "Util/time_representation";
-import LiveData from "Components/v2/bundled_svg/live_data";
+import LiveDataSvg from '../../../../static/images/svgr_bundled/live-data-small.svg'
 
 interface CRDepartureTimeProps {
   departureType: "schedule" | "prediction";
@@ -45,10 +45,7 @@ const CRDepartureTime = ({
     <div className="cr-departure-time">
       {predictionTime}
       <span style={{ display: "inline-block", marginLeft: "19px" }}>
-        <LiveData
-          className="cr-departure-time__live-data-icon"
-          colorHex="#171f26"
-        />
+        <LiveDataSvg color="black" width="36" height="36" viewBox="0 0 32 32" className="cr-departure-time__live-data-icon" />
       </span>
     </div>
   );
