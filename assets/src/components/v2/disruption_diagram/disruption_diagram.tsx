@@ -321,15 +321,12 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
 
   return (
     <>
-      <g transform={`translate(${x + SLOT_WIDTH * 1.5} ${-label.length * 3})`}>
-        <text
-          transform={`rotate(-45)`}
-          textAnchor="middle"
-          dominantBaseline="central"
-        >
-          {label}
-        </text>
-      </g>
+      <text
+        transform={`translate(${x + label.length * 3} ${0}) rotate(-45)`}
+        textAnchor="middle"
+      >
+        {label}
+      </text>
       {background}
       {icon}
     </>
