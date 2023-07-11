@@ -32,6 +32,10 @@
   &--green {
     stroke: $line-color-green;
   }
+
+  &--affected {
+    stroke: #171f26;
+  }
 }
 
 .middle-slot__background {
