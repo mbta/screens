@@ -623,7 +623,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
         region: :boundary,
-        endpoints: ["Oak Grove", "Malden Center"]
+        endpoints: {"Oak Grove", "Malden Center"}
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -649,7 +649,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Use shuttle bus",
         updated_at: "Friday, 5:00 am",
         region: :boundary,
-        endpoints: ["Oak Grove", "Malden Center"]
+        endpoints: {"Oak Grove", "Malden Center"}
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -799,7 +799,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Shuttle buses available",
         updated_at: "Friday, 5:00 am",
         region: :outside,
-        endpoints: ["Wellington", "Wellington"]
+        endpoints: {"Wellington", "Wellington"}
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -825,7 +825,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
         region: :outside,
-        endpoints: ["Wellington", "Assembly"]
+        endpoints: {"Wellington", "Assembly"}
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -877,7 +877,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         updated_at: "Friday, 5:00 am",
         region: :here,
-        endpoints: ["Downtown Crossing", "Downtown Crossing"]
+        endpoints: {"Downtown Crossing", "Downtown Crossing"}
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -902,7 +902,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :shuttle,
         updated_at: "Friday, 5:00 am",
         region: :here,
-        endpoints: ["Downtown Crossing", "Downtown Crossing"]
+        endpoints: {"Downtown Crossing", "Downtown Crossing"}
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -1884,7 +1884,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:14 am",
         region: :outside,
-        endpoints: ["North Station", "Back Bay"]
+        endpoints: {"North Station", "Back Bay"}
       }
 
       assert expected == ReconstructedAlert.serialize(alert_widget)
@@ -2621,7 +2621,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Use shuttle bus",
         updated_at: "Friday, 2:24 pm",
         region: :boundary,
-        endpoints: ["Union Square", "Government Center"]
+        endpoints: {"Union Square", "Government Center"}
       }
 
       assert expected == ReconstructedAlert.serialize(alert_widget)
