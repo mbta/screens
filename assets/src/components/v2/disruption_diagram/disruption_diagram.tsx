@@ -376,6 +376,8 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
   spaceBetween,
   effect,
 }) => {
+  if (effect === "station_closure") return <></>;
+
   const rangeStart = effectRegionSlotIndexRange[0];
   const rangeEnd = effectRegionSlotIndexRange[1];
 
@@ -422,8 +424,6 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
         />
       </>
     );
-  } else {
-    icon = <></>;
   }
 
   return (
