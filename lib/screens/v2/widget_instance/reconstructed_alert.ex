@@ -856,13 +856,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         {min_full_name, _min_abbreviated_name} = min_station_name
         {max_full_name, _max_abbreviated_name} = max_station_name
 
-        [min_full_name, max_full_name]
+        {min_full_name, max_full_name}
     end
   end
 
   def format_endpoint_string(nil), do: nil
 
-  def format_endpoint_string([min_station, max_station]) do
+  def format_endpoint_string({min_station, max_station}) do
     if min_station == max_station do
       "at #{min_station}"
     else
