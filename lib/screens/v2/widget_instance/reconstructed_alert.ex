@@ -36,6 +36,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           | fullscreen_serialized_response()
           | flex_serialized_response()
 
+  # Values shared in each response
+  # %{
+  #   issue: String.t(),
+  #   cause: String.t(),
+  #   effect: Alert.effect()
+  # }
+
   @type takeover_serialized_response :: %{
           issue: String.t(),
           remedy: String.t(),
@@ -47,12 +54,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         }
 
   @type fullscreen_serialized_response :: %{
+          # Unique to fullscreen station closures
           optional(:unaffected_routes) => list(route_id()),
           optional(:location) => String.t() | nil,
           optional(:remedy) => String.t(),
+          # Unique to fullscreen
           optional(:endpoints) => list(String.t()),
           issue: String.t() | list(String.t()),
           cause: Alert.cause() | nil,
+          # List of SVG filenames
           routes: list(String.t()),
           effect: :suspension | :shuttle | :station_closure | :delay,
           updated_at: String.t(),
@@ -113,13 +123,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     {direction_id, route_id} =
       informed_entities
-      |> Enum.map(fn
+      |> hd()
+      |> case do
         %{direction_id: nil, route: route} when location == :downstream -> {0, route}
         %{direction_id: nil, route: route} when location == :upstream -> {1, route}
         %{direction_id: direction_id, route: route} -> {direction_id, route}
-      end)
-      |> Enum.uniq()
-      |> hd()
+      end
 
     cond do
       # When the alert is non-directional but the station is at the boundary:
@@ -220,7 +229,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_takeover_alert(%__MODULE__{alert: %Alert{effect: :suspension} = alert} = t) do
     %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
     informed_entities = Alert.informed_entities(alert)
-    [route_id] = LocalizedAlert.informed_subway_routes(t)
+
+    route_id =
+      case LocalizedAlert.informed_subway_routes(t) do
+        ["Green" <> _] -> "Green"
+        [route_id] -> route_id
+      end
+
     endpoints = get_endpoints(informed_entities, route_id)
 
     %{
@@ -237,7 +252,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_takeover_alert(%__MODULE__{alert: %Alert{effect: :shuttle} = alert} = t) do
     %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
     informed_entities = Alert.informed_entities(alert)
-    [route_id] = LocalizedAlert.informed_subway_routes(t)
+
+    route_id =
+      case LocalizedAlert.informed_subway_routes(t) do
+        ["Green" <> _] -> "Green"
+        [route_id] -> route_id
+      end
+
     endpoints = get_endpoints(informed_entities, route_id)
 
     %{
@@ -289,7 +310,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        ) do
     %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
     informed_entities = Alert.informed_entities(alert)
-    [route_id] = LocalizedAlert.informed_subway_routes(t)
+
+    route_id =
+      case LocalizedAlert.informed_subway_routes(t) do
+        ["Green" <> _] -> "Green"
+        [route_id] -> route_id
+      end
+
     endpoints = get_endpoints(informed_entities, route_id)
     destination = get_destination(t, location)
 
@@ -336,7 +363,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        ) do
     %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
     informed_entities = Alert.informed_entities(alert)
-    [route_id] = LocalizedAlert.informed_subway_routes(t)
+
+    route_id =
+      case LocalizedAlert.informed_subway_routes(t) do
+        ["Green" <> _] -> "Green"
+        [route_id] -> route_id
+      end
+
     endpoints = get_endpoints(informed_entities, route_id)
     destination = get_destination(t, location)
 
@@ -823,13 +856,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         {min_full_name, _min_abbreviated_name} = min_station_name
         {max_full_name, _max_abbreviated_name} = max_station_name
 
-        [min_full_name, max_full_name]
+        {min_full_name, max_full_name}
     end
   end
 
   def format_endpoint_string(nil), do: nil
 
-  def format_endpoint_string([min_station, max_station]) do
+  def format_endpoint_string({min_station, max_station}) do
     if min_station == max_station do
       "at #{min_station}"
     else
