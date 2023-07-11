@@ -255,6 +255,7 @@ interface MiddleSlotComponentProps {
   isAffected: boolean;
   effect: "shuttle" | "suspension" | "station_closure";
   firstAffectedIndex: boolean;
+  label: string;
 }
 
 const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
@@ -266,6 +267,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   isAffected,
   effect,
   firstAffectedIndex,
+  label,
 }) => {
   let background;
   // Background for these effects is drawn in EffectBackgroundComponent.
@@ -319,6 +321,15 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
 
   return (
     <>
+      <g transform={`translate(${x + SLOT_WIDTH * 1.5} ${-label.length * 3})`}>
+        <text
+          transform={`rotate(-45)`}
+          textAnchor="middle"
+          dominantBaseline="central"
+        >
+          {label}
+        </text>
+      </g>
       {background}
       {icon}
     </>
@@ -493,6 +504,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         isCurrentStop={current_station_slot_index === i + 1}
         effect={effect}
         isAffected={isAffected}
+        label={slot.label === "…" ? slot.label : slot.label.full}
         firstAffectedIndex={
           effect === "station_closure"
             ? false
@@ -513,7 +525,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         xmlns="http://www.w3.org/2000/svg"
         style={{ padding: "24px" }}
       >
-        <g transform="translate(12, 100)">
+        <g transform="translate(12, 130)">
           <EffectBackgroundComponent
             effectRegionSlotIndexRange={
               effect === "station_closure"
