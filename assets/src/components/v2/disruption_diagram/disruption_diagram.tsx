@@ -368,38 +368,85 @@ interface AlertEmphasisComponentProps {
     | [range_start: number, range_end: number]
     | number[];
   spaceBetween: number;
+  effect: "suspension" | "shuttle" | "station_closure";
 }
 
 const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
   effectRegionSlotIndexRange,
   spaceBetween,
+  effect,
 }) => {
   const rangeStart = effectRegionSlotIndexRange[0];
   const rangeEnd = effectRegionSlotIndexRange[1];
 
   const x1 = rangeStart * (spaceBetween + SLOT_WIDTH) + L;
   const x2 = (spaceBetween + SLOT_WIDTH) * (rangeEnd - rangeStart + 1);
+  const middleOfLine = (x1 + x2 + (x1 - L / 2)) / 2;
+  const widthOfBackground = 40;
+
+  let icon;
+  if (effect === "shuttle") {
+    icon = (
+      <>
+        <circle
+          cx={middleOfLine}
+          cy="16"
+          r={widthOfBackground}
+          fill="#171F26"
+        />
+        <path
+          transform={`translate(${middleOfLine - widthOfBackground} -24)`}
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M60.8695 37.5334L58.842 21.6673C58.327 18.8044 56.513 17.6872 53.8141 16.5156C49.3915 14.9398 44.7285 14.0896 40.017 14C35.2983 14.0906 30.628 14.9408 26.1974 16.5156C23.532 17.6651 21.7178 18.8039 21.1691 21.6668L19.1309 37.5334V59.4837H22.709V63.3065C22.7138 64.8769 24.0275 66.1487 25.6492 66.153C27.2708 66.1484 28.5841 64.8765 28.5889 63.3062V59.4834H51.5189V63.3062C51.5111 64.3282 52.0697 65.2758 52.9824 65.789C53.8951 66.3022 55.0219 66.3022 55.9346 65.789C56.8473 65.2758 57.4059 64.3282 57.3982 63.3062V59.4834H60.87L60.8695 37.5334ZM31.429 18.0156H48.6755C49.4054 18.0156 49.997 18.5886 49.997 19.2954C49.997 20.0022 49.4054 20.5751 48.6755 20.5751H31.429C30.6991 20.5751 30.1074 20.0022 30.1074 19.2954C30.1074 18.5886 30.6991 18.0156 31.429 18.0156ZM24.5181 24.5431L22.839 37.069C22.8167 37.2128 22.8167 37.359 22.839 37.5028C22.8175 37.9344 22.9743 38.3566 23.2748 38.676C23.5752 38.9955 23.9947 39.186 24.4404 39.2055H55.7192C56.1641 39.2101 56.5924 39.0417 56.9081 38.7379C57.2237 38.4341 57.4002 38.0204 57.3982 37.5895V37.5028C57.4207 37.359 57.4207 37.2128 57.3982 37.069L55.7192 24.5431C55.5841 23.7547 54.8758 23.1793 54.0506 23.1876H26.1971C25.3697 23.179 24.6582 23.7534 24.5181 24.5431ZM25.6476 52.6951C23.9189 52.6982 22.515 51.3436 22.5117 49.6696C22.5085 47.9956 23.9072 46.636 25.6358 46.6328C27.3645 46.6296 28.7686 47.984 28.772 49.658C28.7741 50.4621 28.446 51.2341 27.86 51.8038C27.2739 52.3735 26.478 52.6941 25.6476 52.6951ZM54.4601 46.6328C52.733 46.6339 51.3332 47.9895 51.332 49.662C51.3309 51.3345 52.7289 52.6918 54.4555 52.6951C55.2881 52.6973 56.0872 52.3781 56.6759 51.808C57.2647 51.238 57.5945 50.4642 57.5923 49.658C57.5889 47.9855 56.1872 46.6317 54.4601 46.6328Z"
+          fill="white"
+        />
+      </>
+    );
+  } else if (effect === "suspension") {
+    icon = (
+      <>
+        <rect
+          x={middleOfLine - 35}
+          y="-6"
+          width={60}
+          height={45}
+          fill="white"
+        />
+        <path
+          transform={`translate(${middleOfLine - widthOfBackground} -24)`}
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M23.837 0C23.3732 0 22.9293 0.188765 22.6076 0.522852L0.47732 23.5043C0.171085 23.8223 0 24.2467 0 24.6881V56.182C0 56.6346 0.179809 57.0687 0.499871 57.3888L22.6112 79.5001C22.9313 79.8202 23.3654 80 23.818 80H56.163C56.6268 80 57.0707 79.8112 57.3924 79.4771L79.5227 56.4957C79.8289 56.1777 80 55.7534 80 55.3119V23.818C80 23.3654 79.8202 22.9313 79.5001 22.6112L57.3888 0.499871C57.0687 0.179809 56.6346 0 56.182 0H23.837ZM20.2493 26.6844C19.5909 27.3535 19.5964 28.4288 20.2618 29.091L31.8854 40.6614L20.2566 52.478C19.5953 53.15 19.6042 54.2309 20.2764 54.892L25.9573 60.4784C26.6291 61.1391 27.7094 61.1303 28.3703 60.4586L40 48.6411L51.6297 60.4586C52.2906 61.1303 53.3708 61.1391 54.0427 60.4784L59.7236 54.892C60.3958 54.2309 60.4047 53.15 59.7434 52.478L48.1146 40.6614L59.7383 29.091C60.4036 28.4288 60.4091 27.3535 59.7507 26.6844L54.0303 20.8716C53.3665 20.1971 52.2805 20.1915 51.6098 20.8591L40 32.4157L28.3902 20.8591C27.7195 20.1915 26.6335 20.1971 25.9697 20.8716L20.2493 26.6844Z"
+          fill="#171F26"
+        />
+      </>
+    );
+  } else {
+    icon = <></>;
+  }
 
   return (
-    <g transform="translate(5, 60)">
+    <g transform="translate(5, 100)">
       <path
         d={`M${x1 - L / 2} 4L${x1 - L / 2} 28`}
         stroke="#737373"
-        stroke-width="8"
-        stroke-linecap="round"
+        strokeWidth="8"
+        strokeLinecap="round"
       />
       <path
         d={`M${x1 - L / 2} 16H${x1 + x2}`}
         stroke="#737373"
-        stroke-width="8"
-        stroke-linecap="round"
+        strokeWidth="8"
+        strokeLinecap="round"
       />
       <path
         d={`M${x1 + x2} 4L${x1 + x2} 28`}
         stroke="#737373"
-        stroke-width="8"
-        stroke-linecap="round"
+        strokeWidth="8"
+        strokeLinecap="round"
       />
+      {icon}
     </g>
   );
 };
@@ -457,7 +504,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         xmlns="http://www.w3.org/2000/svg"
         style={{ padding: "24px" }}
       >
-        <g transform="translate(12, 200)">
+        <g transform="translate(12, 100)">
           <EffectBackgroundComponent
             effectRegionSlotIndexRange={
               effect === "station_closure"
@@ -494,6 +541,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
                 : props.effect_region_slot_index_range
             }
             spaceBetween={spaceBetween}
+            effect={effect}
           />
         </g>
       </svg>
