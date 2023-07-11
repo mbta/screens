@@ -120,13 +120,43 @@ const remedySection = (
 );
 
 const mapSection = () => {
+  // const props: ContinuousDisruptionDiagram = {
+  //   effect: "suspension",
+  //   line: "red",
+  //   current_station_slot_index: 2,
+  //   effect_region_slot_index_range: [1, 4],
+  //   slots: [
+  //     { type: "arrow", label_id: "place-alfcl" },
+  //     {
+  //       label: { full: "Kendall/MIT", abbrev: "Kendall/MIT" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Charles/MGH", abbrev: "Charles/MGH" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Park Street", abbrev: "Park St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Downtown Crossing", abbrev: "Downt'n Xng" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "South Station", abbrev: "South Sta" },
+  //       show_symbol: true,
+  //     },
+  //     { type: "arrow", label_id: "place-asmnl+place-brntn" },
+  //   ],
+  // };
   const props: ContinuousDisruptionDiagram = {
     effect: "shuttle",
     line: "green",
-    current_station_slot_index: 13,
-    effect_region_slot_index_range: [1, 7],
+    current_station_slot_index: 11,
+    effect_region_slot_index_range: [0, 7],
     slots: [
-      { type: "arrow", label_id: "place-lake" },
+      { type: "terminal", label_id: "place-lake" },
       {
         label: { full: "South Street", abbrev: "South St" },
         show_symbol: true,
@@ -140,39 +170,34 @@ const mapSection = () => {
         show_symbol: true,
       },
       {
-        label: { full: "Chestnuts Hill Avenue", abbrev: "Chestnut Hill Ave" },
+        label: "…",
+        show_symbol: false,
+      },
+      {
+        label: { full: "Griggs Street", abbrev: "Griggs St" },
         show_symbol: true,
       },
       {
-        label: { full: "Chestnutss Hill Avenue", abbrev: "Chestnut Hill Ave" },
+        label: { full: "Harvard Avenue", abbrev: "Harvard Ave" },
         show_symbol: true,
       },
       {
-        label: { full: " Hill Avenue", abbrev: "Chestnut Hill Ave" },
+        label: { full: "Packard's Corner", abbrev: "Packard's Cn" },
         show_symbol: true,
       },
       {
-        label: { full: "Chestnutss  Avenue", abbrev: "Chestnut Hill Ave" },
+        label: { full: "Babcock Street", abbrev: "Babcock St" },
         show_symbol: true,
       },
       {
-        label: { full: "Chestnutss Hill ", abbrev: "Chestnut Hill Ave" },
-        show_symbol: true,
+        label: {
+          full: "… via Copley & Kenmore",
+          abbrev: "… via Copley & Kenmore",
+        },
+        show_symbol: false,
       },
       {
-        label: { full: "Chestnutss Hill Avenue", abbrev: "Chestnut Hill Ave" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Chestnutss Hill Avenue", abbrev: "Chestnut Hill Ave" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Chestnuts  Avenue", abbrev: "Chestnut Hill Ave" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Chestnut Hill ", abbrev: "Chestnut Hill Ave" },
+        label: { full: "Park Street", abbrev: "Park St" },
         show_symbol: true,
       },
       { type: "terminal", label_id: "place-gover" },
