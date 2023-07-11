@@ -1,5 +1,5 @@
-import { classWithModifier, classWithModifiers } from "Util/util";
 import React, { ComponentType } from "react";
+import { classWithModifier, classWithModifiers } from "Util/util";
 
 const MAX_WIDTH = 904;
 const SLOT_WIDTH = 24;
@@ -15,18 +15,28 @@ type DisruptionDiagramData =
 
 interface DisruptionDiagramBase {
   line: LineColor;
-  current_station_slot_index: number | null;
+  current_station_slot_index: number;
   slots: [EndSlot, ...MiddleSlot[], EndSlot];
 }
 
 interface ContinuousDisruptionDiagram extends DisruptionDiagramBase {
   effect: "shuttle" | "suspension";
-  // Range starts and ends at the effect region's *first and last disrupted stops*.
+  // Range starts and ends at the effect region's *boundary stops*, inclusive.
   // For example in this scenario:
   //     0     1     2     3     4     5     6     7     8
   //    <= === O ========= O - - X - - X - - X - - O === O
-  //                             |---range---|
-  // The range is [4, 6].
+  //                       |---------range---------|
+  // The range is [3, 7].
+  //
+  // SPECIAL CASE:
+  // If the range starts at 0 or ends at the last element of the array,
+  // then the symbol for that terminal stop should use the appropriate
+  // disruption symbol, not the "normal service" symbol.
+  // For example if the range is [0, 5], the left end of the
+  // diagram should use a disruption symbol:
+  //     0     1     2     3     4     5     6     7     8
+  //     X - - X - - X - - X - - X - - O ========= O === =>
+  //     |------------range------------|
   effect_region_slot_index_range: [range_start: number, range_end: number];
 }
 
@@ -48,6 +58,8 @@ interface MiddleSlot {
 // Note the single ellipsis character, not 3 periods
 type Label = "…" | { full: string; abbrev: string };
 
+type LineColor = "blue" | "orange" | "red" | "green";
+
 // End labels have hardcoded presentation, so we just send an ID for the client to use in
 // a lookup.
 //
@@ -56,8 +68,6 @@ type Label = "…" | { full: string; abbrev: string };
 // The rest of the labels' presentations are computed based on the height of the end labels,
 // so we can send actual text for those--it will be dynamically resized to fit.
 type EndLabelID = string;
-
-type LineColor = "blue" | "orange" | "red" | "green";
 
 interface IconProps {
   x: number;
