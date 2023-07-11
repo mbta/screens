@@ -9,6 +9,7 @@ import {
 } from "Util/util";
 import DisruptionDiagram, {
   ContinuousDisruptionDiagram,
+  DiscreteDisruptionDiagram,
 } from "./disruption_diagram/disruption_diagram";
 
 interface PreFareSingleScreenAlertProps {
@@ -120,33 +121,61 @@ const remedySection = (
 
 const mapSection = () => {
   const props: ContinuousDisruptionDiagram = {
-    effect: "suspension",
-    line: "red",
-    current_station_slot_index: 2,
-    effect_region_slot_index_range: [3, 4],
+    effect: "shuttle",
+    line: "green",
+    current_station_slot_index: 13,
+    effect_region_slot_index_range: [1, 7],
     slots: [
-      { type: "arrow", label_id: "place-alfcl" },
+      { type: "arrow", label_id: "place-lake" },
       {
-        label: { full: "Kendall/MIT", abbrev: "Kendall/MIT" },
+        label: { full: "South Street", abbrev: "South St" },
         show_symbol: true,
       },
       {
-        label: { full: "Charles/MGH", abbrev: "Charles/MGH" },
+        label: { full: "Chestnut Hill Avenue", abbrev: "Chestnut Hill Ave" },
         show_symbol: true,
       },
       {
-        label: { full: "Park Street", abbrev: "Park St" },
+        label: { full: "Chiswick Road", abbrev: "Chiswick Rd" },
         show_symbol: true,
       },
       {
-        label: { full: "Downtown Crossing", abbrev: "Downt'n Xng" },
+        label: { full: "Chestnuts Hill Avenue", abbrev: "Chestnut Hill Ave" },
         show_symbol: true,
       },
       {
-        label: { full: "South Station", abbrev: "South Sta" },
+        label: { full: "Chestnutss Hill Avenue", abbrev: "Chestnut Hill Ave" },
         show_symbol: true,
       },
-      { type: "arrow", label_id: "place-asmnl+place-brntn" },
+      {
+        label: { full: " Hill Avenue", abbrev: "Chestnut Hill Ave" },
+        show_symbol: true,
+      },
+      {
+        label: { full: "Chestnutss  Avenue", abbrev: "Chestnut Hill Ave" },
+        show_symbol: true,
+      },
+      {
+        label: { full: "Chestnutss Hill ", abbrev: "Chestnut Hill Ave" },
+        show_symbol: true,
+      },
+      {
+        label: { full: "Chestnutss Hill Avenue", abbrev: "Chestnut Hill Ave" },
+        show_symbol: true,
+      },
+      {
+        label: { full: "Chestnutss Hill Avenue", abbrev: "Chestnut Hill Ave" },
+        show_symbol: true,
+      },
+      {
+        label: { full: "Chestnuts  Avenue", abbrev: "Chestnut Hill Ave" },
+        show_symbol: true,
+      },
+      {
+        label: { full: "Chestnut Hill ", abbrev: "Chestnut Hill Ave" },
+        show_symbol: true,
+      },
+      { type: "terminal", label_id: "place-gover" },
     ],
   };
 

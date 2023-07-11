@@ -224,46 +224,6 @@ const FirstSlotComponent: ComponentType<
   );
 };
 
-interface EffectBackgroundComponentProps {
-  effectRegionSlotIndexRange:
-    | [range_start: number, range_end: number]
-    | number[];
-  effect: string;
-  spaceBetween: number;
-}
-
-const EffectBackgroundComponent: ComponentType<
-  EffectBackgroundComponentProps
-> = ({ spaceBetween, effect, effectRegionSlotIndexRange }) => {
-  const rangeStart = effectRegionSlotIndexRange[0];
-  const rangeEnd = effectRegionSlotIndexRange[1];
-
-  const x1 = rangeStart * (spaceBetween + SLOT_WIDTH) + L;
-  const x2 = (spaceBetween + SLOT_WIDTH) * (rangeEnd - rangeStart + 1);
-
-  let background;
-  if (effect === "shuttle") {
-    background = (
-      <line
-        x1={x1}
-        y1="24"
-        x2={x2}
-        y2="24"
-        height="16"
-        strokeWidth={16}
-        stroke="black"
-        strokeDasharray="12 6"
-      />
-    );
-  } else if (effect === "suspension") {
-    background = <rect width={x2} height="16" x={x1} y="16" fill="#AEAEAE" />;
-  } else {
-    background = <></>;
-  }
-
-  return <>{background}</>;
-};
-
 const LastSlotComponent: ComponentType<
   EndSlotComponentProps & { x: number }
 > = ({ slot, line, x, isCurrentStop }) => {
@@ -363,6 +323,87 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   );
 };
 
+interface EffectBackgroundComponentProps {
+  effectRegionSlotIndexRange:
+    | [range_start: number, range_end: number]
+    | number[];
+  effect: string;
+  spaceBetween: number;
+}
+
+const EffectBackgroundComponent: ComponentType<
+  EffectBackgroundComponentProps
+> = ({ spaceBetween, effect, effectRegionSlotIndexRange }) => {
+  const rangeStart = effectRegionSlotIndexRange[0];
+  const rangeEnd = effectRegionSlotIndexRange[1];
+
+  const x1 = rangeStart * (spaceBetween + SLOT_WIDTH) + L;
+  const x2 = (spaceBetween + SLOT_WIDTH) * (rangeEnd + 1);
+
+  let background;
+  if (effect === "shuttle") {
+    background = (
+      <line
+        x1={x1}
+        y1="24"
+        x2={x2}
+        y2="24"
+        height="16"
+        strokeWidth={16}
+        stroke="black"
+        strokeDasharray="12 6"
+      />
+    );
+  } else if (effect === "suspension") {
+    background = <rect width={x2} height="16" x={x1} y="16" fill="#AEAEAE" />;
+  } else {
+    background = <></>;
+  }
+
+  return <>{background}</>;
+};
+
+interface AlertEmphasisComponentProps {
+  effectRegionSlotIndexRange:
+    | [range_start: number, range_end: number]
+    | number[];
+  spaceBetween: number;
+}
+
+const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
+  effectRegionSlotIndexRange,
+  spaceBetween,
+}) => {
+  const rangeStart = effectRegionSlotIndexRange[0];
+  const rangeEnd = effectRegionSlotIndexRange[1];
+
+  const x1 = rangeStart * (spaceBetween + SLOT_WIDTH) + L;
+  const x2 = (spaceBetween + SLOT_WIDTH) * (rangeEnd - rangeStart + 1);
+
+  return (
+    <g transform="translate(5, 60)">
+      <path
+        d={`M${x1 - L / 2} 4L${x1 - L / 2} 28`}
+        stroke="#737373"
+        stroke-width="8"
+        stroke-linecap="round"
+      />
+      <path
+        d={`M${x1 - L / 2} 16H${x1 + x2}`}
+        stroke="#737373"
+        stroke-width="8"
+        stroke-linecap="round"
+      />
+      <path
+        d={`M${x1 + x2} 4L${x1 + x2} 28`}
+        stroke="#737373"
+        stroke-width="8"
+        stroke-linecap="round"
+      />
+    </g>
+  );
+};
+
 /*
 Client is responsible for:
 - choosing the appropriate symbol for each slot based on whether the stop is inside/outside the effect region, whether it's the current stop, whether it's a Red Line diagram, whether show_symbol is true/false
@@ -388,8 +429,9 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     const isAffected =
       effect === "station_closure"
         ? props.closed_station_slot_indices.includes(i + 1)
-        : i >= props.effect_region_slot_index_range[0] - 2 &&
+        : i >= props.effect_region_slot_index_range[0] - 1 &&
           i <= props.effect_region_slot_index_range[1] - 1;
+
     return (
       <MiddleSlotComponent
         key={key}
@@ -444,6 +486,14 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
             x={x}
             line={line}
             isCurrentStop={current_station_slot_index === slots.length - 1}
+          />
+          <AlertEmphasisComponent
+            effectRegionSlotIndexRange={
+              effect === "station_closure"
+                ? props.closed_station_slot_indices
+                : props.effect_region_slot_index_range
+            }
+            spaceBetween={spaceBetween}
           />
         </g>
       </svg>
