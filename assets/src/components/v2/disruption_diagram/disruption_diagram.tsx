@@ -254,6 +254,7 @@ interface MiddleSlotComponentProps {
   isCurrentStop: boolean;
   isAffected: boolean;
   effect: "shuttle" | "suspension" | "station_closure";
+  firstAffectedIndex: boolean;
 }
 
 const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
@@ -264,6 +265,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   isCurrentStop,
   isAffected,
   effect,
+  firstAffectedIndex,
 }) => {
   let background;
   // Background for these effects is drawn in EffectBackgroundComponent.
@@ -291,7 +293,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
           <CurrentStopIcon x={x} />
         );
     } else {
-      if (isAffected) {
+      if (isAffected && !firstAffectedIndex) {
         switch (effect) {
           case "suspension":
             icon = <SuspensionStopIcon x={x} />;
@@ -355,7 +357,9 @@ const EffectBackgroundComponent: ComponentType<
       />
     );
   } else if (effect === "suspension") {
-    background = <rect width={x2} height="16" x={x1} y="16" fill="#AEAEAE" />;
+    background = (
+      <rect width={x2 - SLOT_WIDTH} height="16" x={x1} y="16" fill="#AEAEAE" />
+    );
   } else {
     background = <></>;
   }
@@ -476,8 +480,8 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     const isAffected =
       effect === "station_closure"
         ? props.closed_station_slot_indices.includes(i + 1)
-        : i >= props.effect_region_slot_index_range[0] - 1 &&
-          i <= props.effect_region_slot_index_range[1] - 1;
+        : i + 1 >= props.effect_region_slot_index_range[0] &&
+          i + 1 <= props.effect_region_slot_index_range[1];
 
     return (
       <MiddleSlotComponent
@@ -489,6 +493,11 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         isCurrentStop={current_station_slot_index === i + 1}
         effect={effect}
         isAffected={isAffected}
+        firstAffectedIndex={
+          effect === "station_closure"
+            ? false
+            : props.effect_region_slot_index_range[0] === i + 1
+        }
       />
     );
   });
