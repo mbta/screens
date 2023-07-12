@@ -123,7 +123,7 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
-  let playerName;
+  let playerName = null;
   if (isDup()) {
     playerName = useOutfrontPlayerName();
   }

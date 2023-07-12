@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 const useOutfrontPlayerName = () => {
-  const [playerName, setPlayerName] = useState(null);
+  const [playerName, setPlayerName] = useState("");
 
   useEffect(() => {
     if (parent?.parent?.mraid ?? false) {
@@ -9,7 +9,7 @@ const useOutfrontPlayerName = () => {
         const info = JSON.parse(mraid.getDeviceInfo());
         setPlayerName(info.deviceName)
       } catch (err) {
-        setPlayerName(null);
+        setPlayerName("noMraid");
       }
     }
   }, [parent?.parent?.mraid]);
