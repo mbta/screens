@@ -38,6 +38,7 @@ import PageLoadNoData from "Components/v2/dup/page_load_no_data";
 import NoData from "Components/v2/dup/no_data";
 import OvernightDepartures from "Components/v2/dup/overnight_departures";
 import useOutfrontPlayerName from "Hooks/use_outfront_player_name";
+import { isDup } from "Util/util";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -122,7 +123,11 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
-  const playerName = useOutfrontPlayerName();
+  // TODO: add requestor conditional so this doesn't execute for Screenplay
+  let playerName;
+  if (isDup()) {
+    playerName = useOutfrontPlayerName();
+  }
 
   if (playerName !== null) {
     const id = `DUP-${playerName.trim()}`;
