@@ -123,7 +123,6 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
-  // TODO: add requestor conditional so this doesn't execute for Screenplay
   let playerName;
   if (isDup()) {
     playerName = useOutfrontPlayerName();
