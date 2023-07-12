@@ -69,6 +69,13 @@ type LineColor = "blue" | "orange" | "red" | "green";
 // so we can send actual text for those--it will be dynamically resized to fit.
 type EndLabelID = string;
 
+const endLabelIDMap: { [labelID: string]: string[] } = {
+  "place-alfcl": ["ALEWIFE"],
+  "place-asmnl+place-brntn": ["ASHMONT &", "BRAINTREE"],
+  "place-gover": ["GOVERNMENT", "CENTER"],
+  "place-lake": ["RIVERSIDE"],
+};
+
 interface IconProps {
   x: number;
   className?: string;
@@ -174,19 +181,60 @@ const ArrowEndpoint: ComponentType<IconProps> = ({ x, className }) => (
   />
 );
 
+const getEndpointLabel = (labelID: string, x: number, isArrow: boolean) => {
+  let labelParts = endLabelIDMap[labelID];
+  if (labelParts.length === 1) {
+    return (
+      <text
+        className="label--endpoint"
+        transform={`translate(${x} -5) rotate(-45)`}
+      >
+        {isArrow && <tspan className="label">to </tspan>}
+        {labelParts[0]}
+      </text>
+    );
+  } else {
+    return (
+      <>
+        <text
+          className="label--endpoint"
+          transform={`translate(${x} -5) rotate(-45)`}
+        >
+          {isArrow && <tspan className="label">to </tspan>}
+          {labelParts[0]}
+        </text>
+        <text
+          className="label--endpoint"
+          transform={`translate(${x + 45} -5) rotate(-45)`}
+        >
+          {labelParts[1]}
+        </text>
+      </>
+    );
+  }
+};
+
 interface EndSlotComponentProps {
   slot: EndSlot;
   line: LineColor;
   isCurrentStop: boolean;
+  labelID: string;
 }
 
-const FirstSlotComponent: ComponentType<
-  EndSlotComponentProps & {
-    spaceBetween: number;
-    isAffected: boolean;
-    effect: string;
-  }
-> = ({ slot, line, spaceBetween, isAffected, effect }) => {
+interface FirstSlotComponentProps extends EndSlotComponentProps {
+  spaceBetween: number;
+  isAffected: boolean;
+  effect: string;
+}
+
+const FirstSlotComponent: ComponentType<FirstSlotComponentProps> = ({
+  slot,
+  line,
+  spaceBetween,
+  isAffected,
+  effect,
+  labelID,
+}) => {
   let icon;
   if (slot.type === "arrow") {
     icon = (
@@ -230,30 +278,47 @@ const FirstSlotComponent: ComponentType<
     <>
       {background}
       {icon}
+      {getEndpointLabel(labelID, L, slot.type === "arrow")}
     </>
   );
 };
 
-const LastSlotComponent: ComponentType<
-  EndSlotComponentProps & { x: number }
-> = ({ slot, line, x, isCurrentStop }) => {
+interface LastlotComponentProps extends EndSlotComponentProps {
+  x: number;
+}
+
+const LastSlotComponent: ComponentType<LastlotComponentProps> = ({
+  slot,
+  line,
+  x,
+  isCurrentStop,
+  labelID,
+}) => {
+  let icon;
   if (slot.type === "arrow") {
-    return (
+    icon = (
       <ArrowEndpoint
         x={x}
         className={classWithModifier("end-slot__arrow", line)}
       />
     );
   } else if (isCurrentStop) {
-    return <CurrentStopIconEndpoint x={x} />;
+    icon = <CurrentStopIconEndpoint x={x} />;
   } else {
-    return (
+    icon = (
       <StopIconEndpoint
         x={x}
         className={classWithModifier("end-slot__icon", line)}
       />
     );
   }
+
+  return (
+    <>
+      {icon}
+      {getEndpointLabel(labelID, x, slot.type === "arrow")}
+    </>
+  );
 };
 
 interface MiddleSlotComponentProps {
@@ -329,16 +394,24 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
     icon = <></>;
   }
 
+  let textModifiers = [];
+
+  if (isCurrentStop) {
+    textModifiers.push("current-stop");
+  }
+
   return (
     <>
+      {background}
+      {icon}
       <text
-        transform={`translate(${x + label.length * 3} ${0}) rotate(-45)`}
-        textAnchor="middle"
+        className={classWithModifiers("label", textModifiers)}
+        transform={`translate(${x} ${-5}) rotate(${
+          label === "…" ? "0" : "-45"
+        })`}
       >
         {label}
       </text>
-      {background}
-      {icon}
     </>
   );
 };
@@ -403,7 +476,10 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
   const rangeStart = effectRegionSlotIndexRange[0];
   const rangeEnd = effectRegionSlotIndexRange[1];
 
-  const x1 = rangeStart * (spaceBetween + SLOT_WIDTH) + L;
+  const x1 = Math.max(
+    rangeStart * (spaceBetween + SLOT_WIDTH + L),
+    L + SLOT_WIDTH / 2
+  );
   const x2 = (spaceBetween + SLOT_WIDTH) * (rangeEnd - rangeStart + 1);
   const middleOfLine = (x1 + x2 + (x1 - L / 2)) / 2;
   const widthOfBackground = 40;
@@ -439,8 +515,8 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
         />
         <path
           transform={`translate(${middleOfLine - widthOfBackground} -24)`}
-          fill-rule="evenodd"
-          clip-rule="evenodd"
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M23.837 0C23.3732 0 22.9293 0.188765 22.6076 0.522852L0.47732 23.5043C0.171085 23.8223 0 24.2467 0 24.6881V56.182C0 56.6346 0.179809 57.0687 0.499871 57.3888L22.6112 79.5001C22.9313 79.8202 23.3654 80 23.818 80H56.163C56.6268 80 57.0707 79.8112 57.3924 79.4771L79.5227 56.4957C79.8289 56.1777 80 55.7534 80 55.3119V23.818C80 23.3654 79.8202 22.9313 79.5001 22.6112L57.3888 0.499871C57.0687 0.179809 56.6346 0 56.182 0H23.837ZM20.2493 26.6844C19.5909 27.3535 19.5964 28.4288 20.2618 29.091L31.8854 40.6614L20.2566 52.478C19.5953 53.15 19.6042 54.2309 20.2764 54.892L25.9573 60.4784C26.6291 61.1391 27.7094 61.1303 28.3703 60.4586L40 48.6411L51.6297 60.4586C52.2906 61.1303 53.3708 61.1391 54.0427 60.4784L59.7236 54.892C60.3958 54.2309 60.4047 53.15 59.7434 52.478L48.1146 40.6614L59.7383 29.091C60.4036 28.4288 60.4091 27.3535 59.7507 26.6844L54.0303 20.8716C53.3665 20.1971 52.2805 20.1915 51.6098 20.8591L40 32.4157L28.3902 20.8591C27.7195 20.1915 26.6335 20.1971 25.9697 20.8716L20.2493 26.6844Z"
           fill="#171F26"
         />
@@ -449,7 +525,7 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
   }
 
   return (
-    <g transform="translate(5, 100)">
+    <>
       <path
         d={`M${x1 - L / 2} 4L${x1 - L / 2} 28`}
         stroke="#737373"
@@ -457,19 +533,19 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
         strokeLinecap="round"
       />
       <path
-        d={`M${x1 - L / 2} 16H${x1 + x2}`}
+        d={`M${x1 - L / 2} 16H${x1 + x2 - L}`}
         stroke="#737373"
         strokeWidth="8"
         strokeLinecap="round"
       />
       <path
-        d={`M${x1 + x2} 4L${x1 + x2} 28`}
+        d={`M${x1 + x2 - L} 4L${x1 + x2 - L} 28`}
         stroke="#737373"
         strokeWidth="8"
         strokeLinecap="round"
       />
       {icon}
-    </g>
+    </>
   );
 };
 
@@ -524,15 +600,14 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   x += spaceBetween + SLOT_WIDTH;
 
   return (
-    <div style={{ width: "904px", height: "308px" }}>
+    <>
       <svg
         width="904px"
-        height="308px"
+        height="320px"
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ padding: "24px" }}
       >
-        <g transform="translate(12, 130)">
+        <g transform="translate(12, 260)">
           <EffectBackgroundComponent
             effectRegionSlotIndexRange={
               effect === "station_closure"
@@ -553,6 +628,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
                 : props.effect_region_slot_index_range.includes(0)
             }
             effect={effect}
+            labelID={beginning.label_id}
           />
 
           {middleSlots}
@@ -561,7 +637,18 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
             x={x}
             line={line}
             isCurrentStop={current_station_slot_index === slots.length - 1}
+            labelID={end.label_id}
           />
+        </g>
+      </svg>
+      <svg
+        width="904px"
+        height="80px"
+        viewBox="0 0 904 80"
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g transform="translate(10, 25)">
           <AlertEmphasisComponent
             effectRegionSlotIndexRange={
               effect === "station_closure"
@@ -573,7 +660,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
           />
         </g>
       </svg>
-    </div>
+    </>
   );
 };
 
