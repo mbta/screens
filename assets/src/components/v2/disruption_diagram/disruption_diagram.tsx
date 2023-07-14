@@ -71,6 +71,7 @@ type Effect = "shuttle" | "suspension" | "station_closure";
 // so we can send actual text for those--it will be dynamically resized to fit.
 type EndLabelID = string;
 
+// If value is length === 2, label is split onto 2 lines.
 const endLabelIDMap: { [labelID: string]: string[] } = {
   "place-bomnl": ["BOWDOIN"],
   "place-wondl": ["WONDERLAND"],
@@ -375,6 +376,7 @@ interface MiddleSlotComponentProps {
   effect: Effect;
   firstAffectedIndex: boolean;
   abbreviate: boolean;
+  labelTextClass: string;
 }
 
 const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
@@ -387,10 +389,11 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   effect,
   firstAffectedIndex,
   abbreviate,
+  labelTextClass,
 }) => {
   const { label } = slot;
   let background;
-  // Background for these effects is drawn in EffectBackgroundComponent.
+  // Background for suspension/shuttle is drawn in EffectBackgroundComponent.
   if (isAffected && effect !== "station_closure") {
     background = <></>;
   } else {
@@ -452,10 +455,10 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
     icon = <></>;
   }
 
-  let textModifiers = [];
+  let textModifier;
 
   if (isCurrentStop) {
-    textModifiers.push("current-stop");
+    textModifier = "current-stop";
   }
 
   return (
@@ -463,7 +466,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
       {background}
       {icon}
       <text
-        className={classWithModifiers("label", textModifiers)}
+        className={classWithModifier(`label-${labelTextClass}`, textModifier)}
         transform={`translate(${x} ${-5}) rotate(${
           label === "…" ? "0" : "-45"
         })`}
@@ -624,6 +627,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   );
   const { 0: beginning, [slots.length - 1]: end, ...middle } = slots;
   const hasEmphasis = effect !== "station_closure";
+  const labelTextClass = slots.length > 12 ? "small" : "large";
 
   let x = 0;
   const middleSlots = Object.values(middle).map((s, i) => {
@@ -652,6 +656,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
             : props.effect_region_slot_index_range[0] === i + 1
         }
         abbreviate={doAbbreviate}
+        labelTextClass={labelTextClass}
       />
     );
   });
