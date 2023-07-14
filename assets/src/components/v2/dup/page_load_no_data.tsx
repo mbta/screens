@@ -1,7 +1,7 @@
 import useOutfrontStation from "Hooks/use_outfront_station";
 import React, { ComponentType } from "react";
 import LinkArrow from "../bundled_svg/link_arrow";
-import Loading from "../../../../static/images/svgr_bundled/loading.svg";
+import Loading from "../bundled_svg/loading";
 import NormalHeader from "./normal_header";
 import { REPLACEMENTS } from "./no_data";
 
@@ -14,7 +14,7 @@ const PageLoadNoData: ComponentType = () => {
       <NormalHeader text={stationName} />
       <div className="loading__body">
         <div className="loading__icon-container">
-          <Loading width="128" height="128" color="#171F26" />
+          <Loading colorHex={"#171F26"} />
         </div>
         <div className="loading__heading">Loading...</div>
         <div className="loading__sub-heading">

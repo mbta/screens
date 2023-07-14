@@ -1,6 +1,6 @@
 import React from "react";
 
-import NoConnection from "../../../../../static/images/svgr_bundled/live-data-none.svg";
+import NoConnection from "Components/v2/bundled_svg/no_connection";
 import FreeText from "Components/v2/free_text";
 
 const NoDataSection = ({ text }) => {
@@ -10,10 +10,8 @@ const NoDataSection = ({ text }) => {
         <FreeText lines={text} />
         <div className="no-data-section__icon-container">
           <NoConnection
-            width="128"
-            height="128" 
             className="no-data-section__no-connection-icon"
-            color="#171F26"
+            colorHex="#171F26"
           />
         </div>
       </div>

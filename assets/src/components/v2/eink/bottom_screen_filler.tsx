@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import HandWithPhone from "../../../../static/images/svgr_bundled/hand-with-phone.svg";
+import HandWithPhone from "Components/v2/bundled_svg/hand_with_phone";
 
 const BottomScreenFiller: ComponentType = () => (
   <div className="bottom-screen-filler">
@@ -14,7 +14,7 @@ const BottomScreenFiller: ComponentType = () => (
       </div>
     </div>
     <div className="bottom-screen-filler__phone-image-container">
-      <HandWithPhone width="184px" height="283px" className="bottom-screen-filler__phone-image" />
+      <HandWithPhone className="bottom-screen-filler__phone-image" />
     </div>
   </div>
 );

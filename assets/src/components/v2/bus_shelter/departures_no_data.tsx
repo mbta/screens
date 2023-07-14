@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import NoConnection from "../../../../static/images/svgr_bundled/live-data-none.svg";
+import NoConnection from "Components/v2/bundled_svg/no_connection";
 
 interface Props {
   show_alternatives: boolean;
@@ -17,10 +17,8 @@ const DeparturesNoData: ComponentType<Props> = ({
       <div className="departures-no-data__main-content">
         <div className="departures-no-data__main-content__no-connection-icon-container">
           <NoConnection
-            width="128"
-            height="128" 
             className="departures-no-data__main-content__no-connection-icon"
-            color={coolBlack}
+            colorHex={coolBlack}
           />
         </div>
         <div className="departures-no-data__main-content__heading">

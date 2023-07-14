@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
-import NoConnection from "../../../../static/images/svgr_bundled/live-data-none.svg";
+import NoConnection from "Components/v2/bundled_svg/no_connection";
 import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 import moment from "moment";
 
@@ -27,10 +27,8 @@ const NoData: ComponentType = () => {
         <div className="no-data__main-content">
           <div className="no-data__main-content__no-connection-icon-container">
             <NoConnection
-              width="128"
-              height="128"
               className="no-data__main-content__no-connection-icon"
-              color="#000000"
+              colorHex="#000000"
             />
           </div>
           <div className="no-data__main-content__heading">
