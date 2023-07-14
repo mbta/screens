@@ -86,3 +86,11 @@
     font-weight: 700;
   }
 }
+
+.station-closure-icon {
+  fill: #171f26;
+
+  &--current-stop {
+    fill: #ee2e24;
+  }
+}
