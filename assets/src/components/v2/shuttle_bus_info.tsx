@@ -1,8 +1,8 @@
 import Arrow, { Direction } from "Components/solari/arrow";
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
-import IsaSvg from "../../../static/images/svgr_bundled/isa-negative.svg";
-import Free from "../../../static/images/svgr_bundled/free.svg";
+import Accessible from "Components/v2/bundled_svg/accessible";
+import Free from "Components/v2/bundled_svg/free";
 import ClockIcon from "Components/v2/clock_icon";
 
 interface Props {
@@ -77,10 +77,8 @@ const ShuttleBusInfo: ComponentType<Props> = ({
           <div className="shuttle-bus-info__trip-info-price">
             <div className="shuttle-bus-info__trip-info-price-icon-container">
               <Free
-                width="128"
-                height="128"
                 className="shuttle-bus-info__trip-info-price-icon"
-                color="#00843d"
+                colorHex="#00843d"
               />
             </div>
             <div className="shuttle-bus-info__trip-info-price-text">
@@ -94,11 +92,9 @@ const ShuttleBusInfo: ComponentType<Props> = ({
           </div>
           <div className="shuttle-bus-info__trip-info-accessibility">
             <div className="shuttle-bus-info__trip-info-accessibility-icon-container">
-              <IsaSvg
-                width="128px"
-                height="128px"
+              <Accessible
                 className="shuttle-bus-info__trip-info-accessibility-icon"
-                color="#165c96"
+                colorHex="#165c96"
               />
             </div>
             <div className="shuttle-bus-info__trip-info-accessibility-text">
