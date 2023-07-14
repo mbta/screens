@@ -496,16 +496,18 @@ const EffectBackgroundComponent: ComponentType<
 
   let background;
   if (effect === "shuttle") {
+    const dashPlusGap = (spaceBetween + SLOT_WIDTH / 2) / 3;
+    const dash = dashPlusGap / 1.5;
+    const gap = dash / 2;
     background = (
       <line
         x1={x1}
         y1="24"
         x2={x2}
         y2="24"
-        height="16"
         strokeWidth={16}
         stroke="black"
-        strokeDasharray="12 6"
+        strokeDasharray={`${dash} ${gap}`}
       />
     );
   } else if (effect === "suspension") {
