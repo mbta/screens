@@ -232,7 +232,7 @@ const mapSection = () => {
   //   effect: "suspension",
   //   line: "red",
   //   current_station_slot_index: 2,
-  //   effect_region_slot_index_range: [1, 4],
+  //   effect_region_slot_index_range: [2, 5],
   //   slots: [
   //     { type: "arrow", label_id: "place-alfcl" },
   //     {
@@ -258,61 +258,277 @@ const mapSection = () => {
   //     { type: "arrow", label_id: "place-asmnl+place-brntn" },
   //   ],
   // };
+
+  // const props: ContinuousDisruptionDiagram = {
+  //   effect: "suspension",
+  //   line: "green",
+  //   current_station_slot_index: 2,
+  //   effect_region_slot_index_range: [2, 6],
+  //   slots: [
+  //     { type: "arrow", label_id: "place-alfcl" },
+  //     {
+  //       label: { full: "Park St", abbrev: "Kendall/MIT" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Government Centerrrrrr", abbrev: "Charles/MGH" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Haymarket", abbrev: "Park St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "North Station", abbrev: "Downt'n Xng" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Science Park/West End", abbrev: "South Sta" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Lechmere", abbrev: "South Sta" },
+  //       show_symbol: true,
+  //     },
+  //     { type: "arrow", label_id: "place-asmnl+place-brntn" },
+  //   ],
+  // };
+
+  // const props: ContinuousDisruptionDiagram = {
+  //   effect: "shuttle",
+  //   line: "green",
+  //   current_station_slot_index: 10,
+  //   effect_region_slot_index_range: [0, 7],
+  //   slots: [
+  //     { type: "terminal", label_id: "place-lake" },
+  //     {
+  //       label: { full: "South Street", abbrev: "South St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Chestnut Hill Avenue", abbrev: "Chestnut Hill Ave" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Chiswick Road", abbrev: "Chiswick Rd" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: "…",
+  //       show_symbol: false,
+  //     },
+  //     {
+  //       label: { full: "Beaconsfield", abbrev: "Griggs St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Harvard Avenue", abbrev: "Harvard Ave" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Packard's Corner", abbrev: "Packard's Cn" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Babcock Street", abbrev: "Babcock St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: {
+  //         full: "… via Copley & Kenmore",
+  //         abbrev: "… via Copley & Kenmore",
+  //       },
+  //       show_symbol: false,
+  //     },
+  //     {
+  //       label: { full: "Park Street", abbrev: "Park St" },
+  //       show_symbol: true,
+  //     },
+  //     { type: "terminal", label_id: "place-gover" },
+  //   ],
+  // };
+
+  // const props: DiscreteDisruptionDiagram = {
+  //   effect: "station_closure",
+  //   line: "green",
+  //   current_station_slot_index: 11,
+  //   closed_station_slot_indices: [2, 11],
+  //   slots: [
+  //     { type: "arrow", label_id: "place-clmnl" },
+  //     {
+  //       label: { full: "Saint Paul Street", abbrev: "St. Paul St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Kent Street", abbrev: "Kent St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Hawes Street", abbrev: "Hawes St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Saint Mary's Street", abbrev: "St. Mary's" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Kenmore", abbrev: "Kenmore" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Hynes Convention Center", abbrev: "Hynes" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Copley", abbrev: "Copley" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Arlington", abbrev: "Arlington" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Boylston", abbrev: "Boylston" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Park Street", abbrev: "Park St" },
+  //       show_symbol: true,
+  //     },
+  //     { type: "terminal", label_id: "place-gover" },
+  //   ],
+  // };
+
+  // const props: DiscreteDisruptionDiagram = {
+  //   effect: "station_closure",
+  //   line: "blue",
+  //   current_station_slot_index: 1,
+  //   closed_station_slot_indices: [4],
+  //   slots: [
+  //     { type: "terminal", label_id: "place-bomnl" },
+  //     {
+  //       label: { full: "Government Center", abbrev: "St. Paul St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "State", abbrev: "Kent St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Aquarium", abbrev: "Hawes St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Maverick", abbrev: "St. Mary's" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Airport", abbrev: "Kenmore" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Wood Island", abbrev: "Hynes" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Orient Heights", abbrev: "Copley" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Suffolk Downs", abbrev: "Arlington" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Beachmont", abbrev: "Boylston" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Revere Beach", abbrev: "Park St" },
+  //       show_symbol: true,
+  //     },
+  //     { type: "terminal", label_id: "place-wondl" },
+  //   ],
+  // };
+
+  // const props: DiscreteDisruptionDiagram = {
+  //   effect: "station_closure",
+  //   line: "orange",
+  //   current_station_slot_index: 7,
+  //   closed_station_slot_indices: [2],
+  //   slots: [
+  //     { type: "arrow", label_id: "place-ogmnl" },
+  //     {
+  //       label: { full: "North Station", abbrev: "St. Paul St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Haymarket", abbrev: "Kent St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "State", abbrev: "Hawes St" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Downtown Crossing", abbrev: "St. Mary's" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Chinatown", abbrev: "Kenmore" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Tufts Medical Center", abbrev: "Hynes" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Back Bay", abbrev: "Copley" },
+  //       show_symbol: true,
+  //     },
+  //     {
+  //       label: { full: "Mass Ave", abbrev: "Arlington" },
+  //       show_symbol: true,
+  //     },
+  //     { type: "arrow", label_id: "place-forhl" },
+  //   ],
+  // };
+
   const props: ContinuousDisruptionDiagram = {
     effect: "shuttle",
-    line: "green",
-    current_station_slot_index: 11,
-    effect_region_slot_index_range: [0, 7],
+    line: "orange",
+    current_station_slot_index: 10,
+    effect_region_slot_index_range: [0, 3],
     slots: [
-      { type: "terminal", label_id: "place-lake" },
+      { type: "terminal", label_id: "place-ogmnl" },
       {
-        label: { full: "South Street", abbrev: "South St" },
+        label: { full: "Community College", abbrev: "St. Paul St" },
         show_symbol: true,
       },
       {
-        label: { full: "Chestnut Hill Avenue", abbrev: "Chestnut Hill Ave" },
+        label: { full: "North Station", abbrev: "St. Paul St" },
         show_symbol: true,
       },
       {
-        label: { full: "Chiswick Road", abbrev: "Chiswick Rd" },
+        label: { full: "Haymarket", abbrev: "Kent St" },
         show_symbol: true,
       },
       {
-        label: "…",
-        show_symbol: false,
-      },
-      {
-        label: { full: "Griggs Street", abbrev: "Griggs St" },
+        label: { full: "State", abbrev: "Hawes St" },
         show_symbol: true,
       },
       {
-        label: { full: "Harvard Avenue", abbrev: "Harvard Ave" },
+        label: { full: "Downtown Crossing", abbrev: "St. Mary's" },
         show_symbol: true,
       },
-      {
-        label: { full: "Packard's Corner", abbrev: "Packard's Cn" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Babcock Street", abbrev: "Babcock St" },
-        show_symbol: true,
-      },
-      {
-        label: {
-          full: "… via Copley & Kenmore",
-          abbrev: "… via Copley & Kenmore",
-        },
-        show_symbol: false,
-      },
-      {
-        label: { full: "Park Street", abbrev: "Park St" },
-        show_symbol: true,
-      },
-      { type: "terminal", label_id: "place-gover" },
+      { type: "arrow", label_id: "place-forhl" },
     ],
   };
 
-  return <DisruptionDiagram {...props} />;
+  return (
+    <div style={{ height: 408, width: 904 }}>
+      <DisruptionDiagram {...props} />
+    </div>
+  );
 };
 
 const isMultiLine = (effect: string, region: string) =>
