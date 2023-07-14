@@ -1,4 +1,4 @@
-import React, { ComponentType, useEffect, useRef, useState } from "react";
+import React, { ComponentType, useEffect, useState } from "react";
 import { classWithModifier, classWithModifiers } from "Util/util";
 
 const MAX_WIDTH = 904;
@@ -72,11 +72,23 @@ type Effect = "shuttle" | "suspension" | "station_closure";
 type EndLabelID = string;
 
 const endLabelIDMap: { [labelID: string]: string[] } = {
+  "place-bomnl": ["BOWDOIN"],
+  "place-wondl": ["WONDERLAND"],
   "place-alfcl": ["ALEWIFE"],
   "place-asmnl+place-brntn": ["ASHMONT &", "BRAINTREE"],
+  "place-asmnl": ["ASHMONT"],
+  "place-brntn": ["BRAINTREE"],
   "place-gover": ["GOVERNMENT", "CENTER"],
-  "place-lake": ["RIVERSIDE"],
+  "place-lake": ["BOSTON COLLEGE"],
   "place-clmnl": ["CLEVELAND CIR"],
+  "place-unsqu": ["UNION SQUARE"],
+  "place-river": ["RIVERSIDE"],
+  "place-mdftf": ["MEDFORD/TUFTS"],
+  "place-hsmnl": ["HEATH ST"],
+  "place-kencl": ["KENMORE"],
+  "place-mdftf+place-unsqu": ["MEDFORD/TUFTS", "& UNION SQ"],
+  "place-north+place-pktrm": ["NORTH STATION", "& PARK ST"],
+  "place-coecl+west": ["COPLEY & WEST"],
   "place-ogmnl": ["OAK GROVE"],
   "place-forhl": ["FOREST", "HILLS"],
   "place-medfd+place-unsq": ["MEDFORD/TUFTS", "& UNION SQ"],
