@@ -536,7 +536,7 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
   const rangeEnd = effectRegionSlotIndexRange[1] - 1;
 
   const x1 = Math.max(
-    rangeStart * (spaceBetween + SLOT_WIDTH + L),
+    (spaceBetween + SLOT_WIDTH) * rangeStart + L * 2,
     L - 8 + SLOT_WIDTH / 2
   );
   const x2 = (spaceBetween + SLOT_WIDTH) * (rangeEnd - rangeStart + 1);
