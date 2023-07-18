@@ -750,6 +750,6 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   );
 };
 
-export { ContinuousDisruptionDiagram, DiscreteDisruptionDiagram };
+export { DisruptionDiagramData };
 
 export default DisruptionDiagram;
