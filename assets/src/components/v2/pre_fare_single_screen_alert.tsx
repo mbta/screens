@@ -263,13 +263,29 @@ const PreFareAlertBanner: React.ComponentType<{routes: any[]}> = ({routes}) => {
     </div>
   } else if (routes.length === 2) {
     // Two destinations
-    banner = <div className={classWithModifiers("alert-banner", ["large--two-routes", getAlertColor(routes)])}>
-      <span><span className="alert-banner__attention-text">ATTENTION,</span> riders to</span>
-      {routes.map((route) => {
-        const LinePill = STRING_TO_SVG[route]
-        return <LinePill className="alert-banner__route-pill--long" color={getHexColor(getRouteColor(route))} />
-      })}
-    </div>
+    banner = (
+      <div
+        className={classWithModifiers("alert-banner", [
+          "large--two-routes",
+          getAlertColor(routes),
+        ])}
+      >
+        <span>
+          <span className="alert-banner__attention-text">ATTENTION,</span>{" "}
+          riders to
+        </span>
+        {routes.map((route) => {
+          const LinePill = STRING_TO_SVG[route];
+          return (
+            <LinePill
+              key={route}
+              className="alert-banner__route-pill--long"
+              color={getHexColor(getRouteColor(route))}
+            />
+          );
+        })}
+      </div>
+    );
   } else {
     // Fallback
     banner = <div className={classWithModifiers("alert-banner", ["small", "yellow"])}>
