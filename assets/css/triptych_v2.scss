@@ -1,0 +1,16 @@
+@import "colors";
+@import "fonts/inter_font_face";
+@import "fonts/helvetica_font_face";
+@import "v2/common/widget";
+
+@import "v2/triptych/screen_container";
+
+@import "v2/triptych/screen/normal";
+
+@import "v2/triptych/body/normal";
+
+@import "v2/placeholder";
+
+body {
+  margin: 0px;
+}
