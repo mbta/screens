@@ -182,6 +182,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           format_for_svg_name(headsign)
         end
     end)
+    |> List.flatten()
     |> Enum.uniq()
   end
 
