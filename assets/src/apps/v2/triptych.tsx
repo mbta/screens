@@ -19,11 +19,15 @@ import NormalBody from "Components/v2/bus_shelter/normal_body";
 import Placeholder from "Components/v2/placeholder";
 
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
+import PageLoadNoData from "Components/v2/lcd/page_load_no_data";
+import NoData from "Components/v2/lcd/no_data";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
   body_normal: NormalBody,
   placeholder: Placeholder,
+  page_load_no_data: PageLoadNoData,
+  no_data: NoData,
 };
 
 const DISABLED_LAYOUT = {
