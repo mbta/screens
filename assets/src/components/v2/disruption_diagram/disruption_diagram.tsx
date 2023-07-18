@@ -79,6 +79,8 @@ const endLabelIDMap: { [labelID: string]: string[] } = {
   "place-asmnl+place-brntn": ["ASHMONT &", "BRAINTREE"],
   "place-asmnl": ["ASHMONT"],
   "place-brntn": ["BRAINTREE"],
+  "place-ogmnl": ["OAK GROVE"],
+  "place-forhl": ["FOREST", "HILLS"],
   "place-gover": ["GOVERNMENT", "CENTER"],
   "place-lake": ["BOSTON COLLEGE"],
   "place-clmnl": ["CLEVELAND CIR"],
@@ -87,12 +89,10 @@ const endLabelIDMap: { [labelID: string]: string[] } = {
   "place-mdftf": ["MEDFORD/TUFTS"],
   "place-hsmnl": ["HEATH ST"],
   "place-kencl": ["KENMORE"],
+  "place-kencl+west": ["KENMORE", "& WEST"],
   "place-mdftf+place-unsqu": ["MEDFORD/TUFTS", "& UNION SQ"],
   "place-north+place-pktrm": ["NORTH STATION", "& PARK ST"],
   "place-coecl+west": ["COPLEY & WEST"],
-  "place-ogmnl": ["OAK GROVE"],
-  "place-forhl": ["FOREST", "HILLS"],
-  "place-medfd+place-unsq": ["MEDFORD/TUFTS", "& UNION SQ"],
 };
 
 interface IconProps {
