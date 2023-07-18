@@ -615,6 +615,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
+    try do
+      diagram_data = Screens.V2.DisruptionDiagram.Model.serialize(t)
+      IO.inspect(diagram_data, label: "✨ Disruption diagram generation succeeded")
+    rescue
+      error ->
+        IO.puts(
+          "💥 Disruption diagram generation failed! Error message and stacktrace below, possibly relevant logs above."
+        )
+
+        reraise error, __STACKTRACE__
+    end
+
     case LocalizedAlert.location(t, is_terminal_station) do
       :inside ->
         t |> serialize_inside_alert() |> Map.put(:region, :inside)
