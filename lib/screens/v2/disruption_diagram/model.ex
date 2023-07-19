@@ -3,12 +3,9 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   Functions to generate a disruption diagram from a `LocalizedAlert`.
   """
 
-  alias Screens.Alerts.Alert
-  alias Screens.LocationContext
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.DisruptionDiagram.Model.Validator
-  alias Screens.V2.DisruptionDiagram.Model.AnnotatedStopSequence
-  alias Screens.Stops.Stop
+  alias Screens.V2.DisruptionDiagram.Model.Builder
 
   import LocalizedAlert, only: [is_localized_alert: 1]
 
@@ -89,6 +86,8 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   # The maximum number of slots that the gap component can take up
   @max_gap_count 2
 
+  @max_closure_count 8
+
   @doc "Produces a JSON-serializable map representing the disruption diagram."
   # TODO Remove nil return type
   @spec serialize(t()) :: serialized_response() | nil
@@ -103,62 +102,115 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   end
 
   defp do_serialize(localized_alert) do
-    annotated_sequence = AnnotatedStopSequence.new(localized_alert)
+    builder = Builder.new(localized_alert)
 
-    line = AnnotatedStopSequence.line(annotated_sequence)
+    line = Builder.line(builder)
 
-    serialize_by_line(line, annotated_sequence)
+    serialize_by_line(line, builder)
   end
 
-  @max_closure_count 8
-
-  @spec serialize_by_line(line_color(), AnnotatedStopSequence.t()) :: serialized_response()
+  @spec serialize_by_line(line_color(), Builder.t()) :: serialized_response()
   # The Blue Line is the simplest case. We always show all stops, starting with Bowdoin.
-  defp serialize_by_line(:blue, annotated_sequence) do
+  defp serialize_by_line(:blue, builder) do
     # The default stop sequence starts with Wonderland, so we need to put the stops in reverse order
     # to have Bowdoin appear first on the diagram.
-    annotated_sequence
-    |> AnnotatedStopSequence.reverse_stops()
-    |> serialize_annotated()
+    builder
+    |> Builder.reverse_stops()
+    |> serialize_builder()
   end
 
   # There's some special logic for the Green Line.
-  defp serialize_by_line(:green, annotated_sequence) do
+  defp serialize_by_line(:green, builder) do
     nil
   end
 
-  defp serialize_by_line(_orange_or_red, annotated_sequence) do
-    annotated_sequence
-    |> fit_closure_region()
+  defp serialize_by_line(_orange_or_red, builder) do
+    builder =
+      with :unchanged <- fit_closure_region(builder),
+           :unchanged <- fit_gap_region(builder),
+           :unchanged <- pad_slots(builder) do
+        builder
+      else
+        {:done, builder} -> builder
+      end
+
+    serialize_builder(builder)
   end
 
   # TODO: What if home stop is in the stops to omit?
-  defp fit_closure_region(annotated_sequence) do
-    if AnnotatedStopSequence.closure_count(annotated_sequence) > 8 do
+  defp fit_closure_region(builder) do
+    if Builder.closure_count(builder) > 8 do
       # The number of closure slots we want left after the omission.
       # This includes one slot for the omitted stations, labeled with "...via $STOPS"
-      target_closure_slots = 12 - min_non_closure_slots(annotated_sequence)
+      # TODO: Why 12? Does this need to change if home stop is inside the closure?
+      target_closure_slots = 12 - min_non_closure_slots(builder)
 
-      AnnotatedStopSequence.omit_stops(
-        annotated_sequence,
-        :closure,
-        target_closure_slots,
-        &get_closure_omission_label(AnnotatedStopSequence.line(annotated_sequence), &1, false)
-      )
+      builder =
+        Builder.omit_stops(
+          builder,
+          :closure,
+          target_closure_slots,
+          &get_omission_label(Builder.line(builder), &1, false)
+        )
+        |> minimize_gap()
+
+      {:done, builder}
     else
-      annotated_sequence
+      :unchanged
     end
   end
 
-  defp get_closure_omission_label(line, omitted_stop_ids, ends_at_gov_ctr?)
+  defp minimize_gap(builder) do
+    target_gap_slots = Builder.min_gap(builder)
 
-  defp get_closure_omission_label(:green, omitted_stop_ids, false) do
+    Builder.omit_stops(
+      builder,
+      :gap,
+      target_gap_slots,
+      &get_omission_label(Builder.line(builder), &1, false)
+    )
+  end
+
+  defp fit_gap_region(builder) do
+    if Builder.gap_count(builder) >= 3 do
+      taken_slots = non_gap_slots(builder)
+      baseline = baseline_slots(Builder.closure_count(builder))
+
+      target_gap_slots = baseline - taken_slots
+
+      builder =
+        Builder.omit_stops(
+          builder,
+          :gap,
+          target_gap_slots,
+          &get_omission_label(Builder.line(builder), &1, false)
+        )
+
+      {:done, builder}
+    else
+      :unchanged
+    end
+  end
+
+  defp pad_slots(builder) do
+    current_slot_count = Builder.slot_count(builder)
+
+    if current_slot_count < @minimum_slot_count do
+      {:done, Builder.add_slots(builder, @minimum_slot_count - current_slot_count)}
+    else
+      :unchanged
+    end
+  end
+
+  defp get_omission_label(line, omitted_stop_ids, ends_at_gov_ctr?)
+
+  defp get_omission_label(:green, omitted_stop_ids, false) do
     if "place-gover" in omitted_stop_ids,
       do: %{full: "…via Government Center", abbrev: "…via Gov't Ctr"},
       else: "…"
   end
 
-  defp get_closure_omission_label(:green, omitted_stop_ids, true) do
+  defp get_omission_label(:green, omitted_stop_ids, true) do
     [
       if("place-kencl" in omitted_stop_ids, do: "Kenmore"),
       if("place-coecl" in omitted_stop_ids, do: "Copley")
@@ -175,45 +227,89 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     end
   end
 
-  defp get_closure_omission_label(:red, omitted_stop_ids, _) do
+  defp get_omission_label(:red, omitted_stop_ids, _) do
     if "place-dwnxg" in omitted_stop_ids,
       do: %{full: "…via Downtown Crossing", abbrev: "…via Downt'n Xng"},
       else: "…"
   end
 
-  defp get_closure_omission_label(:orange, omitted_stop_ids, _) do
+  defp get_omission_label(:orange, omitted_stop_ids, _) do
     if "place-dwnxg" in omitted_stop_ids,
       do: %{full: "…via Downtown Crossing", abbrev: "…via Downt'n Xng"},
       else: "…"
   end
 
-  # get_closure_omission_label should never be called for Blue Line diagrams.
+  # TODO: What do we do if home stop is at JFK and it's a RL trunk alert?
+  # Need to force destination arrow instead of more stops past JFK somehow
 
-  defp min_non_closure_slots(annotated_sequence) do
-    AnnotatedStopSequence.end_count(annotated_sequence) +
-      AnnotatedStopSequence.current_location_count(annotated_sequence) +
-      AnnotatedStopSequence.min_gap(annotated_sequence)
+  # if end_stop_ids is empty, this shouldn't be called
+
+  @spec get_end_label_id(line_color(), nonempty_list()) :: end_label_id()
+  def get_end_label_id(:orange, end_stop_ids) do
+    label_id =
+      cond do
+        "place-forhl" in end_stop_ids -> "place-forhl"
+        "place-ogmnl" in end_stop_ids -> "place-ogmnl"
+      end
+
+    label_id
   end
 
-  defp serialize_annotated(annotated_sequence) do
-    import AnnotatedStopSequence
+  def get_end_label_id(:red, end_stop_ids) do
+    label_id =
+      cond do
+        "place-alfcl" in end_stop_ids ->
+          "place-alfcl"
+
+        "place-asmnl" in end_stop_ids and "place-brntn" in end_stop_ids ->
+          "place-asmnl+place-brntn"
+
+        "place-asmnl" in end_stop_ids ->
+          "place-asmnl"
+
+        "place-brntn" in end_stop_ids ->
+          "place-brntn"
+      end
+
+    label_id
+  end
+
+  defp min_non_closure_slots(builder) do
+    Builder.end_count(builder) +
+      Builder.current_location_count(builder) +
+      Builder.min_gap(builder)
+  end
+
+  # Number of slots used by all regions except the gap, when it doesn't get minimized
+  defp non_gap_slots(builder) do
+    Builder.end_count(builder) + Builder.closure_count(builder) +
+      Builder.current_location_count(builder)
+  end
+
+  for {closure, baseline} <- %{2 => 10, 3 => 10, 4 => 12, 5 => 12, 6 => 14, 7 => 14, 8 => 14} do
+    defp baseline_slots(unquote(closure)), do: unquote(baseline)
+  end
+
+  # TODO: Should this fn be moved to Builder?
+  defp serialize_builder(builder) do
+    import Builder
 
     base_data = %{
-      effect: annotated_sequence |> effect(),
-      line: annotated_sequence |> line(),
-      current_station_slot_index: annotated_sequence |> current_station_index(),
-      slots: annotated_sequence |> to_slots()
+      effect: builder |> effect(),
+      line: builder |> line(),
+      current_station_slot_index: builder |> current_station_index(),
+      slots: builder |> to_slots()
     }
 
     if base_data.effect == :station_closure do
       Map.put(
         base_data,
         :closed_station_slot_indices,
-        annotated_sequence |> disrupted_stop_indices()
+        disrupted_stop_indices(builder)
       )
     else
       range =
-        annotated_sequence
+        builder
         |> disrupted_stop_indices()
         |> then(&[List.first(&1), List.last(&1)])
 

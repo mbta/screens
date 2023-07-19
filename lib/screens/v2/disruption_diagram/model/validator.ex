@@ -2,7 +2,9 @@ defmodule Screens.V2.DisruptionDiagram.Model.Validator do
   @moduledoc """
   Validates LocalizedAlerts for compatibility with disruption diagrams:
   - The alert is a subway alert with an effect of shuttle, suspension, or station_closure
-  - The alert informs stops on only one subway line
+  - The alert informs stops on only one subway route
+    - For BL, OL, & RL, this is the same as the line
+    - For GL, this is one branch. If the alert only informs the trunk, we'll just choose the first branch stop sequence that contains it.
   - The alert does not inform the entire line (we only allow one end of the diagram to have a terminal stop)
   - The current ("home") station is on the line that the alert informs
   """
