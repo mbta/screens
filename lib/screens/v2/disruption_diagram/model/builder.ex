@@ -514,7 +514,11 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   @spec disrupted_stop_indices(t()) :: list(index())
   def disrupted_stop_indices(%__MODULE__{} = builder) do
     builder.sequence
-    |> Map.filter(fn {_i, stop_data} -> stop_data.disrupted? end)
+    |> Map.filter(fn
+      {_i, %OmittedSlot{}} -> false
+      {_i, %ArrowSlot{}} -> false
+      {_i, stop_data} -> stop_data.disrupted?
+    end)
     |> Map.keys()
     |> Enum.sort()
   end
