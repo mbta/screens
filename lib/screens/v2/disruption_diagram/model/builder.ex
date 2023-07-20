@@ -211,12 +211,12 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
 
     builder
     # Reverse the sequence itself...
-    |> update_in([:sequence], fn seq ->
+    |> update_in([Access.key(:sequence)], fn seq ->
       Map.new(seq, fn {i, stop_data} -> {flip_index.(i), stop_data} end)
     end)
     # ...and update the index values in `metadata` accordingly.
     |> update_in(
-      [:metadata],
+      [Access.key(:metadata)],
       &%{
         &1
         | first_disrupted_stop: flip_index.(&1.first_disrupted_stop),
@@ -396,7 +396,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
 
   defp insert_stop(builder, at_index, stop) do
     builder
-    |> update_in([:sequence], fn seq ->
+    |> update_in([Access.key(:sequence)], fn seq ->
       seq
       |> Map.new(fn
         {index, stop_data} when index < at_index -> {index, stop_data}
@@ -404,7 +404,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
       end)
       |> Map.put(at_index, stop)
     end)
-    |> update_in([:metadata], fn meta ->
+    |> update_in([Access.key(:metadata)], fn meta ->
       %{
         meta
         | first_disrupted_stop:
