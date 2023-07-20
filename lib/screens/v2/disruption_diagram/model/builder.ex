@@ -181,6 +181,8 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
         Enum.to_list((rightmost_stop_index + 1)..(builder.metadata.length - 1)//1)
       )
 
+    builder = %{builder | left_omitted: left_omitted, right_omitted: right_omitted}
+
     keys_to_remove = Map.keys(left_omitted) ++ Map.keys(right_omitted)
 
     remove_stops(builder, keys_to_remove)
