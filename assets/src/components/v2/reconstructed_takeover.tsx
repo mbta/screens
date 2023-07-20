@@ -1,7 +1,6 @@
 import React from "react";
 
 import { classWithModifiers, imagePath } from "Util/util";
-import FreeText from "./free_text";
 
 interface ReconAlertProps {
   issue: string | any; // shouldn't be "any"
@@ -10,18 +9,17 @@ interface ReconAlertProps {
   remedy: string;
   routes: any[]; // shouldn't be "any"
   effect: string;
-  urgent: boolean;
+  updated_at: string;
 }
 
 const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
-  const { cause, effect, issue, location, remedy, routes } = alert;
+  const { cause, effect, issue, location, remedy, routes, updated_at } = alert;
 
   return (
     <>
       <div
         className={classWithModifiers("alert-container", [
           "takeover",
-          "urgent",
           routes.length > 1 ? "yellow" : routes[0].color,
         ])}
       >
@@ -29,21 +27,18 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
           <div className="alert-card__body">
             <img
               className="alert-card__body__icon"
-              src={imagePath("no-service-white.svg")}
+              src={imagePath("no-service-black.svg")}
             />
-            <div className="x-large-text">
-              {issue.text ? <FreeText lines={{ text: issue.text }} /> : issue}
-            </div>
-            <div className="alert-card__body__location medium-text">
-              {location}
-            </div>
-            <div className="alert-card__body__cause medium-text">{cause}</div>
+            <div className="alert-card__body__issue">{issue}</div>
+            <div className="alert-card__body__location ">{location}</div>
           </div>
           <div className="alert-card__footer">
-            <img
-              className="alert-card__footer__t-icon"
-              src={imagePath("logo-white.svg")}
-            />
+            <div className="alert-card__footer__cause">
+              {cause && `Cause: ${cause}`}
+            </div>
+            <div className="alert-card__footer__updated-at">
+              Updated <span className="bold">{updated_at}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -51,7 +46,6 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
         className={classWithModifiers("alert-container", [
           "takeover",
           "right",
-          "urgent",
           routes.length > 1 ? "yellow" : routes[0].color,
         ])}
       >
@@ -60,24 +54,22 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
             {effect === "shuttle" ? (
               <>
                 <img
-                  className="alert-card__body__icon"
-                  src={imagePath("bus-negative-white.svg")}
+                  className="alert-card__body__shuttle-icon"
+                  src={imagePath("bus-black.svg")}
                 />
-                <div className="x-large-text">{remedy}</div>
+                <div className="alert-card__body__shuttle-remedy">{remedy}</div>
                 <div className="alert-card__body__accessibility-info">
                   <img
                     className="alert-card__body__isa-icon"
                     src={imagePath("ISA_Blue.svg")}
                   />
-                  <div className="alert-card__body__accessibility-info--text small-text">
+                  <div className="alert-card__body__accessibility-info--text">
                     All shuttle buses are accessible
                   </div>
                 </div>
               </>
             ) : (
-              <div className="alert-card__body__remedy large-text">
-                {remedy}
-              </div>
+              <div className="alert-card__body__remedy">{remedy}</div>
             )}
           </div>
           <div className="alert-card__footer">
