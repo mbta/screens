@@ -131,7 +131,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
            :unchanged <- pad_slots(builder) do
         builder
       else
-        {:done, builder} -> builder
+        {:done, builder} -> Builder.add_back_end_slots(builder)
       end
 
     serialize_builder(builder)

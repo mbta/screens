@@ -468,20 +468,6 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   @spec to_slots(t()) :: list(Model.slot())
   def to_slots(%__MODULE__{} = builder) do
     # use ArrowSlot struct
-    left_end = get_end_slot(builder.metadata.line, Map.values(builder.left_omitted))
-    right_end = get_end_slot(builder.metadata.line, Map.values(builder.right_omitted))
-
-    builder =
-      case left_end do
-        [] -> builder
-        [slot] -> insert_stop(builder, 0, slot)
-      end
-
-    builder =
-      case right_end do
-        [] -> builder
-        [slot] -> insert_stop(builder, builder.metadata.length, slot)
-      end
 
     builder.sequence
     |> Enum.sort_by(fn {index, _slot} -> index end)
@@ -686,4 +672,21 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   defp clamp(index, _metadata) when index < 0, do: 0
   defp clamp(index, metadata) when index >= metadata.length, do: metadata.length - 1
   defp clamp(index, _metadata), do: index
+
+  def add_back_end_slots(builder) do
+    left_end = get_end_slot(builder.metadata.line, Map.values(builder.left_omitted))
+    right_end = get_end_slot(builder.metadata.line, Map.values(builder.right_omitted))
+
+    builder =
+      case left_end do
+        [] -> builder
+        [slot] -> insert_stop(builder, 0, slot)
+      end
+
+    builder =
+      case right_end do
+        [] -> builder
+        [slot] -> insert_stop(builder, builder.metadata.length, slot)
+      end
+  end
 end
