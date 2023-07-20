@@ -78,25 +78,26 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   @doc "Creates a new Builder from a localized alert."
   @spec new(LocalizedAlert.t()) :: t()
   def new(localized_alert) do
+    home_stop_id = localized_alert.location_context.home_stop
+
     informed_stop_ids =
       for %{stop: "place-" <> _ = stop_id} <- localized_alert.alert.informed_entities do
         stop_id
       end
       |> MapSet.new()
 
-    home_stop_id = localized_alert.location_context.home_stop
-
     # TODO: Probably needs adjusting for GL. One disruption can inform multiple routes.
-    # Need to select the route that completely contains all informed stops, rather than just the first one.
+    # Need to select the route that completely contains all informed stops, rather than just the first one we find.
     # -> Change localized_alert.location_context.stop_sequences to a map keyed on route ID??
-    stop_id_to_name =
+    informed_route_id =
       localized_alert.alert.informed_entities
       |> Enum.find_value(fn
         %{route: "Green" <> _ = route_id} -> route_id
         %{route: route_id} when route_id in ["Blue", "Orange", "Red"] -> route_id
         _ -> false
       end)
-      |> Stop.stop_id_to_name()
+
+    stop_id_to_name = Stop.stop_id_to_name(informed_route_id)
 
     stop_sequence =
       localized_alert.location_context.stop_sequences
@@ -110,7 +111,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     init_builder = %{
       sequence: %{},
       metadata: %{
-        line: get_line(localized_alert),
+        line: Route.get_color_for_route(informed_route_id),
         length: stop_sequence_length,
         effect: localized_alert.alert.effect
       },
@@ -672,13 +673,6 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
 
   def current_station_index(%__MODULE__{} = builder),
     do: builder.metadata.home_stop
-
-  defp get_line(localized_alert) do
-    localized_alert.alert.informed_entities
-    |> hd()
-    |> Map.get(:route)
-    |> Route.get_color_for_route()
-  end
 
   # Adjusts an index to be within the bounds of the stop sequence.
   defp clamp(index, _metadata) when index < 0, do: 0
