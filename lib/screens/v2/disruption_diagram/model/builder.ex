@@ -92,7 +92,8 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     stop_id_to_name =
       localized_alert.alert.informed_entities
       |> Enum.find_value(fn
-        %{route: route_id} when is_binary(route_id) -> route_id
+        %{route: "Green" <> _ = route_id} -> route_id
+        %{route: route_id} when route_id in ["Blue", "Orange", "Red"] -> route_id
         _ -> false
       end)
       |> Stop.stop_id_to_name()
