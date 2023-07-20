@@ -408,10 +408,16 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
       %{
         meta
         | first_disrupted_stop:
-            if(meta.first_disrupted_stop >= at_index, do: meta.first_disrupted_stop + 1),
+            if(meta.first_disrupted_stop >= at_index,
+              do: meta.first_disrupted_stop + 1,
+              else: meta.first_disrupted_stop
+            ),
           last_disrupted_stop:
-            if(meta.last_disrupted_stop >= at_index, do: meta.last_disrupted_stop + 1),
-          home_stop: if(meta.home_stop >= at_index, do: meta.home_stop + 1),
+            if(meta.last_disrupted_stop >= at_index,
+              do: meta.last_disrupted_stop + 1,
+              else: meta.last_disrupted_stop
+            ),
+          home_stop: if(meta.home_stop >= at_index, do: meta.home_stop + 1, else: meta.home_stop),
           length: meta.length + 1
       }
     end)
