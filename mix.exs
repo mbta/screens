@@ -78,7 +78,7 @@ defmodule Screens.MixProject do
       {:retry, "~> 0.16.0"},
       {:stream_data, "~> 0.5", only: :test},
       {:memcachex, "~> 0.5.5"},
-      {:arrays, "~> 2.0"}
+      {:aja, "~> 0.6.2"}
     ]
   end
 end
