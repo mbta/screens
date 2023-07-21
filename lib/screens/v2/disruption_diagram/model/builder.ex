@@ -427,8 +427,12 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   def disrupted_stop_indices(%__MODULE__{} = builder) do
     builder.sequence
     |> Vector.with_index()
-    |> Vector.filter(fn {stop_data, _i} -> stop_data.disrupted? end)
-    |> Aja.Enum.map(fn {_stop_data, i} -> i end)
+    |> Vector.filter(fn
+      {%StopSlot{} = stop_data, _i} -> stop_data.disrupted?
+      {_stop_data, _i} -> false
+    end)
+    |> Vector.map(&elem(&1, 1))
+    |> Enum.sort()
   end
 
   @doc """
