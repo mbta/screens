@@ -271,13 +271,9 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     do_omit(builder, closure_indices(builder), target_closure_slots, label_callback)
   end
 
-  def omit_stops(%__MODULE__{} = builder, :gap, target_gap_stops, label_callback)
-      when target_gap_stops <= 5 do
+  def omit_stops(%__MODULE__{} = builder, :gap, target_gap_stops, label_callback) do
     do_omit(builder, gap_indices(builder), target_gap_stops, label_callback)
   end
-
-  # More than 5 target_gap_slots means we don't need to omit? This works but not sure why yet.
-  def omit_stops(%__MODULE__{} = builder, :gap, _target_gap_stops, _label_callback), do: builder
 
   # TODO what even do we name this function
   defp do_omit(builder, current_region_indices, target_slots, label_callback) do
