@@ -419,12 +419,12 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   For shuttles and suspensions, this is the stops that don't have any train service
   *as well as* the stops at the boundary of the disruption that don't have train service in one direction.
   """
-  @spec disrupted_stop_indices(t()) :: list(index())
+  @spec disrupted_stop_indices(t()) :: list(Vector.index())
   def disrupted_stop_indices(%__MODULE__{} = builder) do
     builder.sequence
-    |> Map.filter(fn {_i, stop_data} -> stop_data.disrupted? end)
-    |> Map.keys()
-    |> Enum.sort()
+    |> Vector.with_index()
+    |> Vector.filter(fn {stop_data, _i} -> stop_data.disrupted? end)
+    |> Aja.Enum.map(fn {_stop_data, i} -> i end)
   end
 
   @doc """
@@ -452,12 +452,12 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   # The closure has highest priority, so no other overlapping region can take stops from it.
   defp closure_indices(builder), do: closure_ideal_indices(builder)
 
-  defp closure_ideal_indices(%{metadata: %{effect: :station_closure} = metadata}) do
+  defp closure_ideal_indices(%{metadata: %{effect: :station_closure}} = builder) do
     # first = One stop before the first bypassed stop, if it exists. Otherwise, the first bypassed stop.
-    first = clamp(metadata.first_disrupted_stop - 1, metadata)
+    first = clamp(builder.metadata.first_disrupted_stop - 1, vec_size(builder.sequence))
 
     # last = One stop past the last bypassed stop, if it exists. Otherwise, the last bypassed stop.
-    last = clamp(metadata.last_disrupted_stop + 1, metadata)
+    last = clamp(builder.metadata.last_disrupted_stop + 1, vec_size(builder.sequence))
 
     first..last//1
   end
@@ -504,32 +504,6 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   end
 
   @doc """
-  Returns the number of stops comprising the ends of the diagram.
-
-  This is normally 2, unless the closure region overlaps with one end.
-  """
-  @spec end_count(t()) :: non_neg_integer()
-  def end_count(%__MODULE__{} = builder) do
-    # TODO: Determine without using indices
-    builder
-    |> end_indices()
-    |> Enum.count()
-  end
-
-  # Parts of the end region can be subsumed by the closure region.
-  # defp end_indices(builder) do
-  #   end_region = MapSet.new(end_ideal_indices(builder))
-
-  #   closure_region = MapSet.new(closure_ideal_indices(builder))
-
-  #   MapSet.difference(end_region, closure_region)
-  # end
-
-  # defp end_ideal_indices(builder) do
-  #   [0, builder.metadata.length - 1]
-  # end
-
-  @doc """
   Returns the number of stops comprising the "current location" region
   of the diagram.
 
@@ -537,7 +511,14 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   on the far side of the closure. Its adjacent stop on the near side is
   part of the gap.
 
-  The number is lower when another region overlaps with this region.
+  The number is lower when the closure region overlaps with this region,
+  or when the home stop is a terminal.
+
+  If the home stop is inside the closure: 0
+  If the home stop is on the boundary of the closure and not at a terminal: 1
+  If the home stop is on the boundary of the closure and at a terminal: 0
+  If the home stop is outside the closure and not at a terminal: 2
+  If the home stop is outside the closure and at a terminal: 1
   """
   @spec current_location_count(t()) :: non_neg_integer()
   def current_location_count(%__MODULE__{} = builder) do
@@ -551,28 +532,58 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     end)
   end
 
-  # The current location region has lowest priority, can be subsumed by any other region.
+  # The current location region can be subsumed by the closure and the gap regions.
   defp current_location_indices(builder) do
     current_location_region = MapSet.new(current_location_ideal_indices(builder))
 
     gap_region = MapSet.new(gap_ideal_indices(builder))
     closure_region = MapSet.new(closure_ideal_indices(builder))
-    # end_region = MapSet.new(end_ideal_indices(builder))
 
-    indices =
-      MapSet.difference(
-        current_location_region,
-        MapSet.union(gap_region, closure_region)
-      )
-
-    # TODO: Need to figure out if the end overlaps with this without using indices
-    if(builder.sequence[builder.metadata.home_stop].terminal?)
+    MapSet.difference(
+      current_location_region,
+      MapSet.union(gap_region, closure_region)
+    )
+    |> Enum.min_max(fn -> .. end)
+    |> case do
+      {left, right} -> left..right//1
+      empty_range -> empty_range
+    end
   end
 
-  defp current_location_ideal_indices(%{metadata: metadata}) do
-    home_stop = metadata.home_stop
+  defp current_location_ideal_indices(builder) do
+    home_stop = builder.metadata.home_stop
 
-    clamp(home_stop - 1, metadata)..clamp(home_stop + 1, metadata)//1
+    size = vec_size(builder.sequence)
+
+    clamp(home_stop - 1, size)..clamp(home_stop + 1, size)//1
+  end
+
+  @doc """
+  Returns the number of stops comprising the ends of the diagram.
+
+  This is normally 2, unless another region contains either terminal stop of the line.
+  """
+  @spec end_count(t()) :: non_neg_integer()
+  def end_count(%__MODULE__{} = builder) do
+    # TODO: Determine without using indices
+    builder
+    |> end_indices()
+    |> Enum.count()
+  end
+
+  # The end region has lowest precedence. Its two stops can be subsumed by any other region.
+  defp end_indices(builder) do
+    end_region = MapSet.new(end_ideal_indices(builder))
+
+    c = MapSet.new(closure_ideal_indices(builder))
+    g = MapSet.new(gap_ideal_indices(builder))
+    cl = MapSet.new(current_location_ideal_indices(builder))
+
+    MapSet.difference(end_region, Enum.reduce([c, g, cl], &MapSet.union/2))
+  end
+
+  defp end_ideal_indices(builder) do
+    [0, vec_size(builder.sequence) - 1]
   end
 
   @spec effect(t()) :: :shuttle | :suspension | :station_closure
@@ -585,7 +596,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     do: builder.metadata.home_stop
 
   # Adjusts an index to be within the bounds of the stop sequence.
-  defp clamp(index, _metadata) when index < 0, do: 0
-  defp clamp(index, metadata) when index >= metadata.length, do: metadata.length - 1
-  defp clamp(index, _metadata), do: index
+  defp clamp(index, _sequence_size) when index < 0, do: 0
+  defp clamp(index, sequence_size) when index >= sequence_size, do: sequence_size - 1
+  defp clamp(index, _sequence_size), do: index
 end
