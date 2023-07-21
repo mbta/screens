@@ -174,17 +174,20 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   end
 
   defp split_left_end(builder, amount) do
-    {sequence, left_end} = Vector.split(builder.sequence, amount)
+    {left_end, sequence} = Vector.split(builder.sequence, amount)
 
     %{builder | sequence: sequence, left_end: left_end}
-    |> recalculate_metadata()
   end
 
   defp split_right_end(builder, amount) do
-    {sequence, right_end} = Vector.split(builder.sequence, -amount)
+    if amount == 0 do
+      %{builder | right_end: Vector.new()}
+    else
+      {sequence, right_end} = Vector.split(builder.sequence, -amount)
 
-    # (We don't need to recalculate metadata since we only removed from the end.)
-    %{builder | sequence: sequence, right_end: right_end}
+      # (We don't need to recalculate metadata since we only removed from the end.)
+      %{builder | sequence: sequence, right_end: right_end}
+    end
   end
 
   # Must be called after any operation that causes element indices to change in builder.sequence.
