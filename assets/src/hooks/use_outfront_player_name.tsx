@@ -15,7 +15,7 @@ const useOutfrontPlayerName = () => {
         console.log("   result of JSON.parse: ", info)
         setPlayerName(info.deviceName)
       } catch (err) {
-        console.log("   Within the catch. Setting deviceName to `noMraid`")
+        console.log("Error: ", err)
         setPlayerName("noMraid");
       }
     }
