@@ -386,10 +386,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   @doc "Serializes the builder to a list of Model.slot()'s."
   @spec to_slots(t()) :: list(Model.slot())
   def to_slots(%__MODULE__{} = builder) do
-    left_end = get_end_slot(builder.metadata.line, builder.left_end)
-    right_end = get_end_slot(builder.metadata.line, builder.right_end)
-
-    Aja.Enum.map(left_end +++ builder.sequence +++ right_end, fn
+    Aja.Enum.map(builder.sequence, fn
       %ArrowSlot{} = arrow -> %{type: :arrow, label_id: arrow.label_id}
       %StopSlot{} = stop when stop.terminal? -> %{type: :terminal, label_id: stop.id}
       %StopSlot{} = stop -> %{label: stop.label, show_symbol: true}
