@@ -162,6 +162,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     builder
     |> split_right_end(right_slice_amount)
     |> split_left_end(left_slice_amount)
+    |> recalculate_metadata()
 
     # Re-adding to the main sequence for serialization:
     # - if map size is 0, return []
