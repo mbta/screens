@@ -131,10 +131,12 @@ defmodule Screens.V2.DisruptionDiagram.Model do
            :unchanged <- pad_slots(builder) do
         builder
       else
-        {:done, builder} -> Builder.add_back_end_slots(builder)
+        {:done, builder} -> builder
       end
 
-    serialize_builder(builder)
+    builder
+    |> Builder.add_back_end_slots()
+    |> serialize_builder()
   end
 
   # TODO: What if home stop is in the stops to omit?
