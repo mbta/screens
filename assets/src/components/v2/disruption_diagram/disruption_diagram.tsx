@@ -587,24 +587,28 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
 
   return (
     <>
-      <path
-        d={`M${x1 - L} 4L${x1 - L} 28`}
-        stroke="#737373"
-        strokeWidth="8"
-        strokeLinecap="round"
-      />
-      <path
-        d={`M${x1 - L} 16H${x1 + x2 - L}`}
-        stroke="#737373"
-        strokeWidth="8"
-        strokeLinecap="round"
-      />
-      <path
-        d={`M${x1 + x2 - L} 4L${x1 + x2 - L} 28`}
-        stroke="#737373"
-        strokeWidth="8"
-        strokeLinecap="round"
-      />
+      {effectRegionSlotIndexRange[1] - effectRegionSlotIndexRange[0] > 2 && (
+        <>
+          <path
+            d={`M${x1 - L} 4L${x1 - L} 28`}
+            stroke="#737373"
+            strokeWidth="8"
+            strokeLinecap="round"
+          />
+          <path
+            d={`M${x1 - L} 16H${x1 + x2 - L}`}
+            stroke="#737373"
+            strokeWidth="8"
+            strokeLinecap="round"
+          />
+          <path
+            d={`M${x1 + x2 - L} 4L${x1 + x2 - L} 28`}
+            stroke="#737373"
+            strokeWidth="8"
+            strokeLinecap="round"
+          />
+        </>
+      )}
       {icon}
     </>
   );
