@@ -607,25 +607,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   """
   @spec end_count(t()) :: non_neg_integer()
   def end_count(%__MODULE__{} = builder) do
-    # TODO: Determine without using indices
-    builder
-    |> end_indices()
-    |> Enum.count()
-  end
-
-  # The end region has lowest precedence. Its two stops can be subsumed by any other region.
-  defp end_indices(builder) do
-    end_region = MapSet.new(end_ideal_indices(builder))
-
-    c = MapSet.new(closure_ideal_indices(builder))
-    g = MapSet.new(gap_ideal_indices(builder))
-    cl = MapSet.new(current_location_ideal_indices(builder))
-
-    MapSet.difference(end_region, Enum.reduce([c, g, cl], &MapSet.union/2))
-  end
-
-  defp end_ideal_indices(builder) do
-    [0, vec_size(builder.sequence) - 1]
+    min(1, vec_size(builder.left_end)) + min(1, vec_size(builder.right_end))
   end
 
   @spec effect(t()) :: :shuttle | :suspension | :station_closure
