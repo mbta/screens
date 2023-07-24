@@ -269,7 +269,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   defp do_omit(builder, current_region_indices, target_slots, label_callback) do
     region_length = Enum.count(current_region_indices)
 
-    if target_slots < region_length do
+    if target_slots >= region_length do
       raise "Nothing to omit, function should not have been called"
     end
 
