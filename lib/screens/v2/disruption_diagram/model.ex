@@ -139,15 +139,17 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   # TODO: What if home stop is in the stops to omit?
   defp fit_closure_region(builder) do
-    if Builder.closure_count(builder) > 8 do
+    current_closure_count = Builder.closure_count(builder)
+
+    with true <- current_closure_count > 8,
+         target_closure_slots = 12 - min_non_closure_slots(builder),
+         {:lt, true} <- {:lt, target_closure_slots < current_closure_count} do
       # The number of closure slots we want left after the omission.
       # This includes one slot for the omitted stations, labeled with "...via $STOPS"
       # TODO: Why 12? Does this need to change if home stop is inside the closure?
-      target_closure_slots = 12 - min_non_closure_slots(builder)
-
       builder =
-        Builder.omit_stops(
-          builder,
+        builder
+        |> Builder.omit_stops(
           :closure,
           target_closure_slots,
           &get_omission_label(Builder.line(builder), &1, false)
@@ -156,28 +158,46 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
       {:done, builder}
     else
-      :unchanged
+      {:lt, false} ->
+        target_closure_slots = 12 - min_non_closure_slots(builder)
+
+        IO.puts(
+          "fit_closure_region: target_count (#{target_closure_slots}) >= current_count (#{current_closure_count}), doing nothing"
+        )
+
+      _ ->
+        :unchanged
     end
   end
 
   defp minimize_gap(builder) do
+    current_gap_count = Builder.gap_count(builder)
     target_gap_slots = Builder.min_gap(builder)
 
-    Builder.omit_stops(
-      builder,
-      :gap,
-      target_gap_slots,
-      &get_omission_label(Builder.line(builder), &1, false)
-    )
+    if target_gap_slots < current_gap_count do
+      Builder.omit_stops(
+        builder,
+        :gap,
+        target_gap_slots,
+        &get_omission_label(Builder.line(builder), &1, false)
+      )
+    else
+      IO.puts(
+        "minimize_gap: target_count (#{target_gap_slots}) >= current_count (#{current_gap_count}), doing nothing"
+      )
+
+      builder
+    end
   end
 
   defp fit_gap_region(builder) do
-    if Builder.gap_count(builder) >= 3 do
-      taken_slots = non_gap_slots(builder)
-      baseline = baseline_slots(Builder.closure_count(builder))
+    current_gap_count = Builder.gap_count(builder)
 
-      target_gap_slots = baseline - taken_slots
-
+    with true <- current_gap_count >= 3,
+         taken_slots = non_gap_slots(builder),
+         baseline = baseline_slots(Builder.closure_count(builder)),
+         target_gap_slots = baseline - taken_slots,
+         {:lt, true} <- {:lt, target_gap_slots < current_gap_count} do
       builder =
         Builder.omit_stops(
           builder,
@@ -188,7 +208,17 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
       {:done, builder}
     else
-      :unchanged
+      {:lt, false} ->
+        taken_slots = non_gap_slots(builder)
+        baseline = baseline_slots(Builder.closure_count(builder))
+        target_gap_slots = baseline - taken_slots
+
+        IO.puts(
+          "fit_gap_region: target_count (#{target_gap_slots}) >= current_count (#{current_gap_count}), doing nothing"
+        )
+
+      _ ->
+        :unchanged
     end
   end
 
