@@ -116,7 +116,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     # to have Bowdoin appear first on the diagram.
     builder
     |> Builder.reverse_stops()
-    |> serialize_builder()
+    |> Builder.serialize()
   end
 
   # There's some special logic for the Green Line.
@@ -134,7 +134,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
         {:done, builder} -> builder
       end
 
-    serialize_builder(builder)
+    Builder.serialize(builder)
   end
 
   # TODO: What if home stop is in the stops to omit?
@@ -318,33 +318,6 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   for {closure, baseline} <- %{2 => 10, 3 => 10, 4 => 12, 5 => 12, 6 => 14, 7 => 14, 8 => 14} do
     defp baseline_slots(unquote(closure)), do: unquote(baseline)
-  end
-
-  # TODO: Should this fn be moved to Builder?
-  defp serialize_builder(builder) do
-    import Builder
-
-    base_data = %{
-      effect: builder |> effect(),
-      line: builder |> line(),
-      current_station_slot_index: builder |> current_station_index(),
-      slots: builder |> to_slots()
-    }
-
-    if base_data.effect == :station_closure do
-      Map.put(
-        base_data,
-        :closed_station_slot_indices,
-        disrupted_stop_indices(builder)
-      )
-    else
-      range =
-        builder
-        |> disrupted_stop_indices()
-        |> then(&[List.first(&1), List.last(&1)])
-
-      Map.put(base_data, :effect_region_slot_index_range, range)
-    end
   end
 end
 

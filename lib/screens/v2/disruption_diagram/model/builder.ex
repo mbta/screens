@@ -383,12 +383,36 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     |> do_add_slots(num_to_add - 1, :left_end)
   end
 
-  @doc "Serializes the builder to a list of Model.slot()'s."
-  @spec to_slots(t()) :: list(Model.slot())
-  def to_slots(%__MODULE__{} = builder) do
-    final_sequence = add_back_end_slots(builder)
+  @doc "Serializes the builder to a Model.serialized_response()"
+  @spec serialize(t()) :: Model.serialized_response()
+  def serialize(builder) do
+    builder = add_back_end_slots(builder)
 
-    Aja.Enum.map(final_sequence, fn
+    base_data = %{
+      effect: builder |> effect(),
+      line: builder |> line(),
+      current_station_slot_index: builder |> current_station_index(),
+      slots: builder |> to_slots()
+    }
+
+    if base_data.effect == :station_closure do
+      Map.put(
+        base_data,
+        :closed_station_slot_indices,
+        disrupted_stop_indices(builder)
+      )
+    else
+      range =
+        builder
+        |> disrupted_stop_indices()
+        |> Enum.min_max()
+
+      Map.put(base_data, :effect_region_slot_index_range, range)
+    end
+  end
+
+  defp to_slots(%__MODULE__{} = builder) do
+    Aja.Enum.map(builder.sequence, fn
       %ArrowSlot{} = arrow -> %{type: :arrow, label_id: arrow.label_id}
       %StopSlot{} = stop when stop.terminal? -> %{type: :terminal, label_id: stop.id}
       %StopSlot{} = stop -> %{label: stop.label, show_symbol: true}
@@ -400,13 +424,12 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   # - a terminal stop slot if the end contains 1 stop,
   # - a destination-arrow slot if the end contains multiple stops, or
   # - nothing if the end contains no stops.
-  #
-  # Returns a Vector, not a Builder.
   defp add_back_end_slots(builder) do
     left_end = get_end_slot(builder.metadata.line, builder.left_end)
     right_end = get_end_slot(builder.metadata.line, builder.right_end)
 
-    left_end +++ builder.sequence +++ right_end
+    %{builder | sequence: left_end +++ builder.sequence +++ right_end}
+    |> recalculate_metadata()
   end
 
   defp get_end_slot(_line, vec([])), do: Vector.new()
@@ -432,14 +455,11 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     vec_size(builder.sequence) + left_end_slot_count + right_end_slot_count
   end
 
-  @doc """
-  Returns a sorted list of indices of the stops that are in the alert's informed entities.
-  For station closures, this is the stops that are bypassed.
-  For shuttles and suspensions, this is the stops that don't have any train service
-  *as well as* the stops at the boundary of the disruption that don't have train service in one direction.
-  """
-  @spec disrupted_stop_indices(t()) :: list(Vector.index())
-  def disrupted_stop_indices(%__MODULE__{} = builder) do
+  # Returns a sorted list of indices of the stops that are in the alert's informed entities.
+  # For station closures, this is the stops that are bypassed.
+  # For shuttles and suspensions, this is the stops that don't have any train service
+  # *as well as* the stops at the boundary of the disruption that don't have train service in one direction.
+  defp disrupted_stop_indices(%__MODULE__{} = builder) do
     builder.sequence
     |> Vector.with_index()
     |> Vector.filter(fn
