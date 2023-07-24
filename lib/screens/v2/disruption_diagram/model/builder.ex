@@ -444,7 +444,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     |> Vector.with_index()
     |> Vector.filter(fn
       {%StopSlot{} = stop_data, _i} -> stop_data.disrupted?
-      _ -> false
+      {_other_slot_type, _i} -> false
     end)
     |> Aja.Enum.map(fn {_stop_data, i} -> i end)
   end
