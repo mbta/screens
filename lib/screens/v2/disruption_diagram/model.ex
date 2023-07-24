@@ -165,6 +165,8 @@ defmodule Screens.V2.DisruptionDiagram.Model do
           "fit_closure_region: target_count (#{target_closure_slots}) >= current_count (#{current_closure_count}), doing nothing"
         )
 
+        :unchanged
+
       _ ->
         :unchanged
     end
@@ -216,6 +218,8 @@ defmodule Screens.V2.DisruptionDiagram.Model do
         IO.puts(
           "fit_gap_region: target_count (#{target_gap_slots}) >= current_count (#{current_gap_count}), doing nothing"
         )
+
+        :unchanged
 
       _ ->
         :unchanged
@@ -334,3 +338,13 @@ end
 #         - Green Line: Gov Ctr
 #         - Green Line when the diagram ends at Gov Ctr:
 #           - Kenmore & Copley (whichever are omitted)
+
+# TODO: What if there is a station closure with 3 stops very far apart.
+#       How to avoid omitting the bypassed station in the middle while shrinking closure region
+#       Maybe avoid omitting any stops with disrupted?: true
+#
+#       Complicating factor: The removed stop in the middle could also be the home stop, which
+#       breaks stuff
+
+# TODO: How to handle cases where home stop is at or very close to a branch point--
+# end labels become difficult and potentially need to cut off one end of closure region for station closures

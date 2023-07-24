@@ -9,6 +9,9 @@ defmodule Screens.V2.DisruptionDiagram.Model.Validator do
   - The current ("home") station is on the line that the alert informs
   """
 
+  # TODO: this should reject alerts on Braintree branch when the home screen
+  # is at Ashmont, and similar scenarios
+
   alias Screens.V2.LocalizedAlert
 
   require Logger
