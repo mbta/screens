@@ -162,27 +162,23 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     builder
     |> split_right_end(right_slice_amount)
     |> split_left_end(left_slice_amount)
-
-    # Re-adding to the main sequence for serialization:
-    # - if map size is 0, return []
-    # - if map size is 1, return [%StopSlot{}]. Main serialize function will transform it to a terminal end_slot map
-    # - if map size > 1, determine label using ✨magic✨ and return [%DestinationSlot{}]
-    # serialized result gets ++'ed onto main list.
-    # - *** MUST INCREMENT ARRAY INDICES IF LEFT SIDE ISN'T EMPTY! ***
-    #   - Is there a way to avoid this or do things more elegantly?
-  end
-
-  defp split_left_end(builder, amount) do
-    {sequence, left_end} = Vector.split(builder.sequence, amount)
-
-    %{builder | sequence: sequence, left_end: left_end}
     |> recalculate_metadata()
   end
+
+  defp split_left_end(builder, 0), do: %{builder | left_end: Vector.new()}
+
+  defp split_left_end(builder, amount) do
+    {left_end, sequence} = Vector.split(builder.sequence, amount)
+
+    # (We expect recalculate_metadata to be invoked in the calling function, so don't do it here.)
+    %{builder | sequence: sequence, left_end: left_end}
+  end
+
+  defp split_right_end(builder, 0), do: %{builder | right_end: Vector.new()}
 
   defp split_right_end(builder, amount) do
     {sequence, right_end} = Vector.split(builder.sequence, -amount)
 
-    # (We don't need to recalculate metadata since we only removed from the end.)
     %{builder | sequence: sequence, right_end: right_end}
   end
 
@@ -337,7 +333,9 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
 
     pull_from = if home_stop_is_right_of_center, do: :right_end, else: :left_end
 
-    do_add_slots(builder, num_to_add, pull_from)
+    builder
+    |> do_add_slots(num_to_add, pull_from)
+    |> recalculate_metadata()
   end
 
   defp do_add_slots(builder, 0, _), do: builder
