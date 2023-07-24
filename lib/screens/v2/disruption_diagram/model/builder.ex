@@ -177,13 +177,9 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   defp split_right_end(builder, 0), do: %{builder | right_end: Vector.new()}
 
   defp split_right_end(builder, amount) do
-    if amount == 0 do
-      %{builder | right_end: Vector.new()}
-    else
-      {sequence, right_end} = Vector.split(builder.sequence, -amount)
+    {sequence, right_end} = Vector.split(builder.sequence, -amount)
 
-      %{builder | sequence: sequence, right_end: right_end}
-    end
+    %{builder | sequence: sequence, right_end: right_end}
   end
 
   # Must be called after any operation that causes element indices to change in builder.sequence.
@@ -262,8 +258,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
         :closure,
         target_closure_slots,
         label_callback
-      )
-      when target_closure_slots >= 3 do
+      ) do
     do_omit(builder, closure_indices(builder), target_closure_slots, label_callback)
   end
 
@@ -271,9 +266,12 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     do_omit(builder, gap_indices(builder), target_gap_stops, label_callback)
   end
 
-  # TODO what even do we name this function
   defp do_omit(builder, current_region_indices, target_slots, label_callback) do
     region_length = Enum.count(current_region_indices)
+
+    if target_slots < region_length do
+      raise "Nothing to omit, function should not have been called"
+    end
 
     # We need to omit 1 more stop than the difference, to account for the omission itself, which still takes up one slot:
     #
@@ -282,7 +280,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     #
     # 5 - 3 + 1 = 3 stops to omit (not 2!)
     #
-    # after omission: X - - _ - - X :: length 3
+    # after omission: X - - ... - - X :: length 3
     num_to_omit = region_length - target_slots + 1
 
     num_to_keep = region_length - num_to_omit
@@ -330,6 +328,14 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     end
   end
 
+  @doc """
+  Moves `num_to_add` stops back from the left/right end groups to the main sequence,
+  effectively "padding" the diagram with more stops that otherwise would have been
+  omitted inside one of the destination-arrow slots.
+  Stops are added from the end closest to the home stop, unless it's empty.
+  In that case, they are added from the opposite end.
+  """
+  @spec add_slots(t(), pos_integer()) :: t()
   def add_slots(%__MODULE__{} = builder, num_to_add) do
     closure_region_indices = closure_indices(builder)
     region_length = Enum.count(closure_region_indices)
@@ -384,12 +390,27 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   @doc "Serializes the builder to a list of Model.slot()'s."
   @spec to_slots(t()) :: list(Model.slot())
   def to_slots(%__MODULE__{} = builder) do
-    Aja.Enum.map(builder.sequence, fn
+    final_sequence = add_back_end_slots(builder)
+
+    Aja.Enum.map(final_sequence, fn
       %ArrowSlot{} = arrow -> %{type: :arrow, label_id: arrow.label_id}
       %StopSlot{} = stop when stop.terminal? -> %{type: :terminal, label_id: stop.id}
       %StopSlot{} = stop -> %{label: stop.label, show_symbol: true}
       %OmittedSlot{} = omitted -> %{label: omitted.label, show_symbol: false}
     end)
+  end
+
+  # Re-adds each of left_end and right_end to the main sequence as either:
+  # - a terminal stop slot if the end contains 1 stop,
+  # - a destination-arrow slot if the end contains multiple stops, or
+  # - nothing if the end contains no stops.
+  #
+  # Returns a Vector, not a Builder.
+  defp add_back_end_slots(builder) do
+    left_end = get_end_slot(builder.metadata.line, builder.left_end)
+    right_end = get_end_slot(builder.metadata.line, builder.right_end)
+
+    left_end +++ builder.sequence +++ right_end
   end
 
   defp get_end_slot(_line, vec([])), do: Vector.new()
@@ -427,10 +448,9 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     |> Vector.with_index()
     |> Vector.filter(fn
       {%StopSlot{} = stop_data, _i} -> stop_data.disrupted?
-      {_stop_data, _i} -> false
+      {_other_slot_type, _i} -> false
     end)
-    |> Vector.map(&elem(&1, 1))
-    |> Enum.sort()
+    |> Aja.Enum.map(fn {_stop_data, i} -> i end)
   end
 
   @doc """
