@@ -2,7 +2,7 @@ import React from "react";
 
 import { classWithModifiers, imagePath } from "Util/util";
 import DisruptionDiagram, {
-  DiscreteDisruptionDiagram,
+  DisruptionDiagramData,
 } from "./disruption_diagram/disruption_diagram";
 
 interface ReconAlertProps {
@@ -13,61 +13,20 @@ interface ReconAlertProps {
   routes: any[]; // shouldn't be "any"
   effect: string;
   updated_at: string;
+  disruption_diagram?: DisruptionDiagramData;
 }
 
 const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
-  const { cause, effect, issue, location, remedy, routes, updated_at } = alert;
-
-  const props: DiscreteDisruptionDiagram = {
-    effect: "station_closure",
-    line: "blue",
-    current_station_slot_index: 4,
-    closed_station_slot_indices: [4],
-    slots: [
-      { type: "terminal", label_id: "place-bomnl" },
-      {
-        label: { full: "Government Center", abbrev: "St. Paul St" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "State", abbrev: "Kent St" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Aquarium", abbrev: "Hawes St" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Maverick", abbrev: "St. Mary's" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Airport", abbrev: "Kenmore" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Wood Island", abbrev: "Hynes" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Orient Heights", abbrev: "Copley" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Suffolk Downs", abbrev: "Arlington" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Beachmont", abbrev: "Boylston" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Revere Beach", abbrev: "Park St" },
-        show_symbol: true,
-      },
-      { type: "terminal", label_id: "place-wondl" },
-    ],
-  };
+  const {
+    cause,
+    effect,
+    issue,
+    location,
+    remedy,
+    routes,
+    updated_at,
+    disruption_diagram,
+  } = alert;
 
   return (
     <>
@@ -85,9 +44,11 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
             />
             <div className="alert-card__body__issue">{issue}</div>
             <div className="alert-card__body__location ">{location}</div>
-            <div style={{ height: 408, width: 904 }}>
-              <DisruptionDiagram {...props} />
-            </div>
+            {disruption_diagram && (
+              <div style={{ height: 408, width: 904 }}>
+                <DisruptionDiagram {...disruption_diagram} />
+              </div>
+            )}
           </div>
           <div className="alert-card__footer">
             <div className="alert-card__footer__cause">

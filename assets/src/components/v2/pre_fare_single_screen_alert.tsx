@@ -2,8 +2,7 @@ import useTextResizer from "Hooks/v2/use_text_resizer";
 import React from "react";
 import { getHexColor, STRING_TO_SVG } from "Util/svg_utils";
 import DisruptionDiagram, {
-  ContinuousDisruptionDiagram,
-  DiscreteDisruptionDiagram,
+  DisruptionDiagramData,
 } from "./disruption_diagram/disruption_diagram";
 import { classWithModifier, classWithModifiers, formatCause } from "Util/util";
 
@@ -25,6 +24,7 @@ interface PreFareSingleScreenAlertProps {
   effect: string;
   region: string;
   updated_at: string;
+  disruption_diagram?: DisruptionDiagramData;
 }
 
 // For the standard layout, issue font can be medium or large.
@@ -34,7 +34,8 @@ const standardLayout = (
   issue: string,
   remedy: string,
   effect: string,
-  location: string | null
+  location: string | null,
+  disruptionDiagram: DisruptionDiagramData
 ) => {
   const { ref: contentBlockRef, size: contentTextSize } = useTextResizer({
     sizes: ["medium", "large"],
@@ -46,7 +47,7 @@ const standardLayout = (
     <div className="alert-card__content-block" ref={contentBlockRef}>
       {standardIssueSection(issue, location, contentTextSize)}
       {remedySection(effect, remedy, contentTextSize)}
-      {mapSection()}
+      {mapSection(disruptionDiagram)}
     </div>
   );
 };
@@ -55,10 +56,11 @@ const standardLayout = (
 const downstreamLayout = (
   endpoints: string[],
   effect: string,
-  remedy: string
+  remedy: string,
+  disruptionDiagram: DisruptionDiagramData
 ) => (
   <div className={classWithModifier("alert-card__content-block", "downstream")}>
-    {mapSection()}
+    {mapSection(disruptionDiagram)}
     {downstreamIssueSection(endpoints)}
     {remedySection(effect, remedy, "medium")}
   </div>
@@ -67,7 +69,11 @@ const downstreamLayout = (
 // Covers the case where a station_closure only affects one line at a transfer station.
 // In the even rarer case that there are multiple branches in the routes list or unaffected routes list
 // the font size may need to shrink to accommodate.
-const multiLineLayout = (routes: string[], unaffected_routes: string[]) => {
+const multiLineLayout = (
+  routes: string[],
+  unaffected_routes: string[],
+  disruptionDiagram: DisruptionDiagramData
+) => {
   const AffectedLinePill = STRING_TO_SVG[routes[0]];
 
   return (
@@ -97,7 +103,7 @@ const multiLineLayout = (routes: string[], unaffected_routes: string[]) => {
           <span>trains stop as usual</span>
         </div>
       </div>
-      {mapSection()}
+      {mapSection(disruptionDiagram)}
     </div>
   );
 };
@@ -227,306 +233,10 @@ const remedySection = (
   </div>
 );
 
-const mapSection = () => {
-  // const props: ContinuousDisruptionDiagram = {
-  //   effect: "suspension",
-  //   line: "red",
-  //   current_station_slot_index: 2,
-  //   effect_region_slot_index_range: [2, 5],
-  //   slots: [
-  //     { type: "arrow", label_id: "place-alfcl" },
-  //     {
-  //       label: { full: "Kendall/MIT", abbrev: "Kendall/MIT" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Charles/MGH", abbrev: "Charles/MGH" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Park Street", abbrev: "Park St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Downtown Crossing", abbrev: "Downt'n Xng" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "South Station", abbrev: "South Sta" },
-  //       show_symbol: true,
-  //     },
-  //     { type: "arrow", label_id: "place-asmnl+place-brntn" },
-  //   ],
-  // };
-
-  // const props: ContinuousDisruptionDiagram = {
-  //   effect: "suspension",
-  //   line: "green",
-  //   current_station_slot_index: 2,
-  //   effect_region_slot_index_range: [2, 6],
-  //   slots: [
-  //     { type: "arrow", label_id: "place-alfcl" },
-  //     {
-  //       label: { full: "Park St", abbrev: "Kendall/MIT" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Government Centerrrrrr", abbrev: "Charles/MGH" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Haymarket", abbrev: "Park St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "North Station", abbrev: "Downt'n Xng" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Science Park/West End", abbrev: "South Sta" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Lechmere", abbrev: "South Sta" },
-  //       show_symbol: true,
-  //     },
-  //     { type: "arrow", label_id: "place-asmnl+place-brntn" },
-  //   ],
-  // };
-
-  // const props: ContinuousDisruptionDiagram = {
-  //   effect: "shuttle",
-  //   line: "green",
-  //   current_station_slot_index: 10,
-  //   effect_region_slot_index_range: [0, 7],
-  //   slots: [
-  //     { type: "terminal", label_id: "place-lake" },
-  //     {
-  //       label: { full: "South Street", abbrev: "South St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Chestnut Hill Avenue", abbrev: "Chestnut Hill Ave" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Chiswick Road", abbrev: "Chiswick Rd" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: "…",
-  //       show_symbol: false,
-  //     },
-  //     {
-  //       label: { full: "Beaconsfield", abbrev: "Griggs St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Harvard Avenue", abbrev: "Harvard Ave" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Packard's Corner", abbrev: "Packard's Cn" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Babcock Street", abbrev: "Babcock St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: {
-  //         full: "… via Copley & Kenmore",
-  //         abbrev: "… via Copley & Kenmore",
-  //       },
-  //       show_symbol: false,
-  //     },
-  //     {
-  //       label: { full: "Park Street", abbrev: "Park St" },
-  //       show_symbol: true,
-  //     },
-  //     { type: "terminal", label_id: "place-gover" },
-  //   ],
-  // };
-
-  // const props: DiscreteDisruptionDiagram = {
-  //   effect: "station_closure",
-  //   line: "green",
-  //   current_station_slot_index: 11,
-  //   closed_station_slot_indices: [2, 11],
-  //   slots: [
-  //     { type: "arrow", label_id: "place-clmnl" },
-  //     {
-  //       label: { full: "Saint Paul Street", abbrev: "St. Paul St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Kent Street", abbrev: "Kent St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Hawes Street", abbrev: "Hawes St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Saint Mary's Street", abbrev: "St. Mary's" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Kenmore", abbrev: "Kenmore" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Hynes Convention Center", abbrev: "Hynes" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Copley", abbrev: "Copley" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Arlington", abbrev: "Arlington" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Boylston", abbrev: "Boylston" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Park Street", abbrev: "Park St" },
-  //       show_symbol: true,
-  //     },
-  //     { type: "terminal", label_id: "place-gover" },
-  //   ],
-  // };
-
-  // const props: DiscreteDisruptionDiagram = {
-  //   effect: "station_closure",
-  //   line: "blue",
-  //   current_station_slot_index: 1,
-  //   closed_station_slot_indices: [4],
-  //   slots: [
-  //     { type: "terminal", label_id: "place-bomnl" },
-  //     {
-  //       label: { full: "Government Center", abbrev: "St. Paul St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "State", abbrev: "Kent St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Aquarium", abbrev: "Hawes St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Maverick", abbrev: "St. Mary's" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Airport", abbrev: "Kenmore" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Wood Island", abbrev: "Hynes" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Orient Heights", abbrev: "Copley" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Suffolk Downs", abbrev: "Arlington" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Beachmont", abbrev: "Boylston" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Revere Beach", abbrev: "Park St" },
-  //       show_symbol: true,
-  //     },
-  //     { type: "terminal", label_id: "place-wondl" },
-  //   ],
-  // };
-
-  // const props: DiscreteDisruptionDiagram = {
-  //   effect: "station_closure",
-  //   line: "orange",
-  //   current_station_slot_index: 7,
-  //   closed_station_slot_indices: [2],
-  //   slots: [
-  //     { type: "arrow", label_id: "place-ogmnl" },
-  //     {
-  //       label: { full: "North Station", abbrev: "St. Paul St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Haymarket", abbrev: "Kent St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "State", abbrev: "Hawes St" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Downtown Crossing", abbrev: "St. Mary's" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Chinatown", abbrev: "Kenmore" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Tufts Medical Center", abbrev: "Hynes" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Back Bay", abbrev: "Copley" },
-  //       show_symbol: true,
-  //     },
-  //     {
-  //       label: { full: "Mass Ave", abbrev: "Arlington" },
-  //       show_symbol: true,
-  //     },
-  //     { type: "arrow", label_id: "place-forhl" },
-  //   ],
-  // };
-
-  const props: ContinuousDisruptionDiagram = {
-    effect: "shuttle",
-    line: "orange",
-    current_station_slot_index: 10,
-    effect_region_slot_index_range: [0, 3],
-    slots: [
-      { type: "terminal", label_id: "place-ogmnl" },
-      {
-        label: { full: "Community College", abbrev: "St. Paul St" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "North Station", abbrev: "St. Paul St" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Haymarket", abbrev: "Kent St" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "State", abbrev: "Hawes St" },
-        show_symbol: true,
-      },
-      {
-        label: { full: "Downtown Crossing", abbrev: "St. Mary's" },
-        show_symbol: true,
-      },
-      { type: "arrow", label_id: "place-forhl" },
-    ],
-  };
-
+const mapSection = (disruptionDiagram?: DisruptionDiagramData) => {
   return (
     <div style={{ height: 408, width: 904 }}>
-      <DisruptionDiagram {...props} />
+      {disruptionDiagram && <DisruptionDiagram {...disruptionDiagram} />}
     </div>
   );
 };
@@ -548,6 +258,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
     routes,
     unaffected_routes,
     updated_at,
+    disruption_diagram,
   } = alert;
 
   /**
@@ -563,16 +274,28 @@ const PreFareSingleScreenAlert: React.ComponentType<
       case effect === "delay":
         return fallbackLayout(issue, remedy, effect, routes);
       case effect === "station_closure" && region === "here":
-        return multiLineLayout(routes, unaffected_routes);
+        return multiLineLayout(routes, unaffected_routes, disruption_diagram);
       case effect === "station_closure":
-        return standardLayout(issue, remedy, effect, location);
+        return standardLayout(
+          issue,
+          remedy,
+          effect,
+          location,
+          disruption_diagram
+        );
       case (region === "boundary" || region === "here") &&
         (effect === "shuttle" || effect === "suspension"):
-        return standardLayout(issue, remedy, effect, location);
+        return standardLayout(
+          issue,
+          remedy,
+          effect,
+          location,
+          disruption_diagram
+        );
       case region === "outside" &&
         endpoints &&
         (effect === "shuttle" || effect === "suspension"):
-        return downstreamLayout(endpoints, effect, remedy);
+        return downstreamLayout(endpoints, effect, remedy, disruption_diagram);
       default:
         return fallbackLayout(issue, remedy, effect, routes);
     }

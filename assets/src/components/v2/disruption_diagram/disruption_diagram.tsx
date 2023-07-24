@@ -79,6 +79,8 @@ const endLabelIDMap: { [labelID: string]: string[] } = {
   "place-asmnl+place-brntn": ["ASHMONT &", "BRAINTREE"],
   "place-asmnl": ["ASHMONT"],
   "place-brntn": ["BRAINTREE"],
+  "place-ogmnl": ["OAK GROVE"],
+  "place-forhl": ["FOREST", "HILLS"],
   "place-gover": ["GOVERNMENT", "CENTER"],
   "place-lake": ["BOSTON COLLEGE"],
   "place-clmnl": ["CLEVELAND CIR"],
@@ -87,12 +89,10 @@ const endLabelIDMap: { [labelID: string]: string[] } = {
   "place-mdftf": ["MEDFORD/TUFTS"],
   "place-hsmnl": ["HEATH ST"],
   "place-kencl": ["KENMORE"],
+  "place-kencl+west": ["KENMORE", "& WEST"],
   "place-mdftf+place-unsqu": ["MEDFORD/TUFTS", "& UNION SQ"],
   "place-north+place-pktrm": ["NORTH STATION", "& PARK ST"],
   "place-coecl+west": ["COPLEY & WEST"],
-  "place-ogmnl": ["OAK GROVE"],
-  "place-forhl": ["FOREST", "HILLS"],
-  "place-medfd+place-unsq": ["MEDFORD/TUFTS", "& UNION SQ"],
 };
 
 interface IconProps {
@@ -550,13 +550,13 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
     icon = (
       <>
         <circle
-          cx={middleOfLine - 8}
+          cx={middleOfLine}
           cy="16"
           r={widthOfBackground}
           fill="#171F26"
         />
         <path
-          transform={`translate(${middleOfLine - widthOfBackground - 8} -24)`}
+          transform={`translate(${middleOfLine - widthOfBackground} -24)`}
           fillRule="evenodd"
           clipRule="evenodd"
           d="M60.8695 37.5334L58.842 21.6673C58.327 18.8044 56.513 17.6872 53.8141 16.5156C49.3915 14.9398 44.7285 14.0896 40.017 14C35.2983 14.0906 30.628 14.9408 26.1974 16.5156C23.532 17.6651 21.7178 18.8039 21.1691 21.6668L19.1309 37.5334V59.4837H22.709V63.3065C22.7138 64.8769 24.0275 66.1487 25.6492 66.153C27.2708 66.1484 28.5841 64.8765 28.5889 63.3062V59.4834H51.5189V63.3062C51.5111 64.3282 52.0697 65.2758 52.9824 65.789C53.8951 66.3022 55.0219 66.3022 55.9346 65.789C56.8473 65.2758 57.4059 64.3282 57.3982 63.3062V59.4834H60.87L60.8695 37.5334ZM31.429 18.0156H48.6755C49.4054 18.0156 49.997 18.5886 49.997 19.2954C49.997 20.0022 49.4054 20.5751 48.6755 20.5751H31.429C30.6991 20.5751 30.1074 20.0022 30.1074 19.2954C30.1074 18.5886 30.6991 18.0156 31.429 18.0156ZM24.5181 24.5431L22.839 37.069C22.8167 37.2128 22.8167 37.359 22.839 37.5028C22.8175 37.9344 22.9743 38.3566 23.2748 38.676C23.5752 38.9955 23.9947 39.186 24.4404 39.2055H55.7192C56.1641 39.2101 56.5924 39.0417 56.9081 38.7379C57.2237 38.4341 57.4002 38.0204 57.3982 37.5895V37.5028C57.4207 37.359 57.4207 37.2128 57.3982 37.069L55.7192 24.5431C55.5841 23.7547 54.8758 23.1793 54.0506 23.1876H26.1971C25.3697 23.179 24.6582 23.7534 24.5181 24.5431ZM25.6476 52.6951C23.9189 52.6982 22.515 51.3436 22.5117 49.6696C22.5085 47.9956 23.9072 46.636 25.6358 46.6328C27.3645 46.6296 28.7686 47.984 28.772 49.658C28.7741 50.4621 28.446 51.2341 27.86 51.8038C27.2739 52.3735 26.478 52.6941 25.6476 52.6951ZM54.4601 46.6328C52.733 46.6339 51.3332 47.9895 51.332 49.662C51.3309 51.3345 52.7289 52.6918 54.4555 52.6951C55.2881 52.6973 56.0872 52.3781 56.6759 51.808C57.2647 51.238 57.5945 50.4642 57.5923 49.658C57.5889 47.9855 56.1872 46.6317 54.4601 46.6328Z"
@@ -733,8 +733,8 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
           </g>
         </svg>
         {hasEmphasis && (
-          <svg height="80px" y={328}>
-            <g transform="translate(12, 25)">
+          <svg height="80px" y={315} style={{ position: "absolute" }}>
+            <g transform="translate(12, 24)">
               <AlertEmphasisComponent
                 effectRegionSlotIndexRange={
                   props.effect_region_slot_index_range
@@ -750,6 +750,6 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   );
 };
 
-export { ContinuousDisruptionDiagram, DiscreteDisruptionDiagram };
+export { DisruptionDiagramData };
 
 export default DisruptionDiagram;
