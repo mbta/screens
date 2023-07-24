@@ -132,6 +132,26 @@ const CurrentStopIcon: ComponentType<IconProps> = ({ x }) => (
   </>
 );
 
+const CurrentStopIconEndpointRedLine: ComponentType<IconProps> = ({ x }) => (
+  <>
+    <path
+      transform={`translate(${x - SLOT_WIDTH} -8)`}
+      d="M39.4605 4.26181C36.4447 1.24606 31.5553 1.24606 28.5395 4.26181L4.26181 28.5395C1.24606 31.5553 1.24606 36.4447 4.26181 39.4605L28.5395 63.7382C31.5553 66.7539 36.4447 66.7539 39.4605 63.7382L63.7382 39.4605C66.7539 36.4447 66.7539 31.5553 63.7382 28.5395L39.4605 4.26181Z"
+      fill="#EE2E24"
+      stroke="#E6E4E1"
+      strokeWidth="4"
+      strokeLinejoin="round"
+    />
+    <path
+      transform={`translate(${x - SLOT_WIDTH} -8)`}
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M18.0032 35.1702C17.2222 34.3892 17.2222 33.1229 18.0032 32.3418L32.3417 18.0033C33.1228 17.2223 34.3891 17.2223 35.1702 18.0033L49.5086 32.3418C50.2897 33.1229 50.2897 34.3892 49.5086 35.1702L35.1702 49.5087C34.3891 50.2898 33.1228 50.2898 32.3417 49.5087L18.0032 35.1702Z"
+      fill="white"
+    />
+  </>
+);
+
 const CurrentStopIconEndpoint: ComponentType<IconProps> = ({ x }) => (
   <path
     transform={`translate(${x - SLOT_WIDTH} -8)`}
@@ -264,6 +284,13 @@ const FirstSlotComponent: ComponentType<FirstSlotComponentProps> = ({
         fill={line}
       />
     );
+  } else if (isCurrentStop) {
+    icon =
+      line === "red" ? (
+        <CurrentStopIconEndpointRedLine x={L} />
+      ) : (
+        <CurrentStopIconEndpoint x={L} />
+      );
   } else {
     const modifiers = [line.toString()];
     if (isAffected) {
@@ -335,25 +362,32 @@ const LastSlotComponent: ComponentType<LastlotComponentProps> = ({
         className={classWithModifier("end-slot__arrow", line)}
       />
     );
+  } else if (isAffected && effect === "station_closure") {
+    icon = (
+      <StationClosureStopIcon
+        className={classWithModifier(
+          "station-closure-icon",
+          isCurrentStop ? "current-stop" : ""
+        )}
+        x={x}
+      />
+    );
   } else if (isCurrentStop) {
-    if (isAffected && effect === "station_closure") {
-      icon = (
-        <StationClosureStopIcon
-          className={classWithModifier(
-            "station-closure-icon",
-            isCurrentStop ? "current-stop" : ""
-          )}
-          x={x}
-        />
+    icon =
+      line === "red" ? (
+        <CurrentStopIconEndpointRedLine x={x} />
+      ) : (
+        <CurrentStopIconEndpoint x={x} />
       );
-    } else {
-      icon = <CurrentStopIconEndpoint x={x} />;
-    }
   } else {
+    const modifiers = [line.toString()];
+    if (isAffected) {
+      modifiers.push("affected");
+    }
     icon = (
       <StopIconEndpoint
         x={x}
-        className={classWithModifier("end-slot__icon", line)}
+        className={classWithModifiers("end-slot__icon", modifiers)}
       />
     );
   }
