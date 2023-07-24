@@ -515,6 +515,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
 
   defp gap_ideal_indices(builder) do
     home_stop = builder.metadata.home_stop
+
     closure_left..closure_right = closure_ideal_indices(builder)
 
     cond do
@@ -617,7 +618,6 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     do: builder.metadata.home_stop
 
   # Adjusts an index to be within the bounds of the stop sequence.
-
   defp clamp(index, _sequence_size) when index < 0, do: 0
   defp clamp(index, sequence_size) when index >= sequence_size, do: sequence_size - 1
   defp clamp(index, _sequence_size), do: index
