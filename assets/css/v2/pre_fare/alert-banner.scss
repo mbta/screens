@@ -1,0 +1,56 @@
+.alert-banner {
+  font-family: Inter;
+  width: 100%;
+  font-size: 60px;
+  line-height: 72px;
+  font-weight: 600;
+  filter: drop-shadow(0px 30px 20px rgba(0, 0, 0, 0.25));
+
+  display: flex;
+  flex-wrap: wrap;
+
+  /* Background colors */
+  &--blue {
+    background-color: #B3C5E4;
+  }
+
+  &--red {
+    background-color: #F4BFBB;
+  }
+
+  &--orange {
+    background-color: #FADCB3;
+  }
+
+  &--yellow {
+    background-color: #FFF7BF;
+  }
+
+  &--green {
+    background-color: #B3DAC5;
+  }
+}
+
+.alert-banner__attention-text {
+  font-weight: 700;
+}
+
+.alert-banner__route-pill--short {
+  margin: 0 20px;
+  height: 96px;
+}
+
+.alert-banner__route-pill--long {
+  margin: 16.2px 0 .8px 0;
+}
+
+.alert-banner--large--two-routes {
+  padding: 31px 65px 42px 65px;
+}
+.alert-banner--large--one-route {
+  padding: 86px 74px 102px 74px;
+}
+.alert-banner--small {
+  padding: 64px 65px;
+  align-items: center;
+}

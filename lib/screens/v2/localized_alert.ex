@@ -28,6 +28,14 @@ defmodule Screens.V2.LocalizedAlert do
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
+  @type location ::
+          :boundary_downstream
+          | :boundary_upstream
+          | :downstream
+          | :elsewhere
+          | :inside
+          | :upstream
+
   @typedoc """
   A headsign indicating the direction a vehicle is headed in.
 
@@ -139,13 +147,7 @@ defmodule Screens.V2.LocalizedAlert do
     end
   end
 
-  @spec location(t()) ::
-          :boundary_downstream
-          | :boundary_upstream
-          | :downstream
-          | :elsewhere
-          | :inside
-          | :upstream
+  @spec location(t()) :: location()
   def location(
         %{alert: alert, location_context: location_context},
         is_terminal_station \\ false
@@ -264,7 +266,7 @@ defmodule Screens.V2.LocalizedAlert do
   end
 
   @spec active_routes_at_stop(t()) :: MapSet.t(route_id())
-  defp active_routes_at_stop(%{location_context: %{routes: routes}}) do
+  def active_routes_at_stop(%{location_context: %{routes: routes}}) do
     routes
     |> Enum.filter(& &1.active?)
     |> MapSet.new(& &1.route_id)
