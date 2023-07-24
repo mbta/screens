@@ -304,28 +304,24 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
       |> Enum.drop(offset)
       |> Enum.take(num_to_omit)
 
-    if omitted_indices == [] do
-      builder
-    else
-      label =
-        omitted_indices
-        |> MapSet.new(&builder.sequence[&1].id)
-        |> label_callback.()
+    label =
+      omitted_indices
+      |> MapSet.new(&builder.sequence[&1].id)
+      |> label_callback.()
 
-      {first_omitted, last_omitted} = Enum.min_max(omitted_indices)
+    {first_omitted, last_omitted} = Enum.min_max(omitted_indices)
 
-      builder
-      |> update_in([Access.key(:sequence)], fn seq ->
-        seq
-        # Start with the part left of the omitted section
-        |> Vector.slice(0..(first_omitted - 1)//1)
-        # Add the new omitted slot
-        |> Vector.append(%OmittedSlot{label: label})
-        # Add the part right of the omitted section
-        |> Vector.concat(Vector.slice(seq, (last_omitted + 1)..vec_size(seq)//1))
-      end)
-      |> recalculate_metadata()
-    end
+    builder
+    |> update_in([Access.key(:sequence)], fn seq ->
+      seq
+      # Start with the part left of the omitted section
+      |> Vector.slice(0..(first_omitted - 1)//1)
+      # Add the new omitted slot
+      |> Vector.append(%OmittedSlot{label: label})
+      # Add the part right of the omitted section
+      |> Vector.concat(Vector.slice(seq, (last_omitted + 1)..vec_size(seq)//1))
+    end)
+    |> recalculate_metadata()
   end
 
   @doc """
