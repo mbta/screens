@@ -995,6 +995,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def audio_serialize(t), do: ReconstructedAlert.serialize(t)
     def audio_sort_key(t), do: ReconstructedAlert.audio_sort_key(t)
     def audio_valid_candidate?(t), do: ReconstructedAlert.temporarily_override_alert(t)
+
     def audio_view(t),
       do:
         if(ReconstructedAlert.widget_type(t) === :reconstructed_large_alert,
