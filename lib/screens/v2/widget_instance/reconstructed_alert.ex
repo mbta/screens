@@ -871,27 +871,32 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def serialize(%__MODULE__{is_full_screen: true} = t) do
-    if takeover_alert?(t) do
-      serialize_takeover_alert(t)
-    else
-      location = LocalizedAlert.location(t)
-      serialize_fullscreen_alert(t, location)
-    end
-  end
+    result =
+      if takeover_alert?(t) do
+        serialize_takeover_alert(t)
+      else
+        location = LocalizedAlert.location(t)
+        serialize_fullscreen_alert(t, location)
+      end
 
-  def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
     try do
       diagram_data = Screens.V2.DisruptionDiagram.Model.serialize(t)
       IO.inspect(diagram_data, label: "✨ Disruption diagram generation succeeded")
+      Map.merge(result, %{disruption_diagram: diagram_data})
     rescue
       error ->
         IO.puts(
           "💥 Disruption diagram generation failed! Error message and stacktrace below, possibly relevant logs above."
         )
 
-        reraise error, __STACKTRACE__
-    end
+        IO.inspect(error)
+        IO.puts(Exception.format_stacktrace())
 
+        result
+    end
+  end
+
+  def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
     case LocalizedAlert.location(t, is_terminal_station) do
       :inside ->
         t |> serialize_inside_flex_alert() |> Map.put(:region, :inside)
