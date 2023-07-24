@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Config.Screen
   alias Screens.LocationContext
   alias Screens.Stops.Stop
+  alias Screens.Util
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
@@ -13,7 +14,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             alert: nil,
             now: nil,
             location_context: nil,
-            informed_stations_string: nil,
+            informed_stations: nil,
             is_terminal_station: false,
             is_full_screen: false
 
@@ -26,7 +27,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           alert: Alert.t(),
           now: DateTime.t(),
           location_context: LocationContext.t(),
-          informed_stations_string: String.t(),
+          informed_stations: list(String.t()),
           is_terminal_station: boolean(),
           is_full_screen: boolean()
         }
@@ -44,28 +45,40 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   # }
 
   @type takeover_serialized_response :: %{
+          optional(:other_closures) => list(String.t()),
           issue: String.t(),
           remedy: String.t(),
           location: String.t(),
           cause: String.t(),
           effect: :suspension | :shuttle | :station_closure,
           updated_at: String.t(),
+          # i.e. [%{color: :orange, text: "ORANGE LINE", type: :text}]
           routes: list(map())
+        }
+
+  @type enriched_route :: %{
+          optional(:headsign) => String.t(),
+          route_id: String.t(),
+          svg_name: String.t()
         }
 
   @type fullscreen_serialized_response :: %{
           # Unique to fullscreen station closures
-          optional(:unaffected_routes) => list(route_id()),
+          optional(:unaffected_routes) => list(enriched_route()),
           optional(:location) => String.t() | nil,
           optional(:remedy) => String.t(),
+          optional(:stations) => list(String.t()),
           # Unique to fullscreen
           optional(:endpoints) => list(String.t()),
+          # Unique to transfer station case
+          optional(:is_transfer_station) => boolean(),
           issue: String.t() | list(String.t()),
           cause: Alert.cause() | nil,
           # List of SVG filenames
-          routes: list(String.t()),
+          routes: list(enriched_route()),
           effect: :suspension | :shuttle | :station_closure | :delay,
           updated_at: String.t(),
+          # It seems that region was also added to the flex serialized response?
           region: :here | :boundary | :outside
         }
 
@@ -90,6 +103,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   }
 
   @headsign_svg_map %{
+    # No copley & west?
     "Bowdoin" => "bl-bowdoin",
     "Wonderland" => "bl-wonderland",
     "Government Center" => "gl-govt-center",
@@ -154,10 +168,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     affected_routes = LocalizedAlert.informed_subway_routes(t)
 
     affected_routes
-    |> Enum.group_by(fn
-      "Green" <> _ -> "Green"
-      route -> route
-    end)
+    |> Enum.group_by(&route_without_branch/1)
     |> Enum.map(
       &RoutePill.serialize_route_for_reconstructed_alert(&1, %{
         large: length(affected_routes) == 1
@@ -172,36 +183,55 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities
     |> Enum.filter(&(&1.route_type in [0, 1] and &1.route in routes_at_stop))
     |> Enum.group_by(fn %{route: route} -> route end)
-    |> Enum.map(fn
+    |> Enum.flat_map(fn
       {route_id, _} ->
         headsign = get_destination(t, location, route_id)
-
-        if is_nil(headsign) do
-          route_id |> String.first() |> String.downcase() |> Kernel.<>("l")
-        else
-          format_for_svg_name(headsign)
-        end
+        build_pills_from_headsign(route_id, headsign)
     end)
     |> Enum.uniq()
   end
 
-  defp format_for_svg_name("Ashmont/Braintree"),
-    do: [Map.get(@headsign_svg_map, "Ashmont"), Map.get(@headsign_svg_map, "Braintree")]
+  defp build_pills_from_headsign(route_id, nil) do
+    [
+      %{
+        route_id: route_without_branch(route_id),
+        svg_name: format_short_route_pill(route_id)
+      }
+    ]
+  end
+
+  defp build_pills_from_headsign(route_id, "Ashmont/Braintree") do
+    Enum.map(["Ashmont", "Braintree"], fn dest ->
+      %{
+        route_id: route_id,
+        svg_name: format_for_svg_name(dest),
+        headsign: dest
+      }
+    end)
+  end
+
+  defp build_pills_from_headsign(route_id, headsign) do
+    [
+      %{
+        route_id: route_id,
+        svg_name: format_for_svg_name(headsign),
+        headsign: headsign
+      }
+    ]
+  end
+
+  defp route_without_branch("Green" <> _), do: "Green"
+  defp route_without_branch(route_id), do: route_id
 
   defp format_for_svg_name(headsign), do: Map.get(@headsign_svg_map, headsign)
 
   defp format_cause(:unknown), do: nil
   defp format_cause(cause), do: cause |> to_string() |> String.replace("_", " ")
 
-  defp format_routes(routes) do
-    Enum.map(routes, fn
-      "Green-" <> branch ->
-        "gl-#{String.downcase(branch)}"
+  defp format_short_route_pill("Green-" <> branch), do: "gl-#{String.downcase(branch)}"
 
-      route_id ->
-        String.downcase(route_id)
-    end)
-  end
+  defp format_short_route_pill(route_id),
+    do: route_id |> String.first() |> String.downcase() |> Kernel.<>("l")
 
   defp get_region_from_location(:inside), do: :here
 
@@ -266,6 +296,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       remedy: "Use shuttle bus",
       location:
         "Shuttle buses replace #{route_id} Line trains #{format_endpoint_string(endpoints)}",
+      endpoints: endpoints,
       cause: format_cause(cause),
       routes: get_route_pills(t),
       effect: :shuttle,
@@ -277,8 +308,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %{
       alert: %{cause: cause, updated_at: updated_at},
       now: now,
-      informed_stations_string: informed_stations_string
+      location_context: %{home_stop_name: stop_name},
+      informed_stations: informed_stations
     } = t
+
+    informed_stations_string = Util.format_name_list_to_string(informed_stations)
 
     location_text =
       case LocalizedAlert.informed_subway_routes(t) do
@@ -289,6 +323,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           "The #{route_id1} Line and #{route_id2} Line skip #{informed_stations_string}"
       end
 
+    other_closures = List.delete(informed_stations, stop_name)
+
+    other_closures =
+      if other_closures === [] do
+        nil
+      else
+        other_closures
+      end
+
     %{
       issue: "Station closed",
       remedy: "Seek alternate route",
@@ -296,7 +339,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: format_cause(cause),
       routes: get_route_pills(t),
       effect: :station_closure,
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      other_closures: other_closures
     }
   end
 
@@ -353,7 +397,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: :suspension,
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
-      endpoints: endpoints
+      endpoints: endpoints,
+      is_transfer_station: location === :inside
     }
   end
 
@@ -404,7 +449,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: :shuttle,
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
-      endpoints: endpoints
+      endpoints: endpoints,
+      is_transfer_station: location === :inside
     }
   end
 
@@ -432,8 +478,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end
 
     %{
-      issue: format_routes(affected_routes),
-      unaffected_routes: format_routes(unaffected_routes),
+      issue: nil,
+      unaffected_routes:
+        Enum.flat_map(unaffected_routes, fn route -> build_pills_from_headsign(route, nil) end),
       cause: get_cause(cause),
       routes: get_route_pills(t, :inside),
       effect: :station_closure,
@@ -442,6 +489,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
+  # Downstream closure
   defp serialize_fullscreen_alert(
          %__MODULE__{alert: %Alert{effect: :station_closure}} = t,
          location
@@ -449,8 +497,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %{
       alert: %{cause: cause, updated_at: updated_at},
       now: now,
-      informed_stations_string: informed_stations_string
+      informed_stations: informed_stations
     } = t
+
+    informed_stations_string = Util.format_name_list_to_string(informed_stations)
 
     %{
       issue: "Trains skip #{informed_stations_string}",
@@ -459,7 +509,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       routes: get_route_pills(t, location),
       effect: :station_closure,
       updated_at: format_updated_at(updated_at, now),
-      region: get_region_from_location(location)
+      region: get_region_from_location(location),
+      stations: informed_stations
     }
   end
 
@@ -791,8 +842,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          %__MODULE__{alert: %Alert{effect: :station_closure}} = t,
          _location
        ) do
-    %{alert: %{cause: cause}, informed_stations_string: informed_stations_string} = t
+    %{alert: %{cause: cause}, informed_stations: informed_stations} = t
     cause_text = Alert.get_cause_string(cause)
+
+    informed_stations_string = Util.format_name_list_to_string(informed_stations)
 
     %{
       issue: "Trains will bypass #{informed_stations_string}",
@@ -942,7 +995,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def audio_serialize(t), do: ReconstructedAlert.serialize(t)
     def audio_sort_key(t), do: ReconstructedAlert.audio_sort_key(t)
     def audio_valid_candidate?(t), do: ReconstructedAlert.temporarily_override_alert(t)
-    def audio_view(_instance), do: ScreensWeb.V2.Audio.ReconstructedAlertView
+    def audio_view(t),
+      do:
+        if(ReconstructedAlert.widget_type(t) === :reconstructed_large_alert,
+          do: ScreensWeb.V2.Audio.ReconstructedAlertView,
+          else: ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView
+        )
   end
 
   defimpl Screens.V2.AlertsWidget do
