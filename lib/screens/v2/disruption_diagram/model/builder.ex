@@ -625,28 +625,4 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   defp clamp(index, _sequence_size) when index < 0, do: 0
   defp clamp(index, sequence_size) when index >= sequence_size, do: sequence_size - 1
   defp clamp(index, _sequence_size), do: index
-
-  def add_back_end_slots(builder) do
-    left_end = get_end_slot(builder.metadata.line, builder.left_end)
-    right_end = get_end_slot(builder.metadata.line, builder.right_end)
-
-    builder =
-      case Vector.first(left_end) do
-        nil ->
-          builder
-
-        slot ->
-          update_in(builder, [Access.key(:sequence)], fn seq ->
-            Vector.prepend(seq, slot)
-          end)
-      end
-
-    case Vector.last(right_end) do
-      nil ->
-        builder
-
-      slot ->
-        update_in(builder, [Access.key(:sequence)], fn seq -> Vector.append(seq, slot) end)
-    end
-  end
 end
