@@ -6,6 +6,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.DisruptionDiagram.Model.Validator
   alias Screens.V2.DisruptionDiagram.Model.Builder
+  alias Screens.Stops.Stop
 
   import LocalizedAlert, only: [is_localized_alert: 1]
 
@@ -83,30 +84,31 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   @minimum_slot_count 6
 
-  # The maximum number of slots that the gap component can take up
-  @max_gap_count 2
-
   @max_closure_count 8
 
   @doc "Produces a JSON-serializable map representing the disruption diagram."
-  # TODO Remove nil return type
-  @spec serialize(t()) :: serialized_response() | nil
+  @spec serialize(t()) :: {:ok, serialized_response()} | :error
   def serialize(localized_alert) when is_localized_alert(localized_alert) do
-    case Validator.validate(localized_alert) do
-      :ok ->
-        do_serialize(localized_alert)
-
-      :error ->
-        raise "attempted to generate a disruption diagram for an incompatible LocalizedAlert"
+    with :ok <- Validator.validate(localized_alert),
+         {:ok, data} <- do_serialize(localized_alert) do
+      {:ok, data}
     end
+  rescue
+    error ->
+      Logger.warn(Exception.message(error) <> "\n" <> Exception.format_stacktrace(__STACKTRACE__))
+      :error
   end
 
   defp do_serialize(localized_alert) do
-    builder = Builder.new(localized_alert)
+    case Builder.new(localized_alert) do
+      {:ok, builder} ->
+        line = Builder.line(builder)
 
-    line = Builder.line(builder)
+        {:ok, serialize_by_line(line, builder)}
 
-    serialize_by_line(line, builder)
+      :error ->
+        :error
+    end
   end
 
   @spec serialize_by_line(line_color(), Builder.t()) :: serialized_response()
@@ -290,19 +292,25 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   end
 
   def get_end_label_id(:red, end_stop_ids) do
+    cond do
+      "place-jfk" in end_stop_ids ->
+        "place-asmnl+place-brntn"
+
+      "place-alfcl" in end_stop_ids ->
+        "place-alfcl"
+
+      "place-asmnl" in end_stop_ids ->
+        "place-asmnl"
+
+      "place-brntn" in end_stop_ids ->
+        "place-brntn"
+    end
+  end
+
+  def get_end_label_id(:green, end_stop_ids) do
     label_id =
       cond do
-        "place-alfcl" in end_stop_ids ->
-          "place-alfcl"
-
-        "place-asmnl" in end_stop_ids and "place-brntn" in end_stop_ids ->
-          "place-asmnl+place-brntn"
-
-        "place-asmnl" in end_stop_ids ->
-          "place-asmnl"
-
-        "place-brntn" in end_stop_ids ->
-          "place-brntn"
+        "place-mdftf" -> "place-mdftf"
       end
 
     label_id
@@ -325,11 +333,11 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   end
 end
 
-# TODO: Reverse stop order for all GL diagrams, except when disruption is on GLX
+# DONE: Reverse stop order for all GL diagrams, except when disruption is on GLX
 
-# TODO: Create a function that determines terminal label from a set of omitted stops
+# DONE: Create a function that determines terminal label from a set of omitted stops
 
-# TODO: Define a representation for omitted stops
+# DONE: Define a representation for omitted stops
 
 # TODO: Create a function that determines mid-route label from a set of omitted stops
 #       - via STOP:
@@ -348,3 +356,7 @@ end
 
 # TODO: How to handle cases where home stop is at or very close to a branch point--
 # end labels become difficult and potentially need to cut off one end of closure region for station closures
+
+# TODO: Do we need to handle cases where alert goes from a branch point, down one branch? E.g. JFK - North Quincy
+
+# TODO (code cleanup): See which cases of `vec_size(x)-1` can be replaced with just -1 or similar--Vector.slice supports indexing from end with negatives
