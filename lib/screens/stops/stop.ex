@@ -209,8 +209,6 @@ defmodule Screens.Stops.Stop do
   ]
 
   @green_line_trunk_stops [
-    # These 3 eventually will NOT be trunk stops, but are until Medford opens
-    {"place-unsqu", {"Union Square", "Union Sq"}},
     {"place-lech", {"Lechmere", "Lechmere"}},
     {"place-spmnl", {"Science Park/West End", "Science Pk"}},
     {"place-north", {"North Station", "North Sta"}},
@@ -516,5 +514,9 @@ defmodule Screens.Stops.Stop do
     stop_sequences
     |> Enum.flat_map(fn stop_sequence -> Util.slice_after(stop_sequence, stop_id) end)
     |> MapSet.new()
+  end
+
+  def on_glx?(stop_id) do
+    stop_id in Enum.map(@medford_tufts_branch_stops ++ @union_square_branch_stops, &elem(&1, 0))
   end
 end

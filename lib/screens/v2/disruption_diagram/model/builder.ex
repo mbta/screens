@@ -77,7 +77,8 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
             effect: :shuttle | :suspension | :station_closure,
             first_disrupted_stop: Vector.index(),
             last_disrupted_stop: Vector.index(),
-            home_stop: Vector.index()
+            home_stop: Vector.index(),
+            branch: :b | :c | :d | :e
           }
 
   @doc "Creates a new Builder from a localized alert."
@@ -89,9 +90,6 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
       end
       |> MapSet.new()
 
-    # TODO: Probably needs adjusting for GL. One disruption can inform multiple routes.
-    # Need to select the route that completely contains all informed stops, rather than just the first one we find.
-    # -> Change localized_alert.location_context.stop_sequences to a map keyed on route ID??
     informed_route_id =
       localized_alert.alert.informed_entities
       |> Enum.find_value(fn
@@ -100,16 +98,51 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
         _ -> false
       end)
 
+    {branch, informed_route_id} =
+      case informed_route_id do
+        "Green-" <> branch_letter ->
+          trunk_stop_ids = MapSet.new(Stop.gl_trunk_stops(), &elem(&1, 0))
+
+          if MapSet.subset?(
+               MapSet.new(
+                 MapSet.put(informed_stop_ids, localized_alert.location_context.home_stop)
+               ),
+               trunk_stop_ids
+             ) do
+            {nil, "Green"}
+          else
+            branch =
+              branch_letter
+              |> String.downcase()
+              |> String.to_existing_atom()
+
+            {branch, informed_route_id}
+          end
+
+        _ ->
+          {nil, informed_route_id}
+      end
+
+    line = Route.get_color_for_route(informed_route_id)
+
+    IO.inspect(informed_route_id)
     stop_id_to_name = Stop.stop_id_to_name(informed_route_id)
 
     home_stop_id = localized_alert.location_context.home_stop
 
-    localized_alert.location_context.stop_sequences
-    |> Enum.find(fn sequence ->
-      sequence_set = MapSet.new(sequence)
-      MapSet.subset?(informed_stop_ids, sequence_set)
-    end)
-    |> case do
+    selected_sequence =
+      if line == :green and is_nil(branch) do
+        # It's a GL trunk alert!
+        # Let's use trunk stops for the sequence.
+        Enum.map(Stop.gl_trunk_stops(), &elem(&1, 0))
+      else
+        Enum.find(localized_alert.location_context.stop_sequences, fn sequence ->
+          sequence_set = MapSet.new(sequence)
+          MapSet.subset?(informed_stop_ids, sequence_set)
+        end)
+      end
+
+    case selected_sequence do
       nil ->
         # There's no stop sequence that contains both the home stop and the informed stops.
         :error
@@ -132,11 +165,20 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
               terminal?: false
             }
           end)
-          |> Vector.update_at!(0, &%{&1 | terminal?: true})
-          |> Vector.update_at!(-1, &%{&1 | terminal?: true})
+          |> then(fn seq ->
+            if line == :green and branch == nil do
+              # For GL trunk alerts only, we do not want to mark ends of the sequence (Lechmere & Kenmore) as terminals.
+              seq
+            else
+              seq
+              |> Vector.update_at!(0, &%{&1 | terminal?: true})
+              |> Vector.update_at!(-1, &%{&1 | terminal?: true})
+            end
+          end)
 
         init_metadata = %{
           line: Route.get_color_for_route(informed_route_id),
+          branch: branch,
           effect: localized_alert.alert.effect
         }
 
@@ -146,14 +188,6 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
         |> validate()
     end
   end
-
-  @red_left_branch_points []
-
-  @red_right_branch_points ["place-jfk"]
-
-  @green_left_branch_points ["place-lech"]
-
-  @green_right_branch_points ["place-coecl", "place-kencl"]
 
   defp validate(%{metadata: %{line: non_branching}} = builder)
        when non_branching in [:blue, :orange] do
@@ -191,8 +225,97 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     end
   end
 
-  defp validate(%{metadata: %{line: :green}} = builder) do
-    # If home stop is on a branch, ensure no other branchs are informed -- can only be home stop's branch, or trunk, or branches on the other end?
+  defp validate(%{metadata: %{line: :green, branch: nil}} = builder) do
+    # Trunk alert.
+    # Stop sequence is Lechmere <-> Kenmore.
+    # Since we've already removed all branch stops, we don't need to do any trimming.
+
+    builder =
+      builder
+      |> update_in(
+        [Access.key(:left_end)],
+        &Vector.prepend(&1, %ArrowSlot{label_id: "place-mdftf+place-unsqu"})
+      )
+      |> update_in(
+        [Access.key(:right_end)],
+        &Vector.append(&1, %ArrowSlot{label_id: "western_branches"})
+      )
+
+    {:ok, builder}
+
+    # Both ends will ALWAYS be destination-arrows.
+    # Determing labels later in get_end_label--
+    #
+    # Left end possible labels:
+    # - Lechmere is in left_end: to Medford/Tufts & Union Sq
+    # - if Lechmere is first in sequence, the prepended arrow slot will cover us.
+    #
+    # Right end possible labels (check cases one by one in this order):
+    # - North Station is in right_end: to North Station & Park St
+    # - Gov Ctr is in right_end: to Government Center
+    # - Copley is in right_end: to Copley & West
+    # - Kenmore is in right_end: to Kenmore & West
+    # - If Kenmore is last in sequence, the appended arrow slot will cover us.
+
+    # If Lechmere is in left_end or first in sequence, then replace left_end contents with arrow to Medford/Tufts & Union Sq
+
+    # ALWAYS reverse the builder
+
+    # Example: home stop is Gov Ctr. Copley is bypassed.
+    # We might use E branch stop sequence for this.
+
+    #
+  end
+
+  # For any alert that informs only one branch, it's immediately valid
+  # and we don't need to do any stop trimming because there's only one line of stops on that branch.
+
+  defp validate(%{metadata: %{line: :green, branch: :b}} = builder) do
+    # Boston College (B) branch - to Gov Ctr
+    # Gov Ctr end labeling can be handled normally
+
+    # One end label will ALWAYS be BC, the other will ALWAYS be Gov Ctr (maybe arrows for one or the other)
+    # No trimming necessary
+
+    # ALWAYS reverse the builder
+
+    # Nothing to do here?
+    {:ok, builder}
+  end
+
+  defp validate(%{metadata: %{line: :green, branch: :c}} = builder) do
+    # Cleveland Circle (C) branch - to Gov Ctr
+    # Gov Ctr end labeling can be handled normally
+
+    # One end label will ALWAYS be Cleveland Cir, the other will ALWAYS be Gov Ctr (maybe arrows for one or the other)
+    # No trimming necessary
+
+    # ALWAYS reverse the builder
+
+    # Nothing to do here?
+    {:ok, builder}
+  end
+
+  defp validate(%{metadata: %{line: :green, branch: :d}} = builder) do
+    # Riverside (D) branch - to Union Sq on other end
+    # Branching: Kenmore & Lechmere
+
+    # One end will ALWAYS be Union Sq, the other will ALWAYS be Riverside (maybe arrows)
+    # No trimming necessary--we've narrowed it down to one branch so there's no problem with ambiguity
+
+    # Reverse the builder if the western branch contains informed stops
+    {:ok, builder}
+  end
+
+  defp validate(%{metadata: %{line: :green, branch: :e}} = builder) do
+    # Heath St (E) branch - to Medford/Tufts on other end
+    # Branching: Copley & Lechmere
+
+    # One end will ALWAYS be Medford/Tufts, the other will ALWAYS be Heath St (maybe arrows)
+    # No trimming necessary--we've narrowed it down to one branch so there's no problem with ambiguity
+
+    # Reverse the builder if the western branch contains informed stops
+    {:ok, builder}
   end
 
   defp trim_past_jfk(%{metadata: %{line: :red}} = builder) do
@@ -207,15 +330,14 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   end
 
   defp maybe_add_ashmont_braintree_label(builder) do
-    ### Keep up to JFK, throw out rest, append arrow
-    jfk_index = Aja.Enum.find_index(builder.right_end, &(&1.id == "place-jfk"))
+    case Aja.Enum.find_index(builder.right_end, &(&1.id == "place-jfk")) do
+      nil ->
+        builder
 
-    new_right_end = Vector.take(builder.right_end, jfk_index + 1)
-
-    if Aja.Enum.any?(builder.right_end, &(&1.id in @red_right_branch_points)) do
-      %{builder | right_end: new_right_end}
-    else
-      builder
+      jfk_index ->
+        # JFK is in the right end. Remove everything past it so we can't use branch stops for padding.
+        new_right_end = Vector.take(builder.right_end, jfk_index + 1)
+        %{builder | right_end: new_right_end}
     end
   end
 
@@ -271,12 +393,10 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     # We're going to replace all of the indices, so throw out the old ones.
     # That way, if we fail to set one of them (which shouldn't happen),
     # later code will fail instead of continuing with inaccurate data.
-    meta_without_indices = Map.take(builder.metadata, [:line, :effect])
+    meta_without_indices = Map.take(builder.metadata, [:line, :effect, :branch])
 
     builder.sequence
     |> Vector.with_index()
-    # Note to reviewer: foldl, "fold from left", is a synonym of reduce
-    # (TODO: Remove this comment)
     |> Vector.foldl(meta_without_indices, fn
       {%StopSlot{} = stop_data, i}, meta ->
         disrupted_indices =
@@ -387,6 +507,28 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
       |> Enum.drop(offset)
       |> Enum.take(num_to_omit)
 
+    # # Check if any stops we're about to omit are either
+    # # - the home stop, or
+    # # - a bypassed stop in a station closure alert.
+    # important_omitted_stops =
+    #   for i <- omitted_indices,
+    #       stop_data = builder.sequence[i],
+    #       stop_data.home_stop? or
+    #         (builder.metadata.effect == :station_closure and stop_data.disrupted?),
+    #       do: {stop_data, i}
+
+    # if important_omitted_stops != [] do
+    #   # Uh oh! We tried to omit one or more important stop(s).
+    #   # Do some extra work to see if we can omit stops around it instead.
+    #   do_multi_omit(
+    #     builder,
+    #     current_region_indices,
+    #     target_slots,
+    #     label_callback,
+    #     important_omitted_stops
+    #   )
+    # else
+    # All is good, proceed with the omission.
     label =
       omitted_indices
       |> MapSet.new(&builder.sequence[&1].id)
@@ -398,12 +540,38 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
     |> update_in([Access.key(:sequence)], fn seq ->
       left_side = Vector.slice(seq, 0..(first_omitted - 1)//1)
 
-      right_side = Vector.slice(seq, (last_omitted + 1)..vec_size(seq)//1)
+      right_side = Vector.slice(seq, (last_omitted + 1)..-1//1)
 
       left_side +++ Vector.new([%OmittedSlot{label: label}]) +++ right_side
     end)
     |> recalculate_metadata()
+
+    # end
   end
+
+  # defp do_multi_omit(builder, _current_region_indices, _target_slots, _label_callback, [
+  #        _important_stop_index
+  #      ]) do
+  #   # TODO
+  #   builder
+
+  #   # 1. Check if there's enough space to the left or the right of the important stop to
+  #   #    do the omission.
+  #   # 2. If not, try to do 2 omissions, one on either side.
+  #   # 3. Give up!
+  # end
+
+  # defp do_multi_omit(
+  #        _builder,
+  #        _current_region_indices,
+  #        _target_slots,
+  #        _label_callback,
+  #        _important_stop_indices
+  #      ) do
+  #   # ...Just give up?? This is exceedingly rare--only possible in a very large station closure
+  #   Logger.warn("[uncollapsible disruption diagram]")
+  #   raise "Can't omit enough stops from diagram"
+  # end
 
   @doc """
   Moves `num_to_add` stops back from the left/right end groups to the main sequence,
@@ -414,6 +582,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   """
   @spec add_slots(t(), pos_integer()) :: t()
   def add_slots(%__MODULE__{} = builder, num_to_add) do
+    IO.puts("add_slots was called")
     closure_region_indices = closure_indices(builder)
     region_length = Enum.count(closure_region_indices)
 
@@ -449,19 +618,29 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   defp do_add_slots(builder, num_to_add, :right_end) do
     {stop_data, new_right_end} = Vector.pop_at(builder.right_end, 0)
 
+    # If we just added the last slot from the right end, all we did was move
+    # a terminal/arrow back into the main sequence.
+    # Effectively, nothing was added to the diagram.
+    new_num_to_add = if vec_size(new_right_end) > 0, do: num_to_add - 1, else: num_to_add
+
     builder
     |> put_in([Access.key(:right_end)], new_right_end)
     |> update_in([Access.key(:sequence)], &Vector.append(&1, stop_data))
-    |> do_add_slots(num_to_add - 1, :right_end)
+    |> do_add_slots(new_num_to_add, :right_end)
   end
 
   defp do_add_slots(builder, num_to_add, :left_end) do
     {stop_data, new_left_end} = Vector.pop_last!(builder.left_end)
 
+    # If we just added the last slot from the left end, all we did was move
+    # a terminal/arrow back into the main sequence.
+    # Effectively, nothing was added to the diagram.
+    new_num_to_add = if vec_size(new_left_end) > 0, do: num_to_add - 1, else: num_to_add
+
     builder
     |> put_in([Access.key(:left_end)], new_left_end)
     |> update_in([Access.key(:sequence)], &Vector.prepend(&1, stop_data))
-    |> do_add_slots(num_to_add - 1, :left_end)
+    |> do_add_slots(new_num_to_add, :left_end)
   end
 
   @doc "Serializes the builder to a Model.serialized_response()."
@@ -506,24 +685,35 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   # - a destination-arrow slot if the end contains multiple stops, or
   # - nothing if the end contains no stops.
   defp add_back_end_slots(builder) do
-    left_end = get_end_slot(builder.metadata.line, builder.left_end)
-    right_end = get_end_slot(builder.metadata.line, builder.right_end)
+    left_end = get_end_slot(builder.metadata, builder.left_end)
+    right_end = get_end_slot(builder.metadata, builder.right_end)
 
     %{builder | sequence: left_end +++ builder.sequence +++ right_end}
     |> recalculate_metadata()
   end
 
-  defp get_end_slot(_line, vec([])), do: Vector.new()
+  defp get_end_slot(_meta, vec([])), do: Vector.new()
 
-  defp get_end_slot(_line, vec([%{terminal?: true} = stop_data])), do: Vector.new([stop_data])
+  defp get_end_slot(_meta, vec([%{terminal?: true} = stop_data])), do: Vector.new([stop_data])
 
-  defp get_end_slot(_line, vec([%ArrowSlot{} = predefined_destination])),
+  defp get_end_slot(_meta, vec([%ArrowSlot{} = predefined_destination])),
     do: Vector.new([predefined_destination])
 
-  defp get_end_slot(line, stops) do
+  defp get_end_slot(%{line: :green} = meta, stops) do
+    stop_ids =
+      stops
+      |> Vector.filter(&is_struct(&1, StopSlot))
+      |> Aja.Enum.map(& &1.id)
+
+    label_id = Model.get_gl_end_label_id(meta.branch, stop_ids)
+
+    Vector.new([%ArrowSlot{label_id: label_id}])
+  end
+
+  defp get_end_slot(meta, stops) do
     stop_ids = Aja.Enum.map(stops, & &1.id)
 
-    label_id = Model.get_end_label_id(line, stop_ids)
+    label_id = Model.get_end_label_id(meta.line, stop_ids)
 
     Vector.new([%ArrowSlot{label_id: label_id}])
   end

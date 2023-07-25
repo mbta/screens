@@ -7,10 +7,8 @@ defmodule Screens.V2.DisruptionDiagram.Model.Validator do
     - For GL, this is one branch. If the alert only informs the trunk, we'll just choose the first branch stop sequence that contains it.
   - The alert does not inform the entire line (we only allow one end of the diagram to have a terminal stop)
   - The current ("home") station is on the line that the alert informs
+  - The alert's informed stops do not span from trunk to a branch
   """
-
-  # TODO: this should reject alerts on Braintree branch when the home screen
-  # is at Ashmont, and similar scenarios
 
   alias Screens.V2.LocalizedAlert
 
@@ -19,12 +17,7 @@ defmodule Screens.V2.DisruptionDiagram.Model.Validator do
   def validate(localized_alert) do
     with :ok <- validate_effect(localized_alert.alert.effect),
          :ok <- validate_not_whole_line_disruption(localized_alert.alert),
-         {:ok, informed_subway_routes} <- validate_informed_lines(localized_alert),
-         :ok <-
-           validate_home_stop_on_informed_line(
-             localized_alert.location_context.routes,
-             informed_subway_routes
-           ) do
+         :ok <- validate_informed_lines(localized_alert) do
       :ok
     else
       {:error, reason} ->
@@ -36,13 +29,13 @@ defmodule Screens.V2.DisruptionDiagram.Model.Validator do
   defp validate_effect(effect) when effect in [:shuttle, :suspension, :station_closure], do: :ok
   defp validate_effect(effect), do: {:error, "invalid effect: #{effect}"}
 
-  defp validate_informed_lines(localized_alert) do
-    informed_subway_routes = LocalizedAlert.informed_subway_routes(localized_alert)
+  defp validate_informed_lines(%{alert: alert}) do
+    informed_subway_routes = LocalizedAlert.informed_subway_routes(%{alert: alert})
 
     informed_subway_lines = consolidate_gl(informed_subway_routes)
 
     case informed_subway_lines do
-      [_single_line] -> {:ok, informed_subway_routes}
+      [_single_line] -> :ok
       _ -> {:error, "alert does not inform exactly one subway line"}
     end
   end
@@ -54,12 +47,6 @@ defmodule Screens.V2.DisruptionDiagram.Model.Validator do
        ),
        do: {:error, "alert informs an entire line"},
        else: :ok
-  end
-
-  defp validate_home_stop_on_informed_line(routes_at_home_stop, informed_subway_routes) do
-    if Enum.any?(routes_at_home_stop, &(&1.route_id in informed_subway_routes)),
-      do: :ok,
-      else: {:error, "alert does not inform a subway line that serves screen's home stop"}
   end
 
   defp consolidate_gl(route_ids) do
