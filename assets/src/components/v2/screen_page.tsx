@@ -8,7 +8,6 @@ interface Props {
 
 const ScreenPage = ({ id }: Props) => {
   const screenId = id ?? (useParams() as { id: string }).id;
-  console.log("screenId: ", screenId)
   return <ScreenContainer id={screenId} />;
 };
 
