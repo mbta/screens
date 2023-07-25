@@ -123,7 +123,18 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   # There's some special logic for the Green Line.
   defp serialize_by_line(:green, builder) do
-    nil
+    builder = maybe_reverse_gl(builder)
+
+    builder =
+      with :unchanged <- fit_closure_region(builder),
+           :unchanged <- fit_gap_region(builder),
+           :unchanged <- pad_slots(builder) do
+        builder
+      else
+        {:done, builder} -> builder
+      end
+
+    Builder.serialize(builder)
   end
 
   defp serialize_by_line(_orange_or_red, builder) do
@@ -139,22 +150,55 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     Builder.serialize(builder)
   end
 
-  # TODO: What if home stop is in the stops to omit?
+  # The diagram needs to be flipped whenever it's not a GLX-only alert.
+  defp maybe_reverse_gl(builder) do
+    is_glx_branch = builder.metadata.branch in [:d, :e]
+
+    if is_glx_branch and glx_only_alert?(builder) do
+      builder
+    else
+      Builder.reverse_stops(builder)
+    end
+  end
+
+  defp glx_only_alert?(builder) do
+    diagram_contains_glx =
+      Aja.Enum.any?(builder.sequence, fn
+        %Builder.StopSlot{} = stop_data -> Stop.on_glx?(stop_data.id)
+        _ -> false
+      end)
+
+    copley_index =
+      Aja.Enum.find_index(builder.sequence, fn
+        %Builder.StopSlot{id: "place-coecl"} -> true
+        _ -> false
+      end)
+      |> IO.inspect()
+
+    no_stops_west_of_copley =
+      case copley_index do
+        nil -> true
+        # If Copley is in the sequence, it can only be the last stop
+        i -> i == Aja.Vector.size(builder.sequence) - 1
+      end
+
+    diagram_contains_glx and no_stops_west_of_copley
+  end
+
   defp fit_closure_region(builder) do
+    passes_through_kenmore? = builder.metadata.branch in [:b, :c, :d]
+
     current_closure_count = Builder.closure_count(builder)
 
-    with true <- current_closure_count > 8,
+    with true <- current_closure_count > @max_closure_count,
          target_closure_slots = 12 - min_non_closure_slots(builder),
          {:lt, true} <- {:lt, target_closure_slots < current_closure_count} do
-      # The number of closure slots we want left after the omission.
-      # This includes one slot for the omitted stations, labeled with "...via $STOPS"
-      # TODO: Why 12? Does this need to change if home stop is inside the closure?
       builder =
         builder
         |> Builder.omit_stops(
           :closure,
           target_closure_slots,
-          &get_omission_label(Builder.line(builder), &1, false)
+          &get_omission_label(Builder.line(builder), &1, passes_through_kenmore?)
         )
         |> minimize_gap()
 
@@ -175,6 +219,8 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   end
 
   defp minimize_gap(builder) do
+    passes_through_kenmore? = builder.metadata.branch in [:b, :c, :d]
+
     current_gap_count = Builder.gap_count(builder)
     target_gap_slots = Builder.min_gap(builder)
 
@@ -183,7 +229,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
         builder,
         :gap,
         target_gap_slots,
-        &get_omission_label(Builder.line(builder), &1, false)
+        &get_omission_label(Builder.line(builder), &1, passes_through_kenmore?)
       )
     else
       IO.puts(
@@ -195,6 +241,8 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   end
 
   defp fit_gap_region(builder) do
+    passes_through_kenmore? = builder.metadata.branch in [:b, :c, :d]
+
     current_gap_count = Builder.gap_count(builder)
 
     with true <- current_gap_count >= 3,
@@ -207,7 +255,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
           builder,
           :gap,
           target_gap_slots,
-          &get_omission_label(Builder.line(builder), &1, false)
+          &get_omission_label(Builder.line(builder), &1, passes_through_kenmore?)
         )
 
       {:done, builder}
@@ -238,7 +286,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     end
   end
 
-  defp get_omission_label(line, omitted_stop_ids, ends_at_gov_ctr?)
+  defp get_omission_label(line, omitted_stop_ids, passes_through_kenmore?)
 
   defp get_omission_label(:green, omitted_stop_ids, false) do
     if "place-gover" in omitted_stop_ids,
@@ -275,11 +323,6 @@ defmodule Screens.V2.DisruptionDiagram.Model do
       else: "…"
   end
 
-  # TODO: What do we do if home stop is at JFK and it's a RL trunk alert?
-  # Need to force destination arrow instead of more stops past JFK somehow
-
-  # if end_stop_ids is empty, this shouldn't be called
-
   @spec get_end_label_id(line_color(), nonempty_list()) :: end_label_id()
   def get_end_label_id(:orange, end_stop_ids) do
     label_id =
@@ -307,13 +350,46 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     end
   end
 
-  def get_end_label_id(:green, end_stop_ids) do
-    label_id =
-      cond do
-        "place-mdftf" -> "place-mdftf"
-      end
+  def get_gl_end_label_id(nil, end_stop_ids) do
+    # Trunk alert
 
-    label_id
+    cond do
+      # left end
+      "place-lech" in end_stop_ids -> "place-mdftf+place-unsqu"
+      # right end
+      "place-north" in end_stop_ids -> "place-north+place-pktrm"
+      "place-gover" in end_stop_ids -> "place-gover"
+      "place-coecl" in end_stop_ids -> "place-coecl+west"
+      "place-kencl" in end_stop_ids -> "place-kencl+west"
+    end
+  end
+
+  def get_gl_end_label_id(:b, end_stop_ids) do
+    cond do
+      "place-gover" in end_stop_ids -> "place-gover"
+      "place-lake" in end_stop_ids -> "place-lake"
+    end
+  end
+
+  def get_gl_end_label_id(:c, end_stop_ids) do
+    cond do
+      "place-gover" in end_stop_ids -> "place-gover"
+      "place-clmnl" in end_stop_ids -> "place-clmnl"
+    end
+  end
+
+  def get_gl_end_label_id(:d, end_stop_ids) do
+    cond do
+      "place-unsqu" in end_stop_ids -> "place-unsqu"
+      "place-river" in end_stop_ids -> "place-river"
+    end
+  end
+
+  def get_gl_end_label_id(:e, end_stop_ids) do
+    cond do
+      "place-mdftf" in end_stop_ids -> "place-mdftf"
+      "place-hsmnl" in end_stop_ids -> "place-hsmnl"
+    end
   end
 
   defp min_non_closure_slots(builder) do
@@ -333,30 +409,9 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   end
 end
 
-# DONE: Reverse stop order for all GL diagrams, except when disruption is on GLX
-
-# DONE: Create a function that determines terminal label from a set of omitted stops
-
-# DONE: Define a representation for omitted stops
-
-# TODO: Create a function that determines mid-route label from a set of omitted stops
-#       - via STOP:
-#         - Red Line: DTX
-#         - Orange Line: DTX
-#         - Green Line: Gov Ctr
-#         - Green Line when the diagram ends at Gov Ctr:
-#           - Kenmore & Copley (whichever are omitted)
-
 # TODO: What if there is a station closure with 3 stops very far apart.
 #       How to avoid omitting the bypassed station in the middle while shrinking closure region
 #       Maybe avoid omitting any stops with disrupted?: true
 #
 #       Complicating factor: The removed stop in the middle could also be the home stop, which
 #       breaks stuff
-
-# TODO: How to handle cases where home stop is at or very close to a branch point--
-# end labels become difficult and potentially need to cut off one end of closure region for station closures
-
-# TODO: Do we need to handle cases where alert goes from a branch point, down one branch? E.g. JFK - North Quincy
-
-# TODO (code cleanup): See which cases of `vec_size(x)-1` can be replaced with just -1 or similar--Vector.slice supports indexing from end with negatives
