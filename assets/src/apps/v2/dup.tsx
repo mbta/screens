@@ -123,13 +123,44 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
+  const dEl = document.createElement("div");
+  dEl.id = "debug";
+  document.body.appendChild(dEl);
+  // save the original console.log function
+  const old_logger = console.log;
+  // grab html element for adding console.log output
+  const html_logger = document.getElementById("debug");
+  // replace console.log function with our own function
+  console.log = function (...msgs) {
+    // first call old logger for console output
+    old_logger.call(this, arguments);
+
+    // convert object args to strings and join them together
+    const text = msgs
+      .map((msg) => {
+        if (typeof msg == "object") {
+          return JSON && JSON.stringify ? JSON.stringify(msg) : msg;
+        } else {
+          return msg;
+        }
+      })
+      .join(" ");
+
+    // add the log to the html element.
+    html_logger.innerHTML += "<div>" + text + "<div>";
+  };
+
   let playerName = null;
   if (isDup()) {
     playerName = useOutfrontPlayerName();
   }
 
+  // playerName = "BRW-DUP-004"
+
   if (playerName !== null) {
+    console.log("player name is: ", playerName)
     const id = `DUP-${playerName.trim()}`;
+    console.log("id is ", id)
     return (
       <MappingContext.Provider value={TYPE_TO_COMPONENT}>
         <ResponseMapperContext.Provider value={responseMapper}>

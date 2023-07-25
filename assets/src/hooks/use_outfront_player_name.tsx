@@ -7,6 +7,7 @@ const useOutfrontPlayerName = () => {
     console.log("Running the useEffect hook")
     if (parent?.parent?.mraid ?? false) {
       console.log("  Within the condition: parent?.parent?.mraid == true")
+      const mraid = parent.parent.mraid;
       try {
         console.log("   Within the try. Attempting to getDeviceInfo and parse the result")
         const deviceInfo = mraid.getDeviceInfo();
