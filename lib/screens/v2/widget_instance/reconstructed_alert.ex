@@ -103,10 +103,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   }
 
   @headsign_svg_map %{
-    # No copley & west?
     "Bowdoin" => "bl-bowdoin",
     "Wonderland" => "bl-wonderland",
     "Government Center" => "gl-govt-center",
+    "Copley & West" => "gl-copley-west",
     "North Station & North" => "gl-north-station-north",
     "Boston College" => "glb-boston-college",
     "Cleveland Circle" => "glc-cleveland-cir",
@@ -200,6 +200,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     ]
   end
 
+  # Split Ashmont/Braintree out into two route pills
   defp build_pills_from_headsign(route_id, "Ashmont/Braintree") do
     Enum.map(["Ashmont", "Braintree"], fn dest ->
       %{
@@ -208,6 +209,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         headsign: dest
       }
     end)
+  end
+
+  # If headsign is for the trunk, use "Green" as route_id
+  defp build_pills_from_headsign(_route_id, headsign)
+       when headsign in ["North Station & North", "Copley & West"] do
+    [
+      %{
+        route_id: "Green",
+        svg_name: format_for_svg_name(headsign),
+        headsign: headsign
+      }
+    ]
   end
 
   defp build_pills_from_headsign(route_id, headsign) do
