@@ -273,7 +273,7 @@ const PreFareAlertBanner: React.ComponentType<{routes: EnrichedRoute[]}> = ({rou
       <span><span className="alert-banner__attention-text">ATTENTION,</span> riders to</span>
       {routes.map((route) => {
         const LinePill = STRING_TO_SVG[route.svg_name]
-        return <LinePill className="alert-banner__route-pill--long" color={getHexColor(getRouteColor(route.route_id))} />
+        return <LinePill className="alert-banner__route-pill--long" key={route.svg_name} color={getHexColor(getRouteColor(route.route_id))} />
       })}
     </div>
   } else {
