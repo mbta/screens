@@ -125,7 +125,6 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
 
     line = Route.get_color_for_route(informed_route_id)
 
-    IO.inspect(informed_route_id)
     stop_id_to_name = Stop.stop_id_to_name(informed_route_id)
 
     home_stop_id = localized_alert.location_context.home_stop
@@ -582,7 +581,6 @@ defmodule Screens.V2.DisruptionDiagram.Model.Builder do
   """
   @spec add_slots(t(), pos_integer()) :: t()
   def add_slots(%__MODULE__{} = builder, num_to_add) do
-    IO.puts("add_slots was called")
     closure_region_indices = closure_indices(builder)
     region_length = Enum.count(closure_region_indices)
 

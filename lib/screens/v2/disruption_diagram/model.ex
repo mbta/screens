@@ -173,7 +173,6 @@ defmodule Screens.V2.DisruptionDiagram.Model do
         %Builder.StopSlot{id: "place-coecl"} -> true
         _ -> false
       end)
-      |> IO.inspect()
 
     no_stops_west_of_copley =
       case copley_index do
