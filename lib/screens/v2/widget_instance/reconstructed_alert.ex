@@ -871,11 +871,28 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def serialize(%__MODULE__{is_full_screen: true} = t) do
-    if takeover_alert?(t) do
-      serialize_takeover_alert(t)
-    else
-      location = LocalizedAlert.location(t)
-      serialize_fullscreen_alert(t, location)
+    result =
+      if takeover_alert?(t) do
+        serialize_takeover_alert(t)
+      else
+        location = LocalizedAlert.location(t)
+        serialize_fullscreen_alert(t, location)
+      end
+
+    try do
+      diagram_data = Screens.V2.DisruptionDiagram.Model.serialize(t)
+      IO.inspect(diagram_data, label: "✨ Disruption diagram generation succeeded")
+      Map.merge(result, %{disruption_diagram: diagram_data})
+    rescue
+      error ->
+        IO.puts(
+          "💥 Disruption diagram generation failed! Error message and stacktrace below, possibly relevant logs above."
+        )
+
+        IO.inspect(error)
+        IO.puts(Exception.format_stacktrace())
+
+        result
     end
   end
 
@@ -924,12 +941,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
   def temporarily_override_alert(%__MODULE__{} = t) do
-    # Prevent Porter and Charles/MGH pre-fare screens from incorrectly communicating
-    # a RL alert that affects both the Ashmont and Braintree branches.
-    not (t.alert.id == "495153" and
+    # Prevent Government Center pre-fare screens from incorrectly communicating
+    # a GL alert that affects all branches.
+    not (t.alert.id in ["508765", "508767", "508773", "508776"] and
            t.screen.app_params.reconstructed_alert_widget.stop_id in [
-             "place-portr",
-             "place-chmnl"
+             "place-gover"
            ])
   end
 
