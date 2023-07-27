@@ -15,7 +15,6 @@ defmodule Screens.Stops.Stop do
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes
   alias Screens.Routes.Route
-  alias Screens.RouteType
   alias Screens.Stops.StationsWithRoutesAgent
   alias Screens.Util
   alias Screens.V3Api
@@ -209,6 +208,8 @@ defmodule Screens.Stops.Stop do
   ]
 
   @green_line_trunk_stops [
+    # These 3 eventually will NOT be trunk stops, but are until Medford opens
+    {"place-unsqu", {"Union Square", "Union Sq"}},
     {"place-lech", {"Lechmere", "Lechmere"}},
     {"place-spmnl", {"Science Park/West End", "Science Pk"}},
     {"place-north", {"North Station", "North Sta"}},
@@ -220,18 +221,6 @@ defmodule Screens.Stops.Stop do
     {"place-coecl", {"Copley", "Copley"}},
     {"place-hymnl", {"Hynes Convention Center", "Hynes"}},
     {"place-kencl", {"Kenmore", "Kenmore"}}
-  ]
-
-  @medford_tufts_branch_stops [
-    {"place-mdftf", {"Medford / Tufts", "Medford"}},
-    {"place-balsq", {"Ball Square", "Ball Sq"}},
-    {"place-mgngl", {"Magoun Square", "Magoun Sq"}},
-    {"place-gilmn", {"Gilman Square", "Gilman Sq"}},
-    {"place-esomr", {"East Somerville", "E Somerville"}}
-  ]
-
-  @union_square_branch_stops [
-    {"place-unsqu", {"Union Square", "Union Sq"}}
   ]
 
   @route_stop_sequences %{
@@ -492,7 +481,7 @@ defmodule Screens.Stops.Stop do
 
   # Returns the route types we care about for the alerts of this screen type / place
   @spec get_route_type_filter(screen_type(), String.t()) ::
-          list(RouteType.t())
+          list(atom())
   def get_route_type_filter(app, _) when app in [BusEink, BusShelter], do: [:bus]
   def get_route_type_filter(GlEink, _), do: [:light_rail]
   # Ashmont should not show Mattapan alerts for PreFare or Dup
@@ -514,9 +503,5 @@ defmodule Screens.Stops.Stop do
     stop_sequences
     |> Enum.flat_map(fn stop_sequence -> Util.slice_after(stop_sequence, stop_id) end)
     |> MapSet.new()
-  end
-
-  def on_glx?(stop_id) do
-    stop_id in Enum.map(@medford_tufts_branch_stops ++ @union_square_branch_stops, &elem(&1, 0))
   end
 end

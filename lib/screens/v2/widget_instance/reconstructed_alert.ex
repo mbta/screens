@@ -871,28 +871,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def serialize(%__MODULE__{is_full_screen: true} = t) do
-    result =
-      if takeover_alert?(t) do
-        serialize_takeover_alert(t)
-      else
-        location = LocalizedAlert.location(t)
-        serialize_fullscreen_alert(t, location)
-      end
-
-    try do
-      diagram_data = Screens.V2.DisruptionDiagram.Model.serialize(t)
-      IO.inspect(diagram_data, label: "✨ Disruption diagram generation succeeded")
-      Map.merge(result, %{disruption_diagram: diagram_data})
-    rescue
-      error ->
-        IO.puts(
-          "💥 Disruption diagram generation failed! Error message and stacktrace below, possibly relevant logs above."
-        )
-
-        IO.inspect(error)
-        IO.puts(Exception.format_stacktrace())
-
-        result
+    if takeover_alert?(t) do
+      serialize_takeover_alert(t)
+    else
+      location = LocalizedAlert.location(t)
+      serialize_fullscreen_alert(t, location)
     end
   end
 
