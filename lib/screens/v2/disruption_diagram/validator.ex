@@ -1,4 +1,4 @@
-defmodule Screens.V2.DisruptionDiagram.Model.Validator do
+defmodule Screens.V2.DisruptionDiagram.Validator do
   @moduledoc """
   Validates LocalizedAlerts for compatibility with disruption diagrams:
   - The alert is a subway alert with an effect of shuttle, suspension, or station_closure

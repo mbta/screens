@@ -1,4 +1,4 @@
-defmodule Screens.V2.DisruptionDiagram.Model.Builder do
+defmodule Screens.V2.DisruptionDiagram.Builder do
   @moduledoc """
   An intermediate data structure for transforming a localized alert to a disruption diagram.
 

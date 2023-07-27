@@ -4,8 +4,8 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   """
 
   alias Screens.V2.LocalizedAlert
-  alias Screens.V2.DisruptionDiagram.Model.Validator
-  alias Screens.V2.DisruptionDiagram.Model.Builder
+  alias Screens.V2.DisruptionDiagram.Validator
+  alias Screens.V2.DisruptionDiagram.Builder
   alias Screens.Stops.Stop
 
   import LocalizedAlert, only: [is_localized_alert: 1]
@@ -13,7 +13,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   require Logger
 
   # We don't need to define any new struct for the diagram's source data--
-  # we can just use any map/struct that satisfies LocalizedAlert.t().
+  # we can use any map/struct that satisfies LocalizedAlert.t().
   @type t :: LocalizedAlert.t()
 
   @type serialized_response :: continuous_disruption_diagram() | discrete_disruption_diagram()
