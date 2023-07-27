@@ -35,7 +35,7 @@ const standardLayout = (
   remedy: string,
   effect: string,
   location: string | null,
-  disruptionDiagram: DisruptionDiagramData
+  disruptionDiagram?: DisruptionDiagramData
 ) => {
   const { ref: contentBlockRef, size: contentTextSize } = useTextResizer({
     sizes: ["medium", "large"],
@@ -57,7 +57,7 @@ const downstreamLayout = (
   endpoints: string[],
   effect: string,
   remedy: string,
-  disruptionDiagram: DisruptionDiagramData
+  disruptionDiagram?: DisruptionDiagramData
 ) => (
   <div className={classWithModifier("alert-card__content-block", "downstream")}>
     {mapSection(disruptionDiagram)}
@@ -72,7 +72,7 @@ const downstreamLayout = (
 const multiLineLayout = (
   routes: string[],
   unaffected_routes: string[],
-  disruptionDiagram: DisruptionDiagramData
+  disruptionDiagram?: DisruptionDiagramData
 ) => {
   const AffectedLinePill = STRING_TO_SVG[routes[0]];
 

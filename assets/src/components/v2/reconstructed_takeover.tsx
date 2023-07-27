@@ -46,7 +46,9 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
             <div className="alert-card__body__location ">{location}</div>
             {disruption_diagram && (
               <div style={{ height: 408, width: 904 }}>
-                <DisruptionDiagram {...disruption_diagram} />
+                {disruption_diagram && (
+                  <DisruptionDiagram {...disruption_diagram} />
+                )}
               </div>
             )}
           </div>
