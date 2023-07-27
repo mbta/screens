@@ -730,8 +730,9 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         height="408px"
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
+        overflow="visible"
       >
-        <svg height={hasEmphasis ? 320 : 408} y={0}>
+        <svg height={hasEmphasis ? 320 : 408} y={0} overflow="visible">
           <g
             id="test"
             transform={`translate(12, ${hasEmphasis ? 260 : 320})`}
