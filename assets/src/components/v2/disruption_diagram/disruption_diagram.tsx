@@ -546,7 +546,13 @@ const EffectBackgroundComponent: ComponentType<
     );
   } else if (effect === "suspension") {
     background = (
-      <rect width={x2 - SLOT_WIDTH} height="16" x={x1} y="16" fill="#AEAEAE" />
+      <rect
+        width={x2 - x1 + SLOT_WIDTH}
+        height="16"
+        x={x1}
+        y="16"
+        fill="#AEAEAE"
+      />
     );
   } else {
     background = <></>;
