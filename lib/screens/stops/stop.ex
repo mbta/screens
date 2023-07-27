@@ -519,4 +519,71 @@ defmodule Screens.Stops.Stop do
   def on_glx?(stop_id) do
     stop_id in Enum.map(@medford_tufts_branch_stops ++ @union_square_branch_stops, &elem(&1, 0))
   end
+
+  @doc """
+  Only for use in building test data!
+  In production code, use `Screens.Routes.Route.fetch_routes_by_stop/1`
+  or `t:t.fetch_location_context/1`.
+
+  Returns IDs of the subway/light rail route(s) that serve the given station,
+  using our hardcoded stop sequences rather than API calls.
+  """
+  def __subway_routes_at_station(parent_station_id) do
+    @route_stop_sequences
+    |> Enum.filter(fn
+      # Green isn't a real route ID, ignore it.
+      {"Green", _} ->
+        false
+
+      {_route_id, labeled_sequences} ->
+        stop_sequences =
+          Enum.map(labeled_sequences, fn labeled_sequence ->
+            Enum.map(labeled_sequence, &elem(&1, 0))
+          end)
+
+        Enum.any?(stop_sequences, &(parent_station_id in &1))
+    end)
+    |> Enum.map(fn {route_id, _stop_sequences} -> route_id end)
+  end
+
+  @doc """
+  Only for use in building test data!
+
+  Returns a list of stop sequence(s) that contain the given subway/light rail station.
+  """
+  def __stop_sequences_through_station(parent_station_id) do
+    Enum.flat_map(@route_stop_sequences, fn
+      # Green isn't a real route ID, ignore it.
+      {"Green", _} ->
+        []
+
+      {_route_id, labeled_sequences} ->
+        Enum.flat_map(labeled_sequences, fn labeled_sequence ->
+          stop_sequence = Enum.map(labeled_sequence, &elem(&1, 0))
+          if parent_station_id in stop_sequence, do: [stop_sequence], else: []
+        end)
+    end)
+  end
+
+  @doc """
+  Only for use in building test data!
+  (Though maybe it could be useful elsewhere?)
+
+  Returns IDs of the route(s) whose stop sequence(s) contain all of the given stops.
+  """
+  def __routes_containing_all(parent_station_ids) do
+    @route_stop_sequences
+    |> Enum.filter(fn
+      # Green isn't a real route ID, ignore it.
+      {"Green", _} ->
+        false
+
+      {_route_id, labeled_sequences} ->
+        Enum.any?(labeled_sequences, fn labeled_sequence ->
+          stops = MapSet.new(labeled_sequence, &elem(&1, 0))
+          MapSet.subset?(parent_station_ids, stops)
+        end)
+    end)
+    |> Enum.map(fn {route_id, _} -> route_id end)
+  end
 end
