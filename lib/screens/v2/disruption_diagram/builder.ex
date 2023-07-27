@@ -193,6 +193,10 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     {:ok, builder}
   end
 
+  # TODO: Can this logic mirror the GL logic?
+  # - Find the stop sequence that contains disruption + home stop
+  # - Shorten to trunk if possible
+  # - Add destination arrows when appropriate
   defp validate(%{metadata: %{line: :red}} = builder) do
     # Ensure that this alert does not cross from the trunk to a branch.
     disrupted_indices = disrupted_stop_indices(builder)
@@ -228,6 +232,9 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     # Trunk alert.
     # Stop sequence is Lechmere <-> Kenmore.
     # Since we've already removed all branch stops, we don't need to do any trimming.
+    #
+    # We only need to add the appropriate destination-arrows to either end.
+    # They will be used if the diagram ends up including the leftmost/rightmost trunk stops.
 
     builder =
       builder
@@ -241,79 +248,24 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
       )
 
     {:ok, builder}
-
-    # Both ends will ALWAYS be destination-arrows.
-    # Determing labels later in get_end_label--
-    #
-    # Left end possible labels:
-    # - Lechmere is in left_end: to Medford/Tufts & Union Sq
-    # - if Lechmere is first in sequence, the prepended arrow slot will cover us.
-    #
-    # Right end possible labels (check cases one by one in this order):
-    # - North Station is in right_end: to North Station & Park St
-    # - Gov Ctr is in right_end: to Government Center
-    # - Copley is in right_end: to Copley & West
-    # - Kenmore is in right_end: to Kenmore & West
-    # - If Kenmore is last in sequence, the appended arrow slot will cover us.
-
-    # If Lechmere is in left_end or first in sequence, then replace left_end contents with arrow to Medford/Tufts & Union Sq
-
-    # ALWAYS reverse the builder
-
-    # Example: home stop is Gov Ctr. Copley is bypassed.
-    # We might use E branch stop sequence for this.
-
-    #
   end
 
   # For any alert that informs only one branch, it's immediately valid
   # and we don't need to do any stop trimming because there's only one line of stops on that branch.
 
   defp validate(%{metadata: %{line: :green, branch: :b}} = builder) do
-    # Boston College (B) branch - to Gov Ctr
-    # Gov Ctr end labeling can be handled normally
-
-    # One end label will ALWAYS be BC, the other will ALWAYS be Gov Ctr (maybe arrows for one or the other)
-    # No trimming necessary
-
-    # ALWAYS reverse the builder
-
-    # Nothing to do here?
     {:ok, builder}
   end
 
   defp validate(%{metadata: %{line: :green, branch: :c}} = builder) do
-    # Cleveland Circle (C) branch - to Gov Ctr
-    # Gov Ctr end labeling can be handled normally
-
-    # One end label will ALWAYS be Cleveland Cir, the other will ALWAYS be Gov Ctr (maybe arrows for one or the other)
-    # No trimming necessary
-
-    # ALWAYS reverse the builder
-
-    # Nothing to do here?
     {:ok, builder}
   end
 
   defp validate(%{metadata: %{line: :green, branch: :d}} = builder) do
-    # Riverside (D) branch - to Union Sq on other end
-    # Branching: Kenmore & Lechmere
-
-    # One end will ALWAYS be Union Sq, the other will ALWAYS be Riverside (maybe arrows)
-    # No trimming necessary--we've narrowed it down to one branch so there's no problem with ambiguity
-
-    # Reverse the builder if the western branch contains informed stops
     {:ok, builder}
   end
 
   defp validate(%{metadata: %{line: :green, branch: :e}} = builder) do
-    # Heath St (E) branch - to Medford/Tufts on other end
-    # Branching: Copley & Lechmere
-
-    # One end will ALWAYS be Medford/Tufts, the other will ALWAYS be Heath St (maybe arrows)
-    # No trimming necessary--we've narrowed it down to one branch so there's no problem with ambiguity
-
-    # Reverse the builder if the western branch contains informed stops
     {:ok, builder}
   end
 

@@ -3,11 +3,14 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
   Validates LocalizedAlerts for compatibility with disruption diagrams:
   - The alert is a subway alert with an effect of shuttle, suspension, or station_closure
   - The alert informs stops on only one subway route
-    - For BL, OL, & RL, this is the same as the line
-    - For GL, this is one branch. If the alert only informs the trunk, we'll just choose the first branch stop sequence that contains it.
+    - For BL & OL, this is the same as the line
+    - For RL, this is either the trunk, the Ashmont branch, or the Braintree branch. No combination of the three.
+    - For GL, this is any one branch, or just the trunk (Lechmere to Kenmore).
   - The alert does not inform the entire line (we only allow one end of the diagram to have a terminal stop)
   - The current ("home") station is on the line that the alert informs
-  - The alert's informed stops do not span from trunk to a branch
+    - For cases where the home station is on a branch, the alert must only inform stops
+      reachable from that branch without transfers. For example, if the home station is
+      Cleveland Circle (C branch), the alert must only inform stops between Cleveland Circle and Government Center.
   """
 
   alias Screens.V2.LocalizedAlert

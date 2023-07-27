@@ -95,7 +95,10 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     end
   rescue
     error ->
-      Logger.warn(Exception.message(error) <> "\n" <> Exception.format_stacktrace(__STACKTRACE__))
+      Logger.warn(
+        Exception.message(error) <> "\n\n" <> Exception.format_stacktrace(__STACKTRACE__)
+      )
+
       :error
   end
 
@@ -121,33 +124,29 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     |> Builder.serialize()
   end
 
-  # There's some special logic for the Green Line.
+  # For the Green Line, we need to reverse the diagram in certain cases.
   defp serialize_by_line(:green, builder) do
-    builder = maybe_reverse_gl(builder)
-
-    builder =
-      with :unchanged <- fit_closure_region(builder),
-           :unchanged <- fit_gap_region(builder),
-           :unchanged <- pad_slots(builder) do
-        builder
-      else
-        {:done, builder} -> builder
-      end
-
-    Builder.serialize(builder)
+    builder
+    |> maybe_reverse_gl()
+    |> fit_regions()
+    |> Builder.serialize()
   end
 
+  # Red Line and Orange Line diagrams never need to be reversed--we just need to fit regions.
   defp serialize_by_line(_orange_or_red, builder) do
-    builder =
-      with :unchanged <- fit_closure_region(builder),
-           :unchanged <- fit_gap_region(builder),
-           :unchanged <- pad_slots(builder) do
-        builder
-      else
-        {:done, builder} -> builder
-      end
+    builder
+    |> fit_regions()
+    |> Builder.serialize()
+  end
 
-    Builder.serialize(builder)
+  defp fit_regions(builder) do
+    with :unchanged <- fit_closure_region(builder),
+         :unchanged <- fit_gap_region(builder),
+         :unchanged <- pad_slots(builder) do
+      builder
+    else
+      {:done, builder} -> builder
+    end
   end
 
   # The diagram needs to be flipped whenever it's not a GLX-only alert.
@@ -414,3 +413,11 @@ end
 #
 #       Complicating factor: The removed stop in the middle could also be the home stop, which
 #       breaks stuff
+
+# TODO: One-stop continuous alerts? Are those possible, could they ever make sense?
+# - One-stop shuttle: No...
+# - One-stop suspension: Maybe? Trains in either direction stop at the station but turn around
+
+# TODO: Original code at the start of Builder.new is hot garbo.
+# Make it more resilient--should get stop/route stuff based on the route that fully contains
+# informed stops ++ home stop (since really we only care about getting all the info we need to draw the diagram between them)
