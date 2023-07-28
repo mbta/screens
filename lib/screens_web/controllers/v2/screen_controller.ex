@@ -66,6 +66,16 @@ defmodule ScreensWeb.V2.ScreenController do
     |> render("index_multi.html")
   end
 
+  def widget(conn, %{"id" => app_id} = params)
+      when app_id in @app_id_strings do
+    app_id = String.to_existing_atom(app_id)
+    
+    conn
+    |> assign(:app_id, app_id)
+    |> assign(:widget_data, (if params["widget"], do: Poison.encode!(params["widget"]), else: nil))
+    |> render("index_widget.html")
+  end  
+
   def index(conn, %{"id" => screen_id} = params) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
