@@ -668,6 +668,7 @@ Client is responsible for:
 const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   const { slots, current_station_slot_index, line, effect } = props;
   const [doAbbreviate, setDoAbbreviate] = useState(false);
+  const [scaleFactor, setScaleFactor] = useState(1);
   const numStops = slots.length;
   const spaceBetween = Math.min(
     60,
@@ -721,6 +722,12 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         setDoAbbreviate(true);
       }
 
+      // Prevent diagram from exceeding width of 904px
+      const width = stuff.width;
+      if (width > 904) {
+        setScaleFactor(904 / width);
+      }
+
       setIsDone(true);
     }
   });
@@ -732,12 +739,14 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         height="408px"
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
-        overflow="visible"
+        transform={` scale(${scaleFactor})`}
       >
-        <svg height={hasEmphasis ? 320 : 408} y={0} overflow="visible">
+        <svg height={hasEmphasis ? 320 : 408} y={0}>
           <g
             id="test"
-            transform={`translate(12, ${hasEmphasis ? 260 : 320})`}
+            transform={`translate(0, ${
+              hasEmphasis ? 260 : 320
+            }) scale(${scaleFactor})`}
             visibility={isDone ? "visible" : "hidden"}
           >
             <EffectBackgroundComponent
@@ -781,7 +790,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         </svg>
         {hasEmphasis && (
           <svg height="80px" y={315} style={{ position: "absolute" }}>
-            <g transform="translate(12, 24)">
+            <g transform={`translate(0, 24) scale(${scaleFactor})`}>
               <AlertEmphasisComponent
                 effectRegionSlotIndexRange={
                   props.effect_region_slot_index_range
