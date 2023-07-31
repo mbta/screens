@@ -93,6 +93,7 @@ const endLabelIDMap: { [labelID: string]: string[] } = {
   "place-mdftf+place-unsqu": ["MEDFORD/TUFTS", "& UNION SQ"],
   "place-north+place-pktrm": ["NORTH STATION", "& PARK ST"],
   "place-coecl+west": ["COPLEY & WEST"],
+  western_branches: ["WESTERN BRANCHES"],
 };
 
 interface IconProps {
