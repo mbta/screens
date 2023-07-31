@@ -628,7 +628,8 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
 
   return (
     <>
-      {effectRegionSlotIndexRange[1] - effectRegionSlotIndexRange[0] > 2 && (
+      {effectRegionSlotIndexRange[1] - effectRegionSlotIndexRange[0] + 1 >
+        2 && (
         <>
           <path
             d={`M${x1 - L} 4L${x1 - L} 28`}
