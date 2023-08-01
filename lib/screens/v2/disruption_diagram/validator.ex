@@ -11,15 +11,14 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
   - All stops informed by the alert are directly reachable from the home stop.
   """
 
-  alias Screens.V2.LocalizedAlert
   alias Screens.Alerts.Alert
+  alias Screens.V2.LocalizedAlert
 
   @spec validate(LocalizedAlert.t()) :: :ok | {:error, reason :: String.t()}
   def validate(localized_alert) do
     with :ok <- validate_effect(localized_alert.alert.effect),
-         :ok <- validate_not_whole_route_disruption(localized_alert.alert),
-         :ok <- validate_informed_lines(localized_alert) do
-      :ok
+         :ok <- validate_not_whole_route_disruption(localized_alert.alert) do
+      validate_informed_lines(localized_alert)
     end
   end
 

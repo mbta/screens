@@ -9,6 +9,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
+  require Logger
+
   defstruct screen: nil,
             alert: nil,
             now: nil,
@@ -871,6 +873,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def serialize(%__MODULE__{is_full_screen: true} = t) do
+    diagram_data =
+      case Screens.V2.DisruptionDiagram.Model.serialize(t) do
+        {:ok, serialized_diagram} ->
+          %{disruption_diagram: serialized_diagram}
+
+        {:error, reason} ->
+          Logger.warn("[disruption diagram error] #{reason}")
+          %{}
+      end
+
     result =
       if takeover_alert?(t) do
         serialize_takeover_alert(t)
@@ -879,21 +891,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         serialize_fullscreen_alert(t, location)
       end
 
-    try do
-      diagram_data = Screens.V2.DisruptionDiagram.Model.serialize(t)
-      IO.inspect(diagram_data, label: "✨ Disruption diagram generation succeeded")
-      Map.merge(result, %{disruption_diagram: diagram_data})
-    rescue
-      error ->
-        IO.puts(
-          "💥 Disruption diagram generation failed! Error message and stacktrace below, possibly relevant logs above."
-        )
-
-        IO.inspect(error)
-        IO.puts(Exception.format_stacktrace())
-
-        result
-    end
+    Map.merge(result, diagram_data)
   end
 
   def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do

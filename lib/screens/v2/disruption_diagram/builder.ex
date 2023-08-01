@@ -5,11 +5,11 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   Values should be accessed/manipulated only via public module functions.
   """
 
-  alias Screens.V2.DisruptionDiagram.Model
-  alias Screens.V2.DisruptionDiagram.Label
+  alias Aja.Vector
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
-  alias Aja.Vector
+  alias Screens.V2.DisruptionDiagram.Label
+  alias Screens.V2.DisruptionDiagram.Model
   alias Screens.V2.LocalizedAlert
 
   # Macros for using vectors in pattern matching/guards
@@ -425,11 +425,12 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     # If the number of slots to keep is odd, more slots are devoted to the side of the region nearest the home stop.
     offset =
-      cond do
+      if rem(num_to_keep, 2) == 1 and not home_stop_is_right_of_center do
         # num_to_keep is odd and the home stop is NOT to the right of the closure center.
-        rem(num_to_keep, 2) == 1 and not home_stop_is_right_of_center -> div(num_to_keep, 2) + 1
+        div(num_to_keep, 2) + 1
+      else
         # num_to_keep is even, OR num_to_keep is odd and the home stop is to the right of the closure center.
-        true -> div(num_to_keep, 2)
+        div(num_to_keep, 2)
       end
 
     omitted_indices =
@@ -720,10 +721,8 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     gap_region = MapSet.new(gap_ideal_indices(builder))
     closure_region = MapSet.new(closure_ideal_indices(builder))
 
-    MapSet.difference(
-      current_location_region,
-      MapSet.union(gap_region, closure_region)
-    )
+    current_location_region
+    |> MapSet.difference(MapSet.union(gap_region, closure_region))
     |> Enum.min_max(fn -> :its_empty end)
     |> case do
       {left, right} -> left..right//1

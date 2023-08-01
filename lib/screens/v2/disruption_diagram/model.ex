@@ -3,9 +3,9 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   Functions to generate a disruption diagram from a `LocalizedAlert`.
   """
 
-  alias Screens.V2.LocalizedAlert
-  alias Screens.V2.DisruptionDiagram.Validator
   alias Screens.V2.DisruptionDiagram.Builder
+  alias Screens.V2.DisruptionDiagram.Validator
+  alias Screens.V2.LocalizedAlert
 
   import LocalizedAlert, only: [is_localized_alert: 1]
 
@@ -92,9 +92,8 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   @doc "Produces a JSON-serializable map representing the disruption diagram."
   @spec serialize(t()) :: {:ok, serialized_response()} | {:error, reason :: String.t()}
   def serialize(localized_alert) when is_localized_alert(localized_alert) do
-    with :ok <- Validator.validate(localized_alert),
-         {:ok, data} <- do_serialize(localized_alert) do
-      {:ok, data}
+    with :ok <- Validator.validate(localized_alert) do
+      do_serialize(localized_alert)
     end
   rescue
     error ->

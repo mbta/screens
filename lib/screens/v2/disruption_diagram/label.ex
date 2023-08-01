@@ -3,8 +3,8 @@ defmodule Screens.V2.DisruptionDiagram.Label do
   Functions for labeling disruption diagram slots.
   """
 
-  alias Screens.V2.DisruptionDiagram.Model
   alias Screens.Stops.Stop
+  alias Screens.V2.DisruptionDiagram.Model
 
   @type branch :: :b | :c | :d | :e
 
