@@ -1,9 +1,6 @@
 import React from "react";
 
 import { classWithModifiers, imagePath } from "Util/util";
-import DisruptionDiagram, {
-  DisruptionDiagramData,
-} from "./disruption_diagram/disruption_diagram";
 
 interface ReconAlertProps {
   issue: string | any; // shouldn't be "any"
@@ -13,20 +10,10 @@ interface ReconAlertProps {
   routes: any[]; // shouldn't be "any"
   effect: string;
   updated_at: string;
-  disruption_diagram?: DisruptionDiagramData;
 }
 
 const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
-  const {
-    cause,
-    effect,
-    issue,
-    location,
-    remedy,
-    routes,
-    updated_at,
-    disruption_diagram,
-  } = alert;
+  const { cause, effect, issue, location, remedy, routes, updated_at } = alert;
 
   return (
     <>
@@ -44,11 +31,6 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
             />
             <div className="alert-card__body__issue">{issue}</div>
             <div className="alert-card__body__location ">{location}</div>
-            {disruption_diagram && (
-              <div style={{ height: 408, width: 904 }}>
-                <DisruptionDiagram {...disruption_diagram} />
-              </div>
-            )}
           </div>
           <div className="alert-card__footer">
             <div className="alert-card__footer__cause">
