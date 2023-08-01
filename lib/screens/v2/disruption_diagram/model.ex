@@ -6,7 +6,6 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.DisruptionDiagram.Validator
   alias Screens.V2.DisruptionDiagram.Builder
-  alias Screens.Stops.Stop
 
   import LocalizedAlert, only: [is_localized_alert: 1]
 
@@ -72,7 +71,10 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   # End labels have hardcoded presentation, so we just send an ID for the client to use in
   # a lookup.
   #
-  # TBD what these IDs will look like. We might just use parent station IDs.
+  # In most cases, the IDs are parent station IDs. For compound labels like
+  # "to Ashmont & Braintree", two IDs are joined with '+': "place-asmnl+place-brntn".
+  # For labels that don't use station names, we just use an agreed-upon string:
+  # "western_branches", "place-kencl+west", etc.
   #
   # The rest of the labels' presentations are computed based on the height of the end labels,
   # so we can send actual text for those--it will be dynamically resized to fit.
@@ -147,36 +149,11 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   # The diagram needs to be flipped whenever it's not a GLX-only alert.
   defp maybe_reverse_gl(builder) do
-    is_glx_branch = builder.metadata.branch in [:d, :e]
-
-    if is_glx_branch and glx_only_alert?(builder) do
+    if Builder.glx_only?(builder) do
       builder
     else
       Builder.reverse(builder)
     end
-  end
-
-  defp glx_only_alert?(builder) do
-    diagram_contains_glx =
-      Aja.Enum.any?(builder.sequence, fn
-        %Builder.StopSlot{} = stop_data -> Stop.on_glx?(stop_data.id)
-        _ -> false
-      end)
-
-    copley_index =
-      Aja.Enum.find_index(builder.sequence, fn
-        %Builder.StopSlot{id: "place-coecl"} -> true
-        _ -> false
-      end)
-
-    no_stops_west_of_copley =
-      case copley_index do
-        nil -> true
-        # If Copley is in the sequence, it can only be the last stop
-        i -> i == Aja.Vector.size(builder.sequence) - 1
-      end
-
-    diagram_contains_glx and no_stops_west_of_copley
   end
 
   defp fit_closure_region(builder) do
@@ -255,16 +232,8 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   end
 end
 
-# TODO: What if there is a station closure with 3 stops very far apart.
-#       How to avoid omitting the bypassed station in the middle while shrinking closure region
-#       Maybe avoid omitting any stops with disrupted?: true
-#
-#       Complicating factor: The removed stop in the middle could also be the home stop, which
-#       breaks stuff
-
-# TODO: One-stop continuous alerts? Are those possible, could they ever make sense?
-# - One-stop shuttle: No...
-# - One-stop suspension: Maybe? Trains in either direction stop at the station but turn around
+# TODO: Implement additional logic in Builder.omit_stops to avoid
+#       omitting the home stop or bypasses stops.
 
 # TODO: Original code at the start of Builder.new is hot garbo.
 # Make it more resilient--should get stop/route stuff based on the route that fully contains

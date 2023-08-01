@@ -79,7 +79,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
             first_disrupted_stop: Vector.index(),
             last_disrupted_stop: Vector.index(),
             home_stop: Vector.index(),
-            branch: :b | :c | :d | :e
+            branch: :b | :c | :d | :e | nil
           }
 
   @doc "Creates a new Builder from a localized alert."
@@ -253,19 +253,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   # For any alert that informs only one branch, it's immediately valid
   # and we don't need to do any stop trimming because there's only one line of stops on that branch.
 
-  defp validate(%{metadata: %{line: :green, branch: :b}} = builder) do
-    {:ok, builder}
-  end
-
-  defp validate(%{metadata: %{line: :green, branch: :c}} = builder) do
-    {:ok, builder}
-  end
-
-  defp validate(%{metadata: %{line: :green, branch: :d}} = builder) do
-    {:ok, builder}
-  end
-
-  defp validate(%{metadata: %{line: :green, branch: :e}} = builder) do
+  defp validate(%{metadata: %{line: :green}} = builder) do
     {:ok, builder}
   end
 
@@ -448,28 +436,6 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
       |> Enum.drop(offset)
       |> Enum.take(num_to_omit)
 
-    # # Check if any stops we're about to omit are either
-    # # - the home stop, or
-    # # - a bypassed stop in a station closure alert.
-    # important_omitted_stops =
-    #   for i <- omitted_indices,
-    #       stop_data = builder.sequence[i],
-    #       stop_data.home_stop? or
-    #         (builder.metadata.effect == :station_closure and stop_data.disrupted?),
-    #       do: {stop_data, i}
-
-    # if important_omitted_stops != [] do
-    #   # Uh oh! We tried to omit one or more important stop(s).
-    #   # Do some extra work to see if we can omit stops around it instead.
-    #   do_multi_omit(
-    #     builder,
-    #     current_region_indices,
-    #     target_slots,
-    #     label_callback,
-    #     important_omitted_stops
-    #   )
-    # else
-    # All is good, proceed with the omission.
     label =
       omitted_indices
       |> MapSet.new(&builder.sequence[&1].id)
@@ -486,33 +452,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
       left_side +++ Vector.new([%OmittedSlot{label: label}]) +++ right_side
     end)
     |> recalculate_metadata()
-
-    # end
   end
-
-  # defp do_multi_omit(builder, _current_region_indices, _target_slots, _label_callback, [
-  #        _important_stop_index
-  #      ]) do
-  #   # TODO
-  #   builder
-
-  #   # 1. Check if there's enough space to the left or the right of the important stop to
-  #   #    do the omission.
-  #   # 2. If not, try to do 2 omissions, one on either side.
-  #   # 3. Give up!
-  # end
-
-  # defp do_multi_omit(
-  #        _builder,
-  #        _current_region_indices,
-  #        _target_slots,
-  #        _label_callback,
-  #        _important_stop_indices
-  #      ) do
-  #   # ...Just give up?? This is exceedingly rare--only possible in a very large station closure
-  #   Logger.warn("[uncollapsible disruption diagram]")
-  #   raise "Can't omit enough stops from diagram"
-  # end
 
   @doc """
   Moves `num_to_add` stops back from the left/right end groups to the main sequence,
@@ -810,6 +750,41 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
   @spec line(t()) :: Model.line_color()
   def line(%__MODULE__{} = builder), do: builder.metadata.line
+
+  @spec branch(t()) :: :b | :c | :d | :e | nil
+  def branch(%__MODULE__{} = builder), do: builder.metadata.branch
+
+  @doc """
+  Returns true if this diagram is
+  - for a Green Line alert,
+  - includes at least one GLX stop (past Lechmere), and
+  - does not extend west of Copley.
+  """
+  @spec glx_only?(t()) :: boolean()
+  def glx_only?(%__MODULE__{} = builder) do
+    is_glx_branch = builder.metadata.branch in [:d, :e]
+
+    diagram_contains_glx =
+      Aja.Enum.any?(builder.sequence, fn
+        %StopSlot{} = stop_data -> Stop.on_glx?(stop_data.id)
+        _ -> false
+      end)
+
+    copley_index =
+      Aja.Enum.find_index(builder.sequence, fn
+        %StopSlot{id: "place-coecl"} -> true
+        _ -> false
+      end)
+
+    no_stops_west_of_copley =
+      case copley_index do
+        nil -> true
+        # If Copley is in the sequence, it can only be the last stop
+        i -> i == vec_size(builder.sequence) - 1
+      end
+
+    is_glx_branch and diagram_contains_glx and no_stops_west_of_copley
+  end
 
   # Adjusts an index to be within the bounds of the stop sequence.
   defp clamp(index, _sequence_size) when index < 0, do: 0
