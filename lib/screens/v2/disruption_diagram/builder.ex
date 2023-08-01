@@ -6,6 +6,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   """
 
   alias Screens.V2.DisruptionDiagram.Model
+  alias Screens.V2.DisruptionDiagram.Label
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Aja.Vector
@@ -143,8 +144,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     case selected_sequence do
       nil ->
-        # There's no stop sequence that contains both the home stop and the informed stops.
-        :error
+        {:error, "no stop sequence contains both the home stop and all informed stops"}
 
       selected_sequence ->
         stop_sequence =
@@ -205,7 +205,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     if not is_nil(jfk_index) and Enum.any?(disrupted_indices, &(&1 <= jfk_index)) and
          Enum.any?(disrupted_indices, &(&1 > jfk_index)) do
-      :error
+      {:error, "Red Line alert crosses from trunk to branch"}
     else
       # it's definitely ok, but we might be able to label right end
       cond do
@@ -379,8 +379,8 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   the direction_id=0 route order, e.g. in Blue Line diagrams where we show Bowdoin first but
   direction_id=0 has Wonderland listed first.
   """
-  @spec reverse_stops(t()) :: t()
-  def reverse_stops(%__MODULE__{} = builder) do
+  @spec reverse(t()) :: t()
+  def reverse(%__MODULE__{} = builder) do
     %{
       builder
       | sequence: Vector.reverse(builder.sequence),
@@ -399,28 +399,18 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   The `label_callback` argument should be a function. The IDs of the omitted stops will be passed to this
   function, which should return the appropriate label for those omitted stops.
   """
-  @spec omit_stops(
-          t(),
-          :closure | :gap,
-          pos_integer(),
-          (MapSet.t(Stop.id()) -> Model.label())
-        ) :: t()
-  def omit_stops(builder, region, target_slots, label_callback)
+  @spec omit_stops(t(), :closure | :gap, pos_integer()) :: t()
+  def omit_stops(builder, region, target_slots)
 
-  def omit_stops(
-        %__MODULE__{} = builder,
-        :closure,
-        target_closure_slots,
-        label_callback
-      ) do
-    do_omit(builder, closure_indices(builder), target_closure_slots, label_callback)
+  def omit_stops(%__MODULE__{} = builder, :closure, target_closure_slots) do
+    do_omit(builder, closure_indices(builder), target_closure_slots)
   end
 
-  def omit_stops(%__MODULE__{} = builder, :gap, target_gap_stops, label_callback) do
-    do_omit(builder, gap_indices(builder), target_gap_stops, label_callback)
+  def omit_stops(%__MODULE__{} = builder, :gap, target_gap_stops) do
+    do_omit(builder, gap_indices(builder), target_gap_stops)
   end
 
-  defp do_omit(builder, current_region_indices, target_slots, label_callback) do
+  defp do_omit(builder, current_region_indices, target_slots) do
     region_length = Enum.count(current_region_indices)
 
     if target_slots >= region_length do
@@ -483,7 +473,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     label =
       omitted_indices
       |> MapSet.new(&builder.sequence[&1].id)
-      |> label_callback.()
+      |> Label.get_omission_label(builder.metadata.line, builder.metadata.branch)
 
     {first_omitted, last_omitted} = Enum.min_max(omitted_indices)
 
@@ -526,7 +516,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
   @doc """
   Moves `num_to_add` stops back from the left/right end groups to the main sequence,
-  effectively "padding" the diagram with more stops that otherwise would have been
+  effectively "padding" the diagram with stops that otherwise would have been
   omitted inside one of the destination-arrow slots.
   Stops are added from the end closest to the home stop, unless it's empty.
   In that case, they are added from the opposite end.
@@ -653,17 +643,17 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     stop_ids =
       stops
       |> Vector.filter(&is_struct(&1, StopSlot))
-      |> Aja.Enum.map(& &1.id)
+      |> MapSet.new(& &1.id)
 
-    label_id = Model.get_gl_end_label_id(meta.branch, stop_ids)
+    label_id = Label.get_gl_end_label_id(meta.branch, stop_ids)
 
     Vector.new([%ArrowSlot{label_id: label_id}])
   end
 
   defp get_end_slot(meta, stops) do
-    stop_ids = Aja.Enum.map(stops, & &1.id)
+    stop_ids = MapSet.new(stops, & &1.id)
 
-    label_id = Model.get_end_label_id(meta.line, stop_ids)
+    label_id = Label.get_end_label_id(meta.line, stop_ids)
 
     Vector.new([%ArrowSlot{label_id: label_id}])
   end
@@ -743,17 +733,6 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     Enum.count(gap_indices(builder))
   end
 
-  # The max number of stops allowed in the gap when it needs to be collapsed
-  @collapsed_gap_max 2
-
-  @doc """
-  Returns the minimum possible size of the gap region.
-  """
-  @spec min_gap(t()) :: non_neg_integer()
-  def min_gap(%__MODULE__{} = builder) do
-    min(gap_count(builder), @collapsed_gap_max)
-  end
-
   # The gap region has second highest priority and by its definition doesn't overlap with the closure region.
   defp gap_indices(builder), do: gap_ideal_indices(builder)
 
@@ -828,9 +807,6 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   def end_count(%__MODULE__{} = builder) do
     min(1, vec_size(builder.left_end)) + min(1, vec_size(builder.right_end))
   end
-
-  @spec effect(t()) :: :shuttle | :suspension | :station_closure
-  def effect(%__MODULE__{} = builder), do: builder.metadata.effect
 
   @spec line(t()) :: Model.line_color()
   def line(%__MODULE__{} = builder), do: builder.metadata.line

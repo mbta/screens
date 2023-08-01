@@ -6,26 +6,19 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
     - For BL & OL, this is the same as the line
     - For RL, this is either the trunk, the Ashmont branch, or the Braintree branch. No combination of the three.
     - For GL, this is any one branch, or just the trunk (Lechmere to Kenmore).
-  - The alert does not inform the entire line (we only allow one end of the diagram to have a terminal stop)
-  - The current ("home") station is on the line that the alert informs
-    - For cases where the home station is on a branch, the alert must only inform stops
-      reachable from that branch without transfers. For example, if the home station is
-      Cleveland Circle (C branch), the alert must only inform stops between Cleveland Circle and Government Center.
+    - No combinations of multiple lines, e.g. some stops on BL and some on OL.
+  - The alert does not inform an entire route (we only allow one end of the diagram to have a terminal stop)
+  - All stops informed by the alert are directly reachable from the home stop.
   """
 
   alias Screens.V2.LocalizedAlert
 
-  require Logger
-
+  @spec validate(LocalizedAlert.t()) :: :ok | {:error, reason :: String.t()}
   def validate(localized_alert) do
     with :ok <- validate_effect(localized_alert.alert.effect),
-         :ok <- validate_not_whole_line_disruption(localized_alert.alert),
+         :ok <- validate_not_whole_route_disruption(localized_alert.alert),
          :ok <- validate_informed_lines(localized_alert) do
       :ok
-    else
-      {:error, reason} ->
-        Logger.error("[disruption diagram bad args] reason=\"#{reason}\"")
-        :error
     end
   end
 
@@ -43,12 +36,12 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
     end
   end
 
-  defp validate_not_whole_line_disruption(alert) do
+  defp validate_not_whole_route_disruption(alert) do
     if Enum.any?(
          alert.informed_entities,
-         &match?(%{route: route_id, direction_id: nil, stop: nil} when is_binary(route_id), &1)
+         &match?(%{route: route_id, stop: nil} when is_binary(route_id), &1)
        ),
-       do: {:error, "alert informs an entire line"},
+       do: {:error, "alert informs an entire route"},
        else: :ok
   end
 

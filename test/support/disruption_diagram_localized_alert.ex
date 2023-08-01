@@ -1,6 +1,10 @@
-defmodule Screens.V2.DisruptionDiagram.TestHelper do
+defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
   @moduledoc """
-  Common code for generating disruption diagram test data.
+  Provides a function that generates localized alerts intended for
+  use with disruption diagrams.
+
+  Only the struct fields required by disruption diagrams are populated,
+  so this might not work for testing other code related to localized alerts.
   """
 
   alias Screens.Alerts.Alert

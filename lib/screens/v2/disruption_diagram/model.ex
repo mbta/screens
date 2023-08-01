@@ -10,8 +10,6 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   import LocalizedAlert, only: [is_localized_alert: 1]
 
-  require Logger
-
   # We don't need to define any new struct for the diagram's source data--
   # we can use any map/struct that satisfies LocalizedAlert.t().
   @type t :: LocalizedAlert.t()
@@ -36,7 +34,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
           #     0     1     2     3     4     5     6     7     8
           #     X - - X - - X - - X - - X - - O ========= O === =>
           #     |------------range------------|
-          effect_region_slot_index_range: list(non_neg_integer()),
+          effect_region_slot_index_range: {non_neg_integer(), non_neg_integer()},
           line: line_color(),
           current_station_slot_index: non_neg_integer(),
           # First and last elements of the list are `end_slot`s, middle elements are `middle_slot`s.
@@ -86,8 +84,11 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   @max_closure_count 8
 
+  # The max number of stops allowed in the gap when it needs to be collapsed
+  @collapsed_gap_max 2
+
   @doc "Produces a JSON-serializable map representing the disruption diagram."
-  @spec serialize(t()) :: {:ok, serialized_response()} | :error
+  @spec serialize(t()) :: {:ok, serialized_response()} | {:error, reason :: String.t()}
   def serialize(localized_alert) when is_localized_alert(localized_alert) do
     with :ok <- Validator.validate(localized_alert),
          {:ok, data} <- do_serialize(localized_alert) do
@@ -95,22 +96,17 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     end
   rescue
     error ->
-      Logger.warn(
+      error_string =
         Exception.message(error) <> "\n\n" <> Exception.format_stacktrace(__STACKTRACE__)
-      )
 
-      :error
+      {:error, "Exception raised during serialization:\n\n#{error_string}"}
   end
 
   defp do_serialize(localized_alert) do
-    case Builder.new(localized_alert) do
-      {:ok, builder} ->
-        line = Builder.line(builder)
+    with {:ok, builder} <- Builder.new(localized_alert) do
+      line = Builder.line(builder)
 
-        {:ok, serialize_by_line(line, builder)}
-
-      :error ->
-        :error
+      {:ok, serialize_by_line(line, builder)}
     end
   end
 
@@ -120,7 +116,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     # The default stop sequence starts with Wonderland, so we need to put the stops in reverse order
     # to have Bowdoin appear first on the diagram.
     builder
-    |> Builder.reverse_stops()
+    |> Builder.reverse()
     |> Builder.serialize()
   end
 
@@ -156,7 +152,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     if is_glx_branch and glx_only_alert?(builder) do
       builder
     else
-      Builder.reverse_stops(builder)
+      Builder.reverse(builder)
     end
   end
 
@@ -184,8 +180,6 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   end
 
   defp fit_closure_region(builder) do
-    passes_through_kenmore? = builder.metadata.branch in [:b, :c, :d]
-
     current_closure_count = Builder.closure_count(builder)
 
     with true <- current_closure_count > @max_closure_count,
@@ -193,11 +187,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
          {:lt, true} <- {:lt, target_closure_slots < current_closure_count} do
       builder =
         builder
-        |> Builder.omit_stops(
-          :closure,
-          target_closure_slots,
-          &get_omission_label(Builder.line(builder), &1, passes_through_kenmore?)
-        )
+        |> Builder.omit_stops(:closure, target_closure_slots)
         |> minimize_gap()
 
       {:done, builder}
@@ -205,6 +195,9 @@ defmodule Screens.V2.DisruptionDiagram.Model do
       {:lt, false} ->
         target_closure_slots = 12 - min_non_closure_slots(builder)
 
+        # TODO: Remove this and the extra code producing this {:lt, false} pattern
+        # once we're confident that this is always the right way to handle scenarios
+        # where the math works out this way
         IO.puts(
           "fit_closure_region: target_count (#{target_closure_slots}) >= current_count (#{current_closure_count}), doing nothing"
         )
@@ -217,30 +210,17 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   end
 
   defp minimize_gap(builder) do
-    passes_through_kenmore? = builder.metadata.branch in [:b, :c, :d]
-
     current_gap_count = Builder.gap_count(builder)
-    target_gap_slots = Builder.min_gap(builder)
+    target_gap_slots = min_gap(builder)
 
     if target_gap_slots < current_gap_count do
-      Builder.omit_stops(
-        builder,
-        :gap,
-        target_gap_slots,
-        &get_omission_label(Builder.line(builder), &1, passes_through_kenmore?)
-      )
+      Builder.omit_stops(builder, :gap, target_gap_slots)
     else
-      IO.puts(
-        "minimize_gap: target_count (#{target_gap_slots}) >= current_count (#{current_gap_count}), doing nothing"
-      )
-
       builder
     end
   end
 
   defp fit_gap_region(builder) do
-    passes_through_kenmore? = builder.metadata.branch in [:b, :c, :d]
-
     current_gap_count = Builder.gap_count(builder)
 
     with true <- current_gap_count >= 3,
@@ -248,13 +228,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
          baseline = baseline_slots(Builder.closure_count(builder)),
          target_gap_slots = baseline - taken_slots,
          {:lt, true} <- {:lt, target_gap_slots < current_gap_count} do
-      builder =
-        Builder.omit_stops(
-          builder,
-          :gap,
-          target_gap_slots,
-          &get_omission_label(Builder.line(builder), &1, passes_through_kenmore?)
-        )
+      builder = Builder.omit_stops(builder, :gap, target_gap_slots)
 
       {:done, builder}
     else
@@ -284,122 +258,19 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     end
   end
 
-  defp get_omission_label(line, omitted_stop_ids, passes_through_kenmore?)
-
-  defp get_omission_label(:green, omitted_stop_ids, false) do
-    if "place-gover" in omitted_stop_ids,
-      do: %{full: "…via Government Center", abbrev: "…via Gov't Ctr"},
-      else: "…"
-  end
-
-  defp get_omission_label(:green, omitted_stop_ids, true) do
-    [
-      if("place-kencl" in omitted_stop_ids, do: "Kenmore"),
-      if("place-coecl" in omitted_stop_ids, do: "Copley")
-    ]
-    |> Enum.reject(&is_nil/1)
-    |> Enum.join(" & ")
-    |> case do
-      "" ->
-        "…"
-
-      stop_names ->
-        text = "…via #{stop_names}"
-        %{full: text, abbrev: text}
-    end
-  end
-
-  defp get_omission_label(:red, omitted_stop_ids, _) do
-    if "place-dwnxg" in omitted_stop_ids,
-      do: %{full: "…via Downtown Crossing", abbrev: "…via Downt'n Xng"},
-      else: "…"
-  end
-
-  defp get_omission_label(:orange, omitted_stop_ids, _) do
-    if "place-dwnxg" in omitted_stop_ids,
-      do: %{full: "…via Downtown Crossing", abbrev: "…via Downt'n Xng"},
-      else: "…"
-  end
-
-  @spec get_end_label_id(line_color(), nonempty_list()) :: end_label_id()
-  def get_end_label_id(:orange, end_stop_ids) do
-    label_id =
-      cond do
-        "place-forhl" in end_stop_ids -> "place-forhl"
-        "place-ogmnl" in end_stop_ids -> "place-ogmnl"
-      end
-
-    label_id
-  end
-
-  def get_end_label_id(:red, end_stop_ids) do
-    cond do
-      "place-jfk" in end_stop_ids ->
-        "place-asmnl+place-brntn"
-
-      "place-alfcl" in end_stop_ids ->
-        "place-alfcl"
-
-      "place-asmnl" in end_stop_ids ->
-        "place-asmnl"
-
-      "place-brntn" in end_stop_ids ->
-        "place-brntn"
-    end
-  end
-
-  def get_gl_end_label_id(nil, end_stop_ids) do
-    # Trunk alert
-
-    cond do
-      # left end
-      "place-lech" in end_stop_ids -> "place-mdftf+place-unsqu"
-      # right end
-      "place-north" in end_stop_ids -> "place-north+place-pktrm"
-      "place-gover" in end_stop_ids -> "place-gover"
-      "place-coecl" in end_stop_ids -> "place-coecl+west"
-      "place-kencl" in end_stop_ids -> "place-kencl+west"
-    end
-  end
-
-  def get_gl_end_label_id(:b, end_stop_ids) do
-    cond do
-      "place-gover" in end_stop_ids -> "place-gover"
-      "place-lake" in end_stop_ids -> "place-lake"
-    end
-  end
-
-  def get_gl_end_label_id(:c, end_stop_ids) do
-    cond do
-      "place-gover" in end_stop_ids -> "place-gover"
-      "place-clmnl" in end_stop_ids -> "place-clmnl"
-    end
-  end
-
-  def get_gl_end_label_id(:d, end_stop_ids) do
-    cond do
-      "place-unsqu" in end_stop_ids -> "place-unsqu"
-      "place-river" in end_stop_ids -> "place-river"
-    end
-  end
-
-  def get_gl_end_label_id(:e, end_stop_ids) do
-    cond do
-      "place-mdftf" in end_stop_ids -> "place-mdftf"
-      "place-hsmnl" in end_stop_ids -> "place-hsmnl"
-    end
-  end
-
   defp min_non_closure_slots(builder) do
-    Builder.end_count(builder) +
-      Builder.current_location_count(builder) +
-      Builder.min_gap(builder)
+    Builder.end_count(builder) + Builder.current_location_count(builder) + min_gap(builder)
   end
 
   # Number of slots used by all regions except the gap, when it doesn't get minimized
   defp non_gap_slots(builder) do
     Builder.end_count(builder) + Builder.closure_count(builder) +
       Builder.current_location_count(builder)
+  end
+
+  # The minimum possible size of the gap region.
+  defp min_gap(builder) do
+    min(Builder.gap_count(builder), @collapsed_gap_max)
   end
 
   for {closure, baseline} <- %{2 => 10, 3 => 10, 4 => 12, 5 => 12, 6 => 14, 7 => 14, 8 => 14} do
