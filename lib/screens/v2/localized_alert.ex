@@ -206,28 +206,14 @@ defmodule Screens.V2.LocalizedAlert do
 
   @doc """
   Returns all routes affected by an alert.
-  Used to build route pills for GL e-ink and text for Pre-fare alerts
+  Green Line subway route consolidation logic differs by screen type.
+  Used to build route pills for GL e-ink and text for Pre-fare alerts.
   """
   @spec informed_subway_routes(t()) :: list(String.t())
   def informed_subway_routes(%{screen: %Screen{app_id: app_id}, alert: alert}) do
     alert
-    |> do_informed_subway_routes()
+    |> Alert.informed_subway_routes()
     |> consolidate_gl(app_id)
-  end
-
-  def informed_subway_routes(%{alert: alert}) do
-    do_informed_subway_routes(alert)
-  end
-
-  defp do_informed_subway_routes(alert) do
-    alert
-    |> Alert.informed_entities()
-    |> Enum.map(fn %{route: route} -> route end)
-    # If the alert impacts CR or other lines, weed that out
-    |> Enum.filter(fn e ->
-      Enum.member?(["Red", "Orange", "Green", "Blue"] ++ @green_line_branches, e)
-    end)
-    |> Enum.uniq()
   end
 
   # Different screens may consolidate the GL branch alerts

@@ -10,6 +10,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Aja.Vector
+  alias Screens.V2.LocalizedAlert
 
   # Macros for using vectors in pattern matching/guards
   import Aja, only: [vec: 1, vec_size: 1, +++: 2]

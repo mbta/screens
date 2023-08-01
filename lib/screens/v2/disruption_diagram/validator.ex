@@ -12,6 +12,7 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
   """
 
   alias Screens.V2.LocalizedAlert
+  alias Screens.Alerts.Alert
 
   @spec validate(LocalizedAlert.t()) :: :ok | {:error, reason :: String.t()}
   def validate(localized_alert) do
@@ -25,12 +26,11 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
   defp validate_effect(effect) when effect in [:shuttle, :suspension, :station_closure], do: :ok
   defp validate_effect(effect), do: {:error, "invalid effect: #{effect}"}
 
-  defp validate_informed_lines(%{alert: alert}) do
-    informed_subway_routes = LocalizedAlert.informed_subway_routes(%{alert: alert})
-
-    informed_subway_lines = consolidate_gl(informed_subway_routes)
-
-    case informed_subway_lines do
+  defp validate_informed_lines(localized_alert) do
+    localized_alert.alert
+    |> Alert.informed_subway_routes()
+    |> consolidate_gl()
+    |> case do
       [_single_line] -> :ok
       _ -> {:error, "alert does not inform exactly one subway line"}
     end

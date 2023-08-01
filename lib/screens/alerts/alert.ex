@@ -572,6 +572,16 @@ defmodule Screens.Alerts.Alert do
     informed_entities
   end
 
+  @doc "Returns IDs of all subway routes affected by the alert. Green Line routes are not consolidated."
+  def informed_subway_routes(%__MODULE__{} = alert) do
+    informed_route_ids = MapSet.new(alert.informed_entities, & &1.route)
+
+    Enum.filter(
+      ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E"],
+      &(&1 in informed_route_ids)
+    )
+  end
+
   def effect(%__MODULE__{effect: effect}), do: effect
 
   def direction_id(%__MODULE__{informed_entities: informed_entities}),
