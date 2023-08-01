@@ -184,7 +184,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
     with true <- current_closure_count > @max_closure_count,
          target_closure_slots = 12 - min_non_closure_slots(builder),
-         {:lt, true} <- {:lt, target_closure_slots < current_closure_count} do
+         true <- target_closure_slots < current_closure_count do
       builder =
         builder
         |> Builder.omit_stops(:closure, target_closure_slots)
@@ -192,18 +192,6 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
       {:done, builder}
     else
-      {:lt, false} ->
-        target_closure_slots = 12 - min_non_closure_slots(builder)
-
-        # TODO: Remove this and the extra code producing this {:lt, false} pattern
-        # once we're confident that this is always the right way to handle scenarios
-        # where the math works out this way
-        IO.puts(
-          "fit_closure_region: target_count (#{target_closure_slots}) >= current_count (#{current_closure_count}), doing nothing"
-        )
-
-        :unchanged
-
       _ ->
         :unchanged
     end
@@ -227,22 +215,11 @@ defmodule Screens.V2.DisruptionDiagram.Model do
          taken_slots = non_gap_slots(builder),
          baseline = baseline_slots(Builder.closure_count(builder)),
          target_gap_slots = baseline - taken_slots,
-         {:lt, true} <- {:lt, target_gap_slots < current_gap_count} do
+         true <- target_gap_slots < current_gap_count do
       builder = Builder.omit_stops(builder, :gap, target_gap_slots)
 
       {:done, builder}
     else
-      {:lt, false} ->
-        taken_slots = non_gap_slots(builder)
-        baseline = baseline_slots(Builder.closure_count(builder))
-        target_gap_slots = baseline - taken_slots
-
-        IO.puts(
-          "fit_gap_region: target_count (#{target_gap_slots}) >= current_count (#{current_gap_count}), doing nothing"
-        )
-
-        :unchanged
-
       _ ->
         :unchanged
     end
