@@ -714,15 +714,18 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   const [isDone, setIsDone] = useState(false);
 
   useEffect(() => {
-    const stuff = document.getElementById("test")?.getBoundingClientRect();
-    if (!isDone && stuff && stuff.height !== null) {
-      const height = stuff.height;
+    const dimensions = document
+      .getElementById("line-map")
+      ?.getBoundingClientRect();
+
+    if (!isDone && dimensions && dimensions.height !== null) {
+      const height = dimensions.height;
       if (height > (hasEmphasis ? 320 : 408)) {
         setDoAbbreviate(true);
       }
 
       // Prevent diagram from exceeding width of 904px
-      const width = stuff.width;
+      const width = dimensions.width;
       if (width > 904) {
         setScaleFactor(904 / width);
       }
@@ -742,7 +745,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       >
         <svg height={hasEmphasis ? 320 : 408} y={0}>
           <g
-            id="test"
+            id="line-map"
             transform={`translate(0, ${
               hasEmphasis ? 260 : 320
             }) scale(${scaleFactor})`}
