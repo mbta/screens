@@ -81,9 +81,7 @@ defmodule Screens.V2.DisruptionDiagram.Label do
   Returns the label ID for an end that contains more than one item, in a GL diagram.
   """
   @spec get_gl_end_label_id(branch() | nil, MapSet.t(Stop.id())) :: Model.end_label_id()
-  def get_gl_end_label_id(nil, end_stop_ids) do
-    # Trunk alert
-
+  def get_gl_end_label_id(_trunk = nil, end_stop_ids) do
     cond do
       # left end
       "place-lech" in end_stop_ids -> "place-mdftf+place-unsqu"

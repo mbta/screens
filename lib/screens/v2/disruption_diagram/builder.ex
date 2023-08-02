@@ -12,7 +12,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   alias Screens.V2.DisruptionDiagram.Model
   alias Screens.V2.LocalizedAlert
 
-  # Macros for using vectors in pattern matching/guards
+  # Vector-related macros
   import Aja, only: [vec: 1, vec_size: 1, +++: 2]
 
   require Logger
@@ -333,7 +333,8 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     # We're going to replace all of the indices, so throw out the old ones.
     # That way, if we fail to set one of them (which shouldn't happen),
     # later code will fail instead of continuing with inaccurate data.
-    meta_without_indices = Map.take(builder.metadata, [:line, :effect, :branch])
+    meta_without_indices =
+      Map.drop(builder.metadata, [:home_stop, :first_disrupted_stop, :last_disrupted_stop])
 
     builder.sequence
     |> Vector.with_index()
