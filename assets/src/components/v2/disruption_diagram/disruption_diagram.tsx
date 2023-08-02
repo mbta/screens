@@ -64,8 +64,6 @@ type Effect = "shuttle" | "suspension" | "station_closure";
 // End labels have hardcoded presentation, so we just send an ID for the client to use in
 // a lookup.
 //
-// TBD what these IDs will look like. We might just use parent station IDs.
-//
 // The rest of the labels' presentations are computed based on the height of the end labels,
 // so we can send actual text for those--it will be dynamically resized to fit.
 type EndLabelID = string;
