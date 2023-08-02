@@ -5,7 +5,6 @@ const MAX_WIDTH = 904;
 const SLOT_WIDTH = 24;
 const LINE_HEIGHT = 24;
 const L = 13;
-// TODO: Make this based on headsign
 const R = 165;
 const W = MAX_WIDTH - (L + R);
 
