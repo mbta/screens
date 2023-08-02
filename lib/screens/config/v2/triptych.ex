@@ -11,5 +11,6 @@ defmodule Screens.Config.V2.Triptych do
   defstruct ol_crowding: nil,
             evergreen_content: []
 
-  use Screens.Config.Struct, children: [ol_crowding: OLCrowding, evergreen_content: {:list, EvergreenContentItem}]
+  use Screens.Config.Struct,
+    children: [ol_crowding: OLCrowding, evergreen_content: {:list, EvergreenContentItem}]
 end
