@@ -744,7 +744,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         <svg height={hasEmphasis ? 320 : 408} y={0}>
           <g
             id="line-map"
-            transform={`translate(0, ${
+            transform={`translate(${SLOT_WIDTH / 2}, ${
               hasEmphasis ? 260 : 320
             }) scale(${scaleFactor})`}
             visibility={isDone ? "visible" : "hidden"}
@@ -790,7 +790,11 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         </svg>
         {hasEmphasis && (
           <svg height="80px" y={315} style={{ position: "absolute" }}>
-            <g transform={`translate(0, 24) scale(${scaleFactor})`}>
+            <g
+              transform={`translate(${
+                SLOT_WIDTH / 2
+              }, 24) scale(${scaleFactor})`}
+            >
               <AlertEmphasisComponent
                 effectRegionSlotIndexRange={
                   props.effect_region_slot_index_range
