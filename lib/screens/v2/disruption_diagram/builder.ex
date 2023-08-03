@@ -84,7 +84,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
           }
 
   @doc "Creates a new Builder from a localized alert."
-  @spec new(LocalizedAlert.t()) :: {:ok, t()} | :error
+  @spec new(LocalizedAlert.t()) :: {:ok, t()} | {:error, reason :: String.t()}
   def new(localized_alert) do
     informed_stop_ids =
       for %{stop: "place-" <> _ = stop_id} <- localized_alert.alert.informed_entities do
@@ -327,8 +327,10 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     %{builder | sequence: sequence, right_end: right_end}
   end
 
-  # Must be called after any operation that causes element indices to change in builder.sequence.
-  # That is, when one or more elements are moved, inserted, or removed anywhere before the end of the vector.
+  # Re-computes index fields (home_stop, first/last_disrupted_stop)
+  # in builder.metadata after builder.sequence is changed.
+  #
+  # This function must be called after any operation that changes builder.sequence.
   defp recalculate_metadata(builder) do
     # We're going to replace all of the indices, so throw out the old ones.
     # That way, if we fail to set one of them (which shouldn't happen),
