@@ -100,10 +100,11 @@ interface IconProps {
   className?: string;
 }
 
+// Translate by: width of the icon + stroke-width
 const CurrentStopIconRedLine: ComponentType<IconProps> = ({ x }) => (
   <>
     <path
-      transform={`translate(${x - 52/2} -4)`}
+      transform={`translate(${x - (52+4)/2} -4)`}
       d="M32.6512 3.92661C30.0824 1.3578 25.9176 1.3578 23.3488 3.92661L3.92661 23.3488C1.3578 25.9176 1.3578 30.0824 3.92661 32.6512L23.3488 52.0734C25.9176 54.6422 30.0824 54.6422 32.6512 52.0734L52.0734 32.6512C54.6422 30.0824 54.6422 25.9176 52.0734 23.3488L32.6512 3.92661Z"
       className="middle-slot__background--red"
       stroke="#E6E4E1"
@@ -111,7 +112,7 @@ const CurrentStopIconRedLine: ComponentType<IconProps> = ({ x }) => (
       strokeLinejoin="round"
     />
     <path
-      transform={`translate(${x - 52/2} -4)`}
+      transform={`translate(${x - (52+4)/2} -4)`}
       fillRule="evenodd"
       clipRule="evenodd"
       d="M15.4855 29.219C14.7045 28.438 14.7045 27.1717 15.4855 26.3906L26.3906 15.4855C27.1717 14.7045 28.438 14.7045 29.219 15.4855L40.1242 26.3906C40.9052 27.1717 40.9052 28.438 40.1241 29.219L29.219 40.1242C28.438 40.9052 27.1717 40.9052 26.3906 40.1241L15.4855 29.219Z"
@@ -120,10 +121,11 @@ const CurrentStopIconRedLine: ComponentType<IconProps> = ({ x }) => (
   </>
 );
 
+// Translate by: width of the icon + stroke-width
 const CurrentStopIcon: ComponentType<IconProps> = ({ x }) => (
   <>
     <path
-      transform={`translate(${x - 52/2} -4)`}
+      transform={`translate(${x - (52+4)/2} -4)`}
       d="M3.15665 25.2076C1.61445 26.7498 1.61445 29.2502 3.15665 30.7924L25.2076 52.8434C26.7498 54.3856 29.2502 54.3856 30.7924 52.8434L52.8434 30.7924C54.3856 29.2502 54.3856 26.7498 52.8434 25.2076L30.7924 3.15668C29.2502 1.61448 26.7498 1.61448 25.2076 3.15668L3.15665 25.2076Z"
       fill="#EE2E24"
       stroke="#E6E4E1"
@@ -541,7 +543,7 @@ const EffectBackgroundComponent: ComponentType<
       <line
         x1={x1 + dashXunit}
         y1="24"
-        x2={x2 + dashXunit}
+        x2={x2}
         y2="24"
         strokeWidth={16}
         stroke="black"
