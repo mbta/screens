@@ -47,13 +47,10 @@ defmodule Screens.V2.DisruptionDiagram.Label do
   @doc "Returns the label ID for an end that contains more than one item."
   @spec get_end_label_id(Model.line_color(), Enumerable.t(Stop.id())) :: Model.end_label_id()
   def get_end_label_id(:orange, end_stop_ids) do
-    label_id =
-      cond do
-        "place-forhl" in end_stop_ids -> "place-forhl"
-        "place-ogmnl" in end_stop_ids -> "place-ogmnl"
-      end
-
-    label_id
+    cond do
+      "place-forhl" in end_stop_ids -> "place-forhl"
+      "place-ogmnl" in end_stop_ids -> "place-ogmnl"
+    end
   end
 
   def get_end_label_id(:red, end_stop_ids) do
