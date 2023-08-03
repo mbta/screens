@@ -8,8 +8,8 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   alias Aja.Vector
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
-  alias Screens.V2.DisruptionDiagram.Label
   alias Screens.V2.DisruptionDiagram, as: DD
+  alias Screens.V2.DisruptionDiagram.Label
   alias Screens.V2.LocalizedAlert
 
   # Vector-related macros

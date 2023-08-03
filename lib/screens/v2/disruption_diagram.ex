@@ -1,6 +1,6 @@
 defmodule Screens.V2.DisruptionDiagram do
   @moduledoc """
-  Public interface for the disruption diagram logic.
+  Public interface for generating disruption diagrams.
   """
 
   alias Screens.V2.DisruptionDiagram.Model
