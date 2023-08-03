@@ -1,4 +1,4 @@
-- Feature Name: `eink_widget_endpiont`
+- Feature Name: `eink_widget_endpoint`
 - Start Date: 2023-07-28
 - RFC PR: [mbta/technology-docs#0000](https://github.com/mbta/technology-docs/pull/0000)
 - Asana task: [asana link](https://app.asana.com/0/1185117109217413/1205119093140586)
