@@ -37,13 +37,8 @@ defmodule Screens.V2.DisruptionDiagram.Label do
       else: "…"
   end
 
-  def get_omission_label(omitted_stop_ids, :red, _) do
-    if "place-dwnxg" in omitted_stop_ids,
-      do: %{full: "…via Downtown Crossing", abbrev: "…via Downt'n Xng"},
-      else: "…"
-  end
-
-  def get_omission_label(omitted_stop_ids, :orange, _) do
+  # Orange and Red Lines both only look for Downtown Crossing.
+  def get_omission_label(omitted_stop_ids, line, _) when line in [:orange, :red] do
     if "place-dwnxg" in omitted_stop_ids,
       do: %{full: "…via Downtown Crossing", abbrev: "…via Downt'n Xng"},
       else: "…"
@@ -81,7 +76,7 @@ defmodule Screens.V2.DisruptionDiagram.Label do
   Returns the label ID for an end that contains more than one item, in a GL diagram.
   """
   @spec get_gl_end_label_id(branch() | nil, MapSet.t(Stop.id())) :: Model.end_label_id()
-  def get_gl_end_label_id(_trunk = nil, end_stop_ids) do
+  def get_gl_end_label_id(nil = _trunk, end_stop_ids) do
     cond do
       # left end
       "place-lech" in end_stop_ids -> "place-mdftf+place-unsqu"
