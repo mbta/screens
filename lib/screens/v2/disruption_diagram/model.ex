@@ -82,12 +82,22 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   @type line_color :: :blue | :orange | :red | :green
 
+  # If the diagram is shorter than 6 slots, we "pad" it until it contains at least 6.
   @minimum_slot_count 6
 
+  # If the closure is longer than 8 stops, it needs to be collapsed.
   @max_closure_count 8
 
-  # The max number of stops allowed in the gap when it needs to be collapsed
-  @collapsed_gap_max 2
+  # When the closure needs to be collapsed, we omit stops
+  # from it until the diagram contains 12 slots total.
+  @max_count_with_collapsed_closure 12
+
+  # When the closure needs to be collapsed, we automatically
+  # also collapse the gap, making it take 2 slots or fewer.
+  @max_collapsed_gap_count 2
+
+  # If everything else fits, we still limit the gap to 3 slots or fewer.
+  @max_gap_count 3
 
   @doc "Produces a JSON-serializable map representing the disruption diagram."
   @spec serialize(t()) :: {:ok, serialized_response()} | {:error, reason :: String.t()}
@@ -121,7 +131,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     |> Builder.serialize()
   end
 
-  # For the Green Line, we need to reverse the diagram in certain cases.
+  # For the Green Line, we need to reverse the diagram in certain cases, as well as fit regions.
   defp serialize_by_line(:green, builder) do
     builder
     |> maybe_reverse_gl()
@@ -157,28 +167,26 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   defp fit_closure_region(builder) do
     current_closure_count = Builder.closure_count(builder)
+    target_closure_count = @max_count_with_collapsed_closure - min_non_closure_slots(builder)
 
-    with true <- current_closure_count > @max_closure_count,
-         target_closure_slots = 12 - min_non_closure_slots(builder),
-         true <- target_closure_slots < current_closure_count do
+    if current_closure_count > @max_closure_count and target_closure_count < current_closure_count do
       builder =
         builder
-        |> Builder.omit_stops(:closure, target_closure_slots)
+        |> Builder.omit_stops(:closure, target_closure_count)
         |> minimize_gap()
 
       {:done, builder}
     else
-      _ ->
-        :unchanged
+      :unchanged
     end
   end
 
   defp minimize_gap(builder) do
     current_gap_count = Builder.gap_count(builder)
-    target_gap_slots = min_gap(builder)
+    target_gap_count = min_gap(builder)
 
-    if target_gap_slots < current_gap_count do
-      Builder.omit_stops(builder, :gap, target_gap_slots)
+    if target_gap_count < current_gap_count do
+      Builder.omit_stops(builder, :gap, target_gap_count)
     else
       builder
     end
@@ -186,18 +194,15 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   defp fit_gap_region(builder) do
     current_gap_count = Builder.gap_count(builder)
+    closure_count = Builder.closure_count(builder)
+    target_gap_slots = baseline_slots(closure_count) - non_gap_slots(builder)
 
-    with true <- current_gap_count >= 3,
-         taken_slots = non_gap_slots(builder),
-         baseline = baseline_slots(Builder.closure_count(builder)),
-         target_gap_slots = baseline - taken_slots,
-         true <- target_gap_slots < current_gap_count do
+    if current_gap_count >= @max_gap_count and target_gap_slots < current_gap_count do
       builder = Builder.omit_stops(builder, :gap, target_gap_slots)
 
       {:done, builder}
     else
-      _ ->
-        :unchanged
+      :unchanged
     end
   end
 
@@ -223,7 +228,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
 
   # The minimum possible size of the gap region.
   defp min_gap(builder) do
-    min(Builder.gap_count(builder), @collapsed_gap_max)
+    min(Builder.gap_count(builder), @max_collapsed_gap_count)
   end
 
   for {closure, baseline} <- %{2 => 10, 3 => 10, 4 => 12, 5 => 12, 6 => 14, 7 => 14, 8 => 14} do
