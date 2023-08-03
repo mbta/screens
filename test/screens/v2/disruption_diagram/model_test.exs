@@ -1,7 +1,7 @@
-defmodule Screens.V2.DisruptionDiagram.ModelTest do
+defmodule Screens.V2.DisruptionDiagram.DDTest do
   use ExUnit.Case, async: true
 
-  alias Screens.V2.DisruptionDiagram.Model
+  alias Screens.V2.DisruptionDiagram, as: DD
   alias Screens.LocationContext
   alias Screens.Alerts.Alert
   alias Screens.TestSupport.DisruptionDiagramLocalizedAlert, as: DDAlert
@@ -39,7 +39,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -69,7 +69,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -99,7 +99,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -141,7 +141,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -180,7 +180,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -222,7 +222,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -254,7 +254,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -292,7 +292,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -332,7 +332,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -370,7 +370,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -400,7 +400,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -439,7 +439,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -477,7 +477,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -518,7 +518,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -569,7 +569,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -610,7 +610,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -641,7 +641,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -672,7 +672,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -705,7 +705,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -730,7 +730,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -763,7 +763,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -803,7 +803,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -841,7 +841,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -871,7 +871,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -912,7 +912,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -944,7 +944,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -974,7 +974,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1008,7 +1008,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1040,7 +1040,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1075,7 +1075,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1109,7 +1109,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1143,7 +1143,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1177,7 +1177,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1211,7 +1211,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1244,7 +1244,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1272,7 +1272,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1296,7 +1296,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1331,7 +1331,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1359,7 +1359,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1387,7 +1387,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1423,7 +1423,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         ]
       }
 
-      assert {:ok, actual} = Model.serialize(localized_alert)
+      assert {:ok, actual} = DD.serialize(localized_alert)
 
       assert expected == actual
     end
@@ -1438,7 +1438,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         location_context: %LocationContext{home_stop: ~P"bbsta", stop_sequences: Seq.orange()}
       }
 
-      assert {:error, "invalid effect: delay"} = Model.serialize(delay_scenario)
+      assert {:error, "invalid effect: delay"} = DD.serialize(delay_scenario)
     end
 
     test "rejects whole-route alerts" do
@@ -1447,7 +1447,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         location_context: %LocationContext{home_stop: ~P"bbsta", stop_sequences: Seq.orange()}
       }
 
-      assert {:error, "alert informs an entire route"} = Model.serialize(whole_route_scenario)
+      assert {:error, "alert informs an entire route"} = DD.serialize(whole_route_scenario)
     end
 
     test "rejects alerts that inform multiple lines" do
@@ -1466,7 +1466,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
       }
 
       assert {:error, "alert does not inform exactly one subway line"} =
-               Model.serialize(multi_line_scenario)
+               DD.serialize(multi_line_scenario)
     end
 
     test "rejects alerts whose informed stops do not all lay along one stop sequence" do
@@ -1482,7 +1482,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
       }
 
       assert {:error, "no stop sequence contains both the home stop and all informed stops"} =
-               Model.serialize(branched_scenario)
+               DD.serialize(branched_scenario)
     end
 
     test "rejects alerts whose informed stops include a branch that's not directly reachable from the home stop" do
@@ -1499,7 +1499,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
       }
 
       assert {:error, "no stop sequence contains both the home stop and all informed stops"} =
-               Model.serialize(unreachable_branch_scenario)
+               DD.serialize(unreachable_branch_scenario)
     end
 
     test "rejects Red Line alerts that cross from trunk to branch" do
@@ -1519,7 +1519,7 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
       }
 
       assert {:error, "Red Line alert crosses from trunk to branch"} =
-               Model.serialize(red_line_trunk_branch_scenario)
+               DD.serialize(red_line_trunk_branch_scenario)
     end
 
     ###########
@@ -1532,14 +1532,14 @@ defmodule Screens.V2.DisruptionDiagram.ModelTest do
         DDAlert.make_localized_alert(:shuttle, :orange, ~P"bbsta", {~P"mlmnl", ~P"grnst"})
 
       assert {:error, "Exception raised during serialization" <> _} =
-               Model.serialize(localized_alert)
+               DD.serialize(localized_alert)
     end
 
     test "omits bypassed stops in a the middle of a large closure region" do
       localized_alert =
         DDAlert.make_localized_alert(:station_closure, :orange, ~P"welln", ~P[mlmnl dwnxg grnst])
 
-      assert {:ok, result} = Model.serialize(localized_alert)
+      assert {:ok, result} = DD.serialize(localized_alert)
 
       # Downtown Crossing is missing, but should be included because it's bypassed.
       assert Enum.all?(result.slots, &(not match?(%{label: %{full: "Downtown Crossing"}}, &1)))

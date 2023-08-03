@@ -3,84 +3,12 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   Functions to generate a disruption diagram from a `LocalizedAlert`.
   """
 
+  alias Screens.V2.DisruptionDiagram, as: DD
   alias Screens.V2.DisruptionDiagram.Builder
   alias Screens.V2.DisruptionDiagram.Validator
   alias Screens.V2.LocalizedAlert
 
   import LocalizedAlert, only: [is_localized_alert: 1]
-
-  # We don't need to define any new struct for the diagram's source data--
-  # we can use any map/struct that satisfies LocalizedAlert.t().
-  @type t :: LocalizedAlert.t()
-
-  @type serialized_response :: continuous_disruption_diagram() | discrete_disruption_diagram()
-
-  @type continuous_disruption_diagram :: %{
-          effect: :shuttle | :suspension,
-          # A 2-element list, giving indices of the effect region's *boundary stops*, inclusive.
-          # For example in this scenario:
-          #     0     1     2     3     4     5     6     7     8
-          #    <= === O ========= O - - X - - X - - X - - O === O
-          #                       |---------range---------|
-          # The range is [3, 7].
-          #
-          # SPECIAL CASE:
-          # If the range starts at 0 or ends at the last element of the array,
-          # then the symbol for that terminal stop should use the appropriate
-          # disruption symbol, not the "normal service" symbol.
-          # For example if the range is [0, 5], the left end of the
-          # diagram should use a disruption symbol:
-          #     0     1     2     3     4     5     6     7     8
-          #     X - - X - - X - - X - - X - - O ========= O === =>
-          #     |------------range------------|
-          effect_region_slot_index_range: {non_neg_integer(), non_neg_integer()},
-          line: line_color(),
-          current_station_slot_index: non_neg_integer(),
-          # First and last elements of the list are `end_slot`s, middle elements are `middle_slot`s.
-          slots: list(slot())
-        }
-
-  @type discrete_disruption_diagram :: %{
-          effect: :station_closure,
-          closed_station_slot_indices: list(non_neg_integer()),
-          line: line_color(),
-          current_station_slot_index: non_neg_integer(),
-          # First and last elements of the list are `end_slot`s, middle elements are `middle_slot`s.
-          slots: list(slot())
-        }
-
-  @type slot :: end_slot() | middle_slot()
-
-  @type end_slot :: %{
-          type: :arrow | :terminal,
-          label_id: end_label_id()
-        }
-
-  @type middle_slot :: %{
-          label: label(),
-          show_symbol: boolean()
-        }
-
-  @type label :: label_map() | ellipsis()
-
-  @type label_map :: %{full: String.t(), abbrev: String.t()}
-
-  # Literally the string "…", but you can't use string literals as types in elixir
-  @type ellipsis :: String.t()
-
-  # End labels have hardcoded presentation, so we just send an ID for the client to use in
-  # a lookup.
-  #
-  # In most cases, the IDs are parent station IDs. For compound labels like
-  # "to Ashmont & Braintree", two IDs are joined with '+': "place-asmnl+place-brntn".
-  # For labels that don't use station names, we just use an agreed-upon string:
-  # "western_branches", "place-kencl+west", etc.
-  #
-  # The rest of the labels' presentations are computed based on the height of the end labels,
-  # so we can send actual text for those--it will be dynamically resized to fit.
-  @type end_label_id :: String.t()
-
-  @type line_color :: :blue | :orange | :red | :green
 
   # If the diagram is shorter than 6 slots, we "pad" it until it contains at least 6.
   @minimum_slot_count 6
@@ -100,7 +28,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   @max_gap_count 3
 
   @doc "Produces a JSON-serializable map representing the disruption diagram."
-  @spec serialize(t()) :: {:ok, serialized_response()} | {:error, reason :: String.t()}
+  @spec serialize(DD.t()) :: {:ok, DD.serialized_response()} | {:error, reason :: String.t()}
   def serialize(localized_alert) when is_localized_alert(localized_alert) do
     with :ok <- Validator.validate(localized_alert) do
       do_serialize(localized_alert)
@@ -121,7 +49,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     end
   end
 
-  @spec serialize_by_line(line_color(), Builder.t()) :: serialized_response()
+  @spec serialize_by_line(DD.line_color(), Builder.t()) :: DD.serialized_response()
   # The Blue Line is the simplest case. We always show all stops, starting with Bowdoin.
   defp serialize_by_line(:blue, builder) do
     # The default stop sequence starts with Wonderland, so we need to put the stops in reverse order

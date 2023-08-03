@@ -4,13 +4,12 @@ defmodule Screens.V2.DisruptionDiagram.Label do
   """
 
   alias Screens.Stops.Stop
-  alias Screens.V2.DisruptionDiagram.Model
+  alias Screens.V2.DisruptionDiagram, as: DD
 
   @type branch :: :b | :c | :d | :e
 
   @doc "Returns the label for an omitted slot."
-  @spec get_omission_label(MapSet.t(Stop.id()), Model.line_color(), branch() | nil) ::
-          Model.label()
+  @spec get_omission_label(MapSet.t(Stop.id()), DD.line_color(), branch() | nil) :: DD.label()
   def get_omission_label(omitted_stop_ids, :green, branch_thru_kenmore)
       when branch_thru_kenmore in [:b, :c, :d] do
     # For GL branches that pass through Kenmore, we look for Kenmore and Copley.
@@ -45,7 +44,7 @@ defmodule Screens.V2.DisruptionDiagram.Label do
   end
 
   @doc "Returns the label ID for an end that contains more than one item."
-  @spec get_end_label_id(Model.line_color(), Enumerable.t(Stop.id())) :: Model.end_label_id()
+  @spec get_end_label_id(DD.line_color(), Enumerable.t(Stop.id())) :: DD.end_label_id()
   def get_end_label_id(:orange, end_stop_ids) do
     cond do
       "place-forhl" in end_stop_ids -> "place-forhl"
@@ -72,7 +71,7 @@ defmodule Screens.V2.DisruptionDiagram.Label do
   @doc """
   Returns the label ID for an end that contains more than one item, in a GL diagram.
   """
-  @spec get_gl_end_label_id(branch() | nil, MapSet.t(Stop.id())) :: Model.end_label_id()
+  @spec get_gl_end_label_id(branch() | nil, MapSet.t(Stop.id())) :: DD.end_label_id()
   def get_gl_end_label_id(nil = _trunk, end_stop_ids) do
     cond do
       # left end

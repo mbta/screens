@@ -9,7 +9,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.DisruptionDiagram.Label
-  alias Screens.V2.DisruptionDiagram.Model
+  alias Screens.V2.DisruptionDiagram, as: DD
   alias Screens.V2.LocalizedAlert
 
   # Vector-related macros
@@ -29,7 +29,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     @type t :: %__MODULE__{
             id: Stop.id(),
-            label: Model.label_map(),
+            label: DD.label_map(),
             home_stop?: boolean(),
             disrupted?: boolean(),
             terminal?: boolean()
@@ -42,7 +42,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     @enforce_keys [:label]
     defstruct @enforce_keys
 
-    @type t :: %__MODULE__{label: Model.label()}
+    @type t :: %__MODULE__{label: DD.label()}
   end
 
   defmodule ArrowSlot do
@@ -51,7 +51,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     @enforce_keys [:label_id]
     defstruct @enforce_keys
 
-    @type t :: %__MODULE__{label_id: Model.end_label_id()}
+    @type t :: %__MODULE__{label_id: DD.end_label_id()}
   end
 
   ###############
@@ -75,7 +75,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   @opaque end_sequence :: Vector.t(StopSlot.t() | ArrowSlot.t())
 
   @opaque metadata :: %{
-            line: Model.line_color(),
+            line: DD.line_color(),
             effect: :shuttle | :suspension | :station_closure,
             first_disrupted_stop: Vector.index(),
             last_disrupted_stop: Vector.index(),
@@ -528,8 +528,8 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     |> do_add_slots(new_num_to_add, :left_end)
   end
 
-  @doc "Serializes the builder to a Model.serialized_response()."
-  @spec serialize(t()) :: Model.serialized_response()
+  @doc "Serializes the builder to a DisruptionDiagram.serialized_response()."
+  @spec serialize(t()) :: DD.serialized_response()
   def serialize(builder) do
     builder = add_back_end_slots(builder)
 
@@ -751,7 +751,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     min(1, vec_size(builder.left_end)) + min(1, vec_size(builder.right_end))
   end
 
-  @spec line(t()) :: Model.line_color()
+  @spec line(t()) :: DD.line_color()
   def line(%__MODULE__{} = builder), do: builder.metadata.line
 
   @spec branch(t()) :: :b | :c | :d | :e | nil
