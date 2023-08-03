@@ -370,11 +370,11 @@ const FirstSlotComponent: ComponentType<FirstSlotComponentProps> = ({
   );
 };
 
-interface LastlotComponentProps extends EndSlotComponentProps {
+interface LastSlotComponentProps extends EndSlotComponentProps {
   x: number;
 }
 
-const LastSlotComponent: ComponentType<LastlotComponentProps> = ({
+const LastSlotComponent: ComponentType<LastSlotComponentProps> = ({
   slot,
   line,
   x,
