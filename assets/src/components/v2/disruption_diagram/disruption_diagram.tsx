@@ -116,7 +116,7 @@ const CurrentStopIconRedLine: ComponentType<IconProps> = ({ x }) => {
         strokeLinejoin="round"
       />
       <path
-        transform={`translate(${x - (52 + 4) / 2} -4)`}
+        transform={`translate(${x - (iconWidth + strokeWidth) / 2} -4)`}
         fillRule="evenodd"
         clipRule="evenodd"
         d="M15.4855 29.219C14.7045 28.438 14.7045 27.1717 15.4855 26.3906L26.3906 15.4855C27.1717 14.7045 28.438 14.7045 29.219 15.4855L40.1242 26.3906C40.9052 27.1717 40.9052 28.438 40.1241 29.219L29.219 40.1242C28.438 40.9052 27.1717 40.9052 26.3906 40.1241L15.4855 29.219Z"
