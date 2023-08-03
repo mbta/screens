@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Config.Screen
   alias Screens.LocationContext
   alias Screens.Stops.Stop
+  alias Screens.V2.DisruptionDiagram
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
@@ -874,7 +875,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def serialize(%__MODULE__{is_full_screen: true} = t) do
     diagram_data =
-      case Screens.V2.DisruptionDiagram.Model.serialize(t) do
+      case DisruptionDiagram.serialize(t) do
         {:ok, serialized_diagram} ->
           %{disruption_diagram: serialized_diagram}
 
