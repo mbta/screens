@@ -4,7 +4,7 @@ defmodule Screens.Stops.Stop do
   For a while, all stop-related data was fetched from the API, until we needed to provide consistent
   abbreviations in the reconstructed alert. Now it's valuable to have a local copy of these stop sequences.
   A lot of our code still collects these sequences from the API, though, whether in functions here
-  or in functions in `route_pattern.ex` (see fetch_parent_station_sequences_through_stop).
+  or in functions in `route_pattern.ex` (see fetch_tagged_parent_station_sequences_through_stop).
   So there's inconsistent use of this local data.
   """
 
@@ -452,18 +452,23 @@ defmodule Screens.Stops.Stop do
     with alert_route_types <- get_route_type_filter(app, stop_id),
          {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, alert_route_types),
          route_ids <- Route.route_ids(routes_at_stop),
-         {:ok, stop_sequences} <-
+         {:ok, tagged_stop_sequences} <-
            (cond do
               app in [BusEink, BusShelter, GlEink] ->
-                RoutePattern.fetch_stop_sequences_through_stop(stop_id)
+                RoutePattern.fetch_tagged_stop_sequences_through_stop(stop_id)
 
               app in [PreFare, Dup] ->
-                RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids)
+                RoutePattern.fetch_tagged_parent_station_sequences_through_stop(
+                  stop_id,
+                  route_ids
+                )
             end) do
+      stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+
       {:ok,
        %LocationContext{
          home_stop: stop_id,
-         stop_sequences: stop_sequences,
+         tagged_stop_sequences: tagged_stop_sequences,
          upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
          downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
          routes: routes_at_stop,

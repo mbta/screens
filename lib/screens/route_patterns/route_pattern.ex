@@ -40,10 +40,12 @@ defmodule Screens.RoutePatterns.RoutePattern do
   end
 
   @doc """
-  Fetches stop sequences for all routes serving stop in all applicable directions.
+  Returns a map from route ID to a list of stop sequences of that route, for all
+  routes serving stop, in all applicable directions.
   """
-  @spec fetch_stop_sequences_through_stop(Stop.id()) :: {:ok, list(list(Stop.id()))} | :error
-  def fetch_stop_sequences_through_stop(
+  @spec fetch_tagged_stop_sequences_through_stop(Stop.id()) ::
+          {:ok, %{Route.id() => list(list(Stop.id()))}} | :error
+  def fetch_tagged_stop_sequences_through_stop(
         stop_id,
         route_filters \\ [],
         get_json_fn \\ &V3Api.get_json/2
@@ -60,7 +62,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
 
     case get_json_fn.("route_patterns", params) do
       {:ok, result} ->
-        {:ok, get_stop_sequences_from_result(result)}
+        {:ok, get_tagged_stop_sequences_from_result(result)}
 
       _ ->
         :error
@@ -68,14 +70,19 @@ defmodule Screens.RoutePatterns.RoutePattern do
   end
 
   @doc """
-  Gets stop sequences for stop and converts it to a list of parent station IDs.
+  Returns a map from route ID to a list of stop sequences of that route. Stop sequences
+  are described in terms of parent station IDs, not platform IDs.
+
+  For most routes (everything but Red Line), only one stop sequence will be in the list.
+  For Red Line, the list will contain one stop sequence for the Ashmont branch and one for the Braintree branch.
+
   If no parent station data exists, platform_id is returned instead.
-  Only stop sequences for one direction of travel is returned.
+  Only stop sequences for one direction of travel are returned.
   Assumes that all stop sequences in result are platforms.
   """
-  @spec fetch_parent_station_sequences_through_stop(Stop.id(), list(String.t())) ::
-          {:ok, list(list(Stop.id()))} | :error
-  def fetch_parent_station_sequences_through_stop(
+  @spec fetch_tagged_parent_station_sequences_through_stop(Stop.id(), list(String.t())) ::
+          {:ok, %{Route.id() => list(list(Stop.id()))}} | :error
+  def fetch_tagged_parent_station_sequences_through_stop(
         stop_id,
         route_filters,
         get_json_fn \\ &V3Api.get_json/2
@@ -89,23 +96,37 @@ defmodule Screens.RoutePatterns.RoutePattern do
 
     case get_json_fn.("route_patterns", params) do
       {:ok, result} ->
-        {:ok, convert_platform_to_parent_station(result)}
+        {:ok, get_tagged_parent_station_sequences_from_result(result)}
 
       _ ->
         :error
     end
   end
 
-  defp get_stop_sequences_from_result(result) do
-    get_in(result, [
-      "included",
-      Access.filter(&(&1["type"] == "trip")),
-      "relationships",
-      "stops",
-      "data",
-      Access.all(),
-      "id"
-    ])
+  @doc """
+  Given a map from route ID to stop sequences of that route, returns a flat list
+  of all of the stop sequences.
+
+  ```
+  iex> untag_stop_sequences(%{"route1" => [sequence1, sequence2], "route2" => [sequence3]})
+  [sequence1, sequence2, sequence3]
+  ```
+  """
+  @spec untag_stop_sequences(%{Route.id() => list(list(Stop.id()))}) :: list(list(Stop.id()))
+  def untag_stop_sequences(tagged_stop_sequences) do
+    Enum.flat_map(tagged_stop_sequences, &elem(&1, 1))
+  end
+
+  defp get_tagged_stop_sequences_from_result(result) do
+    result["included"]
+    |> Enum.filter(&(&1["type"] == "trip"))
+    |> Enum.map(fn trip ->
+      route = trip["relationships"]["route"]["data"]["id"]
+      sequence = Enum.map(trip["relationships"]["stops"]["data"], & &1["id"])
+
+      {route, sequence}
+    end)
+    |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
   end
 
   defp get_platform_to_station_map_from_result(result) do
@@ -127,15 +148,23 @@ defmodule Screens.RoutePatterns.RoutePattern do
     |> Enum.into(%{})
   end
 
-  defp convert_platform_to_parent_station(result) do
+  defp get_tagged_parent_station_sequences_from_result(result) do
     platform_to_station_map = get_platform_to_station_map_from_result(result)
 
     result
-    |> get_stop_sequences_from_result()
-    |> Enum.map(fn stop_sequence ->
-      Enum.map(stop_sequence, &Map.fetch!(platform_to_station_map, &1))
+    |> get_tagged_stop_sequences_from_result()
+    |> Map.new(fn {route_id, stop_sequences} ->
+      station_sequences =
+        stop_sequences
+        |> Enum.map(&platforms_to_stations(&1, platform_to_station_map))
+        # Dedup the stop sequences (both directions are listed, but we only need 1)
+        |> Enum.uniq_by(&MapSet.new/1)
+
+      {route_id, station_sequences}
     end)
-    # Dedup the stop sequences (both directions are listed, but we only need 1)
-    |> Enum.uniq_by(&MapSet.new/1)
+  end
+
+  defp platforms_to_stations(stop_sequence, platform_to_station_map) do
+    Enum.map(stop_sequence, &Map.fetch!(platform_to_station_map, &1))
   end
 end

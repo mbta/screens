@@ -5,6 +5,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Config.V2.PreFare
+  alias Screens.LocationContext, as: LC
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.Util
@@ -62,7 +63,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          route_ids <- Route.route_ids(location_context.routes),
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
       relevant_alerts = relevant_alerts(alerts, location_context, now)
-      is_terminal_station = is_terminal?(stop_id, location_context.stop_sequences)
+      is_terminal_station = is_terminal?(stop_id, LC.stop_sequences(location_context))
 
       immediate_disruptions = get_immediate_disruptions(relevant_alerts, location_context)
       downstream_disruptions = get_downstream_disruptions(relevant_alerts, location_context)
@@ -91,7 +92,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
             find_closest_downstream_alerts(
               downstream_disruptions,
               stop_id,
-              location_context.stop_sequences
+              LC.stop_sequences(location_context)
             )
 
           flex_zone_alerts = downstream_disruptions -- fullscreen_alerts
@@ -272,13 +273,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     get_severity_level(severity) != :low and relevant_direction?(reconstructed_alert)
   end
 
-  # This function assumes that stop_sequences is ordered by direction north/east -> south/west.
   # If the current station's stop_id is the first or last entry in all stop_sequences,
   # it is a terminal station. Delay alerts heading in the direction of the station are not relevant.
-  defp relevant_direction?(%{
-         alert: alert,
-         location_context: %{home_stop: stop_id, stop_sequences: stop_sequences}
-       }) do
+  defp relevant_direction?(%{alert: alert, location_context: location_context}) do
+    stop_sequences = LC.stop_sequences(location_context)
     informed_entities = Alert.informed_entities(alert)
 
     direction_id =
@@ -295,14 +293,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         # North/East side terminal stations
         Enum.all?(
           stop_sequences,
-          fn stop_sequence -> stop_id == List.first(stop_sequence) end
+          fn stop_sequence -> location_context.home_stop == List.first(stop_sequence) end
         ) ->
           0
 
         # South/West side terminal stations
         Enum.all?(
           stop_sequences,
-          fn stop_sequence -> stop_id == List.last(stop_sequence) end
+          fn stop_sequence -> location_context.home_stop == List.last(stop_sequence) end
         ) ->
           1
 

@@ -224,11 +224,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     active and (alert_location === :upstream or alert_location === :downstream)
   end
 
-  defp sort_elsewhere(e1, _e2, %__MODULE__{location_context: %{stop_sequences: stop_sequences}}) do
+  defp sort_elsewhere(e1, _e2, %__MODULE__{location_context: location_context}) do
     stations = get_stations_from_entities(e1)
 
     flat_stop_sequences =
-      stop_sequences
+      location_context
+      |> LocationContext.stop_sequences()
       |> List.flatten()
 
     # NOTE: fix this, stop sequences never contain parent station IDs
