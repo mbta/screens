@@ -9,7 +9,8 @@
 
 Mix.install([
   {:httpoison, "~> 1.8.0"},
-  {:jason, "~> 1.4.0"}
+  {:jason, "~> 1.4.0"},
+  {:csv, "~> 3.0"}
 ])
 
 {opts, _, _} =
@@ -73,13 +74,13 @@ get_times = fn [prev, next] ->
       percent_over_60 = number_over_60 / length(times)
 
       %{
+        "30_to_60" => percent_under_60 * 100.0,
         under_30: percent_under_30 * 100.0,
-        under_60: percent_under_60 * 100.0,
         over_60: percent_over_60 * 100.0
       }
     end
 
-  [next, percentages]
+  Map.put_new(percentages, :id, next)
 end
 
 sb_platform_pairs = [
@@ -127,12 +128,16 @@ if direction_id == 0 do
   sb_content =
     sb_platform_pairs
     |> Enum.map(&get_times.(&1))
+    |> CSV.encode(headers: true)
+    |> Enum.join()
 
-  File.write!("scripts/southbound_times.json", Jason.encode!(sb_content), [:binary])
+  File.write!("scripts/southbound_times.csv", sb_content)
 else
   nb_content =
     nb_platform_pairs
     |> Enum.map(&get_times.(&1))
+    |> CSV.encode(headers: true)
+    |> Enum.join()
 
-  File.write!("scripts/northbound_times.json", Jason.encode!(nb_content), [:binary])
+  File.write!("scripts/northbound_times.csv", nb_content)
 end
