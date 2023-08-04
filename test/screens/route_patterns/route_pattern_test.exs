@@ -3,7 +3,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
 
   import Screens.RoutePatterns.RoutePattern
 
-  describe "fetch_stop_sequences_through_stop/2" do
+  describe "fetch_tagged_stop_sequences_through_stop/2" do
     test "returns {:ok, sequences} if fetch function returns {:ok, data}" do
       stop_id = "1265"
 
@@ -18,13 +18,22 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
           %{
             "type" => "trip",
             "relationships" => %{
-              "stops" => %{"data" => [%{"id" => "1"}, %{"id" => "2"}, %{"id" => "3"}]}
+              "stops" => %{"data" => [%{"id" => "1"}, %{"id" => "2"}, %{"id" => "3"}]},
+              "route" => %{"data" => %{"id" => "route1"}}
             }
           },
           %{
             "type" => "trip",
             "relationships" => %{
-              "stops" => %{"data" => [%{"id" => "5"}, %{"id" => "6"}, %{"id" => "7"}]}
+              "stops" => %{"data" => [%{"id" => "3"}, %{"id" => "2"}, %{"id" => "1"}]},
+              "route" => %{"data" => %{"id" => "route1"}}
+            }
+          },
+          %{
+            "type" => "trip",
+            "relationships" => %{
+              "stops" => %{"data" => [%{"id" => "5"}, %{"id" => "6"}, %{"id" => "7"}]},
+              "route" => %{"data" => %{"id" => "route2"}}
             }
           }
         ]
@@ -32,10 +41,10 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
 
       get_json_fn = fn _, ^params -> {:ok, data} end
 
-      expected_stop_sequences = [~w[1 2 3], ~w[5 6 7]]
+      expected_stop_sequences = %{"route1" => [~w[1 2 3], ~w[3 2 1]], "route2" => [~w[5 6 7]]}
 
       assert {:ok, expected_stop_sequences} ==
-               fetch_stop_sequences_through_stop(stop_id, [], get_json_fn)
+               fetch_tagged_stop_sequences_through_stop(stop_id, [], get_json_fn)
     end
 
     test "returns :error if fetch function returns :error" do
@@ -43,7 +52,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
 
       get_json_fn = fn _, _ -> :error end
 
-      assert :error == fetch_stop_sequences_through_stop(stop_id, [], get_json_fn)
+      assert :error == fetch_tagged_stop_sequences_through_stop(stop_id, [], get_json_fn)
     end
 
     test "returns filtered list if route_filters is provided" do
@@ -70,10 +79,10 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
 
       get_json_fn = fn _, ^params -> {:ok, data} end
 
-      expected_stop_sequences = [~w[5 6 7]]
+      expected_stop_sequences = %{"Orange" => [~w[5 6 7]]}
 
       assert {:ok, expected_stop_sequences} ==
-               fetch_stop_sequences_through_stop(stop_id, route_filters, get_json_fn)
+               fetch_tagged_stop_sequences_through_stop(stop_id, route_filters, get_json_fn)
     end
   end
 end

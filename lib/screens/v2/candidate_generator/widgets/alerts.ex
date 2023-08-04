@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{Alerts, BusEink, BusShelter, GlEink}
+  alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.Util
@@ -24,8 +25,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
       )
       when app in @alert_supporting_screen_types do
     with {:ok, location_context} <- fetch_location_context_fn.(app, stop_id, now),
-         reachable_stop_ids =
-           local_and_downstream_stop_ids(location_context.stop_sequences, stop_id),
+         reachable_stop_ids = local_and_downstream_stop_ids(location_context, stop_id),
          route_ids <- Route.route_ids(location_context.routes),
          {:ok, alerts} <-
            fetch_alerts_by_stop_and_route_fn.(
@@ -84,13 +84,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
     |> Enum.to_list()
   end
 
-  defp local_and_downstream_stop_ids(nil, home_stop) do
+  defp local_and_downstream_stop_ids(location_context, home_stop)
+       when location_context.tagged_stop_sequences == nil do
     [home_stop]
   end
 
-  defp local_and_downstream_stop_ids(stop_sequences, home_stop) do
+  defp local_and_downstream_stop_ids(location_context, home_stop) do
     downstream_stop_ids =
-      stop_sequences
+      location_context
+      |> LocationContext.stop_sequences()
       |> Enum.flat_map(&Util.slice_after(&1, home_stop))
       |> Enum.uniq()
 
