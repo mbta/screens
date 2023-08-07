@@ -239,8 +239,7 @@ const getAlertColor = (routes: EnrichedRoute[]) => {
   const colors = routes.map(r => getRouteColor(r.route_id))
   const uniqueColors = new Set(colors).size
 
-  const answer = uniqueColors == 1 ? colors[0] : "yellow"
-  return answer
+  return uniqueColors == 1 ? colors[0] : "yellow"
 }
 
 const PreFareAlertBanner: React.ComponentType<{routes: EnrichedRoute[]}> = ({routes}) => {
