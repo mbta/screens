@@ -2,7 +2,7 @@
 - Start Date: 2023-07-28
 - RFC PR: [screens/docs/tech-spects#0005](https://github.com/mbta/screens/pull/1826)
 - Asana task: [asana link](https://app.asana.com/0/1185117109217413/1205119093140586)
-- Status: Proposed
+- Status: Approved
 
 # Background
 [background]: #background
