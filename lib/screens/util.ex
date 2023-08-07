@@ -143,7 +143,7 @@ defmodule Screens.Util do
   """
   @spec format_name_list_to_string_audio([String.t()]) :: String.t()
   def format_name_list_to_string_audio([string]), do: "#{string}"
-  def format_name_list_to_string_audio([s1, s2]), do: "#{s1} and #{s2}"
+  def format_name_list_to_string_audio([s1, s2]), do: "#{s1}, and, #{s2}"
 
   def format_name_list_to_string_audio(list) do
     list
