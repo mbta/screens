@@ -63,22 +63,22 @@ defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
   defp make_location_context(home_station_id) do
     %LocationContext{
       home_stop: home_station_id,
-      stop_sequences: Stop.__stop_sequences_through_station(home_station_id)
+      tagged_stop_sequences: tagged_stop_sequences_through_station(home_station_id)
     }
   end
 
   defp ies(:green, stop_ids, :per_stop, _home_stop) do
     for stop_id <- stop_ids,
-        route_id <- Stop.__subway_routes_at_station(stop_id),
+        "Green" <> _ = route_id <- subway_routes_at_station(stop_id),
         do: %{route: route_id, stop: stop_id}
   end
 
   defp ies(:green, stop_ids, :overall, home_stop) do
     route_ids =
-      stop_ids
+      [home_stop | stop_ids]
       |> MapSet.new()
-      |> MapSet.put(home_stop)
-      |> Stop.__routes_containing_all()
+      |> routes_containing_all()
+      |> Enum.filter(&match?("Green" <> _, &1))
 
     result =
       for stop_id <- stop_ids,
@@ -122,5 +122,62 @@ defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
 
         Enum.slice(sequence, index_of_first..index_of_last//1)
     end
+  end
+
+  # Returns IDs of the subway/light rail route(s) that serve the given station,
+  # using our hardcoded stop sequences rather than API calls.
+  defp subway_routes_at_station(parent_station_id) do
+    Stop.get_all_routes_stop_sequence()
+    |> Enum.filter(fn
+      # Green isn't a real route ID, ignore it.
+      {"Green", _} ->
+        false
+
+      {_route_id, labeled_sequences} ->
+        stop_sequences =
+          Enum.map(labeled_sequences, fn labeled_sequence ->
+            Enum.map(labeled_sequence, &elem(&1, 0))
+          end)
+
+        Enum.any?(stop_sequences, &(parent_station_id in &1))
+    end)
+    |> Enum.map(fn {route_id, _stop_sequences} -> route_id end)
+  end
+
+  # Returns a %{route => stop_sequences} map for all sequences that that contain the given subway/light rail station.
+  defp tagged_stop_sequences_through_station(parent_station_id) do
+    Stop.get_all_routes_stop_sequence()
+    |> Enum.flat_map(fn
+      # Green isn't a real route ID, ignore it.
+      {"Green", _} ->
+        []
+
+      {route_id, labeled_sequences} ->
+        matching_stop_sequences =
+          Enum.flat_map(labeled_sequences, fn labeled_sequence ->
+            stop_sequence = Enum.map(labeled_sequence, &elem(&1, 0))
+            if parent_station_id in stop_sequence, do: [stop_sequence], else: []
+          end)
+
+        if matching_stop_sequences != [], do: [{route_id, matching_stop_sequences}], else: []
+    end)
+    |> Map.new()
+  end
+
+  # Returns IDs of the route(s) whose stop sequence(s) contain all of the given stops.
+  defp routes_containing_all(parent_station_ids) do
+    Stop.get_all_routes_stop_sequence()
+    |> Enum.filter(fn
+      # Green isn't a real route ID, ignore it.
+      {"Green", _} ->
+        false
+
+      {_route_id, labeled_sequences} ->
+        Enum.any?(labeled_sequences, fn labeled_sequence ->
+          stops = MapSet.new(labeled_sequence, &elem(&1, 0))
+          MapSet.subset?(parent_station_ids, stops)
+        end)
+    end)
+    |> Enum.map(fn {route_id, _} -> route_id end)
   end
 end
