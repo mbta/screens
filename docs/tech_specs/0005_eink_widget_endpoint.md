@@ -114,6 +114,8 @@ const WidgetPage = () => {
 
 And then suddenly, the widget page is rendered! Mercury will be taking screenshots of these pages and sending the image to the screen, only to update with a new screenshot if the data for that widget changes.
 
+Note: `MappingContext` is needed as a wrapper for WidgetPage because it maps the widget data `type` field to components. `ResponseMapperContext` is not needed (because the client won't be making data requests.)
+
 Example 1: Footer. POST to http://localhost:4000/v2/screen/gl_eink_v2/widget with body
 ```
 {
@@ -184,7 +186,6 @@ displays:
 ![example takeover alert][example eink takeover alert]
 
 # Unresolved Questions
-- Are the MappingContext and ResponseMapperContext needed as wrappers for `<WidgetPage />`?
 - What about slots?
   - Since Mercury is building their own frontend skin, I believe the layout and sizing needs to be managed on their end. Is that true?
 
