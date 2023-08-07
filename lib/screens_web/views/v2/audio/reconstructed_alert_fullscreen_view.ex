@@ -16,7 +16,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
   def render_banner(%{
         region: _region,
         routes: routes
-      }) do
+      }) when routes != [] do
     if routes |> hd() |> Map.has_key?(:headsign) do
       destinations = Enum.map(routes, fn route -> route.headsign end)
 
@@ -57,10 +57,10 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
         region: :outside,
         effect: :shuttle,
         routes: route_svg_names,
-        endpoints: endpoints,
+        endpoints: {left_endpoint, right_endpoint},
         cause: cause
       }) do
-    ~E|Shuttle buses replace <%= get_line_name(route_svg_names) %> trains between <%= elem(endpoints, 0) %> and <%= elem(endpoints, 1) %><%= render_cause(cause) %>. All shuttle buses are accessible.|
+    ~E|Shuttle buses replace <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= render_cause(cause) %>. All shuttle buses are accessible.|
   end
 
   # Downstream suspension
@@ -68,10 +68,10 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
         region: :outside,
         effect: :suspension,
         routes: route_svg_names,
-        endpoints: endpoints,
+        endpoints: {left_endpoint, right_endpoint},
         cause: cause
       }) do
-    ~E|There are no <%= get_line_name(route_svg_names) %> trains between <%= elem(endpoints, 0) %> and <%= elem(endpoints, 1) %><%= render_cause(cause) %>. Please seek an alternate route.|
+    ~E|There are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= render_cause(cause) %>. Please seek an alternate route.|
   end
 
   # Boundary shuttle
@@ -80,10 +80,10 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
         effect: :shuttle,
         issue: issue,
         routes: route_svg_names,
-        endpoints: endpoints,
+        endpoints: {left_endpoint, right_endpoint},
         cause: cause
       }) do
-    ~E|There are <%= issue %>. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= elem(endpoints, 0) %> and <%= elem(endpoints, 1) %><%= render_cause(cause) %>. All shuttle buses are accessible.|
+    ~E|There are <%= issue %>. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= render_cause(cause) %>. All shuttle buses are accessible.|
   end
 
   # Boundary suspension
@@ -92,10 +92,10 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
         effect: :suspension,
         issue: issue,
         routes: route_svg_names,
-        endpoints: endpoints,
+        endpoints: {left_endpoint, right_endpoint},
         cause: cause
       }) do
-    ~E|There are <%= issue %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= elem(endpoints, 0) %> and <%= elem(endpoints, 1) %><%= render_cause(cause) %>.|
+    ~E|There are <%= issue %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= render_cause(cause) %>.|
   end
 
   # Closure here - three cases
@@ -137,14 +137,14 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
         %{
           effect: :shuttle,
           routes: route_svg_names,
-          endpoints: endpoints,
+          endpoints: {left_endpoint, right_endpoint},
           cause: cause
         } = alert
       ) do
     if Map.has_key?(alert, :is_transfer_station) do
-      ~E|There are no <%= get_line_name(route_svg_names) %> trains. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= elem(endpoints, 0) %> and <%= elem(endpoints, 1) %><%= render_cause(cause) %>. All shuttle buses are accessible.|
+      ~E|There are no <%= get_line_name(route_svg_names) %> trains. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= render_cause(cause) %>. All shuttle buses are accessible.|
     else
-      ~E|This station is closed. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= elem(endpoints, 0) %> and <%= elem(endpoints, 1) %><%= render_cause(cause) %>. All shuttle buses are accessible.|
+      ~E|This station is closed. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= render_cause(cause) %>. All shuttle buses are accessible.|
     end
   end
 
@@ -152,14 +152,14 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
         %{
           effect: :suspension,
           routes: route_svg_names,
-          endpoints: endpoints,
+          endpoints: {left_endpoint, right_endpoint},
           cause: cause
         } = alert
       ) do
     if Map.has_key?(alert, :is_transfer_station) do
-      ~E|There are no <%= get_line_name(route_svg_names) %> trains<%= render_cause(cause) %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= elem(endpoints, 0) %> and <%= elem(endpoints, 1) %>.|
+      ~E|There are no <%= get_line_name(route_svg_names) %> trains<%= render_cause(cause) %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %>.|
     else
-      ~E|This station is closed<%= render_cause(cause) %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= elem(endpoints, 0) %> and <%= elem(endpoints, 1) %>.|
+      ~E|This station is closed<%= render_cause(cause) %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %>.|
     end
   end
 
@@ -174,23 +174,20 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
       routes
       |> Enum.map(fn route -> route.route_id end)
 
-    lines_with_branches =
-      route_ids
-      |> Enum.filter(&String.contains?(&1, "-"))
-      |> Enum.map(fn "Green-" <> branch_letter -> branch_letter end)
+    branch_letters = for "Green-" <> branch_letter <- route_ids, do: branch_letter
 
     lines_without_branches =
       route_ids
-      |> Enum.filter(&(!String.contains?(&1, "-")))
+      |> Enum.reject(&String.contains?(&1, "Green-"))
       |> Enum.map(fn line -> line <> " Line" end)
 
-    branch_or_branches = if length(lines_with_branches) == 1, do: "branch", else: "branches"
+    branch_or_branches = if length(branch_letters) == 1, do: "branch", else: "branches"
 
     formatted_lines_with_branches =
-      if lines_with_branches !== [],
+      if branch_letters !== [],
         do: [
           "Green Line #{branch_or_branches}, " <>
-            Util.format_name_list_to_string_audio(lines_with_branches)
+            Util.format_name_list_to_string_audio(branch_letters)
         ],
         else: []
 
