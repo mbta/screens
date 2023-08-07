@@ -45,11 +45,12 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     with {:ok, builder} <- Builder.new(localized_alert) do
       line = Builder.line(builder)
 
-      {:ok, serialize_by_line(line, builder)}
+      serialize_by_line(line, builder)
     end
   end
 
-  @spec serialize_by_line(DD.line(), Builder.t()) :: DD.serialized_response()
+  @spec serialize_by_line(DD.line(), Builder.t()) ::
+          {:ok, DD.serialized_response()} | {:error, reason :: String.t()}
   # The Blue Line is the simplest case. We always show all stops, starting with Bowdoin.
   defp serialize_by_line(:blue, builder) do
     # The default stop sequence starts with Wonderland, so we need to put the stops in reverse order
@@ -57,30 +58,33 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     builder
     |> Builder.reverse()
     |> Builder.serialize()
+    |> then(&{:ok, &1})
   end
 
   # For the Green Line, we need to reverse the diagram in certain cases, as well as fit regions.
   defp serialize_by_line(:green, builder) do
-    builder
-    |> maybe_reverse_gl()
-    |> fit_regions()
-    |> Builder.serialize()
+    builder = maybe_reverse_gl(builder)
+
+    with {:ok, builder} <- fit_regions(builder) do
+      {:ok, Builder.serialize(builder)}
+    end
   end
 
   # Red Line and Orange Line diagrams never need to be reversed--we just need to fit regions.
   defp serialize_by_line(_orange_or_red, builder) do
-    builder
-    |> fit_regions()
-    |> Builder.serialize()
+    with {:ok, builder} <- fit_regions(builder) do
+      {:ok, Builder.serialize(builder)}
+    end
   end
 
   defp fit_regions(builder) do
     with :unchanged <- fit_closure_region(builder),
          :unchanged <- fit_gap_region(builder),
          :unchanged <- pad_slots(builder) do
-      builder
+      {:ok, builder}
     else
-      {:done, builder} -> builder
+      {:done, builder} -> {:ok, builder}
+      {:error, _} = error_result -> error_result
     end
   end
 
@@ -98,12 +102,9 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     target_closure_count = @max_count_with_collapsed_closure - min_non_closure_slots(builder)
 
     if current_closure_count > @max_closure_count and target_closure_count < current_closure_count do
-      builder =
-        builder
-        |> Builder.omit_stops(:closure, target_closure_count)
-        |> minimize_gap()
-
-      {:done, builder}
+      with {:ok, builder} <- Builder.omit_stops(builder, :closure, target_closure_count) do
+        {:done, minimize_gap(builder)}
+      end
     else
       :unchanged
     end
@@ -114,7 +115,9 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     target_gap_count = min_gap(builder)
 
     if target_gap_count < current_gap_count do
-      Builder.omit_stops(builder, :gap, target_gap_count)
+      # The gap never contains important stops, so `omit_stops` will always succeed.
+      {:ok, builder} = Builder.omit_stops(builder, :gap, target_gap_count)
+      builder
     else
       builder
     end
@@ -126,7 +129,8 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     target_gap_slots = baseline_slots(closure_count) - non_gap_slots(builder)
 
     if current_gap_count >= @max_gap_count and target_gap_slots < current_gap_count do
-      builder = Builder.omit_stops(builder, :gap, target_gap_slots)
+      # The gap never contains important stops, so `omit_stops` will always succeed.
+      {:ok, builder} = Builder.omit_stops(builder, :gap, target_gap_slots)
 
       {:done, builder}
     else

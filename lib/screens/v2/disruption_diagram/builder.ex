@@ -174,7 +174,8 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   The `label_callback` argument should be a function. The IDs of the omitted stops will be passed to this
   function, which should return the appropriate label for those omitted stops.
   """
-  @spec omit_stops(t(), :closure | :gap, pos_integer()) :: t()
+  @spec omit_stops(t(), :closure | :gap, pos_integer()) ::
+          {:ok, t()} | {:error, reason :: String.t()}
   def omit_stops(builder, region, target_slots)
 
   def omit_stops(%__MODULE__{} = builder, :closure, target_closure_slots) do
@@ -580,6 +581,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
       current_region_indices
       |> Enum.drop(offset)
       |> Enum.take(num_to_omit)
+      |> MapSet.new()
 
     label =
       omitted_indices
@@ -588,15 +590,36 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     {first_omitted, last_omitted} = Enum.min_max(omitted_indices)
 
-    builder
-    |> update_in([Access.key(:sequence)], fn seq ->
-      left_side = Vector.slice(seq, 0..(first_omitted - 1)//1)
+    important_indices =
+      builder.sequence
+      |> Vector.with_index()
+      |> Vector.filter(fn
+        {%StopSlot{} = stop_data, _i} ->
+          (builder.metadata.effect == :station_closure and stop_data.disrupted?) or
+            stop_data.home_stop?
 
-      right_side = Vector.slice(seq, (last_omitted + 1)..-1//1)
+        _ ->
+          false
+      end)
+      |> MapSet.new(fn {_stop_data, i} -> i end)
 
-      left_side +++ Vector.new([%OmittedSlot{label: label}]) +++ right_side
-    end)
-    |> recalculate_metadata()
+    empty_set = MapSet.new()
+
+    case MapSet.intersection(omitted_indices, important_indices) do
+      ^empty_set ->
+        builder
+        |> update_in([Access.key(:sequence)], fn seq ->
+          left_side = Vector.slice(seq, 0..(first_omitted - 1)//1)
+          right_side = Vector.slice(seq, (last_omitted + 1)..-1//1)
+
+          left_side +++ Vector.new([%OmittedSlot{label: label}]) +++ right_side
+        end)
+        |> recalculate_metadata()
+        |> then(&{:ok, &1})
+
+      undesired_omissions ->
+        {:error, "undesired omissions! #{inspect(undesired_omissions)}"}
+    end
   end
 
   defp do_add_slots(builder, 0, _), do: builder
