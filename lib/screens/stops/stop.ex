@@ -443,6 +443,10 @@ defmodule Screens.Stops.Stop do
     @green_line_trunk_stops
   end
 
+  def rl_trunk_stops do
+    @red_line_trunk_stops
+  end
+
   def stop_id_to_name(route_id) do
     @route_stop_sequences
     |> Map.get(route_id)
