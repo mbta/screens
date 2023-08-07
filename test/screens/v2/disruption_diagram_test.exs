@@ -1,4 +1,4 @@
-defmodule Screens.V2.DisruptionDiagram.DDTest do
+defmodule Screens.V2.DisruptionDiagramTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.DisruptionDiagram, as: DD
