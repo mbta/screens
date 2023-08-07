@@ -52,8 +52,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           cause: String.t(),
           effect: :suspension | :shuttle | :station_closure,
           updated_at: String.t(),
-          # i.e. [%{color: :orange, text: "ORANGE LINE", type: :text}]
-          routes: list(map())
+          routes: list(RoutePill.t())
         }
 
   @type enriched_route :: %{
@@ -168,7 +167,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     affected_routes = LocalizedAlert.informed_subway_routes(t)
 
     affected_routes
-    |> Enum.group_by(&route_without_branch/1)
+    |> Enum.group_by(&get_line/1)
     |> Enum.map(
       &RoutePill.serialize_route_for_reconstructed_alert(&1, %{
         large: length(affected_routes) == 1
@@ -194,7 +193,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp build_pills_from_headsign(route_id, nil) do
     [
       %{
-        route_id: route_without_branch(route_id),
+        route_id: get_line(route_id),
         svg_name: format_short_route_pill(route_id)
       }
     ]
@@ -233,8 +232,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     ]
   end
 
-  defp route_without_branch("Green" <> _), do: "Green"
-  defp route_without_branch(route_id), do: route_id
+  defp get_line("Green" <> _), do: "Green"
+  defp get_line(route_id), do: route_id
 
   defp format_for_svg_name(headsign), do: Map.get(@headsign_svg_map, headsign)
 
@@ -339,7 +338,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     other_closures = List.delete(informed_stations, stop_name)
 
     other_closures =
-      if other_closures === [] do
+      if other_closures == [] do
         nil
       else
         other_closures
@@ -411,7 +410,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
       endpoints: endpoints,
-      is_transfer_station: location === :inside
+      is_transfer_station: location == :inside
     }
   end
 
@@ -463,7 +462,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
       endpoints: endpoints,
-      is_transfer_station: location === :inside
+      is_transfer_station: location == :inside
     }
   end
 
@@ -1011,7 +1010,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     def audio_view(t),
       do:
-        if(ReconstructedAlert.widget_type(t) === :reconstructed_large_alert,
+        if(ReconstructedAlert.widget_type(t) == :reconstructed_large_alert,
           do: ScreensWeb.V2.Audio.ReconstructedAlertView,
           else: ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView
         )
