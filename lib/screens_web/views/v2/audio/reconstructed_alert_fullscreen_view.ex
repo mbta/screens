@@ -107,7 +107,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
         cause: cause,
         other_closures: other_closures
       })
-      when other_closures != nil do
+      when other_closures != [] do
     ~E|This station is closed<%= render_cause(cause) %>. Please seek an alternate route. <%= get_line_name(route_svg_names) %> trains are skipping this station and <%= Util.format_name_list_to_string_audio(other_closures) %>.|
   end
 

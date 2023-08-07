@@ -337,13 +337,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     other_closures = List.delete(informed_stations, stop_name)
 
-    other_closures =
-      if other_closures == [] do
-        nil
-      else
-        other_closures
-      end
-
     %{
       issue: "Station closed",
       remedy: "Seek alternate route",
@@ -466,6 +459,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
+  # Station closure for 1 line at a multi-line station
   defp serialize_fullscreen_alert(
          %__MODULE__{alert: %Alert{effect: :station_closure}} = t,
          :inside
