@@ -186,19 +186,24 @@ displays:
 ![example takeover alert][example eink takeover alert]
 
 # Unresolved Questions
-- What about slots?
-  - Since Mercury is building their own frontend skin, I believe the layout and sizing needs to be managed on their end. Is that true?
+
+- Slots: Since Mercury is building their own frontend skin, I believe the layout and sizing needs to be managed on their end. That said, some of our widgets are of flexible size, which does not lend itself for easy screenshotting. For example, the footer fills the whole viewport when it is rendered as a widget. So we may need to add CSS to make the widgets more screenshot-ready.
+- Latency: Widgets will take time to render, so Mercury's screenshot utility will need to give the page enough time for the final widget to be ready.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-???
+None noted.
 
 # Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
 
-Are there any alternatives that would avoid needing to re-run the backend code? (And are there any drawbacks of the current approach that make this re-run worth it?)
+Mercury keeps long-running instances of our e-ink clients so that instead of passing widget data back to us for rendering, they pass it to their dedicated client to render for screenshotting.
+- We wouldn't need to handle additional requests after each data request
+- We wouldn't need to send the entire react app in response to widget requests
+- We would just need to periodically send them the react app.
 
+Not an alternative we need to explore right off the bat -- we can coordinate with Mercury to determine if the originally proposed approach is sufficient for them.
 
 [example eink footer]: /docs/assets/sample_app_screenshots/widgets/example_eink_footer.png
 [example eink partial alert]: /docs/assets/sample_app_screenshots/widgets/example_eink_partial_alert.png
