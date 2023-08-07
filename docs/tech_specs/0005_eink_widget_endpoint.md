@@ -67,14 +67,12 @@ And then the POST request body should be structured like:
 ```
 {
     "widget": {
-        "footer": {
-            "mode_cost": "$2.40",
-            "mode_icon": "subway-negative-black.svg",
-            "mode_text": "Subway",
-            "text": "For real-time predictions and fare purchase locations:",
-            "type": "fare_info_footer",
-            "url": "mbta.com/stops/place-bcnwa"
-        }
+        "mode_cost": "$2.40",
+        "mode_icon": "subway-negative-black.svg",
+        "mode_text": "Subway",
+        "text": "For real-time predictions and fare purchase locations:",
+        "type": "fare_info_footer",
+        "url": "mbta.com/stops/place-bcnwa"
     }
 }
 ```
@@ -96,10 +94,8 @@ Then the bit that should be passed in the POST request is a step deeper at the `
 ```
 {
     "widget": {
-        "medium": {
-            "asset_url": "https://mbta-screens.s3.amazonaws.com/screens-prod/images/e-ink/psa/MBTA SEE SAY_Eink-Messaging.png",
-            "type": "evergreen_content"
-        }
+        "asset_url": "https://mbta-screens.s3.amazonaws.com/screens-prod/images/e-ink/psa/MBTA SEE SAY_Eink-Messaging.png",
+        "type": "evergreen_content"
     }
 }
 ```
@@ -110,9 +106,7 @@ In both `gl_eink.tsx` and `bus_eink.tsx`, there will be a new route to match on 
 
 ```
 const WidgetPage = () => {
-  const widget = getDatasetValue("widgetData")
-  let widgetJson = widget ? JSON.parse(widget) : null
-  if (widgetJson) widgetJson = Object.values(widgetJson)[0]
+  const widgetJson = JSON.parse(getDatasetValue("widgetData"))
 
   return widgetJson ? <Widget data={widgetJson} /> : null
 };
@@ -124,14 +118,12 @@ Example 1: Footer. POST to http://localhost:4000/v2/screen/gl_eink_v2/widget wit
 ```
 {
     "widget": {
-        "footer": {
-            "mode_cost": "$2.40",
-            "mode_icon": "subway-negative-black.svg",
-            "mode_text": "Subway",
-            "text": "For real-time predictions and fare purchase locations:",
-            "type": "fare_info_footer",
-            "url": "mbta.com/stops/place-bcnwa"
-        }
+        "mode_cost": "$2.40",
+        "mode_icon": "subway-negative-black.svg",
+        "mode_text": "Subway",
+        "text": "For real-time predictions and fare purchase locations:",
+        "type": "fare_info_footer",
+        "url": "mbta.com/stops/place-bcnwa"
     }
 }
 ```
@@ -143,20 +135,18 @@ Example 2: Partial alert. POST to http://localhost:4000/v2/screen/gl_eink_v2/wid
 ```
 {
     "widget": {
-        "medium": {
-            "body": "Shuttle buses replacing Green Line E branch service",
-            "header": "Shuttle Buses",
-            "icon": "bus",
-            "route_pills": [
-                {
-                    "color": "green",
-                    "text": "Green Line E",
-                    "type": "text"
-                }
-            ],
-            "type": "alert",
-            "url": "mbta.com/alerts"
-        }
+        "body": "Shuttle buses replacing Green Line E branch service",
+        "header": "Shuttle Buses",
+        "icon": "bus",
+        "route_pills": [
+            {
+                "color": "green",
+                "text": "Green Line E",
+                "type": "text"
+            }
+        ],
+        "type": "alert",
+        "url": "mbta.com/alerts"
     }
 }
 ```
@@ -168,26 +158,24 @@ Example 3: Takeover alert. POST to http://localhost:4000/v2/screen/gl_eink_v2/wi
 ```
 {
     "widget": {
-        "body": {
-            "full_body_bottom_screen": {
-                "type": "bottom_screen_filler"
-            },
-            "full_body_top_screen": {
-                "body": "Heath Street closed",
-                "header": "Station Closed",
-                "icon": "x",
-                "route_pills": [
-                    {
-                        "color": "green",
-                        "text": "Green Line E",
-                        "type": "text"
-                    }
-                ],
-                "type": "full_body_alert",
-                "url": "mbta.com/alerts"
-            },
-            "type": "body_takeover"
-        }
+        "full_body_bottom_screen": {
+            "type": "bottom_screen_filler"
+        },
+        "full_body_top_screen": {
+            "body": "Heath Street closed",
+            "header": "Station Closed",
+            "icon": "x",
+            "route_pills": [
+                {
+                    "color": "green",
+                    "text": "Green Line E",
+                    "type": "text"
+                }
+            ],
+            "type": "full_body_alert",
+            "url": "mbta.com/alerts"
+        },
+        "type": "body_takeover"
     }
 }
 ```
