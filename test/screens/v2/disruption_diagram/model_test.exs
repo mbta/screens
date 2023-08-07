@@ -5,7 +5,7 @@ defmodule Screens.V2.DisruptionDiagram.DDTest do
   alias Screens.LocationContext
   alias Screens.Alerts.Alert
   alias Screens.TestSupport.DisruptionDiagramLocalizedAlert, as: DDAlert
-  alias Screens.TestSupport.SubwayStopSequences, as: Seq
+  alias Screens.TestSupport.SubwayTaggedStopSequences, as: TaggedSeq
 
   import Screens.TestSupport.ParentStationIdSigil
 
@@ -104,9 +104,69 @@ defmodule Screens.V2.DisruptionDiagram.DDTest do
       assert expected == actual
     end
 
+    test "serializes a Blue Line station closure at Government Center, which is also the home stop" do
+      localized_alert =
+        DDAlert.make_localized_alert(:station_closure, :blue, ~P"gover", [~P"gover"])
+
+      expected = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [1],
+        line: :blue,
+        current_station_slot_index: 1,
+        slots: [
+          %{type: :terminal, label_id: ~P"bomnl"},
+          %{label: %{full: "Government Center", abbrev: "Gov't Ctr"}, show_symbol: true},
+          %{label: %{full: "State", abbrev: "State"}, show_symbol: true},
+          %{label: %{full: "Aquarium", abbrev: "Aquarium"}, show_symbol: true},
+          %{label: %{full: "Maverick", abbrev: "Maverick"}, show_symbol: true},
+          %{label: %{full: "Airport", abbrev: "Airport"}, show_symbol: true},
+          %{label: %{full: "Wood Island", abbrev: "Wood Island"}, show_symbol: true},
+          %{label: %{full: "Orient Heights", abbrev: "Orient Hts"}, show_symbol: true},
+          %{label: %{full: "Suffolk Downs", abbrev: "Suffolk Dns"}, show_symbol: true},
+          %{label: %{full: "Beachmont", abbrev: "Beachmont"}, show_symbol: true},
+          %{label: %{full: "Revere Beach", abbrev: "Revere Bch"}, show_symbol: true},
+          %{type: :terminal, label_id: ~P"wondl"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
     ###############
     # ORANGE LINE #
     ###############
+
+    test "serializes an Orange Line trunk station closure at Downtown Crossing, which is also the home stop" do
+      localized_alert =
+        DDAlert.make_localized_alert(:station_closure, :orange, ~P"dwnxg", [~P"dwnxg"])
+
+      expected = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [3],
+        line: :orange,
+        current_station_slot_index: 3,
+        slots: [
+          %{type: :arrow, label_id: ~P"ogmnl"},
+          # <padding>
+          %{label: %{full: "Haymarket", abbrev: "Haymarket"}, show_symbol: true},
+          # </padding>
+          # <closure>
+          %{label: %{full: "State", abbrev: "State"}, show_symbol: true},
+          # <current_location subsumed>
+          %{label: %{full: "Downtown Crossing", abbrev: "Downt'n Xng"}, show_symbol: true},
+          # </current_location>
+          %{label: %{full: "Chinatown", abbrev: "Chinatown"}, show_symbol: true},
+          # </closure>
+          %{type: :arrow, label_id: ~P"forhl"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
 
     test "serializes an Orange Line station closure far from home stop" do
       localized_alert =
@@ -535,6 +595,36 @@ defmodule Screens.V2.DisruptionDiagram.DDTest do
     # RED LINE TRUNK #
     ##################
 
+    test "serializes a Red Line trunk station closure at Downtown Crossing, which is also the home stop" do
+      localized_alert =
+        DDAlert.make_localized_alert(:station_closure, :red, ~P"dwnxg", [~P"dwnxg"])
+
+      expected = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [3],
+        line: :red,
+        current_station_slot_index: 3,
+        slots: [
+          %{type: :arrow, label_id: ~P"alfcl"},
+          # <padding>
+          %{label: %{full: "Charles/MGH", abbrev: "Charles/MGH"}, show_symbol: true},
+          # </padding>
+          # <closure>
+          %{label: %{full: "Park Street", abbrev: "Park St"}, show_symbol: true},
+          # <current_location subsumed>
+          %{label: %{full: "Downtown Crossing", abbrev: "Downt'n Xng"}, show_symbol: true},
+          # </current_location>
+          %{label: %{full: "South Station", abbrev: "South Sta"}, show_symbol: true},
+          # </closure>
+          %{type: :arrow, label_id: ~P"asmnl" <> "+" <> ~P"brntn"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
     # Red - trunk - L terminal - no omission
     test "serializes a Red Line trunk shuttle near the home stop" do
       localized_alert =
@@ -768,6 +858,71 @@ defmodule Screens.V2.DisruptionDiagram.DDTest do
       assert expected == actual
     end
 
+    test "serializes a Red Line shuttle that crosses from trunk to Ashmont branch" do
+      localized_alert =
+        DDAlert.make_localized_alert(:shuttle, :red, ~P"smmnl", {~P"jfk", ~P"fldcr"})
+
+      expected = %{
+        effect: :shuttle,
+        effect_region_slot_index_range: {1, 3},
+        line: :red,
+        current_station_slot_index: 4,
+        slots: [
+          %{type: :arrow, label_id: ~P"alfcl"},
+          # <closure>
+          %{label: %{abbrev: "JFK/UMass", full: "JFK/UMass"}, show_symbol: true},
+          %{label: %{full: "Savin Hill", abbrev: "Savin Hill"}, show_symbol: true},
+          %{label: %{full: "Fields Corner", abbrev: "Fields Cnr"}, show_symbol: true},
+          # </closure>
+          # <gap />
+          # <current_location>
+          %{label: %{full: "Shawmut", abbrev: "Shawmut"}, show_symbol: true},
+          %{type: :terminal, label_id: ~P"asmnl"}
+          # </current_location>
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
+    test "serializes a Red Line suspension that crosses from trunk to Braintree branch" do
+      localized_alert =
+        DDAlert.make_localized_alert(:suspension, :red, ~P"dwnxg", {~P"jfk", ~P"brntn"})
+
+      expected = %{
+        effect: :suspension,
+        effect_region_slot_index_range: {6, 11},
+        line: :red,
+        current_station_slot_index: 2,
+        slots: [
+          %{type: :arrow, label_id: ~P"alfcl"},
+          # <current_location>
+          %{label: %{full: "Park Street", abbrev: "Park St"}, show_symbol: true},
+          %{label: %{full: "Downtown Crossing", abbrev: "Downt'n Xng"}, show_symbol: true},
+          # </current_location>
+          # <gap>
+          %{label: %{full: "South Station", abbrev: "South Sta"}, show_symbol: true},
+          %{label: %{full: "Broadway", abbrev: "Broadway"}, show_symbol: true},
+          %{label: %{full: "Andrew", abbrev: "Andrew"}, show_symbol: true},
+          # </gap>
+          # <closure>
+          %{label: %{full: "JFK/UMass", abbrev: "JFK/UMass"}, show_symbol: true},
+          %{label: %{full: "North Quincy", abbrev: "N Quincy"}, show_symbol: true},
+          %{label: %{full: "Wollaston", abbrev: "Wollaston"}, show_symbol: true},
+          %{label: %{full: "Quincy Center", abbrev: "Quincy Ctr"}, show_symbol: true},
+          %{label: %{full: "Quincy Adams", abbrev: "Quincy Adms"}, show_symbol: true},
+          %{type: :terminal, label_id: "place-brntn"}
+          # </closure>
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
     ####################
     # RED LINE ASHMONT #
     ####################
@@ -982,6 +1137,66 @@ defmodule Screens.V2.DisruptionDiagram.DDTest do
     ####################
     # GREEN LINE TRUNK #
     ####################
+
+    test "serializes a Green Line trunk station closure at Government Center, which is also the home stop" do
+      localized_alert =
+        DDAlert.make_localized_alert(:station_closure, :green, ~P"gover", [~P"gover"])
+
+      expected = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [3],
+        line: :green,
+        current_station_slot_index: 3,
+        slots: [
+          %{type: :arrow, label_id: ~P"coecl" <> "+west"},
+          # <padding>
+          %{label: %{full: "Boylston", abbrev: "Boylston"}, show_symbol: true},
+          # </padding>
+          # <closure>
+          %{label: %{full: "Park Street", abbrev: "Park St"}, show_symbol: true},
+          # <current_location subsumed>
+          %{label: %{full: "Government Center", abbrev: "Gov't Ctr"}, show_symbol: true},
+          # </current_location>
+          %{label: %{full: "Haymarket", abbrev: "Haymarket"}, show_symbol: true},
+          # </closure>
+          %{type: :arrow, label_id: ~P"mdftf" <> "+" <> ~P"unsqu"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
+    test "serializes a Green Line trunk station closure at North Station, which is also the home stop" do
+      localized_alert =
+        DDAlert.make_localized_alert(:station_closure, :green, ~P"north", [~P"north"])
+
+      expected = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [3],
+        line: :green,
+        current_station_slot_index: 3,
+        slots: [
+          %{type: :arrow, label_id: ~P"coecl" <> "+west"},
+          # <padding>
+          %{label: %{full: "Government Center", abbrev: "Gov't Ctr"}, show_symbol: true},
+          # </padding>
+          # <closure>
+          %{label: %{full: "Haymarket", abbrev: "Haymarket"}, show_symbol: true},
+          # <current_location subsumed>
+          %{label: %{full: "North Station", abbrev: "North Sta"}, show_symbol: true},
+          # </current_location>
+          %{label: %{full: "Science Park/West End", abbrev: "Science Pk"}, show_symbol: true},
+          # </closure>
+          %{type: :arrow, label_id: ~P"mdftf" <> "+" <> ~P"unsqu"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
 
     test "serializes a Green Line trunk suspension with home stop on the trunk" do
       localized_alert =
@@ -1435,7 +1650,10 @@ defmodule Screens.V2.DisruptionDiagram.DDTest do
     test "rejects irrelevant alert effects" do
       delay_scenario = %{
         alert: %Alert{effect: :delay, informed_entities: [%{route: "Orange", stop: ~P"rugg"}]},
-        location_context: %LocationContext{home_stop: ~P"bbsta", stop_sequences: Seq.orange()}
+        location_context: %LocationContext{
+          home_stop: ~P"bbsta",
+          tagged_stop_sequences: TaggedSeq.orange()
+        }
       }
 
       assert {:error, "invalid effect: delay"} = DD.serialize(delay_scenario)
@@ -1444,10 +1662,27 @@ defmodule Screens.V2.DisruptionDiagram.DDTest do
     test "rejects whole-route alerts" do
       whole_route_scenario = %{
         alert: %Alert{effect: :suspension, informed_entities: [%{route: "Orange", stop: nil}]},
-        location_context: %LocationContext{home_stop: ~P"bbsta", stop_sequences: Seq.orange()}
+        location_context: %LocationContext{
+          home_stop: ~P"bbsta",
+          tagged_stop_sequences: TaggedSeq.orange()
+        }
       }
 
       assert {:error, "alert informs an entire route"} = DD.serialize(whole_route_scenario)
+    end
+
+    test "rejects shuttle and suspension alerts that inform only one stop" do
+      one_stop_shuttle =
+        DDAlert.make_localized_alert(:shuttle, :blue, ~P"gover", {~P"mvbcl", ~P"mvbcl"})
+
+      assert {:error, "shuttle alert does not inform at least 2 stops"} =
+               DD.serialize(one_stop_shuttle)
+
+      one_stop_suspension =
+        DDAlert.make_localized_alert(:suspension, :green, ~P"north", {~P"kencl", ~P"kencl"})
+
+      assert {:error, "suspension alert does not inform at least 2 stops"} =
+               DD.serialize(one_stop_suspension)
     end
 
     test "rejects alerts that inform multiple lines" do
@@ -1461,7 +1696,7 @@ defmodule Screens.V2.DisruptionDiagram.DDTest do
         },
         location_context: %LocationContext{
           home_stop: ~P"gover",
-          stop_sequences: Seq.blue() ++ Seq.green()
+          tagged_stop_sequences: Map.merge(TaggedSeq.blue(), TaggedSeq.green())
         }
       }
 
@@ -1478,7 +1713,10 @@ defmodule Screens.V2.DisruptionDiagram.DDTest do
             %{route: "Green-E", stop: ~P"mdftf"}
           ]
         },
-        location_context: %LocationContext{home_stop: ~P"gover", stop_sequences: Seq.green()}
+        location_context: %LocationContext{
+          home_stop: ~P"gover",
+          tagged_stop_sequences: TaggedSeq.green()
+        }
       }
 
       assert {:error, "no stop sequence contains both the home stop and all informed stops"} =
@@ -1495,31 +1733,14 @@ defmodule Screens.V2.DisruptionDiagram.DDTest do
             %{route: "Green-E", stop: ~P"symcl"}
           ]
         },
-        location_context: %LocationContext{home_stop: ~P"unsqu", stop_sequences: Seq.green([:d])}
+        location_context: %LocationContext{
+          home_stop: ~P"unsqu",
+          tagged_stop_sequences: TaggedSeq.green([:d])
+        }
       }
 
       assert {:error, "no stop sequence contains both the home stop and all informed stops"} =
                DD.serialize(unreachable_branch_scenario)
-    end
-
-    test "rejects Red Line alerts that cross from trunk to branch" do
-      red_line_trunk_branch_scenario = %{
-        alert: %Alert{
-          effect: :shuttle,
-          informed_entities: [
-            %{route: "Red", stop: ~P"andrw"},
-            %{route: "Red", stop: ~P"jfk"},
-            %{route: "Red", stop: ~P"shmnl"}
-          ]
-        },
-        location_context: %LocationContext{
-          home_stop: ~P"asmnl",
-          stop_sequences: Seq.red([:ashmont])
-        }
-      }
-
-      assert {:error, "Red Line alert crosses from trunk to branch"} =
-               DD.serialize(red_line_trunk_branch_scenario)
     end
 
     ###########

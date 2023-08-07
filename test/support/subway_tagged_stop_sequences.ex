@@ -1,21 +1,23 @@
-defmodule Screens.TestSupport.SubwayStopSequences do
+defmodule Screens.TestSupport.SubwayTaggedStopSequences do
   @moduledoc """
-  Functions providing subway stop sequences for building test data.
+  Functions providing tagged stop sequences for building subway-related test data.
   """
 
   import Screens.TestSupport.ParentStationIdSigil
 
   def blue do
-    [~P[wondl rbmnl bmmnl sdmnl orhte wimnl aport mvbcl aqucl state gover bomnl]]
+    %{"Blue" => [~P[wondl rbmnl bmmnl sdmnl orhte wimnl aport mvbcl aqucl state gover bomnl]]}
   end
 
   def orange do
-    [
-      ~P[ogmnl mlmnl welln astao sull ccmnl north haecl state dwnxg chncl tumnl bbsta masta rugg rcmnl jaksn sbmnl grnst forhl]
-    ]
+    %{
+      "Orange" => [
+        ~P[ogmnl mlmnl welln astao sull ccmnl north haecl state dwnxg chncl tumnl bbsta masta rugg rcmnl jaksn sbmnl grnst forhl]
+      ]
+    }
   end
 
-  def red, do: red(~P[ashmont braintree]a)
+  def red, do: red(~w[ashmont braintree]a)
 
   def red(branches) when is_list(branches) do
     [
@@ -23,18 +25,20 @@ defmodule Screens.TestSupport.SubwayStopSequences do
       :braintree in branches and braintree_seq()
     ]
     |> Enum.filter(& &1)
+    |> then(&%{"Red" => &1})
   end
 
-  def green, do: green(~P[b c d e]a)
+  def green, do: green(~w[b c d e]a)
 
   def green(branches) when is_list(branches) do
     [
-      :b in branches and b_seq(),
-      :c in branches and c_seq(),
-      :d in branches and d_seq(),
-      :e in branches and e_seq()
+      :b in branches and {"Green-B", [b_seq()]},
+      :c in branches and {"Green-C", [c_seq()]},
+      :d in branches and {"Green-D", [d_seq()]},
+      :e in branches and {"Green-E", [e_seq()]}
     ]
     |> Enum.filter(& &1)
+    |> Map.new()
   end
 
   defp ashmont_seq do
