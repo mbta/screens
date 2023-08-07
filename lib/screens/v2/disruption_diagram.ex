@@ -4,6 +4,7 @@ defmodule Screens.V2.DisruptionDiagram do
   """
 
   alias Screens.V2.DisruptionDiagram.Model
+  alias Screens.V2.LocalizedAlert
 
   # We don't need to define any new struct for the diagram's source data--
   # we can use any map/struct that satisfies LocalizedAlert.t().
@@ -30,7 +31,7 @@ defmodule Screens.V2.DisruptionDiagram do
           #     X - - X - - X - - X - - X - - O ========= O === =>
           #     |------------range------------|
           effect_region_slot_index_range: {non_neg_integer(), non_neg_integer()},
-          line: line_color(),
+          line: line(),
           current_station_slot_index: non_neg_integer(),
           # First and last elements of the list are `end_slot`s, middle elements are `middle_slot`s.
           slots: list(slot())
@@ -39,7 +40,7 @@ defmodule Screens.V2.DisruptionDiagram do
   @type discrete_disruption_diagram :: %{
           effect: :station_closure,
           closed_station_slot_indices: list(non_neg_integer()),
-          line: line_color(),
+          line: line(),
           current_station_slot_index: non_neg_integer(),
           # First and last elements of the list are `end_slot`s, middle elements are `middle_slot`s.
           slots: list(slot())
@@ -76,7 +77,9 @@ defmodule Screens.V2.DisruptionDiagram do
   # so we can send actual text for those--it will be dynamically resized to fit.
   @type end_label_id :: String.t()
 
-  @type line_color :: :blue | :orange | :red | :green
+  @type line :: :blue | :orange | :red | :green
+
+  @type branch :: :b | :c | :d | :e | :ashmont | :braintree | :trunk
 
   @doc "Produces a JSON-serializable map representing the disruption diagram."
   @spec serialize(t()) :: {:ok, serialized_response()} | {:error, reason :: String.t()}

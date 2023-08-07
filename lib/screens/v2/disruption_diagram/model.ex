@@ -49,7 +49,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     end
   end
 
-  @spec serialize_by_line(DD.line_color(), Builder.t()) :: DD.serialized_response()
+  @spec serialize_by_line(DD.line(), Builder.t()) :: DD.serialized_response()
   # The Blue Line is the simplest case. We always show all stops, starting with Bowdoin.
   defp serialize_by_line(:blue, builder) do
     # The default stop sequence starts with Wonderland, so we need to put the stops in reverse order
@@ -166,7 +166,3 @@ end
 
 # TODO: Implement additional logic in Builder.omit_stops to avoid
 #       omitting the home stop or bypasses stops.
-
-# TODO: Original code at the start of Builder.new is hot garbo.
-# Make it more resilient--should get stop/route stuff based on the route that fully contains
-# informed stops ++ home stop (since really we only care about getting all the info we need to draw the diagram between them)

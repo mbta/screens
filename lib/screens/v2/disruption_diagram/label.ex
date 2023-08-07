@@ -6,10 +6,8 @@ defmodule Screens.V2.DisruptionDiagram.Label do
   alias Screens.Stops.Stop
   alias Screens.V2.DisruptionDiagram, as: DD
 
-  @type branch :: :b | :c | :d | :e
-
   @doc "Returns the label for an omitted slot."
-  @spec get_omission_label(MapSet.t(Stop.id()), DD.line_color(), branch() | nil) :: DD.label()
+  @spec get_omission_label(MapSet.t(Stop.id()), DD.line(), DD.branch()) :: DD.label()
   def get_omission_label(omitted_stop_ids, :green, branch_thru_kenmore)
       when branch_thru_kenmore in [:b, :c, :d] do
     # For GL branches that pass through Kenmore, we look for Kenmore and Copley.
@@ -20,12 +18,8 @@ defmodule Screens.V2.DisruptionDiagram.Label do
     |> Enum.reject(&is_nil/1)
     |> Enum.join(" & ")
     |> case do
-      "" ->
-        "…"
-
-      stop_names ->
-        text = "…via #{stop_names}"
-        %{full: text, abbrev: text}
+      "" -> "…"
+      stop_names -> %{full: "…via #{stop_names}", abbrev: "…via #{stop_names}"}
     end
   end
 
@@ -44,35 +38,36 @@ defmodule Screens.V2.DisruptionDiagram.Label do
   end
 
   @doc "Returns the label ID for an end that contains more than one item."
-  @spec get_end_label_id(DD.line_color(), Enumerable.t(Stop.id())) :: DD.end_label_id()
-  def get_end_label_id(:orange, end_stop_ids) do
+  @spec get_end_label_id(MapSet.t(Stop.id()), DD.line(), DD.branch()) :: DD.end_label_id()
+  def get_end_label_id(end_stop_ids, :orange, _) do
     cond do
       "place-forhl" in end_stop_ids -> "place-forhl"
       "place-ogmnl" in end_stop_ids -> "place-ogmnl"
     end
   end
 
-  def get_end_label_id(:red, end_stop_ids) do
+  def get_end_label_id(end_stop_ids, :red, :trunk) do
     cond do
-      "place-jfk" in end_stop_ids ->
-        "place-asmnl+place-brntn"
-
-      "place-alfcl" in end_stop_ids ->
-        "place-alfcl"
-
-      "place-asmnl" in end_stop_ids ->
-        "place-asmnl"
-
-      "place-brntn" in end_stop_ids ->
-        "place-brntn"
+      "place-alfcl" in end_stop_ids -> "place-alfcl"
+      "place-jfk" in end_stop_ids -> "place-asmnl+place-brntn"
     end
   end
 
-  @doc """
-  Returns the label ID for an end that contains more than one item, in a GL diagram.
-  """
-  @spec get_gl_end_label_id(branch() | nil, MapSet.t(Stop.id())) :: DD.end_label_id()
-  def get_gl_end_label_id(nil = _trunk, end_stop_ids) do
+  def get_end_label_id(end_stop_ids, :red, :ashmont) do
+    cond do
+      "place-alfcl" in end_stop_ids -> "place-alfcl"
+      "place-asmnl" in end_stop_ids -> "place-asmnl"
+    end
+  end
+
+  def get_end_label_id(end_stop_ids, :red, :braintree) do
+    cond do
+      "place-alfcl" in end_stop_ids -> "place-alfcl"
+      "place-brntn" in end_stop_ids -> "place-brntn"
+    end
+  end
+
+  def get_end_label_id(end_stop_ids, :green, :trunk) do
     cond do
       # left end
       "place-lech" in end_stop_ids -> "place-mdftf+place-unsqu"
@@ -87,28 +82,28 @@ defmodule Screens.V2.DisruptionDiagram.Label do
     end
   end
 
-  def get_gl_end_label_id(:b, end_stop_ids) do
+  def get_end_label_id(end_stop_ids, :green, :b) do
     cond do
       "place-gover" in end_stop_ids -> "place-gover"
       "place-lake" in end_stop_ids -> "place-lake"
     end
   end
 
-  def get_gl_end_label_id(:c, end_stop_ids) do
+  def get_end_label_id(end_stop_ids, :green, :c) do
     cond do
       "place-gover" in end_stop_ids -> "place-gover"
       "place-clmnl" in end_stop_ids -> "place-clmnl"
     end
   end
 
-  def get_gl_end_label_id(:d, end_stop_ids) do
+  def get_end_label_id(end_stop_ids, :green, :d) do
     cond do
       "place-unsqu" in end_stop_ids -> "place-unsqu"
       "place-river" in end_stop_ids -> "place-river"
     end
   end
 
-  def get_gl_end_label_id(:e, end_stop_ids) do
+  def get_end_label_id(end_stop_ids, :green, :e) do
     cond do
       "place-mdftf" in end_stop_ids -> "place-mdftf"
       "place-hsmnl" in end_stop_ids -> "place-hsmnl"
