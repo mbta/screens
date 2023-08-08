@@ -1,13 +1,26 @@
 defmodule Screens.Config.V2.OLCrowding do
   @moduledoc false
-  alias Screens.Config.V2.Header.CurrentStopName
 
   @type t :: %__MODULE__{
-          station: CurrentStopName.t()
+          station_id: String.t(),
+          direction_id: 0 | 1,
+          # temporarily going with float, but will adjust based on design
+          platform_position: float(),
+          front_car_direction: :left | :right
         }
 
-  @enforce_keys [:station]
-  defstruct station: nil
+  @enforce_keys [:station_id, :direction_id, :platform_position, :front_car_direction]
+  defstruct station_id: nil,
+            direction_id: nil,
+            platform_position: nil,
+            front_car_direction: nil
 
-  use Screens.Config.Struct, children: [station: CurrentStopName]
+  use Screens.Config.Struct
+
+  defp value_from_json("direction_id", "left"), do: :left
+  defp value_from_json("direction_id", "right"), do: :right
+  
+  defp value_from_json(_, value), do: value
+
+  defp value_to_json(_, value), do: value
 end

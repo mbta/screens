@@ -12,8 +12,9 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
   def screen_template do
     {:screen,
      %{
-       normal: [:header, :main_content],
-       takeover: [:full_screen]
+       crowding_layout: [:left_two_panes, :third_pane],
+       screen_takeover: [:full_screen], # may not be used
+       screen_split: [:first_pane, :second_pane, :third_pane]
      }}
     |> Builder.build_template()
   end
@@ -35,7 +36,8 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
 
   defp placeholder_instances do
     [
-      %Placeholder{color: :blue, slot_names: [:main_content]}
+      %Placeholder{color: :blue, slot_names: [:left_two_panes]},
+      %Placeholder{color: :green, slot_names: [:third_pane]}
     ]
   end
 end
