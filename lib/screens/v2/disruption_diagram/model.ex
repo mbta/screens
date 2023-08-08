@@ -102,7 +102,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     target_closure_count = @max_count_with_collapsed_closure - min_non_closure_slots(builder)
 
     if current_closure_count > @max_closure_count and target_closure_count < current_closure_count do
-      with {:ok, builder} <- Builder.omit_stops(builder, :closure, target_closure_count) do
+      with {:ok, builder} <- Builder.try_omit_stops(builder, :closure, target_closure_count) do
         {:done, minimize_gap(builder)}
       end
     else
@@ -115,8 +115,8 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     target_gap_count = min_gap(builder)
 
     if target_gap_count < current_gap_count do
-      # The gap never contains important stops, so `omit_stops` will always succeed.
-      {:ok, builder} = Builder.omit_stops(builder, :gap, target_gap_count)
+      # The gap never contains important stops, so `try_omit_stops` will always succeed.
+      {:ok, builder} = Builder.try_omit_stops(builder, :gap, target_gap_count)
       builder
     else
       builder
@@ -129,8 +129,8 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     target_gap_slots = baseline_slots(closure_count) - non_gap_slots(builder)
 
     if current_gap_count >= @max_gap_count and target_gap_slots < current_gap_count do
-      # The gap never contains important stops, so `omit_stops` will always succeed.
-      {:ok, builder} = Builder.omit_stops(builder, :gap, target_gap_slots)
+      # The gap never contains important stops, so `try_omit_stops` will always succeed.
+      {:ok, builder} = Builder.try_omit_stops(builder, :gap, target_gap_slots)
 
       {:done, builder}
     else
@@ -167,6 +167,3 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     defp baseline_slots(unquote(closure)), do: unquote(baseline)
   end
 end
-
-# TODO: Implement additional logic in Builder.omit_stops to avoid
-#       omitting the home stop or bypasses stops.

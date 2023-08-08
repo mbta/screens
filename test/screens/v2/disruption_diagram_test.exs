@@ -1743,27 +1743,104 @@ defmodule Screens.V2.DisruptionDiagramTest do
                DD.serialize(unreachable_branch_scenario)
     end
 
+    ##############
+    # EDGE CASES #
+    ##############
+
+    test "for long shuttles with home stop near the middle, omits stops off-center to avoid omitting the home stop" do
+      localized_alert =
+        DDAlert.make_localized_alert(:shuttle, :orange, ~P"bbsta", {~P"mlmnl", ~P"grnst"})
+
+      expected = %{
+        effect: :shuttle,
+        effect_region_slot_index_range: {1, 10},
+        line: :orange,
+        current_station_slot_index: 4,
+        slots: [
+          %{type: :terminal, label_id: ~P"ogmnl"},
+          # <closure>
+          %{label: %{full: "Malden Center", abbrev: "Malden Ctr"}, show_symbol: true},
+          %{label: %{full: "Wellington", abbrev: "Wellington"}, show_symbol: true},
+          # Assembly, Sullivan Sq, Com College, North Sta, Haymarket, State, Downt'n Xng, Chinatown, Tufts Med
+          # (Shifted left 3 to avoid omitting home stop at Back Bay)
+          %{
+            label: %{full: "…via Downtown Crossing", abbrev: "…via Downt'n Xng"},
+            show_symbol: false
+          },
+          # <current_location subsumed>
+          %{label: %{full: "Back Bay", abbrev: "Back Bay"}, show_symbol: true},
+          %{label: %{full: "Massachusetts Avenue", abbrev: "Mass Ave"}, show_symbol: true},
+          # </current_location>
+          %{label: %{full: "Ruggles", abbrev: "Ruggles"}, show_symbol: true},
+          %{label: %{full: "Roxbury Crossing", abbrev: "Roxbury Xng"}, show_symbol: true},
+          %{label: %{full: "Jackson Square", abbrev: "Jackson Sq"}, show_symbol: true},
+          %{label: %{full: "Stony Brook", abbrev: "Stony Brook"}, show_symbol: true},
+          %{label: %{full: "Green Street", abbrev: "Green St"}, show_symbol: true},
+          # </closure>
+          %{type: :terminal, label_id: ~P"forhl"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
+    test "for long station closures with closures near the middle, omits stops off-center to avoid omitting the home stop" do
+      localized_alert =
+        DDAlert.make_localized_alert(:station_closure, :orange, ~P"welln", ~P[mlmnl haecl grnst])
+
+      expected = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [1, 7, 10],
+        line: :orange,
+        current_station_slot_index: 2,
+        slots: [
+          %{type: :terminal, label_id: ~P"ogmnl"},
+          %{label: %{full: "Malden Center", abbrev: "Malden Ctr"}, show_symbol: true},
+          %{label: %{full: "Wellington", abbrev: "Wellington"}, show_symbol: true},
+          %{label: %{full: "Assembly", abbrev: "Assembly"}, show_symbol: true},
+          %{label: %{full: "Sullivan Square", abbrev: "Sullivan Sq"}, show_symbol: true},
+          %{label: %{full: "Community College", abbrev: "Com College"}, show_symbol: true},
+          %{label: %{full: "North Station", abbrev: "North Sta"}, show_symbol: true},
+          %{label: %{full: "Haymarket", abbrev: "Haymarket"}, show_symbol: true},
+          # State, Downt'n Xng, Chinatown, Tufts Med, Back Bay, Mass Ave, Ruggles, Roxbury Xng, Jackson Sq
+          %{
+            label: %{full: "…via Downtown Crossing", abbrev: "…via Downt'n Xng"},
+            show_symbol: false
+          },
+          %{label: %{full: "Stony Brook", abbrev: "Stony Brook"}, show_symbol: true},
+          %{label: %{full: "Green Street", abbrev: "Green St"}, show_symbol: true},
+          %{type: :terminal, label_id: ~P"forhl"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
+    test "knows when it needs to do a split omission, but doesn't know how yet" do
+      localized_alert =
+        DDAlert.make_localized_alert(:station_closure, :orange, ~P"welln", ~P[mlmnl dwnxg grnst])
+
+      assert {:error, "Not yet implemented"} = DD.serialize(localized_alert)
+    end
+
     ###########
     # FAILURE #
     ###########
 
-    test "fails for closures spanning >8 stops with home stop in the middle" do
-      # (Because the home stop gets omitted and breaks code that depends on it being present in the diagram)
+    test "fails to serialize a station closure that's impossible to fit without omitting an important stop" do
       localized_alert =
-        DDAlert.make_localized_alert(:shuttle, :orange, ~P"bbsta", {~P"mlmnl", ~P"grnst"})
+        DDAlert.make_localized_alert(
+          :station_closure,
+          :orange,
+          ~P"welln",
+          ~P[mlmnl astao ccmnl haecl dwnxg tumnl masta rcmnl sbmnl]
+        )
 
-      assert {:error, "Exception raised during serialization" <> _} =
-               DD.serialize(localized_alert)
-    end
-
-    test "omits bypassed stops in a the middle of a large closure region" do
-      localized_alert =
-        DDAlert.make_localized_alert(:station_closure, :orange, ~P"welln", ~P[mlmnl dwnxg grnst])
-
-      assert {:ok, result} = DD.serialize(localized_alert)
-
-      # Downtown Crossing is missing, but should be included because it's bypassed.
-      assert Enum.all?(result.slots, &(not match?(%{label: %{full: "Downtown Crossing"}}, &1)))
+      assert {:error, "Not yet implemented"} = DD.serialize(localized_alert)
     end
   end
 end
