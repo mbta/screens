@@ -8,15 +8,20 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
     ~E|<p><%= render_banner(alert) %><%= render_alert(alert) %></p>|
   end
 
+  # The field `unaffected_routes` is reserved for single line closures at transfer station
   def render_banner(%{
         unaffected_routes: _unaffected_routes
       }),
       do: nil
 
+  # The field `region` is reserved for single-pane alerts.
+  # Routes will only be empty if the banner should be empty (e.g. multiline delay)
+  def render_banner(%{region: _region, routes: []}), do: ~E|Attention, riders. |
+
   def render_banner(%{
         region: _region,
         routes: routes
-      }) when routes != [] do
+      }) do
     if routes |> hd() |> Map.has_key?(:headsign) do
       destinations = Enum.map(routes, fn route -> route.headsign end)
 
@@ -32,6 +37,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
 
   def render_banner(_), do: nil
 
+  # Delay
   def render_alert(
         %{
           effect: :delay,
@@ -148,6 +154,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
     end
   end
 
+  # Suspension here
   def render_alert(
         %{
           effect: :suspension,
