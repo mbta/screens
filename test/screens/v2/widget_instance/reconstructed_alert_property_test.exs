@@ -14,6 +14,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
   alias Screens.Config.V2.{PreFare}
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.CandidateGenerator
@@ -1139,8 +1140,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
           }
         end)
 
-      station_sequences =
-        Enum.map(route_ids_at_stop, fn id -> Stop.get_route_stop_sequence(id) end)
+      tagged_station_sequences =
+        Map.new(route_ids_at_stop, fn id -> {id, [Stop.get_route_stop_sequence(id)]} end)
+
+      station_sequences = RoutePattern.untag_stop_sequences(tagged_station_sequences)
 
       fetch_alerts_fn = fn _ -> {:ok, [alert]} end
       fetch_stop_name_fn = fn _ -> "Test" end
@@ -1149,7 +1152,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
         {:ok,
          %LocationContext{
            home_stop: stop_id,
-           stop_sequences: station_sequences,
+           tagged_stop_sequences: tagged_station_sequences,
            upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
            downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
            routes: routes_at_stop,

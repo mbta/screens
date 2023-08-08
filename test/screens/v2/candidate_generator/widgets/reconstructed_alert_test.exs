@@ -8,6 +8,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Config.V2.{PreFare, Solari}
   alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.ReconstructedAlert, as: ReconstructedAlertWidget
 
@@ -89,9 +90,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         }
       ]
 
-      stop_sequences = [
-        ["place-ogmnl", "place-mlmnl", "place-welln", "place-astao"]
-      ]
+      tagged_stop_sequences = %{
+        "A" => [["place-ogmnl", "place-mlmnl", "place-welln", "place-astao"]]
+      }
+
+      stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
 
       fetch_stop_name_fn = fn
         "place-ogmnl" -> "Oak Grove"
@@ -102,7 +105,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
 
       location_context = %LocationContext{
         home_stop: stop_id,
-        stop_sequences: stop_sequences,
+        tagged_stop_sequences: tagged_stop_sequences,
         upstream_stops: Stop.upstream_stop_id_set(stop_id, stop_sequences),
         downstream_stops: Stop.downstream_stop_id_set(stop_id, stop_sequences),
         routes: routes_at_stop,

@@ -7,6 +7,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
   alias Screens.Config.Screen
   alias Screens.Config.V2.{Alerts, BusShelter, Solari}
   alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
@@ -35,12 +36,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %{route_id: "44", active?: true}
       ]
 
-      stop_sequences = [
-        ~w[11531 1265 1266],
-        ~w[1262 11531 1265 1266 10413],
-        ~w[1265 1266 10413 11413 17411],
-        ~w[1260 1262 11531 1265]
-      ]
+      tagged_stop_sequences = %{
+        "A" => [~w[11531 1265 1266]],
+        "B" => [~w[1262 11531 1265 1266 10413]],
+        "C" => [~w[1265 1266 10413 11413 17411]],
+        "D" => [~w[1260 1262 11531 1265]]
+      }
+
+      stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
 
       alerts = [
         %Alert{
@@ -66,7 +69,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
 
       location_context = %LocationContext{
         home_stop: stop_id,
-        stop_sequences: stop_sequences,
+        tagged_stop_sequences: tagged_stop_sequences,
         upstream_stops: Stop.upstream_stop_id_set(stop_id, stop_sequences),
         downstream_stops: Stop.downstream_stop_id_set(stop_id, stop_sequences),
         routes: routes_at_stop,
