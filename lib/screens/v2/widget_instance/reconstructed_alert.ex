@@ -77,7 +77,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           routes: list(enriched_route()),
           effect: :suspension | :shuttle | :station_closure | :delay,
           updated_at: String.t(),
-          # It seems that region was also added to the flex serialized response?
           region: :here | :boundary | :outside
         }
 
@@ -555,6 +554,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       region: get_region_from_location(location)
     }
   end
+
+  @spec serialize_inside_flex_alert(t()) :: flex_serialized_response()
+  defp serialize_inside_flex_alert(t)
 
   defp serialize_inside_flex_alert(
          %__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t
