@@ -180,15 +180,15 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   def try_omit_stops(builder, region, target_slots)
 
   def try_omit_stops(%__MODULE__{} = builder, :closure, target_closure_slots) do
-    try_omit(builder, closure_indices(builder), target_closure_slots, important_indices(builder))
+    try_omit(builder, closure_indices(builder), target_closure_slots)
   end
 
   def try_omit_stops(%__MODULE__{} = builder, :gap, target_gap_stops) do
-    try_omit(builder, gap_indices(builder), target_gap_stops, important_indices(builder))
+    try_omit(builder, gap_indices(builder), target_gap_stops)
   end
 
   # Returns a sorted vector containing indices of stops that can't be omitted from the closure region.
-  defp important_indices(builder) do
+  defp get_important_indices(builder) do
     closure_first..closure_last//1 = closure = closure_indices(builder)
 
     [
@@ -558,7 +558,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     %{builder | metadata: new_metadata}
   end
 
-  defp try_omit(builder, current_region_indices, target_slots, important_indices) do
+  defp try_omit(builder, current_region_indices, target_slots) do
     region_length = Enum.count(current_region_indices)
 
     if target_slots >= region_length do
@@ -597,6 +597,8 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
       |> then(fn {leftmost_omitted, rightmost_omitted} ->
         leftmost_omitted..rightmost_omitted//1
       end)
+
+    important_indices = get_important_indices(builder)
 
     undesired_omissions =
       MapSet.intersection(MapSet.new(omitted_indices), MapSet.new(important_indices))
