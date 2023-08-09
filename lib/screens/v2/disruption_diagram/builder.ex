@@ -15,8 +15,6 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   # Vector-related macros
   import Aja, only: [vec: 1, vec_size: 1, +++: 2]
 
-  require Logger
-
   ##################
   # HELPER MODULES #
   ##################
@@ -801,7 +799,9 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
   defp do_add_slots(builder, _greater_than_0, _)
        when vec_size(builder.left_end) == 0 and vec_size(builder.right_end) == 0 do
-    Logger.warn("[disruption diagram no more end stops available]")
+    # There are no more end stops available on either side.
+    # This code is probably running in a test case if the stop sequence is that small.
+    # Just return the builder.
     builder
   end
 
