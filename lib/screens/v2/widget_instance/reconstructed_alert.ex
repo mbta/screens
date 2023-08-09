@@ -873,14 +873,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def serialize(%__MODULE__{is_full_screen: true} = t) do
+  def serialize(widget, log_fn \\ &Logger.warn/1)
+
+  def serialize(%__MODULE__{is_full_screen: true} = t, log_fn) do
     diagram_data =
       case DisruptionDiagram.serialize(t) do
         {:ok, serialized_diagram} ->
           %{disruption_diagram: serialized_diagram}
 
         {:error, reason} ->
-          Logger.warn("[disruption diagram error] #{reason}")
+          log_fn.("[disruption diagram error] #{reason}")
           %{}
       end
 
@@ -895,7 +897,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     Map.merge(result, diagram_data)
   end
 
-  def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
+  def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t, _log_fn) do
     case LocalizedAlert.location(t, is_terminal_station) do
       :inside ->
         t |> serialize_inside_flex_alert() |> Map.put(:region, :inside)
