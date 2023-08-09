@@ -181,34 +181,28 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
           {:ok, t()} | {:error, reason :: String.t()}
   def try_omit_stops(builder, region, target_slots)
 
-  def try_omit_stops(%__MODULE__{} = builder, :closure, target_closure_slots)
-      when builder.metadata.effect == :station_closure do
-    closure_first..closure_last//1 = closure = closure_indices(builder)
-
-    important_indices =
-      [closure_first, builder.metadata.home_stop, closure_last | disrupted_stop_indices(builder)]
-      |> Enum.sort()
-      |> Vector.new()
-
-    try_omit(builder, closure, target_closure_slots, important_indices)
-  end
-
   def try_omit_stops(%__MODULE__{} = builder, :closure, target_closure_slots) do
-    closure_first..closure_last//1 = closure = closure_indices(builder)
-
-    important_indices =
-      [closure_first, builder.metadata.home_stop, closure_last]
-      |> Enum.sort()
-      |> Vector.new()
-
-    try_omit(builder, closure, target_closure_slots, important_indices)
+    try_omit(builder, closure_indices(builder), target_closure_slots, important_indices(builder))
   end
 
   def try_omit_stops(%__MODULE__{} = builder, :gap, target_gap_stops) do
-    # The gap can never contain the home stop or disrupted stops, so we don't need to worry about omitting those.
-    important_indices = Vector.new()
+    try_omit(builder, gap_indices(builder), target_gap_stops, important_indices(builder))
+  end
 
-    try_omit(builder, gap_indices(builder), target_gap_stops, important_indices)
+  # Returns a sorted vector containing indices of stops that can't be omitted from the closure region.
+  defp important_indices(builder) do
+    closure_first..closure_last//1 = closure = closure_indices(builder)
+
+    [
+      closure_first,
+      closure_last,
+      builder.metadata.home_stop in closure and builder.metadata.home_stop,
+      builder.metadata.effect == :station_closure and disrupted_stop_indices(builder)
+    ]
+    |> Enum.filter(& &1)
+    |> List.flatten()
+    |> Enum.sort()
+    |> Vector.new()
   end
 
   @doc """
@@ -221,11 +215,8 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   @spec add_slots(t(), pos_integer()) :: t()
   def add_slots(%__MODULE__{} = builder, num_to_add) do
     closure_region_indices = closure_indices(builder)
-    region_length = Enum.count(closure_region_indices)
 
-    center_index = Enum.at(closure_region_indices, div(region_length - 1, 2))
-
-    home_stop_is_right_of_center = builder.metadata.home_stop > center_index
+    home_stop_is_right_of_center = builder.metadata.home_stop > center(closure_region_indices)
 
     pull_from = if home_stop_is_right_of_center, do: :right_end, else: :left_end
 
@@ -372,8 +363,9 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   end
 
   # Gets all the stuff we need to assemble the struct.
-  @spec get_builder_data(list({Route.id(), list(Stop.id())}), Route.id()) ::
-          {:ok, Route.id(), list(Stop.id()), DD.branch()} | {:error, String.t()}
+  @spec get_builder_data(LocalizedAlert.t(), MapSet.t(Stop.id())) ::
+          {:ok, informed_route :: Route.id(), stop_sequence :: list(Stop.id()), DD.branch()}
+          | {:error, String.t()}
   defp get_builder_data(localized_alert, informed_stop_ids) do
     stops_in_diagram = MapSet.put(informed_stop_ids, localized_alert.location_context.home_stop)
 
@@ -587,10 +579,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     num_to_keep = region_length - num_to_omit
 
-    # (Just left of center if region_length is even.)
-    center_index = Enum.at(current_region_indices, div(region_length - 1, 2))
-
-    home_stop_is_right_of_center = builder.metadata.home_stop > center_index
+    home_stop_is_right_of_center = builder.metadata.home_stop > center(current_region_indices)
 
     # If the number of slots to keep is odd, more slots are devoted to the side of the region nearest the home stop.
     offset =
@@ -611,14 +600,13 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
         leftmost_omitted..rightmost_omitted//1
       end)
 
-    empty_set = MapSet.new()
+    undesired_omissions =
+      MapSet.intersection(MapSet.new(omitted_indices), MapSet.new(important_indices))
 
-    case MapSet.intersection(MapSet.new(omitted_indices), MapSet.new(important_indices)) do
-      ^empty_set ->
-        {:ok, do_omit(builder, omitted_indices)}
-
-      _undesired_omissions ->
-        try_alternate_omit(builder, omitted_indices, important_indices)
+    if MapSet.size(undesired_omissions) == 0 do
+      {:ok, do_omit(builder, omitted_indices)}
+    else
+      try_alternate_omit(builder, omitted_indices, important_indices)
     end
   end
 
@@ -642,15 +630,16 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
   # Handles rare cases where we can't omit stops from the center of the closure.
   # - First, it tries to find a segment of "omission-safe" stops to one side of the center, searching from the center outward.
-  # - If there are no segments wide enough, it then tries to do the omission in two places,
-  #   on either side of the center.
+  # - If there are no segments wide enough, it then tries to do the omission in two places.
   # - If it's still not possible to reduce the slots to the target amount without omitting
   #   an important stop, it gives up and returns an error tuple.
   defp try_alternate_omit(builder, original_omission, important_indices) do
     with :error <- try_side_omit(builder, original_omission, important_indices),
          :error <- try_split_omit(builder, original_omission, important_indices) do
-      {:error,
-       "omission of length #{Range.size(original_omission)} from closure region is not possible without omitting at least one important stop"}
+      n = Range.size(original_omission)
+      msg = "can't omit #{n} from closure region without omitting at least one important stop"
+
+      {:error, msg}
     end
   end
 
@@ -676,8 +665,89 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     end
   end
 
-  defp try_split_omit(_builder, _original_omission, _important_indices) do
-    {:error, "Not yet implemented"}
+  defp try_split_omit(builder, original_omission, important_indices) do
+    # A second omission means a second label--
+    # we need to omit one additional stop to still reach the target region length.
+    omit_count = 1 + Range.size(original_omission)
+
+    closure_first = Vector.first(important_indices)
+    closure_last = Vector.last(important_indices)
+
+    center_index = center(closure_first..closure_last//1)
+
+    # Find all safe segments, sort the longest ones first, and split those to the left
+    # of the closure center from those to the right.
+    {left_segments, right_segments} =
+      important_indices
+      |> Enum.chunk_every(2, 1, :discard)
+      |> Enum.map(fn [left_important, right_important] ->
+        (left_important + 1)..(right_important - 1)//1
+      end)
+      |> Enum.reject(&(Range.size(&1) == 0))
+      |> Enum.sort_by(&Range.size/1, :desc)
+      |> Enum.split_with(&(center(&1) <= center_index))
+
+    left1 = Enum.at(left_segments, 0, ..)
+    left2 = Enum.at(left_segments, 1, ..)
+
+    right1 = Enum.at(right_segments, 0, ..)
+    right2 = Enum.at(right_segments, 1, ..)
+
+    # First, try to omit from either side of the center.
+    # If that's not possible, try omitting in two different places to one side of the center.
+    # After that, give up!
+    segment_pair =
+      cond do
+        Range.size(left1) + Range.size(right1) >= omit_count ->
+          {Enum.reverse(left1), Enum.to_list(right1)}
+
+        Range.size(left1) + Range.size(left2) >= omit_count ->
+          {Enum.reverse(left1), Enum.reverse(left2)}
+
+        Range.size(right1) + Range.size(right2) >= omit_count ->
+          {Enum.to_list(right1), Enum.to_list(right2)}
+
+        true ->
+          :error
+      end
+
+    with {_segment1, _segment2} <- segment_pair do
+      {left_omission, right_omission} = select_split_omission_indices(segment_pair, omit_count)
+
+      # We *must* do the right omission befor the left, to avoid having the indices change
+      builder =
+        builder
+        |> do_omit(right_omission)
+        |> do_omit(left_omission)
+
+      {:ok, builder}
+    end
+  end
+
+  # Evenly pulls indices from the left and right segments until acc contains enough indices.
+  defp select_split_omission_indices(segment_pair, omit_count, l_acc \\ [], r_acc \\ [])
+
+  defp select_split_omission_indices({l, r}, omit_count, l_acc, r_acc) do
+    select_split_omission_indices(l, r, omit_count, l_acc, r_acc)
+  end
+
+  defp select_split_omission_indices(_l, _r, 0, l_acc, r_acc), do: {l_acc, r_acc}
+
+  defp select_split_omission_indices([], [h | t], n, l_acc, r_acc) do
+    select_split_omission_indices([], t, n - 1, l_acc, [h | r_acc])
+  end
+
+  defp select_split_omission_indices([h | t], [], n, l_acc, r_acc) do
+    select_split_omission_indices(t, [], n - 1, [h | l_acc], r_acc)
+  end
+
+  defp select_split_omission_indices([h | t], r, n, l_acc, r_acc)
+       when length(l_acc) <= length(r_acc) do
+    select_split_omission_indices(t, r, n - 1, [h | l_acc], r_acc)
+  end
+
+  defp select_split_omission_indices(l, [h | t], n, l_acc, r_acc) do
+    select_split_omission_indices(l, t, n - 1, l_acc, [h | r_acc])
   end
 
   defp find_safe_segment(original_omission, important_indices, side, offset \\ 1)
@@ -687,24 +757,22 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     tl..tr//1 = tentative_omission = Range.shift(original_omission, -offset)
 
-    cond do
-      tl <= Vector.first(important_indices) or tr >= Vector.last(important_indices) ->
-        :error
+    if tl <= Vector.first(important_indices) or tr >= Vector.last(important_indices) do
+      :error
+    else
+      first_overlap =
+        important_indices
+        |> Vector.reverse()
+        |> Aja.Enum.find(&(&1 in tentative_omission))
 
-      true ->
-        first_overlap =
-          important_indices
-          |> Vector.reverse()
-          |> Aja.Enum.find(&(&1 in tentative_omission))
+      case first_overlap do
+        nil ->
+          {:ok, tentative_omission, offset}
 
-        case first_overlap do
-          nil ->
-            {:ok, tentative_omission, offset}
-
-          i ->
-            # The tentative window contains an important index. Move the window left until it's 1 past the first important index.
-            find_safe_segment(original_omission, important_indices, :left, 1 + r - i)
-        end
+        i ->
+          # The tentative window contains an important index. Move the window past the first important index and try again.
+          find_safe_segment(original_omission, important_indices, :left, 1 + r - i)
+      end
     end
   end
 
@@ -713,21 +781,19 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     tl..tr//1 = tentative_omission = Range.shift(original_omission, offset)
 
-    cond do
-      tl <= Vector.first(important_indices) or tr >= Vector.last(important_indices) ->
-        :error
+    if tl <= Vector.first(important_indices) or tr >= Vector.last(important_indices) do
+      :error
+    else
+      first_overlap = Aja.Enum.find(important_indices, &(&1 in tentative_omission))
 
-      true ->
-        first_overlap = Aja.Enum.find(important_indices, &(&1 in tentative_omission))
+      case first_overlap do
+        nil ->
+          {:ok, tentative_omission, offset}
 
-        case first_overlap do
-          nil ->
-            {:ok, tentative_omission, offset}
-
-          i ->
-            # The tentative window contains an important index. Move the window right until it's 1 past the first important index.
-            find_safe_segment(original_omission, important_indices, :right, 1 + i - l)
-        end
+        i ->
+          # The tentative window contains an important index. Move the window past the first important index and try again.
+          find_safe_segment(original_omission, important_indices, :right, 1 + i - l)
+      end
     end
   end
 
@@ -885,6 +951,11 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     size = vec_size(builder.sequence)
 
     clamp(home_stop - 1, size)..clamp(home_stop + 1, size)//1
+  end
+
+  # (Just left of center if length is even.)
+  defp center(l..r//1) when r >= l do
+    l + div(r - l, 2)
   end
 
   # Adjusts an index to be within the bounds of the stop sequence.

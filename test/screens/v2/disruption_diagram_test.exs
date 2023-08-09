@@ -1747,6 +1747,127 @@ defmodule Screens.V2.DisruptionDiagramTest do
     # EDGE CASES #
     ##############
 
+    test "does not omit from an alert that spans 9 stops and contains the home stop" do
+      # In this case, the closure has more than 8 slots available to it and doesn't get shrunk.
+      localized_alert =
+        DDAlert.make_localized_alert(
+          :suspension,
+          :orange,
+          ~P"haecl",
+          {~P"ccmnl", ~P"masta"}
+        )
+
+      expected = %{
+        effect: :suspension,
+        effect_region_slot_index_range: {1, 9},
+        line: :orange,
+        current_station_slot_index: 3,
+        slots: [
+          %{type: :arrow, label_id: "place-ogmnl"},
+          # <closure>
+          %{label: %{full: "Community College", abbrev: "Com College"}, show_symbol: true},
+          # <current_location subsumed>
+          %{label: %{full: "North Station", abbrev: "North Sta"}, show_symbol: true},
+          %{label: %{full: "Haymarket", abbrev: "Haymarket"}, show_symbol: true},
+          # </current_location>
+          %{label: %{full: "State", abbrev: "State"}, show_symbol: true},
+          %{label: %{full: "Downtown Crossing", abbrev: "Downt'n Xng"}, show_symbol: true},
+          %{label: %{full: "Chinatown", abbrev: "Chinatown"}, show_symbol: true},
+          %{label: %{full: "Tufts Medical Center", abbrev: "Tufts Med"}, show_symbol: true},
+          %{label: %{full: "Back Bay", abbrev: "Back Bay"}, show_symbol: true},
+          %{label: %{full: "Massachusetts Avenue", abbrev: "Mass Ave"}, show_symbol: true},
+          # </closure>
+          %{type: :arrow, label_id: "place-forhl"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
+    test "does not omit from an alert that spans 10 stops and contains the home stop" do
+      # In this case, the closure has more than 8 slots available to it and doesn't get shrunk.
+      localized_alert =
+        DDAlert.make_localized_alert(
+          :suspension,
+          :orange,
+          ~P"haecl",
+          {~P"ccmnl", ~P"rugg"}
+        )
+
+      expected = %{
+        effect: :suspension,
+        effect_region_slot_index_range: {1, 10},
+        line: :orange,
+        current_station_slot_index: 3,
+        slots: [
+          %{type: :arrow, label_id: "place-ogmnl"},
+          # <closure>
+          %{label: %{full: "Community College", abbrev: "Com College"}, show_symbol: true},
+          # <current_location subsumed>
+          %{label: %{full: "North Station", abbrev: "North Sta"}, show_symbol: true},
+          %{label: %{full: "Haymarket", abbrev: "Haymarket"}, show_symbol: true},
+          # </current_location>
+          %{label: %{full: "State", abbrev: "State"}, show_symbol: true},
+          %{label: %{full: "Downtown Crossing", abbrev: "Downt'n Xng"}, show_symbol: true},
+          %{label: %{full: "Chinatown", abbrev: "Chinatown"}, show_symbol: true},
+          %{label: %{full: "Tufts Medical Center", abbrev: "Tufts Med"}, show_symbol: true},
+          %{label: %{full: "Back Bay", abbrev: "Back Bay"}, show_symbol: true},
+          %{label: %{full: "Massachusetts Avenue", abbrev: "Mass Ave"}, show_symbol: true},
+          %{label: %{full: "Ruggles", abbrev: "Ruggles"}, show_symbol: true},
+          # </closure>
+          %{type: :arrow, label_id: "place-forhl"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
+    test "omits from an alert that spans more than 10 stops and contains the home stop" do
+      # The largest a closure can possibly be is 10 slots.
+      localized_alert =
+        DDAlert.make_localized_alert(
+          :suspension,
+          :orange,
+          ~P"haecl",
+          {~P"ccmnl", ~P"rcmnl"}
+        )
+
+      expected = %{
+        effect: :suspension,
+        effect_region_slot_index_range: {1, 10},
+        line: :orange,
+        current_station_slot_index: 3,
+        slots: [
+          %{type: :arrow, label_id: "place-ogmnl"},
+          # <closure>
+          %{label: %{full: "Community College", abbrev: "Com College"}, show_symbol: true},
+          # <current_location subsumed>
+          %{label: %{full: "North Station", abbrev: "North Sta"}, show_symbol: true},
+          %{label: %{full: "Haymarket", abbrev: "Haymarket"}, show_symbol: true},
+          # </current_location>
+          %{label: %{full: "State", abbrev: "State"}, show_symbol: true},
+          #
+          %{label: %{full: "Downtown Crossing", abbrev: "Downt'n Xng"}, show_symbol: true},
+          # Chinatown, Tufts Med
+          %{label: "…", show_symbol: false},
+          %{label: %{full: "Back Bay", abbrev: "Back Bay"}, show_symbol: true},
+          %{label: %{full: "Massachusetts Avenue", abbrev: "Mass Ave"}, show_symbol: true},
+          %{label: %{full: "Ruggles", abbrev: "Ruggles"}, show_symbol: true},
+          %{label: %{full: "Roxbury Crossing", abbrev: "Roxbury Xng"}, show_symbol: true},
+          # </closure>
+          %{type: :arrow, label_id: "place-forhl"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
     test "for long shuttles with home stop near the middle, omits stops off-center to avoid omitting the home stop" do
       localized_alert =
         DDAlert.make_localized_alert(:shuttle, :orange, ~P"bbsta", {~P"mlmnl", ~P"grnst"})
@@ -1820,11 +1941,67 @@ defmodule Screens.V2.DisruptionDiagramTest do
       assert expected == actual
     end
 
-    test "knows when it needs to do a split omission, but doesn't know how yet" do
+    test "splits omission around an important stop when necessary" do
       localized_alert =
         DDAlert.make_localized_alert(:station_closure, :orange, ~P"welln", ~P[mlmnl dwnxg grnst])
 
-      assert {:error, "Not yet implemented"} = DD.serialize(localized_alert)
+      expected = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [1, 5, 10],
+        line: :orange,
+        current_station_slot_index: 2,
+        slots: [
+          %{type: :terminal, label_id: "place-ogmnl"},
+          %{label: %{full: "Malden Center", abbrev: "Malden Ctr"}, show_symbol: true},
+          %{label: %{full: "Wellington", abbrev: "Wellington"}, show_symbol: true},
+          %{label: %{full: "Assembly", abbrev: "Assembly"}, show_symbol: true},
+          %{label: "…", show_symbol: false},
+          %{label: %{full: "Downtown Crossing", abbrev: "Downt'n Xng"}, show_symbol: true},
+          %{label: "…", show_symbol: false},
+          %{label: %{full: "Roxbury Crossing", abbrev: "Roxbury Xng"}, show_symbol: true},
+          %{label: %{full: "Jackson Square", abbrev: "Jackson Sq"}, show_symbol: true},
+          %{label: %{full: "Stony Brook", abbrev: "Stony Brook"}, show_symbol: true},
+          %{label: %{full: "Green Street", abbrev: "Green St"}, show_symbol: true},
+          %{type: :terminal, label_id: "place-forhl"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
+    test "absolute worst case scenario--split omission + gap omission" do
+      localized_alert =
+        DDAlert.make_localized_alert(:station_closure, :green, ~P"unsqu", ~P[boyls brkhl waban])
+
+      expected = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [2, 4, 7],
+        line: :green,
+        current_station_slot_index: 11,
+        slots: [
+          %{type: :terminal, label_id: "place-river"},
+          %{label: %{full: "Woodland", abbrev: "Woodland"}, show_symbol: true},
+          %{label: %{full: "Waban", abbrev: "Waban"}, show_symbol: true},
+          %{label: "…", show_symbol: false},
+          %{label: %{full: "Brookline Hills", abbrev: "B'kline Hls"}, show_symbol: true},
+          %{
+            label: %{full: "…via Kenmore & Copley", abbrev: "…via Kenmore & Copley"},
+            show_symbol: false
+          },
+          %{label: %{full: "Arlington", abbrev: "Arlington"}, show_symbol: true},
+          %{label: %{full: "Boylston", abbrev: "Boylston"}, show_symbol: true},
+          %{label: %{full: "Park Street", abbrev: "Park St"}, show_symbol: true},
+          %{label: "…", show_symbol: false},
+          %{label: %{full: "Lechmere", abbrev: "Lechmere"}, show_symbol: true},
+          %{type: :terminal, label_id: "place-unsqu"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
     end
 
     ###########
@@ -1840,7 +2017,10 @@ defmodule Screens.V2.DisruptionDiagramTest do
           ~P[mlmnl astao ccmnl haecl dwnxg tumnl masta rcmnl sbmnl]
         )
 
-      assert {:error, "Not yet implemented"} = DD.serialize(localized_alert)
+      expected =
+        {:error, "can't omit 9 from closure region without omitting at least one important stop"}
+
+      assert expected == DD.serialize(localized_alert)
     end
   end
 end

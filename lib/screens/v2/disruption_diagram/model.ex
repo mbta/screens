@@ -166,4 +166,8 @@ defmodule Screens.V2.DisruptionDiagram.Model do
   for {closure, baseline} <- %{2 => 10, 3 => 10, 4 => 12, 5 => 12, 6 => 14, 7 => 14, 8 => 14} do
     defp baseline_slots(unquote(closure)), do: unquote(baseline)
   end
+
+  # In rare cases when the home stop is inside the closure region,
+  # more than 8 slots are available to the closure.
+  defp baseline_slots(closure) when closure > 8, do: 14
 end
