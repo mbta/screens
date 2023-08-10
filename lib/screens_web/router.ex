@@ -87,6 +87,7 @@ defmodule ScreensWeb.Router do
       get "/:id", ScreenApiController, :show
       get "/:id/simulation", ScreenApiController, :simulation
       get "/:id/dup", ScreenApiController, :show_dup
+      get "/:id/triptych", ScreenApiController, :show_triptych
       post "/log_frontend_error", ScreenApiController, :log_frontend_error
     end
 

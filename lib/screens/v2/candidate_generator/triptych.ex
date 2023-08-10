@@ -35,6 +35,7 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
 
   defp placeholder_instances do
     [
+      %Placeholder{color: :green, slot_names: [:header]},
       %Placeholder{color: :blue, slot_names: [:main_content]}
     ]
   end

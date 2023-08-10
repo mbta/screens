@@ -33,14 +33,16 @@
 - In assets/webpack.config.js, change `publicPath` in the font config to have value `'fonts/'`.
 - **Only if you are packaging for local testing**
   - replace `const playerName = useOutfrontPlayerName();` in assets/src/apps/v2/dup.tsx with `const playerName = "BRW-DUP-005";` (or any other player name from one of the DUP screen IDs (`DUP-${playerName}`)). This data is provided by Outfront's "wrapper" app that runs on the real DUP screens, but we need to set it ourselves during testing. Think of it as a sort of frontend environment variable.
-  - replace `apiPath = "https://screens.mbta.com" + apiPath;` in assets/src/hooks/v2/use_api_response.tsx with `apiPath = "http://localhost:4000" + apiPath;`.
+  - replace `apiPath = "https://screens.mbta.com...";` in assets/src/hooks/v2/use_api_response.tsx with `apiPath = "http://localhost:4000...";`.
 - `cd` to priv/static and run the following:
   ```sh
   for ROTATION_INDEX in {0..2}; do
     echo "export const ROTATION_INDEX = ${ROTATION_INDEX};" > ../../assets/src/components/v2/dup/rotation_index.tsx
     npm --prefix ../../assets run deploy
-  cp -r css/dup_v2.css js/polyfills.js js/dup_v2.js ../inter_font_face.css ../fonts ../template.json ../preview.png .
-  zip -r dup-app-${ROTATION_INDEX}.zip dup_v2.css polyfills.js dup_v2.js inter_font_face.css fonts images dup-app.html template.json preview.png
+    cp -r css/dup_v2.css js/polyfills.js js/dup_v2.js ../inter_font_face.css ../fonts ../dup_preview.png .
+    cp ../dup_template.json ./template.json
+    sed -i "" "s/DUP APP ./DUP APP ${ROTATION_INDEX}/" template.json
+    zip -r dup-app-${ROTATION_INDEX}.zip dup_v2.css polyfills.js dup_v2.js inter_font_face.css fonts images dup-app.html template.json dup_preview.png
   done
   ```
 - Commit the version bump on a branch, push it, and create a PR to mark the deploy.

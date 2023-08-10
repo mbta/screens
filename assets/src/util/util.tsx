@@ -1,4 +1,5 @@
 import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
+import { TRIPTYCH_PANE } from "Components/v2/triptych/pane";
 import moment from "moment";
 import "moment-timezone";
 import { getDatasetValue } from "Util/dataset";
@@ -44,6 +45,11 @@ const isScreenSide = (value: any): value is ScreenSide => {
   return value === "left" || value === "right";
 };
 
+type TriptychPane = "left" | "middle" | "right";
+const isTriptychPane = (value: any): value is TriptychPane => {
+  return value === "left" || value === "middle" || value === "right";
+};
+
 /**
  * For screen types that are split across two separate displays (pre-fare),
  * this gets the value of the data attribute dictating which side to show.
@@ -66,5 +72,13 @@ export const getRotationIndex = () => {
 
   return isRotationIndex(rotationIndex) ? rotationIndex : null;
 };
+
+export const getTriptychPane = (): TriptychPane | null => {
+  const pane = isOFM()
+    ? TRIPTYCH_PANE
+    : getDatasetValue("pane");
+
+  return isTriptychPane(pane) ? pane : null;
+}
 
 export const firstWord = (str: string): string => str.split(" ")[0];

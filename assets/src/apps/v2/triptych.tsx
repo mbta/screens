@@ -15,12 +15,17 @@ import { MappingContext } from "Components/v2/widget";
 
 import NormalScreen from "Components/v2/bus_shelter/normal_screen";
 import NormalBody from "Components/v2/bus_shelter/normal_body";
+import MultiScreenPage from "Components/v2/multi_screen_page";
+import Viewport from "Components/v2/triptych/viewport";
 
+// Remove on go-live.
 import Placeholder from "Components/v2/placeholder";
 
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import PageLoadNoData from "Components/v2/lcd/page_load_no_data";
 import NoData from "Components/v2/lcd/no_data";
+
+import useOutfrontPlayerName from "Hooks/use_outfront_player_name";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -55,20 +60,43 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
+  const playerName = useOutfrontPlayerName();
+
+  if (playerName !== null) {
+    const id = `TRI-${playerName.trim()}`;
+    return (
+      <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+        <ResponseMapperContext.Provider value={responseMapper}>
+          <Viewport>
+            <ScreenPage id={id} />
+          </Viewport>
+        </ResponseMapperContext.Provider>
+      </MappingContext.Provider>
+    );
+  }
+
   return (
     <Router>
       <Switch>
+        <Route exact path="/v2/screen/triptych_v2">
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
+        </Route>
         <Route exact path="/v2/screen/:id/simulation">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
-              <SimulationScreenPage />
+              <SimulationScreenPage opts={{ alternateView: true }} />
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
         <Route path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
-              <ScreenPage />
+              <Viewport>
+                <ScreenPage />
+              </Viewport>
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
