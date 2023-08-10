@@ -12,10 +12,10 @@ defmodule Screens.V2.DisruptionDiagram.Label do
       when branch_thru_kenmore in [:b, :c, :d] do
     # For GL branches that pass through Kenmore, we look for Kenmore and Copley.
     [
-      if("place-kencl" in omitted_stop_ids, do: "Kenmore"),
-      if("place-coecl" in omitted_stop_ids, do: "Copley")
+      "place-kencl" in omitted_stop_ids and "Kenmore",
+      "place-coecl" in omitted_stop_ids and "Copley"
     ]
-    |> Enum.reject(&is_nil/1)
+    |> Enum.filter(& &1)
     |> Enum.join(" & ")
     |> case do
       "" -> "…"

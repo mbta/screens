@@ -5,10 +5,12 @@ defmodule Screens.TestSupport.SubwayTaggedStopSequences do
 
   import Screens.TestSupport.ParentStationIdSigil
 
+  @spec blue() :: %{Route.id() => [[Stop.id()]]}
   def blue do
     %{"Blue" => [~P[wondl rbmnl bmmnl sdmnl orhte wimnl aport mvbcl aqucl state gover bomnl]]}
   end
 
+  @spec orange() :: %{Route.id() => [[Stop.id()]]}
   def orange do
     %{
       "Orange" => [
@@ -17,9 +19,8 @@ defmodule Screens.TestSupport.SubwayTaggedStopSequences do
     }
   end
 
-  def red, do: red(~w[ashmont braintree]a)
-
-  def red(branches) when is_list(branches) do
+  @spec red(list(atom())) :: %{Route.id() => [[Stop.id()]]}
+  def red(branches \\ ~w[ashmont braintree]a) do
     [
       :ashmont in branches and ashmont_seq(),
       :braintree in branches and braintree_seq()
@@ -28,9 +29,8 @@ defmodule Screens.TestSupport.SubwayTaggedStopSequences do
     |> then(&%{"Red" => &1})
   end
 
-  def green, do: green(~w[b c d e]a)
-
-  def green(branches) when is_list(branches) do
+  @spec green(list(atom())) :: %{Route.id() => [[Stop.id()]]}
+  def green(branches \\ ~w[b c d e]a) do
     [
       :b in branches and {"Green-B", [b_seq()]},
       :c in branches and {"Green-C", [c_seq()]},

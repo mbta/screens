@@ -206,7 +206,7 @@ defmodule Screens.V2.LocalizedAlert do
 
   @doc """
   Returns all routes affected by an alert.
-  Green Line subway route consolidation logic differs by screen type.
+  Green Line route consolidation logic differs by screen type.
   Used to build route pills for GL e-ink and text for Pre-fare alerts.
   """
   @spec informed_subway_routes(t()) :: list(String.t())

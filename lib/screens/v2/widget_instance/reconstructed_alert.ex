@@ -876,6 +876,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def serialize(widget, log_fn \\ &Logger.warn/1)
 
   def serialize(%__MODULE__{is_full_screen: true} = t, log_fn) do
+    main_data =
+      if takeover_alert?(t) do
+        serialize_takeover_alert(t)
+      else
+        location = LocalizedAlert.location(t)
+        serialize_fullscreen_alert(t, location)
+      end
+
     diagram_data =
       case DisruptionDiagram.serialize(t) do
         {:ok, serialized_diagram} ->
@@ -886,15 +894,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           %{}
       end
 
-    result =
-      if takeover_alert?(t) do
-        serialize_takeover_alert(t)
-      else
-        location = LocalizedAlert.location(t)
-        serialize_fullscreen_alert(t, location)
-      end
-
-    Map.merge(result, diagram_data)
+    Map.merge(main_data, diagram_data)
   end
 
   def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t, _log_fn) do
