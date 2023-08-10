@@ -14,7 +14,7 @@ import useApiResponse, {
 import WidgetTreeErrorBoundary from "Components/v2/widget_tree_error_boundary";
 import Widget, { WidgetData } from "Components/v2/widget";
 import useAudioReadout from "Hooks/v2/use_audio_readout";
-import { isDup } from "Util/util";
+import { isOFM } from "Util/util";
 
 type ResponseMapper = (
   apiResponse: ApiResponse
@@ -93,7 +93,7 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
   showBlink,
 }) => {
   const responseMapper = useContext(ResponseMapperContext);
-  const ErrorBoundaryOrFragment = isDup() ? Fragment : WidgetTreeErrorBoundary;
+  const ErrorBoundaryOrFragment = isOFM() ? Fragment : WidgetTreeErrorBoundary;
 
   return (
     <div className="screen-container">
@@ -109,7 +109,7 @@ const ScreenContainer = ({ id }) => {
   const blinkConfig = useContext(BlinkConfigContext);
   const audioConfig = useContext(AudioConfigContext);
   const [showBlink, setShowBlink] = useState(false);
-  const hook = isDup() ? useDupApiResponse : useApiResponse;
+  const hook = isOFM() ? useDupApiResponse : useApiResponse;
 
   const { apiResponse, requestCount, lastSuccess } = hook({ id });
 

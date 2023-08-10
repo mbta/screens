@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import useOutfrontStation from "Hooks/use_outfront_station";
 import { ROTATION_INDEX } from "./rotation_index";
 import { NoDataLayout } from "Components/dup/screen_container";
-import { isDup } from "Util/util";
+import { isOFM } from "Util/util";
 import { fetchDatasetValue } from "Util/dataset";
 import { DUP_SIMULATION_REFRESH_MS } from "Constants";
 
@@ -37,7 +37,7 @@ const ScreenPage = ({
 }: {
   screenContainer: React.ComponentType;
 }): JSX.Element =>
-  isDup() ? (
+  isOFM() ? (
     <DupScreenPage screenContainer={screenContainer} />
   ) : (
     <DevelopmentScreenPage screenContainer={screenContainer} />

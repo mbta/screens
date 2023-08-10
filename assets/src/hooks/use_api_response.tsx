@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { isDup, isRealScreen } from "Util/util";
+import { isOFM, isRealScreen } from "Util/util";
 import useInterval from "Hooks/use_interval";
 import { getDatasetValue } from "Util/dataset";
 import * as SentryLogger from "Util/sentry";
@@ -42,7 +42,7 @@ const useIsRealScreenParam = () => {
 };
 
 const useRequestorParam = () => {
-  if (isDup()) return `&requestor=real_screen`;
+  if (isOFM()) return `&requestor=real_screen`;
 
   let requestor = getDatasetValue("requestor");
   if (!requestor && isRealScreen()) {
@@ -163,7 +163,7 @@ const buildApiPath = ({
     apiPath += `&datetime=${datetime}`;
   }
 
-  if (isDup()) {
+  if (isOFM()) {
     apiPath = "https://screens.mbta.com" + apiPath;
   }
 

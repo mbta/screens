@@ -24,16 +24,20 @@ export const classWithModifiers = (baseClass, modifiers) => {
 export const formatTimeString = (timeString: string) =>
   moment(timeString).tz("America/New_York").format("h:mm");
 
-export const isDup = () => location.href.startsWith("file:");
+/**
+ * Returns true if this client is running on an Outfront Media screen.
+ * (A DUP or a triptych.)
+ */
+export const isOFM = () => location.href.startsWith("file:");
 
 export const imagePath = (fileName: string): string =>
-  isDup() ? `images/${fileName}` : `/images/${fileName}`;
+  isOFM() ? `images/${fileName}` : `/images/${fileName}`;
 
 export const pillPath = (fileName: string): string =>
-  isDup() ? `images/pills/${fileName}` : `/images/pills/${fileName}`;
+  isOFM() ? `images/pills/${fileName}` : `/images/pills/${fileName}`;
 
 export const isRealScreen = () =>
-  isDup() || getDatasetValue("isRealScreen") === "true";
+  isOFM() || getDatasetValue("isRealScreen") === "true";
 
 type ScreenSide = "left" | "right";
 const isScreenSide = (value: any): value is ScreenSide => {
@@ -56,7 +60,7 @@ const isRotationIndex = (value: string | undefined) => {
 };
 
 export const getRotationIndex = () => {
-  const rotationIndex = isDup()
+  const rotationIndex = isOFM()
     ? ROTATION_INDEX.toString()
     : getDatasetValue("rotationIndex");
 

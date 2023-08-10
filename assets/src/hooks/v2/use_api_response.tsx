@@ -2,7 +2,7 @@ import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useState } from "react";
 import { getDataset, getDatasetValue } from "Util/dataset";
-import { getScreenSide, isDup, isRealScreen } from "Util/util";
+import { getScreenSide, isOFM, isRealScreen } from "Util/util";
 import * as SentryLogger from "Util/sentry";
 import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
 
@@ -119,7 +119,7 @@ const getScreenSideParam = () => {
 
 const getRequestorParam = () => {
   // Adding this to v2 because we will eventually widgetize DUPs.
-  if (isDup()) return `&requestor=real_screen`;
+  if (isOFM()) return `&requestor=real_screen`;
 
   let requestor = getDatasetValue("requestor");
   if (!requestor && isRealScreen()) {
@@ -163,7 +163,7 @@ const useBaseApiResponse = ({
   let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
   let apiPath = `/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}`;
 
-  if (isDup()) {
+  if (isOFM()) {
     apiPath = `https://screens.mbta.com${apiPath}&rotation_index=${ROTATION_INDEX}`;
   }
 
