@@ -165,7 +165,7 @@ const useBaseApiResponse = ({
   let apiPath = `/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}`;
 
   if (isOFM()) {
-    apiPath = `https://screens.mbta.com${apiPath}&rotation_index=${ROTATION_INDEX}&triptych_pane=${TRIPTYCH_PANE}`;
+    apiPath = `http://localhost:4000${apiPath}&rotation_index=${ROTATION_INDEX}&pane=${TRIPTYCH_PANE}`;
   }
 
   if (screenIdsWithOffsetMap) {
