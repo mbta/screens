@@ -32,17 +32,17 @@
 - Set the version string in assets/src/components/v2/triptych/version.tsx to `current_year.current_month.current_day.1`.
 - In assets/webpack.config.js, change `publicPath` in the font config to have value `'fonts/'`.
 - **Only if you are packaging for local testing**
-  - replace `const playerName = useOutfrontPlayerName();` in assets/src/apps/v2/triptych.tsx with `const playerName = "[TODO: PUT VALID TRIPTYCH PLAYERNAME HERE]";` (or any other player name from one of the triptych screen IDs (`TRI-${playerName}`)). This data is provided by Outfront's "wrapper" app that runs on the real triptych screens, but we need to set it ourselves during testing. Think of it as a sort of frontend environment variable.
-  - replace `apiPath = "https://screens.mbta.com" + apiPath;` in assets/src/hooks/v2/use_api_response.tsx with `apiPath = "http://localhost:4000" + apiPath;`.
+  - replace `const playerName = useOutfrontPlayerName();` in assets/src/apps/v2/triptych.tsx with `const playerName = "BKB-TRI-001";` (or any other player name from one of the triptych screen IDs (`TRI-${playerName}`)). This data is provided by Outfront's "wrapper" app that runs on the real triptych screens, but we need to set it ourselves during testing. Think of it as a sort of frontend environment variable.
+  - replace `apiPath = "https://screens.mbta.com...";` in assets/src/hooks/v2/use_api_response.tsx with `apiPath = "http://localhost:4000...";`.
 - `cd` to priv/static and run the following:
   ```sh
   for PANE in left middle right; do
-    echo "export const PANE = \"${PANE}\";" > ../../assets/src/components/v2/triptych/pane.tsx
+    echo "export const TRIPTYCH_PANE = \"${PANE}\";" > ../../assets/src/components/v2/triptych/pane.tsx
     npm --prefix ../../assets run deploy
-    cp -r css/triptych_v2.css js/polyfills.js js/triptych_v2.js ../inter_font_face.css ../fonts ../triptych_preview.png .
+    cp -r css/triptych_v2.css js/polyfills.js js/triptych_v2.js ../triptych_preview.png .
     cp ../triptych_template.json ./template.json
-    sed -i "" -E "s/TRIPTYCH APP [[:alpha:]]+/TRIPTYCH APP $(echo $ROTATION_INDEX | tr 'a-z' 'A-Z')/" template.json
-    zip -r triptych-app-${ROTATION_INDEX}.zip triptych_v2.css polyfills.js triptych_v2.js inter_font_face.css fonts images triptych-app.html template.json triptych_preview.png
+    sed -i "" -E "s/TRIPTYCH APP [[:alpha:]]+/TRIPTYCH APP $(echo $PANE | tr 'a-z' 'A-Z')/" template.json
+    zip -r triptych-app-${PANE}.zip triptych_v2.css polyfills.js triptych_v2.js fonts images triptych-app.html template.json triptych_preview.png
   done
   ```
 - Commit the version bump on a branch, push it, and create a PR to mark the deploy.

@@ -5,31 +5,32 @@ require("../../../css/triptych_v2.scss");
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+
 import ScreenPage from "Components/v2/screen_page";
+import { MappingContext } from "Components/v2/widget";
 import {
   ResponseMapper,
   ResponseMapperContext,
   LOADING_LAYOUT,
 } from "Components/v2/screen_container";
-import { MappingContext } from "Components/v2/widget";
 
-import NormalScreen from "Components/v2/bus_shelter/normal_screen";
-import NormalBody from "Components/v2/bus_shelter/normal_body";
 import MultiScreenPage from "Components/v2/multi_screen_page";
-import Viewport from "Components/v2/triptych/viewport";
+import SimulationScreenPage from "Components/v2/simulation_screen_page";
 
 // Remove on go-live.
 import Placeholder from "Components/v2/placeholder";
 
-import SimulationScreenPage from "Components/v2/simulation_screen_page";
-import PageLoadNoData from "Components/v2/lcd/page_load_no_data";
-import NoData from "Components/v2/lcd/no_data";
+import Viewport from "Components/v2/triptych/viewport";
+import NormalScreen from "Components/v2/triptych/normal_screen";
+import TakeoverScreen from "Components/v2/triptych/takeover_screen";
+import PageLoadNoData from "Components/v2/triptych/page_load_no_data";
+import NoData from "Components/v2/triptych/no_data";
 
 import useOutfrontPlayerName from "Hooks/use_outfront_player_name";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
-  body_normal: NormalBody,
+  screen_takeover: TakeoverScreen,
   placeholder: Placeholder,
   page_load_no_data: PageLoadNoData,
   no_data: NoData,

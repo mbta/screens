@@ -16,7 +16,6 @@
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Screens</title>
-      <link rel="stylesheet" href="inter_font_face.css" />
       <link rel="stylesheet" href="dup.css" />
     </head>
 
@@ -40,10 +39,10 @@
   for ROTATION_INDEX in {0..2}; do
     echo "export const ROTATION_INDEX = ${ROTATION_INDEX};" > ../../assets/src/components/dup/rotation_index.tsx
     npm --prefix ../../assets run deploy
-    cp -r css/dup.css js/polyfills.js js/dup.js ../inter_font_face.css ../fonts ../dup_preview.png .
+    cp -r css/dup.css js/polyfills.js js/dup.js ../dup_preview.png .
     cp ../dup_template.json ./template.json
     sed -i "" "s/DUP APP ./DUP APP ${ROTATION_INDEX}/" template.json
-    zip -r dup-app-${ROTATION_INDEX}.zip dup.css polyfills.js dup.js inter_font_face.css fonts images dup-app.html template.json dup_preview.png
+    zip -r dup-app-${ROTATION_INDEX}.zip dup.css polyfills.js dup.js fonts images dup-app.html template.json dup_preview.png
   done
   ```
 - Commit the version bump on a branch, push it, and create a PR to mark the deploy.

@@ -9,7 +9,7 @@ import React, {
 import useApiResponse, {
   ApiResponse,
   SimulationApiResponse,
-  useDupApiResponse,
+  useOFMApiResponse,
 } from "Hooks/v2/use_api_response";
 import WidgetTreeErrorBoundary from "Components/v2/widget_tree_error_boundary";
 import Widget, { WidgetData } from "Components/v2/widget";
@@ -109,7 +109,7 @@ const ScreenContainer = ({ id }) => {
   const blinkConfig = useContext(BlinkConfigContext);
   const audioConfig = useContext(AudioConfigContext);
   const [showBlink, setShowBlink] = useState(false);
-  const hook = isOFM() ? useDupApiResponse : useApiResponse;
+  const hook = isOFM() ? useOFMApiResponse : useApiResponse;
 
   const { apiResponse, requestCount, lastSuccess } = hook({ id });
 

@@ -3,14 +3,15 @@
 @import "fonts/helvetica_font_face";
 @import "v2/common/widget";
 
+@import "v2/triptych/viewport";
 @import "v2/triptych/screen_container";
 
 @import "v2/triptych/screen/normal";
-
-@import "v2/triptych/body/normal";
+@import "v2/triptych/screen/takeover";
 
 @import "v2/lcd_common_styles/page_load_no_data";
 @import "v2/lcd_common_styles/no_data";
+@import "v2/triptych/no_data";
 
 @import "v2/placeholder";
 

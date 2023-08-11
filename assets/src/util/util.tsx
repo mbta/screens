@@ -28,6 +28,8 @@ export const formatTimeString = (timeString: string) =>
 /**
  * Returns true if this client is running on an Outfront Media screen.
  * (A DUP or a triptych.)
+ *
+ * Use this for OFM-specific logic that is common to both the DUP and triptych apps.
  */
 export const isOFM = () => location.href.startsWith("file:");
 
@@ -43,6 +45,11 @@ export const isRealScreen = () =>
 type ScreenSide = "left" | "right";
 const isScreenSide = (value: any): value is ScreenSide => {
   return value === "left" || value === "right";
+};
+
+type RotationIndex = "0" | "1" | "2";
+const isRotationIndex = (value: any): value is RotationIndex => {
+  return value === "0" || value === "1" || value === "2";
 };
 
 type TriptychPane = "left" | "middle" | "right";
@@ -61,11 +68,7 @@ export const getScreenSide = (): ScreenSide | null => {
   return isScreenSide(screenSide) ? screenSide : null;
 };
 
-const isRotationIndex = (value: string | undefined) => {
-  return value === "0" || value === "1" || value === "2";
-};
-
-export const getRotationIndex = () => {
+export const getRotationIndex = (): RotationIndex | null => {
   const rotationIndex = isOFM()
     ? ROTATION_INDEX.toString()
     : getDatasetValue("rotationIndex");
@@ -76,7 +79,7 @@ export const getRotationIndex = () => {
 export const getTriptychPane = (): TriptychPane | null => {
   const pane = isOFM()
     ? TRIPTYCH_PANE
-    : getDatasetValue("pane");
+    : getDatasetValue("triptychPane");
 
   return isTriptychPane(pane) ? pane : null;
 }

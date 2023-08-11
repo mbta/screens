@@ -236,13 +236,19 @@ const useSimulationApiResponse = ({ id }) =>
     responseHandler: rawResponseToSimulationApiResponse,
   });
 
-const useDupApiResponse = ({ id }) =>
+// For OFM apps--DUP, triptych--we need to request a different
+// route that's more permissive of CORS, since these clients are loaded from a local html file
+// (and thus their data requests to our server are cross-origin).
+//
+// Besides the CORS stuff, this different route runs exactly the same backend logic as the normal one
+// used by `useApiResponse`.
+const useOFMApiResponse = ({ id }) =>
   useBaseApiResponse({
     id,
-    routePart: "/dup",
+    routePart: "/ofm",
     responseHandler: rawResponseToApiResponse,
   });
 
 export default useApiResponse;
 export { ApiResponse, SimulationApiResponse };
-export { useSimulationApiResponse, useDupApiResponse };
+export { useSimulationApiResponse, useOFMApiResponse };
