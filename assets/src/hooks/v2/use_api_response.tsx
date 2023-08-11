@@ -2,7 +2,7 @@ import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useState } from "react";
 import { getDataset, getDatasetValue } from "Util/dataset";
-import { getScreenSide, isOFM, isRealScreen } from "Util/util";
+import { getScreenSide, isDUP, isOFM, isRealScreen, isTriptych } from "Util/util";
 import * as SentryLogger from "Util/sentry";
 import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
 import { TRIPTYCH_PANE } from "Components/v2/triptych/pane";
@@ -165,7 +165,12 @@ const useBaseApiResponse = ({
   let apiPath = `/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}`;
 
   if (isOFM()) {
-    apiPath = `http://localhost:4000${apiPath}&rotation_index=${ROTATION_INDEX}&pane=${TRIPTYCH_PANE}`;
+    apiPath = `https://screens.mbta.com${apiPath}`;
+    if (isDUP()) {
+      apiPath = `${apiPath}&rotation_index=${ROTATION_INDEX}`;
+    } else if (isTriptych()) {
+      apiPath = `${apiPath}&pane=${TRIPTYCH_PANE}`;
+    }
   }
 
   if (screenIdsWithOffsetMap) {

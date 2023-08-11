@@ -45,6 +45,7 @@
     zip -r dup-app-${ROTATION_INDEX}.zip dup_v2.css polyfills.js dup_v2.js fonts images dup-app.html template.json dup_preview.png
   done
   ```
+- On completion, the packaged client apps will be saved at `priv/static/dup-app-(0|1|2).zip`.
 - Commit the version bump on a branch, push it, and create a PR to mark the deploy.
 
 ## Debugging

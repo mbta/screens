@@ -45,6 +45,7 @@
     zip -r triptych-app-${PANE}.zip triptych_v2.css polyfills.js triptych_v2.js fonts images triptych-app.html template.json triptych_preview.png
   done
   ```
+- On completion, the packaged client apps will be saved at `priv/static/triptych-app-(left|middle|right).zip`.
 - Commit the version bump on a branch, push it, and create a PR to mark the deploy.
 
 ## Debugging

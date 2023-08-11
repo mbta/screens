@@ -1,1 +1,1 @@
-export const TRIPTYCH_VERSION = "23.8.10.1";
+export const TRIPTYCH_VERSION = "23.8.11.1";

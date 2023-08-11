@@ -33,6 +33,20 @@ export const formatTimeString = (timeString: string) =>
  */
 export const isOFM = () => location.href.startsWith("file:");
 
+/**
+ * Returns true if this client is running on a DUP screen.
+ *
+ * Use this for DUP-specific logic.
+ */
+export const isDUP = () => /^file:.*dup-app.*/.test(location.href);
+
+/**
+ * Returns true if this client is running on a triptych screen.
+ *
+ * Use this for triptych-specific logic.
+ */
+export const isTriptych = () => /^file:.*triptych-app.*/.test(location.href);
+
 export const imagePath = (fileName: string): string =>
   isOFM() ? `images/${fileName}` : `/images/${fileName}`;
 
