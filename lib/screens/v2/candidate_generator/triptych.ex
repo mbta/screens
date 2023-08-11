@@ -14,7 +14,6 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
      %{
        screen_normal: [:header, :main_content],
        screen_takeover: [:full_screen]
-       # TODO: design requested the ability to display three images each covering one pane, we need a separate layout variation for that
      }}
     |> Builder.build_template()
   end
