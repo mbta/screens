@@ -7,7 +7,8 @@ defmodule Screens.Config.V2.TrainCrowding do
           direction_id: 0 | 1,
           # temporarily going with float, but will adjust based on design
           platform_position: float(),
-          front_car_direction: :left | :right
+          front_car_direction: :left | :right,
+          enabled: boolean()
         }
 
   @enforce_keys [:station_id, :direction_id, :platform_position, :front_car_direction]
@@ -15,7 +16,8 @@ defmodule Screens.Config.V2.TrainCrowding do
             route_id: "Orange",
             direction_id: nil,
             platform_position: nil,
-            front_car_direction: nil
+            front_car_direction: nil,
+            enabled: false
 
   use Screens.Config.Struct
 
