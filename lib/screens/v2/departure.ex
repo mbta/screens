@@ -243,4 +243,7 @@ defmodule Screens.V2.Departure do
   defp identify_stop_type_from_times(nil, _), do: :first_stop
   defp identify_stop_type_from_times(_, nil), do: :last_stop
   defp identify_stop_type_from_times(_, _), do: :mid_route_stop
+
+  def stop_for_vehicle(%Prediction{vehicle: %Vehicle{stop_id: stop_id}}), do: stop_id
+  def stop_for_vehicle(_), do: nil
 end

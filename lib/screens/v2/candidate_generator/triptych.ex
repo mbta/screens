@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
 
   alias Screens.V2.WidgetInstance.Placeholder
@@ -12,8 +13,7 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
   def screen_template do
     {:screen,
      %{
-       crowding_layout: [:left_two_panes, :third_pane],
-       screen_takeover: [:full_screen], # may not be used
+       screen_normal: [:full_screen],
        screen_split: [:first_pane, :second_pane, :third_pane]
      }}
     |> Builder.build_template()
@@ -21,10 +21,14 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
 
   @impl CandidateGenerator
   def candidate_instances(
-        _config,
-        _now \\ DateTime.utc_now()
+        config,
+        _now \\ DateTime.utc_now(),
+        crowding_widget_instances_fn \\ &Widgets.TrainCrowding.crowding_widget_instances/1,
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
     [
+      fn -> crowding_widget_instances_fn.(config) end,
+      fn -> evergreen_content_instances_fn.(config) end,
       fn -> placeholder_instances() end
     ]
     |> Task.async_stream(& &1.(), ordered: false, timeout: 20_000)
