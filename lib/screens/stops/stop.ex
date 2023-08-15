@@ -10,7 +10,7 @@ defmodule Screens.Stops.Stop do
 
   require Logger
 
-  alias Screens.Config.V2.{BusEink, BusShelter, Dup, GlEink, PreFare}
+  alias Screens.Config.V2.{BusEink, BusShelter, Dup, GlEink, PreFare, Triptych}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes
@@ -31,7 +31,7 @@ defmodule Screens.Stops.Stop do
           platform_code: String.t() | nil
         }
 
-  @type screen_type :: BusEink | BusShelter | GlEink | PreFare | Dup
+  @type screen_type :: BusEink | BusShelter | GlEink | PreFare | Dup | Triptych
 
   @blue_line_stops [
     {"place-wondl", {"Wonderland", "Wonderland"}},
@@ -368,6 +368,16 @@ defmodule Screens.Stops.Stop do
 
       _ ->
         nil
+    end
+  end
+
+  def fetch_parent_stop_id(stop_id) do
+    case Screens.V3Api.get_json("stops/" <> stop_id, %{"include" => "parent_station"}) do
+      {:ok, %{"included" => [included_data]}} ->
+        %{"id" => parent_station_id} = included_data
+        parent_station_id
+
+      _ -> nil
     end
   end
 
