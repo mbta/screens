@@ -8,6 +8,7 @@ defmodule Screens.Config.V2.Triptych do
           evergreen_content: list(EvergreenContentItem.t())
         }
 
+  @enforce_keys [:train_crowding, :evergreen_content]
   defstruct train_crowding: nil,
             evergreen_content: []
 

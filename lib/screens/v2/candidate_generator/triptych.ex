@@ -22,7 +22,6 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
   @impl CandidateGenerator
   def candidate_instances(
         config,
-        _now \\ DateTime.utc_now(),
         crowding_widget_instances_fn \\ &Widgets.TrainCrowding.crowding_widget_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
       ) do
@@ -40,7 +39,7 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
 
   defp placeholder_instances do
     [
-      %Placeholder{color: :blue, slot_names: [:left_two_panes]},
+      %Placeholder{color: :blue, slot_names: [:full_screen]},
       %Placeholder{color: :green, slot_names: [:third_pane]}
     ]
   end
