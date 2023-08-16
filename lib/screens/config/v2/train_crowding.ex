@@ -23,7 +23,6 @@ defmodule Screens.Config.V2.TrainCrowding do
 
   defp value_from_json("direction_id", "left"), do: :left
   defp value_from_json("direction_id", "right"), do: :right
-  
   defp value_from_json(_, value), do: value
 
   defp value_to_json(_, value), do: value

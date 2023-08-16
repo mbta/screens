@@ -17,27 +17,6 @@ defmodule Screens.Vehicles.Parser do
         "id" => vehicle_id,
         "relationships" => %{"trip" => trip_data, "stop" => stop_data}
       }) do
-        # test
-        # carriages = [
-        #   %{
-        #     "occupancy_status" => "MANY_SEATS_AVAILABLE",
-        #     "occupancy_percentage" => 20,
-        #     "label" => "some-carriage",
-        #     "carriage_sequence" => 1
-        #   },
-        #   %{
-        #     "occupancy_status" => "FULL",
-        #     "occupancy_percentage" => 99,
-        #     "label" => "some-carriage",
-        #     "carriage_sequence" => 2
-        #   },
-        #   %{
-        #     "occupancy_status" => "FEW_SEATS_AVAILABLE",
-        #     "occupancy_percentage" => 90,
-        #     "label" => "some-carriage",
-        #     "carriage_sequence" => 3
-        #   }
-        # ]
     %Screens.Vehicles.Vehicle{
       id: vehicle_id,
       direction_id: direction_id,
@@ -50,12 +29,12 @@ defmodule Screens.Vehicles.Parser do
   end
 
   defp parse_carriages(data), do: Enum.map(data, &parse_car_crowding/1)
-  
+
   defp parse_car_crowding(%{
-        "occupancy_status" => occupancy_status,
-        "occupancy_percentage" => occupancy_percentage,
-        "carriage_sequence" => carriage_sequence
-      }) do
+         "occupancy_status" => occupancy_status,
+         "occupancy_percentage" => occupancy_percentage,
+         "carriage_sequence" => carriage_sequence
+       }) do
     %{
       occupancy_status: parse_occupancy_status(occupancy_status),
       occupancy_percentage: occupancy_percentage,

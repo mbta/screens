@@ -377,7 +377,8 @@ defmodule Screens.Stops.Stop do
         %{"id" => parent_station_id} = included_data
         parent_station_id
 
-      _ -> nil
+      _ ->
+        nil
     end
   end
 
@@ -467,7 +468,7 @@ defmodule Screens.Stops.Stop do
               app in [BusEink, BusShelter, GlEink] ->
                 RoutePattern.fetch_stop_sequences_through_stop(stop_id)
 
-              app in [PreFare, Dup] ->
+              app in [PreFare, Dup, Triptych] ->
                 RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids)
             end) do
       {:ok,
@@ -497,6 +498,7 @@ defmodule Screens.Stops.Stop do
   # Ashmont should not show Mattapan alerts for PreFare or Dup
   def get_route_type_filter(app, "place-asmnl") when app in [PreFare, Dup], do: [:subway]
   def get_route_type_filter(PreFare, _), do: [:light_rail, :subway]
+  def get_route_type_filter(Triptych, _), do: [:light_rail, :subway]
   # WTC is a special bus-only case
   def get_route_type_filter(Dup, "place-wtcst"), do: [:bus]
   def get_route_type_filter(Dup, _), do: [:light_rail, :subway]

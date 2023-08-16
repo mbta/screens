@@ -12,10 +12,10 @@ defmodule Screens.Vehicles.Vehicle do
   @type current_status :: :incoming_at | :stopped_at | :in_transit_to | nil
   @type occupancy_status :: :many_seats_available | :few_seats_available | :full | nil
   @type car_crowding :: %{
-    occupancy_status: occupancy_status,
-    occupancy_percentage: integer,
-    carriage_sequence: integer
-  }
+          occupancy_status: occupancy_status,
+          occupancy_percentage: integer,
+          carriage_sequence: integer
+        }
 
   @type t :: %__MODULE__{
           id: String.t(),

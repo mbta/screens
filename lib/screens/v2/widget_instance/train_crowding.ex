@@ -25,7 +25,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
           front_car_direction: :left | :right,
           now: String.t()
         }
-  
+
   @type crowding_data :: %{
           crowding_level: 1 | 2 | 3,
           percentage: number
@@ -33,11 +33,10 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
 
   @spec serialize(t()) :: widget_data()
   def serialize(%__MODULE__{
-    screen: %Screen{app_params: %Triptych{train_crowding: train_crowding}},
-    prediction: prediction,
-    now: now
-  }) do
-
+        screen: %Screen{app_params: %Triptych{train_crowding: train_crowding}},
+        prediction: prediction,
+        now: now
+      }) do
     %{
       destination: prediction.trip.headsign,
       arrival_time: prediction.arrival_time,
