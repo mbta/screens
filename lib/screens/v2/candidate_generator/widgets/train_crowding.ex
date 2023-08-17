@@ -6,7 +6,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   alias Screens.Config.V2.{TrainCrowding, Triptych}
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
-  alias Screens.V2.Departure
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget
 
@@ -14,11 +13,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   def crowding_widget_instances(
         config,
         now \\ DateTime.utc_now(),
-        fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1
+        fetch_predictions_fn \\ &Prediction.fetch/1,
+        fetch_location_context_fn \\ &Stop.fetch_location_context/3,
+        fetch_parent_stop_id_fn \\ &Stop.fetch_parent_stop_id/1,
+        fetch_alerts_fn \\ &Alert.fetch/1
       )
 
   def crowding_widget_instances(
         %Screen{app_params: %Triptych{train_crowding: %TrainCrowding{enabled: false}}},
+        _,
+        _,
+        _,
         _,
         _
       ) do
@@ -28,6 +33,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   def crowding_widget_instances(
         %Screen{app_params: %Triptych{train_crowding: train_crowding}} = config,
         now,
+        fetch_predictions_fn,
+        fetch_location_context_fn,
+        fetch_parent_stop_id_fn,
         fetch_alerts_fn
       ) do
     with params = %{
@@ -35,33 +43,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
            route_ids: [train_crowding.route_id],
            stop_ids: [train_crowding.station_id]
          },
-         {:ok, predictions} <- Prediction.fetch(params),
-         next_train <- List.first(predictions),
+         {:ok, predictions} <- fetch_predictions_fn.(params),
          {:ok, location_context} <-
-           Stop.fetch_location_context(Triptych, train_crowding.station_id, now) do
-      # If no predictions, then no widget
-      next_station_for_train =
-        if next_train do
-          next_train
-          |> Departure.stop_for_vehicle()
-          |> Stop.fetch_parent_stop_id()
-        else
-          nil
-        end
+          fetch_location_context_fn.(Triptych, train_crowding.station_id, now),
+         {:ok, alerts} <-
+          params |> Map.to_list() |> fetch_alerts_fn.() do
 
-      alerts =
-        params
-        |> Map.to_list()
-        |> fetch_alerts_fn.()
+      next_train_prediction = List.first(predictions)
 
-      # If the train is headed to or stopped at this station, show the widget...
-      # UNLESS we're at a temporary terminal
-      if next_station_for_train == train_crowding.station_id and
+      # If there is an upcoming train, it's headed to this station, and we're not at a temporary terminal,
+      # show the widget
+      if !is_nil(next_train_prediction) and Prediction.vehicle_status(next_train_prediction) == :incoming_at and
+           next_train_prediction |> Prediction.stop_for_vehicle() |> fetch_parent_stop_id_fn.() == train_crowding.station_id and
            !any_alert_makes_this_a_terminal?(alerts, location_context) do
         [
           %CrowdingWidget{
             screen: config,
-            prediction: next_train,
+            prediction: next_train_prediction,
             now: now
           }
         ]
