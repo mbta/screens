@@ -38,12 +38,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
         fetch_parent_stop_id_fn,
         fetch_alerts_fn
       ) do
-    with params = %{
-           direction_id: train_crowding.direction_id,
-           route_ids: [train_crowding.route_id],
-           stop_ids: [train_crowding.station_id]
-         },
-         {:ok, predictions} <- fetch_predictions_fn.(params),
+    params = %{
+      direction_id: train_crowding.direction_id,
+      route_ids: [train_crowding.route_id],
+      stop_ids: [train_crowding.station_id]
+    }
+
+    with {:ok, predictions} <- fetch_predictions_fn.(params),
          {:ok, location_context} <-
            fetch_location_context_fn.(Triptych, train_crowding.station_id, now),
          {:ok, alerts} <-
@@ -79,6 +80,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
     end)
   end
 
+  # credo:disable-for-next-line
   # TODO: This isn't the first time we've written a temporary_terminal function, but this one
   # is a little more reusable? Consider using this func in other places
   defp temporary_terminal?(localized_alert) do

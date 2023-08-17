@@ -13,7 +13,7 @@ defmodule Screens.Vehicles.Vehicle do
   @type occupancy_status :: :many_seats_available | :few_seats_available | :full | nil
   @type car_crowding :: %{
           occupancy_status: occupancy_status,
-          occupancy_percentage: integer,
+          occupancy_percentage: integer | nil,
           carriage_sequence: integer
         }
 
