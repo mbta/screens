@@ -39,7 +39,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
       }) do
     %{
       destination: prediction.trip.headsign,
-      arrival_time: prediction.arrival_time,
+      arrival_time: serialize_time(prediction.arrival_time),
       crowding: prediction.vehicle.carriages,
       platform_position: train_crowding.platform_position,
       front_car_direction: train_crowding.front_car_direction,
