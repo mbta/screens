@@ -7,7 +7,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
   alias Screens.Config.V2.{TrainCrowding, Triptych}
   alias Screens.Predictions.Prediction
   alias Screens.Vehicles.Vehicle
-  alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget 
+  alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget
 
   setup :setup_base
 
@@ -29,23 +29,62 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
       app_id: :triptych_v2
     }
 
-    next_train_prediction = struct(Prediction, %{
-      vehicle: struct(Vehicle, %{stop_id: "10001", current_status: :incoming_at})
-    })
+    next_train_prediction =
+      struct(Prediction, %{
+        vehicle: struct(Vehicle, %{stop_id: "10001", current_status: :incoming_at})
+      })
 
     location_context = %Screens.LocationContext{
       home_stop: "place-masta",
       stop_sequences: [
-        ["place-ogmnl", "place-mlmnl", "place-welln", "place-astao", "place-sull",
-        "place-ccmnl", "place-north", "place-haecl", "place-state", "place-dwnxg",
-        "place-chncl", "place-tumnl", "place-bbsta", "place-masta", "place-rugg",
-        "place-rcmnl", "place-jaksn", "place-sbmnl", "place-grnst", "place-forhl"]
+        [
+          "place-ogmnl",
+          "place-mlmnl",
+          "place-welln",
+          "place-astao",
+          "place-sull",
+          "place-ccmnl",
+          "place-north",
+          "place-haecl",
+          "place-state",
+          "place-dwnxg",
+          "place-chncl",
+          "place-tumnl",
+          "place-bbsta",
+          "place-masta",
+          "place-rugg",
+          "place-rcmnl",
+          "place-jaksn",
+          "place-sbmnl",
+          "place-grnst",
+          "place-forhl"
+        ]
       ],
-      upstream_stops: MapSet.new(["place-astao", "place-bbsta", "place-ccmnl",
-      "place-chncl", "place-dwnxg", "place-haecl", "place-mlmnl", "place-north",
-      "place-ogmnl", "place-state", "place-sull", "place-tumnl", "place-welln"]),
-      downstream_stops: MapSet.new(["place-forhl", "place-grnst", "place-jaksn",
-      "place-rcmnl", "place-rugg", "place-sbmnl"]),
+      upstream_stops:
+        MapSet.new([
+          "place-astao",
+          "place-bbsta",
+          "place-ccmnl",
+          "place-chncl",
+          "place-dwnxg",
+          "place-haecl",
+          "place-mlmnl",
+          "place-north",
+          "place-ogmnl",
+          "place-state",
+          "place-sull",
+          "place-tumnl",
+          "place-welln"
+        ]),
+      downstream_stops:
+        MapSet.new([
+          "place-forhl",
+          "place-grnst",
+          "place-jaksn",
+          "place-rcmnl",
+          "place-rugg",
+          "place-sbmnl"
+        ]),
       routes: [
         %{
           active?: true,
@@ -95,7 +134,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
         created_at: ~U[2023-08-16 20:04:02Z],
         updated_at: ~U[2023-08-16 20:04:02Z],
         url: nil,
-        description: "Affected stops:\r\nHaymarket\r\nState\r\nDowntown Crossing\r\nChinatown\r\nTufts Medical Center\r\nBack Bay\r\nMassachusetts Avenue"
+        description:
+          "Affected stops:\r\nHaymarket\r\nState\r\nDowntown Crossing\r\nChinatown\r\nTufts Medical Center\r\nBack Bay\r\nMassachusetts Avenue"
       }
     ]
 
@@ -112,112 +152,124 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
   end
 
   defp disable_widget(config) do
-    %{config | app_params: %{config.app_params | train_crowding: %{config.app_params.train_crowding | enabled: false}}}
+    %{
+      config
+      | app_params: %{
+          config.app_params
+          | train_crowding: %{config.app_params.train_crowding | enabled: false}
+        }
+    }
   end
 
   describe "crowding_widget_instances/3" do
     test "returns crowding widget if train is on the way to this station", context do
       assert crowding_widget_instances(
-            context.config,
-            context.now,
-            context.fetch_predictions_fn,
-            context.fetch_location_context_fn,
-            context.fetch_parent_stop_id_fn,
-            context.fetch_empty_alerts_fn
-          ) == [
-            %CrowdingWidget{
-              screen: context.config,
-              prediction: context.next_train_prediction,
-              now: context.now
-            }
-          ]
+               context.config,
+               context.now,
+               context.fetch_predictions_fn,
+               context.fetch_location_context_fn,
+               context.fetch_parent_stop_id_fn,
+               context.fetch_empty_alerts_fn
+             ) == [
+               %CrowdingWidget{
+                 screen: context.config,
+                 prediction: context.next_train_prediction,
+                 now: context.now
+               }
+             ]
     end
 
     test "returns empty if train is not coming yet", context do
-      alt_prediction = struct(Prediction, %{
-        vehicle: struct(Vehicle, %{stop_id: "9999", current_status: :incoming_at})
-      })
+      alt_prediction =
+        struct(Prediction, %{
+          vehicle: struct(Vehicle, %{stop_id: "9999", current_status: :incoming_at})
+        })
 
       assert crowding_widget_instances(
-            context.config,
-            context.now,
-            fn _ -> {:ok, [alt_prediction]} end,
-            context.fetch_location_context_fn,
-            fn "9999" -> "place-bbsta" end,
-            context.fetch_empty_alerts_fn
-          ) == []
+               context.config,
+               context.now,
+               fn _ -> {:ok, [alt_prediction]} end,
+               context.fetch_location_context_fn,
+               fn "9999" -> "place-bbsta" end,
+               context.fetch_empty_alerts_fn
+             ) == []
     end
 
     test "returns empty if train has already arrived at this station", context do
-      alt_prediction = struct(Prediction, %{
-        vehicle: struct(Vehicle, %{stop_id: "10001", current_status: :stopped_at})
-      })
+      alt_prediction =
+        struct(Prediction, %{
+          vehicle: struct(Vehicle, %{stop_id: "10001", current_status: :stopped_at})
+        })
 
       assert crowding_widget_instances(
-            context.config,
-            context.now,
-            fn _ -> {:ok, [alt_prediction]} end,
-            context.fetch_location_context_fn,
-            context.fetch_parent_stop_id_fn,
-            context.fetch_empty_alerts_fn
-          ) == []
+               context.config,
+               context.now,
+               fn _ -> {:ok, [alt_prediction]} end,
+               context.fetch_location_context_fn,
+               context.fetch_parent_stop_id_fn,
+               context.fetch_empty_alerts_fn
+             ) == []
     end
 
-    test "returns empty if there is a shuttle / suspension that makes this station a temp terminal", context do
+    test "returns empty if there is a shuttle / suspension that makes this station a temp terminal",
+         context do
       assert crowding_widget_instances(
-            context.config,
-            context.now,
-            context.fetch_predictions_fn,
-            context.fetch_location_context_fn,
-            context.fetch_parent_stop_id_fn,
-            context.fetch_alerts_fn
-          ) == []
+               context.config,
+               context.now,
+               context.fetch_predictions_fn,
+               context.fetch_location_context_fn,
+               context.fetch_parent_stop_id_fn,
+               context.fetch_alerts_fn
+             ) == []
     end
 
     test "returns empty if there are no predictions", context do
       assert crowding_widget_instances(
-            context.config,
-            context.now,
-            fn _ -> {:ok, []} end,
-            context.fetch_location_context_fn,
-            context.fetch_parent_stop_id_fn,
-            context.fetch_empty_alerts_fn
-          ) == []
+               context.config,
+               context.now,
+               fn _ -> {:ok, []} end,
+               context.fetch_location_context_fn,
+               context.fetch_parent_stop_id_fn,
+               context.fetch_empty_alerts_fn
+             ) == []
     end
 
     test "returns empty if any fetches fail", context do
       assert crowding_widget_instances(
-            context.config,
-            context.now,
-            fn _ -> :error end,
-            context.fetch_location_context_fn,
-            context.fetch_parent_stop_id_fn,
-            context.fetch_empty_alerts_fn
-          ) == []
+               context.config,
+               context.now,
+               fn _ -> :error end,
+               context.fetch_location_context_fn,
+               context.fetch_parent_stop_id_fn,
+               context.fetch_empty_alerts_fn
+             ) == []
+
       assert crowding_widget_instances(
-            context.config,
-            context.now,
-            context.fetch_predictions_fn,
-            fn _, _, _ -> :error end,
-            context.fetch_parent_stop_id_fn,
-            context.fetch_empty_alerts_fn
-          ) == []
+               context.config,
+               context.now,
+               context.fetch_predictions_fn,
+               fn _, _, _ -> :error end,
+               context.fetch_parent_stop_id_fn,
+               context.fetch_empty_alerts_fn
+             ) == []
+
       assert crowding_widget_instances(
-            context.config,
-            context.now,
-            context.fetch_predictions_fn,
-            context.fetch_location_context_fn,
-            fn _ -> :error end,
-            context.fetch_empty_alerts_fn
-          ) == []
+               context.config,
+               context.now,
+               context.fetch_predictions_fn,
+               context.fetch_location_context_fn,
+               fn _ -> :error end,
+               context.fetch_empty_alerts_fn
+             ) == []
+
       assert crowding_widget_instances(
-            context.config,
-            context.now,
-            context.fetch_predictions_fn,
-            context.fetch_location_context_fn,
-            context.fetch_parent_stop_id_fn,
-            fn _ -> :error end
-          ) == []
+               context.config,
+               context.now,
+               context.fetch_predictions_fn,
+               context.fetch_location_context_fn,
+               context.fetch_parent_stop_id_fn,
+               fn _ -> :error end
+             ) == []
     end
 
     test "returns empty if widget is disabled", %{config: config} do

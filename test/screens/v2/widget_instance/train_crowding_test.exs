@@ -20,48 +20,50 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
           })
       })
 
-    prediction = struct(Prediction, %{
-      trip: %{
-        headsign: "Oak Grove"
-      },
-      arrival_time: ~U[2023-08-16 21:10:00Z],
-      vehicle: struct(Vehicle, %{
-        stop_id: "10001",
-        current_status: :incoming_at,
-        carriages: [
-          %{
-            occupancy_status: :many_seats_available,
-            occupancy_percentage: 20,
-            carriage_sequence: 1
-          },
-          %{
-            occupancy_status: :few_seats_available,
-            occupancy_percentage: 80,
-            carriage_sequence: 2
-          },
-          %{
-            occupancy_status: :few_seats_available,
-            occupancy_percentage: 85,
-            carriage_sequence: 3
-          },
-          %{
-            occupancy_status: :many_seats_available,
-            occupancy_percentage: 25,
-            carriage_sequence: 4
-          },
-          %{
-            occupancy_status: :full,
-            occupancy_percentage: 98,
-            carriage_sequence: 5
-          },
-          %{
-            occupancy_status: nil,
-            occupancy_percentage: nil,
-            carriage_sequence: 6
-          }
-        ]
+    prediction =
+      struct(Prediction, %{
+        trip: %{
+          headsign: "Oak Grove"
+        },
+        arrival_time: ~U[2023-08-16 21:10:00Z],
+        vehicle:
+          struct(Vehicle, %{
+            stop_id: "10001",
+            current_status: :incoming_at,
+            carriages: [
+              %{
+                occupancy_status: :many_seats_available,
+                occupancy_percentage: 20,
+                carriage_sequence: 1
+              },
+              %{
+                occupancy_status: :few_seats_available,
+                occupancy_percentage: 80,
+                carriage_sequence: 2
+              },
+              %{
+                occupancy_status: :few_seats_available,
+                occupancy_percentage: 85,
+                carriage_sequence: 3
+              },
+              %{
+                occupancy_status: :many_seats_available,
+                occupancy_percentage: 25,
+                carriage_sequence: 4
+              },
+              %{
+                occupancy_status: :full,
+                occupancy_percentage: 98,
+                carriage_sequence: 5
+              },
+              %{
+                occupancy_status: nil,
+                occupancy_percentage: nil,
+                carriage_sequence: 6
+              }
+            ]
+          })
       })
-    })
 
     widget = %WidgetInstance{
       screen: config,
@@ -117,11 +119,13 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
       assert expected == WidgetInstance.serialize(widget)
     end
   end
+
   describe "priority/1" do
     test "returns max priority", %{widget: widget} do
       assert [1] == WidgetInstance.priority(widget)
     end
   end
+
   describe "slot_names/1" do
     test "returns [:full_screen]", %{widget: widget} do
       assert [:full_screen] == WidgetInstance.slot_names(widget)
