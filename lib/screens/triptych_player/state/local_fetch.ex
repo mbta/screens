@@ -1,4 +1,6 @@
 defmodule Screens.TriptychPlayer.State.LocalFetch do
+  @moduledoc false
+
   @behaviour Screens.ConfigCache.State.Fetch
 
   @impl true

@@ -1,6 +1,8 @@
 defmodule Screens.TriptychPlayer.State do
-  alias Screens.ConfigCache.State.Fetch
+  @moduledoc false
+
   alias Screens.Config
+  alias Screens.ConfigCache.State.Fetch
 
   @fetcher Application.compile_env(:screens, :triptych_player_fetcher)
   @last_deploy_fetcher Application.compile_env(:screens, :last_deploy_fetcher)
