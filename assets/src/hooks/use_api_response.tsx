@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { isOFM, isRealScreen } from "Util/util";
+import { isOFM } from "Util/outfront";
+import { isRealScreen } from "Util/util";
 import useInterval from "Hooks/use_interval";
 import { getDatasetValue } from "Util/dataset";
 import * as SentryLogger from "Util/sentry";

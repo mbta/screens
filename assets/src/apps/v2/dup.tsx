@@ -37,7 +37,8 @@ import {
 import PageLoadNoData from "Components/v2/dup/page_load_no_data";
 import NoData from "Components/v2/dup/no_data";
 import OvernightDepartures from "Components/v2/dup/overnight_departures";
-import useOutfrontPlayerName from "Hooks/use_outfront_player_name";
+import { usePlayerName } from "Hooks/outfront";
+import { isDUP } from "Util/outfront";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -122,9 +123,8 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
-  const playerName = useOutfrontPlayerName();
-
-  if (playerName !== null) {
+  if (isDUP()) {
+    const playerName = usePlayerName()!;
     const id = `DUP-${playerName.trim()}`;
     return (
       <MappingContext.Provider value={TYPE_TO_COMPONENT}>

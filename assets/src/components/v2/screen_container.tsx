@@ -9,12 +9,13 @@ import React, {
 import useApiResponse, {
   ApiResponse,
   SimulationApiResponse,
-  useOFMApiResponse,
+  useDUPApiResponse,
+  useTriptychApiResponse,
 } from "Hooks/v2/use_api_response";
 import WidgetTreeErrorBoundary from "Components/v2/widget_tree_error_boundary";
 import Widget, { WidgetData } from "Components/v2/widget";
 import useAudioReadout from "Hooks/v2/use_audio_readout";
-import { isOFM } from "Util/util";
+import { isDUP, isOFM, isTriptych } from "Util/outfront";
 
 type ResponseMapper = (
   apiResponse: ApiResponse
@@ -95,23 +96,34 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
   const responseMapper = useContext(ResponseMapperContext);
   const ErrorBoundaryOrFragment = isOFM() ? Fragment : WidgetTreeErrorBoundary;
 
+  const widgetData = responseMapper(apiResponse);
+
   return (
     <div className="screen-container">
       <ErrorBoundaryOrFragment>
-        {apiResponse && <Widget data={responseMapper(apiResponse)} />}
+        {apiResponse && <Widget data={widgetData} />}
       </ErrorBoundaryOrFragment>
       {showBlink && <div className="screen-container-blink" />}
     </div>
   );
 };
 
+const getApiResponseHook = () => {
+  if (isDUP()) {
+    return useDUPApiResponse;
+  } else if (isTriptych()) {
+    return useTriptychApiResponse;
+  } else {
+    return useApiResponse;
+  }
+};
+
 const ScreenContainer = ({ id }) => {
   const blinkConfig = useContext(BlinkConfigContext);
   const audioConfig = useContext(AudioConfigContext);
   const [showBlink, setShowBlink] = useState(false);
-  const hook = isOFM() ? useOFMApiResponse : useApiResponse;
 
-  const { apiResponse, requestCount, lastSuccess } = hook({ id });
+  const { apiResponse, requestCount, lastSuccess } = getApiResponseHook()({ id });
 
   useAudioReadout({ id, config: audioConfig });
 

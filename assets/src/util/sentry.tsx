@@ -1,4 +1,5 @@
-import { isOFM, isRealScreen } from "Util/util";
+import { isOFM } from "Util/outfront";
+import { isRealScreen } from "Util/util";
 import { getDataset } from "Util/dataset";
 // Previously tried @sentry/react and @sentry/browser as the SDK, but the QtWeb browser on e-inks could not
 // use them. Raven is an older stable SDK that better works with older browsers.

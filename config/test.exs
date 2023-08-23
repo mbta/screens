@@ -11,6 +11,7 @@ config :screens,
   last_deploy_fetcher: Screens.Util.LastDeploy.LocalFetch,
   local_config_file_spec: {:test, "config.json"},
   local_signs_ui_config_file_spec: {:test, "signs_ui_config.json"},
+  local_triptych_player_file_spec: {:test, "triptych_player_to_screen_id.json"},
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.LocalFetch,
   # This will help us write testable functions.
   # Functions that request external data cause flaky tests, so to stop us from writing tests that execute API requests,

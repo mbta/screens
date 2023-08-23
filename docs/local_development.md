@@ -42,7 +42,9 @@
 
 1. Install Elixir dependencies with `mix deps.get`
 1. Install Node.js dependencies with `npm install --prefix assets`
-1. Get access to our S3 bucket from DevOps and/or a teammate and save the JSON found at mbta-ctd-config/screens/screens-prod.json as `priv/local.json` to supply your local server with config values. You will also need to grab the signs_ui_config JSON and save it at `priv/signs_ui_config.json`.
+1. Get access to our S3 bucket from DevOps and/or a teammate and save the JSON found at mbta-ctd-config/screens/screens-prod.json as `priv/local.json` to supply your local server with config values.
+   1. You will also need to grab the signs_ui_config JSON and save it at `priv/signs_ui_config.json`.
+   1. You will also need to create `priv/triptych_player_to_screen_id.json`. If you expect to be testing the packaged triptych client sometime soon, copy the contents of mbta-ctd-config/screens/triptych_player_to_screen_id-prod.json into it. Otherwise, its contents can just be an empty object, `{}`.
 1. Visit [AWS security credentials](https://console.aws.amazon.com/iam/home#/security_credentials) and create an access key if you don't already have it. Save the access key ID and secret access key as environment variables:
 
    ```sh

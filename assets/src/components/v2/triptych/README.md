@@ -1,7 +1,7 @@
 # Triptych app packaging
 
 - Ensure [Corsica](https://hexdocs.pm/corsica/Corsica.html) is used on the server to allow CORS requests (ideally limited to just the triptych-relevant routes). It should already be configured at [this line](/lib/screens_web/controllers/v2/screen_api_controller.ex#L9) in the API controller--if it is, you don't need to do anything for this step.
-- Double check that any behavior specific to the triptych screen environment happens inside of an `isOFM()` check. This includes:
+- Double check that any behavior specific to the triptych screen environment happens inside of an `isTriptych()` or `isOFM()` check. This includes:
   - `buildApiPath` in use_api_response.tsx should return a full URL for the API path: prefix `apiPath` string with "https://screens.mbta.com".
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
 - Create priv/static/triptych-app.html if it doesn’t already exist. Copy paste the following contents in:
@@ -32,20 +32,27 @@
 - Set the version string in assets/src/components/v2/triptych/version.tsx to `current_year.current_month.current_day.1`.
 - In assets/webpack.config.js, change `publicPath` in the font config to have value `'fonts/'`.
 - **Only if you are packaging for local testing**
-  - replace `const playerName = useOutfrontPlayerName();` in assets/src/apps/v2/triptych.tsx with `const playerName = "BKB-TRI-001";` (or any other player name from one of the triptych screen IDs (`TRI-${playerName}`)). This data is provided by Outfront's "wrapper" app that runs on the real triptych screens, but we need to set it ourselves during testing. Think of it as a sort of frontend environment variable.
-  - replace `apiPath = "https://screens.mbta.com...";` in assets/src/hooks/v2/use_api_response.tsx with `apiPath = "http://localhost:4000...";`.
+  - add the following to the top of assets/src/apps/v2/triptych.tsx, filling in the string values:
+    ```ts
+    import { __TEST_setFakeMRAID__ } from "Util/outfront";
+    __TEST_setFakeMRAID__({
+      playerName: "<a player name from priv/triptych_player_to_screen_id.json>",
+      station: "<a station name>",
+      triptychPane: "<right | middle | left>"
+    });
+    ```
+    This sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
+    The MRAID object gives our client info about which screen it's running on.
+  - replace the definition of `getOutfrontAbsolutePath` in assets/src/hooks/v2/use_api_response.tsx with `const getOutfrontAbsolutePath = () => isOFM() ? "http://localhost:4000" : "";`.
+  - make sure priv/triptych_player_to_screen_id.json mirrors mbta-ctd-config/screens/triptych_player_to_screen_id-prod.json, or at least contains a mapping for the `playerName` that you hardcoded two steps ago.
 - `cd` to priv/static and run the following:
   ```sh
-  for PANE in left middle right; do
-    echo "export const TRIPTYCH_PANE = \"${PANE}\";" > ../../assets/src/components/v2/triptych/pane.tsx
-    npm --prefix ../../assets run deploy
-    cp -r css/triptych_v2.css js/polyfills.js js/triptych_v2.js ../triptych_preview.png .
-    cp ../triptych_template.json ./template.json
-    sed -i "" -E "s/TRIPTYCH APP [[:alpha:]]+/TRIPTYCH APP $(echo $PANE | tr 'a-z' 'A-Z')/" template.json
-    zip -r triptych-app-${PANE}.zip triptych_v2.css polyfills.js triptych_v2.js fonts images triptych-app.html template.json triptych_preview.png
-  done
+  npm --prefix ../../assets run deploy && \
+  cp -r css/triptych_v2.css js/polyfills.js js/triptych_v2.js ../triptych_preview.png . && \
+  cp ../triptych_template.json ./template.json && \
+  zip -r triptych-app.zip triptych_v2.css polyfills.js triptych_v2.js fonts images triptych-app.html template.json triptych_preview.png
   ```
-- On completion, the packaged client apps will be saved at `priv/static/triptych-app-(left|middle|right).zip`.
+- On completion, the packaged client app will be saved at `priv/static/triptych-app.zip`.
 - Commit the version bump on a branch, push it, and create a PR to mark the deploy.
 
 ## Debugging
@@ -54,8 +61,21 @@ To assist with debugging on the triptych screens, you can paste this at the modu
 show up on the screen:
 
 ```js
+const Counter = (() => {
+  let n = 0;
+
+  return {
+    next() {
+      let cur = n;
+      n = (n + 1) % 100;
+      return `${cur.toString().padStart(2, "0")}`;
+    }
+  };
+})();
+
 const dEl = document.createElement("div");
 dEl.id = "debug";
+dEl.className = "triptych";
 document.body.appendChild(dEl);
 // save the original console.log function
 const old_logger = console.log;
@@ -78,6 +98,6 @@ console.log = function (...msgs) {
     .join(" ");
 
   // add the log to the html element.
-  html_logger.innerHTML += "<div>" + text + "<div>";
+  html_logger.innerHTML = `<div class="line">${Counter.next()} ${text} </div>${html_logger.innerHTML}`;
 };
 ```

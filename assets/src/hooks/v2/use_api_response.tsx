@@ -2,10 +2,10 @@ import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useState } from "react";
 import { getDataset, getDatasetValue } from "Util/dataset";
-import { getScreenSide, isDUP, isOFM, isRealScreen, isTriptych } from "Util/util";
+import { isDUP, isOFM, isTriptych, getTriptychPane } from "Util/outfront";
+import { getScreenSide, isRealScreen } from "Util/util";
 import * as SentryLogger from "Util/sentry";
 import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
-import { TRIPTYCH_PANE } from "Components/v2/triptych/pane";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -119,7 +119,6 @@ const getScreenSideParam = () => {
 };
 
 const getRequestorParam = () => {
-  // Adding this to v2 because we will eventually widgetize DUPs.
   if (isOFM()) return `&requestor=real_screen`;
 
   let requestor = getDatasetValue("requestor");
@@ -129,6 +128,23 @@ const getRequestorParam = () => {
 
   return requestor ? `&requestor=${requestor}` : "";
 };
+
+const getLoggingParams = () => {
+  if (isDUP()) {
+    return `&rotation_index=${ROTATION_INDEX}`;
+  }
+
+  if (isTriptych()) {
+    const triptychPane = getTriptychPane();
+    if (triptychPane != null) {
+      return `&pane=${triptychPane}`;
+    }
+  }
+
+  return "";
+};
+
+const getOutfrontAbsolutePath = () => isOFM() ? "https://screens.mbta.com" : "";
 
 interface UseApiResponseArgs {
   id: string;
@@ -151,6 +167,8 @@ const useBaseApiResponse = ({
   const isRealScreenParam = getIsRealScreenParam();
   const screenSideParam = getScreenSideParam();
   const requestorParam = getRequestorParam();
+  const loggingParams = getLoggingParams();
+  const outfrontAbsolutePath = getOutfrontAbsolutePath();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
@@ -162,16 +180,7 @@ const useBaseApiResponse = ({
   } = getDataset();
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
-  let apiPath = `/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}`;
-
-  if (isOFM()) {
-    apiPath = `https://screens.mbta.com${apiPath}`;
-    if (isDUP()) {
-      apiPath = `${apiPath}&rotation_index=${ROTATION_INDEX}`;
-    } else if (isTriptych()) {
-      apiPath = `${apiPath}&pane=${TRIPTYCH_PANE}`;
-    }
-  }
+  const apiPath = `${outfrontAbsolutePath}/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}${loggingParams}`;
 
   if (screenIdsWithOffsetMap) {
     const screens = JSON.parse(screenIdsWithOffsetMap);
@@ -245,15 +254,25 @@ const useSimulationApiResponse = ({ id }) =>
 // route that's more permissive of CORS, since these clients are loaded from a local html file
 // (and thus their data requests to our server are cross-origin).
 //
-// Besides the CORS stuff, this different route runs exactly the same backend logic as the normal one
-// used by `useApiResponse`.
-const useOFMApiResponse = ({ id }) =>
+// The /dup endpoint only has the CORS stuff, and otherwise runs exactly the same backend logic as
+// the normal one used by `useApiResponse`.
+//
+// The /triptych endpoint has the CORS stuff, plus an additional step that maps the player name of
+// the individual triptych pane to a screen ID representing the collective trio.
+const useDUPApiResponse = ({ id }) =>
   useBaseApiResponse({
     id,
-    routePart: "/ofm",
+    routePart: "/dup",
+    responseHandler: rawResponseToApiResponse,
+  });
+
+const useTriptychApiResponse = ({ id }) =>
+  useBaseApiResponse({
+    id,
+    routePart: "/triptych",
     responseHandler: rawResponseToApiResponse,
   });
 
 export default useApiResponse;
 export { ApiResponse, SimulationApiResponse };
-export { useSimulationApiResponse, useOFMApiResponse };
+export { useSimulationApiResponse, useDUPApiResponse, useTriptychApiResponse };

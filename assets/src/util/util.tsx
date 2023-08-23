@@ -1,8 +1,7 @@
-import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
-import { TRIPTYCH_PANE } from "Components/v2/triptych/pane";
 import moment from "moment";
 import "moment-timezone";
 import { getDatasetValue } from "Util/dataset";
+import { isOFM } from "Util/outfront";
 
 export const classWithModifier = (baseClass, modifier) => {
   if (!modifier) {
@@ -25,28 +24,6 @@ export const classWithModifiers = (baseClass, modifiers) => {
 export const formatTimeString = (timeString: string) =>
   moment(timeString).tz("America/New_York").format("h:mm");
 
-/**
- * Returns true if this client is running on an Outfront Media screen.
- * (A DUP or a triptych.)
- *
- * Use this for OFM-specific logic that is common to both the DUP and triptych apps.
- */
-export const isOFM = () => location.href.startsWith("file:");
-
-/**
- * Returns true if this client is running on a DUP screen.
- *
- * Use this for DUP-specific logic.
- */
-export const isDUP = () => /^file:.*dup-app.*/.test(location.href);
-
-/**
- * Returns true if this client is running on a triptych screen.
- *
- * Use this for triptych-specific logic.
- */
-export const isTriptych = () => /^file:.*triptych-app.*/.test(location.href);
-
 export const imagePath = (fileName: string): string =>
   isOFM() ? `images/${fileName}` : `/images/${fileName}`;
 
@@ -61,16 +38,6 @@ const isScreenSide = (value: any): value is ScreenSide => {
   return value === "left" || value === "right";
 };
 
-type RotationIndex = "0" | "1" | "2";
-const isRotationIndex = (value: any): value is RotationIndex => {
-  return value === "0" || value === "1" || value === "2";
-};
-
-type TriptychPane = "left" | "middle" | "right";
-const isTriptychPane = (value: any): value is TriptychPane => {
-  return value === "left" || value === "middle" || value === "right";
-};
-
 /**
  * For screen types that are split across two separate displays (pre-fare),
  * this gets the value of the data attribute dictating which side to show.
@@ -81,21 +48,5 @@ export const getScreenSide = (): ScreenSide | null => {
   const screenSide = getDatasetValue("screenSide");
   return isScreenSide(screenSide) ? screenSide : null;
 };
-
-export const getRotationIndex = (): RotationIndex | null => {
-  const rotationIndex = isOFM()
-    ? ROTATION_INDEX.toString()
-    : getDatasetValue("rotationIndex");
-
-  return isRotationIndex(rotationIndex) ? rotationIndex : null;
-};
-
-export const getTriptychPane = (): TriptychPane | null => {
-  const pane = isOFM()
-    ? TRIPTYCH_PANE
-    : getDatasetValue("triptychPane");
-
-  return isTriptychPane(pane) ? pane : null;
-}
 
 export const firstWord = (str: string): string => str.split(" ")[0];

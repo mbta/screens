@@ -17,10 +17,10 @@ import {
   MultiRotationPage,
   SimulationPage,
 } from "Components/dup/dup_screen_page";
-import { isOFM } from "Util/util";
+import { isDUP } from "Util/outfront";
 
 const App = (): JSX.Element => {
-  if (isOFM()) {
+  if (isDUP()) {
     return <ScreenPage screenContainer={ScreenContainer} />;
   } else {
     return (

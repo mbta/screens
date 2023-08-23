@@ -1,7 +1,7 @@
 {
   "templates": [
     {
-      "displayName": "MBTA - TRIPTYCH APP LEFT",
+      "displayName": "MBTA - TRIPTYCH APP",
       "preview": "triptych_preview.png",
       "indexTemplate": "triptych-app.html",
       "previewOrientation": "landscape"

@@ -5,6 +5,7 @@ Some steps call for opening VS Code's "command palette"—you can do that with t
 ## Access and keys
 1. Get access to our S3 bucket from DevOps and/or a teammate.
    1. Save the JSON found at mbta-ctd-config/screens/screens-prod.json as `priv/local.json` to supply your local server with screen configurations.
+   1. Save the JSON found at mbta-ctd-config/screens/triptych_player_to_screen_id-prod.json as `priv/triptych_player_to_screen_id.json` to supply your local server with a mapping from triptych player name to screen ID. You can also just put `{}` into that file, if you don't expect to be testing the packaged triptych client anytime soon.
    1. Save the JSON found at mbta-signs/config.json as `priv/signs_ui_config.json` to supply your local server with route headway information.
 1. Visit [AWS security credentials](https://console.aws.amazon.com/iam/home#/security_credentials) and create an access key if you don't already have it. Keep the tab with this info open; you'll use it shortly.
 1. Sign up for a [V3 API key](https://api-v3.mbta.com/). Keep the tab with this info open; you'll use it shortly.

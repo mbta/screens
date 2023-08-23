@@ -1,14 +1,14 @@
-import useOutfrontStation from "Hooks/use_outfront_station";
 import React, { ComponentType } from "react";
 import LinkArrow from "../bundled_svg/link_arrow";
 import Loading from "../../../../static/images/svgr_bundled/loading.svg";
 import NormalHeader from "./normal_header";
 import { REPLACEMENTS } from "./no_data";
+import { useStationName } from "Hooks/outfront";
 
 const PageLoadNoData: ComponentType = () => {
-  let stationName = useOutfrontStation() || "Transit information";
+  let stationName = useStationName() || "Transit information";
   stationName = REPLACEMENTS[stationName] || stationName;
-  
+
   return (
     <div className="loading__container">
       <NormalHeader text={stationName} />

@@ -26,7 +26,8 @@ import TakeoverScreen from "Components/v2/triptych/takeover_screen";
 import PageLoadNoData from "Components/v2/triptych/page_load_no_data";
 import NoData from "Components/v2/triptych/no_data";
 
-import useOutfrontPlayerName from "Hooks/use_outfront_player_name";
+import { usePlayerName } from "Hooks/outfront";
+import { isTriptych } from "Util/outfront";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -61,15 +62,14 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
-  const playerName = useOutfrontPlayerName();
+  if (isTriptych()) {
+    const playerName = usePlayerName()!;
 
-  if (playerName !== null) {
-    const id = `TRI-${playerName.trim()}`;
     return (
       <MappingContext.Provider value={TYPE_TO_COMPONENT}>
         <ResponseMapperContext.Provider value={responseMapper}>
           <Viewport>
-            <ScreenPage id={id} />
+            <ScreenPage id={playerName} />
           </Viewport>
         </ResponseMapperContext.Provider>
       </MappingContext.Provider>

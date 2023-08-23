@@ -1,6 +1,6 @@
 import React from "react";
 
-import { getTriptychPane } from "Util/util";
+import { getTriptychPane } from "Util/outfront";
 
 /**
  * Shifts one of the three triptych panes into view
