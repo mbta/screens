@@ -35,8 +35,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
       }) do
     %{
       destination: prediction.trip.headsign,
-      crowding:
-        Enum.map(prediction.vehicle.carriages, fn car -> serialize_occupancy_status(car) end),
+      crowding: serialize_carriages(prediction.vehicle.carriages),
       platform_position: train_crowding.platform_position,
       front_car_direction: train_crowding.front_car_direction,
       now: serialize_time(now)
@@ -46,6 +45,9 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   defp serialize_time(%DateTime{} = time) do
     DateTime.to_iso8601(time)
   end
+
+  defp serialize_carriages(nil), do: nil
+  defp serialize_carriages(carriages), do: Enum.map(carriages, fn car -> serialize_occupancy_status(car) end)
 
   defp serialize_occupancy_status(:no_data_available), do: :no_data
   defp serialize_occupancy_status(:many_seats_available), do: :not_crowded
