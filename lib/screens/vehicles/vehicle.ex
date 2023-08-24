@@ -14,7 +14,6 @@ defmodule Screens.Vehicles.Vehicle do
   @type car_crowding :: %{
           occupancy_status: occupancy_status,
           occupancy_percentage: integer | nil,
-          carriage_sequence: integer
         }
 
   @type t :: %__MODULE__{

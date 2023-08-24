@@ -19,7 +19,6 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
 
   @type widget_data :: %{
           destination: String.t(),
-          arrival_time: String.t(),
           crowding: list(crowding_data),
           platform_position: number,
           front_car_direction: :left | :right,
@@ -39,7 +38,6 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
       }) do
     %{
       destination: prediction.trip.headsign,
-      arrival_time: serialize_time(prediction.arrival_time),
       crowding: serialize_crowding(prediction.vehicle.carriages),
       platform_position: train_crowding.platform_position,
       front_car_direction: train_crowding.front_car_direction,
@@ -54,7 +52,6 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   defp serialize_crowding(carriages) do
     Enum.map(carriages, fn train_car -> 
       %{
-        carriage_sequence: train_car.carriage_sequence,
         occupancy_percentage: train_car.occupancy_percentage,
         occupancy_status: serialize_occupancy_status(train_car.occupancy_status)
       }

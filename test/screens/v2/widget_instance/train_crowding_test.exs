@@ -25,7 +25,6 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
         trip: %{
           headsign: "Oak Grove"
         },
-        arrival_time: ~U[2023-08-16 21:10:00Z],
         vehicle:
           struct(Vehicle, %{
             stop_id: "10001",
@@ -34,32 +33,26 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
               %{
                 occupancy_status: :many_seats_available,
                 occupancy_percentage: 20,
-                carriage_sequence: 1
               },
               %{
                 occupancy_status: :few_seats_available,
                 occupancy_percentage: 80,
-                carriage_sequence: 2
               },
               %{
                 occupancy_status: :few_seats_available,
                 occupancy_percentage: 85,
-                carriage_sequence: 3
               },
               %{
                 occupancy_status: :many_seats_available,
                 occupancy_percentage: 25,
-                carriage_sequence: 4
               },
               %{
                 occupancy_status: :full,
                 occupancy_percentage: 98,
-                carriage_sequence: 5
               },
               %{
                 occupancy_status: nil,
                 occupancy_percentage: nil,
-                carriage_sequence: 6
               }
             ]
           })
@@ -78,37 +71,30 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
     test "serializes data", %{widget: widget} do
       expected = %{
         destination: "Oak Grove",
-        arrival_time: "2023-08-16T21:10:00Z",
         crowding: [
           %{
             occupancy_status: :many_seats_available,
             occupancy_percentage: 20,
-            carriage_sequence: 1
           },
           %{
             occupancy_status: :few_seats_available,
             occupancy_percentage: 80,
-            carriage_sequence: 2
           },
           %{
             occupancy_status: :few_seats_available,
             occupancy_percentage: 85,
-            carriage_sequence: 3
           },
           %{
             occupancy_status: :many_seats_available,
             occupancy_percentage: 25,
-            carriage_sequence: 4
           },
           %{
             occupancy_status: :full,
             occupancy_percentage: 98,
-            carriage_sequence: 5
           },
           %{
             occupancy_status: nil,
             occupancy_percentage: nil,
-            carriage_sequence: 6
           }
         ],
         platform_position: 3,

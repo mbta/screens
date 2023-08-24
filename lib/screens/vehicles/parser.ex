@@ -33,12 +33,10 @@ defmodule Screens.Vehicles.Parser do
   defp parse_car_crowding(%{
          "occupancy_status" => occupancy_status,
          "occupancy_percentage" => occupancy_percentage,
-         "carriage_sequence" => carriage_sequence
        }) do
     %{
       occupancy_status: parse_occupancy_status(occupancy_status),
       occupancy_percentage: occupancy_percentage,
-      carriage_sequence: carriage_sequence
     }
   end
 
