@@ -37,50 +37,10 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
         prediction: prediction,
         now: now
       }) do
-    # %{
-    #   destination: prediction.trip.headsign,
-    #   arrival_time: serialize_time(prediction.arrival_time),
-    #   # update with correct serializer
-    #   crowding: prediction.vehicle.carriages,
-    #   platform_position: train_crowding.platform_position,
-    #   front_car_direction: train_crowding.front_car_direction,
-    #   now: serialize_time(now)
-    # }
     %{
       destination: prediction.trip.headsign,
       arrival_time: serialize_time(prediction.arrival_time),
-      crowding: [
-        %{
-          carriage_sequence: 1,
-          occupancy_percentage: 8,
-          occupancy_status: "not_crowded"
-        },
-        %{
-          carriage_sequence: 2,
-          occupancy_percentage: 10,
-          occupancy_status: "not_crowded"
-        },
-        %{
-          carriage_sequence: 3,
-          occupancy_percentage: 30,
-          occupancy_status: "some_crowding"
-        },
-        %{
-          carriage_sequence: 4,
-          occupancy_percentage: 50,
-          occupancy_status: "some_crowding"
-        },
-        %{
-          carriage_sequence: 5,
-          occupancy_percentage: 80,
-          occupancy_status: "crowded"
-        },
-        %{
-          carriage_sequence: 6,
-          occupancy_percentage: nil,
-          occupancy_status: "no_data"
-        },
-      ],
+      crowding: serialize_crowding(prediction.vehicle.carriages),
       platform_position: train_crowding.platform_position,
       front_car_direction: train_crowding.front_car_direction,
       now: serialize_time(now)
@@ -90,6 +50,24 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   defp serialize_time(%DateTime{} = time) do
     DateTime.to_iso8601(time)
   end
+
+  defp serialize_crowding(carriages) do
+    Enum.map(carriages, fn train_car -> 
+      %{
+        carriage_sequence: train_car.carriage_sequence,
+        occupancy_percentage: train_car.occupancy_percentage,
+        occupancy_status: serialize_occupancy_status(train_car.occupancy_status)
+      }
+    end)
+  end
+
+  defp serialize_occupancy_status(:no_data_available), do: "no_data"
+  defp serialize_occupancy_status(:many_seats_available), do: "not_crowded"
+  defp serialize_occupancy_status(:few_seats_available), do: "not_crowded"
+  defp serialize_occupancy_status(:standing_room_only), do: "some_crowding"
+  defp serialize_occupancy_status(:crushed_standing_room_only), do: "crowded"
+  defp serialize_occupancy_status(:full), do: "crowded"
+  defp serialize_occupancy_status(:not_accepting_passengers), do: "disabled"
 
   def priority(_instance), do: [1]
 

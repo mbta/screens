@@ -55,6 +55,10 @@ defmodule Screens.Vehicles.Parser do
 
   defp parse_occupancy_status("MANY_SEATS_AVAILABLE"), do: :many_seats_available
   defp parse_occupancy_status("FEW_SEATS_AVAILABLE"), do: :few_seats_available
+  defp parse_occupancy_status("STANDING_ROOM_ONLY"), do: :standing_room_only
+  defp parse_occupancy_status("CRUSHED_STANDING_ROOM_ONLY"), do: :crushed_standing_room_only
   defp parse_occupancy_status("FULL"), do: :full
+  defp parse_occupancy_status("NO_DATA_AVAILABLE"), do: :no_data_available
+  defp parse_occupancy_status("NOT_ACCEPTING_PASSENGERS"), do: :not_accepting_passengers
   defp parse_occupancy_status(_), do: nil
 end
