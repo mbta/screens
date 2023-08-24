@@ -11,7 +11,7 @@ defmodule Screens.V2.CandidateGenerator.TriptychTest do
         train_crowding: %V2.TrainCrowding{
           station_id: "place-dwnxg",
           direction_id: 1,
-          platform_position: 2.5,
+          platform_position: 3,
           front_car_direction: "right"
         }
       },

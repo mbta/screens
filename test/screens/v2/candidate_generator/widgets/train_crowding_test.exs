@@ -17,7 +17,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
         train_crowding: %TrainCrowding{
           station_id: "place-masta",
           direction_id: 1,
-          platform_position: 2.5,
+          platform_position: 3,
           front_car_direction: "right",
           enabled: true
         },

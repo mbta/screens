@@ -37,10 +37,50 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
         prediction: prediction,
         now: now
       }) do
+    # %{
+    #   destination: prediction.trip.headsign,
+    #   arrival_time: serialize_time(prediction.arrival_time),
+    #   # update with correct serializer
+    #   crowding: prediction.vehicle.carriages,
+    #   platform_position: train_crowding.platform_position,
+    #   front_car_direction: train_crowding.front_car_direction,
+    #   now: serialize_time(now)
+    # }
     %{
       destination: prediction.trip.headsign,
       arrival_time: serialize_time(prediction.arrival_time),
-      crowding: prediction.vehicle.carriages,
+      crowding: [
+        %{
+          carriage_sequence: 1,
+          occupancy_percentage: 8,
+          occupancy_status: "not_crowded"
+        },
+        %{
+          carriage_sequence: 2,
+          occupancy_percentage: 10,
+          occupancy_status: "not_crowded"
+        },
+        %{
+          carriage_sequence: 3,
+          occupancy_percentage: 30,
+          occupancy_status: "some_crowding"
+        },
+        %{
+          carriage_sequence: 4,
+          occupancy_percentage: 50,
+          occupancy_status: "some_crowding"
+        },
+        %{
+          carriage_sequence: 5,
+          occupancy_percentage: 80,
+          occupancy_status: "crowded"
+        },
+        %{
+          carriage_sequence: 6,
+          occupancy_percentage: nil,
+          occupancy_status: "no_data"
+        },
+      ],
       platform_position: train_crowding.platform_position,
       front_car_direction: train_crowding.front_car_direction,
       now: serialize_time(now)

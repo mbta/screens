@@ -13,7 +13,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
             train_crowding: %Screens.Config.V2.TrainCrowding{
               station_id: "place-masta",
               direction_id: 1,
-              platform_position: 2.5,
+              platform_position: 3,
               front_car_direction: "right",
               enabled: true
             }
@@ -111,7 +111,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
             carriage_sequence: 6
           }
         ],
-        platform_position: 2.5,
+        platform_position: 3,
         front_car_direction: "right",
         now: "2023-08-16T21:04:00Z"
       }

@@ -6,7 +6,7 @@ defmodule Screens.Config.V2.TrainCrowding do
           route_id: String.t(),
           direction_id: 0 | 1,
           # temporarily going with float, but will adjust based on design
-          platform_position: float(),
+          platform_position: pos_integer(),
           front_car_direction: :left | :right,
           enabled: boolean()
         }
