@@ -30,30 +30,12 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
             stop_id: "10001",
             current_status: :incoming_at,
             carriages: [
-              %{
-                occupancy_status: :many_seats_available,
-                occupancy_percentage: 20,
-              },
-              %{
-                occupancy_status: :few_seats_available,
-                occupancy_percentage: 80,
-              },
-              %{
-                occupancy_status: :few_seats_available,
-                occupancy_percentage: 85,
-              },
-              %{
-                occupancy_status: :many_seats_available,
-                occupancy_percentage: 25,
-              },
-              %{
-                occupancy_status: :full,
-                occupancy_percentage: 98,
-              },
-              %{
-                occupancy_status: nil,
-                occupancy_percentage: nil,
-              }
+              :crushed_standing_room_only,
+              :few_seats_available,
+              :standing_room_only,
+              :many_seats_available,
+              :full,
+              :not_accepting_passengers
             ]
           })
       })
@@ -71,32 +53,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
     test "serializes data", %{widget: widget} do
       expected = %{
         destination: "Oak Grove",
-        crowding: [
-          %{
-            occupancy_status: :many_seats_available,
-            occupancy_percentage: 20,
-          },
-          %{
-            occupancy_status: :few_seats_available,
-            occupancy_percentage: 80,
-          },
-          %{
-            occupancy_status: :few_seats_available,
-            occupancy_percentage: 85,
-          },
-          %{
-            occupancy_status: :many_seats_available,
-            occupancy_percentage: 25,
-          },
-          %{
-            occupancy_status: :full,
-            occupancy_percentage: 98,
-          },
-          %{
-            occupancy_status: nil,
-            occupancy_percentage: nil,
-          }
-        ],
+        crowding: [:crowded, :not_crowded, :some_crowding, :not_crowded, :crowded, :disabled],
         platform_position: 3,
         front_car_direction: "right",
         now: "2023-08-16T21:04:00Z"
