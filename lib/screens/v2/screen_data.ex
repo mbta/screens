@@ -410,7 +410,14 @@ defmodule Screens.V2.ScreenData do
 
     instance_map
     |> Enum.group_by(
-      fn {paged_slot_id, _} -> Template.get_page(paged_slot_id) end,
+      fn
+        {paged_slot_id, instance} ->
+          if Map.has_key?(instance, :is_full_screen) and instance.is_full_screen do
+            Template.get_slot_id(paged_slot_id)
+          else
+            Template.get_page(paged_slot_id)
+          end
+      end,
       fn {paged_slot_id, instance} -> {Template.unpage(paged_slot_id), instance} end
     )
     # %{page_index => [{slot_id, instance}]}
