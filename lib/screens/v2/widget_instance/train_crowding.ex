@@ -19,16 +19,13 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
 
   @type widget_data :: %{
           destination: String.t(),
-          crowding: list(crowding_data),
+          crowding: list(crowding_level),
           platform_position: number,
           front_car_direction: :left | :right,
           now: String.t()
         }
 
-  @type crowding_data :: %{
-          crowding_level: 1 | 2 | 3,
-          percentage: number
-        }
+  @type crowding_level :: :no_data | :not_crowded | :some_crowding | :crowded | :disabled
 
   @spec serialize(t()) :: widget_data()
   def serialize(%__MODULE__{
@@ -50,21 +47,16 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   end
 
   defp serialize_crowding(carriages) do
-    Enum.map(carriages, fn train_car -> 
-      %{
-        occupancy_percentage: train_car.occupancy_percentage,
-        occupancy_status: serialize_occupancy_status(train_car.occupancy_status)
-      }
-    end)
+    Enum.map(carriages, fn train_car -> serialize_occupancy_status(train_car.occupancy_status) end)
   end
 
-  defp serialize_occupancy_status(:no_data_available), do: "no_data"
-  defp serialize_occupancy_status(:many_seats_available), do: "not_crowded"
-  defp serialize_occupancy_status(:few_seats_available), do: "not_crowded"
-  defp serialize_occupancy_status(:standing_room_only), do: "some_crowding"
-  defp serialize_occupancy_status(:crushed_standing_room_only), do: "crowded"
-  defp serialize_occupancy_status(:full), do: "crowded"
-  defp serialize_occupancy_status(:not_accepting_passengers), do: "disabled"
+  defp serialize_occupancy_status(:no_data_available), do: :no_data
+  defp serialize_occupancy_status(:many_seats_available), do: :not_crowded
+  defp serialize_occupancy_status(:few_seats_available), do: :not_crowded
+  defp serialize_occupancy_status(:standing_room_only), do: :some_crowding
+  defp serialize_occupancy_status(:crushed_standing_room_only), do: :crowded
+  defp serialize_occupancy_status(:full), do: :crowded
+  defp serialize_occupancy_status(:not_accepting_passengers), do: :disabled
 
   def priority(_instance), do: [1]
 
