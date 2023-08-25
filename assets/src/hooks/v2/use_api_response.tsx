@@ -1,6 +1,6 @@
 import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { getDataset, getDatasetValue } from "Util/dataset";
 import { isDUP, isOFM, isTriptych, getTriptychPane } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/util";
@@ -146,6 +146,17 @@ const getLoggingParams = () => {
 
 const getOutfrontAbsolutePath = () => isOFM() ? "https://screens.mbta.com" : "";
 
+const getApiPath = (id: string, routePart: string) => {
+  const outfrontAbsolutePath = getOutfrontAbsolutePath();
+  const lastRefresh = getDatasetValue("lastRefresh");
+  const isRealScreenParam = getIsRealScreenParam();
+  const screenSideParam = getScreenSideParam();
+  const requestorParam = getRequestorParam();
+  const loggingParams = getLoggingParams();
+
+  return `${outfrontAbsolutePath}/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}${loggingParams}`;
+};
+
 interface UseApiResponseArgs {
   id: string;
   failureModeElapsedMs?: number;
@@ -164,23 +175,17 @@ const useBaseApiResponse = ({
   routePart = "",
   responseHandler = rawResponseToApiResponse,
 }: UseApiResponseArgs): UseApiResponseReturn => {
-  const isRealScreenParam = getIsRealScreenParam();
-  const screenSideParam = getScreenSideParam();
-  const requestorParam = getRequestorParam();
-  const loggingParams = getLoggingParams();
-  const outfrontAbsolutePath = getOutfrontAbsolutePath();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const {
-    lastRefresh,
     refreshRate,
     refreshRateOffset,
     screenIdsWithOffsetMap,
   } = getDataset();
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
-  const apiPath = `${outfrontAbsolutePath}/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}${loggingParams}`;
+  const apiPath = useMemo(() => getApiPath(id, routePart), [id, routePart]);
 
   if (screenIdsWithOffsetMap) {
     const screens = JSON.parse(screenIdsWithOffsetMap);
