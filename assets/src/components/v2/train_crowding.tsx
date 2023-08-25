@@ -2,9 +2,10 @@ import React, { ReactElement } from "react";
 
 import { classWithModifier } from "Util/util";
 import { NormalHeaderTime } from "./normal_header";
-import Arrow, { Direction as ArrowDirection } from "Components/solari/arrow";
 
 import Logo from "../../../static/images/svgr_bundled/logo.svg";
+import ArrowUp from "../../../static/images/svgr_bundled/Arrow-90.svg";
+import ArrowUpLeft from "../../../static/images/svgr_bundled/Arrow-45.svg";
 
 import KeyNotCrowded from "../../../static/images/svgr_bundled/train_crowding/Car-NotCrowded-Key.svg";
 import KeySomeCrowding from "../../../static/images/svgr_bundled/train_crowding/Car-SomeCrowding-Key.svg";
@@ -84,8 +85,8 @@ const TrainCrowding: React.ComponentType<Props> = ({
   const slotsWidth = screenWidth + slotOverhang*2
   const extraArrowPadding = 24
   const arrowLeftPadding = (arrowSlot-1) * (slotsWidth/25) - slotOverhang - extraArrowPadding
-  const arrowDirection = [1, 9, 17].includes(platform_position) ? "nw"
-        : platform_position == 25 ? "ne" : "n"
+  const arrowDirection = [1, 9, 17].includes(platform_position) ? "up-left"
+        : platform_position == 25 ? "up-right" : "up"
 
   const textPane = Math.floor(arrowSlot/25 * 3)
   const textPadding = textPane * 3240/3
@@ -105,10 +106,9 @@ const TrainCrowding: React.ComponentType<Props> = ({
         {trainSequence}
       </div>
       <div style={{paddingLeft:arrowLeftPadding}}>
-        <Arrow
-            direction={ arrowDirection as ArrowDirection }
-            className={classWithModifier("crowding-widget__you-are-here-arrow", arrowDirection)}
-          />
+        { arrowDirection == "up" ?
+            <ArrowUp className={classWithModifier("crowding-widget__you-are-here-arrow", arrowDirection)} />
+            : <ArrowUpLeft className={classWithModifier("crowding-widget__you-are-here-arrow", arrowDirection)} /> }
       </div>
       <div style={{marginLeft:textPadding}} className={
             classWithModifier(

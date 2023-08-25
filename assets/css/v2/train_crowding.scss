@@ -86,13 +86,13 @@
 .crowding-widget__you-are-here-arrow {
   width: 180px;
   height: 180px;
-  &--n {
+  &--up {
     animation: up-arrow 1.2s infinite ease-in-out;
   }
-  &--nw {
+  &--up-left {
     animation: up-left-arrow 1.2s infinite ease-in-out;
   }
-  &--ne {
+  &--up-right {
     animation: up-right-arrow 1.2s infinite ease-in-out;
   }
 }
