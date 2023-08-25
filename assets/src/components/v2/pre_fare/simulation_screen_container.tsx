@@ -12,12 +12,10 @@ import WidgetTreeErrorBoundary from "Components/v2/widget_tree_error_boundary";
 
 interface SimulationScreenLayoutProps {
   apiResponse: ApiResponse;
-  opts: { [key: string]: any };
 }
 
 const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
   apiResponse,
-  opts,
 }) => {
   const responseMapper = useContext(ResponseMapperContext);
   const data = responseMapper(apiResponse);
@@ -33,12 +31,6 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
     );
   }
 
-  // If "alternateView" was provided as an option, we use the simulation version of screen normal
-  // Currently only applies to DUPs
-  const widgetData = opts.alternateView
-    ? { ...fullPage, type: "simulation_screen_normal" }
-    : fullPage;
-
   return (
     <div className="simulation-screen-centering-container">
       <div className="simulation-screen-scrolling-container">
@@ -46,7 +38,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
           <div className="simulation__full-page">
             <div className="simulation__title">Live view</div>
             <WidgetTreeErrorBoundary>
-              <Widget data={widgetData} />
+              <Widget data={fullPage} />
             </WidgetTreeErrorBoundary>
           </div>
         )}
@@ -100,7 +92,6 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
 
 const SimulationScreenContainer = ({
   id,
-  opts = {},
 }: {
   id: string;
   opts?: { [key: string]: any };
@@ -109,7 +100,7 @@ const SimulationScreenContainer = ({
 
   return (
     <LastFetchContext.Provider value={lastSuccess}>
-      <SimulationScreenLayout apiResponse={apiResponse} opts={opts} />
+      <SimulationScreenLayout apiResponse={apiResponse} />
     </LastFetchContext.Provider>
   );
 };
