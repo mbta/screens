@@ -104,7 +104,7 @@ interface NormalHeaderTimeProps {
   time: string;
 }
 
-const NormalHeaderTime: ComponentType<NormalHeaderTimeProps> = ({ time }) => {
+export const NormalHeaderTime: ComponentType<NormalHeaderTimeProps> = ({ time }) => {
   const currentTime = formatTimeString(time);
   return <div className="normal-header-time">{currentTime}</div>;
 };
