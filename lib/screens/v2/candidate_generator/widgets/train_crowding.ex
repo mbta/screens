@@ -57,6 +57,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
            Prediction.vehicle_status(next_train_prediction) == :incoming_at and
            next_train_prediction |> Prediction.stop_for_vehicle() |> fetch_parent_stop_id_fn.() ==
              train_crowding.station_id and
+           next_train_prediction.vehicle.carriages != [] and
            not any_alert_makes_this_a_terminal?(alerts, location_context) do
         [
           %CrowdingWidget{
