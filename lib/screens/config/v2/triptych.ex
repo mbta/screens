@@ -1,7 +1,8 @@
 defmodule Screens.Config.V2.Triptych do
   @moduledoc false
 
-  alias Screens.Config.V2.{EvergreenContentItem, OLCrowding}
+  alias Screens.Config.V2.EvergreenContentItem
+  alias Screens.Config.V2.OLCrowding
 
   @type t :: %__MODULE__{
           ol_crowding: OLCrowding.t(),
