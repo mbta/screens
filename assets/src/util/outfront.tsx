@@ -77,7 +77,6 @@ const getTriptychPaneFromTags = () => {
   if (tags !== null) {
     const arrayConfiguration =
       tags.find(({ name }) => name === "Array_configuration")?.value?.[0] ?? null;
-    console.log("getTriptychPane: arrayConfiguration is", arrayConfiguration);
     pane = arrayConfigurationToTriptychPane(arrayConfiguration);
   }
 
@@ -140,8 +139,6 @@ interface OFMTag {
 }
 
 export const getMRAID = (): MRAID | false => {
-  console.log("getMRAID called");
-  console.log("getMRAID: returning", parent?.parent?.mraid);
   return (parent?.parent as OFMWindow)?.mraid ?? false;
 };
 
