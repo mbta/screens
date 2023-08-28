@@ -76,7 +76,7 @@ const TrainCrowding: React.ComponentType<Props> = ({
 }) => {
   // If the front car direction is right, the crowding array needs to be reversed
   // so the last car is rendered on the left.
-  const trains = crowding.map((car, i) => {
+  const trains = crowding.map((carOccupancyStatus, i) => {
     const CarComponent = lookupCarComponent(car, i == 0 && front_car_direction);
     return <CarComponent key={i} className="crowding-widget__train-car" />;
   });
