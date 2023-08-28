@@ -14,7 +14,7 @@ export const isOFM = () => location.href.startsWith("file:");
  *
  * Use this for DUP-specific logic.
  */
-export const isDUP = () => /^file:.*dup-app.*/.test(location.href);
+export const isDup = () => /^file:.*dup-app.*/.test(location.href);
 
 /**
  * Returns true if this client is running on a triptych screen.

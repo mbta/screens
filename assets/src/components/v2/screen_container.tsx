@@ -15,7 +15,7 @@ import useApiResponse, {
 import WidgetTreeErrorBoundary from "Components/v2/widget_tree_error_boundary";
 import Widget, { WidgetData } from "Components/v2/widget";
 import useAudioReadout from "Hooks/v2/use_audio_readout";
-import { isDUP, isOFM, isTriptych } from "Util/outfront";
+import { isDup, isOFM, isTriptych } from "Util/outfront";
 
 type ResponseMapper = (
   apiResponse: ApiResponse
@@ -109,7 +109,7 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
 };
 
 const getApiResponseHook = () => {
-  if (isDUP()) {
+  if (isDup()) {
     return useDUPApiResponse;
   } else if (isTriptych()) {
     return useTriptychApiResponse;

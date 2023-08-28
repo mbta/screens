@@ -2,7 +2,7 @@ import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useMemo, useState } from "react";
 import { getDataset, getDatasetValue } from "Util/dataset";
-import { isDUP, isOFM, isTriptych, getTriptychPane } from "Util/outfront";
+import { isDup, isOFM, isTriptych, getTriptychPane } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/util";
 import * as SentryLogger from "Util/sentry";
 import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
@@ -130,7 +130,7 @@ const getRequestorParam = () => {
 };
 
 const getLoggingParams = () => {
-  if (isDUP()) {
+  if (isDup()) {
     return `&rotation_index=${ROTATION_INDEX}`;
   }
 
