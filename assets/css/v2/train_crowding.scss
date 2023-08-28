@@ -4,20 +4,20 @@
     flex-direction: column;
     padding: 72px;
     height: 578px;
-    background-color: #171F26;
-    color: #E5E4E1;
+    background-color: #171f26;
+    color: #e5e4e1;
     box-sizing: border-box;
   }
   &__body {
     display: flex;
     flex-direction: column;
     height: 920px;
-    background-color: #D9D6D0;
+    background-color: #d9d6d0;
     box-shadow: 0px 8px 12px 0px rgba(0, 0, 0, 0.32);
   }
   &__footer {
     display: flex;
-    background-color: #CCCBC8;
+    background-color: #cccbc8;
     height: 422px;
   }
 }
@@ -25,7 +25,9 @@
 .crowding-widget__header__top-row {
   display: flex;
 
-  .t-logo { padding: 4px; }
+  .t-logo {
+    padding: 4px;
+  }
 
   .normal-header-time {
     @include font--body-2;
@@ -66,21 +68,39 @@
 }
 
 @keyframes up-arrow {
-  from { transform: translateY(0)}
-  50% { transform: translateY(-20px);}
-  to { transform: translateY(0);}
+  from {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 @keyframes up-left-arrow {
-  from { transform: translateY(0)}
-  50% { transform: translateY(-12px) translateX(-12px);}
-  to { transform: translateY(0);}
+  from {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px) translateX(-12px);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 @keyframes up-right-arrow {
-  from { transform: translateY(0) rotate(90deg)}
-  50% { transform: translateY(-12px) translateX(12px) rotate(90deg);}
-  to { transform: translateY(0) rotate(90deg);}
+  from {
+    transform: translateY(0) rotate(90deg);
+  }
+  50% {
+    transform: translateY(-12px) translateX(12px) rotate(90deg);
+  }
+  to {
+    transform: translateY(0) rotate(90deg);
+  }
 }
 
 .crowding-widget__you-are-here-arrow {

@@ -28,7 +28,7 @@ const TYPE_TO_COMPONENT = {
   // we still want to show psas. so should we just make the psas a frontend fallback image?
   // page_load_no_data: PageLoadNoData,
   // no_data: NoData,
-  train_crowding: TrainCrowding
+  train_crowding: TrainCrowding,
 };
 
 const DISABLED_LAYOUT = {
