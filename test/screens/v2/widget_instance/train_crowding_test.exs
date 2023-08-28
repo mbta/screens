@@ -53,7 +53,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
     test "serializes data", %{widget: widget} do
       expected = %{
         destination: "Oak Grove",
-        crowding: [:crowded, :not_crowded, :some_crowding, :not_crowded, :crowded, :disabled],
+        crowding: [:crowded, :not_crowded, :some_crowding, :not_crowded, :crowded, :closed],
         platform_position: 3,
         front_car_direction: "right",
         now: "2023-08-16T21:04:00Z"
