@@ -2,6 +2,7 @@ defmodule Screens.Predictions.Prediction do
   @moduledoc false
 
   alias Screens.Departures.Departure
+  alias Screens.Vehicles.Vehicle
 
   defstruct id: nil,
             trip: nil,
@@ -42,4 +43,12 @@ defmodule Screens.Predictions.Prediction do
       :error -> :error
     end
   end
+
+  def stop_for_vehicle(%__MODULE__{vehicle: %Vehicle{stop_id: stop_id}}), do: stop_id
+  def stop_for_vehicle(_), do: nil
+
+  def vehicle_status(%__MODULE__{vehicle: %Vehicle{current_status: current_status}}),
+    do: current_status
+
+  def vehicle_status(_), do: nil
 end
