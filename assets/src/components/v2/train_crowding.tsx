@@ -40,35 +40,57 @@ interface Props {
   platform_position: number;
 }
 
-type FrontCarDirection = "left" | "right"
-type OccupancyStatus = "no_data" | "not_crowded" | "some_crowding" | "crowded" | "closed"
+type FrontCarDirection = "left" | "right";
+type OccupancyStatus =
+  | "no_data"
+  | "not_crowded"
+  | "some_crowding"
+  | "crowded"
+  | "closed";
 
 const lookupCarComponent = (
   occupancyStatus: OccupancyStatus,
-  frontCarDirection: FrontCarDirection | "middle"
+  frontCarDirection: FrontCarDirection | "middle",
 ) => {
-  const lookupKey: `${FrontCarDirection | "middle"}/${OccupancyStatus}` = `${frontCarDirection}/${occupancyStatus}`;
+  const lookupKey: `${
+    | FrontCarDirection
+    | "middle"}/${OccupancyStatus}` = `${frontCarDirection}/${occupancyStatus}`;
 
   switch (lookupKey) {
-    case "left/not_crowded": return CarNotCrowdedLeft;
-    case "left/some_crowding": return CarSomeCrowdingLeft;
-    case "left/crowded": return CarCrowdedLeft;
-    case "left/no_data": return CarNoDataLeft;
-    case "left/closed": return CarClosedLeft;
+    case "left/not_crowded":
+      return CarNotCrowdedLeft;
+    case "left/some_crowding":
+      return CarSomeCrowdingLeft;
+    case "left/crowded":
+      return CarCrowdedLeft;
+    case "left/no_data":
+      return CarNoDataLeft;
+    case "left/closed":
+      return CarClosedLeft;
 
-    case "right/not_crowded": return CarNotCrowdedRight;
-    case "right/some_crowding": return CarSomeCrowdingRight;
-    case "right/crowded": return CarCrowdedRight;
-    case "right/no_data": return CarNoDataRight;
-    case "right/closed": return CarClosedRight;
+    case "right/not_crowded":
+      return CarNotCrowdedRight;
+    case "right/some_crowding":
+      return CarSomeCrowdingRight;
+    case "right/crowded":
+      return CarCrowdedRight;
+    case "right/no_data":
+      return CarNoDataRight;
+    case "right/closed":
+      return CarClosedRight;
 
-    case "middle/not_crowded": return CarNotCrowdedMiddle;
-    case "middle/some_crowding": return CarSomeCrowdingMiddle;
-    case "middle/crowded": return CarCrowdedMiddle;
-    case "middle/no_data": return CarNoDataMiddle;
-    case "middle/closed": return CarClosedMiddle;
+    case "middle/not_crowded":
+      return CarNotCrowdedMiddle;
+    case "middle/some_crowding":
+      return CarSomeCrowdingMiddle;
+    case "middle/crowded":
+      return CarCrowdedMiddle;
+    case "middle/no_data":
+      return CarNoDataMiddle;
+    case "middle/closed":
+      return CarClosedMiddle;
   }
-}
+};
 
 const TrainCrowding: React.ComponentType<Props> = ({
   crowding,
@@ -80,18 +102,26 @@ const TrainCrowding: React.ComponentType<Props> = ({
   // If the front car direction is right, the crowding array needs to be reversed
   // so the last car is rendered on the left.
   const trains = crowding.map((occupancyStatus, i) => {
-    const CarComponent = lookupCarComponent(occupancyStatus, i==0 ? frontCarDirection : "middle");
+    const CarComponent = lookupCarComponent(
+      occupancyStatus,
+      i == 0 ? frontCarDirection : "middle",
+    );
     return <CarComponent key={i} className="crowding-widget__train-car" />;
   });
 
-  const trainSequence = frontCarDirection == "left" ? trains : [...trains].reverse()
+  const trainSequence =
+    frontCarDirection == "left" ? trains : [...trains].reverse();
 
   // If arrow is between screens, scoot the arrow to the next slot on the right
-  const arrowSlot = [1, 9, 17].includes(platformPosition)
-    ? platformPosition + 1
-    : platformPosition == 25
-    ? platformPosition - 1
-    : platformPosition;
+  // If arrow is beyond the end of the train (slot 25), scoot arrow left
+  let arrowSlot;
+  if ([1, 9, 17].includes(platformPosition)) {
+    arrowSlot = platformPosition + 1;
+  } else {
+    if (platformPosition == 25) {
+      arrowSlot = platformPosition - 1
+    } else arrowSlot = platformPosition;
+  }
 
   // The slot arrangement exceeds the edges of the screen, so to properly set the slot positions
   // we need to make a few adjustments.
