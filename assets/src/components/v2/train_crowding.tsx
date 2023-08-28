@@ -33,12 +33,14 @@ import CarClosedRight from "../../../static/images/svgr_bundled/train_crowding/C
 
 interface Props {
   arrivalTime: string;
-  crowding: string[];
+  crowding: OccupancyStatus[];
   destination: string;
-  front_car_direction: string;
+  front_car_direction: "left" | "right";
   now: string;
   platform_position: number;
 }
+
+type OccupancyStatus = "no_data" | "not_crowded" | "some_crowding" | "crowded" | "disabled" | "closed"
 
 const lookupCarComponent = (
   occupancyStatus: string,

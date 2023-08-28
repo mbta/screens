@@ -25,7 +25,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
           now: String.t()
         }
 
-  @type crowding_level :: :no_data | :not_crowded | :some_crowding | :crowded | :disabled
+  @type crowding_level :: :no_data | :not_crowded | :some_crowding | :crowded | :disabled | :closed
 
   @spec serialize(t()) :: widget_data()
   def serialize(%__MODULE__{
