@@ -18,16 +18,15 @@ import FullScreen from "Components/v2/basic_layouts/full_screen";
 import Placeholder from "Components/v2/placeholder";
 
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
+import PageLoadNoData from "Components/v2/lcd/page_load_no_data";
+import NoData from "Components/v2/lcd/no_data";
 import TrainCrowding from "Components/v2/train_crowding";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: FullScreen,
   placeholder: Placeholder,
-  // TODO: decide on these. When we have an issue with the crowding widget, we'll show
-  // psas via the evergreen widget, but what if we have a server issue for other reasons?
-  // we still want to show psas. so should we just make the psas a frontend fallback image?
-  // page_load_no_data: PageLoadNoData,
-  // no_data: NoData,
+  page_load_no_data: PageLoadNoData,
+  no_data: NoData,
   train_crowding: TrainCrowding,
 };
 
