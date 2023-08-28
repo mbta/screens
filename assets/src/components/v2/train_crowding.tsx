@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React from "react";
 
 import { classWithModifier } from "Util/util";
 import { NormalHeaderTime } from "./normal_header";
