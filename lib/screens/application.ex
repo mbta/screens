@@ -31,9 +31,9 @@ defmodule Screens.Application do
       # ScreensByAlert server process
       Screens.ScreensByAlert,
       # Task supervisor for ScreensByAlert self-refresh jobs
-      {Task.Supervisor, name: Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor}
+      {Task.Supervisor, name: Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor},
       # ScreensByAlert self-refresh job runner
-      # {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner}
+      {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
