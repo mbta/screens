@@ -84,10 +84,7 @@ const TrainCrowding: React.ComponentType<Props> = ({
     return <CarComponent key={i} className="crowding-widget__train-car" />;
   });
 
-  const trainSequence =
-    frontCarDirection == "left"
-      ? trains
-      : ([] as ReactElement[]).concat(trains).reverse();
+  const trainSequence = frontCarDirection == "left" ? trains : [...trains].reverse()
 
   // If arrow is between screens, scoot the arrow to the next slot on the right
   const arrowSlot = [1, 9, 17].includes(platformPosition)
