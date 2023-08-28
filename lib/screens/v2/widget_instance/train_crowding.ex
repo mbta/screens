@@ -57,7 +57,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   defp serialize_occupancy_status(:standing_room_only), do: :some_crowding
   defp serialize_occupancy_status(:crushed_standing_room_only), do: :crowded
   defp serialize_occupancy_status(:full), do: :crowded
-  defp serialize_occupancy_status(:not_accepting_passengers), do: :disabled
+  defp serialize_occupancy_status(:not_accepting_passengers), do: :closed
 
   def priority(_instance), do: [1]
 
