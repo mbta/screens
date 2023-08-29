@@ -1,6 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   @moduledoc false
 
+  require Logger
+
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{TrainCrowding, Triptych}
@@ -59,6 +61,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
              train_crowding.station_id and
            next_train_prediction.vehicle.carriages != [] and
            not any_alert_makes_this_a_terminal?(alerts, location_context) do
+        log_crowding_info(next_train_prediction, train_crowding)
+
         [
           %CrowdingWidget{
             screen: config,
@@ -87,5 +91,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   defp temporary_terminal?(localized_alert) do
     localized_alert.alert.effect in [:suspension, :shuttle] and
       LocalizedAlert.location(localized_alert) in [:boundary_downstream, :boundary_upstream]
+  end
+
+  defp log_crowding_info(prediction, crowding_config) do
+    Enum.each(
+      prediction.vehicle.carriages,
+      fn %Screens.Vehicles.Carriage{} = carriage ->
+        Logger.info(
+          "[train_crowding] station_id=#{crowding_config.station_id} direction_id=#{crowding_config.direction_id} car_number=#{carriage.car_number} vehicle_id=#{prediction.vehicle.id} crowding_level=#{carriage.occupancy_status} trip_id=#{prediction.trip.id} prediction_id=#{prediction.id}"
+        )
+      end
+    )
   end
 end
