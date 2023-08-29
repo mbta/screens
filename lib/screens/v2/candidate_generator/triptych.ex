@@ -14,7 +14,7 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
     {:screen,
      %{
        screen_normal: [:full_screen],
-       screen_split: [:first_pane, :second_pane, :third_pane]
+       screen_split: [:left_pane, :middle_pane, :right_pane]
      }}
     |> Builder.build_template()
   end
