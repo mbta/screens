@@ -1,6 +1,8 @@
 defmodule Screens.Vehicles.Vehicle do
   @moduledoc false
 
+  alias Screens.Vehicles.Carriage
+
   defstruct id: nil,
             direction_id: nil,
             current_status: nil,
@@ -29,7 +31,7 @@ defmodule Screens.Vehicles.Vehicle do
           stop_id: Screens.Stops.Stop.id() | nil,
           parent_stop_id: Screens.Stops.Stop.id() | nil,
           occupancy_status: occupancy_status,
-          carriages: list(occupancy_status) | nil
+          carriages: list(Carriage.t())
         }
 
   def by_route_and_direction(route_id, direction_id) do

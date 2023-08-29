@@ -6,7 +6,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
   alias Screens.Config.Screen
   alias Screens.Config.V2.{TrainCrowding, Triptych}
   alias Screens.Predictions.Prediction
-  alias Screens.Vehicles.Vehicle
+  alias Screens.Vehicles.{Carriage, Vehicle}
   alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget
 
   setup :setup_base
@@ -31,7 +31,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
     next_train_prediction =
       struct(Prediction, %{
-        vehicle: struct(Vehicle, %{stop_id: "10001", current_status: :incoming_at})
+        vehicle:
+          struct(Vehicle, %{
+            stop_id: "10001",
+            current_status: :incoming_at,
+            carriages: [struct(Carriage)]
+          })
       })
 
     location_context = %Screens.LocationContext{
