@@ -50,7 +50,7 @@ export const getPlayerName = (): string | null => {
       const deviceInfoJSON = mraid.getDeviceInfo();
       const deviceInfo = JSON.parse(deviceInfoJSON);
       playerName = deviceInfo.deviceName;
-    } catch (err) { }
+    } catch (err) {}
   }
 
   return playerName;
@@ -58,14 +58,16 @@ export const getPlayerName = (): string | null => {
 
 /**
  * Determines which of the 3 panes of a triptych we're running on (left, middle, or right).
- * 
+ *
  * If we're running on a real triptych screen, we determine the pane from the `Array_configuration` tag.
  * If we're running in a browser, we determine the pane from the `data-triptych-pane` attribute on the #app div.
  *
  * Returns null if we fail to determine the pane for any reason.
  */
 export const getTriptychPane = (): TriptychPane | null => {
-  const pane = isTriptych() ? getTriptychPaneFromTags() : getDatasetValue("triptychPane");
+  const pane = isTriptych()
+    ? getTriptychPaneFromTags()
+    : getDatasetValue("triptychPane");
 
   return isTriptychPane(pane) ? pane : null;
 };
@@ -76,7 +78,8 @@ const getTriptychPaneFromTags = () => {
   const tags = getTags();
   if (tags !== null) {
     const arrayConfiguration =
-      tags.find(({ name }) => name === "Array_configuration")?.value?.[0] ?? null;
+      tags.find(({ name }) => name === "Array_configuration")?.value?.[0] ??
+      null;
     pane = arrayConfigurationToTriptychPane(arrayConfiguration);
   }
 
@@ -101,13 +104,15 @@ const getTags = (): OFMTag[] | null => {
   if (mraid) {
     try {
       tags = JSON.parse(mraid.getTags()).tags as OFMTag[];
-    } catch (err) { }
+    } catch (err) {}
   }
 
   return tags;
 };
 
-const arrayConfigurationToTriptychPane = (arrayConfiguration: string | null): TriptychPane | null => {
+const arrayConfigurationToTriptychPane = (
+  arrayConfiguration: string | null,
+): TriptychPane | null => {
   switch (arrayConfiguration) {
     case "Triple-Left":
       return "left";
@@ -146,24 +151,39 @@ export const getMRAID = (): MRAID | false => {
  * For use in test DUP/triptych packages only! Sets a fake MRAID object on `window` so that we can test OFM client packages
  * as if they are running on real OFM screens.
  */
-export const __TEST_setFakeMRAID__ = (options: { playerName: string; station: string; triptychPane?: TriptychPane }) => {
+export const __TEST_setFakeMRAID__ = (options: {
+  playerName: string;
+  station: string;
+  triptychPane?: TriptychPane;
+}) => {
   const { playerName, station, triptychPane } = options;
 
   let tags: OFMTag[] = [{ name: "Station", value: [station] }];
   if (triptychPane) {
-    tags.push({ name: "Array_configuration", value: [triptychPaneToArrayConfiguration(triptychPane)] });
+    tags.push({
+      name: "Array_configuration",
+      value: [triptychPaneToArrayConfiguration(triptychPane)],
+    });
   }
   const tagsJSON = JSON.stringify({ tags });
 
   const deviceInfoJSON = JSON.stringify({ deviceName: playerName });
 
   const mraid = {
-    getTags() { return tagsJSON; },
-    getDeviceInfo() { return deviceInfoJSON; }
+    getTags() {
+      return tagsJSON;
+    },
+    getDeviceInfo() {
+      return deviceInfoJSON;
+    },
   };
 
   // Be noisy about it so that we don't accidentally ship a package that calls this function.
-  alert(`Setting fake MRAID object for testing purposes: ${JSON.stringify(options)}`);
+  alert(
+    `Setting fake MRAID object for testing purposes: ${JSON.stringify(
+      options,
+    )}`,
+  );
 
   // Since `window.parent.parent.parent...` returns itself if the window does not have a parent, we can just set the mraid object
   // on the current window, and the code that reads `window.parent.parent.mraid` will still access it correctly.

@@ -18,7 +18,7 @@ import useAudioReadout from "Hooks/v2/use_audio_readout";
 import { isDup, isOFM, isTriptych } from "Util/outfront";
 
 type ResponseMapper = (
-  apiResponse: ApiResponse
+  apiResponse: ApiResponse,
 ) => WidgetData | SimulationApiResponse;
 
 const defaultResponseMapper: ResponseMapper = (apiResponse) => {
@@ -42,7 +42,7 @@ const LOADING_LAYOUT = {
 };
 
 const ResponseMapperContext = createContext<ResponseMapper>(
-  defaultResponseMapper
+  defaultResponseMapper,
 );
 
 /* "Blink" info
@@ -68,7 +68,7 @@ interface BlinkConfig {
 const defaultBlinkConfig = null;
 
 const BlinkConfigContext = createContext<BlinkConfig | null>(
-  defaultBlinkConfig
+  defaultBlinkConfig,
 );
 
 interface AudioConfig {
@@ -79,7 +79,7 @@ interface AudioConfig {
 const defaultAudioConfig = null;
 
 const AudioConfigContext = createContext<AudioConfig | null>(
-  defaultAudioConfig
+  defaultAudioConfig,
 );
 
 const LastFetchContext = createContext<number | null>(null);
@@ -123,7 +123,9 @@ const ScreenContainer = ({ id }) => {
   const audioConfig = useContext(AudioConfigContext);
   const [showBlink, setShowBlink] = useState(false);
 
-  const { apiResponse, requestCount, lastSuccess } = getApiResponseHook()({ id });
+  const { apiResponse, requestCount, lastSuccess } = getApiResponseHook()({
+    id,
+  });
 
   useAudioReadout({ id, config: audioConfig });
 

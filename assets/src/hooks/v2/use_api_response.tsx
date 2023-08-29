@@ -81,7 +81,7 @@ const rawResponseToSimulationApiResponse = ({
 const doFailureBuffer = (
   lastSuccess: number | null,
   setApiResponse: React.Dispatch<React.SetStateAction<ApiResponse>>,
-  apiResponse: ApiResponse = FAILURE_RESPONSE
+  apiResponse: ApiResponse = FAILURE_RESPONSE,
 ) => {
   if (lastSuccess == null) {
     // We haven't had a successful request since initial page load.
@@ -144,7 +144,8 @@ const getLoggingParams = () => {
   return "";
 };
 
-const getOutfrontAbsolutePath = () => isOFM() ? "https://screens.mbta.com" : "";
+const getOutfrontAbsolutePath = () =>
+  isOFM() ? "https://screens.mbta.com" : "";
 
 const getApiPath = (id: string, routePart: string) => {
   const outfrontAbsolutePath = getOutfrontAbsolutePath();
@@ -178,11 +179,8 @@ const useBaseApiResponse = ({
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
-  const {
-    refreshRate,
-    refreshRateOffset,
-    screenIdsWithOffsetMap,
-  } = getDataset();
+  const { refreshRate, refreshRateOffset, screenIdsWithOffsetMap } =
+    getDataset();
   const refreshMs = parseInt(refreshRate, 10) * 1000;
   let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
   const apiPath = useMemo(() => getApiPath(id, routePart), [id, routePart]);
@@ -235,7 +233,7 @@ const useBaseApiResponse = ({
       fetchData();
     },
     refreshMs,
-    refreshRateOffsetMs
+    refreshRateOffsetMs,
   );
 
   return { apiResponse, requestCount, lastSuccess };
