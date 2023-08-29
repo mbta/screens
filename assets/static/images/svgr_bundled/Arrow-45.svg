@@ -1,0 +1,4 @@
+<!-- It's importand that these arrows have corrective padding around them to make the vertical and diagonal ones the same size -->
+<svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M34 34L34 126H66V88.628L123.374 146.001L146.001 123.374L88.626 66H126V34L34 34Z" fill="black"/>
+</svg>

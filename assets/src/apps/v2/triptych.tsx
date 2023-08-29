@@ -6,7 +6,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
-import ScreenPage from "Components/v2/screen_page";
+import { usePlayerName } from "Hooks/outfront";
+import { isTriptych } from "Util/outfront";
+
 import { MappingContext } from "Components/v2/widget";
 import {
   ResponseMapper,
@@ -14,27 +16,25 @@ import {
   LOADING_LAYOUT,
 } from "Components/v2/screen_container";
 
+import ScreenPage from "Components/v2/screen_page";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
-
-// Remove on go-live.
-import Placeholder from "Components/v2/placeholder";
-
 import Viewport from "Components/v2/triptych/viewport";
-import NormalScreen from "Components/v2/triptych/normal_screen";
-import TakeoverScreen from "Components/v2/triptych/takeover_screen";
+
+import FullScreen from "Components/v2/basic_layouts/full_screen";
+
 import PageLoadNoData from "Components/v2/triptych/page_load_no_data";
 import NoData from "Components/v2/triptych/no_data";
 
-import { usePlayerName } from "Hooks/outfront";
-import { isTriptych } from "Util/outfront";
+import Placeholder from "Components/v2/placeholder";
+import TrainCrowding from "Components/v2/train_crowding";
 
 const TYPE_TO_COMPONENT = {
-  screen_normal: NormalScreen,
-  screen_takeover: TakeoverScreen,
+  screen_normal: FullScreen,
   placeholder: Placeholder,
   page_load_no_data: PageLoadNoData,
   no_data: NoData,
+  train_crowding: TrainCrowding,
 };
 
 const DISABLED_LAYOUT = {

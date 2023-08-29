@@ -25,7 +25,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
           now: String.t()
         }
 
-  @type crowding_level :: :no_data | :not_crowded | :some_crowding | :crowded | :disabled
+  @type crowding_level :: :no_data | :not_crowded | :some_crowding | :crowded | :closed
 
   @spec serialize(t()) :: widget_data()
   def serialize(%__MODULE__{
@@ -57,7 +57,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   defp serialize_occupancy_status(:standing_room_only), do: :some_crowding
   defp serialize_occupancy_status(:crushed_standing_room_only), do: :crowded
   defp serialize_occupancy_status(:full), do: :crowded
-  defp serialize_occupancy_status(:not_accepting_passengers), do: :disabled
+  defp serialize_occupancy_status(:not_accepting_passengers), do: :closed
 
   def priority(_instance), do: [1]
 
