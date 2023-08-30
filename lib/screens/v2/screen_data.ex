@@ -58,7 +58,7 @@ defmodule Screens.V2.ScreenData do
     screen_data = fetch_data(config)
 
     full_page_data = screen_data |> resolve_paging(refresh_rate) |> serialize()
-    paged_slot_data = screen_data |> get_paged_slots() |> serialize_paged_slots()
+    paged_slot_data = screen_data |> get_paged_slots() |> serialize_paged_slots(config.app_id)
 
     response(data: %{full_page: full_page_data, flex_zone: paged_slot_data})
   end
@@ -401,7 +401,7 @@ defmodule Screens.V2.ScreenData do
     Template.position_widget_instances(layout, serialized_instance_map, paging_metadata)
   end
 
-  defp serialize_paged_slots({instance_map, layout}) do
+  defp serialize_paged_slots({instance_map, layout}, app_id) do
     # instance_map looks like:
     # %{{page_index, slot_id} => instance}
 
@@ -410,7 +410,7 @@ defmodule Screens.V2.ScreenData do
 
     instance_map
     |> Enum.group_by(
-      fn {paged_slot_id, _} -> Template.get_page(paged_slot_id) end,
+      &paged_slot_key(&1, app_id),
       fn {paged_slot_id, instance} -> {Template.unpage(paged_slot_id), instance} end
     )
     # %{page_index => [{slot_id, instance}]}
@@ -488,4 +488,7 @@ defmodule Screens.V2.ScreenData do
 
     :ok = ScreensByAlert.put_data(screen_id, alert_ids)
   end
+
+  defp paged_slot_key({paged_slot_id, _}, :pre_fare_v2), do: Template.get_slot_id(paged_slot_id)
+  defp paged_slot_key({paged_slot_id, _}, _), do: Template.get_page(paged_slot_id)
 end

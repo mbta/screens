@@ -47,7 +47,7 @@ import ReconstructedTakeover from "Components/v2/reconstructed_takeover";
 import CRDepartures from "Components/v2/cr_departures/cr_departures";
 import OvernightCRDepartures from "Components/v2/cr_departures/overnight_cr_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
-import SimulationScreenPage from "Components/v2/simulation_screen_page";
+import SimulationScreenPage from "Components/v2/pre_fare/simulation_screen_page";
 import SurgeBodyRight from "Components/v2/pre_fare/surge_body_right";
 import ShuttleBusInfo from "Components/v2/shuttle_bus_info";
 import BlueBikes from "Components/v2/blue_bikes";
