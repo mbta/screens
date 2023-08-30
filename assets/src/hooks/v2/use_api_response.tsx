@@ -138,9 +138,7 @@ const getLoggingParams = () => {
 
   if (isTriptych()) {
     const triptychPane = getTriptychPane();
-    if (triptychPane != null) {
-      return `&pane=${triptychPane}&version=${TRIPTYCH_VERSION}`;
-    }
+    return `&pane=${triptychPane || "UNKNOWN"}&version=${TRIPTYCH_VERSION}`;
   }
 
   return "";
