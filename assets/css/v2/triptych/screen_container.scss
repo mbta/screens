@@ -5,3 +5,11 @@
   margin: 0px auto;
   overflow: hidden;
 }
+
+.three-flex-panes {
+  display: flex;
+}
+
+.left-pane, .middle-pane, .right-pane {
+  width: 1080px;
+}
