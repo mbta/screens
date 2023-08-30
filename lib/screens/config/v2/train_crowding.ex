@@ -5,7 +5,9 @@ defmodule Screens.Config.V2.TrainCrowding do
           station_id: String.t(),
           route_id: String.t(),
           direction_id: 0 | 1,
-          platform_position: pos_integer(),
+          # Describes where the "you are here" arrow should be positioned.
+          # 1: leftmost, 25: rightmost
+          platform_position: 1..25,
           front_car_direction: :left | :right,
           enabled: boolean()
         }
