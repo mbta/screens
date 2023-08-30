@@ -13,7 +13,6 @@ import { MappingContext } from "Components/v2/widget";
 import {
   ResponseMapper,
   ResponseMapperContext,
-  LOADING_LAYOUT,
 } from "Components/v2/screen_container";
 
 import ScreenPage from "Components/v2/screen_page";
@@ -37,12 +36,19 @@ const TYPE_TO_COMPONENT = {
   train_crowding: TrainCrowding,
 };
 
+const LOADING_LAYOUT = {
+  full_screen: {
+    type: "page_load_no_data",
+  },
+  type: "screen_normal",
+};
+
 const DISABLED_LAYOUT = {
   full_screen: {
     type: "no_data",
     show_alternatives: true,
   },
-  type: "screen_takeover",
+  type: "screen_normal",
 };
 
 const FAILURE_LAYOUT = DISABLED_LAYOUT;
