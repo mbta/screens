@@ -41,6 +41,13 @@ export const getRotationIndex = (): RotationIndex | null => {
   return isRotationIndex(rotationIndex) ? rotationIndex : null;
 };
 
+/**
+ * Gets Outfront's unique name/ID for the media player we're running on.
+ *
+ * For DUPs, this is just a single ID. For triptychs, each of the 3 panes has its own player name.
+ *
+ * Returns null if we fail to determine the player name for any reason.
+ */
 export const getPlayerName = (): string | null => {
   let playerName = null;
 
@@ -86,6 +93,11 @@ const getTriptychPaneFromTags = () => {
   return pane;
 };
 
+/**
+ * Gets name of the station (e.g. "Back Bay") from the `Station` tag.
+ *
+ * Returns null if we fail to determine the station name for any reason.
+ */
 export const getStationName = (): string | null => {
   let station = null;
 
