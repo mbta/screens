@@ -123,7 +123,7 @@ const getTags = (): OFMTag[] | null => {
 };
 
 const arrayConfigurationToTriptychPane = (
-  arrayConfiguration: string | null,
+  arrayConfiguration: string | null
 ): TriptychPane | null => {
   switch (arrayConfiguration) {
     case "Triple-Left":
@@ -154,7 +154,7 @@ interface MRAID {
   addEventListener(
     eventID: EventID,
     callback: () => void,
-    layoutID: LayoutID,
+    layoutID: LayoutID
   ): void;
   EVENTS: { ONSCREEN: EventID };
 }
@@ -205,9 +205,7 @@ export const __TEST_setFakeMRAID__ = (options: {
 
   // Be noisy about it so that we don't accidentally ship a package that calls this function.
   alert(
-    `Setting fake MRAID object for testing purposes: ${JSON.stringify(
-      options,
-    )}`,
+    `Setting fake MRAID object for testing purposes: ${JSON.stringify(options)}`
   );
 
   // Since `window.parent.parent.parent...` returns itself if the window does not have a parent, we can just set the mraid object
@@ -224,7 +222,7 @@ const BASE_MRAID: Pick<MRAID, "EVENTS" | "requestInit" | "addEventListener"> = {
   addEventListener(eventID, callback, layoutID) {
     if (eventID == "fakeOnscreenEvent" && layoutID == "fakeLayoutID") {
       console.log(
-        "FakeMRAID: Setting fake ONSCREEN event to fire in 3 seconds",
+        "FakeMRAID: Setting fake ONSCREEN event to fire in 3 seconds"
       );
 
       setTimeout(() => {
@@ -233,7 +231,7 @@ const BASE_MRAID: Pick<MRAID, "EVENTS" | "requestInit" | "addEventListener"> = {
       }, 2000);
     } else {
       throw new Error(
-        "FakeMRAID: Stubbed addEventListener method expected eventID of 'fakeOnscreenEvent' and layoutID of 'fakeLayoutID'",
+        "FakeMRAID: Stubbed addEventListener method expected eventID of 'fakeOnscreenEvent' and layoutID of 'fakeLayoutID'"
       );
     }
   },
