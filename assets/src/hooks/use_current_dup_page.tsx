@@ -13,7 +13,7 @@ const useCurrentPage = () => {
       mraid.addEventListener(
         mraid.EVENTS.ONSCREEN,
         () => setPaging(true),
-        layoutID
+        layoutID,
       );
     } else {
       setPaging(true);
