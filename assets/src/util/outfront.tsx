@@ -57,7 +57,7 @@ export const getPlayerName = (): string | null => {
       const deviceInfoJSON = mraid.getDeviceInfo();
       const deviceInfo = JSON.parse(deviceInfoJSON);
       playerName = deviceInfo.deviceName;
-    } catch (err) {}
+    } catch (err) { }
   }
 
   return playerName;
@@ -116,7 +116,7 @@ const getTags = (): OFMTag[] | null => {
   if (mraid) {
     try {
       tags = JSON.parse(mraid.getTags()).tags as OFMTag[];
-    } catch (err) {}
+    } catch (err) { }
   }
 
   return tags;
@@ -148,7 +148,15 @@ interface OFMWindow extends Window {
 interface MRAID {
   getTags(): string;
   getDeviceInfo(): string;
+
+  // The below fields/methods are used by logic that runs when the app is foregrounded
+  requestInit(): LayoutID;
+  addEventListener(eventID: EventID, callback: () => void, layoutID: LayoutID): void;
+  EVENTS: { ONSCREEN: EventID }
 }
+
+type LayoutID = any;
+type EventID = any;
 
 interface OFMTag {
   name: string;
@@ -181,7 +189,8 @@ export const __TEST_setFakeMRAID__ = (options: {
 
   const deviceInfoJSON = JSON.stringify({ deviceName: playerName });
 
-  const mraid = {
+  const mraid: MRAID = {
+    ...BASE_MRAID,
     getTags() {
       return tagsJSON;
     },
@@ -201,3 +210,23 @@ export const __TEST_setFakeMRAID__ = (options: {
   // on the current window, and the code that reads `window.parent.parent.mraid` will still access it correctly.
   (window as OFMWindow).mraid = mraid;
 };
+
+const BASE_MRAID: Pick<MRAID, "EVENTS" | "requestInit" | "addEventListener"> = {
+  // Stubbed methods/fields for foreground detection logic
+  EVENTS: { ONSCREEN: "fakeOnscreenEvent" },
+  requestInit() {
+    return "fakeLayoutID";
+  },
+  addEventListener(eventID, callback, layoutID) {
+    if (eventID == "fakeOnscreenEvent" && layoutID == "fakeLayoutID") {
+      console.log("FakeMRAID: Setting fake ONSCREEN event to fire in 3 seconds");
+
+      setTimeout(() => {
+        console.log("FakeMRAID: Firing fake ONSCREEN event");
+        callback();
+      }, 2000);
+    } else {
+      throw new Error("FakeMRAID: Stubbed addEventListener method expected eventID of 'fakeOnscreenEvent' and layoutID of 'fakeLayoutID'");
+    }
+  }
+}

@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
+import { getMRAID } from "Util/outfront";
 
 const useCurrentPage = () => {
   const [page, setPage] = useState(0);
   const [paging, setPaging] = useState(false);
 
-  let mraid;
-
-  try {
-    mraid = parent?.parent?.mraid;
-  } catch (_) {}
-
   useEffect(() => {
+    const mraid = getMRAID();
+
     if (mraid) {
       const layoutID = mraid.requestInit();
       mraid.addEventListener(
