@@ -1,17 +1,17 @@
 import React, { ComponentType } from "react";
-import LcdPageLoadNoData from "Components/v2/lcd/page_load_no_data";
+import { imagePath } from "Util/util";
 
 const PageLoadNoData: ComponentType = () => {
   return (
     <>
       <div className="no-data-left">
-        <LcdPageLoadNoData />
+        <img src={imagePath("loading-triptych.png")} />
       </div>
       <div className="no-data-middle">
-        <LcdPageLoadNoData />
+        <img src={imagePath("loading-triptych.png")} />
       </div>
       <div className="no-data-right">
-        <LcdPageLoadNoData />
+        <img src={imagePath("loading-triptych.png")} />
       </div>
     </>
   );

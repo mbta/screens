@@ -46,7 +46,6 @@ const LOADING_LAYOUT = {
 const DISABLED_LAYOUT = {
   full_screen: {
     type: "no_data",
-    show_alternatives: true,
   },
   type: "screen_normal",
 };
