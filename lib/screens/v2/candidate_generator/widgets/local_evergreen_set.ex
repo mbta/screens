@@ -11,7 +11,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
   alias Screens.Util.Assets
 
   def local_evergreen_set_instances(
-        %Screen{app_params: %app{local_evergreen_set: local_evergreen_sets}} = config,
+        %Screen{app_params: %app{local_evergreen_sets: local_evergreen_sets}} = config,
         now \\ DateTime.utc_now()
       )
       when app in [Triptych] do
@@ -25,6 +25,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
     local_evergreen_sets
     |> Enum.random()
     |> get_set_instances(config, now)
+  end
+
+  def string_to_slot_name(string) do
+    cond do
+      String.contains?(string, "left") -> :left_pane
+      String.contains?(string, "middle") -> :middle_pane
+      String.contains?(string, "right") -> :right_pane
+    end
   end
 
   defp get_set_instances(
@@ -41,7 +49,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
       Enum.map(files, fn file ->
         slot_name = file
         |> String.replace_suffix(".png", "")
-        |> String.to_atom()
+        |> string_to_slot_name()
 
         %EvergreenContent{
           screen: config,
@@ -54,7 +62,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
           audio_priority: [0]
         }
       end)
-
     else
       :error -> []
     end
