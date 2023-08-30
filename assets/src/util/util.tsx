@@ -1,7 +1,7 @@
-import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
 import moment from "moment";
 import "moment-timezone";
 import { getDatasetValue } from "Util/dataset";
+import { isOFM } from "Util/outfront";
 
 export const classWithModifier = (baseClass, modifier) => {
   if (!modifier) {
@@ -24,16 +24,14 @@ export const classWithModifiers = (baseClass, modifiers) => {
 export const formatTimeString = (timeString: string) =>
   moment(timeString).tz("America/New_York").format("h:mm");
 
-export const isDup = () => location.href.startsWith("file:");
-
 export const imagePath = (fileName: string): string =>
-  isDup() ? `images/${fileName}` : `/images/${fileName}`;
+  isOFM() ? `images/${fileName}` : `/images/${fileName}`;
 
 export const pillPath = (fileName: string): string =>
-  isDup() ? `images/pills/${fileName}` : `/images/pills/${fileName}`;
+  isOFM() ? `images/pills/${fileName}` : `/images/pills/${fileName}`;
 
 export const isRealScreen = () =>
-  isDup() || getDatasetValue("isRealScreen") === "true";
+  isOFM() || getDatasetValue("isRealScreen") === "true";
 
 type ScreenSide = "left" | "right";
 const isScreenSide = (value: any): value is ScreenSide => {
@@ -49,18 +47,6 @@ const isScreenSide = (value: any): value is ScreenSide => {
 export const getScreenSide = (): ScreenSide | null => {
   const screenSide = getDatasetValue("screenSide");
   return isScreenSide(screenSide) ? screenSide : null;
-};
-
-const isRotationIndex = (value: string | undefined) => {
-  return value === "0" || value === "1" || value === "2";
-};
-
-export const getRotationIndex = () => {
-  const rotationIndex = isDup()
-    ? ROTATION_INDEX.toString()
-    : getDatasetValue("rotationIndex");
-
-  return isRotationIndex(rotationIndex) ? rotationIndex : null;
 };
 
 export const firstWord = (str: string): string => str.split(" ")[0];

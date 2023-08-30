@@ -2,7 +2,7 @@ import React from "react";
 
 import DefaultNormalHeader, { Icon } from "Components/v2/normal_header";
 import { DUP_VERSION } from "Components/v2/dup/version";
-import useOutfrontPlayerName from "Hooks/use_outfront_player_name";
+import { usePlayerName } from "Hooks/outfront";
 
 interface NormalHeaderProps {
   text: string;
@@ -19,7 +19,7 @@ const NormalHeader = ({
   accentPattern,
   code,
 }: NormalHeaderProps) => {
-  const playerName = useOutfrontPlayerName();
+  const playerName = usePlayerName();
   let version = DUP_VERSION;
   if (playerName) {
     version = `${version}-${playerName}`;

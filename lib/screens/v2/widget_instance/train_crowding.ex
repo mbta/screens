@@ -20,7 +20,9 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   @type widget_data :: %{
           destination: String.t(),
           crowding: list(crowding_level),
-          platform_position: number,
+          # Describes where the "you are here" arrow should be positioned.
+          # 1: leftmost, 25: rightmost
+          platform_position: 1..25,
           front_car_direction: :left | :right,
           now: String.t()
         }

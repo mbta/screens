@@ -17,7 +17,7 @@ import {
   MultiRotationPage,
   SimulationPage,
 } from "Components/dup/dup_screen_page";
-import { isDup } from "Util/util";
+import { isDup } from "Util/outfront";
 
 const App = (): JSX.Element => {
   if (isDup()) {

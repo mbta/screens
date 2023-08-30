@@ -29,7 +29,7 @@ defmodule Screens.V2.CandidateGenerator.TriptychTest do
       assert {:screen,
               %{
                 screen_normal: [:full_screen],
-                screen_split: [:first_pane, :second_pane, :third_pane]
+                screen_split: [:left_pane, :middle_pane, :right_pane]
               }} == Triptych.screen_template()
     end
   end

@@ -48,13 +48,12 @@ type OccupancyStatus =
   | "crowded"
   | "closed";
 
+type CarOrientation = FrontCarDirection | "middle";
 const lookupCarComponent = (
   occupancyStatus: OccupancyStatus,
-  frontCarDirection: FrontCarDirection | "middle",
+  carOrientation: CarOrientation,
 ) => {
-  const lookupKey: `${
-    | FrontCarDirection
-    | "middle"}/${OccupancyStatus}` = `${frontCarDirection}/${occupancyStatus}`;
+  const lookupKey: `${CarOrientation}/${OccupancyStatus}` = `${carOrientation}/${occupancyStatus}`;
 
   switch (lookupKey) {
     case "left/not_crowded":
@@ -119,7 +118,7 @@ const TrainCrowding: React.ComponentType<Props> = ({
     arrowSlot = platformPosition + 1;
   } else {
     if (platformPosition == 25) {
-      arrowSlot = platformPosition - 1
+      arrowSlot = platformPosition - 1;
     } else arrowSlot = platformPosition;
   }
 
@@ -201,8 +200,8 @@ const TrainCrowding: React.ComponentType<Props> = ({
           <div className="crowding-widget__footer__key-row">
             {crowding.includes("closed") ? (
               <>
-                <KeyClosed width="137" height="100" className="key-icon" />{" "}
-                Closed
+                <KeyClosed width="137" height="100" className="key-icon" /> Car
+                closed
               </>
             ) : (
               crowding.includes("no_data") && (
