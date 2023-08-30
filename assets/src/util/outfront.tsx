@@ -110,9 +110,9 @@ export const getStationName = (): string | null => {
 };
 
 const getTags = (): OFMTag[] | null => {
-  const mraid = getMRAID();
-
   let tags = null;
+
+  const mraid = getMRAID();
   if (mraid) {
     try {
       tags = JSON.parse(mraid.getTags()).tags as OFMTag[];
