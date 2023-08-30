@@ -19,7 +19,8 @@ defmodule Screens.LogScreenData do
         is_screen,
         requestor,
         screen_side \\ nil,
-        rotation_index \\ nil
+        rotation_index \\ nil,
+        triptych_pane \\ nil
       ) do
     if is_screen or not is_nil(requestor) do
       data =
@@ -31,6 +32,7 @@ defmodule Screens.LogScreenData do
         |> insert_screen_side(screen_side)
         |> insert_requestor(requestor)
         |> insert_dup_rotation_index(rotation_index)
+        |> insert_triptych_pane(triptych_pane)
 
       log_message("[screen data request]", data)
     end
@@ -140,4 +142,9 @@ defmodule Screens.LogScreenData do
 
   defp insert_dup_rotation_index(data, rotation_index),
     do: Map.put(data, :page_number, rotation_index)
+
+  defp insert_triptych_pane(data, nil), do: data
+
+  defp insert_triptych_pane(data, triptych_pane),
+    do: Map.put(data, :triptych_pane, triptych_pane)
 end

@@ -5,7 +5,7 @@ defmodule ScreensWeb.V2.ScreenController do
   alias Screens.V2.ScreenData.Parameters
 
   @default_app_id :bus_eink
-  @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 dup_v2 gl_eink_v2 solari_v2 solari_large_v2 pre_fare_v2]a
+  @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 dup_v2 gl_eink_v2 solari_v2 solari_large_v2 pre_fare_v2 triptych_v2]a
   @app_id_strings Enum.map(@recognized_app_ids, &Atom.to_string/1)
 
   plug(:check_config)
@@ -54,6 +54,15 @@ defmodule ScreensWeb.V2.ScreenController do
     end
   end
 
+  defp triptych_pane(params) do
+    case params["pane"] do
+      "left" -> "left"
+      "middle" -> "middle"
+      "right" -> "right"
+      _ -> nil
+    end
+  end
+
   def index(conn, %{"id" => app_id})
       when app_id in @app_id_strings do
     app_id = String.to_existing_atom(app_id)
@@ -95,6 +104,7 @@ defmodule ScreensWeb.V2.ScreenController do
         |> assign(:requestor, params["requestor"])
         |> assign(:disable_sentry, params["disable_sentry"])
         |> assign(:rotation_index, rotation_index(params))
+        |> assign(:triptych_pane, triptych_pane(params))
         |> put_view(ScreensWeb.V2.ScreenView)
         |> render("index.html")
 

@@ -6,11 +6,11 @@ import PartialAlerts from "Components/dup/partial_alert";
 import FreeText from "Components/dup/free_text";
 
 import useApiResponse from "Hooks/use_api_response";
-import useOutfrontStation from "Hooks/use_outfront_station";
 import useCurrentPage from "Hooks/use_current_dup_page";
 
 import { formatTimeString, classWithModifier, imagePath } from "Util/util";
 import Loading from "Components/v2/bundled_svg/loading";
+import { useStationName } from "Hooks/outfront";
 
 const LinkArrow = ({ width, color }) => {
   const height = 40;
@@ -66,7 +66,7 @@ const REPLACEMENTS = {
 };
 
 const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
-  let stationName = useOutfrontStation() || "Transit information";
+  let stationName = useStationName();
   stationName = REPLACEMENTS[stationName] || stationName;
 
   return (
@@ -94,7 +94,7 @@ const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
 };
 
 const LoadingLayout = (): JSX.Element => {
-  let stationName = useOutfrontStation() || "Transit information";
+  let stationName = useStationName();
   stationName = REPLACEMENTS[stationName] || stationName;
 
   return (

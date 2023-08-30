@@ -5,23 +5,29 @@ require("../../../css/triptych_v2.scss");
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import ScreenPage from "Components/v2/screen_page";
+
+import { usePlayerName } from "Hooks/outfront";
+import { isTriptych } from "Util/outfront";
+
+import { MappingContext } from "Components/v2/widget";
 import {
   ResponseMapper,
   ResponseMapperContext,
-  LOADING_LAYOUT,
 } from "Components/v2/screen_container";
-import { MappingContext } from "Components/v2/widget";
 import { imagePath } from "Util/util";
+
+import ScreenPage from "Components/v2/screen_page";
+import MultiScreenPage from "Components/v2/multi_screen_page";
+import SimulationScreenPage from "Components/v2/simulation_screen_page";
+import Viewport from "Components/v2/triptych/viewport";
 
 import FullScreen from "Components/v2/basic_layouts/full_screen";
 import TriptychThreePane from "Components/v2/triptych/triptych_three_pane";
 
-import Placeholder from "Components/v2/placeholder";
+import PageLoadNoData from "Components/v2/triptych/page_load_no_data";
+import NoData from "Components/v2/triptych/no_data";
 
-import SimulationScreenPage from "Components/v2/simulation_screen_page";
-import PageLoadNoData from "Components/v2/lcd/page_load_no_data";
-import NoData from "Components/v2/lcd/no_data";
+import Placeholder from "Components/v2/placeholder";
 import TrainCrowding from "Components/v2/train_crowding";
 import EvergreenContent from "Components/v2/evergreen_content";
 
@@ -45,12 +51,18 @@ const TYPE_TO_COMPONENT = {
   placeholder: Placeholder,
 };
 
+const LOADING_LAYOUT = {
+  full_screen: {
+    type: "page_load_no_data",
+  },
+  type: "screen_normal",
+};
+
 const DISABLED_LAYOUT = {
   full_screen: {
     type: "no_data",
-    show_alternatives: true,
   },
-  type: "screen_takeover",
+  type: "screen_normal",
 };
 
 const FAILURE_LAYOUT = DISABLED_LAYOUT;
@@ -70,9 +82,29 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
+  if (isTriptych()) {
+    const playerName = usePlayerName()!;
+
+    return (
+      <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+        <ResponseMapperContext.Provider value={responseMapper}>
+          <Viewport>
+            <ScreenPage id={playerName} />
+          </Viewport>
+        </ResponseMapperContext.Provider>
+      </MappingContext.Provider>
+    );
+  }
+
   return (
     <Router>
       <Switch>
+        <Route exact path="/v2/screen/triptych_v2">
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
+        </Route>
         <Route exact path="/v2/screen/:id/simulation">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
@@ -83,7 +115,9 @@ const App = (): JSX.Element => {
         <Route path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
-              <ScreenPage />
+              <Viewport>
+                <ScreenPage />
+              </Viewport>
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>

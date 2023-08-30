@@ -1,0 +1,31 @@
+.triptych-screen-viewport {
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+
+  .triptych-shifter {
+    width: 3240px;
+    height: 1920px;
+    overflow: hidden;
+    position: absolute;
+  }
+
+  .triptych-shifter--left {
+    left: 0;
+  }
+
+  .triptych-shifter--middle {
+    left: -1080px;
+  }
+
+  .triptych-shifter--right {
+    right: 0px;
+  }
+}
+
+.triptych-screen-viewport--all {
+  width: 3240px;
+}
