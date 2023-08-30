@@ -41,6 +41,13 @@ export const getRotationIndex = (): RotationIndex | null => {
   return isRotationIndex(rotationIndex) ? rotationIndex : null;
 };
 
+/**
+ * Gets Outfront's unique name/ID for the media player we're running on.
+ *
+ * For DUPs, this is just a single ID. For triptychs, each of the 3 panes has its own player name.
+ *
+ * Returns null if we fail to determine the player name for any reason.
+ */
 export const getPlayerName = (): string | null => {
   let playerName = null;
 
@@ -86,6 +93,11 @@ const getTriptychPaneFromTags = () => {
   return pane;
 };
 
+/**
+ * Gets name of the station (e.g. "Back Bay") from the `Station` tag.
+ *
+ * Returns null if we fail to determine the station name for any reason.
+ */
 export const getStationName = (): string | null => {
   let station = null;
 
@@ -98,9 +110,9 @@ export const getStationName = (): string | null => {
 };
 
 const getTags = (): OFMTag[] | null => {
-  const mraid = getMRAID();
-
   let tags = null;
+
+  const mraid = getMRAID();
   if (mraid) {
     try {
       tags = JSON.parse(mraid.getTags()).tags as OFMTag[];
@@ -111,7 +123,7 @@ const getTags = (): OFMTag[] | null => {
 };
 
 const arrayConfigurationToTriptychPane = (
-  arrayConfiguration: string | null,
+  arrayConfiguration: string | null
 ): TriptychPane | null => {
   switch (arrayConfiguration) {
     case "Triple-Left":
@@ -136,7 +148,19 @@ interface OFMWindow extends Window {
 interface MRAID {
   getTags(): string;
   getDeviceInfo(): string;
+
+  // The below fields/methods are used by logic that runs when the app is foregrounded
+  requestInit(): LayoutID;
+  addEventListener(
+    eventID: EventID,
+    callback: () => void,
+    layoutID: LayoutID
+  ): void;
+  EVENTS: { ONSCREEN: EventID };
 }
+
+type LayoutID = any;
+type EventID = any;
 
 interface OFMTag {
   name: string;
@@ -169,7 +193,8 @@ export const __TEST_setFakeMRAID__ = (options: {
 
   const deviceInfoJSON = JSON.stringify({ deviceName: playerName });
 
-  const mraid = {
+  const mraid: MRAID = {
+    ...BASE_MRAID,
     getTags() {
       return tagsJSON;
     },
@@ -180,12 +205,34 @@ export const __TEST_setFakeMRAID__ = (options: {
 
   // Be noisy about it so that we don't accidentally ship a package that calls this function.
   alert(
-    `Setting fake MRAID object for testing purposes: ${JSON.stringify(
-      options,
-    )}`,
+    `Setting fake MRAID object for testing purposes: ${JSON.stringify(options)}`
   );
 
   // Since `window.parent.parent.parent...` returns itself if the window does not have a parent, we can just set the mraid object
   // on the current window, and the code that reads `window.parent.parent.mraid` will still access it correctly.
   (window as OFMWindow).mraid = mraid;
+};
+
+const BASE_MRAID: Pick<MRAID, "EVENTS" | "requestInit" | "addEventListener"> = {
+  // Stubbed methods/fields for foreground detection logic
+  EVENTS: { ONSCREEN: "fakeOnscreenEvent" },
+  requestInit() {
+    return "fakeLayoutID";
+  },
+  addEventListener(eventID, callback, layoutID) {
+    if (eventID == "fakeOnscreenEvent" && layoutID == "fakeLayoutID") {
+      console.log(
+        "FakeMRAID: Setting fake ONSCREEN event to fire in 3 seconds"
+      );
+
+      setTimeout(() => {
+        console.log("FakeMRAID: Firing fake ONSCREEN event");
+        callback();
+      }, 2000);
+    } else {
+      throw new Error(
+        "FakeMRAID: Stubbed addEventListener method expected eventID of 'fakeOnscreenEvent' and layoutID of 'fakeLayoutID'"
+      );
+    }
+  },
 };
