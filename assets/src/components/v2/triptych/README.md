@@ -55,6 +55,16 @@
 - On completion, the packaged client app will be saved at `priv/static/triptych-app.zip`.
 - Commit the version bump on a branch, push it, and create a PR to mark the deploy.
 
+## Working with Outfront
+
+Once you've created the client app package, you'll need to send it to Outfront for them to test and deploy it.
+
+Ask a Screens team member for the email of our contact at Outfront.
+In your message, be sure to specify:
+- a player name (or "Liveboard name"), and
+- a triptych pane (or `Array_configuration`--value should be of the form "Triple-(Left|Middle|Right)")
+that they should set on the test screen.
+
 ## Debugging
 
 To assist with debugging on the triptych screens, you can paste this at the module scope in triptych.tsx to have console logs

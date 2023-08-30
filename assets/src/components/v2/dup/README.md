@@ -57,6 +57,13 @@
 - On completion, the packaged client apps will be saved at `priv/static/dup-app-(0|1|2).zip`.
 - Commit the version bump on a branch, push it, and create a PR to mark the deploy.
 
+## Working with Outfront
+
+Once you've created the client app packages, you'll need to send them to Outfront to test and deploy.
+
+Ask a Screens team member for the email of our contact at Outfront.
+In your message, be sure to specify a player name (or "Liveboard name") that they should set on the test screen.
+
 ## Debugging
 
 To assist with debugging on the DUP screens, you can paste this at the module scope in dup.tsx to have console logs
