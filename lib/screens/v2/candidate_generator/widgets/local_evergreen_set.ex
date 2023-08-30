@@ -16,9 +16,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
       )
       when app in [Triptych] do
 
-    {seed_number, _} = now
+    # Use the current time to help seed the random number generator so that all 3 screens
+    # should be in sync. So we'll seed with current time rounded down to the nearest multiple of 15 seconds.
+    # (Known risk: it's remotely possible that the screens are panels are out-of-sync on either side of a 15-second boundary)
+    seed_number = now
     |> DateTime.truncate(:second)
     |> DateTime.to_gregorian_seconds()
+    |> elem(0)
+    |> Kernel./(15)
+    |> floor()
     
     :rand.seed(:exsss, {seed_number, seed_number, seed_number})
 
