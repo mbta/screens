@@ -128,8 +128,10 @@ defmodule Screens.LogScreenData do
   end
 
   defp screen_name_for_id(screen_id) do
-    %Screen{name: name} = State.screen(screen_id)
-    name
+    case State.screen(screen_id) do
+      %Screen{name: name} -> name
+      nil -> "UNKNOWN_SCREEN"
+    end
   end
 
   defp insert_screen_side(data, nil), do: data
