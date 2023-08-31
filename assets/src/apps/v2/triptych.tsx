@@ -40,9 +40,9 @@ const customizeEvergreenProps = (WrappedComponent: React.ElementType) => {
     const isPlaying = useIsOnScreen();
     return (
       <WrappedComponent
+        {...props}
         asset_url={dupReadyUrl}
         isPlaying={isPlaying}
-        show_identifiers={props.show_identifiers}
       />
     );
   };
