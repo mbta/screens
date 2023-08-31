@@ -8,7 +8,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
   alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance.EvergreenContent
   alias Screens.Config.V2.{LocalEvergreenSet, Triptych}
-  alias Screens.Util.Assets
 
   def local_evergreen_set_instances(
         %Screen{app_params: %app{local_evergreen_sets: local_evergreen_sets}} = config,
@@ -49,27 +48,30 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
          config,
          now
        ) do
-    with path = "assets/static/images/triptych_psas/" <> folder_name,
-         {:ok, files} <- File.ls(path) do
-      Enum.map(files, fn file ->
-        slot_name =
-          file
-          |> String.replace_suffix(".png", "")
-          |> string_to_slot_name()
+    path = "assets/static/images/triptych_psas/" <> folder_name
 
-        %EvergreenContent{
-          screen: config,
-          slot_names: [slot_name],
-          asset_url: path <> "/" <> file,
-          priority: [2],
-          schedule: schedule,
-          now: now,
-          text_for_audio: "",
-          audio_priority: [0]
-        }
-      end)
-    else
-      :error -> []
+    case File.ls(path) do
+      {:ok, files} ->
+        Enum.map(files, fn file ->
+          slot_name =
+            file
+            |> String.replace_suffix(".png", "")
+            |> string_to_slot_name()
+
+          %EvergreenContent{
+            screen: config,
+            slot_names: [slot_name],
+            asset_url: path <> "/" <> file,
+            priority: [2],
+            schedule: schedule,
+            now: now,
+            text_for_audio: "",
+            audio_priority: [0]
+          }
+        end)
+
+      :error ->
+        []
     end
   end
 end

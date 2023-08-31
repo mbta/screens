@@ -7,7 +7,7 @@ defmodule Screens.V2.CandidateGenerator.TriptychTest do
   setup do
     config = %Screen{
       app_params: %V2.Triptych{
-        evergreen_content: [],
+        local_evergreen_sets: [],
         train_crowding: %V2.TrainCrowding{
           station_id: "place-dwnxg",
           direction_id: 1,

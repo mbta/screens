@@ -5,7 +5,7 @@ defmodule Screens.Config.V2.LocalEvergreenSet do
 
   @type t :: %__MODULE__{
           folder_name: String.t(),
-          schedule: list(Schedule.t()),
+          schedule: list(Schedule.t())
         }
 
   @enforce_keys ~w[folder_name]a

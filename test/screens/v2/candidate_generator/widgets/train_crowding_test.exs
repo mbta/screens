@@ -21,7 +21,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
           front_car_direction: "right",
           enabled: true
         },
-        evergreen_content: []
+        local_evergreen_sets: []
       },
       vendor: :outfront,
       device_id: "TEST",
