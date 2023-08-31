@@ -30,7 +30,8 @@ import NoData from "Components/v2/triptych/no_data";
 
 import Placeholder from "Components/v2/placeholder";
 import TrainCrowding from "Components/v2/train_crowding";
-import EvergreenContent from "Components/v2/triptych/evergreen_content";
+import EvergreenContent from "Components/v2/evergreen_content";
+import { TRIPTYCH_VERSION } from "Components/v2/triptych/version";
 
 const customizeEvergreenProps = (WrappedComponent: React.ElementType) => {
   return (props: { asset_url: string; show_identifiers: boolean }) => {
@@ -38,12 +39,19 @@ const customizeEvergreenProps = (WrappedComponent: React.ElementType) => {
     const dupReadyUrl = imagePath(modifiedUrl);
 
     const isPlaying = useIsOnScreen();
+    const playerName = usePlayerName();
+    let identifiers = `${TRIPTYCH_VERSION} ${playerName ? playerName : ""}`;
     return (
-      <WrappedComponent
-        {...props}
-        asset_url={dupReadyUrl}
-        isPlaying={isPlaying}
-      />
+      <>
+        <WrappedComponent
+          {...props}
+          asset_url={dupReadyUrl}
+          isPlaying={isPlaying}
+        />
+        {props.show_identifiers && (
+          <div className="evergreen-content__identifiers">{identifiers}</div>
+        )}
+      </>
     );
   };
 };
