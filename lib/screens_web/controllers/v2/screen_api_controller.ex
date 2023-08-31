@@ -6,7 +6,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   alias Screens.V2.ScreenData
 
   plug(:check_config)
-  plug Corsica, [origins: "*"] when action == :show_dup
+  plug Corsica, [origins: "*"] when action in [:show_dup, :show_triptych]
 
   defp check_config(conn, _) do
     if State.ok?() do
@@ -22,6 +22,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
     screen_side = params["screen_side"]
     rotation_index = params["rotation_index"]
+    triptych_pane = params["pane"]
 
     Screens.LogScreenData.log_data_request(
       screen_id,
@@ -29,7 +30,8 @@ defmodule ScreensWeb.V2.ScreenApiController do
       is_screen,
       params["requestor"],
       screen_side,
-      rotation_index
+      rotation_index,
+      triptych_pane
     )
 
     cond do
@@ -80,6 +82,16 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   def show_dup(conn, params), do: show(conn, params)
+
+  def show_triptych(conn, %{"player_name" => player_name} = params) do
+    case Screens.TriptychPlayer.fetch_screen_id_for_player(player_name) do
+      {:ok, screen_id} -> show(conn, Map.put(params, "id", screen_id))
+      # Reuse the logic + logging in show/2 for nonexistent IDs.
+      # This will log a data request for triptych_player_name:#{player_name} and
+      # Return a 404 response.
+      :error -> show(conn, Map.put(params, "id", "triptych_player_name:#{player_name}"))
+    end
+  end
 
   def simulation(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
     Screens.LogScreenData.log_data_request(

@@ -1,10 +1,10 @@
-# DUP app packaging v2
+# Triptych app packaging
 
-- Ensure [Corsica](https://hexdocs.pm/corsica/Corsica.html) is used on the server to allow CORS requests (ideally limited to just the DUP-relevant routes). It should already be configured at [this line](/lib/screens_web/controllers/v2/screen_api_controller.ex#L9) in the API controller--if it is, you don't need to do anything for this step.
-- Double check that any behavior specific to the DUP screen environment happens inside of an `isDup()` or `isOFM()` check. This includes:
+- Ensure [Corsica](https://hexdocs.pm/corsica/Corsica.html) is used on the server to allow CORS requests (ideally limited to just the triptych-relevant routes). It should already be configured at [this line](/lib/screens_web/controllers/v2/screen_api_controller.ex#L9) in the API controller--if it is, you don't need to do anything for this step.
+- Double check that any behavior specific to the triptych screen environment happens inside of an `isTriptych()` or `isOFM()` check. This includes:
   - `buildApiPath` in use_api_response.tsx should return a full URL for the API path: prefix `apiPath` string with "https://screens.mbta.com".
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
-- Create priv/static/dup-app.html if it doesn’t already exist. Copy paste the following contents in:
+- Create priv/static/triptych-app.html if it doesn’t already exist. Copy paste the following contents in:
 
   ```html
   <!DOCTYPE html>
@@ -14,7 +14,7 @@
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Screens</title>
-      <link rel="stylesheet" href="dup_v2.css" />
+      <link rel="stylesheet" href="triptych_v2.css" />
     </head>
 
     <body>
@@ -24,49 +24,50 @@
         data-environment-name="screens-prod"
       ></div>
       <script type="text/javascript" src="polyfills.js"></script>
-      <script type="text/javascript" src="dup_v2.js"></script>
+      <script type="text/javascript" src="triptych_v2.js"></script>
     </body>
   </html>
   ```
 
-- Set the version string in assets/src/components/v2/dup/version.tsx to `current_year.current_month.current_day.1`.
+- Set the version string in assets/src/components/v2/triptych/version.tsx to `current_year.current_month.current_day.1`.
 - In assets/webpack.config.js, change `publicPath` in the font config to have value `'fonts/'`.
 - **Only if you are packaging for local testing**
-  - add the following to the top of assets/src/apps/v2/dup.tsx, filling in the string values:
+  - add the following to the top of assets/src/apps/v2/triptych.tsx, filling in the string values:
     ```ts
     import { __TEST_setFakeMRAID__ } from "Util/outfront";
     __TEST_setFakeMRAID__({
-      playerName: "<a DUP player name, e.g. BKB-DUP-002. For others, look in priv/local.json for IDs of the pattern 'DUP-${playerName}'>",
-      station: "<a station name>"
+      playerName: "<a player name from priv/triptych_player_to_screen_id.json>",
+      station: "<a station name>",
+      triptychPane: "<right | middle | left>"
     });
     ```
     This sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
     The MRAID object gives our client info about which screen it's running on.
   - replace the definition of `getOutfrontAbsolutePath` in assets/src/hooks/v2/use_api_response.tsx with `const getOutfrontAbsolutePath = () => isOFM() ? "http://localhost:4000" : "";`.
+  - make sure priv/triptych_player_to_screen_id.json mirrors mbta-ctd-config/screens/triptych_player_to_screen_id-prod.json, or at least contains a mapping for the `playerName` that you hardcoded two steps ago.
 - `cd` to priv/static and run the following:
   ```sh
-  for ROTATION_INDEX in {0..2}; do
-    echo "export const ROTATION_INDEX = ${ROTATION_INDEX};" > ../../assets/src/components/v2/dup/rotation_index.tsx && \
-    npm --prefix ../../assets run deploy && \
-    cp -r css/dup_v2.css js/polyfills.js js/dup_v2.js ../dup_preview.png . && \
-    cp ../dup_template.json ./template.json && \
-    sed -i "" "s/DUP APP ./DUP APP ${ROTATION_INDEX}/" template.json && \
-    zip -r dup-app-${ROTATION_INDEX}.zip dup_v2.css polyfills.js dup_v2.js fonts images dup-app.html template.json dup_preview.png
-  done
+  npm --prefix ../../assets run deploy && \
+  cp -r css/triptych_v2.css js/polyfills.js js/triptych_v2.js ../triptych_preview.png . && \
+  cp ../triptych_template.json ./template.json && \
+  zip -r triptych-app.zip triptych_v2.css polyfills.js triptych_v2.js fonts images triptych-app.html template.json triptych_preview.png
   ```
-- On completion, the packaged client apps will be saved at `priv/static/dup-app-(0|1|2).zip`.
+- On completion, the packaged client app will be saved at `priv/static/triptych-app.zip`.
 - Commit the version bump on a branch, push it, and create a PR to mark the deploy.
 
 ## Working with Outfront
 
-Once you've created the client app packages, you'll need to send them to Outfront to test and deploy.
+Once you've created the client app package, you'll need to send it to Outfront for them to test and deploy it.
 
 Ask a Screens team member for the email of our contact at Outfront.
-In your message, be sure to specify a player name (or "Liveboard name") that they should set on the test screen.
+In your message, be sure to specify:
+- a player name (or "Liveboard name"), and
+- a triptych pane (or `Array_configuration`--value should be of the form "Triple-(Left|Middle|Right)")
+that they should set on the test screen.
 
 ## Debugging
 
-To assist with debugging on the DUP screens, you can paste this at the module scope in dup.tsx to have console logs
+To assist with debugging on the triptych screens, you can paste this at the module scope in triptych.tsx to have console logs
 show up on the screen:
 
 ```js
@@ -84,7 +85,7 @@ const Counter = (() => {
 
 const dEl = document.createElement("div");
 dEl.id = "debug";
-dEl.className = "dup";
+dEl.className = "triptych";
 document.body.appendChild(dEl);
 // save the original console.log function
 const old_logger = console.log;

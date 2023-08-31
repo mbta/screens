@@ -18,6 +18,7 @@ defmodule Screens.Application do
       # {Screens.Worker, arg},
       Screens.Config.State.Supervisor,
       Screens.SignsUiConfig.State.Supervisor,
+      Screens.TriptychPlayer.State.Supervisor,
       :hackney_pool.child_spec(:ex_aws_pool, []),
       :hackney_pool.child_spec(:blue_bikes_pool, []),
       :hackney_pool.child_spec(:api_v3_pool, max_connections: 100),

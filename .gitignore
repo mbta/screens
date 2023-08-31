@@ -36,6 +36,7 @@ npm-debug.log
 # Local config files
 /priv/local.json
 /priv/signs_ui_config.json
+/priv/triptych_player_to_screen_id.json
 
 # local environment variables
 /priv/local.env
