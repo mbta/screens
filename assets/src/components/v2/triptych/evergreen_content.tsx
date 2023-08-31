@@ -9,7 +9,6 @@ interface Props {
 }
 
 const EvergreenContent: ComponentType<Props> = (props) => {
-  console.log(props);
   const { show_identifiers: showIdentifiers } = props;
   const playerName = usePlayerName();
   let identifiers = `${TRIPTYCH_VERSION} ${playerName ? playerName : ""}`;
