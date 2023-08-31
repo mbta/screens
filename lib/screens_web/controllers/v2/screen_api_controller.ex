@@ -23,6 +23,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     screen_side = params["screen_side"]
     rotation_index = params["rotation_index"]
     triptych_pane = params["pane"]
+    ofm_app_package_version = params["version"]
 
     Screens.LogScreenData.log_data_request(
       screen_id,
@@ -31,7 +32,8 @@ defmodule ScreensWeb.V2.ScreenApiController do
       params["requestor"],
       screen_side,
       rotation_index,
-      triptych_pane
+      triptych_pane,
+      ofm_app_package_version
     )
 
     cond do
