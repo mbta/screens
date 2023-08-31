@@ -59,6 +59,10 @@ defmodule Screens.LogScreenData do
     log_message("[screen frontend error]", data)
   end
 
+  def log_unrecognized_triptych_player(player_name) do
+    log_message("[unrecognized triptych player name]", %{player_name: player_name})
+  end
+
   def log_api_response(response, screen_id, last_refresh, is_screen, screen_side \\ nil)
 
   def log_api_response(
