@@ -25,7 +25,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
       |> Kernel./(15)
       |> floor()
 
-    :rand.seed(:exsss, {seed_number, seed_number, seed_number})
+    _ = :rand.seed(:exsss, {seed_number, seed_number, seed_number})
 
     local_evergreen_sets
     |> Enum.random()
