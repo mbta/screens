@@ -687,6 +687,24 @@ const shuttleBusInfoColumn = {
   FormCell: FormTextarea,
 };
 
+const trainCrowdingColumn = {
+  Header: "Train Crowding",
+  accessor: buildAppParamAccessor("train_crowding"),
+  mutator: buildAppParamMutator("train_crowding"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
+const localEvergreenSetsColumn = {
+  Header: "Local Evergreen Content Sets",
+  accessor: buildAppParamAccessor("local_evergreen_sets"),
+  mutator: buildAppParamMutator("local_evergreen_sets"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
 const PreFareV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "pre_fare_v2";
@@ -762,7 +780,15 @@ const TriptychV2ScreensTable = (): JSX.Element => {
     return app_id === "triptych_v2";
   };
 
-  return <AdminTable columns={[...v2Columns]} dataFilter={dataFilter} />;
+  return (
+    <AdminTable
+      columns={[
+        trainCrowdingColumn,
+        localEvergreenSetsColumn,
+      ]}
+      dataFilter={dataFilter}
+    />
+  );
 };
 
 export {
