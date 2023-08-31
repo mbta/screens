@@ -5,8 +5,6 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
 
-  alias Screens.V2.WidgetInstance.Placeholder
-
   @behaviour CandidateGenerator
 
   @impl CandidateGenerator
