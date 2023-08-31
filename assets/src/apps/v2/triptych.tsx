@@ -33,14 +33,14 @@ import TrainCrowding from "Components/v2/train_crowding";
 import EvergreenContent from "Components/v2/evergreen_content";
 
 const customizeEvergreenProps = (WrappedComponent: React.ElementType) => {
-  return (props: {asset_url: string}) => {
-    const modifiedUrl = props.asset_url.replace("assets/static/images/", "")
-    const dupReadyUrl = imagePath(modifiedUrl)
+  return (props: { asset_url: string }) => {
+    const modifiedUrl = props.asset_url.replace("assets/static/images/", "");
+    const dupReadyUrl = imagePath(modifiedUrl);
 
-    const isPlaying = useIsOnScreen()
-    return <WrappedComponent asset_url={dupReadyUrl} isPlaying={isPlaying} />
-  }
-}
+    const isPlaying = useIsOnScreen();
+    return <WrappedComponent asset_url={dupReadyUrl} isPlaying={isPlaying} />;
+  };
+};
 
 const TYPE_TO_COMPONENT = {
   // Layouts

@@ -10,7 +10,10 @@ interface Props {
   isPlaying?: boolean;
 }
 
-const EvergreenContent: ComponentType<Props> = ({ asset_url: assetUrl, isPlaying: isPlaying = true }) => {
+const EvergreenContent: ComponentType<Props> = ({
+  asset_url: assetUrl,
+  isPlaying: isPlaying = true,
+}) => {
   const parts = assetUrl.split(".");
   const extension = parts[parts.length - 1].toLowerCase();
 
@@ -22,7 +25,7 @@ const EvergreenContent: ComponentType<Props> = ({ asset_url: assetUrl, isPlaying
   return null;
 };
 
-const Image: ComponentType<{assetUrl: string}> = ({ assetUrl }) => {
+const Image: ComponentType<{ assetUrl: string }> = ({ assetUrl }) => {
   return (
     <div className="evergreen-content-image__container">
       <img className="evergreen-content-image__image" src={assetUrl} />
