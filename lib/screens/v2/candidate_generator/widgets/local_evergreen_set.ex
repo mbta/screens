@@ -70,7 +70,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
           }
         end)
 
-      :error ->
+      {:error, _} ->
         []
     end
   end
