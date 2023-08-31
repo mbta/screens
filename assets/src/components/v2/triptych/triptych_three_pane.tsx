@@ -11,7 +11,7 @@ interface Props {
 const TriptychThreePane: React.ComponentType<Props> = ({
   left_pane: leftPane,
   middle_pane: middlePane,
-  right_pane: rightPane
+  right_pane: rightPane,
 }) => {
   return (
     <div className="three-flex-panes">
