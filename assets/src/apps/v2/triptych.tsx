@@ -29,13 +29,18 @@ import NoData from "Components/v2/triptych/no_data";
 
 import Placeholder from "Components/v2/placeholder";
 import TrainCrowding from "Components/v2/train_crowding";
-import EvergreenContent from "Components/v2/evergreen_content";
+import EvergreenContent from "Components/v2/triptych/evergreen_content";
 
 const adjustAssetUrl = (WrappedComponent: React.ElementType) => {
-  return (props: { asset_url: string }) => {
+  return (props: { asset_url: string; show_identifiers: boolean }) => {
     const modifiedUrl = props.asset_url.replace("assets/static/images/", "");
     const dupReadyUrl = imagePath(modifiedUrl);
-    return <WrappedComponent asset_url={dupReadyUrl} />;
+    return (
+      <WrappedComponent
+        asset_url={dupReadyUrl}
+        show_identifiers={props.show_identifiers}
+      />
+    );
   };
 };
 
