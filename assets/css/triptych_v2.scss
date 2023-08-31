@@ -27,6 +27,18 @@
   line-height: 118px;
 }
 
+@mixin font--caption-2 {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 40px;
+}
+
+@mixin font--caption-3 {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+}
+
 // Top level stuff
 @import "v2/triptych/screen_container";
 @import "v2/triptych/viewport";
