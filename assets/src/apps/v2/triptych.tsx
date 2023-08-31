@@ -7,6 +7,7 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import { usePlayerName } from "Hooks/outfront";
+import useIsOnScreen from "Hooks/v2/use_is_on_screen";
 import { isTriptych } from "Util/outfront";
 
 import { MappingContext } from "Components/v2/widget";
@@ -31,11 +32,13 @@ import Placeholder from "Components/v2/placeholder";
 import TrainCrowding from "Components/v2/train_crowding";
 import EvergreenContent from "Components/v2/evergreen_content";
 
-const adjustAssetUrl = (WrappedComponent: React.ElementType) => {
+const customizeEvergreenProps = (WrappedComponent: React.ElementType) => {
   return (props: {asset_url: string}) => {
     const modifiedUrl = props.asset_url.replace("assets/static/images/", "")
     const dupReadyUrl = imagePath(modifiedUrl)
-    return <WrappedComponent asset_url={dupReadyUrl} />
+
+    const isPlaying = useIsOnScreen()
+    return <WrappedComponent asset_url={dupReadyUrl} isPlaying={isPlaying} />
   }
 }
 
@@ -47,7 +50,7 @@ const TYPE_TO_COMPONENT = {
   page_load_no_data: PageLoadNoData,
   no_data: NoData,
   train_crowding: TrainCrowding,
-  evergreen_content: adjustAssetUrl(EvergreenContent),
+  evergreen_content: customizeEvergreenProps(EvergreenContent),
   placeholder: Placeholder,
 };
 
