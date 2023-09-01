@@ -56,9 +56,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
            params |> Map.to_list() |> fetch_alerts_fn.() do
       next_train_prediction = List.first(predictions)
 
-      Logger.info(
-        "[train_crowding next_prediction] station_id=#{train_crowding.station_id} direction_id=#{train_crowding.direction_id} next_prediction_id=#{next_train_prediction.id} next_trip_id=#{next_train_prediction.trip.id}"
-      )
+      if opts[:is_real_screen] do
+        Logger.info(
+          "[train_crowding next_prediction] station_id=#{train_crowding.station_id} direction_id=#{train_crowding.direction_id} next_prediction_id=#{next_train_prediction.id} next_trip_id=#{next_train_prediction.trip.id}"
+        )
+      end
 
       # If there is an upcoming train, it's headed to this station, and we're not at a temporary terminal,
       # show the widget
@@ -68,7 +70,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
              train_crowding.station_id and
            next_train_prediction.vehicle.carriages != [] and
            not any_alert_makes_this_a_terminal?(alerts, location_context) do
-        log_crowding_info(next_train_prediction, train_crowding)
+        log_crowding_info(next_train_prediction, train_crowding, opts[:is_real_screen])
 
         [
           %CrowdingWidget{
@@ -100,14 +102,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       LocalizedAlert.location(localized_alert) in [:boundary_downstream, :boundary_upstream]
   end
 
-  defp log_crowding_info(prediction, crowding_config) do
-    Enum.each(
-      prediction.vehicle.carriages,
-      fn %Screens.Vehicles.Carriage{} = carriage ->
-        Logger.info(
-          "[train_crowding car_crowding_info] station_id=#{crowding_config.station_id} direction_id=#{crowding_config.direction_id} car_number=#{carriage.car_number} vehicle_id=#{prediction.vehicle.id} crowding_level=#{carriage.occupancy_status} trip_id=#{prediction.trip.id} prediction_id=#{prediction.id}"
-        )
-      end
+  defp log_crowding_info(prediction, crowding_config, true) do
+    crowding_levels =
+      prediction.vehicle.carriages
+      |> Enum.sort_by(& &1.car_number)
+      |> Enum.map(& &1.occupancy_status)
+
+    Logger.info(
+      "[train_crowding car_crowding_info] station_id=#{crowding_config.station_id} direction_id=#{crowding_config.direction_id} trip_id=#{prediction.trip.id} prediction_id=#{prediction.id} vehicle_id=#{prediction.vehicle.id} car_crowding_levels=#{crowding_levels}"
     )
   end
+
+  defp log_crowding_info(_, _, _), do: :ok
 end
