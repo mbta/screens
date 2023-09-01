@@ -2,6 +2,8 @@ import React from "react";
 
 import { classWithModifier } from "Util/util";
 import { NormalHeaderTime } from "./normal_header";
+import { usePlayerName } from "Hooks/outfront";
+import { TRIPTYCH_VERSION } from "./triptych/version";
 
 import Logo from "../../../static/images/svgr_bundled/logo.svg";
 import ArrowUp from "../../../static/images/svgr_bundled/Arrow-90.svg";
@@ -31,15 +33,6 @@ import CarCrowdedRight from "../../../static/images/svgr_bundled/train_crowding/
 import CarNoDataRight from "../../../static/images/svgr_bundled/train_crowding/Car-NoData-Right.svg";
 import CarClosedRight from "../../../static/images/svgr_bundled/train_crowding/Car-Closed-Right.svg";
 
-interface Props {
-  arrivalTime: string;
-  crowding: OccupancyStatus[];
-  destination: string;
-  front_car_direction: FrontCarDirection;
-  now: string;
-  platform_position: number;
-}
-
 type FrontCarDirection = "left" | "right";
 type OccupancyStatus =
   | "no_data"
@@ -51,7 +44,7 @@ type OccupancyStatus =
 type CarOrientation = FrontCarDirection | "middle";
 const lookupCarComponent = (
   occupancyStatus: OccupancyStatus,
-  carOrientation: CarOrientation,
+  carOrientation: CarOrientation
 ) => {
   const lookupKey: `${CarOrientation}/${OccupancyStatus}` = `${carOrientation}/${occupancyStatus}`;
 
@@ -91,19 +84,54 @@ const lookupCarComponent = (
   }
 };
 
+interface FooterSegmentProps {
+  children: React.ReactNode;
+  identifiers: string;
+  showIdentifiers: boolean;
+}
+
+// Wrapper for footer segments so there is less code duplication when adding identifiers
+const FooterSegment: React.ComponentType<FooterSegmentProps> = ({
+  children,
+  identifiers,
+  showIdentifiers,
+}) => {
+  return (
+    <div className="crowding-widget__footer__segment">
+      {children}
+      {showIdentifiers && (
+        <div className="crowding-widget__footer__identifiers">
+          {identifiers}
+        </div>
+      )}
+    </div>
+  );
+};
+
+interface Props {
+  arrivalTime: string;
+  crowding: OccupancyStatus[];
+  destination: string;
+  front_car_direction: FrontCarDirection;
+  now: string;
+  platform_position: number;
+  show_identifiers: boolean;
+}
+
 const TrainCrowding: React.ComponentType<Props> = ({
   crowding,
   destination,
   platform_position: platformPosition,
   front_car_direction: frontCarDirection,
   now,
+  show_identifiers: showIdentifiers,
 }) => {
   // If the front car direction is right, the crowding array needs to be reversed
   // so the last car is rendered on the left.
   const trains = crowding.map((occupancyStatus, i) => {
     const CarComponent = lookupCarComponent(
       occupancyStatus,
-      i == 0 ? frontCarDirection : "middle",
+      i == 0 ? frontCarDirection : "middle"
     );
     return <CarComponent key={i} className="crowding-widget__train-car" />;
   });
@@ -139,6 +167,9 @@ const TrainCrowding: React.ComponentType<Props> = ({
   const textPane = Math.floor((arrowSlot / 25) * 3);
   const textPadding = (textPane * 3240) / 3;
 
+  const playerName = usePlayerName();
+  let identifiers = `${TRIPTYCH_VERSION} ${playerName ? playerName : ""}`;
+
   return (
     <div className="crowding-widget">
       <div className="crowding-widget__header">
@@ -157,14 +188,14 @@ const TrainCrowding: React.ComponentType<Props> = ({
             <ArrowUp
               className={classWithModifier(
                 "crowding-widget__you-are-here-arrow",
-                arrowDirection,
+                arrowDirection
               )}
             />
           ) : (
             <ArrowUpLeft
               className={classWithModifier(
                 "crowding-widget__you-are-here-arrow",
-                arrowDirection,
+                arrowDirection
               )}
             />
           )}
@@ -173,17 +204,23 @@ const TrainCrowding: React.ComponentType<Props> = ({
           style={{ marginLeft: textPadding }}
           className={classWithModifier(
             "crowding-widget__you-are-here-text",
-            [8, 16, 24].includes(arrowSlot) ? "right-align" : "left-align",
+            [8, 16, 24].includes(arrowSlot) ? "right-align" : "left-align"
           )}
         >
           You are here
         </div>
       </div>
       <div className="crowding-widget__footer">
-        <div className="crowding-widget__footer__segment">
+        <FooterSegment
+          showIdentifiers={showIdentifiers}
+          identifiers={identifiers}
+        >
           Current crowding on board
-        </div>
-        <div className="crowding-widget__footer__segment">
+        </FooterSegment>
+        <FooterSegment
+          showIdentifiers={showIdentifiers}
+          identifiers={identifiers}
+        >
           <div className="crowding-widget__footer__key-row">
             <KeyNotCrowded width="137" height="100" className="key-icon" /> Not
             crowded
@@ -192,8 +229,11 @@ const TrainCrowding: React.ComponentType<Props> = ({
             <KeySomeCrowding width="137" height="100" className="key-icon" />{" "}
             Some crowding
           </div>
-        </div>
-        <div className="crowding-widget__footer__segment">
+        </FooterSegment>
+        <FooterSegment
+          showIdentifiers={showIdentifiers}
+          identifiers={identifiers}
+        >
           <div className="crowding-widget__footer__key-row">
             <KeyCrowded width="137" height="100" className="key-icon" /> Crowded
           </div>
@@ -212,7 +252,7 @@ const TrainCrowding: React.ComponentType<Props> = ({
               )
             )}
           </div>
-        </div>
+        </FooterSegment>
       </div>
     </div>
   );
