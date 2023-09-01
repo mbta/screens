@@ -7,7 +7,6 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import { usePlayerName } from "Hooks/outfront";
-import useIsOnScreen from "Hooks/v2/use_is_on_screen";
 import { isTriptych } from "Util/outfront";
 
 import { MappingContext } from "Components/v2/widget";
@@ -15,7 +14,6 @@ import {
   ResponseMapper,
   ResponseMapperContext,
 } from "Components/v2/screen_container";
-import { imagePath } from "Util/util";
 
 import ScreenPage from "Components/v2/screen_page";
 import MultiScreenPage from "Components/v2/multi_screen_page";
@@ -30,16 +28,7 @@ import NoData from "Components/v2/triptych/no_data";
 
 import Placeholder from "Components/v2/placeholder";
 import TrainCrowding from "Components/v2/train_crowding";
-import EvergreenContent from "Components/v2/evergreen_content";
-
-const customizeEvergreenProps = (WrappedComponent: React.ElementType) => {
-  return (props: { asset_url: string }) => {
-    const dupReadyUrl = imagePath(props.asset_url);
-
-    const isPlaying = useIsOnScreen();
-    return <WrappedComponent asset_url={dupReadyUrl} isPlaying={isPlaying} />;
-  };
-};
+import OutfrontEvergreenContent from "Components/v2/outfront_evergreen_content";
 
 const TYPE_TO_COMPONENT = {
   // Layouts
@@ -49,7 +38,7 @@ const TYPE_TO_COMPONENT = {
   page_load_no_data: PageLoadNoData,
   no_data: NoData,
   train_crowding: TrainCrowding,
-  evergreen_content: customizeEvergreenProps(EvergreenContent),
+  evergreen_content: OutfrontEvergreenContent,
   placeholder: Placeholder,
 };
 
