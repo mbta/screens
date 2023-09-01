@@ -549,6 +549,30 @@ const v2Columns = [
   },
 ];
 
+const screenIDColumn = {
+  Header: "Screen ID",
+  accessor: "id",
+  Filter: DefaultColumnFilter,
+  FormCell: FormStaticCell,
+};
+
+const screenNameColumn = {
+  Header: "Name",
+  accessor: "name",
+  Cell: EditableCell,
+  Filter: DefaultColumnFilter,
+  FormCell: FormTextCell,
+};
+
+const evergreenContentColumn = {
+  Header: "Evergreen Content",
+  accessor: buildAppParamAccessor("evergreen_content"),
+  mutator: buildAppParamMutator("evergreen_content"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
 const alertsColumn = {
   Header: "Alerts",
   accessor: buildAppParamAccessor("alerts"),
@@ -705,6 +729,15 @@ const localEvergreenSetsColumn = {
   FormCell: FormTextarea,
 };
 
+const showIdentifiersColumn = {
+  Header: "Show Version & Player Name?",
+  accessor: buildAppParamAccessor("show_identifiers"),
+  mutator: buildAppParamMutator("show_identifiers"),
+  Cell: EditableCheckbox,
+  Filter: DefaultColumnFilter,
+  FormCell: FormBoolean,
+}
+
 const PreFareV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "pre_fare_v2";
@@ -783,8 +816,12 @@ const TriptychV2ScreensTable = (): JSX.Element => {
   return (
     <AdminTable
       columns={[
+        screenIDColumn,
+        screenNameColumn,
         trainCrowdingColumn,
         localEvergreenSetsColumn,
+        evergreenContentColumn,
+        showIdentifiersColumn
       ]}
       dataFilter={dataFilter}
     />

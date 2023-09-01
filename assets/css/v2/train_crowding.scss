@@ -10,6 +10,7 @@
   }
   &__body {
     display: flex;
+    position: relative;
     flex-direction: column;
     height: 920px;
     background-color: #d9d6d0;
@@ -38,6 +39,7 @@
 .crowding-widget__header__destination-sentence {
   @include font--heading-3;
   margin-top: auto;
+  color: #FFFFFF;
   .destination {
     padding-left: 109px;
   }
