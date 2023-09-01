@@ -14,7 +14,7 @@ const TriptychThreePane: React.ComponentType<Props> = ({
   right_pane: rightPane,
 }) => {
   return (
-    <div className="three-flex-panes">
+    <>
       <div className="left-pane">
         <Widget data={leftPane} />
       </div>
@@ -24,7 +24,7 @@ const TriptychThreePane: React.ComponentType<Props> = ({
       <div className="right-pane">
         <Widget data={rightPane} />
       </div>
-    </div>
+    </>
   );
 };
 
