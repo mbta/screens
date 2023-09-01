@@ -21,8 +21,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
       now
       |> DateTime.truncate(:second)
       |> DateTime.to_unix()
-      |> Kernel./(15)
-      |> floor()
+      |> div(15)
 
     _ = :rand.seed(:exsss, {seed_number, seed_number, seed_number})
 
