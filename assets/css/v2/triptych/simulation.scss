@@ -28,18 +28,20 @@
   overflow-x: auto;
   padding-bottom: 20px;
 
-  .three-flex-panes {
+  .simulation__full-page {
     height: 344px;
     width: 580.5px;
     z-index: 999;
     position: relative;
     overflow: hidden;
+    display: flex;
 
     .left-pane,
     .middle-pane,
     .right-pane {
       position: relative;
       overflow: hidden;
+      left: unset;
       height: 100%;
       width: 33.33%;
 
