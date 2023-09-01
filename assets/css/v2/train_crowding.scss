@@ -10,6 +10,7 @@
   }
   &__body {
     display: flex;
+    position: relative;
     flex-direction: column;
     height: 920px;
     background-color: #d9d6d0;
