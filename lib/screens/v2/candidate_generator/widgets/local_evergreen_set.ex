@@ -67,6 +67,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
         end)
 
       {:error, _} ->
+        Logger.warn("[Triptych PSA filepath not found] folder_name=#{folder_name}")
         []
     end
   end
