@@ -20,8 +20,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
     seed_number =
       now
       |> DateTime.truncate(:second)
-      |> DateTime.to_gregorian_seconds()
-      |> elem(0)
+      |> DateTime.to_unix()
       |> Kernel./(15)
       |> floor()
 
