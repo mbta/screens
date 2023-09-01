@@ -6,6 +6,8 @@ import { isDup, isOFM, isTriptych, getTriptychPane } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/util";
 import * as SentryLogger from "Util/sentry";
 import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
+import { DUP_VERSION } from "Components/v2/dup/version";
+import { TRIPTYCH_VERSION } from "Components/v2/triptych/version";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -131,14 +133,12 @@ const getRequestorParam = () => {
 
 const getLoggingParams = () => {
   if (isDup()) {
-    return `&rotation_index=${ROTATION_INDEX}`;
+    return `&rotation_index=${ROTATION_INDEX}&version=${DUP_VERSION}`;
   }
 
   if (isTriptych()) {
     const triptychPane = getTriptychPane();
-    if (triptychPane != null) {
-      return `&pane=${triptychPane}`;
-    }
+    return `&pane=${triptychPane || "UNKNOWN"}&version=${TRIPTYCH_VERSION}`;
   }
 
   return "";
