@@ -46,7 +46,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
          config,
          now
        ) do
-    path = Path.join("assets/static/images/triptych_psas/", folder_name)
+    partial_path = Path.join("triptych_psas/", folder_name)
+    path = Path.join("assets/static/images/", partial_path)
 
     case File.ls(path) do
       {:ok, files} ->
@@ -59,7 +60,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
           %EvergreenContent{
             screen: config,
             slot_names: [slot_name],
-            asset_url: path <> "/" <> file,
+            asset_url: Path.join([partial_path, "/", file]),
             priority: [2],
             schedule: schedule,
             now: now,

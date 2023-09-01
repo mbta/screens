@@ -34,8 +34,7 @@ import EvergreenContent from "Components/v2/evergreen_content";
 
 const customizeEvergreenProps = (WrappedComponent: React.ElementType) => {
   return (props: { asset_url: string }) => {
-    const modifiedUrl = props.asset_url.replace("assets/static/images/", "");
-    const dupReadyUrl = imagePath(modifiedUrl);
+    const dupReadyUrl = imagePath(props.asset_url);
 
     const isPlaying = useIsOnScreen();
     return <WrappedComponent asset_url={dupReadyUrl} isPlaying={isPlaying} />;
