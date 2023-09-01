@@ -168,6 +168,7 @@ interface OFMTag {
 }
 
 export const getMRAID = (): MRAID | false => {
+  if (!isOFM()) return false;
   return (parent?.parent as OFMWindow)?.mraid ?? false;
 };
 
