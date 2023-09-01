@@ -5,6 +5,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
   Currently used only by Triptychs, which randomizes which PSA set appears.
   """
 
+  require Logger
+
   alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance.EvergreenContent
   alias Screens.Config.V2.{LocalEvergreenSet, Triptych}
@@ -20,12 +22,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
     seed_number =
       now
       |> DateTime.truncate(:second)
-      |> DateTime.to_gregorian_seconds()
-      |> elem(0)
-      |> Kernel./(15)
-      |> floor()
+      |> DateTime.to_unix()
+      |> div(15)
 
-    :rand.seed(:exsss, {seed_number, seed_number, seed_number})
+    _ = :rand.seed(:exsss, {seed_number, seed_number, seed_number})
 
     local_evergreen_sets
     |> Enum.random()
@@ -48,20 +48,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
          config,
          now
        ) do
-    path = "assets/static/images/triptych_psas/" <> folder_name
+    partial_path = Path.join("triptych_psas/", folder_name)
+    path = Path.join("assets/static/images/", partial_path)
 
     case File.ls(path) do
       {:ok, files} ->
         Enum.map(files, fn file ->
-          slot_name =
-            file
-            |> String.replace_suffix(".png", "")
-            |> string_to_slot_name()
+          slot_name = string_to_slot_name(file)
 
           %EvergreenContent{
             screen: config,
             slot_names: [slot_name],
-            asset_url: path <> "/" <> file,
+            asset_url: Path.join([partial_path, "/", file]),
             priority: [2],
             schedule: schedule,
             now: now,
@@ -70,7 +68,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
           }
         end)
 
-      :error ->
+      {:error, _} ->
+        Logger.warn("[Triptych PSA filepath not found] folder_name=#{folder_name}")
         []
     end
   end

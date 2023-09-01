@@ -2,6 +2,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   use ScreensWeb, :controller
 
   alias Screens.Config.State
+  alias Screens.LogScreenData
   alias Screens.Util
   alias Screens.V2.ScreenData
 
@@ -23,20 +24,22 @@ defmodule ScreensWeb.V2.ScreenApiController do
     screen_side = params["screen_side"]
     rotation_index = params["rotation_index"]
     triptych_pane = params["pane"]
+    ofm_app_package_version = params["version"]
 
-    Screens.LogScreenData.log_data_request(
+    LogScreenData.log_data_request(
       screen_id,
       last_refresh,
       is_screen,
       params["requestor"],
       screen_side,
       rotation_index,
-      triptych_pane
+      triptych_pane,
+      ofm_app_package_version
     )
 
     cond do
       nonexistent_screen?(screen_id) ->
-        Screens.LogScreenData.log_api_response(
+        LogScreenData.log_api_response(
           :nonexistent,
           screen_id,
           last_refresh,
@@ -47,7 +50,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
         not_found_response(conn)
 
       Util.outdated?(screen_id, last_refresh) ->
-        Screens.LogScreenData.log_api_response(
+        LogScreenData.log_api_response(
           :outdated,
           screen_id,
           last_refresh,
@@ -58,7 +61,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
         json(conn, ScreenData.outdated_response())
 
       disabled?(screen_id) ->
-        Screens.LogScreenData.log_api_response(
+        LogScreenData.log_api_response(
           :disabled,
           screen_id,
           last_refresh,
@@ -69,7 +72,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
         json(conn, ScreenData.disabled_response())
 
       true ->
-        Screens.LogScreenData.log_api_response(
+        LogScreenData.log_api_response(
           :success,
           screen_id,
           last_refresh,
@@ -85,16 +88,21 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   def show_triptych(conn, %{"player_name" => player_name} = params) do
     case Screens.TriptychPlayer.fetch_screen_id_for_player(player_name) do
-      {:ok, screen_id} -> show(conn, Map.put(params, "id", screen_id))
-      # Reuse the logic + logging in show/2 for nonexistent IDs.
-      # This will log a data request for triptych_player_name:#{player_name} and
-      # Return a 404 response.
-      :error -> show(conn, Map.put(params, "id", "triptych_player_name:#{player_name}"))
+      {:ok, screen_id} ->
+        show(conn, Map.put(params, "id", screen_id))
+
+      :error ->
+        LogScreenData.log_unrecognized_triptych_player(player_name)
+
+        # Reuse the logic + logging in show/2 for nonexistent IDs.
+        # This will log a data request for the nonexistent player name and
+        # return a 404 response.
+        show(conn, Map.put(params, "id", "triptych_player_name--#{player_name}"))
     end
   end
 
   def simulation(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
-    Screens.LogScreenData.log_data_request(
+    LogScreenData.log_data_request(
       screen_id,
       last_refresh,
       false,
@@ -122,7 +130,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
         "errorMessage" => error_message,
         "stacktrace" => stack_trace
       }) do
-    Screens.LogScreenData.log_frontend_error(screen_id, error_message, stack_trace)
+    LogScreenData.log_frontend_error(screen_id, error_message, stack_trace)
     json(conn, %{success: true})
   end
 
