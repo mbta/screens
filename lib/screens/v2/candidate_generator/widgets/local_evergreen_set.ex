@@ -52,22 +52,33 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
     path = Path.join("assets/static/images/", relative_path)
 
     case File.ls(path) do
-      {:ok, files} -> build_widget_instances(files, config, relative_path, schedule, now)
+      {:ok, files} ->
+        build_widget_instances(files, config, relative_path, schedule, now)
 
       {:error, _} ->
         relative_path = "triptych_psas/"
         path = Path.join("assets/static/images/", relative_path)
 
-        case File.ls!(path) do
-          triptych_psa_contents ->
+        case File.ls(path) do
+          {:ok, triptych_psa_contents} ->
             default_psa_folder = hd(triptych_psa_contents)
             default_psa_path = Path.join(path, default_psa_folder)
-            Logger.warn("[Triptych PSA filepath not found, using default] configured_folder_name=#{folder_name} default_folder_name=#{default_psa_folder}")
-            
-            files = File.ls!(default_psa_path)
-            build_widget_instances(files, config, Path.join(relative_path, default_psa_folder), schedule, now)
 
-          :error ->
+            Logger.warn(
+              "[Triptych PSA filepath not found, using default] configured_folder_name=#{folder_name} default_folder_name=#{default_psa_folder}"
+            )
+
+            files = File.ls!(default_psa_path)
+
+            build_widget_instances(
+              files,
+              config,
+              Path.join(relative_path, default_psa_folder),
+              schedule,
+              now
+            )
+
+          {:error, _} ->
             Logger.warn("[Empty triptych PSA folder]")
             []
         end
