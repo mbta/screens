@@ -5,6 +5,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
   Currently used only by Triptychs, which randomizes which PSA set appears.
   """
 
+  require Logger
+
   alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance.EvergreenContent
   alias Screens.Config.V2.{LocalEvergreenSet, Triptych}
