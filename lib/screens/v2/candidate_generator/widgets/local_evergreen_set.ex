@@ -46,7 +46,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
          config,
          now
        ) do
-    path = "assets/static/images/triptych_psas/" <> folder_name
+    path = Path.join("assets/static/images/triptych_psas/", folder_name)
 
     case File.ls(path) do
       {:ok, files} ->
