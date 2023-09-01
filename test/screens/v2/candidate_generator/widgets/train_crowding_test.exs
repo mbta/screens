@@ -146,6 +146,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
     %{
       config: config,
+      opts: [],
       now: ~U[2023-08-16 21:04:00Z],
       next_train_prediction: next_train_prediction,
       fetch_predictions_fn: fn _ -> {:ok, [next_train_prediction]} end,
@@ -170,6 +171,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
     test "returns crowding widget if train is on the way to this station", context do
       assert crowding_widget_instances(
                context.config,
+               context.opts,
                context.now,
                context.fetch_predictions_fn,
                context.fetch_location_context_fn,
@@ -192,6 +194,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
       assert crowding_widget_instances(
                context.config,
+               context.opts,
                context.now,
                fn _ -> {:ok, [alt_prediction]} end,
                context.fetch_location_context_fn,
@@ -208,6 +211,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
       assert crowding_widget_instances(
                context.config,
+               context.opts,
                context.now,
                fn _ -> {:ok, [alt_prediction]} end,
                context.fetch_location_context_fn,
@@ -220,6 +224,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
          context do
       assert crowding_widget_instances(
                context.config,
+               context.opts,
                context.now,
                context.fetch_predictions_fn,
                context.fetch_location_context_fn,
@@ -231,6 +236,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
     test "returns empty if there are no predictions", context do
       assert crowding_widget_instances(
                context.config,
+               context.opts,
                context.now,
                fn _ -> {:ok, []} end,
                context.fetch_location_context_fn,
@@ -242,6 +248,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
     test "returns empty if any fetches fail", context do
       assert crowding_widget_instances(
                context.config,
+               context.opts,
                context.now,
                fn _ -> :error end,
                context.fetch_location_context_fn,
@@ -251,6 +258,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
       assert crowding_widget_instances(
                context.config,
+               context.opts,
                context.now,
                context.fetch_predictions_fn,
                fn _, _, _ -> :error end,
@@ -260,6 +268,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
       assert crowding_widget_instances(
                context.config,
+               context.opts,
                context.now,
                context.fetch_predictions_fn,
                context.fetch_location_context_fn,
@@ -269,6 +278,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
       assert crowding_widget_instances(
                context.config,
+               context.opts,
                context.now,
                context.fetch_predictions_fn,
                context.fetch_location_context_fn,
@@ -277,10 +287,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
              ) == []
     end
 
-    test "returns empty if widget is disabled", %{config: config} do
+    test "returns empty if widget is disabled", %{config: config, opts: opts} do
       config = disable_widget(config)
 
-      assert crowding_widget_instances(config) == []
+      assert crowding_widget_instances(config, opts) == []
     end
   end
 end

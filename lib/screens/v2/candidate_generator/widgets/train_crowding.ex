@@ -11,9 +11,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget
 
-  @spec crowding_widget_instances(Screen.t()) :: list(CrowdingWidget.t())
+  @spec crowding_widget_instances(Screen.t(), keyword()) :: list(CrowdingWidget.t())
   def crowding_widget_instances(
         config,
+        opts,
         now \\ DateTime.utc_now(),
         fetch_predictions_fn \\ &Prediction.fetch/1,
         fetch_location_context_fn \\ &Stop.fetch_location_context/3,
@@ -27,6 +28,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
         _,
         _,
         _,
+        _,
         _
       ) do
     []
@@ -34,6 +36,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
   def crowding_widget_instances(
         %Screen{app_params: %Triptych{train_crowding: train_crowding}} = config,
+        opts,
         now,
         fetch_predictions_fn,
         fetch_location_context_fn,

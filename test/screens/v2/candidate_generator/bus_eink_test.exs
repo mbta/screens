@@ -59,10 +59,12 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
       now = ~U[2020-04-06T10:00:00Z]
       evergreen_content_instances_fn = fn _ -> [] end
       subway_status_instances_fn = fn _, _ -> [] end
+      opts = []
 
       actual_instances =
         BusEink.candidate_instances(
           config,
+          opts,
           now,
           fetch_stop_fn,
           departures_instances_fn,

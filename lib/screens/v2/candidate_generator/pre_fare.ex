@@ -64,6 +64,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   # credo:disable-for-next-line
   def candidate_instances(
         config,
+        _opts,
         now \\ DateTime.utc_now(),
         subway_status_instance_fn \\ &Widgets.SubwayStatus.subway_status_instances/2,
         reconstructed_alert_instances_fn \\ &Widgets.ReconstructedAlert.reconstructed_alert_instances/1,

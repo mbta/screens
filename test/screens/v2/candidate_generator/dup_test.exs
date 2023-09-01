@@ -90,6 +90,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       departures_instances_fn = fn _, _ -> [] end
       evergreen_content_instances_fn = fn _ -> [] end
       alerts_instances_fn = fn _, _ -> [] end
+      opts = []
 
       expected_headers =
         List.duplicate(
@@ -105,6 +106,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       actual_instances =
         Dup.candidate_instances(
           config,
+          opts,
           now,
           fetch_stop_fn,
           evergreen_content_instances_fn,
