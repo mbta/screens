@@ -32,13 +32,14 @@
     height: 344px;
     width: 580.5px;
     z-index: 999;
-    display: flex;
-    justify-content: flex-start;
+    position: relative;
+    overflow: hidden;
 
     .left-pane,
     .middle-pane,
     .right-pane {
       position: relative;
+      overflow: hidden;
       height: 100%;
       width: 33.33%;
 
