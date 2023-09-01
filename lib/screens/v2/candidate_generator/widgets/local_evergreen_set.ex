@@ -52,10 +52,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
     case File.ls(path) do
       {:ok, files} ->
         Enum.map(files, fn file ->
-          slot_name =
-            file
-            |> String.replace_suffix(".png", "")
-            |> string_to_slot_name()
+          slot_name = string_to_slot_name(file)
 
           %EvergreenContent{
             screen: config,
