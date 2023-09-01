@@ -53,6 +53,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
            params |> Map.to_list() |> fetch_alerts_fn.() do
       next_train_prediction = List.first(predictions)
 
+      Logger.info(
+        "[train_crowding next_prediction] station_id=#{train_crowding.station_id} direction_id=#{train_crowding.direction_id} next_prediction_id=#{next_train_prediction.id} next_trip_id=#{next_train_prediction.trip.id}"
+      )
+
       # If there is an upcoming train, it's headed to this station, and we're not at a temporary terminal,
       # show the widget
       if not is_nil(next_train_prediction) and
@@ -98,7 +102,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       prediction.vehicle.carriages,
       fn %Screens.Vehicles.Carriage{} = carriage ->
         Logger.info(
-          "[train_crowding] station_id=#{crowding_config.station_id} direction_id=#{crowding_config.direction_id} car_number=#{carriage.car_number} vehicle_id=#{prediction.vehicle.id} crowding_level=#{carriage.occupancy_status} trip_id=#{prediction.trip.id} prediction_id=#{prediction.id}"
+          "[train_crowding car_crowding_info] station_id=#{crowding_config.station_id} direction_id=#{crowding_config.direction_id} car_number=#{carriage.car_number} vehicle_id=#{prediction.vehicle.id} crowding_level=#{carriage.occupancy_status} trip_id=#{prediction.trip.id} prediction_id=#{prediction.id}"
         )
       end
     )
