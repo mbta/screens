@@ -12,7 +12,7 @@ interface Props {
 
 const EvergreenContent: ComponentType<Props> = ({
   asset_url: assetUrl,
-  isPlaying: isPlaying = true,
+  isPlaying = true,
 }) => {
   const parts = assetUrl.split(".");
   const extension = parts[parts.length - 1].toLowerCase();
