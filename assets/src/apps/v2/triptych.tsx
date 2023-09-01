@@ -31,7 +31,6 @@ import NoData from "Components/v2/triptych/no_data";
 import Placeholder from "Components/v2/placeholder";
 import TrainCrowding from "Components/v2/train_crowding";
 import EvergreenContent from "Components/v2/evergreen_content";
-import NormalSimulation from "Components/v2/triptych/normal_simulation";
 import { TRIPTYCH_VERSION } from "Components/v2/triptych/version";
 
 const customizeEvergreenProps = (WrappedComponent: React.ElementType) => {
@@ -67,7 +66,6 @@ const TYPE_TO_COMPONENT = {
   train_crowding: TrainCrowding,
   evergreen_content: customizeEvergreenProps(EvergreenContent),
   placeholder: Placeholder,
-  simulation_screen_normal: NormalSimulation,
 };
 
 const LOADING_LAYOUT = {
@@ -127,7 +125,7 @@ const App = (): JSX.Element => {
         <Route exact path="/v2/screen/:id/simulation">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
-              <SimulationScreenPage opts={{ alternateView: true }} />
+              <SimulationScreenPage />
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
