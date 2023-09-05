@@ -48,29 +48,57 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
          config,
          now
        ) do
-    partial_path = Path.join("triptych_psas/", folder_name)
-    path = Path.join("assets/static/images/", partial_path)
+    relative_path = Path.join("triptych_psas/", folder_name)
+    path = Path.join("assets/static/images/", relative_path)
 
     case File.ls(path) do
       {:ok, files} ->
-        Enum.map(files, fn file ->
-          slot_name = string_to_slot_name(file)
-
-          %EvergreenContent{
-            screen: config,
-            slot_names: [slot_name],
-            asset_url: Path.join([partial_path, "/", file]),
-            priority: [2],
-            schedule: schedule,
-            now: now,
-            text_for_audio: "",
-            audio_priority: [0]
-          }
-        end)
+        build_widget_instances(files, config, relative_path, schedule, now)
 
       {:error, _} ->
-        Logger.warn("[Triptych PSA filepath not found] folder_name=#{folder_name}")
-        []
+        relative_path = "triptych_psas/"
+        path = Path.join("assets/static/images/", relative_path)
+
+        case File.ls(path) do
+          {:ok, triptych_psa_contents} ->
+            default_psa_folder = hd(triptych_psa_contents)
+            default_psa_path = Path.join(path, default_psa_folder)
+
+            Logger.warn(
+              "[Triptych PSA filepath not found, using default] configured_folder_name=#{folder_name} default_folder_name=#{default_psa_folder}"
+            )
+
+            files = File.ls!(default_psa_path)
+
+            build_widget_instances(
+              files,
+              config,
+              Path.join(relative_path, default_psa_folder),
+              schedule,
+              now
+            )
+
+          {:error, _} ->
+            Logger.warn("[Empty triptych PSA folder]")
+            []
+        end
     end
+  end
+
+  defp build_widget_instances(files, config, partial_path, schedule, now) do
+    Enum.map(files, fn file ->
+      slot_name = string_to_slot_name(file)
+
+      %EvergreenContent{
+        screen: config,
+        slot_names: [slot_name],
+        asset_url: Path.join([partial_path, "/", file]),
+        priority: [2],
+        schedule: schedule,
+        now: now,
+        text_for_audio: "",
+        audio_priority: [0]
+      }
+    end)
   end
 end
