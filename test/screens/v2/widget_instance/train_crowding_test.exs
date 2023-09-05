@@ -6,7 +6,13 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
   alias Screens.Vehicles.Vehicle
 
   defp put_crowding_levels(widget, carriages) do
-    %{widget | prediction: %{widget.prediction | vehicle: %{widget.prediction.vehicle | carriages: carriages}}}
+    %{
+      widget
+      | prediction: %{
+          widget.prediction
+          | vehicle: %{widget.prediction.vehicle | carriages: carriages}
+        }
+    }
   end
 
   setup do
@@ -68,14 +74,15 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
     end
 
     test "serializes data, last crowding level (no_data)", %{widget: widget} do
-      widget = put_crowding_levels(widget, [
-        :no_data_available,
-        :no_data_available,
-        :standing_room_only,
-        :many_seats_available,
-        :full,
-        :not_accepting_passengers
-      ])
+      widget =
+        put_crowding_levels(widget, [
+          :no_data_available,
+          :no_data_available,
+          :standing_room_only,
+          :many_seats_available,
+          :full,
+          :not_accepting_passengers
+        ])
 
       expected = %{
         destination: "Oak Grove",
