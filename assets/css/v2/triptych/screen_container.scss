@@ -9,6 +9,7 @@
 .left-pane,
 .middle-pane,
 .right-pane {
+  overflow: hidden;
   position: absolute;
   width: 1080px;
   height: 1920px;
