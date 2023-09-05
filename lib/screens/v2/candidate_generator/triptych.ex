@@ -21,7 +21,7 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
   def candidate_instances(
         config,
         opts,
-        crowding_widget_instances_fn \\ &Widgets.TrainCrowding.crowding_widget_instances/1,
+        crowding_widget_instances_fn \\ &Widgets.TrainCrowding.crowding_widget_instances/2,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
         local_evergreen_set_instances_fn \\ &Widgets.LocalEvergreenSet.local_evergreen_set_instances/1
       ) do
