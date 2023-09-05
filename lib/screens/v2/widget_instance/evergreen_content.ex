@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
   @moduledoc false
 
   alias Screens.Config.Screen
-  alias Screens.Config.V2.Schedule
+  alias Screens.Config.V2.{Schedule, Triptych}
   alias Screens.V2.WidgetInstance
 
   @enforce_keys ~w[screen slot_names asset_url priority now]a
@@ -13,7 +13,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
             schedule: [%Schedule{}],
             now: nil,
             text_for_audio: nil,
-            audio_priority: nil
+            audio_priority: nil,
+            show_identifiers: false
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
@@ -23,10 +24,17 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
           schedule: list(Schedule.t()),
           now: DateTime.t(),
           text_for_audio: String.t(),
-          audio_priority: WidgetInstance.priority()
+          audio_priority: WidgetInstance.priority(),
+          show_identifiers: boolean()
         }
 
   def priority(%__MODULE__{} = instance), do: instance.priority
+
+  def serialize(%__MODULE__{
+        screen: %Screen{app_params: %Triptych{show_identifiers: show_identifiers}},
+        asset_url: asset_url
+      }),
+      do: %{asset_url: asset_url, show_identifiers: show_identifiers}
 
   def serialize(%__MODULE__{asset_url: asset_url}), do: %{asset_url: asset_url}
 

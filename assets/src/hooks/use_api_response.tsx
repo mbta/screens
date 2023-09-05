@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { isDup, isRealScreen } from "Util/util";
+import { isOFM } from "Util/outfront";
+import { isRealScreen } from "Util/util";
 import useInterval from "Hooks/use_interval";
 import { getDatasetValue } from "Util/dataset";
 import * as SentryLogger from "Util/sentry";
@@ -13,7 +14,7 @@ const doFailureBuffer = (
   lastSuccess: number | null,
   failureModeElapsedMs: number,
   setApiResponse: React.Dispatch<React.SetStateAction<object>>,
-  apiResponse: object = FAILURE_RESPONSE
+  apiResponse: object = FAILURE_RESPONSE,
 ) => {
   if (lastSuccess == null) {
     // We haven't had a successful request since initial page load.
@@ -42,7 +43,7 @@ const useIsRealScreenParam = () => {
 };
 
 const useRequestorParam = () => {
-  if (isDup()) return `&requestor=real_screen`;
+  if (isOFM()) return `&requestor=real_screen`;
 
   let requestor = getDatasetValue("requestor");
   if (!requestor && isRealScreen()) {
@@ -70,7 +71,7 @@ const useApiResponse = ({
   failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs) => {
   const [apiResponse, setApiResponse] = useState<object | null>(
-    LOADING_RESPONSE
+    LOADING_RESPONSE,
   );
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const lastRefresh = getDatasetValue("lastRefresh");
@@ -111,7 +112,7 @@ const useApiResponse = ({
           lastSuccess,
           failureModeElapsedMs,
           setApiResponse,
-          json
+          json,
         );
       }
     } catch (err) {
@@ -163,7 +164,7 @@ const buildApiPath = ({
     apiPath += `&datetime=${datetime}`;
   }
 
-  if (isDup()) {
+  if (isOFM()) {
     apiPath = "https://screens.mbta.com" + apiPath;
   }
 

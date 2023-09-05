@@ -20,16 +20,24 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   @type widget_data :: %{
           destination: String.t(),
           crowding: list(crowding_level),
-          platform_position: number,
+          # Describes where the "you are here" arrow should be positioned.
+          # 1: leftmost, 25: rightmost
+          platform_position: 1..25,
           front_car_direction: :left | :right,
-          now: String.t()
+          now: String.t(),
+          show_identifiers: boolean()
         }
 
   @type crowding_level :: :no_data | :not_crowded | :some_crowding | :crowded | :closed
 
   @spec serialize(t()) :: widget_data()
   def serialize(%__MODULE__{
-        screen: %Screen{app_params: %Triptych{train_crowding: train_crowding}},
+        screen: %Screen{
+          app_params: %Triptych{
+            train_crowding: train_crowding,
+            show_identifiers: show_identifiers
+          }
+        },
         prediction: prediction,
         now: now
       }) do
@@ -38,7 +46,8 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
       crowding: serialize_carriages(prediction.vehicle.carriages),
       platform_position: train_crowding.platform_position,
       front_car_direction: train_crowding.front_car_direction,
-      now: serialize_time(now)
+      now: serialize_time(now),
+      show_identifiers: show_identifiers
     }
   end
 

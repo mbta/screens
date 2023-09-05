@@ -7,7 +7,7 @@ defmodule Screens.V2.CandidateGenerator.TriptychTest do
   setup do
     config = %Screen{
       app_params: %V2.Triptych{
-        evergreen_content: [],
+        local_evergreen_sets: [],
         train_crowding: %V2.TrainCrowding{
           station_id: "place-dwnxg",
           direction_id: 1,
@@ -29,7 +29,7 @@ defmodule Screens.V2.CandidateGenerator.TriptychTest do
       assert {:screen,
               %{
                 screen_normal: [:full_screen],
-                screen_split: [:first_pane, :second_pane, :third_pane]
+                screen_split: [:left_pane, :middle_pane, :right_pane]
               }} == Triptych.screen_template()
     end
   end

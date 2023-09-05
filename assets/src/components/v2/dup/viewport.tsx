@@ -1,6 +1,6 @@
 import React from "react";
 
-import { getRotationIndex } from "Util/util";
+import { getRotationIndex } from "Util/outfront";
 
 /**
  * Shifts one of the three rotations into view
