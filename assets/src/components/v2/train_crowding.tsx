@@ -44,7 +44,7 @@ type OccupancyStatus =
 type CarOrientation = FrontCarDirection | "middle";
 const lookupCarComponent = (
   occupancyStatus: OccupancyStatus,
-  carOrientation: CarOrientation
+  carOrientation: CarOrientation,
 ) => {
   const lookupKey: `${CarOrientation}/${OccupancyStatus}` = `${carOrientation}/${occupancyStatus}`;
 
@@ -131,7 +131,7 @@ const TrainCrowding: React.ComponentType<Props> = ({
   const trains = crowding.map((occupancyStatus, i) => {
     const CarComponent = lookupCarComponent(
       occupancyStatus,
-      i == 0 ? frontCarDirection : "middle"
+      i == 0 ? frontCarDirection : "middle",
     );
     return <CarComponent key={i} className="crowding-widget__train-car" />;
   });
@@ -188,14 +188,14 @@ const TrainCrowding: React.ComponentType<Props> = ({
             <ArrowUp
               className={classWithModifier(
                 "crowding-widget__you-are-here-arrow",
-                arrowDirection
+                arrowDirection,
               )}
             />
           ) : (
             <ArrowUpLeft
               className={classWithModifier(
                 "crowding-widget__you-are-here-arrow",
-                arrowDirection
+                arrowDirection,
               )}
             />
           )}
@@ -204,7 +204,7 @@ const TrainCrowding: React.ComponentType<Props> = ({
           style={{ marginLeft: textPadding }}
           className={classWithModifier(
             "crowding-widget__you-are-here-text",
-            [8, 16, 24].includes(arrowSlot) ? "right-align" : "left-align"
+            [8, 16, 24].includes(arrowSlot) ? "right-align" : "left-align",
           )}
         >
           You are here
@@ -247,7 +247,7 @@ const TrainCrowding: React.ComponentType<Props> = ({
               crowding.includes("no_data") && (
                 <>
                   <KeyNoData width="137" height="100" className="key-icon" /> No
-                  Data
+                  data
                 </>
               )
             )}
