@@ -21,19 +21,25 @@ import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import Viewport from "Components/v2/triptych/viewport";
 
 import FullScreen from "Components/v2/basic_layouts/full_screen";
+import TriptychThreePane from "Components/v2/triptych/triptych_three_pane";
 
 import PageLoadNoData from "Components/v2/triptych/page_load_no_data";
 import NoData from "Components/v2/triptych/no_data";
 
 import Placeholder from "Components/v2/placeholder";
 import TrainCrowding from "Components/v2/train_crowding";
+import OutfrontEvergreenContent from "Components/v2/outfront_evergreen_content";
 
 const TYPE_TO_COMPONENT = {
+  // Layouts
   screen_normal: FullScreen,
-  placeholder: Placeholder,
+  screen_split: TriptychThreePane,
+  // Components
   page_load_no_data: PageLoadNoData,
   no_data: NoData,
   train_crowding: TrainCrowding,
+  evergreen_content: OutfrontEvergreenContent,
+  placeholder: Placeholder,
 };
 
 const LOADING_LAYOUT = {

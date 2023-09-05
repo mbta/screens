@@ -56,7 +56,8 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
         crowding: [:crowded, :not_crowded, :some_crowding, :not_crowded, :crowded, :closed],
         platform_position: 3,
         front_car_direction: "right",
-        now: "2023-08-16T21:04:00Z"
+        now: "2023-08-16T21:04:00Z",
+        show_identifiers: false
       }
 
       assert expected == WidgetInstance.serialize(widget)
