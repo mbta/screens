@@ -58,7 +58,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
       if opts[:is_real_screen] do
         Logger.info(
-          "[train_crowding next_prediction] station_id=#{train_crowding.station_id} direction_id=#{train_crowding.direction_id} next_prediction_id=#{next_train_prediction.id} next_trip_id=#{next_train_prediction.trip.id}"
+          "[train_crowding next_prediction] screen_id=#{opts[:screen_id]} triptych_pane=#{opts[:triptych_pane]} station_id=#{train_crowding.station_id} direction_id=#{train_crowding.direction_id} next_prediction_id=#{next_train_prediction.id} next_trip_id=#{next_train_prediction.trip.id}"
         )
       end
 
@@ -70,7 +70,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
              train_crowding.station_id and
            next_train_prediction.vehicle.carriages != [] and
            not any_alert_makes_this_a_terminal?(alerts, location_context) do
-        log_crowding_info(next_train_prediction, train_crowding, opts[:is_real_screen])
+        log_crowding_info(
+          next_train_prediction,
+          train_crowding,
+          opts[:is_real_screen],
+          opts[:screen_id],
+          opts[:triptych_pane]
+        )
 
         [
           %CrowdingWidget{
@@ -102,7 +108,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       LocalizedAlert.location(localized_alert) in [:boundary_downstream, :boundary_upstream]
   end
 
-  defp log_crowding_info(prediction, crowding_config, true) do
+  defp log_crowding_info(prediction, crowding_config, true, screen_id, triptych_pane) do
     crowding_levels =
       prediction.vehicle.carriages
       |> Enum.sort_by(& &1.car_number)
@@ -110,9 +116,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       |> Enum.join(",")
 
     Logger.info(
-      "[train_crowding car_crowding_info] station_id=#{crowding_config.station_id} direction_id=#{crowding_config.direction_id} trip_id=#{prediction.trip.id} prediction_id=#{prediction.id} vehicle_id=#{prediction.vehicle.id} car_crowding_levels=#{crowding_levels}"
+      "[train_crowding car_crowding_info] screen_id=#{screen_id} triptych_pane=#{triptych_pane} station_id=#{crowding_config.station_id} direction_id=#{crowding_config.direction_id} trip_id=#{prediction.trip.id} prediction_id=#{prediction.id} vehicle_id=#{prediction.vehicle.id} car_crowding_levels=#{crowding_levels}"
     )
   end
 
-  defp log_crowding_info(_, _, _), do: :ok
+  defp log_crowding_info(_, _, _, _, _), do: :ok
 end
