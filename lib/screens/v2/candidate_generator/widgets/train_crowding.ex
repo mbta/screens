@@ -108,10 +108,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   end
 
   defp log_crowding_info(prediction, true, screen_id, triptych_pane) do
-    crowding_levels =
-      prediction.vehicle.carriages
-      |> Enum.sort_by(& &1.car_number)
-      |> Enum.map_join(",", & &1.occupancy_status)
+    crowding_levels = Enum.map_join(prediction.vehicle.carriages, ",", & &1.occupancy_status)
 
     Logger.info(
       "[train_crowding car_crowding_info] screen_id=#{screen_id} triptych_pane=#{triptych_pane} trip_id=#{prediction.trip.id} car_crowding_levels=#{crowding_levels}"
