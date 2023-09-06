@@ -72,7 +72,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
            not any_alert_makes_this_a_terminal?(alerts, location_context) do
         log_crowding_info(
           next_train_prediction,
-          train_crowding,
           opts[:is_real_screen],
           opts[:screen_id],
           opts[:triptych_pane]
@@ -108,7 +107,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       LocalizedAlert.location(localized_alert) in [:boundary_downstream, :boundary_upstream]
   end
 
-  defp log_crowding_info(prediction, crowding_config, true, screen_id, triptych_pane) do
+  defp log_crowding_info(prediction, true, screen_id, triptych_pane) do
     crowding_levels =
       prediction.vehicle.carriages
       |> Enum.sort_by(& &1.car_number)
@@ -119,5 +118,5 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
     )
   end
 
-  defp log_crowding_info(_, _, _, _, _), do: :ok
+  defp log_crowding_info(_, _, _, _), do: :ok
 end
