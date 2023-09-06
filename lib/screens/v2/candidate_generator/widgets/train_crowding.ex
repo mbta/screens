@@ -106,7 +106,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
     crowding_levels =
       prediction.vehicle.carriages
       |> Enum.sort_by(& &1.car_number)
-      |> Enum.map(& &1.occupancy_status)
+      |> Enum.map(&to_string/1)
 
     Logger.info(
       "[train_crowding car_crowding_info] station_id=#{crowding_config.station_id} direction_id=#{crowding_config.direction_id} trip_id=#{prediction.trip.id} prediction_id=#{prediction.id} vehicle_id=#{prediction.vehicle.id} car_crowding_levels=#{crowding_levels}"
