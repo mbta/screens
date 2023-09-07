@@ -126,11 +126,11 @@ const arrayConfigurationToTriptychPane = (
   arrayConfiguration: string | null
 ): TriptychPane | null => {
   switch (arrayConfiguration) {
-    case "Triple-Left":
+    case "Triple_Left":
       return "left";
-    case "Triple-Middle":
+    case "Triple_Middle":
       return "middle";
-    case "Triple-Right":
+    case "Triple_Right":
       return "right";
     default:
       return null;
@@ -138,7 +138,7 @@ const arrayConfigurationToTriptychPane = (
 };
 
 const triptychPaneToArrayConfiguration = (pane: TriptychPane): string => {
-  return `Triple-${pane[0].toUpperCase().concat(pane.slice(1))}`;
+  return `Triple_${pane[0].toUpperCase().concat(pane.slice(1))}`;
 };
 
 interface OFMWindow extends Window {

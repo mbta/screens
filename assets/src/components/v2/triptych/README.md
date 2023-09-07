@@ -62,7 +62,7 @@ Once you've created the client app package, you'll need to send it to Outfront f
 Ask a Screens team member for the email of our contact at Outfront.
 In your message, be sure to specify:
 - a player name (or "Liveboard name"), and
-- a triptych pane (or `Array_configuration`--value should be of the form "Triple-(Left|Middle|Right)")
+- a triptych pane (or `Array_configuration`--value should be of the form "Triple_(Left|Middle|Right)")
 that they should set on the test screen.
 
 ## Debugging
