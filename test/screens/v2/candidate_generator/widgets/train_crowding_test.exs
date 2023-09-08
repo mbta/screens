@@ -146,7 +146,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
     %{
       config: config,
-      opts: [],
+      logging_options: %{is_real_screen: false, screen_id: "TEST", triptych_pane: nil},
       now: ~U[2023-08-16 21:04:00Z],
       next_train_prediction: next_train_prediction,
       fetch_predictions_fn: fn _ -> {:ok, [next_train_prediction]} end,
@@ -171,7 +171,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
     test "returns crowding widget if train is on the way to this station", context do
       assert crowding_widget_instances(
                context.config,
-               context.opts,
+               context.logging_options,
                context.now,
                context.fetch_predictions_fn,
                context.fetch_location_context_fn,
@@ -194,7 +194,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
       assert crowding_widget_instances(
                context.config,
-               context.opts,
+               context.logging_options,
                context.now,
                fn _ -> {:ok, [alt_prediction]} end,
                context.fetch_location_context_fn,
@@ -211,7 +211,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
       assert crowding_widget_instances(
                context.config,
-               context.opts,
+               context.logging_options,
                context.now,
                fn _ -> {:ok, [alt_prediction]} end,
                context.fetch_location_context_fn,
@@ -224,7 +224,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
          context do
       assert crowding_widget_instances(
                context.config,
-               context.opts,
+               context.logging_options,
                context.now,
                context.fetch_predictions_fn,
                context.fetch_location_context_fn,
@@ -236,7 +236,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
     test "returns empty if there are no predictions", context do
       assert crowding_widget_instances(
                context.config,
-               context.opts,
+               context.logging_options,
                context.now,
                fn _ -> {:ok, []} end,
                context.fetch_location_context_fn,
@@ -248,7 +248,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
     test "returns empty if any fetches fail", context do
       assert crowding_widget_instances(
                context.config,
-               context.opts,
+               context.logging_options,
                context.now,
                fn _ -> :error end,
                context.fetch_location_context_fn,
@@ -258,7 +258,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
       assert crowding_widget_instances(
                context.config,
-               context.opts,
+               context.logging_options,
                context.now,
                context.fetch_predictions_fn,
                fn _, _, _ -> :error end,
@@ -268,7 +268,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
       assert crowding_widget_instances(
                context.config,
-               context.opts,
+               context.logging_options,
                context.now,
                context.fetch_predictions_fn,
                context.fetch_location_context_fn,
@@ -278,7 +278,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
       assert crowding_widget_instances(
                context.config,
-               context.opts,
+               context.logging_options,
                context.now,
                context.fetch_predictions_fn,
                context.fetch_location_context_fn,
@@ -287,10 +287,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
              ) == []
     end
 
-    test "returns empty if widget is disabled", %{config: config, opts: opts} do
+    test "returns empty if widget is disabled", %{
+      config: config,
+      logging_options: logging_options
+    } do
       config = disable_widget(config)
 
-      assert crowding_widget_instances(config, opts) == []
+      assert crowding_widget_instances(config, logging_options) == []
     end
   end
 end
