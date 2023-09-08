@@ -1,6 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   @moduledoc false
 
+  require Logger
+
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{TrainCrowding, Triptych}
@@ -9,9 +11,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget
 
-  @spec crowding_widget_instances(Screen.t()) :: list(CrowdingWidget.t())
+  @spec crowding_widget_instances(Screen.t(), map()) :: list(CrowdingWidget.t())
   def crowding_widget_instances(
         config,
+        logging_options,
         now \\ DateTime.utc_now(),
         fetch_predictions_fn \\ &Prediction.fetch/1,
         fetch_location_context_fn \\ &Stop.fetch_location_context/3,
@@ -25,6 +28,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
         _,
         _,
         _,
+        _,
         _
       ) do
     []
@@ -32,6 +36,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
   def crowding_widget_instances(
         %Screen{app_params: %Triptych{train_crowding: train_crowding}} = config,
+        logging_options,
         now,
         fetch_predictions_fn,
         fetch_location_context_fn,
@@ -51,6 +56,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
            params |> Map.to_list() |> fetch_alerts_fn.() do
       next_train_prediction = List.first(predictions)
 
+      if logging_options.is_real_screen do
+        Logger.info(
+          "[train_crowding next_prediction] screen_id=#{logging_options.screen_id} triptych_pane=#{logging_options.triptych_pane} next_trip_id=#{next_train_prediction.trip.id}"
+        )
+      end
+
       # If there is an upcoming train, it's headed to this station, and we're not at a temporary terminal,
       # show the widget
       if not is_nil(next_train_prediction) and
@@ -59,6 +70,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
              train_crowding.station_id and
            next_train_prediction.vehicle.carriages != [] and
            not any_alert_makes_this_a_terminal?(alerts, location_context) do
+        log_crowding_info(next_train_prediction, logging_options)
+
         [
           %CrowdingWidget{
             screen: config,
@@ -88,4 +101,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
     localized_alert.alert.effect in [:suspension, :shuttle] and
       LocalizedAlert.location(localized_alert) in [:boundary_downstream, :boundary_upstream]
   end
+
+  defp log_crowding_info(prediction, %{
+         is_real_screen: true,
+         screen_id: screen_id,
+         triptych_pane: triptych_pane
+       }) do
+    crowding_levels = Enum.map_join(prediction.vehicle.carriages, ",", & &1.occupancy_status)
+
+    Logger.info(
+      "[train_crowding car_crowding_info] screen_id=#{screen_id} triptych_pane=#{triptych_pane} trip_id=#{prediction.trip.id} car_crowding_levels=#{crowding_levels}"
+    )
+  end
+
+  defp log_crowding_info(_, _), do: :ok
 end

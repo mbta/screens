@@ -50,9 +50,13 @@ defmodule Screens.Vehicles.Parser do
   defp parse_carriages(data), do: Enum.map(data, &parse_car_crowding/1)
 
   defp parse_car_crowding(%{
+         "label" => car_number,
          "occupancy_status" => occupancy_status
        }),
-       do: parse_occupancy_status(occupancy_status)
+       do: %Screens.Vehicles.Carriage{
+         car_number: car_number,
+         occupancy_status: parse_occupancy_status(occupancy_status)
+       }
 
   defp trip_id_from_trip_data(%{"data" => %{"id" => trip_id}}), do: trip_id
   defp trip_id_from_trip_data(_), do: nil
