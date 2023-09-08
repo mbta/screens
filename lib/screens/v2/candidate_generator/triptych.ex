@@ -26,7 +26,7 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
         local_evergreen_set_instances_fn \\ &Widgets.LocalEvergreenSet.local_evergreen_set_instances/1
       ) do
     [
-      fn -> crowding_widget_instances_fn.(config, opts) end,
+      fn -> crowding_widget_instances_fn.(config, opts[:logging_options]) end,
       fn -> evergreen_content_instances_fn.(config) end,
       fn -> local_evergreen_set_instances_fn.(config) end
     ]
