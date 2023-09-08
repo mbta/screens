@@ -6,13 +6,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
   alias Screens.Vehicles.Vehicle
 
   defp put_crowding_levels(widget, carriages) do
-    %{
-      widget
-      | prediction: %{
-          widget.prediction
-          | vehicle: %{widget.prediction.vehicle | carriages: carriages}
-        }
-    }
+    put_in(widget.prediction.vehicle.carriages, carriages)
   end
 
   setup do
