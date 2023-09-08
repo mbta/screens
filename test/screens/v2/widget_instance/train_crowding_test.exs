@@ -70,12 +70,12 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
     test "serializes data, last crowding level (no_data)", %{widget: widget} do
       widget =
         put_crowding_levels(widget, [
-          :no_data_available,
-          :no_data_available,
-          :standing_room_only,
-          :many_seats_available,
-          :full,
-          :not_accepting_passengers
+          %Carriage{car_number: "1", occupancy_status: :no_data_available},
+          %Carriage{car_number: "2", occupancy_status: :no_data_available},
+          %Carriage{car_number: "3", occupancy_status: :standing_room_only},
+          %Carriage{car_number: "4", occupancy_status: :many_seats_available},
+          %Carriage{car_number: "5", occupancy_status: :full},
+          %Carriage{car_number: "6", occupancy_status: :not_accepting_passengers}
         ])
 
       expected = %{
