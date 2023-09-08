@@ -1,5 +1,11 @@
 # Triptych app packaging
 
+## Resizing the PSAs
+Outfront recommends these asset sizes:
+- Images: The boards can take webp, which saves 35% or possibly more. OFM recommends using `sharp`, but you can also use [webp](https://formulae.brew.sh/formula/webp). `cwebp -resize 1080 0 left.png -o left.webp` will resize left.png to the triptych screen size and convert to webp.
+- Videos: Use handbrake video transcoder to reduce size to below 10MB, at least. (Perhaps much smaller.) To do so, get [HandBrake](https://handbrake.fr/), load the source file, and simply hit "Start". It compresses the file. Check the output to make sure it still looks good.
+
+## Prepping the package
 - Ensure [Corsica](https://hexdocs.pm/corsica/Corsica.html) is used on the server to allow CORS requests (ideally limited to just the triptych-relevant routes). It should already be configured at [this line](/lib/screens_web/controllers/v2/screen_api_controller.ex#L9) in the API controller--if it is, you don't need to do anything for this step.
 - Double check that any behavior specific to the triptych screen environment happens inside of an `isTriptych()` or `isOFM()` check. This includes:
   - `buildApiPath` in use_api_response.tsx should return a full URL for the API path: prefix `apiPath` string with "https://screens.mbta.com".
@@ -31,6 +37,7 @@
 
 - Set the version string in assets/src/components/v2/triptych/version.tsx to `current_year.current_month.current_day.1`.
 - In assets/webpack.config.js, change `publicPath` in the font config to have value `'fonts/'`.
+- If you've renamed / removed image assets, you might want to delete the corresponding folder in `/priv/static`. The folder accumulates assets without clearing old ones out, and these will be included in the built bundle!
 - **Only if you are packaging for local testing**
   - add the following to the top of assets/src/apps/v2/triptych.tsx, filling in the string values:
     ```ts
@@ -62,7 +69,7 @@ Once you've created the client app package, you'll need to send it to Outfront f
 Ask a Screens team member for the email of our contact at Outfront.
 In your message, be sure to specify:
 - a player name (or "Liveboard name"), and
-- a triptych pane (or `Array_configuration`--value should be of the form "Triple-(Left|Middle|Right)")
+- a triptych pane (or `Array_configuration`--value should be of the form "Triple_(Left|Middle|Right)")
 that they should set on the test screen.
 
 ## Debugging

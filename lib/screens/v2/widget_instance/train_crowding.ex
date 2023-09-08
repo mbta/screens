@@ -58,7 +58,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   defp serialize_carriages(nil), do: nil
 
   defp serialize_carriages(carriages),
-    do: Enum.map(carriages, fn car -> serialize_occupancy_status(car) end)
+    do: Enum.map(carriages, fn car -> serialize_occupancy_status(car.occupancy_status) end)
 
   defp serialize_occupancy_status(:no_data_available), do: :no_data
   defp serialize_occupancy_status(:many_seats_available), do: :not_crowded

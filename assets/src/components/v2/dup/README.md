@@ -31,6 +31,7 @@
 
 - Set the version string in assets/src/components/v2/dup/version.tsx to `current_year.current_month.current_day.1`.
 - In assets/webpack.config.js, change `publicPath` in the font config to have value `'fonts/'`.
+- If you've renamed / removed image assets, you might want to delete the corresponding folder in `/priv/static`. The folder accumulates assets without clearing old ones out, and these will be included in the built bundle!
 - **Only if you are packaging for local testing**
   - add the following to the top of assets/src/apps/v2/dup.tsx, filling in the string values:
     ```ts

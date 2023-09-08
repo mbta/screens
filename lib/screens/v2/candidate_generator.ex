@@ -12,7 +12,8 @@ defmodule Screens.V2.CandidateGenerator do
   Fetches data and returns a list of candidate widget instances to be
   considered for placement on the template.
   """
-  @callback candidate_instances(ScreenData.config()) :: ScreenData.candidate_instances()
+  @callback candidate_instances(ScreenData.config(), keyword()) ::
+              ScreenData.candidate_instances()
 
   @doc """
   Receives the finalized list of widget instances that were placed on

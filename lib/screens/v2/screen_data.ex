@@ -41,7 +41,7 @@ defmodule Screens.V2.ScreenData do
 
     layout_and_widgets =
       config
-      |> fetch_data()
+      |> fetch_data(opts)
       |> tap(&cache_visible_alert_widgets(&1, screen_id, config.hidden_from_screenplay))
       |> resolve_paging(refresh_rate)
 
@@ -64,13 +64,13 @@ defmodule Screens.V2.ScreenData do
   end
 
   @spec fetch_data(Screens.Config.Screen.t()) :: {Template.layout(), selected_instances_map()}
-  def fetch_data(config) do
+  def fetch_data(config, opts \\ []) do
     candidate_generator = Parameters.get_candidate_generator(config)
     screen_template = candidate_generator.screen_template()
 
     candidate_instances =
       config
-      |> candidate_generator.candidate_instances()
+      |> candidate_generator.candidate_instances(opts)
       |> Enum.filter(&WidgetInstance.valid_candidate?/1)
 
     pick_instances(screen_template, candidate_instances)

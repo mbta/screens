@@ -20,12 +20,13 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
   @impl CandidateGenerator
   def candidate_instances(
         config,
-        crowding_widget_instances_fn \\ &Widgets.TrainCrowding.crowding_widget_instances/1,
+        opts,
+        crowding_widget_instances_fn \\ &Widgets.TrainCrowding.crowding_widget_instances/2,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
         local_evergreen_set_instances_fn \\ &Widgets.LocalEvergreenSet.local_evergreen_set_instances/1
       ) do
     [
-      fn -> crowding_widget_instances_fn.(config) end,
+      fn -> crowding_widget_instances_fn.(config, opts[:logging_options]) end,
       fn -> evergreen_content_instances_fn.(config) end,
       fn -> local_evergreen_set_instances_fn.(config) end
     ]
