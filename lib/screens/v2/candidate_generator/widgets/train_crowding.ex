@@ -36,7 +36,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
   def crowding_widget_instances(
         %Screen{app_params: %Triptych{train_crowding: train_crowding}} = config,
-        opts,
+        [logging_options: logging_options],
         now,
         fetch_predictions_fn,
         fetch_location_context_fn,
@@ -56,9 +56,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
            params |> Map.to_list() |> fetch_alerts_fn.() do
       next_train_prediction = List.first(predictions)
 
-      if opts[:is_real_screen] do
+      if logging_options.is_real_screen do
         Logger.info(
-          "[train_crowding next_prediction] screen_id=#{opts[:screen_id]} triptych_pane=#{opts[:triptych_pane]} next_trip_id=#{next_train_prediction.trip.id}"
+          "[train_crowding next_prediction] screen_id=#{logging_options.screen_id} triptych_pane=#{logging_options.triptych_pane} next_trip_id=#{next_train_prediction.trip.id}"
         )
       end
 
@@ -70,12 +70,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
              train_crowding.station_id and
            next_train_prediction.vehicle.carriages != [] and
            not any_alert_makes_this_a_terminal?(alerts, location_context) do
-        log_crowding_info(
-          next_train_prediction,
-          opts[:is_real_screen],
-          opts[:screen_id],
-          opts[:triptych_pane]
-        )
+        log_crowding_info(next_train_prediction, logging_options)
 
         [
           %CrowdingWidget{
@@ -107,7 +102,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       LocalizedAlert.location(localized_alert) in [:boundary_downstream, :boundary_upstream]
   end
 
-  defp log_crowding_info(prediction, true, screen_id, triptych_pane) do
+  defp log_crowding_info(prediction, %{
+         is_real_screen: true,
+         screen_id: screen_id,
+         triptych_pane: triptych_pane
+       }) do
     crowding_levels = Enum.map_join(prediction.vehicle.carriages, ",", & &1.occupancy_status)
 
     Logger.info(
@@ -115,5 +114,5 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
     )
   end
 
-  defp log_crowding_info(_, _, _, _), do: :ok
+  defp log_crowding_info(_, _), do: :ok
 end

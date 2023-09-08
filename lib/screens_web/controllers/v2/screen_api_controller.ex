@@ -83,9 +83,11 @@ defmodule ScreensWeb.V2.ScreenApiController do
         json(
           conn,
           ScreenData.by_screen_id(screen_id,
-            is_real_screen: is_screen,
-            screen_id: screen_id,
-            triptych_pane: triptych_pane
+            logging_options: %{
+              is_real_screen: is_screen,
+              screen_id: screen_id,
+              triptych_pane: triptych_pane
+            }
           )
         )
     end
