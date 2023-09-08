@@ -5,6 +5,10 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
   alias Screens.V2.WidgetInstance.TrainCrowding, as: WidgetInstance
   alias Screens.Vehicles.{Carriage, Vehicle}
 
+  defp put_crowding_levels(widget, carriages) do
+    put_in(widget.prediction.vehicle.carriages, carriages)
+  end
+
   setup do
     config =
       struct(Screens.Config.Screen, %{
@@ -50,10 +54,33 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
   end
 
   describe "serialize/1" do
-    test "serializes data", %{widget: widget} do
+    test "serializes data, 6/7 possible crowding levels", %{widget: widget} do
       expected = %{
         destination: "Oak Grove",
         crowding: [:crowded, :not_crowded, :some_crowding, :not_crowded, :crowded, :closed],
+        platform_position: 3,
+        front_car_direction: "right",
+        now: "2023-08-16T21:04:00Z",
+        show_identifiers: false
+      }
+
+      assert expected == WidgetInstance.serialize(widget)
+    end
+
+    test "serializes data, last crowding level (no_data)", %{widget: widget} do
+      widget =
+        put_crowding_levels(widget, [
+          %Carriage{car_number: "1", occupancy_status: :no_data_available},
+          %Carriage{car_number: "2", occupancy_status: :no_data_available},
+          %Carriage{car_number: "3", occupancy_status: :standing_room_only},
+          %Carriage{car_number: "4", occupancy_status: :many_seats_available},
+          %Carriage{car_number: "5", occupancy_status: :full},
+          %Carriage{car_number: "6", occupancy_status: :not_accepting_passengers}
+        ])
+
+      expected = %{
+        destination: "Oak Grove",
+        crowding: [:no_data, :no_data, :some_crowding, :not_crowded, :crowded, :closed],
         platform_position: 3,
         front_car_direction: "right",
         now: "2023-08-16T21:04:00Z",
