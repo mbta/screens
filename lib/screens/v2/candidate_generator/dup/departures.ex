@@ -152,16 +152,21 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> Enum.map(&{Departure.route_id(&1), Departure.direction_id(&1)})
       |> Enum.uniq()
 
+    # Check if there is any room for overnight rows before running the logic.
     overnight_schedules_for_section =
-      get_overnight_schedules_for_section(
-        routes_with_live_departures,
-        params,
-        routes,
-        alert_informed_entities,
-        now,
-        fetch_schedules_fn,
-        fetch_vehicles_fn
-      )
+      if (is_only_section and length(departures) >= 4) or length(departures) >= 2 do
+        []
+      else
+        get_overnight_schedules_for_section(
+          routes_with_live_departures,
+          params,
+          routes,
+          alert_informed_entities,
+          now,
+          fetch_schedules_fn,
+          fetch_vehicles_fn
+        )
+      end
 
     headway_mode = get_headway_mode(stop_ids, headway, alert_informed_entities, now)
 
