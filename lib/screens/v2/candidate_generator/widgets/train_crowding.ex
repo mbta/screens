@@ -56,7 +56,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
            params |> Map.to_list() |> fetch_alerts_fn.() do
       next_train_prediction = List.first(predictions)
 
-      if next_train_prediction && logging_options.is_real_screen do
+      if next_train_prediction && logging_options && logging_options.is_real_screen do
         Logger.info(
           "[train_crowding next_prediction] screen_id=#{logging_options.screen_id} triptych_pane=#{logging_options.triptych_pane} next_trip_id=#{next_train_prediction.trip.id}"
         )
