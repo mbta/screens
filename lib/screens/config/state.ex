@@ -54,6 +54,26 @@ defmodule Screens.Config.State do
     GenServer.call(pid, {:app_params, screen_id})
   end
 
+  @doc """
+  Returns a list of all screen IDs, or those that satisfy a filter.
+
+  You may optionally supply a filter function, which will be used to filter the results.
+  The filter function will be passed a tuple of {screen_id, screen_config} and should return true if that screen ID should be included in the results.
+  """
+  def screen_ids(pid \\ __MODULE__, filter_fn)
+      when is_nil(filter_fn) or is_function(filter_fn, 1) do
+    GenServer.call(pid, {:screen_ids, filter_fn})
+  end
+
+  @doc """
+  Gets the full screens config.
+
+  👉 WARNING: This copies the entire screens config from the Screens.Config.State GenServer process to the process
+  that calls this function. This may be of concern for server performance.
+
+  Unless you really need to get the entire config, try to use one of the other client functions, or define a new one
+  that does a bit more work in the server process to limit the size of data sent back to the client process.
+  """
   def screens(pid \\ __MODULE__) do
     GenServer.call(pid, :screens)
   end
@@ -167,6 +187,20 @@ defmodule Screens.Config.State do
       end
 
     {:reply, app_params, state}
+  end
+
+  def handle_call({:screen_ids, filter_fn}, _from, %__MODULE__{config: config} = state)
+      when is_function(filter_fn, 1) do
+    ids =
+      config.screens
+      |> Enum.filter(filter_fn)
+      |> Enum.map(fn {screen_id, _screen_config} -> screen_id end)
+
+    {:reply, ids, state}
+  end
+
+  def handle_call({:screen_ids, _}, _from, %__MODULE__{config: config} = state) do
+    {:reply, Map.keys(config.screens), state}
   end
 
   def handle_call({:mode_disabled?, mode}, _from, %__MODULE__{config: config} = state) do
