@@ -174,18 +174,17 @@ defmodule Screens.Config.State do
     {:reply, app_params, state}
   end
 
-  def handle_call({:screen_ids, filter_fn}, _from, %__MODULE__{config: config} = state)
-      when is_function(filter_fn, 1) do
+  def handle_call({:screen_ids, nil}, _from, %__MODULE__{config: config} = state) do
+    {:reply, Map.keys(config.screens), state}
+  end
+
+  def handle_call({:screen_ids, filter_fn}, _from, %__MODULE__{config: config} = state) do
     ids =
       config.screens
       |> Enum.filter(filter_fn)
       |> Enum.map(fn {screen_id, _screen_config} -> screen_id end)
 
     {:reply, ids, state}
-  end
-
-  def handle_call({:screen_ids, _}, _from, %__MODULE__{config: config} = state) do
-    {:reply, Map.keys(config.screens), state}
   end
 
   def handle_call({:mode_disabled?, mode}, _from, %__MODULE__{config: config} = state) do
