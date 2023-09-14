@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { doSubmit } from "Util/admin";
 
-const VALIDATE_PATH = "/api/admin/screens/validate";
-const CONFIRM_PATH = "/api/admin/screens/confirm";
-
 const validateJson = (json) => {
   try {
     JSON.parse(json);
@@ -13,17 +10,23 @@ const validateJson = (json) => {
   }
 };
 
-const AdminValidateControls = ({ setEditable, configRef }): JSX.Element => {
+const AdminValidateControls = ({ validatePath, setEditable, configRef }): JSX.Element => {
   const validateCallback = (resultJson) => {
-    configRef.current.value = JSON.stringify(resultJson.config, null, 2);
-    setEditable(false);
+    if (resultJson.success) {
+      configRef.current.value = JSON.stringify(resultJson.config, null, 2);
+      setEditable(false);
+    } else if (resultJson.message) {
+      alert(`Validation failed with message: ${resultJson.message}`);
+    } else {
+      alert("JSON is invalid!");
+    }
   };
 
   const validateFn = () => {
     const config = configRef.current.value;
     if (validateJson(config)) {
       const dataToSubmit = { config };
-      doSubmit(VALIDATE_PATH, dataToSubmit).then(validateCallback);
+      doSubmit(validatePath, dataToSubmit).then(validateCallback);
     } else {
       alert("JSON is invalid!");
     }
@@ -36,7 +39,7 @@ const AdminValidateControls = ({ setEditable, configRef }): JSX.Element => {
   );
 };
 
-const AdminConfirmControls = ({ setEditable, configRef }): JSX.Element => {
+const AdminConfirmControls = ({ confirmPath, setEditable, configRef }): JSX.Element => {
   const backFn = () => {
     setEditable(true);
   };
@@ -54,7 +57,7 @@ const AdminConfirmControls = ({ setEditable, configRef }): JSX.Element => {
   const confirmFn = () => {
     const config = configRef.current.value;
     const dataToSubmit = { config };
-    doSubmit(CONFIRM_PATH, dataToSubmit).then(confirmCallback);
+    doSubmit(confirmPath, dataToSubmit).then(confirmCallback);
   };
 
   return (
@@ -65,22 +68,17 @@ const AdminConfirmControls = ({ setEditable, configRef }): JSX.Element => {
   );
 };
 
-const AdminForm = (): JSX.Element => {
+const AdminForm = ({ fetchConfig, validatePath, confirmPath }): JSX.Element => {
   const [editable, setEditable] = useState(true);
   const configRef = useRef(null);
 
-  const fetchConfig = async () => {
-    const result = await fetch("/api/admin/");
-    const resultJson = await result.json();
-    const screensConfigJson = {
-      screens: JSON.parse(resultJson.config).screens,
-    };
-    const screensConfigString = JSON.stringify(screensConfigJson, null, 2);
-    configRef.current.value = screensConfigString;
+  const setEditorContents = async () => {
+    const config = await fetchConfig();
+    configRef.current.value = JSON.stringify(config, null, 2);
   };
 
   useEffect(() => {
-    fetchConfig();
+    setEditorContents();
     return;
   }, []);
 
@@ -94,11 +92,16 @@ const AdminForm = (): JSX.Element => {
       />
       {editable ? (
         <AdminValidateControls
+          validatePath={validatePath}
           setEditable={setEditable}
           configRef={configRef}
         />
       ) : (
-        <AdminConfirmControls setEditable={setEditable} configRef={configRef} />
+        <AdminConfirmControls
+          confirmPath={confirmPath}
+          setEditable={setEditable}
+          configRef={configRef}
+        />
       )}
     </div>
   );
