@@ -38,14 +38,8 @@ defmodule Screens.V2.ScreenData.Parameters do
     triptych_v2: 0
   }
 
-  # This list should contain IDs of all apps that can show any widget that implements `Screens.V2.AlertsWidget`.
-  @apps_that_show_alerts [
-    :bus_eink_v2,
-    :bus_shelter_v2,
-    :gl_eink_v2,
-    :pre_fare_v2,
-    :dup_v2
-  ]
+  # This list should contain IDs of any apps that __do not__ show any widget that implements `Screens.V2.AlertsWidget`.
+  @apps_that_do_not_show_alerts [:triptych_v2]
 
   @spec get_candidate_generator(Screens.Config.Screen.t() | atom()) :: candidate_generator()
   def get_candidate_generator(%Screens.Config.Screen{app_id: app_id}) do
@@ -83,7 +77,7 @@ defmodule Screens.V2.ScreenData.Parameters do
   end
 
   def shows_alerts?(app_id) do
-    app_id in @apps_that_show_alerts
+    app_id not in @apps_that_do_not_show_alerts
   end
 
   @spec get_audio_interval_offset_seconds(Screens.Config.Screen.t()) :: pos_integer()
