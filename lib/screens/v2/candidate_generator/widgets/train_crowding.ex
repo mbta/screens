@@ -65,7 +65,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       # If there is an upcoming train, it's headed to this station, and we're not at a temporary terminal,
       # show the widget
       if not is_nil(next_train_prediction) and
-           Prediction.vehicle_status(next_train_prediction) == :incoming_at and
+           Prediction.vehicle_status(next_train_prediction) in [:in_transit_to, :incoming_at] and
            next_train_prediction |> Prediction.stop_for_vehicle() |> fetch_parent_stop_id_fn.() ==
              train_crowding.station_id and
            next_train_prediction.vehicle.carriages != [] and
