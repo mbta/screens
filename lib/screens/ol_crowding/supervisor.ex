@@ -14,6 +14,7 @@ defmodule Screens.OlCrowding.DynamicSupervisor do
   end
 
   def start_logger(
+        original_crowding_levels,
         prediction,
         %{
           is_real_screen: true,
@@ -31,6 +32,7 @@ defmodule Screens.OlCrowding.DynamicSupervisor do
         {Logger, :start_link,
          [
            %{
+             original_crowding_levels: original_crowding_levels,
              prediction: prediction,
              logging_options: %{
                is_real_screen: true,

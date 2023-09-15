@@ -130,6 +130,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
     _ =
       Screens.OlCrowding.DynamicSupervisor.start_logger(
+        crowding_levels,
         prediction,
         logging_options,
         train_crowding_config,
