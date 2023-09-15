@@ -20,9 +20,11 @@
  * - Try to order the lists of 3 player names associated with each screen ID by left-middle-right.
  */
 
+type ConfigItemParams = [TriptychScreenID, DirID, CarDir, PlatformPosition, StationID, [string, string, string], string];
+
 // vvv Add items to this array vvv
 
-const getDraftConfigs = (): Parameters<typeof makeConfig>[] => [
+const getDraftConfigs = (): ConfigItemParams[] => [
   // MALDEN CENTER
   ["TRI-MaldenCenter-Orange-0-1", DirID.SB, CarDir.L, 6, "place-mlmnl", ["MAN-DS-001", "MAN-DS-002", "MAN-DS-003"], "Malden Center - OL Inbound 1"],
   ["TRI-MaldenCenter-Orange-0-2", DirID.SB, CarDir.L, 11, "place-mlmnl", ["MAN-DS-004", "MAN-DS-005", "MAN-DS-006"], "Malden Center - OL Inbound 2"],
@@ -211,7 +213,7 @@ interface ConfigItem {
   playerNameEntries: [[string, TriptychScreenID], [string, TriptychScreenID], [string, TriptychScreenID]]
 }
 
-const getConfigs = () => JSON.stringify(mergeConfigs(getDraftConfigs().map((params) => makeConfig.apply(null, params))));
+const getConfigs = () => JSON.stringify(validate(mergeConfigs(getDraftConfigs().map((params) => makeConfig.apply(null, params)))));
 
 const mergeConfigs = (configs: ConfigItem[]) =>
   configs.reduce(({ screenConfig, playerNameMapping }, { configEntry: [k, v], playerNameEntries }) => ({
@@ -219,7 +221,22 @@ const mergeConfigs = (configs: ConfigItem[]) =>
     playerNameMapping: { ...playerNameMapping, ...Object.fromEntries(playerNameEntries) }
   }), { screenConfig: {}, playerNameMapping: {} });
 
-const makeConfig = (id: TriptychScreenID, directionID: DirID, frontCarDirection: CarDir, platformPosition: PlatformPosition, stationID: StationID, playerNames: [string, string, string], name: string): ConfigItem => {
+const validate = (mergedConfig: { screenConfig: object, playerNameMapping: object }) => {
+  const { screenConfig, playerNameMapping } = mergedConfig;
+
+  const screenCount = Object.keys(screenConfig).length;
+  const playerNameCount = Object.keys(playerNameMapping).length;
+
+  if (playerNameCount > 3 * screenCount) {
+    throw "There are too few screen configurations compared to player names. Do you have a duplicate screen ID somewhere in the list?";
+  } else if (playerNameCount < 3 * screenCount) {
+    throw "There are too few player names compared to screens. Do you have a duplicate player name somewhere in the list?";
+  } else {
+    return mergedConfig;
+  }
+};
+
+const makeConfig: (...params: ConfigItemParams) => ConfigItem = (id, directionID, frontCarDirection, platformPosition, stationID, playerNames, name) => {
   if (!isPlatformPosition(platformPosition)) throw "Not a platform position";
 
   return {
