@@ -5,6 +5,7 @@ defmodule Screens.Config.Screen do
 
   alias Screens.Config.{Bus, Dup, Gl, Solari, V2}
   alias Screens.Util
+  alias Screens.V2.ScreenData.Parameters
 
   @type app_id ::
           :bus_eink
@@ -120,6 +121,14 @@ defmodule Screens.Config.Screen do
     screen_config.app_id
     |> Atom.to_string()
     |> String.ends_with?(@v2_app_id_suffix)
+  end
+
+  @doc """
+  Returns true if this screen can show any widget that implements `Screens.V2.AlertsWidget`.
+  """
+  @spec shows_alerts?(t()) :: boolean()
+  def shows_alerts?(screen_config) do
+    Parameters.shows_alerts?(screen_config)
   end
 
   for vendor <- ~w[gds mercury solari c3ms outfront]a do
