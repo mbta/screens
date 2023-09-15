@@ -54,18 +54,23 @@ defmodule Screens.Config.State do
     GenServer.call(pid, {:app_params, screen_id})
   end
 
+  @doc """
+  Returns a list of all screen IDs, or those that satisfy a filter.
+
+  You may optionally supply a filter function, which will be used to filter the results.
+  The filter function will be passed a tuple of {screen_id, screen_config} and should return true if that screen ID should be included in the results.
+  """
+  def screen_ids(filter_fn \\ nil, pid \\ __MODULE__)
+      when is_nil(filter_fn) or is_function(filter_fn, 1) do
+    GenServer.call(pid, {:screen_ids, filter_fn})
+  end
+
   def screens(pid \\ __MODULE__) do
     GenServer.call(pid, :screens)
   end
 
   def config(pid \\ __MODULE__) do
     GenServer.call(pid, :config)
-  end
-
-  @spec v2_screens_visible_to_screenplay(GenServer.server()) ::
-          list(screen_id :: String.t()) | :error
-  def v2_screens_visible_to_screenplay(pid \\ __MODULE__) do
-    GenServer.call(pid, :v2_screens_visible_to_screenplay)
   end
 
   def mode_disabled?(pid \\ __MODULE__, mode) do
@@ -169,20 +174,23 @@ defmodule Screens.Config.State do
     {:reply, app_params, state}
   end
 
+  def handle_call({:screen_ids, nil}, _from, %__MODULE__{config: config} = state) do
+    {:reply, Map.keys(config.screens), state}
+  end
+
+  def handle_call({:screen_ids, filter_fn}, _from, %__MODULE__{config: config} = state) do
+    ids =
+      config.screens
+      |> Enum.filter(filter_fn)
+      |> Enum.map(fn {screen_id, _screen_config} -> screen_id end)
+
+    {:reply, ids, state}
+  end
+
   def handle_call({:mode_disabled?, mode}, _from, %__MODULE__{config: config} = state) do
     %Devops{disabled_modes: disabled_modes} = config.devops
 
     {:reply, Enum.member?(disabled_modes, mode), state}
-  end
-
-  def handle_call(:v2_screens_visible_to_screenplay, _from, %__MODULE__{config: config} = state) do
-    screen_ids =
-      config.screens
-      |> Stream.reject(fn {_screen_id, screen_config} -> screen_config.hidden_from_screenplay end)
-      |> Stream.filter(fn {_screen_id, screen_config} -> Screen.v2_screen?(screen_config) end)
-      |> Enum.map(fn {screen_id, _screen_config} -> screen_id end)
-
-    {:reply, screen_ids, state}
   end
 
   # If we're in an error state, all queries on the state get an :error response

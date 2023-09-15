@@ -4,6 +4,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   screen data, and simulates data requests for any that it finds.
   """
 
+  alias Screens.Config.Screen
   alias Screens.ScreensByAlert
 
   # (Not a real module--just a name assigned to the Task.Supervisor process that supervises each simulated data request run)
@@ -44,7 +45,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
     now = System.system_time(:second)
 
     {screen_ids_to_refresh, overflow} =
-      Screens.Config.State.v2_screens_visible_to_screenplay()
+      watched_screen_ids()
       # get a mapping from each ID to its last updated time
       |> ScreensByAlert.get_screens_last_updated()
       # filter to outdated IDs
@@ -75,6 +76,24 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
     end)
 
     {:noreply, state}
+  end
+
+  defp watched_screen_ids do
+    Screens.Config.State.screen_ids(fn {_screen_id, screen_config} ->
+      valid_for_self_refresh?(screen_config)
+    end)
+  end
+
+  # A screen is valid for self-refresh if all of these are true:
+  # - It's a v2 screen (i.e., it shows widgets)
+  # - It's not hidden from Screenplay
+  # - It's a screen type that can show alerts in some capacity
+  defp valid_for_self_refresh?(screen_config) do
+    is_v2 = Screen.v2_screen?(screen_config)
+    is_visible_to_screenplay = not screen_config.hidden_from_screenplay
+    shows_alerts = Screen.shows_alerts?(screen_config)
+
+    is_v2 and is_visible_to_screenplay and shows_alerts
   end
 
   defp schedule_run do
