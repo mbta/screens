@@ -45,7 +45,7 @@ defmodule Screens.OlCrowding.DynamicSupervisor do
              fetch_params: fetch_params
            }
          ]},
-      restart: :temporary
+      restart: :transient
     }
 
     DynamicSupervisor.start_child(__MODULE__, spec)
