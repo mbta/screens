@@ -8,6 +8,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   alias Screens.Config.V2.{TrainCrowding, Triptych}
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
+  alias Screens.Util
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget
 
@@ -70,7 +71,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
              train_crowding.station_id and
            next_train_prediction.vehicle.carriages != [] and
            not any_alert_makes_this_a_terminal?(alerts, location_context) do
-        log_crowding_info(next_train_prediction, logging_options)
+        _ =
+          log_crowding_info(
+            next_train_prediction,
+            logging_options,
+            train_crowding,
+            fetch_predictions_fn,
+            fetch_parent_stop_id_fn,
+            params
+          )
 
         [
           %CrowdingWidget{
@@ -102,17 +111,40 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       LocalizedAlert.location(localized_alert) in [:boundary_downstream, :boundary_upstream]
   end
 
-  defp log_crowding_info(prediction, %{
-         is_real_screen: true,
-         screen_id: screen_id,
-         triptych_pane: triptych_pane
-       }) do
-    crowding_levels = Enum.map_join(prediction.vehicle.carriages, ",", & &1.occupancy_status)
+  defp log_crowding_info(
+         prediction,
+         %{
+           is_real_screen: true,
+           screen_id: screen_id,
+           triptych_pane: triptych_pane
+         } = logging_options,
+         train_crowding_config,
+         fetch_predictions_fn,
+         fetch_parent_stop_id_fn,
+         fetch_params
+       ) do
+    crowding_levels =
+      Enum.map_join(
+        prediction.vehicle.carriages,
+        ",",
+        &Util.translate_carriage_occupancy_status(&1.occupancy_status)
+      )
 
     Logger.info(
       "[train_crowding car_crowding_info] screen_id=#{screen_id} triptych_pane=#{triptych_pane} trip_id=#{prediction.trip.id} car_crowding_levels=#{crowding_levels}"
     )
+
+    _ =
+      Screens.OlCrowding.DynamicSupervisor.start_logger(
+        crowding_levels,
+        prediction,
+        logging_options,
+        train_crowding_config,
+        fetch_predictions_fn,
+        fetch_parent_stop_id_fn,
+        fetch_params
+      )
   end
 
-  defp log_crowding_info(_, _), do: :ok
+  defp log_crowding_info(_, _, _, _, _, _), do: :ok
 end
