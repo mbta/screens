@@ -17,14 +17,17 @@ defmodule Screens.LogScreenData do
         screen_id,
         last_refresh,
         is_screen,
-        requestor,
-        screen_side \\ nil,
-        rotation_index \\ nil,
-        triptych_pane \\ nil,
-        triptych_player_name \\ nil,
-        ofm_app_package_version \\ nil
+        params
       ) do
+    requestor = params["requestor"]
+
     if is_screen or not is_nil(requestor) do
+      screen_side = params["screen_side"]
+      rotation_index = params["rotation_index"]
+      triptych_pane = params["pane"]
+      triptych_player_name = params["player_name"]
+      ofm_app_package_version = params["version"]
+
       data =
         %{
           screen_id: screen_id,
