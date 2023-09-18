@@ -55,7 +55,7 @@ defmodule Screens.Vehicles.Parser do
        }),
        do: %Screens.Vehicles.Carriage{
          car_number: car_number,
-         occupancy_status: parse_carriage_occupancy_status(occupancy_status)
+         occupancy_status: parse_occupancy_status(occupancy_status)
        }
 
   defp trip_id_from_trip_data(%{"data" => %{"id" => trip_id}}), do: trip_id
@@ -77,13 +77,4 @@ defmodule Screens.Vehicles.Parser do
   defp parse_occupancy_status("NO_DATA_AVAILABLE"), do: :no_data_available
   defp parse_occupancy_status("NOT_ACCEPTING_PASSENGERS"), do: :not_accepting_passengers
   defp parse_occupancy_status(_), do: nil
-
-  defp parse_carriage_occupancy_status("NO_DATA_AVAILABLE"), do: :no_data
-  defp parse_carriage_occupancy_status("MANY_SEATS_AVAILABLE"), do: :not_crowded
-  defp parse_carriage_occupancy_status("FEW_SEATS_AVAILABLE"), do: :not_crowded
-  defp parse_carriage_occupancy_status("STANDING_ROOM_ONLY"), do: :some_crowding
-  defp parse_carriage_occupancy_status("CRUSHED_STANDING_ROOM_ONLY"), do: :crowded
-  defp parse_carriage_occupancy_status("FULL"), do: :crowded
-  defp parse_carriage_occupancy_status("NOT_ACCEPTING_PASSENGERS"), do: :closed
-  defp parse_carriage_occupancy_status(_), do: nil
 end

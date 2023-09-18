@@ -8,6 +8,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   alias Screens.Config.V2.{TrainCrowding, Triptych}
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
+  alias Screens.Util
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget
 
@@ -122,7 +123,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
          fetch_parent_stop_id_fn,
          fetch_params
        ) do
-    crowding_levels = Enum.map_join(prediction.vehicle.carriages, ",", & &1.occupancy_status)
+    crowding_levels =
+      Enum.map_join(
+        prediction.vehicle.carriages,
+        ",",
+        &Util.translate_carriage_occupancy_status(&1.occupancy_status)
+      )
 
     Logger.info(
       "[train_crowding car_crowding_info] screen_id=#{screen_id} triptych_pane=#{triptych_pane} trip_id=#{prediction.trip.id} car_crowding_levels=#{crowding_levels}"

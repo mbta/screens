@@ -34,12 +34,12 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
             stop_id: "10001",
             current_status: :incoming_at,
             carriages: [
-              %Carriage{car_number: "1", occupancy_status: :crowded},
-              %Carriage{car_number: "2", occupancy_status: :not_crowded},
-              %Carriage{car_number: "3", occupancy_status: :some_crowding},
-              %Carriage{car_number: "4", occupancy_status: :not_crowded},
-              %Carriage{car_number: "5", occupancy_status: :crowded},
-              %Carriage{car_number: "6", occupancy_status: :closed}
+              %Carriage{car_number: "1", occupancy_status: :crushed_standing_room_only},
+              %Carriage{car_number: "2", occupancy_status: :few_seats_available},
+              %Carriage{car_number: "3", occupancy_status: :standing_room_only},
+              %Carriage{car_number: "4", occupancy_status: :many_seats_available},
+              %Carriage{car_number: "5", occupancy_status: :full},
+              %Carriage{car_number: "6", occupancy_status: :not_accepting_passengers}
             ]
           })
       })
@@ -70,12 +70,12 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
     test "serializes data, last crowding level (no_data)", %{widget: widget} do
       widget =
         put_crowding_levels(widget, [
-          %Carriage{car_number: "1", occupancy_status: :no_data},
-          %Carriage{car_number: "2", occupancy_status: :no_data},
-          %Carriage{car_number: "3", occupancy_status: :some_crowding},
-          %Carriage{car_number: "4", occupancy_status: :not_crowded},
-          %Carriage{car_number: "5", occupancy_status: :crowded},
-          %Carriage{car_number: "6", occupancy_status: :closed}
+          %Carriage{car_number: "1", occupancy_status: :no_data_available},
+          %Carriage{car_number: "2", occupancy_status: :no_data_available},
+          %Carriage{car_number: "3", occupancy_status: :standing_room_only},
+          %Carriage{car_number: "4", occupancy_status: :many_seats_available},
+          %Carriage{car_number: "5", occupancy_status: :full},
+          %Carriage{car_number: "6", occupancy_status: :not_accepting_passengers}
         ])
 
       expected = %{

@@ -6,6 +6,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   alias Screens.Config.Screen
   alias Screens.Config.V2.Triptych
   alias Screens.Predictions.Prediction
+  alias Screens.Util
 
   defstruct screen: nil,
             prediction: nil,
@@ -56,7 +57,9 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   end
 
   defp serialize_carriages(nil), do: nil
-  defp serialize_carriages(carriages), do: Enum.map(carriages, fn car -> car.occupancy_status end)
+
+  defp serialize_carriages(carriages),
+    do: Enum.map(carriages, &Util.translate_carriage_occupancy_status(&1.occupancy_status))
 
   def priority(_instance), do: [1]
 
