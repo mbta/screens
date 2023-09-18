@@ -22,19 +22,13 @@ defmodule ScreensWeb.V2.ScreenApiController do
   def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
     screen_side = params["screen_side"]
-    rotation_index = params["rotation_index"]
     triptych_pane = params["pane"]
-    ofm_app_package_version = params["version"]
 
     LogScreenData.log_data_request(
       screen_id,
       last_refresh,
       is_screen,
-      params["requestor"],
-      screen_side,
-      rotation_index,
-      triptych_pane,
-      ofm_app_package_version
+      params
     )
 
     cond do
@@ -115,8 +109,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
       screen_id,
       last_refresh,
       false,
-      params["requestor"],
-      params["screen_side"]
+      params
     )
 
     cond do
