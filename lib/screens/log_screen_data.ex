@@ -21,6 +21,7 @@ defmodule Screens.LogScreenData do
         screen_side \\ nil,
         rotation_index \\ nil,
         triptych_pane \\ nil,
+        triptych_player_name \\ nil,
         ofm_app_package_version \\ nil
       ) do
     if is_screen or not is_nil(requestor) do
@@ -34,6 +35,7 @@ defmodule Screens.LogScreenData do
         |> insert_requestor(requestor)
         |> insert_dup_rotation_index(rotation_index)
         |> insert_triptych_pane(triptych_pane)
+        |> insert_triptych_player_name(triptych_player_name)
         |> insert_version(ofm_app_package_version)
 
       log_message("[screen data request]", data)
@@ -155,6 +157,11 @@ defmodule Screens.LogScreenData do
 
   defp insert_triptych_pane(data, triptych_pane),
     do: Map.put(data, :triptych_pane, triptych_pane)
+
+  defp insert_triptych_player_name(data, nil), do: data
+
+  defp insert_triptych_player_name(data, triptych_player_name),
+    do: Map.put(data, :triptych_player_name, triptych_player_name)
 
   defp insert_version(data, nil), do: data
   defp insert_version(data, version), do: Map.put(data, :ofm_app_package_version, version)
