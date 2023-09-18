@@ -5,6 +5,7 @@ defmodule Screens.OlCrowding.Logger do
   use GenServer
 
   alias Screens.Predictions.Prediction
+  alias Screens.Util
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts)
@@ -38,7 +39,13 @@ defmodule Screens.OlCrowding.Logger do
 
     {:ok, predictions} = fetch_predictions_fn.(fetch_params)
     next_train_prediction = List.first(predictions)
-    crowding_levels = Enum.map_join(prediction.vehicle.carriages, ",", & &1.occupancy_status)
+
+    crowding_levels =
+      Enum.map_join(
+        prediction.vehicle.carriages,
+        ",",
+        &Util.translate_carriage_occupancy_status(&1.occupancy_status)
+      )
 
     cond do
       # A car's crowding level changed. Log it and shutdown the process.
