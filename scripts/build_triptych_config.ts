@@ -41,8 +41,8 @@ const getDraftConfigs = (): ConfigItemParams[] => [
   // We should check to confirm that the player name groupings are reflected accurately, and the panes (`Array_configuration`) are tagged correctly as left/middle/right.
   // If groupings are wrong, we could end up showing the "You are here" arrow in the wrong place, or not at all.
   // If pane tags are wrong, we could end up showing left pane content on the right and vice versa.
-  ["TRI-SullivanSquare-Orange-0-1", DirID.SB, CarDir.L, 9, "place-sull", ["SSQ-DS-001", "SSQ-DS-002", "SSQ-DS-003"], "Sullivan Square - OL Inbound 1"],
-  ["TRI-SullivanSquare-Orange-0-2", DirID.SB, CarDir.L, 20, "place-sull", ["SSQ-DS-004", "SSQ-DS-005", "SSQ-DS-006"], "Sullivan Square - OL Inbound 2"],
+  ["TRI-SullivanSquare-Orange-0-1", DirID.SB, CarDir.L, 9, "place-sull", ["SSQ-DS-004", "SSQ-DS-005", "SSQ-DS-006"], "Sullivan Square - OL Inbound 1"],
+  ["TRI-SullivanSquare-Orange-0-2", DirID.SB, CarDir.L, 20, "place-sull", ["SSQ-DS-001", "SSQ-DS-002", "SSQ-DS-003"], "Sullivan Square - OL Inbound 2"],
 
   // NORTH STATION
   ["TRI-NorthStation-Orange-0-1", DirID.SB, CarDir.R, 22, "place-north", ["NST-DS-029", "NST-DS-028", "NST-DS-027"], "North Station - OL Inbound 1"],
@@ -81,10 +81,10 @@ const getDraftConfigs = (): ConfigItemParams[] => [
   // TUFTS MEDICAL CENTER
   // NAME CHANGE: TuftsMed / Tufts Med
   ["TRI-TuftsMed-Orange-0-1", DirID.SB, CarDir.R, 21, "place-tumnl", ["NMC-DS-015", "NMC-DS-014", "NMC-DS-013"], "Tufts Med - OL Outbound 1"],
-  ["TRI-TuftsMed-Orange-0-2", DirID.SB, CarDir.R, 16, "place-tumnl", ["NMC-DS-009", "NMC-DS-008", "NMC-DS-007"], "Tufts Med - OL Outbound 2"],
+  ["TRI-TuftsMed-Orange-0-2", DirID.SB, CarDir.R, 10, "place-tumnl", ["NMC-DS-009", "NMC-DS-008", "NMC-DS-007"], "Tufts Med - OL Outbound 2"],
   ["TRI-TuftsMed-Orange-0-3", DirID.SB, CarDir.R, 5, "place-tumnl", ["NMC-DS-003", "NMC-DS-002", "NMC-DS-001"], "Tufts Med - OL Outbound 3"],
   ["TRI-TuftsMed-Orange-1-1", DirID.NB, CarDir.R, 21, "place-tumnl", ["NMC-DS-004", "NMC-DS-005", "NMC-DS-006"], "Tufts Med - OL Inbound 1"],
-  ["TRI-TuftsMed-Orange-1-2", DirID.NB, CarDir.R, 10, "place-tumnl", ["NMC-DS-010", "NMC-DS-011", "NMC-DS-012"], "Tufts Med - OL Inbound 2"],
+  ["TRI-TuftsMed-Orange-1-2", DirID.NB, CarDir.R, 16, "place-tumnl", ["NMC-DS-010", "NMC-DS-011", "NMC-DS-012"], "Tufts Med - OL Inbound 2"],
   ["TRI-TuftsMed-Orange-1-3", DirID.NB, CarDir.R, 5, "place-tumnl", ["NMC-DS-016", "NMC-DS-017", "NMC-DS-018"], "Tufts Med - OL Inbound 3"],
 
   // BACK BAY
