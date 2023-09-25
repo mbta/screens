@@ -6,11 +6,37 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   alias Screens.Alerts.Alert
   alias Screens.Config.Screen
   alias Screens.Config.V2.{TrainCrowding, Triptych}
+  alias Screens.OlCrowding.Agent
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget
+
+  # {parent_station_id, {sb_platform_id, nb_platform_id}, {median_sb_dwell_seconds, median_nb_dwell_seconds}}
+  # Dwell times come from https://dashboard.transitmatters.org/orange/trips/single.
+  @ol_station_to_platform_map [
+    {"place-ogmnl", {"70036", "70036"}, {660, 660}},
+    {"place-mlmnl", {"70034", "70035"}, {50, 55}},
+    {"place-welln", {"70032", "70033"}, {59, 68}},
+    {"place-astao", {"70278", "70279"}, {52, 59}},
+    {"place-sull", {"70030", "70031"}, {60, 84}},
+    {"place-ccmnl", {"70028", "70029"}, {58, 54}},
+    {"place-north", {"70026", "70027"}, {49, 52}},
+    {"place-haecl", {"70024", "70025"}, {61, 52}},
+    {"place-state", {"70022", "70023"}, {70, 60}},
+    {"place-dwnxg", {"70020", "70021"}, {55, 66}},
+    {"place-chncl", {"70018", "70019"}, {47, 67}},
+    {"place-tumnl", {"70016", "70017"}, {17, 56}},
+    {"place-bbsta", {"70014", "70015"}, {63, 58}},
+    {"place-masta", {"70012", "70013"}, {68, 50}},
+    {"place-rugg", {"70010", "70011"}, {59, 18}},
+    {"place-rcmnl", {"70008", "70009"}, {48, 47}},
+    {"place-jaksn", {"70006", "70007"}, {48, 48}},
+    {"place-sbmnl", {"70004", "70005"}, {50, 13}},
+    {"place-grnst", {"70002", "70003"}, {37, 18}},
+    {"place-forhl", {"70001", "70001"}, {360, 360}}
+  ]
 
   @spec crowding_widget_instances(Screen.t(), map()) :: list(CrowdingWidget.t())
   def crowding_widget_instances(
@@ -63,36 +89,150 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
         )
       end
 
+      common_params = %{
+        screen_config: config,
+        next_train_prediction: next_train_prediction,
+        train_crowding_config: train_crowding,
+        logging_options: logging_options,
+        fetch_parent_stop_id_fn: fetch_parent_stop_id_fn,
+        fetch_predictions_fn: fetch_predictions_fn,
+        fetch_params: params,
+        now: now
+      }
+
+      get_instance(
+        any_alert_makes_this_a_terminal?(alerts, location_context),
+        common_params
+      )
+    else
+      :error -> []
+    end
+  end
+
+  defp get_instance(
+         alert_makes_this_a_terminal,
+         common_params
+       ) do
+    next_train_prediction = common_params.next_train_prediction
+
+    cond do
+      is_nil(next_train_prediction) or
+        alert_makes_this_a_terminal or
+          next_train_prediction.vehicle.carriages == [] ->
+        []
+
       # If there is an upcoming train, it's headed to this station, and we're not at a temporary terminal,
       # show the widget
-      if not is_nil(next_train_prediction) and
-           Prediction.vehicle_status(next_train_prediction) in [:in_transit_to, :incoming_at] and
-           next_train_prediction |> Prediction.stop_for_vehicle() |> fetch_parent_stop_id_fn.() ==
-             train_crowding.station_id and
-           next_train_prediction.vehicle.carriages != [] and
-           not any_alert_makes_this_a_terminal?(alerts, location_context) do
-        _ =
-          log_crowding_info(
-            next_train_prediction,
-            logging_options,
-            train_crowding,
-            fetch_predictions_fn,
-            fetch_parent_stop_id_fn,
-            params
-          )
+      Prediction.vehicle_status(next_train_prediction) in [:in_transit_to, :incoming_at] and
+          next_train_prediction
+          |> Prediction.stop_for_vehicle()
+          |> common_params.fetch_parent_stop_id_fn.() ==
+            common_params.train_crowding_config.station_id ->
+        log_crowding_info(:in_transit, common_params)
+
+        Agent.delete(
+          common_params.train_crowding_config.station_id,
+          common_params.train_crowding_config.direction_id
+        )
 
         [
           %CrowdingWidget{
-            screen: config,
+            screen: common_params[:screen_config],
             prediction: next_train_prediction,
-            now: now
+            now: common_params[:now]
           }
         ]
-      else
+
+      # Test other heuristics
+      true ->
+        get_instance_using_dwell_time(common_params)
+    end
+  end
+
+  defp get_instance_using_dwell_time(common_params) do
+    train_crowding_config = common_params.train_crowding_config
+    next_train_prediction = common_params.next_train_prediction
+
+    previous_stop_index =
+      Enum.find_index(
+        @ol_station_to_platform_map,
+        &(elem(&1, 0) == train_crowding_config.station_id)
+      ) - 1
+
+    {_, platform_id_tuple, _dwell_time_tuple} =
+      Enum.at(@ol_station_to_platform_map, previous_stop_index)
+
+    relevant_platform_id = elem(platform_id_tuple, train_crowding_config.direction_id)
+
+    previous_prediction_tuple =
+      Agent.get(train_crowding_config.station_id, train_crowding_config.direction_id)
+
+    cond do
+      previous_prediction_tuple != nil ->
+        {previous_prediction, previous_now} = previous_prediction_tuple
+
+        relevant_dwell_time =
+          (DateTime.diff(previous_prediction.departure_time, previous_prediction.arrival_time) -
+             10)
+          |> IO.inspect(label: "relevant_dwell_time")
+
+        # We think the train is leaving the previous station soon. Show the widget.
+        if IO.inspect(
+             DateTime.compare(
+               common_params.now,
+               IO.inspect(DateTime.add(previous_now, relevant_dwell_time), label: "previous+dwell")
+             ),
+             label: "compare"
+           ) in [
+             :eq,
+             :gt
+           ] do
+          log_crowding_info(
+            :dwell,
+            common_params
+          )
+
+          [
+            %CrowdingWidget{
+              screen: common_params[:screen_config],
+              prediction: next_train_prediction,
+              now: common_params.now
+            }
+          ]
+        else
+          []
+        end
+
+      Prediction.vehicle_status(next_train_prediction) == :stopped_at and
+          Prediction.stop_for_vehicle(next_train_prediction) == relevant_platform_id ->
+        # Start timer for dwell time but don't show the widget
+        params = %{
+          direction_id: common_params.train_crowding_config.direction_id,
+          route_ids: [common_params.train_crowding_config.route_id],
+          stop_ids: [relevant_platform_id],
+          trip_id: common_params.next_train_prediction.trip.id
+        }
+
+        {:ok, predictions} = common_params.fetch_predictions_fn.(params)
+        first = List.first(predictions)
+
+        if is_nil(first) do
+          []
+        else
+          Logger.info("starting dwell timer")
+
+          Agent.put(
+            train_crowding_config.station_id,
+            train_crowding_config.direction_id,
+            common_params.next_train_prediction,
+            common_params.now
+          )
+
+          []
+        end
+
+      true ->
         []
-      end
-    else
-      :error -> []
     end
   end
 
@@ -112,17 +252,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   end
 
   defp log_crowding_info(
-         prediction,
+         scenario,
          %{
-           is_real_screen: true,
-           screen_id: screen_id,
-           triptych_pane: triptych_pane
-         } = logging_options,
-         train_crowding_config,
-         fetch_predictions_fn,
-         fetch_parent_stop_id_fn,
-         fetch_params
+           next_train_prediction: prediction,
+           train_crowding_config: train_crowding_config,
+           logging_options: %{
+             is_real_screen: true,
+             screen_id: screen_id,
+             triptych_pane: triptych_pane
+           }
+         } = common_params
        ) do
+    Agent.delete(train_crowding_config.station_id, train_crowding_config.direction_id)
+
     crowding_levels =
       Enum.map_join(
         prediction.vehicle.carriages,
@@ -131,20 +273,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       )
 
     Logger.info(
-      "[train_crowding car_crowding_info] screen_id=#{screen_id} triptych_pane=#{triptych_pane} trip_id=#{prediction.trip.id} car_crowding_levels=#{crowding_levels}"
+      "[train_crowding car_crowding_info] screen_id=#{screen_id} triptych_pane=#{triptych_pane} trip_id=#{prediction.trip.id} car_crowding_levels=#{crowding_levels} scenario=#{scenario}"
     )
 
-    _ =
-      Screens.OlCrowding.DynamicSupervisor.start_logger(
-        crowding_levels,
-        prediction,
-        logging_options,
-        train_crowding_config,
-        fetch_predictions_fn,
-        fetch_parent_stop_id_fn,
-        fetch_params
-      )
+    _ = Screens.OlCrowding.DynamicSupervisor.start_logger(crowding_levels, common_params)
   end
 
-  defp log_crowding_info(_, _, _, _, _, _), do: :ok
+  defp log_crowding_info(_, _), do: :ok
 end
