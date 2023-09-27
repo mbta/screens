@@ -48,6 +48,7 @@ defmodule Screens.OlCrowding.DynamicSupervisor do
       restart: :transient
     }
 
-    DynamicSupervisor.start_child(__MODULE__, spec)
+    {:ok, child_pid} = DynamicSupervisor.start_child(__MODULE__, spec)
+    _ = :timer.exit_after(10_000, child_pid, :kill)
   end
 end
