@@ -13,29 +13,28 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget
 
-  # {parent_station_id, {sb_platform_id, nb_platform_id}, {median_sb_dwell_seconds, median_nb_dwell_seconds}}
-  # Dwell times come from https://dashboard.transitmatters.org/orange/trips/single.
+  # {parent_station_id, {sb_platform_id, nb_platform_id}}
   @ol_station_to_platform_map [
-    {"place-ogmnl", {"70036", "70036"}, {660, 660}},
-    {"place-mlmnl", {"70034", "70035"}, {50, 55}},
-    {"place-welln", {"70032", "70033"}, {59, 68}},
-    {"place-astao", {"70278", "70279"}, {52, 59}},
-    {"place-sull", {"70030", "70031"}, {60, 84}},
-    {"place-ccmnl", {"70028", "70029"}, {58, 54}},
-    {"place-north", {"70026", "70027"}, {49, 52}},
-    {"place-haecl", {"70024", "70025"}, {61, 52}},
-    {"place-state", {"70022", "70023"}, {70, 60}},
-    {"place-dwnxg", {"70020", "70021"}, {55, 66}},
-    {"place-chncl", {"70018", "70019"}, {47, 67}},
-    {"place-tumnl", {"70016", "70017"}, {17, 56}},
-    {"place-bbsta", {"70014", "70015"}, {63, 58}},
-    {"place-masta", {"70012", "70013"}, {68, 50}},
-    {"place-rugg", {"70010", "70011"}, {59, 18}},
-    {"place-rcmnl", {"70008", "70009"}, {48, 47}},
-    {"place-jaksn", {"70006", "70007"}, {48, 48}},
-    {"place-sbmnl", {"70004", "70005"}, {50, 13}},
-    {"place-grnst", {"70002", "70003"}, {37, 18}},
-    {"place-forhl", {"70001", "70001"}, {360, 360}}
+    {"place-ogmnl", {"70036", "70036"}},
+    {"place-mlmnl", {"70034", "70035"}},
+    {"place-welln", {"70032", "70033"}},
+    {"place-astao", {"70278", "70279"}},
+    {"place-sull", {"70030", "70031"}},
+    {"place-ccmnl", {"70028", "70029"}},
+    {"place-north", {"70026", "70027"}},
+    {"place-haecl", {"70024", "70025"}},
+    {"place-state", {"70022", "70023"}},
+    {"place-dwnxg", {"70020", "70021"}},
+    {"place-chncl", {"70018", "70019"}},
+    {"place-tumnl", {"70016", "70017"}},
+    {"place-bbsta", {"70014", "70015"}},
+    {"place-masta", {"70012", "70013"}},
+    {"place-rugg", {"70010", "70011"}},
+    {"place-rcmnl", {"70008", "70009"}},
+    {"place-jaksn", {"70006", "70007"}},
+    {"place-sbmnl", {"70004", "70005"}},
+    {"place-grnst", {"70002", "70003"}},
+    {"place-forhl", {"70001", "70001"}}
   ]
 
   @spec crowding_widget_instances(Screen.t(), map()) :: list(CrowdingWidget.t())
@@ -159,31 +158,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
         &(elem(&1, 0) == train_crowding_config.station_id)
       ) - 1
 
-    {_, platform_id_tuple, _dwell_time_tuple} =
-      Enum.at(@ol_station_to_platform_map, previous_stop_index)
+    {_, platform_id_tuple} = Enum.at(@ol_station_to_platform_map, previous_stop_index)
 
     relevant_platform_id = elem(platform_id_tuple, train_crowding_config.direction_id)
 
-    previous_prediction_tuple =
+    time_of_last_prediction_plus_dwell =
       Agent.get(train_crowding_config.station_id, train_crowding_config.direction_id)
 
     cond do
-      previous_prediction_tuple != nil ->
-        {previous_prediction, previous_now} = previous_prediction_tuple
-
-        relevant_dwell_time =
-          (DateTime.diff(previous_prediction.departure_time, previous_prediction.arrival_time) -
-             10)
-          |> IO.inspect(label: "relevant_dwell_time")
-
-        # We think the train is leaving the previous station soon. Show the widget.
-        if IO.inspect(
-             DateTime.compare(
-               common_params.now,
-               IO.inspect(DateTime.add(previous_now, relevant_dwell_time), label: "previous+dwell")
-             ),
-             label: "compare"
-           ) in [
+      time_of_last_prediction_plus_dwell != nil ->
+        # We think the train is about to leave the previous station. Show the widget.
+        if DateTime.compare(common_params.now, time_of_last_prediction_plus_dwell) in [
              :eq,
              :gt
            ] do
@@ -207,25 +192,33 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
           Prediction.stop_for_vehicle(next_train_prediction) == relevant_platform_id ->
         # Start timer for dwell time but don't show the widget
         params = %{
-          direction_id: common_params.train_crowding_config.direction_id,
-          route_ids: [common_params.train_crowding_config.route_id],
+          direction_id: train_crowding_config.direction_id,
+          route_ids: [train_crowding_config.route_id],
           stop_ids: [relevant_platform_id],
-          trip_id: common_params.next_train_prediction.trip.id
+          trip_id: next_train_prediction.trip.id
         }
 
         {:ok, predictions} = common_params.fetch_predictions_fn.(params)
-        first = List.first(predictions)
+        previous_station_prediction_current_trip = List.first(predictions)
 
-        if is_nil(first) do
+        if is_nil(previous_station_prediction_current_trip) do
           []
         else
-          Logger.info("starting dwell timer")
+          # The current trip's prediction for the previous station should have the times we need to predict dwell time.
+          # Subtract 10 seconds to give us some cushion so we have a chance to show the widget before the train leaves.
+          relevant_dwell_time =
+            DateTime.diff(
+              previous_station_prediction_current_trip.departure_time,
+              previous_station_prediction_current_trip.arrival_time
+            ) - 10
+
+          now_plus_dwell = DateTime.add(common_params.now, relevant_dwell_time)
+          IO.inspect(now_plus_dwell, label: "now_plus_dwell")
 
           Agent.put(
             train_crowding_config.station_id,
             train_crowding_config.direction_id,
-            common_params.next_train_prediction,
-            common_params.now
+            now_plus_dwell
           )
 
           []
