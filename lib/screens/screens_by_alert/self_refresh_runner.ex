@@ -71,9 +71,15 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
     # process from going down if an exception is raised while running
     # ScreenData.by_screen_id/1 for some screen.
     Enum.each(screen_ids_to_refresh, fn screen_id ->
-      Task.Supervisor.start_child(TaskSupervisor, Util.fn_with_timeout(fn ->
-        @screen_data_fn.(screen_id, skip_serialize: true)
-      end, 10_000))
+      Task.Supervisor.start_child(
+        TaskSupervisor,
+        Util.fn_with_timeout(
+          fn ->
+            @screen_data_fn.(screen_id, skip_serialize: true)
+          end,
+          10_000
+        )
+      )
     end)
 
     {:noreply, state}
