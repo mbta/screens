@@ -6,6 +6,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
 
   alias Screens.Config.Screen
   alias Screens.ScreensByAlert
+  alias Screens.Util
 
   # (Not a real module--just a name assigned to the Task.Supervisor process that supervises each simulated data request run)
   alias Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor
@@ -70,9 +71,9 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
     # process from going down if an exception is raised while running
     # ScreenData.by_screen_id/1 for some screen.
     Enum.each(screen_ids_to_refresh, fn screen_id ->
-      Task.Supervisor.start_child(TaskSupervisor, fn ->
+      Task.Supervisor.start_child(TaskSupervisor, Util.fn_with_timeout(fn ->
         @screen_data_fn.(screen_id, skip_serialize: true)
-      end)
+      end, 10_000))
     end)
 
     {:noreply, state}

@@ -218,4 +218,16 @@ defmodule Screens.Util do
   def translate_carriage_occupancy_status(:full), do: :crowded
   def translate_carriage_occupancy_status(:not_accepting_passengers), do: :closed
   def translate_carriage_occupancy_status(_), do: nil
+
+  @doc """
+    Adds a timeout to a function. Mainly used for child processes of a Task.Supervisor
+    which don't come with a timeout by default.
+  """
+  @spec fn_with_timeout((-> val), non_neg_integer()) :: (-> val) when val: any()
+  def fn_with_timeout(fun, timeout) do
+    fn ->
+      :timer.exit_after(timeout, :normal)
+      fun.()
+    end
+  end
 end
