@@ -226,7 +226,7 @@ defmodule Screens.Util do
   @spec fn_with_timeout((() -> val), non_neg_integer()) :: (() -> val) when val: any()
   def fn_with_timeout(fun, timeout) do
     fn ->
-      :timer.exit_after(timeout, :normal)
+      _ = :timer.exit_after(timeout, :normal)
       fun.()
     end
   end
