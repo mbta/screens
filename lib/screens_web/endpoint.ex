@@ -24,6 +24,12 @@ defmodule ScreensWeb.Endpoint do
     plug Phoenix.CodeReloader
   end
 
+  socket "/live", Phoenix.LiveView.Socket
+
+  plug Phoenix.LiveDashboard.RequestLogger,
+    param_key: "request_logger",
+    cookie_key: "request_logger"
+
   plug ScreensWeb.Plugs.Metadata
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]

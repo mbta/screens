@@ -1,5 +1,6 @@
 defmodule ScreensWeb.Router do
   use ScreensWeb, :router
+  import Phoenix.LiveDashboard.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -50,6 +51,7 @@ defmodule ScreensWeb.Router do
   scope "/admin", ScreensWeb do
     pipe_through [:redirect_prod_http, :browser, :auth, :ensure_auth, :ensure_screens_group]
 
+    live_dashboard "/dashboard", metrics: ScreensWeb.Telemetry
     get("/", AdminController, :index)
   end
 
