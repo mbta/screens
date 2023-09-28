@@ -41,32 +41,29 @@ defmodule Screens.V3Api do
       {:http_request, e} ->
         {:error, httpoison_error} = e
 
-        log_api_error({:http_fetch_error, e},
-          message: Exception.message(httpoison_error),
-          url: url
-        )
+        log_api_error({:http_fetch_error, e}, url, message: Exception.message(httpoison_error))
 
       {:response_success, %{status_code: 304}} ->
         :not_modified
 
       {:response_success, %{status_code: status_code}} = response ->
-        _ = log_api_error({:bad_response_code, response}, status_code: status_code, url: url)
+        _ = log_api_error({:bad_response_code, response}, url, status_code: status_code)
 
         :bad_response_code
 
       {:parse, {:error, e}} ->
-        log_api_error({:parse_error, e}, url: url)
+        log_api_error({:parse_error, e}, url)
 
       e ->
-        log_api_error({:error, e}, url: url)
+        log_api_error({:error, e}, url)
     end
   end
 
-  defp log_api_error({error_type, _error_data} = error, extra_fields \\ []) do
+  defp log_api_error({error_type, _error_data} = error, url, extra_fields \\ []) do
     extra_fields
     |> Enum.map_join(" ", fn {label, value} -> "#{label}=\"#{value}\"" end)
     |> then(fn fields ->
-      Logger.info("[api_v3_get_json_error] error_type=#{error_type} " <> fields)
+      Logger.info("[api_v3_get_json_error] url=\"#{url}\" error_type=#{error_type} " <> fields)
     end)
 
     error
