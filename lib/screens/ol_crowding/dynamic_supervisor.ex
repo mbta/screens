@@ -44,18 +44,6 @@ defmodule Screens.OlCrowding.DynamicSupervisor do
       restart: :transient
     }
 
-    case DynamicSupervisor.start_child(__MODULE__, spec) do
-      {:ok, child_pid} ->
-        _ = :timer.exit_after(10_000, child_pid, :kill)
-
-      {:ok, child_pid, _} ->
-        _ = :timer.exit_after(10_000, child_pid, :kill)
-
-      {:error, error} ->
-        Logger.error("crowding_dyn_supervisor_process_error #{inspect(error)}")
-
-      _ ->
-        Logger.warn("Something went wrong with starting the crowding dynamic supervisor process")
-    end
+    DynamicSupervisor.start_child(__MODULE__, spec)
   end
 end
