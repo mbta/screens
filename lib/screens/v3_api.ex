@@ -40,21 +40,25 @@ defmodule Screens.V3Api do
     else
       {:http_request, e} ->
         {:error, httpoison_error} = e
-        log_api_error({:http_fetch_error, e}, message: Exception.message(httpoison_error))
+
+        log_api_error({:http_fetch_error, e},
+          message: Exception.message(httpoison_error),
+          url: url
+        )
 
       {:response_success, %{status_code: 304}} ->
         :not_modified
 
       {:response_success, %{status_code: status_code}} = response ->
-        _ = log_api_error({:bad_response_code, response}, status_code: status_code)
+        _ = log_api_error({:bad_response_code, response}, status_code: status_code, url: url)
 
         :bad_response_code
 
       {:parse, {:error, e}} ->
-        log_api_error({:parse_error, e})
+        log_api_error({:parse_error, e}, url: url)
 
       e ->
-        log_api_error({:error, e})
+        log_api_error({:error, e}, url: url)
     end
   end
 
