@@ -1,4 +1,4 @@
-defmodule Screens.OlCrowding.Logger do
+defmodule Screens.OlCrowding.LogCrowdingInfo do
   @moduledoc false
 
   require Logger

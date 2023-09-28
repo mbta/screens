@@ -1,8 +1,10 @@
 defmodule Screens.OlCrowding.DynamicSupervisor do
   @moduledoc false
 
+  require Logger
+
   use DynamicSupervisor
-  alias Screens.OlCrowding.Logger
+  alias Screens.OlCrowding.LogCrowdingInfo
 
   def start_link(init_arg) do
     DynamicSupervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
@@ -25,9 +27,9 @@ defmodule Screens.OlCrowding.DynamicSupervisor do
         }
       ) do
     spec = %{
-      id: Logger,
+      id: LogCrowdingInfo,
       start:
-        {Logger, :start_link,
+        {LogCrowdingInfo, :start_link,
          [
            %{
              original_crowding_levels: original_crowding_levels,
@@ -42,6 +44,18 @@ defmodule Screens.OlCrowding.DynamicSupervisor do
       restart: :transient
     }
 
-    DynamicSupervisor.start_child(__MODULE__, spec)
+    case DynamicSupervisor.start_child(__MODULE__, spec) do
+      {:ok, child_pid} ->
+        _ = :timer.exit_after(10_000, child_pid, :kill)
+
+      {:ok, child_pid, _} ->
+        _ = :timer.exit_after(10_000, child_pid, :kill)
+
+      {:error, error} ->
+        Logger.error("crowding_dyn_supervisor_process_error #{inspect(error)}")
+
+      _ ->
+        Logger.warn("Something went wrong with starting the crowding dynamic supervisor process")
+    end
   end
 end
