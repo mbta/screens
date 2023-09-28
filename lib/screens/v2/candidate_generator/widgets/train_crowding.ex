@@ -152,13 +152,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
     train_crowding_config = common_params.train_crowding_config
     next_train_prediction = common_params.next_train_prediction
 
+    ol_stop_sequence =
+      if train_crowding_config.direction_id == 0 do
+        @ol_station_to_platform_map
+      else
+        Enum.reverse(@ol_station_to_platform_map)
+      end
+
     previous_stop_index =
       Enum.find_index(
-        @ol_station_to_platform_map,
+        ol_stop_sequence,
         &(elem(&1, 0) == train_crowding_config.station_id)
       ) - 1
 
-    {_, platform_id_tuple} = Enum.at(@ol_station_to_platform_map, previous_stop_index)
+    {_, platform_id_tuple} = Enum.at(ol_stop_sequence, previous_stop_index)
 
     relevant_platform_id = elem(platform_id_tuple, train_crowding_config.direction_id)
 
