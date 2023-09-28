@@ -12,8 +12,7 @@ config :screens, ScreensWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "0XmZH5iePmWrvV+PgrsU5z6WFgYupY2Zoh7FEk8pzuDLWftBrF/KtLBbG615wstt",
   render_errors: [view: ScreensWeb.ErrorView, accepts: ~w(html json)],
-  pubsub_server: ScreensWeb.PubSub,
-  live_view: [signing_salt: "cK5v02Jnzmp4C8NjV0wwpD2IdTaZdMvi"]
+  pubsub_server: ScreensWeb.PubSub
 
 # Include 2 logger backends
 config :logger,
