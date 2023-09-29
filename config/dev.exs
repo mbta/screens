@@ -19,7 +19,8 @@ config :screens, ScreensWeb.Endpoint,
       "--watch",
       cd: Path.expand("../assets", __DIR__)
     ]
-  ]
+  ],
+  check_origin: false
 
 config :screens,
   default_api_v3_url: System.get_env("API_V3_URL", "https://api-v3.mbta.com/"),
