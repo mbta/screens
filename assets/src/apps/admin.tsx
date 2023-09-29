@@ -23,11 +23,10 @@ import {
   BusShelterV2ScreensTable,
   PreFareV2ScreensTable,
   DupV2ScreensTable,
-  TriptychV2ScreensTable,
+  TriptychV2ScreensTable
 } from "Components/admin/admin_tables";
 import ImageManager from "Components/admin/admin_image_manager";
 import Devops from "Components/admin/devops";
-// import "../../src/socket";
 
 const App = (): JSX.Element => {
   return (
