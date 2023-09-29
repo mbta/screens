@@ -220,7 +220,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
             ) - 10
 
           now_plus_dwell = DateTime.add(common_params.now, relevant_dwell_time)
-          IO.inspect(now_plus_dwell, label: "now_plus_dwell")
 
           Agent.put(
             train_crowding_config.station_id,
