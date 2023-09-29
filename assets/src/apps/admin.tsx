@@ -27,7 +27,7 @@ import {
 } from "Components/admin/admin_tables";
 import ImageManager from "Components/admin/admin_image_manager";
 import Devops from "Components/admin/devops";
-import "../../static/socket";
+import "../../src/socket";
 
 const App = (): JSX.Element => {
   return (
