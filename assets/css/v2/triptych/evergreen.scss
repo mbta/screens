@@ -14,7 +14,8 @@
 }
 
 .evergreen-content-image__image,
-.evergreen-content-video.looping-video {
+.evergreen-content-video,
+.evergreen-content-video .looping-video {
   width: 1080px;
   height: 1920px;
 }
