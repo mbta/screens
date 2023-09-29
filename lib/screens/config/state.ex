@@ -60,6 +60,9 @@ defmodule Screens.Config.State do
   You may optionally supply a filter function, which will be used to filter the results.
   The filter function will be passed a tuple of {screen_id, screen_config} and should return true if that screen ID should be included in the results.
   """
+  @spec screen_ids(nil) :: list(Config.screen_id())
+  @spec screen_ids(({Config.screen_id(), Screen.t()} -> as_boolean(term()))) ::
+          list(Config.screen_id())
   def screen_ids(filter_fn \\ nil, pid \\ __MODULE__)
       when is_nil(filter_fn) or is_function(filter_fn, 1) do
     GenServer.call(pid, {:screen_ids, filter_fn})

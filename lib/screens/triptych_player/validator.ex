@@ -28,20 +28,26 @@ defmodule Screens.TriptychPlayer.Validator do
   end
 
   defp validate_screen_id_values(mapping) do
-    triptych_screen_ids = MapSet.new(Map.values(mapping))
-    all_screen_ids = MapSet.new(Screens.Config.State.screen_ids())
+    mapped_screen_ids =
+      mapping
+      |> Map.values()
+      |> MapSet.new()
 
-    if MapSet.subset?(triptych_screen_ids, all_screen_ids) do
+    all_triptych_screen_ids =
+      Screens.Config.State.screen_ids(&match?({_screen_id, %{app_id: :triptych_v2}}, &1))
+      |> MapSet.new()
+
+    if MapSet.subset?(mapped_screen_ids, all_triptych_screen_ids) do
       :ok
     else
       unrecognized_ids =
-        triptych_screen_ids
-        |> MapSet.difference(all_screen_ids)
+        mapped_screen_ids
+        |> MapSet.difference(all_triptych_screen_ids)
         |> Enum.sort()
 
       {:error,
-       "Mapping contains unrecognized screen IDs: #{inspect(unrecognized_ids)}.\n\n" <>
-         "Make sure all relevant screens have been configured before linking them to triptych player names."}
+       "Mapping contains unrecognized triptych screen IDs: #{inspect(unrecognized_ids)}.\n\n" <>
+         "Make sure all relevant screens have been configured as triptychs before linking them to triptych player names."}
     end
   end
 end
