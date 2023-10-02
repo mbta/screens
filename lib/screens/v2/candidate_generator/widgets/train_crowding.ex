@@ -127,7 +127,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
           |> Prediction.stop_for_vehicle()
           |> common_params.fetch_parent_stop_id_fn.() ==
             common_params.train_crowding_config.station_id ->
-        log_crowding_info(:in_transit, common_params)
+        _ = log_crowding_info(:in_transit, common_params)
 
         Agent.delete(
           common_params.train_crowding_config.station_id,
@@ -179,10 +179,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
              :eq,
              :gt
            ] do
-          log_crowding_info(
-            :dwell,
-            common_params
-          )
+          _ =
+            log_crowding_info(
+              :dwell,
+              common_params
+            )
 
           [
             %CrowdingWidget{
@@ -275,7 +276,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       "[train_crowding car_crowding_info] screen_id=#{screen_id} triptych_pane=#{triptych_pane} trip_id=#{prediction.trip.id} car_crowding_levels=#{crowding_levels} scenario=#{scenario}"
     )
 
-    _ = Screens.OlCrowding.DynamicSupervisor.start_logger(crowding_levels, common_params)
+    Screens.OlCrowding.DynamicSupervisor.start_logger(crowding_levels, common_params)
   end
 
   defp log_crowding_info(_, _), do: :ok
