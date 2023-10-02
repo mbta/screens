@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Screens</title>
+  <link rel="stylesheet" href="triptych_v2.css" />
+  <script type="text/javascript">
+    const TRIPTYCH_VERSION = "23.9.28.1";
+
+    ////////////////////
+    // COMPONENT DEFS //
+    ////////////////////
+
+    class App extends HTMLElement {
+    }
+
+    class PsaSet extends HTMLElement {
+      set props({ triptychPane, show_identifiers, asset_url, playerName }) {
+        if (triptychPane == null) throw new Error("pane prop not passed to PsaSet");
+        if (show_identifiers == null) throw new Error("show_identifiers prop not passed to PsaSet");
+        if (asset_url == null) throw new Error("asset_url prop not passed to PsaSet");
+        if (playerName == null) throw new Error("playerName prop not passed to PsaSet");
+        this._props = { playerName, triptychPane, showIdentifiers: show_identifiers, assetUrl: asset_url };
+      }
+
+      connectedCallback() {
+        if (this._props) {
+          const { triptychPane, showIdentifiers, assetUrl, playerName } = this._props;
+
+          const imagePath = `images/${assetUrl}`;
+
+          // Create child elements, add to this component's shadow DOM          
+          const shadowRoot = this.attachShadow({ mode: "open" });
+
+          /*
+          <div className="evergreen-content-image__container">
+            <img className="evergreen-content-image__image" src={assetUrl} />
+          </div>
+          */
+
+          // Image
+          const imgContainer = document.createElement("div");
+          imgContainer.className = "evergreen-content-image__container";
+
+          const img = document.createElement('img');
+          img.src = imagePath;
+          img.className = "evergreen-content-image__image";
+
+          imgContainer.appendChild(img);
+          shadowRoot.appendChild(imgContainer);
+
+          // Identifiers
+          if (showIdentifiers) {
+            let div = document.createElement('div');
+            div.className = "evergreen-content__identifiers";
+            div.innerHTML = this.getIdentifiers();
+
+            shadowRoot.appendChild(div);
+          }
+        } else {
+          throw new Error("No props set on PsaSet before connecting to DOM");
+        }
+      }
+
+      getIdentifiers() {
+        return `${TRIPTYCH_VERSION} ${this._props.playerName}`;
+      }
+    }
+
+    class Crowding extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+
+      }
+    }
+
+
+    // Register them all so we can use them.
+    customElements.define("psa-set", PsaSet);
+  </script>
+  <script type="text/javascript">
+    //////////
+    // MAIN //
+    //////////
+    //////////////////////////////////////
+    (() => {
+      const BASE_MRAID = {
+        // Stubbed methods/fields for foreground detection logic
+        EVENTS: { ONSCREEN: "fakeOnscreenEvent" },
+        requestInit() {
+          return "fakeLayoutID";
+        },
+        addEventListener(eventID, callback, layoutID) {
+          if (eventID == "fakeOnscreenEvent" && layoutID == "fakeLayoutID") {
+            console.log(
+              "FakeMRAID: Setting fake ONSCREEN event to fire in 3 seconds"
+            );
+
+            setTimeout(() => {
+              console.log("FakeMRAID: Firing fake ONSCREEN event");
+              callback();
+            }, 2000);
+          } else {
+            throw new Error(
+              "FakeMRAID: Stubbed addEventListener method expected eventID of 'fakeOnscreenEvent' and layoutID of 'fakeLayoutID'"
+            );
+          }
+        },
+      };
+
+      const options = { playerName: "BKB-DS-003", station: "Back Bay", triptychPane: "right" }
+      const { playerName, station, triptychPane } = options;
+
+      const triptychPaneToArrayConfiguration = (pane) => {
+        return `Triple_${pane[0].toUpperCase().concat(pane.slice(1))}`;
+      };
+
+      let tags = [{ name: "Station", value: [station] }];
+      if (triptychPane) {
+        tags.push({
+          name: "Array_configuration",
+          value: [triptychPaneToArrayConfiguration(triptychPane)],
+        });
+      }
+      const tagsJSON = JSON.stringify({ tags });
+
+      const deviceInfoJSON = JSON.stringify({ deviceName: playerName });
+
+      const mraid = {
+        ...BASE_MRAID,
+        getTags() {
+          return tagsJSON;
+        },
+        getDeviceInfo() {
+          return deviceInfoJSON;
+        },
+      };
+
+      // Be noisy about it so that we don't accidentally ship a package that calls this function.
+      alert(
+        `Setting fake MRAID object for testing purposes: ${JSON.stringify(options)}`
+      );
+
+      // Since `window.parent.parent.parent...` returns itself if the window does not have a parent, we can just set the mraid object
+      // on the current window, and the code that reads `window.parent.parent.mraid` will still access it correctly.
+      window.mraid = mraid;
+    })();
+    //////////////////////////////////////
+
+    function setTemplate(id) {
+      let template = document.getElementById(id);
+      // document.body.innerHTML = '';
+      console.log("id is", id);
+      console.log("template is", template);
+      document.body.appendChild(template.content);
+    }
+    const getMRAID = async () => {
+      const mraid = parent?.parent?.mraid ?? false;
+      if (mraid) {
+        return mraid;
+      } else {
+        await sleep(5);
+        return getMRAID();
+      }
+    };
+
+    const getTags = (mraid) => {
+      try {
+        return JSON.parse(mraid.getTags()).tags;
+      } catch (err) {
+        setTemplate("no-data-template");
+        throw err;
+      }
+    };
+
+    const getPlayerName = (mraid) => {
+      try {
+        const deviceInfoJSON = mraid.getDeviceInfo();
+        console.log("deviceInfoJSON is", deviceInfoJSON);
+        const deviceInfo = JSON.parse(deviceInfoJSON);
+        console.log("deviceInfo is", deviceInfo);
+        return deviceInfo.deviceName;
+      } catch (err) {
+        setTemplate("no-data-template");
+        throw err;
+      }
+    };
+
+    const arrayConfigurationToTriptychPane = (arrayConfiguration) => {
+      switch (arrayConfiguration) {
+        case "Triple_Left":
+          return "left";
+        case "Triple_Middle":
+          return "middle";
+        case "Triple_Right":
+          return "right";
+        default:
+          setTemplate("no-data-template")
+          throw new Error(`Couldn't parse Array_configuration value: ${arrayConfiguration}`);
+      }
+    };
+
+    const getOutfrontData = async () => {
+      const mraid = await getMRAID();
+      console.log("mraid is", mraid);
+      const playerName = getPlayerName(mraid);
+      const tags = getTags(mraid);
+
+      const arrayConfiguration = tags.find(({ name }) => name === "Array_configuration")?.value?.[0] ?? null;
+      const triptychPane = arrayConfigurationToTriptychPane(arrayConfiguration);
+
+      console.log("returning", { playerName, triptychPane });
+      return { playerName, triptychPane };
+    }
+
+
+
+    async function fetchData(playerName, triptychPane) {
+      try {
+        const result = await fetch(`https://screens.mbta.com/v2/api/screen/${playerName}/triptych?is_real_screen=true&last_refresh="2020-09-25T17:23:00Z"`);
+        const json = await result.json();
+
+        if (json.data == null) {
+          // Show error template
+          setTemplate("no-data-template")
+        } else {
+          setTemplate("app-template")
+          // Show PSA
+          if (json.data.type === "screen_split") {
+            const { asset_url, show_identifiers } = json.data[`${triptychPane}_pane`];
+            const psaSet = document.createElement("psa-set");
+            const mraid = await getMRAID();
+            psaSet.props = { triptychPane, show_identifiers, asset_url, playerName: getPlayerName(mraid) };
+
+            const root = document.getElementById("app");
+            root.appendChild(psaSet);
+          }
+          // Show crowding
+          else if (json.data.type === "screen_normal") {
+            //NOTHING YET
+            //setTemplate("crowding-widget-template")
+          }
+        }
+      } catch (err) {
+        // Show error template
+        setTemplate("no-data-template");
+        throw err;
+      }
+
+    };
+
+    document.onreadystatechange = async function () {
+      if (document.readyState === "interactive") {
+        setTemplate("loading-template");
+        const { playerName, triptychPane } = await getOutfrontData();
+        fetchData(playerName, triptychPane);
+      }
+    };
+  </script>
+</head>
+
+<body>
+
+  <script type="text/javascript" src="polyfills.js"></script>
+  <script type="text/javascript" src="triptych_v2.js"></script>
+</body>
+
+<template id="loading-template">
+  <img src="images/loading-triptych.webp" />
+</template>
+
+<template id="no-data-template">
+  <img src="images/no-data-triptych.webp" />
+</template>
+
+<template id="app-template">
+  <div id="app">
+  </div>
+</template>
+
+<template id="crowding-widget-template">
+  <div class="triptych-screen-viewport">
+    <div id="shifter-element" class="triptych-shifter">
+      <!-- TODO -->
+      <!-- document.getElementById("shifter-element"); // then append appropriate left/middle/right class to className -->
+      <div class="screen-container">
+        <!-- TODO need to fill this part in with more fine-grained slots-->
+        <slot name="content">NEED CONTENT</slot>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="psa-set-template">
+  <div class="screen-container">
+    <slot name="image">NEED IMAGE</slot>
+  </div>
+</template>
+
+</html>
