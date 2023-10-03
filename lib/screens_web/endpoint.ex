@@ -2,9 +2,17 @@ defmodule ScreensWeb.Endpoint do
   use Sentry.PlugCapture
   use Phoenix.Endpoint, otp_app: :screens
 
-  socket "/socket", ScreensWeb.UserSocket,
-    websocket: true,
-    longpoll: false
+  # The session will be stored in the cookie and signed,
+  # this means its contents can be read but not tampered with.
+  # Set :encryption_salt if you would also like to encrypt it.
+  @session_options [
+    store: :cookie,
+    key: "_screens_key",
+    signing_salt: "g3bAaGvf",
+    same_site: "Lax"
+  ]
+
+  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -23,8 +31,6 @@ defmodule ScreensWeb.Endpoint do
     plug Phoenix.LiveReloader
     plug Phoenix.CodeReloader
   end
-
-  socket "/live", Phoenix.LiveView.Socket
 
   plug Phoenix.LiveDashboard.RequestLogger,
     param_key: "request_logger",
@@ -47,10 +53,7 @@ defmodule ScreensWeb.Endpoint do
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
-  plug Plug.Session,
-    store: :cookie,
-    key: "_screens_key",
-    signing_salt: "g3bAaGvf"
+  plug Plug.Session, @session_options
 
   plug ScreensWeb.Router
 end
