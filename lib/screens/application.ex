@@ -33,7 +33,7 @@ defmodule Screens.Application do
       # Task supervisor for ScreensByAlert self-refresh jobs
       {Task.Supervisor, name: Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor},
       # ScreensByAlert self-refresh job runner
-      # {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner},
+      {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner},
       Screens.OlCrowding.DynamicSupervisor
     ]
 
