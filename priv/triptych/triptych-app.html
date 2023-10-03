@@ -8,83 +8,201 @@
   <title>Screens</title>
   <link rel="stylesheet" href="triptych_v2.css" />
   <script type="text/javascript">
+    /////////////////////////
+    // CONSTANTS & GLOBALS //
+    /////////////////////////
     const TRIPTYCH_VERSION = "23.9.28.1";
+
+    // Custom element names must adhere to naming rules
+    // https://developer.mozilla.org/en-US/docs/Web/API/Web_Components/Using_custom_elements#registering_a_custom_element
+    const WIDGET_TYPE_TO_ELEMENT_NAME = {
+      screen_normal: "screen-normal",
+      screen_split: "screen-split",
+      page_load_no_data: "page-load-no-data",
+      no_data: "no-data",
+      train_crowding: "train-crowding",
+      evergreen_content: "evergreen-content",
+      page_load_no_data: "page-load-no-data",
+      no_data: "no-data"
+    };
+
+    const LOADING_LAYOUT = {
+      full_screen: {
+        type: "page_load_no_data",
+      },
+      type: "screen_normal",
+    };
+
+    const FAILURE_LAYOUT = {
+      full_screen: {
+        type: "no_data",
+      },
+      type: "screen_normal",
+    };
+
+    // Gets set by setOutfrontContext.
+    // { playerName: string, triptychPane: "left" | "middle" | "right" }
+    let IDENTIFIERS;
 
     ////////////////////
     // COMPONENT DEFS //
     ////////////////////
-
     class App extends HTMLElement {
-    }
+      set props({ type, ...subProps }) {
+        if (type == null) throw new Error("type prop not passed to App");
 
-    class PsaSet extends HTMLElement {
-      set props({ triptychPane, show_identifiers, asset_url, playerName }) {
-        if (triptychPane == null) throw new Error("pane prop not passed to PsaSet");
-        if (show_identifiers == null) throw new Error("show_identifiers prop not passed to PsaSet");
-        if (asset_url == null) throw new Error("asset_url prop not passed to PsaSet");
-        if (playerName == null) throw new Error("playerName prop not passed to PsaSet");
-        this._props = { playerName, triptychPane, showIdentifiers: show_identifiers, assetUrl: asset_url };
+        this._props = { type, subProps };
       }
 
       connectedCallback() {
         if (this._props) {
-          const { triptychPane, showIdentifiers, assetUrl, playerName } = this._props;
+          const { type, subProps } = this._props;
+          const template = document.getElementById("app-content-template").content.cloneNode(true);
 
-          const imagePath = `images/${assetUrl}`;
+          template.getElementById("triptych-shifter").className += ` triptych-shifter--${IDENTIFIERS.triptychPane}`;
 
-          // Create child elements, add to this component's shadow DOM          
-          const shadowRoot = this.attachShadow({ mode: "open" });
+          const content = document.createElement(WIDGET_TYPE_TO_ELEMENT_NAME[type]);
+          content.props = { ...subProps };
+          template.getElementById("screen-container").appendChild(content);
 
-          /*
-          <div className="evergreen-content-image__container">
-            <img className="evergreen-content-image__image" src={assetUrl} />
-          </div>
-          */
-
-          // Image
-          const imgContainer = document.createElement("div");
-          imgContainer.className = "evergreen-content-image__container";
-
-          const img = document.createElement('img');
-          img.src = imagePath;
-          img.className = "evergreen-content-image__image";
-
-          imgContainer.appendChild(img);
-          shadowRoot.appendChild(imgContainer);
-
-          // Identifiers
-          if (showIdentifiers) {
-            let div = document.createElement('div');
-            div.className = "evergreen-content__identifiers";
-            div.innerHTML = this.getIdentifiers();
-
-            shadowRoot.appendChild(div);
-          }
+          this.attachShadow({ mode: "open" }).appendChild(template);
         } else {
-          throw new Error("No props set on PsaSet before connecting to DOM");
+          throw new Error("No props set on App before connecting to DOM");
         }
-      }
-
-      getIdentifiers() {
-        return `${TRIPTYCH_VERSION} ${this._props.playerName}`;
       }
     }
 
-    class Crowding extends HTMLElement {
-      constructor() {
-        super();
+    class ScreenNormal extends HTMLElement {
+      set props({ full_screen: fullScreen }) {
+        if (fullScreen == null) throw new Error("full_screen prop not passed to ScreenNormal");
+
+        this._props = { fullScreen };
       }
 
       connectedCallback() {
+        if (this._props) {
+          const { fullScreen: { type, ...subProps } } = this._props;
 
+          const template = document.getElementById("screen-normal-template").content.cloneNode(true);
+
+          const content = document.createElement(WIDGET_TYPE_TO_ELEMENT_NAME[type]);
+          content.props = { ...subProps };
+          template.getElementById("full-screen").appendChild(content);
+
+          this.attachShadow({ mode: "open" }).appendChild(template);
+        } else {
+          throw new Error("No props set on ScreenNormal before connecting to DOM");
+        }
+      }
+    }
+
+    class ScreenSplit extends HTMLElement {
+      set props({ left_pane: left, middle_pane: middle, right_pane: right }) {
+        if (left == null) throw new Error("left_pane prop not passed to ScreenSplit");
+        if (middle == null) throw new Error("middle_pane prop not passed to ScreenSplit");
+        if (right == null) throw new Error("right_pane prop not passed to ScreenSplit");
+
+        this._props = { left, middle, right };
+      }
+
+      connectedCallback() {
+        if (this._props) {
+          const template = document.getElementById("screen-split-template").content.cloneNode(true);
+
+          // Choose which pane div to populate
+          const { type, ...subProps } = this._props[IDENTIFIERS.triptychPane];
+          const paneId = `${IDENTIFIERS.triptychPane}-pane`;
+
+          const content = document.createElement(WIDGET_TYPE_TO_ELEMENT_NAME[type]);
+          content.props = { ...subProps };
+          template.getElementById(paneId).appendChild(content);
+
+          this.attachShadow({ mode: "open" }).appendChild(template);
+        } else {
+          throw new Error("No props set on ScreenSplit before connecting to DOM");
+        }
+      }
+    }
+
+    class EvergreenContent extends HTMLElement {
+      set props({ src, showIdentifiers }) {
+        if (src == null) throw new Error("src prop not passed to EvergreenContent");
+        if (showIdentifiers == null) throw new Error("showIdentifiers prop not passed to EvergreenContent");
+        this._props = { src, showIdentifiers };
+      }
+
+      connectedCallback() {
+        if (this._props) {
+          const { src, showIdentifiers } = this._props;
+          const template = document.getElementById("evergreen-content-template").content.cloneNode(true);
+
+          template.getElementById("image").src = src;
+
+          if (showIdentifiers) {
+            template.getElementById("identifiers").innerText = `${TRIPTYCH_VERSION} ${IDENTIFIERS.playerName}`;
+          }
+
+          this.attachShadow({ mode: "open" }).appendChild(template);
+        } else {
+          throw new Error("No props set on EvergreenContent before connecting to DOM");
+        }
+      }
+    }
+
+    class TrainCrowding extends HTMLElement {
+      set props({ arrivalTime, crowding, destination, front_car_direction: frontCarDirection, now, platform_position: platformPosition, show_identifiers: showIdentifiers }) {
+        if (arrivalTime == null) throw new Error("arrivalTime prop not passed to TrainCrowding");
+        if (crowding == null) throw new Error("crowding prop not passed to TrainCrowding");
+        if (destination == null) throw new Error("destination prop not passed to TrainCrowding");
+        if (frontCarDirection == null) throw new Error("front_car_direction prop not passed to TrainCrowding");
+        if (now == null) throw new Error("now prop not passed to TrainCrowding");
+        if (platformPosition == null) throw new Error("platform_position prop not passed to TrainCrowding");
+        if (showIdentifiers == null) throw new Error("show_identifiers prop not passed to TrainCrowding");
+
+
+        this._props = { arrivalTime, crowding, destination, frontCarDirection, now, platformPosition, showIdentifiers };
+      }
+
+      connectedCallback() {
+        if (this._props) {
+          const { arrivalTime, crowding, destination, frontCarDirection, now, platformPosition, showIdentifiers } = this._props;
+          const template = document.getElementById("train-crowding-template").content.cloneNode(true);
+
+          // TODO
+
+          this.attachShadow({ mode: "open" }).appendChild(template);
+        } else {
+          throw new Error("No props set on TrainCrowding before connecting to DOM");
+        }
+      }
+    }
+
+    class PageLoadNoData extends HTMLElement {
+      connectedCallback() {
+        const template = document.getElementById("page-load-no-data-template").content.cloneNode(true);
+
+        this.attachShadow({ mode: "open" }).appendChild(template);
+      }
+    }
+
+    class NoData extends HTMLElement {
+      connectedCallback() {
+        const template = document.getElementById("no-data-template").content.cloneNode(true);
+
+        this.attachShadow({ mode: "open" }).appendChild(template);
       }
     }
 
 
     // Register them all so we can use them.
-    customElements.define("psa-set", PsaSet);
-  </script>
-  <script type="text/javascript">
+    customElements.define("app-content", App);
+    customElements.define("screen-normal", ScreenNormal);
+    customElements.define("screen-split", ScreenSplit);
+    customElements.define("evergreen-content", EvergreenContent);
+    customElements.define("train-crowding", TrainCrowding);
+    customElements.define("page-load-no-data", PageLoadNoData);
+    customElements.define("no-data", NoData);
+
     //////////
     // MAIN //
     //////////
@@ -153,33 +271,28 @@
     })();
     //////////////////////////////////////
 
-    function setTemplate(id) {
-      let template = document.getElementById(id);
-      // document.body.innerHTML = '';
-      console.log("id is", id);
-      console.log("template is", template);
-      document.body.appendChild(template.content);
-    }
-    const getMRAID = async () => {
+    const _sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const _getMRAID = async () => {
       const mraid = parent?.parent?.mraid ?? false;
       if (mraid) {
         return mraid;
       } else {
-        await sleep(5);
-        return getMRAID();
+        await _sleep(5);
+        return _getMRAID();
       }
     };
 
-    const getTags = (mraid) => {
+    const _getTags = (mraid) => {
       try {
         return JSON.parse(mraid.getTags()).tags;
       } catch (err) {
-        setTemplate("no-data-template");
+        renderData(FAILURE_LAYOUT);
         throw err;
       }
     };
 
-    const getPlayerName = (mraid) => {
+    const _getPlayerName = (mraid) => {
       try {
         const deviceInfoJSON = mraid.getDeviceInfo();
         console.log("deviceInfoJSON is", deviceInfoJSON);
@@ -187,12 +300,12 @@
         console.log("deviceInfo is", deviceInfo);
         return deviceInfo.deviceName;
       } catch (err) {
-        setTemplate("no-data-template");
+        renderData(FAILURE_LAYOUT);
         throw err;
       }
     };
 
-    const arrayConfigurationToTriptychPane = (arrayConfiguration) => {
+    const _arrayConfigurationToTriptychPane = (arrayConfiguration) => {
       switch (arrayConfiguration) {
         case "Triple_Left":
           return "left";
@@ -201,77 +314,67 @@
         case "Triple_Right":
           return "right";
         default:
-          setTemplate("no-data-template")
+          renderData(FAILURE_LAYOUT);
           throw new Error(`Couldn't parse Array_configuration value: ${arrayConfiguration}`);
       }
     };
 
-    const getOutfrontData = async () => {
-      const mraid = await getMRAID();
-      console.log("mraid is", mraid);
-      const playerName = getPlayerName(mraid);
-      const tags = getTags(mraid);
+    const setOutfrontContext = async () => {
+      const mraid = await _getMRAID();
+      const playerName = _getPlayerName(mraid);
+      const tags = _getTags(mraid);
 
       const arrayConfiguration = tags.find(({ name }) => name === "Array_configuration")?.value?.[0] ?? null;
-      const triptychPane = arrayConfigurationToTriptychPane(arrayConfiguration);
+      const triptychPane = _arrayConfigurationToTriptychPane(arrayConfiguration);
 
-      console.log("returning", { playerName, triptychPane });
-      return { playerName, triptychPane };
+      IDENTIFIERS = { playerName, triptychPane };
+      return;
     }
 
+    const renderData = (data) => {
+      const app = document.createElement("app-content");
+      app.props = { ...data };
 
+      const root = document.getElementById("app");
+      root.replaceChildren(app);
+    };
 
     async function fetchData(playerName, triptychPane) {
       try {
         const result = await fetch(`https://screens.mbta.com/v2/api/screen/${playerName}/triptych?is_real_screen=true&last_refresh="2020-09-25T17:23:00Z"`);
         const json = await result.json();
 
-        if (json.data == null) {
+        if (json.data == null || json.disabled) {
           // Show error template
-          setTemplate("no-data-template")
+          return FAILURE_LAYOUT;
         } else {
-          setTemplate("app-template")
-          // Show PSA
-          if (json.data.type === "screen_split") {
-            const { asset_url, show_identifiers } = json.data[`${triptychPane}_pane`];
-            const psaSet = document.createElement("psa-set");
-            const mraid = await getMRAID();
-            psaSet.props = { triptychPane, show_identifiers, asset_url, playerName: getPlayerName(mraid) };
-
-            const root = document.getElementById("app");
-            root.appendChild(psaSet);
-          }
-          // Show crowding
-          else if (json.data.type === "screen_normal") {
-            //NOTHING YET
-            //setTemplate("crowding-widget-template")
-          }
+          return json.data;
         }
       } catch (err) {
         // Show error template
-        setTemplate("no-data-template");
+        renderData(FAILURE_LAYOUT);
         throw err;
       }
-
     };
 
     document.onreadystatechange = async function () {
       if (document.readyState === "interactive") {
-        setTemplate("loading-template");
-        const { playerName, triptychPane } = await getOutfrontData();
-        fetchData(playerName, triptychPane);
+        renderData(LOADING_LAYOUT);
+
+        await setOutfrontContext();
+        const layoutData = await fetchData(playerName, triptychPane);
+
+        renderData(layoutData);
       }
     };
   </script>
 </head>
 
 <body>
-
-  <script type="text/javascript" src="polyfills.js"></script>
-  <script type="text/javascript" src="triptych_v2.js"></script>
+  <div id="app"></div>
 </body>
 
-<template id="loading-template">
+<template id="page-load-no-data-template">
   <img src="images/loading-triptych.webp" />
 </template>
 
@@ -279,28 +382,35 @@
   <img src="images/no-data-triptych.webp" />
 </template>
 
-<template id="app-template">
-  <div id="app">
-  </div>
-</template>
-
-<template id="crowding-widget-template">
+<template id="app-content-template">
   <div class="triptych-screen-viewport">
-    <div id="shifter-element" class="triptych-shifter">
-      <!-- TODO -->
-      <!-- document.getElementById("shifter-element"); // then append appropriate left/middle/right class to className -->
-      <div class="screen-container">
-        <!-- TODO need to fill this part in with more fine-grained slots-->
-        <slot name="content">NEED CONTENT</slot>
+    <div class="triptych-shifter" id="triptych-shifter">
+      <div class="screen-container" id="screen-container">
       </div>
     </div>
   </div>
 </template>
 
-<template id="psa-set-template">
-  <div class="screen-container">
-    <slot name="image">NEED IMAGE</slot>
+<template id="screen-normal-template">
+  <div className="full-screen" id="full-screen">
   </div>
+</template>
+
+<template id="screen-split-template">
+  <div className="left-pane" id="left-pane"></div>
+  <div className="middle-pane" id="middle-pane"></div>
+  <div className="right-pane" id="right-pane"></div>
+</template>
+
+<template id="train-crowding-template">
+  <slot name="content">NEED CROWDING CONTENT</slot>
+</template>
+
+<template id="evergreen-content-template">
+  <div class="evergreen-content-image__container">
+    <img class="evergreen-content-image__image" id="image">
+  </div>
+  <div class="evergreen-content__identifiers" id="identifiers"></div>
 </template>
 
 </html>
