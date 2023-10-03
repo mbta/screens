@@ -40,10 +40,6 @@
       type: "screen_normal",
     };
 
-    // Gets set by setOutfrontContext.
-    // { playerName: string, triptychPane: "left" | "middle" | "right" }
-    let IDENTIFIERS;
-
     ////////////////////
     // COMPONENT DEFS //
     ////////////////////
@@ -59,7 +55,7 @@
           const { type, subProps } = this._props;
           const template = document.getElementById("app-content-template").content.cloneNode(true);
 
-          template.getElementById("triptych-shifter").className += ` triptych-shifter--${IDENTIFIERS.triptychPane}`;
+          template.getElementById("triptych-shifter").className += ` triptych-shifter--${window.IDENTIFIERS.triptychPane}`;
 
           const content = document.createElement(WIDGET_TYPE_TO_ELEMENT_NAME[type]);
           content.props = { ...subProps };
@@ -110,8 +106,8 @@
           const template = document.getElementById("screen-split-template").content.cloneNode(true);
 
           // Choose which pane div to populate
-          const { type, ...subProps } = this._props[IDENTIFIERS.triptychPane];
-          const paneId = `${IDENTIFIERS.triptychPane}-pane`;
+          const { type, ...subProps } = this._props[window.IDENTIFIERS.triptychPane];
+          const paneId = `${window.IDENTIFIERS.triptychPane}-pane`;
 
           const content = document.createElement(WIDGET_TYPE_TO_ELEMENT_NAME[type]);
           content.props = { ...subProps };
@@ -139,7 +135,7 @@
           template.getElementById("image").src = src;
 
           if (showIdentifiers) {
-            template.getElementById("identifiers").innerText = `${TRIPTYCH_VERSION} ${IDENTIFIERS.playerName}`;
+            template.getElementById("identifiers").innerText = `${TRIPTYCH_VERSION} ${window.IDENTIFIERS.playerName}`;
           }
 
           this.attachShadow({ mode: "open" }).appendChild(template);
@@ -327,8 +323,8 @@
       const arrayConfiguration = tags.find(({ name }) => name === "Array_configuration")?.value?.[0] ?? null;
       const triptychPane = _arrayConfigurationToTriptychPane(arrayConfiguration);
 
-      IDENTIFIERS = { playerName, triptychPane };
-      return;
+      window.IDENTIFIERS = { playerName, triptychPane };
+      return "ok";
     }
 
     const renderData = (data) => {
@@ -359,11 +355,15 @@
 
     document.onreadystatechange = async function () {
       if (document.readyState === "interactive") {
-        renderData(LOADING_LAYOUT);
+        // Render without components at first so we don't depend on window.IDENTIFIERS
+        // (Instead of just calling `renderData(LOADING_LAYOUT);`)
+        const loadingPageTemplate = document.getElementById("zero-dependency-page-load-no-data-template").content.cloneNode(true);
+        const appRoot = document.getElementById("app");
+        appRoot.replaceChildren(loadingPageTemplate);
 
         await setOutfrontContext();
-        const layoutData = await fetchData(playerName, triptychPane);
 
+        const layoutData = await fetchData(window.IDENTIFIERS.playerName, window.IDENTIFIERS.triptychPane);
         renderData(layoutData);
       }
     };
@@ -374,12 +374,48 @@
   <div id="app"></div>
 </body>
 
+<template id="zero-dependency-page-load-no-data-template">
+  <div class="triptych-screen-viewport">
+    <div class="triptych-shifter" id="triptych-shifter">
+      <div class="screen-container" id="screen-container">
+        <div className="full-screen" id="full-screen">
+          <div class="no-data-left">
+            <img src="images/loading-triptych.webp" />
+          </div>
+          <div class="no-data-middle">
+            <img src="images/loading-triptych.webp" />
+          </div>
+          <div class="no-data-right">
+            <img src="images/loading-triptych.webp" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <template id="page-load-no-data-template">
-  <img src="images/loading-triptych.webp" />
+  <div class="no-data-left">
+    <img src="images/loading-triptych.webp" />
+  </div>
+  <div class="no-data-middle">
+    <img src="images/loading-triptych.webp" />
+  </div>
+  <div class="no-data-right">
+    <img src="images/loading-triptych.webp" />
+  </div>
 </template>
 
 <template id="no-data-template">
-  <img src="images/no-data-triptych.webp" />
+  <div class="no-data-left">
+    <img src="images/no-data-triptych.webp" />
+  </div>
+  <div class="no-data-middle">
+    <img src="images/no-data-triptych.webp" />
+  </div>
+  <div class="no-data-right">
+    <img src="images/no-data-triptych.webp" />
+  </div>
 </template>
 
 <template id="app-content-template">
