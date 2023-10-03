@@ -1,5 +1,13 @@
 # Triptych app packaging
 
+> [!NOTE]\
+> We had to make a last-minute pivot to a no-framework plain JS build of the client. That code is located
+> in [/priv/plain-js-triptych-app](/priv/plain-js-triptych-app).
+>
+> The below instructions are for creating the full React version of the client, which ran into memory usage
+> issues on the extremely resource-constrained triptych players. There may be slight (or not so slight, as
+> time goes on) differences between this package and the one running on the real screens.
+
 ## Resizing the PSAs
 Outfront recommends these asset sizes:
 - Images: The boards can take webp, which saves 35% or possibly more. OFM recommends using `sharp`, but you can also use [webp](https://formulae.brew.sh/formula/webp). `cwebp -resize 1080 0 left.png -o left.webp` will resize left.png to the triptych screen size and convert to webp.
