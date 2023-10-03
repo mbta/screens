@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Screens</title>
+  <link rel="stylesheet" href="triptych_v2.css" />
+  <script type="text/javascript">
+    /////////////////////////
+    // CONSTANTS & GLOBALS //
+    /////////////////////////
+    const TRIPTYCH_VERSION = "23.10.3.1";
+
+    // Custom element names must adhere to naming rules
+    // https://developer.mozilla.org/en-US/docs/Web/API/Web_Components/Using_custom_elements#registering_a_custom_element
+    // This mapping only needs to include components that can be specified directly by the server's JSON response,
+    // so for example sub-components of a widget, like TrainCrowdingHeader, can be omitted from this.
+    const WIDGET_TYPE_TO_ELEMENT_NAME = {
+      screen_normal: "screen-normal",
+      screen_split: "screen-split",
+      page_load_no_data: "page-load-no-data",
+      no_data: "no-data",
+      train_crowding: "train-crowding",
+      evergreen_content: "evergreen-content",
+      page_load_no_data: "page-load-no-data",
+      no_data: "no-data"
+    };
+
+    const LOADING_LAYOUT = {
+      full_screen: {
+        type: "page_load_no_data",
+      },
+      type: "screen_normal",
+    };
+
+    const FAILURE_LAYOUT = {
+      full_screen: {
+        type: "no_data",
+      },
+      type: "screen_normal",
+    };
+
+    window.IDENTIFIERS = {
+      get playerName() {
+        throw new Error("Tried to read window.IDENTIFIERS.playerName before setting it with `setOutfrontContext`");
+      },
+      get triptychPane() {
+        throw new Error("Tried to read window.IDENTIFIERS.triptychPane before setting it with `setOutfrontContext`");
+      },
+      get showIdentifiers() {
+        throw new Error("Tried to read window.IDENTIFIERS.showIdentifiers before setting it with `setOutfrontContext`");
+      }
+    };
+
+    ////////////////////
+    // COMPONENT DEFS //
+    ////////////////////
+    class App extends HTMLElement {
+      set props({ type, ...subProps }) {
+        if (type == null) throw new Error("type prop not passed to App");
+
+        this._props = { type, subProps };
+      }
+
+      connectedCallback() {
+        if (this._props) {
+          const { type, subProps } = this._props;
+          const template = document.getElementById("app-content-template").content.cloneNode(true);
+
+          template.getElementById("triptych-shifter").className += ` triptych-shifter--${window.IDENTIFIERS.triptychPane}`;
+
+          const content = document.createElement(WIDGET_TYPE_TO_ELEMENT_NAME[type]);
+          content.props = { ...subProps };
+          template.getElementById("screen-container").appendChild(content);
+
+          this.appendChild(template);
+        } else {
+          throw new Error("No props set on App before connecting to DOM");
+        }
+      }
+    }
+
+    class ScreenNormal extends HTMLElement {
+      set props({ full_screen: fullScreen }) {
+        if (fullScreen == null) throw new Error("full_screen prop not passed to ScreenNormal");
+
+        this._props = { fullScreen };
+      }
+
+      connectedCallback() {
+        if (this._props) {
+          const { fullScreen: { type, ...subProps } } = this._props;
+
+          const template = document.getElementById("screen-normal-template").content.cloneNode(true);
+
+          const content = document.createElement(WIDGET_TYPE_TO_ELEMENT_NAME[type]);
+          content.props = { ...subProps };
+          template.getElementById("full-screen").appendChild(content);
+
+          this.appendChild(template);
+        } else {
+          throw new Error("No props set on ScreenNormal before connecting to DOM");
+        }
+      }
+    }
+
+    class ScreenSplit extends HTMLElement {
+      set props({ left_pane: left, middle_pane: middle, right_pane: right }) {
+        if (left == null) throw new Error("left_pane prop not passed to ScreenSplit");
+        if (middle == null) throw new Error("middle_pane prop not passed to ScreenSplit");
+        if (right == null) throw new Error("right_pane prop not passed to ScreenSplit");
+
+        this._props = { left, middle, right };
+      }
+
+      connectedCallback() {
+        if (this._props) {
+          const template = document.getElementById("screen-split-template").content.cloneNode(true);
+
+          // Choose which pane div to populate
+          const { type, ...subProps } = this._props[window.IDENTIFIERS.triptychPane];
+          const paneId = `${window.IDENTIFIERS.triptychPane}-pane`;
+
+          const content = document.createElement(WIDGET_TYPE_TO_ELEMENT_NAME[type]);
+          content.props = { ...subProps };
+          template.getElementById(paneId).appendChild(content);
+
+          this.appendChild(template);
+        } else {
+          throw new Error("No props set on ScreenSplit before connecting to DOM");
+        }
+      }
+    }
+
+    class EvergreenContent extends HTMLElement {
+      set props({ asset_url: assetUrl, show_identifiers: showIdentifiers }) {
+        if (assetUrl == null) throw new Error("asset_url prop not passed to EvergreenContent");
+        if (showIdentifiers == null) throw new Error("show_identifiers prop not passed to EvergreenContent");
+
+        const src = `images/${assetUrl}`;
+        this._props = { src, showIdentifiers };
+      }
+
+      connectedCallback() {
+        if (this._props) {
+          const { src, showIdentifiers } = this._props;
+          const template = document.getElementById("evergreen-content-template").content.cloneNode(true);
+
+          template.getElementById("image").src = src;
+
+          if (showIdentifiers) {
+            template.getElementById("identifiers").innerText = `${TRIPTYCH_VERSION} ${window.IDENTIFIERS.playerName}`;
+          }
+
+          this.appendChild(template);
+        } else {
+          throw new Error("No props set on EvergreenContent before connecting to DOM");
+        }
+      }
+    }
+
+    class TrainCrowding extends HTMLElement {
+      set props({ crowding, destination, front_car_direction: frontCarDirection, now, platform_position: platformPosition, show_identifiers: showIdentifiers }) {
+        if (crowding == null) throw new Error("crowding prop not passed to TrainCrowding");
+        if (destination == null) throw new Error("destination prop not passed to TrainCrowding");
+        if (frontCarDirection == null) throw new Error("front_car_direction prop not passed to TrainCrowding");
+        if (now == null) throw new Error("now prop not passed to TrainCrowding");
+        if (platformPosition == null) throw new Error("platform_position prop not passed to TrainCrowding");
+        if (showIdentifiers == null) throw new Error("show_identifiers prop not passed to TrainCrowding");
+
+
+        this._props = { crowding, destination, frontCarDirection, now, platformPosition, showIdentifiers };
+      }
+
+      connectedCallback() {
+        if (this._props) {
+          const { crowding, destination, frontCarDirection, now, platformPosition, showIdentifiers } = this._props;
+          window.IDENTIFIERS.showIdentifiers = showIdentifiers;
+          const template = document.getElementById("train-crowding-template").content.cloneNode(true);
+
+          const headerContent = document.createElement("train-crowding-header");
+          headerContent.props = { now, destination };
+          template.appendChild(headerContent);
+
+          const bodyContent = document.createElement("train-crowding-body");
+          bodyContent.props = { crowding, frontCarDirection, platformPosition };
+          template.appendChild(bodyContent);
+
+          const footerContent = document.createElement("train-crowding-footer");
+          footerContent.props = { crowding };
+          template.appendChild(footerContent);
+
+          this.appendChild(template);
+        } else {
+          throw new Error("No props set on TrainCrowding before connecting to DOM");
+        }
+      }
+
+      renderHeader(template) {
+        let headerDiv = template.getElementById("crowding-widget-header");
+
+      }
+      renderBody() { }
+      renderFooter() { }
+    }
+
+    class TrainCrowdingHeader extends HTMLElement {
+      set props({ now, destination }) {
+        if (now == null) throw new Error("now prop not passed to TrainCrowdingHeader");
+        if (destination == null) throw new Error("destination prop not passed to TrainCrowdingHeader");
+
+        this._props = { now, destination };
+      }
+
+      connectedCallback() {
+        if (this._props) {
+          const { now, destination } = this._props;
+
+          const template = document.getElementById("train-crowding-header-template").content.cloneNode(true);
+
+          // Need to edit elements with these IDs:
+          const timeWithAmPm = new Date(now).toLocaleTimeString('en', { timeStyle: 'short', hour12: true, timeZone: "America/New_York" });
+          const time = timeWithAmPm.split(" ")[0];
+
+          template.getElementById("time").innerText = time;
+          template.getElementById("header-destination").innerText = destination;
+
+          this.appendChild(template);
+        } else {
+          throw new Error("No props set on TrainCrowdingHeader before connecting to DOM");
+        }
+      }
+    }
+
+    class TrainCrowdingBody extends HTMLElement {
+      set props({ crowding, frontCarDirection, platformPosition }) {
+        if (crowding == null) throw new Error("crowding prop not passed to TrainCrowdingBody");
+        if (frontCarDirection == null) throw new Error("frontCarDirection prop not passed to TrainCrowdingBody");
+        if (platformPosition == null) throw new Error("platformPosition prop not passed to TrainCrowdingBody");
+
+        this._props = { crowding, frontCarDirection, platformPosition };
+      }
+
+      connectedCallback() {
+        if (this._props) {
+          const { crowding, frontCarDirection, platformPosition } = this._props;
+          // If arrow is between screens, scoot the arrow to the next slot on the right
+          // If arrow is beyond the end of the train (slot 25), scoot arrow left
+          let arrowSlot;
+          if ([1, 9, 17].includes(platformPosition)) {
+            arrowSlot = platformPosition + 1;
+          } else {
+            if (platformPosition == 25) {
+              arrowSlot = platformPosition - 1;
+            } else arrowSlot = platformPosition;
+          }
+
+          // The slot arrangement exceeds the edges of the screen, so to properly set the slot positions
+          // we need to make a few adjustments.
+          const screenWidth = 3240;
+          const slotOverhang = 35;
+          const slotsWidth = screenWidth + slotOverhang * 2;
+          const extraArrowPadding = 24;
+          const arrowLeftPadding =
+            (arrowSlot - 1) * (slotsWidth / 25) - slotOverhang - extraArrowPadding;
+          const arrowDirection = [1, 9, 17].includes(platformPosition)
+            ? "up-left"
+            : platformPosition == 25
+              ? "up-right"
+              : "up";
+
+          const textPane = Math.floor((arrowSlot / 25) * 3);
+          const textPadding = (textPane * 3240) / 3;
+
+          const template = document.getElementById("train-crowding-body-template").content.cloneNode(true);
+          const carImageRow = template.getElementById("car-image-row");
+
+          let carElements = crowding.map((occupancyStatus, i) => {
+            const svgSrc = this.lookupCarSvgSrc(
+              occupancyStatus,
+              i == 0 ? frontCarDirection : "middle",
+            );
+
+            const carImg = document.createElement("img");
+            carImg.src = svgSrc;
+            carImg.className = "crowding-widget__train-car";
+            return carImg;
+          });
+
+          carElements = frontCarDirection == "left" ? carElements : [...carElements].reverse();
+
+          carImageRow.append(...carElements);
+
+          const arrowDiv = template.getElementById("arrow");
+          arrowDiv.style.paddingLeft = `${arrowLeftPadding}px`;
+          const arrowImg = document.createElement("img");
+          arrowImg.src = "images/svgr_bundled/" + (arrowDirection === "up" ? "Arrow-90.svg" : "Arrow-45.svg");
+          arrowImg.className = `crowding-widget__you-are-here-arrow crowding-widget__you-are-here-arrow--${arrowDirection}`;
+          arrowDiv.appendChild(arrowImg);
+
+          const youAreHereDiv = template.getElementById("you-are-here-text");
+          youAreHereDiv.style.marginLeft = `${textPadding}px`;
+          youAreHereDiv.innerText = "You are here";
+          youAreHereDiv.className =
+            `crowding-widget__you-are-here-text ${[8, 16, 24].includes(arrowSlot) ? "right-align" : "left-align"}`
+
+
+          this.appendChild(template);
+        } else {
+          throw new Error("No props set on TrainCrowdingBody before connecting to DOM");
+        }
+      }
+
+      renderCars(template) {
+
+      }
+
+      lookupCarSvgSrc(
+        occupancyStatus,
+        carOrientation,
+      ) {
+        const lookupKey = `${carOrientation}/${occupancyStatus}`;
+        let src = "images/svgr_bundled/train_crowding/";
+
+        switch (lookupKey) {
+          case "left/not_crowded":
+            src += "Car-NotCrowded-Left.svg";
+            break;
+          case "left/some_crowding":
+            src += "Car-SomeCrowding-Left.svg";
+            break;
+          case "left/crowded":
+            src += "Car-Crowded-Left.svg";
+            break;
+          case "left/no_data":
+            src += "Car-NoData-Left.svg";
+            break;
+          case "left/closed":
+            src += "Car-Closed-Left.svg";
+            break;
+
+          case "right/not_crowded":
+            src += "Car-NotCrowded-Right.svg";
+            break;
+          case "right/some_crowding":
+            src += "Car-SomeCrowding-Right.svg";
+            break;
+          case "right/crowded":
+            src += "Car-Crowded-Right.svg";
+            break;
+          case "right/no_data":
+            src += "Car-NoData-Right.svg";
+            break;
+          case "right/closed":
+            src += "Car-Closed-Right.svg";
+            break;
+
+          case "middle/not_crowded":
+            src += "Car-NotCrowded-Middle.svg";
+            break;
+          case "middle/some_crowding":
+            src += "Car-SomeCrowding-Middle.svg";
+            break;
+          case "middle/crowded":
+            src += "Car-Crowded-Middle.svg";
+            break;
+          case "middle/no_data":
+            src += "Car-NoData-Middle.svg";
+            break;
+          case "middle/closed":
+            src += "Car-Closed-Middle.svg";
+            break;
+        }
+
+        return src;
+      };
+    }
+
+    class TrainCrowdingFooter extends HTMLElement {
+      set props({ crowding }) {
+        if (crowding == null) throw new Error("crowding prop not passed to TrainCrowdingFooter");
+
+        this._props = { crowding };
+      }
+
+      connectedCallback() {
+        if (this._props) {
+          const { crowding } = this._props;
+
+          const template = document.getElementById("train-crowding-footer-template").content.cloneNode(true);
+
+          // If there's a closed or no-data car, we conditionally add one more key for that.
+          const hasClosed = crowding.includes("closed");
+          const hasNoData = crowding.includes("no_data");
+          if (hasClosed || hasNoData) {
+            const label = hasClosed ? "Car closed" : "No data";
+
+            const keyImg = document.createElement("img");
+            keyImg.width = 137;
+            keyImg.height = 100;
+            keyImg.className = "key-icon";
+            keyImg.src = hasClosed ? "images/svgr_bundled/train_crowding/Car-Closed-Key.svg" : "images/svgr_bundled/train_crowding/Car-NoData-Key.svg";;
+
+            const lastKey = template.getElementById("footer-optional-last-key");
+            lastKey.append(keyImg, document.createTextNode(label));
+          }
+
+          this.appendChild(template);
+        } else {
+          throw new Error("No props set on TrainCrowdingFooter before connecting to DOM");
+        }
+      }
+    }
+
+    class TrainCrowdingFooterSegment extends HTMLElement {
+      connectedCallback() {
+        const { showIdentifiers, playerName } = window.IDENTIFIERS;
+
+        const identifiersDivs = document.getElementsByClassName("crowding-widget__footer__identifiers");
+        if (identifiersDivs.length && showIdentifiers) {
+          for (const identifierDiv of identifiersDivs) {
+            identifierDiv.innerText = `${TRIPTYCH_VERSION} ${playerName}`;
+          }
+        }
+      }
+    }
+
+    class TrainCrowdingFooterKeyRow extends HTMLElement {
+      set props({ now }) {
+        if (!now) console.warn("now prop not passed to TrainCrowdingFooterKeyRow");
+
+        this._props = { now };
+      }
+
+      connectedCallback() {
+        const template = document.getElementById("train-crowding-footer-key-row-template").content.cloneNode(true);
+
+        this.appendChild(template);
+      }
+    }
+
+    class PageLoadNoData extends HTMLElement {
+      connectedCallback() {
+        const template = document.getElementById("page-load-no-data-template").content.cloneNode(true);
+
+        this.appendChild(template);
+      }
+    }
+
+    class NoData extends HTMLElement {
+      connectedCallback() {
+        const template = document.getElementById("no-data-template").content.cloneNode(true);
+
+        this.appendChild(template);
+      }
+    }
+
+
+    // Register them all so we can use them.
+    customElements.define("app-content", App);
+    customElements.define("screen-normal", ScreenNormal);
+    customElements.define("screen-split", ScreenSplit);
+    customElements.define("evergreen-content", EvergreenContent);
+    customElements.define("train-crowding", TrainCrowding);
+    customElements.define("train-crowding-header", TrainCrowdingHeader);
+    customElements.define("train-crowding-body", TrainCrowdingBody);
+    customElements.define("train-crowding-footer", TrainCrowdingFooter);
+    customElements.define("train-crowding-footer-segment", TrainCrowdingFooterSegment);
+    customElements.define("train-crowding-footer-key-row", TrainCrowdingFooterKeyRow);
+    customElements.define("page-load-no-data", PageLoadNoData);
+    customElements.define("no-data", NoData);
+
+    //////////
+    // MAIN //
+    //////////
+    const _sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const _getMRAID = async () => {
+      const mraid = parent?.parent?.mraid ?? false;
+      if (mraid) {
+        return mraid;
+      } else {
+        await _sleep(5);
+        return _getMRAID();
+      }
+    };
+
+    const _getTags = (mraid) => {
+      try {
+        return JSON.parse(mraid.getTags()).tags;
+      } catch (err) {
+        renderData(FAILURE_LAYOUT);
+        throw err;
+      }
+    };
+
+    const _getPlayerName = (mraid) => {
+      try {
+        const deviceInfoJSON = mraid.getDeviceInfo();
+        console.log("deviceInfoJSON is", deviceInfoJSON);
+        const deviceInfo = JSON.parse(deviceInfoJSON);
+        console.log("deviceInfo is", deviceInfo);
+        return deviceInfo.deviceName;
+      } catch (err) {
+        renderData(FAILURE_LAYOUT);
+        throw err;
+      }
+    };
+
+    const _arrayConfigurationToTriptychPane = (arrayConfiguration) => {
+      switch (arrayConfiguration) {
+        case "Triple_Left":
+          return "left";
+        case "Triple_Middle":
+          return "middle";
+        case "Triple_Right":
+          return "right";
+        default:
+          renderData(FAILURE_LAYOUT);
+          throw new Error(`Couldn't parse Array_configuration value: ${arrayConfiguration}`);
+      }
+    };
+
+    const setOutfrontContext = async () => {
+      const mraid = await _getMRAID();
+      const playerName = _getPlayerName(mraid);
+      const tags = _getTags(mraid);
+
+      const arrayConfiguration = tags.find(({ name }) => name === "Array_configuration")?.value?.[0] ?? null;
+      const triptychPane = _arrayConfigurationToTriptychPane(arrayConfiguration);
+
+      window.IDENTIFIERS = { playerName, triptychPane };
+      return "ok";
+    }
+
+    const renderData = (data) => {
+      const app = document.createElement("app-content");
+      app.props = { ...data };
+
+      const root = document.getElementById("app");
+      root.replaceChildren(app);
+    };
+
+    async function fetchData(playerName, triptychPane) {
+      try {
+        const result = await fetch(`https://screens.mbta.com/v2/api/screen/${playerName}/triptych?is_real_screen=true&last_refresh="2020-09-25T17:23:00Z"`);
+        const json = await result.json();
+
+        if (json.data == null || json.disabled) {
+          // Show error template
+          return FAILURE_LAYOUT;
+        } else {
+          return json.data;
+        }
+      } catch (err) {
+        // Show error template
+        renderData(FAILURE_LAYOUT);
+        throw err;
+      }
+    };
+
+    document.onreadystatechange = async function () {
+      if (document.readyState === "interactive") {
+        // Render without components at first so we don't depend on window.IDENTIFIERS
+        // (Instead of just calling `renderData(LOADING_LAYOUT);`)
+        const loadingPageTemplate = document.getElementById("zero-dependency-page-load-no-data-template").content.cloneNode(true);
+        const appRoot = document.getElementById("app");
+        appRoot.replaceChildren(loadingPageTemplate);
+
+        await setOutfrontContext();
+
+        const layoutData = await fetchData(window.IDENTIFIERS.playerName, window.IDENTIFIERS.triptychPane);
+        renderData(layoutData);
+      }
+    };
+  </script>
+</head>
+
+<body>
+  <div id="app"></div>
+</body>
+
+<template id="zero-dependency-page-load-no-data-template">
+  <div class="triptych-screen-viewport">
+    <div class="triptych-shifter" id="triptych-shifter">
+      <div class="screen-container" id="screen-container">
+        <div class="full-screen" id="full-screen">
+          <div class="no-data-left">
+            <img src="images/loading-triptych.webp" />
+          </div>
+          <div class="no-data-middle">
+            <img src="images/loading-triptych.webp" />
+          </div>
+          <div class="no-data-right">
+            <img src="images/loading-triptych.webp" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="page-load-no-data-template">
+  <div class="no-data-left">
+    <img src="images/loading-triptych.webp" />
+  </div>
+  <div class="no-data-middle">
+    <img src="images/loading-triptych.webp" />
+  </div>
+  <div class="no-data-right">
+    <img src="images/loading-triptych.webp" />
+  </div>
+</template>
+
+<template id="no-data-template">
+  <div class="no-data-left">
+    <img src="images/no-data-triptych.webp" />
+  </div>
+  <div class="no-data-middle">
+    <img src="images/no-data-triptych.webp" />
+  </div>
+  <div class="no-data-right">
+    <img src="images/no-data-triptych.webp" />
+  </div>
+</template>
+
+<template id="app-content-template">
+  <div class="triptych-screen-viewport">
+    <div class="triptych-shifter" id="triptych-shifter">
+      <div class="screen-container" id="screen-container">
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="screen-normal-template">
+  <div class="full-screen" id="full-screen">
+  </div>
+</template>
+
+<template id="screen-split-template">
+  <div class="left-pane" id="left-pane"></div>
+  <div class="middle-pane" id="middle-pane"></div>
+  <div class="right-pane" id="right-pane"></div>
+</template>
+
+<template id="train-crowding-template">
+  <div class="crowding-widget"></div>
+</template>
+
+<template id="train-crowding-header-template">
+  <div class="crowding-widget__header">
+    <div class="crowding-widget__header__top-row">
+      <img src="images/svgr_bundled/logo-off-white.svg" width="128" height="128" />
+      <div class="normal-header-time" id="time"></div>
+    </div>
+    <div class="crowding-widget__header__destination-sentence">Next train to<span class="destination"
+        id="header-destination"></span></div>
+  </div>
+</template>
+
+<template id="train-crowding-body-template">
+  <div class="crowding-widget__body">
+    <div class="crowding-widget__train-row" id="car-image-row"></div>
+    <div id="arrow"></div>
+    <div id="you-are-here-text"></div>
+  </div>
+</template>
+
+<template id="train-crowding-footer-template">
+  <div class="crowding-widget__footer" id="train-crowding-footer-root">
+    <train-crowding-footer-segment class="crowding-widget__footer__segment">
+      <div slot="segment-content" id="segment-content">
+        Current crowding on board
+        <div class="crowding-widget__footer__identifiers" id="footer-identifiers"></div>
+      </div>
+    </train-crowding-footer-segment>
+    <train-crowding-footer-segment class="crowding-widget__footer__segment">
+      <div slot="segment-content">
+        <train-crowding-footer-key-row class="crowding-widget__footer__key-row">
+          <img src="images/svgr_bundled/train_crowding/Car-NotCrowded-Key.svg" width="137" height="100"
+            class="key-icon" /> Seats available
+        </train-crowding-footer-key-row>
+        <train-crowding-footer-key-row class="crowding-widget__footer__key-row">
+          <img src="images/svgr_bundled/train_crowding/Car-SomeCrowding-Key.svg" width="137" height="100"
+            class="key-icon" /> Some crowding
+        </train-crowding-footer-key-row>
+        <div class="crowding-widget__footer__identifiers" id="footer-identifiers"></div>
+      </div>
+    </train-crowding-footer-segment>
+    <train-crowding-footer-segment class="crowding-widget__footer__segment">
+      <div slot="segment-content">
+        <train-crowding-footer-key-row class="crowding-widget__footer__key-row">
+          <img src="images/svgr_bundled/train_crowding/Car-Crowded-Key.svg" width="137" height="100" class="key-icon" />
+          Crowded
+        </train-crowding-footer-key-row>
+        <train-crowding-footer-key-row id="footer-optional-last-key"
+          class="crowding-widget__footer__key-row"></train-crowding-footer-key-row>
+      </div>
+      <div class="crowding-widget__footer__identifiers" id="footer-identifiers"></div>
+    </train-crowding-footer-segment>
+  </div>
+</template>
+
+<template id="train-crowding-footer-segment-template">
+  <div class="crowding-widget__footer__segment"></div>
+</template>
+
+<template id="train-crowding-footer-key-row-template">
+  <div class="crowding-widget__footer__key-row"></div>
+</template>
+
+<template id="evergreen-content-template">
+  <div class="evergreen-content-image__container">
+    <img class="evergreen-content-image__image" id="image">
+  </div>
+  <div class="evergreen-content__identifiers" id="identifiers"></div>
+</template>
+
+</html>

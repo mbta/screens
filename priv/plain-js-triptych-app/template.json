@@ -1,10 +1,10 @@
 {
   "templates": [
     {
-      "displayName": "MBTA - TRIPTYCH APP",
+      "displayName": "MBTA - PLAIN JS TRIPTYCH APP",
       "preview": "triptych_preview.png",
       "indexTemplate": "triptych-app.html",
-      "previewOrientation": "landscape"
+      "previewOrientation": "portrait"
     }
   ]
 }
