@@ -652,11 +652,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
   def temporarily_override_alert(%__MODULE__{} = t) do
-    # Prevent Government Center pre-fare screens from incorrectly communicating
-    # a GL alert that affects all branches.
-    not (t.alert.id in ["508765", "508767", "508773", "508776"] and
+    # Prevent Tufts and Back Bay pre-fare screens from
+    # showing an OL alert for the Haymarket station closure.
+    # A static image will be used instead.
+    not (t.alert.id == "519316" and
            t.screen.app_params.reconstructed_alert_widget.stop_id in [
-             "place-gover"
+             "place-bbsta",
+             "place-tumnl"
            ])
   end
 
