@@ -651,14 +651,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
-  def temporarily_override_alert(%__MODULE__{} = t) do
-    # Prevent Government Center pre-fare screens from incorrectly communicating
-    # a GL alert that affects all branches.
-    not (t.alert.id in ["508765", "508767", "508773", "508776"] and
-           t.screen.app_params.reconstructed_alert_widget.stop_id in [
-             "place-gover"
-           ])
-  end
+  def temporarily_override_alert(_t), do: true
 
   defimpl Screens.V2.WidgetInstance do
     def priority(t), do: ReconstructedAlert.priority(t)
