@@ -651,26 +651,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
-  def temporarily_override_alert(%__MODULE__{} = t) do
-    # Prevent Tufts and Back Bay pre-fare screens from
-    # showing an OL alert for the Haymarket station closure.
-    # A static image will be used instead.
-    not (t.alert.id == "519316" and
-           t.screen.app_params.reconstructed_alert_widget.stop_id in [
-             "place-bbsta",
-             "place-tumnl"
-           ])
-  end
+  def valid_candidate?(_t), do: true
 
   defimpl Screens.V2.WidgetInstance do
     def priority(t), do: ReconstructedAlert.priority(t)
     def serialize(t), do: ReconstructedAlert.serialize(t)
     def slot_names(t), do: ReconstructedAlert.slot_names(t)
     def widget_type(t), do: ReconstructedAlert.widget_type(t)
-    def valid_candidate?(t), do: ReconstructedAlert.temporarily_override_alert(t)
+    def valid_candidate?(t), do: ReconstructedAlert.valid_candidate?(t)
     def audio_serialize(t), do: ReconstructedAlert.serialize(t)
     def audio_sort_key(t), do: ReconstructedAlert.audio_sort_key(t)
-    def audio_valid_candidate?(t), do: ReconstructedAlert.temporarily_override_alert(t)
+    def audio_valid_candidate?(t), do: ReconstructedAlert.valid_candidate?(t)
     def audio_view(_instance), do: ScreensWeb.V2.Audio.ReconstructedAlertView
   end
 
