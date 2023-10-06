@@ -651,7 +651,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
-  def valid_candidate?(_t), do: true
+  def valid_candidate?(%__MODULE__{} = t) do
+    # Suppress alert 519312 at Porter and Charles/MGH
+    t.screen.app_params.reconstructed_alert_widget.stop_id not in [
+      "place-portr",
+      "place-chmnl"
+    ] or t.alert.id != "519312"
+  end
 
   defimpl Screens.V2.WidgetInstance do
     def priority(t), do: ReconstructedAlert.priority(t)
