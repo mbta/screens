@@ -653,10 +653,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def valid_candidate?(%__MODULE__{} = t) do
     # Suppress alert 519312 at Porter and Charles/MGH
-    t.screen.app_params.reconstructed_alert_widget.stop_id not in [
-      "place-portr",
-      "place-chmnl"
-    ] or t.alert.id != "519312"
+    t.alert.id != "519312" or
+      t.screen.app_params.reconstructed_alert_widget.stop_id not in [
+        "place-portr",
+        "place-chmnl"
+      ]
   end
 
   defimpl Screens.V2.WidgetInstance do
