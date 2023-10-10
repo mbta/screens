@@ -174,7 +174,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget
       |> put_home_stop(PreFare, home_stop)
       |> put_tagged_stop_sequences(tagged_stop_sequences)
-      |> put_informed_stations_string("Downtown Crossing")
+      |> put_informed_stations(["Downtown Crossing"])
       |> put_routes_at_stop(routes)
 
     %{widget: widget}
@@ -209,7 +209,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget
       |> put_home_stop(PreFare, home_stop)
       |> put_tagged_stop_sequences(tagged_stop_sequences)
-      |> put_informed_stations_string("Malden Center")
+      |> put_informed_stations(["Malden Center"])
       |> put_routes_at_stop(routes)
 
     %{widget: widget}
@@ -493,7 +493,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}]
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        # Odd range, but not a normal alert situation
+        endpoints: {"Malden Center", "Malden Center"}
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -565,7 +567,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}]
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        # Odd range, but not a normal alert situation
+        endpoints: {"Malden Center", "Malden Center"}
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -590,7 +594,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}]
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        endpoints: {"Oak Grove", "Malden Center"}
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
