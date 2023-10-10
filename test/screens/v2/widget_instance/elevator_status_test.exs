@@ -6,6 +6,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   alias Screens.Config.Screen
   alias Screens.Config.V2.{ElevatorStatus, PreFare}
   alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
 
   # Convenience function to build an elevator alert
@@ -57,10 +58,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       "place-qux" => "Qux Station"
     }
 
-    stop_sequences = [
-      ["place-foo", "place-bar"],
-      ["place-foo", "place-bar"]
-    ]
+    tagged_stop_sequences = %{
+      "A" => [
+        ["place-foo", "place-bar"],
+        ["place-foo", "place-bar"]
+      ]
+    }
+
+    stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
 
     station_id_to_icons = %{
       "place-foo" => [:red],
@@ -71,7 +76,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
     location_context = %LocationContext{
       home_stop: home_station_id,
-      stop_sequences: stop_sequences,
+      tagged_stop_sequences: tagged_stop_sequences,
       upstream_stops: Stop.upstream_stop_id_set(home_station_id, stop_sequences),
       downstream_stops: Stop.downstream_stop_id_set(home_station_id, stop_sequences),
       routes: [],

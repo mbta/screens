@@ -6,6 +6,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.Config.V2.{PreFare}
   alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
   alias Screens.V2.AlertsWidget
   alias Screens.V2.CandidateGenerator
@@ -22,7 +23,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
         location_context: %LocationContext{
           home_stop: nil,
-          stop_sequences: nil,
+          tagged_stop_sequences: nil,
           upstream_stops: nil,
           downstream_stops: nil,
           routes: nil,
@@ -51,12 +52,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget | alert: %{widget.alert | informed_entities: ies}}
   end
 
-  defp put_stop_sequences(widget, sequences) do
+  defp put_tagged_stop_sequences(widget, tagged_sequences) do
+    sequences = RoutePattern.untag_stop_sequences(tagged_sequences)
+
     %{
       widget
       | location_context: %{
           widget.location_context
-          | stop_sequences: sequences,
+          | tagged_stop_sequences: tagged_sequences,
             upstream_stops:
               Stop.upstream_stop_id_set(widget.location_context.home_stop, sequences),
             downstream_stops:
@@ -123,26 +126,30 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   defp setup_transfer_station(%{widget: widget}) do
     home_stop = "place-dwnxg"
 
-    stop_sequences = [
-      [
-        "place-ogmnl",
-        "place-haecl",
-        "place-dwnxg",
-        "place-forhl"
+    tagged_stop_sequences = %{
+      "Orange" => [
+        [
+          "place-ogmnl",
+          "place-haecl",
+          "place-dwnxg",
+          "place-forhl"
+        ]
       ],
-      [
-        "place-alfcl",
-        "place-pktrm",
-        "place-dwnxg",
-        "place-asmnl"
-      ],
-      [
-        "place-alfcl",
-        "place-dwnxg",
-        "place-sstat",
-        "place-brntn"
+      "Red" => [
+        [
+          "place-alfcl",
+          "place-pktrm",
+          "place-dwnxg",
+          "place-asmnl"
+        ],
+        [
+          "place-alfcl",
+          "place-dwnxg",
+          "place-sstat",
+          "place-brntn"
+        ]
       ]
-    ]
+    }
 
     routes = [
       %{
@@ -166,8 +173,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     widget =
       widget
       |> put_home_stop(PreFare, home_stop)
-      |> put_stop_sequences(stop_sequences)
-      |> put_informed_stations(["Downtown Crossing"])
+      |> put_tagged_stop_sequences(tagged_stop_sequences)
+      |> put_informed_stations_string("Downtown Crossing")
       |> put_routes_at_stop(routes)
 
     %{widget: widget}
@@ -176,14 +183,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   defp setup_single_line_station(%{widget: widget}) do
     home_stop = "place-mlmnl"
 
-    stop_sequences = [
-      [
-        "place-ogmnl",
-        "place-mlmnl",
-        "place-welln",
-        "place-astao"
+    tagged_stop_sequences = %{
+      "Orange" => [
+        [
+          "place-ogmnl",
+          "place-mlmnl",
+          "place-welln",
+          "place-astao"
+        ]
       ]
-    ]
+    }
 
     routes = [
       %{
@@ -199,8 +208,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     widget =
       widget
       |> put_home_stop(PreFare, home_stop)
-      |> put_stop_sequences(stop_sequences)
-      |> put_informed_stations(["Malden Center"])
+      |> put_tagged_stop_sequences(tagged_stop_sequences)
+      |> put_informed_stations_string("Malden Center")
       |> put_routes_at_stop(routes)
 
     %{widget: widget}
@@ -213,29 +222,33 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget: put_home_stop(widget, PreFare, home_stop)}
   end
 
-  defp setup_stop_sequences(%{widget: widget}) do
-    stop_sequences = [
-      [
-        "place-ogmnl",
-        "place-dwnxg",
-        "place-chncl",
-        "place-forhl"
+  defp setup_tagged_stop_sequences(%{widget: widget}) do
+    tagged_stop_sequences = %{
+      "Orange" => [
+        [
+          "place-ogmnl",
+          "place-dwnxg",
+          "place-chncl",
+          "place-forhl"
+        ]
       ],
-      [
-        "place-asmnl",
-        "place-dwnxg",
-        "place-pktrm",
-        "place-alfcl"
-      ],
-      [
-        "place-alfcl",
-        "place-dwnxg",
-        "place-sstat",
-        "place-brntn"
+      "Red" => [
+        [
+          "place-asmnl",
+          "place-dwnxg",
+          "place-pktrm",
+          "place-alfcl"
+        ],
+        [
+          "place-alfcl",
+          "place-dwnxg",
+          "place-sstat",
+          "place-brntn"
+        ]
       ]
-    ]
+    }
 
-    %{widget: put_stop_sequences(widget, stop_sequences)}
+    %{widget: put_tagged_stop_sequences(widget, tagged_stop_sequences)}
   end
 
   defp setup_informed_entities_string(%{widget: widget}) do
@@ -245,7 +258,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   defp setup_location_context(%{widget: widget}) do
     %{widget: widget}
     |> setup_home_stop()
-    |> setup_stop_sequences()
+    |> setup_tagged_stop_sequences()
     |> setup_routes()
   end
 
@@ -371,14 +384,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-forhl")
         |> put_informed_entities([ie(stop: "place-chncl"), ie(stop: "place-forhl")])
         |> put_effect(:suspension)
-        |> put_stop_sequences([
-          [
-            "place-ogmnl",
-            "place-dwnxg",
-            "place-chncl",
-            "place-forhl"
+        |> put_tagged_stop_sequences(%{
+          "Orange" => [
+            [
+              "place-ogmnl",
+              "place-dwnxg",
+              "place-chncl",
+              "place-forhl"
+            ]
           ]
-        ])
+        })
         |> put_is_terminal_station(true)
         |> put_is_full_screen(true)
 
@@ -393,14 +408,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-forhl")
         |> put_informed_entities([ie(stop: "place-chncl"), ie(stop: "place-forhl")])
         |> put_effect(:shuttle)
-        |> put_stop_sequences([
-          [
-            "place-ogmnl",
-            "place-dwnxg",
-            "place-chncl",
-            "place-forhl"
+        |> put_tagged_stop_sequences(%{
+          "Orange" => [
+            [
+              "place-ogmnl",
+              "place-dwnxg",
+              "place-chncl",
+              "place-forhl"
+            ]
           ]
-        ])
+        })
         |> put_is_terminal_station(true)
         |> put_is_full_screen(true)
 
@@ -438,14 +455,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-forhl")
         |> put_informed_entities([ie(stop: "place-chncl"), ie(stop: "place-forhl")])
         |> put_effect(:severe_delay)
-        |> put_stop_sequences([
-          [
-            "place-ogmnl",
-            "place-dwnxg",
-            "place-chncl",
-            "place-forhl"
+        |> put_tagged_stop_sequences(%{
+          "Orange" => [
+            [
+              "place-ogmnl",
+              "place-dwnxg",
+              "place-chncl",
+              "place-forhl"
+            ]
           ]
-        ])
+        })
         |> put_is_terminal_station(true)
 
       assert [3] == WidgetInstance.priority(widget)
@@ -1315,14 +1334,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-spmnl", route: "Green-E", route_type: 0)
         ])
         |> put_cause(:unknown)
-        |> put_stop_sequences([
-          [
-            "place-smpmnl",
-            "place-north",
-            "place-haecl",
-            "place-gover"
+        |> put_tagged_stop_sequences(%{
+          "Green-E" => [
+            [
+              "place-symcl",
+              "place-north",
+              "place-haecl",
+              "place-gover"
+            ]
           ]
-        ])
+        })
         |> put_routes_at_stop([
           %{
             route_id: "Green-D",
@@ -1627,7 +1648,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       ]
 
       now = ~U[2022-06-24 12:00:00Z]
-      station_sequences = [Stop.get_route_stop_sequence("Orange")]
+      tagged_station_sequences = %{"Orange" => [Stop.get_route_stop_sequence("Orange")]}
+      station_sequences = RoutePattern.untag_stop_sequences(tagged_station_sequences)
 
       fetch_alerts_fn = fn _ -> {:ok, alerts} end
       fetch_stop_name_fn = fn _ -> "Wellington" end
@@ -1636,7 +1658,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         {:ok,
          %LocationContext{
            home_stop: stop_id,
-           stop_sequences: station_sequences,
+           tagged_stop_sequences: tagged_station_sequences,
            upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
            downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
            routes: routes_at_stop,
@@ -2012,7 +2034,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       ]
 
       now = ~U[2022-06-24 12:00:00Z]
-      station_sequences = [Stop.get_route_stop_sequence("Green")]
+      tagged_station_sequences = %{"Green" => [Stop.get_route_stop_sequence("Green")]}
+      station_sequences = RoutePattern.untag_stop_sequences(tagged_station_sequences)
 
       fetch_alerts_fn = fn _ -> {:ok, alerts} end
       fetch_stop_name_fn = fn _ -> "Government Center" end
@@ -2021,7 +2044,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         {:ok,
          %LocationContext{
            home_stop: stop_id,
-           stop_sequences: station_sequences,
+           tagged_stop_sequences: tagged_station_sequences,
            upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
            downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
            routes: routes_at_stop,

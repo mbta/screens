@@ -757,6 +757,14 @@ const SolariLargeV2ScreensTable = (): JSX.Element => {
   return <AdminTable columns={v2SolariColumns} dataFilter={dataFilter} />;
 };
 
+const TriptychV2ScreensTable = (): JSX.Element => {
+  const dataFilter = ({ app_id }) => {
+    return app_id === "triptych_v2";
+  };
+
+  return <AdminTable columns={[...v2Columns]} dataFilter={dataFilter} />;
+};
+
 export {
   AllScreensTable,
   BusScreensTable,
@@ -772,4 +780,5 @@ export {
   SolariLargeV2ScreensTable,
   BusShelterV2ScreensTable,
   PreFareV2ScreensTable,
+  TriptychV2ScreensTable,
 };

@@ -12,7 +12,8 @@ defmodule Screens.V2.ScreenData.Parameters do
     solari_v2: CandidateGenerator.Solari,
     solari_large_v2: CandidateGenerator.SolariLarge,
     pre_fare_v2: CandidateGenerator.PreFare,
-    dup_v2: CandidateGenerator.Dup
+    dup_v2: CandidateGenerator.Dup,
+    triptych_v2: CandidateGenerator.Triptych
   }
 
   @app_id_to_refresh_rate %{
@@ -22,7 +23,8 @@ defmodule Screens.V2.ScreenData.Parameters do
     solari_v2: 15,
     solari_large_v2: 15,
     pre_fare_v2: 20,
-    dup_v2: 30
+    dup_v2: 30,
+    triptych_v2: 30
   }
 
   @app_id_to_audio_readout_interval %{
@@ -32,7 +34,8 @@ defmodule Screens.V2.ScreenData.Parameters do
     solari_v2: 0,
     solari_large_v2: 0,
     pre_fare_v2: 0,
-    dup_v2: 0
+    dup_v2: 0,
+    triptych_v2: 0
   }
 
   @spec get_candidate_generator(Screens.Config.Screen.t() | atom()) :: candidate_generator()
