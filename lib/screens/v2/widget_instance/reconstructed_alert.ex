@@ -283,6 +283,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "No trains",
       remedy: "Seek alternate route",
       location: "No #{route_id} Line trains #{format_endpoint_string(endpoints)}",
+      endpoints: endpoints,
       cause: format_cause(cause),
       routes: get_route_pills(t),
       effect: :suspension,
