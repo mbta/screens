@@ -10,7 +10,7 @@ defmodule Screens.V2.WidgetInstance.FareInfoFooter do
 
   @type mode :: :bus | :subway
   @type t :: %__MODULE__{
-          screen: Screens.Config.Screen.t(),
+          screen: ScreensConfig.Screen.t(),
           mode: mode,
           text: String.t(),
           url: String.t()

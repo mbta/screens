@@ -1,7 +1,7 @@
 defmodule Screens.V2.WidgetInstance.LineMap do
   @moduledoc false
 
-  alias Screens.Config.{Screen, V2}
+  alias ScreensConfig.{Screen, V2}
   alias Screens.Predictions.Prediction
   alias Screens.Trips.Trip
   alias Screens.V2.Departure

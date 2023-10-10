@@ -3,7 +3,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntro do
   An audio-only widget that introduces the section of the readout describing service alerts.
   """
 
-  alias Screens.Config.Screen
+  alias ScreensConfig.Screen
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.{ReconstructedAlert, SubwayStatus}
 

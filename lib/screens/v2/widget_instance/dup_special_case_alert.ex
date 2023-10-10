@@ -6,7 +6,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
   Its serialized data must be valid for a DUP full-screen or partial alert on the client.
   """
 
-  alias Screens.Config.V2.FreeText
+  alias ScreensConfig.V2.FreeText
   alias Screens.V2.WidgetInstance
 
   @enforce_keys [:alert_ids, :slot_names, :widget_type, :special_case]
@@ -30,7 +30,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
     case t do
       %{special_case: :kenmore_westbound_shuttles, widget_type: :partial_alert} ->
         %{
-          text: %Screens.Config.V2.FreeTextLine{
+          text: %ScreensConfig.V2.FreeTextLine{
             icon: :warning,
             text: get_kenmore_special_text(t.branches, :partial_alert)
           },
@@ -39,12 +39,12 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
 
       %{special_case: :kenmore_westbound_shuttles, widget_type: :takeover_alert} ->
         %{
-          text: %Screens.Config.V2.FreeTextLine{
+          text: %ScreensConfig.V2.FreeTextLine{
             icon: :warning,
             text: get_kenmore_special_text(t.branches, :takeover_alert)
           },
           header: %{color: :green, text: "Kenmore"},
-          remedy: %Screens.Config.V2.FreeTextLine{
+          remedy: %ScreensConfig.V2.FreeTextLine{
             icon: :shuttle,
             text: [%{format: :bold, text: "Use shuttle bus"}]
           }
@@ -52,12 +52,12 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
 
       %{special_case: :wtc_detour} ->
         %{
-          text: %Screens.Config.V2.FreeTextLine{
+          text: %ScreensConfig.V2.FreeTextLine{
             icon: :warning,
             text: ["Building closed"]
           },
           header: %{color: :silver, text: "World Trade Ctr"},
-          remedy: %Screens.Config.V2.FreeTextLine{
+          remedy: %ScreensConfig.V2.FreeTextLine{
             icon: :shuttle,
             text: [%{format: :bold, text: "Board Silver Line on street"}]
           }

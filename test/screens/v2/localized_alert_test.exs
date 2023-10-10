@@ -2,8 +2,8 @@ defmodule Screens.V2.LocalizedAlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.BusShelter
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.BusShelter
   alias Screens.LocationContext
   alias Screens.RouteType
   alias Screens.Stops.Stop

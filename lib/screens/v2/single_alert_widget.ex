@@ -9,7 +9,7 @@ defprotocol Screens.V2.SingleAlertWidget do
   """
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
+  alias ScreensConfig.Screen
   alias Screens.RouteType
 
   @type alert_id :: String.t()
@@ -23,7 +23,7 @@ defprotocol Screens.V2.SingleAlertWidget do
   def alert(widget)
 
   @doc """
-  Gets the Screens.Config.Screen struct describing the screen that this widget appears on.
+  Gets the ScreensConfig.Screen struct describing the screen that this widget appears on.
   """
   @spec screen(t()) :: Screen.t()
   def screen(widget)

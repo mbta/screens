@@ -2,7 +2,8 @@ defmodule Screens.ScreenData do
   @moduledoc false
 
   alias Screens.LogScreenData
-  alias Screens.Config.{Screen, State}
+  alias ScreensConfig.Screen
+  alias Screens.Config.State
   alias Screens.Util
 
   @modules_by_app_id %{

@@ -2,8 +2,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{Alerts, BusEink, BusShelter, GlEink}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{Alerts, BusEink, BusShelter, GlEink}
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.Util

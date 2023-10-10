@@ -2,7 +2,7 @@ defmodule Screens.Config.State do
   @moduledoc false
 
   alias Screens.Config
-  alias Screens.Config.{Devops, Screen}
+  alias ScreensConfig.{Devops, Screen}
   alias Screens.ConfigCache.State.Fetch
 
   @config_fetcher Application.compile_env(:screens, :config_fetcher)

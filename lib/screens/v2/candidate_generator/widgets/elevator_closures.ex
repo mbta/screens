@@ -2,8 +2,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{ElevatorStatus, PreFare}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{ElevatorStatus, PreFare}
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.ElevatorStatus, as: ElevatorStatusWidget
 

@@ -1,8 +1,8 @@
 defmodule Screens.V2.WidgetInstance.NormalHeader do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.Destination
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Header.Destination
   alias Screens.V2.WidgetInstance.NormalHeader
 
   defstruct screen: nil,
@@ -12,7 +12,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
   @type icon :: :logo | :green_b | :green_c | :green_d | :green_e
   @type t :: %__MODULE__{
-          screen: Screens.Config.Screen.t(),
+          screen: ScreensConfig.Screen.t(),
           icon: icon | nil,
           text: String.t(),
           time: DateTime.t()

@@ -1,8 +1,8 @@
 defmodule Screens.V2.WidgetInstance.EvergreenContent do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{Schedule, Triptych}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{Schedule, Triptych}
   alias Screens.V2.WidgetInstance
 
   @enforce_keys ~w[screen slot_names asset_url priority now]a

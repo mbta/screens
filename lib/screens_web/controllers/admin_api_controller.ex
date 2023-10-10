@@ -2,6 +2,7 @@ defmodule ScreensWeb.AdminApiController do
   use ScreensWeb, :controller
 
   alias Screens.{Config, Image}
+  alias ScreensConfig.Devops
 
   @config_fetcher Application.compile_env(:screens, :config_fetcher)
 
@@ -34,7 +35,7 @@ defmodule ScreensWeb.AdminApiController do
 
   def devops(conn, %{"disabled_modes" => _disabled_modes} = json) do
     %Config{screens: current_screens_config} = Config.State.config()
-    new_devops_config = Config.Devops.from_json(json)
+    new_devops_config = Devops.from_json(json)
     new_config = %Config{screens: current_screens_config, devops: new_devops_config}
     new_config_json = new_config |> Config.to_json() |> Jason.encode!(pretty: true)
 

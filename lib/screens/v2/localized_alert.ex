@@ -4,7 +4,7 @@ defmodule Screens.V2.LocalizedAlert do
   """
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
+  alias ScreensConfig.Screen
   alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.RouteType

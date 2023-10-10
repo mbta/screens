@@ -13,7 +13,7 @@ defmodule Screens.V2.ScreenData do
   import Screens.V2.Template.Guards
 
   @type screen_id :: String.t()
-  @type config :: Screens.Config.Screen.t()
+  @type config :: ScreensConfig.Screen.t()
   @type candidate_instances :: list(WidgetInstance.t())
   @type selected_instances_map :: %{Template.slot_id() => WidgetInstance.t()}
   @type non_paged_selected_instances_map :: %{Template.non_paged_slot_id() => WidgetInstance.t()}
@@ -63,7 +63,7 @@ defmodule Screens.V2.ScreenData do
     response(data: %{full_page: full_page_data, flex_zone: paged_slot_data})
   end
 
-  @spec fetch_data(Screens.Config.Screen.t()) :: {Template.layout(), selected_instances_map()}
+  @spec fetch_data(ScreensConfig.Screen.t()) :: {Template.layout(), selected_instances_map()}
   def fetch_data(config, opts \\ []) do
     candidate_generator = Parameters.get_candidate_generator(config)
     screen_template = candidate_generator.screen_template()

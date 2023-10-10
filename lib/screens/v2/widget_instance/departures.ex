@@ -2,8 +2,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.FreeTextLine
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.FreeTextLine
   alias Screens.Departures.Departure
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule

@@ -4,11 +4,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   require Logger
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Departures
-  alias Screens.Config.V2.Departures.{Headway, Query, Section}
-  alias Screens.Config.V2.Departures.Query.Params
-  alias Screens.Config.V2.Dup
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Departures
+  alias ScreensConfig.V2.Departures.{Headway, Query, Section}
+  alias ScreensConfig.V2.Departures.Query.Params
+  alias ScreensConfig.V2.Dup
   alias Screens.Routes.Route
   alias Screens.SignsUiConfig
   alias Screens.Util

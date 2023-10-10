@@ -10,7 +10,7 @@ defmodule Screens.Stops.Stop do
 
   require Logger
 
-  alias Screens.Config.V2.{BusEink, BusShelter, Dup, GlEink, PreFare, Triptych}
+  alias ScreensConfig.V2.{BusEink, BusShelter, Dup, GlEink, PreFare, Triptych}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes

@@ -1,11 +1,12 @@
 defmodule Screens.SolariScreenData do
   @moduledoc false
 
-  alias Screens.Config.{Query, Solari, State}
-  alias Screens.Config.Query.{Opts, Params}
-  alias Screens.Config.Solari.Section
-  alias Screens.Config.Solari.Section.{Headway, Layout}
-  alias Screens.Config.Solari.Section.Layout.{Bidirectional, Upcoming}
+  alias ScreensConfig.{Query, Solari}
+  alias ScreensConfig.Query.{Opts, Params}
+  alias ScreensConfig.Solari.Section
+  alias ScreensConfig.Solari.Section.{Headway, Layout}
+  alias ScreensConfig.Solari.Section.Layout.{Bidirectional, Upcoming}
+  alias Screens.Config.State
   alias Screens.Departures.Departure
   alias Screens.{LogScreenData, SignsUiConfig, Util}
 

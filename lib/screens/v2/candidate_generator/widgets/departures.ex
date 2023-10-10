@@ -1,10 +1,10 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Departures.Filter.RouteDirection
-  alias Screens.Config.V2.Departures.{Filter, Query, Section}
-  alias Screens.Config.V2.{BusEink, BusShelter, Departures, GlEink, Solari, SolariLarge}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Departures.Filter.RouteDirection
+  alias ScreensConfig.V2.Departures.{Filter, Query, Section}
+  alias ScreensConfig.V2.{BusEink, BusShelter, Departures, GlEink, Solari, SolariLarge}
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}

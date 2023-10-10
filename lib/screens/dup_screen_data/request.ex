@@ -4,8 +4,8 @@ defmodule Screens.DupScreenData.Request do
   require Logger
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Dup.Section
-  alias Screens.Config.Dup.Section.Headway
+  alias ScreensConfig.Dup.Section
+  alias ScreensConfig.Dup.Section.Headway
   alias Screens.Departures.Departure
   alias Screens.DupScreenData.Response
   alias Screens.SignsUiConfig

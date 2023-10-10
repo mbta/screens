@@ -1,10 +1,10 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.EvergreenContentItem
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.EvergreenContentItem
   alias Screens.V2.WidgetInstance.EvergreenContent
-  alias Screens.Config.V2.{BusEink, BusShelter, Dup, GlEink, PreFare, Triptych}
+  alias ScreensConfig.V2.{BusEink, BusShelter, Dup, GlEink, PreFare, Triptych}
   alias Screens.Util.Assets
 
   def evergreen_content_instances(

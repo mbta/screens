@@ -4,7 +4,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   """
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.V2.FreeTextLine
+  alias ScreensConfig.V2.FreeTextLine
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert
 

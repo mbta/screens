@@ -3,8 +3,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
   alias Screens.V2.WidgetInstance
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{ElevatorStatus, PreFare}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{ElevatorStatus, PreFare}
   alias Screens.LocationContext
   alias Screens.Stops.Stop
 

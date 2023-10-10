@@ -1,7 +1,7 @@
 defmodule Screens.Config do
   @moduledoc false
 
-  alias Screens.Config.{Devops, Screen}
+  alias ScreensConfig.{Devops, Screen}
 
   @type t :: %__MODULE__{
           screens: %{
@@ -16,7 +16,7 @@ defmodule Screens.Config do
   defstruct screens: nil,
             devops: Devops.from_json(:default)
 
-  use Screens.Config.Struct, children: [screens: {:map, Screen}, devops: Devops]
+  use ScreensConfig.Struct, children: [screens: {:map, Screen}, devops: Devops]
 
   @spec schedule_refresh_for_screen_ids(t(), list(String.t()), DateTime.t()) :: t()
   def schedule_refresh_for_screen_ids(config, screen_ids, now \\ DateTime.utc_now()) do

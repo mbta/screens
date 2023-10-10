@@ -4,7 +4,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   screen data, and simulates data requests for any that it finds.
   """
 
-  alias Screens.Config.Screen
+  alias ScreensConfig.Screen
   alias Screens.ScreensByAlert
   alias Screens.Util
 

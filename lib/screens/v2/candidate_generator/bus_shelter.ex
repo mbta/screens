@@ -1,9 +1,9 @@
 defmodule Screens.V2.CandidateGenerator.BusShelter do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusShelter, Footer, Survey}
-  alias Screens.Config.V2.Header.{CurrentStopId, CurrentStopName}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{BusShelter, Footer, Survey}
+  alias ScreensConfig.V2.Header.{CurrentStopId, CurrentStopName}
   alias Screens.Stops.Stop
   alias Screens.Util.Assets
   alias Screens.V2.CandidateGenerator

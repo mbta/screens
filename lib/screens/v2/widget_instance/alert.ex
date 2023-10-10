@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
+  alias ScreensConfig.Screen
   alias Screens.LocationContext
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance

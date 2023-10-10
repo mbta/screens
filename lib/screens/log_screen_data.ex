@@ -1,7 +1,8 @@
 defmodule Screens.LogScreenData do
   @moduledoc false
   require Logger
-  alias Screens.Config.{Screen, State}
+  alias ScreensConfig.Screen
+  alias Screens.Config.State
 
   def log_page_load(screen_id, is_screen, screen_side \\ nil) do
     if is_screen do

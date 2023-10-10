@@ -1,8 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{CRDepartures, PreFare}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{CRDepartures, PreFare}
   alias Screens.Schedules.Schedule
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.CRDepartures, as: CRDeparturesWidget

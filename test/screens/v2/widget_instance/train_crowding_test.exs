@@ -11,10 +11,10 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
 
   setup do
     config =
-      struct(Screens.Config.Screen, %{
+      struct(ScreensConfig.Screen, %{
         app_params:
-          struct(Screens.Config.V2.Triptych, %{
-            train_crowding: %Screens.Config.V2.TrainCrowding{
+          struct(ScreensConfig.V2.Triptych, %{
+            train_crowding: %ScreensConfig.V2.TrainCrowding{
               station_id: "place-masta",
               direction_id: 1,
               platform_position: 3,

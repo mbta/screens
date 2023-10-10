@@ -2,9 +2,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.CurrentStopId
-  alias Screens.Config.V2.PreFare
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Header.CurrentStopId
+  alias ScreensConfig.V2.PreFare
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.Util

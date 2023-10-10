@@ -1,8 +1,8 @@
 defmodule Screens.V2.ScreenAudioData do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{Audio, BusShelter, PreFare}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{Audio, BusShelter, PreFare}
   alias Screens.Util
   alias Screens.V2.ScreenData
   alias Screens.V2.ScreenData.Parameters

@@ -1,9 +1,9 @@
 defmodule Screens.V2.CandidateGenerator.BusEink do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusEink, Footer}
-  alias Screens.Config.V2.Header.CurrentStopId
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{BusEink, Footer}
+  alias ScreensConfig.V2.Header.CurrentStopId
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets

@@ -4,8 +4,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   require Logger
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{TrainCrowding, Triptych}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{TrainCrowding, Triptych}
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
   alias Screens.Util

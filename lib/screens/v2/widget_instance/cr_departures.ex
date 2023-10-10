@@ -1,7 +1,7 @@
 defmodule Screens.V2.WidgetInstance.CRDepartures do
   @moduledoc false
 
-  alias Screens.Config.V2.CRDepartures
+  alias ScreensConfig.V2.CRDepartures
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
   alias Screens.V2.Departure

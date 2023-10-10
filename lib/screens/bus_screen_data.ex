@@ -6,7 +6,8 @@ defmodule Screens.BusScreenData do
   alias Screens.LogScreenData
   alias Screens.NearbyConnections
   alias Screens.Schedules.Schedule
-  alias Screens.Config.{Bus, State}
+  alias ScreensConfig.Bus
+  alias Screens.Config.State
   alias Screens.Util
 
   def by_screen_id(screen_id, is_screen, now \\ DateTime.utc_now()) do

@@ -77,8 +77,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   @subway_icons ~w[red blue orange green silver]a
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{ElevatorStatus, PreFare}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{ElevatorStatus, PreFare}
   alias Screens.LocationContext
   alias Screens.V2.AlertsWidget
   alias Screens.V2.LocalizedAlert
