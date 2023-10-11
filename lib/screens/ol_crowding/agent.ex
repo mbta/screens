@@ -14,7 +14,10 @@ defmodule Screens.OlCrowding.Agent do
     Agent.update(__MODULE__, &Map.delete(&1, "#{station_id}.#{direction_id}"))
   end
 
-  def put(station_id, direction_id, dwell) do
-    Agent.update(__MODULE__, &Map.put(&1, "#{station_id}.#{direction_id}", dwell))
+  def put(station_id, direction_id, show_widget_after_dt) do
+    Agent.update(
+      __MODULE__,
+      &Map.put(&1, "#{station_id}.#{direction_id}", show_widget_after_dt)
+    )
   end
 end

@@ -169,13 +169,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
     relevant_platform_id = elem(platform_id_tuple, train_crowding_config.direction_id)
 
-    time_of_last_prediction_plus_dwell =
+    time_of_last_predicted_departure_time =
       Agent.get(train_crowding_config.station_id, train_crowding_config.direction_id)
 
     cond do
       # We think the train is about to leave the previous station. Show the widget.
-      time_of_last_prediction_plus_dwell != nil and
-          DateTime.compare(common_params.now, time_of_last_prediction_plus_dwell) in [
+      time_of_last_predicted_departure_time != nil and
+          DateTime.compare(
+            common_params.now,
+            time_of_last_predicted_departure_time
+          ) in [
             :eq,
             :gt
           ] ->
@@ -203,20 +206,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
         if is_nil(previous_station_prediction_current_trip) do
           []
         else
-          # The current trip's prediction for the previous station should have the times we need to predict dwell time.
-          # Subtract 10 seconds to give us some cushion so we have a chance to show the widget before the train leaves.
-          relevant_dwell_time =
-            DateTime.diff(
-              previous_station_prediction_current_trip.departure_time,
-              previous_station_prediction_current_trip.arrival_time
-            ) - 10
-
-          now_plus_dwell = DateTime.add(common_params.now, relevant_dwell_time)
-
+          # Cache the departure_time from the previous station's prediction (minus 10 seconds for cushion).
+          # When now >= this time, show the widget.
           Agent.put(
             train_crowding_config.station_id,
             train_crowding_config.direction_id,
-            now_plus_dwell
+            DateTime.add(previous_station_prediction_current_trip.departure_time, -10)
           )
 
           []
