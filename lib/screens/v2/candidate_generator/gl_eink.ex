@@ -42,7 +42,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
             # slot to its left, while still allowing the normal flex zone
             # to appear on the bottom screen.
             top_takeover: [
-              :full_main_content,
+              :full_body_top_screen,
               Builder.with_paging({:flex_zone, %{one_medium: [:medium]}}, 2),
               :footer
             ],

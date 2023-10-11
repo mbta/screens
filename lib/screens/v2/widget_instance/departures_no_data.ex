@@ -24,7 +24,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoData do
   def slot_names(%__MODULE__{slot_name: slot_name}) when not is_nil(slot_name),
     do: [slot_name]
 
-  def slot_names(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}}), do: [:full_main_content]
+  def slot_names(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}}), do: [:full_body_top_screen]
   def slot_names(_instance), do: [:main_content]
   def widget_type(_instance), do: :departures_no_data
   def valid_candidate?(_instance), do: true
