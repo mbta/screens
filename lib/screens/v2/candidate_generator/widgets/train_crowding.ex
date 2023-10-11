@@ -169,15 +169,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
     relevant_platform_id = elem(platform_id_tuple, train_crowding_config.direction_id)
 
-    time_of_last_predicted_departure_time =
+    show_widget_after_dt =
       Agent.get(train_crowding_config.station_id, train_crowding_config.direction_id)
 
     cond do
       # We think the train is about to leave the previous station. Show the widget.
-      time_of_last_predicted_departure_time != nil and
+      show_widget_after_dt != nil and
           DateTime.compare(
             common_params.now,
-            time_of_last_predicted_departure_time
+            show_widget_after_dt
           ) in [
             :eq,
             :gt
