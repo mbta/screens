@@ -173,32 +173,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       Agent.get(train_crowding_config.station_id, train_crowding_config.direction_id)
 
     cond do
-      time_of_last_prediction_plus_dwell != nil ->
-        # We think the train is about to leave the previous station. Show the widget.
-        if DateTime.compare(common_params.now, time_of_last_prediction_plus_dwell) in [
-             :eq,
-             :gt
-           ] do
-          _ =
-            log_crowding_info(
-              :dwell,
-              common_params
-            )
+      # We think the train is about to leave the previous station. Show the widget.
+      time_of_last_prediction_plus_dwell != nil and
+          DateTime.compare(common_params.now, time_of_last_prediction_plus_dwell) in [
+            :eq,
+            :gt
+          ] ->
+        _ =
+          log_crowding_info(
+            :dwell,
+            common_params
+          )
 
-          [
-            %CrowdingWidget{
-              screen: common_params[:screen_config],
-              prediction: next_train_prediction,
-              now: common_params.now
-            }
-          ]
-        else
-          []
-        end
+        []
 
+      # Start timer for dwell time but don't show the widget
       Prediction.vehicle_status(next_train_prediction) == :stopped_at and
           Prediction.stop_for_vehicle(next_train_prediction) == relevant_platform_id ->
-        # Start timer for dwell time but don't show the widget
         params = %{
           direction_id: train_crowding_config.direction_id,
           route_ids: [train_crowding_config.route_id],
