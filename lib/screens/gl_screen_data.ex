@@ -7,6 +7,17 @@ defmodule Screens.GLScreenData do
   alias Screens.Config.{Gl, State}
 
   def by_screen_id(screen_id, is_screen) do
+    if State.mode_disabled?(:light_rail) do
+      %{
+        force_reload: false,
+        success: false
+      }
+    else
+      by_enabled_screen_id(screen_id, is_screen)
+    end
+  end
+
+  defp by_enabled_screen_id(screen_id, is_screen) do
     %Gl{
       stop_id: stop_id,
       route_id: route_id,
