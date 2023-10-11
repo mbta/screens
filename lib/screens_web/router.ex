@@ -1,5 +1,6 @@
 defmodule ScreensWeb.Router do
   use ScreensWeb, :router
+  import Phoenix.LiveDashboard.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -50,6 +51,7 @@ defmodule ScreensWeb.Router do
   scope "/admin", ScreensWeb do
     pipe_through [:redirect_prod_http, :browser, :auth, :ensure_auth, :ensure_screens_group]
 
+    live_dashboard "/dashboard", metrics: ScreensWeb.Telemetry
     get("/", AdminController, :index)
   end
 
@@ -88,7 +90,13 @@ defmodule ScreensWeb.Router do
       get "/:id/simulation", ScreenApiController, :simulation
       get "/:id/dup", ScreenApiController, :show_dup
       get "/:player_name/triptych", ScreenApiController, :show_triptych
+    end
+
+    scope "/api/logging" do
+      pipe_through [:redirect_prod_http, :api]
+
       post "/log_frontend_error", ScreenApiController, :log_frontend_error
+      options "/log_frontend_error", ScreenApiController, :log_frontend_error_preflight
     end
 
     scope "/audio" do
