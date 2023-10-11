@@ -9,6 +9,7 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.V2.LocalizedAlert
 
   @spec validate(LocalizedAlert.t()) :: :ok | {:error, reason :: String.t()}
@@ -52,12 +53,9 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
   end
 
   defp validate_not_whole_route_disruption(alert) do
-    if Enum.any?(
-         alert.informed_entities,
-         &match?(%{route: route_id, stop: nil} when is_binary(route_id), &1)
-       ),
-       do: {:error, "alert informs an entire route"},
-       else: :ok
+    if Enum.any?(alert.informed_entities, &InformedEntity.whole_route?/1),
+      do: {:error, "alert informs an entire route"},
+      else: :ok
   end
 
   defp consolidate_gl(route_ids) do

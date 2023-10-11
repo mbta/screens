@@ -2,6 +2,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   @moduledoc false
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.Config.Screen
   alias Screens.Config.V2.PreFare
   alias Screens.Stops.Stop
@@ -270,29 +271,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{type: :text, color: :green, text: "GL", branches: branches}
   end
 
-  defp ie_is_whole_route?(%{route: route_id, direction_id: nil, stop: nil})
-       when not is_nil(route_id),
-       do: true
-
-  defp ie_is_whole_route?(_), do: false
-
-  defp ie_is_whole_direction?(%{route: route_id, direction_id: direction_id, stop: nil})
-       when not is_nil(route_id) and not is_nil(direction_id),
-       do: true
-
-  defp ie_is_whole_direction?(_), do: false
-
   defp alert_is_whole_route?(informed_entities) do
-    Enum.any?(informed_entities, &ie_is_whole_route?/1)
+    Enum.any?(informed_entities, &InformedEntity.whole_route?/1)
   end
 
   defp alert_is_whole_direction?(informed_entities) do
-    Enum.any?(informed_entities, &ie_is_whole_direction?/1)
+    Enum.any?(informed_entities, &InformedEntity.whole_direction?/1)
   end
 
   defp get_direction(informed_entities, route_id) do
     [%{direction_id: direction_id} | _] =
-      Enum.filter(informed_entities, &ie_is_whole_direction?/1)
+      Enum.filter(informed_entities, &InformedEntity.whole_direction?/1)
 
     direction =
       @route_directions
