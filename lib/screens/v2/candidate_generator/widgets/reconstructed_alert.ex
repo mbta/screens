@@ -8,7 +8,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.LocationContext, as: LC
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
-  alias Screens.Util
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
 
@@ -164,7 +163,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         alert: alert,
         now: now,
         location_context: location_context,
-        informed_stations_string: get_stations(alert, fetch_stop_name_fn),
+        informed_stations: get_stations(alert, fetch_stop_name_fn),
         is_terminal_station: is_terminal_station,
         is_full_screen: is_full_screen
       }
@@ -325,7 +324,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
     case stop_ids do
       [] ->
-        nil
+        []
 
       _ ->
         stop_ids
@@ -338,11 +337,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
             name -> [name]
           end
         )
-        |> Util.format_name_list_to_string()
     end
   end
 
-  defp get_stations(_alert, _fetch_stop_name_fn), do: ""
+  defp get_stations(_alert, _fetch_stop_name_fn), do: []
 
   defp is_terminal?(stop_id, stop_sequences) do
     # Can't use Enum.any, because then Govt Center will be seen as a terminal
