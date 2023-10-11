@@ -178,7 +178,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_full_screen: true,
-            informed_stations_string: "Oak Grove"
+            informed_stations: ["Oak Grove"]
           },
           expected_common_data
         ),
@@ -190,7 +190,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_stations_string: "Malden Center"
+            informed_stations: ["Malden Center"]
           },
           expected_common_data
         ),
@@ -203,7 +203,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_full_screen: false,
-            informed_stations_string: ""
+            informed_stations: []
           },
           expected_common_data
         )
@@ -270,7 +270,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_full_screen: true,
-            informed_stations_string: "Malden Center"
+            informed_stations: ["Malden Center"]
           },
           expected_common_data
         ),
@@ -283,7 +283,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_full_screen: true,
-            informed_stations_string: ""
+            informed_stations: []
           },
           expected_common_data
         ),
@@ -295,7 +295,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-astao")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_stations_string: "Assembly"
+            informed_stations: ["Assembly"]
           },
           expected_common_data
         )
@@ -352,7 +352,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_full_screen: true,
-            informed_stations_string: ""
+            informed_stations: []
           },
           expected_common_data
         )
@@ -432,7 +432,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         screen: config,
         location_context: location_context,
         now: now,
-        informed_stations_string: "",
+        informed_stations: [],
         is_terminal_station: true
       }
 
@@ -511,7 +511,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-ogmnl", direction_id: 0)],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_stations_string: ""
+            informed_stations: []
           },
           expected_common_data
         ),
@@ -523,7 +523,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_stations_string: ""
+            informed_stations: []
           },
           expected_common_data
         )

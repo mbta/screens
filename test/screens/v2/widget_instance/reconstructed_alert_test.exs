@@ -78,8 +78,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     }
   end
 
-  defp put_informed_stations_string(widget, string) do
-    %{widget | informed_stations_string: string}
+  defp put_informed_stations(widget, stations) do
+    %{widget | informed_stations: stations}
   end
 
   defp put_app_id(widget, app_id) do
@@ -174,7 +174,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget
       |> put_home_stop(PreFare, home_stop)
       |> put_tagged_stop_sequences(tagged_stop_sequences)
-      |> put_informed_stations_string("Downtown Crossing")
+      |> put_informed_stations(["Downtown Crossing"])
       |> put_routes_at_stop(routes)
 
     %{widget: widget}
@@ -209,7 +209,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget
       |> put_home_stop(PreFare, home_stop)
       |> put_tagged_stop_sequences(tagged_stop_sequences)
-      |> put_informed_stations_string("Malden Center")
+      |> put_informed_stations(["Malden Center"])
       |> put_routes_at_stop(routes)
 
     %{widget: widget}
@@ -252,7 +252,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   defp setup_informed_entities_string(%{widget: widget}) do
-    %{widget: put_informed_stations_string(widget, "Downtown Crossing")}
+    %{widget: put_informed_stations(widget, ["Downtown Crossing"])}
   end
 
   defp setup_location_context(%{widget: widget}) do
@@ -497,7 +497,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}]
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        # Odd range, but not a normal alert situation
+        endpoints: {"Malden Center", "Malden Center"}
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -520,7 +522,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :shuttle,
         remedy: "Use shuttle bus",
         updated_at: "Friday, 5:00 am",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}]
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        # Odd range, but not a normal alert situation
+        endpoints: {"Malden Center", "Malden Center"}
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -544,6 +548,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        other_closures: ["Malden Center"],
         disruption_diagram: %{
           effect: :station_closure,
           closed_station_slot_indices: [1],
@@ -578,7 +583,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}]
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        # Odd range, but not a normal alert situation
+        endpoints: {"Malden Center", "Malden Center"}
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -604,6 +611,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        endpoints: {"Oak Grove", "Malden Center"},
         disruption_diagram: %{
           effect: :suspension,
           effect_region_slot_index_range: {0, 1},
@@ -641,6 +649,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Use shuttle bus",
         updated_at: "Friday, 5:00 am",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        endpoints: {"Oak Grove", "Malden Center"},
         disruption_diagram: %{
           effect: :shuttle,
           effect_region_slot_index_range: {0, 1},
@@ -677,12 +686,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No trains to Oak Grove",
         location: "No Orange Line trains between Oak Grove and Malden Center",
         cause: nil,
-        routes: ["ol-oak-grove"],
+        routes: [%{headsign: "Oak Grove", route_id: "Orange", svg_name: "ol-oak-grove"}],
         effect: :suspension,
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
         region: :boundary,
         endpoints: {"Oak Grove", "Malden Center"},
+        is_transfer_station: false,
         disruption_diagram: %{
           effect: :suspension,
           effect_region_slot_index_range: {0, 1},
@@ -715,12 +725,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No trains to Oak Grove",
         location: "Shuttle buses between Oak Grove and Malden Center",
         cause: nil,
-        routes: ["ol-oak-grove"],
+        routes: [%{headsign: "Oak Grove", route_id: "Orange", svg_name: "ol-oak-grove"}],
         effect: :shuttle,
         remedy: "Use shuttle bus",
         updated_at: "Friday, 5:00 am",
         region: :boundary,
         endpoints: {"Oak Grove", "Malden Center"},
+        is_transfer_station: false,
         disruption_diagram: %{
           effect: :shuttle,
           effect_region_slot_index_range: {0, 1},
@@ -753,7 +764,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains may be delayed up to 20 minutes",
         cause: nil,
-        routes: ["ol"],
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :delay,
         remedy: "Delays are happening",
         updated_at: "Friday, 5:00 am",
@@ -778,7 +789,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains may be delayed over 60 minutes",
         cause: nil,
-        routes: ["ol"],
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :delay,
         remedy: "Delays are happening",
         updated_at: "Friday, 5:00 am",
@@ -803,7 +814,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains may be delayed up to 20 minutes",
         cause: nil,
-        routes: ["ol-forest-hills"],
+        routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :delay,
         remedy: "Delays are happening",
         updated_at: "Friday, 5:00 am",
@@ -828,7 +839,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains may be delayed over 60 minutes",
         cause: :construction,
-        routes: ["ol"],
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :delay,
         remedy: "Delays are happening",
         updated_at: "Friday, 5:00 am",
@@ -853,7 +864,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains may be delayed over 60 minutes",
         cause: nil,
-        routes: ["ol"],
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :delay,
         remedy: "Delays are happening",
         updated_at: "Friday, 5:00 am",
@@ -877,12 +888,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No trains",
         location: nil,
         cause: nil,
-        routes: ["ol-forest-hills"],
+        routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :shuttle,
         remedy: "Shuttle buses available",
         updated_at: "Friday, 5:00 am",
         region: :outside,
-        endpoints: {"Wellington", "Wellington"}
+        endpoints: {"Wellington", "Wellington"},
+        is_transfer_station: false
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -903,12 +915,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No trains",
         location: nil,
         cause: nil,
-        routes: ["ol-forest-hills"],
+        routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :suspension,
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
         region: :outside,
         endpoints: {"Wellington", "Assembly"},
+        is_transfer_station: false,
         disruption_diagram: %{
           effect: :suspension,
           effect_region_slot_index_range: {2, 3},
@@ -941,10 +954,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_full_screen(true)
 
       expected = %{
-        issue: ["orange"],
-        unaffected_routes: ["red"],
+        issue: nil,
+        unaffected_routes: [%{route_id: "Red", svg_name: "rl"}],
         cause: nil,
-        routes: ["ol"],
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :station_closure,
         updated_at: "Friday, 5:00 am",
         region: :here,
@@ -982,11 +995,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route",
         cause: nil,
         location: "No Orange Line trains at Downtown Crossing",
-        routes: ["ol"],
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :suspension,
         updated_at: "Friday, 5:00 am",
         region: :here,
-        endpoints: {"Downtown Crossing", "Downtown Crossing"}
+        endpoints: {"Downtown Crossing", "Downtown Crossing"},
+        is_transfer_station: true
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -1007,11 +1021,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Use shuttle bus",
         cause: nil,
         location: "Shuttle buses at Downtown Crossing",
-        routes: ["ol"],
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :shuttle,
         updated_at: "Friday, 5:00 am",
         region: :here,
-        endpoints: {"Downtown Crossing", "Downtown Crossing"}
+        endpoints: {"Downtown Crossing", "Downtown Crossing"},
+        is_transfer_station: true
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -1329,7 +1344,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-welln", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_informed_stations_string("Wellington")
+        |> put_informed_stations(["Wellington"])
 
       expected = %{
         issue: "Trains will bypass Wellington",
@@ -1379,7 +1394,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-welln", route: "Orange", route_type: 1)
         ])
         |> put_cause(:construction)
-        |> put_informed_stations_string("Wellington")
+        |> put_informed_stations(["Wellington"])
 
       expected = %{
         issue: "Trains will bypass Wellington",
@@ -1761,12 +1776,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No trains",
         location: nil,
         cause: nil,
-        routes: ["ol-forest-hills"],
+        routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :suspension,
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:14 am",
         region: :outside,
         endpoints: {"North Station", "Back Bay"},
+        is_transfer_station: false,
         disruption_diagram: %{
           effect: :suspension,
           effect_region_slot_index_range: {6, 12},
@@ -2172,12 +2188,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No trains to North Station & North",
         location: "Shuttle buses between Union Square and Government Center",
         cause: nil,
-        routes: ["gl-north-station-north"],
+        routes: [
+          %{
+            headsign: "North Station & North",
+            route_id: "Green",
+            svg_name: "gl-north-station-north"
+          }
+        ],
         effect: :shuttle,
         remedy: "Use shuttle bus",
         updated_at: "Friday, 2:24 pm",
         region: :boundary,
-        endpoints: {"Union Square", "Government Center"}
+        endpoints: {"Union Square", "Government Center"},
+        is_transfer_station: false
       }
 
       assert expected == ReconstructedAlert.serialize(alert_widget, &fake_log/1)

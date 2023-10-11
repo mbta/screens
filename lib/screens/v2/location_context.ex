@@ -8,6 +8,7 @@ defmodule Screens.LocationContext do
 
   @enforce_keys [:home_stop]
   defstruct home_stop: "",
+            home_stop_name: "",
             tagged_stop_sequences: %{},
             upstream_stops: MapSet.new(),
             downstream_stops: MapSet.new(),
@@ -16,6 +17,7 @@ defmodule Screens.LocationContext do
 
   @type t :: %__MODULE__{
           home_stop: Stop.id(),
+          home_stop_name: String.t(),
           # Stop sequences through this stop, keyed under their associated routes
           tagged_stop_sequences: %{Route.id() => list(list(Stop.id()))},
           upstream_stops: MapSet.t(Stop.id()),

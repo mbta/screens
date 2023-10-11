@@ -478,11 +478,13 @@ defmodule Screens.Stops.Stop do
                   route_ids
                 )
             end) do
+      stop_name = fetch_stop_name(stop_id)
       stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
 
       {:ok,
        %LocationContext{
          home_stop: stop_id,
+         home_stop_name: stop_name,
          tagged_stop_sequences: tagged_stop_sequences,
          upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
          downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),

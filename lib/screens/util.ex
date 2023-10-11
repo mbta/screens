@@ -139,6 +139,19 @@ defmodule Screens.Util do
   end
 
   @doc """
+  Same as regular string list formatter, but for audio (extra comma for clarity, "and" instead of "&")
+  """
+  @spec format_name_list_to_string_audio([String.t()]) :: String.t()
+  def format_name_list_to_string_audio([string]), do: "#{string}"
+  def format_name_list_to_string_audio([s1, s2]), do: "#{s1}, and, #{s2}"
+
+  def format_name_list_to_string_audio(list) do
+    list
+    |> List.update_at(length(list) - 1, &"and, #{&1}")
+    |> Enum.join(", ")
+  end
+
+  @doc """
   Returns true if given Time object falls between start_time and end_time.
   """
   def time_in_range?(t, start_time, stop_time) do

@@ -20,6 +20,7 @@ defmodule Screens.Config.Screen do
           | :solari_large
           | :solari_large_v2
           | :pre_fare_v2
+          | :triptych_v2
 
   @type t :: %__MODULE__{
           vendor: :gds | :mercury | :solari | :c3ms | :outfront | :lg_mri,
@@ -40,7 +41,8 @@ defmodule Screens.Config.Screen do
             | V2.Solari.t()
             | V2.SolariLarge.t()
             | V2.PreFare.t()
-            | V2.Dup.t(),
+            | V2.Dup.t()
+            | V2.Triptych.t(),
           tags: list(String.t())
         }
 
@@ -48,7 +50,7 @@ defmodule Screens.Config.Screen do
   @v2_app_id_suffix "_v2"
 
   @recognized_app_ids ~w[bus_eink dup gl_eink_single gl_eink_double solari solari_large]a
-  @recognized_v2_app_ids ~w[bus_eink_v2 bus_shelter_v2 dup_v2 gl_eink_v2 solari_v2 solari_large_v2 pre_fare_v2]a
+  @recognized_v2_app_ids ~w[bus_eink_v2 bus_shelter_v2 dup_v2 gl_eink_v2 solari_v2 solari_large_v2 pre_fare_v2 triptych_v2]a
   @recognized_app_id_strings Enum.map(
                                @recognized_app_ids ++ @recognized_v2_app_ids,
                                &Atom.to_string/1
@@ -67,7 +69,8 @@ defmodule Screens.Config.Screen do
     solari_v2: V2.Solari,
     solari_large: Solari,
     solari_large_v2: V2.SolariLarge,
-    pre_fare_v2: V2.PreFare
+    pre_fare_v2: V2.PreFare,
+    triptych_v2: V2.Triptych
   }
 
   @enforce_keys [:vendor, :device_id, :name, :app_id, :app_params]
