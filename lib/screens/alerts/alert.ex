@@ -97,6 +97,10 @@ defmodule Screens.Alerts.Alert do
           | :unknown
 
   @type informed_entity :: %{
+          optional(:facility) => %{
+            id: String.t() | nil,
+            name: String.t() | nil
+          },
           stop: String.t() | nil,
           route: String.t() | nil,
           route_type: non_neg_integer() | nil,
