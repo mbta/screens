@@ -2,10 +2,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.PreFare
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.SubwayStatus
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.PreFare
 
   defstruct screen: nil,
             subway_alerts: nil

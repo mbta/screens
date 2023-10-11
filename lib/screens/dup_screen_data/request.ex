@@ -4,12 +4,12 @@ defmodule Screens.DupScreenData.Request do
   require Logger
 
   alias Screens.Alerts.Alert
-  alias ScreensConfig.Dup.Section
-  alias ScreensConfig.Dup.Section.Headway
   alias Screens.Departures.Departure
   alias Screens.DupScreenData.Response
   alias Screens.SignsUiConfig
   alias Screens.Util
+  alias ScreensConfig.Dup.Section
+  alias ScreensConfig.Dup.Section.Headway
 
   # Filters for the types of alerts we care about
   @alert_route_types ~w[light_rail subway]a

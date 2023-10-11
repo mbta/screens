@@ -1,9 +1,9 @@
 defmodule Screens.V2.WidgetInstance.NormalHeader do
   @moduledoc false
 
+  alias Screens.V2.WidgetInstance.NormalHeader
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Header.Destination
-  alias Screens.V2.WidgetInstance.NormalHeader
 
   defstruct screen: nil,
             icon: nil,

@@ -1,16 +1,16 @@
 defmodule Screens.V2.CandidateGenerator.GlEink do
   @moduledoc false
 
+  alias Screens.RoutePatterns.RoutePattern
+  alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Widgets
+  alias Screens.V2.Template.Builder
   alias ScreensConfig.V2.Departures
   alias ScreensConfig.V2.Departures.{Query, Section}
   alias ScreensConfig.V2.Departures.Query.Params
   alias ScreensConfig.V2.FreeTextLine
   alias ScreensConfig.{Screen, V2}
   alias ScreensConfig.V2.{Footer, GlEink, Header}
-  alias Screens.RoutePatterns.RoutePattern
-  alias Screens.V2.CandidateGenerator
-  alias Screens.V2.CandidateGenerator.Widgets
-  alias Screens.V2.Template.Builder
 
   alias Screens.V2.WidgetInstance.{
     BottomScreenFiller,

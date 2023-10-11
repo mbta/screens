@@ -7,8 +7,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
 
   require Logger
 
-  alias ScreensConfig.Screen
   alias Screens.V2.WidgetInstance.EvergreenContent
+  alias ScreensConfig.Screen
   alias ScreensConfig.V2.{LocalEvergreenSet, Triptych}
 
   def local_evergreen_set_instances(

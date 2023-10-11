@@ -4,13 +4,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   require Logger
 
   alias Screens.Alerts.Alert
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{TrainCrowding, Triptych}
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{TrainCrowding, Triptych}
 
   @spec crowding_widget_instances(Screen.t(), map()) :: list(CrowdingWidget.t())
   def crowding_widget_instances(

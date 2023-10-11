@@ -3,10 +3,10 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   A widget that displays the crowding on a train that is en route to the current station.
   """
 
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Triptych
   alias Screens.Predictions.Prediction
   alias Screens.Util
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Triptych
 
   defstruct screen: nil,
             prediction: nil,

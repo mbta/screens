@@ -1,9 +1,9 @@
 defmodule Screens.V2.WidgetInstance.ShuttleBusInfo do
   @moduledoc false
 
+  alias Screens.Util
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.{PreFare, ShuttleBusInfo, ShuttleBusSchedule}
-  alias Screens.Util
 
   defstruct screen: nil, now: nil
 

@@ -5,11 +5,11 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
 
   require Logger
 
+  alias Screens.V2.WidgetInstance
+  alias Screens.V2.WidgetInstance.{BlueBikes, NormalHeader, ShuttleBusInfo}
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Header.CurrentStopId
   alias ScreensConfig.V2.PreFare
-  alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.{BlueBikes, NormalHeader, ShuttleBusInfo}
 
   @type subway_line :: :red | :orange | :green | :blue
 

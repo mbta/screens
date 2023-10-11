@@ -2,10 +2,10 @@ defmodule Screens.GLScreenData do
   @moduledoc false
 
   alias Screens.Alerts.Alert
+  alias Screens.Config.State
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
   alias ScreensConfig.Gl
-  alias Screens.Config.State
 
   def by_screen_id(screen_id, is_screen) do
     %Gl{

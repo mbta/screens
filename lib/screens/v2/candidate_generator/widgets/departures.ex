@@ -1,13 +1,13 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   @moduledoc false
 
+  alias Screens.V2.Departure
+  alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Departures.Filter.RouteDirection
   alias ScreensConfig.V2.Departures.{Filter, Query, Section}
   alias ScreensConfig.V2.{BusEink, BusShelter, Departures, GlEink, Solari, SolariLarge}
-  alias Screens.V2.Departure
-  alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
 
   def departures_instances(
         %Screen{app_params: %app{}} = config,

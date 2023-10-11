@@ -4,9 +4,9 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   screen data, and simulates data requests for any that it finds.
   """
 
-  alias ScreensConfig.Screen
   alias Screens.ScreensByAlert
   alias Screens.Util
+  alias ScreensConfig.Screen
 
   # (Not a real module--just a name assigned to the Task.Supervisor process that supervises each simulated data request run)
   alias Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor

@@ -1,9 +1,6 @@
 defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Dup
-  alias ScreensConfig.V2.Header.{CurrentStopId, CurrentStopName}
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: AlertsInstances
@@ -11,6 +8,9 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.NormalHeader
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Dup
+  alias ScreensConfig.V2.Header.{CurrentStopId, CurrentStopName}
 
   @behaviour CandidateGenerator
 

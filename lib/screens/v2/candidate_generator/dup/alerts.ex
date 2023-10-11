@@ -4,14 +4,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   """
 
   alias Screens.Alerts.Alert
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Alerts, as: AlertsConfig
-  alias ScreensConfig.V2.Dup
   alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.{DupAlert, DupSpecialCaseAlert}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Alerts, as: AlertsConfig
+  alias ScreensConfig.V2.Dup
 
   require Logger
 

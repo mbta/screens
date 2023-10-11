@@ -1,8 +1,8 @@
 defmodule Screens.DupScreenData do
   @moduledoc false
 
-  alias ScreensConfig.Dup
   alias Screens.Config.State
+  alias ScreensConfig.Dup
 
   alias ScreensConfig.Dup.Override.{
     FullscreenAlert,

@@ -1,7 +1,7 @@
 defmodule Screens.Psa do
   @moduledoc false
-  alias ScreensConfig.{PsaConfig, Screen, Solari}
   alias Screens.Config.State
+  alias ScreensConfig.{PsaConfig, Screen, Solari}
 
   @eink_refresh_seconds 30
   @solari_refresh_seconds 15

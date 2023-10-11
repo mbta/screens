@@ -1,14 +1,14 @@
 defmodule Screens.SolariScreenData do
   @moduledoc false
 
+  alias Screens.Config.State
+  alias Screens.Departures.Departure
+  alias Screens.{LogScreenData, SignsUiConfig, Util}
   alias ScreensConfig.{Query, Solari}
   alias ScreensConfig.Query.{Opts, Params}
   alias ScreensConfig.Solari.Section
   alias ScreensConfig.Solari.Section.{Headway, Layout}
   alias ScreensConfig.Solari.Section.Layout.{Bidirectional, Upcoming}
-  alias Screens.Config.State
-  alias Screens.Departures.Departure
-  alias Screens.{LogScreenData, SignsUiConfig, Util}
 
   def by_screen_id(screen_id, is_screen, at_historical_datetime \\ nil) do
     if State.mode_disabled?(:bus) do

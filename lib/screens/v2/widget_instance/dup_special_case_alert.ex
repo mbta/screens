@@ -6,8 +6,8 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
   Its serialized data must be valid for a DUP full-screen or partial alert on the client.
   """
 
-  alias ScreensConfig.V2.FreeText
   alias Screens.V2.WidgetInstance
+  alias ScreensConfig.V2.FreeText
 
   @enforce_keys [:alert_ids, :slot_names, :widget_type, :special_case]
   defstruct @enforce_keys ++ [:branches]

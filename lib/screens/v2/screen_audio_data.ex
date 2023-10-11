@@ -1,12 +1,12 @@
 defmodule Screens.V2.ScreenAudioData do
   @moduledoc false
 
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{Audio, BusShelter, PreFare}
   alias Screens.Util
   alias Screens.V2.ScreenData
   alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.WidgetInstance
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{Audio, BusShelter, PreFare}
 
   @type screen_id :: String.t()
 

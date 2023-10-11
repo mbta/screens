@@ -1,12 +1,12 @@
 defmodule Screens.V2.WidgetInstance.LineMap do
   @moduledoc false
 
-  alias ScreensConfig.{Screen, V2}
   alias Screens.Predictions.Prediction
   alias Screens.Trips.Trip
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.LineMap
   alias Screens.Vehicles.Vehicle
+  alias ScreensConfig.{Screen, V2}
 
   defstruct screen: nil,
             stops: [],
