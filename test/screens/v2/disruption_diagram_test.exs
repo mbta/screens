@@ -1643,6 +1643,39 @@ defmodule Screens.V2.DisruptionDiagramTest do
       assert expected == actual
     end
 
+    test "serializes a Cleveland Circle branch alert with home stop at Government Center" do
+      localized_alert =
+        DDAlert.make_localized_alert(:shuttle, :green, ~P"gover", {~P"smary", ~P"cool"})
+
+      expected = %{
+        effect: :shuttle,
+        effect_region_slot_index_range: {1, 5},
+        line: :green,
+        current_station_slot_index: 11,
+        slots: [
+          %{type: :arrow, label_id: ~P"clmnl"},
+          %{label: %{full: "Coolidge Corner", abbrev: "Coolidge Cn"}, show_symbol: true},
+          %{label: %{full: "Saint Paul Street", abbrev: "St. Paul St"}, show_symbol: true},
+          %{label: %{full: "Kent Street", abbrev: "Kent St"}, show_symbol: true},
+          %{label: %{full: "Hawes Street", abbrev: "Hawes St"}, show_symbol: true},
+          %{label: %{full: "Saint Mary's Street", abbrev: "St. Mary's"}, show_symbol: true},
+          %{label: %{full: "Kenmore", abbrev: "Kenmore"}, show_symbol: true},
+          %{label: %{full: "Hynes Convention Center", abbrev: "Hynes"}, show_symbol: true},
+          %{
+            label: %{full: "…via Copley", abbrev: "…via Copley"},
+            show_symbol: false
+          },
+          %{label: %{full: "Boylston", abbrev: "Boylston"}, show_symbol: true},
+          %{label: %{full: "Park Street", abbrev: "Park St"}, show_symbol: true},
+          %{type: :terminal, label_id: ~P"gover"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
     ##############
     # VALIDATION #
     ##############
@@ -1661,7 +1694,10 @@ defmodule Screens.V2.DisruptionDiagramTest do
 
     test "rejects whole-route alerts" do
       whole_route_scenario = %{
-        alert: %Alert{effect: :suspension, informed_entities: [%{route: "Orange", stop: nil}]},
+        alert: %Alert{
+          effect: :suspension,
+          informed_entities: [%{route: "Orange", stop: nil, direction_id: nil}]
+        },
         location_context: %LocationContext{
           home_stop: ~P"bbsta",
           tagged_stop_sequences: TaggedSeq.orange()

@@ -466,18 +466,8 @@ defmodule Screens.Stops.Stop do
   def fetch_location_context(app, stop_id, now) do
     with alert_route_types <- get_route_type_filter(app, stop_id),
          {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, alert_route_types),
-         route_ids <- Route.route_ids(routes_at_stop),
          {:ok, tagged_stop_sequences} <-
-           (cond do
-              app in [BusEink, BusShelter, GlEink] ->
-                RoutePattern.fetch_tagged_stop_sequences_through_stop(stop_id)
-
-              app in [PreFare, Dup] ->
-                RoutePattern.fetch_tagged_parent_station_sequences_through_stop(
-                  stop_id,
-                  route_ids
-                )
-            end) do
+           fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop) do
       stop_name = fetch_stop_name(stop_id)
       stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
 
@@ -529,5 +519,24 @@ defmodule Screens.Stops.Stop do
 
   def on_glx?(stop_id) do
     stop_id in Enum.map(@medford_tufts_branch_stops ++ @union_square_branch_stops, &elem(&1, 0))
+  end
+
+  defp fetch_tagged_stop_sequences_by_app(app, stop_id, _routes_at_stop)
+       when app in [BusEink, BusShelter, GlEink] do
+    RoutePattern.fetch_tagged_stop_sequences_through_stop(stop_id)
+  end
+
+  defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)
+       when app in [Dup] do
+    route_ids = Route.route_ids(routes_at_stop)
+    RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids, false)
+  end
+
+  defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)
+       when app == PreFare do
+    route_ids = Route.route_ids(routes_at_stop)
+
+    # We limit results to canonical route patterns only--no stop sequences for nonstandard patterns.
+    RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids, true)
   end
 end

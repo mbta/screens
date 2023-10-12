@@ -714,7 +714,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     with {_segment1, _segment2} <- segment_pair do
       {left_omission, right_omission} = select_split_omission_indices(segment_pair, omit_count)
 
-      # We *must* do the right omission befor the left, to avoid having the indices change
+      # We *must* do the right omission before the left, to avoid having the indices change underneath us.
       builder =
         builder
         |> do_omit(right_omission)
