@@ -3,7 +3,7 @@ defmodule Screens.Alerts.InformedEntity do
   Functions to query alert informed entities.
   """
 
-  alias Alerts.Alert
+  alias Screens.Alerts.Alert
 
   @type t :: Alert.informed_entity()
 
