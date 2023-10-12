@@ -52,8 +52,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
       ) do
     params = %{
       "include" => "representative_trip.stops,route",
-      "filter[stop]" => stop_id,
-      "filter[canonical]" => true
+      "filter[stop]" => stop_id
     }
 
     params =
