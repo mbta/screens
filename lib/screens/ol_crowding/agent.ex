@@ -14,10 +14,10 @@ defmodule Screens.OlCrowding.Agent do
     Agent.update(__MODULE__, &Map.delete(&1, "#{station_id}.#{direction_id}"))
   end
 
-  def put(station_id, direction_id, show_widget_after_dt) do
+  def put(station_id, direction_id, previous_station_stopped_prediction) do
     Agent.update(
       __MODULE__,
-      &Map.put(&1, "#{station_id}.#{direction_id}", show_widget_after_dt)
+      &Map.put(&1, "#{station_id}.#{direction_id}", previous_station_stopped_prediction)
     )
   end
 end
