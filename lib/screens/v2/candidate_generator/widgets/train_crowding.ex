@@ -264,6 +264,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
       # Update the cached prediction so we can check the new crowding classes next fetch.
       # The departure time we use in the other heuristic should not change, and if it does it is changing to a more accurate time.
+      # If the prediction is nil, leave the existing one alone just in case the dwell time heuristic can log next refresh.
       true ->
         previous_station_prediction_current_trip =
           fetch_previous_station_prediction(
@@ -273,11 +274,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
             common_params.fetch_predictions_fn
           )
 
-        Agent.put(
-          common_params.train_crowding_config.station_id,
-          common_params.train_crowding_config.direction_id,
-          previous_station_prediction_current_trip
-        )
+        if previous_station_prediction_current_trip != nil do
+          Agent.put(
+            common_params.train_crowding_config.station_id,
+            common_params.train_crowding_config.direction_id,
+            previous_station_prediction_current_trip
+          )
+        end
     end
   end
 
