@@ -84,7 +84,7 @@
   /////////////////////////
   // CONSTANTS & GLOBALS //
   /////////////////////////
-  const TRIPTYCH_VERSION = "23.10.5.1";
+  const TRIPTYCH_VERSION = "23.10.18.1";
 
   // Custom element names must adhere to naming rules
   // https://developer.mozilla.org/en-US/docs/Web/API/Web_Components/Using_custom_elements#registering_a_custom_element
@@ -769,7 +769,7 @@
   <div class="crowding-widget__footer" id="train-crowding-footer-root">
     <train-crowding-footer-segment class="crowding-widget__footer__segment">
       <div slot="segment-content" id="segment-content">
-        Current crowding on board
+        Space available<br> on board
         <div class="crowding-widget__footer__identifiers" id="footer-identifiers"></div>
       </div>
     </train-crowding-footer-segment>
@@ -781,7 +781,7 @@
         </train-crowding-footer-key-row>
         <train-crowding-footer-key-row class="crowding-widget__footer__key-row">
           <img src="images/svgr_bundled/train_crowding/Car-SomeCrowding-Key.svg" width="137" height="100"
-            class="key-icon" /> Some crowding
+            class="key-icon" /> Space available
         </train-crowding-footer-key-row>
         <div class="crowding-widget__footer__identifiers" id="footer-identifiers"></div>
       </div>
@@ -790,7 +790,7 @@
       <div slot="segment-content">
         <train-crowding-footer-key-row class="crowding-widget__footer__key-row">
           <img src="images/svgr_bundled/train_crowding/Car-Crowded-Key.svg" width="137" height="100" class="key-icon" />
-          Crowded
+          Limited space
         </train-crowding-footer-key-row>
         <train-crowding-footer-key-row id="footer-optional-last-key"
           class="crowding-widget__footer__key-row"></train-crowding-footer-key-row>

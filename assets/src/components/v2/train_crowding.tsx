@@ -44,7 +44,7 @@ type OccupancyStatus =
 type CarOrientation = FrontCarDirection | "middle";
 const lookupCarComponent = (
   occupancyStatus: OccupancyStatus,
-  carOrientation: CarOrientation,
+  carOrientation: CarOrientation
 ) => {
   const lookupKey: `${CarOrientation}/${OccupancyStatus}` = `${carOrientation}/${occupancyStatus}`;
 
@@ -131,7 +131,7 @@ const TrainCrowding: React.ComponentType<Props> = ({
   const trains = crowding.map((occupancyStatus, i) => {
     const CarComponent = lookupCarComponent(
       occupancyStatus,
-      i == 0 ? frontCarDirection : "middle",
+      i == 0 ? frontCarDirection : "middle"
     );
     return <CarComponent key={i} className="crowding-widget__train-car" />;
   });
@@ -188,14 +188,14 @@ const TrainCrowding: React.ComponentType<Props> = ({
             <ArrowUp
               className={classWithModifier(
                 "crowding-widget__you-are-here-arrow",
-                arrowDirection,
+                arrowDirection
               )}
             />
           ) : (
             <ArrowUpLeft
               className={classWithModifier(
                 "crowding-widget__you-are-here-arrow",
-                arrowDirection,
+                arrowDirection
               )}
             />
           )}
@@ -204,7 +204,7 @@ const TrainCrowding: React.ComponentType<Props> = ({
           style={{ marginLeft: textPadding }}
           className={classWithModifier(
             "crowding-widget__you-are-here-text",
-            [8, 16, 24].includes(arrowSlot) ? "right-align" : "left-align",
+            [8, 16, 24].includes(arrowSlot) ? "right-align" : "left-align"
           )}
         >
           You are here
@@ -215,19 +215,20 @@ const TrainCrowding: React.ComponentType<Props> = ({
           showIdentifiers={showIdentifiers}
           identifiers={identifiers}
         >
-          Current crowding on board
+          Space available
+          <br /> on board
         </FooterSegment>
         <FooterSegment
           showIdentifiers={showIdentifiers}
           identifiers={identifiers}
         >
           <div className="crowding-widget__footer__key-row">
-            <KeyNotCrowded width="137" height="100" className="key-icon" /> Not
-            crowded
+            <KeyNotCrowded width="137" height="100" className="key-icon" />
+            Seats available
           </div>
           <div className="crowding-widget__footer__key-row">
-            <KeySomeCrowding width="137" height="100" className="key-icon" />{" "}
-            Some crowding
+            <KeySomeCrowding width="137" height="100" className="key-icon" />
+            Space available
           </div>
         </FooterSegment>
         <FooterSegment
@@ -235,7 +236,8 @@ const TrainCrowding: React.ComponentType<Props> = ({
           identifiers={identifiers}
         >
           <div className="crowding-widget__footer__key-row">
-            <KeyCrowded width="137" height="100" className="key-icon" /> Crowded
+            <KeyCrowded width="137" height="100" className="key-icon" /> Limited
+            space
           </div>
           <div className="crowding-widget__footer__key-row">
             {crowding.includes("closed") ? (
