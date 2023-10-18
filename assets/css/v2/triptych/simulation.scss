@@ -10,15 +10,13 @@
   &::-webkit-scrollbar {
     width: 12px;
   }
-
   &::-webkit-scrollbar-thumb {
     background-color: #607180;
     border-radius: 12px;
     border: 2px solid #2e3f4d;
   }
-
   &::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px #0000004d;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     border-radius: 12px;
     background-color: #2e3f4d;
   }
@@ -53,7 +51,7 @@
         height: 1920px;
       }
 
-      &>* {
+      & > * {
         transform-origin: top left;
         transform: scale(17.92%);
       }
@@ -74,7 +72,7 @@
       width: 3240px;
     }
 
-    &>* {
+    & > * {
       transform-origin: top left;
       transform: scale(17.92%);
     }

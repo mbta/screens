@@ -5,7 +5,6 @@ require("../../../css/triptych_v2.scss");
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import OutfrontErrorBoundary from "Components/v2/outfront_error_boundary";
 
 import { usePlayerName } from "Hooks/outfront";
 import { isTriptych } from "Util/outfront";
@@ -75,12 +74,14 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 
 const App = (): JSX.Element => {
   if (isTriptych()) {
+    const playerName = usePlayerName()!;
+
     return (
       <MappingContext.Provider value={TYPE_TO_COMPONENT}>
         <ResponseMapperContext.Provider value={responseMapper}>
-          <OutfrontErrorBoundary>
-            <PackagedApp />
-          </OutfrontErrorBoundary>
+          <Viewport>
+            <ScreenPage id={playerName} />
+          </Viewport>
         </ResponseMapperContext.Provider>
       </MappingContext.Provider>
     );
@@ -113,18 +114,6 @@ const App = (): JSX.Element => {
         </Route>
       </Switch>
     </Router>
-  )
-};
-
-// Defined as a separate component so that `usePlayerName` can execute
-// within the error boundary.
-const PackagedApp = (): JSX.Element => {
-  const playerName = usePlayerName()!;
-
-  return (
-    <Viewport>
-      <ScreenPage id={playerName} />
-    </Viewport>
   );
 };
 
