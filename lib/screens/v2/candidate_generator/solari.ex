@@ -1,13 +1,13 @@
 defmodule Screens.V2.CandidateGenerator.Solari do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.CurrentStopName
-  alias Screens.Config.V2.Solari
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Header.CurrentStopName
+  alias ScreensConfig.V2.Solari
 
   @behaviour CandidateGenerator
 

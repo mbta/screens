@@ -2,8 +2,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusShelter, Departures, PreFare}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{BusShelter, Departures, PreFare}
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.SubwayStatus
 

@@ -11,7 +11,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
         time: ~U[2021-03-04 11:00:00Z]
       },
       dup_instance: %WidgetInstance.NormalHeader{
-        screen: struct(Screens.Config.Screen, %{app_id: :dup_v2}),
+        screen: struct(ScreensConfig.Screen, %{app_id: :dup_v2}),
         icon: :logo,
         text: "Ruggles",
         time: ~U[2021-03-04 11:00:00Z]

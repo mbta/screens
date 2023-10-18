@@ -2,10 +2,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{Alerts, Departures, Header}
-  alias Screens.Config.V2.Departures.{Headway, Query, Section}
-  alias Screens.Config.V2.Dup, as: DupConfig
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{Alerts, Departures, Header}
+  alias ScreensConfig.V2.Departures.{Headway, Query, Section}
+  alias ScreensConfig.V2.Dup, as: DupConfig
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule

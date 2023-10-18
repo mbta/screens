@@ -1,11 +1,11 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Departures.Filter.RouteDirection
-  alias Screens.Config.V2.Departures.{Filter, Section}
-  alias Screens.Config.V2.BusShelter
-  alias Screens.Config.V2.Departures, as: DeparturesConfig
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Departures.Filter.RouteDirection
+  alias ScreensConfig.V2.Departures.{Filter, Section}
+  alias ScreensConfig.V2.BusShelter
+  alias ScreensConfig.V2.Departures, as: DeparturesConfig
   alias Screens.V2.CandidateGenerator.Widgets.Departures
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget

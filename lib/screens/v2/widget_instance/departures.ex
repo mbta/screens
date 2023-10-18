@@ -2,8 +2,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.FreeTextLine
   alias Screens.Departures.Departure
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -11,6 +9,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.FreeTextLine
 
   defstruct screen: nil,
             section_data: [],

@@ -10,9 +10,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
   use ExUnitProperties
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{PreFare}
-  alias Screens.Config.V2.Header.CurrentStopId
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{PreFare}
+  alias ScreensConfig.V2.Header.CurrentStopId
   alias Screens.LocationContext
   alias Screens.Stops.Stop
   alias Screens.Util
