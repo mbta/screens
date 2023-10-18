@@ -222,8 +222,8 @@ const TrainCrowding: React.ComponentType<Props> = ({
           identifiers={identifiers}
         >
           <div className="crowding-widget__footer__key-row">
-            <KeyNotCrowded width="137" height="100" className="key-icon" />{" "}
-            Seats available
+            <KeyNotCrowded width="137" height="100" className="key-icon" /> Not
+            crowded
           </div>
           <div className="crowding-widget__footer__key-row">
             <KeySomeCrowding width="137" height="100" className="key-icon" />{" "}

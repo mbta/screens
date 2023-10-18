@@ -39,7 +39,6 @@ import NoData from "Components/v2/dup/no_data";
 import OvernightDepartures from "Components/v2/dup/overnight_departures";
 import { usePlayerName } from "Hooks/outfront";
 import { isDup } from "Util/outfront";
-import OutfrontErrorBoundary from "Components/v2/outfront_error_boundary";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -125,12 +124,14 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 
 const App = (): JSX.Element => {
   if (isDup()) {
+    const playerName = usePlayerName()!;
+    const id = `DUP-${playerName.trim()}`;
     return (
       <MappingContext.Provider value={TYPE_TO_COMPONENT}>
         <ResponseMapperContext.Provider value={responseMapper}>
-          <OutfrontErrorBoundary>
-            <PackagedApp />
-          </OutfrontErrorBoundary>
+          <Viewport>
+            <ScreenPage id={id} />
+          </Viewport>
         </ResponseMapperContext.Provider>
       </MappingContext.Provider>
     );
@@ -163,19 +164,6 @@ const App = (): JSX.Element => {
         </Route>
       </Switch>
     </Router>
-  );
-};
-
-// Defined as a separate component so that `usePlayerName` can execute
-// within the error boundary.
-const PackagedApp = (): JSX.Element => {
-  const playerName = usePlayerName()!;
-  const id = `DUP-${playerName.trim()}`;
-
-  return (
-    <Viewport>
-      <ScreenPage id={id} />
-    </Viewport>
   );
 };
 

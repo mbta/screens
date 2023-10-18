@@ -279,4 +279,3 @@ const useTriptychApiResponse = ({ id }) =>
 export default useApiResponse;
 export { ApiResponse, SimulationApiResponse };
 export { useSimulationApiResponse, useDUPApiResponse, useTriptychApiResponse };
-export { getOutfrontAbsolutePath };

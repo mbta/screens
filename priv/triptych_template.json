@@ -4,7 +4,7 @@
       "displayName": "MBTA - TRIPTYCH APP",
       "preview": "triptych_preview.png",
       "indexTemplate": "triptych-app.html",
-      "previewOrientation": "portrait"
+      "previewOrientation": "landscape"
     }
   ]
 }

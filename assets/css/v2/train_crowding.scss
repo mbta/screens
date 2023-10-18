@@ -8,16 +8,14 @@
     color: #e5e4e1;
     box-sizing: border-box;
   }
-
   &__body {
     display: flex;
     position: relative;
     flex-direction: column;
     height: 920px;
     background-color: #d9d6d0;
-    box-shadow: 0px 8px 12px 0px #00000052;
+    box-shadow: 0px 8px 12px 0px rgba(0, 0, 0, 0.32);
   }
-
   &__footer {
     display: flex;
     background-color: #cccbc8;
@@ -42,7 +40,6 @@
   @include font--heading-3;
   margin-top: auto;
   color: #FFFFFF;
-
   .destination {
     padding-left: 109px;
   }
@@ -62,7 +59,6 @@
   @include font--body-2;
   display: inline-flex;
   align-items: center;
-
   .key-icon {
     padding-right: 72px;
   }
@@ -81,12 +77,53 @@
   padding: 161px 52px 58px 52px;
 }
 
+@keyframes up-arrow {
+  from {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes up-left-arrow {
+  from {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px) translateX(-12px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes up-right-arrow {
+  from {
+    transform: translateY(0) rotate(90deg);
+  }
+  50% {
+    transform: translateY(-12px) translateX(12px) rotate(90deg);
+  }
+  to {
+    transform: translateY(0) rotate(90deg);
+  }
+}
+
 .crowding-widget__you-are-here-arrow {
   width: 180px;
   height: 180px;
-
+  &--up {
+    animation: up-arrow 1.2s infinite ease-in-out;
+  }
+  &--up-left {
+    animation: up-left-arrow 1.2s infinite ease-in-out;
+  }
   &--up-right {
-    transform: rotate(90deg);
+    animation: up-right-arrow 1.2s infinite ease-in-out;
   }
 }
 
@@ -97,7 +134,6 @@
   margin-top: auto;
   padding: 0 72px 108px 72px;
   text-align: left;
-
   &--right-align {
     text-align: right;
   }
