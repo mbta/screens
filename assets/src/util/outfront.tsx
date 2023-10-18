@@ -53,11 +53,9 @@ export const getPlayerName = (): string | null => {
 
   const mraid = getMRAID();
   if (mraid) {
-    try {
-      const deviceInfoJSON = mraid.getDeviceInfo();
-      const deviceInfo = JSON.parse(deviceInfoJSON);
-      playerName = deviceInfo.deviceName;
-    } catch (err) {}
+    const deviceInfoJSON = mraid.getDeviceInfo();
+    const deviceInfo = JSON.parse(deviceInfoJSON);
+    playerName = deviceInfo.deviceName;
   }
 
   return playerName;
@@ -114,9 +112,7 @@ const getTags = (): OFMTag[] | null => {
 
   const mraid = getMRAID();
   if (mraid) {
-    try {
-      tags = JSON.parse(mraid.getTags()).tags as OFMTag[];
-    } catch (err) {}
+    tags = JSON.parse(mraid.getTags()).tags as OFMTag[];
   }
 
   return tags;

@@ -8,36 +8,15 @@ Outfront recommends these asset sizes:
 ## Prepping the package
 - Ensure [Corsica](https://hexdocs.pm/corsica/Corsica.html) is used on the server to allow CORS requests (ideally limited to just the triptych-relevant routes). It should already be configured at [this line](/lib/screens_web/controllers/v2/screen_api_controller.ex#L9) in the API controller--if it is, you don't need to do anything for this step.
 - Double check that any behavior specific to the triptych screen environment happens inside of an `isTriptych()` or `isOFM()` check. This includes:
-  - `buildApiPath` in use_api_response.tsx should return a full URL for the API path: prefix `apiPath` string with "https://screens.mbta.com".
+  - `getOutfrontAbsolutePath` in use_api_response.tsx should return a full URL for the API path: prefix `apiPath` string with "https://screens.mbta.com".
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
-- Create priv/static/triptych-app.html if it doesn’t already exist. Copy paste the following contents in:
-
-  ```html
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="utf-8" />
-      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Screens</title>
-      <link rel="stylesheet" href="triptych_v2.css" />
-    </head>
-
-    <body>
-      <div
-        id="app"
-        data-last-refresh="2020-09-25T17:23:00Z"
-        data-environment-name="screens-prod"
-      ></div>
-      <script type="text/javascript" src="polyfills.js"></script>
-      <script type="text/javascript" src="triptych_v2.js"></script>
-    </body>
-  </html>
-  ```
-
 - Set the version string in assets/src/components/v2/triptych/version.tsx to `current_year.current_month.current_day.1`.
-- In assets/webpack.config.js, change `publicPath` in the font config to have value `'fonts/'`.
-- If you've renamed / removed image assets, you might want to delete the corresponding folder in `/priv/static`. The folder accumulates assets without clearing old ones out, and these will be included in the built bundle!
+- In assets/webpack.config.js:
+  - Comment out all lines in the `entry` object except for **polyfills** and **triptych_v2**.
+  - Change `publicPath` in the font config to have value `'fonts/'`.
+- Delete priv/static with `rm -r priv/static` from the project root.
+- Temporarily start the server to have it repopulate priv/static. `iex -S mix phx.server` from the project root.
+  - You can stop the server as soon as it prints out the big list of files built by webpack.
 - **Only if you are packaging for local testing**
   - add the following to the top of assets/src/apps/v2/triptych.tsx, filling in the string values:
     ```ts
@@ -55,7 +34,7 @@ Outfront recommends these asset sizes:
 - `cd` to priv/static and run the following:
   ```sh
   npm --prefix ../../assets run deploy && \
-  cp -r css/triptych_v2.css js/polyfills.js js/triptych_v2.js ../triptych_preview.png . && \
+  cp -r css/triptych_v2.css js/polyfills.js js/triptych_v2.js ../triptych_preview.png ../triptych-app.html . && \
   cp ../triptych_template.json ./template.json && \
   zip -r triptych-app.zip triptych_v2.css polyfills.js triptych_v2.js fonts images triptych-app.html template.json triptych_preview.png
   ```
