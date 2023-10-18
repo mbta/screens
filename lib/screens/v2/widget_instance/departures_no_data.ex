@@ -1,13 +1,13 @@
 defmodule Screens.V2.WidgetInstance.DeparturesNoData do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Alerts
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Alerts
 
   defstruct screen: nil, show_alternatives?: nil, slot_name: nil
 
   @type t :: %__MODULE__{
-          screen: Screens.Config.Screen.t(),
+          screen: ScreensConfig.Screen.t(),
           show_alternatives?: boolean(),
           slot_name: atom()
         }

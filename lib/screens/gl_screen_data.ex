@@ -2,9 +2,10 @@ defmodule Screens.GLScreenData do
   @moduledoc false
 
   alias Screens.Alerts.Alert
+  alias Screens.Config.State
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
-  alias Screens.Config.{Gl, State}
+  alias ScreensConfig.Gl
 
   def by_screen_id(screen_id, is_screen) do
     if State.mode_disabled?(:light_rail) do

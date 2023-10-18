@@ -1,7 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.SolariTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config.{Screen, V2}
+  alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.Solari
   alias Screens.V2.WidgetInstance.NormalHeader
 

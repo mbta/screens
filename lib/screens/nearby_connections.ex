@@ -1,7 +1,8 @@
 defmodule Screens.NearbyConnections do
   @moduledoc false
 
-  alias Screens.Config.{Bus, State}
+  alias Screens.Config.State
+  alias ScreensConfig.Bus
 
   def by_screen_id(screen_id) do
     %Bus{stop_id: stop_id, nearby_connections: nearby_connections} = State.app_params(screen_id)

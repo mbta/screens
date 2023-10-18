@@ -3,8 +3,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
   import Screens.V2.CandidateGenerator.Widgets.TrainCrowding
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{TrainCrowding, Triptych}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{TrainCrowding, Triptych}
   alias Screens.Predictions.Prediction
   alias Screens.Vehicles.{Carriage, Vehicle}
   alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget

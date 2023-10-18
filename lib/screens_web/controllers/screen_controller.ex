@@ -2,7 +2,8 @@ defmodule ScreensWeb.ScreenController do
   use ScreensWeb, :controller
   require Logger
 
-  alias Screens.Config.{Screen, State}
+  alias Screens.Config.State
+  alias ScreensConfig.Screen
 
   @default_app_id :bus_eink
   @app_ids ~w[bus_eink gl_eink_single gl_eink_double solari dup]a

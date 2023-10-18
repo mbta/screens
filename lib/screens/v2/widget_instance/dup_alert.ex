@@ -4,10 +4,10 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   """
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
   alias Screens.LocationContext
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert.Serialize
+  alias ScreensConfig.Screen
 
   require Logger
 
