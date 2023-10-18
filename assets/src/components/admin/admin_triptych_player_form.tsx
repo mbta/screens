@@ -1,11 +1,18 @@
 import React from "react";
+import _ from "lodash";
 
 import AdminForm from "Components/admin/admin_form";
 
 const fetchConfig = async () => {
   const result = await fetch("/api/admin/triptych_players");
   const resultJson = await result.json();
-  return JSON.parse(resultJson.config);
+
+  // Sort the entries alphanumerically by player name.
+  return _.chain(JSON.parse(resultJson.config))
+    .toPairs()
+    .sortBy(([playerName, _screenId]) => playerName)
+    .fromPairs()
+    .value();
 };
 
 const AdminTriptychPlayerForm = (): JSX.Element => (
