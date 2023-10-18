@@ -34,8 +34,9 @@ defmodule Screens.TriptychPlayer.Validator do
       |> MapSet.new()
 
     all_triptych_screen_ids =
-      Screens.Config.State.screen_ids(&match?({_screen_id, %{app_id: :triptych_v2}}, &1))
-      |> MapSet.new()
+      MapSet.new(
+        Screens.Config.State.screen_ids(&match?({_screen_id, %{app_id: :triptych_v2}}, &1))
+      )
 
     if MapSet.subset?(mapped_screen_ids, all_triptych_screen_ids) do
       :ok
