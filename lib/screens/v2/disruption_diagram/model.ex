@@ -1,6 +1,22 @@
 defmodule Screens.V2.DisruptionDiagram.Model do
   @moduledoc """
   Functions to generate a disruption diagram from a `LocalizedAlert`.
+
+  Most of the logic is focused on fitting content into at most 14 slots by omitting stops from the Closure, the Gap, and/or the
+  Ends as necessary.
+
+  The logic reflects the flowchart created by Betsy and viewable [here](https://miro.com/app/board/uXjVP2Hgi18=/).
+
+  # 📕 Terminology
+
+  | Term | Definition |
+  | :- | :- |
+  | Slot | A single, labeled "point" on the diagram. Can be a stop, an omitted segment, a terminal stop, or a destination arrow. Slots do not necessarily correspond 1:1 with stops. |
+  | Region | A group of slots forming one part of the diagram. Regions can overlap or subsume one another, with a consistent order of precedence: Closure > Gap > Current Location > Ends. |
+  | Closure | The region containing disrupted stops. For station closures, the non-disrupted stops on either end of the disrupted area are also included. |
+  | Current Location | The region containing this screen's home stop, as well as the stop(s) on either side of it. |
+  | Gap | The region between the Closure and the screen's home stop. When present, the Gap always takes the Current Location stop closest to the Closure. |
+  | Ends | The up-to 2 slots at either end of the diagram. These can take the form of either terminal stops, or destination arrows. |
   """
 
   alias Screens.V2.DisruptionDiagram, as: DD
@@ -77,6 +93,15 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     end
   end
 
+  # For GL, OL, and RL, it's possible for the stops we need to show in the diagram to span more than the maximum
+  # number of slots (14). This function replaces segments of stops with single "omitted" slots in
+  # order to keep the diagram small enough.
+  #
+  # In rare cases, the number of stops to show is too *small* and would look awkward, so we instead pad the diagram with
+  # additional slots, pulling stops in from either side of the disrupted area.
+  #
+  # The fitting process stops after any one of the 3 functions in the `with` expression--`fit_closure_region`, `fit_gap_region`, or
+  # `pad_slots`--makes a change to the diagram.
   defp fit_regions(builder) do
     with :unchanged <- fit_closure_region(builder),
          :unchanged <- fit_gap_region(builder),

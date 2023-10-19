@@ -83,8 +83,14 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   defstruct @enforce_keys ++ [left_end: Vector.new(), right_end: Vector.new()]
 
   @type t :: %__MODULE__{
+          # The main sequence of slots in the diagram.
           sequence: sequence(),
+          # Information about the diagram as a whole, including indexes of important stops.
           metadata: metadata(),
+          # The ends are "bags" of stops that are outside the main area of the diagram.
+          # Each end serializes to at most 1 slot in the final diagram.
+          # During serialization, we inspect the contents of each end to determine what the first
+          # and last slot should be.
           left_end: end_sequence(),
           right_end: end_sequence()
         }
@@ -472,11 +478,20 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     |> Vector.update_at!(-1, &%{&1 | terminal?: true})
   end
 
-  # Since we always show all stops for the Blue Line, we don't need to do
-  # anything special with the ends. They don't need to be split out.
-  defp split_end_stops(builder) when builder.metadata.line == :blue, do: builder
+  # Removes stops outside the closure/current location regions from the main sequence, and puts them into the ends.
+  # O = O = O = O = X = X = X = X = O = O = <> = O = O = O = =>
+  # ^   ^   ^   ^                                    ^   ^   ^
+  # Moved to left_end                                Moved to right_end
+  defp split_end_stops(builder) when builder.metadata.line == :blue do
+    # Since we always show all stops for the Blue Line, we don't need to do
+    # anything special with the ends. They don't need to be split out.
+
+    builder
+  end
 
   defp split_end_stops(builder) do
+    # In all other cases, we split out the left and right ends.
+
     in_diagram =
       [
         closure_ideal_indices(builder),
