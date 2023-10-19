@@ -78,6 +78,8 @@ defmodule Screens.RoutePatterns.RoutePattern do
   - For most routes (everything but Red Line), only one stop sequence will be in the list.
   - For Red Line, the list will contain one stop sequence for the Ashmont branch and one for the Braintree branch.
 
+  Pass `false` for `canonical_only?` to limit results to *non-canonical* route patterns. (You probably don't want to do this!)
+
   If no parent station data exists, platform_id is returned instead.
   Only stop sequences for direction ID 0 are returned.
   Assumes that all stop sequences in result are platforms.
@@ -87,16 +89,20 @@ defmodule Screens.RoutePatterns.RoutePattern do
   def fetch_tagged_parent_station_sequences_through_stop(
         stop_id,
         route_filters,
-        canonical_only? \\ false,
+        canonical_only? \\ nil,
         get_json_fn \\ &V3Api.get_json/2
       ) do
     params = %{
       "include" => "representative_trip.stops,route",
       "filter[stop]" => stop_id,
       "filter[direction_id]" => 0,
-      "filter[route]" => Enum.join(route_filters, ","),
-      "filter[canonical]" => canonical_only?
+      "filter[route]" => Enum.join(route_filters, ",")
     }
+
+    params =
+      if is_boolean(canonical_only?) do
+        Map.put(params, "filter[canonical]", canonical_only?)
+      end
 
     case get_json_fn.("route_patterns", params) do
       {:ok, result} ->
