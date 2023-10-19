@@ -88,6 +88,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
           # Information about the diagram as a whole, including indexes of important stops.
           metadata: metadata(),
           # The ends are "bags" of stops that are outside the main area of the diagram.
+          # Stops can be transferred between the `sequence` and the ends during the process of building the diagram.
           # Each end serializes to at most 1 slot in the final diagram.
           # During serialization, we inspect the contents of each end to determine what the first
           # and last slot should be.
@@ -767,6 +768,12 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     select_split_omission_indices(l, t, n - 1, l_acc, [h | r_acc])
   end
 
+  # Searches for a contiguous segment of stops, none of which are important, which
+  # we can omit from the diagram.
+  #
+  # The search starts from the original desired omission near the center of the region
+  # and moves outward, either left or right depending on the `side` argument,
+  # returning either {:ok, safe_segment} or :error if none is found.
   defp find_safe_segment(original_omission, important_indices, side, offset \\ 1)
 
   defp find_safe_segment(original_omission, important_indices, :left, offset) do
