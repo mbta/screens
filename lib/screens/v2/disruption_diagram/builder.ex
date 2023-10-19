@@ -494,12 +494,14 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     in_diagram =
       [
-        closure_ideal_indices(builder),
-        gap_ideal_indices(builder),
+        closure_indices(builder),
+        gap_indices(builder),
+        # We can save a little work by using the "ideal" indices here, since
+        # any overlap will disappear when we drop these into a MapSet.
         current_location_ideal_indices(builder)
       ]
-      |> Enum.map(&MapSet.new/1)
-      |> Enum.reduce(&MapSet.union/2)
+      |> Enum.concat()
+      |> MapSet.new()
 
     {leftmost_stop_index, rightmost_stop_index} = Enum.min_max(in_diagram)
 
@@ -914,9 +916,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   end
 
   # The closure has highest priority, so no other overlapping region can take stops from it.
-  defp closure_indices(builder), do: closure_ideal_indices(builder)
-
-  defp closure_ideal_indices(%{metadata: %{effect: :station_closure}} = builder) do
+  defp closure_indices(%{metadata: %{effect: :station_closure}} = builder) do
     # first = One stop before the first bypassed stop, if it exists. Otherwise, the first bypassed stop.
     first = clamp(builder.metadata.first_disrupted_stop - 1, vec_size(builder.sequence))
 
@@ -926,18 +926,16 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     first..last//1
   end
 
-  defp closure_ideal_indices(%{metadata: %{effect: continuous} = metadata})
+  defp closure_indices(%{metadata: %{effect: continuous} = metadata})
        when continuous in [:shuttle, :suspension] do
     metadata.first_disrupted_stop..metadata.last_disrupted_stop//1
   end
 
   # The gap region has second highest priority and by its definition doesn't overlap with the closure region.
-  defp gap_indices(builder), do: gap_ideal_indices(builder)
-
-  defp gap_ideal_indices(builder) do
+  defp gap_indices(builder) do
     home_stop = builder.metadata.home_stop
 
-    closure_left..closure_right = closure_ideal_indices(builder)
+    closure_left..closure_right = closure_indices(builder)
 
     cond do
       home_stop < closure_left -> (home_stop + 1)..(closure_left - 1)//1
@@ -950,8 +948,8 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   defp current_location_indices(builder) do
     current_location_region = MapSet.new(current_location_ideal_indices(builder))
 
-    gap_region = MapSet.new(gap_ideal_indices(builder))
-    closure_region = MapSet.new(closure_ideal_indices(builder))
+    gap_region = MapSet.new(gap_indices(builder))
+    closure_region = MapSet.new(closure_indices(builder))
 
     current_location_region
     |> MapSet.difference(MapSet.union(gap_region, closure_region))
@@ -962,6 +960,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     end
   end
 
+  # Indices of the current location region if none were taken by other higher-precedence regions.
   defp current_location_ideal_indices(builder) do
     home_stop = builder.metadata.home_stop
 
