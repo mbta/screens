@@ -166,7 +166,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp get_route_pills(t, location \\ nil)
 
   defp get_route_pills(t, nil) do
-    affected_routes = LocalizedAlert.informed_subway_routes(t)
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     affected_routes
     |> Enum.group_by(&get_line/1)
@@ -275,7 +275,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = Alert.informed_entities(alert)
 
     route_id =
-      case LocalizedAlert.informed_subway_routes(t) do
+      case LocalizedAlert.consolidated_informed_subway_routes(t) do
         ["Green" <> _] -> "Green"
         [route_id] -> route_id
       end
@@ -299,7 +299,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = Alert.informed_entities(alert)
 
     route_id =
-      case LocalizedAlert.informed_subway_routes(t) do
+      case LocalizedAlert.consolidated_informed_subway_routes(t) do
         ["Green" <> _] -> "Green"
         [route_id] -> route_id
       end
@@ -330,7 +330,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_stations_string = Util.format_name_list_to_string(informed_stations)
 
     location_text =
-      case LocalizedAlert.informed_subway_routes(t) do
+      case LocalizedAlert.consolidated_informed_subway_routes(t) do
         [route_id] ->
           "#{route_id} Line trains skip #{informed_stations_string}"
 
@@ -364,7 +364,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = Alert.informed_entities(alert)
 
     route_id =
-      case LocalizedAlert.informed_subway_routes(t) do
+      case LocalizedAlert.consolidated_informed_subway_routes(t) do
         ["Green" <> _] -> "Green"
         [route_id] -> route_id
       end
@@ -418,7 +418,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = Alert.informed_entities(alert)
 
     route_id =
-      case LocalizedAlert.informed_subway_routes(t) do
+      case LocalizedAlert.consolidated_informed_subway_routes(t) do
         ["Green" <> _] -> "Green"
         [route_id] -> route_id
       end
@@ -468,7 +468,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          :inside
        ) do
     %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
-    affected_routes = LocalizedAlert.informed_subway_routes(t)
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
     routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
 
     unaffected_routes =
@@ -533,7 +533,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     } = t
 
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
-    affected_routes = LocalizedAlert.informed_subway_routes(t)
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     duration_text =
       case delay_description do
@@ -619,7 +619,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :suspension}} = t, location) do
     %{alert: %{cause: cause, header: header}} = t
-    affected_routes = LocalizedAlert.informed_subway_routes(t)
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
       %{
@@ -656,7 +656,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :shuttle}} = t, location) do
     %{alert: %{cause: cause, header: header}} = t
-    affected_routes = LocalizedAlert.informed_subway_routes(t)
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
       %{
@@ -718,7 +718,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        )
        when severity >= 7 do
     %{alert: %{cause: cause, header: header}} = t
-    affected_routes = LocalizedAlert.informed_subway_routes(t)
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
       %{
@@ -771,7 +771,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        ) do
     %{alert: %{cause: cause, header: header}} = t
     informed_entities = Alert.informed_entities(alert)
-    affected_routes = LocalizedAlert.informed_subway_routes(t)
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
       %{
@@ -812,7 +812,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_outside_alert(%__MODULE__{alert: %Alert{effect: :shuttle} = alert} = t, location) do
     %{alert: %{cause: cause, header: header}} = t
     informed_entities = Alert.informed_entities(alert)
-    affected_routes = LocalizedAlert.informed_subway_routes(t)
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
       %{

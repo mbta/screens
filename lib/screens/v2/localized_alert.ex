@@ -209,8 +209,8 @@ defmodule Screens.V2.LocalizedAlert do
   Green Line route consolidation logic differs by screen type.
   Used to build route pills for GL e-ink and text for Pre-fare alerts.
   """
-  @spec informed_subway_routes(t()) :: list(String.t())
-  def informed_subway_routes(%{screen: %Screen{app_id: app_id}, alert: alert}) do
+  @spec consolidated_informed_subway_routes(t()) :: list(String.t())
+  def consolidated_informed_subway_routes(%{screen: %Screen{app_id: app_id}, alert: alert}) do
     alert
     |> Alert.informed_subway_routes()
     |> consolidate_gl(app_id)
