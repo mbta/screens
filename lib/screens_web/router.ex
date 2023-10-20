@@ -66,6 +66,9 @@ defmodule ScreensWeb.Router do
     get "/image_filenames", AdminApiController, :image_filenames
     post "/image", AdminApiController, :upload_image
     delete "/image/:filename", AdminApiController, :delete_image
+    get "/triptych_players", AdminApiController, :index_triptych_players
+    post "/triptych_players/validate", AdminApiController, :validate_triptych_players
+    post "/triptych_players/confirm", AdminApiController, :confirm_triptych_players
   end
 
   scope "/screen", ScreensWeb do

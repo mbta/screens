@@ -10,8 +10,11 @@ defmodule Screens.TriptychPlayer do
   """
 
   alias Screens.TriptychPlayer.State
+  alias Screens.TriptychPlayer.Validator
 
   defdelegate fetch_screen_id_for_player(player_name), to: State
 
   defdelegate fetch_player_names_for_screen_id(player_name), to: State
+
+  defdelegate validate(mapping), to: Validator
 end

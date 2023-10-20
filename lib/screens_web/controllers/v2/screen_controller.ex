@@ -143,10 +143,7 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   defp screen_ids(target_app_id, refresh_rate) do
-    ids =
-      for {screen_id, %Screen{app_id: ^target_app_id}} <- State.screens() do
-        screen_id
-      end
+    ids = State.screen_ids(&match?({_screen_id, %Screen{app_id: ^target_app_id}}, &1))
 
     ids
     |> Enum.sort(&id_sort_fn/2)

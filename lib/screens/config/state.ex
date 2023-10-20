@@ -60,15 +60,36 @@ defmodule Screens.Config.State do
   You may optionally supply a filter function, which will be used to filter the results.
   The filter function will be passed a tuple of {screen_id, screen_config} and should return true if that screen ID should be included in the results.
   """
+  @spec screen_ids(nil) :: list(Config.screen_id())
+  @spec screen_ids(({Config.screen_id(), Screen.t()} -> as_boolean(term()))) ::
+          list(Config.screen_id())
   def screen_ids(filter_fn \\ nil, pid \\ __MODULE__)
       when is_nil(filter_fn) or is_function(filter_fn, 1) do
     GenServer.call(pid, {:screen_ids, filter_fn})
   end
 
+  @doc """
+  Gets the full map of screen configurations.
+
+  👉 WARNING: This copies a large amount of data from the Screens.Config.State GenServer process to the process
+  that calls this function. This may be of concern for server performance.
+
+  Unless you really need to get the entire map, try to use one of the other client functions, or define a new one
+  that does a bit more work in the server process to limit the size of data sent back to the client process.
+  """
   def screens(pid \\ __MODULE__) do
     GenServer.call(pid, :screens)
   end
 
+  @doc """
+  Gets the entire config struct.
+
+  👉 WARNING: This copies a large amount of data from the Screens.Config.State GenServer process to the process
+  that calls this function. This may be of concern for server performance.
+
+  Unless you really need to get the entire config, try to use one of the other client functions, or define a new one
+  that does a bit more work in the server process to limit the size of data sent back to the client process.
+  """
   def config(pid \\ __MODULE__) do
     GenServer.call(pid, :config)
   end
