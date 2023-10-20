@@ -194,22 +194,6 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     try_omit(builder, gap_indices(builder), target_gap_stops)
   end
 
-  # Returns a sorted vector containing indices of stops that can't be omitted from the closure region.
-  defp get_important_indices(builder) do
-    closure_first..closure_last//1 = closure = closure_indices(builder)
-
-    [
-      closure_first,
-      closure_last,
-      builder.metadata.home_stop in closure and builder.metadata.home_stop,
-      builder.metadata.effect == :station_closure and disrupted_stop_indices(builder)
-    ]
-    |> Enum.filter(& &1)
-    |> List.flatten()
-    |> Enum.sort()
-    |> Vector.new()
-  end
-
   @doc """
   Moves `num_to_add` stops back from the left/right end groups to the main sequence,
   effectively "padding" the diagram with stops that otherwise would have been
@@ -631,6 +615,22 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     else
       try_alternate_omit(builder, omitted_indices, important_indices)
     end
+  end
+
+  # Returns a sorted vector containing indices of stops that can't be omitted from the closure region.
+  defp get_important_indices(builder) do
+    closure_first..closure_last//1 = closure = closure_indices(builder)
+
+    [
+      closure_first,
+      closure_last,
+      builder.metadata.home_stop in closure and builder.metadata.home_stop,
+      builder.metadata.effect == :station_closure and disrupted_stop_indices(builder)
+    ]
+    |> Enum.filter(& &1)
+    |> List.flatten()
+    |> Enum.sort()
+    |> Vector.new()
   end
 
   defp do_omit(builder, omitted_indices) do
