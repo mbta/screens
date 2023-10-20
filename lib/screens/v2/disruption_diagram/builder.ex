@@ -547,30 +547,35 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
       |> Map.from_struct()
       |> Map.drop([:home_stop, :first_disrupted_stop, :last_disrupted_stop])
 
-    new_metadata =
-      builder.sequence
-      |> Vector.with_index()
-      |> Vector.foldl(meta_without_indices, fn
-        {%StopSlot{} = stop_data, i}, meta ->
-          new_entries =
-            [
-              stop_data.disrupted? and [first_disrupted_stop: i, last_disrupted_stop: i],
-              stop_data.home_stop? and [home_stop: i]
-            ]
-            |> Enum.filter(& &1)
-            |> List.flatten()
-            |> Map.new()
+    indexed_sequence = Vector.with_index(builder.sequence)
 
-          Map.merge(meta, new_entries, fn
-            # This lets us set first_disrupted_stop only once.
-            :first_disrupted_stop, prev_value, _new_value -> prev_value
-            # The other entries get updated whenever there's a new value.
-            _k, _prev_value, new_value -> new_value
-          end)
-
-        {_other_slot, _index}, meta ->
-          meta
+    home_stop =
+      Aja.Enum.find_value(indexed_sequence, fn
+        {%StopSlot{home_stop?: true}, i} -> i
+        _ -> false
       end)
+
+    first_disrupted_stop =
+      Aja.Enum.find_value(indexed_sequence, fn
+        {%StopSlot{disrupted?: true}, i} -> i
+        _ -> false
+      end)
+
+    last_disrupted_stop =
+      indexed_sequence
+      |> Vector.reverse()
+      |> Aja.Enum.find_value(fn
+        {%StopSlot{disrupted?: true}, i} -> i
+        _ -> false
+      end)
+
+    new_metadata =
+      meta_without_indices
+      |> Map.merge(%{
+        home_stop: home_stop,
+        first_disrupted_stop: first_disrupted_stop,
+        last_disrupted_stop: last_disrupted_stop
+      })
       |> then(&struct!(Metadata, &1))
 
     %{builder | metadata: new_metadata}
