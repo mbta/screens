@@ -10,7 +10,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.FreeTextLine
 
   require Logger
 
