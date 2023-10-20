@@ -10,13 +10,12 @@ defmodule Screens.V2.LocalizedAlert do
   alias Screens.RouteType
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
-  alias Screens.V2.WidgetInstance.{DupAlert, ElevatorStatus, ReconstructedAlert}
+  alias Screens.V2.WidgetInstance.{DupAlert, ReconstructedAlert}
 
   @type t ::
           AlertWidget.t()
           | DupAlert.t()
           | ReconstructedAlert.t()
-          | ElevatorStatus.t()
           | %{
               optional(:screen) => Screen.t(),
               alert: Alert.t(),
@@ -47,6 +46,11 @@ defmodule Screens.V2.LocalizedAlert do
   See the `*_headsign_matchers` values in config.exs for examples.
   """
   @type headsign :: String.t() | {:adj, String.t()}
+
+  defguard is_localized_alert(value)
+           when is_map(value) and
+                  is_struct(value.alert, Alert) and
+                  is_struct(value.location_context, LocationContext)
 
   @doc """
   Determines the headsign of the affected direction of an alert using
@@ -202,18 +206,13 @@ defmodule Screens.V2.LocalizedAlert do
 
   @doc """
   Returns all routes affected by an alert.
-  Used to build route pills for GL e-ink and text for Pre-fare alerts
+  Green Line route consolidation logic differs by screen type.
+  Used to build route pills for GL e-ink and text for Pre-fare alerts.
   """
-  @spec informed_subway_routes(t()) :: list(String.t())
-  def informed_subway_routes(%{screen: %Screen{app_id: app_id}, alert: alert}) do
+  @spec consolidated_informed_subway_routes(t()) :: list(String.t())
+  def consolidated_informed_subway_routes(%{screen: %Screen{app_id: app_id}, alert: alert}) do
     alert
-    |> Alert.informed_entities()
-    |> Enum.map(fn %{route: route} -> route end)
-    # If the alert impacts CR or other lines, weed that out
-    |> Enum.filter(fn e ->
-      Enum.member?(["Red", "Orange", "Green", "Blue"] ++ @green_line_branches, e)
-    end)
-    |> Enum.uniq()
+    |> Alert.informed_subway_routes()
     |> consolidate_gl(app_id)
   end
 

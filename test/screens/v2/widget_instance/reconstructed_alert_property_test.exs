@@ -1169,8 +1169,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
           fetch_location_context_fn
         )
 
+      # We can't build disruption diagrams for some of these alert scenarios.
+      # Prevent `ReconstructedAlert.serialize` from filling the console with log noise when this happens.
+      fake_log = fn _message -> nil end
+
       Enum.each(alert_widgets, fn widget ->
-        assert %{issue: _, location: _} = ReconstructedAlert.serialize(widget)
+        assert %{issue: _, location: _} = ReconstructedAlert.serialize(widget, fake_log)
       end)
     end
   end

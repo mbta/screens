@@ -22,7 +22,9 @@ defmodule Screens.LocationContext do
           tagged_stop_sequences: %{Route.id() => list(list(Stop.id()))},
           upstream_stops: MapSet.t(Stop.id()),
           downstream_stops: MapSet.t(Stop.id()),
+          # Routes serving this stop
           routes: list(%{route_id: Route.id(), active?: boolean()}),
+          # Route types we care about for the alerts of this screen type / place
           alert_route_types: list(RouteType.t())
         }
 
