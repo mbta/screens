@@ -51,11 +51,13 @@ defmodule Screens.Vehicles.Parser do
 
   defp parse_car_crowding(%{
          "label" => car_number,
-         "occupancy_status" => occupancy_status
+         "occupancy_status" => occupancy_status,
+         "occupancy_percentage" => occupancy_percentage
        }),
        do: %Screens.Vehicles.Carriage{
          car_number: car_number,
-         occupancy_status: parse_occupancy_status(occupancy_status)
+         occupancy_status: parse_occupancy_status(occupancy_status),
+         occupancy_percentage: occupancy_percentage
        }
 
   defp trip_id_from_trip_data(%{"data" => %{"id" => trip_id}}), do: trip_id
