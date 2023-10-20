@@ -44,7 +44,7 @@ defmodule Screens.OlCrowding.LogCrowdingInfo do
       Enum.map_join(
         prediction.vehicle.carriages,
         ",",
-        &Util.translate_carriage_occupancy_status(&1.occupancy_status)
+        &Util.translate_carriage_occupancy_status(&1.occupancy_status, &1.occupancy_percentage)
       )
 
     cond do

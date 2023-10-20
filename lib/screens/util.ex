@@ -210,14 +210,21 @@ defmodule Screens.Util do
     Date.add(get_service_date_today(now), 1)
   end
 
-  def translate_carriage_occupancy_status(:no_data_available), do: :no_data
-  def translate_carriage_occupancy_status(:many_seats_available), do: :not_crowded
-  def translate_carriage_occupancy_status(:few_seats_available), do: :not_crowded
-  def translate_carriage_occupancy_status(:standing_room_only), do: :some_crowding
-  def translate_carriage_occupancy_status(:crushed_standing_room_only), do: :crowded
-  def translate_carriage_occupancy_status(:full), do: :crowded
-  def translate_carriage_occupancy_status(:not_accepting_passengers), do: :closed
-  def translate_carriage_occupancy_status(_), do: nil
+  def translate_carriage_occupancy_status(:no_data_available, _), do: :no_data
+  def translate_carriage_occupancy_status(:not_accepting_passengers, _), do: :closed
+
+  def translate_carriage_occupancy_status(_, occupancy_percentage)
+      when occupancy_percentage <= 12,
+      do: :not_crowded
+
+  def translate_carriage_occupancy_status(_, occupancy_percentage)
+      when occupancy_percentage <= 40,
+      do: :some_crowding
+
+  def translate_carriage_occupancy_status(_, occupancy_percentage) when occupancy_percentage > 40,
+    do: :crowded
+
+  def translate_carriage_occupancy_status(_, _), do: nil
 
   @doc """
     Adds a timeout to a function. Mainly used for child processes of a Task.Supervisor
