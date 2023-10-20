@@ -62,7 +62,7 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
     do:
       Enum.map(
         carriages,
-        &Util.translate_carriage_occupancy_status(&1.occupancy_status, &1.occupancy_percentage)
+        &Util.translate_carriage_occupancy_status/1
       )
 
   def priority(_instance), do: [1]
