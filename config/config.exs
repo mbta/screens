@@ -12,7 +12,8 @@ config :screens, ScreensWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "0XmZH5iePmWrvV+PgrsU5z6WFgYupY2Zoh7FEk8pzuDLWftBrF/KtLBbG615wstt",
   render_errors: [view: ScreensWeb.ErrorView, accepts: ~w(html json)],
-  pubsub_server: ScreensWeb.PubSub
+  pubsub_server: ScreensWeb.PubSub,
+  live_view: [signing_salt: "cK5v02Jnzmp4C8NjV0wwpD2IdTaZdMvi"]
 
 # Include 2 logger backends
 config :logger,
@@ -71,6 +72,8 @@ config :screens,
   audio_psa_s3_directory: "/screens/audio_assets/psa/",
   signs_ui_s3_path: "config.json",
   signs_ui_config_fetcher: Screens.SignsUiConfig.State.S3Fetch,
+  triptych_player_s3_bucket: "mbta-ctd-config",
+  triptych_player_fetcher: Screens.TriptychPlayer.State.S3Fetch,
   last_deploy_fetcher: Screens.Util.LastDeploy.S3Fetch,
   default_api_v3_url: "https://api-v3.mbta.com/",
   blue_bikes_api_client: Screens.BlueBikes.Client,

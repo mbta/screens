@@ -2,8 +2,8 @@ defmodule Screens.Config.State do
   @moduledoc false
 
   alias Screens.Config
-  alias Screens.Config.{Devops, Screen}
   alias Screens.ConfigCache.State.Fetch
+  alias ScreensConfig.{Devops, Screen}
 
   @config_fetcher Application.compile_env(:screens, :config_fetcher)
   @last_deploy_fetcher Application.compile_env(:screens, :last_deploy_fetcher)
@@ -54,18 +54,44 @@ defmodule Screens.Config.State do
     GenServer.call(pid, {:app_params, screen_id})
   end
 
+  @doc """
+  Returns a list of all screen IDs, or those that satisfy a filter.
+
+  You may optionally supply a filter function, which will be used to filter the results.
+  The filter function will be passed a tuple of {screen_id, screen_config} and should return true if that screen ID should be included in the results.
+  """
+  @spec screen_ids(nil) :: list(Config.screen_id())
+  @spec screen_ids(({Config.screen_id(), Screen.t()} -> as_boolean(term()))) ::
+          list(Config.screen_id())
+  def screen_ids(filter_fn \\ nil, pid \\ __MODULE__)
+      when is_nil(filter_fn) or is_function(filter_fn, 1) do
+    GenServer.call(pid, {:screen_ids, filter_fn})
+  end
+
+  @doc """
+  Gets the full map of screen configurations.
+
+  👉 WARNING: This copies a large amount of data from the Screens.Config.State GenServer process to the process
+  that calls this function. This may be of concern for server performance.
+
+  Unless you really need to get the entire map, try to use one of the other client functions, or define a new one
+  that does a bit more work in the server process to limit the size of data sent back to the client process.
+  """
   def screens(pid \\ __MODULE__) do
     GenServer.call(pid, :screens)
   end
 
+  @doc """
+  Gets the entire config struct.
+
+  👉 WARNING: This copies a large amount of data from the Screens.Config.State GenServer process to the process
+  that calls this function. This may be of concern for server performance.
+
+  Unless you really need to get the entire config, try to use one of the other client functions, or define a new one
+  that does a bit more work in the server process to limit the size of data sent back to the client process.
+  """
   def config(pid \\ __MODULE__) do
     GenServer.call(pid, :config)
-  end
-
-  @spec v2_screens_visible_to_screenplay(GenServer.server()) ::
-          list(screen_id :: String.t()) | :error
-  def v2_screens_visible_to_screenplay(pid \\ __MODULE__) do
-    GenServer.call(pid, :v2_screens_visible_to_screenplay)
   end
 
   def mode_disabled?(pid \\ __MODULE__, mode) do
@@ -169,20 +195,23 @@ defmodule Screens.Config.State do
     {:reply, app_params, state}
   end
 
+  def handle_call({:screen_ids, nil}, _from, %__MODULE__{config: config} = state) do
+    {:reply, Map.keys(config.screens), state}
+  end
+
+  def handle_call({:screen_ids, filter_fn}, _from, %__MODULE__{config: config} = state) do
+    ids =
+      config.screens
+      |> Enum.filter(filter_fn)
+      |> Enum.map(fn {screen_id, _screen_config} -> screen_id end)
+
+    {:reply, ids, state}
+  end
+
   def handle_call({:mode_disabled?, mode}, _from, %__MODULE__{config: config} = state) do
     %Devops{disabled_modes: disabled_modes} = config.devops
 
     {:reply, Enum.member?(disabled_modes, mode), state}
-  end
-
-  def handle_call(:v2_screens_visible_to_screenplay, _from, %__MODULE__{config: config} = state) do
-    screen_ids =
-      config.screens
-      |> Stream.reject(fn {_screen_id, screen_config} -> screen_config.hidden_from_screenplay end)
-      |> Stream.filter(fn {_screen_id, screen_config} -> Screen.v2_screen?(screen_config) end)
-      |> Enum.map(fn {screen_id, _screen_config} -> screen_id end)
-
-    {:reply, screen_ids, state}
   end
 
   # If we're in an error state, all queries on the state get an :error response

@@ -1,9 +1,6 @@
 defmodule Screens.V2.CandidateGenerator.BusShelter do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusShelter, Footer, Survey}
-  alias Screens.Config.V2.Header.{CurrentStopId, CurrentStopName}
   alias Screens.Stops.Stop
   alias Screens.Util.Assets
   alias Screens.V2.CandidateGenerator
@@ -11,6 +8,9 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader}
   alias Screens.V2.WidgetInstance.Survey, as: SurveyInstance
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{BusShelter, Footer, Survey}
+  alias ScreensConfig.V2.Header.{CurrentStopId, CurrentStopName}
 
   @behaviour CandidateGenerator
 
@@ -47,6 +47,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   # credo:disable-for-next-line Credo.Check.Design.DuplicatedCode
   def candidate_instances(
         config,
+        _opts,
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/1,

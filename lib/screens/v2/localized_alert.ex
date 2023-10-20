@@ -4,13 +4,13 @@ defmodule Screens.V2.LocalizedAlert do
   """
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
   alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.{DupAlert, ReconstructedAlert}
+  alias ScreensConfig.Screen
 
   @type t ::
           AlertWidget.t()

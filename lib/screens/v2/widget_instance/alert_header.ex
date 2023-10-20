@@ -15,7 +15,7 @@ defmodule Screens.V2.WidgetInstance.AlertHeader do
   @type accent :: :x | :hatched | :chevron
 
   @type t :: %__MODULE__{
-          screen: Screens.Config.Screen.t(),
+          screen: ScreensConfig.Screen.t(),
           text: String.t(),
           icon: icon,
           color: color,

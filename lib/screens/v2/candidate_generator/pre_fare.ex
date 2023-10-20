@@ -1,9 +1,6 @@
 defmodule Screens.V2.CandidateGenerator.PreFare do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.CurrentStopId
-  alias Screens.Config.V2.{PreFare, ShuttleBusInfo}
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
@@ -12,6 +9,9 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
   alias Screens.V2.WidgetInstance.NormalHeader
   alias Screens.V2.WidgetInstance.ShuttleBusInfo, as: ShuttleBusInfoWidget
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Header.CurrentStopId
+  alias ScreensConfig.V2.{PreFare, ShuttleBusInfo}
 
   @behaviour CandidateGenerator
 
@@ -64,6 +64,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   # credo:disable-for-next-line
   def candidate_instances(
         config,
+        _opts,
         now \\ DateTime.utc_now(),
         subway_status_instance_fn \\ &Widgets.SubwayStatus.subway_status_instances/2,
         reconstructed_alert_instances_fn \\ &Widgets.ReconstructedAlert.reconstructed_alert_instances/1,

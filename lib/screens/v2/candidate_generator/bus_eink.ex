@@ -1,14 +1,14 @@
 defmodule Screens.V2.CandidateGenerator.BusEink do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusEink, Footer}
-  alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{BottomScreenFiller, FareInfoFooter, NormalHeader}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{BusEink, Footer}
+  alias ScreensConfig.V2.Header.CurrentStopId
 
   @behaviour CandidateGenerator
 
@@ -44,6 +44,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
   # credo:disable-for-next-line Credo.Check.Design.DuplicatedCode
   def candidate_instances(
         config,
+        _opts,
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/1,

@@ -180,6 +180,8 @@ defmodule Screens.Util do
 
   def outdated?("DUP-" <> _, _), do: false
 
+  def outdated?("TRI-" <> _, _), do: false
+
   def outdated?(screen_id, client_refresh_timestamp) do
     {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
     refresh_if_loaded_before_time = State.refresh_if_loaded_before(screen_id)
@@ -219,5 +221,26 @@ defmodule Screens.Util do
   @spec get_service_date_tomorrow(DateTime.t()) :: Date.t()
   def get_service_date_tomorrow(now) do
     Date.add(get_service_date_today(now), 1)
+  end
+
+  def translate_carriage_occupancy_status(:no_data_available), do: :no_data
+  def translate_carriage_occupancy_status(:many_seats_available), do: :not_crowded
+  def translate_carriage_occupancy_status(:few_seats_available), do: :not_crowded
+  def translate_carriage_occupancy_status(:standing_room_only), do: :some_crowding
+  def translate_carriage_occupancy_status(:crushed_standing_room_only), do: :crowded
+  def translate_carriage_occupancy_status(:full), do: :crowded
+  def translate_carriage_occupancy_status(:not_accepting_passengers), do: :closed
+  def translate_carriage_occupancy_status(_), do: nil
+
+  @doc """
+    Adds a timeout to a function. Mainly used for child processes of a Task.Supervisor
+    which don't come with a timeout by default.
+  """
+  @spec fn_with_timeout((() -> val), non_neg_integer()) :: (() -> val) when val: any()
+  def fn_with_timeout(fun, timeout) do
+    fn ->
+      _ = :timer.exit_after(timeout, :kill)
+      fun.()
+    end
   end
 end

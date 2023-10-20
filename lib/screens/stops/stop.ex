@@ -10,7 +10,6 @@ defmodule Screens.Stops.Stop do
 
   require Logger
 
-  alias Screens.Config.V2.{BusEink, BusShelter, Dup, GlEink, PreFare}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes
@@ -19,6 +18,7 @@ defmodule Screens.Stops.Stop do
   alias Screens.Stops.StationsWithRoutesAgent
   alias Screens.Util
   alias Screens.V3Api
+  alias ScreensConfig.V2.{BusEink, BusShelter, Dup, GlEink, PreFare, Triptych}
 
   defstruct id: nil,
             name: nil,
@@ -32,7 +32,7 @@ defmodule Screens.Stops.Stop do
           platform_code: String.t() | nil
         }
 
-  @type screen_type :: BusEink | BusShelter | GlEink | PreFare | Dup
+  @type screen_type :: BusEink | BusShelter | GlEink | PreFare | Dup | Triptych
 
   @blue_line_stops [
     {"place-wondl", {"Wonderland", "Wonderland"}},
@@ -382,6 +382,17 @@ defmodule Screens.Stops.Stop do
     end
   end
 
+  def fetch_parent_stop_id(stop_id) do
+    case Screens.V3Api.get_json("stops/" <> stop_id, %{"include" => "parent_station"}) do
+      {:ok, %{"included" => [included_data]}} ->
+        %{"id" => parent_station_id} = included_data
+        parent_station_id
+
+      _ ->
+        nil
+    end
+  end
+
   # --- END API functions ---
 
   def stop_on_route?(stop_id, stop_sequence) when not is_nil(stop_id) do
@@ -499,6 +510,7 @@ defmodule Screens.Stops.Stop do
   # Ashmont should not show Mattapan alerts for PreFare or Dup
   def get_route_type_filter(app, "place-asmnl") when app in [PreFare, Dup], do: [:subway]
   def get_route_type_filter(PreFare, _), do: [:light_rail, :subway]
+  def get_route_type_filter(Triptych, _), do: [:light_rail, :subway]
   # WTC is a special bus-only case
   def get_route_type_filter(Dup, "place-wtcst"), do: [:bus]
   def get_route_type_filter(Dup, _), do: [:light_rail, :subway]
@@ -527,7 +539,7 @@ defmodule Screens.Stops.Stop do
   end
 
   defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)
-       when app in [Dup] do
+       when app in [Dup, Triptych] do
     route_ids = Route.route_ids(routes_at_stop)
     RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids, false)
   end

@@ -2,12 +2,13 @@ defmodule Screens.BusScreenData do
   @moduledoc false
 
   alias Screens.Alerts.Alert
+  alias Screens.Config.State
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
   alias Screens.NearbyConnections
   alias Screens.Schedules.Schedule
-  alias Screens.Config.{Bus, State}
   alias Screens.Util
+  alias ScreensConfig.Bus
 
   def by_screen_id(screen_id, is_screen, now \\ DateTime.utc_now()) do
     if State.mode_disabled?(:bus) do

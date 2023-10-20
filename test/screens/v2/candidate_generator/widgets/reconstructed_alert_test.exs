@@ -4,9 +4,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
   import Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.CurrentStopId
-  alias Screens.Config.V2.{PreFare, Solari}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Header.CurrentStopId
+  alias ScreensConfig.V2.{PreFare, Solari}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop

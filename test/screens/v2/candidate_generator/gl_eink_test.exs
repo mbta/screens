@@ -1,7 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.GlEinkTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config.{Screen, V2}
+  alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.GlEink
   alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader}
 
@@ -44,7 +44,7 @@ defmodule Screens.V2.CandidateGenerator.GlEinkTest do
                        :footer
                      ],
                      top_takeover: [
-                       :full_main_content,
+                       :full_body_top_screen,
                        {{0, :flex_zone}, %{one_medium: [{0, :medium}]}},
                        {{1, :flex_zone}, %{one_medium: [{1, :medium}]}},
                        :footer

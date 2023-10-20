@@ -2,8 +2,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.V2.FreeTextLine
-  alias Screens.Config.Screen
+  alias ScreensConfig.V2.FreeTextLine
+  alias ScreensConfig.Screen
   alias Screens.Departures.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route

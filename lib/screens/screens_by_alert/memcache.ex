@@ -27,6 +27,7 @@ defmodule Screens.ScreensByAlert.Memcache do
   ```
   """
   alias Screens.ScreensByAlert.Memcache.TaskSupervisor
+  alias Screens.Util
 
   require Logger
 
@@ -56,10 +57,16 @@ defmodule Screens.ScreensByAlert.Memcache do
 
     # To avoid bottlenecks and unnecessarily blocking the caller, run in a separate task process
     _ =
-      Task.Supervisor.start_child(TaskSupervisor, fn ->
-        update_screens_last_updated_key(screen_id, now)
-        Enum.each(alert_ids, &update_alert_key(&1, screen_id, now))
-      end)
+      Task.Supervisor.start_child(
+        TaskSupervisor,
+        Util.fn_with_timeout(
+          fn ->
+            update_screens_last_updated_key(screen_id, now)
+            Enum.each(alert_ids, &update_alert_key(&1, screen_id, now))
+          end,
+          10_000
+        )
+      )
 
     :ok
   end

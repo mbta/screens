@@ -138,7 +138,7 @@ const configToData = (config) => {
   return _.chain(config.screens)
     .toPairs()
     .map(([screenId, screenData]) => ({ ...screenData, id: screenId }))
-    .sortBy((screenData) => parseInt(screenData.id, 10))
+    .sortBy((screenData) => screenData.id)
     .value();
 };
 

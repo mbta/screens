@@ -4,8 +4,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
   import Screens.V2.CandidateGenerator.Widgets.Alerts
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{Alerts, BusShelter, Solari}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{Alerts, BusShelter, Solari}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop

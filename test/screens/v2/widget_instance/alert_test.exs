@@ -2,8 +2,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusEink, BusShelter, GlEink}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{BusEink, BusShelter, GlEink}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
