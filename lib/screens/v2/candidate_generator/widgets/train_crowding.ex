@@ -174,8 +174,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
     cond do
       cached_prediction != nil ->
+        # Time-based heuristic
+        # We think the train is about to leave the previous station. Log the heuristic.
+        _ = check_time_based_heuristic(cached_prediction, common_params)
+
+        # Consecutive crowding class heuristic.
+        # Crowding class this fetch is the same as last. Log the heuristic.
         _ =
-          pick_heuristic(
+          check_consecutive_crowding_heuristic(
             next_train_prediction,
             relevant_platform_id,
             cached_prediction,
@@ -231,56 +237,57 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
     List.first(predictions)
   end
 
-  defp pick_heuristic(
-         next_train_prediction,
-         relevant_platform_id,
+  defp check_time_based_heuristic(
          cached_prediction,
          common_params
        ) do
     show_widget_after_dt = DateTime.add(cached_prediction.departure_time, -10)
 
-    cond do
-      # Dwell time heuristic
-      # We think the train is about to leave the previous station. Log the heuristic.
-      DateTime.compare(
-        common_params.now,
-        show_widget_after_dt
-      ) in [
-        :eq,
-        :gt
-      ] ->
-        log_crowding_info(
-          :dwell,
-          common_params
-        )
+    if DateTime.compare(
+         common_params.now,
+         show_widget_after_dt
+       ) in [
+         :eq,
+         :gt
+       ] do
+      log_crowding_info(
+        :dwell,
+        common_params
+      )
+    end
+  end
 
-      # Consecutive crowding class heuristic.
-      # Crowding class this fetch is the same as last. Log the heuristic.
-      next_train_prediction.vehicle.carriages == cached_prediction.vehicle.carriages ->
-        log_crowding_info(
-          :consecutive_crowding,
-          common_params
-        )
-
+  defp check_consecutive_crowding_heuristic(
+         next_train_prediction,
+         relevant_platform_id,
+         cached_prediction,
+         common_params
+       ) do
+    if next_train_prediction.vehicle.carriages ==
+         cached_prediction.vehicle.carriages do
+      log_crowding_info(
+        :consecutive_crowding,
+        common_params
+      )
+    else
       # Update the cached prediction so we can check the new crowding classes next fetch.
       # The departure time we use in the other heuristic should not change, and if it does it is changing to a more accurate time.
       # If the prediction is nil, leave the existing one alone just in case the dwell time heuristic can log next refresh.
-      true ->
-        previous_station_prediction_current_trip =
-          fetch_previous_station_prediction(
-            common_params.train_crowding_config,
-            relevant_platform_id,
-            next_train_prediction.trip.id,
-            common_params.fetch_predictions_fn
-          )
+      previous_station_prediction_current_trip =
+        fetch_previous_station_prediction(
+          common_params.train_crowding_config,
+          relevant_platform_id,
+          next_train_prediction.trip.id,
+          common_params.fetch_predictions_fn
+        )
 
-        if previous_station_prediction_current_trip != nil do
-          Agent.put(
-            common_params.train_crowding_config.station_id,
-            common_params.train_crowding_config.direction_id,
-            previous_station_prediction_current_trip
-          )
-        end
+      if previous_station_prediction_current_trip != nil do
+        Agent.put(
+          common_params.train_crowding_config.station_id,
+          common_params.train_crowding_config.direction_id,
+          previous_station_prediction_current_trip
+        )
+      end
     end
   end
 
