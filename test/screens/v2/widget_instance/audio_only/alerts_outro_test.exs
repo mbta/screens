@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsOutroTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureLog
 
-  alias Screens.Config.Screen
+  alias ScreensConfig.Screen
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.AlertsOutro
   alias Screens.V2.WidgetInstance.{MockWidget, SubwayStatus, ReconstructedAlert}

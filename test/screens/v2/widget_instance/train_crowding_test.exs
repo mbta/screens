@@ -11,10 +11,10 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
 
   setup do
     config =
-      struct(Screens.Config.Screen, %{
+      struct(ScreensConfig.Screen, %{
         app_params:
-          struct(Screens.Config.V2.Triptych, %{
-            train_crowding: %Screens.Config.V2.TrainCrowding{
+          struct(ScreensConfig.V2.Triptych, %{
+            train_crowding: %ScreensConfig.V2.TrainCrowding{
               station_id: "place-masta",
               direction_id: 1,
               platform_position: 3,
@@ -34,12 +34,32 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
             stop_id: "10001",
             current_status: :incoming_at,
             carriages: [
-              %Carriage{car_number: "1", occupancy_status: :crushed_standing_room_only},
-              %Carriage{car_number: "2", occupancy_status: :few_seats_available},
-              %Carriage{car_number: "3", occupancy_status: :standing_room_only},
-              %Carriage{car_number: "4", occupancy_status: :many_seats_available},
-              %Carriage{car_number: "5", occupancy_status: :full},
-              %Carriage{car_number: "6", occupancy_status: :not_accepting_passengers}
+              %Carriage{
+                car_number: "1",
+                occupancy_status: :crushed_standing_room_only,
+                occupancy_percentage: 45
+              },
+              %Carriage{
+                car_number: "2",
+                occupancy_status: :few_seats_available,
+                occupancy_percentage: 5
+              },
+              %Carriage{
+                car_number: "3",
+                occupancy_status: :standing_room_only,
+                occupancy_percentage: 20
+              },
+              %Carriage{
+                car_number: "4",
+                occupancy_status: :many_seats_available,
+                occupancy_percentage: 5
+              },
+              %Carriage{car_number: "5", occupancy_status: :full, occupancy_percentage: 45},
+              %Carriage{
+                car_number: "6",
+                occupancy_status: :not_accepting_passengers,
+                occupancy_percentage: -1
+              }
             ]
           })
       })
@@ -70,12 +90,32 @@ defmodule Screens.V2.WidgetInstance.TrainCrowdingTest do
     test "serializes data, last crowding level (no_data)", %{widget: widget} do
       widget =
         put_crowding_levels(widget, [
-          %Carriage{car_number: "1", occupancy_status: :no_data_available},
-          %Carriage{car_number: "2", occupancy_status: :no_data_available},
-          %Carriage{car_number: "3", occupancy_status: :standing_room_only},
-          %Carriage{car_number: "4", occupancy_status: :many_seats_available},
-          %Carriage{car_number: "5", occupancy_status: :full},
-          %Carriage{car_number: "6", occupancy_status: :not_accepting_passengers}
+          %Carriage{
+            car_number: "1",
+            occupancy_status: :no_data_available,
+            occupancy_percentage: -1
+          },
+          %Carriage{
+            car_number: "2",
+            occupancy_status: :no_data_available,
+            occupancy_percentage: -1
+          },
+          %Carriage{
+            car_number: "3",
+            occupancy_status: :standing_room_only,
+            occupancy_percentage: 25
+          },
+          %Carriage{
+            car_number: "4",
+            occupancy_status: :many_seats_available,
+            occupancy_percentage: 5
+          },
+          %Carriage{car_number: "5", occupancy_status: :full, occupancy_percentage: 45},
+          %Carriage{
+            car_number: "6",
+            occupancy_status: :not_accepting_passengers,
+            occupancy_percentage: -1
+          }
         ])
 
       expected = %{

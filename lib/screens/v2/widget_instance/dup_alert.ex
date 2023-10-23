@@ -4,10 +4,10 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   """
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
   alias Screens.LocationContext
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert.Serialize
+  alias ScreensConfig.Screen
 
   require Logger
 
@@ -85,7 +85,12 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   @spec valid_candidate?(t()) :: boolean()
   def valid_candidate?(%__MODULE__{} = t) do
-    alert_layout(t) != :no_render
+    # Suppress alerts 519314 and 529291, at all stations served by the Red Line.
+    suppressed =
+      t.alert.id in ["519314", "529291"] and
+        Enum.any?(t.location_context.routes, &(&1[:route_id] == "Red"))
+
+    not suppressed and alert_layout(t) != :no_render
   end
 
   # Inputs/output are stored as a table for readability.

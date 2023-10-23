@@ -3,9 +3,9 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsOutro do
   An audio-only widget that follows the section of the readout describing alerts.
   """
 
-  alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
+  alias ScreensConfig.Screen
 
   require Logger
 

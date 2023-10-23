@@ -3,10 +3,10 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   A widget that displays the crowding on a train that is en route to the current station.
   """
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Triptych
   alias Screens.Predictions.Prediction
   alias Screens.Util
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Triptych
 
   defstruct screen: nil,
             prediction: nil,
@@ -59,7 +59,11 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   defp serialize_carriages(nil), do: nil
 
   defp serialize_carriages(carriages),
-    do: Enum.map(carriages, &Util.translate_carriage_occupancy_status(&1.occupancy_status))
+    do:
+      Enum.map(
+        carriages,
+        &Util.translate_carriage_occupancy_status/1
+      )
 
   def priority(_instance), do: [1]
 

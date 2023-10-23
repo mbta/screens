@@ -1,7 +1,7 @@
 defmodule Screens.V2.WidgetInstance.FullLineMap do
   @moduledoc false
 
-  alias Screens.Config.Screen
+  alias ScreensConfig.Screen
 
   defstruct screen: nil,
             asset_urls: nil

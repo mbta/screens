@@ -1,13 +1,14 @@
 defmodule Screens.TriptychPlayer.State.S3Fetch do
   @moduledoc false
 
-  @behaviour Screens.ConfigCache.State.Fetch
-
   require Logger
 
-  @impl true
+  @behaviour Screens.ConfigCache.State.Fetch
+  @behaviour Screens.TriptychPlayer.State.Fetch
+
+  @impl Screens.ConfigCache.State.Fetch
   def fetch_config(current_version) do
-    with {:ok, body, new_version} <- get_from_s3(current_version),
+    with {:ok, body, new_version} <- get_config(current_version),
          {:ok, decoded} <- Jason.decode(body) do
       {:ok, decoded, new_version}
     else
@@ -16,9 +17,10 @@ defmodule Screens.TriptychPlayer.State.S3Fetch do
     end
   end
 
-  def get_from_s3(current_version \\ nil) do
+  @impl Screens.TriptychPlayer.State.Fetch
+  def get_config(current_version \\ nil) do
     bucket = Application.get_env(:screens, :triptych_player_s3_bucket)
-    path = path_for_environment()
+    path = config_path_for_environment()
 
     opts =
       case current_version do
@@ -46,7 +48,19 @@ defmodule Screens.TriptychPlayer.State.S3Fetch do
     end
   end
 
-  defp path_for_environment do
+  @impl Screens.TriptychPlayer.State.Fetch
+  def put_config(contents) do
+    bucket = Application.get_env(:screens, :triptych_player_s3_bucket)
+    path = config_path_for_environment()
+    put_operation = ExAws.S3.put_object(bucket, path, contents)
+
+    case ExAws.request(put_operation) do
+      {:ok, %{status_code: 200}} -> :ok
+      _ -> :error
+    end
+  end
+
+  defp config_path_for_environment do
     "screens-" <> env = Application.get_env(:screens, :environment_name, "screens-prod")
     "screens/triptych-player-#{env}.json"
   end

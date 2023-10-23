@@ -1,8 +1,9 @@
 defmodule ScreensWeb.V2.ScreenController do
   use ScreensWeb, :controller
   require Logger
-  alias Screens.Config.{Screen, State}
+  alias Screens.Config.State
   alias Screens.V2.ScreenData.Parameters
+  alias ScreensConfig.Screen
 
   @default_app_id :bus_eink
   @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 dup_v2 gl_eink_v2 solari_v2 solari_large_v2 pre_fare_v2 triptych_v2]a
@@ -142,10 +143,7 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   defp screen_ids(target_app_id, refresh_rate) do
-    ids =
-      for {screen_id, %Screen{app_id: ^target_app_id}} <- State.screens() do
-        screen_id
-      end
+    ids = State.screen_ids(&match?({_screen_id, %Screen{app_id: ^target_app_id}}, &1))
 
     ids
     |> Enum.sort(&id_sort_fn/2)

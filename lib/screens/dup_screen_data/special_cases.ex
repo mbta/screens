@@ -1,14 +1,14 @@
 defmodule Screens.DupScreenData.SpecialCases do
   @moduledoc false
 
-  alias Screens.Config.Dup
+  alias ScreensConfig.Dup
 
-  alias Screens.Config.Dup.Override.{
+  alias ScreensConfig.Dup.Override.{
     PartialAlert,
     PartialAlertList
   }
 
-  alias Screens.Config.V2.FreeTextLine
+  alias ScreensConfig.V2.FreeTextLine
 
   alias Screens.DupScreenData.{Data, Request}
 

@@ -4,14 +4,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   require Logger
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{TrainCrowding, Triptych}
   alias Screens.OlCrowding.Agent
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.TrainCrowding, as: CrowdingWidget
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{TrainCrowding, Triptych}
 
   # {parent_station_id, {sb_platform_id, nb_platform_id}}
   @ol_station_to_platform_map [
@@ -317,7 +317,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       Enum.map_join(
         prediction.vehicle.carriages,
         ",",
-        &Util.translate_carriage_occupancy_status(&1.occupancy_status)
+        &Util.translate_carriage_occupancy_status/1
       )
 
     Logger.info(

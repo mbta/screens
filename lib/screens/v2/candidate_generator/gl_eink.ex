@@ -1,16 +1,16 @@
 defmodule Screens.V2.CandidateGenerator.GlEink do
   @moduledoc false
 
-  alias Screens.Config.V2.Departures
-  alias Screens.Config.V2.Departures.{Query, Section}
-  alias Screens.Config.V2.Departures.Query.Params
-  alias Screens.Config.V2.FreeTextLine
-  alias Screens.Config.{Screen, V2}
-  alias Screens.Config.V2.{Footer, GlEink, Header}
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
+  alias ScreensConfig.V2.Departures
+  alias ScreensConfig.V2.Departures.{Query, Section}
+  alias ScreensConfig.V2.Departures.Query.Params
+  alias ScreensConfig.V2.FreeTextLine
+  alias ScreensConfig.{Screen, V2}
+  alias ScreensConfig.V2.{Footer, GlEink, Header}
 
   alias Screens.V2.WidgetInstance.{
     BottomScreenFiller,
@@ -42,7 +42,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
             # slot to its left, while still allowing the normal flex zone
             # to appear on the bottom screen.
             top_takeover: [
-              :full_main_content,
+              :full_body_top_screen,
               Builder.with_paging({:flex_zone, %{one_medium: [:medium]}}, 2),
               :footer
             ],
