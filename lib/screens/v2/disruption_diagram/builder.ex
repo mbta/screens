@@ -784,7 +784,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   defp find_safe_segment(original_omission, important_indices, :left, offset) do
     _l..r//1 = original_omission
 
-    tl..tr//1 = tentative_omission = Range.shift(original_omission, -offset)
+    tl..tr//1 = tentative_omission = shift_range(original_omission, -offset)
 
     if tl <= Vector.first(important_indices) or tr >= Vector.last(important_indices) do
       :error
@@ -808,7 +808,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   defp find_safe_segment(original_omission, important_indices, :right, offset) do
     l.._r//1 = original_omission
 
-    tl..tr//1 = tentative_omission = Range.shift(original_omission, offset)
+    tl..tr//1 = tentative_omission = shift_range(original_omission, offset)
 
     if tl <= Vector.first(important_indices) or tr >= Vector.last(important_indices) do
       :error
@@ -996,4 +996,12 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   # When we upgrade to Elixir 1.14, this can be replaced with just `..`.
   # https://hexdocs.pm/elixir/Kernel.html#../0
   defp empty_range, do: 0..-1//1
+
+  # Shifts a range by the given number of steps.
+  # When we upgrade to Elixir 1.14, this can be replaced with `Range.shift/2`.
+  def shift_range(first..last//step, steps_to_shift)
+      when is_integer(first) and is_integer(last) and is_integer(step) and
+             is_integer(steps_to_shift) do
+    Range.new(first + steps_to_shift * step, last + steps_to_shift * step, step)
+  end
 end
