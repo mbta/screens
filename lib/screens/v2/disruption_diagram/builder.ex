@@ -710,11 +710,11 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
       |> Enum.sort_by(&Range.size/1, :desc)
       |> Enum.split_with(&(center(&1) <= center_index))
 
-    left1 = Enum.at(left_segments, 0, ..)
-    left2 = Enum.at(left_segments, 1, ..)
+    left1 = Enum.at(left_segments, 0, empty_range())
+    left2 = Enum.at(left_segments, 1, empty_range())
 
-    right1 = Enum.at(right_segments, 0, ..)
-    right2 = Enum.at(right_segments, 1, ..)
+    right1 = Enum.at(right_segments, 0, empty_range())
+    right2 = Enum.at(right_segments, 1, empty_range())
 
     # First, try to omit from either side of the center.
     # If that's not possible, try omitting in two different places to one side of the center.
@@ -952,7 +952,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     cond do
       home_stop < closure_left -> (home_stop + 1)..(closure_left - 1)//1
       home_stop > closure_right -> (closure_right + 1)..(home_stop - 1)//1
-      true -> ..
+      true -> empty_range()
     end
   end
 
@@ -968,7 +968,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
     |> Enum.min_max(fn -> :its_empty end)
     |> case do
       {left, right} -> left..right//1
-      :its_empty -> ..
+      :its_empty -> empty_range()
     end
   end
 
@@ -990,4 +990,10 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   defp clamp(index, _sequence_size) when index < 0, do: 0
   defp clamp(index, sequence_size) when index >= sequence_size, do: sequence_size - 1
   defp clamp(index, _sequence_size), do: index
+
+  # Returns a range of size 0.
+  # When used to slice an enumerable, it returns the whole enumerable (from index 0 to index -1, the last element).
+  # When we upgrade to Elixir 1.14, this can be replaced with just `..`.
+  # https://hexdocs.pm/elixir/Kernel.html#../0
+  defp empty_range, do: 0..-1//1
 end
