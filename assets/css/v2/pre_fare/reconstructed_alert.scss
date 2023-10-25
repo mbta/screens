@@ -177,7 +177,7 @@ $alert-card-footer-height: 80px;
   /* Alert contents */
   .alert-card {
     width: 1016px;
-    height: $takeover-card-height;
+    height: 100%;
     border-radius: 4px;
     background-color: #e5e4e1;
     color: #171f26;
@@ -191,7 +191,15 @@ $alert-card-footer-height: 80px;
       font-size: 200px;
       font-weight: 800;
 
+      .container {
+        height: 100%;
+        display: flex;
+        flex-flow: column;
+        align-items: flex-start;
+      }
+
       &__icon {
+        flex-shrink: 0;
         height: 300px;
         margin-bottom: 48px;
         padding-top: 112px;
@@ -243,6 +251,12 @@ $alert-card-footer-height: 80px;
       &__isa-icon {
         height: 61px;
         padding-right: 33px;
+      }
+
+      .disruption-diagram-container {
+        flex: 1 1 0;
+        margin-top: 32px;
+        margin-bottom: 32px;
       }
     }
 

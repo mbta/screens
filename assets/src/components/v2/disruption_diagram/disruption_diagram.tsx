@@ -4,6 +4,7 @@ import { classWithModifier, classWithModifiers } from "Util/util";
 const MAX_WIDTH = 904;
 const SLOT_WIDTH = 24;
 const LINE_HEIGHT = 24;
+const EMPHASIS_HEIGHT = 80;
 // L can vary based on arrow vs diamond (current stop). Would be nice if this was
 // programmatic, but this works for now
 const L = 17;
@@ -18,6 +19,7 @@ interface DisruptionDiagramBase {
   line: LineColor;
   current_station_slot_index: number;
   slots: [EndSlot, ...MiddleSlot[], EndSlot];
+  svgHeight: number;
 }
 
 interface ContinuousDisruptionDiagram extends DisruptionDiagramBase {
@@ -200,16 +202,17 @@ const SuspensionStopIcon: ComponentType<IconProps> = ({ x }) => {
 };
 
 const StationClosureStopIcon: ComponentType<IconProps> = ({ x, className }) => {
-  const iconWidth = 30;
+  const iconWidth = 48;
+  const strokeWidth = 4;
 
   return (
     <path
       className={className}
-      transform={`translate(${x - iconWidth / 2} -2)`}
+      transform={`translate(${x - (iconWidth + strokeWidth) / 2} -2)`}
       d="M22.6628 27.0001L23.9119 25.7308L22.6498 24.4744L17.0202 18.8706L18.8677 16.9933L24.4828 22.5826L25.7463 23.8404L27.0099 22.5826L32.625 16.9933L34.4725 18.8706L28.8429 24.4744L27.5807 25.7308L28.8298 27.0001L34.4649 32.7261L32.6588 34.5021L27.0229 28.7751L25.7463 27.4779L24.4698 28.7751L18.8338 34.5021L17.0278 32.7261L22.6628 27.0001ZM35.0884 18.2575L35.0876 18.2583L35.0884 18.2575ZM19.4568 35.1147L19.456 35.114L19.4568 35.1147ZM3.22013 15.2827L4.51025 16.5251L3.22013 15.2827C2.73421 15.7873 2.46274 16.4606 2.46274 17.1611V34.0832C2.46274 34.8014 2.74805 35.4902 3.25592 35.9981L15.1366 47.8788L16.4031 46.6124L15.1367 47.8788C15.6445 48.3867 16.3333 48.672 17.0515 48.672H34.4309C35.1669 48.672 35.8711 48.3725 36.3816 47.8424L48.2725 35.4941C48.7585 34.9895 49.0299 34.3162 49.0299 33.6157V16.6936C49.0299 15.9754 48.7446 15.2866 48.2368 14.7788L46.9703 16.0452L48.2367 14.7787L36.356 2.898C35.8481 2.39014 35.1593 2.10483 34.4411 2.10483H17.0617C16.3258 2.10483 15.6215 2.40435 15.111 2.93447L3.22013 15.2827Z"
       fill="#171F26"
       stroke="#E6E4E1"
-      strokeWidth="3.58209"
+      strokeWidth={strokeWidth}
     />
   );
 };
@@ -603,18 +606,20 @@ interface AlertEmphasisComponentProps {
     | number[];
   spaceBetween: number;
   effect: "suspension" | "shuttle";
+  scaleFactor: number;
 }
 
 const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
   effectRegionSlotIndexRange,
   spaceBetween,
   effect,
+  scaleFactor,
 }) => {
   const rangeStart = effectRegionSlotIndexRange[0];
   const rangeEnd = effectRegionSlotIndexRange[1];
 
-  const x1 = rangeStart * (spaceBetween + SLOT_WIDTH) + L;
-  const x2 = (spaceBetween + SLOT_WIDTH) * rangeEnd + L;
+  const x1 = (rangeStart * (spaceBetween + SLOT_WIDTH) + L) * scaleFactor;
+  const x2 = ((spaceBetween + SLOT_WIDTH) * rangeEnd + L) * scaleFactor;
 
   const middleOfLine = (x2 - x1) / 2 + x1;
   const widthOfBackground = 40;
@@ -699,7 +704,8 @@ Client is responsible for:
 */
 
 const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
-  const { slots, current_station_slot_index, line, effect } = props;
+  const { slots, current_station_slot_index, line, effect, svgHeight } = props;
+
   const [doAbbreviate, setDoAbbreviate] = useState(false);
   const [scaleFactor, setScaleFactor] = useState(1);
   const numStops = slots.length;
@@ -746,102 +752,94 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   x += spaceBetween + SLOT_WIDTH;
 
   const [isDone, setIsDone] = useState(false);
+  const [isDoneScaling, setIsDoneScaling] = useState(false);
+  const [lineMapHeight, setLineMapHeight] = useState(0);
 
   useEffect(() => {
     const dimensions = document
       .getElementById("line-map")
       ?.getBoundingClientRect();
 
-    if (!isDone && dimensions && dimensions.height !== null) {
-      const height = dimensions.height;
-      if (height > (hasEmphasis ? 320 : 408)) {
+    const height = dimensions?.height;
+    const width = dimensions?.width;
+
+    if (!isDoneScaling && width) {
+      // Scale diagram up or down so width is 904px
+      setScaleFactor(904 / width);
+      setIsDoneScaling(true);
+    } else if (!isDone && isDoneScaling && height) {
+      if (height > svgHeight) {
         setDoAbbreviate(true);
       }
-
-      // Prevent diagram from exceeding width of 904px
-      const width = dimensions.width;
-      if (width > 904) {
-        setScaleFactor(904 / width);
-      }
+      setLineMapHeight(height);
 
       setIsDone(true);
     }
   });
 
+  const tranlatedY = Math.max(lineMapHeight, svgHeight);
+
   return (
-    <>
-      <svg
-        width="904px"
-        height="408px"
-        version="1.1"
-        xmlns="http://www.w3.org/2000/svg"
-        transform={` scale(${scaleFactor})`}
+    <svg width={904} height="100%" id="whole-svg">
+      <g
+        id="line-map"
+        transform={`translate(${SLOT_WIDTH / 2}, ${
+          hasEmphasis
+            ? tranlatedY - EMPHASIS_HEIGHT * 2.25
+            : tranlatedY - EMPHASIS_HEIGHT * 0.75
+        }) scale(${scaleFactor})`}
+        visibility={isDone ? "visible" : "hidden"}
       >
-        <svg height={hasEmphasis ? 320 : 408} y={0}>
-          <g
-            id="line-map"
-            transform={`translate(${SLOT_WIDTH / 2}, ${
-              hasEmphasis ? 260 : 320
-            }) scale(${scaleFactor})`}
-            visibility={isDone ? "visible" : "hidden"}
-          >
-            <EffectBackgroundComponent
-              effectRegionSlotIndexRange={
-                effect === "station_closure"
-                  ? props.closed_station_slot_indices
-                  : props.effect_region_slot_index_range
-              }
-              effect={effect}
-              spaceBetween={spaceBetween}
-            />
-            <FirstSlotComponent
-              slot={beginning}
-              line={line}
-              isCurrentStop={current_station_slot_index === 0}
-              spaceBetween={spaceBetween}
-              isAffected={
-                effect === "station_closure"
-                  ? props.closed_station_slot_indices.includes(0)
-                  : props.effect_region_slot_index_range.includes(0)
-              }
-              effect={effect}
-            />
-            {middleSlots}
-            <LastSlotComponent
-              slot={end as EndSlot}
-              x={x}
-              line={line}
-              isCurrentStop={current_station_slot_index === slots.length - 1}
-              isAffected={
-                effect === "station_closure"
-                  ? props.closed_station_slot_indices.includes(slots.length - 1)
-                  : props.effect_region_slot_index_range.includes(
-                      slots.length - 1
-                    )
-              }
-              effect={effect}
-            />
-          </g>
-        </svg>
-        {hasEmphasis && (
-          <svg height="80px" y={315} style={{ position: "absolute" }}>
-            <g
-              transform={`translate(${
-                SLOT_WIDTH / 2
-              }, 24) scale(${scaleFactor})`}
-            >
-              <AlertEmphasisComponent
-                effectRegionSlotIndexRange={
-                  props.effect_region_slot_index_range
-                }
-                spaceBetween={spaceBetween}
-                effect={effect}
-              />
-            </g>
-          </svg>
-        )}
-      </svg>
-    </>
+        <EffectBackgroundComponent
+          effectRegionSlotIndexRange={
+            effect === "station_closure"
+              ? props.closed_station_slot_indices
+              : props.effect_region_slot_index_range
+          }
+          effect={effect}
+          spaceBetween={spaceBetween}
+        />
+        <FirstSlotComponent
+          slot={beginning}
+          line={line}
+          isCurrentStop={current_station_slot_index === 0}
+          spaceBetween={spaceBetween}
+          isAffected={
+            effect === "station_closure"
+              ? props.closed_station_slot_indices.includes(0)
+              : props.effect_region_slot_index_range.includes(0)
+          }
+          effect={effect}
+        />
+        {middleSlots}
+        <LastSlotComponent
+          slot={end as EndSlot}
+          x={x}
+          line={line}
+          isCurrentStop={current_station_slot_index === slots.length - 1}
+          isAffected={
+            effect === "station_closure"
+              ? props.closed_station_slot_indices.includes(slots.length - 1)
+              : props.effect_region_slot_index_range.includes(slots.length - 1)
+          }
+          effect={effect}
+        />
+      </g>
+      {hasEmphasis && (
+        <g
+          transform={`translate(${SLOT_WIDTH / 2}, ${
+            tranlatedY - EMPHASIS_HEIGHT * 0.75
+          })`}
+        >
+          <AlertEmphasisComponent
+            effectRegionSlotIndexRange={props.effect_region_slot_index_range}
+            spaceBetween={spaceBetween}
+            effect={effect}
+            scaleFactor={scaleFactor}
+          />
+        </g>
+      )}
+    </svg>
   );
 };
 

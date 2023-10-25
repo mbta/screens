@@ -37,8 +37,15 @@
   .alert-card__body {
     min-height: 0;
     flex-grow: 1;
-    padding: 120px 56px 32px 56px;
+    padding: 120px 56px 0 56px;
     box-sizing: border-box;
+
+    .alert-card__content-block {
+      height: 100%;
+      display: flex;
+      flex-flow: column;
+      align-items: flex-start;
+    }
   }
 
   .alert-card__issue,
@@ -141,6 +148,13 @@
   }
   .alert-card__footer__datetime {
     font-weight: 600;
+  }
+
+  .disruption-diagram-container {
+    flex: 1 1 0;
+    &:not(:first-child) {
+      margin-bottom: 32px;
+    }
   }
 }
 

@@ -1,5 +1,5 @@
 import useTextResizer from "Hooks/v2/use_text_resizer";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getHexColor, STRING_TO_SVG } from "Util/svg_utils";
 import DisruptionDiagram, {
   DisruptionDiagramData,
@@ -28,11 +28,11 @@ interface PreFareSingleScreenAlertProps {
 }
 
 interface EnrichedRoute {
-  route_id: string,
-  svg_name: string
+  route_id: string;
+  svg_name: string;
 }
 
-// For the standard layout, issue font can be medium or large. 
+// For the standard layout, issue font can be medium or large.
 // If remedy is "Seek alternate route", font size is static. Otherwise, it uses the same font size as
 // the issue.
 const standardLayout = (
@@ -79,8 +79,8 @@ const multiLineLayout = (
   unaffected_routes: EnrichedRoute[],
   disruptionDiagram?: DisruptionDiagramData
 ) => {
-  const AffectedLinePill = STRING_TO_SVG[routes[0].svg_name]
-  const affectedLineColor = getHexColor(getRouteColor(routes[0].route_id))
+  const AffectedLinePill = STRING_TO_SVG[routes[0].svg_name];
+  const affectedLineColor = getHexColor(getRouteColor(routes[0].route_id));
 
   return (
     <div className="alert-card__content-block">
@@ -89,17 +89,25 @@ const multiLineLayout = (
         <div className="alert-card__content-block__text--large">
           <AffectedLinePill
             className="alert-card__content-block__route-pill"
-            color={affectedLineColor} />
+            color={affectedLineColor}
+          />
           <span>trains are skipping this station</span>
         </div>
       </div>
       <div className="alert-card__issue">
         <InfoIcon className="alert-card__icon" />
         <div className="alert-card__content-block__text--large">
-          {unaffected_routes.map(route => {
-            const UnaffectedLinePill = STRING_TO_SVG[route.svg_name]
-            const unaffectedLineColor = getHexColor(getRouteColor(route.route_id))
-            return <UnaffectedLinePill className="alert-card__content-block__route-pill" color={unaffectedLineColor} />
+          {unaffected_routes.map((route) => {
+            const UnaffectedLinePill = STRING_TO_SVG[route.svg_name];
+            const unaffectedLineColor = getHexColor(
+              getRouteColor(route.route_id)
+            );
+            return (
+              <UnaffectedLinePill
+                className="alert-card__content-block__route-pill"
+                color={unaffectedLineColor}
+              />
+            );
           })}
           <span>trains stop as usual</span>
         </div>
@@ -235,10 +243,29 @@ const remedySection = (
 );
 
 const mapSection = (disruptionDiagram?: DisruptionDiagramData) => {
+  const [diagramHeight, setDiagramHeight] = useState(0);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const resizeObserver = new ResizeObserver(() => {
+      // Do what you want to do when the size of the element changes
+      setDiagramHeight(ref.current.clientHeight);
+    });
+    resizeObserver.observe(ref.current);
+    return () => resizeObserver.disconnect(); // clean up
+  });
+
   return (
-    <div style={{ height: 408, width: 904 }}>
-      {disruptionDiagram && <DisruptionDiagram {...disruptionDiagram} />}
-    </div>
+    disruptionDiagram && (
+      <div
+        id="disruption-diagram-container"
+        className="disruption-diagram-container"
+        ref={ref}
+      >
+        <DisruptionDiagram {...disruptionDiagram} svgHeight={diagramHeight} />
+      </div>
+    )
   );
 };
 
@@ -331,41 +358,43 @@ const PreFareSingleScreenAlert: React.ComponentType<
 };
 
 const getRouteColor = (route_id: string) => {
-  switch(route_id.substring(0, 3)) {
+  switch (route_id.substring(0, 3)) {
     case "Red":
-      return "red"
+      return "red";
     case "Ora":
-      return "orange"
+      return "orange";
     case "Blu":
-      return "blue"
+      return "blue";
     case "Gre":
-      return "green"
+      return "green";
     default:
-      return "yellow"
+      return "yellow";
   }
 };
 
 // If only one route color is represented ("gl-union" and "gl-riverside" are the same route color)
 // use that, otherwise "yellow"
 const getAlertColor = (routes: EnrichedRoute[]) => {
-  const colors = routes.map(r => getRouteColor(r.route_id))
-  const uniqueColors = new Set(colors).size
-  return uniqueColors == 1 ? colors[0] : "yellow"
-}
+  const colors = routes.map((r) => getRouteColor(r.route_id));
+  const uniqueColors = new Set(colors).size;
+  return uniqueColors == 1 ? colors[0] : "yellow";
+};
 
-const PreFareAlertBanner: React.ComponentType<{routes: EnrichedRoute[]}> = ({
-  routes
+const PreFareAlertBanner: React.ComponentType<{ routes: EnrichedRoute[] }> = ({
+  routes,
 }) => {
   let banner;
 
   if (
     routes.length === 1 &&
-    ["rl", "ol", "bl", "gl", "gl-b", "gl-c", "gl-d", "gl-e"].includes(routes[0].svg_name)
+    ["rl", "ol", "bl", "gl", "gl-b", "gl-c", "gl-d", "gl-e"].includes(
+      routes[0].svg_name
+    )
   ) {
     // One destination, short text
-    const route = routes[0]
-    const LinePill = STRING_TO_SVG[route.svg_name]
-    const color = getRouteColor(route.route_id)
+    const route = routes[0];
+    const LinePill = STRING_TO_SVG[route.svg_name];
+    const color = getRouteColor(route.route_id);
 
     banner = (
       <div className={classWithModifiers("alert-banner", ["small", color])}>
@@ -379,9 +408,9 @@ const PreFareAlertBanner: React.ComponentType<{routes: EnrichedRoute[]}> = ({
     );
   } else if (routes.length === 1) {
     // One destination, long text
-    const route = routes[0]
-    const LinePill = STRING_TO_SVG[route.svg_name]
-    const color = getRouteColor(route.route_id)
+    const route = routes[0];
+    const LinePill = STRING_TO_SVG[route.svg_name];
+    const color = getRouteColor(route.route_id);
 
     banner = (
       <div
@@ -414,7 +443,7 @@ const PreFareAlertBanner: React.ComponentType<{routes: EnrichedRoute[]}> = ({
           riders to
         </span>
         {routes.map((route) => {
-          const LinePill = STRING_TO_SVG[route.svg_name]
+          const LinePill = STRING_TO_SVG[route.svg_name];
           return (
             <LinePill
               className="alert-banner__route-pill--long"
@@ -428,7 +457,12 @@ const PreFareAlertBanner: React.ComponentType<{routes: EnrichedRoute[]}> = ({
   } else {
     // Fallback
     banner = (
-      <div className={classWithModifiers("alert-banner", ["small", getAlertColor(routes)])}>
+      <div
+        className={classWithModifiers("alert-banner", [
+          "small",
+          getAlertColor(routes),
+        ])}
+      >
         <span>
           <span className="alert-banner__attention-text">ATTENTION,</span>{" "}
           riders
