@@ -1031,6 +1031,40 @@ defmodule Screens.V2.DisruptionDiagramTest do
       assert expected == actual
     end
 
+    test "serializes a Red Line trunk station closure with home stop on the Ashmont branch" do
+      localized_alert =
+        DDAlert.make_localized_alert(:station_closure, :red, ~P"asmnl", [~P"chmnl"])
+
+      expected = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [2],
+        line: :red,
+        current_station_slot_index: 9,
+        slots: [
+          %{type: :arrow, label_id: ~P"alfcl"},
+          # <closure>
+          %{label: %{full: "Kendall/MIT", abbrev: "Kendall/MIT"}, show_symbol: true},
+          %{label: %{full: "Charles/MGH", abbrev: "Charles/MGH"}, show_symbol: true},
+          %{label: %{full: "Park Street", abbrev: "Park St"}, show_symbol: true},
+          # </closure>
+          # <gap>
+          %{label: %{full: "Downtown Crossing", abbrev: "Downt'n Xng"}, show_symbol: true},
+          %{label: %{full: "South Station", abbrev: "South Sta"}, show_symbol: true},
+          %{label: "…", show_symbol: false},
+          %{label: %{full: "Fields Corner", abbrev: "Fields Cnr"}, show_symbol: true},
+          %{label: %{full: "Shawmut", abbrev: "Shawmut"}, show_symbol: true},
+          # </gap>
+          # <current_location>
+          %{type: :terminal, label_id: ~P"asmnl"}
+          # </current_location>
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
     ######################
     # RED LINE BRAINTREE #
     ######################
