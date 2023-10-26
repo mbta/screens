@@ -152,9 +152,7 @@
 
   .disruption-diagram-container {
     flex: 1 1 0;
-    &:not(:first-child) {
-      margin-bottom: 32px;
-    }
+    margin-bottom: 32px;
   }
 }
 
