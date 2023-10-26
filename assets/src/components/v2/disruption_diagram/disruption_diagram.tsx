@@ -751,14 +751,14 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     const height = dimensions?.height;
     const width = dimensions?.width;
 
-    if (!isDoneScaling && width && height) {
+    if (!isDoneScaling && width) {
       // Scale diagram up or down so width is 904px
       setScaleFactor(904 / width);
       setIsDoneScaling(true);
-    } else if (!isDone && isDoneScaling && height) {
+    } else if (!isDone && isDoneScaling) {
       // If the height of the line map + emphasis (if present) is still too tall,
       // abbreviate station names.
-      if (height + (hasEmphasis ? EMPHASIS_HEIGHT : 0) > svgHeight) {
+      if (height && height + (hasEmphasis ? EMPHASIS_HEIGHT : 0) > svgHeight) {
         setDoAbbreviate(true);
       }
 
@@ -785,10 +785,10 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       overflow="visible"
       viewBox={`0 0 904 ${svgHeight}`}
       id="whole-svg"
+      visibility={isDone ? "visible" : "hidden"}
     >
       <g
         id="line-map"
-        visibility={isDone ? "visible" : "hidden"}
         transform={`translate(${SLOT_WIDTH / 2}, ${
           lineMapHeight - 8 * scaleFactor
         }) scale(${scaleFactor})`}
