@@ -327,7 +327,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       informed_stations: informed_stations
     } = t
 
-    informed_stations_string = Util.format_name_list_to_string(informed_stations)
+    informed_stations_string =
+      informed_stations |> abbreviate_station_name() |> Util.format_name_list_to_string()
 
     location_text =
       case LocalizedAlert.consolidated_informed_subway_routes(t) do
@@ -509,7 +510,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       informed_stations: informed_stations
     } = t
 
-    informed_stations_string = Util.format_name_list_to_string(informed_stations)
+    informed_stations_string =
+      informed_stations |> abbreviate_station_name() |> Util.format_name_list_to_string()
 
     %{
       issue: "Trains skip #{informed_stations_string}",
@@ -857,7 +859,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %{alert: %{cause: cause}, informed_stations: informed_stations} = t
     cause_text = Alert.get_cause_string(cause)
 
-    informed_stations_string = Util.format_name_list_to_string(informed_stations)
+    informed_stations_string =
+      informed_stations |> abbreviate_station_name() |> Util.format_name_list_to_string()
 
     %{
       issue: "Trains will bypass #{informed_stations_string}",
@@ -897,6 +900,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  defp abbreviate_station_name("Massachusetts Avenue"), do: "Mass Ave"
+  defp abbreviate_station_name(full_name), do: full_name
+
   def get_endpoints(ie, "Green") do
     Enum.find_value(@green_line_branches, fn branch ->
       get_endpoints(ie, branch)
@@ -921,7 +927,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         {min_full_name, _min_abbreviated_name} = min_station_name
         {max_full_name, _max_abbreviated_name} = max_station_name
 
-        {min_full_name, max_full_name}
+        {abbreviate_station_name(min_full_name), abbreviate_station_name(max_full_name)}
     end
   end
 
