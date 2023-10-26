@@ -741,6 +741,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   const [isDone, setIsDone] = useState(false);
   const [isDoneScaling, setIsDoneScaling] = useState(false);
+  const [lineMapHeight, setLineMapHeight] = useState(0);
 
   useEffect(() => {
     const dimensions = document
@@ -750,18 +751,33 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     const height = dimensions?.height;
     const width = dimensions?.width;
 
-    if (!isDoneScaling && width) {
+    if (!isDoneScaling && width && height) {
       // Scale diagram up or down so width is 904px
       setScaleFactor(904 / width);
       setIsDoneScaling(true);
     } else if (!isDone && isDoneScaling && height) {
-      if (height + EMPHASIS_HEIGHT > svgHeight) {
+      // If the height of the line map + emphasis (if present) is still too tall,
+      // abbreviate station names.
+      if (height + (hasEmphasis ? EMPHASIS_HEIGHT : 0) > svgHeight) {
         setDoAbbreviate(true);
       }
 
       setIsDone(true);
     }
   }, [svgHeight]);
+
+  // Get the finalized height of the line map after scaling and abbreviations
+  useEffect(() => {
+    const dimensions = document
+      .getElementById("line-map")
+      ?.getBoundingClientRect();
+
+    const height = dimensions?.height;
+
+    if (height) {
+      setLineMapHeight(height);
+    }
+  }, [isDone]);
 
   return (
     <svg
@@ -774,7 +790,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         id="line-map"
         visibility={isDone ? "visible" : "hidden"}
         transform={`translate(${SLOT_WIDTH / 2}, ${
-          svgHeight - EMPHASIS_HEIGHT * 2
+          lineMapHeight - 8 * scaleFactor
         }) scale(${scaleFactor})`}
       >
         <EffectBackgroundComponent
@@ -816,7 +832,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         <g
           id="alert-emphasis"
           transform={`translate(${SLOT_WIDTH / 2}, ${
-            svgHeight - EMPHASIS_HEIGHT / 1.5
+            lineMapHeight + EMPHASIS_HEIGHT - 8 * scaleFactor
           })`}
         >
           <AlertEmphasisComponent
