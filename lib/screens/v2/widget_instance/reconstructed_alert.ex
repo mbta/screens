@@ -181,15 +181,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_entities = Alert.informed_entities(alert)
     routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
 
-    informed_entities
-    |> Enum.filter(&(&1.route_type in [0, 1] and &1.route in routes_at_stop))
-    |> Enum.group_by(fn %{route: route} -> route end)
-    |> Enum.flat_map(fn
-      {route_id, _} ->
-        headsign = get_destination(t, location, route_id)
-        build_pills_from_headsign(route_id, headsign)
-    end)
-    |> Enum.uniq()
+    pills =
+      informed_entities
+      |> Enum.filter(&(&1.route_type in [0, 1] and &1.route in routes_at_stop))
+      |> Enum.group_by(fn %{route: route} -> route end)
+      |> Enum.flat_map(fn
+        {route_id, _} ->
+          headsign = get_destination(t, location, route_id)
+          build_pills_from_headsign(route_id, headsign)
+      end)
+      |> Enum.uniq()
+
+    if Enum.count(pills, & &1.route_id) > 1 do
+      pills
+      |> Enum.reject(&(&1.route_id == "Green"))
+      |> Enum.concat([%{route_id: "Green", svg_name: "gl"}])
+    end
   end
 
   defp build_pills_from_headsign(route_id, nil) do
