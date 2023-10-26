@@ -110,7 +110,9 @@ const CurrentStopIconRedLine: ComponentType<IconProps> = ({ x }) => {
   return (
     <>
       <path
-        transform={`translate(${x - (iconWidth + strokeWidth) / 2})`}
+        transform={`translate(${x - (iconWidth + strokeWidth) / 2} ${
+          -(iconWidth - strokeWidth) / 3
+        })`}
         d="M32.6512 3.92661C30.0824 1.3578 25.9176 1.3578 23.3488 3.92661L3.92661 23.3488C1.3578 25.9176 1.3578 30.0824 3.92661 32.6512L23.3488 52.0734C25.9176 54.6422 30.0824 54.6422 32.6512 52.0734L52.0734 32.6512C54.6422 30.0824 54.6422 25.9176 52.0734 23.3488L32.6512 3.92661Z"
         className="middle-slot__background--red"
         stroke="#E6E4E1"
@@ -118,7 +120,9 @@ const CurrentStopIconRedLine: ComponentType<IconProps> = ({ x }) => {
         strokeLinejoin="round"
       />
       <path
-        transform={`translate(${x - (iconWidth + strokeWidth) / 2})`}
+        transform={`translate(${x - (iconWidth + strokeWidth) / 2} ${
+          -(iconWidth - strokeWidth) / 3
+        })`}
         fillRule="evenodd"
         clipRule="evenodd"
         d="M15.4855 29.219C14.7045 28.438 14.7045 27.1717 15.4855 26.3906L26.3906 15.4855C27.1717 14.7045 28.438 14.7045 29.219 15.4855L40.1242 26.3906C40.9052 27.1717 40.9052 28.438 40.1241 29.219L29.219 40.1242C28.438 40.9052 27.1717 40.9052 26.3906 40.1241L15.4855 29.219Z"
@@ -177,7 +181,7 @@ const CurrentStopIconEndpoint: ComponentType<IconProps> = ({ x }) => {
 
   return (
     <path
-      transform={`translate(${x - iconWidth / 2} -8)`}
+      transform={`translate(${x - iconWidth / 2} ${-iconWidth / 3})`}
       d="M3.13388 28.7629C1.74155 30.1552 1.74155 32.4126 3.13388 33.8049L28.2253 58.8964C29.6176 60.2887 31.8751 60.2887 33.2674 58.8964L58.3588 33.8049C59.7511 32.4126 59.7511 30.1552 58.3588 28.7629L33.2674 3.67141C31.8751 2.27909 29.6176 2.27909 28.2253 3.67141L3.13388 28.7629Z"
       fill="#EE2E24"
       stroke="#E6E4E1"
