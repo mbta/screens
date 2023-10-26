@@ -549,7 +549,9 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
           className={classWithModifier(`label-${labelTextClass}`, textModifier)}
           transform={`translate(${x} -32) rotate(-45)`}
         >
-          {abbreviate ? label.abbrev : label.full}
+          {abbreviate || label.full === "Massachusetts Avenue"
+            ? label.abbrev
+            : label.full}
         </text>
       )}
     </>
