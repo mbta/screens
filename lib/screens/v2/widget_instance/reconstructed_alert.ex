@@ -196,6 +196,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       pills
       |> Enum.reject(&(&1.route_id == "Green"))
       |> Enum.concat([%{route_id: "Green", svg_name: "gl"}])
+    else
+      pills
     end
   end
 
