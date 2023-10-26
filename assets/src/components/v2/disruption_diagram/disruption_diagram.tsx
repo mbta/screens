@@ -5,6 +5,7 @@ const MAX_WIDTH = 904;
 const SLOT_WIDTH = 24;
 const LINE_HEIGHT = 24;
 const EMPHASIS_HEIGHT = 80;
+const EMPHASIS_PADDING_TOP = 8;
 // L can vary based on arrow vs diamond (current stop). Would be nice if this was
 // programmatic, but this works for now
 const L = 17;
@@ -790,7 +791,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       <g
         id="line-map"
         transform={`translate(${SLOT_WIDTH / 2}, ${
-          lineMapHeight - 8 * scaleFactor
+          lineMapHeight - EMPHASIS_PADDING_TOP * scaleFactor - 16
         }) scale(${scaleFactor})`}
       >
         <EffectBackgroundComponent
@@ -832,7 +833,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         <g
           id="alert-emphasis"
           transform={`translate(${SLOT_WIDTH / 2}, ${
-            lineMapHeight + EMPHASIS_HEIGHT - 8 * scaleFactor
+            lineMapHeight + EMPHASIS_HEIGHT - EMPHASIS_PADDING_TOP * scaleFactor
           })`}
         >
           <AlertEmphasisComponent
