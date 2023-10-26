@@ -327,8 +327,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       informed_stations: informed_stations
     } = t
 
-    informed_stations_string =
-      informed_stations |> abbreviate_station_name() |> Util.format_name_list_to_string()
+    informed_stations_string = Util.format_name_list_to_string(informed_stations)
 
     location_text =
       case LocalizedAlert.consolidated_informed_subway_routes(t) do
@@ -510,8 +509,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       informed_stations: informed_stations
     } = t
 
-    informed_stations_string =
-      informed_stations |> abbreviate_station_name() |> Util.format_name_list_to_string()
+    informed_stations_string = Util.format_name_list_to_string(informed_stations)
 
     %{
       issue: "Trains skip #{informed_stations_string}",
@@ -859,8 +857,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %{alert: %{cause: cause}, informed_stations: informed_stations} = t
     cause_text = Alert.get_cause_string(cause)
 
-    informed_stations_string =
-      informed_stations |> abbreviate_station_name() |> Util.format_name_list_to_string()
+    informed_stations_string = Util.format_name_list_to_string(informed_stations)
 
     %{
       issue: "Trains will bypass #{informed_stations_string}",
