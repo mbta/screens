@@ -777,7 +777,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
     const height = dimensions?.height;
 
-    if (height) {
+    if (isDone && height) {
       setLineMapHeight(height);
     }
   }, [isDone]);
@@ -785,7 +785,6 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   return (
     <svg
       height="100%"
-      overflow="visible"
       viewBox={`0 0 904 ${svgHeight}`}
       id="whole-svg"
       visibility={isDone ? "visible" : "hidden"}
