@@ -242,9 +242,6 @@ const mapSection = (disruptionDiagram?: DisruptionDiagramData) => {
   );
 };
 
-const isMultiLine = (effect: string, region: string) =>
-  effect === "station_closure" && region === "here";
-
 const PreFareSingleScreenAlert: React.ComponentType<
   PreFareSingleScreenAlertProps
 > = (alert) => {
@@ -304,7 +301,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
 
   return (
     <div className="pre-fare-alert__page">
-      {!isMultiLine(effect, region) && <PreFareAlertBanner routes={routes} />}
+      <PreFareAlertBanner routes={routes} />
       <div
         className={classWithModifiers("alert-container", [
           "single-page",
