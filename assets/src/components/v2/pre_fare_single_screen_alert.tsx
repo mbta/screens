@@ -13,6 +13,11 @@ import ISAIcon from "../../../static/images/svgr_bundled/isa.svg";
 import WalkingIcon from "../../../static/images/svgr_bundled/nearby.svg";
 import ShuttleBusIcon from "../../../static/images/svgr_bundled/bus.svg";
 
+const SCREEN_HEIGHT = 1720,
+  FOOTER_HEIGHT = 84,
+  BOTTOM_MARGIN = 32,
+  ALERT_CARD_PADDING = 120 + 32;
+
 interface PreFareSingleScreenAlertProps {
   issue: string;
   location: string;
@@ -40,11 +45,19 @@ const standardLayout = (
   remedy: string,
   effect: string,
   location: string | null,
+  bannerHeight: number,
   disruptionDiagram?: DisruptionDiagramData
 ) => {
+  const maxTextHeight =
+    SCREEN_HEIGHT -
+    FOOTER_HEIGHT -
+    BOTTOM_MARGIN -
+    ALERT_CARD_PADDING -
+    bannerHeight;
+
   const { ref: contentBlockRef, size: contentTextSize } = useTextResizer({
     sizes: ["medium", "large"],
-    maxHeight: 772,
+    maxHeight: maxTextHeight,
     resetDependencies: [issue, remedy],
   });
 
@@ -122,23 +135,13 @@ const fallbackLayout = (
   issue: string,
   remedy: string,
   effect: string,
-  routes: any[]
+  bannerHeight: number
 ) => {
-  // If there is more than 1 route in the banner, or the 1 route is longer than "GL·B"
-  // the banner will be tall. Otherwise, it'll be 1-line
-  const bannerHeight =
-    routes.length > 1 || (routes[0] && routes[0].length > 4) ? 368 : 200;
-
-  const screenHeight = 1720,
-    footerHeight = 84,
-    bottomMargin = 32,
-    alertCardPadding = 120 + 32;
-
   const maxTextHeight =
-    screenHeight -
-    footerHeight -
-    bottomMargin -
-    alertCardPadding -
+    SCREEN_HEIGHT -
+    FOOTER_HEIGHT -
+    BOTTOM_MARGIN -
+    ALERT_CARD_PADDING -
     bannerHeight;
 
   const { ref: pioTextBlockRef, size: pioSecondaryTextSize } = useTextResizer({
@@ -271,6 +274,13 @@ const PreFareSingleScreenAlert: React.ComponentType<
     disruption_diagram,
   } = alert;
 
+  // If there is more than 1 route in the banner, or the 1 route is longer than "GL·B"
+  // the banner will be tall. Otherwise, it'll be 1-line
+  const bannerHeight =
+    routes.length > 1 || (routes[0] && routes[0].svg_name.length > 4)
+      ? 368
+      : 200;
+
   /**
    * This switch statement picks the alert layout
    * - fallback: icon, followed by a summary & pio text, or just the pio text
@@ -282,7 +292,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
   const layoutRenderer = () => {
     switch (true) {
       case effect === "delay":
-        return fallbackLayout(issue, remedy, effect, routes);
+        return fallbackLayout(issue, remedy, effect, bannerHeight);
       case effect === "station_closure" && region === "here":
         return multiLineLayout(routes, unaffected_routes, disruption_diagram);
       case effect === "station_closure":
@@ -291,6 +301,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
           remedy,
           effect,
           location,
+          bannerHeight,
           disruption_diagram
         );
       case (region === "boundary" || region === "here") &&
@@ -300,6 +311,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
           remedy,
           effect,
           location,
+          bannerHeight,
           disruption_diagram
         );
       case region === "outside" &&
@@ -307,7 +319,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
         (effect === "shuttle" || effect === "suspension"):
         return downstreamLayout(endpoints, effect, remedy, disruption_diagram);
       default:
-        return fallbackLayout(issue, remedy, effect, routes);
+        return fallbackLayout(issue, remedy, effect, bannerHeight);
     }
   };
 
