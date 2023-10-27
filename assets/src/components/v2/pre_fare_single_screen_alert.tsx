@@ -302,13 +302,16 @@ const PreFareSingleScreenAlert: React.ComponentType<
     }
   };
 
+  const showBanner = !isMultiLine(effect, region);
+
   return (
     <div className="pre-fare-alert__page">
-      {!isMultiLine(effect, region) && <PreFareAlertBanner routes={routes} />}
+      {showBanner && <PreFareAlertBanner routes={routes} />}
       <div
         className={classWithModifiers("alert-container", [
           "single-page",
           getAlertColor(routes),
+          showBanner ? "with-banner" : "no-banner",
         ])}
       >
         <div className="alert-card">
