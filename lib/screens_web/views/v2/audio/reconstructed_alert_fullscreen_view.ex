@@ -31,7 +31,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
         ~E|Attention, riders. |
       end
     else
-      ~E|Attention, <%= hd(routes).route_id %> riders. |
+      ~E|Attention, <%= hd(routes).route_id %> line riders. |
     end
   end
 
