@@ -133,7 +133,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       if is_nil(route_id) do
         Alert.informed_entities(alert)
       else
-        alert |> Alert.informed_entities() |> Enum.filter(&(&1.route == route_id))
+        alert
+        |> Alert.informed_entities()
+        |> Enum.filter(&String.starts_with?(&1.route, route_id))
       end
 
     {direction_id, route_id} =
@@ -177,28 +179,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     )
   end
 
-  defp get_route_pills(%__MODULE__{alert: alert} = t, location) do
-    informed_entities = Alert.informed_entities(alert)
+  defp get_route_pills(%__MODULE__{} = t, location) do
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
     routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
 
-    pills =
-      informed_entities
-      |> Enum.filter(&(&1.route_type in [0, 1] and &1.route in routes_at_stop))
-      |> Enum.group_by(fn %{route: route} -> route end)
-      |> Enum.flat_map(fn
-        {route_id, _} ->
-          headsign = get_destination(t, location, route_id)
-          build_pills_from_headsign(route_id, headsign)
-      end)
-      |> Enum.uniq()
-
-    if Enum.count(pills) > 1 and Enum.all?(pills, &(&1.route_id == "Green")) do
-      pills
-      |> Enum.reject(&(&1.route_id == "Green"))
-      |> Enum.concat([%{route_id: "Green", svg_name: "gl"}])
-    else
-      pills
-    end
+    affected_routes
+    |> Enum.filter(fn
+      "Green" -> Enum.find(routes_at_stop, &String.starts_with?(&1, "Green"))
+      route -> route in routes_at_stop
+    end)
+    |> Enum.flat_map(fn
+      route_id ->
+        headsign = get_destination(t, location, route_id)
+        build_pills_from_headsign(route_id, headsign)
+    end)
+    |> Enum.uniq()
   end
 
   defp build_pills_from_headsign(route_id, nil) do
