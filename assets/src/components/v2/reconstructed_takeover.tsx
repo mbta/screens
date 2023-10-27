@@ -29,12 +29,14 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
   } = alert;
 
   const [diagramHeight, setDiagramHeight] = useState(0);
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!ref.current) return;
     const resizeObserver = new ResizeObserver(() => {
-      setDiagramHeight(ref.current.clientHeight);
+      if (ref?.current) {
+        setDiagramHeight(ref.current.clientHeight);
+      }
     });
     resizeObserver.observe(ref.current);
     return () => resizeObserver.disconnect(); // clean up

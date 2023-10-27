@@ -767,7 +767,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
       setIsDone(true);
     }
-  }, [svgHeight]);
+  });
 
   // Get the finalized height of the line map after scaling and abbreviations
   useEffect(() => {

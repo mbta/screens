@@ -52,7 +52,9 @@ const standardLayout = (
     <div className="alert-card__content-block" ref={contentBlockRef}>
       {standardIssueSection(issue, location, contentTextSize)}
       {remedySection(effect, remedy, contentTextSize)}
-      {mapSection(disruptionDiagram)}
+      {disruptionDiagram && (
+        <MapSection disruptionDiagram={disruptionDiagram} />
+      )}
     </div>
   );
 };
@@ -65,7 +67,7 @@ const downstreamLayout = (
   disruptionDiagram?: DisruptionDiagramData
 ) => (
   <div className={classWithModifier("alert-card__content-block", "downstream")}>
-    {mapSection(disruptionDiagram)}
+    {disruptionDiagram && <MapSection disruptionDiagram={disruptionDiagram} />}
     {downstreamIssueSection(endpoints)}
     {remedySection(effect, remedy, "medium")}
   </div>
@@ -113,7 +115,9 @@ const multiLineLayout = (
           <span>trains stop as usual</span>
         </div>
       </div>
-      {mapSection(disruptionDiagram)}
+      {disruptionDiagram && (
+        <MapSection disruptionDiagram={disruptionDiagram} />
+      )}
     </div>
   );
 };
@@ -243,30 +247,36 @@ const remedySection = (
   </div>
 );
 
-const mapSection = (disruptionDiagram?: DisruptionDiagramData) => {
+interface MapSectionProps {
+  disruptionDiagram: DisruptionDiagramData;
+}
+
+const MapSection: React.ComponentType<MapSectionProps> = ({
+  disruptionDiagram,
+}) => {
   const [diagramHeight, setDiagramHeight] = useState(0);
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!ref.current) return;
     const resizeObserver = new ResizeObserver(() => {
       // Do what you want to do when the size of the element changes
-      setDiagramHeight(ref.current.clientHeight);
+      if (ref?.current) {
+        setDiagramHeight(ref.current.clientHeight);
+      }
     });
     resizeObserver.observe(ref.current);
     return () => resizeObserver.disconnect(); // clean up
   });
 
   return (
-    disruptionDiagram && (
-      <div
-        id="disruption-diagram-container"
-        className="disruption-diagram-container"
-        ref={ref}
-      >
-        <DisruptionDiagram {...disruptionDiagram} svgHeight={diagramHeight} />
-      </div>
-    )
+    <div
+      id="disruption-diagram-container"
+      className="disruption-diagram-container"
+      ref={ref}
+    >
+      <DisruptionDiagram {...disruptionDiagram} svgHeight={diagramHeight} />
+    </div>
   );
 };
 
