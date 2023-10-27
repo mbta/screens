@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { classWithModifiers, imagePath } from "Util/util";
 import DisruptionDiagram, {
@@ -28,6 +28,20 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
     disruption_diagram,
   } = alert;
 
+  const [diagramHeight, setDiagramHeight] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const resizeObserver = new ResizeObserver(() => {
+      if (ref?.current) {
+        setDiagramHeight(ref.current.clientHeight);
+      }
+    });
+    resizeObserver.observe(ref.current);
+    return () => resizeObserver.disconnect(); // clean up
+  });
+
   return (
     <>
       <div
@@ -38,19 +52,26 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
       >
         <div className="alert-card alert-card--left">
           <div className="alert-card__body">
-            <img
-              className="alert-card__body__icon"
-              src={imagePath("no-service-black.svg")}
-            />
-            <div className="alert-card__body__issue">{issue}</div>
-            <div className="alert-card__body__location ">{location}</div>
-            {disruption_diagram && (
-              <div style={{ height: 408, width: 904 }}>
-                {disruption_diagram && (
-                  <DisruptionDiagram {...disruption_diagram} />
-                )}
-              </div>
-            )}
+            <div className="container">
+              <img
+                className="alert-card__body__icon"
+                src={imagePath("no-service-black.svg")}
+              />
+              <div className="alert-card__body__issue">{issue}</div>
+              <div className="alert-card__body__location ">{location}</div>
+              {disruption_diagram && (
+                <div
+                  id="disruption-diagram-container"
+                  className="disruption-diagram-container"
+                  ref={ref}
+                >
+                  <DisruptionDiagram
+                    {...disruption_diagram}
+                    svgHeight={diagramHeight}
+                  />
+                </div>
+              )}
+            </div>
           </div>
           <div className="alert-card__footer">
             <div className="alert-card__footer__cause">

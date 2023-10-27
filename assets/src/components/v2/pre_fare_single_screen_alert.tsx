@@ -1,5 +1,5 @@
 import useTextResizer from "Hooks/v2/use_text_resizer";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getHexColor, STRING_TO_SVG } from "Util/svg_utils";
 import DisruptionDiagram, {
   DisruptionDiagramData,
@@ -32,16 +32,24 @@ interface EnrichedRoute {
   svg_name: string;
 }
 
+interface StandardLayoutProps {
+  issue: string;
+  remedy: string;
+  effect: string;
+  location: string | null;
+  disruptionDiagram?: DisruptionDiagramData;
+}
+
 // For the standard layout, issue font can be medium or large.
 // If remedy is "Seek alternate route", font size is static. Otherwise, it uses the same font size as
 // the issue.
-const standardLayout = (
-  issue: string,
-  remedy: string,
-  effect: string,
-  location: string | null,
-  disruptionDiagram?: DisruptionDiagramData
-) => {
+const StandardLayout: React.ComponentType<StandardLayoutProps> = ({
+  issue,
+  remedy,
+  effect,
+  location,
+  disruptionDiagram,
+}) => {
   const { ref: contentBlockRef, size: contentTextSize } = useTextResizer({
     sizes: ["medium", "large"],
     maxHeight: 772,
@@ -50,35 +58,58 @@ const standardLayout = (
 
   return (
     <div className="alert-card__content-block" ref={contentBlockRef}>
-      {standardIssueSection(issue, location, contentTextSize)}
-      {remedySection(effect, remedy, contentTextSize)}
-      {mapSection(disruptionDiagram)}
+      <StandardIssueSection
+        issue={issue}
+        location={location}
+        contentTextSize={contentTextSize}
+      />
+      <RemedySection
+        effect={effect}
+        remedy={remedy}
+        contentTextSize={contentTextSize}
+      />
+      {disruptionDiagram && (
+        <MapSection disruptionDiagram={disruptionDiagram} />
+      )}
     </div>
   );
 };
 
+interface DownstreamLayoutProps {
+  endpoints: string[];
+  effect: string;
+  remedy: string;
+  disruptionDiagram?: DisruptionDiagramData;
+}
+
 // In the downstream layout, the map is at the top, and the font size stays constant
-const downstreamLayout = (
-  endpoints: string[],
-  effect: string,
-  remedy: string,
-  disruptionDiagram?: DisruptionDiagramData
-) => (
+const DownstreamLayout: React.ComponentType<DownstreamLayoutProps> = ({
+  endpoints,
+  effect,
+  remedy,
+  disruptionDiagram,
+}) => (
   <div className={classWithModifier("alert-card__content-block", "downstream")}>
-    {mapSection(disruptionDiagram)}
-    {downstreamIssueSection(endpoints)}
-    {remedySection(effect, remedy, "medium")}
+    {disruptionDiagram && <MapSection disruptionDiagram={disruptionDiagram} />}
+    <DownstreamIssueSection endpoints={endpoints} />
+    <RemedySection effect={effect} remedy={remedy} contentTextSize="medium" />
   </div>
 );
+
+interface MultiLineLayoutProps {
+  routes: EnrichedRoute[];
+  unaffected_routes: EnrichedRoute[];
+  disruptionDiagram?: DisruptionDiagramData;
+}
 
 // Covers the case where a station_closure only affects one line at a transfer station.
 // In the even rarer case that there are multiple branches in the routes list or unaffected routes list
 // the font size may need to shrink to accommodate.
-const multiLineLayout = (
-  routes: EnrichedRoute[],
-  unaffected_routes: EnrichedRoute[],
-  disruptionDiagram?: DisruptionDiagramData
-) => {
+const MultiLineLayout: React.ComponentType<MultiLineLayoutProps> = ({
+  routes,
+  unaffected_routes,
+  disruptionDiagram,
+}) => {
   const AffectedLinePill = STRING_TO_SVG[routes[0].svg_name];
   const affectedLineColor = getHexColor(getRouteColor(routes[0].route_id));
 
@@ -113,17 +144,26 @@ const multiLineLayout = (
           <span>trains stop as usual</span>
         </div>
       </div>
-      {mapSection(disruptionDiagram)}
+      {disruptionDiagram && (
+        <MapSection disruptionDiagram={disruptionDiagram} />
+      )}
     </div>
   );
 };
 
-const fallbackLayout = (
-  issue: string,
-  remedy: string,
-  effect: string,
-  routes: any[]
-) => {
+interface FalloutLayoutProps {
+  issue: string;
+  remedy: string;
+  effect: string;
+  routes: any[];
+}
+
+const FallbackLayout: React.ComponentType<FalloutLayoutProps> = ({
+  issue,
+  remedy,
+  effect,
+  routes,
+}) => {
   // If there is more than 1 route in the banner, or the 1 route is longer than "GL·B"
   // the banner will be tall. Otherwise, it'll be 1-line
   const bannerHeight =
@@ -174,18 +214,24 @@ const fallbackLayout = (
   );
 };
 
-const standardIssueSection = (
-  issue: string,
-  location: string | null,
-  textSize: string
-) => (
+interface StandardIssueSectionProps {
+  issue: string;
+  location: string | null;
+  contentTextSize: string;
+}
+
+const StandardIssueSection: React.ComponentType<StandardIssueSectionProps> = ({
+  issue,
+  location,
+  contentTextSize,
+}) => (
   <div className="alert-card__issue">
     <NoServiceIcon className="alert-card__icon" />
     <div>
       <div
         className={classWithModifier(
           "alert-card__content-block__text",
-          textSize
+          contentTextSize
         )}
       >
         {issue}
@@ -197,7 +243,13 @@ const standardIssueSection = (
   </div>
 );
 
-const downstreamIssueSection = (endpoints: string[]) => (
+interface DownstreamIssueSectionProps {
+  endpoints: string[];
+}
+
+const DownstreamIssueSection: React.ComponentType<
+  DownstreamIssueSectionProps
+> = ({ endpoints }) => (
   <div className="alert-card__issue">
     <div
       className={classWithModifier("alert-card__content-block__text", "medium")}
@@ -207,12 +259,16 @@ const downstreamIssueSection = (endpoints: string[]) => (
     </div>
   </div>
 );
-
-const remedySection = (
-  effect: string,
-  remedy: string | null,
-  contentTextSize: string
-) => (
+interface RemedySectionProps {
+  effect: string;
+  remedy: string | null;
+  contentTextSize: string;
+}
+const RemedySection: React.ComponentType<RemedySectionProps> = ({
+  effect,
+  remedy,
+  contentTextSize,
+}) => (
   <div className="alert-card__remedy">
     {effect === "shuttle" ? (
       <>
@@ -243,10 +299,35 @@ const remedySection = (
   </div>
 );
 
-const mapSection = (disruptionDiagram?: DisruptionDiagramData) => {
+interface MapSectionProps {
+  disruptionDiagram: DisruptionDiagramData;
+}
+
+const MapSection: React.ComponentType<MapSectionProps> = ({
+  disruptionDiagram,
+}) => {
+  const [diagramHeight, setDiagramHeight] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const resizeObserver = new ResizeObserver(() => {
+      // Do what you want to do when the size of the element changes
+      if (ref?.current) {
+        setDiagramHeight(ref.current.clientHeight);
+      }
+    });
+    resizeObserver.observe(ref.current);
+    return () => resizeObserver.disconnect(); // clean up
+  });
+
   return (
-    <div style={{ height: 408, width: 904 }}>
-      {disruptionDiagram && <DisruptionDiagram {...disruptionDiagram} />}
+    <div
+      id="disruption-diagram-container"
+      className="disruption-diagram-container"
+      ref={ref}
+    >
+      <DisruptionDiagram {...disruptionDiagram} svgHeight={diagramHeight} />
     </div>
   );
 };
@@ -279,37 +360,73 @@ const PreFareSingleScreenAlert: React.ComponentType<
    * - standard: icon + issue, and icon + remedy, and then map section
    * - downstream: map, issue without icon, then icon + remedy
    **/
-  const layoutRenderer = () => {
-    switch (true) {
-      case effect === "delay":
-        return fallbackLayout(issue, remedy, effect, routes);
-      case effect === "station_closure" && region === "here":
-        return multiLineLayout(routes, unaffected_routes, disruption_diagram);
-      case effect === "station_closure":
-        return standardLayout(
-          issue,
-          remedy,
-          effect,
-          location,
-          disruption_diagram
-        );
-      case (region === "boundary" || region === "here") &&
-        (effect === "shuttle" || effect === "suspension"):
-        return standardLayout(
-          issue,
-          remedy,
-          effect,
-          location,
-          disruption_diagram
-        );
-      case region === "outside" &&
-        endpoints &&
-        (effect === "shuttle" || effect === "suspension"):
-        return downstreamLayout(endpoints, effect, remedy, disruption_diagram);
-      default:
-        return fallbackLayout(issue, remedy, effect, routes);
-    }
-  };
+  let layout;
+  switch (true) {
+    case effect === "delay":
+      layout = (
+        <FallbackLayout
+          issue={issue}
+          remedy={remedy}
+          effect={effect}
+          routes={routes}
+        />
+      );
+      break;
+    case effect === "station_closure" && region === "here":
+      layout = (
+        <MultiLineLayout
+          routes={routes}
+          unaffected_routes={unaffected_routes}
+          disruptionDiagram={disruption_diagram}
+        />
+      );
+      break;
+    case effect === "station_closure":
+      layout = (
+        <StandardLayout
+          issue={issue}
+          remedy={remedy}
+          effect={effect}
+          location={location}
+          disruptionDiagram={disruption_diagram}
+        />
+      );
+
+      break;
+    case (region === "boundary" || region === "here") &&
+      (effect === "shuttle" || effect === "suspension"):
+      layout = (
+        <StandardLayout
+          issue={issue}
+          remedy={remedy}
+          effect={effect}
+          location={location}
+          disruptionDiagram={disruption_diagram}
+        />
+      );
+      break;
+    case region === "outside" &&
+      endpoints &&
+      (effect === "shuttle" || effect === "suspension"):
+      layout = (
+        <DownstreamLayout
+          endpoints={endpoints}
+          effect={effect}
+          remedy={remedy}
+          disruptionDiagram={disruption_diagram}
+        />
+      );
+      break;
+    default:
+      layout = (
+        <FallbackLayout
+          issue={issue}
+          remedy={remedy}
+          effect={effect}
+          routes={routes}
+        />
+      );
+  }
 
   const showBanner = !isMultiLine(effect, region);
 
@@ -324,7 +441,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
         ])}
       >
         <div className="alert-card">
-          <div className="alert-card__body">{layoutRenderer()}</div>
+          <div className="alert-card__body">{layout}</div>
           <div className="alert-card__footer">
             {cause && (
               <div className="alert-card__footer__cause">

@@ -901,6 +901,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  defp abbreviate_station_name("Massachusetts Avenue"), do: "Mass Ave"
+  defp abbreviate_station_name(full_name), do: full_name
+
   def get_endpoints(ie, "Green") do
     Enum.find_value(@green_line_branches, fn branch ->
       get_endpoints(ie, branch)
@@ -925,7 +928,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         {min_full_name, _min_abbreviated_name} = min_station_name
         {max_full_name, _max_abbreviated_name} = max_station_name
 
-        {min_full_name, max_full_name}
+        {abbreviate_station_name(min_full_name), abbreviate_station_name(max_full_name)}
     end
   end
 
