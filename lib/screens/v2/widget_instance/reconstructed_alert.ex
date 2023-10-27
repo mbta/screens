@@ -192,7 +192,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end)
       |> Enum.uniq()
 
-    if Enum.count(pills, & &1.route_id) > 1 do
+    if Enum.count(pills) > 1 and Enum.all?(pills, &(&1.route_id == "Green")) do
       pills
       |> Enum.reject(&(&1.route_id == "Green"))
       |> Enum.concat([%{route_id: "Green", svg_name: "gl"}])
