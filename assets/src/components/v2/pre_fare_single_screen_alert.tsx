@@ -13,6 +13,11 @@ import ISAIcon from "../../../static/images/svgr_bundled/isa.svg";
 import WalkingIcon from "../../../static/images/svgr_bundled/nearby.svg";
 import ShuttleBusIcon from "../../../static/images/svgr_bundled/bus.svg";
 
+const SCREEN_HEIGHT = 1720,
+  FOOTER_HEIGHT = 84,
+  BOTTOM_MARGIN = 32,
+  ALERT_CARD_PADDING = 120 + 32;
+
 interface PreFareSingleScreenAlertProps {
   issue: string;
   location: string;
@@ -37,6 +42,7 @@ interface StandardLayoutProps {
   remedy: string;
   effect: string;
   location: string | null;
+  bannerHeight: number;
   disruptionDiagram?: DisruptionDiagramData;
 }
 
@@ -48,11 +54,16 @@ const StandardLayout: React.ComponentType<StandardLayoutProps> = ({
   remedy,
   effect,
   location,
+  bannerHeight,
   disruptionDiagram,
 }) => {
+  const maxTextHeight =
+    SCREEN_HEIGHT -
+    (FOOTER_HEIGHT + BOTTOM_MARGIN + ALERT_CARD_PADDING + bannerHeight);
+
   const { ref: contentBlockRef, size: contentTextSize } = useTextResizer({
     sizes: ["medium", "large"],
-    maxHeight: 772,
+    maxHeight: maxTextHeight,
     resetDependencies: [issue, remedy],
   });
 
@@ -155,31 +166,18 @@ interface FalloutLayoutProps {
   issue: string;
   remedy: string;
   effect: string;
-  routes: any[];
+  bannerHeight: number;
 }
 
 const FallbackLayout: React.ComponentType<FalloutLayoutProps> = ({
   issue,
   remedy,
   effect,
-  routes,
+  bannerHeight,
 }) => {
-  // If there is more than 1 route in the banner, or the 1 route is longer than "GL·B"
-  // the banner will be tall. Otherwise, it'll be 1-line
-  const bannerHeight =
-    routes.length > 1 || (routes[0] && routes[0].length > 4) ? 368 : 200;
-
-  const screenHeight = 1720,
-    footerHeight = 84,
-    bottomMargin = 32,
-    alertCardPadding = 120 + 32;
-
   const maxTextHeight =
-    screenHeight -
-    footerHeight -
-    bottomMargin -
-    alertCardPadding -
-    bannerHeight;
+    SCREEN_HEIGHT -
+    (FOOTER_HEIGHT + BOTTOM_MARGIN + ALERT_CARD_PADDING + bannerHeight);
 
   const { ref: pioTextBlockRef, size: pioSecondaryTextSize } = useTextResizer({
     sizes: ["small", "medium"],
@@ -352,6 +350,13 @@ const PreFareSingleScreenAlert: React.ComponentType<
     disruption_diagram,
   } = alert;
 
+  // If there is more than 1 route in the banner, or the 1 route is longer than "GL·B"
+  // the banner will be tall. Otherwise, it'll be 1-line
+  const bannerHeight =
+    routes.length > 1 || (routes[0] && routes[0].svg_name.length > 4)
+      ? 368
+      : 200;
+
   /**
    * This switch statement picks the alert layout
    * - fallback: icon, followed by a summary & pio text, or just the pio text
@@ -368,7 +373,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
           issue={issue}
           remedy={remedy}
           effect={effect}
-          routes={routes}
+          bannerHeight={bannerHeight}
         />
       );
       break;
@@ -388,6 +393,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
           remedy={remedy}
           effect={effect}
           location={location}
+          bannerHeight={bannerHeight}
           disruptionDiagram={disruption_diagram}
         />
       );
@@ -401,6 +407,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
           remedy={remedy}
           effect={effect}
           location={location}
+          bannerHeight={bannerHeight}
           disruptionDiagram={disruption_diagram}
         />
       );
@@ -423,7 +430,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
           issue={issue}
           remedy={remedy}
           effect={effect}
-          routes={routes}
+          bannerHeight={bannerHeight}
         />
       );
   }
