@@ -170,7 +170,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
     {_, platform_id_tuple} = Enum.at(ol_stop_sequence, previous_stop_index)
 
-    relevant_platform_id = elem(platform_id_tuple, train_crowding_config.direction_id)
+    previous_platform_id = elem(platform_id_tuple, train_crowding_config.direction_id)
 
     cached_prediction =
       Agent.get(train_crowding_config.station_id, train_crowding_config.direction_id)
@@ -186,7 +186,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
         _ =
           check_consecutive_crowding_heuristic(
             next_train_prediction,
-            relevant_platform_id,
+            previous_platform_id,
             cached_prediction,
             common_params
           )
@@ -195,18 +195,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
       # Start timer for dwell time but don't show the widget
       Prediction.vehicle_status(next_train_prediction) == :stopped_at and
-          Prediction.stop_for_vehicle(next_train_prediction) == relevant_platform_id ->
+          Prediction.stop_for_vehicle(next_train_prediction) == previous_platform_id ->
         previous_station_prediction_current_trip =
           fetch_previous_station_prediction(
             train_crowding_config,
-            relevant_platform_id,
+            previous_platform_id,
             next_train_prediction.trip.id,
             common_params.fetch_predictions_fn
           )
 
         if is_nil(previous_station_prediction_current_trip) do
           Logger.warn(
-            "[log_heuristics] Failed to fetch previous station's prediction: current_platform_id: #{train_crowding_config.station_id} relevant_platform_id: #{relevant_platform_id} trip_id: #{next_train_prediction.trip.id}"
+            "[log_heuristics] Failed to fetch previous station's prediction: current_platform_id: #{train_crowding_config.station_id} previous_platform_id: #{previous_platform_id} trip_id: #{next_train_prediction.trip.id}"
           )
 
           []
