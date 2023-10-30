@@ -261,7 +261,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
          :gt
        ] do
       log_crowding_info(
-        :dwell,
+        :time_based,
         common_params
       )
     end
