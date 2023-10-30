@@ -333,7 +333,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         |> Enum.flat_map(
           &case fetch_stop_name_fn.(&1) do
             :error -> []
-            "Massachusetts Avenue" -> ["Mass. Ave"]
+            "Massachusetts Avenue" -> ["Mass Ave"]
             name -> [name]
           end
         )
