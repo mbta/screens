@@ -99,9 +99,7 @@ const App = (): JSX.Element => {
       <Switch>
         <Route exact path="/v2/screen/gl_eink_v2/widget">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <ResponseMapperContext.Provider value={responseMapper}>
-              <WidgetPage />
-            </ResponseMapperContext.Provider>
+            <WidgetPage />
           </MappingContext.Provider>
         </Route>
         <Route exact path="/v2/screen/gl_eink_v2">
