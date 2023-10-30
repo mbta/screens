@@ -211,8 +211,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
           []
         else
-          # Cache the departure_time from the previous station's prediction (minus 10 seconds for cushion).
-          # When now >= this time, show the widget.
+          # Cache the prediction for the current trip at the previous station.
           Agent.put(
             train_crowding_config.station_id,
             train_crowding_config.direction_id,
@@ -248,6 +247,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
          cached_prediction,
          common_params
        ) do
+    # cached_prediction.departure_time minus 10 seconds (for cushion) is when we expect crowding to be reliable.
+    # When now >= this time, show the widget.
     show_widget_after_dt = DateTime.add(cached_prediction.departure_time, -10)
 
     if DateTime.compare(
