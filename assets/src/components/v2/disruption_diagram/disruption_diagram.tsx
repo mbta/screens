@@ -91,7 +91,7 @@ const endLabelIDMap: { [labelID: string]: string[] } = {
   "place-mdftf": ["MEDFORD/TUFTS"],
   "place-hsmnl": ["HEATH ST"],
   "place-kencl": ["KENMORE"],
-  "place-kencl+west": ["KENMORE", "& WEST"],
+  "place-kencl+west": ["KENMORE & WEST"],
   "place-mdftf+place-unsqu": ["MEDFORD/TUFTS", "& UNION SQ"],
   "place-north+place-pktrm": ["NORTH STATION", "& PARK ST"],
   "place-coecl+west": ["COPLEY & WEST"],
