@@ -84,8 +84,9 @@ defmodule ScreensWeb.Router do
 
       get "/:id", ScreenController, :index
       get "/:id/simulation", ScreenController, :simulation
-      get "/:id/widget", ScreenController, :widget
       post "/:id/widget", ScreenController, :widget
+      # Get not needed for application, but for testing in the browser w/o the Mercury skin
+      get "/:id/widget", ScreenController, :widget
     end
 
     scope "/api/screen" do
