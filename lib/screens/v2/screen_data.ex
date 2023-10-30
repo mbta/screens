@@ -3,6 +3,7 @@ defmodule Screens.V2.ScreenData do
 
   require Logger
 
+  alias Screens.Config.State
   alias Screens.ScreensByAlert
   alias Screens.Util
   alias Screens.V2.AlertsWidget
@@ -47,7 +48,8 @@ defmodule Screens.V2.ScreenData do
 
     unless opts[:skip_serialize] do
       data = serialize(layout_and_widgets)
-      response(data: data)
+      last_deploy_timestamp = State.last_deploy_timestamp()
+      response(data: data, last_deploy_timestamp: last_deploy_timestamp)
     end
   end
 
@@ -445,7 +447,8 @@ defmodule Screens.V2.ScreenData do
     %{
       data: Keyword.get(fields, :data, nil),
       force_reload: Keyword.get(fields, :force_reload, false),
-      disabled: Keyword.get(fields, :disabled, false)
+      disabled: Keyword.get(fields, :disabled, false),
+      last_deploy_timestamp: Keyword.get(fields, :last_deploy_timestamp, nil)
     }
   end
 

@@ -38,6 +38,10 @@ defmodule Screens.Config.State do
     GenServer.call(pid, {:refresh_if_loaded_before, screen_id})
   end
 
+  def last_deploy_timestamp(pid \\ __MODULE__) do
+    GenServer.call(pid, :last_deploy_timestamp)
+  end
+
   def service_level(pid \\ __MODULE__, screen_id) do
     GenServer.call(pid, {:service_level, screen_id})
   end
@@ -141,6 +145,14 @@ defmodule Screens.Config.State do
     end
   end
 
+  def handle_call(
+        :last_deploy_timestamp,
+        _from,
+        %__MODULE__{last_deploy_timestamp: last_deploy_timestamp} = state
+      ) do
+    {:reply, last_deploy_timestamp, state}
+  end
+
   def handle_call({:service_level, screen_id}, _from, %__MODULE__{config: config} = state) do
     screen = Map.get(config.screens, screen_id)
 
@@ -151,10 +163,6 @@ defmodule Screens.Config.State do
       end
 
     {:reply, service_level, state}
-  end
-
-  def handle_call(:green_line_service, _from, %__MODULE__{config: config} = state) do
-    {:reply, config.green_line_service, state}
   end
 
   def handle_call({:disabled?, screen_id}, _from, %__MODULE__{config: config} = state) do
