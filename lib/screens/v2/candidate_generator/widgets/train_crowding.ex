@@ -111,15 +111,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   defp get_instance(
          alert_makes_this_a_terminal,
          common_params
+       )
+       when alert_makes_this_a_terminal or is_nil(common_params.next_train_prediction) or
+              common_params.next_train_prediction == [],
+       do: []
+
+  defp get_instance(
+         _alert_makes_this_a_terminal,
+         common_params
        ) do
     next_train_prediction = common_params.next_train_prediction
 
     cond do
-      is_nil(next_train_prediction) or
-        alert_makes_this_a_terminal or
-          next_train_prediction.vehicle.carriages == [] ->
-        []
-
       # If there is an upcoming train, it's headed to this station, and we're not at a temporary terminal,
       # show the widget
       Prediction.vehicle_status(next_train_prediction) in [:in_transit_to, :incoming_at] and
