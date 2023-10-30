@@ -593,7 +593,13 @@ const EffectBackgroundComponent: ComponentType<
     );
   } else if (effect === "suspension") {
     background = (
-      <rect width={x2 - x1 + SLOT_WIDTH} height="16" x={x1} fill="#AEAEAE" />
+      <rect
+        width={x2 - x1 + SLOT_WIDTH}
+        height="16"
+        x={x1}
+        y="5"
+        fill="#AEAEAE"
+      />
     );
   } else {
     background = <></>;
@@ -643,9 +649,15 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
   } else if (effect === "suspension") {
     icon = (
       <>
-        <rect x={middleOfLine - 35} width={60} height={45} fill="white" />
+        <rect
+          x={middleOfLine - 32}
+          width={60}
+          height={45}
+          y="-6"
+          fill="white"
+        />
         <path
-          transform={`translate(${middleOfLine - widthOfBackground})`}
+          transform={`translate(${middleOfLine - widthOfBackground} -25)`}
           fillRule="evenodd"
           clipRule="evenodd"
           d="M23.837 0C23.3732 0 22.9293 0.188765 22.6076 0.522852L0.47732 23.5043C0.171085 23.8223 0 24.2467 0 24.6881V56.182C0 56.6346 0.179809 57.0687 0.499871 57.3888L22.6112 79.5001C22.9313 79.8202 23.3654 80 23.818 80H56.163C56.6268 80 57.0707 79.8112 57.3924 79.4771L79.5227 56.4957C79.8289 56.1777 80 55.7534 80 55.3119V23.818C80 23.3654 79.8202 22.9313 79.5001 22.6112L57.3888 0.499871C57.0687 0.179809 56.6346 0 56.182 0H23.837ZM20.2493 26.6844C19.5909 27.3535 19.5964 28.4288 20.2618 29.091L31.8854 40.6614L20.2566 52.478C19.5953 53.15 19.6042 54.2309 20.2764 54.892L25.9573 60.4784C26.6291 61.1391 27.7094 61.1303 28.3703 60.4586L40 48.6411L51.6297 60.4586C52.2906 61.1303 53.3708 61.1391 54.0427 60.4784L59.7236 54.892C60.3958 54.2309 60.4047 53.15 59.7434 52.478L48.1146 40.6614L59.7383 29.091C60.4036 28.4288 60.4091 27.3535 59.7507 26.6844L54.0303 20.8716C53.3665 20.1971 52.2805 20.1915 51.6098 20.8591L40 32.4157L28.3902 20.8591C27.7195 20.1915 26.6335 20.1971 25.9697 20.8716L20.2493 26.6844Z"
