@@ -43,6 +43,7 @@ import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import DeparturesNoService from "Components/v2/eink/departures_no_service";
 import EinkSubwayStatus from "Components/v2/subway_status/eink_subway_status";
+import WidgetPage from "Components/v2/widget_page";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -93,6 +94,11 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
+        <Route exact path="/v2/screen/bus_eink_v2/widget">
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <WidgetPage />
+          </MappingContext.Provider>
+        </Route>
         <Route exact path="/v2/screen/bus_eink_v2">
           <MultiScreenPage
             components={TYPE_TO_COMPONENT}
