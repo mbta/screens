@@ -2,7 +2,8 @@ defmodule Screens.Vehicles.Carriage do
   @moduledoc false
 
   defstruct car_number: nil,
-            occupancy_status: nil
+            occupancy_status: nil,
+            occupancy_percentage: nil
 
   @type occupancy_status ::
           :many_seats_available
@@ -16,6 +17,7 @@ defmodule Screens.Vehicles.Carriage do
 
   @type t :: %__MODULE__{
           car_number: String.t(),
-          occupancy_status: occupancy_status | nil
+          occupancy_status: occupancy_status | nil,
+          occupancy_percentage: integer()
         }
 end

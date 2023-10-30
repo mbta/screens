@@ -59,7 +59,11 @@ defmodule Screens.V2.WidgetInstance.TrainCrowding do
   defp serialize_carriages(nil), do: nil
 
   defp serialize_carriages(carriages),
-    do: Enum.map(carriages, &Util.translate_carriage_occupancy_status(&1.occupancy_status))
+    do:
+      Enum.map(
+        carriages,
+        &Util.translate_carriage_occupancy_status/1
+      )
 
   def priority(_instance), do: [1]
 
