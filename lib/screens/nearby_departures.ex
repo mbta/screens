@@ -1,10 +1,11 @@
 defmodule Screens.NearbyDepartures do
   @moduledoc false
 
-  alias Screens.Config.{Gl, State}
+  alias Screens.Config.State
+  alias ScreensConfig.Gl
 
   def by_screen_id(screen_id) do
-    if State.mode_disabled?(:bus) do
+    if State.mode_disabled?(:bus) or State.mode_disabled?(:light_rail) do
       []
     else
       by_enabled_screen_id(screen_id)

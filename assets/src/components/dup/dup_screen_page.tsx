@@ -1,10 +1,10 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 
-import useOutfrontStation from "Hooks/use_outfront_station";
 import { ROTATION_INDEX } from "./rotation_index";
 import { NoDataLayout } from "Components/dup/screen_container";
-import { isDup } from "Util/util";
+import { isDup } from "Util/outfront";
+import { useStationName } from "Hooks/outfront";
 import { fetchDatasetValue } from "Util/dataset";
 import { DUP_SIMULATION_REFRESH_MS } from "Constants";
 
@@ -13,7 +13,7 @@ const DupScreenPage = ({
 }: {
   screenContainer: React.ComponentType;
 }): JSX.Element => {
-  const station = useOutfrontStation();
+  const station = useStationName();
 
   if (station !== null) {
     const id = `DUP-${station.replace(/\s/g, "")}`;

@@ -1,9 +1,10 @@
 defmodule Screens.DupScreenData do
   @moduledoc false
 
-  alias Screens.Config.{Dup, State}
+  alias Screens.Config.State
+  alias ScreensConfig.Dup
 
-  alias Screens.Config.Dup.Override.{
+  alias ScreensConfig.Dup.Override.{
     FullscreenAlert,
     FullscreenImage,
     PartialAlertList

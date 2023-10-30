@@ -18,7 +18,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
   end
 
   def relevant?(alert, now) do
-    relevant_effect?(alert) and Alert.happening_now?(alert, now)
+    relevant_effect?(alert) and Alert.happening_now?(alert, now) and not suppressed?(alert)
   end
 
   # Omit up to 10 minute delays.
@@ -26,4 +26,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
 
   defp relevant_effect?(%Alert{effect: effect}),
     do: effect in [:suspension, :shuttle, :station_closure]
+
+  defp suppressed?(alert), do: alert.id == "529291"
 end

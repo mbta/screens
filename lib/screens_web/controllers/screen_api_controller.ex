@@ -34,7 +34,7 @@ defmodule ScreensWeb.ScreenApiController do
         screen_id,
         last_refresh,
         is_screen,
-        params["requestor"]
+        params
       )
 
     if nonexistent_screen?(screen_id) do
@@ -60,9 +60,7 @@ defmodule ScreensWeb.ScreenApiController do
         screen_id,
         nil,
         is_screen,
-        params["requestor"],
-        nil,
-        rotation_index
+        params
       )
 
     if nonexistent_screen?(screen_id) do

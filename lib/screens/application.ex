@@ -18,11 +18,13 @@ defmodule Screens.Application do
       # {Screens.Worker, arg},
       Screens.Config.State.Supervisor,
       Screens.SignsUiConfig.State.Supervisor,
+      Screens.TriptychPlayer.State.Supervisor,
       :hackney_pool.child_spec(:ex_aws_pool, []),
       :hackney_pool.child_spec(:blue_bikes_pool, []),
       :hackney_pool.child_spec(:api_v3_pool, max_connections: 100),
       {Screens.Stops.StationsWithRoutesAgent, %{}},
-      {Screens.BlueBikes.State, name: Screens.BlueBikes.State},
+      # Turning this off because it's not in use, and the process is failing
+      # {Screens.BlueBikes.State, name: Screens.BlueBikes.State},
       # Task supervisor for ScreensByAlert async updates
       # This supervisor is only used in deployment envs, but it's harmless to start it anyway in local dev.
       {Task.Supervisor, name: Screens.ScreensByAlert.Memcache.TaskSupervisor},
@@ -31,7 +33,8 @@ defmodule Screens.Application do
       # Task supervisor for ScreensByAlert self-refresh jobs
       {Task.Supervisor, name: Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor},
       # ScreensByAlert self-refresh job runner
-      {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner}
+      {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner},
+      Screens.OlCrowding.DynamicSupervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

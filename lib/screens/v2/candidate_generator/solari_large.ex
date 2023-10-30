@@ -1,13 +1,13 @@
 defmodule Screens.V2.CandidateGenerator.SolariLarge do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.CurrentStopName
-  alias Screens.Config.V2.SolariLarge
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Header.CurrentStopName
+  alias ScreensConfig.V2.SolariLarge
 
   @behaviour CandidateGenerator
 
@@ -25,6 +25,7 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
   # credo:disable-for-next-line Credo.Check.Design.DuplicatedCode
   def candidate_instances(
         config,
+        _opts,
         now \\ DateTime.utc_now(),
         departures_instances_fn \\ &Widgets.Departures.departures_instances/1
       ) do

@@ -2,13 +2,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.FreeTextLine
   alias Screens.LocationContext
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.FreeTextLine
 
   defstruct screen: nil,
             alert: nil,
@@ -651,13 +651,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
-  def temporarily_override_alert(%__MODULE__{} = t) do
-    # Prevent Government Center pre-fare screens from incorrectly communicating
-    # a GL alert that affects all branches.
-    not (t.alert.id in ["508765", "508767", "508773", "508776"] and
-           t.screen.app_params.reconstructed_alert_widget.stop_id in [
-             "place-gover"
-           ])
+  def valid_candidate?(%__MODULE__{} = t) do
+    # Suppress alerts 519314 and 529291, at all stations served by the Red Line.
+    suppressed =
+      t.alert.id in ["519314", "529291"] and
+        Enum.any?(t.location_context.routes, &(&1[:route_id] == "Red"))
+
+    not suppressed
   end
 
   defimpl Screens.V2.WidgetInstance do
@@ -665,10 +665,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def serialize(t), do: ReconstructedAlert.serialize(t)
     def slot_names(t), do: ReconstructedAlert.slot_names(t)
     def widget_type(t), do: ReconstructedAlert.widget_type(t)
-    def valid_candidate?(t), do: ReconstructedAlert.temporarily_override_alert(t)
+    def valid_candidate?(t), do: ReconstructedAlert.valid_candidate?(t)
     def audio_serialize(t), do: ReconstructedAlert.serialize(t)
     def audio_sort_key(t), do: ReconstructedAlert.audio_sort_key(t)
-    def audio_valid_candidate?(t), do: ReconstructedAlert.temporarily_override_alert(t)
+    def audio_valid_candidate?(t), do: ReconstructedAlert.valid_candidate?(t)
     def audio_view(_instance), do: ScreensWeb.V2.Audio.ReconstructedAlertView
   end
 

@@ -4,14 +4,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   """
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Alerts, as: AlertsConfig
-  alias Screens.Config.V2.Dup
   alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.{DupAlert, DupSpecialCaseAlert}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Alerts, as: AlertsConfig
+  alias ScreensConfig.V2.Dup
 
   require Logger
 
@@ -157,7 +157,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   # If this is a special case, this function returns the widgets that should be used for it.
   # Otherwise, returns the alerts unchanged.
-  @spec alert_special_cases(list(Alert.t()), Screens.Config.Screen.t()) ::
+  @spec alert_special_cases(list(Alert.t()), ScreensConfig.Screen.t()) ::
           {:normal, list(Alert.t())} | {:special, list(Screens.V2.WidgetInstance.t())}
   defp alert_special_cases([], _), do: {:normal, []}
 

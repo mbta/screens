@@ -1,9 +1,6 @@
 defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Dup
-  alias Screens.Config.V2.Header.{CurrentStopId, CurrentStopName}
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: AlertsInstances
@@ -11,6 +8,9 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.NormalHeader
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Dup
+  alias ScreensConfig.V2.Header.{CurrentStopId, CurrentStopName}
 
   @behaviour CandidateGenerator
 
@@ -76,6 +76,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   @impl CandidateGenerator
   def candidate_instances(
         config,
+        _opts,
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,

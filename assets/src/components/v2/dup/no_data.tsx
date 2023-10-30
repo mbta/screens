@@ -1,8 +1,8 @@
-import useOutfrontStation from "Hooks/use_outfront_station";
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
 import LinkArrow from "../bundled_svg/link_arrow";
 import NormalHeader from "./normal_header";
+import { useStationName } from "Hooks/outfront";
 
 // Fix station name tags without rider-facing names
 export const REPLACEMENTS = {
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const NoData: ComponentType<Props> = ({ include_header }) => {
-  let stationName = useOutfrontStation() || "Transit information";
+  let stationName = useStationName() || "Transit information";
   stationName = REPLACEMENTS[stationName] || stationName;
 
   return (

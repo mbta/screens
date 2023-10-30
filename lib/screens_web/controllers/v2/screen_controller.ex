@@ -1,11 +1,12 @@
 defmodule ScreensWeb.V2.ScreenController do
   use ScreensWeb, :controller
   require Logger
-  alias Screens.Config.{Screen, State}
+  alias Screens.Config.State
   alias Screens.V2.ScreenData.Parameters
+  alias ScreensConfig.Screen
 
   @default_app_id :bus_eink
-  @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 dup_v2 gl_eink_v2 solari_v2 solari_large_v2 pre_fare_v2]a
+  @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 dup_v2 gl_eink_v2 solari_v2 solari_large_v2 pre_fare_v2 triptych_v2]a
   @app_id_strings Enum.map(@recognized_app_ids, &Atom.to_string/1)
 
   plug(:check_config)
@@ -50,6 +51,15 @@ defmodule ScreensWeb.V2.ScreenController do
       "0" -> "0"
       "1" -> "1"
       "2" -> "2"
+      _ -> nil
+    end
+  end
+
+  defp triptych_pane(params) do
+    case params["pane"] do
+      "left" -> "left"
+      "middle" -> "middle"
+      "right" -> "right"
       _ -> nil
     end
   end
@@ -105,6 +115,7 @@ defmodule ScreensWeb.V2.ScreenController do
         |> assign(:requestor, params["requestor"])
         |> assign(:disable_sentry, params["disable_sentry"])
         |> assign(:rotation_index, rotation_index(params))
+        |> assign(:triptych_pane, triptych_pane(params))
         |> put_view(ScreensWeb.V2.ScreenView)
         |> render("index.html")
 
@@ -142,10 +153,7 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   defp screen_ids(target_app_id, refresh_rate) do
-    ids =
-      for {screen_id, %Screen{app_id: ^target_app_id}} <- State.screens() do
-        screen_id
-      end
+    ids = State.screen_ids(&match?({_screen_id, %Screen{app_id: ^target_app_id}}, &1))
 
     ids
     |> Enum.sort(&id_sort_fn/2)

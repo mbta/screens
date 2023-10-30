@@ -1,0 +1,25 @@
+.screen-container {
+  position: relative;
+  width: 3240px;
+  height: 1920px;
+  margin: 0px auto;
+  overflow: hidden;
+}
+
+.left-pane,
+.middle-pane,
+.right-pane {
+  overflow: hidden;
+  position: absolute;
+  width: 1080px;
+  height: 1920px;
+  top: 0;
+}
+
+.middle-pane {
+  left: 1080px;
+}
+
+.right-pane {
+  left: 2160px;
+}

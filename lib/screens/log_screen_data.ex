@@ -1,7 +1,8 @@
 defmodule Screens.LogScreenData do
   @moduledoc false
   require Logger
-  alias Screens.Config.{Screen, State}
+  alias Screens.Config.State
+  alias ScreensConfig.Screen
 
   def log_page_load(screen_id, is_screen, screen_side \\ nil) do
     if is_screen do
@@ -17,11 +18,17 @@ defmodule Screens.LogScreenData do
         screen_id,
         last_refresh,
         is_screen,
-        requestor,
-        screen_side \\ nil,
-        rotation_index \\ nil
+        params
       ) do
+    requestor = params["requestor"]
+
     if is_screen or not is_nil(requestor) do
+      screen_side = params["screen_side"]
+      rotation_index = params["rotation_index"]
+      triptych_pane = params["pane"]
+      triptych_player_name = params["player_name"]
+      ofm_app_package_version = params["version"]
+
       data =
         %{
           screen_id: screen_id,
@@ -31,6 +38,9 @@ defmodule Screens.LogScreenData do
         |> insert_screen_side(screen_side)
         |> insert_requestor(requestor)
         |> insert_dup_rotation_index(rotation_index)
+        |> insert_triptych_pane(triptych_pane)
+        |> insert_triptych_player_name(triptych_player_name)
+        |> insert_version(ofm_app_package_version)
 
       log_message("[screen data request]", data)
     end
@@ -55,6 +65,10 @@ defmodule Screens.LogScreenData do
     }
 
     log_message("[screen frontend error]", data)
+  end
+
+  def log_unrecognized_triptych_player(player_name) do
+    log_message("[unrecognized triptych player name]", %{player_name: player_name})
   end
 
   def log_api_response(response, screen_id, last_refresh, is_screen, screen_side \\ nil)
@@ -126,8 +140,10 @@ defmodule Screens.LogScreenData do
   end
 
   defp screen_name_for_id(screen_id) do
-    %Screen{name: name} = State.screen(screen_id)
-    name
+    case State.screen(screen_id) do
+      %Screen{name: name} -> name
+      nil -> "UNKNOWN_SCREEN"
+    end
   end
 
   defp insert_screen_side(data, nil), do: data
@@ -140,4 +156,17 @@ defmodule Screens.LogScreenData do
 
   defp insert_dup_rotation_index(data, rotation_index),
     do: Map.put(data, :page_number, rotation_index)
+
+  defp insert_triptych_pane(data, nil), do: data
+
+  defp insert_triptych_pane(data, triptych_pane),
+    do: Map.put(data, :triptych_pane, triptych_pane)
+
+  defp insert_triptych_player_name(data, nil), do: data
+
+  defp insert_triptych_player_name(data, triptych_player_name),
+    do: Map.put(data, :triptych_player_name, triptych_player_name)
+
+  defp insert_version(data, nil), do: data
+  defp insert_version(data, version), do: Map.put(data, :ofm_app_package_version, version)
 end

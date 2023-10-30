@@ -1,8 +1,8 @@
-- Feature Name: `eink_widget_endpiont`
+- Feature Name: `eink_widget_endpoint`
 - Start Date: 2023-07-28
-- RFC PR: [mbta/technology-docs#0000](https://github.com/mbta/technology-docs/pull/0000)
+- RFC PR: [screens/docs/tech-spects#0005](https://github.com/mbta/screens/pull/1826)
 - Asana task: [asana link](https://app.asana.com/0/1185117109217413/1205119093140586)
-- Status: Proposed
+- Status: Approved
 
 # Background
 [background]: #background
@@ -67,14 +67,12 @@ And then the POST request body should be structured like:
 ```
 {
     "widget": {
-        "footer": {
-            "mode_cost": "$2.40",
-            "mode_icon": "subway-negative-black.svg",
-            "mode_text": "Subway",
-            "text": "For real-time predictions and fare purchase locations:",
-            "type": "fare_info_footer",
-            "url": "mbta.com/stops/place-bcnwa"
-        }
+        "mode_cost": "$2.40",
+        "mode_icon": "subway-negative-black.svg",
+        "mode_text": "Subway",
+        "text": "For real-time predictions and fare purchase locations:",
+        "type": "fare_info_footer",
+        "url": "mbta.com/stops/place-bcnwa"
     }
 }
 ```
@@ -96,10 +94,8 @@ Then the bit that should be passed in the POST request is a step deeper at the `
 ```
 {
     "widget": {
-        "medium": {
-            "asset_url": "https://mbta-screens.s3.amazonaws.com/screens-prod/images/e-ink/psa/MBTA SEE SAY_Eink-Messaging.png",
-            "type": "evergreen_content"
-        }
+        "asset_url": "https://mbta-screens.s3.amazonaws.com/screens-prod/images/e-ink/psa/MBTA SEE SAY_Eink-Messaging.png",
+        "type": "evergreen_content"
     }
 }
 ```
@@ -110,9 +106,7 @@ In both `gl_eink.tsx` and `bus_eink.tsx`, there will be a new route to match on 
 
 ```
 const WidgetPage = () => {
-  const widget = getDatasetValue("widgetData")
-  let widgetJson = widget ? JSON.parse(widget) : null
-  if (widgetJson) widgetJson = Object.values(widgetJson)[0]
+  const widgetJson = JSON.parse(getDatasetValue("widgetData"))
 
   return widgetJson ? <Widget data={widgetJson} /> : null
 };
@@ -120,18 +114,18 @@ const WidgetPage = () => {
 
 And then suddenly, the widget page is rendered! Mercury will be taking screenshots of these pages and sending the image to the screen, only to update with a new screenshot if the data for that widget changes.
 
+Note: `MappingContext` is needed as a wrapper for WidgetPage because it maps the widget data `type` field to components. `ResponseMapperContext` is not needed (because the client won't be making data requests.)
+
 Example 1: Footer. POST to http://localhost:4000/v2/screen/gl_eink_v2/widget with body
 ```
 {
     "widget": {
-        "footer": {
-            "mode_cost": "$2.40",
-            "mode_icon": "subway-negative-black.svg",
-            "mode_text": "Subway",
-            "text": "For real-time predictions and fare purchase locations:",
-            "type": "fare_info_footer",
-            "url": "mbta.com/stops/place-bcnwa"
-        }
+        "mode_cost": "$2.40",
+        "mode_icon": "subway-negative-black.svg",
+        "mode_text": "Subway",
+        "text": "For real-time predictions and fare purchase locations:",
+        "type": "fare_info_footer",
+        "url": "mbta.com/stops/place-bcnwa"
     }
 }
 ```
@@ -143,20 +137,18 @@ Example 2: Partial alert. POST to http://localhost:4000/v2/screen/gl_eink_v2/wid
 ```
 {
     "widget": {
-        "medium": {
-            "body": "Shuttle buses replacing Green Line E branch service",
-            "header": "Shuttle Buses",
-            "icon": "bus",
-            "route_pills": [
-                {
-                    "color": "green",
-                    "text": "Green Line E",
-                    "type": "text"
-                }
-            ],
-            "type": "alert",
-            "url": "mbta.com/alerts"
-        }
+        "body": "Shuttle buses replacing Green Line E branch service",
+        "header": "Shuttle Buses",
+        "icon": "bus",
+        "route_pills": [
+            {
+                "color": "green",
+                "text": "Green Line E",
+                "type": "text"
+            }
+        ],
+        "type": "alert",
+        "url": "mbta.com/alerts"
     }
 }
 ```
@@ -168,26 +160,24 @@ Example 3: Takeover alert. POST to http://localhost:4000/v2/screen/gl_eink_v2/wi
 ```
 {
     "widget": {
-        "body": {
-            "full_body_bottom_screen": {
-                "type": "bottom_screen_filler"
-            },
-            "full_body_top_screen": {
-                "body": "Heath Street closed",
-                "header": "Station Closed",
-                "icon": "x",
-                "route_pills": [
-                    {
-                        "color": "green",
-                        "text": "Green Line E",
-                        "type": "text"
-                    }
-                ],
-                "type": "full_body_alert",
-                "url": "mbta.com/alerts"
-            },
-            "type": "body_takeover"
-        }
+        "full_body_bottom_screen": {
+            "type": "bottom_screen_filler"
+        },
+        "full_body_top_screen": {
+            "body": "Heath Street closed",
+            "header": "Station Closed",
+            "icon": "x",
+            "route_pills": [
+                {
+                    "color": "green",
+                    "text": "Green Line E",
+                    "type": "text"
+                }
+            ],
+            "type": "full_body_alert",
+            "url": "mbta.com/alerts"
+        },
+        "type": "body_takeover"
     }
 }
 ```
@@ -196,20 +186,24 @@ displays:
 ![example takeover alert][example eink takeover alert]
 
 # Unresolved Questions
-- Are the MappingContext and ResponseMapperContext needed as wrappers for `<WidgetPage />`?
-- What about slots?
-  - Since Mercury is building their own frontend skin, I believe the layout and sizing needs to be managed on their end. Is that true?
+
+- Slots: Since Mercury is building their own frontend skin, I believe the layout and sizing needs to be managed on their end. That said, some of our widgets are of flexible size, which does not lend itself for easy screenshotting. For example, the footer fills the whole viewport when it is rendered as a widget. So we may need to add CSS to make the widgets more screenshot-ready.
+- Latency: Widgets will take time to render, so Mercury's screenshot utility will need to give the page enough time for the final widget to be ready.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-???
+None noted.
 
 # Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
 
-Are there any alternatives that would avoid needing to re-run the backend code? (And are there any drawbacks of the current approach that make this re-run worth it?)
+Mercury keeps long-running instances of our e-ink clients so that instead of passing widget data back to us for rendering, they pass it to their dedicated client to render for screenshotting.
+- We wouldn't need to handle additional requests after each data request
+- We wouldn't need to send the entire react app in response to widget requests
+- We would just need to periodically send them the react app.
 
+Not an alternative we need to explore right off the bat -- we can coordinate with Mercury to determine if the originally proposed approach is sufficient for them.
 
 [example eink footer]: /docs/assets/sample_app_screenshots/widgets/example_eink_footer.png
 [example eink partial alert]: /docs/assets/sample_app_screenshots/widgets/example_eink_partial_alert.png

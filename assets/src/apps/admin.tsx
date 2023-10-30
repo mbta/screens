@@ -7,7 +7,6 @@ import ReactDOM from "react-dom";
 import { HashRouter as Router, Route, Switch } from "react-router-dom";
 
 import AdminNavbar from "Components/admin/admin_navbar";
-import AdminForm from "Components/admin/admin_form";
 import {
   AllScreensTable,
   BusScreensTable,
@@ -23,9 +22,12 @@ import {
   BusShelterV2ScreensTable,
   PreFareV2ScreensTable,
   DupV2ScreensTable,
+  TriptychV2ScreensTable
 } from "Components/admin/admin_tables";
+import AdminTriptychPlayerForm from "Components/admin/admin_triptych_player_form";
 import ImageManager from "Components/admin/admin_image_manager";
 import Devops from "Components/admin/devops";
+import AdminScreenConfigForm from "Components/admin/admin_screen_config_form";
 
 const App = (): JSX.Element => {
   return (
@@ -77,8 +79,14 @@ const App = (): JSX.Element => {
         <Route exact path="/pre-fare-v2-screens">
           <PreFareV2ScreensTable />
         </Route>
-        <Route exact path="/json-editor">
-          <AdminForm />
+        <Route exact path="/triptych-v2-screens">
+          <TriptychV2ScreensTable />
+        </Route>
+        <Route exact path="/screens-json-editor">
+          <AdminScreenConfigForm />
+        </Route>
+        <Route exact path="/triptych-player-json-editor">
+          <AdminTriptychPlayerForm />
         </Route>
         <Route exact path="/image-manager">
           <ImageManager />
