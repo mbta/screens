@@ -205,6 +205,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
           )
 
         if is_nil(previous_station_prediction_current_trip) do
+          Logger.warn(
+            "[log_heuristics] Failed to fetch previous station's prediction: current_platform_id: #{train_crowding_config.station_id} relevant_platform_id: #{relevant_platform_id} trip_id: #{next_train_prediction.trip.id}"
+          )
+
           []
         else
           # Cache the departure_time from the previous station's prediction (minus 10 seconds for cushion).
