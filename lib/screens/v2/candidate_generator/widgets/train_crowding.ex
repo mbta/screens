@@ -179,7 +179,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       cached_prediction != nil ->
         # Time-based heuristic
         # We think the train is about to leave the previous station. Log the heuristic.
-        _ = check_time_based_heuristic(cached_prediction, common_params)
+        _ = check_time_based_heuristic(cached_prediction, common_params, -10)
 
         # Consecutive crowding class heuristic.
         # Crowding class this fetch is the same as last. Log the heuristic.
@@ -245,11 +245,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
   defp check_time_based_heuristic(
          cached_prediction,
-         common_params
+         common_params,
+         previous_departure_time_cushion
        ) do
-    # cached_prediction.departure_time minus 10 seconds (for cushion) is when we expect crowding to be reliable.
+    # cached_prediction.departure_time minus previous_departure_time_cushion is when we expect crowding to be reliable.
     # When now >= this time, show the widget.
-    show_widget_after_dt = DateTime.add(cached_prediction.departure_time, -10)
+    show_widget_after_dt =
+      DateTime.add(cached_prediction.departure_time, previous_departure_time_cushion)
 
     if DateTime.compare(
          common_params.now,
