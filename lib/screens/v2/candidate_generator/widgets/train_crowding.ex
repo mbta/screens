@@ -122,32 +122,31 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
        ) do
     next_train_prediction = common_params.next_train_prediction
 
-    cond do
-      # If there is an upcoming train, it's headed to this station, and we're not at a temporary terminal,
-      # show the widget
-      Prediction.vehicle_status(next_train_prediction) in [:in_transit_to, :incoming_at] and
-          next_train_prediction
-          |> Prediction.stop_for_vehicle()
-          |> common_params.fetch_parent_stop_id_fn.() ==
-            common_params.train_crowding_config.station_id ->
-        _ = log_crowding_info(:in_transit, common_params)
+    # If there is an upcoming train, it's headed to this station, and we're not at a temporary terminal,
+    # show the widget
+    if Prediction.vehicle_status(next_train_prediction) in [:in_transit_to, :incoming_at] and
+         next_train_prediction
+         |> Prediction.stop_for_vehicle()
+         |> common_params.fetch_parent_stop_id_fn.() ==
+           common_params.train_crowding_config.station_id do
+      _ = log_crowding_info(:in_transit, common_params)
 
-        Agent.delete(
-          common_params.train_crowding_config.station_id,
-          common_params.train_crowding_config.direction_id
-        )
+      Agent.delete(
+        common_params.train_crowding_config.station_id,
+        common_params.train_crowding_config.direction_id
+      )
 
-        [
-          %CrowdingWidget{
-            screen: common_params[:screen_config],
-            prediction: next_train_prediction,
-            now: common_params[:now]
-          }
-        ]
+      [
+        %CrowdingWidget{
+          screen: common_params[:screen_config],
+          prediction: next_train_prediction,
+          now: common_params[:now]
+        }
+      ]
 
       # Test other heuristics
-      true ->
-        log_heuristics(common_params)
+    else
+      log_heuristics(common_params)
     end
   end
 
