@@ -541,7 +541,7 @@ defmodule Screens.Stops.Stop do
   defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)
        when app in [Dup, Triptych] do
     route_ids = Route.route_ids(routes_at_stop)
-    RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids, false)
+    RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids)
   end
 
   defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)

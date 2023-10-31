@@ -100,9 +100,9 @@ defmodule Screens.RoutePatterns.RoutePattern do
     }
 
     params =
-      if is_boolean(canonical_only?) do
-        Map.put(params, "filter[canonical]", canonical_only?)
-      end
+      if is_boolean(canonical_only?),
+        do: Map.put(params, "filter[canonical]", canonical_only?),
+        else: params
 
     case get_json_fn.("route_patterns", params) do
       {:ok, result} ->

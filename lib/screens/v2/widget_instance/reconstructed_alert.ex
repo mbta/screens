@@ -99,7 +99,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Red" => ["Ashmont/Braintree", "Alewife"],
     "Green-B" => ["Boston College", "Government Center"],
     "Green-C" => ["Cleveland Circle", "Government Center"],
-    "Green-D" => ["Riverside", "North Station"],
+    "Green-D" => ["Riverside", "North Station & North"],
     "Green-E" => ["Heath Street", "Medford/Tufts"]
   }
 
@@ -133,7 +133,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       if is_nil(route_id) do
         Alert.informed_entities(alert)
       else
-        alert |> Alert.informed_entities() |> Enum.filter(&(&1.route == route_id))
+        alert
+        |> Alert.informed_entities()
+        |> Enum.filter(&String.starts_with?(&1.route, route_id))
       end
 
     {direction_id, route_id} =
@@ -177,15 +179,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     )
   end
 
-  defp get_route_pills(%__MODULE__{alert: alert} = t, location) do
-    informed_entities = Alert.informed_entities(alert)
+  defp get_route_pills(%__MODULE__{} = t, location) do
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
     routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
 
-    informed_entities
-    |> Enum.filter(&(&1.route_type in [0, 1] and &1.route in routes_at_stop))
-    |> Enum.group_by(fn %{route: route} -> route end)
+    affected_routes
+    |> Enum.filter(fn
+      "Green" -> Enum.find(routes_at_stop, &String.starts_with?(&1, "Green"))
+      route -> route in routes_at_stop
+    end)
     |> Enum.flat_map(fn
-      {route_id, _} ->
+      route_id ->
         headsign = get_destination(t, location, route_id)
         build_pills_from_headsign(route_id, headsign)
     end)
@@ -897,6 +901,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  defp abbreviate_station_name("Massachusetts Avenue"), do: "Mass Ave"
+  defp abbreviate_station_name(full_name), do: full_name
+
   def get_endpoints(ie, "Green") do
     Enum.find_value(@green_line_branches, fn branch ->
       get_endpoints(ie, branch)
@@ -921,7 +928,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         {min_full_name, _min_abbreviated_name} = min_station_name
         {max_full_name, _max_abbreviated_name} = max_station_name
 
-        {min_full_name, max_full_name}
+        {abbreviate_station_name(min_full_name), abbreviate_station_name(max_full_name)}
     end
   end
 
