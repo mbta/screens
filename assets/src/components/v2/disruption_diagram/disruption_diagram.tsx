@@ -482,7 +482,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   let icon;
   if (slot.show_symbol) {
     if (isCurrentStop) {
-      if (isAffected && effect === "station_closure") {
+      if (isAffected) {
         icon = (
           <StationClosureStopIcon
             x={x}
