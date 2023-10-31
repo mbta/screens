@@ -82,7 +82,7 @@ defmodule ScreensWeb.V2.ScreenController do
 
     conn
     |> assign(:app_id, app_id)
-    |> assign(:widget_data, if(params["widget"], do: Poison.encode!(params["widget"]), else: nil))
+    |> assign(:widget_data, if(params["widget"], do: Jason.encode!(params["widget"]), else: nil))
     |> render("index_widget.html")
   end
 

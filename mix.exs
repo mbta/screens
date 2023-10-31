@@ -81,8 +81,7 @@ defmodule Screens.MixProject do
       {:memcachex, "~> 0.5.5"},
       {:telemetry_poller, "~> 0.4"},
       {:telemetry_metrics, "~> 0.4"},
-      {:screens_config, git: "https://github.com/mbta/screens-config-lib.git"},
-      {:poison, "~> 4.0"}
+      {:screens_config, git: "https://github.com/mbta/screens-config-lib.git"}
     ]
   end
 end
