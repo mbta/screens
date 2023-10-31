@@ -122,8 +122,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
        ) do
     next_train_prediction = common_params.next_train_prediction
 
-    # If there is an upcoming train, it's headed to this station, and we're not at a temporary terminal,
-    # show the widget
+    # If there is an upcoming train, it's headed to this station,
+    # and we're not at a temporary terminal, log the widget.
     if Prediction.vehicle_status(next_train_prediction) in [:in_transit_to, :incoming_at] and
          next_train_prediction
          |> Prediction.stop_for_vehicle()
@@ -192,7 +192,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
 
         []
 
-      # Start timer for dwell time but don't show the widget
+      # Cache previous prediction but don't log the widget
       Prediction.vehicle_status(next_train_prediction) == :stopped_at and
           Prediction.stop_for_vehicle(next_train_prediction) == previous_platform_id ->
         previous_station_prediction_current_trip =
@@ -248,13 +248,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
          previous_departure_time_cushion
        ) do
     # cached_prediction.departure_time minus previous_departure_time_cushion is when we expect crowding to be reliable.
-    # When now >= this time, show the widget.
-    show_widget_after_dt =
+    # When now >= this time, log the widget.
+    log_widget_after_time =
       DateTime.add(cached_prediction.departure_time, previous_departure_time_cushion)
 
     if DateTime.compare(
          common_params.now,
-         show_widget_after_dt
+         log_widget_after_time
        ) in [
          :eq,
          :gt
@@ -281,7 +281,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
     else
       # Update the cached prediction so we can check the new crowding classes next fetch.
       # The departure time we use in the other heuristic should not change, and if it does it is changing to a more accurate time.
-      # If the prediction is nil, leave the existing one alone just in case the dwell time heuristic can log next refresh.
+      # If the prediction is nil, leave the existing one alone just in case the time heuristic can log next refresh.
       previous_station_prediction_current_trip =
         fetch_previous_station_prediction(
           common_params.train_crowding_config,
