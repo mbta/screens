@@ -127,7 +127,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       Enum.map_join(
         prediction.vehicle.carriages,
         ",",
-        &Util.translate_carriage_occupancy_status(&1.occupancy_status)
+        &Util.translate_carriage_occupancy_status/1
       )
 
     Logger.info(
