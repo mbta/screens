@@ -76,24 +76,6 @@ defmodule ScreensWeb.V2.ScreenController do
     |> render("index_multi.html")
   end
 
-  def widget(conn, %{"id" => app_id, "widget" => widget_data})
-      when app_id in @app_id_strings do
-    app_id = String.to_existing_atom(app_id)
-
-    conn
-    |> assign(:app_id, app_id)
-    |> assign(:widget_data, Jason.encode!(widget_data))
-    |> render("index_widget.html")
-  end
-
-  def widget(conn, %{"id" => app_id}) do
-    app_id = String.to_existing_atom(app_id)
-
-    conn
-    |> put_status(:bad_request)
-    |> text("POST /#{app_id}/widget request must contain a JSON body with `widget` key")
-  end
-
   def index(conn, %{"id" => screen_id} = params) do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
 
@@ -134,6 +116,24 @@ defmodule ScreensWeb.V2.ScreenController do
 
   def index(conn, _params) do
     render_not_found(conn)
+  end
+
+  def widget(conn, %{"id" => app_id, "widget" => widget_data})
+      when app_id in @app_id_strings do
+    app_id = String.to_existing_atom(app_id)
+
+    conn
+    |> assign(:app_id, app_id)
+    |> assign(:widget_data, Jason.encode!(widget_data))
+    |> render("index_widget.html")
+  end
+
+  def widget(conn, %{"id" => app_id}) do
+    app_id = String.to_existing_atom(app_id)
+
+    conn
+    |> put_status(:bad_request)
+    |> text("POST /#{app_id}/widget request must contain a JSON body with `widget` key")
   end
 
   def simulation(conn, params) do
