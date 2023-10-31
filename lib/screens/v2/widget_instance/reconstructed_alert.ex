@@ -99,7 +99,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Red" => ["Ashmont/Braintree", "Alewife"],
     "Green-B" => ["Boston College", "Government Center"],
     "Green-C" => ["Cleveland Circle", "Government Center"],
-    "Green-D" => ["Riverside", "North Station & North"],
+    "Green-D" => ["Riverside", "Union Square"],
     "Green-E" => ["Heath Street", "Medford/Tufts"]
   }
 
