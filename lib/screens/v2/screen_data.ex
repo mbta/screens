@@ -22,7 +22,8 @@ defmodule Screens.V2.ScreenData do
   @type response_map :: %{
           data: serializable_map() | nil,
           force_reload: boolean(),
-          disabled: boolean()
+          disabled: boolean(),
+          last_deploy_timestamp: DateTime.t()
         }
   @type paging_metadata :: %{
           Template.non_paged_slot_id() =>
