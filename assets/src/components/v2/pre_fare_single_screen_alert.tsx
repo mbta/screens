@@ -447,7 +447,12 @@ const PreFareSingleScreenAlert: React.ComponentType<
           showBanner ? "with-banner" : "no-banner",
         ])}
       >
-        <div className="alert-card">
+        <div
+          className={classWithModifier(
+            "alert-card",
+            showBanner ? "with-banner" : "no-banner"
+          )}
+        >
           <div className="alert-card__body">{layout}</div>
           <div className="alert-card__footer">
             {cause && (

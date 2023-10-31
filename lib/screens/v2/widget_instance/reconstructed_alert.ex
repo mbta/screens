@@ -99,8 +99,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Red" => ["Ashmont/Braintree", "Alewife"],
     "Green-B" => ["Boston College", "Government Center"],
     "Green-C" => ["Cleveland Circle", "Government Center"],
-    "Green-D" => ["Riverside", "North Station"],
-    "Green-E" => ["Heath Street", "Union Square"]
+    "Green-D" => ["Riverside", "Union Square"],
+    "Green-E" => ["Heath Street", "Medford/Tufts"]
   }
 
   @headsign_svg_map %{
