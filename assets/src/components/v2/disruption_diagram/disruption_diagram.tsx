@@ -195,16 +195,15 @@ const SuspensionStopIcon: ComponentType<IconProps> = ({ x }) => {
   const iconWidth = 30;
 
   return (
-    <>
-      <rect x={x - iconWidth / 4} y="5" width="18" height="16" fill="white" />
+    <g transform={`translate(${x - iconWidth / 2} ${-iconWidth / 10})`}>
+      <rect x="7" y="6" width="17" height="19" fill="white" />
       <path
-        transform={`translate(${x - iconWidth / 2} -2)`}
         fillRule="evenodd"
         clipRule="evenodd"
         d="M8.93886 0C8.76494 0 8.5985 0.0707868 8.47786 0.196069L0.178995 8.81412C0.0641567 8.93338 0 9.09249 0 9.25805V21.0682C0 21.238 0.0674284 21.4008 0.187452 21.5208L8.47922 29.8125C8.59924 29.9326 8.76202 30 8.93176 30H21.0611C21.2351 30 21.4015 29.9292 21.5221 29.8039L29.821 21.1859C29.9358 21.0666 30 20.9075 30 20.7419V8.93176C30 8.76202 29.9326 8.59924 29.8125 8.47922L21.5208 0.187452C21.4008 0.0674284 21.238 0 21.0682 0H8.93886ZM7.5935 10.0066C7.34658 10.2576 7.34866 10.6608 7.59816 10.9091L11.957 15.248L7.59623 19.6793C7.34824 19.9313 7.35156 20.3366 7.60365 20.5845L9.73397 22.6794C9.98593 22.9272 10.391 22.9239 10.6389 22.672L15 18.2404L19.3611 22.672C19.609 22.9239 20.0141 22.9272 20.266 22.6794L22.3964 20.5845C22.6484 20.3366 22.6518 19.9313 22.4038 19.6793L18.043 15.248L22.4018 10.9091C22.6513 10.6608 22.6534 10.2576 22.4065 10.0066L20.2613 7.82685C20.0124 7.5739 19.6052 7.5718 19.3537 7.82217L15 12.1559L10.6463 7.82217C10.3948 7.5718 9.98758 7.5739 9.73865 7.82685L7.5935 10.0066Z"
         fill="#171F26"
       />
-    </>
+    </g>
   );
 };
 
@@ -227,13 +226,20 @@ const StationClosureStopIcon: ComponentType<IconProps> = ({ x, className }) => {
 };
 
 const ShuttleStopIcon: ComponentType<IconProps> = ({ x }) => (
-  <circle cx={x} cy="12" r="10" fill="white" stroke="#171F26" strokeWidth="4" />
+  <circle
+    cx={x}
+    cy={LINE_HEIGHT / 2}
+    r="10"
+    fill="white"
+    stroke="#171F26"
+    strokeWidth="4"
+  />
 );
 
 const StopIcon: ComponentType<IconProps> = ({ x, className }) => (
   <circle
     cx={x}
-    cy="12"
+    cy={LINE_HEIGHT / 2}
     r="10"
     fill="white"
     className={className}
@@ -244,7 +250,7 @@ const StopIcon: ComponentType<IconProps> = ({ x, className }) => (
 const StopIconEndpoint: ComponentType<IconProps> = ({ x, className }) => (
   <circle
     cx={x}
-    cy="12"
+    cy={LINE_HEIGHT / 2}
     r="20"
     fill="white"
     className={className}
@@ -574,6 +580,7 @@ const EffectBackgroundComponent: ComponentType<
 
   const x1 = rangeStart * (spaceBetween + SLOT_WIDTH) + L;
   const x2 = (spaceBetween + SLOT_WIDTH) * rangeEnd + L;
+  const heightOfBackground = 16;
 
   let background;
   if (effect === "shuttle") {
@@ -586,7 +593,7 @@ const EffectBackgroundComponent: ComponentType<
         y1="12"
         x2={x2}
         y2="12"
-        strokeWidth={16}
+        strokeWidth={heightOfBackground}
         stroke="black"
         strokeDasharray={`${dash} ${gap}`}
       />
@@ -595,9 +602,9 @@ const EffectBackgroundComponent: ComponentType<
     background = (
       <rect
         width={x2 - x1 + SLOT_WIDTH}
-        height="16"
+        height={heightOfBackground}
         x={x1}
-        y="5"
+        y={heightOfBackground / 4}
         fill="#AEAEAE"
       />
     );
@@ -630,40 +637,41 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
   const x2 = ((spaceBetween + SLOT_WIDTH) * rangeEnd + L) * scaleFactor;
 
   const middleOfLine = (x2 - x1) / 2 + x1;
-  const widthOfBackground = 40;
+  const widthOfBackground = 80;
+  const endLinesHeight = 24;
 
   let icon;
   if (effect === "shuttle") {
     icon = (
-      <>
-        <circle cx={middleOfLine} cy="8" r={widthOfBackground} fill="#171F26" />
+      <g
+        transform={`translate(${
+          middleOfLine - widthOfBackground / 2
+        } ${-endLinesHeight})`}
+      >
+        <circle cx="40" cy="40" r="40" fill="#171F26" />
         <path
-          transform={`translate(${middleOfLine - widthOfBackground} -32)`}
           fillRule="evenodd"
           clipRule="evenodd"
           d="M60.8695 37.5334L58.842 21.6673C58.327 18.8044 56.513 17.6872 53.8141 16.5156C49.3915 14.9398 44.7285 14.0896 40.017 14C35.2983 14.0906 30.628 14.9408 26.1974 16.5156C23.532 17.6651 21.7178 18.8039 21.1691 21.6668L19.1309 37.5334V59.4837H22.709V63.3065C22.7138 64.8769 24.0275 66.1487 25.6492 66.153C27.2708 66.1484 28.5841 64.8765 28.5889 63.3062V59.4834H51.5189V63.3062C51.5111 64.3282 52.0697 65.2758 52.9824 65.789C53.8951 66.3022 55.0219 66.3022 55.9346 65.789C56.8473 65.2758 57.4059 64.3282 57.3982 63.3062V59.4834H60.87L60.8695 37.5334ZM31.429 18.0156H48.6755C49.4054 18.0156 49.997 18.5886 49.997 19.2954C49.997 20.0022 49.4054 20.5751 48.6755 20.5751H31.429C30.6991 20.5751 30.1074 20.0022 30.1074 19.2954C30.1074 18.5886 30.6991 18.0156 31.429 18.0156ZM24.5181 24.5431L22.839 37.069C22.8167 37.2128 22.8167 37.359 22.839 37.5028C22.8175 37.9344 22.9743 38.3566 23.2748 38.676C23.5752 38.9955 23.9947 39.186 24.4404 39.2055H55.7192C56.1641 39.2101 56.5924 39.0417 56.9081 38.7379C57.2237 38.4341 57.4002 38.0204 57.3982 37.5895V37.5028C57.4207 37.359 57.4207 37.2128 57.3982 37.069L55.7192 24.5431C55.5841 23.7547 54.8758 23.1793 54.0506 23.1876H26.1971C25.3697 23.179 24.6582 23.7534 24.5181 24.5431ZM25.6476 52.6951C23.9189 52.6982 22.515 51.3436 22.5117 49.6696C22.5085 47.9956 23.9072 46.636 25.6358 46.6328C27.3645 46.6296 28.7686 47.984 28.772 49.658C28.7741 50.4621 28.446 51.2341 27.86 51.8038C27.2739 52.3735 26.478 52.6941 25.6476 52.6951ZM54.4601 46.6328C52.733 46.6339 51.3332 47.9895 51.332 49.662C51.3309 51.3345 52.7289 52.6918 54.4555 52.6951C55.2881 52.6973 56.0872 52.3781 56.6759 51.808C57.2647 51.238 57.5945 50.4642 57.5923 49.658C57.5889 47.9855 56.1872 46.6317 54.4601 46.6328Z"
           fill="white"
         />
-      </>
+      </g>
     );
   } else if (effect === "suspension") {
     icon = (
-      <>
-        <rect
-          x={middleOfLine - 32}
-          width={60}
-          height={45}
-          y="-6"
-          fill="white"
-        />
+      <g
+        transform={`translate(${middleOfLine - widthOfBackground / 2} ${
+          (endLinesHeight - widthOfBackground) / 2
+        })`}
+      >
+        <ellipse cx="40.625" cy="39.375" rx="27.5" ry="29.375" fill="white" />
         <path
-          transform={`translate(${middleOfLine - widthOfBackground} -25)`}
           fillRule="evenodd"
           clipRule="evenodd"
           d="M23.837 0C23.3732 0 22.9293 0.188765 22.6076 0.522852L0.47732 23.5043C0.171085 23.8223 0 24.2467 0 24.6881V56.182C0 56.6346 0.179809 57.0687 0.499871 57.3888L22.6112 79.5001C22.9313 79.8202 23.3654 80 23.818 80H56.163C56.6268 80 57.0707 79.8112 57.3924 79.4771L79.5227 56.4957C79.8289 56.1777 80 55.7534 80 55.3119V23.818C80 23.3654 79.8202 22.9313 79.5001 22.6112L57.3888 0.499871C57.0687 0.179809 56.6346 0 56.182 0H23.837ZM20.2493 26.6844C19.5909 27.3535 19.5964 28.4288 20.2618 29.091L31.8854 40.6614L20.2566 52.478C19.5953 53.15 19.6042 54.2309 20.2764 54.892L25.9573 60.4784C26.6291 61.1391 27.7094 61.1303 28.3703 60.4586L40 48.6411L51.6297 60.4586C52.2906 61.1303 53.3708 61.1391 54.0427 60.4784L59.7236 54.892C60.3958 54.2309 60.4047 53.15 59.7434 52.478L48.1146 40.6614L59.7383 29.091C60.4036 28.4288 60.4091 27.3535 59.7507 26.6844L54.0303 20.8716C53.3665 20.1971 52.2805 20.1915 51.6098 20.8591L40 32.4157L28.3902 20.8591C27.7195 20.1915 26.6335 20.1971 25.9697 20.8716L20.2493 26.6844Z"
           fill="#171F26"
         />
-      </>
+      </g>
     );
   }
 
@@ -673,19 +681,19 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
         2 && (
         <>
           <path
-            d={`M${x1} 4L${x1} 28`}
+            d={`M${x1} 0L${x1} ${endLinesHeight}`}
             stroke="#737373"
             strokeWidth="8"
             strokeLinecap="round"
           />
           <path
-            d={`M${x1} 16H${x2}`}
+            d={`M${x1} ${endLinesHeight / 2}H${x2}`}
             stroke="#737373"
             strokeWidth="8"
             strokeLinecap="round"
           />
           <path
-            d={`M${x2} 4L${x2} 28`}
+            d={`M${x2} 0L${x2} ${endLinesHeight}`}
             stroke="#737373"
             strokeWidth="8"
             strokeLinecap="round"
