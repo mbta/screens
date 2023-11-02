@@ -741,7 +741,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       ?.getBoundingClientRect();
 
     const newSvgHeight = svgContainerDimensions?.height;
-    // Container height changed since last update, reset state.
+    // Container height changed to a value that is different than the previous height, reset state.
     if (newSvgHeight && prevSvgHeight !== newSvgHeight) {
       resetState(newSvgHeight);
     }
