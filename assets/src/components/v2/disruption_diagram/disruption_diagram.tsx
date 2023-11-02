@@ -741,6 +741,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       ?.getBoundingClientRect();
 
     const newSvgHeight = svgContainerDimensions?.height;
+    // Container height changed since last update, reset state.
     if (newSvgHeight && prevSvgHeight !== newSvgHeight) {
       resetState(newSvgHeight);
     }
@@ -763,7 +764,9 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     if (newLineMapHeight * scaling + spaceNeededBelowLineMap <= svgHeight) {
       setScaleFactor(scaling);
       setLineMapHeight(newLineMapHeight * scaling);
-    } else {
+    }
+    // Scaling with MAX_WIDTH made the diagram too tall. Reset scaling and try abbreviating.
+    else {
       setScaleFactor(1);
       setLineMapHeight(newLineMapHeight);
       setDoAbbreviate(true);
@@ -788,14 +791,21 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       let done = false;
 
       while (!done) {
+        // Scaling === 1 when we are trying to abbreviate without scaling.
+        // If diagram is still too big, try scaling with MAX_WIDTH again.
         if (scaling === 1) {
           scaling = MAX_WIDTH / newLineMapWidth;
-        } else if (
+        }
+        // Abbreviating and scaling with MAX_WIDTH was enough. Wrap up hook.
+        else if (
           newLineMapHeight * scaleFactor + spaceNeededBelowLineMap <=
           svgHeight
         ) {
           done = true;
-        } else {
+        }
+        // Abbreviating and scaling with MAX_WIDTH wasn't enough.
+        // Scale with height.
+        else {
           scaling = (svgHeight - spaceNeededBelowLineMap) / newLineMapHeight;
           done = true;
         }
@@ -806,6 +816,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     }
   }, [doAbbreviate]);
 
+  // Get MiddleSlots
   const numStops = slots.length;
   const spaceBetween = Math.min(
     60,
