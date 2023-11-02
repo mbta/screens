@@ -20,7 +20,6 @@ interface DisruptionDiagramBase {
   line: LineColor;
   current_station_slot_index: number;
   slots: [EndSlot, ...MiddleSlot[], EndSlot];
-  svgHeight: number;
 }
 
 interface ContinuousDisruptionDiagram extends DisruptionDiagramBase {
@@ -715,7 +714,7 @@ Client is responsible for:
 */
 
 const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
-  const { slots, current_station_slot_index, line, effect, svgHeight } = props;
+  const { slots, current_station_slot_index, line, effect } = props;
 
   const [doAbbreviate, setDoAbbreviate] = useState(false);
   const [scaleFactor, setScaleFactor] = useState(1);

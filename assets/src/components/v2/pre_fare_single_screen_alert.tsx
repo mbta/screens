@@ -304,28 +304,12 @@ interface MapSectionProps {
 const MapSection: React.ComponentType<MapSectionProps> = ({
   disruptionDiagram,
 }) => {
-  const [diagramHeight, setDiagramHeight] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const resizeObserver = new ResizeObserver(() => {
-      // Do what you want to do when the size of the element changes
-      if (ref?.current) {
-        setDiagramHeight(ref.current.clientHeight);
-      }
-    });
-    resizeObserver.observe(ref.current);
-    return () => resizeObserver.disconnect(); // clean up
-  });
-
   return (
     <div
       id="disruption-diagram-container"
       className="disruption-diagram-container"
-      ref={ref}
     >
-      <DisruptionDiagram {...disruptionDiagram} svgHeight={diagramHeight} />
+      <DisruptionDiagram {...disruptionDiagram} />
     </div>
   );
 };
