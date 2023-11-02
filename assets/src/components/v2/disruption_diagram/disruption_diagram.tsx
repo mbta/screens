@@ -718,13 +718,100 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   const [doAbbreviate, setDoAbbreviate] = useState(false);
   const [scaleFactor, setScaleFactor] = useState(1);
+  const [svgHeight, setSvgHeight] = useState(0);
+  const [prevSvgHeight, setPrevSvgHeight] = useState(-1);
+  const [lineMapHeight, setLineMapHeight] = useState(0);
+  const hasEmphasis = effect !== "station_closure";
+  const spaceNeededBelowLineMap = hasEmphasis
+    ? EMPHASIS_HEIGHT + EMPHASIS_PADDING_TOP
+    : 0;
+
+  const resetState = (newSvgHeight: number) => {
+    setPrevSvgHeight(newSvgHeight);
+    setSvgHeight(newSvgHeight);
+    setLineMapHeight(0);
+    setDoAbbreviate(false);
+    setScaleFactor(1);
+  };
+
+  // Hook that fires when the div in the parent changes size. Reset and start over.
+  useEffect(() => {
+    const svgContainerDimensions = document
+      .getElementById("disruption-diagram-container")
+      ?.getBoundingClientRect();
+
+    const newSvgHeight = svgContainerDimensions?.height;
+    if (newSvgHeight && prevSvgHeight !== newSvgHeight) {
+      resetState(newSvgHeight);
+    }
+  });
+
+  // Hook that checks if we can simply scale based on MAX_WIDTH. If not, we'll try abbreviating.
+  useEffect(() => {
+    const lineMapDimensions = document
+      .getElementById("line-map")
+      ?.getBoundingClientRect();
+
+    const newLineMapHeight = lineMapDimensions?.height;
+    const newLineMapWidth = lineMapDimensions?.width;
+    if (!newLineMapWidth || !newLineMapHeight || svgHeight === 0) return;
+
+    // Initial scaling is always based on MAX_WIDTH
+    let scaling = MAX_WIDTH / newLineMapWidth;
+
+    // Scaling based on width worked
+    if (newLineMapHeight * scaling + spaceNeededBelowLineMap <= svgHeight) {
+      setScaleFactor(scaling);
+      setLineMapHeight(newLineMapHeight * scaling);
+    } else {
+      setScaleFactor(1);
+      setLineMapHeight(newLineMapHeight);
+      setDoAbbreviate(true);
+    }
+  }, [svgHeight]);
+
+  // Hook that fires when we start abbreviating station names.
+  // It first checks the dimensions after abbreviations without any scaling.
+  // If that is still too big, try abbreviations + scaling based on MAX_WIDTH.
+  // If that is still too big, use abbreviations + scaling based on max height (svgHeight - EMPHASIS_HEIGHT - EMPHASIS_PADDING_TOP).
+  useEffect(() => {
+    if (doAbbreviate) {
+      const lineMapDimensions = document
+        .getElementById("line-map")
+        ?.getBoundingClientRect();
+
+      const newLineMapHeight = lineMapDimensions?.height;
+      const newLineMapWidth = lineMapDimensions?.width;
+      if (!newLineMapWidth || !newLineMapHeight) return;
+
+      let scaling = scaleFactor;
+      let done = false;
+
+      while (!done) {
+        if (scaling === 1) {
+          scaling = MAX_WIDTH / newLineMapWidth;
+        } else if (
+          newLineMapHeight * scaleFactor + spaceNeededBelowLineMap <=
+          svgHeight
+        ) {
+          done = true;
+        } else {
+          scaling = (svgHeight - spaceNeededBelowLineMap) / newLineMapHeight;
+          done = true;
+        }
+      }
+
+      setScaleFactor(scaling);
+      setLineMapHeight(newLineMapHeight * scaling);
+    }
+  }, [doAbbreviate]);
+
   const numStops = slots.length;
   const spaceBetween = Math.min(
     60,
     (W - SLOT_WIDTH * numStops) / (numStops - 1)
   );
   const { 0: beginning, [slots.length - 1]: end, ...middle } = slots;
-  const hasEmphasis = effect !== "station_closure";
   const labelTextClass = slots.length > 12 ? "small" : "large";
 
   let x = 0;
@@ -760,46 +847,6 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   });
 
   x += spaceBetween + SLOT_WIDTH;
-
-  const [isDone, setIsDone] = useState(false);
-  const [isDoneScaling, setIsDoneScaling] = useState(false);
-  const [lineMapHeight, setLineMapHeight] = useState(0);
-
-  useEffect(() => {
-    const dimensions = document
-      .getElementById("line-map")
-      ?.getBoundingClientRect();
-
-    const height = dimensions?.height;
-    const width = dimensions?.width;
-
-    if (!isDoneScaling && width) {
-      // Scale diagram up or down so width is 904px
-      setScaleFactor(904 / width);
-      setIsDoneScaling(true);
-    } else if (!isDone && isDoneScaling) {
-      // If the height of the line map + emphasis (if present) is still too tall,
-      // abbreviate station names.
-      if (height && height + (hasEmphasis ? EMPHASIS_HEIGHT : 0) > svgHeight) {
-        setDoAbbreviate(true);
-      }
-
-      setIsDone(true);
-    }
-  });
-
-  // Get the finalized height of the line map after scaling and abbreviations
-  useEffect(() => {
-    const dimensions = document
-      .getElementById("line-map")
-      ?.getBoundingClientRect();
-
-    const height = dimensions?.height;
-
-    if (isDone && height) {
-      setLineMapHeight(height);
-    }
-  }, [isDone]);
 
   return (
     <svg
