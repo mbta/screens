@@ -609,13 +609,22 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "returns Now on e-Ink screens", %{bus_eink_screen: screen} do
-      serialized_now = [%{id: nil, crowding: nil, time: %{text: "Now", type: :text}}]
       now = ~U[2020-01-01T00:00:00Z]
+      departure_time = ~U[2020-01-01T00:00:50Z]
+
+      now_timestamp = %{
+        id: nil,
+        crowding: nil,
+        time: %{text: "Now", type: :text},
+        time_in_epoch: DateTime.to_unix(departure_time)
+      }
+
+      serialized_now = [now_timestamp]
 
       departure = %Departure{
         prediction: %Prediction{
-          arrival_time: ~U[2020-01-01T00:00:50Z],
-          departure_time: ~U[2020-01-01T00:00:50Z],
+          arrival_time: departure_time,
+          departure_time: departure_time,
           route: %Route{type: :subway}
         }
       }
@@ -623,10 +632,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert serialized_now ==
                Departures.serialize_times_with_crowding([departure], screen, now)
 
+      departure_time = ~U[2020-01-01T00:01:10Z]
+      serialized_now = [%{now_timestamp | time_in_epoch: DateTime.to_unix(departure_time)}]
+
       departure = %Departure{
         prediction: %Prediction{
-          arrival_time: ~U[2020-01-01T00:01:10Z],
-          departure_time: ~U[2020-01-01T00:01:10Z],
+          arrival_time: departure_time,
+          departure_time: departure_time,
           route: %Route{type: :subway}
         }
       }
