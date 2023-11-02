@@ -851,66 +851,68 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   return (
     <svg
       height="100%"
-      viewBox={`0 0 904 ${svgHeight}`}
+      viewBox={`${-SLOT_WIDTH / 2} 0 904 ${svgHeight}`}
       id="whole-svg"
-      visibility={isDone ? "visible" : "hidden"}
     >
       <g
-        id="line-map"
-        transform={`translate(${SLOT_WIDTH / 2}, ${
-          lineMapHeight - EMPHASIS_PADDING_TOP * scaleFactor - 16
-        }) scale(${scaleFactor})`}
+        transform={`translate(0, ${
+          hasEmphasis ? (lineMapHeight + 64) * scaleFactor : svgHeight / 2
+        })`}
       >
-        <EffectBackgroundComponent
-          effectRegionSlotIndexRange={
-            effect === "station_closure"
-              ? props.closed_station_slot_indices
-              : props.effect_region_slot_index_range
-          }
-          effect={effect}
-          spaceBetween={spaceBetween}
-        />
-        <FirstSlotComponent
-          slot={beginning}
-          line={line}
-          isCurrentStop={current_station_slot_index === 0}
-          spaceBetween={spaceBetween}
-          isAffected={
-            effect === "station_closure"
-              ? props.closed_station_slot_indices.includes(0)
-              : props.effect_region_slot_index_range.includes(0)
-          }
-          effect={effect}
-        />
-        {middleSlots}
-        <LastSlotComponent
-          slot={end as EndSlot}
-          x={x}
-          line={line}
-          isCurrentStop={current_station_slot_index === slots.length - 1}
-          isAffected={
-            effect === "station_closure"
-              ? props.closed_station_slot_indices.includes(slots.length - 1)
-              : props.effect_region_slot_index_range.includes(slots.length - 1)
-          }
-          effect={effect}
-        />
-      </g>
-      {hasEmphasis && (
-        <g
-          id="alert-emphasis"
-          transform={`translate(${SLOT_WIDTH / 2}, ${
-            lineMapHeight + EMPHASIS_HEIGHT - EMPHASIS_PADDING_TOP * scaleFactor
-          })`}
-        >
-          <AlertEmphasisComponent
-            effectRegionSlotIndexRange={props.effect_region_slot_index_range}
-            spaceBetween={spaceBetween}
+        <g id="line-map" transform={`scale(${scaleFactor})`}>
+          <EffectBackgroundComponent
+            effectRegionSlotIndexRange={
+              effect === "station_closure"
+                ? props.closed_station_slot_indices
+                : props.effect_region_slot_index_range
+            }
             effect={effect}
-            scaleFactor={scaleFactor}
+            spaceBetween={spaceBetween}
+          />
+          <FirstSlotComponent
+            slot={beginning}
+            line={line}
+            isCurrentStop={current_station_slot_index === 0}
+            spaceBetween={spaceBetween}
+            isAffected={
+              effect === "station_closure"
+                ? props.closed_station_slot_indices.includes(0)
+                : props.effect_region_slot_index_range.includes(0)
+            }
+            effect={effect}
+          />
+          {middleSlots}
+          <LastSlotComponent
+            slot={end as EndSlot}
+            x={x}
+            line={line}
+            isCurrentStop={current_station_slot_index === slots.length - 1}
+            isAffected={
+              effect === "station_closure"
+                ? props.closed_station_slot_indices.includes(slots.length - 1)
+                : props.effect_region_slot_index_range.includes(
+                    slots.length - 1
+                  )
+            }
+            effect={effect}
           />
         </g>
-      )}
+        {hasEmphasis && (
+          <g
+            id="alert-emphasis"
+            transform={`translate(0 ${
+              (EMPHASIS_HEIGHT - EMPHASIS_PADDING_TOP) * scaleFactor
+            })`}
+          >
+            <AlertEmphasisComponent
+              effectRegionSlotIndexRange={props.effect_region_slot_index_range}
+              spaceBetween={spaceBetween}
+              effect={effect}
+              scaleFactor={scaleFactor}
+            />
+          </g>
+        )}
+      </g>
     </svg>
   );
 };
