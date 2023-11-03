@@ -1,10 +1,10 @@
 defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @moduledoc false
 
-  alias ScreensConfig.Routes.Route
-  alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.DisruptionDiagram
