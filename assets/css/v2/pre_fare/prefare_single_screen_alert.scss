@@ -44,7 +44,7 @@
   .alert-card__body {
     min-height: 0;
     flex-grow: 1;
-    padding: 120px 56px 0 56px;
+    margin: 120px 56px 0 56px;
     box-sizing: border-box;
 
     .alert-card__content-block {
@@ -158,7 +158,10 @@
   }
 
   .disruption-diagram-container {
+    width: 100%;
     flex: 1;
+    min-height: 0;
+    margin-bottom: 10px;
   }
 }
 
