@@ -24,4 +24,9 @@ defmodule Screens.Alerts.InformedEntity do
       ie
     )
   end
+
+  @spec parent_station?(t()) :: boolean
+  def parent_station?(ie) do
+    match?(%{stop: "place-" <> _}, ie)
+  end
 end

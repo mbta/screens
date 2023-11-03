@@ -1426,13 +1426,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-north", route: "Green-C", route_type: 0),
           ie(stop: "place-north", route: "Green-D", route_type: 0),
           ie(stop: "place-north", route: "Green-E", route_type: 0),
+          ie(stop: "place-spmnl", route: "Green-D", route_type: 0),
           ie(stop: "place-spmnl", route: "Green-E", route_type: 0)
         ])
         |> put_cause(:unknown)
         |> put_tagged_stop_sequences(%{
+          "Green-D" => [
+            [
+              "place-spmnl",
+              "place-north",
+              "place-haecl",
+              "place-gover"
+            ]
+          ],
           "Green-E" => [
             [
-              "place-symcl",
+              "place-spmnl",
               "place-north",
               "place-haecl",
               "place-gover"
@@ -1460,13 +1469,273 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected = %{
         issue: "No trains",
-        location: "between Science Park/West End and North Station",
+        location: "between North Station and Science Park/West End",
         cause: "",
         routes: [%{color: :green, text: "GREEN LINE", type: :text}],
         effect: :shuttle,
         urgent: false,
         region: :outside,
         remedy: "Use shuttle bus"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
+  end
+
+  describe "endpoint reversal" do
+    setup [:setup_screen_config, :setup_now, :setup_active_period]
+
+    test "reverses endpoints for BL alerts", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-mvbcl")
+        |> put_effect(:shuttle)
+        |> put_informed_entities([
+          ie(stop: "place-orhte", route: "Blue", route_type: 0),
+          ie(stop: "place-wimnl", route: "Blue", route_type: 0),
+          ie(stop: "place-aport", route: "Blue", route_type: 0)
+        ])
+        |> put_cause(:unknown)
+        |> put_tagged_stop_sequences(%{
+          "Blue" => [
+            [
+              "place-wondl",
+              "place-rbmnl",
+              "place-bmmnl",
+              "place-sdmnl",
+              "place-orhte",
+              "place-wimnl",
+              "place-aport",
+              "place-mvbcl",
+              "place-aqucl",
+              "place-state",
+              "place-gover",
+              "place-bomnl"
+            ]
+          ]
+        })
+        |> put_routes_at_stop([
+          %{
+            route_id: "Blue",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
+
+      expected = %{
+        issue: "No trains",
+        location: "between Airport and Orient Heights",
+        cause: "",
+        routes: [%{color: :blue, text: "BLUE LINE", type: :text}],
+        effect: :shuttle,
+        urgent: false,
+        region: :outside,
+        remedy: "Use shuttle bus"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
+
+    test "reverses endpoints for GL trunk alert", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-gover")
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-pktrm", route: "Green-B", route_type: 0),
+          ie(stop: "place-pktrm", route: "Green-C", route_type: 0),
+          ie(stop: "place-pktrm", route: "Green-D", route_type: 0),
+          ie(stop: "place-pktrm", route: "Green-E", route_type: 0),
+          ie(stop: "place-boyls", route: "Green-B", route_type: 0),
+          ie(stop: "place-boyls", route: "Green-C", route_type: 0),
+          ie(stop: "place-boyls", route: "Green-D", route_type: 0),
+          ie(stop: "place-boyls", route: "Green-E", route_type: 0),
+          ie(stop: "place-armnl", route: "Green-B", route_type: 0),
+          ie(stop: "place-armnl", route: "Green-C", route_type: 0),
+          ie(stop: "place-armnl", route: "Green-D", route_type: 0),
+          ie(stop: "place-armnl", route: "Green-E", route_type: 0)
+        ])
+        |> put_cause(:unknown)
+        |> put_tagged_stop_sequences(%{
+          "Green-B" => [
+            [
+              "place-haecl",
+              "place-gover",
+              "place-pktrm",
+              "place-boyls",
+              "place-armnl"
+            ]
+          ],
+          "Green-C" => [
+            [
+              "place-haecl",
+              "place-gover",
+              "place-pktrm",
+              "place-boyls",
+              "place-armnl"
+            ]
+          ],
+          "Green-D" => [
+            [
+              "place-haecl",
+              "place-gover",
+              "place-pktrm",
+              "place-boyls",
+              "place-armnl"
+            ]
+          ],
+          "Green-E" => [
+            [
+              "place-haecl",
+              "place-gover",
+              "place-pktrm",
+              "place-boyls",
+              "place-armnl"
+            ]
+          ]
+        })
+        |> put_routes_at_stop([
+          %{
+            route_id: "Green-B",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          },
+          %{
+            route_id: "Green-C",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          },
+          %{
+            route_id: "Green-D",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          },
+          %{
+            route_id: "Green-E",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
+
+      expected = %{
+        issue: "No trains",
+        location: "between Arlington and Park Street",
+        cause: "",
+        routes: [%{color: :green, text: "GREEN LINE", type: :text}],
+        effect: :suspension,
+        urgent: false,
+        region: :outside,
+        remedy: "Seek alternate route"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
+
+    test "reverses endpoints for GL western branch alert", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-symcl")
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-mfa", route: "Green-E", route_type: 0),
+          ie(stop: "place-lngmd", route: "Green-E", route_type: 0),
+          ie(stop: "place-brmnl", route: "Green-E", route_type: 0)
+        ])
+        |> put_cause(:unknown)
+        |> put_tagged_stop_sequences(%{
+          "Green-E" => [
+            [
+              "place-symcl",
+              "place-nuniv",
+              "place-mfa",
+              "place-lngmd",
+              "place-brmnl"
+            ]
+          ]
+        })
+        |> put_routes_at_stop([
+          %{
+            route_id: "Green-E",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
+
+      expected = %{
+        issue: "No trains",
+        location: "between Brigham Circle and Museum of Fine Arts",
+        cause: "",
+        routes: [%{color: :green, text: "GREEN LINE", type: :text, branches: ["E"]}],
+        effect: :suspension,
+        urgent: false,
+        region: :outside,
+        remedy: "Seek alternate route"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
+
+    test "does not reverse endpoints for GLX alert", %{
+      widget: widget
+    } do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-esomr")
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-balsq", route: "Green-E", route_type: 0),
+          ie(stop: "place-mgngl", route: "Green-E", route_type: 0),
+          ie(stop: "place-gilmn", route: "Green-E", route_type: 0)
+        ])
+        |> put_cause(:unknown)
+        |> put_tagged_stop_sequences(%{
+          "Green-E" => [
+            [
+              "place-balsq",
+              "place-mgngl",
+              "place-gilmn",
+              "place-esomr"
+            ]
+          ]
+        })
+        |> put_routes_at_stop([
+          %{
+            route_id: "Green-E",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
+
+      expected = %{
+        issue: "No trains",
+        location: "between Ball Square and Gilman Square",
+        cause: "",
+        routes: [%{color: :green, text: "GREEN LINE", type: :text, branches: ["E"]}],
+        effect: :suspension,
+        urgent: false,
+        region: :outside,
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
