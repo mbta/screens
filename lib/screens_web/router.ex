@@ -84,6 +84,7 @@ defmodule ScreensWeb.Router do
 
       get "/:id", ScreenController, :index
       get "/:id/simulation", ScreenController, :simulation
+      post "/:id/widget", ScreenController, :widget
     end
 
     scope "/api/screen" do

@@ -1,0 +1,5 @@
+<div
+  id="app"
+  data-environment-name="<%= @environment_name %>"
+  data-widget-data="<%= @widget_data %>"
+></div>
