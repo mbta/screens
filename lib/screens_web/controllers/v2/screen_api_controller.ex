@@ -94,13 +94,9 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   defp put_audio_data(screen_data, screen_id, %Screen{app_id: :gl_eink_v2}) do
-    case fetch_ssml(screen_id) do
-      nil ->
-        screen_data
+    audio_data = fetch_ssml(screen_id) || ""
 
-      audio_data ->
-        Map.put(screen_data, :audio_data, audio_data)
-    end
+    Map.put(screen_data, :audio_data, audio_data)
   end
 
   defp put_audio_data(screen_data, _, _), do: screen_data
