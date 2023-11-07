@@ -1,10 +1,12 @@
 defmodule ScreensWeb.V2.ScreenApiController do
   use ScreensWeb, :controller
 
+  alias Phoenix.View
   alias Screens.Config.State
   alias Screens.LogScreenData
   alias Screens.Util
-  alias Screens.V2.ScreenData
+  alias ScreensConfig.Screen
+  alias Screens.V2.{ScreenAudioData, ScreenData}
 
   plug(:check_config)
 
@@ -24,6 +26,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
     screen_side = params["screen_side"]
     triptych_pane = params["pane"]
+    screen = Screens.Config.State.screen(screen_id)
 
     LogScreenData.log_data_request(
       screen_id,
@@ -75,17 +78,39 @@ defmodule ScreensWeb.V2.ScreenApiController do
           screen_side
         )
 
-        json(
-          conn,
-          ScreenData.by_screen_id(screen_id,
+        screen_data =
+          screen_id
+          |> ScreenData.by_screen_id(
             logging_options: %{
               is_real_screen: is_screen,
               screen_id: screen_id,
               triptych_pane: triptych_pane
             }
           )
-        )
+          |> put_audio_data(screen_id, screen)
+
+        json(conn, screen_data)
     end
+  end
+
+  defp put_audio_data(screen_data, screen_id, %Screen{app_id: :gl_eink_v2}) do
+    audio_data = fetch_ssml(screen_id) || ""
+
+    Map.put(screen_data, :audio_data, audio_data)
+  end
+
+  defp put_audio_data(screen_data, _, _), do: screen_data
+
+  defp fetch_ssml(screen_id) do
+    widget_audio_data = ScreenAudioData.by_screen_id(screen_id)
+
+    render_ssml(widget_audio_data: widget_audio_data)
+  end
+
+  defp render_ssml(widget_audio_data: []), do: nil
+
+  defp render_ssml(template_assigns) do
+    View.render_to_string(ScreensWeb.V2.AudioView, "index.ssml", template_assigns)
   end
 
   def show_dup(conn, params), do: show(conn, params)
