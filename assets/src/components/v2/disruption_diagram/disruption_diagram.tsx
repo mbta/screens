@@ -254,7 +254,7 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
       // It just looks right and affects little else
       <LeftArrowEndpoint x={5} className={classWithModifier("end-slot__arrow", line)} />
       : <RightArrowEndpoint x={x} className={classWithModifier("end-slot__arrow", line)} />
-  } else if (isAffected && effect === "station_closure" || effect === "suspension") {
+  } else if (isAffected && (effect === "station_closure" || effect === "suspension")) {
     icon = <LargeXStopIcon x={x} iconSize={61} />
   } else if (isCurrentStop && line === "red") {
     icon = <CurrentStopOpenDiamondIcon x={x} iconSize={64} />
@@ -269,7 +269,7 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
   }
 
   let background;
-  if (!isAffected && leftSide || effect === "station_closure" && leftSide) {
+  if ((!isAffected && leftSide) || (effect === "station_closure" && leftSide)) {
     background = (
       <rect
         className={classWithModifier("end-slot__arrow", line)}
@@ -673,7 +673,6 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
           effect={effect}
           spaceBetween={spaceBetween}
         />
-        {/* TODO: BUG with the endslot when OL suspension malden center - dtx */}
         <EndSlotComponent
           slot={beginning}
           x={L}
