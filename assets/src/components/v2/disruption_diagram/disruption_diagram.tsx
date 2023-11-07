@@ -14,6 +14,8 @@ const MAX_WIDTH = 904;
 const SLOT_WIDTH = 24;
 const LINE_HEIGHT = 24;
 const EMPHASIS_HEIGHT = 80;
+// This padding is only used in 1 spot, and it may not be the most accurate measure
+// of the padding above the emphasis. Keeping for now
 const EMPHASIS_PADDING_TOP = 8;
 const MAX_ICON_HEIGHT = 52;
 // L can vary based on arrow vs diamond (current stop). Would be nice if this was
@@ -360,9 +362,8 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
             icon = <SmallXStopIcon x={x} iconSize={48} />;
             break;
           case "shuttle":
-            // TODO: where in the designs is this? I didn't check to see if this is still looking good
             if (label !== "…" && label.full === "Beaconsfield") {
-              icon = <SmallXStopIcon x={x} iconSize={30} />;
+              icon = <SmallXStopIcon x={x} iconSize={24} />;
             } else {
               icon = <CircleShuttlingStopIcon x={x} />;
             }
