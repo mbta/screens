@@ -2,7 +2,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @moduledoc false
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.DisruptionDiagram
@@ -284,7 +286,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         [route_id] -> route_id
       end
 
-    endpoints = get_endpoints(informed_entities, route_id)
+    endpoints = get_endpoints(informed_entities, route_id, t.location_context.home_stop)
 
     %{
       issue: "No trains",
@@ -308,7 +310,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         [route_id] -> route_id
       end
 
-    endpoints = get_endpoints(informed_entities, route_id)
+    endpoints = get_endpoints(informed_entities, route_id, t.location_context.home_stop)
 
     %{
       issue: "No trains",
@@ -373,7 +375,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         [route_id] -> route_id
       end
 
-    endpoints = get_endpoints(informed_entities, route_id)
+    endpoints = get_endpoints(informed_entities, route_id, t.location_context.home_stop)
     destination = get_destination(t, location)
 
     {issue, location_text} =
@@ -427,7 +429,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         [route_id] -> route_id
       end
 
-    endpoints = get_endpoints(informed_entities, route_id)
+    endpoints = get_endpoints(informed_entities, route_id, t.location_context.home_stop)
     destination = get_destination(t, location)
 
     {issue, location_text, remedy} =
@@ -792,7 +794,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause_text = Alert.get_cause_string(cause)
 
       location_text =
-        informed_entities |> get_endpoints(hd(affected_routes)) |> format_endpoint_string()
+        informed_entities
+        |> get_endpoints(hd(affected_routes), t.location_context.home_stop)
+        |> format_endpoint_string()
 
       issue =
         if is_nil(direction_id) do
@@ -833,7 +837,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause_text = Alert.get_cause_string(cause)
 
       location_text =
-        informed_entities |> get_endpoints(hd(affected_routes)) |> format_endpoint_string()
+        informed_entities
+        |> get_endpoints(hd(affected_routes), t.location_context.home_stop)
+        |> format_endpoint_string()
 
       issue =
         if is_nil(direction_id) do
@@ -904,13 +910,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp abbreviate_station_name("Massachusetts Avenue"), do: "Mass Ave"
   defp abbreviate_station_name(full_name), do: full_name
 
-  def get_endpoints(ie, "Green") do
+  @spec get_endpoints(list(Alert.informed_entity()), Route.id(), Stop.id()) ::
+          {String.t(), String.t()} | nil
+  defp get_endpoints(informed_entities, route_id, home_stop) do
+    with {left_endpoint, right_endpoint} <- do_get_endpoints(informed_entities, route_id) do
+      orient_endpoints({left_endpoint, right_endpoint}, informed_entities, route_id, home_stop)
+    end
+  end
+
+  def do_get_endpoints(ie, "Green") do
     Enum.find_value(@green_line_branches, fn branch ->
-      get_endpoints(ie, branch)
+      do_get_endpoints(ie, branch)
     end)
   end
 
-  def get_endpoints(informed_entities, route_id) do
+  def do_get_endpoints(informed_entities, route_id) do
     case Stop.get_stop_sequence(informed_entities, route_id) do
       nil ->
         nil
@@ -932,14 +946,56 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  # In certain cases, we want to describe an alert's endpoints in the opposite direction,
+  # i.e. direction ID 1 instead of 0, so we need to flip the endpoints tuple before it gets formatted to string.
+  #
+  # Endpoints should be passed to this function in the order of direction ID 0.
+  # For example, orient_endpoints({"place-wondl", "place-gover"}, ...) and not orient_endpoints({"place-gover", "place-wondl"}, ...)
+
+  # All Blue Line alerts
+  defp orient_endpoints({left_endpoint, right_endpoint}, _informed_entities, "Blue", _home_stop) do
+    {right_endpoint, left_endpoint}
+  end
+
+  # All Green Line alerts *except* those where the alert's informed stops ++ the screen's home stop satisfy these conditions:
+  #   - includes at least one GLX stop
+  #   - does not include any stops west of Copley
+  defp orient_endpoints({left_endpoint, right_endpoint}, informed_entities, route_id, home_stop)
+       when route_id in ["Green" | @green_line_branches] do
+    if glx_oriented_alert?(informed_entities, home_stop) do
+      {left_endpoint, right_endpoint}
+    else
+      {right_endpoint, left_endpoint}
+    end
+  end
+
+  # Otherwise, we don't need to flip the endpoints.
+  defp orient_endpoints({left_endpoint, right_endpoint}, _ies, _route_id, _home_stop) do
+    {left_endpoint, right_endpoint}
+  end
+
+  defp glx_oriented_alert?(informed_entities, home_stop) do
+    parent_station_ies = Enum.filter(informed_entities, &InformedEntity.parent_station?/1)
+
+    # It's ok if the home stop is duplicated in this list due to also being informed by the alert.
+    relevant_parent_stations = [home_stop | Enum.map(parent_station_ies, & &1.stop)]
+
+    includes_glx = Enum.any?(relevant_parent_stations, &Stop.on_glx?/1)
+
+    stops_west_of_copley = Stop.get_gl_stops_west_of_copley()
+    includes_west_of_copley = Enum.any?(relevant_parent_stations, &(&1 in stops_west_of_copley))
+
+    includes_glx and not includes_west_of_copley
+  end
+
   def format_endpoint_string(nil), do: nil
 
+  def format_endpoint_string({station, station}) do
+    "at #{station}"
+  end
+
   def format_endpoint_string({min_station, max_station}) do
-    if min_station == max_station do
-      "at #{min_station}"
-    else
-      "between #{min_station} and #{max_station}"
-    end
+    "between #{min_station} and #{max_station}"
   end
 
   def serialize(widget, log_fn \\ &Logger.warn/1)

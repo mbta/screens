@@ -435,6 +435,19 @@ defmodule Screens.Stops.Stop do
     Enum.map(@green_line_branches, &get_route_stop_sequence/1)
   end
 
+  @doc """
+  Returns an unordered MapSet of all GL stops west of Copley.
+  """
+  @spec get_gl_stops_west_of_copley() :: MapSet.t(id())
+  def get_gl_stops_west_of_copley do
+    get_gl_stop_sequences()
+    |> Enum.flat_map(fn stop_sequence ->
+      [_copley | west_of_copley] = Enum.drop_while(stop_sequence, &(&1 != "place-coecl"))
+      west_of_copley
+    end)
+    |> MapSet.new()
+  end
+
   defp sequence_match?(stop_sequence, informed_entities) do
     ie_stops =
       informed_entities
