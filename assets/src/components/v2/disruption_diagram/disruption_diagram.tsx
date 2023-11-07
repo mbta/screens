@@ -488,13 +488,14 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
 
   const middleOfLine = (x2 - x1) / 2 + x1;
   const endLinesHeight = 24;
+  const endLinesStrokeWidth = 8;
 
   let icon;
   if (effect === "shuttle") {
     icon = (
       <g transform={`translate(${
             middleOfLine - EMPHASIS_HEIGHT / 2
-            } ${-endLinesHeight})`}>
+            } -${endLinesHeight + endLinesStrokeWidth/2})`}>
         <ShuttleBusIcon />
       </g>
     )
@@ -518,19 +519,19 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
           <path
             d={`M${x1} 0L${x1} ${endLinesHeight}`}
             stroke="#737373"
-            strokeWidth="8"
+            strokeWidth={`${endLinesStrokeWidth}`}
             strokeLinecap="round"
           />
           <path
             d={`M${x1} ${endLinesHeight / 2}H${x2}`}
             stroke="#737373"
-            strokeWidth="8"
+            strokeWidth={`${endLinesStrokeWidth}`}
             strokeLinecap="round"
           />
           <path
             d={`M${x2} 0L${x2} ${endLinesHeight}`}
             stroke="#737373"
-            strokeWidth="8"
+            strokeWidth={`${endLinesStrokeWidth}`}
             strokeLinecap="round"
           />
         </>
@@ -651,15 +652,17 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   // If topAndBottomMargins is negative, than there is no margin to use, so the viewBox offset should just be
   // the offset (essentially the basic height of the diagram)
   // Otherwise, if there is vertical room, the calculated margin is subtracted from that offset
-  const viewBoxOffset = topAndBottomMargins < 0 ? offset : offset - topAndBottomMargins 
+  const viewBoxOffset = topAndBottomMargins < 0 ? offset : offset - topAndBottomMargins
 
   return (
-    <svg viewBox={`0 -${viewBoxOffset} 904 ${svgHeight}`} transform={`translate(${translateX})`}>
-      <g
-        id="line-map"
-        transform={`scale(${scaleFactor})`}
-        visibility={isDone ? "visible" : "hidden"}
-      >
+    <svg
+      // viewBoxOffset will always be > 0 by the time it's visible, but the console will
+      // still log an error if it's a negative number when it's not-yet-visible
+      viewBox={`0 ${viewBoxOffset > 0 ? -viewBoxOffset : 0} 904 ${svgHeight}`}
+      transform={`translate(${translateX})`}
+      visibility={isDone ? "visible" : "hidden"}
+    >
+      <g id="line-map" transform={`scale(${scaleFactor})`}>
         <EffectBackgroundComponent
           effectRegionSlotIndexRange={
             effect === "station_closure"
@@ -703,8 +706,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       {hasEmphasis && (
         <g
           id="alert-emphasis"
-          transform={`translate(0, ${EMPHASIS_HEIGHT / 2 + (LINE_HEIGHT / 2) * scaleFactor})`}
-          visibility={isDone ? "visible" : "hidden"}
+          transform={`translate(0, ${EMPHASIS_HEIGHT/2 + (EMPHASIS_HEIGHT - MAX_ICON_HEIGHT) * scaleFactor})`}
         >
           <AlertEmphasisComponent
             effectRegionSlotIndexRange={props.effect_region_slot_index_range}
