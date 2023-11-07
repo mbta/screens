@@ -17,16 +17,14 @@ defmodule Screens.OlCrowding.DynamicSupervisor do
 
   def start_logger(
         original_crowding_levels,
-        prediction,
         %{
-          is_real_screen: true,
-          screen_id: screen_id,
-          triptych_pane: triptych_pane
-        },
-        train_crowding_config,
-        fetch_predictions_fn,
-        fetch_parent_stop_id_fn,
-        fetch_params
+          next_train_prediction: prediction,
+          logging_options: logging_options,
+          train_crowding_config: train_crowding_config,
+          fetch_predictions_fn: fetch_predictions_fn,
+          fetch_parent_stop_id_fn: fetch_parent_stop_id_fn,
+          fetch_params: fetch_params
+        }
       ) do
     spec = %{
       id: LogCrowdingInfo,
@@ -36,11 +34,7 @@ defmodule Screens.OlCrowding.DynamicSupervisor do
            %{
              original_crowding_levels: original_crowding_levels,
              prediction: prediction,
-             logging_options: %{
-               is_real_screen: true,
-               screen_id: screen_id,
-               triptych_pane: triptych_pane
-             },
+             logging_options: logging_options,
              train_crowding_config: train_crowding_config,
              fetch_predictions_fn: fetch_predictions_fn,
              fetch_parent_stop_id_fn: fetch_parent_stop_id_fn,
@@ -50,18 +44,6 @@ defmodule Screens.OlCrowding.DynamicSupervisor do
       restart: :transient
     }
 
-    case DynamicSupervisor.start_child(__MODULE__, spec) do
-      {:ok, child_pid} ->
-        _ = :timer.exit_after(10_000, child_pid, :kill)
-
-      {:ok, child_pid, _} ->
-        _ = :timer.exit_after(10_000, child_pid, :kill)
-
-      {:error, error} ->
-        Logger.error("crowding_dyn_supervisor_process_error #{inspect(error)}")
-
-      _ ->
-        Logger.warn("Something went wrong with starting the crowding dynamic supervisor process")
-    end
+    DynamicSupervisor.start_child(__MODULE__, spec)
   end
 end

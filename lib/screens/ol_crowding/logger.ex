@@ -13,6 +13,9 @@ defmodule Screens.OlCrowding.LogCrowdingInfo do
 
   @impl true
   def init(state) do
+    # Widget only shows for a maximum of 15 seconds. Go ahead and schedule the exit.
+    Process.send_after(self(), :shutdown, 15_000)
+
     schedule_run()
 
     {:ok, state}
@@ -66,6 +69,10 @@ defmodule Screens.OlCrowding.LogCrowdingInfo do
       true ->
         {:noreply, state}
     end
+  end
+
+  def handle_info(:shutdown, state) do
+    {:stop, :shutdown, state}
   end
 
   defp schedule_run do
