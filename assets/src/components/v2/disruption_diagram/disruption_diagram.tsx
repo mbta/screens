@@ -15,6 +15,7 @@ const SLOT_WIDTH = 24;
 const LINE_HEIGHT = 24;
 const EMPHASIS_HEIGHT = 80;
 const EMPHASIS_PADDING_TOP = 8;
+const MAX_ICON_HEIGHT = 52;
 // L can vary based on arrow vs diamond (current stop). Would be nice if this was
 // programmatic, but this works for now
 const L = 27;
@@ -112,15 +113,18 @@ interface IconProps {
   className?: string;
 }
 
-// TODO add comments about the translation choices
-// TODO make -${(iconSize-LINE_HEIGHT) / 2} a function
+// Non-circle icons are translated by their top-left corner, while circles
+// are translated by their center-point. So to position these non-circles,
+// translate is x shifted by half the width of the icon, and y is shifted up half its
+// iconsize and half the thickness of the line diagram itself
+const translateNonCircleIcon = (x: number, iconSize: number) => (
+  `translate(${x - iconSize / 2} -${(iconSize-LINE_HEIGHT) / 2})`
+) 
 
 // Special current stop icon for the red line: hollow red diamond
 const CurrentStopOpenDiamondIcon: ComponentType<{x: number, iconSize: number}> = ({ x, iconSize }) => {
-  const strokeWidth = 4;
-
   return (
-    <g className="open-diamond" transform={`translate(${x - (iconSize + strokeWidth) / 2} -${(iconSize-LINE_HEIGHT) / 2})`}>
+    <g className="open-diamond" transform={translateNonCircleIcon(x, iconSize)}>
       <CurrentStopOpenDiamond width={iconSize} height={iconSize} />
     </g>
   );
@@ -128,10 +132,8 @@ const CurrentStopOpenDiamondIcon: ComponentType<{x: number, iconSize: number}> =
 
 // Current stop icon for all other lines: solid red diamond
 const CurrentStopDiamondIcon: ComponentType<{x: number, iconSize: number}> = ({ x, iconSize }) => {
-  const strokeWidth = 4;
-
   return (
-    <g className="solid-diamond" transform={`translate(${x - (iconSize + strokeWidth) / 2} -${(iconSize-LINE_HEIGHT) / 2})`}>
+    <g className="solid-diamond" transform={translateNonCircleIcon(x, iconSize)}>
       <CurrentStopDiamond width={iconSize} height={iconSize} />
     </g>
   );
@@ -140,9 +142,7 @@ const CurrentStopDiamondIcon: ComponentType<{x: number, iconSize: number}> = ({ 
 // This is the x-octagon without a border
 const SmallXStopIcon: ComponentType<{x: number, iconSize: number}> = ({ x, iconSize }) => {
   return (
-    // Translate needs to be the given x shifted by half the size of the icon, and y needs to be shifted up half its
-    // iconsize and half the thickness of the line diagram itself
-    <g className="small-x-stop" transform={`translate(${x - iconSize / 2} -${(iconSize-LINE_HEIGHT) / 2})`}>
+    <g className="small-x-stop" transform={translateNonCircleIcon(x, iconSize)}>
       <SmallXOctagon width={iconSize} height={iconSize} />
     </g>
   );
@@ -151,9 +151,7 @@ const SmallXStopIcon: ComponentType<{x: number, iconSize: number}> = ({ x, iconS
 // This is the x-octagon with a border
 const LargeXStopIcon: ComponentType<{x: number, iconSize: number, color?: string}> = ({ x, iconSize, color }) => {
   return (
-    // Translate needs to be the given x shifted by half the size of the icon, and y needs to be shifted up half its
-    // iconsize and half the thickness of the line diagram itself
-    <g className="large-x-stop" transform={`translate(${x - iconSize / 2} -${(iconSize-LINE_HEIGHT) / 2})`}>
+    <g className="large-x-stop" transform={translateNonCircleIcon(x, iconSize)}>
       <LargeXOctagonBordered color={color} width={iconSize} height={iconSize} />
     </g>
   );
@@ -186,6 +184,8 @@ const LeftArrowEndpoint: ComponentType<IconProps> = ({ x, className }) => (
 );
 
 const RightArrowEndpoint: ComponentType<IconProps> = ({ x, className }) => (
+  // -1 because there is a tiny gap where the previous segment ends and the next segment begins
+  // Let's close up that gap
   <g transform={`translate(${x - 1})`} >
     <ArrowRightEndpoint className={className} />
   </g>
@@ -248,7 +248,8 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
   let icon;
   if (slot.type === "arrow") {
     icon = leftSide === true ?
-      // TODO explain 5
+      // One thing that just is so easily hardcoded for now: the translate(5). 
+      // It just looks right and affects little else
       <LeftArrowEndpoint x={5} className={classWithModifier("end-slot__arrow", line)} />
       : <RightArrowEndpoint x={x} className={classWithModifier("end-slot__arrow", line)} />
   } else if (isAffected && effect === "station_closure" || effect === "suspension") {
@@ -359,7 +360,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
             icon = <SmallXStopIcon x={x} iconSize={48} />;
             break;
           case "shuttle":
-            // TODO: where in the designs is this?
+            // TODO: where in the designs is this? I didn't check to see if this is still looking good
             if (label !== "…" && label.full === "Beaconsfield") {
               icon = <SmallXStopIcon x={x} iconSize={30} />;
             } else {
@@ -490,7 +491,6 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
 
   let icon;
   if (effect === "shuttle") {
-    // Why are these yet another instance of the same icons we've already worked with??
     icon = (
       <g transform={`translate(${
             middleOfLine - EMPHASIS_HEIGHT / 2
@@ -599,61 +599,64 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   x += spaceBetween + SLOT_WIDTH;
 
   const [isDone, setIsDone] = useState(false);
-  const [isDoneScaling, setIsDoneScaling] = useState(false);
-  const [lineMapHeight, setLineMapHeight] = useState(0);
 
-  useEffect(() => {
-    const dimensions = document
+  // Get the size of the diagram svg, excluding emphasis
+  const dimensions = document
       .getElementById("line-map")
       ?.getBoundingClientRect();
 
-    const height = dimensions?.height;
-    const width = dimensions?.width;
+  let height = dimensions?.height ?? 0;
+  let width = dimensions?.width ?? 0;
 
-    // Hardcoding what it SHOULD be returning
-    const newSvgHeight = 309// document.getElementById("disruption-diagram-container")?.getBoundingClientRect()?.height;
+  useEffect(() => {
+    if (svgHeight != 0 && width && height) {
+      // if scaleFactor has already been applied to the line-map, we need to reverse that
+      height = height / scaleFactor
+      width = width / scaleFactor
 
-    if (!isDoneScaling && width && newSvgHeight && height) {
-      // Scale diagram up or down so width < 904px and height < total height
-      const factor = Math.min(904 / width, (newSvgHeight - calculated_emphasis_height) / height)
-      setScaleFactor(factor);
-      setIsDoneScaling(true);
-    } else if (!isDone && isDoneScaling) {
-      // If the height of the line map + emphasis (if present) is still too tall,
-      // abbreviate station names.
-      if (height && height + (hasEmphasis ? EMPHASIS_HEIGHT : 0) > svgHeight) {
-        setDoAbbreviate(true);
+      // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
+      const xScaleFactor = 904 / width
+
+      const needsAbbreviating = height * xScaleFactor + calculated_emphasis_height > svgHeight && !doAbbreviate
+      if (needsAbbreviating) {
+        setDoAbbreviate(true)
+        // now scale y, which requires re-running this effect
+      } else {
+        const factor = Math.min(904 / width, (svgHeight - calculated_emphasis_height) / height)
+        setScaleFactor(factor);
+        setTimeout(() => {
+          setIsDone(true)
+        }, 200)
       }
-
-      setIsDone(true);
     }
-  });
+  }, [svgHeight, doAbbreviate]);
 
-  // Get the finalized height of the line map after scaling and abbreviations
-  useEffect(() => {
-    const dimensions = document
-      .getElementById("line-map")
-      ?.getBoundingClientRect();
+  // This is to center the diagram along the X axis
+  const translateX = (width && (904 - width) / 2) || 0
 
-    const height = dimensions?.height;
+  // Next is to center the diagram along the Y axis, which involves adjusing the SVG viewbox
 
-    if (isDone && height) {
-      setLineMapHeight(height);
-    }
-  }, [isDone]);
+  // If -${svgHeight} is used as the viewbox height, it looks like the line diagram text
+  // pushed all the way to the bottom of the viewbox with just a tiny point of the 
+  // "You are Here" diamond sticking out. So, the parts that are cut off are the whole
+  // height of the line diagram, and a little extra for the bottom of the "You are Here" diamond.
+  
+  // To calculate the height of that missing part, that is:
+  // LINE_HEIGHT*scaleFactor/2 - MAX_ICON_HEIGHT*scaleFactor/2
 
-  const canvasSize = 904
-  const height = document.getElementById("disruption-diagram-container")?.getBoundingClientRect()?.height;
-
-  // 30 = max icon height / 2
-  const viewBoxOffset = height ? height - 30 - calculated_emphasis_height : 0;
+  // offset is parent container height minus all the stuff below the very top of the line diagram
+  const offset = (svgHeight - LINE_HEIGHT*scaleFactor/2 - MAX_ICON_HEIGHT*scaleFactor/2 - calculated_emphasis_height)
+  // topAndBottomMargins is parent container height minus actual full height of line diagram with emphasis
+  const topAndBottomMargins = (svgHeight - height - calculated_emphasis_height)/2
+  // If topAndBottomMargins is negative, than there is no margin to use, so the viewBox offset should just be
+  // the offset (essentially the basic height of the diagram)
+  // Otherwise, if there is vertical room, the calculated margin is subtracted from that offset
+  const viewBoxOffset = topAndBottomMargins < 0 ? offset : offset - topAndBottomMargins 
 
   return (
-    <svg viewBox={`0 -${viewBoxOffset} ${canvasSize} ${canvasSize}`}>
+    <svg viewBox={`0 -${viewBoxOffset} 904 ${svgHeight}`} transform={`translate(${translateX})`}>
       <g
         id="line-map"
-        // Center the axis right on the diagram line
-        transform-origin={`0 ${LINE_HEIGHT/2}`}
         transform={`scale(${scaleFactor})`}
         visibility={isDone ? "visible" : "hidden"}
       >
@@ -666,6 +669,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
           effect={effect}
           spaceBetween={spaceBetween}
         />
+        {/* TODO: BUG with the endslot when OL suspension malden center - dtx */}
         <EndSlotComponent
           slot={beginning}
           x={L}
@@ -699,7 +703,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       {hasEmphasis && (
         <g
           id="alert-emphasis"
-          transform={`translate(0, ${EMPHASIS_HEIGHT / 2 + LINE_HEIGHT / 2})`}
+          transform={`translate(0, ${EMPHASIS_HEIGHT / 2 + (LINE_HEIGHT / 2) * scaleFactor})`}
           visibility={isDone ? "visible" : "hidden"}
         >
           <AlertEmphasisComponent
