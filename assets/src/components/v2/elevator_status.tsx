@@ -294,7 +294,11 @@ const StationRow: ComponentType<Station> = ({
         </div>
         <div className="elevator-status__station-row__station-name">{name}</div>
         <div className="elevator-status__station-row__ids">
-          {formatElevatorIds(elevatorClosures.map(({ elevator_id: id }) => id))}
+          {formatElevatorIds(
+            elevatorClosures
+              .filter(({ elevator_id: id }) => !isNaN(parseInt(id)))
+              .map(({ elevator_id: id }) => id)
+          )}
         </div>
         {isAtHomeStop && (
           <div className="elevator-status__station-row__you-are-here-icon">
