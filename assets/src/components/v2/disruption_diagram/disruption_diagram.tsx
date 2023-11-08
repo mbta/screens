@@ -1,7 +1,6 @@
 import React, { ComponentType, useEffect, useState } from "react";
 import { classWithModifier, classWithModifiers } from "Util/util";
 
-// TODO: Some of these svgs are a bit garbled
 import LargeXOctagonBordered from "../../../../static/images/svgr_bundled/disruption_diagram/large-x-octagon-bordered.svg"
 import SmallXOctagon from "../../../../static/images/svgr_bundled/disruption_diagram/small-x-octagon.svg"
 import CurrentStopDiamond from "../../../../static/images/svgr_bundled/disruption_diagram/current-stop-diamond.svg"
@@ -359,7 +358,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
             icon = <SmallXStopIcon x={x} iconSize={24} />;
             break;
           case "station_closure":
-            icon = <SmallXStopIcon x={x} iconSize={48} />;
+            icon = <LargeXStopIcon x={x} iconSize={48} />;
             break;
           case "shuttle":
             if (label !== "…" && label.full === "Beaconsfield") {
