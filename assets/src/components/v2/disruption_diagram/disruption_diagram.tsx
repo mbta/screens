@@ -1,3 +1,5 @@
+// SPECIFICATION: https://www.notion.so/mbta-downtown-crossing/Disruption-Diagram-Specification-a779027385b545abbff6fb4b4fd0adc1
+
 import React, { ComponentType, useEffect, useState } from "react";
 import { classWithModifier, classWithModifiers } from "Util/util";
 
@@ -9,18 +11,25 @@ import ArrowLeftEndpoint from "../../../../static/images/svgr_bundled/disruption
 import ArrowRightEndpoint from "../../../../static/images/svgr_bundled/disruption_diagram/arrow-right-endpoint.svg"
 import ShuttleBusIcon from "../../../../static/images/svgr_bundled/disruption_diagram/shuttle-emphasis-icon.svg"
 
+// Max width of the disruption diagram, dependent on the screen width
 const MAX_WIDTH = 904;
 const SLOT_WIDTH = 24;
+// Height of the colored line for the diagram
 const LINE_HEIGHT = 24;
 const EMPHASIS_HEIGHT = 80;
 // This padding is only used in 1 spot, and it may not be the most accurate measure
 // of the padding above the emphasis. Keeping for now
 const EMPHASIS_PADDING_TOP = 8;
+// The tallest icon (the diamond) is used in translation calculations
 const MAX_ICON_HEIGHT = 52;
-// L can vary based on arrow vs diamond (current stop). Would be nice if this was
-// programmatic, but this works for now
+// L: the amount by which the left end extends beyond the leftmost station slot.
+// R: the width by which the right end extends beyond the rightmost station slot.
+// L can vary based on whether the first slot is an arrow vs diamond (current stop).
+// Would be nice if this was programmatic, but this works for now
 const L = 27;
 const R = 165;
+// The width taken up by the ends outside the typical station bounds is L + R,
+// so the width available to the rest of the diagram is 904 - (L + R)
 const W = MAX_WIDTH - (L + R);
 
 type DisruptionDiagramData =
