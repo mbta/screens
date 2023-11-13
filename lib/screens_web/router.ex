@@ -9,6 +9,12 @@ defmodule ScreensWeb.Router do
     plug :protect_from_forgery
   end
 
+  pipeline :browser_no_csrf do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_flash
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -79,12 +85,17 @@ defmodule ScreensWeb.Router do
   end
 
   scope "/v2", ScreensWeb.V2 do
+    scope "/widget" do
+      pipe_through [:redirect_prod_http, :browser_no_csrf]
+      post "/:app_id", ScreenController, :widget
+      get "/:app_id", ScreenController, :widget
+    end
+
     scope "/screen" do
       pipe_through [:redirect_prod_http, :browser]
 
       get "/:id", ScreenController, :index
       get "/:id/simulation", ScreenController, :simulation
-      post "/:id/widget", ScreenController, :widget
     end
 
     scope "/api/screen" do
