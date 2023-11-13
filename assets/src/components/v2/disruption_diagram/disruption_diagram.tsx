@@ -196,7 +196,7 @@ const LeftArrowEndpoint: ComponentType<IconProps> = ({ x, className }) => (
 const RightArrowEndpoint: ComponentType<IconProps> = ({ x, className }) => (
   // -1 because there is a tiny gap where the previous segment ends and the next segment begins
   // Let's close up that gap
-  <g transform={`translate(${x - 1})`} >
+  <g transform={`translate(${x})`} >
     <ArrowRightEndpoint className={className} />
   </g>
 );
@@ -241,7 +241,7 @@ interface EndSlotComponentProps {
   isAffected: boolean;
   effect: Effect;
   spaceBetween: number;
-  leftSide: boolean;
+  isLeftSide: boolean;
   x: number
 }
 
@@ -252,12 +252,12 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
   isAffected,
   effect,
   spaceBetween,
-  leftSide,
+  isLeftSide,
   x
 }) => {
   let icon;
   if (slot.type === "arrow") {
-    icon = leftSide === true ?
+    icon = isLeftSide ?
       // One thing that just is so easily hardcoded for now: the translate(5). 
       // It just looks right and affects little else
       <LeftArrowEndpoint x={5} className={classWithModifier("end-slot__arrow", line)} />
@@ -277,7 +277,7 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
   }
 
   let background;
-  if ((!isAffected && leftSide) || (effect === "station_closure" && leftSide)) {
+  if ((!isAffected && isLeftSide) || (effect === "station_closure" && isLeftSide)) {
     background = (
       <rect
         className={classWithModifier("end-slot__arrow", line)}
@@ -693,7 +693,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
               : props.effect_region_slot_index_range.includes(0)
           }
           effect={effect}
-          leftSide={true}
+          isLeftSide={true}
         />
         {middleSlots}
         <EndSlotComponent
@@ -708,7 +708,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
               : props.effect_region_slot_index_range.includes(slots.length - 1)
           }
           effect={effect}
-          leftSide={false}
+          isLeftSide={false}
         />
       </g>
       {hasEmphasis && (
