@@ -197,7 +197,7 @@ const RightArrowEndpoint: ComponentType<EndpointProps> = ({ className }) => (
   <ArrowRightEndpoint className={className} />
 );
 
-const getEndpointLabel = (labelID: string, isArrow: boolean) => {
+const EndpointLabel: ComponentType<{labelID: string, isArrow: boolean}> = ({labelID, isArrow}) => {
   let labelParts = endLabelIDMap[labelID];
   if (labelParts.length === 1) {
     return (
@@ -217,13 +217,25 @@ const getEndpointLabel = (labelID: string, isArrow: boolean) => {
           transform={`translate(0 -32) rotate(-45)`}
         >
           {isArrow && <tspan className="label">to </tspan>}
-          {labelParts[0]}
+          {labelParts[0].includes("&") ?
+            <>
+              {labelParts[0].replace(" &", "")}
+              <tspan className="label"> &</tspan>
+            </>
+            : labelParts[0]
+          }
         </text>
         <text
           className="label--endpoint"
           transform={`translate(45 -32) rotate(-45)`}
         >
-          {labelParts[1]}
+          {labelParts[1].includes("&") ?
+            <>
+              {labelParts[0].replace("& ", "")}
+              <tspan className="label">& </tspan>
+            </>
+            : labelParts[1]
+          }
         </text>
       </>
     );
@@ -290,7 +302,7 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
     <g transform={`translate(${x})`}>
       {background}
       {icon}
-      {getEndpointLabel(slot.label_id, slot.type === "arrow")}
+      <EndpointLabel labelID={slot.label_id} isArrow={slot.type === "arrow"} />
     </g>
   );
 }
