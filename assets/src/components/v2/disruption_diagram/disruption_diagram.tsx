@@ -24,9 +24,9 @@ const EMPHASIS_PADDING_TOP = 8;
 const MAX_ICON_HEIGHT = 52;
 // L: the amount by which the left end extends beyond the leftmost station slot.
 // R: the width by which the right end extends beyond the rightmost station slot.
-// L can vary based on whether the first slot is an arrow vs diamond (current stop).
+// L can vary based on whether the first slot is an arrow vs diamond, because the diamond is larger.
 // Would be nice if this was programmatic, but this works for now
-const L = 27;
+const L = MAX_ICON_HEIGHT/2;
 const R = 165;
 // The width taken up by the ends outside the typical station bounds is L + R,
 // so the width available to the rest of the diagram is 904 - (L + R)
@@ -284,7 +284,7 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
         width={SLOT_WIDTH / 2 + spaceBetween}
         height={LINE_HEIGHT}
         fill={line}
-        x={L + SLOT_WIDTH / 2}
+        x={SLOT_WIDTH / 2}
       />
     );
   } else {
@@ -437,8 +437,8 @@ const EffectBackgroundComponent: ComponentType<
   const rangeStart = effectRegionSlotIndexRange[0];
   const rangeEnd = effectRegionSlotIndexRange[1];
 
-  const x1 = rangeStart * (spaceBetween + SLOT_WIDTH) + L;
-  const x2 = (spaceBetween + SLOT_WIDTH) * rangeEnd + L;
+  const x1 = rangeStart * (spaceBetween + SLOT_WIDTH);
+  const x2 = (spaceBetween + SLOT_WIDTH) * rangeEnd;
   const heightOfBackground = 16;
 
   let background;
@@ -492,8 +492,8 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
   const rangeStart = effectRegionSlotIndexRange[0];
   const rangeEnd = effectRegionSlotIndexRange[1];
 
-  const x1 = (rangeStart * (spaceBetween + SLOT_WIDTH) + L) * scaleFactor;
-  const x2 = ((spaceBetween + SLOT_WIDTH) * rangeEnd + L) * scaleFactor;
+  const x1 = (rangeStart * (spaceBetween + SLOT_WIDTH)) * scaleFactor;
+  const x2 = ((spaceBetween + SLOT_WIDTH) * rangeEnd) * scaleFactor;
 
   const middleOfLine = (x2 - x1) / 2 + x1;
   const endLinesHeight = 24;
@@ -576,7 +576,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   let x = 0;
   const middleSlots = Object.values(middle).map((s, i) => {
-    x = (spaceBetween + SLOT_WIDTH) * (i + 1) + L;
+    x = (spaceBetween + SLOT_WIDTH) * (i + 1);
     const slot = s as MiddleSlot;
     const key = slot.label === "…" ? i : slot.label.full;
     const isAffected =
@@ -671,59 +671,61 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       transform={`translate(${translateX})`}
       visibility={isDone ? "visible" : "hidden"}
     >
-      <g id="line-map" transform={`scale(${scaleFactor})`}>
-        <EffectBackgroundComponent
-          effectRegionSlotIndexRange={
-            effect === "station_closure"
-              ? props.closed_station_slot_indices
-              : props.effect_region_slot_index_range
-          }
-          effect={effect}
-          spaceBetween={spaceBetween}
-        />
-        <EndSlotComponent
-          slot={beginning}
-          x={L}
-          line={line}
-          isCurrentStop={current_station_slot_index === 0}
-          spaceBetween={spaceBetween}
-          isAffected={
-            effect === "station_closure"
-              ? props.closed_station_slot_indices.includes(0)
-              : props.effect_region_slot_index_range.includes(0)
-          }
-          effect={effect}
-          isLeftSide={true}
-        />
-        {middleSlots}
-        <EndSlotComponent
-          slot={end as EndSlot}
-          x={x}
-          line={line}
-          isCurrentStop={current_station_slot_index === slots.length - 1}
-          spaceBetween={spaceBetween}
-          isAffected={
-            effect === "station_closure"
-              ? props.closed_station_slot_indices.includes(slots.length - 1)
-              : props.effect_region_slot_index_range.includes(slots.length - 1)
-          }
-          effect={effect}
-          isLeftSide={false}
-        />
-      </g>
-      {hasEmphasis && (
-        <g
-          id="alert-emphasis"
-          transform={`translate(0, ${EMPHASIS_HEIGHT/2 + (EMPHASIS_HEIGHT - MAX_ICON_HEIGHT) * scaleFactor})`}
-        >
-          <AlertEmphasisComponent
-            effectRegionSlotIndexRange={props.effect_region_slot_index_range}
-            spaceBetween={spaceBetween}
+      <g transform={`translate(${L} 0)`}>
+        <g id="line-map" transform={`scale(${scaleFactor})`}>
+          <EffectBackgroundComponent
+            effectRegionSlotIndexRange={
+              effect === "station_closure"
+                ? props.closed_station_slot_indices
+                : props.effect_region_slot_index_range
+            }
             effect={effect}
-            scaleFactor={scaleFactor}
+            spaceBetween={spaceBetween}
+          />
+          <EndSlotComponent
+            slot={beginning}
+            x={0}
+            line={line}
+            isCurrentStop={current_station_slot_index === 0}
+            spaceBetween={spaceBetween}
+            isAffected={
+              effect === "station_closure"
+                ? props.closed_station_slot_indices.includes(0)
+                : props.effect_region_slot_index_range.includes(0)
+            }
+            effect={effect}
+            isLeftSide={true}
+          />
+          {middleSlots}
+          <EndSlotComponent
+            slot={end as EndSlot}
+            x={x}
+            line={line}
+            isCurrentStop={current_station_slot_index === slots.length - 1}
+            spaceBetween={spaceBetween}
+            isAffected={
+              effect === "station_closure"
+                ? props.closed_station_slot_indices.includes(slots.length - 1)
+                : props.effect_region_slot_index_range.includes(slots.length - 1)
+            }
+            effect={effect}
+            isLeftSide={false}
           />
         </g>
-      )}
+        {hasEmphasis && (
+          <g
+            id="alert-emphasis"
+            transform={`translate(0, ${EMPHASIS_HEIGHT/2 + (EMPHASIS_HEIGHT - MAX_ICON_HEIGHT) * scaleFactor})`}
+          >
+            <AlertEmphasisComponent
+              effectRegionSlotIndexRange={props.effect_region_slot_index_range}
+              spaceBetween={spaceBetween}
+              effect={effect}
+              scaleFactor={scaleFactor}
+            />
+          </g>
+        )}
+      </g>
     </svg>
   );
 };
