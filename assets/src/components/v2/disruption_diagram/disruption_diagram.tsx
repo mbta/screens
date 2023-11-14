@@ -329,7 +329,8 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
     background = (
       <rect
         className={classWithModifier("middle-slot__background", line)}
-        width={SLOT_WIDTH + spaceBetween}
+        // Round up to avoid gaps due to rounded down size during render
+        width={SLOT_WIDTH + Math.ceil(spaceBetween)}
         height={LINE_HEIGHT}
       />
     );
