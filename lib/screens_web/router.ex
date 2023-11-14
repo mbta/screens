@@ -2,17 +2,15 @@ defmodule ScreensWeb.Router do
   use ScreensWeb, :router
   import Phoenix.LiveDashboard.Router
 
-  pipeline :browser do
-    plug :accepts, ["html"]
-    plug :fetch_session
-    plug :fetch_flash
-    plug :protect_from_forgery
-  end
-
   pipeline :browser_no_csrf do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
+  end
+
+  pipeline :browser do
+    plug :browser_no_csrf
+    plug :protect_from_forgery
   end
 
   pipeline :api do
