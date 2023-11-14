@@ -119,58 +119,60 @@ const endLabelIDMap: { [labelID: string]: string[] } = {
 };
 
 interface IconProps {
-  x: number;
-  className?: string;
+  iconSize: number;
+}
+
+interface EndpointProps {
+  className: string;
 }
 
 // Non-circle icons are translated by their top-left corner, while circles
 // are translated by their center-point. So to position these non-circles,
 // translate is x shifted by half the width of the icon, and y is shifted up half its
 // iconsize and half the thickness of the line diagram itself
-const translateNonCircleIcon = (x: number, iconSize: number) => (
-  `translate(${x - iconSize / 2} -${(iconSize-LINE_HEIGHT) / 2})`
+const translateNonCircleIcon = (iconSize: number) => (
+  `translate(${-iconSize / 2} -${(iconSize-LINE_HEIGHT) / 2})`
 ) 
 
 // Special current stop icon for the red line: hollow red diamond
-const CurrentStopOpenDiamondIcon: ComponentType<{x: number, iconSize: number}> = ({ x, iconSize }) => {
+const CurrentStopOpenDiamondIcon: ComponentType<IconProps> = ({ iconSize }) => {
   return (
-    <g className="open-diamond" transform={translateNonCircleIcon(x, iconSize)}>
+    <g className="open-diamond" transform={translateNonCircleIcon(iconSize)}>
       <CurrentStopOpenDiamond width={iconSize} height={iconSize} />
     </g>
   );
 };
 
 // Current stop icon for all other lines: solid red diamond
-const CurrentStopDiamondIcon: ComponentType<{x: number, iconSize: number}> = ({ x, iconSize }) => {
+const CurrentStopDiamondIcon: ComponentType<IconProps> = ({ iconSize }) => {
   return (
-    <g className="solid-diamond" transform={translateNonCircleIcon(x, iconSize)}>
+    <g className="solid-diamond" transform={translateNonCircleIcon(iconSize)}>
       <CurrentStopDiamond width={iconSize} height={iconSize} />
     </g>
   );
 };
 
 // This is the x-octagon without a border
-const SmallXStopIcon: ComponentType<{x: number, iconSize: number}> = ({ x, iconSize }) => {
+const SmallXStopIcon: ComponentType<IconProps> = ({ iconSize }) => {
   return (
-    <g className="small-x-stop" transform={translateNonCircleIcon(x, iconSize)}>
+    <g className="small-x-stop" transform={translateNonCircleIcon(iconSize)}>
       <SmallXOctagon width={iconSize} height={iconSize} />
     </g>
   );
 };
 
 // This is the x-octagon with a border
-const LargeXStopIcon: ComponentType<{x: number, iconSize: number, color?: string}> = ({ x, iconSize, color }) => {
+const LargeXStopIcon: ComponentType<{iconSize: number, color?: string}> = ({ iconSize, color }) => {
   return (
-    <g className="large-x-stop" transform={translateNonCircleIcon(x, iconSize)}>
+    <g className="large-x-stop" transform={translateNonCircleIcon(iconSize)}>
       <LargeXOctagonBordered color={color} width={iconSize} height={iconSize} />
     </g>
   );
 };
 
 // Basic template for a Circle Icon
-const CircleStopIcon: ComponentType<{x: number, r: number, className: string, strokeWidth: number}> = ({ x, r, className, strokeWidth }) => (
+const CircleStopIcon: ComponentType<{r: number, className: string, strokeWidth: number}> = ({ r, className, strokeWidth }) => (
   <circle
-    cx={x}
     cy={LINE_HEIGHT / 2}
     r={r}
     fill="white"
@@ -179,35 +181,29 @@ const CircleStopIcon: ComponentType<{x: number, r: number, className: string, st
   />
 );
 
-const CircleShuttlingStopIcon: ComponentType<IconProps> = ({ x }) => (
-  <CircleStopIcon x={x} r={10} className="shuttle-stop" strokeWidth={4} />
+const CircleShuttlingStopIcon: ComponentType<{}> = () => (
+  <CircleStopIcon r={10} className="shuttle-stop" strokeWidth={4} />
 );
 
-const CircleStopIconEndpoint: ComponentType<{x: number, className: string}> = ({ x, className }) => (
-  <CircleStopIcon x={x} r={20} className={className} strokeWidth={8} />
+const CircleStopIconEndpoint: ComponentType<EndpointProps> = ({ className }) => (
+  <CircleStopIcon r={20} className={className} strokeWidth={8} />
 );
 
-const LeftArrowEndpoint: ComponentType<IconProps> = ({ x, className }) => (
-  <g transform={`translate(${x})`} >
-    <ArrowLeftEndpoint className={className} />
-  </g>
+const LeftArrowEndpoint: ComponentType<EndpointProps> = ({ className }) => (
+  <ArrowLeftEndpoint className={className} />
 );
 
-const RightArrowEndpoint: ComponentType<IconProps> = ({ x, className }) => (
-  // -1 because there is a tiny gap where the previous segment ends and the next segment begins
-  // Let's close up that gap
-  <g transform={`translate(${x})`} >
-    <ArrowRightEndpoint className={className} />
-  </g>
+const RightArrowEndpoint: ComponentType<EndpointProps> = ({ className }) => (
+  <ArrowRightEndpoint className={className} />
 );
 
-const getEndpointLabel = (labelID: string, x: number, isArrow: boolean) => {
+const getEndpointLabel = (labelID: string, isArrow: boolean) => {
   let labelParts = endLabelIDMap[labelID];
   if (labelParts.length === 1) {
     return (
       <text
         className="label--endpoint"
-        transform={`translate(${x} -32) rotate(-45)`}
+        transform={`translate(0 -32) rotate(-45)`}
       >
         {isArrow && <tspan className="label">to </tspan>}
         {labelParts[0]}
@@ -218,14 +214,14 @@ const getEndpointLabel = (labelID: string, x: number, isArrow: boolean) => {
       <>
         <text
           className="label--endpoint"
-          transform={`translate(${x} -32) rotate(-45)`}
+          transform={`translate(0 -32) rotate(-45)`}
         >
           {isArrow && <tspan className="label">to </tspan>}
           {labelParts[0]}
         </text>
         <text
           className="label--endpoint"
-          transform={`translate(${x + 45} -32) rotate(-45)`}
+          transform={`translate(45 -32) rotate(-45)`}
         >
           {labelParts[1]}
         </text>
@@ -258,22 +254,21 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
   let icon;
   if (slot.type === "arrow") {
     icon = isLeftSide ?
-      // One thing that just is so easily hardcoded for now: the translate(5). 
-      // It just looks right and affects little else
-      <LeftArrowEndpoint x={5} className={classWithModifier("end-slot__arrow", line)} />
-      : <RightArrowEndpoint x={x} className={classWithModifier("end-slot__arrow", line)} />
+      // Not sure where the 22 comes from
+      <g transform={`translate(-22 0)`}><LeftArrowEndpoint className={classWithModifier("end-slot__arrow", line)} /></g>
+      : <RightArrowEndpoint className={classWithModifier("end-slot__arrow", line)} />
   } else if (isAffected && (effect === "station_closure" || effect === "suspension")) {
-    icon = <LargeXStopIcon x={x} iconSize={61} />
+    icon = <LargeXStopIcon iconSize={61} />
   } else if (isCurrentStop && line === "red") {
-    icon = <CurrentStopOpenDiamondIcon x={x} iconSize={64} />
+    icon = <CurrentStopOpenDiamondIcon iconSize={64} />
   } else if (isCurrentStop) {
-    icon = <CurrentStopDiamondIcon x={x} iconSize={64} />
+    icon = <CurrentStopDiamondIcon iconSize={64} />
   } else {
       const modifiers = [line.toString()];
       if (isAffected) {
         modifiers.push("affected");
       }
-      icon = <CircleStopIconEndpoint x={x} className={classWithModifiers("end-slot__icon", modifiers)} />
+      icon = <CircleStopIconEndpoint className={classWithModifiers("end-slot__icon", modifiers)} />
   }
 
   let background;
@@ -292,11 +287,11 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
   }
 
   return (
-    <>
+    <g transform={`translate(${x})`}>
       {background}
       {icon}
-      {getEndpointLabel(slot.label_id, x, slot.type === "arrow")}
-    </>
+      {getEndpointLabel(slot.label_id, slot.type === "arrow")}
+    </g>
   );
 }
 
@@ -336,7 +331,6 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
         className={classWithModifier("middle-slot__background", line)}
         width={SLOT_WIDTH + spaceBetween}
         height={LINE_HEIGHT}
-        x={x}
       />
     );
   }
@@ -345,41 +339,31 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   if (slot.show_symbol) {
     if (isCurrentStop) {
       if (isAffected && effect in ["station_closure", "suspension"]) {
-        icon = (
-          <LargeXStopIcon
-            x={x}
-            iconSize={48}
-            color="#ee2e24"
-          />
-        );
+        icon = <LargeXStopIcon iconSize={48} color="#ee2e24" />
       } else {
         icon =
-          line === "red" ? (
-            <CurrentStopOpenDiamondIcon x={x} iconSize={52} />
-          ) : (
-            <CurrentStopDiamondIcon x={x} iconSize={52} />
-          );
+          line === "red" ? <CurrentStopOpenDiamondIcon iconSize={52} />
+          : <CurrentStopDiamondIcon iconSize={52} />
       }
     } else {
       if (isAffected && !firstAffectedIndex) {
         switch (effect) {
           case "suspension":
-            icon = <SmallXStopIcon x={x} iconSize={24} />;
+            icon = <SmallXStopIcon iconSize={24} />;
             break;
           case "station_closure":
-            icon = <LargeXStopIcon x={x} iconSize={48} />;
+            icon = <LargeXStopIcon iconSize={48} />;
             break;
           case "shuttle":
             if (label !== "…" && label.full === "Beaconsfield") {
-              icon = <SmallXStopIcon x={x} iconSize={24} />;
+              icon = <SmallXStopIcon iconSize={24} />;
             } else {
-              icon = <CircleShuttlingStopIcon x={x} />;
+              icon = <CircleShuttlingStopIcon />;
             }
         }
       } else {
         icon = (
           <CircleStopIcon
-            x={x}
             r={10}
             className={classWithModifier("middle-slot__icon", line)}
             strokeWidth={4}
@@ -398,13 +382,13 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   }
 
   return (
-    <>
+    <g transform={`translate(${x})`}>
       {background}
       {icon}
       {label === "…" ? (
         <text
           className={classWithModifier(`label-${labelTextClass}`, textModifier)}
-          transform={`translate(${x - 12} -32)`}
+          transform={`translate(-12 -32)`}
         >
           {" "}
           {label}{" "}
@@ -412,14 +396,14 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
       ) : (
         <text
           className={classWithModifier(`label-${labelTextClass}`, textModifier)}
-          transform={`translate(${x} -32) rotate(-45)`}
+          transform={`translate(0 -32) rotate(-45)`}
         >
           {abbreviate || label.full === "Massachusetts Avenue"
             ? label.abbrev
             : label.full}
         </text>
       )}
-    </>
+    </g>
   );
 };
 
