@@ -668,7 +668,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       transform={`translate(${translateX})`}
       visibility={isDone ? "visible" : "hidden"}
     >
-      <g transform={`translate(${L} 0)`}>
+      <g transform={`translate(${L * scaleFactor} 0)`}>
         <g id="line-map" transform={`scale(${scaleFactor})`}>
           <EffectBackgroundComponent
             effectRegionSlotIndexRange={
