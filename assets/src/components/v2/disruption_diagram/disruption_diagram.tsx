@@ -566,7 +566,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     60,
     (W - SLOT_WIDTH * numStops) / (numStops - 1)
   );
-  const { 0: beginning, [slots.length - 1]: end, ...middle } = slots;
+  const [beginning, middle, end] = [slots[0], slots.slice(1, -1), slots.at(-1)];
   const hasEmphasis = effect !== "station_closure";
   const calculated_emphasis_height = hasEmphasis ? EMPHASIS_HEIGHT + EMPHASIS_PADDING_TOP : 0;
   const labelTextClass = slots.length > 12 ? "small" : "large";
