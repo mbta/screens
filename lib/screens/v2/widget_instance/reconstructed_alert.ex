@@ -652,10 +652,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
   def valid_candidate?(%__MODULE__{} = t) do
-    # Suppress alerts 519314 and 529291, at all stations served by the Red Line.
+    # Suppress GL Surge alerts at Government Center.
     suppressed =
-      t.alert.id in ["519314", "529291"] and
-        Enum.any?(t.location_context.routes, &(&1[:route_id] == "Red"))
+      t.alert.id in ["535274", "535275", "535276"] and
+        t.location_context.home_stop === "place-gover"
 
     not suppressed
   end
