@@ -131,7 +131,7 @@ interface EndpointProps {
 // translate is x shifted by half the width of the icon, and y is shifted up half its
 // iconsize and half the thickness of the line diagram itself
 const translateNonCircleIcon = (iconSize: number) => (
-  `translate(${-iconSize / 2} -${(iconSize-LINE_HEIGHT) / 2})`
+  `translate(-${iconSize / 2} -${(iconSize-LINE_HEIGHT) / 2})`
 ) 
 
 // Special current stop icon for the red line: hollow red diamond
@@ -266,7 +266,6 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
   let icon;
   if (slot.type === "arrow") {
     icon = isLeftSide ?
-      // Not sure where the 22 comes from
       <g transform={`translate(-22 0)`}><LeftArrowEndpoint className={classWithModifier("end-slot__arrow", line)} /></g>
       : <RightArrowEndpoint className={classWithModifier("end-slot__arrow", line)} />
   } else if (isAffected && (effect === "station_closure" || effect === "suspension")) {
@@ -572,15 +571,17 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   const labelTextClass = slots.length > 12 ? "small" : "large";
 
   let x = 0;
-  const middleSlots = Object.values(middle).map((s, i) => {
-    x = (spaceBetween + SLOT_WIDTH) * (i + 1);
+  const middleSlots = middle.map((s, i) => {
+    // Add 1 to the index to counteract the offset caused by removing `beginning` from the original `slots` array.
+    const slotIndex = i + 1;
+    x = (spaceBetween + SLOT_WIDTH) * slotIndex;
     const slot = s as MiddleSlot;
     const key = slot.label === "…" ? i : slot.label.full;
     const isAffected =
       effect === "station_closure"
-        ? props.closed_station_slot_indices.includes(i + 1)
-        : i + 1 >= props.effect_region_slot_index_range[0] &&
-          i + 1 <= props.effect_region_slot_index_range[1] - 1;
+        ? props.closed_station_slot_indices.includes(slotIndex)
+        : slotIndex >= props.effect_region_slot_index_range[0] &&
+        slotIndex <= props.effect_region_slot_index_range[1] - 1;
 
     return (
       <MiddleSlotComponent
@@ -589,13 +590,13 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         x={x}
         spaceBetween={spaceBetween}
         line={line}
-        isCurrentStop={current_station_slot_index === i + 1}
+        isCurrentStop={current_station_slot_index === slotIndex}
         effect={effect}
         isAffected={isAffected}
         firstAffectedIndex={
           effect === "station_closure"
             ? false
-            : props.effect_region_slot_index_range[0] === i + 1
+            : props.effect_region_slot_index_range[0] === slotIndex
         }
         abbreviate={doAbbreviate}
         labelTextClass={labelTextClass}
