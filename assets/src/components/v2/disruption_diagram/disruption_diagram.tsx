@@ -1,15 +1,35 @@
+// SPECIFICATION: https://www.notion.so/mbta-downtown-crossing/Disruption-Diagram-Specification-a779027385b545abbff6fb4b4fd0adc1
+
 import React, { ComponentType, useEffect, useState } from "react";
 import { classWithModifier, classWithModifiers } from "Util/util";
 
+import LargeXOctagonBordered from "../../../../static/images/svgr_bundled/disruption_diagram/large-x-octagon-bordered.svg"
+import SmallXOctagon from "../../../../static/images/svgr_bundled/disruption_diagram/small-x-octagon.svg"
+import CurrentStopDiamond from "../../../../static/images/svgr_bundled/disruption_diagram/current-stop-diamond.svg"
+import CurrentStopOpenDiamond from "../../../../static/images/svgr_bundled/disruption_diagram/current-stop-open-diamond.svg"
+import ArrowLeftEndpoint from "../../../../static/images/svgr_bundled/disruption_diagram/arrow-left-endpoint.svg"
+import ArrowRightEndpoint from "../../../../static/images/svgr_bundled/disruption_diagram/arrow-right-endpoint.svg"
+import ShuttleBusIcon from "../../../../static/images/svgr_bundled/disruption_diagram/shuttle-emphasis-icon.svg"
+
+// Max width of the disruption diagram, dependent on the screen width
 const MAX_WIDTH = 904;
 const SLOT_WIDTH = 24;
+// Height of the colored line for the diagram
 const LINE_HEIGHT = 24;
 const EMPHASIS_HEIGHT = 80;
+// This padding is only used in 1 spot, and it may not be the most accurate measure
+// of the padding above the emphasis. Keeping for now
 const EMPHASIS_PADDING_TOP = 8;
-// L can vary based on arrow vs diamond (current stop). Would be nice if this was
-// programmatic, but this works for now
-const L = 17;
+// The tallest icon (the diamond) is used in translation calculations
+const MAX_ICON_HEIGHT = 52;
+// L: the amount by which the left end extends beyond the leftmost station slot.
+// R: the width by which the right end extends beyond the rightmost station slot.
+// L can vary based on whether the first slot is an arrow vs diamond, because the diamond is larger.
+// Would be nice if this was programmatic, but this works for now
+const L = MAX_ICON_HEIGHT/2;
 const R = 165;
+// The width taken up by the ends outside the typical station bounds is L + R,
+// so the width available to the rest of the diagram is 904 - (L + R)
 const W = MAX_WIDTH - (L + R);
 
 type DisruptionDiagramData =
@@ -99,175 +119,91 @@ const endLabelIDMap: { [labelID: string]: string[] } = {
 };
 
 interface IconProps {
-  x: number;
-  className?: string;
+  iconSize: number;
 }
 
-// Translate by: width of the icon + stroke-width
-const CurrentStopIconRedLine: ComponentType<IconProps> = ({ x }) => {
-  const iconWidth = 52;
-  const strokeWidth = 4;
+interface EndpointProps {
+  className: string;
+}
 
+// Non-circle icons are translated by their top-left corner, while circles
+// are translated by their center-point. So to position these non-circles,
+// translate is x shifted by half the width of the icon, and y is shifted up half its
+// iconsize and half the thickness of the line diagram itself
+const translateNonCircleIcon = (iconSize: number) => (
+  `translate(-${iconSize / 2} -${(iconSize-LINE_HEIGHT) / 2})`
+) 
+
+// Special current stop icon for the red line: hollow red diamond
+const CurrentStopOpenDiamondIcon: ComponentType<IconProps> = ({ iconSize }) => {
   return (
-    <>
-      <path
-        transform={`translate(${x - (iconWidth + strokeWidth) / 2} ${
-          -(iconWidth - strokeWidth) / 3
-        })`}
-        d="M32.6512 3.92661C30.0824 1.3578 25.9176 1.3578 23.3488 3.92661L3.92661 23.3488C1.3578 25.9176 1.3578 30.0824 3.92661 32.6512L23.3488 52.0734C25.9176 54.6422 30.0824 54.6422 32.6512 52.0734L52.0734 32.6512C54.6422 30.0824 54.6422 25.9176 52.0734 23.3488L32.6512 3.92661Z"
-        className="middle-slot__background--red"
-        stroke="#E6E4E1"
-        strokeWidth={strokeWidth}
-        strokeLinejoin="round"
-      />
-      <path
-        transform={`translate(${x - (iconWidth + strokeWidth) / 2} ${
-          -(iconWidth - strokeWidth) / 3
-        })`}
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M15.4855 29.219C14.7045 28.438 14.7045 27.1717 15.4855 26.3906L26.3906 15.4855C27.1717 14.7045 28.438 14.7045 29.219 15.4855L40.1242 26.3906C40.9052 27.1717 40.9052 28.438 40.1241 29.219L29.219 40.1242C28.438 40.9052 27.1717 40.9052 26.3906 40.1241L15.4855 29.219Z"
-        fill="white"
-      />
-    </>
+    <g className="open-diamond" transform={translateNonCircleIcon(iconSize)}>
+      <CurrentStopOpenDiamond width={iconSize} height={iconSize} />
+    </g>
   );
 };
 
-// Translate by: width of the icon + stroke-width
-const CurrentStopIcon: ComponentType<IconProps> = ({ x }) => {
-  const iconWidth = 52;
-  const strokeWidth = 4;
-
+// Current stop icon for all other lines: solid red diamond
+const CurrentStopDiamondIcon: ComponentType<IconProps> = ({ iconSize }) => {
   return (
-    <>
-      <path
-        transform={`translate(${x - (iconWidth + strokeWidth) / 2} ${
-          -(iconWidth - strokeWidth) / 3
-        })`}
-        d="M3.15665 25.2076C1.61445 26.7498 1.61445 29.2502 3.15665 30.7924L25.2076 52.8434C26.7498 54.3856 29.2502 54.3856 30.7924 52.8434L52.8434 30.7924C54.3856 29.2502 54.3856 26.7498 52.8434 25.2076L30.7924 3.15668C29.2502 1.61448 26.7498 1.61448 25.2076 3.15668L3.15665 25.2076Z"
-        fill="#EE2E24"
-        stroke="#E6E4E1"
-        strokeWidth={strokeWidth}
-      />
-    </>
+    <g className="solid-diamond" transform={translateNonCircleIcon(iconSize)}>
+      <CurrentStopDiamond width={iconSize} height={iconSize} />
+    </g>
   );
 };
 
-const CurrentStopIconEndpointRedLine: ComponentType<IconProps> = ({ x }) => {
-  const iconWidth = 64;
-
+// This is the x-octagon without a border
+const SmallXStopIcon: ComponentType<IconProps> = ({ iconSize }) => {
   return (
-    <>
-      <path
-        transform={`translate(${x - iconWidth / 2} ${-iconWidth / 3})`}
-        d="M39.4605 4.26181C36.4447 1.24606 31.5553 1.24606 28.5395 4.26181L4.26181 28.5395C1.24606 31.5553 1.24606 36.4447 4.26181 39.4605L28.5395 63.7382C31.5553 66.7539 36.4447 66.7539 39.4605 63.7382L63.7382 39.4605C66.7539 36.4447 66.7539 31.5553 63.7382 28.5395L39.4605 4.26181Z"
-        fill="#EE2E24"
-        stroke="#E6E4E1"
-        strokeWidth="4"
-        strokeLinejoin="round"
-      />
-      <path
-        transform={`translate(${x - iconWidth / 2} ${-iconWidth / 3})`}
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M18.0032 35.1702C17.2222 34.3892 17.2222 33.1229 18.0032 32.3418L32.3417 18.0033C33.1228 17.2223 34.3891 17.2223 35.1702 18.0033L49.5086 32.3418C50.2897 33.1229 50.2897 34.3892 49.5086 35.1702L35.1702 49.5087C34.3891 50.2898 33.1228 50.2898 32.3417 49.5087L18.0032 35.1702Z"
-        fill="white"
-      />
-    </>
+    <g className="small-x-stop" transform={translateNonCircleIcon(iconSize)}>
+      <SmallXOctagon width={iconSize} height={iconSize} />
+    </g>
   );
 };
 
-const CurrentStopIconEndpoint: ComponentType<IconProps> = ({ x }) => {
-  const iconWidth = 64;
-
+// This is the x-octagon with a border
+const LargeXStopIcon: ComponentType<{iconSize: number, color?: string}> = ({ iconSize, color }) => {
   return (
-    <path
-      transform={`translate(${x - iconWidth / 2} ${-iconWidth / 3})`}
-      d="M3.13388 28.7629C1.74155 30.1552 1.74155 32.4126 3.13388 33.8049L28.2253 58.8964C29.6176 60.2887 31.8751 60.2887 33.2674 58.8964L58.3588 33.8049C59.7511 32.4126 59.7511 30.1552 58.3588 28.7629L33.2674 3.67141C31.8751 2.27909 29.6176 2.27909 28.2253 3.67141L3.13388 28.7629Z"
-      fill="#EE2E24"
-      stroke="#E6E4E1"
-      strokeWidth="3.58209"
-    />
+    <g className="large-x-stop" transform={translateNonCircleIcon(iconSize)}>
+      <LargeXOctagonBordered color={color} width={iconSize} height={iconSize} />
+    </g>
   );
 };
 
-const SuspensionStopIcon: ComponentType<IconProps> = ({ x }) => {
-  const iconWidth = 30;
-
-  return (
-    <>
-      <rect x={x - iconWidth / 4} width="18" height="16" fill="white" />
-      <path
-        transform={`translate(${x - iconWidth / 2} ${-iconWidth})`}
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8.93886 0C8.76494 0 8.5985 0.0707868 8.47786 0.196069L0.178995 8.81412C0.0641567 8.93338 0 9.09249 0 9.25805V21.0682C0 21.238 0.0674284 21.4008 0.187452 21.5208L8.47922 29.8125C8.59924 29.9326 8.76202 30 8.93176 30H21.0611C21.2351 30 21.4015 29.9292 21.5221 29.8039L29.821 21.1859C29.9358 21.0666 30 20.9075 30 20.7419V8.93176C30 8.76202 29.9326 8.59924 29.8125 8.47922L21.5208 0.187452C21.4008 0.0674284 21.238 0 21.0682 0H8.93886ZM7.5935 10.0066C7.34658 10.2576 7.34866 10.6608 7.59816 10.9091L11.957 15.248L7.59623 19.6793C7.34824 19.9313 7.35156 20.3366 7.60365 20.5845L9.73397 22.6794C9.98593 22.9272 10.391 22.9239 10.6389 22.672L15 18.2404L19.3611 22.672C19.609 22.9239 20.0141 22.9272 20.266 22.6794L22.3964 20.5845C22.6484 20.3366 22.6518 19.9313 22.4038 19.6793L18.043 15.248L22.4018 10.9091C22.6513 10.6608 22.6534 10.2576 22.4065 10.0066L20.2613 7.82685C20.0124 7.5739 19.6052 7.5718 19.3537 7.82217L15 12.1559L10.6463 7.82217C10.3948 7.5718 9.98758 7.5739 9.73865 7.82685L7.5935 10.0066Z"
-        fill="#171F26"
-      />
-    </>
-  );
-};
-
-const StationClosureStopIcon: ComponentType<IconProps> = ({ x, className }) => {
-  const iconWidth = 48;
-  const strokeWidth = 4;
-
-  return (
-    <path
-      className={className}
-      transform={`translate(${x - (iconWidth + strokeWidth) / 2} ${
-        -iconWidth / 4
-      })`}
-      d="M22.6628 27.0001L23.9119 25.7308L22.6498 24.4744L17.0202 18.8706L18.8677 16.9933L24.4828 22.5826L25.7463 23.8404L27.0099 22.5826L32.625 16.9933L34.4725 18.8706L28.8429 24.4744L27.5807 25.7308L28.8298 27.0001L34.4649 32.7261L32.6588 34.5021L27.0229 28.7751L25.7463 27.4779L24.4698 28.7751L18.8338 34.5021L17.0278 32.7261L22.6628 27.0001ZM35.0884 18.2575L35.0876 18.2583L35.0884 18.2575ZM19.4568 35.1147L19.456 35.114L19.4568 35.1147ZM3.22013 15.2827L4.51025 16.5251L3.22013 15.2827C2.73421 15.7873 2.46274 16.4606 2.46274 17.1611V34.0832C2.46274 34.8014 2.74805 35.4902 3.25592 35.9981L15.1366 47.8788L16.4031 46.6124L15.1367 47.8788C15.6445 48.3867 16.3333 48.672 17.0515 48.672H34.4309C35.1669 48.672 35.8711 48.3725 36.3816 47.8424L48.2725 35.4941C48.7585 34.9895 49.0299 34.3162 49.0299 33.6157V16.6936C49.0299 15.9754 48.7446 15.2866 48.2368 14.7788L46.9703 16.0452L48.2367 14.7787L36.356 2.898C35.8481 2.39014 35.1593 2.10483 34.4411 2.10483H17.0617C16.3258 2.10483 15.6215 2.40435 15.111 2.93447L3.22013 15.2827Z"
-      fill="#171F26"
-      stroke="#E6E4E1"
-      strokeWidth={strokeWidth}
-    />
-  );
-};
-
-const ShuttleStopIcon: ComponentType<IconProps> = ({ x }) => (
-  <circle cx={x} cy="12" r="10" fill="white" stroke="#171F26" strokeWidth="4" />
-);
-
-const StopIcon: ComponentType<IconProps> = ({ x, className }) => (
+// Basic template for a Circle Icon
+const CircleStopIcon: ComponentType<{r: number, className: string, strokeWidth: number}> = ({ r, className, strokeWidth }) => (
   <circle
-    cx={x}
-    cy="12"
-    r="10"
+    cy={LINE_HEIGHT / 2}
+    r={r}
     fill="white"
     className={className}
-    strokeWidth="4"
+    strokeWidth={strokeWidth}
   />
 );
 
-const StopIconEndpoint: ComponentType<IconProps> = ({ x, className }) => (
-  <circle
-    cx={x}
-    cy="12"
-    r="20"
-    fill="white"
-    className={className}
-    strokeWidth="8"
-  />
+const CircleShuttlingStopIcon: ComponentType<{}> = () => (
+  <CircleStopIcon r={10} className="shuttle-stop" strokeWidth={4} />
 );
 
-const ArrowEndpoint: ComponentType<IconProps> = ({ x, className }) => (
-  <path
-    transform={`translate(${x})`}
-    width={204}
-    d="M0 24V0H59.446C59.8085 0 60.1642 0.0985159 60.475 0.285014L77.1417 10.285C78.4364 11.0618 78.4364 12.9382 77.1417 13.715L60.475 23.715C60.1642 23.9015 59.8085 24 59.446 24H0Z"
-    className={className}
-  />
+const CircleStopIconEndpoint: ComponentType<EndpointProps> = ({ className }) => (
+  <CircleStopIcon r={20} className={className} strokeWidth={8} />
 );
 
-const getEndpointLabel = (labelID: string, x: number, isArrow: boolean) => {
+const LeftArrowEndpoint: ComponentType<EndpointProps> = ({ className }) => (
+  <ArrowLeftEndpoint className={className} />
+);
+
+const RightArrowEndpoint: ComponentType<EndpointProps> = ({ className }) => (
+  <ArrowRightEndpoint className={className} />
+);
+
+const EndpointLabel: ComponentType<{labelID: string, isArrow: boolean}> = ({labelID, isArrow}) => {
   let labelParts = endLabelIDMap[labelID];
   if (labelParts.length === 1) {
     return (
       <text
         className="label--endpoint"
-        transform={`translate(${x} -32) rotate(-45)`}
+        transform={`translate(0 -32) rotate(-45)`}
       >
         {isArrow && <tspan className="label">to </tspan>}
         {labelParts[0]}
@@ -278,16 +214,28 @@ const getEndpointLabel = (labelID: string, x: number, isArrow: boolean) => {
       <>
         <text
           className="label--endpoint"
-          transform={`translate(${x} -32) rotate(-45)`}
+          transform={`translate(0 -32) rotate(-45)`}
         >
           {isArrow && <tspan className="label">to </tspan>}
-          {labelParts[0]}
+          {labelParts[0].includes("&") ?
+            <>
+              {labelParts[0].replace(" &", "")}
+              <tspan className="label"> &</tspan>
+            </>
+            : labelParts[0]
+          }
         </text>
         <text
           className="label--endpoint"
-          transform={`translate(${x + 45} -32) rotate(-45)`}
+          transform={`translate(45 -32) rotate(-45)`}
         >
-          {labelParts[1]}
+          {labelParts[1].includes("&") ?
+            <>
+              {labelParts[0].replace("& ", "")}
+              <tspan className="label">& </tspan>
+            </>
+            : labelParts[1]
+          }
         </text>
       </>
     );
@@ -300,71 +248,49 @@ interface EndSlotComponentProps {
   isCurrentStop: boolean;
   isAffected: boolean;
   effect: Effect;
-}
-
-interface FirstSlotComponentProps extends EndSlotComponentProps {
   spaceBetween: number;
+  isLeftSide: boolean;
+  x: number
 }
 
-const FirstSlotComponent: ComponentType<FirstSlotComponentProps> = ({
+const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
   slot,
   line,
-  spaceBetween,
+  isCurrentStop,
   isAffected,
   effect,
-  isCurrentStop,
+  spaceBetween,
+  isLeftSide,
+  x
 }) => {
   let icon;
   if (slot.type === "arrow") {
-    icon = (
-      <path
-        className={classWithModifier("end-slot__arrow", line)}
-        d="M35 0V24L19.554 24C19.1915 24 18.8358 23.9015 18.525 23.715L1.85831 13.715C0.563633 12.9382 0.563633 11.0618 1.85831 10.285L18.525 0.285015C18.8358 0.0985165 19.1915 0 19.554 0L35 0Z"
-        fill={line}
-      />
-    );
+    icon = isLeftSide ?
+      <g transform={`translate(-22 0)`}><LeftArrowEndpoint className={classWithModifier("end-slot__arrow", line)} /></g>
+      : <RightArrowEndpoint className={classWithModifier("end-slot__arrow", line)} />
+  } else if (isAffected && (effect === "station_closure" || effect === "suspension")) {
+    icon = <LargeXStopIcon iconSize={61} />
+  } else if (isCurrentStop && line === "red") {
+    icon = <CurrentStopOpenDiamondIcon iconSize={64} />
   } else if (isCurrentStop) {
-    icon =
-      line === "red" ? (
-        <CurrentStopIconEndpointRedLine x={L} />
-      ) : (
-        <CurrentStopIconEndpoint x={L} />
-      );
+    icon = <CurrentStopDiamondIcon iconSize={64} />
   } else {
-    const modifiers = [line.toString()];
-    if (isAffected) {
-      modifiers.push("affected");
-    }
-
-    if (isAffected && effect === "station_closure") {
-      icon = (
-        <StationClosureStopIcon
-          className={classWithModifier(
-            "station-closure-icon",
-            isCurrentStop ? "current-stop" : ""
-          )}
-          x={L}
-        />
-      );
-    } else {
-      icon = (
-        <StopIconEndpoint
-          className={classWithModifiers("end-slot__icon", modifiers)}
-          x={L}
-        />
-      );
-    }
+      const modifiers = [line.toString()];
+      if (isAffected) {
+        modifiers.push("affected");
+      }
+      icon = <CircleStopIconEndpoint className={classWithModifiers("end-slot__icon", modifiers)} />
   }
 
   let background;
-  if (!isAffected || effect === "station_closure") {
+  if ((!isAffected && isLeftSide) || (effect === "station_closure" && isLeftSide)) {
     background = (
       <rect
         className={classWithModifier("end-slot__arrow", line)}
         width={SLOT_WIDTH / 2 + spaceBetween}
         height={LINE_HEIGHT}
         fill={line}
-        x={L + SLOT_WIDTH / 2}
+        x={SLOT_WIDTH / 2}
       />
     );
   } else {
@@ -372,71 +298,13 @@ const FirstSlotComponent: ComponentType<FirstSlotComponentProps> = ({
   }
 
   return (
-    <>
+    <g transform={`translate(${x})`}>
       {background}
       {icon}
-      {getEndpointLabel(slot.label_id, L, slot.type === "arrow")}
-    </>
+      <EndpointLabel labelID={slot.label_id} isArrow={slot.type === "arrow"} />
+    </g>
   );
-};
-
-interface LastSlotComponentProps extends EndSlotComponentProps {
-  x: number;
 }
-
-const LastSlotComponent: ComponentType<LastSlotComponentProps> = ({
-  slot,
-  line,
-  x,
-  isCurrentStop,
-  isAffected,
-  effect,
-}) => {
-  let icon;
-  if (slot.type === "arrow") {
-    icon = (
-      <ArrowEndpoint
-        x={x}
-        className={classWithModifier("end-slot__arrow", line)}
-      />
-    );
-  } else if (isAffected && effect === "station_closure") {
-    icon = (
-      <StationClosureStopIcon
-        className={classWithModifier(
-          "station-closure-icon",
-          isCurrentStop ? "current-stop" : ""
-        )}
-        x={x}
-      />
-    );
-  } else if (isCurrentStop) {
-    icon =
-      line === "red" ? (
-        <CurrentStopIconEndpointRedLine x={x} />
-      ) : (
-        <CurrentStopIconEndpoint x={x} />
-      );
-  } else {
-    const modifiers = [line.toString()];
-    if (isAffected) {
-      modifiers.push("affected");
-    }
-    icon = (
-      <StopIconEndpoint
-        x={x}
-        className={classWithModifiers("end-slot__icon", modifiers)}
-      />
-    );
-  }
-
-  return (
-    <>
-      {icon}
-      {getEndpointLabel(slot.label_id, x, slot.type === "arrow")}
-    </>
-  );
-};
 
 interface MiddleSlotComponentProps {
   slot: MiddleSlot;
@@ -472,9 +340,9 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
     background = (
       <rect
         className={classWithModifier("middle-slot__background", line)}
-        width={SLOT_WIDTH + spaceBetween}
+        // Round up to avoid gaps due to rounded down size during render
+        width={SLOT_WIDTH + Math.ceil(spaceBetween)}
         height={LINE_HEIGHT}
-        x={x}
       />
     );
   }
@@ -482,42 +350,35 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   let icon;
   if (slot.show_symbol) {
     if (isCurrentStop) {
-      if (isAffected) {
-        icon = (
-          <StationClosureStopIcon
-            x={x}
-            className="station-closure-icon--current-stop"
-          />
-        );
+      if (isAffected && effect in ["station_closure", "suspension"]) {
+        icon = <LargeXStopIcon iconSize={48} color="#ee2e24" />
       } else {
         icon =
-          line === "red" ? (
-            <CurrentStopIconRedLine x={x} />
-          ) : (
-            <CurrentStopIcon x={x} />
-          );
+          line === "red" ? <CurrentStopOpenDiamondIcon iconSize={52} />
+          : <CurrentStopDiamondIcon iconSize={52} />
       }
     } else {
       if (isAffected && !firstAffectedIndex) {
         switch (effect) {
           case "suspension":
-            icon = <SuspensionStopIcon x={x} />;
+            icon = <SmallXStopIcon iconSize={24} />;
             break;
           case "station_closure":
-            icon = <StationClosureStopIcon x={x} />;
+            icon = <LargeXStopIcon iconSize={48} />;
             break;
           case "shuttle":
             if (label !== "…" && label.full === "Beaconsfield") {
-              icon = <SuspensionStopIcon x={x} />;
+              icon = <SmallXStopIcon iconSize={24} />;
             } else {
-              icon = <ShuttleStopIcon x={x} />;
+              icon = <CircleShuttlingStopIcon />;
             }
         }
       } else {
         icon = (
-          <StopIcon
-            x={x}
+          <CircleStopIcon
+            r={10}
             className={classWithModifier("middle-slot__icon", line)}
+            strokeWidth={4}
           />
         );
       }
@@ -533,13 +394,13 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   }
 
   return (
-    <>
+    <g transform={`translate(${x})`}>
       {background}
       {icon}
       {label === "…" ? (
         <text
           className={classWithModifier(`label-${labelTextClass}`, textModifier)}
-          transform={`translate(${x - 12} -32)`}
+          transform={`translate(-12 -32)`}
         >
           {" "}
           {label}{" "}
@@ -547,14 +408,14 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
       ) : (
         <text
           className={classWithModifier(`label-${labelTextClass}`, textModifier)}
-          transform={`translate(${x} -32) rotate(-45)`}
+          transform={`translate(0 -32) rotate(-45)`}
         >
           {abbreviate || label.full === "Massachusetts Avenue"
             ? label.abbrev
             : label.full}
         </text>
       )}
-    </>
+    </g>
   );
 };
 
@@ -566,14 +427,16 @@ interface EffectBackgroundComponentProps {
   spaceBetween: number;
 }
 
+// Only for shuttles or suspensions
 const EffectBackgroundComponent: ComponentType<
   EffectBackgroundComponentProps
 > = ({ spaceBetween, effect, effectRegionSlotIndexRange }) => {
   const rangeStart = effectRegionSlotIndexRange[0];
   const rangeEnd = effectRegionSlotIndexRange[1];
 
-  const x1 = rangeStart * (spaceBetween + SLOT_WIDTH) + L;
-  const x2 = (spaceBetween + SLOT_WIDTH) * rangeEnd + L;
+  const x1 = rangeStart * (spaceBetween + SLOT_WIDTH);
+  const x2 = (spaceBetween + SLOT_WIDTH) * rangeEnd;
+  const heightOfBackground = 16;
 
   let background;
   if (effect === "shuttle") {
@@ -586,17 +449,21 @@ const EffectBackgroundComponent: ComponentType<
         y1="12"
         x2={x2}
         y2="12"
-        strokeWidth={16}
+        strokeWidth={heightOfBackground}
         stroke="black"
         strokeDasharray={`${dash} ${gap}`}
       />
     );
-  } else if (effect === "suspension") {
-    background = (
-      <rect width={x2 - x1 + SLOT_WIDTH} height="16" x={x1} fill="#AEAEAE" />
-    );
   } else {
-    background = <></>;
+    background = (
+      <rect
+        width={x2 - x1 + SLOT_WIDTH}
+        height={heightOfBackground}
+        x={x1}
+        y={heightOfBackground / 4}
+        fill="#AEAEAE"
+      />
+    );
   }
 
   return <>{background}</>;
@@ -620,38 +487,31 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
   const rangeStart = effectRegionSlotIndexRange[0];
   const rangeEnd = effectRegionSlotIndexRange[1];
 
-  const x1 = (rangeStart * (spaceBetween + SLOT_WIDTH) + L) * scaleFactor;
-  const x2 = ((spaceBetween + SLOT_WIDTH) * rangeEnd + L) * scaleFactor;
+  const x1 = (rangeStart * (spaceBetween + SLOT_WIDTH)) * scaleFactor;
+  const x2 = ((spaceBetween + SLOT_WIDTH) * rangeEnd) * scaleFactor;
 
   const middleOfLine = (x2 - x1) / 2 + x1;
-  const widthOfBackground = 40;
+  const endLinesHeight = 24;
+  const endLinesStrokeWidth = 8;
 
   let icon;
   if (effect === "shuttle") {
     icon = (
-      <>
-        <circle cx={middleOfLine} cy="8" r={widthOfBackground} fill="#171F26" />
-        <path
-          transform={`translate(${middleOfLine - widthOfBackground} -32)`}
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M60.8695 37.5334L58.842 21.6673C58.327 18.8044 56.513 17.6872 53.8141 16.5156C49.3915 14.9398 44.7285 14.0896 40.017 14C35.2983 14.0906 30.628 14.9408 26.1974 16.5156C23.532 17.6651 21.7178 18.8039 21.1691 21.6668L19.1309 37.5334V59.4837H22.709V63.3065C22.7138 64.8769 24.0275 66.1487 25.6492 66.153C27.2708 66.1484 28.5841 64.8765 28.5889 63.3062V59.4834H51.5189V63.3062C51.5111 64.3282 52.0697 65.2758 52.9824 65.789C53.8951 66.3022 55.0219 66.3022 55.9346 65.789C56.8473 65.2758 57.4059 64.3282 57.3982 63.3062V59.4834H60.87L60.8695 37.5334ZM31.429 18.0156H48.6755C49.4054 18.0156 49.997 18.5886 49.997 19.2954C49.997 20.0022 49.4054 20.5751 48.6755 20.5751H31.429C30.6991 20.5751 30.1074 20.0022 30.1074 19.2954C30.1074 18.5886 30.6991 18.0156 31.429 18.0156ZM24.5181 24.5431L22.839 37.069C22.8167 37.2128 22.8167 37.359 22.839 37.5028C22.8175 37.9344 22.9743 38.3566 23.2748 38.676C23.5752 38.9955 23.9947 39.186 24.4404 39.2055H55.7192C56.1641 39.2101 56.5924 39.0417 56.9081 38.7379C57.2237 38.4341 57.4002 38.0204 57.3982 37.5895V37.5028C57.4207 37.359 57.4207 37.2128 57.3982 37.069L55.7192 24.5431C55.5841 23.7547 54.8758 23.1793 54.0506 23.1876H26.1971C25.3697 23.179 24.6582 23.7534 24.5181 24.5431ZM25.6476 52.6951C23.9189 52.6982 22.515 51.3436 22.5117 49.6696C22.5085 47.9956 23.9072 46.636 25.6358 46.6328C27.3645 46.6296 28.7686 47.984 28.772 49.658C28.7741 50.4621 28.446 51.2341 27.86 51.8038C27.2739 52.3735 26.478 52.6941 25.6476 52.6951ZM54.4601 46.6328C52.733 46.6339 51.3332 47.9895 51.332 49.662C51.3309 51.3345 52.7289 52.6918 54.4555 52.6951C55.2881 52.6973 56.0872 52.3781 56.6759 51.808C57.2647 51.238 57.5945 50.4642 57.5923 49.658C57.5889 47.9855 56.1872 46.6317 54.4601 46.6328Z"
-          fill="white"
-        />
-      </>
-    );
+      <g transform={`translate(${
+            middleOfLine - EMPHASIS_HEIGHT / 2
+            } -${endLinesHeight + endLinesStrokeWidth/2})`}>
+        <ShuttleBusIcon />
+      </g>
+    )
   } else if (effect === "suspension") {
     icon = (
-      <>
-        <rect x={middleOfLine - 35} width={60} height={45} fill="white" />
-        <path
-          transform={`translate(${middleOfLine - widthOfBackground})`}
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M23.837 0C23.3732 0 22.9293 0.188765 22.6076 0.522852L0.47732 23.5043C0.171085 23.8223 0 24.2467 0 24.6881V56.182C0 56.6346 0.179809 57.0687 0.499871 57.3888L22.6112 79.5001C22.9313 79.8202 23.3654 80 23.818 80H56.163C56.6268 80 57.0707 79.8112 57.3924 79.4771L79.5227 56.4957C79.8289 56.1777 80 55.7534 80 55.3119V23.818C80 23.3654 79.8202 22.9313 79.5001 22.6112L57.3888 0.499871C57.0687 0.179809 56.6346 0 56.182 0H23.837ZM20.2493 26.6844C19.5909 27.3535 19.5964 28.4288 20.2618 29.091L31.8854 40.6614L20.2566 52.478C19.5953 53.15 19.6042 54.2309 20.2764 54.892L25.9573 60.4784C26.6291 61.1391 27.7094 61.1303 28.3703 60.4586L40 48.6411L51.6297 60.4586C52.2906 61.1303 53.3708 61.1391 54.0427 60.4784L59.7236 54.892C60.3958 54.2309 60.4047 53.15 59.7434 52.478L48.1146 40.6614L59.7383 29.091C60.4036 28.4288 60.4091 27.3535 59.7507 26.6844L54.0303 20.8716C53.3665 20.1971 52.2805 20.1915 51.6098 20.8591L40 32.4157L28.3902 20.8591C27.7195 20.1915 26.6335 20.1971 25.9697 20.8716L20.2493 26.6844Z"
-          fill="#171F26"
-        />
-      </>
+      <g
+        transform={`translate(${middleOfLine - EMPHASIS_HEIGHT / 2} ${
+          (endLinesHeight - EMPHASIS_HEIGHT) / 2
+        })`}
+      >
+        <SmallXOctagon width={EMPHASIS_HEIGHT} height={EMPHASIS_HEIGHT} />
+      </g>
     );
   }
 
@@ -661,21 +521,21 @@ const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
         2 && (
         <>
           <path
-            d={`M${x1} 4L${x1} 28`}
+            d={`M${x1} 0L${x1} ${endLinesHeight}`}
             stroke="#737373"
-            strokeWidth="8"
+            strokeWidth={`${endLinesStrokeWidth}`}
             strokeLinecap="round"
           />
           <path
-            d={`M${x1} 16H${x2}`}
+            d={`M${x1} ${endLinesHeight / 2}H${x2}`}
             stroke="#737373"
-            strokeWidth="8"
+            strokeWidth={`${endLinesStrokeWidth}`}
             strokeLinecap="round"
           />
           <path
-            d={`M${x2} 4L${x2} 28`}
+            d={`M${x2} 0L${x2} ${endLinesHeight}`}
             stroke="#737373"
-            strokeWidth="8"
+            strokeWidth={`${endLinesStrokeWidth}`}
             strokeLinecap="round"
           />
         </>
@@ -704,20 +564,23 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     60,
     (W - SLOT_WIDTH * numStops) / (numStops - 1)
   );
-  const { 0: beginning, [slots.length - 1]: end, ...middle } = slots;
+  const [beginning, middle, end] = [slots[0], slots.slice(1, -1), slots.at(-1)];
   const hasEmphasis = effect !== "station_closure";
+  const calculated_emphasis_height = hasEmphasis ? EMPHASIS_HEIGHT + EMPHASIS_PADDING_TOP : 0;
   const labelTextClass = slots.length > 12 ? "small" : "large";
 
   let x = 0;
-  const middleSlots = Object.values(middle).map((s, i) => {
-    x = (spaceBetween + SLOT_WIDTH) * (i + 1) + L;
+  const middleSlots = middle.map((s, i) => {
+    // Add 1 to the index to counteract the offset caused by removing `beginning` from the original `slots` array.
+    const slotIndex = i + 1;
+    x = (spaceBetween + SLOT_WIDTH) * slotIndex;
     const slot = s as MiddleSlot;
     const key = slot.label === "…" ? i : slot.label.full;
     const isAffected =
       effect === "station_closure"
-        ? props.closed_station_slot_indices.includes(i + 1)
-        : i + 1 >= props.effect_region_slot_index_range[0] &&
-          i + 1 <= props.effect_region_slot_index_range[1] - 1;
+        ? props.closed_station_slot_indices.includes(slotIndex)
+        : slotIndex >= props.effect_region_slot_index_range[0] &&
+        slotIndex <= props.effect_region_slot_index_range[1] - 1;
 
     return (
       <MiddleSlotComponent
@@ -726,13 +589,13 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         x={x}
         spaceBetween={spaceBetween}
         line={line}
-        isCurrentStop={current_station_slot_index === i + 1}
+        isCurrentStop={current_station_slot_index === slotIndex}
         effect={effect}
         isAffected={isAffected}
         firstAffectedIndex={
           effect === "station_closure"
             ? false
-            : props.effect_region_slot_index_range[0] === i + 1
+            : props.effect_region_slot_index_range[0] === slotIndex
         }
         abbreviate={doAbbreviate}
         labelTextClass={labelTextClass}
@@ -743,108 +606,121 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   x += spaceBetween + SLOT_WIDTH;
 
   const [isDone, setIsDone] = useState(false);
-  const [isDoneScaling, setIsDoneScaling] = useState(false);
-  const [lineMapHeight, setLineMapHeight] = useState(0);
 
-  useEffect(() => {
-    const dimensions = document
+  // Get the size of the diagram svg, excluding emphasis
+  const dimensions = document
       .getElementById("line-map")
       ?.getBoundingClientRect();
 
-    const height = dimensions?.height;
-    const width = dimensions?.width;
+  let height = dimensions?.height ?? 0;
+  let width = dimensions?.width ?? 0;
 
-    if (!isDoneScaling && width) {
-      // Scale diagram up or down so width is 904px
-      setScaleFactor(904 / width);
-      setIsDoneScaling(true);
-    } else if (!isDone && isDoneScaling) {
-      // If the height of the line map + emphasis (if present) is still too tall,
-      // abbreviate station names.
-      if (height && height + (hasEmphasis ? EMPHASIS_HEIGHT : 0) > svgHeight) {
-        setDoAbbreviate(true);
+  useEffect(() => {
+    if (svgHeight != 0 && width && height) {
+      // if scaleFactor has already been applied to the line-map, we need to reverse that
+      height = height / scaleFactor
+      width = width / scaleFactor
+
+      // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
+      const xScaleFactor = 904 / width
+
+      const needsAbbreviating = height * xScaleFactor + calculated_emphasis_height > svgHeight && !doAbbreviate
+      if (needsAbbreviating) {
+        setDoAbbreviate(true)
+        // now scale y, which requires re-running this effect
+      } else {
+        const factor = Math.min(904 / width, (svgHeight - calculated_emphasis_height) / height)
+        setScaleFactor(factor);
+        setTimeout(() => {
+          setIsDone(true)
+        }, 200)
       }
-
-      setIsDone(true);
     }
-  });
+  }, [svgHeight, doAbbreviate]);
 
-  // Get the finalized height of the line map after scaling and abbreviations
-  useEffect(() => {
-    const dimensions = document
-      .getElementById("line-map")
-      ?.getBoundingClientRect();
+  // This is to center the diagram along the X axis
+  const translateX = (width && (904 - width) / 2) || 0
 
-    const height = dimensions?.height;
+  // Next is to center the diagram along the Y axis, which involves adjusing the SVG viewbox
 
-    if (isDone && height) {
-      setLineMapHeight(height);
-    }
-  }, [isDone]);
+  // If -${svgHeight} is used as the viewbox height, it looks like the line diagram text
+  // pushed all the way to the bottom of the viewbox with just a tiny point of the 
+  // "You are Here" diamond sticking out. So, the parts that are cut off are the whole
+  // height of the line diagram, and a little extra for the bottom of the "You are Here" diamond.
+  
+  // To calculate the height of that missing part, that is:
+  // LINE_HEIGHT*scaleFactor/2 - MAX_ICON_HEIGHT*scaleFactor/2
+
+  // offset is parent container height minus all the stuff below the very top of the line diagram
+  const offset = (svgHeight - LINE_HEIGHT*scaleFactor/2 - MAX_ICON_HEIGHT*scaleFactor/2 - calculated_emphasis_height)
+  // topAndBottomMargins is parent container height minus actual full height of line diagram with emphasis
+  const topAndBottomMargins = (svgHeight - height - calculated_emphasis_height)/2
+  // If topAndBottomMargins is negative, than there is no margin to use, so the viewBox offset should just be
+  // the offset (essentially the basic height of the diagram)
+  // Otherwise, if there is vertical room, the calculated margin is subtracted from that offset
+  const viewBoxOffset = topAndBottomMargins < 0 ? offset : offset - topAndBottomMargins
 
   return (
     <svg
-      height="100%"
-      viewBox={`0 0 904 ${svgHeight}`}
-      id="whole-svg"
+      // viewBoxOffset will always be > 0 by the time it's visible, but the console will
+      // still log an error if it's a negative number when it's not-yet-visible
+      viewBox={`0 ${viewBoxOffset > 0 ? -viewBoxOffset : 0} 904 ${svgHeight}`}
+      transform={`translate(${translateX})`}
       visibility={isDone ? "visible" : "hidden"}
     >
-      <g
-        id="line-map"
-        transform={`translate(${SLOT_WIDTH / 2}, ${
-          lineMapHeight - EMPHASIS_PADDING_TOP * scaleFactor - 16
-        }) scale(${scaleFactor})`}
-      >
-        <EffectBackgroundComponent
-          effectRegionSlotIndexRange={
-            effect === "station_closure"
-              ? props.closed_station_slot_indices
-              : props.effect_region_slot_index_range
+      <g transform={`translate(${L * scaleFactor} 0)`}>
+        <g id="line-map" transform={`scale(${scaleFactor})`}>
+          {effect !=="station_closure" &&
+            <EffectBackgroundComponent
+              effectRegionSlotIndexRange={props.effect_region_slot_index_range}
+              effect={effect}
+              spaceBetween={spaceBetween}
+            />
           }
-          effect={effect}
-          spaceBetween={spaceBetween}
-        />
-        <FirstSlotComponent
-          slot={beginning}
-          line={line}
-          isCurrentStop={current_station_slot_index === 0}
-          spaceBetween={spaceBetween}
-          isAffected={
-            effect === "station_closure"
-              ? props.closed_station_slot_indices.includes(0)
-              : props.effect_region_slot_index_range.includes(0)
-          }
-          effect={effect}
-        />
-        {middleSlots}
-        <LastSlotComponent
-          slot={end as EndSlot}
-          x={x}
-          line={line}
-          isCurrentStop={current_station_slot_index === slots.length - 1}
-          isAffected={
-            effect === "station_closure"
-              ? props.closed_station_slot_indices.includes(slots.length - 1)
-              : props.effect_region_slot_index_range.includes(slots.length - 1)
-          }
-          effect={effect}
-        />
-      </g>
-      {hasEmphasis && (
-        <g
-          id="alert-emphasis"
-          transform={`translate(${SLOT_WIDTH / 2}, ${
-            lineMapHeight + EMPHASIS_HEIGHT - EMPHASIS_PADDING_TOP * scaleFactor
-          })`}
-        >
-          <AlertEmphasisComponent
-            effectRegionSlotIndexRange={props.effect_region_slot_index_range}
+          <EndSlotComponent
+            slot={beginning}
+            x={0}
+            line={line}
+            isCurrentStop={current_station_slot_index === 0}
             spaceBetween={spaceBetween}
+            isAffected={
+              effect === "station_closure"
+                ? props.closed_station_slot_indices.includes(0)
+                : props.effect_region_slot_index_range.includes(0)
+            }
             effect={effect}
-            scaleFactor={scaleFactor}
+            isLeftSide={true}
+          />
+          {middleSlots}
+          <EndSlotComponent
+            slot={end as EndSlot}
+            x={x}
+            line={line}
+            isCurrentStop={current_station_slot_index === slots.length - 1}
+            spaceBetween={spaceBetween}
+            isAffected={
+              effect === "station_closure"
+                ? props.closed_station_slot_indices.includes(slots.length - 1)
+                : props.effect_region_slot_index_range.includes(slots.length - 1)
+            }
+            effect={effect}
+            isLeftSide={false}
           />
         </g>
-      )}
+        {hasEmphasis && (
+          <g
+            id="alert-emphasis"
+            transform={`translate(0, ${EMPHASIS_HEIGHT/2 + (EMPHASIS_HEIGHT - MAX_ICON_HEIGHT) * scaleFactor})`}
+          >
+            <AlertEmphasisComponent
+              effectRegionSlotIndexRange={props.effect_region_slot_index_range}
+              spaceBetween={spaceBetween}
+              effect={effect}
+              scaleFactor={scaleFactor}
+            />
+          </g>
+        )}
+      </g>
     </svg>
   );
 };

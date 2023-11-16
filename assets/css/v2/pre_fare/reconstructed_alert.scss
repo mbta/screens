@@ -254,7 +254,9 @@ $alert-card-footer-height: 80px;
       }
 
       .disruption-diagram-container {
+        width: 904px;
         flex: 1;
+        min-height: 0;
       }
     }
 
