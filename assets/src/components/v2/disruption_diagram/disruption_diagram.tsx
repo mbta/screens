@@ -427,6 +427,7 @@ interface EffectBackgroundComponentProps {
   spaceBetween: number;
 }
 
+// Only for shuttles or suspensions
 const EffectBackgroundComponent: ComponentType<
   EffectBackgroundComponentProps
 > = ({ spaceBetween, effect, effectRegionSlotIndexRange }) => {
@@ -453,7 +454,7 @@ const EffectBackgroundComponent: ComponentType<
         strokeDasharray={`${dash} ${gap}`}
       />
     );
-  } else if (effect === "suspension") {
+  } else {
     background = (
       <rect
         width={x2 - x1 + SLOT_WIDTH}
@@ -463,8 +464,6 @@ const EffectBackgroundComponent: ComponentType<
         fill="#AEAEAE"
       />
     );
-  } else {
-    background = <></>;
   }
 
   return <>{background}</>;
@@ -671,15 +670,13 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     >
       <g transform={`translate(${L * scaleFactor} 0)`}>
         <g id="line-map" transform={`scale(${scaleFactor})`}>
-          <EffectBackgroundComponent
-            effectRegionSlotIndexRange={
-              effect === "station_closure"
-                ? props.closed_station_slot_indices
-                : props.effect_region_slot_index_range
-            }
-            effect={effect}
-            spaceBetween={spaceBetween}
-          />
+          {effect !=="station_closure" &&
+            <EffectBackgroundComponent
+              effectRegionSlotIndexRange={props.effect_region_slot_index_range}
+              effect={effect}
+              spaceBetween={spaceBetween}
+            />
+          }
           <EndSlotComponent
             slot={beginning}
             x={0}
