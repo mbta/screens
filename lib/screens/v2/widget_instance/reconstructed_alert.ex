@@ -1015,7 +1015,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           %{disruption_diagram: serialized_diagram}
 
         {:error, reason} ->
-          log_fn.("[disruption diagram error] alert_id=#{t.alert.id} home_stop=#{t.location_context.home_stop} #{reason}")
+          log_fn.(
+            "[disruption diagram error] alert_id=#{t.alert.id} home_stop=#{t.location_context.home_stop} #{reason}"
+          )
+
           %{}
       end
 
