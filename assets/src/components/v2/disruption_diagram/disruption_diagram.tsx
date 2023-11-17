@@ -608,14 +608,18 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   const [isDone, setIsDone] = useState(false);
 
   // Get the size of the diagram svg, excluding emphasis
-  const dimensions = document
-      .getElementById("line-map")
-      ?.getBoundingClientRect();
+  let dimensions = document.getElementById("line-map")?.getBoundingClientRect();
 
   let height = dimensions?.height ?? 0;
   let width = dimensions?.width ?? 0;
 
   useEffect(() => {
+    // Get updated dimensions each time this hook runs
+    dimensions = document.getElementById("line-map")?.getBoundingClientRect();
+
+    height = dimensions?.height ?? 0;
+    width = dimensions?.width ?? 0;
+
     if (svgHeight != 0 && width && height) {
       // if scaleFactor has already been applied to the line-map, we need to reverse that
       height = height / scaleFactor
