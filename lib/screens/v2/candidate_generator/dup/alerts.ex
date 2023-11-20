@@ -71,9 +71,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
           not directional_shuttle_or_suspension?(alert)
       end)
 
+    test_surge_alert = ["143269"]
+    prod_surge_alert = ["535276"]
+
     # Suppressing this GL surge alert at Kenmore. Will allow the screen to show C and D predictions.
     if stop_id === "place-kencl" do
-      Enum.reject(alerts, &(&1.id in ["143269"]))
+      Enum.reject(alerts, &(&1.id in (test_surge_alert ++ prod_surge_alert)))
     else
       alerts
     end
