@@ -5,7 +5,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.SubwayStatus
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{Footer, GlEink, PreFare}
+  alias ScreensConfig.V2.PreFare
 
   defstruct screen: nil,
             subway_alerts: nil
@@ -89,12 +89,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     def slot_names(_instance), do: [:medium, :large]
 
     def widget_type(_instance), do: :subway_status
-
-    def valid_candidate?(%{
-          screen: %Screen{app_params: %GlEink{footer: %Footer{stop_id: stop_id}}}
-        })
-        when stop_id in ["place-mfa", "place-hsmnl"],
-        do: false
 
     def valid_candidate?(_instance), do: true
 
