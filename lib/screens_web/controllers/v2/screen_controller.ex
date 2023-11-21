@@ -118,6 +118,42 @@ defmodule ScreensWeb.V2.ScreenController do
     render_not_found(conn)
   end
 
+  # Handles widget page GET requests with widget data as a query param.
+  # Phoenix does not automatically decode JSON received in query params.
+  def widget(conn, %{"app_id" => app_id, "widget" => json_data}) when is_binary(json_data) do
+    case Jason.decode(json_data) do
+      {:ok, widget_data} ->
+        widget(conn, %{"app_id" => app_id, "widget" => widget_data})
+
+      {:error, _} ->
+        conn
+        |> put_status(:bad_request)
+        |> text(
+          "GET /v2/widget/#{app_id} request must contain a `widget` query param containing JSON"
+        )
+    end
+  end
+
+  # Handles widget page POST requests with widget data as a JSON request body.
+  # Phoenix automatically decodes JSON received in POST body.
+  def widget(conn, %{"app_id" => app_id, "widget" => widget_data})
+      when app_id in @app_id_strings do
+    app_id = String.to_existing_atom(app_id)
+
+    conn
+    |> assign(:app_id, app_id)
+    |> assign(:widget_data, Jason.encode!(widget_data))
+    |> render("index_widget.html")
+  end
+
+  def widget(conn, %{"app_id" => app_id}) do
+    app_id = String.to_existing_atom(app_id)
+
+    conn
+    |> put_status(:bad_request)
+    |> text("POST /v2/widget/#{app_id} request must contain a JSON body with `widget` key")
+  end
+
   def simulation(conn, params) do
     conn
     |> assign(

@@ -405,6 +405,10 @@ defmodule Screens.Departures.Departure do
     {"filter[route_type]", Screens.RouteType.to_id(route_type)}
   end
 
+  defp format_query_param({:trip_id, trip_id}) do
+    {"filter[trip]", trip_id}
+  end
+
   defp log_unexpected_groups(groups) do
     Enum.each(groups, fn {trip_id, predictions} ->
       route_ids = Enum.map(predictions, & &1.route.id)

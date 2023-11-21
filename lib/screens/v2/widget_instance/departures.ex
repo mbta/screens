@@ -352,7 +352,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defp crowding_compatible?(_, %Screen{app_id: :dup_v2}), do: false
   defp crowding_compatible?(_, _), do: true
 
-  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defp serialize_time(departure, %Screen{app_id: app_id}, now)
        when app_id in [:bus_eink_v2, :gl_eink_v2] do
     departure_time = Departure.time(departure)
@@ -372,7 +371,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           serialize_timestamp(departure_time, now)
       end
 
-    %{time: time}
+    %{time: time, time_in_epoch: DateTime.to_unix(departure_time)}
   end
 
   defp serialize_time(

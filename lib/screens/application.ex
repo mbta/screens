@@ -34,7 +34,8 @@ defmodule Screens.Application do
       {Task.Supervisor, name: Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor},
       # ScreensByAlert self-refresh job runner
       {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner},
-      Screens.OlCrowding.DynamicSupervisor
+      Screens.OlCrowding.DynamicSupervisor,
+      {Screens.OlCrowding.Agent, %{}}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

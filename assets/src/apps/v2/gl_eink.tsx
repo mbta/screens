@@ -44,6 +44,7 @@ import OvernightDepartures from "Components/v2/eink/overnight_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import EinkSubwayStatus from "Components/v2/subway_status/eink_subway_status";
+import WidgetPage from "Components/v2/widget_page";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -96,6 +97,11 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
+        <Route exact path="/v2/widget/gl_eink_v2">
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <WidgetPage />
+          </MappingContext.Provider>
+        </Route>
         <Route exact path="/v2/screen/gl_eink_v2">
           <MultiScreenPage
             components={TYPE_TO_COMPONENT}

@@ -58,12 +58,28 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     end
   end
 
-  def relevant_alerts(alerts, config, location_context, now) do
-    Enum.filter(alerts, fn alert ->
-      relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
-        relevant_location?(alert, location_context) and
-        not directional_shuttle_or_suspension?(alert)
-    end)
+  def relevant_alerts(
+        alerts,
+        %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}}} = config,
+        location_context,
+        now
+      ) do
+    alerts =
+      Enum.filter(alerts, fn alert ->
+        relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
+          relevant_location?(alert, location_context) and
+          not directional_shuttle_or_suspension?(alert)
+      end)
+
+    test_surge_alert = ["143269"]
+    prod_surge_alert = ["535276"]
+
+    # Suppressing this GL surge alert at Kenmore. Will allow the screen to show C and D predictions.
+    if stop_id === "place-kencl" do
+      Enum.reject(alerts, &(&1.id in (test_surge_alert ++ prod_surge_alert)))
+    else
+      alerts
+    end
   end
 
   @doc """
