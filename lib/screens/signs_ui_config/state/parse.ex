@@ -24,7 +24,7 @@ defmodule Screens.SignsUiConfig.State.Parse do
     |> Enum.into(%{})
   end
 
-  for mode <- ~w[auto headway off static_text]a do
+  for mode <- ~w[auto headway off static_text temporary_terminal]a do
     mode_string = Atom.to_string(mode)
 
     defp parse_sign_mode(unquote(mode_string)), do: unquote(mode)
