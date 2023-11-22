@@ -29,4 +29,6 @@ defmodule Screens.SignsUiConfig.State.Parse do
 
     defp parse_sign_mode(unquote(mode_string)), do: unquote(mode)
   end
+
+  defp parse_sign_mode(_), do: :unknown
 end
