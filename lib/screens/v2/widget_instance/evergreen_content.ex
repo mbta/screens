@@ -96,18 +96,25 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
 
   # Checks if `now` is within the given `time_range` that crosses UTC midnight, as well as at least one of the date ranges in `dates`.
   #
-  # If `now` is within the part of the time period that's past midnight, we extend all date ranges by one day to account for this.
+  # If `now` is within the part of the time period that's past midnight, we shift all date ranges forward by one day to account for this.
   #
-  # For example, if the time range is 22:00 - 03:00 and there's a date range that ends on 1/1,
-  # then we still consider this to be a match if `now` is between 00:00 and 03:00 on 1/2 since that's just past midnight of 12/1.
+  # For example, if the time range is 22:00 - 03:00 and there's a date range that ends on 1/10,
+  # then we still consider this to be a match if `now` is between 00:00 and 03:00 on 1/11 since that's just past midnight of 1/10.
+  #
+  # Conversely: with the same time range, and the date range starts on 1/5,
+  # then it's *not* a match if `now` is between 00:00 and 03:00 on 1/5, because that's just past midnight of 1/4.
   defp time_in_overnight_range?(now, time_range, dates) do
     # True if `now` is in the part of `time_range` that is past midnight.
     now_is_past_midnight = Util.time_in_range?(now, ~T[00:00:00], time_range.end_time_utc)
 
     dates =
-      if now_is_past_midnight,
-        do: Enum.map(dates, &%{&1 | end_date: Date.add(&1.end_date, 1)}),
-        else: dates
+      if now_is_past_midnight do
+        Enum.map(dates, fn date_range ->
+          Map.new(date_range, fn {k, date} -> {k, Date.add(date, 1)} end)
+        end)
+      else
+        dates
+      end
 
     Enum.any?(dates, fn date_range ->
       Date.compare(date_range.start_date, now) in [:lt, :eq] and
