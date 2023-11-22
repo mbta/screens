@@ -90,13 +90,25 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
     def widget_type(_instance), do: :subway_status
 
-    def valid_candidate?(%{
-          screen: %Screen{app_params: %GlEink{footer: %Footer{stop_id: stop_id}}}
-        })
-        when stop_id in ["place-mfa", "place-hsmnl"],
-        do: false
+    def valid_candidate?(instance, now \\ DateTime.utc_now())
 
-    def valid_candidate?(_instance), do: true
+    def valid_candidate?(
+          %{
+            screen: %Screen{app_params: %GlEink{footer: %Footer{stop_id: stop_id}}}
+          },
+          now
+        )
+        when stop_id in ["place-mfa", "place-hsmnl"] do
+      start_dt_of_surge = ~U[2023-11-27T07:30:00Z]
+      end_dt_of_surge = ~U[2023-12-06T07:30:00Z]
+
+      if DateTime.compare(start_dt_of_surge, now) in [:lt, :eq] and
+           DateTime.compare(end_dt_of_surge, now) == :gt,
+         do: false,
+         else: true
+    end
+
+    def valid_candidate?(_instance, _), do: true
 
     def audio_serialize(t), do: serialize(t)
 
