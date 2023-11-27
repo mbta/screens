@@ -4,18 +4,6 @@ defmodule Screens.Cache.Engine do
   """
 
   @typedoc """
-  Settings for the cache. All fields are required.
-  """
-  @type cache_opts_map :: %{
-          name: atom(),
-          update_table: update_table_fn,
-          update_interval_ms: non_neg_integer,
-          update_failure_error_log_threshold_minutes: non_neg_integer
-        }
-
-  @type update_table_fn :: (table_version -> update_success | :unchanged | :error)
-
-  @typedoc """
   To be returned by update_table on success.
 
   new_table_entries must be a tuple or list of tuples, for compatibility with ETS.
