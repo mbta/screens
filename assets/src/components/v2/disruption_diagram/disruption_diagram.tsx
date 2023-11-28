@@ -21,7 +21,7 @@ const EMPHASIS_HEIGHT = 80;
 // of the padding above the emphasis. Keeping for now
 const EMPHASIS_PADDING_TOP = 8;
 // The tallest icon (the diamond) is used in translation calculations
-const MAX_ICON_HEIGHT = 52;
+const MAX_ICON_HEIGHT = 64;
 // L: the amount by which the left end extends beyond the leftmost station slot.
 // R: the width by which the right end extends beyond the rightmost station slot.
 // L can vary based on whether the first slot is an arrow vs diamond, because the diamond is larger.
@@ -684,10 +684,10 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   // This is to center the diagram along the X axis
   const translateX = (width && (904 - width) / 2) || 0;
+  
+  // Next is to align the diagram at the top of the svg, which involves adjusing the SVG viewbox
 
-  // Next is to center the diagram along the Y axis, which involves adjusing the SVG viewbox
-
-  // If -${svgHeight} is used as the viewbox height, it looks like the line diagram text
+  // If -${height} is used as the viewbox height, it looks like the line diagram text
   // pushed all the way to the bottom of the viewbox with just a tiny point of the
   // "You are Here" diamond sticking out. So, the parts that are cut off are the whole
   // height of the line diagram, and a little extra for the bottom of the "You are Here" diamond.
@@ -696,25 +696,17 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   // LINE_HEIGHT*scaleFactor/2 - MAX_ICON_HEIGHT*scaleFactor/2
 
   // offset is parent container height minus all the stuff below the very top of the line diagram
-  const offset =
-    svgHeight -
-    (LINE_HEIGHT * scaleFactor) / 2 -
-    (MAX_ICON_HEIGHT * scaleFactor) / 2 -
-    calculated_emphasis_height;
-  // topAndBottomMargins is parent container height minus actual full height of line diagram with emphasis
-  const topAndBottomMargins =
-    (svgHeight - height - calculated_emphasis_height) / 2;
-  // If topAndBottomMargins is negative, than there is no margin to use, so the viewBox offset should just be
-  // the offset (essentially the basic height of the diagram)
-  // Otherwise, if there is vertical room, the calculated margin is subtracted from that offset
   const viewBoxOffset =
-    topAndBottomMargins < 0 ? offset : offset - topAndBottomMargins;
+    height -
+    (LINE_HEIGHT * scaleFactor) / 2 -
+    (MAX_ICON_HEIGHT * scaleFactor) / 2
 
   return (
     <svg
       // viewBoxOffset will always be > 0 by the time it's visible, but the console will
       // still log an error if it's a negative number when it's not-yet-visible
-      viewBox={`0 ${viewBoxOffset > 0 ? -viewBoxOffset : 0} 904 ${svgHeight}`}
+      viewBox={`0 ${-viewBoxOffset} 904 ${height + calculated_emphasis_height}`}
+      // viewBox={`0 ${-height} 904 ${height + calculated_emphasis_height}`}
       transform={`translate(${translateX})`}
       visibility={isDone ? "visible" : "hidden"}
     >
@@ -762,10 +754,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         {hasEmphasis && (
           <g
             id="alert-emphasis"
-            transform={`translate(0, ${
-              EMPHASIS_HEIGHT / 2 +
-              (EMPHASIS_HEIGHT - MAX_ICON_HEIGHT) * scaleFactor
-            })`}
+            transform={`translate(0, ${calculated_emphasis_height})`}
           >
             <AlertEmphasisComponent
               effectRegionSlotIndexRange={props.effect_region_slot_index_range}
