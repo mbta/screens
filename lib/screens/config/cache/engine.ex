@@ -1,9 +1,15 @@
 defmodule Screens.Config.Cache.Engine do
   alias Screens.Config
   alias Screens.Config.Fetch
-  require Logger
 
   @behaviour Screens.Cache.Engine
+
+  @type table_contents :: list(table_entry)
+
+  @type table_entry ::
+          {screen_id :: String.t(), ScreensConfig.Screen.t()}
+          | {:last_deploy_timestamp, DateTime.t()}
+          | {:devops, ScreensConfig.Devops.t()}
 
   @last_deploy_fetcher Application.compile_env(:screens, :last_deploy_fetcher)
 
@@ -15,8 +21,8 @@ defmodule Screens.Config.Cache.Engine do
     last_deploy_timestamp = @last_deploy_fetcher.get_last_deploy_time()
 
     with {:ok, body, new_version} <- Fetch.fetch_config(current_version),
-         {:ok, parsed} <- Jason.decode(body) do
-      config = Config.from_json(parsed)
+         {:ok, deserialized} <- Jason.decode(body) do
+      config = Config.from_json(deserialized)
 
       # It's inefficient to store the entire config under one key--every time we read any entry from an ETS table,
       # a full copy of that entry is made.
@@ -36,6 +42,7 @@ defmodule Screens.Config.Cache.Engine do
   @impl true
   def update_failure_error_log_threshold_minutes, do: 2
 
+  @spec config_to_table_entries(Config.t(), DateTime.t()) :: table_contents
   defp config_to_table_entries(config, last_deploy_timestamp) do
     screen_entries = Map.to_list(config.screens)
     metadata_entries = [last_deploy_timestamp: last_deploy_timestamp, devops: config.devops]
