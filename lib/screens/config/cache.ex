@@ -6,10 +6,7 @@ defmodule Screens.Config.Cache do
   alias Screens.Config
   alias ScreensConfig.Screen
 
-  @table :screens_config
-
-  # Only defined so that the engine module can also access @table.
-  def table, do: @table
+  use Screens.Cache.Client, table: :screens_config
 
   def ok?, do: table_exists?()
 
@@ -157,24 +154,10 @@ defmodule Screens.Config.Cache do
     end
   end
 
-  defmacrop with_table(do: block) do
-    quote do
-      if table_exists?() do
-        unquote(block)
-      else
-        :error
-      end
-    end
-  end
-
   defp table_entries_to_config(entries) do
     {devops, entries} = List.keytake(entries, :devops, 0)
     screen_entries = List.keydelete(entries, :last_deploy_timestamp, 0)
 
     %Config{screens: Map.new(screen_entries), devops: devops}
-  end
-
-  defp table_exists? do
-    :ets.whereis(@table) != :undefined
   end
 end
