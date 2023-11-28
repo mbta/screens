@@ -1,4 +1,4 @@
-defmodule Screens.SignsUiConfig.State.Parse do
+defmodule Screens.SignsUiConfig.Parse do
   @moduledoc false
 
   def parse_config(%{"configured_headways" => headways, "signs" => signs}) do
