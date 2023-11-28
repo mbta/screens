@@ -113,6 +113,7 @@ const DepartureRoutePill = ({
 const sectionPillMapping: Record<string, PillType> = {
   blue: { routeName: "BL", routePillColor: "blue" },
   red: { routeName: "RL", routePillColor: "red" },
+  green: {routeName: "GL", routePillColor: "green"},
   mattapan: { routeName: "M", routePillColor: "red" },
   orange: { routeName: "OL", routePillColor: "orange" },
   cr: { routeName: "CR", routePillColor: "purple" },
