@@ -22,7 +22,7 @@ defmodule Screens.Application do
       Screens.TriptychPlayer.State.Supervisor,
       {Screens.Cache.Owner, engine_module: Screens.Config.Cache.Engine},
       {Screens.Cache.Owner, engine_module: Screens.SignsUiConfig.Cache.Engine},
-      # {Screens.Cache.Owner, engine_module: Screens.TriptychPlayer.Cache.Engine},
+      {Screens.Cache.Owner, engine_module: Screens.TriptychPlayer.Cache.Engine},
       :hackney_pool.child_spec(:ex_aws_pool, []),
       :hackney_pool.child_spec(:blue_bikes_pool, []),
       :hackney_pool.child_spec(:api_v3_pool, max_connections: 100),
