@@ -287,10 +287,9 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
         className={classWithModifier("end-slot__arrow", line)}
       />
     );
-  } else if (
-    isAffected &&
-    (effect === "station_closure" || effect === "suspension")
-  ) {
+  } else if (isAffected && isCurrentStop) {
+    icon = <LargeXStopIcon iconSize={61} color="#ee2e24" />;
+  } else if (isAffected) {
     icon = <LargeXStopIcon iconSize={61} />;
   } else if (isCurrentStop && line === "red") {
     icon = <CurrentStopOpenDiamondIcon iconSize={64} />;
@@ -379,7 +378,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   let icon;
   if (slot.show_symbol) {
     if (isCurrentStop) {
-      if (isAffected && effect in ["station_closure", "suspension"]) {
+      if (isAffected) {
         icon = <LargeXStopIcon iconSize={48} color="#ee2e24" />;
       } else {
         icon =
