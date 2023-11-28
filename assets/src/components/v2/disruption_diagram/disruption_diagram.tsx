@@ -685,7 +685,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   // This is to center the diagram along the X axis
   const translateX = (width && (904 - width) / 2) || 0;
   
-  // Next is to align the diagram at the top of the svg, which involves adjusing the SVG viewbox
+  // Next is to align the diagram at the top of the svg, which involves adjusting the SVG viewbox
 
   // If -${height} is used as the viewbox height, it looks like the line diagram text
   // pushed all the way to the bottom of the viewbox with just a tiny point of the
