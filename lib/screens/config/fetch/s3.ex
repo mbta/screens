@@ -1,4 +1,6 @@
 defmodule Screens.Config.Fetch.S3 do
+  require Logger
+
   @behaviour Screens.Config.Fetch
 
   @impl true

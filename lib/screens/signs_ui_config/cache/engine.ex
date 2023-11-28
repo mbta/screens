@@ -1,5 +1,6 @@
 defmodule Screens.SignsUiConfig.Cache.Engine do
   alias Screens.SignsUiConfig.State.Parse
+  alias Screens.SignsUiConfig.Fetch
 
   @behaviour Screens.Cache.Engine
 
@@ -8,6 +9,8 @@ defmodule Screens.SignsUiConfig.Cache.Engine do
   @type table_entry ::
           {{:sign_mode, sign_id :: String.t()}, atom()}
           | {{:time_ranges, zone_id :: String.t()}, %{off_peak: time_range, peak: time_range}}
+
+  @type time_range :: {low :: integer(), high :: integer()}
 
   @impl true
   def name, do: Screens.SignsUiConfig.Cache.table()
@@ -37,7 +40,7 @@ defmodule Screens.SignsUiConfig.Cache.Engine do
   defp config_to_table_entries({sign_modes, time_ranges}) do
     sign_modes = Enum.map(sign_modes, fn {id, mode} -> {{:sign_mode, id}, mode} end)
 
-    time_ranges = Enum.map(fn {id, ranges} -> {{:time_ranges, id}, ranges} end)
+    time_ranges = Enum.map(time_ranges, fn {id, ranges} -> {{:time_ranges, id}, ranges} end)
 
     sign_modes ++ time_ranges
   end
