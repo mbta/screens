@@ -16,10 +16,6 @@ defmodule Screens.Application do
       ScreensWeb.Endpoint,
       # Starts a worker by calling: Screens.Worker.start_link(arg)
       # {Screens.Worker, arg},
-      # TODO delete all 3 of these
-      Screens.Config.State.Supervisor,
-      Screens.SignsUiConfig.State.Supervisor,
-      Screens.TriptychPlayer.State.Supervisor,
       {Screens.Cache.Owner, engine_module: Screens.Config.Cache.Engine},
       {Screens.Cache.Owner, engine_module: Screens.SignsUiConfig.Cache.Engine},
       {Screens.Cache.Owner, engine_module: Screens.TriptychPlayer.Cache.Engine},
