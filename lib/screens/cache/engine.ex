@@ -4,17 +4,21 @@ defmodule Screens.Cache.Engine do
   """
 
   @typedoc """
-  To be returned by update_table on success.
+  To be returned by update_table.
 
   new_table_entries must be a tuple or list of tuples, for compatibility with ETS.
   The first element of each tuple is used as the lookup key for that entry.
 
-  :replace causes the table's entire contents to be replaced by the new data.
-  :patch only merges the new entries into the existing table contents, overwriting any existing entries with matching keys.
+  - :replace causes the table's entire contents to be replaced by the new data.
+  - :patch only merges the new entries into the existing table contents, overwriting any existing entries with matching keys.
+  - :unchanged causes the table to be left unchanged.
+  - :error causes the table to be left unchanged. A log will be omitted to notify of the update error.
   """
-  @type update_success ::
+  @type update_result ::
           {:replace, new_table_entries :: tuple | list(tuple), new_version :: table_version}
           | {:patch, updated_table_entries :: tuple | list(tuple)}
+          | :unchanged
+          | :error
 
   @typedoc """
   Any value representing the current version of the table data.
@@ -41,7 +45,7 @@ defmodule Screens.Cache.Engine do
   @doc """
   Returns new data for the cache.
   """
-  @callback update_table(table_version) :: update_success | :unchanged | :error
+  @callback update_table(table_version) :: update_result
 
   @doc """
   Returns the number of milliseconds to wait between each `update_table` call.

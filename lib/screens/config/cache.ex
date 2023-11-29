@@ -165,7 +165,7 @@ defmodule Screens.Config.Cache do
   end
 
   defp table_entries_to_config(entries) do
-    {devops, entries} = List.keytake(entries, :devops, 0)
+    {{:devops, devops}, entries} = List.keytake(entries, :devops, 0)
     screen_entries = List.keydelete(entries, :last_deploy_timestamp, 0)
 
     %Config{screens: Map.new(screen_entries), devops: devops}

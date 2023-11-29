@@ -16,7 +16,7 @@ defmodule Screens.Cache.Owner do
   @type t :: %__MODULE__{
           ### Properties specified by engine module
           name: any(),
-          update_table: Engine.update_table_fn(),
+          update_table: (Engine.table_version() -> Engine.update_result()),
           update_interval_ms: non_neg_integer,
           update_failure_error_log_threshold_minutes: non_neg_integer,
 
@@ -80,13 +80,13 @@ defmodule Screens.Cache.Owner do
 
     state = do_update(init_state)
 
-    schedule_update(cache_opts.update_interval_ms)
+    _ = schedule_update(cache_opts.update_interval_ms)
     {:ok, state}
   end
 
   @impl true
   def handle_info(:update, state) do
-    schedule_update(state.update_interval_ms)
+    _ = schedule_update(state.update_interval_ms)
 
     {:noreply, do_update(state)}
   end
