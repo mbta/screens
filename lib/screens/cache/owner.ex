@@ -8,10 +8,10 @@ defmodule Screens.Cache.Owner do
   This module is not concerned with what the table's contents look like,
   or what kinds of queries will be made against it.
   """
+  alias Screens.Cache.Engine
+  require Logger
 
   use GenServer
-
-  alias Screens.Cache.Engine
 
   @type t :: %__MODULE__{
           ### Properties specified by engine module
@@ -53,6 +53,17 @@ defmodule Screens.Cache.Owner do
     }
 
     GenServer.start_link(__MODULE__, cache_opts, gen_server_opts)
+  end
+
+  # Overrides the default child_spec/1 defined by `use GenServer`, because we need
+  # a unique ID for each cache owner that we spin up.
+  # The table name provided by the engine must be unique, so let's use that!
+  def child_spec(init_arg) do
+    table_name = init_arg[:engine_module].name()
+
+    init_arg
+    |> super()
+    |> Map.replace!(:id, :"#{table_name}_cache_owner")
   end
 
   ### Server

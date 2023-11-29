@@ -3,7 +3,7 @@ defmodule Screens.V2.ScreenData do
 
   require Logger
 
-  alias Screens.Config.State
+  alias Screens.Config.Cache
   alias Screens.ScreensByAlert
   alias Screens.Util
   alias Screens.V2.AlertsWidget
@@ -49,7 +49,7 @@ defmodule Screens.V2.ScreenData do
 
     unless opts[:skip_serialize] do
       data = serialize(layout_and_widgets)
-      last_deploy_timestamp = State.last_deploy_timestamp()
+      last_deploy_timestamp = Cache.last_deploy_timestamp()
       response(data: data, last_deploy_timestamp: last_deploy_timestamp)
     end
   end
@@ -81,7 +81,7 @@ defmodule Screens.V2.ScreenData do
 
   @spec get_config(screen_id()) :: config()
   def get_config(screen_id) do
-    Screens.Config.State.screen(screen_id)
+    Screens.Config.Cache.screen(screen_id)
   end
 
   @spec pick_instances(Template.template(), candidate_instances()) ::

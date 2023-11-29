@@ -2,7 +2,7 @@ defmodule Screens.TriptychPlayer.Fetch.Local do
   @behaviour Screens.TriptychPlayer.Fetch
 
   @impl true
-  def fetch_config(current_version) do
+  def fetch_config(current_version \\ nil) do
     case File.read(local_config_path()) do
       {:ok, contents} -> {:ok, contents, current_version}
       _ -> :error

@@ -11,7 +11,7 @@ defmodule Screens.Config.Cache do
   def ok?, do: table_exists?()
 
   def refresh_if_loaded_before(screen_id) do
-    with_table do
+    with_table default: nil do
       [[last_deploy_timestamp]] = :ets.match(@table, {:last_deploy_timestamp, :"$1"})
 
       refresh_if_loaded_before =
@@ -44,7 +44,7 @@ defmodule Screens.Config.Cache do
   end
 
   def service_level(screen_id) do
-    with_table do
+    with_table default: 1 do
       case :ets.match(@table, {screen_id, %{app_params: %{service_level: :"$1"}}}) do
         [[service_level]] -> service_level
         [] -> 1
@@ -53,7 +53,7 @@ defmodule Screens.Config.Cache do
   end
 
   def disabled?(screen_id) do
-    with_table do
+    with_table default: false do
       case :ets.match(@table, {screen_id, %{disabled: :"$1"}}) do
         [[disabled]] -> disabled
         [] -> false
@@ -62,7 +62,7 @@ defmodule Screens.Config.Cache do
   end
 
   def screen(screen_id) do
-    with_table do
+    with_table default: nil do
       case :ets.match(@table, {screen_id, :"$1"}) do
         [[screen]] -> screen
         [] -> nil
@@ -71,9 +71,18 @@ defmodule Screens.Config.Cache do
   end
 
   def app_params(screen_id) do
-    with_table do
+    with_table default: nil do
       case :ets.match(@table, {screen_id, %{app_params: :"$1"}}) do
         [[app_params]] -> app_params
+        [] -> nil
+      end
+    end
+  end
+
+  def devops do
+    with_table default: nil do
+      case :ets.match(@table, {:devops, :"$1"}) do
+        [[devops]] -> devops
         [] -> nil
       end
     end
@@ -83,7 +92,7 @@ defmodule Screens.Config.Cache do
   Returns a list of all screen IDs.
   """
   def screen_ids do
-    with_table do
+    with_table default: [] do
       # Not sure how to avoid matching against the struct this way.
       # Since this isn't a true pattern match, doing %Screen{} actually tries to instantiate the struct,
       # and we end up matching against all of its default field values,
@@ -97,11 +106,11 @@ defmodule Screens.Config.Cache do
   The filter function will be passed a tuple of {screen_id, screen_config} and should return true if that screen ID should be included in the results.
   """
   def screen_ids(filter_fn) do
-    with_table do
+    with_table default: [] do
       :ets.foldl(
         fn
           {screen_id, %Screen{}} = entry, acc when is_binary(screen_id) ->
-            if filter_fn.(entry), do: [entry | acc], else: acc
+            if filter_fn.(entry), do: [screen_id | acc], else: acc
 
           _, acc ->
             acc
@@ -113,10 +122,11 @@ defmodule Screens.Config.Cache do
   end
 
   def mode_disabled?(mode) do
-    with_table do
-      [%Devops{disabled_modes: disabled_modes}] = :ets.lookup(@table, :devops)
-
-      mode in disabled_modes
+    with_table default: false do
+      case :ets.match(@table, {:devops, %{disabled_modes: :"$1"}}) do
+        [[disabled_modes]] -> mode in disabled_modes
+        [] -> false
+      end
     end
   end
 
@@ -126,10 +136,11 @@ defmodule Screens.Config.Cache do
   👉 WARNING: This function is expensive to run and returns a large amount of data.
 
   Unless you really need to get the entire map, try to use one of the other client functions, or define a new one
-  that does a bit more work in the server process to limit the size of data sent back to the client process.
+  that relies more on :ets.match / :ets.select to limit the size of data returned.
   """
   def screens do
     with_table do
+      # TODO: Is it worth wrapping screen ID keys in {:screen, screen_id} to let the filtering step happen in :ets.match?
       @table
       |> :ets.tab2list()
       |> Enum.filter(fn {k, v} -> is_binary(k) and is_struct(v, Screen) end)
@@ -140,11 +151,10 @@ defmodule Screens.Config.Cache do
   @doc """
   Gets the entire config struct.
 
-  👉 WARNING: This copies a large amount of data from the Screens.Config.State GenServer process to the process
-  that calls this function. This may be of concern for server performance.
+  👉 WARNING: This function is expensive to run and returns a large amount of data.
 
   Unless you really need to get the entire config, try to use one of the other client functions, or define a new one
-  that does a bit more work in the server process to limit the size of data sent back to the client process.
+  that relies more on :ets.match / :ets.select to limit the size of data returned.
   """
   def config do
     with_table do

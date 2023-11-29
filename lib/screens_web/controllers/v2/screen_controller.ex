@@ -1,7 +1,7 @@
 defmodule ScreensWeb.V2.ScreenController do
   use ScreensWeb, :controller
   require Logger
-  alias Screens.Config.State
+  alias Screens.Config.Cache
   alias Screens.V2.ScreenData.Parameters
   alias ScreensConfig.Screen
 
@@ -15,7 +15,7 @@ defmodule ScreensWeb.V2.ScreenController do
   plug(:v2_layout)
 
   defp check_config(conn, _) do
-    if State.ok?() do
+    if Cache.ok?() do
       conn
     else
       conn
@@ -81,7 +81,7 @@ defmodule ScreensWeb.V2.ScreenController do
 
     _ = Screens.LogScreenData.log_page_load(screen_id, is_screen, screen_side(params))
 
-    config = State.screen(screen_id)
+    config = Cache.screen(screen_id)
 
     case config do
       %Screen{app_id: app_id} ->
@@ -161,7 +161,7 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   defp screen_ids(target_app_id, refresh_rate) do
-    ids = State.screen_ids(&match?({_screen_id, %Screen{app_id: ^target_app_id}}, &1))
+    ids = Cache.screen_ids(&match?({_screen_id, %Screen{app_id: ^target_app_id}}, &1))
 
     ids
     |> Enum.sort(&id_sort_fn/2)

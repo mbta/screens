@@ -2,7 +2,7 @@ defmodule Screens.BusScreenData do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.State
+  alias Screens.Config.Cache
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
   alias Screens.NearbyConnections
@@ -11,7 +11,7 @@ defmodule Screens.BusScreenData do
   alias ScreensConfig.Bus
 
   def by_screen_id(screen_id, is_screen, now \\ DateTime.utc_now()) do
-    if State.mode_disabled?(:bus) do
+    if Cache.mode_disabled?(:bus) do
       %{
         force_reload: false,
         success: false
@@ -22,7 +22,7 @@ defmodule Screens.BusScreenData do
   end
 
   defp by_enabled_screen_id(screen_id, is_screen, now) do
-    %Bus{stop_id: stop_id} = State.app_params(screen_id)
+    %Bus{stop_id: stop_id} = Cache.app_params(screen_id)
 
     # If we are unable to fetch alerts:
     # - inline_alerts will be an empty list
@@ -59,7 +59,7 @@ defmodule Screens.BusScreenData do
 
     stop_name = extract_stop_name(nearby_connections_data, departures)
 
-    service_level = State.service_level(screen_id)
+    service_level = Cache.service_level(screen_id)
 
     _ = LogScreenData.log_departures(screen_id, is_screen, departures)
 

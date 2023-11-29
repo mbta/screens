@@ -4,7 +4,7 @@ defmodule Screens.Config.Fetch.S3 do
   @behaviour Screens.Config.Fetch
 
   @impl true
-  def fetch_config(current_version) do
+  def fetch_config(current_version \\ nil) do
     bucket = Application.get_env(:screens, :config_s3_bucket)
     path = config_path_for_environment()
 

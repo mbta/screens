@@ -2,13 +2,13 @@ defmodule Screens.GLScreenData do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.State
+  alias Screens.Config.Cache
   alias Screens.Departures.Departure
   alias Screens.LogScreenData
   alias ScreensConfig.Gl
 
   def by_screen_id(screen_id, is_screen) do
-    if State.mode_disabled?(:light_rail) do
+    if Cache.mode_disabled?(:light_rail) do
       %{
         force_reload: false,
         success: false
@@ -26,7 +26,7 @@ defmodule Screens.GLScreenData do
       headway_mode: headway_mode?,
       platform_id: platform_id,
       service_level: service_level
-    } = State.app_params(screen_id)
+    } = Cache.app_params(screen_id)
 
     {line_map_data, departures} =
       get_line_map_data_and_departures(route_id, stop_id, direction_id, platform_id)

@@ -4,7 +4,7 @@ defmodule Screens.SignsUiConfig.Fetch.S3 do
   @behaviour Screens.SignsUiConfig.Fetch
 
   @impl true
-  def fetch_config(current_version) do
+  def fetch_config(current_version \\ nil) do
     bucket = Application.get_env(:screens, :signs_ui_s3_bucket)
     path = Application.get_env(:screens, :signs_ui_s3_path)
 

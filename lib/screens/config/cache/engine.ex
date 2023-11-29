@@ -42,7 +42,7 @@ defmodule Screens.Config.Cache.Engine do
   @impl true
   def update_failure_error_log_threshold_minutes, do: 2
 
-  @spec config_to_table_entries(Config.t(), DateTime.t()) :: table_contents
+  @spec config_to_table_entries(Config.t(), DateTime.t() | nil) :: table_contents
   defp config_to_table_entries(config, last_deploy_timestamp) do
     screen_entries = Map.to_list(config.screens)
     metadata_entries = [last_deploy_timestamp: last_deploy_timestamp, devops: config.devops]

@@ -11,7 +11,7 @@ defmodule ScreensWeb.AdminApiController do
   plug :accepts, ["multipart/form-data"] when action == :upload_image
 
   def index(conn, _params) do
-    {:ok, config, _version} = @config_fetcher.get_config()
+    {:ok, config, _version} = @config_fetcher.fetch_config()
     json(conn, %{config: config})
   end
 
@@ -21,7 +21,7 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   def confirm(conn, %{"config" => config}) do
-    %Config{devops: current_devops_config} = Config.State.config()
+    %Config{devops: current_devops_config} = Config.Cache.config()
     %Config{screens: new_screens_config} = config |> Jason.decode!() |> Config.from_json()
     new_config = %Config{screens: new_screens_config, devops: current_devops_config}
     new_config_json = new_config |> Config.to_json() |> Jason.encode!(pretty: true)
@@ -36,7 +36,7 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   def index_triptych_players(conn, _params) do
-    {:ok, mapping, _version} = @triptych_config_fetcher.get_config()
+    {:ok, mapping, _version} = @triptych_config_fetcher.fetch_config()
     json(conn, %{config: mapping})
   end
 
@@ -66,7 +66,7 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   def devops(conn, %{"disabled_modes" => _disabled_modes} = json) do
-    %Config{screens: current_screens_config} = Config.State.config()
+    %Config{screens: current_screens_config} = Config.Cache.config()
     new_devops_config = Devops.from_json(json)
     new_config = %Config{screens: current_screens_config, devops: new_devops_config}
     new_config_json = new_config |> Config.to_json() |> Jason.encode!(pretty: true)
@@ -81,7 +81,7 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   def refresh(conn, %{"screen_ids" => screen_ids}) do
-    current_config = Config.State.config()
+    current_config = Config.Cache.config()
 
     new_config = Config.schedule_refresh_for_screen_ids(current_config, screen_ids)
     {:ok, new_config_json} = Jason.encode(Config.to_json(new_config), pretty: true)

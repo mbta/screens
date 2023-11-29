@@ -1,11 +1,11 @@
 defmodule Screens.NearbyConnections do
   @moduledoc false
 
-  alias Screens.Config.State
+  alias Screens.Config.Cache
   alias ScreensConfig.Bus
 
   def by_screen_id(screen_id) do
-    %Bus{stop_id: stop_id, nearby_connections: nearby_connections} = State.app_params(screen_id)
+    %Bus{stop_id: stop_id, nearby_connections: nearby_connections} = Cache.app_params(screen_id)
 
     nearby_stop_ids = Enum.map(nearby_connections, fn {stop_id, _} -> stop_id end)
     stop_query = Enum.join([stop_id | nearby_stop_ids], ",")

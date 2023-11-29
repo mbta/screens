@@ -23,7 +23,7 @@ defmodule Screens.SignsUiConfig.Cache do
   end
 
   def time_ranges(line_or_trunk) do
-    with_table do
+    with_table default: nil do
       case :ets.match(@table, {{:time_ranges, line_or_trunk}, :"$1"}) do
         [[ranges]] -> ranges
         [] -> nil
@@ -34,7 +34,7 @@ defmodule Screens.SignsUiConfig.Cache do
   defp all_signs_in_modes?([], _modes), do: false
 
   defp all_signs_in_modes?(sign_ids, modes) do
-    with_table do
+    with_table default: false do
       Enum.all?(sign_ids, fn sign_id ->
         case :ets.match(@table, {{:sign_mode, sign_id}, :"$1"}) do
           [[mode]] -> mode in modes
