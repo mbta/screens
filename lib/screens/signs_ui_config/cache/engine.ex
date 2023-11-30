@@ -4,8 +4,8 @@ defmodule Screens.SignsUiConfig.Cache.Engine do
   """
 
   alias Screens.SignsUiConfig.Cache
-  alias Screens.SignsUiConfig.Parse
   alias Screens.SignsUiConfig.Fetch
+  alias Screens.SignsUiConfig.Parse
 
   @behaviour Screens.Cache.Engine
 
