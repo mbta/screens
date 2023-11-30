@@ -35,7 +35,7 @@ defmodule Screens.Config.Cache.Engine do
   end
 
   @impl true
-  def update_interval_ms, do: 15_000
+  def update_interval_ms, do: 5_000
 
   @impl true
   def update_failure_error_log_threshold_minutes, do: 2
