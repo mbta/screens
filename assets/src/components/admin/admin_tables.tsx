@@ -620,7 +620,7 @@ const GLEinkV2ScreensTable = (): JSX.Element => {
 
   return (
     <AdminTable
-      columns={[...v2Columns, alertsColumn, lineMapColumn]}
+      columns={[...v2Columns, alertsColumn, lineMapColumn, audioColumn]}
       dataFilter={dataFilter}
     />
   );
@@ -754,6 +754,7 @@ const PreFareV2ScreensTable = (): JSX.Element => {
         crDeparturesColumn,
         blueBikesColumn,
         shuttleBusInfoColumn,
+        audioColumn
       ]}
       dataFilter={dataFilter}
     />
