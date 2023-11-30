@@ -1,11 +1,11 @@
 defmodule Screens.NearbyDepartures do
   @moduledoc false
 
-  alias Screens.Config.State
+  alias Screens.Config.Cache
   alias ScreensConfig.Gl
 
   def by_screen_id(screen_id) do
-    if State.mode_disabled?(:bus) or State.mode_disabled?(:light_rail) do
+    if Cache.mode_disabled?(:bus) or Cache.mode_disabled?(:light_rail) do
       []
     else
       by_enabled_screen_id(screen_id)
@@ -13,7 +13,7 @@ defmodule Screens.NearbyDepartures do
   end
 
   defp by_enabled_screen_id(screen_id) do
-    %Gl{nearby_departures: nearby_departure_stop_ids} = State.app_params(screen_id)
+    %Gl{nearby_departures: nearby_departure_stop_ids} = Cache.app_params(screen_id)
 
     prediction_result =
       Screens.Predictions.Prediction.fetch(%{stop_ids: nearby_departure_stop_ids})

@@ -1,7 +1,7 @@
 defmodule Screens.LogScreenData do
   @moduledoc false
   require Logger
-  alias Screens.Config.State
+  alias Screens.Config.Cache
   alias ScreensConfig.Screen
 
   def log_page_load(screen_id, is_screen, screen_side \\ nil) do
@@ -140,7 +140,7 @@ defmodule Screens.LogScreenData do
   end
 
   defp screen_name_for_id(screen_id) do
-    case State.screen(screen_id) do
+    case Cache.screen(screen_id) do
       %Screen{name: name} -> name
       nil -> "UNKNOWN_SCREEN"
     end

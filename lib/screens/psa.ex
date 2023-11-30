@@ -1,6 +1,6 @@
 defmodule Screens.Psa do
   @moduledoc false
-  alias Screens.Config.State
+  alias Screens.Config.Cache
   alias ScreensConfig.{PsaConfig, Screen, Solari}
 
   @eink_refresh_seconds 30
@@ -13,7 +13,7 @@ defmodule Screens.Psa do
     %Screen{
       app_id: app_id,
       app_params: %_app{psa_config: psa_config}
-    } = State.screen(screen_id)
+    } = Cache.screen(screen_id)
 
     %PsaConfig{
       default_list: default_list,
@@ -31,7 +31,7 @@ defmodule Screens.Psa do
   end
 
   def current_audio_psa_for(screen_id) do
-    case State.app_params(screen_id) do
+    case Cache.app_params(screen_id) do
       %Solari{audio_psa: audio_psa} -> audio_psa
       _ -> nil
     end

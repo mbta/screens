@@ -140,11 +140,11 @@ defmodule Screens.DupScreenData.Request do
       temporary_terminal?(section_alert) and
         not (branch_station?(stop_ids) and branch_alert?(section_alert))
 
-    signs_ui_headways? = SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids)
+    signs_ui_headways? = SignsUiConfig.Cache.all_signs_in_headway_mode?(sign_ids)
     headway_mode? = non_branch_temporary_terminal? or signs_ui_headways?
 
     if headway_mode? do
-      time_ranges = SignsUiConfig.State.time_ranges(headway_id)
+      time_ranges = SignsUiConfig.Cache.time_ranges(headway_id)
       current_time_period = Screens.Util.time_period(current_time)
 
       case time_ranges do

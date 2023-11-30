@@ -1,13 +1,13 @@
 defmodule ScreensWeb.ScreenApiController do
   use ScreensWeb, :controller
   require Logger
-  alias Screens.Config.State
+  alias Screens.Config.Cache
 
   plug(:check_config)
   plug Corsica, [origins: "*"] when action == :show_dup
 
   defp check_config(conn, _) do
-    if State.ok?() do
+    if Cache.ok?() do
       conn
     else
       conn
@@ -73,7 +73,7 @@ defmodule ScreensWeb.ScreenApiController do
   end
 
   defp nonexistent_screen?(screen_id) do
-    is_nil(State.screen(screen_id))
+    is_nil(Cache.screen(screen_id))
   end
 
   defp not_found_response(conn) do

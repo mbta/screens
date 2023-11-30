@@ -1,7 +1,7 @@
 defmodule Screens.ScreenData do
   @moduledoc false
 
-  alias Screens.Config.State
+  alias Screens.Config.Cache
   alias Screens.LogScreenData
   alias Screens.Util
   alias ScreensConfig.Screen
@@ -47,7 +47,7 @@ defmodule Screens.ScreenData do
   end
 
   defp disabled?(screen_id) do
-    State.disabled?(screen_id)
+    Cache.disabled?(screen_id)
   end
 
   defp fetch_data(screen_id, is_screen) do
@@ -58,7 +58,7 @@ defmodule Screens.ScreenData do
   end
 
   defp app_id_from_screen_id(screen_id) do
-    %Screen{app_id: app_id} = State.screen(screen_id)
+    %Screen{app_id: app_id} = Cache.screen(screen_id)
     app_id
   end
 end

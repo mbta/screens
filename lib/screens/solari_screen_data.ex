@@ -1,7 +1,7 @@
 defmodule Screens.SolariScreenData do
   @moduledoc false
 
-  alias Screens.Config.State
+  alias Screens.Config.Cache
   alias Screens.Departures.Departure
   alias Screens.{LogScreenData, SignsUiConfig, Util}
   alias ScreensConfig.{Query, Solari}
@@ -11,7 +11,7 @@ defmodule Screens.SolariScreenData do
   alias ScreensConfig.Solari.Section.Layout.{Bidirectional, Upcoming}
 
   def by_screen_id(screen_id, is_screen, at_historical_datetime \\ nil) do
-    if State.mode_disabled?(:bus) do
+    if Cache.mode_disabled?(:bus) do
       %{force_reload: false, success: false}
     else
       by_enabled_screen_id(screen_id, is_screen, at_historical_datetime)
@@ -24,7 +24,7 @@ defmodule Screens.SolariScreenData do
       sections: sections,
       section_headers: section_headers,
       overhead: overhead
-    } = State.app_params(screen_id)
+    } = Cache.app_params(screen_id)
 
     current_time =
       case at_historical_datetime do
@@ -98,14 +98,14 @@ defmodule Screens.SolariScreenData do
 
   defp section_disabled?(%Section{pill: pill}, %Headway{sign_ids: sign_ids}) do
     subway_disabled? =
-      State.mode_disabled?(:subway) or SignsUiConfig.State.all_signs_inactive?(sign_ids)
+      Cache.mode_disabled?(:subway) or SignsUiConfig.Cache.all_signs_inactive?(sign_ids)
 
     subway_section? = pill in ~w[red orange blue]a
 
-    commuter_rail_disabled? = State.mode_disabled?(:rail)
+    commuter_rail_disabled? = Cache.mode_disabled?(:rail)
     commuter_rail_section? = pill === :cr
 
-    light_rail_disabled? = State.mode_disabled?(:light_rail)
+    light_rail_disabled? = Cache.mode_disabled?(:light_rail)
     light_rail_section? = pill in ~w[green mattapan]a
 
     (subway_section? and subway_disabled?) or (commuter_rail_section? and commuter_rail_disabled?) or
@@ -152,8 +152,8 @@ defmodule Screens.SolariScreenData do
         %Headway{sign_ids: sign_ids, headway_id: headway_id, headsigns: headsigns},
         current_time
       ) do
-    if SignsUiConfig.State.all_signs_in_headway_mode?(sign_ids) do
-      time_ranges = SignsUiConfig.State.time_ranges(headway_id)
+    if SignsUiConfig.Cache.all_signs_in_headway_mode?(sign_ids) do
+      time_ranges = SignsUiConfig.Cache.time_ranges(headway_id)
       current_time_period = Screens.Util.time_period(current_time)
 
       case time_ranges do

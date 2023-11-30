@@ -5,16 +5,16 @@ defmodule Screens.TriptychPlayer do
   to screen ID
   (our ID for the collective triptych screen comprising 3 panes).
 
-  The mapping is cached in a GenServer which checks for updates to the source JSON
-  file every 15 seconds.
+  The mapping is cached in an ETS table controlled by a GenServer
+  which checks for updates to the source JSON file every 15 seconds.
   """
 
-  alias Screens.TriptychPlayer.State
+  alias Screens.TriptychPlayer.Cache
   alias Screens.TriptychPlayer.Validator
 
-  defdelegate fetch_screen_id_for_player(player_name), to: State
+  defdelegate fetch_screen_id_for_player(player_name), to: Cache
 
-  defdelegate fetch_player_names_for_screen_id(player_name), to: State
+  defdelegate fetch_player_names_for_screen_id(player_name), to: Cache
 
   defdelegate validate(mapping), to: Validator
 end
