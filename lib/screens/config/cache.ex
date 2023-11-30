@@ -100,10 +100,6 @@ defmodule Screens.Config.Cache do
   """
   def screen_ids do
     with_table default: [] do
-      # Not sure how to avoid matching against the struct this way.
-      # Since this isn't a true pattern match, doing %Screen{} actually tries to instantiate the struct,
-      # and we end up matching against all of its default field values,
-      # or getting a compile error if it has any enforced keys.
       @table
       |> :ets.match({{:screen, :"$1"}, :_})
       |> List.flatten()
