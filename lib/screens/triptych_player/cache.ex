@@ -5,6 +5,10 @@ defmodule Screens.TriptychPlayer.Cache do
 
   use Screens.Cache.Client, table: :triptych_player
 
+  @type table_contents :: list(table_entry)
+
+  @type table_entry :: {player_name :: String.t(), screen_id :: String.t()}
+
   def fetch_screen_id_for_player(player_name) do
     with_table default: :error do
       case :ets.match(@table, {player_name, :"$1"}) do

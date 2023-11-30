@@ -1,15 +1,9 @@
 defmodule Screens.Config.Cache.Engine do
   alias Screens.Config
+  alias Screens.Config.Cache
   alias Screens.Config.Fetch
 
   @behaviour Screens.Cache.Engine
-
-  @type table_contents :: list(table_entry)
-
-  @type table_entry ::
-          {screen_id :: String.t(), ScreensConfig.Screen.t()}
-          | {:last_deploy_timestamp, DateTime.t()}
-          | {:devops, ScreensConfig.Devops.t()}
 
   @last_deploy_fetcher Application.compile_env(:screens, :last_deploy_fetcher)
 
@@ -42,10 +36,15 @@ defmodule Screens.Config.Cache.Engine do
   @impl true
   def update_failure_error_log_threshold_minutes, do: 2
 
-  @spec config_to_table_entries(Config.t(), DateTime.t() | nil) :: table_contents
+  @spec config_to_table_entries(Config.t(), DateTime.t() | nil) :: Cache.table_contents()
   defp config_to_table_entries(config, last_deploy_timestamp) do
-    screen_entries = Map.to_list(config.screens)
+    screen_entries =
+      Enum.map(config.screens, fn {screen_id, screen_config} ->
+        {{:screen, screen_id}, screen_config}
+      end)
+
     metadata_entries = [last_deploy_timestamp: last_deploy_timestamp, devops: config.devops]
+
     metadata_entries ++ screen_entries
   end
 end

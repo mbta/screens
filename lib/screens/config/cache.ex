@@ -4,9 +4,16 @@ defmodule Screens.Config.Cache do
   """
 
   alias Screens.Config
-  alias ScreensConfig.Screen
+  alias ScreensConfig.Devops
 
   use Screens.Cache.Client, table: :screens_config
+
+  @type table_contents :: list(table_entry)
+
+  @type table_entry ::
+          {{:screen, screen_id :: String.t()}, ScreensConfig.Screen.t()}
+          | {:last_deploy_timestamp, DateTime.t()}
+          | {:devops, ScreensConfig.Devops.t()}
 
   def ok?, do: table_exists?()
 
@@ -45,7 +52,7 @@ defmodule Screens.Config.Cache do
 
   def service_level(screen_id) do
     with_table default: 1 do
-      case :ets.match(@table, {screen_id, %{app_params: %{service_level: :"$1"}}}) do
+      case :ets.match(@table, {{:screen, screen_id}, %{app_params: %{service_level: :"$1"}}}) do
         [[service_level]] -> service_level
         [] -> 1
       end
@@ -54,7 +61,7 @@ defmodule Screens.Config.Cache do
 
   def disabled?(screen_id) do
     with_table default: false do
-      case :ets.match(@table, {screen_id, %{disabled: :"$1"}}) do
+      case :ets.match(@table, {{:screen, screen_id}, %{disabled: :"$1"}}) do
         [[disabled]] -> disabled
         [] -> false
       end
@@ -63,7 +70,7 @@ defmodule Screens.Config.Cache do
 
   def screen(screen_id) do
     with_table default: nil do
-      case :ets.match(@table, {screen_id, :"$1"}) do
+      case :ets.match(@table, {{:screen, screen_id}, :"$1"}) do
         [[screen]] -> screen
         [] -> nil
       end
@@ -72,7 +79,7 @@ defmodule Screens.Config.Cache do
 
   def app_params(screen_id) do
     with_table default: nil do
-      case :ets.match(@table, {screen_id, %{app_params: :"$1"}}) do
+      case :ets.match(@table, {{:screen, screen_id}, %{app_params: :"$1"}}) do
         [[app_params]] -> app_params
         [] -> nil
       end
@@ -97,7 +104,9 @@ defmodule Screens.Config.Cache do
       # Since this isn't a true pattern match, doing %Screen{} actually tries to instantiate the struct,
       # and we end up matching against all of its default field values,
       # or getting a compile error if it has any enforced keys.
-      :ets.select(@table, [{{:"$1", %{__struct__: Screen}}, [{:is_binary, :"$1"}], [:"$1"]}])
+      @table
+      |> :ets.match({{:screen, :"$1"}, :_})
+      |> List.flatten()
     end
   end
 
@@ -107,17 +116,15 @@ defmodule Screens.Config.Cache do
   """
   def screen_ids(filter_fn) do
     with_table default: [] do
-      :ets.foldl(
-        fn
-          {screen_id, %Screen{}} = entry, acc when is_binary(screen_id) ->
-            if filter_fn.(entry), do: [screen_id | acc], else: acc
+      filter_reducer = fn
+        {{:screen, screen_id}, screen_config}, acc ->
+          if filter_fn.({screen_id, screen_config}), do: [screen_id | acc], else: acc
 
-          _, acc ->
-            acc
-        end,
-        [],
-        @table
-      )
+        _, acc ->
+          acc
+      end
+
+      :ets.foldl(filter_reducer, [], @table)
     end
   end
 
@@ -140,10 +147,16 @@ defmodule Screens.Config.Cache do
   """
   def screens do
     with_table do
-      # TODO: Is it worth wrapping screen ID keys in {:screen, screen_id} to let the filtering step happen in :ets.match?
+      match_screen_entries = {{:screen, :"$1"}, :"$2"}
+      no_guards = []
+      output_entry_as_screen_id_screen_config_tuple = [{{:"$1", :"$2"}}]
+
+      match_spec = [
+        {match_screen_entries, no_guards, output_entry_as_screen_id_screen_config_tuple}
+      ]
+
       @table
-      |> :ets.tab2list()
-      |> Enum.filter(fn {k, v} -> is_binary(k) and is_struct(v, Screen) end)
+      |> :ets.select(match_spec)
       |> Map.new()
     end
   end
@@ -157,17 +170,11 @@ defmodule Screens.Config.Cache do
   that relies more on :ets.match / :ets.select to limit the size of data returned.
   """
   def config do
-    with_table do
-      @table
-      |> :ets.tab2list()
-      |> table_entries_to_config()
+    with screens_map when is_map(screens_map) <- screens(),
+         %Devops{} = devops_struct <- devops() do
+      %Config{screens: screens_map, devops: devops_struct}
+    else
+      _ -> :error
     end
-  end
-
-  defp table_entries_to_config(entries) do
-    {{:devops, devops}, entries} = List.keytake(entries, :devops, 0)
-    screen_entries = List.keydelete(entries, :last_deploy_timestamp, 0)
-
-    %Config{screens: Map.new(screen_entries), devops: devops}
   end
 end

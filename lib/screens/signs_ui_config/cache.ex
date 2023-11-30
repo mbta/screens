@@ -5,6 +5,14 @@ defmodule Screens.SignsUiConfig.Cache do
 
   use Screens.Cache.Client, table: :signs_ui_config
 
+  @type table_contents :: list(table_entry)
+
+  @type table_entry ::
+          {{:sign_mode, sign_id :: String.t()}, atom()}
+          | {{:time_ranges, zone_id :: String.t()}, %{off_peak: time_range, peak: time_range}}
+
+  @type time_range :: {low :: integer(), high :: integer()}
+
   # Implementation notes:
   # Table entries use 2-part tuples as keys, to distinguish sign mode entries from time range entries.
   # They look like:

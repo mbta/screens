@@ -3,10 +3,6 @@ defmodule Screens.TriptychPlayer.Cache.Engine do
 
   @behaviour Screens.Cache.Engine
 
-  @type table_contents :: list(table_entry)
-
-  @type table_entry :: {player_name :: String.t(), screen_id :: String.t()}
-
   @impl true
   def name, do: Screens.TriptychPlayer.Cache.table()
 
