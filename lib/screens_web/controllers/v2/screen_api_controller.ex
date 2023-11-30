@@ -1,8 +1,8 @@
 defmodule ScreensWeb.V2.ScreenApiController do
   use ScreensWeb, :controller
 
-  alias Screens.Config.Cache
   alias Phoenix.View
+  alias Screens.Config.Cache
   alias Screens.LogScreenData
   alias Screens.Util
   alias ScreensConfig.Screen
