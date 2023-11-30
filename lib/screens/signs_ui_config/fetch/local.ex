@@ -1,4 +1,8 @@
 defmodule Screens.SignsUiConfig.Fetch.Local do
+  @moduledoc """
+  Functions to work with a local copy of the Signs UI config.
+  """
+
   @behaviour Screens.SignsUiConfig.Fetch
 
   @impl true

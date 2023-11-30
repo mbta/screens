@@ -1,4 +1,8 @@
 defmodule Screens.SignsUiConfig.Fetch.S3 do
+  @moduledoc """
+  Functions to work with an S3-hosted copy of the Signs UI config.
+  """
+
   require Logger
 
   @behaviour Screens.SignsUiConfig.Fetch

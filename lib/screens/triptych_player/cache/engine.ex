@@ -1,4 +1,8 @@
 defmodule Screens.TriptychPlayer.Cache.Engine do
+  @moduledoc """
+  Engine for the triptych player config cache.
+  """
+
   alias Screens.TriptychPlayer.Fetch
 
   @behaviour Screens.Cache.Engine

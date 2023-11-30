@@ -1,5 +1,8 @@
 defmodule Screens.Config.Fetch do
-  @moduledoc false
+  @moduledoc """
+  Defines a behaviour for, and delegates to, a module that provides access to
+  the screens config file.
+  """
 
   alias Screens.Cache.Engine
 

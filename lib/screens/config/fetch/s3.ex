@@ -1,4 +1,8 @@
 defmodule Screens.Config.Fetch.S3 do
+  @moduledoc """
+  Functions to work with an S3-hosted copy of the triptych player config.
+  """
+
   require Logger
 
   @behaviour Screens.Config.Fetch

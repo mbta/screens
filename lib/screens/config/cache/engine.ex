@@ -1,4 +1,8 @@
 defmodule Screens.Config.Cache.Engine do
+  @moduledoc """
+  Engine for the screens config cache.
+  """
+
   alias Screens.Config
   alias Screens.Config.Cache
   alias Screens.Config.Fetch

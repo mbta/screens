@@ -1,4 +1,8 @@
 defmodule Screens.TriptychPlayer.Fetch.Local do
+  @moduledoc """
+  Functions to work with a local copy of the triptych player config.
+  """
+
   @behaviour Screens.TriptychPlayer.Fetch
 
   @impl true

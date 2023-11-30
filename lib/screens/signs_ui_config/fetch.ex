@@ -1,4 +1,9 @@
 defmodule Screens.SignsUiConfig.Fetch do
+  @moduledoc """
+  Defines a behaviour for, and delegates to, a module that provides access to
+  the Signs UI config file.
+  """
+
   alias Screens.Cache.Engine
 
   @type fetch_result :: {:ok, String.t(), Engine.table_version()} | :unchanged | :error

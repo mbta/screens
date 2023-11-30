@@ -1,4 +1,8 @@
 defmodule Screens.Config.Fetch.Local do
+  @moduledoc """
+  Functions to work with a local copy of the screens config.
+  """
+
   @behaviour Screens.Config.Fetch
 
   @impl true

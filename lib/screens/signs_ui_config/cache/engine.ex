@@ -1,4 +1,8 @@
 defmodule Screens.SignsUiConfig.Cache.Engine do
+  @moduledoc """
+  Engine for the Signs UI config cache.
+  """
+
   alias Screens.SignsUiConfig.Cache
   alias Screens.SignsUiConfig.Parse
   alias Screens.SignsUiConfig.Fetch
