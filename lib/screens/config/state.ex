@@ -26,7 +26,7 @@ defmodule Screens.Config.State do
   use Screens.ConfigCache.State,
     config_module: Screens.Config.State,
     fetch_config_fn: &@config_fetcher.fetch_config/1,
-    refresh_ms: 15 * 1000,
+    refresh_ms: 5 * 1000,
     fetch_failure_error_threshold_minutes: 2,
     fetch_last_deploy_fn: &@last_deploy_fetcher.get_last_deploy_time/0
 
