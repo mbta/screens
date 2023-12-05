@@ -226,7 +226,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       primary_route_for_section = List.first(routes)
 
       # If we know the predictions are unreliable, don't even bother fetching them.
-      if not is_nil(primary_route_for_section) and
+      if is_nil(primary_route_for_section) or
            Screens.Config.State.mode_disabled?(primary_route_for_section.type) do
         %{type: :no_data_section, route: primary_route_for_section}
       else
