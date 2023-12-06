@@ -15,7 +15,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         post_processing_fn \\ fn sections, _config -> sections end
       )
       when app in [BusEink, BusShelter, GlEink, SolariLarge, Solari] do
-    if Screens.Config.State.mode_disabled?(get_devops_mode(config)) do
+    if Screens.Config.Cache.mode_disabled?(get_devops_mode(config)) do
       [%DeparturesNoData{screen: config, show_alternatives?: false}]
     else
       do_departures_instances(config, fetch_section_departures_fn, post_processing_fn)

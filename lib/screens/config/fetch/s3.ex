@@ -1,25 +1,14 @@
-defmodule Screens.Config.State.S3Fetch do
-  @moduledoc false
+defmodule Screens.Config.Fetch.S3 do
+  @moduledoc """
+  Functions to work with an S3-hosted copy of the screens config.
+  """
 
   require Logger
-  alias Screens.Config
 
-  @behaviour Config.State.Fetch
-  @behaviour Screens.ConfigCache.State.Fetch
+  @behaviour Screens.Config.Fetch
 
   @impl true
-  def fetch_config(current_version) do
-    with {:ok, body, new_version} <- get_config(current_version),
-         {:ok, parsed} <- Jason.decode(body) do
-      {:ok, Config.from_json(parsed), new_version}
-    else
-      :unchanged -> :unchanged
-      _ -> :error
-    end
-  end
-
-  @impl true
-  def get_config(current_version \\ nil) do
+  def fetch_config(current_version \\ nil) do
     bucket = Application.get_env(:screens, :config_s3_bucket)
     path = config_path_for_environment()
 
@@ -50,10 +39,10 @@ defmodule Screens.Config.State.S3Fetch do
   end
 
   @impl true
-  def put_config(contents) do
+  def put_config(file_contents) do
     bucket = Application.get_env(:screens, :config_s3_bucket)
     path = config_path_for_environment()
-    put_operation = ExAws.S3.put_object(bucket, path, contents)
+    put_operation = ExAws.S3.put_object(bucket, path, file_contents)
 
     case ExAws.request(put_operation) do
       {:ok, %{status_code: 200}} -> :ok

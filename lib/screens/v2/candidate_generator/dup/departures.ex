@@ -227,7 +227,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
       # If we know the predictions are unreliable, don't even bother fetching them.
       if is_nil(primary_route_for_section) or
-           Screens.Config.State.mode_disabled?(primary_route_for_section.type) do
+           Screens.Config.Cache.mode_disabled?(primary_route_for_section.type) do
         %{type: :no_data_section, route: primary_route_for_section}
       else
         section_departures =
@@ -346,7 +346,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         not (branch_station?(stop_ids) and branch_alert?(interpreted_alert))
 
     if headway_mode? do
-      time_ranges = SignsUiConfig.State.time_ranges(headway_id)
+      time_ranges = SignsUiConfig.Cache.time_ranges(headway_id)
       current_time_period = Screens.Util.time_period(current_time)
 
       case time_ranges do
