@@ -88,6 +88,9 @@ defmodule Screens.RoutePatterns.RoutePattern do
     }
 
     case get_json_fn.("route_patterns", params) do
+      {:ok, %{"data" => []}} ->
+        :error
+
       {:ok, result} ->
         {:ok, convert_platform_to_parent_station(result)}
 
