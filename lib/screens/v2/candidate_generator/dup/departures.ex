@@ -219,14 +219,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
                               bidirectional: is_bidirectional
                             } = section ->
       routes = get_routes_serving_section(params, create_station_with_routes_map_fn)
-      # DUP sections will always show one mode.
+      # DUP sections will always show no more than one mode.
       # For subway, each route will have its own section.
       # If the stop is served by two different subway/light rail routes, route_ids must be populated for each section
       # Otherwise, we only need the first route in the list of routes serving the stop.
       primary_route_for_section = List.first(routes)
 
       # If we know the predictions are unreliable, don't even bother fetching them.
-      if Screens.Config.State.mode_disabled?(primary_route_for_section.type) do
+      if is_nil(primary_route_for_section) or
+           Screens.Config.State.mode_disabled?(primary_route_for_section.type) do
         %{type: :no_data_section, route: primary_route_for_section}
       else
         section_departures =
