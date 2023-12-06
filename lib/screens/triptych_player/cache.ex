@@ -1,6 +1,6 @@
 defmodule Screens.TriptychPlayer.Cache do
   @moduledoc """
-  Functions to read data from a cached copy of the Signs UI config.
+  Functions to read data from a cached copy of the triptych player config.
   """
 
   use Screens.Cache.Client, table: :triptych_player
