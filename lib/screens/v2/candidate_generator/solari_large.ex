@@ -34,7 +34,7 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
       fn -> departures_instances_fn.(config) end,
       fn -> placeholder_instances() end
     ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: 15_000)
+    |> Task.async_stream(& &1.(), timeout: 15_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
