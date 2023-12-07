@@ -30,7 +30,7 @@ defmodule Screens.V2.CandidateGenerator.Triptych do
       fn -> evergreen_content_instances_fn.(config) end,
       fn -> local_evergreen_set_instances_fn.(config) end
     ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: 20_000)
+    |> Task.async_stream(& &1.(), timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
