@@ -599,9 +599,13 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   );
   const [beginning, middle, end] = [slots[0], slots.slice(1, -1), slots.at(-1)];
   const hasEmphasis = effect !== "station_closure";
-  const calculated_emphasis_height = hasEmphasis
-    ? EMPHASIS_HEIGHT + EMPHASIS_PADDING_TOP * scaleFactor
-    : 0;
+
+  const getEmphasisHeight = (scaler: number) => (
+    hasEmphasis
+    ? EMPHASIS_HEIGHT + EMPHASIS_PADDING_TOP * scaler
+    : 0
+  )
+
   const labelTextClass = slots.length > 12 ? "small" : "large";
 
   let x = 0;
@@ -644,14 +648,12 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   // Get the size of the diagram svg, excluding emphasis
   let dimensions = document.getElementById("line-map")?.getBoundingClientRect();
-
   let height = dimensions?.height ?? 0;
   let width = dimensions?.width ?? 0;
 
   useEffect(() => {
     // Get updated dimensions each time this hook runs
     dimensions = document.getElementById("line-map")?.getBoundingClientRect();
-
     height = dimensions?.height ?? 0;
     width = dimensions?.width ?? 0;
 
@@ -664,15 +666,16 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       const xScaleFactor = 904 / width;
 
       const needsAbbreviating =
-        height * xScaleFactor + calculated_emphasis_height > svgHeight &&
+        height * xScaleFactor + getEmphasisHeight(xScaleFactor) > svgHeight &&
         !doAbbreviate;
       if (needsAbbreviating) {
         setDoAbbreviate(true);
         // now scale y, which requires re-running this effect
       } else {
+        const yScaleFactor = (svgHeight - getEmphasisHeight(1)) / height
         const factor = Math.min(
-          904 / width,
-          (svgHeight - calculated_emphasis_height) / height
+          xScaleFactor,
+          yScaleFactor
         );
         setScaleFactor(factor);
         setTimeout(() => {
@@ -705,7 +708,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     <svg
       // viewBoxOffset will always be > 0 by the time it's visible, but the console will
       // still log an error if it's a negative number when it's not-yet-visible
-      viewBox={`0 ${-viewBoxOffset} 904 ${height + calculated_emphasis_height}`}
+      viewBox={`0 ${-viewBoxOffset} 904 ${height + getEmphasisHeight(scaleFactor)}`}
       transform={`translate(${translateX})`}
       visibility={isDone ? "visible" : "hidden"}
     >
@@ -754,7 +757,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
           <g
             id="alert-emphasis"
             transform={`translate(0, ${
-              calculated_emphasis_height / 2 +
+              getEmphasisHeight(scaleFactor) / 2 +
               MAX_ICON_HEIGHT * scaleFactor / 2
             })`}
           >
