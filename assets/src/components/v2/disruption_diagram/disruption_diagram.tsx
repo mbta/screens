@@ -600,9 +600,9 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   const [beginning, middle, end] = [slots[0], slots.slice(1, -1), slots.at(-1)];
   const hasEmphasis = effect !== "station_closure";
 
-  const getEmphasisHeight = (scaler: number) => (
+  const getEmphasisHeight = (scale: number) => (
     hasEmphasis
-    ? EMPHASIS_HEIGHT + EMPHASIS_PADDING_TOP * scaler
+    ? EMPHASIS_HEIGHT + EMPHASIS_PADDING_TOP * scale
     : 0
   )
 
