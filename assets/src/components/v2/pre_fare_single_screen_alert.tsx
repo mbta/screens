@@ -162,14 +162,14 @@ const MultiLineLayout: React.ComponentType<MultiLineLayoutProps> = ({
   );
 };
 
-interface FalloutLayoutProps {
+interface FallbackLayoutProps {
   issue: string;
   remedy: string;
   effect: string;
   bannerHeight: number;
 }
 
-const FallbackLayout: React.ComponentType<FalloutLayoutProps> = ({
+const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
   issue,
   remedy,
   effect,
@@ -453,7 +453,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
             showBanner ? "with-banner" : "no-banner"
           )}
         >
-          <div className="alert-card__body">{layout}</div>
+          <div className={classWithModifier("alert-card__body", effect)}>{layout}</div>
           <div className="alert-card__footer">
             {cause && (
               <div className="alert-card__footer__cause">
