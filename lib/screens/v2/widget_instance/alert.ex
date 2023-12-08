@@ -260,10 +260,18 @@ defmodule Screens.V2.WidgetInstance.Alert do
     DateTime.diff(now, start, :second)
   end
 
-  def audio_serialize(_instance), do: %{}
+  def audio_serialize(%__MODULE__{alert: %Alert{description: description}}),
+    do: %{description: description}
 
-  def audio_sort_key(_instance), do: [0]
+  def audio_sort_key(%__MODULE__{} = t) do
+    if takeover_alert?(t) do
+      @automated_override_priority
+    else
+      @flex_zone_alert_base_priority
+    end
+  end
 
+  def audio_valid_candidate?(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}}), do: true
   def audio_valid_candidate?(_instance), do: false
 
   def audio_view(_instance), do: ScreensWeb.V2.Audio.AlertView
