@@ -30,6 +30,14 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
     [:header]
   end
 
+  def audio_serialize(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}, text: text, icon: icon})
+      when icon in [:green_b, :green_c, :green_d, :green_e] do
+    "green_" <> branch = to_string(icon)
+    %{text: text, branch: branch}
+  end
+
+  def audio_serialize(%__MODULE__{text: text}), do: %{text: text}
+
   defp showing_destination?(%__MODULE__{
          screen: %Screen{app_params: %_app{header: %Destination{}}}
        }) do
@@ -51,7 +59,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
     def valid_candidate?(_instance), do: true
 
-    def audio_serialize(%NormalHeader{text: text}), do: %{text: text}
+    def audio_serialize(instance), do: NormalHeader.audio_serialize(instance)
 
     def audio_sort_key(_instance), do: [0]
 
