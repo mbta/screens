@@ -696,13 +696,14 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   // height of the line diagram, and a little extra for the bottom of the "You are Here" diamond.
 
   // To calculate the height of that missing part, that is:
-  // LINE_HEIGHT*scaleFactor/2 - MAX_ICON_HEIGHT*scaleFactor/2
+  // LINE_HEIGHT*scaleFactor/2 - MAX_ICON_HEIGHT*scaleFactor/2 + (hasEmphasis ? EMPHASIS_PADDING_TOP * scaleFactor : 0)
 
   // offset is parent container height minus all the stuff below the very top of the line diagram
-  const viewBoxOffset =
-    height -
-    (LINE_HEIGHT * scaleFactor) / 2 -
-    (MAX_ICON_HEIGHT * scaleFactor) / 2
+  const viewBoxOffset = 
+    height
+    - (LINE_HEIGHT * scaleFactor) / 2
+    - (MAX_ICON_HEIGHT * scaleFactor) / 2
+    + (hasEmphasis ? EMPHASIS_PADDING_TOP * scaleFactor : 0)
 
   return (
     <svg
