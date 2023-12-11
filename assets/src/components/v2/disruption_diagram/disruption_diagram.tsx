@@ -758,8 +758,9 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
           <g
             id="alert-emphasis"
             transform={`translate(0, ${
-              getEmphasisHeight(scaleFactor) / 2 +
-              MAX_ICON_HEIGHT * scaleFactor / 2
+              40 // Half the height of the emphasis icon
+              + 24 * scaleFactor // Half the height of the largest icon, "you are here" octagon
+              + 8 * scaleFactor // Emphasis padding
             })`}
           >
             <AlertEmphasisComponent
