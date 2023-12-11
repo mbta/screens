@@ -14,8 +14,14 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   defp setup_base(_context) do
     %{
       widget: %AlertWidget{
-        alert: %Alert{id: "123"},
-        screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
+        alert: %Alert{id: "123", description: "This is a description."},
+        screen: %Screen{
+          app_params: nil,
+          vendor: nil,
+          device_id: nil,
+          name: nil,
+          app_id: :gl_eink_v2
+        },
         location_context: %LocationContext{
           home_stop: nil,
           stop_sequences: nil,
@@ -608,19 +614,24 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns empty string", %{widget: widget} do
-      assert %{} == AlertWidget.audio_serialize(widget)
+    test "returns alert description", %{widget: widget} do
+      assert %{description: widget.alert.description} == AlertWidget.audio_serialize(widget)
     end
   end
 
   describe "audio_sort_key/1" do
     test "returns [0]", %{widget: widget} do
-      assert [0] == AlertWidget.audio_sort_key(widget)
+      assert [2, 2] == AlertWidget.audio_sort_key(widget)
     end
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns false", %{widget: widget} do
+    test "returns true for gl_eink_v2", %{widget: widget} do
+      assert AlertWidget.audio_valid_candidate?(widget)
+    end
+
+    test "returns false for screen types != gl_eink_v2", %{widget: widget} do
+      widget = %{widget | screen: %Screen{widget.screen | app_id: :bus_eink_v2}}
       refute AlertWidget.audio_valid_candidate?(widget)
     end
   end
