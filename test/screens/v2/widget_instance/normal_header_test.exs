@@ -1,6 +1,7 @@
 defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
   use ExUnit.Case, async: true
 
+  alias ScreensConfig.V2.{GlEink, Header}
   alias Screens.V2.WidgetInstance
 
   setup do
@@ -15,6 +16,17 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
         icon: :logo,
         text: "Ruggles",
         time: ~U[2021-03-04 11:00:00Z]
+      },
+      mercury_eink_instance: %WidgetInstance.NormalHeader{
+        screen:
+          struct(ScreensConfig.Screen, %{
+            app_id: :gl_eink_v2,
+            vendor: :mercury,
+            app_params: struct(GlEink, %{header: struct(Header.Destination)})
+          }),
+        icon: :green_e,
+        text: "Medford/Tufts",
+        time: ~U[2021-03-04 11:00:00Z]
       }
     }
   end
@@ -26,6 +38,16 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
   end
 
   describe "serialize/1" do
+    test "does not return time if vendor is Mercury and app is GlEink", %{
+      mercury_eink_instance: instance
+    } do
+      assert %{
+               icon: :green_e,
+               text: "Medford/Tufts",
+               show_to: true
+             } == WidgetInstance.serialize(instance)
+    end
+
     test "returns serialized text, icon and time", %{instance: instance} do
       assert %{
                icon: :logo,
