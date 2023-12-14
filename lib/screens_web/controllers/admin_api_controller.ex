@@ -1,8 +1,8 @@
 defmodule ScreensWeb.AdminApiController do
   use ScreensWeb, :controller
 
-  alias Screens.Config.Fetch, as: ConfigFetch
   alias Screens.Config.Cache, as: ConfigCache
+  alias Screens.Config.Fetch, as: ConfigFetch
   alias Screens.Image
   alias Screens.TriptychPlayer
   alias Screens.TriptychPlayer.Fetch, as: TriptychPlayerFetch
