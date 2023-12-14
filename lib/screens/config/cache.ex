@@ -3,8 +3,7 @@ defmodule Screens.Config.Cache do
   Functions to read data from a cached copy of the screens config.
   """
 
-  alias Screens.Config
-  alias ScreensConfig.Devops
+  alias ScreensConfig.{Config, Devops}
 
   use Screens.Cache.Client, table: :screens_config
 

@@ -1,12 +1,11 @@
 defmodule ScreensWeb.AdminApiController do
   use ScreensWeb, :controller
 
-  alias Screens.Config
   alias Screens.Config.Fetch, as: ConfigFetch
   alias Screens.Image
   alias Screens.TriptychPlayer
   alias Screens.TriptychPlayer.Fetch, as: TriptychPlayerFetch
-  alias ScreensConfig.Devops
+  alias ScreensConfig.{Config, Devops}
 
   plug :accepts, ["multipart/form-data"] when action == :upload_image
 
