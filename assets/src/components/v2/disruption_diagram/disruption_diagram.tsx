@@ -21,12 +21,13 @@ const EMPHASIS_HEIGHT = 80;
 // of the padding above the emphasis. Keeping for now
 const EMPHASIS_PADDING_TOP = 8;
 // The tallest icon (the diamond) is used in translation calculations
-const MAX_ICON_HEIGHT = 52;
+const MAX_ENDPOINT_HEIGHT = 64;
+const LARGE_X_STOP_ICON_HEIGHT = 48;
 // L: the amount by which the left end extends beyond the leftmost station slot.
 // R: the width by which the right end extends beyond the rightmost station slot.
 // L can vary based on whether the first slot is an arrow vs diamond, because the diamond is larger.
 // Would be nice if this was programmatic, but this works for now
-const L = MAX_ICON_HEIGHT / 2;
+const L = MAX_ENDPOINT_HEIGHT / 2;
 const R = 165;
 // The width taken up by the ends outside the typical station bounds is L + R,
 // so the width available to the rest of the diagram is 904 - (L + R)
@@ -287,15 +288,14 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
         className={classWithModifier("end-slot__arrow", line)}
       />
     );
-  } else if (
-    isAffected &&
-    (effect === "station_closure" || effect === "suspension")
-  ) {
+  } else if (isAffected && isCurrentStop) {
+    icon = <LargeXStopIcon iconSize={61} color="#ee2e24" />;
+  } else if (isAffected) {
     icon = <LargeXStopIcon iconSize={61} />;
   } else if (isCurrentStop && line === "red") {
-    icon = <CurrentStopOpenDiamondIcon iconSize={64} />;
+    icon = <CurrentStopOpenDiamondIcon iconSize={MAX_ENDPOINT_HEIGHT} />;
   } else if (isCurrentStop) {
-    icon = <CurrentStopDiamondIcon iconSize={64} />;
+    icon = <CurrentStopDiamondIcon iconSize={MAX_ENDPOINT_HEIGHT} />;
   } else {
     const modifiers = [line.toString()];
     if (isAffected) {
@@ -379,8 +379,8 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   let icon;
   if (slot.show_symbol) {
     if (isCurrentStop) {
-      if (isAffected && effect in ["station_closure", "suspension"]) {
-        icon = <LargeXStopIcon iconSize={48} color="#ee2e24" />;
+      if (isAffected) {
+        icon = <LargeXStopIcon iconSize={LARGE_X_STOP_ICON_HEIGHT} color="#ee2e24" />;
       } else {
         icon =
           line === "red" ? (
@@ -396,7 +396,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
             icon = <SmallXStopIcon iconSize={24} />;
             break;
           case "station_closure":
-            icon = <LargeXStopIcon iconSize={48} />;
+            icon = <LargeXStopIcon iconSize={LARGE_X_STOP_ICON_HEIGHT} />;
             break;
           case "shuttle":
             if (label !== "…" && label.full === "Beaconsfield") {
@@ -600,9 +600,13 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   );
   const [beginning, middle, end] = [slots[0], slots.slice(1, -1), slots.at(-1)];
   const hasEmphasis = effect !== "station_closure";
-  const calculated_emphasis_height = hasEmphasis
-    ? EMPHASIS_HEIGHT + EMPHASIS_PADDING_TOP
-    : 0;
+
+  const getEmphasisHeight = (scale: number) => (
+    hasEmphasis
+    ? EMPHASIS_HEIGHT + EMPHASIS_PADDING_TOP * scale
+    : 0
+  )
+
   const labelTextClass = slots.length > 12 ? "small" : "large";
 
   let x = 0;
@@ -645,14 +649,12 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   // Get the size of the diagram svg, excluding emphasis
   let dimensions = document.getElementById("line-map")?.getBoundingClientRect();
-
   let height = dimensions?.height ?? 0;
   let width = dimensions?.width ?? 0;
 
   useEffect(() => {
     // Get updated dimensions each time this hook runs
     dimensions = document.getElementById("line-map")?.getBoundingClientRect();
-
     height = dimensions?.height ?? 0;
     width = dimensions?.width ?? 0;
 
@@ -665,15 +667,16 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       const xScaleFactor = 904 / width;
 
       const needsAbbreviating =
-        height * xScaleFactor + calculated_emphasis_height > svgHeight &&
+        height * xScaleFactor + getEmphasisHeight(xScaleFactor) > svgHeight &&
         !doAbbreviate;
       if (needsAbbreviating) {
         setDoAbbreviate(true);
         // now scale y, which requires re-running this effect
       } else {
+        const yScaleFactor = (svgHeight - getEmphasisHeight(1)) / height
         const factor = Math.min(
-          904 / width,
-          (svgHeight - calculated_emphasis_height) / height
+          xScaleFactor,
+          yScaleFactor
         );
         setScaleFactor(factor);
         setTimeout(() => {
@@ -685,37 +688,29 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   // This is to center the diagram along the X axis
   const translateX = (width && (904 - width) / 2) || 0;
+  
+  // Next is to align the diagram at the top of the svg, which involves adjusting the SVG viewbox
 
-  // Next is to center the diagram along the Y axis, which involves adjusing the SVG viewbox
-
-  // If -${svgHeight} is used as the viewbox height, it looks like the line diagram text
+  // If -${height} is used as the viewbox height, it looks like the line diagram text
   // pushed all the way to the bottom of the viewbox with just a tiny point of the
   // "You are Here" diamond sticking out. So, the parts that are cut off are the whole
   // height of the line diagram, and a little extra for the bottom of the "You are Here" diamond.
 
   // To calculate the height of that missing part, that is:
-  // LINE_HEIGHT*scaleFactor/2 - MAX_ICON_HEIGHT*scaleFactor/2
+  // LINE_HEIGHT*scaleFactor/2 - MAX_ENDPOINT_HEIGHT*scaleFactor/2 + (hasEmphasis ? EMPHASIS_PADDING_TOP * scaleFactor : 0)
 
   // offset is parent container height minus all the stuff below the very top of the line diagram
-  const offset =
-    svgHeight -
-    (LINE_HEIGHT * scaleFactor) / 2 -
-    (MAX_ICON_HEIGHT * scaleFactor) / 2 -
-    calculated_emphasis_height;
-  // topAndBottomMargins is parent container height minus actual full height of line diagram with emphasis
-  const topAndBottomMargins =
-    (svgHeight - height - calculated_emphasis_height) / 2;
-  // If topAndBottomMargins is negative, than there is no margin to use, so the viewBox offset should just be
-  // the offset (essentially the basic height of the diagram)
-  // Otherwise, if there is vertical room, the calculated margin is subtracted from that offset
-  const viewBoxOffset =
-    topAndBottomMargins < 0 ? offset : offset - topAndBottomMargins;
+  const viewBoxOffset = 
+    height
+    - (LINE_HEIGHT * scaleFactor) / 2
+    - (MAX_ENDPOINT_HEIGHT * scaleFactor) / 2
+    + (hasEmphasis ? EMPHASIS_PADDING_TOP * scaleFactor : 0)
 
   return (
     <svg
       // viewBoxOffset will always be > 0 by the time it's visible, but the console will
       // still log an error if it's a negative number when it's not-yet-visible
-      viewBox={`0 ${viewBoxOffset > 0 ? -viewBoxOffset : 0} 904 ${svgHeight}`}
+      viewBox={`0 ${-viewBoxOffset} 904 ${height + getEmphasisHeight(scaleFactor)}`}
       transform={`translate(${translateX})`}
       visibility={isDone ? "visible" : "hidden"}
     >
@@ -764,8 +759,9 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
           <g
             id="alert-emphasis"
             transform={`translate(0, ${
-              EMPHASIS_HEIGHT / 2 +
-              (EMPHASIS_HEIGHT - MAX_ICON_HEIGHT) * scaleFactor
+              EMPHASIS_HEIGHT/2 // Half the height of the emphasis icon
+              + LARGE_X_STOP_ICON_HEIGHT/2 * scaleFactor // Half the height of the largest closure icon, "you are here" octagon
+              + 8 * scaleFactor // Emphasis padding
             })`}
           >
             <AlertEmphasisComponent
