@@ -192,7 +192,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end)
     |> Enum.flat_map(fn
       route_id ->
-        headsign = get_destination(t, location, route_id)
+        # Boundary alerts shouldn't have headsign in the banner
+        headsign = if get_region_from_location(location) === :boundary do
+            nil
+          else
+            get_destination(t, location, route_id)
+          end
         build_pills_from_headsign(route_id, headsign)
     end)
     |> Enum.uniq()
@@ -389,12 +394,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
         issue =
           cond do
+            # Here
             location == :inside ->
               "No #{route_id} Line trains"
 
             is_nil(destination) ->
               "No trains"
 
+            # Boundary
             true ->
               "No trains to #{destination}"
           end
