@@ -193,11 +193,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     |> Enum.flat_map(fn
       route_id ->
         # Boundary alerts shouldn't have headsign in the banner
-        headsign = if get_region_from_location(location) === :boundary do
-            nil
-          else
+        headsign =
+          unless get_region_from_location(location) === :boundary do
             get_destination(t, location, route_id)
           end
+
         build_pills_from_headsign(route_id, headsign)
     end)
     |> Enum.uniq()
