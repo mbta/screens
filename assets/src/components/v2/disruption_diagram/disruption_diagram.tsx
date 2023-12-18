@@ -21,12 +21,13 @@ const EMPHASIS_HEIGHT = 80;
 // of the padding above the emphasis. Keeping for now
 const EMPHASIS_PADDING_TOP = 8;
 // The tallest icon (the diamond) is used in translation calculations
-const MAX_ICON_HEIGHT = 64;
+const MAX_ENDPOINT_HEIGHT = 64;
+const LARGE_X_STOP_ICON_HEIGHT = 48;
 // L: the amount by which the left end extends beyond the leftmost station slot.
 // R: the width by which the right end extends beyond the rightmost station slot.
 // L can vary based on whether the first slot is an arrow vs diamond, because the diamond is larger.
 // Would be nice if this was programmatic, but this works for now
-const L = MAX_ICON_HEIGHT / 2;
+const L = MAX_ENDPOINT_HEIGHT / 2;
 const R = 165;
 // The width taken up by the ends outside the typical station bounds is L + R,
 // so the width available to the rest of the diagram is 904 - (L + R)
@@ -292,9 +293,9 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
   } else if (isAffected) {
     icon = <LargeXStopIcon iconSize={61} />;
   } else if (isCurrentStop && line === "red") {
-    icon = <CurrentStopOpenDiamondIcon iconSize={64} />;
+    icon = <CurrentStopOpenDiamondIcon iconSize={MAX_ENDPOINT_HEIGHT} />;
   } else if (isCurrentStop) {
-    icon = <CurrentStopDiamondIcon iconSize={64} />;
+    icon = <CurrentStopDiamondIcon iconSize={MAX_ENDPOINT_HEIGHT} />;
   } else {
     const modifiers = [line.toString()];
     if (isAffected) {
@@ -379,7 +380,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
   if (slot.show_symbol) {
     if (isCurrentStop) {
       if (isAffected) {
-        icon = <LargeXStopIcon iconSize={48} color="#ee2e24" />;
+        icon = <LargeXStopIcon iconSize={LARGE_X_STOP_ICON_HEIGHT} color="#ee2e24" />;
       } else {
         icon =
           line === "red" ? (
@@ -395,7 +396,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
             icon = <SmallXStopIcon iconSize={24} />;
             break;
           case "station_closure":
-            icon = <LargeXStopIcon iconSize={48} />;
+            icon = <LargeXStopIcon iconSize={LARGE_X_STOP_ICON_HEIGHT} />;
             break;
           case "shuttle":
             if (label !== "…" && label.full === "Beaconsfield") {
@@ -696,13 +697,13 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   // height of the line diagram, and a little extra for the bottom of the "You are Here" diamond.
 
   // To calculate the height of that missing part, that is:
-  // LINE_HEIGHT*scaleFactor/2 - MAX_ICON_HEIGHT*scaleFactor/2 + (hasEmphasis ? EMPHASIS_PADDING_TOP * scaleFactor : 0)
+  // LINE_HEIGHT*scaleFactor/2 - MAX_ENDPOINT_HEIGHT*scaleFactor/2 + (hasEmphasis ? EMPHASIS_PADDING_TOP * scaleFactor : 0)
 
   // offset is parent container height minus all the stuff below the very top of the line diagram
   const viewBoxOffset = 
     height
     - (LINE_HEIGHT * scaleFactor) / 2
-    - (MAX_ICON_HEIGHT * scaleFactor) / 2
+    - (MAX_ENDPOINT_HEIGHT * scaleFactor) / 2
     + (hasEmphasis ? EMPHASIS_PADDING_TOP * scaleFactor : 0)
 
   return (
@@ -758,8 +759,8 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
           <g
             id="alert-emphasis"
             transform={`translate(0, ${
-              40 // Half the height of the emphasis icon
-              + 24 * scaleFactor // Half the height of the largest icon, "you are here" octagon
+              EMPHASIS_HEIGHT/2 // Half the height of the emphasis icon
+              + LARGE_X_STOP_ICON_HEIGHT/2 * scaleFactor // Half the height of the largest closure icon, "you are here" octagon
               + 8 * scaleFactor // Emphasis padding
             })`}
           >
