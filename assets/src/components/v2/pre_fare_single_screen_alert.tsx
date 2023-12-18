@@ -14,9 +14,15 @@ import WalkingIcon from "../../../static/images/svgr_bundled/nearby.svg";
 import ShuttleBusIcon from "../../../static/images/svgr_bundled/bus.svg";
 
 const SCREEN_HEIGHT = 1720,
+  // The footer has effect type and updated time
   FOOTER_HEIGHT = 84,
-  BOTTOM_MARGIN = 32,
-  ALERT_CARD_PADDING = 120 + 32;
+  // Color margin at the very edge of the alert
+  BOTTOM_MARGIN = 32
+
+const getBannerPadding = (effect: string) => {
+  if (effect === "shuttle") return 80
+  else return 120
+}
 
 interface PreFareSingleScreenAlertProps {
   issue: string;
@@ -59,7 +65,7 @@ const StandardLayout: React.ComponentType<StandardLayoutProps> = ({
 }) => {
   const maxTextHeight =
     SCREEN_HEIGHT -
-    (FOOTER_HEIGHT + BOTTOM_MARGIN + ALERT_CARD_PADDING + bannerHeight);
+    (FOOTER_HEIGHT + BOTTOM_MARGIN + getBannerPadding(effect) + bannerHeight);
 
   const { ref: contentBlockRef, size: contentTextSize } = useTextResizer({
     sizes: ["medium", "large"],
@@ -177,7 +183,7 @@ const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
 }) => {
   const maxTextHeight =
     SCREEN_HEIGHT -
-    (FOOTER_HEIGHT + BOTTOM_MARGIN + ALERT_CARD_PADDING + bannerHeight);
+    (FOOTER_HEIGHT + BOTTOM_MARGIN + getBannerPadding(effect) + bannerHeight);
 
   const { ref: pioTextBlockRef, size: pioSecondaryTextSize } = useTextResizer({
     sizes: ["small", "medium"],
