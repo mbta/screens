@@ -1,8 +1,8 @@
 defmodule Screens.ConfigTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config
   alias Screens.Config.Fetch
+  alias ScreensConfig.Config
 
   def fetch_config(_context) do
     {:ok, file_contents, _} = Fetch.fetch_config(nil)
