@@ -184,8 +184,7 @@ $alert-card-footer-height: 80px;
 
     &__body {
       height: $takeover-card-height - $takeover-card-footer-height;
-      width: 904px;
-      padding-left: 56px;
+      padding: 0 56px;
       box-sizing: border-box;
       font-family: Inter, sans-serif;
       font-size: 200px;
