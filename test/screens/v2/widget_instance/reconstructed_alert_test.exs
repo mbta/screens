@@ -686,7 +686,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No trains to Oak Grove",
         location: "No Orange Line trains between Oak Grove and Malden Center",
         cause: nil,
-        routes: [%{headsign: "Oak Grove", route_id: "Orange", svg_name: "ol-oak-grove"}],
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :suspension,
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
@@ -725,7 +725,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No trains to Oak Grove",
         location: "Shuttle buses between Oak Grove and Malden Center",
         cause: nil,
-        routes: [%{headsign: "Oak Grove", route_id: "Orange", svg_name: "ol-oak-grove"}],
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :shuttle,
         remedy: "Use shuttle bus",
         updated_at: "Friday, 5:00 am",
@@ -2457,13 +2457,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No trains to North Station & North",
         location: "Shuttle buses between Union Square and Government Center",
         cause: nil,
-        routes: [
-          %{
-            headsign: "North Station & North",
-            route_id: "Green",
-            svg_name: "gl-north-station-north"
-          }
-        ],
+        routes: [%{route_id: "Green", svg_name: "gl"}],
         effect: :shuttle,
         remedy: "Use shuttle bus",
         updated_at: "Friday, 2:24 pm",
