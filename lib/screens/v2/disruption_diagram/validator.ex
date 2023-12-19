@@ -10,6 +10,7 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
+  alias Screens.LocationContext
   alias Screens.V2.LocalizedAlert
 
   @spec validate(LocalizedAlert.t()) :: :ok | {:error, reason :: String.t()}
@@ -43,12 +44,34 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
   defp validate_stop_count(_), do: :ok
 
   defp validate_informed_lines(localized_alert) do
+    # We can draw a diagram for an alert only when there's a single line to draw.
+    #
+    # This is the case when either:
+    # - The alert informs only one line, or
+    # - The alert informs multiple lines, but only one of those informed lines serves the home stop.
+
     localized_alert.alert
     |> Alert.informed_subway_routes()
     |> consolidate_gl()
     |> case do
-      [_single_line] -> :ok
-      _ -> {:error, "alert does not inform exactly one subway line"}
+      [_single_line] ->
+        :ok
+
+      informed_lines ->
+        lines_serving_stop =
+          localized_alert.location_context
+          |> LocationContext.route_ids()
+          |> consolidate_gl()
+
+        informed_lines_serving_stop =
+          MapSet.intersection(MapSet.new(informed_lines), MapSet.new(lines_serving_stop))
+
+        if MapSet.size(informed_lines_serving_stop) == 1 do
+          :ok
+        else
+          {:error,
+           "alert does not inform exactly one subway line, and home stop location does not help us choose one of the informed lines"}
+        end
     end
   end
 

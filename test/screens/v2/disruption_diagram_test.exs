@@ -1755,7 +1755,7 @@ defmodule Screens.V2.DisruptionDiagramTest do
                DD.serialize(one_stop_suspension)
     end
 
-    test "rejects alerts that inform multiple lines" do
+    test "rejects alerts that inform multiple lines and can't be filtered to one line" do
       multi_line_scenario = %{
         alert: %Alert{
           effect: :station_closure,
@@ -1766,11 +1766,16 @@ defmodule Screens.V2.DisruptionDiagramTest do
         },
         location_context: %LocationContext{
           home_stop: ~P"gover",
-          tagged_stop_sequences: Map.merge(TaggedSeq.blue(), TaggedSeq.green())
+          tagged_stop_sequences: Map.merge(TaggedSeq.blue(), TaggedSeq.green()),
+          routes: [
+            %{route_id: "Blue", active?: true}
+            | Enum.map(~w[B C D E], &%{route_id: "Green-#{&1}", active?: true})
+          ]
         }
       }
 
-      assert {:error, "alert does not inform exactly one subway line"} =
+      assert {:error,
+              "alert does not inform exactly one subway line, and home stop location does not help us choose one of the informed lines"} =
                DD.serialize(multi_line_scenario)
     end
 
@@ -1816,6 +1821,141 @@ defmodule Screens.V2.DisruptionDiagramTest do
     ##############
     # EDGE CASES #
     ##############
+
+    test "serializes an alert informing 2 lines when home stop is served by only one of the informed lines (BL)" do
+      multi_line_scenario = %{
+        alert: %Alert{
+          effect: :station_closure,
+          informed_entities: [
+            %{route: "Blue", stop: ~P"gover"}
+            | Enum.map(~w[B C D E], &%{route: "Green-#{&1}", stop: ~P"gover"})
+          ]
+        },
+        location_context: %LocationContext{
+          home_stop: ~P"wondl",
+          tagged_stop_sequences: Map.merge(TaggedSeq.blue(), TaggedSeq.green()),
+          routes: [%{route_id: "Blue", active?: true}]
+        }
+      }
+
+      expected = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [1],
+        line: :blue,
+        current_station_slot_index: 11,
+        slots: [
+          %{type: :terminal, label_id: ~P"bomnl"},
+          %{label: %{full: "Government Center", abbrev: "Gov't Ctr"}, show_symbol: true},
+          %{label: %{full: "State", abbrev: "State"}, show_symbol: true},
+          %{label: %{full: "Aquarium", abbrev: "Aquarium"}, show_symbol: true},
+          %{label: %{full: "Maverick", abbrev: "Maverick"}, show_symbol: true},
+          %{label: %{full: "Airport", abbrev: "Airport"}, show_symbol: true},
+          %{label: %{full: "Wood Island", abbrev: "Wood Island"}, show_symbol: true},
+          %{label: %{full: "Orient Heights", abbrev: "Orient Hts"}, show_symbol: true},
+          %{label: %{full: "Suffolk Downs", abbrev: "Suffolk Dns"}, show_symbol: true},
+          %{label: %{full: "Beachmont", abbrev: "Beachmont"}, show_symbol: true},
+          %{label: %{full: "Revere Beach", abbrev: "Revere Bch"}, show_symbol: true},
+          %{type: :terminal, label_id: ~P"wondl"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(multi_line_scenario)
+
+      assert expected == actual
+    end
+
+    test "serializes an alert informing 2 lines when home stop is served by only one of the informed lines (GL)" do
+      multi_line_scenario = %{
+        alert: %Alert{
+          effect: :station_closure,
+          informed_entities: [
+            %{route: "Blue", stop: ~P"gover"}
+            | Enum.map(~w[B C D E], &%{route: "Green-#{&1}", stop: ~P"gover"})
+          ]
+        },
+        location_context: %LocationContext{
+          home_stop: ~P"pktrm",
+          tagged_stop_sequences: Map.merge(TaggedSeq.red(), TaggedSeq.green()),
+          routes: [
+            %{route_id: "Red", active?: true}
+            | Enum.map(~w[B C D E], &%{route_id: "Green-#{&1}", active?: true})
+          ]
+        }
+      }
+
+      expected = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [3],
+        line: :green,
+        current_station_slot_index: 2,
+        slots: [
+          %{type: :arrow, label_id: ~P"coecl" <> "+west"},
+          # <current_location>
+          %{label: %{full: "Boylston", abbrev: "Boylston"}, show_symbol: true},
+          # <closure>
+          %{label: %{full: "Park Street", abbrev: "Park St"}, show_symbol: true},
+          # </current_location>
+          %{label: %{full: "Government Center", abbrev: "Gov't Ctr"}, show_symbol: true},
+          %{label: %{full: "Haymarket", abbrev: "Haymarket"}, show_symbol: true},
+          # </closure>
+          %{type: :arrow, label_id: ~P"mdftf" <> "+" <> ~P"unsqu"}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(multi_line_scenario)
+
+      assert expected == actual
+    end
+
+    test "serializes an alert informing 2 lines when home stop is served by only one of the informed lines (GL branch)" do
+      multi_line_scenario = %{
+        alert: %Alert{
+          effect: :station_closure,
+          informed_entities: [
+            %{route: "Red", stop: ~P"pktrm"}
+            | Enum.map(~w[B C D E], &%{route: "Green-#{&1}", stop: ~P"pktrm"})
+          ]
+        },
+        location_context: %LocationContext{
+          home_stop: ~P"bucen",
+          tagged_stop_sequences: TaggedSeq.green([:b]),
+          routes: [%{route_id: "Green-B", active?: true}]
+        }
+      }
+
+      expected = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [8],
+        line: :green,
+        current_station_slot_index: 2,
+        slots: [
+          %{type: :arrow, label_id: ~P"lake"},
+          # <current_location>
+          %{label: %{full: "Amory Street", abbrev: "Amory St"}, show_symbol: true},
+          %{label: %{full: "Boston University Central", abbrev: "BU Central"}, show_symbol: true},
+          # </current_location>
+          # <gap>
+          %{label: %{full: "Boston University East", abbrev: "BU East"}, show_symbol: true},
+          %{label: %{full: "Blandford Street", abbrev: "Blandford"}, show_symbol: true},
+          # Kenmore, Hynes, Copley
+          %{
+            label: %{full: "…via Kenmore & Copley", abbrev: "…via Kenmore & Copley"},
+            show_symbol: false
+          },
+          %{label: %{full: "Arlington", abbrev: "Arlington"}, show_symbol: true},
+          # </gap>
+          # <closure>
+          %{label: %{full: "Boylston", abbrev: "Boylston"}, show_symbol: true},
+          %{label: %{full: "Park Street", abbrev: "Park St"}, show_symbol: true},
+          %{type: :terminal, label_id: ~P"gover"}
+          # </closure>
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(multi_line_scenario)
+
+      assert expected == actual
+    end
 
     test "does not omit from an alert that spans 9 stops and contains the home stop" do
       # In this case, the closure has more than 8 slots available to it and doesn't get shrunk.
