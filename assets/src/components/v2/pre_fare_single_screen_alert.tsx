@@ -13,17 +13,6 @@ import ISAIcon from "../../../static/images/svgr_bundled/isa.svg";
 import WalkingIcon from "../../../static/images/svgr_bundled/nearby.svg";
 import ShuttleBusIcon from "../../../static/images/svgr_bundled/bus.svg";
 
-const SCREEN_HEIGHT = 1720,
-  // The footer has effect type and updated time
-  FOOTER_HEIGHT = 84,
-  // Color margin at the very edge of the alert
-  BOTTOM_MARGIN = 32
-
-const getBannerPadding = (effect: string) => {
-  if (effect === "shuttle") return 80
-  else return 120
-}
-
 interface PreFareSingleScreenAlertProps {
   issue: string;
   location: string;
@@ -48,43 +37,44 @@ interface StandardLayoutProps {
   remedy: string;
   effect: string;
   location: string | null;
-  bannerHeight: number;
   disruptionDiagram?: DisruptionDiagramData;
 }
 
-// For the standard layout, issue font can be medium or large.
-// If remedy is "Seek alternate route", font size is static. Otherwise, it uses the same font size as
-// the issue.
+// Bypassed station alerts can have resizing font based on how many stations are affected
+// Other alerts have static font sizes:
+// - issue font is size large
+// - "Seek alternate route" remedy is medium
+// - "Use shuttle bus" remedy is large
 const StandardLayout: React.ComponentType<StandardLayoutProps> = ({
   issue,
   remedy,
   effect,
   location,
-  bannerHeight,
   disruptionDiagram,
 }) => {
-  const maxTextHeight =
-    SCREEN_HEIGHT -
-    (FOOTER_HEIGHT + BOTTOM_MARGIN + getBannerPadding(effect) + bannerHeight);
+  const maxTextHeight = 772
 
   const { ref: contentBlockRef, size: contentTextSize } = useTextResizer({
     sizes: ["medium", "large"],
-    maxHeight: maxTextHeight,
+    // the 32 is padding on the text object
+    maxHeight: maxTextHeight + 32,
     resetDependencies: [issue, remedy],
   });
 
   return (
-    <div className="alert-card__content-block" ref={contentBlockRef}>
-      <StandardIssueSection
-        issue={issue}
-        location={location}
-        contentTextSize={contentTextSize}
-      />
-      <RemedySection
-        effect={effect}
-        remedy={remedy}
-        contentTextSize={contentTextSize}
-      />
+    <div className="alert-card__content-block" >
+      <div ref={contentBlockRef}>
+        <StandardIssueSection
+          issue={issue}
+          location={location}
+          contentTextSize={effect === "station_closure" ? contentTextSize : "large"}
+        />
+        <RemedySection
+          effect={effect}
+          remedy={remedy}
+          contentTextSize="large"
+        />
+      </div>
       {disruptionDiagram && (
         <MapSection disruptionDiagram={disruptionDiagram} />
       )}
@@ -172,22 +162,16 @@ interface FallbackLayoutProps {
   issue: string;
   remedy: string;
   effect: string;
-  bannerHeight: number;
 }
 
 const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
   issue,
   remedy,
   effect,
-  bannerHeight,
 }) => {
-  const maxTextHeight =
-    SCREEN_HEIGHT -
-    (FOOTER_HEIGHT + BOTTOM_MARGIN + getBannerPadding(effect) + bannerHeight);
-
   const { ref: pioTextBlockRef, size: pioSecondaryTextSize } = useTextResizer({
     sizes: ["small", "medium"],
-    maxHeight: maxTextHeight,
+    maxHeight: 460,
     resetDependencies: [issue, remedy],
   });
 
@@ -201,7 +185,7 @@ const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
     );
 
   return (
-    <div className="alert-card__pio-text" ref={pioTextBlockRef}>
+    <div className="alert-card__pio-text">
       {icon}
       {issue && <div className="alert-card__pio-text__main-text">{issue}</div>}
       {remedy && (
@@ -210,6 +194,7 @@ const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
             "alert-card__pio-text__secondary-text",
             pioSecondaryTextSize
           )}
+          ref={pioTextBlockRef}
         >
           {remedy}
         </div>
@@ -356,13 +341,6 @@ const PreFareSingleScreenAlert: React.ComponentType<
     disruption_diagram,
   } = alert;
 
-  // If there is more than 1 route in the banner, or the 1 route is longer than "GL·B"
-  // the banner will be tall. Otherwise, it'll be 1-line
-  const bannerHeight =
-    routes.length > 1 || (routes[0] && routes[0].svg_name.length > 4)
-      ? 368
-      : 200;
-
   /**
    * This switch statement picks the alert layout
    * - fallback: icon, followed by a summary & pio text, or just the pio text
@@ -379,7 +357,6 @@ const PreFareSingleScreenAlert: React.ComponentType<
           issue={issue}
           remedy={remedy}
           effect={effect}
-          bannerHeight={bannerHeight}
         />
       );
       break;
@@ -399,7 +376,6 @@ const PreFareSingleScreenAlert: React.ComponentType<
           remedy={remedy}
           effect={effect}
           location={location}
-          bannerHeight={bannerHeight}
           disruptionDiagram={disruption_diagram}
         />
       );
@@ -413,7 +389,6 @@ const PreFareSingleScreenAlert: React.ComponentType<
           remedy={remedy}
           effect={effect}
           location={location}
-          bannerHeight={bannerHeight}
           disruptionDiagram={disruption_diagram}
         />
       );
@@ -436,7 +411,6 @@ const PreFareSingleScreenAlert: React.ComponentType<
           issue={issue}
           remedy={remedy}
           effect={effect}
-          bannerHeight={bannerHeight}
         />
       );
   }
