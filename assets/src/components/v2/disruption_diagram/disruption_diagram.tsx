@@ -242,8 +242,8 @@ const EndpointLabel: ComponentType<{ labelID: string; isArrow: boolean }> = ({
         >
           {labelParts[1].includes("&") ? (
             <>
-              {labelParts[0].replace("& ", "")}
               <tspan className="label">& </tspan>
+              {labelParts[1].replace("& ", "")}
             </>
           ) : (
             labelParts[1]
