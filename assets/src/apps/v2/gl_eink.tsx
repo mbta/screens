@@ -46,6 +46,7 @@ import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import EinkSubwayStatus from "Components/v2/subway_status/eink_subway_status";
 import WidgetPage from "Components/v2/widget_page";
 import TopAndFlexTakeoverBody from "Components/v2/eink/top_and_flex_takeover";
+import FlexZoneTakeoverBody from "Components/v2/eink/flex_zone_takeover";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -54,6 +55,7 @@ const TYPE_TO_COMPONENT = {
   body_takeover: TakeoverBody,
   top_takeover: TopTakeoverBody,
   bottom_takeover: BottomTakeoverBody,
+  flex_zone_takeover: FlexZoneTakeoverBody,
   top_and_flex_takeover: TopAndFlexTakeoverBody,
   one_medium: OneMedium,
   placeholder: Placeholder,
