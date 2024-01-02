@@ -57,7 +57,8 @@ defmodule Screens.V2.CandidateGenerator.GlEinkTest do
                        :left_sidebar,
                        :main_content,
                        :full_body_bottom_screen
-                     ]
+                     ],
+                     top_and_flex_takeover: [:full_body_top_screen, :flex_zone_takeover, :footer]
                    }}
                 ],
                 screen_takeover: [:full_screen]
