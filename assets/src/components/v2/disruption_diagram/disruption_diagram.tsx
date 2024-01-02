@@ -290,7 +290,7 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
     );
   } else if (isAffected && isCurrentStop) {
     icon = <LargeXStopIcon iconSize={61} color="#ee2e24" />;
-  } else if (isAffected) {
+  } else if (isAffected && effect != "shuttle") {
     icon = <LargeXStopIcon iconSize={61} />;
   } else if (isCurrentStop && line === "red") {
     icon = <CurrentStopOpenDiamondIcon iconSize={MAX_ENDPOINT_HEIGHT} />;
