@@ -32,6 +32,11 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
             bottom_takeover: [
               :main_content,
               :full_body_bottom_screen
+            ],
+            flex_zone_takeover: [
+              :main_content,
+              :flex_zone_takeover,
+              :footer
             ]
           }}
        ],
