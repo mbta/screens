@@ -98,7 +98,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @route_directions %{
     "Blue" => ["Bowdoin", "Wonderland"],
     "Orange" => ["Forest Hills", "Oak Grove"],
-    "Red" => ["Ashmont/Braintree", "Alewife"],
+    "Red" => ["Ashmont & Braintree", "Alewife"],
     "Green-B" => ["Boston College", "Government Center"],
     "Green-C" => ["Cleveland Circle", "Government Center"],
     "Green-D" => ["Riverside", "Union Square"],
@@ -212,7 +212,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     ]
   end
 
-  # Split Ashmont/Braintree out into two route pills
+  # Split "Ashmont & Braintree" out into two route pills
   defp build_pills_from_headsign(route_id, "Ashmont & Braintree") do
     Enum.map(["Ashmont", "Braintree"], fn dest ->
       %{
