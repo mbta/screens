@@ -4,10 +4,11 @@ import { classWithModifiers, imagePath } from "Util/util";
 import DisruptionDiagram, {
   DisruptionDiagramData,
 } from "./disruption_diagram/disruption_diagram";
+import FreeText, { FreeTextType } from "./free_text";
 
 interface ReconAlertProps {
   issue: string | any; // shouldn't be "any"
-  location: string;
+  location: string | FreeTextType;
   cause: string;
   remedy: string;
   routes: any[]; // shouldn't be "any"
@@ -58,7 +59,9 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
                 src={imagePath("no-service-black.svg")}
               />
               <div className="alert-card__body__issue">{issue}</div>
-              <div className="alert-card__body__location ">{location}</div>
+              <div className="alert-card__body__location ">
+                { typeof location === "string" ? location : <FreeText lines={location} /> }
+              </div>
               {disruption_diagram && (
                 <div
                   id="disruption-diagram-container"

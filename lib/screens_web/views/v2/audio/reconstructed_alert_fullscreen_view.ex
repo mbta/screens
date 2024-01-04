@@ -200,7 +200,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
 
     list_of_lines =
       (formatted_lines_with_branches ++ lines_without_branches)
-      |> Util.format_name_list_to_string()
+      |> Util.format_name_list_to_string_audio()
 
     ~E|<%= list_of_lines %>|
   end
