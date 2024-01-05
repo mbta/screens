@@ -30,7 +30,7 @@ import GLBBostonCollege from '../../static/images/svgr_bundled/pills/glb-boston-
 import GLCClevelandCircle from '../../static/images/svgr_bundled/pills/glc-cleveland-cir.svg'
 import GLDRiverside from '../../static/images/svgr_bundled/pills/gld-riverside.svg'
 import GLDUnionSq from '../../static/images/svgr_bundled/pills/gld-union-sq.svg'
-import GLEHeathSt from '../../static/images/svgr_bundled/pills/gle-medford-tufts.svg'
+import GLEHeathSt from '../../static/images/svgr_bundled/pills/gle-heath-st.svg'
 import GLEMedfordTufts from '../../static/images/svgr_bundled/pills/gle-medford-tufts.svg'
 import OLForestHills from '../../static/images/svgr_bundled/pills/ol-forest-hills.svg'
 import OLOakGrove from '../../static/images/svgr_bundled/pills/ol-oak-grove.svg'
