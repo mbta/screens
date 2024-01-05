@@ -102,7 +102,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Green-B" => ["Boston College", "Government Center"],
     "Green-C" => ["Cleveland Circle", "Government Center"],
     "Green-D" => ["Riverside", "Union Square"],
-    "Green-E" => ["Heath Street", "Medford/Tufts"]
+    "Green-E" => ["Heath Street", "Medford/Tufts"],
+    "Green-trunk" => ["Copley & West", "North Station & North"]
   }
 
   @headsign_svg_map %{
@@ -140,13 +141,24 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         |> Enum.filter(&String.starts_with?(&1.route, route_id))
       end
 
-    {direction_id, route_id} =
+    # Consolidate the list of entities into their direction from current station
+    # and their affiliated route id
+    list_of_directions_and_routes =
       informed_entities
-      |> hd()
-      |> case do
-        %{direction_id: nil, route: route} when location == :downstream -> {0, route}
-        %{direction_id: nil, route: route} when location == :upstream -> {1, route}
-        %{direction_id: direction_id, route: route} -> {direction_id, route}
+      |> Enum.map(fn entity -> get_direction_and_route_from_entity(entity, location) end)
+      |> Enum.uniq()
+
+    {direction_id, route_id} =
+      if length(list_of_directions_and_routes) == 1 do
+        hd(list_of_directions_and_routes)
+        # If there are multiple route ids in that informed entities list, we're on a branch
+      else
+        direction_id =
+          list_of_directions_and_routes
+          |> hd()
+          |> elem(0)
+
+        {direction_id, "Green-trunk"}
       end
 
     cond do
@@ -166,6 +178,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         |> Enum.at(direction_id)
     end
   end
+
+  # Given an entity and the directionality of the alert from the home stop,
+  # return a tuple with the affected direction_id and route id
+  defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, location)
+       when location == :downstream,
+       do: {0, route}
+
+  defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, location)
+       when location == :upstream,
+       do: {1, route}
+
+  defp get_direction_and_route_from_entity(
+         %{direction_id: direction_id, route: route},
+         _location
+       ),
+       do: {direction_id, route}
 
   defp get_route_pills(t, location \\ nil)
 
