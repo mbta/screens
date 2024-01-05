@@ -21,7 +21,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             location_context: nil,
             informed_stations: nil,
             is_terminal_station: false,
-            is_full_screen: false
+            is_dual_screen: false
 
   @type stop_id :: String.t()
 
@@ -34,22 +34,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           location_context: LocationContext.t(),
           informed_stations: list(String.t()),
           is_terminal_station: boolean(),
-          is_full_screen: boolean()
+          is_dual_screen: boolean()
         }
 
   @type serialized_response ::
-          takeover_serialized_response()
-          | fullscreen_serialized_response()
+          dual_screen_serialized_response()
+          | single_screen_serialized_response()
           | flex_serialized_response()
 
-  # Values shared in each response
-  # %{
-  #   issue: String.t(),
-  #   cause: String.t(),
-  #   effect: Alert.effect()
-  # }
-
-  @type takeover_serialized_response :: %{
+  @type dual_screen_serialized_response :: %{
           optional(:other_closures) => list(String.t()),
           issue: String.t(),
           remedy: String.t(),
@@ -66,13 +59,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           svg_name: String.t()
         }
 
-  @type fullscreen_serialized_response :: %{
-          # Unique to fullscreen station closures
+  @type single_screen_serialized_response :: %{
+          # Unique to station closures
           optional(:unaffected_routes) => list(enriched_route()),
           optional(:location) => String.t() | nil,
           optional(:remedy) => String.t(),
           optional(:stations) => list(String.t()),
-          # Unique to fullscreen
+          # Unique to single screen alerts
           optional(:endpoints) => list(String.t()),
           # Unique to transfer station case
           optional(:is_transfer_station) => boolean(),
@@ -292,19 +285,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp get_cause(:unknown), do: nil
   defp get_cause(cause), do: cause
 
-  def takeover_alert?(%__MODULE__{is_full_screen: false}), do: false
+  def dual_screen_alert?(%__MODULE__{is_dual_screen: false}), do: false
 
-  def takeover_alert?(%__MODULE__{is_terminal_station: is_terminal_station, alert: alert} = t) do
+  def dual_screen_alert?(%__MODULE__{is_terminal_station: is_terminal_station, alert: alert} = t) do
     Alert.effect(alert) in [:station_closure, :suspension, :shuttle] and
       LocalizedAlert.location(t, is_terminal_station) == :inside and
       LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
       (is_nil(Alert.direction_id(t.alert)) or is_terminal_station)
   end
 
-  @spec serialize_takeover_alert(t()) :: takeover_serialized_response()
-  defp serialize_takeover_alert(t)
+  @spec serialize_dual_screen_alert(t()) :: dual_screen_serialized_response()
+  defp serialize_dual_screen_alert(t)
 
-  defp serialize_takeover_alert(%__MODULE__{alert: %Alert{effect: :suspension} = alert} = t) do
+  defp serialize_dual_screen_alert(%__MODULE__{alert: %Alert{effect: :suspension} = alert} = t) do
     %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
     informed_entities = Alert.informed_entities(alert)
 
@@ -328,7 +321,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_takeover_alert(%__MODULE__{alert: %Alert{effect: :shuttle} = alert} = t) do
+  defp serialize_dual_screen_alert(%__MODULE__{alert: %Alert{effect: :shuttle} = alert} = t) do
     %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
     informed_entities = Alert.informed_entities(alert)
 
@@ -353,7 +346,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_takeover_alert(%__MODULE__{alert: %Alert{effect: :station_closure}} = t) do
+  defp serialize_dual_screen_alert(%__MODULE__{alert: %Alert{effect: :station_closure}} = t) do
     %{
       alert: %{cause: cause, updated_at: updated_at},
       now: now,
@@ -386,11 +379,41 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  @spec serialize_fullscreen_alert(t(), LocalizedAlert.location()) ::
-          fullscreen_serialized_response()
-  defp serialize_fullscreen_alert(t, location)
+  # When an alert violates our assumptions and we're unable to make a disruption diagram
+  # we show this fallback format for dual / single screen alerts
+  @spec serialize_dual_screen_fallback_alert(t()) :: dual_screen_serialized_response()
+  defp serialize_dual_screen_fallback_alert(%__MODULE__{alert: alert, now: now} = t) do
+    %{
+      issue: (if alert.effect == :station_closure, do: "Station closed", else: "No trains"),
+      remedy: (if alert.effect == :shuttle, do: "Use shuttle bus", else: "Seek alternate route"),
+      location: alert.header,
+      cause: format_cause(alert.cause),
+      routes: get_route_pills(t),
+      effect: alert.effect,
+      updated_at: format_updated_at(alert.updated_at, now)
+    }
+  end
 
-  defp serialize_fullscreen_alert(
+  @spec serialize_single_screen_fallback_alert(t(), LocalizedAlert.location()) :: single_screen_serialized_response()
+  defp serialize_single_screen_fallback_alert(%__MODULE__{alert: alert, now: now} = t, location) do
+    %{
+      issue: nil,
+      remedy: nil,
+      remedy_bold: alert.header,
+      location: nil,
+      cause: format_cause(alert.cause),
+      routes: get_route_pills(t, location),
+      effect: alert.effect,
+      updated_at: format_updated_at(alert.updated_at, now),
+      region: get_region_from_location(location)
+    }
+  end
+
+  @spec serialize_single_screen_alert(t(), LocalizedAlert.location()) ::
+          single_screen_serialized_response()
+  defp serialize_single_screen_alert(t, location)
+
+  defp serialize_single_screen_alert(
          %__MODULE__{alert: %Alert{effect: :suspension} = alert} = t,
          location
        ) do
@@ -446,7 +469,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_fullscreen_alert(
+  defp serialize_single_screen_alert(
          %__MODULE__{alert: %Alert{effect: :shuttle} = alert} = t,
          location
        ) do
@@ -499,7 +522,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Station closure for 1 line at a multi-line station
-  defp serialize_fullscreen_alert(
+  defp serialize_single_screen_alert(
          %__MODULE__{alert: %Alert{effect: :station_closure}} = t,
          :inside
        ) do
@@ -535,7 +558,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Downstream closure
-  defp serialize_fullscreen_alert(
+  defp serialize_single_screen_alert(
          %__MODULE__{alert: %Alert{effect: :station_closure}} = t,
          location
        ) do
@@ -559,7 +582,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_fullscreen_alert(
+  defp serialize_single_screen_alert(
          %__MODULE__{alert: %Alert{effect: :delay}} = t,
          location
        ) do
@@ -1030,15 +1053,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def serialize(widget, log_fn \\ &Logger.warn/1)
 
-  def serialize(%__MODULE__{is_full_screen: true} = t, log_fn) do
-    main_data =
-      if takeover_alert?(t) do
-        serialize_takeover_alert(t)
-      else
-        location = LocalizedAlert.location(t)
-        serialize_fullscreen_alert(t, location)
-      end
-
+  def serialize(%__MODULE__{is_dual_screen: true, alert: %Alert{effect: effect}} = t, log_fn) do
     diagram_data =
       case DisruptionDiagram.serialize(t) do
         {:ok, serialized_diagram} ->
@@ -1051,6 +1066,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
           %{}
       end
+
+    main_data = cond do
+      diagram_data == %{} and effect != :delay and dual_screen_alert?(t) ->
+        serialize_dual_screen_fallback_alert(t)
+      diagram_data == %{} and effect != :delay ->
+        location = LocalizedAlert.location(t)
+        serialize_single_screen_fallback_alert(t, location)
+      dual_screen_alert?(t) ->
+        serialize_dual_screen_alert(t)
+      true ->
+        location = LocalizedAlert.location(t)
+        serialize_single_screen_alert(t, location)
+    end
 
     Map.merge(main_data, diagram_data)
   end
@@ -1068,7 +1096,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def audio_sort_key(%__MODULE__{is_full_screen: true}), do: [2]
+  def audio_sort_key(%__MODULE__{is_dual_screen: true}), do: [2]
 
   def audio_sort_key(%__MODULE__{} = t) do
     case serialize(t) do
@@ -1078,21 +1106,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def priority(%__MODULE__{is_full_screen: true}), do: [1]
+  def priority(%__MODULE__{is_dual_screen: true}), do: [1]
   def priority(_t), do: [3]
 
-  def slot_names(%__MODULE__{is_full_screen: false}), do: [:large]
+  def slot_names(%__MODULE__{is_dual_screen: false}), do: [:large]
 
   def slot_names(%__MODULE__{} = t) do
-    if takeover_alert?(t),
+    if dual_screen_alert?(t),
       do: [:full_body],
       else: [:paged_main_content_left]
   end
 
-  def widget_type(%__MODULE__{is_full_screen: false}), do: :reconstructed_large_alert
+  def widget_type(%__MODULE__{is_dual_screen: false}), do: :reconstructed_large_alert
 
   def widget_type(%__MODULE__{} = t) do
-    if takeover_alert?(t),
+    if dual_screen_alert?(t),
       do: :reconstructed_takeover,
       else: :single_screen_alert
   end
@@ -1125,7 +1153,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       do:
         if(ReconstructedAlert.widget_type(t) == :reconstructed_large_alert,
           do: ScreensWeb.V2.Audio.ReconstructedAlertView,
-          else: ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView
+          else: ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView
         )
   end
 

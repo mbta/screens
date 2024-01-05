@@ -1,4 +1,4 @@
-defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
+defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
   use ScreensWeb, :view
 
   alias Screens.Alerts.Alert
@@ -167,6 +167,19 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertFullscreenView do
       ~E|There are no <%= get_line_name(route_svg_names) %> trains<%= render_cause(cause) %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %>.|
     else
       ~E|This station is closed<%= render_cause(cause) %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %>.|
+    end
+  end
+
+  # Fallback
+  def render_alert(%{
+    issue: issue,
+    remedy: remedy,
+    remedy_bold: remedy_bold,
+  }) do
+    if !is_nil(remedy_bold) do
+      ~E|<%= remedy_bold %>.|
+    else
+      ~E|<%= issue %>. <%= remedy %>|
     end
   end
 
