@@ -181,19 +181,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Given an entity and the directionality of the alert from the home stop,
   # return a tuple with the affected direction_id and route id
-  defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, location)
-       when location == :downstream,
-       do: {0, route}
+  defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, :downstream),
+    do: {0, route}
 
-  defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, location)
-       when location == :upstream,
-       do: {1, route}
+  defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, :upstream),
+    do: {1, route}
 
-  defp get_direction_and_route_from_entity(
-         %{direction_id: direction_id, route: route},
-         _location
-       ),
-       do: {direction_id, route}
+  defp get_direction_and_route_from_entity(%{direction_id: direction_id, route: route}, _),
+    do: {direction_id, route}
 
   defp get_route_pills(t, location \\ nil)
 
