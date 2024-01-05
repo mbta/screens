@@ -369,6 +369,16 @@ const PreFareSingleScreenAlert: React.ComponentType<
         />
       );
       break;
+    case !disruption_diagram:
+      layout = (
+        <FallbackLayout
+          issue={issue}
+          remedy={remedy}
+          remedyBold={remedy_bold}
+          effect={effect}
+        />
+      );
+      break;
     case effect === "station_closure" && region === "here":
       layout = (
         <MultiLineLayout
@@ -388,7 +398,6 @@ const PreFareSingleScreenAlert: React.ComponentType<
           disruptionDiagram={disruption_diagram}
         />
       );
-
       break;
     case (region === "boundary" || region === "here") &&
       (effect === "shuttle" || effect === "suspension"):
