@@ -278,7 +278,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     |> List.update_at(length(list) - 1, &" & #{&1}")
     |> Enum.join(", #")
     |> String.split("#")
-    |> Enum.map(fn string -> %{format: :nowrap, text: "#{string}"} end)
+    |> Enum.map(fn string -> %{format: :nowrap, text: string} end)
     |> Enum.intersperse("")
   end
 
