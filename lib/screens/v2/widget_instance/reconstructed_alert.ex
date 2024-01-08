@@ -275,7 +275,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp format_station_name_list(list) do
     list
-    |> List.update_at(length(list) - 1, &" & #{&1}")
+    |> List.update_at(-1, &" & #{&1}")
     |> Enum.join(", #")
     |> String.split("#")
     |> Enum.map(fn string -> %{format: :nowrap, text: string} end)
