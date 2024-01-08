@@ -176,10 +176,10 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         remedy: remedy,
         remedy_bold: remedy_bold
       }) do
-    if !is_nil(remedy_bold) do
-      ~E|<%= remedy_bold %>.|
-    else
+    if is_nil(remedy_bold) do
       ~E|<%= issue %>. <%= remedy %>|
+    else
+      ~E|<%= remedy_bold %>.|
     end
   end
 

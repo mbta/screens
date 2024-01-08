@@ -1068,22 +1068,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           %{}
       end
 
-    main_data =
-      cond do
-        diagram_data == %{} and effect != :delay and dual_screen_alert?(t) ->
-          serialize_dual_screen_fallback_alert(t)
-
-        diagram_data == %{} and effect != :delay ->
-          location = LocalizedAlert.location(t)
-          serialize_single_screen_fallback_alert(t, location)
-
-        dual_screen_alert?(t) ->
-          serialize_dual_screen_alert(t)
-
-        true ->
-          location = LocalizedAlert.location(t)
-          serialize_single_screen_alert(t, location)
-      end
+    main_data = pick_layout_serializer(diagram_data, effect, dual_screen_alert?(t))
 
     Map.merge(main_data, diagram_data)
   end
@@ -1099,6 +1084,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location when location in [:downstream, :upstream] ->
         t |> serialize_outside_alert(location) |> Map.put(:region, :outside)
     end
+  end
+
+  def pick_layout_serializer(%{}, effect, true) when effect != :delay, do: serialize_dual_screen_fallback_alert(t)
+  def pick_layout_serializer(%{}, effect, false) when effect != :delay do
+    location = LocalizedAlert.location(t)
+    serialize_single_screen_fallback_alert(t, location)
+  end
+  def pick_layout_serializer(_, _, true), do: serialize_dual_screen_alert(t)
+  def pick_layout_serializer(_, _, _) do
+    location = LocalizedAlert.location(t)
+    serialize_single_screen_alert(t, location)
   end
 
   def audio_sort_key(%__MODULE__{is_dual_screen: true}), do: [2]
