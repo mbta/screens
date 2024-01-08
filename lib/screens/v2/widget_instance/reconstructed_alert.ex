@@ -1068,7 +1068,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           %{}
       end
 
-    main_data = pick_layout_serializer(diagram_data, effect, dual_screen_alert?(t))
+    main_data = pick_layout_serializer(t, diagram_data, effect, dual_screen_alert?(t))
 
     Map.merge(main_data, diagram_data)
   end
@@ -1086,13 +1086,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def pick_layout_serializer(%{}, effect, true) when effect != :delay, do: serialize_dual_screen_fallback_alert(t)
-  def pick_layout_serializer(%{}, effect, false) when effect != :delay do
+  def pick_layout_serializer(t, %{}, effect, true) when effect != :delay, do: serialize_dual_screen_fallback_alert(t)
+  def pick_layout_serializer(t, %{}, effect, false) when effect != :delay do
     location = LocalizedAlert.location(t)
     serialize_single_screen_fallback_alert(t, location)
   end
-  def pick_layout_serializer(_, _, true), do: serialize_dual_screen_alert(t)
-  def pick_layout_serializer(_, _, _) do
+  def pick_layout_serializer(t, _, _, true), do: serialize_dual_screen_alert(t)
+  def pick_layout_serializer(t, _, _, _) do
     location = LocalizedAlert.location(t)
     serialize_single_screen_alert(t, location)
   end
