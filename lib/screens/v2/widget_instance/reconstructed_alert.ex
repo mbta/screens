@@ -12,6 +12,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{FreeText, FreeTextLine}
 
   require Logger
 
@@ -53,7 +54,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           optional(:other_closures) => list(String.t()),
           issue: String.t(),
           remedy: String.t(),
-          location: String.t(),
+          location: String.t() | FreeTextLine.t(),
           cause: String.t(),
           effect: :suspension | :shuttle | :station_closure,
           updated_at: String.t(),
@@ -281,6 +282,29 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp format_short_route_pill(route_id),
     do: route_id |> String.first() |> String.downcase() |> Kernel.<>("l")
 
+  # Alert subheaders should not wrap in the middle of a station name
+  # so we have to use FreeTextLines to prevent the wrapping.
+  # This function takes a list of proper noun strings and
+  # returns a list of FreeTextLines with "nowrap" applied
+  @spec format_station_name_list([String.t()]) :: list(FreeText.t())
+  defp format_station_name_list([string]), do: [%{format: :nowrap, text: "#{string}"}]
+
+  defp format_station_name_list([s1, s2]),
+    do: [
+      %{format: :nowrap, text: "#{s1}"},
+      " & ",
+      %{format: :nowrap, text: "#{s2}"}
+    ]
+
+  defp format_station_name_list(list) do
+    list
+    |> List.update_at(-1, &" & #{&1}")
+    |> Enum.join(", #")
+    |> String.split("#")
+    |> Enum.map(fn string -> %{format: :nowrap, text: string} end)
+    |> Enum.intersperse("")
+  end
+
   defp get_region_from_location(:inside), do: :here
 
   defp get_region_from_location(location)
@@ -361,15 +385,24 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       informed_stations: informed_stations
     } = t
 
-    informed_stations_string = Util.format_name_list_to_string(informed_stations)
+    # Alert subheaders should not wrap in the middle of a station name
+    # so we have to use FreeTextLines to prevent the wrapping
+    informed_stations_free_text = format_station_name_list(informed_stations)
 
     location_text =
       case LocalizedAlert.consolidated_informed_subway_routes(t) do
         [route_id] ->
-          "#{route_id} Line trains skip #{informed_stations_string}"
+          %FreeTextLine{
+            icon: nil,
+            text: ["#{route_id} Line trains skip "] ++ informed_stations_free_text
+          }
 
         [route_id1, route_id2] ->
-          "The #{route_id1} Line and #{route_id2} Line skip #{informed_stations_string}"
+          %FreeTextLine{
+            icon: nil,
+            text:
+              ["The #{route_id1} Line and #{route_id2} Line skip "] ++ informed_stations_free_text
+          }
       end
 
     other_closures = List.delete(informed_stations, stop_name)

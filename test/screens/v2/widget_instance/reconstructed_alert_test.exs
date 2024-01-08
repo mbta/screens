@@ -542,7 +542,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected = %{
         issue: "Station closed",
-        location: "Orange Line trains skip Malden Center",
+        location: %ScreensConfig.V2.FreeTextLine{
+          icon: nil,
+          text: ["Orange Line trains skip ", %{format: :nowrap, text: "Malden Center"}]
+        },
         cause: nil,
         effect: :station_closure,
         remedy: "Seek alternate route",
