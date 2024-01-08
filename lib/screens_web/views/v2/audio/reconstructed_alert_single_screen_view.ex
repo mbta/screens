@@ -172,10 +172,10 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
 
   # Fallback
   def render_alert(%{
-    issue: issue,
-    remedy: remedy,
-    remedy_bold: remedy_bold,
-  }) do
+        issue: issue,
+        remedy: remedy,
+        remedy_bold: remedy_bold
+      }) do
     if !is_nil(remedy_bold) do
       ~E|<%= remedy_bold %>.|
     else

@@ -384,8 +384,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @spec serialize_dual_screen_fallback_alert(t()) :: dual_screen_serialized_response()
   defp serialize_dual_screen_fallback_alert(%__MODULE__{alert: alert, now: now} = t) do
     %{
-      issue: (if alert.effect == :station_closure, do: "Station closed", else: "No trains"),
-      remedy: (if alert.effect == :shuttle, do: "Use shuttle bus", else: "Seek alternate route"),
+      issue: if(alert.effect == :station_closure, do: "Station closed", else: "No trains"),
+      remedy: if(alert.effect == :shuttle, do: "Use shuttle bus", else: "Seek alternate route"),
       location: alert.header,
       cause: format_cause(alert.cause),
       routes: get_route_pills(t),
@@ -394,7 +394,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  @spec serialize_single_screen_fallback_alert(t(), LocalizedAlert.location()) :: single_screen_serialized_response()
+  @spec serialize_single_screen_fallback_alert(t(), LocalizedAlert.location()) ::
+          single_screen_serialized_response()
   defp serialize_single_screen_fallback_alert(%__MODULE__{alert: alert, now: now} = t, location) do
     %{
       issue: nil,
@@ -1067,18 +1068,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           %{}
       end
 
-    main_data = cond do
-      diagram_data == %{} and effect != :delay and dual_screen_alert?(t) ->
-        serialize_dual_screen_fallback_alert(t)
-      diagram_data == %{} and effect != :delay ->
-        location = LocalizedAlert.location(t)
-        serialize_single_screen_fallback_alert(t, location)
-      dual_screen_alert?(t) ->
-        serialize_dual_screen_alert(t)
-      true ->
-        location = LocalizedAlert.location(t)
-        serialize_single_screen_alert(t, location)
-    end
+    main_data =
+      cond do
+        diagram_data == %{} and effect != :delay and dual_screen_alert?(t) ->
+          serialize_dual_screen_fallback_alert(t)
+
+        diagram_data == %{} and effect != :delay ->
+          location = LocalizedAlert.location(t)
+          serialize_single_screen_fallback_alert(t, location)
+
+        dual_screen_alert?(t) ->
+          serialize_dual_screen_alert(t)
+
+        true ->
+          location = LocalizedAlert.location(t)
+          serialize_single_screen_alert(t, location)
+      end
 
     Map.merge(main_data, diagram_data)
   end
