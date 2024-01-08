@@ -1086,12 +1086,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def pick_layout_serializer(t, %{}, effect, true) when effect != :delay, do: serialize_dual_screen_fallback_alert(t)
-  def pick_layout_serializer(t, %{}, effect, false) when effect != :delay do
+  def pick_layout_serializer(t, diagram, effect, true) when diagram == %{} and effect != :delay,
+    do: serialize_dual_screen_fallback_alert(t)
+
+  def pick_layout_serializer(t, diagram, effect, false)
+      when diagram == %{} and effect != :delay do
     location = LocalizedAlert.location(t)
     serialize_single_screen_fallback_alert(t, location)
   end
+
   def pick_layout_serializer(t, _, _, true), do: serialize_dual_screen_alert(t)
+
   def pick_layout_serializer(t, _, _, _) do
     location = LocalizedAlert.location(t)
     serialize_single_screen_alert(t, location)
