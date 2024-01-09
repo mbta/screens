@@ -11,6 +11,7 @@ import {
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 import { standardTimeRepresentation } from "Util/time_representation";
+import moment from "moment";
 
 const WIDE_MINI_PILL_ROUTES = ["441/442"];
 
@@ -137,10 +138,29 @@ const PlaceholderMessage = ({ pill, text }): JSX.Element => (
   </div>
 );
 
-const NoDeparturesMessage = ({ pill }): JSX.Element => {
-  return (
-    <PlaceholderMessage pill={pill} text="No departures currently available" />
+const isDuringSurge = () => {
+  const now = moment();
+  const isDuringFirstRange = now.isBetween(
+    moment("2024-01-03T09:30:00Z"),
+    moment("2024-01-13T07:30:00Z")
   );
+
+  const isDuringSecondRange = now.isBetween(
+    moment("2024-01-16T09:30:00Z"),
+    moment("2024-01-29T07:30:00Z")
+  );
+
+  return isDuringFirstRange || isDuringSecondRange;
+};
+
+const NoDeparturesMessage = ({ pill, stationName }): JSX.Element => {
+  let placeholderText = "No departures currently available";
+
+  if (stationName === "Haymarket" && isDuringSurge()) {
+    placeholderText = "Service Suspended";
+  }
+
+  return <PlaceholderMessage pill={pill} text={placeholderText} />;
 };
 
 const NoDataMessage = ({ pill }): JSX.Element => {
@@ -544,6 +564,7 @@ const Section = ({
   pill,
   headway: { active, headsigns, range_low: rangeLow, range_high: rangeHigh },
   disabled,
+  stationName,
 }): JSX.Element => {
   departures = departures.slice(0, numRows);
 
@@ -565,7 +586,7 @@ const Section = ({
         {disabled ? (
           <NoDataMessage pill={pill} />
         ) : (
-          <NoDeparturesMessage pill={pill} />
+          <NoDeparturesMessage pill={pill} stationName={stationName} />
         )}
       </SectionFrame>
     );
