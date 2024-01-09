@@ -22,7 +22,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             location_context: nil,
             informed_stations: nil,
             is_terminal_station: false,
-            is_dual_screen: false
+            # Full screen alert, whether that's a single or dual screen alert
+            is_full_screen: false
 
   @type stop_id :: String.t()
 
@@ -35,7 +36,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           location_context: LocationContext.t(),
           informed_stations: list(String.t()),
           is_terminal_station: boolean(),
-          is_dual_screen: boolean()
+          is_full_screen: boolean()
         }
 
   @type serialized_response ::
@@ -309,7 +310,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp get_cause(:unknown), do: nil
   defp get_cause(cause), do: cause
 
-  def dual_screen_alert?(%__MODULE__{is_dual_screen: false}), do: false
+  def dual_screen_alert?(%__MODULE__{is_full_screen: false}), do: false
 
   def dual_screen_alert?(%__MODULE__{is_terminal_station: is_terminal_station, alert: alert} = t) do
     Alert.effect(alert) in [:station_closure, :suspension, :shuttle] and
@@ -1087,7 +1088,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def serialize(widget, log_fn \\ &Logger.warn/1)
 
-  def serialize(%__MODULE__{is_dual_screen: true, alert: %Alert{effect: effect}} = t, log_fn) do
+  def serialize(%__MODULE__{is_full_screen: true, alert: %Alert{effect: effect}} = t, log_fn) do
     diagram_data =
       case DisruptionDiagram.serialize(t) do
         {:ok, serialized_diagram} ->
@@ -1135,7 +1136,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     serialize_single_screen_alert(t, location)
   end
 
-  def audio_sort_key(%__MODULE__{is_dual_screen: true}), do: [2]
+  def audio_sort_key(%__MODULE__{is_full_screen: true}), do: [2]
 
   def audio_sort_key(%__MODULE__{} = t) do
     case serialize(t) do
@@ -1145,10 +1146,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def priority(%__MODULE__{is_dual_screen: true}), do: [1]
+  def priority(%__MODULE__{is_full_screen: true}), do: [1]
   def priority(_t), do: [3]
 
-  def slot_names(%__MODULE__{is_dual_screen: false}), do: [:large]
+  def slot_names(%__MODULE__{is_full_screen: false}), do: [:large]
 
   def slot_names(%__MODULE__{} = t) do
     if dual_screen_alert?(t),
@@ -1156,7 +1157,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       else: [:paged_main_content_left]
   end
 
-  def widget_type(%__MODULE__{is_dual_screen: false}), do: :reconstructed_large_alert
+  def widget_type(%__MODULE__{is_full_screen: false}), do: :reconstructed_large_alert
 
   def widget_type(%__MODULE__{} = t) do
     if dual_screen_alert?(t),

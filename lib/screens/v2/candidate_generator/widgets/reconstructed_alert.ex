@@ -150,7 +150,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   defp create_alert_instances(
          alerts,
-         is_dual_screen,
+         is_full_screen,
          config: config,
          location_context: location_context,
          fetch_stop_name_fn: fetch_stop_name_fn,
@@ -165,7 +165,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         location_context: location_context,
         informed_stations: get_stations(alert, fetch_stop_name_fn),
         is_terminal_station: is_terminal_station,
-        is_dual_screen: is_dual_screen
+        is_full_screen: is_full_screen
       }
     end)
   end
