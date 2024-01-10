@@ -33,6 +33,17 @@ const R = 165;
 // so the width available to the rest of the diagram is 904 - (L + R)
 const W = MAX_WIDTH - (L + R);
 
+// List of abbreviated stations
+const abbreviationList: {[string: string]: string} = {
+  "Boston University Center": "BU Central",
+  "Boston University East": "BU East",
+  "Downtown Crossing": "Downtown Xng",
+  "Government Center": "Gov't Center",
+  "Hynes Convention Center": "Hynes",
+  "Massachusetts Avenue": "Mass Ave",
+  "Tufts Medical Center": "Tufts Medical Ctr"
+}
+
 type DisruptionDiagramData =
   | ContinuousDisruptionDiagram
   | DiscreteDisruptionDiagram;
@@ -442,8 +453,8 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
           className={classWithModifier(`label-${labelTextClass}`, textModifier)}
           transform={`translate(0 -32) rotate(-45)`}
         >
-          {abbreviate || label.full === "Massachusetts Avenue"
-            ? label.abbrev
+          {abbreviate && Object.keys(abbreviationList).includes(label.full)
+            ? abbreviationList[label.full]
             : label.full}
         </text>
       )}
