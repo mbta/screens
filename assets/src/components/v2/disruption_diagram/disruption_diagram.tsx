@@ -689,8 +689,8 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
             xScaleFactor,
             yScaleFactor
           );
+          setScaleFactor(factor);
           setTimeout(() => {
-            setScaleFactor(factor);
             setIsDone(true);
           }, 200);
         }
