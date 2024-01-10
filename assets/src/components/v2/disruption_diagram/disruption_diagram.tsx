@@ -604,6 +604,8 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   const [doAbbreviate, setDoAbbreviate] = useState(false);
   const [scaleFactor, setScaleFactor] = useState(1);
+  const [isDone, setIsDone] = useState(false);
+
   const numStops = slots.length;
   const spaceBetween = Math.min(
     60,
@@ -656,8 +658,6 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   x += spaceBetween + SLOT_WIDTH;
 
-  const [isDone, setIsDone] = useState(false);
-
   // Get the size of the diagram svg, excluding emphasis
   let dimensions = document.getElementById("line-map")?.getBoundingClientRect();
   let height = dimensions?.height ?? 0;
@@ -670,21 +670,30 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     width = dimensions?.width ?? 0;
 
     if (svgHeight != 0 && width && height) {
+      // But actually height should be registering as 597.8??
+      // It's because labels aren't added until later...
+
+      console.log("svg has height, and line-map has height: ", height, " width: ", width)
       // if scaleFactor has already been applied to the line-map, we need to reverse that
-      height = height / scaleFactor;
-      width = width / scaleFactor;
+      const unscaledHeight = height / scaleFactor;
+      const unscaledWidth = width / scaleFactor;
+      console.log("unscaled height: ", unscaledHeight, "width: ", unscaledWidth)
 
       // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
-      const xScaleFactor = 904 / width;
+      let xScaleFactor = 904 / unscaledWidth;
+      // Round down to the tenth's place
+      // xScaleFactor = Math.floor(xScaleFactor * 10)/10
+      console.log("scale factor", xScaleFactor)
 
-      const needsAbbreviating =
-        height * xScaleFactor + getEmphasisHeight(xScaleFactor) > svgHeight &&
-        !doAbbreviate;
+      console.log("that would make height / width: ", unscaledHeight * xScaleFactor, unscaledWidth * xScaleFactor)
+      
+      const needsAbbreviating = !doAbbreviate &&
+        unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) > svgHeight;
       if (needsAbbreviating) {
         setDoAbbreviate(true);
         // now scale y, which requires re-running this effect
       } else {
-        const yScaleFactor = (svgHeight - getEmphasisHeight(1)) / height
+        const yScaleFactor = (svgHeight - getEmphasisHeight(1)) / unscaledHeight
         const factor = Math.min(
           xScaleFactor,
           yScaleFactor
@@ -723,7 +732,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       // still log an error if it's a negative number when it's not-yet-visible
       viewBox={`0 ${-viewBoxOffset} 904 ${height + getEmphasisHeight(scaleFactor)}`}
       transform={`translate(${translateX})`}
-      visibility={isDone ? "visible" : "hidden"}
+      visibility={isDone ? "visible" : "visible"}
     >
       <g transform={`translate(${L * scaleFactor} 0)`}>
         <g id="line-map" transform={`scale(${scaleFactor})`}>
