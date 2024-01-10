@@ -131,7 +131,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         [
           "place-ogmnl",
           "place-haecl",
+          "place-state",
           "place-dwnxg",
+          "place-chncl",
           "place-forhl"
         ]
       ],
@@ -477,7 +479,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     end
   end
 
-  describe "serialize_takeover_alert/1 single line station" do
+  describe "serialize_dual_screen_alert/1 single line station" do
     setup @one_line_station_alert_widget_context_setup_group ++ [:setup_active_period]
 
     test "handles suspension", %{widget: widget} do
@@ -485,21 +487,35 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1),
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_full_screen(true)
 
       expected = %{
-        issue: "No trains",
-        location: "No Orange Line trains at Malden Center",
+        issue: "No trains to Forest Hills",
+        location: "No Orange Line trains between Malden Center and Wellington",
         cause: nil,
         effect: :suspension,
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
-        # Odd range, but not a normal alert situation
-        endpoints: {"Malden Center", "Malden Center"}
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        endpoints: {"Malden Center", "Wellington"},
+        disruption_diagram: %{
+          current_station_slot_index: 1,
+          effect: :suspension,
+          effect_region_slot_index_range: {1, 2},
+          line: :orange,
+          slots: [
+            %{label_id: "place-ogmnl", type: :terminal},
+            %{label: %{abbrev: "Malden Ctr", full: "Malden Center"}, show_symbol: true},
+            %{label: %{abbrev: "Wellington", full: "Wellington"}, show_symbol: true},
+            %{label_id: "place-astao", type: :terminal}
+          ]
+        },
+        is_transfer_station: false,
+        region: :boundary
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -508,23 +524,38 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     test "handles shuttle", %{widget: widget} do
       widget =
         widget
+        |> put_home_stop(PreFare, "place-welln")
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop: "place-welln", route: "Orange", route_type: 1),
+          ie(stop: "place-astao", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_full_screen(true)
 
       expected = %{
-        issue: "No trains",
-        location: "Shuttle buses replace Orange Line trains at Malden Center",
+        issue: "No trains to Forest Hills",
+        location: "Shuttle buses between Wellington and Assembly",
         cause: nil,
         effect: :shuttle,
         remedy: "Use shuttle bus",
         updated_at: "Friday, 5:00 am",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
-        # Odd range, but not a normal alert situation
-        endpoints: {"Malden Center", "Malden Center"}
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        endpoints: {"Wellington", "Assembly"},
+        region: :boundary,
+        is_transfer_station: false,
+        disruption_diagram: %{
+          current_station_slot_index: 2,
+          effect: :shuttle,
+          effect_region_slot_index_range: {2, 3},
+          line: :orange,
+          slots: [
+            %{label_id: "place-ogmnl", type: :terminal},
+            %{label: %{abbrev: "Malden Ctr", full: "Malden Center"}, show_symbol: true},
+            %{label: %{abbrev: "Wellington", full: "Wellington"}, show_symbol: true},
+            %{label_id: "place-astao", type: :terminal}
+          ]
+        }
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -572,23 +603,38 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     test "handles alert with cause", %{widget: widget} do
       widget =
         widget
+        |> put_home_stop(PreFare, "place-welln")
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop: "place-welln", route: "Orange", route_type: 1),
+          ie(stop: "place-astao", route: "Orange", route_type: 1)
         ])
         |> put_cause(:construction)
         |> put_is_full_screen(true)
 
       expected = %{
-        issue: "No trains",
-        location: "No Orange Line trains at Malden Center",
-        cause: "construction",
+        issue: "No trains to Forest Hills",
+        location: "No Orange Line trains between Wellington and Assembly",
+        cause: :construction,
         effect: :suspension,
         remedy: "Seek alternate route",
         updated_at: "Friday, 5:00 am",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
-        # Odd range, but not a normal alert situation
-        endpoints: {"Malden Center", "Malden Center"}
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        endpoints: {"Wellington", "Assembly"},
+        disruption_diagram: %{
+          current_station_slot_index: 2,
+          effect: :suspension,
+          effect_region_slot_index_range: {2, 3},
+          line: :orange,
+          slots: [
+            %{label_id: "place-ogmnl", type: :terminal},
+            %{label: %{abbrev: "Malden Ctr", full: "Malden Center"}, show_symbol: true},
+            %{label: %{abbrev: "Wellington", full: "Wellington"}, show_symbol: true},
+            %{label_id: "place-astao", type: :terminal}
+          ]
+        },
+        is_transfer_station: false,
+        region: :boundary
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -882,7 +928,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop: "place-welln", route: "Orange", route_type: 1)
+          ie(stop: "place-welln", route: "Orange", route_type: 1),
+          ie(stop: "place-astao", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_full_screen(true)
@@ -896,8 +943,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Shuttle buses available",
         updated_at: "Friday, 5:00 am",
         region: :outside,
-        endpoints: {"Wellington", "Wellington"},
-        is_transfer_station: false
+        endpoints: {"Wellington", "Assembly"},
+        is_transfer_station: false,
+        disruption_diagram: %{
+          current_station_slot_index: 1,
+          effect: :shuttle,
+          effect_region_slot_index_range: {2, 3},
+          line: :orange,
+          slots: [
+            %{label_id: "place-ogmnl", type: :terminal},
+            %{label: %{abbrev: "Malden Ctr", full: "Malden Center"}, show_symbol: true},
+            %{label: %{abbrev: "Wellington", full: "Wellington"}, show_symbol: true},
+            %{label_id: "place-astao", type: :terminal}
+          ]
+        }
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -988,22 +1047,39 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop: "place-dwnxg", route: "Orange", route_type: 1)
+          ie(stop: "place-chncl", route: "Orange", route_type: 1),
+          ie(stop: "place-dwnxg", route: "Orange", route_type: 1),
+          ie(stop: "place-state", route: "Orange", route_type: 1),
+          ie(stop: "place-haecl", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_full_screen(true)
 
       expected = %{
-        issue: "No Orange Line trains",
-        remedy: "Seek alternate route",
         cause: nil,
-        location: "No Orange Line trains at Downtown Crossing",
-        routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :suspension,
-        updated_at: "Friday, 5:00 am",
+        endpoints: {"Haymarket", "Chinatown"},
+        is_transfer_station: true,
+        issue: "No Orange Line trains",
+        location: "No Orange Line trains between Haymarket and Chinatown",
         region: :here,
-        endpoints: {"Downtown Crossing", "Downtown Crossing"},
-        is_transfer_station: true
+        remedy: "Seek alternate route",
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        updated_at: "Friday, 5:00 am",
+        disruption_diagram: %{
+          current_station_slot_index: 3,
+          effect: :suspension,
+          effect_region_slot_index_range: {1, 4},
+          line: :orange,
+          slots: [
+            %{label_id: "place-ogmnl", type: :terminal},
+            %{label: %{abbrev: "Haymarket", full: "Haymarket"}, show_symbol: true},
+            %{label: %{abbrev: "State", full: "State"}, show_symbol: true},
+            %{label: %{abbrev: "Downt'n Xng", full: "Downtown Crossing"}, show_symbol: true},
+            %{label: %{abbrev: "Chinatown", full: "Chinatown"}, show_symbol: true},
+            %{label_id: "place-forhl", type: :terminal}
+          ]
+        }
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -1014,7 +1090,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop: "place-dwnxg", route: "Orange", route_type: 1)
+          ie(stop: "place-state", route: "Orange", route_type: 1),
+          ie(stop: "place-dwnxg", route: "Orange", route_type: 1),
+          ie(stop: "place-chncl", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_full_screen(true)
@@ -1023,13 +1101,27 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No Orange Line trains",
         remedy: "Use shuttle bus",
         cause: nil,
-        location: "Shuttle buses at Downtown Crossing",
+        location: "Shuttle buses between State and Chinatown",
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :shuttle,
         updated_at: "Friday, 5:00 am",
         region: :here,
-        endpoints: {"Downtown Crossing", "Downtown Crossing"},
-        is_transfer_station: true
+        endpoints: {"State", "Chinatown"},
+        is_transfer_station: true,
+        disruption_diagram: %{
+          current_station_slot_index: 3,
+          effect: :shuttle,
+          effect_region_slot_index_range: {2, 4},
+          line: :orange,
+          slots: [
+            %{label_id: "place-ogmnl", type: :terminal},
+            %{label: %{abbrev: "Haymarket", full: "Haymarket"}, show_symbol: true},
+            %{label: %{abbrev: "State", full: "State"}, show_symbol: true},
+            %{label: %{abbrev: "Downt'n Xng", full: "Downtown Crossing"}, show_symbol: true},
+            %{label: %{abbrev: "Chinatown", full: "Chinatown"}, show_symbol: true},
+            %{label_id: "place-forhl", type: :terminal}
+          ]
+        }
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -1410,6 +1502,58 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         urgent: false,
         region: :outside,
         remedy: "Seek alternate route"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
+
+    test "two screen fallback layout for an alert that violates assumptions (suspension that's only 1 stop)",
+         %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_alert_header("Simulation of PIO text")
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_full_screen(true)
+
+      expected = %{
+        cause: nil,
+        effect: :suspension,
+        issue: "No trains",
+        location: "Simulation of PIO text",
+        remedy: "Seek alternate route",
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        updated_at: "Friday, 5:00 am"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
+
+    test "one screen fallback layout for an alert that violates assumptions (suspension that's only 1 stop)",
+         %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_alert_header("Simulation of PIO text")
+        |> put_informed_entities([
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_full_screen(true)
+
+      expected = %{
+        cause: nil,
+        effect: :suspension,
+        issue: nil,
+        location: nil,
+        remedy: nil,
+        routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
+        updated_at: "Friday, 5:00 am",
+        region: :outside,
+        remedy_bold: "Simulation of PIO text"
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -2457,16 +2601,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       # Fullscreen test
       expected = %{
-        issue: "No trains to North Station & North",
-        location: "Shuttle buses between Union Square and Government Center",
         cause: nil,
-        routes: [%{route_id: "Green", svg_name: "gl"}],
         effect: :shuttle,
-        remedy: "Use shuttle bus",
-        updated_at: "Friday, 2:24 pm",
+        issue: nil,
+        location: nil,
         region: :boundary,
-        endpoints: {"Union Square", "Government Center"},
-        is_transfer_station: false
+        remedy: nil,
+        routes: [%{route_id: "Green", svg_name: "gl"}],
+        updated_at: "Friday, 2:24 pm",
+        remedy_bold:
+          "Green Line is replaced by shuttle buses between Government Center and Union Square due to a structural issue with the Government Center Garage. Shuttle buses are not servicing Haymarket Station."
       }
 
       assert expected == ReconstructedAlert.serialize(alert_widget, &fake_log/1)

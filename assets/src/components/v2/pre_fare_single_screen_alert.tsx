@@ -18,6 +18,7 @@ interface PreFareSingleScreenAlertProps {
   location: string;
   cause: string;
   remedy: string;
+  remedy_bold?: string;
   routes: EnrichedRoute[];
   unaffected_routes: EnrichedRoute[];
   endpoints: string[];
@@ -161,12 +162,14 @@ const MultiLineLayout: React.ComponentType<MultiLineLayoutProps> = ({
 interface FallbackLayoutProps {
   issue: string;
   remedy: string;
+  remedyBold?: string;
   effect: string;
 }
 
 const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
   issue,
   remedy,
+  remedyBold,
   effect,
 }) => {
   const { ref: pioTextBlockRef, size: pioSecondaryTextSize } = useTextResizer({
@@ -177,21 +180,21 @@ const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
 
   const icon =
     effect === "delay" ? (
-      <ClockIcon className="alert-card__pio-text__icon" />
+      <ClockIcon className="alert-card__fallback__icon" />
     ) : effect === "shuttle" ? (
-      <ShuttleBusIcon className="alert-card__pio-text__icon" />
+      <ShuttleBusIcon className="alert-card__fallback__icon" />
     ) : (
-      <NoServiceIcon className="alert-card__pio-text__icon" />
+      <NoServiceIcon className="alert-card__fallback__icon" />
     );
 
   return (
-    <div className="alert-card__pio-text">
+    <div className="alert-card__fallback">
       {icon}
-      {issue && <div className="alert-card__pio-text__main-text">{issue}</div>}
+      {issue && <div className="alert-card__fallback__issue-text">{issue}</div>}
       {remedy && (
         <div
           className={classWithModifier(
-            "alert-card__pio-text__secondary-text",
+            "alert-card__fallback__pio-text",
             pioSecondaryTextSize
           )}
           ref={pioTextBlockRef}
@@ -199,6 +202,11 @@ const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
           {remedy}
         </div>
       )}
+      {remedyBold &&
+        <div className="alert-card__fallback__pio-text alert-card__fallback__pio-text--bold">
+            {remedyBold}
+        </div>
+      }
     </div>
   );
 };
@@ -335,6 +343,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
     issue,
     location,
     remedy,
+    remedy_bold,
     routes,
     unaffected_routes,
     updated_at,
@@ -360,6 +369,16 @@ const PreFareSingleScreenAlert: React.ComponentType<
         />
       );
       break;
+    case !disruption_diagram:
+      layout = (
+        <FallbackLayout
+          issue={issue}
+          remedy={remedy}
+          remedyBold={remedy_bold}
+          effect={effect}
+        />
+      );
+      break;
     case effect === "station_closure" && region === "here":
       layout = (
         <MultiLineLayout
@@ -379,7 +398,6 @@ const PreFareSingleScreenAlert: React.ComponentType<
           disruptionDiagram={disruption_diagram}
         />
       );
-
       break;
     case (region === "boundary" || region === "here") &&
       (effect === "shuttle" || effect === "suspension"):
@@ -410,6 +428,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
         <FallbackLayout
           issue={issue}
           remedy={remedy}
+          remedyBold={remedy_bold}
           effect={effect}
         />
       );

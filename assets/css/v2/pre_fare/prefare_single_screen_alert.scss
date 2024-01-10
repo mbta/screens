@@ -108,24 +108,27 @@
     }
   }
 
-  .alert-card__pio-text__icon {
+  .alert-card__fallback__icon {
     height: 192px;
     color: #171f26;
     margin-bottom: 48px;
   }
-  .alert-card__pio-text__main-text {
+  .alert-card__fallback__issue-text {
     font-size: 88px;
     line-height: 105.6px;
     font-weight: 700;
     margin-bottom: 54px;
   }
-  .alert-card__pio-text__secondary-text {
+  .alert-card__fallback__pio-text {
     font-size: 68px;
     line-height: 81px;
     font-weight: 500;
     &--small {
       font-size: 55.1px;
       line-height: 65.63px;
+    }
+    &--bold {
+      font-weight: 700;
     }
   }
 
