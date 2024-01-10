@@ -1170,7 +1170,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     case serialize(t) do
       %{urgent: true} -> [1]
       %{effect: effect} when effect in [:delay] -> [1, 1]
-      _ -> [1, 0]
+      _ -> [1, 2]
     end
   end
 
