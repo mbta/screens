@@ -662,39 +662,45 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   let dimensions = document.getElementById("line-map")?.getBoundingClientRect();
   let height = dimensions?.height ?? 0;
   let width = dimensions?.width ?? 0;
+  
+  const measureDiagramAndScale = () => {
+    // Get updated dimensions each time this hook runs
+    dimensions = document.getElementById("line-map")?.getBoundingClientRect();
+    height = dimensions?.height ?? 0;
+    width = dimensions?.width ?? 0;
 
+    if (svgHeight != 0 && width && height) {
+      // if scaleFactor has already been applied to the line-map, we need to reverse that
+      const unscaledHeight = height / scaleFactor;
+      const unscaledWidth = width / scaleFactor;
+
+      // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
+      let xScaleFactor = 904 / unscaledWidth;
+      
+      const needsAbbreviating = !doAbbreviate &&
+        unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) > svgHeight;
+      if (needsAbbreviating) {
+        setDoAbbreviate(true);
+        // now scale y, which requires re-running this effect
+      } else {
+        const yScaleFactor = (svgHeight - getEmphasisHeight(1)) / unscaledHeight
+        const factor = Math.min(
+          xScaleFactor,
+          yScaleFactor
+        );
+        setScaleFactor(factor);
+        setTimeout(() => {
+          setIsDone(true);
+        }, 200);
+      }
+    }
+  }
+
+  // When the parent container size changes, or abbreviation setting changes,
+  // re-measure the diagram and scale accordingly
   useEffect(() => {
     setTimeout(() => {
-      // Get updated dimensions each time this hook runs
-      dimensions = document.getElementById("line-map")?.getBoundingClientRect();
-      height = dimensions?.height ?? 0;
-      width = dimensions?.width ?? 0;
-
-      if (svgHeight != 0 && width && height) {
-        // if scaleFactor has already been applied to the line-map, we need to reverse that
-        const unscaledHeight = height / scaleFactor;
-        const unscaledWidth = width / scaleFactor;
-
-        // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
-        let xScaleFactor = 904 / unscaledWidth;
-        
-        const needsAbbreviating = !doAbbreviate &&
-          unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) > svgHeight;
-        if (needsAbbreviating) {
-          setDoAbbreviate(true);
-          // now scale y, which requires re-running this effect
-        } else {
-          const yScaleFactor = (svgHeight - getEmphasisHeight(1)) / unscaledHeight
-          const factor = Math.min(
-            xScaleFactor,
-            yScaleFactor
-          );
-          setScaleFactor(factor);
-          setTimeout(() => {
-            setIsDone(true);
-          }, 200);
-        }
-      }
+      measureDiagramAndScale()
     }, 100)
   }, [svgHeight, doAbbreviate]);
 
