@@ -1909,7 +1909,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   describe "audio_sort_key/1" do
     setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
-    test "returns [2] when alert is urgent", %{widget: widget} do
+    test "returns [1] when alert is urgent", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
@@ -1919,10 +1919,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
         |> put_is_full_screen(true)
 
-      assert [2] == WidgetInstance.audio_sort_key(widget)
+      assert [1] == WidgetInstance.audio_sort_key(widget)
     end
 
-    test "returns [2, 1] when alert is not urgent", %{widget: widget} do
+    test "returns [1, 2] when alert is not urgent", %{widget: widget} do
       widget =
         widget
         |> put_effect(:station_closure)
@@ -1932,10 +1932,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:construction)
 
-      assert [2, 1] == WidgetInstance.audio_sort_key(widget)
+      assert [1, 2] == WidgetInstance.audio_sort_key(widget)
     end
 
-    test "returns [2, 2] when alert effect is :delay", %{widget: widget} do
+    test "returns [1, 1] when alert effect is :delay", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
@@ -1945,7 +1945,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
         |> put_alert_header("Test Alert")
 
-      assert [2, 2] == WidgetInstance.audio_sort_key(widget)
+      assert [1, 1] == WidgetInstance.audio_sort_key(widget)
     end
   end
 
