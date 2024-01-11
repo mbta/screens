@@ -1164,13 +1164,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     serialize_single_screen_alert(t, location)
   end
 
-  def audio_sort_key(%__MODULE__{is_full_screen: true}), do: [2]
+  def audio_sort_key(%__MODULE__{is_full_screen: true}), do: [1]
 
   def audio_sort_key(%__MODULE__{} = t) do
     case serialize(t) do
-      %{urgent: true} -> [2]
-      %{effect: effect} when effect in [:delay] -> [2, 2]
-      _ -> [2, 1]
+      %{urgent: true} -> [1]
+      %{effect: effect} when effect in [:delay] -> [1, 1]
+      _ -> [1, 2]
     end
   end
 

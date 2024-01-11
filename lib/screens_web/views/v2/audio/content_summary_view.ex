@@ -2,7 +2,7 @@ defmodule ScreensWeb.V2.Audio.ContentSummaryView do
   use ScreensWeb, :view
 
   def render("_widget.ssml", %{lines_at_station: lines}) do
-    ~E|<p><s>You will hear the subway service overview, the current alerts for the <%= render_lines_at_station(lines) %>, and system elevator closures</s></p>|
+    ~E|<p><s>You will hear the current alerts for the <%= render_lines_at_station(lines) %>, the subway service overview, and system elevator closures</s></p>|
   end
 
   defp render_lines_at_station([line]) do

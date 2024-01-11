@@ -95,7 +95,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
     def audio_serialize(t), do: serialize(t)
 
-    def audio_sort_key(_instance), do: [1]
+    def audio_sort_key(_instance), do: [2]
 
     def audio_valid_candidate?(%{screen: %Screen{app_params: %PreFare{}}}), do: true
     def audio_valid_candidate?(_instance), do: false
