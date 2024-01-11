@@ -33,6 +33,17 @@ const R = 165;
 // so the width available to the rest of the diagram is 904 - (L + R)
 const W = MAX_WIDTH - (L + R);
 
+// List of abbreviated stations
+const abbreviationList: {[string: string]: string} = {
+  "Boston University Center": "BU Central",
+  "Boston University East": "BU East",
+  "Downtown Crossing": "Downtown Xng",
+  "Government Center": "Gov't Center",
+  "Hynes Convention Center": "Hynes",
+  "Massachusetts Avenue": "Mass Ave",
+  "Tufts Medical Center": "Tufts Medical Ctr"
+}
+
 type DisruptionDiagramData =
   | ContinuousDisruptionDiagram
   | DiscreteDisruptionDiagram;
@@ -442,8 +453,8 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
           className={classWithModifier(`label-${labelTextClass}`, textModifier)}
           transform={`translate(0 -32) rotate(-45)`}
         >
-          {abbreviate || label.full === "Massachusetts Avenue"
-            ? label.abbrev
+          {abbreviate && Object.keys(abbreviationList).includes(label.full)
+            ? abbreviationList[label.full]
             : label.full}
         </text>
       )}
@@ -593,6 +604,8 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   const [doAbbreviate, setDoAbbreviate] = useState(false);
   const [scaleFactor, setScaleFactor] = useState(1);
+  const [isDone, setIsDone] = useState(false);
+
   const numStops = slots.length;
   const spaceBetween = Math.min(
     60,
@@ -645,14 +658,12 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   x += spaceBetween + SLOT_WIDTH;
 
-  const [isDone, setIsDone] = useState(false);
-
   // Get the size of the diagram svg, excluding emphasis
   let dimensions = document.getElementById("line-map")?.getBoundingClientRect();
   let height = dimensions?.height ?? 0;
   let width = dimensions?.width ?? 0;
-
-  useEffect(() => {
+  
+  const measureDiagramAndScale = () => {
     // Get updated dimensions each time this hook runs
     dimensions = document.getElementById("line-map")?.getBoundingClientRect();
     height = dimensions?.height ?? 0;
@@ -660,20 +671,19 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
     if (svgHeight != 0 && width && height) {
       // if scaleFactor has already been applied to the line-map, we need to reverse that
-      height = height / scaleFactor;
-      width = width / scaleFactor;
+      const unscaledHeight = height / scaleFactor;
+      const unscaledWidth = width / scaleFactor;
 
       // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
-      const xScaleFactor = 904 / width;
-
-      const needsAbbreviating =
-        height * xScaleFactor + getEmphasisHeight(xScaleFactor) > svgHeight &&
-        !doAbbreviate;
+      let xScaleFactor = 904 / unscaledWidth;
+      
+      const needsAbbreviating = !doAbbreviate &&
+        unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) > svgHeight;
       if (needsAbbreviating) {
         setDoAbbreviate(true);
         // now scale y, which requires re-running this effect
       } else {
-        const yScaleFactor = (svgHeight - getEmphasisHeight(1)) / height
+        const yScaleFactor = (svgHeight - getEmphasisHeight(1)) / unscaledHeight
         const factor = Math.min(
           xScaleFactor,
           yScaleFactor
@@ -684,6 +694,14 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         }, 200);
       }
     }
+  }
+
+  // When the parent container size changes, or abbreviation setting changes,
+  // re-measure the diagram and scale accordingly
+  useEffect(() => {
+    setTimeout(() => {
+      measureDiagramAndScale()
+    }, 100)
   }, [svgHeight, doAbbreviate]);
 
   // This is to center the diagram along the X axis
