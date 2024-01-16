@@ -171,6 +171,13 @@ const App = (): JSX.Element => {
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
+        <Route exact path="/v2/screen/pending/:id/simulation">
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <SimulationScreenPage opts={{ alternateView: true }} />
+            </ResponseMapperContext.Provider>
+          </MappingContext.Provider>
+        </Route>
       </Switch>
     </Router>
   );

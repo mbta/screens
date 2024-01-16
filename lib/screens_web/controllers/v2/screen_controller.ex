@@ -204,6 +204,15 @@ defmodule ScreensWeb.V2.ScreenController do
     |> index(params)
   end
 
+  def simulation_pending(conn, params) do
+    conn
+    |> assign(
+      :screenplay_fullstory_org_id,
+      Application.get_env(:screens, :screenplay_fullstory_org_id)
+    )
+    |> index_pending(params)
+  end
+
   defp render_not_found(conn) do
     conn
     |> assign(:app_id, @default_app_id)
