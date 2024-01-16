@@ -153,6 +153,47 @@ defmodule ScreensWeb.V2.ScreenApiController do
     end
   end
 
+  def show_pending(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
+    LogScreenData.log_data_request(
+      screen_id,
+      last_refresh,
+      false,
+      params
+    )
+
+    case get_pending_screen_config(screen_id) do
+      nil ->
+        not_found_response(conn)
+
+      config ->
+        screen_data =
+          ScreenData.pending_data_by_screen_config(
+            config,
+            logging_options: %{
+              is_real_screen: false,
+              screen_id: screen_id,
+              triptych_pane: "UNKNOWN"
+            }
+          )
+
+        json(conn, screen_data)
+    end
+  end
+
+  def simulation_pending(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
+    LogScreenData.log_data_request(
+      screen_id,
+      last_refresh,
+      false,
+      params
+    )
+
+    case get_pending_screen_config(screen_id) do
+      nil -> not_found_response(conn)
+      config -> json(conn, ScreenData.pending_simulation_data_by_screen_config(config))
+    end
+  end
+
   def log_frontend_error(conn, params) do
     # Some basic defensive measures since this endpoint is very permissive.
     # We make sure each param is a string and trim them to reasonable lengths, in case they're huge.
@@ -181,6 +222,16 @@ defmodule ScreensWeb.V2.ScreenApiController do
       allow_methods: ["POST"],
       allow_headers: ["content-type"]
     )
+  end
+
+  defp get_pending_screen_config(screen_id) do
+    with {:ok, config_json} <- Screens.PendingConfig.Fetch.fetch_config(),
+         {:ok, raw_map} <- Jason.decode(config_json) do
+      config = Screens.PendingConfig.from_json(raw_map)
+      config.screens[screen_id]
+    else
+      _ -> nil
+    end
   end
 
   defp nonexistent_screen?(screen_id) do

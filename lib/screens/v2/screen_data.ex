@@ -66,6 +66,31 @@ defmodule Screens.V2.ScreenData do
     response(data: %{full_page: full_page_data, flex_zone: paged_slot_data})
   end
 
+  @spec pending_data_by_screen_config(ScreensConfig.Screen.t()) :: response_map()
+  def pending_data_by_screen_config(pending_screen_config, opts \\ []) do
+    refresh_rate = Parameters.get_refresh_rate(pending_screen_config)
+
+    layout_and_widgets =
+      pending_screen_config
+      |> fetch_data(opts)
+      |> resolve_paging(refresh_rate)
+
+    data = serialize(layout_and_widgets)
+
+    response(data: data)
+  end
+
+  @spec pending_simulation_data_by_screen_config(ScreensConfig.Screen.t()) :: response_map()
+  def pending_simulation_data_by_screen_config(pending_screen_config) do
+    refresh_rate = Parameters.get_refresh_rate(pending_screen_config)
+    screen_data = fetch_data(pending_screen_config)
+
+    full_page_data = screen_data |> resolve_paging(refresh_rate) |> serialize()
+    paged_slot_data = screen_data |> get_paged_slots() |> serialize_paged_slots()
+
+    response(data: %{full_page: full_page_data, flex_zone: paged_slot_data})
+  end
+
   @spec fetch_data(ScreensConfig.Screen.t()) :: {Template.layout(), selected_instances_map()}
   def fetch_data(config, opts \\ []) do
     candidate_generator = Parameters.get_candidate_generator(config)
