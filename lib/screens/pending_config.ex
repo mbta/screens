@@ -4,7 +4,7 @@ defmodule Screens.PendingConfig do
 
   @type t :: %__MODULE__{
           screens: %{
-            Screens.Config.screen_id() => Screen.t()
+            ScreensConfig.Config.screen_id() => Screen.t()
           }
         }
 
