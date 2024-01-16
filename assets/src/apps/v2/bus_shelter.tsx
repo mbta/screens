@@ -125,6 +125,17 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
+        <Route exact path="/v2/screen/:id">
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <BlinkConfigContext.Provider value={blinkConfig}>
+                <AudioConfigContext.Provider value={getAudioConfig()}>
+                  <ScreenPage />
+                </AudioConfigContext.Provider>
+              </BlinkConfigContext.Provider>
+            </ResponseMapperContext.Provider>
+          </MappingContext.Provider>
+        </Route>
         <Route exact path="/v2/screen/bus_shelter_v2">
           <MultiScreenPage
             components={TYPE_TO_COMPONENT}
@@ -138,7 +149,7 @@ const App = (): JSX.Element => {
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
-        <Route path="/v2/screen/:id">
+        <Route exact path="/v2/screen/pending/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <BlinkConfigContext.Provider value={blinkConfig}>

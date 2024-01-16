@@ -90,6 +90,15 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
+        <Route exact path="/v2/screen/:id">
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <Viewport>
+                <ScreenPage />
+              </Viewport>
+            </ResponseMapperContext.Provider>
+          </MappingContext.Provider>
+        </Route>
         <Route exact path="/v2/screen/triptych_v2">
           <MultiScreenPage
             components={TYPE_TO_COMPONENT}
@@ -103,7 +112,7 @@ const App = (): JSX.Element => {
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
-        <Route path="/v2/screen/:id">
+        <Route exact path="/v2/screen/pending/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <Viewport>
