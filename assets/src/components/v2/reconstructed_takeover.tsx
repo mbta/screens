@@ -70,7 +70,6 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
                 >
                   <DisruptionDiagram
                     {...disruption_diagram}
-                    svgHeight={diagramHeight}
                   />
                 </div>
               )}

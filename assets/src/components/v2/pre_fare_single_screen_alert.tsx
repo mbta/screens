@@ -324,7 +324,7 @@ const MapSection: React.ComponentType<MapSectionProps> = ({
       className="disruption-diagram-container"
       ref={ref}
     >
-      <DisruptionDiagram {...disruptionDiagram} svgHeight={diagramHeight} />
+      <DisruptionDiagram {...disruptionDiagram} />
     </div>
   );
 };

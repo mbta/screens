@@ -1,6 +1,6 @@
 // SPECIFICATION: https://www.notion.so/mbta-downtown-crossing/Disruption-Diagram-Specification-a779027385b545abbff6fb4b4fd0adc1
 
-import React, { ComponentType, useEffect, useState } from "react";
+import React, { ComponentType, useEffect, useRef, useState } from "react";
 import { classWithModifier, classWithModifiers } from "Util/util";
 
 import LargeXOctagonBordered from "../../../../static/images/svgr_bundled/disruption_diagram/large-x-octagon-bordered.svg";
@@ -11,8 +11,11 @@ import ArrowLeftEndpoint from "../../../../static/images/svgr_bundled/disruption
 import ArrowRightEndpoint from "../../../../static/images/svgr_bundled/disruption_diagram/arrow-right-endpoint.svg";
 import ShuttleBusIcon from "../../../../static/images/svgr_bundled/disruption_diagram/shuttle-emphasis-icon.svg";
 
-// Max width of the disruption diagram, dependent on the screen width
-const MAX_WIDTH = 904;
+import { useWhatChanged } from '@simbathesailor/use-what-changed';
+
+
+// Width of the disruption diagram, dependent on the screen width
+const DIAGRAM_WIDTH = 904;
 const SLOT_WIDTH = 24;
 // Height of the colored line for the diagram
 const LINE_HEIGHT = 24;
@@ -30,8 +33,8 @@ const LARGE_X_STOP_ICON_HEIGHT = 48;
 const L = MAX_ENDPOINT_HEIGHT / 2;
 const R = 165;
 // The width taken up by the ends outside the typical station bounds is L + R,
-// so the width available to the rest of the diagram is 904 - (L + R)
-const W = MAX_WIDTH - (L + R);
+// so the width available to the rest of the diagram is DIAGRAM_WIDTH - (L + R)
+const W = DIAGRAM_WIDTH - (L + R);
 
 // List of abbreviated stations
 const abbreviationList: {[string: string]: string} = {
@@ -52,7 +55,6 @@ interface DisruptionDiagramBase {
   line: LineColor;
   current_station_slot_index: number;
   slots: [EndSlot, ...MiddleSlot[], EndSlot];
-  svgHeight: number;
 }
 
 interface ContinuousDisruptionDiagram extends DisruptionDiagramBase {
@@ -600,7 +602,25 @@ Client is responsible for:
 */
 
 const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
-  const { slots, current_station_slot_index, line, effect, svgHeight } = props;
+  const { slots, current_station_slot_index, line, effect } = props;
+
+  // A ref on the diagram container will indicate how much room we have to scale the map
+  const [diagramContainerHeight, setDiagramContainerHeight] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    const resizeObserver = new ResizeObserver(() => {
+      if (ref?.current) {
+        setDiagramContainerHeight(ref.current.clientHeight);
+      }
+    });
+    resizeObserver.observe(ref.current);
+    return () => resizeObserver.disconnect(); // clean up
+  });
+
+  // We also need the diagram container's width. Unlike height, the width is stable on first render.
+  // But could be 904px or scaled down, depending on whether we're looking at a Screenplay simulation.
+  const fullWidth = document.getElementById("diagram-container")?.getBoundingClientRect()?.width ?? 0
 
   const [doAbbreviate, setDoAbbreviate] = useState(false);
   const [scaleFactor, setScaleFactor] = useState(1);
@@ -664,30 +684,35 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   let width = dimensions?.width ?? 0;
   
   const measureDiagramAndScale = () => {
+    console.log("re running measure and scale")
     // Get updated dimensions each time this hook runs
     dimensions = document.getElementById("line-map")?.getBoundingClientRect();
     height = dimensions?.height ?? 0;
     width = dimensions?.width ?? 0;
+    console.log("current width: ", width, "current scale: ", scaleFactor)
 
-    if (svgHeight != 0 && width && height) {
+    if (diagramContainerHeight != 0 && width && height) {
       // if scaleFactor has already been applied to the line-map, we need to reverse that
       const unscaledHeight = height / scaleFactor;
       const unscaledWidth = width / scaleFactor;
+      console.log("       unscaledWidth: ", unscaledWidth)
 
       // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
-      let xScaleFactor = 904 / unscaledWidth;
+      let xScaleFactor = fullWidth / unscaledWidth;
+      console.log("new scale factor: ", xScaleFactor)
       
       const needsAbbreviating = !doAbbreviate &&
-        unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) > svgHeight;
+        unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) > diagramContainerHeight;
       if (needsAbbreviating) {
         setDoAbbreviate(true);
         // now scale y, which requires re-running this effect
       } else {
-        const yScaleFactor = (svgHeight - getEmphasisHeight(1)) / unscaledHeight
+        const yScaleFactor = (diagramContainerHeight - getEmphasisHeight(1)) / unscaledHeight
         const factor = Math.min(
           xScaleFactor,
           yScaleFactor
         );
+        console.log("about to set scale factor")
         setScaleFactor(factor);
         setTimeout(() => {
           setIsDone(true);
@@ -697,17 +722,33 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   }
 
   // When the parent container size changes, or abbreviation setting changes,
-  // re-measure the diagram and scale accordingly
+  // re-measure the diagram and scale accordingly.
+  // The setTimeout is needed in cases where the font takes a little while to load
+  // but the diagram measurements have already been taken. This doesn't cause the
+  // diagramContainerHeight to change, so we need another way to force the hook to re-run
+  // Example: shuttle Chinatown > Mass Ave, screen located at Back Bay
+  
+  useWhatChanged([diagramContainerHeight, doAbbreviate], "diagramContainerHeight, doAbbreviate")
   useEffect(() => {
-    setTimeout(() => {
+    console.log("running useeffect")
+    document.fonts.ready.then(() => {
       measureDiagramAndScale()
-    }, 100)
-  }, [svgHeight, doAbbreviate]);
+    })
+  }, [diagramContainerHeight, doAbbreviate]);
 
   // This is to center the diagram along the X axis
-  const translateX = (width && (904 - width) / 2) || 0;
+  const translateX = (width && (fullWidth - width) / 2) || 0;
   
   // Next is to align the diagram at the top of the svg, which involves adjusting the SVG viewbox
+
+  // First, we need to figure out whether we're in a Screenplay simulation or not,
+  // because unfortunately, the CSS transform on those simulations messes up the widget's
+  // ability to measure itself in the DOM. So, we need to get the original height of the
+  // diagram, pre-scaled, to accurately set its viewbox dimensions.
+  const simulation = document.getElementById("simulation")
+  const simulationStyle = simulation && window.getComputedStyle(simulation) 
+  const simulationTransform = new WebKitCSSMatrix(simulationStyle?.transform).m11;
+  const originalHeight = height * 1/simulationTransform
 
   // If -${height} is used as the viewbox height, it looks like the line diagram text
   // pushed all the way to the bottom of the viewbox with just a tiny point of the
@@ -717,81 +758,82 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   // To calculate the height of that missing part, that is:
   // LINE_HEIGHT*scaleFactor/2 - MAX_ENDPOINT_HEIGHT*scaleFactor/2 + (hasEmphasis ? EMPHASIS_PADDING_TOP * scaleFactor : 0)
 
-  // offset is parent container height minus all the stuff below the very top of the line diagram
+  // So finally, the vertical viewBoxOffset is parent container height minus
+  // all the stuff below the very top of the line diagram
   const viewBoxOffset = 
-    height
-    - (LINE_HEIGHT * scaleFactor) / 2
-    - (MAX_ENDPOINT_HEIGHT * scaleFactor) / 2
+    originalHeight
+    - LINE_HEIGHT * scaleFactor / 2
+    - MAX_ENDPOINT_HEIGHT * scaleFactor / 2
     + (hasEmphasis ? EMPHASIS_PADDING_TOP * scaleFactor : 0)
 
   return (
-    <svg
-      // viewBoxOffset will always be > 0 by the time it's visible, but the console will
-      // still log an error if it's a negative number when it's not-yet-visible
-      viewBox={`0 ${-viewBoxOffset} 904 ${height + getEmphasisHeight(scaleFactor)}`}
-      transform={`translate(${translateX})`}
-      visibility={isDone ? "visible" : "hidden"}
-    >
-      <g transform={`translate(${L * scaleFactor} 0)`}>
-        <g id="line-map" transform={`scale(${scaleFactor})`}>
-          {effect !== "station_closure" && (
-            <EffectBackgroundComponent
-              effectRegionSlotIndexRange={props.effect_region_slot_index_range}
-              effect={effect}
+    <div style={{width: "100%", height: "100%"}} id="diagram-container" ref={ref}>
+      <svg
+        viewBox={`0 ${-viewBoxOffset} ${DIAGRAM_WIDTH} ${originalHeight + getEmphasisHeight(scaleFactor)}`}
+        transform={`translate(${translateX})`}
+        visibility={isDone ? "visible" : "hidden"}
+      >
+        <g transform={`translate(${L * scaleFactor} 0)`}>
+          <g id="line-map" transform={`scale(${scaleFactor})`}>
+            {effect !== "station_closure" && (
+              <EffectBackgroundComponent
+                effectRegionSlotIndexRange={props.effect_region_slot_index_range}
+                effect={effect}
+                spaceBetween={spaceBetween}
+              />
+            )}
+            <EndSlotComponent
+              slot={beginning}
+              x={0}
+              line={line}
+              isCurrentStop={current_station_slot_index === 0}
               spaceBetween={spaceBetween}
+              isAffected={
+                effect === "station_closure"
+                  ? props.closed_station_slot_indices.includes(0)
+                  : props.effect_region_slot_index_range.includes(0)
+              }
+              effect={effect}
+              isLeftSide={true}
             />
-          )}
-          <EndSlotComponent
-            slot={beginning}
-            x={0}
-            line={line}
-            isCurrentStop={current_station_slot_index === 0}
-            spaceBetween={spaceBetween}
-            isAffected={
-              effect === "station_closure"
-                ? props.closed_station_slot_indices.includes(0)
-                : props.effect_region_slot_index_range.includes(0)
-            }
-            effect={effect}
-            isLeftSide={true}
-          />
-          {middleSlots}
-          <EndSlotComponent
-            slot={end as EndSlot}
-            x={x}
-            line={line}
-            isCurrentStop={current_station_slot_index === slots.length - 1}
-            spaceBetween={spaceBetween}
-            isAffected={
-              effect === "station_closure"
-                ? props.closed_station_slot_indices.includes(slots.length - 1)
-                : props.effect_region_slot_index_range.includes(
-                    slots.length - 1
-                  )
-            }
-            effect={effect}
-            isLeftSide={false}
-          />
-        </g>
-        {hasEmphasis && (
-          <g
-            id="alert-emphasis"
-            transform={`translate(0, ${
-              EMPHASIS_HEIGHT/2 // Half the height of the emphasis icon
-              + LARGE_X_STOP_ICON_HEIGHT/2 * scaleFactor // Half the height of the largest closure icon, "you are here" octagon
-              + 8 * scaleFactor // Emphasis padding
-            })`}
-          >
-            <AlertEmphasisComponent
-              effectRegionSlotIndexRange={props.effect_region_slot_index_range}
+            {middleSlots}
+            <EndSlotComponent
+              slot={end as EndSlot}
+              x={x}
+              line={line}
+              isCurrentStop={current_station_slot_index === slots.length - 1}
               spaceBetween={spaceBetween}
+              isAffected={
+                effect === "station_closure"
+                  ? props.closed_station_slot_indices.includes(slots.length - 1)
+                  : props.effect_region_slot_index_range.includes(
+                      slots.length - 1
+                    )
+              }
               effect={effect}
-              scaleFactor={scaleFactor}
+              isLeftSide={false}
             />
           </g>
-        )}
-      </g>
-    </svg>
+          {hasEmphasis && (
+            <g
+              id="alert-emphasis"
+              transform={`translate(0, ${
+                EMPHASIS_HEIGHT/2 // Half the height of the emphasis icon
+                + LARGE_X_STOP_ICON_HEIGHT/2 * scaleFactor // Half the height of the largest closure icon, "you are here" octagon
+                + 8 * scaleFactor // Emphasis padding
+              })`}
+            >
+              <AlertEmphasisComponent
+                effectRegionSlotIndexRange={props.effect_region_slot_index_range}
+                spaceBetween={spaceBetween}
+                effect={effect}
+                scaleFactor={scaleFactor}
+              />
+            </g>
+          )}
+        </g>
+      </svg>
+    </div>
   );
 };
 

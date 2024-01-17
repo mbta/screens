@@ -37,12 +37,18 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
         {apiResponse && (
           <div className="simulation__full-page">
             <div className="simulation__title">Live view</div>
-            <WidgetTreeErrorBoundary>
-              <Widget data={fullPage} />
-            </WidgetTreeErrorBoundary>
+            <div
+              className="simulation"
+              id={`simulation`}
+            >
+              <WidgetTreeErrorBoundary>
+                <Widget data={fullPage} />
+              </WidgetTreeErrorBoundary>
+            </div>
           </div>
         )}
-        {flexZone && <div className="divider"></div>}
+        {/* {flexZone && <div className="divider"></div>} */}
+        {/* Change this to 1 */}
         {leftScreenPages && leftScreenPages.length > 0 && (
           <div className="simulation__left-screen">
             <div className="simulation__title">
@@ -54,7 +60,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
                   return (
                     <div
                       key={`page${index}`}
-                      className="simulation__left-screen-widget"
+                      className="simulation simulation__left-screen-widget"
                     >
                       <Widget data={flexZonePage} />
                     </div>
@@ -64,7 +70,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
             </div>
           </div>
         )}
-        {rightScreenPages && rightScreenPages.length > 0 && (
+        {rightScreenPages && rightScreenPages.length > 1 && (
           <div className="simulation__right-screen">
             <div className="simulation__title">
               Flex zone ({rightScreenPages.length})
@@ -75,7 +81,8 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
                   return (
                     <div
                       key={`page${index}`}
-                      className="simulation__right-screen-widget"
+                      className="simulation simulation__right-screen-widget"
+                      id={`simulation`} // add index
                     >
                       <Widget data={flexZonePage} />
                     </div>
