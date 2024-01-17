@@ -711,7 +711,9 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         );
         console.log("about to set scale factor")
         setScaleFactor(factor);
-        setIsDone(true);
+        setTimeout(() => {
+          setIsDone(true);
+        }, 200);
       }
     }
   }
