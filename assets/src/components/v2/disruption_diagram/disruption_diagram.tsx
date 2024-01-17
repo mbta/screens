@@ -11,9 +11,6 @@ import ArrowLeftEndpoint from "../../../../static/images/svgr_bundled/disruption
 import ArrowRightEndpoint from "../../../../static/images/svgr_bundled/disruption_diagram/arrow-right-endpoint.svg";
 import ShuttleBusIcon from "../../../../static/images/svgr_bundled/disruption_diagram/shuttle-emphasis-icon.svg";
 
-import { useWhatChanged } from '@simbathesailor/use-what-changed';
-
-
 // Width of the disruption diagram, dependent on the screen width
 const DIAGRAM_WIDTH = 904;
 const SLOT_WIDTH = 24;
@@ -691,11 +688,11 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     width = dimensions?.width ?? 0;
     console.log("current width: ", width, "current scale: ", scaleFactor)
 
-    if (diagramContainerHeight != 0 && width && height) {
+    if (!isDone && diagramContainerHeight != 0 && width && height) {
       // if scaleFactor has already been applied to the line-map, we need to reverse that
       const unscaledHeight = height / scaleFactor;
       const unscaledWidth = width / scaleFactor;
-      console.log("       unscaledWidth: ", unscaledWidth)
+      console.log("   unscaledWidth: ", unscaledWidth)
 
       // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
       let xScaleFactor = fullWidth / unscaledWidth;
@@ -714,9 +711,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         );
         console.log("about to set scale factor")
         setScaleFactor(factor);
-        setTimeout(() => {
-          setIsDone(true);
-        }, 200);
+        setIsDone(true);
       }
     }
   }
@@ -728,12 +723,14 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   // diagramContainerHeight to change, so we need another way to force the hook to re-run
   // Example: shuttle Chinatown > Mass Ave, screen located at Back Bay
   
-  useWhatChanged([diagramContainerHeight, doAbbreviate], "diagramContainerHeight, doAbbreviate")
   useEffect(() => {
-    console.log("running useeffect")
     document.fonts.ready.then(() => {
       measureDiagramAndScale()
     })
+    return () => {
+      setScaleFactor(1)
+      setIsDone(false)
+    }
   }, [diagramContainerHeight, doAbbreviate]);
 
   // This is to center the diagram along the X axis
