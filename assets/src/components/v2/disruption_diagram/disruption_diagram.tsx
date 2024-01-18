@@ -709,7 +709,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
           xScaleFactor,
           yScaleFactor
         );
-        console.log("about to set scale factor")
+        console.log("       about to set scale factor")
         setScaleFactor(factor);
         setTimeout(() => {
           setIsDone(true);
@@ -720,18 +720,18 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   // When the parent container size changes, or abbreviation setting changes,
   // re-measure the diagram and scale accordingly.
-  // The setTimeout is needed in cases where the font takes a little while to load
-  // but the diagram measurements have already been taken. This doesn't cause the
-  // diagramContainerHeight to change, so we need another way to force the hook to re-run
+  // The document.fonts.ready.then() is needed when the font takes a while to load
+  // but the diagram measurements have already been taken.
   // Example: shuttle Chinatown > Mass Ave, screen located at Back Bay
-  
+
+  // The isCurrent setting is needed to clean up the 
   useEffect(() => {
+    let isCurrent = true
     document.fonts.ready.then(() => {
-      measureDiagramAndScale()
+      if (isCurrent) measureDiagramAndScale()
     })
     return () => {
-      setScaleFactor(1)
-      setIsDone(false)
+      isCurrent = false
     }
   }, [diagramContainerHeight, doAbbreviate]);
 
