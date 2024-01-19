@@ -1,6 +1,6 @@
 // SPECIFICATION: https://www.notion.so/mbta-downtown-crossing/Disruption-Diagram-Specification-a779027385b545abbff6fb4b4fd0adc1
 
-import React, { ComponentType, useEffect, useRef, useState } from "react";
+import React, { ComponentType, useCallback, useEffect, useRef, useState } from "react";
 import { classWithModifier, classWithModifiers } from "Util/util";
 
 import LargeXOctagonBordered from "../../../../static/images/svgr_bundled/disruption_diagram/large-x-octagon-bordered.svg";
@@ -675,28 +675,32 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   x += spaceBetween + SLOT_WIDTH;
 
-  // Get the size of the diagram svg, excluding emphasis
-  let dimensions = document.getElementById("line-map")?.getBoundingClientRect();
-  let height = dimensions?.height ?? 0;
-  let width = dimensions?.width ?? 0;
-  
-  const measureDiagramAndScale = () => {
-    console.log("re running measure and scale")
-    // Get updated dimensions each time this hook runs
-    dimensions = document.getElementById("line-map")?.getBoundingClientRect();
-    height = dimensions?.height ?? 0;
-    width = dimensions?.width ?? 0;
-    console.log("current width: ", width, "current scale: ", scaleFactor)
+  // Get the size of the diagram line map svg, excluding emphasis
+  const [lineDiagramHeight, setLineDiagramHeight] = useState(0);
+  const [lineDiagramWidth, setLineDiagramWidth] = useState(0);
 
-    if (!isDone && diagramContainerHeight != 0 && width && height) {
-      // if scaleFactor has already been applied to the line-map, we need to reverse that
-      const unscaledHeight = height / scaleFactor;
-      const unscaledWidth = width / scaleFactor;
-      console.log("   unscaledWidth: ", unscaledWidth)
+  // Measures line-map svg when the scaleFactor changes, updates state
+  const measuredRef = useCallback(node => {
+    const myObserver = new ResizeObserver(() => {})
+
+    if (node !== null) {
+      myObserver.observe(node)
+      setLineDiagramHeight(node.getBoundingClientRect().height);
+      setLineDiagramWidth(node.getBoundingClientRect().width);
+    }
+    
+    return () => myObserver.disconnect()
+  }, [scaleFactor]);
+  
+  // Scale the line-map svg given the available screen width 
+  const measureDiagramAndScale = () => {
+    if (!isDone && diagramContainerHeight != 0) {
+      // If scaleFactor has already been applied to the line-map, we need to reverse that for calculations
+      const unscaledHeight = lineDiagramHeight / scaleFactor;
+      const unscaledWidth = lineDiagramWidth / scaleFactor;
 
       // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
       let xScaleFactor = fullWidth / unscaledWidth;
-      console.log("new scale factor: ", xScaleFactor)
       
       const needsAbbreviating = !doAbbreviate &&
         unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) > diagramContainerHeight;
@@ -709,34 +713,31 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
           xScaleFactor,
           yScaleFactor
         );
-        console.log("       about to set scale factor")
         setScaleFactor(factor);
-        setTimeout(() => {
-          setIsDone(true);
-        }, 200);
+        setIsDone(true);
       }
     }
   }
 
   // When the parent container size changes, or abbreviation setting changes,
   // re-measure the diagram and scale accordingly.
-  // The document.fonts.ready.then() is needed when the font takes a while to load
-  // but the diagram measurements have already been taken.
-  // Example: shuttle Chinatown > Mass Ave, screen located at Back Bay
-
-  // The isCurrent setting is needed to clean up the 
   useEffect(() => {
+    // The isCurrent setting is needed to clean up the unused hook runs / state changes
     let isCurrent = true
+    
+    // The document.fonts.ready.then() is needed when the font takes a while to load
+    // but the diagram measurements have already been taken.
+    // Example: shuttle Chinatown > Mass Ave, screen located at Back Bay
     document.fonts.ready.then(() => {
       if (isCurrent) measureDiagramAndScale()
     })
     return () => {
       isCurrent = false
     }
-  }, [diagramContainerHeight, doAbbreviate]);
+  }, [lineDiagramHeight, diagramContainerHeight, doAbbreviate]);
 
   // This is to center the diagram along the X axis
-  const translateX = (width && (fullWidth - width) / 2) || 0;
+  const translateX = (lineDiagramWidth && (fullWidth - lineDiagramWidth) / 2) || 0;
   
   // Next is to align the diagram at the top of the svg, which involves adjusting the SVG viewbox
 
@@ -747,7 +748,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   const simulation = document.getElementById("simulation")
   const simulationStyle = simulation && window.getComputedStyle(simulation) 
   const simulationTransform = new WebKitCSSMatrix(simulationStyle?.transform).m11;
-  const originalHeight = height * 1/simulationTransform
+  const originalHeight = lineDiagramHeight * 1/simulationTransform
 
   // If -${height} is used as the viewbox height, it looks like the line diagram text
   // pushed all the way to the bottom of the viewbox with just a tiny point of the
@@ -773,7 +774,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         visibility={isDone ? "visible" : "hidden"}
       >
         <g transform={`translate(${L * scaleFactor} 0)`}>
-          <g id="line-map" transform={`scale(${scaleFactor})`}>
+          <g id="line-map" transform={`scale(${scaleFactor})`} ref={measuredRef}>
             {effect !== "station_closure" && (
               <EffectBackgroundComponent
                 effectRegionSlotIndexRange={props.effect_region_slot_index_range}
