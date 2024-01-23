@@ -451,27 +451,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  # %{
-  #   # Unique to station closures
-  #   optional(:unaffected_routes) => list(enriched_route()),
-  #   optional(:location) => String.t() | nil,
-  #   optional(:remedy) => String.t(),
-  #   optional(:stations) => list(String.t()),
-  #   # Unique to single screen alerts
-  #   optional(:endpoints) => list(String.t()),
-  #   # Unique to transfer station case
-  #   optional(:is_transfer_station) => boolean(),
-  #   # Weird extra field for fallback layout with special styling
-  #   optional(:remedy_bold) => String.t(),
-  #   issue: String.t() | list(String.t()),
-  #   cause: Alert.cause() | nil,
-  #   # List of SVG filenames
-  #   routes: list(enriched_route()),
-  #   effect: :suspension | :shuttle | :station_closure | :delay,
-  #   updated_at: String.t(),
-  #   region: :here | :boundary | :outside
-  # }
-
   @spec serialize_single_screen_alert(t(), LocalizedAlert.location()) ::
           single_screen_serialized_response()
   defp serialize_single_screen_alert(t, location)
