@@ -187,8 +187,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp get_direction_and_route_from_entity(
          %{direction_id: nil, route: "Red", stop: stop_id},
          location
-       )
-       when location in [:downstream, :boundary_downstream] do
+       ) do
     cond do
       Stop.on_ashmont_branch?(stop_id) and location in [:downstream, :boundary_downstream] ->
         {0, "Red-Ashmont"}
@@ -200,7 +199,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         {0, "Red-Braintree"}
 
       Stop.on_braintree_branch?(stop_id) ->
-        {1, "Red-Ashmont"}
+        {1, "Red-Braintree"}
 
       location in [:downstream, :boundary_downstream] ->
         {0, "Red"}
