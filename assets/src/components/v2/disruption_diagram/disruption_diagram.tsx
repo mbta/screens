@@ -41,7 +41,9 @@ const abbreviationList: {[string: string]: string} = {
   "Government Center": "Gov't Center",
   "Hynes Convention Center": "Hynes",
   "Massachusetts Avenue": "Mass Ave",
-  "Tufts Medical Center": "Tufts Medical Ctr"
+  "Tufts Medical Center": "Tufts Medical Ctr",
+  "…via Government Center": "…via Gov't Center",
+  "…via Downtown Crossing": "…via Downtown Xng"
 }
 
 type DisruptionDiagramData =
@@ -702,8 +704,10 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
       let xScaleFactor = fullWidth / unscaledWidth;
       
-      const needsAbbreviating = !doAbbreviate &&
-        unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) > diagramContainerHeight;
+      // If xScaleFactor is less than 1, let's try abbreviating.
+      // Or, if the x scaling constrains the height, abbreviate
+      const needsAbbreviating = !doAbbreviate && (xScaleFactor < 1 ||
+        unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) > diagramContainerHeight);
       if (needsAbbreviating) {
         setDoAbbreviate(true);
         // now scale y, which requires re-running this effect
