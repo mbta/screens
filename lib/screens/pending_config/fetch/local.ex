@@ -5,11 +5,20 @@ defmodule Screens.PendingConfig.Fetch.Local do
 
   @behaviour Screens.PendingConfig.Fetch
 
+  require Logger
+
   @impl true
   def fetch_config do
     case File.read(local_config_path()) do
-      {:ok, contents} -> {:ok, contents}
-      _ -> :error
+      {:ok, contents} ->
+        {:ok, contents}
+
+      _ ->
+        Logger.warn(
+          ~s|Could not open #{local_config_path()}. If it doesn't exist, create it with contents of `{"screens": {}}`.|
+        )
+
+        :error
     end
   end
 
