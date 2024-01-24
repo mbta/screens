@@ -241,6 +241,8 @@ defmodule Screens.Stops.Stop do
       @red_line_trunk_stops ++ @red_line_ashmont_branch_stops,
       @red_line_trunk_stops ++ @red_line_braintree_branch_stops
     ],
+    "Red-Ashmont" => [@red_line_ashmont_branch_stops],
+    "Red-Braintree" => [@red_line_braintree_branch_stops],
     "Green-B" => [@green_line_b_stops],
     "Green-C" => [@green_line_c_stops],
     "Green-D" => [@green_line_d_stops],
@@ -544,6 +546,14 @@ defmodule Screens.Stops.Stop do
 
   def on_glx?(stop_id) do
     stop_id in Enum.map(@medford_tufts_branch_stops ++ @union_square_branch_stops, &elem(&1, 0))
+  end
+
+  def on_ashmont_branch?(stop_id) do
+    stop_id in Enum.map(@red_line_ashmont_branch_stops, &elem(&1, 0))
+  end
+
+  def on_braintree_branch?(stop_id) do
+    stop_id in Enum.map(@red_line_braintree_branch_stops, &elem(&1, 0))
   end
 
   defp fetch_tagged_stop_sequences_by_app(app, stop_id, _routes_at_stop)

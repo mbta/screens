@@ -95,6 +95,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @route_directions %{
     "Blue" => ["Bowdoin", "Wonderland"],
     "Orange" => ["Forest Hills", "Oak Grove"],
+    "Red-Ashmont" => ["Ashmont", "Alewife"],
+    "Red-Braintree" => ["Braintree", "Alewife"],
     "Red" => ["Ashmont & Braintree", "Alewife"],
     "Green-B" => ["Boston College", "Government Center"],
     "Green-C" => ["Cleveland Circle", "Government Center"],
@@ -137,6 +139,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         |> Alert.informed_entities()
         |> Enum.filter(&String.starts_with?(&1.route, route_id))
       end
+      |> Enum.filter(&InformedEntity.parent_station?/1)
 
     # Consolidate the list of entities into their direction from current station
     # and their affiliated route id
@@ -177,7 +180,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Given an entity and the directionality of the alert from the home stop,
-  # return a tuple with the affected direction_id and route id
+  # return a tuple with the affected direction_id and route_id
+
+  # If the route is red and the alert is downstream, we have to figure out whether the alert
+  # only affects one branch or both
+  defp get_direction_and_route_from_entity(%{direction_id: nil, route: "Red", stop: stop_id}, location) when location in [:downstream, :boundary_downstream] do
+    cond do
+      Stop.on_ashmont_branch?(stop_id) and location in [:downstream, :boundary_downstream] -> {0, "Red-Ashmont"}
+      Stop.on_ashmont_branch?(stop_id) -> {1, "Red-Ashmont"}
+      Stop.on_braintree_branch?(stop_id) and location in [:downstream, :boundary_downstream] -> {0, "Red-Braintree"}
+      Stop.on_braintree_branch?(stop_id) -> {1, "Red-Ashmont"}
+      location in [:downstream, :boundary_downstream] -> {0, "Red"}
+      true -> {1, "Red"}
+    end
+  end
+  
   defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, location)
        when location in [:downstream, :boundary_downstream],
        do: {0, route}
@@ -208,8 +225,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
 
     affected_routes
+    # Filter alert-affected routes by which routes are at the current stop
+    # If a green-branch is the affected route, we can generalize it to just "Green-"
+    # because our prefare screens will be on the trunk. Any GL disruption will be 
+    # downstream of a GL trunk station.
     |> Enum.filter(fn
-      "Green" -> Enum.find(routes_at_stop, &String.starts_with?(&1, "Green"))
+      "Green" <> _ -> Enum.find(routes_at_stop, &String.starts_with?(&1, "Green"))
       route -> route in routes_at_stop
     end)
     |> Enum.flat_map(fn
