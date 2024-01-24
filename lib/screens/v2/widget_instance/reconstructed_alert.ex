@@ -184,17 +184,32 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # If the route is red and the alert is downstream, we have to figure out whether the alert
   # only affects one branch or both
-  defp get_direction_and_route_from_entity(%{direction_id: nil, route: "Red", stop: stop_id}, location) when location in [:downstream, :boundary_downstream] do
+  defp get_direction_and_route_from_entity(
+         %{direction_id: nil, route: "Red", stop: stop_id},
+         location
+       )
+       when location in [:downstream, :boundary_downstream] do
     cond do
-      Stop.on_ashmont_branch?(stop_id) and location in [:downstream, :boundary_downstream] -> {0, "Red-Ashmont"}
-      Stop.on_ashmont_branch?(stop_id) -> {1, "Red-Ashmont"}
-      Stop.on_braintree_branch?(stop_id) and location in [:downstream, :boundary_downstream] -> {0, "Red-Braintree"}
-      Stop.on_braintree_branch?(stop_id) -> {1, "Red-Ashmont"}
-      location in [:downstream, :boundary_downstream] -> {0, "Red"}
-      true -> {1, "Red"}
+      Stop.on_ashmont_branch?(stop_id) and location in [:downstream, :boundary_downstream] ->
+        {0, "Red-Ashmont"}
+
+      Stop.on_ashmont_branch?(stop_id) ->
+        {1, "Red-Ashmont"}
+
+      Stop.on_braintree_branch?(stop_id) and location in [:downstream, :boundary_downstream] ->
+        {0, "Red-Braintree"}
+
+      Stop.on_braintree_branch?(stop_id) ->
+        {1, "Red-Ashmont"}
+
+      location in [:downstream, :boundary_downstream] ->
+        {0, "Red"}
+
+      true ->
+        {1, "Red"}
     end
   end
-  
+
   defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, location)
        when location in [:downstream, :boundary_downstream],
        do: {0, route}
