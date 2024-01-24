@@ -132,14 +132,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          route_id \\ nil
        ) do
     informed_entities =
-      if is_nil(route_id) do
-        Alert.informed_entities(alert)
-      else
-        alert
-        |> Alert.informed_entities()
-        |> Enum.filter(&String.starts_with?(&1.route, route_id))
-      end
-      |> Enum.filter(&InformedEntity.parent_station?/1)
+      alert
+      |> Alert.informed_entities()
+      |> Enum.filter(fn entity ->
+        InformedEntity.parent_station?(entity) and
+          (is_nil(route_id) or String.starts_with?(entity.route, route_id))
+      end)
 
     # Consolidate the list of entities into their direction from current station
     # and their affiliated route id
@@ -241,7 +239,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     affected_routes
     # Filter alert-affected routes by which routes are at the current stop
     # If a green-branch is the affected route, we can generalize it to just "Green-"
-    # because our prefare screens will be on the trunk. Any GL disruption will be 
+    # because our prefare screens will be on the trunk. Any GL disruption will be
     # downstream of a GL trunk station.
     |> Enum.filter(fn
       "Green" <> _ -> Enum.find(routes_at_stop, &String.starts_with?(&1, "Green"))
