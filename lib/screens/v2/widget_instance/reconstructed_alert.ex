@@ -135,7 +135,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       alert
       |> Alert.informed_entities()
       |> Enum.filter(fn entity ->
-        InformedEntity.parent_station?(entity) and
+        (InformedEntity.parent_station?(entity) or is_nil(entity.stop)) and
           (is_nil(route_id) or String.starts_with?(entity.route, route_id))
       end)
 
@@ -185,7 +185,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp get_direction_and_route_from_entity(
          %{direction_id: nil, route: "Red", stop: stop_id},
          location
-       ) do
+       )
+       when stop_id != nil do
     cond do
       Stop.on_ashmont_branch?(stop_id) and location in [:downstream, :boundary_downstream] ->
         {0, "Red-Ashmont"}
@@ -202,8 +203,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       location in [:downstream, :boundary_downstream] ->
         {0, "Red"}
 
-      true ->
+      location in [:upstream, :boundary_upstream] ->
         {1, "Red"}
+
+      true ->
+        {nil, "Red"}
     end
   end
 

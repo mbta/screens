@@ -241,8 +241,6 @@ defmodule Screens.Stops.Stop do
       @red_line_trunk_stops ++ @red_line_ashmont_branch_stops,
       @red_line_trunk_stops ++ @red_line_braintree_branch_stops
     ],
-    "Red-Ashmont" => [@red_line_ashmont_branch_stops],
-    "Red-Braintree" => [@red_line_braintree_branch_stops],
     "Green-B" => [@green_line_b_stops],
     "Green-C" => [@green_line_c_stops],
     "Green-D" => [@green_line_d_stops],
