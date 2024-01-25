@@ -186,28 +186,34 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          %{direction_id: nil, route: "Red", stop: stop_id},
          location
        )
-       when stop_id != nil do
+       when stop_id != nil and location in [:downstream, :boundary_downstream] do
     cond do
-      Stop.on_ashmont_branch?(stop_id) and location in [:downstream, :boundary_downstream] ->
+      Stop.on_ashmont_branch?(stop_id) ->
         {0, "Red-Ashmont"}
 
+      Stop.on_braintree_branch?(stop_id) ->
+        {0, "Red-Braintree"}
+
+      true ->
+        {0, "Red"}
+    end
+  end
+
+  # Same with RL upstream alerts
+  defp get_direction_and_route_from_entity(
+         %{direction_id: nil, route: "Red", stop: stop_id},
+         location
+       )
+       when stop_id != nil and location in [:upstream, :boundary_upstream] do
+    cond do
       Stop.on_ashmont_branch?(stop_id) ->
         {1, "Red-Ashmont"}
-
-      Stop.on_braintree_branch?(stop_id) and location in [:downstream, :boundary_downstream] ->
-        {0, "Red-Braintree"}
 
       Stop.on_braintree_branch?(stop_id) ->
         {1, "Red-Braintree"}
 
-      location in [:downstream, :boundary_downstream] ->
-        {0, "Red"}
-
-      location in [:upstream, :boundary_upstream] ->
-        {1, "Red"}
-
       true ->
-        {nil, "Red"}
+        {1, "Red"}
     end
   end
 
