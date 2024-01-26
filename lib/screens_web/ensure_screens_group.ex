@@ -6,10 +6,10 @@ defmodule ScreensWeb.EnsureScreensGroup do
   def init(options), do: options
 
   def call(conn, _opts) do
-    with %{"groups" => groups} <- Guardian.Plug.current_claims(conn),
-         true <- is_list(groups),
-         screens_group <- Application.get_env(:screens, :cognito_group),
-         true <- screens_group in groups do
+    with %{"roles" => roles} <- Guardian.Plug.current_claims(conn),
+         true <- is_list(roles),
+         screens_role <- Application.get_env(:screens, :keycloak_role),
+         true <- screens_role in roles do
       conn
     else
       _ ->

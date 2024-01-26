@@ -35,24 +35,24 @@ defmodule ScreensWeb.ConnCase do
       tags[:authenticated] ->
         user = "test_user"
 
-        screens_group = Application.get_env(:screens, :cognito_group)
+        screens_role = Application.get_env(:screens, :keycloak_role)
 
         conn =
           Phoenix.ConnTest.build_conn()
           |> Plug.Conn.put_req_header("x-forwarded-proto", "https")
           |> init_test_session(%{})
-          |> Guardian.Plug.sign_in(ScreensWeb.AuthManager, user, %{groups: [screens_group]})
+          |> Guardian.Plug.sign_in(ScreensWeb.AuthManager, user, %{roles: [screens_role]})
 
         {:ok, conn: conn}
 
-      tags[:authenticated_not_in_group] ->
+      tags[:authenticated_not_in_role] ->
         user = "test_user"
 
         conn =
           Phoenix.ConnTest.build_conn()
           |> Plug.Conn.put_req_header("x-forwarded-proto", "https")
           |> init_test_session(%{})
-          |> Guardian.Plug.sign_in(ScreensWeb.AuthManager, user, %{groups: []})
+          |> Guardian.Plug.sign_in(ScreensWeb.AuthManager, user, %{roles: []})
 
         {:ok, conn: conn}
 
