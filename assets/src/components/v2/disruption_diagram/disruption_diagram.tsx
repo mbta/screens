@@ -600,9 +600,16 @@ Client is responsible for:
 
 const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   const { slots, current_station_slot_index, line, effect } = props;
-
+  const [doAbbreviate, setDoAbbreviate] = useState(false);
+  const [scaleFactor, setScaleFactor] = useState(1);
+  const [isDone, setIsDone] = useState(false);
+  // Get the size of the diagram line map svg, excluding emphasis
+  const [lineDiagramHeight, setLineDiagramHeight] = useState(0);
+  const [lineDiagramWidth, setLineDiagramWidth] = useState(0);  
   // A ref on the diagram container will indicate how much room we have to scale the map
   const [diagramContainerHeight, setDiagramContainerHeight] = useState(0);
+  const [simulationTransform, setSimulationTransform] = useState(1);
+
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!ref.current) return;
@@ -615,13 +622,32 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     return () => resizeObserver.disconnect(); // clean up
   });
 
-  // We also need the diagram container's width. Unlike height, the width is stable on first render.
-  // But could be 904px or scaled down, depending on whether we're looking at a Screenplay simulation.
-  const fullWidth = document.getElementById("diagram-container")?.getBoundingClientRect()?.width ?? 0
+  // Measures line-map svg when the scaleFactor changes, updates state
+  const measuredRef = useCallback(node => {
+    const myObserver = new ResizeObserver(() => {})
 
-  const [doAbbreviate, setDoAbbreviate] = useState(false);
-  const [scaleFactor, setScaleFactor] = useState(1);
-  const [isDone, setIsDone] = useState(false);
+    if (node !== null) {
+      myObserver.observe(node)
+      setLineDiagramHeight(node.getBoundingClientRect().height);
+      setLineDiagramWidth(node.getBoundingClientRect().width);
+    }
+    
+    return () => myObserver.disconnect()
+  }, [scaleFactor]);
+
+  // First, we need to figure out whether we're in a Screenplay simulation or not,
+  // because unfortunately, the CSS transform on those simulations messes up the widget's
+  // ability to measure itself in the DOM. So, we need to get the original height of the
+  // diagram, pre-scaled, to accurately set its viewbox dimensions.
+  let simulation, simulationStyle;
+  useEffect(() => {
+    simulation = document.getElementById("simulation")
+    simulationStyle = simulation && window.getComputedStyle(simulation) 
+    setSimulationTransform(new WebKitCSSMatrix(simulationStyle?.transform).m11);
+  }, []);
+  
+  const fullWidth = 904 * simulationTransform;
+  const originalHeight = lineDiagramHeight * 1/simulationTransform
 
   const numStops = slots.length;
   const spaceBetween = Math.min(
@@ -674,23 +700,6 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   });
 
   x += spaceBetween + SLOT_WIDTH;
-
-  // Get the size of the diagram line map svg, excluding emphasis
-  const [lineDiagramHeight, setLineDiagramHeight] = useState(0);
-  const [lineDiagramWidth, setLineDiagramWidth] = useState(0);
-
-  // Measures line-map svg when the scaleFactor changes, updates state
-  const measuredRef = useCallback(node => {
-    const myObserver = new ResizeObserver(() => {})
-
-    if (node !== null) {
-      myObserver.observe(node)
-      setLineDiagramHeight(node.getBoundingClientRect().height);
-      setLineDiagramWidth(node.getBoundingClientRect().width);
-    }
-    
-    return () => myObserver.disconnect()
-  }, [scaleFactor]);
   
   // Scale the line-map svg given the available screen width 
   const measureDiagramAndScale = () => {
@@ -741,15 +750,6 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   
   // Next is to align the diagram at the top of the svg, which involves adjusting the SVG viewbox
 
-  // First, we need to figure out whether we're in a Screenplay simulation or not,
-  // because unfortunately, the CSS transform on those simulations messes up the widget's
-  // ability to measure itself in the DOM. So, we need to get the original height of the
-  // diagram, pre-scaled, to accurately set its viewbox dimensions.
-  const simulation = document.getElementById("simulation")
-  const simulationStyle = simulation && window.getComputedStyle(simulation) 
-  const simulationTransform = new WebKitCSSMatrix(simulationStyle?.transform).m11;
-  const originalHeight = lineDiagramHeight * 1/simulationTransform
-
   // If -${height} is used as the viewbox height, it looks like the line diagram text
   // pushed all the way to the bottom of the viewbox with just a tiny point of the
   // "You are Here" diamond sticking out. So, the parts that are cut off are the whole
@@ -764,7 +764,6 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     originalHeight
     - LINE_HEIGHT * scaleFactor / 2
     - MAX_ENDPOINT_HEIGHT * scaleFactor / 2
-    + (hasEmphasis ? EMPHASIS_PADDING_TOP * scaleFactor : 0)
 
   return (
     <div style={{width: "100%", height: "100%"}} id="diagram-container" ref={ref}>
