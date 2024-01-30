@@ -41,7 +41,7 @@ defmodule Screens.Ueberauth.Strategy.Fake do
       raw_info: %UeberauthOidcc.RawInfo{
         userinfo: %{
           "resource_access" => %{
-            "dev-client" => %{"roles" => [Ueberauth.Strategy.Helpers.options(conn)[:roles]]}
+            "dev-client" => %{"roles" => Ueberauth.Strategy.Helpers.options(conn)[:roles]}
           }
         }
       }

@@ -70,7 +70,7 @@ config :screens, ScreensWeb.AuthManager, secret_key: "test key"
 
 config :ueberauth, Ueberauth,
   providers: [
-    keycloak: {Screens.Ueberauth.Strategy.Fake, [groups: ["screens-admin"]]}
+    keycloak: {Screens.Ueberauth.Strategy.Fake, [roles: ["screens-admin"]]}
   ]
 
 config :ueberauth_oidcc,
