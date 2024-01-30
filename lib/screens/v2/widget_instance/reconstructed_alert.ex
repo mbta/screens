@@ -95,6 +95,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @route_directions %{
     "Blue" => ["Bowdoin", "Wonderland"],
     "Orange" => ["Forest Hills", "Oak Grove"],
+    "Red-Ashmont" => ["Ashmont", "Alewife"],
+    "Red-Braintree" => ["Braintree", "Alewife"],
     "Red" => ["Ashmont & Braintree", "Alewife"],
     "Green-B" => ["Boston College", "Government Center"],
     "Green-C" => ["Cleveland Circle", "Government Center"],
@@ -130,13 +132,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          route_id \\ nil
        ) do
     informed_entities =
-      if is_nil(route_id) do
-        Alert.informed_entities(alert)
-      else
-        alert
-        |> Alert.informed_entities()
-        |> Enum.filter(&String.starts_with?(&1.route, route_id))
-      end
+      alert
+      |> Alert.informed_entities()
+      |> Enum.filter(fn entity ->
+        (InformedEntity.parent_station?(entity) or is_nil(entity.stop)) and
+          (is_nil(route_id) or String.starts_with?(entity.route, route_id))
+      end)
 
     # Consolidate the list of entities into their direction from current station
     # and their affiliated route id
@@ -177,7 +178,45 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Given an entity and the directionality of the alert from the home stop,
-  # return a tuple with the affected direction_id and route id
+  # return a tuple with the affected direction_id and route_id
+
+  # If the route is red and the alert is downstream, we have to figure out whether the alert
+  # only affects one branch or both
+  defp get_direction_and_route_from_entity(
+         %{direction_id: nil, route: "Red", stop: stop_id},
+         location
+       )
+       when stop_id != nil and location in [:downstream, :boundary_downstream] do
+    cond do
+      Stop.on_ashmont_branch?(stop_id) ->
+        {0, "Red-Ashmont"}
+
+      Stop.on_braintree_branch?(stop_id) ->
+        {0, "Red-Braintree"}
+
+      true ->
+        {0, "Red"}
+    end
+  end
+
+  # Same with RL upstream alerts
+  defp get_direction_and_route_from_entity(
+         %{direction_id: nil, route: "Red", stop: stop_id},
+         location
+       )
+       when stop_id != nil and location in [:upstream, :boundary_upstream] do
+    cond do
+      Stop.on_ashmont_branch?(stop_id) ->
+        {1, "Red-Ashmont"}
+
+      Stop.on_braintree_branch?(stop_id) ->
+        {1, "Red-Braintree"}
+
+      true ->
+        {1, "Red"}
+    end
+  end
+
   defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, location)
        when location in [:downstream, :boundary_downstream],
        do: {0, route}
@@ -208,8 +247,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
 
     affected_routes
+    # Filter alert-affected routes by which routes are at the current stop
+    # If a green-branch is the affected route, we can generalize it to just "Green-"
+    # because our prefare screens will be on the trunk. Any GL disruption will be
+    # downstream of a GL trunk station.
     |> Enum.filter(fn
-      "Green" -> Enum.find(routes_at_stop, &String.starts_with?(&1, "Green"))
+      "Green" <> _ -> Enum.find(routes_at_stop, &String.starts_with?(&1, "Green"))
       route -> route in routes_at_stop
     end)
     |> Enum.flat_map(fn
@@ -450,27 +493,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       region: get_region_from_location(location)
     }
   end
-
-  # %{
-  #   # Unique to station closures
-  #   optional(:unaffected_routes) => list(enriched_route()),
-  #   optional(:location) => String.t() | nil,
-  #   optional(:remedy) => String.t(),
-  #   optional(:stations) => list(String.t()),
-  #   # Unique to single screen alerts
-  #   optional(:endpoints) => list(String.t()),
-  #   # Unique to transfer station case
-  #   optional(:is_transfer_station) => boolean(),
-  #   # Weird extra field for fallback layout with special styling
-  #   optional(:remedy_bold) => String.t(),
-  #   issue: String.t() | list(String.t()),
-  #   cause: Alert.cause() | nil,
-  #   # List of SVG filenames
-  #   routes: list(enriched_route()),
-  #   effect: :suspension | :shuttle | :station_closure | :delay,
-  #   updated_at: String.t(),
-  #   region: :here | :boundary | :outside
-  # }
 
   @spec serialize_single_screen_alert(t(), LocalizedAlert.location()) ::
           single_screen_serialized_response()
