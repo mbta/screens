@@ -695,37 +695,37 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   });
 
   x += spaceBetween + SLOT_WIDTH;
-  
-  // Scale the line-map svg given the available screen width 
-  const measureDiagramAndScale = () => {
-    if (!isDone && diagramContainerHeight != 0) {
-      // If scaleFactor has already been applied to the line-map, we need to reverse that for calculations
-      const unscaledHeight = lineDiagramHeight / scaleFactor;
-      const unscaledWidth = lineDiagramWidth / scaleFactor;
-
-      // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
-      let xScaleFactor = fullWidth / unscaledWidth;
-      
-      const needsAbbreviating = !doAbbreviate &&
-        unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) * simulationTransform > diagramContainerHeight;
-      if (needsAbbreviating) {
-        setDoAbbreviate(true);
-        // now scale y, which requires re-running this effect
-      } else {
-        const yScaleFactor = (diagramContainerHeight - getEmphasisHeight(1) * simulationTransform) / unscaledHeight
-        const factor = Math.min(
-          xScaleFactor,
-          yScaleFactor
-        );
-        setScaleFactor(factor);
-        setIsDone(true);
-      }
-    }
-  }
 
   // When the parent container size changes, or abbreviation setting changes,
   // re-measure the diagram and scale accordingly.
   useEffect(() => {
+    // Scale the line-map svg given the available screen width 
+    const measureDiagramAndScale = () => {
+      if (!isDone && diagramContainerHeight != 0) {
+        // If scaleFactor has already been applied to the line-map, we need to reverse that for calculations
+        const unscaledHeight = lineDiagramHeight / scaleFactor;
+        const unscaledWidth = lineDiagramWidth / scaleFactor;
+
+        // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
+        let xScaleFactor = fullWidth / unscaledWidth;
+        
+        const needsAbbreviating = !doAbbreviate &&
+          unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) * simulationTransform > diagramContainerHeight;
+        if (needsAbbreviating) {
+          setDoAbbreviate(true);
+          // now scale y, which requires re-running this effect
+        } else {
+          const yScaleFactor = (diagramContainerHeight - getEmphasisHeight(1) * simulationTransform) / unscaledHeight
+          const factor = Math.min(
+            xScaleFactor,
+            yScaleFactor
+          );
+          setScaleFactor(factor);
+          setIsDone(true);
+        }
+      }
+    }
+
     // The isCurrent setting is needed to clean up the unused hook runs / state changes
     let isCurrent = true
     
