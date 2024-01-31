@@ -624,15 +624,10 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
   // Measures line-map svg when the scaleFactor changes, updates state
   const measuredRef = useCallback(node => {
-    const myObserver = new ResizeObserver(() => {})
-
     if (node !== null) {
-      myObserver.observe(node)
       setLineDiagramHeight(node.getBoundingClientRect().height);
       setLineDiagramWidth(node.getBoundingClientRect().width);
-    }
-    
-    return () => myObserver.disconnect()
+    } 
   }, [scaleFactor]);
 
   // First, we need to figure out whether we're in a Screenplay simulation or not,
@@ -643,7 +638,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   useEffect(() => {
     simulation = document.getElementById("simulation")
     simulationStyle = simulation && window.getComputedStyle(simulation) 
-    setSimulationTransform(new WebKitCSSMatrix(simulationStyle?.transform).m11);
+    setSimulationTransform(new DOMMatrix(simulationStyle?.transform).m11);
   }, []);
   
   const fullWidth = 904 * simulationTransform;
