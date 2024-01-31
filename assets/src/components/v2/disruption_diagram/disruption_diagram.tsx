@@ -623,7 +623,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   }, [ref?.current]);
 
   // Measures line-map svg when the scaleFactor changes, updates state
-  const measuredRef = useCallback(node => {
+  const measureLineMapNode = useCallback(node => {
     if (node !== null) {
       setLineDiagramHeight(node.getBoundingClientRect().height);
       setLineDiagramWidth(node.getBoundingClientRect().width);
@@ -768,7 +768,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         visibility={isDone ? "visible" : "hidden"}
       >
         <g transform={`translate(${L * scaleFactor} 0)`}>
-          <g id="line-map" transform={`scale(${scaleFactor})`} ref={measuredRef}>
+          <g id="line-map" transform={`scale(${scaleFactor})`} ref={measureLineMapNode}>
             {effect !== "station_closure" && (
               <EffectBackgroundComponent
                 effectRegionSlotIndexRange={props.effect_region_slot_index_range}
