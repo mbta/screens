@@ -615,11 +615,11 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     if (!ref.current) return;
     const resizeObserver = new ResizeObserver(() => {
       if (ref?.current) {
-        setDiagramContainerHeight(ref.current.clientHeight);
+        setDiagramContainerHeight(ref.current.clientHeight * simulationTransform);
       }
     });
     resizeObserver.observe(ref.current);
-    return () => resizeObserver.disconnect(); // clean up
+    return () => resizeObserver.disconnect();
   });
 
   // Measures line-map svg when the scaleFactor changes, updates state
@@ -712,12 +712,12 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
       let xScaleFactor = fullWidth / unscaledWidth;
       
       const needsAbbreviating = !doAbbreviate &&
-        unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) > diagramContainerHeight;
+        unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) * simulationTransform > diagramContainerHeight;
       if (needsAbbreviating) {
         setDoAbbreviate(true);
         // now scale y, which requires re-running this effect
       } else {
-        const yScaleFactor = (diagramContainerHeight - getEmphasisHeight(1)) / unscaledHeight
+        const yScaleFactor = (diagramContainerHeight - getEmphasisHeight(1) * simulationTransform) / unscaledHeight
         const factor = Math.min(
           xScaleFactor,
           yScaleFactor
@@ -746,7 +746,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   }, [lineDiagramHeight, diagramContainerHeight, doAbbreviate]);
 
   // This is to center the diagram along the X axis
-  const translateX = (lineDiagramWidth && (fullWidth - lineDiagramWidth) / 2) || 0;
+  const translateX = (lineDiagramWidth && (fullWidth - lineDiagramWidth) / 2 / simulationTransform) || 0;
   
   // Next is to align the diagram at the top of the svg, which involves adjusting the SVG viewbox
 
@@ -766,7 +766,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     - MAX_ENDPOINT_HEIGHT * scaleFactor / 2
 
   return (
-    <div style={{width: "100%", height: "100%"}} id="diagram-container" ref={ref}>
+    <div style={{width: "100%", height: "100%"}} ref={ref}>
       <svg
         viewBox={`0 ${-viewBoxOffset} ${DIAGRAM_WIDTH} ${originalHeight + getEmphasisHeight(scaleFactor)}`}
         transform={`translate(${translateX})`}
