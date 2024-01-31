@@ -620,7 +620,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     });
     resizeObserver.observe(ref.current);
     return () => resizeObserver.disconnect();
-  });
+  }, [ref?.current]);
 
   // Measures line-map svg when the scaleFactor changes, updates state
   const measuredRef = useCallback(node => {
