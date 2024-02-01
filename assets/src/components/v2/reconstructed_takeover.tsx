@@ -29,20 +29,6 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
     disruption_diagram,
   } = alert;
 
-  const [diagramHeight, setDiagramHeight] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const resizeObserver = new ResizeObserver(() => {
-      if (ref?.current) {
-        setDiagramHeight(ref.current.clientHeight);
-      }
-    });
-    resizeObserver.observe(ref.current);
-    return () => resizeObserver.disconnect(); // clean up
-  });
-
   return (
     <>
       <div
@@ -66,12 +52,8 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
                 <div
                   id="disruption-diagram-container"
                   className="disruption-diagram-container"
-                  ref={ref}
                 >
-                  <DisruptionDiagram
-                    {...disruption_diagram}
-                    svgHeight={diagramHeight}
-                  />
+                  <DisruptionDiagram {...disruption_diagram} />
                 </div>
               )}
             </div>

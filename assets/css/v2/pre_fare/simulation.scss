@@ -29,6 +29,11 @@
   margin-bottom: 20px;
   height: 449px;
 
+  .simulation {
+    transform-origin: top left;
+    transform: scale(17.92%);
+  }
+
   .simulation__full-page {
     max-height: 407px;
     max-width: 388px;
@@ -42,11 +47,6 @@
       line-height: 24px;
       color: #f8f9fa;
       margin-bottom: 10px;
-    }
-
-    & > *:not(.simulation__title) {
-      transform-origin: top left;
-      transform: scale(17.92%);
     }
   }
 
@@ -63,8 +63,6 @@
         & > * {
           height: 1720px;
           width: 1080px;
-          transform-origin: top left;
-          transform: scale(17.92%);
           overflow: hidden;
         }
       }
@@ -93,8 +91,6 @@
         & > * {
           height: 1720px;
           width: 1080px;
-          transform-origin: top left;
-          transform: scale(17.92%);
           overflow: hidden;
         }
       }

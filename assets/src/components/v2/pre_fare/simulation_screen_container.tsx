@@ -31,19 +31,24 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
     );
   }
 
+  const isPageListActive = leftScreenPages && leftScreenPages.length > 1
+                        && rightScreenPages && rightScreenPages.length > 1
+
   return (
     <div className="simulation-screen-centering-container">
       <div className="simulation-screen-scrolling-container">
         {apiResponse && (
           <div className="simulation__full-page">
             <div className="simulation__title">Live view</div>
-            <WidgetTreeErrorBoundary>
-              <Widget data={fullPage} />
-            </WidgetTreeErrorBoundary>
+            <div className="simulation" id="simulation">
+              <WidgetTreeErrorBoundary>
+                <Widget data={fullPage} />
+              </WidgetTreeErrorBoundary>
+            </div>
           </div>
         )}
-        {flexZone && <div className="divider"></div>}
-        {leftScreenPages && leftScreenPages.length > 0 && (
+        {isPageListActive && <div className="divider"></div>}
+        {leftScreenPages && leftScreenPages.length > 1 && (
           <div className="simulation__left-screen">
             <div className="simulation__title">
               Left panel ({leftScreenPages.length})
@@ -54,7 +59,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
                   return (
                     <div
                       key={`page${index}`}
-                      className="simulation__left-screen-widget"
+                      className="simulation simulation__left-screen-widget"
                     >
                       <Widget data={flexZonePage} />
                     </div>
@@ -64,7 +69,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
             </div>
           </div>
         )}
-        {rightScreenPages && rightScreenPages.length > 0 && (
+        {rightScreenPages && rightScreenPages.length > 1 && (
           <div className="simulation__right-screen">
             <div className="simulation__title">
               Flex zone ({rightScreenPages.length})
@@ -75,7 +80,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
                   return (
                     <div
                       key={`page${index}`}
-                      className="simulation__right-screen-widget"
+                      className="simulation simulation__right-screen-widget"
                     >
                       <Widget data={flexZonePage} />
                     </div>
