@@ -711,8 +711,10 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
         const xScaleFactor = fullWidth / unscaledWidth;
         
-        const needsAbbreviating = !doAbbreviate &&
-          unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) * simulationTransform > diagramContainerHeight;
+        // If xScaleFactor is less than 1, let's try abbreviating.
+        // Or, if the x scaling constrains the height, abbreviate
+        const needsAbbreviating = !doAbbreviate && (xScaleFactor < 1 ||
+          unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) * simulationTransform > diagramContainerHeight);
         if (needsAbbreviating) {
           setDoAbbreviate(true);
           // now scale y, which requires re-running this effect
