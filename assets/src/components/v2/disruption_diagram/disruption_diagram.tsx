@@ -625,8 +625,9 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   // Measures line-map svg when the scaleFactor changes, updates state
   const measureLineMapNode = useCallback(node => {
     if (node !== null) {
-      setLineDiagramHeight(node.getBoundingClientRect().height);
-      setLineDiagramWidth(node.getBoundingClientRect().width);
+      const {height, width} = node.getBoundingClientRect();
+      setLineDiagramHeight(height);
+      setLineDiagramWidth(width);
     } 
   }, [scaleFactor]);
 
