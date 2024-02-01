@@ -635,10 +635,9 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   // because unfortunately, the CSS transform on those simulations messes up the widget's
   // ability to measure itself in the DOM. So, we need to get the original height of the
   // diagram, pre-scaled, to accurately set its viewbox dimensions.
-  let simulation, simulationStyle;
   useEffect(() => {
-    simulation = document.getElementById("simulation")
-    simulationStyle = simulation && window.getComputedStyle(simulation) 
+    const simulation = document.getElementById("simulation")
+    const simulationStyle = simulation && window.getComputedStyle(simulation) 
     setSimulationTransform(new DOMMatrix(simulationStyle?.transform).m11);
   }, []);
   
