@@ -83,7 +83,7 @@ config :ueberauth_oidcc,
   ]
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+config :logger, level: :warning
 
 config :screens, :screens_by_alert,
   cache_module: Screens.ScreensByAlert.GenServer,

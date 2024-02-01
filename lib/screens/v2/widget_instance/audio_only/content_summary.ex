@@ -36,7 +36,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
     # Attempt to find a header widget and place this widget immediately after it
     case Enum.find(t.widgets_snapshot, &match?(%NormalHeader{}, &1)) do
       nil ->
-        Logger.warn("Failed to find a header widget in the audio readout queue")
+        Logger.warning("Failed to find a header widget in the audio readout queue")
         [0]
 
       header ->

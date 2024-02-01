@@ -180,7 +180,7 @@ defmodule Screens.Cache.Owner do
     if log_as_error?(state) do
       Logger.error(log_message)
     else
-      Logger.warn(log_message)
+      Logger.warning(log_message)
     end
 
     %{state | retry_count: state.retry_count + 1}

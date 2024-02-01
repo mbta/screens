@@ -53,10 +53,10 @@ config :screens,
 
 config :screens, ScreensWeb.AuthManager, issuer: "screens"
 
+# Placeholder for Keycloak authentication, defined for real in environment configs
 config :ueberauth, Ueberauth,
   providers: [
-    keycloak:
-      {Ueberauth.Strategy.Oidcc, userinfo: true, uid_field: "email", scopes: ~w(openid email)}
+    keycloak: nil
   ]
 
 config :screens,
