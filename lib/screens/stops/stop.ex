@@ -546,6 +546,14 @@ defmodule Screens.Stops.Stop do
     stop_id in Enum.map(@medford_tufts_branch_stops ++ @union_square_branch_stops, &elem(&1, 0))
   end
 
+  def on_ashmont_branch?(stop_id) do
+    stop_id in Enum.map(@red_line_ashmont_branch_stops, &elem(&1, 0))
+  end
+
+  def on_braintree_branch?(stop_id) do
+    stop_id in Enum.map(@red_line_braintree_branch_stops, &elem(&1, 0))
+  end
+
   defp fetch_tagged_stop_sequences_by_app(app, stop_id, _routes_at_stop)
        when app in [BusEink, BusShelter, GlEink] do
     RoutePattern.fetch_tagged_stop_sequences_through_stop(stop_id)

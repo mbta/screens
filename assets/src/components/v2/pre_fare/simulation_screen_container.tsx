@@ -40,10 +40,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
         {apiResponse && (
           <div className="simulation__full-page">
             <div className="simulation__title">Live view</div>
-            <div
-              className="simulation"
-              id={`simulation`}
-            >
+            <div className="simulation" id="simulation">
               <WidgetTreeErrorBoundary>
                 <Widget data={fullPage} />
               </WidgetTreeErrorBoundary>
