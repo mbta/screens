@@ -708,7 +708,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
         const unscaledWidth = lineDiagramWidth / scaleFactor;
 
         // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
-        let xScaleFactor = fullWidth / unscaledWidth;
+        const xScaleFactor = fullWidth / unscaledWidth;
         
         const needsAbbreviating = !doAbbreviate &&
           unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) * simulationTransform > diagramContainerHeight;
