@@ -66,13 +66,239 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
     end
   end
 
-  describe "valid_candidate?/1" do
+  describe "valid_candidate?/1 with \"classic\" schedule" do
     test "returns true with blank schedule", %{widget: widget} do
       assert WidgetInstance.valid_candidate?(widget)
     end
 
     test "returns false with old schedule", %{widget_old_schedule: widget_old_schedule} do
       refute WidgetInstance.valid_candidate?(widget_old_schedule)
+    end
+  end
+
+  describe "valid_candidate?/1 with recurrent schedule" do
+    setup do
+      %{
+        widget_non_overnight_schedule:
+          struct(EvergreenContent, %{
+            schedule: %{
+              dates: [%{start_date: ~D[2023-01-05], end_date: ~D[2023-01-10]}],
+              times: [%{start_time_utc: ~T[06:30:00], end_time_utc: ~T[17:00:00]}]
+            }
+          }),
+        widget_overnight_schedule:
+          struct(EvergreenContent, %{
+            schedule: %{
+              dates: [%{start_date: ~D[2023-01-05], end_date: ~D[2023-01-10]}],
+              times: [%{start_time_utc: ~T[22:00:00], end_time_utc: ~T[03:00:00]}]
+            }
+          }),
+        widget_multi_schedule:
+          struct(EvergreenContent, %{
+            schedule: %{
+              dates: [
+                %{start_date: ~D[2023-01-05], end_date: ~D[2023-01-10]},
+                %{start_date: ~D[2023-02-05], end_date: ~D[2023-02-10]}
+              ],
+              times: [
+                %{start_time_utc: ~T[06:30:00], end_time_utc: ~T[17:00:00]},
+                %{start_time_utc: ~T[22:00:00], end_time_utc: ~T[03:00:00]}
+              ]
+            }
+          })
+      }
+    end
+
+    # Recurrent schedule: basic cases
+
+    test "recurrent schedule: returns false for empty schedule" do
+      widget =
+        struct(EvergreenContent, %{
+          now: ~U[2023-01-05T12:00:00Z],
+          schedule: %{
+            dates: [],
+            times: []
+          }
+        })
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent schedule: returns false for schedule with no dates" do
+      widget =
+        struct(EvergreenContent, %{
+          now: ~U[2023-01-05T12:00:00Z],
+          schedule: %{
+            dates: [],
+            times: [%{start_time_utc: ~T[06:30:00], end_time_utc: ~T[17:00:00]}]
+          }
+        })
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent schedule: returns false for schedule with no times" do
+      widget =
+        struct(EvergreenContent, %{
+          now: ~U[2023-01-05T12:00:00Z],
+          schedule: %{
+            dates: [%{start_date: ~D[2023-01-01], end_date: ~D[2023-01-10]}],
+            times: []
+          }
+        })
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    # Recurrent schedule: non-overnight time period
+
+    test "recurrent schedule: returns true for schedule with non-overnight time period, now is within date and time",
+         %{widget_non_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-05T12:00:00Z]}
+
+      assert WidgetInstance.valid_candidate?(widget)
+
+      widget = %{widget | now: ~U[2023-01-06T12:00:00Z]}
+
+      assert WidgetInstance.valid_candidate?(widget)
+
+      widget = %{widget | now: ~U[2023-01-10T12:00:00Z]}
+
+      assert WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent schedule: returns false for schedule with non-overnight time period, now is outside date",
+         %{widget_non_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-04T12:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+
+      widget = %{widget | now: ~U[2023-01-11T12:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent schedule: returns false for schedule with non-overnight time period, now is outside time",
+         %{widget_non_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-05T06:29:59Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+
+      widget = %{widget | now: ~U[2023-01-05T17:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent schedule: returns false for schedule with non-overnight time period, now is outside date and time",
+         %{widget_non_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-02-18T21:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    # Recurrent schedule: overnight time period
+    # date: 1/5 - 1/10
+    # time: 22:00 - 03:00
+
+    test "recurrent_schedule: returns false for schedule with overnight time period, now is before UTC midnight + within time range + on start date - 1",
+         %{widget_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-04T23:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent_schedule: returns false for schedule with overnight time period, now is after UTC midnight + within time range + on start date",
+         %{widget_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-05T01:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent_schedule: returns true for schedule with overnight time period, now is before UTC midnight + within time range + on start date",
+         %{widget_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-05T22:00:00Z]}
+
+      assert WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent_schedule: returns false for schedule with overnight time period, now is outside of time range + within date range",
+         %{widget_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-05T12:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent_schedule: returns true for schedule with overnight time period, now is before UTC midnight + within time range + on end date",
+         %{widget_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-10T23:00:00Z]}
+
+      assert WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent_schedule: returns true for schedule with overnight time period, now is after UTC midnight + within time range + on end date + 1",
+         %{widget_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-11T01:00:00Z]}
+
+      assert WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent_schedule: returns false for schedule with overnight time period, now is outside of time range + on end date + 1",
+         %{widget_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-11T12:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent_schedule: returns false for schedule with overnight time period, now is before UTC midnight + within time range + on end date + 1",
+         %{widget_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-11T23:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent_schedule: returns false for schedule with overnight time period, now is after UTC midnight + within time range + on end date + 2",
+         %{widget_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-12T01:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent_schedule: returns false for schedule with overnight time period, now is outside of time range + on end date + 2",
+         %{widget_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-12T12:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent_schedule: returns false for schedule with overnight time period, now is before UTC midnight + within of time range + on end date + 2",
+         %{widget_overnight_schedule: widget} do
+      widget = %{widget | now: ~U[2023-01-12T23:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+
+    # Multiple dates/times
+
+    test "recurrent_schedule: returns true if any date and any time matches when there are multiple",
+         %{widget_multi_schedule: widget} do
+      widget = %{widget | now: ~U[2023-02-06T12:00:00Z]}
+
+      assert WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "recurrent_schedule: returns false if either no date or no time matches when there are multiple",
+         %{widget_multi_schedule: widget} do
+      widget = %{widget | now: ~U[2023-03-06T12:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+
+      widget = %{widget | now: ~U[2023-02-06T18:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
+
+      widget = %{widget | now: ~U[2023-03-06T18:00:00Z]}
+
+      refute WidgetInstance.valid_candidate?(widget)
     end
   end
 

@@ -1,23 +1,14 @@
-defmodule Screens.SignsUiConfig.State.S3Fetch do
-  @moduledoc false
-
-  alias Screens.SignsUiConfig.State
-  @behaviour Screens.ConfigCache.State.Fetch
+defmodule Screens.SignsUiConfig.Fetch.S3 do
+  @moduledoc """
+  Functions to work with an S3-hosted copy of the Signs UI config.
+  """
 
   require Logger
 
-  @impl true
-  def fetch_config(current_version) do
-    with {:ok, body, new_version} <- get_from_s3(current_version),
-         {:ok, decoded} <- Jason.decode(body) do
-      {:ok, State.Parse.parse_config(decoded), new_version}
-    else
-      :unchanged -> :unchanged
-      _ -> :error
-    end
-  end
+  @behaviour Screens.SignsUiConfig.Fetch
 
-  def get_from_s3(current_version \\ nil) do
+  @impl true
+  def fetch_config(current_version \\ nil) do
     bucket = Application.get_env(:screens, :signs_ui_s3_bucket)
     path = Application.get_env(:screens, :signs_ui_s3_path)
 

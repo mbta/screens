@@ -86,7 +86,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   end
 
   defp watched_screen_ids do
-    Screens.Config.State.screen_ids(fn {_screen_id, screen_config} ->
+    Screens.Config.Cache.screen_ids(fn {_screen_id, screen_config} ->
       valid_for_self_refresh?(screen_config)
     end)
   end

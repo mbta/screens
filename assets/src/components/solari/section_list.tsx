@@ -9,6 +9,7 @@ interface Props {
   sectionHeaders: string;
   currentTimeString: string;
   overhead: boolean;
+  stationName: string;
   isDummy?: boolean;
 }
 
@@ -20,6 +21,7 @@ const SectionList = React.forwardRef(
       sectionHeaders,
       currentTimeString,
       overhead,
+      stationName,
       isDummy = false,
     }: Props,
     ref
@@ -44,6 +46,7 @@ const SectionList = React.forwardRef(
               overhead={overhead}
               isAnimated={!isDummy}
               key={section.name}
+              stationName={stationName}
             />
           );
         })}

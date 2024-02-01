@@ -1,4 +1,4 @@
-defmodule Screens.SignsUiConfig.State.Parse do
+defmodule Screens.SignsUiConfig.Parse do
   @moduledoc false
 
   def parse_config(%{"configured_headways" => headways, "signs" => signs}) do
@@ -24,9 +24,11 @@ defmodule Screens.SignsUiConfig.State.Parse do
     |> Enum.into(%{})
   end
 
-  for mode <- ~w[auto headway off static_text]a do
+  for mode <- ~w[auto headway off static_text temporary_terminal]a do
     mode_string = Atom.to_string(mode)
 
     defp parse_sign_mode(unquote(mode_string)), do: unquote(mode)
   end
+
+  defp parse_sign_mode(_), do: :unknown
 end

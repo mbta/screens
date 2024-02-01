@@ -105,6 +105,9 @@ defmodule Screens.RoutePatterns.RoutePattern do
         else: params
 
     case get_json_fn.("route_patterns", params) do
+      {:ok, %{"data" => []}} ->
+        :error
+
       {:ok, result} ->
         {:ok, get_tagged_parent_station_sequences_from_result(result)}
 

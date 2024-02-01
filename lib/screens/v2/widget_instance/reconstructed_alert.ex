@@ -1219,8 +1219,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def valid_candidate?(%__MODULE__{} = t) do
     # Suppress GL Surge alerts at Government Center.
-    test_surge_alerts = ["143269", "143277"]
-    prod_surge_alerts = ["535276", "536905"]
+    test_surge_alerts = ["155040"]
+    prod_surge_alerts = ["544008", "546499", "547600", "547613", "549803"]
 
     suppressed =
       t.alert.id in (test_surge_alerts ++ prod_surge_alerts) and

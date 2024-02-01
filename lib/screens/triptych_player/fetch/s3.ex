@@ -1,24 +1,14 @@
-defmodule Screens.TriptychPlayer.State.S3Fetch do
-  @moduledoc false
+defmodule Screens.TriptychPlayer.Fetch.S3 do
+  @moduledoc """
+  Functions to work with an S3-hosted copy of the triptych player config.
+  """
 
   require Logger
 
-  @behaviour Screens.ConfigCache.State.Fetch
-  @behaviour Screens.TriptychPlayer.State.Fetch
+  @behaviour Screens.TriptychPlayer.Fetch
 
-  @impl Screens.ConfigCache.State.Fetch
-  def fetch_config(current_version) do
-    with {:ok, body, new_version} <- get_config(current_version),
-         {:ok, decoded} <- Jason.decode(body) do
-      {:ok, decoded, new_version}
-    else
-      :unchanged -> :unchanged
-      _ -> :error
-    end
-  end
-
-  @impl Screens.TriptychPlayer.State.Fetch
-  def get_config(current_version \\ nil) do
+  @impl true
+  def fetch_config(current_version \\ nil) do
     bucket = Application.get_env(:screens, :triptych_player_s3_bucket)
     path = config_path_for_environment()
 
@@ -48,11 +38,11 @@ defmodule Screens.TriptychPlayer.State.S3Fetch do
     end
   end
 
-  @impl Screens.TriptychPlayer.State.Fetch
-  def put_config(contents) do
+  @impl true
+  def put_config(file_contents) do
     bucket = Application.get_env(:screens, :triptych_player_s3_bucket)
     path = config_path_for_environment()
-    put_operation = ExAws.S3.put_object(bucket, path, contents)
+    put_operation = ExAws.S3.put_object(bucket, path, file_contents)
 
     case ExAws.request(put_operation) do
       {:ok, %{status_code: 200}} -> :ok
