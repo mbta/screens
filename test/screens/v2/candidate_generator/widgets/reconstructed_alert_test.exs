@@ -8,6 +8,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
   alias ScreensConfig.V2.Header.CurrentStopId
   alias ScreensConfig.V2.{PreFare, Solari}
   alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.ReconstructedAlert, as: ReconstructedAlertWidget
 
@@ -22,7 +23,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
 
   describe "reconstructed_alert_instances/5" do
     setup do
-      stop_id = "place-hsmnl"
+      stop_id = "place-ogmnl"
 
       app = PreFare
 
@@ -36,86 +37,35 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
 
       routes_at_stop = [
         %{
-          route_id: "Red",
+          route_id: "Orange",
           active?: true,
           direction_destinations: nil,
           long_name: nil,
           short_name: nil,
           type: :subway
-        },
-        %{
-          route_id: "Green-B",
-          active?: false,
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :light_rail
-        },
-        %{
-          route_id: "Green-C",
-          active?: true,
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :light_rail
-        },
-        %{
-          route_id: "Green-D",
-          active?: true,
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :light_rail
-        },
-        %{
-          route_id: "Green-E",
-          active?: true,
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :light_rail
         }
       ]
 
       happening_now_active_period = [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-      upcoming_active_period = [{~U[2021-01-02T00:00:00Z], ~U[2021-01-03T00:00:00Z]}]
 
       alerts = [
         %Alert{
           id: "1",
           effect: :station_closure,
-          informed_entities: [ie(stop: "place-hsmnl")],
+          informed_entities: [ie(stop: "place-ogmnl")],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "2",
           effect: :station_closure,
-          informed_entities: [ie(stop: "place-bckhl")],
+          informed_entities: [ie(stop: "place-mlmnl")],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "3",
           effect: :delay,
-          informed_entities: [ie(stop: "place-hsmnl")],
+          informed_entities: [ie(stop: "place-ogmnl")],
           active_period: happening_now_active_period
-        },
-        %Alert{
-          id: "4",
-          effect: :station_closure,
-          informed_entities: [],
-          active_period: happening_now_active_period
-        },
-        %Alert{
-          id: "5",
-          effect: :stop_closure,
-          informed_entities: [ie(stop: "place-rvrwy")],
-          active_period: happening_now_active_period
-        },
-        %Alert{
-          id: "6",
-          effect: :station_closure,
-          informed_entities: [ie(stop: "place-hsmnl")],
-          active_period: upcoming_active_period
         }
       ]
 
@@ -123,30 +73,39 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         %Alert{
           id: "1",
           effect: :delay,
-          informed_entities: [ie(stop: "place-hsmnl", direction_id: 0)],
+          informed_entities: [ie(stop: "place-ogmnl", direction_id: 0)],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "2",
           effect: :delay,
-          informed_entities: [ie(stop: "place-hsmnl")],
+          informed_entities: [ie(stop: "place-ogmnl")],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "3",
           effect: :delay,
-          informed_entities: [ie(stop: "place-hsmnl", direction_id: 1)],
+          informed_entities: [ie(stop: "place-ogmnl", direction_id: 1)],
           active_period: happening_now_active_period
         }
       ]
 
-      stop_sequences = [
-        ["place-hsmnl", "place-bckhl", "place-rvrwy", "place-mispk"]
-      ]
+      tagged_stop_sequences = %{
+        "A" => [["place-ogmnl", "place-mlmnl", "place-welln", "place-astao"]]
+      }
+
+      stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+
+      fetch_stop_name_fn = fn
+        "place-ogmnl" -> "Oak Grove"
+        "place-mlmnl" -> "Malden Center"
+        "place-welln" -> "Wellington"
+        "place-astao" -> "Assembly"
+      end
 
       location_context = %LocationContext{
         home_stop: stop_id,
-        stop_sequences: stop_sequences,
+        tagged_stop_sequences: tagged_stop_sequences,
         upstream_stops: Stop.upstream_stop_id_set(stop_id, stop_sequences),
         downstream_stops: Stop.downstream_stop_id_set(stop_id, stop_sequences),
         routes: routes_at_stop,
@@ -158,10 +117,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         bad_config: bad_config,
         location_context: location_context,
         now: ~U[2021-01-01T00:00:00Z],
-        informed_stations_string: "Alewife",
+        happening_now_active_period: happening_now_active_period,
         fetch_alerts_fn: fn _ -> {:ok, alerts} end,
         fetch_directional_alerts_fn: fn _ -> {:ok, directional_alerts} end,
-        fetch_stop_name_fn: fn _ -> "Alewife" end,
+        fetch_stop_name_fn: fetch_stop_name_fn,
         fetch_location_context_fn: fn _, _, _ -> {:ok, location_context} end,
         x_fetch_alerts_fn: fn _ -> :error end,
         x_fetch_stop_name_fn: fn _ -> :error end,
@@ -169,22 +128,43 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
       }
     end
 
-    test "returns a list of alert widgets if all queries succeed", context do
+    test "returns fullscreen instances for immediate disruptions", context do
       %{
         config: config,
         location_context: location_context,
         now: now,
-        informed_stations_string: informed_stations_string,
-        fetch_alerts_fn: fetch_alerts_fn,
+        happening_now_active_period: happening_now_active_period,
         fetch_stop_name_fn: fetch_stop_name_fn,
         fetch_location_context_fn: fetch_location_context_fn
       } = context
+
+      alerts = [
+        %Alert{
+          id: "1",
+          effect: :station_closure,
+          informed_entities: [ie(stop: "place-ogmnl")],
+          active_period: happening_now_active_period
+        },
+        %Alert{
+          id: "2",
+          effect: :station_closure,
+          informed_entities: [ie(stop: "place-mlmnl")],
+          active_period: happening_now_active_period
+        },
+        %Alert{
+          id: "3",
+          effect: :delay,
+          informed_entities: [ie(stop: "place-ogmnl")],
+          active_period: happening_now_active_period
+        }
+      ]
+
+      fetch_alerts_fn = fn _ -> {:ok, alerts} end
 
       expected_common_data = %{
         screen: config,
         location_context: location_context,
         now: now,
-        informed_stations_string: informed_stations_string,
         is_terminal_station: true
       }
 
@@ -194,9 +174,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "1",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-hsmnl")],
+              informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            }
+            },
+            is_full_screen: true,
+            informed_stations: ["Oak Grove"]
           },
           expected_common_data
         ),
@@ -205,9 +187,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-bckhl")],
+              informed_entities: [ie(stop: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            }
+            },
+            informed_stations: ["Malden Center"]
           },
           expected_common_data
         ),
@@ -216,9 +199,160 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "3",
               effect: :delay,
-              informed_entities: [ie(stop: "place-hsmnl")],
+              informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            }
+            },
+            is_full_screen: false,
+            informed_stations: []
+          },
+          expected_common_data
+        )
+      ]
+
+      assert expected_widgets ==
+               reconstructed_alert_instances(
+                 config,
+                 now,
+                 fetch_alerts_fn,
+                 fetch_stop_name_fn,
+                 fetch_location_context_fn
+               )
+    end
+
+    test "returns fullscreen instances for closest downstream disruptions if no immediate disruptions",
+         context do
+      %{
+        config: config,
+        location_context: location_context,
+        now: now,
+        happening_now_active_period: happening_now_active_period,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn
+      } = context
+
+      alerts = [
+        %Alert{
+          id: "1",
+          effect: :station_closure,
+          informed_entities: [ie(stop: "place-mlmnl")],
+          active_period: happening_now_active_period
+        },
+        %Alert{
+          id: "2",
+          effect: :station_closure,
+          informed_entities: [ie(stop: "place-astao")],
+          active_period: happening_now_active_period
+        },
+        %Alert{
+          id: "3",
+          effect: :shuttle,
+          informed_entities: [ie(stop: "place-mlmnl"), ie(stop: "place-welln")],
+          active_period: happening_now_active_period
+        }
+      ]
+
+      fetch_alerts_fn = fn _ -> {:ok, alerts} end
+
+      expected_common_data = %{
+        screen: config,
+        location_context: location_context,
+        now: now,
+        is_terminal_station: true
+      }
+
+      expected_widgets = [
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "1",
+              effect: :station_closure,
+              informed_entities: [ie(stop: "place-mlmnl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            is_full_screen: true,
+            informed_stations: ["Malden Center"]
+          },
+          expected_common_data
+        ),
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "3",
+              effect: :shuttle,
+              informed_entities: [ie(stop: "place-mlmnl"), ie(stop: "place-welln")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            is_full_screen: true,
+            informed_stations: []
+          },
+          expected_common_data
+        ),
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "2",
+              effect: :station_closure,
+              informed_entities: [ie(stop: "place-astao")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            informed_stations: ["Assembly"]
+          },
+          expected_common_data
+        )
+      ]
+
+      assert expected_widgets ==
+               reconstructed_alert_instances(
+                 config,
+                 now,
+                 fetch_alerts_fn,
+                 fetch_stop_name_fn,
+                 fetch_location_context_fn
+               )
+    end
+
+    test "returns fullscreen instances for moderate disruptions if no immediate/downstream disruptions",
+         context do
+      %{
+        config: config,
+        location_context: location_context,
+        now: now,
+        happening_now_active_period: happening_now_active_period,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn
+      } = context
+
+      alerts = [
+        %Alert{
+          id: "1",
+          effect: :delay,
+          severity: 6,
+          informed_entities: [ie(stop: "place-mlmnl")],
+          active_period: happening_now_active_period
+        }
+      ]
+
+      fetch_alerts_fn = fn _ -> {:ok, alerts} end
+
+      expected_common_data = %{
+        screen: config,
+        location_context: location_context,
+        now: now,
+        is_terminal_station: true
+      }
+
+      expected_widgets = [
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "1",
+              effect: :delay,
+              severity: 6,
+              informed_entities: [ie(stop: "place-mlmnl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            is_full_screen: true,
+            informed_stations: []
           },
           expected_common_data
         )
@@ -298,7 +432,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         screen: config,
         location_context: location_context,
         now: now,
-        informed_stations_string: "",
+        informed_stations: [],
         is_terminal_station: true
       }
 
@@ -308,9 +442,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "1",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-hsmnl")],
+              informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            }
+            },
+            is_full_screen: true
           },
           expected_common_data
         ),
@@ -319,7 +454,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-bckhl")],
+              informed_entities: [ie(stop: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             }
           },
@@ -330,9 +465,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "3",
               effect: :delay,
-              informed_entities: [ie(stop: "place-hsmnl")],
+              informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            }
+            },
+            is_full_screen: false
           },
           expected_common_data
         )
@@ -353,7 +489,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         config: config,
         location_context: location_context,
         now: now,
-        informed_stations_string: informed_stations_string,
         fetch_directional_alerts_fn: fetch_directional_alerts_fn,
         fetch_stop_name_fn: fetch_stop_name_fn,
         fetch_location_context_fn: fetch_location_context_fn
@@ -363,8 +498,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         screen: config,
         location_context: location_context,
         now: now,
-        informed_stations_string: informed_stations_string,
-        is_terminal_station: true
+        is_terminal_station: true,
+        is_full_screen: true
       }
 
       expected_widgets = [
@@ -373,9 +508,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "1",
               effect: :delay,
-              informed_entities: [ie(stop: "place-hsmnl", direction_id: 0)],
+              informed_entities: [ie(stop: "place-ogmnl", direction_id: 0)],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            }
+            },
+            informed_stations: []
           },
           expected_common_data
         ),
@@ -384,9 +520,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :delay,
-              informed_entities: [ie(stop: "place-hsmnl")],
+              informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-            }
+            },
+            informed_stations: []
           },
           expected_common_data
         )

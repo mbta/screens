@@ -131,11 +131,24 @@ defmodule Screens.Util do
   """
   @spec format_name_list_to_string([String.t()]) :: String.t()
   def format_name_list_to_string([string]), do: "#{string}"
-  def format_name_list_to_string([s1, s2]), do: "#{s1} and #{s2}"
+  def format_name_list_to_string([s1, s2]), do: "#{s1} & #{s2}"
 
   def format_name_list_to_string(list) do
     list
-    |> List.update_at(length(list) - 1, &"and #{&1}")
+    |> List.update_at(length(list) - 1, &"& #{&1}")
+    |> Enum.join(", ")
+  end
+
+  @doc """
+  Same as regular string list formatter, but for audio (extra comma for clarity, "and" instead of "&")
+  """
+  @spec format_name_list_to_string_audio([String.t()]) :: String.t()
+  def format_name_list_to_string_audio([string]), do: "#{string}"
+  def format_name_list_to_string_audio([s1, s2]), do: "#{s1}, and, #{s2}"
+
+  def format_name_list_to_string_audio(list) do
+    list
+    |> List.update_at(length(list) - 1, &"and, #{&1}")
     |> Enum.join(", ")
   end
 

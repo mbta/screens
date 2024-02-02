@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.{Alerts, Departures, Dup, FreeTextLine}
   alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: DupAlerts
   alias Screens.V2.WidgetInstance.DupSpecialCaseAlert
@@ -66,101 +67,114 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
     ]
   end
 
-  defp stop_sequences("place-kencl") do
-    [
-      [
-        "place-unsqu",
-        "place-lech",
-        "place-spmnl",
-        "place-north",
-        "place-haecl",
-        "place-gover",
-        "place-pktrm",
-        "place-boyls",
-        "place-armnl",
-        "place-coecl",
-        "place-hymnl",
-        "place-kencl",
-        "place-fenwy",
-        "place-longw",
-        "place-bvmnl",
-        "place-brkhl",
-        "place-bcnfd",
-        "place-rsmnl",
-        "place-chhil",
-        "place-newto",
-        "place-newtn",
-        "place-eliot",
-        "place-waban",
-        "place-woodl",
-        "place-river"
+  defp tagged_stop_sequences("place-kencl") do
+    %{
+      "Green-B" => [
+        [
+          "place-gover",
+          "place-pktrm",
+          "place-boyls",
+          "place-armnl",
+          "place-coecl",
+          "place-hymnl",
+          "place-kencl",
+          "place-bland",
+          "place-buest",
+          "place-bucen",
+          "place-amory",
+          "place-babck",
+          "place-brico",
+          "place-harvd",
+          "place-grigg",
+          "place-alsgr",
+          "place-wrnst",
+          "place-wascm",
+          "place-sthld",
+          "place-chswk",
+          "place-chill",
+          "place-sougr",
+          "place-lake"
+        ]
       ],
-      [
-        "place-gover",
-        "place-pktrm",
-        "place-boyls",
-        "place-armnl",
-        "place-coecl",
-        "place-hymnl",
-        "place-kencl",
-        "place-bland",
-        "place-buest",
-        "place-bucen",
-        "place-amory",
-        "place-babck",
-        "place-brico",
-        "place-harvd",
-        "place-grigg",
-        "place-alsgr",
-        "place-wrnst",
-        "place-wascm",
-        "place-sthld",
-        "place-chswk",
-        "place-chill",
-        "place-sougr",
-        "place-lake"
+      "Green-C" => [
+        [
+          "place-gover",
+          "place-pktrm",
+          "place-boyls",
+          "place-armnl",
+          "place-coecl",
+          "place-hymnl",
+          "place-kencl",
+          "place-smary",
+          "place-hwsst",
+          "place-kntst",
+          "place-stpul",
+          "place-cool",
+          "place-sumav",
+          "place-bndhl",
+          "place-fbkst",
+          "place-bcnwa",
+          "place-tapst",
+          "place-denrd",
+          "place-engav",
+          "place-clmnl"
+        ]
       ],
-      [
-        "place-gover",
-        "place-pktrm",
-        "place-boyls",
-        "place-armnl",
-        "place-coecl",
-        "place-hymnl",
-        "place-kencl",
-        "place-smary",
-        "place-hwsst",
-        "place-kntst",
-        "place-stpul",
-        "place-cool",
-        "place-sumav",
-        "place-bndhl",
-        "place-fbkst",
-        "place-bcnwa",
-        "place-tapst",
-        "place-denrd",
-        "place-engav",
-        "place-clmnl"
+      "Green-D" => [
+        [
+          "place-unsqu",
+          "place-lech",
+          "place-spmnl",
+          "place-north",
+          "place-haecl",
+          "place-gover",
+          "place-pktrm",
+          "place-boyls",
+          "place-armnl",
+          "place-coecl",
+          "place-hymnl",
+          "place-kencl",
+          "place-fenwy",
+          "place-longw",
+          "place-bvmnl",
+          "place-brkhl",
+          "place-bcnfd",
+          "place-rsmnl",
+          "place-chhil",
+          "place-newto",
+          "place-newtn",
+          "place-eliot",
+          "place-waban",
+          "place-woodl",
+          "place-river"
+        ]
       ]
-    ]
+    }
   end
 
-  defp stop_sequences("place-wtcst") do
-    [
-      [
-        "place-sstat",
-        "place-crtst",
-        "place-wtcst",
-        "place-conrd",
-        "place-aport",
-        "place-estav",
-        "place-boxdt",
-        "place-belsq",
-        "place-chels"
+  defp tagged_stop_sequences("place-wtcst") do
+    %{
+      # SL1
+      "741" => [["place-sstat", "place-crtst", "place-wtcst", "place-conrd", "17091"]],
+      # SL2
+      "742" => [
+        ["place-sstat", "place-crtst", "place-wtcst", "place-conrd", "247", "30249", "30250"]
       ],
-      ["place-sstat", "place-crtst", "place-wtcst", "place-conrd", "247", "30249", "30250"],
-      ["place-sstat", "place-crtst", "place-wtcst", "place-conrd", "17091"]
-    ]
+      # SL3
+      "743" => [
+        [
+          "place-sstat",
+          "place-crtst",
+          "place-wtcst",
+          "place-conrd",
+          "place-aport",
+          "place-estav",
+          "place-boxdt",
+          "place-belsq",
+          "place-chels"
+        ]
+      ]
+    }
   end
 
   describe "dup alert_instances/6 > serialize/1" do
@@ -900,12 +914,15 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         wtc_alerts: wtc_alerts,
         fetch_location_context_fn: fn
           _, stop_id, _ ->
+            tagged_stop_sequences = tagged_stop_sequences(stop_id)
+            stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+
             {:ok,
              %LocationContext{
                home_stop: stop_id,
-               stop_sequences: stop_sequences(stop_id),
-               upstream_stops: Stop.upstream_stop_id_set(stop_id, stop_sequences(stop_id)),
-               downstream_stops: Stop.downstream_stop_id_set(stop_id, stop_sequences(stop_id)),
+               tagged_stop_sequences: tagged_stop_sequences,
+               upstream_stops: Stop.upstream_stop_id_set(stop_id, stop_sequences),
+               downstream_stops: Stop.downstream_stop_id_set(stop_id, stop_sequences),
                routes: routes(stop_id),
                alert_route_types: Stop.get_route_type_filter(Dup, stop_id)
              }}

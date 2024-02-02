@@ -103,7 +103,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     routes =
       if app_id === :gl_eink_v2 do
         # Get route pills for alert, including that on connecting GL branches
-        LocalizedAlert.informed_subway_routes(t)
+        LocalizedAlert.consolidated_informed_subway_routes(t)
       else
         # Get route pills for an alert, but only the routes that are at this stop
         LocalizedAlert.informed_routes_at_home_stop(t)

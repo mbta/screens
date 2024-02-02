@@ -41,30 +41,32 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
 
     location_context = %Screens.LocationContext{
       home_stop: "place-masta",
-      stop_sequences: [
-        [
-          "place-ogmnl",
-          "place-mlmnl",
-          "place-welln",
-          "place-astao",
-          "place-sull",
-          "place-ccmnl",
-          "place-north",
-          "place-haecl",
-          "place-state",
-          "place-dwnxg",
-          "place-chncl",
-          "place-tumnl",
-          "place-bbsta",
-          "place-masta",
-          "place-rugg",
-          "place-rcmnl",
-          "place-jaksn",
-          "place-sbmnl",
-          "place-grnst",
-          "place-forhl"
+      tagged_stop_sequences: %{
+        "Orange" => [
+          [
+            "place-ogmnl",
+            "place-mlmnl",
+            "place-welln",
+            "place-astao",
+            "place-sull",
+            "place-ccmnl",
+            "place-north",
+            "place-haecl",
+            "place-state",
+            "place-dwnxg",
+            "place-chncl",
+            "place-tumnl",
+            "place-bbsta",
+            "place-masta",
+            "place-rugg",
+            "place-rcmnl",
+            "place-jaksn",
+            "place-sbmnl",
+            "place-grnst",
+            "place-forhl"
+          ]
         ]
-      ],
+      },
       upstream_stops:
         MapSet.new([
           "place-astao",
