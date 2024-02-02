@@ -4,7 +4,7 @@ defmodule Screens.Stops.Stop do
   For a while, all stop-related data was fetched from the API, until we needed to provide consistent
   abbreviations in the reconstructed alert. Now it's valuable to have a local copy of these stop sequences.
   A lot of our code still collects these sequences from the API, though, whether in functions here
-  or in functions in `route_pattern.ex` (see fetch_parent_station_sequences_through_stop).
+  or in functions in `route_pattern.ex` (see fetch_tagged_parent_station_sequences_through_stop).
   So there's inconsistent use of this local data.
   """
 
@@ -14,6 +14,7 @@ defmodule Screens.Stops.Stop do
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes
   alias Screens.Routes.Route
+  alias Screens.RouteType
   alias Screens.Stops.StationsWithRoutesAgent
   alias Screens.Util
   alias Screens.V3Api
@@ -208,8 +209,6 @@ defmodule Screens.Stops.Stop do
   ]
 
   @green_line_trunk_stops [
-    # These 3 eventually will NOT be trunk stops, but are until Medford opens
-    {"place-unsqu", {"Union Square", "Union Sq"}},
     {"place-lech", {"Lechmere", "Lechmere"}},
     {"place-spmnl", {"Science Park/West End", "Science Pk"}},
     {"place-north", {"North Station", "North Sta"}},
@@ -221,6 +220,18 @@ defmodule Screens.Stops.Stop do
     {"place-coecl", {"Copley", "Copley"}},
     {"place-hymnl", {"Hynes Convention Center", "Hynes"}},
     {"place-kencl", {"Kenmore", "Kenmore"}}
+  ]
+
+  @medford_tufts_branch_stops [
+    {"place-mdftf", {"Medford / Tufts", "Medford"}},
+    {"place-balsq", {"Ball Square", "Ball Sq"}},
+    {"place-mgngl", {"Magoun Square", "Magoun Sq"}},
+    {"place-gilmn", {"Gilman Square", "Gilman Sq"}},
+    {"place-esomr", {"East Somerville", "E Somerville"}}
+  ]
+
+  @union_square_branch_stops [
+    {"place-unsqu", {"Union Square", "Union Sq"}}
   ]
 
   @route_stop_sequences %{
@@ -424,6 +435,19 @@ defmodule Screens.Stops.Stop do
     Enum.map(@green_line_branches, &get_route_stop_sequence/1)
   end
 
+  @doc """
+  Returns an unordered MapSet of all GL stops west of Copley.
+  """
+  @spec get_gl_stops_west_of_copley() :: MapSet.t(id())
+  def get_gl_stops_west_of_copley do
+    get_gl_stop_sequences()
+    |> Enum.flat_map(fn stop_sequence ->
+      [_copley | west_of_copley] = Enum.drop_while(stop_sequence, &(&1 != "place-coecl"))
+      west_of_copley
+    end)
+    |> MapSet.new()
+  end
+
   defp sequence_match?(stop_sequence, informed_entities) do
     ie_stops =
       informed_entities
@@ -441,6 +465,10 @@ defmodule Screens.Stops.Stop do
 
   def gl_trunk_stops do
     @green_line_trunk_stops
+  end
+
+  def rl_trunk_stops do
+    @red_line_trunk_stops
   end
 
   def stop_id_to_name(route_id) do
@@ -462,19 +490,16 @@ defmodule Screens.Stops.Stop do
   def fetch_location_context(app, stop_id, now) do
     with alert_route_types <- get_route_type_filter(app, stop_id),
          {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, alert_route_types),
-         route_ids <- Route.route_ids(routes_at_stop),
-         {:ok, stop_sequences} <-
-           (cond do
-              app in [BusEink, BusShelter, GlEink] ->
-                RoutePattern.fetch_stop_sequences_through_stop(stop_id)
+         {:ok, tagged_stop_sequences} <-
+           fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop) do
+      stop_name = fetch_stop_name(stop_id)
+      stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
 
-              app in [PreFare, Dup, Triptych] ->
-                RoutePattern.fetch_parent_station_sequences_through_stop(stop_id, route_ids)
-            end) do
       {:ok,
        %LocationContext{
          home_stop: stop_id,
-         stop_sequences: stop_sequences,
+         home_stop_name: stop_name,
+         tagged_stop_sequences: tagged_stop_sequences,
          upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
          downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
          routes: routes_at_stop,
@@ -492,7 +517,7 @@ defmodule Screens.Stops.Stop do
 
   # Returns the route types we care about for the alerts of this screen type / place
   @spec get_route_type_filter(screen_type(), String.t()) ::
-          list(atom())
+          list(RouteType.t())
   def get_route_type_filter(app, _) when app in [BusEink, BusShelter], do: [:bus]
   def get_route_type_filter(GlEink, _), do: [:light_rail]
   # Ashmont should not show Mattapan alerts for PreFare or Dup
@@ -515,5 +540,36 @@ defmodule Screens.Stops.Stop do
     stop_sequences
     |> Enum.flat_map(fn stop_sequence -> Util.slice_after(stop_sequence, stop_id) end)
     |> MapSet.new()
+  end
+
+  def on_glx?(stop_id) do
+    stop_id in Enum.map(@medford_tufts_branch_stops ++ @union_square_branch_stops, &elem(&1, 0))
+  end
+
+  def on_ashmont_branch?(stop_id) do
+    stop_id in Enum.map(@red_line_ashmont_branch_stops, &elem(&1, 0))
+  end
+
+  def on_braintree_branch?(stop_id) do
+    stop_id in Enum.map(@red_line_braintree_branch_stops, &elem(&1, 0))
+  end
+
+  defp fetch_tagged_stop_sequences_by_app(app, stop_id, _routes_at_stop)
+       when app in [BusEink, BusShelter, GlEink] do
+    RoutePattern.fetch_tagged_stop_sequences_through_stop(stop_id)
+  end
+
+  defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)
+       when app in [Dup, Triptych] do
+    route_ids = Route.route_ids(routes_at_stop)
+    RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids)
+  end
+
+  defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)
+       when app == PreFare do
+    route_ids = Route.route_ids(routes_at_stop)
+
+    # We limit results to canonical route patterns only--no stop sequences for nonstandard patterns.
+    RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids, true)
   end
 end

@@ -78,6 +78,7 @@ defmodule Screens.MixProject do
       {:retry, "~> 0.16.0"},
       {:stream_data, "~> 0.5", only: :test},
       {:memcachex, "~> 0.5.5"},
+      {:aja, "~> 0.6.2"},
       {:telemetry_poller, "~> 0.4"},
       {:telemetry_metrics, "~> 0.4"},
       {:screens_config, git: "https://github.com/mbta/screens-config-lib.git"}

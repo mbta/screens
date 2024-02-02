@@ -321,12 +321,12 @@ config :screens,
     # Charles/MGH
     "place-chmnl" => [
       %{informed: "70072", not_informed: "70076", alert_headsign: "Alewife"},
-      %{informed: "70075", not_informed: "70071", alert_headsign: "Ashmont/Braintree"}
+      %{informed: "70075", not_informed: "70071", alert_headsign: "Ashmont & Braintree"}
     ],
     # Porter
     "place-portr" => [
       %{informed: "70064", not_informed: "70068", alert_headsign: "Alewife"},
-      %{informed: "70067", not_informed: "70063", alert_headsign: "Ashmont/Braintree"}
+      %{informed: "70067", not_informed: "70063", alert_headsign: "Ashmont & Braintree"}
     ],
     "place-welln" => [
       %{informed: "70278", not_informed: "70034", alert_headsign: "Forest Hills"},

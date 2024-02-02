@@ -1,5 +1,5 @@
-$takeover-card-height: 1600px;
-$takeover-card-footer-height: 176px;
+$takeover-card-height: 1656px;
+$takeover-card-footer-height: 84px;
 
 $alert-card-height: 576px;
 $alert-card-footer-height: 80px;
@@ -44,8 +44,12 @@ $alert-card-footer-height: 80px;
     padding: 40px 120px 20px 44px;
     box-sizing: border-box;
 
-    .bold { font-weight: 800; }
-    .medium-bold { font-weight: 500; }
+    .bold {
+      font-weight: 800;
+    }
+    .medium-bold {
+      font-weight: 500;
+    }
   }
   .alert-card__body__content {
     padding: 56px 0 0 8px;
@@ -92,7 +96,7 @@ $alert-card-footer-height: 80px;
         margin-left: 16px;
       }
     }
-    
+
     .route-pill__text {
       position: relative;
       width: fit-content;
@@ -167,73 +171,134 @@ $alert-card-footer-height: 80px;
   color: white;
   height: 100%;
   width: 1080px;
-  padding: 60px;
+  padding: 32px;
   box-sizing: border-box;
 
   /* Alert contents */
   .alert-card {
-    width: 960px;
-    height: $takeover-card-height;
-    border-radius: 32px;
-    box-shadow: 0px 10px 20px 0px rgba(23, 31, 38, 0.25);
-    background-color: #171f26;
-  }
+    width: 1016px;
+    height: 100%;
+    border-radius: 4px;
+    background-color: #e5e4e1;
+    color: #171f26;
 
-  .alert-card__body {
-    height: $takeover-card-height - $takeover-card-footer-height;
-    padding: 72px;
-    box-sizing: border-box;
-  }
+    &__body {
+      height: $takeover-card-height - $takeover-card-footer-height;
+      padding: 0 56px;
+      box-sizing: border-box;
+      font-family: Inter, sans-serif;
+      font-size: 200px;
+      font-weight: 800;
 
-  .alert-card__body__icon {
-    height: 280px;
-    padding-bottom: 80px;
-  }
+      .container {
+        height: 100%;
+        display: flex;
+        flex-flow: column;
+        align-items: flex-start;
+      }
 
-  .alert-card__body__location {
-    margin: 40px 0 24px 0;
-    font-weight: 800;
-    text-transform: capitalize;
-  }
+      &__icon {
+        flex-shrink: 0;
+        height: 300px;
+        margin-bottom: 48px;
+        padding-top: 112px;
+      }
 
-  .alert-card__body__cause {
-    font-weight: 500;
-    text-transform: capitalize;
-  }
+      &__issue {
+        width: 904px;
+        margin-bottom: 32px;
+        line-height: 220px;
+      }
 
-  .alert-card__body__remedy {
-    font-weight: 800;
-    padding-top: 352px;
-  }
+      &__location {
+        font-size: 60px;
+        font-weight: 400;
+        margin-bottom: 32px;
+      }
 
-  .alert-card__body__accessibility-info {
-    margin-top: 90px;
-    display: flex;
-    &--text {
-      width: 524px;
-      color: #e6e4e1;
+      &__cause {
+        font-weight: 500;
+        text-transform: capitalize;
+      }
+
+      &__remedy {
+        padding-top: 474px;
+        height: 660px;
+        line-height: 220px;
+      }
+
+      &__shuttle-icon {
+        height: 300px;
+        padding-top: 112px;
+      }
+
+      &__shuttle-remedy {
+        height: 660px;
+        line-height: 220px;
+      }
+
+      &__accessibility-info {
+        margin-top: 34px;
+        display: flex;
+        &--text {
+          font-weight: 400;
+          font-size: 53px;
+          min-width: 811px;
+          color: #000000;
+        }
+      }
+
+      &__isa-icon {
+        height: 61px;
+        padding-right: 33px;
+      }
+
+      .disruption-diagram-container {
+        width: 904px;
+        flex: 1;
+        min-height: 0;
+      }
     }
-  }
 
-  .alert-card__body__isa-icon {
-    height: 136px;
-    padding-right: 36px;
-  }
-    
-  .alert-card__footer {
-    background-color: #2e3e4d;
-    border-radius: 0px 0px 32px 32px;
-    height: $takeover-card-footer-height;
-  }
-  .alert-card__footer__t-icon {
-    height: 102px;
-    padding: 37px 47px;
-  }
-  .alert-card__footer__alerts-url {
-    font-size: 64px;
-    font-weight: 800;
-    text-align: right;
-    padding: 41px 52px 55px 0;
+    &__footer {
+      color: #000000;
+      background-color: #cccbc8;
+      border-radius: 0px 0px 4px 4px;
+      height: $takeover-card-footer-height;
+      font-size: 32px;
+      font-weight: 400;
+      position: relative;
+      text-align: center;
+
+      &__cause {
+        position: absolute;
+        bottom: 20px;
+        left: 60px;
+        height: 44px;
+        margin-top: 20px;
+        text-transform: capitalize;
+      }
+
+      &__updated-at {
+        position: absolute;
+        bottom: 20px;
+        right: 60px;
+        height: 44px;
+        text-align: end;
+        margin-top: 20px;
+
+        .bold {
+          font-weight: 600;
+        }
+      }
+
+      &__alerts-url {
+        position: absolute;
+        bottom: 20px;
+        right: 60px;
+        text-align: right;
+      }
+    }
   }
 }
 
@@ -255,13 +320,14 @@ $alert-card-footer-height: 80px;
     font-weight: 500;
   }
   .alert-card__body__route-pills
-  .route-pills__branches
-  .route-pills__branches__dot {
+    .route-pills__branches
+    .route-pills__branches__dot {
     background-color: #171f26;
   }
 }
 
-.alert-container--takeover, .alert-container--urgent {
+.alert-container--takeover,
+.alert-container--urgent {
   /* Background colors */
   &.alert-container--blue {
     background-color: $line-color-blue;

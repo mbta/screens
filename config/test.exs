@@ -27,6 +27,73 @@ config :screens,
   dup_headsign_replacements: %{
     "Test 1" => "T1"
   },
+  prefare_alert_headsign_matchers: %{
+    # Government Center
+    "place-gover" => [
+      # GL
+      %{informed: "70203", not_informed: "70200", alert_headsign: "North Station & North"},
+      %{
+        informed: ~w[70199 70198 70197 70196],
+        not_informed: "70204",
+        alert_headsign: "Copley & West"
+      },
+      # BL
+      %{informed: "70042", not_informed: "70038", alert_headsign: "Wonderland"},
+      %{informed: "70038", not_informed: "70041", alert_headsign: "Bowdoin"}
+    ],
+    # Tufts
+    "place-tumnl" => [
+      %{informed: "70019", not_informed: "70015", alert_headsign: "Oak Grove"},
+      %{informed: "70014", not_informed: "70018", alert_headsign: "Forest Hills"}
+    ],
+    # Back Bay
+    "place-bbsta" => [
+      %{informed: "70017", not_informed: "70013", alert_headsign: "Oak Grove"},
+      %{informed: "70012", not_informed: "70016", alert_headsign: "Forest Hills"}
+    ],
+    # Forest Hills
+    "place-forhl" => [
+      %{informed: "70003", not_informed: nil, alert_headsign: "Oak Grove"}
+    ],
+    # Maverick
+    "place-mvbcl" => [
+      %{informed: "70048", not_informed: "70044", alert_headsign: "Wonderland"},
+      %{informed: "70043", not_informed: "70047", alert_headsign: "Bowdoin"}
+    ],
+    # Ashmont
+    "place-asmnl" => [
+      %{informed: "70092", not_informed: nil, alert_headsign: "Alewife"}
+    ],
+    # Charles/MGH
+    "place-chmnl" => [
+      %{informed: "70072", not_informed: "70076", alert_headsign: "Alewife"},
+      %{informed: "70075", not_informed: "70071", alert_headsign: "Ashmont & Braintree"}
+    ],
+    # Porter
+    "place-portr" => [
+      %{informed: "70064", not_informed: "70068", alert_headsign: "Alewife"},
+      %{informed: "70067", not_informed: "70063", alert_headsign: "Ashmont & Braintree"}
+    ],
+    # Wellington
+    "place-welln" => [
+      %{informed: "70278", not_informed: "70034", alert_headsign: "Forest Hills"},
+      %{informed: "70035", not_informed: "70279", alert_headsign: "Oak Grove"}
+    ],
+    # Downtown Crossing
+    "place-dwnxg" => [
+      # OL
+      %{informed: "70018", not_informed: "70022", alert_headsign: "Forest Hills"},
+      %{informed: "70023", not_informed: "70019", alert_headsign: "Oak Grove"},
+      # RL
+      %{informed: "70076", not_informed: "70080", alert_headsign: "Alewife"},
+      %{informed: "70079", not_informed: "70075", alert_headsign: "Ashmont & Braintree"}
+    ],
+    # Malden Center
+    "place-mlmnl" => [
+      %{informed: "70032", not_informed: "70036", alert_headsign: "Forest Hills"},
+      %{informed: "70036", not_informed: "70033", alert_headsign: "Oak Grove"}
+    ]
+  },
   dup_alert_headsign_matchers: %{
     "place-B" => [
       %{

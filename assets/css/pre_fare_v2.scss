@@ -40,6 +40,8 @@
 @import "v2/pre_fare/flex/paging_indicator";
 @import "v2/pre_fare/full_line_map";
 @import "v2/pre_fare/reconstructed_alert";
+@import "v2/pre_fare/alert-banner";
+@import "v2/pre_fare/prefare_single_screen_alert";
 @import "v2/pre_fare/free_text";
 @import "v2/pre_fare/shuttle_bus_info";
 
@@ -61,6 +63,8 @@
 @import "v2/pre_fare/simulation";
 
 @import "v2/blue_bikes";
+
+@import "v2/pre_fare/disruption_diagram/disruption_diagram";
 
 body {
   margin: 0px;

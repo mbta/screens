@@ -1,6 +1,54 @@
-import React, { ComponentType } from "react";
+// SPECIFICATION: https://www.notion.so/mbta-downtown-crossing/Disruption-Diagram-Specification-a779027385b545abbff6fb4b4fd0adc1
 
-type DisruptionDiagramData = ContinuousDisruptionDiagram | DiscreteDisruptionDiagram;
+import React, { ComponentType, useCallback, useEffect, useRef, useState } from "react";
+import { classWithModifier, classWithModifiers } from "Util/util";
+
+import LargeXOctagonBordered from "../../../../static/images/svgr_bundled/disruption_diagram/large-x-octagon-bordered.svg";
+import SmallXOctagon from "../../../../static/images/svgr_bundled/disruption_diagram/small-x-octagon.svg";
+import CurrentStopDiamond from "../../../../static/images/svgr_bundled/disruption_diagram/current-stop-diamond.svg";
+import CurrentStopOpenDiamond from "../../../../static/images/svgr_bundled/disruption_diagram/current-stop-open-diamond.svg";
+import ArrowLeftEndpoint from "../../../../static/images/svgr_bundled/disruption_diagram/arrow-left-endpoint.svg";
+import ArrowRightEndpoint from "../../../../static/images/svgr_bundled/disruption_diagram/arrow-right-endpoint.svg";
+import ShuttleBusIcon from "../../../../static/images/svgr_bundled/disruption_diagram/shuttle-emphasis-icon.svg";
+
+// Width of the disruption diagram, dependent on the screen width
+const DIAGRAM_WIDTH = 904;
+const SLOT_WIDTH = 24;
+// Height of the colored line for the diagram
+const LINE_HEIGHT = 24;
+const EMPHASIS_HEIGHT = 80;
+// This padding is only used in 1 spot, and it may not be the most accurate measure
+// of the padding above the emphasis. Keeping for now
+const EMPHASIS_PADDING_TOP = 8;
+// The tallest icon (the diamond) is used in translation calculations
+const MAX_ENDPOINT_HEIGHT = 64;
+const LARGE_X_STOP_ICON_HEIGHT = 48;
+// L: the amount by which the left end extends beyond the leftmost station slot.
+// R: the width by which the right end extends beyond the rightmost station slot.
+// L can vary based on whether the first slot is an arrow vs diamond, because the diamond is larger.
+// Would be nice if this was programmatic, but this works for now
+const L = MAX_ENDPOINT_HEIGHT / 2;
+const R = 165;
+// The width taken up by the ends outside the typical station bounds is L + R,
+// so the width available to the rest of the diagram is DIAGRAM_WIDTH - (L + R)
+const W = DIAGRAM_WIDTH - (L + R);
+
+// List of abbreviated stations
+const abbreviationList: {[string: string]: string} = {
+  "Boston University Center": "BU Central",
+  "Boston University East": "BU East",
+  "Downtown Crossing": "Downtown Xng",
+  "Government Center": "Gov't Center",
+  "Hynes Convention Center": "Hynes",
+  "Massachusetts Avenue": "Mass Ave",
+  "Tufts Medical Center": "Tufts Medical Ctr",
+  "…via Government Center": "…via Gov't Center",
+  "…via Downtown Crossing": "…via Downtown Xng"
+}
+
+type DisruptionDiagramData =
+  | ContinuousDisruptionDiagram
+  | DiscreteDisruptionDiagram;
 
 interface DisruptionDiagramBase {
   line: LineColor;
@@ -45,22 +93,503 @@ interface MiddleSlot {
 }
 
 // Note the single ellipsis character, not 3 periods
-type Label = "…" | { full: string, abbrev: string };
+type Label = "…" | { full: string; abbrev: string };
+
+type LineColor = "blue" | "orange" | "red" | "green";
+
+type Effect = "shuttle" | "suspension" | "station_closure";
 
 // End labels have hardcoded presentation, so we just send an ID for the client to use in
 // a lookup.
-//
-// TBD what these IDs will look like. We might just use parent station IDs.
 //
 // The rest of the labels' presentations are computed based on the height of the end labels,
 // so we can send actual text for those--it will be dynamically resized to fit.
 type EndLabelID = string;
 
-type LineColor =
-  | "blue"
-  | "orange"
-  | "red"
-  | "green";
+// If value is length === 2, label is split onto 2 lines.
+const endLabelIDMap: { [labelID: string]: string[] } = {
+  "place-bomnl": ["BOWDOIN"],
+  "place-wondl": ["WONDERLAND"],
+  "place-alfcl": ["ALEWIFE"],
+  "place-asmnl+place-brntn": ["ASHMONT &", "BRAINTREE"],
+  "place-asmnl": ["ASHMONT"],
+  "place-brntn": ["BRAINTREE"],
+  "place-ogmnl": ["OAK GROVE"],
+  "place-forhl": ["FOREST", "HILLS"],
+  "place-gover": ["GOVERNMENT", "CENTER"],
+  "place-lake": ["BOSTON COLLEGE"],
+  "place-clmnl": ["CLEVELAND CIR"],
+  "place-unsqu": ["UNION SQUARE"],
+  "place-river": ["RIVERSIDE"],
+  "place-mdftf": ["MEDFORD/TUFTS"],
+  "place-hsmnl": ["HEATH ST"],
+  "place-kencl": ["KENMORE"],
+  "place-kencl+west": ["KENMORE & WEST"],
+  "place-mdftf+place-unsqu": ["MEDFORD/TUFTS", "& UNION SQ"],
+  "place-north+place-pktrm": ["NORTH STATION", "& PARK ST"],
+  "place-coecl+west": ["COPLEY & WEST"],
+  western_branches: ["WESTERN BRANCHES"],
+};
+
+interface IconProps {
+  iconSize: number;
+}
+
+interface EndpointProps {
+  className: string;
+}
+
+// Non-circle icons are translated by their top-left corner, while circles
+// are translated by their center-point. So to position these non-circles,
+// translate is x shifted by half the width of the icon, and y is shifted up half its
+// iconsize and half the thickness of the line diagram itself
+const translateNonCircleIcon = (iconSize: number) =>
+  `translate(-${iconSize / 2} -${(iconSize - LINE_HEIGHT) / 2})`;
+
+// Special current stop icon for the red line: hollow red diamond
+const CurrentStopOpenDiamondIcon: ComponentType<IconProps> = ({ iconSize }) => {
+  return (
+    <g className="open-diamond" transform={translateNonCircleIcon(iconSize)}>
+      <CurrentStopOpenDiamond width={iconSize} height={iconSize} />
+    </g>
+  );
+};
+
+// Current stop icon for all other lines: solid red diamond
+const CurrentStopDiamondIcon: ComponentType<IconProps> = ({ iconSize }) => {
+  return (
+    <g className="solid-diamond" transform={translateNonCircleIcon(iconSize)}>
+      <CurrentStopDiamond width={iconSize} height={iconSize} />
+    </g>
+  );
+};
+
+// This is the x-octagon without a border
+const SmallXStopIcon: ComponentType<IconProps> = ({ iconSize }) => {
+  return (
+    <g className="small-x-stop" transform={translateNonCircleIcon(iconSize)}>
+      <SmallXOctagon width={iconSize} height={iconSize} />
+    </g>
+  );
+};
+
+// This is the x-octagon with a border
+const LargeXStopIcon: ComponentType<{ iconSize: number; color?: string }> = ({
+  iconSize,
+  color,
+}) => {
+  return (
+    <g className="large-x-stop" transform={translateNonCircleIcon(iconSize)}>
+      <LargeXOctagonBordered color={color} width={iconSize} height={iconSize} />
+    </g>
+  );
+};
+
+// Basic template for a Circle Icon
+const CircleStopIcon: ComponentType<{
+  r: number;
+  className: string;
+  strokeWidth: number;
+}> = ({ r, className, strokeWidth }) => (
+  <circle
+    cy={LINE_HEIGHT / 2}
+    r={r}
+    fill="white"
+    className={className}
+    strokeWidth={strokeWidth}
+  />
+);
+
+const CircleShuttlingStopIcon: ComponentType<{}> = () => (
+  <CircleStopIcon r={10} className="shuttle-stop" strokeWidth={4} />
+);
+
+const CircleStopIconEndpoint: ComponentType<EndpointProps> = ({
+  className,
+}) => <CircleStopIcon r={20} className={className} strokeWidth={8} />;
+
+const LeftArrowEndpoint: ComponentType<EndpointProps> = ({ className }) => (
+  <ArrowLeftEndpoint className={className} />
+);
+
+const RightArrowEndpoint: ComponentType<EndpointProps> = ({ className }) => (
+  <ArrowRightEndpoint className={className} />
+);
+
+const EndpointLabel: ComponentType<{ labelID: string; isArrow: boolean }> = ({
+  labelID,
+  isArrow,
+}) => {
+  let labelParts = endLabelIDMap[labelID];
+  if (labelParts.length === 1) {
+    return (
+      <text
+        className="label--endpoint"
+        transform={`translate(0 -32) rotate(-45)`}
+      >
+        {isArrow && <tspan className="label">to </tspan>}
+        {labelParts[0]}
+      </text>
+    );
+  } else {
+    return (
+      <>
+        <text
+          className="label--endpoint"
+          transform={`translate(0 -32) rotate(-45)`}
+        >
+          {isArrow && <tspan className="label">to </tspan>}
+          {labelParts[0].includes("&") ? (
+            <>
+              {labelParts[0].replace(" &", "")}
+              <tspan className="label"> &</tspan>
+            </>
+          ) : (
+            labelParts[0]
+          )}
+        </text>
+        <text
+          className="label--endpoint"
+          transform={`translate(45 -32) rotate(-45)`}
+        >
+          {labelParts[1].includes("&") ? (
+            <>
+              <tspan className="label">& </tspan>
+              {labelParts[1].replace("& ", "")}
+            </>
+          ) : (
+            labelParts[1]
+          )}
+        </text>
+      </>
+    );
+  }
+};
+
+interface EndSlotComponentProps {
+  slot: EndSlot;
+  line: LineColor;
+  isCurrentStop: boolean;
+  isAffected: boolean;
+  effect: Effect;
+  spaceBetween: number;
+  isLeftSide: boolean;
+  x: number;
+}
+
+const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
+  slot,
+  line,
+  isCurrentStop,
+  isAffected,
+  effect,
+  spaceBetween,
+  isLeftSide,
+  x,
+}) => {
+  let icon;
+  if (slot.type === "arrow") {
+    icon = isLeftSide ? (
+      <g transform={`translate(-22 0)`}>
+        <LeftArrowEndpoint
+          className={classWithModifier("end-slot__arrow", line)}
+        />
+      </g>
+    ) : (
+      <RightArrowEndpoint
+        className={classWithModifier("end-slot__arrow", line)}
+      />
+    );
+  } else if (isAffected && isCurrentStop) {
+    icon = <LargeXStopIcon iconSize={61} color="#ee2e24" />;
+  } else if (isAffected && effect != "shuttle") {
+    icon = <LargeXStopIcon iconSize={61} />;
+  } else if (isCurrentStop && line === "red") {
+    icon = <CurrentStopOpenDiamondIcon iconSize={MAX_ENDPOINT_HEIGHT} />;
+  } else if (isCurrentStop) {
+    icon = <CurrentStopDiamondIcon iconSize={MAX_ENDPOINT_HEIGHT} />;
+  } else {
+    const modifiers = [line.toString()];
+    if (isAffected) {
+      modifiers.push("affected");
+    }
+    icon = (
+      <CircleStopIconEndpoint
+        className={classWithModifiers("end-slot__icon", modifiers)}
+      />
+    );
+  }
+
+  let background;
+  if (
+    (!isAffected && isLeftSide) ||
+    (effect === "station_closure" && isLeftSide)
+  ) {
+    background = (
+      <rect
+        className={classWithModifier("end-slot__arrow", line)}
+        width={SLOT_WIDTH / 2 + spaceBetween}
+        height={LINE_HEIGHT}
+        fill={line}
+        x={SLOT_WIDTH / 2}
+      />
+    );
+  } else {
+    background = <></>;
+  }
+
+  return (
+    <g transform={`translate(${x})`}>
+      {background}
+      {icon}
+      <EndpointLabel labelID={slot.label_id} isArrow={slot.type === "arrow"} />
+    </g>
+  );
+};
+
+interface MiddleSlotComponentProps {
+  slot: MiddleSlot;
+  x: number;
+  spaceBetween: number;
+  line: LineColor;
+  isCurrentStop: boolean;
+  isAffected: boolean;
+  effect: Effect;
+  firstAffectedIndex: boolean;
+  abbreviate: boolean;
+  labelTextClass: string;
+}
+
+const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
+  slot,
+  x,
+  spaceBetween,
+  line,
+  isCurrentStop,
+  isAffected,
+  effect,
+  firstAffectedIndex,
+  abbreviate,
+  labelTextClass,
+}) => {
+  const { label } = slot;
+  let background;
+  // Background for suspension/shuttle is drawn in EffectBackgroundComponent.
+  if (isAffected && effect !== "station_closure") {
+    background = <></>;
+  } else {
+    background = (
+      <rect
+        className={classWithModifier("middle-slot__background", line)}
+        // Round up to avoid gaps due to rounded down size during render
+        width={SLOT_WIDTH + Math.ceil(spaceBetween)}
+        height={LINE_HEIGHT}
+      />
+    );
+  }
+
+  let icon;
+  if (slot.show_symbol) {
+    if (isCurrentStop) {
+      if (isAffected) {
+        icon = <LargeXStopIcon iconSize={LARGE_X_STOP_ICON_HEIGHT} color="#ee2e24" />;
+      } else {
+        icon =
+          line === "red" ? (
+            <CurrentStopOpenDiamondIcon iconSize={52} />
+          ) : (
+            <CurrentStopDiamondIcon iconSize={52} />
+          );
+      }
+    } else {
+      if (isAffected && !firstAffectedIndex) {
+        switch (effect) {
+          case "suspension":
+            icon = <SmallXStopIcon iconSize={24} />;
+            break;
+          case "station_closure":
+            icon = <LargeXStopIcon iconSize={LARGE_X_STOP_ICON_HEIGHT} />;
+            break;
+          case "shuttle":
+            if (label !== "…" && label.full === "Beaconsfield") {
+              icon = <SmallXStopIcon iconSize={24} />;
+            } else {
+              icon = <CircleShuttlingStopIcon />;
+            }
+        }
+      } else {
+        icon = (
+          <CircleStopIcon
+            r={10}
+            className={classWithModifier("middle-slot__icon", line)}
+            strokeWidth={4}
+          />
+        );
+      }
+    }
+  } else {
+    icon = <></>;
+  }
+
+  let textModifier;
+
+  if (isCurrentStop) {
+    textModifier = "current-stop";
+  }
+
+  return (
+    <g transform={`translate(${x})`}>
+      {background}
+      {icon}
+      {label === "…" ? (
+        <text
+          className={classWithModifier(`label-${labelTextClass}`, textModifier)}
+          transform={`translate(-12 -32)`}
+        >
+          {" "}
+          {label}{" "}
+        </text>
+      ) : (
+        <text
+          className={classWithModifier(`label-${labelTextClass}`, textModifier)}
+          transform={`translate(0 -32) rotate(-45)`}
+        >
+          {abbreviate && Object.keys(abbreviationList).includes(label.full)
+            ? abbreviationList[label.full]
+            : label.full}
+        </text>
+      )}
+    </g>
+  );
+};
+
+interface EffectBackgroundComponentProps {
+  effectRegionSlotIndexRange:
+    | [range_start: number, range_end: number]
+    | number[];
+  effect: Effect;
+  spaceBetween: number;
+}
+
+// Only for shuttles or suspensions
+const EffectBackgroundComponent: ComponentType<
+  EffectBackgroundComponentProps
+> = ({ spaceBetween, effect, effectRegionSlotIndexRange }) => {
+  const rangeStart = effectRegionSlotIndexRange[0];
+  const rangeEnd = effectRegionSlotIndexRange[1];
+
+  const x1 = rangeStart * (spaceBetween + SLOT_WIDTH);
+  const x2 = (spaceBetween + SLOT_WIDTH) * rangeEnd;
+  const heightOfBackground = 16;
+
+  let background;
+  if (effect === "shuttle") {
+    const dashXunit = (spaceBetween + SLOT_WIDTH) / 18;
+    const dash = dashXunit * 4;
+    const gap = dashXunit * 2;
+    background = (
+      <line
+        x1={x1 + dashXunit}
+        y1="12"
+        x2={x2}
+        y2="12"
+        strokeWidth={heightOfBackground}
+        stroke="black"
+        strokeDasharray={`${dash} ${gap}`}
+      />
+    );
+  } else {
+    background = (
+      <rect
+        width={x2 - x1 + SLOT_WIDTH}
+        height={heightOfBackground}
+        x={x1}
+        y={heightOfBackground / 4}
+        fill="#AEAEAE"
+      />
+    );
+  }
+
+  return <>{background}</>;
+};
+
+interface AlertEmphasisComponentProps {
+  effectRegionSlotIndexRange:
+    | [range_start: number, range_end: number]
+    | number[];
+  spaceBetween: number;
+  effect: "suspension" | "shuttle";
+  scaleFactor: number;
+}
+
+const AlertEmphasisComponent: ComponentType<AlertEmphasisComponentProps> = ({
+  effectRegionSlotIndexRange,
+  spaceBetween,
+  effect,
+  scaleFactor,
+}) => {
+  const rangeStart = effectRegionSlotIndexRange[0];
+  const rangeEnd = effectRegionSlotIndexRange[1];
+
+  const x1 = rangeStart * (spaceBetween + SLOT_WIDTH) * scaleFactor;
+  const x2 = (spaceBetween + SLOT_WIDTH) * rangeEnd * scaleFactor;
+
+  const middleOfLine = (x2 - x1) / 2 + x1;
+  const endLinesHeight = 24;
+  const endLinesStrokeWidth = 8;
+
+  let icon;
+  if (effect === "shuttle") {
+    icon = (
+      <g
+        transform={`translate(${middleOfLine - EMPHASIS_HEIGHT / 2} -${
+          endLinesHeight + endLinesStrokeWidth / 2
+        })`}
+      >
+        <ShuttleBusIcon />
+      </g>
+    );
+  } else if (effect === "suspension") {
+    icon = (
+      <g
+        transform={`translate(${middleOfLine - EMPHASIS_HEIGHT / 2} ${
+          (endLinesHeight - EMPHASIS_HEIGHT) / 2
+        })`}
+      >
+        <SmallXOctagon width={EMPHASIS_HEIGHT} height={EMPHASIS_HEIGHT} />
+      </g>
+    );
+  }
+
+  return (
+    <>
+      {effectRegionSlotIndexRange[1] - effectRegionSlotIndexRange[0] + 1 >
+        2 && (
+        <>
+          <path
+            d={`M${x1} 0L${x1} ${endLinesHeight}`}
+            stroke="#737373"
+            strokeWidth={`${endLinesStrokeWidth}`}
+            strokeLinecap="round"
+          />
+          <path
+            d={`M${x1} ${endLinesHeight / 2}H${x2}`}
+            stroke="#737373"
+            strokeWidth={`${endLinesStrokeWidth}`}
+            strokeLinecap="round"
+          />
+          <path
+            d={`M${x2} 0L${x2} ${endLinesHeight}`}
+            stroke="#737373"
+            strokeWidth={`${endLinesStrokeWidth}`}
+            strokeLinecap="round"
+          />
+        </>
+      )}
+      {icon}
+    </>
+  );
+};
 
 /*
 Client is responsible for:
@@ -71,10 +600,241 @@ Client is responsible for:
 - sizing, spacing, positioning of edges/end arrows/shuttle dashes/the diagram as a whole within its container
 */
 
-const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (_props) => {
+const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
+  const { slots, current_station_slot_index, line, effect } = props;
+  const [doAbbreviate, setDoAbbreviate] = useState(false);
+  const [scaleFactor, setScaleFactor] = useState(1);
+  const [isDone, setIsDone] = useState(false);
+  // Get the size of the diagram line map svg, excluding emphasis
+  const [lineDiagramHeight, setLineDiagramHeight] = useState(0);
+  const [lineDiagramWidth, setLineDiagramWidth] = useState(0);  
+  // A ref on the diagram container will indicate how much room we have to scale the map
+  const [diagramContainerHeight, setDiagramContainerHeight] = useState(0);
+  const [simulationTransform, setSimulationTransform] = useState(1);
+
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    const resizeObserver = new ResizeObserver(() => {
+      if (ref?.current) {
+        setDiagramContainerHeight(ref.current.clientHeight * simulationTransform);
+      }
+    });
+    resizeObserver.observe(ref.current);
+    return () => resizeObserver.disconnect();
+  }, [ref?.current]);
+
+  // Measures line-map svg when the scaleFactor changes, updates state
+  const measureLineMapNode = useCallback(node => {
+    if (node !== null) {
+      const {height, width} = node.getBoundingClientRect();
+      setLineDiagramHeight(height);
+      setLineDiagramWidth(width);
+    } 
+  }, [scaleFactor]);
+
+  // First, we need to figure out whether we're in a Screenplay simulation or not,
+  // because unfortunately, the CSS transform on those simulations messes up the widget's
+  // ability to measure itself in the DOM. So, we need to get the original height of the
+  // diagram, pre-scaled, to accurately set its viewbox dimensions.
+  useEffect(() => {
+    const simulation = document.getElementById("simulation")
+    const simulationStyle = simulation && window.getComputedStyle(simulation) 
+    setSimulationTransform(new DOMMatrix(simulationStyle?.transform).m11);
+  }, []);
+  
+  const fullWidth = 904 * simulationTransform;
+  const originalHeight = lineDiagramHeight * 1/simulationTransform
+
+  const numStops = slots.length;
+  const spaceBetween = Math.min(
+    60,
+    (W - SLOT_WIDTH * numStops) / (numStops - 1)
+  );
+  const [beginning, middle, end] = [slots[0], slots.slice(1, -1), slots.at(-1)];
+  const hasEmphasis = effect !== "station_closure";
+
+  const getEmphasisHeight = (scale: number) => (
+    hasEmphasis
+    ? EMPHASIS_HEIGHT + EMPHASIS_PADDING_TOP * scale
+    : 0
+  )
+
+  const labelTextClass = slots.length > 12 ? "small" : "large";
+
+  let x = 0;
+  const middleSlots = middle.map((s, i) => {
+    // Add 1 to the index to counteract the offset caused by removing `beginning` from the original `slots` array.
+    const slotIndex = i + 1;
+    x = (spaceBetween + SLOT_WIDTH) * slotIndex;
+    const slot = s as MiddleSlot;
+    const key = slot.label === "…" ? i : slot.label.full;
+    const isAffected =
+      effect === "station_closure"
+        ? props.closed_station_slot_indices.includes(slotIndex)
+        : slotIndex >= props.effect_region_slot_index_range[0] &&
+          slotIndex <= props.effect_region_slot_index_range[1] - 1;
+
+    return (
+      <MiddleSlotComponent
+        key={key}
+        slot={slot}
+        x={x}
+        spaceBetween={spaceBetween}
+        line={line}
+        isCurrentStop={current_station_slot_index === slotIndex}
+        effect={effect}
+        isAffected={isAffected}
+        firstAffectedIndex={
+          effect === "station_closure"
+            ? false
+            : props.effect_region_slot_index_range[0] === slotIndex
+        }
+        abbreviate={doAbbreviate}
+        labelTextClass={labelTextClass}
+      />
+    );
+  });
+
+  x += spaceBetween + SLOT_WIDTH;
+
+  // When the parent container size changes, or abbreviation setting changes,
+  // re-measure the diagram and scale accordingly.
+  useEffect(() => {
+    // Scale the line-map svg given the available screen width 
+    const measureDiagramAndScale = () => {
+      if (!isDone && diagramContainerHeight != 0) {
+        // If scaleFactor has already been applied to the line-map, we need to reverse that for calculations
+        const unscaledHeight = lineDiagramHeight / scaleFactor;
+        const unscaledWidth = lineDiagramWidth / scaleFactor;
+
+        // First, scale x. Then, check if it needs abbreviating. Then scale y, given the abbreviation
+        const xScaleFactor = fullWidth / unscaledWidth;
+        
+        // If xScaleFactor is less than 1, let's try abbreviating.
+        // Or, if the x scaling constrains the height, abbreviate
+        const needsAbbreviating = !doAbbreviate && (xScaleFactor < 1 ||
+          unscaledHeight * xScaleFactor + getEmphasisHeight(xScaleFactor) * simulationTransform > diagramContainerHeight);
+        if (needsAbbreviating) {
+          setDoAbbreviate(true);
+          // now scale y, which requires re-running this effect
+        } else {
+          const yScaleFactor = (diagramContainerHeight - getEmphasisHeight(1) * simulationTransform) / unscaledHeight
+          const factor = Math.min(
+            xScaleFactor,
+            yScaleFactor
+          );
+          setScaleFactor(factor);
+          setIsDone(true);
+        }
+      }
+    }
+
+    // The isCurrent setting is needed to clean up the unused hook runs / state changes
+    let isCurrent = true
+    
+    // The document.fonts.ready.then() is needed when the font takes a while to load
+    // but the diagram measurements have already been taken.
+    // Example: shuttle Chinatown > Mass Ave, screen located at Back Bay
+    document.fonts.ready.then(() => {
+      if (isCurrent) measureDiagramAndScale()
+    })
+    return () => {
+      isCurrent = false
+    }
+  }, [lineDiagramHeight, diagramContainerHeight, doAbbreviate]);
+
+  // This is to center the diagram along the X axis
+  const translateX = (lineDiagramWidth && (fullWidth - lineDiagramWidth) / 2 / simulationTransform) || 0;
+  
+  // Next is to align the diagram at the top of the svg, which involves adjusting the SVG viewbox
+
+  // If -${height} is used as the viewbox height, it looks like the line diagram text
+  // pushed all the way to the bottom of the viewbox with just a tiny point of the
+  // "You are Here" diamond sticking out. So, the parts that are cut off are the whole
+  // height of the line diagram, and a little extra for the bottom of the "You are Here" diamond.
+
+  // To calculate the height of that missing part, that is:
+  // LINE_HEIGHT*scaleFactor/2 - MAX_ENDPOINT_HEIGHT*scaleFactor/2 + (hasEmphasis ? EMPHASIS_PADDING_TOP * scaleFactor : 0)
+
+  // So finally, the vertical viewBoxOffset is parent container height minus
+  // all the stuff below the very top of the line diagram
+  const viewBoxOffset = 
+    originalHeight
+    - LINE_HEIGHT * scaleFactor / 2
+    - MAX_ENDPOINT_HEIGHT * scaleFactor / 2
+
   return (
-    <div className="disruption-diagram">Diagram goes here!</div>
+    <div style={{width: "100%", height: "100%"}} ref={ref}>
+      <svg
+        viewBox={`0 ${-viewBoxOffset} ${DIAGRAM_WIDTH} ${originalHeight + getEmphasisHeight(scaleFactor)}`}
+        transform={`translate(${translateX})`}
+        visibility={isDone ? "visible" : "hidden"}
+      >
+        <g transform={`translate(${L * scaleFactor} 0)`}>
+          <g id="line-map" transform={`scale(${scaleFactor})`} ref={measureLineMapNode}>
+            {effect !== "station_closure" && (
+              <EffectBackgroundComponent
+                effectRegionSlotIndexRange={props.effect_region_slot_index_range}
+                effect={effect}
+                spaceBetween={spaceBetween}
+              />
+            )}
+            <EndSlotComponent
+              slot={beginning}
+              x={0}
+              line={line}
+              isCurrentStop={current_station_slot_index === 0}
+              spaceBetween={spaceBetween}
+              isAffected={
+                effect === "station_closure"
+                  ? props.closed_station_slot_indices.includes(0)
+                  : props.effect_region_slot_index_range.includes(0)
+              }
+              effect={effect}
+              isLeftSide={true}
+            />
+            {middleSlots}
+            <EndSlotComponent
+              slot={end as EndSlot}
+              x={x}
+              line={line}
+              isCurrentStop={current_station_slot_index === slots.length - 1}
+              spaceBetween={spaceBetween}
+              isAffected={
+                effect === "station_closure"
+                  ? props.closed_station_slot_indices.includes(slots.length - 1)
+                  : props.effect_region_slot_index_range.includes(
+                      slots.length - 1
+                    )
+              }
+              effect={effect}
+              isLeftSide={false}
+            />
+          </g>
+          {hasEmphasis && (
+            <g
+              id="alert-emphasis"
+              transform={`translate(0, ${
+                EMPHASIS_HEIGHT/2 // Half the height of the emphasis icon
+                + LARGE_X_STOP_ICON_HEIGHT/2 * scaleFactor // Half the height of the largest closure icon, "you are here" octagon
+                + 8 * scaleFactor // Emphasis padding
+              })`}
+            >
+              <AlertEmphasisComponent
+                effectRegionSlotIndexRange={props.effect_region_slot_index_range}
+                spaceBetween={spaceBetween}
+                effect={effect}
+                scaleFactor={scaleFactor}
+              />
+            </g>
+          )}
+        </g>
+      </svg>
+    </div>
   );
 };
+
+export { DisruptionDiagramData };
 
 export default DisruptionDiagram;
