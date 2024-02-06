@@ -18,6 +18,16 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
           time: DateTime.t()
         }
 
+  def serialize(
+        %__MODULE__{
+          screen: %Screen{vendor: :mercury, app_id: :gl_eink_v2},
+          icon: icon,
+          text: text
+        } = t
+      ) do
+    %{icon: icon, text: text, show_to: showing_destination?(t)}
+  end
+
   def serialize(%__MODULE__{icon: icon, text: text, time: time} = t) do
     %{icon: icon, text: text, time: DateTime.to_iso8601(time), show_to: showing_destination?(t)}
   end

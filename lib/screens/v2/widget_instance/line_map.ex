@@ -239,7 +239,8 @@ defmodule Screens.V2.WidgetInstance.LineMap do
       if index < 0 do
         []
       else
-        [%{id: vehicle_id, index: index, label: label}]
+        departure_time_epoch = d |> Departure.time() |> DateTime.to_unix()
+        [%{id: vehicle_id, index: index, label: label, time_in_epoch: departure_time_epoch}]
       end
     end
   end

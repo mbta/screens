@@ -52,10 +52,21 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
               :full_body_top_screen,
               :full_body_bottom_screen
             ],
+            flex_zone_takeover: [
+              :left_sidebar,
+              :main_content,
+              :flex_zone_takeover,
+              :footer
+            ],
             bottom_takeover: [
               :left_sidebar,
               :main_content,
               :full_body_bottom_screen
+            ],
+            top_and_flex_takeover: [
+              :full_body_top_screen,
+              :flex_zone_takeover,
+              :footer
             ]
           }}
        ],

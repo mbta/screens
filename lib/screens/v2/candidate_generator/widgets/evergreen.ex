@@ -29,7 +29,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
        ) do
     %EvergreenContent{
       screen: config,
-      slot_names: slot_names,
+      slot_names: Enum.map(slot_names, &String.to_existing_atom/1),
       asset_url: Assets.s3_asset_url(asset_path),
       priority: priority,
       schedule: schedule,

@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.{BusEink, BusShelter, GlEink}
   alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
   alias Screens.V2.AlertsWidget
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
@@ -24,7 +25,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
         },
         location_context: %LocationContext{
           home_stop: nil,
-          stop_sequences: nil,
+          tagged_stop_sequences: nil,
           upstream_stops: nil,
           downstream_stops: nil,
           routes: nil,
@@ -53,12 +54,14 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     %{widget | alert: %{widget.alert | informed_entities: ies}}
   end
 
-  defp put_stop_sequences(widget, sequences) do
+  defp put_tagged_stop_sequences(widget, tagged_sequences) do
+    sequences = RoutePattern.untag_stop_sequences(tagged_sequences)
+
     %{
       widget
       | location_context: %{
           widget.location_context
-          | stop_sequences: sequences,
+          | tagged_stop_sequences: tagged_sequences,
             upstream_stops:
               Stop.upstream_stop_id_set(widget.location_context.home_stop, sequences),
             downstream_stops:
@@ -99,16 +102,20 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     %{widget: put_home_stop(widget, BusShelter, home_stop)}
   end
 
-  defp setup_stop_sequences(%{widget: widget}) do
-    stop_sequences = [
-      ~w[0 1 2 3 4  5 6 7 8 9],
-      ~w[10 20 30 4 5 7],
-      ~w[           5 6 90],
-      ~w[200 40     5],
-      ~w[111 222 333]
-    ]
+  defp setup_tagged_stop_sequences(%{widget: widget}) do
+    tagged_stop_sequences = %{
+      "A" => [
+        ~w[0 1 2 3 4  5 6 7 8 9],
+        ~w[10 20 30 4 5 7]
+      ],
+      "B" => [
+        ~w[           5 6 90],
+        ~w[200 40     5],
+        ~w[111 222 333]
+      ]
+    }
 
-    %{widget: put_stop_sequences(widget, stop_sequences)}
+    %{widget: put_tagged_stop_sequences(widget, tagged_stop_sequences)}
   end
 
   defp setup_routes(%{widget: widget}) do
@@ -124,7 +131,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   defp setup_location_context(%{widget: widget}) do
     %{widget: widget}
     |> setup_home_stop()
-    |> setup_stop_sequences()
+    |> setup_tagged_stop_sequences()
     |> setup_routes()
   end
 

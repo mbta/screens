@@ -6,8 +6,8 @@ defmodule Screens.V3Api do
   require Logger
 
   @default_opts [
-    timeout: 2000,
-    recv_timeout: 2000,
+    timeout: 5000,
+    recv_timeout: 5000,
     hackney: [pool: :api_v3_pool, checkout_timeout: 4000]
   ]
 

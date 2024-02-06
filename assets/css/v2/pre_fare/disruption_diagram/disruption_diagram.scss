@@ -1,0 +1,124 @@
+.end-slot__arrow {
+  &--red {
+    fill: $line-color-red;
+  }
+
+  &--blue {
+    fill: $line-color-blue;
+  }
+
+  &--orange {
+    fill: $line-color-orange;
+  }
+
+  &--green {
+    fill: $line-color-green;
+  }
+}
+
+.end-slot__icon {
+  &--red {
+    stroke: $line-color-red;
+  }
+
+  &--blue {
+    stroke: $line-color-blue;
+  }
+
+  &--orange {
+    stroke: $line-color-orange;
+  }
+
+  &--green {
+    stroke: $line-color-green;
+  }
+
+  &--affected {
+    stroke: #171f26;
+  }
+}
+
+.shuttle-stop {
+  stroke: #171f26;
+}
+
+.middle-slot__background {
+  &--red {
+    fill: $line-color-red;
+  }
+
+  &--blue {
+    fill: $line-color-blue;
+  }
+
+  &--orange {
+    fill: $line-color-orange;
+  }
+
+  &--green {
+    fill: $line-color-green;
+  }
+}
+
+.middle-slot__icon {
+  &--red {
+    stroke: $line-color-red;
+  }
+
+  &--blue {
+    stroke: $line-color-blue;
+  }
+
+  &--orange {
+    stroke: $line-color-orange;
+  }
+
+  &--green {
+    stroke: $line-color-green;
+  }
+}
+
+.label--endpoint {
+  font-size: 35px;
+  font-weight: 700;
+
+  .label {
+    font-weight: 400;
+  }
+}
+
+.label-large {
+  font-family: Inter;
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 35px;
+
+  &--current-stop {
+    font-size: 35px;
+    font-weight: 700;
+  }
+
+  &--small {
+    font-size: 25px;
+  }
+}
+
+.label-small {
+  font-family: Inter;
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 35px;
+
+  &--current-stop {
+    font-size: 30px;
+    font-weight: 700;
+  }
+}
+
+.station-closure-icon {
+  fill: #171f26;
+
+  &--current-stop {
+    fill: #ee2e24;
+  }
+}

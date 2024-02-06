@@ -28,6 +28,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         sectionHeaders={apiResponse.section_headers}
         currentTimeString={apiResponse.current_time}
         overhead={apiResponse.overhead}
+        stationName={apiResponse.station_name}
       />
       {apiResponse.psa_url && (
         <Psa

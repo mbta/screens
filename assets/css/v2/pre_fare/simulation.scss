@@ -5,7 +5,7 @@
 }
 
 .simulation-screen-scrolling-container {
-  scrollbar-color: #607180 #2E3F4D;
+  scrollbar-color: #607180 #2e3f4d;
 
   &::-webkit-scrollbar {
     width: 12px;
@@ -13,12 +13,12 @@
   &::-webkit-scrollbar-thumb {
     background-color: #607180;
     border-radius: 12px;
-    border: 2px solid #2E3F4D;
+    border: 2px solid #2e3f4d;
   }
   &::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     border-radius: 12px;
-    background-color: #2E3F4D;
+    background-color: #2e3f4d;
   }
 }
 
@@ -26,99 +26,91 @@
   display: flex;
   overflow-y: hidden;
   overflow-x: auto;
-  padding-bottom: 20px;
+  margin-bottom: 20px;
+  height: 449px;
+
+  .simulation {
+    transform-origin: top left;
+    transform: scale(17.92%);
+  }
 
   .simulation__full-page {
-    height: 344px;
-    width: 387px;
-    margin-right: 24px;
+    max-height: 407px;
+    max-width: 388px;
+    margin: 16px;
     z-index: 999;
-    box-shadow: 0px 0px 32px 0px #00000040;
 
-    & > * {
-      transform-origin: top left;
-      transform: scale(17.92%);
+    .simulation__title {
+      font-family: Inter;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 24px;
+      color: #f8f9fa;
+      margin-bottom: 10px;
     }
   }
 
-  .simulation__flex-zone {
-    background: #2e3f4d;
-    display: flex;
-    margin: auto 2px auto 0;
-    height: 160px;
-    border-radius: 0 8px 8px 0;
-    position: relative;
+  .simulation__left-screen {
+    height: 375px;
+    margin: 32px 16px 16px 16px;
 
-    &:before {
-      content: "";
-      position: absolute;
-      right: 100%;
-      // NO HEIGHT
-      border-top: 80px solid transparent;
-      border-right: 100px solid #2e3f4d;
-      border-bottom: 80px solid transparent;
-    }
-  }
-
-  .simulation__flex-zone-widget {
-    width: 256px;
-    height: 144px;
-    margin-top: auto;
-    margin-bottom: auto;
-
-    .alert-container--urgent {
-      background-color: unset;
-    }
-
-    &:last-child {
-      margin-right: 8px;
-    }
-
-    &:not(:last-child) {
-      margin-right: 24px;
-    }
-
-    .flex-one-large,
-    .flex-two-medium {
-      transform-origin: top left;
-      transform: scale(25%);
-
-      .flex-one-large__large {
-        .evergreen-content-image__container,
-        .evergreen-content-image__image {
-          max-width: 1024px;
-          max-height: 576px;
-        }
-      }
-
-      .flex-two-medium__left,
-      .flex-two-medium__right {
-        .evergreen-content-image__container,
-        .evergreen-content-image__image {
-          max-width: 480px;
-          max-height: 580px;
-        }
-      }
-
-      & > * {
-        position: unset;
-
-        // Pre-Fare flex-zones are a little weird.
-        // For some reason, some widgets have padding or margin that throw off the positioning in the sim.
-        // Removing margin and padding in the widget fixes it.
-        & > * {
-          margin: 0;
-          padding: 0;
-        }
-      }
-    }
-
-    .flex-two-medium {
+    .simulation__left-screen-widget-container {
       display: flex;
 
-      .flex-two-medium__left {
-        margin-right: 40px;
+      .simulation__left-screen-widget {
+        width: 194px;
+        margin-right: 24px;
+        & > * {
+          height: 1720px;
+          width: 1080px;
+          overflow: hidden;
+        }
       }
     }
+
+    .simulation__title {
+      font-family: Inter;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      color: #f8f9fa;
+      margin-bottom: 10px;
+    }
+  }
+
+  .simulation__right-screen {
+    height: 375px;
+    margin: 128px 16px 16px 16px;
+
+    .simulation__right-screen-widget-container {
+      display: flex;
+
+      .simulation__right-screen-widget {
+        width: 194px;
+        margin-right: 24px;
+        & > * {
+          height: 1720px;
+          width: 1080px;
+          overflow: hidden;
+        }
+      }
+    }
+
+    .simulation__title {
+      font-family: Inter;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      color: #f8f9fa;
+      margin-bottom: 10px;
+    }
+  }
+
+  .divider:after {
+    content: "";
+    position: absolute;
+    border-left: 1px solid #1e2933;
+    top: 48px;
+    height: 343px;
   }
 }

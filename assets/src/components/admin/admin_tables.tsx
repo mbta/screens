@@ -614,13 +614,28 @@ const GLEinkV2ScreensTable = (): JSX.Element => {
     FormCell: FormTextarea,
   };
 
+  const platformLocationColumn = {
+    Header: "Platform Location",
+    accessor: buildAppParamAccessor("platform_location"),
+    mutator: buildAppParamMutator("platform_location"),
+    Cell: EditableSelect,
+    disableFilters: true,
+    FormCell: buildFormSelect(["front", "back"], false),
+  };
+
   const dataFilter = ({ app_id }) => {
     return app_id === "gl_eink_v2";
   };
 
   return (
     <AdminTable
-      columns={[...v2Columns, alertsColumn, lineMapColumn, audioColumn]}
+      columns={[
+        ...v2Columns,
+        alertsColumn,
+        lineMapColumn,
+        audioColumn,
+        platformLocationColumn,
+      ]}
       dataFilter={dataFilter}
     />
   );

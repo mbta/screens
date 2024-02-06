@@ -3,9 +3,9 @@ defmodule Screens.Config.Cache.Engine do
   Engine for the screens config cache.
   """
 
-  alias Screens.Config
   alias Screens.Config.Cache
   alias Screens.Config.Fetch
+  alias ScreensConfig.Config
 
   @behaviour Screens.Cache.Engine
 
