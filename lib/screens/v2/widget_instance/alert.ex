@@ -260,8 +260,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
     DateTime.diff(now, start, :second)
   end
 
-  def audio_serialize(%__MODULE__{alert: %Alert{description: description}}),
-    do: %{description: description}
+  def audio_serialize(%__MODULE__{alert: %Alert{header: header}}),
+    do: %{header: header}
 
   def audio_sort_key(%__MODULE__{} = t) do
     if takeover_alert?(t) do
