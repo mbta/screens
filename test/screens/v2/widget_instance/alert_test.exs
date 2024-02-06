@@ -15,7 +15,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   defp setup_base(_context) do
     %{
       widget: %AlertWidget{
-        alert: %Alert{id: "123", description: "This is a description."},
+        alert: %Alert{id: "123", header: "This is some text."},
         screen: %Screen{
           app_params: nil,
           vendor: nil,
@@ -621,8 +621,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns alert description", %{widget: widget} do
-      assert %{description: widget.alert.description} == AlertWidget.audio_serialize(widget)
+    test "returns alert header", %{widget: widget} do
+      assert %{header: widget.alert.header} == AlertWidget.audio_serialize(widget)
     end
   end
 
