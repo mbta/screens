@@ -227,7 +227,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   defp get_pending_screen_config(screen_id) do
     with {:ok, config_json} <- Screens.PendingConfig.Fetch.fetch_config(),
          {:ok, raw_map} <- Jason.decode(config_json) do
-      config = Screens.PendingConfig.from_json(raw_map)
+      config = ScreensConfig.PendingConfig.from_json(raw_map)
       config.screens[screen_id]
     else
       _ -> nil

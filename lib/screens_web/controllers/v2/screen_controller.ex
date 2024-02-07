@@ -2,7 +2,6 @@ defmodule ScreensWeb.V2.ScreenController do
   use ScreensWeb, :controller
   require Logger
   alias Screens.Config.Cache
-  alias Screens.PendingConfig
   alias Screens.V2.ScreenData.Parameters
   alias ScreensConfig.Screen
 
@@ -109,9 +108,9 @@ defmodule ScreensWeb.V2.ScreenController do
     # _ = Screens.LogScreenData.log_pending_screen_page_load(screen_id)
 
     config =
-      with {:ok, config_json} <- PendingConfig.Fetch.fetch_config(),
+      with {:ok, config_json} <- Screens.PendingConfig.Fetch.fetch_config(),
            {:ok, raw_map} <- Jason.decode(config_json) do
-        pending_config = PendingConfig.from_json(raw_map)
+        pending_config = ScreensConfig.PendingConfig.from_json(raw_map)
         pending_config.screens[screen_id]
       else
         _ -> nil
