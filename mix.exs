@@ -82,7 +82,9 @@ defmodule Screens.MixProject do
       {:aja, "~> 0.6.2"},
       {:telemetry_poller, "~> 0.4"},
       {:telemetry_metrics, "~> 0.4"},
-      {:screens_config, git: "https://github.com/mbta/screens-config-lib.git"}
+      {:screens_config,
+       git: "https://github.com/mbta/screens-config-lib.git",
+       ref: "6bde1c69110b665d6223746a0340d6d44b5ac0be"}
     ]
   end
 end
