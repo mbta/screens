@@ -86,7 +86,9 @@ defmodule Screens.V2.ScreenData do
     screen_data = fetch_data(pending_screen_config)
 
     full_page_data = screen_data |> resolve_paging(refresh_rate) |> serialize()
-    paged_slot_data = screen_data |> get_paged_slots() |> serialize_paged_slots()
+
+    paged_slot_data =
+      screen_data |> get_paged_slots() |> serialize_paged_slots(pending_screen_config.app_id)
 
     response(data: %{full_page: full_page_data, flex_zone: paged_slot_data})
   end
