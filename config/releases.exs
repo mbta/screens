@@ -65,22 +65,24 @@ config :screens, Screens.ScreensByAlert.Memcache,
     coder: Screens.ScreensByAlert.Memcache.SafeErlangCoder
   ]
 
-keycloak_opts = [
-  issuer: :keycloak_issuer,
-  client_id: System.fetch_env!("KEYCLOAK_CLIENT_ID"),
-  client_secret: System.fetch_env!("KEYCLOAK_CLIENT_SECRET")
-]
-
-config :ueberauth_oidcc,
-  issuers: [
-    %{
-      name: :keycloak_issuer,
-      issuer: System.fetch_env!("KEYCLOAK_ISSUER")
-    }
-  ],
-  providers: [
-    keycloak: keycloak_opts
+if config_env() == :prod do
+  keycloak_opts = [
+    issuer: :keycloak_issuer,
+    client_id: System.fetch_env!("KEYCLOAK_CLIENT_ID"),
+    client_secret: System.fetch_env!("KEYCLOAK_CLIENT_SECRET")
   ]
+
+  config :ueberauth_oidcc,
+    issuers: [
+      %{
+        name: :keycloak_issuer,
+        issuer: System.fetch_env!("KEYCLOAK_ISSUER")
+      }
+    ],
+    providers: [
+      keycloak: keycloak_opts
+    ]
+end
 
 # ## Using releases (Elixir v1.9+)
 #
