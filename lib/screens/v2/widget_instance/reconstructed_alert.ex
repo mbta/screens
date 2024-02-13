@@ -1218,12 +1218,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
   def valid_candidate?(%__MODULE__{} = t) do
-    # Suppress GL Surge alerts at Government Center.
-    test_surge_alerts = ["155040"]
-    prod_surge_alerts = ["544008", "546499", "547600", "547613", "549803"]
-
     suppressed =
-      t.alert.id in (test_surge_alerts ++ prod_surge_alerts) and
+      t.alert.id in ["549108", "553614", "553615", "553616", "553617"] and
         t.location_context.home_stop === "place-gover"
 
     not suppressed
