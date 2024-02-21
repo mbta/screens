@@ -100,13 +100,6 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   def index_pending(conn, %{"id" => screen_id} = params) do
-    # Should we log info for these requests?
-    # Current precedent is to not, for simulation requests.
-    # But it could be helpful, and we don't have to come up with a way to
-    # distinguish between requests from "real screens" vs not.
-    # (Because real screens should never hit this endpoint.)
-    # _ = Screens.LogScreenData.log_pending_screen_page_load(screen_id)
-
     config =
       with {:ok, config_json} <- Screens.PendingConfig.Fetch.fetch_config(),
            {:ok, raw_map} <- Jason.decode(config_json) do
