@@ -147,15 +147,22 @@ const getLoggingParams = () => {
 const getOutfrontAbsolutePath = () =>
   isOFM() ? "https://screens.mbta.com" : "";
 
+const getRoute = () => {
+  let route = "/v2/api/screen/";
+  const isPending = getDatasetValue("isPending") === "true";
+  return isPending ? `${route}pending/` : route;
+};
+
 const getApiPath = (id: string, routePart: string) => {
   const outfrontAbsolutePath = getOutfrontAbsolutePath();
+  const route = getRoute();
   const lastRefresh = getDatasetValue("lastRefresh");
   const isRealScreenParam = getIsRealScreenParam();
   const screenSideParam = getScreenSideParam();
   const requestorParam = getRequestorParam();
   const loggingParams = getLoggingParams();
 
-  return `${outfrontAbsolutePath}/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}${loggingParams}`;
+  return `${outfrontAbsolutePath}${route}${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}${loggingParams}`;
 };
 
 interface UseApiResponseArgs {

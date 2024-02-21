@@ -83,39 +83,72 @@ defmodule ScreensWeb.V2.ScreenController do
 
     config = Cache.screen(screen_id)
 
-    case config do
-      %Screen{app_id: app_id} ->
-        refresh_rate = Parameters.get_refresh_rate(app_id)
+    if is_struct(config, Screen) do
+      assigns = get_assigns(params, screen_id, config)
 
-        conn
-        |> assign(:app_id, app_id)
-        |> assign(:refresh_rate, refresh_rate)
-        |> assign(:audio_readout_interval, Parameters.get_audio_readout_interval(app_id))
-        |> assign(
-          :audio_interval_offset_seconds,
-          Parameters.get_audio_interval_offset_seconds(config)
-        )
-        |> assign(:sentry_frontend_dsn, Application.get_env(:screens, :sentry_frontend_dsn))
-        |> assign(
-          :refresh_rate_offset,
-          calculate_refresh_rate_offset(screen_id, refresh_rate)
-        )
-        |> assign(:is_real_screen, match?(%{"is_real_screen" => "true"}, params))
-        |> assign(:screen_side, screen_side(params))
-        |> assign(:requestor, params["requestor"])
-        |> assign(:disable_sentry, params["disable_sentry"])
-        |> assign(:rotation_index, rotation_index(params))
-        |> assign(:triptych_pane, triptych_pane(params))
-        |> put_view(ScreensWeb.V2.ScreenView)
-        |> render("index.html")
-
-      nil ->
-        render_not_found(conn)
+      conn
+      |> merge_assigns(assigns)
+      |> put_view(ScreensWeb.V2.ScreenView)
+      |> render("index.html")
+    else
+      render_not_found(conn)
     end
   end
 
   def index(conn, _params) do
     render_not_found(conn)
+  end
+
+  def index_pending(conn, %{"id" => screen_id} = params) do
+    config =
+      with {:ok, config_json} <- Screens.PendingConfig.Fetch.fetch_config(),
+           {:ok, raw_map} <- Jason.decode(config_json) do
+        pending_config = ScreensConfig.PendingConfig.from_json(raw_map)
+        pending_config.screens[screen_id]
+      else
+        _ -> nil
+      end
+
+    if config != nil do
+      # Pending screen pages work exactly the same as normal screen pages,
+      # except they don't do data refreshes.
+      assigns =
+        params
+        |> get_assigns(screen_id, config)
+        |> Keyword.replace(:refresh_rate, 0)
+        |> Keyword.put(:is_pending, true)
+
+      conn
+      |> merge_assigns(assigns)
+      |> put_view(ScreensWeb.V2.ScreenView)
+      |> render("index.html")
+    else
+      render_not_found(conn)
+    end
+  end
+
+  def index_pending(conn, _params) do
+    render_not_found(conn)
+  end
+
+  defp get_assigns(params, screen_id, %Screen{app_id: app_id} = config) do
+    refresh_rate = Parameters.get_refresh_rate(app_id)
+
+    [
+      app_id: app_id,
+      refresh_rate: refresh_rate,
+      audio_readout_interval: Parameters.get_audio_readout_interval(app_id),
+      audio_interval_offset_seconds: Parameters.get_audio_interval_offset_seconds(config),
+      sentry_frontend_dsn: Application.get_env(:screens, :sentry_frontend_dsn),
+      refresh_rate_offset: calculate_refresh_rate_offset(screen_id, refresh_rate),
+      is_real_screen: match?(%{"is_real_screen" => "true"}, params),
+      screen_side: screen_side(params),
+      requestor: params["requestor"],
+      disable_sentry: params["disable_sentry"],
+      rotation_index: rotation_index(params),
+      triptych_pane: triptych_pane(params),
+      is_pending: false
+    ]
   end
 
   # Handles widget page GET requests with widget data as a query param.
@@ -161,6 +194,15 @@ defmodule ScreensWeb.V2.ScreenController do
       Application.get_env(:screens, :screenplay_fullstory_org_id)
     )
     |> index(params)
+  end
+
+  def simulation_pending(conn, params) do
+    conn
+    |> assign(
+      :screenplay_fullstory_org_id,
+      Application.get_env(:screens, :screenplay_fullstory_org_id)
+    )
+    |> index_pending(params)
   end
 
   defp render_not_found(conn) do

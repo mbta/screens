@@ -125,20 +125,7 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
-        <Route exact path="/v2/screen/bus_shelter_v2">
-          <MultiScreenPage
-            components={TYPE_TO_COMPONENT}
-            responseMapper={responseMapper}
-          />
-        </Route>
-        <Route exact path="/v2/screen/:id/simulation">
-          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <ResponseMapperContext.Provider value={responseMapper}>
-              <SimulationScreenPage />
-            </ResponseMapperContext.Provider>
-          </MappingContext.Provider>
-        </Route>
-        <Route path="/v2/screen/:id">
+        <Route exact path={["/v2/screen/:id", "/v2/screen/pending/:id"]}>
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <BlinkConfigContext.Provider value={blinkConfig}>
@@ -146,6 +133,19 @@ const App = (): JSX.Element => {
                   <ScreenPage />
                 </AudioConfigContext.Provider>
               </BlinkConfigContext.Provider>
+            </ResponseMapperContext.Provider>
+          </MappingContext.Provider>
+        </Route>
+        <Route exact path="/v2/screen/bus_shelter_v2">
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
+        </Route>
+        <Route exact path={["/v2/screen/:id/simulation", "/v2/screen/pending/:id/simulation"]}>
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <SimulationScreenPage />
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
