@@ -1219,7 +1219,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def valid_candidate?(%__MODULE__{} = t) do
     suppressed =
-      t.alert.id in ["549108", "553614", "553615", "553616", "553617"] and
+      t.alert.id in ["549108", "554930", "554931", "554932"] and
         t.location_context.home_stop === "place-gover"
 
     not suppressed
