@@ -49,20 +49,15 @@ config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :screens,
   redirect_http?: true,
-  cognito_group: "screens-admin"
+  keycloak_role: "screens-admin"
 
 config :screens, ScreensWeb.AuthManager, issuer: "screens"
 
+# Placeholder for Keycloak authentication, defined for real in environment configs
 config :ueberauth, Ueberauth,
   providers: [
-    cognito: {Ueberauth.Strategy.Cognito, []}
+    keycloak: nil
   ]
-
-config :ueberauth, Ueberauth.Strategy.Cognito,
-  auth_domain: {System, :get_env, ["COGNITO_DOMAIN"]},
-  client_id: {System, :get_env, ["COGNITO_CLIENT_ID"]},
-  user_pool_id: {System, :get_env, ["COGNITO_USER_POOL_ID"]},
-  aws_region: {System, :get_env, ["COGNITO_AWS_REGION"]}
 
 config :screens,
   gds_dms_username: "mbtadata@gmail.com",

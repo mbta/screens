@@ -35,6 +35,13 @@ config :screens, :screens_by_alert,
   screens_last_updated_ttl_seconds: 3600,
   screens_ttl_seconds: 40
 
+# Configure Ueberauth to use Keycloak
+config :ueberauth, Ueberauth,
+  providers: [
+    keycloak:
+      {Ueberauth.Strategy.Oidcc, userinfo: true, uid_field: "email", scopes: ~w(openid email)}
+  ]
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

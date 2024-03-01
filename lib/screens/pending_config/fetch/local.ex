@@ -14,7 +14,7 @@ defmodule Screens.PendingConfig.Fetch.Local do
         {:ok, contents}
 
       _ ->
-        Logger.warn(
+        Logger.warning(
           ~s|Could not open #{local_config_path()}. If it doesn't exist, create it with contents of `{"screens": {}}`.|
         )
 
