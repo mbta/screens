@@ -35,7 +35,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsOutro do
 
     case last_alert_widget do
       nil ->
-        Logger.warn("Failed to find an alert widget in the audio readout queue")
+        Logger.warning("Failed to find an alert widget in the audio readout queue")
         [100]
 
       widget ->

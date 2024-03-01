@@ -64,7 +64,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
             default_psa_folder = hd(triptych_psa_contents)
             default_psa_path = Path.join(path, default_psa_folder)
 
-            Logger.warn(
+            Logger.warning(
               "[Triptych PSA filepath not found, using default] configured_folder_name=#{folder_name} default_folder_name=#{default_psa_folder}"
             )
 
@@ -79,7 +79,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.LocalEvergreenSet do
             )
 
           {:error, _} ->
-            Logger.warn("[Empty triptych PSA folder]")
+            Logger.warning("[Empty triptych PSA folder]")
             []
         end
     end

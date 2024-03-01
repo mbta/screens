@@ -83,7 +83,7 @@ defmodule Screens.ScreensByAlert.Memcache do
         Map.merge(default_map, found_items)
 
       {:error, message} ->
-        Logger.warn("[get_screens_by_alert memcache error] message=\"#{message}\"")
+        Logger.warning("[get_screens_by_alert memcache error] message=\"#{message}\"")
         # Should we return an error tuple instead of the default map?
         default_map
     end
@@ -100,7 +100,7 @@ defmodule Screens.ScreensByAlert.Memcache do
         Map.merge(default_map, found_items)
 
       {:error, message} ->
-        Logger.warn("[get_screens_last_updated memcache error] message=\"#{message}\"")
+        Logger.warning("[get_screens_last_updated memcache error] message=\"#{message}\"")
         # Should we return an error tuple instead of the default map?
         default_map
     end
@@ -113,7 +113,7 @@ defmodule Screens.ScreensByAlert.Memcache do
     _ =
       case set_result do
         {:error, message} ->
-          Logger.warn(
+          Logger.warning(
             "[put_data screens_last_updated memcache error] screen_id=#{screen_id} message=#{message}"
           )
 
@@ -141,7 +141,7 @@ defmodule Screens.ScreensByAlert.Memcache do
 
     case cas_result do
       {:error, message} ->
-        Logger.warn(
+        Logger.warning(
           "[put_data screens_by_alert memcache error] alert_id=#{alert_id} screen_id=#{screen_id} message=#{message}"
         )
 
