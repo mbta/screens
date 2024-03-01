@@ -248,7 +248,7 @@ defmodule Screens.Util do
     Adds a timeout to a function. Mainly used for child processes of a Task.Supervisor
     which don't come with a timeout by default.
   """
-  @spec fn_with_timeout((-> val), non_neg_integer()) :: (-> val) when val: any()
+  @spec fn_with_timeout((() -> val), non_neg_integer()) :: (() -> val) when val: any()
   def fn_with_timeout(fun, timeout) do
     fn ->
       _ = :timer.exit_after(timeout, :kill)

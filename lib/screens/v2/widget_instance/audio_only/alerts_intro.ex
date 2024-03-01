@@ -38,11 +38,11 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntro do
 
     case first_service_alert_index do
       nil ->
-        Logger.warning("Failed to find a service alert widget in the audio readout queue")
+        Logger.warn("Failed to find a service alert widget in the audio readout queue")
         [0]
 
       0 ->
-        Logger.warning(
+        Logger.warn(
           "Unexpectedly found a service alert widget at the start of the audio readout queue"
         )
 

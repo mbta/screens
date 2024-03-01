@@ -8,35 +8,27 @@ defmodule ScreensWeb.Controllers.AuthControllerTest do
       auth = %Ueberauth.Auth{
         uid: "foo@mbta.com",
         credentials: %Ueberauth.Auth.Credentials{
-          expires_at: current_time + 1_000
-        },
-        extra: %{
-          raw_info: %{
-            userinfo: %{
-              "resource_access" => %{
-                "test-client" => %{"roles" => ["screens-admin"]}
-              }
-            }
-          }
+          expires_at: current_time + 1_000,
+          other: %{groups: ["test1"]}
         }
       }
 
       conn =
         conn
         |> assign(:ueberauth_auth, auth)
-        |> get(ScreensWeb.Router.Helpers.auth_path(conn, :callback, "keycloak"))
+        |> get(ScreensWeb.Router.Helpers.auth_path(conn, :callback, "cognito"))
 
       response = html_response(conn, 302)
 
       assert response =~ ScreensWeb.Router.Helpers.admin_path(conn, :index)
-      assert Guardian.Plug.current_claims(conn)["roles"] == ["screens-admin"]
+      assert Guardian.Plug.current_claims(conn)["groups"] == ["test1"]
     end
 
     test "handles generic failure", %{conn: conn} do
       conn =
         conn
         |> assign(:ueberauth_failure, %Ueberauth.Failure{})
-        |> get(ScreensWeb.Router.Helpers.auth_path(conn, :callback, "keycloak"))
+        |> get(ScreensWeb.Router.Helpers.auth_path(conn, :callback, "cognito"))
 
       response = response(conn, 401)
 
@@ -46,11 +38,11 @@ defmodule ScreensWeb.Controllers.AuthControllerTest do
 
   describe "request" do
     test "redirects to auth callback", %{conn: conn} do
-      conn = get(conn, ScreensWeb.Router.Helpers.auth_path(conn, :request, "keycloak"))
+      conn = get(conn, ScreensWeb.Router.Helpers.auth_path(conn, :request, "cognito"))
 
       response = response(conn, 302)
 
-      assert response =~ ScreensWeb.Router.Helpers.auth_path(conn, :callback, "keycloak")
+      assert response =~ ScreensWeb.Router.Helpers.auth_path(conn, :callback, "cognito")
     end
   end
 end

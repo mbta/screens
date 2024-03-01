@@ -46,7 +46,7 @@ defmodule ScreensWeb.Router do
   end
 
   scope "/auth", ScreensWeb do
-    pipe_through([:redirect_prod_http, :browser])
+    pipe_through([:browser])
 
     get("/:provider", AuthController, :request)
     get("/:provider/callback", AuthController, :callback)

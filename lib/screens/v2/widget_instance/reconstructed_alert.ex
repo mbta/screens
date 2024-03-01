@@ -1136,7 +1136,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "between #{min_station} and #{max_station}"
   end
 
-  def serialize(widget, log_fn \\ &Logger.warning/1)
+  def serialize(widget, log_fn \\ &Logger.warn/1)
 
   def serialize(%__MODULE__{is_full_screen: true, alert: %Alert{effect: effect}} = t, log_fn) do
     diagram_data =

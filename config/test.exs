@@ -139,20 +139,11 @@ config :screens, ScreensWeb.AuthManager, secret_key: "test key"
 
 config :ueberauth, Ueberauth,
   providers: [
-    keycloak: {Screens.Ueberauth.Strategy.Fake, [roles: ["screens-admin"]]}
-  ]
-
-config :ueberauth_oidcc,
-  providers: [
-    keycloak: [
-      issuer: :keycloak_issuer,
-      client_id: "test-client",
-      client_secret: "fake-secret"
-    ]
+    cognito: {Screens.Ueberauth.Strategy.Fake, []}
   ]
 
 # Print only warnings and errors during test
-config :logger, level: :warning
+config :logger, level: :warn
 
 config :screens, :screens_by_alert,
   cache_module: Screens.ScreensByAlert.GenServer,

@@ -236,7 +236,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
         stop_id: t.screen.app_params.alerts.stop_id
       })
 
-    Logger.warning(
+    Logger.warn(
       "[DUP alert no matching layout] " <>
         Enum.map_join(log_fields, " ", fn {label, value} -> "#{label}=#{value}" end)
     )
