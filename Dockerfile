@@ -1,5 +1,5 @@
 # first, get the elixir dependencies within an Elixir + Alpine Linux container
-FROM hexpm/elixir:1.15.7-erlang-26.2.1-alpine-3.18.4 AS elixir-builder
+FROM hexpm/elixir:1.13.1-erlang-24.2-alpine-3.15.0 AS elixir-builder
 
 ENV LANG="C.UTF-8" MIX_ENV="prod"
 
@@ -38,7 +38,7 @@ COPY --from=assets-builder /root/priv/static ./priv/static
 RUN mix do compile --force, phx.digest, release
 
 # finally, use an Alpine container for the runtime environment
-FROM alpine:3.18.4
+FROM alpine:3.15.0
 
 ENV MIX_ENV="prod" TERM="xterm" LANG="C.UTF-8" PORT="4000"
 

@@ -7,7 +7,7 @@ defmodule ScreensWeb.AuthManager.ErrorHandler do
   def auth_error(conn, {_type, _reason}, _opts) do
     Phoenix.Controller.redirect(
       conn,
-      to: ScreensWeb.Router.Helpers.auth_path(conn, :request, "keycloak")
+      to: ScreensWeb.Router.Helpers.auth_path(conn, :request, "cognito")
     )
   end
 end

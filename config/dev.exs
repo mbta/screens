@@ -39,16 +39,7 @@ config :screens, ScreensWeb.AuthManager, secret_key: "secret key"
 
 config :ueberauth, Ueberauth,
   providers: [
-    keycloak: {Screens.Ueberauth.Strategy.Fake, [roles: ["screens-admin"]]}
-  ]
-
-config :ueberauth_oidcc,
-  providers: [
-    keycloak: [
-      issuer: :keycloak_issuer,
-      client_id: "dev-client",
-      client_secret: "fake-secret"
-    ]
+    cognito: {Screens.Ueberauth.Strategy.Fake, []}
   ]
 
 # ## SSL Support

@@ -565,7 +565,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
        ) do
     cond do
       DateTime.compare(now, first_schedule_tomorrow.departure_time) == :gt ->
-        Logger.warning(
+        Logger.warn(
           "[get_overnight_schedules_for_section] now is after first_schedule_tomorrow. route_id=#{route_id} direction_id=#{direction_id} now=#{now}"
         )
 
