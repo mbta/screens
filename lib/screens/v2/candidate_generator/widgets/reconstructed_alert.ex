@@ -10,6 +10,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Header.CurrentStopId
   alias ScreensConfig.V2.PreFare
+  alias ScreensConfig.V2.ReconstructedAlert, as: ReconstructedAlertConfig
 
   @relevant_effects ~w[shuttle suspension station_closure delay]a
 
@@ -49,14 +50,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   Given the routes, fetch all alerts for the route
   """
   def reconstructed_alert_instances(
-        %Screen{
-          app_params: %PreFare{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}}
-        } = config,
+        %Screen{app_params: app_params} = config,
         now \\ DateTime.utc_now(),
         fetch_alerts_fn \\ &Alert.fetch/1,
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         fetch_location_context_fn \\ &Stop.fetch_location_context/3
       ) do
+    %PreFare{
+      reconstructed_alert_widget: %ReconstructedAlertConfig{
+        parent_station_id: %CurrentStopId{stop_id: stop_id}
+      }
+    } = app_params
+
     # Filtering by subway and light_rail types
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, stop_id, now),
          route_ids <- Route.route_ids(location_context.routes),
