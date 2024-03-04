@@ -90,6 +90,12 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
+        <Route exact path="/v2/screen/triptych_v2">
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
+        </Route>
         <Route path={["/v2/screen/:id", "/v2/screen/pending/:id"]}>
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
@@ -99,13 +105,13 @@ const App = (): JSX.Element => {
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
-        <Route exact path="/v2/screen/triptych_v2">
-          <MultiScreenPage
-            components={TYPE_TO_COMPONENT}
-            responseMapper={responseMapper}
-          />
-        </Route>
-        <Route exact path={["/v2/screen/:id/simulation", "/v2/screen/pending/:id/simulation"]}>
+        <Route
+          exact
+          path={[
+            "/v2/screen/:id/simulation",
+            "/v2/screen/pending/:id/simulation",
+          ]}
+        >
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <SimulationScreenPage />
