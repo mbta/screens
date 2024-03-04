@@ -24,12 +24,6 @@ api_v3_key =
   |> ExAws.request!()
   |> Map.fetch!("SecretString")
 
-cognito_client_secret =
-  (eb_env_name <> "-cognito-client-secret")
-  |> ExAws.SecretsManager.get_secret_value()
-  |> ExAws.request!()
-  |> Map.fetch!("SecretString")
-
 screens_auth_secret =
   (eb_env_name <> "-screens-auth-secret")
   |> ExAws.SecretsManager.get_secret_value()
@@ -62,7 +56,6 @@ config :sentry,
   enable_source_code_context: true,
   root_source_code_path: File.cwd!()
 
-config :ueberauth, Ueberauth.Strategy.Cognito, client_secret: cognito_client_secret
 config :screens, ScreensWeb.AuthManager, secret_key: screens_auth_secret
 
 config :screens, Screens.ScreensByAlert.Memcache,
@@ -71,6 +64,25 @@ config :screens, Screens.ScreensByAlert.Memcache,
     hostname: System.get_env("MEMCACHED_HOST"),
     coder: Screens.ScreensByAlert.Memcache.SafeErlangCoder
   ]
+
+if config_env() == :prod do
+  keycloak_opts = [
+    issuer: :keycloak_issuer,
+    client_id: System.fetch_env!("KEYCLOAK_CLIENT_ID"),
+    client_secret: System.fetch_env!("KEYCLOAK_CLIENT_SECRET")
+  ]
+
+  config :ueberauth_oidcc,
+    issuers: [
+      %{
+        name: :keycloak_issuer,
+        issuer: System.fetch_env!("KEYCLOAK_ISSUER")
+      }
+    ],
+    providers: [
+      keycloak: keycloak_opts
+    ]
+end
 
 # ## Using releases (Elixir v1.9+)
 #
