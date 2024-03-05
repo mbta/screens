@@ -11,8 +11,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
 
   alias Screens.Alerts.Alert
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{PreFare}
+  alias ScreensConfig.V2.PreFare
   alias ScreensConfig.V2.Header.CurrentStopId
+  alias ScreensConfig.V2.ReconstructedAlert, as: ReconstructedAlertWidgetConfig
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
@@ -1110,7 +1111,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
         struct(Screen, %{
           app_id: :pre_fare_v2,
           app_params:
-            struct(PreFare, %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}})
+            struct(PreFare, %{
+              reconstructed_alert_widget: %ReconstructedAlertWidgetConfig{
+                parent_station_id: %CurrentStopId{stop_id: stop_id}
+              }
+            })
         })
 
       # Randomly setting current time to Thu Jul 31 2025 23:59:59 GMT-0400 (Eastern Daylight Time)

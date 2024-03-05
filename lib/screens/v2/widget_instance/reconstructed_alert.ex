@@ -12,7 +12,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{FreeText, FreeTextLine}
+  alias ScreensConfig.V2.{FreeText, FreeTextLine, PreFare}
+  alias ScreensConfig.V2.ReconstructedAlert, as: ReconstructedAlertConfig
 
   require Logger
 
@@ -358,6 +359,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp get_cause(cause), do: cause
 
   def dual_screen_alert?(%__MODULE__{is_full_screen: false}), do: false
+
+  def dual_screen_alert?(%__MODULE__{
+        screen: %Screen{
+          app_params: %PreFare{
+            reconstructed_alert_widget: %ReconstructedAlertConfig{
+              pair_takeover_with_cr_widget: true
+            }
+          }
+        }
+      }),
+      do: false
 
   def dual_screen_alert?(%__MODULE__{is_terminal_station: is_terminal_station, alert: alert} = t) do
     Alert.effect(alert) in [:station_closure, :suspension, :shuttle] and

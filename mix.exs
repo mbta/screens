@@ -84,7 +84,7 @@ defmodule Screens.MixProject do
       {:telemetry_metrics, "~> 0.4"},
       {:screens_config,
        git: "https://github.com/mbta/screens-config-lib.git",
-       ref: "6bde1c69110b665d6223746a0340d6d44b5ac0be"}
+       ref: "f6e96ba3f418c20cecafad681a800769a4a11513"}
     ]
   end
 end

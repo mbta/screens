@@ -7,6 +7,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Header.CurrentStopId
   alias ScreensConfig.V2.{PreFare, Solari}
+  alias ScreensConfig.V2.ReconstructedAlert, as: ReconstructedAlertWidgetConfig
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
@@ -30,7 +31,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
       config =
         struct(Screen, %{
           app_id: :pre_fare_v2,
-          app_params: struct(app, %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}})
+          app_params:
+            struct(app, %{
+              reconstructed_alert_widget: %ReconstructedAlertWidgetConfig{
+                parent_station_id: %CurrentStopId{stop_id: stop_id}
+              }
+            })
         })
 
       bad_config = struct(Screen, %{app_params: struct(Solari)})
