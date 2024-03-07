@@ -30,6 +30,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
             cr_departures:
               %CRDepartures{
                 direction_to_destination: direction_to_destination,
+                pair_with_alert_widget: pair_with_alert_widget,
                 station: station,
                 destination: destination,
                 header_pill: header_pill
@@ -73,6 +74,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
                 destination: destination,
                 direction_to_destination: inbound_outbound,
                 header_pill: header_pill,
+                slot: get_slot(pair_with_alert_widget),
                 now: now
               }
           end
@@ -128,4 +130,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
     {:ok, schedules} = Schedule.fetch(params, next_service_day)
     List.first(schedules)
   end
+
+  defp get_slot(false), do: [:main_content_left]
+  defp get_slot(true), do: [:main_content_left, :full_body_right]
 end
