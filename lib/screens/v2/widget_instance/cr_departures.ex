@@ -131,9 +131,8 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
          } = departure,
          now
        ) do
-    # %Departure{schedule: schedule}
     {:ok, scheduled_departure_time} =
-      departure
+      %Departure{schedule: schedule}
       |> Departure.time()
       |> DateTime.shift_zone("America/New_York")
 
