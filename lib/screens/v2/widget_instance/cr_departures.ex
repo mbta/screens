@@ -12,6 +12,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
             destination: nil,
             direction_to_destination: nil,
             header_pill: nil,
+            slot: [],
             now: nil
 
   @type t :: %__MODULE__{
@@ -20,6 +21,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           destination: String.t(),
           direction_to_destination: String.t(),
           header_pill: :red | :blue | :green | :orange,
+          slot: list(:main_content_left | :main_content_right),
           now: DateTime.t()
         }
 
@@ -56,7 +58,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       }
     end
 
-    def slot_names(_instance), do: [:main_content_left]
+    def slot_names(instance), do: instance.slot
 
     def widget_type(_instance), do: :cr_departures
 

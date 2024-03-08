@@ -12,8 +12,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{FreeText, FreeTextLine, PreFare}
-  alias ScreensConfig.V2.ReconstructedAlert, as: ReconstructedAlertConfig
+  alias ScreensConfig.V2.{CRDepartures, FreeText, FreeTextLine, PreFare}
 
   require Logger
 
@@ -363,8 +362,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def dual_screen_alert?(%__MODULE__{
         screen: %Screen{
           app_params: %PreFare{
-            reconstructed_alert_widget: %ReconstructedAlertConfig{
-              pair_takeover_with_cr_widget: true
+            cr_departures: %CRDepartures{
+              pair_with_alert_widget: true
             }
           }
         }

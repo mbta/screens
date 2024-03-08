@@ -5,7 +5,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.PreFare
   alias ScreensConfig.V2.Header.CurrentStopId
-  alias ScreensConfig.V2.ReconstructedAlert, as: ReconstructedAlertWidgetConfig
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
@@ -1978,9 +1977,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           app_id: :pre_fare_v2,
           app_params:
             struct(PreFare, %{
-              reconstructed_alert_widget: %ReconstructedAlertWidgetConfig{
-                parent_station_id: %CurrentStopId{stop_id: stop_id}
-              }
+              reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}
             })
         })
 
@@ -2257,9 +2254,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           app_id: :pre_fare_v2,
           app_params:
             struct(PreFare, %{
-              reconstructed_alert_widget: %ReconstructedAlertWidgetConfig{
-                parent_station_id: %CurrentStopId{stop_id: stop_id}
-              }
+              reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}
             })
         })
 
