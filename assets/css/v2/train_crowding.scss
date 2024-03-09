@@ -39,7 +39,7 @@
 .crowding-widget__header__destination-sentence {
   @include font--heading-3;
   margin-top: auto;
-  color: #FFFFFF;
+  color: #ffffff;
   .destination {
     padding-left: 109px;
   }
@@ -116,15 +116,6 @@
 .crowding-widget__you-are-here-arrow {
   width: 180px;
   height: 180px;
-  &--up {
-    animation: up-arrow 1.2s infinite ease-in-out;
-  }
-  &--up-left {
-    animation: up-left-arrow 1.2s infinite ease-in-out;
-  }
-  &--up-right {
-    animation: up-right-arrow 1.2s infinite ease-in-out;
-  }
 }
 
 .crowding-widget__you-are-here-text {
