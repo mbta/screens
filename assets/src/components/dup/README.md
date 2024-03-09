@@ -1,3 +1,6 @@
+> [!WARNING]\
+> This app is no longer being used or developed. These instructions might be out of date. Use the v2 DUP app packaging instructions instead.
+
 # DUP app packaging
 
 - Ensure [Corsica](https://hexdocs.pm/corsica/Corsica.html) is used on the server to allow CORS requests (ideally limited to just the DUP-relevant routes). It should already be configured at [this line](/lib/screens_web/controllers/screen_api_controller.ex#L7) in the API controller--if it is, you don't need to do anything for this step.
