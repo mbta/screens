@@ -28,7 +28,7 @@ ENV NVM_SYMLINK_CURRENT=true
 ENV PATH=${NVM_DIR}/current/bin:${PATH}
 
 # [Optional, Choice] Node.js version: none, lts/*, 16, 14, 12, 10
-ARG NODE_VERSION="14"
+ARG NODE_VERSION="16"
 
 # Install needed packages and setup non-root user. Use a separate RUN statement to add your own dependencies.
 RUN apt-get update \
