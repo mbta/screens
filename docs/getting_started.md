@@ -1,4 +1,4 @@
-## Getting Started - Local Development
+## Getting Started
 
 1. Clone this repo
 1. Install the [asdf package manager](https://github.com/asdf-vm/asdf)
