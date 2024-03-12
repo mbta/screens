@@ -1,63 +1,63 @@
-## Getting Started
+# Getting Started
 
 1. Clone this repo
-1. Install the [asdf package manager](https://github.com/asdf-vm/asdf)
-1. Install dependencies:
-   `brew install autoconf@2.69 coreutils gnupg`
+1. Install [`asdf`](https://github.com/asdf-vm/asdf)
+1. Install language build dependencies: `brew install coreutils`
 1. Add `asdf` plugins:
    1. `asdf plugin-add erlang`
    1. `asdf plugin-add elixir`
    1. `asdf plugin-add nodejs`
-1. Import the Node.js release team's OpenPGP keys to main keyring (this is required by asdf-nodejs):
-   `bash ~/.asdf/plugins/nodejs/bin/import-release-team-keyring`
 1. Install versions specified in `.tool-versions` with `asdf install`
-
-   **If** you see an error along the lines of 
-      ```sh
-      configure: error: 
-
-         You are natively building Erlang/OTP for a later version of MacOSX
-         than current version (11.0). You either need to
-         cross-build Erlang/OTP, or set the environment variable
-         MACOSX_DEPLOYMENT_TARGET to 11.0 (or a lower version).
-      ```
-      you can try modifying the OTP source downloaded by `asdf` to get around it (More context can be found on [this Github issue](https://github.com/asdf-vm/asdf-erlang/issues/161#issuecomment-731477842)):
-
-      ```sh
-      cd ~/.asdf/plugins/erlang/kerl-home/archives
-      tar zxvf OTP-<version>.tar.gz
-      ```
-
-      Next, modify **~/.asdf/plugins/erlang/kerl-home/archives/otp-OTP-{version}/make/configure.in** near line 415 by adding `&& false` (exact line # may vary based on OTP version):
-      ```sh
-      #if __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > $int_macosx_version && false
-      ```
-
-      Re-tar the directory:
-      ```sh
-      tar cfz OTP-<version>.tar otp-OTP-<version>
-      rm -rf otp-OTP-<version>
-      ```
-      Return to your screens repo and try running `asdf install` again.
-
 1. Install Elixir dependencies with `mix deps.get`
 1. Install Node.js dependencies with `npm install --prefix assets`
-1. Get access to our S3 bucket from DevOps and/or a teammate and save the JSON found at mbta-ctd-config/screens/screens-prod.json as `priv/local.json` to supply your local server with config values.
-   1. You will also need to grab the signs_ui_config JSON and save it at `priv/signs_ui_config.json`.
-   1. You will also need to create `priv/triptych_player_to_screen_id.json`. If you expect to be testing the packaged triptych client sometime soon, copy the contents of mbta-ctd-config/screens/triptych_player_to_screen_id-prod.json into it. Otherwise, its contents can just be an empty object, `{}`.
-   1. You will also need to create `priv/local_pending.json`, the set of pending screen configs. Either copy mbta-ctd-config/screens/pending-screens-prod.json down from S3, or create a new file with `{"screens": {}}` as its contents.
-1. Visit [AWS security credentials](https://console.aws.amazon.com/iam/home#/security_credentials) and create an access key if you don't already have it. Save the access key ID and secret access key as environment variables:
+1. Run `scripts/pull_configs.sh dev`. This will save the current Screens and
+   Signs-UI configuration stored on S3 to the `priv` directory, which is where
+   the app expects to find this configuration when running locally.
+   * This script uses the `aws` CLI, so it assumes you have this installed and
+     configured with working credentials, and that your AWS account has Screens
+     team permissions. If you don't have all this completely set up but do have
+     S3 access through the AWS web console, you can get the files from there,
+     referring to the script to see what to copy and where to save it. Or, ask
+     the team if someone can send you their files!
+1. If you haven't already, create a [V3 API account](https://api-v3.mbta.com/)
+   using your work email, and use the portal to create an API key.
+1. Start the Phoenix server with `env API_V3_KEY="your-key" mix phx.server`.
+1. Visit <http://localhost:4000/v2/screen/PRE-101> (one of our screens, chosen
+   arbitrarily) to check that everything is working!
 
-   ```sh
-   export AWS_ACCESS_KEY_ID="<key id>"
-   export AWS_SECRET_ACCESS_KEY="<secret key>"
-   ```
+### Environment variables
 
-   You can put this in `priv/local.env` if you like, and it will be ignored by git. Wherever you put the keys, make sure to `source` them before running the local server.
+To avoid having to paste your V3 API key into the terminal every time you want
+to start the server, you can add it to your environment. The `export` command
+does this for the rest of the shell session it's run in:
 
-1. Sign up for a [V3 API key](https://api-v3.mbta.com/)
-1. Start Phoenix endpoint with `API_V3_KEY=<your-key-here> mix phx.server`
+```sh
+export API_V3_KEY="your-key-here"
+```
 
-Visit [`localhost:4000/screen/1`](http://localhost:4000/screen/1) in your browser to check that everything is working.
+[`direnv`](https://direnv.net/) is a convenient way to load exports like this
+automatically on a per-project basis. Once installed, you can create a `.envrc`
+file in the root of this (or any) project, with the above as its content; when
+your current directory is in the project, the variable will be loaded. Keep in
+mind any changes to this file must be followed by a `direnv allow` to approve
+them.
 
-You may want to add `export API_V3_KEY=<your-key-here>` to your shell config so that you don't have to specify it each time you run `mix phx.server`.
+### AWS credentials
+
+In deployed environments, the app gets its configuration directly from S3, and
+the admin interface can write the configuration to S3 as well. To test or work
+on this functionality locally, you'll need an AWS
+[access key](https://console.aws.amazon.com/iam/home#/security_credentials).
+
+The app will use a key stored in the environment variables `AWS_ACCESS_KEY_ID`
+and `AWS_SECRET_ACCESS_KEY`. These can be exported or saved in a `.envrc` as
+with the V3 API key above, but for security reasons it is recommended to only
+[store them in 1Password][1]. There are a few ways to make these available to
+the app using the 1Password CLI, but one way is using an export command like
+this (which works in `.envrc`):
+
+```sh
+export AWS_SECRET_ACCESS_KEY=$(op item get --vault VAULT_NAME ITEM_NAME --field FIELD_NAME)
+```
+
+[1]: https://www.notion.so/mbta-downtown-crossing/Storing-Access-Keys-Securely-in-1Password-b89310bc67784722a5a218500f34443d?pm=c
