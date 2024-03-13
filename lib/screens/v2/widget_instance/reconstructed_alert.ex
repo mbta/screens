@@ -144,19 +144,28 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     list_of_directions_and_routes =
       informed_entities
       |> Enum.map(fn entity -> get_direction_and_route_from_entity(entity, location) end)
+      |> Enum.filter(& &1)
       |> Enum.uniq()
 
     {direction_id, route_id} =
       if length(list_of_directions_and_routes) == 1 do
         hd(list_of_directions_and_routes)
-        # If there are multiple route ids in that informed entities list, we're on a branch
+      # If there are multiple route ids in that informed entities list, then the alert includes branching
       else
         direction_id =
           list_of_directions_and_routes
           |> hd()
           |> elem(0)
 
-        {direction_id, "Green-trunk"}
+        if {direction_id, "Red"} in list_of_directions_and_routes or
+              (
+                {direction_id, "Red-Ashmont"} in list_of_directions_and_routes and
+                {direction_id, "Red-Braintree"} in list_of_directions_and_routes
+              ) do
+          {direction_id, "Red"}
+        else
+          {direction_id, "Green-trunk"}
+        end
       end
 
     cond do
@@ -179,6 +188,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Given an entity and the directionality of the alert from the home stop,
   # return a tuple with the affected direction_id and route_id
+  
+  # Skip processing JFK, because it is a branching node station. The other stations in the alert
+  # will determine the destination needed for this alert
+  defp get_direction_and_route_from_entity(%{stop: "place-jfk"}, _location), do: nil
 
   # If the route is red and the alert is downstream, we have to figure out whether the alert
   # only affects one branch or both
@@ -244,7 +257,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp get_route_pills(%__MODULE__{} = t, location) do
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
+    |> IO.inspect(label: "affected routes")
     routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
+    |> IO.inspect(label: "routes at stop")
 
     affected_routes
     # Filter alert-affected routes by which routes are at the current stop
@@ -255,6 +270,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       "Green" <> _ -> Enum.find(routes_at_stop, &String.starts_with?(&1, "Green"))
       route -> route in routes_at_stop
     end)
+    |> IO.inspect()
     |> Enum.flat_map(fn
       route_id ->
         # Boundary alerts shouldn't have headsign in the banner
@@ -262,6 +278,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           unless get_region_from_location(location) === :boundary do
             get_destination(t, location, route_id)
           end
+          |> IO.inspect(label: "headsign")
 
         build_pills_from_headsign(route_id, headsign)
     end)
