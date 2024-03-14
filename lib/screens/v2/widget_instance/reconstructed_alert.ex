@@ -150,21 +150,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     {direction_id, route_id} =
       if length(list_of_directions_and_routes) == 1 do
         hd(list_of_directions_and_routes)
-
-        # If there are multiple route ids in that informed entities list, then the alert includes branching
+      # If there are multiple route ids in that informed entities list, then the alert includes branching
       else
-        direction_id =
-          list_of_directions_and_routes
-          |> hd()
-          |> elem(0)
-
-        if {direction_id, "Red"} in list_of_directions_and_routes or
-             ({direction_id, "Red-Ashmont"} in list_of_directions_and_routes and
-                {direction_id, "Red-Braintree"} in list_of_directions_and_routes) do
-          {direction_id, "Red"}
-        else
-          {direction_id, "Green-trunk"}
-        end
+        select_direction_and_route(list_of_directions_and_routes)
       end
 
     cond do
@@ -239,6 +227,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp get_direction_and_route_from_entity(%{direction_id: direction_id, route: route}, _),
     do: {direction_id, route}
+
+  # Select 1 direction + route from this list of directions + routes for multiple branches
+  defp select_direction_and_route(list_of_directions_and_routes) do
+    direction_id =
+      list_of_directions_and_routes
+      |> hd()
+      |> elem(0)
+
+    if {direction_id, "Red"} in list_of_directions_and_routes or
+          ({direction_id, "Red-Ashmont"} in list_of_directions_and_routes and
+            {direction_id, "Red-Braintree"} in list_of_directions_and_routes) do
+      {direction_id, "Red"}
+    else
+      {direction_id, "Green-trunk"}
+    end
+  end
 
   defp get_route_pills(t, location \\ nil)
 
