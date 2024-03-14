@@ -236,14 +236,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       |> hd()
       |> elem(0)
 
-    if {direction_id, "Red"} in list_of_directions_and_routes or
-         ({direction_id, "Red-Ashmont"} in list_of_directions_and_routes and
-            {direction_id, "Red-Braintree"} in list_of_directions_and_routes) do
-      {direction_id, "Red"}
-    else
-      {direction_id, "Green-trunk"}
-    end
-  end
+   case list_of_directions_and_routes do
+       [{direction_id, "Red" <> _} | _] -> {direction_id, "Red"}
+       _ -> {direction_id, "Green-trunk"}
+   end
 
   defp get_route_pills(t, location \\ nil)
 
