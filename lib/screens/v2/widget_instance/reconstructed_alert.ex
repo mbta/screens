@@ -236,10 +236,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       |> hd()
       |> elem(0)
 
-   case list_of_directions_and_routes do
-       [{direction_id, "Red" <> _} | _] -> {direction_id, "Red"}
-       _ -> {direction_id, "Green-trunk"}
-   end
+    case list_of_directions_and_routes do
+      [{direction_id, "Red" <> _} | _] -> {direction_id, "Red"}
+      _ -> {direction_id, "Green-trunk"}
+    end
+  end
 
   defp get_route_pills(t, location \\ nil)
 
