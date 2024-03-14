@@ -1627,6 +1627,324 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
     end
+
+    test "gets correct destination for RL alert affecting trunk and a whole branch", %{
+      widget: widget
+    } do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-portr")
+        |> put_effect(:shuttle)
+        |> put_informed_entities([
+          ie(stop: "place-andrw", route: "Red", route_type: 1),
+          ie(stop: "place-asmnl", route: "Red", route_type: 1),
+          ie(stop: "place-brdwy", route: "Red", route_type: 1),
+          ie(stop: "place-fldcr", route: "Red", route_type: 1),
+          ie(stop: "place-jfk", route: "Red", route_type: 1),
+          ie(stop: "place-shmnl", route: "Red", route_type: 1),
+          ie(stop: "place-smmnl", route: "Red", route_type: 1)
+        ])
+        |> put_tagged_stop_sequences(%{
+          "Red" => [
+            [
+              "place-alfcl",
+              "place-davis",
+              "place-portr",
+              "place-harsq",
+              "place-cntsq",
+              "place-knncl",
+              "place-chmnl",
+              "place-pktrm",
+              "place-dwnxg",
+              "place-sstat",
+              "place-brdwy",
+              "place-andrw",
+              "place-jfk",
+              "place-nqncy",
+              "place-wlsta",
+              "place-qnctr",
+              "place-qamnl",
+              "place-brntn"
+            ],
+            [
+              "place-alfcl",
+              "place-davis",
+              "place-portr",
+              "place-harsq",
+              "place-cntsq",
+              "place-knncl",
+              "place-chmnl",
+              "place-pktrm",
+              "place-dwnxg",
+              "place-sstat",
+              "place-brdwy",
+              "place-andrw",
+              "place-jfk",
+              "place-shmnl",
+              "place-fldcr",
+              "place-smmnl",
+              "place-asmnl"
+            ]
+          ]
+        })
+        |> put_routes_at_stop([
+          %{
+            type: :subway,
+            route_id: "Red",
+            short_name: "",
+            active?: true,
+            long_name: "Red Line",
+            direction_destinations: ["Ashmont/Braintree", "Alewife"]
+          }
+        ])
+        |> put_is_full_screen(true)
+
+      expected = %{
+        cause: nil,
+        location: nil,
+        effect: :shuttle,
+        issue: "No trains",
+        remedy: "Shuttle buses available",
+        updated_at: "Friday, 5:00 am",
+        region: :outside,
+        routes: [
+          %{headsign: "Ashmont", route_id: "Red", svg_name: "rl-ashmont"},
+          %{headsign: "Braintree", route_id: "Red", svg_name: "rl-braintree"}
+        ],
+        endpoints: {"Broadway", "Ashmont"},
+        is_transfer_station: false,
+        disruption_diagram: %{
+          line: :red,
+          effect: :shuttle,
+          slots: [
+            %{type: :terminal, label_id: "place-alfcl"},
+            %{label: %{full: "Davis", abbrev: "Davis"}, show_symbol: true},
+            %{label: %{full: "Porter", abbrev: "Porter"}, show_symbol: true},
+            %{label: %{full: "Harvard", abbrev: "Harvard"}, show_symbol: true},
+            %{label: %{full: "Central", abbrev: "Central"}, show_symbol: true},
+            %{
+              label: %{full: "…via Downtown Crossing", abbrev: "…via Downt'n Xng"},
+              show_symbol: false
+            },
+            %{label: %{full: "South Station", abbrev: "South Sta"}, show_symbol: true},
+            %{label: %{full: "Broadway", abbrev: "Broadway"}, show_symbol: true},
+            %{label: %{full: "Andrew", abbrev: "Andrew"}, show_symbol: true},
+            %{label: %{full: "JFK/UMass", abbrev: "JFK/UMass"}, show_symbol: true},
+            %{label: %{full: "Savin Hill", abbrev: "Savin Hill"}, show_symbol: true},
+            %{
+              label: %{full: "Fields Corner", abbrev: "Fields Cnr"},
+              show_symbol: true
+            },
+            %{label: %{full: "Shawmut", abbrev: "Shawmut"}, show_symbol: true},
+            %{type: :terminal, label_id: "place-asmnl"}
+          ],
+          current_station_slot_index: 2,
+          effect_region_slot_index_range: {7, 13}
+        }
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
+
+    test "gets correct destination for RL alert affecting one branch starting at JFK", %{
+      widget: widget
+    } do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-portr")
+        |> put_effect(:shuttle)
+        |> put_informed_entities([
+          ie(stop: "place-asmnl", route: "Red", route_type: 1),
+          ie(stop: "place-fldcr", route: "Red", route_type: 1),
+          ie(stop: "place-jfk", route: "Red", route_type: 1),
+          ie(stop: "place-shmnl", route: "Red", route_type: 1),
+          ie(stop: "place-smmnl", route: "Red", route_type: 1)
+        ])
+        |> put_tagged_stop_sequences(%{
+          "Red" => [
+            [
+              "place-alfcl",
+              "place-davis",
+              "place-portr",
+              "place-harsq",
+              "place-cntsq",
+              "place-knncl",
+              "place-chmnl",
+              "place-pktrm",
+              "place-dwnxg",
+              "place-sstat",
+              "place-brdwy",
+              "place-andrw",
+              "place-jfk",
+              "place-nqncy",
+              "place-wlsta",
+              "place-qnctr",
+              "place-qamnl",
+              "place-brntn"
+            ],
+            [
+              "place-alfcl",
+              "place-davis",
+              "place-portr",
+              "place-harsq",
+              "place-cntsq",
+              "place-knncl",
+              "place-chmnl",
+              "place-pktrm",
+              "place-dwnxg",
+              "place-sstat",
+              "place-brdwy",
+              "place-andrw",
+              "place-jfk",
+              "place-shmnl",
+              "place-fldcr",
+              "place-smmnl",
+              "place-asmnl"
+            ]
+          ]
+        })
+        |> put_routes_at_stop([
+          %{
+            type: :subway,
+            route_id: "Red",
+            short_name: "",
+            active?: true,
+            long_name: "Red Line",
+            direction_destinations: ["Ashmont/Braintree", "Alewife"]
+          }
+        ])
+        |> put_is_full_screen(true)
+
+      expected = %{
+        cause: nil,
+        location: nil,
+        effect: :shuttle,
+        issue: "No trains",
+        remedy: "Shuttle buses available",
+        updated_at: "Friday, 5:00 am",
+        region: :outside,
+        routes: [
+          %{headsign: "Ashmont", route_id: "Red", svg_name: "rl-ashmont"}
+        ],
+        endpoints: {"JFK/UMass", "Ashmont"},
+        is_transfer_station: false,
+        disruption_diagram: %{
+          line: :red,
+          effect: :shuttle,
+          slots: [
+            %{type: :terminal, label_id: "place-alfcl"},
+            %{label: %{full: "Davis", abbrev: "Davis"}, show_symbol: true},
+            %{label: %{full: "Porter", abbrev: "Porter"}, show_symbol: true},
+            %{label: %{full: "Harvard", abbrev: "Harvard"}, show_symbol: true},
+            %{label: %{full: "Central", abbrev: "Central"}, show_symbol: true},
+            %{
+              label: %{full: "…via Downtown Crossing", abbrev: "…via Downt'n Xng"},
+              show_symbol: false
+            },
+            %{label: %{full: "Andrew", abbrev: "Andrew"}, show_symbol: true},
+            %{label: %{full: "JFK/UMass", abbrev: "JFK/UMass"}, show_symbol: true},
+            %{label: %{full: "Savin Hill", abbrev: "Savin Hill"}, show_symbol: true},
+            %{
+              label: %{full: "Fields Corner", abbrev: "Fields Cnr"},
+              show_symbol: true
+            },
+            %{label: %{full: "Shawmut", abbrev: "Shawmut"}, show_symbol: true},
+            %{type: :terminal, label_id: "place-asmnl"}
+          ],
+          current_station_slot_index: 2,
+          effect_region_slot_index_range: {7, 11}
+        }
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
+
+    test "gets correct destination for RL alert affecting both branches", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-portr")
+        |> put_effect(:shuttle)
+        |> put_alert_header("Simulation of PIO text")
+        |> put_informed_entities([
+          ie(stop: "place-nqncy", route: "Red", route_type: 1),
+          ie(stop: "place-asmnl", route: "Red", route_type: 1),
+          ie(stop: "place-fldcr", route: "Red", route_type: 1),
+          ie(stop: "place-jfk", route: "Red", route_type: 1),
+          ie(stop: "place-shmnl", route: "Red", route_type: 1),
+          ie(stop: "place-smmnl", route: "Red", route_type: 1)
+        ])
+        |> put_tagged_stop_sequences(%{
+          "Red" => [
+            [
+              "place-alfcl",
+              "place-davis",
+              "place-portr",
+              "place-harsq",
+              "place-cntsq",
+              "place-knncl",
+              "place-chmnl",
+              "place-pktrm",
+              "place-dwnxg",
+              "place-sstat",
+              "place-brdwy",
+              "place-andrw",
+              "place-jfk",
+              "place-nqncy",
+              "place-wlsta",
+              "place-qnctr",
+              "place-qamnl",
+              "place-brntn"
+            ],
+            [
+              "place-alfcl",
+              "place-davis",
+              "place-portr",
+              "place-harsq",
+              "place-cntsq",
+              "place-knncl",
+              "place-chmnl",
+              "place-pktrm",
+              "place-dwnxg",
+              "place-sstat",
+              "place-brdwy",
+              "place-andrw",
+              "place-jfk",
+              "place-shmnl",
+              "place-fldcr",
+              "place-smmnl",
+              "place-asmnl"
+            ]
+          ]
+        })
+        |> put_routes_at_stop([
+          %{
+            type: :subway,
+            route_id: "Red",
+            short_name: "",
+            active?: true,
+            long_name: "Red Line",
+            direction_destinations: ["Ashmont/Braintree", "Alewife"]
+          }
+        ])
+        |> put_is_full_screen(true)
+
+      expected = %{
+        cause: "",
+        effect: :shuttle,
+        issue: nil,
+        location: nil,
+        remedy: nil,
+        routes: [
+          %{headsign: "Ashmont", route_id: "Red", svg_name: "rl-ashmont"},
+          %{headsign: "Braintree", route_id: "Red", svg_name: "rl-braintree"}
+        ],
+        updated_at: "Friday, 5:00 am",
+        region: :outside,
+        remedy_bold: "Simulation of PIO text"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
   end
 
   describe "endpoint reversal" do
