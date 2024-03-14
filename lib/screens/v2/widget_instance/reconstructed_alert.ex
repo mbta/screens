@@ -144,19 +144,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     list_of_directions_and_routes =
       informed_entities
       |> Enum.map(fn entity -> get_direction_and_route_from_entity(entity, location) end)
+      |> Enum.filter(& &1)
       |> Enum.uniq()
 
     {direction_id, route_id} =
       if length(list_of_directions_and_routes) == 1 do
         hd(list_of_directions_and_routes)
-        # If there are multiple route ids in that informed entities list, we're on a branch
-      else
-        direction_id =
-          list_of_directions_and_routes
-          |> hd()
-          |> elem(0)
 
-        {direction_id, "Green-trunk"}
+        # If there are multiple route ids in that informed entities list, then the alert includes branching
+      else
+        select_direction_and_route(list_of_directions_and_routes)
       end
 
     cond do
@@ -179,6 +176,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Given an entity and the directionality of the alert from the home stop,
   # return a tuple with the affected direction_id and route_id
+
+  # Skip processing JFK, because it is a branching node station. The other stations in the alert
+  # will determine the destination needed for this alert
+  defp get_direction_and_route_from_entity(%{stop: "place-jfk"}, _location), do: nil
 
   # If the route is red and the alert is downstream, we have to figure out whether the alert
   # only affects one branch or both
@@ -227,6 +228,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp get_direction_and_route_from_entity(%{direction_id: direction_id, route: route}, _),
     do: {direction_id, route}
+
+  # Select 1 direction + route from this list of directions + routes for multiple branches
+  defp select_direction_and_route(list_of_directions_and_routes) do
+    direction_id =
+      list_of_directions_and_routes
+      |> hd()
+      |> elem(0)
+
+    case list_of_directions_and_routes do
+      [{direction_id, "Red" <> _} | _] -> {direction_id, "Red"}
+      _ -> {direction_id, "Green-trunk"}
+    end
+  end
 
   defp get_route_pills(t, location \\ nil)
 
