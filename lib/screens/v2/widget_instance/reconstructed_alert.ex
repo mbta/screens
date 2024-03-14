@@ -150,7 +150,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     {direction_id, route_id} =
       if length(list_of_directions_and_routes) == 1 do
         hd(list_of_directions_and_routes)
-      # If there are multiple route ids in that informed entities list, then the alert includes branching
+
+        # If there are multiple route ids in that informed entities list, then the alert includes branching
       else
         select_direction_and_route(list_of_directions_and_routes)
       end
@@ -236,7 +237,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       |> elem(0)
 
     if {direction_id, "Red"} in list_of_directions_and_routes or
-          ({direction_id, "Red-Ashmont"} in list_of_directions_and_routes and
+         ({direction_id, "Red-Ashmont"} in list_of_directions_and_routes and
             {direction_id, "Red-Braintree"} in list_of_directions_and_routes) do
       {direction_id, "Red"}
     else
