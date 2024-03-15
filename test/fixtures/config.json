@@ -2585,7 +2585,7 @@
       "vendor": "gds"
     },
     "1301": {
-      "app_id": "solari_v2",
+      "app_id": "busway_v2",
       "app_params": {
         "departures": {
           "sections": [

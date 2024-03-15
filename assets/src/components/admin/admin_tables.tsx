@@ -776,7 +776,7 @@ const PreFareV2ScreensTable = (): JSX.Element => {
   );
 };
 
-const v2SolariColumns = [
+const v2BuswayColumns = [
   {
     Header: "Screen ID",
     accessor: "id",
@@ -808,12 +808,12 @@ const v2SolariColumns = [
   },
 ];
 
-const SolariV2ScreensTable = (): JSX.Element => {
+const BuswayV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
-    return app_id === "solari_v2";
+    return app_id === "busway_v2";
   };
 
-  return <AdminTable columns={v2SolariColumns} dataFilter={dataFilter} />;
+  return <AdminTable columns={v2BuswayColumns} dataFilter={dataFilter} />;
 };
 
 const SolariLargeV2ScreensTable = (): JSX.Element => {
@@ -821,7 +821,7 @@ const SolariLargeV2ScreensTable = (): JSX.Element => {
     return app_id === "solari_large_v2";
   };
 
-  return <AdminTable columns={v2SolariColumns} dataFilter={dataFilter} />;
+  return <AdminTable columns={v2BuswayColumns} dataFilter={dataFilter} />;
 };
 
 const TriptychV2ScreensTable = (): JSX.Element => {
@@ -855,7 +855,7 @@ export {
   DupV2ScreensTable,
   BusEinkV2ScreensTable,
   GLEinkV2ScreensTable,
-  SolariV2ScreensTable,
+  BuswayV2ScreensTable,
   SolariLargeV2ScreensTable,
   BusShelterV2ScreensTable,
   PreFareV2ScreensTable,

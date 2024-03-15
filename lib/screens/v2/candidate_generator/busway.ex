@@ -1,4 +1,4 @@
-defmodule Screens.V2.CandidateGenerator.Solari do
+defmodule Screens.V2.CandidateGenerator.Busway do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
@@ -7,7 +7,7 @@ defmodule Screens.V2.CandidateGenerator.Solari do
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Header.CurrentStopName
-  alias ScreensConfig.V2.Solari
+  alias ScreensConfig.V2.Busway
 
   @behaviour CandidateGenerator
 
@@ -42,7 +42,7 @@ defmodule Screens.V2.CandidateGenerator.Solari do
   def audio_only_instances(_widgets, _config), do: []
 
   defp header_instances(config, now) do
-    %Screen{app_params: %Solari{header: %CurrentStopName{stop_name: stop_name}}} = config
+    %Screen{app_params: %Busway{header: %CurrentStopName{stop_name: stop_name}}} = config
 
     [%NormalHeader{screen: config, icon: :logo, text: stop_name, time: now}]
   end
