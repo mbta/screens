@@ -1,13 +1,13 @@
-defmodule Screens.V2.CandidateGenerator.SolariTest do
+defmodule Screens.V2.CandidateGenerator.BuswayTest do
   use ExUnit.Case, async: true
 
   alias ScreensConfig.{Screen, V2}
-  alias Screens.V2.CandidateGenerator.Solari
+  alias Screens.V2.CandidateGenerator.Busway
   alias Screens.V2.WidgetInstance.NormalHeader
 
   setup do
     config = %Screen{
-      app_params: %V2.Solari{
+      app_params: %V2.Busway{
         departures: %V2.Departures{sections: []},
         header: %V2.Header.CurrentStopName{stop_name: "Ruggles"}
       },
@@ -26,7 +26,7 @@ defmodule Screens.V2.CandidateGenerator.SolariTest do
               %{
                 normal: [:header, :main_content],
                 takeover: [:full_screen]
-              }} == Solari.screen_template()
+              }} == Busway.screen_template()
     end
   end
 
@@ -43,7 +43,7 @@ defmodule Screens.V2.CandidateGenerator.SolariTest do
         time: ~U[2020-04-06T10:00:00Z]
       }
 
-      actual_instances = Solari.candidate_instances(config, opts, now, departures_instances_fn)
+      actual_instances = Busway.candidate_instances(config, opts, now, departures_instances_fn)
 
       assert expected_header in actual_instances
     end

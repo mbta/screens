@@ -7,14 +7,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Departures.Filter.RouteDirection
   alias ScreensConfig.V2.Departures.{Filter, Query, Section}
-  alias ScreensConfig.V2.{BusEink, BusShelter, Departures, GlEink, Solari, SolariLarge}
+  alias ScreensConfig.V2.{BusEink, BusShelter, Busway, Departures, GlEink, SolariLarge}
 
   def departures_instances(
         %Screen{app_params: %app{}} = config,
         fetch_section_departures_fn \\ &fetch_section_departures/1,
         post_processing_fn \\ fn sections, _config -> sections end
       )
-      when app in [BusEink, BusShelter, GlEink, SolariLarge, Solari] do
+      when app in [BusEink, BusShelter, Busway, GlEink, SolariLarge] do
     if Screens.Config.Cache.mode_disabled?(get_devops_mode(config)) do
       [%DeparturesNoData{screen: config, show_alternatives?: false}]
     else
