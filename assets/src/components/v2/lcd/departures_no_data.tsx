@@ -24,7 +24,7 @@ const DeparturesNoData: ComponentType<Props> = ({
           />
         </div>
         <div className="departures-no-data__main-content__heading">
-          Live bus departure updates are temporarily unavailable.
+          Live departure updates are temporarily unavailable.
         </div>
       </div>
       {showAlternatives && (
@@ -34,7 +34,7 @@ const DeparturesNoData: ComponentType<Props> = ({
             <div className="departures-no-data__alternatives__message">
               For schedules, go to{" "}
               <span className="departures-no-data__alternatives__message__em">
-                mbta.com/stops/{stopId}
+                {stopId ? <>mbta.com/stops/{stopId}</> : <>mbta.com/schedules</>}
               </span>{" "}
             </div>
           </div>

@@ -3,13 +3,13 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
 
   alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.Busway
-  alias Screens.V2.WidgetInstance.NormalHeader
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, NormalHeader}
 
   setup do
     config = %Screen{
       app_params: %V2.Busway{
         departures: %V2.Departures{sections: []},
-        header: %V2.Header.CurrentStopName{stop_name: "Ruggles"}
+        header: %V2.Header.CurrentStopName{stop_name: ""}
       },
       vendor: :solari,
       device_id: "TEST",
@@ -17,7 +17,9 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
       app_id: :solari_test_v2
     }
 
-    %{config: config}
+    deps = %Busway.Deps{departures_instances: fn _ -> [] end}
+
+    %{config: config, deps: deps}
   end
 
   describe "screen_template/0" do
@@ -31,21 +33,20 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
   end
 
   describe "candidate_instances/2" do
-    test "returns expected header", %{config: config} do
-      departures_instances_fn = fn _ -> [] end
+    test "includes header with stop name", %{config: config, deps: deps} do
       now = ~U[2020-04-06T10:00:00Z]
-      opts = []
+      config = put_in(config.app_params.header.stop_name, "Ruggles")
+      deps = struct!(deps, now: fn -> now end)
 
-      expected_header = %NormalHeader{
-        screen: config,
-        icon: :logo,
-        text: "Ruggles",
-        time: ~U[2020-04-06T10:00:00Z]
-      }
+      expected_header = %NormalHeader{screen: config, icon: :logo, text: "Ruggles", time: now}
+      assert expected_header in Busway.candidate_instances(config, [], deps)
+    end
 
-      actual_instances = Busway.candidate_instances(config, opts, now, departures_instances_fn)
+    test "includes departures instances", %{config: config, deps: deps} do
+      no_data = %DeparturesNoData{screen: config, show_alternatives?: true}
+      deps = struct!(deps, departures_instances: fn ^config -> [no_data] end)
 
-      assert expected_header in actual_instances
+      assert no_data in Busway.candidate_instances(config, [], deps)
     end
   end
 end
