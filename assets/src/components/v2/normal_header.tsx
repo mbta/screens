@@ -67,13 +67,6 @@ interface NormalHeaderTitleProps {
 
 const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = forwardRef(
   ({ icon, text, size, showTo, fullName }, ref) => {
-    const modifiers: string[] = [size];
-    if (icon) {
-      modifiers.push("with-icon");
-    } else {
-      modifiers.push("no-icon");
-    }
-
     const abbreviatedText = fullName ? text : abbreviateText(text);
     const environmentName = getDatasetValue("environmentName") || "";
 
@@ -82,15 +75,14 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = forwardRef(
         {["screens-dev", "screens-dev-green"].includes(environmentName) && (
           <div className="normal-header__environment">{environmentName}</div>
         )}
-        <div className="normal-header-title">
+        <div className={
+          classWithModifiers(
+            "normal-header-title",
+            [size, icon ? "with-icon" : "no-icon"]
+          )
+        }>
           {icon && <NormalHeaderIcon icon={icon} />}
-          <div
-            className={classWithModifiers(
-              "normal-header-title__text",
-              modifiers,
-            )}
-            ref={ref}
-          >
+          <div className="normal-header-title__text" ref={ref}>
             {showTo && <div className="normal-header-to__text">TO</div>}
             {abbreviatedText}
           </div>

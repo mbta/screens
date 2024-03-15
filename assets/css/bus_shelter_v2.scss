@@ -3,7 +3,7 @@
 @import "colors";
 @import "fonts";
 
-@import "v2/bus_shelter/screen_container";
+@import "v2/lcd_common/screen_container";
 
 @import "v2/bus_shelter/screen/normal";
 @import "v2/bus_shelter/screen/takeover";
@@ -17,18 +17,14 @@
 @import "v2/bus_shelter/flex/two_medium";
 
 @import "v2/placeholder";
-@import "v2/bus_shelter/normal_header";
+@import "v2/lcd_common/normal_header";
 @import "v2/bus_shelter/link_footer";
 @import "v2/lcd_common/subway_status";
 @import "v2/lcd_common/route_pill";
-@import "v2/bus_shelter/free_text";
+@import "v2/lcd_common/free_text";
 
+@import "v2/lcd_common/departures";
 @import "v2/bus_shelter/departures";
-@import "v2/bus_shelter/departures/row";
-@import "v2/bus_shelter/departures/destination";
-@import "v2/bus_shelter/departures/time";
-@import "v2/bus_shelter/departures/crowding";
-@import "v2/bus_shelter/departures/alert";
 
 @import "v2/bus_shelter/alert";
 
@@ -39,6 +35,7 @@
 
 @import "v2/lcd_common/no_data";
 @import "v2/lcd_common/page_load_no_data";
+@import "v2/lcd_common/departures_no_data";
 @import "v2/bus_shelter/departures_no_data";
 
 @import "v2/multi_screen_page";

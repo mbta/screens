@@ -20,14 +20,6 @@
   position: absolute;
   left: 40px;
   bottom: 40px;
-}
-
-.normal-header-title__text {
-  display: inline-block;
-  vertical-align: middle;
-  font-family: Helvetica, sans-serif;
-  font-weight: 700;
-  color: #ffffff;
 
   &--large {
     font-size: 104px;
@@ -38,8 +30,16 @@
     font-size: 72px;
     line-height: 72px;
   }
+}
 
-  &--with-icon {
+.normal-header-title__text {
+  display: inline-block;
+  vertical-align: middle;
+  font-family: Helvetica, sans-serif;
+  font-weight: 700;
+  color: #ffffff;
+
+  .normal-header-title--with-icon & {
     width: 668px;
   }
 }

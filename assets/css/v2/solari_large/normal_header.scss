@@ -20,6 +20,8 @@
   position: absolute;
   left: 40px;
   bottom: 40px;
+  font-size: 164px;
+  line-height: 136px;
 }
 
 .normal-header-title__text {
@@ -28,10 +30,8 @@
   font-family: Helvetica, sans-serif;
   font-weight: 700;
   color: #ffffff;
-  font-size: 164px;
-  line-height: 136px;
 
-  &--with-icon {
+  .normal-header-title--with-icon & {
     width: 612px;
   }
 }

@@ -6,32 +6,34 @@ defmodule Screens.V2.CandidateGenerator.Busway do
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Header.CurrentStopName
   alias ScreensConfig.V2.Busway
+  alias ScreensConfig.V2.Header.CurrentStopName
+
+  defmodule Deps do
+    @moduledoc false
+    defstruct now: &DateTime.utc_now/0,
+              departures_instances: &Widgets.Departures.departures_instances/1
+  end
 
   @behaviour CandidateGenerator
 
   @impl CandidateGenerator
   def screen_template do
-    {:screen,
-     %{
-       normal: [:header, :main_content],
-       takeover: [:full_screen]
-     }}
+    {
+      :screen,
+      %{
+        normal: [:header, :main_content],
+        takeover: [:full_screen]
+      }
+    }
     |> Builder.build_template()
   end
 
   @impl CandidateGenerator
-  # credo:disable-for-next-line Credo.Check.Design.DuplicatedCode
-  def candidate_instances(
-        config,
-        _opts,
-        now \\ DateTime.utc_now(),
-        departures_instances_fn \\ &Widgets.Departures.departures_instances/1
-      ) do
+  def candidate_instances(config, _opts, deps \\ %Deps{}) do
     [
-      fn -> header_instances(config, now) end,
-      fn -> departures_instances_fn.(config) end,
+      fn -> header_instances(config, deps.now.()) end,
+      fn -> deps.departures_instances.(config) end,
       fn -> placeholder_instances() end
     ]
     |> Task.async_stream(& &1.(), timeout: 15_000)
