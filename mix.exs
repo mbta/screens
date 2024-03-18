@@ -53,7 +53,7 @@ defmodule Screens.MixProject do
       {:phoenix_live_reload, "~> 1.3", only: :dev},
       {:phoenix_live_view, "~> 0.17.1"},
       {:phoenix_live_dashboard, "~> 0.6"},
-      {:gettext, "~> 0.22.1"},
+      {:gettext, "~> 0.24.0"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.6"},
       {:cowboy, "== 2.10.0"},
