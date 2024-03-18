@@ -214,15 +214,17 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
     } = config
 
     Enum.map(sections, fn
-      {:ok, departures} when length(departures) <= 1 ->
-        format_headway(route_id, stop_id, direction_id, departures)
-
-      {:ok, departures} ->
-        {:ok, departures}
-
-      # Show headway instead of nothing when API fetch fails
-      :error ->
+      _ ->
         format_headway(route_id, stop_id, direction_id)
+        # {:ok, departures} when length(departures) <= 1 ->
+        #   format_headway(route_id, stop_id, direction_id, departures)
+
+        # {:ok, departures} ->
+        #   {:ok, departures}
+
+        # # Show headway instead of nothing when API fetch fails
+        # :error ->
+        #   format_headway(route_id, stop_id, direction_id)
     end)
   end
 
