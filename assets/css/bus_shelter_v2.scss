@@ -19,8 +19,8 @@
 @import "v2/placeholder";
 @import "v2/bus_shelter/normal_header";
 @import "v2/bus_shelter/link_footer";
-@import "v2/lcd_common_styles/subway_status";
-@import "v2/lcd_common_styles/route_pill";
+@import "v2/lcd_common/subway_status";
+@import "v2/lcd_common/route_pill";
 @import "v2/bus_shelter/free_text";
 
 @import "v2/bus_shelter/departures";
@@ -37,8 +37,8 @@
 
 @import "v2/bus_shelter/survey";
 
-@import "v2/lcd_common_styles/no_data";
-@import "v2/lcd_common_styles/page_load_no_data";
+@import "v2/lcd_common/no_data";
+@import "v2/lcd_common/page_load_no_data";
 @import "v2/bus_shelter/departures_no_data";
 
 @import "v2/multi_screen_page";
