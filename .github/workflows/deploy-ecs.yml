@@ -8,7 +8,7 @@ on:
         required: true
         default: dev
   push:
-    branches: ["master"]
+    branches: ["main"]
 
 jobs:
   call-workflow:
