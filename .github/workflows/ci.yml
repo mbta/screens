@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  pull_request:
+    paths-ignore:
+      - docs/**
+      - scripts/**
+      - "*.md"
+      - LICENSE
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  MIX_ENV: test
+
+jobs:
+  ex-compile:
+    name: Elixir Warnings
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: mix compile --warnings-as-errors
+
+  ex-credo:
+    name: Elixir Credo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: mix credo --strict
+
+  ex-dialyzer:
+    name: Elixir Dialyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - uses: mbta/actions/dialyzer@v2
+
+  ex-format:
+    name: Elixir Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: mix format --check-formatted
+
+  ex-tests:
+    name: Elixir Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: mix test --cover
+      - name: Save PR information
+        if: github.event.pull_request
+        run: |
+          echo "${{ github.event.pull_request.number }}" > cover/PR_NUMBER
+          echo "${{ github.event.pull_request.head.sha }}" > cover/PR_SHA
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: elixir-lcov
+          path: cover/
