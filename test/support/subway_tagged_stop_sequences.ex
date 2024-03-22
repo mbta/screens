@@ -3,6 +3,8 @@ defmodule Screens.TestSupport.SubwayTaggedStopSequences do
   Functions providing tagged stop sequences for building subway-related test data.
   """
 
+  alias Screens.{Routes.Route, Stops.Stop}
+
   import Screens.TestSupport.ParentStationIdSigil
 
   @spec blue() :: %{Route.id() => [[Stop.id()]]}
