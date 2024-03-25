@@ -59,7 +59,7 @@ defmodule Screens.MixProject do
       {:cowboy, "== 2.10.0"},
       {:httpoison, "~> 1.8.0"},
       {:tzdata, "~> 1.1"},
-      {:credo, "~> 1.6.0"},
+      {:credo, "~> 1.7.5"},
       {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:ex_aws, "~> 2.1"},
