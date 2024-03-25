@@ -3,7 +3,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   alias Screens.Alerts.Alert
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.PreFare
+  alias ScreensConfig.V2.{CRDepartures, PreFare}
   alias ScreensConfig.V2.Header.CurrentStopId
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
@@ -112,6 +112,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   defp put_is_full_screen(widget, is_full_screen) do
     %{widget | is_full_screen: is_full_screen}
+  end
+
+  defp put_pair_with_cr_widget(widget, pair_with_alert_widget) do
+    cr_departures =
+      struct(CRDepartures,
+        enabled: pair_with_alert_widget,
+        pair_with_alert_widget: pair_with_alert_widget
+      )
+
+    app_params = struct(PreFare, cr_departures: cr_departures)
+
+    %{
+      widget
+      | screen: %Screen{widget.screen | app_params: app_params}
+    }
   end
 
   defp ie(opts) do
@@ -430,6 +445,33 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert [1] == WidgetInstance.priority(widget)
       assert [:full_body] == WidgetInstance.slot_names(widget)
       assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
+    end
+
+    test "returns :paged_main_content_left for a takeover when paired with CR widget", %{
+      widget: widget
+    } do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-forhl")
+        |> put_informed_entities([ie(stop: "place-chncl"), ie(stop: "place-forhl")])
+        |> put_effect(:shuttle)
+        |> put_tagged_stop_sequences(%{
+          "Orange" => [
+            [
+              "place-ogmnl",
+              "place-dwnxg",
+              "place-chncl",
+              "place-forhl"
+            ]
+          ]
+        })
+        |> put_is_terminal_station(true)
+        |> put_is_full_screen(true)
+        |> put_pair_with_cr_widget(true)
+
+      assert [1] == WidgetInstance.priority(widget)
+      assert [:paged_main_content_left] == WidgetInstance.slot_names(widget)
+      assert :single_screen_alert == WidgetInstance.widget_type(widget)
     end
 
     test "returns flex zone alert for a severe delay", %{widget: widget} do
