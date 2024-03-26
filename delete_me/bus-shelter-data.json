@@ -1,0 +1,328 @@
+{
+  "sections": [
+    {
+      "arrow": "e",
+      "audio": {
+        "wayfinding": null
+      },
+      "departures": [
+        {
+          "alerts": [],
+          "crowding_level": null,
+          "destination": "Alewife",
+          "direction_id": 1,
+          "id": "prediction-ADDED-1581832456-70094-50",
+          "inline_badges": [],
+          "route": "",
+          "route_id": "Red",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:01:00Z",
+          "track_number": null,
+          "vehicle_status": "stopped_at"
+        },
+        {
+          "alerts": [],
+          "crowding_level": null,
+          "destination": "Alewife",
+          "direction_id": 1,
+          "id": "prediction-ADDED-1581832459-70094-50",
+          "inline_badges": [],
+          "route": "",
+          "route_id": "Red",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:19:00Z",
+          "track_number": null,
+          "vehicle_status": "in_transit_to"
+        }
+      ],
+      "disabled": false,
+      "headway": {
+        "active": false
+      },
+      "name": "Red Line",
+      "paging": {
+        "is_enabled": false
+      },
+      "pill": "red"
+    },
+    {
+      "arrow": "e",
+      "audio": {
+        "wayfinding": null
+      },
+      "departures": [
+        {
+          "alerts": [],
+          "crowding_level": null,
+          "destination": "Mattapan",
+          "direction_id": 0,
+          "id": "prediction-59623909-70261-1",
+          "inline_badges": [],
+          "route": "",
+          "route_id": "Mattapan",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:03:12Z",
+          "track_number": null,
+          "vehicle_status": "incoming_at"
+        }
+      ],
+      "disabled": false,
+      "headway": {
+        "active": false
+      },
+      "name": "Mattapan Trolley",
+      "paging": {
+        "is_enabled": false
+      },
+      "pill": "mattapan"
+    },
+    {
+      "arrow": "s",
+      "audio": {
+        "wayfinding": null
+      },
+      "departures": [
+        {
+          "alerts": [],
+          "crowding_level": null,
+          "destination": "Andrew",
+          "direction_id": 1,
+          "id": "prediction-60167790-334-1",
+          "inline_badges": [],
+          "route": "18",
+          "route_id": "18",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:05:00Z",
+          "track_number": null,
+          "vehicle_status": "stopped_at"
+        },
+        {
+          "alerts": [],
+          "crowding_level": null,
+          "destination": "Wakefield Ave",
+          "direction_id": 0,
+          "id": "prediction-60451419-334-1",
+          "inline_badges": [],
+          "route": "24",
+          "route_id": "24",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:05:00Z",
+          "track_number": null,
+          "vehicle_status": "stopped_at"
+        },
+        {
+          "alerts": ["delay"],
+          "crowding_level": null,
+          "destination": "Ruggles",
+          "direction_id": 1,
+          "id": "prediction-60167789-334-1",
+          "inline_badges": [],
+          "route": "23",
+          "route_id": "23",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:08:19Z",
+          "track_number": null,
+          "vehicle_status": "in_transit_to"
+        },
+        {
+          "alerts": ["delay"],
+          "crowding_level": 1,
+          "destination": "Ruggles",
+          "direction_id": 1,
+          "id": "prediction-60167791-334-1",
+          "inline_badges": [],
+          "route": "22",
+          "route_id": "22",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:09:00Z",
+          "track_number": null,
+          "vehicle_status": "stopped_at"
+        },
+        {
+          "alerts": [],
+          "crowding_level": null,
+          "destination": "Crawford Square",
+          "direction_id": 0,
+          "id": "prediction-60488165-334-1",
+          "inline_badges": [],
+          "route": "240",
+          "route_id": "240",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:10:00Z",
+          "track_number": null,
+          "vehicle_status": "in_transit_to"
+        },
+        {
+          "alerts": ["delay"],
+          "crowding_level": null,
+          "destination": "Ruggles",
+          "direction_id": 1,
+          "id": "prediction-60167792-334-1",
+          "inline_badges": [],
+          "route": "23",
+          "route_id": "23",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:12:00Z",
+          "track_number": null,
+          "vehicle_status": null
+        },
+        {
+          "alerts": [],
+          "crowding_level": null,
+          "destination": "Forest Hills",
+          "direction_id": 1,
+          "id": "prediction-60450481-334-1",
+          "inline_badges": [],
+          "route": "21",
+          "route_id": "21",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:14:00Z",
+          "track_number": null,
+          "vehicle_status": "stopped_at"
+        },
+        {
+          "alerts": [],
+          "crowding_level": null,
+          "destination": "Gallivan Blvd via Norfolk St",
+          "direction_id": 1,
+          "id": "prediction-60450832-334-1",
+          "inline_badges": [],
+          "route": "26",
+          "route_id": "26",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:15:00Z",
+          "track_number": null,
+          "vehicle_status": "stopped_at"
+        },
+        {
+          "alerts": [],
+          "crowding_level": null,
+          "destination": "Quincy Center",
+          "direction_id": 0,
+          "id": "prediction-60487447-334-1",
+          "inline_badges": [],
+          "route": "215",
+          "route_id": "215",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:17:14Z",
+          "track_number": null,
+          "vehicle_status": "in_transit_to"
+        },
+        {
+          "alerts": ["delay"],
+          "crowding_level": null,
+          "destination": "Ruggles",
+          "direction_id": 1,
+          "id": "prediction-60167794-334-1",
+          "inline_badges": [],
+          "route": "23",
+          "route_id": "23",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:27:25Z",
+          "track_number": null,
+          "vehicle_status": "in_transit_to"
+        },
+        {
+          "alerts": ["delay"],
+          "crowding_level": null,
+          "destination": "Ruggles",
+          "direction_id": 1,
+          "id": "prediction-60167793-334-1",
+          "inline_badges": [],
+          "route": "22",
+          "route_id": "22",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:30:10Z",
+          "track_number": null,
+          "vehicle_status": "stopped_at"
+        },
+        {
+          "alerts": ["delay"],
+          "crowding_level": null,
+          "destination": "Ruggles",
+          "direction_id": 1,
+          "id": "prediction-60167796-334-1",
+          "inline_badges": [],
+          "route": "22",
+          "route_id": "22",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:36:00Z",
+          "track_number": null,
+          "vehicle_status": "stopped_at"
+        },
+        {
+          "alerts": [],
+          "crowding_level": null,
+          "destination": "Forest Hills",
+          "direction_id": 1,
+          "id": "prediction-60450482-334-1",
+          "inline_badges": [],
+          "route": "21",
+          "route_id": "21",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:36:00Z",
+          "track_number": null,
+          "vehicle_status": null
+        },
+        {
+          "alerts": [],
+          "crowding_level": null,
+          "destination": "Quincy Center",
+          "direction_id": 0,
+          "id": "prediction-60487490-334-1",
+          "inline_badges": [],
+          "route": "215",
+          "route_id": "215",
+          "scheduled_time": null,
+          "stop_name": "Ashmont",
+          "stop_type": "first_stop",
+          "time": "2024-03-26T14:40:00Z",
+          "track_number": null,
+          "vehicle_status": "stopped_at"
+        }
+      ],
+      "disabled": false,
+      "headway": {
+        "active": false
+      },
+      "name": "Busway",
+      "paging": {
+        "is_enabled": true,
+        "visible_rows": 10
+      },
+      "pill": "bus"
+    }
+  ]
+}

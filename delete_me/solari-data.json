@@ -1,0 +1,173 @@
+{
+  "sections": [
+    {
+      "rows": [
+        {
+          "headsign": {
+            "headsign": "Ashmont",
+            "variation": null
+          },
+          "id": "o4a9P7qJYUmLtIgTz+2S8Q==",
+          "inline_alerts": [],
+          "route": {
+            "color": "yellow",
+            "text": "22",
+            "type": "text"
+          },
+          "times_with_crowding": [
+            {
+              "crowding": 1,
+              "id": "prediction-60169457-1266-8",
+              "time": {
+                "minutes": 9,
+                "type": "minutes"
+              }
+            }
+          ],
+          "type": "departure_row"
+        },
+        {
+          "headsign": {
+            "headsign": "Mattapan",
+            "variation": "via Franklin Field"
+          },
+          "id": "FKFmYtnbgOFSz1arETl2+g==",
+          "inline_alerts": [],
+          "route": {
+            "color": "yellow",
+            "text": "29",
+            "type": "text"
+          },
+          "times_with_crowding": [
+            {
+              "crowding": null,
+              "id": "prediction-60450600-1266-3",
+              "time": {
+                "minutes": 10,
+                "type": "minutes"
+              }
+            }
+          ],
+          "type": "departure_row"
+        },
+        {
+          "headsign": {
+            "headsign": "Ruggles",
+            "variation": null
+          },
+          "id": "6mUWtuWZBZ94AVm27beyyQ==",
+          "inline_alerts": [],
+          "route": {
+            "color": "yellow",
+            "text": "44",
+            "type": "text"
+          },
+          "times_with_crowding": [
+            {
+              "crowding": null,
+              "id": "prediction-60169074-1266-3",
+              "time": {
+                "minutes": 11,
+                "type": "minutes"
+              }
+            }
+          ],
+          "type": "departure_row"
+        },
+        {
+          "headsign": {
+            "headsign": "Ashmont",
+            "variation": null
+          },
+          "id": "uzglUYcQ+8SlHtTjezR9jw==",
+          "inline_alerts": [],
+          "route": {
+            "color": "yellow",
+            "text": "22",
+            "type": "text"
+          },
+          "times_with_crowding": [
+            {
+              "crowding": null,
+              "id": "prediction-60169461-1266-8",
+              "time": {
+                "minutes": 13,
+                "type": "minutes"
+              }
+            },
+            {
+              "crowding": null,
+              "id": "prediction-60169467-1266-8",
+              "time": {
+                "minutes": 26,
+                "type": "minutes"
+              }
+            }
+          ],
+          "type": "departure_row"
+        },
+        {
+          "headsign": {
+            "headsign": "Ruggles",
+            "variation": null
+          },
+          "id": "UadAMO3iOF6sWFcNAJuDzg==",
+          "inline_alerts": [],
+          "route": {
+            "color": "yellow",
+            "text": "44",
+            "type": "text"
+          },
+          "times_with_crowding": [
+            {
+              "crowding": null,
+              "id": "prediction-60169075-1266-3",
+              "time": {
+                "minutes": 35,
+                "type": "minutes"
+              }
+            }
+          ],
+          "type": "departure_row"
+        },
+        {
+          "headsign": {
+            "headsign": "Ashmont",
+            "variation": null
+          },
+          "id": "qrx2mxxtLAu8sceVQimK8Q==",
+          "inline_alerts": [],
+          "route": {
+            "color": "yellow",
+            "text": "22",
+            "type": "text"
+          },
+          "times_with_crowding": [
+            {
+              "crowding": null,
+              "id": "prediction-60169471-1266-8",
+              "time": {
+                "minutes": 44,
+                "type": "minutes"
+              }
+            },
+            {
+              "crowding": null,
+              "id": "prediction-60169478-1266-8",
+              "time": {
+                "am_pm": "am",
+                "hour": 11,
+                "minute": 0,
+                "show_am_pm": false,
+                "type": "timestamp"
+              }
+            }
+          ],
+          "type": "departure_row"
+        }
+      ],
+      "type": "normal_section"
+    }
+  ],
+  "type": "departures"
+}
