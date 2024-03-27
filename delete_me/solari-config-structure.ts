@@ -107,19 +107,31 @@ interface Bidirectional {
 
 // "Normal" layout. The section shows as many upcoming predictions as space allows.
 interface Upcoming {
-  // Limits the maximum number of rows to show.
+  // Limits the maximum number of departures to show in the section.
   num_rows: number | "infinity";
   // If true, a "Later Departures" row is shown at the bottom of the section
   // when there are more predictions than it can fit.
   paged: boolean;
-  // TODO -- still working on documenting code that uses this
-  // In terms of logic:
-  // Only passed to the frontend in a paged section. Only paged sections use
-  // this field.
-  // Sent to the frontend as a field in the `paging` object.
-  // If set to infinity, this value gets sent to the frontend as the length of
-  // the departures list.
-  // If set to a number, this value gets passed through to the frontend.
+  // This field is only used by, and only takes effect for, paged sections.
+  // (Sections with "Later Departures" at the end)
+  //
+  // This field works in tandem with `num_rows`.
+  // In paged sections, `num_rows` limits the maximum number of _departures_ to
+  // keep in the JS array for that section.
+  // Whereas `visible_rows` limits the number of _rendered rows_ drawn on the
+  // page, with the "Later Departures" element counting as 1 row.
+  // For example if a section has `visible_rows: 3` and a lot of departures to
+  // show, then it will render 2 regular departure rows and then put up to 5
+  // additional departures into the "Later Departures" element.
+  //
+  // One very funky piece of behavior is that when there are 2 or more sections
+  // that need to have rows removed to fit everything on the screen, the
+  // auto-sizing code attempts to maintain the **ratio** of visible rows between
+  // those sections.
+  // For example, if there are two sections with `visible_rows` of 2 and 10
+  // respectively, and we need to cut the content down to 6 rows total, then we
+  // will end up with sections containing 1 and 5 rows respectively--the
+  // proportions are maintained.
   visible_rows: number | "infinity";
   // Additional filters on the prediction rows. See `RouteConfig` interface below.
   routes: RouteConfig;
