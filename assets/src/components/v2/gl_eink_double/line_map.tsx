@@ -404,7 +404,7 @@ const VehicleLabel = ({ cx, cy, label }) => {
   return null;
 };
 
-const Vehicle = ({ id, index, label }) => {
+const Vehicle = ({ index, label }) => {
   const cx = LEFT_MARGIN + LINE_WIDTH / 2;
   const cy = TOP_MARGIN + index * STOP_SPACING;
 

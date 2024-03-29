@@ -51,7 +51,7 @@ const LinkArrow = ({ width }) => {
   );
 };
 
-const HeadwaySectionList = ({ section: { pill, headway } }): JSX.Element => {
+const HeadwaySectionList = ({ section: { headway } }): JSX.Element => {
   return (
     <div className={classWithModifier("section-list", "headway")}>
       <div

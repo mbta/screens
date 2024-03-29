@@ -1,5 +1,5 @@
 import useTextResizer from "Hooks/v2/use_text_resizer";
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { getHexColor, STRING_TO_SVG } from "Util/svg_utils";
 import DisruptionDiagram, {
   DisruptionDiagramData,

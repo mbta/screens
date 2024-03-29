@@ -39,7 +39,7 @@ const Departures = forwardRef(
     const departureGroups = buildDepartureGroups(departures);
     return (
       <div className="departures" ref={ref}>
-        {departureGroups.map((group, i) => (
+        {departureGroups.map((group) => (
           <DepartureGroup
             currentTimeString={currentTimeString}
             departures={group}

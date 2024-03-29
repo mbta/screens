@@ -33,7 +33,7 @@ const NormalDeparturesRenderer = forwardRef(
 );
 
 const trimRows = (rows, n) => {
-  const { trimmed, count } = rows.reduce(
+  const { trimmed } = rows.reduce(
     ({ count, trimmed }, row: Row) => {
       if (row.type == "notice_row") {
         if (count < n) {

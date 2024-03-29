@@ -199,7 +199,7 @@ class PagedDeparture extends React.Component<
     this.stopPaging();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (!this.propsEqual(prevProps)) {
       this.stopPaging();
       this.setState({ currentPageNumber: 0 });

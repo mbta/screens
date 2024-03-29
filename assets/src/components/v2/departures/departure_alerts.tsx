@@ -2,7 +2,7 @@ import React from "react";
 
 import FreeText, { srcForIcon } from "Components/v2/free_text";
 
-const DepartureAlert = ({ color, icon, text }) => {
+const DepartureAlert = ({ icon, text }) => {
   const imgSrc = srcForIcon(icon);
 
   return (

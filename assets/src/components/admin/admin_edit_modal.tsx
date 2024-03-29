@@ -4,7 +4,6 @@ import _ from "lodash";
 const EditModal = ({
   columns,
   data,
-  setData,
   selectedRowIds,
   setShowEditModal,
   setTableVersion,
@@ -18,7 +17,7 @@ const EditModal = ({
   const [formValues, setFormValues] = useState(initialFormValues);
 
   const applyChanges = () => {
-    columns.forEach(({ Header, FormCell, id, accessor, mutator }) => {
+    columns.forEach(({ Header, accessor, mutator }) => {
       const value = formValues[Header];
       if (value !== undefined) {
         const columnIdOrMutator =
@@ -38,7 +37,7 @@ const EditModal = ({
   return (
     <div className="admin-modal__background">
       <div className="admin-modal__content">
-        {columns.map(({ Header, FormCell, accessor }, i) => {
+        {columns.map(({ Header, FormCell, accessor }) => {
           if (FormCell) {
             const selectedRowValues = selectedRows.map((row) => {
               if (typeof accessor === "function") {
