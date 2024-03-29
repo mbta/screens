@@ -23,7 +23,6 @@ const TopScreenLayout = ({
   currentTimeString,
   stopName,
   departures,
-  stopId,
   routeId,
   headway,
   lineMapData,

@@ -407,10 +407,6 @@ const LineMapStops = (): JSX.Element => {
     showOriginStop,
     lastVisibleStopIndex,
     stopNames,
-    radius,
-    dy,
-    height,
-    stopMarginTop,
   } = useContext(LineMapContext);
   return (
     <g>
@@ -435,7 +431,6 @@ const LineMapBase = (): JSX.Element => {
 const LineMapContainer = ({
   data,
   height,
-  width,
   currentTimeString,
   showVehicles,
 }: {

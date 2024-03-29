@@ -1,4 +1,4 @@
-import moment from "moment";
+import "moment";
 import "moment-timezone";
 import React from "react";
 

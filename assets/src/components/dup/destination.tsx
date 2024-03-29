@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
+import React, { useRef, useState, useLayoutEffect } from "react";
 import _ from "lodash";
 
 const LINE_HEIGHT = 138; // px

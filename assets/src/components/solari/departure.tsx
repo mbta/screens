@@ -53,7 +53,7 @@ const OverheadDepartureTimeAndCrowding = ({
   // Timing is controlled by the timings on the animation. The animation on the time element
   // ends after 10s, then the animationend event toggles crowding on.
   useEffect(() => {
-    const onAnimationEnd = (e) => {
+    const onAnimationEnd = () => {
       setShowCrowding(true);
     };
 

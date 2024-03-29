@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useTable, useFilters, useRowSelect } from "react-table";
 import _ from "lodash";
 
@@ -52,10 +52,6 @@ const Table = ({
     headerGroups,
     rows,
     prepareRow,
-    state,
-    visibleColumns,
-    preGlobalFilteredRows,
-    setGlobalFilter,
     state: { selectedRowIds },
   } = useTable(
     {
@@ -103,7 +99,7 @@ const Table = ({
         </thead>
 
         <tbody {...getTableBodyProps()}>
-          {rows.map((row, i) => {
+          {rows.map((row) => {
             prepareRow(row);
             return (
               <tr {...row.getRowProps()}>

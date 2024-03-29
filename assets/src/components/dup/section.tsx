@@ -49,7 +49,7 @@ const Section = ({
   );
 };
 
-const HeadwaySection = ({ headway, pill }): JSX.Element => {
+const HeadwaySection = ({ headway }): JSX.Element => {
   return (
     <div className="section section--headway">
       <div className="partial-alert partial-alert--dark">
