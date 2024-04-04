@@ -80,7 +80,7 @@ export const getTriptychPane = (): TriptychPane | null => {
 };
 
 const getTriptychPaneFromTags = () => {
-  let pane = null;
+  let pane: TriptychPane | null = null;
 
   const tags = getTags();
   if (tags !== null) {
@@ -110,7 +110,7 @@ export const getStationName = (): string | null => {
 };
 
 const getTags = (): OFMTag[] | null => {
-  let tags = null;
+  let tags: OFMTag[] | null = null;
 
   const mraid = getMRAID();
   if (mraid) {

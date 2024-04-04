@@ -33,7 +33,7 @@ interface LineMapData {
   vehicles: LineMapVehicle[];
 }
 
-const LineMapContext = createContext();
+const LineMapContext = createContext<any>({});
 
 const ScheduledDepartureIcon = ({ x, y, iconRadius }): JSX.Element => {
   return (
@@ -137,6 +137,8 @@ const LineMapStopLabel = ({ x, y, lines, current, origin }): JSX.Element => {
         </tspan>
       </text>
     );
+  } else {
+    throw new Error(`unexpected value for lines: ${lines}`);
   }
 };
 
@@ -206,7 +208,7 @@ const LineMapVehicleLabel = ({
   y,
   time,
   currentTimeString,
-}): JSX.Element => {
+}): JSX.Element | null => {
   const timeRep = einkTimeRepresentation(time, currentTimeString);
   if (timeRep.type === "TEXT") {
     return (
@@ -256,7 +258,7 @@ const LineMapVehicleIcon = ({ x, y, size }): JSX.Element => {
   );
 };
 
-const LineMapVehicle = ({ vehicle, currentTimeString }): JSX.Element => {
+const LineMapVehicle = ({ vehicle, currentTimeString }): JSX.Element | null => {
   const { lineWidth, radius, dy, height, stopMarginTop } =
     useContext(LineMapContext);
 

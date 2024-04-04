@@ -6,6 +6,7 @@ import {
 import Widget, { WidgetData } from "./widget";
 import {
   ApiResponse,
+  SimulationApiResponse,
   useSimulationApiResponse,
 } from "Hooks/v2/use_api_response";
 import WidgetTreeErrorBoundary from "Components/v2/widget_tree_error_boundary";
@@ -20,7 +21,8 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
   opts,
 }) => {
   const responseMapper = useContext(ResponseMapperContext);
-  const data = responseMapper(apiResponse);
+  // See `ScreenLayout` for the explanation of this cast.
+  const data = responseMapper(apiResponse) as SimulationApiResponse;
   const { fullPage, flexZone } = data;
 
   // If "alternateView" was provided as an option, we use the simulation version of screen normal

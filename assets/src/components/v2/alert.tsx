@@ -91,7 +91,7 @@ const BodyTextSizer: ComponentType<BodyTextSizerProps> = ({
   maxHeight,
 }) => {
   const [isSmall, setSmall] = useState(false);
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     if (ref.current && !isSmall && ref.current.clientHeight > maxHeight) {

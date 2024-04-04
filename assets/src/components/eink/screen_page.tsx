@@ -3,11 +3,7 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchDatasetValue } from "Util/dataset";
 
-const MultiScreenPage = ({
-  screenContainer: ScreenContainer,
-}: {
-  screenContainer: React.ComponentType;
-}): JSX.Element => {
+const MultiScreenPage = ({ screenContainer: ScreenContainer }): JSX.Element => {
   const screenIds = JSON.parse(fetchDatasetValue("screenIds"));
 
   return (
@@ -19,20 +15,14 @@ const MultiScreenPage = ({
   );
 };
 
-const ScreenPage = ({
-  screenContainer: ScreenContainer,
-}: {
-  screenContainer: React.ComponentType;
-}): JSX.Element => {
-  const { id } = useParams();
+type QueryParams = { id?: string }
+
+const ScreenPage = ({ screenContainer: ScreenContainer }): JSX.Element => {
+  const { id } = useParams<QueryParams>();
   return <ScreenContainer id={id} />;
 };
 
-const AuditScreenPage = ({
-  screenLayout: ScreenLayout,
-}: {
-  screenLayout: React.ComponentType;
-}): JSX.Element => {
+const AuditScreenPage = ({ screenLayout: ScreenLayout }): JSX.Element => {
   const [data, setData] = useState("");
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {

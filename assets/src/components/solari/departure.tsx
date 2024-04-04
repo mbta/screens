@@ -43,7 +43,7 @@ const OverheadDepartureTimeAndCrowding = ({
   currentTimeString,
 }) => {
   const [showCrowding, setShowCrowding] = useState(false);
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   // When we load new data, show the time, which is styled to animate in from the right.
   useEffect(() => {
@@ -64,6 +64,8 @@ const OverheadDepartureTimeAndCrowding = ({
           ref.current.removeEventListener("animationend", onAnimationEnd);
         }
       };
+    } else {
+      return () => {};
     }
   });
 
@@ -128,7 +130,7 @@ const Departure = ({
   const timeAnimationModifier =
     timeRepresentation.type === "TEXT" ? "animated" : "static";
 
-  const containerModifiers = [];
+  const containerModifiers: string[] = [];
   if (groupStart) {
     containerModifiers.push("group-start");
   }

@@ -13,8 +13,8 @@ const LOADING_RESPONSE = { type: "loading" };
 const doFailureBuffer = (
   lastSuccess: number | null,
   failureModeElapsedMs: number,
-  setApiResponse: React.Dispatch<React.SetStateAction<object>>,
-  apiResponse: object = FAILURE_RESPONSE,
+  setApiResponse: React.Dispatch<React.SetStateAction<Record<string, any>>>,
+  apiResponse: Record<string, any> = FAILURE_RESPONSE,
 ) => {
   if (lastSuccess == null) {
     // We haven't had a successful request since initial page load.
@@ -70,7 +70,7 @@ const useApiResponse = ({
   withWatchdog = false,
   failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs) => {
-  const [apiResponse, setApiResponse] = useState<object | null>(
+  const [apiResponse, setApiResponse] = useState<Record<string, any> | null>(
     LOADING_RESPONSE,
   );
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);

@@ -65,7 +65,7 @@ interface NormalHeaderTitleProps {
   fullName: boolean;
 }
 
-const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = forwardRef(
+const NormalHeaderTitle = forwardRef<HTMLDivElement, NormalHeaderTitleProps>(
   ({ icon, text, size, showTo, fullName }, ref) => {
     const abbreviatedText = fullName ? text : abbreviateText(text);
     const environmentName = getDatasetValue("environmentName") || "";

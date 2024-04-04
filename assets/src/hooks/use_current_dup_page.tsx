@@ -26,6 +26,8 @@ const useCurrentPage = () => {
         setPage((p) => 1 - p);
       }, 3750);
       return () => clearInterval(interval);
+    } else {
+      return () => {};
     }
   }, [paging]);
 

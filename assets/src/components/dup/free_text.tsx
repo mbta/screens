@@ -39,6 +39,8 @@ const getKey = (elt) => {
     return `special--${elt.special}`;
   } else if (elt.icon !== undefined) {
     return `icon--${elt.icon}`;
+  } else {
+    throw new Error("empty free text element");
   }
 };
 

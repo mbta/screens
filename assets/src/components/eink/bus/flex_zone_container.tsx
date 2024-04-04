@@ -1,12 +1,21 @@
 import React, { forwardRef } from "react";
 
 import Departures from "Components/eink/bus/departures";
+import {
+  Props as DepartureGroupProps
+} from "Components/eink/bus/departure_group";
 import NearbyConnections from "Components/eink/bus/nearby_connections";
 import ServiceMap from "Components/eink/bus/service_map";
 import GlobalAlert from "Components/eink/global_alert";
 import TakeoverAlert from "Components/eink/takeover_alert";
 
-const FlexZoneContainer = forwardRef(
+type Props = Omit<DepartureGroupProps, "size"> & {
+  globalAlert: object
+  nearbyConnections: object[]
+  psaUrl: string
+}
+
+const FlexZoneContainer = forwardRef<HTMLDivElement, Props>(
   (
     { currentTimeString, departures, globalAlert, nearbyConnections, psaUrl },
     ref
@@ -70,4 +79,5 @@ const FlexZoneContainer = forwardRef(
   }
 );
 
+export { Props };
 export default FlexZoneContainer;

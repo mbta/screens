@@ -106,6 +106,7 @@ const AddModal = ({ setData, closeModal }): JSX.Element => {
   const addScreen = () => {
     const newRow = {
       app_id: formValues.app_id,
+      // @ts-expect-error
       app_params: defaultAppParamsByAppId[formValues.app_id],
       device_id: formValues.device_id,
       disabled: false,
@@ -126,7 +127,7 @@ const AddModal = ({ setData, closeModal }): JSX.Element => {
         {fields.map(({ key, label, FormCell }) => (
           <div key={key}>
             <div>{label}</div>
-            <FormCell header={key} setFormValues={setFormValues} />
+            <FormCell value="" header={key} setFormValues={setFormValues} />
           </div>
         ))}
         <div>

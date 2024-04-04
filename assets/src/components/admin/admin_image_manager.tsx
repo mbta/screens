@@ -77,10 +77,11 @@ const ImageManagerContainer = ({}): JSX.Element => {
 
 const ImageUpload = ({}): JSX.Element => {
   const [stagedImageUpload, setStagedImageUpload] =
-    useState<FileWithPreview>(null);
+    useState<FileWithPreview | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleClickUpload = async () => {
+    if (!stagedImageUpload) return;
     setIsUploading(true);
 
     const formData = new FormData();

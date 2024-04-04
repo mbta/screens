@@ -243,7 +243,6 @@ const AdminTableControls = ({
         <EditModal
           columns={columns}
           data={data}
-          setData={setData}
           selectedRowIds={selectedRowIds}
           setShowEditModal={setShowEditModal}
           setTableVersion={setTableVersion}
@@ -258,7 +257,7 @@ const AdminTableControls = ({
 };
 
 const AdminTable = ({ columns, dataFilter }): JSX.Element => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const [editable, setEditable] = useState(true);
   const [tableVersion, setTableVersion] = useState(0);
 

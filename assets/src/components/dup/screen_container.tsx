@@ -67,7 +67,7 @@ const REPLACEMENTS = {
 
 const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
   let stationName = useStationName();
-  stationName = REPLACEMENTS[stationName] || stationName;
+  stationName = REPLACEMENTS[stationName!] || stationName;
 
   return (
     <div className={classWithModifier("screen-container", "no-data")}>
@@ -95,7 +95,7 @@ const NoDataLayout = ({ code }: { code?: string }): JSX.Element => {
 
 const LoadingLayout = (): JSX.Element => {
   let stationName = useStationName();
-  stationName = REPLACEMENTS[stationName] || stationName;
+  stationName = REPLACEMENTS[stationName!] || stationName;
 
   return (
     <div className={classWithModifier("screen-container", "loading")}>

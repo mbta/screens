@@ -15,6 +15,7 @@ interface ReconAlertProps {
   effect: string;
   updated_at: string;
   disruption_diagram?: DisruptionDiagramData;
+  urgent: boolean;
 }
 
 const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {

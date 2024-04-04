@@ -155,7 +155,7 @@ const BaseMapStops = ({ stops }) => {
           />
         );
 
-        let stopLabel = null;
+        let stopLabel: JSX.Element | null = null;
         let labelText = abbreviateStop(label);
         if (downstream || current || terminal) {
           let modifier;
@@ -417,7 +417,7 @@ const Vehicle = ({ index, label }) => {
   );
 };
 
-const Vehicles = ({ vehicles, stops }) => {
+const Vehicles = ({ vehicles, stops }: { vehicles: Vehicle[], stops: Stop[] }) => {
   const maxIndex = stops.length;
   vehicles = vehicles.filter(({ index }) => index <= maxIndex);
 
@@ -444,11 +444,35 @@ const showScheduledDeparture = (stops) => {
   );
 };
 
+type Props = {
+  stops: Stop[];
+  vehicles: Vehicle[];
+  scheduled_departure: ScheduledDeparture;
+}
+
+type Stop = {
+  label: string;
+  downstream: boolean;
+  current: boolean;
+  terminal: boolean;
+}
+
+type Vehicle = {
+  id: string;
+  index: number;
+  label: string;
+}
+
+type ScheduledDeparture = {
+  timestamp: string;
+  station_name: string;
+}
+
 const LineMap = ({
   stops,
   vehicles,
   scheduled_departure: scheduledDeparture,
-}) => {
+}: Props) => {
   stops = truncateStops(stops);
 
   return (
