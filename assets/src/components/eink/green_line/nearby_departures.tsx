@@ -50,7 +50,7 @@ const NearbyDeparturesRow = ({
         <NearbyDeparturesDestination destination={destination} />
         <NearbyDeparturesTime
           time={time}
-          currentTimeStirng={currentTimeString}
+          currentTimeString={currentTimeString}
         />
       </div>
       <div className="nearby-departures__hairline"></div>
@@ -58,7 +58,7 @@ const NearbyDeparturesRow = ({
   );
 };
 
-const NearbyDepartures = ({ data, currentTimeString }): JSX.Element => {
+const NearbyDepartures = ({ data, currentTimeString }): JSX.Element | null => {
   if (!data || data.length === 0 || data.includes(null)) {
     return null;
   }

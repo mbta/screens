@@ -4,7 +4,7 @@ import { PagedSection, Section } from "Components/solari/section";
 import { classWithModifier } from "Util/util";
 
 interface Props {
-  sections: object[];
+  sections: any[];
   sectionSizes: number[];
   sectionHeaders: string;
   currentTimeString: string;
@@ -13,7 +13,7 @@ interface Props {
   isDummy?: boolean;
 }
 
-const SectionList = React.forwardRef(
+const SectionList = React.forwardRef<HTMLDivElement, Props>(
   (
     {
       sections,
@@ -23,7 +23,7 @@ const SectionList = React.forwardRef(
       overhead,
       stationName,
       isDummy = false,
-    }: Props,
+    },
     ref
   ): JSX.Element => {
     const className = isDummy

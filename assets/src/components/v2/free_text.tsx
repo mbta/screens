@@ -43,10 +43,12 @@ const getKey = (elt: string | FreeTextElementType) => {
     return `special--${elt.special}`;
   } else if (elt.icon !== undefined) {
     return `icon--${elt.icon}`;
+  } else {
+    throw new Error("empty free text element");
   }
 };
 
-const Icon = ({ icon }: { icon: string }) => {
+const Icon = ({ icon }: { icon?: string }) => {
   let iconElt;
 
   if (!icon) {
@@ -173,7 +175,7 @@ const FreeTextLine = ({
   icon,
   text,
 }: {
-  icon: string;
+  icon?: string;
   text: (string | FreeTextElementType)[];
 }) => {
   return (
@@ -189,7 +191,7 @@ const FreeTextLine = ({
 };
 
 export interface FreeTextType {
-  icon: string;
+  icon?: string;
   text: FreeTextElementType[];
 }
 

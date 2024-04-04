@@ -26,7 +26,7 @@ const parseSeverity = (severity) => {
   };
 };
 
-const InlineAlert = ({ alertData }): JSX.Element => {
+const InlineAlert = ({ alertData }): JSX.Element | null => {
   if (alertData === undefined || alertData === null) {
     return null;
   }

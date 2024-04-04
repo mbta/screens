@@ -13,6 +13,8 @@ const NormalSection = ({ rows }) => {
             return <DepartureRow {...data} key={id} />;
           } else if (type === "notice_row") {
             return <NoticeRow row={row} key={"notice" + index} />;
+          } else {
+            throw new Error(`unimplemented row type: ${type}`);
           }
         })}
       </div>

@@ -1,7 +1,7 @@
 import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useMemo, useState } from "react";
-import { getDataset, getDatasetValue } from "Util/dataset";
+import { fetchDatasetValue, getDatasetValue } from "Util/dataset";
 import { isDup, isOFM, isTriptych, getTriptychPane } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/util";
 import * as SentryLogger from "Util/sentry";
@@ -186,10 +186,11 @@ const useBaseApiResponse = ({
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
-  const { refreshRate, refreshRateOffset, screenIdsWithOffsetMap } =
-    getDataset();
-  const refreshMs = parseInt(refreshRate, 10) * 1000;
-  let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
+  const refreshRate = fetchDatasetValue("refreshRate");
+  const refreshRateOffset = fetchDatasetValue("refreshRateOffset");
+  const screenIdsWithOffsetMap = getDatasetValue("screenIdsWithOffsetMap");
+  const refreshMs = parseInt(refreshRate!, 10) * 1000;
+  let refreshRateOffsetMs = parseInt(refreshRateOffset!, 10) * 1000;
   const apiPath = useMemo(() => getApiPath(id, routePart), [id, routePart]);
 
   if (screenIdsWithOffsetMap) {

@@ -35,7 +35,7 @@ const allRoundings = (
   );
 };
 
-const assignSectionSizes = (sections: object[], numRows: number): number[] => {
+const assignSectionSizes = (sections: any[], numRows: number): number[] => {
   // set the sizes for all empty sections to 1, to accomodate the "no departures" placeholder message
   const indexedAssignedEmpties = _.mapValues(
     _.pickBy({ ...sections }, (section) => section.departures.length === 0),
@@ -61,7 +61,7 @@ const assignSectionSizes = (sections: object[], numRows: number): number[] => {
 };
 
 const assignSectionSizesHelper = (
-  sections: Record<number, object>,
+  sections: Record<number, any>,
   numRows: number
 ): Record<number, number> => {
   const initialSizes = _.mapValues(sections, (section) => {
@@ -89,7 +89,7 @@ const assignSectionSizesHelper = (
     );
   });
 
-  return roundedSizes;
+  return roundedSizes!;
 };
 
 interface Props {
@@ -189,6 +189,7 @@ class SectionListSizer extends React.Component<Props, State> {
       this.props;
 
     return (
+      // @ts-expect-error
       <SectionList
         sections={sections}
         sectionSizes={this.state.sectionSizes}

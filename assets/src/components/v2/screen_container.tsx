@@ -96,7 +96,12 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
   const responseMapper = useContext(ResponseMapperContext);
   const ErrorBoundaryOrFragment = isOFM() ? Fragment : WidgetTreeErrorBoundary;
 
-  const widgetData = responseMapper(apiResponse);
+  // We know this can only be `WidgetData` and not `SimulationApiResponse` here
+  // because `ScreenPage` is only used in contexts where a "non-simulation" API
+  // response will be received (and vice-versa for `SimulationScreenLayout`).
+  // TODO: Refactor how this works so the cast isn't needed, since it suppresses
+  // any real type errors we might have.
+  const widgetData = responseMapper(apiResponse) as WidgetData;
 
   return (
     <div className="screen-container">

@@ -21,14 +21,23 @@ const TimestampDepartureTime = ({ hour, minute }) => {
   return <div className="departure-time__timestamp">{timestamp}</div>;
 };
 
-const DepartureTime = ({ type, ...data }) => {
+type Props =
+  | (TextDeparture & { type: "text" })
+  | (MinutesDeparture & { type: "minutes" })
+  | (TimestampDeparture & { type: "timestamp" });
+
+interface TextDeparture { text: string }
+interface MinutesDeparture { minutes: number }
+interface TimestampDeparture { hour: number, minute: number }
+
+const DepartureTime = ({ type, ...data }: Props) => {
   let inner;
   if (type === "text") {
-    inner = <TextDepartureTime {...data} />;
+    inner = <TextDepartureTime {...data as TextDeparture} />;
   } else if (type === "minutes") {
-    inner = <MinutesDepartureTime {...data} />;
+    inner = <MinutesDepartureTime {...data as MinutesDeparture} />;
   } else if (type === "timestamp") {
-    inner = <TimestampDepartureTime {...data} />;
+    inner = <TimestampDepartureTime {...data as TimestampDeparture} />;
   }
 
   return (

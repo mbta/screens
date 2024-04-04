@@ -211,8 +211,9 @@ class PagedDeparture extends React.Component<
     const { pageCount, departures } = this.props;
     return (
       pageCount === otherProps.pageCount &&
-      departures.length === otherProps.departures.length &&
-      departures.every((d, i) => d.id === otherProps.departures[i].id)
+        departures.length === otherProps.departures.length &&
+        // @ts-expect-error
+        departures.every((d, i) => d.id === otherProps.departures[i].id)
     );
   }
 
@@ -280,11 +281,13 @@ class PagedDeparture extends React.Component<
       this.props.pageCount - (this.state.currentPageNumber + 1);
     const numWidePillsToTheRight = this.props.departures
       .slice(this.state.currentPageNumber + 1)
+      // @ts-expect-error
       .filter(({ route }) => WIDE_MINI_PILL_ROUTES.includes(route)).length;
     const numNormalPillsToTheRight =
       selectedRightOffset - numWidePillsToTheRight;
 
     const currentPillIsWide = WIDE_MINI_PILL_ROUTES.includes(
+      // @ts-expect-error
       currentPagedDeparture.route
     );
     const pillCenterOffset = currentPillIsWide ? 64.5 : 30; // px
@@ -312,6 +315,7 @@ class PagedDeparture extends React.Component<
             {this.props.departures.map((departure, i) => {
               const rightOffset = this.props.pageCount - (i + 1);
               return (
+                // @ts-expect-error
                 <React.Fragment key={departure.id}>
                   {rightOffset === 0 && (
                     <div
@@ -322,7 +326,9 @@ class PagedDeparture extends React.Component<
                     ></div>
                   )}
                   <PagedDepartureRoutePill
+                    // @ts-expect-error
                     route={departure.route}
+                    // @ts-expect-error
                     routeId={departure.route_id}
                     selected={i === this.state.currentPageNumber}
                   />
@@ -340,7 +346,9 @@ class PagedDeparture extends React.Component<
           </div>
         </div>
         <Departure
+          // @ts-expect-error
           {...camelizeDepartureObject(currentPagedDeparture)}
+          // @ts-expect-error
           currentTimeString={this.props.currentTimeString}
           overhead={this.props.overhead}
           groupStart={true}
@@ -352,7 +360,7 @@ class PagedDeparture extends React.Component<
 }
 
 interface DepartureListProps {
-  departure: object;
+  departures: any[];
   currentTimeString: string;
   isAnimated: boolean;
   overhead: boolean;
@@ -499,6 +507,7 @@ const PagedSection = ({
   overhead,
   isAnimated,
   currentTimeString,
+  // @ts-expect-error
   disabled,
 }: PagedSectionProps): JSX.Element => {
   const pageCount = getPageCount(departures, numRows);
@@ -521,6 +530,7 @@ const PagedSection = ({
         {disabled ? (
           <NoDataMessage pill={pill} />
         ) : (
+          // @ts-expect-error
           <NoDeparturesMessage pill={pill} />
         )}
       </SectionFrame>

@@ -70,11 +70,13 @@ const AdminConfirmControls = ({ confirmPath, setEditable, configRef }): JSX.Elem
 
 const AdminForm = ({ fetchConfig, validatePath, confirmPath }): JSX.Element => {
   const [editable, setEditable] = useState(true);
-  const configRef = useRef(null);
+  const configRef = useRef<HTMLTextAreaElement>(null);
 
   const setEditorContents = async () => {
-    const config = await fetchConfig();
-    configRef.current.value = JSON.stringify(config, null, 2);
+    if (configRef.current) {
+      const config = await fetchConfig();
+      configRef.current.value = JSON.stringify(config, null, 2);
+    }
   };
 
   useEffect(() => {

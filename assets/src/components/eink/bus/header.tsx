@@ -7,13 +7,12 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
   const SIZES = ["small", "large"];
   const MAX_HEIGHT = 216;
 
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
   const [stopSize, setStopSize] = useState(1);
   const currentTime = formatTimeString(currentTimeString);
 
   useLayoutEffect(() => {
-    const height = ref.current.clientHeight;
-    if (height > MAX_HEIGHT) {
+    if (ref.current && ref.current.clientHeight > MAX_HEIGHT) {
       setStopSize(stopSize - 1);
     }
   });
@@ -23,7 +22,7 @@ const Header = ({ stopName, currentTimeString }): JSX.Element => {
   return (
     <div className="header">
       <div className="header__environment">
-        {["screens-dev", "screens-dev-green"].includes(environmentName)
+        {["screens-dev", "screens-dev-green"].includes(environmentName!)
           ? environmentName
           : ""}
       </div>

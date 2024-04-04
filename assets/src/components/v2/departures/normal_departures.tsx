@@ -11,7 +11,8 @@ import NormalSection from "Components/v2/departures/normal_section";
 import NoticeSection from "Components/v2/departures/notice_section";
 import { LastFetchContext } from "../screen_container";
 
-const NormalDeparturesRenderer = forwardRef(
+// TODO: fully define the type of sections and their contents, replace `any`
+const NormalDeparturesRenderer = forwardRef<HTMLDivElement, any>(
   ({ sections, sectionSizes }, ref) => {
     return (
       <div className="departures-container">
@@ -24,6 +25,8 @@ const NormalDeparturesRenderer = forwardRef(
               );
             } else if (type === "notice_section") {
               return <NoticeSection {...data} key={i} />;
+            } else {
+              throw new Error(`section type not implemented: ${type}`);
             }
           })}
         </div>
@@ -92,12 +95,12 @@ const NormalDeparturesSizer = ({ sections, onDoneSizing }) => {
   const [tempSectionSizes, setTempSectionSizes] = useState(
     getInitialSectionSizes(sections)
   );
-  const ref = useRef();
+  const ref = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     if (
-      ref.current &&
-      ref.current.clientHeight > ref.current.parentNode.parentNode.clientHeight
+      ref.current?.parentElement?.parentElement &&
+      ref.current.clientHeight > ref.current.parentElement.parentElement.clientHeight
     ) {
       setTempSectionSizes((sectionSizes) => {
         return [sectionSizes[0] - 1];

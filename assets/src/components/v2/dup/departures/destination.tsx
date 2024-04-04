@@ -43,8 +43,8 @@ const RenderedDestination = ({ parts, index1, index2, currentPageIndex }) => {
 };
 
 const Destination = ({ headsign, currentPage }) => {
-  const firstLineRef = useRef(null);
-  const secondLineRef = useRef(null);
+  const firstLineRef = useRef<HTMLDivElement>(null);
+  const secondLineRef = useRef<HTMLDivElement>(null);
 
   let parts = headsign.split(" ");
 

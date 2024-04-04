@@ -21,6 +21,7 @@ const DepartureAlerts = ({ alerts }) => {
   return (
     <div className="departure-alerts">
       {alerts.map(({ id, ...data }) => (
+        // @ts-expect-error
         <DepartureAlert {...data} key={id} />
       ))}
     </div>

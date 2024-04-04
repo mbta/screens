@@ -25,6 +25,8 @@ const NormalDepartures = ({ sections }) => {
             case "overnight_section":
               return <OvernightSection text={data.text} key={i} />;
           }
+
+          throw new Error(`unimplemented section type: ${type}`);
         })}
       </div>
     </div>

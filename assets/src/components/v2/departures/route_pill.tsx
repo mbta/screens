@@ -15,6 +15,7 @@ interface BasePill {
 interface TextPill extends BasePill {
   text: string;
   size?: string;
+  branches?: string[];
 }
 
 interface IconPill extends BasePill {
@@ -89,7 +90,7 @@ const SlashedRoutePill: ComponentType<SlashedPill> = ({ part1, part2 }) => {
 const RoutePill: ComponentType<Pill> = (pill) => {
   const modifiers: string[] = [pill.color];
 
-  let innerContent = null;
+  let innerContent: JSX.Element | null = null;
   switch (pill.type) {
     case "text":
       innerContent = <TextRoutePill {...pill} />;
@@ -101,8 +102,8 @@ const RoutePill: ComponentType<Pill> = (pill) => {
       innerContent = <SlashedRoutePill {...pill} />;
   }
 
-  let branches = null;
-  if (pill.branches) {
+  let branches: JSX.Element[] | null = null;
+  if (pill.type == "text" && pill.branches) {
     branches = pill.branches.map((branch: string) => (
       <div
         key={branch}

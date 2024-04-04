@@ -11,22 +11,17 @@ export type TimeRepresentation =
 export const timeRepresentationsEqual = (rep1, rep2) => {
   if (!rep1 || !rep2) {
     return false;
-  }
-  if (rep1.type !== rep2.type) {
+  } else if (rep1.type !== rep2.type) {
     return false;
-  }
-
-  if (rep1.type === "TIMESTAMP") {
+  } else if (rep1.type === "TIMESTAMP") {
     return rep1.ampm === rep2.ampm && rep1.timestamp === rep2.timestamp;
-  }
-
-  if (rep1.type === "MINUTES") {
+  } else if (rep1.type === "MINUTES") {
     return rep1.minutes === rep2.minutes;
-  }
-
-  if (rep1.type === "TEXT") {
+  } else if (rep1.type === "TEXT") {
     return rep1.text === rep2.text;
   }
+
+  return false; // impossible?
 };
 
 export const standardTimeRepresentation = (
@@ -34,8 +29,8 @@ export const standardTimeRepresentation = (
   currentTimeString: string,
   vehicleStatus: string,
   stopType: string,
-  noMinutes: boolean,
-  forceTimestamp: boolean
+  noMinutes?: boolean,
+  forceTimestamp?: boolean
 ): TimeRepresentation => {
   const departureTime = moment(departureTimeString);
   const currentTime = moment(currentTimeString);

@@ -16,7 +16,7 @@ const FormTextCell = ({ value, header, setFormValues }) => {
   return <input defaultValue={value} onBlur={onBlur} />;
 };
 
-const buildFormSelect = (options, isNumber) => {
+const buildFormSelect = (options, isNumber?) => {
   const FormSelect = ({ value, header, setFormValues }) => {
     const onChange = (e) => {
       let newValue = e.target.value;
@@ -66,9 +66,9 @@ const FormBoolean = ({ value, header, setFormValues }) => {
 
   return (
     <select onChange={onChange} defaultValue={value}>
-      <option value={undefined}></option>
-      <option value={true}>True</option>
-      <option value={false}>False</option>
+      <option></option>
+      <option value="true">True</option>
+      <option value="false">False</option>
     </select>
   );
 };

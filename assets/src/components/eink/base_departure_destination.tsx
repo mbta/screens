@@ -5,15 +5,15 @@ const splitDestination = (destination) => {
   const parenPattern = /(.+) (\(.+)/;
 
   if (viaPattern.test(destination)) {
-    return viaPattern.exec(destination).slice(1);
+    return viaPattern.exec(destination)!.slice(1);
   } else if (parenPattern.test(destination)) {
-    return parenPattern.exec(destination).slice(1);
+    return parenPattern.exec(destination)!.slice(1);
   } else {
     return [destination];
   }
 };
 
-const BaseDepartureDestination = ({ destination }): JSX.Element => {
+const BaseDepartureDestination = ({ destination }): JSX.Element | null => {
   if (!destination) {
     return null;
   }

@@ -42,6 +42,7 @@ const TopScreenLayout = ({
         currentTimeString={currentTimeString}
         showVehicles={!isHeadwayMode}
       />
+      { /* @ts-expect-error */ }
       <Departures
         departures={departures}
         headway={headway}
@@ -93,7 +94,6 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         currentTimeString={apiResponse.current_time}
         stopName={apiResponse.stop_name}
         departures={apiResponse.departures}
-        stopId={apiResponse.stop_id}
         routeId={apiResponse.route_id}
         lineMapData={apiResponse.line_map}
         headway={apiResponse.headway}

@@ -217,7 +217,7 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
     }
 
     let textContainerClassName = "subway-status_alert_text-container";
-    const textContainerModifiers = [];
+    const textContainerModifiers: string[] = [];
     if (hideOverflow) {
       textContainerModifiers.push("hide-overflow");
     }

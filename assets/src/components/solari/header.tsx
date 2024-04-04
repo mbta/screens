@@ -17,7 +17,7 @@ const Header = ({
   return (
     <div className="header">
       <div className="header__environment">
-        {["screens-dev", "screens-dev-green"].includes(environmentName)
+        {["screens-dev", "screens-dev-green"].includes(environmentName!)
           ? environmentName
           : ""}
       </div>

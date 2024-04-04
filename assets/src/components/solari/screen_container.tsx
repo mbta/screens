@@ -79,7 +79,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
 
 const ScreenContainer = ({ id }): JSX.Element => {
   const query = new URLSearchParams(useLocation().search);
-  const datetime = query.get("datetime");
+  const datetime = query.get("datetime") || undefined;
 
   const apiResponse = useApiResponse({
     id,

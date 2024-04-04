@@ -87,7 +87,7 @@ const SectionList = ({
     <div className="section-list">
       {sections.map(({ departures, pill, headway }) => {
         if (headway) {
-          return <HeadwaySection headway={headway} pill={pill} key={pill} />;
+          return <HeadwaySection headway={headway} key={pill} />;
         } else {
           return (
             <Section

@@ -4,6 +4,12 @@ import DepartureRow from "Components/eink/bus/departure_row";
 import InlineAlert from "Components/eink/bus/inline_alert";
 import { classWithModifier } from "Util/util";
 
+type Props = {
+  currentTimeString: string
+  departures: object[]
+  size: string
+}
+
 const DepartureGroup = ({
   currentTimeString,
   departures,
@@ -37,4 +43,5 @@ const DepartureGroup = ({
   );
 };
 
+export { Props };
 export default DepartureGroup;

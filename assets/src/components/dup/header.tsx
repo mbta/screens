@@ -28,13 +28,21 @@ const Pattern = ({ pattern }: { pattern: string }): JSX.Element => {
   );
 };
 
+type Props = {
+  text: string | null
+  currentTimeString?: string
+  pattern?: string
+  color?: string
+  code?: string
+}
+
 const Header = ({
   text,
   currentTimeString,
   pattern,
   color,
   code,
-}): JSX.Element => {
+} : Props): JSX.Element => {
   const environmentName = getDatasetValue("environmentName");
 
   const className = color
@@ -46,7 +54,7 @@ const Header = ({
   return (
     <div className={className}>
       <div className="header__environment">
-        {["screens-dev", "screens-dev-green"].includes(environmentName)
+        {["screens-dev", "screens-dev-green"].includes(environmentName!)
           ? environmentName
           : ""}
       </div>
