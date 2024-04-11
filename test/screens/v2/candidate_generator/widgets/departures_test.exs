@@ -2,8 +2,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   use ExUnit.Case, async: true
 
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Departures.Filter.RouteDirection
-  alias ScreensConfig.V2.Departures.{Filter, Section}
+  alias ScreensConfig.V2.Departures.Filters.RouteDirections
+  alias ScreensConfig.V2.Departures.Filters.RouteDirections.RouteDirection
+  alias ScreensConfig.V2.Departures.{Filters, Section}
   alias ScreensConfig.V2.BusShelter
   alias ScreensConfig.V2.Departures, as: DeparturesConfig
   alias Screens.V2.CandidateGenerator.Widgets.Departures
@@ -19,10 +20,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       config = %Screen{
         app_params: %BusShelter{
           departures: %DeparturesConfig{
-            sections: [
-              %Section{query: "query A", filter: nil},
-              %Section{query: "query B", filter: nil}
-            ]
+            sections: [%Section{query: "query A"}, %Section{query: "query B"}]
           },
           header: nil,
           footer: nil,
@@ -152,37 +150,41 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
     test "filters departures with included route-directions" do
       departures = [r_d_departure("41", 1), r_d_departure("41", 0), r_d_departure("1", 1)]
 
-      filter = %Filter{
-        action: :include,
-        route_directions: [
-          %RouteDirection{route_id: "39", direction_id: 0},
-          %RouteDirection{route_id: "41", direction_id: 0}
-        ]
+      filters = %Filters{
+        route_directions: %RouteDirections{
+          action: :include,
+          targets: [
+            %RouteDirection{route_id: "39", direction_id: 0},
+            %RouteDirection{route_id: "41", direction_id: 0}
+          ]
+        }
       }
 
       expected_filtered = [r_d_departure("41", 0)]
 
-      assert {:ok, expected_filtered} == Departures.filter_departures({:ok, departures}, filter)
+      assert {:ok, expected_filtered} == Departures.filter_departures({:ok, departures}, filters)
     end
 
     test "rejects departures with excluded route-directions" do
       departures = [r_d_departure("41", 1), r_d_departure("41", 0), r_d_departure("1", 1)]
 
-      filter = %Filter{
-        action: :exclude,
-        route_directions: [
-          %RouteDirection{route_id: "39", direction_id: 0},
-          %RouteDirection{route_id: "41", direction_id: 0}
-        ]
+      filters = %Filters{
+        route_directions: %RouteDirections{
+          action: :exclude,
+          targets: [
+            %RouteDirection{route_id: "39", direction_id: 0},
+            %RouteDirection{route_id: "41", direction_id: 0}
+          ]
+        }
       }
 
       expected_filtered = [r_d_departure("41", 1), r_d_departure("1", 1)]
 
-      assert {:ok, expected_filtered} == Departures.filter_departures({:ok, departures}, filter)
+      assert {:ok, expected_filtered} == Departures.filter_departures({:ok, departures}, filters)
     end
 
     test "passes through :error" do
-      assert :error == Departures.filter_departures(:error, nil)
+      assert :error == Departures.filter_departures(:error, %Filters{})
     end
   end
 
