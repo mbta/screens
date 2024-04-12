@@ -31,7 +31,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     def priority(%CRDeparturesWidget{config: config}), do: config.priority
 
     def serialize(%CRDeparturesWidget{
-          config: %CRDepartures{station: station} = config,
+          config: %CRDepartures{station: station, is_free: is_free} = config,
           departures_data: departures_data,
           destination: destination,
           direction_to_destination: direction_to_destination,
@@ -54,7 +54,8 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
         station: station,
         destination: destination,
         direction: direction_to_destination,
-        header_pill: RoutePill.serialize_icon(header_pill)
+        header_pill: RoutePill.serialize_icon(header_pill),
+        is_free: is_free
       }
     end
 
