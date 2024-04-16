@@ -7,6 +7,7 @@
     "watch": "concurrently --kill-others --prefix-colors auto npm:watch-*",
     "watch-build": "webpack --mode development --stats minimal --watch",
     "watch-tsc": "tsc --noEmit --preserveWatchOutput --watch",
+    "tsc:check": "tsc --noEmit",
     "lint": "tslint --fix -p .",
     "lint:check": "tslint -p .",
     "format": "prettier --list-different \"{.,**}/*.{js,json,ts,tsx,css,scss}\" | xargs prettier --write",

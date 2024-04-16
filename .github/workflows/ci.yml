@@ -65,3 +65,21 @@ jobs:
         with:
           name: elixir-lcov
           path: cover/
+
+  js-build:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - working-directory: ./assets
+        run: npm run deploy
+
+  js-types:
+    name: Frontend Types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - working-directory: ./assets
+        run: npm run tsc:check
