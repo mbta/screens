@@ -4,7 +4,9 @@
   "scripts": {
     "deploy": "webpack --mode production",
     "test": "jest",
-    "watch": "webpack --mode development --watch",
+    "watch": "concurrently --kill-others --prefix-colors auto npm:watch-*",
+    "watch-build": "webpack --mode development --stats minimal --watch",
+    "watch-tsc": "tsc --noEmit --preserveWatchOutput --watch",
     "lint": "tslint --fix -p .",
     "lint:check": "tslint -p .",
     "format": "prettier --list-different \"{.,**}/*.{js,json,ts,tsx,css,scss}\" | xargs prettier --write",
@@ -46,6 +48,7 @@
     "@types/react-dom": "^17.0.9",
     "@types/react-router-dom": "^5.1.8",
     "babel-loader": "^8.2.2",
+    "concurrently": "^8.2.2",
     "copy-webpack-plugin": "^6.4.1",
     "css-loader": "^5.2.7",
     "file-loader": "^6.2.0",
