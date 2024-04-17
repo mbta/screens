@@ -280,6 +280,21 @@ config :screens,
         alert_headsign: "Braintree",
         headway_headsign: "Alewife"
       }
+    ],
+    # Maverick
+    "place-mvbcl" => [
+      %{
+        informed: "70048",
+        not_informed: "70044",
+        alert_headsign: "Wonderland",
+        headway_headsign: "Bowdoin"
+      },
+      %{
+        informed: "70043",
+        not_informed: "70047",
+        alert_headsign: "Bowdoin",
+        headway_headsign: "Wonderland"
+      }
     ]
   },
   prefare_alert_headsign_matchers: %{
