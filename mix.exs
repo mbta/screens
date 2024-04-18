@@ -73,7 +73,7 @@ defmodule Screens.MixProject do
       {:guardian, "~> 2.3.1"},
       {:ueberauth, "~> 0.10"},
       {:ueberauth_oidcc, "~> 0.3"},
-      {:corsica, "~> 1.0"},
+      {:corsica, "~> 2.1"},
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
       {:sentry, "~> 10.4"},
       {:retry, "~> 0.16.0"},
