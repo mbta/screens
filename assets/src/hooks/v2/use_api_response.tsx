@@ -187,10 +187,10 @@ const useBaseApiResponse = ({
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const refreshRate = fetchDatasetValue("refreshRate");
-  const refreshRateOffset = fetchDatasetValue("refreshRateOffset");
+  const refreshRateOffset = getDatasetValue("refreshRateOffset") || "0";
   const screenIdsWithOffsetMap = getDatasetValue("screenIdsWithOffsetMap");
   const refreshMs = parseInt(refreshRate!, 10) * 1000;
-  let refreshRateOffsetMs = parseInt(refreshRateOffset!, 10) * 1000;
+  let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
   const apiPath = useMemo(() => getApiPath(id, routePart), [id, routePart]);
 
   if (screenIdsWithOffsetMap) {
