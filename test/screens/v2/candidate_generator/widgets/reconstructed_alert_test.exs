@@ -6,7 +6,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
   alias Screens.Alerts.Alert
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Header.CurrentStopId
-  alias ScreensConfig.V2.{PreFare, Solari}
+  alias ScreensConfig.V2.{Busway, PreFare}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
@@ -36,7 +36,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             })
         })
 
-      bad_config = struct(Screen, %{app_params: struct(Solari)})
+      bad_config = struct(Screen, %{app_params: struct(Busway)})
 
       routes_at_stop = [
         %{

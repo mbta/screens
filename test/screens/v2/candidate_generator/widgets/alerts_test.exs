@@ -5,7 +5,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
 
   alias Screens.Alerts.Alert
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{Alerts, BusShelter, Solari}
+  alias ScreensConfig.V2.{Alerts, BusShelter, Busway}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
@@ -28,7 +28,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
 
       config = struct(Screen, %{app_params: struct(app, %{alerts: %Alerts{stop_id: stop_id}})})
 
-      bad_config = struct(Screen, %{app_params: struct(Solari)})
+      bad_config = struct(Screen, %{app_params: struct(Busway)})
 
       routes_at_stop = [
         %{route_id: "22", active?: true},

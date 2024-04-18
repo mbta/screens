@@ -3,7 +3,7 @@ Make a copy of this file within this directory, and rename it to your_feature_na
 
 Consider all sections optional, and feel free to add new ones! These are just guidelines.
 
-Once satisfied with your tech spec, commit it on a branch, push to GitHub, open a PR, and follow the usual review process. Merge into master once approved.
+Once satisfied with your tech spec, commit it on a branch, push to GitHub, open a PR, and follow the usual review process. Merge into `main` once approved.
 
 BEGIN TEMPLATE
 

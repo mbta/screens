@@ -37,8 +37,8 @@ const AdminNavbar = (): JSX.Element => {
       <Link to="/gl-eink-v2-screens">
         <button>GL Eink V2 Screens Table</button>
       </Link>
-      <Link to="/solari-v2-screens">
-        <button>Solari V2 Screens Table</button>
+      <Link to="/busway-v2-screens">
+        <button>Busway V2 Screens Table</button>
       </Link>
       <Link to="/solari-large-v2-screens">
         <button>Solari Large V2 Screens Table</button>

@@ -60,7 +60,7 @@ defmodule Screens.MixProject do
       {:httpoison, "~> 2.2.1"},
       {:tzdata, "~> 1.1"},
       {:credo, "~> 1.6.0"},
-      {:dialyxir, "~> 1.1.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4.3", only: [:dev, :test], runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.1"},
@@ -69,7 +69,7 @@ defmodule Screens.MixProject do
       {:ehmon, github: "mbta/ehmon", only: :prod},
       {:sweet_xml, "~> 0.7.0"},
       {:timex, "~> 3.6"},
-      {:hackney, "== 1.17.4"},
+      {:hackney, "== 1.20.1"},
       {:guardian, "~> 2.3.1"},
       {:ueberauth, "~> 0.10"},
       {:ueberauth_oidcc, "~> 0.3"},
@@ -84,7 +84,7 @@ defmodule Screens.MixProject do
       {:telemetry_metrics, "~> 0.4"},
       {:screens_config,
        git: "https://github.com/mbta/screens-config-lib.git",
-       ref: "92e9fdfe0cf8cd46a3c9122403d29469b3d46c16"}
+       ref: "6599d0df9c5bebbfb762e0ae8ae6af6f6c0359d0"}
     ]
   end
 end

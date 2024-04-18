@@ -5,16 +5,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Departures.Filter.RouteDirection
-  alias ScreensConfig.V2.Departures.{Filter, Query, Section}
-  alias ScreensConfig.V2.{BusEink, BusShelter, Departures, GlEink, Solari, SolariLarge}
+  alias ScreensConfig.V2.Departures.Filters.RouteDirections
+  alias ScreensConfig.V2.Departures.Filters.RouteDirections.RouteDirection
+  alias ScreensConfig.V2.Departures.{Filters, Query, Section}
+  alias ScreensConfig.V2.{BusEink, BusShelter, Busway, Departures, GlEink, SolariLarge}
 
   def departures_instances(
         %Screen{app_params: %app{}} = config,
         fetch_section_departures_fn \\ &fetch_section_departures/1,
         post_processing_fn \\ fn sections, _config -> sections end
       )
-      when app in [BusEink, BusShelter, GlEink, SolariLarge, Solari] do
+      when app in [BusEink, BusShelter, Busway, GlEink, SolariLarge] do
     if Screens.Config.Cache.mode_disabled?(get_devops_mode(config)) do
       [%DeparturesNoData{screen: config, show_alternatives?: false}]
     else
@@ -22,10 +23,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     end
   end
 
-  def fetch_section_departures(%Section{query: query, filter: filter}) do
+  def fetch_section_departures(%Section{query: query, filters: filters}) do
     query
     |> fetch_departures()
-    |> filter_departures(filter)
+    |> filter_departures(filters)
   end
 
   defp do_departures_instances(
@@ -76,25 +77,29 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   def filter_departures(:error, _), do: :error
 
-  def filter_departures({:ok, departures}, %Filter{
-        action: :include,
-        route_directions: route_directions
-      }) do
-    {:ok, Enum.filter(departures, &departure_in_route_directions?(&1, route_directions))}
+  def filter_departures({:ok, departures}, %Filters{route_directions: route_directions}) do
+    {:ok, filter_by_route_direction(departures, route_directions)}
   end
 
-  def filter_departures({:ok, departures}, %Filter{
-        action: :exclude,
-        route_directions: route_directions
-      }) do
-    {:ok, Enum.reject(departures, &departure_in_route_directions?(&1, route_directions))}
+  defp filter_by_route_direction(departures, %RouteDirections{
+         action: :include,
+         targets: targets
+       }) do
+    Enum.filter(departures, &departure_in_route_directions?(&1, targets))
   end
 
-  def filter_departures({:ok, departures}, nil) do
-    {:ok, departures}
+  defp filter_by_route_direction(departures, %RouteDirections{
+         action: :exclude,
+         targets: targets
+       }) do
+    Enum.reject(departures, &departure_in_route_directions?(&1, targets))
   end
 
-  def departure_in_route_directions?(d, route_directions) do
+  defp filter_by_route_direction(departures, nil) do
+    departures
+  end
+
+  defp departure_in_route_directions?(d, route_directions) do
     route_direction(d) in route_directions
   end
 

@@ -17,24 +17,6 @@
   width: 964px;
   height: 100%;
   position: relative;
-}
-
-.normal-header-title__text {
-  display: inline-block;
-  vertical-align: middle;
-  font-family: Helvetica, sans-serif;
-  font-weight: 700;
-  color: #ffffff;
-
-  &--with-icon {
-    width: 768px;
-  }
-
-  &--no-icon {
-    margin-left: 40px;
-    margin-top: 40px;
-    width: 864px;
-  }
 
   &--large {
     font-size: 96px;
@@ -44,6 +26,24 @@
   &--small {
     font-size: 72px;
     line-height: 72px;
+  }
+}
+
+.normal-header-title__text {
+  display: inline-block;
+  vertical-align: middle;
+  font-family: Helvetica, sans-serif;
+  font-weight: 700;
+  color: #ffffff;
+
+  .normal-header-title--with-icon & {
+    width: 768px;
+  }
+
+  .normal-header-title--no-icon & {
+    margin-left: 40px;
+    margin-top: 40px;
+    width: 864px;
   }
 }
 

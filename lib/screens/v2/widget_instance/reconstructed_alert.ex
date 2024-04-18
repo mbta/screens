@@ -377,6 +377,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         screen: %Screen{
           app_params: %PreFare{
             cr_departures: %CRDepartures{
+              enabled: true,
               pair_with_alert_widget: true
             }
           }

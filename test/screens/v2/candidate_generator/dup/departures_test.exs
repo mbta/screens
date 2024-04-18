@@ -280,12 +280,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config =
         config
         |> put_primary_departures([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil},
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}, filter: nil}
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}},
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}}
         ])
         |> put_secondary_departures_sections([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-C"]}}, filter: nil},
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-D"]}}, filter: nil}
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-C"]}}},
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-D"]}}}
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
@@ -445,8 +445,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     } do
       config =
         put_primary_departures(config, [
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil},
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}, filter: nil}
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}},
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}}
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
@@ -618,10 +618,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         put_primary_departures(config, [
           %Section{
             bidirectional: true,
-            query: %Query{params: %Query.Params{stop_ids: ["place-F"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["place-F"]}}
           },
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}, filter: nil}
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}}
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
@@ -793,8 +792,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         put_primary_departures(config, [
           %Section{
             bidirectional: true,
-            query: %Query{params: %Query.Params{stop_ids: ["place-G"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["place-G"]}}
           }
         ])
 
@@ -892,7 +890,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         put_primary_departures(config, [
           %Section{
             query: %Query{params: %Query.Params{stop_ids: ["place-B"]}},
-            filter: nil,
             headway: %Headway{headway_id: "red_trunk"}
           }
         ])
@@ -1080,7 +1077,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         put_primary_departures(config, [
           %Section{
             query: %Query{params: %Query.Params{stop_ids: ["place-B"]}},
-            filter: nil,
             headway: %Headway{headway_id: "red_trunk"}
           }
         ])
@@ -1169,7 +1165,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         put_primary_departures(config, [
           %Section{
             query: %Query{params: %Query.Params{stop_ids: ["place-B"]}},
-            filter: nil,
             headway: %Headway{headway_id: "red_trunk"}
           }
         ])
@@ -1376,7 +1371,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         put_primary_departures(config, [
           %Section{
             query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}},
-            filter: nil,
             headway: %Headway{headway_id: "green_trunk"}
           }
         ])
@@ -1534,7 +1528,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         put_primary_departures(config, [
           %Section{
             query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}},
-            filter: nil,
             headway: %Headway{headway_id: "green_trunk"}
           }
         ])
@@ -1653,22 +1646,18 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         |> put_primary_departures([
           %Section{
             query: %Query{params: %Query.Params{stop_ids: ["Boat"]}},
-            filter: nil,
             headway: %Headway{headway_id: "ferry"}
           },
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Orange"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Orange"]}}
           }
         ])
         |> put_secondary_departures_sections([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Orange"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Orange"]}}
           },
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Green"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Green"]}}
           }
         ])
 
@@ -1778,19 +1767,16 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         config
         |> put_primary_departures([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-E"], route_ids: []}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["place-E"], route_ids: []}}
           }
         ])
         |> put_secondary_departures_sections([
           %Section{
             query: %Query{params: %Query.Params{stop_ids: ["Boat"]}},
-            filter: nil,
             headway: %Headway{headway_id: "ferry"}
           },
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Green"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Green"]}}
           }
         ])
 
@@ -1826,14 +1812,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         config
         |> put_primary_departures([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}
           }
         ])
         |> put_secondary_departures_sections([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-A", "bus-B"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["bus-A", "bus-B"]}}
           }
         ])
 
@@ -1962,14 +1946,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         config
         |> put_primary_departures([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}
           }
         ])
         |> put_secondary_departures_sections([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-A", "bus-B"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["bus-A", "bus-B"]}}
           }
         ])
 
@@ -2092,8 +2074,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         config
         |> put_primary_departures([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-B"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["bus-B"]}}
           }
         ])
 
@@ -2165,8 +2146,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         config
         |> put_primary_departures([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-B"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["bus-B"]}}
           }
         ])
 
@@ -2231,14 +2211,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         config
         |> put_primary_departures([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}
           }
         ])
         |> put_secondary_departures_sections([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-B"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["bus-B"]}}
           }
         ])
 
@@ -2338,8 +2316,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         config
         |> put_primary_departures([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-B"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["bus-B"]}}
           }
         ])
 
@@ -2397,8 +2374,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         config
         |> put_primary_departures([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-overnight"]}},
-            filter: nil
+            query: %Query{params: %Query.Params{stop_ids: ["place-overnight"]}}
           }
         ])
 
