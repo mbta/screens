@@ -75,7 +75,7 @@ defmodule Screens.MixProject do
       {:ueberauth_oidcc, "~> 0.3"},
       {:corsica, "~> 1.0"},
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
-      {:sentry, "~> 8.0"},
+      {:sentry, "~> 10.4"},
       {:retry, "~> 0.16.0"},
       {:stream_data, "~> 0.5", only: :test},
       {:memcachex, "~> 0.5.5"},
