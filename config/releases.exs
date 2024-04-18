@@ -42,19 +42,20 @@ config :screens, ScreensWeb.Endpoint,
   http: [:inet6, port: String.to_integer(System.get_env("PORT") || "4000")],
   secret_key_base: secret_key_base
 
+sentry_dsn = System.get_env("SENTRY_DSN")
+
 config :screens,
   api_v3_key: api_v3_key,
   environment_name: eb_env_name,
   signs_ui_s3_bucket: signs_ui_s3_bucket,
-  sentry_frontend_dsn: System.get_env("SENTRY_DSN"),
+  sentry_frontend_dsn: sentry_dsn,
   screenplay_fullstory_org_id: System.get_env("SCREENPLAY_FULLSTORY_ORG_ID")
 
-config :sentry,
-  dsn: System.get_env("SENTRY_DSN"),
-  environment_name: eb_env_name,
-  included_environments: [eb_env_name],
-  enable_source_code_context: true,
-  root_source_code_path: File.cwd!()
+if sentry_dsn not in [nil, ""] do
+  config :sentry,
+    dsn: sentry_dsn,
+    environment_name: eb_env_name
+end
 
 config :screens, ScreensWeb.AuthManager, secret_key: screens_auth_secret
 
