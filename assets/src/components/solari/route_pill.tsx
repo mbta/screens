@@ -69,31 +69,33 @@ const routeToPill = (
 };
 
 const Pill = ({ routeName, routePillColor }: PillType): JSX.Element => {
-  let routeImg: JSX.Element | undefined;
+  let route: JSX.Element | string | null;
 
   if (routeName === "CR") {
-    routeImg = (
+    route = (
       <img
         className="departure-route--icon"
         src={imagePath("commuter-rail.svg")}
       ></img>
     );
   } else if (routeName === "Boat") {
-    routeImg = (
+    route = (
       <img className="departure-route--icon" src={imagePath("ferry.svg")}></img>
     );
   } else if (routeName === "BUS") {
-    routeImg = (
+    route = (
       <img
         className="departure-route--icon"
         src={imagePath("bus-black.svg")}
       ></img>
     );
+  } else {
+    route = routeName;
   }
 
   return (
     <div className={classWithModifier("departure-route", routePillColor)}>
-      {routeImg && <BaseRoutePill route={routeImg} />}
+      {route && <BaseRoutePill route={route} />}
     </div>
   );
 };
