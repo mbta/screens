@@ -25,7 +25,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           }
         } = config,
         now,
-        fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
+        fetch_departures_fn \\ &Departure.fetch/2,
         fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1,
         fetch_schedules_fn \\ &Screens.Schedules.Schedule.fetch/2,
         create_station_with_routes_map_fn \\ &Screens.Stops.Stop.create_station_with_routes_map/1,
@@ -34,7 +34,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     primary_departures_instances =
       primary_sections
       |> get_sections_data(
-        fetch_section_departures_fn,
+        fetch_departures_fn,
         fetch_alerts_fn,
         create_station_with_routes_map_fn,
         now
@@ -62,7 +62,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     secondary_departures_instances =
       secondary_sections
       |> get_sections_data(
-        fetch_section_departures_fn,
+        fetch_departures_fn,
         fetch_alerts_fn,
         create_station_with_routes_map_fn,
         now
@@ -205,7 +205,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp get_sections_data(
          sections,
-         fetch_section_departures_fn,
+         fetch_departures_fn,
          fetch_alerts_fn,
          create_station_with_routes_map_fn,
          now
@@ -231,7 +231,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         %{type: :no_data_section, route: primary_route_for_section}
       else
         section_departures =
-          case fetch_section_departures_fn.(section) do
+          case Widgets.Departures.fetch_section_departures(section, fetch_departures_fn) do
             {:ok, []} ->
               []
 

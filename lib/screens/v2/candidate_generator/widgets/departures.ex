@@ -10,36 +10,43 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias ScreensConfig.V2.Departures.{Filters, Query, Section}
   alias ScreensConfig.V2.{BusEink, BusShelter, Busway, Departures, GlEink, SolariLarge}
 
-  def departures_instances(
-        %Screen{app_params: %app{}} = config,
-        fetch_section_departures_fn \\ &fetch_section_departures/1,
-        post_processing_fn \\ fn sections, _config -> sections end
-      )
+  @type options :: [
+          departure_fetch_fn: Departure.fetch(),
+          post_process_fn: ([Departure.result()], Screen.t() -> [Departure.result() | :overnight])
+        ]
+
+  @type widget ::
+          DeparturesNoData.t()
+          | DeparturesNoService.t()
+          | DeparturesWidget.t()
+          | OvernightDepartures.t()
+
+  @spec departures_instances(Screen.t()) :: [widget()]
+  @spec departures_instances(Screen.t(), options()) :: [widget()]
+  def departures_instances(%Screen{app_params: %app{}} = config, options \\ [])
       when app in [BusEink, BusShelter, Busway, GlEink, SolariLarge] do
     if Screens.Config.Cache.mode_disabled?(get_devops_mode(config)) do
       [%DeparturesNoData{screen: config, show_alternatives?: false}]
     else
-      do_departures_instances(config, fetch_section_departures_fn, post_processing_fn)
+      do_departures_instances(
+        config,
+        Keyword.get(options, :departure_fetch_fn, &Departure.fetch/2),
+        Keyword.get(options, :post_process_fn, fn results, _config -> results end)
+      )
     end
-  end
-
-  def fetch_section_departures(%Section{query: query, filters: filters}) do
-    query
-    |> fetch_departures()
-    |> filter_departures(filters)
   end
 
   defp do_departures_instances(
          %Screen{app_params: %{departures: %Departures{sections: sections}}, app_id: app_id} =
            config,
-         fetch_section_departures_fn,
-         post_processing_fn
+         departure_fetch_fn,
+         post_process_fn
        ) do
     sections_data =
       sections
-      |> Task.async_stream(fetch_section_departures_fn, timeout: 30_000)
-      |> Enum.map(fn {:ok, data} -> data end)
-      |> post_processing_fn.(config)
+      |> Task.async_stream(&fetch_section_departures(&1, departure_fetch_fn), timeout: 30_000)
+      |> Enum.map(fn {:ok, result} -> result end)
+      |> post_process_fn.(config)
 
     departures_instance =
       cond do
@@ -64,21 +71,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     [departures_instance]
   end
 
-  defp fetch_departures(%Query{opts: opts, params: params}) do
-    fetch_opts =
-      opts
-      |> Map.from_struct()
-      |> Keyword.new()
-
+  @spec fetch_section_departures(Section.t()) :: Departure.result()
+  @spec fetch_section_departures(Section.t(), Departure.fetch()) :: Departure.result()
+  def fetch_section_departures(
+        %Section{query: %Query{opts: opts, params: params}, filters: filters},
+        departure_fetch_fn \\ &Departure.fetch/2
+      ) do
     fetch_params = Map.from_struct(params)
+    fetch_opts = opts |> Map.from_struct() |> Keyword.new()
 
-    Departure.fetch(fetch_params, fetch_opts)
+    with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
+      {:ok, filter_departures(departures, filters)}
+    end
   end
 
-  def filter_departures(:error, _), do: :error
-
-  def filter_departures({:ok, departures}, %Filters{route_directions: route_directions}) do
-    {:ok, filter_by_route_direction(departures, route_directions)}
+  defp filter_departures(departures, %Filters{route_directions: route_directions}) do
+    filter_by_route_direction(departures, route_directions)
   end
 
   defp filter_by_route_direction(departures, %RouteDirections{
