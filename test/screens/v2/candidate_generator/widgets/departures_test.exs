@@ -216,5 +216,47 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       assert {:ok, included_departures} ==
                Departures.fetch_section_departures(section, fetch_fn)
     end
+
+    test "filters departures for sections configured as bidirectional" do
+      config = build_config([])
+
+      config =
+        put_in(config.app_params.departures.sections, [
+          %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}, bidirectional: true},
+          %Section{query: %Query{params: %Query.Params{route_ids: ["B"]}}}
+        ])
+
+      fetch_fn =
+        build_fetch_fn(%{
+          "A" =>
+            {:ok,
+             [
+               # take
+               build_departure("A", 0),
+               # filter out: same as first
+               build_departure("A", 0),
+               # take
+               build_departure("A", 1),
+               # filter out: same as first
+               build_departure("A", 0)
+             ]},
+          "B" => {:ok, [build_departure("B", 0), build_departure("B", 0)]}
+        })
+
+      expected_departures_instances = [
+        %DeparturesWidget{
+          screen: config,
+          section_data: [
+            %{type: :normal_section, rows: [build_departure("A", 0), build_departure("A", 1)]},
+            %{type: :normal_section, rows: [build_departure("B", 0), build_departure("B", 0)]}
+          ]
+        }
+      ]
+
+      actual_departures_instances =
+        Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
+
+      assert expected_departures_instances == actual_departures_instances
+    end
   end
 end
