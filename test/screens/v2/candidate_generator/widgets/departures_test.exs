@@ -4,23 +4,36 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Departures.Filters.RouteDirections
   alias ScreensConfig.V2.Departures.Filters.RouteDirections.RouteDirection
-  alias ScreensConfig.V2.Departures.{Filters, Section}
+  alias ScreensConfig.V2.Departures.{Filters, Query, Section}
   alias ScreensConfig.V2.BusShelter
   alias ScreensConfig.V2.Departures, as: DeparturesConfig
   alias Screens.V2.CandidateGenerator.Widgets.Departures
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Trips.Trip
 
+  defp build_departure(route_id, direction_id) do
+    %Departure{
+      prediction: %Prediction{
+        route: %Route{id: route_id},
+        trip: %Trip{direction_id: direction_id}
+      }
+    }
+  end
+
   describe "departures_instances/1" do
-    setup do
-      config = %Screen{
+    defp build_config(section_route_ids) do
+      %Screen{
         app_params: %BusShelter{
           departures: %DeparturesConfig{
-            sections: [%Section{query: "query A"}, %Section{query: "query B"}]
+            sections:
+              Enum.map(
+                section_route_ids,
+                &%Section{query: %Query{params: %Query.Params{route_ids: [&1]}}}
+              )
           },
           header: nil,
           footer: nil,
@@ -29,41 +42,41 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         vendor: nil,
         device_id: nil,
         name: nil,
-        app_id: nil
+        app_id: :bus_shelter_v2
       }
-
-      %{config: config}
     end
 
-    test "returns DeparturesWidget when all section requests succeed and receive departure data",
-         %{config: config} do
-      fetch_section_departures_fn = fn
-        %Section{query: "query A"} -> {:ok, ["departure A1", "departure A2"]}
-        %Section{query: "query B"} -> {:ok, ["departure B1", "departure B2"]}
+    defp build_fetch_fn(route_ids_to_results) do
+      fn %{route_ids: [route_id]}, _opts ->
+        Map.fetch!(route_ids_to_results, route_id)
       end
+    end
+
+    test "returns DeparturesWidget when all section requests succeed with departure data" do
+      config = build_config(["A", "B"])
+      departures_a = [build_departure("A", 0), build_departure("A", 1)]
+      departures_b = [build_departure("B", 0), build_departure("B", 1)]
+      fetch_fn = build_fetch_fn(%{"A" => {:ok, departures_a}, "B" => {:ok, departures_b}})
 
       expected_departures_instances = [
         %DeparturesWidget{
           screen: config,
           section_data: [
-            %{type: :normal_section, rows: ["departure A1", "departure A2"]},
-            %{type: :normal_section, rows: ["departure B1", "departure B2"]}
+            %{type: :normal_section, rows: departures_a},
+            %{type: :normal_section, rows: departures_b}
           ]
         }
       ]
 
       actual_departures_instances =
-        Departures.departures_instances(config, fetch_section_departures_fn)
+        Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
 
       assert expected_departures_instances == actual_departures_instances
     end
 
-    test "returns DeparturesWidget when all sections requests succeed but receive no departure data",
-         %{config: config} do
-      fetch_section_departures_fn = fn
-        %Section{query: "query A"} -> {:ok, []}
-        %Section{query: "query B"} -> {:ok, []}
-      end
+    test "returns DeparturesWidget when all section requests succeed with empty departures" do
+      config = build_config(["A", "B"])
+      fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, []}})
 
       expected_departures_instances = [
         %DeparturesWidget{
@@ -76,54 +89,60 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       ]
 
       actual_departures_instances =
-        Departures.departures_instances(config, fetch_section_departures_fn)
+        Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
 
       assert expected_departures_instances == actual_departures_instances
     end
 
-    test "returns DeparturesNoData if any section request fails", %{config: config} do
-      fetch_section_departures_fn = fn
-        %Section{query: "query A"} -> {:ok, []}
-        %Section{query: "query B"} -> :error
-      end
+    test "returns DeparturesNoData if any section request fails" do
+      config = build_config(["A", "B"])
+      fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => :error})
 
       expected_departures_instances = [
         %DeparturesNoData{screen: config, show_alternatives?: true}
       ]
 
       actual_departures_instances =
-        Departures.departures_instances(config, fetch_section_departures_fn)
+        Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
 
       assert expected_departures_instances == actual_departures_instances
     end
 
-    test "returns OvernightDepartures if sections_data contains overnight atom", %{config: config} do
-      fetch_section_departures_fn = fn
-        %Section{query: "query A"} -> {:ok, []}
-        %Section{query: "query B"} -> {:ok, []}
-      end
+    test "returns DeparturesNoService for bus e-ink when there is a single empty section" do
+      config = %Screen{build_config(["E"]) | app_id: :bus_eink_v2}
+      fetch_fn = build_fetch_fn(%{"E" => {:ok, []}})
 
-      post_processing_fn = fn _sections, _config ->
-        [:overnight]
-      end
-
-      expected_departures_instances = [
-        %OvernightDepartures{}
-      ]
+      expected_departures_instances = [%DeparturesNoService{screen: config}]
 
       actual_departures_instances =
-        Departures.departures_instances(config, fetch_section_departures_fn, post_processing_fn)
+        Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
 
       assert expected_departures_instances == actual_departures_instances
     end
 
-    test "returns DeparturesWidget with results from post processing", %{config: config} do
-      fetch_section_departures_fn = fn
-        %Section{query: "query A"} -> {:ok, []}
-        %Section{query: "query B"} -> {:ok, ["departure B1"]}
-      end
+    test "returns OvernightDepartures if post-process result is [:overnight]" do
+      config = build_config(["A", "B"])
+      fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, []}})
+      post_fn = fn [{:ok, []}, {:ok, []}], _config -> [:overnight] end
 
-      post_processing_fn = fn sections, _config ->
+      expected_departures_instances = [%OvernightDepartures{}]
+
+      actual_departures_instances =
+        Departures.departures_instances(
+          config,
+          departure_fetch_fn: fetch_fn,
+          post_process_fn: post_fn
+        )
+
+      assert expected_departures_instances == actual_departures_instances
+    end
+
+    test "returns DeparturesWidget with results from post processing" do
+      config = build_config(["A", "B"])
+      departure_b = build_departure("B", 0)
+      fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, [departure_b]}})
+
+      post_process_fn = fn sections, _config ->
         Enum.map(sections, fn {:ok, departures} ->
           {:ok, departures ++ ["notice"]}
         end)
@@ -134,66 +153,68 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
           screen: config,
           section_data: [
             %{type: :normal_section, rows: ["notice"]},
-            %{type: :normal_section, rows: ["departure B1", "notice"]}
+            %{type: :normal_section, rows: [departure_b, "notice"]}
           ]
         }
       ]
 
       actual_departures_instances =
-        Departures.departures_instances(config, fetch_section_departures_fn, post_processing_fn)
+        Departures.departures_instances(
+          config,
+          departure_fetch_fn: fetch_fn,
+          post_process_fn: post_process_fn
+        )
 
       assert expected_departures_instances == actual_departures_instances
     end
   end
 
-  describe "filter_departures/2" do
+  describe "fetch_section_departures/1" do
     test "filters departures with included route-directions" do
-      departures = [r_d_departure("41", 1), r_d_departure("41", 0), r_d_departure("1", 1)]
-
-      filters = %Filters{
-        route_directions: %RouteDirections{
-          action: :include,
-          targets: [
-            %RouteDirection{route_id: "39", direction_id: 0},
-            %RouteDirection{route_id: "41", direction_id: 0}
-          ]
+      section = %Section{
+        query: %Query{params: %Query.Params{stop_ids: ["S"]}},
+        filters: %Filters{
+          route_directions: %RouteDirections{
+            action: :include,
+            targets: [
+              %RouteDirection{route_id: "39", direction_id: 0},
+              %RouteDirection{route_id: "41", direction_id: 0}
+            ]
+          }
         }
       }
 
-      expected_filtered = [r_d_departure("41", 0)]
+      included_departure = build_departure("41", 0)
 
-      assert {:ok, expected_filtered} == Departures.filter_departures({:ok, departures}, filters)
+      fetch_fn = fn %{stop_ids: ["S"]}, _ ->
+        {:ok, [build_departure("41", 1), included_departure, build_departure("1", 1)]}
+      end
+
+      assert {:ok, [included_departure]} == Departures.fetch_section_departures(section, fetch_fn)
     end
 
     test "rejects departures with excluded route-directions" do
-      departures = [r_d_departure("41", 1), r_d_departure("41", 0), r_d_departure("1", 1)]
-
-      filters = %Filters{
-        route_directions: %RouteDirections{
-          action: :exclude,
-          targets: [
-            %RouteDirection{route_id: "39", direction_id: 0},
-            %RouteDirection{route_id: "41", direction_id: 0}
-          ]
+      section = %Section{
+        query: %Query{params: %Query.Params{stop_ids: ["S"]}},
+        filters: %Filters{
+          route_directions: %RouteDirections{
+            action: :exclude,
+            targets: [
+              %RouteDirection{route_id: "39", direction_id: 0},
+              %RouteDirection{route_id: "41", direction_id: 0}
+            ]
+          }
         }
       }
 
-      expected_filtered = [r_d_departure("41", 1), r_d_departure("1", 1)]
+      included_departures = [build_departure("41", 1), build_departure("1", 1)]
 
-      assert {:ok, expected_filtered} == Departures.filter_departures({:ok, departures}, filters)
+      fetch_fn = fn %{stop_ids: ["S"]}, _ ->
+        {:ok, [build_departure("41", 0) | included_departures]}
+      end
+
+      assert {:ok, included_departures} ==
+               Departures.fetch_section_departures(section, fetch_fn)
     end
-
-    test "passes through :error" do
-      assert :error == Departures.filter_departures(:error, %Filters{})
-    end
-  end
-
-  defp r_d_departure(route_id, direction_id) do
-    %Departure{
-      prediction: %Prediction{
-        route: %Route{id: route_id},
-        trip: %Trip{direction_id: direction_id}
-      }
-    }
   end
 end

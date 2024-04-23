@@ -81,20 +81,14 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         _opts,
         now \\ DateTime.utc_now(),
         fetch_destination_fn \\ &fetch_destination/2,
-        departures_instances_fn \\ &Widgets.Departures.departures_instances/3,
+        departures_instances_fn \\ &Widgets.Departures.departures_instances/2,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
         subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/2
       ) do
     [
       fn -> header_instances(config, now, fetch_destination_fn) end,
-      fn ->
-        departures_instances_fn.(
-          config,
-          &Widgets.Departures.fetch_section_departures/1,
-          &departures_post_processing/2
-        )
-      end,
+      fn -> departures_instances_fn.(config, post_process_fn: &departures_post_processing/2) end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
       fn -> line_map_instances(config, now) end,

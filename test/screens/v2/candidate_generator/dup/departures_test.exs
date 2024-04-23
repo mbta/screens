@@ -55,8 +55,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       app_id: :dup_v2
     }
 
-    fetch_section_departures_fn = fn
-      %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}} ->
+    fetch_departures_fn = fn
+      %{stop_ids: ["place-A"]}, _opts ->
         {:ok,
          [
            %Departure{
@@ -70,7 +70,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            }
          ]}
 
-      %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}} ->
+      %{stop_ids: ["place-B"]}, _opts ->
         {:ok,
          [
            %Departure{
@@ -120,7 +120,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            }
          ]}
 
-      %Section{query: %Query{params: %Query.Params{stop_ids: ["place-C"]}}} ->
+      %{stop_ids: ["place-C"]}, _opts ->
         {:ok,
          [
            %Departure{
@@ -134,7 +134,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            }
          ]}
 
-      %Section{query: %Query{params: %Query.Params{stop_ids: ["place-D"]}}} ->
+      %{stop_ids: ["place-D"]}, _opts ->
         {:ok,
          [
            %Departure{
@@ -148,7 +148,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            }
          ]}
 
-      %Section{query: %Query{params: %Query.Params{stop_ids: ["place-F"]}}} ->
+      %{stop_ids: ["place-F"]}, _opts ->
         {:ok,
          [
            %Departure{
@@ -193,7 +193,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            }
          ]}
 
-      %Section{query: %Query{params: %Query.Params{stop_ids: ["place-G"]}}} ->
+      %{stop_ids: ["place-G"]}, _opts ->
         {:ok,
          [
            %Departure{
@@ -206,7 +206,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            }
          ]}
 
-      %Section{query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}}} ->
+      %{stop_ids: ["place-kencl"]}, _opts ->
         {:ok,
          [
            %Departure{
@@ -220,7 +220,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            }
          ]}
 
-      %Section{query: %Query{params: %Query.Params{stop_ids: ["bus-A", "bus-B"]}}} ->
+      %{stop_ids: ["bus-A", "bus-B"]}, _opts ->
         {:ok,
          [
            %Departure{
@@ -234,7 +234,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            }
          ]}
 
-      _ ->
+      _, _ ->
         {:ok, []}
     end
 
@@ -260,7 +260,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     %{
       config: config,
-      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
@@ -271,7 +271,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   describe "departures_instances/4" do
     test "returns primary and secondary departures", %{
       config: config,
-      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
@@ -425,7 +425,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -437,7 +437,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns only primary departures if secondary is missing", %{
       config: config,
-      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
@@ -596,7 +596,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -608,7 +608,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns only bidirectional departures if configured for that", %{
       config: config,
-      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
@@ -770,7 +770,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -782,7 +782,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns one row for bidirectional departures if only one departure exists", %{
       config: config,
-      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
@@ -868,7 +868,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -880,7 +880,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns 4 departures if only one section", %{
       config: config,
-      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
@@ -1056,7 +1056,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -1068,7 +1068,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns headway sections for temporary terminal", %{
       config: config,
-      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_departures_fn: fetch_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
@@ -1144,7 +1144,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -1156,7 +1156,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns normal sections for upcoming alert", %{
       config: config,
-      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_departures_fn: fetch_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
@@ -1350,7 +1350,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -1362,7 +1362,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns normal sections for branch station for alert with branch terminal headsign", %{
       config: config,
-      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_departures_fn: fetch_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
@@ -1507,7 +1507,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -1519,7 +1519,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns headway sections for branch station for alert with trunk headsign", %{
       config: config,
-      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_departures_fn: fetch_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
@@ -1623,7 +1623,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -1635,7 +1635,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns no data sections for disabled mode", %{
       config: config,
-      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
       fetch_schedules_fn: fetch_schedules_fn,
@@ -1745,7 +1745,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -1757,7 +1757,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns empty departures list if sections have no departures", %{
       config: config,
-      fetch_section_departures_fn: fetch_section_departures_fn,
+      fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       create_station_with_routes_map_fn: create_station_with_routes_map_fn,
@@ -1788,7 +1788,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -1803,7 +1803,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     test "returns normal sections with normal rows and overnight rows for routes in overnight mode",
          %{
            config: config,
-           fetch_section_departures_fn: fetch_section_departures_fn,
+           fetch_departures_fn: fetch_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
            create_station_with_routes_map_fn: create_station_with_routes_map_fn,
            fetch_vehicles_fn: fetch_vehicles_fn
@@ -1924,7 +1924,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -1937,7 +1937,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     test "returns normal sections with normal rows and overnight rows with nil scheduled times for routes in overnight mode with no scheduled trips tomorrow",
          %{
            config: config,
-           fetch_section_departures_fn: fetch_section_departures_fn,
+           fetch_departures_fn: fetch_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
            create_station_with_routes_map_fn: create_station_with_routes_map_fn,
            fetch_vehicles_fn: fetch_vehicles_fn
@@ -2051,7 +2051,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -2065,7 +2065,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     test "returns empty departures if now is after tomorrow's first schedule",
          %{
            config: config,
-           fetch_section_departures_fn: fetch_section_departures_fn,
+           fetch_departures_fn: fetch_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
            create_station_with_routes_map_fn: create_station_with_routes_map_fn,
            fetch_vehicles_fn: fetch_vehicles_fn
@@ -2124,7 +2124,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -2137,7 +2137,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     test "returns empty departures if now is before today's last schedule and there are no schedules tomorrow",
          %{
            config: config,
-           fetch_section_departures_fn: fetch_section_departures_fn,
+           fetch_departures_fn: fetch_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
            create_station_with_routes_map_fn: create_station_with_routes_map_fn,
            fetch_vehicles_fn: fetch_vehicles_fn
@@ -2189,7 +2189,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -2202,7 +2202,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     test "returns OvernightDepartures if all routes in section are overnight",
          %{
            config: config,
-           fetch_section_departures_fn: fetch_section_departures_fn,
+           fetch_departures_fn: fetch_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
            create_station_with_routes_map_fn: create_station_with_routes_map_fn,
            fetch_vehicles_fn: fetch_vehicles_fn
@@ -2294,7 +2294,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -2307,7 +2307,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     test "returns OvernightDepartures with no routes if all rotations are overnight",
          %{
            config: config,
-           fetch_section_departures_fn: fetch_section_departures_fn,
+           fetch_departures_fn: fetch_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
            create_station_with_routes_map_fn: create_station_with_routes_map_fn,
            fetch_vehicles_fn: fetch_vehicles_fn
@@ -2354,7 +2354,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
@@ -2367,7 +2367,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     test "returns OvernightDepartures for rail sections with active alert and no active vehicles",
          %{
            config: config,
-           fetch_section_departures_fn: fetch_section_departures_fn,
+           fetch_departures_fn: fetch_departures_fn,
            create_station_with_routes_map_fn: create_station_with_routes_map_fn
          } do
       config =
@@ -2436,7 +2436,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         Dup.Departures.departures_instances(
           config,
           now,
-          fetch_section_departures_fn,
+          fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
           create_station_with_routes_map_fn,
