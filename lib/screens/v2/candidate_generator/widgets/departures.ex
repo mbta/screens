@@ -74,14 +74,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   @spec fetch_section_departures(Section.t()) :: Departure.result()
   @spec fetch_section_departures(Section.t(), Departure.fetch()) :: Departure.result()
   def fetch_section_departures(
-        %Section{query: %Query{opts: opts, params: params}, filters: filters},
+        %Section{
+          query: %Query{opts: opts, params: params},
+          filters: filters,
+          bidirectional: is_bidirectional
+        },
         departure_fetch_fn \\ &Departure.fetch/2
       ) do
     fetch_params = Map.from_struct(params)
     fetch_opts = opts |> Map.from_struct() |> Keyword.new()
 
     with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
-      {:ok, filter_departures(departures, filters)}
+      {:ok, departures |> filter_departures(filters) |> make_bidirectional(is_bidirectional)}
     end
   end
 
@@ -114,6 +118,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   defp route_direction(d) do
     %RouteDirection{route_id: Departure.route_id(d), direction_id: Departure.direction_id(d)}
   end
+
+  # "Bidirectional" mode: take only the first departure, and the next departure in the opposite
+  # direction from the first, if one exists.
+  defp make_bidirectional([first | rest], true) do
+    first_direction = Departure.direction_id(first)
+
+    opposite? =
+      Enum.find(rest, Enum.at(rest, 0), fn departure ->
+        Departure.direction_id(departure) == 1 - first_direction
+      end)
+
+    Enum.reject([first, opposite?], &is_nil/1)
+  end
+
+  defp make_bidirectional(departures, _), do: departures
 
   defp get_devops_mode(%Screen{app_id: :bus_shelter_v2}), do: :bus
   defp get_devops_mode(%Screen{app_id: :bus_eink_v2}), do: :bus
