@@ -73,24 +73,40 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   @spec fetch_section_departures(Section.t()) :: Departure.result()
   @spec fetch_section_departures(Section.t(), Departure.fetch()) :: Departure.result()
+  @spec fetch_section_departures(Section.t(), Departure.fetch(), DateTime.t()) ::
+          Departure.result()
   def fetch_section_departures(
         %Section{
           query: %Query{opts: opts, params: params},
           filters: filters,
           bidirectional: is_bidirectional
         },
-        departure_fetch_fn \\ &Departure.fetch/2
+        departure_fetch_fn \\ &Departure.fetch/2,
+        now \\ DateTime.utc_now()
       ) do
     fetch_params = Map.from_struct(params)
     fetch_opts = opts |> Map.from_struct() |> Keyword.new()
 
     with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
-      {:ok, departures |> filter_departures(filters) |> make_bidirectional(is_bidirectional)}
+      {:ok, departures |> filter_departures(filters, now) |> make_bidirectional(is_bidirectional)}
     end
   end
 
-  defp filter_departures(departures, %Filters{route_directions: route_directions}) do
-    filter_by_route_direction(departures, route_directions)
+  defp filter_departures(
+         departures,
+         %Filters{max_minutes: max_minutes, route_directions: route_directions},
+         now
+       ) do
+    departures
+    |> filter_by_time(max_minutes, now)
+    |> filter_by_route_direction(route_directions)
+  end
+
+  defp filter_by_time(departures, nil, _now), do: departures
+
+  defp filter_by_time(departures, max_minutes, now) do
+    latest_time = DateTime.add(now, max_minutes, :minute)
+    Enum.reject(departures, &(DateTime.compare(Departure.time(&1), latest_time) == :gt))
   end
 
   defp filter_by_route_direction(departures, %RouteDirections{
