@@ -15,11 +15,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   alias Screens.Routes.Route
   alias Screens.Trips.Trip
 
-  defp build_departure(route_id, direction_id) do
+  defp build_departure(route_id, direction_id, arrival_time \\ ~U[2024-01-01 12:00:00Z]) do
     %Departure{
       prediction: %Prediction{
         route: %Route{id: route_id},
-        trip: %Trip{direction_id: direction_id}
+        trip: %Trip{direction_id: direction_id},
+        arrival_time: arrival_time
       }
     }
   end
@@ -170,6 +171,27 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   end
 
   describe "fetch_section_departures/1" do
+    test "filters departures by time when a section has a max_minutes" do
+      now = ~U[2024-01-01 12:00:00Z]
+
+      section = %Section{
+        query: %Query{params: %Query.Params{stop_ids: ["S"]}},
+        filters: %Filters{max_minutes: 60}
+      }
+
+      included_departures = [
+        build_departure("1", 0, DateTime.add(now, 59, :minute)),
+        build_departure("1", 0, DateTime.add(now, 60, :minute))
+      ]
+
+      fetch_fn = fn %{stop_ids: ["S"]}, _ ->
+        {:ok, [build_departure("1", 0, DateTime.add(now, 61, :minute)) | included_departures]}
+      end
+
+      assert {:ok, included_departures} ==
+               Departures.fetch_section_departures(section, fetch_fn, now)
+    end
+
     test "filters departures with included route-directions" do
       section = %Section{
         query: %Query{params: %Query.Params{stop_ids: ["S"]}},
