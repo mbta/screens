@@ -28,7 +28,8 @@
     }
   }
 
-  &--past, &--unselected {
+  &--past,
+  &--unselected {
     .flex-zone-page-indicator__page__progress-bar {
       background: rgb(230, 230, 230);
     }

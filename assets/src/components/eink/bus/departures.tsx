@@ -1,5 +1,5 @@
 import DepartureGroup, {
-  Props as DepartureGroupProps
+  Props as DepartureGroupProps,
 } from "Components/eink/bus/departure_group";
 import React, { forwardRef } from "react";
 
@@ -8,7 +8,7 @@ const buildDepartureGroups = (departures) => {
     return [];
   }
 
-  const groups : any[] = [];
+  const groups: any[] = [];
 
   departures.forEach((departure) => {
     if (groups.length === 0) {
@@ -51,7 +51,7 @@ const Departures = forwardRef<HTMLDivElement, DepartureGroupProps>(
         ))}
       </div>
     );
-  }
+  },
 );
 
 export default Departures;

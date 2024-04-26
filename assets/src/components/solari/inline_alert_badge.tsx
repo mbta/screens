@@ -9,7 +9,7 @@ const alertValues = _.mapValues(
     snow_route: { svgPath: "solari-snowflake.svg", text: "snow route" },
     last_trip: { svgPath: "solari-moon.svg", text: "last trip" },
   },
-  ({ svgPath, ...rest }) => ({ ...rest, svgPath: imagePath(svgPath) })
+  ({ svgPath, ...rest }) => ({ ...rest, svgPath: imagePath(svgPath) }),
 );
 
 interface InlineAlertBadgeProps {

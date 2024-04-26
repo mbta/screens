@@ -124,7 +124,7 @@ const Departure = ({
     time,
     currentTimeString,
     vehicleStatus,
-    stopType
+    stopType,
   );
 
   const timeAnimationModifier =

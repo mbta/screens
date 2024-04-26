@@ -11,7 +11,7 @@ const NoDataSection = ({ text }) => {
         <div className="no-data-section__icon-container">
           <NoConnection
             width="128"
-            height="128" 
+            height="128"
             className="no-data-section__no-connection-icon"
             color="#171F26"
           />

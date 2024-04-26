@@ -7,7 +7,10 @@ interface Props {
   numPages: number;
 }
 
-const FlexZonePageIndicator: ComponentType<Props> = ({ pageIndex, numPages }) => {
+const FlexZonePageIndicator: ComponentType<Props> = ({
+  pageIndex,
+  numPages,
+}) => {
   return (
     <div className="flex-zone-page-indicator">
       {Array.from({ length: numPages }).map((_, i) => {
@@ -24,7 +27,7 @@ const FlexZonePageIndicator: ComponentType<Props> = ({ pageIndex, numPages }) =>
           <div
             className={classWithModifier(
               "flex-zone-page-indicator__page",
-              modifier
+              modifier,
             )}
             key={i}
           >

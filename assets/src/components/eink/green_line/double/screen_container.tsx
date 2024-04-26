@@ -42,7 +42,7 @@ const TopScreenLayout = ({
         currentTimeString={currentTimeString}
         showVehicles={!isHeadwayMode}
       />
-      { /* @ts-expect-error */ }
+      {/* @ts-expect-error */}
       <Departures
         departures={departures}
         headway={headway}

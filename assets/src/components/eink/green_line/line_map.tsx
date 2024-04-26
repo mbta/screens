@@ -405,11 +405,8 @@ const LineMapOriginStop = (): JSX.Element => {
 };
 
 const LineMapStops = (): JSX.Element => {
-  const {
-    showOriginStop,
-    lastVisibleStopIndex,
-    stopNames,
-  } = useContext(LineMapContext);
+  const { showOriginStop, lastVisibleStopIndex, stopNames } =
+    useContext(LineMapContext);
   return (
     <g>
       {[...Array(lastVisibleStopIndex + 1)].map((_, i) => (
@@ -462,7 +459,7 @@ const LineMapContainer = ({
 
   // The last stop which fits in the alloted vertical space
   const lastVisibleStopIndex = Math.floor(
-    (height - constants.stopMarginTop - 2 * constants.radius) / constants.dy
+    (height - constants.stopMarginTop - 2 * constants.radius) / constants.dy,
   );
 
   // Compute the y-position of the current stop
@@ -495,7 +492,7 @@ const LineMapContainer = ({
   // for stop index i. null values correspond to unlabeled stops.
   const unlabeledStops = Array.from(
     { length: originStopIndex - 3 },
-    () => null
+    () => null,
   );
   const stopNames = [
     data.stops.following,

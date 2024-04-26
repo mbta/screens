@@ -41,13 +41,13 @@ const camelizeDepartureObject = ({
 
 const isArrivingOrBoarding = (
   { time, vehicle_status, stop_type },
-  currentTimeString
+  currentTimeString,
 ) => {
   const timeRepresentation = standardTimeRepresentation(
     time,
     currentTimeString,
     vehicle_status,
-    stop_type
+    stop_type,
   );
   return (
     timeRepresentation.type === "TEXT" &&
@@ -129,7 +129,7 @@ const PlaceholderMessage = ({ pill, text }): JSX.Element => (
       <div
         className={classWithModifier(
           "departure-destination",
-          "no-departures-placeholder"
+          "no-departures-placeholder",
         )}
       >
         <BaseDepartureDestination destination={text} />
@@ -142,12 +142,12 @@ const isDuringSurge = () => {
   const now = moment();
   const isDuringFirstRange = now.isBetween(
     moment("2024-01-03T09:30:00Z"),
-    moment("2024-01-13T07:30:00Z")
+    moment("2024-01-13T07:30:00Z"),
   );
 
   const isDuringSecondRange = now.isBetween(
     moment("2024-01-16T09:30:00Z"),
-    moment("2024-01-29T07:30:00Z")
+    moment("2024-01-29T07:30:00Z"),
   );
 
   return isDuringFirstRange || isDuringSecondRange;
@@ -211,9 +211,9 @@ class PagedDeparture extends React.Component<
     const { pageCount, departures } = this.props;
     return (
       pageCount === otherProps.pageCount &&
-        departures.length === otherProps.departures.length &&
-        // @ts-expect-error
-        departures.every((d, i) => d.id === otherProps.departures[i].id)
+      departures.length === otherProps.departures.length &&
+      // @ts-expect-error
+      departures.every((d, i) => d.id === otherProps.departures[i].id)
     );
   }
 
@@ -222,7 +222,7 @@ class PagedDeparture extends React.Component<
     if (refreshMs !== null) {
       this.interval = window.setInterval(
         this.updatePaging.bind(this),
-        refreshMs
+        refreshMs,
       );
     }
   }
@@ -288,7 +288,7 @@ class PagedDeparture extends React.Component<
 
     const currentPillIsWide = WIDE_MINI_PILL_ROUTES.includes(
       // @ts-expect-error
-      currentPagedDeparture.route
+      currentPagedDeparture.route,
     );
     const pillCenterOffset = currentPillIsWide ? 64.5 : 30; // px
     const totalPillSpaceWidth = selectedRightOffset * pillSpace;
@@ -309,7 +309,7 @@ class PagedDeparture extends React.Component<
           <div
             className={classWithModifier(
               "later-departure__header-route-list",
-              sizeModifier
+              sizeModifier,
             )}
           >
             {this.props.departures.map((departure, i) => {

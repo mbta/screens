@@ -9,7 +9,7 @@ const useFitDepartures = (departuresRef, laterDeparturesRef) => {
 
   const [departureCount, setDepartureCount] = useState(MAX_DEPARTURE_ROWS);
   const [laterDepartureCount, setLaterDepartureCount] = useState(
-    MAX_LATER_DEPARTURE_ROWS
+    MAX_LATER_DEPARTURE_ROWS,
   );
 
   useLayoutEffect(() => {

@@ -12,7 +12,7 @@ interface PillType {
 const routeToPill = (
   route: string,
   routeId: string,
-  trackNumber: string | null
+  trackNumber: string | null,
 ): PillType => {
   if (route === null) {
     return { routeName: null, routePillColor: null };
@@ -117,7 +117,7 @@ const DepartureRoutePill = ({
 const sectionPillMapping: Record<string, PillType> = {
   blue: { routeName: "BL", routePillColor: "blue" },
   red: { routeName: "RL", routePillColor: "red" },
-  green: {routeName: "GL", routePillColor: "green"},
+  green: { routeName: "GL", routePillColor: "green" },
   mattapan: { routeName: "M", routePillColor: "red" },
   orange: { routeName: "OL", routePillColor: "orange" },
   cr: { routeName: "CR", routePillColor: "purple" },
@@ -167,11 +167,11 @@ const PagedDepartureRoutePill = ({ route, routeId, selected }): JSX.Element => {
   ];
   const pillClass = classWithModifiers(
     "later-departure__route-pill",
-    modifiers
+    modifiers,
   );
   const textClass = classWithModifiers(
     "later-departure__route-text",
-    modifiers
+    modifiers,
   );
 
   const routeText = routeId.startsWith("CR-") ? routeIdMapping[routeId] : route;

@@ -9,9 +9,9 @@ import { fetchDatasetValue } from "Util/dataset";
 import { DUP_SIMULATION_REFRESH_MS } from "Constants";
 
 type QueryParams = {
-  id?: string
-  rotationIndex?: string
-}
+  id?: string;
+  rotationIndex?: string;
+};
 
 const DupScreenPage = ({ screenContainer: ScreenContainer }): JSX.Element => {
   const station = useStationName();

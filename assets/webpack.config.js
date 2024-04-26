@@ -13,8 +13,8 @@ module.exports = (env, options) => ({
       Components: path.resolve(__dirname, "src/components"),
       Hooks: path.resolve(__dirname, "src/hooks"),
       Util: path.resolve(__dirname, "src/util"),
-      Constants: path.resolve(__dirname, "src/constants")
-    }
+      Constants: path.resolve(__dirname, "src/constants"),
+    },
   },
   entry: {
     polyfills: "./src/polyfills.js",
@@ -31,11 +31,11 @@ module.exports = (env, options) => ({
     dup_v2: "./src/apps/v2/dup.tsx",
     bus_shelter_v2: "./src/apps/v2/bus_shelter.tsx",
     pre_fare_v2: "./src/apps/v2/pre_fare.tsx",
-    triptych_v2: "./src/apps/v2/triptych.tsx"
+    triptych_v2: "./src/apps/v2/triptych.tsx",
   },
   output: {
     filename: "[name].js",
-    path: path.resolve(__dirname, "../priv/static/js")
+    path: path.resolve(__dirname, "../priv/static/js"),
   },
   module: {
     rules: [
@@ -48,7 +48,7 @@ module.exports = (env, options) => ({
             presets: [
               ["@babel/preset-env", { targets: "> 0.25%" }],
               "@babel/preset-react",
-              "@babel/preset-typescript"
+              "@babel/preset-typescript",
             ],
             plugins: [
               "@babel/plugin-proposal-export-default-from",
@@ -56,64 +56,64 @@ module.exports = (env, options) => ({
               ["@babel/plugin-proposal-optional-chaining", { loose: false }],
               [
                 "@babel/plugin-proposal-pipeline-operator",
-                { proposal: "minimal" }
+                { proposal: "minimal" },
               ],
               [
                 "@babel/plugin-proposal-nullish-coalescing-operator",
-                { loose: false }
+                { loose: false },
               ],
-              "@babel/plugin-proposal-do-expressions"
-            ]
-          }
-        }
+              "@babel/plugin-proposal-do-expressions",
+            ],
+          },
+        },
       },
       {
         enforce: "pre",
         test: /\.js$/,
-        loader: "source-map-loader"
+        loader: "source-map-loader",
       },
       {
         test: /\.s?css$/,
         use: [
           MiniCssExtractPlugin.loader,
           {
-            loader: "css-loader"
+            loader: "css-loader",
           },
           {
-            loader: "sass-loader"
-          }
-        ]
+            loader: "sass-loader",
+          },
+        ],
       },
       {
         test: /\.svg$/i,
         issuer: /\.[jt]sx?$/,
-        use: ['@svgr/webpack'],
+        use: ["@svgr/webpack"],
       },
       {
         test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
         use: [
           {
-            loader: 'file-loader',
+            loader: "file-loader",
             options: {
-              name: '[name].[ext]',
-              outputPath: 'fonts/',
-              publicPath: '../fonts/',
-              useRelativePaths: true
-            }
-          }
-        ]
-      }
-    ]
+              name: "[name].[ext]",
+              outputPath: "fonts/",
+              publicPath: "../fonts/",
+              useRelativePaths: true,
+            },
+          },
+        ],
+      },
+    ],
   },
   plugins: [
     new MiniCssExtractPlugin({ filename: "../css/[name].css" }),
-    new CopyWebpackPlugin({patterns: [{ from: "static/", to: "../" }]})
+    new CopyWebpackPlugin({ patterns: [{ from: "static/", to: "../" }] }),
   ],
   devtool: "source-map",
   optimization: {
     minimizer: [
       new TerserPlugin({ cache: true, parallel: true, sourceMap: false }),
-      new OptimizeCSSAssetsPlugin({})
-    ]
-  }
+      new OptimizeCSSAssetsPlugin({}),
+    ],
+  },
 });

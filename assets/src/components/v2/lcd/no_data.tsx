@@ -40,7 +40,12 @@ const NoData: ComponentType<Props> = ({
               </span>{" "}
             </div>
             <div className="no-data__t-logo-icon-container">
-              <TLogo width="1000" height="1000" className="no-data__t-logo-icon" color={coolBlack} />
+              <TLogo
+                width="1000"
+                height="1000"
+                className="no-data__t-logo-icon"
+                color={coolBlack}
+              />
             </div>
           </div>
         </>

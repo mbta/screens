@@ -31,23 +31,25 @@ interface UseAudioReadoutArgs {
   config: AudioConfig | null;
 }
 
-const useAudioReadout = ({
-  id,
-  config
-}: UseAudioReadoutArgs): void => {
+const useAudioReadout = ({ id, config }: UseAudioReadoutArgs): void => {
   if (config == null || config.readoutIntervalMinutes === 0) {
     return;
   }
 
   const intervalPeriodMs = config.readoutIntervalMinutes * 60000;
 
-  const refreshRateOffsetMs = parseInt(fetchDatasetValue("refreshRateOffset"), 10) * 1000;
+  const refreshRateOffsetMs =
+    parseInt(fetchDatasetValue("refreshRateOffset"), 10) * 1000;
   const intervalOffsetSeconds = config.intervalOffsetSeconds;
-  const intervalOffsetMs = refreshRateOffsetMs + (intervalOffsetSeconds * 1000);
+  const intervalOffsetMs = refreshRateOffsetMs + intervalOffsetSeconds * 1000;
 
-  useDriftlessInterval(() => {
-    fetchAudio(id);
-  }, intervalPeriodMs, intervalOffsetMs);
+  useDriftlessInterval(
+    () => {
+      fetchAudio(id);
+    },
+    intervalPeriodMs,
+    intervalOffsetMs,
+  );
 };
 
 export default useAudioReadout;

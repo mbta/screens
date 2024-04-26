@@ -1,9 +1,5 @@
 import React, { ComponentType, forwardRef } from "react";
-import {
-  classWithModifier,
-  classWithModifiers,
-  firstWord,
-} from "Util/util";
+import { classWithModifier, classWithModifiers, firstWord } from "Util/util";
 import { STRING_TO_SVG, getHexColor } from "Util/svg_utils";
 import {
   Alert,
@@ -133,7 +129,7 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
       CONTRACTED_ALERT_MAX_HEIGHT,
       CONTRACTED_ALERT_FITTING_STEPS,
       id,
-      status
+      status,
     );
 
   let locationText: string | null;
@@ -174,7 +170,7 @@ const ExtendedAlert: ComponentType<AlertWithID> = ({
     EXTENDED_ALERT_MAX_HEIGHT,
     EXTENDED_ALERT_FITTING_STEPS,
     id,
-    status
+    status,
   );
 
   let locationText: string | null;
@@ -208,7 +204,7 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
     let containerClassName = "subway-status_alert";
     containerClassName = classWithModifier(
       containerClassName,
-      routePill ? "has-pill" : "no-pill"
+      routePill ? "has-pill" : "no-pill",
     );
 
     let sizerClassName = "subway-status_alert-sizer";
@@ -228,14 +224,14 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
 
     textContainerClassName = classWithModifiers(
       textContainerClassName,
-      textContainerModifiers
+      textContainerModifiers,
     );
 
     let statusTextClassName = "subway-status_alert_status-text";
     if (status === NORMAL_STATUS) {
       statusTextClassName = classWithModifier(
         statusTextClassName,
-        "normal-service"
+        "normal-service",
       );
     }
 
@@ -256,7 +252,7 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
@@ -266,7 +262,7 @@ const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
     const sortedUniqueBranches = Array.from(new Set(routePill.branches)).sort();
     return <GLBranchPillGroup branches={sortedUniqueBranches} />;
   } else {
-    const LinePill = STRING_TO_SVG[`${routePill.color[0]}l`]
+    const LinePill = STRING_TO_SVG[`${routePill.color[0]}l`];
     return (
       <LinePill width="144" height="74" color={getHexColor(routePill.color)} />
     );
@@ -276,14 +272,22 @@ const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
 const GLBranchPillGroup: ComponentType<Pick<GLMultiPill, "branches">> = ({
   branches: [firstBranch, ...rest],
 }) => {
-  const ComboLinePill = STRING_TO_SVG[`gl-${firstBranch}`]
+  const ComboLinePill = STRING_TO_SVG[`gl-${firstBranch}`];
 
   return (
     <>
       <ComboLinePill width="203" height="74" color={getHexColor("green")} />
       {rest.map((branch) => {
-        const BranchPill = STRING_TO_SVG[`green-${branch}-circle`]
-        return <BranchPill width="74" height="74" color={getHexColor("green")} className="branch-icon" key={ branch }/>
+        const BranchPill = STRING_TO_SVG[`green-${branch}-circle`];
+        return (
+          <BranchPill
+            width="74"
+            height="74"
+            color={getHexColor("green")}
+            className="branch-icon"
+            key={branch}
+          />
+        );
       })}
     </>
   );
@@ -305,7 +309,7 @@ const cleanUpServerData = (data: SubwayStatusData): SubwayStatusData => ({
 });
 
 const convertLocationlessExtendedAlertToContracted = (
-  section: Section
+  section: Section,
 ): Section =>
   isExtendedWithNoLocation(section)
     ? { type: "contracted", alerts: [section.alert] }
@@ -337,7 +341,7 @@ const shouldShowLastRule = ({ blue, orange, red, green }: SubwayStatusData) => {
 };
 
 const isExtendedWithNoLocation = (
-  section: Section
+  section: Section,
 ): section is ExtendedSection => isExtended(section) && !section.alert.location;
 
 export default LcdSubwayStatus;

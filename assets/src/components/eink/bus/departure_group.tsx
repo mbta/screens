@@ -5,10 +5,10 @@ import InlineAlert from "Components/eink/bus/inline_alert";
 import { classWithModifier } from "Util/util";
 
 type Props = {
-  currentTimeString: string
-  departures: object[]
-  size: string
-}
+  currentTimeString: string;
+  departures: object[];
+  size: string;
+};
 
 const DepartureGroup = ({
   currentTimeString,
@@ -23,7 +23,7 @@ const DepartureGroup = ({
         {departures.map(
           (
             { id, route, destination, crowding_level: crowdingLevel, time },
-            i
+            i,
           ) => (
             <DepartureRow
               currentTimeString={currentTimeString}
@@ -34,7 +34,7 @@ const DepartureGroup = ({
               size={size}
               key={id}
             />
-          )
+          ),
         )}
         {alerts && alerts.length > 0 && <InlineAlert />}
       </div>

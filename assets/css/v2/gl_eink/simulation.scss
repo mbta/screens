@@ -1,5 +1,5 @@
 .simulation-screen-scrolling-container {
-  scrollbar-color: #607180 #2E3F4D;
+  scrollbar-color: #607180 #2e3f4d;
 
   &::-webkit-scrollbar {
     width: 12px;
@@ -7,12 +7,12 @@
   &::-webkit-scrollbar-thumb {
     background-color: #607180;
     border-radius: 12px;
-    border: 2px solid #2E3F4D;
+    border: 2px solid #2e3f4d;
   }
   &::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     border-radius: 12px;
-    background-color: #2E3F4D;
+    background-color: #2e3f4d;
   }
 }
 

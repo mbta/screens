@@ -23,4 +23,4 @@ const AdminTriptychPlayerForm = (): JSX.Element => (
   />
 );
 
-export default AdminTriptychPlayerForm
+export default AdminTriptychPlayerForm;

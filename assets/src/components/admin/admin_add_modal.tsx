@@ -97,7 +97,7 @@ const defaultAppParamsByAppId = {
 };
 
 const initialFormValues = _.fromPairs(
-  fields.map(({ key }) => [key, undefined])
+  fields.map(({ key }) => [key, undefined]),
 );
 
 const AddModal = ({ setData, closeModal }): JSX.Element => {

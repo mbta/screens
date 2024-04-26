@@ -104,7 +104,7 @@ const blinkConfig: BlinkConfig = {
 
 const getAudioConfig = (): AudioConfig | null => {
   const audioIntervalOffsetSeconds = getDatasetValue(
-    "audioIntervalOffsetSeconds"
+    "audioIntervalOffsetSeconds",
   );
   const audioReadoutInterval = getDatasetValue("audioReadoutInterval");
 
