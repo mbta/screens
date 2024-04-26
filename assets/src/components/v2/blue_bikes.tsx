@@ -140,8 +140,12 @@ const NormalRow: ComponentType<NormalStation> = (station) => {
         walkDistanceMinutes={station.walk_distance_minutes}
         walkDistanceFeet={station.walk_distance_feet}
       />
-      <div className="blue-bikes__station__bikes">{station.num_bikes_available}</div>
-      <div className="blue-bikes__station__docks">{station.num_docks_available}</div>
+      <div className="blue-bikes__station__bikes">
+        {station.num_bikes_available}
+      </div>
+      <div className="blue-bikes__station__docks">
+        {station.num_docks_available}
+      </div>
     </div>
   );
 };
@@ -157,12 +161,8 @@ const ValetRow: ComponentType<ValetStation> = (station) => {
         walkDistanceMinutes={station.walk_distance_minutes}
         walkDistanceFeet={station.walk_distance_feet}
       />
-      <div className="blue-bikes__station__valet-main-text">
-        Unlimited
-      </div>
-      <div className="blue-bikes__station__valet-alt-text">
-        ilimitado
-      </div>
+      <div className="blue-bikes__station__valet-main-text">Unlimited</div>
+      <div className="blue-bikes__station__valet-alt-text">ilimitado</div>
     </div>
   );
 };
@@ -233,7 +233,11 @@ const Footer: ComponentType<FooterProps> = (props) => {
   return (
     <div className="blue-bikes__footer">
       <div className="blue-bikes__footer__clock-icon-container">
-        <ClockIcon minutes={maxMinutes} fgColor="rgb(23, 31, 38)" bgColor="transparent" />
+        <ClockIcon
+          minutes={maxMinutes}
+          fgColor="rgb(23, 31, 38)"
+          bgColor="transparent"
+        />
       </div>
       <div className="blue-bikes__footer__distance-to-destination">
         <div className="blue-bikes__footer__main-text">
@@ -244,15 +248,14 @@ const Footer: ComponentType<FooterProps> = (props) => {
         </div>
       </div>
       <div className="blue-bikes__footer__free-icon-container">
-        <img className="blue-bikes__footer__free-icon" src={imagePath("free-green.svg")} />
+        <img
+          className="blue-bikes__footer__free-icon"
+          src={imagePath("free-green.svg")}
+        />
       </div>
       <div className="blue-bikes__footer__passes">
-        <div className="blue-bikes__footer__main-text">
-          Free passes
-        </div>
-        <div className="blue-bikes__footer__alt-text">
-          pases gratis
-        </div>
+        <div className="blue-bikes__footer__main-text">Free passes</div>
+        <div className="blue-bikes__footer__alt-text">pases gratis</div>
       </div>
     </div>
   );

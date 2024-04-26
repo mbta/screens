@@ -161,8 +161,8 @@ const TrainCrowding: React.ComponentType<Props> = ({
   const arrowDirection = [1, 9, 17].includes(platformPosition)
     ? "up-left"
     : platformPosition == 25
-    ? "up-right"
-    : "up";
+      ? "up-right"
+      : "up";
 
   const textPane = Math.floor((arrowSlot / 25) * 3);
   const textPadding = (textPane * 3240) / 3;

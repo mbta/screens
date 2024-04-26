@@ -57,7 +57,7 @@ const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
     <div
       className={classWithModifier(
         "subway-status_row",
-        alerts.length === 1 ? "single" : "multi"
+        alerts.length === 1 ? "single" : "multi",
       )}
     >
       <div className="subway-status_route-pill-container">
@@ -160,7 +160,7 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
     if (status === NORMAL_STATUS) {
       textContainerClassName = classWithModifier(
         textContainerClassName,
-        "normal-service"
+        "normal-service",
       );
     }
 
@@ -181,7 +181,7 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 const SubwayStatusRoutePill: ComponentType<{
@@ -200,8 +200,8 @@ const SubwayStatusRoutePill: ComponentType<{
   }
 
   // Return the route pill at the top of the section above alerts.
-  const LinePill = STRING_TO_SVG[`${routePill.color}-line`]
-  return <LinePill height="65" />
+  const LinePill = STRING_TO_SVG[`${routePill.color}-line`];
+  return <LinePill height="65" />;
 };
 
 const GLBranchPillGroup: ComponentType<
@@ -210,12 +210,18 @@ const GLBranchPillGroup: ComponentType<
   // We only inline route pills for GL branches.
   // Otherwise, we show a single route pill above alerts in each section.
   if (showInlineBranches) {
-    
     return (
       <>
         {branches.map((branch) => {
-          const LinePill = STRING_TO_SVG[`green-${branch}-circle`]
-          return <LinePill width="64" height="64" key={branch} className="branch-icon" />        
+          const LinePill = STRING_TO_SVG[`green-${branch}-circle`];
+          return (
+            <LinePill
+              width="64"
+              height="64"
+              key={branch}
+              className="branch-icon"
+            />
+          );
         })}
       </>
     );
@@ -223,13 +229,20 @@ const GLBranchPillGroup: ComponentType<
 
   const [firstBranch, ...rest] = branches;
 
-  const ComboLinePill = STRING_TO_SVG[`green-line-${firstBranch}`]
+  const ComboLinePill = STRING_TO_SVG[`green-line-${firstBranch}`];
   return (
     <>
       <ComboLinePill width="404" height="64" className="branch-icon" />
       {rest.map((branch) => {
-        const BranchLinePill = STRING_TO_SVG[`green-${branch}-circle`]
-        return <BranchLinePill width="64" height="64" key={branch} className="branch-icon" />    
+        const BranchLinePill = STRING_TO_SVG[`green-${branch}-circle`];
+        return (
+          <BranchLinePill
+            width="64"
+            height="64"
+            key={branch}
+            className="branch-icon"
+          />
+        );
       })}
     </>
   );
@@ -242,13 +255,13 @@ const GLBranchPillGroup: ComponentType<
 // The header is displayed when every section has exactly 1 alert.
 const shouldShowHeader = ({ blue, orange, red, green }: SubwayStatusData) => {
   return [blue, orange, red, green].every(
-    (data) => isContractedWith1Alert(data) || isExtended(data)
+    (data) => isContractedWith1Alert(data) || isExtended(data),
   );
 };
 
 const getRoutePillObject = (
   section: Section,
-  color: LineColor
+  color: LineColor,
 ): SubwayStatusPill => {
   // If the current section is `green` and there is only one alert, see if there are any branches
   // that can be added to the route pill. If no branches exist, the GL pill will be rendered with no branches.
@@ -257,7 +270,7 @@ const getRoutePillObject = (
       return {
         color: color,
         branches: section.alerts.flatMap(
-          (alert) => alert.route_pill?.branches ?? []
+          (alert) => alert.route_pill?.branches ?? [],
         ),
       };
     } else if (isExtended(section)) {

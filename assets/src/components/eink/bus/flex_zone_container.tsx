@@ -1,24 +1,22 @@
 import React, { forwardRef } from "react";
 
 import Departures from "Components/eink/bus/departures";
-import {
-  Props as DepartureGroupProps
-} from "Components/eink/bus/departure_group";
+import { Props as DepartureGroupProps } from "Components/eink/bus/departure_group";
 import NearbyConnections from "Components/eink/bus/nearby_connections";
 import ServiceMap from "Components/eink/bus/service_map";
 import GlobalAlert from "Components/eink/global_alert";
 import TakeoverAlert from "Components/eink/takeover_alert";
 
 type Props = Omit<DepartureGroupProps, "size"> & {
-  globalAlert: object
-  nearbyConnections: object[]
-  psaUrl: string
-}
+  globalAlert: object;
+  nearbyConnections: object[];
+  psaUrl: string;
+};
 
 const FlexZoneContainer = forwardRef<HTMLDivElement, Props>(
   (
     { currentTimeString, departures, globalAlert, nearbyConnections, psaUrl },
-    ref
+    ref,
   ): JSX.Element => {
     // Check whether there are any later departures to show
     const showLaterDepartures = departures && departures.length > 0;
@@ -76,7 +74,7 @@ const FlexZoneContainer = forwardRef<HTMLDivElement, Props>(
         <div className="flex-zone__bottom-container">{bottomComponent}</div>
       </div>
     );
-  }
+  },
 );
 
 export { Props };

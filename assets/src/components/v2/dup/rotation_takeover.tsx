@@ -9,7 +9,7 @@ interface Props {
 
 const RotationTakeover: React.ComponentType<Props> = ({
   full_rotation: fullRotation,
-  rotation: rotation
+  rotation: rotation,
 }) => {
   return (
     <div className={`widget-slot rotation-${rotation}`}>

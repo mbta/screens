@@ -22,7 +22,7 @@ import {
   BusShelterV2ScreensTable,
   PreFareV2ScreensTable,
   DupV2ScreensTable,
-  TriptychV2ScreensTable
+  TriptychV2ScreensTable,
 } from "Components/admin/admin_tables";
 import AdminTriptychPlayerForm from "Components/admin/admin_triptych_player_form";
 import ImageManager from "Components/admin/admin_image_manager";

@@ -38,7 +38,7 @@ const DeparturesTable: React.ComponentType<Props> = ({
         <div className="via-service-icon">
           <img
             src={imagePath(
-              station.service ? "cr-service.svg" : "cr-no-service.svg"
+              station.service ? "cr-service.svg" : "cr-no-service.svg",
             )}
           />
         </div>
@@ -56,8 +56,10 @@ const DeparturesTable: React.ComponentType<Props> = ({
           <th className="arrival"></th>
         </tr>
         {departures.map((departure: Departure) => {
-          const withStations = departure.headsign.station_service_list.length > 0 
-            ? "with-stations" : ""
+          const withStations =
+            departure.headsign.station_service_list.length > 0
+              ? "with-stations"
+              : "";
 
           return (
             <tr key={departure.prediction_or_schedule_id}>
@@ -82,7 +84,7 @@ const DeparturesTable: React.ComponentType<Props> = ({
                     departure.time.departure_type === "prediction" &&
                       departure.time.departure_time.type === "text"
                       ? "animated"
-                      : "static"
+                      : "static",
                   )}
                 >
                   <CRDepartureTime

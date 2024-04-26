@@ -104,7 +104,7 @@ const EditableSelect = ({
 }) => {
   const options = useMemo(
     () => gatherSelectOptions(preFilteredRows, id),
-    [id, preFilteredRows]
+    [id, preFilteredRows],
   );
 
   const onChange = (e) => {

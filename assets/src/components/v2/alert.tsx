@@ -44,7 +44,7 @@ const BaseAlert: ComponentType<BaseAlertProps> = ({
           <div
             className={classWithModifier(
               "alert-widget__content__route-pills",
-              routePills.length > 2 ? "small" : "regular"
+              routePills.length > 2 ? "small" : "regular",
             )}
           >
             {routePills.map((pill) => (
@@ -103,7 +103,7 @@ const BodyTextSizer: ComponentType<BodyTextSizerProps> = ({
     <div
       className={classWithModifier(
         "alert-widget__content__body-text",
-        isSmall ? "small" : "regular"
+        isSmall ? "small" : "regular",
       )}
       ref={ref}
     >

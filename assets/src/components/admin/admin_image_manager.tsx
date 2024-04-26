@@ -117,7 +117,7 @@ const ImageUpload = ({}): JSX.Element => {
         alert("That file is too large; please try one under 20MB.");
       }
     },
-    [setStagedImageUpload]
+    [setStagedImageUpload],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -168,7 +168,7 @@ const ImageManager = ({ imageFilenames }): JSX.Element => {
       try {
         const response = await fetchWithCsrf(
           `/api/admin/image/${selectedFilename}`,
-          { method: "DELETE" }
+          { method: "DELETE" },
         );
 
         const result = await response.json();

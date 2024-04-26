@@ -51,4 +51,5 @@ export const getScreenSide = (): ScreenSide | null => {
 
 export const firstWord = (str: string): string => str.split(" ")[0];
 
-export const formatCause = (cause: string) => (cause.charAt(0).toUpperCase() + cause.substring(1)).replace("_", " ");
+export const formatCause = (cause: string) =>
+  (cause.charAt(0).toUpperCase() + cause.substring(1)).replace("_", " ");

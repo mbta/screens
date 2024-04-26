@@ -24,7 +24,7 @@ const SelectColumnFilter = ({
 }) => {
   const options = useMemo(
     () => gatherSelectOptions(preFilteredRows, id),
-    [id, preFilteredRows]
+    [id, preFilteredRows],
   );
 
   return (

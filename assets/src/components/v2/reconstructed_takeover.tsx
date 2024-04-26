@@ -47,7 +47,11 @@ const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
               />
               <div className="alert-card__body__issue">{issue}</div>
               <div className="alert-card__body__location ">
-                { typeof location === "string" ? location : <FreeText lines={location} /> }
+                {typeof location === "string" ? (
+                  location
+                ) : (
+                  <FreeText lines={location} />
+                )}
               </div>
               {disruption_diagram && (
                 <div

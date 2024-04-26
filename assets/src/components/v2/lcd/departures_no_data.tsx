@@ -18,7 +18,7 @@ const DeparturesNoData: ComponentType<Props> = ({
         <div className="departures-no-data__main-content__no-connection-icon-container">
           <NoConnection
             width="128"
-            height="128" 
+            height="128"
             className="departures-no-data__main-content__no-connection-icon"
             color={coolBlack}
           />
@@ -34,7 +34,11 @@ const DeparturesNoData: ComponentType<Props> = ({
             <div className="departures-no-data__alternatives__message">
               For schedules, go to{" "}
               <span className="departures-no-data__alternatives__message__em">
-                {stopId ? <>mbta.com/stops/{stopId}</> : <>mbta.com/schedules</>}
+                {stopId ? (
+                  <>mbta.com/stops/{stopId}</>
+                ) : (
+                  <>mbta.com/schedules</>
+                )}
               </span>{" "}
             </div>
           </div>

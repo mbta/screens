@@ -75,12 +75,12 @@ const NormalHeaderTitle = forwardRef<HTMLDivElement, NormalHeaderTitleProps>(
         {["screens-dev", "screens-dev-green"].includes(environmentName) && (
           <div className="normal-header__environment">{environmentName}</div>
         )}
-        <div className={
-          classWithModifiers(
-            "normal-header-title",
-            [size, icon ? "with-icon" : "no-icon"]
-          )
-        }>
+        <div
+          className={classWithModifiers("normal-header-title", [
+            size,
+            icon ? "with-icon" : "no-icon",
+          ])}
+        >
           {icon && <NormalHeaderIcon icon={icon} />}
           <div className="normal-header-title__text" ref={ref}>
             {showTo && <div className="normal-header-to__text">TO</div>}

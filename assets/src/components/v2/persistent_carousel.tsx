@@ -12,7 +12,12 @@ interface Props<T> extends WrappedComponentProps {
   pages: T[];
 }
 
-const Carousel = <T,>({ PageRenderer, pages, onFinish, lastUpdate }: Props<T>): ReactNode => {
+const Carousel = <T,>({
+  PageRenderer,
+  pages,
+  onFinish,
+  lastUpdate,
+}: Props<T>): ReactNode => {
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [pageIndex, setPageIndex] = useState(0);
 
@@ -33,11 +38,17 @@ const Carousel = <T,>({ PageRenderer, pages, onFinish, lastUpdate }: Props<T>): 
   }, [pageIndex]);
 
   return (
-    <PageRenderer page={pages[pageIndex]} pageIndex={pageIndex} numPages={pages.length} />
+    <PageRenderer
+      page={pages[pageIndex]}
+      pageIndex={pageIndex}
+      numPages={pages.length}
+    />
   );
-}
+};
 
-const PersistentCarousel = makePersistent(Carousel as ComponentType<WrappedComponentProps>);
+const PersistentCarousel = makePersistent(
+  Carousel as ComponentType<WrappedComponentProps>,
+);
 
 /**
  * Call this function on some `PageRenderer` component to wrap it in a persistent component that
@@ -98,8 +109,7 @@ const PersistentCarousel = makePersistent(Carousel as ComponentType<WrappedCompo
  */
 const makePersistentCarousel =
   <T,>(Component: ComponentType<PageRendererProps<T>>) =>
-    ({ ...data }) =>
-      <PersistentCarousel {...data} PageRenderer={Component} />;
+  ({ ...data }) => <PersistentCarousel {...data} PageRenderer={Component} />;
 
 export default makePersistentCarousel;
 export { PageRendererProps };

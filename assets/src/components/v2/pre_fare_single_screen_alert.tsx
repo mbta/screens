@@ -53,7 +53,7 @@ const StandardLayout: React.ComponentType<StandardLayoutProps> = ({
   location,
   disruptionDiagram,
 }) => {
-  const maxTextHeight = 772
+  const maxTextHeight = 772;
 
   const { ref: contentBlockRef, size: contentTextSize } = useTextResizer({
     sizes: ["medium", "large"],
@@ -63,12 +63,14 @@ const StandardLayout: React.ComponentType<StandardLayoutProps> = ({
   });
 
   return (
-    <div className="alert-card__content-block" >
+    <div className="alert-card__content-block">
       <div ref={contentBlockRef}>
         <StandardIssueSection
           issue={issue}
           location={location}
-          contentTextSize={effect === "station_closure" ? contentTextSize : "large"}
+          contentTextSize={
+            effect === "station_closure" ? contentTextSize : "large"
+          }
         />
         <RemedySection
           effect={effect}
@@ -139,7 +141,7 @@ const MultiLineLayout: React.ComponentType<MultiLineLayoutProps> = ({
           {unaffected_routes.map((route) => {
             const UnaffectedLinePill = STRING_TO_SVG[route.svg_name];
             const unaffectedLineColor = getHexColor(
-              getRouteColor(route.route_id)
+              getRouteColor(route.route_id),
             );
             return (
               <UnaffectedLinePill
@@ -195,18 +197,18 @@ const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
         <div
           className={classWithModifier(
             "alert-card__fallback__pio-text",
-            pioSecondaryTextSize
+            pioSecondaryTextSize,
           )}
           ref={pioTextBlockRef}
         >
           {remedy}
         </div>
       )}
-      {remedyBold &&
+      {remedyBold && (
         <div className="alert-card__fallback__pio-text alert-card__fallback__pio-text--bold">
-            {remedyBold}
+          {remedyBold}
         </div>
-      }
+      )}
     </div>
   );
 };
@@ -228,7 +230,7 @@ const StandardIssueSection: React.ComponentType<StandardIssueSectionProps> = ({
       <div
         className={classWithModifier(
           "alert-card__content-block__text",
-          contentTextSize
+          contentTextSize,
         )}
       >
         {issue}
@@ -277,7 +279,7 @@ const RemedySection: React.ComponentType<RemedySectionProps> = ({
           <div
             className={classWithModifier(
               "alert-card__content-block__text",
-              contentTextSize
+              contentTextSize,
             )}
           >
             {remedy}
@@ -303,7 +305,6 @@ interface MapSectionProps {
 const MapSection: React.ComponentType<MapSectionProps> = ({
   disruptionDiagram,
 }) => {
-
   return (
     <div
       id="disruption-diagram-container"
@@ -346,13 +347,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
   let layout;
   switch (true) {
     case effect === "delay":
-      layout = (
-        <FallbackLayout
-          issue={issue}
-          remedy={remedy}
-          effect={effect}
-        />
-      );
+      layout = <FallbackLayout issue={issue} remedy={remedy} effect={effect} />;
       break;
     case !disruption_diagram:
       layout = (
@@ -434,10 +429,12 @@ const PreFareSingleScreenAlert: React.ComponentType<
         <div
           className={classWithModifier(
             "alert-card",
-            showBanner ? "with-banner" : "no-banner"
+            showBanner ? "with-banner" : "no-banner",
           )}
         >
-          <div className={classWithModifier("alert-card__body", effect)}>{layout}</div>
+          <div className={classWithModifier("alert-card__body", effect)}>
+            {layout}
+          </div>
           <div className="alert-card__footer">
             {cause && (
               <div className="alert-card__footer__cause">
@@ -486,7 +483,7 @@ const PreFareAlertBanner: React.ComponentType<{ routes: EnrichedRoute[] }> = ({
   if (
     routes.length === 1 &&
     ["rl", "ol", "bl", "gl", "gl-b", "gl-c", "gl-d", "gl-e"].includes(
-      routes[0].svg_name
+      routes[0].svg_name,
     )
   ) {
     // One destination, short text

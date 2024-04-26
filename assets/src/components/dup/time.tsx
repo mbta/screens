@@ -24,7 +24,7 @@ const Time = ({
     vehicleStatus,
     stopType,
     noMinutes,
-    false
+    false,
   );
 
   if (scheduledTime && timeRepresentation.type !== "TEXT") {
@@ -34,7 +34,7 @@ const Time = ({
       vehicleStatus,
       stopType,
       noMinutes,
-      true
+      true,
     );
     if (!timeRepresentationsEqual(timeRepresentation, scheduleRepresentation)) {
       if (currentPage === 0) {

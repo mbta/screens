@@ -26,18 +26,25 @@ type Props =
   | (MinutesDeparture & { type: "minutes" })
   | (TimestampDeparture & { type: "timestamp" });
 
-interface TextDeparture { text: string }
-interface MinutesDeparture { minutes: number }
-interface TimestampDeparture { hour: number, minute: number }
+interface TextDeparture {
+  text: string;
+}
+interface MinutesDeparture {
+  minutes: number;
+}
+interface TimestampDeparture {
+  hour: number;
+  minute: number;
+}
 
 const DepartureTime = ({ type, ...data }: Props) => {
   let inner;
   if (type === "text") {
-    inner = <TextDepartureTime {...data as TextDeparture} />;
+    inner = <TextDepartureTime {...(data as TextDeparture)} />;
   } else if (type === "minutes") {
-    inner = <MinutesDepartureTime {...data as MinutesDeparture} />;
+    inner = <MinutesDepartureTime {...(data as MinutesDeparture)} />;
   } else if (type === "timestamp") {
-    inner = <TimestampDepartureTime {...data as TimestampDeparture} />;
+    inner = <TimestampDepartureTime {...(data as TimestampDeparture)} />;
   }
 
   return (

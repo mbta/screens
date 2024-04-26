@@ -23,7 +23,7 @@ const iconPaths: { [key: string]: string } = _.mapValues(
     bus: "bus-black.svg",
     delay: "clock.svg",
   },
-  imagePath
+  imagePath,
 );
 
 const srcForIcon = (icon: string) => {
@@ -82,7 +82,7 @@ const FormatString = ({
   const modifiers = format === null ? [] : [format];
   const className = `free-text__element ${classWithModifiers(
     "free-text__string",
-    modifiers
+    modifiers,
   )}`;
 
   return <span className={className}>{text}</span>;

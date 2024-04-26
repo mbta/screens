@@ -751,7 +751,7 @@ const showIdentifiersColumn = {
   Cell: EditableCheckbox,
   Filter: DefaultColumnFilter,
   FormCell: FormBoolean,
-}
+};
 
 const PreFareV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
@@ -769,7 +769,7 @@ const PreFareV2ScreensTable = (): JSX.Element => {
         crDeparturesColumn,
         blueBikesColumn,
         shuttleBusInfoColumn,
-        audioColumn
+        audioColumn,
       ]}
       dataFilter={dataFilter}
     />
@@ -837,7 +837,7 @@ const TriptychV2ScreensTable = (): JSX.Element => {
         trainCrowdingColumn,
         localEvergreenSetsColumn,
         evergreenContentColumn,
-        showIdentifiersColumn
+        showIdentifiersColumn,
       ]}
       dataFilter={dataFilter}
     />

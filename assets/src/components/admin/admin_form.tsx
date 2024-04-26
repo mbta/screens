@@ -10,7 +10,11 @@ const validateJson = (json) => {
   }
 };
 
-const AdminValidateControls = ({ validatePath, setEditable, configRef }): JSX.Element => {
+const AdminValidateControls = ({
+  validatePath,
+  setEditable,
+  configRef,
+}): JSX.Element => {
   const validateCallback = (resultJson) => {
     if (resultJson.success) {
       configRef.current.value = JSON.stringify(resultJson.config, null, 2);
@@ -39,7 +43,11 @@ const AdminValidateControls = ({ validatePath, setEditable, configRef }): JSX.El
   );
 };
 
-const AdminConfirmControls = ({ confirmPath, setEditable, configRef }): JSX.Element => {
+const AdminConfirmControls = ({
+  confirmPath,
+  setEditable,
+  configRef,
+}): JSX.Element => {
   const backFn = () => {
     setEditable(true);
   };

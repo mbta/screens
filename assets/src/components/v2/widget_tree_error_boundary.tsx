@@ -60,7 +60,7 @@ class WidgetTreeErrorBoundary extends React.Component<Props, State> {
       console.error(
         "WidgetTreeErrorBoundary caught an error during render",
         error,
-        errorInfo
+        errorInfo,
       );
       return;
     }
@@ -155,7 +155,9 @@ const LogTimeRecorder = (() => {
 // It's necessary to get the context separately and pass it to the component
 // as a prop because we need this value in getDerivedStateFromProps, which
 // does not receive context as an argument.
-const WrappedWithLastFetch: React.ComponentType<Omit<Props, "lastFetch">> = (props) => {
+const WrappedWithLastFetch: React.ComponentType<Omit<Props, "lastFetch">> = (
+  props,
+) => {
   const lastFetch = useContext(LastFetchContext);
 
   return <WidgetTreeErrorBoundary {...props} lastFetch={lastFetch} />;

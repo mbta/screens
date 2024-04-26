@@ -14,14 +14,14 @@ const BaseDepartureTime = ({
   if (time.type.toUpperCase() === "TEXT") {
     return (
       <div className="base-departure-time">
-        { /* @ts-expect-error */ }
+        {/* @ts-expect-error */}
         <span className="base-departure-time__text">{time.text}</span>
       </div>
     );
   } else if (time.type.toUpperCase() === "MINUTES") {
     return (
       <div className="base-departure-time">
-        { /* @ts-expect-error */ }
+        {/* @ts-expect-error */}
         <span className="base-departure-time__minutes">{time.minutes}</span>
         <span className="base-departure-time__minutes-label">m</span>
       </div>
@@ -29,7 +29,7 @@ const BaseDepartureTime = ({
   } else if (time.type.toUpperCase() === "TIMESTAMP") {
     return (
       <div className="base-departure-time">
-        { /* @ts-expect-error */ }
+        {/* @ts-expect-error */}
         <span className="base-departure-time__timestamp">{time.timestamp}</span>
         {!hideAmPm && (
           /* @ts-expect-error */
