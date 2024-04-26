@@ -75,6 +75,15 @@ jobs:
       - working-directory: ./assets
         run: npm run deploy
 
+  js-format:
+    name: Frontend Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - working-directory: ./assets
+        run: npm run format:check
+
   js-types:
     name: Frontend Types
     runs-on: ubuntu-latest
