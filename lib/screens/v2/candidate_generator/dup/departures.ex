@@ -25,7 +25,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           }
         } = config,
         now,
-        fetch_section_departures_fn \\ &Widgets.Departures.fetch_section_departures/1,
+        fetch_departures_fn \\ &Departure.fetch/2,
         fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1,
         fetch_schedules_fn \\ &Screens.Schedules.Schedule.fetch/2,
         create_station_with_routes_map_fn \\ &Screens.Stops.Stop.create_station_with_routes_map/1,
@@ -34,7 +34,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     primary_departures_instances =
       primary_sections
       |> get_sections_data(
-        fetch_section_departures_fn,
+        fetch_departures_fn,
         fetch_alerts_fn,
         create_station_with_routes_map_fn,
         now
@@ -62,7 +62,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     secondary_departures_instances =
       secondary_sections
       |> get_sections_data(
-        fetch_section_departures_fn,
+        fetch_departures_fn,
         fetch_alerts_fn,
         create_station_with_routes_map_fn,
         now
@@ -205,7 +205,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp get_sections_data(
          sections,
-         fetch_section_departures_fn,
+         fetch_departures_fn,
          fetch_alerts_fn,
          create_station_with_routes_map_fn,
          now
@@ -215,8 +215,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
                               query: %Query{
                                 params: %Params{stop_ids: stop_ids} = params
                               },
-                              headway: headway,
-                              bidirectional: is_bidirectional
+                              headway: headway
                             } = section ->
       routes = get_routes_serving_section(params, create_station_with_routes_map_fn)
       # DUP sections will always show no more than one mode.
@@ -231,19 +230,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         %{type: :no_data_section, route: primary_route_for_section}
       else
         section_departures =
-          case fetch_section_departures_fn.(section) do
-            {:ok, []} ->
-              []
-
-            {:ok, section_departures} ->
-              # If the section is configured as bidirectional,
-              # it needs to show one departure in each direction
-              if is_bidirectional,
-                do: get_bidirectional_departures(section_departures),
-                else: section_departures
-
-            _ ->
-              []
+          case Widgets.Departures.fetch_section_departures(section, fetch_departures_fn) do
+            {:ok, departures} -> departures
+            :error -> []
           end
 
         alert_informed_entities = get_section_entities(params, fetch_alerts_fn, now)
@@ -272,25 +261,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   defp get_section_route_from_entities(_, _), do: nil
-
-  defp get_bidirectional_departures(section_departures) do
-    first_row = List.first(section_departures)
-    first_direction_id = Departure.direction_id(first_row)
-
-    second_row =
-      Enum.find(section_departures, Enum.at(section_departures, 1), fn departure ->
-        Departure.direction_id(departure) === 1 - first_direction_id
-      end)
-
-    # Towards the end of service, there can exist a scenario where one direction is done and the other only has one more departure.
-    # When this happens, the default above is nil because section_departures only has one departure in the list.
-    # In that scenario, only return first_row and let the overnight logic determine what row should be displayed.
-    if is_nil(second_row) do
-      [first_row]
-    else
-      [first_row, second_row]
-    end
-  end
 
   defp get_section_entities(
          %Params{

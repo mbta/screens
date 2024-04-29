@@ -289,6 +289,36 @@ config :screens,
         alert_headsign: "Bowdoin",
         headway_headsign: "Wonderland"
       }
+    ],
+    # South Station
+    "place-sstat" => [
+      %{
+        informed: "70078",
+        not_informed: "70082",
+        alert_headsign: "Alewife",
+        headway_headsign: "Ashmont/Braintree"
+      },
+      %{
+        informed: "70081",
+        not_informed: "70077",
+        alert_headsign: "Ashmont/Braintree",
+        headway_headsign: "Alewife"
+      }
+    ],
+    # Kendall
+    "place-knncl" => [
+      %{
+        informed: "70070",
+        not_informed: "70074",
+        alert_headsign: "Alewife",
+        headway_headsign: "Ashmont/Braintree"
+      },
+      %{
+        informed: "70073",
+        not_informed: "70069",
+        alert_headsign: "Ashmont/Braintree",
+        headway_headsign: "Alewife"
+      }
     ]
   },
   prefare_alert_headsign_matchers: %{
