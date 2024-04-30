@@ -36,7 +36,7 @@ Outfront recommends these asset sizes:
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Screens</title>
-      <link rel="stylesheet" href="triptych_v2.css" />
+      <link rel="stylesheet" href="packaged_triptych_v2.css" />
     </head>
 
     <body>
@@ -45,8 +45,11 @@ Outfront recommends these asset sizes:
         data-last-refresh="2020-09-25T17:23:00Z"
         data-environment-name="screens-prod"
       ></div>
-      <script type="text/javascript" src="polyfills.js"></script>
-      <script type="text/javascript" src="triptych_v2.js"></script>
+      <script
+        type="text/javascript"
+        src="packaged_triptych_polyfills.js"
+      ></script>
+      <script type="text/javascript" src="packaged_triptych_v2.js"></script>
     </body>
   </html>
   ```
@@ -80,9 +83,9 @@ Outfront recommends these asset sizes:
 - `cd` to priv/static and run the following:
   ```sh
   npm --prefix ../../assets run deploy && \
-  cp -r css/triptych_v2.css js/polyfills.js js/triptych_v2.js ../triptych_preview.png . && \
+  cp -r css/packaged_triptych_v2.css js/packaged_triptych_polyfills.js js/packaged_triptych_v2.js ../triptych_preview.png . && \
   cp ../triptych_template.json ./template.json && \
-  zip -r triptych-app.zip triptych_v2.css polyfills.js triptych_v2.js fonts images triptych-app.html template.json triptych_preview.png
+  zip -r triptych-app.zip packaged_triptych_v2.css packaged_triptych_polyfills.js packaged_triptych_v2.js fonts triptych_images triptych-app.html template.json triptych_preview.png
   ```
 - On completion, the packaged client app will be saved at
   `priv/static/triptych-app.zip`.
