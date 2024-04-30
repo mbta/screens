@@ -255,7 +255,7 @@ const ScheduledDepartureDescription = ({ cx, cy, timestamp, stationName }) => {
         dy="36"
         className={classWithModifier(
           "line-map__scheduled-departure",
-          "message"
+          "message",
         )}
       >
         Scheduled to depart
@@ -265,7 +265,7 @@ const ScheduledDepartureDescription = ({ cx, cy, timestamp, stationName }) => {
         dy="32"
         className={classWithModifier(
           "line-map__scheduled-departure",
-          "message"
+          "message",
         )}
       >
         {stationName}
@@ -385,7 +385,7 @@ const VehicleMinutesLabel = ({ cx, cy, minutes }) => {
         dx="3"
         className={classWithModifier(
           "line-map__vehicle-label",
-          "minutes-label"
+          "minutes-label",
         )}
       >
         m
@@ -417,7 +417,13 @@ const Vehicle = ({ index, label }) => {
   );
 };
 
-const Vehicles = ({ vehicles, stops }: { vehicles: Vehicle[], stops: Stop[] }) => {
+const Vehicles = ({
+  vehicles,
+  stops,
+}: {
+  vehicles: Vehicle[];
+  stops: Stop[];
+}) => {
   const maxIndex = stops.length;
   vehicles = vehicles.filter(({ index }) => index <= maxIndex);
 
@@ -432,7 +438,7 @@ const Vehicles = ({ vehicles, stops }: { vehicles: Vehicle[], stops: Stop[] }) =
 
 const truncateStops = (stops) => {
   const n = Math.floor(
-    (HEIGHT - (TOP_MARGIN + BIG_STOP_RADIUS)) / STOP_SPACING
+    (HEIGHT - (TOP_MARGIN + BIG_STOP_RADIUS)) / STOP_SPACING,
   );
   return stops.slice(0, n + 1);
 };
@@ -448,25 +454,25 @@ type Props = {
   stops: Stop[];
   vehicles: Vehicle[];
   scheduled_departure: ScheduledDeparture;
-}
+};
 
 type Stop = {
   label: string;
   downstream: boolean;
   current: boolean;
   terminal: boolean;
-}
+};
 
 type Vehicle = {
   id: string;
   index: number;
   label: string;
-}
+};
 
 type ScheduledDeparture = {
   timestamp: string;
   station_name: string;
-}
+};
 
 const LineMap = ({
   stops,

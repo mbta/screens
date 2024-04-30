@@ -10,9 +10,8 @@
     "tsc:check": "tsc --noEmit",
     "lint": "tslint --fix -p .",
     "lint:check": "tslint -p .",
-    "format": "prettier --list-different \"{.,**}/*.{js,json,ts,tsx,css,scss}\" | xargs prettier --write",
-    "format:check": "prettier --check \"{.,**}/*.{js,json,ts,tsx,css,scss}\"",
-    "check": "npm run lint:check && npm run format:check"
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@fullstory/browser": "^1.7.1",
@@ -56,7 +55,7 @@
     "jest": "^27.0.6",
     "mini-css-extract-plugin": "^1.6.2",
     "optimize-css-assets-webpack-plugin": "^6.0.1",
-    "prettier": "^2.3.2",
+    "prettier": "^3.2.5",
     "sass": "^1.62.1",
     "sass-loader": "^10.1.0",
     "source-map-loader": "^1.1.3",

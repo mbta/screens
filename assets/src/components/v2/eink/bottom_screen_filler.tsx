@@ -14,7 +14,11 @@ const BottomScreenFiller: ComponentType = () => (
       </div>
     </div>
     <div className="bottom-screen-filler__phone-image-container">
-      <HandWithPhone width="184px" height="283px" className="bottom-screen-filler__phone-image" />
+      <HandWithPhone
+        width="184px"
+        height="283px"
+        className="bottom-screen-filler__phone-image"
+      />
     </div>
   </div>
 );

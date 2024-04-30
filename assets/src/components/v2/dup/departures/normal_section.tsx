@@ -14,9 +14,7 @@ const NormalSection = ({ rows }) => {
       {rows.map((row, index) => {
         const { id, type, ...data } = row;
         if (type === "departure_row") {
-          return (
-            <DepartureRow {...data} key={id} currentPage={currentPage} />
-          );
+          return <DepartureRow {...data} key={id} currentPage={currentPage} />;
         } else if (type === "notice_row") {
           return <NoticeRow row={row} key={"notice" + index} />;
         } else {
@@ -24,7 +22,7 @@ const NormalSection = ({ rows }) => {
         }
       })}
     </div>
-  )
+  );
 };
 
 export default NormalSection;

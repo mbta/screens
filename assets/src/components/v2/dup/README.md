@@ -7,7 +7,7 @@
 - Create priv/static/dup-app.html if it doesn’t already exist. Copy paste the following contents in:
 
   ```html
-  <!DOCTYPE html>
+  <!doctype html>
   <html lang="en">
     <head>
       <meta charset="utf-8" />
@@ -37,8 +37,9 @@
     ```ts
     import { __TEST_setFakeMRAID__ } from "Util/outfront";
     __TEST_setFakeMRAID__({
-      playerName: "<a DUP player name, e.g. BKB-DUP-002. For others, look in priv/local.json for IDs of the pattern 'DUP-${playerName}'>",
-      station: "<a station name>"
+      playerName:
+        "<a DUP player name, e.g. BKB-DUP-002. For others, look in priv/local.json for IDs of the pattern 'DUP-${playerName}'>",
+      station: "<a station name>",
     });
     ```
     This sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
@@ -79,7 +80,7 @@ const Counter = (() => {
       let cur = n;
       n = (n + 1) % 100;
       return `${cur.toString().padStart(2, "0")}`;
-    }
+    },
   };
 })();
 

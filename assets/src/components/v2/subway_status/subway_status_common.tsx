@@ -70,7 +70,7 @@ export const isGLMultiPill = (pill?: SubwayStatusPill): pill is GLMultiPill =>
   (pill?.branches?.length ?? 0) > 0;
 
 export const isAlertLocationMap = (
-  location: AlertLocation
+  location: AlertLocation,
 ): location is AlertLocationMap =>
   location !== null && typeof location === "object";
 
@@ -94,7 +94,7 @@ export const adjustAlertForContractedStatus = (alert: Alert): Alert => ({
   status: delayMinutesToM(alert.status),
   location: clearLocationForAllGLBranchesAlert(
     alert.location,
-    alert.route_pill
+    alert.route_pill,
   ),
 });
 
@@ -105,7 +105,7 @@ const delayMinutesToM = (status: string): string =>
 
 const clearLocationForAllGLBranchesAlert = (
   location: AlertLocation,
-  routePill?: SubwayStatusPill
+  routePill?: SubwayStatusPill,
 ): AlertLocation => {
   if (isGLMultiPill(routePill) && new Set(routePill.branches).size === 4) {
     return null;
@@ -120,7 +120,7 @@ const clearLocationForAllGLBranchesAlert = (
 export const getAlertID = (
   alert: Alert,
   statusType: Section["type"],
-  index: number = 0
+  index: number = 0,
 ): string => {
   const location = isAlertLocationMap(alert.location)
     ? `${alert.location.abbrev}-${alert.location.full}`
@@ -132,7 +132,7 @@ export const getAlertID = (
 };
 
 export const isContractedWith1Alert = (
-  section: Section
+  section: Section,
 ): section is ContractedSection =>
   isContracted(section) && section.alerts.length === 1;
 
@@ -143,8 +143,17 @@ export enum FittingStep {
   FullSize = "FullSize",
 }
 
-export const useSubwayStatusTextResizer = (rowHeight: number, steps: FittingStep[], id: string, status: string) => {
-  const { ref, size: fittingStep, isDone } = useTextResizer({
+export const useSubwayStatusTextResizer = (
+  rowHeight: number,
+  steps: FittingStep[],
+  id: string,
+  status: string,
+) => {
+  const {
+    ref,
+    size: fittingStep,
+    isDone,
+  } = useTextResizer({
     sizes: steps,
     maxHeight: rowHeight,
     resetDependencies: [id],
@@ -176,5 +185,12 @@ export const useSubwayStatusTextResizer = (rowHeight: number, steps: FittingStep
       }
   }
 
-  return { ref, abbrev, truncateStatus, replaceLocationWithUrl, fittingStep, isDone };
+  return {
+    ref,
+    abbrev,
+    truncateStatus,
+    replaceLocationWithUrl,
+    fittingStep,
+    isDone,
+  };
 };

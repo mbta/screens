@@ -12,7 +12,7 @@ const EditModal = ({
   const selectedRows = _.filter(data, (_row, i) => selectedRowIds[i]);
 
   const initialFormValues = _.fromPairs(
-    columns.map(({ Header }) => [Header, undefined])
+    columns.map(({ Header }) => [Header, undefined]),
   );
   const [formValues, setFormValues] = useState(initialFormValues);
 
@@ -50,10 +50,10 @@ const EditModal = ({
             const firstValue = selectedRowValues[0];
             const otherValues = selectedRowValues.slice(
               1,
-              selectedRowValues.length
+              selectedRowValues.length,
             );
             const valuesAllMatch = _.every(otherValues, (otherValue) =>
-              _.isEqual(firstValue, otherValue)
+              _.isEqual(firstValue, otherValue),
             );
             const value = valuesAllMatch ? firstValue : undefined;
 

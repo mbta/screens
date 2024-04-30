@@ -24,9 +24,7 @@ const Viewport: React.ComponentType<{}> = ({ children }) => {
 
   return (
     <div className={viewportClassName}>
-      <div className={shifterClassName}>
-        {children}
-      </div>
+      <div className={shifterClassName}>{children}</div>
     </div>
   );
 };

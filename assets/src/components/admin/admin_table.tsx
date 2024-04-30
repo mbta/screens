@@ -28,7 +28,7 @@ const buildIndexMapping = (data, dataFilter) => {
         isIncluded ? filteredIndex + 1 : filteredIndex,
       ];
     },
-    [{}, 0]
+    [{}, 0],
   );
 
   return indexMapping;
@@ -79,7 +79,7 @@ const Table = ({
         },
         ...cols,
       ]);
-    }
+    },
   );
 
   return (
@@ -295,7 +295,7 @@ const AdminTable = ({ columns, dataFilter }): JSX.Element => {
           return mutator(row, value);
         }
         return row;
-      })
+      }),
     );
   };
 

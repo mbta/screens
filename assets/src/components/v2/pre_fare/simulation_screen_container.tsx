@@ -24,15 +24,18 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
   let rightScreenPages: WidgetData[] = [];
   if (flexZone) {
     leftScreenPages = flexZone.filter(
-      (widget: WidgetData) => widget.type === "body_left_flex"
+      (widget: WidgetData) => widget.type === "body_left_flex",
     );
     rightScreenPages = flexZone.filter(
-      (widget: WidgetData) => !leftScreenPages.includes(widget)
+      (widget: WidgetData) => !leftScreenPages.includes(widget),
     );
   }
 
-  const isPageListActive = leftScreenPages && leftScreenPages.length > 1
-                        && rightScreenPages && rightScreenPages.length > 1
+  const isPageListActive =
+    leftScreenPages &&
+    leftScreenPages.length > 1 &&
+    rightScreenPages &&
+    rightScreenPages.length > 1;
 
   return (
     <div className="simulation-screen-centering-container">
@@ -64,7 +67,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
                       <Widget data={flexZonePage} />
                     </div>
                   );
-                }
+                },
               )}
             </div>
           </div>
@@ -85,7 +88,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
                       <Widget data={flexZonePage} />
                     </div>
                   );
-                }
+                },
               )}
             </div>
           </div>

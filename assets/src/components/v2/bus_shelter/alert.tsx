@@ -1,6 +1,10 @@
 import React, { ComponentType } from "react";
 
-import BaseAlert, { Props, AlertCardProps, AlertIcon } from "Components/v2/alert";
+import BaseAlert, {
+  Props,
+  AlertCardProps,
+  AlertIcon,
+} from "Components/v2/alert";
 
 const FlexZoneAlert: ComponentType<Props> = (props) => {
   return (

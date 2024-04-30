@@ -60,10 +60,10 @@ const Destination = ({ headsign, currentPage }) => {
   useLayoutEffect(() => {
     if (firstLineRef.current && secondLineRef.current) {
       const firstLines = Math.round(
-        firstLineRef.current.clientHeight / LINE_HEIGHT
+        firstLineRef.current.clientHeight / LINE_HEIGHT,
       );
       const secondLines = Math.round(
-        secondLineRef.current.clientHeight / LINE_HEIGHT
+        secondLineRef.current.clientHeight / LINE_HEIGHT,
       );
 
       switch (phase) {

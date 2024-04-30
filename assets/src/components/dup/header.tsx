@@ -29,12 +29,12 @@ const Pattern = ({ pattern }: { pattern: string }): JSX.Element => {
 };
 
 type Props = {
-  text: string | null
-  currentTimeString?: string
-  pattern?: string
-  color?: string
-  code?: string
-}
+  text: string | null;
+  currentTimeString?: string;
+  pattern?: string;
+  color?: string;
+  code?: string;
+};
 
 const Header = ({
   text,
@@ -42,7 +42,7 @@ const Header = ({
   pattern,
   color,
   code,
-} : Props): JSX.Element => {
+}: Props): JSX.Element => {
   const environmentName = getDatasetValue("environmentName");
 
   const className = color

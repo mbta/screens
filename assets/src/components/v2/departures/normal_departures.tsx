@@ -32,7 +32,7 @@ const NormalDeparturesRenderer = forwardRef<HTMLDivElement, any>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 const trimRows = (rows, n) => {
@@ -58,7 +58,7 @@ const trimRows = (rows, n) => {
         return { count, trimmed };
       }
     },
-    { count: 0, trimmed: [] }
+    { count: 0, trimmed: [] },
   );
 
   return trimmed;
@@ -93,14 +93,15 @@ const getInitialSectionSizes = (sections) => {
 
 const NormalDeparturesSizer = ({ sections, onDoneSizing }) => {
   const [tempSectionSizes, setTempSectionSizes] = useState(
-    getInitialSectionSizes(sections)
+    getInitialSectionSizes(sections),
   );
   const ref = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     if (
       ref.current?.parentElement?.parentElement &&
-      ref.current.clientHeight > ref.current.parentElement.parentElement.clientHeight
+      ref.current.clientHeight >
+        ref.current.parentElement.parentElement.clientHeight
     ) {
       setTempSectionSizes((sectionSizes) => {
         return [sectionSizes[0] - 1];

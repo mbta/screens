@@ -15,7 +15,7 @@ const MultiScreenPage = ({ screenContainer: ScreenContainer }): JSX.Element => {
   );
 };
 
-type QueryParams = { id?: string }
+type QueryParams = { id?: string };
 
 const ScreenPage = ({ screenContainer: ScreenContainer }): JSX.Element => {
   const { id } = useParams<QueryParams>();

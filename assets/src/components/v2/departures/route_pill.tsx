@@ -109,7 +109,7 @@ const RoutePill: ComponentType<Pill> = (pill) => {
         key={branch}
         className={classWithModifiers(
           "route-pill",
-          modifiers.concat(["branch"])
+          modifiers.concat(["branch"]),
         )}
       >
         <TextRoutePill {...pill} text={branch} />

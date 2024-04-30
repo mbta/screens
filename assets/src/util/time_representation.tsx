@@ -30,7 +30,7 @@ export const standardTimeRepresentation = (
   vehicleStatus: string,
   stopType: string,
   noMinutes?: boolean,
-  forceTimestamp?: boolean
+  forceTimestamp?: boolean,
 ): TimeRepresentation => {
   const departureTime = moment(departureTimeString);
   const currentTime = moment(currentTimeString);
@@ -65,7 +65,7 @@ export const standardTimeRepresentation = (
 
 export const einkTimeRepresentation = (
   departureTimeString: string,
-  currentTimeString: string
+  currentTimeString: string,
 ): TimeRepresentation => {
   const departureTime = moment(departureTimeString);
   const currentTime = moment(currentTimeString);

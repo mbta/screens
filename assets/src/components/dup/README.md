@@ -9,7 +9,7 @@
 - Create priv/static/dup-app.html if it doesn’t already exist. Copy paste the following contents in:
 
   ```html
-  <!DOCTYPE html>
+  <!doctype html>
   <html lang="en">
     <head>
       <meta charset="utf-8" />

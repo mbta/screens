@@ -51,7 +51,9 @@
       $contracted-status-with-one-alert-bottom-padding;
   }
 
-  .subway-status_status--contracted.subway-status_status--two-alerts:not(.subway-status_status--has-second-pill) {
+  .subway-status_status--contracted.subway-status_status--two-alerts:not(
+      .subway-status_status--has-second-pill
+    ) {
     // 193px
     // Second alert still gets the height of a pill, despite not having one visible
     height: $status-top-padding + (2 * $pill-height) +

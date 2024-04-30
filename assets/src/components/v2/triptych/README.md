@@ -29,7 +29,7 @@ Outfront recommends these asset sizes:
   the following contents in:
 
   ```html
-  <!DOCTYPE html>
+  <!doctype html>
   <html lang="en">
     <head>
       <meta charset="utf-8" />
@@ -103,7 +103,6 @@ message, be sure to specify:
 - a player name (or "Liveboard name"), and
 - a triptych pane (or `Array_configuration`--value should be of the form
   "Triple\_(Left|Middle|Right)")
-  that they should set on the test screen.
 
 ## Debugging
 

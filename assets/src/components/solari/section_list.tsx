@@ -24,7 +24,7 @@ const SectionList = React.forwardRef<HTMLDivElement, Props>(
       stationName,
       isDummy = false,
     },
-    ref
+    ref,
   ): JSX.Element => {
     const className = isDummy
       ? classWithModifier("section-list", "dummy")
@@ -52,7 +52,7 @@ const SectionList = React.forwardRef<HTMLDivElement, Props>(
         })}
       </div>
     );
-  }
+  },
 );
 
 export default SectionList;

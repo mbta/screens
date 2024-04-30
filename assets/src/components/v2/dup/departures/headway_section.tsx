@@ -7,7 +7,7 @@ const HeadwaySection = ({ text, layout }) => {
     <div
       className={`departures-section ${classWithModifier(
         "headway-section",
-        layout
+        layout,
       )}`}
     >
       <FreeText lines={text} />

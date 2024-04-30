@@ -1,12 +1,10 @@
 import React, { forwardRef, useRef } from "react";
 
 import Departures from "Components/eink/bus/departures";
-import {
-  Props as DepartureGroupProps
-} from "Components/eink/bus/departure_group";
+import { Props as DepartureGroupProps } from "Components/eink/bus/departure_group";
 import FareInfo from "Components/eink/bus/fare_info";
 import FlexZoneContainer, {
-  Props as FlexZoneContainerProps
+  Props as FlexZoneContainerProps,
 } from "Components/eink/bus/flex_zone_container";
 import Header from "Components/eink/bus/header";
 import DigitalBridge from "Components/eink/digital_bridge";
@@ -22,8 +20,9 @@ import NoConnectionBottom from "Components/eink/no_connection_bottom";
 import NoConnectionTop from "Components/eink/no_connection_top";
 import LoadingTop from "Components/eink/loading_top";
 
-type TopScreenLayoutProps =
-  Omit<DepartureGroupProps, "size"> & { stopName: string }
+type TopScreenLayoutProps = Omit<DepartureGroupProps, "size"> & {
+  stopName: string;
+};
 
 const TopScreenLayout = forwardRef<HTMLDivElement, TopScreenLayoutProps>(
   ({ currentTimeString, stopName, departures }, ref): JSX.Element => {
@@ -38,10 +37,10 @@ const TopScreenLayout = forwardRef<HTMLDivElement, TopScreenLayoutProps>(
         />
       </div>
     );
-  }
+  },
 );
 
-type BottomScreenLayoutProps = FlexZoneContainerProps & { stopId: string }
+type BottomScreenLayoutProps = FlexZoneContainerProps & { stopId: string };
 
 const BottomScreenLayout = forwardRef<HTMLDivElement, BottomScreenLayoutProps>(
   (
@@ -53,7 +52,7 @@ const BottomScreenLayout = forwardRef<HTMLDivElement, BottomScreenLayoutProps>(
       nearbyConnections,
       psaUrl,
     },
-    ref
+    ref,
   ): JSX.Element => {
     return (
       <div className="single-screen-container">
@@ -69,7 +68,7 @@ const BottomScreenLayout = forwardRef<HTMLDivElement, BottomScreenLayoutProps>(
         <DigitalBridge stopId={stopId} />
       </div>
     );
-  }
+  },
 );
 
 const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
@@ -78,13 +77,13 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
 
   const { departureCount, laterDepartureCount } = useFitDepartures(
     departuresRef,
-    laterDeparturesRef
+    laterDeparturesRef,
   );
 
   const departuresData = apiResponse.departures.slice(0, departureCount);
   const laterDeparturesData = apiResponse.departures.slice(
     departureCount,
-    departureCount + laterDepartureCount
+    departureCount + laterDepartureCount,
   );
 
   return (

@@ -19,7 +19,7 @@ const FlexZonePageIndicator = ({ pageIndex, numPages }) => {
           <div
             className={classWithModifier(
               "flex-zone-page-indicator__page",
-              modifier
+              modifier,
             )}
             key={i}
           >

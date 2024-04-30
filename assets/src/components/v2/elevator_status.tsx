@@ -146,7 +146,7 @@ const TimeframeHeadingIcon = ({
 
 const getTimeframeEndText = (
   happeningNow: boolean,
-  activePeriod: ActivePeriod
+  activePeriod: ActivePeriod,
 ) => {
   let endText: String = "";
   if (happeningNow) {
@@ -217,7 +217,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
       <div
         className={classWithModifier(
           "detail-page__closure",
-          isAtHomeStop && happeningNow ? "active-at-home" : ""
+          isAtHomeStop && happeningNow ? "active-at-home" : "",
         )}
       >
         <div className="detail-page__closure-location">
@@ -234,7 +234,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
         <div
           className={classWithModifier(
             "detail-page__closure-header",
-            headerSize
+            headerSize,
           )}
           ref={headerRef}
         >
@@ -254,7 +254,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
         <div
           className={classWithModifier(
             "detail-page__description",
-            descriptionSize
+            descriptionSize,
           )}
           ref={descriptionRef}
         >
@@ -297,7 +297,7 @@ const StationRow: ComponentType<Station> = ({
           {formatElevatorIds(
             elevatorClosures
               .filter(({ elevator_id: id }) => !isNaN(parseInt(id)))
-              .map(({ elevator_id: id }) => id)
+              .map(({ elevator_id: id }) => id),
           )}
         </div>
         {isAtHomeStop && (
