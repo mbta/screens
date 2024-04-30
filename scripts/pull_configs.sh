@@ -26,6 +26,8 @@ maybe_cp() {
       [Yy]* ) aws s3 cp "$1" "$2";;
       * ) echo "Skipped.";;
     esac
+  else
+    aws s3 cp "$1" "$2"
   fi
 }
 
