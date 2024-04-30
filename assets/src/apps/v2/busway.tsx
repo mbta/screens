@@ -33,6 +33,7 @@ import DeparturesNoData from "Components/v2/lcd/departures_no_data";
 import PageLoadNoData from "Components/v2/lcd/page_load_no_data";
 
 import MultiScreenPage from "Components/v2/multi_screen_page";
+import SimulationScreenPage from "Components/v2/simulation_screen_page";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -88,12 +89,25 @@ const App = (): JSX.Element => {
             responseMapper={responseMapper}
           />
         </Route>
-        <Route path="/v2/screen/:id">
+        <Route exact path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <BlinkConfigContext.Provider value={blinkConfig}>
                 <ScreenPage />
               </BlinkConfigContext.Provider>
+            </ResponseMapperContext.Provider>
+          </MappingContext.Provider>
+        </Route>
+        <Route
+          exact
+          path={[
+            "/v2/screen/:id/simulation",
+            "/v2/screen/pending/:id/simulation",
+          ]}
+        >
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <SimulationScreenPage />
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>

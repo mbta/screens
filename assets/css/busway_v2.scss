@@ -24,6 +24,9 @@
 @import "v2/busway/departures_no_data";
 @import "v2/lcd_common/departures_no_data";
 
+@import "v2/simulation_common";
+@import "v2/lcd_common/simulation";
+
 body {
   margin: 0px;
 }
