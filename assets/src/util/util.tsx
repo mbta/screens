@@ -1,7 +1,7 @@
 import moment from "moment";
 import "moment-timezone";
 import { getDatasetValue } from "Util/dataset";
-import { isOFM } from "Util/outfront";
+import { isOFM, isTriptych } from "Util/outfront";
 
 export const classWithModifier = (baseClass, modifier) => {
   if (!modifier) {
@@ -25,7 +25,10 @@ export const formatTimeString = (timeString: string) =>
   moment(timeString).tz("America/New_York").format("h:mm");
 
 export const imagePath = (fileName: string): string =>
-  isOFM() ? `images/${fileName}` : `/images/${fileName}`;
+  isOFM() ? outfrontImagePath(fileName) : `/images/${fileName}`;
+
+export const outfrontImagePath = (fileName: string): string =>
+  isTriptych() ? `triptych_images/${fileName}` : `/images/${fileName}`;
 
 export const pillPath = (fileName: string): string =>
   isOFM() ? `images/pills/${fileName}` : `/images/pills/${fileName}`;

@@ -5,6 +5,10 @@ import useIsOnScreen from "Hooks/v2/use_is_on_screen";
 import { imagePath } from "Util/util";
 import { TRIPTYCH_VERSION } from "./triptych/version";
 import { usePlayerName } from "Hooks/outfront";
+import { isOFM } from "Util/outfront";
+if (isOFM()) {
+  require.context("../../../static/images/triptych_psas", true, /\.(webp)$/);
+}
 
 const OutfrontEvergreenContent: ComponentType<{
   asset_url: string;

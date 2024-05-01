@@ -104,6 +104,34 @@ module.exports = (env, options) => [
             },
           ],
         },
+        {
+          test: /\.(png|jpe?g|gif)$/i,
+          use: [
+            {
+              loader: "file-loader",
+              options: {
+                name: "[name].[ext]",
+                outputPath: "/images/",
+                publicPath: "../images/",
+                useRelativePaths: true,
+              },
+            },
+          ],
+        },
+        {
+          test: /\.(webp)$/i,
+          use: [
+            {
+              loader: "file-loader",
+              options: {
+                name: "[folder]/[name].[ext]",
+                outputPath: "/images/triptych_psas/",
+                publicPath: "../images/triptych_psas/",
+                useRelativePaths: true,
+              },
+            },
+          ],
+        },
       ],
     },
     plugins: [
@@ -150,7 +178,6 @@ module.exports = (env, options) => [
                 [
                   "@babel/preset-env",
                   {
-                    // debug: true,
                     corejs: { version: 3, proposals: true },
                     useBuiltIns: "usage",
                   },
@@ -195,7 +222,21 @@ module.exports = (env, options) => [
         {
           test: /\.svg$/i,
           issuer: /\.[jt]sx?$/,
-          use: ["@svgr/webpack"],
+          use: [
+            {
+              loader: "@svgr/webpack",
+              options: { svgo: true },
+            },
+            {
+              loader: "file-loader",
+              options: {
+                name: "[name].[ext]",
+                outputPath: "triptych_svgs/",
+                publicPath: "triptych_svgs/",
+                useRelativePaths: true,
+              },
+            },
+          ],
         },
         {
           test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
@@ -206,6 +247,35 @@ module.exports = (env, options) => [
                 name: "[name].[ext]",
                 outputPath: "fonts/",
                 publicPath: "fonts/",
+                useRelativePaths: true,
+              },
+            },
+          ],
+        },
+        {
+          test: /\.(png|jpe?g|gif)$/i,
+          use: [
+            {
+              loader: "file-loader",
+
+              options: {
+                name: "[name].[ext]",
+                outputPath: "triptych_images/",
+                publicPath: "triptych_images/",
+                useRelativePaths: true,
+              },
+            },
+          ],
+        },
+        {
+          test: /\.(webp)$/i,
+          use: [
+            {
+              loader: "file-loader",
+              options: {
+                name: "/[folder]/[name].[ext]",
+                outputPath: "triptych_images/triptych_psas/",
+                publicPath: "triptych_images/triptych_psas/",
                 useRelativePaths: true,
               },
             },

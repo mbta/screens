@@ -1,17 +1,17 @@
 import React, { ComponentType } from "react";
-import { imagePath } from "Util/util";
+import loadingPNG from "../../../../static/images/loading-triptych.png";
 
 const PageLoadNoData: ComponentType = () => {
   return (
     <>
       <div className="no-data-left">
-        <img src={imagePath("loading-triptych.png")} />
+        <img src={loadingPNG} />
       </div>
       <div className="no-data-middle">
-        <img src={imagePath("loading-triptych.png")} />
+        <img src={loadingPNG} />
       </div>
       <div className="no-data-right">
-        <img src={imagePath("loading-triptych.png")} />
+        <img src={loadingPNG} />
       </div>
     </>
   );
