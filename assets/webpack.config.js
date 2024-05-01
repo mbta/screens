@@ -222,21 +222,7 @@ module.exports = (env, options) => [
         {
           test: /\.svg$/i,
           issuer: /\.[jt]sx?$/,
-          use: [
-            {
-              loader: "@svgr/webpack",
-              options: { svgo: true },
-            },
-            {
-              loader: "file-loader",
-              options: {
-                name: "[name].[ext]",
-                outputPath: "triptych_svgs/",
-                publicPath: "triptych_svgs/",
-                useRelativePaths: true,
-              },
-            },
-          ],
+          use: "@svgr/webpack",
         },
         {
           test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
@@ -285,12 +271,14 @@ module.exports = (env, options) => [
     },
     plugins: [
       new MiniCssExtractPlugin({ filename: "../css/[name].css" }),
-      new CopyWebpackPlugin({ patterns: [{ from: "static/", to: "../" }] }),
+      new CopyWebpackPlugin({
+        patterns: [{ from: "static/fonts", to: "../fonts" }],
+      }),
     ],
     devtool: "source-map",
     optimization: {
       minimizer: [
-        new TerserPlugin({ cache: true, parallel: true, sourceMap: false }),
+        new TerserPlugin({ cache: true, parallel: true, sourceMap: true }),
         new OptimizeCSSAssetsPlugin({}),
       ],
     },
