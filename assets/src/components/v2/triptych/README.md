@@ -84,8 +84,9 @@ Outfront recommends these asset sizes:
   ```sh
   npm --prefix ../../assets run deploy && \
   cp -r css/packaged_triptych_v2.css js/packaged_triptych_polyfills.js js/packaged_triptych_v2.js ../triptych_preview.png . && \
+  cp -r js/triptych_images js/triptych_svgs . && \
   cp ../triptych_template.json ./template.json && \
-  zip -r triptych-app.zip packaged_triptych_v2.css packaged_triptych_polyfills.js packaged_triptych_v2.js fonts triptych_images triptych-app.html template.json triptych_preview.png
+  zip -r triptych-app.zip packaged_triptych_v2.css packaged_triptych_polyfills.js packaged_triptych_v2.js fonts triptych_images triptych_svgs triptych-app.html template.json triptych_preview.png
   ```
 - On completion, the packaged client app will be saved at
   `priv/static/triptych-app.zip`.
