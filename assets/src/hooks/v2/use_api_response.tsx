@@ -83,7 +83,7 @@ const rawResponseToSimulationApiResponse = ({
 const doFailureBuffer = (
   lastSuccess: number | null,
   setApiResponse: React.Dispatch<React.SetStateAction<ApiResponse>>,
-  apiResponse: ApiResponse = FAILURE_RESPONSE
+  apiResponse: ApiResponse = FAILURE_RESPONSE,
 ) => {
   if (lastSuccess == null) {
     // We haven't had a successful request since initial page load.
@@ -241,7 +241,7 @@ const useBaseApiResponse = ({
       fetchData();
     },
     refreshMs,
-    refreshRateOffsetMs
+    refreshRateOffsetMs,
   );
 
   return { apiResponse, requestCount, lastSuccess };

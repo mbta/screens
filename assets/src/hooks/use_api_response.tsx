@@ -14,7 +14,7 @@ const doFailureBuffer = (
   lastSuccess: number | null,
   failureModeElapsedMs: number,
   setApiResponse: React.Dispatch<React.SetStateAction<Record<string, any>>>,
-  apiResponse: Record<string, any> = FAILURE_RESPONSE
+  apiResponse: Record<string, any> = FAILURE_RESPONSE,
 ) => {
   if (lastSuccess == null) {
     // We haven't had a successful request since initial page load.
@@ -71,7 +71,7 @@ const useApiResponse = ({
   failureModeElapsedMs = MINUTE_IN_MS,
 }: UseApiResponseArgs) => {
   const [apiResponse, setApiResponse] = useState<Record<string, any> | null>(
-    LOADING_RESPONSE
+    LOADING_RESPONSE,
   );
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const lastRefresh = getDatasetValue("lastRefresh");
@@ -112,7 +112,7 @@ const useApiResponse = ({
           lastSuccess,
           failureModeElapsedMs,
           setApiResponse,
-          json
+          json,
         );
       }
     } catch (err) {
