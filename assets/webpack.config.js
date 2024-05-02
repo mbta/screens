@@ -105,28 +105,14 @@ module.exports = (env, options) => [
           ],
         },
         {
-          test: /\.(png|jpe?g|gif)$/i,
+          test: /\.(png|jpe?g|gif|webp)$/i,
           use: [
             {
               loader: "file-loader",
               options: {
                 name: "[name].[ext]",
                 outputPath: "/images/",
-                publicPath: "../images/",
-                useRelativePaths: true,
-              },
-            },
-          ],
-        },
-        {
-          test: /\.(webp)$/i,
-          use: [
-            {
-              loader: "file-loader",
-              options: {
-                name: "[folder]/[name].[ext]",
-                outputPath: "/images/triptych_psas/",
-                publicPath: "../images/triptych_psas/",
+                publicPath: "/images/",
                 useRelativePaths: true,
               },
             },
