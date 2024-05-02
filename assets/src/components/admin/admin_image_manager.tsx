@@ -56,7 +56,7 @@ const S3ImageThumbnail = ({ filename }): JSX.Element => (
   <ImageThumbnail src={`/image/${filename}`} fullSize />
 );
 
-const ImageManagerContainer = ({}): JSX.Element => {
+const ImageManagerContainer = (): JSX.Element => {
   const [imageFilenames, setImageFilenames] = useState<string[]>([]);
 
   const loadState = async () => {
@@ -75,7 +75,7 @@ const ImageManagerContainer = ({}): JSX.Element => {
   );
 };
 
-const ImageUpload = ({}): JSX.Element => {
+const ImageUpload = (): JSX.Element => {
   const [stagedImageUpload, setStagedImageUpload] =
     useState<FileWithPreview | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -100,7 +100,7 @@ const ImageUpload = ({}): JSX.Element => {
       } else {
         throw new Error();
       }
-    } catch (e) {
+    } catch {
       alert("Upload failed.");
       setIsUploading(false);
     }
@@ -108,7 +108,7 @@ const ImageUpload = ({}): JSX.Element => {
 
   const onDrop = useCallback(
     ([acceptedFile]) => {
-      if (!!acceptedFile) {
+      if (acceptedFile) {
         const fileWithPreview = Object.assign(acceptedFile, {
           preview: URL.createObjectURL(acceptedFile),
         });
@@ -178,7 +178,7 @@ const ImageManager = ({ imageFilenames }): JSX.Element => {
         } else {
           throw new Error();
         }
-      } catch (e) {
+      } catch {
         alert(`Failed to delete ${selectedFilename}.`);
         setIsDeleting(false);
       }

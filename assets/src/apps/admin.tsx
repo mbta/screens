@@ -1,5 +1,3 @@
-declare function require(name: string): string;
-// tslint:disable-next-line
 require("../../css/admin.scss");
 
 import React from "react";

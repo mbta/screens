@@ -115,7 +115,7 @@ const useApiResponse = ({
           json,
         );
       }
-    } catch (err) {
+    } catch {
       doFailureBuffer(lastSuccess, failureModeElapsedMs, setApiResponse);
     }
   };

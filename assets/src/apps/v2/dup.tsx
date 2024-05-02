@@ -4,8 +4,6 @@ initSentry("dup_v2");
 import initFullstory from "Util/fullstory";
 initFullstory();
 
-declare function require(name: string): string;
-// tslint:disable-next-line
 require("../../../css/dup_v2.scss");
 
 import React from "react";

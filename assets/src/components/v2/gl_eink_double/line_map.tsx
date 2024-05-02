@@ -29,8 +29,8 @@ const abbreviateStop = (stop) => {
 // Will only split on a space.
 const splitLabel = (labelText: string) => {
   let middle = Math.floor(labelText.length / 2);
-  let before = labelText.lastIndexOf(" ", middle);
-  let after = labelText.indexOf(" ", middle + 1);
+  const before = labelText.lastIndexOf(" ", middle);
+  const after = labelText.indexOf(" ", middle + 1);
 
   if (middle - before < after - middle) {
     middle = before;
@@ -169,7 +169,7 @@ const BaseMapStops = ({ stops }) => {
           }
 
           if (labelText.length > MAXIMUM_STOP_LABEL_LENGTH) {
-            let labelParts = splitLabel(labelText);
+            const labelParts = splitLabel(labelText);
             stopLabel = (
               <text
                 x={LEFT_MARGIN + LINE_WIDTH + TEXT_LEFT_MARGIN}

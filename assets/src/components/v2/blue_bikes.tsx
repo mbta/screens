@@ -48,7 +48,7 @@ const BlueBikes: ComponentType<Props> = (props) => {
   );
 };
 
-const Header: ComponentType<{}> = () => {
+const Header: ComponentType = () => {
   return (
     <div className="blue-bikes__header">
       <div className="blue-bikes__header__bike-icon-container">

@@ -5,7 +5,7 @@ const validateJson = (json) => {
   try {
     JSON.parse(json);
     return true;
-  } catch (err) {
+  } catch {
     return false;
   }
 };

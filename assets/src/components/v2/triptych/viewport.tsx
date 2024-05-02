@@ -8,7 +8,7 @@ import { getTriptychPane } from "Util/outfront";
  * If the param is missing, this will show the full
  * screen content (3240px x 1920px).
  */
-const Viewport: React.ComponentType<{}> = ({ children }) => {
+const Viewport: React.ComponentType = ({ children }) => {
   let viewportClassName = "triptych-screen-viewport";
   let shifterClassName = "triptych-shifter";
 

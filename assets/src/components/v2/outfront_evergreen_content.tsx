@@ -13,7 +13,7 @@ const OutfrontEvergreenContent: ComponentType<{
   const dupReadyUrl = imagePath(assetUrl);
   const isPlaying = useIsOnScreen();
   const playerName = usePlayerName();
-  let identifiers = `${TRIPTYCH_VERSION} ${playerName ? playerName : ""}`;
+  const identifiers = `${TRIPTYCH_VERSION} ${playerName ? playerName : ""}`;
   return (
     <>
       <EvergreenContent asset_url={dupReadyUrl} isPlaying={isPlaying} />
