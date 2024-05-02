@@ -206,7 +206,7 @@ const CircleStopIcon: ComponentType<{
   />
 );
 
-const CircleShuttlingStopIcon: ComponentType<{}> = () => (
+const CircleShuttlingStopIcon: ComponentType = () => (
   <CircleStopIcon r={10} className="shuttle-stop" strokeWidth={4} />
 );
 
@@ -226,7 +226,8 @@ const EndpointLabel: ComponentType<{ labelID: string; isArrow: boolean }> = ({
   labelID,
   isArrow,
 }) => {
-  let labelParts = endLabelIDMap[labelID];
+  const labelParts = endLabelIDMap[labelID];
+
   if (labelParts.length === 1) {
     return (
       <text

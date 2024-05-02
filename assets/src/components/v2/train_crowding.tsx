@@ -168,7 +168,7 @@ const TrainCrowding: React.ComponentType<Props> = ({
   const textPadding = (textPane * 3240) / 3;
 
   const playerName = usePlayerName();
-  let identifiers = `${TRIPTYCH_VERSION} ${playerName ? playerName : ""}`;
+  const identifiers = `${TRIPTYCH_VERSION} ${playerName ? playerName : ""}`;
 
   return (
     <div className="crowding-widget">

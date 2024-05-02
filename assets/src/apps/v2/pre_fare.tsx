@@ -4,8 +4,6 @@ initSentry("pre_fare");
 import initFullstory from "Util/fullstory";
 initFullstory();
 
-declare function require(name: string): string;
-// tslint:disable-next-line
 require("../../../css/pre_fare_v2.scss");
 
 import React from "react";

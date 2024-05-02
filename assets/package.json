@@ -8,8 +8,9 @@
     "watch-build": "webpack --mode development --stats minimal --watch",
     "watch-tsc": "tsc --noEmit --preserveWatchOutput --watch",
     "tsc:check": "tsc --noEmit",
-    "lint": "tslint --fix -p .",
-    "lint:check": "tslint -p .",
+    "lint": "eslint --fix .",
+    "lint:check": "eslint .",
+    "lint:errors": "eslint --quiet .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -29,7 +30,8 @@
     "react-router-dom": "^5.2.0",
     "react-table": "^7.7.0",
     "react-transition-group": "^4.4.2",
-    "regenerator-runtime": "^0.13.7"
+    "regenerator-runtime": "^0.13.7",
+    "weak-key": "^1.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.14.8",
@@ -41,6 +43,7 @@
     "@babel/preset-react": "^7.14.5",
     "@babel/preset-stage-1": "^7.8.3",
     "@babel/preset-typescript": "^7.14.5",
+    "@eslint/js": "^9.1.1",
     "@svgr/webpack": "^5.5.0",
     "@types/jest": "^27.0.0",
     "@types/lodash": "^4.14.171",
@@ -51,7 +54,11 @@
     "concurrently": "^8.2.2",
     "copy-webpack-plugin": "^6.4.1",
     "css-loader": "^5.2.7",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.34.1",
     "file-loader": "^6.2.0",
+    "globals": "^15.1.0",
     "jest": "^27.0.6",
     "mini-css-extract-plugin": "^1.6.2",
     "optimize-css-assets-webpack-plugin": "^6.0.1",
@@ -62,9 +69,8 @@
     "terser-webpack-plugin": "^4.2.3",
     "ts-jest": "^27.0.4",
     "ts-loader": "^8.3.0",
-    "tslint": "^6.1.3",
-    "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.3.5",
+    "typescript-eslint": "^7.8.0",
     "webpack": "^4.46.0",
     "webpack-cli": "^4.7.2",
     "whatwg-fetch": "^3.6.2"

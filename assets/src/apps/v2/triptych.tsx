@@ -1,5 +1,3 @@
-declare function require(name: string): string;
-// tslint:disable-next-line
 require("../../../css/triptych_v2.scss");
 
 import React from "react";

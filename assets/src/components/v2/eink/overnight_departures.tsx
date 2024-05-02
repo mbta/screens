@@ -4,7 +4,7 @@ import { imagePath } from "Util/util";
 
 interface Props {}
 
-const OvernightDepartures: ComponentType<Props> = ({}) => {
+const OvernightDepartures: ComponentType<Props> = () => {
   const currentTime = moment().tz("America/New_York").format("h:mm");
 
   return (

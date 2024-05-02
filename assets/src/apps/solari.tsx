@@ -4,8 +4,6 @@ initSentry("solari");
 import initFullstory from "Util/fullstory";
 initFullstory();
 
-declare function require(name: string): string;
-// tslint:disable-next-line
 require("../../css/solari.scss");
 
 import React, { useEffect } from "react";

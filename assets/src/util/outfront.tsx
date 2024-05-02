@@ -57,7 +57,7 @@ export const getPlayerName = (): string | null => {
       const deviceInfoJSON = mraid.getDeviceInfo();
       const deviceInfo = JSON.parse(deviceInfoJSON);
       playerName = deviceInfo.deviceName;
-    } catch (err) {}
+    } catch {}
   }
 
   return playerName;
@@ -99,14 +99,13 @@ const getTriptychPaneFromTags = () => {
  * Returns null if we fail to determine the station name for any reason.
  */
 export const getStationName = (): string | null => {
-  let station = null;
-
   const tags = getTags();
+
   if (tags != null) {
     return tags.find(({ name }) => name === "Station")?.value?.[0] ?? null;
   }
 
-  return station;
+  return null;
 };
 
 const getTags = (): OFMTag[] | null => {
@@ -116,7 +115,7 @@ const getTags = (): OFMTag[] | null => {
   if (mraid) {
     try {
       tags = JSON.parse(mraid.getTags()).tags as OFMTag[];
-    } catch (err) {}
+    } catch {}
   }
 
   return tags;
@@ -183,7 +182,7 @@ export const __TEST_setFakeMRAID__ = (options: {
 }) => {
   const { playerName, station, triptychPane } = options;
 
-  let tags: OFMTag[] = [{ name: "Station", value: [station] }];
+  const tags: OFMTag[] = [{ name: "Station", value: [station] }];
   if (triptychPane) {
     tags.push({
       name: "Array_configuration",

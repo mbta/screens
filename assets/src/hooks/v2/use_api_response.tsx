@@ -148,7 +148,7 @@ const getOutfrontAbsolutePath = () =>
   isOFM() ? "https://screens.mbta.com" : "";
 
 const getRoute = () => {
-  let route = "/v2/api/screen/";
+  const route = "/v2/api/screen/";
   const isPending = getDatasetValue("isPending") === "true";
   return isPending ? `${route}pending/` : route;
 };
@@ -223,7 +223,7 @@ const useBaseApiResponse = ({
         });
         setLastSuccess(now);
       }
-    } catch (err) {
+    } catch {
       doFailureBuffer(lastSuccess, setApiResponse);
     }
 

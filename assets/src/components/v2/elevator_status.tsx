@@ -101,14 +101,14 @@ const instanceOfListPage = (page: ElevatorStatusPage): page is ListPage => {
   return (page as ListPage).stations !== undefined;
 };
 
-const ElevatorOutageIcon = ({}: {}): JSX.Element => (
+const ElevatorOutageIcon = (): JSX.Element => (
   <img
     className="detail-page__closure-outage-icon"
     src={imagePath("elevator-status-outage-black.svg")}
   />
 );
 
-const HereIcon: ComponentType<{}> = ({}) => (
+const HereIcon: ComponentType = () => (
   <img
     className="elevator-status__closure-you-are-here-icon"
     src={imagePath("elevator-status-you-are-here.svg")}
@@ -148,7 +148,7 @@ const getTimeframeEndText = (
   happeningNow: boolean,
   activePeriod: ActivePeriod,
 ) => {
-  let endText: String = "";
+  let endText = "";
   if (happeningNow) {
     if (activePeriod.end === null) {
       endText = "Until further notice";
@@ -328,11 +328,12 @@ const formatElevatorIds = (ids: string[]) => {
       return `#${ids[0]}`;
     case 2:
       return `#${ids[0]} and ${ids[1]}`;
-    default:
+    default: {
       // a, b, ..., m, and n
       const allButLast = ids.slice(0, ids.length - 1);
       const last = ids[ids.length - 1];
       return `#${allButLast.join(", ")}, and ${last}`;
+    }
   }
 };
 
