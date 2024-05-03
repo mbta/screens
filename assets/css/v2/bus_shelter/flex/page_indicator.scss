@@ -1,7 +1,7 @@
 .flex-zone-page-indicator {
   position: absolute;
   top: 624px;
-  left: 0px;
+  left: 0;
   width: 1024px;
   height: 20px;
   text-align: center;
@@ -22,7 +22,7 @@
   margin-left: 44px;
   overflow: hidden;
   background: #cccbc8;
-  box-shadow: inset 1px 2px 6px 0px #bfbebb;
+  box-shadow: inset 1px 2px 6px 0 #bfbebb;
 
   &--past {
     .flex-zone-page-indicator__page__progress-bar {

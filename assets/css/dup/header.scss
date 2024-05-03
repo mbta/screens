@@ -1,5 +1,4 @@
 .header {
-  position: relative;
   background-color: #171f26;
   color: white;
   height: 248px;
@@ -8,21 +7,27 @@
   &--color-red {
     background-color: $line-color-red;
   }
+
   &--color-orange {
     background-color: $line-color-orange;
   }
+
   &--color-green {
     background-color: $line-color-green;
   }
+
   &--color-blue {
     background-color: $line-color-blue;
   }
+
   &--color-silver {
     background-color: $line-color-silver;
   }
+
   &--color-purple {
     background-color: $line-color-cr;
   }
+
   &--color-yellow {
     background-color: $alert-yellow;
     color: #171f26;
@@ -40,7 +45,7 @@
 .header__logo-container {
   height: 184px;
   width: 184px;
-  margin: 32px 64px 32px 64px;
+  margin: 32px 64px;
   display: inline-block;
   vertical-align: middle;
 }
@@ -65,32 +70,35 @@
 
 .header__environment {
   @include font--text--75bold;
+
   position: absolute;
   top: 12px;
   left: 40px;
   font-size: 48px;
-  color: #ffffff;
+  color: #fff;
   letter-spacing: 0;
   line-height: 48px;
 }
 
 .header__version {
   @include font--display--65medium;
+
   font-size: 32px;
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   left: 8px;
-  color: #ffffff;
+  color: #fff;
   opacity: 0.33;
 }
 
 .header__error-code {
   @include font--display--65medium;
+
   font-size: 32px;
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
   right: 8px;
-  color: #ffffff;
+  color: #fff;
   opacity: 0.33;
 }
 

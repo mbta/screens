@@ -1,5 +1,5 @@
 .screen-container {
-  margin: 0px auto;
+  margin: 0 auto;
   width: 1920px;
   height: 1080px;
   position: relative;
@@ -24,7 +24,7 @@
 }
 
 .disabled__time {
-  color: #ffffff;
+  color: #fff;
   font-family: Helvetica, sans-serif;
   font-size: 138px;
   line-height: 138px;
@@ -60,7 +60,7 @@
 .disabled__link-text {
   display: inline-block;
   vertical-align: middle;
-  color: #ffffff;
+  color: #fff;
   font-family: Inter, sans-serif;
   font-size: 108px;
   margin-left: 72px;
@@ -89,7 +89,6 @@
   display: inline-block;
   width: 1544px;
   vertical-align: top;
-
   font-family: Inter, sans-serif;
   color: #171f26;
   font-size: 144px;
@@ -103,7 +102,6 @@
   vertical-align: top;
   margin-left: 312px;
   margin-top: 64px;
-
   font-family: Inter, sans-serif;
   color: #171f26;
   font-size: 112px;
@@ -158,10 +156,10 @@
   font-size: 144px;
   color: #171f26;
   line-height: 160px;
-  font-family: Inter;
+  font-family: Inter, sans-serif;
 
   .free-text__text-pill {
-    color: #ffffff;
+    color: #fff;
   }
 }
 
@@ -179,7 +177,7 @@
 .headway-section-list__link-text {
   display: inline-block;
   vertical-align: middle;
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   font-size: 108px;
   margin-left: 72px;
 }

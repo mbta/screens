@@ -8,14 +8,16 @@
     color: #e5e4e1;
     box-sizing: border-box;
   }
+
   &__body {
     display: flex;
     position: relative;
     flex-direction: column;
     height: 920px;
     background-color: #d9d6d0;
-    box-shadow: 0px 8px 12px 0px rgba(0, 0, 0, 0.32);
+    box-shadow: 0 8px 12px 0 rgb(0 0 0 / 32%);
   }
+
   &__footer {
     display: flex;
     background-color: #cccbc8;
@@ -32,14 +34,17 @@
 
   .normal-header-time {
     @include font--body-2;
+
     margin-left: auto;
   }
 }
 
 .crowding-widget__header__destination-sentence {
   @include font--heading-3;
+
   margin-top: auto;
-  color: #ffffff;
+  color: #fff;
+
   .destination {
     padding-left: 109px;
   }
@@ -47,6 +52,7 @@
 
 .crowding-widget__footer__segment {
   @include font--body-1;
+
   padding: 71px 72px;
   flex: 1 1;
   display: flex;
@@ -57,8 +63,10 @@
 
 .crowding-widget__footer__key-row {
   @include font--body-2;
+
   display: inline-flex;
   align-items: center;
+
   .key-icon {
     padding-right: 72px;
   }
@@ -66,6 +74,7 @@
 
 .crowding-widget__footer__identifiers {
   @include font--caption-2;
+
   position: absolute;
   bottom: 18px;
   right: 24px;
@@ -74,41 +83,47 @@
 .crowding-widget__train-row {
   display: flex;
   justify-content: space-between;
-  padding: 161px 52px 58px 52px;
+  padding: 161px 52px 58px;
 }
 
 @keyframes up-arrow {
-  from {
+  0% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-20px);
   }
-  to {
+
+  100% {
     transform: translateY(0);
   }
 }
 
 @keyframes up-left-arrow {
-  from {
+  0% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-12px) translateX(-12px);
   }
-  to {
+
+  100% {
     transform: translateY(0);
   }
 }
 
 @keyframes up-right-arrow {
-  from {
+  0% {
     transform: translateY(0) rotate(90deg);
   }
+
   50% {
     transform: translateY(-12px) translateX(12px) rotate(90deg);
   }
-  to {
+
+  100% {
     transform: translateY(0) rotate(90deg);
   }
 }
@@ -116,12 +131,15 @@
 .crowding-widget__you-are-here-arrow {
   width: 180px;
   height: 180px;
+
   &--up {
     animation: up-arrow 1.2s infinite ease-in-out;
   }
+
   &--up-left {
     animation: up-left-arrow 1.2s infinite ease-in-out;
   }
+
   &--up-right {
     animation: up-right-arrow 1.2s infinite ease-in-out;
   }
@@ -129,11 +147,13 @@
 
 .crowding-widget__you-are-here-text {
   @include font--subtitle;
+
   width: 1080px;
   box-sizing: border-box;
   margin-top: auto;
-  padding: 0 72px 108px 72px;
+  padding: 0 72px 108px;
   text-align: left;
+
   &--right-align {
     text-align: right;
   }

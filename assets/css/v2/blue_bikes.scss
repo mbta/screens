@@ -12,8 +12,8 @@
       left: 32px;
       width: 1016px;
       height: 778px;
-      background: rgb(217, 214, 208);
-      box-shadow: 0px 10px 20px 0px rgba(23, 31, 38, 0.25);
+      background: rgb(217 214 208);
+      box-shadow: 0 10px 20px 0 rgb(23 31 38 / 25%);
       border-radius: 16px;
       overflow: hidden;
     }
@@ -34,7 +34,7 @@
       width: 102px;
       height: 102px;
       border-radius: 51px;
-      background: rgb(0, 61, 165);
+      background: rgb(0 61 165);
     }
 
     .blue-bikes__header__bike-icon {
@@ -77,7 +77,7 @@
       left: 0;
       width: 1016px;
       height: 388px;
-      background: rgb(235, 234, 232);
+      background: rgb(235 234 232);
       overflow: hidden;
     }
 
@@ -113,7 +113,7 @@
       left: 0;
       height: 44px;
       line-height: 44px;
-      color: rgb(23, 31, 38);
+      color: rgb(23 31 38);
       font-family: Inter, sans-serif;
       font-size: 32px;
       font-weight: bold;
@@ -125,7 +125,7 @@
       left: 0;
       height: 36px;
       line-height: 36px;
-      color: rgb(23, 31, 38);
+      color: rgb(23 31 38);
       font-family: Inter, sans-serif;
       font-size: 24px;
       font-weight: normal;
@@ -135,7 +135,7 @@
       width: 928px;
       height: 4px;
       margin-left: 44px;
-      background: rgb(204, 203, 200);
+      background: rgb(204 203 200);
       border-radius: 2px;
     }
 
@@ -160,7 +160,7 @@
       top: 36px;
       height: 64px;
       line-height: 64px;
-      color: rgb(23, 31, 38);
+      color: rgb(23 31 38);
       font-family: Inter, sans-serif;
       font-size: 56px;
       font-weight: normal;
@@ -178,7 +178,7 @@
       position: absolute;
       top: 52px;
       left: 565px;
-      color: rgb(23, 31, 38);
+      color: rgb(23 31 38);
       font-family: Inter, sans-serif;
       font-size: 40px;
       font-weight: 500;
@@ -190,8 +190,8 @@
       position: absolute;
       top: 55px;
       left: 780px;
-      color: rgb(23, 31, 38);
-      font-family: Inter;
+      color: rgb(23 31 38);
+      font-family: Inter, sans-serif;
       font-size: 32px;
       font-weight: normal;
       height: 44px;
@@ -206,7 +206,7 @@
     }
 
     .blue-bikes__station__out-of-service-main-text {
-      color: rgb(153, 152, 150);
+      color: rgb(153 152 150);
       font-family: Inter, sans-serif;
       font-size: 40px;
       font-weight: 500;
@@ -215,8 +215,8 @@
     }
 
     .blue-bikes__station__out-of-service-alt-text {
-      color: rgb(153, 152, 150);
-      font-family: Inter;
+      color: rgb(153 152 150);
+      font-family: Inter, sans-serif;
       font-size: 32px;
       font-weight: normal;
       height: 44px;
@@ -233,7 +233,7 @@
       display: inline-block;
       width: 94px;
       height: 64px;
-      color: rgb(23, 31, 38);
+      color: rgb(23 31 38);
       font-family: Inter, sans-serif;
       font-size: 72px;
       font-weight: 800;
@@ -244,7 +244,7 @@
     .blue-bikes__distance-minutes-unit {
       display: inline-block;
       margin-left: 8px;
-      color: rgb(23, 31, 38);
+      color: rgb(23 31 38);
       font-family: Inter, sans-serif;
       font-size: 56px;
       font-weight: normal;
@@ -255,7 +255,7 @@
     .blue-bikes__distance-feet {
       display: inline-block;
       margin-left: 24px;
-      color: rgb(23, 31, 38);
+      color: rgb(23 31 38);
       font-family: Inter, sans-serif;
       font-size: 40px;
       font-weight: normal;
@@ -314,7 +314,7 @@
     .blue-bikes__footer__main-text {
       display: inline-block;
       height: 52px;
-      color: rgb(23, 31, 38);
+      color: rgb(23 31 38);
       font-size: 40px;
       font-family: Inter, sans-serif;
       font-weight: bold;
@@ -325,7 +325,7 @@
       display: inline-block;
       margin-left: 24px;
       height: 44px;
-      color: rgb(23, 31, 38);
+      color: rgb(23 31 38);
       font-size: 32px;
       font-family: Inter, sans-serif;
       font-weight: normal;

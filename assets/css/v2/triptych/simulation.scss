@@ -1,26 +1,24 @@
 .simulation-screen-scrolling-container {
+  display: flex;
+  overflow: auto hidden;
+  padding-bottom: 20px;
   scrollbar-color: #607180 #2e3f4d;
 
   &::-webkit-scrollbar {
     width: 12px;
   }
+
   &::-webkit-scrollbar-thumb {
     background-color: #607180;
     border-radius: 12px;
     border: 2px solid #2e3f4d;
   }
+
   &::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 0 6px rgb(0 0 0 / 30%);
     border-radius: 12px;
     background-color: #2e3f4d;
   }
-}
-
-.simulation-screen-scrolling-container {
-  display: flex;
-  overflow-y: hidden;
-  overflow-x: auto;
-  padding-bottom: 20px;
 
   .simulation__full-page {
     height: 344px;

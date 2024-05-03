@@ -1,14 +1,23 @@
 // General styles for free text / route pills
 .free-text {
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   font-size: 138px;
   line-height: 138px;
-  color: #ffffff;
+  color: #fff;
 }
 
 .free-text__line {
   display: inline-block;
   vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  // Needed to keep y's from getting cut off!
+  line-height: initial;
+
+  .free-text__element {
+    line-height: initial;
+  }
 }
 
 .free-text__icon-container {
@@ -20,7 +29,7 @@
   // which we do for one-row headways
   .free-text__route-pill {
     margin-top: 35px;
-    color: #ffffff;
+    color: #fff;
   }
 }
 
@@ -76,7 +85,7 @@
 
   &--bus {
     background: $line-color-bus;
-    box-shadow: 2px 4px 2px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
   }
 }
 
@@ -86,16 +95,6 @@
 
   &--branch {
     font-size: 84px;
-  }
-}
-
-.free-text__line {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  // Needed to keep y's from getting cut off!
-  line-height: initial;
-  .free-text__element {
-    line-height: initial;
   }
 }
 
@@ -152,12 +151,15 @@
   .free-text__icon-container {
     height: 202px;
   }
+
   .free-text__icon-image {
     padding-top: 37px;
   }
+
   .free-text__line {
     height: 202px;
   }
+
   .free-text__element {
     vertical-align: middle;
   }
@@ -189,8 +191,9 @@
   .free-text {
     color: #171f26;
   }
+
   .free-text__text-pill {
-    color: #ffffff;
+    color: #fff;
   }
 }
 

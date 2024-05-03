@@ -1,7 +1,7 @@
 .global-alert {
   background: black;
   color: white;
-  border-radius: 0px 24px 24px 0px;
+  border-radius: 0 24px 24px 0;
   margin-right: 34px;
   margin-top: auto;
   margin-bottom: auto;
@@ -20,11 +20,12 @@
 .global-alert__icon-image {
   height: 128px;
   width: 128px;
-  margin: 32px 40px 32px 40px;
+  margin: 32px 40px;
 }
 
 .global-alert__header-effect {
   @include font--display--75bold;
+
   display: inline-block;
   width: 720px;
   vertical-align: top;
@@ -34,6 +35,7 @@
 
 .global-alert__header-timestamp {
   @include font--text--55regular;
+
   display: inline-block;
   width: 194px;
   vertical-align: top;
@@ -50,6 +52,7 @@
 
 .global-alert__body-description {
   @include font--paragraph--regular;
+
   padding: 25px 40px 51px 208px;
   font-size: 40px;
   line-height: 56px;

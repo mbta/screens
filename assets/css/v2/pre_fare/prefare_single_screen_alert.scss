@@ -16,19 +16,42 @@
 }
 
 .alert-container--single-page {
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   flex-grow: 1;
   min-height: 0;
   width: 1080px;
-  padding: 0 32px 32px 32px;
+  padding: 0 32px 32px;
   box-sizing: border-box;
 
+  /* Background colors */
+
+  &.alert-container--blue {
+    background-color: $line-color-blue;
+  }
+
+  &.alert-container--red {
+    background-color: $line-color-red;
+  }
+
+  &.alert-container--orange {
+    background-color: $line-color-orange;
+  }
+
+  &.alert-container--yellow {
+    background-color: $alert-yellow;
+  }
+
+  &.alert-container--green {
+    background-color: $line-color-green;
+  }
+
   /* Alert contents */
+
   .alert-card {
     height: 100%;
     display: flex;
     flex-direction: column;
-    box-shadow: 0px 10px 20px 0px rgba(23, 31, 38, 0.25);
+    box-shadow: 0 10px 20px 0 rgb(23 31 38 / 25%);
     background-color: #e5e4e1;
 
     &--no-banner {
@@ -43,8 +66,9 @@
   .alert-card__body {
     min-height: 0;
     flex-grow: 1;
-    padding: 120px 56px 32px 56px;
+    padding: 120px 56px 32px;
     box-sizing: border-box;
+
     &--shuttle {
       padding-top: 80px;
       padding-bottom: 0;
@@ -62,11 +86,14 @@
   .alert-card__remedy {
     display: flex;
   }
+
   .alert-card__issue {
     margin-bottom: 48px;
   }
+
   .alert-card__remedy {
     margin-bottom: 32px;
+
     &__text {
       font-size: 74px;
       font-weight: 600;
@@ -75,7 +102,8 @@
   }
 
   .alert-card__issue__location {
-    @include small-text();
+    @include small-text;
+
     margin-top: 40px;
   }
 
@@ -93,9 +121,11 @@
 
   .alert-card__content-block__text {
     font-weight: 700;
+
     &--large {
-      @include large-text();
+      @include large-text;
     }
+
     &--medium {
       font-size: 86.4px;
       line-height: 95px;
@@ -113,20 +143,24 @@
     color: #171f26;
     margin-bottom: 48px;
   }
+
   .alert-card__fallback__issue-text {
     font-size: 88px;
     line-height: 105.6px;
     font-weight: 700;
     margin-bottom: 54px;
   }
+
   .alert-card__fallback__pio-text {
     font-size: 68px;
     line-height: 81px;
     font-weight: 500;
+
     &--small {
       font-size: 55.1px;
       line-height: 65.63px;
     }
+
     &--bold {
       font-weight: 700;
     }
@@ -135,7 +169,8 @@
   .alert-card__body__accessibility-info {
     &--text {
       margin-top: 22px;
-      @include small-text();
+
+      @include small-text;
     }
   }
 
@@ -147,7 +182,7 @@
   .alert-card__footer {
     flex-shrink: 0;
     background: #cccbc8;
-    border-radius: 0px 0px 4px 4px;
+    border-radius: 0 0 4px 4px;
     height: 84px;
     display: flex;
     align-items: center;
@@ -156,9 +191,11 @@
     font-size: 32px;
     justify-content: right;
   }
+
   .alert-card__footer__cause {
     flex-grow: 1;
   }
+
   .alert-card__footer__datetime {
     font-weight: 600;
   }
@@ -186,30 +223,8 @@
   display: inline;
   vertical-align: bottom;
   margin-right: 9px;
+
   &:last-of-type {
     margin-right: 46px;
-  }
-}
-
-.alert-container--single-page {
-  /* Background colors */
-  &.alert-container--blue {
-    background-color: $line-color-blue;
-  }
-
-  &.alert-container--red {
-    background-color: $line-color-red;
-  }
-
-  &.alert-container--orange {
-    background-color: $line-color-orange;
-  }
-
-  &.alert-container--yellow {
-    background-color: $alert-yellow;
-  }
-
-  &.alert-container--green {
-    background-color: $line-color-green;
   }
 }

@@ -10,27 +10,27 @@
 }
 
 .simulation-screen-scrolling-container {
+  height: 100%;
+  overflow-x: auto;
+  padding-bottom: 20px;
   scrollbar-color: #607180 #2e3f4d;
 
   &::-webkit-scrollbar {
     width: 12px;
   }
+
   &::-webkit-scrollbar-thumb {
     background-color: #607180;
     border-radius: 12px;
     border: 2px solid #2e3f4d;
   }
+
   &::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 0 6px rgb(0 0 0 / 30%);
     border-radius: 12px;
     background-color: #2e3f4d;
   }
-}
 
-.simulation-screen-scrolling-container {
-  height: 100%;
-  overflow-x: auto;
-  padding-bottom: 20px;
   .projection {
     display: grid;
     grid-template-columns: 280px 280px 280px;

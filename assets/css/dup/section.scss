@@ -4,7 +4,7 @@
   &:not(:first-child) {
     .section-hairline {
       position: absolute;
-      left: 0px;
+      left: 0;
       top: -3px;
       height: 6px;
       width: 1920px;
@@ -16,6 +16,6 @@
     font-size: 138px;
     color: #171f26;
     line-height: 128px;
-    font-family: Inter;
+    font-family: Inter, sans-serif;
   }
 }

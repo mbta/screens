@@ -1,7 +1,7 @@
 .flex-zone-page-indicator {
   position: absolute;
   bottom: 0;
-  right: 0px;
+  right: 0;
   width: 1080px;
   height: 20px;
   text-align: center;
@@ -23,7 +23,7 @@
   border-radius: 24px;
   overflow: hidden;
   background: #cccbc8;
-  box-shadow: inset 1px 2px 6px 0px #bfbebb;
+  box-shadow: inset 1px 2px 6px 0 #bfbebb;
 
   &:not(:first-child) {
     margin-left: 44px;

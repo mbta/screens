@@ -2,7 +2,7 @@
   height: 172px;
   background: black;
   position: absolute;
-  bottom: 0px;
+  bottom: 0;
 }
 
 .digital-bridge__logo-container {
@@ -14,7 +14,7 @@
 .digital-bridge__logo-image {
   height: 128px;
   width: 128px;
-  margin: 24px 40px 20px 40px;
+  margin: 24px 40px 20px;
 }
 
 .digital-bridge__link-container {
@@ -27,12 +27,14 @@
 
 .digital-bridge__link-description {
   @include font--text--55regular;
+
   font-size: 36px;
   line-height: 56px;
 }
 
 .digital-bridge__link-url {
   @include font--text--75bold;
+
   font-size: 44px;
   line-height: 56px;
 }

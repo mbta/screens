@@ -1,7 +1,7 @@
 .link-footer {
   position: relative;
   height: 172px;
-  background: #000000;
+  background: #000;
 }
 
 .link-footer__contents {
@@ -25,11 +25,10 @@
   display: inline-block;
   vertical-align: middle;
   width: 952px;
-
   font-size: 40px;
   line-height: 52px;
-  font-family: Inter;
-  color: #ffffff;
+  font-family: Inter, sans-serif;
+  color: #fff;
 }
 
 .link-footer__message-text {

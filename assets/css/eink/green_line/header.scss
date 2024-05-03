@@ -7,22 +7,24 @@
 
 .header__environment {
   @include font--text--75bold;
+
   position: absolute;
   top: 12px;
   left: 40px;
   font-size: 48px;
-  color: #ffffff;
+  color: #fff;
   letter-spacing: 0;
   line-height: 48px;
 }
 
 .header__time {
   @include font--text--55regular;
+
   position: absolute;
   top: 28px;
   right: 40px;
   font-size: 72px;
-  color: #ffffff;
+  color: #fff;
   letter-spacing: 0;
   text-align: right;
   line-height: 72px;
@@ -30,13 +32,14 @@
 
 .header__realtime-indicator {
   @include font--text--55regular;
+
   position: absolute;
   right: 40px;
   bottom: 47px;
   width: 240px;
   height: 64px;
   font-size: 24px;
-  color: #ffffff;
+  color: #fff;
   text-align: right;
   line-height: 32px;
   text-transform: uppercase;
@@ -50,8 +53,9 @@
 
 .header__stop-container {
   @include font--display--75bold;
+
   width: 900px;
-  color: #ffffff;
+  color: #fff;
   letter-spacing: 1px;
   position: absolute;
   bottom: 28px;

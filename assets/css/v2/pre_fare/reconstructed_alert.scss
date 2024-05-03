@@ -7,21 +7,24 @@ $alert-card-footer-height: 80px;
 .alert-container {
   // Takeover fonts
   color: #171f26;
-  font-family: Inter;
+  font-family: Inter, sans-serif;
 
   .x-large-text {
     font-size: 200px;
     font-weight: 800;
     line-height: 220px;
   }
+
   .large-text {
     font-size: 120px;
     line-height: 144px;
   }
+
   .medium-text {
     font-size: 72px;
     line-height: 86px;
   }
+
   .small-text {
     font-size: 56px;
     line-height: 68px;
@@ -47,51 +50,64 @@ $alert-card-footer-height: 80px;
     .bold {
       font-weight: 800;
     }
+
     .medium-bold {
       font-weight: 500;
     }
   }
+
   .alert-card__body__content {
     padding: 56px 0 0 8px;
+
     &--extra-small {
       font-size: 40px;
       line-height: 52px;
+
       .alert-card__body__isa-icon {
         height: 51px;
         padding-left: 16px;
       }
     }
+
     &--small {
       font-size: 48px;
       line-height: 60px;
+
       .alert-card__body__isa-icon {
         height: 51px;
         padding-left: 16px;
       }
     }
+
     &--large {
       font-size: 56px;
       line-height: 68px;
+
       .alert-card__body__isa-icon {
         height: 51px;
         padding-left: 16px;
       }
     }
+
     &--extra-large {
       font-size: 72px;
       line-height: 86px;
+
       .alert-card__body__isa-icon {
         height: 65px;
         padding-left: 16px;
       }
     }
   }
+
   .alert-card__body__route-pills {
     display: inline-flex;
+
     .route-pill {
       display: inline-block;
       width: fit-content;
       height: 80px;
+
       &:not(:first-child) {
         margin-left: 16px;
       }
@@ -104,7 +120,7 @@ $alert-card-footer-height: 80px;
       font-size: 60px;
       line-height: 80px;
       text-transform: uppercase;
-      font-family: "neue-haas-grotesk-text";
+      font-family: neue-haas-grotesk-text, sans-serif;
     }
 
     .route-pills__branches {
@@ -125,40 +141,48 @@ $alert-card-footer-height: 80px;
         display: inline-flex;
         justify-content: center;
         margin-left: 6px;
+
         &:nth-child(2) {
           margin-left: 0;
         }
+
         .route-pill__text {
           padding: 0;
         }
       }
     }
   }
+
   .alert-card__body__delay-notice {
     font-size: 56px;
     font-weight: 800;
     margin-left: 32px;
     display: inline-block;
   }
+
   .alert-card__body__icon {
     position: absolute;
     top: 0;
     right: 0;
+
     &-image {
       height: 176px;
     }
   }
+
   .alert-card__body__remedy {
     font-weight: 800;
     padding-top: 32px;
     display: flex;
     align-items: center;
   }
+
   .alert-card__footer {
     background-color: #cccbc8;
-    border-radius: 0px 0px 32px 32px;
+    border-radius: 0 0 32px 32px;
     height: $alert-card-footer-height;
   }
+
   .alert-card__footer__alerts-url {
     color: black;
     font-size: 40px;
@@ -240,11 +264,12 @@ $alert-card-footer-height: 80px;
       &__accessibility-info {
         margin-top: 34px;
         display: flex;
+
         &--text {
           font-weight: 400;
           font-size: 53px;
           min-width: 811px;
-          color: #000000;
+          color: #000;
         }
       }
 
@@ -261,9 +286,9 @@ $alert-card-footer-height: 80px;
     }
 
     &__footer {
-      color: #000000;
+      color: #000;
       background-color: #cccbc8;
-      border-radius: 0px 0px 4px 4px;
+      border-radius: 0 0 4px 4px;
       height: $takeover-card-footer-height;
       font-size: 32px;
       font-weight: 400;
@@ -315,10 +340,12 @@ $alert-card-footer-height: 80px;
   .alert-card__footer {
     background-color: black;
   }
+
   .alert-card__footer__alerts-url {
     color: white;
     font-weight: 500;
   }
+
   .alert-card__body__route-pills
     .route-pills__branches
     .route-pills__branches__dot {

@@ -7,8 +7,8 @@
 
 .screen-normal__header {
   position: absolute;
-  top: 0px;
-  left: 0px;
+  top: 0;
+  left: 0;
   width: 1080px;
   height: 272px;
   overflow: hidden;
@@ -17,7 +17,7 @@
 .screen-normal__body {
   position: absolute;
   top: 272px;
-  left: 0px;
+  left: 0;
   width: 1080px;
   height: 1648px;
   overflow: hidden;

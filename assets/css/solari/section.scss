@@ -15,7 +15,7 @@
 
   .section-header__icon {
     display: block;
-    margin: 24px auto 0 auto;
+    margin: 24px auto 0;
   }
 
   .later-departure__header-title {
@@ -39,6 +39,7 @@
 
 .section-header__name {
   @include font--text--75bold;
+
   vertical-align: middle;
 }
 
@@ -54,7 +55,7 @@
 .section-header__arrow-image {
   width: 57px;
   height: 57px;
-  margin: 33px 0 33px;
+  margin: 33px 0;
 }
 
 .later-departure__header {
@@ -69,9 +70,10 @@
   display: inline-block;
   margin-top: 34px;
   margin-bottom: 27px;
+
   @include font--text--65medium;
+
   text-transform: uppercase;
-  letter-spacing: 2px;
   font-size: 36px;
   line-height: 40px;
   letter-spacing: 2px;
@@ -81,7 +83,7 @@
 .later-departure__header-route-list {
   display: inline-block;
   position: absolute;
-  right: 0px;
+  right: 0;
   top: 31px;
 
   &--size-normal {
@@ -122,8 +124,9 @@
   &--selected {
     height: 46px;
 
-    // Width depends on the route
     &.later-departure__route-pill {
+      // Width depends on the route
+
       &--width-wide {
         width: 158px;
       }
@@ -131,25 +134,24 @@
       &--width-normal {
         width: 89px;
       }
-    }
 
-    // Different selected pill colors by mode
-    &.later-departure__route-pill {
+      // Different selected pill colors by mode
+
       &--commuter-rail {
         background: #80276c;
-        color: #ffffff;
+        color: #fff;
       }
 
       &--bus {
         background: #ffc72c;
-        color: #000000;
+        color: #000;
       }
     }
   }
 
   &--unselected {
-    color: rgba(23, 31, 38, 0.8);
-    border: 3px solid rgba(23, 31, 38, 0.8);
+    color: rgb(23 31 38 / 80%);
+    border: 3px solid rgb(23 31 38 / 80%);
     height: 40px;
 
     // Width depends on the route

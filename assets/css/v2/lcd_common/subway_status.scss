@@ -4,7 +4,6 @@
   $text-dark-gray: #171f26;
   $widget-background: #e5e4e1;
   $rule-color: #cccbc8;
-
   $rule-width: 808px;
   $status-top-padding: 18px;
   $status-left-padding: 24px;
@@ -22,26 +21,20 @@
   width: 1024px;
   height: 576px;
   overflow: hidden;
-
   box-sizing: border-box;
   padding-top: 6px;
-
   background: $widget-background;
   color: $text-dark-gray;
   font-family: Inter, sans-serif;
-
   border-radius: 16px;
-  box-shadow: 0px 12px 24px 0px rgba(23, 31, 38, 0.25);
+  box-shadow: 0 12px 24px 0 rgb(23 31 38 / 25%);
 
   .subway-status_status {
     position: relative;
-
     width: 100%;
-
     box-sizing: border-box;
     padding-top: $status-top-padding;
     padding-left: $status-left-padding;
-
     overflow: hidden;
   }
 
@@ -78,14 +71,11 @@
   // in the React code and it's rendered as a real element.
   .subway-status_status_rule {
     content: "";
-
     position: absolute;
     bottom: 0;
     right: 24px;
-
     width: $rule-width;
     height: 4px;
-
     background: $rule-color;
     border-radius: 2px;
   }
@@ -127,6 +117,7 @@
 
   .subway-status_alert_route-pill-container {
     display: inline-block;
+
     // If the row has no pill, we still keep this element as a pill-sized
     // spacer to maintain consistent positioning of everything else in the row.
     min-width: $pill-width;
