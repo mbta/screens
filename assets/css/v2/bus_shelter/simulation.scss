@@ -7,10 +7,11 @@
     border-radius: 0 8px 8px 0;
     position: relative;
 
-    &:before {
+    &::before {
       content: "";
       position: absolute;
       right: 100%;
+
       // NO HEIGHT
       border-top: 80px solid transparent;
       border-right: 100px solid #2e3f4d;

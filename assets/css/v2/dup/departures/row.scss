@@ -2,10 +2,10 @@
   position: relative;
   height: 208px;
 
-  &:not(:first-child):before {
+  &:not(:first-child)::before {
     content: "";
     position: absolute;
-    top: 0px;
+    top: 0;
     left: 302px;
     height: 4px;
     width: 1586px;

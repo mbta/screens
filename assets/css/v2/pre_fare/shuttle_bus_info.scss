@@ -7,10 +7,10 @@
 
   .shuttle-bus-info__container {
     height: 845px;
-    background: rgb(217, 214, 208);
-    box-shadow: 0px 10px 20px 0px rgba(23, 31, 38, 0.25);
+    background: rgb(217 214 208);
+    box-shadow: 0 10px 20px 0 rgb(23 31 38 / 25%);
     border-radius: 16px;
-    margin: 16px 32px 32px 32px;
+    margin: 16px 32px 32px;
     position: relative;
     overflow: hidden;
 
@@ -34,28 +34,28 @@
         left: 216px;
 
         &--english {
-          color: rgb(23, 31, 38);
+          color: rgb(23 31 38);
           font-size: 80px;
-          font-family: Inter;
+          font-family: Inter, sans-serif;
           font-weight: bold;
           line-height: 80px;
         }
 
         &--spanish {
-          color: rgb(23, 31, 38);
+          color: rgb(23 31 38);
           font-size: 48px;
-          font-family: Inter;
+          font-family: Inter, sans-serif;
           font-weight: normal;
           line-height: 66px;
           margin-top: 8px;
-          opacity: 90%;
+          opacity: 0.9;
         }
       }
     }
 
     .shuttle-bus-info__boarding-instructions {
       height: 172px;
-      background: rgb(235, 234, 232);
+      background: rgb(235 234 232);
 
       .shuttle-bus-info__boarding-instructions-arrow-icon-container {
         position: absolute;
@@ -75,22 +75,22 @@
         left: 216px;
 
         &--english {
-          color: rgb(23, 31, 38);
+          color: rgb(23 31 38);
           font-size: 48px;
-          font-family: Inter;
+          font-family: Inter, sans-serif;
           font-weight: bold;
-          letter-spacing: 0px;
+          letter-spacing: 0;
           line-height: 64px;
         }
 
         &--spanish {
-          color: rgb(23, 31, 38);
+          color: rgb(23 31 38);
           font-size: 36px;
-          font-family: Inter;
+          font-family: Inter, sans-serif;
           font-weight: normal;
           line-height: 44px;
           margin-top: 8px;
-          opacity: 90%;
+          opacity: 0.9;
         }
       }
     }
@@ -113,20 +113,20 @@
 
         &--english {
           margin-right: 24px;
-          color: rgb(23, 31, 38);
+          color: rgb(23 31 38);
           font-size: 40px;
-          font-family: Inter;
+          font-family: Inter, sans-serif;
           font-weight: bold;
           line-height: 52px;
         }
 
         &--spanish {
-          color: rgb(23, 31, 38);
+          color: rgb(23 31 38);
           font-size: 32px;
-          font-family: Inter;
+          font-family: Inter, sans-serif;
           font-weight: normal;
           line-height: 44px;
-          opacity: 90%;
+          opacity: 0.9;
         }
       }
 
@@ -149,20 +149,20 @@
 
           &--english {
             margin-right: 24px;
-            color: rgb(23, 31, 38);
+            color: rgb(23 31 38);
             font-size: 40px;
-            font-family: Inter;
+            font-family: Inter, sans-serif;
             font-weight: bold;
             line-height: 52px;
           }
 
           &--spanish {
-            color: rgb(23, 31, 38);
+            color: rgb(23 31 38);
             font-size: 32px;
-            font-family: Inter;
+            font-family: Inter, sans-serif;
             font-weight: normal;
             line-height: 44px;
-            opacity: 90%;
+            opacity: 0.9;
           }
         }
       }
@@ -186,17 +186,17 @@
           margin-right: 44px;
 
           &--english {
-            color: rgb(23, 31, 38);
+            color: rgb(23 31 38);
             font-size: 32px;
-            font-family: Inter;
+            font-family: Inter, sans-serif;
             font-weight: bold;
             line-height: 44px;
           }
 
           &--spanish {
-            color: rgb(23, 31, 38);
+            color: rgb(23 31 38);
             font-size: 24px;
-            font-family: Inter;
+            font-family: Inter, sans-serif;
             font-weight: normal;
             line-height: 36px;
           }

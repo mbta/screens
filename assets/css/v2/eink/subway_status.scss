@@ -2,12 +2,13 @@
   position: relative;
   height: 1080px;
   width: 1136px;
-  padding: 29px 32px 32px 32px;
+  padding: 29px 32px 32px;
   overflow: hidden;
   background-color: white;
 
   .branch-icon {
     display: inline-block;
+
     &:not(:last-child) {
       margin-right: 8px;
     }
@@ -31,15 +32,12 @@
 
     .subway-status_status_rule {
       content: "";
-
       position: absolute;
       bottom: 0;
       right: 10px;
-
       width: 1116px;
       height: 2px;
-
-      background: #000000;
+      background: #000;
       border-radius: 1px;
     }
 

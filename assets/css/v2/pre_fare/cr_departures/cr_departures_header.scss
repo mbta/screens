@@ -1,5 +1,5 @@
 .departures-card__header {
-  padding: 40px 60px 0 60px;
+  padding: 40px 60px 0;
   box-sizing: border-box;
   font-weight: 800;
   font-size: 72px;
@@ -8,16 +8,19 @@
   span {
     vertical-align: middle;
   }
+
   .route-pill {
     width: 149px;
     height: 72px;
     margin: 0 27px;
     vertical-align: middle;
   }
+
   .departures-card__header-text {
     margin: 40px 0;
     width: 860px;
   }
+
   .pill-container {
     display: inline-flex;
     align-items: center;
@@ -31,6 +34,7 @@
   font-weight: 500;
   width: 850px;
   margin-bottom: 80px;
+
   .free-cr {
     height: 56px;
     width: 56px;

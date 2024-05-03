@@ -2,7 +2,7 @@
   position: relative;
   height: 100%;
   width: 100%;
-  background: #000000;
+  background: #000;
 }
 
 .normal-header-icon {
@@ -34,7 +34,7 @@
   vertical-align: middle;
   font-family: Helvetica, sans-serif;
   font-weight: 700;
-  color: #ffffff;
+  color: #fff;
 
   .normal-header-title--with-icon & {
     width: 768px;
@@ -49,7 +49,7 @@
 
 .normal-header-to__text {
   font-family: Helvetica, sans-serif;
-  color: #ffffff;
+  color: #fff;
   letter-spacing: 2px;
   font-size: 56px;
   line-height: 64px;
@@ -61,8 +61,8 @@
   position: absolute;
   right: 40px;
   top: 40px;
-  font-family: Inter;
-  color: #ffffff;
+  font-family: Inter, sans-serif;
+  color: #fff;
   font-size: 72px;
   line-height: 72px;
 }
@@ -77,9 +77,9 @@
 
 .normal-header-updated__text {
   text-align: right;
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   font-weight: 500;
-  color: #ffffff;
+  color: #fff;
   font-size: 24px;
   line-height: 28px;
 }
@@ -97,7 +97,7 @@
   padding-left: 40px;
   padding-top: 10px;
   font-size: 36px;
-  color: #ffffff;
+  color: #fff;
   letter-spacing: 0;
   line-height: 48px;
 }

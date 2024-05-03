@@ -5,9 +5,8 @@
   &:not(:last-child)::after {
     content: "";
     position: absolute;
-    bottom: 0px;
+    bottom: 0;
     left: 200px;
-
     width: 848px;
     height: 4px;
     border-radius: 2px;

@@ -9,7 +9,7 @@
 .departures__notice-row {
   width: 794px;
   height: 264px;
-  color: rgb(153, 152, 150);
+  color: rgb(153 152 150);
   font-size: 72px;
   font-family: Inter, sans-serif;
   text-align: right;
@@ -24,9 +24,8 @@
   &:not(:last-child)::after {
     content: "";
     position: absolute;
-    bottom: 0px;
-    left: 0px;
-
+    bottom: 0;
+    left: 0;
     width: 794px;
     height: 2px;
     border-radius: 3px;

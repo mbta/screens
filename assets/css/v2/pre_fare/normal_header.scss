@@ -2,8 +2,9 @@
   position: relative;
   height: 100%;
   width: 100%;
-  background: rgb(23, 31, 38);
+  background: rgb(23 31 38);
 }
+
 .normal-header-icon {
   display: inline-block;
   vertical-align: middle;
@@ -37,7 +38,7 @@
   vertical-align: middle;
   font-family: Helvetica, sans-serif;
   font-weight: 700;
-  color: #ffffff;
+  color: #fff;
 
   .normal-header-title--with-icon & {
     width: 668px;
@@ -48,11 +49,11 @@
   position: absolute;
   right: 40px;
   top: 40px;
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   font-size: 56px;
   line-height: 56px;
   font-weight: 600;
-  color: #ffffff;
+  color: #fff;
 }
 
 .left-screen .normal-header-time,
@@ -62,9 +63,10 @@
 
 .normal-header__environment {
   @include font--text--75bold;
+
   position: absolute;
   font-size: 36px;
-  color: #ffffff;
+  color: #fff;
   letter-spacing: 0;
   line-height: 48px;
   padding-top: 10px;

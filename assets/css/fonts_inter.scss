@@ -16,6 +16,7 @@
   font-family: Inter, sans-serif;
   font-weight: 400;
 }
+
 @mixin font--text--55regular {
   @include font--text--55roman;
 }
@@ -33,6 +34,6 @@
 // https://rsms.me/inter/
 
 @mixin font--paragraph--regular {
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   font-weight: 400;
 }

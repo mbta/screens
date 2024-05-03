@@ -21,12 +21,11 @@
 .departures-no-data__main-content__heading {
   width: 752px;
   height: 240px;
-
-  color: rgb(23, 31, 38);
+  color: rgb(23 31 38);
   font-size: 64px;
   font-family: Inter, sans-serif;
   font-weight: bold;
-  letter-spacing: 0px;
+  letter-spacing: 0;
   line-height: 80px;
 }
 
@@ -44,19 +43,17 @@
 .departures-no-data__phone-icon-container {
   position: absolute;
   left: 6px;
-
   width: 206px;
   height: 206px;
 }
 
 .departures-no-data__alternatives__message {
   width: 662px;
-
-  color: rgb(23, 31, 38);
+  color: rgb(23 31 38);
   font-size: 48px;
   font-family: Inter, sans-serif;
   font-weight: normal;
-  letter-spacing: 0px;
+  letter-spacing: 0;
   line-height: 64px;
 }
 

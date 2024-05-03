@@ -5,6 +5,7 @@
 
 .header__time {
   @include font--text--55regular;
+
   position: absolute;
 }
 
@@ -15,21 +16,24 @@
 
 .header__station-name {
   @include font--display--75bold;
+
   letter-spacing: 2px;
 }
 
 .header__subtitle {
   @include font--display--65medium;
+
   letter-spacing: 3px;
 }
 
 .header__environment {
   @include font--text--75bold;
+
   position: absolute;
   top: 12px;
   left: 40px;
   font-size: 48px;
-  color: #ffffff;
+  color: #fff;
   letter-spacing: 0;
   line-height: 48px;
 }

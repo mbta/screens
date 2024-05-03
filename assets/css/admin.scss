@@ -35,7 +35,7 @@
 
 .admin-table__controls {
   position: fixed;
-  bottom: 0px;
+  bottom: 0;
   width: 100%;
   background: white;
   padding: 1em;
@@ -51,7 +51,7 @@
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgb(0 0 0 / 40%);
 }
 
 .admin-modal__content {
@@ -72,8 +72,7 @@
 
   &__thumbnail-container {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-flow: row wrap;
     margin-top: 16px;
   }
 
@@ -114,7 +113,7 @@
     padding: 20px;
     border-width: 2px;
     border-radius: 2px;
-    border-color: #eeeeee;
+    border-color: #eee;
     border-style: dashed;
     background-color: #fafafa;
     color: #bdbdbd;

@@ -5,11 +5,13 @@
     position: absolute;
     bottom: 0;
     right: 0;
-    background-color: rgba(23, 31, 38, 0.7);
+    background-color: rgb(23 31 38 / 70%);
+
     @include font--caption-3;
+
     color: white;
     text-align: right;
-    padding: 12px 24px 18px 24px;
+    padding: 12px 24px 18px;
   }
 }
 

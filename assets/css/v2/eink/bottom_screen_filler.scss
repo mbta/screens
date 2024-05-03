@@ -1,6 +1,6 @@
 .bottom-screen-filler {
   height: 1600px;
-  background-color: #000000;
+  background-color: #000;
 }
 
 .bottom-screen-filler__alternatives-container {
@@ -12,18 +12,17 @@
 
 .bottom-screen-filler__alternatives__message {
   width: 869px;
-
-  color: #ffffff;
+  color: #fff;
   font-size: 72px;
   font-family: Inter, sans-serif;
   font-weight: normal;
-  letter-spacing: 0px;
+  letter-spacing: 0;
   margin-bottom: 16px;
   line-height: 96px;
 }
 
 .bottom-screen-filler__alternatives__link-app {
-  color: #ffffff;
+  color: #fff;
   font-family: Inter, sans-serif;
   font-size: 96px;
   font-weight: 800;
@@ -46,7 +45,7 @@
   max-width: 100%;
   position: absolute;
   width: 100%;
-  bottom: 0px;
+  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
 }

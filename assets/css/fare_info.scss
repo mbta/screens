@@ -11,8 +11,8 @@
 .fares__icon-image {
   height: 128px;
   width: 128px;
-  margin: 48px 40px 83px 40px;
-  padding: 0px;
+  margin: 48px 40px 83px;
+  padding: 0;
 }
 
 .fares__info-container {
@@ -22,6 +22,7 @@
 
 .fares__info-header {
   @include font--text--75bold;
+
   font-size: 36px;
   line-height: 36px;
   text-transform: uppercase;
@@ -32,6 +33,7 @@
 
 .fares__info-link {
   @include font--text--55regular;
+
   font-size: 32px;
   line-height: 36px;
   text-align: right;
@@ -40,23 +42,20 @@
   width: 540px;
 }
 
-.fares__info-rows {
-}
-
-.fares__info-row {
-}
-
 .fares__info-row-cost {
   @include font--text--75bold;
+
   font-size: 44px;
 }
 
 .fares__info-row-description {
   @include font--text--55regular;
+
   font-size: 44px;
 }
 
 .fares__info-row-details {
   @include font--text--55regular;
+
   font-size: 32px;
 }

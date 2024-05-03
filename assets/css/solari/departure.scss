@@ -10,7 +10,7 @@
 
 // Add a border before each group start, except for the first one
 .departure-container--group-start:not(:first-child) {
-  border-top: 3px solid rgba(199, 199, 199, 0.58);
+  border-top: 3px solid rgb(199 199 199 / 58%);
 }
 
 // While a row is animating out, don't show a border above the next group start unless the exiting row is a group end
@@ -22,7 +22,7 @@
 
 // Add a border above the later departure section, but not above departure rows inside it
 .later-departure {
-  border-top: 3px solid rgba(199, 199, 199, 0.58);
+  border-top: 3px solid rgb(199 199 199 / 58%);
 
   .departure-container {
     border-top: none;
@@ -235,5 +235,5 @@
 
 // Make sure the dummy section list is easy to tell from the real one
 .section-list--dummy .departures-container {
-  background-color: #ff00ff;
+  background-color: #f0f;
 }

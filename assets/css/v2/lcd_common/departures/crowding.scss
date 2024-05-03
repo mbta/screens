@@ -1,7 +1,6 @@
 .departure-crowding {
   display: inline-block;
   vertical-align: middle;
-
   margin-right: 16px;
 }
 
@@ -10,7 +9,7 @@
 }
 
 .departure-crowding__icon-person--inactive {
-  fill: #cccccc;
+  fill: #ccc;
 }
 
 .departure-crowding__icon--level-1 {
@@ -21,7 +20,7 @@
 
 .departure-crowding__icon--level-2 {
   .departure-crowding__icon-person--active {
-    fill: #ff9900;
+    fill: #f90;
   }
 }
 

@@ -5,10 +5,10 @@
     height: 416px;
   }
 
-  &:not(:first-child):before {
+  &:not(:first-child)::before {
     content: "";
     position: absolute;
-    left: 0px;
+    left: 0;
     height: 6px;
     width: 1920px;
     background-color: #bfbebb;

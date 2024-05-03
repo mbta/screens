@@ -17,8 +17,7 @@
 .departure-time {
   display: inline-block;
   vertical-align: middle;
-
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   color: black;
 }
 
@@ -31,7 +30,6 @@
 .departure-time__minutes {
   display: inline-block;
   margin-left: 3px;
-
   font-size: 120px;
   line-height: 120px;
   font-weight: 800;
@@ -39,7 +37,6 @@
 
 .departure-time__minutes-label {
   display: inline-block;
-
   font-size: 80px;
   line-height: 88px;
 }

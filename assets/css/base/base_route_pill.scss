@@ -14,6 +14,7 @@
 
 .base-route-pill__route-text {
   @include font--text--75bold;
+
   letter-spacing: 0.0277em;
 
   &--with-slash {

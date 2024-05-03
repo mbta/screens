@@ -8,7 +8,9 @@
   background-color: black;
   color: white;
   border-radius: 10px;
+
   @include font--text--55regular;
+
   text-transform: uppercase;
   padding-right: 16px;
   padding-left: 16px;

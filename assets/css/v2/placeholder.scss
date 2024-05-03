@@ -4,27 +4,27 @@
   border-radius: 16px;
 
   &--blue {
-    background-color: rgba(0, 61, 165, 0.4);
+    background-color: rgb(0 61 165 / 40%);
   }
 
   &--green {
-    background-color: rgba(0, 132, 61, 0.4);
+    background-color: rgb(0 132 61 / 40%);
   }
 
   &--red {
-    background-color: rgba(218, 41, 28, 0.4);
+    background-color: rgb(218 41 28 / 40%);
   }
 
   &--orange {
-    background-color: rgba(237, 139, 0, 0.4);
+    background-color: rgb(237 139 0 / 40%);
   }
 
   &--grey,
   &--gray {
-    background-color: rgba(124, 135, 142, 0.4);
+    background-color: rgb(124 135 142 / 40%);
   }
 
   &--black {
-    background-color: rgba(0, 0, 0, 1);
+    background-color: rgb(0 0 0 / 100%);
   }
 }

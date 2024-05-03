@@ -1,20 +1,20 @@
-// *** HEADS UP ***
-// The backend logic that fits list view rows onto pages
-// makes assumptions based on styles defined here.
-//
-// Currently, each row for a station in the list view has its height
-// calculated as:
-//     100px + (48px * length(station.closures))
-//
-// If any changes to this stylesheet affect that, be sure to update
-// the backend page-fitting logic as well.
-// *** HEADS UP ***
+/*** HEADS UP ***
+The backend logic that fits list view rows onto pages
+makes assumptions based on styles defined here.
+
+Currently, each row for a station in the list view has its height
+calculated as:
+   100px + (48px * length(station.closures))
+
+If any changes to this stylesheet affect that, be sure to update
+the backend page-fitting logic as well.
+*** HEADS UP ***/
 
 .elevator-status {
   width: 1024px;
   height: 1000px;
   background: #e5e4e1;
-  box-shadow: 0px 10px 20px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 10px 20px 0 rgb(0 0 0 / 25%);
   border-radius: 16px;
   margin: 16px 28px;
   position: relative;
@@ -46,7 +46,7 @@
     position: absolute;
     bottom: 0;
     background: #cccbc8;
-    border-radius: 0px 0px 16px 16px;
+    border-radius: 0 0 16px 16px;
     height: 124px;
     width: 1024px;
 
@@ -83,14 +83,14 @@
 
   &__station-row {
     width: 1024px;
-    border-top: 4px solid rgb(217, 214, 208);
+    border-top: 4px solid rgb(217 214 208);
     padding-top: 24px;
     padding-left: 32px;
     padding-bottom: 20px;
     box-sizing: border-box;
 
     &--home-stop {
-      background-color: rgba(255, 255, 255, 0.68);
+      background-color: rgb(255 255 255 / 68%);
     }
 
     &__header {
@@ -112,7 +112,7 @@
       font-size: 40px;
       font-family: Inter, sans-serif;
       font-weight: 700;
-      letter-spacing: 0px;
+      letter-spacing: 0;
       line-height: 44px;
       vertical-align: top;
       margin-bottom: 12px;
@@ -121,13 +121,14 @@
     &__ids {
       display: inline-block;
       height: 44px;
-      color: rgb(115, 115, 115);
+      color: rgb(115 115 115);
       font-size: 32px;
       font-family: Inter, sans-serif;
       font-weight: 500;
-      letter-spacing: 0px;
+      letter-spacing: 0;
       line-height: 44px;
       vertical-align: text-top;
+
       // needs a tiiiiny nudge to align with station name
       transform: translateY(1px);
       margin-left: 16px;
@@ -154,13 +155,11 @@
     &__closure {
       width: 960px;
       height: 40px;
-
       font-size: 32px;
       font-family: Inter, sans-serif;
       font-weight: 400;
-      letter-spacing: 0px;
+      letter-spacing: 0;
       line-height: 32px;
-
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -176,7 +175,7 @@
   width: 100%;
   height: 1000px;
   margin-bottom: 8px;
-  border-top: 4px solid rgb(217, 214, 208);
+  border-top: 4px solid rgb(217 214 208);
 
   .detail-page__closure {
     height: 100%;
@@ -185,7 +184,7 @@
     padding-right: 38px;
 
     &--active-at-home {
-      background: rgba(255, 255, 255, 0.44);
+      background: rgb(255 255 255 / 44%);
     }
 
     .detail-page__closure-location {

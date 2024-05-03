@@ -6,8 +6,8 @@
 
 .flex-zone-takeover__main-content {
   position: absolute;
-  top: 0px;
-  left: 0px;
+  top: 0;
+  left: 0;
   width: 1200px;
   height: 1312px;
 }
@@ -15,7 +15,7 @@
 .flex-zone-takeover__flex-zone {
   position: absolute;
   top: 1312px;
-  left: 0px;
+  left: 0;
   width: 1200px;
   height: 1164px;
 }
@@ -23,7 +23,7 @@
 .flex-zone-takeover__footer {
   position: absolute;
   top: 2476px;
-  left: 0px;
+  left: 0;
   width: 1200px;
   height: 436px;
 }
