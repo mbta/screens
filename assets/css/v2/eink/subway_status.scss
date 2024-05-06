@@ -1,7 +1,7 @@
 .subway-status {
   position: relative;
-  height: 1080px;
   width: 1136px;
+  height: 1080px;
   padding: 29px 32px 32px;
   overflow: hidden;
   background-color: white;
@@ -31,12 +31,12 @@
     }
 
     .subway-status_status_rule {
-      content: "";
       position: absolute;
-      bottom: 0;
       right: 10px;
+      bottom: 0;
       width: 1116px;
       height: 2px;
+      content: "";
       background: #000;
       border-radius: 1px;
     }
@@ -61,11 +61,11 @@
 
 .subway-status_status {
   position: relative;
-  width: 100%;
   box-sizing: border-box;
+  width: 100%;
+  margin-top: 24px;
   margin-left: 36px;
   overflow: hidden;
-  margin-top: 24px;
 
   .subway-status_alert:not(:first-child) {
     margin-top: 24px;
@@ -78,23 +78,23 @@
 
   .subway-status_alert_text-container {
     display: inline-block;
-    vertical-align: top;
     font-family: Inter, sans-serif;
+    font-size: 56px;
     font-weight: 800;
     line-height: 65px;
-    font-size: 56px;
+    vertical-align: top;
 
     &--normal-service {
-      font-weight: 500;
       font-size: 48px;
+      font-weight: 500;
       line-height: 43px;
     }
 
     .subway-status_alert_location-text {
-      font-weight: 500;
-      font-size: 40px;
-      line-height: 40px;
       margin-left: 24px;
+      font-size: 40px;
+      font-weight: 500;
+      line-height: 40px;
     }
   }
 }

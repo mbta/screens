@@ -1,6 +1,6 @@
 .header {
-  background-color: #171f26;
   color: white;
+  background-color: #171f26;
 }
 
 .header__time {
@@ -33,9 +33,9 @@
   top: 12px;
   left: 40px;
   font-size: 48px;
+  line-height: 48px;
   color: #fff;
   letter-spacing: 0;
-  line-height: 48px;
 }
 
 .screen-container--size-normal {
@@ -44,10 +44,10 @@
   }
 
   .header__time {
-    font-size: 50px;
-    line-height: 72px;
     top: 23px;
     right: 35px;
+    font-size: 50px;
+    line-height: 72px;
   }
 
   .header__station-name {
@@ -56,10 +56,10 @@
   }
 
   .header__subtitle {
-    text-transform: uppercase;
-    font-size: 50px;
     margin-top: 16px;
+    font-size: 50px;
     line-height: 60px;
+    text-transform: uppercase;
   }
 }
 
@@ -81,8 +81,8 @@
   }
 
   .header__subtitle {
+    margin-top: 32px;
     font-size: 96px;
     line-height: 96px;
-    margin-top: 32px;
   }
 }

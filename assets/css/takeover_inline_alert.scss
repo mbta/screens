@@ -5,11 +5,11 @@
 .takeover-inline-alert__badge {
   @include font--text--55regular;
 
-  background-color: black;
-  color: white;
-  font-size: 32px;
-  border-radius: 16px;
   padding: 12px 16px;
+  font-size: 32px;
+  color: white;
+  background-color: black;
+  border-radius: 16px;
 }
 
 .takeover-inline-alert__icon {

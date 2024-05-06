@@ -10,8 +10,8 @@
 }
 
 .nearby-departures__icon-image {
-  height: 128px;
   width: 128px;
+  height: 128px;
   margin: 0 40px 32px;
 }
 
@@ -19,28 +19,28 @@
   @include font--text--75bold;
 
   display: inline-block;
-  vertical-align: top;
+  margin-top: 22px;
   font-size: 72px;
   line-height: 72px;
-  margin-top: 22px;
+  vertical-align: top;
 }
 
 .nearby-departures__hairline {
   height: 1px;
-  background-color: #808080;
-  margin-left: 208px;
   margin-right: 40px;
+  margin-left: 208px;
+  background-color: #808080;
 }
 
 .nearby-departures-row__header {
-  margin-left: 208px;
-  margin-right: 40px;
   margin-top: 18px;
+  margin-right: 40px;
+  margin-left: 208px;
 }
 
 .nearby-departures-row__body {
-  margin: 18px 40px 24px 208px;
   display: inline-block;
+  margin: 18px 40px 24px 208px;
 }
 
 .nearby-departures-row__stop-name {
@@ -53,23 +53,23 @@
 
 .nearby-departures-route {
   display: inline-block;
-  vertical-align: middle;
   width: 178px;
   margin-right: 32px;
   font-size: 72px;
+  vertical-align: middle;
 }
 
 .nearby-departures-destination {
   display: inline-block;
-  vertical-align: middle;
   width: 500px;
   font-size: 54px;
+  vertical-align: middle;
 }
 
 .nearby-departures-time {
   display: inline-block;
   width: 242px;
-  vertical-align: middle;
-  text-align: right;
   font-size: 72px;
+  text-align: right;
+  vertical-align: middle;
 }

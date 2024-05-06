@@ -9,8 +9,8 @@
 
 .flex-zone-page-indicator__page__progress-bar {
   position: absolute;
-  height: 16px;
   width: 144px;
+  height: 16px;
 }
 
 .flex-zone-page-indicator__page {
@@ -18,9 +18,9 @@
   display: inline-block;
   width: 144px;
   height: 16px;
-  border-radius: 24px;
   margin-left: 44px;
   overflow: hidden;
+  border-radius: 24px;
 
   &--selected {
     .flex-zone-page-indicator__page__progress-bar {

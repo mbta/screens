@@ -1,17 +1,17 @@
 .full-screen-alert__body {
-  background-color: #171f26;
   box-sizing: border-box;
   width: 1920px;
   height: 832px;
   padding-top: 72px;
-  padding-left: 64px;
   padding-right: 64px;
+  padding-left: 64px;
+  background-color: #171f26;
 }
 
 .full-screen-alert__link {
   position: absolute;
-  bottom: 56px;
   right: 72px;
+  bottom: 56px;
 }
 
 .full-screen-alert__link-arrow {
@@ -21,9 +21,9 @@
 
 .full-screen-alert__link-text {
   display: inline-block;
-  vertical-align: middle;
-  color: #fff;
+  margin-left: 72px;
   font-family: Inter, sans-serif;
   font-size: 108px;
-  margin-left: 72px;
+  color: #fff;
+  vertical-align: middle;
 }

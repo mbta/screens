@@ -2,19 +2,19 @@
   position: relative;
   width: 280px;
   height: 144px;
-  border-radius: 112.5px;
   background-color: black;
+  border-radius: 112.5px;
 }
 
 .route-pill__text {
   position: absolute;
   width: 100%;
-  text-align: center;
-  font-size: 120px;
-  line-height: 144px;
   font-family: neue-haas-grotesk-text, sans-serif;
+  font-size: 120px;
   font-weight: 700;
+  line-height: 144px;
   color: white;
+  text-align: center;
 
   &--small {
     font-size: 112px;
@@ -24,12 +24,12 @@
 .route-pill__slashed-text {
   position: absolute;
   width: 100%;
-  text-align: center;
-  font-size: 64px;
-  line-height: 144px;
   font-family: neue-haas-grotesk-text, sans-serif;
+  font-size: 64px;
   font-weight: 700;
+  line-height: 144px;
   color: white;
+  text-align: center;
 }
 
 .route-pill__icon {

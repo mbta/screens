@@ -13,8 +13,8 @@
 
 .free-text__icon-container {
   display: inline-block;
-  vertical-align: middle;
   text-align: center;
+  vertical-align: middle;
 
   .free-text__route-pill {
     margin-top: 30px;
@@ -150,19 +150,19 @@
   }
 
   .free-text__route-pill {
-    height: 144px;
     width: 248px;
-    border-radius: 72px;
+    height: 144px;
     font-size: 96px;
     line-height: 144px;
+    border-radius: 72px;
   }
 
   .free-text__text-pill {
-    border-radius: 84px;
+    padding-right: 84px;
+    padding-left: 84px;
     font-size: 126px;
     line-height: 168px;
-    padding-left: 84px;
-    padding-right: 84px;
+    border-radius: 84px;
   }
 
   .free-text__inline-icon {
@@ -219,19 +219,19 @@
   }
 
   .free-text__route-pill {
-    height: 144px;
     width: 248px;
-    border-radius: 72px;
+    height: 144px;
     font-size: 96px;
     line-height: 144px;
+    border-radius: 72px;
   }
 
   .free-text__text-pill {
-    border-radius: 84px;
+    padding-right: 84px;
+    padding-left: 84px;
     font-size: 126px;
     line-height: 168px;
-    padding-left: 84px;
-    padding-right: 84px;
+    border-radius: 84px;
   }
 
   .free-text__inline-icon {
@@ -240,8 +240,8 @@
   }
 
   .free-text__inline-icon-image {
-    transform: translateY(20px);
     height: 139px;
+    transform: translateY(20px);
   }
 
   &--dark {

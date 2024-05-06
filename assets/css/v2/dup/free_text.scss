@@ -8,12 +8,12 @@
 
 .free-text__line {
   display: inline-block;
-  vertical-align: middle;
   overflow: hidden;
-  text-overflow: ellipsis;
 
   // Needed to keep y's from getting cut off!
   line-height: initial;
+  text-overflow: ellipsis;
+  vertical-align: middle;
 
   .free-text__element {
     line-height: initial;
@@ -22,8 +22,8 @@
 
 .free-text__icon-container {
   display: inline-block;
-  vertical-align: middle;
   text-align: center;
+  vertical-align: middle;
 
   // Needed if we use a route pill as the leading icon for the row
   // which we do for one-row headways
@@ -105,19 +105,19 @@
 }
 
 .free-text__route-pill {
-  height: 144px;
   width: 248px;
-  border-radius: 72px;
+  height: 144px;
   font-size: 96px;
   line-height: 144px;
+  border-radius: 72px;
 }
 
 .free-text__text-pill {
-  border-radius: 84px;
+  padding-right: 84px;
+  padding-left: 84px;
   font-size: 126px;
   line-height: 168px;
-  padding-left: 84px;
-  padding-right: 84px;
+  border-radius: 84px;
 }
 
 // Partial alert and one-line headway have similar styles
@@ -182,8 +182,8 @@
   .free-text__icon-image {
     width: 100%;
     height: 100%;
-    object-fit: contain;
     padding: 0;
+    object-fit: contain;
   }
 }
 

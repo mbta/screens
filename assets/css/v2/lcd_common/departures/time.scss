@@ -34,23 +34,23 @@
 
 .departure-time {
   display: inline-block;
-  vertical-align: middle;
   font-family: Inter, sans-serif;
   color: #171f26;
+  vertical-align: middle;
 }
 
 .departure-time__text {
   font-size: 72px;
-  line-height: 64px;
   font-weight: 800;
+  line-height: 64px;
 }
 
 .departure-time__minutes {
   display: inline-block;
   margin-left: 4px;
   font-size: 72px;
-  line-height: 64px;
   font-weight: 800;
+  line-height: 64px;
 }
 
 .departure-time__minutes-label {
@@ -61,6 +61,6 @@
 
 .departure-time__timestamp {
   font-size: 72px;
-  line-height: 64px;
   font-weight: 800;
+  line-height: 64px;
 }

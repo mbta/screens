@@ -6,8 +6,8 @@
 
 .link-footer__contents {
   position: absolute;
-  left: 48px;
   top: 24px;
+  left: 48px;
 }
 
 .link-footer__logo {
@@ -16,18 +16,18 @@
 }
 
 .link-footer__logo-image {
-  height: 108px;
   width: 108px;
+  height: 108px;
   margin-right: 42px;
 }
 
 .link-footer__message {
   display: inline-block;
-  vertical-align: middle;
+  font-family: Inter, sans-serif;
   font-size: 48px;
   line-height: 48px;
-  font-family: Inter, sans-serif;
   color: #000;
+  vertical-align: middle;
 }
 
 .link-footer__message-url {

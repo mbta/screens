@@ -2,10 +2,10 @@
   position: relative;
   box-sizing: border-box;
   width: 1080px;
-  background-color: #e6e4e1;
   padding-top: 96px;
   padding-left: 104px;
   overflow: hidden;
+  background-color: #e6e4e1;
 }
 
 .departures-no-data__main-content {
@@ -21,19 +21,19 @@
 .departures-no-data__main-content__heading {
   width: 752px;
   height: 240px;
-  color: rgb(23 31 38);
-  font-size: 64px;
   font-family: Inter, sans-serif;
+  font-size: 64px;
   font-weight: bold;
-  letter-spacing: 0;
   line-height: 80px;
+  color: rgb(23 31 38);
+  letter-spacing: 0;
 }
 
 .departures-no-data__hairline {
-  content: "";
-  background: #737373;
   width: 753px;
   height: 2px;
+  content: "";
+  background: #737373;
 }
 
 .departures-no-data__alternatives-container {
@@ -49,12 +49,12 @@
 
 .departures-no-data__alternatives__message {
   width: 662px;
-  color: rgb(23 31 38);
-  font-size: 48px;
   font-family: Inter, sans-serif;
+  font-size: 48px;
   font-weight: normal;
-  letter-spacing: 0;
   line-height: 64px;
+  color: rgb(23 31 38);
+  letter-spacing: 0;
 }
 
 .departures-no-data__alternatives__message__em {

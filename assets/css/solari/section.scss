@@ -6,11 +6,11 @@
   position: relative;
 
   .section-header {
-    color: black;
-    width: 88px;
     position: absolute;
     top: 0;
     left: 0;
+    width: 88px;
+    color: black;
   }
 
   .section-header__icon {
@@ -25,15 +25,15 @@
 
 .section--normal {
   .section-header {
+    height: 123px;
     color: #171f26;
     background-color: #e1e1df;
-    height: 123px;
   }
 
   .section-header__name {
+    margin-left: 48px;
     font-size: 50px;
     line-height: 123px;
-    margin-left: 48px;
   }
 }
 
@@ -45,9 +45,9 @@
 
 .section-header__arrow-container {
   float: right;
-  margin-right: 50px;
-  height: 123px;
   width: 57px;
+  height: 123px;
+  margin-right: 50px;
   font-size: 0;
   vertical-align: middle;
 }
@@ -60,9 +60,9 @@
 
 .later-departure__header {
   position: relative;
-  margin-left: 42px;
-  margin-right: 42px;
   margin-top: 12px;
+  margin-right: 42px;
+  margin-left: 42px;
   border-bottom: 5px solid #ababab;
 }
 
@@ -70,21 +70,20 @@
   display: inline-block;
   margin-top: 34px;
   margin-bottom: 27px;
-
-  @include font--text--65medium;
-
-  text-transform: uppercase;
   font-size: 36px;
   line-height: 40px;
-  letter-spacing: 2px;
   color: #171f26;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+
+  @include font--text--65medium;
 }
 
 .later-departure__header-route-list {
-  display: inline-block;
   position: absolute;
-  right: 0;
   top: 31px;
+  right: 0;
+  display: inline-block;
 
   &--size-normal {
     .later-departure__route-pill--size-small {
@@ -94,15 +93,15 @@
 }
 
 .later-departure__route-pill-caret {
-  content: "";
-  display: inline-block;
-  border-style: solid;
-  border-width: 14px;
-  width: 0;
-  height: 0;
   position: absolute;
   top: 44px;
   right: 0;
+  display: inline-block;
+  width: 0;
+  height: 0;
+  content: "";
+  border-style: solid;
+  border-width: 14px;
   transition: transform 0.2s ease;
 
   &--before {
@@ -117,9 +116,9 @@
 
 .later-departure__route-pill {
   display: inline-block;
+  margin-left: 25px;
   text-align: center;
   border-radius: 46px;
-  margin-left: 25px;
 
   &--selected {
     height: 46px;
@@ -138,21 +137,21 @@
       // Different selected pill colors by mode
 
       &--commuter-rail {
-        background: #80276c;
         color: #fff;
+        background: #80276c;
       }
 
       &--bus {
-        background: #ffc72c;
         color: #000;
+        background: #ffc72c;
       }
     }
   }
 
   &--unselected {
+    height: 40px;
     color: rgb(23 31 38 / 80%);
     border: 3px solid rgb(23 31 38 / 80%);
-    height: 40px;
 
     // Width depends on the route
     &.later-departure__route-pill {

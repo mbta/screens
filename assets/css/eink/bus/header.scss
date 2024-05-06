@@ -1,8 +1,8 @@
 .header {
-  background-color: black;
-  color: white;
-  height: 288px;
   position: relative;
+  height: 288px;
+  color: white;
+  background-color: black;
 }
 
 .header__environment {
@@ -12,9 +12,9 @@
   top: 12px;
   left: 40px;
   font-size: 48px;
+  line-height: 48px;
   color: #fff;
   letter-spacing: 0;
-  line-height: 48px;
 }
 
 .header__time {
@@ -24,10 +24,10 @@
   top: 28px;
   right: 40px;
   font-size: 72px;
-  color: #fff;
-  letter-spacing: 0;
-  text-align: right;
   line-height: 72px;
+  color: #fff;
+  text-align: right;
+  letter-spacing: 0;
 }
 
 .header__realtime-indicator {
@@ -39,27 +39,27 @@
   width: 240px;
   height: 64px;
   font-size: 24px;
+  line-height: 32px;
   color: #fff;
   text-align: right;
-  line-height: 32px;
   text-transform: uppercase;
 }
 
 .header__realtime-indicator-icon {
-  height: 32px;
   width: 32px;
+  height: 32px;
   margin-right: 8px;
 }
 
 .header__stop-name {
   @include font--display--75bold;
 
-  width: 820px;
-  color: #fff;
-  letter-spacing: 1px;
   position: absolute;
   bottom: 38px;
   left: 56px;
+  width: 820px;
+  color: #fff;
+  letter-spacing: 1px;
 }
 
 .header__stop-name--small {
