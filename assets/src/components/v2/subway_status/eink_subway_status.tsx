@@ -43,7 +43,7 @@ const EinkSubwayStatus: ComponentType<SubwayStatusData> = (props) => {
 type LineStatusProps = { section: Section; color: LineColor };
 
 const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
-  let alerts: [Alert] | [Alert, Alert] = isContracted(section)
+  const alerts: [Alert] | [Alert, Alert] = isContracted(section)
     ? section.alerts
     : [section.alert];
 

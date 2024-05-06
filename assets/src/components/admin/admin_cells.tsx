@@ -139,7 +139,7 @@ const EditableTextarea = ({
     try {
       const json = JSON.parse(e.target.value);
       doUpdate(index, mutator || id, json);
-    } catch (err) {
+    } catch {
       alert(`Invalid JSON in ${id} for Screen ID ${rowValues.id}`);
     }
   };

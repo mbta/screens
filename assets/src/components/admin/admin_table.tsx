@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTable, useFilters, useRowSelect } from "react-table";
 import _ from "lodash";
+import weakKey from "weak-key";
 
 import { doSubmit } from "Util/admin";
 import { IndeterminateCheckbox } from "Components/admin/admin_cells";
@@ -20,7 +21,7 @@ const buildDefaultMutator = (columnId) => {
 
 const buildIndexMapping = (data, dataFilter) => {
   // Map from index in filter to index in all data
-  const [indexMapping, _filteredIndex] = data.reduce(
+  const [indexMapping] = data.reduce(
     ([acc, filteredIndex], row, index) => {
       const isIncluded = dataFilter(row);
       return [
@@ -87,9 +88,12 @@ const Table = ({
       <table {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
+            <tr
+              key={weakKey(headerGroup)}
+              {...headerGroup.getHeaderGroupProps()}
+            >
               {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()}>
+                <th key={column.id} {...column.getHeaderProps()}>
                   {column.render("Header")}
                   <div>{column.canFilter ? column.render("Filter") : null}</div>
                 </th>
@@ -102,10 +106,12 @@ const Table = ({
           {rows.map((row) => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps()}>
+              <tr key={weakKey(row)} {...row.getRowProps()}>
                 {row.cells.map((cell) => {
                   return (
-                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    <td key={cell.column.id} {...cell.getCellProps()}>
+                      {cell.render("Cell")}
+                    </td>
                   );
                 })}
               </tr>
