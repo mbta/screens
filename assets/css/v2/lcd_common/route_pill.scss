@@ -41,11 +41,11 @@
 .route-pill__text {
   position: absolute;
   width: 100%;
-  text-align: center;
   font-family: neue-haas-grotesk-text, sans-serif;
   font-size: 48px;
-  line-height: 74px;
   font-weight: 700;
+  line-height: 74px;
+  text-align: center;
 
   &--yellow {
     color: black;
@@ -76,11 +76,11 @@
 .route-pill__slashed-text {
   position: absolute;
   width: 100%;
-  text-align: center;
   font-family: neue-haas-grotesk-text, sans-serif;
   font-size: 32px;
-  line-height: 74px;
   font-weight: 700;
+  line-height: 74px;
+  text-align: center;
 }
 
 .route-pill__slashed-part-1 {

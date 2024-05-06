@@ -8,44 +8,44 @@
 }
 
 .no-data__header {
-  background-color: #000;
   height: 288px;
+  background-color: #000;
 }
 
 .no-data__logo-container {
-  width: 208px;
   display: inline-block;
+  width: 208px;
   vertical-align: middle;
 }
 
 .no-data__logo-image {
-  height: 128px;
   width: 128px;
+  height: 128px;
   margin: 24px 40px 20px;
 }
 
 .no-data__header-text-container {
-  width: 700px;
-  color: white;
   display: inline-block;
-  vertical-align: middle;
+  width: 700px;
   margin-top: 30px;
+  color: white;
+  vertical-align: middle;
 }
 
 .no-data__header-text {
   font-family: Helvetica, sans-serif;
+  font-size: 88px;
   font-weight: 700;
+  line-height: 88px;
   color: #fff;
   letter-spacing: 1px;
-  font-size: 88px;
-  line-height: 88px;
 }
 
 .no-data__main-content__no-connection-icon-container {
-  margin-top: 155px;
-  margin-bottom: 56px;
   width: 236px;
   height: 236px;
+  margin-top: 155px;
+  margin-bottom: 56px;
 }
 
 .no-data__main-content__no-connection-icon {
@@ -61,41 +61,41 @@
 .no-data__main-content__heading {
   width: 810px;
   height: 336px;
-  color: #000;
-  font-size: 104px;
-  font-family: Inter, sans-serif;
-  font-weight: bold;
-  letter-spacing: 0;
-  line-height: 112px;
   margin-bottom: 64px;
+  font-family: Inter, sans-serif;
+  font-size: 104px;
+  font-weight: bold;
+  line-height: 112px;
+  color: #000;
+  letter-spacing: 0;
 }
 
 .no-data__hairline {
-  content: "";
-  background: #000;
   width: 811px;
   height: 2px;
+  content: "";
+  background: #000;
   border-radius: 1px;
 }
 
 .no-data__main-content__subheading {
-  margin-top: 47px;
   width: 916px;
   height: 184px;
-  color: #000;
-  font-size: 72px;
+  margin-top: 47px;
   font-family: Inter, sans-serif;
+  font-size: 72px;
   font-weight: normal;
-  letter-spacing: 0;
   line-height: 92px;
+  color: #000;
+  letter-spacing: 0;
 }
 
 .no-data__time {
   position: absolute;
-  right: 40px;
   top: 40px;
+  right: 40px;
   font-family: Inter, sans-serif;
-  color: #fff;
   font-size: 72px;
   line-height: 72px;
+  color: #fff;
 }

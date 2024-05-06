@@ -1,17 +1,17 @@
 .crowding-widget {
   &__header {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    padding: 72px;
     height: 578px;
-    background-color: #171f26;
+    padding: 72px;
     color: #e5e4e1;
-    box-sizing: border-box;
+    background-color: #171f26;
   }
 
   &__body {
-    display: flex;
     position: relative;
+    display: flex;
     flex-direction: column;
     height: 920px;
     background-color: #d9d6d0;
@@ -20,8 +20,8 @@
 
   &__footer {
     display: flex;
-    background-color: #cccbc8;
     height: 422px;
+    background-color: #cccbc8;
   }
 }
 
@@ -53,12 +53,12 @@
 .crowding-widget__footer__segment {
   @include font--body-1;
 
-  padding: 71px 72px;
-  flex: 1 1;
+  position: relative;
   display: flex;
+  flex: 1 1;
   flex-direction: column;
   justify-content: space-between;
-  position: relative;
+  padding: 71px 72px;
 }
 
 .crowding-widget__footer__key-row {
@@ -76,8 +76,8 @@
   @include font--caption-2;
 
   position: absolute;
-  bottom: 18px;
   right: 24px;
+  bottom: 18px;
 }
 
 .crowding-widget__train-row {
@@ -148,10 +148,10 @@
 .crowding-widget__you-are-here-text {
   @include font--subtitle;
 
-  width: 1080px;
   box-sizing: border-box;
-  margin-top: auto;
+  width: 1080px;
   padding: 0 72px 108px;
+  margin-top: auto;
   text-align: left;
 
   &--right-align {

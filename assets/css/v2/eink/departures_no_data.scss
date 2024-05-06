@@ -11,28 +11,28 @@
 .departures-no-data__main-content__no-connection-icon-container {
   width: 236px;
   height: 236px;
-  margin-bottom: 48px;
   margin-top: 111px;
+  margin-bottom: 48px;
 }
 
 .departures-no-data__main-content__heading {
   width: 770px;
   height: 448px;
-  color: rgb(0 0 0);
-  font-size: 104px;
   font-family: Inter, sans-serif;
+  font-size: 104px;
   font-weight: bold;
-  letter-spacing: 0;
   line-height: 112px;
+  color: rgb(0 0 0);
+  letter-spacing: 0;
 }
 
 .departures-no-data__hairline {
-  content: "";
-  background: #000;
   width: 784px;
   height: 1px;
-  margin-left: 208px;
   margin-top: 52px;
+  margin-left: 208px;
+  content: "";
+  background: #000;
 }
 
 .departures-no-data__alternatives-container {
@@ -43,12 +43,12 @@
 .departures-no-data__alternatives__message {
   width: 872px;
   height: 300px;
-  color: rgb(0 0 0);
-  font-size: 72px;
   font-family: Inter, sans-serif;
+  font-size: 72px;
   font-weight: normal;
-  letter-spacing: 0;
   line-height: 92px;
+  color: rgb(0 0 0);
+  letter-spacing: 0;
 }
 
 .departures-no-data__main-content__no-connection-icon {

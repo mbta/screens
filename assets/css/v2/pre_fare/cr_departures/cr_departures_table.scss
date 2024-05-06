@@ -1,11 +1,11 @@
 .cr-departures-table {
-  border-collapse: collapse;
   table-layout: fixed;
+  border-collapse: collapse;
 
   th {
+    padding-bottom: 72px;
     font-size: 32px;
     text-align: left;
-    padding-bottom: 72px;
   }
 
   tr {
@@ -31,8 +31,8 @@
   }
 
   td.headsign.with-stations {
-    vertical-align: top;
     padding-top: 34px;
+    vertical-align: top;
   }
 
   td.arrival.with-stations {
@@ -50,21 +50,21 @@
   // END alignment code
 
   .headsign {
-    padding-left: 82px;
     width: 516px;
+    padding-left: 82px;
     font-weight: bold;
-    letter-spacing: 0;
     line-height: 56px;
+    letter-spacing: 0;
   }
 
   .arrival {
-    padding-left: 7px;
     width: 233px;
     height: 64px;
+    padding-left: 7px;
     font-size: 72px;
     font-weight: 800;
-    text-align: right;
     line-height: 64px;
+    text-align: right;
   }
 
   .track {
@@ -74,31 +74,31 @@
   .track-tbd {
     width: 90px;
     height: 90px;
-    text-align: center;
     font-size: 36px;
     font-weight: normal;
-    letter-spacing: 0;
     line-height: 32px;
+    text-align: center;
+    letter-spacing: 0;
   }
 
   .stops-at-text {
+    margin-top: 16px;
     font-size: 40px;
     font-weight: 600;
-    letter-spacing: 0;
     line-height: 40px;
-    margin-top: 16px;
+    letter-spacing: 0;
   }
 
   .headsign-text {
-    font-size: 56px;
     width: 516px;
+    font-size: 56px;
   }
 
   .track-number-text {
-    padding-top: 40px;
-    text-align: center;
     height: 56px;
+    padding-top: 40px;
     font-size: 56px;
+    text-align: center;
   }
 
   .arrow-image {
@@ -106,8 +106,8 @@
     text-align: center;
 
     .departure__arrow-image {
-      height: 64px;
       width: 64px;
+      height: 64px;
     }
   }
 
@@ -118,7 +118,7 @@
 
   .via-stop-name {
     display: inline-block;
-    vertical-align: middle;
     margin-left: 24px;
+    vertical-align: middle;
   }
 }

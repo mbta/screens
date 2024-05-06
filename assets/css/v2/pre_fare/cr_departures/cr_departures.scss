@@ -1,33 +1,33 @@
 .departures-container {
-  font-family: Inter, sans-serif;
   height: 100%;
-  background-color: #80276c;
   padding: 32px;
+  font-family: Inter, sans-serif;
+  background-color: #80276c;
 }
 
 .departures-card {
-  border-radius: 16px;
-  background-color: #d9d6d0;
   height: 1656px;
+  background-color: #d9d6d0;
+  border-radius: 16px;
 }
 
 .departures-card__body {
-  background-color: #ebeae8;
-  padding: 32px 44px;
-  box-shadow: 0 10px 20px 0 rgb(0 0 0 / 16%);
-  height: 1016px;
   box-sizing: border-box;
+  height: 1016px;
+  padding: 32px 44px;
+  background-color: #ebeae8;
+  box-shadow: 0 10px 20px 0 rgb(0 0 0 / 16%);
 
   .departures-card__body-english {
+    padding-bottom: 8px;
     font-size: 32px;
     line-height: 44px;
-    padding-bottom: 8px;
   }
 
   .departures-card__body-spanish {
+    padding-bottom: 36px;
     font-size: 24px;
     line-height: 36px;
-    padding-bottom: 36px;
   }
 }
 

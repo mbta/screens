@@ -10,8 +10,8 @@
 }
 
 .nearby-connections__icon-image {
-  height: 128px;
   width: 128px;
+  height: 128px;
   margin: 0 40px 32px;
 }
 
@@ -19,23 +19,23 @@
   @include font--text--75bold;
 
   display: inline-block;
-  vertical-align: top;
+  margin-top: 22px;
   font-size: 72px;
   line-height: 72px;
-  margin-top: 22px;
+  vertical-align: top;
 }
 
 .nearby-connections__hairline {
   height: 1px;
-  background-color: #808080;
-  margin-left: 208px;
   margin-right: 40px;
+  margin-left: 208px;
+  background-color: #808080;
 }
 
 .nearby-connections-row__header {
-  margin-left: 208px;
-  margin-right: 40px;
   margin-top: 18px;
+  margin-right: 40px;
+  margin-left: 208px;
 }
 
 .nearby-connections-row__stop-name {
@@ -57,8 +57,8 @@
   @include font--text--55regular;
 
   display: inline-block;
-  text-align: right;
   float: right;
+  text-align: right;
 }
 
 .nearby-connections-row__distance-units {
@@ -67,11 +67,11 @@
 }
 
 .nearby-connections-row__distance-icon {
+  position: relative;
+  top: 6px;
   width: 48px;
   height: 54px;
   margin-right: 12px;
-  position: relative;
-  top: 6px;
 }
 
 .nearby-connections-row__routes {
@@ -85,9 +85,9 @@
 }
 
 .nearby-connections-route__pill {
+  text-align: center;
   background: black;
   border-radius: 54px;
-  text-align: center;
 }
 
 .nearby-connections-route__pill--large {
@@ -105,29 +105,29 @@
 .nearby-connections-route__text {
   @include font--text--75bold;
 
-  color: white;
   display: inline-block;
+  color: white;
   text-transform: uppercase;
 }
 
 .nearby-connections-route__text--large {
+  margin-right: 32px;
+  margin-left: 32px;
   font-size: 54px;
   letter-spacing: 1.5px;
-  margin-left: 32px;
-  margin-right: 32px;
 }
 
 .nearby-connections-route__text--small {
+  margin-right: 19.2px;
+  margin-left: 19.2px;
   font-size: 32.4px;
   letter-spacing: 0.9px;
-  margin-left: 19.2px;
-  margin-right: 19.2px;
 }
 
 .nearby-connections-route__icon {
+  position: relative;
+  top: 6px;
   width: 48px;
   height: 54px;
   margin-right: 12px;
-  position: relative;
-  top: 6px;
 }

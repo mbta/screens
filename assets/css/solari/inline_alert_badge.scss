@@ -1,7 +1,7 @@
 .inline-alert-badge {
   display: inline-block;
-  box-shadow: 0 5px 21px rgb(0 0 0 / 20%);
   vertical-align: middle;
+  box-shadow: 0 5px 21px rgb(0 0 0 / 20%);
 
   &:not(:last-child) {
     margin-right: 30px;
@@ -12,9 +12,9 @@
   }
 
   &--snow_route {
+    box-sizing: border-box;
     background: #fff;
     border: 3px solid #171f26;
-    box-sizing: border-box;
   }
 
   &--last_trip {
@@ -24,11 +24,10 @@
 
 .inline-alert-badge__text {
   display: inline-block;
+  text-transform: uppercase;
+  vertical-align: middle;
 
   @include font--text--65medium;
-
-  vertical-align: middle;
-  text-transform: uppercase;
 
   &--delay {
     color: #fff;
@@ -60,10 +59,10 @@
   }
 
   .inline-alert-badge__text {
+    margin-right: 19px;
+    margin-left: 12px;
     font-size: 30px;
     line-height: 48px;
-    margin-left: 12px;
-    margin-right: 19px;
 
     &--snow_route {
       line-height: 42px;
@@ -71,9 +70,9 @@
   }
 
   .inline-alert-badge__icon-container {
-    margin-left: 12px;
-    height: 48px;
     width: 31px;
+    height: 48px;
+    margin-left: 12px;
 
     &--snow_route {
       height: 42px;
@@ -81,8 +80,8 @@
   }
 
   .inline-alert-badge__icon-image {
-    height: 32px;
     width: 32px;
+    height: 32px;
     margin-top: 8px;
 
     &--snow_route {
@@ -98,10 +97,10 @@
   }
 
   .inline-alert-badge__text {
+    margin-right: 46px;
+    margin-left: 32px;
     font-size: 60px;
     line-height: 112px;
-    margin-left: 32px;
-    margin-right: 46px;
 
     &--snow_route {
       line-height: 106px;
@@ -109,9 +108,9 @@
   }
 
   .inline-alert-badge__icon-container {
-    margin-left: 30px;
-    height: 76px;
     width: 60px;
+    height: 76px;
+    margin-left: 30px;
 
     &--snow_route {
       height: 70px;
@@ -119,8 +118,8 @@
   }
 
   .inline-alert-badge__icon-image {
-    height: 60px;
     width: 60px;
+    height: 60px;
     margin-top: 8px;
 
     &--snow_route {

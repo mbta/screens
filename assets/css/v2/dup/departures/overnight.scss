@@ -25,23 +25,23 @@
 
       .route-pill {
         display: inline-block;
-        height: 144px;
         width: 279px;
-        border-radius: 100px;
+        height: 144px;
         margin: 0 40px 0 0;
+        border-radius: 100px;
       }
     }
 
     .overnight-departures__text {
       width: 1182px;
       font-family: Inter, sans-serif;
-      font-weight: 600;
       font-size: 138px;
+      font-weight: 600;
       line-height: 148px;
 
       &:only-child {
-        font-weight: 700;
         font-size: 138px;
+        font-weight: 700;
         line-height: 148px;
       }
     }

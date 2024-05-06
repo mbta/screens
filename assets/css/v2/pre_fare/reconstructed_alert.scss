@@ -6,8 +6,8 @@ $alert-card-footer-height: 80px;
 
 .alert-container {
   // Takeover fonts
-  color: #171f26;
   font-family: Inter, sans-serif;
+  color: #171f26;
 
   .x-large-text {
     font-size: 200px;
@@ -32,9 +32,9 @@ $alert-card-footer-height: 80px;
 }
 
 .alert-container--large-flex {
-  padding: 26px 28px;
-  height: 522px;
   box-sizing: border-box;
+  height: 522px;
+  padding: 26px 28px;
 
   /* Alert contents */
   .alert-card {
@@ -43,9 +43,9 @@ $alert-card-footer-height: 80px;
   }
 
   .alert-card__body {
+    box-sizing: border-box;
     height: $alert-card-height - $alert-card-footer-height;
     padding: 40px 120px 20px 44px;
-    box-sizing: border-box;
 
     .bold {
       font-weight: 800;
@@ -117,10 +117,10 @@ $alert-card-footer-height: 80px;
       position: relative;
       width: fit-content;
       padding: 0 40px;
+      font-family: neue-haas-grotesk-text, sans-serif;
       font-size: 60px;
       line-height: 80px;
       text-transform: uppercase;
-      font-family: neue-haas-grotesk-text, sans-serif;
     }
 
     .route-pills__branches {
@@ -128,18 +128,18 @@ $alert-card-footer-height: 80px;
       margin-left: -16px;
 
       .route-pills__branches__dot {
-        height: 92px;
-        width: 92px;
-        border-radius: 50%;
         position: absolute;
+        width: 92px;
+        height: 92px;
         margin: -6px;
         background-color: #e6e4e1;
+        border-radius: 50%;
       }
 
       .route-pill--branch {
-        width: 80px;
         display: inline-flex;
         justify-content: center;
+        width: 80px;
         margin-left: 6px;
 
         &:nth-child(2) {
@@ -154,10 +154,10 @@ $alert-card-footer-height: 80px;
   }
 
   .alert-card__body__delay-notice {
+    display: inline-block;
+    margin-left: 32px;
     font-size: 56px;
     font-weight: 800;
-    margin-left: 32px;
-    display: inline-block;
   }
 
   .alert-card__body__icon {
@@ -171,61 +171,61 @@ $alert-card-footer-height: 80px;
   }
 
   .alert-card__body__remedy {
-    font-weight: 800;
-    padding-top: 32px;
     display: flex;
     align-items: center;
+    padding-top: 32px;
+    font-weight: 800;
   }
 
   .alert-card__footer {
+    height: $alert-card-footer-height;
     background-color: #cccbc8;
     border-radius: 0 0 32px 32px;
-    height: $alert-card-footer-height;
   }
 
   .alert-card__footer__alerts-url {
-    color: black;
-    font-size: 40px;
-    text-align: right;
     padding: 16px 34px 24px 0;
+    font-size: 40px;
+    color: black;
+    text-align: right;
   }
 }
 
 .alert-container--takeover {
-  color: white;
-  height: 100%;
-  width: 1080px;
-  padding: 32px;
   box-sizing: border-box;
+  width: 1080px;
+  height: 100%;
+  padding: 32px;
+  color: white;
 
   /* Alert contents */
   .alert-card {
     width: 1016px;
     height: 100%;
-    border-radius: 4px;
-    background-color: #e5e4e1;
     color: #171f26;
+    background-color: #e5e4e1;
+    border-radius: 4px;
 
     &__body {
+      box-sizing: border-box;
       height: $takeover-card-height - $takeover-card-footer-height;
       padding: 0 56px;
-      box-sizing: border-box;
       font-family: Inter, sans-serif;
       font-size: 200px;
       font-weight: 800;
 
       .container {
-        height: 100%;
         display: flex;
         flex-flow: column;
         align-items: flex-start;
+        height: 100%;
       }
 
       &__icon {
         flex-shrink: 0;
         height: 300px;
-        margin-bottom: 48px;
         padding-top: 112px;
+        margin-bottom: 48px;
       }
 
       &__issue {
@@ -235,9 +235,9 @@ $alert-card-footer-height: 80px;
       }
 
       &__location {
+        margin-bottom: 32px;
         font-size: 60px;
         font-weight: 400;
-        margin-bottom: 32px;
       }
 
       &__cause {
@@ -246,8 +246,8 @@ $alert-card-footer-height: 80px;
       }
 
       &__remedy {
-        padding-top: 474px;
         height: 660px;
+        padding-top: 474px;
         line-height: 220px;
       }
 
@@ -262,13 +262,13 @@ $alert-card-footer-height: 80px;
       }
 
       &__accessibility-info {
-        margin-top: 34px;
         display: flex;
+        margin-top: 34px;
 
         &--text {
-          font-weight: 400;
-          font-size: 53px;
           min-width: 811px;
+          font-size: 53px;
+          font-weight: 400;
           color: #000;
         }
       }
@@ -279,21 +279,21 @@ $alert-card-footer-height: 80px;
       }
 
       .disruption-diagram-container {
-        width: 904px;
         flex: 1;
+        width: 904px;
         min-height: 0;
       }
     }
 
     &__footer {
-      color: #000;
-      background-color: #cccbc8;
-      border-radius: 0 0 4px 4px;
+      position: relative;
       height: $takeover-card-footer-height;
       font-size: 32px;
       font-weight: 400;
-      position: relative;
+      color: #000;
       text-align: center;
+      background-color: #cccbc8;
+      border-radius: 0 0 4px 4px;
 
       &__cause {
         position: absolute;
@@ -306,11 +306,11 @@ $alert-card-footer-height: 80px;
 
       &__updated-at {
         position: absolute;
-        bottom: 20px;
         right: 60px;
+        bottom: 20px;
         height: 44px;
-        text-align: end;
         margin-top: 20px;
+        text-align: end;
 
         .bold {
           font-weight: 600;
@@ -319,8 +319,8 @@ $alert-card-footer-height: 80px;
 
       &__alerts-url {
         position: absolute;
-        bottom: 20px;
         right: 60px;
+        bottom: 20px;
         text-align: right;
       }
     }
@@ -342,8 +342,8 @@ $alert-card-footer-height: 80px;
   }
 
   .alert-card__footer__alerts-url {
-    color: white;
     font-weight: 500;
+    color: white;
   }
 
   .alert-card__body__route-pills

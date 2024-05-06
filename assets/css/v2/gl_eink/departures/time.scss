@@ -4,49 +4,49 @@
   padding-bottom: 56px;
 
   &:not(:last-child)::after {
-    content: "";
     position: absolute;
     bottom: 0;
     left: 0;
     width: 794px;
     height: 2px;
-    border-radius: 3px;
+    content: "";
     background-color: black;
+    border-radius: 3px;
   }
 }
 
 .departure-time {
+  margin-right: 32px;
   font-family: Inter, sans-serif;
   color: black;
   text-align: right;
-  margin-right: 32px;
 }
 
 .departure-time__text {
   font-size: 360px;
-  line-height: 360px;
   font-weight: 800;
+  line-height: 360px;
 }
 
 .departure-time__minutes {
   display: inline-block;
   margin-right: 16px;
   font-size: 360px;
-  line-height: 360px;
   font-weight: 800;
+  line-height: 360px;
 }
 
 .departure-time__minutes-label {
   display: inline-block;
   font-size: 264px;
-  line-height: 264px;
   font-weight: 400;
+  line-height: 264px;
 }
 
 .departure-time__timestamp {
   font-size: 280px;
-  line-height: 280px;
   font-weight: 800;
+  line-height: 280px;
 }
 
 .departure-crowding {

@@ -1,16 +1,16 @@
 .inline-alert {
-  text-align: right;
   margin-right: 40px;
+  text-align: right;
 }
 
 .inline-alert__badge {
   @include font--text--55regular;
 
-  background-color: black;
-  color: white;
-  font-size: 40px;
-  border-radius: 16px;
   padding: 12px 32px 12px 16px;
+  font-size: 40px;
+  color: white;
+  background-color: black;
+  border-radius: 16px;
 }
 
 .inline-alert__emphasis {
@@ -18,10 +18,10 @@
 }
 
 .inline-alert__icon {
-  width: 48px;
-  height: 52px;
   position: relative;
   top: 12px;
-  margin-left: 12px;
+  width: 48px;
+  height: 52px;
   margin-right: 24px;
+  margin-left: 12px;
 }

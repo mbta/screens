@@ -1,11 +1,11 @@
 .cr-departure-time {
   .cr-departure-time__prediction {
-    color: rgb(115 115 115);
-    font-size: 56px;
     font-family: Inter, sans-serif;
+    font-size: 56px;
     font-weight: 800;
-    text-align: right;
     line-height: 56px;
+    color: rgb(115 115 115);
+    text-align: right;
 
     &.delayed {
       color: rgb(115 115 115);
@@ -13,25 +13,25 @@
   }
 
   .cr-departure-time__subtext {
-    color: rgb(115 115 115);
-    font-family: Inter, sans-serif;
-    text-align: right;
-    letter-spacing: 0;
     margin-top: 26px;
+    font-family: Inter, sans-serif;
     font-size: 32px;
     font-weight: bold;
     line-height: 32px;
+    color: rgb(115 115 115);
+    text-align: right;
+    letter-spacing: 0;
   }
 
   .cr-departure-time__live-data-icon {
-    transform: scaleX(-1);
-    height: 36px;
     width: 36px;
+    height: 36px;
+    transform: scaleX(-1);
   }
 
   .base-departure-time {
-    line-height: 64px;
     font-size: 72px;
+    line-height: 64px;
 
     &__minutes {
       line-height: unset;

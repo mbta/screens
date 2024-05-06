@@ -11,8 +11,8 @@
     width: 1136px;
     height: 1080px;
     padding-top: 32px;
-    padding-left: 32px;
     padding-right: 72px;
+    padding-left: 32px;
   }
 
   .alert-widget__content__route-pills {
@@ -57,29 +57,29 @@
   }
 
   .alert-widget__content__header-text {
-    height: 96px;
     width: 992px;
-    color: white;
-    font-size: 96px;
-    font-family: Inter, sans-serif;
-    font-weight: 800;
-    letter-spacing: 0;
-    line-height: 96px;
+    height: 96px;
     margin-top: 64px;
     margin-left: 40px;
     overflow: hidden;
-    white-space: nowrap;
+    font-family: Inter, sans-serif;
+    font-size: 96px;
+    font-weight: 800;
+    line-height: 96px;
+    color: white;
     text-overflow: clip;
+    letter-spacing: 0;
+    white-space: nowrap;
   }
 
   .alert-widget__content__body-text {
     width: 992px;
-    color: white;
-    font-family: Inter, sans-serif;
-    font-weight: 500;
-    letter-spacing: 0;
     margin-top: 64px;
     margin-left: 40px;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    color: white;
+    letter-spacing: 0;
 
     &--regular {
       font-size: 64px;
@@ -88,17 +88,17 @@
 
     &--small {
       height: 528px;
+      overflow: hidden;
       font-size: 48px;
       line-height: 64px;
-      overflow: hidden;
     }
   }
 
   .alert-widget__content__cta {
     position: absolute;
+    bottom: 0;
     height: 120px;
     margin-left: 40px;
-    bottom: 0;
   }
 
   .alert-widget__content__cta__icon {
@@ -113,14 +113,14 @@
 
   .alert-widget__content__cta__url {
     display: inline-block;
-    margin-left: 56px;
     margin-bottom: 64px;
-    color: white;
-    font-size: 56px;
+    margin-left: 56px;
     font-family: Inter, sans-serif;
+    font-size: 56px;
     font-weight: 800;
-    text-align: right;
     line-height: 56px;
+    color: white;
+    text-align: right;
   }
 }
 
@@ -138,8 +138,8 @@
     width: 1136px;
     height: 1280px;
     padding-top: 64px;
-    padding-left: 46px;
     padding-right: 64px;
+    padding-left: 46px;
   }
 
   .alert-widget__content__route-pills {
@@ -156,23 +156,23 @@
 
   .alert-widget__content__header-text {
     height: 120px;
-    color: black;
-    font-size: 120px;
-    font-family: Inter, sans-serif;
-    font-weight: 800;
-    letter-spacing: 0;
-    line-height: 120px;
     margin-top: 64px;
     margin-left: 18px;
+    font-family: Inter, sans-serif;
+    font-size: 120px;
+    font-weight: 800;
+    line-height: 120px;
+    color: black;
+    letter-spacing: 0;
   }
 
   .alert-widget__content__body-text {
-    color: black;
-    font-family: Inter, sans-serif;
-    font-weight: 500;
-    letter-spacing: 0;
     margin-top: 64px;
     margin-left: 18px;
+    font-family: Inter, sans-serif;
+    font-weight: 500;
+    color: black;
+    letter-spacing: 0;
 
     &--regular {
       font-size: 56px;
@@ -181,17 +181,17 @@
 
     &--small {
       height: 744px;
+      overflow: hidden;
       font-size: 42px;
       line-height: 58px;
-      overflow: hidden;
     }
   }
 
   .alert-widget__content__cta {
     position: absolute;
+    bottom: 0;
     height: 120px;
     margin-left: 18px;
-    bottom: 0;
   }
 
   .alert-widget__content__cta__icon {
@@ -205,13 +205,13 @@
 
   .alert-widget__content__cta__url {
     display: inline-block;
-    margin-left: 66px;
     margin-bottom: 56px;
-    color: black;
-    font-size: 64px;
+    margin-left: 66px;
     font-family: Inter, sans-serif;
+    font-size: 64px;
     font-weight: 800;
-    text-align: right;
     line-height: 64px;
+    color: black;
+    text-align: right;
   }
 }

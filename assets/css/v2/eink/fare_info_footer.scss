@@ -1,6 +1,6 @@
 .fare-info {
-  height: 264px;
   position: relative;
+  height: 264px;
 }
 
 .fare-info__icon {
@@ -10,8 +10,8 @@
 }
 
 .fare-info__icon-image {
-  height: 128px;
   width: 128px;
+  height: 128px;
 }
 
 .fare-info__message {
@@ -23,17 +23,17 @@
 .fare-info__message-header {
   font-family: Inter, sans-serif;
   font-size: 44px;
-  line-height: 72px;
   font-weight: 800;
+  line-height: 72px;
   text-transform: uppercase;
 }
 
 .fare-info__message-body {
+  width: 712px;
   margin-top: 3px;
   font-family: Inter, sans-serif;
   font-size: 44px;
   line-height: 56px;
-  width: 712px;
 }
 
 .fare-info__cost {
@@ -42,7 +42,7 @@
   right: 40px;
   font-family: Inter, sans-serif;
   font-size: 72px;
-  line-height: 72px;
   font-weight: 700;
+  line-height: 72px;
   color: #000;
 }

@@ -1,16 +1,16 @@
 .departure-headway {
   display: inline-block;
-  vertical-align: middle;
-  text-align: right;
   width: 300px;
+  text-align: right;
+  vertical-align: middle;
 }
 
 .departure-headway__destination {
-  color: #171f26;
   display: inline-block;
-  vertical-align: middle;
   width: 528px;
   font-size: 50px;
+  color: #171f26;
+  vertical-align: middle;
 }
 
 .departure-headway__highlight {
@@ -24,10 +24,10 @@
 .departure-headway__message {
   @include font--text--55regular;
 
+  margin-right: 10px;
+  margin-left: 10px;
   font-size: 36px;
   line-height: 52px;
-  margin-left: 10px;
-  margin-right: 10px;
 }
 
 .departure-headway__range {

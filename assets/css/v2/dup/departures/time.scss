@@ -1,9 +1,9 @@
 .departure-time {
-  color: #171f26;
-  text-align: right;
+  font-family: Inter, sans-serif;
   font-size: 138px;
   line-height: 1em;
-  font-family: Inter, sans-serif;
+  color: #171f26;
+  text-align: right;
 
   &:not(:first-child) {
     margin-top: 32px;
@@ -15,30 +15,30 @@
   }
 
   &__moon-icon {
-    color: black;
-    height: 128px;
     width: 128px;
+    height: 128px;
+    color: black;
   }
 }
 
 .departure-time__text {
-  font-weight: 700;
   font-size: 1em;
+  font-weight: 700;
   line-height: 1.185em;
 }
 
 .departure-time__minutes {
   display: inline-block;
-  font-size: 1em;
   margin-right: 0.0694em;
-  line-height: 1.185em;
+  font-size: 1em;
   font-weight: 800;
+  line-height: 1.185em;
 }
 
 .departure-time__minutes-label {
   display: inline-block;
-  font-weight: 400;
   font-size: 0.729em;
+  font-weight: 400;
   line-height: 1em;
 }
 
@@ -47,15 +47,15 @@
 }
 
 .departure-time__time {
-  font-weight: 800;
   font-size: 138px;
+  font-weight: 800;
   line-height: 128px;
 }
 
 .departure-time__ampm {
   margin-left: 20px;
-  font-weight: 400;
   font-size: 96px;
+  font-weight: 400;
   line-height: 108px;
   letter-spacing: 2px;
 }

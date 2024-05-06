@@ -16,8 +16,8 @@
   line-height: 32px;
 
   &--current-terminal {
-    font-weight: 600;
     font-size: 32px;
+    font-weight: 600;
   }
 
   &--current {
@@ -31,8 +31,8 @@
 
 .line-map__vehicle-droplet {
   stroke: white;
-  stroke-width: 8;
   stroke-linejoin: round;
+  stroke-width: 8;
 }
 
 .line-map__vehicle-label {

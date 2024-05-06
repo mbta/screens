@@ -1,17 +1,17 @@
 .connection-error {
-  margin: 0 auto;
-  padding: 0;
   width: 1200px;
   height: 1600px;
+  padding: 0;
+  margin: 0 auto;
   overflow: hidden;
 }
 
 .connection-error__time {
   position: absolute;
-  margin-left: 1000px;
   margin-top: 40px;
+  margin-left: 1000px;
   font-family: Inter, sans-serif;
-  color: #fff;
   font-size: 72px;
   line-height: 72px;
+  color: #fff;
 }

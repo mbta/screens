@@ -2,13 +2,13 @@
   text-align: center;
 
   &--with-slash {
-    border-radius: 0.5em;
     height: 0.833em;
+    border-radius: 0.5em;
   }
 
   &--no-slash {
-    border-radius: 1em;
     height: 1.18em;
+    border-radius: 1em;
   }
 }
 

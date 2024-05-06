@@ -1,7 +1,7 @@
 .no-data__container,
 .loading__container {
-  background-color: #e6e4e1;
   height: 100%;
+  background-color: #e6e4e1;
 }
 
 .no-data__body,
@@ -13,8 +13,8 @@
 .loading__icon-container {
   display: inline-block;
   width: 312px;
-  vertical-align: top;
   text-align: center;
+  vertical-align: top;
 }
 
 .no-data__icon-image,
@@ -26,32 +26,32 @@
 .loading__heading {
   display: inline-block;
   width: 1544px;
-  vertical-align: top;
   font-family: Inter, sans-serif;
-  color: #171f26;
   font-size: 144px;
-  line-height: 160px;
   font-weight: 800;
+  line-height: 160px;
+  color: #171f26;
+  vertical-align: top;
 }
 
 .loading__sub-heading {
   display: inline-block;
   width: 1544px;
-  vertical-align: top;
-  margin-left: 312px;
   margin-top: 64px;
+  margin-left: 312px;
   font-family: Inter, sans-serif;
-  color: #171f26;
   font-size: 112px;
-  line-height: 140px;
   font-weight: normal;
+  line-height: 140px;
+  color: #171f26;
+  vertical-align: top;
 }
 
 .no-data__link,
 .loading__link {
   position: absolute;
-  margin-top: 88px;
   right: 72px;
+  margin-top: 88px;
 }
 
 .no-data__link-arrow,
@@ -63,9 +63,9 @@
 .no-data__link-text,
 .loading__link-text {
   display: inline-block;
-  vertical-align: middle;
-  color: #171f26;
+  margin-left: 72px;
   font-family: Inter, sans-serif;
   font-size: 108px;
-  margin-left: 72px;
+  color: #171f26;
+  vertical-align: middle;
 }

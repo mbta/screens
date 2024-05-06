@@ -1,10 +1,10 @@
 .global-alert {
-  background: black;
-  color: white;
-  border-radius: 0 24px 24px 0;
-  margin-right: 34px;
   margin-top: auto;
+  margin-right: 34px;
   margin-bottom: auto;
+  color: white;
+  background: black;
+  border-radius: 0 24px 24px 0;
 }
 
 .global-alert__header {
@@ -18,8 +18,8 @@
 }
 
 .global-alert__icon-image {
-  height: 128px;
   width: 128px;
+  height: 128px;
   margin: 32px 40px;
 }
 
@@ -28,9 +28,9 @@
 
   display: inline-block;
   width: 720px;
-  vertical-align: top;
-  font-size: 80px;
   margin-top: 52px;
+  font-size: 80px;
+  vertical-align: top;
 }
 
 .global-alert__header-timestamp {
@@ -38,12 +38,12 @@
 
   display: inline-block;
   width: 194px;
-  vertical-align: top;
-  text-align: right;
   margin-top: 86px;
   margin-right: 44px;
   font-size: 16px;
+  text-align: right;
   text-transform: uppercase;
+  vertical-align: top;
 }
 
 .global-alert__body {

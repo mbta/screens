@@ -14,8 +14,8 @@
     width: 480px;
     height: 580px;
     padding-top: 24px;
-    padding-left: 32px;
     padding-right: 32px;
+    padding-left: 32px;
   }
 
   .alert-widget__content__route-pills {
@@ -46,21 +46,21 @@
 
   .alert-widget__content__header-text {
     height: 48px;
-    color: rgb(23 31 38);
-    font-size: 48px;
-    font-family: Inter, sans-serif;
-    font-weight: 800;
-    letter-spacing: 0;
-    line-height: 48px;
     margin-top: 32px;
+    font-family: Inter, sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 48px;
+    color: rgb(23 31 38);
+    letter-spacing: 0;
   }
 
   .alert-widget__content__body-text {
-    color: rgb(23 31 38);
+    margin-top: 24px;
     font-family: Inter, sans-serif;
     font-weight: 500;
+    color: rgb(23 31 38);
     letter-spacing: 0;
-    margin-top: 24px;
 
     &--regular {
       font-size: 32px;
@@ -69,19 +69,19 @@
 
     &--small {
       height: 280px;
+      overflow: hidden;
       font-size: 24px;
       line-height: 32px;
-      overflow: hidden;
     }
   }
 
   .alert-widget__content__cta {
-    background: rgb(115 115 115);
-    height: 80px;
-    width: 100%;
     position: absolute;
-    left: 0;
     bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background: rgb(115 115 115);
     border-radius: 0 0 16px 16px;
   }
 
@@ -96,12 +96,12 @@
   .alert-widget__content__cta__url {
     padding-top: 18px;
     padding-right: 24px;
-    color: white;
-    font-size: 40px;
     font-family: Inter, sans-serif;
+    font-size: 40px;
     font-weight: 800;
-    text-align: right;
     line-height: 40px;
+    color: white;
+    text-align: right;
   }
 }
 
@@ -120,8 +120,8 @@
     width: 1000px;
     height: 1568px;
     padding-top: 64px;
-    padding-left: 64px;
     padding-right: 64px;
+    padding-left: 64px;
   }
 
   .alert-widget__content__route-pills {
@@ -138,21 +138,21 @@
 
   .alert-widget__content__header-text {
     height: 120px;
-    color: white;
-    font-size: 120px;
-    font-family: Inter, sans-serif;
-    font-weight: 800;
-    letter-spacing: 0;
-    line-height: 120px;
     margin-top: 64px;
+    font-family: Inter, sans-serif;
+    font-size: 120px;
+    font-weight: 800;
+    line-height: 120px;
+    color: white;
+    letter-spacing: 0;
   }
 
   .alert-widget__content__body-text {
-    color: white;
+    margin-top: 64px;
     font-family: Inter, sans-serif;
     font-weight: 500;
+    color: white;
     letter-spacing: 0;
-    margin-top: 64px;
 
     &--regular {
       font-size: 56px;
@@ -161,27 +161,27 @@
 
     &--small {
       height: 744px;
+      overflow: hidden;
       font-size: 42px;
       line-height: 58px;
-      overflow: hidden;
     }
   }
 
   .alert-widget__content__cta {
-    background: rgb(46 62 77);
-    height: 192px;
-    width: 100%;
     position: absolute;
-    left: 0;
     bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 192px;
+    background: rgb(46 62 77);
     border-radius: 0 0 32px 32px;
   }
 
   .alert-widget__content__cta__icon {
-    height: 128px;
     position: absolute;
     top: 32px;
     left: 64px;
+    height: 128px;
   }
 
   .alert-widget__content__cta__icon__image {
@@ -195,11 +195,11 @@
   .alert-widget__content__cta__url {
     padding-top: 32px;
     padding-right: 64px;
-    color: white;
-    font-size: 64px;
     font-family: Inter, sans-serif;
+    font-size: 64px;
     font-weight: 800;
-    text-align: right;
     line-height: 128px;
+    color: white;
+    text-align: right;
   }
 }
