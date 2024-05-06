@@ -7,7 +7,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
-module.exports = (env, options) => [
+module.exports = () => [
   {
     resolve: {
       extensions: [".ts", ".tsx", ".js", ".jsx"],
