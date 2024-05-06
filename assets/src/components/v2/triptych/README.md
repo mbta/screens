@@ -29,7 +29,7 @@ Outfront recommends these asset sizes:
   the following contents in:
 
   ```html
-  <!DOCTYPE html>
+  <!doctype html>
   <html lang="en">
     <head>
       <meta charset="utf-8" />
