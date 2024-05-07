@@ -7,19 +7,68 @@ const TerserPlugin = require("terser-webpack-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
+common_export_body = {
+  resolve: {
+    extensions: [".ts", ".tsx", ".js", ".jsx"],
+    alias: {
+      // Please also update the "paths" list in tsconfig.json when you add aliases here!
+      Components: path.resolve(__dirname, "src/components"),
+      Hooks: path.resolve(__dirname, "src/hooks"),
+      Util: path.resolve(__dirname, "src/util"),
+      Constants: path.resolve(__dirname, "src/constants"),
+      Images: path.resolve(__dirname, "static/images"),
+    },
+  },
+  output: {
+    filename: "[name].js",
+    path: path.resolve(__dirname, "../priv/static/js"),
+  },
+  devtool: "source-map",
+  optimization: {
+    minimizer: [
+      new TerserPlugin({ cache: true, parallel: true, sourceMap: false }),
+      new OptimizeCSSAssetsPlugin({}),
+    ],
+  },
+};
+
+common_rules = [
+  {
+    enforce: "pre",
+    test: /\.js$/,
+    loader: "source-map-loader",
+  },
+  {
+    test: /\.s?css$/,
+    use: [
+      MiniCssExtractPlugin.loader,
+      {
+        loader: "css-loader",
+      },
+      {
+        loader: "sass-loader",
+      },
+    ],
+  },
+  {
+    test: /\.svg$/i,
+    issuer: /\.[jt]sx?$/,
+    use: ["@svgr/webpack"],
+  },
+];
+
+common_babel_loader_plugins = [
+  "@babel/plugin-proposal-export-default-from",
+  "@babel/plugin-proposal-logical-assignment-operators",
+  ["@babel/plugin-proposal-optional-chaining", { loose: false }],
+  ["@babel/plugin-proposal-pipeline-operator", { proposal: "minimal" }],
+  ["@babel/plugin-proposal-nullish-coalescing-operator", { loose: false }],
+  "@babel/plugin-proposal-do-expressions",
+];
+
 module.exports = () => [
   {
-    resolve: {
-      extensions: [".ts", ".tsx", ".js", ".jsx"],
-      alias: {
-        // Please also update the "paths" list in tsconfig.json when you add aliases here!
-        Components: path.resolve(__dirname, "src/components"),
-        Hooks: path.resolve(__dirname, "src/hooks"),
-        Util: path.resolve(__dirname, "src/util"),
-        Constants: path.resolve(__dirname, "src/constants"),
-        Images: path.resolve(__dirname, "static/images"),
-      },
-    },
+    ...common_export_body,
     entry: {
       polyfills: "./src/polyfills.js",
       bus_eink: "./src/apps/bus_eink.tsx",
@@ -37,10 +86,6 @@ module.exports = () => [
       pre_fare_v2: "./src/apps/v2/pre_fare.tsx",
       triptych_v2: "./src/apps/v2/triptych.tsx",
     },
-    output: {
-      filename: "[name].js",
-      path: path.resolve(__dirname, "../priv/static/js"),
-    },
     module: {
       rules: [
         {
@@ -54,45 +99,11 @@ module.exports = () => [
                 "@babel/preset-react",
                 "@babel/preset-typescript",
               ],
-              plugins: [
-                "@babel/plugin-proposal-export-default-from",
-                "@babel/plugin-proposal-logical-assignment-operators",
-                ["@babel/plugin-proposal-optional-chaining", { loose: false }],
-                [
-                  "@babel/plugin-proposal-pipeline-operator",
-                  { proposal: "minimal" },
-                ],
-                [
-                  "@babel/plugin-proposal-nullish-coalescing-operator",
-                  { loose: false },
-                ],
-                "@babel/plugin-proposal-do-expressions",
-              ],
+              plugins: common_babel_loader_plugins,
             },
           },
         },
-        {
-          enforce: "pre",
-          test: /\.js$/,
-          loader: "source-map-loader",
-        },
-        {
-          test: /\.s?css$/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            {
-              loader: "css-loader",
-            },
-            {
-              loader: "sass-loader",
-            },
-          ],
-        },
-        {
-          test: /\.svg$/i,
-          issuer: /\.[jt]sx?$/,
-          use: ["@svgr/webpack"],
-        },
+        ...common_rules,
         {
           test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
           use: [
@@ -127,33 +138,12 @@ module.exports = () => [
       new MiniCssExtractPlugin({ filename: "../css/[name].css" }),
       new CopyWebpackPlugin({ patterns: [{ from: "static/", to: "../" }] }),
     ],
-    devtool: "source-map",
-    optimization: {
-      minimizer: [
-        new TerserPlugin({ cache: true, parallel: true, sourceMap: false }),
-        new OptimizeCSSAssetsPlugin({}),
-      ],
-    },
   },
   {
-    resolve: {
-      extensions: [".ts", ".tsx", ".js", ".jsx"],
-      alias: {
-        // Please also update the "paths" list in tsconfig.json when you add aliases here!
-        Components: path.resolve(__dirname, "src/components"),
-        Hooks: path.resolve(__dirname, "src/hooks"),
-        Util: path.resolve(__dirname, "src/util"),
-        Constants: path.resolve(__dirname, "src/constants"),
-        Images: path.resolve(__dirname, "static/images"),
-      },
-    },
+    ...common_export_body,
     entry: {
       packaged_triptych_polyfills: "./src/polyfills.js",
       packaged_triptych_v2: "./src/apps/v2/triptych.tsx",
-    },
-    output: {
-      filename: "[name].js",
-      path: path.resolve(__dirname, "../priv/static/js"),
     },
     module: {
       rules: [
@@ -175,45 +165,11 @@ module.exports = () => [
                 "@babel/preset-react",
                 "@babel/preset-typescript",
               ],
-              plugins: [
-                "@babel/plugin-proposal-export-default-from",
-                "@babel/plugin-proposal-logical-assignment-operators",
-                ["@babel/plugin-proposal-optional-chaining", { loose: false }],
-                [
-                  "@babel/plugin-proposal-pipeline-operator",
-                  { proposal: "minimal" },
-                ],
-                [
-                  "@babel/plugin-proposal-nullish-coalescing-operator",
-                  { loose: false },
-                ],
-                "@babel/plugin-proposal-do-expressions",
-              ],
+              plugins: common_babel_loader_plugins,
             },
           },
         },
-        {
-          enforce: "pre",
-          test: /\.js$/,
-          loader: "source-map-loader",
-        },
-        {
-          test: /\.s?css$/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            {
-              loader: "css-loader",
-            },
-            {
-              loader: "sass-loader",
-            },
-          ],
-        },
-        {
-          test: /\.svg$/i,
-          issuer: /\.[jt]sx?$/,
-          use: "@svgr/webpack",
-        },
+        ...common_rules,
         {
           test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
           use: [
@@ -265,12 +221,5 @@ module.exports = () => [
         patterns: [{ from: "static/fonts", to: "../fonts" }],
       }),
     ],
-    devtool: "source-map",
-    optimization: {
-      minimizer: [
-        new TerserPlugin({ cache: true, parallel: true, sourceMap: true }),
-        new OptimizeCSSAssetsPlugin({}),
-      ],
-    },
   },
 ];
