@@ -7,7 +7,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
-common_export_body = {
+const common_export_body = {
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx"],
     alias: {
@@ -32,7 +32,7 @@ common_export_body = {
   },
 };
 
-common_rules = [
+const common_rules = [
   {
     enforce: "pre",
     test: /\.js$/,
@@ -57,7 +57,7 @@ common_rules = [
   },
 ];
 
-common_babel_loader_plugins = [
+const common_babel_loader_plugins = [
   "@babel/plugin-proposal-export-default-from",
   "@babel/plugin-proposal-logical-assignment-operators",
   ["@babel/plugin-proposal-optional-chaining", { loose: false }],
