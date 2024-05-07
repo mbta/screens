@@ -22,37 +22,10 @@ Outfront recommends these asset sizes:
   controller--if it is, you don't need to do anything for this step.
 - Double check that any behavior specific to the triptych screen environment
   happens inside of an `isTriptych()` or `isOFM()` check. This includes:
+
   - `buildApiPath` in use_api_response.tsx should return a full URL for the API
     path: prefix `apiPath` string with "https://screens.mbta.com".
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
-- Create priv/static/triptych-app.html if it doesn’t already exist. Copy paste
-  the following contents in:
-
-  ```html
-  <!doctype html>
-  <html lang="en">
-    <head>
-      <meta charset="utf-8" />
-      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Screens</title>
-      <link rel="stylesheet" href="packaged_triptych_v2.css" />
-    </head>
-
-    <body>
-      <div
-        id="app"
-        data-last-refresh="2020-09-25T17:23:00Z"
-        data-environment-name="screens-prod"
-      ></div>
-      <script
-        type="text/javascript"
-        src="packaged_triptych_polyfills.js"
-      ></script>
-      <script type="text/javascript" src="packaged_triptych_v2.js"></script>
-    </body>
-  </html>
-  ```
 
 - Set the version string in assets/src/components/v2/triptych/version.tsx to
   `current_year.current_month.current_day.1`.
@@ -81,7 +54,7 @@ Outfront recommends these asset sizes:
 - `cd` to priv/static and run the following:
   ```sh
   npm --prefix ../../assets run deploy && \
-  cp -r css/packaged_triptych_v2.css js/packaged_triptych_polyfills.js js/packaged_triptych_v2.js js/packaged_triptych_v2.js.map ../triptych_preview.png . && \
+  cp -r css/packaged_triptych_v2.css js/packaged_triptych_polyfills.js js/packaged_triptych_v2.js js/packaged_triptych_v2.js.map ../triptych_preview.png ../triptych-app.html . && \
   cp -r js/triptych_images . && \
   cp ../triptych_template.json ./template.json && \
   zip -r triptych-app.zip packaged_triptych_v2.css packaged_triptych_polyfills.js packaged_triptych_v2.js packaged_triptych_v2.js.map fonts triptych_images triptych-app.html template.json triptych_preview.png
