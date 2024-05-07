@@ -2,7 +2,7 @@ import useTextResizer from "Hooks/v2/use_text_resizer";
 import React, { forwardRef, ComponentType } from "react";
 import { getDatasetValue } from "Util/dataset";
 
-import LiveDataSvg from "../../../static/images/svgr_bundled/live-data-small.svg";
+import LiveDataSvg from "Images/svgr_bundled/live-data-small.svg";
 
 import {
   classWithModifier,

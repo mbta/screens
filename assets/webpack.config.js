@@ -17,6 +17,7 @@ module.exports = () => [
         Hooks: path.resolve(__dirname, "src/hooks"),
         Util: path.resolve(__dirname, "src/util"),
         Constants: path.resolve(__dirname, "src/constants"),
+        Images: path.resolve(__dirname, "static/images"),
       },
     },
     entry: {
@@ -143,6 +144,7 @@ module.exports = () => [
         Hooks: path.resolve(__dirname, "src/hooks"),
         Util: path.resolve(__dirname, "src/util"),
         Constants: path.resolve(__dirname, "src/constants"),
+        Images: path.resolve(__dirname, "static/images"),
       },
     },
     entry: {

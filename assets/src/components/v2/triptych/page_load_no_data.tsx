@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import loadingPNG from "../../../../static/images/loading-triptych.png";
+import loadingPNG from "Images/loading-triptych.png";
 
 const PageLoadNoData: ComponentType = () => {
   return (

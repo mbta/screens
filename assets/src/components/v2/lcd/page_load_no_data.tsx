@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import Loading from "../../../../static/images/svgr_bundled/loading.svg";
+import Loading from "Images/svgr_bundled/loading.svg";
 
 const coolBlack = "#171F26";
 

@@ -1,7 +1,7 @@
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
 import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
-import Loading from "../../../../static/images/svgr_bundled/loading.svg";
+import Loading from "Images/svgr_bundled/loading.svg";
 
 const PageLoadNoData: ComponentType = () => {
   return (

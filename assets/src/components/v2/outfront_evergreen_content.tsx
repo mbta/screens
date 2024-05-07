@@ -8,7 +8,7 @@ import { usePlayerName } from "Hooks/outfront";
 import { isOFM } from "Util/outfront";
 
 if (isOFM()) {
-  require.context("../../../static/images/triptych_psas", true, /\.(webp)$/);
+  require.context("Images/triptych_psas", true, /\.(webp)$/);
 }
 
 const OutfrontEvergreenContent: ComponentType<{

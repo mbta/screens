@@ -1,6 +1,6 @@
 import React from "react";
 
-import NoConnection from "../../../../../static/images/svgr_bundled/live-data-none.svg";
+import NoConnection from "Images/svgr_bundled/live-data-none.svg";
 import FreeText from "Components/v2/free_text";
 
 const NoDataSection = ({ text }) => {

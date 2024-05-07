@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 import LinkArrow from "../bundled_svg/link_arrow";
-import Loading from "../../../../static/images/svgr_bundled/loading.svg";
+import Loading from "Images/svgr_bundled/loading.svg";
 import NormalHeader from "./normal_header";
 import { REPLACEMENTS } from "./no_data";
 import { useStationName } from "Hooks/outfront";

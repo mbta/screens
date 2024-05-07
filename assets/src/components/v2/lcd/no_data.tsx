@@ -1,6 +1,6 @@
-import NoConnection from "../../../../static/images/svgr_bundled/live-data-none.svg";
+import NoConnection from "Images/svgr_bundled/live-data-none.svg";
 import React, { ComponentType } from "react";
-import TLogo from "../../../../static/images/svgr_bundled/logo.svg";
+import TLogo from "Images/svgr_bundled/logo.svg";
 
 interface Props {
   show_alternatives: boolean;

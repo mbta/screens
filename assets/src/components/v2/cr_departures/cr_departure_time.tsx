@@ -2,7 +2,7 @@ import BaseDepartureTime from "Components/eink/base_departure_time";
 import moment from "moment";
 import React from "react";
 import { TimeRepresentation } from "Util/time_representation";
-import LiveDataSvg from "../../../../static/images/svgr_bundled/live-data-small.svg";
+import LiveDataSvg from "Images/svgr_bundled/live-data-small.svg";
 
 interface CRDepartureTimeProps {
   departureType: "schedule" | "prediction";

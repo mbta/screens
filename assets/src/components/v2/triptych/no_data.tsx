@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import noDataPNG from "../../../../static/images/no-data-triptych.png";
+import noDataPNG from "Images/no-data-triptych.png";
 
 interface Props {
   show_alternatives: boolean;
