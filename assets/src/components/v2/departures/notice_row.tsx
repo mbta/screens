@@ -1,7 +1,15 @@
-import React from "react";
-import FreeText from "Components/v2/free_text";
+import React, { ComponentType } from "react";
+import FreeText, { FreeTextType } from "Components/v2/free_text";
 
-const NoticeRow = ({ row }) => {
+type NoticeRow = {
+  text: FreeTextType;
+};
+
+type Props = {
+  row: NoticeRow;
+};
+
+const NoticeRow: ComponentType<Props> = ({ row }) => {
   return (
     <div className="departures__notice-row">
       <FreeText lines={{ text: row.text.text }} />
