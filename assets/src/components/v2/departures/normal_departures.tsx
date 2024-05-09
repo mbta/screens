@@ -1,4 +1,5 @@
 import React, {
+  ComponentType,
   useState,
   forwardRef,
   useLayoutEffect,
@@ -6,27 +7,40 @@ import React, {
   useEffect,
   useContext,
 } from "react";
+import weakKey from "weak-key";
 
-import NormalSection from "Components/v2/departures/normal_section";
+import NormalSection, {
+  Row as NormalRow,
+} from "Components/v2/departures/normal_section";
 import NoticeSection from "Components/v2/departures/notice_section";
 import { LastFetchContext } from "../screen_container";
 
-// TODO: fully define the type of sections and their contents, replace `any`
-const NormalDeparturesRenderer = forwardRef<HTMLDivElement, any>(
+type Section =
+  | (NormalSection & { type: "normal_section" })
+  | (NoticeSection & { type: "notice_section" });
+
+type RendererProps = {
+  sections: Section[];
+  sectionSizes: number[];
+};
+
+const NormalDeparturesRenderer = forwardRef<HTMLDivElement, RendererProps>(
   ({ sections, sectionSizes }, ref) => {
     return (
       <div className="departures-container">
         <div className="departures" ref={ref}>
-          {sections.map(({ type, ...data }, i) => {
-            if (type === "normal_section") {
-              const { rows } = data;
+          {sections.map((section, i) => {
+            const key = weakKey(section);
+
+            if (section.type === "normal_section") {
               return (
-                <NormalSection rows={trimRows(rows, sectionSizes[i])} key={i} />
+                <NormalSection
+                  rows={trimRows(section.rows, sectionSizes[i])}
+                  key={key}
+                />
               );
-            } else if (type === "notice_section") {
-              return <NoticeSection {...data} key={i} />;
             } else {
-              throw new Error(`section type not implemented: ${type}`);
+              return <NoticeSection {...section} key={key} />;
             }
           })}
         </div>
@@ -37,7 +51,7 @@ const NormalDeparturesRenderer = forwardRef<HTMLDivElement, any>(
 
 const trimRows = (rows, n) => {
   const { trimmed } = rows.reduce(
-    ({ count, trimmed }, row: Row) => {
+    ({ count, trimmed }, row: NormalRow) => {
       if (row.type == "notice_row") {
         if (count < n) {
           return { count: count + 1, trimmed: [...trimmed, row] };
@@ -64,20 +78,8 @@ const trimRows = (rows, n) => {
   return trimmed;
 };
 
-interface DepartureRow {
-  type: "departure_row";
-  times_with_crowding: any[];
-}
-
-interface NoticeRow {
-  type: "notice_row";
-  text: object;
-}
-
-type Row = DepartureRow | NoticeRow;
-
 const getInitialSectionSize = (data) => {
-  return data.rows.reduce((acc, row: Row) => {
+  return data.rows.reduce((acc, row: NormalRow) => {
     switch (row.type) {
       case "departure_row":
         return acc + row.times_with_crowding.length;
@@ -120,7 +122,11 @@ const NormalDeparturesSizer = ({ sections, onDoneSizing }) => {
   );
 };
 
-const NormalDepartures = ({ sections }) => {
+type NormalDepartures = {
+  sections: Section[];
+};
+
+const NormalDepartures: ComponentType<NormalDepartures> = ({ sections }) => {
   const [sectionSizes, setSectionSizes] = useState([]);
   const lastFetch = useContext(LastFetchContext);
 

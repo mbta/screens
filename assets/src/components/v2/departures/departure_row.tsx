@@ -1,17 +1,27 @@
-import React from "react";
+import React, { ComponentType } from "react";
 
-import RoutePill from "Components/v2/departures/route_pill";
+import RoutePill, { Pill } from "Components/v2/departures/route_pill";
 import Destination from "Components/v2/departures/destination";
-import DepartureTimes from "Components/v2/departures/departure_times";
+import DepartureTimes, {
+  TimeWithCrowding,
+} from "Components/v2/departures/departure_times";
 import DepartureAlerts from "Components/v2/departures/departure_alerts";
 
-const DepartureRow = ({
+type DepartureRow = {
+  id: string;
+  route: Pill;
+  headsign: Destination;
+  times_with_crowding: TimeWithCrowding[];
+  // currently never used, will be removed
+  inline_alerts: any[];
+};
+
+const DepartureRow: ComponentType<DepartureRow> = ({
   headsign,
   route,
   times_with_crowding: timesWithCrowding,
   inline_alerts: inlineAlerts,
 }) => {
-  const routeText = Number(route.text);
   return (
     <div className="departure-row">
       <div // Keep pill aligned to top if there is a variation for the headsign.
@@ -20,10 +30,7 @@ const DepartureRow = ({
           "departure-row__route" + (headsign.variation ? "" : " center")
         }
       >
-        <RoutePill
-          {...route}
-          size={isNaN(routeText) || routeText > 200 ? "small" : "large"}
-        />
+        <RoutePill {...route} />
       </div>
       <div className="departure-row__destination">
         <Destination {...headsign} />

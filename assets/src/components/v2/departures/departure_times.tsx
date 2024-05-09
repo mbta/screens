@@ -1,9 +1,21 @@
-import React from "react";
+import React, { ComponentType } from "react";
 
 import DepartureTime from "Components/v2/departures/departure_time";
-import DepartureCrowding from "Components/v2/departures/departure_crowding";
+import DepartureCrowding, {
+  CrowdingLevel,
+} from "Components/v2/departures/departure_crowding";
 
-const DepartureTimes = ({ timesWithCrowding }) => {
+export type TimeWithCrowding = {
+  id: string;
+  time: DepartureTime;
+  crowding: CrowdingLevel | null;
+};
+
+type Props = {
+  timesWithCrowding: TimeWithCrowding[];
+};
+
+const DepartureTimes: ComponentType<Props> = ({ timesWithCrowding }) => {
   return (
     <div className="departure-times-with-crowding">
       {timesWithCrowding.map(({ id, time, crowding }) => (

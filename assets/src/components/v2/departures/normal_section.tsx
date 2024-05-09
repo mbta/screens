@@ -1,20 +1,26 @@
-import React from "react";
+import React, { ComponentType } from "react";
+import weakKey from "weak-key";
 
-import DepartureRow from "Components/v2/departures/departure_row";
+import DepartureRow from "./departure_row";
 import NoticeRow from "./notice_row";
 
-const NormalSection = ({ rows }) => {
+export type Row =
+  | (DepartureRow & { type: "departure_row" })
+  | (NoticeRow & { type: "notice_row" });
+
+type NormalSection = {
+  rows: Row[];
+};
+
+const NormalSection: ComponentType<NormalSection> = ({ rows }) => {
   return (
     <div>
       <div className="departures-section">
-        {rows.map((row, index) => {
-          const { id, type, ...data } = row;
-          if (type === "departure_row") {
-            return <DepartureRow {...data} key={id} />;
-          } else if (type === "notice_row") {
-            return <NoticeRow row={row} key={"notice" + index} />;
+        {rows.map((row) => {
+          if (row.type === "departure_row") {
+            return <DepartureRow {...row} key={row.id} />;
           } else {
-            throw new Error(`unimplemented row type: ${type}`);
+            return <NoticeRow row={row} key={weakKey(row)} />;
           }
         })}
       </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ComponentType } from "react";
 import { classWithModifier } from "Util/util";
 
 const TextDepartureTime = ({ text }) => {
@@ -21,7 +21,7 @@ const TimestampDepartureTime = ({ hour, minute }) => {
   return <div className="departure-time__timestamp">{timestamp}</div>;
 };
 
-type Props =
+type DepartureTime =
   | (TextDeparture & { type: "text" })
   | (MinutesDeparture & { type: "minutes" })
   | (TimestampDeparture & { type: "timestamp" });
@@ -37,7 +37,7 @@ interface TimestampDeparture {
   minute: number;
 }
 
-const DepartureTime = ({ type, ...data }: Props) => {
+const DepartureTime: ComponentType<DepartureTime> = ({ type, ...data }) => {
   let inner;
   if (type === "text") {
     inner = <TextDepartureTime {...(data as TextDeparture)} />;

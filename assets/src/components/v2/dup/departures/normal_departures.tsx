@@ -15,7 +15,7 @@ const NormalDepartures = ({ sections }) => {
             case "normal_section":
               return <NormalSection rows={data.rows} key={i} />;
             case "notice_section":
-              return <NoticeSection {...data} key={i} />;
+              return <NoticeSection text={data.text} key={i} />;
             case "headway_section":
               return (
                 <HeadwaySection text={data.text} layout={data.layout} key={i} />

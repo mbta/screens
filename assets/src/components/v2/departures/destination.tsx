@@ -1,6 +1,11 @@
-import React from "react";
+import React, { ComponentType } from "react";
 
-const Destination = ({ headsign, variation }) => {
+type Destination = {
+  headsign: string;
+  variation?: string;
+};
+
+const Destination: ComponentType<Destination> = ({ headsign, variation }) => {
   return (
     <div className="departure-destination">
       <div className="departure-destination__headsign">{headsign}</div>

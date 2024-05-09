@@ -92,9 +92,12 @@ const RoutePill: ComponentType<Pill> = (pill) => {
 
   let innerContent: JSX.Element | null = null;
   switch (pill.type) {
-    case "text":
-      innerContent = <TextRoutePill {...pill} />;
+    case "text": {
+      const routeNum = Number(pill.text);
+      const size = isNaN(routeNum) || routeNum > 199 ? "small" : "large";
+      innerContent = <TextRoutePill size={size} {...pill} />;
       break;
+    }
     case "icon":
       innerContent = <IconRoutePill {...pill} />;
       break;
