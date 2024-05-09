@@ -100,7 +100,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
       }
 
       get_instance(
-        any_alert_makes_this_a_terminal?(alerts, location_context),
+        any_alert_makes_this_a_terminal?(alerts, location_context, now),
         common_params
       )
     else
@@ -301,9 +301,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowding do
   end
 
   # Given alerts at this station, check to see if any alert make this a temporary terminal
-  defp any_alert_makes_this_a_terminal?(alerts, location_context) do
+  defp any_alert_makes_this_a_terminal?(alerts, location_context, now) do
     Enum.any?(alerts, fn alert ->
-      temporary_terminal?(%{alert: alert, location_context: location_context})
+      if Alert.happening_now?(alert, now) do
+        temporary_terminal?(%{alert: alert, location_context: location_context})
+      end
     end)
   end
 

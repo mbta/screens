@@ -29,6 +29,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
       app_id: :triptych_v2
     }
 
+    now = ~U[2023-08-16 21:04:00Z]
+
     next_train_prediction =
       struct(Prediction, %{
         vehicle:
@@ -135,7 +137,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
           %{direction_id: nil, route: "Orange", route_type: 1, stop: "place-state"},
           %{direction_id: nil, route: "Orange", route_type: 1, stop: "place-tumnl"}
         ],
-        active_period: [{~U[2023-08-16 20:04:00Z], ~U[2023-08-16 22:04:06Z]}],
+        active_period: [{DateTime.add(now, -1, :hour), DateTime.add(now, 2, :hour)}],
         lifecycle: "NEW",
         timeframe: nil,
         created_at: ~U[2023-08-16 20:04:02Z],
@@ -149,7 +151,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.TrainCrowdingTest do
     %{
       config: config,
       logging_options: %{is_real_screen: false, screen_id: "TEST", triptych_pane: nil},
-      now: ~U[2023-08-16 21:04:00Z],
+      now: now,
       next_train_prediction: next_train_prediction,
       fetch_predictions_fn: fn _ -> {:ok, [next_train_prediction]} end,
       fetch_location_context_fn: fn _, _, _ -> {:ok, location_context} end,
