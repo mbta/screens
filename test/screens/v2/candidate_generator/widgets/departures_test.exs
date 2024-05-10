@@ -121,10 +121,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       assert expected_departures_instances == actual_departures_instances
     end
 
-    test "returns OvernightDepartures if post-process result is [:overnight]" do
-      config = build_config(["A", "B"])
-      fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, []}})
-      post_fn = fn [{:ok, []}, {:ok, []}], _config -> [:overnight] end
+    test "returns OvernightDepartures if post-process result is :overnight" do
+      config = build_config(["A"])
+      fetch_fn = build_fetch_fn(%{"A" => {:ok, []}})
+      post_fn = fn {:ok, []}, _config -> :overnight end
 
       expected_departures_instances = [%OvernightDepartures{}]
 
@@ -143,10 +143,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       departure_b = build_departure("B", 0)
       fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, [departure_b]}})
 
-      post_process_fn = fn sections, _config ->
-        Enum.map(sections, fn {:ok, departures} ->
-          {:ok, departures ++ ["notice"]}
-        end)
+      post_process_fn = fn {:ok, departures}, _config ->
+        {:ok, departures ++ ["notice"]}
       end
 
       expected_departures_instances = [

@@ -188,7 +188,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
     [%BottomScreenFiller{screen: config}]
   end
 
-  defp departures_post_processing(sections, config) do
+  defp departures_post_processing(fetch_result, config) do
     %Screen{
       app_params: %GlEink{
         departures: %Departures{
@@ -207,7 +207,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
       }
     } = config
 
-    Enum.map(sections, fn
+    case fetch_result do
       {:ok, departures} when length(departures) <= 1 ->
         format_headway(route_id, stop_id, direction_id, departures)
 
@@ -217,7 +217,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
       # Show headway instead of nothing when API fetch fails
       :error ->
         format_headway(route_id, stop_id, direction_id)
-    end)
+    end
   end
 
   defp format_headway(route_id, stop_id, direction_id, departures_to_concat \\ []) do
