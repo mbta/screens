@@ -3,6 +3,7 @@ import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
 import pluginReactConfig from "eslint-plugin-react/configs/recommended.js";
 import eslintConfigPrettier from "eslint-config-prettier";
+import jestPlugin from "eslint-plugin-jest";
 
 export default [
   { languageOptions: { globals: globals.browser } },
@@ -10,6 +11,10 @@ export default [
   ...tseslint.configs.recommended,
   pluginReactConfig,
   eslintConfigPrettier,
+  {
+    files: ["test/**"],
+    ...jestPlugin.configs["flat/style"],
+  },
   {
     settings: { react: { version: "detect" } },
     rules: {

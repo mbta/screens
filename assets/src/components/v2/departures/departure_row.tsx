@@ -12,7 +12,7 @@ type DepartureRow = {
   route: Pill;
   headsign: Destination;
   times_with_crowding: TimeWithCrowding[];
-  // currently never used, will be removed
+  // currently the server always sets this to an empty array; will be removed
   inline_alerts: any[];
 };
 

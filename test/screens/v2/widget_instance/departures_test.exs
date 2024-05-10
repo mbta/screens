@@ -2,6 +2,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
+  alias ScreensConfig.V2.Departures.Layout
   alias ScreensConfig.V2.FreeTextLine
   alias ScreensConfig.Screen
   alias Screens.Departures.Departure
@@ -35,9 +36,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "returns serialized normal_section", %{bus_shelter_screen: bus_shelter_screen} do
-      section = %{type: :normal_section, rows: []}
+      section = %{type: :normal_section, rows: [], layout: %Layout{}}
 
-      assert %{type: :normal_section, rows: []} ==
+      assert %{type: :normal_section, rows: []} =
                Departures.serialize_section(section, bus_shelter_screen)
     end
 
@@ -51,9 +52,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     test "returns serialized normal_section with notice", %{
       bus_shelter_screen: bus_shelter_screen
     } do
-      section = %{type: :normal_section, rows: [%{text: %FreeTextLine{icon: nil, text: []}}]}
+      section = %{
+        type: :normal_section,
+        rows: [%{text: %FreeTextLine{icon: nil, text: []}}],
+        layout: %Layout{}
+      }
 
-      assert %{type: :normal_section, rows: [%{type: :notice_row, text: %{icon: nil, text: []}}]} ==
+      assert %{type: :normal_section, rows: [%{type: :notice_row, text: %{icon: nil, text: []}}]} =
                Departures.serialize_section(section, bus_shelter_screen)
     end
   end
@@ -76,6 +81,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     } do
       section = %{
         type: :normal_section,
+        layout: %Layout{},
         rows: [
           %Departure{
             schedule:
@@ -113,7 +119,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                  }
                ],
                type: :normal_section
-             } ==
+             } =
                Departures.serialize_section(section, dup_screen, true)
     end
 

@@ -10,6 +10,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Departures.Layout
   alias ScreensConfig.V2.FreeTextLine
 
   defstruct screen: nil,
@@ -18,7 +19,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type section :: %{
           type: :normal_section,
-          rows: list(Departure.t() | notice())
+          rows: list(Departure.t() | notice()),
+          layout: Layout.t()
         }
 
   @type notice_section :: %{
@@ -145,14 +147,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :headway_section, text: FreeTextLine.to_json(text), layout: layout}
   end
 
-  def serialize_section(%{type: :normal_section, rows: departures}, screen, _) do
+  def serialize_section(%{type: :normal_section, rows: departures, layout: layout}, screen, _) do
     rows =
       departures
       |> Enum.take(@max_departures)
       |> group_consecutive_departures(screen)
       |> Enum.map(&serialize_row(&1, screen))
 
-    %{type: :normal_section, rows: rows}
+    %{type: :normal_section, rows: rows, layout: Layout.to_json(layout)}
   end
 
   def serialize_section(%{type: :overnight_section, routes: routes}, _, _) do

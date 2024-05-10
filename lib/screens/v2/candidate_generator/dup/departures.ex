@@ -13,7 +13,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Departures
-  alias ScreensConfig.V2.Departures.{Headway, Query, Section}
+  alias ScreensConfig.V2.Departures.{Headway, Layout, Query, Section}
   alias ScreensConfig.V2.Departures.Query.Params
   alias ScreensConfig.V2.Dup
 
@@ -188,7 +188,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
             Enum.take(departures, 2)
           end
 
-        %{type: :normal_section, rows: visible_departures}
+        # DUPs don't support Layout for now
+        %{type: :normal_section, rows: visible_departures, layout: %Layout{}}
 
       # Headway mode
       true ->
