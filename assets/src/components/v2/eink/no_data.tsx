@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
-import NoConnection from "../../../../static/images/svgr_bundled/live-data-none.svg";
+import NoConnection from "Images/svgr_bundled/live-data-none.svg";
 import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 import moment from "moment";
 

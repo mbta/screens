@@ -5,7 +5,7 @@ We've started using an svg loader called SVGR that imports svgs as ready-to-use 
 We're in the process of consolidating this huge assets folder of svgs into this `svgr_bundled` folder.
 
 ```
-import Free from "../../../../static/images/svgr_bundled/free.svg";
+import Free from "Images/svgr_bundled/free.svg";
 
 <Free width="128" height="128" className="free-cr" color="#171F26" />
 ```

@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import { imagePath } from "Util/util";
+import noDataPNG from "Images/no-data-triptych.png";
 
 interface Props {
   show_alternatives: boolean;
@@ -9,13 +9,13 @@ const NoData: ComponentType<Props> = () => {
   return (
     <>
       <div className="no-data-left">
-        <img src={imagePath("no-data-triptych.png")} />
+        <img src={noDataPNG} />
       </div>
       <div className="no-data-middle">
-        <img src={imagePath("no-data-triptych.png")} />
+        <img src={noDataPNG} />
       </div>
       <div className="no-data-right">
-        <img src={imagePath("no-data-triptych.png")} />
+        <img src={noDataPNG} />
       </div>
     </>
   );

@@ -5,33 +5,33 @@ import { NormalHeaderTime } from "./normal_header";
 import { usePlayerName } from "Hooks/outfront";
 import { TRIPTYCH_VERSION } from "./triptych/version";
 
-import Logo from "../../../static/images/svgr_bundled/logo.svg";
-import ArrowUp from "../../../static/images/svgr_bundled/Arrow-90.svg";
-import ArrowUpLeft from "../../../static/images/svgr_bundled/Arrow-45.svg";
+import Logo from "Images/svgr_bundled/logo.svg";
+import ArrowUp from "Images/svgr_bundled/Arrow-90.svg";
+import ArrowUpLeft from "Images/svgr_bundled/Arrow-45.svg";
 
-import KeyNotCrowded from "../../../static/images/svgr_bundled/train_crowding/Car-NotCrowded-Key.svg";
-import KeySomeCrowding from "../../../static/images/svgr_bundled/train_crowding/Car-SomeCrowding-Key.svg";
-import KeyCrowded from "../../../static/images/svgr_bundled/train_crowding/Car-Crowded-Key.svg";
-import KeyNoData from "../../../static/images/svgr_bundled/train_crowding/Car-NoData-Key.svg";
-import KeyClosed from "../../../static/images/svgr_bundled/train_crowding/Car-Closed-Key.svg";
+import KeyNotCrowded from "Images/svgr_bundled/train_crowding/Car-NotCrowded-Key.svg";
+import KeySomeCrowding from "Images/svgr_bundled/train_crowding/Car-SomeCrowding-Key.svg";
+import KeyCrowded from "Images/svgr_bundled/train_crowding/Car-Crowded-Key.svg";
+import KeyNoData from "Images/svgr_bundled/train_crowding/Car-NoData-Key.svg";
+import KeyClosed from "Images/svgr_bundled/train_crowding/Car-Closed-Key.svg";
 
-import CarNotCrowdedLeft from "../../../static/images/svgr_bundled/train_crowding/Car-NotCrowded-Left.svg";
-import CarSomeCrowdingLeft from "../../../static/images/svgr_bundled/train_crowding/Car-SomeCrowding-Left.svg";
-import CarCrowdedLeft from "../../../static/images/svgr_bundled/train_crowding/Car-Crowded-Left.svg";
-import CarNoDataLeft from "../../../static/images/svgr_bundled/train_crowding/Car-NoData-Left.svg";
-import CarClosedLeft from "../../../static/images/svgr_bundled/train_crowding/Car-Closed-Left.svg";
+import CarNotCrowdedLeft from "Images/svgr_bundled/train_crowding/Car-NotCrowded-Left.svg";
+import CarSomeCrowdingLeft from "Images/svgr_bundled/train_crowding/Car-SomeCrowding-Left.svg";
+import CarCrowdedLeft from "Images/svgr_bundled/train_crowding/Car-Crowded-Left.svg";
+import CarNoDataLeft from "Images/svgr_bundled/train_crowding/Car-NoData-Left.svg";
+import CarClosedLeft from "Images/svgr_bundled/train_crowding/Car-Closed-Left.svg";
 
-import CarNotCrowdedMiddle from "../../../static/images/svgr_bundled/train_crowding/Car-NotCrowded-Middle.svg";
-import CarSomeCrowdingMiddle from "../../../static/images/svgr_bundled/train_crowding/Car-SomeCrowding-Middle.svg";
-import CarCrowdedMiddle from "../../../static/images/svgr_bundled/train_crowding/Car-Crowded-Middle.svg";
-import CarNoDataMiddle from "../../../static/images/svgr_bundled/train_crowding/Car-NoData-Middle.svg";
-import CarClosedMiddle from "../../../static/images/svgr_bundled/train_crowding/Car-Closed-Middle.svg";
+import CarNotCrowdedMiddle from "Images/svgr_bundled/train_crowding/Car-NotCrowded-Middle.svg";
+import CarSomeCrowdingMiddle from "Images/svgr_bundled/train_crowding/Car-SomeCrowding-Middle.svg";
+import CarCrowdedMiddle from "Images/svgr_bundled/train_crowding/Car-Crowded-Middle.svg";
+import CarNoDataMiddle from "Images/svgr_bundled/train_crowding/Car-NoData-Middle.svg";
+import CarClosedMiddle from "Images/svgr_bundled/train_crowding/Car-Closed-Middle.svg";
 
-import CarNotCrowdedRight from "../../../static/images/svgr_bundled/train_crowding/Car-NotCrowded-Right.svg";
-import CarSomeCrowdingRight from "../../../static/images/svgr_bundled/train_crowding/Car-SomeCrowding-Right.svg";
-import CarCrowdedRight from "../../../static/images/svgr_bundled/train_crowding/Car-Crowded-Right.svg";
-import CarNoDataRight from "../../../static/images/svgr_bundled/train_crowding/Car-NoData-Right.svg";
-import CarClosedRight from "../../../static/images/svgr_bundled/train_crowding/Car-Closed-Right.svg";
+import CarNotCrowdedRight from "Images/svgr_bundled/train_crowding/Car-NotCrowded-Right.svg";
+import CarSomeCrowdingRight from "Images/svgr_bundled/train_crowding/Car-SomeCrowding-Right.svg";
+import CarCrowdedRight from "Images/svgr_bundled/train_crowding/Car-Crowded-Right.svg";
+import CarNoDataRight from "Images/svgr_bundled/train_crowding/Car-NoData-Right.svg";
+import CarClosedRight from "Images/svgr_bundled/train_crowding/Car-Closed-Right.svg";
 
 type FrontCarDirection = "left" | "right";
 type OccupancyStatus =
@@ -222,8 +222,8 @@ const TrainCrowding: React.ComponentType<Props> = ({
           identifiers={identifiers}
         >
           <div className="crowding-widget__footer__key-row">
-            <KeyNotCrowded width="137" height="100" className="key-icon" /> Not
-            crowded
+            <KeyNotCrowded width="137" height="100" className="key-icon" />{" "}
+            Seats available
           </div>
           <div className="crowding-widget__footer__key-row">
             <KeySomeCrowding width="137" height="100" className="key-icon" />{" "}
