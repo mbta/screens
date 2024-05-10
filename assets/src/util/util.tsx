@@ -1,5 +1,7 @@
 import moment from "moment";
 import "moment-timezone";
+import { RefObject } from "react";
+
 import { getDatasetValue } from "Util/dataset";
 import { isOFM, isTriptych } from "Util/outfront";
 
@@ -23,6 +25,9 @@ export const classWithModifiers = (baseClass, modifiers) => {
 
 export const formatTimeString = (timeString: string) =>
   moment(timeString).tz("America/New_York").format("h:mm");
+
+export const hasOverflowY = (ref: RefObject<Element>): boolean =>
+  !!ref.current && ref.current.scrollHeight > ref.current.clientHeight;
 
 export const imagePath = (fileName: string): string =>
   isOFM() ? outfrontImagePath(fileName) : `/images/${fileName}`;

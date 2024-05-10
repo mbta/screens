@@ -44,24 +44,33 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
        ) do
     sections_data =
       sections
-      |> Task.async_stream(&fetch_section_departures(&1, departure_fetch_fn), timeout: 30_000)
-      |> Enum.map(fn {:ok, fetch_result} -> post_process_fn.(fetch_result, config) end)
+      |> Task.async_stream(
+        &%{
+          section: &1,
+          result: &1 |> fetch_section_departures(departure_fetch_fn) |> post_process_fn.(config)
+        },
+        timeout: 30_000
+      )
+      |> Enum.map(fn {:ok, section_data} -> section_data end)
 
     departures_instance =
       cond do
-        Enum.any?(sections_data, &(&1 == :error)) ->
+        Enum.any?(sections_data, &(&1.result == :error)) ->
           %DeparturesNoData{screen: config, show_alternatives?: true}
 
-        sections_data == [:overnight] ->
+        match?([%{result: :overnight}], sections_data) ->
           %OvernightDepartures{}
 
-        sections_data == [ok: []] and app_id == :bus_eink_v2 ->
+        match?([%{result: {:ok, []}}], sections_data) and app_id == :bus_eink_v2 ->
           %DeparturesNoService{screen: config}
 
         true ->
           sections =
-            Enum.map(sections_data, fn {:ok, departures} ->
-              %{type: :normal_section, rows: departures}
+            Enum.map(sections_data, fn %{
+                                         section: %Section{layout: layout},
+                                         result: {:ok, departures}
+                                       } ->
+              %{type: :normal_section, rows: departures, layout: layout}
             end)
 
           %DeparturesWidget{screen: config, section_data: sections}

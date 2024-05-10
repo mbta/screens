@@ -4,7 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Departures.Filters.RouteDirections
   alias ScreensConfig.V2.Departures.Filters.RouteDirections.RouteDirection
-  alias ScreensConfig.V2.Departures.{Filters, Query, Section}
+  alias ScreensConfig.V2.Departures.{Filters, Layout, Query, Section}
   alias ScreensConfig.V2.BusShelter
   alias ScreensConfig.V2.Departures, as: DeparturesConfig
   alias Screens.V2.CandidateGenerator.Widgets.Departures
@@ -63,9 +63,32 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         %DeparturesWidget{
           screen: config,
           section_data: [
-            %{type: :normal_section, rows: departures_a},
-            %{type: :normal_section, rows: departures_b}
+            %{type: :normal_section, layout: %Layout{}, rows: departures_a},
+            %{type: :normal_section, layout: %Layout{}, rows: departures_b}
           ]
+        }
+      ]
+
+      actual_departures_instances =
+        Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
+
+      assert expected_departures_instances == actual_departures_instances
+    end
+
+    test "passes layout field from the config through to the returned sections" do
+      config = build_config(["A"])
+      fetch_fn = build_fetch_fn(%{"A" => {:ok, []}})
+      layout = %Layout{min: 2, base: 4, max: 6, include_later: true}
+
+      config =
+        put_in(config.app_params.departures.sections, [
+          %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}, layout: layout}
+        ])
+
+      expected_departures_instances = [
+        %DeparturesWidget{
+          screen: config,
+          section_data: [%{type: :normal_section, layout: layout, rows: []}]
         }
       ]
 
@@ -83,8 +106,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         %DeparturesWidget{
           screen: config,
           section_data: [
-            %{type: :normal_section, rows: []},
-            %{type: :normal_section, rows: []}
+            %{type: :normal_section, layout: %Layout{}, rows: []},
+            %{type: :normal_section, layout: %Layout{}, rows: []}
           ]
         }
       ]
@@ -151,8 +174,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         %DeparturesWidget{
           screen: config,
           section_data: [
-            %{type: :normal_section, rows: ["notice"]},
-            %{type: :normal_section, rows: [departure_b, "notice"]}
+            %{type: :normal_section, layout: %Layout{}, rows: ["notice"]},
+            %{type: :normal_section, layout: %Layout{}, rows: [departure_b, "notice"]}
           ]
         }
       ]
@@ -267,8 +290,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         %DeparturesWidget{
           screen: config,
           section_data: [
-            %{type: :normal_section, rows: [build_departure("A", 0), build_departure("A", 1)]},
-            %{type: :normal_section, rows: [build_departure("B", 0), build_departure("B", 0)]}
+            %{
+              type: :normal_section,
+              layout: %Layout{},
+              rows: [build_departure("A", 0), build_departure("A", 1)]
+            },
+            %{
+              type: :normal_section,
+              layout: %Layout{},
+              rows: [build_departure("B", 0), build_departure("B", 0)]
+            }
           ]
         }
       ]
