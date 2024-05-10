@@ -12,7 +12,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   @type options :: [
           departure_fetch_fn: Departure.fetch(),
-          post_process_fn: ([Departure.result()], Screen.t() -> [Departure.result() | :overnight])
+          post_process_fn: (Departure.result(), Screen.t() -> Departure.result() | :overnight)
         ]
 
   @type widget ::
@@ -45,8 +45,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     sections_data =
       sections
       |> Task.async_stream(&fetch_section_departures(&1, departure_fetch_fn), timeout: 30_000)
-      |> Enum.map(fn {:ok, result} -> result end)
-      |> post_process_fn.(config)
+      |> Enum.map(fn {:ok, fetch_result} -> post_process_fn.(fetch_result, config) end)
 
     departures_instance =
       cond do
