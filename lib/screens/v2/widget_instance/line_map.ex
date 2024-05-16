@@ -273,23 +273,19 @@ defmodule Screens.V2.WidgetInstance.LineMap do
         &match?(%Departure{prediction: %Prediction{trip: %Trip{direction_id: ^direction_id}}}, &1)
       )
 
-    if prediction_count < 2 do
+    departure = Enum.find(departures, &is_nil(&1.prediction))
+
+    if prediction_count < 2 and not is_nil(departure) do
       %{name: origin_stop_name} = Enum.at(stops, 0)
 
-      if departure = Enum.find(departures, &is_nil(&1.prediction)) do
-        {:ok, local_time} =
-          departure
-          |> Departure.time()
-          |> DateTime.shift_zone("America/New_York")
+      {:ok, local_time} =
+        departure
+        |> Departure.time()
+        |> DateTime.shift_zone("America/New_York")
 
-        {:ok, timestamp} = Timex.format(local_time, "{h12}:{m}")
+      {:ok, timestamp} = Timex.format(local_time, "{h12}:{m}")
 
-        %{timestamp: timestamp, station_name: origin_stop_name}
-      else
-        nil
-      end
-    else
-      nil
+      %{timestamp: timestamp, station_name: origin_stop_name}
     end
   end
 end
