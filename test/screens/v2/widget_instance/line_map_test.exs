@@ -303,6 +303,11 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
                LineMap.serialize_scheduled_departure([d1, d2], direction_id, stops, false)
     end
 
+    test "returns nil when there are no departures", %{stops: stops} do
+      direction_id = 1
+      assert nil == LineMap.serialize_scheduled_departure([], direction_id, stops, false)
+    end
+
     test "returns the correct origin", %{stops: stops} do
       direction_id = 1
 

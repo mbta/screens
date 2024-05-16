@@ -265,6 +265,9 @@ defmodule Screens.V2.WidgetInstance.LineMap do
   def serialize_scheduled_departure(_departures, _direction_id, _stops, true = _is_terminal?),
     do: nil
 
+  def serialize_scheduled_departure([] = _departures, _direction_id, _stops, _is_terminal?),
+    do: nil
+
   def serialize_scheduled_departure(departures, direction_id, stops, _is_terminal?) do
     # Number of departures with predictions (not just schedules) in this direction
     prediction_count =
