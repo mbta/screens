@@ -28,7 +28,7 @@ export const imagePath = (fileName: string): string =>
   isOFM() ? outfrontImagePath(fileName) : `/images/${fileName}`;
 
 export const outfrontImagePath = (fileName: string): string =>
-  isTriptych() ? `triptych_images/${fileName}` : `/images/${fileName}`;
+  isTriptych() ? `triptych_images/${fileName}` : `images/${fileName}`;
 
 export const pillPath = (fileName: string): string =>
   isOFM() ? `images/pills/${fileName}` : `/images/pills/${fileName}`;
