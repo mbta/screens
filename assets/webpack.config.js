@@ -124,9 +124,7 @@ module.exports = () => [
             {
               loader: "file-loader",
               options: {
-                name: "[name].[ext]",
-                outputPath: "/images/",
-                publicPath: "/images/",
+                name: "/[folder]/[name].[ext]",
                 useRelativePaths: true,
               },
             },
