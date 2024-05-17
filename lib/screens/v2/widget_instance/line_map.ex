@@ -268,29 +268,24 @@ defmodule Screens.V2.WidgetInstance.LineMap do
   def serialize_scheduled_departure(departures, direction_id, stops, _is_terminal?) do
     # Number of departures with predictions (not just schedules) in this direction
     prediction_count =
-      departures
-      |> Stream.reject(fn %Departure{prediction: p} -> is_nil(p) end)
-      |> Stream.reject(fn %Departure{prediction: %Prediction{trip: t}} -> is_nil(t) end)
-      |> Stream.filter(fn %Departure{prediction: %Prediction{trip: %Trip{direction_id: d}}} ->
-        d == direction_id
-      end)
-      |> Enum.count()
+      Enum.count(
+        departures,
+        &match?(%Departure{prediction: %Prediction{trip: %Trip{direction_id: ^direction_id}}}, &1)
+      )
 
-    if prediction_count < 2 do
+    departure = Enum.find(departures, &is_nil(&1.prediction))
+
+    if prediction_count < 2 and not is_nil(departure) do
       %{name: origin_stop_name} = Enum.at(stops, 0)
 
       {:ok, local_time} =
-        departures
-        |> Enum.filter(fn d -> is_nil(d.prediction) end)
-        |> Enum.at(0)
+        departure
         |> Departure.time()
         |> DateTime.shift_zone("America/New_York")
 
       {:ok, timestamp} = Timex.format(local_time, "{h12}:{m}")
 
       %{timestamp: timestamp, station_name: origin_stop_name}
-    else
-      nil
     end
   end
 end
