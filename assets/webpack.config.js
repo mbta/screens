@@ -119,12 +119,26 @@ module.exports = () => [
           ],
         },
         {
-          test: /\.(png|jpe?g|gif|webp)$/i,
+          test: /\.(png|jpe?g|gif)$/i,
           use: [
             {
               loader: "file-loader",
               options: {
                 name: "[name].[ext]",
+                outputPath: "/images/",
+                publicPath: "/images/",
+                useRelativePaths: true,
+              },
+            },
+          ],
+        },
+        {
+          test: /\.(webp)$/i,
+          use: [
+            {
+              loader: "file-loader",
+              options: {
+                name: "/[folder]/[name].[ext]",
                 outputPath: "/images/",
                 publicPath: "/images/",
                 useRelativePaths: true,
