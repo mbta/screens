@@ -4,7 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Departures.Filters.RouteDirections
   alias ScreensConfig.V2.Departures.Filters.RouteDirections.RouteDirection
-  alias ScreensConfig.V2.Departures.{Filters, Layout, Query, Section}
+  alias ScreensConfig.V2.Departures.{Filters, Header, Layout, Query, Section}
   alias ScreensConfig.V2.BusShelter
   alias ScreensConfig.V2.Departures, as: DeparturesConfig
   alias Screens.V2.CandidateGenerator.Widgets.Departures
@@ -96,6 +96,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
 
       assert expected_departures_instances == actual_departures_instances
+    end
+
+    test "passes header field from the config through to the returned sections" do
+      config = build_config(["A"])
+      fetch_fn = build_fetch_fn(%{"A" => {:ok, []}})
+      header = %Header{title: "Test Header 1", arrow: :sw}
+
+      config =
+        put_in(config.app_params.departures.sections, [
+          %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}, header: header}
+        ])
+
+      assert [
+               %DeparturesWidget{
+                 section_data: [%{header: ^header}]
+               }
+             ] = Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
     end
 
     test "returns DeparturesWidget when all section requests succeed with empty departures" do
