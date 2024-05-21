@@ -19,10 +19,10 @@
 @import "v2/lcd_common/no_data";
 @import "v2/lcd_common/page_load_no_data";
 
-@import "v2/busway/departures";
 @import "v2/lcd_common/departures";
-@import "v2/busway/departures_no_data";
 @import "v2/lcd_common/departures_no_data";
+@import "v2/busway/departures";
+@import "v2/busway/departures_no_data";
 
 @import "v2/simulation_common";
 @import "v2/lcd_common/simulation";

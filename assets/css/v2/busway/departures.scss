@@ -1,3 +1,7 @@
 .departures-container {
   height: 100%;
+  padding-top: 0;
 }
+
+@import "departures/header";
+@import "departures/arrow";
