@@ -17,6 +17,11 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     ~E|<p><%= text %></p>|
   end
 
+  defp render_section(%{type: :normal_section, header: header, departure_groups: departure_groups})
+       when is_binary(header) do
+    ~E|<p><%= header %></p><%= Enum.map(departure_groups, &render_departure_group/1) %>|
+  end
+
   defp render_section(%{type: :normal_section, departure_groups: departure_groups}) do
     ~E|<%= Enum.map(departure_groups, &render_departure_group/1) %>|
   end

@@ -897,6 +897,36 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
   end
 
+  describe "audio_serialize_section/2" do
+    test "can serialize a :normal_section" do
+      section = %{
+        type: :normal_section,
+        rows: [],
+        header: %Header{title: "Section Header"}
+      }
+
+      assert %{
+               type: :normal_section,
+               departure_groups: [],
+               header: "Section Header"
+             } = Departures.audio_serialize_section(section, nil)
+    end
+
+    test "uses the `read_as` header property if available" do
+      section = %{
+        type: :normal_section,
+        rows: [],
+        header: %Header{title: "Section Header", read_as: "A special audio-only value"}
+      }
+
+      assert %{
+               type: :normal_section,
+               departure_groups: [],
+               header: "A special audio-only value"
+             } = Departures.audio_serialize_section(section, nil)
+    end
+  end
+
   describe "audio_sort_key/1" do
     test "returns [1]" do
       instance = %Departures{}

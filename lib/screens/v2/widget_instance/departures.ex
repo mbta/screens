@@ -187,7 +187,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :notice_section, text: FreeTextLine.to_plaintext(text)}
   end
 
-  def audio_serialize_section(%{type: :normal_section, rows: departures}, screen) do
+  def audio_serialize_section(%{type: :normal_section, rows: departures} = section, screen) do
+    header =
+      case section[:header] do
+        %{read_as: header} when is_binary(header) -> header
+        %{title: header} when is_binary(header) -> header
+        _ -> nil
+      end
+
     serialized_departure_groups =
       departures
       |> group_all_departures(2)
@@ -195,6 +202,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{
       type: :normal_section,
+      header: header,
       departure_groups: serialized_departure_groups
     }
   end
