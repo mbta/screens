@@ -35,7 +35,7 @@ defmodule Screens.Vehicles.Vehicle do
         }
 
   def by_route_and_direction(route_id, direction_id) do
-    case Screens.V3Api.get_json_with_cache("vehicles", %{
+    case Screens.V3Api.get_json("vehicles", %{
            "filter[route]" => route_id,
            "filter[direction_id]" => direction_id
          }) do
