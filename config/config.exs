@@ -412,6 +412,10 @@ config :screens, :screens_by_alert,
   screens_last_updated_ttl_seconds: 3600,
   screens_ttl_seconds: 40
 
+config :screens, Screens.ScreenApiResponseCache,
+  # => 1 hr
+  gc_interval: 3_600_000
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
