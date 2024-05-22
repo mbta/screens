@@ -171,7 +171,7 @@ defmodule Screens.Alerts.Alert do
   ]
 
   @spec fetch(keyword()) :: {:ok, list(t())} | :error
-  def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
+  def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json_with_cache/2) do
     params =
       opts
       |> Enum.flat_map(&format_query_param/1)

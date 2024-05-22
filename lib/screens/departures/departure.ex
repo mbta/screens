@@ -347,7 +347,7 @@ defmodule Screens.Departures.Departure do
       |> Enum.reject(&is_nil/1)
       |> Enum.into(%{})
 
-    case Screens.V3Api.get_json(api_endpoint, api_query_params) do
+    case Screens.V3Api.get_json_with_cache(api_endpoint, api_query_params) do
       {:ok, result} -> {:ok, parser.parse_result(result)}
       _ -> :error
     end
