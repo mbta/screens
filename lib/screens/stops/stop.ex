@@ -286,6 +286,9 @@ defmodule Screens.Stops.Stop do
       {:ok, %{"data" => []}, _} ->
         fetch_routes_serving_stop(station_id, get_json_fn, attempts_left - 1)
 
+      {:ok, %{"data" => data}} ->
+        {:ok, Enum.map(data, fn route -> Routes.Parser.parse_route(route) end)}
+
       _ ->
         :error
     end
