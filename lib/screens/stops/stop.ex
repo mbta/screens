@@ -271,47 +271,20 @@ defmodule Screens.Stops.Stop do
 
   def fetch_routes_serving_stop(
         station_id,
-        headers \\ [],
-        get_json_fn \\ &V3Api.get_json/5,
+        get_json_fn \\ &V3Api.get_json/2,
         attempts_left \\ 3
       )
 
-  def fetch_routes_serving_stop(_station_id, _headers, _get_json_fn, 0), do: :bad_response
+  def fetch_routes_serving_stop(_station_id, _get_json_fn, 0), do: :bad_response
 
   def fetch_routes_serving_stop(
         station_id,
-        headers,
         get_json_fn,
         attempts_left
       ) do
-    case get_json_fn.(
-           "routes",
-           %{
-             "filter[stop]" => station_id
-           },
-           headers,
-           [],
-           true
-         ) do
+    case get_json_fn.("routes", %{"filter[stop]" => station_id}) do
       {:ok, %{"data" => []}, _} ->
-        fetch_routes_serving_stop(station_id, headers, get_json_fn, attempts_left - 1)
-
-      {:ok, %{"data" => data}, headers} ->
-        date =
-          headers
-          |> Enum.into(%{})
-          |> Map.get("last-modified")
-
-        routes =
-          data
-          |> Enum.map(fn route -> Routes.Parser.parse_route(route) end)
-
-        StationsWithRoutesAgent.put(station_id, routes, date)
-
-        {:ok, routes}
-
-      :not_modified ->
-        :not_modified
+        fetch_routes_serving_stop(station_id, get_json_fn, attempts_left - 1)
 
       _ ->
         :error
@@ -322,28 +295,18 @@ defmodule Screens.Stops.Stop do
   @spec create_station_with_routes_map(String.t()) :: list(Routes.Route.t())
   def create_station_with_routes_map(station_id) do
     case StationsWithRoutesAgent.get(station_id) do
-      {routes, date} ->
-        get_routes_serving_stop(station_id, routes, date)
-
       nil ->
         get_routes_serving_stop(station_id)
+
+      routes ->
+        get_routes_serving_stop(station_id, routes)
     end
   end
 
-  defp get_routes_serving_stop(station_id, default_routes \\ [], date \\ nil) do
-    headers =
-      if is_nil(date) do
-        []
-      else
-        [{"if-modified-since", date}]
-      end
-
-    case fetch_routes_serving_stop(station_id, headers) do
+  defp get_routes_serving_stop(station_id, default_routes \\ []) do
+    case fetch_routes_serving_stop(station_id) do
       {:ok, new_routes} ->
         new_routes
-
-      :not_modified ->
-        default_routes
 
       :bad_response ->
         Logger.error(
