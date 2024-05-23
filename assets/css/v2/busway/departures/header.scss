@@ -1,17 +1,17 @@
 .departures-header {
+  @include font--inter--bold;
+
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  font-family: Inter, sans-serif;
   font-size: 56px;
-  font-weight: 700;
   line-height: 67.77px;
   text-transform: uppercase;
   letter-spacing: 3px;
-  background-color: #cccbc8;
-  border-top: 4px solid #b2b1af;
+  background-color: $warm-neutral-80;
+  border-top: 4px solid $true-grey-70;
 
   &:not(:empty) {
     min-height: 104px;
