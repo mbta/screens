@@ -5,18 +5,10 @@ import DepartureRow from "./departure_row";
 import NoticeRow from "./notice_row";
 import Header from "./header";
 
-import type { Direction } from "Components/solari/arrow";
-
 export type Layout = {
   base: number | null;
   max: number | null;
   min: number;
-};
-
-export type HeaderData = {
-  title: string | null;
-  arrow: Direction | null;
-  read_as: string | null;
 };
 
 export type Row =
@@ -25,7 +17,7 @@ export type Row =
 
 type NormalSection = {
   layout: Layout;
-  header?: HeaderData | null;
+  header: React.ComponentProps<typeof Header>;
   rows: Row[];
 };
 
@@ -33,7 +25,7 @@ const NormalSection: ComponentType<NormalSection> = ({ rows, header }) => {
   return (
     <div>
       <div className="departures-section">
-        {header && <Header title={header.title} direction={header.arrow} />}
+        <Header {...header} />
         {rows.map((row) => {
           if (row.type === "departure_row") {
             return <DepartureRow {...row} key={row.id} />;
