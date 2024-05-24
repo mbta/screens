@@ -81,10 +81,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         ])
 
       assert [
-               %DeparturesWidget{
-                 screen: ^config,
-                 section_data: [%{layout: ^layout}]
-               }
+               %DeparturesWidget{screen: ^config, section_data: [%{layout: ^layout}]}
              ] = Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
     end
 
@@ -98,11 +95,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
           %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}, header: header}
         ])
 
-      assert [
-               %DeparturesWidget{
-                 section_data: [%{header: ^header}]
-               }
-             ] = Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
+      assert [%DeparturesWidget{section_data: [%{header: ^header}]}] =
+               Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
     end
 
     test "returns DeparturesWidget when all section requests succeed with empty departures" do
@@ -181,8 +175,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                  ]
                }
              ] =
-               Departures.departures_instances(
-                 config,
+               Departures.departures_instances(config,
                  departure_fetch_fn: fetch_fn,
                  post_process_fn: post_process_fn
                )
@@ -292,16 +285,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                %DeparturesWidget{
                  screen: ^config,
                  section_data: [
-                   %{
-                     rows: [^departure_a_0, ^departure_a_1]
-                   },
-                   %{
-                     rows: [^departure_b_0, ^departure_b_0]
-                   }
+                   %{rows: [^departure_a_0, ^departure_a_1]},
+                   %{rows: [^departure_b_0, ^departure_b_0]}
                  ]
                }
-             ] =
-               Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
+             ] = Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
     end
   end
 end
