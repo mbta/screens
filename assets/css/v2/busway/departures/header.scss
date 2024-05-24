@@ -10,11 +10,16 @@
   line-height: 67.77px;
   text-transform: uppercase;
   letter-spacing: 3px;
-  background-color: $warm-neutral-80;
   border-top: 4px solid $true-grey-70;
 
   &:not(:empty) {
     min-height: 104px;
     padding: 18px 32px 18px 48px;
+    background-color: $warm-neutral-80;
   }
+}
+
+.departures-section:first-of-type .departures-header:empty {
+  height: 8px;
+  border: none;
 }

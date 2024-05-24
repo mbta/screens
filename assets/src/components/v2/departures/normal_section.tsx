@@ -23,17 +23,15 @@ type NormalSection = {
 
 const NormalSection: ComponentType<NormalSection> = ({ rows, header }) => {
   return (
-    <div>
-      <div className="departures-section">
-        <Header {...header} />
-        {rows.map((row) => {
-          if (row.type === "departure_row") {
-            return <DepartureRow {...row} key={row.id} />;
-          } else {
-            return <NoticeRow row={row} key={weakKey(row)} />;
-          }
-        })}
-      </div>
+    <div className="departures-section">
+      <Header {...header} />
+      {rows.map((row) => {
+        if (row.type === "departure_row") {
+          return <DepartureRow {...row} key={row.id} />;
+        } else {
+          return <NoticeRow row={row} key={weakKey(row)} />;
+        }
+      })}
     </div>
   );
 };
