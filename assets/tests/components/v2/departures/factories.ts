@@ -8,6 +8,7 @@ export const normalSection = Factory.define<Section>(() => ({
   type: "normal_section",
   layout: { min: 1, base: null, max: null },
   rows: departureRow.buildList(1),
+  header: { title: null, arrow: null },
 }));
 
 export const departureRow = Factory.define<Row>(({ sequence }) => ({

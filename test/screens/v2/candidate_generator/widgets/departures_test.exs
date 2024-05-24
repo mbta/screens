@@ -4,7 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Departures.Filters.RouteDirections
   alias ScreensConfig.V2.Departures.Filters.RouteDirections.RouteDirection
-  alias ScreensConfig.V2.Departures.{Filters, Layout, Query, Section}
+  alias ScreensConfig.V2.Departures.{Filters, Header, Layout, Query, Section}
   alias ScreensConfig.V2.BusShelter
   alias ScreensConfig.V2.Departures, as: DeparturesConfig
   alias Screens.V2.CandidateGenerator.Widgets.Departures
@@ -59,20 +59,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       departures_b = [build_departure("B", 0), build_departure("B", 1)]
       fetch_fn = build_fetch_fn(%{"A" => {:ok, departures_a}, "B" => {:ok, departures_b}})
 
-      expected_departures_instances = [
-        %DeparturesWidget{
-          screen: config,
-          section_data: [
-            %{type: :normal_section, layout: %Layout{}, rows: departures_a},
-            %{type: :normal_section, layout: %Layout{}, rows: departures_b}
-          ]
-        }
-      ]
-
-      actual_departures_instances =
-        Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
-
-      assert expected_departures_instances == actual_departures_instances
+      assert [
+               %DeparturesWidget{
+                 screen: ^config,
+                 section_data: [
+                   %{type: :normal_section, rows: ^departures_a},
+                   %{type: :normal_section, rows: ^departures_b}
+                 ]
+               }
+             ] = Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
     end
 
     test "passes layout field from the config through to the returned sections" do
@@ -85,37 +80,38 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
           %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}, layout: layout}
         ])
 
-      expected_departures_instances = [
-        %DeparturesWidget{
-          screen: config,
-          section_data: [%{type: :normal_section, layout: layout, rows: []}]
-        }
-      ]
+      assert [
+               %DeparturesWidget{screen: ^config, section_data: [%{layout: ^layout}]}
+             ] = Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
+    end
 
-      actual_departures_instances =
-        Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
+    test "passes header field from the config through to the returned sections" do
+      config = build_config(["A"])
+      fetch_fn = build_fetch_fn(%{"A" => {:ok, []}})
+      header = %Header{title: "Test Header 1", arrow: :sw}
 
-      assert expected_departures_instances == actual_departures_instances
+      config =
+        put_in(config.app_params.departures.sections, [
+          %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}, header: header}
+        ])
+
+      assert [%DeparturesWidget{section_data: [%{header: ^header}]}] =
+               Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
     end
 
     test "returns DeparturesWidget when all section requests succeed with empty departures" do
       config = build_config(["A", "B"])
       fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, []}})
 
-      expected_departures_instances = [
-        %DeparturesWidget{
-          screen: config,
-          section_data: [
-            %{type: :normal_section, layout: %Layout{}, rows: []},
-            %{type: :normal_section, layout: %Layout{}, rows: []}
-          ]
-        }
-      ]
-
-      actual_departures_instances =
-        Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
-
-      assert expected_departures_instances == actual_departures_instances
+      assert [
+               %DeparturesWidget{
+                 screen: ^config,
+                 section_data: [
+                   %{type: :normal_section, rows: []},
+                   %{type: :normal_section, rows: []}
+                 ]
+               }
+             ] = Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
     end
 
     test "returns DeparturesNoData if any section request fails" do
@@ -170,24 +166,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         {:ok, departures ++ ["notice"]}
       end
 
-      expected_departures_instances = [
-        %DeparturesWidget{
-          screen: config,
-          section_data: [
-            %{type: :normal_section, layout: %Layout{}, rows: ["notice"]},
-            %{type: :normal_section, layout: %Layout{}, rows: [departure_b, "notice"]}
-          ]
-        }
-      ]
-
-      actual_departures_instances =
-        Departures.departures_instances(
-          config,
-          departure_fetch_fn: fetch_fn,
-          post_process_fn: post_process_fn
-        )
-
-      assert expected_departures_instances == actual_departures_instances
+      assert [
+               %DeparturesWidget{
+                 screen: ^config,
+                 section_data: [
+                   %{type: :normal_section, rows: ["notice"]},
+                   %{type: :normal_section, rows: [^departure_b, "notice"]}
+                 ]
+               }
+             ] =
+               Departures.departures_instances(config,
+                 departure_fetch_fn: fetch_fn,
+                 post_process_fn: post_process_fn
+               )
     end
   end
 
@@ -269,45 +260,36 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
           %Section{query: %Query{params: %Query.Params{route_ids: ["B"]}}}
         ])
 
+      departure_a_0 = build_departure("A", 0)
+      departure_a_1 = build_departure("A", 1)
+      departure_b_0 = build_departure("B", 0)
+
       fetch_fn =
         build_fetch_fn(%{
           "A" =>
             {:ok,
              [
                # take
-               build_departure("A", 0),
+               departure_a_0,
                # filter out: same as first
-               build_departure("A", 0),
+               departure_a_0,
                # take
-               build_departure("A", 1),
+               departure_a_1,
                # filter out: same as first
-               build_departure("A", 0)
+               departure_a_0
              ]},
-          "B" => {:ok, [build_departure("B", 0), build_departure("B", 0)]}
+          "B" => {:ok, [departure_b_0, departure_b_0]}
         })
 
-      expected_departures_instances = [
-        %DeparturesWidget{
-          screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
-              layout: %Layout{},
-              rows: [build_departure("A", 0), build_departure("A", 1)]
-            },
-            %{
-              type: :normal_section,
-              layout: %Layout{},
-              rows: [build_departure("B", 0), build_departure("B", 0)]
-            }
-          ]
-        }
-      ]
-
-      actual_departures_instances =
-        Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
-
-      assert expected_departures_instances == actual_departures_instances
+      assert [
+               %DeparturesWidget{
+                 screen: ^config,
+                 section_data: [
+                   %{rows: [^departure_a_0, ^departure_a_1]},
+                   %{rows: [^departure_b_0, ^departure_b_0]}
+                 ]
+               }
+             ] = Departures.departures_instances(config, departure_fetch_fn: fetch_fn)
     end
   end
 end

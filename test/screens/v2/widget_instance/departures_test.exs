@@ -2,6 +2,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
+  alias ScreensConfig.V2.Departures.Header
   alias ScreensConfig.V2.Departures.Layout
   alias ScreensConfig.V2.FreeTextLine
   alias ScreensConfig.Screen
@@ -36,10 +37,30 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "returns serialized normal_section", %{bus_shelter_screen: bus_shelter_screen} do
-      section = %{type: :normal_section, rows: [], layout: %Layout{}}
+      section = %{type: :normal_section, rows: [], layout: %Layout{}, header: %Header{}}
 
       assert %{type: :normal_section, rows: []} =
                Departures.serialize_section(section, bus_shelter_screen)
+    end
+
+    test "returns serialized normal_section with a header if a header exists", %{
+      bus_shelter_screen: bus_shelter_screen
+    } do
+      section = %{
+        type: :normal_section,
+        rows: [],
+        layout: %Layout{},
+        header: %Header{
+          title: "Simple Test Header",
+          arrow: :n,
+          read_as: "Special read-as text"
+        }
+      }
+
+      assert %{
+               type: :normal_section,
+               header: %{title: "Simple Test Header", arrow: :n, read_as: "Special read-as text"}
+             } = Departures.serialize_section(section, bus_shelter_screen)
     end
 
     test "returns serialized notice_section", %{bus_shelter_screen: bus_shelter_screen} do
@@ -55,7 +76,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       section = %{
         type: :normal_section,
         rows: [%{text: %FreeTextLine{icon: nil, text: []}}],
-        layout: %Layout{}
+        layout: %Layout{},
+        header: %Header{}
       }
 
       assert %{type: :normal_section, rows: [%{type: :notice_row, text: %{icon: nil, text: []}}]} =
@@ -82,6 +104,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       section = %{
         type: :normal_section,
         layout: %Layout{},
+        header: %Header{},
         rows: [
           %Departure{
             schedule:
@@ -873,6 +896,36 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       instance = %Departures{}
 
       assert %{sections: _sections} = WidgetInstance.audio_serialize(instance)
+    end
+  end
+
+  describe "audio_serialize_section/2" do
+    test "can serialize a :normal_section" do
+      section = %{
+        type: :normal_section,
+        rows: [],
+        header: %Header{title: "Section Header"}
+      }
+
+      assert %{
+               type: :normal_section,
+               departure_groups: [],
+               header: "Section Header"
+             } = Departures.audio_serialize_section(section, nil)
+    end
+
+    test "uses the `read_as` header property if available" do
+      section = %{
+        type: :normal_section,
+        rows: [],
+        header: %Header{title: "Section Header", read_as: "A special audio-only value"}
+      }
+
+      assert %{
+               type: :normal_section,
+               departure_groups: [],
+               header: "A special audio-only value"
+             } = Departures.audio_serialize_section(section, nil)
     end
   end
 

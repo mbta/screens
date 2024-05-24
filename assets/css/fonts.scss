@@ -35,3 +35,8 @@
   font-family: Inter, sans-serif;
   font-weight: 400;
 }
+
+@mixin font--inter--bold {
+  font-family: Inter, sans-serif;
+  font-weight: 700;
+}

@@ -67,10 +67,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         true ->
           sections =
             Enum.map(sections_data, fn %{
-                                         section: %Section{layout: layout},
+                                         section: %Section{layout: layout, header: header},
                                          result: {:ok, departures}
                                        } ->
-              %{type: :normal_section, rows: departures, layout: layout}
+              %{type: :normal_section, rows: departures, layout: layout, header: header}
             end)
 
           %DeparturesWidget{screen: config, section_data: sections}

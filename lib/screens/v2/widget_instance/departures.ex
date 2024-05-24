@@ -10,6 +10,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Departures.Header
   alias ScreensConfig.V2.Departures.Layout
   alias ScreensConfig.V2.FreeTextLine
 
@@ -20,7 +21,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @type section :: %{
           type: :normal_section,
           rows: list(Departure.t() | notice()),
-          layout: Layout.t()
+          layout: Layout.t(),
+          header: Header.t()
         }
 
   @type notice_section :: %{
@@ -147,14 +149,23 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :headway_section, text: FreeTextLine.to_json(text), layout: layout}
   end
 
-  def serialize_section(%{type: :normal_section, rows: departures, layout: layout}, screen, _) do
+  def serialize_section(
+        %{type: :normal_section, rows: departures, layout: layout, header: header},
+        screen,
+        _
+      ) do
     rows =
       departures
       |> Enum.take(@max_departures)
       |> group_consecutive_departures(screen)
       |> Enum.map(&serialize_row(&1, screen))
 
-    %{type: :normal_section, rows: rows, layout: Layout.to_json(layout)}
+    %{
+      type: :normal_section,
+      rows: rows,
+      layout: Layout.to_json(layout),
+      header: Header.to_json(header)
+    }
   end
 
   def serialize_section(%{type: :overnight_section, routes: routes}, _, _) do
@@ -179,7 +190,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :notice_section, text: FreeTextLine.to_plaintext(text)}
   end
 
-  def audio_serialize_section(%{type: :normal_section, rows: departures}, screen) do
+  def audio_serialize_section(%{type: :normal_section, rows: departures, header: header}, screen) do
+    header =
+      case header do
+        %{read_as: header} when is_binary(header) -> header
+        %{title: header} when is_binary(header) -> header
+        _ -> nil
+      end
+
     serialized_departure_groups =
       departures
       |> group_all_departures(2)
@@ -187,6 +205,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{
       type: :normal_section,
+      header: header,
       departure_groups: serialized_departure_groups
     }
   end

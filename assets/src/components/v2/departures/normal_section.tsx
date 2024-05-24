@@ -3,6 +3,7 @@ import weakKey from "weak-key";
 
 import DepartureRow from "./departure_row";
 import NoticeRow from "./notice_row";
+import Header from "./header";
 
 export type Layout = {
   base: number | null;
@@ -16,21 +17,21 @@ export type Row =
 
 type NormalSection = {
   layout: Layout;
+  header: React.ComponentProps<typeof Header>;
   rows: Row[];
 };
 
-const NormalSection: ComponentType<NormalSection> = ({ rows }) => {
+const NormalSection: ComponentType<NormalSection> = ({ rows, header }) => {
   return (
-    <div>
-      <div className="departures-section">
-        {rows.map((row) => {
-          if (row.type === "departure_row") {
-            return <DepartureRow {...row} key={row.id} />;
-          } else {
-            return <NoticeRow row={row} key={weakKey(row)} />;
-          }
-        })}
-      </div>
+    <div className="departures-section">
+      <Header {...header} />
+      {rows.map((row) => {
+        if (row.type === "departure_row") {
+          return <DepartureRow {...row} key={row.id} />;
+        } else {
+          return <NoticeRow row={row} key={weakKey(row)} />;
+        }
+      })}
     </div>
   );
 };
