@@ -37,7 +37,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "returns serialized normal_section", %{bus_shelter_screen: bus_shelter_screen} do
-      section = %{type: :normal_section, rows: [], layout: %Layout{}}
+      section = %{type: :normal_section, rows: [], layout: %Layout{}, header: %Header{}}
 
       assert %{type: :normal_section, rows: []} =
                Departures.serialize_section(section, bus_shelter_screen)
@@ -76,7 +76,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       section = %{
         type: :normal_section,
         rows: [%{text: %FreeTextLine{icon: nil, text: []}}],
-        layout: %Layout{}
+        layout: %Layout{},
+        header: %Header{}
       }
 
       assert %{type: :normal_section, rows: [%{type: :notice_row, text: %{icon: nil, text: []}}]} =
@@ -103,6 +104,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       section = %{
         type: :normal_section,
         layout: %Layout{},
+        header: %Header{},
         rows: [
           %Departure{
             schedule:

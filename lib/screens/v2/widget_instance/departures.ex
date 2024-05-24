@@ -22,7 +22,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           type: :normal_section,
           rows: list(Departure.t() | notice()),
           layout: Layout.t(),
-          header: Header.t() | nil
+          header: Header.t()
         }
 
   @type notice_section :: %{
@@ -150,19 +150,22 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
-        %{type: :normal_section, rows: departures, layout: layout} = section,
+        %{type: :normal_section, rows: departures, layout: layout, header: header},
         screen,
         _
       ) do
-    header = if section[:header], do: Header.to_json(section[:header])
-
     rows =
       departures
       |> Enum.take(@max_departures)
       |> group_consecutive_departures(screen)
       |> Enum.map(&serialize_row(&1, screen))
 
-    %{type: :normal_section, rows: rows, layout: Layout.to_json(layout), header: header}
+    %{
+      type: :normal_section,
+      rows: rows,
+      layout: Layout.to_json(layout),
+      header: Header.to_json(header)
+    }
   end
 
   def serialize_section(%{type: :overnight_section, routes: routes}, _, _) do
@@ -187,9 +190,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :notice_section, text: FreeTextLine.to_plaintext(text)}
   end
 
-  def audio_serialize_section(%{type: :normal_section, rows: departures} = section, screen) do
+  def audio_serialize_section(%{type: :normal_section, rows: departures, header: header}, screen) do
     header =
-      case section[:header] do
+      case header do
         %{read_as: header} when is_binary(header) -> header
         %{title: header} when is_binary(header) -> header
         _ -> nil
