@@ -14,7 +14,6 @@ const DirectionArrow = ({ direction }: { direction: CardinalDirection }) => {
   return (
     <img
       src={src}
-      data-direction={direction}
       className={cx("direction-arrow", {
         "rotate-45": direction === "n",
         "rotate-90": direction === "ne",
