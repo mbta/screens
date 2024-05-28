@@ -72,7 +72,7 @@ defmodule Screens.V3Api do
       |> Enum.into(%{})
       |> Map.get("last-modified")
 
-    ScreenApiResponseCache.put(url, {response, date}, ttl: :timer.hours(1))
+    ScreenApiResponseCache.put(url, {response, date})
   end
 
   defp log_api_error({error_type, _error_data} = error, url, extra_fields \\ []) do
