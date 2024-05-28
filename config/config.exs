@@ -413,8 +413,8 @@ config :screens, :screens_by_alert,
   screens_ttl_seconds: 40
 
 config :screens, Screens.ScreenApiResponseCache,
-  # => 1 hr
-  gc_interval: 3_600_000
+  gc_interval: :timer.hours(1),
+  allocated_memory: 250_000_000
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
