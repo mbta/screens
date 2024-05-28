@@ -5,6 +5,8 @@ defmodule Screens.V3Api do
 
   require Logger
 
+  alias Screens.ScreenApiResponseCache
+
   @default_opts [
     timeout: 5000,
     recv_timeout: 5000,
@@ -15,12 +17,17 @@ defmodule Screens.V3Api do
   def get_json(
         route,
         params \\ %{},
-        extra_headers \\ [],
-        opts \\ [],
-        return_with_headers \\ false
+        opts \\ []
       ) do
-    headers = extra_headers ++ api_key_headers(Application.get_env(:screens, :api_v3_key))
+    headers = api_key_headers(Application.get_env(:screens, :api_v3_key))
     url = build_url(route, params)
+
+    cached_response = ScreenApiResponseCache.get(url)
+
+    headers =
+      if is_nil(cached_response),
+        do: headers,
+        else: headers ++ [{"if-modified-since", elem(cached_response, 1)}]
 
     with {:http_request, {:ok, response}} <-
            {:http_request,
@@ -32,11 +39,10 @@ defmodule Screens.V3Api do
          {:response_success, %{status_code: 200, body: body, headers: headers}} <-
            {:response_success, response},
          {:parse, {:ok, parsed}} <- {:parse, Jason.decode(body)} do
-      if return_with_headers do
-        {:ok, parsed, headers}
-      else
-        {:ok, parsed}
-      end
+      Logger.info("[api_v3_get_json] response has been modified, updating cache")
+      update_response_cache(url, parsed, headers)
+
+      {:ok, parsed}
     else
       {:http_request, e} ->
         {:error, httpoison_error} = e
@@ -44,7 +50,8 @@ defmodule Screens.V3Api do
         log_api_error({:http_fetch_error, e}, url, message: Exception.message(httpoison_error))
 
       {:response_success, %{status_code: 304}} ->
-        :not_modified
+        Logger.info("[api_v3_get_json] response not modified, using cache")
+        {:ok, elem(cached_response, 0)}
 
       {:response_success, %{status_code: status_code}} = response ->
         _ = log_api_error({:bad_response_code, response}, url, status_code: status_code)
@@ -57,6 +64,15 @@ defmodule Screens.V3Api do
       e ->
         log_api_error({:error, e}, url)
     end
+  end
+
+  defp update_response_cache(url, response, headers) do
+    date =
+      headers
+      |> Enum.into(%{})
+      |> Map.get("last-modified")
+
+    ScreenApiResponseCache.put(url, {response, date})
   end
 
   defp log_api_error({error_type, _error_data} = error, url, extra_fields \\ []) do

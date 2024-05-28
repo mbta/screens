@@ -10,7 +10,7 @@ defmodule Screens.Stops.StationsWithRoutesAgent do
     Agent.get(__MODULE__, &Map.get(&1, station_id))
   end
 
-  def put(station_id, routes, date) do
-    Agent.update(__MODULE__, &Map.put(&1, station_id, {routes, date}))
+  def put(station_id, routes) do
+    Agent.update(__MODULE__, &Map.put(&1, station_id, routes))
   end
 end
