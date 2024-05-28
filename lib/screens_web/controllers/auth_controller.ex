@@ -4,6 +4,7 @@ defmodule ScreensWeb.AuthController do
   use ScreensWeb, :controller
   plug Ueberauth
 
+  # Respond with 404 instead of crashing when the path doesn't match a supported provider
   def request(conn, %{"provider" => provider}) when provider != "keycloak" do
     send_resp(conn, 404, "Not Found")
   end
