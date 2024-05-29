@@ -1,9 +1,15 @@
-import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  ComponentType,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import weakKey from "weak-key";
 
 import NormalSection from "./normal_section";
 import NoticeSection from "./notice_section";
-import { Section, trimSections } from "./section";
+import { Section, trimSections, toSectionWithLaterRows } from "./section";
 
 import { warn } from "Util/sentry";
 import { hasOverflowY } from "Util/util";
@@ -14,10 +20,17 @@ type NormalDepartures = {
 
 const NormalDepartures: ComponentType<NormalDepartures> = ({ sections }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const [trimmedSections, setTrimmedSections] = useState(sections);
+  const sectionsWithLaterRows = useMemo(
+    () => sections.map(toSectionWithLaterRows),
+    [sections],
+  );
+  const [trimmedSections, setTrimmedSections] = useState(sectionsWithLaterRows);
 
   // Restart trimming if the sections prop is changed (i.e. new data).
-  useLayoutEffect(() => setTrimmedSections(sections), [sections]);
+  useLayoutEffect(
+    () => setTrimmedSections(sectionsWithLaterRows),
+    [sectionsWithLaterRows],
+  );
 
   // Iteratively trim sections until the container doesn't overflow.
   useLayoutEffect(() => {
