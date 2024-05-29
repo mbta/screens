@@ -1,14 +1,15 @@
 import { Factory } from "fishery";
 
-import { Section } from "Components/v2/departures/section";
+import { SectionWithLaterRows } from "Components/v2/departures/section";
 import { Row } from "Components/v2/departures/normal_section";
 import { TimeWithCrowding } from "Components/v2/departures/departure_times";
 
-export const normalSection = Factory.define<Section>(() => ({
+export const normalSection = Factory.define<SectionWithLaterRows>(() => ({
   type: "normal_section",
-  layout: { min: 1, base: null, max: null },
+  layout: { min: 1, base: null, max: null, include_later: false },
   rows: departureRow.buildList(1),
   header: { title: null, arrow: null },
+  laterRows: [],
 }));
 
 export const departureRow = Factory.define<Row>(({ sequence }) => ({

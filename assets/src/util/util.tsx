@@ -29,6 +29,9 @@ export const formatTimeString = (timeString: string) =>
 export const hasOverflowY = (ref: RefObject<Element>): boolean =>
   !!ref.current && ref.current.scrollHeight > ref.current.clientHeight;
 
+export const hasOverflowX = (ref: RefObject<Element>): boolean =>
+  !!ref.current && ref.current.scrollWidth > ref.current.clientWidth;
+
 export const imagePath = (fileName: string): string =>
   isOFM() ? outfrontImagePath(fileName) : `/images/${fileName}`;
 

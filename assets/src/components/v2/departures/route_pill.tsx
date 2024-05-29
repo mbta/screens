@@ -90,6 +90,8 @@ const SlashedRoutePill: ComponentType<SlashedPill> = ({ part1, part2 }) => {
 const RoutePill: ComponentType<Pill> = (pill) => {
   const modifiers: string[] = [pill.color];
 
+  if (pill.outline) modifiers.push("outline");
+
   let innerContent: JSX.Element | null = null;
   switch (pill.type) {
     case "text": {

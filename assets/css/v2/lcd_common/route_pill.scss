@@ -36,6 +36,16 @@
     background-color: $line-color-bus;
     box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
   }
+
+  &--outline {
+    background: none;
+    border: 2px solid #2e3e4d;
+    box-shadow: none;
+
+    .route-pill__slashed-text {
+      color: #2e3e4d;
+    }
+  }
 }
 
 .route-pill__text {
@@ -59,6 +69,10 @@
   &--silver,
   &--teal {
     color: white;
+  }
+
+  &--outline {
+    color: #2e3e4d;
   }
 }
 
