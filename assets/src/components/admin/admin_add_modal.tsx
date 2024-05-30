@@ -17,6 +17,7 @@ const fields = [
       "bus_shelter_v2",
       "busway_v2",
       "dup",
+      "dup_v2",
       "gl_eink_double",
       "gl_eink_single",
       "gl_eink_v2",
