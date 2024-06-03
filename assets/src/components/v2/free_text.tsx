@@ -104,7 +104,7 @@ const TextRoutePill = ({ route }: { route: string }) => {
   const branch = route.startsWith("green_") ? "branch" : "trunk";
 
   return (
-    <span className="free-text__element free-text__route-container">
+    <span className="free-text__element">
       <div className={classWithModifier("free-text__route-pill", route)}>
         <div
           className={classWithModifier("free-text__route-pill__text", branch)}
@@ -118,7 +118,7 @@ const TextRoutePill = ({ route }: { route: string }) => {
 
 const IconRoutePill = ({ route }: { route: string }) => {
   return (
-    <span className="free-text__element free-text__route-container">
+    <span className="free-text__element">
       <div className={classWithModifier("free-text__route-pill", route)}>
         <img className="free-text__icon-image" src={srcForIcon(route)} />
       </div>
@@ -128,7 +128,7 @@ const IconRoutePill = ({ route }: { route: string }) => {
 
 const TextPill = ({ color, text }: { color: string; text?: string }) => {
   return (
-    <span className="free-text__element free-text__pill-container">
+    <span className="free-text__element">
       <div className={classWithModifier("free-text__text-pill", color)}>
         <div className="free-text__text-pill__text">{text}</div>
       </div>
