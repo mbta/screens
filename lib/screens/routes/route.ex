@@ -2,6 +2,7 @@ defmodule Screens.Routes.Route do
   @moduledoc false
 
   alias Screens.RouteType
+  alias Screens.Stops.Stop
   alias Screens.V3Api
 
   @sl_route_ids ~w[741 742 743 746 749 751]
@@ -22,6 +23,14 @@ defmodule Screens.Routes.Route do
           type: RouteType.t()
         }
 
+  @type params :: %{
+          optional(:stop_id) => Stop.id(),
+          optional(:stop_ids) => [Stop.id()],
+          optional(:date) => Date.t() | DateTime.t(),
+          optional(:route_types) => [RouteType.t()] | RouteType.t()
+        }
+
+  @spec by_id(id()) :: {:ok, t()} | :error
   def by_id(route_id) do
     case V3Api.get_json("routes/" <> route_id) do
       {:ok, %{"data" => data}} -> {:ok, Screens.Routes.Parser.parse_route(data)}
@@ -29,6 +38,8 @@ defmodule Screens.Routes.Route do
     end
   end
 
+  @spec fetch() :: {:ok, [t()]} | :error
+  @spec fetch(params()) :: {:ok, [t()]} | :error
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
     params =
       opts
