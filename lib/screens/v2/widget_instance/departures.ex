@@ -18,7 +18,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
             section_data: [],
             slot_names: []
 
-  @type section :: %{
+  @type normal_section :: %{
           type: :normal_section,
           rows: list(Departure.t() | notice()),
           layout: Layout.t(),
@@ -42,13 +42,25 @@ defmodule Screens.V2.WidgetInstance.Departures do
           routes: list(Route.t())
         }
 
+  @type no_data_section :: %{
+          type: :no_data_section,
+          route: Route.t()
+        }
+
   @type notice :: %{
           text: FreeTextLine.t()
         }
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          section_data: list(section | notice_section | headway_section() | overnight_section()),
+          section_data:
+            list(
+              normal_section()
+              | notice_section()
+              | headway_section()
+              | overnight_section()
+              | no_data_section()
+            ),
           slot_names: list(atom())
         }
 
