@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   @moduledoc false
 
   alias Screens.Routes.Route
+  alias Screens.RouteType
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
@@ -22,6 +23,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   @type options :: [
           departure_fetch_fn: Departure.fetch(),
+          disabled_modes_fn: (-> RouteType.t()),
           post_process_fn: (Departure.result(), Screen.t() -> Departure.result() | :overnight),
           route_fetch_fn: (Route.params() -> {:ok, [Route.t()]} | :error)
         ]
@@ -36,11 +38,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   @spec departures_instances(Screen.t(), options()) :: [widget()]
   def departures_instances(%Screen{app_params: %app{}} = config, options \\ [])
       when app in [BusEink, BusShelter, Busway, GlEink, SolariLarge] do
-    if Screens.Config.Cache.mode_disabled?(get_devops_mode(config)) do
+    disabled_modes =
+      Keyword.get(options, :disabled_modes_fn, &Screens.Config.Cache.disabled_modes/0).()
+
+    if screen_devops_mode(config) in disabled_modes do
       [%DeparturesNoData{screen: config, show_alternatives?: false}]
     else
       do_departures_instances(
         config,
+        disabled_modes,
         Keyword.get(options, :departure_fetch_fn, &Departure.fetch/2),
         Keyword.get(options, :post_process_fn, fn results, _config -> results end),
         Keyword.get(options, :route_fetch_fn, &Route.fetch/1)
@@ -51,6 +57,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   defp do_departures_instances(
          %Screen{app_params: %{departures: %Departures{sections: sections}}, app_id: app_id} =
            config,
+         disabled_modes,
          departure_fetch_fn,
          post_process_fn,
          route_fetch_fn
@@ -64,7 +71,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
           section: &1,
           result:
             &1
-            |> fetch_section_departures(departure_fetch_fn)
+            |> fetch_section_departures(disabled_modes, departure_fetch_fn)
             |> post_process_fn.(config)
             |> post_process_no_data(&1, has_multiple_sections, route_fetch_fn)
         },
@@ -151,8 +158,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   end
 
   @spec fetch_section_departures(Section.t()) :: Departure.result()
-  @spec fetch_section_departures(Section.t(), Departure.fetch()) :: Departure.result()
-  @spec fetch_section_departures(Section.t(), Departure.fetch(), DateTime.t()) ::
+  @spec fetch_section_departures(Section.t(), [RouteType.t()]) :: Departure.result()
+  @spec fetch_section_departures(Section.t(), [RouteType.t()], Departure.fetch()) ::
+          Departure.result()
+  @spec fetch_section_departures(Section.t(), [RouteType.t()], Departure.fetch(), DateTime.t()) ::
           Departure.result()
   def fetch_section_departures(
         %Section{
@@ -160,6 +169,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
           filters: filters,
           bidirectional: is_bidirectional
         },
+        disabled_route_types \\ [],
         departure_fetch_fn \\ &Departure.fetch/2,
         now \\ DateTime.utc_now()
       ) do
@@ -167,7 +177,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     fetch_opts = opts |> Map.from_struct() |> Keyword.new()
 
     with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
-      {:ok, departures |> filter_departures(filters, now) |> make_bidirectional(is_bidirectional)}
+      {:ok,
+       departures
+       |> Enum.reject(&(Departure.route_type(&1) in disabled_route_types))
+       |> filter_departures(filters, now)
+       |> make_bidirectional(is_bidirectional)}
     end
   end
 
@@ -229,8 +243,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   defp make_bidirectional(departures, _), do: departures
 
-  defp get_devops_mode(%Screen{app_id: :bus_shelter_v2}), do: :bus
-  defp get_devops_mode(%Screen{app_id: :bus_eink_v2}), do: :bus
-  defp get_devops_mode(%Screen{app_id: :gl_eink_v2}), do: :light_rail
-  defp get_devops_mode(_), do: nil
+  # Some screen types are always configured to show departures for one specific transit mode. In
+  # that case, if the mode is devops-disabled, we immediately know the whole screen should display
+  # a "no data" message.
+  defp screen_devops_mode(%Screen{app_id: :bus_shelter_v2}), do: :bus
+  defp screen_devops_mode(%Screen{app_id: :bus_eink_v2}), do: :bus
+  defp screen_devops_mode(%Screen{app_id: :gl_eink_v2}), do: :light_rail
+  defp screen_devops_mode(_), do: nil
 end
