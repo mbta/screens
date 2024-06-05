@@ -16,10 +16,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   alias Screens.Routes.Route
   alias Screens.Trips.Trip
 
-  defp build_departure(route_id, direction_id, arrival_time \\ ~U[2024-01-01 12:00:00Z]) do
+  defp build_departure(
+         route_id,
+         direction_id,
+         route_type \\ :bus,
+         arrival_time \\ ~U[2024-01-01 12:00:00Z]
+       ) do
     %Departure{
       prediction: %Prediction{
-        route: %Route{id: route_id},
+        route: %Route{id: route_id, type: route_type},
         trip: %Trip{direction_id: direction_id},
         arrival_time: arrival_time
       }
@@ -143,6 +148,42 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                )
     end
 
+    test "with multiple sections, returns a notice row when a mode is devops-disabled" do
+      # use a screen type that does not get entirely disabled based on mode
+      config = %Screen{build_config(["A", "B"]) | app_id: :busway_v2}
+      departure_b = build_departure("B", 0, :subway)
+
+      departure_fetch_fn =
+        build_fetch_fn(%{"A" => {:ok, [build_departure("A", 0)]}, "B" => {:ok, [departure_b]}})
+
+      disabled_modes_fn = fn -> [:bus] end
+      route_fetch_fn = fn %{ids: ["A"]} -> {:ok, [%Route{id: "A", type: :bus}]} end
+
+      assert [
+               %DeparturesWidget{
+                 section_data: [
+                   %{
+                     type: :normal_section,
+                     rows: [
+                       %{
+                         text: %FreeTextLine{
+                           icon: :bus,
+                           text: ["No departures currently available"]
+                         }
+                       }
+                     ]
+                   },
+                   %{type: :normal_section, rows: [^departure_b]}
+                 ]
+               }
+             ] =
+               departures_instances(config,
+                 departure_fetch_fn: departure_fetch_fn,
+                 disabled_modes_fn: disabled_modes_fn,
+                 route_fetch_fn: route_fetch_fn
+               )
+    end
+
     test "returns DeparturesNoData if any section request fails" do
       config = build_config(["A", "B"])
       fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => :error})
@@ -154,6 +195,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       actual_departures_instances = departures_instances(config, departure_fetch_fn: fetch_fn)
 
       assert expected_departures_instances == actual_departures_instances
+    end
+
+    test "returns DeparturesNoData if the mode for the screen type is devops-disabled" do
+      config = %Screen{build_config(["A"]) | app_id: :gl_eink_v2}
+      fetch_fn = build_fetch_fn(%{"A" => {:ok, []}})
+      disabled_modes_fn = fn -> [:light_rail] end
+
+      assert [%DeparturesNoData{screen: config, show_alternatives?: false}] ==
+               departures_instances(config,
+                 departure_fetch_fn: fetch_fn,
+                 disabled_modes_fn: disabled_modes_fn
+               )
     end
 
     test "returns DeparturesNoService for bus e-ink when there is a single empty section" do
@@ -218,16 +271,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       }
 
       included_departures = [
-        build_departure("1", 0, DateTime.add(now, 59, :minute)),
-        build_departure("1", 0, DateTime.add(now, 60, :minute))
+        build_departure("1", 0, nil, DateTime.add(now, 59, :minute)),
+        build_departure("1", 0, nil, DateTime.add(now, 60, :minute))
       ]
 
       fetch_fn = fn %{stop_ids: ["S"]}, _ ->
-        {:ok, [build_departure("1", 0, DateTime.add(now, 61, :minute)) | included_departures]}
+        {:ok,
+         [build_departure("1", 0, nil, DateTime.add(now, 61, :minute)) | included_departures]}
       end
 
       assert {:ok, included_departures} ==
-               Departures.fetch_section_departures(section, fetch_fn, now)
+               Departures.fetch_section_departures(section, [], fetch_fn, now)
     end
 
     test "filters departures with included route-directions" do
@@ -250,7 +304,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         {:ok, [build_departure("41", 1), included_departure, build_departure("1", 1)]}
       end
 
-      assert {:ok, [included_departure]} == Departures.fetch_section_departures(section, fetch_fn)
+      assert {:ok, [included_departure]} ==
+               Departures.fetch_section_departures(section, [], fetch_fn)
     end
 
     test "rejects departures with excluded route-directions" do
@@ -274,7 +329,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       end
 
       assert {:ok, included_departures} ==
-               Departures.fetch_section_departures(section, fetch_fn)
+               Departures.fetch_section_departures(section, [], fetch_fn)
     end
 
     test "filters departures for sections configured as bidirectional" do

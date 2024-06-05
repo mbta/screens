@@ -225,13 +225,18 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       # Otherwise, we only need the first route in the list of routes serving the stop.
       primary_route_for_section = List.first(routes)
 
+      disabled_modes = Screens.Config.Cache.disabled_modes()
+
       # If we know the predictions are unreliable, don't even bother fetching them.
-      if is_nil(primary_route_for_section) or
-           Screens.Config.Cache.mode_disabled?(primary_route_for_section.type) do
+      if is_nil(primary_route_for_section) or primary_route_for_section.type in disabled_modes do
         %{type: :no_data_section, route: primary_route_for_section}
       else
         section_departures =
-          case Widgets.Departures.fetch_section_departures(section, fetch_departures_fn) do
+          case Widgets.Departures.fetch_section_departures(
+                 section,
+                 disabled_modes,
+                 fetch_departures_fn
+               ) do
             {:ok, departures} -> departures
             :error -> []
           end
