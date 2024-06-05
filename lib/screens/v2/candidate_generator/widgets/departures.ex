@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   @moduledoc false
 
+  alias Screens.Routes.Route
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
@@ -8,11 +9,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias ScreensConfig.V2.Departures.Filters.RouteDirections
   alias ScreensConfig.V2.Departures.Filters.RouteDirections.RouteDirection
   alias ScreensConfig.V2.Departures.{Filters, Query, Section}
-  alias ScreensConfig.V2.{BusEink, BusShelter, Busway, Departures, GlEink, SolariLarge}
+
+  alias ScreensConfig.V2.{
+    BusEink,
+    BusShelter,
+    Busway,
+    Departures,
+    FreeTextLine,
+    GlEink,
+    SolariLarge
+  }
 
   @type options :: [
           departure_fetch_fn: Departure.fetch(),
-          post_process_fn: (Departure.result(), Screen.t() -> Departure.result() | :overnight)
+          post_process_fn: (Departure.result(), Screen.t() -> Departure.result() | :overnight),
+          route_fetch_fn: (Route.params() -> {:ok, [Route.t()]} | :error)
         ]
 
   @type widget ::
@@ -31,7 +42,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
       do_departures_instances(
         config,
         Keyword.get(options, :departure_fetch_fn, &Departure.fetch/2),
-        Keyword.get(options, :post_process_fn, fn results, _config -> results end)
+        Keyword.get(options, :post_process_fn, fn results, _config -> results end),
+        Keyword.get(options, :route_fetch_fn, &Route.fetch/1)
       )
     end
   end
@@ -40,14 +52,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
          %Screen{app_params: %{departures: %Departures{sections: sections}}, app_id: app_id} =
            config,
          departure_fetch_fn,
-         post_process_fn
+         post_process_fn,
+         route_fetch_fn
        ) do
+    has_multiple_sections = match?([_, _ | _], sections)
+
     sections_data =
       sections
       |> Task.async_stream(
         &%{
           section: &1,
-          result: &1 |> fetch_section_departures(departure_fetch_fn) |> post_process_fn.(config)
+          result:
+            &1
+            |> fetch_section_departures(departure_fetch_fn)
+            |> post_process_fn.(config)
+            |> post_process_no_data(&1, has_multiple_sections, route_fetch_fn)
         },
         timeout: 30_000
       )
@@ -66,17 +85,69 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
         true ->
           sections =
-            Enum.map(sections_data, fn %{
-                                         section: %Section{layout: layout, header: header},
-                                         result: {:ok, departures}
-                                       } ->
-              %{type: :normal_section, rows: departures, layout: layout, header: header}
+            Enum.map(sections_data, fn
+              %{section: %Section{header: header, layout: layout}, result: result} ->
+                %{
+                  type: :normal_section,
+                  rows: normal_section_rows(result),
+                  layout: layout,
+                  header: header
+                }
             end)
 
           %DeparturesWidget{screen: config, section_data: sections}
       end
 
     [departures_instance]
+  end
+
+  # When a section has no departures on a screen with multiple sections, populate it with a "no
+  # data" entry. This may include a "representative" route for the section, used to determine an
+  # icon to display alongside the message.
+  #
+  # NOTE: Assumes any given section is configured such that it only displays departures from a
+  # single route-type-or-subway-line. If there would be more than one route-type-or-subway-line,
+  # one is picked arbitrarily.
+  defp post_process_no_data({:ok, []}, section, true = _has_multiple_sections, route_fetch_fn) do
+    %Section{
+      query: %Query{
+        params: %Query.Params{route_ids: route_ids, route_type: route_type, stop_ids: stop_ids}
+      }
+    } = section
+
+    fetch_params =
+      Map.reject(
+        %{
+          limit: 1,
+          ids: route_ids,
+          route_types: if(route_type, do: [route_type], else: []),
+          stop_ids: stop_ids
+        },
+        fn {_key, value} -> value == [] end
+      )
+
+    route =
+      case route_fetch_fn.(fetch_params) do
+        {:ok, [route]} -> route
+        :error -> nil
+      end
+
+    {:no_data, route}
+  end
+
+  defp post_process_no_data(fetch_result, _, _, _), do: fetch_result
+
+  defp normal_section_rows({:ok, departures}), do: departures
+
+  defp normal_section_rows({:no_data, route?}) do
+    [
+      %{
+        text: %FreeTextLine{
+          icon: if(route?, do: Route.get_icon_or_color_from_route(route?), else: nil),
+          text: ["No departures currently available"]
+        }
+      }
+    ]
   end
 
   @spec fetch_section_departures(Section.t()) :: Departure.result()
