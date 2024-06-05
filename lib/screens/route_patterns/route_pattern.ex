@@ -35,7 +35,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
            RoutePatterns.Parser.parse_result(route_patterns, route_id) do
       {:ok, parsed_result}
     else
-      :error -> :error
+      _ -> :error
     end
   end
 
