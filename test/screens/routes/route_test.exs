@@ -15,6 +15,20 @@ defmodule Screens.Routes.RouteTest do
     }
   end
 
+  describe "fetch/1" do
+    test "sets an ID filter" do
+      get_json_fn = fn _, %{"filter[id]" => "1,2,3"} -> {:ok, %{"data" => [route_json("2")]}} end
+
+      assert {:ok, [%{id: "2"}]} = fetch(%{ids: ["1", "2", "3"]}, get_json_fn)
+    end
+
+    test "sets a limit param" do
+      get_json_fn = fn _, %{"page[limit]" => "1"} -> {:ok, %{"data" => [route_json("ABC")]}} end
+
+      assert {:ok, [%{id: "ABC"}]} = fetch(%{limit: 1}, get_json_fn)
+    end
+  end
+
   describe "fetch_routes_by_stop/3" do
     setup do
       active_routes = [route_json("22"), route_json("44")]

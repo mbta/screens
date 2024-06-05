@@ -1,4 +1,5 @@
-.departure-row {
+.departure-row,
+.departures__notice-row {
   position: relative;
   padding-bottom: 30px;
 
@@ -12,6 +13,11 @@
     background-color: #cccbc8;
     border-radius: 2px;
   }
+}
+
+.departures__notice-row {
+  margin-top: 27px;
+  margin-left: 32px;
 }
 
 .departure-row__route {

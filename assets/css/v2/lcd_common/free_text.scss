@@ -1,3 +1,22 @@
+.free-text {
+  font-family: Inter, sans-serif;
+  font-size: 48px;
+}
+
+.free-text__icon-container {
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.free-text__line {
+  display: inline-block;
+  margin-left: 24px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
 .free-text__element {
   &:not(:last-child)::after {
     content: " ";
@@ -8,4 +27,68 @@
   &--bold {
     font-weight: 700;
   }
+
+  &--small {
+    font-size: 0.8em;
+  }
+}
+
+.free-text__route-pill,
+.free-text__text-pill {
+  display: inline-block;
+  width: 144px;
+  height: 74px;
+  font-family: neue-haas-grotesk-text;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 74px;
+  color: white;
+  text-align: center;
+  border-radius: 100px;
+
+  &--green,
+  &--green_b,
+  &--green_c,
+  &--green_d,
+  &--green_e {
+    background: $line-color-green;
+  }
+
+  &--blue {
+    background: $line-color-blue;
+  }
+
+  &--red {
+    background: $line-color-red;
+  }
+
+  &--orange {
+    background: $line-color-orange;
+  }
+
+  &--silver {
+    background: $line-color-silver;
+  }
+
+  &--cr,
+  &--purple {
+    background: $line-color-cr;
+  }
+
+  &--bus,
+  &--yellow {
+    color: black;
+    background: $line-color-bus;
+    box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
+  }
+
+  &--ferry,
+  &--teal {
+    background-color: $line-color-ferry;
+  }
+}
+
+.free-text__icon-image {
+  height: 60px;
+  margin-top: 7px;
 }

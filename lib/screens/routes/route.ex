@@ -24,10 +24,12 @@ defmodule Screens.Routes.Route do
         }
 
   @type params :: %{
+          optional(:ids) => [id()],
           optional(:stop_id) => Stop.id(),
           optional(:stop_ids) => [Stop.id()],
           optional(:date) => Date.t() | DateTime.t(),
-          optional(:route_types) => [RouteType.t()] | RouteType.t()
+          optional(:route_types) => [RouteType.t()] | RouteType.t(),
+          optional(:limit) => pos_integer()
         }
 
   @spec by_id(id()) :: {:ok, t()} | :error
@@ -85,6 +87,10 @@ defmodule Screens.Routes.Route do
     end
   end
 
+  defp format_query_param({:ids, ids}) when is_list(ids) do
+    [{"filter[id]", Enum.join(ids, ",")}]
+  end
+
   defp format_query_param({:stop_ids, stop_ids}) when is_list(stop_ids) do
     [{"filter[stop]", Enum.join(stop_ids, ",")}]
   end
@@ -107,6 +113,10 @@ defmodule Screens.Routes.Route do
 
   defp format_query_param({:route_types, route_type}) do
     format_query_param({:route_types, [route_type]})
+  end
+
+  defp format_query_param({:limit, limit}) when is_integer(limit) and limit > 0 do
+    [{"page[limit]", to_string(limit)}]
   end
 
   defp format_query_param(_), do: []
