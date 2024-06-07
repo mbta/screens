@@ -148,6 +148,36 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                )
     end
 
+    test "with multiple sections, returns DeparturesWidget with notice rows in empty sections if route_fetch_fn returns no routes" do
+      config = build_config(["A", "B"])
+      departure_b = build_departure("B", 0)
+      departure_fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, [departure_b]}})
+      route_fetch_fn = fn %{ids: ["A"]} -> {:ok, []} end
+
+      assert [
+               %DeparturesWidget{
+                 section_data: [
+                   %{
+                     type: :normal_section,
+                     rows: [
+                       %{
+                         text: %FreeTextLine{
+                           icon: nil,
+                           text: ["No departures currently available"]
+                         }
+                       }
+                     ]
+                   },
+                   %{type: :normal_section, rows: [^departure_b]}
+                 ]
+               }
+             ] =
+               departures_instances(config,
+                 departure_fetch_fn: departure_fetch_fn,
+                 route_fetch_fn: route_fetch_fn
+               )
+    end
+
     test "with multiple sections, returns a notice row when a mode is devops-disabled" do
       # use a screen type that does not get entirely disabled based on mode
       config = %Screen{build_config(["A", "B"]) | app_id: :busway_v2}
