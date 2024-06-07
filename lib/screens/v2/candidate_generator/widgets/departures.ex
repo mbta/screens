@@ -135,8 +135,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
     route =
       case route_fetch_fn.(fetch_params) do
-        {:ok, [route]} -> route
-        :error -> nil
+        {:ok, [route | _]} -> route
+        _ -> nil
       end
 
     {:no_data, route}
