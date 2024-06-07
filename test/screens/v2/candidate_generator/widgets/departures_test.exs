@@ -148,7 +148,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                )
     end
 
-    test "with multiple sections, returns DeparturesWidget with notice rows in empty sections if route_fetch_fn returns no routes" do
+    test "with multiple sections, returns notice row with no icon if no routes are found" do
       config = build_config(["A", "B"])
       departure_b = build_departure("B", 0)
       departure_fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, [departure_b]}})
