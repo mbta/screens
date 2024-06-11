@@ -85,7 +85,8 @@ defmodule Screens.MixProject do
       {:screens_config,
        git: "https://github.com/mbta/screens-config-lib.git",
        ref: "25fb47c58fc0b485c8c6df78fe94914292856903"},
-      {:nebulex, "~> 2.6"}
+      {:nebulex, "~> 2.6"},
+      {:remote_ip, "~> 1.2"}
     ]
   end
 end
