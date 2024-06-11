@@ -22,7 +22,7 @@ config :logger,
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
-  metadata: [:client_ip, :request_id]
+  metadata: [:client_ip, :remote_ip, :request_id]
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
