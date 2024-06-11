@@ -37,6 +37,7 @@ defmodule ScreensWeb.Endpoint do
     cookie_key: "request_logger"
 
   plug RemoteIp
+  plug ScreensWeb.Plugs.Metadata
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
