@@ -253,8 +253,10 @@ const DownstreamIssueSection: React.ComponentType<
     <div
       className={classWithModifier("alert-card__content-block__text", "medium")}
     >
-      No trains <span style={{ fontWeight: 500 }}>between</span> {endpoints[0]}{" "}
-      <span style={{ fontWeight: 500 }}>&</span> {endpoints[1]}
+      No trains <span style={{ fontWeight: 500 }}>between</span>{" "}
+      <span className="free-text__string--nowrap">{endpoints[0]}</span>{" "}
+      <span style={{ fontWeight: 500 }}>&</span>{" "}
+      <span className="free-text__string--nowrap">{endpoints[1]}</span>
     </div>
   </div>
 );
