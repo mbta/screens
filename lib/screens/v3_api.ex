@@ -39,7 +39,6 @@ defmodule Screens.V3Api do
          {:response_success, %{status_code: 200, body: body, headers: headers}} <-
            {:response_success, response},
          {:parse, {:ok, parsed}} <- {:parse, Jason.decode(body)} do
-      Logger.info("[api_v3_get_json] response has been modified, updating cache")
       update_response_cache(url, parsed, headers)
 
       {:ok, parsed}
@@ -50,7 +49,6 @@ defmodule Screens.V3Api do
         log_api_error({:http_fetch_error, e}, url, message: Exception.message(httpoison_error))
 
       {:response_success, %{status_code: 304}} ->
-        Logger.info("[api_v3_get_json] response not modified, using cache")
         {:ok, elem(cached_response, 0)}
 
       {:response_success, %{status_code: status_code}} = response ->
