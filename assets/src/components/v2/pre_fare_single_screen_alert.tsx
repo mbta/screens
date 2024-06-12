@@ -6,6 +6,8 @@ import DisruptionDiagram, {
 } from "./disruption_diagram/disruption_diagram";
 import { classWithModifier, classWithModifiers, formatCause } from "Util/util";
 
+import FreeText, { type FreeTextType } from "./free_text";
+
 import ClockIcon from "Images/svgr_bundled/clock-negative.svg";
 import NoServiceIcon from "Images/svgr_bundled/no-service.svg";
 import InfoIcon from "Images/svgr_bundled/info.svg";
@@ -13,15 +15,34 @@ import ISAIcon from "Images/svgr_bundled/isa.svg";
 import WalkingIcon from "Images/svgr_bundled/nearby.svg";
 import ShuttleBusIcon from "Images/svgr_bundled/bus.svg";
 
+type StringOrFreeText = string | FreeTextType | Array<string | FreeTextType>;
+
+const Text = ({ children: text }: { children?: StringOrFreeText | null }) => {
+  if (text == null) return null;
+
+  if (typeof text === "string") return <span>{text}</span>;
+  if (Array.isArray(text)) {
+    return (
+      <>
+        {text.map((el, i) => (
+          <Text key={i}>{el}</Text>
+        ))}
+      </>
+    );
+  }
+
+  return <FreeText lines={text} />;
+};
+
 interface PreFareSingleScreenAlertProps {
-  issue: string;
-  location: string;
+  issue: StringOrFreeText;
+  location: StringOrFreeText;
   cause: string;
   remedy: string;
   remedy_bold?: string;
   routes: EnrichedRoute[];
   unaffected_routes: EnrichedRoute[];
-  endpoints: string[];
+  endpoints: [string, string];
   effect: string;
   region: string;
   updated_at: string;
@@ -34,10 +55,10 @@ interface EnrichedRoute {
 }
 
 interface StandardLayoutProps {
-  issue: string;
+  issue: StringOrFreeText;
   remedy: string;
   effect: string;
-  location: string | null;
+  location: StringOrFreeText | null;
   disruptionDiagram?: DisruptionDiagramData;
 }
 
@@ -86,7 +107,7 @@ const StandardLayout: React.ComponentType<StandardLayoutProps> = ({
 };
 
 interface DownstreamLayoutProps {
-  endpoints: string[];
+  endpoints: [string, string];
   effect: string;
   remedy: string;
   disruptionDiagram?: DisruptionDiagramData;
@@ -162,7 +183,7 @@ const MultiLineLayout: React.ComponentType<MultiLineLayoutProps> = ({
 };
 
 interface FallbackLayoutProps {
-  issue: string;
+  issue: StringOrFreeText;
   remedy: string;
   remedyBold?: string;
   effect: string;
@@ -192,7 +213,11 @@ const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
   return (
     <div className="alert-card__fallback">
       {icon}
-      {issue && <div className="alert-card__fallback__issue-text">{issue}</div>}
+      {issue && (
+        <div className="alert-card__fallback__issue-text">
+          <Text>{issue}</Text>
+        </div>
+      )}
       {remedy && (
         <div
           className={classWithModifier(
@@ -214,8 +239,8 @@ const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
 };
 
 interface StandardIssueSectionProps {
-  issue: string;
-  location: string | null;
+  issue: StringOrFreeText;
+  location: StringOrFreeText | null;
   contentTextSize: string;
 }
 
@@ -233,17 +258,19 @@ const StandardIssueSection: React.ComponentType<StandardIssueSectionProps> = ({
           contentTextSize,
         )}
       >
-        {issue}
+        <Text>{issue}</Text>
       </div>
       {location && (
-        <div className="alert-card__issue__location">{location}</div>
+        <div className="alert-card__issue__location">
+          <Text>{location}</Text>
+        </div>
       )}
     </div>
   </div>
 );
 
 interface DownstreamIssueSectionProps {
-  endpoints: string[];
+  endpoints: [string, string];
 }
 
 const DownstreamIssueSection: React.ComponentType<
