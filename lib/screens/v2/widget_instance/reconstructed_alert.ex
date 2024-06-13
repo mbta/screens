@@ -6,7 +6,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
-  alias Screens.Util
   alias Screens.V2.DisruptionDiagram
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
@@ -411,7 +410,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %{
       issue: "No trains",
       remedy: "Seek alternate route",
-      location: "No #{route_id} Line trains #{format_endpoint_string(endpoints)}",
+      location: %{text: ["No #{route_id} Line trains " | format_endpoint_string(endpoints)]},
       endpoints: endpoints,
       cause: format_cause(cause),
       routes: get_route_pills(t),
@@ -436,8 +435,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %{
       issue: "No trains",
       remedy: "Use shuttle bus",
-      location:
-        "Shuttle buses replace #{route_id} Line trains #{format_endpoint_string(endpoints)}",
+      location: %{
+        text: [
+          "Shuttle buses replace #{route_id} Line trains " | format_endpoint_string(endpoints)
+        ]
+      },
       endpoints: endpoints,
       cause: format_cause(cause),
       routes: get_route_pills(t),
@@ -547,7 +549,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         endpoint_text = format_endpoint_string(endpoints)
 
         location_text =
-          if is_nil(endpoint_text), do: nil, else: "No #{route_id} Line trains #{endpoint_text}"
+          if is_nil(endpoint_text),
+            do: nil,
+            else: %{text: ["No #{route_id} Line trains " | endpoint_text]}
 
         issue =
           cond do
@@ -560,7 +564,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
             # Boundary
             true ->
-              "No trains to #{destination}"
+              %{
+                text: [
+                  "No trains to ",
+                  %{text: destination, format: :nowrap}
+                ]
+              }
           end
 
         {issue, location_text}
@@ -601,7 +610,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         {"No trains", nil, "Shuttle buses available"}
       else
         endpoint_text = format_endpoint_string(endpoints)
-        location_text = if is_nil(endpoint_text), do: nil, else: "Shuttle buses #{endpoint_text}"
+
+        location_text =
+          if is_nil(endpoint_text), do: nil, else: %{text: ["Shuttle buses " | endpoint_text]}
 
         issue =
           cond do
@@ -612,7 +623,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
               "No trains"
 
             true ->
-              "No trains to #{destination}"
+              %{text: ["No trains to ", %{text: destination, format: :nowrap}]}
           end
 
         {issue, location_text, "Use shuttle bus"}
@@ -679,10 +690,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       informed_stations: informed_stations
     } = t
 
-    informed_stations_string = Util.format_name_list_to_string(informed_stations)
+    formatted_informed_stations = format_station_name_list(informed_stations)
 
     %{
-      issue: "Trains skip #{informed_stations_string}",
+      issue: %{text: ["Trains skip " | formatted_informed_stations]},
       remedy: "Seek alternate route",
       cause: get_cause(cause),
       routes: get_route_pills(t, location),
@@ -770,7 +781,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       if is_nil(destination) do
         "Trains may be delayed #{duration_text}"
       else
-        "#{destination} trains may be delayed #{duration_text}"
+        %{
+          text: [
+            %{text: destination, format: :nowrap},
+            %{text: "trains may be delayed #{duration_text}"}
+          ]
+        }
       end
 
     %{
@@ -809,7 +825,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         if is_nil(destination) do
           "No trains"
         else
-          "No #{destination} trains"
+          %{text: ["No ", %{text: destination, format: :nowrap}, " trains"]}
         end
 
       %{
@@ -846,7 +862,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         if is_nil(destination) do
           "No trains"
         else
-          "No #{destination} trains"
+          %{text: ["No ", %{text: destination, format: :nowrap}, " trains"]}
         end
 
       %{
@@ -915,7 +931,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         if is_nil(destination) do
           "Trains may be delayed #{duration_text}"
         else
-          "#{destination} trains may be delayed #{duration_text}"
+          %{
+            text: [
+              %{text: destination, format: :nowrap},
+              " trains may be delayed #{duration_text}"
+            ]
+          }
         end
 
       %{
@@ -966,7 +987,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         if is_nil(direction_id) do
           "No trains"
         else
-          "No #{get_destination(t, location)} trains"
+          %{text: ["No ", %{text: get_destination(t, location), format: :nowrap}, " trains"]}
         end
 
       %{
@@ -1031,10 +1052,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %{alert: %{cause: cause}, informed_stations: informed_stations} = t
     cause_text = Alert.get_cause_string(cause)
 
-    informed_stations_string = Util.format_name_list_to_string(informed_stations)
+    formatted_informed_stations = format_station_name_list(informed_stations)
 
     %{
-      issue: "Trains will bypass #{informed_stations_string}",
+      issue: %{text: ["Trains will bypass " | formatted_informed_stations]},
       remedy: "Seek alternate route",
       location: "",
       cause: cause_text,
@@ -1155,11 +1176,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def format_endpoint_string(nil), do: nil
 
   def format_endpoint_string({station, station}) do
-    "at #{station}"
+    ["at ", %{text: station, format: :nowrap}]
   end
 
   def format_endpoint_string({min_station, max_station}) do
-    "between #{min_station} and #{max_station}"
+    [
+      "between ",
+      %{text: min_station, format: :nowrap},
+      " and ",
+      %{text: max_station, format: :nowrap}
+    ]
   end
 
   def serialize(widget, log_fn \\ &Logger.warning/1)
