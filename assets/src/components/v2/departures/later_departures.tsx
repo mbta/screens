@@ -70,7 +70,7 @@ const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
                     "later-departures__route--selected": i === j,
                   })}
                 >
-                  <RoutePill {...d.route} outline={i !== j} />
+                  <RoutePill pill={d.route} outline={i !== j} />
                 </li>
               ))}
             </ol>

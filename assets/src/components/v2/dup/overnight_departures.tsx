@@ -27,7 +27,7 @@ const OvernightDepartures: ComponentType<Props> = ({ routes }) => {
         {routes.length > 0 && (
           <div className="overnight-departures__route-pill-container">
             {routes.map((route) => (
-              <RoutePill {...route} key={route.color} />
+              <RoutePill pill={route} key={route.color} />
             ))}
           </div>
         )}
