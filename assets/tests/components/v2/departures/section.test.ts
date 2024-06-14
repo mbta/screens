@@ -1,15 +1,23 @@
 import { describe, expect, test } from "@jest/globals";
 
+import _ from "lodash/fp";
+
 import {
+  toFoldedSection,
   trimSections,
-  type SectionWithLaterRows,
+  type FoldedSection,
 } from "Components/v2/departures/section";
 
 import { departureRow, normalSection, timeWithCrowding } from "./factories";
 
+const buildFoldedSection = (attrs) =>
+  toFoldedSection(normalSection.build(attrs));
+
+const dropId = (rows) => rows.map((row) => _.omit(["id"], row));
+
 describe("trimSections", () => {
   test("does nothing with notice sections", () => {
-    const sections: SectionWithLaterRows[] = [
+    const sections: FoldedSection[] = [
       {
         type: "notice_section",
         text: { text: [{ text: "text" }] },
@@ -26,13 +34,19 @@ describe("trimSections", () => {
     const [rowB1, rowB2, rowB3, ...trimmedB] = rowsB;
 
     const sections = [
-      normalSection.build({ layout: { max: 2 }, rows: rowsA }),
-      normalSection.build({ layout: { max: 3 }, rows: rowsB }),
+      buildFoldedSection({ layout: { max: 2 }, rows: rowsA }),
+      buildFoldedSection({ layout: { max: 3 }, rows: rowsB }),
     ];
 
-    expect(trimSections(sections)).toEqual([
-      { ...sections[0], rows: [rowA1, rowA2], trimmedRows: trimmedA },
-      { ...sections[1], rows: [rowB1, rowB2, rowB3], trimmedRows: trimmedB },
+    expect(trimSections(sections)).toMatchObject([
+      {
+        ...sections[0],
+        rows: { aboveFold: [rowA1, rowA2], belowFold: dropId(trimmedA) },
+      },
+      {
+        ...sections[1],
+        rows: { aboveFold: [rowB1, rowB2, rowB3], belowFold: dropId(trimmedB) },
+      },
     ]);
   });
 
@@ -41,23 +55,25 @@ describe("trimSections", () => {
     const [rowB1, rowB2, rowB3, rowB4, ...trimmedB] = rowsB;
 
     const sections = [
-      normalSection.build({
+      buildFoldedSection({
         layout: { base: 2 },
         rows: departureRow.buildList(3),
       }),
-      normalSection.build({ layout: { base: 2 }, rows: rowsB }),
-      normalSection.build({
+      buildFoldedSection({ layout: { base: 2 }, rows: rowsB }),
+      buildFoldedSection({
         layout: { base: 2 },
         rows: departureRow.buildList(2),
       }),
     ];
 
-    expect(trimSections(sections)).toEqual([
+    expect(trimSections(sections)).toMatchObject([
       { ...sections[0] },
       {
         ...sections[1],
-        rows: [rowB1, rowB2, rowB3, rowB4],
-        trimmedRows: trimmedB,
+        rows: {
+          aboveFold: [rowB1, rowB2, rowB3, rowB4],
+          belowFold: dropId(trimmedB),
+        },
       },
       { ...sections[2] },
     ]);
@@ -68,16 +84,19 @@ describe("trimSections", () => {
     const [rowA1, rowA2, ...trimmedA] = rowsA;
 
     const sections = [
-      normalSection.build({ layout: { min: 1, base: null }, rows: rowsA }),
-      normalSection.build({
+      buildFoldedSection({ layout: { min: 1, base: null }, rows: rowsA }),
+      buildFoldedSection({
         layout: { min: 1, base: 2 },
         rows: departureRow.buildList(2),
       }),
     ];
 
-    expect(trimSections(sections)).toEqual([
-      { ...sections[0], rows: [rowA1, rowA2], trimmedRows: trimmedA },
-      { ...sections[1] },
+    expect(trimSections(sections)).toMatchObject([
+      {
+        ...sections[0],
+        rows: { aboveFold: [rowA1, rowA2], belowFold: dropId(trimmedA) },
+      },
+      sections[1],
     ]);
   });
 
@@ -86,27 +105,30 @@ describe("trimSections", () => {
     const [rowA1, rowA2, ...trimmedA] = rowsA;
 
     const sections = [
-      normalSection.build({ layout: { min: 1 }, rows: rowsA }),
-      normalSection.build({
+      buildFoldedSection({ layout: { min: 1 }, rows: rowsA }),
+      buildFoldedSection({
         layout: { min: 3 },
         rows: departureRow.buildList(3),
       }),
-      normalSection.build({
+      buildFoldedSection({
         layout: { min: 1 },
         rows: departureRow.buildList(2),
       }),
     ];
 
-    expect(trimSections(sections)).toEqual([
-      { ...sections[0], rows: [rowA1, rowA2], trimmedRows: trimmedA },
-      { ...sections[1] },
-      { ...sections[2] },
+    expect(trimSections(sections)).toMatchObject([
+      {
+        ...sections[0],
+        rows: { aboveFold: [rowA1, rowA2], belowFold: dropId(trimmedA) },
+      },
+      sections[1],
+      sections[2],
     ]);
   });
 
   test("returns the original array if no sections are over their `min`", () => {
     const sections = [
-      normalSection.build({
+      buildFoldedSection({
         layout: { min: 2 },
         rows: departureRow.buildList(2),
       }),
@@ -122,10 +144,10 @@ describe("trimSections", () => {
     const partialRow = { ...row, times_with_crowding: [time1, time2] };
     const trimmedRow = { ...row, times_with_crowding: trimmedTimes };
 
-    const sections = [normalSection.build({ rows: [row] })];
+    const sections = [buildFoldedSection({ rows: [row] })];
 
-    expect(trimSections(sections)).toEqual([
-      { ...sections[0], rows: [partialRow], trimmedRows: [trimmedRow] },
+    expect(trimSections(sections)).toMatchObject([
+      { rows: { aboveFold: [partialRow], belowFold: dropId([trimmedRow]) } },
     ]);
   });
 });

@@ -4,7 +4,7 @@ import Arrow45 from "Images/svgr_bundled/Arrow-45-no-padding.svg";
 
 type CardinalDirection = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
 
-interface Props {
+export interface Props {
   title: string | null;
   arrow: CardinalDirection | null;
 }

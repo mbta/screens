@@ -37,6 +37,7 @@ const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
 
   useEffect(() => {
     if (departures.length < 2) return;
+
     const pageDurationMs = Math.min(
       MAX_PAGE_RATE_MS,
       refreshRateMs / departures.length,

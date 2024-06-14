@@ -9,7 +9,7 @@ import weakKey from "weak-key";
 
 import NormalSection from "./normal_section";
 import NoticeSection from "./notice_section";
-import { Section, trimSections, toSectionWithLaterRows } from "./section";
+import { Section, trimSections, toFoldedSection } from "./section";
 
 import { warn } from "Util/sentry";
 import { hasOverflowY } from "Util/util";
@@ -20,37 +20,34 @@ type NormalDepartures = {
 
 const NormalDepartures: ComponentType<NormalDepartures> = ({ sections }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const sectionsWithLaterRows = useMemo(
-    () => sections.map(toSectionWithLaterRows),
+  const initialSections = useMemo(
+    () => sections.map(toFoldedSection),
     [sections],
   );
-  const [trimmedSections, setTrimmedSections] = useState(sectionsWithLaterRows);
+  const [foldedSections, setFoldedSections] = useState(initialSections);
 
-  // Restart trimming if the sections prop is changed (i.e. new data).
-  useLayoutEffect(
-    () => setTrimmedSections(sectionsWithLaterRows),
-    [sectionsWithLaterRows],
-  );
+  // Restart trimming if the original sections are changed (i.e. new data).
+  useLayoutEffect(() => setFoldedSections(initialSections), [initialSections]);
 
   // Iteratively trim sections until the container doesn't overflow.
   useLayoutEffect(() => {
     if (hasOverflowY(ref)) {
-      const newSections = trimSections(trimmedSections);
+      const newSections = trimSections(foldedSections);
 
-      if (trimmedSections != newSections) {
-        setTrimmedSections(newSections);
+      if (foldedSections != newSections) {
+        setFoldedSections(newSections);
       } else {
         warn("layout failed: departures will overflow");
       }
     }
-  }, [trimmedSections]);
+  }, [foldedSections]);
 
   return (
     <div className="departures-container" ref={ref}>
-      {trimmedSections.map((section) => {
+      {foldedSections.map((section) => {
         const key = weakKey(section);
 
-        if (section.type === "normal_section") {
+        if (section.type === "folded_section") {
           return <NormalSection {...section} key={key} />;
         } else {
           return <NoticeSection {...section} key={key} />;
