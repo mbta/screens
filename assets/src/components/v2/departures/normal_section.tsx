@@ -4,7 +4,7 @@ import weakKey from "weak-key";
 import DepartureRow from "./departure_row";
 import NoticeRow from "./notice_row";
 import Header, { type Props as HeaderProps } from "./header";
-import LaterDepartures from "./later_departures";
+import LaterDepartures, { MIN_LATER_DEPARTURES } from "./later_departures";
 
 export type Layout = {
   base: number | null;
@@ -51,7 +51,7 @@ const NormalSection: ComponentType<FoldedNormalSection> = ({
         }
       })}
 
-      {includeLater && belowFold.length > 0 && (
+      {includeLater && belowFold.length >= MIN_LATER_DEPARTURES && (
         <LaterDepartures rows={belowFold} />
       )}
     </div>
