@@ -14,6 +14,11 @@ import useRefreshRate from "Hooks/v2/use_refresh_rate";
 import DepartureRow from "./departure_row";
 import RoutePill from "./route_pill";
 
+// Breakpoint where folding departures into Later Departures is likely to save
+// space rather than take up more of it. Below this number of Later Departures,
+// the component is not used, even if enabled.
+export const MIN_LATER_DEPARTURES = 3;
+
 const MAX_LATER_DEPARTURES = 5;
 
 // "Magic" number carried over from Solari. Prevents a Later Departures
