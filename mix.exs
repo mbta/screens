@@ -77,7 +77,7 @@ defmodule Screens.MixProject do
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
       {:sentry, "~> 10.4"},
       {:retry, "~> 0.16.0"},
-      {:stream_data, "~> 0.5", only: :test},
+      {:stream_data, "~> 1.1", only: :test},
       {:memcachex, "~> 0.5.5"},
       {:aja, "~> 0.6.2"},
       {:telemetry_poller, "~> 0.4"},
