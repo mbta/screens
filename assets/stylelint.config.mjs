@@ -31,6 +31,10 @@ export default {
     // We use blank lines to separate "groups" of variables.
     "scss/dollar-variable-empty-line-before": null,
 
+    // Allow single-line comments without a blank line before them, as in the
+    // standard config for CSS. Interacts poorly with enforced property order.
+    "scss/double-slash-comment-empty-line-before": null,
+
     // Conflicts with Prettier, which breaks long lines involving operators by
     // putting operators at the ends of lines.
     "scss/operator-no-newline-after": null,
