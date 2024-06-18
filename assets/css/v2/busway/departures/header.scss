@@ -9,6 +9,7 @@
   font-size: 48px;
   text-transform: uppercase;
   letter-spacing: 3px;
+  white-space: pre-line; // Allow using embedded line breaks to control wrapping
   border-top: 4px solid $true-grey-70;
 
   &:not(:empty) {
