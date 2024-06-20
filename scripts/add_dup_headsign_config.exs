@@ -191,8 +191,8 @@ defmodule AddDUPHeadsignConfig do
       {not_informed, informed} = Enum.unzip(informed_and_not_informed)
 
       %{
-        informed: maybe_unwrap_stop_ids(informed),
-        not_informed: maybe_unwrap_stop_ids(not_informed),
+        informed: informed |> Enum.uniq() |> maybe_unwrap_stop_ids(),
+        not_informed: not_informed |> Enum.uniq() |> maybe_unwrap_stop_ids(),
         alert_headsign: alert_headsign(direction_id, headsigns_by_direction),
         headway_headsign: headway_headsign(direction_id, headsigns_by_direction)
       }
