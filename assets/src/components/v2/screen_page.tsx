@@ -11,7 +11,7 @@ const ScreenPage = ({ id }: Props) => {
   const screenId = id ?? (useParams() as { id: string }).id;
   return (
     <ScreenIDProvider id={screenId}>
-      <ScreenContainer id={screenId} />;
+      <ScreenContainer id={screenId} />
     </ScreenIDProvider>
   );
 };
