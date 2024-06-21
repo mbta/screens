@@ -27,14 +27,18 @@ defmodule AddDUPHeadsignConfig do
           using the `--headsign_0` and/or `--headsign_1` options.
 
 
+  NOTE: Pay extra attention when dealing with branching stations! You will likely
+  have to manually alter the sets of `informed` and `not_informed` stations to 
+  properly match match alerts for each possible branch / combination of branches.
+
   ## Usage
 
       ./scripts/add_dup_headsign_config.exs --help
 
       ./scripts/add_dup_headsign_config.exs --parent-station <parent_station>
                                             --route <route_id>
-                                           [--headsign_0 <direction_id 0 headsign override>]
-                                           [--headsign_1 <direction_id 1 headsign override>]
+                                           [--headsign-0 <direction_id 0 headsign override>]
+                                           [--headsign-1 <direction_id 1 headsign override>]
 
   """
   defmodule V3Api do
