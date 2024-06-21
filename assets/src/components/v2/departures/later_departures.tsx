@@ -56,40 +56,40 @@ const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
   }, [refreshRateMs, departures.length]);
 
   return (
-    <div
-      className="later-departures__carousel"
-      style={
-        {
-          "--later-departures-offset": currentDepartureIdx,
-        } as React.CSSProperties
-      }
-    >
-      {departures.map((departure, i) => (
-        <div className="later-departures" key={departure.id}>
-          <div className="later-departures__header" ref={ref}>
-            <h3>Later Departures</h3>
-            <ol>
-              {departures.map((d, j) => (
-                <li
-                  key={d.id}
-                  className={cx({
-                    "later-departures__route--selected": i === j,
-                  })}
-                >
-                  <RoutePill
-                    pill={d.route}
-                    outline={i !== j}
-                    useRouteAbbrev={true}
-                  />
-                </li>
-              ))}
-            </ol>
-          </div>
-          <div>
-            <DepartureRow {...departure} />
-          </div>
-        </div>
-      ))}
+    <div className="later-departures">
+      <div className="later-departures__header" ref={ref}>
+        <h3>Later Departures</h3>
+        <ol>
+          {departures.map((departure, index) => (
+            <li
+              key={departure.id}
+              className={cx({
+                "later-departures__route--selected":
+                  index === currentDepartureIdx,
+              })}
+            >
+              <RoutePill
+                pill={departure.route}
+                outline={index !== currentDepartureIdx}
+                useRouteAbbrev={true}
+              />
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div
+        className="later-departures__carousel"
+        style={
+          {
+            "--later-departures-offset": currentDepartureIdx,
+          } as React.CSSProperties
+        }
+      >
+        {departures.map((departure) => (
+          <DepartureRow key={departure.id} {...departure} />
+        ))}
+      </div>
     </div>
   );
 };
