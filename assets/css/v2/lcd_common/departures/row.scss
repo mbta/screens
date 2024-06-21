@@ -2,17 +2,6 @@
 .departures__notice-row {
   position: relative;
   padding-bottom: 30px;
-
-  &:not(:last-child)::after {
-    position: absolute;
-    bottom: 0;
-    left: 200px;
-    width: 848px;
-    height: 4px;
-    content: "";
-    background-color: #cccbc8;
-    border-radius: 2px;
-  }
 }
 
 .departures__notice-row {
