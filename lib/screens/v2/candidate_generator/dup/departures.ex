@@ -609,9 +609,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp get_route_pills_for_rotation(sections) do
     sections
-    |> Enum.flat_map(fn %{routes: routes} ->
-      Enum.map(routes, &Route.get_icon_or_color_from_route/1)
-    end)
+    |> Enum.flat_map(fn %{routes: routes} -> Enum.map(routes, &Route.icon/1) end)
     |> Enum.uniq()
   end
 end

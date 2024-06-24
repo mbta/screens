@@ -150,7 +150,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     [
       %{
         text: %FreeTextLine{
-          icon: if(route?, do: Route.get_icon_or_color_from_route(route?), else: nil),
+          icon: if(route?, do: Route.icon(route?), else: nil),
           text: ["No departures currently available"]
         }
       }

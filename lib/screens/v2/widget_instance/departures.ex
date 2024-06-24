@@ -109,7 +109,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   def serialize_section(%{type: :no_data_section, route: route}, _screen, _) do
     text = %FreeTextLine{
-      icon: Route.get_icon_or_color_from_route(route),
+      icon: Route.icon(route),
       text: ["Updates unavailable"]
     }
 
@@ -121,7 +121,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         _screen,
         is_only_section
       ) do
-    pill_color = Route.get_color_for_route(route)
+    pill_color = Route.color(route)
     layout = if is_only_section, do: :full_screen, else: :row
 
     formatted_route =
@@ -183,7 +183,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   def serialize_section(%{type: :overnight_section, routes: routes}, _, _) do
     route_pill =
       routes
-      |> Enum.map(&Route.get_icon_or_color_from_route/1)
+      |> Enum.map(&Route.icon/1)
       |> List.first()
 
     text = %FreeTextLine{
