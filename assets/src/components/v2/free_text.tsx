@@ -13,6 +13,7 @@ const textPills = [
   "green_c",
   "green_d",
   "green_e",
+  "mattapan",
 ];
 const iconPills = ["cr", "bus", "ferry"];
 
@@ -109,6 +110,7 @@ const TextRoutePill = ({ route }: { route: string }) => {
     green_c: "GL·C",
     green_d: "GL·D",
     green_e: "GL·E",
+    mattapan: "M",
   }[route];
 
   const branch = route.startsWith("green_") ? "branch" : "trunk";

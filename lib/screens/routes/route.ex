@@ -34,7 +34,7 @@ defmodule Screens.Routes.Route do
 
   @typep name_colors :: :blue | :green | :orange | :red | :silver
   @type color :: name_colors() | :purple | :teal | :yellow
-  @type icon :: name_colors() | :bus | :cr | :ferry
+  @type icon :: name_colors() | :bus | :cr | :ferry | :mattapan
 
   @spec by_id(id()) :: {:ok, t()} | :error
   def by_id(route_id) do
@@ -168,6 +168,7 @@ defmodule Screens.Routes.Route do
   def icon(%{id: "Boat-" <> _}), do: :ferry
   def icon(%{id: "CR-" <> _}), do: :cr
   def icon(%{id: "Green" <> _}), do: :green
+  def icon(%{id: "Mattapan"}), do: :mattapan
   def icon(%{id: "Orange"}), do: :orange
   def icon(%{id: "Red"}), do: :red
   def icon(%{id: id}) when id in @sl_route_ids, do: :silver
