@@ -151,11 +151,14 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
       :cr ->
         %{type: :icon, icon: :rail, color: :purple}
 
-      :silver ->
-        %{type: :text, text: "SL", color: :silver}
-
       :ferry ->
         %{type: :icon, icon: :boat, color: :teal}
+
+      :mattapan ->
+        %{type: :text, text: "M", color: :red}
+
+      :silver ->
+        %{type: :text, text: "SL", color: :silver}
 
       route_color ->
         pill = route_color |> to_string |> String.capitalize() |> do_serialize(%{})
