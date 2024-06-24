@@ -32,6 +32,10 @@ defmodule Screens.Routes.Route do
           optional(:limit) => pos_integer()
         }
 
+  @typep name_colors :: :blue | :green | :orange | :red | :silver
+  @type color :: name_colors() | :purple | :teal | :yellow
+  @type icon :: name_colors() | :bus | :cr | :ferry
+
   @spec by_id(id()) :: {:ok, t()} | :error
   def by_id(route_id) do
     case V3Api.get_json("routes/" <> route_id) do
@@ -138,28 +142,38 @@ defmodule Screens.Routes.Route do
   @spec route_ids(list(%{route_id: id(), active?: boolean()})) :: list(id())
   def route_ids(routes), do: Enum.map(routes, & &1.route_id)
 
-  def get_color_for_route(route_id, route_type \\ nil)
+  @spec color(id()) :: color()
+  @spec color(id(), RouteType.t() | nil) :: color()
+  def color(route_id, route_type \\ nil)
 
-  def get_color_for_route("Red", _), do: :red
-  def get_color_for_route("Mattapan", _), do: :red
-  def get_color_for_route("Orange", _), do: :orange
-  def get_color_for_route("Green" <> _, _), do: :green
-  def get_color_for_route("Blue", _), do: :blue
-  def get_color_for_route("CR-" <> _, _), do: :purple
-  def get_color_for_route("Boat-" <> _, _), do: :teal
+  def color("Red", _), do: :red
+  def color("Mattapan", _), do: :red
+  def color("Orange", _), do: :orange
+  def color("Green" <> _, _), do: :green
+  def color("Blue", _), do: :blue
+  def color("CR-" <> _, _), do: :purple
+  def color("Boat-" <> _, _), do: :teal
+  def color(route_id, _) when route_id in @sl_route_ids, do: :silver
+  def color(_, :rail), do: :purple
+  def color(_, :ferry), do: :teal
+  def color(_, _), do: :yellow
 
-  def get_color_for_route(route_id, _)
-      when route_id in @sl_route_ids,
-      do: :silver
-
-  def get_color_for_route(_, :rail), do: :purple
-  def get_color_for_route(_, :ferry), do: :teal
-  def get_color_for_route(_, _), do: :yellow
-
-  def get_icon_or_color_from_route(%{type: :rail}), do: :cr
-  def get_icon_or_color_from_route(%{short_name: "SL" <> _}), do: :silver
-  def get_icon_or_color_from_route(%{type: :bus}), do: :bus
-  def get_icon_or_color_from_route(%{type: :ferry}), do: :ferry
-  def get_icon_or_color_from_route(%{id: id}), do: get_color_for_route(id)
-  def get_icon_or_color_from_route(_), do: :yellow
+  @doc """
+  Returns an "icon", as understood by `FreeText` or `RoutePill.serialize_icon/1`, for a route.
+  Somewhat specific to "no service" or "no data" states where a single pill represents a group of
+  routes, hence all bus routes are `:bus`, all GL routes are `:green`, etc.
+  """
+  @spec icon(t()) :: icon()
+  def icon(%{id: "Blue"}), do: :blue
+  def icon(%{id: "Boat-" <> _}), do: :ferry
+  def icon(%{id: "CR-" <> _}), do: :cr
+  def icon(%{id: "Green" <> _}), do: :green
+  def icon(%{id: "Orange"}), do: :orange
+  def icon(%{id: "Red"}), do: :red
+  def icon(%{id: id}) when id in @sl_route_ids, do: :silver
+  def icon(%{short_name: "SL" <> _}), do: :silver
+  def icon(%{type: :bus}), do: :bus
+  def icon(%{type: :ferry}), do: :ferry
+  def icon(%{type: :rail}), do: :cr
+  def icon(_), do: :bus
 end

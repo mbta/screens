@@ -11,21 +11,21 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
           text: String.t(),
           route_abbrev: String.t() | nil,
           branches: [String.t()] | nil,
-          color: color()
+          color: Route.color()
         }
 
   @type icon_pill :: %{
           type: :icon,
           icon: icon(),
           route_abbrev: String.t() | nil,
-          color: color()
+          color: Route.color()
         }
 
   @type slashed_route_pill :: %{
           type: :slashed,
           part1: String.t(),
           part2: String.t(),
-          color: color()
+          color: Route.color()
         }
 
   @type audio_route :: %{
@@ -35,8 +35,6 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
         }
 
   @type icon :: :bus | :light_rail | :rail | :boat
-
-  @type color :: :red | :orange | :green | :blue | :purple | :yellow | :teal
 
   @cr_line_abbreviations %{
     "Haverhill" => "HVL",
@@ -78,7 +76,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
         })
       end
 
-    Map.put(route, :color, Route.get_color_for_route(route_id, route_type))
+    Map.put(route, :color, Route.color(route_id, route_type))
   end
 
   @spec serialize_for_audio_departure(Route.id(), String.t(), RouteType.t(), pos_integer() | nil) ::
@@ -124,7 +122,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   def serialize_route_for_alert(route_id, gl_long \\ true) do
     route = do_serialize(route_id, %{gl_long: gl_long, gl_branch: true})
 
-    Map.merge(route, %{color: Route.get_color_for_route(route_id)})
+    Map.merge(route, %{color: Route.color(route_id)})
   end
 
   def serialize_route_for_reconstructed_alert(route_id_group, opts \\ %{})
@@ -141,9 +139,10 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
 
   def serialize_route_for_reconstructed_alert({route_id, _}, opts) do
     route = do_serialize(route_id, opts)
-    Map.merge(route, %{color: Route.get_color_for_route(route_id)})
+    Map.merge(route, %{color: Route.color(route_id)})
   end
 
+  @spec serialize_icon(Route.icon()) :: t()
   def serialize_icon(icon) do
     case icon do
       :bus ->

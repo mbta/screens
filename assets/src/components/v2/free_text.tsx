@@ -3,8 +3,18 @@ import _ from "lodash";
 
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 
-const textPills = ["red", "blue", "orange", "green", "silver"];
-const iconPills = ["cr", "bus"];
+const textPills = [
+  "red",
+  "blue",
+  "orange",
+  "green",
+  "silver",
+  "green_b",
+  "green_c",
+  "green_d",
+  "green_e",
+];
+const iconPills = ["cr", "bus", "ferry"];
 
 const iconPaths: { [key: string]: string } = _.mapValues(
   {
