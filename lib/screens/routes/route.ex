@@ -71,24 +71,30 @@ defmodule Screens.Routes.Route do
         get_json_fn \\ &V3Api.get_json/2,
         fetch_routes_fn \\ &fetch_routes/3
       ) do
-    with {:ok, routes} <- fetch_routes_fn.(stop_id, get_json_fn, type_filters),
-         {:ok, active_route_ids} <- fetch_active_route_ids(stop_id, now, get_json_fn) do
-      active_set = MapSet.new(active_route_ids)
+    Screens.Telemetry.span(
+      ~w[screens routes route fetch_routes_by_stop]a,
+      %{stop_id: stop_id, type_filters: type_filters},
+      fn ->
+        with {:ok, routes} <- fetch_routes_fn.(stop_id, get_json_fn, type_filters),
+             {:ok, active_route_ids} <- fetch_active_route_ids(stop_id, now, get_json_fn) do
+          active_set = MapSet.new(active_route_ids)
 
-      routes_at_stop =
-        Enum.map(
-          routes,
-          &(&1
-            |> Map.from_struct()
-            |> Map.put(:active?, MapSet.member?(active_set, &1.id))
-            |> Map.put(:route_id, &1.id)
-            |> Map.delete(:id))
-        )
+          routes_at_stop =
+            Enum.map(
+              routes,
+              &(&1
+                |> Map.from_struct()
+                |> Map.put(:active?, MapSet.member?(active_set, &1.id))
+                |> Map.put(:route_id, &1.id)
+                |> Map.delete(:id))
+            )
 
-      {:ok, routes_at_stop}
-    else
-      :error -> :error
-    end
+          {:ok, routes_at_stop}
+        else
+          :error -> :error
+        end
+      end
+    )
   end
 
   defp format_query_param({:ids, ids}) when is_list(ids) do

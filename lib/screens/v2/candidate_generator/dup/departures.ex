@@ -211,49 +211,77 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          create_station_with_routes_map_fn,
          now
        ) do
-    sections
-    |> Task.async_stream(fn %Section{
-                              query: %Query{
-                                params: %Params{stop_ids: stop_ids} = params
-                              },
-                              headway: headway
-                            } = section ->
-      routes = get_routes_serving_section(params, create_station_with_routes_map_fn)
-      # DUP sections will always show no more than one mode.
-      # For subway, each route will have its own section.
-      # If the stop is served by two different subway/light rail routes, route_ids must be populated for each section
-      # Otherwise, we only need the first route in the list of routes serving the stop.
-      primary_route_for_section = List.first(routes)
+    Screens.Telemetry.span(
+      [:screens, :v2, :candidate_generator, :dup, :departures, :get_sections_data],
+      fn ->
+        ctx = Screens.Telemetry.context()
 
-      disabled_modes = Screens.Config.Cache.disabled_modes()
-
-      # If we know the predictions are unreliable, don't even bother fetching them.
-      if is_nil(primary_route_for_section) or primary_route_for_section.type in disabled_modes do
-        %{type: :no_data_section, route: primary_route_for_section}
-      else
-        section_departures =
-          case Widgets.Departures.fetch_section_departures(
-                 section,
-                 disabled_modes,
-                 fetch_departures_fn
-               ) do
-            {:ok, departures} -> departures
-            :error -> []
-          end
-
-        alert_informed_entities = get_section_entities(params, fetch_alerts_fn, now)
-
-        %{
-          departures: section_departures,
-          alert_informed_entities: alert_informed_entities,
-          headway: headway,
-          stop_ids: stop_ids,
-          routes: routes,
-          params: params
-        }
+        sections
+        |> Task.async_stream(
+          &get_section_data(
+            &1,
+            fetch_departures_fn,
+            fetch_alerts_fn,
+            create_station_with_routes_map_fn,
+            now,
+            ctx
+          )
+        )
+        |> Enum.map(fn {:ok, data} -> data end)
       end
-    end)
-    |> Enum.map(fn {:ok, data} -> data end)
+    )
+  end
+
+  defp get_section_data(
+         %Section{query: %Query{params: %Params{stop_ids: stop_ids} = params}, headway: headway} =
+           section,
+         fetch_departures_fn,
+         fetch_alerts_fn,
+         create_station_with_routes_map_fn,
+         now,
+         ctx
+       ) do
+    Screens.Telemetry.span(
+      [:screens, :v2, :candidate_generator, :dup, :departures, :get_section_data],
+      ctx,
+      fn ->
+        routes = get_routes_serving_section(params, create_station_with_routes_map_fn)
+        # DUP sections will always show no more than one mode.
+        # For subway, each route will have its own section.
+        # If the stop is served by two different subway/light rail routes, route_ids must be populated for each section
+        # Otherwise, we only need the first route in the list of routes serving the stop.
+        primary_route_for_section = List.first(routes)
+
+        disabled_modes = Screens.Config.Cache.disabled_modes()
+
+        # If we know the predictions are unreliable, don't even bother fetching them.
+        if is_nil(primary_route_for_section) or
+             primary_route_for_section.type in disabled_modes do
+          %{type: :no_data_section, route: primary_route_for_section}
+        else
+          section_departures =
+            case Widgets.Departures.fetch_section_departures(
+                   section,
+                   disabled_modes,
+                   fetch_departures_fn
+                 ) do
+              {:ok, departures} -> departures
+              :error -> []
+            end
+
+          alert_informed_entities = get_section_entities(params, fetch_alerts_fn, now)
+
+          %{
+            departures: section_departures,
+            alert_informed_entities: alert_informed_entities,
+            headway: headway,
+            stop_ids: stop_ids,
+            routes: routes,
+            params: params
+          }
+        end
+      end
+    )
   end
 
   defp get_section_route_from_entities(
