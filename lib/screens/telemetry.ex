@@ -68,7 +68,15 @@ defmodule Screens.Telemetry do
   end
 
   def context do
-    %{correlation_id: get_correlation_id(), parent_id: get_parent_span_id()}
+    ctx = %{correlation_id: get_correlation_id(), parent_id: get_parent_span_id()}
+    request_id = Process.get(:request_id) || Logger.metadata()[:request_id]
+
+    if request_id do
+      Process.put(:request_id, request_id)
+      Map.put(ctx, :request_id, request_id)
+    else
+      ctx
+    end
   end
 
   def generate_span_id do
@@ -107,7 +115,7 @@ defmodule Screens.Telemetry do
     end
   end
 
-  @default_metadata ~w[span_id parent_id correlation_id]a
+  @default_metadata ~w[span_id parent_id correlation_id request_id]a
   @default_measurements ~w[duration]a
 
   defp handle_span(name, config \\ []) when is_list(name) do
