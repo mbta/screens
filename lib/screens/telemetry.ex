@@ -89,13 +89,14 @@ defmodule Screens.Telemetry do
     metadata = Map.take(metadata, Map.get(config, :metadata, []))
 
     Logger.info(fn ->
-      [
-        "[#{Enum.join(name, ".")}]",
-        " ",
-        to_log_iodata(metadata),
-        " ",
-        to_log_iodata(measurements)
-      ]
+      measurements =
+        Map.replace_lazy(
+          measurements,
+          :duration,
+          &:erlang.convert_time_unit(&1, :native, :millisecond)
+        )
+
+      ["event=", Enum.join(name, "."), " ", to_log(metadata), " ", to_log(measurements)]
     end)
   end
 
@@ -145,9 +146,9 @@ defmodule Screens.Telemetry do
     {Enum.join(name, "."), events, config}
   end
 
-  defp to_log_iodata(enum) do
+  defp to_log(enum) do
     for {k, v} <- enum do
-      [to_string(k), "=", to_string(v)]
+      [to_string(k), "=", inspect(v)]
     end
     |> Enum.intersperse(" ")
   end
