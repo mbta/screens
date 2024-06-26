@@ -29,39 +29,49 @@ defmodule Screens.V3Api do
         do: headers,
         else: headers ++ [{"if-modified-since", elem(cached_response, 1)}]
 
-    with {:http_request, {:ok, response}} <-
-           {:http_request,
-            HTTPoison.get(
-              url,
-              headers,
-              Keyword.merge(@default_opts, opts)
-            )},
-         {:response_success, %{status_code: 200, body: body, headers: headers}} <-
-           {:response_success, response},
-         {:parse, {:ok, parsed}} <- {:parse, Jason.decode(body)} do
-      update_response_cache(url, parsed, headers)
+    ctx = Screens.Telemetry.context()
 
-      {:ok, parsed}
-    else
-      {:http_request, e} ->
-        {:error, httpoison_error} = e
+    meta =
+      Map.merge(ctx, %{
+        cached: cached_response != nil,
+        url: url
+      })
 
-        log_api_error({:http_fetch_error, e}, url, message: Exception.message(httpoison_error))
+    Screens.Telemetry.span([:screens, :v3_api, :get_json], meta, fn ->
+      with {:http_request, {:ok, response}} <-
+             {:http_request,
+              HTTPoison.get(
+                url,
+                headers,
+                Keyword.merge(@default_opts, opts)
+              )},
+           {:response_success, %{status_code: 200, body: body, headers: headers}} <-
+             {:response_success, response},
+           {:parse, {:ok, parsed}} <- {:parse, Jason.decode(body)} do
+        update_response_cache(url, parsed, headers)
 
-      {:response_success, %{status_code: 304}} ->
-        {:ok, elem(cached_response, 0)}
+        {:ok, parsed}
+      else
+        {:http_request, e} ->
+          {:error, httpoison_error} = e
 
-      {:response_success, %{status_code: status_code}} = response ->
-        _ = log_api_error({:bad_response_code, response}, url, status_code: status_code)
+          log_api_error({:http_fetch_error, e}, url, message: Exception.message(httpoison_error))
 
-        :bad_response_code
+        {:response_success, %{status_code: 304}} ->
+          {:ok, elem(cached_response, 0)}
 
-      {:parse, {:error, e}} ->
-        log_api_error({:parse_error, e}, url)
+        {:response_success, %{status_code: status_code}} = response ->
+          _ = log_api_error({:bad_response_code, response}, url, status_code: status_code)
 
-      e ->
-        log_api_error({:error, e}, url)
-    end
+          :bad_response_code
+
+        {:parse, {:error, e}} ->
+          log_api_error({:parse_error, e}, url)
+
+        e ->
+          log_api_error({:error, e}, url)
+      end
+    end)
   end
 
   defp update_response_cache(url, response, headers) do

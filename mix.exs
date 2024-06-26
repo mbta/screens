@@ -81,6 +81,7 @@ defmodule Screens.MixProject do
       {:stream_data, "~> 1.1", only: :test},
       {:memcachex, "~> 0.5.5"},
       {:aja, "~> 0.6.2"},
+      {:telemetry, "~> 1.2"},
       {:telemetry_poller, "~> 0.4"},
       {:telemetry_metrics, "~> 0.4"},
       {:screens_config,

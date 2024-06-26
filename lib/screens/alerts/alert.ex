@@ -172,18 +172,20 @@ defmodule Screens.Alerts.Alert do
 
   @spec fetch(keyword()) :: {:ok, list(t())} | :error
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
-    params =
-      opts
-      |> Enum.flat_map(&format_query_param/1)
-      |> Enum.into(%{})
+    Screens.Telemetry.span([:screens, :alerts, :alert, :fetch], fn ->
+      params =
+        opts
+        |> Enum.flat_map(&format_query_param/1)
+        |> Enum.into(%{})
 
-    case get_json_fn.("alerts", params) do
-      {:ok, result} ->
-        {:ok, Screens.Alerts.Parser.parse_result(result)}
+      case get_json_fn.("alerts", params) do
+        {:ok, result} ->
+          {:ok, Screens.Alerts.Parser.parse_result(result)}
 
-      _ ->
-        :error
-    end
+        _ ->
+          :error
+      end
+    end)
   end
 
   @doc """

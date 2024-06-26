@@ -338,14 +338,16 @@ defmodule Screens.Stops.Stop do
   end
 
   def fetch_stop_name(stop_id) do
-    case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do
-      {:ok, %{"data" => [stop_data]}} ->
-        %{"attributes" => %{"name" => stop_name}} = stop_data
-        stop_name
+    Screens.Telemetry.span(~w[screens stops stop fetch_stop_name]a, %{stop_id: stop_id}, fn ->
+      case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do
+        {:ok, %{"data" => [stop_data]}} ->
+          %{"attributes" => %{"name" => stop_name}} = stop_data
+          stop_name
 
-      _ ->
-        nil
-    end
+        _ ->
+          nil
+      end
+    end)
   end
 
   def fetch_parent_stop_id(stop_id) do
@@ -454,31 +456,37 @@ defmodule Screens.Stops.Stop do
           DateTime.t()
         ) :: {:ok, LocationContext.t()} | :error
   def fetch_location_context(app, stop_id, now) do
-    with alert_route_types <- get_route_type_filter(app, stop_id),
-         {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, alert_route_types),
-         {:ok, tagged_stop_sequences} <-
-           fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop) do
-      stop_name = fetch_stop_name(stop_id)
-      stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+    Screens.Telemetry.span(
+      ~w[screens stops stop fetch_location_context]a,
+      %{app: app, stop_id: stop_id},
+      fn ->
+        with alert_route_types <- get_route_type_filter(app, stop_id),
+             {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, alert_route_types),
+             {:ok, tagged_stop_sequences} <-
+               fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop) do
+          stop_name = fetch_stop_name(stop_id)
+          stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
 
-      {:ok,
-       %LocationContext{
-         home_stop: stop_id,
-         home_stop_name: stop_name,
-         tagged_stop_sequences: tagged_stop_sequences,
-         upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
-         downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
-         routes: routes_at_stop,
-         alert_route_types: alert_route_types
-       }}
-    else
-      :error ->
-        Logger.error(
-          "[fetch_location_context fetch error] Failed to get location context for an alert: stop_id=#{stop_id}"
-        )
+          {:ok,
+           %LocationContext{
+             home_stop: stop_id,
+             home_stop_name: stop_name,
+             tagged_stop_sequences: tagged_stop_sequences,
+             upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
+             downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
+             routes: routes_at_stop,
+             alert_route_types: alert_route_types
+           }}
+        else
+          :error ->
+            Logger.error(
+              "[fetch_location_context fetch error] Failed to get location context for an alert: stop_id=#{stop_id}"
+            )
 
-        :error
-    end
+            :error
+        end
+      end
+    )
   end
 
   # Returns the route types we care about for the alerts of this screen type / place
