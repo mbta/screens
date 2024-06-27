@@ -1270,11 +1270,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
   def valid_candidate?(%__MODULE__{} = t) do
-    suppressed =
-      t.alert.id in ["549108", "555079", "555080"] and
-        t.location_context.home_stop === "place-gover"
-
-    not suppressed
+    t.alert.id not in ["197140", "580015"]
   end
 
   defimpl Screens.V2.WidgetInstance do
