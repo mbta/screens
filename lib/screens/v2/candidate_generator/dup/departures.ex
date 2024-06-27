@@ -235,7 +235,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           {:exit, reason} ->
             ctx =
               Screens.Telemetry.context()
-              |> Enum.map_join(" ", fn {k, v} -> "#{k}=#{v}" end)
+              |> to_log()
 
             Logger.error(["event=get_section_data.exit reason=#{reason} ", ctx])
             raise "Failed to get section data"
@@ -651,5 +651,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     sections
     |> Enum.flat_map(fn %{routes: routes} -> Enum.map(routes, &Route.icon/1) end)
     |> Enum.uniq()
+  end
+
+  defp to_log(map) do
+    Enum.map_join(map, " ", fn {k, v} -> "#{k}=#{v}" end)
   end
 end
