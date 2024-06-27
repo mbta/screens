@@ -225,9 +225,21 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
             create_station_with_routes_map_fn,
             now,
             ctx
-          )
+          ),
+          on_timeout: :kill_task
         )
-        |> Enum.map(fn {:ok, data} -> data end)
+        |> Enum.flat_map(fn
+          {:ok, data} ->
+            [data]
+
+          {:exit, reason} ->
+            ctx =
+              Screens.Telemetry.context()
+              |> Enum.map_join(" ", fn {k, v} -> "#{k}=#{v}" end)
+
+            Logger.error(["event=get_section_data.exit reason=#{reason} ", ctx])
+            []
+        end)
       end
     )
   end
