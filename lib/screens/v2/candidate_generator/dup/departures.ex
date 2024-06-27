@@ -228,9 +228,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           ),
           on_timeout: :kill_task
         )
-        |> Enum.flat_map(fn
+        |> Enum.map(fn
           {:ok, data} ->
-            [data]
+            data
 
           {:exit, reason} ->
             ctx =
@@ -238,7 +238,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
               |> Enum.map_join(" ", fn {k, v} -> "#{k}=#{v}" end)
 
             Logger.error(["event=get_section_data.exit reason=#{reason} ", ctx])
-            []
+            raise "Failed to get section data"
         end)
       end
     )
