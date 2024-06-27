@@ -13,33 +13,26 @@ defmodule Screens.Telemetry do
   def init(_) do
     handlers = [
       # V3 API
-      log_span(~w[screens v3_api get_json]a, metadata: ~w[url cached]a),
+      handle_span(~w[screens v3_api get_json]a, metadata: ~w[url cached]a),
       # Stops
-      log_span(~w[screens stops stop fetch_stop_name]a, metadata: ~w[stop_id]),
-      log_span(~w[screens stops stop fetch_location_context]a, metadata: ~w[app stop_id]),
+      handle_span(~w[screens stops stop fetch_stop_name]a, metadata: ~w[stop_id]),
+      handle_span(~w[screens stops stop fetch_location_context]a, metadata: ~w[app stop_id]),
       # Alerts
-      log_span(~w[screens alerts alert fetch]a),
+      handle_span(~w[screens alerts alert fetch]a),
       # Routes
-      log_span(~w[screens routes route fetch_routes_by_stop]a,
+      handle_span(~w[screens routes route fetch_routes_by_stop]a,
         metadata: ~w[stop_id type_filters]a
       ),
       # DUP Candidate Generator
-      log_span(~w[screens v2 candidate_generator dup departures_instances]a),
-      log_span(~w[screens v2 candidate_generator dup departures get_section_data]a),
-      log_span(~w[screens v2 candidate_generator dup departures get_sections_data]a),
-      log_span(~w[screens v2 candidate_generator dup header_instances]a),
-      log_span(~w[screens v2 candidate_generator dup alerts_instances]a),
-      log_span(~w[screens v2 candidate_generator dup evergreen_content_instances]a),
-
-      # events
-      log_event(~w[hackney_pool]a,
-        metadata: ~w[pool]a,
-        measurements: ~w[free_count in_use_count no_socket queue_count take_rate]a
-      )
+      handle_span(~w[screens v2 candidate_generator dup departures_instances]a),
+      handle_span(~w[screens v2 candidate_generator dup departures get_section_data]a),
+      handle_span(~w[screens v2 candidate_generator dup departures get_sections_data]a),
+      handle_span(~w[screens v2 candidate_generator dup header_instances]a),
+      handle_span(~w[screens v2 candidate_generator dup alerts_instances]a),
+      handle_span(~w[screens v2 candidate_generator dup evergreen_content_instances]a)
     ]
 
     for {name, event_names, config} <- handlers do
-      event_names = wrap_event_names(event_names)
       :ok = :telemetry.attach_many(name, event_names, &Screens.Telemetry.handle_event/4, config)
     end
 
@@ -126,25 +119,7 @@ defmodule Screens.Telemetry do
   @default_metadata ~w[span_id parent_id correlation_id request_id]a
   @default_measurements ~w[duration]a
 
-  defp log_span(name, config \\ []) when is_list(name) do
-    config = build_config(config)
-
-    events = [
-      name ++ [:start],
-      name ++ [:stop],
-      name ++ [:exception]
-    ]
-
-    {Enum.join(name, "."), events, config}
-  end
-
-  defp log_event(name, config) when is_list(name) do
-    config = build_config(config)
-
-    {Enum.join(name, "."), name, config}
-  end
-
-  defp build_config(config) do
+  defp handle_span(name, config \\ []) when is_list(name) do
     metadata =
       config
       |> Keyword.get(:metadata, [])
@@ -157,10 +132,18 @@ defmodule Screens.Telemetry do
       |> Enum.concat(@default_measurements)
       |> Enum.uniq()
 
-    %{
+    config = %{
       metadata: metadata,
       measurements: measurements
     }
+
+    events = [
+      name ++ [:start],
+      name ++ [:stop],
+      name ++ [:exception]
+    ]
+
+    {Enum.join(name, "."), events, config}
   end
 
   defp to_log(enum) do
@@ -169,7 +152,4 @@ defmodule Screens.Telemetry do
     end
     |> Enum.intersperse(" ")
   end
-
-  defp wrap_event_names([[_ | _] | _] = event_names), do: event_names
-  defp wrap_event_names(event_names), do: [event_names]
 end
