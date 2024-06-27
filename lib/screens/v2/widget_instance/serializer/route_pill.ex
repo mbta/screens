@@ -1,6 +1,8 @@
 defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   @moduledoc false
 
+  require Logger
+
   alias Screens.Routes.Route
   alias Screens.RouteType
 
@@ -37,18 +39,19 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   @type icon :: :bus | :light_rail | :rail | :boat
 
   @cr_line_abbreviations %{
-    "Haverhill" => "HVL",
-    "Newburyport" => "NBP",
-    "Lowell" => "LWL",
-    "Fitchburg" => "FBG",
-    "Worcester" => "WOR",
-    "Needham" => "NDM",
-    "Franklin" => "FRK",
-    "Providence" => "PVD",
     "Fairmount" => "FMT",
-    "Middleborough" => "MID",
+    "Fitchburg" => "FBG",
+    "Foxboro" => "FOX",
+    "Franklin" => "FRK",
+    "Greenbush" => "GRB",
+    "Haverhill" => "HVL",
     "Kingston" => "KNG",
-    "Greenbush" => "GRB"
+    "Lowell" => "LWL",
+    "Middleborough" => "MID",
+    "Needham" => "NDM",
+    "Newburyport" => "NBP",
+    "Providence" => "PVD",
+    "Worcester" => "WOR"
   }
 
   @special_bus_route_names %{
@@ -201,7 +204,13 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   defp do_serialize("Blue", _), do: %{type: :text, text: "BL"}
 
   defp do_serialize("CR-" <> line, opts) do
-    base = %{route_abbrev: Map.fetch!(@cr_line_abbreviations, line)}
+    abbreviation =
+      Map.get_lazy(@cr_line_abbreviations, line, fn ->
+        Logger.warning("missing route pill abbreviation for CR-" <> line)
+        nil
+      end)
+
+    base = %{route_abbrev: abbreviation}
 
     if track_number = opts[:track_number],
       do: Map.merge(base, %{type: :text, text: "TR#{track_number}"}),
