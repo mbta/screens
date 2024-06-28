@@ -410,7 +410,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %{
       issue: "No trains",
       remedy: "Seek alternate route",
-      location: %{text: ["No #{route_id} Line trains " | format_endpoint_string(endpoints)]},
+      location: %{
+        text: ["No #{route_id} Line trains " | format_endpoint_string(endpoints, true)]
+      },
       endpoints: endpoints,
       cause: format_cause(cause),
       routes: get_route_pills(t),
@@ -437,7 +439,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       remedy: "Use shuttle bus",
       location: %{
         text: [
-          "Shuttle buses replace #{route_id} Line trains " | format_endpoint_string(endpoints)
+          "Shuttle buses replace #{route_id} Line trains "
+          | format_endpoint_string(endpoints, true)
         ]
       },
       endpoints: endpoints,
@@ -546,7 +549,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       if location in [:downstream, :upstream] do
         {"No trains", nil}
       else
-        endpoint_text = format_endpoint_string(endpoints)
+        endpoint_text = format_endpoint_string(endpoints, true)
 
         location_text =
           if is_nil(endpoint_text),
@@ -609,7 +612,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       if location in [:downstream, :upstream] do
         {"No trains", nil, "Shuttle buses available"}
       else
-        endpoint_text = format_endpoint_string(endpoints)
+        endpoint_text = format_endpoint_string(endpoints, true)
 
         location_text =
           if is_nil(endpoint_text), do: nil, else: %{text: ["Shuttle buses " | endpoint_text]}
@@ -1173,19 +1176,31 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     includes_glx and not includes_west_of_copley
   end
 
-  def format_endpoint_string(nil), do: nil
+  @spec format_endpoint_string(nil | {String.t(), String.t()}) ::
+          nil | list(FreeText.t()) | String.t()
+  def format_endpoint_string(stations, prevent_line_wrap \\ false)
 
-  def format_endpoint_string({station, station}) do
-    ["at ", %{text: station, format: :nowrap}]
+  def format_endpoint_string(nil, _), do: nil
+
+  def format_endpoint_string({station, station}, prevent_line_wrap) do
+    if prevent_line_wrap do
+      ["at ", %{text: station, format: :nowrap}]
+    else
+      "at #{station}"
+    end
   end
 
-  def format_endpoint_string({min_station, max_station}) do
-    [
-      "between ",
-      %{text: min_station, format: :nowrap},
-      " and ",
-      %{text: max_station, format: :nowrap}
-    ]
+  def format_endpoint_string({min_station, max_station}, prevent_line_wrap) do
+    if prevent_line_wrap do
+      [
+        "between ",
+        %{text: min_station, format: :nowrap},
+        " and ",
+        %{text: max_station, format: :nowrap}
+      ]
+    else
+      "between #{min_station} and #{max_station}"
+    end
   end
 
   def serialize(widget, log_fn \\ &Logger.warning/1)
