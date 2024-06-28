@@ -1,9 +1,9 @@
 defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
   use ScreensWeb, :view
 
-  alias ScreensConfig.V2.FreeTextLine
   alias Screens.Alerts.Alert
   alias Screens.Util
+  alias ScreensConfig.V2.FreeTextLine
 
   def render("_widget.ssml", alert) do
     ~E|<p><%= render_banner(alert) %><%= render_alert(alert) %></p>|
@@ -223,8 +223,8 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
   defp render_cause(cause), do: " #{Alert.get_cause_string(cause)}"
 
   defp issue_to_string(%{text: _} = issue) do
-    issueFreeText = struct(FreeTextLine, issue)
-    FreeTextLine.to_plaintext(issueFreeText)
+    issue_free_text = struct(FreeTextLine, issue)
+    FreeTextLine.to_plaintext(issue_free_text)
   end
 
   defp issue_to_string(issue), do: issue
