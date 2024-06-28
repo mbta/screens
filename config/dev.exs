@@ -11,7 +11,7 @@ config :screens, ScreensWeb.Endpoint,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
-  watchers: [npm: ["run", "watch", cd: "assets"]]
+  watchers: [npx: ["exit_on_eof", "npm run watch", cd: "assets"]]
 
 config :screens,
   default_api_v3_url: System.get_env("API_V3_URL", "https://api-v3.mbta.com/"),
