@@ -1270,7 +1270,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
   def valid_candidate?(%__MODULE__{} = t) do
-    t.alert.id not in ["197140", "580015"]
+    test_alert_ids = ["197140"]
+    prod_alert_ids = ["580015"]
+    t.alert.id not in (test_alert_ids ++ prod_alert_ids)
   end
 
   defimpl Screens.V2.WidgetInstance do
