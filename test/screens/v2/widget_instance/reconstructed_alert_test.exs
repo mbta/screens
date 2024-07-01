@@ -536,16 +536,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_full_screen(true)
 
       expected = %{
-        issue: %{text: ["No trains to ", %{format: :nowrap, text: "Forest Hills"}]},
-        location: %{
-          text: [
-            "No Orange Line trains ",
-            "between ",
-            %{format: :nowrap, text: "Malden Center"},
-            " and ",
-            %{format: :nowrap, text: "Wellington"}
-          ]
-        },
+        issue: "No trains to Forest Hills",
+        location: "No Orange Line trains between Malden Center and Wellington",
         cause: nil,
         effect: :suspension,
         remedy: "Seek alternate route",
@@ -584,16 +576,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_full_screen(true)
 
       expected = %{
-        issue: %{text: ["No trains to ", %{format: :nowrap, text: "Forest Hills"}]},
-        location: %{
-          text: [
-            "Shuttle buses ",
-            "between ",
-            %{format: :nowrap, text: "Wellington"},
-            " and ",
-            %{format: :nowrap, text: "Assembly"}
-          ]
-        },
+        issue: "No trains to Forest Hills",
+        location: "Shuttle buses between Wellington and Assembly",
         cause: nil,
         effect: :shuttle,
         remedy: "Use shuttle bus",
@@ -671,16 +655,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_full_screen(true)
 
       expected = %{
-        issue: %{text: ["No trains to ", %{format: :nowrap, text: "Forest Hills"}]},
-        location: %{
-          text: [
-            "No Orange Line trains ",
-            "between ",
-            %{format: :nowrap, text: "Wellington"},
-            " and ",
-            %{format: :nowrap, text: "Assembly"}
-          ]
-        },
+        issue: "No trains to Forest Hills",
+        location: "No Orange Line trains between Wellington and Assembly",
         cause: :construction,
         effect: :suspension,
         remedy: "Seek alternate route",
@@ -720,15 +696,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected = %{
         issue: "No trains",
-        location: %{
-          text: [
-            "No Orange Line trains ",
-            "between ",
-            %{format: :nowrap, text: "Oak Grove"},
-            " and ",
-            %{format: :nowrap, text: "Malden Center"}
-          ]
-        },
+        location: "No Orange Line trains between Oak Grove and Malden Center",
         cause: nil,
         effect: :suspension,
         remedy: "Seek alternate route",
@@ -766,15 +734,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected = %{
         issue: "No trains",
-        location: %{
-          text: [
-            "Shuttle buses replace Orange Line trains ",
-            "between ",
-            %{format: :nowrap, text: "Oak Grove"},
-            " and ",
-            %{format: :nowrap, text: "Malden Center"}
-          ]
-        },
+        location: "Shuttle buses replace Orange Line trains between Oak Grove and Malden Center",
         cause: nil,
         effect: :shuttle,
         remedy: "Use shuttle bus",
@@ -814,16 +774,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_full_screen(true)
 
       expected = %{
-        issue: %{text: ["No trains to ", %{format: :nowrap, text: "Oak Grove"}]},
-        location: %{
-          text: [
-            "No Orange Line trains ",
-            "between ",
-            %{format: :nowrap, text: "Oak Grove"},
-            " and ",
-            %{format: :nowrap, text: "Malden Center"}
-          ]
-        },
+        issue: "No trains to Oak Grove",
+        location: "No Orange Line trains between Oak Grove and Malden Center",
         cause: nil,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :suspension,
@@ -861,16 +813,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_full_screen(true)
 
       expected = %{
-        issue: %{text: ["No trains to ", %{format: :nowrap, text: "Oak Grove"}]},
-        location: %{
-          text: [
-            "Shuttle buses ",
-            "between ",
-            %{format: :nowrap, text: "Oak Grove"},
-            " and ",
-            %{format: :nowrap, text: "Malden Center"}
-          ]
-        },
+        issue: "No trains to Oak Grove",
+        location: "Shuttle buses between Oak Grove and Malden Center",
         cause: nil,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :shuttle,
@@ -1159,15 +1103,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         endpoints: {"Haymarket", "Chinatown"},
         is_transfer_station: true,
         issue: "No Orange Line trains",
-        location: %{
-          text: [
-            "No Orange Line trains ",
-            "between ",
-            %{format: :nowrap, text: "Haymarket"},
-            " and ",
-            %{format: :nowrap, text: "Chinatown"}
-          ]
-        },
+        location: "No Orange Line trains between Haymarket and Chinatown",
         region: :here,
         remedy: "Seek alternate route",
         routes: [%{route_id: "Orange", svg_name: "ol"}],
@@ -1207,15 +1143,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No Orange Line trains",
         remedy: "Use shuttle bus",
         cause: nil,
-        location: %{
-          text: [
-            "Shuttle buses ",
-            "between ",
-            %{format: :nowrap, text: "State"},
-            " and ",
-            %{format: :nowrap, text: "Chinatown"}
-          ]
-        },
+        location: "Shuttle buses between State and Chinatown",
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :shuttle,
         updated_at: "Friday, 5:00 am",
@@ -1334,7 +1262,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
 
       expected = %{
-        issue: %{text: ["No ", %{format: :nowrap, text: "Alewife"}, " trains"]},
+        issue: "No Alewife trains",
         location: "",
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
@@ -1358,7 +1286,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
 
       expected = %{
-        issue: %{text: ["No ", %{format: :nowrap, text: "Alewife"}, " trains"]},
+        issue: "No Alewife trains",
         location: "",
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
@@ -1409,9 +1337,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_severity(10)
 
       expected = %{
-        issue: %{
-          text: [%{format: :nowrap, text: "Alewife"}, " trains may be delayed over 60 minutes"]
-        },
+        issue: "Alewife trains may be delayed over 60 minutes",
         location: "",
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
@@ -1436,9 +1362,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_severity(10)
 
       expected = %{
-        issue: %{
-          text: [%{format: :nowrap, text: "Alewife"}, " trains may be delayed over 60 minutes"]
-        },
+        issue: "Alewife trains may be delayed over 60 minutes",
         location: "",
         cause: "due to construction",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
@@ -1465,7 +1389,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
 
       expected = %{
-        issue: %{text: ["No ", %{format: :nowrap, text: "Oak Grove"}, " trains"]},
+        issue: "No Oak Grove trains",
         location: "at Wellington",
         cause: "",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
@@ -1513,7 +1437,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
 
       expected = %{
-        issue: %{text: ["No ", %{format: :nowrap, text: "Oak Grove"}, " trains"]},
+        issue: "No Oak Grove trains",
         location: "between Wellington and Assembly",
         cause: "",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
@@ -1560,7 +1484,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_informed_stations(["Wellington"])
 
       expected = %{
-        issue: %{text: ["Trains will bypass ", %{format: :nowrap, text: "Wellington"}]},
+        issue: "Trains will bypass Wellington",
         location: "",
         cause: "",
         routes: [
@@ -1610,7 +1534,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_informed_stations(["Wellington"])
 
       expected = %{
-        issue: %{text: ["Trains will bypass ", %{text: "Wellington", format: :nowrap}]},
+        issue: "Trains will bypass Wellington",
         location: "",
         cause: "due to construction",
         routes: [
@@ -3057,7 +2981,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       # Flexzone test
       expected = %{
-        issue: %{text: ["No ", %{text: "North Station & North", format: :nowrap}, " trains"]},
+        issue: "No North Station & North trains",
         location: "",
         cause: "",
         routes: [%{color: :green, text: "GREEN LINE", type: :text}],
