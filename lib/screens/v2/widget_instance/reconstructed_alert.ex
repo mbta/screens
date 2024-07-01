@@ -1206,18 +1206,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def serialize(widget, log_fn \\ &Logger.warning/1)
 
   def serialize(%__MODULE__{is_full_screen: true, alert: %Alert{effect: effect}} = t, log_fn) do
-    diagram_data =
-      case DisruptionDiagram.serialize(t) do
-        {:ok, serialized_diagram} ->
-          %{disruption_diagram: serialized_diagram}
-
-        {:error, reason} ->
-          log_fn.(
-            "[disruption diagram error] alert_id=#{t.alert.id} home_stop=#{t.location_context.home_stop} #{reason}"
-          )
-
-          %{}
-      end
+    diagram_data = serialize_diagram(t, log_fn)
 
     main_data = pick_layout_serializer(t, diagram_data, effect, dual_screen_alert?(t))
 
@@ -1234,6 +1223,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       location when location in [:downstream, :upstream] ->
         t |> serialize_outside_alert(location) |> Map.put(:region, :outside)
+    end
+  end
+
+  defp serialize_diagram(%__MODULE__{alert: %Alert{effect: :delay}}, _), do: %{}
+
+  defp serialize_diagram(%__MODULE__{} = t, log_fn) do
+    case DisruptionDiagram.serialize(t) do
+      {:ok, serialized_diagram} ->
+        %{disruption_diagram: serialized_diagram}
+
+      {:error, reason} ->
+        log_fn.(
+          "[disruption diagram error] alert_id=#{t.alert.id} home_stop=#{t.location_context.home_stop} #{reason}"
+        )
+
+        %{}
     end
   end
 
