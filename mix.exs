@@ -23,7 +23,7 @@ defmodule Screens.MixProject do
   #
   # Type `mix help compile.app` for more information.
   def application do
-    apps = [:logger, :runtime_tools]
+    apps = [:logger, :runtime_tools, :hackney_telemetry]
 
     apps =
       case Mix.env() do
@@ -81,14 +81,15 @@ defmodule Screens.MixProject do
       {:stream_data, "~> 1.1", only: :test},
       {:memcachex, "~> 0.5.5"},
       {:aja, "~> 0.6.2"},
-      {:telemetry, "~> 1.2"},
+      {:telemetry, "~> 1.2", override: true},
       {:telemetry_poller, "~> 0.4"},
       {:telemetry_metrics, "~> 0.4"},
       {:screens_config,
        git: "https://github.com/mbta/screens-config-lib.git",
        ref: "25fb47c58fc0b485c8c6df78fe94914292856903"},
       {:nebulex, "~> 2.6"},
-      {:remote_ip, "~> 1.2"}
+      {:remote_ip, "~> 1.2"},
+      {:hackney_telemetry, "~> 0.1.1"}
     ]
   end
 end
