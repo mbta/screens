@@ -3,7 +3,6 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
 
   alias Screens.Alerts.Alert
   alias Screens.Util
-  alias ScreensConfig.V2.FreeTextLine
 
   def render("_widget.ssml", alert) do
     ~E|<p><%= render_banner(alert) %><%= render_alert(alert) %></p>|
@@ -45,7 +44,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
           issue: issue
         } = alert
       ) do
-    ~E|<%= issue_to_string(issue) %><%= render_cause(alert.cause) %>.|
+    ~E|<%= issue %><%= render_cause(alert.cause) %>.|
   end
 
   # Downstream closure
@@ -90,7 +89,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         endpoints: {left_endpoint, right_endpoint},
         cause: cause
       }) do
-    ~E|There are <%= issue_to_string(issue) %>. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= render_cause(cause) %>. All shuttle buses are accessible.|
+    ~E|There are <%= issue %>. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= render_cause(cause) %>. All shuttle buses are accessible.|
   end
 
   # Boundary suspension
@@ -102,7 +101,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         endpoints: {left_endpoint, right_endpoint},
         cause: cause
       }) do
-    ~E|There are <%= issue_to_string(issue) %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= render_cause(cause) %>.|
+    ~E|There are <%= issue %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= render_cause(cause) %>.|
   end
 
   # Closure here - three cases
@@ -221,11 +220,4 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
 
   defp render_cause(nil), do: nil
   defp render_cause(cause), do: " #{Alert.get_cause_string(cause)}"
-
-  defp issue_to_string(%{text: _} = issue) do
-    issue_free_text = struct(FreeTextLine, issue)
-    FreeTextLine.to_plaintext(issue_free_text)
-  end
-
-  defp issue_to_string(issue), do: issue
 end

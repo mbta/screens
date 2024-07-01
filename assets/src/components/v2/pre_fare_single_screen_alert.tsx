@@ -6,8 +6,6 @@ import DisruptionDiagram, {
 } from "./disruption_diagram/disruption_diagram";
 import { classWithModifier, classWithModifiers, formatCause } from "Util/util";
 
-import FreeText, { type FreeTextType } from "./free_text";
-
 import ClockIcon from "Images/svgr_bundled/clock-negative.svg";
 import NoServiceIcon from "Images/svgr_bundled/no-service.svg";
 import InfoIcon from "Images/svgr_bundled/info.svg";
@@ -15,28 +13,9 @@ import ISAIcon from "Images/svgr_bundled/isa.svg";
 import WalkingIcon from "Images/svgr_bundled/nearby.svg";
 import ShuttleBusIcon from "Images/svgr_bundled/bus.svg";
 
-type StringOrFreeText = string | FreeTextType | Array<string | FreeTextType>;
-
-const Text = ({ children: text }: { children?: StringOrFreeText | null }) => {
-  if (text == null) return null;
-
-  if (typeof text === "string") return <span>{text}</span>;
-  if (Array.isArray(text)) {
-    return (
-      <>
-        {text.map((el, i) => (
-          <Text key={i}>{el}</Text>
-        ))}
-      </>
-    );
-  }
-
-  return <FreeText lines={text} />;
-};
-
 interface PreFareSingleScreenAlertProps {
-  issue: StringOrFreeText;
-  location: StringOrFreeText;
+  issue: string;
+  location: string;
   cause: string;
   remedy: string;
   remedy_bold?: string;
@@ -55,10 +34,10 @@ interface EnrichedRoute {
 }
 
 interface StandardLayoutProps {
-  issue: StringOrFreeText;
+  issue: string;
   remedy: string;
   effect: string;
-  location: StringOrFreeText | null;
+  location: string | null;
   disruptionDiagram?: DisruptionDiagramData;
 }
 
@@ -183,7 +162,7 @@ const MultiLineLayout: React.ComponentType<MultiLineLayoutProps> = ({
 };
 
 interface FallbackLayoutProps {
-  issue: StringOrFreeText;
+  issue: string;
   remedy: string;
   remedyBold?: string;
   effect: string;
@@ -213,11 +192,7 @@ const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
   return (
     <div className="alert-card__fallback">
       {icon}
-      {issue && (
-        <div className="alert-card__fallback__issue-text">
-          <Text>{issue}</Text>
-        </div>
-      )}
+      {issue && <div className="alert-card__fallback__issue-text">{issue}</div>}
       {remedy && (
         <div
           className={classWithModifier(
@@ -239,8 +214,8 @@ const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
 };
 
 interface StandardIssueSectionProps {
-  issue: StringOrFreeText;
-  location: StringOrFreeText | null;
+  issue: string;
+  location: string | null;
   contentTextSize: string;
 }
 
@@ -258,12 +233,10 @@ const StandardIssueSection: React.ComponentType<StandardIssueSectionProps> = ({
           contentTextSize,
         )}
       >
-        <Text>{issue}</Text>
+        {issue}
       </div>
       {location && (
-        <div className="alert-card__issue__location">
-          <Text>{location}</Text>
-        </div>
+        <div className="alert-card__issue__location">{location}</div>
       )}
     </div>
   </div>
@@ -280,10 +253,8 @@ const DownstreamIssueSection: React.ComponentType<
     <div
       className={classWithModifier("alert-card__content-block__text", "medium")}
     >
-      No trains <span style={{ fontWeight: 500 }}>between</span>{" "}
-      <span className="free-text__string--nowrap">{endpoints[0]}</span>{" "}
-      <span style={{ fontWeight: 500 }}>&</span>{" "}
-      <span className="free-text__string--nowrap">{endpoints[1]}</span>
+      No trains <span style={{ fontWeight: 500 }}>between</span> {endpoints[0]}{" "}
+      <span style={{ fontWeight: 500 }}>&</span> {endpoints[1]}
     </div>
   </div>
 );
