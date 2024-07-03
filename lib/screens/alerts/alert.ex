@@ -592,4 +592,16 @@ defmodule Screens.Alerts.Alert do
 
   def direction_id(%__MODULE__{informed_entities: informed_entities}),
     do: List.first(informed_entities).direction_id
+
+  def is_child_stop_closure?(%__MODULE__{
+        effect: :station_closure,
+        informed_entities: informed_entities
+      }) do
+    affected_platform_ids =
+      Enum.reject(informed_entities, &String.starts_with?(&1.stop, "place-"))
+
+    length(affected_platform_ids) == 1
+  end
+
+  def is_child_stop_closure?(_), do: false
 end

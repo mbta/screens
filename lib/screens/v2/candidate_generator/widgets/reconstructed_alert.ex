@@ -53,7 +53,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         now \\ DateTime.utc_now(),
         fetch_alerts_fn \\ &Alert.fetch/1,
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
-        fetch_location_context_fn \\ &Stop.fetch_location_context/3
+        fetch_location_context_fn \\ &Stop.fetch_location_context/3,
+        fetch_subway_platforms_for_stop_fn \\ &Stop.fetch_subway_platforms_for_stop/1
       ) do
     %PreFare{
       reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}
@@ -75,7 +76,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         location_context: location_context,
         fetch_stop_name_fn: fetch_stop_name_fn,
         is_terminal_station: is_terminal_station,
-        now: now
+        now: now,
+        fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
       ]
 
       cond do
@@ -157,9 +159,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          location_context: location_context,
          fetch_stop_name_fn: fetch_stop_name_fn,
          is_terminal_station: is_terminal_station,
-         now: now
+         now: now,
+         fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
        ) do
     Enum.map(alerts, fn alert ->
+      is_child_stop_closure? = Alert.is_child_stop_closure?(alert)
+
       %ReconstructedAlert{
         screen: config,
         alert: alert,
@@ -167,9 +172,27 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         location_context: location_context,
         informed_stations: get_stations(alert, fetch_stop_name_fn),
         is_terminal_station: is_terminal_station,
-        is_full_screen: is_full_screen
+        is_full_screen: is_full_screen,
+        use_fallback_layout: is_child_stop_closure?,
+        informed_platform:
+          get_closed_platform(alert, is_child_stop_closure?, fetch_subway_platforms_for_stop_fn)
       }
     end)
+  end
+
+  defp get_closed_platform(_, false, _), do: nil
+
+  defp get_closed_platform(
+         %{effect: :station_closure, informed_entities: informed_entities},
+         true,
+         fetch_subway_platforms_for_stop_fn
+       ) do
+    {[informed_parent_station], [informed_platform]} =
+      Enum.split_with(informed_entities, &String.starts_with?(&1.stop, "place-"))
+
+    informed_parent_station.stop
+    |> fetch_subway_platforms_for_stop_fn.()
+    |> Enum.find(&(&1.id == informed_platform.stop))
   end
 
   defp find_closest_downstream_alerts(alerts, stop_id, stop_sequences) do

@@ -23,7 +23,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             informed_stations: nil,
             is_terminal_station: false,
             # Full screen alert, whether that's a single or dual screen alert
-            is_full_screen: false
+            is_full_screen: false,
+            use_fallback_layout: false,
+            informed_platform: nil
 
   @type stop_id :: String.t()
 
@@ -36,7 +38,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           location_context: LocationContext.t(),
           informed_stations: list(String.t()),
           is_terminal_station: boolean(),
-          is_full_screen: boolean()
+          is_full_screen: boolean(),
+          use_fallback_layout: boolean(),
+          informed_platform: Stop.t() | nil
         }
 
   @type serialized_response ::
@@ -1024,6 +1028,27 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  # We assume this alert affects only one platform at one station.
+  defp serialize_outside_alert(
+         %__MODULE__{
+           use_fallback_layout: true,
+           alert: %Alert{effect: :station_closure},
+           informed_stations: [informed_station],
+           informed_platform: informed_platform
+         } = t,
+         _location
+       ) do
+    %{
+      issue: "Bypassing #{informed_platform.platform_name} platform at #{informed_station}",
+      remedy: nil,
+      location: "",
+      cause: nil,
+      routes: get_route_pills(t),
+      effect: :station_closure,
+      urgent: false
+    }
+  end
+
   defp serialize_outside_alert(
          %__MODULE__{alert: %Alert{effect: :station_closure}} = t,
          _location
@@ -1165,6 +1190,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def serialize(widget, log_fn \\ &Logger.warning/1)
 
+  def serialize(%__MODULE__{is_full_screen: true, use_fallback_layout: true} = t, _log_fn) do
+    location = LocalizedAlert.location(t)
+
+    t
+    |> serialize_single_screen_fallback_alert(location)
+    |> Map.merge(%{effect: :fallback})
+  end
+
   def serialize(%__MODULE__{is_full_screen: true, alert: %Alert{effect: effect}} = t, log_fn) do
     diagram_data = serialize_diagram(t, log_fn)
 
@@ -1233,6 +1266,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def slot_names(%__MODULE__{is_full_screen: false}), do: [:large]
 
+  def slot_names(%__MODULE__{use_fallback_layout: true, alert: %{effect: :station_closure}}),
+    do: [:paged_main_content_left]
+
   def slot_names(%__MODULE__{} = t) do
     if dual_screen_alert?(t),
       do: [:full_body],
@@ -1240,6 +1276,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def widget_type(%__MODULE__{is_full_screen: false}), do: :reconstructed_large_alert
+
+  def widget_type(%__MODULE__{use_fallback_layout: true}), do: :single_screen_alert
 
   def widget_type(%__MODULE__{} = t) do
     if dual_screen_alert?(t),

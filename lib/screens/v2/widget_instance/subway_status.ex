@@ -380,15 +380,23 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp serialize_alert(
-         %Alert{effect: :station_closure, informed_entities: informed_entities},
+         %Alert{effect: :station_closure, informed_entities: informed_entities} = alert,
          route_id
        ) do
-    # Get closed station names from informed entities
-    stop_names = get_stop_names_from_informed_entities(informed_entities, route_id)
+    if Alert.is_child_stop_closure?(alert) do
+      %{
+        status: "Bypassing 1 stop",
+        location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"},
+        station_count: 1
+      }
+    else
+      # Get closed station names from informed entities
+      stop_names = get_stop_names_from_informed_entities(informed_entities, route_id)
 
-    {status, location} = format_station_closure(stop_names)
+      {status, location} = format_station_closure(stop_names)
 
-    %{status: status, location: location, station_count: length(stop_names)}
+      %{status: status, location: location, station_count: length(stop_names)}
+    end
   end
 
   defp serialize_alert(
