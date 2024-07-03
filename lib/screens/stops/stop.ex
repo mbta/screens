@@ -12,7 +12,7 @@ defmodule Screens.Stops.Stop do
 
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
-  alias Screens.Routes
+  alias Screens.{Routes, Stops}
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Stops.StationsWithRoutesAgent
@@ -360,6 +360,21 @@ defmodule Screens.Stops.Stop do
 
       _ ->
         nil
+    end
+  end
+
+  def fetch_subway_platforms_for_stop(stop_id) do
+    case Screens.V3Api.get_json("stops/" <> stop_id, %{"include" => "child_stops"}) do
+      {:ok, %{"included" => child_stop_data}} ->
+        Enum.filter(child_stop_data, fn %{
+                                          "attributes" => %{
+                                            "location_type" => location_type,
+                                            "vehicle_type" => vehicle_type
+                                          }
+                                        } ->
+          location_type == 0 and vehicle_type == 1
+        end)
+        |> Enum.map(&Stops.Parser.parse_stop/1)
     end
   end
 
