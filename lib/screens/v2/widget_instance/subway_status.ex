@@ -386,8 +386,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     if Alert.is_child_stop_closure?(alert) do
       %{
         status: "Bypassing 1 stop",
-        location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"},
-        station_count: 1
+        location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"}
       }
     else
       # Get closed station names from informed entities
