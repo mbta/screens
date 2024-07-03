@@ -22,14 +22,16 @@ defmodule Screens.Stops.Stop do
 
   defstruct id: nil,
             name: nil,
-            platform_code: nil
+            platform_code: nil,
+            platform_name: nil
 
   @type id :: String.t()
 
   @type t :: %__MODULE__{
           id: id,
           name: String.t(),
-          platform_code: String.t() | nil
+          platform_code: String.t() | nil,
+          platform_name: String.t() | nil
         }
 
   @type screen_type :: BusEink | BusShelter | GlEink | PreFare | Dup | Triptych
