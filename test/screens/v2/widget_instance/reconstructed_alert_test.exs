@@ -28,7 +28,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           downstream_stops: nil,
           routes: nil,
           alert_route_types: nil
-        }
+        },
+        all_platforms_at_informed_station: []
       }
     }
   end
@@ -129,12 +130,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     }
   end
 
-  defp put_use_fallback_layout(widget, use_fallback_layout) do
-    %{widget | use_fallback_layout: use_fallback_layout}
-  end
-
-  defp put_informed_platform(widget, informed_platform) do
-    %{widget | informed_platform: informed_platform}
+  defp put_all_platforms_at_informed_station(widget, all_platforms_at_informed_station) do
+    %{widget | all_platforms_at_informed_station: all_platforms_at_informed_station}
   end
 
   defp ie(opts) do
@@ -381,8 +378,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     test "returns takeover for a suspension that affects all station trips", %{widget: widget} do
       widget =
         put_informed_entities(widget, [
-          ie(route: "Red", route_type: 1),
-          ie(route: "Orange", route_type: 1)
+          ie(route: "Red", route_type: 1, stop: "place-dwnxg"),
+          ie(route: "Orange", route_type: 1, stop: "place-dwnxg")
         ])
         |> put_is_full_screen(true)
 
@@ -536,7 +533,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-forhl")
         |> put_effect(:station_closure)
         |> put_is_full_screen(true)
-        |> put_use_fallback_layout(true)
 
       assert [1] == WidgetInstance.priority(widget)
       assert [:paged_main_content_left] == WidgetInstance.slot_names(widget)
@@ -1080,7 +1076,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         })
         |> put_cause(:unknown)
         |> put_is_full_screen(true)
-        |> put_use_fallback_layout(true)
         |> put_alert_header("Test Alert")
         |> put_routes_at_stop([
           %{
@@ -1100,7 +1095,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         location: nil,
         cause: nil,
         routes: [%{route_id: "Red", svg_name: "rl"}],
-        effect: :fallback,
+        effect: :station_closure,
         updated_at: "Friday, 5:00 am",
         region: :here
       }
@@ -1122,7 +1117,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         })
         |> put_cause(:unknown)
         |> put_is_full_screen(true)
-        |> put_use_fallback_layout(true)
         |> put_alert_header("Test Alert")
         |> put_routes_at_stop([
           %{
@@ -1142,7 +1136,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         location: nil,
         cause: nil,
         routes: [%{route_id: "Red", svg_name: "rl-alewife", headsign: "Alewife"}],
-        effect: :fallback,
+        effect: :station_closure,
         updated_at: "Friday, 5:00 am",
         region: :outside
       }
@@ -1620,8 +1614,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         })
         |> put_cause(:unknown)
         |> put_informed_stations(["Porter"])
-        |> put_use_fallback_layout(true)
-        |> put_informed_platform(%{id: "70065", platform_name: "Ashmont/Braintree"})
+        |> put_all_platforms_at_informed_station([
+          %{id: "70065", platform_name: "Ashmont/Braintree"},
+          %{id: "70066", platform_name: "Alewife"}
+        ])
 
       expected = %{
         issue: "Bypassing Ashmont/Braintree platform at Porter",
@@ -1630,7 +1626,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [
           %{color: :red, text: "RED LINE", type: :text}
         ],
-        effect: :station_closure,
+        effect: :fallback,
         urgent: false,
         region: :outside,
         remedy: nil
@@ -2679,13 +2675,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
          }}
       end
 
+      fetch_subway_platforms_for_stop_fn = fn _ -> [] end
+
       alert_widget =
         config
         |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
           now,
           fetch_alerts_fn,
           fetch_stop_name_fn,
-          fetch_location_context_fn
+          fetch_location_context_fn,
+          fetch_subway_platforms_for_stop_fn
         )
         |> List.first()
 
@@ -3093,13 +3092,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
          }}
       end
 
+      fetch_subway_platforms_for_stop_fn = fn _ -> [] end
+
       alert_widget =
         config
         |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
           now,
           fetch_alerts_fn,
           fetch_stop_name_fn,
-          fetch_location_context_fn
+          fetch_location_context_fn,
+          fetch_subway_platforms_for_stop_fn
         )
         |> List.first()
 

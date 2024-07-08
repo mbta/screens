@@ -593,15 +593,36 @@ defmodule Screens.Alerts.Alert do
   def direction_id(%__MODULE__{informed_entities: informed_entities}),
     do: List.first(informed_entities).direction_id
 
-  def is_child_stop_closure?(%__MODULE__{
-        effect: :station_closure,
+  def informed_platforms(%__MODULE__{
         informed_entities: informed_entities
       }) do
-    affected_platform_ids =
-      Enum.reject(informed_entities, &String.starts_with?(&1.stop, "place-"))
-
-    length(affected_platform_ids) == 1
+    Enum.reject(
+      informed_entities,
+      &(String.starts_with?(&1.stop, "place-") or &1.route_type != 1)
+    )
   end
 
-  def is_child_stop_closure?(_), do: false
+  def informed_parent_stations(%__MODULE__{
+        informed_entities: informed_entities
+      }) do
+    Enum.filter(informed_entities, &String.starts_with?(&1.stop, "place-"))
+  end
+
+  @spec is_child_stop_closure?(__MODULE__.t(), list(Stop.t())) :: boolean()
+  def is_child_stop_closure?(
+        %__MODULE__{effect: :station_closure} = alert,
+        all_platforms_at_informed_station
+      ) do
+    informed_parent_stations = informed_parent_stations(alert)
+
+    case informed_parent_stations do
+      [_] ->
+        length(informed_platforms(alert)) != length(all_platforms_at_informed_station)
+
+      _ ->
+        false
+    end
+  end
+
+  def is_child_stop_closure?(_, _), do: false
 end

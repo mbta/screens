@@ -24,8 +24,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             is_terminal_station: false,
             # Full screen alert, whether that's a single or dual screen alert
             is_full_screen: false,
-            use_fallback_layout: false,
-            informed_platform: nil
+            all_platforms_at_informed_station: []
 
   @type stop_id :: String.t()
 
@@ -39,8 +38,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           informed_stations: list(String.t()),
           is_terminal_station: boolean(),
           is_full_screen: boolean(),
-          use_fallback_layout: boolean(),
-          informed_platform: Stop.t() | nil
+          all_platforms_at_informed_station: list(Stop.t())
         }
 
   @type serialized_response ::
@@ -1028,45 +1026,31 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  # We assume this alert affects only one platform at one station.
   defp serialize_outside_alert(
          %__MODULE__{
-           use_fallback_layout: true,
-           alert: %Alert{effect: :station_closure},
-           informed_stations: [informed_station],
-           informed_platform: informed_platform
+           alert: %Alert{effect: :station_closure} = alert,
+           all_platforms_at_informed_station: all_platforms_at_informed_station
          } = t,
          _location
        ) do
-    %{
-      issue: "Bypassing #{informed_platform.platform_name} platform at #{informed_station}",
-      remedy: nil,
-      location: "",
-      cause: nil,
-      routes: get_route_pills(t),
-      effect: :station_closure,
-      urgent: false
-    }
-  end
+    if Alert.is_child_stop_closure?(alert, all_platforms_at_informed_station) do
+      serialize_outside_platform_closure(t)
+    else
+      %{alert: %{cause: cause}, informed_stations: informed_stations} = t
+      cause_text = Alert.get_cause_string(cause)
 
-  defp serialize_outside_alert(
-         %__MODULE__{alert: %Alert{effect: :station_closure}} = t,
-         _location
-       ) do
-    %{alert: %{cause: cause}, informed_stations: informed_stations} = t
-    cause_text = Alert.get_cause_string(cause)
+      informed_stations_string = Util.format_name_list_to_string(informed_stations)
 
-    informed_stations_string = Util.format_name_list_to_string(informed_stations)
-
-    %{
-      issue: "Trains will bypass #{informed_stations_string}",
-      remedy: "Seek alternate route",
-      location: "",
-      cause: cause_text,
-      routes: get_route_pills(t),
-      effect: :station_closure,
-      urgent: false
-    }
+      %{
+        issue: "Trains will bypass #{informed_stations_string}",
+        remedy: "Seek alternate route",
+        location: "",
+        cause: cause_text,
+        routes: get_route_pills(t),
+        effect: :station_closure,
+        urgent: false
+      }
+    end
   end
 
   defp serialize_outside_alert(
@@ -1082,6 +1066,36 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: "",
       routes: get_route_pills(t),
       effect: :delay,
+      urgent: false
+    }
+  end
+
+  defp serialize_outside_platform_closure(
+         %__MODULE__{
+           alert: alert,
+           informed_stations: [informed_station],
+           all_platforms_at_informed_station: all_platforms_at_informed_station
+         } = t
+       ) do
+    issue =
+      case Alert.informed_platforms(alert) do
+        [informed_platform] ->
+          platform =
+            Enum.find(all_platforms_at_informed_station, &(&1.id == informed_platform.stop))
+
+          "Bypassing #{platform.platform_name} platform at #{informed_station}"
+
+        informed_platforms ->
+          "Bypassing #{length(informed_platforms)} platform at #{informed_station}"
+      end
+
+    %{
+      issue: issue,
+      remedy: nil,
+      location: "",
+      cause: nil,
+      routes: get_route_pills(t),
+      effect: :fallback,
       urgent: false
     }
   end
@@ -1190,20 +1204,25 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def serialize(widget, log_fn \\ &Logger.warning/1)
 
-  def serialize(%__MODULE__{is_full_screen: true, use_fallback_layout: true} = t, _log_fn) do
+  def serialize(
+        %__MODULE__{
+          is_full_screen: true,
+          alert: %Alert{effect: effect} = alert,
+          all_platforms_at_informed_station: all_platforms_at_informed_station
+        } = t,
+        log_fn
+      ) do
     location = LocalizedAlert.location(t)
 
-    t
-    |> serialize_single_screen_fallback_alert(location)
-    |> Map.merge(%{effect: :fallback})
-  end
+    if Alert.is_child_stop_closure?(alert, all_platforms_at_informed_station) do
+      t |> serialize_single_screen_fallback_alert(location)
+    else
+      diagram_data = serialize_diagram(t, log_fn)
 
-  def serialize(%__MODULE__{is_full_screen: true, alert: %Alert{effect: effect}} = t, log_fn) do
-    diagram_data = serialize_diagram(t, log_fn)
+      main_data = pick_layout_serializer(t, diagram_data, effect, location, dual_screen_alert?(t))
 
-    main_data = pick_layout_serializer(t, diagram_data, effect, dual_screen_alert?(t))
-
-    Map.merge(main_data, diagram_data)
+      Map.merge(main_data, diagram_data)
+    end
   end
 
   def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t, _log_fn) do
@@ -1235,19 +1254,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def pick_layout_serializer(t, diagram, effect, true) when diagram == %{} and effect != :delay,
-    do: serialize_dual_screen_fallback_alert(t)
+  def pick_layout_serializer(t, diagram, effect, location, is_dual_screen_alert)
 
-  def pick_layout_serializer(t, diagram, effect, false)
+  def pick_layout_serializer(t, diagram, effect, _, true)
+      when diagram == %{} and effect != :delay,
+      do: serialize_dual_screen_fallback_alert(t)
+
+  def pick_layout_serializer(t, diagram, effect, location, false)
       when diagram == %{} and effect != :delay do
-    location = LocalizedAlert.location(t)
     serialize_single_screen_fallback_alert(t, location)
   end
 
-  def pick_layout_serializer(t, _, _, true), do: serialize_dual_screen_alert(t)
+  def pick_layout_serializer(t, _, _, _, true), do: serialize_dual_screen_alert(t)
 
-  def pick_layout_serializer(t, _, _, _) do
-    location = LocalizedAlert.location(t)
+  def pick_layout_serializer(t, _, _, location, _) do
     serialize_single_screen_alert(t, location)
   end
 
@@ -1266,23 +1286,42 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def slot_names(%__MODULE__{is_full_screen: false}), do: [:large]
 
-  def slot_names(%__MODULE__{use_fallback_layout: true, alert: %{effect: :station_closure}}),
-    do: [:paged_main_content_left]
+  def slot_names(
+        %__MODULE__{
+          alert: alert,
+          all_platforms_at_informed_station: all_platforms_at_informed_station
+        } = t
+      ) do
+    cond do
+      Alert.is_child_stop_closure?(alert, all_platforms_at_informed_station) ->
+        [:paged_main_content_left]
 
-  def slot_names(%__MODULE__{} = t) do
-    if dual_screen_alert?(t),
-      do: [:full_body],
-      else: [:paged_main_content_left]
+      dual_screen_alert?(t) ->
+        [:full_body]
+
+      true ->
+        [:paged_main_content_left]
+    end
   end
 
   def widget_type(%__MODULE__{is_full_screen: false}), do: :reconstructed_large_alert
 
-  def widget_type(%__MODULE__{use_fallback_layout: true}), do: :single_screen_alert
+  def widget_type(
+        %__MODULE__{
+          alert: alert,
+          all_platforms_at_informed_station: all_platforms_at_informed_station
+        } = t
+      ) do
+    cond do
+      Alert.is_child_stop_closure?(alert, all_platforms_at_informed_station) ->
+        :single_screen_alert
 
-  def widget_type(%__MODULE__{} = t) do
-    if dual_screen_alert?(t),
-      do: :reconstructed_takeover,
-      else: :single_screen_alert
+      dual_screen_alert?(t) ->
+        :reconstructed_takeover
+
+      true ->
+        :single_screen_alert
+    end
   end
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]

@@ -163,7 +163,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
        ) do
     Enum.map(alerts, fn alert ->
-      is_child_stop_closure? = Alert.is_child_stop_closure?(alert)
+      all_platforms_at_informed_station =
+        get_platforms_at_informed_station(alert, fetch_subway_platforms_for_stop_fn)
 
       %ReconstructedAlert{
         screen: config,
@@ -173,27 +174,27 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         informed_stations: get_stations(alert, fetch_stop_name_fn),
         is_terminal_station: is_terminal_station,
         is_full_screen: is_full_screen,
-        use_fallback_layout: is_child_stop_closure?,
-        informed_platform:
-          get_closed_platform(alert, is_child_stop_closure?, fetch_subway_platforms_for_stop_fn)
+        all_platforms_at_informed_station: all_platforms_at_informed_station
       }
     end)
   end
 
-  defp get_closed_platform(_, false, _), do: nil
-
-  defp get_closed_platform(
-         %{effect: :station_closure, informed_entities: informed_entities},
-         true,
+  defp get_platforms_at_informed_station(
+         %{effect: :station_closure} = alert,
          fetch_subway_platforms_for_stop_fn
        ) do
-    {[informed_parent_station], [informed_platform]} =
-      Enum.split_with(informed_entities, &String.starts_with?(&1.stop, "place-"))
+    informed_parent_stations = Alert.informed_parent_stations(alert)
 
-    informed_parent_station.stop
-    |> fetch_subway_platforms_for_stop_fn.()
-    |> Enum.find(&(&1.id == informed_platform.stop))
+    case informed_parent_stations do
+      [informed_parent_station] ->
+        fetch_subway_platforms_for_stop_fn.(informed_parent_station.stop)
+
+      _ ->
+        []
+    end
   end
+
+  defp get_platforms_at_informed_station(_, _), do: []
 
   defp find_closest_downstream_alerts(alerts, stop_id, stop_sequences) do
     home_stop_distance_map = build_distance_map(stop_id, stop_sequences)
