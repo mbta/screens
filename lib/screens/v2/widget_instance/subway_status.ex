@@ -13,7 +13,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          subway_alerts: list(Alert.t())
+          subway_alerts: list(%{alert: Alert.t(), context: %{}})
         }
 
   @type serialized_response :: %{
@@ -153,7 +153,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     )
   end
 
-  defp alert_routes(%Alert{informed_entities: entities}) do
+  defp alert_routes(%{alert: %Alert{informed_entities: entities}}) do
     entities
     |> Enum.map(fn e -> Map.get(e, :route) end)
     |> Enum.reject(&is_nil/1)
@@ -364,12 +364,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{status: "Normal Service"}
   end
 
-  defp serialize_alert(%Alert{effect: :shuttle, informed_entities: informed_entities}, route_id) do
+  defp serialize_alert(
+         %{alert: %Alert{effect: :shuttle, informed_entities: informed_entities}},
+         route_id
+       ) do
     %{status: "Shuttle Bus", location: get_location(informed_entities, route_id)}
   end
 
   defp serialize_alert(
-         %Alert{effect: :suspension, informed_entities: informed_entities},
+         %{alert: %Alert{effect: :suspension, informed_entities: informed_entities}},
          route_id
        ) do
     location = get_location(informed_entities, route_id)
@@ -380,12 +383,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp serialize_alert(
-         %Alert{effect: :station_closure, informed_entities: informed_entities} = alert,
+         %{
+           alert: %Alert{effect: :station_closure, informed_entities: informed_entities} = alert,
+           context: %{all_platforms_at_informed_station: all_platforms_at_informed_station}
+         },
          route_id
        ) do
-    if Alert.is_child_stop_closure?(alert) do
+    if Alert.is_child_stop_closure?(alert, all_platforms_at_informed_station) do
+      informed_platforms = Alert.informed_platforms(alert)
+
       %{
-        status: "Bypassing 1 stop",
+        status: "Bypassing #{length(informed_platforms)} stop",
         location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"}
       }
     else
@@ -399,10 +407,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp serialize_alert(
-         %Alert{
-           effect: :delay,
-           severity: severity,
-           informed_entities: informed_entities
+         %{
+           alert: %Alert{
+             effect: :delay,
+             severity: severity,
+             informed_entities: informed_entities
+           }
          },
          route_id
        ) do
@@ -428,9 +438,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   def serialize_green_line_branch_alert(
-        %Alert{
-          effect: :station_closure,
-          informed_entities: informed_entities
+        %{
+          alert: %Alert{
+            effect: :station_closure,
+            informed_entities: informed_entities
+          }
         },
         route_ids
       ) do
@@ -513,7 +525,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
-  defp alert_affects_gl_trunk_or_whole_line?(alert, gl_stop_sets) do
+  defp alert_affects_gl_trunk_or_whole_line?(%{alert: alert}, gl_stop_sets) do
     alert_affects_gl_trunk?(alert, gl_stop_sets) or
       alert_affects_whole_green_line?(alert)
   end
@@ -731,6 +743,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   def get_total_alerts(alerts) do
     total_affected_routes =
       alerts
+      |> Enum.map(& &1.alert)
       |> Enum.uniq_by(& &1.id)
       |> Enum.map(&get_total_affected_routes_for_alert/1)
       |> Enum.sum()

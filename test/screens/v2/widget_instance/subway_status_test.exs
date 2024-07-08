@@ -7,6 +7,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.SubwayStatus
 
+  defp subway_alerts(alerts),
+    do: Enum.map(alerts, &%{alert: &1, context: %{all_platforms_at_informed_station: []}})
+
   describe "priority/1" do
     test "returns high priority for a flex zone widget" do
       instance = %SubwayStatus{subway_alerts: []}
@@ -64,17 +67,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles station closure alert with 4+ stops" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{route: "Blue", stop: "place-aport"},
-              %{route: "Blue", stop: "place-mvbcl"},
-              %{route: "Blue", stop: "place-aqucl"},
-              %{route: "Blue", stop: "place-state"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Blue", stop: "place-aport"},
+                %{route: "Blue", stop: "place-mvbcl"},
+                %{route: "Blue", stop: "place-aqucl"},
+                %{route: "Blue", stop: "place-state"}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -124,16 +128,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles station closure alert with 3 stops" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{route: "Blue", stop: "place-aport"},
-              %{route: "Blue", stop: "place-mvbcl"},
-              %{route: "Blue", stop: "place-aqucl"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Blue", stop: "place-aport"},
+                %{route: "Blue", stop: "place-mvbcl"},
+                %{route: "Blue", stop: "place-aqucl"}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -183,15 +188,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 1 alert" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{route: "Blue", stop: "place-aport"},
-              %{route: "Blue", stop: "place-mvbcl"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Blue", stop: "place-aport"},
+                %{route: "Blue", stop: "place-mvbcl"}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -238,26 +244,27 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 2 alerts, 2 routes" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :suspension,
-            informed_entities: [
-              %{route: "Blue", stop: "place-aport"},
-              %{route: "Blue", stop: "place-mvbcl"},
-              %{route: "Blue", stop: "place-aqucl"}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Green-B", stop: nil},
-              %{route: "Green-C", stop: nil},
-              %{route: "Green-D", stop: nil},
-              %{route: "Green-E", stop: nil}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Blue", stop: "place-aport"},
+                %{route: "Blue", stop: "place-mvbcl"},
+                %{route: "Blue", stop: "place-aqucl"}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Green-B", stop: nil},
+                %{route: "Green-C", stop: nil},
+                %{route: "Green-D", stop: nil},
+                %{route: "Green-E", stop: nil}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -302,23 +309,24 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 2 alerts, 1 non-GL route" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :suspension,
-            informed_entities: [
-              %{route: "Blue", stop: "place-aport"}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Blue", stop: "place-aport"},
-              %{route: "Blue", stop: "place-mvbcl"},
-              %{route: "Blue", stop: "place-aqucl"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Blue", stop: "place-aport"}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Blue", stop: "place-aport"},
+                %{route: "Blue", stop: "place-mvbcl"},
+                %{route: "Blue", stop: "place-aqucl"}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -370,42 +378,43 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 4 alerts, 2 non-GL routes" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :suspension,
-            informed_entities: [
-              %{route: "Blue", stop: "place-aport"},
-              %{route: "Blue", stop: "place-mvbcl"},
-              %{route: "Blue", stop: "place-aqucl"}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Blue", stop: "place-aport"},
-              %{route: "Blue", stop: "place-mvbcl"},
-              %{route: "Blue", stop: "place-aqucl"}
-            ]
-          },
-          %Alert{
-            effect: :suspension,
-            informed_entities: [
-              %{route: "Orange", stop: "place-ogmnl"},
-              %{route: "Orange", stop: "place-mlmnl"},
-              %{route: "Orange", stop: "place-welln"}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Orange", stop: "place-ogmnl"},
-              %{route: "Orange", stop: "place-mlmnl"},
-              %{route: "Orange", stop: "place-welln"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Blue", stop: "place-aport"},
+                %{route: "Blue", stop: "place-mvbcl"},
+                %{route: "Blue", stop: "place-aqucl"}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Blue", stop: "place-aport"},
+                %{route: "Blue", stop: "place-mvbcl"},
+                %{route: "Blue", stop: "place-aqucl"}
+              ]
+            },
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Orange", stop: "place-ogmnl"},
+                %{route: "Orange", stop: "place-mlmnl"},
+                %{route: "Orange", stop: "place-welln"}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Orange", stop: "place-ogmnl"},
+                %{route: "Orange", stop: "place-mlmnl"},
+                %{route: "Orange", stop: "place-welln"}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -454,31 +463,32 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 3 alerts, 2 non-GL routes" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{route: "Blue", stop: "place-aport"}
-            ]
-          },
-          %Alert{
-            effect: :suspension,
-            informed_entities: [
-              %{route: "Orange", stop: "place-ogmnl"},
-              %{route: "Orange", stop: "place-mlmnl"},
-              %{route: "Orange", stop: "place-welln"}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Orange", stop: "place-ogmnl"},
-              %{route: "Orange", stop: "place-mlmnl"},
-              %{route: "Orange", stop: "place-welln"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Blue", stop: "place-aport"}
+              ]
+            },
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Orange", stop: "place-ogmnl"},
+                %{route: "Orange", stop: "place-mlmnl"},
+                %{route: "Orange", stop: "place-welln"}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Orange", stop: "place-ogmnl"},
+                %{route: "Orange", stop: "place-mlmnl"},
+                %{route: "Orange", stop: "place-welln"}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -532,23 +542,24 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 1 alert on GL trunk and 1 alert on GL branch" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :suspension,
-            informed_entities: [
-              %{route: "Green-C", stop: "place-hwsst"},
-              %{route: "Green-C", stop: "place-kntst"},
-              %{route: "Green-C", stop: "place-stpul"}
-            ]
-          },
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{route: "Green-D", stop: "place-gover"},
-              %{route: "Green-D", stop: "place-river"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Green-C", stop: "place-hwsst"},
+                %{route: "Green-C", stop: "place-kntst"},
+                %{route: "Green-C", stop: "place-stpul"}
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Green-D", stop: "place-gover"},
+                %{route: "Green-D", stop: "place-river"}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -608,33 +619,34 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 1 alert on GL trunk and 2 alerts on GL branch" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :suspension,
-            informed_entities: [
-              %{route: "Green-C", stop: "place-hwsst"},
-              %{route: "Green-C", stop: "place-kntst"},
-              %{route: "Green-C", stop: "place-stpul"}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Green-B", stop: nil}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 6,
-            informed_entities: [
-              %{route: "Green-B", stop: nil},
-              %{route: "Green-C", stop: nil},
-              %{route: "Green-D", stop: nil},
-              %{route: "Green-E", stop: nil}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Green-C", stop: "place-hwsst"},
+                %{route: "Green-C", stop: "place-kntst"},
+                %{route: "Green-C", stop: "place-stpul"}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Green-B", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 6,
+              informed_entities: [
+                %{route: "Green-B", stop: nil},
+                %{route: "Green-C", stop: nil},
+                %{route: "Green-D", stop: nil},
+                %{route: "Green-E", stop: nil}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -687,25 +699,26 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 2 alerts on GL trunk" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :suspension,
-            informed_entities: [
-              %{route: "Green-C", stop: "place-gover"},
-              %{route: "Green-C", stop: "place-pktrm"}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Green-B", stop: nil},
-              %{route: "Green-C", stop: nil},
-              %{route: "Green-D", stop: nil},
-              %{route: "Green-E", stop: nil}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Green-C", stop: "place-gover"},
+                %{route: "Green-C", stop: "place-pktrm"}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Green-B", stop: nil},
+                %{route: "Green-C", stop: nil},
+                %{route: "Green-D", stop: nil},
+                %{route: "Green-E", stop: nil}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -761,22 +774,23 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 2 alerts on GL branches" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :delay,
-            severity: 9,
-            informed_entities: [
-              %{route: "Green-C", stop: nil}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Green-B", stop: nil}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :delay,
+              severity: 9,
+              informed_entities: [
+                %{route: "Green-C", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Green-B", stop: nil}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -829,29 +843,30 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 3+ alerts on GL branches" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :delay,
-            severity: 9,
-            informed_entities: [
-              %{route: "Green-C", stop: nil}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Green-B", stop: nil}
-            ]
-          },
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{route: "Green-E", stop: "place-symcl"},
-              %{route: "Green-E", stop: "place-nuniv"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :delay,
+              severity: 9,
+              informed_entities: [
+                %{route: "Green-C", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Green-B", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Green-E", stop: "place-symcl"},
+                %{route: "Green-E", stop: "place-nuniv"}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -899,28 +914,29 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 2 alerts on GL branches and 1 alert on non-GL route" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :delay,
-            severity: 9,
-            informed_entities: [
-              %{route: "Green-C", stop: nil}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Green-B", stop: nil}
-            ]
-          },
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{route: "Orange", stop: "place-ogmnl"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :delay,
+              severity: 9,
+              informed_entities: [
+                %{route: "Green-C", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Green-B", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Orange", stop: "place-ogmnl"}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -975,31 +991,32 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 2 alerts on GL trunk and 1 alert on GL branch" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :delay,
-            severity: 9,
-            informed_entities: [
-              %{route: "Green-C", stop: nil}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Green-B", stop: nil},
-              %{route: "Green-C", stop: nil},
-              %{route: "Green-D", stop: nil},
-              %{route: "Green-E", stop: nil}
-            ]
-          },
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{route: "Green-D", stop: "place-kencl"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :delay,
+              severity: 9,
+              informed_entities: [
+                %{route: "Green-C", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Green-B", stop: nil},
+                %{route: "Green-C", stop: nil},
+                %{route: "Green-D", stop: nil},
+                %{route: "Green-E", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Green-D", stop: "place-kencl"}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -1047,35 +1064,36 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 2 alerts on GL branches and 2 alerts on non-GL route" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :delay,
-            severity: 9,
-            informed_entities: [
-              %{route: "Green-C", stop: nil}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Green-B", stop: nil}
-            ]
-          },
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{route: "Orange", stop: "place-ogmnl"}
-            ]
-          },
-          %Alert{
-            effect: :delay,
-            severity: 5,
-            informed_entities: [
-              %{route: "Orange", stop: nil}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :delay,
+              severity: 9,
+              informed_entities: [
+                %{route: "Green-C", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Green-B", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Orange", stop: "place-ogmnl"}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Orange", stop: nil}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -1129,27 +1147,28 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 1 alert on GL trunk and 2 alerts on non-GL route" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{route: "Green-D", stop: "place-lech"},
-              %{route: "Green-E", stop: "place-lech"}
-            ]
-          },
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{route: "Orange", stop: "place-ogmnl"}
-            ]
-          },
-          %Alert{
-            effect: :suspension,
-            informed_entities: [
-              %{route: "Blue", stop: "place-bmmnl"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Green-D", stop: "place-lech"},
+                %{route: "Green-E", stop: "place-lech"}
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Orange", stop: "place-ogmnl"}
+              ]
+            },
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Blue", stop: "place-bmmnl"}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -1201,21 +1220,22 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 1 alert on GL branch and 1 alert on non-GL route" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :delay,
-            severity: 9,
-            informed_entities: [
-              %{route: "Green-C", stop: nil}
-            ]
-          },
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{route: "Orange", stop: "place-ogmnl"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :delay,
+              severity: 9,
+              informed_entities: [
+                %{route: "Green-C", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Orange", stop: "place-ogmnl"}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -1261,17 +1281,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "handles 1 alert affecting 3 routes" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :delay,
-            severity: 9,
-            informed_entities: [
-              %{route: "Green-C", stop: nil},
-              %{route: "Blue", stop: nil},
-              %{route: "Orange", stop: nil}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :delay,
+              severity: 9,
+              informed_entities: [
+                %{route: "Green-C", stop: nil},
+                %{route: "Blue", stop: nil},
+                %{route: "Orange", stop: nil}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -1322,12 +1343,20 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
     test "handles 1 platform closure alert" do
       instance = %SubwayStatus{
         subway_alerts: [
-          %Alert{
-            effect: :station_closure,
-            informed_entities: [
-              %{stop: "place-portr", route: "Red", route_type: 1},
-              %{stop: "70065", route: "Red", route_type: 1}
-            ]
+          %{
+            alert: %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Red", stop: "place-portr", route_type: 1},
+                %{route: "Red", stop: "70065", route_type: 1}
+              ]
+            },
+            context: %{
+              all_platforms_at_informed_station: [
+                %{id: "70065", platform_name: "Ashmont/Braintree"},
+                %{id: "70066", platform_name: "Alewife"}
+              ]
+            }
           }
         ]
       }
@@ -1375,14 +1404,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "uses 'Entire line' location text for whole-line shuttles" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :shuttle,
-            informed_entities: [
-              %{route: "Blue", route_type: 1, direction_id: nil, stop: nil}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :shuttle,
+              informed_entities: [
+                %{route: "Blue", route_type: 1, direction_id: nil, stop: nil}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -1419,14 +1449,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "uses 'Entire line' location text for whole-line suspensions" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :suspension,
-            informed_entities: [
-              %{route: "Blue", route_type: 1, direction_id: nil, stop: nil}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Blue", route_type: 1, direction_id: nil, stop: nil}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -1463,17 +1494,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "uses 'Entire line' location text for whole-Green Line suspensions" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :suspension,
-            informed_entities: [
-              %{route: "Green-B", route_type: 0, direction_id: nil, stop: nil},
-              %{route: "Green-C", route_type: 0, direction_id: nil, stop: nil},
-              %{route: "Green-D", route_type: 0, direction_id: nil, stop: nil},
-              %{route: "Green-E", route_type: 0, direction_id: nil, stop: nil}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Green-B", route_type: 0, direction_id: nil, stop: nil},
+                %{route: "Green-C", route_type: 0, direction_id: nil, stop: nil},
+                %{route: "Green-D", route_type: 0, direction_id: nil, stop: nil},
+                %{route: "Green-E", route_type: 0, direction_id: nil, stop: nil}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -1510,15 +1542,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "does _not_ use 'Entire line' location text for whole-line delays" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :delay,
-            severity: 9,
-            informed_entities: [
-              %{route: "Blue", route_type: 1, direction_id: nil, stop: nil}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :delay,
+              severity: 9,
+              informed_entities: [
+                %{route: "Blue", route_type: 1, direction_id: nil, stop: nil}
+              ]
+            }
+          ])
       }
 
       expected = %{
@@ -1555,17 +1588,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "finds correct endpoints if shuttle starts on trunk" do
       instance = %SubwayStatus{
-        subway_alerts: [
-          %Alert{
-            effect: :shuttle,
-            informed_entities: [
-              %{direction_id: nil, route: "Green-C", route_type: 0, stop: "place-kencl"},
-              %{direction_id: nil, route: "Green-C", route_type: 0, stop: "place-smary"},
-              %{direction_id: nil, route: "Green-C", route_type: 0, stop: "place-hwsst"},
-              %{direction_id: nil, route: "Green-C", route_type: 0, stop: "place-kntst"}
-            ]
-          }
-        ]
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :shuttle,
+              informed_entities: [
+                %{direction_id: nil, route: "Green-C", route_type: 0, stop: "place-kencl"},
+                %{direction_id: nil, route: "Green-C", route_type: 0, stop: "place-smary"},
+                %{direction_id: nil, route: "Green-C", route_type: 0, stop: "place-hwsst"},
+                %{direction_id: nil, route: "Green-C", route_type: 0, stop: "place-kntst"}
+              ]
+            }
+          ])
       }
 
       expected = %{
