@@ -593,7 +593,7 @@ defmodule Screens.Alerts.Alert do
   def direction_id(%__MODULE__{informed_entities: informed_entities}),
     do: List.first(informed_entities).direction_id
 
-  def informed_platforms(%__MODULE__{
+  def informed_subway_platforms(%__MODULE__{
         informed_entities: informed_entities
       }) do
     Enum.reject(
@@ -608,8 +608,8 @@ defmodule Screens.Alerts.Alert do
     Enum.filter(informed_entities, &String.starts_with?(&1.stop, "place-"))
   end
 
-  @spec is_child_stop_closure?(__MODULE__.t(), list(Stop.t())) :: boolean()
-  def is_child_stop_closure?(
+  @spec is_partial_station_closure?(__MODULE__.t(), list(Stop.t())) :: boolean()
+  def is_partial_station_closure?(
         %__MODULE__{effect: :station_closure} = alert,
         all_platforms_at_informed_station
       ) do
@@ -617,12 +617,12 @@ defmodule Screens.Alerts.Alert do
 
     case informed_parent_stations do
       [_] ->
-        length(informed_platforms(alert)) != length(all_platforms_at_informed_station)
+        length(informed_subway_platforms(alert)) != length(all_platforms_at_informed_station)
 
       _ ->
         false
     end
   end
 
-  def is_child_stop_closure?(_, _), do: false
+  def is_partial_station_closure?(_, _), do: false
 end

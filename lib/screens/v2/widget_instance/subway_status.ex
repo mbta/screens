@@ -389,8 +389,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
          },
          route_id
        ) do
-    if Alert.is_child_stop_closure?(alert, all_platforms_at_informed_station) do
-      informed_platforms = Alert.informed_platforms(alert)
+    if Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) do
+      informed_platforms = Alert.informed_subway_platforms(alert)
 
       %{
         status: "Bypassing #{length(informed_platforms)} stop",

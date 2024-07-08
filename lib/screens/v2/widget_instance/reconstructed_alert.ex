@@ -1033,7 +1033,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t,
          _location
        ) do
-    if Alert.is_child_stop_closure?(alert, all_platforms_at_informed_station) do
+    if Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) do
       serialize_outside_platform_closure(t)
     else
       %{alert: %{cause: cause}, informed_stations: informed_stations} = t
@@ -1078,15 +1078,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        ) do
     issue =
-      case Alert.informed_platforms(alert) do
+      case Alert.informed_subway_platforms(alert) do
         [informed_platform] ->
           platform =
             Enum.find(all_platforms_at_informed_station, &(&1.id == informed_platform.stop))
 
           "Bypassing #{platform.platform_name} platform at #{informed_station}"
 
-        informed_platforms ->
-          "Bypassing #{length(informed_platforms)} platform at #{informed_station}"
+        informed_subway_platforms ->
+          "Bypassing #{length(informed_subway_platforms)} platform at #{informed_station}"
       end
 
     %{
@@ -1214,7 +1214,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       ) do
     location = LocalizedAlert.location(t)
 
-    if Alert.is_child_stop_closure?(alert, all_platforms_at_informed_station) do
+    if Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) do
       t |> serialize_single_screen_fallback_alert(location)
     else
       diagram_data = serialize_diagram(t, log_fn)
@@ -1293,7 +1293,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         } = t
       ) do
     cond do
-      Alert.is_child_stop_closure?(alert, all_platforms_at_informed_station) ->
+      Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) ->
         [:paged_main_content_left]
 
       dual_screen_alert?(t) ->
@@ -1313,7 +1313,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         } = t
       ) do
     cond do
-      Alert.is_child_stop_closure?(alert, all_platforms_at_informed_station) ->
+      Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) ->
         :single_screen_alert
 
       dual_screen_alert?(t) ->
