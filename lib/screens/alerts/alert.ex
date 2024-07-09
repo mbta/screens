@@ -593,12 +593,13 @@ defmodule Screens.Alerts.Alert do
   def direction_id(%__MODULE__{informed_entities: informed_entities}),
     do: List.first(informed_entities).direction_id
 
+  # Subway platform IDs are always integers
   def informed_subway_platforms(%__MODULE__{
         informed_entities: informed_entities
       }) do
-    Enum.reject(
+    Enum.filter(
       informed_entities,
-      &(String.starts_with?(&1.stop, "place-") or &1.route_type != 1)
+      &(match?({_n, ""}, Integer.parse(&1.stop)) and &1.route_type == 1)
     )
   end
 
