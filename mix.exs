@@ -81,9 +81,7 @@ defmodule Screens.MixProject do
       {:stream_data, "~> 1.1", only: :test},
       {:memcachex, "~> 0.5.5"},
       {:aja, "~> 0.6.2"},
-      # hackney_telemetry wants :telemetry 1.0.0 specifically but will work
-      # with 1.2 which is in the lock file
-      {:telemetry, "~> 1.2", override: true},
+      {:telemetry, "~> 1.2"},
       {:telemetry_poller, "~> 0.4"},
       {:telemetry_metrics, "~> 0.4"},
       {:screens_config,
@@ -91,7 +89,7 @@ defmodule Screens.MixProject do
        ref: "25fb47c58fc0b485c8c6df78fe94914292856903"},
       {:nebulex, "~> 2.6"},
       {:remote_ip, "~> 1.2"},
-      {:hackney_telemetry, "~> 0.1.1"},
+      {:hackney_telemetry, "~> 0.2.0"},
       {:ex_cldr_messages, "~> 1.0"}
     ]
   end
