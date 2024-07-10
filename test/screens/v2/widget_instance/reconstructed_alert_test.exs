@@ -1652,9 +1652,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_informed_stations(["JFK/UMass"])
         |> put_all_platforms_at_informed_station([
           %{id: "70085", platform_name: "Ashmont"},
-          %{id: "70086", platform_name: "Ashmont"},
+          %{id: "70086", platform_name: "Alewife (from Ashmont)"},
           %{id: "70095", platform_name: "Braintree"},
-          %{id: "70096", platform_name: "Braintree"}
+          %{id: "70096", platform_name: "Alewife (from Braintree)"}
         ])
 
       expected = %{
