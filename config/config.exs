@@ -56,6 +56,11 @@ config :ueberauth, Ueberauth,
     keycloak: nil
   ]
 
+config :ex_cldr,
+  default_locale: "en",
+  default_backend: Screens.Cldr,
+  json_library: Jason
+
 config :screens,
   gds_dms_username: "mbtadata@gmail.com",
   config_fetcher: Screens.Config.Fetch.S3,
