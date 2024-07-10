@@ -1402,6 +1402,71 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       assert expected == WidgetInstance.serialize(instance)
     end
 
+    test "handles alert closing multiple platforms at one station" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %{
+            alert: %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Red", stop: "place-jfk", route_type: 1},
+                %{route: "Red", stop: "70085", route_type: 1},
+                %{route: "Red", stop: "70095", route_type: 1}
+              ]
+            },
+            context: %{
+              all_platforms_at_informed_station: [
+                %{id: "70085", platform_name: "Ashmont"},
+                %{id: "70086", platform_name: "Alewife (from Ashmont)"},
+                %{id: "70095", platform_name: "Braintree"},
+                %{id: "70096", platform_name: "Alewife (from Braintree)"}
+              ]
+            }
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Normal Service"
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :extended,
+          alert: %{
+            status: "Bypassing 2 stops",
+            location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"},
+            route_pill: %{type: :text, text: "RL", color: :red}
+          }
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green},
+              status: "Normal Service"
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
     test "uses 'Entire line' location text for whole-line shuttles" do
       instance = %SubwayStatus{
         subway_alerts:

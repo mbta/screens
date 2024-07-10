@@ -1635,6 +1635,44 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
     end
 
+    test "handles multiple platform closures at same station", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-andrw")
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-jfk", route: "Red", route_type: 1),
+          ie(stop: "70085", route: "Red", route_type: 1),
+          ie(stop: "70095", route: "Red", route_type: 1)
+        ])
+        |> put_tagged_stop_sequences(%{
+          "Red" => [["place-jfk", "place-andrw"]]
+        })
+        |> put_cause(:unknown)
+        |> put_informed_stations(["JFK/UMass"])
+        |> put_all_platforms_at_informed_station([
+          %{id: "70085", platform_name: "Ashmont"},
+          %{id: "70086", platform_name: "Ashmont"},
+          %{id: "70095", platform_name: "Braintree"},
+          %{id: "70096", platform_name: "Braintree"}
+        ])
+
+      expected = %{
+        issue: "Bypassing 2 platforms at JFK/UMass",
+        location: "",
+        cause: nil,
+        routes: [
+          %{color: :red, text: "RED LINE", type: :text}
+        ],
+        effect: :fallback,
+        urgent: false,
+        region: :outside,
+        remedy: nil
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
+
     test "handles delay", %{widget: widget} do
       widget =
         widget
