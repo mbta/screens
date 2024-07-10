@@ -393,7 +393,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       informed_platforms = Alert.informed_subway_platforms(alert)
 
       %{
-        status: "Bypassing #{length(informed_platforms)} stop",
+        status:
+          Cldr.Message.format!("Bypassing {num_informed_platforms, plural,
+                                =1 {1 stop}
+                                other {# stops}}",
+            num_informed_platforms: length(informed_platforms)
+          ),
         location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"}
       }
     else

@@ -1092,7 +1092,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           "Bypassing #{platform.platform_name} platform at #{informed_station}"
 
         informed_subway_platforms ->
-          "Bypassing #{length(informed_subway_platforms)} platform at #{informed_station}"
+          Cldr.Message.format!("Bypassing {num_platforms, plural,
+          =1 {1 platform}
+          other {# platforms}} at {informed_station}",
+            num_platforms: length(informed_subway_platforms),
+            informed_station: informed_station
+          )
       end
 
     %{
