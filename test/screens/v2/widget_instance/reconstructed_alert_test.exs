@@ -1087,6 +1087,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             type: :subway
           }
         ])
+        |> put_all_platforms_at_informed_station([
+          %{id: "70065", platform_name: "Ashmont/Braintree"},
+          %{id: "70066", platform_name: "Alewife"}
+        ])
 
       expected = %{
         issue: nil,
@@ -1127,6 +1131,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             short_name: nil,
             type: :subway
           }
+        ])
+        |> put_all_platforms_at_informed_station([
+          %{id: "70065", platform_name: "Ashmont/Braintree"},
+          %{id: "70066", platform_name: "Alewife"}
         ])
 
       expected = %{
