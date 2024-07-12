@@ -17,8 +17,8 @@ export type FoldedSection =
 
 export const toFoldedSection = (section: Section): FoldedSection => {
   switch (section.type) {
-    case "normal_section":
-      return {
+    case "normal_section": {
+      const foldedSection: FoldedSection = {
         ...section,
         type: "folded_section",
         rows: {
@@ -26,6 +26,16 @@ export const toFoldedSection = (section: Section): FoldedSection => {
           belowFold: [],
         },
       };
+
+      if (section.layout.max) {
+        const length = sectionLength(foldedSection);
+
+        for (let l = length; l > section.layout.max; l--)
+          trimSection(foldedSection);
+      }
+
+      return foldedSection;
+    }
 
     case "notice_section":
       return section;
@@ -46,7 +56,7 @@ export const trimSections = (sections: FoldedSection[]): FoldedSection[] => {
     .map((section) => ({ section, length: sectionLength(section) }))
     .sort(({ length: a }, { length: b }) => b - a);
 
-  for (const trimStage of Object.values(trimStages)) {
+  for (const trimStage of [trimOneTowardsBase, trimOneTowardsMin]) {
     if (trimStage(sortedSizedSections)) return trimmed;
   }
 
@@ -73,42 +83,20 @@ type SizedFoldedSection = {
   section: FoldedSection;
 };
 
-// Functions which destructively trim departures from sections, returning `true`
-// if any trimming occurred. Each iteration of section trimming tries each one
-// of these in sequence until one succeeds or they have all been tried. Assumes
-// the given sections are reverse-sorted by length (largest first).
-const trimStages: Record<string, (sections: SizedFoldedSection[]) => boolean> =
-  {
-    // Trim all sections with more departures than their `max` until they have
-    // exactly as many as their `max` (if defined).
-    allToMax: (sections) => {
-      return sections.reduce((didTrim, { section, length }) => {
-        if (section.type == "folded_section" && section.layout.max) {
-          for (let l = length; l > section.layout.max; l--) {
-            if (trimSection(section)) {
-              // Trimmed this section; may be able to trim more, so keep going.
-              didTrim ||= true;
-            } else {
-              // This section can't be trimmed further, so return early.
-              return didTrim;
-            }
-          }
-        }
+// `trimOne` functions destructively trim departures from sections, returning
+// `true` if any trimming occurred. Each iteration of section trimming tries
+// each function in sequence until one succeeds or they have all been tried.
+// They assume the given sections are reverse-sorted by length (largest first).
 
-        return didTrim;
-      }, false);
-    },
+// Trim one departure from the section with the most, among those with more than
+// their `base`. If no `base` is defined, acts as `trimTowardsMin`.
+const trimOneTowardsBase = (sections: SizedFoldedSection[]): boolean =>
+  trimOneBy(sections, (length, { min, base }) => length > (base || min));
 
-    // Trim one departure from the section with the most, among those with more
-    // than their `base`. If no `base` is defined, acts as `oneOverMin`.
-    oneTowardsBase: (sections) =>
-      trimOneBy(sections, (length, { min, base }) => length > (base || min)),
-
-    // Trim one departure from the section with the most, among those with more
-    // than their `min`.
-    oneTowardsMin: (sections) =>
-      trimOneBy(sections, (length, { min }) => length > min),
-  };
+// Trim one departure from the section with the most, among those with more than
+// their `min`.
+const trimOneTowardsMin = (sections: SizedFoldedSection[]): boolean =>
+  trimOneBy(sections, (length, { min }) => length > min);
 
 const trimOneBy = (
   sections: SizedFoldedSection[],
