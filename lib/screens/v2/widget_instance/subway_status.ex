@@ -390,7 +390,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
          route_id
        ) do
     if Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) do
-      informed_platforms = Alert.informed_subway_platforms(alert)
+      platform_ids = Enum.map(all_platforms_at_informed_station, & &1.id)
+      informed_platforms = Enum.filter(informed_entities, &(&1.stop in platform_ids))
 
       %{
         status:

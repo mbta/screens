@@ -593,16 +593,6 @@ defmodule Screens.Alerts.Alert do
   def direction_id(%__MODULE__{informed_entities: informed_entities}),
     do: List.first(informed_entities).direction_id
 
-  # Subway platform IDs are always integers
-  def informed_subway_platforms(%__MODULE__{
-        informed_entities: informed_entities
-      }) do
-    Enum.filter(
-      informed_entities,
-      &(match?({_n, ""}, Integer.parse(&1.stop)) and &1.route_type == 1)
-    )
-  end
-
   def informed_parent_stations(%__MODULE__{
         informed_entities: informed_entities
       }) do
@@ -611,14 +601,16 @@ defmodule Screens.Alerts.Alert do
 
   @spec is_partial_station_closure?(__MODULE__.t(), list(Stop.t())) :: boolean()
   def is_partial_station_closure?(
-        %__MODULE__{effect: :station_closure} = alert,
+        %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
         all_platforms_at_informed_station
       ) do
     informed_parent_stations = informed_parent_stations(alert)
 
     case informed_parent_stations do
       [_] ->
-        length(informed_subway_platforms(alert)) != length(all_platforms_at_informed_station)
+        platform_ids = Enum.map(all_platforms_at_informed_station, & &1.id)
+        informed_platforms = Enum.filter(informed_entities, &(&1.stop in platform_ids))
+        length(informed_platforms) != length(all_platforms_at_informed_station)
 
       _ ->
         false

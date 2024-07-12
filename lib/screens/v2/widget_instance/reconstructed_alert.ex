@@ -1078,13 +1078,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp serialize_outside_platform_closure(
          %__MODULE__{
-           alert: alert,
+           alert: %{informed_entities: informed_entities},
            informed_stations: [informed_station],
            all_platforms_at_informed_station: all_platforms_at_informed_station
          } = t
        ) do
+    platform_ids = Enum.map(all_platforms_at_informed_station, & &1.id)
+
     issue =
-      case Alert.informed_subway_platforms(alert) do
+      case Enum.filter(informed_entities, &(&1.stop in platform_ids)) do
         [informed_platform] ->
           platform =
             Enum.find(all_platforms_at_informed_station, &(&1.id == informed_platform.stop))
