@@ -133,14 +133,19 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
          } = departure,
          now
        ) do
-    if is_nil(schedule) do
-      Logger.error("[cr_departures serialize_time] schedule is nil: #{inspect(departure)}")
-    end
-
     {:ok, scheduled_departure_time} =
-      %Departure{schedule: schedule}
-      |> Departure.time()
-      |> DateTime.shift_zone("America/New_York")
+      try do
+        %Departure{schedule: schedule}
+        |> Departure.time()
+        |> DateTime.shift_zone("America/New_York")
+      rescue
+        ex ->
+          Logger.error(
+            "[cr_departures serialize_time] Could not get schedule time: #{inspect(departure)}"
+          )
+
+          reraise ex, __STACKTRACE__
+      end
 
     cond do
       is_nil(prediction) ->
