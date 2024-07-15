@@ -10,6 +10,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
+  alias Screens.Stops.Stop
   alias Screens.Trips.Trip
   alias Screens.Vehicles.Vehicle
   alias Screens.V2.{Departure, WidgetInstance}
@@ -542,11 +543,24 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           departure_time: ~U[2020-01-01T00:01:10Z],
           route: %Route{type: :subway},
-          vehicle: %Vehicle{current_status: :stopped_at}
+          vehicle: %Vehicle{current_status: :stopped_at, stop_id: "stop-b"},
+          stop: %Stop{id: "stop-b"}
         }
       }
 
       assert serialized_boarding ==
+               Departures.serialize_times_with_crowding([departure], screen, now)
+
+      departure = %Departure{
+        prediction: %Prediction{
+          departure_time: ~U[2020-01-01T00:01:10Z],
+          route: %Route{type: :subway},
+          vehicle: %Vehicle{current_status: :stopped_at, stop_id: "stop-a"},
+          stop: %Stop{id: "stop-b"}
+        }
+      }
+
+      assert serialized_boarding !=
                Departures.serialize_times_with_crowding([departure], screen, now)
 
       departure = %Departure{

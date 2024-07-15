@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
+  alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
   alias Screens.Util
@@ -415,8 +416,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
        do: %{time: %{type: :icon, icon: :overnight}}
 
   defp serialize_time(departure, _screen, now) do
+    stop_id = Departure.stop_id(departure)
     departure_time = Departure.time(departure)
     vehicle_status = Departure.vehicle_status(departure)
+    vehicle_stop_id = Prediction.stop_for_vehicle(departure.prediction)
     stop_type = Departure.stop_type(departure)
     route_type = Departure.route_type(departure)
 
@@ -425,7 +428,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     time =
       cond do
-        vehicle_status == :stopped_at and second_diff < 90 ->
+        vehicle_status == :stopped_at and second_diff < 90 and stop_id == vehicle_stop_id ->
           %{type: :text, text: "BRD"}
 
         second_diff < 30 and stop_type == :first_stop ->
