@@ -117,7 +117,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                   type: :subway,
                   long_name: "Orange Line"
                 },
-                stop: %Screens.Stops.Stop{id: "70015", name: "Back Bay"},
+                stop: %Stop{id: "70015", name: "Back Bay"},
                 stop_headsign: "Oak Grove"
               )
           }
@@ -567,7 +567,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           departure_time: ~U[2020-01-01T00:02:10Z],
           route: %Route{type: :subway},
-          vehicle: %Vehicle{current_status: :stopped_at}
+          vehicle: %Vehicle{current_status: :stopped_at},
+          stop: %Stop{}
         }
       }
 
@@ -578,7 +579,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           departure_time: ~U[2020-01-01T00:02:10Z],
           route: %Route{type: :subway},
-          vehicle: %Vehicle{current_status: :in_transit_to}
+          vehicle: %Vehicle{current_status: :in_transit_to},
+          stop: %Stop{}
         }
       }
 
@@ -594,7 +596,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: nil,
           departure_time: ~U[2020-01-01T00:00:10Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -605,7 +608,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: nil,
           departure_time: ~U[2020-01-01T00:00:40Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -616,7 +620,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:00:10Z],
           departure_time: ~U[2020-01-01T00:00:10Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -632,7 +637,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:00:10Z],
           departure_time: ~U[2020-01-01T00:00:10Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -643,7 +649,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:00:40Z],
           departure_time: ~U[2020-01-01T00:00:40Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -697,7 +704,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:20:00Z],
           departure_time: ~U[2020-01-01T00:20:00Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -708,7 +716,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:20:00Z],
           departure_time: ~U[2020-01-01T00:20:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         }
       }
 
@@ -719,7 +728,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:20:00Z],
           departure_time: ~U[2020-01-01T00:20:00Z],
-          route: %Route{type: :bus}
+          route: %Route{type: :bus},
+          stop: %Stop{}
         }
       }
 
@@ -730,7 +740,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:20:00Z],
           departure_time: ~U[2020-01-01T00:20:00Z],
-          route: %Route{type: :ferry}
+          route: %Route{type: :ferry},
+          stop: %Stop{}
         }
       }
 
@@ -759,7 +770,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T05:20:00Z],
           departure_time: ~U[2020-01-01T05:20:00Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -774,12 +786,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T02:20:00Z],
           departure_time: ~U[2020-01-01T02:20:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         },
         schedule: %Schedule{
           arrival_time: ~U[2020-01-01T02:15:00Z],
           departure_time: ~U[2020-01-01T02:15:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         }
       }
 
@@ -807,12 +821,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T02:20:00Z],
           departure_time: ~U[2020-01-01T02:20:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         },
         schedule: %Schedule{
           arrival_time: ~U[2020-01-01T02:20:00Z],
           departure_time: ~U[2020-01-01T02:20:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         }
       }
 
@@ -827,12 +843,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T02:20:00Z],
           departure_time: ~U[2020-01-01T02:20:00Z],
-          route: %Route{type: :bus}
+          route: %Route{type: :bus},
+          stop: %Stop{}
         },
         schedule: %Schedule{
           arrival_time: ~U[2020-01-01T02:15:00Z],
           departure_time: ~U[2020-01-01T02:15:00Z],
-          route: %Route{type: :bus}
+          route: %Route{type: :bus},
+          stop: %Stop{}
         }
       }
 
@@ -847,12 +865,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:00:10Z],
           departure_time: ~U[2020-01-01T00:00:10Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         },
         schedule: %Schedule{
           arrival_time: ~U[2020-01-01T00:05:00Z],
           departure_time: ~U[2020-01-01T00:05:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         }
       }
 
@@ -868,7 +888,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T02:20:00Z],
           departure_time: ~U[2020-01-01T02:20:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         }
       }
 

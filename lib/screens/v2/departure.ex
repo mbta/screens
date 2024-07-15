@@ -186,8 +186,6 @@ defmodule Screens.V2.Departure do
     stop_id
   end
 
-  def stop_id(_), do: nil
-
   def stop_type(%__MODULE__{
         prediction: %Prediction{arrival_time: arrival_time, departure_time: departure_time}
       }) do
