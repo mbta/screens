@@ -415,6 +415,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
        ),
        do: %{time: %{type: :icon, icon: :overnight}}
 
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defp serialize_time(departure, _screen, now) do
     stop_id = Departure.stop_id(departure)
     departure_time = Departure.time(departure)
