@@ -1,6 +1,7 @@
 defmodule Screens.Alerts.Alert do
   @moduledoc false
 
+  alias Screens.Alerts.InformedEntity
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Stops.Stop
@@ -596,7 +597,7 @@ defmodule Screens.Alerts.Alert do
   def informed_parent_stations(%__MODULE__{
         informed_entities: informed_entities
       }) do
-    Enum.filter(informed_entities, &String.starts_with?(&1.stop, "place-"))
+    Enum.filter(informed_entities, &InformedEntity.parent_station?/1)
   end
 
   @spec is_partial_station_closure?(__MODULE__.t(), list(Stop.t())) :: boolean()
