@@ -393,8 +393,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       }),
       do: false
 
-  def dual_screen_alert?(%__MODULE__{is_terminal_station: is_terminal_station, alert: alert} = t) do
+  def dual_screen_alert?(
+        %__MODULE__{
+          is_terminal_station: is_terminal_station,
+          alert: alert,
+          all_platforms_at_informed_station: all_platforms_at_informed_station
+        } = t
+      ) do
     Alert.effect(alert) in [:station_closure, :suspension, :shuttle] and
+      not Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) and
       LocalizedAlert.location(t, is_terminal_station) == :inside and
       LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
       (is_nil(Alert.direction_id(t.alert)) or is_terminal_station)
@@ -1299,42 +1306,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def slot_names(%__MODULE__{is_full_screen: false}), do: [:large]
 
-  def slot_names(
-        %__MODULE__{
-          alert: alert,
-          all_platforms_at_informed_station: all_platforms_at_informed_station
-        } = t
-      ) do
-    cond do
-      Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) ->
-        [:paged_main_content_left]
-
-      dual_screen_alert?(t) ->
-        [:full_body]
-
-      true ->
-        [:paged_main_content_left]
-    end
+  def slot_names(%__MODULE__{} = t) do
+    if dual_screen_alert?(t),
+      do: [:full_body],
+      else: [:paged_main_content_left]
   end
 
   def widget_type(%__MODULE__{is_full_screen: false}), do: :reconstructed_large_alert
 
-  def widget_type(
-        %__MODULE__{
-          alert: alert,
-          all_platforms_at_informed_station: all_platforms_at_informed_station
-        } = t
-      ) do
-    cond do
-      Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) ->
-        :single_screen_alert
-
-      dual_screen_alert?(t) ->
-        :reconstructed_takeover
-
-      true ->
-        :single_screen_alert
-    end
+  def widget_type(%__MODULE__{} = t) do
+    if dual_screen_alert?(t),
+      do: :reconstructed_takeover,
+      else: :single_screen_alert
   end
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
