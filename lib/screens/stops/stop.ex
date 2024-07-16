@@ -367,17 +367,14 @@ defmodule Screens.Stops.Stop do
     case Screens.V3Api.get_json("stops/" <> stop_id, %{"include" => "child_stops"}) do
       {:ok, %{"included" => child_stop_data}} ->
         child_stop_data
-        |> Enum.filter(
-          &match?(
-            %{
-              "attributes" => %{
-                "location_type" => 0,
-                "vehicle_type" => 1
-              }
-            },
-            &1
-          )
-        )
+        |> Enum.filter(fn %{
+                            "attributes" => %{
+                              "location_type" => location_type,
+                              "vehicle_type" => vehicle_type
+                            }
+                          } ->
+          location_type == 0 and vehicle_type in [0, 1]
+        end)
         |> Enum.map(&Stops.Parser.parse_stop/1)
     end
   end
