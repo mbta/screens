@@ -1228,7 +1228,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     location = LocalizedAlert.location(t)
 
     if Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) do
-      t |> serialize_single_screen_fallback_alert(location)
+      serialize_single_screen_fallback_alert(t, location)
     else
       diagram_data = serialize_diagram(t, log_fn)
 
