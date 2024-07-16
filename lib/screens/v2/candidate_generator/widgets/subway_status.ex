@@ -53,11 +53,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
           []
       end
 
-    %{
+    %SubwayStatus.SubwayStatusAlert{
       alert: alert,
       context: %{all_platforms_at_informed_station: all_platforms_at_informed_station}
     }
   end
 
-  defp append_context(alert, _), do: %{alert: alert, context: %{}}
+  defp append_context(alert, _), do: struct(SubwayStatus.SubwayStatusAlert, alert: alert)
 end

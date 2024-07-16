@@ -1,5 +1,7 @@
 defmodule Screens.V2.WidgetInstance.SubwayStatus do
-  @moduledoc false
+  @moduledoc """
+  A flex-zone widget that displays a brief status of each subway line.
+  """
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
@@ -8,12 +10,26 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.{Footer, GlEink, PreFare}
 
+  defmodule SubwayStatusAlert do
+    @type t :: %__MODULE__{
+            alert: Alert.t(),
+            context: context()
+          }
+
+    @enforce_keys [:alert]
+    defstruct @enforce_keys ++ [context: nil]
+
+    @type context :: %{
+            optional(:all_platforms_at_informed_station) => list(String.t())
+          }
+  end
+
   defstruct screen: nil,
             subway_alerts: nil
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          subway_alerts: list(%{alert: Alert.t(), context: %{}})
+          subway_alerts: list(SubwayStatusAlert.t())
         }
 
   @type serialized_response :: %{
