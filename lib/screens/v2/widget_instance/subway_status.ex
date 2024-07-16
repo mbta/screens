@@ -360,6 +360,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     Map.merge(%{route_pill: serialize_route_pill(route_id)}, serialize_alert(alert, route_id))
   end
 
+  @spec serialize_alert(Alert.t() | nil, String.t()) :: alert()
+  defp serialize_alert(alert, route_id)
+
   defp serialize_alert(nil, _route_id) do
     %{status: "Normal Service"}
   end
@@ -443,15 +446,19 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     }
   end
 
-  def serialize_green_line_branch_alert(
-        %{
-          alert: %Alert{
-            effect: :station_closure,
-            informed_entities: informed_entities
-          }
-        },
-        route_ids
-      ) do
+  @spec serialize_green_line_branch_alert(%{alert: Alert.t(), context: %{}}, list(String.t())) ::
+          alert()
+  defp serialize_green_line_branch_alert(alert, route_ids)
+
+  defp serialize_green_line_branch_alert(
+         %{
+           alert: %Alert{
+             effect: :station_closure,
+             informed_entities: informed_entities
+           }
+         },
+         route_ids
+       ) do
     stop_names =
       Enum.flat_map(route_ids, &get_stop_names_from_informed_entities(informed_entities, &1))
 
@@ -467,7 +474,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   # If only one branch is affected, we can still determine a stop
   # range to show, for applicable alert types
-  def serialize_green_line_branch_alert(alert, [route_id]) do
+  defp serialize_green_line_branch_alert(alert, [route_id]) do
     Map.merge(
       %{route_pill: serialize_gl_pill_with_branches([route_id])},
       serialize_alert(alert, route_id)
@@ -475,7 +482,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   # Otherwise, give up on determining a stop range.
-  def serialize_green_line_branch_alert(alert, route_ids) do
+  defp serialize_green_line_branch_alert(alert, route_ids) do
     Map.merge(
       %{route_pill: serialize_gl_pill_with_branches(route_ids)},
       serialize_alert(alert, "Green")
