@@ -29,7 +29,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           routes: nil,
           alert_route_types: nil
         },
-        all_platforms_at_informed_station: []
+        partial_closure_platform_names: []
       }
     }
   end
@@ -130,8 +130,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     }
   end
 
-  defp put_all_platforms_at_informed_station(widget, all_platforms_at_informed_station) do
-    %{widget | all_platforms_at_informed_station: all_platforms_at_informed_station}
+  defp put_partial_closure_platform_names(widget, partial_closure_platform_names) do
+    %{widget | partial_closure_platform_names: partial_closure_platform_names}
   end
 
   defp ie(opts) do
@@ -1087,10 +1087,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             type: :subway
           }
         ])
-        |> put_all_platforms_at_informed_station([
-          %{id: "70065", platform_name: "Ashmont/Braintree"},
-          %{id: "70066", platform_name: "Alewife"}
-        ])
+        |> put_partial_closure_platform_names(["Ashmont/Braintree", "Alewife"])
 
       expected = %{
         issue: nil,
@@ -1132,10 +1129,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             type: :subway
           }
         ])
-        |> put_all_platforms_at_informed_station([
-          %{id: "70065", platform_name: "Ashmont/Braintree"},
-          %{id: "70066", platform_name: "Alewife"}
-        ])
+        |> put_partial_closure_platform_names(["Ashmont/Braintree", "Alewife"])
 
       expected = %{
         issue: nil,
@@ -1622,10 +1616,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         })
         |> put_cause(:unknown)
         |> put_informed_stations(["Porter"])
-        |> put_all_platforms_at_informed_station([
-          %{id: "70065", platform_name: "Ashmont/Braintree"},
-          %{id: "70066", platform_name: "Alewife"}
-        ])
+        |> put_partial_closure_platform_names(["Ashmont/Braintree"])
 
       expected = %{
         issue: "Bypassing Ashmont/Braintree platform at Porter",
@@ -1634,7 +1625,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [
           %{color: :red, text: "RED LINE", type: :text}
         ],
-        effect: :fallback,
+        effect: :station_closure,
         urgent: false,
         region: :outside,
         remedy: nil
@@ -1658,12 +1649,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         })
         |> put_cause(:unknown)
         |> put_informed_stations(["JFK/UMass"])
-        |> put_all_platforms_at_informed_station([
-          %{id: "70085", platform_name: "Ashmont"},
-          %{id: "70086", platform_name: "Alewife (from Ashmont)"},
-          %{id: "70095", platform_name: "Braintree"},
-          %{id: "70096", platform_name: "Alewife (from Braintree)"}
-        ])
+        |> put_partial_closure_platform_names(["Ashmont", "Braintree"])
 
       expected = %{
         issue: "Bypassing 2 platforms at JFK/UMass",
@@ -1672,7 +1658,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [
           %{color: :red, text: "RED LINE", type: :text}
         ],
-        effect: :fallback,
+        effect: :station_closure,
         urgent: false,
         region: :outside,
         remedy: nil

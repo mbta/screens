@@ -24,7 +24,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             is_terminal_station: false,
             # Full screen alert, whether that's a single or dual screen alert
             is_full_screen: false,
-            all_platforms_at_informed_station: []
+            partial_closure_platform_names: []
 
   @type stop_id :: String.t()
 
@@ -38,7 +38,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           informed_stations: list(String.t()),
           is_terminal_station: boolean(),
           is_full_screen: boolean(),
-          all_platforms_at_informed_station: list(Stop.t())
+          partial_closure_platform_names: list(String.t())
         }
 
   @type serialized_response ::
@@ -393,15 +393,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       }),
       do: false
 
+  def dual_screen_alert?(%__MODULE__{
+        alert: %Alert{effect: :station_closure},
+        partial_closure_platform_names: partial_closure_platform_names
+      })
+      when partial_closure_platform_names != [],
+      do: false
+
   def dual_screen_alert?(
         %__MODULE__{
           is_terminal_station: is_terminal_station,
-          alert: alert,
-          all_platforms_at_informed_station: all_platforms_at_informed_station
+          alert: alert
         } = t
       ) do
     Alert.effect(alert) in [:station_closure, :suspension, :shuttle] and
-      not Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) and
       LocalizedAlert.location(t, is_terminal_station) == :inside and
       LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
       (is_nil(Alert.direction_id(t.alert)) or is_terminal_station)
@@ -1039,31 +1044,61 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  # Partial closure
   defp serialize_outside_alert(
          %__MODULE__{
-           alert: %Alert{effect: :station_closure} = alert,
-           all_platforms_at_informed_station: all_platforms_at_informed_station
+           informed_stations: [informed_station],
+           partial_closure_platform_names: partial_closure_platform_names
+         } = t,
+         _location
+       )
+       when partial_closure_platform_names != [] do
+    issue =
+      case partial_closure_platform_names do
+        [informed_platform_name] ->
+          "Bypassing #{informed_platform_name} platform at #{informed_station}"
+
+        informed_subway_platforms ->
+          Cldr.Message.format!("Bypassing {num_platforms, plural,
+            =1 {1 platform}
+            other {# platforms}} at {informed_station}",
+            num_platforms: length(informed_subway_platforms),
+            informed_station: informed_station
+          )
+      end
+
+    %{
+      issue: issue,
+      remedy: nil,
+      location: "",
+      cause: nil,
+      routes: get_route_pills(t),
+      effect: :station_closure,
+      urgent: false
+    }
+  end
+
+  # Full closure
+  defp serialize_outside_alert(
+         %__MODULE__{
+           alert: %Alert{effect: :station_closure}
          } = t,
          _location
        ) do
-    if Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) do
-      serialize_outside_platform_closure(t)
-    else
-      %{alert: %{cause: cause}, informed_stations: informed_stations} = t
-      cause_text = Alert.get_cause_string(cause)
+    %{alert: %{cause: cause}, informed_stations: informed_stations} = t
+    cause_text = Alert.get_cause_string(cause)
 
-      informed_stations_string = Util.format_name_list_to_string(informed_stations)
+    informed_stations_string = Util.format_name_list_to_string(informed_stations)
 
-      %{
-        issue: "Trains will bypass #{informed_stations_string}",
-        remedy: "Seek alternate route",
-        location: "",
-        cause: cause_text,
-        routes: get_route_pills(t),
-        effect: :station_closure,
-        urgent: false
-      }
-    end
+    %{
+      issue: "Trains will bypass #{informed_stations_string}",
+      remedy: "Seek alternate route",
+      location: "",
+      cause: cause_text,
+      routes: get_route_pills(t),
+      effect: :station_closure,
+      urgent: false
+    }
   end
 
   defp serialize_outside_alert(
@@ -1079,43 +1114,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: "",
       routes: get_route_pills(t),
       effect: :delay,
-      urgent: false
-    }
-  end
-
-  defp serialize_outside_platform_closure(
-         %__MODULE__{
-           alert: %{informed_entities: informed_entities},
-           informed_stations: [informed_station],
-           all_platforms_at_informed_station: all_platforms_at_informed_station
-         } = t
-       ) do
-    platform_ids = Enum.map(all_platforms_at_informed_station, & &1.id)
-
-    issue =
-      case Enum.filter(informed_entities, &(&1.stop in platform_ids)) do
-        [informed_platform] ->
-          platform =
-            Enum.find(all_platforms_at_informed_station, &(&1.id == informed_platform.stop))
-
-          "Bypassing #{platform.platform_name} platform at #{informed_station}"
-
-        informed_subway_platforms ->
-          Cldr.Message.format!("Bypassing {num_platforms, plural,
-          =1 {1 platform}
-          other {# platforms}} at {informed_station}",
-            num_platforms: length(informed_subway_platforms),
-            informed_station: informed_station
-          )
-      end
-
-    %{
-      issue: issue,
-      remedy: nil,
-      location: "",
-      cause: nil,
-      routes: get_route_pills(t),
-      effect: :fallback,
       urgent: false
     }
   end
@@ -1227,22 +1225,27 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def serialize(
         %__MODULE__{
           is_full_screen: true,
-          alert: %Alert{effect: effect} = alert,
-          all_platforms_at_informed_station: all_platforms_at_informed_station
+          alert: %Alert{effect: :station_closure},
+          partial_closure_platform_names: partial_closure_platform_names
+        } = t,
+        _log_fn
+      )
+      when partial_closure_platform_names != [] do
+    location = LocalizedAlert.location(t)
+    serialize_single_screen_fallback_alert(t, location)
+  end
+
+  def serialize(
+        %__MODULE__{
+          is_full_screen: true,
+          alert: %Alert{effect: effect}
         } = t,
         log_fn
       ) do
     location = LocalizedAlert.location(t)
-
-    if Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) do
-      serialize_single_screen_fallback_alert(t, location)
-    else
-      diagram_data = serialize_diagram(t, log_fn)
-
-      main_data = pick_layout_serializer(t, diagram_data, effect, location, dual_screen_alert?(t))
-
-      Map.merge(main_data, diagram_data)
-    end
+    diagram_data = serialize_diagram(t, log_fn)
+    main_data = pick_layout_serializer(t, diagram_data, effect, location, dual_screen_alert?(t))
+    Map.merge(main_data, diagram_data)
   end
 
   def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t, _log_fn) do

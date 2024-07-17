@@ -11,6 +11,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   alias ScreensConfig.V2.{Footer, GlEink, PreFare}
 
   defmodule SubwayStatusAlert do
+    @moduledoc false
+
     @type t :: %__MODULE__{
             alert: Alert.t(),
             context: context()

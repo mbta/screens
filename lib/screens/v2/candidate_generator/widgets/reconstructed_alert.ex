@@ -163,8 +163,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
        ) do
     Enum.map(alerts, fn alert ->
-      all_platforms_at_informed_station =
-        get_platforms_at_informed_station(alert, fetch_subway_platforms_for_stop_fn)
+      all_platforms_names_at_informed_station =
+        get_platform_names_at_informed_station(alert, fetch_subway_platforms_for_stop_fn)
 
       %ReconstructedAlert{
         screen: config,
@@ -174,27 +174,26 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         informed_stations: get_stations(alert, fetch_stop_name_fn),
         is_terminal_station: is_terminal_station,
         is_full_screen: is_full_screen,
-        all_platforms_at_informed_station: all_platforms_at_informed_station
+        partial_closure_platform_names: all_platforms_names_at_informed_station
       }
     end)
   end
 
-  defp get_platforms_at_informed_station(
-         %{effect: :station_closure} = alert,
+  defp get_platform_names_at_informed_station(
+         %Alert{effect: :station_closure, informed_entities: informed_entities} = alert,
          fetch_subway_platforms_for_stop_fn
        ) do
-    informed_parent_stations = Alert.informed_parent_stations(alert)
-
-    case informed_parent_stations do
-      [informed_parent_station] ->
-        fetch_subway_platforms_for_stop_fn.(informed_parent_station.stop)
-
-      _ ->
-        []
+    with [informed_parent_station] <- Alert.informed_parent_stations(alert),
+         platforms <- fetch_subway_platforms_for_stop_fn.(informed_parent_station.stop),
+         true <- Alert.is_partial_station_closure?(alert, platforms) do
+      informed_stop_ids = Enum.map(informed_entities, & &1.stop)
+      platforms |> Enum.filter(&(&1.id in informed_stop_ids)) |> Enum.map(& &1.platform_name)
+    else
+      _ -> []
     end
   end
 
-  defp get_platforms_at_informed_station(_, _), do: []
+  defp get_platform_names_at_informed_station(_, _), do: []
 
   defp find_closest_downstream_alerts(alerts, stop_id, stop_sequences) do
     home_stop_distance_map = build_distance_map(stop_id, stop_sequences)
