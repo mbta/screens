@@ -600,6 +600,8 @@ defmodule Screens.Alerts.Alert do
     Enum.filter(informed_entities, &InformedEntity.parent_station?/1)
   end
 
+  # Although Alerts UI allows you to create partial closures affecting multiple stations,
+  # we are assuming that will never happen.
   @spec is_partial_station_closure?(__MODULE__.t(), list(Stop.t())) :: boolean()
   def is_partial_station_closure?(
         %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
