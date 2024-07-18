@@ -20,7 +20,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           }
 
     @enforce_keys [:alert]
-    defstruct @enforce_keys ++ [context: nil]
+    defstruct @enforce_keys ++ [context: %{}]
 
     @type context :: %{
             optional(:all_platforms_at_informed_station) => list(String.t())
