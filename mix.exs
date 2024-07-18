@@ -47,7 +47,7 @@ defmodule Screens.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.6.0"},
+      {:phoenix, "~> 1.7.14"},
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.3", only: :dev},
