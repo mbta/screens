@@ -10,12 +10,27 @@ import {
 
 import { departureRow, normalSection, timeWithCrowding } from "./factories";
 
-const buildFoldedSection = (attrs) =>
-  toFoldedSection(normalSection.build(attrs));
-
 const dropId = (rows) => rows.map((row) => _.omit(["id"], row));
 
+describe("toFoldedSection", () => {
+  test("trims departures above the section's `max`", () => {
+    const rows = departureRow.buildList(5);
+    const [row1, row2, row3, ...trimmed] = rows;
+
+    const section = normalSection.build({ layout: { max: 3 }, rows: rows });
+
+    expect(toFoldedSection(section)).toMatchObject({
+      ...section,
+      type: "folded_section",
+      rows: { aboveFold: [row1, row2, row3], belowFold: dropId(trimmed) },
+    });
+  });
+});
+
 describe("trimSections", () => {
+  const buildFoldedSection = (attrs) =>
+    toFoldedSection(normalSection.build(attrs));
+
   test("does nothing with notice sections", () => {
     const sections: FoldedSection[] = [
       {
@@ -25,29 +40,6 @@ describe("trimSections", () => {
     ];
 
     expect(trimSections(sections)).toBe(sections);
-  });
-
-  test("trims all sections to their `max` if any exceed it", () => {
-    const rowsA = departureRow.buildList(3);
-    const [rowA1, rowA2, ...trimmedA] = rowsA;
-    const rowsB = departureRow.buildList(5);
-    const [rowB1, rowB2, rowB3, ...trimmedB] = rowsB;
-
-    const sections = [
-      buildFoldedSection({ layout: { max: 2 }, rows: rowsA }),
-      buildFoldedSection({ layout: { max: 3 }, rows: rowsB }),
-    ];
-
-    expect(trimSections(sections)).toMatchObject([
-      {
-        ...sections[0],
-        rows: { aboveFold: [rowA1, rowA2], belowFold: dropId(trimmedA) },
-      },
-      {
-        ...sections[1],
-        rows: { aboveFold: [rowB1, rowB2, rowB3], belowFold: dropId(trimmedB) },
-      },
-    ]);
   });
 
   test("trims one departure from the largest section above its `base`", () => {
