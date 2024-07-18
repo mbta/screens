@@ -125,6 +125,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         fetch_directional_alerts_fn: fn _ -> {:ok, directional_alerts} end,
         fetch_stop_name_fn: fetch_stop_name_fn,
         fetch_location_context_fn: fn _, _, _ -> {:ok, location_context} end,
+        fetch_subway_platforms_for_stop_fn: fn _ -> [] end,
         x_fetch_alerts_fn: fn _ -> :error end,
         x_fetch_stop_name_fn: fn _ -> :error end,
         x_fetch_location_context_fn: fn _, _, _ -> :error end
@@ -138,7 +139,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         now: now,
         happening_now_active_period: happening_now_active_period,
         fetch_stop_name_fn: fetch_stop_name_fn,
-        fetch_location_context_fn: fetch_location_context_fn
+        fetch_location_context_fn: fetch_location_context_fn,
+        fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
       } = context
 
       alerts = [
@@ -168,7 +170,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         screen: config,
         location_context: location_context,
         now: now,
-        is_terminal_station: true
+        is_terminal_station: true,
+        all_platforms_at_informed_station: []
       }
 
       expected_widgets = [
@@ -218,7 +221,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_alerts_fn,
                  fetch_stop_name_fn,
-                 fetch_location_context_fn
+                 fetch_location_context_fn,
+                 fetch_subway_platforms_for_stop_fn
                )
     end
 
@@ -230,7 +234,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         now: now,
         happening_now_active_period: happening_now_active_period,
         fetch_stop_name_fn: fetch_stop_name_fn,
-        fetch_location_context_fn: fetch_location_context_fn
+        fetch_location_context_fn: fetch_location_context_fn,
+        fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
       } = context
 
       alerts = [
@@ -260,7 +265,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         screen: config,
         location_context: location_context,
         now: now,
-        is_terminal_station: true
+        is_terminal_station: true,
+        all_platforms_at_informed_station: []
       }
 
       expected_widgets = [
@@ -310,7 +316,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_alerts_fn,
                  fetch_stop_name_fn,
-                 fetch_location_context_fn
+                 fetch_location_context_fn,
+                 fetch_subway_platforms_for_stop_fn
                )
     end
 
@@ -341,7 +348,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         screen: config,
         location_context: location_context,
         now: now,
-        is_terminal_station: true
+        is_terminal_station: true,
+        all_platforms_at_informed_station: []
       }
 
       expected_widgets = [
@@ -428,7 +436,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         now: now,
         fetch_location_context_fn: fetch_location_context_fn,
         fetch_alerts_fn: fetch_alerts_fn,
-        x_fetch_stop_name_fn: x_fetch_stop_name_fn
+        x_fetch_stop_name_fn: x_fetch_stop_name_fn,
+        fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
       } = context
 
       expected_common_data = %{
@@ -436,6 +445,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         location_context: location_context,
         now: now,
         informed_stations: [],
+        all_platforms_at_informed_station: [],
         is_terminal_station: true
       }
 
@@ -483,7 +493,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_alerts_fn,
                  x_fetch_stop_name_fn,
-                 fetch_location_context_fn
+                 fetch_location_context_fn,
+                 fetch_subway_platforms_for_stop_fn
                )
     end
 
@@ -502,7 +513,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         location_context: location_context,
         now: now,
         is_terminal_station: true,
-        is_full_screen: true
+        is_full_screen: true,
+        all_platforms_at_informed_station: []
       }
 
       expected_widgets = [
