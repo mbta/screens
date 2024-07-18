@@ -19,7 +19,9 @@ defmodule ScreensWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: ScreensWeb
+      use Phoenix.Controller,
+        namespace: ScreensWeb,
+        layouts: [html: {ScreensWeb.LayoutView, :app}]
 
       import Plug.Conn
       import ScreensWeb.Gettext
