@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.SubwayStatus
   alias ScreensConfig.Screen
@@ -378,7 +379,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     Map.merge(%{route_pill: serialize_route_pill(route_id)}, serialize_alert(alert, route_id))
   end
 
-  @spec serialize_alert(Alert.t() | nil, String.t()) :: alert()
+  @spec serialize_alert(Alert.t() | nil, Route.id()) :: alert()
   defp serialize_alert(alert, route_id)
 
   defp serialize_alert(nil, _route_id) do
