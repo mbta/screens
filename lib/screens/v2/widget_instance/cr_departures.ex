@@ -200,7 +200,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
     departure_time =
       cond do
-        is_boarding?(
+        boarding?(
           vehicle,
           stop_type,
           stop_id,
@@ -222,7 +222,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     %{departure_time: departure_time, departure_type: :prediction, is_delayed: is_delayed}
   end
 
-  defp is_boarding?(
+  defp boarding?(
          vehicle,
          stop_type,
          home_station_id,

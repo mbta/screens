@@ -465,7 +465,7 @@ defmodule Screens.Alerts.Alert do
     {inline_alerts, global_alerts} =
       [stop_id: stop_id]
       |> fetch_or_empty_list()
-      |> Enum.split_with(&is_inline?/1)
+      |> Enum.split_with(&inline?/1)
 
     global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
 
@@ -473,11 +473,11 @@ defmodule Screens.Alerts.Alert do
   end
 
   # V1 only
-  defp is_inline?(%{effect: :delay}) do
+  defp inline?(%{effect: :delay}) do
     true
   end
 
-  defp is_inline?(_) do
+  defp inline?(_) do
     false
   end
 
@@ -523,7 +523,7 @@ defmodule Screens.Alerts.Alert do
     {inline_alerts, global_alerts} =
       [route_id: route_id]
       |> fetch_or_empty_list()
-      |> Enum.split_with(&is_inline?/1)
+      |> Enum.split_with(&inline?/1)
 
     global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
 
@@ -602,8 +602,8 @@ defmodule Screens.Alerts.Alert do
 
   # Although Alerts UI allows you to create partial closures affecting multiple stations,
   # we are assuming that will never happen.
-  @spec is_partial_station_closure?(__MODULE__.t(), list(Stop.t())) :: boolean()
-  def is_partial_station_closure?(
+  @spec partial_station_closure?(__MODULE__.t(), list(Stop.t())) :: boolean()
+  def partial_station_closure?(
         %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
         all_platforms_at_informed_station
       ) do
@@ -620,5 +620,5 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  def is_partial_station_closure?(_, _), do: false
+  def partial_station_closure?(_, _), do: false
 end

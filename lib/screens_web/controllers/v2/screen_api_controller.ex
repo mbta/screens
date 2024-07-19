@@ -23,7 +23,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
-    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
+    is_screen = ScreensWeb.UserAgent.screen_conn?(conn, screen_id)
     screen_side = params["screen_side"]
     triptych_pane = params["pane"]
     screen = Cache.screen(screen_id)

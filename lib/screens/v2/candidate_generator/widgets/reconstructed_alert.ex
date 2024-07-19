@@ -65,7 +65,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          route_ids <- Route.route_ids(location_context.routes),
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
       relevant_alerts = relevant_alerts(alerts, location_context, now)
-      is_terminal_station = is_terminal?(stop_id, LC.stop_sequences(location_context))
+      is_terminal_station = terminal?(stop_id, LC.stop_sequences(location_context))
 
       immediate_disruptions = get_immediate_disruptions(relevant_alerts, location_context)
       downstream_disruptions = get_downstream_disruptions(relevant_alerts, location_context)
@@ -185,7 +185,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
        ) do
     with [informed_parent_station] <- Alert.informed_parent_stations(alert),
          platforms <- fetch_subway_platforms_for_stop_fn.(informed_parent_station.stop),
-         true <- Alert.is_partial_station_closure?(alert, platforms) do
+         true <- Alert.partial_station_closure?(alert, platforms) do
       informed_stop_ids = Enum.map(informed_entities, & &1.stop)
       platforms |> Enum.filter(&(&1.id in informed_stop_ids)) |> Enum.map(& &1.platform_name)
     else
@@ -367,7 +367,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   defp get_stations(_alert, _fetch_stop_name_fn), do: []
 
-  defp is_terminal?(stop_id, stop_sequences) do
+  defp terminal?(stop_id, stop_sequences) do
     # Can't use Enum.any, because then Govt Center will be seen as a terminal
     # Using all is ok because no station is the terminal of one line and NOT the terminal of another line
     # excluding GL branches
