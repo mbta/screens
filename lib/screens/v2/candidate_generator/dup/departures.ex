@@ -245,8 +245,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   defp get_section_data(
-         %Section{query: %Query{params: %Params{stop_ids: stop_ids} = params}, headway: headway} =
-           section,
+         %Section{query: %Query{params: params}} = section,
          fetch_departures_fn,
          fetch_alerts_fn,
          create_station_with_routes_map_fn,
@@ -271,29 +270,48 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
              primary_route_for_section.type in disabled_modes do
           %{type: :no_data_section, route: primary_route_for_section}
         else
-          section_departures =
-            case Widgets.Departures.fetch_section_departures(
-                   section,
-                   disabled_modes,
-                   fetch_departures_fn
-                 ) do
-              {:ok, departures} -> departures
-              :error -> []
-            end
-
-          alert_informed_entities = get_section_entities(params, fetch_alerts_fn, now)
-
-          %{
-            departures: section_departures,
-            alert_informed_entities: alert_informed_entities,
-            headway: headway,
-            stop_ids: stop_ids,
-            routes: routes,
-            params: params
-          }
+          create_section_data_map(
+            section,
+            routes,
+            disabled_modes,
+            fetch_departures_fn,
+            fetch_alerts_fn,
+            now
+          )
         end
       end
     )
+  end
+
+  defp create_section_data_map(
+         %Section{query: %Query{params: %Params{stop_ids: stop_ids} = params}, headway: headway} =
+           section,
+         routes,
+         disabled_modes,
+         fetch_departures_fn,
+         fetch_alerts_fn,
+         now
+       ) do
+    section_departures =
+      case Widgets.Departures.fetch_section_departures(
+             section,
+             disabled_modes,
+             fetch_departures_fn
+           ) do
+        {:ok, departures} -> departures
+        :error -> []
+      end
+
+    alert_informed_entities = get_section_entities(params, fetch_alerts_fn, now)
+
+    %{
+      departures: section_departures,
+      alert_informed_entities: alert_informed_entities,
+      headway: headway,
+      stop_ids: stop_ids,
+      routes: routes,
+      params: params
+    }
   end
 
   defp get_section_route_from_entities(

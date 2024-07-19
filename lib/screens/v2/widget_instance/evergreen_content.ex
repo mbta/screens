@@ -86,10 +86,11 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
       if time_match_crosses_utc_midnight do
         time_in_overnight_range?(now, time_match, schedule.dates)
       else
-        Enum.any?(schedule.dates, fn date_range ->
-          Date.compare(date_range.start_date, now) in [:lt, :eq] and
-            Date.compare(now, date_range.end_date) in [:lt, :eq]
-        end)
+        Enum.any?(
+          schedule.dates,
+          &(Date.compare(now, &1.start_date) in [:gt, :eq] and
+              Date.compare(now, &1.end_date) in [:lt, :eq])
+        )
       end
     end
   end
@@ -109,16 +110,21 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
 
     dates =
       if now_is_past_midnight do
-        Enum.map(dates, fn date_range ->
-          Map.new(date_range, fn {k, date} -> {k, Date.add(date, 1)} end)
-        end)
+        shift_dates_for_past_midnight(dates)
       else
         dates
       end
 
-    Enum.any?(dates, fn date_range ->
-      Date.compare(date_range.start_date, now) in [:lt, :eq] and
-        Date.compare(now, date_range.end_date) in [:lt, :eq]
+    Enum.any?(
+      dates,
+      &(Date.compare(now, &1.start_date) in [:gt, :eq] and
+          Date.compare(now, &1.end_date) in [:lt, :eq])
+    )
+  end
+
+  defp shift_dates_for_past_midnight(dates) do
+    Enum.map(dates, fn date_range ->
+      Map.new(date_range, fn {k, date} -> {k, Date.add(date, 1)} end)
     end)
   end
 
