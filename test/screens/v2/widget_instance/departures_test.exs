@@ -2,11 +2,15 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.V2.FreeTextLine
-  alias Screens.Config.Screen
+  alias ScreensConfig.V2.Departures.Header
+  alias ScreensConfig.V2.Departures.Layout
+  alias ScreensConfig.V2.FreeTextLine
+  alias ScreensConfig.Screen
+  alias Screens.Departures.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
+  alias Screens.Stops.Stop
   alias Screens.Trips.Trip
   alias Screens.Vehicles.Vehicle
   alias Screens.V2.{Departure, WidgetInstance}
@@ -34,10 +38,30 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "returns serialized normal_section", %{bus_shelter_screen: bus_shelter_screen} do
-      section = %{type: :normal_section, rows: []}
+      section = %{type: :normal_section, rows: [], layout: %Layout{}, header: %Header{}}
 
-      assert %{type: :normal_section, rows: []} ==
+      assert %{type: :normal_section, rows: []} =
                Departures.serialize_section(section, bus_shelter_screen)
+    end
+
+    test "returns serialized normal_section with a header if a header exists", %{
+      bus_shelter_screen: bus_shelter_screen
+    } do
+      section = %{
+        type: :normal_section,
+        rows: [],
+        layout: %Layout{},
+        header: %Header{
+          title: "Simple Test Header",
+          arrow: :n,
+          read_as: "Special read-as text"
+        }
+      }
+
+      assert %{
+               type: :normal_section,
+               header: %{title: "Simple Test Header", arrow: :n, read_as: "Special read-as text"}
+             } = Departures.serialize_section(section, bus_shelter_screen)
     end
 
     test "returns serialized notice_section", %{bus_shelter_screen: bus_shelter_screen} do
@@ -50,9 +74,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     test "returns serialized normal_section with notice", %{
       bus_shelter_screen: bus_shelter_screen
     } do
-      section = %{type: :normal_section, rows: [%{text: %FreeTextLine{icon: nil, text: []}}]}
+      section = %{
+        type: :normal_section,
+        rows: [%{text: %FreeTextLine{icon: nil, text: []}}],
+        layout: %Layout{},
+        header: %Header{}
+      }
 
-      assert %{type: :normal_section, rows: [%{type: :notice_row, text: %{icon: nil, text: []}}]} ==
+      assert %{type: :normal_section, rows: [%{type: :notice_row, text: %{icon: nil, text: []}}]} =
                Departures.serialize_section(section, bus_shelter_screen)
     end
   end
@@ -70,15 +99,63 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       }
     end
 
+    test "returns serialized normal_section for section with row with no scheduled time", %{
+      dup_screen: dup_screen
+    } do
+      section = %{
+        type: :normal_section,
+        layout: %Layout{},
+        header: %Header{},
+        rows: [
+          %Departure{
+            schedule:
+              struct(Schedule,
+                arrival_time: nil,
+                departure_time: nil,
+                route: %Screens.Routes.Route{
+                  id: "Orange",
+                  type: :subway,
+                  long_name: "Orange Line"
+                },
+                stop: %Stop{id: "70015", name: "Back Bay"},
+                stop_headsign: "Oak Grove"
+              )
+          }
+        ]
+      }
+
+      assert %{
+               rows: [
+                 %{
+                   headsign: %{headsign: "Oak Grove"},
+                   # MD5 hash when the schedule ID is nil. Won't change unless ID does.
+                   id: "1B2M2Y8AsgTpgAmY7PhCfg==",
+                   inline_alerts: [],
+                   route: %{color: :orange, text: "OL", type: :text},
+                   times_with_crowding: [
+                     %{
+                       crowding: nil,
+                       id: nil,
+                       time: %{icon: :overnight, type: :icon}
+                     }
+                   ],
+                   type: :departure_row
+                 }
+               ],
+               type: :normal_section
+             } =
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
     test "returns serialized headway_section for one configured section", %{
       dup_screen: dup_screen
     } do
-      section = %{type: :headway_section, pill: :red, time_range: {1, 2}, headsign: "Test"}
+      section = %{type: :headway_section, route: "Red", time_range: {1, 2}, headsign: "Test"}
 
       expected_text = %{
         icon: "subway-negative-black",
         text: [
-          %{color: :red, text: "Red Line"},
+          %{color: :red, text: "RED LINE"},
           %{special: :break},
           "Test trains every",
           %{format: :bold, text: "1-2"},
@@ -86,22 +163,113 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         ]
       }
 
-      assert %{type: :headway_section, text: expected_text} ==
+      assert %{type: :headway_section, text: expected_text, layout: :full_screen} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
+    test "returns serialized headway_section for one configured section with Ashmont/Braintree headsign",
+         %{
+           dup_screen: dup_screen
+         } do
+      section = %{
+        type: :headway_section,
+        route: "Red",
+        time_range: {1, 2},
+        headsign: "Ashmont/Braintree"
+      }
+
+      expected_text = %{
+        icon: "subway-negative-black",
+        text: [
+          %{color: :red, text: "RED LINE"},
+          %{special: :break},
+          "Ashmont/Braintree trains every",
+          %{format: :bold, text: "1-2m"}
+        ]
+      }
+
+      assert %{type: :headway_section, text: expected_text, layout: :full_screen} ==
                Departures.serialize_section(section, dup_screen, true)
     end
 
     test "returns serialized headway_section for multiple configured sections", %{
       dup_screen: dup_screen
     } do
-      section = %{type: :headway_section, pill: :red, time_range: {1, 2}, headsign: "Test"}
+      section = %{type: :headway_section, route: "Red", time_range: {1, 2}, headsign: "Test"}
 
       expected_text = %{
         icon: :red,
         text: ["every", %{format: :bold, text: "1-2"}, "minutes"]
       }
 
-      assert %{type: :headway_section, text: expected_text} ==
+      assert %{type: :headway_section, text: expected_text, layout: :row} ==
                Departures.serialize_section(section, dup_screen, false)
+    end
+
+    test "returns serialized no_data_section for subway/light rail", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :no_data_section, route: %{id: "Orange", type: :subway}}
+
+      expected_text = %{
+        icon: :orange,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+
+      section = %{type: :no_data_section, route: %{id: "Green", type: :light_rail}}
+
+      expected_text = %{
+        icon: :green,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
+    test "returns serialized no_data_section for bus", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :no_data_section, route: %{id: "555", type: :bus}}
+
+      expected_text = %{
+        icon: :bus,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
+    test "returns serialized no_data_section for SL", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :no_data_section, route: %{short_name: "SL1", type: :bus}}
+
+      expected_text = %{
+        icon: :silver,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
+    end
+
+    test "returns serialized no_data_section for CR", %{
+      dup_screen: dup_screen
+    } do
+      section = %{type: :no_data_section, route: %{id: "CR-Test", type: :rail}}
+
+      expected_text = %{
+        icon: :cr,
+        text: ["Updates unavailable"]
+      }
+
+      assert %{type: :no_data_section, text: expected_text} ==
+               Departures.serialize_section(section, dup_screen, true)
     end
   end
 
@@ -263,7 +431,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{route: %Route{id: "CR-Providence", type: :rail}}
       }
 
-      assert %{type: :icon, icon: :rail, color: :purple} ==
+      assert %{type: :icon, icon: :rail, color: :purple, route_abbrev: "PVD"} ==
                Departures.serialize_route([departure], serializer)
     end
 
@@ -281,7 +449,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{route: %Route{id: "CR-Providence", type: :rail}, track_number: 7}
       }
 
-      assert %{type: :text, text: "TR7", color: :purple} ==
+      assert %{type: :text, text: "TR7", color: :purple, route_abbrev: "PVD"} ==
                Departures.serialize_route([departure], serializer)
     end
   end
@@ -375,7 +543,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           departure_time: ~U[2020-01-01T00:01:10Z],
           route: %Route{type: :subway},
-          vehicle: %Vehicle{current_status: :stopped_at}
+          vehicle: %Vehicle{current_status: :stopped_at, stop_id: "stop-b"},
+          stop: %Stop{id: "stop-b"}
         }
       }
 
@@ -384,9 +553,10 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       departure = %Departure{
         prediction: %Prediction{
-          departure_time: ~U[2020-01-01T00:02:10Z],
+          departure_time: ~U[2020-01-01T00:01:10Z],
           route: %Route{type: :subway},
-          vehicle: %Vehicle{current_status: :stopped_at}
+          vehicle: %Vehicle{current_status: :stopped_at, stop_id: "stop-a"},
+          stop: %Stop{id: "stop-b"}
         }
       }
 
@@ -397,7 +567,20 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           departure_time: ~U[2020-01-01T00:02:10Z],
           route: %Route{type: :subway},
-          vehicle: %Vehicle{current_status: :in_transit_to}
+          vehicle: %Vehicle{current_status: :stopped_at},
+          stop: %Stop{}
+        }
+      }
+
+      assert serialized_boarding !=
+               Departures.serialize_times_with_crowding([departure], screen, now)
+
+      departure = %Departure{
+        prediction: %Prediction{
+          departure_time: ~U[2020-01-01T00:02:10Z],
+          route: %Route{type: :subway},
+          vehicle: %Vehicle{current_status: :in_transit_to},
+          stop: %Stop{}
         }
       }
 
@@ -413,7 +596,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: nil,
           departure_time: ~U[2020-01-01T00:00:10Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -424,7 +608,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: nil,
           departure_time: ~U[2020-01-01T00:00:40Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -435,7 +620,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:00:10Z],
           departure_time: ~U[2020-01-01T00:00:10Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -451,7 +637,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:00:10Z],
           departure_time: ~U[2020-01-01T00:00:10Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -462,7 +649,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:00:40Z],
           departure_time: ~U[2020-01-01T00:00:40Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -471,13 +659,22 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "returns Now on e-Ink screens", %{bus_eink_screen: screen} do
-      serialized_now = [%{id: nil, crowding: nil, time: %{text: "Now", type: :text}}]
       now = ~U[2020-01-01T00:00:00Z]
+      departure_time = ~U[2020-01-01T00:00:50Z]
+
+      now_timestamp = %{
+        id: nil,
+        crowding: nil,
+        time: %{text: "Now", type: :text},
+        time_in_epoch: DateTime.to_unix(departure_time)
+      }
+
+      serialized_now = [now_timestamp]
 
       departure = %Departure{
         prediction: %Prediction{
-          arrival_time: ~U[2020-01-01T00:00:50Z],
-          departure_time: ~U[2020-01-01T00:00:50Z],
+          arrival_time: departure_time,
+          departure_time: departure_time,
           route: %Route{type: :subway}
         }
       }
@@ -485,10 +682,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert serialized_now ==
                Departures.serialize_times_with_crowding([departure], screen, now)
 
+      departure_time = ~U[2020-01-01T00:01:10Z]
+      serialized_now = [%{now_timestamp | time_in_epoch: DateTime.to_unix(departure_time)}]
+
       departure = %Departure{
         prediction: %Prediction{
-          arrival_time: ~U[2020-01-01T00:01:10Z],
-          departure_time: ~U[2020-01-01T00:01:10Z],
+          arrival_time: departure_time,
+          departure_time: departure_time,
           route: %Route{type: :subway}
         }
       }
@@ -504,7 +704,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:20:00Z],
           departure_time: ~U[2020-01-01T00:20:00Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -515,7 +716,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:20:00Z],
           departure_time: ~U[2020-01-01T00:20:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         }
       }
 
@@ -526,7 +728,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:20:00Z],
           departure_time: ~U[2020-01-01T00:20:00Z],
-          route: %Route{type: :bus}
+          route: %Route{type: :bus},
+          stop: %Stop{}
         }
       }
 
@@ -537,7 +740,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:20:00Z],
           departure_time: ~U[2020-01-01T00:20:00Z],
-          route: %Route{type: :ferry}
+          route: %Route{type: :ferry},
+          stop: %Stop{}
         }
       }
 
@@ -547,7 +751,17 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
     test "correctly serializes timestamps", %{bus_shelter_screen: screen} do
       serialized_timestamp = [
-        %{id: nil, crowding: nil, time: %{type: :timestamp, am_pm: :am, hour: 12, minute: 20}}
+        %{
+          id: nil,
+          crowding: nil,
+          time: %{
+            type: :timestamp,
+            am_pm: :am,
+            hour: 12,
+            minute: 20,
+            show_am_pm: true
+          }
+        }
       ]
 
       now = ~U[2020-01-01T00:00:00Z]
@@ -556,7 +770,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T05:20:00Z],
           departure_time: ~U[2020-01-01T05:20:00Z],
-          route: %Route{type: :subway}
+          route: %Route{type: :subway},
+          stop: %Stop{}
         }
       }
 
@@ -571,12 +786,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T02:20:00Z],
           departure_time: ~U[2020-01-01T02:20:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         },
         schedule: %Schedule{
           arrival_time: ~U[2020-01-01T02:15:00Z],
           departure_time: ~U[2020-01-01T02:15:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         }
       }
 
@@ -584,8 +801,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                %{
                  id: nil,
                  crowding: nil,
-                 time: %{am_pm: :pm, hour: 9, minute: 20, type: :timestamp},
-                 scheduled_time: %{am_pm: :pm, hour: 9, minute: 15, type: :timestamp}
+                 time: %{am_pm: :pm, hour: 9, minute: 20, type: :timestamp, show_am_pm: false},
+                 scheduled_time: %{
+                   am_pm: :pm,
+                   hour: 9,
+                   minute: 15,
+                   type: :timestamp,
+                   show_am_pm: false
+                 }
                }
              ] ==
                Departures.serialize_times_with_crowding([departure], screen, now)
@@ -598,12 +821,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T02:20:00Z],
           departure_time: ~U[2020-01-01T02:20:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         },
         schedule: %Schedule{
           arrival_time: ~U[2020-01-01T02:20:00Z],
           departure_time: ~U[2020-01-01T02:20:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         }
       }
 
@@ -618,12 +843,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T02:20:00Z],
           departure_time: ~U[2020-01-01T02:20:00Z],
-          route: %Route{type: :bus}
+          route: %Route{type: :bus},
+          stop: %Stop{}
         },
         schedule: %Schedule{
           arrival_time: ~U[2020-01-01T02:15:00Z],
           departure_time: ~U[2020-01-01T02:15:00Z],
-          route: %Route{type: :bus}
+          route: %Route{type: :bus},
+          stop: %Stop{}
         }
       }
 
@@ -638,12 +865,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T00:00:10Z],
           departure_time: ~U[2020-01-01T00:00:10Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         },
         schedule: %Schedule{
           arrival_time: ~U[2020-01-01T00:05:00Z],
           departure_time: ~U[2020-01-01T00:05:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         }
       }
 
@@ -659,7 +888,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{
           arrival_time: ~U[2020-01-01T02:20:00Z],
           departure_time: ~U[2020-01-01T02:20:00Z],
-          route: %Route{type: :rail}
+          route: %Route{type: :rail},
+          stop: %Stop{}
         }
       }
 
@@ -701,6 +931,36 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       instance = %Departures{}
 
       assert %{sections: _sections} = WidgetInstance.audio_serialize(instance)
+    end
+  end
+
+  describe "audio_serialize_section/2" do
+    test "can serialize a :normal_section" do
+      section = %{
+        type: :normal_section,
+        rows: [],
+        header: %Header{title: "Section Header"}
+      }
+
+      assert %{
+               type: :normal_section,
+               departure_groups: [],
+               header: "Section Header"
+             } = Departures.audio_serialize_section(section, nil)
+    end
+
+    test "uses the `read_as` header property if available" do
+      section = %{
+        type: :normal_section,
+        rows: [],
+        header: %Header{title: "Section Header", read_as: "A special audio-only value"}
+      }
+
+      assert %{
+               type: :normal_section,
+               departure_groups: [],
+               header: "A special audio-only value"
+             } = Departures.audio_serialize_section(section, nil)
     end
   end
 

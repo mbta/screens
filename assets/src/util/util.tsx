@@ -1,9 +1,16 @@
 import moment from "moment";
 import "moment-timezone";
+import { RefObject } from "react";
+
 import { getDatasetValue } from "Util/dataset";
+import { isOFM, isTriptych } from "Util/outfront";
 
 export const classWithModifier = (baseClass, modifier) => {
-  return `${baseClass} ${baseClass}--${modifier}`;
+  if (!modifier) {
+    return baseClass;
+  } else {
+    return `${baseClass} ${baseClass}--${modifier}`;
+  }
 };
 
 export const classWithModifiers = (baseClass, modifiers) => {
@@ -19,13 +26,23 @@ export const classWithModifiers = (baseClass, modifiers) => {
 export const formatTimeString = (timeString: string) =>
   moment(timeString).tz("America/New_York").format("h:mm");
 
-export const isDup = () => location.href.startsWith("file:");
+export const hasOverflowY = (ref: RefObject<Element>): boolean =>
+  !!ref.current && ref.current.scrollHeight > ref.current.clientHeight;
+
+export const hasOverflowX = (ref: RefObject<Element>): boolean =>
+  !!ref.current && ref.current.scrollWidth > ref.current.clientWidth;
 
 export const imagePath = (fileName: string): string =>
-  isDup() ? `images/${fileName}` : `/images/${fileName}`;
+  isOFM() ? outfrontImagePath(fileName) : `/images/${fileName}`;
+
+export const outfrontImagePath = (fileName: string): string =>
+  isTriptych() ? `triptych_images/${fileName}` : `images/${fileName}`;
+
+export const pillPath = (fileName: string): string =>
+  isOFM() ? `images/pills/${fileName}` : `/images/pills/${fileName}`;
 
 export const isRealScreen = () =>
-  isDup() || getDatasetValue("isRealScreen") === "true";
+  isOFM() || getDatasetValue("isRealScreen") === "true";
 
 type ScreenSide = "left" | "right";
 const isScreenSide = (value: any): value is ScreenSide => {
@@ -43,11 +60,7 @@ export const getScreenSide = (): ScreenSide | null => {
   return isScreenSide(screenSide) ? screenSide : null;
 };
 
-type RotationIndex = "0" | "1" | "2";
-const isRotationIndex = (value: any): value is RotationIndex => {
-  return value === "0" || value === "1" || value === "2";
-};
-export const getRotationIndex = (): RotationIndex | null => {
-  const rotationIndex = getDatasetValue("rotationIndex");
-  return isRotationIndex(rotationIndex) ? rotationIndex : null;
-};
+export const firstWord = (str: string): string => str.split(" ")[0];
+
+export const formatCause = (cause: string) =>
+  (cause.charAt(0).toUpperCase() + cause.substring(1)).replace("_", " ");

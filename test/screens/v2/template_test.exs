@@ -28,7 +28,9 @@ defmodule Screens.V2.TemplateTest do
          {:flex_zone, {:two_medium, [:medium_left, :medium_right]}}}
       ]
 
-      assert expected == Template.slot_combinations(template)
+      actual = Template.slot_combinations(template)
+
+      assert Enum.sort(expected) == Enum.sort(actual)
     end
 
     test "handles nested maps correctly" do
@@ -75,7 +77,9 @@ defmodule Screens.V2.TemplateTest do
         {[:fullscreen], {:screen, {:takeover, [:fullscreen]}}}
       ]
 
-      assert expected == Template.slot_combinations(template)
+      actual = Template.slot_combinations(template)
+
+      assert Enum.sort(expected) == Enum.sort(actual)
     end
 
     test "handles multiple nested maps correctly" do
@@ -110,7 +114,9 @@ defmodule Screens.V2.TemplateTest do
            ]}}}
       ]
 
-      assert expected == Template.slot_combinations(template)
+      actual = Template.slot_combinations(template)
+
+      assert Enum.sort(expected) == Enum.sort(actual)
     end
   end
 

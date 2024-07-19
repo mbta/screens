@@ -10,9 +10,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
   use ExUnitProperties
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{PreFare}
-  alias Screens.Config.V2.Header.CurrentStopId
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.PreFare
+  alias ScreensConfig.V2.Header.CurrentStopId
+  alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.CandidateGenerator
@@ -1108,7 +1110,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
         struct(Screen, %{
           app_id: :pre_fare_v2,
           app_params:
-            struct(PreFare, %{reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}})
+            struct(PreFare, %{
+              reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}
+            })
         })
 
       # Randomly setting current time to Thu Jul 31 2025 23:59:59 GMT-0400 (Eastern Daylight Time)
@@ -1138,30 +1142,41 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
           }
         end)
 
-      station_sequences =
-        Enum.map(route_ids_at_stop, fn id -> Stop.get_route_stop_sequence(id) end)
+      tagged_station_sequences =
+        Map.new(route_ids_at_stop, fn id -> {id, [Stop.get_route_stop_sequence(id)]} end)
 
-      fetch_routes_by_stop_fn = fn _, _, _ -> {:ok, routes_at_stop} end
-
-      fetch_parent_station_sequences_through_stop_fn = fn _, _ ->
-        {:ok, station_sequences}
-      end
+      station_sequences = RoutePattern.untag_stop_sequences(tagged_station_sequences)
 
       fetch_alerts_fn = fn _ -> {:ok, [alert]} end
       fetch_stop_name_fn = fn _ -> "Test" end
+
+      fetch_location_context_fn = fn _, _, _ ->
+        {:ok,
+         %LocationContext{
+           home_stop: stop_id,
+           tagged_stop_sequences: tagged_station_sequences,
+           upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
+           downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
+           routes: routes_at_stop,
+           alert_route_types: Stop.get_route_type_filter(PreFare, stop_id)
+         }}
+      end
 
       alert_widgets =
         CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
           config,
           now_datetime,
-          fetch_routes_by_stop_fn,
-          fetch_parent_station_sequences_through_stop_fn,
           fetch_alerts_fn,
-          fetch_stop_name_fn
+          fetch_stop_name_fn,
+          fetch_location_context_fn
         )
 
+      # We can't build disruption diagrams for some of these alert scenarios.
+      # Prevent `ReconstructedAlert.serialize` from filling the console with log noise when this happens.
+      fake_log = fn _message -> nil end
+
       Enum.each(alert_widgets, fn widget ->
-        assert %{issue: _, location: _, routes: _} = ReconstructedAlert.serialize(widget)
+        assert %{issue: _, location: _} = ReconstructedAlert.serialize(widget, fake_log)
       end)
     end
   end

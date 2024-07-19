@@ -1,12 +1,12 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{CRDepartures, PreFare}
   alias Screens.Schedules.Schedule
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.CRDepartures, as: CRDeparturesWidget
   alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightCRDepartures}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{CRDepartures, PreFare}
 
   def departures_instances(
         config,
@@ -30,8 +30,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
             cr_departures:
               %CRDepartures{
                 direction_to_destination: direction_to_destination,
+                pair_with_alert_widget: pair_with_alert_widget,
                 station: station,
-                destination: destination
+                destination: destination,
+                header_pill: header_pill
               } = cr_departures
           }
         } = config,
@@ -71,6 +73,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
                 departures_data: departures_data,
                 destination: destination,
                 direction_to_destination: inbound_outbound,
+                header_pill: header_pill,
+                slot: get_slot(pair_with_alert_widget),
                 now: now
               }
           end
@@ -92,7 +96,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
       route_ids: [
         "CR-Franklin",
         "CR-Needham",
-        "CR-Providence"
+        "CR-Providence",
+        "CR-Fitchburg"
       ],
       route_type: :rail,
       stop_ids: [station]
@@ -114,7 +119,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
       route_ids: [
         "CR-Franklin",
         "CR-Needham",
-        "CR-Providence"
+        "CR-Providence",
+        "CR-Fitchburg"
       ],
       route_type: :rail,
       stop_ids: [station],
@@ -124,4 +130,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
     {:ok, schedules} = Schedule.fetch(params, next_service_day)
     List.first(schedules)
   end
+
+  defp get_slot(false), do: [:main_content_left]
+  defp get_slot(true), do: [:main_content_left, :full_body_right]
 end

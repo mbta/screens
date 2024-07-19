@@ -66,7 +66,7 @@ const DepartureList = ({
   currentTimeString,
   destination,
   headway,
-}: DepartureListProps): JSX.Element[] => {
+}: DepartureListProps): JSX.Element => {
   const renderedDepartures = departures.map(({ id, time }) => (
     <Departure time={time} currentTimeString={currentTimeString} key={id} />
   ));
@@ -78,19 +78,23 @@ const DepartureList = ({
         headway={headway}
         variant={HeadwayMessageVariant.Sub}
         key="departure-list-headway"
-      />
+      />,
     );
   }
 
-  return [
-    ...renderedDepartures.slice(0, 1),
-    <div className="departures__hairline" key="departure-list-hairline" />,
-    ...renderedDepartures.slice(1, 2),
-  ];
+  return (
+    <>
+      {[
+        ...renderedDepartures.slice(0, 1),
+        <div className="departures__hairline" key="departure-list-hairline" />,
+        ...renderedDepartures.slice(1, 2),
+      ]}
+    </>
+  );
 };
 
 interface DepartureListProps {
-  departures: { time: string }[];
+  departures: { id: string; time: string }[];
   currentTimeString: string;
   destination: string;
   headway: number;

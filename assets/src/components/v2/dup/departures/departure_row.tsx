@@ -15,8 +15,10 @@ const DepartureRow = ({
     <div className="departure-row">
       <div className="departure-row__route">
         <RoutePill
-          {...route}
-          size={isNaN(routeText) || routeText > 200 ? "small" : "large"}
+          pill={{
+            ...route,
+            size: isNaN(routeText) || routeText > 200 ? "small" : "large",
+          }}
         />
       </div>
       <div className="departure-row__destination">

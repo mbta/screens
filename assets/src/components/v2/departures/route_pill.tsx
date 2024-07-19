@@ -9,12 +9,13 @@ type Pill =
 
 interface BasePill {
   color: Color;
-  outline?: boolean;
+  route_abbrev?: string;
 }
 
 interface TextPill extends BasePill {
   text: string;
   size?: string;
+  branches?: string[];
 }
 
 interface IconPill extends BasePill {
@@ -26,23 +27,35 @@ interface SlashedPill extends BasePill {
   part2: string;
 }
 
-type Color = "red" | "orange" | "green" | "blue" | "purple" | "yellow" | "teal";
+type Color =
+  | "red"
+  | "orange"
+  | "green"
+  | "blue"
+  | "purple"
+  | "yellow"
+  | "teal"
+  | "silver";
 
 type PillIcon = "bus" | "light_rail" | "rail" | "boat";
 
-const TextRoutePill: ComponentType<TextPill> = ({
+const TextRoutePill: ComponentType<TextPill & { outline?: boolean }> = ({
   color,
   text,
   outline,
   size,
 }) => {
   const modifiers: string[] = [color];
+
   if (outline) {
     modifiers.push("outline");
   }
 
   if (size) {
     modifiers.push(size);
+  } else {
+    const routeNum = Number(text);
+    modifiers.push(isNaN(routeNum) || routeNum > 199 ? "small" : "large");
   }
 
   return (
@@ -78,34 +91,54 @@ const SlashedRoutePill: ComponentType<SlashedPill> = ({ part1, part2 }) => {
   );
 };
 
-const RoutePill: ComponentType<Pill> = (pill) => {
+type Props = {
+  pill: Pill;
+  outline?: boolean;
+  useRouteAbbrev?: boolean;
+};
+
+const RoutePill: ComponentType<Props> = ({ pill, outline, useRouteAbbrev }) => {
   const modifiers: string[] = [pill.color];
+  if (outline) modifiers.push("outline");
 
-  let innerContent = null;
-  switch (pill.type) {
-    case "text":
-      innerContent = <TextRoutePill {...pill} />;
-      break;
-    case "icon":
-      innerContent = <IconRoutePill {...pill} />;
-      break;
-    case "slashed":
-      innerContent = <SlashedRoutePill {...pill} />;
-  }
+  let innerContent: JSX.Element | null = null;
+  let branches: JSX.Element[] | null = null;
 
-  let branches = null;
-  if (pill.branches) {
-    branches = pill.branches.map((branch: string) => (
-      <div
-        key={branch}
-        className={classWithModifiers(
-          "route-pill",
-          modifiers.concat(["branch"])
-        )}
-      >
-        <TextRoutePill {...pill} text={branch} />
-      </div>
-    ));
+  if (useRouteAbbrev && pill.route_abbrev) {
+    innerContent = (
+      <TextRoutePill
+        text={pill.route_abbrev}
+        color={pill.color}
+        outline={outline}
+      />
+    );
+  } else {
+    switch (pill.type) {
+      case "text":
+        innerContent = <TextRoutePill {...pill} outline={outline} />;
+        break;
+
+      case "icon":
+        innerContent = <IconRoutePill {...pill} />;
+        break;
+
+      case "slashed":
+        innerContent = <SlashedRoutePill {...pill} />;
+    }
+
+    if (pill.type == "text" && pill.branches) {
+      branches = pill.branches.map((branch: string) => (
+        <div
+          key={branch}
+          className={classWithModifiers(
+            "route-pill",
+            modifiers.concat(["branch"]),
+          )}
+        >
+          <TextRoutePill {...pill} text={branch} />
+        </div>
+      ));
+    }
   }
 
   return (

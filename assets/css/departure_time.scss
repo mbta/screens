@@ -1,13 +1,13 @@
 .departure-time {
   display: inline-block;
-  vertical-align: middle;
   text-align: right;
+  vertical-align: middle;
 }
 
 .departure-time--large {
-  font-size: 120px;
   width: 240px;
   padding-right: 32px;
+  font-size: 120px;
 }
 
 .departure-time--large .base-departure-time__text {
@@ -24,7 +24,7 @@
 }
 
 .departure-time--small {
-  font-size: 72px;
   width: 260px;
   padding-right: 40px;
+  font-size: 72px;
 }

@@ -3,9 +3,9 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntro do
   An audio-only widget that introduces the section of the readout describing service alerts.
   """
 
-  alias Screens.Config.Screen
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.{ReconstructedAlert, SubwayStatus}
+  alias ScreensConfig.Screen
 
   require Logger
 
@@ -38,11 +38,11 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntro do
 
     case first_service_alert_index do
       nil ->
-        Logger.warn("Failed to find a service alert widget in the audio readout queue")
+        Logger.warning("Failed to find a service alert widget in the audio readout queue")
         [0]
 
       0 ->
-        Logger.warn(
+        Logger.warning(
           "Unexpectedly found a service alert widget at the start of the audio readout queue"
         )
 

@@ -4,7 +4,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoService do
   defstruct screen: nil
 
   @type t :: %__MODULE__{
-          screen: Screens.Config.Screen.t()
+          screen: ScreensConfig.Screen.t()
         }
 
   def priority(_instance), do: [2]

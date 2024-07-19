@@ -7,29 +7,28 @@
 }
 
 .departures__notice-row {
+  position: relative;
   width: 794px;
   height: 264px;
-  color: rgb(153, 152, 150);
-  font-size: 72px;
-  font-family: Inter, sans-serif;
-  text-align: right;
   padding-top: 56px;
   padding-bottom: 56px;
-  position: relative;
+  font-family: Inter, sans-serif;
+  font-size: 72px;
+  color: rgb(153 152 150);
+  text-align: right;
 }
 
 .departure-row {
   position: relative;
 
   &:not(:last-child)::after {
-    content: "";
     position: absolute;
-    bottom: 0px;
-    left: 0px;
-
+    bottom: 0;
+    left: 0;
     width: 794px;
     height: 2px;
-    border-radius: 3px;
+    content: "";
     background-color: black;
+    border-radius: 3px;
   }
 }

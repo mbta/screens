@@ -61,7 +61,7 @@ const NearbyConnectionsRow = ({ name, distance, routes }): JSX.Element => {
   );
 };
 
-const NearbyConnections = ({ nearbyConnections }): JSX.Element => {
+const NearbyConnections = ({ nearbyConnections }): JSX.Element | null => {
   if (!nearbyConnections || nearbyConnections.length === 0) {
     return null;
   }

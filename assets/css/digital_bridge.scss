@@ -1,52 +1,54 @@
 .digital-bridge {
+  position: absolute;
+  bottom: 0;
   height: 172px;
   background: black;
-  position: absolute;
-  bottom: 0px;
 }
 
 .digital-bridge__logo-container {
-  font-size: 0;
-  width: 208px;
   display: inline-block;
+  width: 208px;
+  font-size: 0;
 }
 
 .digital-bridge__logo-image {
-  height: 128px;
   width: 128px;
-  margin: 24px 40px 20px 40px;
+  height: 128px;
+  margin: 24px 40px 20px;
 }
 
 .digital-bridge__link-container {
-  width: 792px;
-  color: white;
   display: inline-block;
-  vertical-align: top;
+  width: 792px;
   margin-top: 30px;
+  color: white;
+  vertical-align: top;
 }
 
 .digital-bridge__link-description {
   @include font--text--55regular;
+
   font-size: 36px;
   line-height: 56px;
 }
 
 .digital-bridge__link-url {
   @include font--text--75bold;
+
   font-size: 44px;
   line-height: 56px;
 }
 
 .digital-bridge__qr-container {
-  width: 200px;
   display: inline-block;
-  vertical-align: top;
+  width: 200px;
   font-size: 0;
+  vertical-align: top;
 }
 
 .digital-bridge__qr-image-container {
-  background: white;
   margin: 22px 32px 22px 40px;
+  background: white;
   border-radius: 8px;
 }
 

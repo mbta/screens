@@ -7,6 +7,7 @@
   data-audio-interval-offset-seconds="<%= @audio_interval_offset_seconds %>"
   data-refresh-rate-offset="<%= @refresh_rate_offset %>"
   data-is-real-screen="<%= @is_real_screen %>"
+  data-is-pending="<%= @is_pending %>"
   <%= if not is_nil(@screen_side) do %>
     data-screen-side="<%= @screen_side %>"
   <% end %>
@@ -15,6 +16,12 @@
   <% end %>
   <%= if not is_nil(@rotation_index) do %>
     data-rotation-index="<%= @rotation_index %>"
+  <% end %>
+  <%= if not is_nil(@triptych_pane) do %>
+    data-triptych-pane="<%= @triptych_pane %>"
+  <% end %>
+  <%= if assigns[:screenplay_fullstory_org_id] do %>
+    data-screenplay-fullstory-org-id="<%= assigns[:screenplay_fullstory_org_id] %>"
   <% end %>
   data-requestor="<%= @requestor %>"
   data-disable-sentry="<%= @disable_sentry %>"

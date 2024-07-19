@@ -11,6 +11,7 @@ import {
 import BaseDepartureDestination from "Components/eink/base_departure_destination";
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 import { standardTimeRepresentation } from "Util/time_representation";
+import moment from "moment";
 
 const WIDE_MINI_PILL_ROUTES = ["441/442"];
 
@@ -40,13 +41,13 @@ const camelizeDepartureObject = ({
 
 const isArrivingOrBoarding = (
   { time, vehicle_status, stop_type },
-  currentTimeString
+  currentTimeString,
 ) => {
   const timeRepresentation = standardTimeRepresentation(
     time,
     currentTimeString,
     vehicle_status,
-    stop_type
+    stop_type,
   );
   return (
     timeRepresentation.type === "TEXT" &&
@@ -128,7 +129,7 @@ const PlaceholderMessage = ({ pill, text }): JSX.Element => (
       <div
         className={classWithModifier(
           "departure-destination",
-          "no-departures-placeholder"
+          "no-departures-placeholder",
         )}
       >
         <BaseDepartureDestination destination={text} />
@@ -137,10 +138,29 @@ const PlaceholderMessage = ({ pill, text }): JSX.Element => (
   </div>
 );
 
-const NoDeparturesMessage = ({ pill }): JSX.Element => {
-  return (
-    <PlaceholderMessage pill={pill} text="No departures currently available" />
+const isDuringSurge = () => {
+  const now = moment();
+  const isDuringFirstRange = now.isBetween(
+    moment("2024-01-03T09:30:00Z"),
+    moment("2024-01-13T07:30:00Z"),
   );
+
+  const isDuringSecondRange = now.isBetween(
+    moment("2024-01-16T09:30:00Z"),
+    moment("2024-01-29T07:30:00Z"),
+  );
+
+  return isDuringFirstRange || isDuringSecondRange;
+};
+
+const NoDeparturesMessage = ({ pill, stationName }): JSX.Element => {
+  let placeholderText = "No departures currently available";
+
+  if (stationName === "Haymarket" && isDuringSurge()) {
+    placeholderText = "Service Suspended";
+  }
+
+  return <PlaceholderMessage pill={pill} text={placeholderText} />;
 };
 
 const NoDataMessage = ({ pill }): JSX.Element => {
@@ -179,7 +199,7 @@ class PagedDeparture extends React.Component<
     this.stopPaging();
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (!this.propsEqual(prevProps)) {
       this.stopPaging();
       this.setState({ currentPageNumber: 0 });
@@ -192,6 +212,7 @@ class PagedDeparture extends React.Component<
     return (
       pageCount === otherProps.pageCount &&
       departures.length === otherProps.departures.length &&
+      // @ts-expect-error
       departures.every((d, i) => d.id === otherProps.departures[i].id)
     );
   }
@@ -201,7 +222,7 @@ class PagedDeparture extends React.Component<
     if (refreshMs !== null) {
       this.interval = window.setInterval(
         this.updatePaging.bind(this),
-        refreshMs
+        refreshMs,
       );
     }
   }
@@ -260,12 +281,14 @@ class PagedDeparture extends React.Component<
       this.props.pageCount - (this.state.currentPageNumber + 1);
     const numWidePillsToTheRight = this.props.departures
       .slice(this.state.currentPageNumber + 1)
+      // @ts-expect-error
       .filter(({ route }) => WIDE_MINI_PILL_ROUTES.includes(route)).length;
     const numNormalPillsToTheRight =
       selectedRightOffset - numWidePillsToTheRight;
 
     const currentPillIsWide = WIDE_MINI_PILL_ROUTES.includes(
-      currentPagedDeparture.route
+      // @ts-expect-error
+      currentPagedDeparture.route,
     );
     const pillCenterOffset = currentPillIsWide ? 64.5 : 30; // px
     const totalPillSpaceWidth = selectedRightOffset * pillSpace;
@@ -286,12 +309,13 @@ class PagedDeparture extends React.Component<
           <div
             className={classWithModifier(
               "later-departure__header-route-list",
-              sizeModifier
+              sizeModifier,
             )}
           >
             {this.props.departures.map((departure, i) => {
               const rightOffset = this.props.pageCount - (i + 1);
               return (
+                // @ts-expect-error
                 <React.Fragment key={departure.id}>
                   {rightOffset === 0 && (
                     <div
@@ -302,7 +326,9 @@ class PagedDeparture extends React.Component<
                     ></div>
                   )}
                   <PagedDepartureRoutePill
+                    // @ts-expect-error
                     route={departure.route}
+                    // @ts-expect-error
                     routeId={departure.route_id}
                     selected={i === this.state.currentPageNumber}
                   />
@@ -320,7 +346,9 @@ class PagedDeparture extends React.Component<
           </div>
         </div>
         <Departure
+          // @ts-expect-error
           {...camelizeDepartureObject(currentPagedDeparture)}
+          // @ts-expect-error
           currentTimeString={this.props.currentTimeString}
           overhead={this.props.overhead}
           groupStart={true}
@@ -332,7 +360,7 @@ class PagedDeparture extends React.Component<
 }
 
 interface DepartureListProps {
-  departure: object;
+  departures: any[];
   currentTimeString: string;
   isAnimated: boolean;
   overhead: boolean;
@@ -479,6 +507,7 @@ const PagedSection = ({
   overhead,
   isAnimated,
   currentTimeString,
+  // @ts-expect-error
   disabled,
 }: PagedSectionProps): JSX.Element => {
   const pageCount = getPageCount(departures, numRows);
@@ -501,6 +530,7 @@ const PagedSection = ({
         {disabled ? (
           <NoDataMessage pill={pill} />
         ) : (
+          // @ts-expect-error
           <NoDeparturesMessage pill={pill} />
         )}
       </SectionFrame>
@@ -544,6 +574,7 @@ const Section = ({
   pill,
   headway: { active, headsigns, range_low: rangeLow, range_high: rangeHigh },
   disabled,
+  stationName,
 }): JSX.Element => {
   departures = departures.slice(0, numRows);
 
@@ -565,7 +596,7 @@ const Section = ({
         {disabled ? (
           <NoDataMessage pill={pill} />
         ) : (
-          <NoDeparturesMessage pill={pill} />
+          <NoDeparturesMessage pill={pill} stationName={stationName} />
         )}
       </SectionFrame>
     );

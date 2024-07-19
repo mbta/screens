@@ -1,10 +1,13 @@
-defmodule WidgetInstance.ElevatorStatusTest do
+defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.WidgetInstance
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{ElevatorStatus, PreFare}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{ElevatorStatus, PreFare}
+  alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
+  alias Screens.Stops.Stop
 
   # Convenience function to build an elevator alert
   defp alert(opts) do
@@ -46,7 +49,7 @@ defmodule WidgetInstance.ElevatorStatusTest do
     happening_now_active_period = [{~U[2022-01-01T00:00:00Z], ~U[2022-01-01T22:00:00Z]}]
     upcoming_active_period = [{~U[2022-02-01T00:00:00Z], ~U[2022-02-01T22:00:00Z]}]
 
-    facility_id_to_name = for id <- 1..9, into: %{}, do: {to_string(id), "Elevator #{id}"}
+    facility_id_to_map = fn id -> %{id: to_string(id), name: "Elevator #{id}"} end
 
     station_id_to_name = %{
       "place-foo" => "Foo Station",
@@ -55,10 +58,14 @@ defmodule WidgetInstance.ElevatorStatusTest do
       "place-qux" => "Qux Station"
     }
 
-    stop_sequences = [
-      ["place-foo", "place-bar"],
-      ["place-foo", "place-bar"]
-    ]
+    tagged_stop_sequences = %{
+      "A" => [
+        ["place-foo", "place-bar"],
+        ["place-foo", "place-bar"]
+      ]
+    }
+
+    stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
 
     station_id_to_icons = %{
       "place-foo" => [:red],
@@ -67,22 +74,39 @@ defmodule WidgetInstance.ElevatorStatusTest do
       "place-qux" => [:green]
     }
 
-    home_ies = fn facility ->
+    location_context = %LocationContext{
+      home_stop: home_station_id,
+      tagged_stop_sequences: tagged_stop_sequences,
+      upstream_stops: Stop.upstream_stop_id_set(home_station_id, stop_sequences),
+      downstream_stops: Stop.downstream_stop_id_set(home_station_id, stop_sequences),
+      routes: [],
+      alert_route_types: []
+    }
+
+    home_ies = fn facility_id ->
+      facility = facility_id_to_map.(facility_id)
+
       [ie(stop: home_station_id, facility: facility)] ++
         Enum.map(home_platform_ids, &ie(stop: &1, facility: facility))
     end
 
-    connecting_ies = fn facility ->
+    connecting_ies = fn facility_id ->
+      facility = facility_id_to_map.(facility_id)
+
       [ie(stop: connecting_station_id, facility: facility)] ++
         Enum.map(connecting_platform_ids, &ie(stop: &1, facility: facility))
     end
 
-    elsewhere_ies = fn facility ->
+    elsewhere_ies = fn facility_id ->
+      facility = facility_id_to_map.(facility_id)
+
       [ie(stop: elsewhere_station_id, facility: facility)] ++
         Enum.map(elsewhere_platform_ids, &ie(stop: &1, facility: facility))
     end
 
-    other_elsewhere_ies = fn facility ->
+    other_elsewhere_ies = fn facility_id ->
+      facility = facility_id_to_map.(facility_id)
+
       [ie(stop: other_elsewhere_station_id, facility: facility)] ++
         Enum.map(other_elsewhere_platform_ids, &ie(stop: &1, facility: facility))
     end
@@ -199,11 +223,10 @@ defmodule WidgetInstance.ElevatorStatusTest do
       %WidgetInstance.ElevatorStatus{
         screen: screen_config,
         alerts: opts[:alerts] || [],
-        facility_id_to_name: facility_id_to_name,
         station_id_to_name: station_id_to_name,
         station_id_to_icons: station_id_to_icons,
         now: now,
-        stop_sequences: stop_sequences
+        location_context: location_context
       }
     end
 

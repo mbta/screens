@@ -1,4 +1,6 @@
-import DepartureGroup from "Components/eink/bus/departure_group";
+import DepartureGroup, {
+  Props as DepartureGroupProps,
+} from "Components/eink/bus/departure_group";
 import React, { forwardRef } from "react";
 
 const buildDepartureGroups = (departures) => {
@@ -6,7 +8,7 @@ const buildDepartureGroups = (departures) => {
     return [];
   }
 
-  const groups = [];
+  const groups: any[] = [];
 
   departures.forEach((departure) => {
     if (groups.length === 0) {
@@ -31,15 +33,15 @@ const buildDepartureGroups = (departures) => {
   return groups;
 };
 
-const Departures = forwardRef(
-  ({ currentTimeString, departures, size }, ref): JSX.Element => {
+const Departures = forwardRef<HTMLDivElement, DepartureGroupProps>(
+  ({ currentTimeString, departures, size }, ref): JSX.Element | null => {
     if (!departures || departures.length === 0) {
       return null;
     }
     const departureGroups = buildDepartureGroups(departures);
     return (
       <div className="departures" ref={ref}>
-        {departureGroups.map((group, i) => (
+        {departureGroups.map((group) => (
           <DepartureGroup
             currentTimeString={currentTimeString}
             departures={group}
@@ -49,7 +51,7 @@ const Departures = forwardRef(
         ))}
       </div>
     );
-  }
+  },
 );
 
 export default Departures;

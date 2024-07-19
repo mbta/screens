@@ -1,8 +1,9 @@
 import initSentry from "Util/sentry";
 initSentry("bus_eink_v2");
 
-declare function require(name: string): string;
-// tslint:disable-next-line
+import initFullstory from "Util/fullstory";
+initFullstory();
+
 require("../../../css/bus_eink_v2.scss");
 
 import React from "react";
@@ -19,7 +20,7 @@ import BottomTakeoverBody from "Components/v2/bus_eink/bottom_takeover_body";
 import OneMedium from "Components/v2/eink/flex/one_medium";
 
 import Placeholder from "Components/v2/placeholder";
-import NormalHeader from "Components/v2/eink/normal_header";
+import NormalHeader from "Components/v2/eink/bus_normal_header";
 import FareInfoFooter from "Components/v2/eink/fare_info_footer";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import EvergreenContent from "Components/v2/evergreen_content";
@@ -39,6 +40,9 @@ import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import DeparturesNoService from "Components/v2/eink/departures_no_service";
+import EinkSubwayStatus from "Components/v2/subway_status/eink_subway_status";
+import WidgetPage from "Components/v2/widget_page";
+import FlexZoneTakeoverBody from "Components/v2/bus_eink/flex_zone_takeover";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -46,6 +50,7 @@ const TYPE_TO_COMPONENT = {
   body_normal: NormalBody,
   body_takeover: TakeoverBody,
   bottom_takeover: BottomTakeoverBody,
+  flex_zone_takeover: FlexZoneTakeoverBody,
   one_medium: OneMedium,
   placeholder: Placeholder,
   fare_info_footer: FareInfoFooter,
@@ -59,6 +64,7 @@ const TYPE_TO_COMPONENT = {
   bottom_screen_filler: BottomScreenFiller,
   departures_no_data: DeparturesNoData,
   departures_no_service: DeparturesNoService,
+  subway_status: EinkSubwayStatus,
 };
 
 const DISABLED_LAYOUT = {
@@ -94,17 +100,28 @@ const App = (): JSX.Element => {
             responseMapper={responseMapper}
           />
         </Route>
-        <Route exact path="/v2/screen/:id/simulation">
-          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <ResponseMapperContext.Provider value={responseMapper}>
-              <SimulationScreenPage />
-            </ResponseMapperContext.Provider>
-          </MappingContext.Provider>
-        </Route>
-        <Route path="/v2/screen/:id">
+        <Route exact path={["/v2/screen/:id", "/v2/screen/pending/:id"]}>
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <ScreenPage />
+            </ResponseMapperContext.Provider>
+          </MappingContext.Provider>
+        </Route>
+        <Route exact path="/v2/widget/bus_eink_v2">
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <WidgetPage />
+          </MappingContext.Provider>
+        </Route>
+        <Route
+          exact
+          path={[
+            "/v2/screen/:id/simulation",
+            "/v2/screen/pending/:id/simulation",
+          ]}
+        >
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <SimulationScreenPage />
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>

@@ -8,7 +8,7 @@ defmodule Screens.V2.WidgetInstance.LinkFooter do
             url: nil
 
   @type t :: %__MODULE__{
-          screen: Screens.Config.Screen.t(),
+          screen: ScreensConfig.Screen.t(),
           text: String.t(),
           url: String.t()
         }

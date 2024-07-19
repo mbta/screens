@@ -1,19 +1,20 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 
-import useOutfrontStation from "Hooks/use_outfront_station";
 import { ROTATION_INDEX } from "./rotation_index";
 import { NoDataLayout } from "Components/dup/screen_container";
-import { isDup } from "Util/util";
+import { isDup } from "Util/outfront";
+import { useStationName } from "Hooks/outfront";
 import { fetchDatasetValue } from "Util/dataset";
 import { DUP_SIMULATION_REFRESH_MS } from "Constants";
 
-const DupScreenPage = ({
-  screenContainer: ScreenContainer,
-}: {
-  screenContainer: React.ComponentType;
-}): JSX.Element => {
-  const station = useOutfrontStation();
+type QueryParams = {
+  id?: string;
+  rotationIndex?: string;
+};
+
+const DupScreenPage = ({ screenContainer: ScreenContainer }): JSX.Element => {
+  const station = useStationName();
 
   if (station !== null) {
     const id = `DUP-${station.replace(/\s/g, "")}`;
@@ -25,30 +26,20 @@ const DupScreenPage = ({
 
 const DevelopmentScreenPage = ({
   screenContainer: ScreenContainer,
-}: {
-  screenContainer: React.ComponentType;
 }): JSX.Element => {
-  const { id, rotationIndex } = useParams();
+  const { id, rotationIndex } = useParams<QueryParams>();
   return <ScreenContainer id={id} rotationIndex={rotationIndex} />;
 };
 
-const ScreenPage = ({
-  screenContainer,
-}: {
-  screenContainer: React.ComponentType;
-}): JSX.Element =>
+const ScreenPage = ({ screenContainer }): JSX.Element =>
   isDup() ? (
     <DupScreenPage screenContainer={screenContainer} />
   ) : (
     <DevelopmentScreenPage screenContainer={screenContainer} />
   );
 
-const RotationPage = ({
-  screenContainer: ScreenContainer,
-}: {
-  screenContainer: React.ComponentType;
-}): JSX.Element => {
-  const { id } = useParams();
+const RotationPage = ({ screenContainer: ScreenContainer }): JSX.Element => {
+  const { id } = useParams<QueryParams>();
   return (
     <div className="rotation-page">
       <ScreenContainer id={id} rotationIndex={0} />
@@ -58,12 +49,8 @@ const RotationPage = ({
   );
 };
 
-const SimulationPage = ({
-  screenContainer: ScreenContainer,
-}: {
-  screenContainer: React.ComponentType;
-}): JSX.Element => {
-  const { id } = useParams();
+const SimulationPage = ({ screenContainer: ScreenContainer }): JSX.Element => {
+  const { id } = useParams<QueryParams>();
   return (
     <div className="simulation-screen-centering-container">
       <div className="simulation-screen-scrolling-container">
@@ -91,8 +78,6 @@ const SimulationPage = ({
 
 const MultiRotationPage = ({
   screenContainer: ScreenContainer,
-}: {
-  screenContainer: React.ComponentType;
 }): JSX.Element => {
   const screenIds = JSON.parse(fetchDatasetValue("screenIds")) as string[];
 

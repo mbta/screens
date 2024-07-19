@@ -39,7 +39,7 @@ defmodule Screens.Departures.Departure do
           time: DateTime.t(),
           crowding_level: crowding_level,
           inline_badges: list(map()),
-          track_number: pos_integer() | nil
+          track_number: String.t() | nil
         }
 
   @type query_params :: %{
@@ -385,8 +385,16 @@ defmodule Screens.Departures.Departure do
     {"include", Enum.join(relationships, ",")}
   end
 
+  defp format_query_param({:date, %DateTime{} = date}) do
+    {"filter[date]", Util.get_service_date_today(date)}
+  end
+
+  defp format_query_param({:date, %Date{} = date}) do
+    {"filter[date]", Date.to_iso8601(date)}
+  end
+
   defp format_query_param({:date, date}) do
-    {"date", date}
+    {"filter[date]", date}
   end
 
   defp format_query_param({:route_type, nil}) do
@@ -397,6 +405,10 @@ defmodule Screens.Departures.Departure do
     {"filter[route_type]", Screens.RouteType.to_id(route_type)}
   end
 
+  defp format_query_param({:trip_id, trip_id}) do
+    {"filter[trip]", trip_id}
+  end
+
   defp log_unexpected_groups(groups) do
     Enum.each(groups, fn {trip_id, predictions} ->
       route_ids = Enum.map(predictions, & &1.route.id)
@@ -405,7 +417,7 @@ defmodule Screens.Departures.Departure do
       expected_route_ids = ["64", "120"]
 
       if length(route_ids) > 1 and !Enum.member?(expected_route_ids, route_id) do
-        Logger.warn(
+        Logger.warning(
           "log_unexpected_groups found #{length(route_ids)} predictions on trip #{trip_id} for route #{Enum.at(route_ids, 0)}"
         )
       end

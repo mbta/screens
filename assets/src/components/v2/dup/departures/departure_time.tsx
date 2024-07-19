@@ -1,5 +1,5 @@
 import React from "react";
-import { classWithModifier, classWithModifiers } from "Util/util";
+import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 
 const TextDepartureTime = ({ text }) => {
   return <div className="departure-time__text">{text}</div>;
@@ -14,17 +14,25 @@ const MinutesDepartureTime = ({ minutes }) => {
   );
 };
 
-const TimestampDepartureTime = ({ hour, minute }) => {
+const TimestampDepartureTime = ({ hour, minute, am_pm, show_am_pm }) => {
   const zeroFilledMinute = minute < 10 ? "0" + minute : minute;
   const timestamp = `${hour}:${zeroFilledMinute}`;
 
-  return <div className="departure-time__timestamp">{timestamp}</div>;
+  return (
+    <div className="departure-time__timestamp">
+      <span className="departure-time__time">{timestamp}</span>
+      {show_am_pm && <span className="departure-time__ampm">{am_pm}</span>}
+    </div>
+  );
 };
 
 const DepartureTime = ({ scheduled_time, time, currentPage }) => {
   let predictedTime;
-
-  if (time.type === "text") {
+  if (time.type === "icon") {
+    predictedTime = (
+      <img className="departure-time__moon-icon" src={imagePath(`moon.svg`)} />
+    );
+  } else if (time.type === "text") {
     predictedTime = <TextDepartureTime {...time} />;
   } else if (time.type === "minutes") {
     predictedTime = <MinutesDepartureTime {...time} />;

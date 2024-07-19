@@ -59,7 +59,7 @@ const EditableNumberInput = ({
     if (!isNaN(value)) {
       doUpdate(index, mutator || id, value);
     } else {
-      alert(`Integer value expected in ${id} for Screen ID ${rowValues.id}`);
+      alert(`Integer value expected in ${id}`);
     }
   };
 
@@ -104,7 +104,7 @@ const EditableSelect = ({
 }) => {
   const options = useMemo(
     () => gatherSelectOptions(preFilteredRows, id),
-    [id, preFilteredRows]
+    [id, preFilteredRows],
   );
 
   const onChange = (e) => {
@@ -119,6 +119,7 @@ const EditableSelect = ({
       disabled={!editable}
     >
       {options.map((opt) => (
+        // @ts-expect-error
         <option value={opt} key={opt}>
           {opt}
         </option>
@@ -138,7 +139,7 @@ const EditableTextarea = ({
     try {
       const json = JSON.parse(e.target.value);
       doUpdate(index, mutator || id, json);
-    } catch (err) {
+    } catch {
       alert(`Invalid JSON in ${id} for Screen ID ${rowValues.id}`);
     }
   };
@@ -154,10 +155,10 @@ const EditableTextarea = ({
 };
 
 const IndeterminateCheckbox = ({ indeterminate, ...rest }) => {
-  const ref = useRef();
+  const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    ref.current.indeterminate = indeterminate;
+    if (ref.current) ref.current.indeterminate = indeterminate;
   }, [ref, indeterminate]);
 
   return (

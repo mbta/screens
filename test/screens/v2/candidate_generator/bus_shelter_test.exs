@@ -1,7 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.BusShelterTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config.{Screen, V2}
+  alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.BusShelter
   alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader}
 
@@ -79,7 +79,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       fetch_stop_fn = fn "1216" -> "Columbus Ave @ Dimock St" end
       now = ~U[2020-04-06T10:00:00Z]
       evergreen_content_instances_fn = fn _ -> [] end
-      subway_status_instances_fn = fn _ -> [] end
+      subway_status_instances_fn = fn _, _ -> [] end
+      opts = []
 
       expected_header = %NormalHeader{
         screen: config,
@@ -93,6 +94,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       actual_instances =
         BusShelter.candidate_instances(
           config,
+          opts,
           now,
           fetch_stop_fn,
           departures_instances_fn,
@@ -114,7 +116,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       fetch_stop_fn = fn "1216" -> raise "This should not be called!" end
       now = ~U[2020-04-06T10:00:00Z]
       evergreen_content_instances_fn = fn _ -> [] end
-      subway_status_instances_fn = fn _ -> [] end
+      subway_status_instances_fn = fn _, _ -> [] end
+      opts = []
 
       expected_header = %NormalHeader{
         screen: config,
@@ -126,6 +129,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       actual_instances =
         BusShelter.candidate_instances(
           config,
+          opts,
           now,
           fetch_stop_fn,
           departures_instances_fn,

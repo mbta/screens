@@ -1,22 +1,28 @@
 import useTextResizer from "Hooks/v2/use_text_resizer";
-import React, {
-  forwardRef,
-  ComponentType
-} from "react";
+import React, { forwardRef, ComponentType } from "react";
+import { getDatasetValue } from "Util/dataset";
 
-import { classWithModifier, classWithModifiers, formatTimeString, imagePath } from "Util/util";
+import LiveDataSvg from "Images/svgr_bundled/live-data-small.svg";
+
+import {
+  classWithModifier,
+  classWithModifiers,
+  formatTimeString,
+  imagePath,
+} from "Util/util";
 
 enum Icon {
   green_b = "green_b",
   green_c = "green_c",
   green_d = "green_d",
   green_e = "green_e",
-  logo = "logo"
+  logo = "logo",
+  logo_negative = "logo_negative",
 }
 
 enum TitleSize {
   small = "small",
-  large = "large"
+  large = "large",
 }
 
 const ICON_TO_SRC: Record<Icon, string> = {
@@ -25,6 +31,7 @@ const ICON_TO_SRC: Record<Icon, string> = {
   green_d: "GL-D.svg",
   green_e: "GL-E.svg",
   logo: "logo-white.svg",
+  logo_negative: "logo-black.svg",
 };
 
 const abbreviateText = (text: string) => {
@@ -58,35 +65,40 @@ interface NormalHeaderTitleProps {
   fullName: boolean;
 }
 
-const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = forwardRef(
+const NormalHeaderTitle = forwardRef<HTMLDivElement, NormalHeaderTitleProps>(
   ({ icon, text, size, showTo, fullName }, ref) => {
-    const modifiers: string[] = [size];
-    if (icon) {
-      modifiers.push("with-icon");
-    }
-
     const abbreviatedText = fullName ? text : abbreviateText(text);
+    const environmentName = getDatasetValue("environmentName") || "";
 
     return (
-      <div className="normal-header-title">
-        {showTo && <div className="normal-header-to__text">TO</div>}
-        {icon && <NormalHeaderIcon icon={icon} />}
+      <>
+        {["screens-dev", "screens-dev-green"].includes(environmentName) && (
+          <div className="normal-header__environment">{environmentName}</div>
+        )}
         <div
-          className={classWithModifiers("normal-header-title__text", modifiers)}
-          ref={ref}
+          className={classWithModifiers("normal-header-title", [
+            size,
+            icon ? "with-icon" : "no-icon",
+          ])}
         >
-          {abbreviatedText}
+          {icon && <NormalHeaderIcon icon={icon} />}
+          <div className="normal-header-title__text" ref={ref}>
+            {showTo && <div className="normal-header-to__text">TO</div>}
+            {abbreviatedText}
+          </div>
         </div>
-      </div>
+      </>
     );
-  }
+  },
 );
 
 interface NormalHeaderTimeProps {
   time: string;
 }
 
-const NormalHeaderTime: ComponentType<NormalHeaderTimeProps> = ({ time }) => {
+export const NormalHeaderTime: ComponentType<NormalHeaderTimeProps> = ({
+  time,
+}) => {
   const currentTime = formatTimeString(time);
   return <div className="normal-header-time">{currentTime}</div>;
 };
@@ -94,12 +106,13 @@ const NormalHeaderTime: ComponentType<NormalHeaderTimeProps> = ({ time }) => {
 const NormalHeaderUpdated = () => {
   return (
     <div className="normal-header-updated">
-      <div className="normal-header-updated__icon">
-        <img
-          className="normal-header-updated__img"
-          src={imagePath("live-data-small.svg")}
-        />
-      </div>
+      <LiveDataSvg
+        color="white"
+        width="25"
+        height="25"
+        viewBox="0 0 32 32"
+        className="normal-header-updated__img"
+      />
       <div className="normal-header-updated__text">
         UPDATED LIVE EVERY MINUTE
       </div>
@@ -111,15 +124,24 @@ interface NormalHeaderVersionProps {
   version: string;
 }
 
-const NormalHeaderVersion: ComponentType<NormalHeaderVersionProps> = ({ version }) => {
+const NormalHeaderVersion: ComponentType<NormalHeaderVersionProps> = ({
+  version,
+}) => {
   return <div className="normal-header-version">{version}</div>;
 };
 
-const NormalHeaderAccent = ({accentPatternFile}: {accentPatternFile: string}) => (
+const NormalHeaderAccent = ({
+  accentPatternFile,
+}: {
+  accentPatternFile: string;
+}) => (
   <div className="normal-header__accent-pattern-container">
-    <img className="normal-header__accent-pattern-image" src={imagePath(accentPatternFile)} />
+    <img
+      className="normal-header__accent-pattern-image"
+      src={imagePath(accentPatternFile)}
+    />
   </div>
-)
+);
 
 interface Props {
   icon?: Icon;
@@ -146,7 +168,6 @@ const NormalHeader: ComponentType<Props> = ({
   classModifiers,
   accentPattern,
 }) => {
-
   const { ref: headerRef, size: headerSize } = useTextResizer({
     sizes: Object.keys(TitleSize),
     maxHeight: maxHeight,
@@ -165,7 +186,9 @@ const NormalHeader: ComponentType<Props> = ({
       {time && <NormalHeaderTime time={time} />}
       {version && <NormalHeaderVersion version={version} />}
       {showUpdated && <NormalHeaderUpdated />}
-      {accentPattern && <NormalHeaderAccent accentPatternFile={accentPattern}/>}
+      {accentPattern && (
+        <NormalHeaderAccent accentPatternFile={accentPattern} />
+      )}
     </div>
   );
 };

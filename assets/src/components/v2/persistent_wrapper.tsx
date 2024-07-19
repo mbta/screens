@@ -10,7 +10,10 @@ interface Props {
   WrappedComponent: ComponentType<WrappedComponentProps>;
 }
 
-const PersistentWrapper: ComponentType<Props> = ({ WrappedComponent, ...data }) => {
+const PersistentWrapper: ComponentType<Props> = ({
+  WrappedComponent,
+  ...data
+}) => {
   const lastFetch = useContext(LastFetchContext);
 
   const [visibleData, setVisibleData] = useState(data);
@@ -56,8 +59,7 @@ const PersistentWrapper: ComponentType<Props> = ({ WrappedComponent, ...data }) 
  */
 const makePersistent =
   (Component: ComponentType<WrappedComponentProps>) =>
-    ({ ...data }) =>
-      <PersistentWrapper {...data} WrappedComponent={Component} />;
+  ({ ...data }) => <PersistentWrapper {...data} WrappedComponent={Component} />;
 
 export default makePersistent;
 export { WrappedComponentProps };

@@ -1,7 +1,7 @@
 defmodule Screens.V2.WidgetInstance.Survey do
   @moduledoc false
 
-  alias Screens.Config.Screen
+  alias ScreensConfig.Screen
 
   @enforce_keys ~w[screen enabled? medium_asset_url large_asset_url]a
   defstruct @enforce_keys

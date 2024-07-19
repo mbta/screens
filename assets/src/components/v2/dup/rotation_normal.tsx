@@ -11,7 +11,7 @@ interface Props {
 const RotationNormal: React.ComponentType<Props> = ({
   header: header,
   body: body,
-  rotation: rotation
+  rotation: rotation,
 }) => {
   return (
     <div className={`widget-slot rotation-${rotation}`}>

@@ -1,10 +1,5 @@
-.partial-alerts {
-  position: absolute;
-  bottom: 0;
-  border-top: 6px solid #bfbebb;
-}
-
 .partial-alert {
+  border-top: 6px solid #00000040;
 
   &--green {
     background: $line-color-green;

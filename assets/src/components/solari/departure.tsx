@@ -43,7 +43,7 @@ const OverheadDepartureTimeAndCrowding = ({
   currentTimeString,
 }) => {
   const [showCrowding, setShowCrowding] = useState(false);
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   // When we load new data, show the time, which is styled to animate in from the right.
   useEffect(() => {
@@ -53,7 +53,7 @@ const OverheadDepartureTimeAndCrowding = ({
   // Timing is controlled by the timings on the animation. The animation on the time element
   // ends after 10s, then the animationend event toggles crowding on.
   useEffect(() => {
-    const onAnimationEnd = (e) => {
+    const onAnimationEnd = () => {
       setShowCrowding(true);
     };
 
@@ -64,6 +64,8 @@ const OverheadDepartureTimeAndCrowding = ({
           ref.current.removeEventListener("animationend", onAnimationEnd);
         }
       };
+    } else {
+      return () => {};
     }
   });
 
@@ -122,13 +124,13 @@ const Departure = ({
     time,
     currentTimeString,
     vehicleStatus,
-    stopType
+    stopType,
   );
 
   const timeAnimationModifier =
     timeRepresentation.type === "TEXT" ? "animated" : "static";
 
-  const containerModifiers = [];
+  const containerModifiers: string[] = [];
   if (groupStart) {
     containerModifiers.push("group-start");
   }

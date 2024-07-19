@@ -6,28 +6,28 @@ defmodule Screens.V2.WidgetInstance.BlueBikesTest do
 
   setup do
     config =
-      struct(Screens.Config.Screen, %{
+      struct(ScreensConfig.Screen, %{
         app_params:
-          struct(Screens.Config.V2.PreFare, %{
-            blue_bikes: %Screens.Config.V2.BlueBikes{
+          struct(ScreensConfig.V2.PreFare, %{
+            blue_bikes: %ScreensConfig.V2.BlueBikes{
               enabled: true,
               destination: "Back Bay",
               minutes_range_to_destination: "15-20",
               priority: [123],
               stations: [
-                %Screens.Config.V2.BlueBikes.Station{
+                %ScreensConfig.V2.BlueBikes.Station{
                   id: "279",
                   arrow: :e,
                   walk_distance_minutes: 10,
                   walk_distance_feet: 2820
                 },
-                %Screens.Config.V2.BlueBikes.Station{
+                %ScreensConfig.V2.BlueBikes.Station{
                   id: "273",
                   arrow: :n,
                   walk_distance_minutes: 1,
                   walk_distance_feet: 282
                 },
-                %Screens.Config.V2.BlueBikes.Station{
+                %ScreensConfig.V2.BlueBikes.Station{
                   id: "11",
                   arrow: :ne,
                   walk_distance_minutes: 30,

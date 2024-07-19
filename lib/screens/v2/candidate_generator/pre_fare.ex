@@ -1,9 +1,6 @@
 defmodule Screens.V2.CandidateGenerator.PreFare do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.CurrentStopId
-  alias Screens.Config.V2.{PreFare, ShuttleBusInfo}
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
@@ -12,6 +9,9 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
   alias Screens.V2.WidgetInstance.NormalHeader
   alias Screens.V2.WidgetInstance.ShuttleBusInfo, as: ShuttleBusInfoWidget
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Header.CurrentStopId
+  alias ScreensConfig.V2.{PreFare, ShuttleBusInfo}
 
   @behaviour CandidateGenerator
 
@@ -27,7 +27,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
               {:body_left,
                %{
                  body_left_normal: [:main_content_left],
-                 body_left_takeover: [:full_body_left]
+                 body_left_takeover: [:full_body_left],
+                 body_left_flex: Builder.with_paging(:paged_main_content_left, 4)
                }},
               {:body_right,
                %{
@@ -63,8 +64,9 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   # credo:disable-for-next-line
   def candidate_instances(
         config,
+        _opts,
         now \\ DateTime.utc_now(),
-        subway_status_instance_fn \\ &Widgets.SubwayStatus.subway_status_instances/1,
+        subway_status_instance_fn \\ &Widgets.SubwayStatus.subway_status_instances/2,
         reconstructed_alert_instances_fn \\ &Widgets.ReconstructedAlert.reconstructed_alert_instances/1,
         elevator_status_instance_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2,
         full_line_map_instances_fn \\ &Widgets.FullLineMap.full_line_map_instances/1,
@@ -74,7 +76,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       ) do
     [
       fn -> header_instances(config, now) end,
-      fn -> subway_status_instance_fn.(config) end,
+      fn -> subway_status_instance_fn.(config, now) end,
       fn -> reconstructed_alert_instances_fn.(config) end,
       fn -> elevator_status_instance_fn.(config, now) end,
       fn -> full_line_map_instances_fn.(config) end,
@@ -83,7 +85,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       fn -> blue_bikes_instances_fn.(config) end,
       fn -> shuttle_bus_info_instances(config, now) end
     ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
+    |> Task.async_stream(& &1.(), timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
@@ -98,7 +100,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       fn -> alerts_intro_instances(widgets, config) end,
       fn -> alerts_outro_instances(widgets, config) end
     ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
+    |> Task.async_stream(& &1.(), timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 

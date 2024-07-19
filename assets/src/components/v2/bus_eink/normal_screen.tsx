@@ -7,10 +7,7 @@ interface Props {
   body: WidgetData;
 }
 
-const NormalScreen: React.ComponentType<Props> = ({
-  header,
-  body
-}) => {
+const NormalScreen: React.ComponentType<Props> = ({ header, body }) => {
   return (
     <div className="screen-normal">
       <div className="screen-normal__header">

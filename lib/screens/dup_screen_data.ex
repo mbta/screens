@@ -1,9 +1,10 @@
 defmodule Screens.DupScreenData do
   @moduledoc false
 
-  alias Screens.Config.{Dup, State}
+  alias Screens.Config.Cache
+  alias ScreensConfig.Dup
 
-  alias Screens.Config.Dup.Override.{
+  alias ScreensConfig.Dup.Override.{
     FullscreenAlert,
     FullscreenImage,
     PartialAlertList
@@ -14,8 +15,8 @@ defmodule Screens.DupScreenData do
   def by_screen_id(screen_id, rotation_index, now \\ DateTime.utc_now())
 
   def by_screen_id(screen_id, rotation_index, now) when rotation_index in ~w[0 1] do
-    %Dup{primary: primary_departures, override: override} = State.app_params(screen_id)
-    disabled = State.disabled?(screen_id)
+    %Dup{primary: primary_departures, override: override} = Cache.app_params(screen_id)
+    disabled = Cache.disabled?(screen_id)
 
     case {override, rotation_index, disabled} do
       {_, _, true} ->
@@ -33,7 +34,7 @@ defmodule Screens.DupScreenData do
   end
 
   def by_screen_id(screen_id, "2", now) do
-    %Dup{secondary: secondary_departures, override: override} = State.app_params(screen_id)
+    %Dup{secondary: secondary_departures, override: override} = Cache.app_params(screen_id)
 
     case {secondary_departures, override} do
       {%Dup.Departures{sections: []}, _} ->

@@ -3,13 +3,13 @@ defmodule ScreensWeb.V2.AudioController do
   require Logger
 
   alias Phoenix.View
-  alias Screens.Config.State
+  alias Screens.Config.Cache
   alias Screens.V2.ScreenAudioData
 
   plug(:check_config)
 
   defp check_config(conn, _) do
-    if State.ok?(), do: conn, else: not_found(conn)
+    if Cache.ok?(), do: conn, else: not_found(conn)
   end
 
   def show(conn, %{"id" => screen_id} = params) do
@@ -20,7 +20,7 @@ defmodule ScreensWeb.V2.AudioController do
 
     cond do
       not screen_exists?(screen_id) -> not_found(conn)
-      State.disabled?(screen_id) -> disabled(conn)
+      Cache.disabled?(screen_id) -> disabled(conn)
       true -> readout(conn, screen_id, real_screen?, disposition)
     end
   end
@@ -30,7 +30,7 @@ defmodule ScreensWeb.V2.AudioController do
       not screen_exists?(screen_id) ->
         not_found(conn)
 
-      State.disabled?(screen_id) ->
+      Cache.disabled?(screen_id) ->
         json(conn, %{volume: 0.0})
 
       true ->
@@ -42,7 +42,7 @@ defmodule ScreensWeb.V2.AudioController do
   def debug(conn, %{"id" => screen_id}) do
     cond do
       not screen_exists?(screen_id) -> not_found(conn)
-      State.disabled?(screen_id) -> text(conn, "Screen #{screen_id} is disabled.")
+      Cache.disabled?(screen_id) -> text(conn, "Screen #{screen_id} is disabled.")
       true -> text(conn, fetch_ssml(screen_id))
     end
   end
@@ -92,6 +92,6 @@ defmodule ScreensWeb.V2.AudioController do
   end
 
   defp screen_exists?(screen_id) do
-    not is_nil(State.screen(screen_id))
+    not is_nil(Cache.screen(screen_id))
   end
 end

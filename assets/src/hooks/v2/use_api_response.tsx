@@ -1,9 +1,14 @@
 import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
-import React, { useEffect, useState } from "react";
-import { getDataset, getDatasetValue } from "Util/dataset";
-import { getScreenSide, isDup, isRealScreen } from "Util/util";
+import React, { useEffect, useMemo, useState } from "react";
+import { getDatasetValue } from "Util/dataset";
+import { isDup, isOFM, isTriptych, getTriptychPane } from "Util/outfront";
+import { getScreenSide, isRealScreen } from "Util/util";
 import * as SentryLogger from "Util/sentry";
+import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
+import { DUP_VERSION } from "Components/v2/dup/version";
+import { TRIPTYCH_VERSION } from "Components/v2/triptych/version";
+import useRefreshRate from "./use_refresh_rate";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -79,7 +84,7 @@ const rawResponseToSimulationApiResponse = ({
 const doFailureBuffer = (
   lastSuccess: number | null,
   setApiResponse: React.Dispatch<React.SetStateAction<ApiResponse>>,
-  apiResponse: ApiResponse = FAILURE_RESPONSE
+  apiResponse: ApiResponse = FAILURE_RESPONSE,
 ) => {
   if (lastSuccess == null) {
     // We haven't had a successful request since initial page load.
@@ -117,8 +122,7 @@ const getScreenSideParam = () => {
 };
 
 const getRequestorParam = () => {
-  // Adding this to v2 because we will eventually widgetize DUPs.
-  if (isDup()) return `&requestor=real_screen`;
+  if (isOFM()) return `&requestor=real_screen`;
 
   let requestor = getDatasetValue("requestor");
   if (!requestor && isRealScreen()) {
@@ -126,6 +130,40 @@ const getRequestorParam = () => {
   }
 
   return requestor ? `&requestor=${requestor}` : "";
+};
+
+const getLoggingParams = () => {
+  if (isDup()) {
+    return `&rotation_index=${ROTATION_INDEX}&version=${DUP_VERSION}`;
+  }
+
+  if (isTriptych()) {
+    const triptychPane = getTriptychPane();
+    return `&pane=${triptychPane || "UNKNOWN"}&version=${TRIPTYCH_VERSION}`;
+  }
+
+  return "";
+};
+
+const getOutfrontAbsolutePath = () =>
+  isOFM() ? "https://screens.mbta.com" : "";
+
+const getRoute = () => {
+  const route = "/v2/api/screen/";
+  const isPending = getDatasetValue("isPending") === "true";
+  return isPending ? `${route}pending/` : route;
+};
+
+const getApiPath = (id: string, routePart: string) => {
+  const outfrontAbsolutePath = getOutfrontAbsolutePath();
+  const route = getRoute();
+  const lastRefresh = getDatasetValue("lastRefresh");
+  const isRealScreenParam = getIsRealScreenParam();
+  const screenSideParam = getScreenSideParam();
+  const requestorParam = getRequestorParam();
+  const loggingParams = getLoggingParams();
+
+  return `${outfrontAbsolutePath}${route}${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}${loggingParams}`;
 };
 
 interface UseApiResponseArgs {
@@ -146,28 +184,11 @@ const useBaseApiResponse = ({
   routePart = "",
   responseHandler = rawResponseToApiResponse,
 }: UseApiResponseArgs): UseApiResponseReturn => {
-  const isRealScreenParam = getIsRealScreenParam();
-  const screenSideParam = getScreenSideParam();
-  const requestorParam = getRequestorParam();
+  const { refreshRateMs, refreshRateOffsetMs } = useRefreshRate();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
-  const {
-    lastRefresh,
-    refreshRate,
-    refreshRateOffset,
-    screenIdsWithOffsetMap,
-  } = getDataset();
-  const refreshMs = parseInt(refreshRate, 10) * 1000;
-  let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
-  const apiPath = `/v2/api/screen/${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}`;
-
-  if (screenIdsWithOffsetMap) {
-    const screens = JSON.parse(screenIdsWithOffsetMap);
-
-    refreshRateOffsetMs =
-      screens.find((screen) => screen.id === id).refresh_rate_offset * 1000;
-  }
+  const apiPath = useMemo(() => getApiPath(id, routePart), [id, routePart]);
 
   const fetchData = async () => {
     try {
@@ -192,7 +213,7 @@ const useBaseApiResponse = ({
         });
         setLastSuccess(now);
       }
-    } catch (err) {
+    } catch {
       doFailureBuffer(lastSuccess, setApiResponse);
     }
 
@@ -209,8 +230,8 @@ const useBaseApiResponse = ({
     () => {
       fetchData();
     },
-    refreshMs,
-    refreshRateOffsetMs
+    refreshRateMs,
+    refreshRateOffsetMs,
   );
 
   return { apiResponse, requestCount, lastSuccess };
@@ -230,6 +251,29 @@ const useSimulationApiResponse = ({ id }) =>
     responseHandler: rawResponseToSimulationApiResponse,
   });
 
+// For OFM apps--DUP, triptych--we need to request a different
+// route that's more permissive of CORS, since these clients are loaded from a local html file
+// (and thus their data requests to our server are cross-origin).
+//
+// The /dup endpoint only has the CORS stuff, and otherwise runs exactly the same backend logic as
+// the normal one used by `useApiResponse`.
+//
+// The /triptych endpoint has the CORS stuff, plus an additional step that maps the player name of
+// the individual triptych pane to a screen ID representing the collective trio.
+const useDUPApiResponse = ({ id }) =>
+  useBaseApiResponse({
+    id,
+    routePart: "/dup",
+    responseHandler: rawResponseToApiResponse,
+  });
+
+const useTriptychApiResponse = ({ id }) =>
+  useBaseApiResponse({
+    id,
+    routePart: "/triptych",
+    responseHandler: rawResponseToApiResponse,
+  });
+
 export default useApiResponse;
 export { ApiResponse, SimulationApiResponse };
-export { useSimulationApiResponse };
+export { useSimulationApiResponse, useDUPApiResponse, useTriptychApiResponse };

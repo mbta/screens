@@ -17,13 +17,18 @@ defmodule ScreensWeb do
   and import those modules here.
   """
 
+  def static_paths, do: ~w(css fonts images js favicon.ico robots.txt)
+
   def controller do
     quote do
-      use Phoenix.Controller, namespace: ScreensWeb
+      use Phoenix.Controller,
+        namespace: ScreensWeb,
+        layouts: [html: {ScreensWeb.LayoutView, :app}]
 
       import Plug.Conn
       import ScreensWeb.Gettext
       alias ScreensWeb.Router.Helpers, as: Routes
+      unquote(verified_routes())
     end
   end
 
@@ -37,11 +42,16 @@ defmodule ScreensWeb do
       import Phoenix.Controller, only: [get_flash: 1, get_flash: 2, view_module: 1]
 
       # Use all HTML functionality (forms, tags, etc)
-      use Phoenix.HTML
+      import Phoenix.HTML, except: [sigil_E: 2]
+      import Phoenix.HTML.Form
+      use PhoenixHTMLHelpers
+
+      import ScreensWeb.HTML
 
       import ScreensWeb.ErrorHelpers
       import ScreensWeb.Gettext
       alias ScreensWeb.Router.Helpers, as: Routes
+      unquote(verified_routes())
     end
   end
 
@@ -57,6 +67,15 @@ defmodule ScreensWeb do
     quote do
       use Phoenix.Channel
       import ScreensWeb.Gettext
+    end
+  end
+
+  def verified_routes do
+    quote do
+      use Phoenix.VerifiedRoutes,
+        endpoint: ScreensWeb.Endpoint,
+        router: ScreensWeb.Router,
+        statics: ScreensWeb.static_paths()
     end
   end
 

@@ -28,6 +28,7 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
         sectionHeaders={apiResponse.section_headers}
         currentTimeString={apiResponse.current_time}
         overhead={apiResponse.overhead}
+        stationName={apiResponse.station_name}
       />
       {apiResponse.psa_url && (
         <Psa
@@ -78,7 +79,7 @@ const ScreenLayout = ({ apiResponse }): JSX.Element => {
 
 const ScreenContainer = ({ id }): JSX.Element => {
   const query = new URLSearchParams(useLocation().search);
-  const datetime = query.get("datetime");
+  const datetime = query.get("datetime") || undefined;
 
   const apiResponse = useApiResponse({
     id,

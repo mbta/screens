@@ -3,9 +3,10 @@ defmodule Screens.V2.ScreenData do
 
   require Logger
 
+  alias Screens.Config.Cache
   alias Screens.ScreensByAlert
   alias Screens.Util
-  alias Screens.V2.AlertWidgetInstance
+  alias Screens.V2.AlertsWidget
   alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
@@ -13,7 +14,7 @@ defmodule Screens.V2.ScreenData do
   import Screens.V2.Template.Guards
 
   @type screen_id :: String.t()
-  @type config :: Screens.Config.Screen.t()
+  @type config :: ScreensConfig.Screen.t()
   @type candidate_instances :: list(WidgetInstance.t())
   @type selected_instances_map :: %{Template.slot_id() => WidgetInstance.t()}
   @type non_paged_selected_instances_map :: %{Template.non_paged_slot_id() => WidgetInstance.t()}
@@ -21,7 +22,8 @@ defmodule Screens.V2.ScreenData do
   @type response_map :: %{
           data: serializable_map() | nil,
           force_reload: boolean(),
-          disabled: boolean()
+          disabled: boolean(),
+          last_deploy_timestamp: DateTime.t()
         }
   @type paging_metadata :: %{
           Template.non_paged_slot_id() =>
@@ -41,13 +43,14 @@ defmodule Screens.V2.ScreenData do
 
     layout_and_widgets =
       config
-      |> fetch_data()
+      |> fetch_data(opts)
       |> tap(&cache_visible_alert_widgets(&1, screen_id, config.hidden_from_screenplay))
       |> resolve_paging(refresh_rate)
 
     unless opts[:skip_serialize] do
       data = serialize(layout_and_widgets)
-      response(data: data)
+      last_deploy_timestamp = Cache.last_deploy_timestamp()
+      response(data: data, last_deploy_timestamp: last_deploy_timestamp)
     end
   end
 
@@ -58,19 +61,46 @@ defmodule Screens.V2.ScreenData do
     screen_data = fetch_data(config)
 
     full_page_data = screen_data |> resolve_paging(refresh_rate) |> serialize()
-    paged_slot_data = screen_data |> get_paged_slots() |> serialize_paged_slots()
+    paged_slot_data = screen_data |> get_paged_slots() |> serialize_paged_slots(config.app_id)
 
     response(data: %{full_page: full_page_data, flex_zone: paged_slot_data})
   end
 
-  @spec fetch_data(Screens.Config.Screen.t()) :: {Template.layout(), selected_instances_map()}
-  def fetch_data(config) do
+  @spec pending_data_by_screen_config(ScreensConfig.Screen.t()) :: response_map()
+  def pending_data_by_screen_config(pending_screen_config, opts \\ []) do
+    refresh_rate = Parameters.get_refresh_rate(pending_screen_config)
+
+    layout_and_widgets =
+      pending_screen_config
+      |> fetch_data(opts)
+      |> resolve_paging(refresh_rate)
+
+    data = serialize(layout_and_widgets)
+
+    response(data: data)
+  end
+
+  @spec pending_simulation_data_by_screen_config(ScreensConfig.Screen.t()) :: response_map()
+  def pending_simulation_data_by_screen_config(pending_screen_config) do
+    refresh_rate = Parameters.get_refresh_rate(pending_screen_config)
+    screen_data = fetch_data(pending_screen_config)
+
+    full_page_data = screen_data |> resolve_paging(refresh_rate) |> serialize()
+
+    paged_slot_data =
+      screen_data |> get_paged_slots() |> serialize_paged_slots(pending_screen_config.app_id)
+
+    response(data: %{full_page: full_page_data, flex_zone: paged_slot_data})
+  end
+
+  @spec fetch_data(ScreensConfig.Screen.t()) :: {Template.layout(), selected_instances_map()}
+  def fetch_data(config, opts \\ []) do
     candidate_generator = Parameters.get_candidate_generator(config)
     screen_template = candidate_generator.screen_template()
 
     candidate_instances =
       config
-      |> candidate_generator.candidate_instances()
+      |> candidate_generator.candidate_instances(opts)
       |> Enum.filter(&WidgetInstance.valid_candidate?/1)
 
     pick_instances(screen_template, candidate_instances)
@@ -78,7 +108,7 @@ defmodule Screens.V2.ScreenData do
 
   @spec get_config(screen_id()) :: config()
   def get_config(screen_id) do
-    Screens.Config.State.screen(screen_id)
+    Screens.Config.Cache.screen(screen_id)
   end
 
   @spec pick_instances(Template.template(), candidate_instances()) ::
@@ -401,7 +431,7 @@ defmodule Screens.V2.ScreenData do
     Template.position_widget_instances(layout, serialized_instance_map, paging_metadata)
   end
 
-  defp serialize_paged_slots({instance_map, layout}) do
+  defp serialize_paged_slots({instance_map, layout}, app_id) do
     # instance_map looks like:
     # %{{page_index, slot_id} => instance}
 
@@ -410,7 +440,7 @@ defmodule Screens.V2.ScreenData do
 
     instance_map
     |> Enum.group_by(
-      fn {paged_slot_id, _} -> Template.get_page(paged_slot_id) end,
+      &paged_slot_key(&1, app_id),
       fn {paged_slot_id, instance} -> {Template.unpage(paged_slot_id), instance} end
     )
     # %{page_index => [{slot_id, instance}]}
@@ -445,7 +475,8 @@ defmodule Screens.V2.ScreenData do
     %{
       data: Keyword.get(fields, :data, nil),
       force_reload: Keyword.get(fields, :force_reload, false),
-      disabled: Keyword.get(fields, :disabled, false)
+      disabled: Keyword.get(fields, :disabled, false),
+      last_deploy_timestamp: Keyword.get(fields, :last_deploy_timestamp, nil)
     }
   end
 
@@ -484,11 +515,11 @@ defmodule Screens.V2.ScreenData do
     alert_ids =
       instance_map
       |> Map.values()
-      |> Enum.filter(fn widget_struct ->
-        not is_nil(AlertWidgetInstance.impl_for(widget_struct))
-      end)
-      |> Enum.flat_map(&AlertWidgetInstance.alert_ids/1)
+      |> Enum.flat_map(&AlertsWidget.alert_ids/1)
 
     :ok = ScreensByAlert.put_data(screen_id, alert_ids)
   end
+
+  defp paged_slot_key({paged_slot_id, _}, :pre_fare_v2), do: Template.get_slot_id(paged_slot_id)
+  defp paged_slot_key({paged_slot_id, _}, _), do: Template.get_page(paged_slot_id)
 end

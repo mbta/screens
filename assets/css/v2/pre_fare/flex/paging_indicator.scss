@@ -1,12 +1,12 @@
 .flex-zone-page-indicator {
   position: absolute;
+  right: 0;
   bottom: 0;
-  right: 0px;
   width: 1080px;
   height: 20px;
-  text-align: center;
   padding-top: 16px;
   padding-bottom: 24px;
+  text-align: center;
 }
 
 .flex-zone-page-indicator__page__progress-bar {
@@ -20,10 +20,10 @@
   display: inline-block;
   width: 144px;
   height: 16px;
-  border-radius: 24px;
   overflow: hidden;
   background: #cccbc8;
-  box-shadow: inset 1px 2px 6px 0px #bfbebb;
+  border-radius: 24px;
+  box-shadow: inset 1px 2px 6px 0 #bfbebb;
 
   &:not(:first-child) {
     margin-left: 44px;

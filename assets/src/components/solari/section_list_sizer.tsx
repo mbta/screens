@@ -22,7 +22,7 @@ const totalRows = (sections) => {
 };
 
 const allRoundings = (
-  obj: Record<number, number>
+  obj: Record<number, number>,
 ): Record<number, number>[] => {
   return _.reduce(
     obj,
@@ -31,25 +31,25 @@ const allRoundings = (
       const ceils = list.map((o) => ({ ...o, [key]: Math.ceil(n) }));
       return [...floors, ...ceils];
     },
-    [{}]
+    [{}],
   );
 };
 
-const assignSectionSizes = (sections: object[], numRows: number): number[] => {
+const assignSectionSizes = (sections: any[], numRows: number): number[] => {
   // set the sizes for all empty sections to 1, to accomodate the "no departures" placeholder message
   const indexedAssignedEmpties = _.mapValues(
     _.pickBy({ ...sections }, (section) => section.departures.length === 0),
-    () => 1
+    () => 1,
   );
 
   const indexedNonEmpties = _.pickBy(
     { ...sections },
-    (section) => section.departures.length > 0
+    (section) => section.departures.length > 0,
   );
 
   const indexedAssignedNonEmpties = assignSectionSizesHelper(
     indexedNonEmpties,
-    numRows - _.size(indexedAssignedEmpties)
+    numRows - _.size(indexedAssignedEmpties),
   );
 
   // merge the objects and convert back to an array
@@ -61,8 +61,8 @@ const assignSectionSizes = (sections: object[], numRows: number): number[] => {
 };
 
 const assignSectionSizesHelper = (
-  sections: Record<number, object>,
-  numRows: number
+  sections: Record<number, any>,
+  numRows: number,
 ): Record<number, number> => {
   const initialSizes = _.mapValues(sections, (section) => {
     if (section?.paging?.is_enabled) {
@@ -75,21 +75,21 @@ const assignSectionSizesHelper = (
   const initialRows = _.sum(Object.values(initialSizes));
   const scaledSizes = _.mapValues(
     initialSizes,
-    (n) => (n * numRows) / initialRows
+    (n) => (n * numRows) / initialRows,
   );
 
   // Choose "best" rounding
   const allSizeCombinations = allRoundings(scaledSizes);
   const validSizeCombinations = allSizeCombinations.filter(
-    (comb) => _.sum(Object.values(comb)) === numRows
+    (comb) => _.sum(Object.values(comb)) === numRows,
   );
   const roundedSizes = _.minBy(validSizeCombinations, (comb) => {
     return _.sum(
-      _.map(comb, (rounded, i) => Math.abs(rounded - scaledSizes[i]))
+      _.map(comb, (rounded, i) => Math.abs(rounded - scaledSizes[i])),
     );
   });
 
-  return roundedSizes;
+  return roundedSizes!;
 };
 
 interface Props {
@@ -147,7 +147,7 @@ class SectionListSizer extends React.Component<Props, State> {
 
   componentDidUpdate(_props: Props, prevState: State) {
     const newStateFromProps = SectionListSizer.getInitialStateFromProps(
-      this.props
+      this.props,
     );
 
     if (this.stateEquals(prevState) && !this.stateEquals(newStateFromProps)) {
@@ -189,6 +189,7 @@ class SectionListSizer extends React.Component<Props, State> {
       this.props;
 
     return (
+      // @ts-expect-error
       <SectionList
         sections={sections}
         sectionSizes={this.state.sectionSizes}

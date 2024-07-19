@@ -3,11 +3,24 @@ import _ from "lodash";
 
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 
-const pillIcons = ["red", "blue", "orange", "green", "silver"];
+const textPills = [
+  "red",
+  "blue",
+  "orange",
+  "green",
+  "silver",
+  "green_b",
+  "green_c",
+  "green_d",
+  "green_e",
+  "mattapan",
+];
+const iconPills = ["cr", "bus", "ferry"];
 
 const iconPaths: { [key: string]: string } = _.mapValues(
   {
     warning: "alert.svg",
+    warning_negative: "alert-black.svg",
     x: "no-service-white.svg",
     shuttle: "bus-white.svg",
     subway: "subway-white.svg",
@@ -18,16 +31,17 @@ const iconPaths: { [key: string]: string } = _.mapValues(
     green_c: "gl-c-color.svg",
     green_d: "gl-d-color.svg",
     green_e: "gl-e-color.svg",
-    clock: "clock.svg",
+    bus: "bus-black.svg",
+    delay: "clock.svg",
   },
-  imagePath
+  imagePath,
 );
 
-const srcForIcon = (icon) => {
+const srcForIcon = (icon: string) => {
   return iconPaths[icon];
 };
 
-const getKey = (elt) => {
+const getKey = (elt: string | FreeTextElementType) => {
   if (typeof elt === "string") {
     return elt;
   } else if (elt.format !== undefined) {
@@ -40,16 +54,20 @@ const getKey = (elt) => {
     return `special--${elt.special}`;
   } else if (elt.icon !== undefined) {
     return `icon--${elt.icon}`;
+  } else {
+    throw new Error("empty free text element");
   }
 };
 
-const Icon = ({ icon }) => {
+const Icon = ({ icon }: { icon?: string }) => {
   let iconElt;
 
-  if (icon === null) {
+  if (!icon) {
     iconElt = null;
-  } else if (pillIcons.includes(icon)) {
-    iconElt = <RoutePill route={icon} />;
+  } else if (textPills.includes(icon)) {
+    iconElt = <TextRoutePill route={icon} />;
+  } else if (iconPills.includes(icon)) {
+    iconElt = <IconRoutePill route={icon} />;
   } else {
     iconElt = <img className="free-text__icon-image" src={srcForIcon(icon)} />;
   }
@@ -57,7 +75,7 @@ const Icon = ({ icon }) => {
   return <div className="free-text__icon-container">{iconElt}</div>;
 };
 
-const InlineIcon = ({ icon }) => {
+const InlineIcon = ({ icon }: { icon: string }) => {
   return (
     <span className="free-text__element free-text__inline-icon">
       <img className="free-text__inline-icon-image" src={srcForIcon(icon)} />
@@ -65,34 +83,40 @@ const InlineIcon = ({ icon }) => {
   );
 };
 
-const FormatString = ({ format, text }) => {
+const FormatString = ({
+  format,
+  text,
+}: {
+  format: string | null;
+  text?: string;
+}) => {
   const modifiers = format === null ? [] : [format];
   const className = `free-text__element ${classWithModifiers(
     "free-text__string",
-    modifiers
+    modifiers,
   )}`;
 
   return <span className={className}>{text}</span>;
 };
 
-const RoutePill = ({ route }) => {
+const TextRoutePill = ({ route }: { route: string }) => {
   const routeName = {
     red: "RL",
     blue: "BL",
     orange: "OL",
     green: "GL",
     silver: "SL",
-    cr: "CR",
     green_b: "GL·B",
     green_c: "GL·C",
     green_d: "GL·D",
     green_e: "GL·E",
+    mattapan: "M",
   }[route];
 
   const branch = route.startsWith("green_") ? "branch" : "trunk";
 
   return (
-    <span className="free-text__element free-text__route-container">
+    <span className="free-text__element">
       <div className={classWithModifier("free-text__route-pill", route)}>
         <div
           className={classWithModifier("free-text__route-pill__text", branch)}
@@ -104,9 +128,19 @@ const RoutePill = ({ route }) => {
   );
 };
 
-const TextPill = ({ color, text }) => {
+const IconRoutePill = ({ route }: { route: string }) => {
   return (
-    <span className="free-text__element free-text__pill-container">
+    <span className="free-text__element">
+      <div className={classWithModifier("free-text__route-pill", route)}>
+        <img className="free-text__icon-image" src={srcForIcon(route)} />
+      </div>
+    </span>
+  );
+};
+
+const TextPill = ({ color, text }: { color: string; text?: string }) => {
+  return (
+    <span className="free-text__element">
       <div className={classWithModifier("free-text__text-pill", color)}>
         <div className="free-text__text-pill__text">{text}</div>
       </div>
@@ -114,7 +148,7 @@ const TextPill = ({ color, text }) => {
   );
 };
 
-const Special = ({ data }) => {
+const Special = ({ data }: { data: string }) => {
   if (data === "break") {
     return <br />;
   }
@@ -122,13 +156,22 @@ const Special = ({ data }) => {
   return null;
 };
 
-const FreeTextElement = ({ elt }) => {
+interface FreeTextElementType {
+  text?: string;
+  format?: string;
+  route?: string;
+  color?: string;
+  special?: string;
+  icon?: string;
+}
+
+const FreeTextElement = ({ elt }: { elt: string | FreeTextElementType }) => {
   if (typeof elt === "string") {
     return <FormatString text={elt} format={null} />;
   } else if (elt.format !== undefined) {
     return <FormatString text={elt.text} format={elt.format} />;
   } else if (elt.route !== undefined) {
-    return <RoutePill route={elt.route} />;
+    return <TextRoutePill route={elt.route} />;
   } else if (elt.color !== undefined) {
     return <TextPill color={elt.color} text={elt.text} />;
   } else if (elt.special !== undefined) {
@@ -140,14 +183,51 @@ const FreeTextElement = ({ elt }) => {
   return null;
 };
 
-const FreeText = ({ elements }) => {
+const FreeTextLine = ({
+  icon,
+  text,
+}: {
+  icon?: string;
+  text: (string | FreeTextElementType)[];
+}) => {
   return (
-    <div className="free-text">
-      {elements.map((elt) => (
-        <FreeTextElement elt={elt} key={getKey(elt)} />
-      ))}
+    <div className="free-text__line-container">
+      <Icon icon={icon} />
+      <div className="free-text__line">
+        {text.map((elt: string | FreeTextElementType) => (
+          <FreeTextElement elt={elt} key={getKey(elt)} />
+        ))}
+      </div>
     </div>
   );
+};
+
+export interface FreeTextType {
+  icon?: string;
+  text: FreeTextElementType[];
+}
+
+interface FreeTextProps {
+  lines: FreeTextType | FreeTextType[];
+}
+
+const FreeText = ({ lines }: FreeTextProps) => {
+  if (Array.isArray(lines)) {
+    const [{ icon: icon1, text: text1 }, { icon: icon2, text: text2 }] = lines;
+    return (
+      <div className="free-text">
+        <FreeTextLine icon={icon1} text={text1} />
+        <FreeTextLine icon={icon2} text={text2} />
+      </div>
+    );
+  } else {
+    const { icon, text } = lines;
+    return (
+      <div className="free-text">
+        <FreeTextLine icon={icon} text={text} />
+      </div>
+    );
+  }
 };
 
 export default FreeText;

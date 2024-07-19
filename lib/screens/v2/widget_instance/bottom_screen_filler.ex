@@ -11,7 +11,7 @@ defmodule Screens.V2.WidgetInstance.BottomScreenFiller do
   `body` region.
   """
 
-  alias Screens.Config.Screen
+  alias ScreensConfig.Screen
 
   defstruct ~w[screen]a
 

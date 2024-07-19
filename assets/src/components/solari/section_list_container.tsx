@@ -8,6 +8,7 @@ interface Props {
   sectionHeaders: string;
   currentTimeString: string;
   overhead: boolean;
+  stationName: string;
 }
 
 const SectionListContainer = ({
@@ -15,6 +16,7 @@ const SectionListContainer = ({
   sectionHeaders,
   currentTimeString,
   overhead,
+  stationName,
 }: Props): JSX.Element => {
   const [sectionSizes, setSectionSizes] = React.useState([] as number[]);
 
@@ -27,6 +29,7 @@ const SectionListContainer = ({
           sectionHeaders={sectionHeaders}
           currentTimeString={currentTimeString}
           overhead={overhead}
+          stationName={stationName}
         />
       )}
       <SectionListSizer

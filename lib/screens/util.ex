@@ -1,7 +1,8 @@
 defmodule Screens.Util do
   @moduledoc false
 
-  alias Screens.Config.State
+  alias Screens.Config.Cache
+  alias Screens.Vehicles.Carriage
 
   def format_time(t) do
     t |> DateTime.truncate(:second) |> DateTime.to_iso8601()
@@ -130,11 +131,24 @@ defmodule Screens.Util do
   """
   @spec format_name_list_to_string([String.t()]) :: String.t()
   def format_name_list_to_string([string]), do: "#{string}"
-  def format_name_list_to_string([s1, s2]), do: "#{s1} and #{s2}"
+  def format_name_list_to_string([s1, s2]), do: "#{s1} & #{s2}"
 
   def format_name_list_to_string(list) do
     list
-    |> List.update_at(length(list) - 1, &"and #{&1}")
+    |> List.update_at(length(list) - 1, &"& #{&1}")
+    |> Enum.join(", ")
+  end
+
+  @doc """
+  Same as regular string list formatter, but for audio (extra comma for clarity, "and" instead of "&")
+  """
+  @spec format_name_list_to_string_audio([String.t()]) :: String.t()
+  def format_name_list_to_string_audio([string]), do: "#{string}"
+  def format_name_list_to_string_audio([s1, s2]), do: "#{s1}, and, #{s2}"
+
+  def format_name_list_to_string_audio(list) do
+    list
+    |> List.update_at(length(list) - 1, &"and, #{&1}")
     |> Enum.join(", ")
   end
 
@@ -161,13 +175,17 @@ defmodule Screens.Util do
   def route_type_from_id("Red"), do: :subway
   def route_type_from_id("Orange"), do: :subway
   def route_type_from_id("Blue"), do: :subway
-  def route_type_from_id("CR-" <> _), do: :commuter_rail
+  def route_type_from_id("CR-" <> _), do: :rail
   def route_type_from_id("Boat-" <> _), do: :ferry
   def route_type_from_id(_), do: :bus
 
+  def outdated?("DUP-" <> _, _), do: false
+
+  def outdated?("TRI-" <> _, _), do: false
+
   def outdated?(screen_id, client_refresh_timestamp) do
     {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
-    refresh_if_loaded_before_time = State.refresh_if_loaded_before(screen_id)
+    refresh_if_loaded_before_time = Cache.refresh_if_loaded_before(screen_id)
 
     case refresh_if_loaded_before_time do
       nil -> false
@@ -179,4 +197,62 @@ defmodule Screens.Util do
   def to_set(id) when is_binary(id), do: MapSet.new([id])
   def to_set(ids) when is_list(ids), do: MapSet.new(ids)
   def to_set(%MapSet{} = already_a_set), do: already_a_set
+
+  @doc """
+    Calculates the service day for the given DateTime.
+    For context, MBTA service days end at 3am, not at midnight.
+    So getting the service day means subtracting 3 hours from the current time.
+    To avoid duplicate DateTime calculations existing throughout the code,
+    this function will handle the actual calculations needed to get the service day.
+  """
+  @spec get_service_date_today(DateTime.t()) :: Date.t()
+  def get_service_date_today(now) do
+    {:ok, now_eastern} = DateTime.shift_zone(now, "America/New_York")
+
+    # If it is at least 3am, the current date matches the service date.
+    # If current time is between 12am and 3am, the date has changed but we are still in service for the previous day.
+    # That means we need to subtract 1 day to get the current service date.
+    if now_eastern.hour >= 3 do
+      DateTime.to_date(now_eastern)
+    else
+      Date.add(now_eastern, -1)
+    end
+  end
+
+  @spec get_service_date_tomorrow(DateTime.t()) :: Date.t()
+  def get_service_date_tomorrow(now) do
+    Date.add(get_service_date_today(now), 1)
+  end
+
+  def translate_carriage_occupancy_status(%Carriage{occupancy_status: :no_data_available}),
+    do: :no_data
+
+  def translate_carriage_occupancy_status(%Carriage{occupancy_status: :not_accepting_passengers}),
+    do: :closed
+
+  def translate_carriage_occupancy_status(%Carriage{occupancy_percentage: occupancy_percentage})
+      when occupancy_percentage <= 12,
+      do: :not_crowded
+
+  def translate_carriage_occupancy_status(%Carriage{occupancy_percentage: occupancy_percentage})
+      when occupancy_percentage <= 40,
+      do: :some_crowding
+
+  def translate_carriage_occupancy_status(%Carriage{occupancy_percentage: occupancy_percentage})
+      when occupancy_percentage > 40,
+      do: :crowded
+
+  def translate_carriage_occupancy_status(_), do: nil
+
+  @doc """
+    Adds a timeout to a function. Mainly used for child processes of a Task.Supervisor
+    which don't come with a timeout by default.
+  """
+  @spec fn_with_timeout((-> val), non_neg_integer()) :: (-> val) when val: any()
+  def fn_with_timeout(fun, timeout) do
+    fn ->
+      _ = :timer.exit_after(timeout, :kill)
+      fun.()
+    end
+  end
 end

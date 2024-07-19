@@ -454,6 +454,14 @@ const DupV2ScreensTable = (): JSX.Element => {
   const columns = [
     { Header: "Screen ID", accessor: "id", Filter: DefaultColumnFilter },
     {
+      Header: "Header",
+      accessor: buildAppParamAccessor("header"),
+      mutator: buildAppParamMutator("header"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
       Header: "Primary Departures",
       accessor: buildAppParamAccessor("primary_departures"),
       mutator: buildAppParamMutator("primary_departures"),
@@ -465,6 +473,14 @@ const DupV2ScreensTable = (): JSX.Element => {
       Header: "Secondary Departures",
       accessor: buildAppParamAccessor("secondary_departures"),
       mutator: buildAppParamMutator("secondary_departures"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Alerts",
+      accessor: buildAppParamAccessor("alerts"),
+      mutator: buildAppParamMutator("alerts"),
       Cell: EditableTextarea,
       disableFilters: true,
       FormCell: FormTextarea,
@@ -533,6 +549,30 @@ const v2Columns = [
   },
 ];
 
+const screenIDColumn = {
+  Header: "Screen ID",
+  accessor: "id",
+  Filter: DefaultColumnFilter,
+  FormCell: FormStaticCell,
+};
+
+const screenNameColumn = {
+  Header: "Name",
+  accessor: "name",
+  Cell: EditableCell,
+  Filter: DefaultColumnFilter,
+  FormCell: FormTextCell,
+};
+
+const evergreenContentColumn = {
+  Header: "Evergreen Content",
+  accessor: buildAppParamAccessor("evergreen_content"),
+  mutator: buildAppParamMutator("evergreen_content"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
 const alertsColumn = {
   Header: "Alerts",
   accessor: buildAppParamAccessor("alerts"),
@@ -574,13 +614,28 @@ const GLEinkV2ScreensTable = (): JSX.Element => {
     FormCell: FormTextarea,
   };
 
+  const platformLocationColumn = {
+    Header: "Platform Location",
+    accessor: buildAppParamAccessor("platform_location"),
+    mutator: buildAppParamMutator("platform_location"),
+    Cell: EditableSelect,
+    disableFilters: true,
+    FormCell: buildFormSelect(["front", "back"], false),
+  };
+
   const dataFilter = ({ app_id }) => {
     return app_id === "gl_eink_v2";
   };
 
   return (
     <AdminTable
-      columns={[...v2Columns, alertsColumn, lineMapColumn]}
+      columns={[
+        ...v2Columns,
+        alertsColumn,
+        lineMapColumn,
+        audioColumn,
+        platformLocationColumn,
+      ]}
       dataFilter={dataFilter}
     />
   );
@@ -671,6 +726,33 @@ const shuttleBusInfoColumn = {
   FormCell: FormTextarea,
 };
 
+const trainCrowdingColumn = {
+  Header: "Train Crowding",
+  accessor: buildAppParamAccessor("train_crowding"),
+  mutator: buildAppParamMutator("train_crowding"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
+const localEvergreenSetsColumn = {
+  Header: "Local Evergreen Content Sets",
+  accessor: buildAppParamAccessor("local_evergreen_sets"),
+  mutator: buildAppParamMutator("local_evergreen_sets"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
+const showIdentifiersColumn = {
+  Header: "Show Version & Player Name?",
+  accessor: buildAppParamAccessor("show_identifiers"),
+  mutator: buildAppParamMutator("show_identifiers"),
+  Cell: EditableCheckbox,
+  Filter: DefaultColumnFilter,
+  FormCell: FormBoolean,
+};
+
 const PreFareV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "pre_fare_v2";
@@ -687,13 +769,14 @@ const PreFareV2ScreensTable = (): JSX.Element => {
         crDeparturesColumn,
         blueBikesColumn,
         shuttleBusInfoColumn,
+        audioColumn,
       ]}
       dataFilter={dataFilter}
     />
   );
 };
 
-const v2SolariColumns = [
+const v2BuswayColumns = [
   {
     Header: "Screen ID",
     accessor: "id",
@@ -725,12 +808,12 @@ const v2SolariColumns = [
   },
 ];
 
-const SolariV2ScreensTable = (): JSX.Element => {
+const BuswayV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
-    return app_id === "solari_v2";
+    return app_id === "busway_v2";
   };
 
-  return <AdminTable columns={v2SolariColumns} dataFilter={dataFilter} />;
+  return <AdminTable columns={v2BuswayColumns} dataFilter={dataFilter} />;
 };
 
 const SolariLargeV2ScreensTable = (): JSX.Element => {
@@ -738,7 +821,27 @@ const SolariLargeV2ScreensTable = (): JSX.Element => {
     return app_id === "solari_large_v2";
   };
 
-  return <AdminTable columns={v2SolariColumns} dataFilter={dataFilter} />;
+  return <AdminTable columns={v2BuswayColumns} dataFilter={dataFilter} />;
+};
+
+const TriptychV2ScreensTable = (): JSX.Element => {
+  const dataFilter = ({ app_id }) => {
+    return app_id === "triptych_v2";
+  };
+
+  return (
+    <AdminTable
+      columns={[
+        screenIDColumn,
+        screenNameColumn,
+        trainCrowdingColumn,
+        localEvergreenSetsColumn,
+        evergreenContentColumn,
+        showIdentifiersColumn,
+      ]}
+      dataFilter={dataFilter}
+    />
+  );
 };
 
 export {
@@ -752,8 +855,9 @@ export {
   DupV2ScreensTable,
   BusEinkV2ScreensTable,
   GLEinkV2ScreensTable,
-  SolariV2ScreensTable,
+  BuswayV2ScreensTable,
   SolariLargeV2ScreensTable,
   BusShelterV2ScreensTable,
   PreFareV2ScreensTable,
+  TriptychV2ScreensTable,
 };

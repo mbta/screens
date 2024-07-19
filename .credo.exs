@@ -38,7 +38,6 @@
         {Credo.Check.Readability.SpaceAfterCommas},
         {Credo.Check.Refactor.DoubleBooleanNegation},
         {Credo.Check.Refactor.CondStatements},
-        {Credo.Check.Refactor.CyclomaticComplexity},
         {Credo.Check.Refactor.FunctionArity},
         {Credo.Check.Refactor.MatchInCondition},
         {Credo.Check.Refactor.NegatedConditionsInUnless},
@@ -65,7 +64,10 @@
         {Credo.Check.Refactor.ABCSize, false},
         {Credo.Check.Refactor.AppendSingleItem, false},
         {Credo.Check.Refactor.VariableRebinding, false},
-        {Credo.Check.Warning.MapGetUnsafePass, false}
+        {Credo.Check.Warning.MapGetUnsafePass, false},
+
+        # Intentionally disabled
+        {Credo.Check.Refactor.CyclomaticComplexity, false}
       ]
     }
   ]

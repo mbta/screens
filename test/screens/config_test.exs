@@ -1,11 +1,14 @@
 defmodule Screens.ConfigTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config
-  alias Screens.Config.State.LocalFetch
+  alias Screens.Config.Fetch
+  alias ScreensConfig.Config
 
   def fetch_config(_context) do
-    {:ok, config, _} = LocalFetch.fetch_config(nil)
+    {:ok, file_contents, _} = Fetch.fetch_config(nil)
+    {:ok, parsed} = Jason.decode(file_contents)
+    config = Config.from_json(parsed)
+
     {:ok, %{config: config}}
   end
 

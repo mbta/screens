@@ -1,14 +1,14 @@
 defmodule Screens.V2.CandidateGenerator.BusEink do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusEink, Footer}
-  alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{BottomScreenFiller, FareInfoFooter, NormalHeader}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{BusEink, Footer}
+  alias ScreensConfig.V2.Header.CurrentStopId
 
   @behaviour CandidateGenerator
 
@@ -32,6 +32,11 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
             bottom_takeover: [
               :main_content,
               :full_body_bottom_screen
+            ],
+            flex_zone_takeover: [
+              :main_content,
+              :flex_zone_takeover,
+              :footer
             ]
           }}
        ],
@@ -44,11 +49,13 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
   # credo:disable-for-next-line Credo.Check.Design.DuplicatedCode
   def candidate_instances(
         config,
+        _opts,
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/1,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
-        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
+        subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/2
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
@@ -56,9 +63,10 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
       fn -> evergreen_content_instances_fn.(config) end,
-      fn -> bottom_screen_filler_instances(config) end
+      fn -> bottom_screen_filler_instances(config) end,
+      fn -> subway_status_instances_fn.(config, now) end
     ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
+    |> Task.async_stream(& &1.(), timeout: 30_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 

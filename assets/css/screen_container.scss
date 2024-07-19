@@ -1,9 +1,9 @@
 .single-screen-container {
   position: relative;
-  margin: 0px auto;
-  padding: 0px;
   width: 1200px;
   height: 1600px;
+  padding: 0;
+  margin: 0 auto;
   overflow: hidden;
 
   &--gl-mercury {

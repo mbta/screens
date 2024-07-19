@@ -1,7 +1,7 @@
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
 
-const DeparturesNoService: ComponentType = ({}) => {
+const DeparturesNoService: ComponentType = () => {
   return (
     <div className="departures-no-service-container">
       <img

@@ -4,7 +4,11 @@ import { useEffect, useRef } from "react";
 
 const noop = () => {};
 
-const useInterval = (callback: () => void, delay: number, skipInterval?: boolean) => {
+const useInterval = (
+  callback: () => void,
+  delay: number,
+  skipInterval?: boolean,
+) => {
   const savedCallback = useRef<() => void>(noop);
 
   // Remember the latest callback.

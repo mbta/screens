@@ -1,0 +1,106 @@
+@use "sass:math";
+
+.later-departures__carousel {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  transform: translateX(calc(-100% * var(--later-departures-offset)));
+
+  .departure-row {
+    flex-shrink: 0;
+  }
+}
+
+.later-departures {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 100%;
+  background-color: $warm-neutral-90;
+
+  &__header {
+    box-sizing: inherit;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0 32px;
+    border-bottom: 4px solid $true-grey-70;
+
+    h3 {
+      box-sizing: inherit;
+      flex-shrink: 0;
+      padding: 18px 0;
+      margin: 0;
+      font-family: Inter;
+      font-size: 40px;
+      font-weight: 500;
+      line-height: 43px;
+      color: $cool-black-15;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    ol {
+      display: flex;
+      flex-direction: row;
+      gap: 24px;
+      justify-content: space-between;
+      list-style: none;
+
+      .route-pill {
+        // RoutePill is using some position: absolute/relative stuff to center
+        // text vertically; however, it also relies on fixed widths. To get
+        // these route pills to grow horizontally when needed (and simplify
+        // doing that) the smaller RoutePills used in the Later Departures
+        // component use flexbox to center things instead. `position: static`
+        // is the default value so this rule resets the default behavior.
+        position: static;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        min-width: 86px;
+        height: 44px;
+      }
+
+      .route-pill--yellow {
+        box-shadow: 1px 1px 1px 0 rgba(0 0 0 / 25%);
+      }
+
+      .route-pill__text,
+      .route-pill__slashed-text {
+        position: static;
+        padding: 0 14px;
+        font-size: 36px;
+        line-height: 36px;
+      }
+
+      .route-pill__slashed-text {
+        display: flex;
+      }
+    }
+  }
+
+  &__route--selected {
+    position: relative;
+
+    &::after {
+      $caret-size: 16px;
+
+      position: absolute;
+      bottom: -25px;
+      left: calc(50% - math.hypot($caret-size, $caret-size) / 2);
+      box-sizing: border-box;
+      width: $caret-size;
+      height: $caret-size;
+      content: " ";
+      background-color: $warm-neutral-90;
+      border-top: 4px solid $true-grey-70;
+      border-left: 4px solid $true-grey-70;
+      transform: rotate(45deg);
+    }
+  }
+}

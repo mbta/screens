@@ -2,17 +2,23 @@ defmodule Screens.V2.Departure.Builder do
   @moduledoc false
 
   alias Screens.Predictions.Prediction
+  alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
   alias Screens.V2.Departure
   alias Screens.Vehicles.Vehicle
 
+  @typep predictions_or_schedules :: [Prediction.t() | Schedule.t()]
+
+  @spec get_relevant_departures(predictions_or_schedules()) :: predictions_or_schedules()
+  @spec get_relevant_departures(predictions_or_schedules(), DateTime.t()) ::
+          predictions_or_schedules()
   def get_relevant_departures(predictions_or_schedules, now \\ DateTime.utc_now()) do
     predictions_or_schedules
     |> Stream.reject(&in_past_or_nil_time?(&1, now))
     |> Stream.reject(&multi_route_duplicate?/1)
     |> Stream.reject(&vehicle_already_departed?/1)
-    |> choose_earliest_stop_per_trip()
+    |> choose_earliest_arrival_per_trip()
   end
 
   defp in_past_or_nil_time?(%{arrival_time: nil, departure_time: nil}, _), do: true
@@ -51,7 +57,7 @@ defmodule Screens.V2.Departure.Builder do
 
   defp vehicle_already_departed?(_), do: false
 
-  defp choose_earliest_stop_per_trip(predictions_or_schedules) do
+  defp choose_earliest_arrival_per_trip(predictions_or_schedules) do
     {departures_without_trip, departures_with_trip} =
       Enum.split_with(predictions_or_schedules, fn
         %{trip: nil} -> true
@@ -63,14 +69,22 @@ defmodule Screens.V2.Departure.Builder do
       departures_with_trip
       |> Enum.group_by(fn %{trip: %Trip{id: trip_id}} -> trip_id end)
       |> Enum.map(fn {_trip_id, departures} ->
-        Enum.min_by(departures, &(&1.departure_time || &1.arrival_time), DateTime)
+        Enum.min_by(departures, &earliest_time/1, DateTime)
       end)
 
     departures_without_trip
     |> Kernel.++(deduplicated_predictions_with_trip)
-    |> Enum.sort_by(&(&1.departure_time || &1.arrival_time), DateTime)
+    |> Enum.sort_by(&earliest_time/1, DateTime)
   end
 
+  # align with `Departure.time/1`
+  defp earliest_time(%{arrival_time: time}) when not is_nil(time), do: time
+  defp earliest_time(%{departure_time: time}) when not is_nil(time), do: time
+  defp earliest_time(_prediction_or_schedule), do: nil
+
+  @spec merge_predictions_and_schedules([Prediction.t()], [Schedule.t()], [Schedule.t()]) :: [
+          Departure.t()
+        ]
   def merge_predictions_and_schedules(filtered_predictions, filtered_schedules, all_schedules) do
     predicted_trip_ids =
       filtered_predictions

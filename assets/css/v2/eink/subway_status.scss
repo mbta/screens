@@ -1,0 +1,100 @@
+.subway-status {
+  position: relative;
+  width: 1136px;
+  height: 1080px;
+  padding: 29px 32px 32px;
+  overflow: hidden;
+  background-color: white;
+
+  .branch-icon {
+    display: inline-block;
+
+    &:not(:last-child) {
+      margin-right: 8px;
+    }
+  }
+
+  .subway-status__header {
+    font-family: Helvetica, sans-serif;
+    font-size: 72px;
+    font-weight: 700;
+    line-height: 96px;
+  }
+
+  .subway-status_row {
+    position: relative;
+    min-height: 230px;
+    max-height: 320px;
+
+    &--multi {
+      height: 320px;
+    }
+
+    .subway-status_status_rule {
+      position: absolute;
+      right: 10px;
+      bottom: 0;
+      width: 1116px;
+      height: 2px;
+      content: "";
+      background: #000;
+      border-radius: 1px;
+    }
+
+    &:last-child {
+      .subway-status_status_rule {
+        width: 1136px;
+        height: 4px;
+      }
+    }
+  }
+}
+
+.subway-status_route-pill-container {
+  height: 64px;
+  padding-top: 44px;
+
+  .pill-icon {
+    margin-right: 8px;
+  }
+}
+
+.subway-status_status {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 24px;
+  margin-left: 36px;
+  overflow: hidden;
+
+  .subway-status_alert:not(:first-child) {
+    margin-top: 24px;
+  }
+
+  .subway-status_alert_route-pill-container {
+    display: inline-block;
+    margin-right: 16px;
+  }
+
+  .subway-status_alert_text-container {
+    display: inline-block;
+    font-family: Inter, sans-serif;
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 65px;
+    vertical-align: top;
+
+    &--normal-service {
+      font-size: 48px;
+      font-weight: 500;
+      line-height: 43px;
+    }
+
+    .subway-status_alert_location-text {
+      margin-left: 24px;
+      font-size: 40px;
+      font-weight: 500;
+      line-height: 40px;
+    }
+  }
+}

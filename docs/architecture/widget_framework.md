@@ -34,7 +34,7 @@ Screens team members can see this as a [flowchart in Miro](https://miro.com/app/
 The module where most of this logic lives is [`Screens.V2.ScreenData`](/lib/screens/screen_data.ex), starting with `by_screen_id/2`.
 
 1. Client requests `/v2/api/screen/{id}`. Subsequent steps take place on the server.
-1. We get the config stored under `id` in the screen configuration file. The file lives in S3 and the Screens application caches its contents locally in a [GenServer](/lib/screens/config/state.ex).
+1. We get the config stored under `id` in the screen configuration file. The file lives in S3 and the Screens application caches its contents locally in an [ETS Table](/lib/screens/config/cache.ex).
 1. We look up the "app ID" stored in the config. We get the appropriate candidate generator module for that app ID.
 1. We get the template for this screen type by calling `candidate_generator.screen_template()`.
 1. We get a list of candidate widgets for the screen by calling `candidate_generator.candidate_instances(config)`.
@@ -104,7 +104,7 @@ By keeping the backend in control of paging, content stays real-time, all the ti
 
 ### Persistent front-end widgets and frontend paging
 
-A small number of widgets perform paging internally, entirely on the client. These include the elevator status widget and the pre-fare "full line map" widget. They use a [special function](/assets/src/components/v2/persistent_carousel.tsx#L99) to create a component that cycles through one page at a time, ignoring new data from the backend until it finishes consuming the pages it last received.
+A small number of widgets perform paging internally, entirely on the client. These include the elevator status widget and the pre-fare "full line map" widget. They use a [special function](/assets/src/components/v2/persistent_carousel.tsx#L110) to create a component that cycles through one page at a time, ignoring new data from the backend until it finishes consuming the pages it last received.
 
 To the backend, they are just normal widgets—it sends data for them in every response, and the client chooses whether or not to discard it.
 

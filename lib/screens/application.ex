@@ -10,19 +10,22 @@ defmodule Screens.Application do
 
     # List all child processes to be supervised
     children = [
+      Screens.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: ScreensWeb.PubSub},
       # Start the endpoint when the application starts
       ScreensWeb.Endpoint,
       # Starts a worker by calling: Screens.Worker.start_link(arg)
       # {Screens.Worker, arg},
-      Screens.Config.State.Supervisor,
-      Screens.SignsUiConfig.State.Supervisor,
+      {Screens.Cache.Owner, engine_module: Screens.Config.Cache.Engine},
+      {Screens.Cache.Owner, engine_module: Screens.SignsUiConfig.Cache.Engine},
+      {Screens.Cache.Owner, engine_module: Screens.TriptychPlayer.Cache.Engine},
       :hackney_pool.child_spec(:ex_aws_pool, []),
       :hackney_pool.child_spec(:blue_bikes_pool, []),
       :hackney_pool.child_spec(:api_v3_pool, max_connections: 100),
       {Screens.Stops.StationsWithRoutesAgent, %{}},
-      {Screens.BlueBikes.State, name: Screens.BlueBikes.State},
+      # Turning this off because it's not in use, and the process is failing
+      # {Screens.BlueBikes.State, name: Screens.BlueBikes.State},
       # Task supervisor for ScreensByAlert async updates
       # This supervisor is only used in deployment envs, but it's harmless to start it anyway in local dev.
       {Task.Supervisor, name: Screens.ScreensByAlert.Memcache.TaskSupervisor},
@@ -31,7 +34,10 @@ defmodule Screens.Application do
       # Task supervisor for ScreensByAlert self-refresh jobs
       {Task.Supervisor, name: Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor},
       # ScreensByAlert self-refresh job runner
-      {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner}
+      {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner},
+      Screens.OlCrowding.DynamicSupervisor,
+      {Screens.OlCrowding.Agent, %{}},
+      {Screens.ScreenApiResponseCache, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

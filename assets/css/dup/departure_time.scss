@@ -1,13 +1,13 @@
 @import "../base/base_departure_time";
 
 .departure-time {
-  color: #171f26;
   display: inline-block;
-  text-align: right;
-  vertical-align: middle;
   width: 400px;
   margin-right: 32px;
   font-size: 138px;
+  color: #171f26;
+  text-align: right;
+  vertical-align: middle;
 
   &--disabled {
     color: #6e6e6e;

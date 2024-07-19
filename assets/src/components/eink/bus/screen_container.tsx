@@ -1,8 +1,11 @@
 import React, { forwardRef, useRef } from "react";
 
 import Departures from "Components/eink/bus/departures";
+import { Props as DepartureGroupProps } from "Components/eink/bus/departure_group";
 import FareInfo from "Components/eink/bus/fare_info";
-import FlexZoneContainer from "Components/eink/bus/flex_zone_container";
+import FlexZoneContainer, {
+  Props as FlexZoneContainerProps,
+} from "Components/eink/bus/flex_zone_container";
 import Header from "Components/eink/bus/header";
 import DigitalBridge from "Components/eink/digital_bridge";
 import NoService from "Components/eink/no_service";
@@ -17,7 +20,11 @@ import NoConnectionBottom from "Components/eink/no_connection_bottom";
 import NoConnectionTop from "Components/eink/no_connection_top";
 import LoadingTop from "Components/eink/loading_top";
 
-const TopScreenLayout = forwardRef(
+type TopScreenLayoutProps = Omit<DepartureGroupProps, "size"> & {
+  stopName: string;
+};
+
+const TopScreenLayout = forwardRef<HTMLDivElement, TopScreenLayoutProps>(
   ({ currentTimeString, stopName, departures }, ref): JSX.Element => {
     return (
       <div className="single-screen-container">
@@ -30,10 +37,12 @@ const TopScreenLayout = forwardRef(
         />
       </div>
     );
-  }
+  },
 );
 
-const BottomScreenLayout = forwardRef(
+type BottomScreenLayoutProps = FlexZoneContainerProps & { stopId: string };
+
+const BottomScreenLayout = forwardRef<HTMLDivElement, BottomScreenLayoutProps>(
   (
     {
       currentTimeString,
@@ -43,7 +52,7 @@ const BottomScreenLayout = forwardRef(
       nearbyConnections,
       psaUrl,
     },
-    ref
+    ref,
   ): JSX.Element => {
     return (
       <div className="single-screen-container">
@@ -59,7 +68,7 @@ const BottomScreenLayout = forwardRef(
         <DigitalBridge stopId={stopId} />
       </div>
     );
-  }
+  },
 );
 
 const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
@@ -68,13 +77,13 @@ const DefaultScreenLayout = ({ apiResponse }): JSX.Element => {
 
   const { departureCount, laterDepartureCount } = useFitDepartures(
     departuresRef,
-    laterDeparturesRef
+    laterDeparturesRef,
   );
 
   const departuresData = apiResponse.departures.slice(0, departureCount);
   const laterDeparturesData = apiResponse.departures.slice(
     departureCount,
-    departureCount + laterDepartureCount
+    departureCount + laterDepartureCount,
   );
 
   return (

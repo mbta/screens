@@ -2,9 +2,9 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureLog
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.CurrentStopId
-  alias Screens.Config.V2.PreFare
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Header.CurrentStopId
+  alias ScreensConfig.V2.PreFare
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
   alias Screens.V2.WidgetInstance.MockWidget

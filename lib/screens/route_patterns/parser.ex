@@ -9,7 +9,7 @@ defmodule Screens.RoutePatterns.Parser do
   end
 
   def parse_result(_, _) do
-    Logger.warn("Unrecognized format of route_pattern data.")
+    Logger.warning("Unrecognized format of route_pattern data.")
     :error
   end
 
@@ -72,7 +72,7 @@ defmodule Screens.RoutePatterns.Parser do
     case parsed do
       # If `trip` is present, but the stop array is empty, there's a problem with the trip in the API
       [] ->
-        Logger.warn("Trip data doesn't contain stop ids. trip_id: #{trip_id}")
+        Logger.warning("Trip data doesn't contain stop ids. trip_id: #{trip_id}")
         :error
 
       _ ->

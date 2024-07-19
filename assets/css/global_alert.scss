@@ -1,10 +1,10 @@
 .global-alert {
-  background: black;
-  color: white;
-  border-radius: 0px 24px 24px 0px;
-  margin-right: 34px;
   margin-top: auto;
+  margin-right: 34px;
   margin-bottom: auto;
+  color: white;
+  background: black;
+  border-radius: 0 24px 24px 0;
 }
 
 .global-alert__header {
@@ -18,30 +18,32 @@
 }
 
 .global-alert__icon-image {
-  height: 128px;
   width: 128px;
-  margin: 32px 40px 32px 40px;
+  height: 128px;
+  margin: 32px 40px;
 }
 
 .global-alert__header-effect {
   @include font--display--75bold;
+
   display: inline-block;
   width: 720px;
-  vertical-align: top;
-  font-size: 80px;
   margin-top: 52px;
+  font-size: 80px;
+  vertical-align: top;
 }
 
 .global-alert__header-timestamp {
   @include font--text--55regular;
+
   display: inline-block;
   width: 194px;
-  vertical-align: top;
-  text-align: right;
   margin-top: 86px;
   margin-right: 44px;
   font-size: 16px;
+  text-align: right;
   text-transform: uppercase;
+  vertical-align: top;
 }
 
 .global-alert__body {
@@ -50,6 +52,7 @@
 
 .global-alert__body-description {
   @include font--paragraph--regular;
+
   padding: 25px 40px 51px 208px;
   font-size: 40px;
   line-height: 56px;

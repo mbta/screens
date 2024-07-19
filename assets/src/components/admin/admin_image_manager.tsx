@@ -1,18 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import _ from "lodash";
+import getCsrfToken from "Util/csrf";
 
 interface FileWithPreview extends File {
   preview: string;
 }
 
 const fetchWithCsrf = (resource: RequestInfo, init: RequestInit = {}) => {
-  const csrfToken = document.head.querySelector(
-    "[name~=csrf-token][content]"
-  ).content;
   return fetch(resource, {
     ...init,
-    headers: { ...(init?.headers || {}), "x-csrf-token": csrfToken },
+    headers: { ...(init?.headers || {}), "x-csrf-token": getCsrfToken() },
     credentials: "include",
   });
 };
@@ -58,7 +56,7 @@ const S3ImageThumbnail = ({ filename }): JSX.Element => (
   <ImageThumbnail src={`/image/${filename}`} fullSize />
 );
 
-const ImageManagerContainer = ({}): JSX.Element => {
+const ImageManagerContainer = (): JSX.Element => {
   const [imageFilenames, setImageFilenames] = useState<string[]>([]);
 
   const loadState = async () => {
@@ -77,12 +75,13 @@ const ImageManagerContainer = ({}): JSX.Element => {
   );
 };
 
-const ImageUpload = ({}): JSX.Element => {
+const ImageUpload = (): JSX.Element => {
   const [stagedImageUpload, setStagedImageUpload] =
-    useState<FileWithPreview>(null);
+    useState<FileWithPreview | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleClickUpload = async () => {
+    if (!stagedImageUpload) return;
     setIsUploading(true);
 
     const formData = new FormData();
@@ -101,7 +100,7 @@ const ImageUpload = ({}): JSX.Element => {
       } else {
         throw new Error();
       }
-    } catch (e) {
+    } catch {
       alert("Upload failed.");
       setIsUploading(false);
     }
@@ -109,7 +108,7 @@ const ImageUpload = ({}): JSX.Element => {
 
   const onDrop = useCallback(
     ([acceptedFile]) => {
-      if (!!acceptedFile) {
+      if (acceptedFile) {
         const fileWithPreview = Object.assign(acceptedFile, {
           preview: URL.createObjectURL(acceptedFile),
         });
@@ -118,7 +117,7 @@ const ImageUpload = ({}): JSX.Element => {
         alert("That file is too large; please try one under 20MB.");
       }
     },
-    [setStagedImageUpload]
+    [setStagedImageUpload],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -169,7 +168,7 @@ const ImageManager = ({ imageFilenames }): JSX.Element => {
       try {
         const response = await fetchWithCsrf(
           `/api/admin/image/${selectedFilename}`,
-          { method: "DELETE" }
+          { method: "DELETE" },
         );
 
         const result = await response.json();
@@ -179,7 +178,7 @@ const ImageManager = ({ imageFilenames }): JSX.Element => {
         } else {
           throw new Error();
         }
-      } catch (e) {
+      } catch {
         alert(`Failed to delete ${selectedFilename}.`);
         setIsDeleting(false);
       }

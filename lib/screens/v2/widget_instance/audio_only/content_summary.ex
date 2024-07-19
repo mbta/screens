@@ -5,11 +5,11 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
 
   require Logger
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Header.CurrentStopId
-  alias Screens.Config.V2.PreFare
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.{BlueBikes, NormalHeader, ShuttleBusInfo}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Header.CurrentStopId
+  alias ScreensConfig.V2.PreFare
 
   @type subway_line :: :red | :orange | :green | :blue
 
@@ -36,7 +36,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
     # Attempt to find a header widget and place this widget immediately after it
     case Enum.find(t.widgets_snapshot, &match?(%NormalHeader{}, &1)) do
       nil ->
-        Logger.warn("Failed to find a header widget in the audio readout queue")
+        Logger.warning("Failed to find a header widget in the audio readout queue")
         [0]
 
       header ->

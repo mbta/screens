@@ -1,7 +1,7 @@
 defmodule Screens.V2.WidgetInstance.BottomScreenFillerTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config.Screen
+  alias ScreensConfig.Screen
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.BottomScreenFiller
 

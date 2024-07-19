@@ -1,39 +1,22 @@
 .normal-header {
   position: relative;
-  height: 100%;
   width: 100%;
-  background: #000000;
+  height: 100%;
+  background: #000;
 }
 
 .normal-header-icon {
   display: inline-block;
-  vertical-align: middle;
-}
-
-.normal-header-icon__image {
-  height: 128px;
   width: 128px;
-  margin-right: 28px;
+  height: 128px;
+  margin: 120px 28px 40px 40px;
+  vertical-align: middle;
 }
 
 .normal-header-title {
-  width: 892px;
-  position: absolute;
-  left: 40px;
-  bottom: 40px;
-}
-
-.normal-header-title__text {
-  display: inline-block;
-  vertical-align: middle;
-  font-family: neue-haas-grotesk-display;
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: 1px;
-
-  &--with-icon {
-    width: 736px;
-  }
+  position: relative;
+  width: 964px;
+  height: 100%;
 
   &--large {
     font-size: 96px;
@@ -46,54 +29,75 @@
   }
 }
 
+.normal-header-title__text {
+  display: inline-block;
+  font-family: Helvetica, sans-serif;
+  font-weight: 700;
+  color: #fff;
+  vertical-align: middle;
+
+  .normal-header-title--with-icon & {
+    width: 768px;
+  }
+
+  .normal-header-title--no-icon & {
+    width: 864px;
+    margin-top: 40px;
+    margin-left: 40px;
+  }
+}
+
 .normal-header-to__text {
-  position: absolute;
-  font-family: neue-haas-grotesk-display;
-  color: #ffffff;
-  letter-spacing: 2px;
-  font-size: 56px;
-  line-height: 64px;
   height: 64px;
-  width: 736px;
+  font-family: Helvetica, sans-serif;
+  font-size: 56px;
   font-weight: 500;
-  left: 156px;
-  bottom: 110px;
+  line-height: 64px;
+  color: #fff;
+  letter-spacing: 2px;
 }
 
 .normal-header-time {
   position: absolute;
-  right: 40px;
   top: 40px;
+  right: 40px;
   font-family: Inter;
-  color: #ffffff;
   font-size: 72px;
   line-height: 72px;
+  color: #fff;
 }
 
 .normal-header-updated {
   position: absolute;
   right: 40px;
-  bottom: 40px;
+  bottom: 56px;
+  display: flex;
+  width: 204px;
 }
 
 .normal-header-updated__text {
-  display: inline-block;
-  vertical-align: top;
-  width: 168px;
-  text-align: right;
-  font-family: neue-haas-grotesk-display;
-  color: #ffffff;
+  font-family: Inter;
   font-size: 24px;
-  line-height: 30px;
-}
-
-.normal-header-updated__icon {
-  display: inline-block;
-  vertical-align: top;
+  font-weight: 500;
+  line-height: 28px;
+  color: #fff;
+  text-align: right;
 }
 
 .normal-header-updated__img {
-  height: 25px;
+  flex-shrink: 0;
   width: 25px;
-  margin-right: 4px;
+  height: 25px;
+}
+
+.normal-header__environment {
+  position: absolute;
+  padding-top: 10px;
+  padding-left: 40px;
+  font-family: Helvetica, sans-serif;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 48px;
+  color: #fff;
+  letter-spacing: 0;
 }

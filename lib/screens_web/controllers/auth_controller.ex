@@ -4,26 +4,27 @@ defmodule ScreensWeb.AuthController do
   use ScreensWeb, :controller
   plug Ueberauth
 
-  def request(conn, %{"provider" => provider}) when provider != "cognito" do
-    send_resp(conn, 404, "Not Found")
-  end
-
-  def callback(conn, %{"provider" => provider}) when provider != "cognito" do
+  # Respond with 404 instead of crashing when the path doesn't match a supported provider
+  def request(conn, %{"provider" => provider}) when provider != "keycloak" do
     send_resp(conn, 404, "Not Found")
   end
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
     username = auth.uid
     expiration = auth.credentials.expires_at
-    credentials = auth.credentials
-
     current_time = System.system_time(:second)
+
+    keycloak_client_id =
+      get_in(Application.get_env(:ueberauth_oidcc, :providers), [:keycloak, :client_id])
+
+    roles =
+      get_in(auth.extra.raw_info.userinfo, ["resource_access", keycloak_client_id, "roles"]) || []
 
     conn
     |> Guardian.Plug.sign_in(
       ScreensWeb.AuthManager,
       username,
-      %{groups: credentials.other.groups},
+      %{roles: roles},
       ttl: {expiration - current_time, :seconds}
     )
     |> redirect(to: ScreensWeb.Router.Helpers.admin_path(conn, :index))
@@ -41,7 +42,7 @@ defmodule ScreensWeb.AuthController do
       end)
       |> Enum.join(", ")
 
-    _ = Logger.info("[ueberauth_failure] messages=\"#{error_messages}\"")
+    Logger.info("[ueberauth_failure] messages=\"#{error_messages}\"")
 
     send_resp(conn, 401, "unauthenticated")
   end

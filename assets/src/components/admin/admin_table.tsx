@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useTable, useFilters, useRowSelect } from "react-table";
 import _ from "lodash";
+import weakKey from "weak-key";
 
 import { doSubmit } from "Util/admin";
 import { IndeterminateCheckbox } from "Components/admin/admin_cells";
@@ -20,7 +21,7 @@ const buildDefaultMutator = (columnId) => {
 
 const buildIndexMapping = (data, dataFilter) => {
   // Map from index in filter to index in all data
-  const [indexMapping, _filteredIndex] = data.reduce(
+  const [indexMapping] = data.reduce(
     ([acc, filteredIndex], row, index) => {
       const isIncluded = dataFilter(row);
       return [
@@ -28,7 +29,7 @@ const buildIndexMapping = (data, dataFilter) => {
         isIncluded ? filteredIndex + 1 : filteredIndex,
       ];
     },
-    [{}, 0]
+    [{}, 0],
   );
 
   return indexMapping;
@@ -52,10 +53,6 @@ const Table = ({
     headerGroups,
     rows,
     prepareRow,
-    state,
-    visibleColumns,
-    preGlobalFilteredRows,
-    setGlobalFilter,
     state: { selectedRowIds },
   } = useTable(
     {
@@ -83,7 +80,7 @@ const Table = ({
         },
         ...cols,
       ]);
-    }
+    },
   );
 
   return (
@@ -91,9 +88,12 @@ const Table = ({
       <table {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
+            <tr
+              key={weakKey(headerGroup)}
+              {...headerGroup.getHeaderGroupProps()}
+            >
               {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps()}>
+                <th key={column.id} {...column.getHeaderProps()}>
                   {column.render("Header")}
                   <div>{column.canFilter ? column.render("Filter") : null}</div>
                 </th>
@@ -103,13 +103,15 @@ const Table = ({
         </thead>
 
         <tbody {...getTableBodyProps()}>
-          {rows.map((row, i) => {
+          {rows.map((row) => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps()}>
+              <tr key={weakKey(row)} {...row.getRowProps()}>
                 {row.cells.map((cell) => {
                   return (
-                    <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                    <td key={cell.column.id} {...cell.getCellProps()}>
+                      {cell.render("Cell")}
+                    </td>
                   );
                 })}
               </tr>
@@ -138,7 +140,7 @@ const configToData = (config) => {
   return _.chain(config.screens)
     .toPairs()
     .map(([screenId, screenData]) => ({ ...screenData, id: screenId }))
-    .sortBy((screenData) => parseInt(screenData.id, 10))
+    .sortBy((screenData) => screenData.id)
     .value();
 };
 
@@ -247,7 +249,6 @@ const AdminTableControls = ({
         <EditModal
           columns={columns}
           data={data}
-          setData={setData}
           selectedRowIds={selectedRowIds}
           setShowEditModal={setShowEditModal}
           setTableVersion={setTableVersion}
@@ -262,7 +263,7 @@ const AdminTableControls = ({
 };
 
 const AdminTable = ({ columns, dataFilter }): JSX.Element => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const [editable, setEditable] = useState(true);
   const [tableVersion, setTableVersion] = useState(0);
 
@@ -300,7 +301,7 @@ const AdminTable = ({ columns, dataFilter }): JSX.Element => {
           return mutator(row, value);
         }
         return row;
-      })
+      }),
     );
   };
 

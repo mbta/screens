@@ -27,7 +27,6 @@ class DebugErrorBoundary extends React.Component {
   }
 
   public componentDidCatch(error: Error, errorInfo: object) {
-    // tslint:disable-next-line:no-console
     console.error(error, errorInfo);
   }
 

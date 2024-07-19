@@ -36,7 +36,11 @@ const calculateMsToNextCall = (periodMs: number, offsetMs: number) => {
   return nextCallTimestamp - now;
 };
 
-const useDriftlessInterval = (callback: () => void, periodMs: number, offsetMs: number = 0) => {
+const useDriftlessInterval = (
+  callback: () => void,
+  periodMs: number,
+  offsetMs: number = 0,
+) => {
   const savedCallback = useRef<() => void>(noop);
   const [tickSignal, setTickSignal] = useState<boolean>(false);
 

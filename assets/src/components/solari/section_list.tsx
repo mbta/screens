@@ -4,15 +4,16 @@ import { PagedSection, Section } from "Components/solari/section";
 import { classWithModifier } from "Util/util";
 
 interface Props {
-  sections: object[];
+  sections: any[];
   sectionSizes: number[];
   sectionHeaders: string;
   currentTimeString: string;
   overhead: boolean;
+  stationName: string;
   isDummy?: boolean;
 }
 
-const SectionList = React.forwardRef(
+const SectionList = React.forwardRef<HTMLDivElement, Props>(
   (
     {
       sections,
@@ -20,9 +21,10 @@ const SectionList = React.forwardRef(
       sectionHeaders,
       currentTimeString,
       overhead,
+      stationName,
       isDummy = false,
-    }: Props,
-    ref
+    },
+    ref,
   ): JSX.Element => {
     const className = isDummy
       ? classWithModifier("section-list", "dummy")
@@ -44,12 +46,13 @@ const SectionList = React.forwardRef(
               overhead={overhead}
               isAnimated={!isDummy}
               key={section.name}
+              stationName={stationName}
             />
           );
         })}
       </div>
     );
-  }
+  },
 );
 
 export default SectionList;

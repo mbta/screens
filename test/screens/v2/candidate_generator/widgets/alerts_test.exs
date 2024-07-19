@@ -4,22 +4,31 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
   import Screens.V2.CandidateGenerator.Widgets.Alerts
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{Alerts, BusShelter, Solari}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{Alerts, BusShelter, Busway}
+  alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
+  alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
   defp ie(opts \\ []) do
     %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}
   end
 
-  describe "alert_instances/5" do
+  # credo:disable-for-next-line
+  # TODO: GL e-ink needs to be specifically tested here, because sometimes the alerts are rendered slightly differently
+
+  describe "alert_instances/4" do
     setup do
       now = ~U[2021-01-01T00:00:00Z]
 
-      config =
-        struct(Screen, %{app_params: struct(BusShelter, %{alerts: %Alerts{stop_id: "1265"}})})
+      stop_id = "1265"
 
-      bad_config = struct(Screen, %{app_params: struct(Solari)})
+      app = BusShelter
+
+      config = struct(Screen, %{app_params: struct(app, %{alerts: %Alerts{stop_id: stop_id}})})
+
+      bad_config = struct(Screen, %{app_params: struct(Busway)})
 
       routes_at_stop = [
         %{route_id: "22", active?: true},
@@ -27,12 +36,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %{route_id: "44", active?: true}
       ]
 
-      stop_sequences = [
-        ~w[11531 1265 1266],
-        ~w[1262 11531 1265 1266 10413],
-        ~w[1265 1266 10413 11413 17411],
-        ~w[1260 1262 11531 1265]
-      ]
+      tagged_stop_sequences = %{
+        "A" => [~w[11531 1265 1266]],
+        "B" => [~w[1262 11531 1265 1266 10413]],
+        "C" => [~w[1265 1266 10413 11413 17411]],
+        "D" => [~w[1260 1262 11531 1265]]
+      }
+
+      stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
 
       alerts = [
         %Alert{
@@ -56,36 +67,39 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{id: "4", effect: :stop_closure, informed_entities: [], active_period: [{now, nil}]}
       ]
 
+      location_context = %LocationContext{
+        home_stop: stop_id,
+        tagged_stop_sequences: tagged_stop_sequences,
+        upstream_stops: Stop.upstream_stop_id_set(stop_id, stop_sequences),
+        downstream_stops: Stop.downstream_stop_id_set(stop_id, stop_sequences),
+        routes: routes_at_stop,
+        alert_route_types: Stop.get_route_type_filter(app, stop_id)
+      }
+
       %{
         config: config,
         bad_config: bad_config,
-        routes_at_stop: routes_at_stop,
-        stop_sequences: stop_sequences,
+        location_context: location_context,
         now: now,
-        fetch_simplified_routes_at_stop_fn: fn _, _ -> {:ok, routes_at_stop} end,
-        fetch_stop_sequences_fn: fn _ -> {:ok, stop_sequences} end,
         fetch_alerts_fn: fn _, _ -> {:ok, alerts} end,
-        x_fetch_simplified_routes_at_stop_fn: fn _, _ -> :error end,
-        x_fetch_stop_sequences_fn: fn _ -> :error end,
-        x_fetch_alerts_fn: fn _, _ -> :error end
+        fetch_location_context_fn: fn _, _, _ -> {:ok, location_context} end,
+        x_fetch_alerts_fn: fn _, _ -> :error end,
+        x_fetch_location_context_fn: fn _, _, _ -> :error end
       }
     end
 
     test "returns a list of alert widgets if all queries succeed", context do
       %{
         config: config,
-        routes_at_stop: routes_at_stop,
-        stop_sequences: stop_sequences,
+        location_context: location_context,
         now: now,
-        fetch_simplified_routes_at_stop_fn: fetch_simplified_routes_at_stop_fn,
-        fetch_stop_sequences_fn: fetch_stop_sequences_fn,
-        fetch_alerts_fn: fetch_alerts_fn
+        fetch_alerts_fn: fetch_alerts_fn,
+        fetch_location_context_fn: fetch_location_context_fn
       } = context
 
       expected_common_data = %{
         screen: config,
-        routes_at_stop: routes_at_stop,
-        stop_sequences: stop_sequences,
+        location_context: location_context,
         now: now
       }
 
@@ -118,9 +132,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
                alert_instances(
                  config,
                  now,
-                 fetch_simplified_routes_at_stop_fn,
-                 fetch_stop_sequences_fn,
-                 fetch_alerts_fn
+                 fetch_alerts_fn,
+                 fetch_location_context_fn
                )
     end
 
@@ -128,18 +141,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       %{
         bad_config: bad_config,
         now: now,
-        fetch_simplified_routes_at_stop_fn: fetch_simplified_routes_at_stop_fn,
-        fetch_stop_sequences_fn: fetch_stop_sequences_fn,
-        fetch_alerts_fn: fetch_alerts_fn
+        fetch_alerts_fn: fetch_alerts_fn,
+        fetch_location_context_fn: fetch_location_context_fn
       } = context
 
       assert_raise FunctionClauseError, fn ->
         alert_instances(
           bad_config,
           now,
-          fetch_simplified_routes_at_stop_fn,
-          fetch_stop_sequences_fn,
-          fetch_alerts_fn
+          fetch_alerts_fn,
+          fetch_location_context_fn
         )
       end
     end
@@ -148,44 +159,31 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       %{
         config: config,
         now: now,
-        fetch_simplified_routes_at_stop_fn: fetch_simplified_routes_at_stop_fn,
-        fetch_stop_sequences_fn: fetch_stop_sequences_fn,
         fetch_alerts_fn: fetch_alerts_fn,
-        x_fetch_simplified_routes_at_stop_fn: x_fetch_simplified_routes_at_stop_fn,
-        x_fetch_stop_sequences_fn: x_fetch_stop_sequences_fn,
-        x_fetch_alerts_fn: x_fetch_alerts_fn
+        fetch_location_context_fn: fetch_location_context_fn,
+        x_fetch_alerts_fn: x_fetch_alerts_fn,
+        x_fetch_location_context_fn: x_fetch_location_context_fn
       } = context
 
       assert [] ==
                alert_instances(
                  config,
                  now,
-                 x_fetch_simplified_routes_at_stop_fn,
-                 fetch_stop_sequences_fn,
-                 fetch_alerts_fn
+                 fetch_alerts_fn,
+                 x_fetch_location_context_fn
                )
 
       assert [] ==
                alert_instances(
                  config,
                  now,
-                 fetch_simplified_routes_at_stop_fn,
-                 x_fetch_stop_sequences_fn,
-                 fetch_alerts_fn
-               )
-
-      assert [] ==
-               alert_instances(
-                 config,
-                 now,
-                 fetch_simplified_routes_at_stop_fn,
-                 fetch_stop_sequences_fn,
-                 x_fetch_alerts_fn
+                 x_fetch_alerts_fn,
+                 fetch_location_context_fn
                )
     end
   end
 
-  describe "filter_alerts/4" do
+  describe "relevant_alerts/4" do
     setup do
       %{
         stop_ids: ~w[1 2 3],
@@ -233,7 +231,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       ]
 
       assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
-               filter_alerts(alerts, stop_ids, route_ids, now)
+               relevant_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "filters out alerts that inform stops that are not downstream of the home stop", %{
@@ -275,7 +273,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       ]
 
       assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
-               filter_alerts(alerts, stop_ids, route_ids, now)
+               relevant_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "keeps alerts that inform an entire route type", %{
@@ -304,7 +302,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [%Alert{id: "1"}] = filter_alerts(alerts, stop_ids, route_ids, now)
+      assert [%Alert{id: "1"}] = relevant_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "filters out alerts with other informed entities", %{
@@ -321,7 +319,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
+      assert [] = relevant_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "filters out alerts that do not have a relevant effect", %{
@@ -338,7 +336,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
+      assert [] = relevant_alerts(alerts, stop_ids, route_ids, now)
     end
 
     test "filters out upcoming alerts", %{
@@ -355,7 +353,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [] = filter_alerts(alerts, stop_ids, route_ids, now)
+      assert [] = relevant_alerts(alerts, stop_ids, route_ids, now)
     end
   end
 end

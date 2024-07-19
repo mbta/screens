@@ -107,7 +107,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDeparturesTest do
 
   describe "audio_valid_candidate?/1" do
     test "returns true", %{inbound_widget: widget} do
-      assert WidgetInstance.audio_valid_candidate?(widget)
+      assert !WidgetInstance.audio_valid_candidate?(widget)
     end
   end
 

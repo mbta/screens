@@ -161,6 +161,26 @@ defmodule Screens.V2.Departure.BuilderTest do
       assert MapSet.new([d1, d4, d5, d6]) ==
                MapSet.new(Builder.get_relevant_departures(departures, now))
     end
+
+    test "sorts departures by arrival time if present, departure time if not" do
+      # arrives earlier, departs later
+      d1 = %Schedule{
+        id: "1",
+        arrival_time: ~U[2020-02-01T00:00:01Z],
+        departure_time: ~U[2020-02-01T00:00:05Z]
+      }
+
+      # arrives later, departs earlier
+      d2 = %Schedule{
+        id: "2",
+        arrival_time: ~U[2020-02-01T00:00:02Z],
+        departure_time: ~U[2020-02-01T00:00:03Z]
+      }
+
+      now = ~U[2020-01-01T00:00:00Z]
+
+      assert [d1, d2] == Builder.get_relevant_departures([d2, d1], now)
+    end
   end
 
   describe "merge_predictions_and_schedules/2" do

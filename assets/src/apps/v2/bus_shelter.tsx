@@ -1,8 +1,9 @@
 import initSentry from "Util/sentry";
 initSentry("bus_shelter");
 
-declare function require(name: string): string;
-// tslint:disable-next-line
+import initFullstory from "Util/fullstory";
+initFullstory();
+
 require("../../../css/bus_shelter_v2.scss");
 
 import React from "react";
@@ -34,13 +35,13 @@ import Placeholder from "Components/v2/placeholder";
 import LinkFooter from "Components/v2/bus_shelter/link_footer";
 import NormalHeader from "Components/v2/lcd/normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
-import SubwayStatus from "Components/v2/subway_status";
+import LcdSubwayStatus from "Components/v2/subway_status/lcd_subway_status";
 
 import EvergreenContent from "Components/v2/evergreen_content";
 import Survey from "Components/v2/survey";
 
 import NoData from "Components/v2/lcd/no_data";
-import DeparturesNoData from "Components/v2/bus_shelter/departures_no_data";
+import DeparturesNoData from "Components/v2/lcd/departures_no_data";
 
 import { FlexZoneAlert, FullBodyAlert } from "Components/v2/bus_shelter/alert";
 import MultiScreenPage from "Components/v2/multi_screen_page";
@@ -60,7 +61,7 @@ const TYPE_TO_COMPONENT = {
   link_footer: LinkFooter,
   normal_header: NormalHeader,
   departures: NormalDepartures,
-  subway_status: SubwayStatus,
+  subway_status: LcdSubwayStatus,
   alert: FlexZoneAlert,
   full_body_alert: FullBodyAlert,
   evergreen_content: EvergreenContent,
@@ -101,7 +102,7 @@ const blinkConfig: BlinkConfig = {
 
 const getAudioConfig = (): AudioConfig | null => {
   const audioIntervalOffsetSeconds = getDatasetValue(
-    "audioIntervalOffsetSeconds"
+    "audioIntervalOffsetSeconds",
   );
   const audioReadoutInterval = getDatasetValue("audioReadoutInterval");
 
@@ -128,14 +129,7 @@ const App = (): JSX.Element => {
             responseMapper={responseMapper}
           />
         </Route>
-        <Route exact path="/v2/screen/:id/simulation">
-          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <ResponseMapperContext.Provider value={responseMapper}>
-              <SimulationScreenPage />
-            </ResponseMapperContext.Provider>
-          </MappingContext.Provider>
-        </Route>
-        <Route path="/v2/screen/:id">
+        <Route exact path={["/v2/screen/:id", "/v2/screen/pending/:id"]}>
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <BlinkConfigContext.Provider value={blinkConfig}>
@@ -143,6 +137,19 @@ const App = (): JSX.Element => {
                   <ScreenPage />
                 </AudioConfigContext.Provider>
               </BlinkConfigContext.Provider>
+            </ResponseMapperContext.Provider>
+          </MappingContext.Provider>
+        </Route>
+        <Route
+          exact
+          path={[
+            "/v2/screen/:id/simulation",
+            "/v2/screen/pending/:id/simulation",
+          ]}
+        >
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <SimulationScreenPage />
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>

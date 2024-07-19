@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ComponentType } from "react";
 import { classWithModifier } from "Util/util";
 
 const TextDepartureTime = ({ text }) => {
@@ -21,14 +21,30 @@ const TimestampDepartureTime = ({ hour, minute }) => {
   return <div className="departure-time__timestamp">{timestamp}</div>;
 };
 
-const DepartureTime = ({ type, ...data }) => {
+type DepartureTime =
+  | (TextDeparture & { type: "text" })
+  | (MinutesDeparture & { type: "minutes" })
+  | (TimestampDeparture & { type: "timestamp" });
+
+interface TextDeparture {
+  text: string;
+}
+interface MinutesDeparture {
+  minutes: number;
+}
+interface TimestampDeparture {
+  hour: number;
+  minute: number;
+}
+
+const DepartureTime: ComponentType<DepartureTime> = ({ type, ...data }) => {
   let inner;
   if (type === "text") {
-    inner = <TextDepartureTime {...data} />;
+    inner = <TextDepartureTime {...(data as TextDeparture)} />;
   } else if (type === "minutes") {
-    inner = <MinutesDepartureTime {...data} />;
+    inner = <MinutesDepartureTime {...(data as MinutesDeparture)} />;
   } else if (type === "timestamp") {
-    inner = <TimestampDepartureTime {...data} />;
+    inner = <TimestampDepartureTime {...(data as TimestampDeparture)} />;
   }
 
   return (

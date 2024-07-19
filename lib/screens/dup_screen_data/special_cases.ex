@@ -1,14 +1,14 @@
 defmodule Screens.DupScreenData.SpecialCases do
   @moduledoc false
 
-  alias Screens.Config.Dup
+  alias ScreensConfig.Dup
 
-  alias Screens.Config.Dup.Override.{
+  alias ScreensConfig.Dup.Override.{
     PartialAlert,
     PartialAlertList
   }
 
-  alias Screens.Config.V2.FreeTextLine
+  alias ScreensConfig.V2.FreeTextLine
 
   alias Screens.DupScreenData.{Data, Request}
 
@@ -243,7 +243,7 @@ defmodule Screens.DupScreenData.SpecialCases do
     partial_alert_text = ["No", %{format: :bold, text: "Westbound"}, "trains"]
 
     kenmore_headway_id = "green_trunk"
-    time_ranges = Screens.SignsUiConfig.State.time_ranges(kenmore_headway_id)
+    time_ranges = Screens.SignsUiConfig.Cache.time_ranges(kenmore_headway_id)
     current_time_period = Screens.Util.time_period(current_time)
 
     case time_ranges do

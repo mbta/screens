@@ -1,9 +1,9 @@
 @import "../base/base_departure_time";
 
 .departure-time {
+  display: inline-block;
   color: #171f26;
   text-align: right;
-  display: inline-block;
   vertical-align: middle;
 
   &--animated {

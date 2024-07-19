@@ -18,7 +18,7 @@ const Audio: ComponentType<Props> = ({ text, volume = 1 }) => {
       fetch("/v2/audio/text_to_speech/" + text)
         .then((response) => response.blob())
         .then((blob) => {
-          var url = URL.createObjectURL(blob);
+          const url = URL.createObjectURL(blob);
           if (ref?.current instanceof HTMLAudioElement) {
             ref.current.src = url;
             ref.current.volume = volume;

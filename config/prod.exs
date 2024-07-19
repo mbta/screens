@@ -12,7 +12,12 @@ import Config
 config :screens, ScreensWeb.Endpoint,
   url: [host: "example.com", port: 80],
   server: true,
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  check_origin: [
+    "https://screens.mbta.com",
+    "https://screens-dev.mbtace.com",
+    "https://screens-dev-green.mbtace.com"
+  ]
 
 # Do not print debug messages in production
 config :logger, level: :info
@@ -29,6 +34,13 @@ config :screens, :screens_by_alert,
   screens_by_alert_ttl_seconds: 40,
   screens_last_updated_ttl_seconds: 3600,
   screens_ttl_seconds: 40
+
+# Configure Ueberauth to use Keycloak
+config :ueberauth, Ueberauth,
+  providers: [
+    keycloak:
+      {Ueberauth.Strategy.Oidcc, userinfo: true, uid_field: "email", scopes: ~w(openid email)}
+  ]
 
 # ## SSL Support
 #

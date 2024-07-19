@@ -19,7 +19,7 @@ const iconPaths: { [key: string]: string } = _.mapValues(
     green_d: "gl-d-color.svg",
     green_e: "gl-e-color.svg",
   },
-  imagePath
+  imagePath,
 );
 
 const srcForIcon = (icon) => {
@@ -39,6 +39,8 @@ const getKey = (elt) => {
     return `special--${elt.special}`;
   } else if (elt.icon !== undefined) {
     return `icon--${elt.icon}`;
+  } else {
+    throw new Error("empty free text element");
   }
 };
 
@@ -68,7 +70,7 @@ const FormatString = ({ format, text }) => {
   const modifiers = format === null ? [] : [format];
   const className = `free-text__element ${classWithModifiers(
     "free-text__string",
-    modifiers
+    modifiers,
   )}`;
 
   return <span className={className}>{text}</span>;

@@ -6,8 +6,10 @@ import {
 import Widget, { WidgetData } from "./widget";
 import {
   ApiResponse,
+  SimulationApiResponse,
   useSimulationApiResponse,
 } from "Hooks/v2/use_api_response";
+import WidgetTreeErrorBoundary from "Components/v2/widget_tree_error_boundary";
 
 interface SimulationScreenLayoutProps {
   apiResponse: ApiResponse;
@@ -19,36 +21,41 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
   opts,
 }) => {
   const responseMapper = useContext(ResponseMapperContext);
-  const data = responseMapper(apiResponse);
+  // See `ScreenLayout` for the explanation of this cast.
+  const data = responseMapper(apiResponse) as SimulationApiResponse;
   const { fullPage, flexZone } = data;
 
   // If "alternateView" was provided as an option, we use the simulation version of screen normal
   // Currently only applies to DUPs
   const widgetData = opts.alternateView
     ? { ...fullPage, type: "simulation_screen_normal" }
-    : { fullPage };
+    : fullPage;
 
   return (
     <div className="simulation-screen-centering-container">
       <div className="simulation-screen-scrolling-container">
         {apiResponse && (
           <div className="simulation__full-page">
-            <Widget data={widgetData} />
+            <WidgetTreeErrorBoundary>
+              <Widget data={widgetData} />
+            </WidgetTreeErrorBoundary>
           </div>
         )}
         {flexZone?.length > 0 && (
-          <div className="simulation__flex-zone">
-            {flexZone.map((flexZonePage: WidgetData, index: number) => {
-              return (
-                <div
-                  key={`page${index}`}
-                  className="simulation__flex-zone-widget"
-                >
-                  <Widget data={flexZonePage} />
-                </div>
-              );
-            })}
-          </div>
+          <WidgetTreeErrorBoundary showFallbackOnError={false}>
+            <div className="simulation__flex-zone">
+              {flexZone.map((flexZonePage: WidgetData, index: number) => {
+                return (
+                  <div
+                    key={`page${index}`}
+                    className="simulation__flex-zone-widget"
+                  >
+                    <Widget data={flexZonePage} />
+                  </div>
+                );
+              })}
+            </div>
+          </WidgetTreeErrorBoundary>
         )}
       </div>
     </div>

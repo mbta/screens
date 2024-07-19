@@ -1,8 +1,9 @@
 import initSentry from "Util/sentry";
 initSentry("pre_fare");
 
-declare function require(name: string): string;
-// tslint:disable-next-line
+import initFullstory from "Util/fullstory";
+initFullstory();
+
 require("../../../css/pre_fare_v2.scss");
 
 import React from "react";
@@ -29,13 +30,14 @@ import NormalHeader from "Components/v2/pre_fare/normal_header";
 import OneLarge from "Components/v2/pre_fare/flex/one_large";
 import TwoMedium from "Components/v2/pre_fare/flex/two_medium";
 import BodyLeftTakeover from "Components/v2/pre_fare/body_left_takeover";
+import BodyLeftFlex from "Components/v2/pre_fare/body_left_flex";
 import BodyRightTakeover from "Components/v2/pre_fare/body_right_takeover";
 import BodyTakeover from "Components/v2/pre_fare/body_takeover";
 import ScreenTakeover from "Components/v2/pre_fare/screen_takeover";
 import ScreenSplitTakeover from "Components/v2/pre_fare/screen_split_takeover";
 import ElevatorStatus from "Components/v2/elevator_status";
 import FullLineMap from "Components/v2/full_line_map";
-import SubwayStatus from "Components/v2/subway_status";
+import LcdSubwayStatus from "Components/v2/subway_status/lcd_subway_status";
 import ReconstructedAlert from "Components/v2/reconstructed_alert";
 import NoData from "Components/v2/pre_fare/no_data";
 import PageLoadNoData from "Components/v2/pre_fare/page_load_no_data";
@@ -43,12 +45,14 @@ import ReconstructedTakeover from "Components/v2/reconstructed_takeover";
 import CRDepartures from "Components/v2/cr_departures/cr_departures";
 import OvernightCRDepartures from "Components/v2/cr_departures/overnight_cr_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
-import SimulationScreenPage from "Components/v2/simulation_screen_page";
+import SimulationScreenPage from "Components/v2/pre_fare/simulation_screen_page";
 import SurgeBodyRight from "Components/v2/pre_fare/surge_body_right";
 import ShuttleBusInfo from "Components/v2/shuttle_bus_info";
 import BlueBikes from "Components/v2/blue_bikes";
+import PreFareSingleScreenAlert from "Components/v2/pre_fare_single_screen_alert";
 
 const TYPE_TO_COMPONENT = {
+  // Slots
   screen_normal: NormalScreen,
   screen_takeover: ScreenTakeover,
   screen_split_takeover: ScreenSplitTakeover,
@@ -56,20 +60,23 @@ const TYPE_TO_COMPONENT = {
   body_takeover: BodyTakeover,
   body_left_normal: NormalBodyLeft,
   body_left_takeover: BodyLeftTakeover,
+  body_left_flex: BodyLeftFlex,
   body_right_normal: NormalBodyRight,
   body_right_surge: SurgeBodyRight,
   body_right_takeover: BodyRightTakeover,
   normal_header: NormalHeader,
   one_large: OneLarge,
   two_medium: TwoMedium,
+  // Widgets
   placeholder: Placeholder,
   evergreen_content: EvergreenContent,
   elevator_status: ElevatorStatus,
   full_line_map: FullLineMap,
-  subway_status: SubwayStatus,
+  subway_status: LcdSubwayStatus,
   no_data: NoData,
   page_load_no_data: PageLoadNoData,
   reconstructed_large_alert: ReconstructedAlert,
+  single_screen_alert: PreFareSingleScreenAlert,
   reconstructed_takeover: ReconstructedTakeover,
   cr_departures: CRDepartures,
   overnight_cr_departures: OvernightCRDepartures,
@@ -116,14 +123,7 @@ const App = (): JSX.Element => {
             responseMapper={responseMapper}
           />
         </Route>
-        <Route exact path="/v2/screen/:id/simulation">
-          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <ResponseMapperContext.Provider value={responseMapper}>
-              <SimulationScreenPage />
-            </ResponseMapperContext.Provider>
-          </MappingContext.Provider>
-        </Route>
-        <Route path="/v2/screen/:id">
+        <Route exact path={["/v2/screen/:id", "/v2/screen/pending/:id"]}>
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
               <BlinkConfigContext.Provider value={blinkConfig}>
@@ -131,6 +131,19 @@ const App = (): JSX.Element => {
                   <ScreenPage />
                 </Viewport>
               </BlinkConfigContext.Provider>
+            </ResponseMapperContext.Provider>
+          </MappingContext.Provider>
+        </Route>
+        <Route
+          exact
+          path={[
+            "/v2/screen/:id/simulation",
+            "/v2/screen/pending/:id/simulation",
+          ]}
+        >
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <SimulationScreenPage />
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>

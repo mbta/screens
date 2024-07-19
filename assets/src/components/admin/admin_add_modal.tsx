@@ -15,15 +15,17 @@ const fields = [
       "bus_eink",
       "bus_eink_v2",
       "bus_shelter_v2",
+      "busway_v2",
       "dup",
-      "gl_eink_single",
+      "dup_v2",
       "gl_eink_double",
+      "gl_eink_single",
       "gl_eink_v2",
+      "pre_fare_v2",
       "solari",
-      "solari_v2",
       "solari_large",
       "solari_large_v2",
-      "pre_fare_v2",
+      "triptych_v2",
     ]),
   },
   {
@@ -75,7 +77,7 @@ const defaultAppParamsByAppId = {
     header: {},
     alerts: {},
   },
-  solari_v2: {
+  busway_v2: {
     departures: {},
     header: {},
   },
@@ -88,10 +90,15 @@ const defaultAppParamsByAppId = {
       stop_name: "",
     },
   },
+  triptych_v2: {
+    header: {
+      stop_name: "",
+    },
+  },
 };
 
 const initialFormValues = _.fromPairs(
-  fields.map(({ key }) => [key, undefined])
+  fields.map(({ key }) => [key, undefined]),
 );
 
 const AddModal = ({ setData, closeModal }): JSX.Element => {
@@ -100,6 +107,7 @@ const AddModal = ({ setData, closeModal }): JSX.Element => {
   const addScreen = () => {
     const newRow = {
       app_id: formValues.app_id,
+      // @ts-expect-error
       app_params: defaultAppParamsByAppId[formValues.app_id],
       device_id: formValues.device_id,
       disabled: false,
@@ -120,7 +128,7 @@ const AddModal = ({ setData, closeModal }): JSX.Element => {
         {fields.map(({ key, label, FormCell }) => (
           <div key={key}>
             <div>{label}</div>
-            <FormCell header={key} setFormValues={setFormValues} />
+            <FormCell value="" header={key} setFormValues={setFormValues} />
           </div>
         ))}
         <div>

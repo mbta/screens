@@ -2,9 +2,12 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusEink, BusShelter, GlEink, Solari}
-  alias Screens.V2.AlertWidgetInstance
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{BusEink, BusShelter, GlEink}
+  alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
+  alias Screens.Stops.Stop
+  alias Screens.V2.AlertsWidget
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
   setup :setup_base
@@ -12,8 +15,22 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   defp setup_base(_context) do
     %{
       widget: %AlertWidget{
-        alert: %Alert{id: "123"},
-        screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil}
+        alert: %Alert{id: "123", header: "This is some text."},
+        screen: %Screen{
+          app_params: nil,
+          vendor: nil,
+          device_id: nil,
+          name: nil,
+          app_id: :gl_eink_v2
+        },
+        location_context: %LocationContext{
+          home_stop: nil,
+          tagged_stop_sequences: nil,
+          upstream_stops: nil,
+          downstream_stops: nil,
+          routes: nil,
+          alert_route_types: nil
+        }
       }
     }
   end
@@ -23,13 +40,12 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   defp put_home_stop(widget, app_config_module, stop_id) do
-    alias Screens.Config.V2.Alerts
-
     %{
       widget
-      | screen: %{
-          widget.screen
-          | app_params: struct(app_config_module, %{alerts: %Alerts{stop_id: stop_id}})
+      | location_context: %{
+          widget.location_context
+          | alert_route_types: Stop.get_route_type_filter(app_config_module, stop_id),
+            home_stop: stop_id
         }
     }
   end
@@ -38,12 +54,30 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     %{widget | alert: %{widget.alert | informed_entities: ies}}
   end
 
-  defp put_stop_sequences(widget, sequences) do
-    %{widget | stop_sequences: sequences}
+  defp put_tagged_stop_sequences(widget, tagged_sequences) do
+    sequences = RoutePattern.untag_stop_sequences(tagged_sequences)
+
+    %{
+      widget
+      | location_context: %{
+          widget.location_context
+          | tagged_stop_sequences: tagged_sequences,
+            upstream_stops:
+              Stop.upstream_stop_id_set(widget.location_context.home_stop, sequences),
+            downstream_stops:
+              Stop.downstream_stop_id_set(widget.location_context.home_stop, sequences)
+        }
+    }
   end
 
   defp put_routes_at_stop(widget, routes) do
-    %{widget | routes_at_stop: routes}
+    %{
+      widget
+      | location_context: %{
+          widget.location_context
+          | routes: routes
+        }
+    }
   end
 
   defp put_app_id(widget, app_id) do
@@ -68,16 +102,20 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     %{widget: put_home_stop(widget, BusShelter, home_stop)}
   end
 
-  defp setup_stop_sequences(%{widget: widget}) do
-    stop_sequences = [
-      ~w[0 1 2 3 4  5 6 7 8 9],
-      ~w[10 20 30 4 5 7],
-      ~w[           5 6 90],
-      ~w[200 40     5],
-      ~w[111 222 333]
-    ]
+  defp setup_tagged_stop_sequences(%{widget: widget}) do
+    tagged_stop_sequences = %{
+      "A" => [
+        ~w[0 1 2 3 4  5 6 7 8 9],
+        ~w[10 20 30 4 5 7]
+      ],
+      "B" => [
+        ~w[           5 6 90],
+        ~w[200 40     5],
+        ~w[111 222 333]
+      ]
+    }
 
-    %{widget: put_stop_sequences(widget, stop_sequences)}
+    %{widget: put_tagged_stop_sequences(widget, tagged_stop_sequences)}
   end
 
   defp setup_routes(%{widget: widget}) do
@@ -88,6 +126,13 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     ]
 
     %{widget: put_routes_at_stop(widget, routes)}
+  end
+
+  defp setup_location_context(%{widget: widget}) do
+    %{widget: widget}
+    |> setup_home_stop()
+    |> setup_tagged_stop_sequences()
+    |> setup_routes()
   end
 
   defp setup_screen_config(%{widget: widget}) do
@@ -117,9 +162,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
   # Pass this to `setup` to set up "context" data on the alert widget, without setting up the API alert itself.
   @alert_widget_context_setup_group [
-    :setup_home_stop,
-    :setup_stop_sequences,
-    :setup_routes,
+    :setup_location_context,
     :setup_screen_config,
     :setup_now
   ]
@@ -458,87 +501,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     end
   end
 
-  describe "seconds_to_next_active_period/2" do
-    test "returns seconds to start of first active period after current time, if it exists", %{
-      widget: widget
-    } do
-      now = ~U[2021-01-02T01:00:00Z]
-      next_start = ~U[2021-01-03T00:00:01Z]
-
-      widget =
-        widget
-        |> put_active_period([
-          {~U[2021-01-01T00:00:00Z], ~U[2021-01-01T23:00:00Z]},
-          {~U[2021-01-02T00:00:00Z], ~U[2021-01-02T23:00:00Z]},
-          {next_start, ~U[2021-01-03T23:00:00Z]}
-        ])
-        |> put_now(now)
-
-      expected_seconds_to_next_active_period = 23 * 60 * 60 + 1
-
-      assert expected_seconds_to_next_active_period ==
-               AlertWidget.seconds_to_next_active_period(widget)
-    end
-
-    test "returns :infinity if no active period starting after current time exists", %{
-      widget: widget
-    } do
-      widget = put_now(widget, ~U[2021-01-02T01:00:00Z])
-
-      # no active period at all
-      assert :infinity == AlertWidget.seconds_to_next_active_period(widget)
-
-      # no start date after current time
-      widget =
-        put_active_period(widget, [
-          {nil, ~U[2021-01-01T23:00:00Z]},
-          {~U[2021-01-02T00:00:00Z], ~U[2021-01-02T23:00:00Z]}
-        ])
-
-      assert :infinity == AlertWidget.seconds_to_next_active_period(widget)
-    end
-  end
-
-  describe "home_stop_id/1" do
-    test "returns stop ID from config for screen types that use only one stop ID", %{
-      widget: widget
-    } do
-      widget = put_home_stop(widget, BusShelter, "123")
-
-      assert "123" == AlertWidget.home_stop_id(widget)
-    end
-
-    test "fails for other screen types", %{widget: widget} do
-      widget = put_home_stop(widget, Solari, "123")
-
-      assert_raise FunctionClauseError, fn -> AlertWidget.home_stop_id(widget) end
-    end
-
-    test "fails when config is not correct shape", %{widget: widget} do
-      assert_raise FunctionClauseError, fn -> AlertWidget.home_stop_id(widget) end
-    end
-  end
-
-  describe "informed_entities/1" do
-    test "returns informed entities list from the widget's alert", %{widget: widget} do
-      ies = [ie(stop: "123"), ie(stop: "1129", route: "39")]
-
-      widget = put_informed_entities(widget, ies)
-
-      assert ies == AlertWidget.informed_entities(widget)
-    end
-  end
-
-  describe "effect/1" do
-    test "returns effect from the widget's alert", %{widget: widget} do
-      effect = :detour
-
-      widget = put_effect(widget, effect)
-
-      assert effect == AlertWidget.effect(widget)
-    end
-  end
-
   describe "tiebreaker_primary_timeframe/1" do
     setup @valid_alert_setup_group
 
@@ -659,19 +621,24 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns empty string", %{widget: widget} do
-      assert %{} == AlertWidget.audio_serialize(widget)
+    test "returns alert header", %{widget: widget} do
+      assert %{header: widget.alert.header} == AlertWidget.audio_serialize(widget)
     end
   end
 
   describe "audio_sort_key/1" do
     test "returns [0]", %{widget: widget} do
-      assert [0] == AlertWidget.audio_sort_key(widget)
+      assert [2, 2] == AlertWidget.audio_sort_key(widget)
     end
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns false", %{widget: widget} do
+    test "returns true for gl_eink_v2", %{widget: widget} do
+      assert AlertWidget.audio_valid_candidate?(widget)
+    end
+
+    test "returns false for screen types != gl_eink_v2", %{widget: widget} do
+      widget = %{widget | screen: %Screen{widget.screen | app_id: :bus_eink_v2}}
       refute AlertWidget.audio_valid_candidate?(widget)
     end
   end
@@ -682,9 +649,9 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     end
   end
 
-  describe "alert_id/1" do
-    test "returns alert_id", %{widget: widget} do
-      assert [widget.alert.id] == AlertWidgetInstance.alert_ids(widget)
+  describe "alert_ids/1" do
+    test "returns alert_ids", %{widget: widget} do
+      assert [widget.alert.id] == AlertsWidget.alert_ids(widget)
     end
   end
 end

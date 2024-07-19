@@ -1,9 +1,6 @@
 defmodule Screens.V2.CandidateGenerator.BusShelter do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{BusShelter, Footer, Survey}
-  alias Screens.Config.V2.Header.{CurrentStopId, CurrentStopName}
   alias Screens.Stops.Stop
   alias Screens.Util.Assets
   alias Screens.V2.CandidateGenerator
@@ -11,6 +8,9 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader}
   alias Screens.V2.WidgetInstance.Survey, as: SurveyInstance
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{BusShelter, Footer, Survey}
+  alias ScreensConfig.V2.Header.{CurrentStopId, CurrentStopName}
 
   @behaviour CandidateGenerator
 
@@ -47,23 +47,24 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   # credo:disable-for-next-line Credo.Check.Design.DuplicatedCode
   def candidate_instances(
         config,
+        _opts,
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/1,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
-        subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/1
+        subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/2
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
       fn -> departures_instances_fn.(config) end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
-      fn -> subway_status_instances_fn.(config) end,
+      fn -> subway_status_instances_fn.(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end,
       fn -> survey_instances(config) end
     ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
+    |> Task.async_stream(& &1.(), timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 

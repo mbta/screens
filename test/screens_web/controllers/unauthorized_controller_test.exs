@@ -4,7 +4,7 @@ defmodule ScreensWeb.Controllers.UnauthorizedControllerTest do
   import ScreensWeb.Router.Helpers
 
   describe "index/2" do
-    @tag :authenticated_not_in_group
+    @tag :authenticated_not_in_role
     test "renders response", %{conn: conn} do
       conn = get(conn, unauthorized_path(conn, :index))
 

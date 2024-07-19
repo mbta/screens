@@ -1,26 +1,26 @@
 .screen-takeover {
-  width: 1920px;
-  margin-left: auto;
-  margin-right: auto;
   position: relative;
+  width: 1920px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .screen-takeover__rotation-zero {
-  top: 0px;
-  left: 0px;
+  top: 0;
+  left: 0;
   width: 1920px;
   height: 1080px;
 }
 
 .screen-takeover__rotation-one {
-  top: 0px;
+  top: 0;
   left: 1920px;
   width: 1920px;
   height: 1080px;
 }
 
 .screen-takeover__rotation-two {
-  top: 0px;
+  top: 0;
   left: 3840px;
   width: 1920px;
   height: 1080px;

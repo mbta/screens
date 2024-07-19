@@ -6,9 +6,7 @@ interface Props {
   data: WidgetData;
 }
 
-const MappingContext = React.createContext(
-  {} as Record<string, React.ComponentType>
-);
+const MappingContext = React.createContext({});
 
 const Widget: React.ComponentType<Props> = ({ data }) => {
   if (data == null) {

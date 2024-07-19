@@ -1,15 +1,19 @@
 defmodule Screens.V2.WidgetInstance.CRDepartures do
   @moduledoc false
 
-  alias Screens.Config.V2.CRDepartures
+  require Logger
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
   alias Screens.V2.Departure
+  alias Screens.V2.WidgetInstance.Serializer.RoutePill
+  alias ScreensConfig.V2.CRDepartures
 
   defstruct config: nil,
             departures_data: [],
             destination: nil,
             direction_to_destination: nil,
+            header_pill: nil,
+            slot: [],
             now: nil
 
   @type t :: %__MODULE__{
@@ -17,6 +21,8 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           departures_data: list(Departure.t()),
           destination: String.t(),
           direction_to_destination: String.t(),
+          header_pill: :red | :blue | :green | :orange,
+          slot: list(:main_content_left | :main_content_right),
           now: DateTime.t()
         }
 
@@ -26,10 +32,11 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     def priority(%CRDeparturesWidget{config: config}), do: config.priority
 
     def serialize(%CRDeparturesWidget{
-          config: %CRDepartures{station: station} = config,
+          config: %CRDepartures{station: station, is_free: is_free} = config,
           departures_data: departures_data,
           destination: destination,
           direction_to_destination: direction_to_destination,
+          header_pill: header_pill,
           now: now
         }) do
       %{
@@ -47,12 +54,13 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
           ),
         station: station,
         destination: destination,
-        time_to_destination: config.travel_time_to_destination,
-        direction: direction_to_destination
+        direction: direction_to_destination,
+        header_pill: RoutePill.serialize_icon(header_pill),
+        is_free: is_free
       }
     end
 
-    def slot_names(_instance), do: [:main_content_left]
+    def slot_names(instance), do: instance.slot
 
     def widget_type(_instance), do: :cr_departures
 
@@ -126,9 +134,18 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
          now
        ) do
     {:ok, scheduled_departure_time} =
-      %Departure{schedule: schedule}
-      |> Departure.time()
-      |> DateTime.shift_zone("America/New_York")
+      try do
+        %Departure{schedule: schedule}
+        |> Departure.time()
+        |> DateTime.shift_zone("America/New_York")
+      rescue
+        ex ->
+          Logger.error(
+            "[cr_departures serialize_time] Could not get schedule time: #{inspect(departure)}"
+          )
+
+          reraise ex, __STACKTRACE__
+      end
 
     cond do
       is_nil(prediction) ->

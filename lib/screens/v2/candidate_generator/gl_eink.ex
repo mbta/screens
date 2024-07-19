@@ -1,16 +1,16 @@
 defmodule Screens.V2.CandidateGenerator.GlEink do
   @moduledoc false
 
-  alias Screens.Config.V2.Departures
-  alias Screens.Config.V2.Departures.{Query, Section}
-  alias Screens.Config.V2.Departures.Query.Params
-  alias Screens.Config.V2.FreeTextLine
-  alias Screens.Config.{Screen, V2}
-  alias Screens.Config.V2.{Footer, GlEink, Header}
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
+  alias ScreensConfig.V2.Departures
+  alias ScreensConfig.V2.Departures.{Query, Section}
+  alias ScreensConfig.V2.Departures.Query.Params
+  alias ScreensConfig.V2.FreeTextLine
+  alias ScreensConfig.{Screen, V2}
+  alias ScreensConfig.V2.{Footer, GlEink, Header}
 
   alias Screens.V2.WidgetInstance.{
     BottomScreenFiller,
@@ -42,7 +42,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
             # slot to its left, while still allowing the normal flex zone
             # to appear on the bottom screen.
             top_takeover: [
-              :full_main_content,
+              :full_body_top_screen,
               Builder.with_paging({:flex_zone, %{one_medium: [:medium]}}, 2),
               :footer
             ],
@@ -52,10 +52,21 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
               :full_body_top_screen,
               :full_body_bottom_screen
             ],
+            flex_zone_takeover: [
+              :left_sidebar,
+              :main_content,
+              :flex_zone_takeover,
+              :footer
+            ],
             bottom_takeover: [
               :left_sidebar,
               :main_content,
               :full_body_bottom_screen
+            ],
+            top_and_flex_takeover: [
+              :full_body_top_screen,
+              :flex_zone_takeover,
+              :footer
             ]
           }}
        ],
@@ -67,28 +78,25 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   @impl CandidateGenerator
   def candidate_instances(
         config,
+        _opts,
         now \\ DateTime.utc_now(),
         fetch_destination_fn \\ &fetch_destination/2,
-        departures_instances_fn \\ &Widgets.Departures.departures_instances/3,
+        departures_instances_fn \\ &Widgets.Departures.departures_instances/2,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
-        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
+        subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/2
       ) do
     [
       fn -> header_instances(config, now, fetch_destination_fn) end,
-      fn ->
-        departures_instances_fn.(
-          config,
-          &Widgets.Departures.fetch_section_departures/1,
-          &departures_post_processing/2
-        )
-      end,
+      fn -> departures_instances_fn.(config, post_process_fn: &departures_post_processing/2) end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
       fn -> line_map_instances(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end,
-      fn -> bottom_screen_filler_instances(config) end
+      fn -> bottom_screen_filler_instances(config) end,
+      fn -> subway_status_instances_fn.(config, now) end
     ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
+    |> Task.async_stream(& &1.(), timeout: 30_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
@@ -180,7 +188,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
     [%BottomScreenFiller{screen: config}]
   end
 
-  defp departures_post_processing(sections, config) do
+  defp departures_post_processing(fetch_result, config) do
     %Screen{
       app_params: %GlEink{
         departures: %Departures{
@@ -199,7 +207,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
       }
     } = config
 
-    Enum.map(sections, fn
+    case fetch_result do
       {:ok, departures} when length(departures) <= 1 ->
         format_headway(route_id, stop_id, direction_id, departures)
 
@@ -209,7 +217,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
       # Show headway instead of nothing when API fetch fails
       :error ->
         format_headway(route_id, stop_id, direction_id)
-    end)
+    end
   end
 
   defp format_headway(route_id, stop_id, direction_id, departures_to_concat \\ []) do

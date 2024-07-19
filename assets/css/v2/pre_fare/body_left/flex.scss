@@ -1,0 +1,12 @@
+.body-left-flex {
+  position: relative;
+}
+
+.body-left-flex__paged-main-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1080px;
+  height: 1720px;
+  overflow: hidden;
+}

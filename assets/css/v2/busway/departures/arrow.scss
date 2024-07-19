@@ -1,0 +1,12 @@
+.direction-arrow {
+  width: 56px;
+  height: 56px;
+}
+
+$rotations: 45, 90, 135, 180, 225, 270, 315;
+
+@each $rotation in $rotations {
+  .rotate-#{$rotation} {
+    transform: rotate(#{$rotation}deg);
+  }
+}

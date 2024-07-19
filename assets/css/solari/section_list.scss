@@ -3,6 +3,7 @@
 
 .section-list-container {
   position: relative;
+
   // *
   overflow: hidden;
 }
@@ -10,9 +11,10 @@
 .section-list {
   &--dummy {
     position: absolute;
-    left: 1080px;
     top: 0;
+    left: 1080px;
     width: 1080px;
+
     // *
     opacity: 0;
   }

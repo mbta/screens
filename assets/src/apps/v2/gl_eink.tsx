@@ -1,8 +1,9 @@
 import initSentry from "Util/sentry";
 initSentry("gl_eink_v2");
 
-declare function require(name: string): string;
-// tslint:disable-next-line
+import initFullstory from "Util/fullstory";
+initFullstory();
+
 require("../../../css/gl_eink_v2.scss");
 
 import React from "react";
@@ -20,7 +21,7 @@ import BottomTakeoverBody from "Components/v2/gl_eink_double/bottom_takeover_bod
 import OneMedium from "Components/v2/eink/flex/one_medium";
 import Placeholder from "Components/v2/placeholder";
 import FareInfoFooter from "Components/v2/eink/fare_info_footer";
-import NormalHeader from "Components/v2/eink/normal_header";
+import NormalHeader from "Components/v2/eink/gl_normal_header";
 import NormalDepartures from "Components/v2/departures/normal_departures";
 import LineMap from "Components/v2/gl_eink_double/line_map";
 import EvergreenContent from "Components/v2/evergreen_content";
@@ -40,7 +41,10 @@ import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 import OvernightDepartures from "Components/v2/eink/overnight_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
-import ExceptionCatcher from "Components/v2/exception_catcher";
+import EinkSubwayStatus from "Components/v2/subway_status/eink_subway_status";
+import WidgetPage from "Components/v2/widget_page";
+import TopAndFlexTakeoverBody from "Components/v2/eink/top_and_flex_takeover";
+import FlexZoneTakeoverBody from "Components/v2/gl_eink_double/flex_zone_takeover";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -49,6 +53,8 @@ const TYPE_TO_COMPONENT = {
   body_takeover: TakeoverBody,
   top_takeover: TopTakeoverBody,
   bottom_takeover: BottomTakeoverBody,
+  flex_zone_takeover: FlexZoneTakeoverBody,
+  top_and_flex_takeover: TopAndFlexTakeoverBody,
   one_medium: OneMedium,
   placeholder: Placeholder,
   fare_info_footer: FareInfoFooter,
@@ -63,6 +69,7 @@ const TYPE_TO_COMPONENT = {
   bottom_screen_filler: BottomScreenFiller,
   overnight_departures: OvernightDepartures,
   departures_no_data: DeparturesNoData,
+  subway_status: EinkSubwayStatus,
 };
 
 const DISABLED_LAYOUT = {
@@ -98,19 +105,28 @@ const App = (): JSX.Element => {
             responseMapper={responseMapper}
           />
         </Route>
-        <Route exact path="/v2/screen/:id/simulation">
+        <Route exact path={["/v2/screen/:id", "/v2/screen/pending/:id"]}>
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
-              <SimulationScreenPage />
+              <ScreenPage />
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
-        <Route path="/v2/screen/:id">
+        <Route exact path="/v2/widget/gl_eink_v2">
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <WidgetPage />
+          </MappingContext.Provider>
+        </Route>
+        <Route
+          exact
+          path={[
+            "/v2/screen/:id/simulation",
+            "/v2/screen/pending/:id/simulation",
+          ]}
+        >
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
-              <ExceptionCatcher>
-                <ScreenPage />
-              </ExceptionCatcher>
+              <SimulationScreenPage />
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>

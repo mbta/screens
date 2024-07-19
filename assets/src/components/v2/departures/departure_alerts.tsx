@@ -2,7 +2,7 @@ import React from "react";
 
 import FreeText, { srcForIcon } from "Components/v2/free_text";
 
-const DepartureAlert = ({ color, icon, text }) => {
+const DepartureAlert = ({ icon, text }) => {
   const imgSrc = srcForIcon(icon);
 
   return (
@@ -11,7 +11,7 @@ const DepartureAlert = ({ color, icon, text }) => {
         <img className="departure-alert__icon-image" src={imgSrc} />
       </div>
       <div className="departure-alert__text">
-        <FreeText elements={text} />
+        <FreeText lines={{ text: text }} />
       </div>
     </div>
   );
@@ -21,6 +21,7 @@ const DepartureAlerts = ({ alerts }) => {
   return (
     <div className="departure-alerts">
       {alerts.map(({ id, ...data }) => (
+        // @ts-expect-error
         <DepartureAlert {...data} key={id} />
       ))}
     </div>

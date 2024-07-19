@@ -1,10 +1,15 @@
 defmodule ScreensWeb.Router do
   use ScreensWeb, :router
+  import Phoenix.LiveDashboard.Router
 
-  pipeline :browser do
+  pipeline :browser_no_csrf do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
+  end
+
+  pipeline :browser do
+    plug :browser_no_csrf
     plug :protect_from_forgery
   end
 
@@ -13,7 +18,7 @@ defmodule ScreensWeb.Router do
   end
 
   pipeline :redirect_prod_http do
-    if Application.get_env(:screens, :redirect_http?) do
+    if Application.compile_env(:screens, :redirect_http?) do
       plug(Plug.SSL, rewrite_on: [:x_forwarded_proto])
     end
   end
@@ -41,7 +46,7 @@ defmodule ScreensWeb.Router do
   end
 
   scope "/auth", ScreensWeb do
-    pipe_through([:browser])
+    pipe_through([:redirect_prod_http, :browser])
 
     get("/:provider", AuthController, :request)
     get("/:provider/callback", AuthController, :callback)
@@ -50,6 +55,7 @@ defmodule ScreensWeb.Router do
   scope "/admin", ScreensWeb do
     pipe_through [:redirect_prod_http, :browser, :auth, :ensure_auth, :ensure_screens_group]
 
+    live_dashboard "/dashboard", metrics: ScreensWeb.Telemetry
     get("/", AdminController, :index)
   end
 
@@ -64,6 +70,9 @@ defmodule ScreensWeb.Router do
     get "/image_filenames", AdminApiController, :image_filenames
     post "/image", AdminApiController, :upload_image
     delete "/image/:filename", AdminApiController, :delete_image
+    get "/triptych_players", AdminApiController, :index_triptych_players
+    post "/triptych_players/validate", AdminApiController, :validate_triptych_players
+    post "/triptych_players/confirm", AdminApiController, :confirm_triptych_players
   end
 
   scope "/screen", ScreensWeb do
@@ -74,11 +83,20 @@ defmodule ScreensWeb.Router do
   end
 
   scope "/v2", ScreensWeb.V2 do
+    scope "/widget" do
+      pipe_through [:redirect_prod_http, :browser_no_csrf]
+      post "/:app_id", ScreenController, :widget
+      get "/:app_id", ScreenController, :widget
+    end
+
     scope "/screen" do
       pipe_through [:redirect_prod_http, :browser]
 
       get "/:id", ScreenController, :index
-      get "/:id/simulation", ScreenController, :index
+      get "/:id/simulation", ScreenController, :simulation
+
+      get "/pending/:id", ScreenController, :index_pending
+      get "/pending/:id/simulation", ScreenController, :simulation_pending
     end
 
     scope "/api/screen" do
@@ -86,7 +104,19 @@ defmodule ScreensWeb.Router do
 
       get "/:id", ScreenApiController, :show
       get "/:id/simulation", ScreenApiController, :simulation
+
+      get "/:id/dup", ScreenApiController, :show_dup
+      get "/:player_name/triptych", ScreenApiController, :show_triptych
+
+      get "/pending/:id", ScreenApiController, :show_pending
+      get "/pending/:id/simulation", ScreenApiController, :simulation_pending
+    end
+
+    scope "/api/logging" do
+      pipe_through [:redirect_prod_http, :api]
+
       post "/log_frontend_error", ScreenApiController, :log_frontend_error
+      options "/log_frontend_error", ScreenApiController, :log_frontend_error_preflight
     end
 
     scope "/audio" do
@@ -127,12 +157,6 @@ defmodule ScreensWeb.Router do
     get "/:id/readout.mp3", AudioController, :show
 
     get "/:id/debug", AudioController, :debug
-  end
-
-  scope "/alert_priority", ScreensWeb do
-    pipe_through [:redirect_prod_http, :api, :browser]
-
-    get "/:id", AlertPriorityController, :show
   end
 
   scope "/api", ScreensWeb do

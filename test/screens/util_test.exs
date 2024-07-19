@@ -8,12 +8,12 @@ defmodule Screens.UtilTest do
       assert "Alewife" === format_name_list_to_string(["Alewife"])
     end
 
-    test "returns 'X and Y' if list has length 2" do
-      assert "Alewife and Davis" === format_name_list_to_string(["Alewife", "Davis"])
+    test "returns 'X & Y' if list has length 2" do
+      assert "Alewife & Davis" === format_name_list_to_string(["Alewife", "Davis"])
     end
 
-    test "returns 'X, Y, and Z' if list has length >= 3" do
-      assert "Alewife, Davis, Porter, and Harvard" ===
+    test "returns 'X, Y, & Z' if list has length >= 3" do
+      assert "Alewife, Davis, Porter, & Harvard" ===
                format_name_list_to_string(["Alewife", "Davis", "Porter", "Harvard"])
     end
   end
@@ -99,6 +99,22 @@ defmodule Screens.UtilTest do
       stop_time = ~T[05:00:00]
 
       assert time_in_range?(t, start_time, stop_time)
+    end
+  end
+
+  describe "get_service_date_today/1" do
+    test "returns the current date if after 3am" do
+      now_eastern = DateTime.new!(~D[2022-01-01], ~T[09:00:00], "America/New_York")
+      now = DateTime.shift_zone!(now_eastern, "Etc/UTC")
+      expected = ~D[2022-01-01]
+      assert(expected == get_service_date_today(now))
+    end
+
+    test "returns the yesterday's date if between 12am and 3am" do
+      now_eastern = DateTime.new!(~D[2022-01-01], ~T[00:00:00], "America/New_York")
+      now = DateTime.shift_zone!(now_eastern, "Etc/UTC")
+      expected = ~D[2021-12-31]
+      assert expected == get_service_date_today(now)
     end
   end
 end

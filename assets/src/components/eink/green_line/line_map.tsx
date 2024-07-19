@@ -33,7 +33,7 @@ interface LineMapData {
   vehicles: LineMapVehicle[];
 }
 
-const LineMapContext = createContext();
+const LineMapContext = createContext<any>({});
 
 const ScheduledDepartureIcon = ({ x, y, iconRadius }): JSX.Element => {
   return (
@@ -137,6 +137,8 @@ const LineMapStopLabel = ({ x, y, lines, current, origin }): JSX.Element => {
         </tspan>
       </text>
     );
+  } else {
+    throw new Error(`unexpected value for lines: ${lines}`);
   }
 };
 
@@ -206,7 +208,7 @@ const LineMapVehicleLabel = ({
   y,
   time,
   currentTimeString,
-}): JSX.Element => {
+}): JSX.Element | null => {
   const timeRep = einkTimeRepresentation(time, currentTimeString);
   if (timeRep.type === "TEXT") {
     return (
@@ -256,7 +258,7 @@ const LineMapVehicleIcon = ({ x, y, size }): JSX.Element => {
   );
 };
 
-const LineMapVehicle = ({ vehicle, currentTimeString }): JSX.Element => {
+const LineMapVehicle = ({ vehicle, currentTimeString }): JSX.Element | null => {
   const { lineWidth, radius, dy, height, stopMarginTop } =
     useContext(LineMapContext);
 
@@ -403,15 +405,8 @@ const LineMapOriginStop = (): JSX.Element => {
 };
 
 const LineMapStops = (): JSX.Element => {
-  const {
-    showOriginStop,
-    lastVisibleStopIndex,
-    stopNames,
-    radius,
-    dy,
-    height,
-    stopMarginTop,
-  } = useContext(LineMapContext);
+  const { showOriginStop, lastVisibleStopIndex, stopNames } =
+    useContext(LineMapContext);
   return (
     <g>
       {[...Array(lastVisibleStopIndex + 1)].map((_, i) => (
@@ -435,7 +430,6 @@ const LineMapBase = (): JSX.Element => {
 const LineMapContainer = ({
   data,
   height,
-  width,
   currentTimeString,
   showVehicles,
 }: {
@@ -465,7 +459,7 @@ const LineMapContainer = ({
 
   // The last stop which fits in the alloted vertical space
   const lastVisibleStopIndex = Math.floor(
-    (height - constants.stopMarginTop - 2 * constants.radius) / constants.dy
+    (height - constants.stopMarginTop - 2 * constants.radius) / constants.dy,
   );
 
   // Compute the y-position of the current stop
@@ -498,7 +492,7 @@ const LineMapContainer = ({
   // for stop index i. null values correspond to unlabeled stops.
   const unlabeledStops = Array.from(
     { length: originStopIndex - 3 },
-    () => null
+    () => null,
   );
   const stopNames = [
     data.stops.following,

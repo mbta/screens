@@ -1,9 +1,21 @@
-import React from "react";
+import React, { ComponentType } from "react";
 
-const Destination = ({ headsign, variation }) => {
+const abbreviate = (headsign: string): string => {
+  if (headsign === "Government Center") return "Government Ctr";
+  return headsign;
+};
+
+type Destination = {
+  headsign: string;
+  variation?: string;
+};
+
+const Destination: ComponentType<Destination> = ({ headsign, variation }) => {
   return (
     <div className="departure-destination">
-      <div className="departure-destination__headsign">{headsign}</div>
+      <div className="departure-destination__headsign">
+        {abbreviate(headsign)}
+      </div>
       {variation && (
         <div className="departure-destination__variation">{variation}</div>
       )}

@@ -1,15 +1,16 @@
 defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.Dup
-  alias Screens.Config.V2.Header.CurrentStopId
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Dup.Alerts, as: AlertsInstances
   alias Screens.V2.CandidateGenerator.Dup.Departures, as: DeparturesInstances
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{NormalHeader, Placeholder}
+  alias Screens.V2.WidgetInstance.NormalHeader
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Dup
+  alias ScreensConfig.V2.Header.{CurrentStopId, CurrentStopName}
 
   @behaviour CandidateGenerator
 
@@ -75,22 +76,30 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   @impl CandidateGenerator
   def candidate_instances(
         config,
+        _opts,
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
-        departures_instances_fn \\ &DeparturesInstances.departures_instances/2
+        departures_instances_fn \\ &DeparturesInstances.departures_instances/2,
+        alerts_instances_fn \\ &AlertsInstances.alert_instances/2
       ) do
-    [
-      fn -> header_instances(config, now, fetch_stop_name_fn) end,
-      fn -> placeholder_instances() end,
-      fn -> departures_instances_fn.(config, now) end,
-      fn -> evergreen_content_instances_fn.(config) end
-    ]
-    |> Task.async_stream(& &1.(), ordered: false, timeout: :infinity)
-    |> Enum.flat_map(fn {:ok, instances} -> instances end)
-  end
+    Screens.Telemetry.span([:screens, :v2, :candidate_generator, :dup], fn ->
+      ctx = Screens.Telemetry.context()
 
-  ### Start Header
+      [
+        span_thunk(:header_instances, ctx, fn ->
+          header_instances(config, now, fetch_stop_name_fn)
+        end),
+        span_thunk(:alerts_instances, ctx, fn -> alerts_instances_fn.(config, now) end),
+        span_thunk(:departures_instances, ctx, fn -> departures_instances_fn.(config, now) end),
+        span_thunk(:evergreen_content_instances, ctx, fn ->
+          evergreen_content_instances_fn.(config)
+        end)
+      ]
+      |> Task.async_stream(& &1.(), timeout: 30_000)
+      |> Enum.flat_map(fn {:ok, instances} -> instances end)
+    end)
+  end
 
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
@@ -100,20 +109,26 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         now,
         fetch_stop_name_fn
       ) do
-    %Screen{app_params: %Dup{header: %CurrentStopId{stop_id: stop_id}}} = config
+    %Screen{app_params: %Dup{header: header_config}} = config
 
-    stop_name = fetch_stop_name_fn.(stop_id)
+    stop_name =
+      case header_config do
+        %CurrentStopId{stop_id: stop_id} ->
+          case fetch_stop_name_fn.(stop_id) do
+            nil -> []
+            stop_name -> stop_name
+          end
+
+        %CurrentStopName{stop_name: stop_name} ->
+          stop_name
+      end
 
     List.duplicate(%NormalHeader{screen: config, icon: :logo, text: stop_name, time: now}, 3)
   end
 
-  ### End Header
-
-  defp placeholder_instances do
-    [
-      %Placeholder{slot_names: [:main_content_one], color: :orange},
-      %Placeholder{slot_names: [:main_content_reduced_two], color: :green},
-      %Placeholder{slot_names: [:bottom_pane_two], color: :red}
-    ]
+  defp span_thunk(name, meta, fun) when is_atom(name) and is_function(fun, 0) do
+    fn ->
+      Screens.Telemetry.span([:screens, :v2, :candidate_generator, :dup, name], meta, fun)
+    end
   end
 end

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { getRotationIndex } from "Util/util";
+import { getRotationIndex } from "Util/outfront";
 
 /**
  * Shifts one of the three rotations into view
@@ -8,7 +8,7 @@ import { getRotationIndex } from "Util/util";
  * If the param is missing, this will show the full
  * screen content (5760px x 1080px).
  */
-const Viewport: React.ComponentType<{}> = ({ children }) => {
+const Viewport: React.ComponentType = ({ children }) => {
   let viewportClassName = "dup-screen-viewport";
   let shifterClassName = "dup-shifter";
   switch (getRotationIndex()) {

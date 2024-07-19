@@ -44,11 +44,15 @@ const BaseAlert: ComponentType<BaseAlertProps> = ({
           <div
             className={classWithModifier(
               "alert-widget__content__route-pills",
-              routePills.length > 2 ? "small" : "regular"
+              routePills.length > 2 ? "small" : "regular",
             )}
           >
             {routePills.map((pill) => (
-              <RoutePill {...pill} key={routePillKey(pill)} />
+              <RoutePill
+                pill={pill}
+                useRouteAbbrev={true}
+                key={routePillKey(pill)}
+              />
             ))}
           </div>
           <div className="alert-widget__content__icon">
@@ -91,7 +95,7 @@ const BodyTextSizer: ComponentType<BodyTextSizerProps> = ({
   maxHeight,
 }) => {
   const [isSmall, setSmall] = useState(false);
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     if (ref.current && !isSmall && ref.current.clientHeight > maxHeight) {
@@ -103,7 +107,7 @@ const BodyTextSizer: ComponentType<BodyTextSizerProps> = ({
     <div
       className={classWithModifier(
         "alert-widget__content__body-text",
-        isSmall ? "small" : "regular"
+        isSmall ? "small" : "regular",
       )}
       ref={ref}
     >

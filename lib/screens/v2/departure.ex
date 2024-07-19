@@ -4,6 +4,7 @@ defmodule Screens.V2.Departure do
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
+  alias Screens.Stops.Stop
   alias Screens.Trips.Trip
   alias Screens.V2.Departure.Builder
   alias Screens.Vehicles.Vehicle
@@ -13,9 +14,25 @@ defmodule Screens.V2.Departure do
           schedule: Screens.Schedules.Schedule.t() | nil
         }
 
-  defstruct prediction: nil,
-            schedule: nil
+  defstruct prediction: nil, schedule: nil
 
+  @type params :: %{
+          optional(:direction_id) => :both | 0 | 1,
+          optional(:route_ids) => [Route.id()],
+          optional(:route_type) => nil | :bus | :ferry | :light_rail | :rail | :subway,
+          optional(:stop_ids) => [Stop.id()]
+        }
+
+  @type opts :: [
+          include_schedules: boolean(),
+          now: DateTime.t()
+        ]
+
+  @type result :: {:ok, [t()]} | :error
+
+  @type fetch :: (params(), opts() -> result())
+
+  @spec fetch(params(), opts()) :: result()
   def fetch(params, opts \\ []) do
     # This is equivalent to an argument with a default value, so it's fine
     # credo:disable-for-next-line Screens.Checks.UntestableDateTime
@@ -160,6 +177,14 @@ defmodule Screens.V2.Departure do
   end
 
   def scheduled_time(_), do: nil
+
+  def stop_id(%__MODULE__{prediction: %Prediction{stop: %Stop{id: stop_id}}}) do
+    stop_id
+  end
+
+  def stop_id(%__MODULE__{prediction: nil, schedule: %Schedule{stop: %Stop{id: stop_id}}}) do
+    stop_id
+  end
 
   def stop_type(%__MODULE__{
         prediction: %Prediction{arrival_time: arrival_time, departure_time: departure_time}

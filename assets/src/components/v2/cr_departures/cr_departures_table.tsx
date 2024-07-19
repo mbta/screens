@@ -33,75 +33,58 @@ const DeparturesTable: React.ComponentType<Props> = ({
   };
 
   const getStationServiceList = (stationServiceList: StationService[]) => {
-    return stationServiceList.map((station: StationService) => {
-      return (
-        <div className="stops-at-text" key={station.name}>
-          <div className="via-service-icon">
-            <img
-              src={imagePath(
-                station.service ? "cr-service.svg" : "cr-no-service.svg"
-              )}
-            />
-          </div>
-          <div className="via-stop-name">{station.name}</div>
+    return stationServiceList.map((station: StationService) => (
+      <div className="stops-at-text" key={station.name}>
+        <div className="via-service-icon">
+          <img
+            src={imagePath(
+              station.service ? "cr-service.svg" : "cr-no-service.svg",
+            )}
+          />
         </div>
-      );
-    });
-  };
-
-  const getHeaderDirection = (language: string) => {
-    if (language === "english") {
-      return direction;
-    }
-
-    if (direction === "inbound") {
-      return "entrantes a";
-    } else {
-      return "saliendo de";
-    }
+        <div className="via-stop-name">{station.name}</div>
+      </div>
+    ));
   };
 
   return (
     <table className="cr-departures-table">
       <tbody>
-        <tr className="cr-departures-table__header-row">
-          <td className="track">
-            <div className="table-header__english">Track</div>
-            <div className="table-header__spanish">Pista</div>
-          </td>
-          <td className="headsign">
-            <div className="table-header__english">
-              Upcoming {getHeaderDirection("english")} departures
-            </div>
-            <div className="table-header__spanish">
-              Trenes {getHeaderDirection("spanish")} Boston
-            </div>
-          </td>
-          <td className="arrival"></td>
+        <tr>
+          <th className="track">Track</th>
+          <th className="headsign">Upcoming {direction} departures</th>
+          <th className="arrival"></th>
         </tr>
         {departures.map((departure: Departure) => {
+          const withStations =
+            departure.headsign.station_service_list.length > 0
+              ? "with-stations"
+              : "";
+
           return (
             <tr key={departure.prediction_or_schedule_id}>
-              <td className="track">
+              <td className={`track ${withStations}`}>
                 {getArrowOrTbd(departure.arrow)}
-                <div className="track-number-text">
-                  {departure.track_number}
-                </div>
+                {departure.track_number && (
+                  <div className="track-number-text">
+                    {departure.track_number}
+                  </div>
+                )}
               </td>
-              <td className="headsign">
+              <td className={`headsign ${withStations}`}>
                 <div className="headsign-text">
                   {departure.headsign.headsign}
                 </div>
                 {getStationServiceList(departure.headsign.station_service_list)}
               </td>
-              <td className="arrival">
+              <td className={`arrival ${withStations}`}>
                 <div
                   className={classWithModifier(
                     "departure-time",
                     departure.time.departure_type === "prediction" &&
                       departure.time.departure_time.type === "text"
                       ? "animated"
-                      : "static"
+                      : "static",
                   )}
                 >
                   <CRDepartureTime

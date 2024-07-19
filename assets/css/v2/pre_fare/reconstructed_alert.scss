@@ -1,27 +1,30 @@
-$takeover-card-height: 1600px;
-$takeover-card-footer-height: 176px;
+$takeover-card-height: 1656px;
+$takeover-card-footer-height: 84px;
 
 $alert-card-height: 576px;
 $alert-card-footer-height: 80px;
 
 .alert-container {
   // Takeover fonts
-  color: #171f26;
   font-family: Inter;
+  color: #171f26;
 
   .x-large-text {
     font-size: 200px;
     font-weight: 800;
     line-height: 220px;
   }
+
   .large-text {
     font-size: 120px;
     line-height: 144px;
   }
+
   .medium-text {
     font-size: 72px;
     line-height: 86px;
   }
+
   .small-text {
     font-size: 56px;
     line-height: 68px;
@@ -29,9 +32,9 @@ $alert-card-footer-height: 80px;
 }
 
 .alert-container--large-flex {
-  padding: 26px 28px;
-  height: 522px;
   box-sizing: border-box;
+  height: 522px;
+  padding: 26px 28px;
 
   /* Alert contents */
   .alert-card {
@@ -40,67 +43,84 @@ $alert-card-footer-height: 80px;
   }
 
   .alert-card__body {
+    box-sizing: border-box;
     height: $alert-card-height - $alert-card-footer-height;
     padding: 40px 120px 20px 44px;
-    box-sizing: border-box;
 
-    .bold { font-weight: 800; }
-    .medium-bold { font-weight: 500; }
+    .bold {
+      font-weight: 800;
+    }
+
+    .medium-bold {
+      font-weight: 500;
+    }
   }
+
   .alert-card__body__content {
     padding: 56px 0 0 8px;
+
     &--extra-small {
       font-size: 40px;
       line-height: 52px;
+
       .alert-card__body__isa-icon {
         height: 51px;
         padding-left: 16px;
       }
     }
+
     &--small {
       font-size: 48px;
       line-height: 60px;
+
       .alert-card__body__isa-icon {
         height: 51px;
         padding-left: 16px;
       }
     }
+
     &--large {
       font-size: 56px;
       line-height: 68px;
+
       .alert-card__body__isa-icon {
         height: 51px;
         padding-left: 16px;
       }
     }
+
     &--extra-large {
       font-size: 72px;
       line-height: 86px;
+
       .alert-card__body__isa-icon {
         height: 65px;
         padding-left: 16px;
       }
     }
   }
+
   .alert-card__body__route-pills {
     display: inline-flex;
+
     .route-pill {
       display: inline-block;
       width: fit-content;
       height: 80px;
+
       &:not(:first-child) {
         margin-left: 16px;
       }
     }
-    
+
     .route-pill__text {
       position: relative;
       width: fit-content;
       padding: 0 40px;
+      font-family: neue-haas-grotesk-text;
       font-size: 60px;
       line-height: 80px;
       text-transform: uppercase;
-      font-family: "neue-haas-grotesk-text";
     }
 
     .route-pills__branches {
@@ -108,132 +128,202 @@ $alert-card-footer-height: 80px;
       margin-left: -16px;
 
       .route-pills__branches__dot {
-        height: 92px;
-        width: 92px;
-        border-radius: 50%;
         position: absolute;
+        width: 92px;
+        height: 92px;
         margin: -6px;
         background-color: #e6e4e1;
+        border-radius: 50%;
       }
 
       .route-pill--branch {
-        width: 80px;
         display: inline-flex;
         justify-content: center;
+        width: 80px;
         margin-left: 6px;
+
         &:nth-child(2) {
           margin-left: 0;
         }
+
         .route-pill__text {
           padding: 0;
         }
       }
     }
   }
+
   .alert-card__body__delay-notice {
+    display: inline-block;
+    margin-left: 32px;
     font-size: 56px;
     font-weight: 800;
-    margin-left: 32px;
-    display: inline-block;
   }
+
   .alert-card__body__icon {
     position: absolute;
     top: 0;
     right: 0;
+
     &-image {
       height: 176px;
     }
   }
+
   .alert-card__body__remedy {
-    font-weight: 800;
-    padding-top: 32px;
     display: flex;
     align-items: center;
+    padding-top: 32px;
+    font-weight: 800;
   }
+
   .alert-card__footer {
-    background-color: #cccbc8;
-    border-radius: 0px 0px 32px 32px;
     height: $alert-card-footer-height;
+    background-color: #cccbc8;
+    border-radius: 0 0 32px 32px;
   }
+
   .alert-card__footer__alerts-url {
-    color: black;
-    font-size: 40px;
-    text-align: right;
     padding: 16px 34px 24px 0;
+    font-size: 40px;
+    color: black;
+    text-align: right;
   }
 }
 
 .alert-container--takeover {
-  color: white;
-  height: 100%;
-  width: 1080px;
-  padding: 60px;
   box-sizing: border-box;
+  width: 1080px;
+  height: 100%;
+  padding: 32px;
+  color: white;
 
   /* Alert contents */
   .alert-card {
-    width: 960px;
-    height: $takeover-card-height;
-    border-radius: 32px;
-    box-shadow: 0px 10px 20px 0px rgba(23, 31, 38, 0.25);
-    background-color: #171f26;
-  }
+    width: 1016px;
+    height: 100%;
+    color: #171f26;
+    background-color: #e5e4e1;
+    border-radius: 4px;
 
-  .alert-card__body {
-    height: $takeover-card-height - $takeover-card-footer-height;
-    padding: 72px;
-    box-sizing: border-box;
-  }
+    &__body {
+      box-sizing: border-box;
+      height: $takeover-card-height - $takeover-card-footer-height;
+      padding: 0 56px;
+      font-family: Inter, sans-serif;
+      font-size: 200px;
+      font-weight: 800;
 
-  .alert-card__body__icon {
-    height: 280px;
-    padding-bottom: 80px;
-  }
+      .container {
+        display: flex;
+        flex-flow: column;
+        align-items: flex-start;
+        height: 100%;
+      }
 
-  .alert-card__body__location {
-    margin: 40px 0 24px 0;
-    font-weight: 800;
-    text-transform: capitalize;
-  }
+      &__icon {
+        flex-shrink: 0;
+        height: 300px;
+        padding-top: 112px;
+        margin-bottom: 48px;
+      }
 
-  .alert-card__body__cause {
-    font-weight: 500;
-    text-transform: capitalize;
-  }
+      &__issue {
+        width: 904px;
+        margin-bottom: 32px;
+        line-height: 220px;
+      }
 
-  .alert-card__body__remedy {
-    font-weight: 800;
-    padding-top: 352px;
-  }
+      &__location {
+        margin-bottom: 32px;
+        font-size: 60px;
+        font-weight: 400;
+      }
 
-  .alert-card__body__accessibility-info {
-    margin-top: 90px;
-    display: flex;
-    &--text {
-      width: 524px;
-      color: #e6e4e1;
+      &__cause {
+        font-weight: 500;
+        text-transform: capitalize;
+      }
+
+      &__remedy {
+        height: 660px;
+        padding-top: 474px;
+        line-height: 220px;
+      }
+
+      &__shuttle-icon {
+        height: 300px;
+        padding-top: 112px;
+      }
+
+      &__shuttle-remedy {
+        height: 660px;
+        line-height: 220px;
+      }
+
+      &__accessibility-info {
+        display: flex;
+        margin-top: 34px;
+
+        &--text {
+          min-width: 811px;
+          font-size: 53px;
+          font-weight: 400;
+          color: #000;
+        }
+      }
+
+      &__isa-icon {
+        height: 61px;
+        padding-right: 33px;
+      }
+
+      .disruption-diagram-container {
+        flex: 1;
+        width: 904px;
+        min-height: 0;
+      }
     }
-  }
 
-  .alert-card__body__isa-icon {
-    height: 136px;
-    padding-right: 36px;
-  }
-    
-  .alert-card__footer {
-    background-color: #2e3e4d;
-    border-radius: 0px 0px 32px 32px;
-    height: $takeover-card-footer-height;
-  }
-  .alert-card__footer__t-icon {
-    height: 102px;
-    padding: 37px 47px;
-  }
-  .alert-card__footer__alerts-url {
-    font-size: 64px;
-    font-weight: 800;
-    text-align: right;
-    padding: 41px 52px 55px 0;
+    &__footer {
+      position: relative;
+      height: $takeover-card-footer-height;
+      font-size: 32px;
+      font-weight: 400;
+      color: #000;
+      text-align: center;
+      background-color: #cccbc8;
+      border-radius: 0 0 4px 4px;
+
+      &__cause {
+        position: absolute;
+        bottom: 20px;
+        left: 60px;
+        height: 44px;
+        margin-top: 20px;
+        text-transform: capitalize;
+      }
+
+      &__updated-at {
+        position: absolute;
+        right: 60px;
+        bottom: 20px;
+        height: 44px;
+        margin-top: 20px;
+        text-align: end;
+
+        .bold {
+          font-weight: 600;
+        }
+      }
+
+      &__alerts-url {
+        position: absolute;
+        right: 60px;
+        bottom: 20px;
+        text-align: right;
+      }
+    }
   }
 }
 
@@ -250,18 +340,21 @@ $alert-card-footer-height: 80px;
   .alert-card__footer {
     background-color: black;
   }
+
   .alert-card__footer__alerts-url {
-    color: white;
     font-weight: 500;
+    color: white;
   }
+
   .alert-card__body__route-pills
-  .route-pills__branches
-  .route-pills__branches__dot {
+    .route-pills__branches
+    .route-pills__branches__dot {
     background-color: #171f26;
   }
 }
 
-.alert-container--takeover, .alert-container--urgent {
+.alert-container--takeover,
+.alert-container--urgent {
   /* Background colors */
   &.alert-container--blue {
     background-color: $line-color-blue;

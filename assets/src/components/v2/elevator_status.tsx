@@ -101,14 +101,14 @@ const instanceOfListPage = (page: ElevatorStatusPage): page is ListPage => {
   return (page as ListPage).stations !== undefined;
 };
 
-const ElevatorOutageIcon = ({}: {}): JSX.Element => (
+const ElevatorOutageIcon = (): JSX.Element => (
   <img
     className="detail-page__closure-outage-icon"
     src={imagePath("elevator-status-outage-black.svg")}
   />
 );
 
-const HereIcon: ComponentType<{}> = ({}) => (
+const HereIcon: ComponentType = () => (
   <img
     className="elevator-status__closure-you-are-here-icon"
     src={imagePath("elevator-status-you-are-here.svg")}
@@ -146,9 +146,9 @@ const TimeframeHeadingIcon = ({
 
 const getTimeframeEndText = (
   happeningNow: boolean,
-  activePeriod: ActivePeriod
+  activePeriod: ActivePeriod,
 ) => {
-  let endText: String = "";
+  let endText = "";
   if (happeningNow) {
     if (activePeriod.end === null) {
       endText = "Until further notice";
@@ -217,7 +217,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
       <div
         className={classWithModifier(
           "detail-page__closure",
-          isAtHomeStop && happeningNow ? "active-at-home" : ""
+          isAtHomeStop && happeningNow ? "active-at-home" : "",
         )}
       >
         <div className="detail-page__closure-location">
@@ -234,7 +234,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
         <div
           className={classWithModifier(
             "detail-page__closure-header",
-            headerSize
+            headerSize,
           )}
           ref={headerRef}
         >
@@ -254,7 +254,7 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
         <div
           className={classWithModifier(
             "detail-page__description",
-            descriptionSize
+            descriptionSize,
           )}
           ref={descriptionRef}
         >
@@ -294,7 +294,11 @@ const StationRow: ComponentType<Station> = ({
         </div>
         <div className="elevator-status__station-row__station-name">{name}</div>
         <div className="elevator-status__station-row__ids">
-          {formatElevatorIds(elevatorClosures.map(({ elevator_id: id }) => id))}
+          {formatElevatorIds(
+            elevatorClosures
+              .filter(({ elevator_id: id }) => !isNaN(parseInt(id)))
+              .map(({ elevator_id: id }) => id),
+          )}
         </div>
         {isAtHomeStop && (
           <div className="elevator-status__station-row__you-are-here-icon">
@@ -324,11 +328,12 @@ const formatElevatorIds = (ids: string[]) => {
       return `#${ids[0]}`;
     case 2:
       return `#${ids[0]} and ${ids[1]}`;
-    default:
+    default: {
       // a, b, ..., m, and n
       const allButLast = ids.slice(0, ids.length - 1);
       const last = ids[ids.length - 1];
       return `#${allButLast.join(", ")}, and ${last}`;
+    }
   }
 };
 

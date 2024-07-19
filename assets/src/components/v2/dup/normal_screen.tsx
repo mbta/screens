@@ -34,7 +34,6 @@ export const NormalSimulation: React.ComponentType<Props> = ({
         <Widget data={rotationOne} />
         <Widget data={rotationTwo} />
       </div>
-      
     </div>
   );
 };

@@ -2,8 +2,7 @@ import BaseDepartureTime from "Components/eink/base_departure_time";
 import moment from "moment";
 import React from "react";
 import { TimeRepresentation } from "Util/time_representation";
-import { classWithModifier } from "Util/util";
-import LiveData from "Components/v2/bundled_svg/live_data";
+import LiveDataSvg from "Images/svgr_bundled/live-data-small.svg";
 
 interface CRDepartureTimeProps {
   departureType: "schedule" | "prediction";
@@ -22,19 +21,12 @@ const CRDepartureTime = ({
     return (
       <div className="cr-departure-time">
         <div
-          className={`cr-departure-time__text ${isDelayed ? "delayed" : ""}`}
+          className={`cr-departure-time__prediction ${isDelayed ? "delayed" : ""}`}
         >
           {formattedTime}
         </div>
-        <div
-          className={classWithModifier("cr-departure-time__subtext", "english")}
-        >
+        <div className="cr-departure-time__subtext">
           {isDelayed ? "Delayed" : "Scheduled"}
-        </div>
-        <div
-          className={classWithModifier("cr-departure-time__subtext", "spanish")}
-        >
-          {isDelayed ? "Atrasado" : "Programada"}
         </div>
       </div>
     );
@@ -42,7 +34,9 @@ const CRDepartureTime = ({
 
   const predictionTime =
     typeof time === "string" ? (
-      <span style={{ display: "inline-block" }}>{formattedTime}</span>
+      <span className="base-departure-time" style={{ display: "inline-block" }}>
+        {formattedTime}
+      </span>
     ) : (
       <span style={{ display: "inline-block" }}>
         <BaseDepartureTime time={time as TimeRepresentation} hideAmPm />
@@ -53,9 +47,12 @@ const CRDepartureTime = ({
     <div className="cr-departure-time">
       {predictionTime}
       <span style={{ display: "inline-block", marginLeft: "19px" }}>
-        <LiveData
+        <LiveDataSvg
+          color="black"
+          width="36"
+          height="36"
+          viewBox="0 0 32 32"
           className="cr-departure-time__live-data-icon"
-          colorHex="#737373"
         />
       </span>
     </div>

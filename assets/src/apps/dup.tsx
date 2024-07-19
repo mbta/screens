@@ -1,8 +1,6 @@
 import initSentry from "Util/sentry";
 initSentry("dup");
 
-declare function require(name: string): string;
-// tslint:disable-next-line
 require("../../css/dup.scss");
 
 import React from "react";
@@ -17,7 +15,7 @@ import {
   MultiRotationPage,
   SimulationPage,
 } from "Components/dup/dup_screen_page";
-import { isDup } from "Util/util";
+import { isDup } from "Util/outfront";
 
 const App = (): JSX.Element => {
   if (isDup()) {

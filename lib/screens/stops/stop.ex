@@ -4,23 +4,37 @@ defmodule Screens.Stops.Stop do
   For a while, all stop-related data was fetched from the API, until we needed to provide consistent
   abbreviations in the reconstructed alert. Now it's valuable to have a local copy of these stop sequences.
   A lot of our code still collects these sequences from the API, though, whether in functions here
-  or in functions in `route_pattern.ex` (see fetch_parent_station_sequences_through_stop).
+  or in functions in `route_pattern.ex` (see fetch_tagged_parent_station_sequences_through_stop).
   So there's inconsistent use of this local data.
   """
 
-  alias Screens.Routes
+  require Logger
+
+  alias Screens.LocationContext
+  alias Screens.RoutePatterns.RoutePattern
+  alias Screens.{Routes, Stops}
+  alias Screens.Routes.Route
+  alias Screens.RouteType
   alias Screens.Stops.StationsWithRoutesAgent
+  alias Screens.Util
   alias Screens.V3Api
+  alias ScreensConfig.V2.{BusEink, BusShelter, Dup, GlEink, PreFare, Triptych}
 
   defstruct id: nil,
-            name: nil
+            name: nil,
+            platform_code: nil,
+            platform_name: nil
 
   @type id :: String.t()
 
   @type t :: %__MODULE__{
           id: id,
-          name: String.t()
+          name: String.t(),
+          platform_code: String.t() | nil,
+          platform_name: String.t() | nil
         }
+
+  @type screen_type :: BusEink | BusShelter | GlEink | PreFare | Dup | Triptych
 
   @blue_line_stops [
     {"place-wondl", {"Wonderland", "Wonderland"}},
@@ -197,8 +211,6 @@ defmodule Screens.Stops.Stop do
   ]
 
   @green_line_trunk_stops [
-    # These 3 eventually will NOT be trunk stops, but are until Medford opens
-    {"place-unsqu", {"Union Square", "Union Sq"}},
     {"place-lech", {"Lechmere", "Lechmere"}},
     {"place-spmnl", {"Science Park/West End", "Science Pk"}},
     {"place-north", {"North Station", "North Sta"}},
@@ -210,6 +222,18 @@ defmodule Screens.Stops.Stop do
     {"place-coecl", {"Copley", "Copley"}},
     {"place-hymnl", {"Hynes Convention Center", "Hynes"}},
     {"place-kencl", {"Kenmore", "Kenmore"}}
+  ]
+
+  @medford_tufts_branch_stops [
+    {"place-mdftf", {"Medford / Tufts", "Medford"}},
+    {"place-balsq", {"Ball Square", "Ball Sq"}},
+    {"place-mgngl", {"Magoun Square", "Magoun Sq"}},
+    {"place-gilmn", {"Gilman Square", "Gilman Sq"}},
+    {"place-esomr", {"East Somerville", "E Somerville"}}
+  ]
+
+  @union_square_branch_stops [
+    {"place-unsqu", {"Union Square", "Union Sq"}}
   ]
 
   @route_stop_sequences %{
@@ -225,6 +249,8 @@ defmodule Screens.Stops.Stop do
     "Green-E" => [@green_line_e_stops],
     "Green" => [@green_line_trunk_stops]
   }
+
+  @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
   # --- These functions involve the API ---
 
@@ -245,63 +271,111 @@ defmodule Screens.Stops.Stop do
     end
   end
 
-  def fetch_routes_serving_stop(station_id, headers \\ [], get_json_fn \\ &V3Api.get_json/5) do
-    case get_json_fn.(
-           "routes",
-           %{
-             "filter[stop]" => station_id
-           },
-           headers,
-           [],
-           true
-         ) do
-      {:ok, %{"data" => data}, headers} ->
-        date =
-          headers
-          |> Enum.into(%{})
-          |> Map.get("last-modified")
+  def fetch_routes_serving_stop(
+        station_id,
+        get_json_fn \\ &V3Api.get_json/2,
+        attempts_left \\ 3
+      )
 
-        routes =
-          data
-          |> Enum.map(fn route -> Routes.Parser.parse_route(route) end)
+  def fetch_routes_serving_stop(_station_id, _get_json_fn, 0), do: :bad_response
 
-        StationsWithRoutesAgent.put(station_id, routes, date)
+  def fetch_routes_serving_stop(
+        station_id,
+        get_json_fn,
+        attempts_left
+      ) do
+    case get_json_fn.("routes", %{"filter[stop]" => station_id}) do
+      {:ok, %{"data" => []}, _} ->
+        fetch_routes_serving_stop(station_id, get_json_fn, attempts_left - 1)
 
-        {:ok, routes}
-
-      :not_modified ->
-        :not_modified
+      {:ok, %{"data" => data}} ->
+        {:ok, Enum.map(data, fn route -> Routes.Parser.parse_route(route) end)}
 
       _ ->
         :error
     end
   end
 
+  # Returns a list of Route structs that serve the provided ID
+  @spec create_station_with_routes_map(String.t()) :: list(Routes.Route.t())
   def create_station_with_routes_map(station_id) do
     case StationsWithRoutesAgent.get(station_id) do
-      {routes, date} ->
-        case fetch_routes_serving_stop(station_id, [{"if-modified-since", date}]) do
-          {:ok, new_routes} -> new_routes
-          :not_modified -> routes
-          :error -> []
-        end
-
       nil ->
-        case fetch_routes_serving_stop(station_id) do
-          {:ok, new_routes} -> new_routes
-          :error -> []
-        end
+        get_routes_serving_stop(station_id)
+
+      routes ->
+        get_routes_serving_stop(station_id, routes)
     end
   end
 
+  defp get_routes_serving_stop(station_id, default_routes \\ []) do
+    case fetch_routes_serving_stop(station_id) do
+      {:ok, new_routes} ->
+        new_routes
+
+      :bad_response ->
+        Logger.error(
+          "[create_station_with_routes_map no routes] Received an empty list from API: stop_id=#{station_id}"
+        )
+
+        default_routes
+
+      :error ->
+        Logger.error(
+          "[create_station_with_routes_map fetch error] Received an error from API: stop_id=#{station_id}"
+        )
+
+        default_routes
+    end
+  end
+
+  def get_routes_serving_stop_ids(stop_ids) do
+    stop_ids
+    |> Enum.flat_map(fn stop_id ->
+      stop_id
+      |> create_station_with_routes_map()
+      |> Enum.map(& &1.id)
+    end)
+    |> Enum.uniq()
+  end
+
   def fetch_stop_name(stop_id) do
-    case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do
-      {:ok, %{"data" => [stop_data]}} ->
-        %{"attributes" => %{"name" => stop_name}} = stop_data
-        stop_name
+    Screens.Telemetry.span(~w[screens stops stop fetch_stop_name]a, %{stop_id: stop_id}, fn ->
+      case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do
+        {:ok, %{"data" => [stop_data]}} ->
+          %{"attributes" => %{"name" => stop_name}} = stop_data
+          stop_name
+
+        _ ->
+          nil
+      end
+    end)
+  end
+
+  def fetch_parent_stop_id(stop_id) do
+    case Screens.V3Api.get_json("stops/" <> stop_id, %{"include" => "parent_station"}) do
+      {:ok, %{"included" => [included_data]}} ->
+        %{"id" => parent_station_id} = included_data
+        parent_station_id
 
       _ ->
         nil
+    end
+  end
+
+  def fetch_subway_platforms_for_stop(stop_id) do
+    case Screens.V3Api.get_json("stops/" <> stop_id, %{"include" => "child_stops"}) do
+      {:ok, %{"included" => child_stop_data}} ->
+        child_stop_data
+        |> Enum.filter(fn %{
+                            "attributes" => %{
+                              "location_type" => location_type,
+                              "vehicle_type" => vehicle_type
+                            }
+                          } ->
+          location_type == 0 and vehicle_type in [0, 1]
+        end)
+        |> Enum.map(&Stops.Parser.parse_stop/1)
     end
   end
 
@@ -320,6 +394,12 @@ defmodule Screens.Stops.Stop do
   @doc """
   Finds a stop sequence which contains all stations in informed_entities.
   """
+  def get_stop_sequence(informed_entities, "Green") do
+    Enum.find_value(@green_line_branches, fn branch ->
+      get_stop_sequence(informed_entities, branch)
+    end)
+  end
+
   def get_stop_sequence(informed_entities, route_id) do
     stop_sequences = Map.get(@route_stop_sequences, route_id)
     Enum.find(stop_sequences, &sequence_match?(&1, informed_entities))
@@ -331,6 +411,27 @@ defmodule Screens.Stops.Stop do
     |> Enum.flat_map(fn x -> x end)
     |> Enum.map(fn {k, _v} -> k end)
     |> Enum.uniq()
+  end
+
+  def get_all_routes_stop_sequence do
+    @route_stop_sequences
+  end
+
+  def get_gl_stop_sequences do
+    Enum.map(@green_line_branches, &get_route_stop_sequence/1)
+  end
+
+  @doc """
+  Returns an unordered MapSet of all GL stops west of Copley.
+  """
+  @spec get_gl_stops_west_of_copley() :: MapSet.t(id())
+  def get_gl_stops_west_of_copley do
+    get_gl_stop_sequences()
+    |> Enum.flat_map(fn stop_sequence ->
+      [_copley | west_of_copley] = Enum.drop_while(stop_sequence, &(&1 != "place-coecl"))
+      west_of_copley
+    end)
+    |> MapSet.new()
   end
 
   defp sequence_match?(stop_sequence, informed_entities) do
@@ -349,7 +450,11 @@ defmodule Screens.Stops.Stop do
   end
 
   def gl_trunk_stops do
-    @route_stop_sequences |> Map.get("Green") |> hd() |> Enum.map(&elem(&1, 0)) |> MapSet.new()
+    @green_line_trunk_stops
+  end
+
+  def rl_trunk_stops do
+    @red_line_trunk_stops
   end
 
   def stop_id_to_name(route_id) do
@@ -360,7 +465,103 @@ defmodule Screens.Stops.Stop do
     |> Enum.into(%{})
   end
 
-  def get_all_routes_stop_sequence do
-    @route_stop_sequences
+  @doc """
+  Fetches all the location context for a screen given its app type, stop id, and time
+  """
+  @spec fetch_location_context(
+          screen_type(),
+          id(),
+          DateTime.t()
+        ) :: {:ok, LocationContext.t()} | :error
+  def fetch_location_context(app, stop_id, now) do
+    Screens.Telemetry.span(
+      ~w[screens stops stop fetch_location_context]a,
+      %{app: app, stop_id: stop_id},
+      fn ->
+        with alert_route_types <- get_route_type_filter(app, stop_id),
+             {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, alert_route_types),
+             {:ok, tagged_stop_sequences} <-
+               fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop) do
+          stop_name = fetch_stop_name(stop_id)
+          stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+
+          {:ok,
+           %LocationContext{
+             home_stop: stop_id,
+             home_stop_name: stop_name,
+             tagged_stop_sequences: tagged_stop_sequences,
+             upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
+             downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
+             routes: routes_at_stop,
+             alert_route_types: alert_route_types
+           }}
+        else
+          :error ->
+            Logger.error(
+              "[fetch_location_context fetch error] Failed to get location context for an alert: stop_id=#{stop_id}"
+            )
+
+            :error
+        end
+      end
+    )
+  end
+
+  # Returns the route types we care about for the alerts of this screen type / place
+  @spec get_route_type_filter(screen_type(), String.t()) ::
+          list(RouteType.t())
+  def get_route_type_filter(app, _) when app in [BusEink, BusShelter], do: [:bus]
+  def get_route_type_filter(GlEink, _), do: [:light_rail]
+  # Ashmont should not show Mattapan alerts for PreFare or Dup
+  def get_route_type_filter(app, "place-asmnl") when app in [PreFare, Dup], do: [:subway]
+  def get_route_type_filter(PreFare, _), do: [:light_rail, :subway]
+  def get_route_type_filter(Triptych, _), do: [:light_rail, :subway]
+  # WTC is a special bus-only case
+  def get_route_type_filter(Dup, "place-wtcst"), do: [:bus]
+  def get_route_type_filter(Dup, _), do: [:light_rail, :subway]
+
+  @spec upstream_stop_id_set(String.t(), list(list(id()))) :: MapSet.t(id())
+  def upstream_stop_id_set(stop_id, stop_sequences) do
+    stop_sequences
+    |> Enum.flat_map(fn stop_sequence -> Util.slice_before(stop_sequence, stop_id) end)
+    |> MapSet.new()
+  end
+
+  @spec downstream_stop_id_set(String.t(), list(list(id()))) :: MapSet.t(id())
+  def downstream_stop_id_set(stop_id, stop_sequences) do
+    stop_sequences
+    |> Enum.flat_map(fn stop_sequence -> Util.slice_after(stop_sequence, stop_id) end)
+    |> MapSet.new()
+  end
+
+  def on_glx?(stop_id) do
+    stop_id in Enum.map(@medford_tufts_branch_stops ++ @union_square_branch_stops, &elem(&1, 0))
+  end
+
+  def on_ashmont_branch?(stop_id) do
+    stop_id in Enum.map(@red_line_ashmont_branch_stops, &elem(&1, 0))
+  end
+
+  def on_braintree_branch?(stop_id) do
+    stop_id in Enum.map(@red_line_braintree_branch_stops, &elem(&1, 0))
+  end
+
+  defp fetch_tagged_stop_sequences_by_app(app, stop_id, _routes_at_stop)
+       when app in [BusEink, BusShelter, GlEink] do
+    RoutePattern.fetch_tagged_stop_sequences_through_stop(stop_id)
+  end
+
+  defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)
+       when app in [Dup, Triptych] do
+    route_ids = Route.route_ids(routes_at_stop)
+    RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids)
+  end
+
+  defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)
+       when app == PreFare do
+    route_ids = Route.route_ids(routes_at_stop)
+
+    # We limit results to canonical route patterns only--no stop sequences for nonstandard patterns.
+    RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids, true)
   end
 end

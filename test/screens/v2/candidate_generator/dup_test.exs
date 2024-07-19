@@ -1,9 +1,9 @@
 defmodule Screens.V2.CandidateGenerator.DupTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{Departures, Header}
-  alias Screens.Config.V2.Dup, as: DupConfig
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{Alerts, Departures, Header}
+  alias ScreensConfig.V2.Dup, as: DupConfig
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.WidgetInstance.NormalHeader
 
@@ -12,7 +12,8 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       app_params: %DupConfig{
         header: %Header.CurrentStopId{stop_id: "place-gover"},
         primary_departures: struct(Departures),
-        secondary_departures: struct(Departures)
+        secondary_departures: struct(Departures),
+        alerts: struct(Alerts)
       },
       vendor: :outfront,
       device_id: "TEST",
@@ -20,7 +21,20 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       app_id: :dup_v2
     }
 
-    %{config: config}
+    config_stop_name = %Screen{
+      app_params: %DupConfig{
+        header: %Header.CurrentStopName{stop_name: "Gov Center"},
+        primary_departures: struct(Departures),
+        secondary_departures: struct(Departures),
+        alerts: struct(Alerts)
+      },
+      vendor: :outfront,
+      device_id: "TEST",
+      name: "TEST",
+      app_id: :dup_v2
+    }
+
+    %{config: config, config_stop_name: config_stop_name}
   end
 
   describe "screen_template/0" do
@@ -75,6 +89,8 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       fetch_stop_fn = fn "place-gover" -> "Government Center" end
       departures_instances_fn = fn _, _ -> [] end
       evergreen_content_instances_fn = fn _ -> [] end
+      alerts_instances_fn = fn _, _ -> [] end
+      opts = []
 
       expected_headers =
         List.duplicate(
@@ -90,10 +106,12 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       actual_instances =
         Dup.candidate_instances(
           config,
+          opts,
           now,
           fetch_stop_fn,
           evergreen_content_instances_fn,
-          departures_instances_fn
+          departures_instances_fn,
+          alerts_instances_fn
         )
 
       assert Enum.all?(expected_headers, &Enum.member?(actual_instances, &1))
@@ -101,7 +119,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
   end
 
   describe "header_instances/3" do
-    test "returns expected header", %{config: config} do
+    test "returns expected header for stop_id", %{config: config} do
       now = ~U[2020-04-06T10:00:00Z]
       fetch_stop_name_fn = fn _ -> "Test Stop" end
 
@@ -110,6 +128,29 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           screen: config,
           icon: :logo,
           text: "Test Stop",
+          time: now
+        }
+        |> List.duplicate(3)
+
+      actual_instances =
+        Dup.header_instances(
+          config,
+          now,
+          fetch_stop_name_fn
+        )
+
+      Enum.all?(expected_headers, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns expected header for stop_name", %{config_stop_name: config} do
+      now = ~U[2020-04-06T10:00:00Z]
+      fetch_stop_name_fn = fn _ -> nil end
+
+      expected_headers =
+        %NormalHeader{
+          screen: config,
+          icon: :logo,
+          text: "Gov Center",
           time: now
         }
         |> List.duplicate(3)

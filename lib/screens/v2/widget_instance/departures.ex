@@ -2,20 +2,28 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.FreeTextLine
+  alias Screens.Departures.Departure
+  alias Screens.Predictions.Prediction
+  alias Screens.Routes.Route
+  alias Screens.Schedules.Schedule
   alias Screens.Util
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Departures.Header
+  alias ScreensConfig.V2.Departures.Layout
+  alias ScreensConfig.V2.FreeTextLine
 
   defstruct screen: nil,
             section_data: [],
             slot_names: []
 
-  @type section :: %{
+  @type normal_section :: %{
           type: :normal_section,
-          rows: list(Departure.t() | notice())
+          rows: list(Departure.t() | notice()),
+          layout: Layout.t(),
+          header: Header.t()
         }
 
   @type notice_section :: %{
@@ -25,7 +33,19 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type headway_section :: %{
           type: :headway_section,
-          pill: :red | :orange | :green | :blue
+          route: :red | :orange | :green | :blue,
+          time_range: {integer(), integer()},
+          headsign: String.t()
+        }
+
+  @type overnight_section :: %{
+          type: :overnight_section,
+          routes: list(Route.t())
+        }
+
+  @type no_data_section :: %{
+          type: :no_data_section,
+          route: Route.t()
         }
 
   @type notice :: %{
@@ -34,7 +54,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          section_data: list(section | notice_section | headway_section()),
+          section_data:
+            list(
+              normal_section()
+              | notice_section()
+              | headway_section()
+              | overnight_section()
+              | no_data_section()
+            ),
           slot_names: list(atom())
         }
 
@@ -81,51 +108,109 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :notice_section, text: text}
   end
 
+  def serialize_section(%{type: :no_data_section, route: route}, _screen, _) do
+    text = %FreeTextLine{
+      icon: Route.icon(route),
+      text: ["Updates unavailable"]
+    }
+
+    %{type: :no_data_section, text: FreeTextLine.to_json(text)}
+  end
+
   def serialize_section(
-        %{type: :headway_section, pill: pill, time_range: {lo, hi}, headsign: headsign},
+        %{type: :headway_section, route: route, time_range: {lo, hi}, headsign: headsign},
         _screen,
         is_only_section
       ) do
+    pill_color = Route.color(route)
+    layout = if is_only_section, do: :full_screen, else: :row
+
+    formatted_route =
+      case route do
+        "Green" <> _ -> "Green"
+        route -> route
+      end
+
     text =
       if is_only_section do
+        time_range =
+          if headsign == "Ashmont/Braintree" do
+            [%{format: :bold, text: "#{lo}-#{hi}m"}]
+          else
+            [%{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
+          end
+
         %FreeTextLine{
           icon: "subway-negative-black",
-          text: [
-            %{
-              color: pill,
-              text: "#{String.capitalize("#{pill}")} Line"
-            },
-            %{special: :break},
-            "#{headsign} trains every",
-            %{format: :bold, text: "#{lo}-#{hi}"},
-            "minutes"
-          ]
+          text:
+            [
+              %{
+                color: pill_color,
+                text: "#{String.upcase(formatted_route)} LINE"
+              },
+              %{special: :break},
+              "#{headsign} trains every"
+            ] ++ time_range
         }
       else
         %FreeTextLine{
-          icon: pill,
+          icon: pill_color,
           text: ["every", %{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
         }
       end
 
-    %{type: :headway_section, text: FreeTextLine.to_json(text)}
+    %{type: :headway_section, text: FreeTextLine.to_json(text), layout: layout}
   end
 
-  def serialize_section(%{type: :normal_section, rows: departures}, screen, _) do
+  def serialize_section(
+        %{type: :normal_section, rows: departures, layout: layout, header: header},
+        screen,
+        _
+      ) do
     rows =
       departures
       |> Enum.take(@max_departures)
       |> group_consecutive_departures(screen)
       |> Enum.map(&serialize_row(&1, screen))
 
-    %{type: :normal_section, rows: rows}
+    %{
+      type: :normal_section,
+      rows: rows,
+      layout: Layout.to_json(layout),
+      header: Header.to_json(header)
+    }
+  end
+
+  def serialize_section(%{type: :overnight_section, routes: routes}, _, _) do
+    route_pill =
+      routes
+      |> Enum.map(&Route.icon/1)
+      |> List.first()
+
+    text = %FreeTextLine{
+      icon: route_pill,
+      text: [
+        "Service resumes",
+        %{special: :break},
+        "in the morning"
+      ]
+    }
+
+    %{type: :overnight_section, text: FreeTextLine.to_json(text)}
   end
 
   def audio_serialize_section(%{type: :notice_section, text: text}, _screen) do
     %{type: :notice_section, text: FreeTextLine.to_plaintext(text)}
   end
 
-  def audio_serialize_section(%{type: :normal_section, rows: departures}, screen) do
+  def audio_serialize_section(%{type: :normal_section, rows: departures, header: header}, screen) do
+    header =
+      case header do
+        %{read_as: header} when is_binary(header) -> header
+        %{title: header} when is_binary(header) -> header
+        _ -> nil
+      end
+
     serialized_departure_groups =
       departures
       |> group_all_departures(2)
@@ -133,6 +218,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{
       type: :normal_section,
+      header: header,
       departure_groups: serialized_departure_groups
     }
   end
@@ -300,7 +386,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defp crowding_compatible?(_, %Screen{app_id: :dup_v2}), do: false
   defp crowding_compatible?(_, _), do: true
 
-  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   defp serialize_time(departure, %Screen{app_id: app_id}, now)
        when app_id in [:bus_eink_v2, :gl_eink_v2] do
     departure_time = Departure.time(departure)
@@ -317,15 +402,24 @@ defmodule Screens.V2.WidgetInstance.Departures do
           %{type: :minutes, minutes: minute_diff}
 
         true ->
-          serialize_timestamp(departure_time)
+          serialize_timestamp(departure_time, now)
       end
 
-    %{time: time}
+    %{time: time, time_in_epoch: DateTime.to_unix(departure_time)}
   end
 
+  defp serialize_time(
+         %Departure{schedule: %Schedule{arrival_time: nil, departure_time: nil}},
+         _screen,
+         _now
+       ),
+       do: %{time: %{type: :icon, icon: :overnight}}
+
   defp serialize_time(departure, _screen, now) do
+    stop_id = Departure.stop_id(departure)
     departure_time = Departure.time(departure)
     vehicle_status = Departure.vehicle_status(departure)
+    vehicle_stop_id = Prediction.stop_for_vehicle(departure.prediction)
     stop_type = Departure.stop_type(departure)
     route_type = Departure.route_type(departure)
 
@@ -334,7 +428,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     time =
       cond do
-        vehicle_status == :stopped_at and second_diff < 90 ->
+        vehicle_status == :stopped_at and second_diff < 90 and stop_id == vehicle_stop_id ->
           %{type: :text, text: "BRD"}
 
         second_diff < 30 and stop_type == :first_stop ->
@@ -347,7 +441,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           %{type: :minutes, minutes: minute_diff}
 
         true ->
-          serialize_timestamp(departure_time)
+          serialize_timestamp(departure_time, now)
       end
 
     %{time: time}
@@ -361,7 +455,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     if is_nil(scheduled_time) do
       %{time: serialized_time}
     else
-      serialized_scheduled_time = serialize_timestamp(scheduled_time)
+      serialized_scheduled_time = serialize_timestamp(scheduled_time, now)
 
       case serialized_time do
         %{type: :text} ->
@@ -376,12 +470,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
   end
 
-  defp serialize_timestamp(departure_time) do
+  defp serialize_timestamp(departure_time, now) do
     {:ok, local_time} = DateTime.shift_zone(departure_time, "America/New_York")
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
     minute = local_time.minute
     am_pm = if local_time.hour >= 12, do: :pm, else: :am
-    %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm}
+    show_am_pm = Util.get_service_date_tomorrow(now).day == local_time.day
+    %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm, show_am_pm: show_am_pm}
   end
 
   defp serialize_crowding(departure) do

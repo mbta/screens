@@ -2,14 +2,14 @@ defmodule ScreensWeb.AudioController do
   use ScreensWeb, :controller
   require Logger
   alias Phoenix.View
-  alias Screens.Config.State
+  alias Screens.Config.Cache
 
   @fallback_audio_path "assets/static/audio/readout_fallback.mp3"
 
   plug(:check_config)
 
   defp check_config(conn, _) do
-    if State.ok?() do
+    if Cache.ok?() do
       conn
     else
       conn
@@ -19,7 +19,7 @@ defmodule ScreensWeb.AudioController do
   end
 
   defp screen_exists?(screen_id) do
-    not is_nil(State.screen(screen_id))
+    not is_nil(Cache.screen(screen_id))
   end
 
   def show(conn, %{"id" => screen_id} = params) do

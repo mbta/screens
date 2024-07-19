@@ -1,7 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.BusEinkTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config.{Screen, V2}
+  alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.BusEink
   alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader}
 
@@ -43,7 +43,8 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
                      bottom_takeover: [
                        :main_content,
                        :full_body_bottom_screen
-                     ]
+                     ],
+                     flex_zone_takeover: [:main_content, :flex_zone_takeover, :footer]
                    }}
                 ],
                 screen_takeover: [:full_screen]
@@ -58,15 +59,19 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
       fetch_stop_fn = fn "1722" -> "1624 Blue Hill Ave @ Mattapan Sq" end
       now = ~U[2020-04-06T10:00:00Z]
       evergreen_content_instances_fn = fn _ -> [] end
+      subway_status_instances_fn = fn _, _ -> [] end
+      opts = []
 
       actual_instances =
         BusEink.candidate_instances(
           config,
+          opts,
           now,
           fetch_stop_fn,
           departures_instances_fn,
           alerts_instances_fn,
-          evergreen_content_instances_fn
+          evergreen_content_instances_fn,
+          subway_status_instances_fn
         )
 
       expected_header = %NormalHeader{

@@ -29,8 +29,8 @@ const abbreviateStop = (stop) => {
 // Will only split on a space.
 const splitLabel = (labelText: string) => {
   let middle = Math.floor(labelText.length / 2);
-  let before = labelText.lastIndexOf(" ", middle);
-  let after = labelText.indexOf(" ", middle + 1);
+  const before = labelText.lastIndexOf(" ", middle);
+  const after = labelText.indexOf(" ", middle + 1);
 
   if (middle - before < after - middle) {
     middle = before;
@@ -155,7 +155,7 @@ const BaseMapStops = ({ stops }) => {
           />
         );
 
-        let stopLabel = null;
+        let stopLabel: JSX.Element | null = null;
         let labelText = abbreviateStop(label);
         if (downstream || current || terminal) {
           let modifier;
@@ -169,7 +169,7 @@ const BaseMapStops = ({ stops }) => {
           }
 
           if (labelText.length > MAXIMUM_STOP_LABEL_LENGTH) {
-            let labelParts = splitLabel(labelText);
+            const labelParts = splitLabel(labelText);
             stopLabel = (
               <text
                 x={LEFT_MARGIN + LINE_WIDTH + TEXT_LEFT_MARGIN}
@@ -255,7 +255,7 @@ const ScheduledDepartureDescription = ({ cx, cy, timestamp, stationName }) => {
         dy="36"
         className={classWithModifier(
           "line-map__scheduled-departure",
-          "message"
+          "message",
         )}
       >
         Scheduled to depart
@@ -265,7 +265,7 @@ const ScheduledDepartureDescription = ({ cx, cy, timestamp, stationName }) => {
         dy="32"
         className={classWithModifier(
           "line-map__scheduled-departure",
-          "message"
+          "message",
         )}
       >
         {stationName}
@@ -385,7 +385,7 @@ const VehicleMinutesLabel = ({ cx, cy, minutes }) => {
         dx="3"
         className={classWithModifier(
           "line-map__vehicle-label",
-          "minutes-label"
+          "minutes-label",
         )}
       >
         m
@@ -404,7 +404,7 @@ const VehicleLabel = ({ cx, cy, label }) => {
   return null;
 };
 
-const Vehicle = ({ id, index, label }) => {
+const Vehicle = ({ index, label }) => {
   const cx = LEFT_MARGIN + LINE_WIDTH / 2;
   const cy = TOP_MARGIN + index * STOP_SPACING;
 
@@ -417,7 +417,13 @@ const Vehicle = ({ id, index, label }) => {
   );
 };
 
-const Vehicles = ({ vehicles, stops }) => {
+const Vehicles = ({
+  vehicles,
+  stops,
+}: {
+  vehicles: Vehicle[];
+  stops: Stop[];
+}) => {
   const maxIndex = stops.length;
   vehicles = vehicles.filter(({ index }) => index <= maxIndex);
 
@@ -432,7 +438,7 @@ const Vehicles = ({ vehicles, stops }) => {
 
 const truncateStops = (stops) => {
   const n = Math.floor(
-    (HEIGHT - (TOP_MARGIN + BIG_STOP_RADIUS)) / STOP_SPACING
+    (HEIGHT - (TOP_MARGIN + BIG_STOP_RADIUS)) / STOP_SPACING,
   );
   return stops.slice(0, n + 1);
 };
@@ -444,11 +450,35 @@ const showScheduledDeparture = (stops) => {
   );
 };
 
+type Props = {
+  stops: Stop[];
+  vehicles: Vehicle[];
+  scheduled_departure: ScheduledDeparture;
+};
+
+type Stop = {
+  label: string;
+  downstream: boolean;
+  current: boolean;
+  terminal: boolean;
+};
+
+type Vehicle = {
+  id: string;
+  index: number;
+  label: string;
+};
+
+type ScheduledDeparture = {
+  timestamp: string;
+  station_name: string;
+};
+
 const LineMap = ({
   stops,
   vehicles,
   scheduled_departure: scheduledDeparture,
-}) => {
+}: Props) => {
   stops = truncateStops(stops);
 
   return (

@@ -43,8 +43,8 @@ const RenderedDestination = ({ parts, index1, index2, currentPageIndex }) => {
 };
 
 const Destination = ({ headsign, currentPage }) => {
-  const firstLineRef = useRef(null);
-  const secondLineRef = useRef(null);
+  const firstLineRef = useRef<HTMLDivElement>(null);
+  const secondLineRef = useRef<HTMLDivElement>(null);
 
   let parts = headsign.split(" ");
 
@@ -60,10 +60,10 @@ const Destination = ({ headsign, currentPage }) => {
   useLayoutEffect(() => {
     if (firstLineRef.current && secondLineRef.current) {
       const firstLines = Math.round(
-        firstLineRef.current.clientHeight / LINE_HEIGHT
+        firstLineRef.current.clientHeight / LINE_HEIGHT,
       );
       const secondLines = Math.round(
-        secondLineRef.current.clientHeight / LINE_HEIGHT
+        secondLineRef.current.clientHeight / LINE_HEIGHT,
       );
 
       switch (phase) {
@@ -149,7 +149,7 @@ const Destination = ({ headsign, currentPage }) => {
       <div className="departure-destination__headsign" ref={firstLineRef}>
         {firstLine}
       </div>
-      <div className="departure-destination__variation" ref={secondLineRef}>
+      <div className="departure-destination__headsign" ref={secondLineRef}>
         {secondLine}
       </div>
     </div>

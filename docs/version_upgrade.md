@@ -10,7 +10,6 @@ Places to update:
 - [ ] Dockerfile
   - Update the Elixir and Erlang versions in `FROM hexpm/elixir:X-erlang-Y-alpine-3.15.0 AS elixir-builder`. You may also need to use a newer Alpine Linux version. Search https://hub.docker.com/r/hexpm/elixir/tags for the appropriate image tag.
   - You may also need to install new OS packages to allow newer version of Erlang to run, e.g. `libstdc++` `libgcc` and `ncurses-libs` for Erlang/OTP 24+. Check with the team and/or department about these if you see errors about missing C libraries during build or bootup of the application. Add new required packages to the `RUN apk --update add ...` line. Available packages can be found at https://pkgs.alpinelinux.org/packages.
-- [ ] .devcontainer/devcontainer.json - NOT .devcontainer/Dockerfile
 - [ ] .credo.exs - remove disabled checks as appropriate
 - [ ] mix.exs
 

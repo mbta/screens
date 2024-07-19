@@ -1,0 +1,258 @@
+// General styles for free text / route pills
+.free-text {
+  font-family: Inter, sans-serif;
+  font-size: 138px;
+  line-height: 138px;
+  color: #fff;
+}
+
+.free-text__line {
+  display: inline-block;
+  overflow: hidden;
+
+  // Needed to keep y's from getting cut off!
+  line-height: initial;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+
+  .free-text__element {
+    line-height: initial;
+  }
+}
+
+.free-text__icon-container {
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+
+  // Needed if we use a route pill as the leading icon for the row
+  // which we do for one-row headways
+  .free-text__route-pill {
+    margin-top: 35px;
+    color: #fff;
+  }
+}
+
+.free-text__element {
+  &:not(:last-child)::after {
+    content: " ";
+  }
+}
+
+.free-text__string {
+  &--bold {
+    font-weight: 700;
+  }
+
+  &--small {
+    font-size: 0.8em;
+  }
+}
+
+.free-text__route-pill,
+.free-text__text-pill {
+  display: inline-block;
+  text-align: center;
+
+  &--green,
+  &--green_b,
+  &--green_c,
+  &--green_d,
+  &--green_e {
+    background: $line-color-green;
+  }
+
+  &--blue {
+    background: $line-color-blue;
+  }
+
+  &--red,
+  &--mattapan {
+    background: $line-color-red;
+  }
+
+  &--orange {
+    background: $line-color-orange;
+  }
+
+  &--silver {
+    background: $line-color-silver;
+  }
+
+  &--cr,
+  &--purple {
+    background: $line-color-cr;
+  }
+
+  &--bus {
+    background: $line-color-bus;
+    box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
+  }
+}
+
+.free-text__route-pill__text,
+.free-text__text-pill__text {
+  font-family: Helvetica, sans-serif;
+  font-weight: 700;
+
+  &--branch {
+    font-size: 84px;
+  }
+}
+
+.free-text__inline-icon-image {
+  // This is not a Helvetica transform
+  // This is because FreeText centering for inline icons is weird
+  transform: translateY(20px);
+}
+
+.free-text__route-pill {
+  width: 248px;
+  height: 144px;
+  font-size: 96px;
+  line-height: 144px;
+  border-radius: 72px;
+}
+
+.free-text__text-pill {
+  padding-right: 84px;
+  padding-left: 84px;
+  font-size: 126px;
+  line-height: 168px;
+  border-radius: 84px;
+}
+
+// Partial alert and one-line headway have similar styles
+.partial-alert,
+.headway-section--row {
+  .free-text__line {
+    width: 1608px;
+    white-space: nowrap;
+  }
+
+  .free-text__icon-container {
+    width: 312px;
+    height: 208px;
+  }
+
+  .free-text__icon-image {
+    height: 128px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+}
+
+.partial-alert {
+  &--yellow {
+    .free-text {
+      color: #171f26;
+    }
+  }
+
+  // slight edits for partial alert because of the top border
+  .free-text__icon-container {
+    height: 202px;
+  }
+
+  .free-text__icon-image {
+    padding-top: 37px;
+  }
+
+  .free-text__line {
+    height: 202px;
+  }
+
+  .free-text__element {
+    vertical-align: middle;
+  }
+}
+
+// Full page headway and Full page alert have similar styles
+.headway-section--full_screen,
+.full-screen-alert__body-text {
+  .free-text__line {
+    width: 1517px;
+  }
+
+  .free-text__icon-container {
+    width: 168px;
+    height: 168px;
+    margin-right: 72px;
+    vertical-align: top;
+  }
+
+  .free-text__icon-image {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    object-fit: contain;
+  }
+}
+
+.headway-section {
+  .free-text {
+    color: #171f26;
+  }
+
+  .free-text__text-pill {
+    color: #fff;
+  }
+}
+
+.full-screen-alert__body-text {
+  .free-text__line {
+    width: 1544px;
+    line-height: 156px;
+  }
+
+  .free-text__line-container {
+    margin-bottom: 40px;
+  }
+
+  .free-text__icon-container {
+    margin-right: 64px;
+  }
+
+  .free-text__route-pill {
+    height: 128px;
+    line-height: 128px;
+    vertical-align: bottom;
+    transform: translateY(-10px);
+  }
+}
+
+// No Data and Overnight sections have similar styles
+.no-data-section,
+.overnight-section {
+  .free-text__line {
+    width: 1400px;
+    font-weight: 600;
+    color: #171f26;
+  }
+
+  .free-text__icon-container {
+    width: 312px;
+    height: 208px;
+  }
+
+  .free-text__icon-image {
+    height: 112.5px;
+    margin-top: 15.75px;
+  }
+}
+
+.no-data-section {
+  .free-text {
+    display: inline-block;
+  }
+}
+
+.overnight-section {
+  .free-text__line {
+    margin-top: 24px;
+  }
+
+  .free-text__icon-container {
+    vertical-align: top;
+  }
+}

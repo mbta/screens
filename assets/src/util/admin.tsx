@@ -1,3 +1,5 @@
+import getCsrfToken from "Util/csrf";
+
 const gatherSelectOptions = (rows, columnId) => {
   const options = rows.map((row) => row.values[columnId]);
   const uniqueOptions = new Set(options);
@@ -6,14 +8,11 @@ const gatherSelectOptions = (rows, columnId) => {
 
 const doSubmit = async (path, data) => {
   try {
-    const csrfToken = document.head.querySelector(
-      "[name~=csrf-token][content]"
-    ).content;
     const result = await fetch(path, {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        "x-csrf-token": csrfToken,
+        "x-csrf-token": getCsrfToken(),
       },
       credentials: "include",
       body: JSON.stringify(data),

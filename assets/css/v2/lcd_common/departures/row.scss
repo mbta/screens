@@ -1,0 +1,31 @@
+.departure-row,
+.departures__notice-row {
+  position: relative;
+  padding-bottom: 30px;
+}
+
+.departures__notice-row {
+  margin-top: 27px;
+  margin-left: 32px;
+}
+
+.departure-row__route {
+  display: inline-block;
+  margin-top: 27px;
+  margin-left: 32px;
+  vertical-align: top;
+}
+
+.departure-row__destination {
+  display: inline-block;
+  margin-top: 32px;
+  margin-left: 24px;
+  vertical-align: top;
+}
+
+.departure-row__time {
+  display: inline-block;
+  margin-top: 32px;
+  margin-right: 32px;
+  vertical-align: top;
+}

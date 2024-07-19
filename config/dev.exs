@@ -11,30 +11,35 @@ config :screens, ScreensWeb.Endpoint,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
-  watchers: [
-    node: [
-      "node_modules/webpack/bin/webpack.js",
-      "--mode",
-      "development",
-      "--watch",
-      cd: Path.expand("../assets", __DIR__)
-    ]
-  ]
+  watchers: [npx: ["exit_on_eof", "npm run watch", cd: "assets"]]
 
 config :screens,
   default_api_v3_url: System.get_env("API_V3_URL", "https://api-v3.mbta.com/"),
   api_v3_key: System.get_env("API_V3_KEY"),
-  config_fetcher: Screens.Config.State.LocalFetch,
+  config_fetcher: Screens.Config.Fetch.Local,
+  pending_config_fetcher: Screens.PendingConfig.Fetch.Local,
+  triptych_player_fetcher: Screens.TriptychPlayer.Fetch.Local,
   last_deploy_fetcher: Screens.Util.LastDeploy.LocalFetch,
   local_config_file_spec: {:priv, "local.json"},
+  local_pending_config_file_spec: {:priv, "local_pending.json"},
   local_signs_ui_config_file_spec: {:priv, "signs_ui_config.json"},
-  signs_ui_config_fetcher: Screens.SignsUiConfig.State.LocalFetch
+  signs_ui_config_fetcher: Screens.SignsUiConfig.Fetch.Local,
+  local_triptych_player_file_spec: {:priv, "triptych_player_to_screen_id.json"}
 
 config :screens, ScreensWeb.AuthManager, secret_key: "secret key"
 
 config :ueberauth, Ueberauth,
   providers: [
-    cognito: {Screens.Ueberauth.Strategy.Fake, []}
+    keycloak: {Screens.Ueberauth.Strategy.Fake, [roles: ["screens-admin"]]}
+  ]
+
+config :ueberauth_oidcc,
+  providers: [
+    keycloak: [
+      issuer: :keycloak_issuer,
+      client_id: "dev-client",
+      client_secret: "fake-secret"
+    ]
   ]
 
 # ## SSL Support

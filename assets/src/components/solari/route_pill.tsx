@@ -12,7 +12,7 @@ interface PillType {
 const routeToPill = (
   route: string,
   routeId: string,
-  trackNumber: number | null
+  trackNumber: string | null,
 ): PillType => {
   if (route === null) {
     return { routeName: null, routePillColor: null };
@@ -69,29 +69,33 @@ const routeToPill = (
 };
 
 const Pill = ({ routeName, routePillColor }: PillType): JSX.Element => {
+  let route: JSX.Element | string | null;
+
   if (routeName === "CR") {
-    routeName = (
+    route = (
       <img
         className="departure-route--icon"
         src={imagePath("commuter-rail.svg")}
       ></img>
     );
   } else if (routeName === "Boat") {
-    routeName = (
+    route = (
       <img className="departure-route--icon" src={imagePath("ferry.svg")}></img>
     );
   } else if (routeName === "BUS") {
-    routeName = (
+    route = (
       <img
         className="departure-route--icon"
         src={imagePath("bus-black.svg")}
       ></img>
     );
+  } else {
+    route = routeName;
   }
 
   return (
     <div className={classWithModifier("departure-route", routePillColor)}>
-      {routeName && <BaseRoutePill route={routeName} />}
+      {route && <BaseRoutePill route={route} />}
     </div>
   );
 };
@@ -107,12 +111,13 @@ const DepartureRoutePill = ({
 }: {
   route: string;
   routeId: string;
-  trackNumber: number | null;
+  trackNumber: string | null;
 }): JSX.Element => <Pill {...routeToPill(route, routeId, trackNumber)} />;
 
 const sectionPillMapping: Record<string, PillType> = {
   blue: { routeName: "BL", routePillColor: "blue" },
   red: { routeName: "RL", routePillColor: "red" },
+  green: { routeName: "GL", routePillColor: "green" },
   mattapan: { routeName: "M", routePillColor: "red" },
   orange: { routeName: "OL", routePillColor: "orange" },
   cr: { routeName: "CR", routePillColor: "purple" },
@@ -162,11 +167,11 @@ const PagedDepartureRoutePill = ({ route, routeId, selected }): JSX.Element => {
   ];
   const pillClass = classWithModifiers(
     "later-departure__route-pill",
-    modifiers
+    modifiers,
   );
   const textClass = classWithModifiers(
     "later-departure__route-text",
-    modifiers
+    modifiers,
   );
 
   const routeText = routeId.startsWith("CR-") ? routeIdMapping[routeId] : route;

@@ -2,7 +2,8 @@ defmodule ScreensWeb.ScreenController do
   use ScreensWeb, :controller
   require Logger
 
-  alias Screens.Config.{Screen, State}
+  alias Screens.Config.Cache
+  alias ScreensConfig.Screen
 
   @default_app_id :bus_eink
   @app_ids ~w[bus_eink gl_eink_single gl_eink_double solari dup]a
@@ -14,7 +15,7 @@ defmodule ScreensWeb.ScreenController do
   plug(:last_refresh)
 
   defp check_config(conn, _) do
-    if State.ok?() do
+    if Cache.ok?() do
       conn
     else
       conn
@@ -54,10 +55,7 @@ defmodule ScreensWeb.ScreenController do
   end
 
   defp screen_ids(target_app_id) do
-    ids =
-      for {screen_id, %Screen{app_id: ^target_app_id}} <- State.screens() do
-        screen_id
-      end
+    ids = Cache.screen_ids(&match?({_screen_id, %Screen{app_id: ^target_app_id}}, &1))
 
     Enum.sort(ids, &id_sort_fn/2)
   end
@@ -77,7 +75,7 @@ defmodule ScreensWeb.ScreenController do
 
     _ = Screens.LogScreenData.log_page_load(screen_id, is_screen)
 
-    case State.screen(screen_id) do
+    case Cache.screen(screen_id) do
       %Screen{app_id: app_id} ->
         conn
         |> assign(:app_id, app_id)

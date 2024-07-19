@@ -1,8 +1,6 @@
 defmodule ScreensWeb.AudioView do
   use ScreensWeb, :view
 
-  import Phoenix.HTML
-
   @spec render_pill_header(atom(), String.t() | nil) :: Phoenix.HTML.safe()
   defp render_pill_header(pill, wayfinding) do
     ~E|<s><%= render_pill(pill) %> trips<%= render_wayfinding(wayfinding) %></s>|

@@ -61,8 +61,7 @@ defmodule Screens.Predictions.Parser do
     trip = Map.get(included_data, {"trip", trip_id})
     stop = Map.get(included_data, {"stop", stop_id})
     route = Map.get(included_data, {"route", route_id})
-
-    track_number = parse_track_number(stop_id)
+    track_number = Map.get(included_data, {"stop", stop_id}).platform_code
 
     vehicle =
       case get_in(relationships, ["vehicle", "data", "id"]) do
@@ -99,17 +98,5 @@ defmodule Screens.Predictions.Parser do
   defp parse_time(s) do
     {:ok, time, _} = DateTime.from_iso8601(s)
     time
-  end
-
-  @spec parse_track_number(stop_id :: String.t() | nil) :: pos_integer() | nil
-  defp parse_track_number(nil), do: nil
-
-  defp parse_track_number(stop_id) do
-    ~r|^\w+-\w+-(\d+)$|
-    |> Regex.run(stop_id, capture: :all_but_first)
-    |> case do
-      nil -> nil
-      [track_number] -> String.to_integer(track_number)
-    end
   end
 end

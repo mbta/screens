@@ -23,7 +23,7 @@ const DisableModeRow = ({ mode, modeDisabled, onChange }) => {
 };
 
 const Devops = () => {
-  const [disabledModes, setDisabledModes] = useState([]);
+  const [disabledModes, setDisabledModes] = useState<any[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const Devops = () => {
     { name: "Bus", id: "bus" },
     { name: "Subway", id: "subway" },
     { name: "Light Rail", id: "light_rail" },
-    { name: "Commuter Rail", id: "commuter_rail" },
+    { name: "Commuter Rail", id: "rail" },
   ];
 
   return (

@@ -1,8 +1,8 @@
 defmodule Screens.V2.WidgetInstance.ShuttleBusInfoTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config.Screen
-  alias Screens.Config.V2.{PreFare, ShuttleBusInfo, ShuttleBusSchedule}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{PreFare, ShuttleBusInfo, ShuttleBusSchedule}
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ShuttleBusInfo, as: ShuttleBusInfoWidget
 

@@ -1,4 +1,4 @@
-@import url("https://rsms.me/inter/inter.css");
+@import "https://rsms.me/inter/inter.css";
 
 @import "fonts_inter";
 
@@ -22,7 +22,7 @@
 @import "solari/loading";
 
 body {
-  margin: 0px;
+  margin: 0;
 
   &.scroll-disabled {
     overflow: hidden;
