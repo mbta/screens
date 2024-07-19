@@ -1,6 +1,6 @@
 .departure-crowding {
-  vertical-align: middle;
   display: inline-block;
+  vertical-align: middle;
 
   &--normal {
     width: 52px;
@@ -8,8 +8,8 @@
   }
 
   &--overhead {
-    height: 127.5px;
     width: 209px;
+    height: 127.5px;
     padding-right: 25px;
     text-align: right;
 

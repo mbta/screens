@@ -5,12 +5,12 @@
     height: 416px;
   }
 
-  &:not(:first-child):before {
-    content: "";
+  &:not(:first-child)::before {
     position: absolute;
-    left: 0px;
-    height: 6px;
+    left: 0;
     width: 1920px;
+    height: 6px;
+    content: "";
     background-color: #bfbebb;
   }
 }

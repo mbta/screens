@@ -1,25 +1,26 @@
 .normal-header {
   position: relative;
-  height: 100%;
   width: 100%;
-  background: rgb(23, 31, 38);
+  height: 100%;
+  background: rgb(23 31 38);
 }
+
 .normal-header-icon {
   display: inline-block;
   vertical-align: middle;
 }
 
 .normal-header-icon__image {
-  height: 128px;
   width: 128px;
+  height: 128px;
   margin-right: 28px;
 }
 
 .normal-header-title {
-  width: 1000px;
   position: absolute;
-  left: 40px;
   bottom: 40px;
+  left: 40px;
+  width: 1000px;
 
   &--large {
     font-size: 104px;
@@ -34,10 +35,10 @@
 
 .normal-header-title__text {
   display: inline-block;
-  vertical-align: middle;
   font-family: Helvetica, sans-serif;
   font-weight: 700;
-  color: #ffffff;
+  color: #fff;
+  vertical-align: middle;
 
   .normal-header-title--with-icon & {
     width: 668px;
@@ -46,13 +47,13 @@
 
 .normal-header-time {
   position: absolute;
-  right: 40px;
   top: 40px;
+  right: 40px;
   font-family: Inter;
   font-size: 56px;
-  line-height: 56px;
   font-weight: 600;
-  color: #ffffff;
+  line-height: 56px;
+  color: #fff;
 }
 
 .left-screen .normal-header-time,
@@ -62,11 +63,12 @@
 
 .normal-header__environment {
   @include font--text--75bold;
+
   position: absolute;
-  font-size: 36px;
-  color: #ffffff;
-  letter-spacing: 0;
-  line-height: 48px;
   padding-top: 10px;
   margin-left: 48px;
+  font-size: 36px;
+  line-height: 48px;
+  color: #fff;
+  letter-spacing: 0;
 }

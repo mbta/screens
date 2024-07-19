@@ -1,42 +1,40 @@
 .page-load-no-data-container {
+  box-sizing: border-box;
   width: 1080px;
   height: 1920px;
-  background: #e6e4e1;
   padding-left: 80px;
-  box-sizing: border-box;
   overflow: hidden;
+  background: #e6e4e1;
 }
 
 .page-load-no-data__main-content__heading {
   width: 810px;
-
-  color: #000000;
-  font-size: 104px;
-  font-family: Inter, sans-serif;
-  font-weight: bold;
-  letter-spacing: 0px;
-  line-height: 112px;
   margin-bottom: 64px;
+  font-family: Inter, sans-serif;
+  font-size: 104px;
+  font-weight: bold;
+  line-height: 112px;
+  color: #000;
+  letter-spacing: 0;
 }
 
 .page-load-no-data__main-content__subheading {
-  margin-top: 47px;
   width: 916px;
   height: 184px;
-
-  color: #000000;
-  font-size: 72px;
+  margin-top: 47px;
   font-family: Inter, sans-serif;
+  font-size: 72px;
   font-weight: normal;
-  letter-spacing: 0px;
   line-height: 92px;
+  color: #000;
+  letter-spacing: 0;
 }
 
 .page-load-no-data__main-content__loading-icon-container {
-  margin-top: 155px;
-  margin-bottom: 56px;
   width: 236px;
   height: 236px;
+  margin-top: 155px;
+  margin-bottom: 56px;
 }
 
 .page-load-no-data__main-content__loading-icon {

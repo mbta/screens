@@ -10,11 +10,18 @@
   }
 }
 
+.free-text__string--nowrap {
+  white-space: nowrap;
+}
+
 .free-text__route-pill {
   display: inline-block;
+  width: 423px;
+  height: 218px;
   font-family: Helvetica, sans-serif;
   font-weight: 700;
   text-align: center;
+  border-radius: 109px;
 
   &--green,
   &--green_b,
@@ -28,7 +35,8 @@
     background: $line-color-blue;
   }
 
-  &--red {
+  &--red,
+  &--mattapan {
     background: $line-color-red;
   }
 
@@ -43,18 +51,9 @@
   &--cr {
     background: $line-color-cr;
   }
-}
 
-.free-text__route-pill {
-  height: 218px;
-  width: 423px;
-  border-radius: 109px;
   .free-text__route-pill_text {
     font-size: 96px;
     line-height: unset;
   }
-}
-
-.free-text__string--nowrap {
-  white-space: nowrap;
 }

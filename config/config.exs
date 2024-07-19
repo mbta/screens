@@ -22,7 +22,7 @@ config :logger,
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
-  metadata: [:client_ip, :request_id]
+  metadata: [:client_ip, :remote_ip, :request_id]
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
@@ -41,6 +41,9 @@ config :ex_aws, :hackney_opts,
 
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
+config :hackney, mod_metrics: :hackney_telemetry
+config :hackney_telemetry, report_interval: 5_000
+
 config :screens,
   redirect_http?: true,
   keycloak_role: "screens-admin"
@@ -52,6 +55,11 @@ config :ueberauth, Ueberauth,
   providers: [
     keycloak: nil
   ]
+
+config :ex_cldr,
+  default_locale: "en",
+  default_backend: Screens.Cldr,
+  json_library: Jason
 
 config :screens,
   gds_dms_username: "mbtadata@gmail.com",
@@ -319,6 +327,68 @@ config :screens,
         alert_headsign: "Ashmont/Braintree",
         headway_headsign: "Alewife"
       }
+    ],
+    # Park Street
+    "place-pktrm" => [
+      # Green Line
+      # Government Center -> Park Street -> Boylston
+      %{
+        # Government Center
+        not_informed: "70202",
+        # Boylston
+        informed: "70159",
+        alert_headsign: "Copley & West",
+        headway_headsign: "Northbound"
+      },
+      # Boylston -> Park Street -> Government Center
+      %{
+        # Boylston
+        not_informed: "70158",
+        # Government Center
+        informed: "70201",
+        alert_headsign: "Northbound",
+        headway_headsign: "Copley & West"
+      },
+      # Red Line
+      # Charles/MGH -> Park Street -> Downtown Crossing (Southbound)
+      %{
+        # Charles/MGH
+        not_informed: "70073",
+        # Downtown Crossing
+        informed: "70077",
+        alert_headsign: "Ashmont/Braintree",
+        headway_headsign: "Alewife"
+      },
+      # Downtown Crossing -> Park Street -> Charles/MGH (Northbound)
+      %{
+        # Downtown Crossing
+        not_informed: "70078",
+        # Charles/MGH
+        informed: "70074",
+        alert_headsign: "Alewife",
+        headway_headsign: "Ashmont/Braintree"
+      }
+    ],
+    # Arlington
+    "place-armnl" => [
+      # Boylston -> Arlington -> Copley
+      %{
+        # Boylston
+        not_informed: "70159",
+        # Copley
+        informed: "70155",
+        alert_headsign: "Copley & West",
+        headway_headsign: "Northbound"
+      },
+      # Copley -> Arlington -> Boylston
+      %{
+        # Copley
+        not_informed: "70154",
+        # Boylston
+        informed: "70158",
+        alert_headsign: "Northbound",
+        headway_headsign: "Copley & West"
+      }
     ]
   },
   prefare_alert_headsign_matchers: %{
@@ -411,6 +481,10 @@ config :screens, :screens_by_alert,
   screens_by_alert_ttl_seconds: 40,
   screens_last_updated_ttl_seconds: 3600,
   screens_ttl_seconds: 40
+
+config :screens, Screens.ScreenApiResponseCache,
+  gc_interval: :timer.hours(1),
+  allocated_memory: 250_000_000
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

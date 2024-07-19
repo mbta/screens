@@ -3,25 +3,18 @@ defmodule ScreensWeb.Plugs.Metadata do
 
   require Logger
 
-  def init(default), do: default
+  def init(opts), do: opts
 
-  def call(conn, _default) do
-    log_client_ip(conn)
-
+  def call(conn, _opts) do
     conn
+    |> copy_remote_ip_to_client_ip()
   end
 
-  defp log_client_ip(conn) do
-    forwarded_for =
-      conn
-      |> Plug.Conn.get_req_header("x-forwarded-for")
-      |> List.first()
+  defp copy_remote_ip_to_client_ip(conn) do
+    client_ip = Logger.metadata()[:remote_ip]
 
-    remote_ip =
-      conn.remote_ip
-      |> :inet_parse.ntoa()
-      |> to_string()
+    Logger.metadata(client_ip: client_ip)
 
-    Logger.metadata(client_ip: forwarded_for || remote_ip)
+    conn
   end
 end

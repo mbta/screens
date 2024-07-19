@@ -21,7 +21,7 @@ interface PreFareSingleScreenAlertProps {
   remedy_bold?: string;
   routes: EnrichedRoute[];
   unaffected_routes: EnrichedRoute[];
-  endpoints: string[];
+  endpoints: [string, string];
   effect: string;
   region: string;
   updated_at: string;
@@ -86,7 +86,7 @@ const StandardLayout: React.ComponentType<StandardLayoutProps> = ({
 };
 
 interface DownstreamLayoutProps {
-  endpoints: string[];
+  endpoints: [string, string];
   effect: string;
   remedy: string;
   disruptionDiagram?: DisruptionDiagramData;
@@ -243,7 +243,7 @@ const StandardIssueSection: React.ComponentType<StandardIssueSectionProps> = ({
 );
 
 interface DownstreamIssueSectionProps {
-  endpoints: string[];
+  endpoints: [string, string];
 }
 
 const DownstreamIssueSection: React.ComponentType<

@@ -3,8 +3,19 @@ import _ from "lodash";
 
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
 
-const textPills = ["red", "blue", "orange", "green", "silver"];
-const iconPills = ["cr", "bus"];
+const textPills = [
+  "red",
+  "blue",
+  "orange",
+  "green",
+  "silver",
+  "green_b",
+  "green_c",
+  "green_d",
+  "green_e",
+  "mattapan",
+];
+const iconPills = ["cr", "bus", "ferry"];
 
 const iconPaths: { [key: string]: string } = _.mapValues(
   {
@@ -99,12 +110,13 @@ const TextRoutePill = ({ route }: { route: string }) => {
     green_c: "GL·C",
     green_d: "GL·D",
     green_e: "GL·E",
+    mattapan: "M",
   }[route];
 
   const branch = route.startsWith("green_") ? "branch" : "trunk";
 
   return (
-    <span className="free-text__element free-text__route-container">
+    <span className="free-text__element">
       <div className={classWithModifier("free-text__route-pill", route)}>
         <div
           className={classWithModifier("free-text__route-pill__text", branch)}
@@ -118,7 +130,7 @@ const TextRoutePill = ({ route }: { route: string }) => {
 
 const IconRoutePill = ({ route }: { route: string }) => {
   return (
-    <span className="free-text__element free-text__route-container">
+    <span className="free-text__element">
       <div className={classWithModifier("free-text__route-pill", route)}>
         <img className="free-text__icon-image" src={srcForIcon(route)} />
       </div>
@@ -128,7 +140,7 @@ const IconRoutePill = ({ route }: { route: string }) => {
 
 const TextPill = ({ color, text }: { color: string; text?: string }) => {
   return (
-    <span className="free-text__element free-text__pill-container">
+    <span className="free-text__element">
       <div className={classWithModifier("free-text__text-pill", color)}>
         <div className="free-text__text-pill__text">{text}</div>
       </div>

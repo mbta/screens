@@ -1,8 +1,8 @@
 @import "../base/base_departure_destination";
 
 .departure-destination {
-  color: #171f26;
   display: inline-block;
+  color: #171f26;
   vertical-align: middle;
 }
 
@@ -12,8 +12,8 @@
     font-size: 50px;
 
     &--no-departures-placeholder {
-      font-size: 40px;
       width: 815px;
+      font-size: 40px;
     }
   }
 }
@@ -31,6 +31,7 @@
 .screen-container--size-large {
   .departure-destination {
     @include font--text--65medium;
+
     width: 550px;
     font-size: 96px;
 

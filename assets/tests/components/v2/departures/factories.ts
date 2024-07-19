@@ -6,8 +6,9 @@ import { TimeWithCrowding } from "Components/v2/departures/departure_times";
 
 export const normalSection = Factory.define<Section>(() => ({
   type: "normal_section",
-  layout: { min: 1, base: null, max: null },
+  layout: { min: 1, base: null, max: null, include_later: false },
   rows: departureRow.buildList(1),
+  header: { title: null, arrow: null },
 }));
 
 export const departureRow = Factory.define<Row>(({ sequence }) => ({

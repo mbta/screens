@@ -1,13 +1,13 @@
 .link-footer {
   position: relative;
   height: 172px;
-  background: #000000;
+  background: #000;
 }
 
 .link-footer__contents {
   position: absolute;
-  left: 40px;
   top: 22px;
+  left: 40px;
 }
 
 .link-footer__logo {
@@ -16,20 +16,19 @@
 }
 
 .link-footer__logo-image {
-  height: 128px;
   width: 128px;
+  height: 128px;
   margin-right: 40px;
 }
 
 .link-footer__message {
   display: inline-block;
-  vertical-align: middle;
   width: 952px;
-
+  font-family: Inter;
   font-size: 40px;
   line-height: 52px;
-  font-family: Inter;
-  color: #ffffff;
+  color: #fff;
+  vertical-align: middle;
 }
 
 .link-footer__message-text {

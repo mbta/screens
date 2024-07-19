@@ -12,7 +12,7 @@ type Props = {
 const NoticeRow: ComponentType<Props> = ({ row }) => {
   return (
     <div className="departures__notice-row">
-      <FreeText lines={{ text: row.text.text }} />
+      <FreeText lines={row.text} />
     </div>
   );
 };

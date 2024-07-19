@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.Alerts.Alert
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.{Alerts, Departures, Header}
+  alias ScreensConfig.V2.Departures.Header, as: SectionHeader
   alias ScreensConfig.V2.Departures.{Headway, Layout, Query, Section}
   alias ScreensConfig.V2.Dup, as: DupConfig
   alias Screens.Predictions.Prediction
@@ -297,6 +298,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -313,6 +315,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -345,6 +348,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -361,6 +365,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -393,6 +398,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -409,6 +415,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -464,6 +471,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -480,6 +488,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -512,6 +521,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -528,6 +538,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -560,6 +571,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -576,6 +588,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -644,6 +657,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -670,6 +684,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -692,6 +707,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -718,6 +734,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -740,6 +757,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -766,6 +784,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -823,6 +842,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -845,6 +865,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -867,6 +888,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -924,6 +946,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -976,6 +999,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1028,6 +1052,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1221,6 +1246,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1273,6 +1299,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1325,6 +1352,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1471,6 +1499,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1493,6 +1522,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1515,6 +1545,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1704,6 +1735,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1730,6 +1762,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1752,6 +1785,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1885,6 +1919,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1907,6 +1942,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -1929,6 +1965,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -2015,6 +2052,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -2037,6 +2075,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -2059,6 +2098,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -2144,17 +2184,23 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [%{layout: %Layout{}, rows: [], type: :normal_section}],
+          section_data: [
+            %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
+          ],
           slot_names: [:main_content_zero]
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [%{layout: %Layout{}, rows: [], type: :normal_section}],
+          section_data: [
+            %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
+          ],
           slot_names: [:main_content_one]
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [%{layout: %Layout{}, rows: [], type: :normal_section}],
+          section_data: [
+            %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
+          ],
           slot_names: [:main_content_two]
         }
       ]
@@ -2209,17 +2255,23 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [%{layout: %Layout{}, rows: [], type: :normal_section}],
+          section_data: [
+            %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
+          ],
           slot_names: [:main_content_zero]
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [%{layout: %Layout{}, rows: [], type: :normal_section}],
+          section_data: [
+            %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
+          ],
           slot_names: [:main_content_one]
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [%{layout: %Layout{}, rows: [], type: :normal_section}],
+          section_data: [
+            %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
+          ],
           slot_names: [:main_content_two]
         }
       ]
@@ -2290,6 +2342,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:
@@ -2312,6 +2365,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             %{
               type: :normal_section,
               layout: %Layout{},
+              header: %SectionHeader{},
               rows: [
                 %Screens.V2.Departure{
                   prediction:

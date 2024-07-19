@@ -4,8 +4,8 @@
 
 .body-normal__left {
   position: absolute;
-  top: 0px;
-  left: 0px;
+  top: 0;
+  left: 0;
   width: 1080px;
   height: 1720px;
   overflow: hidden;
@@ -14,7 +14,7 @@
 
 .body-normal__right {
   position: absolute;
-  top: 0px;
+  top: 0;
   left: 1080px;
   width: 1080px;
   height: 1720px;

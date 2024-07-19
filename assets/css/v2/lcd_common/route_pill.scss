@@ -34,18 +34,28 @@
 
   &--yellow {
     background-color: $line-color-bus;
-    box-shadow: 2px 4px 2px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
+  }
+
+  &--outline {
+    background: none;
+    border: 2px solid #2e3e4d;
+    box-shadow: none;
+
+    .route-pill__slashed-text {
+      color: #2e3e4d;
+    }
   }
 }
 
 .route-pill__text {
   position: absolute;
   width: 100%;
-  text-align: center;
-  font-family: "neue-haas-grotesk-text";
+  font-family: neue-haas-grotesk-text;
   font-size: 48px;
-  line-height: 74px;
   font-weight: 700;
+  line-height: 74px;
+  text-align: center;
 
   &--yellow {
     color: black;
@@ -59,6 +69,10 @@
   &--silver,
   &--teal {
     color: white;
+  }
+
+  &--outline {
+    color: #2e3e4d;
   }
 }
 
@@ -76,11 +90,11 @@
 .route-pill__slashed-text {
   position: absolute;
   width: 100%;
-  text-align: center;
-  font-family: "neue-haas-grotesk-text";
+  font-family: neue-haas-grotesk-text;
   font-size: 32px;
-  line-height: 74px;
   font-weight: 700;
+  line-height: 74px;
+  text-align: center;
 }
 
 .route-pill__slashed-part-1 {

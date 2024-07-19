@@ -1,7 +1,7 @@
 @mixin large-text {
   font-size: 112px;
-  line-height: 120px;
   font-weight: 700;
+  line-height: 120px;
 }
 
 @mixin small-text {
@@ -16,183 +16,15 @@
 }
 
 .alert-container--single-page {
-  font-family: Inter;
-  flex-grow: 1;
-  min-height: 0;
-  width: 1080px;
-  padding: 0 32px 32px 32px;
   box-sizing: border-box;
+  flex-grow: 1;
+  width: 1080px;
+  min-height: 0;
+  padding: 0 32px 32px;
+  font-family: Inter;
 
-  /* Alert contents */
-  .alert-card {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0px 10px 20px 0px rgba(23, 31, 38, 0.25);
-    background-color: #e5e4e1;
-
-    &--no-banner {
-      border-radius: 4px;
-    }
-
-    &--with-banner {
-      border-radius: 0 0 4px 4px;
-    }
-  }
-
-  .alert-card__body {
-    min-height: 0;
-    flex-grow: 1;
-    padding: 120px 56px 32px 56px;
-    box-sizing: border-box;
-    &--shuttle {
-      padding-top: 80px;
-      padding-bottom: 0;
-    }
-
-    .alert-card__content-block {
-      height: 100%;
-      display: flex;
-      flex-flow: column;
-      align-items: flex-start;
-    }
-  }
-
-  .alert-card__issue,
-  .alert-card__remedy {
-    display: flex;
-  }
-  .alert-card__issue {
-    margin-bottom: 48px;
-  }
-  .alert-card__remedy {
-    margin-bottom: 32px;
-    &__text {
-      font-size: 74px;
-      font-weight: 600;
-      align-self: center;
-    }
-  }
-
-  .alert-card__issue__location {
-    @include small-text();
-    margin-top: 40px;
-  }
-
-  .alert-card__remedy__shuttle-icons {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .alert-card__icon {
-    color: #171f26;
-    height: 124px;
-    min-width: 124px;
-    margin-right: 45px;
-  }
-
-  .alert-card__content-block__text {
-    font-weight: 700;
-    &--large {
-      @include large-text();
-    }
-    &--medium {
-      font-size: 86.4px;
-      line-height: 95px;
-    }
-  }
-
-  .alert-card__content-block--downstream {
-    .alert-card__content-block__text {
-      line-height: 108px;
-    }
-  }
-
-  .alert-card__fallback__icon {
-    height: 192px;
-    color: #171f26;
-    margin-bottom: 48px;
-  }
-  .alert-card__fallback__issue-text {
-    font-size: 88px;
-    line-height: 105.6px;
-    font-weight: 700;
-    margin-bottom: 54px;
-  }
-  .alert-card__fallback__pio-text {
-    font-size: 68px;
-    line-height: 81px;
-    font-weight: 500;
-    &--small {
-      font-size: 55.1px;
-      line-height: 65.63px;
-    }
-    &--bold {
-      font-weight: 700;
-    }
-  }
-
-  .alert-card__body__accessibility-info {
-    &--text {
-      margin-top: 22px;
-      @include small-text();
-    }
-  }
-
-  .alert-card__isa-icon {
-    height: 40px;
-    margin: auto 45px 0 auto;
-  }
-
-  .alert-card__footer {
-    flex-shrink: 0;
-    background: #cccbc8;
-    border-radius: 0px 0px 4px 4px;
-    height: 84px;
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
-    padding: 20px 60px;
-    font-size: 32px;
-    justify-content: right;
-  }
-  .alert-card__footer__cause {
-    flex-grow: 1;
-  }
-  .alert-card__footer__datetime {
-    font-weight: 600;
-  }
-
-  .disruption-diagram-container {
-    width: 100%;
-    flex: 1;
-    margin-bottom: 64px;
-    min-height: 0;
-  }
-}
-
-.alert-container--no-banner {
-  padding-top: 32px;
-}
-
-.alert-container--right {
-  position: absolute;
-  top: 0;
-  left: 1080px;
-}
-
-.alert-card__content-block__route-pill {
-  height: 124px;
-  display: inline;
-  vertical-align: bottom;
-  margin-right: 9px;
-  &:last-of-type {
-    margin-right: 46px;
-  }
-}
-
-.alert-container--single-page {
   /* Background colors */
+
   &.alert-container--blue {
     background-color: $line-color-blue;
   }
@@ -211,5 +43,188 @@
 
   &.alert-container--green {
     background-color: $line-color-green;
+  }
+
+  /* Alert contents */
+
+  .alert-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #e5e4e1;
+    box-shadow: 0 10px 20px 0 rgb(23 31 38 / 25%);
+
+    &--no-banner {
+      border-radius: 4px;
+    }
+
+    &--with-banner {
+      border-radius: 0 0 4px 4px;
+    }
+  }
+
+  .alert-card__body {
+    box-sizing: border-box;
+    flex-grow: 1;
+    min-height: 0;
+    padding: 120px 56px 32px;
+
+    &--shuttle {
+      padding-top: 80px;
+      padding-bottom: 0;
+    }
+
+    .alert-card__content-block {
+      display: flex;
+      flex-flow: column;
+      align-items: flex-start;
+      height: 100%;
+    }
+  }
+
+  .alert-card__issue,
+  .alert-card__remedy {
+    display: flex;
+  }
+
+  .alert-card__issue {
+    margin-bottom: 48px;
+  }
+
+  .alert-card__remedy {
+    margin-bottom: 32px;
+
+    &__text {
+      align-self: center;
+      font-size: 74px;
+      font-weight: 600;
+    }
+  }
+
+  .alert-card__issue__location {
+    @include small-text;
+
+    margin-top: 40px;
+  }
+
+  .alert-card__remedy__shuttle-icons {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .alert-card__icon {
+    min-width: 124px;
+    height: 124px;
+    margin-right: 45px;
+    color: #171f26;
+  }
+
+  .alert-card__content-block__text {
+    font-weight: 700;
+
+    &--large {
+      @include large-text;
+    }
+
+    &--medium {
+      font-size: 86.4px;
+      line-height: 95px;
+    }
+  }
+
+  .alert-card__content-block--downstream {
+    .alert-card__content-block__text {
+      line-height: 108px;
+    }
+  }
+
+  .alert-card__fallback__icon {
+    height: 192px;
+    margin-bottom: 48px;
+    color: #171f26;
+  }
+
+  .alert-card__fallback__issue-text {
+    margin-bottom: 54px;
+    font-size: 88px;
+    font-weight: 700;
+    line-height: 105.6px;
+  }
+
+  .alert-card__fallback__pio-text {
+    font-size: 68px;
+    font-weight: 500;
+    line-height: 81px;
+
+    &--small {
+      font-size: 55.1px;
+      line-height: 65.63px;
+    }
+
+    &--bold {
+      font-weight: 700;
+    }
+  }
+
+  .alert-card__body__accessibility-info {
+    &--text {
+      margin-top: 22px;
+
+      @include small-text;
+    }
+  }
+
+  .alert-card__isa-icon {
+    height: 40px;
+    margin: auto 45px 0 auto;
+  }
+
+  .alert-card__footer {
+    box-sizing: border-box;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: right;
+    height: 84px;
+    padding: 20px 60px;
+    font-size: 32px;
+    background: #cccbc8;
+    border-radius: 0 0 4px 4px;
+  }
+
+  .alert-card__footer__cause {
+    flex-grow: 1;
+  }
+
+  .alert-card__footer__datetime {
+    font-weight: 600;
+  }
+
+  .disruption-diagram-container {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    margin-bottom: 64px;
+  }
+}
+
+.alert-container--no-banner {
+  padding-top: 32px;
+}
+
+.alert-container--right {
+  position: absolute;
+  top: 0;
+  left: 1080px;
+}
+
+.alert-card__content-block__route-pill {
+  display: inline;
+  height: 124px;
+  margin-right: 9px;
+  vertical-align: bottom;
+
+  &:last-of-type {
+    margin-right: 46px;
   }
 }

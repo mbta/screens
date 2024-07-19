@@ -6,29 +6,32 @@
 
 .departures__headway-message {
   @include font--text--55regular;
-  font-size: 72px;
-  text-align: right;
-  color: #999999;
-  padding-right: 40px;
+
   padding-top: 72px;
+  padding-right: 40px;
   padding-bottom: 72px;
+  font-size: 72px;
+  color: #999;
+  text-align: right;
 }
 
 .departures__headway-message--large {
   @include font--display--75bold;
+
   font-size: 96px;
   line-height: 96px;
-  color: #000000;
+  color: #000;
   letter-spacing: 1px;
 }
 
 .departures__headway-message__subheading {
   @include font--text--55regular;
-  font-size: 56px;
-  text-align: right;
-  color: #999999;
+
   padding-right: 40px;
   padding-bottom: 72px;
+  font-size: 56px;
+  color: #999;
+  text-align: right;
 }
 
 .departures__headway-message__range {
@@ -36,11 +39,11 @@
 }
 
 .departures__departure {
+  padding-top: 72px;
+  padding-right: 40px;
+  padding-bottom: 72px;
   font-size: 336px;
   text-align: right;
-  padding-right: 40px;
-  padding-top: 72px;
-  padding-bottom: 72px;
 
   & .base-departure-time__text {
     line-height: 1em;
@@ -64,20 +67,20 @@
 }
 
 .departures__hairline {
-  height: 2px;
   width: 718px;
-  background: #cccccc;
+  height: 2px;
+  background: #ccc;
 }
 
 .departures__container {
-  height: 100%;
   position: relative;
+  height: 100%;
 }
 
 .departures__delay-badge {
   position: absolute;
+  right: 0;
   bottom: 52px;
-  right: 0px;
 }
 
 .departures-list-psa {

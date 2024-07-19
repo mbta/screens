@@ -11,7 +11,7 @@ const CRDeparturesHeaderFree = ({ headerPill }) => {
       <div className="departures-card__header-text">
         <span>Free Commuter Rail during</span>
         <span className="pill-container">
-          <RoutePill {...headerPill} />
+          <RoutePill pill={headerPill} />
         </span>
         <span>disruption</span>
       </div>

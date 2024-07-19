@@ -1,61 +1,65 @@
 .header {
-  background-color: black;
-  color: white;
-  height: 288px;
   position: relative;
+  height: 288px;
+  color: white;
+  background-color: black;
 }
 
 .header__environment {
   @include font--text--75bold;
+
   position: absolute;
   top: 12px;
   left: 40px;
   font-size: 48px;
-  color: #ffffff;
-  letter-spacing: 0;
   line-height: 48px;
+  color: #fff;
+  letter-spacing: 0;
 }
 
 .header__time {
   @include font--text--55regular;
+
   position: absolute;
   top: 28px;
   right: 40px;
   font-size: 72px;
-  color: #ffffff;
-  letter-spacing: 0;
-  text-align: right;
   line-height: 72px;
+  color: #fff;
+  text-align: right;
+  letter-spacing: 0;
 }
 
 .header__realtime-indicator {
   @include font--text--55regular;
+
   position: absolute;
   right: 40px;
   bottom: 47px;
   width: 240px;
   height: 64px;
   font-size: 24px;
-  color: #ffffff;
-  text-align: right;
   line-height: 32px;
+  color: #fff;
+  text-align: right;
   text-transform: uppercase;
 }
 
 .header__realtime-indicator-icon {
-  height: 32px;
   width: 32px;
+  height: 32px;
   margin-right: 8px;
 }
 
 .header__stop-name {
   @include font--display--75bold;
-  width: 820px;
-  color: #ffffff;
-  letter-spacing: 1px;
+
   position: absolute;
   bottom: 38px;
   left: 56px;
+  width: 820px;
+  color: #fff;
+  letter-spacing: 1px;
 }
 
 .header__stop-name--small {

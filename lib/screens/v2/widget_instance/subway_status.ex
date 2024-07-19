@@ -1,19 +1,38 @@
 defmodule Screens.V2.WidgetInstance.SubwayStatus do
-  @moduledoc false
+  @moduledoc """
+  A flex-zone widget that displays a brief status of each subway line.
+  """
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.SubwayStatus
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.{Footer, GlEink, PreFare}
+
+  defmodule SubwayStatusAlert do
+    @moduledoc false
+
+    @type t :: %__MODULE__{
+            alert: Alert.t(),
+            context: context()
+          }
+
+    @enforce_keys [:alert]
+    defstruct @enforce_keys ++ [context: %{}]
+
+    @type context :: %{
+            optional(:all_platforms_at_informed_station) => list(String.t())
+          }
+  end
 
   defstruct screen: nil,
             subway_alerts: nil
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          subway_alerts: list(Alert.t())
+          subway_alerts: list(SubwayStatusAlert.t())
         }
 
   @type serialized_response :: %{
@@ -153,7 +172,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     )
   end
 
-  defp alert_routes(%Alert{informed_entities: entities}) do
+  defp alert_routes(%{alert: %Alert{informed_entities: entities}}) do
     entities
     |> Enum.map(fn e -> Map.get(e, :route) end)
     |> Enum.reject(&is_nil/1)
@@ -360,16 +379,22 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     Map.merge(%{route_pill: serialize_route_pill(route_id)}, serialize_alert(alert, route_id))
   end
 
+  @spec serialize_alert(Alert.t() | nil, Route.id()) :: alert()
+  defp serialize_alert(alert, route_id)
+
   defp serialize_alert(nil, _route_id) do
     %{status: "Normal Service"}
   end
 
-  defp serialize_alert(%Alert{effect: :shuttle, informed_entities: informed_entities}, route_id) do
+  defp serialize_alert(
+         %{alert: %Alert{effect: :shuttle, informed_entities: informed_entities}},
+         route_id
+       ) do
     %{status: "Shuttle Bus", location: get_location(informed_entities, route_id)}
   end
 
   defp serialize_alert(
-         %Alert{effect: :suspension, informed_entities: informed_entities},
+         %{alert: %Alert{effect: :suspension, informed_entities: informed_entities}},
          route_id
        ) do
     location = get_location(informed_entities, route_id)
@@ -380,22 +405,42 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp serialize_alert(
-         %Alert{effect: :station_closure, informed_entities: informed_entities},
+         %{
+           alert: %Alert{effect: :station_closure, informed_entities: informed_entities} = alert,
+           context: %{all_platforms_at_informed_station: all_platforms_at_informed_station}
+         },
          route_id
        ) do
-    # Get closed station names from informed entities
-    stop_names = get_stop_names_from_informed_entities(informed_entities, route_id)
+    if Alert.is_partial_station_closure?(alert, all_platforms_at_informed_station) do
+      platform_ids = Enum.map(all_platforms_at_informed_station, & &1.id)
+      informed_platforms = Enum.filter(informed_entities, &(&1.stop in platform_ids))
 
-    {status, location} = format_station_closure(stop_names)
+      %{
+        status:
+          Cldr.Message.format!("Bypassing {num_informed_platforms, plural,
+                                =1 {1 stop}
+                                other {# stops}}",
+            num_informed_platforms: length(informed_platforms)
+          ),
+        location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"}
+      }
+    else
+      # Get closed station names from informed entities
+      stop_names = get_stop_names_from_informed_entities(informed_entities, route_id)
 
-    %{status: status, location: location, station_count: length(stop_names)}
+      {status, location} = format_station_closure(stop_names)
+
+      %{status: status, location: location, station_count: length(stop_names)}
+    end
   end
 
   defp serialize_alert(
-         %Alert{
-           effect: :delay,
-           severity: severity,
-           informed_entities: informed_entities
+         %{
+           alert: %Alert{
+             effect: :delay,
+             severity: severity,
+             informed_entities: informed_entities
+           }
          },
          route_id
        ) do
@@ -420,13 +465,19 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     }
   end
 
-  def serialize_green_line_branch_alert(
-        %Alert{
-          effect: :station_closure,
-          informed_entities: informed_entities
-        },
-        route_ids
-      ) do
+  @spec serialize_green_line_branch_alert(%{alert: Alert.t(), context: %{}}, list(String.t())) ::
+          alert()
+  defp serialize_green_line_branch_alert(alert, route_ids)
+
+  defp serialize_green_line_branch_alert(
+         %{
+           alert: %Alert{
+             effect: :station_closure,
+             informed_entities: informed_entities
+           }
+         },
+         route_ids
+       ) do
     stop_names =
       Enum.flat_map(route_ids, &get_stop_names_from_informed_entities(informed_entities, &1))
 
@@ -442,7 +493,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   # If only one branch is affected, we can still determine a stop
   # range to show, for applicable alert types
-  def serialize_green_line_branch_alert(alert, [route_id]) do
+  defp serialize_green_line_branch_alert(alert, [route_id]) do
     Map.merge(
       %{route_pill: serialize_gl_pill_with_branches([route_id])},
       serialize_alert(alert, route_id)
@@ -450,7 +501,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   # Otherwise, give up on determining a stop range.
-  def serialize_green_line_branch_alert(alert, route_ids) do
+  defp serialize_green_line_branch_alert(alert, route_ids) do
     Map.merge(
       %{route_pill: serialize_gl_pill_with_branches(route_ids)},
       serialize_alert(alert, "Green")
@@ -506,7 +557,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
-  defp alert_affects_gl_trunk_or_whole_line?(alert, gl_stop_sets) do
+  defp alert_affects_gl_trunk_or_whole_line?(%{alert: alert}, gl_stop_sets) do
     alert_affects_gl_trunk?(alert, gl_stop_sets) or
       alert_affects_whole_green_line?(alert)
   end
@@ -724,6 +775,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   def get_total_alerts(alerts) do
     total_affected_routes =
       alerts
+      |> Enum.map(& &1.alert)
       |> Enum.uniq_by(& &1.id)
       |> Enum.map(&get_total_affected_routes_for_alert/1)
       |> Enum.sum()

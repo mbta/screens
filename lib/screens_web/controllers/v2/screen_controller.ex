@@ -35,7 +35,7 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   defp v2_layout(conn, _) do
-    put_layout(conn, {ScreensWeb.V2.LayoutView, "app.html"})
+    put_layout(conn, html: {ScreensWeb.V2.LayoutView, :app})
   end
 
   defp screen_side(params) do

@@ -23,7 +23,7 @@ defmodule Screens.MixProject do
   #
   # Type `mix help compile.app` for more information.
   def application do
-    apps = [:logger, :runtime_tools]
+    apps = [:logger, :runtime_tools, :hackney_telemetry]
 
     apps =
       case Mix.env() do
@@ -47,12 +47,14 @@ defmodule Screens.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.6.0"},
+      {:phoenix, "~> 1.7.14"},
       {:phoenix_pubsub, "~> 2.0"},
-      {:phoenix_html, "~> 3.0.4"},
+      {:phoenix_html, "~> 4.0"},
+      {:phoenix_view, "~> 2.0"},
       {:phoenix_live_reload, "~> 1.3", only: :dev},
-      {:phoenix_live_view, "~> 0.17.1"},
-      {:phoenix_live_dashboard, "~> 0.6"},
+      {:phoenix_live_view, "~> 0.20.17"},
+      {:phoenix_live_dashboard, "~> 0.8.4"},
+      {:phoenix_html_helpers, "~> 1.0"},
       {:gettext, "~> 0.22.1"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.6"},
@@ -65,7 +67,7 @@ defmodule Screens.MixProject do
       {:ex_aws, "~> 2.1"},
       {:ex_aws_s3, "~> 2.1"},
       {:ex_aws_secretsmanager, "~> 2.0", only: :prod},
-      {:ex_aws_polly, "~> 0.4.0"},
+      {:ex_aws_polly, "~> 0.5.0"},
       {:ehmon, github: "mbta/ehmon", only: :prod},
       {:sweet_xml, "~> 0.7.0"},
       {:timex, "~> 3.6"},
@@ -73,18 +75,23 @@ defmodule Screens.MixProject do
       {:guardian, "~> 2.3.1"},
       {:ueberauth, "~> 0.10"},
       {:ueberauth_oidcc, "~> 0.3"},
-      {:corsica, "~> 1.0"},
+      {:corsica, "~> 2.1"},
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
       {:sentry, "~> 10.4"},
-      {:retry, "~> 0.16.0"},
-      {:stream_data, "~> 0.5", only: :test},
+      {:retry, "~> 0.18.0"},
+      {:stream_data, "~> 1.1", only: :test},
       {:memcachex, "~> 0.5.5"},
       {:aja, "~> 0.6.2"},
+      {:telemetry, "~> 1.2"},
       {:telemetry_poller, "~> 0.4"},
       {:telemetry_metrics, "~> 0.4"},
       {:screens_config,
        git: "https://github.com/mbta/screens-config-lib.git",
-       ref: "6599d0df9c5bebbfb762e0ae8ae6af6f6c0359d0"}
+       ref: "25fb47c58fc0b485c8c6df78fe94914292856903"},
+      {:nebulex, "~> 2.6"},
+      {:remote_ip, "~> 1.2"},
+      {:hackney_telemetry, "~> 0.2.0"},
+      {:ex_cldr_messages, "~> 1.0"}
     ]
   end
 end

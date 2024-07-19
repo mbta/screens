@@ -1,26 +1,35 @@
 // General styles for free text / route pills
 .free-text {
-  font-family: Inter;
+  font-family: Inter, sans-serif;
   font-size: 138px;
   line-height: 138px;
-  color: #ffffff;
+  color: #fff;
 }
 
 .free-text__line {
   display: inline-block;
+  overflow: hidden;
+
+  // Needed to keep y's from getting cut off!
+  line-height: initial;
+  text-overflow: ellipsis;
   vertical-align: middle;
+
+  .free-text__element {
+    line-height: initial;
+  }
 }
 
 .free-text__icon-container {
   display: inline-block;
-  vertical-align: middle;
   text-align: center;
+  vertical-align: middle;
 
   // Needed if we use a route pill as the leading icon for the row
   // which we do for one-row headways
   .free-text__route-pill {
     margin-top: 35px;
-    color: #ffffff;
+    color: #fff;
   }
 }
 
@@ -57,7 +66,8 @@
     background: $line-color-blue;
   }
 
-  &--red {
+  &--red,
+  &--mattapan {
     background: $line-color-red;
   }
 
@@ -76,26 +86,17 @@
 
   &--bus {
     background: $line-color-bus;
-    box-shadow: 2px 4px 2px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
   }
 }
 
 .free-text__route-pill__text,
 .free-text__text-pill__text {
   font-family: Helvetica, sans-serif;
+  font-weight: 700;
 
   &--branch {
     font-size: 84px;
-  }
-}
-
-.free-text__line {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  // Needed to keep y's from getting cut off!
-  line-height: initial;
-  .free-text__element {
-    line-height: initial;
   }
 }
 
@@ -106,19 +107,19 @@
 }
 
 .free-text__route-pill {
-  height: 144px;
   width: 248px;
-  border-radius: 72px;
+  height: 144px;
   font-size: 96px;
   line-height: 144px;
+  border-radius: 72px;
 }
 
 .free-text__text-pill {
-  border-radius: 84px;
+  padding-right: 84px;
+  padding-left: 84px;
   font-size: 126px;
   line-height: 168px;
-  padding-left: 84px;
-  padding-right: 84px;
+  border-radius: 84px;
 }
 
 // Partial alert and one-line headway have similar styles
@@ -152,12 +153,15 @@
   .free-text__icon-container {
     height: 202px;
   }
+
   .free-text__icon-image {
     padding-top: 37px;
   }
+
   .free-text__line {
     height: 202px;
   }
+
   .free-text__element {
     vertical-align: middle;
   }
@@ -180,8 +184,8 @@
   .free-text__icon-image {
     width: 100%;
     height: 100%;
-    object-fit: contain;
     padding: 0;
+    object-fit: contain;
   }
 }
 
@@ -189,8 +193,9 @@
   .free-text {
     color: #171f26;
   }
+
   .free-text__text-pill {
-    color: #ffffff;
+    color: #fff;
   }
 }
 

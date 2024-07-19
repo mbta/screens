@@ -43,7 +43,7 @@ const ReconstructedAlert: ComponentType<ReconAlertProps> = (alert) => {
           <div className="alert-card__body">
             <div className={"alert-card__body__route-pills"}>
               {routes.map((pill) => (
-                <RoutePill {...pill} key={routePillKey(pill)} />
+                <RoutePill pill={pill} key={routePillKey(pill)} />
               ))}
             </div>
             {effect === "delay" && (

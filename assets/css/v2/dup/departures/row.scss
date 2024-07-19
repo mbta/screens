@@ -2,13 +2,13 @@
   position: relative;
   height: 208px;
 
-  &:not(:first-child):before {
-    content: "";
+  &:not(:first-child)::before {
     position: absolute;
-    top: 0px;
+    top: 0;
     left: 302px;
-    height: 4px;
     width: 1586px;
+    height: 4px;
+    content: "";
     background-color: #cccbc8;
   }
 }
@@ -24,11 +24,11 @@
 }
 
 .departure-row__time {
-  color: #171f26;
   display: inline-block;
-  text-align: right;
-  vertical-align: middle;
   width: 400px;
   margin-right: 32px;
   font-size: 138px;
+  color: #171f26;
+  text-align: right;
+  vertical-align: middle;
 }

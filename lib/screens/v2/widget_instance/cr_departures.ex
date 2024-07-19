@@ -1,6 +1,7 @@
 defmodule Screens.V2.WidgetInstance.CRDepartures do
   @moduledoc false
 
+  require Logger
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
   alias Screens.V2.Departure
@@ -133,9 +134,18 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
          now
        ) do
     {:ok, scheduled_departure_time} =
-      %Departure{schedule: schedule}
-      |> Departure.time()
-      |> DateTime.shift_zone("America/New_York")
+      try do
+        %Departure{schedule: schedule}
+        |> Departure.time()
+        |> DateTime.shift_zone("America/New_York")
+      rescue
+        ex ->
+          Logger.error(
+            "[cr_departures serialize_time] Could not get schedule time: #{inspect(departure)}"
+          )
+
+          reraise ex, __STACKTRACE__
+      end
 
     cond do
       is_nil(prediction) ->

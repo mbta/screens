@@ -30,7 +30,7 @@ const DepartureRow: ComponentType<DepartureRow> = ({
           "departure-row__route" + (headsign.variation ? "" : " center")
         }
       >
-        <RoutePill {...route} />
+        <RoutePill pill={route} />
       </div>
       <div className="departure-row__destination">
         <Destination {...headsign} />

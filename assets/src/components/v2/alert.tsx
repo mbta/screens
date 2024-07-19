@@ -48,7 +48,11 @@ const BaseAlert: ComponentType<BaseAlertProps> = ({
             )}
           >
             {routePills.map((pill) => (
-              <RoutePill {...pill} key={routePillKey(pill)} />
+              <RoutePill
+                pill={pill}
+                useRouteAbbrev={true}
+                key={routePillKey(pill)}
+              />
             ))}
           </div>
           <div className="alert-widget__content__icon">

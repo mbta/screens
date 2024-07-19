@@ -1,13 +1,14 @@
 import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useMemo, useState } from "react";
-import { fetchDatasetValue, getDatasetValue } from "Util/dataset";
+import { getDatasetValue } from "Util/dataset";
 import { isDup, isOFM, isTriptych, getTriptychPane } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/util";
 import * as SentryLogger from "Util/sentry";
 import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
 import { DUP_VERSION } from "Components/v2/dup/version";
 import { TRIPTYCH_VERSION } from "Components/v2/triptych/version";
+import useRefreshRate from "./use_refresh_rate";
 
 const MINUTE_IN_MS = 60_000;
 
@@ -183,24 +184,11 @@ const useBaseApiResponse = ({
   routePart = "",
   responseHandler = rawResponseToApiResponse,
 }: UseApiResponseArgs): UseApiResponseReturn => {
+  const { refreshRateMs, refreshRateOffsetMs } = useRefreshRate();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
-  // Live OFM screens ignore any configured refreshRate.
-  // Hardcoding to 0 prevents an interval from being started unnecessarily.
-  const refreshRate = isOFM() ? "0" : fetchDatasetValue("refreshRate");
-  const refreshRateOffset = getDatasetValue("refreshRateOffset") || "0";
-  const screenIdsWithOffsetMap = getDatasetValue("screenIdsWithOffsetMap");
-  const refreshMs = parseInt(refreshRate!, 10) * 1000;
-  let refreshRateOffsetMs = parseInt(refreshRateOffset, 10) * 1000;
   const apiPath = useMemo(() => getApiPath(id, routePart), [id, routePart]);
-
-  if (screenIdsWithOffsetMap) {
-    const screens = JSON.parse(screenIdsWithOffsetMap);
-
-    refreshRateOffsetMs =
-      screens.find((screen) => screen.id === id).refresh_rate_offset * 1000;
-  }
 
   const fetchData = async () => {
     try {
@@ -242,7 +230,7 @@ const useBaseApiResponse = ({
     () => {
       fetchData();
     },
-    refreshMs,
+    refreshRateMs,
     refreshRateOffsetMs,
   );
 

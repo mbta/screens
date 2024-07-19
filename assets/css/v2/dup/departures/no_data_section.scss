@@ -5,13 +5,14 @@
   .no-data-section__icon-container {
     display: inline-block;
     height: 100%;
-    vertical-align: middle;
-    margin-left: 32px;
     margin-right: 32px;
+    margin-left: 32px;
+    vertical-align: middle;
   }
+
   .no-data-section__no-connection-icon {
-    height: 144px;
     width: 144px;
+    height: 144px;
   }
 
   .no-data-section__row {

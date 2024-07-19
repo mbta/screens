@@ -23,7 +23,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             informed_stations: nil,
             is_terminal_station: false,
             # Full screen alert, whether that's a single or dual screen alert
-            is_full_screen: false
+            is_full_screen: false,
+            partial_closure_platform_names: []
 
   @type stop_id :: String.t()
 
@@ -36,7 +37,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           location_context: LocationContext.t(),
           informed_stations: list(String.t()),
           is_terminal_station: boolean(),
-          is_full_screen: boolean()
+          is_full_screen: boolean(),
+          partial_closure_platform_names: list(String.t())
         }
 
   @type serialized_response ::
@@ -143,18 +145,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     # and their affiliated route id
     list_of_directions_and_routes =
       informed_entities
-      |> Enum.map(fn entity -> get_direction_and_route_from_entity(entity, location) end)
+      |> Enum.map(&get_direction_and_route_from_entity(&1, alert.effect, location))
       |> Enum.filter(& &1)
       |> Enum.uniq()
 
-    {direction_id, route_id} =
-      if length(list_of_directions_and_routes) == 1 do
-        hd(list_of_directions_and_routes)
-
-        # If there are multiple route ids in that informed entities list, then the alert includes branching
-      else
-        select_direction_and_route(list_of_directions_and_routes)
-      end
+    {direction_id, route_id} = select_direction_and_route(list_of_directions_and_routes)
 
     cond do
       # When the alert is non-directional but the station is at the boundary:
@@ -177,14 +172,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   # Given an entity and the directionality of the alert from the home stop,
   # return a tuple with the affected direction_id and route_id
 
+  defp get_direction_and_route_from_entity(%{stop: "place-jfk"}, :station_closure, _location),
+    do: {nil, "Red"}
+
   # Skip processing JFK, because it is a branching node station. The other stations in the alert
   # will determine the destination needed for this alert
-  defp get_direction_and_route_from_entity(%{stop: "place-jfk"}, _location), do: nil
+  defp get_direction_and_route_from_entity(%{stop: "place-jfk"}, _, _location),
+    do: nil
 
   # If the route is red and the alert is downstream, we have to figure out whether the alert
   # only affects one branch or both
   defp get_direction_and_route_from_entity(
          %{direction_id: nil, route: "Red", stop: stop_id},
+         _,
          location
        )
        when stop_id != nil and location in [:downstream, :boundary_downstream] do
@@ -203,6 +203,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   # Same with RL upstream alerts
   defp get_direction_and_route_from_entity(
          %{direction_id: nil, route: "Red", stop: stop_id},
+         _,
          location
        )
        when stop_id != nil and location in [:upstream, :boundary_upstream] do
@@ -218,29 +219,24 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, location)
+  defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, _, location)
        when location in [:downstream, :boundary_downstream],
        do: {0, route}
 
-  defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, location)
+  defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, _, location)
        when location in [:upstream, :boundary_upstream],
        do: {1, route}
 
-  defp get_direction_and_route_from_entity(%{direction_id: direction_id, route: route}, _),
+  defp get_direction_and_route_from_entity(%{direction_id: direction_id, route: route}, _, _),
     do: {direction_id, route}
 
   # Select 1 direction + route from this list of directions + routes for multiple branches
-  defp select_direction_and_route(list_of_directions_and_routes) do
-    direction_id =
-      list_of_directions_and_routes
-      |> hd()
-      |> elem(0)
+  defp select_direction_and_route([]), do: {nil, nil}
+  defp select_direction_and_route([direction_and_route]), do: direction_and_route
 
-    case list_of_directions_and_routes do
-      [{direction_id, "Red" <> _} | _] -> {direction_id, "Red"}
-      _ -> {direction_id, "Green-trunk"}
-    end
-  end
+  # If there are multiple route ids in that informed entities list, then the alert includes branching
+  defp select_direction_and_route([{direction_id, "Red" <> _} | _]), do: {direction_id, "Red"}
+  defp select_direction_and_route([{direction_id, _} | _]), do: {direction_id, "Green-trunk"}
 
   defp get_route_pills(t, location \\ nil)
 
@@ -385,7 +381,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       }),
       do: false
 
-  def dual_screen_alert?(%__MODULE__{is_terminal_station: is_terminal_station, alert: alert} = t) do
+  def dual_screen_alert?(%__MODULE__{
+        alert: %Alert{effect: :station_closure},
+        partial_closure_platform_names: partial_closure_platform_names
+      })
+      when partial_closure_platform_names != [],
+      do: false
+
+  def dual_screen_alert?(
+        %__MODULE__{
+          is_terminal_station: is_terminal_station,
+          alert: alert
+        } = t
+      ) do
     Alert.effect(alert) in [:station_closure, :suspension, :shuttle] and
       LocalizedAlert.location(t, is_terminal_station) == :inside and
       LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
@@ -1024,8 +1032,45 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  # Partial closure
   defp serialize_outside_alert(
-         %__MODULE__{alert: %Alert{effect: :station_closure}} = t,
+         %__MODULE__{
+           informed_stations: [informed_station],
+           partial_closure_platform_names: partial_closure_platform_names
+         } = t,
+         _location
+       )
+       when partial_closure_platform_names != [] do
+    issue =
+      case partial_closure_platform_names do
+        [informed_platform_name] ->
+          "Bypassing #{informed_platform_name} platform at #{informed_station}"
+
+        informed_subway_platforms ->
+          Cldr.Message.format!("Bypassing {num_platforms, plural,
+            =1 {1 platform}
+            other {# platforms}} at {informed_station}",
+            num_platforms: length(informed_subway_platforms),
+            informed_station: informed_station
+          )
+      end
+
+    %{
+      issue: issue,
+      remedy: nil,
+      location: "",
+      cause: nil,
+      routes: get_route_pills(t),
+      effect: :station_closure,
+      urgent: false
+    }
+  end
+
+  # Full closure
+  defp serialize_outside_alert(
+         %__MODULE__{
+           alert: %Alert{effect: :station_closure}
+         } = t,
          _location
        ) do
     %{alert: %{cause: cause}, informed_stations: informed_stations} = t
@@ -1152,6 +1197,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     includes_glx and not includes_west_of_copley
   end
 
+  @spec format_endpoint_string({String.t(), String.t()} | nil) :: String.t() | nil
   def format_endpoint_string(nil), do: nil
 
   def format_endpoint_string({station, station}) do
@@ -1164,22 +1210,29 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def serialize(widget, log_fn \\ &Logger.warning/1)
 
-  def serialize(%__MODULE__{is_full_screen: true, alert: %Alert{effect: effect}} = t, log_fn) do
-    diagram_data =
-      case DisruptionDiagram.serialize(t) do
-        {:ok, serialized_diagram} ->
-          %{disruption_diagram: serialized_diagram}
+  def serialize(
+        %__MODULE__{
+          is_full_screen: true,
+          alert: %Alert{effect: :station_closure},
+          partial_closure_platform_names: partial_closure_platform_names
+        } = t,
+        _log_fn
+      )
+      when partial_closure_platform_names != [] do
+    location = LocalizedAlert.location(t)
+    serialize_single_screen_fallback_alert(t, location)
+  end
 
-        {:error, reason} ->
-          log_fn.(
-            "[disruption diagram error] alert_id=#{t.alert.id} home_stop=#{t.location_context.home_stop} #{reason}"
-          )
-
-          %{}
-      end
-
-    main_data = pick_layout_serializer(t, diagram_data, effect, dual_screen_alert?(t))
-
+  def serialize(
+        %__MODULE__{
+          is_full_screen: true,
+          alert: %Alert{effect: effect}
+        } = t,
+        log_fn
+      ) do
+    location = LocalizedAlert.location(t)
+    diagram_data = serialize_diagram(t, log_fn)
+    main_data = pick_layout_serializer(t, diagram_data, effect, location, dual_screen_alert?(t))
     Map.merge(main_data, diagram_data)
   end
 
@@ -1196,19 +1249,36 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def pick_layout_serializer(t, diagram, effect, true) when diagram == %{} and effect != :delay,
-    do: serialize_dual_screen_fallback_alert(t)
+  defp serialize_diagram(%__MODULE__{alert: %Alert{effect: :delay}}, _), do: %{}
 
-  def pick_layout_serializer(t, diagram, effect, false)
+  defp serialize_diagram(%__MODULE__{} = t, log_fn) do
+    case DisruptionDiagram.serialize(t) do
+      {:ok, serialized_diagram} ->
+        %{disruption_diagram: serialized_diagram}
+
+      {:error, reason} ->
+        log_fn.(
+          "[disruption diagram error] alert_id=#{t.alert.id} home_stop=#{t.location_context.home_stop} #{reason}"
+        )
+
+        %{}
+    end
+  end
+
+  def pick_layout_serializer(t, diagram, effect, location, is_dual_screen_alert)
+
+  def pick_layout_serializer(t, diagram, effect, _, true)
+      when diagram == %{} and effect != :delay,
+      do: serialize_dual_screen_fallback_alert(t)
+
+  def pick_layout_serializer(t, diagram, effect, location, false)
       when diagram == %{} and effect != :delay do
-    location = LocalizedAlert.location(t)
     serialize_single_screen_fallback_alert(t, location)
   end
 
-  def pick_layout_serializer(t, _, _, true), do: serialize_dual_screen_alert(t)
+  def pick_layout_serializer(t, _, _, _, true), do: serialize_dual_screen_alert(t)
 
-  def pick_layout_serializer(t, _, _, _) do
-    location = LocalizedAlert.location(t)
+  def pick_layout_serializer(t, _, _, location, _) do
     serialize_single_screen_alert(t, location)
   end
 
@@ -1244,11 +1314,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
   def valid_candidate?(%__MODULE__{} = t) do
-    suppressed =
-      t.alert.id in ["549108", "555079", "555080"] and
-        t.location_context.home_stop === "place-gover"
-
-    not suppressed
+    test_alert_ids = ["197140"]
+    prod_alert_ids = ["580015"]
+    t.alert.id not in (test_alert_ids ++ prod_alert_ids)
   end
 
   defimpl Screens.V2.WidgetInstance do

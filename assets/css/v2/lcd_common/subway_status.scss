@@ -4,7 +4,6 @@
   $text-dark-gray: #171f26;
   $widget-background: #e5e4e1;
   $rule-color: #cccbc8;
-
   $rule-width: 808px;
   $status-top-padding: 18px;
   $status-left-padding: 24px;
@@ -16,32 +15,27 @@
   $contracted-status-with-two-alerts-bottom-padding: 20px;
   $extended-status-bottom-padding: 71px;
 
+  box-sizing: border-box;
+
   /// End variables
   /// Begin styles
 
   width: 1024px;
   height: 576px;
-  overflow: hidden;
-
-  box-sizing: border-box;
   padding-top: 6px;
-
-  background: $widget-background;
-  color: $text-dark-gray;
+  overflow: hidden;
   font-family: Inter, sans-serif;
-
+  color: $text-dark-gray;
+  background: $widget-background;
   border-radius: 16px;
-  box-shadow: 0px 12px 24px 0px rgba(23, 31, 38, 0.25);
+  box-shadow: 0 12px 24px 0 rgb(23 31 38 / 25%);
 
   .subway-status_status {
     position: relative;
-
-    width: 100%;
-
     box-sizing: border-box;
+    width: 100%;
     padding-top: $status-top-padding;
     padding-left: $status-left-padding;
-
     overflow: hidden;
   }
 
@@ -77,15 +71,12 @@
   // Instead, whether to include the rule or not is determined
   // in the React code and it's rendered as a real element.
   .subway-status_status_rule {
-    content: "";
-
     position: absolute;
-    bottom: 0;
     right: 24px;
-
+    bottom: 0;
     width: $rule-width;
     height: 4px;
-
+    content: "";
     background: $rule-color;
     border-radius: 2px;
   }
@@ -121,12 +112,13 @@
   // if it's too long.
   .subway-status_alert-sizer--hide-overflow {
     overflow: hidden;
-    white-space: nowrap;
     text-overflow: clip;
+    white-space: nowrap;
   }
 
   .subway-status_alert_route-pill-container {
     display: inline-block;
+
     // If the row has no pill, we still keep this element as a pill-sized
     // spacer to maintain consistent positioning of everything else in the row.
     min-width: $pill-width;
@@ -135,10 +127,10 @@
 
   .subway-status_alert_text-container {
     display: inline-block;
-    vertical-align: top;
     width: fit-content;
     max-width: 830px;
     margin-left: 24px;
+    vertical-align: top;
 
     &--2-branches {
       max-width: 671px;
@@ -158,15 +150,15 @@
   // if it's too long.
   .subway-status_alert_text-container.subway-status_alert_text-container--hide-overflow {
     overflow: hidden;
-    white-space: nowrap;
     text-overflow: clip;
+    white-space: nowrap;
   }
 
   span.subway-status_alert_status-text {
     // common styles for status text
+    font-size: 48px;
     font-weight: 800;
     line-height: $pill-height;
-    font-size: 48px;
   }
 
   .subway-status_status--extended span.subway-status_alert_status-text {
@@ -178,8 +170,8 @@
 
   span.subway-status_alert_status-text.subway-status_alert_status-text--normal-service {
     // "Normal Service" gets thinner text
-    font-weight: 500;
     font-size: 40px;
+    font-weight: 500;
   }
 
   span.subway-status_alert_location-text {
@@ -190,14 +182,14 @@
   .subway-status_status--contracted span.subway-status_alert_location-text {
     // contracted-specific styles for location text
     margin-left: 16px;
-    line-height: $pill-height;
     font-size: 27px;
+    line-height: $pill-height;
   }
 
   .subway-status_status--extended span.subway-status_alert_location-text {
     // extended-specific styles for location text
-    line-height: 48px;
     font-size: 32px;
+    line-height: 48px;
   }
 
   .branch-icon {

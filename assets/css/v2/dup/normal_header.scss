@@ -1,28 +1,39 @@
 .normal-header {
   position: relative;
-  height: 248px;
   width: 100%;
-  background: rgb(23, 31, 38);
+  height: 248px;
+  background: rgb(23 31 38);
+
   &--red {
     background-color: $line-color-red;
   }
+
   &--orange {
     background-color: $line-color-orange;
   }
+
   &--green {
     background-color: $line-color-green;
   }
+
   &--blue {
     background-color: $line-color-blue;
   }
+
   &--teal {
     background-color: $line-color-ferry;
   }
+
   &--silver {
     background-color: $line-color-silver;
   }
+
   &--yellow {
     background-color: $alert-yellow;
+
+    .normal-header-title__text {
+      color: #171f26;
+    }
   }
 }
 
@@ -32,45 +43,45 @@
 }
 
 .normal-header-icon__image {
-  height: 184px;
   width: 184px;
+  height: 184px;
   margin-right: 64px;
 }
 
 .normal-header-title {
   position: absolute;
-  left: 64px;
   top: 32px;
+  left: 64px;
 }
 
 .normal-header-title__text {
   display: inline-block;
-  vertical-align: middle;
   font-family: Helvetica, sans-serif;
-  font-weight: 700;
-  color: #ffffff;
   font-size: 144px;
+  font-weight: 700;
   line-height: 144px;
+  color: #fff;
+  vertical-align: middle;
 }
 
 .normal-header-time {
   position: absolute;
-  right: 32px;
   top: 70px;
+  right: 32px;
   font-family: Inter, sans-serif;
   font-size: 108px;
   line-height: 108px;
-  color: #ffffff;
+  color: #fff;
 }
 
 .normal-header-version {
+  position: absolute;
+  bottom: 0;
+  left: 8px;
   font-family: Inter, sans-serif;
   font-size: 32px;
   font-weight: 500;
-  position: absolute;
-  bottom: 0px;
-  left: 8px;
-  color: #ffffff;
+  color: #fff;
   opacity: 0.33;
 }
 
@@ -85,12 +96,6 @@
 }
 
 .normal-header__environment {
-  color: white;
   position: absolute;
-}
-
-.normal-header--yellow {
-  .normal-header-title__text {
-    color: #171f26;
-  }
+  color: white;
 }

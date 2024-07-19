@@ -124,10 +124,14 @@ defmodule Screens.Config.Cache do
   end
 
   def mode_disabled?(mode) do
-    with_table default: false do
+    mode in disabled_modes()
+  end
+
+  def disabled_modes do
+    with_table default: [] do
       case :ets.match(@table, {:devops, %{disabled_modes: :"$1"}}) do
-        [[disabled_modes]] -> mode in disabled_modes
-        [] -> false
+        [[disabled_modes]] -> disabled_modes
+        [] -> []
       end
     end
   end

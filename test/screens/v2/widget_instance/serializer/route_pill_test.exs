@@ -1,17 +1,28 @@
 defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
   use ExUnit.Case, async: true
 
+  import ExUnit.CaptureLog
   import Screens.V2.WidgetInstance.Serializer.RoutePill
 
   describe "serialize_for_departure/4" do
-    test "Uses track number if not nil" do
-      assert %{type: :text, text: "TR3", color: :purple} ==
+    test "Returns rail icon with a route abbreviation for Commuter Rail" do
+      assert %{type: :icon, icon: :rail, color: :purple, route_abbrev: "FMT"} ==
+               serialize_for_departure("CR-Fairmount", "", :rail, nil)
+    end
+
+    test "Returns track number with route abbreviation for CR when not nil" do
+      assert %{type: :text, text: "TR3", color: :purple, route_abbrev: "FMT"} ==
                serialize_for_departure("CR-Fairmount", "", :rail, 3)
     end
 
-    test "Returns rail icon if route type is :rail" do
-      assert %{type: :icon, icon: :rail, color: :purple} ==
-               serialize_for_departure("CR-Fairmount", "", :rail, nil)
+    test "Returns no abbreviation and logs a warning for an unknown CR route" do
+      logs =
+        capture_log([level: :warning], fn ->
+          assert %{type: :icon, icon: :rail, color: :purple, route_abbrev: nil} ==
+                   serialize_for_departure("CR-Foobar", "", :rail, nil)
+        end)
+
+      assert logs =~ "missing route pill abbreviation for CR-Foobar"
     end
 
     test "Returns boat icon if route type is :ferry" do
@@ -70,8 +81,9 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
                serialize_route_for_alert("Green-B")
     end
 
-    test "Abbreviates Commuter Rail route names" do
-      assert %{type: :text, text: "LWL", color: :purple} == serialize_route_for_alert("CR-Lowell")
+    test "Includes a text abbreviation for Commuter Rail routes" do
+      assert %{type: :icon, icon: :rail, color: :purple, route_abbrev: "LWL"} ==
+               serialize_route_for_alert("CR-Lowell")
     end
 
     test "Returns boat icon for ferry routes" do

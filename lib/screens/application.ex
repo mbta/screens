@@ -10,6 +10,7 @@ defmodule Screens.Application do
 
     # List all child processes to be supervised
     children = [
+      Screens.Telemetry,
       # Start the PubSub system
       {Phoenix.PubSub, name: ScreensWeb.PubSub},
       # Start the endpoint when the application starts
@@ -35,7 +36,8 @@ defmodule Screens.Application do
       # ScreensByAlert self-refresh job runner
       {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner},
       Screens.OlCrowding.DynamicSupervisor,
-      {Screens.OlCrowding.Agent, %{}}
+      {Screens.OlCrowding.Agent, %{}},
+      {Screens.ScreenApiResponseCache, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

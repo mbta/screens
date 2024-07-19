@@ -1,13 +1,13 @@
 .evergreen-content-image__container {
-  background-color: #e4e6e1;
   overflow: hidden;
+  background-color: #e4e6e1;
 }
 
 .flex-two-medium__left,
 .flex-two-medium__right {
   .evergreen-content-image__container {
     border-radius: 16px;
-    box-shadow: 0px 12px 24px 0px rgba(23, 31, 38, 0.25);
+    box-shadow: 0 12px 24px 0 rgb(23 31 38 / 25%);
   }
 
   .evergreen-content-image__container,

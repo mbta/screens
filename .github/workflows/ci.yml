@@ -93,6 +93,24 @@ jobs:
       - working-directory: ./assets
         run: npm run lint:errors
 
+  js-styles:
+    name: Frontend Styles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - working-directory: ./assets
+        run: npm run styles:check
+
+  js-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - working-directory: ./assets
+        run: npm test
+
   js-types:
     name: Frontend Types
     runs-on: ubuntu-latest

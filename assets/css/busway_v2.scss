@@ -1,4 +1,4 @@
-@import url("https://rsms.me/inter/inter.css");
+@import "https://rsms.me/inter/inter.css";
 
 @import "colors";
 @import "fonts";
@@ -28,7 +28,7 @@
 @import "v2/lcd_common/simulation";
 
 body {
-  margin: 0px;
+  margin: 0;
 }
 
 .multi-screen-page {

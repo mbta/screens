@@ -114,7 +114,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     with {:ok, route_id, stop_sequence, branch} <-
            get_builder_data(localized_alert, informed_stop_ids) do
-      line = Route.get_color_for_route(route_id)
+      line = Route.color(route_id)
 
       stop_id_to_name = Stop.stop_id_to_name(route_id)
 

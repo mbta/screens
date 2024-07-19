@@ -1,28 +1,27 @@
 .departure-alerts {
-  text-align: right;
-  margin-right: 32px;
   margin-top: 24px;
+  margin-right: 32px;
+  text-align: right;
 }
 
 .departure-alert {
   display: inline-block;
   height: 56px;
-  border-radius: 8px;
-  background-color: #171f26;
   margin-left: 16px;
-
   font-family: Inter;
   font-size: 36px;
   line-height: 56px;
   color: white;
+  background-color: #171f26;
+  border-radius: 8px;
 }
 
 .departure-alert__icon {
   display: inline-block;
-  vertical-align: top;
-  margin-left: 16px;
-  margin-top: 8px;
   height: 40px;
+  margin-top: 8px;
+  margin-left: 16px;
+  vertical-align: top;
 }
 
 .departure-alert__icon-image {
@@ -31,7 +30,7 @@
 
 .departure-alert__text {
   display: inline-block;
-  vertical-align: top;
-  margin-left: 16px;
   margin-right: 16px;
+  margin-left: 16px;
+  vertical-align: top;
 }

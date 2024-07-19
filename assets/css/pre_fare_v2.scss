@@ -1,4 +1,4 @@
-@import url("https://rsms.me/inter/inter.css");
+@import "https://rsms.me/inter/inter.css";
 
 @import "colors";
 
@@ -35,7 +35,7 @@
 @import "v2/pre_fare/evergreen/image";
 @import "v2/pre_fare/evergreen/video";
 
-@import "v2/placeholder.scss";
+@import "v2/placeholder";
 @import "v2/pre_fare/elevator_status";
 @import "v2/pre_fare/flex/paging_indicator";
 @import "v2/pre_fare/full_line_map";
@@ -68,7 +68,7 @@
 @import "v2/pre_fare/disruption_diagram/disruption_diagram";
 
 body {
-  margin: 0px;
+  margin: 0;
 }
 
 .multi-screen-page {

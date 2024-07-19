@@ -2,6 +2,7 @@ defmodule Screens.Routes.Route do
   @moduledoc false
 
   alias Screens.RouteType
+  alias Screens.Stops.Stop
   alias Screens.V3Api
 
   @sl_route_ids ~w[741 742 743 746 749 751]
@@ -22,6 +23,20 @@ defmodule Screens.Routes.Route do
           type: RouteType.t()
         }
 
+  @type params :: %{
+          optional(:ids) => [id()],
+          optional(:stop_id) => Stop.id(),
+          optional(:stop_ids) => [Stop.id()],
+          optional(:date) => Date.t() | DateTime.t(),
+          optional(:route_types) => [RouteType.t()] | RouteType.t(),
+          optional(:limit) => pos_integer()
+        }
+
+  @typep name_colors :: :blue | :green | :orange | :red | :silver
+  @type color :: name_colors() | :purple | :teal | :yellow
+  @type icon :: name_colors() | :bus | :cr | :ferry | :mattapan
+
+  @spec by_id(id()) :: {:ok, t()} | :error
   def by_id(route_id) do
     case V3Api.get_json("routes/" <> route_id) do
       {:ok, %{"data" => data}} -> {:ok, Screens.Routes.Parser.parse_route(data)}
@@ -29,6 +44,8 @@ defmodule Screens.Routes.Route do
     end
   end
 
+  @spec fetch() :: {:ok, [t()]} | :error
+  @spec fetch(params()) :: {:ok, [t()]} | :error
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
     params =
       opts
@@ -38,30 +55,6 @@ defmodule Screens.Routes.Route do
     case get_json_fn.("routes/", params) do
       {:ok, %{"data" => data}} -> {:ok, Enum.map(data, &Screens.Routes.Parser.parse_route/1)}
       _ -> :error
-    end
-  end
-
-  @doc """
-  Fetches IDs and active status of routes that serve the given stop. `today` is used to determine whether
-  each route is actively running on the current day.
-  """
-  @spec fetch_simplified_routes_at_stop(String.t()) ::
-          {:ok, list(%{route_id: id(), active?: boolean()})} | :error
-  def fetch_simplified_routes_at_stop(
-        stop_id,
-        now \\ DateTime.utc_now(),
-        get_json_fn \\ &V3Api.get_json/2
-      ) do
-    with {:ok, all_route_ids} <- fetch_all_route_ids(stop_id, get_json_fn),
-         {:ok, active_route_ids} <- fetch_active_route_ids(stop_id, now, get_json_fn) do
-      active_set = MapSet.new(active_route_ids)
-
-      routes_at_stop =
-        Enum.map(all_route_ids, &%{route_id: &1, active?: MapSet.member?(active_set, &1)})
-
-      {:ok, routes_at_stop}
-    else
-      :error -> :error
     end
   end
 
@@ -78,24 +71,34 @@ defmodule Screens.Routes.Route do
         get_json_fn \\ &V3Api.get_json/2,
         fetch_routes_fn \\ &fetch_routes/3
       ) do
-    with {:ok, routes} <- fetch_routes_fn.(stop_id, get_json_fn, type_filters),
-         {:ok, active_route_ids} <- fetch_active_route_ids(stop_id, now, get_json_fn) do
-      active_set = MapSet.new(active_route_ids)
+    Screens.Telemetry.span(
+      ~w[screens routes route fetch_routes_by_stop]a,
+      %{stop_id: stop_id, type_filters: type_filters},
+      fn ->
+        with {:ok, routes} <- fetch_routes_fn.(stop_id, get_json_fn, type_filters),
+             {:ok, active_route_ids} <- fetch_active_route_ids(stop_id, now, get_json_fn) do
+          active_set = MapSet.new(active_route_ids)
 
-      routes_at_stop =
-        Enum.map(
-          routes,
-          &(&1
-            |> Map.from_struct()
-            |> Map.put(:active?, MapSet.member?(active_set, &1.id))
-            |> Map.put(:route_id, &1.id)
-            |> Map.delete(:id))
-        )
+          routes_at_stop =
+            Enum.map(
+              routes,
+              &(&1
+                |> Map.from_struct()
+                |> Map.put(:active?, MapSet.member?(active_set, &1.id))
+                |> Map.put(:route_id, &1.id)
+                |> Map.delete(:id))
+            )
 
-      {:ok, routes_at_stop}
-    else
-      :error -> :error
-    end
+          {:ok, routes_at_stop}
+        else
+          :error -> :error
+        end
+      end
+    )
+  end
+
+  defp format_query_param({:ids, ids}) when is_list(ids) do
+    [{"filter[id]", Enum.join(ids, ",")}]
   end
 
   defp format_query_param({:stop_ids, stop_ids}) when is_list(stop_ids) do
@@ -122,14 +125,11 @@ defmodule Screens.Routes.Route do
     format_query_param({:route_types, [route_type]})
   end
 
-  defp format_query_param(_), do: []
-
-  defp fetch_all_route_ids(stop_id, get_json_fn) do
-    case fetch([stop_id: stop_id], get_json_fn) do
-      {:ok, routes} -> {:ok, Enum.map(routes, & &1.id)}
-      :error -> :error
-    end
+  defp format_query_param({:limit, limit}) when is_integer(limit) and limit > 0 do
+    [{"page[limit]", to_string(limit)}]
   end
+
+  defp format_query_param(_), do: []
 
   defp fetch_routes(stop_id, get_json_fn, type_filters) do
     case fetch([stop_id: stop_id, route_types: type_filters], get_json_fn) do
@@ -148,28 +148,39 @@ defmodule Screens.Routes.Route do
   @spec route_ids(list(%{route_id: id(), active?: boolean()})) :: list(id())
   def route_ids(routes), do: Enum.map(routes, & &1.route_id)
 
-  def get_color_for_route(route_id, route_type \\ nil)
+  @spec color(id()) :: color()
+  @spec color(id(), RouteType.t() | nil) :: color()
+  def color(route_id, route_type \\ nil)
 
-  def get_color_for_route("Red", _), do: :red
-  def get_color_for_route("Mattapan", _), do: :red
-  def get_color_for_route("Orange", _), do: :orange
-  def get_color_for_route("Green" <> _, _), do: :green
-  def get_color_for_route("Blue", _), do: :blue
-  def get_color_for_route("CR-" <> _, _), do: :purple
-  def get_color_for_route("Boat-" <> _, _), do: :teal
+  def color("Red", _), do: :red
+  def color("Mattapan", _), do: :red
+  def color("Orange", _), do: :orange
+  def color("Green" <> _, _), do: :green
+  def color("Blue", _), do: :blue
+  def color("CR-" <> _, _), do: :purple
+  def color("Boat-" <> _, _), do: :teal
+  def color(route_id, _) when route_id in @sl_route_ids, do: :silver
+  def color(_, :rail), do: :purple
+  def color(_, :ferry), do: :teal
+  def color(_, _), do: :yellow
 
-  def get_color_for_route(route_id, _)
-      when route_id in @sl_route_ids,
-      do: :silver
-
-  def get_color_for_route(_, :rail), do: :purple
-  def get_color_for_route(_, :ferry), do: :teal
-  def get_color_for_route(_, _), do: :yellow
-
-  def get_icon_or_color_from_route(%{type: :rail}), do: :cr
-  def get_icon_or_color_from_route(%{short_name: "SL" <> _}), do: :silver
-  def get_icon_or_color_from_route(%{type: :bus}), do: :bus
-  def get_icon_or_color_from_route(%{type: :ferry}), do: :ferry
-  def get_icon_or_color_from_route(%{id: id}), do: get_color_for_route(id)
-  def get_icon_or_color_from_route(_), do: :yellow
+  @doc """
+  Returns an "icon", as understood by `FreeText` or `RoutePill.serialize_icon/1`, for a route.
+  Somewhat specific to "no service" or "no data" states where a single pill represents a group of
+  routes, hence all bus routes are `:bus`, all GL routes are `:green`, etc.
+  """
+  @spec icon(t()) :: icon()
+  def icon(%{id: "Blue"}), do: :blue
+  def icon(%{id: "Boat-" <> _}), do: :ferry
+  def icon(%{id: "CR-" <> _}), do: :cr
+  def icon(%{id: "Green" <> _}), do: :green
+  def icon(%{id: "Mattapan"}), do: :mattapan
+  def icon(%{id: "Orange"}), do: :orange
+  def icon(%{id: "Red"}), do: :red
+  def icon(%{id: id}) when id in @sl_route_ids, do: :silver
+  def icon(%{short_name: "SL" <> _}), do: :silver
+  def icon(%{type: :bus}), do: :bus
+  def icon(%{type: :ferry}), do: :ferry
+  def icon(%{type: :rail}), do: :cr
+  def icon(_), do: :bus
 end

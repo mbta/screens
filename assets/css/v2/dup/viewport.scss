@@ -1,16 +1,16 @@
 .dup-screen-viewport {
+  position: relative;
   width: 1920px;
   height: 1080px;
-  overflow: hidden;
-  position: relative;
-  margin-left: auto;
   margin-right: auto;
+  margin-left: auto;
+  overflow: hidden;
 
   .dup-shifter {
+    position: absolute;
     width: 5760px;
     height: 1080px;
     overflow: hidden;
-    position: absolute;
   }
 
   .dup-shifter--rotation-zero {
@@ -22,7 +22,7 @@
   }
 
   .dup-shifter--rotation-two {
-    right: 0px;
+    right: 0;
   }
 }
 

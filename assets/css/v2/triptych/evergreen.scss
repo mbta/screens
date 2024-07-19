@@ -3,13 +3,14 @@
 .right-pane {
   .evergreen-content__identifiers {
     position: absolute;
-    bottom: 0;
     right: 0;
-    background-color: rgba(23, 31, 38, 0.7);
-    @include font--caption-3;
+    bottom: 0;
+    padding: 12px 24px 18px;
     color: white;
     text-align: right;
-    padding: 12px 24px 18px 24px;
+    background-color: rgb(23 31 38 / 70%);
+
+    @include font--caption-3;
   }
 }
 

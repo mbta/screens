@@ -1,16 +1,16 @@
 .triptych-screen-viewport {
+  position: relative;
   width: 1080px;
   height: 1920px;
-  overflow: hidden;
-  position: relative;
-  margin-left: auto;
   margin-right: auto;
+  margin-left: auto;
+  overflow: hidden;
 
   .triptych-shifter {
+    position: absolute;
     width: 3240px;
     height: 1920px;
     overflow: hidden;
-    position: absolute;
   }
 
   .triptych-shifter--left {
@@ -22,7 +22,7 @@
   }
 
   .triptych-shifter--right {
-    right: 0px;
+    right: 0;
   }
 }
 

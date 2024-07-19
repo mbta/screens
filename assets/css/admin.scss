@@ -8,6 +8,7 @@
 }
 
 .admin-table {
+  padding-bottom: 3em;
   font-family: sans-serif;
   font-size: 14px;
 
@@ -19,8 +20,6 @@
       border: 0;
     }
   }
-
-  padding-bottom: 3em;
 }
 
 .admin-table__textarea {
@@ -35,10 +34,10 @@
 
 .admin-table__controls {
   position: fixed;
-  bottom: 0px;
+  bottom: 0;
   width: 100%;
-  background: white;
   padding: 1em;
+  background: white;
 }
 
 .admin-table__column--name {
@@ -47,17 +46,17 @@
 
 .admin-modal__background {
   position: fixed;
-  left: 0;
   top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgb(0 0 0 / 40%);
 }
 
 .admin-modal__content {
-  margin: 15% auto;
-  padding: 20px;
   width: 60%;
+  padding: 20px;
+  margin: 15% auto;
   background-color: #fefefe;
   border: 1px solid #888;
 }
@@ -72,21 +71,20 @@
 
   &__thumbnail-container {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-flow: row wrap;
     margin-top: 16px;
   }
 
   &__thumbnail {
+    box-sizing: border-box;
     display: inline-flex;
-    border-radius: 2px;
-    border: 1px solid #eaeaea;
-    margin-bottom: 8px;
-    margin-right: 8px;
     width: 100px;
     height: 100px;
     padding: 4px;
-    box-sizing: border-box;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #eaeaea;
+    border-radius: 2px;
 
     & &--full-size {
       width: unset;
@@ -107,20 +105,20 @@
   }
 
   &__dropzone {
-    flex: 1;
     display: flex;
+    flex: 1;
     flex-direction: column;
     align-items: center;
+    width: 50%;
     padding: 20px;
+    color: #bdbdbd;
+    background-color: #fafafa;
+    border-color: #eee;
+    border-style: dashed;
     border-width: 2px;
     border-radius: 2px;
-    border-color: #eeeeee;
-    border-style: dashed;
-    background-color: #fafafa;
-    color: #bdbdbd;
     outline: none;
     transition: border 0.24s ease-in-out;
-    width: 50%;
 
     &:focus,
     &:hover {

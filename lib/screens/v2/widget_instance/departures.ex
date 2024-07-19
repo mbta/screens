@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
+  alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
   alias Screens.Util
@@ -10,6 +11,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
+  alias ScreensConfig.V2.Departures.Header
   alias ScreensConfig.V2.Departures.Layout
   alias ScreensConfig.V2.FreeTextLine
 
@@ -17,10 +19,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
             section_data: [],
             slot_names: []
 
-  @type section :: %{
+  @type normal_section :: %{
           type: :normal_section,
           rows: list(Departure.t() | notice()),
-          layout: Layout.t()
+          layout: Layout.t(),
+          header: Header.t()
         }
 
   @type notice_section :: %{
@@ -40,13 +43,25 @@ defmodule Screens.V2.WidgetInstance.Departures do
           routes: list(Route.t())
         }
 
+  @type no_data_section :: %{
+          type: :no_data_section,
+          route: Route.t()
+        }
+
   @type notice :: %{
           text: FreeTextLine.t()
         }
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          section_data: list(section | notice_section | headway_section() | overnight_section()),
+          section_data:
+            list(
+              normal_section()
+              | notice_section()
+              | headway_section()
+              | overnight_section()
+              | no_data_section()
+            ),
           slot_names: list(atom())
         }
 
@@ -95,7 +110,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   def serialize_section(%{type: :no_data_section, route: route}, _screen, _) do
     text = %FreeTextLine{
-      icon: Route.get_icon_or_color_from_route(route),
+      icon: Route.icon(route),
       text: ["Updates unavailable"]
     }
 
@@ -107,7 +122,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         _screen,
         is_only_section
       ) do
-    pill_color = Route.get_color_for_route(route)
+    pill_color = Route.color(route)
     layout = if is_only_section, do: :full_screen, else: :row
 
     formatted_route =
@@ -147,20 +162,29 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :headway_section, text: FreeTextLine.to_json(text), layout: layout}
   end
 
-  def serialize_section(%{type: :normal_section, rows: departures, layout: layout}, screen, _) do
+  def serialize_section(
+        %{type: :normal_section, rows: departures, layout: layout, header: header},
+        screen,
+        _
+      ) do
     rows =
       departures
       |> Enum.take(@max_departures)
       |> group_consecutive_departures(screen)
       |> Enum.map(&serialize_row(&1, screen))
 
-    %{type: :normal_section, rows: rows, layout: Layout.to_json(layout)}
+    %{
+      type: :normal_section,
+      rows: rows,
+      layout: Layout.to_json(layout),
+      header: Header.to_json(header)
+    }
   end
 
   def serialize_section(%{type: :overnight_section, routes: routes}, _, _) do
     route_pill =
       routes
-      |> Enum.map(&Route.get_icon_or_color_from_route/1)
+      |> Enum.map(&Route.icon/1)
       |> List.first()
 
     text = %FreeTextLine{
@@ -179,7 +203,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :notice_section, text: FreeTextLine.to_plaintext(text)}
   end
 
-  def audio_serialize_section(%{type: :normal_section, rows: departures}, screen) do
+  def audio_serialize_section(%{type: :normal_section, rows: departures, header: header}, screen) do
+    header =
+      case header do
+        %{read_as: header} when is_binary(header) -> header
+        %{title: header} when is_binary(header) -> header
+        _ -> nil
+      end
+
     serialized_departure_groups =
       departures
       |> group_all_departures(2)
@@ -187,6 +218,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{
       type: :normal_section,
+      header: header,
       departure_groups: serialized_departure_groups
     }
   end
@@ -384,8 +416,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
        do: %{time: %{type: :icon, icon: :overnight}}
 
   defp serialize_time(departure, _screen, now) do
+    stop_id = Departure.stop_id(departure)
     departure_time = Departure.time(departure)
     vehicle_status = Departure.vehicle_status(departure)
+    vehicle_stop_id = Prediction.stop_for_vehicle(departure.prediction)
     stop_type = Departure.stop_type(departure)
     route_type = Departure.route_type(departure)
 
@@ -394,7 +428,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     time =
       cond do
-        vehicle_status == :stopped_at and second_diff < 90 ->
+        vehicle_status == :stopped_at and second_diff < 90 and stop_id == vehicle_stop_id ->
           %{type: :text, text: "BRD"}
 
         second_diff < 30 and stop_type == :first_stop ->

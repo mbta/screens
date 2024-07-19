@@ -28,7 +28,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           downstream_stops: nil,
           routes: nil,
           alert_route_types: nil
-        }
+        },
+        partial_closure_platform_names: []
       }
     }
   end
@@ -127,6 +128,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget
       | screen: %Screen{widget.screen | app_params: app_params}
     }
+  end
+
+  defp put_partial_closure_platform_names(widget, partial_closure_platform_names) do
+    %{widget | partial_closure_platform_names: partial_closure_platform_names}
   end
 
   defp ie(opts) do
@@ -373,8 +378,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     test "returns takeover for a suspension that affects all station trips", %{widget: widget} do
       widget =
         put_informed_entities(widget, [
-          ie(route: "Red", route_type: 1),
-          ie(route: "Orange", route_type: 1)
+          ie(route: "Red", route_type: 1, stop: "place-dwnxg"),
+          ie(route: "Orange", route_type: 1, stop: "place-dwnxg")
         ])
         |> put_is_full_screen(true)
 
@@ -518,6 +523,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert [3] == WidgetInstance.priority(widget)
       assert [:large] == WidgetInstance.slot_names(widget)
       assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
+    end
+
+    test "returns :paged_main_content_left for full screen single platform closures", %{
+      widget: widget
+    } do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-forhl")
+        |> put_effect(:station_closure)
+        |> put_is_full_screen(true)
+
+      assert [1] == WidgetInstance.priority(widget)
+      assert [:paged_main_content_left] == WidgetInstance.slot_names(widget)
+      assert :single_screen_alert == WidgetInstance.widget_type(widget)
     end
   end
 
@@ -1042,6 +1061,90 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
     end
+
+    test "handles platform closure at home station", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-portr")
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-portr", route: "Red", route_type: 1),
+          ie(stop: "70065", route: "Red", route_type: 1)
+        ])
+        |> put_tagged_stop_sequences(%{
+          "Red" => [["place-portr", "place-asmnl"]]
+        })
+        |> put_cause(:unknown)
+        |> put_is_full_screen(true)
+        |> put_alert_header("Test Alert")
+        |> put_routes_at_stop([
+          %{
+            route_id: "Red",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
+        |> put_partial_closure_platform_names(["Ashmont/Braintree", "Alewife"])
+
+      expected = %{
+        issue: nil,
+        remedy: nil,
+        remedy_bold: "Test Alert",
+        location: nil,
+        cause: nil,
+        routes: [%{route_id: "Red", svg_name: "rl"}],
+        effect: :station_closure,
+        updated_at: "Friday, 5:00 am",
+        region: :here
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
+
+    test "handles downstream platform closure", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-asmnl")
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-portr", route: "Red", route_type: 1),
+          ie(stop: "70065", route: "Red", route_type: 1)
+        ])
+        |> put_tagged_stop_sequences(%{
+          "Red" => [["place-portr", "place-asmnl"]]
+        })
+        |> put_cause(:unknown)
+        |> put_is_full_screen(true)
+        |> put_alert_header("Test Alert")
+        |> put_routes_at_stop([
+          %{
+            route_id: "Red",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
+        |> put_partial_closure_platform_names(["Ashmont/Braintree", "Alewife"])
+
+      expected = %{
+        issue: nil,
+        remedy: nil,
+        remedy_bold: "Test Alert",
+        location: nil,
+        cause: nil,
+        routes: [%{route_id: "Red", svg_name: "rl-alewife", headsign: "Alewife"}],
+        effect: :station_closure,
+        updated_at: "Friday, 5:00 am",
+        region: :outside
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
   end
 
   describe "serialize_fullscreen_alert/1 transfer station" do
@@ -1473,7 +1576,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
     end
 
-    test "handles station closure", %{widget: widget} do
+    test "handles full station closure", %{widget: widget} do
       widget =
         widget
         |> put_effect(:station_closure)
@@ -1494,6 +1597,71 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         urgent: false,
         region: :outside,
         remedy: "Seek alternate route"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
+
+    test "handles platform closure", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-asmnl")
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-portr", route: "Red", route_type: 1),
+          ie(stop: "70065", route: "Red", route_type: 1)
+        ])
+        |> put_tagged_stop_sequences(%{
+          "Red" => [["place-portr", "place-asmnl"]]
+        })
+        |> put_cause(:unknown)
+        |> put_informed_stations(["Porter"])
+        |> put_partial_closure_platform_names(["Ashmont/Braintree"])
+
+      expected = %{
+        issue: "Bypassing Ashmont/Braintree platform at Porter",
+        location: "",
+        cause: nil,
+        routes: [
+          %{color: :red, text: "RED LINE", type: :text}
+        ],
+        effect: :station_closure,
+        urgent: false,
+        region: :outside,
+        remedy: nil
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+    end
+
+    test "handles multiple platform closures at same station", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-andrw")
+        |> put_effect(:station_closure)
+        |> put_informed_entities([
+          ie(stop: "place-jfk", route: "Red", route_type: 1),
+          ie(stop: "70085", route: "Red", route_type: 1),
+          ie(stop: "70095", route: "Red", route_type: 1)
+        ])
+        |> put_tagged_stop_sequences(%{
+          "Red" => [["place-jfk", "place-andrw"]]
+        })
+        |> put_cause(:unknown)
+        |> put_informed_stations(["JFK/UMass"])
+        |> put_partial_closure_platform_names(["Ashmont", "Braintree"])
+
+      expected = %{
+        issue: "Bypassing 2 platforms at JFK/UMass",
+        location: "",
+        cause: nil,
+        routes: [
+          %{color: :red, text: "RED LINE", type: :text}
+        ],
+        effect: :station_closure,
+        urgent: false,
+        region: :outside,
+        remedy: nil
       }
 
       assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
@@ -2539,13 +2707,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
          }}
       end
 
+      fetch_subway_platforms_for_stop_fn = fn _ -> [] end
+
       alert_widget =
         config
         |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
           now,
           fetch_alerts_fn,
           fetch_stop_name_fn,
-          fetch_location_context_fn
+          fetch_location_context_fn,
+          fetch_subway_platforms_for_stop_fn
         )
         |> List.first()
 
@@ -2953,13 +3124,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
          }}
       end
 
+      fetch_subway_platforms_for_stop_fn = fn _ -> [] end
+
       alert_widget =
         config
         |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
           now,
           fetch_alerts_fn,
           fetch_stop_name_fn,
-          fetch_location_context_fn
+          fetch_location_context_fn,
+          fetch_subway_platforms_for_stop_fn
         )
         |> List.first()
 

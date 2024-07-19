@@ -12,7 +12,7 @@ defmodule Screens.Stops.Stop do
 
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
-  alias Screens.Routes
+  alias Screens.{Routes, Stops}
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Stops.StationsWithRoutesAgent
@@ -22,14 +22,16 @@ defmodule Screens.Stops.Stop do
 
   defstruct id: nil,
             name: nil,
-            platform_code: nil
+            platform_code: nil,
+            platform_name: nil
 
   @type id :: String.t()
 
   @type t :: %__MODULE__{
           id: id,
           name: String.t(),
-          platform_code: String.t() | nil
+          platform_code: String.t() | nil,
+          platform_name: String.t() | nil
         }
 
   @type screen_type :: BusEink | BusShelter | GlEink | PreFare | Dup | Triptych
@@ -271,47 +273,23 @@ defmodule Screens.Stops.Stop do
 
   def fetch_routes_serving_stop(
         station_id,
-        headers \\ [],
-        get_json_fn \\ &V3Api.get_json/5,
+        get_json_fn \\ &V3Api.get_json/2,
         attempts_left \\ 3
       )
 
-  def fetch_routes_serving_stop(_station_id, _headers, _get_json_fn, 0), do: :bad_response
+  def fetch_routes_serving_stop(_station_id, _get_json_fn, 0), do: :bad_response
 
   def fetch_routes_serving_stop(
         station_id,
-        headers,
         get_json_fn,
         attempts_left
       ) do
-    case get_json_fn.(
-           "routes",
-           %{
-             "filter[stop]" => station_id
-           },
-           headers,
-           [],
-           true
-         ) do
+    case get_json_fn.("routes", %{"filter[stop]" => station_id}) do
       {:ok, %{"data" => []}, _} ->
-        fetch_routes_serving_stop(station_id, headers, get_json_fn, attempts_left - 1)
+        fetch_routes_serving_stop(station_id, get_json_fn, attempts_left - 1)
 
-      {:ok, %{"data" => data}, headers} ->
-        date =
-          headers
-          |> Enum.into(%{})
-          |> Map.get("last-modified")
-
-        routes =
-          data
-          |> Enum.map(fn route -> Routes.Parser.parse_route(route) end)
-
-        StationsWithRoutesAgent.put(station_id, routes, date)
-
-        {:ok, routes}
-
-      :not_modified ->
-        :not_modified
+      {:ok, %{"data" => data}} ->
+        {:ok, Enum.map(data, fn route -> Routes.Parser.parse_route(route) end)}
 
       _ ->
         :error
@@ -322,28 +300,18 @@ defmodule Screens.Stops.Stop do
   @spec create_station_with_routes_map(String.t()) :: list(Routes.Route.t())
   def create_station_with_routes_map(station_id) do
     case StationsWithRoutesAgent.get(station_id) do
-      {routes, date} ->
-        get_routes_serving_stop(station_id, routes, date)
-
       nil ->
         get_routes_serving_stop(station_id)
+
+      routes ->
+        get_routes_serving_stop(station_id, routes)
     end
   end
 
-  defp get_routes_serving_stop(station_id, default_routes \\ [], date \\ nil) do
-    headers =
-      if is_nil(date) do
-        []
-      else
-        [{"if-modified-since", date}]
-      end
-
-    case fetch_routes_serving_stop(station_id, headers) do
+  defp get_routes_serving_stop(station_id, default_routes \\ []) do
+    case fetch_routes_serving_stop(station_id) do
       {:ok, new_routes} ->
         new_routes
-
-      :not_modified ->
-        default_routes
 
       :bad_response ->
         Logger.error(
@@ -372,14 +340,16 @@ defmodule Screens.Stops.Stop do
   end
 
   def fetch_stop_name(stop_id) do
-    case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do
-      {:ok, %{"data" => [stop_data]}} ->
-        %{"attributes" => %{"name" => stop_name}} = stop_data
-        stop_name
+    Screens.Telemetry.span(~w[screens stops stop fetch_stop_name]a, %{stop_id: stop_id}, fn ->
+      case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do
+        {:ok, %{"data" => [stop_data]}} ->
+          %{"attributes" => %{"name" => stop_name}} = stop_data
+          stop_name
 
-      _ ->
-        nil
-    end
+        _ ->
+          nil
+      end
+    end)
   end
 
   def fetch_parent_stop_id(stop_id) do
@@ -390,6 +360,22 @@ defmodule Screens.Stops.Stop do
 
       _ ->
         nil
+    end
+  end
+
+  def fetch_subway_platforms_for_stop(stop_id) do
+    case Screens.V3Api.get_json("stops/" <> stop_id, %{"include" => "child_stops"}) do
+      {:ok, %{"included" => child_stop_data}} ->
+        child_stop_data
+        |> Enum.filter(fn %{
+                            "attributes" => %{
+                              "location_type" => location_type,
+                              "vehicle_type" => vehicle_type
+                            }
+                          } ->
+          location_type == 0 and vehicle_type in [0, 1]
+        end)
+        |> Enum.map(&Stops.Parser.parse_stop/1)
     end
   end
 
@@ -488,31 +474,37 @@ defmodule Screens.Stops.Stop do
           DateTime.t()
         ) :: {:ok, LocationContext.t()} | :error
   def fetch_location_context(app, stop_id, now) do
-    with alert_route_types <- get_route_type_filter(app, stop_id),
-         {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, alert_route_types),
-         {:ok, tagged_stop_sequences} <-
-           fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop) do
-      stop_name = fetch_stop_name(stop_id)
-      stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+    Screens.Telemetry.span(
+      ~w[screens stops stop fetch_location_context]a,
+      %{app: app, stop_id: stop_id},
+      fn ->
+        with alert_route_types <- get_route_type_filter(app, stop_id),
+             {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, alert_route_types),
+             {:ok, tagged_stop_sequences} <-
+               fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop) do
+          stop_name = fetch_stop_name(stop_id)
+          stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
 
-      {:ok,
-       %LocationContext{
-         home_stop: stop_id,
-         home_stop_name: stop_name,
-         tagged_stop_sequences: tagged_stop_sequences,
-         upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
-         downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
-         routes: routes_at_stop,
-         alert_route_types: alert_route_types
-       }}
-    else
-      :error ->
-        Logger.error(
-          "[fetch_location_context fetch error] Failed to get location context for an alert: stop_id=#{stop_id}"
-        )
+          {:ok,
+           %LocationContext{
+             home_stop: stop_id,
+             home_stop_name: stop_name,
+             tagged_stop_sequences: tagged_stop_sequences,
+             upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
+             downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),
+             routes: routes_at_stop,
+             alert_route_types: alert_route_types
+           }}
+        else
+          :error ->
+            Logger.error(
+              "[fetch_location_context fetch error] Failed to get location context for an alert: stop_id=#{stop_id}"
+            )
 
-        :error
-    end
+            :error
+        end
+      end
+    )
   end
 
   # Returns the route types we care about for the alerts of this screen type / place
