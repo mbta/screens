@@ -4,7 +4,7 @@ defmodule ScreensWeb.UnauthorizedController do
   def index(conn, _params) do
     conn
     |> put_status(403)
-    |> put_layout("error.html")
-    |> render("index.html")
+    |> put_layout(html: {ScreensWeb.LayoutView, :error})
+    |> render(:index)
   end
 end
