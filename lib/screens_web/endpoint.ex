@@ -22,7 +22,7 @@ defmodule ScreensWeb.Endpoint do
     at: "/",
     from: :screens,
     gzip: false,
-    only: ~w(css fonts images js favicon.ico robots.txt)
+    only: ScreensWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

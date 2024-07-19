@@ -27,6 +27,8 @@ defmodule ScreensWeb.ConnCase do
 
       # The default endpoint for testing
       @endpoint ScreensWeb.Endpoint
+
+      use ScreensWeb, :verified_routes
     end
   end
 
