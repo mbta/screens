@@ -111,7 +111,14 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
     if length(routes) <= 3 do
       routes
-      |> Enum.sort()
+      |> Enum.sort_by(fn route_id ->
+        case Integer.parse(route_id) do
+          # Bus route (including SL_, CT_)
+          {route_number, ""} -> route_number
+          # Non-bus route
+          _ -> route_id
+        end
+      end)
       |> Enum.map(&RoutePill.serialize_route_for_alert(&1, length(routes) == 1))
     else
       t.location_context.alert_route_types
