@@ -27,7 +27,7 @@ defmodule ScreensWeb.ScreenApiController do
   end
 
   def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
-    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
+    is_screen = ScreensWeb.UserAgent.screen_conn?(conn, screen_id)
 
     _ =
       Screens.LogScreenData.log_data_request(
@@ -53,7 +53,7 @@ defmodule ScreensWeb.ScreenApiController do
   end
 
   def show_dup(conn, %{"id" => screen_id, "rotation_index" => rotation_index} = params) do
-    is_screen = ScreensWeb.UserAgent.is_screen_conn?(conn, screen_id)
+    is_screen = ScreensWeb.UserAgent.screen_conn?(conn, screen_id)
 
     _ =
       Screens.LogScreenData.log_data_request(

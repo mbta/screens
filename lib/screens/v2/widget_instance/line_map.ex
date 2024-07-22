@@ -41,11 +41,11 @@ defmodule Screens.V2.WidgetInstance.LineMap do
       } = config
 
       current_stop_index = Enum.find_index(stops, fn %{id: stop} -> stop == current_stop end)
-      current_stop_is_terminal? = current_stop_index == 0
+      current_stop_terminal? = current_stop_index == 0
 
       %{
         stops:
-          LineMap.serialize_stops(current_stop, stops, reverse_stops, current_stop_is_terminal?),
+          LineMap.serialize_stops(current_stop, stops, reverse_stops, current_stop_terminal?),
         vehicles:
           LineMap.serialize_vehicles(
             departures,
@@ -54,14 +54,14 @@ defmodule Screens.V2.WidgetInstance.LineMap do
             direction_id,
             current_stop,
             now,
-            current_stop_is_terminal?
+            current_stop_terminal?
           ),
         scheduled_departure:
           LineMap.serialize_scheduled_departure(
             departures,
             direction_id,
             stops,
-            current_stop_is_terminal?
+            current_stop_terminal?
           )
       }
     end
@@ -81,7 +81,7 @@ defmodule Screens.V2.WidgetInstance.LineMap do
     def audio_view(_instance), do: ScreensWeb.V2.Audio.LineMapView
   end
 
-  def serialize_stops(current_stop, stops, reverse_stops, is_terminal?) do
+  def serialize_stops(current_stop, stops, reverse_stops, terminal?) do
     current_stop_index = Enum.find_index(stops, fn %{id: stop} -> stop == current_stop end)
 
     forward_stops =
@@ -98,7 +98,7 @@ defmodule Screens.V2.WidgetInstance.LineMap do
       end)
       |> Enum.reverse()
 
-    if is_terminal? do
+    if terminal? do
       backward_stops =
         reverse_stops
         |> Enum.reverse()
@@ -126,7 +126,7 @@ defmodule Screens.V2.WidgetInstance.LineMap do
         direction_id,
         current_stop,
         now,
-        is_terminal?
+        terminal?
       ) do
     departures_with_vehicle_and_trip =
       departures
@@ -139,7 +139,7 @@ defmodule Screens.V2.WidgetInstance.LineMap do
       |> Enum.flat_map(&serialize_vehicle_departure(&1, stops, current_stop, now))
 
     all_vehicles =
-      if is_terminal? do
+      if terminal? do
         backward_vehicles =
           departures_with_vehicle_and_trip
           |> Stream.filter(&reverse_directions_match?(&1, direction_id))
@@ -262,10 +262,10 @@ defmodule Screens.V2.WidgetInstance.LineMap do
     end
   end
 
-  def serialize_scheduled_departure(_departures, _direction_id, _stops, true = _is_terminal?),
+  def serialize_scheduled_departure(_departures, _direction_id, _stops, true = _terminal?),
     do: nil
 
-  def serialize_scheduled_departure(departures, direction_id, stops, _is_terminal?) do
+  def serialize_scheduled_departure(departures, direction_id, stops, _terminal?) do
     # Number of departures with predictions (not just schedules) in this direction
     prediction_count =
       Enum.count(

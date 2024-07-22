@@ -486,12 +486,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
   def serialize_inline_alerts([first_departure | _]) do
     first_departure
     |> Departure.alerts()
-    |> Enum.filter(&alert_is_inline?/1)
+    |> Enum.filter(&inline_alert?/1)
     |> Enum.map(&serialize_inline_alert/1)
   end
 
-  defp alert_is_inline?(%{effect: :delay}), do: false
-  defp alert_is_inline?(_), do: false
+  defp inline_alert?(%{effect: :delay}), do: false
+  defp inline_alert?(_), do: false
 
   defp serialize_inline_alert(%{id: id, effect: :delay, severity: severity}) do
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
