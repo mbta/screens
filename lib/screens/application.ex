@@ -36,7 +36,8 @@ defmodule Screens.Application do
       {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner},
       Screens.OlCrowding.DynamicSupervisor,
       {Screens.OlCrowding.Agent, %{}},
-      {Screens.ScreenApiResponseCache, []}
+      {Screens.ScreenApiResponseCache, []},
+      Screens.Streams.Alerts
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
