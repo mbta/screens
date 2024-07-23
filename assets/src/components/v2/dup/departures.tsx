@@ -1,12 +1,12 @@
 import React from "react";
 
-import NormalSection from "Components/v2/dup/departures/normal_section";
+import NormalSection from "./departures/normal_section";
 import NoticeSection from "Components/v2/departures/notice_section";
-import HeadwaySection from "Components/v2/dup/departures/headway_section";
-import NoDataSection from "Components/v2/dup/departures/no_data_section";
-import OvernightSection from "./overnight_section";
+import HeadwaySection from "./departures/headway_section";
+import NoDataSection from "./departures/no_data_section";
+import OvernightSection from "./departures/overnight_section";
 
-const NormalDepartures = ({ sections }) => {
+const Departures = ({ sections }) => {
   return (
     <div className="departures-container">
       <div className="departures">
@@ -33,4 +33,4 @@ const NormalDepartures = ({ sections }) => {
   );
 };
 
-export default NormalDepartures;
+export default Departures;

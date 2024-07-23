@@ -13,7 +13,7 @@ import NormalScreen from "Components/v2/solari_large/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/lcd/normal_header";
-import NormalDepartures from "Components/v2/departures/normal_departures";
+import Departures from "Components/v2/departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 
 const TYPE_TO_COMPONENT = {
@@ -21,7 +21,7 @@ const TYPE_TO_COMPONENT = {
   takeover: TakeoverScreen,
   placeholder: Placeholder,
   normal_header: NormalHeader,
-  departures: NormalDepartures,
+  departures: Departures,
 };
 
 const App = (): JSX.Element => {
