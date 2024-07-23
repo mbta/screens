@@ -16,7 +16,7 @@ import NormalScreen, {
   NormalSimulation,
 } from "Components/v2/dup/normal_screen";
 import NormalHeader from "Components/v2/dup/normal_header";
-import NormalDepartures from "Components/v2/dup/departures/normal_departures";
+import Departures from "Components/v2/dup/departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import Viewport from "Components/v2/dup/viewport";
 import EvergreenContent from "Components/v2/evergreen_content";
@@ -54,7 +54,7 @@ const TYPE_TO_COMPONENT = {
   body_split_one: splitRotationFromPropNames(SplitBody, "one"),
   body_split_two: splitRotationFromPropNames(SplitBody, "two"),
   normal_header: NormalHeader,
-  departures: NormalDepartures,
+  departures: Departures,
   evergreen_content: EvergreenContent,
   partial_alert: PartialAlert,
   takeover_alert: TakeoverAlert,

@@ -22,7 +22,7 @@ import OneMedium from "Components/v2/eink/flex/one_medium";
 import Placeholder from "Components/v2/placeholder";
 import NormalHeader from "Components/v2/eink/bus_normal_header";
 import FareInfoFooter from "Components/v2/eink/fare_info_footer";
-import NormalDepartures from "Components/v2/departures/normal_departures";
+import Departures from "Components/v2/departures";
 import EvergreenContent from "Components/v2/evergreen_content";
 import {
   LOADING_LAYOUT,
@@ -55,7 +55,7 @@ const TYPE_TO_COMPONENT = {
   placeholder: Placeholder,
   fare_info_footer: FareInfoFooter,
   normal_header: NormalHeader,
-  departures: NormalDepartures,
+  departures: Departures,
   alert: MediumFlexAlert,
   full_body_alert: FullBodyTopScreenAlert,
   evergreen_content: EvergreenContent,

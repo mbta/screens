@@ -24,7 +24,7 @@ import TakeoverScreen from "Components/v2/takeover_screen";
 import Placeholder from "Components/v2/placeholder";
 
 import NormalHeader from "Components/v2/lcd/normal_header";
-import NormalDepartures from "Components/v2/departures/normal_departures";
+import Departures from "Components/v2/departures";
 
 import NoData from "Components/v2/lcd/no_data";
 import DeparturesNoData from "Components/v2/lcd/departures_no_data";
@@ -38,7 +38,7 @@ const TYPE_TO_COMPONENT = {
   takeover: TakeoverScreen,
   placeholder: Placeholder,
   normal_header: NormalHeader,
-  departures: NormalDepartures,
+  departures: Departures,
   no_data: NoData,
   page_load_no_data: PageLoadNoData,
   departures_no_data: DeparturesNoData,

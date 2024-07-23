@@ -7,18 +7,18 @@ import React, {
 } from "react";
 import weakKey from "weak-key";
 
-import NormalSection from "./normal_section";
-import NoticeSection from "./notice_section";
-import { Section, trimSections, toFoldedSection } from "./section";
+import NormalSection from "./departures/normal_section";
+import NoticeSection from "./departures/notice_section";
+import { Section, trimSections, toFoldedSection } from "./departures/section";
 
 import { warn } from "Util/sentry";
 import { hasOverflowY } from "Util/util";
 
-type NormalDepartures = {
+type Departures = {
   sections: Section[];
 };
 
-const NormalDepartures: ComponentType<NormalDepartures> = ({ sections }) => {
+const Departures: ComponentType<Departures> = ({ sections }) => {
   const ref = useRef<HTMLDivElement>(null);
   const initialSections = useMemo(
     () => sections.map(toFoldedSection),
@@ -57,4 +57,4 @@ const NormalDepartures: ComponentType<NormalDepartures> = ({ sections }) => {
   );
 };
 
-export default NormalDepartures;
+export default Departures;
