@@ -1,11 +1,9 @@
 import React, { ComponentType } from "react";
 
-import RoutePill, { Pill } from "Components/v2/departures/route_pill";
-import Destination from "Components/v2/departures/destination";
-import DepartureTimes, {
-  TimeWithCrowding,
-} from "Components/v2/departures/departure_times";
-import DepartureAlerts from "Components/v2/departures/departure_alerts";
+import RoutePill, { Pill } from "./route_pill";
+import Destination from "./destination";
+import DepartureTimes, { TimeWithCrowding } from "./departure_times";
+import DepartureAlerts from "./departure_alerts";
 
 type DepartureRow = {
   id: string;

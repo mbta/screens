@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 import { classWithModifier, imagePath } from "Util/util";
-import RoutePill, { Pill } from "../departures/route_pill";
+import RoutePill, { Pill } from "Components/v2/departures/route_pill";
 
 interface Props {
   routes: Pill[];

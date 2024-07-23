@@ -1,8 +1,8 @@
 import React from "react";
 
 import RoutePill from "Components/v2/departures/route_pill";
-import Destination from "Components/v2/dup/departures/destination";
-import DepartureTimes from "Components/v2/dup/departures/departure_times";
+import Destination from "./destination";
+import DepartureTimes from "./departure_times";
 
 const DepartureRow = ({
   headsign,

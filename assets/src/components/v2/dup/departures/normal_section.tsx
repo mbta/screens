@@ -1,6 +1,6 @@
 import React from "react";
 
-import DepartureRow from "Components/v2/dup/departures/departure_row";
+import DepartureRow from "./departure_row";
 import NoticeRow from "Components/v2/departures/notice_row";
 import useCurrentPage from "Hooks/use_current_dup_page";
 

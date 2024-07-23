@@ -1,9 +1,7 @@
 import React, { ComponentType } from "react";
 
-import DepartureTime from "Components/v2/departures/departure_time";
-import DepartureCrowding, {
-  CrowdingLevel,
-} from "Components/v2/departures/departure_crowding";
+import DepartureTime from "./departure_time";
+import DepartureCrowding, { CrowdingLevel } from "./departure_crowding";
 
 export type TimeWithCrowding = {
   id: string;
