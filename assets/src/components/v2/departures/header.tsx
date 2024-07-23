@@ -4,10 +4,10 @@ import Arrow45 from "Images/svgr_bundled/Arrow-45-no-padding.svg";
 
 type CardinalDirection = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
 
-export interface Props {
+type Header = {
   title: string | null;
   arrow: CardinalDirection | null;
-}
+};
 
 const DirectionArrow = ({ arrow }: { arrow: CardinalDirection }) => (
   <Arrow45
@@ -23,7 +23,7 @@ const DirectionArrow = ({ arrow }: { arrow: CardinalDirection }) => (
   />
 );
 
-const Header = ({ title, arrow }: Props) => {
+const Header = ({ title, arrow }: Header) => {
   return (
     <header className="departures-header">
       {(title || arrow) && <span>{title}</span>}
