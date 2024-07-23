@@ -3,7 +3,7 @@ import weakKey from "weak-key";
 
 import DepartureRow from "./departure_row";
 import NoticeRow from "./notice_row";
-import Header, { type Props as HeaderProps } from "./header";
+import Header from "./header";
 import LaterDepartures, { MIN_LATER_DEPARTURES } from "./later_departures";
 
 export type Layout = {
@@ -19,13 +19,13 @@ export type Row =
 
 export type NormalSection = {
   layout: Layout;
-  header: HeaderProps;
+  header: Header;
   rows: Row[];
 };
 
 export type FoldedNormalSection = {
   layout: Layout;
-  header: HeaderProps;
+  header: Header;
   rows: FoldedRows;
 };
 
