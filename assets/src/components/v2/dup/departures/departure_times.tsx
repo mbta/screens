@@ -1,6 +1,6 @@
 import React from "react";
 
-import DepartureTime from "Components/v2/dup/departures/departure_time";
+import DepartureTime from "./departure_time";
 
 const DepartureTimes = ({ timesWithCrowding, currentPage }) => {
   return (
