@@ -74,6 +74,29 @@ defmodule Screens.Telemetry do
     end)
   end
 
+  @doc """
+  Like `span/3` but requires a tuple of `{<return value>, <stop meta>}` to be
+  returned from the passed function. The `<stop meta>` map will be merged into
+  the meta map passed to `span_with_stop_meta/3`.
+  """
+  def span_with_stop_meta(name, meta \\ %{}, fun) do
+    ctx = context()
+
+    meta =
+      ctx
+      |> Map.merge(meta)
+      |> Map.put_new_lazy(:span_id, &generate_span_id/0)
+
+    previous_span_id = Process.put(:span_id, meta[:span_id])
+    meta = Map.put_new(meta, :parent_id, previous_span_id)
+
+    :telemetry.span(name, meta, fn ->
+      {result, stop_meta} = fun.()
+      Process.put(:span_id, previous_span_id)
+      {result, Map.merge(meta, stop_meta)}
+    end)
+  end
+
   def context do
     ctx = %{correlation_id: get_correlation_id(), parent_id: get_parent_span_id()}
     request_id = Process.get(:request_id) || Logger.metadata()[:request_id]

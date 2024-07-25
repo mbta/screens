@@ -22,22 +22,19 @@ defmodule Screens.V3Api do
     headers = api_key_headers(Application.get_env(:screens, :api_v3_key))
     url = build_url(route, params)
 
-    cached_response = ScreenApiResponseCache.get(url)
-
-    headers =
-      if is_nil(cached_response),
-        do: headers,
-        else: headers ++ [{"if-modified-since", elem(cached_response, 1)}]
-
     ctx = Screens.Telemetry.context()
 
     meta =
-      Map.merge(ctx, %{
-        cached: cached_response != nil,
-        url: url
-      })
+      Map.merge(ctx, %{url: url})
 
-    Screens.Telemetry.span([:screens, :v3_api, :get_json], meta, fn ->
+    Screens.Telemetry.span_with_stop_meta([:screens, :v3_api, :get_json], meta, fn ->
+      cached_response = ScreenApiResponseCache.get(url)
+
+      headers =
+        if is_nil(cached_response),
+          do: headers,
+          else: headers ++ [{"if-modified-since", elem(cached_response, 1)}]
+
       with {:http_request, {:ok, response}} <-
              {:http_request,
               HTTPoison.get(
@@ -50,26 +47,33 @@ defmodule Screens.V3Api do
            {:parse, {:ok, parsed}} <- {:parse, Jason.decode(body)} do
         update_response_cache(url, parsed, headers)
 
-        {:ok, parsed}
+        {{:ok, parsed}, %{cached: false}}
       else
         {:http_request, e} ->
           {:error, httpoison_error} = e
 
-          log_api_error({:http_fetch_error, e}, url, message: Exception.message(httpoison_error))
+          error =
+            log_api_error({:http_fetch_error, e}, url,
+              message: Exception.message(httpoison_error)
+            )
+
+          {error, %{cached: false}}
 
         {:response_success, %{status_code: 304}} ->
-          {:ok, elem(cached_response, 0)}
+          {{:ok, elem(cached_response, 0)}, %{cached: true}}
 
         {:response_success, %{status_code: status_code}} = response ->
           _ = log_api_error({:bad_response_code, response}, url, status_code: status_code)
 
-          :bad_response_code
+          {:bad_response_code, %{cached: false}}
 
         {:parse, {:error, e}} ->
-          log_api_error({:parse_error, e}, url)
+          error = log_api_error({:parse_error, e}, url)
+          {error, %{cached: false}}
 
         e ->
-          log_api_error({:error, e}, url)
+          error = log_api_error({:error, e}, url)
+          {error, %{cached: false}}
       end
     end)
   end
