@@ -9,7 +9,6 @@ interface NormalHeaderProps {
   time?: string;
   color?: string;
   accentPattern?: string;
-  code?: string;
 }
 
 const NormalHeader = ({
@@ -17,15 +16,11 @@ const NormalHeader = ({
   time,
   color,
   accentPattern,
-  code,
 }: NormalHeaderProps) => {
   const playerName = usePlayerName();
   let version = DUP_VERSION;
   if (playerName) {
     version = `${version}-${playerName}`;
-  }
-  if (code) {
-    version = `${version}; Maintenance code: ${code}`;
   }
 
   return (
@@ -33,8 +28,6 @@ const NormalHeader = ({
       icon={color === "yellow" ? Icon.logo_negative : Icon.logo}
       text={text}
       time={time}
-      // Currently, we don't use different codes that populating this would be useful...
-      // But this was a feature available in v1, so just set it up here.
       version={version}
       maxHeight={208}
       showTo={false}
