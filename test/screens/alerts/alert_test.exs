@@ -107,4 +107,131 @@ defmodule Screens.Alerts.AlertTest do
       assert effect == Alert.effect(%Alert{effect: effect})
     end
   end
+
+  describe "fetch_from_cache/2" do
+    setup do
+      alerts = [
+        %Alert{
+          id: "USING_WHEELCHAIR",
+          cause: :construction,
+          effect: :delay,
+          severity: 4,
+          header: "Alert 0",
+          description: "Alert 0",
+          informed_entities: [
+            %{
+              activities: ~w[USING_WHEELCHAIR],
+              stop: "A",
+              route: nil,
+              route_type: 3,
+              direction_id: nil
+            }
+          ]
+        },
+        %Alert{
+          id: "stop: A, route_type: 3",
+          cause: :construction,
+          effect: :delay,
+          severity: 4,
+          header: "Alert 1",
+          description: "Alert 1",
+          informed_entities: [
+            %{activities: ~w[BOARD RIDE], stop: "A", route: nil, route_type: 3, direction_id: nil}
+          ]
+        },
+        %Alert{
+          id: "stop: B, route_type: 3",
+          cause: :construction,
+          effect: :delay,
+          severity: 4,
+          header: "Alert 2",
+          description: "Alert 2",
+          informed_entities: [
+            %{activities: ~w[BOARD RIDE], stop: "B", route: nil, route_type: 3, direction_id: nil}
+          ]
+        },
+        %Alert{
+          id: "stop: C, route: Z, route_type: 2, direction_id: 0",
+          cause: :construction,
+          effect: :delay,
+          severity: 4,
+          header: "Alert 3",
+          description: "Alert 3",
+          informed_entities: [
+            %{activities: ~w[BOARD EXIT], stop: "C", route: "Z", route_type: 2, direction_id: 0}
+          ]
+        },
+        %Alert{
+          id: "stop: D, route: Y/Z, route_type: 2, direction_id: 1",
+          cause: :construction,
+          effect: :delay,
+          severity: 4,
+          header: "Alert 4",
+          description: "Alert 4",
+          informed_entities: [
+            %{activities: ~w[BOARD RIDE], stop: "D", route: "Z", route_type: 2, direction_id: 1},
+            %{activities: ~w[BOARD RIDE], stop: nil, route: "Y", route_type: 2, direction_id: nil}
+          ]
+        }
+      ]
+
+      [alerts: alerts, get_all_alerts: fn -> alerts end]
+    end
+
+    test "returns all of the alerts", %{alerts: alerts, get_all_alerts: get_all_alerts} do
+      assert alerts == Alert.fetch_from_cache([], get_all_alerts)
+    end
+
+    test "filters by stops", %{get_all_alerts: get_all_alerts} do
+      assert [%Alert{id: "stop: A" <> _}] =
+               Alert.fetch_from_cache([stop_id: "A"], get_all_alerts)
+
+      assert [%Alert{id: "stop: B" <> _}] =
+               Alert.fetch_from_cache([stop_ids: ["B"]], get_all_alerts)
+
+      assert [%Alert{id: "stop: A" <> _}, %Alert{id: "stop: B" <> _}] =
+               Alert.fetch_from_cache([stop_ids: ["A", "B"]], get_all_alerts)
+    end
+
+    test "filters by routes", %{get_all_alerts: get_all_alerts} do
+      assert [%Alert{id: "stop: C, route: Z" <> _}, %Alert{id: "stop: D, route: Y/Z" <> _}] =
+               Alert.fetch_from_cache([route_ids: ["Z"]], get_all_alerts)
+
+      assert [%Alert{id: "stop: D, route: Y/Z" <> _}] =
+               Alert.fetch_from_cache([route_ids: ["Y"]], get_all_alerts)
+    end
+
+    test "filters by route_type", %{get_all_alerts: get_all_alerts} do
+      assert [
+               %Alert{id: "stop: C, route: Z, route_type: 2" <> _},
+               %Alert{id: "stop: D, route: Y/Z, route_type: 2" <> _}
+             ] =
+               Alert.fetch_from_cache([route_type: :rail], get_all_alerts)
+
+      assert [
+               %Alert{id: "stop: C, route: Z, route_type: 2" <> _},
+               %Alert{id: "stop: D, route: Y/Z, route_type: 2" <> _}
+             ] =
+               Alert.fetch_from_cache([route_type: 2], get_all_alerts)
+
+      assert [
+               %Alert{id: "stop: A, route_type: 3" <> _},
+               %Alert{id: "stop: B, route_type: 3" <> _}
+             ] =
+               Alert.fetch_from_cache([route_types: [:bus]], get_all_alerts)
+    end
+
+    test "filters by route and direction_id", %{get_all_alerts: get_all_alerts} do
+      assert [%Alert{id: "stop: D, route: Y/Z, route_type: 2, direction_id: 1"}] =
+               Alert.fetch_from_cache([route_ids: ["Z"], direction_id: 1], get_all_alerts)
+    end
+
+    test "filters by activities when passed", %{get_all_alerts: get_all_alerts} do
+      assert [%Alert{id: "USING_WHEELCHAIR"}] =
+               Alert.fetch_from_cache([activities: ["USING_WHEELCHAIR"]], get_all_alerts)
+
+      assert [%Alert{id: "stop: C, route: Z" <> _}] =
+               Alert.fetch_from_cache([activities: ["EXIT", "DOES_NOT_EXIST"]], get_all_alerts)
+    end
+  end
 end
