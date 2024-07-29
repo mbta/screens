@@ -68,6 +68,7 @@ defmodule Screens.Alerts.Parser do
 
   defp parse_informed_entity(ie) do
     %{
+      activities: get_in(ie, ["activities"]),
       stop: get_in(ie, ["stop"]),
       route: get_in(ie, ["route"]),
       route_type: get_in(ie, ["route_type"]),
