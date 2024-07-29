@@ -10,16 +10,10 @@ const DepartureRow = ({
   times_with_crowding: timesWithCrowding,
   currentPage,
 }) => {
-  const routeText = Number(route.text);
   return (
     <div className="departure-row">
       <div className="departure-row__route">
-        <RoutePill
-          pill={{
-            ...route,
-            size: isNaN(routeText) || routeText > 200 ? "small" : "large",
-          }}
-        />
+        <RoutePill pill={route} />
       </div>
       <div className="departure-row__destination">
         <Destination {...headsign} currentPage={currentPage} />
