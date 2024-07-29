@@ -1,4 +1,6 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
+
+import type DestinationBase from "Components/v2/departures/destination";
 
 const LINE_HEIGHT = 138; // px
 
@@ -42,7 +44,11 @@ const RenderedDestination = ({ parts, index1, index2, currentPageIndex }) => {
   );
 };
 
-const Destination = ({ headsign, currentPage }) => {
+interface Props extends DestinationBase {
+  currentPage: number;
+}
+
+const Destination: ComponentType<Props> = ({ headsign, currentPage }) => {
   const firstLineRef = useRef<HTMLDivElement>(null);
   const secondLineRef = useRef<HTMLDivElement>(null);
 

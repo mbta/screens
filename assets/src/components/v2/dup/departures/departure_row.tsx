@@ -1,10 +1,15 @@
-import React from "react";
+import React, { ComponentType } from "react";
 
+import type DepartureRowBase from "Components/v2/departures/departure_row";
 import RoutePill from "Components/v2/departures/route_pill";
 import Destination from "./destination";
 import DepartureTimes from "./departure_times";
 
-const DepartureRow = ({
+interface Props extends DepartureRowBase {
+  currentPage: number;
+}
+
+const DepartureRow: ComponentType<Props> = ({
   headsign,
   route,
   times_with_crowding: timesWithCrowding,

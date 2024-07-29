@@ -413,7 +413,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
          _screen,
          _now
        ),
-       do: %{time: %{type: :icon, icon: :overnight}}
+       do: %{time: %{type: :overnight}}
 
   defp serialize_time(departure, _screen, now) do
     stop_id = Departure.stop_id(departure)

@@ -561,6 +561,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
        ) do
     if DateTime.compare(now, last_schedule_today.departure_time) == :gt or
          DateTime.compare(now, first_schedule_today.departure_time) == :lt do
+      # nil/nil acts as a flag for the serializer to produce an `overnight` departure time
       %Departure{
         schedule: %{last_schedule_today | departure_time: nil, arrival_time: nil}
       }

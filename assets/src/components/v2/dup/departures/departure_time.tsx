@@ -1,5 +1,7 @@
-import React from "react";
+import React, { ComponentType } from "react";
 import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
+
+import type DepartureTimeBase from "Components/v2/departures/departure_time";
 
 const TextDepartureTime = ({ text }) => {
   return <div className="departure-time__text">{text}</div>;
@@ -26,9 +28,19 @@ const TimestampDepartureTime = ({ hour, minute, am_pm, show_am_pm }) => {
   );
 };
 
-const DepartureTime = ({ scheduled_time, time, currentPage }) => {
+interface Props {
+  time: DepartureTimeBase;
+  scheduled_time?: DepartureTimeBase;
+  currentPage: number;
+}
+
+const DepartureTime: ComponentType<Props> = ({
+  scheduled_time,
+  time,
+  currentPage,
+}) => {
   let predictedTime;
-  if (time.type === "icon") {
+  if (time.type === "overnight") {
     predictedTime = (
       <img className="departure-time__moon-icon" src={imagePath(`moon.svg`)} />
     );
@@ -50,11 +62,11 @@ const DepartureTime = ({ scheduled_time, time, currentPage }) => {
 
   let scheduledTime;
 
-  if (time.type === "text") {
+  if (scheduled_time.type === "text") {
     scheduledTime = <TextDepartureTime {...scheduled_time} />;
-  } else if (time.type === "minutes") {
+  } else if (scheduled_time.type === "minutes") {
     scheduledTime = <MinutesDepartureTime {...scheduled_time} />;
-  } else if (time.type === "timestamp") {
+  } else if (scheduled_time.type === "timestamp") {
     scheduledTime = <TimestampDepartureTime {...scheduled_time} />;
   }
   if (currentPage === 0) {
@@ -67,7 +79,7 @@ const DepartureTime = ({ scheduled_time, time, currentPage }) => {
     return (
       <div
         className={classWithModifiers("departure-time", [
-          time.type,
+          scheduled_time.type,
           "disabled",
         ])}
       >

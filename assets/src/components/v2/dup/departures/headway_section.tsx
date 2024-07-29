@@ -1,8 +1,13 @@
-import React from "react";
-import FreeText from "Components/v2/free_text";
+import React, { ComponentType } from "react";
+import FreeText, { FreeTextType } from "Components/v2/free_text";
 import { classWithModifier } from "Util/util";
 
-const HeadwaySection = ({ text, layout }) => {
+interface HeadwaySection {
+  layout: string;
+  text: FreeTextType;
+}
+
+const HeadwaySection: ComponentType<HeadwaySection> = ({ text, layout }) => {
   return (
     <div
       className={`departures-section ${classWithModifier(

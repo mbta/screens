@@ -1,32 +1,39 @@
-import React from "react";
+import React, { ComponentType } from "react";
 
+import { type Section as SectionBase } from "Components/v2/departures/section";
 import NormalSection from "./departures/normal_section";
 import NoticeSection from "Components/v2/departures/notice_section";
 import HeadwaySection from "./departures/headway_section";
 import NoDataSection from "./departures/no_data_section";
 import OvernightSection from "./departures/overnight_section";
 
-const Departures = ({ sections }) => {
+type Section =
+  | SectionBase
+  | (HeadwaySection & { type: "headway_section" })
+  | (NoDataSection & { type: "no_data_section" })
+  | (OvernightSection & { type: "overnight_section" });
+
+interface Props {
+  sections: Section[];
+}
+
+const Departures: ComponentType<Props> = ({ sections }) => {
   return (
     <div className="departures-container">
       <div className="departures">
-        {sections.map(({ type, ...data }, i) => {
-          switch (type) {
+        {sections.map((section, i) => {
+          switch (section.type) {
             case "normal_section":
-              return <NormalSection rows={data.rows} key={i} />;
+              return <NormalSection {...section} key={i} />;
             case "notice_section":
-              return <NoticeSection text={data.text} key={i} />;
+              return <NoticeSection {...section} key={i} />;
             case "headway_section":
-              return (
-                <HeadwaySection text={data.text} layout={data.layout} key={i} />
-              );
+              return <HeadwaySection {...section} key={i} />;
             case "no_data_section":
-              return <NoDataSection text={data.text} key={i} />;
+              return <NoDataSection {...section} key={i} />;
             case "overnight_section":
-              return <OvernightSection text={data.text} key={i} />;
+              return <OvernightSection {...section} key={i} />;
           }
-
-          throw new Error(`unimplemented section type: ${type}`);
         })}
       </div>
     </div>

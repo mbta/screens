@@ -1,9 +1,13 @@
-import React from "react";
+import React, { ComponentType } from "react";
 
 import NoConnection from "Images/svgr_bundled/live-data-none.svg";
-import FreeText from "Components/v2/free_text";
+import FreeText, { FreeTextType } from "Components/v2/free_text";
 
-const NoDataSection = ({ text }) => {
+interface NoDataSection {
+  text: FreeTextType;
+}
+
+const NoDataSection: ComponentType<NoDataSection> = ({ text }) => {
   return (
     <div className="departures-section no-data-section">
       <div className="no-data-section__row">
