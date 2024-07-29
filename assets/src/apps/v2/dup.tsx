@@ -73,24 +73,15 @@ const responseMapper: ResponseMapper = (apiResponse) => {
     case "failure":
       return {
         rotation_one: {
-          full_rotation: {
-            type: "no_data",
-            include_header: true,
-          },
+          full_rotation: { type: "no_data" },
           type: "rotation_takeover_one",
         },
         rotation_two: {
-          full_rotation: {
-            type: "no_data",
-            include_header: true,
-          },
+          full_rotation: { type: "no_data" },
           type: "rotation_takeover_two",
         },
         rotation_zero: {
-          full_rotation: {
-            type: "no_data",
-            include_header: true,
-          },
+          full_rotation: { type: "no_data" },
           type: "rotation_takeover_zero",
         },
         type: "screen_normal",
