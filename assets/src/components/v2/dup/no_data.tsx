@@ -10,17 +10,14 @@ export const REPLACEMENTS = {
   Malden: "Malden Center",
 } as { [key: string]: string };
 
-interface Props {
-  include_header?: boolean;
-}
-
-const NoData: ComponentType<Props> = ({ include_header }) => {
+const NoData: ComponentType = () => {
   let stationName = useStationName() || "Transit information";
   stationName = REPLACEMENTS[stationName] || stationName;
 
   return (
     <div className="no-data__container">
-      {include_header && <NormalHeader text={stationName} />}
+      <NormalHeader text={stationName} />
+
       <div className="no-data__body">
         <div className="no-data__icon-container">
           <img
@@ -32,6 +29,7 @@ const NoData: ComponentType<Props> = ({ include_header }) => {
           Live updates are temporarily unavailable
         </div>
       </div>
+
       <div className="no-data__link">
         <div className="no-data__link-arrow">
           <LinkArrow width={375} colorHex="#a2a3a3" />
