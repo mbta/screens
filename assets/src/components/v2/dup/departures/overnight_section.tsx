@@ -1,8 +1,12 @@
-import React from "react";
+import React, { ComponentType } from "react";
 
-import FreeText from "Components/v2/free_text";
+import FreeText, { FreeTextType } from "Components/v2/free_text";
 
-const OvernightSection = ({ text }) => {
+interface OvernightSection {
+  text: FreeTextType;
+}
+
+const OvernightSection: ComponentType<OvernightSection> = ({ text }) => {
   return (
     <div className="departures-section overnight-section">
       <div className="overnight-section__row">

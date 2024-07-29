@@ -24,7 +24,10 @@ const TimestampDepartureTime = ({ hour, minute }) => {
 type DepartureTime =
   | (TextDeparture & { type: "text" })
   | (MinutesDeparture & { type: "minutes" })
-  | (TimestampDeparture & { type: "timestamp" });
+  | (TimestampDeparture & { type: "timestamp" })
+  // Note: `overnight` is only produced in the DUP code path, and so is only
+  // supported in the DUP version of this component.
+  | { type: "overnight" };
 
 interface TextDeparture {
   text: string;
@@ -35,6 +38,10 @@ interface MinutesDeparture {
 interface TimestampDeparture {
   hour: number;
   minute: number;
+  // Note: `am_pm` fields are currently only supported by the DUP version of
+  // this component, but are always present in departures serialization.
+  am_pm: string;
+  show_am_pm: boolean;
 }
 
 const DepartureTime: ComponentType<DepartureTime> = ({ type, ...data }) => {

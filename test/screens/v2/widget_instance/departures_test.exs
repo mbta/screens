@@ -132,13 +132,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                    id: "1B2M2Y8AsgTpgAmY7PhCfg==",
                    inline_alerts: [],
                    route: %{color: :orange, text: "OL", type: :text},
-                   times_with_crowding: [
-                     %{
-                       crowding: nil,
-                       id: nil,
-                       time: %{icon: :overnight, type: :icon}
-                     }
-                   ],
+                   times_with_crowding: [%{id: nil, crowding: nil, time: %{type: :overnight}}],
                    type: :departure_row
                  }
                ],

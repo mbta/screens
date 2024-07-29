@@ -6,6 +6,9 @@ import DepartureCrowding, { CrowdingLevel } from "./departure_crowding";
 export type TimeWithCrowding = {
   id: string;
   time: DepartureTime;
+  // Note: `scheduled_time` is currently only supported by the DUP version of
+  // `DepartureTime`, but is always present in departures serialization.
+  scheduled_time?: DepartureTime;
   crowding: CrowdingLevel | null;
 };
 

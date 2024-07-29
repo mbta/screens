@@ -1,8 +1,17 @@
-import React from "react";
+import React, { ComponentType } from "react";
 
+import { type TimeWithCrowding } from "Components/v2/departures/departure_times";
 import DepartureTime from "./departure_time";
 
-const DepartureTimes = ({ timesWithCrowding, currentPage }) => {
+interface Props {
+  timesWithCrowding: TimeWithCrowding[];
+  currentPage: number;
+}
+
+const DepartureTimes: ComponentType<Props> = ({
+  timesWithCrowding,
+  currentPage,
+}) => {
   return (
     <>
       {timesWithCrowding.map(({ id, time, scheduled_time }) => (
