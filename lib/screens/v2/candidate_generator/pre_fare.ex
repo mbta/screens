@@ -93,10 +93,10 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   def audio_only_instances(
         widgets,
         config,
-        fetch_routes_by_stop_fn \\ &Route.fetch_routes_by_stop/1
+        routes_serving_stop_fn \\ &Route.serving_stop/1
       ) do
     [
-      fn -> content_summary_instances(widgets, config, fetch_routes_by_stop_fn) end,
+      fn -> content_summary_instances(widgets, config, routes_serving_stop_fn) end,
       fn -> alerts_intro_instances(widgets, config) end,
       fn -> alerts_outro_instances(widgets, config) end
     ]
@@ -133,14 +133,14 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     [%ShuttleBusInfoWidget{screen: config, now: now}]
   end
 
-  defp content_summary_instances(widgets, config, fetch_routes_by_stop_fn) do
+  defp content_summary_instances(widgets, config, routes_serving_stop_fn) do
     config.app_params.content_summary.parent_station_id
-    |> fetch_routes_by_stop_fn.()
+    |> routes_serving_stop_fn.()
     |> case do
       {:ok, routes_at_station} ->
         subway_lines_at_station =
           routes_at_station
-          |> Enum.map(& &1.route_id)
+          |> Enum.map(& &1.id)
           |> Enum.map(fn
             "Red" -> :red
             "Orange" -> :orange

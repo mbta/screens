@@ -29,10 +29,9 @@ defmodule Screens.Routes.RouteTest do
     end
   end
 
-  describe "fetch_routes_by_stop/3" do
+  describe "serving_stop_with_active/3" do
     setup do
       active_routes = [route_json("22"), route_json("44")]
-
       all_routes = [route_json("22"), route_json("29"), route_json("44")]
 
       stop_id = "1265"
@@ -79,33 +78,12 @@ defmodule Screens.Routes.RouteTest do
       } = context
 
       expected_routes = [
-        %{
-          active?: true,
-          route_id: "22",
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :subway
-        },
-        %{
-          active?: false,
-          route_id: "29",
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :subway
-        },
-        %{
-          active?: true,
-          route_id: "44",
-          direction_destinations: nil,
-          long_name: nil,
-          short_name: nil,
-          type: :subway
-        }
+        %{active?: true, route_id: "22"},
+        %{active?: false, route_id: "29"},
+        %{active?: true, route_id: "44"}
       ]
 
-      assert {:ok, expected_routes} == fetch_routes_by_stop(stop_id, now, [], get_json_fn)
+      assert {:ok, expected_routes} == serving_stop_with_active(stop_id, now, [], get_json_fn)
     end
 
     test "returns :error if either fetch function returns :error", context do
@@ -118,12 +96,9 @@ defmodule Screens.Routes.RouteTest do
         x_fetch_routes_fn: x_fetch_routes_fn
       } = context
 
-      assert :error == fetch_routes_by_stop(stop_id, now, [], x_get_json_fn1)
-
-      assert :error == fetch_routes_by_stop(stop_id, now, [], x_get_json_fn2)
-
-      assert :error ==
-               fetch_routes_by_stop(stop_id, now, [], get_json_fn, x_fetch_routes_fn)
+      assert :error == serving_stop_with_active(stop_id, now, [], x_get_json_fn1)
+      assert :error == serving_stop_with_active(stop_id, now, [], x_get_json_fn2)
+      assert :error == serving_stop_with_active(stop_id, now, [], get_json_fn, x_fetch_routes_fn)
     end
 
     test "filters routes by type if provided", context do
@@ -135,7 +110,7 @@ defmodule Screens.Routes.RouteTest do
       } = context
 
       assert {:ok, []} ==
-               fetch_routes_by_stop(stop_id, now, :subway, get_json_fn, fetch_routes_fn)
+               serving_stop_with_active(stop_id, now, :subway, get_json_fn, fetch_routes_fn)
     end
   end
 end

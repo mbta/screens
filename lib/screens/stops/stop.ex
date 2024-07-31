@@ -12,10 +12,9 @@ defmodule Screens.Stops.Stop do
 
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
-  alias Screens.{Routes, Stops}
   alias Screens.Routes.Route
   alias Screens.RouteType
-  alias Screens.Stops.StationsWithRoutesAgent
+  alias Screens.Stops
   alias Screens.Util
   alias Screens.V3Api
   alias ScreensConfig.V2.{BusEink, BusShelter, Dup, GlEink, PreFare, Triptych}
@@ -271,74 +270,6 @@ defmodule Screens.Stops.Stop do
     end
   end
 
-  def fetch_routes_serving_stop(
-        station_id,
-        get_json_fn \\ &V3Api.get_json/2,
-        attempts_left \\ 3
-      )
-
-  def fetch_routes_serving_stop(_station_id, _get_json_fn, 0), do: :bad_response
-
-  def fetch_routes_serving_stop(
-        station_id,
-        get_json_fn,
-        attempts_left
-      ) do
-    case get_json_fn.("routes", %{"filter[stop]" => station_id}) do
-      {:ok, %{"data" => []}, _} ->
-        fetch_routes_serving_stop(station_id, get_json_fn, attempts_left - 1)
-
-      {:ok, %{"data" => data}} ->
-        {:ok, Enum.map(data, fn route -> Routes.Parser.parse_route(route) end)}
-
-      _ ->
-        :error
-    end
-  end
-
-  # Returns a list of Route structs that serve the provided ID
-  @spec create_station_with_routes_map(String.t()) :: list(Routes.Route.t())
-  def create_station_with_routes_map(station_id) do
-    case StationsWithRoutesAgent.get(station_id) do
-      nil ->
-        get_routes_serving_stop(station_id)
-
-      routes ->
-        get_routes_serving_stop(station_id, routes)
-    end
-  end
-
-  defp get_routes_serving_stop(station_id, default_routes \\ []) do
-    case fetch_routes_serving_stop(station_id) do
-      {:ok, new_routes} ->
-        new_routes
-
-      :bad_response ->
-        Logger.error(
-          "[create_station_with_routes_map no routes] Received an empty list from API: stop_id=#{station_id}"
-        )
-
-        default_routes
-
-      :error ->
-        Logger.error(
-          "[create_station_with_routes_map fetch error] Received an error from API: stop_id=#{station_id}"
-        )
-
-        default_routes
-    end
-  end
-
-  def get_routes_serving_stop_ids(stop_ids) do
-    stop_ids
-    |> Enum.flat_map(fn stop_id ->
-      stop_id
-      |> create_station_with_routes_map()
-      |> Enum.map(& &1.id)
-    end)
-    |> Enum.uniq()
-  end
-
   def fetch_stop_name(stop_id) do
     Screens.Telemetry.span(~w[screens stops stop fetch_stop_name]a, %{stop_id: stop_id}, fn ->
       case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do
@@ -479,7 +410,8 @@ defmodule Screens.Stops.Stop do
       %{app: app, stop_id: stop_id},
       fn ->
         with alert_route_types <- get_route_type_filter(app, stop_id),
-             {:ok, routes_at_stop} <- Route.fetch_routes_by_stop(stop_id, now, alert_route_types),
+             {:ok, routes_at_stop} <-
+               Route.serving_stop_with_active(stop_id, now, alert_route_types),
              {:ok, tagged_stop_sequences} <-
                fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop) do
           stop_name = fetch_stop_name(stop_id)
