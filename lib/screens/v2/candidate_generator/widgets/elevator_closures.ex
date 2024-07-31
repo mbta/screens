@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   @moduledoc false
 
   alias Screens.Alerts.Alert
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.ElevatorStatus, as: ElevatorStatusWidget
   alias ScreensConfig.Screen
@@ -51,7 +52,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     |> MapSet.new()
     |> MapSet.put(home_parent_station_id)
     |> Enum.map(fn station_id ->
-      {station_id, station_id |> Stop.create_station_with_routes_map() |> routes_to_icons()}
+      {station_id, station_id |> Route.serving_stop() |> routes_to_icons()}
     end)
     |> Enum.into(%{})
   end

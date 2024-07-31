@@ -1,6 +1,9 @@
 defmodule Screens.Routes.Route do
   @moduledoc false
 
+  require Logger
+
+  alias Screens.Routes.Parser
   alias Screens.RouteType
   alias Screens.Stops.Stop
   alias Screens.V3Api
@@ -39,7 +42,7 @@ defmodule Screens.Routes.Route do
   @spec by_id(id()) :: {:ok, t()} | :error
   def by_id(route_id) do
     case V3Api.get_json("routes/" <> route_id) do
-      {:ok, %{"data" => data}} -> {:ok, Screens.Routes.Parser.parse_route(data)}
+      {:ok, %{"data" => data}} -> {:ok, Parser.parse_route(data)}
       _ -> :error
     end
   end
@@ -53,18 +56,46 @@ defmodule Screens.Routes.Route do
       |> Enum.into(%{})
 
     case get_json_fn.("routes/", params) do
-      {:ok, %{"data" => data}} -> {:ok, Enum.map(data, &Screens.Routes.Parser.parse_route/1)}
+      {:ok, %{"data" => data}} -> {:ok, Enum.map(data, &Parser.parse_route/1)}
       _ -> :error
     end
   end
 
+  @doc "Fetches routes that serve the given stop."
+  @spec serving_stop(Stop.id()) :: {:ok, t()} | :error
+  def serving_stop(
+        stop_id,
+        get_json_fn \\ &V3Api.get_json/2,
+        attempts_left \\ 3
+      )
+
+  def serving_stop(_stop_id, _get_json_fn, 0), do: :error
+
+  def serving_stop(
+        stop_id,
+        get_json_fn,
+        attempts_left
+      ) do
+    case get_json_fn.("routes", %{"filter[stop]" => stop_id}) do
+      {:ok, %{"data" => []}, _} ->
+        Logger.warning("Route.serving_stop empty_retry attempts_left=#{attempts_left - 1}")
+        serving_stop(stop_id, get_json_fn, attempts_left - 1)
+
+      {:ok, %{"data" => data}} ->
+        {:ok, Enum.map(data, fn route -> Parser.parse_route(route) end)}
+
+      _ ->
+        :error
+    end
+  end
+
   @doc """
-  Fetches routes that serve the given stop. `now` is used to determine whether
-  each route is actively running on the current day.
+  Similar to `serving_stop` but also determines whether each route has any scheduled service at
+  the given stop on the current day. Only route IDs and the `active?` flag are returned.
   """
-  @spec fetch_routes_by_stop(String.t()) ::
+  @spec serving_stop_with_active(Stop.id()) ::
           {:ok, list(%{route_id: id(), active?: boolean()})} | :error
-  def fetch_routes_by_stop(
+  def serving_stop_with_active(
         stop_id,
         now \\ DateTime.utc_now(),
         type_filters \\ [],
@@ -72,7 +103,7 @@ defmodule Screens.Routes.Route do
         fetch_routes_fn \\ &fetch_routes/3
       ) do
     Screens.Telemetry.span(
-      ~w[screens routes route fetch_routes_by_stop]a,
+      ~w[screens routes route serving_stop_with_active]a,
       %{stop_id: stop_id, type_filters: type_filters},
       fn ->
         with {:ok, routes} <- fetch_routes_fn.(stop_id, get_json_fn, type_filters),
@@ -80,14 +111,7 @@ defmodule Screens.Routes.Route do
           active_set = MapSet.new(active_route_ids)
 
           routes_at_stop =
-            Enum.map(
-              routes,
-              &(&1
-                |> Map.from_struct()
-                |> Map.put(:active?, MapSet.member?(active_set, &1.id))
-                |> Map.put(:route_id, &1.id)
-                |> Map.delete(:id))
-            )
+            Enum.map(routes, &%{route_id: &1.id, active?: MapSet.member?(active_set, &1.id)})
 
           {:ok, routes_at_stop}
         else

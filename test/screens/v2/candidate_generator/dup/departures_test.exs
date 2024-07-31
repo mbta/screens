@@ -250,7 +250,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     fetch_vehicles_fn = fn _, _ -> [struct(Vehicle)] end
 
-    create_station_with_routes_map_fn = fn
+    fetch_routes_serving_stop_fn = fn
       "Boat" -> [%{id: "Ferry", type: :ferry}]
       "place-A" -> [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]
       "bus-A" -> [%{id: "Bus A", type: :bus}]
@@ -264,7 +264,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
     }
   end
@@ -275,7 +275,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
@@ -441,7 +441,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -453,7 +453,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
@@ -624,7 +624,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -636,7 +636,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
@@ -810,7 +810,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -822,7 +822,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
@@ -914,7 +914,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -926,7 +926,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
@@ -1108,7 +1108,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -1119,7 +1119,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config: config,
       fetch_departures_fn: fetch_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
@@ -1196,7 +1196,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -1207,7 +1207,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config: config,
       fetch_departures_fn: fetch_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
@@ -1408,7 +1408,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -1419,7 +1419,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config: config,
       fetch_departures_fn: fetch_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
@@ -1571,7 +1571,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -1582,7 +1582,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config: config,
       fetch_departures_fn: fetch_departures_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
@@ -1687,7 +1687,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -1698,7 +1698,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config: config,
       fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
       fetch_schedules_fn: fetch_schedules_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
     } do
@@ -1815,7 +1815,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -1827,7 +1827,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_departures_fn: fetch_departures_fn,
       fetch_alerts_fn: fetch_alerts_fn,
       fetch_schedules_fn: fetch_schedules_fn,
-      create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+      fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
       fetch_vehicles_fn: fetch_vehicles_fn
     } do
       config =
@@ -1858,7 +1858,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -1872,7 +1872,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            config: config,
            fetch_departures_fn: fetch_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
-           create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+           fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
            fetch_vehicles_fn: fetch_vehicles_fn
          } do
       config =
@@ -2000,7 +2000,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -2012,7 +2012,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            config: config,
            fetch_departures_fn: fetch_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
-           create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+           fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
            fetch_vehicles_fn: fetch_vehicles_fn
          } do
       config =
@@ -2133,7 +2133,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -2146,7 +2146,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            config: config,
            fetch_departures_fn: fetch_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
-           create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+           fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
            fetch_vehicles_fn: fetch_vehicles_fn
          } do
       config =
@@ -2212,7 +2212,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -2224,7 +2224,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            config: config,
            fetch_departures_fn: fetch_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
-           create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+           fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
            fetch_vehicles_fn: fetch_vehicles_fn
          } do
       config =
@@ -2283,7 +2283,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -2295,7 +2295,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            config: config,
            fetch_departures_fn: fetch_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
-           create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+           fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
            fetch_vehicles_fn: fetch_vehicles_fn
          } do
       config =
@@ -2392,7 +2392,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -2404,7 +2404,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            config: config,
            fetch_departures_fn: fetch_departures_fn,
            fetch_alerts_fn: fetch_alerts_fn,
-           create_station_with_routes_map_fn: create_station_with_routes_map_fn,
+           fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn,
            fetch_vehicles_fn: fetch_vehicles_fn
          } do
       config =
@@ -2452,7 +2452,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 
@@ -2463,7 +2463,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
          %{
            config: config,
            fetch_departures_fn: fetch_departures_fn,
-           create_station_with_routes_map_fn: create_station_with_routes_map_fn
+           fetch_routes_serving_stop_fn: fetch_routes_serving_stop_fn
          } do
       config =
         config
@@ -2534,7 +2534,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_departures_fn,
           fetch_alerts_fn,
           fetch_schedules_fn,
-          create_station_with_routes_map_fn,
+          fetch_routes_serving_stop_fn,
           fetch_vehicles_fn
         )
 

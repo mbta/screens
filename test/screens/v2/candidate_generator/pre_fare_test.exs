@@ -119,9 +119,8 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
          %{config: config} do
       widgets = []
 
-      fetch_routes_by_stop_fn = fn "place-foo" ->
-        {:ok,
-         [%{route_id: "Red"}, %{route_id: "Green-B"}, %{route_id: "Green-C"}, %{route_id: "Blue"}]}
+      routes_serving_stop_fn = fn "place-foo" ->
+        {:ok, [%{id: "Red"}, %{id: "Green-B"}, %{id: "Green-C"}, %{id: "Blue"}]}
       end
 
       expected_content_summary = %ContentSummary{
@@ -133,7 +132,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
       assert expected_content_summary in PreFare.audio_only_instances(
                widgets,
                config,
-               fetch_routes_by_stop_fn
+               routes_serving_stop_fn
              )
     end
 
@@ -143,10 +142,10 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
          } do
       widgets = []
 
-      fetch_routes_by_stop_fn = fn "place-foo" -> :error end
+      routes_serving_stop_fn = fn "place-foo" -> :error end
 
       refute Enum.any?(
-               PreFare.audio_only_instances(widgets, config, fetch_routes_by_stop_fn),
+               PreFare.audio_only_instances(widgets, config, routes_serving_stop_fn),
                &match?(%ContentSummary{}, &1)
              )
     end
@@ -154,10 +153,10 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
     test "always returns list containing alerts intro", %{config: config} do
       widgets = []
 
-      fetch_routes_by_stop_fn = fn "place-foo" -> {:ok, []} end
+      routes_serving_stop_fn = fn "place-foo" -> {:ok, []} end
 
       assert Enum.any?(
-               PreFare.audio_only_instances(widgets, config, fetch_routes_by_stop_fn),
+               PreFare.audio_only_instances(widgets, config, routes_serving_stop_fn),
                &match?(%AlertsIntro{}, &1)
              )
     end
@@ -165,10 +164,10 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
     test "always returns list containing alerts outro", %{config: config} do
       widgets = []
 
-      fetch_routes_by_stop_fn = fn "place-foo" -> {:ok, []} end
+      routes_serving_stop_fn = fn "place-foo" -> {:ok, []} end
 
       assert Enum.any?(
-               PreFare.audio_only_instances(widgets, config, fetch_routes_by_stop_fn),
+               PreFare.audio_only_instances(widgets, config, routes_serving_stop_fn),
                &match?(%AlertsOutro{}, &1)
              )
     end
