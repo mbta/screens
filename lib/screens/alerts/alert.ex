@@ -175,8 +175,18 @@ defmodule Screens.Alerts.Alert do
   ]
 
   @spec fetch(keyword()) :: {:ok, list(t())} | :error
-  def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
-    Screens.Telemetry.span([:screens, :alerts, :alert, :fetch], fn ->
+  def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2, get_all_alerts \\ &Cache.all/0) do
+    Screens.Telemetry.span_with_stop_meta([:screens, :alerts, :alert, :fetch], fn ->
+      if supported_by_cache?(opts) do
+        {fetch_from_cache(opts, get_all_alerts), %{from: :cache}}
+      else
+        {fetch_from_v3_api(opts, get_json_fn), %{from: :v3_api}}
+      end
+    end)
+  end
+
+  def fetch_from_v3_api(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
+    Screens.Telemetry.span([:screens, :alerts, :alert, :fetch_from_v3_api], fn ->
       params =
         opts
         |> Enum.flat_map(&format_query_param/1)
@@ -193,15 +203,17 @@ defmodule Screens.Alerts.Alert do
   end
 
   def fetch_from_cache(filters \\ [], get_all_alerts \\ &Cache.all/0) do
-    alerts = get_all_alerts.()
+    Screens.Telemetry.span([:screens, :alerts, :alert, :fetch_from_cache], fn ->
+      alerts = get_all_alerts.()
 
-    filters =
-      filters
-      |> Enum.map(&format_cache_filter/1)
-      |> Enum.reject(&is_nil/1)
-      |> Enum.into(%{})
+      filters =
+        filters
+        |> Enum.map(&format_cache_filter/1)
+        |> Enum.reject(&is_nil/1)
+        |> Enum.into(%{})
 
-    Screens.Alerts.Cache.Filter.filter_by(alerts, filters)
+      {:ok, Screens.Alerts.Cache.Filter.filter_by(alerts, filters)}
+    end)
   end
 
   defp format_cache_filter({:route_id, route_id}), do: {:routes, [route_id]}
@@ -225,6 +237,25 @@ defmodule Screens.Alerts.Alert do
   defp format_cache_filter({:direction_id, :both}), do: nil
 
   defp format_cache_filter(filter), do: filter
+
+  defp supported_by_cache?(opts) do
+    Enum.all?(opts, fn {key, _} -> supported_cache_filter?(key) end)
+  end
+
+  for supported_filter <- ~w[routes
+                             route_id
+                             route_ids
+                             stops
+                             stop_id
+                             stop_ids
+                             route_type
+                             route_types
+                             direction_id
+                             activities]a do
+    defp supported_cache_filter?(unquote(supported_filter)), do: true
+  end
+
+  defp supported_cache_filter?(_), do: false
 
   @doc """
   Convenience for cases when it's safe to treat an API alert data outage
