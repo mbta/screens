@@ -52,7 +52,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     |> MapSet.new()
     |> MapSet.put(home_parent_station_id)
     |> Enum.map(fn station_id ->
-      {station_id, station_id |> Route.serving_stop() |> routes_to_icons()}
+      {station_id, station_id |> routes_serving_stop() |> routes_to_icons()}
     end)
     |> Enum.into(%{})
   end
@@ -64,6 +64,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
       |> Enum.map(fn %{stop: stop_id} -> stop_id end)
       |> Enum.filter(&String.starts_with?(&1, "place-"))
     end)
+  end
+
+  defp routes_serving_stop(stop_id) do
+    case Route.serving_stop(stop_id) do
+      {:ok, routes} -> routes
+      :error -> []
+    end
   end
 
   defp routes_to_icons(routes) do

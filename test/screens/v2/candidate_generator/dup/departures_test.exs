@@ -251,12 +251,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     fetch_vehicles_fn = fn _, _ -> [struct(Vehicle)] end
 
     fetch_routes_serving_stop_fn = fn
-      "Boat" -> [%{id: "Ferry", type: :ferry}]
-      "place-A" -> [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]
-      "bus-A" -> [%{id: "Bus A", type: :bus}]
-      "bus-B" -> [%{id: "Bus B", type: :bus}]
-      "place-overnight" -> [%{id: "Red", type: :subway}]
-      _ -> [%{id: "test", type: :test}]
+      "Boat" -> {:ok, [%{id: "Ferry", type: :ferry}]}
+      "place-A" -> {:ok, [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]}
+      "bus-A" -> {:ok, [%{id: "Bus A", type: :bus}]}
+      "bus-B" -> {:ok, [%{id: "Bus B", type: :bus}]}
+      "place-overnight" -> {:ok, [%{id: "Red", type: :subway}]}
+      _ -> {:ok, [%{id: "test", type: :test}]}
     end
 
     %{

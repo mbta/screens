@@ -638,7 +638,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
        ) do
     routes =
       stop_ids
-      |> Enum.flat_map(&fetch_routes_serving_stop_fn.(&1))
+      |> Enum.map(&fetch_routes_serving_stop_fn.(&1))
+      |> Enum.flat_map(fn
+        {:ok, routes} -> routes
+        :error -> []
+      end)
       |> Enum.uniq()
 
     if route_ids == [] do
