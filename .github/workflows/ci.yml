@@ -54,17 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
-      - run: mix test --cover
-      - name: Save PR information
-        if: github.event.pull_request
-        run: |
-          echo "${{ github.event.pull_request.number }}" > cover/PR_NUMBER
-          echo "${{ github.event.pull_request.head.sha }}" > cover/PR_SHA
-      - name: Upload coverage artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: elixir-lcov
-          path: cover/
+      - run: mix test
 
   js-build:
     name: Frontend Build
