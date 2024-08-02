@@ -28,23 +28,7 @@ if config_env() == :prod do
   {:ok, _} = Application.ensure_all_started(:ex_aws)
   {:ok, _} = Application.ensure_all_started(:ex_aws_secretsmanager)
 
-  secret_key_base =
-    (eb_env_name <> "-secret-key-base")
-    |> ExAws.SecretsManager.get_secret_value()
-    |> ExAws.request!()
-    |> Map.fetch!("SecretString")
-
-  api_v3_key =
-    (eb_env_name <> "-api-v3-key")
-    |> ExAws.SecretsManager.get_secret_value()
-    |> ExAws.request!()
-    |> Map.fetch!("SecretString")
-
-  screens_auth_secret =
-    (eb_env_name <> "-screens-auth-secret")
-    |> ExAws.SecretsManager.get_secret_value()
-    |> ExAws.request!()
-    |> Map.fetch!("SecretString")
+  eb_env_name = System.get_env("ENVIRONMENT_NAME")
 
   signs_ui_s3_bucket =
     case eb_env_name do
@@ -56,13 +40,11 @@ if config_env() == :prod do
 
   config :screens, ScreensWeb.Endpoint,
     http: [:inet6, port: String.to_integer(System.get_env("PORT") || "4000")],
-    secret_key_base: secret_key_base
+    secret_key_base: System.get_env("SECRET_KEY_BASE")
 
   sentry_dsn = System.get_env("SENTRY_DSN")
 
   config :screens,
-    api_v3_url: api_v3_url,
-    api_v3_key: api_v3_key,
     environment_name: eb_env_name,
     signs_ui_s3_bucket: signs_ui_s3_bucket,
     sentry_frontend_dsn: sentry_dsn,
@@ -74,7 +56,7 @@ if config_env() == :prod do
       environment_name: eb_env_name
   end
 
-  config :screens, ScreensWeb.AuthManager, secret_key: screens_auth_secret
+  config :screens, ScreensWeb.AuthManager, secret_key: System.get_env("SCREENS_AUTH_SECRET")
 
   config :screens, Screens.ScreensByAlert.Memcache,
     connection_opts: [
