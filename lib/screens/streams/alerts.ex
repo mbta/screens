@@ -23,7 +23,7 @@ defmodule Screens.Streams.Alerts do
   defp children(:test), do: []
 
   defp children(_env) do
-    api_url = Application.get_env(:screens, :default_api_v3_url)
+    api_url = Application.get_env(:screens, :api_v3_url)
     api_key = Application.get_env(:screens, :api_v3_key)
 
     url =

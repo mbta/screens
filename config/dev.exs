@@ -14,8 +14,6 @@ config :screens, ScreensWeb.Endpoint,
   watchers: [npx: ["exit_on_eof", "npm run watch", cd: "assets"]]
 
 config :screens,
-  default_api_v3_url: System.get_env("API_V3_URL", "https://api-v3.mbta.com/"),
-  api_v3_key: System.get_env("API_V3_KEY"),
   config_fetcher: Screens.Config.Fetch.Local,
   pending_config_fetcher: Screens.PendingConfig.Fetch.Local,
   triptych_player_fetcher: Screens.TriptychPlayer.Fetch.Local,
