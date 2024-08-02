@@ -1,0 +1,11 @@
+# Example environment configuration file: copy to `.envrc` (this is git-ignored)
+# and fill in any additional values you need. Will be automatically loaded and
+# unloaded by `direnv` if installed, or execute manually using `source .envrc`.
+
+export API_V3_KEY=
+export API_V3_URL="https://api-v3.mbta.com"
+
+# export AWS_ACCESS_KEY_ID=
+# export AWS_SECRET_ACCESS_KEY=
+
+export SECRET_KEY_BASE="local_secret_key_base_at_least_64_bytes_________________________________"
