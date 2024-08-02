@@ -73,7 +73,6 @@ config :screens,
   triptych_player_s3_bucket: "mbta-ctd-config",
   triptych_player_fetcher: Screens.TriptychPlayer.Fetch.S3,
   last_deploy_fetcher: Screens.Util.LastDeploy.S3Fetch,
-  default_api_v3_url: "https://api-v3.mbta.com/",
   blue_bikes_api_client: Screens.BlueBikes.Client,
   blue_bikes_station_information_url:
     "https://gbfs.bluebikes.com/gbfs/en/station_information.json",
