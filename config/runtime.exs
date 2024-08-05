@@ -21,15 +21,6 @@ unless config_env() == :test do
 end
 
 if config_env() == :prod do
-  # make sure ExAWS.SecretsManager and its dependencies are available
-  {:ok, _} = Application.ensure_all_started(:httpoison)
-  {:ok, _} = Application.ensure_all_started(:hackney_telemetry)
-  {:ok, _} = Application.ensure_all_started(:hackney)
-  {:ok, _} = Application.ensure_all_started(:ex_aws)
-  {:ok, _} = Application.ensure_all_started(:ex_aws_secretsmanager)
-
-  eb_env_name = System.get_env("ENVIRONMENT_NAME")
-
   signs_ui_s3_bucket =
     case eb_env_name do
       "screens-prod" -> "mbta-signs"
