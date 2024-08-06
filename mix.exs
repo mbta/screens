@@ -55,7 +55,7 @@ defmodule Screens.MixProject do
       {:phoenix_live_view, "~> 0.20.17"},
       {:phoenix_live_dashboard, "~> 0.8.4"},
       {:phoenix_html_helpers, "~> 1.0"},
-      {:gettext, "~> 0.22.1"},
+      {:gettext, "~> 0.25.0"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.6"},
       {:cowboy, "== 2.12.0"},
