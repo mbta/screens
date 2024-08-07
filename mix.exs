@@ -91,12 +91,7 @@ defmodule Screens.MixProject do
       {:remote_ip, "~> 1.2"},
       {:hackney_telemetry, "~> 0.2.0"},
       {:ex_cldr_messages, "~> 1.0"},
-      {:server_sent_event_stage, "~> 1.2"},
-      # override because server_sent_event_stage requires an older version
-      # there are no breaking changes from the castore@0.1 which
-      # server_sent_event_stage requests and castore@1.0.8 which was already
-      # in the lock file.
-      {:castore, "~> 1.0", override: true}
+      {:server_sent_event_stage, "~> 1.2"}
     ]
   end
 end
