@@ -1,6 +1,9 @@
 defmodule Screens.Alerts.Alert do
   @moduledoc false
 
+  import Screens.RouteType, only: :macros
+
+  alias Screens.Alerts.Cache
   alias Screens.Alerts.InformedEntity
   alias Screens.Routes.Route
   alias Screens.RouteType
@@ -188,6 +191,40 @@ defmodule Screens.Alerts.Alert do
       end
     end)
   end
+
+  def fetch_from_cache(filters \\ [], get_all_alerts \\ &Cache.all/0) do
+    alerts = get_all_alerts.()
+
+    filters =
+      filters
+      |> Enum.map(&format_cache_filter/1)
+      |> Enum.reject(&is_nil/1)
+      |> Enum.into(%{})
+
+    Screens.Alerts.Cache.Filter.filter_by(alerts, filters)
+  end
+
+  defp format_cache_filter({:route_id, route_id}), do: {:routes, [route_id]}
+  defp format_cache_filter({:stop_id, stop_id}), do: {:stops, [stop_id]}
+  defp format_cache_filter({:route_ids, route_ids}), do: {:routes, route_ids}
+  defp format_cache_filter({:stop_ids, stop_ids}), do: {:stops, stop_ids}
+
+  defp format_cache_filter({:route_type, route_type}),
+    do: format_cache_filter({:route_types, [route_type]})
+
+  defp format_cache_filter({:route_types, route_types}) do
+    route_types =
+      Enum.map(route_types, fn
+        route_type when is_route_type(route_type) -> RouteType.to_id(route_type)
+        route_type -> route_type
+      end)
+
+    {:route_types, route_types}
+  end
+
+  defp format_cache_filter({:direction_id, :both}), do: nil
+
+  defp format_cache_filter(filter), do: filter
 
   @doc """
   Convenience for cases when it's safe to treat an API alert data outage
