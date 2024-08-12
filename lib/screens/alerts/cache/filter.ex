@@ -2,6 +2,13 @@ defmodule Screens.Alerts.Cache.Filter do
   @moduledoc """
   Logic to apply filters to a list of `Screens.Alerts.Alert` structs.
   """
+
+  @route_mod Application.compile_env(
+               :screens,
+               :alerts_cache_filter_route_mod,
+               Screens.Routes.Route
+             )
+
   @default_activities ~w[BOARD EXIT RIDE]
 
   @type filter_opts() :: %{
@@ -16,12 +23,14 @@ defmodule Screens.Alerts.Cache.Filter do
   def filter_by(alerts, filter_opts) when filter_opts == %{}, do: alerts
 
   def filter_by(alerts, filter_opts) do
-    filter_opts = Map.put_new(filter_opts, :activities, @default_activities)
+    {activities, filter_opts} = Map.pop(filter_opts, :activities, @default_activities)
 
     alerts
     |> filter(filter_opts)
-    |> filter_by_informed_entity_activity(filter_opts)
+    |> filter_by_informed_entity_activity(activities)
   end
+
+  defp filter(alerts, filter_opts) when filter_opts == %{}, do: alerts
 
   defp filter(alerts, filter_opts) do
     filter_opts
@@ -29,7 +38,7 @@ defmodule Screens.Alerts.Cache.Filter do
     |> apply_matchers(alerts)
   end
 
-  defp filter_by_informed_entity_activity(alerts, %{activities: values}) do
+  defp filter_by_informed_entity_activity(alerts, values) do
     values = MapSet.new(values)
 
     if MapSet.member?(values, "ALL") do
@@ -49,15 +58,20 @@ defmodule Screens.Alerts.Cache.Filter do
     end
   end
 
-  defp filter_by_informed_entity_activity(alerts, filter_opts) do
-    filter_opts = Map.put(filter_opts, :activities, @default_activities)
-
-    filter_by_informed_entity_activity(alerts, filter_opts)
-  end
-
-  defp build_matchers(filter_opts) do
+  def build_matchers(filter_opts) do
     filter_opts
     |> Enum.reduce([%{}], &build_matcher/2)
+    |> reject_empty_matchers()
+    |> Enum.uniq()
+  end
+
+  defp reject_empty_matchers(matchers) do
+    matchers
+    |> Enum.reject(fn matcher ->
+      matcher
+      |> Map.values()
+      |> Enum.all?(&is_nil/1)
+    end)
   end
 
   defp apply_matchers(matchers, alerts) do
@@ -78,12 +92,29 @@ defmodule Screens.Alerts.Cache.Filter do
   end
 
   defp build_matcher({:stops, values}, acc) when is_list(values) do
-    matchers_for_values(acc, :stop, values)
-  end
+    routes =
+      values
+      |> Enum.flat_map(fn stop_id ->
+        {:ok, routes} = @route_mod.serving_stop(stop_id)
+        routes
+      end)
 
-  defp build_matcher({:activities, values}, acc) when is_list(values) do
-    # activities are filtered later, no need to add matchers
-    acc
+    route_matchers =
+      for %{id: route_id} <- routes,
+          stop_id <- [nil | values] do
+        %{route: route_id, stop: stop_id}
+      end
+
+    stop_matchers =
+      for stop_id <- [nil | values] do
+        %{stop: stop_id}
+      end
+
+    for matcher_list <- [route_matchers, stop_matchers],
+        merge <- matcher_list,
+        matcher <- acc do
+      Map.merge(matcher, merge)
+    end
   end
 
   defp matchers_for_values(acc, key, values) do

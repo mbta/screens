@@ -1,7 +1,10 @@
 defmodule Screens.Alerts.AlertTest do
   use ExUnit.Case, async: true
 
+  import Mox
+
   alias Screens.Alerts.Alert
+  alias Screens.Routes.Route
 
   defp alert_json(id) do
     %{
@@ -178,11 +181,16 @@ defmodule Screens.Alerts.AlertTest do
       [alerts: alerts, get_all_alerts: fn -> alerts end]
     end
 
-    test "returns all of the alerts", %{alerts: alerts, get_all_alerts: get_all_alerts} do
+    test "returns all of the alerts matching the default activities", %{
+      alerts: alerts,
+      get_all_alerts: get_all_alerts
+    } do
       assert {:ok, alerts} == Alert.fetch_from_cache([], get_all_alerts)
     end
 
     test "filters by stops", %{get_all_alerts: get_all_alerts} do
+      stub(Route.Mock, :serving_stop, fn _ -> {:ok, []} end)
+
       assert {:ok, [%Alert{id: "stop: A" <> _}]} =
                Alert.fetch_from_cache([stop_id: "A"], get_all_alerts)
 
