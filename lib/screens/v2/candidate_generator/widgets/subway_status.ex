@@ -12,18 +12,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
       ) do
     route_ids = ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E"]
 
-    case Screens.Alerts.Alert.fetch(route_ids: route_ids) do
-      {:ok, alerts} ->
-        relevant_alerts =
-          alerts
-          |> Enum.filter(&relevant?(&1, now))
-          |> Enum.map(&append_context(&1, fetch_subway_platforms_for_stop_fn))
+    {:ok, alerts} = Screens.Alerts.Alert.fetch_from_cache(route_ids: route_ids)
 
-        [%SubwayStatus{screen: config, subway_alerts: relevant_alerts}]
+    relevant_alerts =
+      alerts
+      |> Enum.filter(&relevant?(&1, now))
+      |> Enum.map(&append_context(&1, fetch_subway_platforms_for_stop_fn))
 
-      :error ->
-        []
-    end
+    [%SubwayStatus{screen: config, subway_alerts: relevant_alerts}]
   end
 
   def relevant?(alert, now) do
