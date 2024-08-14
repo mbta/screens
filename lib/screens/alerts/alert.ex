@@ -201,7 +201,13 @@ defmodule Screens.Alerts.Alert do
       |> Enum.reject(&is_nil/1)
       |> Enum.into(%{})
 
-    Screens.Alerts.Cache.Filter.filter_by(alerts, filters)
+    {:ok, Screens.Alerts.Cache.Filter.filter_by(alerts, filters)}
+  end
+
+  def fetch_from_cache_or_empty_list(filters \\ [], get_all_alerts \\ &Cache.all/0) do
+    {:ok, alerts} = fetch_from_cache(filters, get_all_alerts)
+
+    alerts
   end
 
   defp format_cache_filter({:route_id, route_id}), do: {:routes, [route_id]}
@@ -559,7 +565,7 @@ defmodule Screens.Alerts.Alert do
   def by_route_id(route_id, stop_id) do
     {inline_alerts, global_alerts} =
       [route_id: route_id]
-      |> fetch_or_empty_list()
+      |> fetch_from_cache_or_empty_list()
       |> Enum.split_with(&inline?/1)
 
     global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
