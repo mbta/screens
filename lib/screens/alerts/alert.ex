@@ -201,7 +201,7 @@ defmodule Screens.Alerts.Alert do
       |> Enum.reject(&is_nil/1)
       |> Enum.into(%{})
 
-    Screens.Alerts.Cache.Filter.filter_by(alerts, filters)
+    {:ok, Screens.Alerts.Cache.Filter.filter_by(alerts, filters)}
   end
 
   defp format_cache_filter({:route_id, route_id}), do: {:routes, [route_id]}
