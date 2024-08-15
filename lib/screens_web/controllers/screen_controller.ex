@@ -79,10 +79,9 @@ defmodule ScreensWeb.ScreenController do
       %Screen{app_id: app_id} ->
         conn
         |> assign(:app_id, app_id)
-        |> assign(:sentry_frontend_dsn, Application.get_env(:screens, :sentry_frontend_dsn))
+        |> assign(:sentry_dsn, if(params["disable_sentry"], do: nil, else: Sentry.get_dsn()))
         |> assign(:is_real_screen, match?(%{"is_real_screen" => "true"}, params))
         |> assign(:requestor, params["requestor"])
-        |> assign(:disable_sentry, params["disable_sentry"])
         |> render("index.html")
 
       nil ->
