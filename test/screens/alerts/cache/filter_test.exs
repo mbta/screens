@@ -53,5 +53,17 @@ defmodule Screens.Alerts.Cache.FilterTest do
                %{stop: "place-aport"}
              ] == Filter.build_matchers(%{stops: ["place-aport"]})
     end
+
+    test "expands route filters to include route types" do
+      stub(Route.Mock, :by_id, fn
+        "Blue" -> {:ok, %Route{id: "Blue", type: :subway}}
+        "Green-E" -> {:ok, %Route{id: "Green-E", type: :light_rail}}
+      end)
+
+      assert [
+               %{route: "Blue", route_type: 1},
+               %{route: "Green-E", route_type: 0}
+             ] = Filter.build_matchers(%{routes: ["Blue", "Green-E"]})
+    end
   end
 end

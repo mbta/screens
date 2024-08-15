@@ -202,6 +202,11 @@ defmodule Screens.Alerts.AlertTest do
     end
 
     test "filters by routes", %{get_all_alerts: get_all_alerts} do
+      stub(Route.Mock, :by_id, fn
+        "Z" -> {:ok, %Route{id: "Z", type: :rail}}
+        "Y" -> {:ok, %Route{id: "Y", type: :rail}}
+      end)
+
       assert {:ok, [%Alert{id: "stop: C, route: Z" <> _}, %Alert{id: "stop: D, route: Y/Z" <> _}]} =
                Alert.fetch_from_cache([route_ids: ["Z"]], get_all_alerts)
 
@@ -233,6 +238,8 @@ defmodule Screens.Alerts.AlertTest do
     end
 
     test "filters by route and direction_id", %{get_all_alerts: get_all_alerts} do
+      stub(Route.Mock, :by_id, fn "Z" -> {:ok, %Route{id: "Z", type: :rail}} end)
+
       assert {:ok, [%Alert{id: "stop: D, route: Y/Z, route_type: 2, direction_id: 1"}]} =
                Alert.fetch_from_cache([route_ids: ["Z"], direction_id: 1], get_all_alerts)
     end

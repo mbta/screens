@@ -39,6 +39,7 @@ defmodule Screens.Routes.Route do
   @type color :: name_colors() | :purple | :teal | :yellow
   @type icon :: name_colors() | :bus | :cr | :ferry | :mattapan
 
+  @callback by_id(id()) :: {:ok, t()} | :error
   @spec by_id(id()) :: {:ok, t()} | :error
   def by_id(route_id) do
     case V3Api.get_json("routes/" <> route_id) do
