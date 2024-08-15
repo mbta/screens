@@ -5,7 +5,9 @@ defmodule Screens.Stops.StopsToRoutes do
   """
   use Nebulex.Cache,
     otp_app: :screens,
-    adapter: Nebulex.Adapters.Local
+    adapter: Application.compile_env(:screens, [__MODULE__, :adapter])
+
+  @route_mod Application.compile_env(:screens, :stops_to_routes_route_mod, Screens.Routes.Route)
 
   @base_ttl :timer.hours(1)
 
@@ -20,7 +22,7 @@ defmodule Screens.Stops.StopsToRoutes do
       else
         from_api =
           for stop_id <- missing_stop_ids, into: %{} do
-            {:ok, routes} = fetch_routes_for_stops(stop_id)
+            {:ok, routes} = @route_mod.serving_stop(stop_id)
             route_ids = Enum.map(routes, & &1.id)
 
             {stop_id, route_ids}
@@ -35,11 +37,6 @@ defmodule Screens.Stops.StopsToRoutes do
     |> Enum.map(&ungroup_values/1)
     |> Enum.concat()
     |> Enum.uniq()
-  end
-
-  defp fetch_routes_for_stops(stop_ids) do
-    stop_impl = Application.get_env(:screens, :stops_to_routes_stop_mod, Screens.Stops.Stop)
-    stop_impl.fetch_routes_for_stops(stop_ids)
   end
 
   defp ungroup_values(map) do

@@ -2,12 +2,7 @@ defmodule Screens.Alerts.Cache.Filter do
   @moduledoc """
   Logic to apply filters to a list of `Screens.Alerts.Alert` structs.
   """
-
-  @route_mod Application.compile_env(
-               :screens,
-               :alerts_cache_filter_route_mod,
-               Screens.Routes.Route
-             )
+  alias Screens.Stops.StopsToRoutes
 
   @default_activities ~w[BOARD EXIT RIDE]
 
@@ -92,15 +87,10 @@ defmodule Screens.Alerts.Cache.Filter do
   end
 
   defp build_matcher({:stops, values}, acc) when is_list(values) do
-    routes =
-      values
-      |> Enum.flat_map(fn stop_id ->
-        {:ok, routes} = @route_mod.serving_stop(stop_id)
-        routes
-      end)
+    route_ids = StopsToRoutes.stops_to_routes(values)
 
     route_matchers =
-      for %{id: route_id} <- routes,
+      for route_id <- route_ids,
           stop_id <- [nil | values] do
         %{route: route_id, stop: stop_id}
       end
