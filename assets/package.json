@@ -50,7 +50,7 @@
     "@eslint/js": "^9.1.1",
     "@jest/globals": "^29.7.0",
     "@svgr/webpack": "^5.5.0",
-    "@types/lodash": "^4.14.171",
+    "@types/lodash": "^4.17.4",
     "@types/react": "^17.0.14",
     "@types/react-dom": "^17.0.9",
     "@types/react-router-dom": "^5.1.8",
