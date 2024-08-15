@@ -139,12 +139,11 @@ defmodule ScreensWeb.V2.ScreenController do
       refresh_rate: refresh_rate,
       audio_readout_interval: Parameters.get_audio_readout_interval(app_id),
       audio_interval_offset_seconds: Parameters.get_audio_interval_offset_seconds(config),
-      sentry_frontend_dsn: Application.get_env(:screens, :sentry_frontend_dsn),
+      sentry_dsn: if(params["disable_sentry"], do: nil, else: Sentry.get_dsn()),
       refresh_rate_offset: calculate_refresh_rate_offset(screen_id, refresh_rate),
       is_real_screen: match?(%{"is_real_screen" => "true"}, params),
       screen_side: screen_side(params),
       requestor: params["requestor"],
-      disable_sentry: params["disable_sentry"],
       rotation_index: rotation_index(params),
       triptych_pane: triptych_pane(params),
       is_pending: false

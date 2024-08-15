@@ -21,19 +21,14 @@ const captureException = (ex: unknown, options?: RavenOptions) => {
 
 /**
  * Initializes Sentry if the DSN is defined AND this client is running on
- * a real production screen AND the URL does not contain the disable_sentry param.
+ * a real production screen.
  */
 const initSentry = (appString: string) => {
-  const {
-    sentry: sentryDsn,
-    environmentName: env,
-    disableSentry,
-  } = getDataset();
-  // Note: passing an empty string as the DSN sets up a "no-op SDK" that captures errors and lets you call its methods,
-  // but does not actually log anything to the Sentry service.
+  const { sentry: sentryDsn, environmentName: env } = getDataset();
 
-  if (sentryDsn && isRealScreen() && !disableSentry) {
+  if (sentryDsn && isRealScreen()) {
     Raven.config(sentryDsn, { environment: env }).install();
+
     if (isOFM()) {
       const today = new Date();
       const hour = today.getHours();

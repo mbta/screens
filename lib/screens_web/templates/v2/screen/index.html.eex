@@ -8,11 +8,9 @@
   data-refresh-rate-offset="<%= @refresh_rate_offset %>"
   data-is-real-screen="<%= @is_real_screen %>"
   data-is-pending="<%= @is_pending %>"
+  data-sentry="<%= @sentry_dsn %>"
   <%= if not is_nil(@screen_side) do %>
     data-screen-side="<%= @screen_side %>"
-  <% end %>
-  <%= if record_sentry?() do %>
-    data-sentry="<%= @sentry_frontend_dsn %>"
   <% end %>
   <%= if not is_nil(@rotation_index) do %>
     data-rotation-index="<%= @rotation_index %>"
@@ -24,5 +22,4 @@
     data-screenplay-fullstory-org-id="<%= assigns[:screenplay_fullstory_org_id] %>"
   <% end %>
   data-requestor="<%= @requestor %>"
-  data-disable-sentry="<%= @disable_sentry %>"
 ></div>

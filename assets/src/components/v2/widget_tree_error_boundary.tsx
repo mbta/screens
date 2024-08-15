@@ -65,7 +65,7 @@ class WidgetTreeErrorBoundary extends React.Component<Props, State> {
       return;
     }
 
-    if (getDataset().disableSentry) {
+    if (!getDataset().sentry) {
       // Log via the server. (to Splunk, at time of writing.)
       fetch("/v2/api/screen/log_frontend_error", {
         method: "POST",

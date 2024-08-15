@@ -21,6 +21,10 @@ unless config_env() == :test do
 end
 
 if config_env() == :prod do
+  config :sentry,
+    dsn: System.get_env("SENTRY_DSN"),
+    environment_name: eb_env_name
+
   signs_ui_s3_bucket =
     case eb_env_name do
       "screens-prod" -> "mbta-signs"
@@ -33,19 +37,10 @@ if config_env() == :prod do
     http: [:inet6, port: String.to_integer(System.get_env("PORT") || "4000")],
     secret_key_base: System.get_env("SECRET_KEY_BASE")
 
-  sentry_dsn = System.get_env("SENTRY_DSN")
-
   config :screens,
     environment_name: eb_env_name,
     signs_ui_s3_bucket: signs_ui_s3_bucket,
-    sentry_frontend_dsn: sentry_dsn,
     screenplay_fullstory_org_id: System.get_env("SCREENPLAY_FULLSTORY_ORG_ID")
-
-  if sentry_dsn not in [nil, ""] do
-    config :sentry,
-      dsn: sentry_dsn,
-      environment_name: eb_env_name
-  end
 
   config :screens, ScreensWeb.AuthManager, secret_key: System.get_env("SCREENS_AUTH_SECRET")
 
