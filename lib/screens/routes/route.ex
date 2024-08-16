@@ -62,7 +62,7 @@ defmodule Screens.Routes.Route do
   end
 
   @doc "Fetches routes that serve the given stop."
-  @spec serving_stop(Stop.id()) :: {:ok, [t()]} | :error
+  @callback serving_stop(Stop.id()) :: {:ok, [t()]} | :error
   def serving_stop(
         stop_id,
         get_json_fn \\ &V3Api.get_json/2,
