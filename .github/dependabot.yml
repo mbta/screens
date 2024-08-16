@@ -8,7 +8,6 @@ updates:
     open-pull-requests-limit: 10
     groups:
       mix-patches:
-        applies-to: version-updates
         patterns:
           - "*"
         update-types:
@@ -21,35 +20,29 @@ updates:
     open-pull-requests-limit: 10
     groups:
       npm-patches:
-        applies-to: version-updates
         patterns:
           - "*"
         update-types:
           - "patch"
       eslint:
-        applies-to: version-updates
         patterns:
           - "eslint*"
           - "@typescript-eslint*"
           - "@eslint*"
       react:
-        applies-to: version-updates
         patterns:
           - "react*"
           - "@types/react*"
       testing-tools:
-        applies-to: version-updates
         patterns:
           - "ts-jest"
           - "jest*"
           - "@jest*"
       babel:
-        applies-to: version-updates
         patterns:
           - "babel*"
           - "@babel*"
       webpack:
-        applies-to: version-updates
         patterns:
           - "webpack*"
           - "*webpack-plugin"
@@ -57,6 +50,5 @@ updates:
           - "@types/webpack-env"
           - "*-loader"
       moment:
-        applies-to: version-updates
         patterns:
           - "moment*"
