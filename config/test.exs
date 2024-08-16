@@ -27,6 +27,7 @@ config :screens,
   blue_bikes_station_status_url: [:no_api_requests_allowed_during_testing],
   blue_bikes_api_client: Screens.BlueBikes.FakeClient,
   stops_to_routes_route_mod: Screens.Routes.Route.Mock,
+  alerts_cache_filter_route_mod: Screens.Routes.Route.Mock,
   dup_headsign_replacements: %{
     "Test 1" => "T1"
   },

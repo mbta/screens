@@ -2,7 +2,11 @@ defmodule Screens.Alerts.Cache.Filter do
   @moduledoc """
   Logic to apply filters to a list of `Screens.Alerts.Alert` structs.
   """
+  alias Screens.Routes.Route
+  alias Screens.RouteType
   alias Screens.Stops.StopsToRoutes
+
+  @route_mod Application.compile_env(:screens, :alerts_cache_filter_route_mod, Route)
 
   @default_activities ~w[BOARD EXIT RIDE]
 
@@ -75,7 +79,11 @@ defmodule Screens.Alerts.Cache.Filter do
   end
 
   defp build_matcher({:routes, values}, acc) when is_list(values) do
-    matchers_for_values(acc, :route, values)
+    for route_id <- values,
+        for_route <- matchers_for_route_id(route_id),
+        matcher <- acc do
+      Map.merge(matcher, for_route)
+    end
   end
 
   defp build_matcher({:route_types, values}, acc) when is_list(values) do
@@ -111,6 +119,25 @@ defmodule Screens.Alerts.Cache.Filter do
     for value <- values,
         matcher <- acc do
       Map.put(matcher, key, value)
+    end
+  end
+
+  defp matchers_for_route_id(nil) do
+    [%{route: nil}]
+  end
+
+  defp matchers_for_route_id(route_id) do
+    case @route_mod.by_id(route_id) do
+      {:ok, %Route{type: type}} ->
+        [
+          %{
+            route_type: RouteType.to_id(type),
+            route: route_id
+          }
+        ]
+
+      _ ->
+        [%{route: route_id}]
     end
   end
 
