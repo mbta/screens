@@ -4,7 +4,7 @@ defmodule ScreensWeb.AdminController do
   def index(conn, _) do
     conn
     |> assign(:app_id, "admin")
-    |> put_layout(html: {ScreensWeb.LayoutView, :admin})
+    |> put_layout(html: {ScreensWeb.V2.LayoutView, :app})
     |> render(:admin)
   end
 end
