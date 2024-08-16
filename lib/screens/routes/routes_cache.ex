@@ -4,9 +4,11 @@ defmodule Screens.Routes.RoutesCache do
   """
   use Nebulex.Cache,
     otp_app: :screens,
-    adapter: Nebulex.Adapters.Local
+    adapter: Application.compile_env(:screens, [__MODULE__, :adapter])
 
   alias Screens.Routes.Route
+
+  @route_mod Application.compile_env(:screens, :routes_cache_route_mod, Screens.Routes.Route)
 
   @base_ttl :timer.hours(1)
 
@@ -15,15 +17,18 @@ defmodule Screens.Routes.RoutesCache do
     if route = get(id) do
       route
     else
-      case Route.by_id(id) do
-        {:ok, %Route{} = route} ->
-          put(id, route, ttl: ttl())
+      route = fetch_by_id(id)
 
-          route
+      unless is_nil(route), do: put(id, route, ttl: ttl())
 
-        _ ->
-          nil
-      end
+      route
+    end
+  end
+
+  defp fetch_by_id(id) do
+    case @route_mod.by_id(id) do
+      {:ok, %Route{} = route} -> route
+      _ -> nil
     end
   end
 

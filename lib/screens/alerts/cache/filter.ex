@@ -3,10 +3,9 @@ defmodule Screens.Alerts.Cache.Filter do
   Logic to apply filters to a list of `Screens.Alerts.Alert` structs.
   """
   alias Screens.Routes.Route
+  alias Screens.Routes.RoutesCache
   alias Screens.RouteType
   alias Screens.Stops.StopsToRoutes
-
-  @route_mod Application.compile_env(:screens, :alerts_cache_filter_route_mod, Route)
 
   @default_activities ~w[BOARD EXIT RIDE]
 
@@ -127,8 +126,8 @@ defmodule Screens.Alerts.Cache.Filter do
   end
 
   defp matchers_for_route_id(route_id) do
-    case @route_mod.by_id(route_id) do
-      {:ok, %Route{type: type}} ->
+    case RoutesCache.by_id(route_id) do
+      %Route{type: type} ->
         [
           %{
             route_type: RouteType.to_id(type),
