@@ -48,7 +48,7 @@ defmodule ScreensWeb.V2.AudioController do
   end
 
   def text_to_speech(conn, %{"text" => text}) do
-    case Screens.Audio.synthesize(text, false, "text") do
+    case Screens.Audio.synthesize(text, "text", is_screen: false) do
       {:ok, audio_data} ->
         send_download(conn, {:binary, audio_data}, filename: "readout.mp3", disposition: :inline)
 
@@ -60,7 +60,7 @@ defmodule ScreensWeb.V2.AudioController do
   defp readout(conn, screen_id, real_screen?, disposition) do
     screen_id
     |> fetch_ssml()
-    |> Screens.Audio.synthesize(real_screen?, "ssml")
+    |> Screens.Audio.synthesize("ssml", screen_id: screen_id, is_screen: real_screen?)
     |> case do
       {:ok, audio_data} ->
         send_download(conn, {:binary, audio_data},

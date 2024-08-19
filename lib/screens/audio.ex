@@ -20,7 +20,8 @@ defmodule Screens.Audio do
 
   @type departure_group :: {departure_group_key(), [map()]}
 
-  def synthesize(ssml_string, is_screen, text_type) do
+  @spec synthesize(String.t(), String.t(), keyword()) :: {:ok, binary()} | :error
+  def synthesize(ssml_string, text_type, log_meta) do
     result =
       ssml_string
       |> ExAws.Polly.synthesize_speech(lexicon_names: @lexicon_names, text_type: text_type)
@@ -30,16 +31,13 @@ defmodule Screens.Audio do
       {:ok, %{body: audio_data}} ->
         {:ok, audio_data}
 
-      {:error, reason} ->
-        _ =
-          if is_screen do
-            Logger.error("synthesize_ssml_failed #{reason}")
-          end
-
+      {:error, error} ->
+        report_error(ssml_string, error, log_meta)
         :error
     end
   end
 
+  # used in V1 only
   def from_api_data(
         %{
           station_name: station_name,
@@ -187,5 +185,21 @@ defmodule Screens.Audio do
       nil -> nil
       psa_config -> Fetch.fetch_psa(psa_config)
     end
+  end
+
+  defp report_error(ssml_string, error, meta) do
+    Logger.error(
+      "synthesize_ssml_failed string=#{inspect(ssml_string)} error=#{inspect(error)}",
+      meta
+    )
+
+    _ =
+      if meta[:is_screen] do
+        Sentry.capture_message("synthesize_ssml_failed",
+          extra: Enum.into(meta, %{error: error, string: ssml_string})
+        )
+      end
+
+    nil
   end
 end
