@@ -38,7 +38,8 @@ defmodule Screens.Application do
       {Screens.OlCrowding.Agent, %{}},
       {Screens.ScreenApiResponseCache, []},
       Screens.Streams.Alerts,
-      Screens.Stops.StopsToRoutes
+      Screens.Stops.StopsToRoutes,
+      Screens.Routes.RoutesCache
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
