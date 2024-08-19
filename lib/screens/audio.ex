@@ -20,11 +20,11 @@ defmodule Screens.Audio do
 
   @type departure_group :: {departure_group_key(), [map()]}
 
-  @spec synthesize(String.t(), String.t(), keyword()) :: {:ok, binary()} | :error
-  def synthesize(ssml_string, text_type, log_meta) do
+  @spec synthesize(String.t(), keyword()) :: {:ok, binary()} | :error
+  def synthesize(ssml_string, log_meta) do
     result =
       ssml_string
-      |> ExAws.Polly.synthesize_speech(lexicon_names: @lexicon_names, text_type: text_type)
+      |> ExAws.Polly.synthesize_speech(lexicon_names: @lexicon_names, text_type: "ssml")
       |> ExAws.request()
 
     case result do
