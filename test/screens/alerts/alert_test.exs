@@ -6,6 +6,8 @@ defmodule Screens.Alerts.AlertTest do
   alias Screens.Alerts.Alert
   alias Screens.Routes.Route
 
+  setup :verify_on_exit!
+
   defp alert_json(id) do
     %{
       "id" => id,

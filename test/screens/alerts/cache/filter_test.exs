@@ -6,6 +6,8 @@ defmodule Screens.Alerts.Cache.FilterTest do
   alias Screens.Alerts.Cache.Filter
   alias Screens.Routes.Route
 
+  setup :verify_on_exit!
+
   describe "build_matchers/1" do
     test "passes through empty filters" do
       assert [] == Filter.build_matchers(%{})
