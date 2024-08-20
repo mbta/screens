@@ -56,7 +56,7 @@ defmodule Screens.Alerts.Cache.Filter do
     end
   end
 
-  def build_matchers(filter_opts) do
+  defp build_matchers(filter_opts) do
     filter_opts
     |> Enum.reduce([%{}], &build_matcher/2)
     |> reject_empty_matchers()
@@ -145,11 +145,44 @@ defmodule Screens.Alerts.Cache.Filter do
     |> Enum.any?(&matches?(alert, &1))
   end
 
-  defp matches?(alert, matcher) when is_map(matcher) do
-    Enum.all?(matcher, &matches?(alert, &1))
+  defp matches?(%{informed_entities: informed_entities}, matcher) when is_map(matcher) do
+    informed_entities
+    |> Enum.any?(fn ie ->
+      matcher
+      |> expand_matcher()
+      |> Enum.any?(fn matcher ->
+        ie
+        |> Map.intersect(matcher, &values_equal?/3)
+        |> Map.values()
+        |> Enum.all?()
+      end)
+    end)
   end
 
-  defp matches?(alert, {key, value}) do
-    Enum.any?(alert.informed_entities, &(Map.get(&1, key) == value))
+  defp expand_matcher(matcher) do
+    for route_type <- part_values(matcher, :route_type),
+        route <- part_values(matcher, :route),
+        stop <- part_values(matcher, :stop),
+        direction_id <- part_values(matcher, :direction_id) do
+      %{route_type: route_type, route: route, stop: stop, direction_id: direction_id}
+    end
+    |> Enum.map(fn expanded_matcher ->
+      Map.reject(expanded_matcher, &match?({_, :_}, &1))
+    end)
+    |> Enum.reject(fn expanded_matcher ->
+      expanded_matcher
+      |> Map.values()
+      |> Enum.all?(&is_nil/1)
+    end)
   end
+
+  defp part_values(map, key) do
+    case Map.fetch(map, key) do
+      {:ok, nil} -> [nil]
+      {:ok, value} -> [value, nil]
+      :error -> [:_]
+    end
+  end
+
+  defp values_equal?(_key, a, b), do: a == b
 end
