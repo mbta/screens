@@ -61,6 +61,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-jest": "^28.5.0",
     "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
     "exit_on_eof": "^1.0.4",
     "file-loader": "^6.2.0",
     "fishery": "^2.2.2",
