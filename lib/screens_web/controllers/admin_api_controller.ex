@@ -6,7 +6,7 @@ defmodule ScreensWeb.AdminApiController do
   alias Screens.Image
   alias Screens.TriptychPlayer
   alias Screens.TriptychPlayer.Fetch, as: TriptychPlayerFetch
-  alias ScreensConfig.{Config, Devops}
+  alias ScreensConfig.{Config, Devops, Screen}
 
   plug :accepts, ["multipart/form-data"] when action == :upload_image
 
@@ -15,9 +15,35 @@ defmodule ScreensWeb.AdminApiController do
     json(conn, %{config: config})
   end
 
+  def validate(conn, %{"id" => _id, "config" => screen_json}) do
+    validated_json = screen_json |> Jason.decode!() |> Screen.from_json() |> Screen.to_json()
+    json(conn, %{success: true, config: validated_json})
+  end
+
   def validate(conn, %{"config" => config}) do
     validated_json = config |> Jason.decode!() |> Config.from_json() |> Config.to_json()
     json(conn, %{success: true, config: validated_json})
+  end
+
+  def confirm(conn, %{"id" => id, "config" => screen_json}) do
+    {:ok, config_json, _version} = ConfigFetch.fetch_config()
+    config = config_json |> Jason.decode!() |> Config.from_json()
+    %Screen{app_id: app_id} = screen = screen_json |> Jason.decode!() |> Screen.from_json()
+
+    new_config = %Config{
+      config
+      | screens: Map.update!(config.screens, id, fn %Screen{app_id: ^app_id} -> screen end)
+    }
+
+    new_config_json = new_config |> Config.to_json() |> Jason.encode!(pretty: true)
+
+    success =
+      case ConfigFetch.put_config(new_config_json) do
+        :ok -> true
+        :error -> false
+      end
+
+    json(conn, %{success: success})
   end
 
   def confirm(conn, %{"config" => config}) do

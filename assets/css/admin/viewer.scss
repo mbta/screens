@@ -1,0 +1,74 @@
+.viewer {
+  display: flex;
+  gap: 0.5em;
+  align-items: stretch;
+}
+
+.viewer__controls {
+  display: flex;
+  flex: 0 0 24em;
+  flex-direction: column;
+  gap: 1.5em;
+  padding: 1em;
+  background-color: #eee;
+
+  h1 {
+    margin: 0;
+  }
+
+  fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    align-items: start;
+
+    & > div {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5em;
+      align-items: center;
+    }
+  }
+
+  legend {
+    color: #666;
+  }
+
+  select {
+    max-width: 22em;
+  }
+}
+
+.viewer__modal {
+  width: 80%;
+  max-width: 1024px;
+
+  &__close-button {
+    float: right;
+  }
+
+  &__ssml {
+    font-family: monospace;
+    white-space: preserve;
+  }
+
+  .admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+  }
+
+  .admin__textarea {
+    width: 100%;
+    height: 80vh;
+  }
+}
+
+.viewer__screen {
+  flex: 1 1 auto;
+
+  iframe {
+    width: 100%;
+    border: 0;
+  }
+}

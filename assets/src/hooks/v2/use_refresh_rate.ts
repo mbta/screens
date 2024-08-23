@@ -1,6 +1,7 @@
 import _ from "lodash";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { fetchDatasetValue, getDatasetValue } from "Util/dataset";
+import { useReceiveMessage } from "Util/inspector";
 import { isOFM } from "Util/outfront";
 import { useScreenID } from "./use_screen_id";
 
@@ -11,6 +12,7 @@ interface RefreshRateConfig {
 
 const useRefreshRate = (): RefreshRateConfig => {
   const screenId = useScreenID();
+  const refreshRateOverride = useInspectorOverride();
 
   return useMemo(() => {
     // Live OFM screens ignore any configured refreshRate.
@@ -19,7 +21,7 @@ const useRefreshRate = (): RefreshRateConfig => {
     const refreshRateOffset = getDatasetValue("refreshRateOffset") || "0";
     const screenIdsWithOffsetMap = getDatasetValue("screenIdsWithOffsetMap");
 
-    const refreshRateMs = parseFloat(refreshRate) * 1000;
+    const refreshRateMs = refreshRateOverride ?? parseFloat(refreshRate) * 1000;
 
     let refreshRateOffsetMs;
 
@@ -32,7 +34,17 @@ const useRefreshRate = (): RefreshRateConfig => {
     }
 
     return { refreshRateMs, refreshRateOffsetMs };
-  }, [screenId]);
+  }, [screenId, refreshRateOverride]);
+};
+
+const useInspectorOverride = (): number | null => {
+  const [override, setOverride] = useState<number | null>(null);
+
+  useReceiveMessage((message) => {
+    if (message.type == "set_refresh_rate") setOverride(message.ms);
+  });
+
+  return override;
 };
 
 export default useRefreshRate;
