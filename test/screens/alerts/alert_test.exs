@@ -8,32 +8,67 @@ defmodule Screens.Alerts.AlertTest do
 
   setup :verify_on_exit!
 
-  defp ie(opts) do
+  defp alert_json(id) do
     %{
-      stop: opts[:stop],
-      route: opts[:route],
-      route_type: opts[:route_type],
-      activities: opts[:activities] || ~w[BOARD EXIT RIDE]
+      "id" => id,
+      "attributes" => %{
+        "active_period" => [],
+        "created_at" => nil,
+        "updated_at" => nil,
+        "cause" => nil,
+        "effect" => nil,
+        "header" => nil,
+        "informed_entity" => [],
+        "lifecycle" => nil,
+        "severity" => nil,
+        "timeframe" => nil,
+        "url" => nil,
+        "description" => nil
+      }
     }
   end
 
   describe "fetch_by_stop_and_route/3" do
-    test "returns {:ok, merged_alerts} if fetch function succeeds in both cases" do
-      stub(Route.Mock, :by_id, fn _id -> nil end)
-      stub(Route.Mock, :serving_stop, fn _ -> {:ok, []} end)
-
-      get_all_alerts_fn = fn ->
-        [
-          %Alert{id: "1", informed_entities: [ie(stop: "1265")]},
-          %Alert{id: "2", informed_entities: [ie(stop: "1266")]},
-          %Alert{id: "3", informed_entities: [ie(stop: "10413", route: "22")]},
-          %Alert{id: "4", informed_entities: [ie(route: "29")]},
-          %Alert{id: "5", informed_entities: [ie(route: "44")]}
-        ]
-      end
+    setup do
+      stop_based_alerts = [alert_json("1"), alert_json("2"), alert_json("3")]
+      route_based_alerts = [alert_json("4"), alert_json("3"), alert_json("5")]
 
       stop_ids = ~w[1265 1266 10413 11413 17411]
       route_ids = ~w[22 29 44]
+
+      stop_ids_param = Enum.join(stop_ids, ",")
+      route_ids_param = Enum.join(route_ids, ",")
+
+      %{
+        stop_ids: ~w[1265 1266 10413 11413 17411],
+        route_ids: ~w[22 29 44],
+        get_json_fn: fn
+          _, %{"filter[stop]" => ^stop_ids_param, "filter[route]" => ^route_ids_param} ->
+            {:ok, %{"data" => stop_based_alerts}}
+
+          _, %{"filter[route]" => ^route_ids_param} ->
+            {:ok, %{"data" => route_based_alerts}}
+        end,
+        x_get_json_fn1: fn
+          _, %{"filter[stop]" => ^stop_ids_param, "filter[route]" => ^route_ids_param} -> :error
+          _, %{"filter[route]" => ^route_ids_param} -> {:ok, %{"data" => route_based_alerts}}
+        end,
+        x_get_json_fn2: fn
+          _, %{"filter[stop]" => ^stop_ids_param, "filter[route]" => ^route_ids_param} ->
+            {:ok, %{"data" => stop_based_alerts}}
+
+          _, %{"filter[route]" => ^route_ids_param} ->
+            :error
+        end
+      }
+    end
+
+    test "returns {:ok, merged_alerts} if fetch function succeeds in both cases", context do
+      %{
+        stop_ids: stop_ids,
+        route_ids: route_ids,
+        get_json_fn: get_json_fn
+      } = context
 
       assert {:ok,
               [
@@ -42,8 +77,24 @@ defmodule Screens.Alerts.AlertTest do
                 %Alert{id: "3"},
                 %Alert{id: "4"},
                 %Alert{id: "5"}
-              ]} = Alert.fetch_by_stop_and_route(stop_ids, route_ids, get_all_alerts_fn)
+              ]} = Alert.fetch_by_stop_and_route(stop_ids, route_ids, get_json_fn)
     end
+
+    test "returns :error if fetch function returns :error", context do
+      %{
+        stop_ids: stop_ids,
+        route_ids: route_ids,
+        x_get_json_fn1: x_get_json_fn1,
+        x_get_json_fn2: x_get_json_fn2
+      } = context
+
+      assert :error == Alert.fetch_by_stop_and_route(stop_ids, route_ids, x_get_json_fn1)
+      assert :error == Alert.fetch_by_stop_and_route(stop_ids, route_ids, x_get_json_fn2)
+    end
+  end
+
+  defp ie(opts) do
+    %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}
   end
 
   describe "informed_entities/1" do

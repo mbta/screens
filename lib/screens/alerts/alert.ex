@@ -175,18 +175,8 @@ defmodule Screens.Alerts.Alert do
   ]
 
   @spec fetch(keyword()) :: {:ok, list(t())} | :error
-  def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2, get_all_alerts \\ &Cache.all/0) do
-    Screens.Telemetry.span_with_stop_meta([:screens, :alerts, :alert, :fetch], fn ->
-      if supported_by_cache?(opts) do
-        {fetch_from_cache(opts, get_all_alerts), %{from: :cache}}
-      else
-        {fetch_from_v3_api(opts, get_json_fn), %{from: :v3_api}}
-      end
-    end)
-  end
-
-  def fetch_from_v3_api(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
-    Screens.Telemetry.span([:screens, :alerts, :alert, :fetch_from_v3_api], fn ->
+  def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
+    Screens.Telemetry.span([:screens, :alerts, :alert, :fetch], fn ->
       params =
         opts
         |> Enum.flat_map(&format_query_param/1)
@@ -203,17 +193,15 @@ defmodule Screens.Alerts.Alert do
   end
 
   def fetch_from_cache(filters \\ [], get_all_alerts \\ &Cache.all/0) do
-    Screens.Telemetry.span([:screens, :alerts, :alert, :fetch_from_cache], fn ->
-      alerts = get_all_alerts.()
+    alerts = get_all_alerts.()
 
-      filters =
-        filters
-        |> Enum.map(&format_cache_filter/1)
-        |> Enum.reject(&is_nil/1)
-        |> Enum.into(%{})
+    filters =
+      filters
+      |> Enum.map(&format_cache_filter/1)
+      |> Enum.reject(&is_nil/1)
+      |> Enum.into(%{})
 
-      {:ok, Screens.Alerts.Cache.Filter.filter_by(alerts, filters)}
-    end)
+    {:ok, Screens.Alerts.Cache.Filter.filter_by(alerts, filters)}
   end
 
   def fetch_from_cache_or_empty_list(filters \\ [], get_all_alerts \\ &Cache.all/0) do
@@ -243,25 +231,6 @@ defmodule Screens.Alerts.Alert do
   defp format_cache_filter({:direction_id, :both}), do: nil
 
   defp format_cache_filter(filter), do: filter
-
-  defp supported_by_cache?(opts) do
-    Enum.all?(opts, fn {key, _} -> supported_cache_filter?(key) end)
-  end
-
-  for supported_filter <- ~w[routes
-                             route_id
-                             route_ids
-                             stops
-                             stop_id
-                             stop_ids
-                             route_type
-                             route_types
-                             direction_id
-                             activities]a do
-    defp supported_cache_filter?(unquote(supported_filter)), do: true
-  end
-
-  defp supported_cache_filter?(_), do: false
 
   @doc """
   Convenience for cases when it's safe to treat an API alert data outage
@@ -297,10 +266,10 @@ defmodule Screens.Alerts.Alert do
   https://app.asana.com/0/0/1200476247539238/f
   """
   @spec fetch_by_stop_and_route(list(Stop.id()), list(Route.id())) :: {:ok, list(t())} | :error
-  def fetch_by_stop_and_route(stop_ids, route_ids, get_all_alerts \\ &Cache.all/0) do
+  def fetch_by_stop_and_route(stop_ids, route_ids, get_json_fn \\ &V3Api.get_json/2) do
     with {:ok, stop_based_alerts} <-
-           fetch_from_cache([stop_ids: stop_ids, route_ids: route_ids], get_all_alerts),
-         {:ok, route_based_alerts} <- fetch_from_cache([route_ids: route_ids], get_all_alerts) do
+           fetch([stop_ids: stop_ids, route_ids: route_ids], get_json_fn),
+         {:ok, route_based_alerts} <- fetch([route_ids: route_ids], get_json_fn) do
       merged_alerts =
         [stop_based_alerts, route_based_alerts]
         |> Enum.concat()
