@@ -2,6 +2,7 @@ import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useMemo, useState } from "react";
 import { getDatasetValue } from "Util/dataset";
+import { sendMessage, useReceiveMessage } from "Util/inspector";
 import { isDup, isOFM, isTriptych, getTriptychPane } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/util";
 import * as SentryLogger from "Util/sentry";
@@ -234,7 +235,27 @@ const useBaseApiResponse = ({
     refreshRateOffsetMs,
   );
 
+  useInspectorControls(fetchData, lastSuccess);
+
   return { apiResponse, requestCount, lastSuccess };
+};
+
+const useInspectorControls = (
+  fetchData: () => void,
+  lastSuccess: number | null,
+): void => {
+  useReceiveMessage((message) => {
+    if (message.type == "refresh_data") fetchData();
+  });
+
+  useEffect(() => {
+    if (lastSuccess) {
+      sendMessage(window.parent, {
+        type: "data_refreshed",
+        timestamp: lastSuccess,
+      });
+    }
+  }, [lastSuccess]);
 };
 
 const useApiResponse = ({ id }) =>

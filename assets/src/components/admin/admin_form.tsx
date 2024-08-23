@@ -93,7 +93,7 @@ const AdminForm = ({ fetchConfig, validatePath, confirmPath }): JSX.Element => {
   }, []);
 
   return (
-    <div>
+    <div className="admin-form">
       <textarea
         ref={configRef}
         id="config"

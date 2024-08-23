@@ -25,8 +25,10 @@ import AdminScreenConfigForm from "Components/admin/admin_screen_config_form";
 import AdminTriptychPlayerForm from "Components/admin/admin_triptych_player_form";
 import ImageManager from "Components/admin/admin_image_manager";
 import Devops from "Components/admin/devops";
+import Inspector from "Components/admin/inspector";
 
 const routes: [string, string, ComponentType][][] = [
+  [["inspector", "🔍", Inspector]],
   [["", "All Screens", AllScreensTable]],
   [
     ["bus-eink-v2-screens", "Bus E-ink", BusEinkV2ScreensTable],

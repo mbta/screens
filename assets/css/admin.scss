@@ -1,3 +1,5 @@
+@import "admin/viewer";
+
 #app {
   font-family: sans-serif;
   font-size: 14px;
@@ -19,6 +21,7 @@
 
 .admin-navbar__group {
   display: flex;
+  align-items: center;
 
   &:not(:first-child) {
     padding-left: 1em;

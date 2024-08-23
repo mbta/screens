@@ -64,7 +64,9 @@ defmodule ScreensWeb.Router do
 
     get "/", AdminApiController, :index
     post "/screens/validate", AdminApiController, :validate
+    post "/screens/validate/:id", AdminApiController, :validate
     post "/screens/confirm", AdminApiController, :confirm
+    post "/screens/confirm/:id", AdminApiController, :confirm
     post "/refresh", AdminApiController, :refresh
     post "/devops", AdminApiController, :devops
     get "/image_filenames", AdminApiController, :image_filenames
