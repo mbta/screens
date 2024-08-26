@@ -20,14 +20,17 @@ defmodule ScreensWeb.AuthController do
     roles =
       get_in(auth.extra.raw_info.userinfo, ["resource_access", keycloak_client_id, "roles"]) || []
 
+    redirect_to = Plug.Conn.get_session(conn, :previous_path, ~p"/admin")
+
     conn
+    |> Plug.Conn.delete_session(:previous_path)
     |> Guardian.Plug.sign_in(
       ScreensWeb.AuthManager,
       username,
       %{roles: roles},
       ttl: {expiration - current_time, :seconds}
     )
-    |> redirect(to: ScreensWeb.Router.Helpers.admin_path(conn, :index))
+    |> redirect(to: redirect_to)
   end
 
   def callback(
