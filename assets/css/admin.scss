@@ -84,6 +84,12 @@
   width: 240px;
 }
 
+.admin-table__inspector-link {
+  color: unset;
+  text-decoration: none;
+  border-bottom: 1px dotted;
+}
+
 .admin-modal__background {
   position: fixed;
   top: 0;

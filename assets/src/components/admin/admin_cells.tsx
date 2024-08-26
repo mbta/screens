@@ -1,4 +1,5 @@
 import React, { useRef, useMemo, useEffect } from "react";
+import { Link } from "react-router-dom";
 import _ from "lodash";
 
 import { gatherSelectOptions } from "Util/admin";
@@ -168,6 +169,18 @@ const IndeterminateCheckbox = ({ indeterminate, ...rest }) => {
   );
 };
 
+const InspectorLink = ({ value }) => {
+  return (
+    <Link
+      to={`/inspector?id=${value}`}
+      className="admin-table__inspector-link"
+      title="🔍 View in Inspector"
+    >
+      {value}
+    </Link>
+  );
+};
+
 export {
   EditableCell,
   EditableList,
@@ -176,4 +189,5 @@ export {
   EditableCheckbox,
   EditableTextarea,
   IndeterminateCheckbox,
+  InspectorLink,
 };
