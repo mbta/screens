@@ -56,7 +56,7 @@ defmodule ScreensWeb.Router do
     pipe_through [:redirect_prod_http, :browser, :auth, :ensure_auth, :ensure_screens_group]
 
     live_dashboard "/dashboard", metrics: ScreensWeb.Telemetry
-    get("/", AdminController, :index)
+    get("/*_", AdminController, :index)
   end
 
   scope "/api/admin", ScreensWeb do

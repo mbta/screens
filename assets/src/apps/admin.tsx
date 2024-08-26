@@ -2,7 +2,12 @@ require("../../css/admin.scss");
 
 import React, { ComponentType } from "react";
 import ReactDOM from "react-dom";
-import { HashRouter as Router, NavLink, Route, Switch } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  NavLink,
+  Route,
+  Switch,
+} from "react-router-dom";
 import weakKey from "weak-key";
 
 import {
@@ -43,7 +48,7 @@ const routes: [string, string, ComponentType][][] = [
 
 const App = (): JSX.Element => {
   return (
-    <Router>
+    <Router basename="/admin">
       <div className="admin-navbar">
         {routes.map((group) => (
           <div key={weakKey(group)} className="admin-navbar__group">
