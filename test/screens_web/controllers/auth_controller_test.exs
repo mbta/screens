@@ -28,7 +28,7 @@ defmodule ScreensWeb.Controllers.AuthControllerTest do
 
       response = html_response(conn, 302)
 
-      assert response =~ ScreensWeb.Router.Helpers.admin_path(conn, :index)
+      assert response =~ ~p"/admin"
       assert Guardian.Plug.current_claims(conn)["roles"] == ["screens-admin"]
     end
 
