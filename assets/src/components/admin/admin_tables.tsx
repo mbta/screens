@@ -14,6 +14,7 @@ import {
   EditableSelect,
   EditableCheckbox,
   EditableTextarea,
+  InspectorLink,
 } from "Components/admin/admin_cells";
 
 import {
@@ -42,6 +43,7 @@ const AllScreensTable = (): JSX.Element => {
     {
       Header: "Screen ID",
       accessor: "id",
+      Cell: InspectorLink,
       Filter: DefaultColumnFilter,
       FormCell: FormStaticCell,
     },
@@ -115,7 +117,12 @@ const AllScreensTable = (): JSX.Element => {
 
 const SolariScreensTable = (): JSX.Element => {
   const columns = [
-    { Header: "Screen ID", accessor: "id", Filter: DefaultColumnFilter },
+    {
+      Header: "Screen ID",
+      accessor: "id",
+      Cell: InspectorLink,
+      Filter: DefaultColumnFilter,
+    },
     {
       Header: "Station Name",
       accessor: buildAppParamAccessor("station_name"),
@@ -182,7 +189,12 @@ const SolariScreensTable = (): JSX.Element => {
 
 const DupV2ScreensTable = (): JSX.Element => {
   const columns = [
-    { Header: "Screen ID", accessor: "id", Filter: DefaultColumnFilter },
+    {
+      Header: "Screen ID",
+      accessor: "id",
+      Cell: InspectorLink,
+      Filter: DefaultColumnFilter,
+    },
     {
       Header: "Header",
       accessor: buildAppParamAccessor("header"),
@@ -235,6 +247,7 @@ const v2Columns = [
   {
     Header: "Screen ID",
     accessor: "id",
+    Cell: InspectorLink,
     Filter: DefaultColumnFilter,
     FormCell: FormStaticCell,
   },
@@ -282,6 +295,7 @@ const v2Columns = [
 const screenIDColumn = {
   Header: "Screen ID",
   accessor: "id",
+  Cell: InspectorLink,
   Filter: DefaultColumnFilter,
   FormCell: FormStaticCell,
 };
@@ -515,6 +529,7 @@ const BuswayV2ScreensTable = (): JSX.Element => {
     {
       Header: "Screen ID",
       accessor: "id",
+      Cell: InspectorLink,
       Filter: DefaultColumnFilter,
       FormCell: FormStaticCell,
     },
