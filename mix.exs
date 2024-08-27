@@ -90,9 +90,7 @@ defmodule Screens.MixProject do
       {:nebulex, "~> 2.6"},
       {:remote_ip, "~> 1.2"},
       {:hackney_telemetry, "~> 0.2.0"},
-      {:ex_cldr_messages, "~> 1.0"},
-      {:server_sent_event_stage, "~> 1.2"},
-      {:mox, "~> 1.1", only: :test}
+      {:ex_cldr_messages, "~> 1.0"}
     ]
   end
 end

@@ -23,7 +23,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
         config,
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
-        fetch_alerts_fn \\ &Alert.fetch_from_cache/1,
+        fetch_alerts_fn \\ &Alert.fetch/1,
         fetch_location_context_fn \\ &Stop.fetch_location_context/3
       ) do
     # In this function:

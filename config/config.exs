@@ -485,9 +485,6 @@ config :screens, Screens.ScreenApiResponseCache,
   gc_interval: :timer.hours(1),
   allocated_memory: 250_000_000
 
-config :screens, Screens.Stops.StopsToRoutes, adapter: Nebulex.Adapters.Local
-config :screens, Screens.Routes.RoutesCache, adapter: Nebulex.Adapters.Local
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

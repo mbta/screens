@@ -39,7 +39,6 @@ defmodule Screens.Routes.Route do
   @type color :: name_colors() | :purple | :teal | :yellow
   @type icon :: name_colors() | :bus | :cr | :ferry | :mattapan
 
-  @callback by_id(id()) :: {:ok, t()} | :error
   @spec by_id(id()) :: {:ok, t()} | :error
   def by_id(route_id) do
     case V3Api.get_json("routes/" <> route_id) do
@@ -63,7 +62,7 @@ defmodule Screens.Routes.Route do
   end
 
   @doc "Fetches routes that serve the given stop."
-  @callback serving_stop(Stop.id()) :: {:ok, [t()]} | :error
+  @spec serving_stop(Stop.id()) :: {:ok, [t()]} | :error
   def serving_stop(
         stop_id,
         get_json_fn \\ &V3Api.get_json/2,
