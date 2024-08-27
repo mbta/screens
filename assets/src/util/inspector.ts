@@ -5,6 +5,9 @@ import { useEffect } from "react";
  * iframe'd screens. Limit usage of these functions to this specific purpose;
  * components _within_ a screen have many better options (props, contexts, etc.)
  * for communicating with each other.
+ *
+ * In screen code, use ONLY the `toInspector`/`fromInspector` functions. These
+ * safely do nothing if the screen is not running within the inspector.
  */
 
 export type Message =
@@ -12,16 +15,36 @@ export type Message =
   | { type: "refresh_data" }
   | { type: "set_refresh_rate"; ms: number | null };
 
+export const INSPECTOR_FRAME_NAME = "screen-inspector-frame";
+
+const isFramed = (): boolean => window.name == INSPECTOR_FRAME_NAME;
+
 const sendMessage = (window: Window, message: Message) =>
   window.postMessage(message, { targetOrigin: location.origin });
 
-const useReceiveMessage = (handler: (message: Message) => void) =>
-  useEffect(() => {
-    const listener = ({ data, origin }) =>
-      origin == location.origin && handler(data);
+const sendToInspector = (message: Message) => {
+  if (isFramed()) sendMessage(window.parent, message);
+};
 
-    window.addEventListener("message", listener);
-    return () => window.removeEventListener("message", listener);
-  });
+type MessageHandler = (message: Message) => void;
 
-export { sendMessage, useReceiveMessage };
+const useReceiveMessage = (handler: MessageHandler) =>
+  useEffect(() => receiveHook(handler));
+
+const useReceiveFromInspector = (handler: MessageHandler) =>
+  useEffect(() => (isFramed() ? receiveHook(handler) : undefined));
+
+const receiveHook = (handler: MessageHandler) => {
+  const listener = ({ data, origin }) =>
+    origin == location.origin && handler(data);
+
+  window.addEventListener("message", listener);
+  return () => window.removeEventListener("message", listener);
+};
+
+export {
+  sendMessage,
+  sendToInspector,
+  useReceiveMessage,
+  useReceiveFromInspector,
+};

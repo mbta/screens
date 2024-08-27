@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { useMemo, useState } from "react";
 import { fetchDatasetValue, getDatasetValue } from "Util/dataset";
-import { useReceiveMessage } from "Util/inspector";
+import { useReceiveFromInspector } from "Util/inspector";
 import { isOFM } from "Util/outfront";
 import { useScreenID } from "./use_screen_id";
 
@@ -40,7 +40,7 @@ const useRefreshRate = (): RefreshRateConfig => {
 const useInspectorOverride = (): number | null => {
   const [override, setOverride] = useState<number | null>(null);
 
-  useReceiveMessage((message) => {
+  useReceiveFromInspector((message) => {
     if (message.type == "set_refresh_rate") setOverride(message.ms);
   });
 

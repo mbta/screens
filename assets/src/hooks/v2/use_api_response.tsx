@@ -2,7 +2,7 @@ import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useMemo, useState } from "react";
 import { getDatasetValue } from "Util/dataset";
-import { sendMessage, useReceiveMessage } from "Util/inspector";
+import { sendToInspector, useReceiveFromInspector } from "Util/inspector";
 import { isDup, isOFM, isTriptych, getTriptychPane } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/util";
 import * as SentryLogger from "Util/sentry";
@@ -244,16 +244,13 @@ const useInspectorControls = (
   fetchData: () => void,
   lastSuccess: number | null,
 ): void => {
-  useReceiveMessage((message) => {
+  useReceiveFromInspector((message) => {
     if (message.type == "refresh_data") fetchData();
   });
 
   useEffect(() => {
     if (lastSuccess) {
-      sendMessage(window.parent, {
-        type: "data_refreshed",
-        timestamp: lastSuccess,
-      });
+      sendToInspector({ type: "data_refreshed", timestamp: lastSuccess });
     }
   }, [lastSuccess]);
 };
