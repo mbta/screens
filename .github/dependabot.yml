@@ -1,14 +1,54 @@
 version: 2
 updates:
-- package-ecosystem: mix
-  directory: "/"
-  schedule:
-    interval: daily
-    time: "10:00"
-  open-pull-requests-limit: 10
-- package-ecosystem: npm
-  directory: "/assets"
-  schedule:
-    interval: daily
-    time: "10:00"
-  open-pull-requests-limit: 10
+  - package-ecosystem: mix
+    directory: "/"
+    schedule:
+      interval: daily
+      time: "10:00"
+    open-pull-requests-limit: 10
+    groups:
+      mix-patches:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+  - package-ecosystem: npm
+    directory: "/assets"
+    schedule:
+      interval: daily
+      time: "10:00"
+    open-pull-requests-limit: 10
+    groups:
+      npm-patches:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+      eslint:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+          - "@eslint*"
+      react:
+        patterns:
+          - "react*"
+          - "@types/react*"
+      testing-tools:
+        patterns:
+          - "ts-jest"
+          - "jest*"
+          - "@jest*"
+      babel:
+        patterns:
+          - "babel*"
+          - "@babel*"
+      webpack:
+        patterns:
+          - "webpack*"
+          - "*webpack-plugin"
+          - "@svgr/webpack"
+          - "@types/webpack-env"
+          - "*-loader"
+      moment:
+        patterns:
+          - "moment*"
