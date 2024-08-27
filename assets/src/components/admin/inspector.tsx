@@ -11,7 +11,12 @@ import { useHistory, useLocation } from "react-router-dom";
 import AdminForm from "./admin_form";
 
 import { doSubmit, type Config, type Screen } from "Util/admin";
-import { type Message, sendMessage, useReceiveMessage } from "Util/inspector";
+import {
+  type Message,
+  INSPECTOR_FRAME_NAME,
+  sendMessage,
+  useReceiveMessage,
+} from "Util/inspector";
 
 type ScreenWithId = { id: string; config: Screen };
 
@@ -90,6 +95,7 @@ const Inspector: ComponentType = () => {
 
       <div className="viewer__screen">
         <iframe
+          name={INSPECTOR_FRAME_NAME}
           onLoad={adjustFrame}
           ref={frameRef}
           src={
