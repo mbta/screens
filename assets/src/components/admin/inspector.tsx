@@ -291,7 +291,7 @@ const DataControls: ComponentType<{
         <input
           type="checkbox"
           checked={isRefreshEnabled}
-          onClick={() => setIsRefreshEnabled(!isRefreshEnabled)}
+          onChange={() => setIsRefreshEnabled(!isRefreshEnabled)}
         />
         Enable refresh interval
       </label>
