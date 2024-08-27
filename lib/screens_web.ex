@@ -26,7 +26,7 @@ defmodule ScreensWeb do
         layouts: [html: {ScreensWeb.LayoutView, :app}]
 
       import Plug.Conn
-      import ScreensWeb.Gettext
+      use Gettext, backend: ScreensWeb.Gettext
       alias ScreensWeb.Router.Helpers, as: Routes
       unquote(verified_routes())
     end
@@ -49,7 +49,7 @@ defmodule ScreensWeb do
       import ScreensWeb.HTML
 
       import ScreensWeb.ErrorHelpers
-      import ScreensWeb.Gettext
+      use Gettext, backend: ScreensWeb.Gettext
       alias ScreensWeb.Router.Helpers, as: Routes
       unquote(verified_routes())
     end
@@ -66,7 +66,7 @@ defmodule ScreensWeb do
   def channel do
     quote do
       use Phoenix.Channel
-      import ScreensWeb.Gettext
+      use Gettext, backend: ScreensWeb.Gettext
     end
   end
 
