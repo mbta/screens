@@ -103,6 +103,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget | alert: %{widget.alert | header: header}}
   end
 
+  defp put_alert_id(widget, id) do
+    %{widget | alert: %{widget.alert | id: id}}
+  end
+
   defp put_severity(widget, severity) do
     %{widget | alert: %{widget.alert | severity: severity}}
   end
@@ -3170,6 +3174,23 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
                  %{alert_widget | is_full_screen: false},
                  &fake_log/1
                )
+    end
+  end
+
+  describe "valid_candidate?/1" do
+    test "returns true", %{widget: widget} do
+      assert WidgetInstance.valid_candidate?(widget)
+    end
+
+    suppressed_alerts = ~w[590467]
+
+    for alert_id <- suppressed_alerts do
+      @tag alert_id: alert_id
+      test "returns false for alert ##{alert_id}", %{widget: widget, alert_id: alert_id} do
+        refute widget
+               |> put_alert_id(alert_id)
+               |> WidgetInstance.valid_candidate?()
+      end
     end
   end
 end
