@@ -1,9 +1,6 @@
 defmodule Screens.Alerts.Alert do
   @moduledoc false
 
-  import Screens.RouteType, only: :macros
-
-  alias Screens.Alerts.Cache
   alias Screens.Alerts.InformedEntity
   alias Screens.Routes.Route
   alias Screens.RouteType
@@ -191,46 +188,6 @@ defmodule Screens.Alerts.Alert do
       end
     end)
   end
-
-  def fetch_from_cache(filters \\ [], get_all_alerts \\ &Cache.all/0) do
-    alerts = get_all_alerts.()
-
-    filters =
-      filters
-      |> Enum.map(&format_cache_filter/1)
-      |> Enum.reject(&is_nil/1)
-      |> Enum.into(%{})
-
-    {:ok, Screens.Alerts.Cache.Filter.filter_by(alerts, filters)}
-  end
-
-  def fetch_from_cache_or_empty_list(filters \\ [], get_all_alerts \\ &Cache.all/0) do
-    {:ok, alerts} = fetch_from_cache(filters, get_all_alerts)
-
-    alerts
-  end
-
-  defp format_cache_filter({:route_id, route_id}), do: {:routes, [route_id]}
-  defp format_cache_filter({:stop_id, stop_id}), do: {:stops, [stop_id]}
-  defp format_cache_filter({:route_ids, route_ids}), do: {:routes, route_ids}
-  defp format_cache_filter({:stop_ids, stop_ids}), do: {:stops, stop_ids}
-
-  defp format_cache_filter({:route_type, route_type}),
-    do: format_cache_filter({:route_types, [route_type]})
-
-  defp format_cache_filter({:route_types, route_types}) do
-    route_types =
-      Enum.map(route_types, fn
-        route_type when is_route_type(route_type) -> RouteType.to_id(route_type)
-        route_type -> route_type
-      end)
-
-    {:route_types, route_types}
-  end
-
-  defp format_cache_filter({:direction_id, :both}), do: nil
-
-  defp format_cache_filter(filter), do: filter
 
   @doc """
   Convenience for cases when it's safe to treat an API alert data outage
@@ -565,7 +522,7 @@ defmodule Screens.Alerts.Alert do
   def by_route_id(route_id, stop_id) do
     {inline_alerts, global_alerts} =
       [route_id: route_id]
-      |> fetch_from_cache_or_empty_list()
+      |> fetch_or_empty_list()
       |> Enum.split_with(&inline?/1)
 
     global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)

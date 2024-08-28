@@ -51,7 +51,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   def reconstructed_alert_instances(
         %Screen{app_params: %PreFare{} = app_params} = config,
         now \\ DateTime.utc_now(),
-        fetch_alerts_fn \\ &Alert.fetch_from_cache/1,
+        fetch_alerts_fn \\ &Alert.fetch/1,
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         fetch_location_context_fn \\ &Stop.fetch_location_context/3,
         fetch_subway_platforms_for_stop_fn \\ &Stop.fetch_subway_platforms_for_stop/1
