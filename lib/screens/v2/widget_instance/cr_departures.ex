@@ -134,17 +134,16 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
          now
        ) do
     {:ok, scheduled_departure_time} =
-      try do
+      if is_nil(schedule) do
+        Logger.error(
+          "[cr_departures serialize_time] Could not get schedule time: #{inspect(departure)}"
+        )
+
+        {:ok, nil}
+      else
         %Departure{schedule: schedule}
         |> Departure.time()
         |> DateTime.shift_zone("America/New_York")
-      rescue
-        ex ->
-          Logger.error(
-            "[cr_departures serialize_time] Could not get schedule time: #{inspect(departure)}"
-          )
-
-          reraise ex, __STACKTRACE__
       end
 
     cond do
@@ -175,7 +174,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
       |> Departure.time()
       |> DateTime.shift_zone("America/New_York")
 
-    is_delayed = DateTime.compare(scheduled_departure_time, predicted_departure_time) == :lt
+    is_delayed = delayed?(scheduled_departure_time, predicted_departure_time)
 
     %{departure_time: scheduled_departure_time, departure_type: :schedule, is_delayed: is_delayed}
   end
@@ -196,7 +195,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
     stop_type = Departure.stop_type(departure)
     second_diff = DateTime.diff(predicted_departure_time, now)
     minute_diff = round(second_diff / 60)
-    is_delayed = DateTime.compare(scheduled_departure_time, predicted_departure_time) == :lt
+    is_delayed = delayed?(scheduled_departure_time, predicted_departure_time)
 
     departure_time =
       cond do
@@ -256,4 +255,10 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   # Forrest Hills should not show a track number, only wayfinding arrow.
   defp get_track_number(_, "place-forhl"), do: nil
   defp get_track_number(departure, _station), do: Departure.track_number(departure)
+
+  defp delayed?(%DateTime{} = scheduled_departure_time, %DateTime{} = predicted_departure_time) do
+    DateTime.compare(scheduled_departure_time, predicted_departure_time) == :lt
+  end
+
+  defp delayed?(_, _), do: false
 end

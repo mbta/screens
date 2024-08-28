@@ -450,4 +450,36 @@ defmodule Screens.V2.DepartureTest do
       assert nil == Departure.vehicle_status(departure)
     end
   end
+
+  describe "fetch_predictions_and_schedules/2" do
+    test "maintains schedules even if they are in the past" do
+      now = ~U[2024-08-28 17:13:14.116713Z]
+      # The train is _very_ late!!
+      schedule =
+        %Schedule{
+          trip: %Trip{id: "trip-1"},
+          arrival_time: DateTime.add(now, -10, :minute),
+          departure_time: DateTime.add(now, -8, :minute)
+        }
+
+      # The train is almost here!
+      prediction =
+        %Prediction{
+          trip: %Trip{id: "trip-1"},
+          arrival_time: DateTime.add(now, 2, :minute),
+          departure_time: DateTime.add(now, 5, :minute)
+        }
+
+      fetch_predictions_fn = fn _ -> {:ok, [prediction]} end
+      fetch_schedules_fn = fn _ -> {:ok, [schedule]} end
+
+      assert {:ok, [%Departure{schedule: schedule, prediction: prediction}]} ==
+               Departure.fetch_predictions_and_schedules(
+                 [],
+                 now,
+                 fetch_predictions_fn,
+                 fetch_schedules_fn
+               )
+    end
+  end
 end
