@@ -4,9 +4,9 @@ defmodule Screens.V2.WidgetInstance.CRDeparturesTest do
   # alias Screens.Alerts.Alert
   # alias Screens.Config.Dup.Override.FreeTextLine
   # alias Screens.Config.Screen
+  alias Screens.Schedules.Schedule
   alias Screens.Predictions.Prediction
   # alias Screens.Routes.Route
-  # alias Screens.Schedules.Schedule
   alias Screens.Trips.Trip
   # alias Screens.Vehicles.Vehicle
   alias Screens.V2.{Departure, WidgetInstance}
@@ -50,6 +50,86 @@ defmodule Screens.V2.WidgetInstance.CRDeparturesTest do
 
       assert %{headsign: "Beth Israel", station_service_list: []} ==
                CRDeparturesWidget.serialize_headsign(departure, "Somewhere")
+    end
+  end
+
+  describe "serialize_departure/5" do
+    test "serializes a departure with a schedule and a prediction" do
+      now = ~U[2024-08-28 18:08:30.883227Z]
+
+      departure = %Departure{
+        schedule: %Schedule{
+          id: "schedule-1",
+          trip: %Trip{id: "trip-1", headsign: "Somewhere"},
+          arrival_time: DateTime.add(now, 5, :minute),
+          departure_time: DateTime.add(now, 7, :minute)
+        },
+        prediction: %Prediction{
+          id: "prediction-1",
+          trip: %Trip{id: "trip-1", headsign: "Somewhere"},
+          arrival_time: DateTime.add(now, 5, :minute),
+          departure_time: DateTime.add(now, 7, :minute)
+        }
+      }
+
+      assert %{
+               prediction_or_schedule_id: "prediction-1"
+             } =
+               CRDeparturesWidget.serialize_departure(
+                 departure,
+                 "Somewhere",
+                 %{},
+                 "place-smwhr",
+                 now
+               )
+    end
+
+    test "serializes a departure with only a schedule" do
+      now = ~U[2024-08-28 18:08:30.883227Z]
+
+      departure = %Departure{
+        schedule: %Schedule{
+          id: "schedule-1",
+          trip: %Trip{id: "trip-1", headsign: "Somewhere"},
+          arrival_time: DateTime.add(now, 5, :minute),
+          departure_time: DateTime.add(now, 7, :minute)
+        }
+      }
+
+      assert %{
+               prediction_or_schedule_id: "schedule-1"
+             } =
+               CRDeparturesWidget.serialize_departure(
+                 departure,
+                 "Somewhere",
+                 %{},
+                 "place-smwhr",
+                 now
+               )
+    end
+
+    test "serializes a departure with only a prediction" do
+      now = ~U[2024-08-28 18:08:30.883227Z]
+
+      departure = %Departure{
+        prediction: %Prediction{
+          id: "prediction-1",
+          trip: %Trip{id: "trip-1", headsign: "Somewhere"},
+          arrival_time: DateTime.add(now, 5, :minute),
+          departure_time: DateTime.add(now, 7, :minute)
+        }
+      }
+
+      assert %{
+               prediction_or_schedule_id: "prediction-1"
+             } =
+               CRDeparturesWidget.serialize_departure(
+                 departure,
+                 "Somewhere",
+                 %{},
+                 "place-smwhr",
+                 now
+               )
     end
   end
 

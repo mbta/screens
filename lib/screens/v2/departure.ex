@@ -45,9 +45,14 @@ defmodule Screens.V2.Departure do
     end
   end
 
-  def fetch_predictions_and_schedules(params, now) do
-    with {:ok, predictions} <- Prediction.fetch(params),
-         {:ok, schedules} <- Schedule.fetch(params) do
+  def fetch_predictions_and_schedules(
+        params,
+        now,
+        fetch_predictions_fn \\ &Prediction.fetch/1,
+        fetch_schedules_fn \\ &Schedule.fetch/1
+      ) do
+    with {:ok, predictions} <- fetch_predictions_fn.(params),
+         {:ok, schedules} <- fetch_schedules_fn.(params) do
       relevant_predictions = Builder.get_relevant_departures(predictions, now)
       relevant_schedules = Builder.get_relevant_departures(schedules, now)
 
