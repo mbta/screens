@@ -80,7 +80,7 @@ defmodule Screens.MixProject do
       {:retry, "~> 0.18.0"},
       {:stream_data, "~> 1.1", only: :test},
       {:memcachex, "~> 0.5.5"},
-      {:aja, "~> 0.6.2"},
+      {:aja, "~> 0.7.0"},
       {:telemetry, "~> 1.2"},
       {:telemetry_poller, "~> 0.4"},
       {:telemetry_metrics, "~> 0.4"},
