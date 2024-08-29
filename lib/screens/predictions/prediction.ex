@@ -2,6 +2,7 @@ defmodule Screens.Predictions.Prediction do
   @moduledoc false
 
   alias Screens.Departures.Departure
+  alias Screens.Predictions.ScheduleRelationship
   alias Screens.Vehicles.Vehicle
 
   defstruct id: nil,
@@ -13,7 +14,8 @@ defmodule Screens.Predictions.Prediction do
             arrival_time: nil,
             departure_time: nil,
             stop_headsign: nil,
-            track_number: nil
+            track_number: nil,
+            schedule_relationship: :scheduled
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -25,7 +27,8 @@ defmodule Screens.Predictions.Prediction do
           arrival_time: DateTime.t() | nil,
           departure_time: DateTime.t() | nil,
           stop_headsign: String.t() | nil,
-          track_number: String.t() | nil
+          track_number: String.t() | nil,
+          schedule_relationship: ScheduleRelationship.t()
         }
 
   @spec fetch(Departure.query_params()) :: {:ok, list(t())} | :error

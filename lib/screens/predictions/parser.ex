@@ -1,5 +1,6 @@
 defmodule Screens.Predictions.Parser do
   @moduledoc false
+  alias Screens.Predictions.ScheduleRelationship
 
   def parse_result(%{"data" => data, "included" => included}) do
     included_data = parse_included_data(included)
@@ -46,11 +47,17 @@ defmodule Screens.Predictions.Parser do
         %{"id" => id, "attributes" => attributes, "relationships" => relationships},
         included_data
       ) do
-    %{"arrival_time" => arrival_time_string, "departure_time" => departure_time_string} =
+    %{
+      "arrival_time" => arrival_time_string,
+      "departure_time" => departure_time_string,
+      "schedule_relationship" => schedule_relationship
+    } =
       attributes
 
     arrival_time = parse_time(arrival_time_string)
     departure_time = parse_time(departure_time_string)
+
+    schedule_relationship = ScheduleRelationship.parse(schedule_relationship)
 
     %{
       "route" => %{"data" => %{"id" => route_id}},
@@ -89,7 +96,8 @@ defmodule Screens.Predictions.Parser do
       alerts: alerts,
       arrival_time: arrival_time,
       departure_time: departure_time,
-      track_number: track_number
+      track_number: track_number,
+      schedule_relationship: schedule_relationship
     }
   end
 
