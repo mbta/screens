@@ -1,6 +1,7 @@
 defmodule Screens.V2.Departure.Builder do
   @moduledoc false
 
+  alias Screens.Departures.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
@@ -119,8 +120,15 @@ defmodule Screens.V2.Departure.Builder do
       end)
       |> Enum.map(fn s -> %Departure{schedule: s} end)
 
-    predicted_departures
-    |> Kernel.++(unpredicted_departures)
+    departures = predicted_departures ++ unpredicted_departures
+
+    departures
+    |> Enum.reject(&cancelled_or_skipped?/1)
     |> Enum.sort_by(&Departure.time/1, DateTime)
   end
+
+  defp cancelled_or_skipped?(%Departure{prediction: %Prediction{schedule_relationship: sr}}),
+    do: sr in [:cancelled, :skipped]
+
+  defp cancelled_or_skipped?(_), do: false
 end

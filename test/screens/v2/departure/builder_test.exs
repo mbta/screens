@@ -275,5 +275,49 @@ defmodule Screens.V2.Departure.BuilderTest do
       assert expected ==
                Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
     end
+
+    test "filters out departures that have been marked cancelled" do
+      p1 = %Prediction{id: "p1", departure_time: ~U[2020-02-01T00:00:00Z], trip: %Trip{id: "t7"}}
+
+      p2 = %Prediction{
+        id: "p2",
+        departure_time: ~U[2020-02-01T01:00:00Z],
+        trip: %Trip{id: "t3"},
+        schedule_relationship: :cancelled
+      }
+
+      predictions = [p1, p2]
+
+      s1 = %Schedule{id: "s1", departure_time: ~U[2020-02-01T01:01:00Z], trip: %Trip{id: "t3"}}
+      s2 = %Schedule{id: "s2", departure_time: ~U[2020-02-01T00:01:00Z], trip: %Trip{id: "t7"}}
+      schedules = [s1, s2]
+
+      expected = [%Departure{prediction: p1, schedule: s2}]
+
+      assert expected ==
+               Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
+    end
+
+    test "filters out departures that have been marked skipped" do
+      p1 = %Prediction{id: "p1", departure_time: ~U[2020-02-01T00:00:00Z], trip: %Trip{id: "t7"}}
+
+      p2 = %Prediction{
+        id: "p2",
+        departure_time: ~U[2020-02-01T01:00:00Z],
+        trip: %Trip{id: "t3"},
+        schedule_relationship: :skipped
+      }
+
+      predictions = [p1, p2]
+
+      s1 = %Schedule{id: "s1", departure_time: ~U[2020-02-01T01:01:00Z], trip: %Trip{id: "t3"}}
+      s2 = %Schedule{id: "s2", departure_time: ~U[2020-02-01T00:01:00Z], trip: %Trip{id: "t7"}}
+      schedules = [s1, s2]
+
+      expected = [%Departure{prediction: p1, schedule: s2}]
+
+      assert expected ==
+               Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
+    end
   end
 end
