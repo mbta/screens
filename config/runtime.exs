@@ -17,21 +17,13 @@ if config_env() == :prod do
     dsn: System.get_env("SENTRY_DSN"),
     environment_name: eb_env_name
 
-  signs_ui_s3_bucket =
-    case eb_env_name do
-      "screens-prod" -> "mbta-signs"
-      "screens-dev" -> "mbta-signs-dev"
-      "screens-dev-green" -> "mbta-signs-dev"
-      _ -> nil
-    end
-
   config :screens, ScreensWeb.Endpoint,
     http: [:inet6, port: String.to_integer(System.get_env("PORT") || "4000")],
     secret_key_base: System.get_env("SECRET_KEY_BASE")
 
   config :screens,
     environment_name: eb_env_name,
-    signs_ui_s3_bucket: signs_ui_s3_bucket,
+    signs_ui_s3_bucket: System.fetch_env!("SIGNS_UI_S3_BUCKET"),
     screenplay_fullstory_org_id: System.get_env("SCREENPLAY_FULLSTORY_ORG_ID")
 
   config :screens, ScreensWeb.AuthManager, secret_key: System.get_env("SCREENS_AUTH_SECRET")
