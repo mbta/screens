@@ -23,6 +23,8 @@ defmodule Screens.V2.ScreenData do
           data: serializable_map() | nil,
           force_reload: boolean(),
           disabled: boolean(),
+          # Mercury uses this to help optimize data refreshes
+          # https://app.asana.com/0/1185117109217413/1205234924224431/f
           last_deploy_timestamp: DateTime.t()
         }
   @type paging_metadata :: %{

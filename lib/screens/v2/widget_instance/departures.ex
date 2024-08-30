@@ -405,6 +405,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
           serialize_timestamp(departure_time, now)
       end
 
+    # time_in_epoch is used by Mercury so they can calculate timestamps on their own.
+    # https://app.asana.com/0/1176097567827729/1205730972991228/f
     %{time: time, time_in_epoch: DateTime.to_unix(departure_time)}
   end
 
