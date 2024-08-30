@@ -4,23 +4,15 @@
 # remember to add this file to your .gitignore.
 import Config
 
-eb_env_name = System.get_env("ENVIRONMENT_NAME")
-
-api_v3_url =
-  case eb_env_name do
-    "screens-prod" -> "https://api-v3.mbta.com/"
-    "screens-dev" -> "https://api-dev.mbtace.com/"
-    "screens-dev-green" -> "https://api-dev-green.mbtace.com/"
-    _ -> System.get_env("API_V3_URL", "https://api-v3.mbta.com/")
-  end
-
 unless config_env() == :test do
   config :screens,
-    api_v3_url: api_v3_url,
+    api_v3_url: System.get_env("API_V3_URL", "https://api-v3.mbta.com/"),
     api_v3_key: System.get_env("API_V3_KEY")
 end
 
 if config_env() == :prod do
+  eb_env_name = System.get_env("ENVIRONMENT_NAME")
+
   config :sentry,
     dsn: System.get_env("SENTRY_DSN"),
     environment_name: eb_env_name
