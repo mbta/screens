@@ -1,6 +1,8 @@
 defmodule Screens.V2.WidgetInstance.CRDeparturesTest do
   use ExUnit.Case, async: true
 
+  import ExUnit.CaptureLog
+
   alias Screens.Schedules.Schedule
   alias Screens.Predictions.Prediction
   alias Screens.Trips.Trip
@@ -102,7 +104,7 @@ defmodule Screens.V2.WidgetInstance.CRDeparturesTest do
                )
     end
 
-    test "serializes a departure with only a prediction" do
+    test "serializes a departure with only a prediction, logs an error" do
       now = ~U[2024-08-28 18:08:30.883227Z]
 
       departure = %Departure{
@@ -114,16 +116,19 @@ defmodule Screens.V2.WidgetInstance.CRDeparturesTest do
         }
       }
 
-      assert %{
-               prediction_or_schedule_id: "prediction-1"
-             } =
-               CRDeparturesWidget.serialize_departure(
-                 departure,
-                 "Somewhere",
-                 %{},
-                 "place-smwhr",
-                 now
-               )
+      {result, log} =
+        with_log(fn ->
+          CRDeparturesWidget.serialize_departure(
+            departure,
+            "Somewhere",
+            %{},
+            "place-smwhr",
+            now
+          )
+        end)
+
+      assert log =~ "Could not get schedule time"
+      assert %{prediction_or_schedule_id: "prediction-1"} = result
     end
   end
 end
