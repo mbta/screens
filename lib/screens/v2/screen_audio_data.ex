@@ -1,6 +1,7 @@
 defmodule Screens.V2.ScreenAudioData do
   @moduledoc false
 
+  alias Screens.Config.Cache
   alias Screens.Util
   alias Screens.V2.ScreenData
   alias Screens.V2.ScreenData.Parameters
@@ -13,8 +14,8 @@ defmodule Screens.V2.ScreenAudioData do
   @spec by_screen_id(screen_id()) :: list({module(), map()}) | :error
   def by_screen_id(
         screen_id,
-        get_config_fn \\ &ScreenData.get_config/1,
-        fetch_data_fn \\ &ScreenData.fetch_data/1,
+        get_config_fn \\ &Cache.screen/1,
+        generate_layout_fn \\ &ScreenData.Layout.generate/1,
         get_audio_only_instances_fn \\ &get_audio_only_instances/2,
         now \\ DateTime.utc_now()
       ) do
@@ -29,7 +30,7 @@ defmodule Screens.V2.ScreenAudioData do
         if date_in_range?(audio, now) do
           visual_widgets_with_audio_equivalence =
             config
-            |> fetch_data_fn.()
+            |> generate_layout_fn.()
             |> elem(1)
             |> Map.values()
             |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
@@ -51,7 +52,7 @@ defmodule Screens.V2.ScreenAudioData do
   @spec volume_by_screen_id(screen_id()) :: {:ok, float()} | :error
   def volume_by_screen_id(
         screen_id,
-        get_config_fn \\ &ScreenData.get_config/1,
+        get_config_fn \\ &Cache.screen/1,
         now \\ DateTime.utc_now()
       ) do
     config = get_config_fn.(screen_id)
