@@ -1,8 +1,6 @@
 defmodule Screens.Routes.Route do
   @moduledoc false
 
-  require Logger
-
   alias Screens.Routes.Parser
   alias Screens.RouteType
   alias Screens.Stops.Stop
@@ -63,24 +61,8 @@ defmodule Screens.Routes.Route do
 
   @doc "Fetches routes that serve the given stop."
   @spec serving_stop(Stop.id()) :: {:ok, [t()]} | :error
-  def serving_stop(
-        stop_id,
-        get_json_fn \\ &V3Api.get_json/2,
-        attempts_left \\ 3
-      )
-
-  def serving_stop(_stop_id, _get_json_fn, 0), do: :error
-
-  def serving_stop(
-        stop_id,
-        get_json_fn,
-        attempts_left
-      ) do
+  def serving_stop(stop_id, get_json_fn \\ &V3Api.get_json/2) do
     case get_json_fn.("routes", %{"filter[stop]" => stop_id}) do
-      {:ok, %{"data" => []}, _} ->
-        Logger.warning("Route.serving_stop empty_retry attempts_left=#{attempts_left - 1}")
-        serving_stop(stop_id, get_json_fn, attempts_left - 1)
-
       {:ok, %{"data" => data}} ->
         {:ok, Enum.map(data, fn route -> Parser.parse_route(route) end)}
 
