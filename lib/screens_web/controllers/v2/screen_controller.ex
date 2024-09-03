@@ -83,7 +83,7 @@ defmodule ScreensWeb.V2.ScreenController do
 
     config = Cache.screen(screen_id)
 
-    if is_struct(config, Screen) do
+    if match?(%Screen{app_id: app_id} when app_id in @recognized_app_ids, config) do
       assigns = get_assigns(params, screen_id, config)
 
       conn
