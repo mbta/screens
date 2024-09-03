@@ -67,7 +67,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   end
 
   defp routes_serving_stop(stop_id) do
-    case Route.serving_stop(stop_id) do
+    case Route.serving_stops([stop_id]) do
       {:ok, routes} -> routes
       :error -> []
     end
