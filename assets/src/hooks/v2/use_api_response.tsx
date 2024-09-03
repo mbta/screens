@@ -13,70 +13,46 @@ import useRefreshRate from "./use_refresh_rate";
 
 const MINUTE_IN_MS = 60_000;
 
-interface RawResponse {
-  data: WidgetData | null;
-  force_reload: boolean;
-  disabled: boolean;
-}
+type SimulationResponse = { full_page: WidgetData; flex_zone: WidgetData[] };
 
-interface SimulationRawResponse {
-  data: {
-    full_page: WidgetData;
-    flex_zone: WidgetData[];
-  };
-  force_reload: boolean;
+type RawResponse = {
+  data: SimulationResponse | WidgetData | null;
   disabled: boolean;
-}
+  force_reload: boolean;
+};
+
+type SimulationData = { fullPage: WidgetData; flexZone: WidgetData[] };
 
 type ApiResponse =
   // The request was successful.
   | { state: "success"; data: WidgetData }
-  | { state: "simulation_success"; data: SimulationApiResponse }
-  // The request was successful, but this screen is currently disabled via config.
+  | { state: "simulation_success"; data: SimulationData }
+  // The request was successful, but this screen is disabled via config.
   | { state: "disabled" }
   // Either:
   // - The request failed.
-  // - The server responded, but did not successfully fetch data. Riders may still be able to find data from other sources.
+  // - The server responded, but did not successfully fetch data. Riders may
+  //   still be able to find data from other sources.
   | { state: "failure" }
   | { state: "loading" };
-
-type SimulationApiResponse =
-  // The request was successful.
-  {
-    fullPage: WidgetData;
-    flexZone: WidgetData[];
-  };
 
 const FAILURE_RESPONSE: ApiResponse = { state: "failure" };
 const LOADING_RESPONSE: ApiResponse = { state: "loading" };
 
-const rawResponseToApiResponse = ({
-  data,
-  disabled,
-}: RawResponse): ApiResponse => {
-  if (disabled) {
+const rawResponseToApiResponse = (response: RawResponse): ApiResponse => {
+  if (response.disabled) {
     return { state: "disabled" };
-  } else if (data != null) {
-    return { state: "success", data };
-  } else {
-    return { state: "failure" };
-  }
-};
+  } else if (response.data) {
+    const data = response.data;
 
-const rawResponseToSimulationApiResponse = ({
-  data,
-  disabled,
-}: SimulationRawResponse): ApiResponse => {
-  if (disabled) {
-    return { state: "disabled" };
-  } else if (data != null) {
-    return {
-      state: "simulation_success",
-      data: {
-        fullPage: data.full_page,
-        flexZone: data.flex_zone,
-      },
-    };
+    if ("full_page" in data) {
+      return {
+        state: "simulation_success",
+        data: { fullPage: data.full_page, flexZone: data.flex_zone },
+      };
+    } else {
+      return { state: "success", data };
+    }
   } else {
     return { state: "failure" };
   }
@@ -169,9 +145,7 @@ const getApiPath = (id: string, routePart: string) => {
 
 interface UseApiResponseArgs {
   id: string;
-  failureModeElapsedMs?: number;
   routePart?: string;
-  responseHandler?: (json: any) => ApiResponse;
 }
 
 interface UseApiResponseReturn {
@@ -183,7 +157,6 @@ interface UseApiResponseReturn {
 const useBaseApiResponse = ({
   id,
   routePart = "",
-  responseHandler = rawResponseToApiResponse,
 }: UseApiResponseArgs): UseApiResponseReturn => {
   const { refreshRateMs, refreshRateOffsetMs } = useRefreshRate();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
@@ -195,13 +168,13 @@ const useBaseApiResponse = ({
     try {
       const now = Date.now();
       const result = await fetch(apiPath);
-      const json = await result.json();
+      const rawResponse: RawResponse = await result.json();
 
-      if (json.force_reload) {
+      if (rawResponse.force_reload) {
         window.location.reload();
       }
 
-      const apiResponse = responseHandler(json);
+      const apiResponse = rawResponseToApiResponse(rawResponse);
 
       if (apiResponse.state == "failure") {
         doFailureBuffer(lastSuccess, setApiResponse, apiResponse);
@@ -255,19 +228,10 @@ const useInspectorControls = (
   }, [lastSuccess]);
 };
 
-const useApiResponse = ({ id }) =>
-  useBaseApiResponse({
-    id,
-    routePart: "",
-    responseHandler: rawResponseToApiResponse,
-  });
+const useApiResponse = ({ id }) => useBaseApiResponse({ id, routePart: "" });
 
 const useSimulationApiResponse = ({ id }) =>
-  useBaseApiResponse({
-    id,
-    routePart: "/simulation",
-    responseHandler: rawResponseToSimulationApiResponse,
-  });
+  useBaseApiResponse({ id, routePart: "/simulation" });
 
 // For OFM apps--DUP, triptych--we need to request a different
 // route that's more permissive of CORS, since these clients are loaded from a local html file
@@ -279,19 +243,11 @@ const useSimulationApiResponse = ({ id }) =>
 // The /triptych endpoint has the CORS stuff, plus an additional step that maps the player name of
 // the individual triptych pane to a screen ID representing the collective trio.
 const useDUPApiResponse = ({ id }) =>
-  useBaseApiResponse({
-    id,
-    routePart: "/dup",
-    responseHandler: rawResponseToApiResponse,
-  });
+  useBaseApiResponse({ id, routePart: "/dup" });
 
 const useTriptychApiResponse = ({ id }) =>
-  useBaseApiResponse({
-    id,
-    routePart: "/triptych",
-    responseHandler: rawResponseToApiResponse,
-  });
+  useBaseApiResponse({ id, routePart: "/triptych" });
 
 export default useApiResponse;
-export { ApiResponse, SimulationApiResponse };
+export type { ApiResponse, SimulationData };
 export { useSimulationApiResponse, useDUPApiResponse, useTriptychApiResponse };

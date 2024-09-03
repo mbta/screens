@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import useApiResponse, {
   ApiResponse,
-  SimulationApiResponse,
+  SimulationData,
   useDUPApiResponse,
   useTriptychApiResponse,
 } from "Hooks/v2/use_api_response";
@@ -17,9 +17,7 @@ import Widget, { WidgetData } from "Components/v2/widget";
 import useAudioReadout from "Hooks/v2/use_audio_readout";
 import { isDup, isOFM, isTriptych } from "Util/outfront";
 
-type ResponseMapper = (
-  apiResponse: ApiResponse,
-) => WidgetData | SimulationApiResponse;
+type ResponseMapper = (apiResponse: ApiResponse) => WidgetData | SimulationData;
 
 const defaultResponseMapper: ResponseMapper = (apiResponse) => {
   switch (apiResponse.state) {
@@ -96,9 +94,9 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
   const responseMapper = useContext(ResponseMapperContext);
   const ErrorBoundaryOrFragment = isOFM() ? Fragment : WidgetTreeErrorBoundary;
 
-  // We know this can only be `WidgetData` and not `SimulationApiResponse` here
-  // because `ScreenPage` is only used in contexts where a "non-simulation" API
-  // response will be received (and vice-versa for `SimulationScreenLayout`).
+  // We know this can only be `WidgetData` and not `SimulationData` here because
+  // `ScreenPage` is only used in contexts where a "non-simulation" API response
+  // will be received (and vice-versa for `SimulationScreenLayout`).
   // TODO: Refactor how this works so the cast isn't needed, since it suppresses
   // any real type errors we might have.
   const widgetData = responseMapper(apiResponse) as WidgetData;
