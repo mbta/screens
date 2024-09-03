@@ -59,10 +59,10 @@ defmodule Screens.Routes.Route do
     end
   end
 
-  @doc "Fetches routes that serve the given stop."
-  @spec serving_stop(Stop.id()) :: {:ok, [t()]} | :error
-  def serving_stop(stop_id, get_json_fn \\ &V3Api.get_json/2) do
-    case get_json_fn.("routes", %{"filter[stop]" => stop_id}) do
+  @doc "Fetches routes that serve the given stops."
+  @spec serving_stops([Stop.id()]) :: {:ok, [t()]} | :error
+  def serving_stops(stop_ids, get_json_fn \\ &V3Api.get_json/2) do
+    case get_json_fn.("routes", %{"filter[stop]" => Enum.join(stop_ids, ",")}) do
       {:ok, %{"data" => data}} ->
         {:ok, Enum.map(data, fn route -> Parser.parse_route(route) end)}
 
@@ -72,7 +72,7 @@ defmodule Screens.Routes.Route do
   end
 
   @doc """
-  Similar to `serving_stop` but also determines whether each route has any scheduled service at
+  Similar to `serving_stops` but also determines whether each route has any scheduled service at
   the given stop on the current day. Only route IDs and the `active?` flag are returned.
   """
   @spec serving_stop_with_active(Stop.id()) ::
