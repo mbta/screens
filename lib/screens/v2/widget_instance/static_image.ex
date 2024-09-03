@@ -2,17 +2,17 @@ defmodule Screens.V2.WidgetInstance.StaticImage do
   @moduledoc false
 
   alias Screens.V2.WidgetInstance.StaticImage
+  alias ScreensConfig.Screen
 
   defstruct screen: nil,
             image_url: nil,
             priority: nil,
             size: nil
 
-  @type config :: Screens.V2.ScreenData.config()
   @type size :: :small | :medium | :large | :fullscreen
 
   @type t :: %__MODULE__{
-          screen: config(),
+          screen: Screen.t(),
           image_url: String.t(),
           priority: Screens.V2.WidgetInstance.priority(),
           size: size()

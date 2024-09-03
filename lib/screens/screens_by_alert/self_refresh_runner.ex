@@ -30,7 +30,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
 
   @data_ttl_seconds 30
 
-  @screen_data_fn Application.compile_env(:screens, :screens_by_alert)[:screen_data_fn]
+  @screen_data_fn Application.compile_env!(:screens, [:screens_by_alert, :screen_data_fn])
 
   @impl true
   def init(:ok) do
@@ -68,15 +68,12 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
     # using the return value, while also providing graceful handling of shutdowns.
     #
     # Doing the work in a separate, unlinked task process protects this GenServer
-    # process from going down if an exception is raised while running
-    # ScreenData.by_screen_id/1 for some screen.
+    # process from going down if screen data fetching raises an exception.
     Enum.each(screen_ids_to_refresh, fn screen_id ->
       Task.Supervisor.start_child(
         TaskSupervisor,
         Util.fn_with_timeout(
-          fn ->
-            @screen_data_fn.(screen_id, skip_serialize: true)
-          end,
+          fn -> @screen_data_fn.(screen_id, update_visible_alerts?: true) end,
           10_000
         )
       )
