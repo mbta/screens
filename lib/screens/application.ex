@@ -29,6 +29,7 @@ defmodule Screens.Application do
       # Task supervisor for parallel running of candidate generator variants
       {Task.Supervisor, name: Screens.V2.ScreenData.ParallelRunSupervisor},
       {Screens.ScreenApiResponseCache, []},
+      Screens.LastTrip,
       {Phoenix.PubSub, name: ScreensWeb.PubSub},
       ScreensWeb.Endpoint
     ]
