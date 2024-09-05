@@ -11,7 +11,9 @@ import { DUP_VERSION } from "Components/v2/dup/version";
 import { TRIPTYCH_VERSION } from "Components/v2/triptych/version";
 import useRefreshRate from "./use_refresh_rate";
 
+const BASE_PATH = "/v2/api/screen";
 const MINUTE_IN_MS = 60_000;
+const OUTFRONT_BASE_URI = "https://screens.mbta.com";
 
 type SimulationResponse = { full_page: WidgetData; flex_zone: WidgetData[] };
 
@@ -85,68 +87,56 @@ const doFailureBuffer = (
   }
 };
 
-const getIsRealScreenParam = () => {
-  return isRealScreen() ? "&is_real_screen=true" : "";
-};
-
 const isSuccess = (response: ApiResponse) =>
   response != null &&
   ["success", "simulation_success"].includes(response.state);
 
-const getScreenSideParam = () => {
-  const screenSide = getScreenSide();
-  return screenSide ? `&screen_side=${screenSide}` : "";
-};
-
-const getRequestorParam = () => {
-  if (isOFM()) return `&requestor=real_screen`;
-
-  let requestor = getDatasetValue("requestor");
-  if (!requestor && isRealScreen()) {
-    requestor = "real_screen";
-  }
-
-  return requestor ? `&requestor=${requestor}` : "";
-};
-
-const getLoggingParams = () => {
+const loggingParams = () => {
   if (isDup()) {
-    return `&rotation_index=${ROTATION_INDEX}&version=${DUP_VERSION}`;
+    return {
+      rotation_index: ROTATION_INDEX.toString(),
+      version: DUP_VERSION,
+    };
+  } else if (isTriptych()) {
+    return {
+      pane: getTriptychPane() ?? "UNKNOWN",
+      version: TRIPTYCH_VERSION,
+    };
+  } else {
+    return {};
   }
-
-  if (isTriptych()) {
-    const triptychPane = getTriptychPane();
-    return `&pane=${triptychPane || "UNKNOWN"}&version=${TRIPTYCH_VERSION}`;
-  }
-
-  return "";
 };
 
-const getOutfrontAbsolutePath = () =>
-  isOFM() ? "https://screens.mbta.com" : "";
+const useApiPath = (screenId: string, appendPath?: string): string => {
+  return useMemo(() => {
+    const base = isOFM() ? OUTFRONT_BASE_URI : document.baseURI;
+    const path = [
+      BASE_PATH,
+      getDatasetValue("isPending") === "true" ? "pending" : null,
+      screenId,
+      appendPath,
+    ]
+      .filter(Boolean)
+      .join("/");
 
-const getRoute = () => {
-  const route = "/v2/api/screen/";
-  const isPending = getDatasetValue("isPending") === "true";
-  return isPending ? `${route}pending/` : route;
+    const url = new URL(path, base);
+
+    const params: Record<string, string | null | undefined> = {
+      is_real_screen: isRealScreen() ? "true" : null,
+      last_refresh: getDatasetValue("lastRefresh"),
+      requestor:
+        getDatasetValue("requestor") ?? (isRealScreen() ? "real_screen" : null),
+      screen_side: getScreenSide(),
+      ...loggingParams(),
+    };
+
+    for (const [key, value] of Object.entries(params)) {
+      if (value) url.searchParams.append(key, value);
+    }
+
+    return url.toString();
+  }, [screenId, appendPath]);
 };
-
-const getApiPath = (id: string, routePart: string) => {
-  const outfrontAbsolutePath = getOutfrontAbsolutePath();
-  const route = getRoute();
-  const lastRefresh = getDatasetValue("lastRefresh");
-  const isRealScreenParam = getIsRealScreenParam();
-  const screenSideParam = getScreenSideParam();
-  const requestorParam = getRequestorParam();
-  const loggingParams = getLoggingParams();
-
-  return `${outfrontAbsolutePath}${route}${id}${routePart}?last_refresh=${lastRefresh}${isRealScreenParam}${screenSideParam}${requestorParam}${loggingParams}`;
-};
-
-interface UseApiResponseArgs {
-  id: string;
-  routePart?: string;
-}
 
 interface UseApiResponseReturn {
   apiResponse: ApiResponse;
@@ -154,15 +144,15 @@ interface UseApiResponseReturn {
   lastSuccess: number | null;
 }
 
-const useBaseApiResponse = ({
-  id,
-  routePart = "",
-}: UseApiResponseArgs): UseApiResponseReturn => {
+const useBaseApiResponse = (
+  id: string,
+  appendPath?: string,
+): UseApiResponseReturn => {
   const { refreshRateMs, refreshRateOffsetMs } = useRefreshRate();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
-  const apiPath = useMemo(() => getApiPath(id, routePart), [id, routePart]);
+  const apiPath = useApiPath(id, appendPath);
 
   const fetchData = async () => {
     try {
@@ -194,12 +184,12 @@ const useBaseApiResponse = ({
     setRequestCount((count) => count + 1);
   };
 
-  // Fetch data once, immediately, on page load
+  // Fetch data immediately, and if the path we should fetch changes
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [apiPath]);
 
-  // Schedule subsequent data fetches, if we need to
+  // Schedule subsequent data fetches based on refresh rate+offset
   useDriftlessInterval(
     () => {
       fetchData();
@@ -228,10 +218,10 @@ const useInspectorControls = (
   }, [lastSuccess]);
 };
 
-const useApiResponse = ({ id }) => useBaseApiResponse({ id, routePart: "" });
+const useApiResponse = ({ id }) => useBaseApiResponse(id);
 
 const useSimulationApiResponse = ({ id }) =>
-  useBaseApiResponse({ id, routePart: "/simulation" });
+  useBaseApiResponse(id, "simulation");
 
 // For OFM apps--DUP, triptych--we need to request a different
 // route that's more permissive of CORS, since these clients are loaded from a local html file
@@ -242,11 +232,8 @@ const useSimulationApiResponse = ({ id }) =>
 //
 // The /triptych endpoint has the CORS stuff, plus an additional step that maps the player name of
 // the individual triptych pane to a screen ID representing the collective trio.
-const useDUPApiResponse = ({ id }) =>
-  useBaseApiResponse({ id, routePart: "/dup" });
-
-const useTriptychApiResponse = ({ id }) =>
-  useBaseApiResponse({ id, routePart: "/triptych" });
+const useDUPApiResponse = ({ id }) => useBaseApiResponse(id, "dup");
+const useTriptychApiResponse = ({ id }) => useBaseApiResponse(id, "triptych");
 
 export default useApiResponse;
 export type { ApiResponse, SimulationData };

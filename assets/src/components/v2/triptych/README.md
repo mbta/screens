@@ -46,8 +46,8 @@ Outfront recommends these asset sizes:
     This sets up a fake MRAID object that emulates the real one available to the
     client when running on Outfront screens. The MRAID object gives our client
     info about which screen it's running on.
-  - replace the definition of `getOutfrontAbsolutePath` in
-    assets/src/hooks/v2/use_api_response.tsx with `const getOutfrontAbsolutePath = () => isOFM() ? "http://localhost:4000" : "";`.
+  - replace the definition of `OUTFRONT_BASE_URI` in
+    `assets/src/hooks/v2/use_api_response.tsx` with `"http://localhost:4000"`.
   - make sure priv/triptych_player_to_screen_id.json mirrors
     mbta-ctd-config/screens/triptych_player_to_screen_id-prod.json, or at least
     contains a mapping for the `playerName` that you hardcoded two steps ago.
