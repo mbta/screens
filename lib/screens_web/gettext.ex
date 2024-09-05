@@ -5,7 +5,7 @@ defmodule ScreensWeb.Gettext do
   By using [Gettext](https://hexdocs.pm/gettext),
   your module gains a set of macros for translations, for example:
 
-      import ScreensWeb.Gettext
+      use Gettext, backend: ScreensWeb.Gettext
 
       # Simple translation
       gettext("Here is the string to translate")
@@ -20,5 +20,5 @@ defmodule ScreensWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :screens
+  use Gettext.Backend, otp_app: :screens
 end
