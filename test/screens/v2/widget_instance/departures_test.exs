@@ -972,6 +972,97 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                header: "A special audio-only value"
              } = Departures.audio_serialize_section(section, nil, now)
     end
+
+    test "returns 1 departure time if all other times are > 2 minutes away" do
+      now = ~U[2020-01-01T00:00:00Z]
+
+      section = %{
+        type: :normal_section,
+        rows: [
+          %Departure{
+            prediction: %Prediction{
+              arrival_time: ~U[2020-01-01T00:01:00Z],
+              route: %Route{type: :subway},
+              trip: %Trip{headsign: "Test"},
+              stop: %Stop{id: "place-test"}
+            }
+          },
+          %Departure{
+            prediction: %Prediction{
+              arrival_time: ~U[2020-01-01T02:01:00Z],
+              route: %Route{type: :subway},
+              trip: %Trip{headsign: "Test"},
+              stop: %Stop{id: "place-test"}
+            }
+          }
+        ],
+        header: %Header{title: "Section Header"}
+      }
+
+      assert %{
+               type: :normal_section,
+               departure_groups: [
+                 {:normal,
+                  %{
+                    id: "1B2M2Y8AsgTpgAmY7PhCfg==",
+                    type: :departure_row,
+                    headsign: %{headsign: "Test", variation: nil},
+                    route: %{track_number: nil, vehicle_type: :train, route_text: nil},
+                    times_with_crowding: [
+                      %{id: nil, time: %{type: :minutes, minutes: 1}, crowding: nil}
+                    ],
+                    inline_alerts: []
+                  }}
+               ],
+               header: "Section Header"
+             } = Departures.audio_serialize_section(section, nil, now)
+    end
+
+    test "returns 2 departure times <= 2 minutes away" do
+      now = ~U[2020-01-01T00:00:00Z]
+
+      section = %{
+        type: :normal_section,
+        rows: [
+          %Departure{
+            prediction: %Prediction{
+              arrival_time: ~U[2020-01-01T00:01:00Z],
+              route: %Route{type: :subway},
+              trip: %Trip{headsign: "Test"},
+              stop: %Stop{id: "place-test"}
+            }
+          },
+          %Departure{
+            prediction: %Prediction{
+              arrival_time: ~U[2020-01-01T00:02:00Z],
+              route: %Route{type: :subway},
+              trip: %Trip{headsign: "Test"},
+              stop: %Stop{id: "place-test"}
+            }
+          }
+        ],
+        header: %Header{title: "Section Header"}
+      }
+
+      assert %{
+               type: :normal_section,
+               departure_groups: [
+                 {:normal,
+                  %{
+                    id: "1B2M2Y8AsgTpgAmY7PhCfg==",
+                    type: :departure_row,
+                    headsign: %{headsign: "Test", variation: nil},
+                    route: %{track_number: nil, vehicle_type: :train, route_text: nil},
+                    times_with_crowding: [
+                      %{id: nil, time: %{type: :minutes, minutes: 1}, crowding: nil},
+                      %{id: nil, time: %{type: :minutes, minutes: 2}, crowding: nil}
+                    ],
+                    inline_alerts: []
+                  }}
+               ],
+               header: "Section Header"
+             } = Departures.audio_serialize_section(section, nil, now)
+    end
   end
 
   describe "audio_sort_key/1" do

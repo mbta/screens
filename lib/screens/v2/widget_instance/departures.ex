@@ -264,7 +264,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   @doc """
-  Groups all departures of the same route and headsign, limiting each group to `max_entries_per_group` entries.
+  Groups all departures of the same route and headsign.
+  If a group has two departures less than 2 minutes away, read both, otherwise only read the closest departure.
   `notice` rows are never grouped.
 
   The list is ordered by the occurrence of the _first_ departure of each group--later departures can "leap frog"
@@ -286,7 +287,17 @@ defmodule Screens.V2.WidgetInstance.Departures do
         {:notice, notice}
 
       {_key, departure_group} ->
-        {:normal, Enum.take(departure_group, max_entries_per_group)}
+        [first_departure | other_departures] = departure_group
+
+        additional_departure =
+          other_departures
+          |> Enum.filter(fn departure ->
+            time = Departure.time(departure)
+            DateTime.diff(time, now, :minute) <= 2
+          end)
+          |> Enum.take(1)
+
+        {:normal, [first_departure] ++ additional_departure}
     end)
   end
 
