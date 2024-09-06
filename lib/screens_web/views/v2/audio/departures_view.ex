@@ -96,9 +96,13 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
       {route_text, &render_route/1},
       {vehicle_type || "trip", fn v -> ~E|<%= v %>| end},
       {headsign, fn h -> ~E|to <%= render_headsign(h) %>| end},
-      {track_number, fn tn -> ~E|on track <%= tn %>| end}
+      {track_number, fn tn -> render_track_number(tn, vehicle_type) end}
     ])
   end
+
+  defp render_track_number(nil, _), do: ~E""
+  defp render_track_number(track_number, :bus), do: ~E|at berth <%= track_number %><break/>|
+  defp render_track_number(track_number, _), do: ~E|on track <%= track_number %><break/>|
 
   defp render_route(route_text) do
     cond do
