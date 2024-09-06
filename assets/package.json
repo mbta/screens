@@ -47,7 +47,7 @@
     "@babel/preset-typescript": "^7.14.5",
     "@eslint/js": "^9.1.1",
     "@jest/globals": "^29.7.0",
-    "@sentry/webpack-plugin": "^2.22.2",
+    "@sentry/webpack-plugin": "^2.22.4",
     "@svgr/webpack": "^5.5.0",
     "@types/lodash": "^4.17.4",
     "@types/react": "^17.0.14",
