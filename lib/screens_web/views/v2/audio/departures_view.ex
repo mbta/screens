@@ -64,8 +64,14 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     ~E|<s><%= content %></s>|
   end
 
-  defp render_time_with_crowding({%{crowding: crowding, time: time}, _}, route, _headsign) do
-    route_headsign_rendered = render_route_headsign(route, nil)
+  defp render_time_with_crowding({%{crowding: crowding, time: time}, _}, route, headsign) do
+    route_headsign_rendered =
+      if route.vehicle_type == :train do
+        render_route_headsign(route, headsign)
+      else
+        render_route_headsign(route, nil)
+      end
+
     crowding_rendered = render_crowding_level(crowding)
     preposition = preposition_for_time_type(time.type)
 
