@@ -1,8 +1,158 @@
+defmodule Screens.V2.ScreenDataTest.Stub do
+  defmacro candidate_generator(name, instances_fn) do
+    quote do
+      defmodule unquote(name) do
+        alias Screens.V2.CandidateGenerator
+        alias Screens.V2.Template.Builder
+        alias Screens.V2.WidgetInstance.Placeholder
+
+        @behaviour CandidateGenerator
+
+        @impl CandidateGenerator
+        def screen_template(), do: Builder.build_template({:screen, %{normal: [:main]}})
+
+        @impl CandidateGenerator
+        def candidate_instances(config, _opts) do
+          unquote(instances_fn).(config)
+        end
+
+        @impl CandidateGenerator
+        def audio_only_instances(_widgets, _config), do: []
+
+        defp placeholder(color), do: %Placeholder{color: color, slot_names: [:main]}
+      end
+    end
+  end
+end
+
 defmodule Screens.V2.ScreenDataTest do
   use ExUnit.Case, async: true
 
+  alias ScreensConfig.Screen
+  alias Screens.Config.MockCache
   alias Screens.V2.ScreenData
+  alias Screens.V2.ScreenData.MockParameters
   alias Screens.V2.WidgetInstance.MockWidget
+  alias Screens.V2.WidgetInstance.Placeholder
+  alias Screens.V2.ScreenDataTest.Stub
+
+  import ExUnit.CaptureLog
+  import Mox
+  setup :verify_on_exit!
+
+  require Stub
+
+  Stub.candidate_generator(GrayGenerator, fn _ -> [placeholder(:gray)] end)
+  Stub.candidate_generator(GreenGenerator, fn _ -> [placeholder(:green)] end)
+
+  Stub.candidate_generator(CrashGenerator, fn %Screen{app_params: %{test_pid: pid}} ->
+    send(pid, {:crash_running, self()})
+    raise "oopsie"
+  end)
+
+  describe "get/2" do
+    setup do
+      stub(MockParameters, :get_refresh_rate, fn _app_id -> 0 end)
+      :ok
+    end
+
+    defp build_config(attrs) do
+      struct!(
+        %Screen{app_id: :test_app, app_params: %{}, device_id: "", name: "", vendor: ""},
+        attrs
+      )
+    end
+
+    test "gets widget data for a screen ID" do
+      expect(MockCache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
+
+      expect(
+        MockParameters,
+        :get_candidate_generator,
+        fn %Screen{app_id: :test_app}, nil -> GrayGenerator end
+      )
+
+      assert ScreenData.get("test_id") ==
+               %{type: :normal, main: %{type: :placeholder, color: :gray}}
+    end
+
+    test "generates widget data from a pending config" do
+      deny(MockCache, :screen, 1)
+
+      expect(
+        MockParameters,
+        :get_candidate_generator,
+        fn %Screen{app_id: :test_app}, nil -> GrayGenerator end
+      )
+
+      assert ScreenData.get("test_id", pending_config: build_config(%{app_id: :test_app})) ==
+               %{type: :normal, main: %{type: :placeholder, color: :gray}}
+    end
+
+    test "selects a variant candidate generator" do
+      expect(MockCache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
+
+      expect(
+        MockParameters,
+        :get_candidate_generator,
+        fn %Screen{app_id: :test_app}, "test_variant" -> GrayGenerator end
+      )
+
+      assert ScreenData.get("test_id", generator_variant: "test_variant") ==
+               %{type: :normal, main: %{type: :placeholder, color: :gray}}
+    end
+
+    test "runs all variant generators in the background" do
+      expect(MockCache, :screen, fn "test_id" ->
+        build_config(%{app_id: :test_app, app_params: %{test_pid: self()}})
+      end)
+
+      expect(MockParameters, :get_variants, fn %Screen{app_id: :test_app} -> ["crash"] end)
+
+      stub(
+        MockParameters,
+        :get_candidate_generator,
+        fn
+          %Screen{app_id: :test_app}, nil -> GrayGenerator
+          %Screen{app_id: :test_app}, "crash" -> CrashGenerator
+        end
+      )
+
+      capture_log(fn ->
+        assert %{type: :normal} = ScreenData.get("test_id", run_all_variants?: true)
+
+        receive do
+          {:crash_running, pid} ->
+            ref = Process.monitor(pid)
+            assert_receive({:DOWN, ^ref, :process, _pid, _reason})
+        end
+      end)
+    end
+  end
+
+  describe "variants/2" do
+    setup do
+      stub(MockParameters, :get_refresh_rate, fn _app_id -> 0 end)
+      :ok
+    end
+
+    test "gets widget data for all variants" do
+      expect(MockCache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
+      expect(MockParameters, :get_variants, fn %Screen{app_id: :test_app} -> ["green"] end)
+
+      stub(
+        MockParameters,
+        :get_candidate_generator,
+        fn
+          %Screen{app_id: :test_app}, nil -> GrayGenerator
+          %Screen{app_id: :test_app}, "green" -> GreenGenerator
+        end
+      )
+
+      assert {%{main: %{color: :gray}}, %{"green" => %{main: %{color: :green}}}} =
+               ScreenData.variants("test_id")
+    end
+  end
 
   describe "serialize/1" do
     test "serializes a hierarchical layout" do

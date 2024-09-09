@@ -11,12 +11,6 @@ defmodule Screens.Application do
     # List all child processes to be supervised
     children = [
       Screens.Telemetry,
-      # Start the PubSub system
-      {Phoenix.PubSub, name: ScreensWeb.PubSub},
-      # Start the endpoint when the application starts
-      ScreensWeb.Endpoint,
-      # Starts a worker by calling: Screens.Worker.start_link(arg)
-      # {Screens.Worker, arg},
       {Screens.Cache.Owner, engine_module: Screens.Config.Cache.Engine},
       {Screens.Cache.Owner, engine_module: Screens.SignsUiConfig.Cache.Engine},
       {Screens.Cache.Owner, engine_module: Screens.TriptychPlayer.Cache.Engine},
@@ -26,7 +20,6 @@ defmodule Screens.Application do
       # Turning this off because it's not in use, and the process is failing
       # {Screens.BlueBikes.State, name: Screens.BlueBikes.State},
       # Task supervisor for ScreensByAlert async updates
-      # This supervisor is only used in deployment envs, but it's harmless to start it anyway in local dev.
       {Task.Supervisor, name: Screens.ScreensByAlert.Memcache.TaskSupervisor},
       # ScreensByAlert server process
       Screens.ScreensByAlert,
@@ -36,7 +29,11 @@ defmodule Screens.Application do
       {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner},
       Screens.OlCrowding.DynamicSupervisor,
       {Screens.OlCrowding.Agent, %{}},
-      {Screens.ScreenApiResponseCache, []}
+      # Task supervisor for parallel running of candidate generator variants
+      {Task.Supervisor, name: Screens.V2.ScreenData.ParallelRunSupervisor},
+      {Screens.ScreenApiResponseCache, []},
+      {Phoenix.PubSub, name: ScreensWeb.PubSub},
+      ScreensWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

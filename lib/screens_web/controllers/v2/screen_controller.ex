@@ -146,6 +146,7 @@ defmodule ScreensWeb.V2.ScreenController do
       requestor: params["requestor"],
       rotation_index: rotation_index(params),
       triptych_pane: triptych_pane(params),
+      variant: params["variant"],
       is_pending: false
     ]
   end

@@ -36,6 +36,8 @@ const AUDIO_SCREEN_TYPES = new Set([
   "pre_fare_v2",
 ]);
 
+const SCREEN_TYPE_VARIANTS = { dup_v2: ["new_departures"] };
+
 const Inspector: ComponentType = () => {
   const [config, setConfig] = useState<Config | null>(null);
 
@@ -55,6 +57,7 @@ const Inspector: ComponentType = () => {
       : null;
 
   const [isSimulation, setIsSimulation] = useState(false);
+  const [isVariantEnabled, setIsVariantEnabled] = useState(false);
 
   const frameRef = useRef<HTMLIFrameElement>(null);
 
@@ -79,13 +82,22 @@ const Inspector: ComponentType = () => {
               screen={screen}
               isSimulation={isSimulation}
               setIsSimulation={setIsSimulation}
+              isVariantEnabled={isVariantEnabled}
+              setIsVariantEnabled={setIsVariantEnabled}
             />
 
             {screen && (
               <>
                 <ConfigControls screen={screen} />
                 <ViewControls zoom={zoom} setZoom={setZoom} />
-                <DataControls sendToFrame={sendToFrame} />
+                <DataControls
+                  // Reset when the loaded screen changes, since the new screen
+                  // will not be aware of previously-sent inspector messages
+                  key={screen.id}
+                  isVariantEnabled={isVariantEnabled}
+                  screen={screen}
+                  sendToFrame={sendToFrame}
+                />
                 <AudioControls screen={screen} />
               </>
             )}
@@ -101,7 +113,11 @@ const Inspector: ComponentType = () => {
           src={
             screen
               ? new URL(
-                  `/v2/screen/${screen.id}${isSimulation ? "/simulation" : ""}`,
+                  [
+                    `/v2/screen/${screen.id}`,
+                    isSimulation ? "/simulation" : "",
+                    isVariantEnabled ? "?variant=all" : "",
+                  ].join(""),
                   location.origin,
                 ).toString()
               : "about:blank"
@@ -117,7 +133,16 @@ const ScreenSelector: ComponentType<{
   screen: ScreenWithId | null;
   isSimulation: boolean;
   setIsSimulation: (value: boolean) => void;
-}> = ({ config, screen, isSimulation, setIsSimulation }) => {
+  isVariantEnabled: boolean;
+  setIsVariantEnabled: (value: boolean) => void;
+}> = ({
+  config,
+  screen,
+  isSimulation,
+  setIsSimulation,
+  isVariantEnabled,
+  setIsVariantEnabled,
+}) => {
   const history = useHistory();
   const { pathname, search } = useLocation();
 
@@ -165,7 +190,16 @@ const ScreenSelector: ComponentType<{
           checked={isSimulation}
           onChange={() => setIsSimulation(!isSimulation)}
         />
-        Screenplay Simulation
+        Screenplay simulation
+      </label>
+
+      <label>
+        <input
+          type="checkbox"
+          checked={isVariantEnabled}
+          onChange={() => setIsVariantEnabled(!isVariantEnabled)}
+        />
+        Enable variant switcher
       </label>
     </fieldset>
   );
@@ -253,11 +287,14 @@ const ViewControls: ComponentType<{
 };
 
 const DataControls: ComponentType<{
+  isVariantEnabled: boolean;
+  screen: ScreenWithId;
   sendToFrame: (message: Message) => void;
-}> = ({ sendToFrame }) => {
+}> = ({ isVariantEnabled, screen, sendToFrame }) => {
   const [dataTimestamp, setDataTimestamp] = useState<number | null>(null);
   const [dataSecondsOld, setDataSecondsOld] = useState<number | null>(null);
   const [isRefreshEnabled, setIsRefreshEnabled] = useState(true);
+  const [variant, setVariant] = useState<string | null>(null);
 
   useReceiveMessage((message) => {
     if (message.type == "data_refreshed") {
@@ -279,29 +316,63 @@ const DataControls: ComponentType<{
     sendToFrame({ type: "set_refresh_rate", ms: isRefreshEnabled ? null : 0 });
   }, [isRefreshEnabled]);
 
+  useEffect(() => {
+    sendToFrame({ type: "set_data_variant", variant: variant });
+  }, [variant]);
+
   return (
-    <fieldset>
-      <legend>Data</legend>
+    <>
+      <fieldset>
+        <legend>Data</legend>
 
-      <div>
-        <button onClick={() => sendToFrame({ type: "refresh_data" })}>
-          Refresh
-        </button>
+        <div>
+          <button onClick={() => sendToFrame({ type: "refresh_data" })}>
+            Refresh
+          </button>
 
-        {isRefreshEnabled && dataSecondsOld != null && (
-          <span>⏱️ {dataSecondsOld} seconds ago</span>
-        )}
-      </div>
+          {isRefreshEnabled && dataSecondsOld != null && (
+            <span>⏱️ {dataSecondsOld} seconds ago</span>
+          )}
+        </div>
 
-      <label>
-        <input
-          type="checkbox"
-          checked={isRefreshEnabled}
-          onChange={() => setIsRefreshEnabled(!isRefreshEnabled)}
-        />
-        Enable refresh interval
-      </label>
-    </fieldset>
+        <label>
+          <input
+            type="checkbox"
+            checked={isRefreshEnabled}
+            onChange={() => setIsRefreshEnabled(!isRefreshEnabled)}
+          />
+          Enable refresh interval
+        </label>
+      </fieldset>
+
+      {isVariantEnabled && (
+        <fieldset>
+          <legend>Variants</legend>
+
+          <label>
+            <input
+              type="radio"
+              name="variant"
+              checked={variant === null}
+              onChange={() => setVariant(null)}
+            />
+            Default
+          </label>
+
+          {(SCREEN_TYPE_VARIANTS[screen.config.app_id] ?? []).map((v) => (
+            <label key={v}>
+              <input
+                type="radio"
+                name="variant"
+                checked={variant === v}
+                onChange={() => setVariant(v)}
+              />
+              <code>{v}</code>
+            </label>
+          ))}
+        </fieldset>
+      )}
+    </>
   );
 };
 

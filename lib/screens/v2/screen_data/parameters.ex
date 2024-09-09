@@ -3,16 +3,17 @@ defmodule Screens.V2.ScreenData.Parameters do
 
   alias Screens.V2.CandidateGenerator
 
-  @type candidate_generator :: module()
-
-  @app_id_to_candidate_generator %{
+  @app_id_to_candidate_generators %{
     bus_eink_v2: CandidateGenerator.BusEink,
     bus_shelter_v2: CandidateGenerator.BusShelter,
     gl_eink_v2: CandidateGenerator.GlEink,
     busway_v2: CandidateGenerator.Busway,
     solari_large_v2: CandidateGenerator.SolariLarge,
     pre_fare_v2: CandidateGenerator.PreFare,
-    dup_v2: CandidateGenerator.Dup,
+    dup_v2: {
+      CandidateGenerator.Dup,
+      %{"new_departures" => CandidateGenerator.DupNew}
+    },
     triptych_v2: CandidateGenerator.Triptych
   }
 
@@ -38,16 +39,25 @@ defmodule Screens.V2.ScreenData.Parameters do
     triptych_v2: 0
   }
 
-  @spec get_candidate_generator(ScreensConfig.Screen.t() | atom()) :: candidate_generator()
-  def get_candidate_generator(%ScreensConfig.Screen{app_id: app_id}) do
-    get_candidate_generator(app_id)
+  @callback get_candidate_generator(ScreensConfig.Screen.t()) :: module()
+  @callback get_candidate_generator(ScreensConfig.Screen.t(), String.t() | nil) :: module()
+  def get_candidate_generator(%ScreensConfig.Screen{app_id: app_id}, variant \\ nil) do
+    case Map.get(@app_id_to_candidate_generators, app_id) do
+      {default, _variants} when is_nil(variant) -> default
+      {_default, variants} -> Map.fetch!(variants, variant)
+      default -> default
+    end
   end
 
-  def get_candidate_generator(app_id) do
-    Map.get(@app_id_to_candidate_generator, app_id)
+  @callback get_variants(ScreensConfig.Screen.t()) :: [String.t()]
+  def get_variants(%ScreensConfig.Screen{app_id: app_id}) do
+    case Map.get(@app_id_to_candidate_generators, app_id) do
+      {_default, variants} -> Map.keys(variants)
+      _default -> []
+    end
   end
 
-  @spec get_refresh_rate(ScreensConfig.Screen.t() | atom()) :: pos_integer() | nil
+  @callback get_refresh_rate(ScreensConfig.Screen.t() | atom()) :: pos_integer() | nil
   def get_refresh_rate(%ScreensConfig.Screen{app_id: app_id}) do
     get_refresh_rate(app_id)
   end

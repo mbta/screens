@@ -5,8 +5,8 @@ defmodule ScreensWeb.V2.ScreenApiController do
   alias Screens.Config.Cache
   alias Screens.LogScreenData
   alias Screens.Util
-  alias ScreensConfig.Screen
   alias Screens.V2.{ScreenAudioData, ScreenData}
+  alias ScreensConfig.Screen
 
   @base_response %{data: nil, disabled: false, force_reload: false}
   @disabled_response %{@base_response | disabled: true}
@@ -30,6 +30,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     is_screen = ScreensWeb.UserAgent.screen_conn?(conn, screen_id)
     screen_side = params["screen_side"]
     triptych_pane = params["pane"]
+    variant = params["variant"]
     screen = Cache.screen(screen_id)
 
     LogScreenData.log_data_request(
@@ -84,7 +85,8 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
         response =
           screen_id
-          |> ScreenData.get(
+          |> screen_response(variant,
+            run_all_variants?: true,
             update_visible_alerts?: true,
             logging_options: %{
               is_real_screen: is_screen,
@@ -92,15 +94,25 @@ defmodule ScreensWeb.V2.ScreenApiController do
               triptych_pane: triptych_pane
             }
           )
-          |> to_response(screen_id, screen)
+          |> put_extra_fields(screen_id, screen)
 
         json(conn, response)
     end
   end
 
+  defp screen_response(screen_id, "all", opts) do
+    {default, variants} = ScreenData.variants(screen_id, opts)
+    Map.put(%{@base_response | data: default}, :variants, variants)
+  end
+
+  defp screen_response(screen_id, variant, opts) do
+    data = ScreenData.get(screen_id, Keyword.put(opts, :generator_variant, variant))
+    %{@base_response | data: data}
+  end
+
   # Add extra fields used by the Mercury E-ink client
-  defp to_response(screen_data, screen_id, %Screen{app_id: :gl_eink_v2}) do
-    %{@base_response | data: screen_data}
+  defp put_extra_fields(response, screen_id, %Screen{app_id: :gl_eink_v2}) do
+    response
     # Used to enable audio readout without additional network requests
     # https://app.asana.com/0/1176097567827729/1205748798471858/f
     |> Map.put(:audio_data, fetch_ssml(screen_id))
@@ -109,7 +121,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     |> Map.put(:last_deploy_timestamp, Cache.last_deploy_timestamp())
   end
 
-  defp to_response(screen_data, _, _), do: %{@base_response | data: screen_data}
+  defp put_extra_fields(response, _, _), do: response
 
   defp fetch_ssml(screen_id) do
     case ScreenAudioData.by_screen_id(screen_id) do
@@ -139,6 +151,8 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   def simulation(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
+    variant = params["variant"]
+
     LogScreenData.log_data_request(
       screen_id,
       last_refresh,
@@ -157,8 +171,17 @@ defmodule ScreensWeb.V2.ScreenApiController do
         json(conn, @disabled_response)
 
       true ->
-        data_response(conn, ScreenData.simulation(screen_id))
+        json(conn, simulation_response(screen_id, variant))
     end
+  end
+
+  defp simulation_response(screen_id, "all") do
+    {default, variants} = ScreenData.simulation_variants(screen_id)
+    Map.put(%{@base_response | data: default}, :variants, variants)
+  end
+
+  defp simulation_response(screen_id, variant) do
+    %{@base_response | data: ScreenData.simulation(screen_id, generator_variant: variant)}
   end
 
   def show_pending(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
@@ -185,7 +208,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
             }
           )
 
-        data_response(conn, screen_data)
+        json(conn, %{@base_response | data: screen_data})
     end
   end
 
@@ -198,8 +221,12 @@ defmodule ScreensWeb.V2.ScreenApiController do
     )
 
     case get_pending_screen_config(screen_id) do
-      nil -> not_found_response(conn)
-      config -> data_response(conn, ScreenData.simulation(screen_id, pending_config: config))
+      nil ->
+        not_found_response(conn)
+
+      config ->
+        screen_data = ScreenData.simulation(screen_id, pending_config: config)
+        json(conn, %{@base_response | data: screen_data})
     end
   end
 
@@ -250,8 +277,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
   defp disabled?(screen_id) do
     Cache.disabled?(screen_id)
   end
-
-  defp data_response(conn, data), do: json(conn, %{@base_response | data: data})
 
   defp not_found_response(conn) do
     conn
