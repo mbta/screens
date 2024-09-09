@@ -6,6 +6,7 @@
   data-audio-readout-interval="<%= @audio_readout_interval %>"
   data-audio-interval-offset-seconds="<%= @audio_interval_offset_seconds %>"
   data-refresh-rate-offset="<%= @refresh_rate_offset %>"
+  data-variant="<%= @variant %>"
   data-is-real-screen="<%= @is_real_screen %>"
   data-is-pending="<%= @is_pending %>"
   data-sentry="<%= @sentry_dsn %>"

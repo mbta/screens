@@ -1,64 +1,121 @@
 defmodule Screens.V2.ScreenData do
   @moduledoc false
 
-  alias Screens.Config.Cache
   alias Screens.ScreensByAlert
   alias Screens.V2.AlertsWidget
-  alias Screens.V2.ScreenData.{Layout, Parameters}
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.Screen
+  alias __MODULE__.{ParallelRunSupervisor, Layout}
 
   import Screens.V2.Template.Guards, only: [is_slot_id: 1, is_paged_slot_id: 1]
 
+  @config_cache Application.compile_env(
+                  :screens,
+                  [__MODULE__, :config_cache_module],
+                  Screens.Config.Cache
+                )
+  @parameters Application.compile_env(
+                :screens,
+                [__MODULE__, :parameters_module],
+                Screens.V2.ScreenData.Parameters
+              )
+
   @type t :: %{type: atom()}
   @type simulation_data :: %{full_page: t(), flex_zone: [t()]}
+  @type variants(data) :: {data, %{String.t() => data}}
   @type screen_id :: String.t()
   @type options :: [
           logging_options: %{atom() => term()},
+          generator_variant: String.t(),
           pending_config: Screen.t(),
+          run_all_variants?: boolean(),
           update_visible_alerts?: boolean()
         ]
 
   @spec get(screen_id()) :: t()
   @spec get(screen_id(), options()) :: t()
   def get(screen_id, opts \\ []) do
-    config = get_config(screen_id, opts)
-
-    screen_id
-    |> generate_layout(config, opts)
-    |> resolve_paging(config)
-    |> serialize()
+    select_variant(screen_id, opts, &layout_to_data/2)
   end
 
   @spec simulation(screen_id()) :: simulation_data()
   @spec simulation(screen_id(), options()) :: simulation_data()
   def simulation(screen_id, opts \\ []) do
-    config = get_config(screen_id, opts)
-    layout = generate_layout(screen_id, config, opts)
+    select_variant(screen_id, opts, &layout_to_simulation_data/2)
+  end
 
+  @spec variants(screen_id()) :: variants(t())
+  @spec variants(screen_id(), options()) :: variants(t())
+  def variants(screen_id, opts \\ []) do
+    all_variants(screen_id, opts, &layout_to_data/2)
+  end
+
+  @spec simulation_variants(screen_id()) :: variants(simulation_data())
+  @spec simulation_variants(screen_id(), options()) :: variants(simulation_data())
+  def simulation_variants(screen_id, opts \\ []) do
+    all_variants(screen_id, opts, &layout_to_simulation_data/2)
+  end
+
+  @spec select_variant(screen_id(), options(), (Layout.t(), Screen.t() -> data)) :: data
+        when data: t() | simulation_data()
+  defp select_variant(screen_id, opts, then_fn) do
+    config = get_config(screen_id, opts)
+    selected_variant = Keyword.get(opts, :generator_variant)
+
+    if Keyword.get(opts, :run_all_variants?, false) do
+      other_variants = List.delete([nil | @parameters.get_variants(config)], selected_variant)
+
+      Enum.each(other_variants, fn variant ->
+        {:ok, _pid} =
+          Task.Supervisor.start_child(ParallelRunSupervisor, fn ->
+            config |> Layout.generate(variant, opts) |> then_fn.(config)
+          end)
+      end)
+    end
+
+    config
+    |> Layout.generate(selected_variant, opts)
+    |> tap(&update_visible_alerts(&1, screen_id, config, opts))
+    |> then_fn.(config)
+  end
+
+  @spec all_variants(screen_id(), options(), (Layout.t(), Screen.t() -> data)) ::
+          {data, %{atom() => data}}
+        when data: t() | simulation_data()
+  defp all_variants(screen_id, opts, then_fn) do
+    config = get_config(screen_id, opts)
+
+    ParallelRunSupervisor
+    |> Task.Supervisor.async_stream(
+      [nil | @parameters.get_variants(config)],
+      fn variant ->
+        {variant, config |> Layout.generate(variant, opts) |> then_fn.(config)}
+      end
+    )
+    |> Enum.map(fn {:ok, result} -> result end)
+    |> Enum.split(1)
+    |> then(fn {[{nil, default}], variants} -> {default, Map.new(variants)} end)
+  end
+
+  defp get_config(screen_id, opts),
+    do: Keyword.get_lazy(opts, :pending_config, fn -> @config_cache.screen(screen_id) end)
+
+  @spec layout_to_data(Layout.t(), Screen.t()) :: t()
+  defp layout_to_data(layout, config) do
+    layout |> resolve_paging(config) |> serialize()
+  end
+
+  @spec layout_to_simulation_data(Layout.t(), Screen.t()) :: simulation_data()
+  defp layout_to_simulation_data(layout, config) do
     %{
       full_page: layout |> resolve_paging(config) |> serialize(),
       flex_zone: layout |> serialize_paged_slots(config.app_id)
     }
   end
 
-  defp get_config(screen_id, opts),
-    do: Keyword.get_lazy(opts, :pending_config, fn -> Cache.screen(screen_id) end)
-
-  defp generate_layout(screen_id, config, opts) do
-    config
-    |> Layout.generate(opts)
-    |> tap(
-      &if(
-        Keyword.get(opts, :update_visible_alerts?, false),
-        do: update_visible_alerts(&1, screen_id, config)
-      )
-    )
-  end
-
   defp resolve_paging(layout, config),
-    do: Layout.resolve_paging(layout, Parameters.get_refresh_rate(config))
+    do: Layout.resolve_paging(layout, @parameters.get_refresh_rate(config))
 
   @spec serialize(Layout.non_paged()) :: map() | nil
   def serialize({layout, instance_map, paging_metadata}) do
@@ -136,15 +193,19 @@ defmodule Screens.V2.ScreenData do
     end
   end
 
-  def update_visible_alerts(_, _, %Screen{hidden_from_screenplay: true}), do: :ok
+  def update_visible_alerts(_, _, %Screen{hidden_from_screenplay: true}, _opts), do: :ok
 
-  def update_visible_alerts({_layout, instance_map}, screen_id, _config) do
-    alert_ids =
-      instance_map
-      |> Map.values()
-      |> Enum.flat_map(&AlertsWidget.alert_ids/1)
+  def update_visible_alerts({_layout, instance_map}, screen_id, _config, opts) do
+    if Keyword.get(opts, :update_visible_alerts?, false) do
+      alert_ids =
+        instance_map
+        |> Map.values()
+        |> Enum.flat_map(&AlertsWidget.alert_ids/1)
 
-    :ok = ScreensByAlert.put_data(screen_id, alert_ids)
+      ScreensByAlert.put_data(screen_id, alert_ids)
+    end
+
+    :ok
   end
 
   defp paged_slot_key({paged_slot_id, _}, :pre_fare_v2), do: Template.get_slot_id(paged_slot_id)

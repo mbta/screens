@@ -6,12 +6,17 @@ defmodule Screens.V2.ScreenData.Layout do
   require Logger
 
   alias Screens.Util
-  alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.Screen
 
   import Template.Guards, only: [is_paged: 1, is_paged_slot_id: 1, is_non_paged_slot_id: 1]
+
+  @parameters Application.compile_env(
+                :screens,
+                [Screens.V2.ScreenData, :parameters_module],
+                Screens.V2.ScreenData.Parameters
+              )
 
   @type t :: {Template.layout(), %{Template.slot_id() => WidgetInstance.t()}}
   @type non_paged ::
@@ -26,9 +31,10 @@ defmodule Screens.V2.ScreenData.Layout do
         }
 
   @spec generate(Screen.t()) :: t()
-  @spec generate(Screen.t(), keyword()) :: t()
-  def generate(config, candidate_generator_opts \\ []) do
-    candidate_generator = Parameters.get_candidate_generator(config)
+  @spec generate(Screen.t(), String.t() | nil) :: t()
+  @spec generate(Screen.t(), String.t() | nil, keyword()) :: t()
+  def generate(config, variant \\ nil, candidate_generator_opts \\ []) do
+    candidate_generator = @parameters.get_candidate_generator(config, variant)
     screen_template = candidate_generator.screen_template()
 
     config

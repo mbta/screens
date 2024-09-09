@@ -160,3 +160,7 @@ config :screens, :screens_by_alert,
   screens_by_alert_ttl_seconds: 2,
   screens_last_updated_ttl_seconds: 2,
   screens_ttl_seconds: 1
+
+config :screens, Screens.V2.ScreenData,
+  config_cache_module: Screens.Config.MockCache,
+  parameters_module: Screens.V2.ScreenData.MockParameters

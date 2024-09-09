@@ -17,18 +17,16 @@ const OUTFRONT_BASE_URI = "https://screens.mbta.com";
 
 type SimulationResponse = { full_page: WidgetData; flex_zone: WidgetData[] };
 
-type RawResponse = {
-  data: SimulationResponse | WidgetData | null;
-  disabled: boolean;
-  force_reload: boolean;
+type DataResponse<T extends SimulationResponse | WidgetData> = {
+  data: T;
+  variants?: Record<string, T>;
 };
 
 type SimulationData = { fullPage: WidgetData; flexZone: WidgetData[] };
 
-type ApiResponse =
-  // The request was successful.
-  | { state: "success"; data: WidgetData }
-  | { state: "simulation_success"; data: SimulationData }
+type Success = { state: "success"; data: WidgetData };
+type SimulationSuccess = { state: "simulation_success"; data: SimulationData };
+type NonSuccess =
   // The request was successful, but this screen is disabled via config.
   | { state: "disabled" }
   // Either:
@@ -36,29 +34,52 @@ type ApiResponse =
   // - The server responded, but did not successfully fetch data. Riders may
   //   still be able to find data from other sources.
   | { state: "failure" }
+  // Initial state when no data has been received yet.
   | { state: "loading" };
+
+type ApiResponse = Success | SimulationSuccess | NonSuccess;
+
+type ApiResponseWithVariants =
+  | (Success & { variants?: Record<string, WidgetData> })
+  | (SimulationSuccess & { variants?: Record<string, SimulationData> })
+  | NonSuccess;
 
 const FAILURE_RESPONSE: ApiResponse = { state: "failure" };
 const LOADING_RESPONSE: ApiResponse = { state: "loading" };
 
-const rawResponseToApiResponse = (response: RawResponse): ApiResponse => {
-  if (response.disabled) {
+const parseRawResponse = (json): ApiResponseWithVariants => {
+  if (json.disabled) {
     return { state: "disabled" };
-  } else if (response.data) {
-    const data = response.data;
+  } else if (json.data) {
+    if ("full_page" in json.data) {
+      const { data, variants } = json as DataResponse<SimulationResponse>;
 
-    if ("full_page" in data) {
       return {
         state: "simulation_success",
-        data: { fullPage: data.full_page, flexZone: data.flex_zone },
+        data: parseSimulationResponse(data),
+        variants: Object.fromEntries(
+          Object.entries(variants ?? {}).map(([variant, data]) => [
+            variant,
+            parseSimulationResponse(data),
+          ]),
+        ),
       };
     } else {
-      return { state: "success", data };
+      const { data, variants } = json as DataResponse<WidgetData>;
+      return { state: "success", data, variants };
     }
   } else {
     return { state: "failure" };
   }
 };
+
+const parseSimulationResponse = ({
+  full_page,
+  flex_zone,
+}: SimulationResponse): SimulationData => ({
+  fullPage: full_page,
+  flexZone: flex_zone,
+});
 
 const doFailureBuffer = (
   lastSuccess: number | null,
@@ -87,8 +108,9 @@ const doFailureBuffer = (
   }
 };
 
-const isSuccess = (response: ApiResponse) =>
-  response != null &&
+const isSuccess = (
+  response: ApiResponse,
+): response is Success | SimulationSuccess =>
   ["success", "simulation_success"].includes(response.state);
 
 const loggingParams = () => {
@@ -127,6 +149,7 @@ const useApiPath = (screenId: string, appendPath?: string): string => {
       requestor:
         getDatasetValue("requestor") ?? (isRealScreen() ? "real_screen" : null),
       screen_side: getScreenSide(),
+      variant: getDatasetValue("variant"),
       ...loggingParams(),
     };
 
@@ -158,22 +181,20 @@ const useBaseApiResponse = (
     try {
       const now = Date.now();
       const result = await fetch(apiPath);
-      const rawResponse: RawResponse = await result.json();
+      const json = await result.json();
 
-      if (rawResponse.force_reload) {
-        window.location.reload();
-      }
+      if (json.force_reload) window.location.reload();
 
-      const apiResponse = rawResponseToApiResponse(rawResponse);
+      const response = parseRawResponse(json);
 
-      if (apiResponse.state == "failure") {
-        doFailureBuffer(lastSuccess, setApiResponse, apiResponse);
+      if (response.state == "failure") {
+        doFailureBuffer(lastSuccess, setApiResponse, response);
       } else {
         setApiResponse((prevApiResponse) => {
           if (!isSuccess(prevApiResponse)) {
             SentryLogger.info("Exiting no-data state.");
           }
-          return apiResponse;
+          return response;
         });
         setLastSuccess(now);
       }
@@ -184,12 +205,12 @@ const useBaseApiResponse = (
     setRequestCount((count) => count + 1);
   };
 
-  // Fetch data immediately, and if the path we should fetch changes
+  // Fetch data once, immediately, on page load
   useEffect(() => {
     fetchData();
-  }, [apiPath]);
+  }, []);
 
-  // Schedule subsequent data fetches based on refresh rate+offset
+  // Schedule subsequent data fetches, if we need to
   useDriftlessInterval(
     () => {
       fetchData();
@@ -198,9 +219,46 @@ const useBaseApiResponse = (
     refreshRateOffsetMs,
   );
 
+  const variant = useInspectorVariant();
   useInspectorControls(fetchData, lastSuccess);
 
-  return { apiResponse, requestCount, lastSuccess };
+  return {
+    apiResponse: selectVariant(apiResponse, variant),
+    requestCount,
+    lastSuccess,
+  };
+};
+
+const selectVariant = (
+  response: ApiResponseWithVariants,
+  variant: string | null,
+): ApiResponse => {
+  if (variant && isSuccess(response) && response.variants) {
+    if (variant in response.variants) {
+      // This seems like it should be replacable with a less "mutable" approach
+      // such as `return { ...response, data: response.variants[variant] }`, but
+      // the compiler can't work out that the types are compatible. Maybe check
+      // this again once we upgrade to TypeScript 5.
+      const copy = { ...response };
+      copy.data = response.variants[variant];
+      delete copy.variants;
+      return copy;
+    } else {
+      return FAILURE_RESPONSE;
+    }
+  } else {
+    return response;
+  }
+};
+
+const useInspectorVariant = (): string | null => {
+  const [variant, setVariant] = useState<string | null>(null);
+
+  useReceiveFromInspector((message) => {
+    if (message.type == "set_data_variant") setVariant(message.variant);
+  });
+
+  return variant;
 };
 
 const useInspectorControls = (

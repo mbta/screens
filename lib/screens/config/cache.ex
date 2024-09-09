@@ -3,16 +3,16 @@ defmodule Screens.Config.Cache do
   Functions to read data from a cached copy of the screens config.
   """
 
-  alias ScreensConfig.{Config, Devops}
+  alias ScreensConfig.{Config, Devops, Screen}
 
   use Screens.Cache.Client, table: :screens_config
 
   @type table_contents :: list(table_entry)
 
   @type table_entry ::
-          {{:screen, screen_id :: String.t()}, ScreensConfig.Screen.t()}
+          {{:screen, screen_id :: String.t()}, Screen.t()}
           | {:last_deploy_timestamp, DateTime.t()}
-          | {:devops, ScreensConfig.Devops.t()}
+          | {:devops, Devops.t()}
 
   def ok?, do: table_exists?()
 
@@ -67,6 +67,7 @@ defmodule Screens.Config.Cache do
     end
   end
 
+  @callback screen(id :: String.t()) :: Screen.t() | nil
   def screen(screen_id) do
     with_table default: nil do
       case :ets.match(@table, {{:screen, screen_id}, :"$1"}) do
