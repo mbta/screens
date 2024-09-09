@@ -265,7 +265,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @doc """
   Groups all departures of the same route and headsign.
-  If a group has two departures less than 2 minutes away, read both, otherwise only read the closest departure.
+  If a group's first departure is less than 2 minutes away, read two departures, otherwise only read the first departure.
   `notice` rows are never grouped.
 
   The list is ordered by the occurrence of the _first_ departure of each group--later departures can "leap frog"
@@ -286,18 +286,15 @@ defmodule Screens.V2.WidgetInstance.Departures do
       {ref, [notice]} when is_reference(ref) ->
         {:notice, notice}
 
-      {_key, departure_group} ->
-        [first_departure | other_departures] = departure_group
+      {_key, [first_departure | _] = departure_group} ->
+        departures =
+          if first_departure |> Departure.time() |> DateTime.diff(now, :minute) <= 2 do
+            Enum.take(departure_group, 2)
+          else
+            [first_departure]
+          end
 
-        additional_departure =
-          other_departures
-          |> Enum.filter(fn departure ->
-            time = Departure.time(departure)
-            DateTime.diff(time, now, :minute) <= 2
-          end)
-          |> Enum.take(1)
-
-        {:normal, [first_departure] ++ additional_departure}
+        {:normal, departures}
     end)
   end
 

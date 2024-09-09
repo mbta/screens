@@ -973,7 +973,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
              } = Departures.audio_serialize_section(section, nil, now)
     end
 
-    test "returns 1 departure time if all other times are > 2 minutes away" do
+    test "returns 1 departure time if first departure is > 2 minutes away" do
       now = ~U[2020-01-01T00:00:00Z]
 
       section = %{
@@ -981,7 +981,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         rows: [
           %Departure{
             prediction: %Prediction{
-              arrival_time: ~U[2020-01-01T00:01:00Z],
+              arrival_time: ~U[2020-01-01T00:05:00Z],
               route: %Route{type: :subway},
               trip: %Trip{headsign: "Test"},
               stop: %Stop{id: "place-test"}
@@ -1009,7 +1009,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                     headsign: %{headsign: "Test", variation: nil},
                     route: %{track_number: nil, vehicle_type: :train, route_text: nil},
                     times_with_crowding: [
-                      %{id: nil, time: %{type: :minutes, minutes: 1}, crowding: nil}
+                      %{id: nil, time: %{type: :minutes, minutes: 5}, crowding: nil}
                     ],
                     inline_alerts: []
                   }}
