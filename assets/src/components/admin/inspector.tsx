@@ -315,11 +315,9 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
     [dialogRef, ssml],
   );
 
-  let audioPath: string | null = null;
-
-  if (AUDIO_SCREEN_TYPES.has(screen.config.app_id)) {
-    audioPath = `/v2/audio/${screen.id}`;
-  }
+  const audioPath = AUDIO_SCREEN_TYPES.has(screen.config.app_id)
+    ? `/v2/audio/${screen.id}`
+    : null;
 
   return (
     <fieldset>

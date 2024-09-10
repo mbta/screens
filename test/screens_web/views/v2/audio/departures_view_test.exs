@@ -43,6 +43,132 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
     end
   end
 
+  describe "normal sections" do
+    test "always read GL headsign" do
+      assigns = %{
+        sections: [
+          %{
+            type: :normal_section,
+            header: nil,
+            departure_groups: [
+              normal: %{
+                type: :departure_row,
+                times_with_crowding: [
+                  %{
+                    id: "test1",
+                    time: %{type: :minutes, minutes: 1},
+                    crowding: nil
+                  },
+                  %{
+                    id: "test2",
+                    time: %{type: :minutes, minutes: 6},
+                    crowding: nil
+                  }
+                ],
+                route: %{
+                  vehicle_type: :train,
+                  track_number: nil,
+                  route_text: "Green Line B"
+                },
+                headsign: %{headsign: "Boston College", variation: nil},
+                inline_alerts: []
+              },
+              normal: %{
+                type: :departure_row,
+                times_with_crowding: [
+                  %{
+                    id: "test3",
+                    time: %{type: :minutes, minutes: 1},
+                    crowding: nil
+                  },
+                  %{
+                    id: "test4",
+                    time: %{type: :minutes, minutes: 6},
+                    crowding: nil
+                  }
+                ],
+                route: %{
+                  vehicle_type: :train,
+                  track_number: nil,
+                  route_text: "Red Line"
+                },
+                headsign: %{headsign: "Alewife", variation: nil},
+                inline_alerts: []
+              }
+            ]
+          }
+        ]
+      }
+
+      assert render(assigns) =~
+               "The next Green Line B train to Boston College arrives in 1 minute"
+
+      assert render(assigns) =~
+               "The following Green Line B train to Boston College arrives in 6 minutes"
+
+      assert render(assigns) =~
+               "The next Red Line train to Alewife arrives in 1 minute"
+
+      assert render(assigns) =~
+               "The following Red Line train arrives in 6 minutes"
+    end
+
+    test "reads track_number as 'at berth' for bus and 'on track' for CR" do
+      assigns = %{
+        sections: [
+          %{
+            type: :normal_section,
+            header: nil,
+            departure_groups: [
+              normal: %{
+                type: :departure_row,
+                times_with_crowding: [
+                  %{
+                    id: "test1",
+                    time: %{type: :text, text: "BRD"},
+                    crowding: 1
+                  }
+                ],
+                route: %{vehicle_type: :bus, track_number: "E", route_text: "73"},
+                headsign: %{headsign: "Waverley", variation: nil},
+                inline_alerts: []
+              },
+              normal: %{
+                type: :departure_row,
+                times_with_crowding: [
+                  %{
+                    id: "test3",
+                    time: %{
+                      type: :timestamp,
+                      minute: 31,
+                      hour: 12,
+                      am_pm: :pm,
+                      show_am_pm: false
+                    },
+                    crowding: nil
+                  }
+                ],
+                route: %{
+                  vehicle_type: :train,
+                  track_number: "5",
+                  route_text: "Needham Line"
+                },
+                headsign: %{headsign: "South Station", variation: nil},
+                inline_alerts: []
+              }
+            ]
+          }
+        ]
+      }
+
+      assert render(assigns) =~
+               "The next <say-as interpret-as=\"address\">73</say-as> bus to Waverley at berth E"
+
+      assert render(assigns) =~
+               "The next Needham Line train to South Station on track 5"
+    end
+  end
+
   ## helpers
 
   defp render(data) do
