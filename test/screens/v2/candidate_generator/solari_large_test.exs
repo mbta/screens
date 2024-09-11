@@ -32,7 +32,7 @@ defmodule Screens.V2.CandidateGenerator.SolariLargeTest do
 
   describe "candidate_instances/2" do
     test "returns expected header", %{config: config} do
-      departures_instances_fn = fn _ -> [] end
+      departures_instances_fn = fn _, _ -> [] end
       now = ~U[2020-04-06T10:00:00Z]
       opts = []
 

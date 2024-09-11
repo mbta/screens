@@ -54,7 +54,7 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
 
   describe "candidate_instances/3" do
     test "returns expected header", %{config: config} do
-      departures_instances_fn = fn _ -> [] end
+      departures_instances_fn = fn _, _ -> [] end
       alerts_instances_fn = fn _ -> [] end
       fetch_stop_fn = fn "1722" -> "1624 Blue Hill Ave @ Mattapan Sq" end
       now = ~U[2020-04-06T10:00:00Z]
