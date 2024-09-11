@@ -265,7 +265,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @doc """
   Groups all departures of the same route and headsign.
-  If a group's first departure is less than 2 minutes away, read two departures, otherwise only read the first departure.
   `notice` rows are never grouped.
 
   The list is ordered by the occurrence of the _first_ departure of each group--later departures can "leap frog"
