@@ -218,7 +218,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     serialized_departure_groups =
       departures
-      |> group_all_departures(now, 2, screen.app_id)
+      |> group_all_departures(now, screen.app_id)
       |> Enum.map(&audio_serialize_departure_group(&1, screen, now))
 
     %{
@@ -263,24 +263,21 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end)
   end
 
-  @doc """
-  Groups all departures of the same route and headsign.
-  `notice` rows are never grouped.
+  # Groups all departures of the same route and headsign.
+  # `notice` rows are never grouped.
 
-  The list is ordered by the occurrence of the _first_ departure of each group--later departures can "leap frog"
-  ahead of other ones of a different route/headsign if there's an earlier departure of the same route/headsign.
-  """
+  # The list is ordered by the occurrence of the _first_ departure of each group--later departures can "leap frog"
+  # ahead of other ones of a different route/headsign if there's an earlier departure of the same route/headsign.
   @spec group_all_departures(
           list(Departure.t() | notice),
           DateTime.t(),
-          integer(),
           Screen.app_id()
         ) ::
           list(
             {:normal, list(Departure.t())}
             | {:notice, notice}
           )
-  def group_all_departures(departures, now, max_entries_per_group, app_id) do
+  defp group_all_departures(departures, now, app_id) do
     departures
     |> Util.group_by_with_order(fn
       %{text: %FreeTextLine{}} -> make_ref()
@@ -295,7 +292,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           if app_id == :busway_v2 do
             filter_departure_group(departure_group, now)
           else
-            Enum.take(departure_group, max_entries_per_group)
+            Enum.take(departure_group, 2)
           end
 
         {:normal, departures}
