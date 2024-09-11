@@ -66,6 +66,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
                   }
                 ],
                 route: %{
+                  id: "Green-B",
                   vehicle_type: :train,
                   track_number: nil,
                   route_text: "Green Line B"
@@ -88,6 +89,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
                   }
                 ],
                 route: %{
+                  id: "Red",
                   vehicle_type: :train,
                   track_number: nil,
                   route_text: "Red Line"
@@ -129,7 +131,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
                     crowding: 1
                   }
                 ],
-                route: %{vehicle_type: :bus, track_number: "E", route_text: "73"},
+                route: %{id: "73", vehicle_type: :bus, track_number: "E", route_text: "73"},
                 headsign: %{headsign: "Waverley", variation: nil},
                 inline_alerts: []
               },
@@ -149,6 +151,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
                   }
                 ],
                 route: %{
+                  id: "CR-Needham",
                   vehicle_type: :train,
                   track_number: "5",
                   route_text: "Needham Line"

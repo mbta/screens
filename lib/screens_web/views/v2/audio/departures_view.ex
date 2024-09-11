@@ -66,7 +66,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
 
   defp render_time_with_crowding({%{crowding: crowding, time: time}, _}, route, headsign) do
     route_headsign_rendered =
-      if String.starts_with?(route.route_text, "Green Line") do
+      if String.starts_with?(route.id, "Green") do
         render_route_headsign(route, headsign)
       else
         render_route_headsign(route, nil)

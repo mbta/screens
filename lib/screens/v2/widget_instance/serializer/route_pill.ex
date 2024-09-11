@@ -31,6 +31,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
         }
 
   @type audio_route :: %{
+          id: Route.id(),
           route_text: String.t(),
           vehicle_type: :train | :bus | :trolley | :ferry | nil,
           track_number: pos_integer() | nil
@@ -98,6 +99,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
       end
 
     %{
+      id: route_id,
       route_text: route_name,
       vehicle_type: vehicle_type,
       track_number: track_number
